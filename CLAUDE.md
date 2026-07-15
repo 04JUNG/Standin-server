@@ -55,7 +55,8 @@ webtoon-pose-mvp/
 │  └─ models.py          Pydantic 응답 모델 = 문서화된 계약
 ├─ docs/
 │  ├─ API_CONTRACT.md     전체 HTTP 계약(/analyze·/pose·/healthz) + 앱서버 경계·불일치
-│  ├─ DECISIONS.md        DB·라이브러리 저장·동원 핸드오프 결정(읽어볼 것)
+│  ├─ DECISIONS.md        DB·라이브러리 저장·동원 핸드오프·BFF 분리 결정(읽어볼 것)
+│  ├─ BFF_DESIGN.md       앱 서버(BFF) 구현 설계(Python/FastAPI)
 │  ├─ EXPORT_CONTRACT.md  동원 Export 주문서 JSON 형식·예시
 │  ├─ SEARCH_EVAL_2026-07-14.md  검색 정성평가 리포트(실데이터 14컷)
 │  ├─ COLLABORATION.md    브랜치·커밋·PR·소유 경계·env 규칙

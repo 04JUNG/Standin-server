@@ -67,7 +67,8 @@ uvicorn api.app:app --reload          # http://127.0.0.1:8000/docs 에서 계약
 2. [`README-vlm-search.md`](README-vlm-search.md) — 스캐폴드 실행법·모듈↔단계 표
 3. [`docs/API_CONTRACT.md`](docs/API_CONTRACT.md) — 전체 HTTP 계약 + 앱 서버 경계·불일치
 4. [`docs/EXPORT_CONTRACT.md`](docs/EXPORT_CONTRACT.md) — 동원 Export 주문서(`/export-order`) 형식
-5. [`docs/DECISIONS.md`](docs/DECISIONS.md) — DB·라이브러리 저장·핸드오프 결정(ADR)
+5. [`docs/DECISIONS.md`](docs/DECISIONS.md) — DB·라이브러리 저장·핸드오프·앱서버(BFF) 분리 결정(ADR)
+   - [`docs/BFF_DESIGN.md`](docs/BFF_DESIGN.md) — 앱 서버(BFF) 구현 설계(Python/FastAPI)
 6. [`docs/SEARCH_EVAL_2026-07-14.md`](docs/SEARCH_EVAL_2026-07-14.md) — 실데이터 검색 정성평가
 7. [`docs/COLLABORATION.md`](docs/COLLABORATION.md) — 브랜치·커밋·PR·소유 경계·env 규칙
 8. [`docs/QA_SECURITY_RELEASE.md`](docs/QA_SECURITY_RELEASE.md) — 보안(키·라이선스·무인증 경계)·테스트·릴리스
