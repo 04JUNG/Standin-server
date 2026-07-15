@@ -1,0 +1,21 @@
+# --- 코어(스캐폴드 실행) ---
+numpy>=1.24
+
+# --- API 레이어 ---
+fastapi>=0.110
+uvicorn[standard]>=0.29
+python-multipart>=0.0.9      # UploadFile(멀티파트) 처리
+Pillow>=10.0                 # 업로드 PNG 로드
+
+# DB: SQLite는 파이썬 표준 라이브러리(sqlite3) — 별도 설치 불필요
+
+# --- 실제 모델 연결 시(선택) ---
+# google-genai>=1.0           # Gemini(현행 SDK). GEMINI_MODEL=gemini-2.5-flash 등
+# openai>=1.40                # gpt-5-mini 대안
+# rtmlib>=0.0.13              # RTMPose Body(17kp)
+# onnxruntime>=1.17
+# opencv-python>=4.9
+# bvhio>=2.0                  # 실 BVH 파싱(library.load_bvh_pose)
+# --- 스케일업 시 DB 교체(선택) ---
+# lancedb                     # 임베디드 벡터DB(서버리스, 필터+벡터)
+# psycopg[binary] + pgvector  # 앱팀 Postgres와 공유할 경우
