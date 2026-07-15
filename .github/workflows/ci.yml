@@ -1,0 +1,21 @@
+name: CI
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [develop]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install deps (core only)
+        run: pip install numpy
+      - name: Syntax/build check
+        run: python -m compileall src api scripts
+      - name: Smoke test (mock, no API/model)
+        run: python tests/test_smoke.py

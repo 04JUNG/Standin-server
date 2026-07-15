@@ -1,0 +1,43 @@
+# 라이브러리 데이터: Mixamo/CMU 재배포 금지 조항 → 공개 레포에 커밋 금지
+data/bvh/
+data/*.db
+data/*.db-journal
+data/index.pkl
+
+# 테스트 러프/입력 이미지(작가 저작물일 수 있음)
+rough*.png
+
+# 루트에 생기는 생성물 이미지(eval/audit/sheet/libcheck 등)
+/*.png
+
+# 모델 가중치(용량 큼, 각자 다운로드)
+*.onnx
+
+# 기타 생성물
+tags.csv
+
+# 시크릿 — API 키 절대 커밋 금지
+.env
+.env.*
+!.env.example
+*.key
+
+# Claude Code 개인 설정
+.claude/settings.local.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE 개인 설정
+.vscode/
+.idea/
+*.pem
