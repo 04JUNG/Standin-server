@@ -23,7 +23,8 @@ import numpy as np
 from .schema import VLMAnalysis, CutResult, Shot
 from .config import CFG
 from .vlm.client import build_vlm_client, BaseVLMClient
-from .detect import MockDetector, reconcile
+from .detect import (MockDetector, pick_uncovered, reconcile, reconcile_count,
+                     skeleton_to_bbox)
 from .pose import build_pose_model
 from .routing import route
 from .descriptor import build_descriptors
@@ -54,6 +55,9 @@ class Pipeline:
             return CutResult(route="bust", count_confidence="n/a",
                              detector_count=0, vlm_count=vlm.num_people,
                              notes=["흉상 컷 → 상체 방향·앵글(MVP 후순위). 검색 스킵."])
+
+        if getattr(self.pose, "self_detecting", False):
+            return self._process_self_detecting(image, img_w, img_h, vlm)
 
         # 3) 검출 + VLM 사람 수 보정 (개수 일치=신뢰도 신호)
         det_boxes = self.detector.detect(image, img_w, img_h)
@@ -87,8 +91,49 @@ class Pipeline:
             f"low/폴백={n_low}, top_k={CFG.top_k_final})")
         return result
 
+    def _process_self_detecting(self, image, img_w: int, img_h: int,
+                                vlm: VLMAnalysis) -> CutResult:
+        """RTMPose Body path: pose inference itself is the first detection pass."""
+        skeletons = self.pose.estimate(image, None, img_w, img_h)
+        boxes = [skeleton_to_bbox(skel) for skel in skeletons]
+        rec = reconcile_count(len(skeletons), vlm.num_people)
+        missing = vlm.num_people - len(skeletons)
+        if missing > 0 and vlm.approx_boxes:
+            rescued = 0
+            for box in pick_uncovered(vlm.approx_boxes, boxes, missing):
+                skel = self.pose.estimate_crop(image, box, img_w, img_h)
+                if skel is not None:
+                    skeletons.append(skel)
+                    boxes.append(skeleton_to_bbox(skel))
+                    rescued += 1
+            if rescued:
+                rec["notes"].append(
+                    f"놓친 {missing}명 중 {rescued}명 VLM 대략 박스로 복원(저신뢰 유지)")
+
+        descs = build_descriptors(vlm, skeletons, boxes)
+        result = CutResult(route="core", count_confidence=rec["confidence"],
+                           detector_count=rec["detector_count"],
+                           vlm_count=vlm.num_people, descriptors=descs,
+                           notes=list(rec["notes"]))
+        fallback_distance = CFG.fallback_distance * (
+            0.7 if rec["confidence"] == "low" else 1.0)
+        for index, desc in enumerate(descs):
+            skel = skeletons[index] if index < len(skeletons) else None
+            candidates, confidence, reason = self._search_one(
+                desc, skel, fallback_distance)
+            result.person_candidates.append(candidates)
+            result.person_confidence.append(confidence)
+            if reason:
+                result.notes.append(f"인물 {index}: {reason}")
+        result.candidates = result.person_candidates[0] if result.person_candidates else []
+        low_count = result.person_confidence.count("low")
+        result.notes.append(
+            f"인물 {len(descs)}명 처리 (high={result.person_confidence.count('high')}, "
+            f"low/폴백={low_count}, top_k={CFG.top_k_final})")
+        return result
+
     # ---- 인물 1명: 스켈레톤 → 기하검색 → 신뢰도 판정 ----
-    def _search_one(self, desc, skel):
+    def _search_one(self, desc, skel, fallback_distance=None):
         # (a) 추출 실패(얽힘·심한 가림): score 평균이 낮으면 폴백
         if skel is None or float(np.mean(skel.scores)) < CFG.min_skeleton_score:
             return [], "low", "스켈레톤 추출 실패 → 폴백(작가)"
@@ -98,7 +143,8 @@ class Pipeline:
             return [], "low", "후보 없음 → 폴백"
 
         # (b) 라이브러리 공백/얽힘: Top-1 거리가 임계 초과면 확신 없음
-        if cands[0].distance > CFG.fallback_distance:
+        threshold = CFG.fallback_distance if fallback_distance is None else fallback_distance
+        if cands[0].distance > threshold:
             return cands, "low", (f"Top-1 거리 {cands[0].distance:.2f} > "
-                                  f"{CFG.fallback_distance} → 저신뢰(폴백 권장)")
+                                  f"{threshold} → 저신뢰(폴백 권장)")
         return cands, "high", None

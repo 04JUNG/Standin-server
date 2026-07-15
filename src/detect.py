@@ -10,12 +10,31 @@
 """
 from __future__ import annotations
 
-from typing import List
+from typing import List, Tuple
 
 import numpy as np
 
-from .schema import BBox, VLMAnalysis
+from .schema import BBox, Skeleton, VLMAnalysis
 from .config import CFG
+
+
+def hint_count(image) -> Tuple[int, bool]:
+    hint = str(getattr(image, "hint", image) if isinstance(image, str)
+               else getattr(image, "hint", "")).lower()
+    n = 2 if ("2p" in hint or "2인" in hint or "two" in hint) else 1
+    return n, ("miss" in hint)
+
+
+def mock_person_boxes(image, img_w: int, img_h: int) -> List[BBox]:
+    n, missing = hint_count(image)
+    if missing:
+        n = max(0, n - 1)
+    boxes = []
+    for i in range(n):
+        x1 = (0.1 + 0.45 * i) * img_w
+        boxes.append(BBox(x1, 0.12*img_h, x1 + 0.4*img_w, 0.93*img_h,
+                          source="detector", score=0.9))
+    return boxes
 
 
 class BaseDetector:
@@ -29,6 +48,7 @@ class MockDetector(BaseDetector):
     개수 불일치 → VLM 보정 경로를 테스트할 수 있게 한다.
     """
     def detect(self, image, img_w: int, img_h: int) -> List[BBox]:
+        return mock_person_boxes(image, img_w, img_h)
         hint = str(getattr(image, "hint", image) if isinstance(image, str)
                    else getattr(image, "hint", "")).lower()
         n = 2 if ("2p" in hint or "2인" in hint or "two" in hint) else 1
@@ -45,8 +65,48 @@ class MockDetector(BaseDetector):
 class RTMLibDetector(BaseDetector):
     """실제 검출기 자리. rtmlib의 Body가 내부 검출을 포함하므로 보통 pose.py와 함께 쓴다.
     별도 검출기(YOLO 등)를 붙이려면 여기 구현."""
+    def __init__(self):
+        from rtmlib import Body
+        self.model = Body(mode="performance", backend="onnxruntime", device="cpu")
+
     def detect(self, image, img_w: int, img_h: int) -> List[BBox]:
+        import cv2
+        if isinstance(image, str):
+            img = cv2.imdecode(np.fromfile(image, dtype=np.uint8), cv2.IMREAD_COLOR)
+            if img is None:
+                raise FileNotFoundError(f"image load failed: {image}")
+        elif isinstance(image, np.ndarray):
+            img = image
+        else:
+            img = np.asarray(image.convert("RGB"))[:, :, ::-1]
+        kpts, scores = self.model(np.ascontiguousarray(img))
+        return [skeleton_to_bbox(Skeleton(np.asarray(k), np.asarray(s)))
+                for k, s in zip(kpts, scores)]
         raise NotImplementedError("실제 검출기 연결 지점(TODO): YOLO/RTMDet 등")
+
+
+def skeleton_to_bbox(skel: Skeleton, kpt_thr: float = 0.3) -> BBox:
+    kp = np.asarray(skel.keypoints, dtype=np.float32).reshape(-1, 2)
+    sc = np.asarray(skel.scores, dtype=np.float32).reshape(-1)
+    visible = kp[sc >= kpt_thr]
+    if len(visible) == 0:
+        visible = kp
+    x1, y1 = visible.min(axis=0)
+    x2, y2 = visible.max(axis=0)
+    return BBox(float(x1), float(y1), float(x2), float(y2),
+                source="pose", score=float(sc.mean()) if len(sc) else 0.0)
+
+
+def reconcile_count(det_count: int, vlm_count: int) -> dict:
+    if det_count == vlm_count:
+        return {"confidence": "high", "detector_count": det_count,
+                "vlm_count": vlm_count,
+                "notes": [f"개수 일치(det={det_count}, vlm={vlm_count}) → 신뢰"]}
+    notes = [f"개수 불일치(det={det_count}, vlm={vlm_count}) → 저신뢰(폴백 후보)"]
+    if det_count < vlm_count:
+        notes.append(f"검출 누락 추정 {vlm_count - det_count}명 → 작가 확인 권장")
+    return {"confidence": "low", "detector_count": det_count,
+            "vlm_count": vlm_count, "notes": notes}
 
 
 def reconcile(detector_boxes: List[BBox], vlm: VLMAnalysis) -> dict:
@@ -86,6 +146,10 @@ def _iou(a: BBox, b: BBox) -> float:
     inter = iw * ih
     ua = (a.x2-a.x1)*(a.y2-a.y1) + (b.x2-b.x1)*(b.y2-b.y1) - inter
     return inter / ua if ua > 0 else 0.0
+
+
+def pick_uncovered(vlm_boxes: List[BBox], det_boxes: List[BBox], k: int) -> List[BBox]:
+    return _pick_uncovered(vlm_boxes, det_boxes, k)
 
 
 def _pick_uncovered(vlm_boxes: List[BBox], det_boxes: List[BBox], k: int) -> List[BBox]:

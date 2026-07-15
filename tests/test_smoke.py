@@ -4,6 +4,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.library import build_synthetic_index
 from src.pipeline import Pipeline
+from src.pose import MockSelfDetectingPoseModel
 from src.config import CFG
 
 
@@ -56,6 +57,45 @@ def test_person_confidence_high_on_good_match():
 def test_two_person_two_results():
     res = _pipe().process_cut(_Img("full_half standing front 2p"))
     assert len(res.person_candidates) == 2
+
+
+def test_selfdetect_recovers_missing_person():
+    p = Pipeline(build_synthetic_index(), pose_model=MockSelfDetectingPoseModel())
+    res = p.process_cut(_Img("full_half standing front 2p miss"))
+    assert res.detector_count == 1
+    assert res.count_confidence == "low"
+    assert len(res.person_candidates) == 2
+    assert any("복원" in note for note in res.notes)
+
+
+def test_load_bgr_ndarray_channels():
+    import numpy as np
+    from src.pose import _load_bgr
+    assert _load_bgr(np.zeros((5, 4), np.uint8)).shape == (5, 4, 3)
+    assert _load_bgr(np.zeros((5, 4, 4), np.uint8)).shape == (5, 4, 3)
+    assert _load_bgr(np.zeros((5, 4, 1), np.uint8)).shape == (5, 4, 3)
+    out = _load_bgr(np.zeros((5, 4, 3), np.uint8))
+    assert out.shape == (5, 4, 3) and out.flags["C_CONTIGUOUS"]
+
+
+def test_load_bgr_pil_modes():
+    try:
+        from PIL import Image
+    except ImportError:
+        return
+    import numpy as np
+    from src.pose import _load_bgr
+    for mode in ("RGBA", "L", "P", "RGB"):
+        out = _load_bgr(Image.new(mode, (6, 4)))
+        assert out.shape == (4, 6, 3) and out.dtype == np.uint8
+
+
+def test_selfdetect_count_match_high():
+    p = Pipeline(build_synthetic_index(), pose_model=MockSelfDetectingPoseModel())
+    res = p.process_cut(_Img("full_half standing front 2p"))
+    assert res.detector_count == 2
+    assert res.count_confidence == "high"
+    assert not any("복원" in note for note in res.notes)
 
 
 if __name__ == "__main__":
