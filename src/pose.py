@@ -90,25 +90,10 @@ class RTMPoseModel(BasePoseModel):
         self.model = Body(mode="performance", backend="onnxruntime", device="cpu")
 
     def estimate(self, image, boxes, img_w, img_h):
-        kpts, scores = self.model(_load_bgr(image))
+        # 한글/유니코드 경로는 _load_bgr가 cv2.imdecode(np.fromfile)로 안전 로드.
+        kpts, scores = self.model(_load_bgr(image))   # (N,17,2), (N,17)
         return [Skeleton(np.asarray(k, dtype=np.float32), np.asarray(s, dtype=np.float32))
                 for k, s in zip(kpts, scores)]
-        import numpy as np
-        img = image
-        if isinstance(image, str):
-            import cv2
-            # ⚠ cv2.imread는 Windows에서 한글/유니코드 경로에 None 반환 → imdecode 우회
-            img = cv2.imdecode(np.fromfile(image, dtype=np.uint8), cv2.IMREAD_COLOR)
-            if img is None:
-                raise FileNotFoundError(f"이미지 로드 실패(경로/파일 확인): {image}")
-        elif not isinstance(image, np.ndarray):
-            img = np.asarray(image)[:, :, ::-1]   # PIL(RGB)→BGR
-        kpts, scores = self.model(img)            # (N,17,2), (N,17)
-        out = []
-        for i in range(len(kpts)):
-            out.append(Skeleton(np.asarray(kpts[i], dtype=np.float32),
-                                np.asarray(scores[i], dtype=np.float32)))
-        return out
 
     def estimate_crop(self, image, box: BBox, img_w, img_h) -> Optional[Skeleton]:
         img = _load_bgr(image)
