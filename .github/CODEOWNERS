@@ -1,5 +1,5 @@
-# 모든 변경에 대해 아래 세 명에게 리뷰를 자동 요청한다.
+# 모든 변경에 대해 04JUNG/04jung_owner 팀에 리뷰를 자동 요청한다.
 # PR 작성자 본인은 GitHub이 자동으로 리뷰어에서 제외한다.
-# ⚠ 리뷰를 '강제'(머지 차단)하려면 저장소 설정 → Branches → branch protection에서
-#    "Require review from Code Owners"를 켜야 한다(파일이 아니라 웹 설정).
-* @linelie00 @Spacegaeguri @leedongwon1
+# ⚠ 팀이 코드 오너로 인정되려면 이 레포에 **Write 이상** 권한이 있어야 한다(Read면 무시됨).
+# ⚠ 리뷰 '강제'(머지 차단)는 Settings → Branches → "Require review from Code Owners".
+* @04JUNG/04jung_owner
