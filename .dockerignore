@@ -1,0 +1,18 @@
+.git
+.github
+docs
+tests
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+# 데이터·모델·시크릿(이미지에 넣지 않음 — 런타임 생성/마운트)
+data/
+*.db
+*.db-journal
+*.onnx
+*.png
+tags.csv
+.env
+.env.*
