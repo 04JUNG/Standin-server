@@ -14,6 +14,7 @@ FastAPI 레이어 — 도원의 Python 추론 서버.
 from __future__ import annotations
 
 import io
+import json
 import os
 from datetime import datetime, timezone
 from contextlib import asynccontextmanager
@@ -24,6 +25,7 @@ from fastapi.responses import FileResponse, Response
 from src.config import CFG
 from src.pipeline import Pipeline
 from src.library import build_synthetic_index
+from src.library_source import ensure_library
 from src.repo import build_db, load_entries, get_bvh_path, get_pose_meta
 from api.models import (CutResultOut, PersonOut, CandidateOut,
                         ExportOrderRequest, ExportOrder, ExportItem)
@@ -33,17 +35,61 @@ DB_PATH = os.getenv("DB_PATH", "data/poses.db")
 STATE: dict = {}
 
 
+class StartupError(RuntimeError):
+    """설정이 잘못돼 안전하게 서비스할 수 없다. 기동을 중단한다."""
+
+
 def _ensure_db():
+    """포즈 라이브러리를 준비한다.
+
+    개발과 프로덕션의 정책이 다르다.
+      · 개발  — 라이브러리가 없으면 합성으로 만들어 바로 띄운다(오프라인 편의).
+      · 프로덕션 — 합성으로 대체하지 않는다. 라이브러리가 없으면 기동을 실패시킨다.
+        가짜 후보를 정상처럼 서빙하면 작가가 잘못된 포즈를 받고도 알 수 없다
+        (CLAUDE.md §10: 구현하지 않은 것을 작동하는 것처럼 보이게 하지 않는다).
+    """
+    fetched = ensure_library(CFG.data_dir, DB_PATH, CFG.pose_library_uri or None)
+    if fetched:
+        print(f"[startup] 포즈 라이브러리를 받았습니다: {CFG.pose_library_uri}")
+
     if not os.path.exists(DB_PATH):
+        if CFG.is_production:
+            raise StartupError(
+                f"포즈 라이브러리가 없습니다(DB_PATH={DB_PATH}). "
+                "POSE_LIBRARY_URI로 번들 위치를 지정하거나 볼륨으로 마운트하세요. "
+                "프로덕션에서는 합성 라이브러리로 대체하지 않습니다."
+            )
+        print(f"[startup] {DB_PATH} 없음 → 합성 라이브러리 생성(개발 모드)")
         build_db(build_synthetic_index(), DB_PATH)
+
     return load_entries(DB_PATH)
+
+
+def _check_backends() -> None:
+    """프로덕션에서 mock 백엔드로 뜨는 것을 막는다."""
+    if not CFG.is_production:
+        return
+    mocked = [
+        name
+        for name, value in (("VLM_PROVIDER", CFG.vlm_provider), ("POSE_BACKEND", CFG.pose_backend))
+        if value == "mock"
+    ]
+    if mocked:
+        raise StartupError(
+            f"프로덕션에서 mock 백엔드를 쓸 수 없습니다: {', '.join(mocked)}. "
+            "실제 provider/backend를 지정하세요."
+        )
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    _check_backends()
     entries = _ensure_db()                      # 1회 로드
     STATE["pipeline"] = Pipeline(entries)       # VLM/검출/포즈 팩토리도 1회 초기화
     STATE["db_path"] = DB_PATH
+    STATE["pose_count"] = len(entries)
+    print(f"[startup] 준비 완료 — 포즈 {len(entries)}개, env={CFG.app_env}, "
+          f"vlm={CFG.vlm_provider}, pose={CFG.pose_backend}")
     yield
     STATE.clear()
 
@@ -53,8 +99,20 @@ app = FastAPI(title="Standin Pose Pipeline", version="0.1.0", lifespan=lifespan)
 
 @app.get("/healthz")
 def healthz():
-    ok = "pipeline" in STATE
-    return {"ok": ok, "provider": CFG.vlm_provider, "pose_backend": CFG.pose_backend}
+    # 라이브러리가 비면 후보를 하나도 못 내므로 healthy로 보고하지 않는다.
+    # ECS/ALB가 이 응답으로 태스크 교체를 판단한다.
+    pose_count = STATE.get("pose_count", 0)
+    ok = "pipeline" in STATE and pose_count > 0
+    body = {
+        "ok": ok,
+        "env": CFG.app_env,
+        "provider": CFG.vlm_provider,
+        "pose_backend": CFG.pose_backend,
+        "pose_count": pose_count,
+    }
+    return body if ok else Response(
+        content=json.dumps(body), status_code=503, media_type="application/json"
+    )
 
 
 def _load_image(data: bytes):
