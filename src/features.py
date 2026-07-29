@@ -69,3 +69,48 @@ def pose_distance(a: np.ndarray, b: np.ndarray) -> float:
     A = np.asarray(a, dtype=np.float32).reshape(17, 2)[_BODY]
     B = np.asarray(b, dtype=np.float32).reshape(17, 2)[_BODY]
     return float(np.linalg.norm(A - B, axis=1).mean())
+
+
+# ---- 비율 불변(뼈 방향/각도) 거리 ------------------------------------------
+# 위치-L2는 관절 '위치' 차이를 재므로 다리 길이 등 비율 차이를 페널티로 먹는다
+# (웹툰 러프는 실인체 라이브러리보다 사지가 길게 그려짐 → 좋은 매칭이 밀림).
+# 대신 각 '뼈의 방향(단위벡터)'만 비교하면 길이 무관, 자세 모양만 매칭된다.
+
+# COCO17 뼈: 팔·다리·어깨선·골반선·몸통측면.  (a→b)
+_BONES = [
+    (5, 7), (7, 9),      # 왼팔 상완/전완
+    (6, 8), (8, 10),     # 오른팔
+    (11, 13), (13, 15),  # 왼다리 대퇴/정강
+    (12, 14), (14, 16),  # 오른다리
+    (5, 6), (11, 12),    # 어깨선·골반선
+    (5, 11), (6, 12),    # 몸통 좌/우 측면
+]
+
+
+def bone_dirs(feat: np.ndarray):
+    """정규화 피처(34,) 또는 (17,2) → 뼈별 2D 단위방향과 유효마스크."""
+    kp = np.asarray(feat, dtype=np.float32).reshape(17, 2)
+    dirs = np.zeros((len(_BONES), 2), dtype=np.float32)
+    ok = np.zeros(len(_BONES), dtype=bool)
+    for i, (a, b) in enumerate(_BONES):
+        v = kp[b] - kp[a]
+        n = float(np.linalg.norm(v))
+        # 결측(마스킹된 0관절)이면 양끝이 같아 n≈0 → 무효 처리
+        if n > 1e-6 and not (np.allclose(kp[a], 0) or np.allclose(kp[b], 0)):
+            dirs[i] = v / n; ok[i] = True
+    return dirs, ok
+
+
+def angle_distance(a: np.ndarray, b: np.ndarray) -> float:
+    """뼈 방향 코사인 거리 평균 (0=완전 일치 ~ 2=정반대). 비율(길이) 불변."""
+    da, oa = bone_dirs(a); db, ob = bone_dirs(b)
+    m = oa & ob
+    if not m.any():
+        return 2.0
+    cos = np.clip((da[m] * db[m]).sum(axis=1), -1.0, 1.0)
+    return float((1.0 - cos).mean())
+
+
+def hybrid_distance(a: np.ndarray, b: np.ndarray, w_angle: float = 0.7) -> float:
+    """위치-L2와 각도 거리의 가중 결합(스케일 맞춰 정규화)."""
+    return (1 - w_angle) * pose_distance(a, b) + w_angle * angle_distance(a, b)

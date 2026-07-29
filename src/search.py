@@ -13,8 +13,15 @@ from typing import List
 import numpy as np
 
 from .schema import (LibraryEntry, PersonDescriptor, PoseCandidate, View)
-from .features import pose_distance
+from .features import pose_distance, angle_distance, hybrid_distance
 from .config import CFG
+
+
+def _dist(a, b):
+    m = CFG.distance_metric.lower()
+    if m == "angle":  return angle_distance(a, b)
+    if m == "hybrid": return hybrid_distance(a, b, CFG.hybrid_w)
+    return pose_distance(a, b)
 
 
 def _tag_prefilter(entries: List[LibraryEntry], desc: PersonDescriptor) -> List[LibraryEntry]:
@@ -79,7 +86,7 @@ def knn_geometric(entries, feature, top_k=None):
     같은 pose_id의 여러 view 중 최선 1개만 남겨 다양성 확보."""
     top_k = top_k or CFG.top_k_final
     scored = [PoseCandidate(pose_id=e.pose_id, view=e.view,
-                            distance=pose_distance(feature, e.feature),
+                            distance=_dist(feature, e.feature),
                             tags=e.tags, bvh_path=e.bvh_path) for e in entries]
     scored.sort(key=lambda c: c.distance)
     seen, out = set(), []
