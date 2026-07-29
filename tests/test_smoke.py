@@ -6,6 +6,11 @@ from src.library import build_synthetic_index
 from src.pipeline import Pipeline
 from src.pose import MockSelfDetectingPoseModel
 from src.config import CFG
+from src.runtime_guard import (
+    MockBackendError,
+    actual_backend_names,
+    ensure_production_backends,
+)
 
 
 class _Img(str):
@@ -96,6 +101,37 @@ def test_selfdetect_count_match_high():
     assert res.detector_count == 2
     assert res.count_confidence == "high"
     assert not any("복원" in note for note in res.notes)
+
+
+def test_production_rejects_silent_mock_fallback():
+    """설정이 실백엔드여도 실제 객체가 mock이면 프로덕션 기동을 막는다."""
+    pipeline = Pipeline(build_synthetic_index())
+    try:
+        ensure_production_backends(
+            pipeline,
+            is_production=True,
+            requested_vlm="gemini",
+            requested_pose="rtmlib",
+        )
+    except MockBackendError as exc:
+        message = str(exc)
+        assert "VLM_PROVIDER=gemini" in message
+        assert "POSE_BACKEND=rtmlib" in message
+        assert "MockVLMClient" in message
+        assert "MockPoseModel" in message
+    else:
+        raise AssertionError("프로덕션 mock 백엔드를 허용했습니다.")
+
+
+def test_development_allows_mock_backends_and_reports_actual_names():
+    pipeline = Pipeline(build_synthetic_index())
+    ensure_production_backends(
+        pipeline,
+        is_production=False,
+        requested_vlm="gemini",
+        requested_pose="rtmlib",
+    )
+    assert actual_backend_names(pipeline, "gemini", "rtmlib") == ("mock", "mock")
 
 
 if __name__ == "__main__":

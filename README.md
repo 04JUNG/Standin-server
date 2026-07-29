@@ -71,7 +71,9 @@ uvicorn api.app:app --reload          # http://127.0.0.1:8000/docs 에서 계약
 | `VLM_PROVIDER=mock` 또는 `POSE_BACKEND=mock` | 그대로 기동 | **기동 실패** |
 | 라이브러리가 비어 있음(`pose_count=0`) | `/healthz` 503 | `/healthz` 503 |
 
-`build_*()`의 조용한 mock 폴백은 그대로 남아 있으므로, 프로덕션에서는 위 가드가 첫 방어선이다.
+`build_*()`의 조용한 mock 폴백은 개발 편의를 위해 남아 있다. 프로덕션에서는
+`Pipeline` 초기화 후 실제 VLM·포즈 인스턴스를 검사하므로, 실백엔드 설정에서 키나
+런타임 의존성이 빠져 mock으로 폴백해도 기동에 실패한다.
 
 ### 포즈 라이브러리 공급
 

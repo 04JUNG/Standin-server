@@ -27,6 +27,11 @@ from src.pipeline import Pipeline
 from src.library import build_synthetic_index
 from src.library_source import ensure_library
 from src.repo import build_db, load_entries, get_bvh_path, get_pose_meta
+from src.runtime_guard import (
+    MockBackendError,
+    actual_backend_names,
+    ensure_production_backends,
+)
 from api.models import (CutResultOut, PersonOut, CandidateOut,
                         ExportOrderRequest, ExportOrder, ExportItem)
 
@@ -65,31 +70,34 @@ def _ensure_db():
     return load_entries(DB_PATH)
 
 
-def _check_backends() -> None:
-    """프로덕션에서 mock 백엔드로 뜨는 것을 막는다."""
-    if not CFG.is_production:
-        return
-    mocked = [
-        name
-        for name, value in (("VLM_PROVIDER", CFG.vlm_provider), ("POSE_BACKEND", CFG.pose_backend))
-        if value == "mock"
-    ]
-    if mocked:
-        raise StartupError(
-            f"프로덕션에서 mock 백엔드를 쓸 수 없습니다: {', '.join(mocked)}. "
-            "실제 provider/backend를 지정하세요."
+def _check_backends(pipeline: Pipeline) -> None:
+    """프로덕션에서 실제로 생성된 mock 백엔드로 뜨는 것을 막는다."""
+    try:
+        ensure_production_backends(
+            pipeline,
+            is_production=CFG.is_production,
+            requested_vlm=CFG.vlm_provider,
+            requested_pose=CFG.pose_backend,
         )
+    except MockBackendError as exc:
+        raise StartupError(str(exc)) from exc
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    _check_backends()
     entries = _ensure_db()                      # 1회 로드
-    STATE["pipeline"] = Pipeline(entries)       # VLM/검출/포즈 팩토리도 1회 초기화
+    pipeline = Pipeline(entries)                # VLM/검출/포즈 팩토리도 1회 초기화
+    _check_backends(pipeline)                   # 팩토리 폴백 후 실제 인스턴스 검사
+    actual_vlm, actual_pose = actual_backend_names(
+        pipeline, CFG.vlm_provider, CFG.pose_backend
+    )
+    STATE["pipeline"] = pipeline
     STATE["db_path"] = DB_PATH
     STATE["pose_count"] = len(entries)
+    STATE["provider"] = actual_vlm
+    STATE["pose_backend"] = actual_pose
     print(f"[startup] 준비 완료 — 포즈 {len(entries)}개, env={CFG.app_env}, "
-          f"vlm={CFG.vlm_provider}, pose={CFG.pose_backend}")
+          f"vlm={actual_vlm}, pose={actual_pose}")
     yield
     STATE.clear()
 
@@ -106,8 +114,8 @@ def healthz():
     body = {
         "ok": ok,
         "env": CFG.app_env,
-        "provider": CFG.vlm_provider,
-        "pose_backend": CFG.pose_backend,
+        "provider": STATE.get("provider", CFG.vlm_provider),
+        "pose_backend": STATE.get("pose_backend", CFG.pose_backend),
         "pose_count": pose_count,
     }
     return body if ok else Response(
