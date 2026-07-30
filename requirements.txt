@@ -16,6 +16,10 @@ Pillow>=10.0                 # 업로드 PNG 로드
 # onnxruntime>=1.17
 # opencv-python>=4.9
 # bvhio>=2.0                  # 실 BVH 파싱(library.load_bvh_pose)
+# --- 배포(선택) ---
+# POSE_LIBRARY_URI가 s3:// 형식일 때만 필요. https:// 는 표준 라이브러리로 받는다.
+# boto3                       # ECS 태스크 역할로 인증 → 키를 환경에 두지 않음
+
 # --- 스케일업 시 DB 교체(선택) ---
 # lancedb                     # 임베디드 벡터DB(서버리스, 필터+벡터)
 # psycopg[binary] + pgvector  # 앱팀 Postgres와 공유할 경우

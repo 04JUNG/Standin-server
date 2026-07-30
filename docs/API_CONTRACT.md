@@ -43,7 +43,7 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
 
 | 메서드 | 경로 | 입력 | 출력 | 소비자 |
 |---|---|---|---|---|
-| `GET` | `/healthz` | — | `{ok, provider, pose_backend}` | 앱 서버 기동 확인 |
+| `GET` | `/healthz` | — | `{ok, env, provider, pose_backend, pose_count}` | 앱 서버 기동 확인(비정상 시 503) |
 | `POST` | `/analyze` | multipart PNG (+`hint`) | `CutResult` | 앱 서버 → 뷰어 Top-K 표시 |
 | `GET` | `/pose/{pose_id}/bvh` | 경로 파라미터 | `application/octet-stream` | 동원 내보내기 |
 | `POST` | `/export-order` | `ExportOrderRequest` | `ExportOrder` | 동원 내보내기 (→ `EXPORT_CONTRACT.md`) |
@@ -171,10 +171,12 @@ Content-Type: multipart/form-data
 **`GET /healthz`**
 
 ```json
-{ "ok": true, "provider": "mock", "pose_backend": "mock" }
+{ "ok": true, "env": "development", "provider": "mock", "pose_backend": "mock", "pose_count": 20 }
 ```
 
-`ok`는 파이프라인 로드 여부. `provider`/`pose_backend`로 **현재 mock인지 실모델인지** 앱 서버가 확인할 수 있다.
+`ok`는 파이프라인 로드 **그리고** 라이브러리가 비어 있지 않은지(`pose_count > 0`). `provider`/`pose_backend`로 **현재 mock인지 실모델인지**, `env`로 개발/프로덕션 여부를 앱 서버가 확인할 수 있다.
+
+`ok: false`일 때는 **HTTP 503**으로 응답한다 — 후보를 하나도 낼 수 없는 상태라 로드밸런서·오케스트레이터가 트래픽을 보내지 않아야 한다.
 
 **`POST /export-order`** — 작가가 고른 하나 → 동원 주문서(`ExportOrder`). 상세 계약·예시(1인/2인/얽힘/스킵)는 **`docs/EXPORT_CONTRACT.md`** 참조. 요약: `/analyze`(Top-K 보여주기)와 **별개 계약**이며, DB에서 `bvh_url`·`set_id`·`tags`를 채워 완성한다.
 

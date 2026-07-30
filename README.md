@@ -59,6 +59,51 @@ uvicorn api.app:app --reload          # http://127.0.0.1:8000/docs 에서 계약
 
 ---
 
+## 배포 (컨테이너)
+
+### `APP_ENV=production`이 하는 일
+
+개발 편의 기능이 프로덕션에서 **가짜 결과를 정상처럼 서빙하지 않도록** 막는다.
+
+| 상황 | development | production |
+|---|---|---|
+| 포즈 라이브러리 없음 | 합성 라이브러리 생성 후 기동 | **기동 실패** |
+| `VLM_PROVIDER=mock` 또는 `POSE_BACKEND=mock` | 그대로 기동 | **기동 실패** |
+| 라이브러리가 비어 있음(`pose_count=0`) | `/healthz` 503 | `/healthz` 503 |
+
+`build_*()`의 조용한 mock 폴백은 개발 편의를 위해 남아 있다. 프로덕션에서는
+`Pipeline` 초기화 후 실제 VLM·포즈 인스턴스를 검사하므로, 실백엔드 설정에서 키나
+런타임 의존성이 빠져 mock으로 폴백해도 기동에 실패한다.
+
+### 포즈 라이브러리 공급
+
+라이브러리(`poses.db` · `index.pkl` · `bvh/`)는 **이미지에 넣지 않는다** — Mixamo/CMU 재배포 금지 조항 때문에 `.gitignore`·`.dockerignore`로 제외돼 있다. 배포 환경에서는 기동 시 번들을 받아 푼다.
+
+```bash
+# 1) 번들 만들기 (루트에 poses.db, 선택적으로 index.pkl·bvh/)
+tar -czf pose-library-v1.tar.gz -C data poses.db index.pkl bvh
+
+# 2) 비공개 버킷에 올리기
+aws s3 cp pose-library-v1.tar.gz s3://<bucket>/pose-library/v1.tar.gz
+
+# 3) 컨테이너에 위치만 알려주기
+POSE_LIBRARY_URI=s3://<bucket>/pose-library/v1.tar.gz
+```
+
+- `s3://`는 **boto3 + ECS 태스크 역할**로 인증한다(키를 환경변수에 두지 않는다). `requirements.txt`에서 `boto3` 주석을 해제해야 한다.
+- `https://`도 지원한다(표준 라이브러리로 받으므로 추가 의존성 없음).
+- 이미 `DB_PATH`에 파일이 있으면 받지 않는다 → 로컬은 `data/`에 직접 두면 그대로 쓴다.
+- 번들 압축 해제 시 경로 탈출(`../`)은 거부한다.
+
+라이브러리를 바꾸려면 새 번들을 올리고 `POSE_LIBRARY_URI`만 갱신한다. 이미지는 다시 굽지 않아도 된다.
+
+### 이미지
+
+- 비루트 유저(`uid=10001`)로 실행한다.
+- `HEALTHCHECK`가 `/healthz`를 본다 — 라이브러리가 비면 503이라 오케스트레이터가 태스크를 교체한다.
+
+---
+
 ## 문서 맵
 
 읽는 순서:
