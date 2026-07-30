@@ -16,6 +16,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.repo import load_entries
 from src.features import normalize_skeleton, pose_distance
+from src.search import _dist  # DISTANCE env(pos/angle/hybrid) 존중
 from src.bvh import load_coco17
 from src.library import VIRTUAL_CAMERAS
 
@@ -64,7 +65,7 @@ def query_from_bvh(bvh_path):
 
 
 def search(entries, feat, topk):
-    scored = sorted(((pose_distance(feat, e.feature), e) for e in entries),
+    scored = sorted(((_dist(feat, e.feature), e) for e in entries),
                     key=lambda t: t[0])
     seen, out = set(), []
     for d, e in scored:
@@ -161,7 +162,7 @@ def main():
     # 전체 순위(포즈별 최소거리). uw=1.0이면 기본 pose_distance와 동일.
     best = {}
     for e in entries:
-        d = wdist(feat, e.feature, a.uw) if a.uw != 1.0 else pose_distance(feat, e.feature)
+        d = wdist(feat, e.feature, a.uw) if a.uw != 1.0 else _dist(feat, e.feature)
         if e.pose_id not in best or d < best[e.pose_id][0]:
             best[e.pose_id] = (d, e)
     ranked = sorted(best.values(), key=lambda t: t[0])

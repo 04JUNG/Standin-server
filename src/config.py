@@ -51,6 +51,9 @@ class Config:
 
     # 검색 Top-1 거리가 이 값보다 크면 '확신 없음' → 저신뢰(얽힘·추출실패·라이브러리 공백) → 폴백.
     # 실데이터로 보정: 좋은 매칭 ~0.15, 앉기-서기 ~0.36, 추출실패 ~0.6+ 관측.
+    # 검색 거리: "pos"(위치L2·기본) | "angle"(뼈 방향·비율 불변) | "hybrid"
+    distance_metric: str = os.getenv("DISTANCE", "pos")
+    hybrid_w: float = float(os.getenv("HYBRID_W", "0.7"))   # hybrid에서 각도 비중
     fallback_distance: float = float(os.getenv("FALLBACK_DISTANCE", "0.45"))
     # 스켈레톤 평균 score가 이 값 미만이면 추출 실패로 간주.
     min_skeleton_score: float = float(os.getenv("MIN_SKELETON_SCORE", "0.2"))
