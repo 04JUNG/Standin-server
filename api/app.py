@@ -27,6 +27,7 @@ from src.pipeline import Pipeline
 from src.library import build_synthetic_index
 from src.library_source import ensure_library
 from src.repo import build_db, load_entries, get_bvh_path, get_pose_meta
+from src.thumbnails import THUMBNAIL_VIEWS, find_thumbnail, thumbnail_url
 from src.runtime_guard import (
     MockBackendError,
     actual_backend_names,
@@ -162,6 +163,7 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default="")):
                 pose_id=c.pose_id, view=c.view.value, distance=c.distance,
                 tags=c.tags, rerank_score=c.rerank_score,
                 bvh_url=f"/pose/{c.pose_id}/bvh",
+                thumbnail_url=thumbnail_url(CFG.data_dir, c.pose_id, c.view.value),
             ) for c in cands],
         ))
     return CutResultOut(
@@ -185,6 +187,24 @@ def get_pose_bvh(pose_id: str):
                  f"실 라이브러리 빌드 전 단계.")
     return FileResponse(path, media_type="application/octet-stream",
                         filename=f"{pose_id}.bvh")
+
+
+@app.get("/pose/{pose_id}/thumbnail")
+def get_pose_thumbnail(pose_id: str, view: str):
+    """번들에 포함된 후보 시점 PNG를 반환한다."""
+    if view not in THUMBNAIL_VIEWS:
+        raise HTTPException(400, f"unsupported thumbnail view: {view}")
+    if get_pose_meta(STATE["db_path"], pose_id) is None:
+        raise HTTPException(404, f"unknown pose_id: {pose_id}")
+
+    path = find_thumbnail(CFG.data_dir, pose_id, view)
+    if path is None:
+        raise HTTPException(404, f"thumbnail not found: pose_id={pose_id}, view={view}")
+    return FileResponse(
+        path,
+        media_type="image/png",
+        headers={"Cache-Control": "private, max-age=86400"},
+    )
 
 
 @app.post("/export-order", response_model=ExportOrder)

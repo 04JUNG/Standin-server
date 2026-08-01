@@ -1,5 +1,7 @@
 """스모크 테스트: shot/사람수 분기 + 기하 매칭 + 신뢰도 폴백 계약 검증."""
 import os, sys
+import tempfile
+from pathlib import Path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.library import build_synthetic_index
@@ -11,6 +13,7 @@ from src.runtime_guard import (
     actual_backend_names,
     ensure_production_backends,
 )
+from src.thumbnails import find_thumbnail, thumbnail_url
 
 
 class _Img(str):
@@ -132,6 +135,21 @@ def test_development_allows_mock_backends_and_reports_actual_names():
         requested_pose="rtmlib",
     )
     assert actual_backend_names(pipeline, "gemini", "rtmlib") == ("mock", "mock")
+
+
+def test_thumbnail_lookup_uses_pose_and_view_without_path_escape():
+    with tempfile.TemporaryDirectory() as tmp:
+        thumbs = Path(tmp) / "thumbs"
+        thumbs.mkdir()
+        expected = thumbs / "Wave Pose__front.png"
+        expected.write_bytes(b"png")
+
+        assert find_thumbnail(tmp, "Wave Pose", "front") == expected.resolve()
+        assert thumbnail_url(tmp, "Wave Pose", "front") == (
+            "/pose/Wave%20Pose/thumbnail?view=front"
+        )
+        assert find_thumbnail(tmp, "../escape", "front") is None
+        assert find_thumbnail(tmp, "Wave Pose", "diagonal") is None
 
 
 if __name__ == "__main__":
