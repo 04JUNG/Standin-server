@@ -12,7 +12,11 @@ WORKDIR /app
 
 # 코어 + API 의존성만(실모델 의존성은 requirements.txt에서 주석 처리됨)
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+# rtmlib가 GUI용 OpenCV 패키지를 의존성으로 다시 설치하므로, 화면이 없는 ECS에서는
+# 두 패키지를 제거하고 headless 변형만 마지막에 재설치한다.
+RUN pip install --no-cache-dir -r requirements.txt \
+    && pip uninstall -y opencv-python opencv-contrib-python \
+    && pip install --no-cache-dir --no-deps --force-reinstall "opencv-python-headless>=4.9"
 
 COPY . .
 

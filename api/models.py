@@ -15,6 +15,7 @@ class CandidateOut(BaseModel):
     tags: dict
     rerank_score: Optional[float] = None
     bvh_url: str = Field(..., description="동원 내보내기 팀이 받는 라이브러리 BVH 다운로드 경로")
+    thumbnail_url: Optional[str] = Field(None, description="후보 시점 PNG 썸네일의 내부 다운로드 경로")
 
 
 class PersonOut(BaseModel):
