@@ -27,7 +27,7 @@ from .detect import (MockDetector, pick_uncovered, reconcile, reconcile_count,
                      skeleton_to_bbox)
 from .pose import build_pose_model
 from .routing import route
-from .descriptor import build_descriptors
+from .descriptor import build_descriptors, order_left_to_right
 from .features import normalize_skeleton
 from .search import knn_geometric
 
@@ -66,6 +66,8 @@ class Pipeline:
 
         # 4) 사람 수 분기: 인물마다 스켈레톤 → 기하 검색
         skeletons = self.pose.estimate(image, boxes, img_w, img_h)
+        # 인물을 화면 왼쪽부터 정렬 → person_index가 좌→우 순서를 따르게 함
+        skeletons, boxes = order_left_to_right(skeletons, boxes)
         descs = build_descriptors(vlm, skeletons, boxes)
 
         result = CutResult(
@@ -110,6 +112,8 @@ class Pipeline:
                 rec["notes"].append(
                     f"놓친 {missing}명 중 {rescued}명 VLM 대략 박스로 복원(저신뢰 유지)")
 
+        # 인물을 화면 왼쪽부터 정렬 → person_index가 좌→우 순서를 따르게 함
+        skeletons, boxes = order_left_to_right(skeletons, boxes)
         descs = build_descriptors(vlm, skeletons, boxes)
         result = CutResult(route="core", count_confidence=rec["confidence"],
                            detector_count=rec["detector_count"],

@@ -134,6 +134,35 @@ def test_development_allows_mock_backends_and_reports_actual_names():
     assert actual_backend_names(pipeline, "gemini", "rtmlib") == ("mock", "mock")
 
 
+
+def test_order_left_to_right_sorts_by_box_x1():
+    """좌→우 정렬 헬퍼: 뒤섞인 박스를 왼쪽부터 정렬한다."""
+    from src.descriptor import order_left_to_right
+    from src.schema import BBox
+    boxes = [BBox(300, 0, 400, 10), BBox(0, 0, 50, 10), BBox(120, 0, 220, 10)]
+    _, ordered = order_left_to_right([None, None, None], boxes)
+    xs = [b.x1 for b in ordered]
+    assert xs == [0.0, 120.0, 300.0]
+
+
+def test_order_left_to_right_falls_back_to_skeleton_x():
+    """박스가 없으면 스켈레톤 x중앙값으로 좌→우 정렬한다."""
+    import numpy as np
+    from src.descriptor import order_left_to_right
+    from src.schema import Skeleton
+    right = Skeleton(np.array([[0.9, 0.5]] * 17, np.float32), np.ones(17, np.float32))
+    left = Skeleton(np.array([[0.1, 0.5]] * 17, np.float32), np.ones(17, np.float32))
+    ordered, _ = order_left_to_right([right, left], [None, None])
+    assert float(ordered[0].keypoints[0][0]) < float(ordered[1].keypoints[0][0])
+
+
+def test_person_index_is_left_to_right():
+    """파이프라인 결과의 인물 순서(person_index)가 좌→우여야 한다."""
+    res = _pipe().process_cut(_Img("full_half standing front 2p"))
+    xs = [d.box.x1 for d in res.descriptors if d.box is not None]
+    assert xs == sorted(xs)
+
+
 if __name__ == "__main__":
     import traceback
     fns = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
