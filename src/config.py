@@ -60,5 +60,92 @@ class Config:
     # 스켈레톤 평균 score가 이 값 미만이면 추출 실패로 간주.
     min_skeleton_score: float = float(os.getenv("MIN_SKELETON_SCORE", "0.2"))
 
+    # --- 포즈 미세조정(refine) ---  docs/REFINE_DESIGN.md
+    # 설계 원칙: refine은 '좋아지거나, 그대로'다. 아래 값들은 전부 그 보장을 위한 것.
+    refine_enabled: bool = os.getenv("REFINE_ENABLED", "1") == "1"   # 시연 중 비상 스위치
+    # 손실이 base * 이 비율보다 못 줄면 조정을 버리고 베이스를 반환.
+    refine_min_gain: float = float(os.getenv("REFINE_MIN_GAIN", "0.95"))
+    # 베이스 손실이 이 값 이하면 '이미 맞음' → 조정하지 않는다.
+    # 0.01 ≈ 뼈당 평균 8° 오차. 러프 추출 노이즈보다 작아 조정할 실익이 없다.
+    refine_min_loss: float = float(os.getenv("REFINE_MIN_LOSS", "0.01"))
+    refine_max_iter: int = int(os.getenv("REFINE_MAX_ITER", "100"))
+    # 베이스 정규화 강도. 클수록 덜 움직인다(=더 안전, 덜 맞음).
+    refine_lambda: float = float(os.getenv("REFINE_LAMBDA", "0.05"))
+    # 채널당 베이스에서 벗어날 수 있는 최대 각도(하드 바운드).
+    # ⚠ 이것만으로는 '미세조정'이 보장되지 않는다 — 각도 공간의 제약은 3D 공간의
+    #   제약이 아니다. 어깨에서 45°면 손목은 몸통 길이의 0.7배까지 움직인다(실측).
+    #   docs/REFINE_DESIGN.md §6-4 참조.
+    refine_max_delta_deg: float = float(os.getenv("REFINE_MAX_DELTA_DEG", "45"))
+
+    # refine 후보 사지: "arms"(기본) | "all"
+    # 실제로 무엇을 조정할지는 아래 관측 감도 게이트가 컷마다 판단한다.
+    # P2(3D 이동량 게이트) 전에는 다리를 풀지 않는 것이 MVP 안전 기본값이다.
+    refine_limbs: str = os.getenv("REFINE_LIMBS", "arms")
+
+    # --- 관측 감도 게이트 (docs/REFINE_DESIGN.md §6-5) ---
+    # "다리를 켜냐 끄냐"는 잘못된 질문이다. 다리 관측 감도는 컷마다 8배 범위로 흩어진다
+    # (전신 컷에서 또렷한 다리 = 팔과 비슷, 허벅지에서 잘린 컷 = 팔의 1/10).
+    # 그래서 전역 on/off 대신 **컷마다 사지별로 재서** 안 보이는 사지만 동결한다.
+    refine_observability_gate: bool = os.getenv("REFINE_OBS_GATE", "1") == "1"
+    # 그 컷에서 가장 잘 보이는 사지 대비 이 비율 미만이면 동결(상대 기준이라
+    # 포즈·스케일에 안 휘둘린다). 실측상 위험 구간이 '팔 중앙값의 1/3 미만'이었다.
+    refine_min_observability: float = float(os.getenv("REFINE_MIN_OBS", "0.34"))
+    # 모든 사지가 다 안 보이는 컷에서 상대 기준만으론 못 막으므로 절대 하한도 둔다.
+    refine_min_observability_abs: float = float(os.getenv("REFINE_MIN_OBS_ABS", "0.10"))
+
+    # --- P1a: 축별 관측 감도 정규화 (docs/REFINE_NEXT.md §3 P1a) ---
+    # 한 관절의 회전축마다 2D에서 보이는 정도가 다르다. 잘 안 보이는 축은
+    # 베이스 정규화를 강화해 전완/손·종아리/발이 공짜로 비틀리지 않게 한다.
+    refine_axis_observability: bool = os.getenv("REFINE_AXIS_OBS", "1") == "1"
+    # 가장 잘 보이는 축 대비 정규화 강화 배수의 상한. 기존 lambda보다 약하게
+    # 만들지는 않고 [1, max] 범위에서 위험한 축만 강화한다.
+    refine_axis_lambda_max_mult: float = float(
+        os.getenv("REFINE_AXIS_LAMBDA_MAX_MULT", "100")
+    )
+    # --- P1b: 축 조합 null-space 정규화 (docs/REFINE_NEXT.md §3 P1b) ---
+    # P1a는 X/Y/Z 축 하나가 안 보이는 경우를 잡는다. 실제 팔 관절의 일부는
+    # 각 축은 따로 보이지만 여러 축을 섞은 방향이 안 보이므로, 그 조합 방향도
+    # 야코비안 SVD로 찾아 베이스에 고정한다.
+    refine_svd_observability: bool = os.getenv("REFINE_SVD_OBS", "1") == "1"
+    refine_svd_lambda_max_mult: float = float(
+        os.getenv("REFINE_SVD_LAMBDA_MAX_MULT", "2")
+    )
+    # --- P2: post-solve 사지별 3D 이동량 게이트 (docs/REFINE_P2.md) ---
+    # 사람 눈 평가에서 유용한 큰 조정까지 폐기해 P3 검증 동안 하드 게이트는 보류한다.
+    # 0이어도 이동량 진단은 limb_decisions에 계속 남는다.
+    refine_move_gate: bool = os.getenv("REFINE_MOVE_GATE", "0") == "1"
+    # 몸통 길이로 정규화한 사지 중간관절·말단 평균 / 말단 최대 이동량 상한.
+    refine_max_move_mean: float = float(os.getenv("REFINE_MAX_MOVE_MEAN", "0.20"))
+    refine_max_move_max: float = float(os.getenv("REFINE_MAX_MOVE_MAX", "0.35"))
+    # --- P3a: 베이스 상대 팔-몸통 자기 충돌 게이트 (docs/REFINE_P3.md) ---
+    # 실 러프 probe에서 171734의 깊은 손 관통과 124629 정상 Top-5가 분리돼 기본 활성화.
+    # P2는 계속 로그 전용이며 P3만 하드 게이트로 사용한다.
+    refine_collision_gate: bool = os.getenv("REFINE_COLLISION_GATE", "1") == "1"
+    refine_collision_torso_shoulder_scale: float = float(
+        os.getenv("REFINE_COLLISION_TORSO_SHOULDER_SCALE", "0.38")
+    )
+    refine_collision_torso_hip_scale: float = float(
+        os.getenv("REFINE_COLLISION_TORSO_HIP_SCALE", "0.45")
+    )
+    refine_collision_arm_radius: float = float(
+        os.getenv("REFINE_COLLISION_ARM_RADIUS", "0.035")
+    )
+    refine_collision_hand_radius: float = float(
+        os.getenv("REFINE_COLLISION_HAND_RADIUS", "0.025")
+    )
+    refine_collision_samples: int = int(os.getenv("REFINE_COLLISION_SAMPLES", "9"))
+    # 손끝 프록시 기준 171734 양성(0.055/0.090)과 124629 최대 음성(0.043)
+    # 사이로 고정했다. 표본이 작으므로 실사용 로그를 계속 보정 근거로 남긴다.
+    refine_collision_min_depth: float = float(
+        os.getenv("REFINE_COLLISION_MIN_DEPTH", "0.05")
+    )
+    refine_collision_worsen_delta: float = float(
+        os.getenv("REFINE_COLLISION_WORSEN_DELTA", "0.01")
+    )
+    # 팔꿈치·무릎이 이 각도보다 접히면 부자연 → 조정 폐기(베이스 반환).
+    refine_min_bend_deg: float = float(os.getenv("REFINE_MIN_BEND_DEG", "20"))
+    # 조정본 BVH 저장 위치(캐시). data_dir 기준 상대.
+    refine_dir: str = os.getenv("REFINE_DIR", "refined")
+
 
 CFG = Config()

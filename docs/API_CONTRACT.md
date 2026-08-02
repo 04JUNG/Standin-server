@@ -48,6 +48,77 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
 | `GET` | `/pose/{pose_id}/bvh` | 경로 파라미터 | `application/octet-stream` | 동원 내보내기 |
 | `POST` | `/export-order` | `ExportOrderRequest` | `ExportOrder` | 동원 내보내기 (→ `EXPORT_CONTRACT.md`) |
 | `GET` | `/docs` | — | OpenAPI UI | 사람(계약 확인) |
+| `POST` | `/refine` | `RefineRequest` | `RefineResponse` | 앱 서버 → 조정된 BVH (→ `REFINE_DESIGN.md`) |
+| `GET` | `/refined/{handle}/bvh` | 경로 파라미터 | `application/octet-stream` | 동원 내보내기(조정본) |
+
+> `PersonOut`에 **`keypoints`(17×2, 이미지 픽셀)** · **`scores`(17)** 가 포함된다.
+> `/analyze`가 이미 추출하는 값이라 연산 추가는 0이며, `/refine`을 순수 함수로 만들기 위한 것이다.
+> 클라이언트는 이 두 값을 **그대로 `/refine`에 되돌려주면** 된다 — 러프 재전송·포즈 재추론 없음.
+
+### 2-1. `POST /refine` — 고른 후보 1개를 러프에 맞춰 조정
+
+작가가 Top-K 중 하나를 고른 **직후** 호출한다. 연산은 커밋된 포즈에만 든다.
+
+```jsonc
+// 요청
+{
+  "pose_id": "Sitting Idle_01",
+  "view": "front",
+  "keypoints": [[120.5, 88.0], ...],   // /analyze의 PersonOut.keypoints 그대로
+  "scores":    [0.91, 0.87, ...],      // /analyze의 PersonOut.scores 그대로
+  "search_distance": 0.21              // 그 후보의 distance(선택). 주면 안전 게이트가 켜진다
+}
+// 응답
+{
+  "pose_id": "Sitting Idle_01", "view": "front",
+  "refined": true, "reason": "ok_partial",
+  "bvh_url": "/refined/7d3ebff90f5064ec/bvh",
+  "loss_base": 0.599, "loss_final": 0.004, "gain": 0.993,
+  "backend": "numpy",
+  "limbs": ["right_arm"],
+  "limb_decisions": {
+    "left_arm": {
+      "accepted": false, "reason": "self_collision",
+      "mean_move": 0.083, "endpoint_move": 0.153,
+      "collision": {
+        "checked": true, "status": "new_penetration",
+        "pair": "left_hand:torso", "part": "hand",
+        "base_depth": 0.0, "solved_depth": 0.055, "final_depth": 0.0,
+        "sample_fraction": 0.75,
+        "collision_point": [10.59, -4.66, 3.36]
+      }
+    },
+    "right_arm": {
+      "accepted": true, "reason": "ok",
+      "mean_move": 0.361, "endpoint_move": 0.549,
+      "collision": {
+        "checked": true, "status": "clear", "pair": null, "part": null,
+        "base_depth": 0.0, "solved_depth": 0.0, "final_depth": 0.0,
+        "sample_fraction": null, "collision_point": null
+      }
+    }
+  }
+}
+```
+
+**`refined: false`는 오류가 아니다.** 안전 게이트가 조정을 버리고 베이스를 준 것이며,
+이때 `bvh_url`은 `/pose/{pose_id}/bvh`가 된다. 클라이언트는 `bvh_url`만 따라가면
+두 경우를 구분하지 않고 동작한다("좋아지거나, 그대로"). `reason` 값 목록은
+`REFINE_DESIGN.md` §4-3.
+
+- `search_distance`를 **주는 것을 권장한다.** 검색이 실패한 컷에서 refine을 돌리면
+  틀린 포즈를 러프에 억지로 끼워맞춰 베이스보다 나빠진다. 이 값이 있어야 서버가 막는다.
+- 같은 입력은 같은 `bvh_url`을 돌려준다(해시 캐시). 작가가 같은 후보를 다시 눌러도 재계산 없음.
+- `limbs`에는 P3까지 통과해 실제로 조정된 사지만 담긴다. `limb_decisions`는 고려한
+  모든 사지의 채택 여부·탈락 사유·몸통 길이로 정규화한 3D 이동량을 담는다.
+- P1 solve까지 도달한 결과의 팔에는 `collision`이 추가된다. 동결된 팔도 진단하되
+  게이트로 수정하지는 않는다. `base_depth`와 P1 전체 조정본의 `solved_depth`를 비교해
+  refine이 새로 만든 깊은 관통만 `new_penetration`으로 판정한다. P3가 해당 팔만 복구하면
+  `final_depth`는 베이스 깊이로 돌아가고, 충돌하지 않은 반대팔 조정은 유지된다.
+- 전체 `reason`에는 `collision_gate`(충돌 팔 복구 후 남은 사지 없음),
+  `collision_unresolved`(복구 후 깊이 불변식 실패)가 포함된다. 사지 reason의
+  `self_collision`은 해당 사지만 베이스로 복구됐다는 뜻이다.
+- 오류: 없는 `pose_id` → 404 · BVH 파일 미존재 → 409 · `keypoints`/`scores` 길이≠17 → 422.
 
 기본 주소: `uvicorn api.app:app --reload` → `http://127.0.0.1:8000`. **버전 프리픽스 없음**(`/analyze`, `/v1/analyze` 아님).
 

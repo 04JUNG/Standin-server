@@ -51,6 +51,14 @@ class PersonOut(BaseModel):
     skeleton: Optional[SkeletonOut] = None
     confidence: Optional[str] = None
     candidates: List[CandidateOut]
+    # /refine을 '순수 함수'로 만들기 위한 필드(docs/REFINE_DESIGN.md §3).
+    # /analyze가 이미 추출한 값을 실어 보낼 뿐이라 연산 추가는 0이다.
+    # 클라이언트는 이 두 값을 그대로 POST /refine에 되돌려주면 된다
+    # → 러프 이미지 재전송·포즈 재추론 없음.
+    keypoints: Optional[List[List[float]]] = Field(
+        None, description="러프에서 추출한 2D 스켈레톤 (17×2, 이미지 픽셀 좌표)")
+    scores: Optional[List[float]] = Field(
+        None, description="관절별 신뢰도 (17,). 낮은 관절은 refine 손실에서 제외됨")
 
 
 class CutResultOut(BaseModel):
@@ -62,6 +70,45 @@ class CutResultOut(BaseModel):
     notes: List[str] = []
     image: ImageInfoOut
     inference_metadata: InferenceMetadataOut
+
+
+# ==== 포즈 미세조정 (docs/REFINE_DESIGN.md) ================================
+# 작가가 Top-K 중 '고른 1개'만 러프에 맞춰 조정한다. 계산은 커밋된 포즈에만 든다.
+
+class RefineRequest(BaseModel):
+    pose_id: str = Field(..., description="작가가 고른 후보의 pose_id")
+    view: str = Field(..., description="그 후보의 view(=매칭된 투영 각도)")
+    keypoints: List[List[float]] = Field(
+        ..., description="/analyze가 준 PersonOut.keypoints를 그대로 (17×2)")
+    scores: Optional[List[float]] = Field(
+        None, description="/analyze가 준 PersonOut.scores를 그대로 (17,)")
+    search_distance: Optional[float] = Field(
+        None, description="그 후보의 distance. 주면 '베이스 불일치' 안전 게이트가 켜진다")
+
+
+class RefineResponse(BaseModel):
+    """refined=False여도 오류가 아니다 — 안전 게이트가 조정을 버리고 베이스를 준 것."""
+    pose_id: str
+    view: str
+    refined: bool = Field(..., description="조정본이 나왔는가. False면 bvh_url=베이스")
+    reason: str = Field(..., description="ok | disabled | entangled_set | "
+                                         "low_skeleton_score | base_mismatch | "
+                                         "multiframe_base | insufficient_target_bones | "
+                                         "already_matched | no_gain | ok_partial | "
+                                         "movement_gate | global_no_gain | "
+                                         "collision_gate | collision_unresolved | "
+                                         "joint_limit | diverged")
+    bvh_url: str = Field(..., description="내려받을 BVH 경로(조정본 또는 베이스)")
+    loss_base: Optional[float] = Field(None, description="조정 전 각도 손실")
+    loss_final: Optional[float] = Field(None, description="조정 후 각도 손실")
+    gain: Optional[float] = Field(None, description="손실 감소율(0.3=30% 개선)")
+    backend: str = Field(..., description="scipy | numpy | none")
+    limbs: List[str] = Field(
+        default_factory=list, description="P3까지 통과해 최종 조정된 사지")
+    limb_decisions: dict = Field(
+        default_factory=dict,
+        description=("고려한 사지별 채택 여부·사유, 몸통 정규화 3D 이동량, "
+                     "베이스 상대 손·전완-몸통 충돌 진단"))
 
 
 # ==== 동원 Export 계약 (Tauri → 동원 내보내기) ============================

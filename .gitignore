@@ -1,8 +1,11 @@
 # 라이브러리 데이터: Mixamo/CMU 재배포 금지 조항 → 공개 레포에 커밋 금지
-data/bvh/
-data/*.db
-data/*.db-journal
-data/index.pkl
+# data/ 전체를 무시한다(추적 중인 파일 0개). 원본 BVH·중간 산출물·DB·조정본 모두 포함.
+data/
+*.refined.bvh
+
+# refine/eval 산출물
+eval_refine/
+top5_out/
 
 # 테스트 러프/입력 이미지(작가 저작물일 수 있음)
 rough*.png
