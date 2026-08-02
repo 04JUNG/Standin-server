@@ -84,6 +84,8 @@ Content-Type: multipart/form-data
       "index": 0,
       "box": [120.0, 80.0, 360.0, 720.0],
       "tags": { "shot": "full_half", "action": "standing", "view": "front", "relationship": "solo" },
+      "skeleton": { "schema_version": "coco17-v1", "keypoints": [[1.0, 2.0]], "scores": [0.9] },
+      "confidence": "high",
       "candidates": [
         {
           "pose_id": "stand_solo",
@@ -96,7 +98,17 @@ Content-Type: multipart/form-data
       ]
     }
   ],
-  "notes": []
+  "notes": [],
+  "image": { "width": 1280, "height": 720 },
+  "inference_metadata": {
+    "deployment_version": "git-sha",
+    "vlm_provider": "gemini",
+    "vlm_model": "gemini-2.5-flash",
+    "pose_backend": "rtmlib",
+    "pose_model_version": "runtime-default",
+    "pose_library_version": "v1",
+    "feature_version": 1
+  }
 }
 ```
 
@@ -110,6 +122,8 @@ Content-Type: multipart/form-data
 | `vlm_count` | int | VLM이 센 사람 수 (둘의 일치가 신뢰도 신호 — `CLAUDE.md` 불변식 §2) |
 | `people` | Person[] | 인물별 결과. `route:"skip"`이면 빈 배열 |
 | `notes` | string[] | 폴백 사유 등 사람이 읽는 메모 |
+| `image` | object | 분석 기준 원본의 `width`, `height` |
+| `inference_metadata` | object | 배포·VLM·포즈 backend/model·포즈 라이브러리·feature schema 버전 |
 
 **`people[]` (PersonOut)**
 
@@ -118,6 +132,8 @@ Content-Type: multipart/form-data
 | `index` | int | 컷 안 인물 인덱스(0부터) |
 | `box` | float[4] \| null | `[x1,y1,x2,y2]` 픽셀 |
 | `tags` | object | 이 인물의 의미 태그(§4) |
+| `skeleton` | object \| null | `coco17-v1` 2D keypoints와 관절별 confidence |
+| `confidence` | string \| null | 인물 검출·매칭 신뢰도 |
 | `candidates` | Candidate[] | Top-K 후보(기본 `top_k_final=5`, `config.py`) |
 
 **`candidates[]` (CandidateOut)**

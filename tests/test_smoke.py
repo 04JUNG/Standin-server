@@ -14,6 +14,24 @@ from src.runtime_guard import (
     ensure_production_backends,
 )
 from src.thumbnails import find_thumbnail, thumbnail_url
+from api.models import SkeletonOut, ImageInfoOut, InferenceMetadataOut
+
+
+def test_api_models_include_skeleton_and_version_lineage():
+    skeleton = SkeletonOut(keypoints=[[1.0, 2.0]], scores=[0.9])
+    image = ImageInfoOut(width=100, height=200)
+    metadata = InferenceMetadataOut(
+        deployment_version="sha",
+        vlm_provider="mock",
+        vlm_model="mock",
+        pose_backend="mock",
+        pose_model_version="1",
+        pose_library_version="v1",
+        feature_version=1,
+    )
+    assert skeleton.schema_version == "coco17-v1"
+    assert image.height == 200
+    assert metadata.pose_library_version == "v1"
 
 
 class _Img(str):

@@ -18,10 +18,33 @@ class CandidateOut(BaseModel):
     thumbnail_url: Optional[str] = Field(None, description="후보 시점 PNG 썸네일의 내부 다운로드 경로")
 
 
+class SkeletonOut(BaseModel):
+    schema_version: str = "coco17-v1"
+    keypoints: List[List[float]]
+    scores: List[float]
+
+
+class ImageInfoOut(BaseModel):
+    width: int
+    height: int
+
+
+class InferenceMetadataOut(BaseModel):
+    deployment_version: str
+    vlm_provider: str
+    vlm_model: str
+    pose_backend: str
+    pose_model_version: str
+    pose_library_version: str
+    feature_version: int
+
+
 class PersonOut(BaseModel):
     index: int
     box: Optional[List[float]] = Field(None, description="[x1,y1,x2,y2] 픽셀")
     tags: dict
+    skeleton: Optional[SkeletonOut] = None
+    confidence: Optional[str] = None
     candidates: List[CandidateOut]
 
 
@@ -32,6 +55,8 @@ class CutResultOut(BaseModel):
     vlm_count: int
     people: List[PersonOut] = []
     notes: List[str] = []
+    image: ImageInfoOut
+    inference_metadata: InferenceMetadataOut
 
 
 # ==== 동원 Export 계약 (Tauri → 동원 내보내기) ============================
