@@ -3,6 +3,7 @@ numpy>=1.24
 
 # --- API 레이어 ---
 fastapi>=0.110
+pydantic>=2.7,<3             # Annotated list length constraints used by API contracts
 uvicorn[standard]>=0.29
 python-multipart>=0.0.9      # UploadFile(멀티파트) 처리
 Pillow>=10.0                 # 업로드 PNG 로드

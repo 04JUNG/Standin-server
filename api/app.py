@@ -26,14 +26,15 @@ from src.config import CFG
 from src.pipeline import Pipeline
 from src.library import build_synthetic_index
 from src.library_source import ensure_library
-from src.repo import build_db, load_entries, get_bvh_path, get_pose_meta
+from src.repo import FEATURE_VERSION, build_db, load_entries, get_bvh_path, get_pose_meta
 from src.thumbnails import THUMBNAIL_VIEWS, find_thumbnail, thumbnail_url
 from src.runtime_guard import (
     MockBackendError,
     actual_backend_names,
     ensure_production_backends,
 )
-from api.models import (CutResultOut, PersonOut, CandidateOut,
+from api.models import (CutResultOut, PersonOut, CandidateOut, SkeletonOut,
+                        ImageInfoOut, InferenceMetadataOut,
                         ExportOrderRequest, ExportOrder, ExportItem)
 
 DB_PATH = os.getenv("DB_PATH", "data/poses.db")
@@ -159,6 +160,12 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default="")):
             index=i,
             box=desc.box.as_list() if desc.box else None,
             tags=desc.tag_dict(),
+            skeleton=(SkeletonOut(
+                keypoints=desc.skeleton.keypoints.tolist(),
+                scores=desc.skeleton.scores.tolist(),
+            ) if desc.skeleton is not None else None),
+            confidence=(res.person_confidence[i]
+                        if i < len(res.person_confidence) else None),
             candidates=[CandidateOut(
                 pose_id=c.pose_id, view=c.view.value, distance=c.distance,
                 tags=c.tags, rerank_score=c.rerank_score,
@@ -166,10 +173,23 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default="")):
                 thumbnail_url=thumbnail_url(CFG.data_dir, c.pose_id, c.view.value),
             ) for c in cands],
         ))
+    vlm_model = (CFG.gemini_model if STATE.get("provider") == "gemini"
+                 else CFG.openai_model if STATE.get("provider") == "openai"
+                 else "mock")
     return CutResultOut(
         route=res.route, count_confidence=res.count_confidence,
         detector_count=res.detector_count, vlm_count=res.vlm_count,
         people=people, notes=res.notes,
+        image=ImageInfoOut(width=w, height=h),
+        inference_metadata=InferenceMetadataOut(
+            deployment_version=CFG.deployment_version,
+            vlm_provider=STATE.get("provider", CFG.vlm_provider),
+            vlm_model=vlm_model,
+            pose_backend=STATE.get("pose_backend", CFG.pose_backend),
+            pose_model_version=os.getenv("POSE_MODEL_VERSION", "runtime-default"),
+            pose_library_version=CFG.pose_library_version,
+            feature_version=FEATURE_VERSION,
+        ),
     )
 
 

@@ -44,6 +44,8 @@ class Config:
     # 비어 있으면 받지 않는다 → 로컬은 data/에 직접 둔 파일을 쓴다.
     pose_library_uri: str = os.getenv("POSE_LIBRARY_URI", "")
     data_dir: str = os.getenv("DATA_DIR", "data")
+    deployment_version: str = os.getenv("DEPLOYMENT_VERSION", "development")
+    pose_library_version: str = os.getenv("POSE_LIBRARY_VERSION", "v1")
 
     @property
     def is_production(self) -> bool:

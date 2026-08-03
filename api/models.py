@@ -4,7 +4,7 @@ schema.py의 dataclass를 미러링하되, 네트워크 경계에 맞게 bvh_url
 """
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import Annotated, List, Literal, Optional
 from pydantic import BaseModel, Field
 
 
@@ -18,10 +18,38 @@ class CandidateOut(BaseModel):
     thumbnail_url: Optional[str] = Field(None, description="후보 시점 PNG 썸네일의 내부 다운로드 경로")
 
 
+Point2D = Annotated[List[float], Field(min_length=2, max_length=2)]
+Keypoints17 = Annotated[List[Point2D], Field(min_length=17, max_length=17)]
+Scores17 = Annotated[List[float], Field(min_length=17, max_length=17)]
+
+
+class SkeletonOut(BaseModel):
+    schema_version: Literal["coco17-v1"] = "coco17-v1"
+    keypoints: Keypoints17
+    scores: Scores17
+
+
+class ImageInfoOut(BaseModel):
+    width: int
+    height: int
+
+
+class InferenceMetadataOut(BaseModel):
+    deployment_version: str
+    vlm_provider: str
+    vlm_model: str
+    pose_backend: str
+    pose_model_version: str
+    pose_library_version: str
+    feature_version: int
+
+
 class PersonOut(BaseModel):
     index: int
     box: Optional[List[float]] = Field(None, description="[x1,y1,x2,y2] 픽셀")
     tags: dict
+    skeleton: Optional[SkeletonOut] = None
+    confidence: Optional[str] = None
     candidates: List[CandidateOut]
 
 
@@ -32,6 +60,8 @@ class CutResultOut(BaseModel):
     vlm_count: int
     people: List[PersonOut] = []
     notes: List[str] = []
+    image: ImageInfoOut
+    inference_metadata: InferenceMetadataOut
 
 
 # ==== 동원 Export 계약 (Tauri → 동원 내보내기) ============================
