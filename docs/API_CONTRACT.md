@@ -84,7 +84,17 @@ Content-Type: multipart/form-data
       "index": 0,
       "box": [120.0, 80.0, 360.0, 720.0],
       "tags": { "shot": "full_half", "action": "standing", "view": "front", "relationship": "solo" },
-      "skeleton": { "schema_version": "coco17-v1", "keypoints": [[1.0, 2.0]], "scores": [0.9] },
+      "skeleton": {
+        "schema_version": "coco17-v1",
+        "keypoints": [
+          [640.0, 120.0], [630.0, 110.0], [650.0, 110.0], [615.0, 120.0],
+          [665.0, 120.0], [590.0, 210.0], [690.0, 210.0], [560.0, 320.0],
+          [720.0, 320.0], [540.0, 420.0], [740.0, 420.0], [610.0, 410.0],
+          [670.0, 410.0], [605.0, 560.0], [675.0, 560.0], [600.0, 700.0],
+          [680.0, 700.0]
+        ],
+        "scores": [0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9]
+      },
       "confidence": "high",
       "candidates": [
         {
@@ -132,7 +142,7 @@ Content-Type: multipart/form-data
 | `index` | int | 컷 안 인물 인덱스(0부터) |
 | `box` | float[4] \| null | `[x1,y1,x2,y2]` 픽셀 |
 | `tags` | object | 이 인물의 의미 태그(§4) |
-| `skeleton` | object \| null | `coco17-v1` 2D keypoints와 관절별 confidence |
+| `skeleton` | object \| null | `coco17-v1`의 정확히 17개 `[x,y]` keypoints와 17개 관절 confidence. 순서는 COCO-17 표준을 따른다. |
 | `confidence` | string \| null | 인물 검출·매칭 신뢰도 |
 | `candidates` | Candidate[] | Top-K 후보(기본 `top_k_final=5`, `config.py`) |
 

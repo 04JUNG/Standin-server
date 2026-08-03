@@ -4,7 +4,7 @@ schema.py의 dataclass를 미러링하되, 네트워크 경계에 맞게 bvh_url
 """
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import Annotated, List, Literal, Optional
 from pydantic import BaseModel, Field
 
 
@@ -18,10 +18,15 @@ class CandidateOut(BaseModel):
     thumbnail_url: Optional[str] = Field(None, description="후보 시점 PNG 썸네일의 내부 다운로드 경로")
 
 
+Point2D = Annotated[List[float], Field(min_length=2, max_length=2)]
+Keypoints17 = Annotated[List[Point2D], Field(min_length=17, max_length=17)]
+Scores17 = Annotated[List[float], Field(min_length=17, max_length=17)]
+
+
 class SkeletonOut(BaseModel):
-    schema_version: str = "coco17-v1"
-    keypoints: List[List[float]]
-    scores: List[float]
+    schema_version: Literal["coco17-v1"] = "coco17-v1"
+    keypoints: Keypoints17
+    scores: Scores17
 
 
 class ImageInfoOut(BaseModel):

@@ -1,7 +1,9 @@
 """스모크 테스트: shot/사람수 분기 + 기하 매칭 + 신뢰도 폴백 계약 검증."""
+import io
 import os, sys
 import tempfile
 from pathlib import Path
+from pydantic import ValidationError
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.library import build_synthetic_index
@@ -17,8 +19,12 @@ from src.thumbnails import find_thumbnail, thumbnail_url
 from api.models import SkeletonOut, ImageInfoOut, InferenceMetadataOut
 
 
+def _coco17_keypoints():
+    return [[float(i), float(i + 1)] for i in range(17)]
+
+
 def test_api_models_include_skeleton_and_version_lineage():
-    skeleton = SkeletonOut(keypoints=[[1.0, 2.0]], scores=[0.9])
+    skeleton = SkeletonOut(keypoints=_coco17_keypoints(), scores=[0.9] * 17)
     image = ImageInfoOut(width=100, height=200)
     metadata = InferenceMetadataOut(
         deployment_version="sha",
@@ -34,6 +40,26 @@ def test_api_models_include_skeleton_and_version_lineage():
     assert metadata.pose_library_version == "v1"
 
 
+def _assert_invalid_skeleton(**overrides):
+    payload = {"keypoints": _coco17_keypoints(), "scores": [0.9] * 17}
+    payload.update(overrides)
+    try:
+        SkeletonOut(**payload)
+    except ValidationError:
+        return
+    raise AssertionError(f"invalid COCO-17 skeleton was accepted: {overrides}")
+
+
+def test_api_model_rejects_non_coco17_shapes():
+    for count in (16, 18):
+        _assert_invalid_skeleton(keypoints=_coco17_keypoints()[:count]
+                                 if count < 17 else _coco17_keypoints() + [[17.0, 18.0]])
+        _assert_invalid_skeleton(scores=[0.9] * count)
+    _assert_invalid_skeleton(keypoints=[[0.0]] + _coco17_keypoints()[1:])
+    _assert_invalid_skeleton(keypoints=[[0.0, 1.0, 2.0]] + _coco17_keypoints()[1:])
+    _assert_invalid_skeleton(schema_version="other")
+
+
 class _Img(str):
     @property
     def hint(self): return str(self)
@@ -41,6 +67,47 @@ class _Img(str):
 
 def _pipe():
     return Pipeline(build_synthetic_index())
+
+
+def test_analyze_route_maps_full_response_contract():
+    from PIL import Image
+    from fastapi import UploadFile
+    import api.app as api_app
+
+    image_bytes = io.BytesIO()
+    Image.new("RGB", (16, 12), color=(255, 255, 255)).save(image_bytes, format="PNG")
+    image_bytes.seek(0)
+
+    previous_state = dict(api_app.STATE)
+    api_app.STATE.clear()
+    api_app.STATE.update({
+        "pipeline": _pipe(),
+        "provider": "mock",
+        "pose_backend": "mock",
+    })
+    try:
+        result = api_app.analyze(
+            UploadFile(filename="cut.png", file=image_bytes),
+            hint="full_half standing front 1p",
+        ).model_dump()
+    finally:
+        api_app.STATE.clear()
+        api_app.STATE.update(previous_state)
+
+    assert result["image"] == {"width": 16, "height": 12}
+    assert len(result["people"]) == 1
+    skeleton = result["people"][0]["skeleton"]
+    assert skeleton["schema_version"] == "coco17-v1"
+    assert len(skeleton["keypoints"]) == 17
+    assert all(len(point) == 2 for point in skeleton["keypoints"])
+    assert len(skeleton["scores"]) == 17
+    assert result["people"][0]["candidates"]
+    metadata = result["inference_metadata"]
+    assert metadata["deployment_version"] == CFG.deployment_version
+    assert metadata["vlm_provider"] == "mock"
+    assert metadata["pose_backend"] == "mock"
+    assert metadata["pose_library_version"] == CFG.pose_library_version
+    assert isinstance(metadata["feature_version"], int)
 
 
 def test_core_route_and_geometric_topk():
