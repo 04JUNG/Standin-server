@@ -1,21 +1,39 @@
 name: CI
+
 on:
   pull_request:
     branches: [main, develop]
   push:
     branches: [develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: inference-ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  test:
+  checks:
+    name: PR checks
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install deps (core only)
-        run: pip install numpy
-      - name: Syntax/build check
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt pytest
+
+      - name: Compile Python sources
         run: python -m compileall src api scripts
-      - name: Smoke test (mock, no API/model)
-        run: python tests/test_smoke.py
+
+      - name: Run tests
+        run: python -m pytest tests/ -q
+
+      - name: Validate production image
+        run: docker build --platform linux/amd64 --tag standin-inference:ci .
