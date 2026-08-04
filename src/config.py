@@ -57,8 +57,51 @@ class Config:
     distance_metric: str = os.getenv("DISTANCE", "pos")
     hybrid_w: float = float(os.getenv("HYBRID_W", "0.7"))   # hybrid에서 각도 비중
     fallback_distance: float = float(os.getenv("FALLBACK_DISTANCE", "0.45"))
+    # mask-aware 거리는 coverage마다 분모가 달라 raw distance를 서로 직접 비교할 수 없다.
+    # 아래 값은 metric×coverage별 보정 지점이다. 아직 고정 평가셋으로 보정하지 않은
+    # 환경에서는 기존 FALLBACK_DISTANCE를 호환 기본값으로 쓰되, sparse는 별도 정책으로
+    # high confidence를 금지한다(docs/SKELETON_EXTRACTION_IMPROVEMENT.md §5-0).
+    fallback_pos_full: float = float(os.getenv(
+        "FALLBACK_POS_FULL", os.getenv("FALLBACK_DISTANCE", "0.45")))
+    fallback_pos_reduced: float = float(os.getenv(
+        "FALLBACK_POS_REDUCED", os.getenv("FALLBACK_DISTANCE", "0.45")))
+    fallback_angle_full: float = float(os.getenv(
+        "FALLBACK_ANGLE_FULL", os.getenv("FALLBACK_DISTANCE", "0.45")))
+    fallback_angle_reduced: float = float(os.getenv(
+        "FALLBACK_ANGLE_REDUCED", os.getenv("FALLBACK_DISTANCE", "0.45")))
+    fallback_hybrid_full: float = float(os.getenv(
+        "FALLBACK_HYBRID_FULL", os.getenv("FALLBACK_DISTANCE", "0.45")))
+    fallback_hybrid_reduced: float = float(os.getenv(
+        "FALLBACK_HYBRID_REDUCED", os.getenv("FALLBACK_DISTANCE", "0.45")))
     # 스켈레톤 평균 score가 이 값 미만이면 추출 실패로 간주.
     min_skeleton_score: float = float(os.getenv("MIN_SKELETON_SCORE", "0.2"))
+
+    # --- 스켈레톤 추출 보완 --- docs/SKELETON_EXTRACTION_IMPROVEMENT.md
+    skeleton_kpt_threshold: float = float(os.getenv("SKELETON_KPT_THRESHOLD", "0.3"))
+    skeleton_torso_min_box_ratio: float = float(os.getenv(
+        "SKELETON_TORSO_MIN_BOX_RATIO", "0.05"))
+    slot_min_box_area_ratio: float = float(os.getenv("SLOT_MIN_BOX_AREA_RATIO", "0.001"))
+    slot_assignment_max_cost: float = float(os.getenv("SLOT_ASSIGNMENT_MAX_COST", "0.85"))
+    slot_assignment_ambiguity_margin: float = float(os.getenv(
+        "SLOT_ASSIGNMENT_AMBIGUITY_MARGIN", "0.08"))
+    slot_duplicate_iou: float = float(os.getenv("SLOT_DUPLICATE_IOU", "0.70"))
+    slot_provisional_max_iou: float = float(os.getenv("SLOT_PROVISIONAL_MAX_IOU", "0.20"))
+    slot_crop_max_per_cut: int = int(os.getenv("SLOT_CROP_MAX_PER_CUT", "2"))
+    slot_crop_padding: float = float(os.getenv("SLOT_CROP_PADDING", "0.20"))
+    # 음수면 family overlap만 판정하고 Top-1 angle은 진단값으로만 기록한다.
+    # 고정 평가셋 보정 뒤 양수로 설정하면 두 조건을 함께 게이트한다.
+    slot_stability_top1_angle_max: float = float(os.getenv(
+        "SLOT_STABILITY_TOP1_ANGLE_MAX", "-1"))
+
+    def fallback_threshold(self, metric: str, coverage_class: str) -> float | None:
+        """metric×coverage confidence 임계값. sparse/insufficient는 high 대상이 아니다."""
+        metric = metric.lower()
+        coverage_class = coverage_class.lower()
+        if coverage_class not in ("full", "reduced"):
+            return None
+        if metric not in ("pos", "angle", "hybrid"):
+            metric = "pos"
+        return float(getattr(self, f"fallback_{metric}_{coverage_class}"))
 
     # --- 포즈 미세조정(refine) ---  docs/REFINE_DESIGN.md
     # 설계 원칙: refine은 '좋아지거나, 그대로'다. 아래 값들은 전부 그 보장을 위한 것.

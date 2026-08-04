@@ -17,7 +17,7 @@ from typing import List
 import numpy as np
 
 from .schema import LibraryEntry, View, Shot, Action, Relationship, COCO17
-from .features import normalize_skeleton
+from .features import normalize_skeleton, _BODY
 from .bvh import load_coco17
 
 
@@ -114,6 +114,19 @@ def build_entries_from_pose(pose_id: str, joints3d: np.ndarray, tags: dict,
     """
     if scores is None:
         scores = np.ones(17, dtype=np.float32)
+    joints3d = np.asarray(joints3d, dtype=np.float32)
+    scores = np.asarray(scores, dtype=np.float32).reshape(-1)
+    if joints3d.shape != (17, 3):
+        raise ValueError(
+            f"pose '{pose_id}' COCO mapping must have shape (17,3), got {joints3d.shape}"
+        )
+    if scores.shape != (17,) or not np.isfinite(joints3d).all() or not np.isfinite(scores).all():
+        raise ValueError(f"pose '{pose_id}' has invalid COCO mapping values")
+    missing_body = [index for index in _BODY if scores[index] < 0.3]
+    if missing_body:
+        raise ValueError(
+            f"pose '{pose_id}' has incomplete BVH body mapping: {missing_body}"
+        )
     entries = []
     for view in VIRTUAL_CAMERAS:
         feat = pose_to_feature(joints3d, view, scores)   # ← refine과 공유

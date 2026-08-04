@@ -43,6 +43,12 @@ class BasePoseModel:
         out = self.estimate(image, [box], img_w, img_h)
         return out[0] if out else None
 
+    def estimate_crop_candidates(self, image, box: BBox, img_w: int,
+                                 img_h: int) -> List[Skeleton]:
+        """슬롯 복구용 후보 목록. 단일 결과 백엔드는 0~1개로 호환한다."""
+        result = self.estimate_crop(image, box, img_w, img_h)
+        return [result] if result is not None else []
+
 
 class MockPoseModel(BasePoseModel):
     """박스 위치에 맞춰 그럴듯한 곧은-서기 스켈레톤을 합성. 검색 파이프라인 검증용."""
@@ -78,6 +84,10 @@ class MockSelfDetectingPoseModel(MockPoseModel):
     def estimate_crop(self, image, box: BBox, img_w: int, img_h: int) -> Optional[Skeleton]:
         return super().estimate(image, [box], img_w, img_h)[0]
 
+    def estimate_crop_candidates(self, image, box: BBox, img_w: int,
+                                 img_h: int) -> List[Skeleton]:
+        return [self.estimate_crop(image, box, img_w, img_h)]
+
 
 class RTMPoseModel(BasePoseModel):
     """실제 RTMPose Body 어댑터. `pip install rtmlib onnxruntime opencv-python`.
@@ -95,21 +105,31 @@ class RTMPoseModel(BasePoseModel):
         return [Skeleton(np.asarray(k, dtype=np.float32), np.asarray(s, dtype=np.float32))
                 for k, s in zip(kpts, scores)]
 
-    def estimate_crop(self, image, box: BBox, img_w, img_h) -> Optional[Skeleton]:
+    def estimate_crop_candidates(self, image, box: BBox, img_w, img_h) -> List[Skeleton]:
         img = _load_bgr(image)
         h, w = img.shape[:2]
         bw, bh = box.x2 - box.x1, box.y2 - box.y1
-        x1 = max(0, int(box.x1 - 0.15*bw)); y1 = max(0, int(box.y1 - 0.15*bh))
-        x2 = min(w, int(box.x2 + 0.15*bw)); y2 = min(h, int(box.y2 + 0.15*bh))
+        padding = CFG.slot_crop_padding
+        x1 = max(0, int(box.x1 - padding*bw)); y1 = max(0, int(box.y1 - padding*bh))
+        x2 = min(w, int(box.x2 + padding*bw)); y2 = min(h, int(box.y2 + padding*bh))
         crop = img[y1:y2, x1:x2]
         if crop.size == 0:
-            return None
+            return []
         kpts, scores = self.model(crop)
         if len(kpts) == 0:
+            return []
+        offset = np.array([x1, y1], dtype=np.float32)
+        return [Skeleton(np.asarray(points, dtype=np.float32) + offset,
+                         np.asarray(score, dtype=np.float32))
+                for points, score in zip(kpts, scores)]
+
+    def estimate_crop(self, image, box: BBox, img_w, img_h) -> Optional[Skeleton]:
+        """레거시 단일 결과 호출. 새 슬롯 경로는 구조+적합도로 후보를 직접 고른다."""
+        candidates = self.estimate_crop_candidates(image, box, img_w, img_h)
+        if not candidates:
             return None
-        index = int(np.argmax([np.asarray(score).mean() for score in scores]))
-        points = np.asarray(kpts[index], dtype=np.float32) + np.array([x1, y1], dtype=np.float32)
-        return Skeleton(points, np.asarray(scores[index], dtype=np.float32))
+        index = int(np.argmax([np.asarray(item.scores).mean() for item in candidates]))
+        return candidates[index]
 
 
 def build_pose_model() -> BasePoseModel:

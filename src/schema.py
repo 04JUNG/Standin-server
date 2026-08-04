@@ -120,6 +120,13 @@ class PersonDescriptor:
     skeleton: Optional[Skeleton]
     feature: Optional[np.ndarray]
     box: Optional[BBox] = None
+    # 내부 추출 품질 메타데이터. API 계약에는 PR #7 정리 뒤 별도로 노출한다.
+    valid_joint_mask: Optional[np.ndarray] = None
+    skeleton_state: str = "valid"
+    coverage_class: str = "full"
+    slot_origin: str = "detector"
+    refine_allowed: bool = True
+    quality_reasons: list[str] = field(default_factory=list)
 
     def tag_dict(self) -> dict:
         return {
@@ -167,6 +174,7 @@ class PoseCandidate:
     tags: dict
     bvh_path: Optional[str] = None
     rerank_score: Optional[float] = None
+    pose_family_id: Optional[str] = None
 
 
 def dumps(obj) -> str:

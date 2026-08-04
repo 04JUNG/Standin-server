@@ -41,8 +41,8 @@ def order_left_to_right(skeletons: List[Optional[Skeleton]],
 
 
 def build_descriptors(vlm: VLMAnalysis,
-                      skeletons: List[Skeleton],
-                      boxes: List[BBox]) -> List[PersonDescriptor]:
+                      skeletons: List[Optional[Skeleton]],
+                      boxes: List[Optional[BBox]]) -> List[PersonDescriptor]:
     """
     인물별 Descriptor 생성. 태그(shot/action/view/relationship)는 컷 단위 값을 공유하되,
     스켈레톤/피처/박스는 인물별로 갖는다.
@@ -55,5 +55,62 @@ def build_descriptors(vlm: VLMAnalysis,
             shot=vlm.shot, action=vlm.action, view=vlm.view,
             relationship=vlm.relationship,
             skeleton=sk, feature=feat, box=box,
+        ))
+    return out
+
+
+def build_slot_descriptors(vlm: VLMAnalysis, slots) -> List[PersonDescriptor]:
+    """복구가 끝난 PersonSlot을 검색 descriptor로 변환한다.
+
+    invalid/missing 슬롯도 descriptor 자리를 유지해 뒤 인물의 person_index가 당겨지지
+    않게 한다. 명시적 mask는 순위 거리에 전달하고 raw score는 평가를 위해 보존한다.
+    """
+    out: List[PersonDescriptor] = []
+    for slot in slots:
+        skeleton = slot.skeleton
+        evidence = slot.evidence
+        searchable = bool(skeleton is not None and evidence is not None
+                          and evidence.searchable and slot.state not in ("missing", "invalid"))
+        valid_mask = evidence.valid_joint_mask.copy() if evidence is not None else None
+        feature = None
+        if searchable:
+            feature = normalize_skeleton(
+                skeleton.keypoints, skeleton.scores, valid_mask=valid_mask
+            )
+        refine_allowed = bool(
+            searchable
+            and slot.state == "valid"
+            and evidence.coverage_class == "full"
+            and slot.slot_origin != "rtm_provisional"
+            and slot.skeleton_source != "crop_retry"
+        )
+        # hard invalid 좌표(NaN/Inf 포함)는 네트워크 경계로 내보내지 않는다. raw 값은
+        # slot/evidence trace에만 남기고 descriptor 자리는 유지한다.
+        output_skeleton = skeleton if slot.state not in ("missing", "invalid") else None
+        if output_skeleton is not None:
+            output_scores = evidence.effective_scores
+            if not refine_allowed:
+                # PR #7 전 API에는 refine_allowed가 없다. score를 0으로 보내면 기존
+                # /refine의 low_skeleton_score 게이트가 안전하게 베이스를 반환한다.
+                output_scores = np.zeros(17, dtype=np.float32)
+            output_skeleton = Skeleton(
+                np.asarray(output_skeleton.keypoints, dtype=np.float32).copy(),
+                output_scores,
+            )
+        out.append(PersonDescriptor(
+            shot=vlm.shot,
+            action=vlm.action,
+            view=vlm.view,
+            relationship=vlm.relationship,
+            skeleton=output_skeleton,
+            feature=feature,
+            box=slot.result_box,
+            valid_joint_mask=valid_mask,
+            skeleton_state=slot.state,
+            coverage_class=(evidence.coverage_class if evidence is not None
+                            else "insufficient"),
+            slot_origin=slot.slot_origin,
+            refine_allowed=refine_allowed,
+            quality_reasons=list(dict.fromkeys(slot.reasons)),
         ))
     return out

@@ -25,6 +25,18 @@ import numpy as np
 from .schema import LibraryEntry, View
 
 FEATURE_VERSION = 1   # features.normalize_skeleton 규격 버전. 바꾸면 +1 하고 재빌드.
+FEATURE_SHAPE = (34,)
+
+
+def _validated_feature(feature, pose_id: str) -> np.ndarray:
+    feat = np.asarray(feature, dtype=np.float32).reshape(-1)
+    if feat.shape != FEATURE_SHAPE:
+        raise ValueError(
+            f"pose '{pose_id}' feature shape must be {FEATURE_SHAPE}, got {feat.shape}"
+        )
+    if not np.isfinite(feat).all():
+        raise ValueError(f"pose '{pose_id}' feature contains NaN/Inf")
+    return feat
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS poses (
@@ -60,11 +72,15 @@ def connect(db_path: str) -> sqlite3.Connection:
 
 def build_db(entries: List[LibraryEntry], db_path: str) -> int:
     """LibraryEntry 목록 → SQLite. 같은 pose_id는 poses 1행 + view별 projections N행."""
+    # 기존 DB를 비우기 전에 전 항목을 검증한다. 중간 feature 하나가 깨졌다고 정상 DB를
+    # 부분 갱신하거나 열린 transaction으로 남기면 안 된다.
+    validated = [(entry, _validated_feature(entry.feature, entry.pose_id))
+                 for entry in entries]
     con = connect(db_path)
     con.execute("DELETE FROM pose_projections")
     con.execute("DELETE FROM poses")
     seen = set()
-    for e in entries:
+    for e, validated_feature in validated:
         if e.pose_id not in seen:
             con.execute(
                 "INSERT INTO poses(pose_id,bvh_path,source,license,shot,action,"
@@ -76,7 +92,7 @@ def build_db(entries: List[LibraryEntry], db_path: str) -> int:
                  json.dumps(e.meta, ensure_ascii=False)),
             )
             seen.add(e.pose_id)
-        feat = np.asarray(e.feature, dtype=np.float32).tobytes()
+        feat = validated_feature.tobytes()
         con.execute(
             "INSERT INTO pose_projections(pose_id,view,feature_blob,feature_version)"
             " VALUES(?,?,?,?)",
@@ -104,7 +120,10 @@ def load_entries(db_path: str) -> List[LibraryEntry]:
             raise RuntimeError(
                 f"feature_version 불일치(db={r['feature_version']} != "
                 f"code={FEATURE_VERSION}). DB를 재빌드하세요(scripts/build_db.py).")
-        feat = np.frombuffer(r["feature_blob"], dtype=np.float32).copy()
+        feat = _validated_feature(
+            np.frombuffer(r["feature_blob"], dtype=np.float32).copy(),
+            r["pose_id"],
+        )
         tags = {"shot": r["shot"], "action": r["action"],
                 "relationship": r["relationship"], "view": r["view"]}
         out.append(LibraryEntry(
