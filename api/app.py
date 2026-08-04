@@ -163,6 +163,11 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default="")):
     for i, desc in enumerate(res.descriptors):
         cands = per_person[i] if i < len(per_person) else []
         skel = desc.skeleton
+        raw_scores = None
+        if desc.raw_scores is not None:
+            raw = np.asarray(desc.raw_scores, dtype=float).reshape(-1)
+            if raw.shape == (17,) and np.isfinite(raw).all():
+                raw_scores = raw.tolist()
         people.append(PersonOut(
             index=i,
             box=desc.box.as_list() if desc.box else None,
@@ -171,8 +176,6 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default="")):
                 keypoints=desc.skeleton.keypoints.tolist(),
                 scores=desc.skeleton.scores.tolist(),
             ) if desc.skeleton is not None else None),
-            confidence=(res.person_confidence[i]
-                        if i < len(res.person_confidence) else None),
             candidates=[CandidateOut(
                 pose_id=c.pose_id, view=c.view.value, distance=c.distance,
                 tags=c.tags, rerank_score=c.rerank_score,
@@ -184,6 +187,22 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default="")):
                       if skel is not None else None,
             scores=np.asarray(skel.scores, dtype=float).reshape(-1).tolist()
                    if skel is not None else None,
+            raw_scores=raw_scores,
+            confidence=(res.person_confidence[i]
+                        if i < len(res.person_confidence) else "low"),
+            skeleton_state=desc.skeleton_state,
+            skeleton_source=desc.skeleton_source,
+            coverage_class=desc.coverage_class,
+            slot_origin=desc.slot_origin,
+            search_stability=desc.search_stability,
+            distance_metric=desc.distance_metric,
+            rank_distance=desc.rank_distance,
+            confidence_threshold=desc.confidence_threshold,
+            valid_limbs=list(desc.valid_limbs),
+            refinable_limbs=list(desc.refinable_limbs),
+            refine_allowed=desc.refine_allowed,
+            quality_trace=desc.quality_trace,
+            quality_reasons=desc.quality_reasons,
         ))
     vlm_model = (CFG.gemini_model if STATE.get("provider") == "gemini"
                  else CFG.openai_model if STATE.get("provider") == "openai"
@@ -245,7 +264,11 @@ def _refine_handle(req: RefineRequest) -> str:
     """같은 입력 → 같은 파일. 작가가 같은 후보를 다시 눌러도 재계산하지 않는다."""
     kp = np.asarray(req.keypoints, dtype=float).round(2).tobytes()
     sc = np.asarray(req.scores or [], dtype=float).round(3).tobytes()
-    h = hashlib.sha1(f"{req.pose_id}|{req.view}|".encode() + kp + sc)
+    policy = (
+        f"|allowed={req.refine_allowed}|limbs="
+        f"{','.join(sorted(req.refinable_limbs or []))}|"
+    ).encode()
+    h = hashlib.sha1(f"{req.pose_id}|{req.view}|".encode() + policy + kp + sc)
     return h.hexdigest()[:16]
 
 
@@ -269,6 +292,13 @@ def refine(req: RefineRequest):
     if req.scores is not None and len(req.scores) != 17:
         raise HTTPException(422, f"scores는 17개여야 합니다(받은 값: {len(req.scores)})")
 
+    if req.refine_allowed is False:
+        return RefineResponse(
+            pose_id=req.pose_id, view=req.view, refined=False,
+            reason="skeleton_policy", bvh_url=f"/pose/{req.pose_id}/bvh",
+            loss_base=None, loss_final=None, gain=None, backend="none",
+        )
+
     # 얽힘 세트는 조정하지 않는다. hug_01_A/B를 각자 돌리면 두 사람이 맞물리던
     # 정합(손이 어깨에 닿는 등)이 깨지는데, BVH는 상대 위치를 안 실으므로
     # 그 깨짐을 되돌릴 방법이 없다. 세트 refine은 세트 전체를 함께 푸는 별도 과제.
@@ -282,7 +312,8 @@ def refine(req: RefineRequest):
     out_path = os.path.join(REFINE_DIR, f"{handle}.bvh")
     try:
         res = refine_bvh(base, req.keypoints, req.scores, req.view,
-                         out_path=out_path, search_distance=req.search_distance)
+                         out_path=out_path, search_distance=req.search_distance,
+                         allowed_limbs=req.refinable_limbs)
     except ValueError as exc:                      # 알 수 없는 view 등
         raise HTTPException(422, str(exc)) from exc
 

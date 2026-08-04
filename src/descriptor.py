@@ -79,20 +79,18 @@ def build_slot_descriptors(vlm: VLMAnalysis, slots) -> List[PersonDescriptor]:
             )
         refine_allowed = bool(
             searchable
-            and slot.state == "valid"
-            and evidence.coverage_class == "full"
+            and slot.state in ("valid", "partial")
+            and evidence.coverage_class in ("full", "reduced")
+            and evidence.refinable_limbs
             and slot.slot_origin != "rtm_provisional"
             and slot.skeleton_source != "crop_retry"
+            and (slot.state == "valid" or slot.search_stability == "stable")
         )
         # hard invalid 좌표(NaN/Inf 포함)는 네트워크 경계로 내보내지 않는다. raw 값은
         # slot/evidence trace에만 남기고 descriptor 자리는 유지한다.
         output_skeleton = skeleton if slot.state not in ("missing", "invalid") else None
         if output_skeleton is not None:
             output_scores = evidence.effective_scores
-            if not refine_allowed:
-                # PR #7 전 API에는 refine_allowed가 없다. score를 0으로 보내면 기존
-                # /refine의 low_skeleton_score 게이트가 안전하게 베이스를 반환한다.
-                output_scores = np.zeros(17, dtype=np.float32)
             output_skeleton = Skeleton(
                 np.asarray(output_skeleton.keypoints, dtype=np.float32).copy(),
                 output_scores,
@@ -110,7 +108,29 @@ def build_slot_descriptors(vlm: VLMAnalysis, slots) -> List[PersonDescriptor]:
             coverage_class=(evidence.coverage_class if evidence is not None
                             else "insufficient"),
             slot_origin=slot.slot_origin,
+            skeleton_source=slot.skeleton_source,
             refine_allowed=refine_allowed,
+            valid_limbs=(evidence.valid_limbs if evidence is not None else ()),
+            refinable_limbs=(evidence.refinable_limbs if evidence is not None else ()),
+            raw_scores=(evidence.raw_scores.copy() if evidence is not None else None),
+            search_stability=slot.search_stability,
+            distance_metric=None,
+            rank_distance=slot.rank_distance,
+            confidence_threshold=slot.confidence_threshold,
+            quality_trace={
+                "assigned_rtm_index": slot.assigned_rtm_index,
+                "assignment_cost": slot.assignment_cost,
+                "assignment_margin": slot.assignment_margin,
+                "valid_bone_count": (evidence.valid_bone_count
+                                     if evidence is not None else 0),
+                "torso_bone_count": (evidence.torso_bone_count
+                                     if evidence is not None else 0),
+                "quality_components": (dict(evidence.quality_components)
+                                       if evidence is not None else {}),
+                "retry_count": slot.retry_count,
+                "retry_reason": slot.retry_reason,
+                "retry_elapsed_ms": round(float(slot.retry_elapsed_ms), 3),
+            },
             quality_reasons=list(dict.fromkeys(slot.reasons)),
         ))
     return out

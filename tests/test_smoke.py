@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.library import build_synthetic_index
 from src.pipeline import Pipeline
-from src.pose import MockSelfDetectingPoseModel
+from src.pose import MockPoseModel, MockSelfDetectingPoseModel
 from src.config import CFG
 from src.runtime_guard import (
     MockBackendError,
@@ -16,6 +16,7 @@ from src.runtime_guard import (
     ensure_production_backends,
 )
 from src.thumbnails import find_thumbnail, thumbnail_url
+from src.vlm.client import MockVLMClient
 from api.models import SkeletonOut, ImageInfoOut, InferenceMetadataOut
 
 
@@ -66,7 +67,8 @@ class _Img(str):
 
 
 def _pipe():
-    return Pipeline(build_synthetic_index())
+    return Pipeline(build_synthetic_index(), vlm_client=MockVLMClient(),
+                    pose_model=MockPoseModel())
 
 
 def test_analyze_route_maps_full_response_contract():
@@ -153,7 +155,8 @@ def test_two_person_two_results():
 
 
 def test_selfdetect_recovers_missing_person():
-    p = Pipeline(build_synthetic_index(), pose_model=MockSelfDetectingPoseModel())
+    p = Pipeline(build_synthetic_index(), vlm_client=MockVLMClient(),
+                 pose_model=MockSelfDetectingPoseModel())
     res = p.process_cut(_Img("full_half standing front 2p miss"))
     assert res.detector_count == 1
     assert res.count_confidence == "low"
@@ -184,7 +187,8 @@ def test_load_bgr_pil_modes():
 
 
 def test_selfdetect_count_match_high():
-    p = Pipeline(build_synthetic_index(), pose_model=MockSelfDetectingPoseModel())
+    p = Pipeline(build_synthetic_index(), vlm_client=MockVLMClient(),
+                 pose_model=MockSelfDetectingPoseModel())
     res = p.process_cut(_Img("full_half standing front 2p"))
     assert res.detector_count == 2
     assert res.count_confidence == "high"
@@ -193,7 +197,8 @@ def test_selfdetect_count_match_high():
 
 def test_production_rejects_silent_mock_fallback():
     """설정이 실백엔드여도 실제 객체가 mock이면 프로덕션 기동을 막는다."""
-    pipeline = Pipeline(build_synthetic_index())
+    pipeline = Pipeline(build_synthetic_index(), vlm_client=MockVLMClient(),
+                        pose_model=MockPoseModel())
     try:
         ensure_production_backends(
             pipeline,
@@ -212,7 +217,8 @@ def test_production_rejects_silent_mock_fallback():
 
 
 def test_development_allows_mock_backends_and_reports_actual_names():
-    pipeline = Pipeline(build_synthetic_index())
+    pipeline = Pipeline(build_synthetic_index(), vlm_client=MockVLMClient(),
+                        pose_model=MockPoseModel())
     ensure_production_backends(
         pipeline,
         is_production=False,
@@ -475,6 +481,21 @@ def test_refine_gate_low_skeleton_score():
         res = refine_bvh(base, kp, np.zeros(17, np.float32), "front",
                          out_path=f"{d}/out.bvh")
         assert not res.refined and res.reason == "low_skeleton_score"
+
+
+def test_refine_respects_skeleton_policy_allowed_limbs():
+    """추출 품질 단계가 허용하지 않은 사지는 score가 높아도 풀지 않는다."""
+    import tempfile
+    from src.refine import refine_bvh
+    with tempfile.TemporaryDirectory() as d:
+        base = _synthetic_bvh(d, "base.bvh")
+        tgt = _bvh_with_rotation(d, "tgt.bvh", "LeftArm", 25.0)
+        kp, sc = _target_kp(tgt)
+        res = refine_bvh(
+            base, kp, sc, "front", out_path=f"{d}/out.bvh",
+            allowed_limbs=[],
+        )
+        assert not res.refined and res.reason == "insufficient_target_bones"
 
 
 def test_refine_disabled_switch():

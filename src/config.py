@@ -80,11 +80,28 @@ class Config:
     skeleton_kpt_threshold: float = float(os.getenv("SKELETON_KPT_THRESHOLD", "0.3"))
     skeleton_torso_min_box_ratio: float = float(os.getenv(
         "SKELETON_TORSO_MIN_BOX_RATIO", "0.05"))
+    # 구조 이상은 웹툰 과장을 허용하도록 넉넉한 상한을 쓰며, hard invalid가 아니라
+    # crop/A-B 안정성 진단의 신호로 사용한다.
+    skeleton_torso_width_ratio_max: float = float(os.getenv(
+        "SKELETON_TORSO_WIDTH_RATIO_MAX", "2.50"))
+    skeleton_arm_segment_ratio_max: float = float(os.getenv(
+        "SKELETON_ARM_SEGMENT_RATIO_MAX", "1.80"))
+    skeleton_leg_segment_ratio_max: float = float(os.getenv(
+        "SKELETON_LEG_SEGMENT_RATIO_MAX", "2.50"))
+    skeleton_adjacent_segment_ratio_max: float = float(os.getenv(
+        "SKELETON_ADJACENT_SEGMENT_RATIO_MAX", "3.50"))
     slot_min_box_area_ratio: float = float(os.getenv("SLOT_MIN_BOX_AREA_RATIO", "0.001"))
     slot_assignment_max_cost: float = float(os.getenv("SLOT_ASSIGNMENT_MAX_COST", "0.85"))
     slot_assignment_ambiguity_margin: float = float(os.getenv(
         "SLOT_ASSIGNMENT_AMBIGUITY_MARGIN", "0.08"))
     slot_duplicate_iou: float = float(os.getenv("SLOT_DUPLICATE_IOU", "0.70"))
+    # IoU만으로 중복을 판정하면 포옹처럼 실제 두 사람이 겹친 장면을 지운다.
+    # 공통 body 관절의 평균 거리를 박스 대각선으로 정규화해 함께 확인한다.
+    slot_duplicate_keypoint_distance: float = float(os.getenv(
+        "SLOT_DUPLICATE_KEYPOINT_DISTANCE", "0.08"))
+    slot_owner_padding: float = float(os.getenv("SLOT_OWNER_PADDING", "0.15"))
+    slot_cross_owner_max_iou: float = float(os.getenv(
+        "SLOT_CROSS_OWNER_MAX_IOU", "0.50"))
     slot_provisional_max_iou: float = float(os.getenv("SLOT_PROVISIONAL_MAX_IOU", "0.20"))
     slot_crop_max_per_cut: int = int(os.getenv("SLOT_CROP_MAX_PER_CUT", "2"))
     slot_crop_padding: float = float(os.getenv("SLOT_CROP_PADDING", "0.20"))

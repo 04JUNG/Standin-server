@@ -49,7 +49,6 @@ class PersonOut(BaseModel):
     box: Optional[List[float]] = Field(None, description="[x1,y1,x2,y2] 픽셀")
     tags: dict
     skeleton: Optional[SkeletonOut] = None
-    confidence: Optional[str] = None
     candidates: List[CandidateOut]
     # /refine을 '순수 함수'로 만들기 위한 필드(docs/REFINE_DESIGN.md §3).
     # /analyze가 이미 추출한 값을 실어 보낼 뿐이라 연산 추가는 0이다.
@@ -59,6 +58,26 @@ class PersonOut(BaseModel):
         None, description="러프에서 추출한 2D 스켈레톤 (17×2, 이미지 픽셀 좌표)")
     scores: Optional[List[float]] = Field(
         None, description="관절별 신뢰도 (17,). 낮은 관절은 refine 손실에서 제외됨")
+    raw_scores: Optional[List[float]] = Field(
+        None, description="평가용 RTMPose 원본 score. scores는 구조 마스킹/안전정책 반영값")
+    confidence: str = Field("low", description="high | low")
+    skeleton_state: str = Field(
+        "valid", description="valid | partial | suspect | missing | invalid")
+    skeleton_source: str = Field(
+        "full_image", description="none | full_image | crop_retry")
+    coverage_class: str = Field(
+        "full", description="full | reduced | sparse | insufficient")
+    slot_origin: str = Field("vlm", description="vlm | rtm_provisional")
+    search_stability: Optional[str] = Field(
+        None, description="stable | ambiguous | unstable | not_required | not_available")
+    distance_metric: Optional[str] = None
+    rank_distance: Optional[float] = None
+    confidence_threshold: Optional[float] = None
+    valid_limbs: List[str] = Field(default_factory=list)
+    refinable_limbs: List[str] = Field(default_factory=list)
+    refine_allowed: bool = False
+    quality_trace: dict = Field(default_factory=dict)
+    quality_reasons: List[str] = Field(default_factory=list)
 
 
 class CutResultOut(BaseModel):
@@ -84,6 +103,10 @@ class RefineRequest(BaseModel):
         None, description="/analyze가 준 PersonOut.scores를 그대로 (17,)")
     search_distance: Optional[float] = Field(
         None, description="그 후보의 distance. 주면 '베이스 불일치' 안전 게이트가 켜진다")
+    refine_allowed: Optional[bool] = Field(
+        None, description="/analyze가 준 값을 그대로 전달. false면 서버가 refine을 차단")
+    refinable_limbs: Optional[List[str]] = Field(
+        None, description="/analyze가 허용한 사지만 전달. 예: left_arm")
 
 
 class RefineResponse(BaseModel):
@@ -92,7 +115,7 @@ class RefineResponse(BaseModel):
     view: str
     refined: bool = Field(..., description="조정본이 나왔는가. False면 bvh_url=베이스")
     reason: str = Field(..., description="ok | disabled | entangled_set | "
-                                         "low_skeleton_score | base_mismatch | "
+                                         "skeleton_policy | low_skeleton_score | base_mismatch | "
                                          "multiframe_base | insufficient_target_bones | "
                                          "already_matched | no_gain | ok_partial | "
                                          "movement_gate | global_no_gain | "

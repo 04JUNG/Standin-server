@@ -69,8 +69,7 @@ def knn(entries: List[LibraryEntry], desc: PersonDescriptor,
     q = desc.feature
     scored = []
     for e in pool:
-        d = pose_distance(q, e.feature, query_valid_mask,
-                          np.ones(17, dtype=bool))
+        d = _dist(q, e.feature, query_valid_mask=query_valid_mask)
         if e.view == desc.view:
             d *= CFG.view_priority_weight     # 같은 시점 우대(필터 아님)
         scored.append(PoseCandidate(

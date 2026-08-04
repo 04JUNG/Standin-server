@@ -125,7 +125,16 @@ class PersonDescriptor:
     skeleton_state: str = "valid"
     coverage_class: str = "full"
     slot_origin: str = "detector"
+    skeleton_source: str = "full_image"
     refine_allowed: bool = True
+    valid_limbs: tuple[str, ...] = ()
+    refinable_limbs: tuple[str, ...] = ()
+    raw_scores: Optional[np.ndarray] = None
+    search_stability: Optional[str] = None
+    distance_metric: Optional[str] = None
+    rank_distance: Optional[float] = None
+    confidence_threshold: Optional[float] = None
+    quality_trace: dict = field(default_factory=dict)
     quality_reasons: list[str] = field(default_factory=list)
 
     def tag_dict(self) -> dict:

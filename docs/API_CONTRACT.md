@@ -66,7 +66,9 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
   "view": "front",
   "keypoints": [[120.5, 88.0], ...],   // /analyze의 PersonOut.keypoints 그대로
   "scores":    [0.91, 0.87, ...],      // /analyze의 PersonOut.scores 그대로
-  "search_distance": 0.21              // 그 후보의 distance(선택). 주면 안전 게이트가 켜진다
+  "search_distance": 0.21,             // 그 후보의 distance(선택). 주면 안전 게이트가 켜진다
+  "refine_allowed": true,              // PersonOut.refine_allowed 그대로
+  "refinable_limbs": ["left_arm"]      // PersonOut.refinable_limbs 그대로
 }
 // 응답
 {
@@ -216,6 +218,17 @@ Content-Type: multipart/form-data
 | `skeleton` | object \| null | `coco17-v1`의 정확히 17개 `[x,y]` keypoints와 17개 관절 confidence. 순서는 COCO-17 표준을 따른다. |
 | `confidence` | string \| null | 인물 검출·매칭 신뢰도 |
 | `candidates` | Candidate[] | Top-K 후보(기본 `top_k_final=5`, `config.py`) |
+| `keypoints` / `scores` | float[17][2] / float[17] \| null | 원본 좌표와 구조 마스킹·refine 정책을 반영한 유효 score |
+| `raw_scores` | float[17] \| null | 평가용 RTMPose 원본 score |
+| `confidence` | string | `high` 또는 `low` |
+| `skeleton_state` | string | `valid` · `partial` · `suspect` · `missing` · `invalid` |
+| `skeleton_source` | string | `full_image` · `crop_retry` · `none` |
+| `coverage_class` | string | `full` · `reduced` · `sparse` · `insufficient` |
+| `slot_origin` | string | `vlm` · `rtm_provisional` |
+| `search_stability` | string \| null | `stable` · `ambiguous` · `unstable` · `not_required` · `not_available` |
+| `valid_limbs` / `refinable_limbs` | string[] | 검색에 남은 부위와 refine 허용 사지 |
+| `refine_allowed` | bool | 현재 스켈레톤·검색 결과에 refine을 적용해도 되는가 |
+| `quality_reasons` / `quality_trace` | string[] / object | 구조 판정 사유와 배정·coverage·retry·검색 진단값 |
 
 **`candidates[]` (CandidateOut)**
 

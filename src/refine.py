@@ -531,6 +531,7 @@ def refine_bvh(base_bvh: str,
                search_distance: Optional[float] = None,
                frame: int = 0,
                bone_weights: Optional[Sequence[float]] = None,
+               allowed_limbs: Optional[Sequence[str]] = None,
                cfg=CFG) -> RefineResult:
     """
     베이스 BVH를 러프 2D 스켈레톤에 맞춰 미세조정한다.
@@ -542,6 +543,7 @@ def refine_bvh(base_bvh: str,
         view:             매칭된 view("front"/"three_quarter"/"side"/"back")
         out_path:         조정본 저장 경로. None이면 베이스 옆에 .refined.bvh
         search_distance:  /analyze가 낸 Top-1 거리. 주면 게이트 5(베이스 불일치) 작동
+        allowed_limbs:    스켈레톤 품질 단계가 허용한 사지. None이면 기존 동작
         frame:            베이스 BVH에서 사용할 프레임(라이브러리 색인과 동일하게 0)
 
     Returns:
@@ -583,9 +585,16 @@ def refine_bvh(base_bvh: str,
     # 한쪽 뼈만 보이는 사지를 풀면(예: 무릎은 보이는데 발목은 잘림) 부실한 타깃에
     # 맞추려고 고관절이 크게 돌아간다. 통째로 동결하는 편이 언제나 낫다.
     bone_index = {tuple(b): i for i, b in enumerate(_BONES)}
+    configured_limbs = tuple(enabled_limbs(cfg))
+    if allowed_limbs is not None:
+        requested = tuple(dict.fromkeys(str(name) for name in allowed_limbs))
+        unknown = sorted(set(requested) - set(LIMBS))
+        if unknown:
+            raise ValueError(f"unknown refinable limbs: {unknown}")
+        configured_limbs = tuple(name for name in configured_limbs if name in requested)
     limb_decisions = {}
     active = []
-    for name in enabled_limbs(cfg):
+    for name in configured_limbs:
         if all(tgt_ok[bone_index[p]] for p in LIMBS[name][1]):
             active.append(name)
             limb_decisions[name] = {

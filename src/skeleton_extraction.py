@@ -39,6 +39,8 @@ class SkeletonEvidence:
     valid_bone_count: int
     torso_bone_count: int
     torso_scale: float
+    suspect_limbs: tuple[str, ...] = ()
+    quality_components: dict[str, float | int | bool] = field(default_factory=dict)
     reasons: list[str] = field(default_factory=list)
 
     @property
@@ -55,6 +57,15 @@ class SkeletonEvidence:
         out[~self.valid_joint_mask] = 0.0
         return out
 
+    @property
+    def refine_scores(self) -> np.ndarray:
+        """구버전 클라이언트도 의심 사지를 풀지 못하게 만든 refine 전용 score."""
+        out = self.effective_scores
+        for limb in self.suspect_limbs:
+            _, middle, endpoint = _LIMB_JOINTS[limb]
+            out[[middle, endpoint]] = 0.0
+        return out
+
 
 @dataclass
 class PersonSlot:
@@ -69,6 +80,13 @@ class PersonSlot:
     retry_count: int = 0
     reasons: list[str] = field(default_factory=list)
     assignment_cost: Optional[float] = None
+    assignment_margin: Optional[float] = None
+    assigned_rtm_index: Optional[int] = None
+    search_stability: Optional[str] = None
+    rank_distance: Optional[float] = None
+    confidence_threshold: Optional[float] = None
+    retry_reason: Optional[str] = None
+    retry_elapsed_ms: float = 0.0
 
     @property
     def result_box(self) -> Optional[BBox]:
@@ -80,6 +98,33 @@ class AssignmentResult:
     slots: list[PersonSlot]
     unmatched_candidate_indices: list[int]
     invalid_vlm_box_reasons: list[str]
+
+
+_LIMB_JOINTS = {
+    "left_arm": (5, 7, 9),
+    "right_arm": (6, 8, 10),
+    "left_leg": (11, 13, 15),
+    "right_leg": (12, 14, 16),
+}
+
+
+def _expanded_box(box: BBox, ratio: float) -> BBox:
+    width = max(0.0, box.x2 - box.x1)
+    height = max(0.0, box.y2 - box.y1)
+    return BBox(
+        box.x1 - width * ratio,
+        box.y1 - height * ratio,
+        box.x2 + width * ratio,
+        box.y2 + height * ratio,
+        source=box.source,
+        score=box.score,
+    )
+
+
+def _point_in_box(point: np.ndarray, box: Optional[BBox]) -> bool:
+    if box is None or not np.isfinite(point).all():
+        return False
+    return bool(box.x1 <= point[0] <= box.x2 and box.y1 <= point[1] <= box.y2)
 
 
 def _finite_box(box: BBox) -> bool:
@@ -166,29 +211,41 @@ def torso_center(skeleton: Skeleton, valid_mask: np.ndarray | None = None
 
 def analyze_skeleton(skeleton: Optional[Skeleton], box: Optional[BBox] = None,
                      kpt_thr: float | None = None,
-                     torso_min_box_ratio: float | None = None
-                     ) -> SkeletonEvidence:
-    """score와 구조 최소조건을 분리해 state와 coverage를 계산한다."""
-    kpt_thr = CFG.skeleton_kpt_threshold if kpt_thr is None else float(kpt_thr)
-    torso_min_box_ratio = (CFG.skeleton_torso_min_box_ratio
+                     torso_min_box_ratio: float | None = None,
+                     owner_box: Optional[BBox] = None,
+                     peer_boxes: Iterable[BBox] = (),
+                     cfg=CFG) -> SkeletonEvidence:
+    """score·구조·슬롯 소유권을 분리해 state와 coverage를 계산한다.
+
+    ``box``는 스켈레톤 자체 크기 기준이고 ``owner_box``는 VLM 슬롯 소유권
+    기준이다. 사지가 다른 슬롯으로 향한다는 사실만으로 좌표를 폐기하지 않는다.
+    강한 길이 불연속은 effective mask에서 제거하고, 소유권 교차는 A/B 검색에서
+    검증할 ``suspect_limbs``로만 남긴다.
+    """
+    kpt_thr = cfg.skeleton_kpt_threshold if kpt_thr is None else float(kpt_thr)
+    torso_min_box_ratio = (cfg.skeleton_torso_min_box_ratio
                            if torso_min_box_ratio is None
                            else float(torso_min_box_ratio))
     empty_joint = np.zeros(17, dtype=bool)
     empty_bone = np.zeros(len(_BONES), dtype=bool)
     if skeleton is None:
         return SkeletonEvidence(
-            "missing", "insufficient", empty_joint, empty_bone,
-            np.zeros(17, dtype=np.float32), (), (), 0, 0, 0.0,
-            ["missing_skeleton"],
+            state="missing", coverage_class="insufficient",
+            valid_joint_mask=empty_joint, valid_bone_mask=empty_bone,
+            raw_scores=np.zeros(17, dtype=np.float32), valid_limbs=(),
+            refinable_limbs=(), valid_bone_count=0, torso_bone_count=0,
+            torso_scale=0.0, reasons=["missing_skeleton"],
         )
     try:
         kp = np.asarray(skeleton.keypoints, dtype=np.float32).reshape(17, 2)
         scores = np.asarray(skeleton.scores, dtype=np.float32).reshape(17)
     except (TypeError, ValueError):
         return SkeletonEvidence(
-            "invalid", "insufficient", empty_joint, empty_bone,
-            np.zeros(17, dtype=np.float32), (), (), 0, 0, 0.0,
-            ["invalid_shape"],
+            state="invalid", coverage_class="insufficient",
+            valid_joint_mask=empty_joint, valid_bone_mask=empty_bone,
+            raw_scores=np.zeros(17, dtype=np.float32), valid_limbs=(),
+            refinable_limbs=(), valid_bone_count=0, torso_bone_count=0,
+            torso_scale=0.0, reasons=["invalid_shape"],
         )
 
     reasons: list[str] = []
@@ -196,12 +253,6 @@ def analyze_skeleton(skeleton: Optional[Skeleton], box: Optional[BBox] = None,
     if not finite.all():
         reasons.append("non_finite_keypoints")
     valid_joint = finite & (scores >= kpt_thr)
-    valid_bone = np.asarray(
-        [valid_joint[a] and valid_joint[b] for a, b in _BONES], dtype=bool
-    )
-    valid_bones = int(valid_bone.sum())
-    torso_bones = int(valid_bone[TORSO_BONES].sum())
-
     anchors_valid = bool(valid_joint[ANCHOR_JOINTS].all())
     torso_scale = 0.0
     if anchors_valid:
@@ -216,6 +267,104 @@ def analyze_skeleton(skeleton: Optional[Skeleton], box: Optional[BBox] = None,
         reasons.append("invalid_torso_anchors")
     elif not torso_normal:
         reasons.append("torso_degenerate")
+
+    quality: dict[str, float | int | bool] = {
+        "anchors_valid": anchors_valid,
+        "torso_scale": torso_scale,
+    }
+    torso_suspect = False
+    suspect_limbs: set[str] = set()
+
+    # 합쳐진 두 인물의 어깨/골반을 한 몸통으로 연결한 경우를 강한 비율 이상으로
+    # 감지한다. 웹툰 과장을 허용하도록 임계값은 정상 비율보다 넉넉하게 둔다.
+    if torso_normal:
+        shoulder_ratio = float(np.linalg.norm(kp[5] - kp[6]) / torso_scale)
+        hip_ratio = float(np.linalg.norm(kp[11] - kp[12]) / torso_scale)
+        quality["shoulder_width_ratio"] = shoulder_ratio
+        quality["hip_width_ratio"] = hip_ratio
+        if max(shoulder_ratio, hip_ratio) > cfg.skeleton_torso_width_ratio_max:
+            torso_suspect = True
+            reasons.append("torso_width_outlier")
+
+    peers = [peer for peer in peer_boxes if peer is not None]
+    if owner_box is not None and anchors_valid:
+        owner_region = _expanded_box(owner_box, cfg.slot_owner_padding)
+        center = kp[ANCHOR_JOINTS].mean(axis=0)
+        owner_anchor_count = sum(_point_in_box(kp[j], owner_region)
+                                 for j in ANCHOR_JOINTS)
+        quality["owner_anchor_count"] = int(owner_anchor_count)
+        center_in_owner = _point_in_box(center, owner_region)
+        quality["torso_center_in_owner"] = center_in_owner
+        peer_anchor_count = max(
+            (sum(_point_in_box(kp[j], peer) for j in ANCHOR_JOINTS)
+             for peer in peers),
+            default=0,
+        )
+        quality["max_peer_anchor_count"] = int(peer_anchor_count)
+        if peer_anchor_count >= 2 and (not center_in_owner or owner_anchor_count < 3):
+            torso_suspect = True
+            reasons.append("torso_cross_slot")
+        elif not center_in_owner:
+            # VLM 박스는 대략값이므로 팔다리/anchor가 조금 나가는 것은 허용하지만,
+            # 몸통 중심 자체가 padding 밖이면 슬롯 소유권을 신뢰하기 어렵다.
+            reasons.append("torso_outside_slot")
+            torso_suspect = True
+
+    # 사지의 두 segment를 몸통 길이와 비교한다. 명백한 길이 점프는 다른 인물의
+    # 관절이 붙은 강한 증거이므로 distal 관절을 마스킹한다. 단순히 다른 슬롯으로
+    # 뻗은 팔은 합법적인 포즈일 수 있어 suspect로만 남기고 A/B 검색에 맡긴다.
+    for limb, (root, middle, endpoint) in _LIMB_JOINTS.items():
+        if not (valid_joint[root] and valid_joint[middle] and valid_joint[endpoint]
+                and torso_normal):
+            continue
+        first = float(np.linalg.norm(kp[middle] - kp[root]))
+        second = float(np.linalg.norm(kp[endpoint] - kp[middle]))
+        first_ratio = first / torso_scale
+        second_ratio = second / torso_scale
+        adjacent_ratio = max(first, second) / max(min(first, second), 1e-6)
+        quality[f"{limb}_segment_max_ratio"] = max(first_ratio, second_ratio)
+        quality[f"{limb}_segment_balance"] = adjacent_ratio
+        length_limit = (cfg.skeleton_arm_segment_ratio_max
+                        if limb.endswith("arm")
+                        else cfg.skeleton_leg_segment_ratio_max)
+        first_bad = first_ratio > length_limit
+        second_bad = second_ratio > length_limit
+        balance_bad = adjacent_ratio > cfg.skeleton_adjacent_segment_ratio_max
+        if first_bad or second_bad or balance_bad:
+            if first_bad or (balance_bad and first >= second):
+                # middle이 잘못되면 그 아래 endpoint의 소유권도 보장할 수 없다.
+                valid_joint[[middle, endpoint]] = False
+            else:
+                # 정상 upper segment는 살리고 튄 endpoint만 제거한다.
+                valid_joint[endpoint] = False
+            suspect_limbs.add(limb)
+            reasons.append(f"{limb}_length_outlier")
+            continue
+
+        if owner_box is None or not peers:
+            continue
+        owner_region = _expanded_box(owner_box, cfg.slot_owner_padding)
+        if not _point_in_box(kp[root], owner_region):
+            continue
+        distal = (kp[middle], kp[endpoint])
+        for peer in peers:
+            # 박스 자체가 크게 겹치면 소유권 증거가 약하다. 얽힘 장면의 정상 팔을
+            # 과도하게 지우지 않기 위해 별도 suspect도 만들지 않는다.
+            if bbox_iou(owner_box, peer) > cfg.slot_cross_owner_max_iou:
+                continue
+            peer_hits = sum(_point_in_box(point, peer) for point in distal)
+            owner_misses = sum(not _point_in_box(point, owner_region) for point in distal)
+            if peer_hits == 2 and owner_misses >= 1:
+                suspect_limbs.add(limb)
+                reasons.append(f"{limb}_cross_slot")
+                break
+
+    # 구조 마스킹을 적용한 뒤 coverage를 다시 계산한다.
+    valid_bone = np.asarray(
+        [valid_joint[a] and valid_joint[b] for a, b in _BONES], dtype=bool
+    )
+    valid_bones = int(valid_bone.sum())
+    torso_bones = int(valid_bone[TORSO_BONES].sum())
     if valid_bones < 4:
         reasons.append("insufficient_valid_bones")
     if torso_bones < 2:
@@ -239,17 +388,25 @@ def analyze_skeleton(skeleton: Optional[Skeleton], box: Optional[BBox] = None,
         state = "invalid"
     elif coverage == "insufficient":
         state = "suspect"  # crop 전에는 복구 가능성을 남긴다.
-    elif len(complete_limbs) == 4:
+    elif torso_suspect:
+        state = "suspect"
+    elif len(complete_limbs) == 4 and not suspect_limbs:
         state = "valid"
     else:
         state = "partial"
 
     valid_limbs = (("torso",) + complete_limbs) if torso_normal else complete_limbs
-    refinable = complete_limbs if coverage in ("full", "reduced") else ()
+    refinable = tuple(
+        limb for limb in complete_limbs if limb not in suspect_limbs
+    ) if coverage in ("full", "reduced") and not torso_suspect else ()
     return SkeletonEvidence(
-        state, coverage, valid_joint, valid_bone, scores.copy(),
-        tuple(valid_limbs), tuple(refinable), valid_bones, torso_bones,
-        torso_scale, reasons,
+        state=state, coverage_class=coverage,
+        valid_joint_mask=valid_joint, valid_bone_mask=valid_bone,
+        raw_scores=scores.copy(), valid_limbs=tuple(valid_limbs),
+        refinable_limbs=tuple(refinable), valid_bone_count=valid_bones,
+        torso_bone_count=torso_bones, torso_scale=torso_scale,
+        suspect_limbs=tuple(sorted(suspect_limbs)), quality_components=quality,
+        reasons=list(dict.fromkeys(reasons)),
     )
 
 
@@ -271,6 +428,43 @@ def assignment_cost(slot_box: BBox, candidate_box: Optional[BBox],
                                   slot_box.y2 - slot_box.y1)))
     center_distance = min(2.0, float(np.linalg.norm(center - slot_center) / diag))
     return 0.65 * (1.0 - bbox_iou(slot_box, candidate_box)) + 0.35 * center_distance
+
+
+def duplicate_skeleton_distance(a: Skeleton, b: Skeleton,
+                                a_box: Optional[BBox], b_box: Optional[BBox],
+                                kpt_thr: float | None = None) -> float:
+    """겹친 두 사람과 동일 검출 중복을 분리하는 정규화 관절 거리."""
+    if a_box is None or b_box is None:
+        return float("inf")
+    kpt_thr = CFG.skeleton_kpt_threshold if kpt_thr is None else float(kpt_thr)
+    try:
+        a_kp = np.asarray(a.keypoints, dtype=np.float32).reshape(17, 2)
+        b_kp = np.asarray(b.keypoints, dtype=np.float32).reshape(17, 2)
+        a_sc = np.asarray(a.scores, dtype=np.float32).reshape(17)
+        b_sc = np.asarray(b.scores, dtype=np.float32).reshape(17)
+    except (TypeError, ValueError):
+        return float("inf")
+    valid = (np.isfinite(a_kp).all(axis=1) & np.isfinite(b_kp).all(axis=1)
+             & np.isfinite(a_sc) & np.isfinite(b_sc)
+             & (a_sc >= kpt_thr) & (b_sc >= kpt_thr))
+    valid[:5] = False
+    if int(valid.sum()) < 4:
+        return float("inf")
+    diag_a = np.hypot(a_box.x2 - a_box.x1, a_box.y2 - a_box.y1)
+    diag_b = np.hypot(b_box.x2 - b_box.x1, b_box.y2 - b_box.y1)
+    scale = max(1.0, float((diag_a + diag_b) * 0.5))
+    return float(np.linalg.norm(a_kp[valid] - b_kp[valid], axis=1).mean() / scale)
+
+
+def are_duplicate_skeletons(a: Skeleton, b: Skeleton,
+                            a_box: Optional[BBox], b_box: Optional[BBox],
+                            cfg=CFG) -> bool:
+    return bool(
+        bbox_iou(a_box, b_box) >= cfg.slot_duplicate_iou
+        and duplicate_skeleton_distance(a, b, a_box, b_box,
+                                        cfg.skeleton_kpt_threshold)
+        <= cfg.slot_duplicate_keypoint_distance
+    )
 
 
 def _hungarian(cost: np.ndarray) -> list[int]:
@@ -342,7 +536,9 @@ def assign_candidates(vlm_boxes: Iterable[BBox], candidates: list[Skeleton],
     duplicate_indices: set[int] = set()
     for i in range(len(candidates)):
         for j in range(i + 1, len(candidates)):
-            if bbox_iou(candidate_boxes[i], candidate_boxes[j]) >= cfg.slot_duplicate_iou:
+            if are_duplicate_skeletons(
+                    candidates[i], candidates[j], candidate_boxes[i],
+                    candidate_boxes[j], cfg):
                 duplicate_indices.update((i, j))
 
     used: set[int] = set()
@@ -374,16 +570,28 @@ def assign_candidates(vlm_boxes: Iterable[BBox], candidates: list[Skeleton],
             used.add(column)
             slot.skeleton = candidates[column]
             slot.skeleton_box = candidate_boxes[column]
-            slot.evidence = evidence[column]
-            slot.state = evidence[column].state
+            peer_boxes = [other.vlm_box for index, other in enumerate(slots)
+                          if index != row and other.vlm_box is not None]
+            slot.evidence = analyze_skeleton(
+                candidates[column], candidate_boxes[column],
+                cfg.skeleton_kpt_threshold, cfg.skeleton_torso_min_box_ratio,
+                owner_box=slot.vlm_box, peer_boxes=peer_boxes, cfg=cfg,
+            )
+            slot.state = slot.evidence.state
             slot.skeleton_source = "full_image"
             slot.assignment_cost = cost
-            slot.reasons.extend(evidence[column].reasons)
-            alternatives = sorted(float(x) for x in real_cost[row] if np.isfinite(x))
-            row_best = alternatives[0] if alternatives else float("inf")
+            slot.assigned_rtm_index = column
+            slot.reasons.extend(slot.evidence.reasons)
+            alternatives = sorted(float(x) for candidate_index, x in enumerate(real_cost[row])
+                                  if candidate_index != column and np.isfinite(x))
+            slot.assignment_margin = (
+                alternatives[0] - cost if alternatives else None
+            )
+            row_costs = sorted(float(x) for x in real_cost[row] if np.isfinite(x))
+            row_best = row_costs[0] if row_costs else float("inf")
             row_ambiguous = (
-                len(alternatives) >= 2
-                and alternatives[1] - alternatives[0]
+                len(row_costs) >= 2
+                and row_costs[1] - row_costs[0]
                 < cfg.slot_assignment_ambiguity_margin
             )
             competition = cost - row_best > cfg.slot_assignment_ambiguity_margin
@@ -427,6 +635,7 @@ def assign_candidates(vlm_boxes: Iterable[BBox], candidates: list[Skeleton],
             next_id, "rtm_provisional", skeleton=candidates[index],
             skeleton_box=box, evidence=ev, state=ev.state,
             skeleton_source="full_image",
+            assigned_rtm_index=index,
             reasons=list(ev.reasons) + ["unmatched_rtm_provisional"],
         )
         slots.append(slot)
@@ -441,11 +650,15 @@ def assign_candidates(vlm_boxes: Iterable[BBox], candidates: list[Skeleton],
     )
 
 
-def _candidate_fit_score(skeleton: Skeleton, slot_box: BBox, cfg=CFG
+def _candidate_fit_score(skeleton: Skeleton, slot_box: BBox,
+                         peer_boxes: Iterable[BBox] = (), cfg=CFG
                          ) -> tuple[float, SkeletonEvidence, Optional[BBox]]:
     box = skeleton_bbox(skeleton, cfg.skeleton_kpt_threshold)
-    ev = analyze_skeleton(skeleton, box or slot_box, cfg.skeleton_kpt_threshold,
-                          cfg.skeleton_torso_min_box_ratio)
+    ev = analyze_skeleton(
+        skeleton, box or slot_box, cfg.skeleton_kpt_threshold,
+        cfg.skeleton_torso_min_box_ratio, owner_box=slot_box,
+        peer_boxes=peer_boxes, cfg=cfg,
+    )
     if box is None or ev.coverage_class == "insufficient":
         return -float("inf"), ev, box
     center = torso_center(skeleton, ev.valid_joint_mask)
@@ -457,25 +670,34 @@ def _candidate_fit_score(skeleton: Skeleton, slot_box: BBox, cfg=CFG
                       if center is not None else 2.0)
     coverage_bonus = {"full": 3.0, "reduced": 2.0, "sparse": 0.5}.get(
         ev.coverage_class, 0.0)
+    state_bonus = {"valid": 4.0, "partial": 1.5, "suspect": -2.0}.get(
+        ev.state, -10.0
+    )
     score = (ev.valid_bone_count + 1.5 * ev.torso_bone_count + coverage_bonus
+             + state_bonus
              + 2.0 * bbox_iou(slot_box, box) - center_penalty)
     return float(score), ev, box
 
 
-def select_crop_candidate(slot: PersonSlot, candidates: list[Skeleton], cfg=CFG
+def select_crop_candidate(slot: PersonSlot, candidates: list[Skeleton], cfg=CFG,
+                          peer_boxes: Iterable[BBox] = ()
                           ) -> Optional[tuple[Skeleton, SkeletonEvidence, BBox]]:
     """평균 score 대신 슬롯 적합도+구조 품질로 crop 결과를 선택한다."""
     if slot.vlm_box is None:
         return None
     best: Optional[tuple[float, Skeleton, SkeletonEvidence, BBox]] = None
     for candidate in candidates:
-        score, evidence, box = _candidate_fit_score(candidate, slot.vlm_box, cfg)
+        score, evidence, box = _candidate_fit_score(
+            candidate, slot.vlm_box, peer_boxes, cfg
+        )
         if box is not None and (best is None or score > best[0]):
             best = (score, candidate, evidence, box)
     if best is None or not np.isfinite(best[0]):
         return None
     if slot.skeleton is not None:
-        original_score, _, _ = _candidate_fit_score(slot.skeleton, slot.vlm_box, cfg)
+        original_score, _, _ = _candidate_fit_score(
+            slot.skeleton, slot.vlm_box, peer_boxes, cfg
+        )
         if best[0] <= original_score + 0.1:
             return None
     return best[1], best[2], best[3]
@@ -527,7 +749,7 @@ def sort_slots_left_to_right(slots: list[PersonSlot]) -> list[PersonSlot]:
 
 
 def conservative_joint_mask(evidence: SkeletonEvidence) -> np.ndarray:
-    """A/B stability의 B mask: 불완전 사지는 뿌리 관절을 남기고 distal만 제거한다."""
+    """A/B stability의 B mask: 불완전·소유권 의심 사지의 distal을 제거한다."""
     mask = np.asarray(evidence.valid_joint_mask, dtype=bool).copy()
     distal = {
         "left_arm": (7, 9),
@@ -536,7 +758,8 @@ def conservative_joint_mask(evidence: SkeletonEvidence) -> np.ndarray:
         "right_leg": (14, 16),
     }
     complete = set(evidence.refinable_limbs)
+    suspect = set(evidence.suspect_limbs)
     for name, joints in distal.items():
-        if name not in complete:
+        if name not in complete or name in suspect:
             mask[list(joints)] = False
     return mask

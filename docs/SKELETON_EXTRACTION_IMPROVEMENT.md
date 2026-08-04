@@ -5,10 +5,11 @@
 >
 > 기준일: 2026-08-03 · 구현 브랜치 `feat/skeleton-extraction-improvement`
 >
-> 상태: **Claude 리뷰를 반영한 최종 설계안이자 구현 기준 문서.**
-> mask-aware 거리, coverage, 라이브러리 검증, `PersonSlot` 전역 배정, 조건부 crop,
-> pose-family A/B 안정성 진단, 최종 좌→우 정렬은 구현 중이다. 고정 평가셋 임계값 보정,
-> unstable partial의 사후 crop 재검사, PR #7 이후 API 메타데이터 연결은 아직 남아 있다.
+> 상태: **런타임 구현 완료, 실데이터 임계값 보정 대기.**
+> mask-aware 거리, coverage, 라이브러리 검증, `PersonSlot` 전역 배정, 합침·소유권 구조 검사,
+> 조건부 crop, pose-family A/B 안정성 진단, unstable partial의 사후 crop 재검사,
+> 최종 좌→우 정렬, API 품질 메타데이터와 refine 사지 제한까지 연결됐다.
+> 남은 일은 고정 평가셋으로 metric×coverage·구조 비율 임계값을 보정하는 것이다.
 
 ---
 
@@ -881,3 +882,29 @@ top5_usefulness:  good / usable / bad
 - 안정성은 raw pose ID가 아니라 mirror를 접은 pose family 기준으로 본다.
 - 검색 가능성과 refine 가능 사지 수는 별도로 보고한다.
 - 정상 컷의 빠른 경로를 기준 성능으로 두고, 재시도 경로가 전체 p95를 과도하게 늘리지 않게 한다.
+
+---
+
+## 13. 구현 상태 (2026-08-05)
+
+### 완료
+
+- explicit query mask를 사용하는 `pos/angle/hybrid` 거리와 coverage별 confidence
+- VLM 박스 검증, 슬롯-RTM 전역 일대일 배정, 좌→우 최종 인덱스
+- IoU와 관절 유사도를 함께 보는 중복 검출
+- 몸통 anchor·폭 비율·사지 segment 연속성·슬롯 소유권 검사
+- 강한 길이 이상 관절 마스킹과 소유권 의심 사지 A/B 검색
+- `missing/suspect` 선행 crop 및 `unstable partial` 사후 crop 1회
+- crop 후 품질·검색 재검사와 soft/hard fallback 분리
+- raw/effective score, valid/refinable limb, 안정성·거리·retry trace API 노출
+- `/refine`의 `refine_allowed` 및 `refinable_limbs` 강제
+- 정상 경로 추가 pose/crop 호출 없음 회귀 테스트
+
+### 평가셋이 있어야 끝나는 항목
+
+- `distance_metric × coverage_class`별 fallback 임계값 확정
+- 몸통 폭·사지 길이·중복 관절 거리 임계값 보정
+- `SLOT_STABILITY_TOP1_ANGLE_MAX` 활성값 확정
+- provisional precision, crop 오복구율, 정상/재시도 p50·p95 측정
+
+이 값들은 코드 미구현이 아니라 **라벨 없는 상태에서 임의 확정하면 안 되는 calibration 값**이다.
