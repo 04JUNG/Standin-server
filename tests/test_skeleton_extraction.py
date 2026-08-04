@@ -260,6 +260,34 @@ def test_normal_pipeline_calls_full_pose_once_and_skips_crop():
     assert not any("ab_knn=" in note for note in result.notes)
 
 
+def test_invalid_full_image_skeleton_retries_crop_once():
+    invalid = _skeleton(cx=200, cy=150, scale=120)
+    invalid.keypoints[0] = [np.nan, np.nan]
+    recovered = _skeleton(cx=200, cy=150, scale=120)
+
+    class InvalidThenRecoveredPose(MockPoseModel):
+        self_detecting = True
+
+        def __init__(self):
+            self.crop_calls = 0
+
+        def estimate(self, image, boxes, img_w, img_h):
+            return [invalid]
+
+        def estimate_crop_candidates(self, image, box, img_w, img_h):
+            self.crop_calls += 1
+            return [recovered]
+
+    pose = InvalidThenRecoveredPose()
+    result = Pipeline(
+        build_synthetic_index(), vlm_client=MockVLMClient(), pose_model=pose
+    ).process_cut(_Img("full_half standing front 1p"), 400, 300)
+
+    assert pose.crop_calls == 1
+    assert result.descriptors[0].skeleton_source == "crop_retry"
+    assert result.descriptors[0].skeleton_state == "valid"
+
+
 def test_pipeline_person_index_is_stable_when_rtm_order_is_shuffled():
     class ShuffledPose(MockPoseModel):
         self_detecting = True

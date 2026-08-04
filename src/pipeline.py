@@ -161,7 +161,7 @@ class Pipeline:
         # partial은 먼저 검색 안정성을 본 뒤, 실제로 불안정할 때만 아래에서 재시도한다.
         for slot in assignment.slots:
             if slot.vlm_box is not None and (
-                    slot.skeleton is None or slot.state == "suspect"):
+                    slot.skeleton is None or slot.state in ("suspect", "invalid")):
                 try_crop(slot, "pre_search_suspect")
 
         slots = [finalize_slot(slot, CFG) for slot in assignment.slots]
