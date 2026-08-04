@@ -68,12 +68,14 @@ webtoon-pose-mvp/
 │  ├─ mixamo_fbx_to_bvh.py  Mixamo FBX → 포즈별 1프레임 BVH(Blender)
 │  ├─ bvh_contact_sheet.py  BVH 폴더 → COCO17 스틱피겨 시트(투영 검수)
 │  ├─ eval_search.py       러프→RTMPose→검색 Top-K 정성평가(4순위, --use-vlm 태그검색)
-│  └─ vlm_tag.py           러프→VLM 태그(shot/action/view/count) 측정(5순위)
+│  ├─ vlm_tag.py           러프→VLM 태그(shot/action/view/count) 측정(5순위)
+│  └─ deploy_pose_library.py  라이브러리 검증→S3 업로드→추론 서비스 재기동(운영자용)
 ├─ tests/
 │  └─ test_smoke.py       핵심 계약 검증(pytest 불필요, 자체 러너 내장)
 ├─ data/
 │  ├─ poses.db            (자동 생성) SQLite 라이브러리 = 검색 단일 소스
 │  ├─ bvh/                원본 BVH 파일(동원이 /pose/{id}/bvh로 받는 실체)
+│  ├─ thumbs/             <id>__<view>.png 후보 미리보기(없으면 썸네일만 조용히 사라짐)
 │  └─ index.pkl           (레거시) 데모용 pickle 인덱스
 └─ src/
    ├─ pipeline.py         오케스트레이터: process_cut() 한 컷 흐름 전체
