@@ -48,6 +48,79 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
 | `GET` | `/pose/{pose_id}/bvh` | 경로 파라미터 | `application/octet-stream` | 동원 내보내기 |
 | `POST` | `/export-order` | `ExportOrderRequest` | `ExportOrder` | 동원 내보내기 (→ `EXPORT_CONTRACT.md`) |
 | `GET` | `/docs` | — | OpenAPI UI | 사람(계약 확인) |
+| `POST` | `/refine` | `RefineRequest` | `RefineResponse` | 앱 서버 → 조정된 BVH (→ `REFINE_DESIGN.md`) |
+| `GET` | `/refined/{handle}/bvh` | 경로 파라미터 | `application/octet-stream` | 동원 내보내기(조정본) |
+
+> `PersonOut`에 **`keypoints`(17×2, 이미지 픽셀)** · **`scores`(17)** 가 포함된다.
+> `/analyze`가 이미 추출하는 값이라 연산 추가는 0이며, `/refine`을 순수 함수로 만들기 위한 것이다.
+> 클라이언트는 이 두 값을 **그대로 `/refine`에 되돌려주면** 된다 — 러프 재전송·포즈 재추론 없음.
+
+### 2-1. `POST /refine` — 고른 후보 1개를 러프에 맞춰 조정
+
+작가가 Top-K 중 하나를 고른 **직후** 호출한다. 연산은 커밋된 포즈에만 든다.
+
+```jsonc
+// 요청
+{
+  "pose_id": "Sitting Idle_01",
+  "view": "front",
+  "keypoints": [[120.5, 88.0], ...],   // /analyze의 PersonOut.keypoints 그대로
+  "scores":    [0.91, 0.87, ...],      // /analyze의 PersonOut.scores 그대로
+  "search_distance": 0.21,             // 그 후보의 distance(선택). 주면 안전 게이트가 켜진다
+  "refine_allowed": true,              // PersonOut.refine_allowed 그대로
+  "refinable_limbs": ["left_arm"]      // PersonOut.refinable_limbs 그대로
+}
+// 응답
+{
+  "pose_id": "Sitting Idle_01", "view": "front",
+  "refined": true, "reason": "ok_partial",
+  "bvh_url": "/refined/7d3ebff90f5064ec/bvh",
+  "loss_base": 0.599, "loss_final": 0.004, "gain": 0.993,
+  "backend": "numpy",
+  "limbs": ["right_arm"],
+  "limb_decisions": {
+    "left_arm": {
+      "accepted": false, "reason": "self_collision",
+      "mean_move": 0.083, "endpoint_move": 0.153,
+      "collision": {
+        "checked": true, "status": "new_penetration",
+        "pair": "left_hand:torso", "part": "hand",
+        "base_depth": 0.0, "solved_depth": 0.055, "final_depth": 0.0,
+        "sample_fraction": 0.75,
+        "collision_point": [10.59, -4.66, 3.36]
+      }
+    },
+    "right_arm": {
+      "accepted": true, "reason": "ok",
+      "mean_move": 0.361, "endpoint_move": 0.549,
+      "collision": {
+        "checked": true, "status": "clear", "pair": null, "part": null,
+        "base_depth": 0.0, "solved_depth": 0.0, "final_depth": 0.0,
+        "sample_fraction": null, "collision_point": null
+      }
+    }
+  }
+}
+```
+
+**`refined: false`는 오류가 아니다.** 안전 게이트가 조정을 버리고 베이스를 준 것이며,
+이때 `bvh_url`은 `/pose/{pose_id}/bvh`가 된다. 클라이언트는 `bvh_url`만 따라가면
+두 경우를 구분하지 않고 동작한다("좋아지거나, 그대로"). `reason` 값 목록은
+`REFINE_DESIGN.md` §4-3.
+
+- `search_distance`를 **주는 것을 권장한다.** 검색이 실패한 컷에서 refine을 돌리면
+  틀린 포즈를 러프에 억지로 끼워맞춰 베이스보다 나빠진다. 이 값이 있어야 서버가 막는다.
+- 같은 입력은 같은 `bvh_url`을 돌려준다(해시 캐시). 작가가 같은 후보를 다시 눌러도 재계산 없음.
+- `limbs`에는 P3까지 통과해 실제로 조정된 사지만 담긴다. `limb_decisions`는 고려한
+  모든 사지의 채택 여부·탈락 사유·몸통 길이로 정규화한 3D 이동량을 담는다.
+- P1 solve까지 도달한 결과의 팔에는 `collision`이 추가된다. 동결된 팔도 진단하되
+  게이트로 수정하지는 않는다. `base_depth`와 P1 전체 조정본의 `solved_depth`를 비교해
+  refine이 새로 만든 깊은 관통만 `new_penetration`으로 판정한다. P3가 해당 팔만 복구하면
+  `final_depth`는 베이스 깊이로 돌아가고, 충돌하지 않은 반대팔 조정은 유지된다.
+- 전체 `reason`에는 `collision_gate`(충돌 팔 복구 후 남은 사지 없음),
+  `collision_unresolved`(복구 후 깊이 불변식 실패)가 포함된다. 사지 reason의
+  `self_collision`은 해당 사지만 베이스로 복구됐다는 뜻이다.
+- 오류: 없는 `pose_id` → 404 · BVH 파일 미존재 → 409 · `keypoints`/`scores` 길이≠17 → 422.
 
 기본 주소: `uvicorn api.app:app --reload` → `http://127.0.0.1:8000`. **버전 프리픽스 없음**(`/analyze`, `/v1/analyze` 아님).
 
@@ -84,6 +157,18 @@ Content-Type: multipart/form-data
       "index": 0,
       "box": [120.0, 80.0, 360.0, 720.0],
       "tags": { "shot": "full_half", "action": "standing", "view": "front", "relationship": "solo" },
+      "skeleton": {
+        "schema_version": "coco17-v1",
+        "keypoints": [
+          [640.0, 120.0], [630.0, 110.0], [650.0, 110.0], [615.0, 120.0],
+          [665.0, 120.0], [590.0, 210.0], [690.0, 210.0], [560.0, 320.0],
+          [720.0, 320.0], [540.0, 420.0], [740.0, 420.0], [610.0, 410.0],
+          [670.0, 410.0], [605.0, 560.0], [675.0, 560.0], [600.0, 700.0],
+          [680.0, 700.0]
+        ],
+        "scores": [0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9]
+      },
+      "confidence": "high",
       "candidates": [
         {
           "pose_id": "stand_solo",
@@ -96,7 +181,17 @@ Content-Type: multipart/form-data
       ]
     }
   ],
-  "notes": []
+  "notes": [],
+  "image": { "width": 1280, "height": 720 },
+  "inference_metadata": {
+    "deployment_version": "git-sha",
+    "vlm_provider": "gemini",
+    "vlm_model": "gemini-2.5-flash",
+    "pose_backend": "rtmlib",
+    "pose_model_version": "runtime-default",
+    "pose_library_version": "v1",
+    "feature_version": 1
+  }
 }
 ```
 
@@ -110,6 +205,8 @@ Content-Type: multipart/form-data
 | `vlm_count` | int | VLM이 센 사람 수 (둘의 일치가 신뢰도 신호 — `CLAUDE.md` 불변식 §2) |
 | `people` | Person[] | 인물별 결과. `route:"skip"`이면 빈 배열 |
 | `notes` | string[] | 폴백 사유 등 사람이 읽는 메모 |
+| `image` | object | 분석 기준 원본의 `width`, `height` |
+| `inference_metadata` | object | 배포·VLM·포즈 backend/model·포즈 라이브러리·feature schema 버전 |
 
 **`people[]` (PersonOut)**
 
@@ -118,7 +215,20 @@ Content-Type: multipart/form-data
 | `index` | int | 컷 안 인물 인덱스(0부터) |
 | `box` | float[4] \| null | `[x1,y1,x2,y2]` 픽셀 |
 | `tags` | object | 이 인물의 의미 태그(§4) |
+| `skeleton` | object \| null | `coco17-v1`의 정확히 17개 `[x,y]` keypoints와 17개 관절 confidence. 순서는 COCO-17 표준을 따른다. |
+| `confidence` | string \| null | 인물 검출·매칭 신뢰도 |
 | `candidates` | Candidate[] | Top-K 후보(기본 `top_k_final=5`, `config.py`) |
+| `keypoints` / `scores` | float[17][2] / float[17] \| null | 원본 좌표와 구조 마스킹·refine 정책을 반영한 유효 score |
+| `raw_scores` | float[17] \| null | 평가용 RTMPose 원본 score |
+| `confidence` | string | `high` 또는 `low` |
+| `skeleton_state` | string | `valid` · `partial` · `suspect` · `missing` · `invalid` |
+| `skeleton_source` | string | `full_image` · `crop_retry` · `none` |
+| `coverage_class` | string | `full` · `reduced` · `sparse` · `insufficient` |
+| `slot_origin` | string | `vlm` · `rtm_provisional` |
+| `search_stability` | string \| null | `stable` · `ambiguous` · `unstable` · `not_required` · `not_available` |
+| `valid_limbs` / `refinable_limbs` | string[] | 검색에 남은 부위와 refine 허용 사지 |
+| `refine_allowed` | bool | 현재 스켈레톤·검색 결과에 refine을 적용해도 되는가 |
+| `quality_reasons` / `quality_trace` | string[] / object | 구조 판정 사유와 배정·coverage·retry·검색 진단값 |
 
 **`candidates[]` (CandidateOut)**
 

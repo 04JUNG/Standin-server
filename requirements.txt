@@ -3,11 +3,18 @@ numpy>=1.24
 
 # --- API 레이어 ---
 fastapi>=0.110
+pydantic>=2.7,<3             # Annotated list length constraints used by API contracts
 uvicorn[standard]>=0.29
 python-multipart>=0.0.9      # UploadFile(멀티파트) 처리
 Pillow>=10.0                 # 업로드 PNG 로드
 
 # DB: SQLite는 파이썬 표준 라이브러리(sqlite3) — 별도 설치 불필요
+
+# --- 포즈 미세조정(refine) — 선택 ---
+# 없어도 동작한다. src/refine.py가 numpy 전용 LM으로 폴백한다(코어=numpy 원칙 유지).
+# 다만 폴백은 수치 야코비안이라 느리다(실측: 조정 1건당 numpy ~0.9s vs scipy ~0.2s).
+# 시연 서버에는 넣는 것을 권장.
+# scipy>=1.11
 
 # --- 실제 모델 연결 시(선택) ---
 google-genai>=1.0             # Gemini(현행 SDK). GEMINI_MODEL=gemini-2.5-flash 등

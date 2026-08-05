@@ -34,7 +34,9 @@ uvicorn api.app:app --reload          # http://127.0.0.1:8000/docs 에서 계약
 ```
 [Tauri 앱] ──> [앱 서버(친구들)] ──> [도원 추론 서버 = 이 저장소]
               인증·Job·기록          POST /analyze (동기, 무인증)
+                                     POST /refine   (고른 후보 → 러프에 맞춰 조정)
                                      GET  /pose/{id}/bvh
+                                     GET  /refined/{handle}/bvh
                                      POST /export-order
                                      GET  /healthz
 ```
@@ -77,11 +79,21 @@ uvicorn api.app:app --reload          # http://127.0.0.1:8000/docs 에서 계약
 
 ### 포즈 라이브러리 공급
 
-라이브러리(`poses.db` · `index.pkl` · `bvh/`)는 **이미지에 넣지 않는다** — Mixamo/CMU 재배포 금지 조항 때문에 `.gitignore`·`.dockerignore`로 제외돼 있다. 배포 환경에서는 기동 시 번들을 받아 푼다.
+라이브러리(`poses.db` · `index.pkl` · `bvh/` · `thumbs/`)는 **이미지에 넣지 않는다** — Mixamo/CMU 재배포 금지 조항 때문에 `.gitignore`·`.dockerignore`로 제외돼 있다. 배포 환경에서는 기동 시 번들을 받아 푼다.
+
+배포 중인 추론 서버에 올릴 때는 아래를 직접 치지 말고 **배포 스크립트를 쓴다.** 검증 → 압축 →
+업로드 → 재기동 → 확인을 한 번에 하고, 번들이 잘못됐으면 업로드 자체를 막는다.
 
 ```bash
-# 1) 번들 만들기 (루트에 poses.db, 선택적으로 index.pkl·bvh/)
-tar -czf pose-library-v1.tar.gz -C data poses.db index.pkl bvh
+python scripts/deploy_pose_library.py data/
+```
+
+수동으로 번들만 만들 때는 다음과 같다. **`thumbs`를 빠뜨리지 않는다** — 빠져도 에러가 나지
+않고 썸네일만 조용히 사라진다(`src/thumbnails.py`가 파일이 없으면 `None`을 돌려준다).
+
+```bash
+# 1) 번들 만들기 (루트에 poses.db · index.pkl · bvh/ · thumbs/)
+tar -czf pose-library-v1.tar.gz -C data poses.db index.pkl bvh thumbs
 
 # 2) 비공개 버킷에 올리기
 aws s3 cp pose-library-v1.tar.gz s3://<bucket>/pose-library/v1.tar.gz

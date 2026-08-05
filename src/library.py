@@ -17,7 +17,7 @@ from typing import List
 import numpy as np
 
 from .schema import LibraryEntry, View, Shot, Action, Relationship, COCO17
-from .features import normalize_skeleton
+from .features import normalize_skeleton, _BODY
 from .bvh import load_coco17
 
 
@@ -45,6 +45,28 @@ def project_3d_to_2d(joints3d: np.ndarray, y_angle: float) -> np.ndarray:
     r = _rot_y(y_angle)
     p = joints3d @ r.T
     return p[:, :2].astype(np.float32)
+
+
+def view_angle(view) -> float:
+    """View(또는 그 문자열 값) → 가상 카메라 Y축 회전각."""
+    return VIRTUAL_CAMERAS[view if isinstance(view, View) else View(view)]
+
+
+def pose_to_feature(joints3d: np.ndarray, view, scores: np.ndarray | None = None
+                    ) -> np.ndarray:
+    """
+    3D 포즈 → 특정 view의 정규화 피처(34,).
+
+    ⚠ 피처 공간 대칭성의 단일 소스(CLAUDE.md 불변식 4).
+    라이브러리 색인(build_entries_from_pose)과 refine의 전방계산이 **반드시**
+    이 함수를 공유한다. 한쪽만 바꾸면 검색이나 refine이 조용히 망가진다.
+    """
+    if scores is None:
+        scores = np.ones(17, dtype=np.float32)
+    kp2d = project_3d_to_2d(joints3d, view_angle(view)).copy()
+    # 투영 좌표는 y가 위로 +이므로 이미지 좌표(y 아래로 +)와 맞추려 부호 반전
+    kp2d[:, 1] *= -1
+    return normalize_skeleton(kp2d, scores)
 
 
 # ---- 3D 포즈 소스 --------------------------------------------------------
@@ -92,12 +114,22 @@ def build_entries_from_pose(pose_id: str, joints3d: np.ndarray, tags: dict,
     """
     if scores is None:
         scores = np.ones(17, dtype=np.float32)
+    joints3d = np.asarray(joints3d, dtype=np.float32)
+    scores = np.asarray(scores, dtype=np.float32).reshape(-1)
+    if joints3d.shape != (17, 3):
+        raise ValueError(
+            f"pose '{pose_id}' COCO mapping must have shape (17,3), got {joints3d.shape}"
+        )
+    if scores.shape != (17,) or not np.isfinite(joints3d).all() or not np.isfinite(scores).all():
+        raise ValueError(f"pose '{pose_id}' has invalid COCO mapping values")
+    missing_body = [index for index in _BODY if scores[index] < 0.3]
+    if missing_body:
+        raise ValueError(
+            f"pose '{pose_id}' has incomplete BVH body mapping: {missing_body}"
+        )
     entries = []
-    for view, angle in VIRTUAL_CAMERAS.items():
-        kp2d = project_3d_to_2d(joints3d, angle)
-        # 투영 좌표는 y가 위로 +이므로 이미지 좌표(y 아래로 +)와 맞추려 부호 반전
-        kp2d = kp2d.copy(); kp2d[:, 1] *= -1
-        feat = normalize_skeleton(kp2d, scores)
+    for view in VIRTUAL_CAMERAS:
+        feat = pose_to_feature(joints3d, view, scores)   # ← refine과 공유
         t = dict(tags); t["view"] = view.value
         entries.append(LibraryEntry(pose_id=pose_id, view=view, feature=feat,
                                     tags=t, bvh_path=bvh_path))
