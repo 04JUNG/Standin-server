@@ -57,8 +57,155 @@ class Config:
     distance_metric: str = os.getenv("DISTANCE", "pos")
     hybrid_w: float = float(os.getenv("HYBRID_W", "0.7"))   # hybrid에서 각도 비중
     fallback_distance: float = float(os.getenv("FALLBACK_DISTANCE", "0.45"))
+    # mask-aware 거리는 coverage마다 분모가 달라 raw distance를 서로 직접 비교할 수 없다.
+    # 아래 값은 metric×coverage별 보정 지점이다. 아직 고정 평가셋으로 보정하지 않은
+    # 환경에서는 기존 FALLBACK_DISTANCE를 호환 기본값으로 쓰되, sparse는 별도 정책으로
+    # high confidence를 금지한다(docs/SKELETON_EXTRACTION_IMPROVEMENT.md §5-0).
+    fallback_pos_full: float = float(os.getenv(
+        "FALLBACK_POS_FULL", os.getenv("FALLBACK_DISTANCE", "0.45")))
+    fallback_pos_reduced: float = float(os.getenv(
+        "FALLBACK_POS_REDUCED", os.getenv("FALLBACK_DISTANCE", "0.45")))
+    fallback_angle_full: float = float(os.getenv(
+        "FALLBACK_ANGLE_FULL", os.getenv("FALLBACK_DISTANCE", "0.45")))
+    fallback_angle_reduced: float = float(os.getenv(
+        "FALLBACK_ANGLE_REDUCED", os.getenv("FALLBACK_DISTANCE", "0.45")))
+    fallback_hybrid_full: float = float(os.getenv(
+        "FALLBACK_HYBRID_FULL", os.getenv("FALLBACK_DISTANCE", "0.45")))
+    fallback_hybrid_reduced: float = float(os.getenv(
+        "FALLBACK_HYBRID_REDUCED", os.getenv("FALLBACK_DISTANCE", "0.45")))
     # 스켈레톤 평균 score가 이 값 미만이면 추출 실패로 간주.
     min_skeleton_score: float = float(os.getenv("MIN_SKELETON_SCORE", "0.2"))
+
+    # --- 스켈레톤 추출 보완 --- docs/SKELETON_EXTRACTION_IMPROVEMENT.md
+    skeleton_kpt_threshold: float = float(os.getenv("SKELETON_KPT_THRESHOLD", "0.3"))
+    skeleton_torso_min_box_ratio: float = float(os.getenv(
+        "SKELETON_TORSO_MIN_BOX_RATIO", "0.05"))
+    # 구조 이상은 웹툰 과장을 허용하도록 넉넉한 상한을 쓰며, hard invalid가 아니라
+    # crop/A-B 안정성 진단의 신호로 사용한다.
+    skeleton_torso_width_ratio_max: float = float(os.getenv(
+        "SKELETON_TORSO_WIDTH_RATIO_MAX", "2.50"))
+    skeleton_arm_segment_ratio_max: float = float(os.getenv(
+        "SKELETON_ARM_SEGMENT_RATIO_MAX", "1.80"))
+    skeleton_leg_segment_ratio_max: float = float(os.getenv(
+        "SKELETON_LEG_SEGMENT_RATIO_MAX", "2.50"))
+    skeleton_adjacent_segment_ratio_max: float = float(os.getenv(
+        "SKELETON_ADJACENT_SEGMENT_RATIO_MAX", "3.50"))
+    slot_min_box_area_ratio: float = float(os.getenv("SLOT_MIN_BOX_AREA_RATIO", "0.001"))
+    slot_assignment_max_cost: float = float(os.getenv("SLOT_ASSIGNMENT_MAX_COST", "0.85"))
+    slot_assignment_ambiguity_margin: float = float(os.getenv(
+        "SLOT_ASSIGNMENT_AMBIGUITY_MARGIN", "0.08"))
+    slot_duplicate_iou: float = float(os.getenv("SLOT_DUPLICATE_IOU", "0.70"))
+    # IoU만으로 중복을 판정하면 포옹처럼 실제 두 사람이 겹친 장면을 지운다.
+    # 공통 body 관절의 평균 거리를 박스 대각선으로 정규화해 함께 확인한다.
+    slot_duplicate_keypoint_distance: float = float(os.getenv(
+        "SLOT_DUPLICATE_KEYPOINT_DISTANCE", "0.08"))
+    slot_owner_padding: float = float(os.getenv("SLOT_OWNER_PADDING", "0.15"))
+    slot_cross_owner_max_iou: float = float(os.getenv(
+        "SLOT_CROSS_OWNER_MAX_IOU", "0.50"))
+    slot_provisional_max_iou: float = float(os.getenv("SLOT_PROVISIONAL_MAX_IOU", "0.20"))
+    slot_crop_max_per_cut: int = int(os.getenv("SLOT_CROP_MAX_PER_CUT", "2"))
+    slot_crop_padding: float = float(os.getenv("SLOT_CROP_PADDING", "0.20"))
+    # 음수면 family overlap만 판정하고 Top-1 angle은 진단값으로만 기록한다.
+    # 고정 평가셋 보정 뒤 양수로 설정하면 두 조건을 함께 게이트한다.
+    slot_stability_top1_angle_max: float = float(os.getenv(
+        "SLOT_STABILITY_TOP1_ANGLE_MAX", "-1"))
+
+    def fallback_threshold(self, metric: str, coverage_class: str) -> float | None:
+        """metric×coverage confidence 임계값. sparse/insufficient는 high 대상이 아니다."""
+        metric = metric.lower()
+        coverage_class = coverage_class.lower()
+        if coverage_class not in ("full", "reduced"):
+            return None
+        if metric not in ("pos", "angle", "hybrid"):
+            metric = "pos"
+        return float(getattr(self, f"fallback_{metric}_{coverage_class}"))
+
+    # --- 포즈 미세조정(refine) ---  docs/REFINE_DESIGN.md
+    # 설계 원칙: refine은 '좋아지거나, 그대로'다. 아래 값들은 전부 그 보장을 위한 것.
+    refine_enabled: bool = os.getenv("REFINE_ENABLED", "1") == "1"   # 시연 중 비상 스위치
+    # 손실이 base * 이 비율보다 못 줄면 조정을 버리고 베이스를 반환.
+    refine_min_gain: float = float(os.getenv("REFINE_MIN_GAIN", "0.95"))
+    # 베이스 손실이 이 값 이하면 '이미 맞음' → 조정하지 않는다.
+    # 0.01 ≈ 뼈당 평균 8° 오차. 러프 추출 노이즈보다 작아 조정할 실익이 없다.
+    refine_min_loss: float = float(os.getenv("REFINE_MIN_LOSS", "0.01"))
+    refine_max_iter: int = int(os.getenv("REFINE_MAX_ITER", "100"))
+    # 베이스 정규화 강도. 클수록 덜 움직인다(=더 안전, 덜 맞음).
+    refine_lambda: float = float(os.getenv("REFINE_LAMBDA", "0.05"))
+    # 채널당 베이스에서 벗어날 수 있는 최대 각도(하드 바운드).
+    # ⚠ 이것만으로는 '미세조정'이 보장되지 않는다 — 각도 공간의 제약은 3D 공간의
+    #   제약이 아니다. 어깨에서 45°면 손목은 몸통 길이의 0.7배까지 움직인다(실측).
+    #   docs/REFINE_DESIGN.md §6-4 참조.
+    refine_max_delta_deg: float = float(os.getenv("REFINE_MAX_DELTA_DEG", "45"))
+
+    # refine 후보 사지: "arms"(기본) | "all"
+    # 실제로 무엇을 조정할지는 아래 관측 감도 게이트가 컷마다 판단한다.
+    # P2(3D 이동량 게이트) 전에는 다리를 풀지 않는 것이 MVP 안전 기본값이다.
+    refine_limbs: str = os.getenv("REFINE_LIMBS", "arms")
+
+    # --- 관측 감도 게이트 (docs/REFINE_DESIGN.md §6-5) ---
+    # "다리를 켜냐 끄냐"는 잘못된 질문이다. 다리 관측 감도는 컷마다 8배 범위로 흩어진다
+    # (전신 컷에서 또렷한 다리 = 팔과 비슷, 허벅지에서 잘린 컷 = 팔의 1/10).
+    # 그래서 전역 on/off 대신 **컷마다 사지별로 재서** 안 보이는 사지만 동결한다.
+    refine_observability_gate: bool = os.getenv("REFINE_OBS_GATE", "1") == "1"
+    # 그 컷에서 가장 잘 보이는 사지 대비 이 비율 미만이면 동결(상대 기준이라
+    # 포즈·스케일에 안 휘둘린다). 실측상 위험 구간이 '팔 중앙값의 1/3 미만'이었다.
+    refine_min_observability: float = float(os.getenv("REFINE_MIN_OBS", "0.34"))
+    # 모든 사지가 다 안 보이는 컷에서 상대 기준만으론 못 막으므로 절대 하한도 둔다.
+    refine_min_observability_abs: float = float(os.getenv("REFINE_MIN_OBS_ABS", "0.10"))
+
+    # --- P1a: 축별 관측 감도 정규화 (docs/REFINE_NEXT.md §3 P1a) ---
+    # 한 관절의 회전축마다 2D에서 보이는 정도가 다르다. 잘 안 보이는 축은
+    # 베이스 정규화를 강화해 전완/손·종아리/발이 공짜로 비틀리지 않게 한다.
+    refine_axis_observability: bool = os.getenv("REFINE_AXIS_OBS", "1") == "1"
+    # 가장 잘 보이는 축 대비 정규화 강화 배수의 상한. 기존 lambda보다 약하게
+    # 만들지는 않고 [1, max] 범위에서 위험한 축만 강화한다.
+    refine_axis_lambda_max_mult: float = float(
+        os.getenv("REFINE_AXIS_LAMBDA_MAX_MULT", "100")
+    )
+    # --- P1b: 축 조합 null-space 정규화 (docs/REFINE_NEXT.md §3 P1b) ---
+    # P1a는 X/Y/Z 축 하나가 안 보이는 경우를 잡는다. 실제 팔 관절의 일부는
+    # 각 축은 따로 보이지만 여러 축을 섞은 방향이 안 보이므로, 그 조합 방향도
+    # 야코비안 SVD로 찾아 베이스에 고정한다.
+    refine_svd_observability: bool = os.getenv("REFINE_SVD_OBS", "1") == "1"
+    refine_svd_lambda_max_mult: float = float(
+        os.getenv("REFINE_SVD_LAMBDA_MAX_MULT", "2")
+    )
+    # --- P2: post-solve 사지별 3D 이동량 게이트 (docs/REFINE_P2.md) ---
+    # 사람 눈 평가에서 유용한 큰 조정까지 폐기해 P3 검증 동안 하드 게이트는 보류한다.
+    # 0이어도 이동량 진단은 limb_decisions에 계속 남는다.
+    refine_move_gate: bool = os.getenv("REFINE_MOVE_GATE", "0") == "1"
+    # 몸통 길이로 정규화한 사지 중간관절·말단 평균 / 말단 최대 이동량 상한.
+    refine_max_move_mean: float = float(os.getenv("REFINE_MAX_MOVE_MEAN", "0.20"))
+    refine_max_move_max: float = float(os.getenv("REFINE_MAX_MOVE_MAX", "0.35"))
+    # --- P3a: 베이스 상대 팔-몸통 자기 충돌 게이트 (docs/REFINE_P3.md) ---
+    # 실 러프 probe에서 171734의 깊은 손 관통과 124629 정상 Top-5가 분리돼 기본 활성화.
+    # P2는 계속 로그 전용이며 P3만 하드 게이트로 사용한다.
+    refine_collision_gate: bool = os.getenv("REFINE_COLLISION_GATE", "1") == "1"
+    refine_collision_torso_shoulder_scale: float = float(
+        os.getenv("REFINE_COLLISION_TORSO_SHOULDER_SCALE", "0.38")
+    )
+    refine_collision_torso_hip_scale: float = float(
+        os.getenv("REFINE_COLLISION_TORSO_HIP_SCALE", "0.45")
+    )
+    refine_collision_arm_radius: float = float(
+        os.getenv("REFINE_COLLISION_ARM_RADIUS", "0.035")
+    )
+    refine_collision_hand_radius: float = float(
+        os.getenv("REFINE_COLLISION_HAND_RADIUS", "0.025")
+    )
+    refine_collision_samples: int = int(os.getenv("REFINE_COLLISION_SAMPLES", "9"))
+    # 손끝 프록시 기준 171734 양성(0.055/0.090)과 124629 최대 음성(0.043)
+    # 사이로 고정했다. 표본이 작으므로 실사용 로그를 계속 보정 근거로 남긴다.
+    refine_collision_min_depth: float = float(
+        os.getenv("REFINE_COLLISION_MIN_DEPTH", "0.05")
+    )
+    refine_collision_worsen_delta: float = float(
+        os.getenv("REFINE_COLLISION_WORSEN_DELTA", "0.01")
+    )
+    # 팔꿈치·무릎이 이 각도보다 접히면 부자연 → 조정 폐기(베이스 반환).
+    refine_min_bend_deg: float = float(os.getenv("REFINE_MIN_BEND_DEG", "20"))
+    # 조정본 BVH 저장 위치(캐시). data_dir 기준 상대.
+    refine_dir: str = os.getenv("REFINE_DIR", "refined")
 
 
 CFG = Config()

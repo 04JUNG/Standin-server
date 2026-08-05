@@ -41,8 +41,8 @@ def order_left_to_right(skeletons: List[Optional[Skeleton]],
 
 
 def build_descriptors(vlm: VLMAnalysis,
-                      skeletons: List[Skeleton],
-                      boxes: List[BBox]) -> List[PersonDescriptor]:
+                      skeletons: List[Optional[Skeleton]],
+                      boxes: List[Optional[BBox]]) -> List[PersonDescriptor]:
     """
     인물별 Descriptor 생성. 태그(shot/action/view/relationship)는 컷 단위 값을 공유하되,
     스켈레톤/피처/박스는 인물별로 갖는다.
@@ -55,5 +55,82 @@ def build_descriptors(vlm: VLMAnalysis,
             shot=vlm.shot, action=vlm.action, view=vlm.view,
             relationship=vlm.relationship,
             skeleton=sk, feature=feat, box=box,
+        ))
+    return out
+
+
+def build_slot_descriptors(vlm: VLMAnalysis, slots) -> List[PersonDescriptor]:
+    """복구가 끝난 PersonSlot을 검색 descriptor로 변환한다.
+
+    invalid/missing 슬롯도 descriptor 자리를 유지해 뒤 인물의 person_index가 당겨지지
+    않게 한다. 명시적 mask는 순위 거리에 전달하고 raw score는 평가를 위해 보존한다.
+    """
+    out: List[PersonDescriptor] = []
+    for slot in slots:
+        skeleton = slot.skeleton
+        evidence = slot.evidence
+        searchable = bool(skeleton is not None and evidence is not None
+                          and evidence.searchable and slot.state not in ("missing", "invalid"))
+        valid_mask = evidence.valid_joint_mask.copy() if evidence is not None else None
+        feature = None
+        if searchable:
+            feature = normalize_skeleton(
+                skeleton.keypoints, skeleton.scores, valid_mask=valid_mask
+            )
+        refine_allowed = bool(
+            searchable
+            and slot.state in ("valid", "partial")
+            and evidence.coverage_class in ("full", "reduced")
+            and evidence.refinable_limbs
+            and slot.slot_origin != "rtm_provisional"
+            and slot.skeleton_source != "crop_retry"
+            and (slot.state == "valid" or slot.search_stability == "stable")
+        )
+        # hard invalid 좌표(NaN/Inf 포함)는 네트워크 경계로 내보내지 않는다. raw 값은
+        # slot/evidence trace에만 남기고 descriptor 자리는 유지한다.
+        output_skeleton = skeleton if slot.state not in ("missing", "invalid") else None
+        if output_skeleton is not None:
+            output_scores = evidence.effective_scores
+            output_skeleton = Skeleton(
+                np.asarray(output_skeleton.keypoints, dtype=np.float32).copy(),
+                output_scores,
+            )
+        out.append(PersonDescriptor(
+            shot=vlm.shot,
+            action=vlm.action,
+            view=vlm.view,
+            relationship=vlm.relationship,
+            skeleton=output_skeleton,
+            feature=feature,
+            box=slot.result_box,
+            valid_joint_mask=valid_mask,
+            skeleton_state=slot.state,
+            coverage_class=(evidence.coverage_class if evidence is not None
+                            else "insufficient"),
+            slot_origin=slot.slot_origin,
+            skeleton_source=slot.skeleton_source,
+            refine_allowed=refine_allowed,
+            valid_limbs=(evidence.valid_limbs if evidence is not None else ()),
+            refinable_limbs=(evidence.refinable_limbs if evidence is not None else ()),
+            raw_scores=(evidence.raw_scores.copy() if evidence is not None else None),
+            search_stability=slot.search_stability,
+            distance_metric=None,
+            rank_distance=slot.rank_distance,
+            confidence_threshold=slot.confidence_threshold,
+            quality_trace={
+                "assigned_rtm_index": slot.assigned_rtm_index,
+                "assignment_cost": slot.assignment_cost,
+                "assignment_margin": slot.assignment_margin,
+                "valid_bone_count": (evidence.valid_bone_count
+                                     if evidence is not None else 0),
+                "torso_bone_count": (evidence.torso_bone_count
+                                     if evidence is not None else 0),
+                "quality_components": (dict(evidence.quality_components)
+                                       if evidence is not None else {}),
+                "retry_count": slot.retry_count,
+                "retry_reason": slot.retry_reason,
+                "retry_elapsed_ms": round(float(slot.retry_elapsed_ms), 3),
+            },
+            quality_reasons=list(dict.fromkeys(slot.reasons)),
         ))
     return out

@@ -13,12 +13,14 @@ FastAPI 레이어 — 도원의 Python 추론 서버.
 """
 from __future__ import annotations
 
+import hashlib
 import io
 import json
 import os
 from datetime import datetime, timezone
 from contextlib import asynccontextmanager
 
+import numpy as np
 from fastapi import FastAPI, File, Form, UploadFile, HTTPException
 from fastapi.responses import FileResponse, Response
 
@@ -26,7 +28,9 @@ from src.config import CFG
 from src.pipeline import Pipeline
 from src.library import build_synthetic_index
 from src.library_source import ensure_library
-from src.repo import FEATURE_VERSION, build_db, load_entries, get_bvh_path, get_pose_meta
+from src.refine import refine_bvh
+from src.repo import (FEATURE_VERSION, build_db, load_entries,
+                      get_bvh_path, get_pose_meta)
 from src.thumbnails import THUMBNAIL_VIEWS, find_thumbnail, thumbnail_url
 from src.runtime_guard import (
     MockBackendError,
@@ -35,9 +39,11 @@ from src.runtime_guard import (
 )
 from api.models import (CutResultOut, PersonOut, CandidateOut, SkeletonOut,
                         ImageInfoOut, InferenceMetadataOut,
+                        RefineRequest, RefineResponse,
                         ExportOrderRequest, ExportOrder, ExportItem)
 
 DB_PATH = os.getenv("DB_PATH", "data/poses.db")
+REFINE_DIR = os.path.join(CFG.data_dir, CFG.refine_dir)
 
 STATE: dict = {}
 
@@ -156,6 +162,12 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default="")):
     per_person = getattr(res, "person_candidates", [])
     for i, desc in enumerate(res.descriptors):
         cands = per_person[i] if i < len(per_person) else []
+        skel = desc.skeleton
+        raw_scores = None
+        if desc.raw_scores is not None:
+            raw = np.asarray(desc.raw_scores, dtype=float).reshape(-1)
+            if raw.shape == (17,) and np.isfinite(raw).all():
+                raw_scores = raw.tolist()
         people.append(PersonOut(
             index=i,
             box=desc.box.as_list() if desc.box else None,
@@ -164,14 +176,33 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default="")):
                 keypoints=desc.skeleton.keypoints.tolist(),
                 scores=desc.skeleton.scores.tolist(),
             ) if desc.skeleton is not None else None),
-            confidence=(res.person_confidence[i]
-                        if i < len(res.person_confidence) else None),
             candidates=[CandidateOut(
                 pose_id=c.pose_id, view=c.view.value, distance=c.distance,
                 tags=c.tags, rerank_score=c.rerank_score,
                 bvh_url=f"/pose/{c.pose_id}/bvh",
                 thumbnail_url=thumbnail_url(CFG.data_dir, c.pose_id, c.view.value),
             ) for c in cands],
+            # 이미 추출한 스켈레톤을 실어 보낸다(연산 추가 0) → /refine이 순수 함수가 된다.
+            keypoints=np.asarray(skel.keypoints, dtype=float).reshape(-1, 2).tolist()
+                      if skel is not None else None,
+            scores=np.asarray(skel.scores, dtype=float).reshape(-1).tolist()
+                   if skel is not None else None,
+            raw_scores=raw_scores,
+            confidence=(res.person_confidence[i]
+                        if i < len(res.person_confidence) else "low"),
+            skeleton_state=desc.skeleton_state,
+            skeleton_source=desc.skeleton_source,
+            coverage_class=desc.coverage_class,
+            slot_origin=desc.slot_origin,
+            search_stability=desc.search_stability,
+            distance_metric=desc.distance_metric,
+            rank_distance=desc.rank_distance,
+            confidence_threshold=desc.confidence_threshold,
+            valid_limbs=list(desc.valid_limbs),
+            refinable_limbs=list(desc.refinable_limbs),
+            refine_allowed=desc.refine_allowed,
+            quality_trace=desc.quality_trace,
+            quality_reasons=desc.quality_reasons,
         ))
     vlm_model = (CFG.gemini_model if STATE.get("provider") == "gemini"
                  else CFG.openai_model if STATE.get("provider") == "openai"
@@ -225,6 +256,119 @@ def get_pose_thumbnail(pose_id: str, view: str):
         media_type="image/png",
         headers={"Cache-Control": "private, max-age=86400"},
     )
+
+
+# ---- 포즈 미세조정 (docs/REFINE_DESIGN.md) --------------------------------
+
+def _refine_handle(req: RefineRequest) -> str:
+    """같은 입력 → 같은 파일. 작가가 같은 후보를 다시 눌러도 재계산하지 않는다."""
+    kp = np.asarray(req.keypoints, dtype=float).round(2).tobytes()
+    sc = np.asarray(req.scores or [], dtype=float).round(3).tobytes()
+    policy = (
+        f"|allowed={req.refine_allowed}|limbs="
+        f"{','.join(sorted(req.refinable_limbs or []))}|"
+    ).encode()
+    h = hashlib.sha1(f"{req.pose_id}|{req.view}|".encode() + policy + kp + sc)
+    return h.hexdigest()[:16]
+
+
+@app.post("/refine", response_model=RefineResponse)
+def refine(req: RefineRequest):
+    """
+    작가가 고른 후보 1개를 러프에 맞춰 미세조정한다.
+
+    입력은 /analyze 응답을 그대로 되돌려주면 된다(러프 이미지 재전송 불필요).
+    **refined=False는 오류가 아니다** — 안전 게이트가 조정을 버리고 베이스를 준 것이며,
+    이 경우 bvh_url은 원래의 /pose/{id}/bvh와 동등하다(§4-3 "좋아지거나, 그대로").
+    """
+    meta = get_pose_meta(STATE["db_path"], req.pose_id)
+    if meta is None:
+        raise HTTPException(404, f"unknown pose_id: {req.pose_id}")
+    base = meta["bvh_path"]
+    if not base or not os.path.exists(base):
+        raise HTTPException(409, f"pose '{req.pose_id}' 등록됨(경로={base})이나 BVH 파일 미존재.")
+    if len(req.keypoints) != 17:
+        raise HTTPException(422, f"keypoints는 17개여야 합니다(받은 값: {len(req.keypoints)})")
+    if req.scores is not None and len(req.scores) != 17:
+        raise HTTPException(422, f"scores는 17개여야 합니다(받은 값: {len(req.scores)})")
+
+    if req.refine_allowed is False:
+        return RefineResponse(
+            pose_id=req.pose_id, view=req.view, refined=False,
+            reason="skeleton_policy", bvh_url=f"/pose/{req.pose_id}/bvh",
+            loss_base=None, loss_final=None, gain=None, backend="none",
+        )
+
+    # 얽힘 세트는 조정하지 않는다. hug_01_A/B를 각자 돌리면 두 사람이 맞물리던
+    # 정합(손이 어깨에 닿는 등)이 깨지는데, BVH는 상대 위치를 안 실으므로
+    # 그 깨짐을 되돌릴 방법이 없다. 세트 refine은 세트 전체를 함께 푸는 별도 과제.
+    if meta.get("set_id"):
+        return RefineResponse(
+            pose_id=req.pose_id, view=req.view, refined=False,
+            reason="entangled_set", bvh_url=f"/pose/{req.pose_id}/bvh",
+            loss_base=None, loss_final=None, gain=None, backend="none")
+
+    handle = _refine_handle(req)
+    out_path = os.path.join(REFINE_DIR, f"{handle}.bvh")
+    try:
+        res = refine_bvh(base, req.keypoints, req.scores, req.view,
+                         out_path=out_path, search_distance=req.search_distance,
+                         allowed_limbs=req.refinable_limbs)
+    except ValueError as exc:                      # 알 수 없는 view 등
+        raise HTTPException(422, str(exc)) from exc
+
+    if res.refined:
+        # 사이드카: handle만으로는 어떤 포즈인지 알 수 없다. 동원의 '파일명·소재 폴더
+        # 규칙'(EXPORT_CONTRACT §4-3)과 export 주문서 연결에 pose_id가 필요하다.
+        with open(os.path.join(REFINE_DIR, f"{handle}.json"), "w",
+                  encoding="utf-8") as f:
+            json.dump({"handle": handle, "pose_id": req.pose_id, "view": req.view,
+                       "base_bvh_url": f"/pose/{req.pose_id}/bvh",
+                       "limbs": list(res.limbs),
+                       "limb_decisions": res.limb_decisions,
+                       "created_at": datetime.now(timezone.utc).isoformat(
+                           timespec="seconds")}, f, ensure_ascii=False)
+
+    return RefineResponse(
+        pose_id=req.pose_id, view=req.view,
+        refined=res.refined, reason=res.reason,
+        bvh_url=(f"/refined/{handle}/bvh" if res.refined
+                 else f"/pose/{req.pose_id}/bvh"),
+        loss_base=None if np.isnan(res.loss_base) else res.loss_base,
+        loss_final=None if np.isnan(res.loss_final) else res.loss_final,
+        gain=None if np.isnan(res.loss_base) else res.gain,
+        backend=res.backend,
+        limbs=list(res.limbs),
+        limb_decisions=res.limb_decisions,
+    )
+
+
+@app.get("/refined/{handle}/bvh")
+def get_refined_bvh(handle: str):
+    """
+    조정본 BVH 다운로드. 동원 내보내기는 /pose/{id}/bvh와 동일하게 소비하면 된다
+    (HIERARCHY가 원본 그대로라 CSP 미러링·축 보정 로직은 손댈 필요 없음).
+
+    ⚠ 배포 주의: 이 파일은 **refine을 처리한 인스턴스의 로컬 디스크**에 있다.
+      추론 서버를 태스크 2개 이상으로 띄우면 POST /refine과 이 GET이 다른 태스크에
+      떨어져 404가 난다. 해소 전까지 추론 서버는 단일 태스크로 운영할 것.
+      (docs/REFINE_HANDOFF.md §3)
+    """
+    if not handle.isalnum():                       # 경로 조작 차단
+        raise HTTPException(400, "invalid handle")
+    path = os.path.join(REFINE_DIR, f"{handle}.bvh")
+    if not os.path.exists(path):
+        raise HTTPException(404, f"unknown refine handle: {handle} (만료됐거나 미생성)")
+    # 사이드카가 있으면 pose_id로 내려준다 — 동원의 파일명 규칙이 handle을 모른다.
+    name = f"{handle}.refined.bvh"
+    side = os.path.join(REFINE_DIR, f"{handle}.json")
+    if os.path.exists(side):
+        try:
+            with open(side, encoding="utf-8") as f:
+                name = f"{json.load(f)['pose_id']}.refined.bvh"
+        except Exception:
+            pass
+    return FileResponse(path, media_type="application/octet-stream", filename=name)
 
 
 @app.post("/export-order", response_model=ExportOrder)

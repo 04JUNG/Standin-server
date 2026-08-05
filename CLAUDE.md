@@ -23,6 +23,8 @@ python scripts/build_db.py            # 합성 라이브러리 → SQLite(data/p
 BVH_DIR=data/bvh python scripts/build_db.py   # 실 BVH 폴더 → SQLite
 uvicorn api.app:app --reload          # http://127.0.0.1:8000/docs 에서 계약 확인
 #   POST /analyze (멀티파트 PNG) → CutResult / GET /pose/{id}/bvh / GET /healthz
+#   POST /refine (고른 후보 1개를 러프에 맞춰 조정) → GET /refined/{handle}/bvh
+REFINE_ENABLED=0 uvicorn api.app:app   # refine 비상 스위치(시연 중 이상 동작 시)
 #   DB_PATH env로 위치 지정(동기화 폴더 금지 — SQLite 락). 기본 data/poses.db
 ```
 
@@ -54,7 +56,12 @@ webtoon-pose-mvp/
 │  ├─ app.py             /analyze · /export-order · /pose/{id}/bvh · /healthz · /docs
 │  └─ models.py          Pydantic 응답 모델 = 문서화된 계약
 ├─ docs/
+│  ├─ PIPELINE_OVERVIEW.md 전체 파이프라인 자립 설명(외부 LLM 인수인계용 — 규약·수식·불변식)
 │  ├─ API_CONTRACT.md     전체 HTTP 계약(/analyze·/pose·/healthz) + 앱서버 경계·불일치
+│  ├─ MVP_RELEASE.md      작가 실사용 30분 시연 컷라인·체크리스트(현재 목표의 단일 소스)
+│  ├─ REFINE_DESIGN.md    포즈 미세조정(refine) 설계 — 축소판 파라미터·안전 게이트
+│  ├─ REFINE_NEXT.md      refine 개선 방향·우선순위(원인 1개 → 입자도 3개) ★ 다음 작업 시작점
+│  ├─ REFINE_HANDOFF.md   이 브랜치가 안 한 것 — export 배선·뷰어 재로드(팀원 인계)
 │  ├─ DECISIONS.md        DB·라이브러리 저장·동원 핸드오프·BFF 분리 결정(읽어볼 것)
 │  ├─ BFF_DESIGN.md       앱 서버(BFF) 구현 설계(Python/FastAPI)
 │  ├─ EXPORT_CONTRACT.md  동원 Export 주문서 JSON 형식·예시
@@ -68,7 +75,11 @@ webtoon-pose-mvp/
 │  ├─ mixamo_fbx_to_bvh.py  Mixamo FBX → 포즈별 1프레임 BVH(Blender)
 │  ├─ bvh_contact_sheet.py  BVH 폴더 → COCO17 스틱피겨 시트(투영 검수)
 │  ├─ eval_search.py       러프→RTMPose→검색 Top-K 정성평가(4순위, --use-vlm 태그검색)
-│  ├─ vlm_tag.py           러프→VLM 태그(shot/action/view/count) 측정(5순위)
+│  ├─ eval_refine.py       refine 정성평가 — 베이스·조정·러프 3열 비교(숫자만 믿지 말 것)
+│  ├─ eval_refine_batch.py 폴더 단위 refine 평가 — 컷별 컨택트 시트 + summary.csv + 트리아지
+│  ├─ refine_top5.py       러프 1장 → Top-5 썸네일 + Top-5 전부의 조정 BVH + manifest
+│  ├─ diag_refine_3d.py    refine 3D 건전성 진단 — 4개 view 렌더 + 이동량/효율(⚠ 단일 view 검증 금지)
+│  └─ vlm_tag.py           러프→VLM 태그(shot/action/view/count) 측정(5순위)
 │  └─ deploy_pose_library.py  라이브러리 검증→S3 업로드→추론 서비스 재기동(운영자용)
 ├─ tests/
 │  └─ test_smoke.py       핵심 계약 검증(pytest 불필요, 자체 러너 내장)
@@ -86,6 +97,7 @@ webtoon-pose-mvp/
    ├─ pose.py             [4] RTMPose Body 래퍼(mock/rtmlib)
    ├─ bvh.py              BVH 파싱+FK+관절명→COCO17 매핑(라이브러리·검수 공용 소스)
    ├─ features.py         스켈레톤→정규화 피처(쿼리·라이브러리 공용, 반드시 동일)
+   ├─ refine.py           [10] 선택 포즈 미세조정 — 팔·다리 회전만, 안전 게이트로 폐기 판정
    ├─ descriptor.py       [6] VLM 태그 + 피처 결합(JSON, LLM 불필요)
    ├─ library.py          [7] 3D→다중카메라 2D 투영 색인(합성/실BVH)
    ├─ repo.py             DB 저장소(SQLite): 스키마·feature BLOB·bvh 경로 레지스트리
@@ -117,9 +129,10 @@ VLM.analyze  ── 1회 호출로 개수·shot·action·view·relationship·대
 1. **VLM 태그 = shot + 사람 수(제어 신호)만.** action/view/relationship는 매칭에 안 쓴다(기하와 중복). shot→라우팅(skip/bust/core), 사람 수→분기(N명→N BVH). 관절 좌표는 VLM이 생성 안 함(검출기·포즈 모델 몫).
 2. **개수 일치 = 스케일 무관 신뢰도 신호.** rtmlib score는 모델마다 스케일이 달라(Body 0.1~0.2 vs Wholebody 1.4~7.5) 신뢰도로 못 쓴다. 대신 `detect.py::reconcile`이 "검출기 개수 vs VLM 개수" 이진 일치로 `high`/`low`를 낸다. 불일치=폴백 후보. 이 신호를 다른 것으로 바꾸지 말 것.
 3. **얽힘·공백 = 폴백(신뢰도 분기).** 매칭은 순수 기하라 별도 얽힘 태그가 없다. 대신 `pipeline._search_one`이 스켈레톤 score 낮음(추출 실패) 또는 Top-1 거리 > `CFG.fallback_distance`(라이브러리 공백·얽힘)면 `person_confidence='low'`로 폴백(작가). 임계값은 실데이터로 보정.
-4. **피처 공간의 대칭성.** 쿼리(추출 스켈레톤)와 라이브러리(3D→2D 투영)가 **반드시 같은** `features.normalize_skeleton`을 통과해야 kNN이 성립한다. 정규화는 힙 중심 이동 + 몸통 길이 스케일 + 결측 관절 마스킹(카메라·인물 크기 불변). 한쪽만 바꾸면 검색이 조용히 망가진다.
+4. **피처 공간의 대칭성.** 쿼리(추출 스켈레톤)와 라이브러리(3D→2D 투영)가 **반드시 같은** `features.normalize_skeleton`을 통과해야 kNN이 성립한다. 정규화는 힙 중심 이동 + 몸통 길이 스케일 + 결측 관절 마스킹(카메라·인물 크기 불변). 한쪽만 바꾸면 검색이 조용히 망가진다. 3D 포즈→피처는 `library.pose_to_feature`가 단일 소스이고 **색인과 refine이 이 함수를 공유**한다(`test_feature_space_symmetry_shared_function`이 감시).
 5. **Descriptor 결합에 LLM 불필요.** VLM 태그 + 스켈레톤 피처는 `descriptor.py`에서 JSON 구조화로만 합친다.
 6. **얽힘 관계는 세트로.** `Relationship.HUGGING`/`FIGHTING`은 `is_entangled` → 2인 상호작용 포즈를 한 덩어리로 검색(개별 인물 분해가 실패하는 케이스).
+7. **refine은 좋아지거나, 그대로.** `refine.py`는 검색된 베이스 포즈의 **팔 회전만** 러프에 맞춰 돌린다(기본 `REFINE_LIMBS=arms`. 루트/힙 위치·척추·손목·**다리** 고정). 다리는 투영 관측 감도가 팔의 1/3.4라 손실이 못 보는 방향으로 크게 움직인다 — 3D 정규화·이동량 게이트 없이 켜지 말 것(`REFINE_DESIGN.md` §6-4). 안전 게이트 중 하나라도 걸리면 조정을 버리고 베이스를 그대로 반환한다 — refine이 결과를 나쁘게 만드는 경로는 존재하면 안 된다. 특히 **검색이 실패한 컷에는 refine을 돌리지 않는다**(틀린 베이스를 러프에 끼워맞추면 더 이상해진다). 게이트를 약화시키는 방향으로 바꾸지 말 것. 상세: `docs/REFINE_DESIGN.md`.
 
 ## 검색이 어떻게 매칭되나 (개념)
 

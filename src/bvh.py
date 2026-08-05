@@ -12,6 +12,8 @@ BVH 파싱 + 순전파(FK) + 관절명→COCO17 매핑. 라이브러리와 검�
 from __future__ import annotations
 
 import math
+import os
+
 import numpy as np
 
 from .schema import COCO17
@@ -87,6 +89,60 @@ def bones(joints):
     return [(j[1], i) for i, j in enumerate(joints) if j[1] != -1]
 
 
+# ---------- 채널 인덱스 (refine이 회전각을 파라미터로 잡는 데 사용) ----------
+
+def channel_starts(joints):
+    """관절 인덱스 → MOTION 프레임 배열에서 그 관절의 채널이 시작하는 위치."""
+    starts, ci = [], 0
+    for j in joints:
+        starts.append(ci)
+        ci += len(j[3])
+    return starts
+
+
+def find_joint(joints, suffix: str) -> int:
+    """접미사(mixamorig: 등 접두사 무시)로 관절 인덱스 찾기. 없으면 -1."""
+    for idx, j in enumerate(joints):
+        if j[0].split(":")[-1] == suffix:
+            return idx
+    return -1
+
+
+def rotation_channel_indices(joints, joint_idx: int):
+    """해당 관절의 '회전' 채널이 프레임 배열에서 갖는 전역 인덱스 목록."""
+    start = channel_starts(joints)[joint_idx]
+    return [start + k for k, ch in enumerate(joints[joint_idx][3])
+            if ch.endswith("rotation")]
+
+
+# ---------- 쓰기 ----------
+
+def hierarchy_text(path: str) -> str:
+    """원본 BVH의 HIERARCHY 블록을 텍스트 그대로 반환(MOTION 직전까지)."""
+    lines = open(path).read().splitlines()
+    for i, ln in enumerate(lines):
+        if ln.strip().upper() == "MOTION":
+            return "\n".join(lines[:i])
+    raise ValueError(f"MOTION 섹션이 없습니다: {path}")
+
+
+def write_single_frame_bvh(src_path: str, frame_values, out_path: str,
+                           frame_time: float = 0.033333) -> str:
+    """
+    원본의 HIERARCHY를 **원문 그대로 복사**하고 MOTION만 1프레임으로 교체해 저장.
+
+    계층·OFFSET(뼈 길이)을 재직렬화하지 않는 것이 핵심이다. refine은 회전각만
+    바꾸므로 뼈 길이·계층이 달라질 이유가 없고, 재직렬화하면 반올림 오차나
+    파서 미지원 구문(주석 등)으로 원본이 조용히 손상될 수 있다.
+    """
+    head = hierarchy_text(src_path)
+    vals = " ".join(f"{float(v):.6f}" for v in np.asarray(frame_values).ravel())
+    os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
+    with open(out_path, "w") as f:
+        f.write(f"{head}\nMOTION\nFrames: 1\nFrame Time: {frame_time:.6f}\n{vals}\n")
+    return out_path
+
+
 # ---------- COCO17 매핑 ----------
 # COCO 인덱스 → BVH 관절 접미사 후보(우선순위순). score: 매핑 신뢰도.
 _MAP = {
@@ -117,14 +173,14 @@ def _suffix_map(joints, pos):
     return out
 
 
-def load_coco17(path: str, frame: int = 0):
+def coco17_from_fk(joints, pos):
     """
-    BVH 1프레임 → (kp(17,3) float32, scores(17,) float32).
+    이미 계산된 FK 결과 → (kp(17,3) float32, scores(17,) float32).
     hips 중심으로 평행이동해서 반환(투영이 몸 중심을 축으로 돌도록).
+
+    load_coco17과 refine의 반복 전방계산이 **이 함수를 공유**한다.
+    한쪽만 바꾸면 라이브러리 색인과 refine 목표가 어긋난다.
     """
-    joints, data = parse_bvh(path)
-    fr = data[min(frame, len(data) - 1)]
-    pos = fk(joints, fr)
     smap = _suffix_map(joints, pos)
 
     kp = np.zeros((17, 3), dtype=np.float32)
@@ -141,3 +197,10 @@ def load_coco17(path: str, frame: int = 0):
         mid = smap.get("Hips", smap.get("Hip", np.zeros(3)))
     kp[sc > 0] -= mid
     return kp, sc
+
+
+def load_coco17(path: str, frame: int = 0):
+    """BVH 1프레임 → (kp(17,3) float32, scores(17,) float32)."""
+    joints, data = parse_bvh(path)
+    fr = data[min(frame, len(data) - 1)]
+    return coco17_from_fk(joints, fk(joints, fr))

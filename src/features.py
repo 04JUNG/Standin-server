@@ -19,7 +19,8 @@ L_SH, R_SH, L_HIP, R_HIP = 5, 6, 11, 12
 
 def normalize_skeleton(keypoints: np.ndarray,
                        scores: np.ndarray | None = None,
-                       kpt_thr: float = 0.3) -> np.ndarray:
+                       kpt_thr: float = 0.3,
+                       valid_mask: np.ndarray | None = None) -> np.ndarray:
     """
     keypoints: (17,2), scores: (17,) → feature: (34,) float32
     보이지 않는(score<thr) 관절은 0으로 마스킹.
@@ -42,6 +43,8 @@ def normalize_skeleton(keypoints: np.ndarray,
 
     # 3) 결측 관절 마스킹
     mask = scores >= kpt_thr
+    if valid_mask is not None:
+        mask &= _as_joint_mask(valid_mask)
     kp[~mask] = 0.0
 
     return kp.reshape(-1).astype(np.float32)
@@ -60,15 +63,32 @@ def cosine_distance(a: np.ndarray, b: np.ndarray) -> float:
 _BODY = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
 
 
-def pose_distance(a: np.ndarray, b: np.ndarray) -> float:
+def _as_joint_mask(mask: np.ndarray | None) -> np.ndarray:
+    """17관절 bool mask로 정규화한다. 잘못된 형상은 조용히 쓰지 않는다."""
+    if mask is None:
+        return np.ones(17, dtype=bool)
+    out = np.asarray(mask, dtype=bool).reshape(-1)
+    if out.shape != (17,):
+        raise ValueError(f"joint mask must have shape (17,), got {out.shape}")
+    return out
+
+
+def pose_distance(a: np.ndarray, b: np.ndarray,
+                  a_valid_mask: np.ndarray | None = None,
+                  b_valid_mask: np.ndarray | None = None) -> float:
     """
     포즈 검색용 거리 = 정규화 공간 '몸통 관절당 평균 L2'.
     cosine을 대체(cosine은 팔 굽힘 같은 국소 차이를 못 잡고 큰 차이와 뒤섞임 — 실측).
     얼굴점(0~4)은 BVH에 없어 head로 근사되므로 제외(쿼리·라이브러리 비대칭 회피).
     """
-    A = np.asarray(a, dtype=np.float32).reshape(17, 2)[_BODY]
-    B = np.asarray(b, dtype=np.float32).reshape(17, 2)[_BODY]
-    return float(np.linalg.norm(A - B, axis=1).mean())
+    A = np.asarray(a, dtype=np.float32).reshape(17, 2)
+    B = np.asarray(b, dtype=np.float32).reshape(17, 2)
+    valid = _as_joint_mask(a_valid_mask) & _as_joint_mask(b_valid_mask)
+    body_valid = valid[np.asarray(_BODY)]
+    if not body_valid.any():
+        return float("inf")
+    body = np.asarray(_BODY)[body_valid]
+    return float(np.linalg.norm(A[body] - B[body], axis=1).mean())
 
 
 # ---- 비율 불변(뼈 방향/각도) 거리 ------------------------------------------
@@ -87,23 +107,49 @@ _BONES = [
 ]
 
 
-def bone_dirs(feat: np.ndarray):
-    """정규화 피처(34,) 또는 (17,2) → 뼈별 2D 단위방향과 유효마스크."""
+def bone_dirs(feat: np.ndarray,
+              joint_valid_mask: np.ndarray | None = None,
+              observable_bones: np.ndarray | None = None):
+    """정규화 피처 → 뼈별 2D 단위방향과 명시적 유효마스크.
+
+    ``joint_valid_mask``를 주면 좌표값 ``(0, 0)``으로 결측을 추론하지 않는다.
+    이미지 원점에 실제로 놓인 관절도 유효할 수 있기 때문이다. mask를 생략한 호출은
+    기존 refine/스크립트 호환을 위해 0 좌표 결측 규약을 유지한다.
+    """
     kp = np.asarray(feat, dtype=np.float32).reshape(17, 2)
+    explicit = joint_valid_mask is not None
+    joints_ok = _as_joint_mask(joint_valid_mask)
+    if observable_bones is None:
+        observable = np.ones(len(_BONES), dtype=bool)
+    else:
+        observable = np.asarray(observable_bones, dtype=bool).reshape(-1)
+        if observable.shape != (len(_BONES),):
+            raise ValueError(
+                f"observable_bones must have shape ({len(_BONES)},), "
+                f"got {observable.shape}"
+            )
     dirs = np.zeros((len(_BONES), 2), dtype=np.float32)
     ok = np.zeros(len(_BONES), dtype=bool)
     for i, (a, b) in enumerate(_BONES):
         v = kp[b] - kp[a]
         n = float(np.linalg.norm(v))
-        # 결측(마스킹된 0관절)이면 양끝이 같아 n≈0 → 무효 처리
-        if n > 1e-6 and not (np.allclose(kp[a], 0) or np.allclose(kp[b], 0)):
+        legacy_coords_ok = explicit or not (
+            np.allclose(kp[a], 0) or np.allclose(kp[b], 0)
+        )
+        if (observable[i] and joints_ok[a] and joints_ok[b]
+                and n > 1e-6 and legacy_coords_ok):
             dirs[i] = v / n; ok[i] = True
     return dirs, ok
 
 
-def angle_distance(a: np.ndarray, b: np.ndarray) -> float:
+def angle_distance(a: np.ndarray, b: np.ndarray,
+                   a_valid_mask: np.ndarray | None = None,
+                   b_valid_mask: np.ndarray | None = None,
+                   a_observable_bones: np.ndarray | None = None,
+                   b_observable_bones: np.ndarray | None = None) -> float:
     """뼈 방향 코사인 거리 평균 (0=완전 일치 ~ 2=정반대). 비율(길이) 불변."""
-    da, oa = bone_dirs(a); db, ob = bone_dirs(b)
+    da, oa = bone_dirs(a, a_valid_mask, a_observable_bones)
+    db, ob = bone_dirs(b, b_valid_mask, b_observable_bones)
     m = oa & ob
     if not m.any():
         return 2.0
@@ -111,6 +157,15 @@ def angle_distance(a: np.ndarray, b: np.ndarray) -> float:
     return float((1.0 - cos).mean())
 
 
-def hybrid_distance(a: np.ndarray, b: np.ndarray, w_angle: float = 0.7) -> float:
+def hybrid_distance(a: np.ndarray, b: np.ndarray, w_angle: float = 0.7,
+                    a_valid_mask: np.ndarray | None = None,
+                    b_valid_mask: np.ndarray | None = None,
+                    a_observable_bones: np.ndarray | None = None,
+                    b_observable_bones: np.ndarray | None = None) -> float:
     """위치-L2와 각도 거리의 가중 결합(스케일 맞춰 정규화)."""
-    return (1 - w_angle) * pose_distance(a, b) + w_angle * angle_distance(a, b)
+    pos = pose_distance(a, b, a_valid_mask, b_valid_mask)
+    angle = angle_distance(
+        a, b, a_valid_mask, b_valid_mask,
+        a_observable_bones, b_observable_bones,
+    )
+    return (1 - w_angle) * pos + w_angle * angle
