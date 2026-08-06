@@ -351,8 +351,10 @@ def get_refined_bvh(handle: str):
 
     ⚠ 배포 주의: 이 파일은 **refine을 처리한 인스턴스의 로컬 디스크**에 있다.
       추론 서버를 태스크 2개 이상으로 띄우면 POST /refine과 이 GET이 다른 태스크에
-      떨어져 404가 난다. 해소 전까지 추론 서버는 단일 태스크로 운영할 것.
-      (docs/REFINE_HANDOFF.md §3)
+      떨어져 404가 난다. 적용 전까지 추론 서버는 단일 태스크로 운영할 것.
+
+      해소 방법은 정해졌다 — `POST /refine` 응답에 BVH 본문을 실어 이 GET 자체를
+      없앤다(docs/REFINE_HANDOFF.md §3). 그 뒤 이 엔드포인트는 제거 대상이다.
     """
     if not handle.isalnum():                       # 경로 조작 차단
         raise HTTPException(400, "invalid handle")

@@ -100,23 +100,114 @@ items.append(ExportItem(
 
 ---
 
-## 3. 보류 결정 — 조정본 파일의 수명과 배포 (팀 합의 필요)
+## 3. 결정 — 조정본을 `/refine` 응답에 실어 보낸다 (2026-08-05 확정)
 
 조정본은 **refine을 처리한 인스턴스의 로컬 디스크**(`{DATA_DIR}/{REFINE_DIR}`)에 있다.
 
 | 문제 | 언제 터지나 |
 |---|---|
-| 태스크 2개 이상이면 `POST /refine`과 `GET /refined/...`가 다른 인스턴스에 떨어져 404 | ALB 뒤 다중 태스크 |
+| 태스크 2개 이상이면 `POST /refine`과 `GET /refined/...`가 다른 인스턴스에 떨어져 404 | 다중 태스크 |
 | 태스크가 교체되면 조정본이 사라짐 | ECS 롤링 배포·헬스체크 실패 |
 | 캐시가 무한히 쌓임 | 장기 운영 |
 
-**MVP 결정: 추론 서버는 단일 태스크로 띄운다.** 코드 변경 0, 시연 규모에 충분.
-아래는 나중 선택지(지금 고르지 않는다):
+### 왜 "단일 태스크"로는 부족했나
 
-- **바이트 인라인** — `/refine`이 BVH 내용을 응답에 실음. 무상태가 되지만 동원이
-  URL 다운로드를 전제하면 양쪽 지원이 필요. (`EXPORT_CONTRACT` §4 확인필요 ①과 같은 논점)
-- **공유 스토리지(S3/EFS)** — 제대로 된 해법. 인프라 작업이 붙는다.
-- **TTL 청소** — 어느 쪽을 고르든 필요.
+원래 MVP 결정은 "추론 서버를 단일 태스크로 띄운다, 코드 변경 0"이었다. **운영에서 공짜가
+아니었다.**
+
+`desiredCount=1`만으로는 부족하다. ECS 롤링 배포는 기본적으로 새 태스크를 먼저 띄우므로
+구·신 태스크가 잠시 공존하고, Cloud Map이 두 주소를 모두 돌려준다. 그래서 실제로 한 태스크만
+존재하게 하려면 `minHealthyPercent=0`(교체 후 기동)이 필요했는데 그 대가가 컸다.
+
+- **배포 실패가 곧 장애가 된다.** 구 태스크를 먼저 내리므로 새 이미지가 healthy가 되지
+  못하면 서비스할 태스크가 없다. 이 서버는 포즈 라이브러리나 VLM 키가 잘못되면 **의도적으로
+  기동을 거부**하도록 만들어져 있어서(`runtime_guard`, `_ensure_db`) 실제로 밟을 수 있는 경로다.
+- **배포 중 수십 초~2분 중단**이 매번 발생한다.
+- AWS가 `maximumPercent<=100`을 **Availability Zone 재분산이 켜진 서비스에서 거부**해
+  프로덕션 배포가 400으로 실패하고 CloudFormation이 롤백했다. 재분산을 끄는 것으로 우회했다.
+
+인프라는 현재 `refineEnabled` 조건부로 이 제약을 refine을 켤 때만 걸도록 해 두었다. 즉
+**refine을 켜는 순간 위 비용이 되살아난다.**
+
+### 채택안 — 바이트 인라인
+
+`POST /refine` 응답에 조정 BVH 본문을 함께 실어 **두 번째 요청을 없앤다.**
+
+```text
+before   POST /refine → (로컬 디스크에 씀) → GET /refined/{handle}/bvh → BFF가 S3 저장
+after    POST /refine → 응답에 본문 포함 → BFF가 S3 저장
+```
+
+두 번째 요청이 없으면 태스크 친화성 요구 자체가 사라진다. 태스크 수·배포 전략·AZ 재분산
+어느 것도 신경 쓸 필요가 없어지고, 인프라의 조건부 분기를 전부 지울 수 있다.
+
+**크기 걱정은 없다.** `refine_bvh`는 `write_single_frame_bvh`로 **단일 프레임** BVH를 쓴다
+(`src/refine.py`). HIERARCHY 블록 + MOTION 한 줄이라 JSON 문자열로 실어도 부담이 되지 않는다.
+
+공유 스토리지(S3 직접 쓰기)는 채택하지 않았다. 추론 태스크에 S3 쓰기 권한과 버킷 설정이
+붙는데, 지금 구조에서는 **BFF가 유일한 S3 writer**인 편이 권한 경계가 단순하다.
+
+> §3의 원래 우려("동원이 URL 다운로드를 전제하면 양쪽 지원이 필요")는 해소됐다. 조정본을
+> 소비하는 것은 BFF 하나뿐이고, 클라이언트는 BFF의 공개 export URL만 쓴다. 추론 서버의
+> `/refined/{handle}`를 외부에서 직접 받아가는 경로는 없다.
+
+### 계약 변경
+
+`RefineResponse`에 필드 하나를 **추가만** 한다.
+
+```python
+# api/models.py::RefineResponse
+bvh: Optional[str] = Field(
+    None, description="조정본 BVH 본문(LF 개행). refined=true일 때만 채운다. "
+                      "소비자는 이 값을 받아 자기 저장소에 보관한다.")
+```
+
+- `bvh_url`은 **그대로 둔다.** 구 소비자가 계속 동작해야 하고, `refined=false`일 때는
+  여전히 베이스 경로를 가리키는 의미가 있다.
+- 로컬 파일 쓰기와 `GET /refined/{handle}/bvh`도 당장은 유지한다. 순차 배포 중 구 BFF가 쓴다.
+- **개행은 LF로 고정한다.** JSON을 경유하면 이스케이프됐다 복원되므로, 원본이 CRLF면 결과가
+  달라진다. 동원의 CSP 축 보정·드래그가 걸린 부분이라 조용히 틀리면 찾기 어렵다.
+
+### 소비자 쪽 (`Standin-app-server`)
+
+`src/refine/service.ts`가 두 단계를 한 단계로 줄인다.
+
+```ts
+// upstream.bvh가 있으면 그대로 저장한다. 없으면(구 추론 서버) 기존 경로로 폴백.
+const bytes = upstream.bvh
+  ? new TextEncoder().encode(upstream.bvh)
+  : new Uint8Array(await (await deps.fetchUpstreamPath(upstream.bvh_url)).arrayBuffer());
+await deps.putRefinedBvh(objectKey, bytes);
+```
+
+`fetchUpstreamPath`와 `RefineDeps`의 해당 항목은 폴백 제거 단계까지 남긴다.
+
+### 배포 순서
+
+각 단계가 **단독으로 안전**해야 한다.
+
+| # | 저장소 | 내용 | 왜 안전한가 |
+|---|---|---|---|
+| 1 | Standin-server | `bvh` 필드 추가 | 순수 추가. 구 BFF는 무시한다 |
+| 2 | Standin-app-server | `bvh` 우선, 없으면 폴백 | 구·신 추론 서버 모두 동작 |
+| 3 | Standin-infra | `refineEnabled` 삼항 제거 → 항상 `100/200` + AZ 재분산 | 이 시점엔 두 번째 요청이 없다 |
+| 4 | (나중) | `/refined/{handle}`·로컬 쓰기·폴백 제거 | 정리 |
+
+**3번을 2번보다 먼저 하면 안 된다.** 구 BFF가 아직 두 번 요청하는 상태에서 무중단 배포로
+되돌리면 조정본 404가 난다.
+
+4번을 하면 "캐시가 무한히 쌓임" 문제도 함께 사라진다. handle 기반 멱등 캐시가 없어지지만,
+BFF의 `refined_artifacts` PK(`job_id, person_index, candidate_id`)가 같은 선택의 재호출을
+막으므로 충분하다.
+
+### 검증
+
+- **server**: `refined=true`면 `bvh`가 비어 있지 않고 `refined=false`면 `None`인지. 계약
+  fixture에 추가한다.
+- **app-server**: `bvh`가 있으면 `fetchUpstreamPath`를 **호출하지 않고** 저장하는지, 없으면
+  폴백하는지. 기존 `RefineDeps` 주입 구조로 DB·S3 없이 검증할 수 있다.
+- **통합**: 추론 태스크를 교체한 뒤에도 export가 성공하는지(E2E-08). 이 변경의 목적이므로
+  staging에서 반드시 확인한다.
 
 ---
 
