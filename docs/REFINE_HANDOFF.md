@@ -165,8 +165,17 @@ bvh: Optional[str] = Field(
 - `bvh_url`은 **그대로 둔다.** 구 소비자가 계속 동작해야 하고, `refined=false`일 때는
   여전히 베이스 경로를 가리키는 의미가 있다.
 - 로컬 파일 쓰기와 `GET /refined/{handle}/bvh`도 당장은 유지한다. 순차 배포 중 구 BFF가 쓴다.
-- **개행은 LF로 고정한다.** JSON을 경유하면 이스케이프됐다 복원되므로, 원본이 CRLF면 결과가
-  달라진다. 동원의 CSP 축 보정·드래그가 걸린 부분이라 조용히 틀리면 찾기 어렵다.
+- **개행은 LF로 고정한다.** 단, 위험은 *읽기*가 아니라 *쓰기* 쪽이다 (2026-08-07 리뷰로 정정).
+  - HIERARCHY는 이미 LF로 정규화된다. `hierarchy_text()`가 universal newlines로 읽어
+    `splitlines()` + `"\n".join()`으로 재조립하므로(`src/bvh.py`), 원본 BVH가 CRLF여도 이
+    시점에 LF가 된다. MOTION 블록은 f-string으로 직접 만든다. 즉 **응답에 실리는 `bvh`
+    문자열은 플랫폼과 무관하게 항상 LF다.**
+  - 반면 `write_single_frame_bvh()`의 `open(out_path, "w")`는 `newline=`을 지정하지 않아
+    `\n`이 `os.linesep`으로 번역된다. Linux 컨테이너에서는 LF지만 Windows에서 돌리면 디스크
+    파일이 CRLF가 된다. 1~3단계 동안 두 경로가 공존하므로, 신 BFF(`bvh` 필드, 항상 LF)와
+    구 BFF(`GET /refined/{handle}/bvh`, 서버 플랫폼 의존)가 **서로 다른 바이트**를 받을 수
+    있다. 동원의 CSP 축 보정·드래그가 걸린 부분이라 조용히 틀리면 찾기 어렵다.
+  - → 1단계에서 `newline="\n"`을 명시해 두 경로의 바이트를 일치시킨다.
 
 ### 소비자 쪽 (`Standin-app-server`)
 
@@ -188,7 +197,7 @@ await deps.putRefinedBvh(objectKey, bytes);
 
 | # | 저장소 | 내용 | 왜 안전한가 |
 |---|---|---|---|
-| 1 | Standin-server | `bvh` 필드 추가 | 순수 추가. 구 BFF는 무시한다 |
+| 1 | Standin-server | `bvh` 필드 추가 + `write_single_frame_bvh`에 `newline="\n"` | 순수 추가. 구 BFF는 무시한다. 개행 고정은 두 경로의 바이트를 맞춘다 |
 | 2 | Standin-app-server | `bvh` 우선, 없으면 폴백 | 구·신 추론 서버 모두 동작 |
 | 3 | Standin-infra | `refineEnabled` 삼항 제거 → 항상 `100/200` + AZ 재분산 | 이 시점엔 두 번째 요청이 없다 |
 | 4 | (나중) | `/refined/{handle}`·로컬 쓰기·폴백 제거 | 정리 |
@@ -199,6 +208,11 @@ await deps.putRefinedBvh(objectKey, bytes);
 4번을 하면 "캐시가 무한히 쌓임" 문제도 함께 사라진다. handle 기반 멱등 캐시가 없어지지만,
 BFF의 `refined_artifacts` PK(`job_id, person_index, candidate_id`)가 같은 선택의 재호출을
 막으므로 충분하다.
+
+4번의 전제는 리뷰에서 확인됐다(2026-08-07). `/refined/{handle}/bvh`를 HTTP로 읽는 코드는
+없고, 평가·진단 스크립트(`run_batch_pipeline.py`, `eval_refine_batch.py`, `diag_refine_3d.py`,
+`run_skeleton_pipeline_bundle.py`)는 전부 `src.refine.refine_bvh`를 직접 호출해 자체
+`out_path`에 쓴다 — 로컬 쓰기 제거와 무관하다.
 
 ### 검증
 
