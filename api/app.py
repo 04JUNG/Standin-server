@@ -317,7 +317,16 @@ def refine(req: RefineRequest):
     except ValueError as exc:                      # 알 수 없는 view 등
         raise HTTPException(422, str(exc)) from exc
 
+    # 조정본 본문을 응답에 실어 보낸다(REFINE_HANDOFF §3). 소비자가 bvh_url로 두 번째
+    # 요청을 하지 않아도 되므로, 롤링 배포 중 다른 태스크가 응답해 404가 나는 경로가
+    # 사라진다. write_single_frame_bvh는 HIERARCHY + MOTION 1프레임만 쓰므로(단일 프레임)
+    # 본문을 인라인해도 응답 크기가 문제되지 않는다.
+    # 텍스트 모드로 읽어 universal newlines가 개행을 LF로 정규화한다 — 계약이 "LF"다.
+    bvh_text = None
+
     if res.refined:
+        bvh_text = open(out_path, encoding="utf-8").read()
+
         # 사이드카: handle만으로는 어떤 포즈인지 알 수 없다. 동원의 '파일명·소재 폴더
         # 규칙'(EXPORT_CONTRACT §4-3)과 export 주문서 연결에 pose_id가 필요하다.
         with open(os.path.join(REFINE_DIR, f"{handle}.json"), "w",
@@ -334,6 +343,7 @@ def refine(req: RefineRequest):
         refined=res.refined, reason=res.reason,
         bvh_url=(f"/refined/{handle}/bvh" if res.refined
                  else f"/pose/{req.pose_id}/bvh"),
+        bvh=bvh_text,
         loss_base=None if np.isnan(res.loss_base) else res.loss_base,
         loss_final=None if np.isnan(res.loss_final) else res.loss_final,
         gain=None if np.isnan(res.loss_base) else res.gain,
@@ -351,8 +361,10 @@ def get_refined_bvh(handle: str):
 
     ⚠ 배포 주의: 이 파일은 **refine을 처리한 인스턴스의 로컬 디스크**에 있다.
       추론 서버를 태스크 2개 이상으로 띄우면 POST /refine과 이 GET이 다른 태스크에
-      떨어져 404가 난다. 해소 전까지 추론 서버는 단일 태스크로 운영할 것.
-      (docs/REFINE_HANDOFF.md §3)
+      떨어져 404가 난다. 적용 전까지 추론 서버는 단일 태스크로 운영할 것.
+
+      해소 방법은 정해졌다 — `POST /refine` 응답에 BVH 본문을 실어 이 GET 자체를
+      없앤다(docs/REFINE_HANDOFF.md §3). 그 뒤 이 엔드포인트는 제거 대상이다.
     """
     if not handle.isalnum():                       # 경로 조작 차단
         raise HTTPException(400, "invalid handle")

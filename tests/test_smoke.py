@@ -439,6 +439,34 @@ def test_refine_output_bvh_is_reloadable():
         assert kp3.shape == (17, 3)
 
 
+def test_refine_output_uses_lf_newlines():
+    """조정본 파일은 플랫폼과 무관하게 LF다(REFINE_HANDOFF §3).
+
+    /refine 응답의 bvh 필드는 항상 LF인데, 파일 쓰기가 os.linesep을 따르면 Windows에서만
+    디스크 파일이 CRLF가 된다. 그러면 신 소비자(응답 인라인)와 구 소비자(GET /refined)가
+    서로 다른 바이트를 받는다 — 조용히 틀리면 찾기 어려운 종류의 차이다.
+    """
+    import tempfile
+    from src.refine import refine_bvh
+    with tempfile.TemporaryDirectory() as d:
+        base = _synthetic_bvh(d, "base.bvh")
+        tgt = _bvh_with_rotation(d, "tgt.bvh", "LeftArm", 15.0)
+        kp, sc = _target_kp(tgt)
+        res = refine_bvh(base, kp, sc, "front", out_path=f"{d}/out.bvh")
+        assert res.refined, f"조정이 폐기됨: {res.reason}"
+        raw = open(res.bvh_path, "rb").read()
+        assert b"\r\n" not in raw, "조정본에 CRLF가 섞였다"
+
+
+def test_refine_response_bvh_field_defaults_to_none():
+    """refined=false면 bvh는 None이다 — 소비자는 이 값으로 분기한다."""
+    from api.models import RefineResponse
+    r = RefineResponse(pose_id="p", view="front", refined=False,
+                       reason="skeleton_policy", bvh_url="/pose/p/bvh",
+                       backend="none")
+    assert r.bvh is None
+
+
 def test_refine_gate_already_matched_returns_base():
     """이미 맞으면 개선 여지가 없다 → 손대지 않고 베이스 그대로."""
     import tempfile
