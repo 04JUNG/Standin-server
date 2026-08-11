@@ -28,7 +28,8 @@ import numpy as np
 
 from .config import CFG
 from .bvh import (parse_bvh, fk, coco17_from_fk, find_joint,
-                  rotation_channel_indices, write_single_frame_bvh)
+                  rotation_channel_indices, single_frame_bvh_text,
+                  write_single_frame_bvh)
 from .features import _BONES, bone_dirs, normalize_skeleton
 from .library import pose_to_feature
 from .collision import (ARM_JOINTS, arm_torso_penetration, collision_dict,
@@ -315,7 +316,7 @@ class RefineResult:
     """refine 1회의 결과. refined=False면 bvh_path는 **베이스 원본**이다."""
     refined: bool
     reason: str                 # 성공 사유 또는 게이트 이름
-    bvh_path: str
+    bvh_path: Optional[str]     # out_path=None으로 호출하면 성공해도 None(미기록)
     loss_base: float
     loss_final: float
     iterations: int
@@ -327,6 +328,7 @@ class RefineResult:
     svd_singular_values: tuple = ()  # P1b: 잘 보이는 조합 → null 조합 순 특이값
     svd_lambda_mult: tuple = ()      # P1b: 위 조합별 lambda 강화 배수
     limb_decisions: dict = field(default_factory=dict)  # 사지별 채택·탈락 사유와 P2 이동량
+    bvh_text: Optional[str] = None   # 조정본 본문(LF). refined=True일 때만 채운다
 
     @property
     def gain(self) -> float:
@@ -541,13 +543,16 @@ def refine_bvh(base_bvh: str,
         target_keypoints: 러프에서 추출한 (17,2) 2D 관절(이미지 좌표)
         target_scores:    (17,) 관절 신뢰도. None이면 전부 1
         view:             매칭된 view("front"/"three_quarter"/"side"/"back")
-        out_path:         조정본 저장 경로. None이면 베이스 옆에 .refined.bvh
+        out_path:         조정본 저장 경로. **None이면 파일을 쓰지 않는다** —
+                          본문은 RefineResult.bvh_text로만 돌려준다
         search_distance:  /analyze가 낸 Top-1 거리. 주면 게이트 5(베이스 불일치) 작동
         allowed_limbs:    스켈레톤 품질 단계가 허용한 사지. None이면 기존 동작
         frame:            베이스 BVH에서 사용할 프레임(라이브러리 색인과 동일하게 0)
 
     Returns:
         RefineResult. **refined=False면 bvh_path는 베이스 원본**이다(조정 폐기).
+        refined=True면 bvh_text에 조정본 본문(LF)이 들어 있고, out_path를 준
+        경우에만 bvh_path가 그 경로를 가리킨다.
     """
     if not os.path.exists(base_bvh):
         raise FileNotFoundError(base_bvh)
@@ -1000,14 +1005,18 @@ def refine_bvh(base_bvh: str,
             refresh_collision_final(base_params)
             return decorate(r)
 
-    # --- 통과: 조정본 기록 -------------------------------------------------
-    if out_path is None:
-        out_path = os.path.splitext(base_bvh)[0] + ".refined.bvh"
+    # --- 통과: 조정본 생성 -------------------------------------------------
+    # 본문은 항상 만들고, 파일로 남길지는 호출자가 정한다. 추론 API는 응답에 본문을
+    # 실어 보내므로 로컬 디스크에 쌓을 이유가 없다(REFINE_HANDOFF §3 4단계).
+    # 평가·진단 스크립트는 계속 out_path를 줘서 파일을 받는다.
     refresh_collision_final(x)
-    write_single_frame_bvh(base_bvh, fwd.frame_for(x), out_path)
+    text = single_frame_bvh_text(base_bvh, fwd.frame_for(x))
+    if out_path is not None:
+        write_single_frame_bvh(base_bvh, fwd.frame_for(x), out_path)
 
     result = RefineResult(
         True, "ok_partial" if rolled_back else "ok", out_path,
-        loss_base, loss_final, nfev, backend, limbs=tuple(kept)
+        loss_base, loss_final, nfev, backend, limbs=tuple(kept),
+        bvh_text=text,
     )
     return decorate(result)

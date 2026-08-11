@@ -48,8 +48,7 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
 | `GET` | `/pose/{pose_id}/bvh` | 경로 파라미터 | `application/octet-stream` | 동원 내보내기 |
 | `POST` | `/export-order` | `ExportOrderRequest` | `ExportOrder` | 동원 내보내기 (→ `EXPORT_CONTRACT.md`) |
 | `GET` | `/docs` | — | OpenAPI UI | 사람(계약 확인) |
-| `POST` | `/refine` | `RefineRequest` | `RefineResponse` | 앱 서버 → 조정된 BVH (→ `REFINE_DESIGN.md`) |
-| `GET` | `/refined/{handle}/bvh` | 경로 파라미터 | `application/octet-stream` | 동원 내보내기(조정본) |
+| `POST` | `/refine` | `RefineRequest` | `RefineResponse` | 앱 서버 → 조정된 BVH 본문(응답 `bvh`) (→ `REFINE_DESIGN.md`) |
 
 > `PersonOut`에 **`keypoints`(17×2, 이미지 픽셀)** · **`scores`(17)** 가 포함된다.
 > `/analyze`가 이미 추출하는 값이라 연산 추가는 0이며, `/refine`을 순수 함수로 만들기 위한 것이다.
@@ -74,7 +73,8 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
 {
   "pose_id": "Sitting Idle_01", "view": "front",
   "refined": true, "reason": "ok_partial",
-  "bvh_url": "/refined/7d3ebff90f5064ec/bvh",
+  "bvh_url": "/pose/Sitting Idle_01/bvh",   // 항상 베이스. 조정본에는 URL이 없다
+  "bvh": "HIERARCHY\nROOT Hips\n...\nMOTION\nFrames: 1\n...",  // 조정본 본문(LF)
   "loss_base": 0.599, "loss_final": 0.004, "gain": 0.993,
   "backend": "numpy",
   "limbs": ["right_arm"],
