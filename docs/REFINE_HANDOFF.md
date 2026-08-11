@@ -24,6 +24,12 @@ bvh_url=f"/pose/{sel.pose_id}/bvh"     # ← 항상 베이스. 조정본은 여�
 
 ## 1. 남은 작업 A — `/export-order`에 조정본 연결 (담당: 내보내기 쪽)
 
+> ⚠ **아래 스케치는 §3 4단계로 무효가 됐다(2026-08-11).** `refined_handle`·
+> `/refined/{handle}/bvh`·`REFINE_DIR`은 전부 제거됐다. 조정본은 `POST /refine` 응답의
+> `bvh` 본문으로만 나가고 BFF가 S3에 보관한다. 이 작업을 실제로 할 때는 handle이 아니라
+> **BFF의 `refined_artifacts`를 기준으로** 다시 설계해야 한다. 아래 코드 블록은 당시 의도를
+> 남겨 둔 기록이다.
+
 ### 무엇을
 
 작가가 refine을 받았으면 그 결과가 주문서에 실려야 한다. **재계산은 하지 않는다** —
@@ -200,14 +206,27 @@ await deps.putRefinedBvh(objectKey, bytes);
 | 1 | Standin-server | `bvh` 필드 추가 + `write_single_frame_bvh`에 `newline="\n"` | 순수 추가. 구 BFF는 무시한다. 개행 고정은 두 경로의 바이트를 맞춘다 |
 | 2 | Standin-app-server | `bvh` 우선, 없으면 폴백 | 구·신 추론 서버 모두 동작 |
 | 3 | Standin-infra | `refineEnabled` 삼항 제거 → 항상 `100/200` + AZ 재분산 | 이 시점엔 두 번째 요청이 없다 |
-| 4 | (나중) | `/refined/{handle}`·로컬 쓰기·폴백 제거 | 정리 |
+| 4 | server / app-server | `/refined/{handle}`·로컬 쓰기·폴백 제거 | 정리 |
 
-**3번을 2번보다 먼저 하면 안 된다.** 구 BFF가 아직 두 번 요청하는 상태에서 무중단 배포로
-되돌리면 조정본 404가 난다.
+**1~3은 2026-08-11에 프로덕션 배포 완료.** 배포 직후 실제 refine 1건으로 확인했다 —
+`POST /refine` 뒤에 `GET /refined/...`가 따라붙지 않고, BFF에 `refine_applied`가 남았다.
+
+**3번을 2번보다 먼저 하면 안 됐다.** 구 BFF가 아직 두 번 요청하는 상태에서 무중단 배포로
+되돌리면 조정본 404가 난다. 제약은 머지가 아니라 **배포**에 걸린다는 점에 주의 — develop
+머지로는 아무것도 배포되지 않고, `main` 푸시가 자동 배포를 트리거한다(인프라는 수동
+`cdk deploy`).
 
 4번을 하면 "캐시가 무한히 쌓임" 문제도 함께 사라진다. handle 기반 멱등 캐시가 없어지지만,
 BFF의 `refined_artifacts` PK(`job_id, person_index, candidate_id`)가 같은 선택의 재호출을
 막으므로 충분하다.
+
+**4번 적용됨(2026-08-11).** 서버 쪽 변경:
+
+- `GET /refined/{handle}/bvh` 라우트 제거. 사이드카 JSON과 `_refine_handle()`도 함께 제거
+- `refine_bvh(out_path=None)`이 **파일을 쓰지 않는다.** 본문은 `RefineResult.bvh_text`로
+  돌려주고, 추론 API는 이 경로로 호출한다. 평가·진단 스크립트는 계속 `out_path`를 준다
+- `REFINE_DIR` 설정 제거
+- `bvh_url`은 refined 여부와 무관하게 항상 `/pose/{id}/bvh`(베이스)
 
 4번의 전제는 리뷰에서 확인됐다(2026-08-07). `/refined/{handle}/bvh`를 HTTP로 읽는 코드는
 없고, 평가·진단 스크립트(`run_batch_pipeline.py`, `eval_refine_batch.py`, `diag_refine_3d.py`,

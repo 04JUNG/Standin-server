@@ -13,7 +13,6 @@ FastAPI 레이어 — 도원의 Python 추론 서버.
 """
 from __future__ import annotations
 
-import hashlib
 import io
 import json
 import os
@@ -43,7 +42,6 @@ from api.models import (CutResultOut, PersonOut, CandidateOut, SkeletonOut,
                         ExportOrderRequest, ExportOrder, ExportItem)
 
 DB_PATH = os.getenv("DB_PATH", "data/poses.db")
-REFINE_DIR = os.path.join(CFG.data_dir, CFG.refine_dir)
 
 STATE: dict = {}
 
@@ -259,17 +257,10 @@ def get_pose_thumbnail(pose_id: str, view: str):
 
 
 # ---- 포즈 미세조정 (docs/REFINE_DESIGN.md) --------------------------------
-
-def _refine_handle(req: RefineRequest) -> str:
-    """같은 입력 → 같은 파일. 작가가 같은 후보를 다시 눌러도 재계산하지 않는다."""
-    kp = np.asarray(req.keypoints, dtype=float).round(2).tobytes()
-    sc = np.asarray(req.scores or [], dtype=float).round(3).tobytes()
-    policy = (
-        f"|allowed={req.refine_allowed}|limbs="
-        f"{','.join(sorted(req.refinable_limbs or []))}|"
-    ).encode()
-    h = hashlib.sha1(f"{req.pose_id}|{req.view}|".encode() + policy + kp + sc)
-    return h.hexdigest()[:16]
+#
+# handle 기반 로컬 캐시는 제거됐다(REFINE_HANDOFF §3 4단계). 같은 선택을 다시
+# 눌러도 추론을 재호출하지 않는 멱등성은 BFF의 refined_artifacts PK
+# (job_id, person_index, candidate_id)가 담당한다.
 
 
 @app.post("/refine", response_model=RefineResponse)
@@ -308,42 +299,25 @@ def refine(req: RefineRequest):
             reason="entangled_set", bvh_url=f"/pose/{req.pose_id}/bvh",
             loss_base=None, loss_final=None, gain=None, backend="none")
 
-    handle = _refine_handle(req)
-    out_path = os.path.join(REFINE_DIR, f"{handle}.bvh")
     try:
+        # out_path=None → 로컬 파일을 쓰지 않는다. 조정본은 응답 본문으로만 나간다.
         res = refine_bvh(base, req.keypoints, req.scores, req.view,
-                         out_path=out_path, search_distance=req.search_distance,
+                         out_path=None, search_distance=req.search_distance,
                          allowed_limbs=req.refinable_limbs)
     except ValueError as exc:                      # 알 수 없는 view 등
         raise HTTPException(422, str(exc)) from exc
 
-    # 조정본 본문을 응답에 실어 보낸다(REFINE_HANDOFF §3). 소비자가 bvh_url로 두 번째
-    # 요청을 하지 않아도 되므로, 롤링 배포 중 다른 태스크가 응답해 404가 나는 경로가
-    # 사라진다. write_single_frame_bvh는 HIERARCHY + MOTION 1프레임만 쓰므로(단일 프레임)
-    # 본문을 인라인해도 응답 크기가 문제되지 않는다.
-    # 텍스트 모드로 읽어 universal newlines가 개행을 LF로 정규화한다 — 계약이 "LF"다.
-    bvh_text = None
-
-    if res.refined:
-        bvh_text = open(out_path, encoding="utf-8").read()
-
-        # 사이드카: handle만으로는 어떤 포즈인지 알 수 없다. 동원의 '파일명·소재 폴더
-        # 규칙'(EXPORT_CONTRACT §4-3)과 export 주문서 연결에 pose_id가 필요하다.
-        with open(os.path.join(REFINE_DIR, f"{handle}.json"), "w",
-                  encoding="utf-8") as f:
-            json.dump({"handle": handle, "pose_id": req.pose_id, "view": req.view,
-                       "base_bvh_url": f"/pose/{req.pose_id}/bvh",
-                       "limbs": list(res.limbs),
-                       "limb_decisions": res.limb_decisions,
-                       "created_at": datetime.now(timezone.utc).isoformat(
-                           timespec="seconds")}, f, ensure_ascii=False)
-
+    # 조정본은 응답 본문(bvh)으로만 나간다. 소비자가 두 번째 요청을 하지 않으므로
+    # 롤링 배포 중 다른 태스크가 응답해 404가 나는 경로가 없고, 로컬 디스크에
+    # 조정본이 무한정 쌓이지도 않는다(REFINE_HANDOFF §3).
+    #
+    # bvh_url은 refined 여부와 무관하게 항상 베이스를 가리킨다. 조정본에는 더 이상
+    # URL이 없다 — 소비자는 bvh를 받아 자기 저장소에 보관한다.
     return RefineResponse(
         pose_id=req.pose_id, view=req.view,
         refined=res.refined, reason=res.reason,
-        bvh_url=(f"/refined/{handle}/bvh" if res.refined
-                 else f"/pose/{req.pose_id}/bvh"),
-        bvh=bvh_text,
+        bvh_url=f"/pose/{req.pose_id}/bvh",
+        bvh=res.bvh_text,
         loss_base=None if np.isnan(res.loss_base) else res.loss_base,
         loss_final=None if np.isnan(res.loss_final) else res.loss_final,
         gain=None if np.isnan(res.loss_base) else res.gain,
@@ -353,34 +327,9 @@ def refine(req: RefineRequest):
     )
 
 
-@app.get("/refined/{handle}/bvh")
-def get_refined_bvh(handle: str):
-    """
-    조정본 BVH 다운로드. 동원 내보내기는 /pose/{id}/bvh와 동일하게 소비하면 된다
-    (HIERARCHY가 원본 그대로라 CSP 미러링·축 보정 로직은 손댈 필요 없음).
-
-    ⚠ 배포 주의: 이 파일은 **refine을 처리한 인스턴스의 로컬 디스크**에 있다.
-      추론 서버를 태스크 2개 이상으로 띄우면 POST /refine과 이 GET이 다른 태스크에
-      떨어져 404가 난다. 적용 전까지 추론 서버는 단일 태스크로 운영할 것.
-
-      해소 방법은 정해졌다 — `POST /refine` 응답에 BVH 본문을 실어 이 GET 자체를
-      없앤다(docs/REFINE_HANDOFF.md §3). 그 뒤 이 엔드포인트는 제거 대상이다.
-    """
-    if not handle.isalnum():                       # 경로 조작 차단
-        raise HTTPException(400, "invalid handle")
-    path = os.path.join(REFINE_DIR, f"{handle}.bvh")
-    if not os.path.exists(path):
-        raise HTTPException(404, f"unknown refine handle: {handle} (만료됐거나 미생성)")
-    # 사이드카가 있으면 pose_id로 내려준다 — 동원의 파일명 규칙이 handle을 모른다.
-    name = f"{handle}.refined.bvh"
-    side = os.path.join(REFINE_DIR, f"{handle}.json")
-    if os.path.exists(side):
-        try:
-            with open(side, encoding="utf-8") as f:
-                name = f"{json.load(f)['pose_id']}.refined.bvh"
-        except Exception:
-            pass
-    return FileResponse(path, media_type="application/octet-stream", filename=name)
+# GET /refined/{handle}/bvh는 제거됐다(REFINE_HANDOFF §3 4단계).
+# 조정본은 POST /refine 응답의 bvh 필드로만 나가고, 보관은 소비자(BFF)가 한다.
+# 추론 컨테이너의 로컬 디스크에는 아무것도 남지 않는다.
 
 
 @app.post("/export-order", response_model=ExportOrder)
