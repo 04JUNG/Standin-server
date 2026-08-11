@@ -442,9 +442,9 @@ def test_refine_output_bvh_is_reloadable():
 def test_refine_output_uses_lf_newlines():
     """조정본 파일은 플랫폼과 무관하게 LF다(REFINE_HANDOFF §3).
 
-    /refine 응답의 bvh 필드는 항상 LF인데, 파일 쓰기가 os.linesep을 따르면 Windows에서만
-    디스크 파일이 CRLF가 된다. 그러면 신 소비자(응답 인라인)와 구 소비자(GET /refined)가
-    서로 다른 바이트를 받는다 — 조용히 틀리면 찾기 어려운 종류의 차이다.
+    파일 쓰기가 os.linesep을 따르면 Windows에서만 디스크 파일이 CRLF가 되어, 같은
+    조정본이 경로에 따라 다른 바이트가 된다 — 조용히 틀리면 찾기 어려운 종류의 차이다.
+    평가·진단 스크립트가 이 경로로 파일을 받으므로 계속 지킨다.
     """
     import tempfile
     from src.refine import refine_bvh
@@ -465,6 +465,45 @@ def test_refine_response_bvh_field_defaults_to_none():
                        reason="skeleton_policy", bvh_url="/pose/p/bvh",
                        backend="none")
     assert r.bvh is None
+
+
+def test_refine_without_out_path_writes_nothing():
+    """out_path=None이면 디스크에 아무것도 남기지 않는다(REFINE_HANDOFF §3 4단계).
+
+    추론 API가 이 경로로 호출한다. 파일이 남으면 REFINE_DIR이 무한정 쌓이던
+    문제가 되돌아온다.
+    """
+    import tempfile
+    from src.refine import refine_bvh
+    with tempfile.TemporaryDirectory() as d:
+        base = _synthetic_bvh(d, "base.bvh")
+        tgt = _bvh_with_rotation(d, "tgt.bvh", "LeftArm", 15.0)
+        kp, sc = _target_kp(tgt)
+        before = sorted(os.listdir(d))
+
+        res = refine_bvh(base, kp, sc, "front", out_path=None)
+
+        assert res.refined, f"조정이 폐기됨: {res.reason}"
+        assert res.bvh_path is None, "파일을 쓰지 않았는데 경로가 붙었다"
+        assert sorted(os.listdir(d)) == before, "새 파일이 생겼다"
+        # 베이스 옆에 .refined.bvh를 만들던 예전 기본 동작도 사라져야 한다
+        assert not os.path.exists(os.path.splitext(base)[0] + ".refined.bvh")
+
+
+def test_refine_bvh_text_matches_written_file():
+    """응답에 싣는 본문과 파일로 쓴 바이트가 같아야 한다.
+
+    두 경로가 갈라지면 어느 쪽이 맞는지 알 수 없게 된다.
+    """
+    import tempfile
+    from src.refine import refine_bvh
+    with tempfile.TemporaryDirectory() as d:
+        base = _synthetic_bvh(d, "base.bvh")
+        tgt = _bvh_with_rotation(d, "tgt.bvh", "LeftForeArm", 20.0)
+        kp, sc = _target_kp(tgt)
+        res = refine_bvh(base, kp, sc, "front", out_path=f"{d}/out.bvh")
+        assert res.refined, f"조정이 폐기됨: {res.reason}"
+        assert res.bvh_text == open(res.bvh_path, encoding="utf-8").read()
 
 
 def test_refine_gate_already_matched_returns_base():

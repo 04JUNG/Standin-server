@@ -126,23 +126,32 @@ def hierarchy_text(path: str) -> str:
     raise ValueError(f"MOTION 섹션이 없습니다: {path}")
 
 
-def write_single_frame_bvh(src_path: str, frame_values, out_path: str,
-                           frame_time: float = 0.033333) -> str:
+def single_frame_bvh_text(src_path: str, frame_values,
+                          frame_time: float = 0.033333) -> str:
     """
-    원본의 HIERARCHY를 **원문 그대로 복사**하고 MOTION만 1프레임으로 교체해 저장.
+    원본의 HIERARCHY를 **원문 그대로 복사**하고 MOTION만 1프레임으로 교체한 본문.
 
     계층·OFFSET(뼈 길이)을 재직렬화하지 않는 것이 핵심이다. refine은 회전각만
     바꾸므로 뼈 길이·계층이 달라질 이유가 없고, 재직렬화하면 반올림 오차나
     파서 미지원 구문(주석 등)으로 원본이 조용히 손상될 수 있다.
+
+    개행은 항상 LF다. hierarchy_text()가 universal newlines로 읽어 재조립하고
+    나머지는 여기서 직접 만들기 때문에, 원본이 CRLF여도 결과는 LF다.
     """
     head = hierarchy_text(src_path)
     vals = " ".join(f"{float(v):.6f}" for v in np.asarray(frame_values).ravel())
+    return f"{head}\nMOTION\nFrames: 1\nFrame Time: {frame_time:.6f}\n{vals}\n"
+
+
+def write_single_frame_bvh(src_path: str, frame_values, out_path: str,
+                           frame_time: float = 0.033333) -> str:
+    """single_frame_bvh_text()의 결과를 파일로 저장한다."""
+    text = single_frame_bvh_text(src_path, frame_values, frame_time)
     os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
-    # newline="\n" 필수. 미지정이면 "\n"이 os.linesep으로 번역돼 Windows에서만 CRLF
-    # 파일이 나온다. /refine 응답의 bvh 필드는 항상 LF이므로, 그대로 두면 두 경로
-    # (응답 인라인 / GET /refined/{handle}/bvh)가 서로 다른 바이트를 주게 된다.
+    # newline="\n" 필수. 미지정이면 "\n"이 os.linesep으로 번역돼 Windows에서만
+    # CRLF 파일이 나오고, 같은 조정본이 경로에 따라 다른 바이트가 된다.
     with open(out_path, "w", newline="\n") as f:
-        f.write(f"{head}\nMOTION\nFrames: 1\nFrame Time: {frame_time:.6f}\n{vals}\n")
+        f.write(text)
     return out_path
 
 
