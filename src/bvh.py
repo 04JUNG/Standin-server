@@ -138,7 +138,10 @@ def write_single_frame_bvh(src_path: str, frame_values, out_path: str,
     head = hierarchy_text(src_path)
     vals = " ".join(f"{float(v):.6f}" for v in np.asarray(frame_values).ravel())
     os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
-    with open(out_path, "w") as f:
+    # newline="\n" 필수. 미지정이면 "\n"이 os.linesep으로 번역돼 Windows에서만 CRLF
+    # 파일이 나온다. /refine 응답의 bvh 필드는 항상 LF이므로, 그대로 두면 두 경로
+    # (응답 인라인 / GET /refined/{handle}/bvh)가 서로 다른 바이트를 주게 된다.
+    with open(out_path, "w", newline="\n") as f:
         f.write(f"{head}\nMOTION\nFrames: 1\nFrame Time: {frame_time:.6f}\n{vals}\n")
     return out_path
 
