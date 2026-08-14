@@ -37,6 +37,7 @@ from src.refine_policy import structural_refine_allowed
 from src.repo import (FEATURE_VERSION, build_db, load_entries,
                       get_bvh_path, get_pose_meta)
 from src.thumbnails import THUMBNAIL_VIEWS, find_thumbnail, thumbnail_url
+from src.tracing import capture_trace, span
 from src.runtime_guard import (
     MockBackendError,
     actual_backend_names,
@@ -202,7 +203,8 @@ class _HintImg(str):
 
 
 @app.post("/analyze", response_model=CutResultOut)
-def analyze(file: UploadFile = File(...), hint: str = Form(default="")):
+def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
+            response: Response = None):
     data = file.file.read()
     image, w, h = _load_image(data)
     # dev 편의: mock provider일 때만 hint를 이미지 대용으로 사용
@@ -210,7 +212,12 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default="")):
         image = _HintImg(hint)
 
     pipe: Pipeline = STATE["pipeline"]
-    res = pipe.process_cut(image, w, h)
+    with capture_trace() as timing:
+        with span("pipeline_total"):
+            res = pipe.process_cut(image, w, h)
+    if response is not None:
+        response.headers["Server-Timing"] = timing.server_timing()
+        response.headers["X-Standin-Timing-Kind"] = "live-server-stage"
 
     people = []
     per_person = getattr(res, "person_candidates", [])
