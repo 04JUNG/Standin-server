@@ -4,8 +4,9 @@ schema.py의 dataclass를 미러링하되, 네트워크 경계에 맞게 bvh_url
 """
 from __future__ import annotations
 
+import math
 from typing import Annotated, List, Literal, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class CandidateOut(BaseModel):
@@ -50,7 +51,7 @@ class PersonOut(BaseModel):
     tags: dict
     skeleton: Optional[SkeletonOut] = None
     candidates: List[CandidateOut]
-    # /refine을 '순수 함수'로 만들기 위한 필드(docs/REFINE_DESIGN.md §3).
+    # /refine을 '순수 함수'로 만들기 위한 필드(docs/REFINE_DESIGN.md).
     # /analyze가 이미 추출한 값을 실어 보낼 뿐이라 연산 추가는 0이다.
     # 클라이언트는 이 두 값을 그대로 POST /refine에 되돌려주면 된다
     # → 러프 이미지 재전송·포즈 재추론 없음.
@@ -96,10 +97,11 @@ class CutResultOut(BaseModel):
 
 class RefineRequest(BaseModel):
     pose_id: str = Field(..., description="작가가 고른 후보의 pose_id")
-    view: str = Field(..., description="그 후보의 view(=매칭된 투영 각도)")
-    keypoints: List[List[float]] = Field(
+    view: Literal["front", "three_quarter", "side", "back"] = Field(
+        ..., description="그 후보의 view(=매칭된 투영 각도)")
+    keypoints: Keypoints17 = Field(
         ..., description="/analyze가 준 PersonOut.keypoints를 그대로 (17×2)")
-    scores: Optional[List[float]] = Field(
+    scores: Optional[Scores17] = Field(
         None, description="/analyze가 준 PersonOut.scores를 그대로 (17,)")
     search_distance: Optional[float] = Field(
         None, description="그 후보의 distance. 주면 '베이스 불일치' 안전 게이트가 켜진다")
@@ -107,6 +109,49 @@ class RefineRequest(BaseModel):
         None, description="/analyze가 준 값을 그대로 전달. false면 서버가 refine을 차단")
     refinable_limbs: Optional[List[str]] = Field(
         None, description="/analyze가 허용한 사지만 전달. 예: left_arm")
+    skeleton_state: Optional[str] = Field(
+        None, description="/analyze의 skeleton_state; v2 진단 lineage")
+    coverage_class: Optional[str] = Field(
+        None, description="/analyze의 coverage_class; v2 진단 lineage")
+    slot_origin: Optional[str] = Field(
+        None, description="/analyze의 slot_origin; 인물 소유권 lineage")
+    skeleton_source: Optional[str] = Field(
+        None, description="/analyze의 skeleton_source; 인물 소유권 lineage")
+    search_stability: Optional[str] = Field(
+        None, description="partial 스켈레톤의 보수적 mask 검색 안정성")
+    distance_metric: Optional[str] = Field(
+        None, description="후보를 검색할 때 사용한 거리 metric")
+    confidence_threshold: Optional[float] = Field(
+        None, description="검색 당시 metric×coverage confidence threshold")
+    gap_type: Literal["near_gap", "structural_gap", "unknown"] = Field(
+        "unknown", description="평가 라벨. refine 실행 게이트로 사용하지 않음")
+    refine_mode: Literal["conservative", "aggressive"] = Field(
+        "conservative",
+        description=("v2.4 조정 강도. aggressive도 hard safety gate는 완화하지 않고 "
+                     "실패 시 conservative 결과로 복구"),
+    )
+
+    @field_validator("keypoints")
+    @classmethod
+    def _finite_keypoints(cls, value):
+        if not all(math.isfinite(float(number)) for point in value for number in point):
+            raise ValueError("keypoints must contain only finite values")
+        return value
+
+    @field_validator("scores")
+    @classmethod
+    def _finite_scores(cls, value):
+        if value is not None and (not all(math.isfinite(float(number)) for number in value)
+                                  or any(float(number) < 0.0 for number in value)):
+            raise ValueError("scores must contain finite non-negative values")
+        return value
+
+    @field_validator("search_distance", "confidence_threshold")
+    @classmethod
+    def _finite_optional_number(cls, value):
+        if value is not None and not math.isfinite(float(value)):
+            raise ValueError("distance metadata must be finite")
+        return value
 
 
 class RefineResponse(BaseModel):
@@ -117,21 +162,29 @@ class RefineResponse(BaseModel):
     reason: str = Field(..., description="ok | disabled | entangled_set | "
                                          "skeleton_policy | low_skeleton_score | base_mismatch | "
                                          "multiframe_base | insufficient_target_bones | "
+                                         "low_observability | no_solvable_joints | "
                                          "already_matched | no_gain | ok_partial | "
                                          "movement_gate | global_no_gain | "
                                          "collision_gate | collision_unresolved | "
-                                         "joint_limit | diverged")
+                                         "joint_limit | safety_gate | unchanged_geometry | "
+                                         "timeout | diverged")
     bvh_url: str = Field(..., description="내려받을 BVH 경로(조정본 또는 베이스)")
     loss_base: Optional[float] = Field(None, description="조정 전 각도 손실")
     loss_final: Optional[float] = Field(None, description="조정 후 각도 손실")
     gain: Optional[float] = Field(None, description="손실 감소율(0.3=30% 개선)")
-    backend: str = Field(..., description="scipy | numpy | none")
+    backend: str = Field(..., description="scipy | numpy | scipy+numpy | none")
+    refine_version: str = Field("v1.3", description="실행한 refine policy/code 버전")
+    refine_outcome: Literal["improved", "unchanged", "reverted", "not_attempted"] = Field(
+        "not_attempted", description="gap_type과 독립인 적용 결과")
     limbs: List[str] = Field(
         default_factory=list, description="P3까지 통과해 최종 조정된 사지")
     limb_decisions: dict = Field(
         default_factory=dict,
         description=("고려한 사지별 채택 여부·사유, 몸통 정규화 3D 이동량, "
                      "베이스 상대 손·전완-몸통 충돌 진단"))
+    diagnostics: dict = Field(
+        default_factory=dict,
+        description="v2의 base/solved/adopted 손실·안전·버전 lineage")
 
 
 # ==== 동원 Export 계약 (Tauri → 동원 내보내기) ============================

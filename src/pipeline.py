@@ -30,6 +30,7 @@ from .detect import MockDetector, reconcile, reconcile_count
 from .pose import build_pose_model
 from .routing import route
 from .descriptor import build_slot_descriptors
+from .refine_policy import structural_refine_allowed
 from .search import candidate_stability, knn_geometric
 from .skeleton_extraction import (
     apply_crop_result,
@@ -263,27 +264,50 @@ class Pipeline:
         유지해 어느 쪽도 suspect 스켈레톤을 refine하지 못하게 한다.
         """
         evidence = slot.evidence
-        configured_limbs = (
-            {"left_arm", "right_arm"}
-            if CFG.refine_limbs.lower() == "arms"
-            else {"left_arm", "right_arm", "left_leg", "right_leg"}
+        if CFG.refine_v2_enabled:
+            configured_limbs = {"left_arm", "right_arm"}
+            if CFG.refine_v2_lower_body:
+                configured_limbs.update({"left_leg", "right_leg"})
+        else:
+            configured_limbs = (
+                {"left_arm", "right_arm"}
+                if CFG.refine_limbs.lower() == "arms"
+                else {"left_arm", "right_arm", "left_leg", "right_leg"}
+            )
+        evidence_limbs = (
+            evidence.refinable_limbs if evidence is not None else ()
         )
+        if evidence is not None and not CFG.refine_v2_enabled:
+            # foreshortening soft eligibility는 v2.3 전용이다. v1에서 REFINE_LIMBS=all을
+            # 켠 기존 평가도 검색 mask 기준 하체 동작을 그대로 유지한다.
+            evidence_limbs = tuple(
+                limb for limb in evidence_limbs
+                if limb not in evidence.foreshortened_limbs
+            )
         refinable_limbs = tuple(
-            limb for limb in (evidence.refinable_limbs if evidence is not None else ())
-            if limb in configured_limbs
+            limb for limb in evidence_limbs if limb in configured_limbs
         )
-        allowed = bool(
-            confidence == "high"
-            and evidence is not None
-            and slot.state in ("valid", "partial")
-            and evidence.coverage_class in ("full", "reduced")
-            and refinable_limbs
-            and slot.slot_origin == "vlm"
-            and slot.skeleton_source == "full_image"
+        structural_allowed = bool(
+            evidence is not None
+            and structural_refine_allowed(
+                skeleton_state=slot.state,
+                coverage_class=evidence.coverage_class,
+                refinable_limbs=refinable_limbs,
+                slot_origin=slot.slot_origin,
+                skeleton_source=slot.skeleton_source,
+            )
+        )
+        # v1은 검색 confidence까지 실행 게이트로 사용한다. v2는 검색 거리/순위가
+        # 낮다는 이유만으로 차단하지 않고, 스켈레톤·소유권·coverage 안전성만 본다.
+        allowed = structural_allowed if CFG.refine_v2_enabled else bool(
+            confidence == "high" and structural_allowed
             and (slot.state == "valid" or slot.search_stability == "stable")
         )
         desc.refine_allowed = allowed
         desc.refinable_limbs = refinable_limbs
+        desc.quality_trace["refine_policy"] = (
+            "v2_structural" if CFG.refine_v2_enabled else "v1_search_and_structural"
+        )
         if desc.skeleton is not None and evidence is not None:
             desc.skeleton.scores = (
                 evidence.refine_scores if allowed

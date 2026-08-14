@@ -134,7 +134,7 @@ class Config:
     # 채널당 베이스에서 벗어날 수 있는 최대 각도(하드 바운드).
     # ⚠ 이것만으로는 '미세조정'이 보장되지 않는다 — 각도 공간의 제약은 3D 공간의
     #   제약이 아니다. 어깨에서 45°면 손목은 몸통 길이의 0.7배까지 움직인다(실측).
-    #   docs/REFINE_DESIGN.md §6-4 참조.
+    #   docs/REFINE_DESIGN.md 참조.
     refine_max_delta_deg: float = float(os.getenv("REFINE_MAX_DELTA_DEG", "45"))
 
     # refine 후보 사지: "arms"(기본) | "all"
@@ -142,7 +142,7 @@ class Config:
     # P2(3D 이동량 게이트) 전에는 다리를 풀지 않는 것이 MVP 안전 기본값이다.
     refine_limbs: str = os.getenv("REFINE_LIMBS", "arms")
 
-    # --- 관측 감도 게이트 (docs/REFINE_DESIGN.md §6-5) ---
+    # --- 관측 감도 게이트 (docs/REFINE_DESIGN.md) ---
     # "다리를 켜냐 끄냐"는 잘못된 질문이다. 다리 관측 감도는 컷마다 8배 범위로 흩어진다
     # (전신 컷에서 또렷한 다리 = 팔과 비슷, 허벅지에서 잘린 컷 = 팔의 1/10).
     # 그래서 전역 on/off 대신 **컷마다 사지별로 재서** 안 보이는 사지만 동결한다.
@@ -153,7 +153,7 @@ class Config:
     # 모든 사지가 다 안 보이는 컷에서 상대 기준만으론 못 막으므로 절대 하한도 둔다.
     refine_min_observability_abs: float = float(os.getenv("REFINE_MIN_OBS_ABS", "0.10"))
 
-    # --- P1a: 축별 관측 감도 정규화 (docs/REFINE_NEXT.md §3 P1a) ---
+    # --- P1a: 축별 관측 감도 정규화 (docs/REFINE_DESIGN.md) ---
     # 한 관절의 회전축마다 2D에서 보이는 정도가 다르다. 잘 안 보이는 축은
     # 베이스 정규화를 강화해 전완/손·종아리/발이 공짜로 비틀리지 않게 한다.
     refine_axis_observability: bool = os.getenv("REFINE_AXIS_OBS", "1") == "1"
@@ -162,7 +162,7 @@ class Config:
     refine_axis_lambda_max_mult: float = float(
         os.getenv("REFINE_AXIS_LAMBDA_MAX_MULT", "100")
     )
-    # --- P1b: 축 조합 null-space 정규화 (docs/REFINE_NEXT.md §3 P1b) ---
+    # --- P1b: 축 조합 null-space 정규화 (docs/REFINE_DESIGN.md) ---
     # P1a는 X/Y/Z 축 하나가 안 보이는 경우를 잡는다. 실제 팔 관절의 일부는
     # 각 축은 따로 보이지만 여러 축을 섞은 방향이 안 보이므로, 그 조합 방향도
     # 야코비안 SVD로 찾아 베이스에 고정한다.
@@ -170,14 +170,14 @@ class Config:
     refine_svd_lambda_max_mult: float = float(
         os.getenv("REFINE_SVD_LAMBDA_MAX_MULT", "2")
     )
-    # --- P2: post-solve 사지별 3D 이동량 게이트 (docs/REFINE_P2.md) ---
+    # --- P2: post-solve 사지별 3D 이동량 게이트 (docs/REFINE_DESIGN.md) ---
     # 사람 눈 평가에서 유용한 큰 조정까지 폐기해 P3 검증 동안 하드 게이트는 보류한다.
     # 0이어도 이동량 진단은 limb_decisions에 계속 남는다.
     refine_move_gate: bool = os.getenv("REFINE_MOVE_GATE", "0") == "1"
     # 몸통 길이로 정규화한 사지 중간관절·말단 평균 / 말단 최대 이동량 상한.
     refine_max_move_mean: float = float(os.getenv("REFINE_MAX_MOVE_MEAN", "0.20"))
     refine_max_move_max: float = float(os.getenv("REFINE_MAX_MOVE_MAX", "0.35"))
-    # --- P3a: 베이스 상대 팔-몸통 자기 충돌 게이트 (docs/REFINE_P3.md) ---
+    # --- P3a: 베이스 상대 팔-몸통 자기 충돌 게이트 (docs/REFINE_DESIGN.md) ---
     # 실 러프 probe에서 171734의 깊은 손 관통과 124629 정상 Top-5가 분리돼 기본 활성화.
     # P2는 계속 로그 전용이며 P3만 하드 게이트로 사용한다.
     refine_collision_gate: bool = os.getenv("REFINE_COLLISION_GATE", "1") == "1"
@@ -193,6 +193,9 @@ class Config:
     refine_collision_hand_radius: float = float(
         os.getenv("REFINE_COLLISION_HAND_RADIUS", "0.025")
     )
+    refine_collision_leg_radius: float = float(
+        os.getenv("REFINE_COLLISION_LEG_RADIUS", "0.045")
+    )
     refine_collision_samples: int = int(os.getenv("REFINE_COLLISION_SAMPLES", "9"))
     # 손끝 프록시 기준 171734 양성(0.055/0.090)과 124629 최대 음성(0.043)
     # 사이로 고정했다. 표본이 작으므로 실사용 로그를 계속 보정 근거로 남긴다.
@@ -206,6 +209,73 @@ class Config:
     refine_min_bend_deg: float = float(os.getenv("REFINE_MIN_BEND_DEG", "20"))
     # 조정본 BVH 저장 위치(캐시). data_dir 기준 상대.
     refine_dir: str = os.getenv("REFINE_DIR", "refined")
+
+    # --- Refine v2 (docs/REFINE_V2_DESIGN.md) ---------------------------
+    # v2는 구현·평가 기간 동안 v1과 병행한다. 검증/승격 전에는 기본 OFF라서
+    # production의 기존 5% gain 계약을 조용히 바꾸지 않는다.
+    refine_v2_enabled: bool = os.getenv("REFINE_V2_ENABLED", "0") == "1"
+    # v2의 채택 문턱은 제품 의미의 5%가 아니라 수치 노이즈만 거르는 양의 gain이다.
+    refine_gain_epsilon: float = float(os.getenv("REFINE_GAIN_EPSILON", "0.0001"))
+    # robust 2D endpoint + base 대비 3D 이동량의 목적함수 가중치.
+    refine_v2_endpoint_weight: float = float(os.getenv(
+        "REFINE_V2_ENDPOINT_WEIGHT", "0.35"))
+    refine_v2_endpoint_huber_delta: float = float(os.getenv(
+        "REFINE_V2_ENDPOINT_HUBER_DELTA", "0.15"))
+    refine_v2_move_weight: float = float(os.getenv(
+        "REFINE_V2_MOVE_WEIGHT", "0.08"))
+    refine_v2_collision_weight: float = float(os.getenv(
+        "REFINE_V2_COLLISION_WEIGHT", "0.10"))
+    refine_v2_anatomy_weight: float = float(os.getenv(
+        "REFINE_V2_ANATOMY_WEIGHT", "0.05"))
+    # v2.3 C1: 얕은 손-다리 접촉은 허용하되 새로 생긴 깊은 관통은 별도
+    # 낮은 상한으로 차단한다. 실제 메시 holdout 승격 전 production 기본은 v1이다.
+    refine_v2_hand_leg_min_depth: float = float(os.getenv(
+        "REFINE_V2_HAND_LEG_MIN_DEPTH", "0.01"))
+    refine_v2_hand_leg_worsen_delta: float = float(os.getenv(
+        "REFINE_V2_HAND_LEG_WORSEN_DELTA", "0.005"))
+    # v2.3 C3: 양쪽 무릎·발목의 signed relative-vector 손실.
+    refine_v2_lower_pair_weight: float = float(os.getenv(
+        "REFINE_V2_LOWER_PAIR_WEIGHT", "0.35"))
+    refine_v2_lower_pair_min_gap_delta: float = float(os.getenv(
+        "REFINE_V2_LOWER_PAIR_MIN_GAP_DELTA", "0.02"))
+    refine_v2_foreshortening_direction_scale: float = float(os.getenv(
+        "REFINE_V2_FORESHORTENING_DIRECTION_SCALE", "0.25"))
+    # v2.4 aggressive: 안전 게이트는 공유하고 pair/contact 목적만 강화한다.
+    refine_v2_hand_pair_weight: float = float(os.getenv(
+        "REFINE_V2_HAND_PAIR_WEIGHT", "0.80"))
+    refine_v2_hand_pair_midpoint_weight: float = float(os.getenv(
+        "REFINE_V2_HAND_PAIR_MIDPOINT_WEIGHT", "0.60"))
+    refine_v2_hand_pair_min_gap_delta: float = float(os.getenv(
+        "REFINE_V2_HAND_PAIR_MIN_GAP_DELTA", "0.02"))
+    refine_v2_lap_contact_2d_threshold: float = float(os.getenv(
+        "REFINE_V2_LAP_CONTACT_2D_THRESHOLD", "0.25"))
+    refine_v2_lap_contact_weight: float = float(os.getenv(
+        "REFINE_V2_LAP_CONTACT_WEIGHT", "1.50"))
+    refine_v2_lap_contact_min_clearance: float = float(os.getenv(
+        "REFINE_V2_LAP_CONTACT_MIN_CLEARANCE", "-0.003"))
+    refine_v2_lap_contact_max_clearance: float = float(os.getenv(
+        "REFINE_V2_LAP_CONTACT_MAX_CLEARANCE", "0.02"))
+    refine_v2_aggressive_lower_pair_weight: float = float(os.getenv(
+        "REFINE_V2_AGGRESSIVE_LOWER_PAIR_WEIGHT", "0.90"))
+    refine_v2_ankle_counter_max_delta_deg: float = float(os.getenv(
+        "REFINE_V2_ANKLE_COUNTER_MAX_DELTA_DEG", "18"))
+    # v2 플래그 안에서는 하체가 첫 우선 과제다. 구조/coverage/관측 게이트를
+    # 통과한 다리만 실제 solve 대상이 된다.
+    refine_v2_lower_body: bool = os.getenv("REFINE_V2_LOWER_BODY", "1") == "1"
+    # 몸통은 V2-1 검증 뒤 독립적으로 켜는 default-off 단계다.
+    refine_v2_torso_enabled: bool = os.getenv("REFINE_V2_TORSO", "0") == "1"
+    refine_v2_torso_max_delta_deg: float = float(os.getenv(
+        "REFINE_V2_TORSO_MAX_DELTA_DEG", "8"))
+    # 1.0부터 가장 큰 안전 alpha를 고른다. 문자열은 내림차순이어야 한다.
+    refine_v2_blend_alphas: str = os.getenv(
+        "REFINE_V2_BLEND_ALPHAS", "1.0,0.75,0.5,0.25")
+    # 베이스 발 orientation/접촉 보존 게이트. COCO-17로 발 방향을 새로 만들지 않는다.
+    refine_v2_foot_direction_deg: float = float(os.getenv(
+        "REFINE_V2_FOOT_DIRECTION_DEG", "12"))
+    refine_v2_ground_tolerance: float = float(os.getenv(
+        "REFINE_V2_GROUND_TOLERANCE", "0.08"))
+    # 요청별 cooperative timeout. solver residual 경계에서 중단하고 베이스로 복구한다.
+    refine_timeout_seconds: float = float(os.getenv("REFINE_TIMEOUT_SECONDS", "5.0"))
 
 
 CFG = Config()

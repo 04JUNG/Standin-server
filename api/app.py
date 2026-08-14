@@ -17,6 +17,9 @@ import hashlib
 import io
 import json
 import os
+import tempfile
+import time
+from dataclasses import asdict
 from datetime import datetime, timezone
 from contextlib import asynccontextmanager
 
@@ -25,10 +28,12 @@ from fastapi import FastAPI, File, Form, UploadFile, HTTPException
 from fastapi.responses import FileResponse, Response
 
 from src.config import CFG
+from src.bvh import parse_bvh
 from src.pipeline import Pipeline
 from src.library import build_synthetic_index
 from src.library_source import ensure_library
-from src.refine import refine_bvh
+from src.refine import REFINE_CODE_VERSION, REFINE_V2_CODE_VERSION, refine_bvh
+from src.refine_policy import structural_refine_allowed
 from src.repo import (FEATURE_VERSION, build_db, load_entries,
                       get_bvh_path, get_pose_meta)
 from src.thumbnails import THUMBNAIL_VIEWS, find_thumbnail, thumbnail_url
@@ -44,6 +49,11 @@ from api.models import (CutResultOut, PersonOut, CandidateOut, SkeletonOut,
 
 DB_PATH = os.getenv("DB_PATH", "data/poses.db")
 REFINE_DIR = os.path.join(CFG.data_dir, CFG.refine_dir)
+SOURCE_REVISION = (
+    os.getenv("SOURCE_REVISION")
+    or os.getenv("GIT_SHA")
+    or CFG.deployment_version
+)
 
 STATE: dict = {}
 
@@ -110,7 +120,50 @@ async def lifespan(app: FastAPI):
     STATE.clear()
 
 
-app = FastAPI(title="Standin Pose Pipeline", version="0.1.0", lifespan=lifespan)
+app = FastAPI(title="Standin Pose Pipeline", version="0.2.0", lifespan=lifespan)
+
+
+def _refine_capability() -> dict:
+    """평가 하네스가 v1/v2 실행 정체성을 fail-closed로 고정할 공개 정보."""
+    refine_config = {
+        key: value for key, value in asdict(CFG).items()
+        if key.startswith("refine_") or key in {
+            "distance_metric", "fallback_distance", "min_skeleton_score",
+            "fallback_pos_full", "fallback_pos_reduced",
+            "fallback_angle_full", "fallback_angle_reduced",
+            "fallback_hybrid_full", "fallback_hybrid_reduced",
+        }
+    }
+    code_version = (
+        REFINE_V2_CODE_VERSION if CFG.refine_v2_enabled else REFINE_CODE_VERSION
+    )
+    identity = {
+        "code_version": code_version,
+        "feature_version": FEATURE_VERSION,
+        "pose_library_version": CFG.pose_library_version,
+        "deployment_version": CFG.deployment_version,
+        "source_revision": SOURCE_REVISION,
+        "config": refine_config,
+    }
+    config_sha256 = hashlib.sha256(
+        json.dumps(identity, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    return {
+        "enabled": bool(CFG.refine_enabled),
+        "v2_enabled": bool(CFG.refine_v2_enabled),
+        "torso_enabled": bool(CFG.refine_v2_torso_enabled),
+        "code_version": code_version,
+        "supported_modes": (
+            ["conservative", "aggressive"]
+            if CFG.refine_v2_enabled else ["conservative"]
+        ),
+        "config_sha256": config_sha256,
+        "config": refine_config,
+        "feature_version": FEATURE_VERSION,
+        "pose_library_version": CFG.pose_library_version,
+        "deployment_version": CFG.deployment_version,
+        "source_revision": SOURCE_REVISION,
+    }
 
 
 @app.get("/healthz")
@@ -125,6 +178,7 @@ def healthz():
         "provider": STATE.get("provider", CFG.vlm_provider),
         "pose_backend": STATE.get("pose_backend", CFG.pose_backend),
         "pose_count": pose_count,
+        "refine": _refine_capability(),
     }
     return body if ok else Response(
         content=json.dumps(body), status_code=503, media_type="application/json"
@@ -260,16 +314,81 @@ def get_pose_thumbnail(pose_id: str, view: str):
 
 # ---- 포즈 미세조정 (docs/REFINE_DESIGN.md) --------------------------------
 
-def _refine_handle(req: RefineRequest) -> str:
-    """같은 입력 → 같은 파일. 작가가 같은 후보를 다시 눌러도 재계산하지 않는다."""
-    kp = np.asarray(req.keypoints, dtype=float).round(2).tobytes()
-    sc = np.asarray(req.scores or [], dtype=float).round(3).tobytes()
-    policy = (
-        f"|allowed={req.refine_allowed}|limbs="
-        f"{','.join(sorted(req.refinable_limbs or []))}|"
-    ).encode()
-    h = hashlib.sha1(f"{req.pose_id}|{req.view}|".encode() + policy + kp + sc)
-    return h.hexdigest()[:16]
+def _file_sha256(path: str) -> str:
+    digest = hashlib.sha256()
+    with open(path, "rb") as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _refine_handle(req: RefineRequest, base_bvh: str) -> str:
+    """BVH·mask·코드/설정 lineage까지 포함한 content-addressed cache key."""
+    capability = _refine_capability()
+    lineage = {
+        "pose_id": req.pose_id,
+        "view": req.view,
+        "base_bvh_sha256": _file_sha256(base_bvh),
+        "refine_capability_identity": capability,
+        "policy": {
+            "refine_allowed": req.refine_allowed,
+            "refinable_limbs": sorted(req.refinable_limbs or []),
+            "skeleton_state": req.skeleton_state,
+            "coverage_class": req.coverage_class,
+            "slot_origin": req.slot_origin,
+            "skeleton_source": req.skeleton_source,
+            "search_stability": req.search_stability,
+            "gap_type": req.gap_type,
+            "refine_mode": req.refine_mode,
+        },
+        "search": {
+            "distance": req.search_distance,
+            "metric": req.distance_metric,
+            "confidence_threshold": req.confidence_threshold,
+        },
+    }
+    digest = hashlib.sha256(
+        json.dumps(lineage, sort_keys=True, separators=(",", ":")).encode()
+    )
+    digest.update(np.asarray(req.keypoints, dtype="<f4").tobytes())
+    digest.update(np.asarray(req.scores or [], dtype="<f4").tobytes())
+    return digest.hexdigest()[:24]
+
+
+def _read_refine_cache(handle: str):
+    sidecar = os.path.join(REFINE_DIR, f"{handle}.json")
+    if not os.path.exists(sidecar):
+        return None
+    try:
+        with open(sidecar, encoding="utf-8") as source:
+            payload = json.load(source)
+        response = payload.get("response")
+        if not isinstance(response, dict):
+            return None
+        if response.get("refined") and not os.path.exists(
+                os.path.join(REFINE_DIR, f"{handle}.bvh")):
+            return None
+        response.setdefault("diagnostics", {})["cache_hit"] = True
+        return RefineResponse(**response)
+    except (OSError, ValueError, TypeError):
+        return None
+
+
+def _write_refine_sidecar(handle: str, payload: dict) -> None:
+    os.makedirs(REFINE_DIR, exist_ok=True)
+    descriptor, temporary = tempfile.mkstemp(
+        prefix=f".{handle}.", suffix=".json.tmp", dir=REFINE_DIR
+    )
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8") as sink:
+            json.dump(payload, sink, ensure_ascii=False, sort_keys=True)
+        os.replace(temporary, os.path.join(REFINE_DIR, f"{handle}.json"))
+    except Exception:
+        try:
+            os.unlink(temporary)
+        except OSError:
+            pass
+        raise
 
 
 @app.post("/refine", response_model=RefineResponse)
@@ -287,16 +406,60 @@ def refine(req: RefineRequest):
     base = meta["bvh_path"]
     if not base or not os.path.exists(base):
         raise HTTPException(409, f"pose '{req.pose_id}' 등록됨(경로={base})이나 BVH 파일 미존재.")
-    if len(req.keypoints) != 17:
-        raise HTTPException(422, f"keypoints는 17개여야 합니다(받은 값: {len(req.keypoints)})")
-    if req.scores is not None and len(req.scores) != 17:
-        raise HTTPException(422, f"scores는 17개여야 합니다(받은 값: {len(req.scores)})")
+    try:
+        parse_bvh(base)
+    except (OSError, AssertionError, ValueError, IndexError) as exc:
+        raise HTTPException(
+            409, f"pose '{req.pose_id}'의 BVH를 파싱할 수 없습니다: {exc}"
+        ) from exc
 
-    if req.refine_allowed is False:
+    policy_lineage_present = bool(
+        req.refine_allowed is not None
+        or req.refinable_limbs is not None
+        or req.skeleton_state is not None
+        or req.coverage_class is not None
+        or req.slot_origin is not None
+        or req.skeleton_source is not None
+    )
+    policy_valid = bool(
+        req.refine_allowed is True
+        and structural_refine_allowed(
+            skeleton_state=req.skeleton_state,
+            coverage_class=req.coverage_class,
+            refinable_limbs=req.refinable_limbs,
+            slot_origin=req.slot_origin,
+            skeleton_source=req.skeleton_source,
+        )
+    )
+    # Legacy v1 callers that sent no policy lineage remain compatible. Once a
+    # caller supplies /analyze policy fields, both v1 and v2 revalidate them.
+    if (
+        req.refine_allowed is False
+        or (policy_lineage_present and not policy_valid)
+        or (CFG.refine_v2_enabled and not policy_valid)
+    ):
         return RefineResponse(
             pose_id=req.pose_id, view=req.view, refined=False,
             reason="skeleton_policy", bvh_url=f"/pose/{req.pose_id}/bvh",
             loss_base=None, loss_final=None, gain=None, backend="none",
+            refine_version=(REFINE_V2_CODE_VERSION if CFG.refine_v2_enabled
+                            else REFINE_CODE_VERSION),
+            refine_outcome="not_attempted",
+            diagnostics={
+                "mode_requested": req.refine_mode,
+                "mode_applied": "base",
+                "aggressive_attempted": False,
+                "aggressive_reason": "skeleton_policy",
+                "cache_hit": False,
+                "context": {
+                    "base_bvh_sha256": _file_sha256(base),
+                    "refine_config_sha256": _refine_capability()["config_sha256"],
+                    "pose_library_version": CFG.pose_library_version,
+                    "deployment_version": CFG.deployment_version,
+                    "feature_version": FEATURE_VERSION,
+                    "source_revision": SOURCE_REVISION,
+                },
+            },
         )
 
     # 얽힘 세트는 조정하지 않는다. hug_01_A/B를 각자 돌리면 두 사람이 맞물리던
@@ -306,30 +469,90 @@ def refine(req: RefineRequest):
         return RefineResponse(
             pose_id=req.pose_id, view=req.view, refined=False,
             reason="entangled_set", bvh_url=f"/pose/{req.pose_id}/bvh",
-            loss_base=None, loss_final=None, gain=None, backend="none")
+            loss_base=None, loss_final=None, gain=None, backend="none",
+            refine_version=(REFINE_V2_CODE_VERSION if CFG.refine_v2_enabled
+                            else REFINE_CODE_VERSION),
+            refine_outcome="not_attempted",
+            diagnostics={
+                "mode_requested": req.refine_mode,
+                "mode_applied": "base",
+                "aggressive_attempted": False,
+                "aggressive_reason": "entangled_set",
+                "cache_hit": False,
+                "context": {
+                    "base_bvh_sha256": _file_sha256(base),
+                    "refine_config_sha256": _refine_capability()["config_sha256"],
+                    "pose_library_version": CFG.pose_library_version,
+                    "deployment_version": CFG.deployment_version,
+                    "feature_version": FEATURE_VERSION,
+                    "source_revision": SOURCE_REVISION,
+                },
+            })
 
-    handle = _refine_handle(req)
-    out_path = os.path.join(REFINE_DIR, f"{handle}.bvh")
+    os.makedirs(REFINE_DIR, exist_ok=True)
+    handle = _refine_handle(req, base)
+    cached = _read_refine_cache(handle)
+    if cached is not None:
+        return cached
+
+    final_path = os.path.join(REFINE_DIR, f"{handle}.bvh")
+    descriptor, temporary_path = tempfile.mkstemp(
+        prefix=f".{handle}.", suffix=".bvh.tmp", dir=REFINE_DIR
+    )
+    os.close(descriptor)
+    os.unlink(temporary_path)  # writer가 새 파일을 만들게 해 부분 파일을 구분한다.
+    timeout = max(float(CFG.refine_timeout_seconds), 0.0)
+    deadline = None if timeout == 0.0 else time.monotonic() + timeout
     try:
         res = refine_bvh(base, req.keypoints, req.scores, req.view,
-                         out_path=out_path, search_distance=req.search_distance,
-                         allowed_limbs=req.refinable_limbs)
+                         out_path=temporary_path,
+                         search_distance=req.search_distance,
+                         allowed_limbs=req.refinable_limbs,
+                         refine_mode=req.refine_mode,
+                         deadline=deadline)
     except ValueError as exc:                      # 알 수 없는 view 등
+        try:
+            os.unlink(temporary_path)
+        except OSError:
+            pass
         raise HTTPException(422, str(exc)) from exc
+    except (OSError, AssertionError) as exc:
+        try:
+            os.unlink(temporary_path)
+        except OSError:
+            pass
+        raise HTTPException(409, f"refine BVH 처리 실패: {exc}") from exc
 
     if res.refined:
-        # 사이드카: handle만으로는 어떤 포즈인지 알 수 없다. 동원의 '파일명·소재 폴더
-        # 규칙'(EXPORT_CONTRACT §4-3)과 export 주문서 연결에 pose_id가 필요하다.
-        with open(os.path.join(REFINE_DIR, f"{handle}.json"), "w",
-                  encoding="utf-8") as f:
-            json.dump({"handle": handle, "pose_id": req.pose_id, "view": req.view,
-                       "base_bvh_url": f"/pose/{req.pose_id}/bvh",
-                       "limbs": list(res.limbs),
-                       "limb_decisions": res.limb_decisions,
-                       "created_at": datetime.now(timezone.utc).isoformat(
-                           timespec="seconds")}, f, ensure_ascii=False)
+        os.replace(temporary_path, final_path)
+    else:
+        try:
+            os.unlink(temporary_path)
+        except OSError:
+            pass
 
-    return RefineResponse(
+    diagnostics = dict(res.diagnostics)
+    context = diagnostics.setdefault("context", {})
+    context.update({
+        "gap_type": req.gap_type,
+        "skeleton_state": req.skeleton_state,
+        "coverage_class": req.coverage_class,
+        "slot_origin": req.slot_origin,
+        "skeleton_source": req.skeleton_source,
+        "search_stability": req.search_stability,
+        "distance_metric": req.distance_metric or context.get("distance_metric"),
+        "confidence_threshold": req.confidence_threshold,
+        "refine_mode": req.refine_mode,
+        "feature_version": FEATURE_VERSION,
+        "base_bvh_sha256": _file_sha256(base),
+        "refine_config_sha256": _refine_capability()["config_sha256"],
+        "pose_library_version": CFG.pose_library_version,
+        "deployment_version": CFG.deployment_version,
+        "source_revision": SOURCE_REVISION,
+    })
+    diagnostics["cache_hit"] = False
+
+    response = RefineResponse(
         pose_id=req.pose_id, view=req.view,
         refined=res.refined, reason=res.reason,
         bvh_url=(f"/refined/{handle}/bvh" if res.refined
@@ -338,9 +561,23 @@ def refine(req: RefineRequest):
         loss_final=None if np.isnan(res.loss_final) else res.loss_final,
         gain=None if np.isnan(res.loss_base) else res.gain,
         backend=res.backend,
+        refine_version=res.refine_version,
+        refine_outcome=res.refine_outcome,
         limbs=list(res.limbs),
         limb_decisions=res.limb_decisions,
+        diagnostics=diagnostics,
     )
+
+    _write_refine_sidecar(handle, {
+        "handle": handle,
+        "pose_id": req.pose_id,
+        "view": req.view,
+        "base_bvh_url": f"/pose/{req.pose_id}/bvh",
+        "base_bvh_sha256": _file_sha256(base),
+        "response": response.model_dump(),
+        "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+    })
+    return response
 
 
 @app.get("/refined/{handle}/bvh")
@@ -352,7 +589,7 @@ def get_refined_bvh(handle: str):
     ⚠ 배포 주의: 이 파일은 **refine을 처리한 인스턴스의 로컬 디스크**에 있다.
       추론 서버를 태스크 2개 이상으로 띄우면 POST /refine과 이 GET이 다른 태스크에
       떨어져 404가 난다. 해소 전까지 추론 서버는 단일 태스크로 운영할 것.
-      (docs/REFINE_HANDOFF.md §3)
+      (docs/PR10_MAIN_MERGE_REQUIREMENTS.md INF-03)
     """
     if not handle.isalnum():                       # 경로 조작 차단
         raise HTTPException(400, "invalid handle")
