@@ -179,7 +179,9 @@ refine의 각도 손실은 **이 함수를 그대로 재사용**한다. 검색�
 | `REFINE_COLLISION_WORSEN_DELTA` | `0.01` | 베이스 대비 관통 악화 하한(torso 단위) |
 | `REFINE_MAX_DELTA_DEG` | `45` | 채널당 베이스 이탈 한계(하드 바운드) |
 | `REFINE_MIN_BEND_DEG` | `20` | 팔꿈치·무릎 최소 굽힘각 |
-| `REFINE_DIR` | `refined` | 조정본 캐시 폴더(`DATA_DIR` 기준 상대) |
+
+`REFINE_DIR`(조정본 로컬 캐시)는 제거됐다. 조정본은 `POST /refine` 응답의 `bvh`
+필드로만 나가고 보관은 소비자가 한다 — `REFINE_HANDOFF.md` §3 참고.
 
 `REFINE_ENABLED=0` 한 방으로 refine 전체를 끌 수 있다. 시연 당일 이상 동작 시 탈출구.
 
@@ -234,7 +236,7 @@ scipy가 있으면 `least_squares`(TRF, 바운드 지원), 없으면 **numpy 전
 | 1 | `PersonOut`에 `keypoints`·`scores` | `api/models.py`, `api/app.py` | ✅ |
 | 2 | `refine_bvh(...) → RefineResult` | `src/refine.py` | ✅ |
 | 3 | 안전 게이트 8종 + 하드 바운드 | `src/refine.py` | ✅ |
-| 4 | `POST /refine` · `GET /refined/{handle}/bvh` | `api/app.py`, `api/models.py` | ✅ |
+| 4 | `POST /refine` (응답 `bvh`에 본문 인라인) | `api/app.py`, `api/models.py` | ✅ |
 | 5 | 검증 스크립트 — 베이스·조정·러프 3열 비교 | `scripts/eval_refine.py` | ✅ |
 | 6 | 스모크 회귀(게이트·피처 대칭성) | `tests/test_smoke.py` | ✅ |
 | 7 | P1a/P1b 관측 정규화 | `src/refine.py` | ✅ |

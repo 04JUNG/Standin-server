@@ -36,7 +36,6 @@ uvicorn api.app:app --reload          # http://127.0.0.1:8000/docs 에서 계약
               인증·Job·기록          POST /analyze (동기, 무인증)
                                      POST /refine   (고른 후보 → 러프에 맞춰 조정)
                                      GET  /pose/{id}/bvh
-                                     GET  /refined/{handle}/bvh
                                      POST /export-order
                                      GET  /healthz
 ```

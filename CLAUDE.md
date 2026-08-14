@@ -23,7 +23,7 @@ python scripts/build_db.py            # 합성 라이브러리 → SQLite(data/p
 BVH_DIR=data/bvh python scripts/build_db.py   # 실 BVH 폴더 → SQLite
 uvicorn api.app:app --reload          # http://127.0.0.1:8000/docs 에서 계약 확인
 #   POST /analyze (멀티파트 PNG) → CutResult / GET /pose/{id}/bvh / GET /healthz
-#   POST /refine (고른 후보 1개를 러프에 맞춰 조정) → GET /refined/{handle}/bvh
+#   POST /refine (고른 후보 1개를 러프에 맞춰 조정) → 응답 bvh 필드에 조정본 본문
 REFINE_ENABLED=0 uvicorn api.app:app   # refine 비상 스위치(시연 중 이상 동작 시)
 #   DB_PATH env로 위치 지정(동기화 폴더 금지 — SQLite 락). 기본 data/poses.db
 ```

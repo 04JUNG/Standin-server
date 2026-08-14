@@ -121,11 +121,12 @@ class RefineResponse(BaseModel):
                                          "movement_gate | global_no_gain | "
                                          "collision_gate | collision_unresolved | "
                                          "joint_limit | diverged")
-    bvh_url: str = Field(..., description="내려받을 BVH 경로(조정본 또는 베이스)")
+    bvh_url: str = Field(..., description="베이스 BVH 경로(/pose/{id}/bvh). refined 여부와 "
+                                          "무관하게 항상 베이스다 — 조정본에는 URL이 없다.")
     bvh: Optional[str] = Field(
         None, description="조정본 BVH 본문(LF 개행). refined=true일 때만 채운다. "
-                          "소비자는 이 값을 자기 저장소에 보관하면 되고 bvh_url을 "
-                          "다시 받아올 필요가 없다.")
+                          "조정본을 얻는 **유일한** 경로이므로 소비자는 이 값을 받아 "
+                          "자기 저장소에 보관해야 한다.")
     loss_base: Optional[float] = Field(None, description="조정 전 각도 손실")
     loss_final: Optional[float] = Field(None, description="조정 후 각도 손실")
     gain: Optional[float] = Field(None, description="손실 감소율(0.3=30% 개선)")

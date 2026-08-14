@@ -204,8 +204,8 @@ class Config:
     )
     # 팔꿈치·무릎이 이 각도보다 접히면 부자연 → 조정 폐기(베이스 반환).
     refine_min_bend_deg: float = float(os.getenv("REFINE_MIN_BEND_DEG", "20"))
-    # 조정본 BVH 저장 위치(캐시). data_dir 기준 상대.
-    refine_dir: str = os.getenv("REFINE_DIR", "refined")
+    # REFINE_DIR(조정본 로컬 캐시)는 제거됐다. 조정본은 /refine 응답으로만 나가고
+    # 보관은 BFF가 한다(docs/REFINE_HANDOFF.md §3 4단계).
 
 
 CFG = Config()
