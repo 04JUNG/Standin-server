@@ -9,7 +9,7 @@
 내부 semantic runtime을 제품 HTTP 경계에 연결했다.
 
 - `POST /semantic-search`: 사용자 문장, `top_k`, 미리보기 `view_hint` 입력
-- `GET /healthz.semantic`: build·encoder·unit 수·cache·concurrency readiness
+- `GET /healthz`의 `semantic` 객체: build·encoder·unit 수·cache·concurrency readiness
 - 동일 build/request LRU cache: 기본 256개
 - ONNX query 실행 bounded concurrency: 기본 2, 대기 250ms 뒤 `503 semantic_busy`
 - optional 실패 격리: `SEMANTIC_REQUIRED=0`이면 `/analyze` health 유지
