@@ -30,6 +30,7 @@ from src.config import CFG
 from src.logging_setup import (configure_logging, log_error, log_info,
                                log_warn, request_id_var)
 from src import notify as alerts
+from src.ops_metrics import COLLECTOR, TASK_ID
 from src.pipeline import Pipeline
 from src.library import build_synthetic_index
 from src.library_source import ensure_library
@@ -196,13 +197,18 @@ async def request_context(request: Request, call_next):
         response.headers["X-Request-Id"] = request_id
         route = _route_pattern(request)
         # 헬스체크는 30초마다 온다. 정상 응답까지 남기면 로그의 대부분이 healthz가 된다.
+        error_code = (f"HTTP_{response.status_code}"
+                      if response.status_code >= 400 else None)
         if route != "/healthz" or response.status_code != 200:
             emit = log_warn if response.status_code >= 500 else log_info
             emit("http_request", "",
                  route=route, method=request.method,
                  status=response.status_code, durationMs=duration_ms,
-                 errorCode=(f"HTTP_{response.status_code}"
-                            if response.status_code >= 400 else None))
+                 errorCode=error_code)
+        # 로그와 같은 자리에서 지표도 센다. 두 곳에서 세면 반드시 어긋난다(계획 3단계).
+        # 지표에는 healthz도 넣는다 — 로그는 시끄러워서 뺐지만 가용성 계산에는 필요하다.
+        COLLECTOR.record(time.time(), response.status_code, duration_ms,
+                         route=route, error_code=error_code)
         return response
     finally:
         request_id_var.reset(token)
@@ -224,6 +230,20 @@ def healthz():
     return body if ok else Response(
         content=json.dumps(body), status_code=503, media_type="application/json"
     )
+
+
+@app.get("/ops/metrics")
+def ops_metrics():
+    """분 단위 롤업을 그대로 내보낸다(계획 3단계). BFF가 1분마다 긁어 RDS에 넣는다.
+
+    ⚠ 내부 전용이다. 이 서비스는 무인증이라 ALB에 붙지 않으며 Cloud Map 내부 DNS로만
+      닿는다(README의 공개 경계 원칙). 여기에 개인정보는 담지 않는다 — 카운트와
+      라우트 패턴뿐이다.
+
+    버킷을 내보낸 뒤 지우지 않는다. BFF가 쓰다 실패하면 그 분이 통째로 사라지기 때문이다.
+    BFF 저장이 upsert라 같은 값을 다시 읽어도 결과가 같다.
+    """
+    return {"service": "inference", "taskId": TASK_ID, "buckets": COLLECTOR.snapshot()}
 
 
 def _load_image(data: bytes):
