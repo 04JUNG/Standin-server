@@ -35,7 +35,7 @@ from src.schema import COCO17  # noqa: E402
 
 SCHEMA_VERSION = 1
 INVENTORY_VERSION = 1
-FILENAME_PARSER_VERSION = 1
+FILENAME_PARSER_VERSION = 2
 BODY_INDICES = tuple(range(5, 17))
 DERIVATION_SUFFIXES = ("_ground", "_legfix", "_legstraight")
 
@@ -91,10 +91,38 @@ def _filename_evidence(stem: str) -> dict:
     source_clip_id_hint = None
     source_frame_hint = None
     sample_ordinal_hint = None
+    selection_kind = None
     retarget_profile_hint = None
 
-    match = re.fullmatch(r"cmu_(\d+)_(\d+)_(\d+)", seed_base)
+    match = re.fullmatch(r"(UAL1|UAL2|g1)__(.+)__(p|n)(\d+)_f(\d+)", seed_base)
     if match:
+        namespace, clip, selection_kind, sample, frame = match.groups()
+        namespace_lower = namespace.lower()
+        pattern = "intake_clip_sample_frame"
+        collection_hint = {
+            "ual1": "universal_animation_library_1_standard",
+            "ual2": "universal_animation_library_2_standard",
+            "g1": "g1_moves",
+        }[namespace_lower]
+        provider_hint = "quaternius" if namespace_lower.startswith("ual") else "g1_moves"
+        label_hint = _split_words(clip)
+        native_clip_id_hint = clip
+        source_clip_id_hint = f"filename_hint:{namespace_lower}:{clip}"
+        source_frame_hint = int(frame)
+        sample_ordinal_hint = int(sample)
+    if pattern == "opaque":
+        match = re.fullmatch(r"MH__(.+)", seed_base)
+        if match:
+            asset = match.group(1)
+            pattern = "makehuman_static_asset"
+            collection_hint = "makehuman_poses_01"
+            provider_hint = "makehuman_community"
+            label_hint = _split_words(asset)
+            native_clip_id_hint = asset
+            source_clip_id_hint = f"filename_hint:makehuman:{asset}"
+    if pattern == "opaque":
+        match = re.fullmatch(r"cmu_(\d+)_(\d+)_(\d+)", seed_base)
+    if pattern == "opaque" and match:
         subject, trial, frame = match.groups()
         pattern = "cmu_subject_trial_frame"
         collection_hint = "cmu"
@@ -103,7 +131,7 @@ def _filename_evidence(stem: str) -> dict:
         native_clip_id_hint = trial
         source_clip_id_hint = f"filename_hint:cmu:{subject}:{trial}"
         source_frame_hint = int(frame)
-    else:
+    if pattern == "opaque":
         match = re.fullmatch(r"rokoko_(.+)_mixamo_(\d+)", seed_base)
         if match:
             clip, frame = match.groups()
@@ -114,26 +142,26 @@ def _filename_evidence(stem: str) -> dict:
             source_clip_id_hint = f"filename_hint:rokoko:{clip}"
             source_frame_hint = int(frame)
             retarget_profile_hint = "mixamorig"
-        else:
-            match = re.fullmatch(r"(.+?)_(\d{5})", seed_base)
-            if match:
-                label, frame = match.groups()
-                pattern = "named_clip_frame"
-                label_hint = _split_words(label)
-                source_clip_id_hint = f"filename_hint:named:{label}"
-                source_frame_hint = int(frame)
-            else:
-                match = re.fullmatch(r"(.+?)_(\d{2})", seed_base)
-                if match:
-                    label, sample = match.groups()
-                    pattern = "named_clip_sample"
-                    label_hint = _split_words(label)
-                    source_clip_id_hint = f"filename_hint:named:{label}"
-                    source_frame_hint = None
-                    sample_ordinal_hint = int(sample)
-                elif seed_base:
-                    pattern = "named_unversioned"
-                    label_hint = _split_words(seed_base)
+    if pattern == "opaque":
+        match = re.fullmatch(r"(.+?)_(\d{5})", seed_base)
+        if match:
+            label, frame = match.groups()
+            pattern = "named_clip_frame"
+            label_hint = _split_words(label)
+            source_clip_id_hint = f"filename_hint:named:{label}"
+            source_frame_hint = int(frame)
+    if pattern == "opaque":
+        match = re.fullmatch(r"(.+?)_(\d{2})", seed_base)
+        if match:
+            label, sample = match.groups()
+            pattern = "named_clip_sample"
+            label_hint = _split_words(label)
+            source_clip_id_hint = f"filename_hint:named:{label}"
+            source_frame_hint = None
+            sample_ordinal_hint = int(sample)
+    if pattern == "opaque" and seed_base:
+        pattern = "named_unversioned"
+        label_hint = _split_words(seed_base)
 
     return {
         "parser_version": FILENAME_PARSER_VERSION,
@@ -149,6 +177,9 @@ def _filename_evidence(stem: str) -> dict:
         "selected_frame_index_hint": source_frame_hint,
         "frame_index_base_hint": "unknown" if source_frame_hint is not None else None,
         "sample_ordinal_hint": sample_ordinal_hint,
+        "selection_kind_hint": (
+            selection_kind if pattern == "intake_clip_sample_frame" else None
+        ),
         "retarget_profile_hint": retarget_profile_hint,
         "derivation_hints": sorted(derivation_hints),
         "evidence_status": "proposed",
@@ -208,7 +239,11 @@ def _inspect_bvh(path: Path) -> tuple[dict, dict]:
     }
 
 
-def _member_record(path: Path, all_pose_ids: set[str]) -> dict:
+def _member_record(
+    path: Path,
+    all_pose_ids: set[str],
+    provenance_by_pose: dict[str, dict],
+) -> dict:
     pose_id = path.stem
     canonical_id, mirrored = _without_mirror(pose_id)
     expected_original = canonical_id if mirrored else None
@@ -226,16 +261,26 @@ def _member_record(path: Path, all_pose_ids: set[str]) -> dict:
         warnings.append("orphan_mirror")
     if filename_evidence["label_en_hint"] is None:
         warnings.append("opaque_filename")
-    warnings.extend(
-        ["source_unverified", "license_unresolved", "semantic_annotation_missing"]
-    )
+    intake = provenance_by_pose.get(pose_id)
+    source = (intake or {}).get("source") or {}
+    source_verified = bool(source.get("source_clip_id"))
+    license_resolved = bool(source.get("license_id"))
+    if not source_verified:
+        warnings.append("source_unverified")
+    if not license_resolved:
+        warnings.append("license_unresolved")
+    warnings.append("semantic_annotation_missing")
 
     geometry_eligible = (
         validation["parse_status"] == "pass"
         and validation["mapping_status"] == "pass"
         and bvh_metadata["frame_count"] == 1
     )
-    blockers = ["source_unverified", "license_unresolved", "semantic_annotation_not_accepted"]
+    blockers = ["semantic_annotation_not_accepted"]
+    if not source_verified:
+        blockers.insert(0, "source_unverified")
+    if not license_resolved:
+        blockers.insert(0, "license_unresolved")
     if not geometry_eligible:
         blockers.insert(0, "bvh_geometry_validation_failed")
     if mirrored and not mirror_exists:
@@ -251,14 +296,22 @@ def _member_record(path: Path, all_pose_ids: set[str]) -> dict:
             **bvh_metadata,
         },
         "provenance_refs": {
-            "source_clip_id": None,
+            "source_clip_id": source.get("source_clip_id"),
             "pose_lineage_id": f"lineage:{pose_id}",
-            "verification_status": "unverified",
+            "verification_status": (
+                "intake_manifest_verified" if source_verified else "unverified"
+            ),
         },
         "grouping": {
-            "mirror_group_id": f"mirror:{canonical_id}",
-            "semantic_unit_id": f"pose:{canonical_id}",
-            "pose_family_id": None,
+            "mirror_group_id": (intake or {}).get("grouping", {}).get(
+                "mirror_group_id", f"mirror:{canonical_id}"
+            ),
+            "semantic_unit_id": (intake or {}).get("grouping", {}).get(
+                "semantic_unit_id", f"pose:{canonical_id}"
+            ),
+            "pose_family_id": (intake or {}).get("grouping", {}).get(
+                "pose_family_id"
+            ),
             "variant": {
                 "kind": "mirrored" if mirrored else "original",
                 "mirror_of": expected_original,
@@ -267,6 +320,7 @@ def _member_record(path: Path, all_pose_ids: set[str]) -> dict:
             "set": None,
         },
         "filename_evidence": filename_evidence,
+        "intake_evidence": intake,
         "posecode_evidence": None,
         "validation": {
             **validation,
@@ -307,7 +361,13 @@ def _mark_duplicate_content(records: list[dict]) -> int:
     return len(duplicate_hashes)
 
 
-def _header(bvh_dir: Path, records: list[dict], duplicate_hash_groups: int, partial: bool) -> dict:
+def _header(
+    bvh_dir: Path,
+    records: list[dict],
+    duplicate_hash_groups: int,
+    partial: bool,
+    provenance_manifest: Path | None,
+) -> dict:
     mirrored = [r for r in records if r["grouping"]["variant"]["kind"] == "mirrored"]
     complete_pairs = sum(
         1
@@ -326,10 +386,19 @@ def _header(bvh_dir: Path, records: list[dict], duplicate_hash_groups: int, part
         "inventory_version": INVENTORY_VERSION,
         "generator": {
             "name": "scripts/init_bvh_tag_inventory.py",
-            "version": 1,
+            "version": 2,
             "filename_parser_version": FILENAME_PARSER_VERSION,
         },
-        "input": {"bvh_dir": _display_path(bvh_dir), "partial_inventory": partial},
+        "input": {
+            "bvh_dir": _display_path(bvh_dir),
+            "partial_inventory": partial,
+            "provenance_manifest": (
+                _display_path(provenance_manifest) if provenance_manifest else None
+            ),
+            "provenance_manifest_sha256": (
+                _sha256(provenance_manifest) if provenance_manifest else None
+            ),
+        },
         "pose_library_version": _library_version(records),
         "counts": {
             "pose_members": len(records),
@@ -344,8 +413,34 @@ def _header(bvh_dir: Path, records: list[dict], duplicate_hash_groups: int, part
                 r["validation"]["mapping_status"] != "pass" for r in records
             ),
             "duplicate_hash_groups": duplicate_hash_groups,
+            "intake_provenance_members": sum(
+                record.get("intake_evidence") is not None for record in records
+            ),
         },
     }
+
+
+def _load_provenance_manifest(path: Path | None) -> dict[str, dict]:
+    if path is None:
+        return {}
+    rows: dict[str, dict] = {}
+    batch_id = None
+    for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        if not line.strip():
+            continue
+        row = json.loads(line)
+        if row.get("record_type") == "intake_header":
+            batch_id = row.get("batch_id")
+            continue
+        if row.get("record_type") != "pose_intake_member":
+            continue
+        pose_id = row.get("pose_id")
+        if not pose_id or pose_id in rows:
+            raise ValueError(
+                f"invalid or duplicate pose_id in {path}:{line_number}: {pose_id!r}"
+            )
+        rows[pose_id] = {**row, "batch_id": row.get("batch_id") or batch_id}
+    return rows
 
 
 def _write_jsonl(output: Path, rows: list[dict]) -> None:
@@ -374,6 +469,10 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--bvh-dir", default="data/bvh")
     parser.add_argument("--output", default="data/semantic/inventory.v1.jsonl")
     parser.add_argument(
+        "--provenance-manifest",
+        help="optional pose_intake_member JSONL used to preserve verified source lineage",
+    )
+    parser.add_argument(
         "--limit",
         type=int,
         default=0,
@@ -399,9 +498,28 @@ def main() -> int:
     if not paths:
         raise SystemExit(f"No root-level .bvh files found: {bvh_dir}")
 
-    records = [_member_record(path, pose_ids) for path in paths]
+    provenance_manifest = (
+        Path(args.provenance_manifest) if args.provenance_manifest else None
+    )
+    provenance_by_pose = _load_provenance_manifest(provenance_manifest)
+    unknown_provenance = sorted(set(provenance_by_pose) - pose_ids)
+    if unknown_provenance:
+        raise SystemExit(
+            "Provenance manifest references poses absent from BVH directory: "
+            + ", ".join(unknown_provenance[:5])
+        )
+    records = [
+        _member_record(path, pose_ids, provenance_by_pose)
+        for path in paths
+    ]
     duplicate_hash_groups = _mark_duplicate_content(records)
-    header = _header(bvh_dir, records, duplicate_hash_groups, partial=args.limit > 0)
+    header = _header(
+        bvh_dir,
+        records,
+        duplicate_hash_groups,
+        partial=args.limit > 0,
+        provenance_manifest=provenance_manifest,
+    )
     output = Path(args.output)
     _write_jsonl(output, [header, *records])
 

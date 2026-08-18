@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import math
 import os
+import re
 
 import numpy as np
 
@@ -21,7 +22,11 @@ from .schema import COCO17
 
 # ---------- 파싱 ----------
 def parse_bvh(path: str):
-    toks = open(path).read().split()
+    # 일부 Blender/변환 스크립트는 HIERARCHY의 마지막 닫는 괄호와
+    # MOTION 헤더 사이 줄바꿈을 생략해 ``}MOTION``으로 기록한다.
+    # 공백 토큰화 전에 이 경계만 정규화해 원본 BVH를 다시 쓰지 않고 읽는다.
+    text = open(path).read().replace("}MOTION", "} MOTION")
+    toks = text.split()
     i = 0
     joints = []          # [name, parent_idx, offset(3,), channels(list), is_end]
     stack = []
@@ -119,10 +124,10 @@ def rotation_channel_indices(joints, joint_idx: int):
 
 def hierarchy_text(path: str) -> str:
     """원본 BVH의 HIERARCHY 블록을 텍스트 그대로 반환(MOTION 직전까지)."""
-    lines = open(path).read().splitlines()
-    for i, ln in enumerate(lines):
-        if ln.strip().upper() == "MOTION":
-            return "\n".join(lines[:i])
+    text = open(path).read()
+    match = re.search(r"(?im)\bMOTION\s*\r?\n\s*Frames:", text)
+    if match:
+        return text[: match.start()].rstrip()
     raise ValueError(f"MOTION 섹션이 없습니다: {path}")
 
 

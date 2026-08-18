@@ -27,6 +27,10 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--cmu-catalog-html")
     parser.add_argument("--cmu-catalog-captured-at")
     parser.add_argument("--exclusions", default="config/library_exclusions.v1.json")
+    parser.add_argument(
+        "--library-number-registry-seed",
+        help="optional prior registry; existing BVH numbers are preserved and new numbers append",
+    )
     return parser.parse_args()
 
 
@@ -41,6 +45,11 @@ def main() -> int:
             cmu_catalog_html=Path(args.cmu_catalog_html) if args.cmu_catalog_html else None,
             cmu_catalog_captured_at=args.cmu_catalog_captured_at,
             exclusions_path=Path(args.exclusions) if args.exclusions else None,
+            library_number_registry_seed=(
+                Path(args.library_number_registry_seed)
+                if args.library_number_registry_seed
+                else None
+            ),
         )
     )
     print(json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True))

@@ -35,6 +35,10 @@ def _counterpart_name(name: str) -> str:
         return name.replace("Left", "Right")
     if "Right" in name:
         return name.replace("Right", "Left")
+    if name.endswith("_l"):
+        return name[:-2] + "_r"
+    if name.endswith("_r"):
+        return name[:-2] + "_l"
     return name
 
 

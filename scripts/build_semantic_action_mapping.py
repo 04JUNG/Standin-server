@@ -252,7 +252,11 @@ def map_source(
         "mapping_rules_version": 1,
         "mapping_id": _sha256_json(mapping_payload),
         "source_clip_id": source["source_clip_id"],
-        "provider": "CMU" if source.get("provider") == "cmu_graphics_lab" else "unknown",
+        "provider": (
+            "CMU"
+            if source.get("provider") == "cmu_graphics_lab"
+            else source.get("provider") or "unknown"
+        ),
         "collection_id": source["collection"]["id"],
         "raw_action_label": label,
         "raw_action_label_normalized": normalized_label,

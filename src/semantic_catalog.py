@@ -50,6 +50,7 @@ class CatalogPaths:
     cmu_catalog_html: Path | None = None
     cmu_catalog_captured_at: str | None = None
     exclusions_path: Path | None = None
+    library_number_registry_seed: Path | None = None
 
 
 class _CMUCatalogParser(HTMLParser):
@@ -179,6 +180,9 @@ def read_inventory(path: Path) -> tuple[dict[str, Any], list[dict[str, Any]]]:
 
 
 def _source_identity(member: dict[str, Any], raw_dir: Path) -> tuple[str, str]:
+    intake_source = (member.get("intake_evidence") or {}).get("source") or {}
+    if intake_source.get("source_clip_id"):
+        return str(intake_source["source_clip_id"]), "intake_manifest"
     evidence = member["filename_evidence"]
     pattern = evidence["pattern"]
     if pattern == "cmu_subject_trial_frame":
@@ -220,6 +224,72 @@ def build_source_clips(
     output: list[dict[str, Any]] = []
     for source_clip_id, (kind, member) in sorted(representative.items()):
         evidence = member["filename_evidence"]
+        if kind == "intake_manifest":
+            intake = member["intake_evidence"]
+            source = intake["source"]
+            verified_fields = [
+                "provider",
+                "collection.id",
+                "native_ids.clip_id",
+                "original.title",
+                "original.filename",
+                "original.artifact_uri",
+                "license_ref",
+                "product_bvh_export",
+            ]
+            if source.get("source_sha256"):
+                verified_fields.append("original.sha256")
+            if source.get("derived_artifact_path"):
+                verified_fields.append("original.derived_artifact_uri")
+            if source.get("source_url"):
+                verified_fields.append("original.catalog_uri")
+            output.append(
+                {
+                    "record_type": "source_clip",
+                    "schema_version": 1,
+                    "source_clip_id": source_clip_id,
+                    "provider": source.get("provider"),
+                    "collection": {
+                        "id": source.get("collection_id"),
+                        "version": source.get("collection_version"),
+                    },
+                    "native_ids": {
+                        "subject_id": source.get("native_subject_id"),
+                        "asset_id": source.get("native_asset_id"),
+                        "clip_id": source.get("native_clip_id"),
+                    },
+                    "original": {
+                        "title": source.get("original_title"),
+                        "local_label": source.get("original_title"),
+                        "filename": source.get("original_filename"),
+                        "catalog_uri": source.get("source_url"),
+                        "artifact_uri": source.get("original_path"),
+                        "derived_artifact_uri": source.get("derived_artifact_path"),
+                        "sha256": source.get("source_sha256"),
+                        "fps": source.get("fps"),
+                    },
+                    "license_ref": {
+                        "id": source.get("license_id"),
+                        "url": source.get("license_url"),
+                    },
+                    "attribution": {
+                        "required": bool(source.get("attribution_required")),
+                        "author": source.get("author"),
+                    },
+                    "product_bvh_export": source.get("product_bvh_export"),
+                    "catalog_evidence": {
+                        "status": "intake_manifest_verified",
+                        "snapshot_ref": None,
+                        "captured_at": None,
+                    },
+                    "verification": {
+                        "status": "intake_manifest_verified",
+                        "verified_fields": sorted(verified_fields),
+                        "unresolved_fields": [],
+                    },
+                }
+            )
+            continue
         if kind == "cmu":
             subject_hint = evidence["native_subject_id_hint"]
             clip_hint = evidence["native_clip_id_hint"]
@@ -379,12 +449,23 @@ def _match_raw_frame(derived_path: Path, raw_path: Path, frame_hint: int | None)
     return {"status": "frame_values_differ", "frame_index": None, "frame_index_base": "unknown", "evidence": []}
 
 
-def _existing_library_numbers(lineage_path: Path, registry_path: Path) -> dict[str, str]:
-    if registry_path.exists():
-        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+def _existing_library_numbers(
+    lineage_path: Path,
+    registry_path: Path,
+    seed_registry_path: Path | None = None,
+) -> dict[str, str]:
+    source_registry = (
+        registry_path
+        if registry_path.exists()
+        else seed_registry_path
+        if seed_registry_path and seed_registry_path.exists()
+        else None
+    )
+    if source_registry:
+        registry = json.loads(source_registry.read_text(encoding="utf-8"))
         assignments = registry.get("assignments")
         if not isinstance(assignments, dict):
-            raise ValueError(f"invalid library number registry: {registry_path}")
+            raise ValueError(f"invalid library number registry: {source_registry}")
         return {str(key): str(value) for key, value in assignments.items()}
     mapping: dict[str, str] = {}
     for row in _read_jsonl(lineage_path):
@@ -402,9 +483,12 @@ def build_pose_lineage(
     raw_dir: Path,
     existing_path: Path,
     registry_path: Path,
+    seed_registry_path: Path | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     sources = {row["source_clip_id"]: row for row in source_clips}
-    library_numbers = _existing_library_numbers(existing_path, registry_path)
+    library_numbers = _existing_library_numbers(
+        existing_path, registry_path, seed_registry_path
+    )
     used_numbers = [int(value.split("-")[-1]) for value in library_numbers.values() if re.fullmatch(r"BVH-\d{6}", value)]
     next_number = max(used_numbers, default=0) + 1
     for pose_id in sorted(member["pose_id"] for member in members):
@@ -419,10 +503,80 @@ def build_pose_lineage(
         evidence = member["filename_evidence"]
         source_clip_id = pose_to_source[pose_id]
         source = sources[source_clip_id]
-        source_label = source["original"].get("local_label")
-        raw_path = raw_dir / f"{source_label}.bvh" if source_label else Path("__missing__")
+        intake = member.get("intake_evidence")
         bvh_path = bvh_dir / f"{pose_id}.bvh"
         is_mirror = member["grouping"]["variant"]["kind"] == "mirrored"
+        if intake:
+            extraction = intake.get("extraction") or {}
+            derivation = intake.get("derivation") or {}
+            selected_frame = extraction.get("selected_frame_index")
+            operations = []
+            if selected_frame is not None:
+                operations.append(
+                    {"type": "extract_frame", "status": "intake_manifest_verified"}
+                )
+            for operation in derivation.get("operations", []):
+                operations.append(
+                    {
+                        "type": "mirror" if operation == "mirror_x" else operation,
+                        "status": "intake_manifest_verified",
+                    }
+                )
+            parent_pose_id = derivation.get("parent_pose_id")
+            parent_hash = (
+                by_pose[parent_pose_id]["bvh"]["sha256"]
+                if parent_pose_id in by_pose
+                else None
+            )
+            rows.append(
+                {
+                    "record_type": "pose_lineage",
+                    "schema_version": 1,
+                    "pose_lineage_id": f"lineage:{pose_id}",
+                    "library_no": library_numbers[pose_id],
+                    "pose_id": pose_id,
+                    "bvh_filename": bvh_path.name,
+                    "bvh_sha256": member["bvh"]["sha256"],
+                    "source_clip_id": source_clip_id,
+                    "extraction": {
+                        "selected_frame_index": selected_frame,
+                        "selected_frame_index_hint": selected_frame,
+                        "frame_index_base": extraction.get("frame_index_base")
+                        or "unknown",
+                        "source_fps": source["original"].get("fps"),
+                        "source_time_seconds": None,
+                        "sample_ordinal": extraction.get("sample_ordinal"),
+                        "selection_kind": extraction.get("selection_kind"),
+                    },
+                    "derivation": {
+                        "parent_pose_id": parent_pose_id,
+                        "parent_artifact_sha256": parent_hash,
+                        "operations": operations,
+                        "conversion_recipe_id": intake.get("batch_id"),
+                        "retarget_profile": None,
+                    },
+                    "evidence": [
+                        {
+                            "kind": "pose_intake_manifest",
+                            "ref": member["provenance_refs"]["source_clip_id"],
+                            "supports": [
+                                "source_clip_id",
+                                "extraction",
+                                "derivation",
+                                "pose_family_id",
+                            ],
+                        }
+                    ],
+                    "verification": {
+                        "catalog_match_status": source["catalog_evidence"]["status"],
+                        "file_lineage_status": "intake_manifest_verified",
+                        "warnings": [],
+                    },
+                }
+            )
+            continue
+        source_label = source["original"].get("local_label")
+        raw_path = raw_dir / f"{source_label}.bvh" if source_label else Path("__missing__")
         match = (
             {"status": "derived_mirror", "frame_index": None, "frame_index_base": "unknown", "evidence": []}
             if is_mirror
@@ -508,6 +662,21 @@ def _source_label(source: dict[str, Any]) -> str | None:
 def _source_is_excluded(source: dict[str, Any]) -> bool:
     policy = source.get("library_policy") or {}
     return policy.get("state") == "pending_removal"
+
+
+def _source_license_resolved(source: dict[str, Any]) -> bool:
+    license_ref = source.get("license_ref")
+    if isinstance(license_ref, dict):
+        return bool(license_ref.get("id"))
+    return bool(license_ref)
+
+
+def _source_provenance_verified(source: dict[str, Any]) -> bool:
+    return source.get("verification", {}).get("status") in {
+        "catalog_verified_file_unverified",
+        "local_artifact_verified_external_origin_unknown",
+        "intake_manifest_verified",
+    }
 
 
 def apply_source_exclusions(
@@ -643,12 +812,11 @@ def build_proposals(
             warnings.append("action_name_missing")
         if excluded:
             warnings.append("source_excluded_pending_removal")
-        if source["provider"] != "cmu_graphics_lab":
+        if source["provider"] != "cmu_graphics_lab" and not _source_license_resolved(source):
             warnings.append("license_unresolved")
         if (
             source["provider"] != "cmu_graphics_lab"
-            and source["verification"]["status"]
-            not in {"catalog_verified_file_unverified", "local_artifact_verified_external_origin_unknown"}
+            and not _source_provenance_verified(source)
         ):
             warnings.append("source_unverified")
         if mirror_report and mirror_report["status"] != "pass":
@@ -1255,6 +1423,7 @@ def build_catalog(paths: CatalogPaths) -> dict[str, Any]:
         raw_dir=paths.raw_dir,
         existing_path=lineage_path,
         registry_path=registry_path,
+        seed_registry_path=paths.library_number_registry_seed,
     )
     proposals_path = paths.output_dir / "proposals.v1.jsonl"
     proposal_history, current, proposal_stats = build_proposals(
