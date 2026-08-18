@@ -11,11 +11,14 @@ VLM 클라이언트 추상화.
 from __future__ import annotations
 
 import json
+import random
 import re
+import time
 from typing import Optional
 
 from ..schema import VLMAnalysis, BBox, Shot, Action, View, Relationship
 from ..config import CFG
+from ..logging_setup import log_info, log_warn
 from . import prompts
 
 
@@ -118,12 +121,20 @@ class MockVLMClient(BaseVLMClient):
 class GeminiVLMClient(BaseVLMClient):
     """Gemini Flash 어댑터 (현행 google-genai SDK). `pip install google-genai pillow`, env GEMINI_API_KEY.
     모델은 GEMINI_MODEL env로 지정(기본 gemini-2.5-flash). 최신 Flash로 올리려면 그 값을 바꾼다."""
-    def __init__(self, model: Optional[str] = None):
-        from google import genai            # 신 SDK: from google import genai
-        import os
-        self._genai = genai
-        self._client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+    def __init__(self, model: Optional[str] = None, *, client=None, sleep=time.sleep,
+                 jitter=random.uniform):
+        if client is None:
+            from google import genai            # 신 SDK: from google import genai
+            from google.genai import types
+            import os
+            client = genai.Client(
+                api_key=os.environ["GEMINI_API_KEY"],
+                http_options=types.HttpOptions(timeout=CFG.gemini_request_timeout_ms),
+            )
+        self._client = client
         self._model = model or CFG.gemini_model
+        self._sleep = sleep
+        self._jitter = jitter
 
     @staticmethod
     def _to_part(image):
@@ -137,16 +148,57 @@ class GeminiVLMClient(BaseVLMClient):
 
     def analyze(self, image, img_w: int, img_h: int) -> VLMAnalysis:
         from google.genai import types
-        resp = self._client.models.generate_content(
-            model=self._model,
-            contents=[prompts.USER_TEMPLATE, self._to_part(image)],
-            config=types.GenerateContentConfig(
-                system_instruction=prompts.SYSTEM,
-                response_mime_type="application/json",
-                temperature=0,
-            ),
-        )
-        return _coerce(_extract_json(resp.text), img_w, img_h)
+        part = self._to_part(image)
+        attempts = max(1, CFG.gemini_max_attempts)
+        for attempt in range(1, attempts + 1):
+            started = time.monotonic()
+            try:
+                resp = self._client.models.generate_content(
+                    model=self._model,
+                    contents=[prompts.USER_TEMPLATE, part],
+                    config=types.GenerateContentConfig(
+                        system_instruction=prompts.SYSTEM,
+                        response_mime_type="application/json",
+                        temperature=0,
+                    ),
+                )
+                log_info(
+                    "gemini_request",
+                    model=self._model,
+                    attempt=attempt,
+                    status="ok",
+                    elapsedMs=round((time.monotonic() - started) * 1000),
+                )
+                return _coerce(_extract_json(resp.text), img_w, img_h)
+            except Exception as error:
+                status = _http_status(error)
+                retryable = status in (429, 503) and attempt < attempts
+                log_warn(
+                    "gemini_request",
+                    model=self._model,
+                    attempt=attempt,
+                    status=status or "error",
+                    retry=retryable,
+                    elapsedMs=round((time.monotonic() - started) * 1000),
+                    errorCode=f"GEMINI_{status}" if status else "GEMINI_ERROR",
+                )
+                if not retryable:
+                    raise
+                delay = min(
+                    CFG.gemini_retry_base_seconds * (2 ** (attempt - 1)),
+                    CFG.gemini_retry_max_seconds,
+                )
+                self._sleep(self._jitter(delay * 0.8, delay * 1.2))
+        raise RuntimeError("unreachable")
+
+
+def _http_status(error: Exception) -> int | None:
+    """google-genai APIError와 테스트 대역에서 HTTP 상태 코드를 안전하게 읽는다."""
+    for name in ("code", "status_code"):
+        value = getattr(error, name, None)
+        if isinstance(value, int):
+            return value
+    return None
 
 
 class OpenAIVLMClient(BaseVLMClient):
@@ -180,5 +232,9 @@ def build_vlm_client() -> BaseVLMClient:
         if p == "openai":
             return OpenAIVLMClient()
     except Exception as e:  # 키/패키지 없음 등
-        print(f"[vlm] {p} 초기화 실패({e}) → mock 폴백")
+        # 조용한 폴백은 프로덕션에서 runtime_guard가 기동을 막는다. 여기서는
+        # "왜" 폴백했는지를 남긴다 — 가드가 잡은 뒤 원인을 찾는 유일한 단서다.
+        log_warn("backend_fallback", "VLM 초기화 실패 → mock 폴백",
+                 errorCode="VLM_BACKEND_INIT_FAILED", backend=p,
+                 errorName=type(e).__name__, detail=str(e)[:300])
     return MockVLMClient()

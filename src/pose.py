@@ -12,6 +12,7 @@ import numpy as np
 
 from .schema import BBox, Skeleton
 from .config import CFG
+from .logging_setup import log_warn
 
 
 def _load_bgr(image):
@@ -137,7 +138,11 @@ def build_pose_model() -> BasePoseModel:
         try:
             return RTMPoseModel()
         except Exception as e:
-            print(f"[pose] rtmlib 초기화 실패({e}) → mock 폴백")
+            # 조용한 폴백은 프로덕션에서 runtime_guard가 기동을 막는다. 여기서는
+            # "왜" 폴백했는지를 남긴다 — 가드가 잡은 뒤 원인을 찾는 유일한 단서다.
+            log_warn("backend_fallback", "rtmlib 초기화 실패 → mock 폴백",
+                     errorCode="POSE_BACKEND_INIT_FAILED", backend="rtmlib",
+                     errorName=type(e).__name__, detail=str(e)[:300])
     if CFG.pose_backend.lower() in ("mock-selfdet", "mock_b"):
         return MockSelfDetectingPoseModel()
     return MockPoseModel()

@@ -16,14 +16,21 @@ from __future__ import annotations
 import io
 import json
 import os
+import re
+import time
+import uuid
 from datetime import datetime, timezone
 from contextlib import asynccontextmanager
 
 import numpy as np
-from fastapi import FastAPI, File, Form, UploadFile, HTTPException
-from fastapi.responses import FileResponse, Response
+from fastapi import FastAPI, File, Form, Request, UploadFile, HTTPException
+from fastapi.responses import FileResponse, JSONResponse, Response
 
 from src.config import CFG
+from src.logging_setup import (configure_logging, log_error, log_info,
+                               log_warn, request_id_var)
+from src import notify as alerts
+from src.ops_metrics import COLLECTOR, TASK_ID
 from src.pipeline import Pipeline
 from src.library import build_synthetic_index
 from src.library_source import ensure_library
@@ -40,6 +47,10 @@ from api.models import (CutResultOut, PersonOut, CandidateOut, SkeletonOut,
                         ImageInfoOut, InferenceMetadataOut,
                         RefineRequest, RefineResponse,
                         ExportOrderRequest, ExportOrder, ExportItem)
+
+# uvicorn이 자기 로깅을 세운 뒤 이 모듈을 import한다. 여기서 덮어써야 로그가
+# JSON 한 종류로 남는다(그대로 두면 uvicorn 형식과 우리 형식이 섞인다).
+configure_logging()
 
 DB_PATH = os.getenv("DB_PATH", "data/poses.db")
 
@@ -61,7 +72,8 @@ def _ensure_db():
     """
     fetched = ensure_library(CFG.data_dir, DB_PATH, CFG.pose_library_uri or None)
     if fetched:
-        print(f"[startup] 포즈 라이브러리를 받았습니다: {CFG.pose_library_uri}")
+        log_info("pose_library", "포즈 라이브러리를 받았습니다",
+                 source=CFG.pose_library_uri, libraryVersion=CFG.pose_library_version)
 
     if not os.path.exists(DB_PATH):
         if CFG.is_production:
@@ -70,7 +82,8 @@ def _ensure_db():
                 "POSE_LIBRARY_URI로 번들 위치를 지정하거나 볼륨으로 마운트하세요. "
                 "프로덕션에서는 합성 라이브러리로 대체하지 않습니다."
             )
-        print(f"[startup] {DB_PATH} 없음 → 합성 라이브러리 생성(개발 모드)")
+        log_warn("pose_library", "라이브러리 없음 → 합성 라이브러리 생성(개발 모드)",
+                 errorCode="LIBRARY_MISSING", dbPath=DB_PATH)
         build_db(build_synthetic_index(), DB_PATH)
 
     return load_entries(DB_PATH)
@@ -91,24 +104,114 @@ def _check_backends(pipeline: Pipeline) -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    entries = _ensure_db()                      # 1회 로드
-    pipeline = Pipeline(entries)                # VLM/검출/포즈 팩토리도 1회 초기화
-    _check_backends(pipeline)                   # 팩토리 폴백 후 실제 인스턴스 검사
+    try:
+        entries = _ensure_db()                      # 1회 로드
+        pipeline = Pipeline(entries)                # VLM/검출/포즈 팩토리도 1회 초기화
+        _check_backends(pipeline)                   # 팩토리 폴백 후 실제 인스턴스 검사
+    except Exception as exc:
+        # 기동 실패는 컨테이너가 뜨지 않는다는 뜻이고, 그 상태에서는 앱이 더 이상
+        # 아무것도 보고할 수 없다. 죽기 전에 동기로 한 번 보낸다.
+        log_error("startup", "기동 실패", exc_info=True, errorCode="STARTUP_FAILED")
+        alerts.notify_now(
+            "P1", "STARTUP_FAILED",
+            "추론 서버가 기동하지 못했습니다. 태스크가 반복 재시작합니다.",
+            context={"env": CFG.app_env, "원인": type(exc).__name__, "상세": str(exc)[:300]},
+        )
+        raise
+
     actual_vlm, actual_pose = actual_backend_names(
         pipeline, CFG.vlm_provider, CFG.pose_backend
     )
+    # 설정한 백엔드와 실제로 만들어진 백엔드가 다르면 조용한 폴백이다. production은
+    # 위 _check_backends가 이미 막았으므로 여기 도달하면 개발 환경이다.
+    if (actual_vlm, actual_pose) != (CFG.vlm_provider, CFG.pose_backend):
+        log_warn("backend_fallback", "요청한 백엔드 대신 폴백으로 기동",
+                 errorCode="BACKEND_FALLBACK",
+                 requestedVlm=CFG.vlm_provider, actualVlm=actual_vlm,
+                 requestedPose=CFG.pose_backend, actualPose=actual_pose)
+
     STATE["pipeline"] = pipeline
     STATE["db_path"] = DB_PATH
     STATE["pose_count"] = len(entries)
     STATE["provider"] = actual_vlm
     STATE["pose_backend"] = actual_pose
-    print(f"[startup] 준비 완료 — 포즈 {len(entries)}개, env={CFG.app_env}, "
-          f"vlm={actual_vlm}, pose={actual_pose}")
+    log_info("startup", "준비 완료", poseCount=len(entries), env=CFG.app_env,
+             vlm=actual_vlm, pose=actual_pose, libraryVersion=CFG.pose_library_version)
+    alerts.notify(
+        "P3", "STARTUP",
+        f"추론 서버 기동 — 포즈 {len(entries)}개, vlm={actual_vlm}, pose={actual_pose}",
+        context={"env": CFG.app_env, "version": CFG.deployment_version},
+    )
     yield
+    log_info("shutdown", "종료")
     STATE.clear()
+    # 종료 신호 뒤에는 배치 창을 기다릴 수 없다. 버퍼에 남은 알림을 밀어낸다.
+    alerts.flush()
 
 
 app = FastAPI(title="Standin Pose Pipeline", version="0.1.0", lifespan=lifespan)
+
+
+# BFF가 붙여 보내는 요청 ID. 로그 주입을 막기 위해 형식을 검사하고, 어긋나면 새로 만든다.
+_REQUEST_ID_RE = re.compile(r"^[A-Za-z0-9_.:-]{1,128}$")
+
+
+def _route_pattern(request: Request) -> str:
+    """라우트 **패턴**(`/pose/{pose_id}/bvh`)을 돌려준다.
+
+    실제 경로를 쓰면 pose_id마다 다른 값이 되어 집계 카디널리티가 터진다.
+    라우팅이 안 된 요청(404)은 경로 자체가 임의 값이므로 남기지 않는다.
+    """
+    route = request.scope.get("route")
+    return getattr(route, "path", None) or "unmatched"
+
+
+@app.middleware("http")
+async def request_context(request: Request, call_next):
+    """요청마다 requestId를 잡고, 끝날 때 http_request 한 줄을 남긴다.
+
+    BFF가 `X-Request-Id`를 넘겨주므로 두 서비스의 로그가 같은 값으로 이어진다
+    (마스터독스 「관측성」 §4). 응답 헤더로 되돌려주어 호출측도 확인할 수 있게 한다.
+    """
+    incoming = request.headers.get("X-Request-Id", "")
+    request_id = incoming if _REQUEST_ID_RE.match(incoming) else f"req_{uuid.uuid4()}"
+    token = request_id_var.set(request_id)
+    started = time.monotonic()
+    try:
+        try:
+            response = await call_next(request)
+        except Exception as exc:
+            route = _route_pattern(request)
+            log_error("unhandled_error", "처리되지 않은 예외", exc_info=True,
+                      route=route, method=request.method, errorCode="INTERNAL_ERROR")
+            alerts.notify(
+                "P2", "UNHANDLED_ERROR",
+                f"{request.method} {route} 처리 중 예외가 발생했습니다.",
+                key=f"P2:unhandled:{route}",
+                context={"예외": type(exc).__name__},
+            )
+            # HTTPException이 아닌 예외는 여기까지 온다. 계약대로 JSON으로 답한다.
+            response = JSONResponse(status_code=500, content={"detail": "internal error"})
+
+        duration_ms = round((time.monotonic() - started) * 1000)
+        response.headers["X-Request-Id"] = request_id
+        route = _route_pattern(request)
+        # 헬스체크는 30초마다 온다. 정상 응답까지 남기면 로그의 대부분이 healthz가 된다.
+        error_code = (f"HTTP_{response.status_code}"
+                      if response.status_code >= 400 else None)
+        if route != "/healthz" or response.status_code != 200:
+            emit = log_warn if response.status_code >= 500 else log_info
+            emit("http_request", "",
+                 route=route, method=request.method,
+                 status=response.status_code, durationMs=duration_ms,
+                 errorCode=error_code)
+        # 로그와 같은 자리에서 지표도 센다. 두 곳에서 세면 반드시 어긋난다(계획 3단계).
+        # 지표에는 healthz도 넣는다 — 로그는 시끄러워서 뺐지만 가용성 계산에는 필요하다.
+        COLLECTOR.record(time.time(), response.status_code, duration_ms,
+                         route=route, error_code=error_code)
+        return response
+    finally:
+        request_id_var.reset(token)
 
 
 @app.get("/healthz")
@@ -127,6 +230,20 @@ def healthz():
     return body if ok else Response(
         content=json.dumps(body), status_code=503, media_type="application/json"
     )
+
+
+@app.get("/ops/metrics")
+def ops_metrics():
+    """분 단위 롤업을 그대로 내보낸다(계획 3단계). BFF가 1분마다 긁어 RDS에 넣는다.
+
+    ⚠ 내부 전용이다. 이 서비스는 무인증이라 ALB에 붙지 않으며 Cloud Map 내부 DNS로만
+      닿는다(README의 공개 경계 원칙). 여기에 개인정보는 담지 않는다 — 카운트와
+      라우트 패턴뿐이다.
+
+    버킷을 내보낸 뒤 지우지 않는다. BFF가 쓰다 실패하면 그 분이 통째로 사라지기 때문이다.
+    BFF 저장이 upsert라 같은 값을 다시 읽어도 결과가 같다.
+    """
+    return {"service": "inference", "taskId": TASK_ID, "buckets": COLLECTOR.snapshot()}
 
 
 def _load_image(data: bytes):
