@@ -18,6 +18,7 @@ from typing import Optional
 
 from ..schema import VLMAnalysis, BBox, Shot, Action, View, Relationship
 from ..config import CFG
+from ..logging_setup import log_info, log_warn
 from . import prompts
 
 
@@ -161,25 +162,26 @@ class GeminiVLMClient(BaseVLMClient):
                         temperature=0,
                     ),
                 )
-                print(json.dumps({
-                    "type": "gemini_request",
-                    "model": self._model,
-                    "attempt": attempt,
-                    "status": "ok",
-                    "elapsedMs": round((time.monotonic() - started) * 1000),
-                }))
+                log_info(
+                    "gemini_request",
+                    model=self._model,
+                    attempt=attempt,
+                    status="ok",
+                    elapsedMs=round((time.monotonic() - started) * 1000),
+                )
                 return _coerce(_extract_json(resp.text), img_w, img_h)
             except Exception as error:
                 status = _http_status(error)
                 retryable = status in (429, 503) and attempt < attempts
-                print(json.dumps({
-                    "type": "gemini_request",
-                    "model": self._model,
-                    "attempt": attempt,
-                    "status": status or "error",
-                    "retry": retryable,
-                    "elapsedMs": round((time.monotonic() - started) * 1000),
-                }))
+                log_warn(
+                    "gemini_request",
+                    model=self._model,
+                    attempt=attempt,
+                    status=status or "error",
+                    retry=retryable,
+                    elapsedMs=round((time.monotonic() - started) * 1000),
+                    errorCode=f"GEMINI_{status}" if status else "GEMINI_ERROR",
+                )
                 if not retryable:
                     raise
                 delay = min(
@@ -230,5 +232,9 @@ def build_vlm_client() -> BaseVLMClient:
         if p == "openai":
             return OpenAIVLMClient()
     except Exception as e:  # 키/패키지 없음 등
-        print(f"[vlm] {p} 초기화 실패({e}) → mock 폴백")
+        # 조용한 폴백은 프로덕션에서 runtime_guard가 기동을 막는다. 여기서는
+        # "왜" 폴백했는지를 남긴다 — 가드가 잡은 뒤 원인을 찾는 유일한 단서다.
+        log_warn("backend_fallback", "VLM 초기화 실패 → mock 폴백",
+                 errorCode="VLM_BACKEND_INIT_FAILED", backend=p,
+                 errorName=type(e).__name__, detail=str(e)[:300])
     return MockVLMClient()
