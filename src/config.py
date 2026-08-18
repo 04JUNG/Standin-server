@@ -23,6 +23,13 @@ class Config:
     # --- VLM ---  provider: "mock"(오프라인 기본) | "gemini" | "openai"
     vlm_provider: str = os.getenv("VLM_PROVIDER", "mock")
     gemini_model: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+    # Gemini HTTP 호출은 BFF의 전체 분석 timeout(기본 120초)보다 충분히 짧게 끝낸다.
+    # google-genai HttpOptions.timeout 단위는 밀리초다.
+    gemini_request_timeout_ms: int = int(os.getenv("GEMINI_REQUEST_TIMEOUT_MS", "20000"))
+    # attempts는 최초 호출을 포함한다. 429/503만 이 범위 안에서 재시도한다.
+    gemini_max_attempts: int = int(os.getenv("GEMINI_MAX_ATTEMPTS", "3"))
+    gemini_retry_base_seconds: float = float(os.getenv("GEMINI_RETRY_BASE_SECONDS", "0.5"))
+    gemini_retry_max_seconds: float = float(os.getenv("GEMINI_RETRY_MAX_SECONDS", "2.0"))
     openai_model: str = os.getenv("OPENAI_MODEL", "gpt-5-mini")
 
     # --- 검출/포즈 ---  "mock" | "rtmlib"

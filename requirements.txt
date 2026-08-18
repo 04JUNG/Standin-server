@@ -17,7 +17,7 @@ Pillow>=10.0                 # 업로드 PNG 로드
 # scipy>=1.11
 
 # --- 실제 모델 연결 시(선택) ---
-google-genai>=1.0             # Gemini(현행 SDK). GEMINI_MODEL=gemini-2.5-flash 등
+google-genai>=1.10,<3         # HttpOptions timeout 지원 범위를 고정. GEMINI_MODEL=gemini-2.5-flash 등
 # openai>=1.40                # gpt-5-mini 대안
 rtmlib>=0.0.13                # RTMPose Body(17kp)
 onnxruntime>=1.17
