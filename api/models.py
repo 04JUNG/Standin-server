@@ -92,6 +92,81 @@ class CutResultOut(BaseModel):
     inference_metadata: InferenceMetadataOut
 
 
+# ==== 사용자 텍스트 semantic search ======================================
+
+class SemanticSearchRequest(BaseModel):
+    query: str = Field(
+        ..., min_length=1, max_length=500,
+        description="사용자가 입력한 한국어 중심 포즈 검색 문장",
+    )
+    top_k: int = Field(5, ge=1, le=100)
+    view_hint: Optional[Literal["front", "three_quarter", "side", "back"]] = Field(
+        None,
+        description=("미리보기 썸네일 시점 힌트. 방향 중립 semantic matching의 "
+                     "exact 판정에는 사용하지 않음"),
+    )
+
+    @field_validator("query")
+    @classmethod
+    def validate_query(cls, value: str) -> str:
+        normalized = " ".join(value.strip().split())
+        if not normalized:
+            raise ValueError("query must contain non-whitespace text")
+        if any(ord(character) < 32 for character in normalized):
+            raise ValueError("query contains a control character")
+        return normalized
+
+
+class SemanticCandidateOut(BaseModel):
+    semantic_unit_id: str
+    pose_id: str
+    variant_kind: Literal["original", "mirrored"]
+    source_clip_id: str
+    retrieval_score: float = Field(
+        ..., description="dense+lexical RRF 내부 순위 점수. 확률이 아님"
+    )
+    constraint_margin: Optional[float] = None
+    constraint_results: List[dict] = Field(default_factory=list)
+    evidence_state: Literal["observed", "contextual"]
+    exact_pose_claim: bool
+    side_resolved: bool = False
+    context_key: Optional[str] = None
+    context_provenance: Optional[dict] = None
+    matched_constraints: List[str] = Field(default_factory=list)
+    unknown_constraints: List[str] = Field(default_factory=list)
+    best_text_document: dict = Field(default_factory=dict)
+    match_source: Literal["semantic_user"] = "semantic_user"
+    refine_allowed: Literal[False] = False
+    preview_view: Literal["front", "three_quarter", "side", "back"] = "front"
+    bvh_url: str
+    thumbnail_url: Optional[str] = Field(
+        None, description="미리보기 파일이 번들에 있을 때만 제공되는 내부 PNG 경로"
+    )
+
+
+class SemanticSearchResponse(BaseModel):
+    query: str
+    status: Literal[
+        "success", "contextual_candidates", "library_gap", "clarification_required"
+    ]
+    exact_match_status: Literal["exact", "library_gap", "not_evaluated"]
+    semantic_build_id: str
+    parsed_query: dict
+    match_source: Literal["semantic_user"] = "semantic_user"
+    refine_allowed: Literal[False] = False
+    results: List[SemanticCandidateOut] = Field(default_factory=list)
+    gap_reason: List[str] = Field(default_factory=list)
+    clarification_question: Optional[str] = None
+    matching_pose_members: Optional[int] = None
+    matching_semantic_units: Optional[int] = None
+    unknown_pose_members: Optional[int] = None
+    view_hint: Optional[str] = None
+    cache_hit: bool
+    service_version: int
+    service_time_ms: float
+    warnings: List[str] = Field(default_factory=list)
+
+
 # ==== 포즈 미세조정 (docs/REFINE_DESIGN.md) ================================
 # 작가가 Top-K 중 '고른 1개'만 러프에 맞춰 조정한다. 계산은 커밋된 포즈에만 든다.
 

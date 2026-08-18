@@ -1,0 +1,31 @@
+{
+  "record_type": "pose_lineage",
+  "schema_version": 1,
+  "pose_lineage_id": "lineage:<pose_id>",
+  "library_no": null,
+  "pose_id": "<pose_id>",
+  "bvh_filename": "<pose_id>.bvh",
+  "bvh_sha256": "sha256:<hash>",
+  "source_clip_id": null,
+  "extraction": {
+    "selected_frame_index": null,
+    "selected_frame_index_hint": null,
+    "frame_index_base": "unknown",
+    "source_fps": null,
+    "source_time_seconds": null,
+    "sample_ordinal": null
+  },
+  "derivation": {
+    "parent_pose_id": null,
+    "parent_artifact_sha256": null,
+    "operations": [],
+    "conversion_recipe_id": null,
+    "retarget_profile": null
+  },
+  "evidence": [],
+  "verification": {
+    "catalog_match_status": "unverified",
+    "file_lineage_status": "unverified",
+    "warnings": []
+  }
+}

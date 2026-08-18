@@ -1,0 +1,157 @@
+{
+  "record_type": "tagging_review_card",
+  "schema_version": 1,
+  "derived_view": true,
+  "sample_status": "proposal_not_indexable",
+  "identity": {
+    "library_no": null,
+    "pose_id": "cmu_05_03_00150",
+    "bvh_filename": "cmu_05_03_00150.bvh",
+    "semantic_unit_id": "pose:cmu_05_03_00150",
+    "mirror_group_id": "mirror:cmu_05_03_00150"
+  },
+  "source_clip": {
+    "source_clip_id": "cmu:05_03",
+    "provider": "cmu_graphics_lab",
+    "collection_id": "cmu_motion_capture_database",
+    "native_subject_id": "05",
+    "native_asset_id": null,
+    "native_clip_id": "03",
+    "original_title": "dance - sideways arabesque, turn step, folding arms",
+    "original_filename": null,
+    "catalog_uri": "https://mocap.cs.cmu.edu/search.php?subjectnumber=5&trinum=3",
+    "catalog_match_status": "verified",
+    "source_artifact_status": "unverified"
+  },
+  "lineage": {
+    "selected_frame_index": null,
+    "selected_frame_index_hint": 150,
+    "frame_index_base": "unknown",
+    "source_fps": 120,
+    "sample_ordinal": null,
+    "operations": [
+      {
+        "type": "extract_frame",
+        "status": "unverified"
+      }
+    ]
+  },
+  "preview": {
+    "front": "data/thumbs/cmu_05_03_00150__front.png",
+    "three_quarter": "data/thumbs/cmu_05_03_00150__three_quarter.png",
+    "side": "data/thumbs/cmu_05_03_00150__side.png",
+    "back": "data/thumbs/cmu_05_03_00150__back.png"
+  },
+  "semantic_proposal": {
+    "caption_ko": "한쪽 다리를 뒤로 길게 뻗고 양팔을 벌린 균형 자세",
+    "caption_en": "a balancing pose with one leg extended backward and both arms spread",
+    "aliases_ko": [
+      "아라베스크",
+      "한발 균형"
+    ],
+    "coarse_action": "standing",
+    "fine_actions": [
+      "dance",
+      "arabesque"
+    ],
+    "motion_phase": "unknown",
+    "posture": [
+      "one_leg_balance",
+      "torso_lean_forward"
+    ],
+    "gesture": [
+      "both_arms_extended"
+    ],
+    "interaction": "solo",
+    "intended_props": [],
+    "unit_atoms": [
+      {
+        "predicate": "action_intent",
+        "value": "dance",
+        "polarity": "positive",
+        "evidence_state": "intended",
+        "provenance": {
+          "kind": "source_catalog",
+          "ref": "https://mocap.cs.cmu.edu/search.php?subjectnumber=5&trinum=3",
+          "version": 1,
+          "review_status": "accepted"
+        }
+      },
+      {
+        "predicate": "pose_name_context",
+        "value": "arabesque",
+        "polarity": "positive",
+        "evidence_state": "contextual",
+        "provenance": {
+          "kind": "source_catalog",
+          "ref": "https://mocap.cs.cmu.edu/search.php?subjectnumber=5&trinum=3",
+          "version": 1,
+          "review_status": "accepted"
+        }
+      }
+    ]
+  },
+  "posecode_measurements": {
+    "status": "diagnostic_sample_not_indexable",
+    "coordinate_profile": "coco17_hips_centered_diagnostic_v0",
+    "left_elbow_flexion_deg": 161.474,
+    "right_elbow_flexion_deg": 162.088,
+    "left_knee_flexion_deg": 164.05,
+    "right_knee_flexion_deg": 110.959,
+    "left_wrist_height_torso_units": 1.084,
+    "right_wrist_height_torso_units": 0.155,
+    "ankle_separation_shoulder_units": 3.535,
+    "observed_atoms": [
+      {
+        "predicate": "joint_flexion",
+        "subject": "left_elbow",
+        "measure": 161.474,
+        "measure_unit": "degree",
+        "bucket": "extended",
+        "polarity": "positive",
+        "evidence_state": "observed",
+        "provenance": {
+          "kind": "bvh_rule",
+          "ref": "cmu_05_03_00150.bvh",
+          "version": 0,
+          "review_status": "needs_review"
+        }
+      },
+      {
+        "predicate": "joint_flexion",
+        "subject": "right_elbow",
+        "measure": 162.088,
+        "measure_unit": "degree",
+        "bucket": "extended",
+        "polarity": "positive",
+        "evidence_state": "observed",
+        "provenance": {
+          "kind": "bvh_rule",
+          "ref": "cmu_05_03_00150.bvh",
+          "version": 0,
+          "review_status": "needs_review"
+        }
+      }
+    ]
+  },
+  "field_evidence": {
+    "source_clip.native_ids": "official_catalog",
+    "source_clip.original_title": "official_catalog",
+    "lineage.selected_frame_index_hint": "filename",
+    "semantic_proposal.fine_actions": "official_catalog_context",
+    "semantic_proposal.unit_atoms": "official_catalog_context",
+    "semantic_proposal.caption_ko": "human_draft_from_4view",
+    "posecode_measurements": "bvh_diagnostic_rule"
+  },
+  "review": {
+    "priority": "P1",
+    "status": "needs_review",
+    "required_checks": [
+      "allocate_library_no",
+      "verify_source_artifact_and_frame_base",
+      "review_caption_and_aliases",
+      "replace_diagnostic_posecode_and_atoms_with_versioned_generator",
+      "resolve_license_reference"
+    ]
+  }
+}

@@ -3,6 +3,7 @@ FastAPI 레이어 — 도원의 Python 추론 서버.
 
 경계: [앱 서버 팀] --HTTP--> [이 서비스]  (문서화된 OpenAPI 계약 = /docs)
   POST /analyze         멀티파트 PNG 러프 컷 → CutResult(JSON)
+  POST /semantic-search 사용자 텍스트 → 의미 포즈 후보(JSON, opt-in)
   GET  /pose/{id}/bvh   후보 pose_id → 라이브러리 BVH 파일(동원 내보내기 팀이 소비)
   GET  /healthz         기동 확인
 
@@ -22,6 +23,8 @@ import time
 from dataclasses import asdict
 from datetime import datetime, timezone
 from contextlib import asynccontextmanager
+from pathlib import Path
+from typing import Optional
 
 import numpy as np
 from fastapi import FastAPI, File, Form, UploadFile, HTTPException
@@ -43,10 +46,17 @@ from src.runtime_guard import (
     actual_backend_names,
     ensure_production_backends,
 )
+from src.semantic_service import (
+    SemanticBusyError,
+    SemanticSearchService,
+    load_semantic_service,
+)
 from api.models import (CutResultOut, PersonOut, CandidateOut, SkeletonOut,
                         ImageInfoOut, InferenceMetadataOut,
                         RefineRequest, RefineResponse,
-                        ExportOrderRequest, ExportOrder, ExportItem)
+                        ExportOrderRequest, ExportOrder, ExportItem,
+                        SemanticSearchRequest, SemanticSearchResponse,
+                        SemanticCandidateOut)
 
 DB_PATH = os.getenv("DB_PATH", "data/poses.db")
 REFINE_DIR = os.path.join(CFG.data_dir, CFG.refine_dir)
@@ -102,6 +112,63 @@ def _check_backends(pipeline: Pipeline) -> None:
         raise StartupError(str(exc)) from exc
 
 
+def _semantic_base_status(reason: str) -> dict:
+    return {
+        "enabled": bool(CFG.semantic_enabled),
+        "required": bool(CFG.semantic_required),
+        "ready": False,
+        "reason": reason,
+        "semantic_build_id": None,
+        "semantic_unit_count": 0,
+        "pose_member_count": 0,
+        "embedding_version": None,
+    }
+
+
+def _load_semantic_at_startup() -> None:
+    if not CFG.semantic_enabled:
+        STATE["semantic"] = _semantic_base_status("disabled")
+        return
+    if CFG.is_production and not CFG.semantic_build_dir:
+        message = "production semantic search requires explicit SEMANTIC_BUILD_DIR"
+        STATE["semantic"] = _semantic_base_status("explicit_build_required")
+        if CFG.semantic_required:
+            raise StartupError(message)
+        print(f"[startup] semantic 준비 실패 — {message}")
+        return
+    try:
+        service = load_semantic_service(
+            build_dir=(Path(CFG.semantic_build_dir) if CFG.semantic_build_dir else None),
+            builds_root=Path(CFG.semantic_builds_root),
+            profile_path=Path(CFG.semantic_profile_path),
+            models_root=Path(CFG.semantic_models_root),
+            max_concurrency=CFG.semantic_max_concurrency,
+            acquire_timeout_seconds=CFG.semantic_acquire_timeout_seconds,
+            cache_size=CFG.semantic_cache_size,
+        )
+        if CFG.is_production and not service.runtime.manifest.get("production_ready"):
+            raise RuntimeError("semantic build is not promoted for production")
+    except Exception as exc:
+        STATE["semantic"] = _semantic_base_status(
+            f"startup_failed:{type(exc).__name__}"
+        )
+        print(f"[startup] semantic 준비 실패 — {type(exc).__name__}: {exc}")
+        if CFG.semantic_required:
+            raise StartupError(f"required semantic search failed: {type(exc).__name__}") from exc
+        return
+    STATE["semantic_service"] = service
+    STATE["semantic"] = {
+        "enabled": True,
+        "required": bool(CFG.semantic_required),
+        **service.readiness(),
+    }
+    print(
+        "[startup] semantic 준비 완료 — "
+        f"unit={STATE['semantic']['semantic_unit_count']}, "
+        f"build={STATE['semantic']['semantic_build_id']}"
+    )
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     entries = _ensure_db()                      # 1회 로드
@@ -115,13 +182,14 @@ async def lifespan(app: FastAPI):
     STATE["pose_count"] = len(entries)
     STATE["provider"] = actual_vlm
     STATE["pose_backend"] = actual_pose
+    _load_semantic_at_startup()
     print(f"[startup] 준비 완료 — 포즈 {len(entries)}개, env={CFG.app_env}, "
           f"vlm={actual_vlm}, pose={actual_pose}")
     yield
     STATE.clear()
 
 
-app = FastAPI(title="Standin Pose Pipeline", version="0.2.0", lifespan=lifespan)
+app = FastAPI(title="Standin Pose Pipeline", version="0.3.0", lifespan=lifespan)
 
 
 def _refine_capability() -> dict:
@@ -172,7 +240,17 @@ def healthz():
     # 라이브러리가 비면 후보를 하나도 못 내므로 healthy로 보고하지 않는다.
     # ECS/ALB가 이 응답으로 태스크 교체를 판단한다.
     pose_count = STATE.get("pose_count", 0)
-    ok = "pipeline" in STATE and pose_count > 0
+    service = STATE.get("semantic_service")
+    if isinstance(service, SemanticSearchService):
+        semantic = {
+            "enabled": True,
+            "required": bool(CFG.semantic_required),
+            **service.readiness(),
+        }
+    else:
+        semantic = STATE.get("semantic", _semantic_base_status("not_initialized"))
+    geometry_ok = "pipeline" in STATE and pose_count > 0
+    ok = geometry_ok and (not CFG.semantic_required or semantic["ready"])
     body = {
         "ok": ok,
         "env": CFG.app_env,
@@ -180,9 +258,114 @@ def healthz():
         "pose_backend": STATE.get("pose_backend", CFG.pose_backend),
         "pose_count": pose_count,
         "refine": _refine_capability(),
+        "semantic": semantic,
     }
     return body if ok else Response(
         content=json.dumps(body), status_code=503, media_type="application/json"
+    )
+
+
+def _semantic_not_ready_detail() -> dict:
+    status = STATE.get("semantic", _semantic_base_status("not_initialized"))
+    return {
+        "code": "semantic_not_ready",
+        "message": "semantic search is not ready",
+        "reason": status.get("reason", "not_initialized"),
+        "semantic_build_id": status.get("semantic_build_id"),
+    }
+
+
+@app.post("/semantic-search", response_model=SemanticSearchResponse)
+def semantic_search(req: SemanticSearchRequest, response: Response = None):
+    """사용자 문장으로 의미 후보를 찾는다. 기존 geometry 검색과 독립된 경계다."""
+    if req.top_k > CFG.semantic_top_k_max:
+        raise HTTPException(
+            422,
+            detail={
+                "code": "semantic_top_k_exceeded",
+                "message": f"top_k must be <= {CFG.semantic_top_k_max}",
+            },
+        )
+    service = STATE.get("semantic_service")
+    if not isinstance(service, SemanticSearchService):
+        raise HTTPException(503, detail=_semantic_not_ready_detail())
+    try:
+        result = service.search(
+            req.query,
+            top_k=req.top_k,
+            view_hint=req.view_hint,
+        )
+    except SemanticBusyError as exc:
+        raise HTTPException(
+            503,
+            detail={
+                "code": "semantic_busy",
+                "message": str(exc),
+                "retryable": True,
+            },
+            headers={"Retry-After": "1"},
+        ) from exc
+    except ValueError as exc:
+        raise HTTPException(
+            422,
+            detail={"code": "invalid_semantic_query", "message": str(exc)},
+        ) from exc
+
+    preview_view = req.view_hint or "front"
+    candidates = [
+        SemanticCandidateOut(
+            semantic_unit_id=row["semantic_unit_id"],
+            pose_id=row["pose_id"],
+            variant_kind=row["variant_kind"],
+            source_clip_id=row["source_clip_id"],
+            retrieval_score=row["score"],
+            constraint_margin=row.get("constraint_margin"),
+            constraint_results=row.get("constraint_results", []),
+            evidence_state=row["evidence_state"],
+            exact_pose_claim=row["exact_pose_claim"],
+            side_resolved=row.get("side_resolved", False),
+            context_key=row.get("context_key"),
+            context_provenance=row.get("context_provenance"),
+            matched_constraints=row.get("matched_constraints", []),
+            unknown_constraints=row.get("unknown_constraints", []),
+            best_text_document=row.get("best_text_document", {}),
+            match_source="semantic_user",
+            refine_allowed=False,
+            preview_view=preview_view,
+            bvh_url=f"/pose/{row['pose_id']}/bvh",
+            thumbnail_url=thumbnail_url(CFG.data_dir, row["pose_id"], preview_view),
+        )
+        for row in result["results"]
+    ]
+    warnings = ["semantic_candidates_cannot_be_refined"]
+    if req.view_hint:
+        warnings.append("view_hint_applies_to_preview_only")
+    if result["status"] == "contextual_candidates":
+        warnings.append("contextual_candidates_are_not_observed_pose_facts")
+    if response is not None:
+        response.headers["Server-Timing"] = (
+            f"semantic;dur={float(result['service_time_ms']):.3f}"
+        )
+        response.headers["X-Standin-Timing-Kind"] = "semantic-runtime"
+    return SemanticSearchResponse(
+        query=result["query"],
+        status=result["status"],
+        exact_match_status=result["exact_match_status"],
+        semantic_build_id=result["semantic_build_id"],
+        parsed_query=result["parsed_query"],
+        match_source="semantic_user",
+        refine_allowed=False,
+        results=candidates,
+        gap_reason=result.get("gap_reason", []),
+        clarification_question=result.get("clarification_question"),
+        matching_pose_members=result.get("matching_pose_members"),
+        matching_semantic_units=result.get("matching_semantic_units"),
+        unknown_pose_members=result.get("unknown_pose_members"),
+        view_hint=req.view_hint,
+        cache_hit=result["cache_hit"],
+        service_version=result["service_version"],
+        service_time_ms=result["service_time_ms"],
+        warnings=warnings,
     )
 
 

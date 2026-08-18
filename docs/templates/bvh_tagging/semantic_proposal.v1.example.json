@@ -1,0 +1,187 @@
+{
+  "record_type": "semantic_proposal",
+  "schema_version": 1,
+  "proposal_id": "sha256:replace_with_run_key",
+  "semantic_unit_id": "pose:Waving_02",
+  "semantic_unit_type": "pose_variant_group",
+  "member_pose_ids": [
+    "Waving_02",
+    "Waving_02_mirror"
+  ],
+  "source_clip_id": null,
+  "input_fingerprint": "sha256:replace_with_member_hashes_and_preview_hash",
+  "semantic": {
+    "caption_ko": "한 손을 어깨 위로 든 선 자세",
+    "caption_en": "a standing pose with one hand raised above the shoulder",
+    "aliases_ko": [
+      "한 손 들기"
+    ],
+    "aliases_en": [
+      "one hand raised"
+    ],
+    "coarse_action": "standing",
+    "fine_actions": [
+      "greeting"
+    ],
+    "motion_phase": "unknown",
+    "posture": [
+      "standing_like"
+    ],
+    "gesture": [
+      "one_hand_raised"
+    ],
+    "interaction": {
+      "kind": "solo",
+      "set_id": null,
+      "set_role": null
+    },
+    "intended_props": [],
+    "unit_atoms": [
+      {
+        "predicate": "action_intent",
+        "value": "greeting",
+        "polarity": "positive",
+        "evidence_state": "intended",
+        "provenance": {
+          "kind": "filename_hint",
+          "ref": "Waving_02",
+          "version": 1,
+          "review_status": "needs_review"
+        }
+      }
+    ]
+  },
+  "member_posecodes": {
+    "Waving_02": {
+      "measurements": {
+        "right_elbow_flexion_deg": 78.4,
+        "right_wrist_height_torso_units": 1.42
+      },
+      "observed_atoms": [
+        {
+          "predicate": "joint_flexion",
+          "subject": "right_elbow",
+          "measure": 78.4,
+          "measure_unit": "degree",
+          "bucket": "bent",
+          "polarity": "positive",
+          "evidence_state": "observed",
+          "provenance": {
+            "kind": "bvh_rule",
+            "ref": "Waving_02.bvh",
+            "version": 1,
+            "review_status": "generated"
+          }
+        },
+        {
+          "predicate": "relative_position",
+          "subject": "right_wrist",
+          "relation": "above",
+          "object": "right_shoulder",
+          "axis": "vertical",
+          "measure": 0.31,
+          "measure_unit": "torso_length",
+          "bucket": "clear",
+          "polarity": "positive",
+          "evidence_state": "observed",
+          "provenance": {
+            "kind": "bvh_rule",
+            "ref": "Waving_02.bvh",
+            "version": 1,
+            "review_status": "generated"
+          }
+        }
+      ]
+    },
+    "Waving_02_mirror": {
+      "measurements": {
+        "left_elbow_flexion_deg": 78.4,
+        "left_wrist_height_torso_units": 1.42
+      },
+      "observed_atoms": [
+        {
+          "predicate": "joint_flexion",
+          "subject": "left_elbow",
+          "measure": 78.4,
+          "measure_unit": "degree",
+          "bucket": "bent",
+          "polarity": "positive",
+          "evidence_state": "observed",
+          "provenance": {
+            "kind": "bvh_rule",
+            "ref": "Waving_02_mirror.bvh",
+            "version": 1,
+            "review_status": "generated"
+          }
+        },
+        {
+          "predicate": "relative_position",
+          "subject": "left_wrist",
+          "relation": "above",
+          "object": "left_shoulder",
+          "axis": "vertical",
+          "measure": 0.31,
+          "measure_unit": "torso_length",
+          "bucket": "clear",
+          "polarity": "positive",
+          "evidence_state": "observed",
+          "provenance": {
+            "kind": "bvh_rule",
+            "ref": "Waving_02_mirror.bvh",
+            "version": 1,
+            "review_status": "generated"
+          }
+        }
+      ]
+    }
+  },
+  "field_evidence": {
+    "semantic.caption_ko": [
+      {
+        "source": "vlm_contact_sheet",
+        "ref": "sha256:replace_with_contact_sheet_hash"
+      }
+    ],
+    "semantic.fine_actions": [
+      {
+        "source": "filename_hint",
+        "ref": "Waving_02"
+      }
+    ],
+    "semantic.unit_atoms": [
+      {
+        "source": "filename_hint",
+        "ref": "Waving_02"
+      }
+    ],
+    "member_posecodes": [
+      {
+        "source": "bvh_rule",
+        "ref": "posecode-v1"
+      }
+    ]
+  },
+  "generator": {
+    "run_key": "sha256:replace_with_run_key",
+    "semantic_schema_version": 1,
+    "semantic_vocab_version": 1,
+    "atom_schema_version": 1,
+    "filename_parser_version": 1,
+    "posecode_version": 1,
+    "coordinate_profile": "body_local_v1",
+    "vlm_provider": "google",
+    "vlm_model_id": "replace_with_exact_model_id",
+    "prompt_version": 1
+  },
+  "validation": {
+    "errors": [],
+    "warnings": [
+      "source_unverified",
+      "license_unresolved",
+      "fine_action_requires_human_review"
+    ],
+    "review_priority": "P1"
+  },
+  "workflow_status": "needs_review",
+  "content_revision": 1
+}

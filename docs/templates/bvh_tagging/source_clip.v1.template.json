@@ -1,0 +1,34 @@
+{
+  "record_type": "source_clip",
+  "schema_version": 1,
+  "source_clip_id": "provider:stable_internal_join_key",
+  "provider": null,
+  "collection": {
+    "id": null,
+    "version": null
+  },
+  "native_ids": {
+    "subject_id": null,
+    "asset_id": null,
+    "clip_id": null
+  },
+  "original": {
+    "title": null,
+    "filename": null,
+    "catalog_uri": null,
+    "artifact_uri": null,
+    "sha256": null,
+    "fps": null
+  },
+  "license_ref": null,
+  "catalog_evidence": {
+    "status": "missing",
+    "snapshot_ref": null,
+    "captured_at": null
+  },
+  "verification": {
+    "status": "unverified",
+    "verified_fields": [],
+    "unresolved_fields": []
+  }
+}
