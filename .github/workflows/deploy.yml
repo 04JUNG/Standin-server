@@ -57,6 +57,9 @@ jobs:
           tags: |
             ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
             ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
+          # 로그의 version 필드가 된다. 이미지에 구워야 cdk deploy가 돌아도 남는다.
+          build-args: |
+            DEPLOYMENT_VERSION=${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
