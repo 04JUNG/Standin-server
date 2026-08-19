@@ -37,7 +37,6 @@ uvicorn api.app:app --reload          # http://127.0.0.1:8000/docs 에서 계약
               인증·Job·기록          POST /analyze (동기, 무인증)
                                      POST /refine   (고른 후보 → 러프에 맞춰 조정)
                                      GET  /pose/{id}/bvh
-                                     GET  /refined/{handle}/bvh
                                      POST /export-order
                                      GET  /healthz
 ```
@@ -45,8 +44,15 @@ uvicorn api.app:app --reload          # http://127.0.0.1:8000/docs 에서 계약
 이 서버는 **동기·무인증·무상태 추론 API**다. 인증·Job 비동기·버전 프리픽스는 앱 서버가 감싼다.
 자세한 계약과 경계는 [`docs/API_CONTRACT.md`](docs/API_CONTRACT.md).
 
-Refine v2는 구현되어 있지만 holdout 승격 전까지 기본값은 꺼져 있다. 로컬/평가 서버에서만
-`REFINE_V2_ENABLED=1`로 켜며, 하체 단계가 승인되기 전 `REFINE_V2_TORSO=0`을 유지한다.
+Refine는 v2.5 safe aggressive가 제품 기본이다(`REFINE_V2_ENABLED=1`,
+`REFINE_DEFAULT_MODE=aggressive`). aggressive 후보는 원본 대비 구조 안전과 conservative 대비
+공통 metric non-regression을 모두 통과한 경우에만 반환되고, 실패하면 conservative 또는 베이스로
+정확히 복구된다. 몸통은 승인 전까지 `REFINE_V2_TORSO=0`을 유지한다. 비상 복구는
+`REFINE_DEFAULT_MODE=conservative` → `REFINE_V2_ENABLED=0` 순이다.
+
+조정본은 `POST /refine` 응답의 `bvh` 본문으로만 나간다. 로컬 디스크에 남기지 않으므로 조정본
+다운로드 URL은 없다(`docs/REFINE_HANDOFF.md` §3 4단계).
+
 합성 1차 스크리닝은 다음처럼 실행한다.
 
 ```bash
