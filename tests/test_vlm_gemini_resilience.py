@@ -106,3 +106,43 @@ def test_does_not_retry_non_transient_or_timeout(monkeypatch, failure):
 
     assert models.calls == 1
     assert sleeps == []
+
+
+def test_stops_retrying_when_vlm_budget_cannot_fit_another_attempt(monkeypatch):
+    """재시도가 BFF의 분석 상한을 먹어 치우지 않는지 확인한다.
+
+    timeout을 45초로 올린 뒤에는 429/503 재시도 3회가 135초가 되어 BFF 상한(120초)을
+    넘는다. 그러면 사용자는 원인을 알 수 없는 ANALYSIS_TIMEOUT을 받고, 정작 VLM이
+    왜 실패했는지는 어디에도 남지 않는다. 남은 예산으로 한 번 더 시도할 수 없으면
+    재시도하지 않는다.
+    """
+    monkeypatch.setattr(CFG, "gemini_max_attempts", 3)
+    monkeypatch.setattr(CFG, "gemini_request_timeout_ms", 45_000)
+    monkeypatch.setattr(CFG, "gemini_total_budget_seconds", 40)  # 45초짜리 시도가 안 들어간다
+    sleeps = []
+    client, models = make_client(
+        monkeypatch, [ApiFailure(503), ApiFailure(503), ApiFailure(503)], sleeps
+    )
+
+    with pytest.raises(ApiFailure):
+        client.analyze("ignored", 100, 100)
+
+    assert models.calls == 1, "예산이 부족하면 재시도하지 않는다"
+    assert sleeps == []
+
+
+def test_retries_within_budget(monkeypatch):
+    """예산이 넉넉하면 기존대로 429/503을 재시도한다(예산 가드가 정상 경로를 막지 않는다)."""
+    monkeypatch.setattr(CFG, "gemini_max_attempts", 3)
+    monkeypatch.setattr(CFG, "gemini_request_timeout_ms", 45_000)
+    monkeypatch.setattr(CFG, "gemini_total_budget_seconds", 120)
+    sleeps = []
+    client, models = make_client(
+        monkeypatch, [ApiFailure(503), valid_response()], sleeps
+    )
+
+    result = client.analyze("ignored", 100, 100)
+
+    assert result.num_people == 1
+    assert models.calls == 2
+    assert len(sleeps) == 1
