@@ -604,7 +604,10 @@ def refine(req: RefineRequest):
         # 후보를 재검증하고, 채택본의 본문만 응답으로 나간다.
         res = refine_bvh(base, req.keypoints, req.scores, req.view,
                          out_path=None, search_distance=req.search_distance,
-                         allowed_limbs=req.refinable_limbs,
+                         # 하체 비관측이면 정책 단계에서 이미 걸러낸 목록을 넘긴다.
+                         # v2는 내부에서 한 번 더 막지만, REFINE_V2_ENABLED=0으로
+                         # 되돌렸을 때 v1 경로에도 같은 fail-closed가 적용돼야 한다.
+                         allowed_limbs=effective_limbs,
                          lower_body_observed=req.lower_body_observed,
                          refine_mode=effective_mode, deadline=deadline)
     except ValueError as exc:                      # 알 수 없는 view 등

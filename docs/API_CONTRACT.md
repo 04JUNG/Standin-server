@@ -78,7 +78,7 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
   "distance_metric": "pos",
   "confidence_threshold": 0.45,
   "gap_type": "unknown",               // 평가 라벨이며 실행 게이트가 아님
-  "refine_mode": "aggressive"           // v2.4: 기본 conservative, 명시 선택 aggressive
+  "refine_mode": null                   // 생략/null 권장. 서버 기본은 safe aggressive
 }
 // 응답
 {
@@ -140,9 +140,11 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
   `/pose/{pose_id}/bvh`이며 조정본 다운로드 URL은 존재하지 않는다. 추론 서버는 조정본을 저장하지
   않으므로 무상태이고, 재계산을 막는 멱등성은 BFF의 `refined_artifacts` PK가 담당한다
   (`docs/REFINE_HANDOFF.md` §3 4단계).
-- `refine_mode` 기본값은 `conservative`다. `aggressive`는 같은 hard safety gate 아래 보수적 단계를
-  먼저 실행하고 hand/lap/lower pair와 제한적 Foot counter-rotation을 추가 시도한다. 공격적 단계가
-  실패하면 보수적 artifact를, 보수적 단계도 실패하면 베이스를 반환한다.
+- `refine_mode`를 생략하거나 `null`로 보내면 서버 기본값을 따른다. 현재 제품 기본은
+  **safe aggressive**(`REFINE_DEFAULT_MODE=aggressive`)다. `aggressive`는 같은 hard safety gate
+  아래 보수적 단계를 먼저 실행하고 hand/lap/lower pair와 제한적 Foot counter-rotation을 추가
+  시도한다. 공격적 단계가 실패하면 보수적 artifact를, 보수적 단계도 실패하면 베이스를 반환한다.
+  `REFINE_V2_ENABLED=0`이면 요청값과 무관하게 effective mode는 `conservative`다.
 - `refine_outcome`은 `improved | unchanged | reverted | not_attempted`이며 `gap_type`과 섞지 않는다.
   v2의 `diagnostics`에는 전체·부위별 base/solved/adopted direction·position·hybrid 손실,
   3D 이동량, 안전 판정, 부분 채택 alpha, 몸통 local rotation과 버전 lineage가 들어간다.

@@ -13,6 +13,37 @@
 전체 서버 계약의 단일 소스는 `api/models.py`와 OpenAPI `/docs`이며, 이 문서는 소비자 관점의 매핑과
 마이그레이션 규칙을 고정한다.
 
+## 0. ⚠ 마이그레이션 필수 — lineage를 안 보내면 refine이 조용히 꺼진다
+
+**이 서버 버전부터 `REFINE_V2_ENABLED=1`이 기본이다.** v2는 `/analyze`의 policy lineage를
+fail-closed로 재검증하므로, 아래 조건을 **하나라도 못 채우면 요청이 전부
+`refined=false`, `reason=skeleton_policy`로 떨어진다.**
+
+```python
+# src/refine_policy.py — 이 조건을 모두 만족해야 solver가 돈다
+skeleton_state   in {"valid", "partial"}
+coverage_class   in {"full", "reduced"}
+refinable_limbs  비어 있지 않음
+slot_origin      == "vlm"
+skeleton_source  == "full_image"
+```
+
+기본값이 `None`이라 **필드를 생략하면 자동으로 불합격**이다. `refine_allowed`와
+`refinable_limbs`만 보내던 기존 BFF는 이 배포 직후 refine이 100% 무효가 된다.
+
+**이건 HTTP 오류가 아니라 정상 200 응답이다.** BFF가 `refined=false`를 정상 스킵으로
+기록하면 로그·헬스체크·알림 어디에도 아무것도 남지 않는다. 조용히 꺼진 것을 알아채기 어렵다.
+
+**대응 순서**
+
+1. BFF가 §4 표의 lineage 필드를 모두 전달하도록 **먼저** 배포한다. 구 서버는 모르는 필드를
+   pydantic이 무시하므로 서버보다 먼저 나가도 안전하다.
+2. 배포 후 `diagnostics.mode_applied` 분포를 확인한다. 전부 `base`이고
+   `reason=skeleton_policy`이면 lineage가 여전히 안 오고 있다는 뜻이다.
+3. 전환 기간에는 `reason=skeleton_policy` 비율을 지표로 둔다.
+
+---
+
 ## 1. 한눈에 보는 변경점
 
 | 구분 | v1 | v2.5 제품 기본 | 표시 |
@@ -366,11 +397,20 @@ REFINE_V2_ENABLED=0
 REFINE_ENABLED=0
 ```
 
+> ⚠ **`REFINE_V25_SELECTOR_ENABLED=0`을 단독 비상 스위치로 쓰지 말 것.**
+> production에서 `기본 aggressive + selector off`는 안전하지 않은 구성이라
+> `/healthz.refine.config_valid=false` → **HTTP 503**이 된다. ALB가 전 태스크를 unhealthy로
+> 보고 교체 루프에 들어간다. selector를 꺼야 한다면 `REFINE_DEFAULT_MODE=conservative`를
+> **반드시 함께** 설정한다. 애초에 selector off는 raw aggressive를 우회 반환하는 경로라
+> 허용하지 않으며, 강도를 낮추려면 mode를 내리는 것이 정상 경로다.
+
 변경 후 프로세스를 재시작하고 `/healthz.refine.config_sha256`가 바뀌었는지 확인한다.
 
 ## 12. 팀 인계 완료 체크리스트
 
 - [ ] BFF가 `/analyze` person lineage와 `lower_body_observed`를 빠짐없이 `/refine`에 전달한다.
+- [ ] **§0을 읽었고, lineage 누락 시 refine이 조용히 꺼진다는 점을 배포 순서에 반영했다.**
+- [ ] `reason=skeleton_policy` 비율을 전환 기간 지표로 두었다.
 - [ ] 생략된 `refine_mode`가 safe aggressive라는 점을 반영했다.
 - [ ] `refined=false`도 성공 응답으로 처리하고 `bvh_url`을 사용한다.
 - [ ] BFF upstream timeout이 7초 이상이다.

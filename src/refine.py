@@ -874,9 +874,13 @@ def refine_bvh(base_bvh: str,
         )
         collision_base[name] = base_measure
         collision_solved[name] = solved_measure
-        limb_decisions[name]["collision"] = collision_dict(
-            base_measure, solved_measure, status, limb=name
-        )
+        # 이 루프는 설정상 활성인 팔 전부를 진단한다. 요청이 allowed_limbs로 한쪽
+        # 팔만 열었으면 limb_decisions에는 그 팔만 있으므로 없는 키에 쓰지 않는다.
+        # 베이스/조정 충돌 측정 자체는 위 두 dict에 남아 manifest 구분은 유지된다.
+        if name in limb_decisions:
+            limb_decisions[name]["collision"] = collision_dict(
+                base_measure, solved_measure, status, limb=name
+            )
 
     def refresh_collision_final(params):
         """현재 혼합 자세의 final_depth를 갱신하고 측정값을 반환한다."""
@@ -887,10 +891,13 @@ def refine_bvh(base_bvh: str,
         for limb in collision_base:
             measure = measure_collision(kp_final, kp_final_sc, limb, params)
             final[limb] = measure
-            diagnostic = limb_decisions[limb]["collision"]
-            diagnostic["final_depth"] = (
-                round(float(measure.depth), 6) if measure.available else None
-            )
+            # collision_base는 설정상 활성인 팔 전부를 담지만 limb_decisions는
+            # 요청이 연 사지만 담는다. 열리지 않은 팔은 진단만 남기고 넘어간다.
+            diagnostic = limb_decisions.get(limb, {}).get("collision")
+            if diagnostic is not None:
+                diagnostic["final_depth"] = (
+                    round(float(measure.depth), 6) if measure.available else None
+                )
         return final
 
     kept = list(active)

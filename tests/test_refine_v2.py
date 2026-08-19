@@ -966,6 +966,57 @@ def test_v25_inline_delivery_leaves_no_scratch_directory():
         assert after == before, f"임시 디렉터리가 남았다: {after - before}"
 
 
+def test_v1_path_also_freezes_lower_body_when_unobserved():
+    """REFINE_V2_ENABLED=0으로 되돌려도 하체 fail-closed가 유지된다.
+
+    API가 정책 판정에만 쓰고 solver에는 원본 refinable_limbs를 넘기면, v2는
+    내부에서 다시 막지만 v1 경로에는 하체 게이트가 없어 조용히 다리가 움직인다.
+    비상 복구 스위치를 내린 순간 안전 계약이 달라지면 안 된다.
+    """
+    import api.app as api_app
+    from api.models import RefineRequest
+
+    seen = {}
+
+    with tempfile.TemporaryDirectory() as directory:
+        base = _synthetic_bvh(directory, "base.bvh")
+        target = _bvh_with_rotation(directory, "target.bvh", "LeftArm", 15.0)
+        keypoints, scores = _target_kp(target)
+        request = RefineRequest(
+            pose_id="pose", view="front", keypoints=keypoints.tolist(),
+            scores=scores.tolist(), refine_allowed=True,
+            refinable_limbs=["left_arm", "left_leg", "right_leg"],
+            lower_body_observed=False,          # 반신 컷 — 하체 비관측
+            skeleton_state="valid", coverage_class="full", slot_origin="vlm",
+            skeleton_source="full_image",
+        )
+        original_meta = api_app.get_pose_meta
+        original_solver = api_app.refine_bvh
+        original_flag = CFG.refine_v2_enabled
+        original_state = dict(api_app.STATE)
+
+        def capture(*args, **kwargs):
+            seen["allowed_limbs"] = list(kwargs.get("allowed_limbs") or [])
+            return original_solver(*args, **kwargs)
+
+        try:
+            api_app.STATE["db_path"] = os.path.join(directory, "unused.db")
+            api_app.get_pose_meta = lambda *_a: {"bvh_path": base, "set_id": None}
+            api_app.refine_bvh = capture
+            CFG.refine_v2_enabled = False        # 비상 복구 경로
+            api_app.refine(request)
+        finally:
+            api_app.get_pose_meta = original_meta
+            api_app.refine_bvh = original_solver
+            CFG.refine_v2_enabled = original_flag
+            api_app.STATE.clear()
+            api_app.STATE.update(original_state)
+
+    assert "left_leg" not in seen["allowed_limbs"], seen
+    assert "right_leg" not in seen["allowed_limbs"], seen
+    assert seen["allowed_limbs"] == ["left_arm"]
+
+
 if __name__ == "__main__":
     import traceback
     functions = [value for name, value in sorted(globals().items())
