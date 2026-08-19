@@ -1,15 +1,17 @@
-"""승인된 Refine v2 구현.
+"""승인된 Refine v2.5 safe-aggressive 구현.
 
-v1과 production 기본 동작을 보존하기 위해 ``REFINE_V2_ENABLED=1``일 때만
-``src.refine.refine_bvh``가 이 모듈로 위임한다. 검색 순위를 바꾸지 않고 사용자가
-고른 한 후보만 처리한다.
+제품 기본은 ``REFINE_V2_ENABLED=1``이며 ``src.refine.refine_bvh``가 이 모듈로
+위임한다. v1 비교·비상 복구에서는 플래그를 0으로 명시한다. 검색 순위를 바꾸지
+않고 사용자가 고른 한 후보만 처리한다.
 """
 from __future__ import annotations
 
 import math
 import os
 import tempfile
-from typing import Optional, Sequence
+import time
+from dataclasses import dataclass
+from typing import Any, Optional, Sequence
 
 import numpy as np
 
@@ -42,6 +44,10 @@ BLOCK_ENDPOINTS = {
     "left_leg": (13, 15), "right_leg": (14, 16),
     "torso": (5, 6, 11, 12),
 }
+LEG_KEYPOINTS = {
+    "left_leg": (11, 13, 15),
+    "right_leg": (12, 14, 16),
+}
 TORSO_SUFFIX_ALLOWLIST = (
     "Pelvis", "Spine", "Spine1", "Spine2", "Spine3", "Chest", "UpperChest",
 )
@@ -58,6 +64,34 @@ _JOINT_DELTA_LIMITS = {
     "LeftLeg": {"X": 42.0, "Y": 15.0, "Z": 15.0},
     "RightLeg": {"X": 42.0, "Y": 15.0, "Z": 15.0},
 }
+
+
+@dataclass(frozen=True)
+class _PreparedTarget:
+    keypoints: np.ndarray
+    scores: np.ndarray
+    valid: np.ndarray
+    feature: np.ndarray
+    directions: np.ndarray
+    bones_ok: np.ndarray
+    legacy_directions: np.ndarray
+    legacy_bones_ok: np.ndarray
+    bone_weights: np.ndarray
+
+
+@dataclass(frozen=True)
+class _PreparedBase:
+    path: str
+    joints: Any
+    data: np.ndarray
+
+
+def _prepare_base(path: str) -> _PreparedBase:
+    try:
+        joints, data = parse_bvh(path)
+    except (OSError, AssertionError, ValueError) as exc:
+        raise ValueError(f"invalid base BVH: {exc}") from exc
+    return _PreparedBase(str(path), joints, np.asarray(data, dtype=np.float64))
 
 
 def _alphas(cfg) -> tuple[float, ...]:
@@ -97,6 +131,32 @@ def _target_state(keypoints, scores):
     feature = normalize_skeleton(kp, sc, valid_mask=valid)
     dirs, bones_ok = bone_dirs(feature, joint_valid_mask=valid)
     return kp, sc, valid, feature, dirs, bones_ok
+
+
+def _prepare_target(target_keypoints, target_scores, bone_weights) -> _PreparedTarget:
+    keypoints = np.asarray(target_keypoints, dtype=np.float64)
+    scores = (np.ones(17, dtype=np.float64) if target_scores is None
+              else np.asarray(target_scores, dtype=np.float64))
+    keypoints, scores, valid, feature, directions, bones_ok = _target_state(
+        keypoints, scores
+    )
+    weights = (np.ones(len(_BONES), dtype=np.float64) if bone_weights is None
+               else np.asarray(bone_weights, dtype=np.float64))
+    if weights.shape != (len(_BONES),) or not np.all(np.isfinite(weights)):
+        raise ValueError(
+            f"bone_weights must have shape ({len(_BONES)},) and be finite"
+        )
+    if np.any(weights < 0.0):
+        raise ValueError("bone_weights must be non-negative")
+    legacy_directions, legacy_bones_ok = target_bone_dirs(keypoints, scores)
+    return _PreparedTarget(
+        keypoints=keypoints.copy(), scores=scores.copy(), valid=valid.copy(),
+        feature=np.asarray(feature).copy(),
+        directions=np.asarray(directions).copy(), bones_ok=bones_ok.copy(),
+        legacy_directions=np.asarray(legacy_directions).copy(),
+        legacy_bones_ok=np.asarray(legacy_bones_ok).copy(),
+        bone_weights=weights.copy(),
+    )
 
 
 def _frame_state(joints, frame, view):
@@ -152,6 +212,121 @@ def _foreshortened_direction_weights(keypoints, scores, weights, cfg):
             out[first_bone if first <= second else second_bone] *= scale
             softened.append(limb)
     return out, tuple(softened)
+
+
+def _projected_joint_angle(feature, root: int, middle: int, endpoint: int) -> float:
+    """정규화된 2D feature에서 0..180°의 관절 내각을 계산한다."""
+    xy = np.asarray(feature, dtype=np.float64).reshape(17, 2)
+    first = xy[root] - xy[middle]
+    second = xy[endpoint] - xy[middle]
+    denom = float(np.linalg.norm(first) * np.linalg.norm(second))
+    if not np.isfinite(denom) or denom <= 1e-10:
+        return float("nan")
+    cosine = float(np.clip(np.dot(first, second) / denom, -1.0, 1.0))
+    return float(np.degrees(np.arccos(cosine)))
+
+
+def _single_leg_extension_evidence(
+        keypoints, scores, target_feature, base_feature,
+        foreshortened_limbs, cfg) -> dict[str, dict]:
+    """v2.5.3의 엄격한 low-observability 예외를 판정한다.
+
+    target이 straight class이고 B0와의 차이가 제한 범위인 경우에만, 압축된
+    proximal segment 때문에 탈락한 한쪽 다리를 solve 대상으로 되살린다.
+    """
+    evidence: dict[str, dict] = {}
+    if not bool(getattr(cfg, "refine_v253_single_leg_extension_enabled", False)):
+        return evidence
+    kp = np.asarray(keypoints, dtype=np.float64).reshape(17, 2)
+    sc = np.asarray(scores, dtype=np.float64).reshape(17)
+    target_xy = np.asarray(target_feature, dtype=np.float64).reshape(17, 2)
+    base_xy = np.asarray(base_feature, dtype=np.float64).reshape(17, 2)
+    for limb in foreshortened_limbs:
+        root, middle, endpoint = LEG_KEYPOINTS[limb]
+        if np.any(sc[[root, middle, endpoint]] < 0.3):
+            continue
+        proximal = float(np.linalg.norm(kp[middle] - kp[root]))
+        distal = float(np.linalg.norm(kp[endpoint] - kp[middle]))
+        # 이 예외는 proximal foreshortening만 다룬다. 발목 쪽이 압축된 경우는
+        # endpoint 방향 자체가 불안정하므로 기존 low_observability 판정을 유지한다.
+        if not np.isfinite(proximal + distal) or proximal > distal:
+            continue
+        target_angle = _projected_joint_angle(
+            target_xy, root, middle, endpoint
+        )
+        base_angle = _projected_joint_angle(
+            base_xy, root, middle, endpoint
+        )
+        extension_delta = target_angle - base_angle
+        if not (
+            np.isfinite(target_angle)
+            and np.isfinite(base_angle)
+            and target_angle >= cfg.refine_v253_straight_angle_min_deg
+            and cfg.refine_v253_extension_delta_min_deg
+            <= extension_delta
+            <= cfg.refine_v253_extension_delta_max_deg
+        ):
+            continue
+        base_ankle_error = float(np.linalg.norm(
+            base_xy[endpoint] - target_xy[endpoint]
+        ))
+        if not np.isfinite(base_ankle_error) or base_ankle_error <= 1e-8:
+            continue
+        evidence[limb] = {
+            "active": True,
+            "accepted": False,
+            "reason": "eligible_foreshortened_extension",
+            "target_angle_deg": round(target_angle, 4),
+            "base_angle_deg": round(base_angle, 4),
+            "extension_delta_deg": round(extension_delta, 4),
+            "proximal_px": round(proximal, 4),
+            "distal_px": round(distal, 4),
+            "base_ankle_error": round(base_ankle_error, 8),
+        }
+    # v2 범위를 임의 part composition으로 넓히지 않도록 한 요청에서 한쪽만 허용한다.
+    if len(evidence) != 1:
+        return {}
+    return evidence
+
+
+def _single_leg_extension_status(
+        joints, frame, view, target_feature, limb, evidence, cfg) -> dict:
+    """후보가 straight class와 ankle 양의 개선을 함께 만족하는지 검사한다."""
+    _, _, _, feature, *_ = _frame_state(joints, frame, view)
+    root, middle, endpoint = LEG_KEYPOINTS[limb]
+    angle = _projected_joint_angle(feature, root, middle, endpoint)
+    target_angle = float(evidence["target_angle_deg"])
+    base_angle = float(evidence["base_angle_deg"])
+    target_xy = np.asarray(target_feature, dtype=np.float64).reshape(17, 2)
+    xy = np.asarray(feature, dtype=np.float64).reshape(17, 2)
+    ankle_error = float(np.linalg.norm(xy[endpoint] - target_xy[endpoint]))
+    base_error = abs(target_angle - base_angle)
+    final_error = abs(target_angle - angle) if np.isfinite(angle) else float("inf")
+    angle_ok = bool(
+        np.isfinite(angle)
+        and (
+            angle >= cfg.refine_v253_straight_angle_min_deg
+            or final_error <= 0.5 * max(base_error, 1e-8)
+        )
+    )
+    ankle_ok = bool(
+        np.isfinite(ankle_error)
+        and ankle_error < float(evidence["base_ankle_error"]) - cfg.refine_gain_epsilon
+    )
+    return {
+        "accepted": bool(angle_ok and ankle_ok),
+        "projected_angle_deg": (
+            round(float(angle), 4) if np.isfinite(angle) else None
+        ),
+        "target_angle_error_deg": (
+            round(float(final_error), 4) if np.isfinite(final_error) else None
+        ),
+        "angle_gate": angle_ok,
+        "ankle_error": (
+            round(float(ankle_error), 8) if np.isfinite(ankle_error) else None
+        ),
+        "ankle_gate": ankle_ok,
+    }
 
 
 def _direction_loss(cur_dirs, cur_ok, target_dirs, target_ok, weights, mask):
@@ -353,11 +528,11 @@ def _lap_contact_state(target_feature, target_valid, blocks, aggressive, cfg):
     arm_wrist = {"left_arm": 9, "right_arm": 10}
     leg_segment = {"left_leg": (11, 13), "right_leg": (12, 14)}
     for arm, wrist in arm_wrist.items():
-        if arm not in blocks or not valid[wrist]:
+        if not valid[wrist]:
             continue
         choices = []
         for leg, (hip, knee) in leg_segment.items():
-            if leg not in blocks or not (valid[hip] and valid[knee]):
+            if not (valid[hip] and valid[knee]):
                 continue
             distance = _point_segment_distance_2d(
                 xy[wrist], xy[hip], xy[knee]
@@ -366,7 +541,11 @@ def _lap_contact_state(target_feature, target_valid, blocks, aggressive, cfg):
         if not choices:
             continue
         distance, leg = min(choices, key=lambda item: (item[0], item[1]))
-        if distance <= cfg.refine_v2_lap_contact_2d_threshold:
+        # 접촉의 한쪽만 solve 대상이어도 다른 쪽은 고정 장애물/접촉면이다.
+        # 둘 다 block에 있어야 한다고 제한하면 한 팔만 움직인 경우의 손-다리
+        # 접촉 회귀가 phase gate를 우회해 final selector에서 뒤늦게 탈락한다.
+        if ((arm in blocks or leg in blocks)
+                and distance <= cfg.refine_v2_lap_contact_2d_threshold):
             contacts.append((arm, leg, float(distance)))
     return {
         "active": bool(contacts),
@@ -428,6 +607,66 @@ def _lap_contact_involves(contact_state, block) -> bool:
         block == arm or block == leg
         for arm, leg, _ in contact_state.get("contacts", ())
     )
+
+
+def _aggressive_objective_activity(prepared_base: _PreparedBase,
+                                   prepared_target: _PreparedTarget,
+                                   view: str,
+                                   allowed_limbs: Optional[Sequence[str]],
+                                   eligible_blocks: Optional[Sequence[str]],
+                                   cfg) -> dict:
+    """C+query에서 남은 pair/contact와 관측 가능한 block을 한 번 고정한다."""
+    if len(prepared_base.data) != 1:
+        return {"active": False, "reason": "multiframe_base", "blocks": []}
+    frame = np.asarray(prepared_base.data[0], dtype=np.float64)
+    _, _, _, base_feature, _, base_ok = _frame_state(
+        prepared_base.joints, frame, view
+    )
+    configured = list(ARM_LIMBS)
+    if cfg.refine_v2_lower_body:
+        configured.extend(LEG_LIMBS)
+    if allowed_limbs is not None:
+        requested = set(str(name) for name in allowed_limbs)
+        configured = [name for name in configured if name in requested]
+    weights = prepared_target.bone_weights.copy()
+    for index, (a, b) in enumerate(_BONES):
+        weights[index] *= min(
+            float(np.clip(prepared_target.scores[a], 0.0, 1.0)),
+            float(np.clip(prepared_target.scores[b], 0.0, 1.0)),
+        )
+        if not prepared_target.bones_ok[index] or not base_ok[index]:
+            weights[index] = 0.0
+    bone_index = {tuple(bone): index for index, bone in enumerate(_BONES)}
+    blocks = [
+        limb for limb in configured
+        if all(weights[bone_index[pair]] > 0.0 for pair in LIMBS[limb][1])
+    ]
+    if eligible_blocks is not None:
+        eligible = set(str(name) for name in eligible_blocks)
+        blocks = [limb for limb in blocks if limb in eligible]
+    hand = _hand_pair_state(
+        base_feature, prepared_target.feature, prepared_target.valid,
+        blocks, True, cfg,
+    )
+    lower = _lower_pair_state(
+        base_feature, prepared_target.feature, prepared_target.valid,
+        blocks, cfg,
+    )
+    lap = _lap_contact_state(
+        prepared_target.feature, prepared_target.valid, blocks, True, cfg,
+    )
+    objectives = {
+        "hand_pair": bool(hand.get("active")),
+        "lower_pair": bool(lower.get("active")),
+        "lap_contact": bool(lap.get("active")),
+    }
+    return {
+        "active": any(objectives.values()),
+        "reason": "active_pair_or_contact" if any(objectives.values())
+                  else "no_aggressive_pair_or_contact",
+        "blocks": list(blocks),
+        "objectives": objectives,
+    }
 
 
 def _lap_contact_regresses(joints, base_frame, trial_frame, view,
@@ -540,7 +779,7 @@ def _aggregate_metrics(block_metrics, blocks):
             for key in ("direction", "position", "move", "hybrid")}
 
 
-def _param_limits(fwd, cfg, torso=False):
+def _param_limits(fwd, cfg, torso=False, extension_limbs=()):
     limits = np.empty(len(fwd.param_idx), dtype=np.float64)
     for index, (joint, label) in enumerate(zip(fwd.param_joints, fwd.param_labels)):
         axis = label.rsplit(".", 1)[-1]
@@ -550,8 +789,35 @@ def _param_limits(fwd, cfg, torso=False):
             limit = _JOINT_DELTA_LIMITS.get(joint, {}).get(
                 axis, cfg.refine_max_delta_deg
             )
+            for limb in extension_limbs:
+                side = "Left" if limb == "left_leg" else "Right"
+                if joint == f"{side}UpLeg":
+                    limit = min(
+                        float(limit),
+                        float(cfg.refine_v253_up_leg_max_delta_deg),
+                    )
         limits[index] = min(float(limit), float(cfg.refine_max_delta_deg))
     return np.maximum(limits, 0.0)
+
+
+def _cumulative_param_bounds(fwd, p0, limits, policy_base_frame=None):
+    """C→A가 B0 trust budget을 다시 전부 쓰지 않도록 절대 bounds를 만든다."""
+    p0 = np.asarray(p0, dtype=np.float64)
+    limits = np.asarray(limits, dtype=np.float64)
+    lo, hi = p0 - limits, p0 + limits
+    if policy_base_frame is None:
+        return lo, hi, True
+    policy = np.asarray(policy_base_frame, dtype=np.float64)
+    max_index = int(np.max(fwd.param_idx)) if fwd.param_idx.size else -1
+    if policy.ndim != 1 or policy.size <= max_index:
+        return lo, hi, False
+    origin = policy[fwd.param_idx]
+    relative = (p0 - origin + 180.0) % 360.0 - 180.0
+    if np.any(np.abs(relative) > limits + 1e-6):
+        return lo, hi, False
+    lo = np.maximum(lo, p0 + (-limits - relative))
+    hi = np.minimum(hi, p0 + (limits - relative))
+    return lo, hi, bool(np.all(lo <= hi + 1e-9))
 
 
 def _soft_collision_depths(joints, fwd, params, active_limbs, base_depths, cfg):
@@ -684,10 +950,15 @@ def _vector_angle_degrees(a, b) -> Optional[float]:
 
 
 def _counter_rotate_feet(joints, reference_frame, trial_frame, view, limbs,
-                         cfg, deadline):
+                         cfg, deadline, policy_base_frame=None):
     """발 위치를 건드리지 않고 Foot local rotation으로 기준 방향만 복원한다."""
     result = np.asarray(trial_frame, dtype=np.float64).copy()
-    reference_positions = fk(joints, reference_frame)
+    # C→A 두 단계에서도 발 방향 게이트는 직전 C가 아니라 원본 B0 기준이어야
+    # 한다. 단계마다 12°를 허용하면 누적 최종본이 12°를 넘을 수 있다.
+    orientation_reference = (
+        reference_frame if policy_base_frame is None else policy_base_frame
+    )
+    reference_positions = fk(joints, orientation_reference)
     diagnostics = {}
     total_nfev = 0
     for limb in limbs:
@@ -740,6 +1011,21 @@ def _counter_rotate_feet(joints, reference_frame, trial_frame, view, limbs,
 
         limit = max(float(cfg.refine_v2_ankle_counter_max_delta_deg), 0.0)
         lo, hi = p0 - limit, p0 + limit
+        global_limits = np.full(
+            len(p0), max(float(cfg.refine_max_delta_deg), 0.0),
+            dtype=np.float64,
+        )
+        cumulative_lo, cumulative_hi, feasible = _cumulative_param_bounds(
+            fwd, p0, global_limits, policy_base_frame
+        )
+        if not feasible:
+            diagnostics[limb] = {
+                "attempted": False, "accepted": False,
+                "reason": "b0_trust_budget_exhausted",
+                "before_deg": before_angle, "after_deg": before_angle,
+            }
+            continue
+        lo, hi = np.maximum(lo, cumulative_lo), np.minimum(hi, cumulative_hi)
         try:
             try:
                 solved, nfev = _solve_scipy(
@@ -999,7 +1285,8 @@ def _refresh_arm_leg_final_depths(joints, frame, view, safety, cfg) -> None:
 def _solve_stage(joints, base_frame, view, suffixes, blocks, solve_mask,
                  target_feature, target_dirs, target_valid, target_bones_ok,
                  bone_weights, joint_weights, kp_base, base_collision_depths,
-                 cfg, deadline, torso=False, aggressive=False):
+                 cfg, deadline, torso=False, aggressive=False,
+                 policy_base_frame=None, extension_limbs=()):
     fwd = _Forward(joints, base_frame, view, suffixes)
     if fwd.param_idx.size == 0:
         return None
@@ -1076,6 +1363,27 @@ def _solve_stage(joints, base_frame, view, suffixes, blocks, solve_mask,
             * np.maximum(joint_weights[target_contact], 0.0)
         )[:, None]
 
+        # final selector의 mean joint L2와 같은 방향의 surrogate다. 각 점의
+        # 좌표 residual을 sqrt(norm)으로 나누면 제곱합이 L2 norm에 비례한다.
+        # aggressive에서만 작게 추가하고 final selector 기준은 그대로 둔다.
+        selector_position = np.zeros((0, 2), dtype=np.float64)
+        selector_weight = max(
+            float(getattr(cfg, "refine_v25_joint_nme_weight", 0.0)), 0.0
+        )
+        if aggressive and selector_weight > 0.0:
+            selector_valid = ((scores[target_contact] >= 0.3)
+                              & target_valid[target_contact])
+            deltas = xy[target_contact[selector_valid]] - target_xy[
+                target_contact[selector_valid]
+            ]
+            norms = np.linalg.norm(deltas, axis=1)
+            selector_position = deltas / np.sqrt(
+                np.maximum(norms, 1e-6)
+            )[:, None]
+            selector_position *= math.sqrt(
+                selector_weight / max(len(selector_position), 1)
+            )
+
         pair = np.zeros((0,), dtype=np.float64)
         if lower_pair.get("active"):
             pair_delta = _lower_pair_vectors(feature) - lower_pair["target_vectors"]
@@ -1144,13 +1452,20 @@ def _solve_stage(joints, base_frame, view, suffixes, blocks, solve_mask,
             for name in bend_names
         ], dtype=np.float64) * math.sqrt(max(cfg.refine_v2_anatomy_weight, 0.0))
         return np.concatenate([
-            direction, position.ravel(), pair, hand, contact,
+            direction, position.ravel(), selector_position.ravel(),
+            pair, hand, contact,
             move, axis_reg, svd_reg,
             collision, anatomy,
         ])
 
-    limits = _param_limits(fwd, cfg, torso=torso)
-    lo, hi = p0 - limits, p0 + limits
+    limits = _param_limits(
+        fwd, cfg, torso=torso, extension_limbs=extension_limbs
+    )
+    lo, hi, feasible = _cumulative_param_bounds(
+        fwd, p0, limits, policy_base_frame
+    )
+    if not feasible:
+        return None
     try:
         try:
             solved, nfev = _solve_scipy(
@@ -1189,6 +1504,15 @@ def _solve_stage(joints, base_frame, view, suffixes, blocks, solve_mask,
         "lower_pair": lower_pair,
         "hand_pair": hand_pair,
         "lap_contact": lap_contact,
+        "active_objectives": {
+            "lower_pair": bool(lower_pair.get("active")),
+            "hand_pair": bool(hand_pair.get("active")),
+            "lap_contact": bool(lap_contact.get("active")),
+            "joint_nme_surrogate": bool(
+                aggressive and getattr(cfg, "refine_v25_joint_nme_weight", 0.0) > 0.0
+            ),
+        },
+        "parameter_count": int(len(p0)),
     }
 
 
@@ -1230,6 +1554,11 @@ def _refine_bvh_v2_phase(base_bvh: str,
                          allowed_limbs: Optional[Sequence[str]] = None,
                          deadline: Optional[float] = None,
                          aggressive: bool = False,
+                         diagnostic_candidate_out_path: Optional[str] = None,
+                         prepared_target: Optional[_PreparedTarget] = None,
+                         prepared_base: Optional[_PreparedBase] = None,
+                         policy_base_frame=None,
+                         state_out: Optional[dict] = None,
                          cfg=CFG) -> RefineResult:
     """positive-gain/zero-regression Refine v2의 한 단계 실행."""
     fail = lambda reason: RefineResult(
@@ -1239,30 +1568,30 @@ def _refine_bvh_v2_phase(base_bvh: str,
     if not cfg.refine_enabled:
         return fail("disabled")
 
-    kp_input = np.asarray(target_keypoints, dtype=np.float64)
-    scores = (np.ones(17, dtype=np.float64) if target_scores is None
-              else np.asarray(target_scores, dtype=np.float64))
-    kp_input, scores, target_valid, target_feature, target_dirs, target_ok = (
-        _target_state(kp_input, scores)
+    prepared_target_reused = prepared_target is not None
+    prepared_base_reused = prepared_base is not None
+    prepared_target = prepared_target or _prepare_target(
+        target_keypoints, target_scores, bone_weights
     )
+    kp_input = prepared_target.keypoints.copy()
+    scores = prepared_target.scores.copy()
+    target_valid = prepared_target.valid.copy()
+    target_feature = prepared_target.feature.copy()
+    target_dirs = prepared_target.directions.copy()
+    target_ok = prepared_target.bones_ok.copy()
     if float(scores[_BODY_SCORE_IDX].mean()) < cfg.min_skeleton_score:
         return fail("low_skeleton_score")
 
-    try:
-        joints, data = parse_bvh(base_bvh)
-    except (OSError, AssertionError, ValueError) as exc:
-        raise ValueError(f"invalid base BVH: {exc}") from exc
+    prepared_base = prepared_base or _prepare_base(base_bvh)
+    joints, data = prepared_base.joints, prepared_base.data
     if len(data) != 1:
         return fail("multiframe_base")
     frame0 = np.asarray(data[min(frame, len(data) - 1)], dtype=np.float64).copy()
-    _, kp_base, _, _, base_dirs, base_ok = _frame_state(joints, frame0, view)
+    _, kp_base, _, base_feature, base_dirs, base_ok = _frame_state(
+        joints, frame0, view
+    )
 
-    weights = (np.ones(len(_BONES), dtype=np.float64) if bone_weights is None
-               else np.asarray(bone_weights, dtype=np.float64))
-    if weights.shape != (len(_BONES),) or not np.all(np.isfinite(weights)):
-        raise ValueError(f"bone_weights must have shape ({len(_BONES)},) and be finite")
-    if np.any(weights < 0.0):
-        raise ValueError("bone_weights must be non-negative")
+    weights = prepared_target.bone_weights.copy()
     # effective score와 구조 mask를 뼈 단위로 결합한다.
     for index, (a, b) in enumerate(_BONES):
         weights[index] *= min(float(np.clip(scores[a], 0.0, 1.0)),
@@ -1274,6 +1603,18 @@ def _refine_bvh_v2_phase(base_bvh: str,
     weights, foreshortened_limbs = _foreshortened_direction_weights(
         kp_input, scores, weights, cfg
     )
+    # safe-aggressive의 두 번째 단계에서도 activation 기준은 C가 아니라 원본
+    # B0다. 그렇지 않으면 C가 절반 이상 개선한 순간 증거가 사라져 A가 남은
+    # extension을 마무리하지 못한다. 누적 bounds 역시 policy_base_frame(B0)을 쓴다.
+    extension_base_feature = base_feature
+    if policy_base_frame is not None:
+        _, _, _, extension_base_feature, *_ = _frame_state(
+            joints, policy_base_frame, view
+        )
+    extension_evidence = _single_leg_extension_evidence(
+        kp_input, scores, target_feature, extension_base_feature,
+        foreshortened_limbs, cfg,
+    )
 
     configured = list(ARM_LIMBS)
     if cfg.refine_v2_lower_body:
@@ -1284,6 +1625,10 @@ def _refine_bvh_v2_phase(base_bvh: str,
         if unknown:
             raise ValueError(f"unknown refinable limbs: {unknown}")
         configured = [name for name in configured if name in requested]
+    extension_evidence = {
+        limb: value for limb, value in extension_evidence.items()
+        if limb in configured
+    }
 
     bone_index = {tuple(b): i for i, b in enumerate(_BONES)}
     decisions = {}
@@ -1306,7 +1651,8 @@ def _refine_bvh_v2_phase(base_bvh: str,
         result.limb_decisions = decisions
         return result
 
-    target_dirs_legacy, target_ok_legacy = target_bone_dirs(kp_input, scores)
+    target_dirs_legacy = prepared_target.legacy_directions
+    target_ok_legacy = prepared_target.legacy_bones_ok
     observability = {
         limb: limb_observability(
             joints, frame0, view, limb,
@@ -1323,6 +1669,9 @@ def _refine_bvh_v2_phase(base_bvh: str,
         for limb in active:
             if observability[limb] >= floor:
                 kept.append(limb)
+            elif limb in extension_evidence:
+                kept.append(limb)
+                decisions[limb]["reason"] = "extension_observability_rescue"
             else:
                 decisions[limb]["reason"] = "low_observability"
         active = kept
@@ -1368,6 +1717,8 @@ def _refine_bvh_v2_phase(base_bvh: str,
             target_feature, target_dirs, target_valid, target_ok,
             weights, joint_weights, kp_base, base_collision_depths,
             cfg, deadline, torso=False, aggressive=aggressive,
+            policy_base_frame=policy_base_frame,
+            extension_limbs=tuple(extension_evidence),
         )
     except _RefineTimeout:
         for block in active:
@@ -1389,6 +1740,12 @@ def _refine_bvh_v2_phase(base_bvh: str,
         return result
 
     solved_frame = limb_solve["frame_solved"].copy()
+    # D0 평가 전용 계측: per-block alpha·안전 gate를 적용하기 전 full solve를
+    # 보존한다. 기본 None이므로 제품 endpoint의 파일/반환 계약은 변하지 않는다.
+    if diagnostic_candidate_out_path is not None:
+        write_single_frame_bvh(
+            base_bvh, solved_frame, diagnostic_candidate_out_path,
+        )
     adopted_frame = frame0.copy()
     target_contacts = _target_ground_contacts(target_feature, target_valid, cfg)
     safety_log = {}
@@ -1440,6 +1797,9 @@ def _refine_bvh_v2_phase(base_bvh: str,
                 round(float(value), 6) for value in endpoint_bone_weights
             ],
             "foreshortened_limbs": list(foreshortened_limbs),
+            "single_leg_extension": {
+                limb: dict(value) for limb, value in extension_evidence.items()
+            },
             "excluded_bones": excluded_bones,
             "block_alphas": {k: 0.0 for k in blocks},
             "safety": safety,
@@ -1468,6 +1828,13 @@ def _refine_bvh_v2_phase(base_bvh: str,
                 cfg,
             ),
             "ankle_counter_rotation": dict(ankle_counter_log),
+            "solver_profile": {
+                "nfev": int(limb_solve["nfev"] + ankle_counter_nfev),
+                "parameter_count": limb_solve["parameter_count"],
+                "active_objectives": limb_solve["active_objectives"],
+                "prepared_target_reused": prepared_target_reused,
+                "prepared_base_reused": prepared_base_reused,
+            },
             "torso": {"enabled": bool(cfg.refine_v2_torso_enabled),
                       "attempted": False, "accepted": False},
             "context": {
@@ -1542,7 +1909,8 @@ def _refine_bvh_v2_phase(base_bvh: str,
             counter_diag = {}
             if aggressive and block in LEG_LIMBS:
                 trial_frame, counter_diag, counter_nfev = _counter_rotate_feet(
-                    joints, frame0, trial_frame, view, (block,), cfg, deadline
+                    joints, frame0, trial_frame, view, (block,), cfg, deadline,
+                    policy_base_frame=policy_base_frame,
                 )
                 ankle_counter_nfev += counter_nfev
             block_metric = _metrics(
@@ -1577,6 +1945,16 @@ def _refine_bvh_v2_phase(base_bvh: str,
                         lap_contact_state, cfg):
                     last_reason = "lap_contact_regression"
                     continue
+            extension_status = None
+            if block in extension_evidence:
+                extension_status = _single_leg_extension_status(
+                    joints, trial_frame, view, target_feature,
+                    block, extension_evidence[block], cfg,
+                )
+                if not extension_status["accepted"]:
+                    last_reason = "extension_goal_not_met"
+                    extension_evidence[block]["final"] = extension_status
+                    continue
             safe, reason, safety = _limb_safety(
                 joints, frame0, trial_frame, view, block,
                 target_contacts, cfg,
@@ -1585,16 +1963,25 @@ def _refine_bvh_v2_phase(base_bvh: str,
             if not safe:
                 last_reason = reason
                 continue
-            chosen = (alpha, trial_frame, block_metric, safety, counter_diag)
+            chosen = (
+                alpha, trial_frame, block_metric, safety,
+                counter_diag, extension_status,
+            )
             break
         if chosen is None:
             decisions[block].update({"accepted": False, "reason": last_reason})
             safety_log[block] = last_safety
             return
-        alpha, adopted_frame, metric, safety, counter_diag = chosen
+        alpha, adopted_frame, metric, safety, counter_diag, extension_status = chosen
         if counter_diag:
             ankle_counter_log.update(counter_diag)
-        record_choice(block, alpha, metric, safety)
+        reason = "ok_foreshortened_extension" \
+            if block in extension_evidence else "ok"
+        record_choice(block, alpha, metric, safety, reason=reason)
+        if extension_status is not None:
+            extension_evidence[block].update(
+                accepted=True, reason=reason, final=extension_status
+            )
 
     if hand_pair_state.get("active"):
         hand_pair_adoption.update(attempted=True, reason="pair_no_gain")
@@ -1715,7 +2102,8 @@ def _refine_bvh_v2_phase(base_bvh: str,
             counter_diag = {}
             if aggressive:
                 trial_frame, counter_diag, counter_nfev = _counter_rotate_feet(
-                    joints, frame0, trial_frame, view, LEG_LIMBS, cfg, deadline
+                    joints, frame0, trial_frame, view, LEG_LIMBS, cfg, deadline,
+                    policy_base_frame=policy_base_frame,
                 )
                 ankle_counter_nfev += counter_nfev
             leg_metrics = {
@@ -1746,6 +2134,23 @@ def _refine_bvh_v2_phase(base_bvh: str,
                         lap_contact_state, cfg)):
                 lower_pair_adoption["reason"] = "lap_contact_regression"
                 continue
+            extension_failed = False
+            pair_extension_status = {}
+            for limb in LEG_LIMBS:
+                if limb not in extension_evidence:
+                    continue
+                status = _single_leg_extension_status(
+                    joints, trial_frame, view, target_feature,
+                    limb, extension_evidence[limb], cfg,
+                )
+                pair_extension_status[limb] = status
+                if not status["accepted"]:
+                    extension_failed = True
+            if extension_failed:
+                lower_pair_adoption["reason"] = "extension_goal_not_met"
+                for limb, status in pair_extension_status.items():
+                    extension_evidence[limb]["final"] = status
+                continue
             trial_metrics = {
                 block: _metrics(
                     joints, trial_frame, view, target_feature, target_dirs,
@@ -1775,10 +2180,19 @@ def _refine_bvh_v2_phase(base_bvh: str,
                 loss_adopted=round(float(pair_loss), 8),
             )
             for limb in LEG_LIMBS:
+                choice_reason = (
+                    "ok_foreshortened_extension"
+                    if limb in extension_evidence else "ok_lower_pair"
+                )
                 record_choice(
                     limb, alpha, leg_metrics[limb], pair_safety[limb],
-                    reason="ok_lower_pair",
+                    reason=choice_reason,
                 )
+                if limb in pair_extension_status:
+                    extension_evidence[limb].update(
+                        accepted=True, reason=choice_reason,
+                        final=pair_extension_status[limb],
+                    )
             break
 
     # 공동 채택이 불가능할 때만, pair 관계를 더 나쁘게 만들지 않는 범위에서
@@ -1871,6 +2285,7 @@ def _refine_bvh_v2_phase(base_bvh: str,
                     _base_collision_depths(joints, adopted_frame, view,
                                            tuple(adopted_limbs), cfg),
                     cfg, deadline, torso=True, aggressive=aggressive,
+                    policy_base_frame=policy_base_frame,
                 )
             except _RefineTimeout:
                 torso_solve = None
@@ -1986,6 +2401,13 @@ def _refine_bvh_v2_phase(base_bvh: str,
     if out_path is None:
         out_path = os.path.splitext(base_bvh)[0] + ".refined.v2.bvh"
     write_single_frame_bvh(base_bvh, adopted_frame, out_path)
+    if state_out is not None:
+        state_out.clear()
+        state_out.update({
+            "joints": joints,
+            "frame": adopted_frame.copy(),
+            "path": str(out_path),
+        })
 
     final_direction = final_aggregate["direction"]
     diagnostics = {
@@ -2005,6 +2427,9 @@ def _refine_bvh_v2_phase(base_bvh: str,
             round(float(value), 6) for value in endpoint_bone_weights
         ],
         "foreshortened_limbs": list(foreshortened_limbs),
+        "single_leg_extension": {
+            limb: dict(value) for limb, value in extension_evidence.items()
+        },
         "excluded_bones": excluded_bones,
         "block_alphas": {block: decisions[block]["alpha"] for block in blocks},
         "safety": safety_log,
@@ -2033,6 +2458,13 @@ def _refine_bvh_v2_phase(base_bvh: str,
             cfg,
         ),
         "ankle_counter_rotation": dict(ankle_counter_log),
+        "solver_profile": {
+            "nfev": int(total_nfev),
+            "parameter_count": limb_solve["parameter_count"],
+            "active_objectives": limb_solve["active_objectives"],
+            "prepared_target_reused": prepared_target_reused,
+            "prepared_base_reused": prepared_base_reused,
+        },
         "torso": torso_diag,
         "context": {
             "search_distance": search_distance,
@@ -2067,6 +2499,7 @@ def _refine_bvh_v2_phase(base_bvh: str,
 
 
 def _phase_summary(result: RefineResult) -> dict:
+    profile = result.diagnostics.get("solver_profile", {})
     return {
         "refined": bool(result.refined),
         "reason": result.reason,
@@ -2078,6 +2511,7 @@ def _phase_summary(result: RefineResult) -> dict:
         "iterations": int(result.iterations),
         "backend": result.backend,
         "limbs": list(result.limbs),
+        "solver_profile": dict(profile),
     }
 
 
@@ -2091,7 +2525,7 @@ def _decorate_mode(result: RefineResult, requested: str, applied: str,
             key: phase.diagnostics[key]
             for key in (
                 "hand_pair", "lap_contact", "lower_pair",
-                "ankle_counter_rotation",
+                "ankle_counter_rotation", "single_leg_extension",
             )
             if key in phase.diagnostics
         }
@@ -2118,6 +2552,518 @@ def _decorate_mode(result: RefineResult, requested: str, applied: str,
     return result
 
 
+def _refine_bvh_v2_impl(base_bvh: str,
+                        target_keypoints,
+                        target_scores=None,
+                        view: str = "front",
+                        out_path: Optional[str] = None,
+                        search_distance: Optional[float] = None,
+                        frame: int = 0,
+                        bone_weights: Optional[Sequence[float]] = None,
+                        allowed_limbs: Optional[Sequence[str]] = None,
+                        lower_body_observed: Optional[bool] = None,
+                        deadline: Optional[float] = None,
+                        refine_mode: str = "conservative",
+                        diagnostic_candidate_out_path: Optional[str] = None,
+                        cfg=CFG) -> RefineResult:
+    """v2.5 safe-aggressive 오케스트레이터.
+
+    기존 phase 내부의 block alpha/rollback 뒤에 독립 final selector를 둔다.
+    selector는 최초 원본 ``base_bvh`` 대비 구조 안전과 conservative 대비 공통
+    metric non-regression을 모두 통과한 aggressive artifact만 반환한다.
+    """
+    if refine_mode not in ("conservative", "aggressive"):
+        raise ValueError(
+            "refine_mode must be 'conservative' or 'aggressive'"
+        )
+    lower_body_policy = bool(lower_body_observed is True)
+    if allowed_limbs is None:
+        effective_allowed_limbs = None if lower_body_policy else list(ARM_LIMBS)
+    else:
+        effective_allowed_limbs = list(dict.fromkeys(
+            str(name) for name in allowed_limbs
+        ))
+        if not lower_body_policy:
+            effective_allowed_limbs = [
+                name for name in effective_allowed_limbs
+                if name not in LEG_LIMBS
+            ]
+    request_started = time.monotonic()
+    total_budget_ms = (
+        None if deadline is None
+        else max(0.0, (deadline - request_started) * 1000.0)
+    )
+    prepare_started = time.monotonic()
+    prepared_target = None
+    policy_base = None
+    policy_base_frame = None
+    if cfg.refine_enabled:
+        prepared_target = _prepare_target(
+            target_keypoints, target_scores, bone_weights
+        )
+        policy_base = _prepare_base(base_bvh)
+        if len(policy_base.data) == 1:
+            policy_base_frame = np.asarray(
+                policy_base.data[min(frame, len(policy_base.data) - 1)],
+                dtype=np.float64,
+            ).copy()
+    prepare_ms = (time.monotonic() - prepare_started) * 1000.0
+
+    def add_v25_diagnostics(result, *, selector, candidate_status,
+                            conservative_ms, aggressive_ms=0.0,
+                            aggressive_activity=None):
+        selector = dict(selector or {})
+        postcheck_started = time.monotonic()
+        if result.refined:
+            try:
+                from .refine_selector import final_collision_safety
+                final_collision = final_collision_safety(
+                    base_bvh, result.bvh_path, cfg
+                )
+            except Exception as exc:
+                final_collision = {
+                    "passed": False,
+                    "violations": [{
+                        "type": "final_collision_postcheck_error",
+                        "error": f"{type(exc).__name__}: {exc}",
+                    }],
+                    "checks": {},
+                }
+            if not final_collision["passed"]:
+                failed_path = result.bvh_path
+                if os.path.abspath(failed_path) != os.path.abspath(base_bvh):
+                    try:
+                        os.unlink(failed_path)
+                    except OSError:
+                        pass
+                for decision in result.limb_decisions.values():
+                    if decision.get("accepted"):
+                        decision.update(
+                            accepted=False,
+                            reason="final_collision_gate",
+                            alpha=0.0,
+                        )
+                result.refined = False
+                result.reason = "final_collision_gate"
+                result.bvh_path = base_bvh
+                if np.isfinite(result.loss_base):
+                    result.loss_final = result.loss_base
+                result.limbs = ()
+                candidate_status = "rejected_final_collision"
+                selector.update({
+                    "accepted": False,
+                    "selected_mode": "base",
+                    "fallback_stage": "final_collision",
+                    "fallback_reason": "final_collision_gate",
+                })
+        else:
+            final_collision = {
+                "passed": True,
+                "skipped": True,
+                "reason": "base_selected",
+                "violations": [],
+                "checks": {},
+            }
+        extension_postcheck = {
+            "passed": True,
+            "skipped": True,
+            "reason": "no_accepted_single_leg_extension",
+            "checks": {},
+        }
+        accepted_extensions = {
+            limb: evidence
+            for limb, evidence in (
+                result.diagnostics.get("single_leg_extension", {}) or {}
+            ).items()
+            if evidence.get("active") and evidence.get("accepted")
+        }
+        if result.refined and accepted_extensions:
+            try:
+                final_base = _prepare_base(result.bvh_path)
+                if len(final_base.data) != 1:
+                    raise ValueError("final extension artifact must be single-frame")
+                checks = {
+                    limb: _single_leg_extension_status(
+                        final_base.joints, final_base.data[0], view,
+                        prepared_target.feature, limb, evidence, cfg,
+                    )
+                    for limb, evidence in accepted_extensions.items()
+                }
+                extension_postcheck = {
+                    "passed": all(row["accepted"] for row in checks.values()),
+                    "skipped": False,
+                    "reason": "ok" if all(
+                        row["accepted"] for row in checks.values()
+                    ) else "final_extension_goal_not_met",
+                    "checks": checks,
+                }
+            except Exception as exc:
+                extension_postcheck = {
+                    "passed": False,
+                    "skipped": False,
+                    "reason": "final_extension_postcheck_error",
+                    "checks": {},
+                    "error": f"{type(exc).__name__}: {exc}",
+                }
+            if not extension_postcheck["passed"]:
+                failed_path = result.bvh_path
+                if os.path.abspath(failed_path) != os.path.abspath(base_bvh):
+                    try:
+                        os.unlink(failed_path)
+                    except OSError:
+                        pass
+                for decision in result.limb_decisions.values():
+                    if decision.get("accepted"):
+                        decision.update(
+                            accepted=False,
+                            reason="final_extension_gate",
+                            alpha=0.0,
+                        )
+                result.refined = False
+                result.reason = "final_extension_gate"
+                result.bvh_path = base_bvh
+                if np.isfinite(result.loss_base):
+                    result.loss_final = result.loss_base
+                result.limbs = ()
+                candidate_status = "rejected_final_extension"
+                selector.update({
+                    "accepted": False,
+                    "selected_mode": "base",
+                    "fallback_stage": "final_extension",
+                    "fallback_reason": "final_extension_gate",
+                })
+        postcheck_ms = (time.monotonic() - postcheck_started) * 1000.0
+        diagnostics = dict(result.diagnostics)
+        if (not final_collision.get("passed", False)
+                or not extension_postcheck.get("passed", False)):
+            diagnostics["mode_applied"] = "base"
+            diagnostics["refine_outcome"] = "reverted"
+        diagnostics.update({
+            "mode_effective": refine_mode,
+            "lower_body_observed": lower_body_policy,
+            "lower_body_policy": (
+                "enabled" if lower_body_policy else "all_lower_frozen"
+            ),
+            "candidate_status": candidate_status,
+            "aggressive_activity": aggressive_activity,
+            "selector": selector,
+            "final_collision_postcheck": final_collision,
+            "final_single_leg_extension_postcheck": extension_postcheck,
+            "time_budget": {
+                "total_ms": total_budget_ms,
+                "prepare_ms": round(float(prepare_ms), 3),
+                "conservative_ms": round(float(conservative_ms), 3),
+                "aggressive_ms": round(float(aggressive_ms), 3),
+                "selector_ms": round(float(
+                    selector.get("selector_ms", 0.0)
+                ), 3),
+                "final_postcheck_ms": round(float(postcheck_ms), 3),
+                "remaining_ms": (
+                    None if deadline is None else round(max(
+                        0.0, (deadline - time.monotonic()) * 1000.0
+                    ), 3)
+                ),
+                "elapsed_ms": round(
+                    (time.monotonic() - request_started) * 1000.0, 3
+                ),
+            },
+        })
+        result.diagnostics = diagnostics
+        return result
+
+    common = dict(
+        target_scores=target_scores,
+        view=view,
+        search_distance=search_distance,
+        frame=frame,
+        bone_weights=bone_weights,
+        allowed_limbs=effective_allowed_limbs,
+        deadline=deadline,
+        prepared_target=prepared_target,
+        policy_base_frame=policy_base_frame,
+        cfg=cfg,
+    )
+    if refine_mode == "conservative":
+        phase_started = time.monotonic()
+        conservative = _refine_bvh_v2_phase(
+            base_bvh, target_keypoints, out_path=out_path,
+            aggressive=False, prepared_base=policy_base, **common,
+        )
+        conservative_ms = (time.monotonic() - phase_started) * 1000.0
+        applied = "conservative" if conservative.refined else "base"
+        result = _decorate_mode(
+            conservative, refine_mode, applied, conservative
+        )
+        return add_v25_diagnostics(
+            result,
+            selector={
+                "version": REFINE_V2_CODE_VERSION,
+                "accepted": False,
+                "selected_mode": applied,
+                "candidate_available": False,
+                "fallback_stage": None,
+                "fallback_reason": "conservative_requested",
+                "structural_checks": {},
+                "metrics": {},
+                "selector_ms": 0.0,
+            },
+            candidate_status="not_attempted",
+            conservative_ms=conservative_ms,
+        )
+
+    final_path = out_path or (
+        os.path.splitext(base_bvh)[0] + ".refined.v2.bvh"
+    )
+    output_dir = os.path.dirname(os.path.abspath(final_path)) or "."
+    os.makedirs(output_dir, exist_ok=True)
+    descriptor, conservative_path = tempfile.mkstemp(
+        prefix=".refine-v25-conservative-", suffix=".bvh", dir=output_dir
+    )
+    os.close(descriptor)
+    os.unlink(conservative_path)
+    descriptor, aggressive_path = tempfile.mkstemp(
+        prefix=".refine-v25-aggressive-", suffix=".bvh", dir=output_dir
+    )
+    os.close(descriptor)
+    os.unlink(aggressive_path)
+    aggressive_result = None
+    conservative_ms = 0.0
+    aggressive_ms = 0.0
+    try:
+        conservative_state = {}
+        conservative_started = time.monotonic()
+        conservative = _refine_bvh_v2_phase(
+            base_bvh, target_keypoints, out_path=conservative_path,
+            aggressive=False, prepared_base=policy_base,
+            state_out=conservative_state, **common,
+        )
+        conservative_ms = (time.monotonic() - conservative_started) * 1000.0
+        can_attempt = bool(
+            conservative.refined
+            or conservative.reason in ("already_matched", "unchanged_geometry")
+        )
+        if not can_attempt:
+            result = _decorate_mode(
+                conservative, refine_mode, "base", conservative
+            )
+            return add_v25_diagnostics(
+                result,
+                selector={
+                    "version": REFINE_V2_CODE_VERSION,
+                    "accepted": False,
+                    "selected_mode": "base",
+                    "candidate_available": False,
+                    "fallback_stage": "conservative",
+                    "fallback_reason": conservative.reason,
+                    "structural_checks": {}, "metrics": {}, "selector_ms": 0.0,
+                },
+                candidate_status="not_attempted",
+                conservative_ms=conservative_ms,
+            )
+
+        conservative_reference = (
+            conservative_path if conservative.refined else base_bvh
+        )
+        conservative_mode = "conservative" if conservative.refined else "base"
+        # B0+query가 정한 안전 정책은 그대로 유지하되, aggressive 전용
+        # objective가 C 결과에서 이미 충족됐는지는 C의 메모리 상태로 판정한다.
+        # 반복 solve 안에서 cohort를 바꾸는 것이 아니라 C→A 경계에서 단 한 번
+        # 확인하므로 적응적 objective 소실 없이 불필요한 두 번째 solve를 줄인다.
+        aggressive_prepared_base = policy_base
+        if conservative.refined and conservative_state:
+            aggressive_prepared_base = _PreparedBase(
+                conservative_reference,
+                conservative_state["joints"],
+                np.asarray([conservative_state["frame"]], dtype=np.float64),
+            )
+        eligible_blocks = [
+            name for name, decision in conservative.limb_decisions.items()
+            if decision.get("reason") not in {
+                "low_observability", "invisible_target",
+            }
+        ]
+        aggressive_activity = _aggressive_objective_activity(
+            aggressive_prepared_base, prepared_target, view,
+            effective_allowed_limbs,
+            eligible_blocks, cfg,
+        )
+        reserve = max(float(cfg.refine_v25_final_check_reserve_seconds), 0.0)
+        minimum = max(float(cfg.refine_v25_aggressive_min_remaining_seconds), 0.0)
+        remaining = None if deadline is None else deadline - time.monotonic()
+        if remaining is not None and remaining < minimum + reserve:
+            if conservative.refined:
+                os.replace(conservative_path, final_path)
+                conservative.bvh_path = final_path
+            result = _decorate_mode(
+                conservative, refine_mode, conservative_mode, conservative
+            )
+            return add_v25_diagnostics(
+                result,
+                selector={
+                    "version": REFINE_V2_CODE_VERSION,
+                    "accepted": False,
+                    "selected_mode": conservative_mode,
+                    "candidate_available": False,
+                    "fallback_stage": "deadline",
+                    "fallback_reason": "aggressive_insufficient_time",
+                    "structural_checks": {}, "metrics": {}, "selector_ms": 0.0,
+                },
+                candidate_status="not_attempted",
+                conservative_ms=conservative_ms,
+                aggressive_activity=aggressive_activity,
+            )
+        # 마감시간 안전 판정이 항상 최우선이다. 또한 D0/진단 실행은 실제
+        # aggressive 후보를 보존해야 하므로 비활성 objective 단축을 적용하지 않는다.
+        inactive_budget_risk = bool(
+            total_budget_ms is not None
+            and conservative_ms >= total_budget_ms * float(
+                cfg.refine_v25_inactive_skip_budget_fraction
+            )
+        )
+        if (bool(cfg.refine_v25_skip_inactive_aggressive)
+                and diagnostic_candidate_out_path is None
+                and not aggressive_activity["active"]
+                and inactive_budget_risk):
+            if conservative.refined:
+                os.replace(conservative_path, final_path)
+                conservative.bvh_path = final_path
+            result = _decorate_mode(
+                conservative, refine_mode, conservative_mode, conservative
+            )
+            return add_v25_diagnostics(
+                result,
+                selector={
+                    "version": REFINE_V2_CODE_VERSION,
+                    "accepted": False,
+                    "selected_mode": conservative_mode,
+                    "candidate_available": False,
+                    "fallback_stage": "objective",
+                    "fallback_reason": "aggressive_objectives_inactive_budget_risk",
+                    "structural_checks": {}, "metrics": {}, "selector_ms": 0.0,
+                },
+                candidate_status="not_attempted",
+                conservative_ms=conservative_ms,
+                aggressive_activity=aggressive_activity,
+            )
+
+        aggressive_base = conservative_reference
+        aggressive_deadline = (
+            None if deadline is None else max(time.monotonic(), deadline - reserve)
+        )
+        aggressive_common = dict(common)
+        aggressive_common["deadline"] = aggressive_deadline
+        aggressive_started = time.monotonic()
+        aggressive_result = _refine_bvh_v2_phase(
+            aggressive_base, target_keypoints, out_path=aggressive_path,
+            aggressive=True,
+            diagnostic_candidate_out_path=diagnostic_candidate_out_path,
+            prepared_base=aggressive_prepared_base,
+            **aggressive_common,
+        )
+        aggressive_ms = (time.monotonic() - aggressive_started) * 1000.0
+        if aggressive_result.refined:
+            from .refine_selector import select_aggressive
+            decision = select_aggressive(
+                policy_base_path=base_bvh,
+                conservative_path=conservative_reference,
+                aggressive_path=aggressive_path,
+                conservative_mode=conservative_mode,
+                target_keypoints=target_keypoints,
+                target_scores=target_scores,
+                view=view,
+                allowed_limbs=effective_allowed_limbs,
+                deadline=deadline,
+                cfg=cfg,
+                trust_limits=_JOINT_DELTA_LIMITS,
+            )
+            selector = decision.to_dict()
+            if decision.candidate_accepted:
+                os.replace(decision.selected_path, final_path)
+                aggressive_result.bvh_path = final_path
+                original_base_loss = conservative.loss_base
+                if np.isfinite(original_base_loss):
+                    aggressive_result.loss_base = original_base_loss
+                aggressive_result.iterations += conservative.iterations
+                aggressive_result.backend = "+".join(dict.fromkeys(
+                    part for part in (
+                        conservative.backend, aggressive_result.backend
+                    ) if part != "none"
+                )) or "none"
+                aggressive_result.limbs = tuple(dict.fromkeys(
+                    tuple(conservative.limbs) + tuple(aggressive_result.limbs)
+                ))
+                merged_decisions = {
+                    key: dict(value)
+                    for key, value in conservative.limb_decisions.items()
+                }
+                for key, value in aggressive_result.limb_decisions.items():
+                    if value.get("accepted") or key not in merged_decisions:
+                        merged_decisions[key] = dict(value)
+                aggressive_result.limb_decisions = merged_decisions
+                result = _decorate_mode(
+                    aggressive_result, refine_mode, "aggressive",
+                    conservative, aggressive_result,
+                )
+                return add_v25_diagnostics(
+                    result, selector=selector, candidate_status="generated",
+                    conservative_ms=conservative_ms, aggressive_ms=aggressive_ms,
+                    aggressive_activity=aggressive_activity,
+                )
+
+            if conservative.refined:
+                os.replace(conservative_path, final_path)
+                conservative.bvh_path = final_path
+            result = _decorate_mode(
+                conservative, refine_mode, conservative_mode,
+                conservative, aggressive_result,
+            )
+            return add_v25_diagnostics(
+                result, selector=selector, candidate_status="generated",
+                conservative_ms=conservative_ms, aggressive_ms=aggressive_ms,
+                aggressive_activity=aggressive_activity,
+            )
+
+        if conservative.refined:
+            os.replace(conservative_path, final_path)
+            conservative.bvh_path = final_path
+            applied = "conservative"
+        else:
+            applied = "base"
+        result = _decorate_mode(
+            conservative, refine_mode, applied,
+            conservative, aggressive_result,
+        )
+        candidate_status = (
+            "timeout" if aggressive_result.reason == "timeout"
+            else "already_matched" if aggressive_result.reason == "already_matched"
+            else "not_attempted" if aggressive_result.reason in {
+                "low_observability", "no_solvable_joints", "insufficient_target_bones",
+            }
+            else "no_gain"
+        )
+        return add_v25_diagnostics(
+            result,
+            selector={
+                "version": REFINE_V2_CODE_VERSION,
+                "accepted": False,
+                "selected_mode": applied,
+                "candidate_available": False,
+                "fallback_stage": "aggressive",
+                "fallback_reason": f"aggressive_{aggressive_result.reason}",
+                "structural_checks": {}, "metrics": {}, "selector_ms": 0.0,
+            },
+            candidate_status=candidate_status,
+            conservative_ms=conservative_ms,
+            aggressive_ms=aggressive_ms,
+            aggressive_activity=aggressive_activity,
+        )
+    finally:
+        if os.path.exists(conservative_path):
+            os.unlink(conservative_path)
+        if os.path.exists(aggressive_path):
+            os.unlink(aggressive_path)
+
+
 def refine_bvh_v2(base_bvh: str,
                   target_keypoints,
                   target_scores=None,
@@ -2127,102 +3073,50 @@ def refine_bvh_v2(base_bvh: str,
                   frame: int = 0,
                   bone_weights: Optional[Sequence[float]] = None,
                   allowed_limbs: Optional[Sequence[str]] = None,
+                  lower_body_observed: Optional[bool] = None,
                   deadline: Optional[float] = None,
                   refine_mode: str = "conservative",
+                  diagnostic_candidate_out_path: Optional[str] = None,
                   cfg=CFG) -> RefineResult:
-    """v2.4 모드 오케스트레이터. aggressive 실패 시 conservative를 반환한다."""
-    if refine_mode not in ("conservative", "aggressive"):
-        raise ValueError(
-            "refine_mode must be 'conservative' or 'aggressive'"
-        )
-    common = dict(
-        target_scores=target_scores,
-        view=view,
-        search_distance=search_distance,
-        frame=frame,
-        bone_weights=bone_weights,
-        allowed_limbs=allowed_limbs,
-        deadline=deadline,
+    """v2.5 오케스트레이터의 산출물 전달 계층.
+
+    selector와 FINAL post-check는 후보를 실제 BVH로 다시 parse/FK해 검증하므로
+    내부적으로는 파일이 필요하다. 하지만 제품 API는 조정본을 응답 본문으로만
+    보내므로(docs/REFINE_HANDOFF.md §3 4단계), ``out_path=None``이면 그 파일들을
+    요청 수명의 임시 디렉터리에 만들고 끝나면 통째로 지운다. 남는 것은
+    ``RefineResult.bvh_text`` 하나뿐이다.
+
+    ``out_path``를 준 호출(평가·진단 스크립트)은 기존처럼 파일을 받는다.
+    """
+    forward = dict(
+        target_scores=target_scores, view=view,
+        search_distance=search_distance, frame=frame,
+        bone_weights=bone_weights, allowed_limbs=allowed_limbs,
+        lower_body_observed=lower_body_observed, deadline=deadline,
+        refine_mode=refine_mode,
+        diagnostic_candidate_out_path=diagnostic_candidate_out_path,
         cfg=cfg,
     )
-    if refine_mode == "conservative":
-        conservative = _refine_bvh_v2_phase(
-            base_bvh, target_keypoints, out_path=out_path,
-            aggressive=False, **common,
+    if out_path is not None:
+        result = _refine_bvh_v2_impl(
+            base_bvh, target_keypoints, out_path=out_path, **forward
         )
-        applied = "conservative" if conservative.refined else "base"
-        return _decorate_mode(
-            conservative, refine_mode, applied, conservative
-        )
+        if result.refined and result.bvh_path and os.path.exists(result.bvh_path):
+            with open(result.bvh_path, encoding="utf-8") as source:
+                result.bvh_text = source.read()
+        return result
 
-    final_path = out_path or (
-        os.path.splitext(base_bvh)[0] + ".refined.v2.bvh"
-    )
-    output_dir = os.path.dirname(os.path.abspath(final_path)) or "."
-    os.makedirs(output_dir, exist_ok=True)
-    descriptor, conservative_path = tempfile.mkstemp(
-        prefix=".refine-v24-conservative-", suffix=".bvh", dir=output_dir
-    )
-    os.close(descriptor)
-    os.unlink(conservative_path)
-    aggressive_result = None
-    try:
-        conservative = _refine_bvh_v2_phase(
-            base_bvh, target_keypoints, out_path=conservative_path,
-            aggressive=False, **common,
+    with tempfile.TemporaryDirectory(prefix="refine-v25-") as scratch:
+        result = _refine_bvh_v2_impl(
+            base_bvh, target_keypoints,
+            out_path=os.path.join(scratch, "final.bvh"), **forward
         )
-        can_attempt = bool(
-            conservative.refined
-            or conservative.reason in ("already_matched", "unchanged_geometry")
-        )
-        if not can_attempt:
-            return _decorate_mode(
-                conservative, refine_mode, "base", conservative
-            )
-
-        aggressive_base = (
-            conservative_path if conservative.refined else base_bvh
-        )
-        aggressive_result = _refine_bvh_v2_phase(
-            aggressive_base, target_keypoints, out_path=final_path,
-            aggressive=True, **common,
-        )
-        if aggressive_result.refined:
-            original_base_loss = conservative.loss_base
-            if np.isfinite(original_base_loss):
-                aggressive_result.loss_base = original_base_loss
-            aggressive_result.iterations += conservative.iterations
-            aggressive_result.backend = "+".join(dict.fromkeys(
-                part for part in (
-                    conservative.backend, aggressive_result.backend
-                ) if part != "none"
-            )) or "none"
-            aggressive_result.limbs = tuple(dict.fromkeys(
-                tuple(conservative.limbs) + tuple(aggressive_result.limbs)
-            ))
-            merged_decisions = {
-                key: dict(value)
-                for key, value in conservative.limb_decisions.items()
-            }
-            for key, value in aggressive_result.limb_decisions.items():
-                if value.get("accepted") or key not in merged_decisions:
-                    merged_decisions[key] = dict(value)
-            aggressive_result.limb_decisions = merged_decisions
-            return _decorate_mode(
-                aggressive_result, refine_mode, "aggressive",
-                conservative, aggressive_result,
-            )
-
-        if conservative.refined:
-            os.replace(conservative_path, final_path)
-            conservative.bvh_path = final_path
-            applied = "conservative"
+        if result.refined and result.bvh_path and os.path.exists(result.bvh_path):
+            with open(result.bvh_path, encoding="utf-8") as source:
+                result.bvh_text = source.read()
+            result.bvh_path = None
         else:
-            applied = "base"
-        return _decorate_mode(
-            conservative, refine_mode, applied,
-            conservative, aggressive_result,
-        )
-    finally:
-        if os.path.exists(conservative_path):
-            os.unlink(conservative_path)
+            # 폐기됐으면 베이스 원본을 가리키고 본문은 싣지 않는다.
+            result.bvh_text = None
+            result.bvh_path = base_bvh
+        return result

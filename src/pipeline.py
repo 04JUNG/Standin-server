@@ -116,6 +116,12 @@ class Pipeline:
         with span("slot_assignment"):
             assignment = assign_candidates(vlm.approx_boxes, list(skeletons),
                                            img_w, img_h, CFG)
+        for slot in assignment.slots:
+            slot.lower_body_observed = bool(
+                slot.slot_origin == "vlm"
+                and slot.slot_id < len(vlm.lower_body_visible)
+                and vlm.lower_body_visible[slot.slot_id] is True
+            )
         notes = list(count_record["notes"])
         count_confidence = count_record["confidence"]
         if assignment.invalid_vlm_box_reasons:
@@ -301,6 +307,11 @@ class Pipeline:
         refinable_limbs = tuple(
             limb for limb in evidence_limbs if limb in configured_limbs
         )
+        if not desc.lower_body_observed:
+            refinable_limbs = tuple(
+                limb for limb in refinable_limbs
+                if limb not in {"left_leg", "right_leg"}
+            )
         structural_allowed = bool(
             evidence is not None
             and structural_refine_allowed(
@@ -319,6 +330,11 @@ class Pipeline:
         )
         desc.refine_allowed = allowed
         desc.refinable_limbs = refinable_limbs
+        desc.quality_trace["lower_body_observed"] = bool(
+            desc.lower_body_observed
+        )
+        if not desc.lower_body_observed:
+            desc.quality_trace["lower_body_policy"] = "all_lower_frozen"
         desc.quality_trace["refine_policy"] = (
             "v2_structural" if CFG.refine_v2_enabled else "v1_search_and_structural"
         )

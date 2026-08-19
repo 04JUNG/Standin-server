@@ -37,7 +37,7 @@ from .collision import (ARM_JOINTS, arm_torso_penetration, collision_dict,
 
 
 REFINE_CODE_VERSION = "v1.3"
-REFINE_V2_CODE_VERSION = "v2.4.0"
+REFINE_V2_CODE_VERSION = "v2.5.3"
 
 
 # ---- 축소판 파라미터 (설계문서 §4-1) --------------------------------------
@@ -567,8 +567,10 @@ def refine_bvh(base_bvh: str,
                frame: int = 0,
                bone_weights: Optional[Sequence[float]] = None,
                allowed_limbs: Optional[Sequence[str]] = None,
+               lower_body_observed: Optional[bool] = None,
                deadline: Optional[float] = None,
                refine_mode: str = "conservative",
+               diagnostic_candidate_out_path: Optional[str] = None,
                cfg=CFG) -> RefineResult:
     """
     베이스 BVH를 러프 2D 스켈레톤에 맞춰 미세조정한다.
@@ -582,6 +584,7 @@ def refine_bvh(base_bvh: str,
                           본문은 RefineResult.bvh_text로만 돌려준다
         search_distance:  /analyze가 낸 Top-1 거리. 주면 게이트 5(베이스 불일치) 작동
         allowed_limbs:    스켈레톤 품질 단계가 허용한 사지. None이면 기존 동작
+        lower_body_observed: true가 아니면 v2의 모든 하체 조정을 동결
         frame:            베이스 BVH에서 사용할 프레임(라이브러리 색인과 동일하게 0)
         refine_mode:      v2.5 conservative | safe aggressive. v1은 conservative만 허용
 
@@ -602,7 +605,9 @@ def refine_bvh(base_bvh: str,
             base_bvh, target_keypoints, target_scores, view,
             out_path=out_path, search_distance=search_distance, frame=frame,
             bone_weights=bone_weights, allowed_limbs=allowed_limbs,
+            lower_body_observed=lower_body_observed,
             deadline=deadline, refine_mode=refine_mode, cfg=cfg,
+            diagnostic_candidate_out_path=diagnostic_candidate_out_path,
         )
     if refine_mode != "conservative":
         raise ValueError("aggressive refine_mode requires REFINE_V2_ENABLED=1")

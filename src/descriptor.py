@@ -115,6 +115,7 @@ def build_slot_descriptors(vlm: VLMAnalysis, slots) -> List[PersonDescriptor]:
             refine_allowed=refine_allowed,
             valid_limbs=(evidence.valid_limbs if evidence is not None else ()),
             refinable_limbs=(evidence.refinable_limbs if evidence is not None else ()),
+            lower_body_observed=bool(slot.lower_body_observed),
             raw_scores=(evidence.raw_scores.copy() if evidence is not None else None),
             search_stability=slot.search_stability,
             distance_metric=None,

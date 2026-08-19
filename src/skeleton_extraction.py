@@ -92,6 +92,7 @@ class PersonSlot:
     confidence_threshold: Optional[float] = None
     retry_reason: Optional[str] = None
     retry_elapsed_ms: float = 0.0
+    lower_body_observed: bool = False
 
     @property
     def result_box(self) -> Optional[BBox]:

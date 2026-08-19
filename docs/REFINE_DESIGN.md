@@ -1,9 +1,10 @@
 # Refine 설계
 
-> 상태: production 현재 기준(v1) · 갱신일: 2026-08-11 · 기준 코드: `src/refine.py`, `src/collision.py`, `api/app.py`, `api/models.py`
+> 상태: v1 fallback·공통 안전 게이트 기준 · 갱신일: 2026-08-18 · 기준 코드: `src/refine.py`, `src/collision.py`, `api/app.py`, `api/models.py`
 >
-> 승인된 v2는 `src/refine_v2.py`에 feature flag로 구현되어 있다. 고정 holdout 승격 전까지
-> `REFINE_V2_ENABLED=0`이 기본이며, v2 계약·남은 증거는 `REFINE_V2_DESIGN.md`를 따른다.
+> 제품 기본은 `REFINE_V2_ENABLED=1`, `REFINE_DEFAULT_MODE=aggressive`인 v2.5 safe aggressive다.
+> 이 문서는 v1 fallback과 v2가 공유하는 기초 안전 게이트를 보존하며, 현재 v2.5 정책은
+> `REFINE_V2_DESIGN.md`를 따른다.
 
 ## 목적
 
@@ -126,7 +127,7 @@ scipy `least_squares`를 우선 사용하고, 사용할 수 없거나 진행하�
 
 정확한 HTTP 필드와 전체 enum은 [`API_CONTRACT.md`](API_CONTRACT.md)와 `api/models.py`를 따른다.
 
-## 기본 설정
+## v1 fallback 기본 설정
 
 | env | 기본값 | 의미 |
 |---|---:|---|
@@ -179,10 +180,12 @@ scipy `least_squares`를 우선 사용하고, 사용할 수 없거나 진행하�
 - COCO-17만 사용하므로 손바닥·손가락·발 방향을 직접 추론하지 못한다.
 - 머리·척추·루트 위치는 조정하지 않는다.
 - 잘못된 베이스나 라이브러리 공백은 refine으로 해결할 수 없다.
-- 조정본은 현재 추론 태스크 로컬 파일이다. production 활성화 전 영속 저장이 필요하다.
-- BFF 프록시, 클라이언트 preview와 최종 export 연결이 완료되기 전 production에서는 refine을 꺼야 한다.
+- 조정본은 현재 추론 태스크 로컬 파일이다. 다중 태스크 운영 전 공유 영속 저장 또는 동일 태스크
+  라우팅이 필요하다.
+- BFF는 `/refine` 응답의 최종 `bvh_url`을 보존해야 한다. 기존 `/export-order`만 다시 호출하면
+  조정본이 원본 URL로 되돌아갈 수 있다.
 
-통합 조건은 [`PR10_MAIN_MERGE_REQUIREMENTS.md`](PR10_MAIN_MERGE_REQUIREMENTS.md)를 따른다.
+통합 조건은 [`REFINE_API_V25_BACKEND_BFF_HANDOFF.md`](REFINE_API_V25_BACKEND_BFF_HANDOFF.md)를 따른다.
 
 ## 구현 과정 기록
 

@@ -3,14 +3,31 @@
 data/
 *.refined.bvh
 
-# refine/eval 산출물
+# refine/eval 산출물 — out/ 전체(약 150MB, 69개 run 디렉터리)를 무시한다.
+# 단 설계/승격 문서가 증거로 인용하는 소형 텍스트 리포트만 예외로 추적한다.
+# (`!out/**/`가 있어야 git이 하위 디렉터리를 계속 탐색해 예외가 적용된다)
 eval_refine/
 top5_out/
 .eval-cache/
-out/eval/
+out/**
+!out/**/
+!out/**/REPORT.md
+!out/**/FINDINGS.md
+!out/**/REVIEW.md
+!out/**/REGRESSION_FIXTURES.md
 
 # 테스트 러프/입력 이미지(작가 저작물일 수 있음)
 rough*.png
+# 러프 콘티 원본 입력. data/와 같은 이유(작가 저작물)로 공개 레포에 커밋 금지.
+# 재현 식별은 파일이 아니라 tests/fixtures/*.jsonl의 image_sha256으로 한다.
+in/
+
+# 슬라이드·발표 산출물과 에이전트 작업 디렉터리(대용량 바이너리, 추적 대상 아님)
+*.pptx
+*.pptx.inspect.ndjson
+/Standin_이번_스프린트_리뷰/
+.codex-*/
+tmp/
 
 # 루트에 생기는 생성물 이미지(eval/audit/sheet/libcheck 등)
 /*.png

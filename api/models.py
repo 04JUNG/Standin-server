@@ -76,6 +76,11 @@ class PersonOut(BaseModel):
     confidence_threshold: Optional[float] = None
     valid_limbs: List[str] = Field(default_factory=list)
     refinable_limbs: List[str] = Field(default_factory=list)
+    lower_body_observed: bool = Field(
+        False,
+        description=("VLM이 해당 인물의 양쪽 골반·무릎·발목을 실제 관측했다고 "
+                     "판정했는지. false면 모든 하체 refine 차단"),
+    )
     refine_allowed: bool = False
     quality_trace: dict = Field(default_factory=dict)
     quality_reasons: List[str] = Field(default_factory=list)
@@ -104,11 +109,19 @@ class RefineRequest(BaseModel):
     scores: Optional[Scores17] = Field(
         None, description="/analyze가 준 PersonOut.scores를 그대로 (17,)")
     search_distance: Optional[float] = Field(
-        None, description="그 후보의 distance. 주면 '베이스 불일치' 안전 게이트가 켜진다")
+        None, description=("그 후보의 distance. v1에서는 베이스 불일치 게이트, "
+                           "v2.5에서는 실행을 막지 않는 검색 lineage"))
     refine_allowed: Optional[bool] = Field(
-        None, description="/analyze가 준 값을 그대로 전달. false면 서버가 refine을 차단")
+        None, description=("/analyze가 준 값을 그대로 전달. false면 차단하며 "
+                           "v2.5에서는 policy lineage로 필수"))
     refinable_limbs: Optional[List[str]] = Field(
-        None, description="/analyze가 허용한 사지만 전달. 예: left_arm")
+        None, description=("/analyze가 허용한 사지만 그대로 전달. 예: left_arm. "
+                           "v2.5 policy lineage로 필수"))
+    lower_body_observed: Optional[bool] = Field(
+        None,
+        description=("/analyze가 준 값을 그대로 전달. true가 아니면 leg/lower_pair/"
+                     "leg-driving lap_contact/ankle 조정을 모두 차단"),
+    )
     skeleton_state: Optional[str] = Field(
         None, description="/analyze의 skeleton_state; v2 진단 lineage")
     coverage_class: Optional[str] = Field(
@@ -125,10 +138,10 @@ class RefineRequest(BaseModel):
         None, description="검색 당시 metric×coverage confidence threshold")
     gap_type: Literal["near_gap", "structural_gap", "unknown"] = Field(
         "unknown", description="평가 라벨. refine 실행 게이트로 사용하지 않음")
-    refine_mode: Literal["conservative", "aggressive"] = Field(
-        "conservative",
-        description=("v2.4 조정 강도. aggressive도 hard safety gate는 완화하지 않고 "
-                     "실패 시 conservative 결과로 복구"),
+    refine_mode: Optional[Literal["conservative", "aggressive"]] = Field(
+        None,
+        description=("v2.5 조정 정책. 생략/null이면 서버 REFINE_DEFAULT_MODE를 사용. "
+                     "aggressive도 final selector 실패 시 conservative/base로 복구"),
     )
 
     @field_validator("keypoints")
@@ -179,7 +192,7 @@ class RefineResponse(BaseModel):
     loss_final: Optional[float] = Field(None, description="조정 후 각도 손실")
     gain: Optional[float] = Field(None, description="손실 감소율(0.3=30% 개선)")
     backend: str = Field(..., description="scipy | numpy | scipy+numpy | none")
-    refine_version: str = Field("v1.3", description="실행한 refine policy/code 버전")
+    refine_version: str = Field("v2.5.1", description="실행한 refine policy/code 버전")
     refine_outcome: Literal["improved", "unchanged", "reverted", "not_attempted"] = Field(
         "not_attempted", description="gap_type과 독립인 적용 결과")
     limbs: List[str] = Field(

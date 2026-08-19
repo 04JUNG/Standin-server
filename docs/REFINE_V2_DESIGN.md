@@ -1,20 +1,56 @@
-# Refine v2 설계 (v2.4 통합 승인·구현 기준)
+# Refine v2 설계 (v2.5 Safe Aggressive Selector 통합 기준)
 
-> 상태: v2.4 보수적/공격적 feature flag 구현·engineering probe 완료 · production 승격 대기
+> 상태: v2.5.3 engineering closeout 완료 · 순수 near-gap Joint NME 5.3779% · known-bad 반환 0 · 자동 안전/속도 gate 통과
 > v2.2 승인일: 2026-08-11
 > v2.3 최종 승인·구현일: 2026-08-12
 > v2.4 범위 승인일: 2026-08-12
 > v2.4 구현일: 2026-08-12
 > No-refine/v1/v2.4 3-arm 평가 전략 정리일: 2026-08-13
-> 현재 기준 코드: `src/refine.py`, `src/refine_v2.py`, `src/collision.py`, `src/config.py`, `src/skeleton_extraction.py`, `src/pipeline.py`, `api/app.py`, `api/models.py`
-> 현재 동작 기준: `docs/REFINE_DESIGN.md`
->
-> 이 문서는 Refine v2의 단일 후속 설계 문서다. v2가 검증·승격될 때까지 실제 동작의
-> 단일 기준은 `docs/REFINE_DESIGN.md`와 실행 코드다.
+> v2.5 selector 구현일: 2026-08-17
+> v2.5.2 하체 가시성·FINAL 관통 post-check 구현일: 2026-08-18
+> v2.5.3 single-leg extension·pose quarantine 구현 및 D0 3회 검증일: 2026-08-18
 
-`REFINE_V2_ENABLED=0`이 기본값이므로 현재 production 동작은 v1을 유지한다. 구현 완료는
-코드 경로와 자동 테스트가 준비됐다는 뜻이며, 고정 holdout의 `worse=0`과 단계별 `better>=1`을
-통과했다는 뜻은 아니다. v2는 해당 승격 관문을 통과하기 전 production 기본값이 되지 않는다.
+## 0. v2.5 최종 정책
+
+v2.5의 `aggressive`는 raw aggressive 결과를 직접 반환한다는 뜻이 아니다. conservative를 먼저
+계산하고 aggressive final 후보를 만든 뒤, 독립 selector가 다음 두 조건을 모두 확인한 경우에만
+aggressive를 반환한다.
+
+1. 사용자가 선택한 최초 base(B0) 대비 hierarchy·channel·누적 trust region·관절·신규 충돌 안전
+2. conservative(C) 대비 동일 target mask의 joint/endpoint 및 활성 hand/lower/lap metric non-regression과
+   최소 한 metric의 양의 gain
+
+실패·timeout·검사 불능은 모두 exact conservative 또는 base로 복구한다. solver 내부 block
+alpha/rollback은 유지하며 selector는 그 뒤의 실제 final BVH를 다시 parse/FK한다. 외부 evaluator의
+foot/ground proxy 경보 하나만으로는 결과를 폐기하지 않는다.
+
+v2.5.2에서는 `/analyze`의 인물별 `lower_body_observed`가 명시적으로 `true`일 때만 다리 block을
+허용한다. false·누락·길이 불일치는 fail-closed이며 leg block, `lower_pair`, 다리를 움직이는
+`lap_contact`, 발목 counter-rotation을 모두 닫고 하체 BVH channel을 B0와 동일하게 보존한다.
+또한 aggressive/conservative mode 선택이 끝난 실제 FINAL artifact를 다시 parse/FK하여 충돌 proxy를
+검사한다. B0 대비 신규·악화 관통이 검출되거나 검사가 불가능하면 FINAL을 폐기하고 **B0 exact
+fallback**을 반환한다.
+
+요청 `refine_mode`가 생략/null이면 `REFINE_DEFAULT_MODE`를 사용한다. 2026-08-18 결정으로 제품
+기본값은 `aggressive`이며, 그 의미는 raw 결과 직접 반환이 아닌 **safe aggressive attempt**다.
+v2가 꺼지면 effective mode는 무조건 conservative다. v2.5.3은 아래 자동 최소 완료선을 통과해 v2의
+최종 engineering release candidate가 됐다. lap-contact 실표본과 대규모 작가 blind/실메시 holdout은
+운영 승격 증거로 계속 추적하며, 해당 기능의 증거가 없는 범위를 과장해 승인하지 않는다.
+
+핵심 config는 `REFINE_V25_SELECTOR_ENABLED`, metric별 epsilon,
+`REFINE_V25_JOINT_NME_WEIGHT`, `REFINE_V25_PARTIAL_ALPHAS`,
+`REFINE_V25_SKIP_INACTIVE_AGGRESSIVE`, `REFINE_V25_INACTIVE_SKIP_BUDGET_FRACTION`,
+`REFINE_V25_FINAL_CHECK_RESERVE_SECONDS`, `REFINE_V25_AGGRESSIVE_MIN_REMAINING_SECONDS`이며 모두
+healthz config hash와 cache identity에 포함된다. 상세 구현·승격 판정은 저장소 루트의
+`REFINE_V2_5_IMPLEMENTATION.md`를 따른다. 아래 v2.4 절은 solver 단계와 기존 평가 이력으로 유지한다.
+> 현재 기준 코드: `src/refine.py`, `src/refine_v2.py`, `src/collision.py`, `src/config.py`, `src/skeleton_extraction.py`, `src/pipeline.py`, `api/app.py`, `api/models.py`
+> 현재 v2.5 동작 기준: 이 문서와 실행 코드. `docs/REFINE_DESIGN.md`는 v1 fallback·공통 게이트 기준.
+>
+> 이 문서는 Refine v2.5의 제품 정책과 검증 기준을 통합한 설계 문서다.
+
+`REFINE_V2_ENABLED=1`, `REFINE_DEFAULT_MODE=aggressive`, selector ON이 현재 제품 기본이다.
+`REFINE_V2_ENABLED=0`은 v1 비교 실험과 비상 복구에서만 명시한다. 기본 설정 결정은 품질 컷라인을
+없앤다는 뜻이 아니며, Joint NME·p95 개선은 운영 중 계속 추적한다.
 
 이 문서에서 **v2.2**는 2026-08-11 기준 초기 feature-flag 코드를 뜻한다. **v2.3**은 아래 두
 실사용 피드백을 반영해 2026-08-12 최종 승인 후 구현한 보정 버전이다.
@@ -106,13 +142,13 @@ gap_type: near_gap | structural_gap | unknown
 refine_outcome: improved | unchanged | reverted | not_attempted
 ```
 
-## 2. 현재 구현 기준 (v1 production / v2.4 flag)
+## 2. 현재 구현 기준 (v1 fallback / v2.5 production 기본)
 
-| 항목 | v1 production 기본 | v2.4 feature flag 현재 코드 |
+| 항목 | v1 fallback/비교 | v2.5 production 기본 |
 |---|---|---|
 | 조정 부위 | 기본 양팔, `REFINE_LIMBS=all`이면 다리 | 양팔 + 조건부 하체, 몸통은 별도 default-off |
 | 고정 부위 | 손목·손가락·발목·힙·루트·척추·목·머리 | 몸통 flag OFF 기준 손목·손가락·발목·힙·루트·척추·목·머리 |
-| 모드 | 단일 v1 | `conservative` 기본, 명시적 `aggressive` |
+| 모드 | 단일 v1 | safe `aggressive` 기본, 명시적 `conservative` override |
 | 목적함수 | 사지별 두 뼈의 2D 단위 방향 | direction + robust endpoint + pair/contact + 3D move + collision + anatomy |
 | 뼈 가중치 | API 기본 `1.0` | effective score·valid mask 기반 |
 | 뼈 유효 조건 | 양 끝 score 각각 `0.3` 이상 | 양 끝 score·구조 mask·허용 사지·관측 감도 통과 |
@@ -178,9 +214,10 @@ v2.4는 하나의 solver를 임계값만 바꿔 두 이름으로 부르지 않�
 | 실패 fallback | base | conservative, conservative가 없으면 base |
 | 몸통 | 별도 `REFINE_V2_TORSO=0` 기본 | 자동 활성화하지 않음 |
 
-API 요청은 `refine_mode: conservative | aggressive`를 받고 기본값은 `conservative`다. 응답 진단에는
-`mode_requested`, `mode_applied`, `aggressive_attempted`, `aggressive_reason`을 남긴다. 캐시 content hash와
-sidecar에도 mode를 포함해 보수적 artifact가 공격적 요청에 재사용되거나 그 반대가 되지 않게 한다.
+API 요청은 `refine_mode: conservative | aggressive | null`을 받고 생략/null의 기본값은 safe
+`aggressive`다. 응답 진단에는 `mode_requested`, `mode_effective`, `mode_applied`,
+`aggressive_attempted`, `aggressive_reason`을 남긴다. 채택된 artifact는 응답 `bvh` 본문으로만
+나가므로 보수적 결과가 공격적 요청에 재사용될 서버측 경로 자체가 없다.
 두 단계는 같은 요청 timeout 예산을 공유한다.
 
 ```text
@@ -974,9 +1011,9 @@ BVH와 동일한 artifact identity 및 body·camera·renderer version을 사용�
 저장해 전달한다. legacy endpoint까지 v2에 포함하려면 optional refined artifact 필드를 추가하는
 별도 API 계약 승인을 먼저 받는다.
 
-v2 config를 켤 때 현재 선택 1개 캐시 키에는 최소한 query keypoints·scores·mask, base BVH content
-hash, pose-library/feature/config version, view와 허용 부위를 포함한다. 이는 새 비동기 기능이 아니라
-같은 입력에 오래된 v1 조정본이 재사용되는 것을 막기 위한 기존 캐시 무효화 보강이다.
+추론 서버는 조정본을 저장하지 않는다(무상태 인라인 전달). 따라서 오래된 v1 조정본이 재사용될
+서버측 캐시가 없다. BFF가 `refined_artifacts`로 멱등성을 관리할 때는 refine code/config version과
+pose-library version을 키에 포함해 설정 변경 시 자동 무효화되게 한다.
 
 ## 12. 구현 순서
 
@@ -994,6 +1031,9 @@ hash, pose-library/feature/config version, view와 허용 부위를 포함한다
 | v2.4 보수적/공격적 모드 | 구현·모드별 cache·정확 복구 단위검증 완료 | 고정 blind pair의 공격적 accepted worse 0 |
 | v2.4 `hand_pair`·`lap_contact` | 공동/개별 채택·접촉 band·각 pair non-regression 구현 | 손목 간격/중점 human 개선·접촉 부유/관통 0 |
 | v2.4 강화 lower pair·발목 보정 | 공격적 가중치·Foot-only `18°` 보정 구현 | 목표 간격 human 개선·발 방향/지면 회귀 0 |
+| v2.5.1 selector/NME·속도 | prepared target/BVH 재사용, B0 잔여 trust bound, Joint NME surrogate, safe global blend, budget-risk skip 구현. 자동 gate는 통과했으나 사용자 proxy 검토에서 관통·반신 하체 회귀 확인 | v2.5.2로 안전 수정 완료 |
+| v2.5.2 하체 가시성·FINAL 안전 | `lower_body_observed=true`일 때만 하체 허용, mode 선택 후 FINAL 충돌 재검사, 실패 시 B0 exact fallback, search miss 분리 구현. frozen D0 구조/selector 회귀 0 | 실제 메시 관통 holdout·lap-contact 표본·Joint NME 5% 재달성·작가 blind |
+| v2.5.3 최종 마감 | 단축 투시 단일 다리의 제한적 proximal-assisted extension, 구조 공백/불량 B0의 refine 분모·런타임 분리, 알려진 관통 fixture 차단 구현. D0 24개 Joint 5.3779%, worse/hard/proxy/timeout 0 | 작가 blind·실메시 holdout·lap-contact 실표본은 후속 운영 승격 증거 |
 | V2-2 몸통 | 별도 default-off flag 구현됨 | V2-1 승격 후 독립 blind pair 평가 |
 | V2-3 제품 품질 | 선택 1개 cache·timeout fallback·진단 구현됨 | BFF/클라이언트/export 실제 환경 E2E와 cache-off p95 |
 
@@ -1003,13 +1043,159 @@ hash, pose-library/feature/config version, view와 허용 부위를 포함한다
 `standin_eval report`가 담당한다.
 
 v2.3 C1–C3는 사용자 최종 승인 후 같은 구현 묶음으로 반영했다. C2/C3만 켜지고 C1이 빠지는
-중간 상태는 허용하지 않는다. 구현은 `REFINE_V2_ENABLED=1` 아래에서만 동작하며 v1과 production의
-v2 기본 OFF는 유지한다.
+중간 상태는 허용하지 않는다. 구현은 `REFINE_V2_ENABLED=1` 아래에서 동작하며 현재 production 기본도
+v2.5 safe-aggressive다. v1은 명시적 `REFINE_V2_ENABLED=0`으로만 사용한다.
 
-`REFINE_V2_CODE_VERSION`은 `v2.4.0`이며 C1–C3와 v2.4 mode·pair/contact·발목 설정은 refine
-content hash와 진단 `config_version`에 포함된다. mode도 hash에 들어가 conservative artifact가
-aggressive 요청에 재사용되거나 그 반대가 되지 않는다. 이전 v2 캐시·artifact는 v2.4 결과로
-재사용하지 않는다.
+`REFINE_V2_CODE_VERSION`은 `v2.5.3`이며 C1–C3와 v2.4 mode·pair/contact·발목 설정, v2.5 final
+selector 설정은 진단 `config_version`과
+`/healthz.refine.config_sha256`에 포함된다. 서버는 artifact를 보관하지 않으므로 mode 간 재사용
+문제가 발생하지 않는다.
+
+### v2.5.1 속도·NME engineering 확인 — 2026-08-18
+
+동일 frozen near-gap D0 27개를 cache-off 3회(총 81 요청) 실행한
+`out/eval/v25_optimization_v251_x3_20260818/REPORT.md`에서 final artifact 기준 Joint NME는
+conservative 대비 5.75%, endpoint NME는 7.60% 감소했다. p95는 1.75초, max는 2.71초,
+timeout/구조 hard violation/채택 selector regression은 모두 0이었다. 최종 mode는
+aggressive 18, conservative 8, base 1이며 global blend 부분 채택은 2건이었다.
+
+이 결과는 구현 직후 3회 engineering 측정이다. lap-contact 표본, sealed holdout,
+실메시 안전과 작가 blind 평가는 아직 남아 있으므로 최종 승격 완료로 해석하지 않는다.
+
+### v2.5.1 proxy 경보 사용자 검토 — 2026-08-18
+
+자동 경보 8건이 걸린 6개 unit을 B0/C/FINAL과 4-view로 검토했고 사용자 판정을 완료했다.
+
+| unit | 사용자 판정 | 분류 |
+|---|---|---|
+| `124702:p0` | FINAL이 가장 유사함 | 정상 개선; foot-direction 경보 false positive |
+| `131040:p0` | 품질은 좋지 않지만 문제없음 | 안전 회귀 없음 |
+| `131056:p2` | B0의 손부터 기괴하며 FINAL도 같은 손 회전을 상속; FINAL 관통 관찰 | 원본 BVH 품질 결함, refine 귀속은 mesh 비교 대기 |
+| `171734:p0` | FINAL 관통, 반신 컷 하체 이동 | refine 안전 회귀 + 적용 범위 오류 |
+| `2.16.52:p0` | 반신 컷 하체 이동 | 적용 범위 오류 |
+| `4.56.21:p0` | 더 유사한 포즈가 라이브러리에 있음 | search miss; refine 대상/분모에서 제외 |
+
+따라서 자동 hard violation 0은 실제 관통 0을 의미하지 않는다. v2.5.1 승격은 보류하며 다음 수정 없이
+sealed holdout으로 넘어가지 않는다.
+
+1. `131056:p2`의 불량 B0 asset을 검색 DB/index에서 quarantine한다. 손·손가락 회전은 B0/C/FINAL에서
+   동일하므로 refine이 손 모양을 생성한 것으로 집계하지 않는다. `_mirror` 생성 검사는 현재 COCO-17만
+   확인해 손가락을 놓치므로 원본/미러 full-hand QA를 추가한다.
+2. 반신 또는 하체 비관측이면 leg block, lower-pair, leg-driving lap-contact, ankle counter-rotation을 닫고
+   하체 channel을 B0와 동일하게 보존한다.
+3. aggressive/conservative 선택 뒤 FINAL artifact에 독립 관통 post-check를 적용한다. B0가 안전할 때만
+   exact B0 fallback하고, B0부터 불량이면 다음 Top-K 후보로 넘긴다.
+4. `4.56.21:p0`은 search regression fixture로 옮겨 더 유사한 라이브러리 포즈가 Top-K/Top-1에 오는지
+   확인한다. 구조가 다른 B0를 solver 강도로 억지 보정하지 않는다.
+5. `124702:p0`의 정상 개선을 보존하기 위해 foot-direction proxy 단독 경보를 전역 hard reject로
+   승격하지 않는다.
+
+상세 판정과 산출물은 `out/review/v251_proxy_alerts_20260818/FINDINGS.md`에 고정한다.
+
+### v2.5.2 안전 수정 및 frozen D0 재실행 — 2026-08-18
+
+사용자 판정을 반영해 다음을 구현했다.
+
+1. VLM이 인물별 `lower_body_visible`를 반환하고 `/analyze`가 `lower_body_observed`를 노출한다.
+   BFF가 이를 `/refine`으로 그대로 전달하며, 값이 `true`가 아니면 모든 하체 조정을 차단한다.
+2. selector가 mode를 고른 뒤 실제 FINAL artifact를 독립적으로 다시 parse/FK하여 arm-torso,
+   arm-leg, leg-leg, leg-torso 충돌을 검사한다. 신규·악화 관통 또는 검사 불능이면 FINAL 파일을
+   폐기하고 B0 경로·손실·사지 목록으로 정확히 복구한다.
+3. `4.56.21:p0`은 v2.5.2 override에서 `structural_gap`으로 바꾸고 refine D0 분모에서 제외했으며
+   `tests/fixtures/search_regressions.v1.jsonl`로 이동했다. 사용자가 지목한 더 유사한 BVH의 정확한
+   `pose_id`는 아직 미기입이므로 현재 fixture는 검색 회귀 소유권과 현 B0만 고정한다.
+
+동일 frozen D0를 3회 재실행한 결과는
+`out/eval/v25_optimization_v252_x3_20260818/REPORT.md`다. search miss 1건을 제외한 26개에서
+FINAL mode는 aggressive 15, conservative 9, base 2였다. 구조 hard violation, 채택 selector metric
+회귀, timeout은 모두 0이다. Joint NME 감소는 **4.9958946357%**, endpoint NME 감소는
+**6.3194578428%**, cache-off p95는 **1.548초**, max는 **2.765초**다.
+
+`171734:p0`과 `2.16.52:p0`의 하체 channel 최대 변화는 모두 `0.0`으로 확인됐고 기존 하체 관련
+foot/ground proxy 경보도 사라졌다. `2.16.52:p0`은 B0 exact fallback이며 `171734:p0`은 하체를
+동결한 채 상체만 조정했다. 남은 proxy 경보 3건은 사용자 판정상 정상 개선인 `124702:p0`, 안전
+문제 없음인 `131040:p0`, B0 손 asset 결함이 있는 `131056:p2`다.
+
+Joint NME의 사전 승격선은 `>=5.00%`이므로 `4.9958946357%`를 반올림해 통과로 기록하지 않는다.
+부족분은 약 **0.004105%p**다. 또한 FINAL post-check는 현재 BVH capsule/COCO proxy이므로 실제 CSP
+메시 관통 0건을 증명하지 않는다. 따라서 v2.5.2는 요청한 안전 수정의 engineering 회귀를 통과했지만,
+실메시 holdout과 정확한 Joint NME 승격선은 아직 대기다.
+
+### v2.5.3 최종 마감 범위와 출시 판정 — 2026-08-18
+
+6개 FINAL 육안검사에서 다음 세 사례를 다시 분류했다.
+
+| unit | 최종 분류 | v2 처리 |
+|---|---|---|
+| `171734:p0` | 구조 공백/검색 후보 부적합 | 반신 target에서 보이지 않는 하체를 refine으로 생성하지 않는다. B0가 `Dig And Plant Seeds`의 양무릎 꿇기 계열이므로 다음 Top-K로 이관한다. 보이는 관통이 있으면 해당 후보를 반환하지 않는다. |
+| `131056:p2` | 구조 공백 + 불량 B0 hand asset | 2D 손목 간격 개선을 성공으로 인정하지 않는다. hands-forward/clasped 깊이·손목·손가락 자세는 현재 refine 범위 밖이며 원본 asset을 quarantine하고 다음 Top-K로 이관한다. |
+| `131211:p1` | 유효 near-gap, v2 구현 누락 | 같은 앉은 자세 계열에서 한쪽 무릎만 약 32° 더 펴면 된다. v2.5.3의 제한된 `single_leg_extension`으로 해결한다. |
+
+`131211:p1`의 target 무릎 각도는 약 `97.7° / 171.8°`, B0는 `137.6° / 139.7°`, v2.5.2 FINAL은
+`104.8° / 139.7°`다. 펴져야 할 오른쪽 다리가 `foreshortened → low_observability`로 다리 전체
+solve에서 빠지고 `lower_pair=both_legs_required`도 비활성화된 것이 직접 원인이다.
+
+v2.5.3은 일반적인 한쪽 다리 파트 조합을 도입하지 않는다. 다음 조건을 모두 만족하는 단축 투시
+`single_leg_extension`만 v2 범위다. 실제 fixture 검증 결과 `Leg`만 회전하면 무릎 endpoint가 악화돼
+목표 자세를 만들 수 없었으므로, 기존 32°보다 작은 `UpLeg <=18°` 보조 budget을 함께 사용한다.
+
+1. `lower_body_observed=true`이고 hip/knee/ankle이 동일 인물 소유권과 score gate를 통과한다.
+2. 압축된 `hip→knee` 때문에 전체 leg observability가 낮지만 `knee→ankle`은 유효하다.
+3. 목표가 명확한 knee extension이며 B0 대비 필요한 변화가 `15°–45°`다.
+4. 골반·root·몸통은 B0로 동결하고, 해당 `UpLeg`은 B0 대비 최대 18°의 제한적 보조만 허용한다.
+5. 해당 `Leg`와 필요한 경우 `Foot <=18°` counter-rotation을 최적화한다. C→A의 발 방향 기준은 항상 B0다.
+6. 목표 knee-angle 오차와 ankle endpoint가 개선되고 공통 metric이 non-regression이어야 한다.
+7. anatomy, leg-leg, leg-torso, arm-leg, foot/ground와 FINAL collision post-check를 모두 통과해야 한다.
+
+채택 결과는 `reason=ok_foreshortened_extension`으로 진단한다. 실패·검사 불능·trust bound 초과는 B0로
+복구하며, 필요한 변화가 45°를 넘거나 hip/pelvis 이동, 다리 꼬기, 접촉면 변경이 필요하면 구조 공백으로
+다음 Top-K에 넘긴다. 임의 파트 조합과 큰 비대칭 하체 재구성은 후속 연구다.
+
+#### 구조 공백이 v2 성능에 미친 영향
+
+v2.5.2의 26개 집계에는 뒤늦게 구조 공백으로 확정한 `171734:p0`, `131056:p2`가 포함됐다. 두 unit을
+제외하고 유효 near-gap 24개만 같은 FINAL artifact로 재집계하면 다음과 같다.
+
+| 지표 | 오염된 26개 | near-gap 24개 | 변화 |
+|---|---:|---:|---:|
+| Joint NME 감소 | 4.9958946357% | **5.2675061589%** | +0.2716115232%p |
+| Endpoint NME 감소 | 6.3194578428% | **6.6529686195%** | +0.3335107767%p |
+| Joint NME better/tie/worse | 15/11/0 | **14/10/0** | worse 0 유지 |
+
+따라서 구조 공백까지 refine으로 해결하려 한 것은 자동 평균을 낮췄을 뿐 아니라, `131056:p2`처럼 2D
+NME는 좋아 보여도 손의 깊이·손가락 의도와 실제 메시 관통을 놓치는 잘못된 성공을 만들었다. v2의
+성능 문제 일부는 solver 부족이 아니라 평가 cohort와 제품 경계 오염이었다. 구조 공백을 제외한 현재
+near-gap 수치는 Joint NME 5% 사전선을 통과한다.
+
+#### v2.5.3 구현·재검증 결과
+
+v2.5.3에서 다음을 구현했다.
+
+- `131211:p1`: low-observability 전역 gate는 유지하고, 한쪽 proximal foreshortening + straight target
+  + B0 각도 차이 15°–45° 증거가 동시에 있을 때만 solve를 복구한다. 오른쪽 무릎은 `139.7° → 166.0°`,
+  target 오차는 `32.1° → 5.8°`로 줄었다.
+- `131056:p2`, `171734:p0`: `config/refine_pose_quarantine.v1.json`으로 geometry search에서 제외해
+  다음 Top-K를 자연 승격한다. stale `/pose/{id}/bvh`와 `/refine` 요청도 HTTP 409
+  `pose_quarantined`로 차단한다.
+- C→A 발 counter-rotation은 단계별 C가 아니라 B0 방향을 기준으로 해 누적 발 방향 초과를 막는다.
+- D0 label override를 버전순 누적해 구조 공백 3건을 near-gap 분모에서 제외한다.
+
+최종 3회 측정은 `out/eval/v25_optimization_v253_x3_20260818/REPORT.md`에 고정했다.
+
+| 항목 | v2.5.3 결과 | 최소선 | 판정 |
+|---|---:|---:|---|
+| 유효 near-gap | 24 | 고정 cohort | 통과 |
+| Joint NME 감소 | **5.3779318216%** | ≥5% | 통과 |
+| Endpoint NME 감소 | **6.8257237633%** | >0 | 통과 |
+| Joint better/tie/worse | **14/10/0** | worse 0 | 통과 |
+| hard / proxy / selector 회귀 | **0 / 0 / 0** | 모두 0 | 통과 |
+| timeout | **0** | 0 | 통과 |
+| 요청 p95 | **1.548초** | ≤3초 | 통과 |
+| 알려진 불량 pose 반환 | **0** | 0 | 통과 |
+
+따라서 v2.5.3은 v2의 최종 engineering release candidate로 마감한다. safe aggressive 기본과 v1
+비상 스위치를 유지한다. 다만 lap-contact D0 표본은 0이고 capsule 검사는 실제 메시 증명이 아니므로,
+대규모 일반 운영 승격 시 작가 blind·실메시 holdout·lap-contact 실표본을 별도 체크한다.
 
 ### v2.3 구현 직후 sitting E2E 확인 — 2026-08-12
 
@@ -1091,7 +1277,7 @@ aggressive 요청에 재사용되거나 그 반대가 되지 않는다. 이전 v
 
 ### V2-4 — 보수적/공격적 사용자 선택
 
-1. `refine_mode` API·cache·sidecar·진단 lineage 추가, 기본 `conservative`
+1. `refine_mode` API·진단 lineage 추가, 현재 기본 safe `aggressive`
 2. conservative 결과 또는 안전한 base snapshot을 aggressive 시작점으로 고정
 3. `hand_pair` 공동 solve·공동 alpha·팔별 pair non-regression fallback
 4. 2D 접촉 증거 기반 `lap_contact`와 3D surface band residual

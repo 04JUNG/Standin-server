@@ -43,6 +43,12 @@ def _coerce(analysis: dict, img_w: int, img_h: int) -> VLMAnalysis:
             continue
 
     num = int(analysis.get("num_people", len(boxes)) or 0)
+    raw_lower = analysis.get("lower_body_visible")
+    if isinstance(raw_lower, list) and len(raw_lower) == num:
+        lower_body_visible = [value is True for value in raw_lower]
+    else:
+        # 새 안전 lineage가 없으면 하체를 추측하지 않는다.
+        lower_body_visible = [False] * max(num, 0)
     return VLMAnalysis(
         num_people=num,
         shot=pick(Shot, analysis.get("shot"), Shot.FULL_HALF),
@@ -53,6 +59,7 @@ def _coerce(analysis: dict, img_w: int, img_h: int) -> VLMAnalysis:
         approx_boxes=boxes,
         dialogue=analysis.get("dialogue"),
         raw=analysis,
+        lower_body_visible=lower_body_visible,
     )
 
 
@@ -114,8 +121,14 @@ class MockVLMClient(BaseVLMClient):
                 BBox(0.05*img_w, 0.1*img_h, 0.5*img_w, 0.95*img_h, "vlm", 0.5),
                 BBox(0.5*img_w, 0.1*img_h, 0.95*img_w, 0.95*img_h, "vlm", 0.5),
             ]
-        return VLMAnalysis(num, shot, action, view, rel, boxes,
-                           dialogue=None, raw={"mock": True, "hint": hint})
+        lower_hidden = any(token in hint for token in (
+            "half_body", "half-body", "lower_hidden", "반신", "하체 비관측",
+        ))
+        return VLMAnalysis(
+            num, shot, action, view, rel, boxes,
+            dialogue=None, raw={"mock": True, "hint": hint},
+            lower_body_visible=[not lower_hidden] * num,
+        )
 
 
 class GeminiVLMClient(BaseVLMClient):

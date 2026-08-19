@@ -1,5 +1,9 @@
 # PR #10 main 병합 전 통합 기능요구서
 
+> ⚠ **조정본 전달 부분은 무효다(2026-08-11, `docs/REFINE_HANDOFF.md` §3 4단계).**
+> `/refined/{handle}/bvh`·`refined_handle`·`REFINE_DIR`은 제거됐고 조정본은 `POST /refine`
+> 응답의 `bvh` 본문으로만 나간다. 아래 문서는 PR10 당시 통합 요건 기록으로 남긴다.
+
 > 기준: `04JUNG/Standin-server` PR #10 `feat/skeleton-extraction-improvement → develop`  
 > 작성일: 2026-08-05  
 > 대상: 추론 서버, BFF(`Standin-app-server`), 데스크톱 클라이언트(`Standin-client`), AWS 인프라

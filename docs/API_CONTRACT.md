@@ -123,7 +123,7 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
     "hybrid_loss_adopted": 0.14,
     "block_alphas": {"left_arm": 0.0, "right_arm": 0.75},
     "torso": {"attempted": false, "accepted": false},
-    "cache_hit": false
+    "aggressive_attempted": true
   }
 }
 ```
@@ -136,9 +136,10 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
 - v1에서 `search_distance`는 베이스 불일치 게이트다. `REFINE_V2_ENABLED=1`에서는 거리·순위만으로
   실행을 막지 않고 진단에 남긴다. 대신 `refine_allowed`, 스켈레톤 상태·coverage·소유권 lineage와
   `refinable_limbs`를 모두 그대로 보내야 하며, 누락·불일치하면 fail-closed한다.
-- 같은 입력은 같은 `bvh_url`을 돌려준다. 캐시 키에는 query/mask, 베이스 BVH content hash,
-  feature·pose-library·refine code/config version, view·허용 부위·`refine_mode`가 포함된다. 실제 sidecar/BVH가
-  존재할 때만 cache hit로 반환하고 설정·라이브러리가 바뀌면 자동 무효화된다.
+- **조정본은 응답 `bvh` 본문으로만 나간다.** `bvh_url`은 `refined` 여부와 무관하게 항상 베이스
+  `/pose/{pose_id}/bvh`이며 조정본 다운로드 URL은 존재하지 않는다. 추론 서버는 조정본을 저장하지
+  않으므로 무상태이고, 재계산을 막는 멱등성은 BFF의 `refined_artifacts` PK가 담당한다
+  (`docs/REFINE_HANDOFF.md` §3 4단계).
 - `refine_mode` 기본값은 `conservative`다. `aggressive`는 같은 hard safety gate 아래 보수적 단계를
   먼저 실행하고 hand/lap/lower pair와 제한적 Foot counter-rotation을 추가 시도한다. 공격적 단계가
   실패하면 보수적 artifact를, 보수적 단계도 실패하면 베이스를 반환한다.

@@ -149,6 +149,7 @@ async def lifespan(app: FastAPI):
     STATE["pipeline"] = pipeline
     STATE["db_path"] = DB_PATH
     STATE["pose_count"] = len(entries)
+    STATE["quarantined_pose_count"] = len(quarantine)
     STATE["provider"] = actual_vlm
     STATE["pose_backend"] = actual_pose
     log_info("startup", "준비 완료", poseCount=len(entries), env=CFG.app_env,
@@ -205,8 +206,12 @@ def _refine_capability() -> dict:
         "enabled": bool(CFG.refine_enabled),
         "v2_enabled": bool(CFG.refine_v2_enabled),
         "torso_enabled": bool(CFG.refine_v2_torso_enabled),
-        "default_mode": CFG.refine_default_mode,
-        "selector_enabled": bool(CFG.refine_v25_selector_enabled),
+        "default_mode": (
+            CFG.refine_default_mode if CFG.refine_v2_enabled else "conservative"
+        ),
+        "selector_enabled": bool(
+            CFG.refine_v2_enabled and CFG.refine_v25_selector_enabled
+        ),
         "config_valid": bool(config_valid),
         "pose_quarantine_sha256": pose_quarantine_sha256(CFG),
         "code_version": code_version,
@@ -220,6 +225,7 @@ def _refine_capability() -> dict:
         "pose_library_version": CFG.pose_library_version,
         "deployment_version": CFG.deployment_version,
         "source_revision": SOURCE_REVISION,
+        "pose_quarantine_sha256": identity["pose_quarantine_sha256"],
     }
 
 
@@ -290,14 +296,16 @@ def healthz():
     # 라이브러리가 비면 후보를 하나도 못 내므로 healthy로 보고하지 않는다.
     # ECS/ALB가 이 응답으로 태스크 교체를 판단한다.
     pose_count = STATE.get("pose_count", 0)
-    ok = "pipeline" in STATE and pose_count > 0
+    capability = _refine_capability()
+    ok = "pipeline" in STATE and pose_count > 0 and capability["config_valid"]
     body = {
         "ok": ok,
         "env": CFG.app_env,
         "provider": STATE.get("provider", CFG.vlm_provider),
         "pose_backend": STATE.get("pose_backend", CFG.pose_backend),
         "pose_count": pose_count,
-        "refine": _refine_capability(),
+        "quarantined_pose_count": STATE.get("quarantined_pose_count", 0),
+        "refine": capability,
     }
     return body if ok else Response(
         content=json.dumps(body), status_code=503, media_type="application/json"
@@ -393,6 +401,7 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
             confidence_threshold=desc.confidence_threshold,
             valid_limbs=list(desc.valid_limbs),
             refinable_limbs=list(desc.refinable_limbs),
+            lower_body_observed=bool(desc.lower_body_observed),
             refine_allowed=desc.refine_allowed,
             quality_trace=desc.quality_trace,
             quality_reasons=desc.quality_reasons,
@@ -611,6 +620,7 @@ def refine(req: RefineRequest):
         "gap_type": req.gap_type,
         "skeleton_state": req.skeleton_state,
         "coverage_class": req.coverage_class,
+        "lower_body_observed": req.lower_body_observed is True,
         "slot_origin": req.slot_origin,
         "skeleton_source": req.skeleton_source,
         "search_stability": req.search_stability,

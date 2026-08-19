@@ -6,6 +6,7 @@ import os
 import sys
 import tempfile
 import threading
+from unittest import SkipTest
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -254,7 +255,21 @@ def test_replay_adapters_reproduce_normalized_inputs():
     assert pose.unused_calls == 0
 
 
+
+def _require_pose_db() -> str:
+    """포즈 DB가 있는 환경에서만 도는 테스트임을 명시한다.
+
+    data/는 Mixamo·CMU 원본 재배포 금지 정책으로 레포에 커밋하지 않으므로
+    (.gitignore) CI 체크아웃에는 존재하지 않는다. 라이브러리를 내려받은
+    로컬·평가 환경에서만 실제 capture/replay를 검증한다.
+    """
+    db_path = "data/poses.db"
+    if not Path(db_path).exists():
+        raise SkipTest(f"pose library DB unavailable: {db_path}")
+    return db_path
+
 def test_mock_fixture_capture_and_replay_end_to_end():
+    _require_pose_db()
     with tempfile.TemporaryDirectory() as directory:
         root = Path(directory)
         dataset = _dataset(directory, people=1)
@@ -280,6 +295,7 @@ def test_mock_fixture_capture_and_replay_end_to_end():
 
 
 def test_fixture_capture_reuses_content_addressed_model_cache():
+    _require_pose_db()
     with tempfile.TemporaryDirectory() as directory:
         root = Path(directory)
         dataset = _dataset(directory, people=1)

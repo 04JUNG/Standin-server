@@ -53,6 +53,11 @@ class Config:
     data_dir: str = os.getenv("DATA_DIR", "data")
     deployment_version: str = os.getenv("DEPLOYMENT_VERSION", "development")
     pose_library_version: str = os.getenv("POSE_LIBRARY_VERSION", "v1")
+    # 메시 육안 QA에서 불량으로 확정된 개별 pose는 DB에서 물리 삭제하기 전에도
+    # geometry 검색·BVH 다운로드·refine에서 즉시 제외한다.
+    refine_pose_quarantine_path: str = os.getenv(
+        "REFINE_POSE_QUARANTINE_PATH", "config/refine_pose_quarantine.v1.json"
+    )
 
     # --- 관측성(로그·알림) --- 마스터독스 「관측성 — 로그·모니터링·디스코드 알림」
     log_level: str = os.getenv("LOG_LEVEL", "INFO")
@@ -234,9 +239,9 @@ class Config:
     # REFINE_DIR(조정본 로컬 캐시)는 제거됐다. 조정본은 /refine 응답으로만 나가고
     # 보관은 BFF가 한다(docs/REFINE_HANDOFF.md §3 4단계).
     # --- Refine v2 (docs/REFINE_V2_DESIGN.md) ---------------------------
-    # v2는 구현·평가 기간 동안 v1과 병행한다. 검증/승격 전에는 기본 OFF라서
-    # production의 기존 5% gain 계약을 조용히 바꾸지 않는다.
-    refine_v2_enabled: bool = os.getenv("REFINE_V2_ENABLED", "0") == "1"
+    # v2.5 safe-aggressive가 기본 제품 경로다. 비상 복구·v1 비교 실험만
+    # REFINE_V2_ENABLED=0으로 명시한다.
+    refine_v2_enabled: bool = os.getenv("REFINE_V2_ENABLED", "1") == "1"
     # v2의 채택 문턱은 제품 의미의 5%가 아니라 수치 노이즈만 거르는 양의 gain이다.
     refine_gain_epsilon: float = float(os.getenv("REFINE_GAIN_EPSILON", "0.0001"))
     # robust 2D endpoint + base 대비 3D 이동량의 목적함수 가중치.
@@ -251,7 +256,7 @@ class Config:
     refine_v2_anatomy_weight: float = float(os.getenv(
         "REFINE_V2_ANATOMY_WEIGHT", "0.05"))
     # v2.3 C1: 얕은 손-다리 접촉은 허용하되 새로 생긴 깊은 관통은 별도
-    # 낮은 상한으로 차단한다. 실제 메시 holdout 승격 전 production 기본은 v1이다.
+    # 낮은 상한으로 차단한다. v2.5 selector가 최종 구조 안전을 다시 확인한다.
     refine_v2_hand_leg_min_depth: float = float(os.getenv(
         "REFINE_V2_HAND_LEG_MIN_DEPTH", "0.01"))
     refine_v2_hand_leg_worsen_delta: float = float(os.getenv(
@@ -282,6 +287,22 @@ class Config:
         "REFINE_V2_AGGRESSIVE_LOWER_PAIR_WEIGHT", "0.90"))
     refine_v2_ankle_counter_max_delta_deg: float = float(os.getenv(
         "REFINE_V2_ANKLE_COUNTER_MAX_DELTA_DEG", "18"))
+    # v2.5.3: 단축 투시로 leg 전체 observability만 낮아진 경우, 명확한
+    # one-leg extension 증거에 한해서 gate를 구조적으로 복구한다. 일반적인
+    # 비대칭 하체 재구성이나 관측성 gate 전역 완화에는 쓰지 않는다.
+    refine_v253_single_leg_extension_enabled: bool = os.getenv(
+        "REFINE_V253_SINGLE_LEG_EXTENSION_ENABLED", "1"
+    ) == "1"
+    refine_v253_straight_angle_min_deg: float = float(os.getenv(
+        "REFINE_V253_STRAIGHT_ANGLE_MIN_DEG", "160"))
+    refine_v253_extension_delta_min_deg: float = float(os.getenv(
+        "REFINE_V253_EXTENSION_DELTA_MIN_DEG", "15"))
+    refine_v253_extension_delta_max_deg: float = float(os.getenv(
+        "REFINE_V253_EXTENSION_DELTA_MAX_DEG", "45"))
+    # 종아리 endpoint만으로는 화면상의 무릎 위치를 옮길 수 없으므로 UpLeg을
+    # 기존 32°보다 작은 보조 budget 안에서만 함께 푼다.
+    refine_v253_up_leg_max_delta_deg: float = float(os.getenv(
+        "REFINE_V253_UP_LEG_MAX_DELTA_DEG", "18"))
     # v2 플래그 안에서는 하체가 첫 우선 과제다. 구조/coverage/관측 게이트를
     # 통과한 다리만 실제 solve 대상이 된다.
     refine_v2_lower_body: bool = os.getenv("REFINE_V2_LOWER_BODY", "1") == "1"
@@ -297,8 +318,68 @@ class Config:
         "REFINE_V2_FOOT_DIRECTION_DEG", "12"))
     refine_v2_ground_tolerance: float = float(os.getenv(
         "REFINE_V2_GROUND_TOLERANCE", "0.08"))
+    # v2.5 제품 정책: 기본 aggressive도 final selector를 통과한 경우에만 반환한다.
+    refine_default_mode: str = os.getenv(
+        "REFINE_DEFAULT_MODE", "aggressive").strip().lower()
+    refine_v25_selector_enabled: bool = os.getenv(
+        "REFINE_V25_SELECTOR_ENABLED", "1") == "1"
+    refine_v25_joint_nme_epsilon: float = float(os.getenv(
+        "REFINE_V25_JOINT_NME_EPSILON", "0.000001"))
+    refine_v25_endpoint_nme_epsilon: float = float(os.getenv(
+        "REFINE_V25_ENDPOINT_NME_EPSILON", "0.000001"))
+    refine_v25_pair_epsilon: float = float(os.getenv(
+        "REFINE_V25_PAIR_EPSILON", "0.000001"))
+    refine_v25_contact_epsilon: float = float(os.getenv(
+        "REFINE_V25_CONTACT_EPSILON", "0.00000001"))
+    # aggressive solver가 final selector의 mean joint L2와 같은 방향을 보도록
+    # 추가하는 작은 surrogate. selector epsilon/안전 게이트는 바꾸지 않는다.
+    refine_v25_joint_nme_weight: float = float(os.getenv(
+        "REFINE_V25_JOINT_NME_WEIGHT", "0.15"))
+    # full aggressive가 탈락했을 때 C→A 전역 alpha 후보를 독립 재검사한다.
+    refine_v25_partial_alphas: str = os.getenv(
+        "REFINE_V25_PARTIAL_ALPHAS", "0.75,0.5,0.25")
+    # pair/contact 목적이 없고 아래 budget-risk 조건도 만족하면 A를 생략한다.
+    refine_v25_skip_inactive_aggressive: bool = os.getenv(
+        "REFINE_V25_SKIP_INACTIVE_AGGRESSIVE", "1") == "1"
+    # C에서 관측 가능한 pair/contact가 남지 않았더라도 빠른 요청은 Joint NME
+    # surrogate의 추가 이득을 위해 A를 시도한다. C가 전체 예산에서 이 비율 이상을
+    # 쓴 고위험 요청만 A를 생략해 cooperative timeout 전에 C를 확정한다.
+    refine_v25_inactive_skip_budget_fraction: float = float(os.getenv(
+        "REFINE_V25_INACTIVE_SKIP_BUDGET_FRACTION", "0.25"))
+    refine_v25_final_check_reserve_seconds: float = float(os.getenv(
+        "REFINE_V25_FINAL_CHECK_RESERVE_SECONDS", "0.15"))
+    refine_v25_aggressive_min_remaining_seconds: float = float(os.getenv(
+        "REFINE_V25_AGGRESSIVE_MIN_REMAINING_SECONDS", "0.75"))
     # 요청별 cooperative timeout. solver residual 경계에서 중단하고 베이스로 복구한다.
     refine_timeout_seconds: float = float(os.getenv("REFINE_TIMEOUT_SECONDS", "5.0"))
+
+    def __post_init__(self) -> None:
+        if self.refine_default_mode not in ("conservative", "aggressive"):
+            raise ValueError(
+                "REFINE_DEFAULT_MODE must be 'conservative' or 'aggressive'"
+            )
+        if self.refine_v25_joint_nme_weight < 0.0:
+            raise ValueError("REFINE_V25_JOINT_NME_WEIGHT must be non-negative")
+        if not 0.0 <= self.refine_v253_up_leg_max_delta_deg <= 32.0:
+            raise ValueError(
+                "REFINE_V253_UP_LEG_MAX_DELTA_DEG must be in [0,32]"
+            )
+        if not (
+            0.0 <= self.refine_v253_extension_delta_min_deg
+            <= self.refine_v253_extension_delta_max_deg <= 90.0
+        ):
+            raise ValueError(
+                "REFINE_V253 extension delta bounds must satisfy "
+                "0 <= min <= max <= 90"
+            )
+        if not 0.0 <= self.refine_v253_straight_angle_min_deg <= 180.0:
+            raise ValueError(
+                "REFINE_V253_STRAIGHT_ANGLE_MIN_DEG must be in [0,180]"
+            )
+        if not 0.0 <= self.refine_v25_inactive_skip_budget_fraction <= 1.0:
+            raise ValueError(
+                "REFINE_V25_INACTIVE_SKIP_BUDGET_FRACTION must be in [0,1]"
+            )
 
 
 CFG = Config()
