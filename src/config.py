@@ -23,6 +23,13 @@ class Config:
     # --- VLM ---  provider: "mock"(오프라인 기본) | "gemini" | "openai"
     vlm_provider: str = os.getenv("VLM_PROVIDER", "mock")
     gemini_model: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+    # Gemini HTTP 호출은 BFF의 전체 분석 timeout(기본 120초)보다 충분히 짧게 끝낸다.
+    # google-genai HttpOptions.timeout 단위는 밀리초다.
+    gemini_request_timeout_ms: int = int(os.getenv("GEMINI_REQUEST_TIMEOUT_MS", "20000"))
+    # attempts는 최초 호출을 포함한다. 429/503만 이 범위 안에서 재시도한다.
+    gemini_max_attempts: int = int(os.getenv("GEMINI_MAX_ATTEMPTS", "3"))
+    gemini_retry_base_seconds: float = float(os.getenv("GEMINI_RETRY_BASE_SECONDS", "0.5"))
+    gemini_retry_max_seconds: float = float(os.getenv("GEMINI_RETRY_MAX_SECONDS", "2.0"))
     openai_model: str = os.getenv("OPENAI_MODEL", "gpt-5-mini")
 
     # --- 검출/포즈 ---  "mock" | "rtmlib"
@@ -46,6 +53,23 @@ class Config:
     data_dir: str = os.getenv("DATA_DIR", "data")
     deployment_version: str = os.getenv("DEPLOYMENT_VERSION", "development")
     pose_library_version: str = os.getenv("POSE_LIBRARY_VERSION", "v1")
+
+    # --- 관측성(로그·알림) --- 마스터독스 「관측성 — 로그·모니터링·디스코드 알림」
+    log_level: str = os.getenv("LOG_LEVEL", "INFO")
+    # 장애 알림 웹훅. ⚠ URL 자체가 비밀이다 — URL을 아는 누구나 그 채널에 글을 쓸 수 있다.
+    # 배포에서는 Secrets Manager의 standin/discord에서 주입한다.
+    # 비어 있으면 알림기는 조용히 no-op이다(로컬은 웹훅 없이 그대로 돈다).
+    discord_webhook_alert: str = os.getenv("DISCORD_WEBHOOK_ALERT", "")   # P1
+    discord_webhook_warn: str = os.getenv("DISCORD_WEBHOOK_WARN", "")     # P2
+    discord_webhook_ops: str = os.getenv("DISCORD_WEBHOOK_OPS", "")       # P3
+    # P1에 붙일 멘션(@here 등). 코드에 박지 않는다 — 야간 호출 정책은 팀이 정한다.
+    discord_alert_mention: str = os.getenv("DISCORD_ALERT_MENTION", "")
+    # 배치 창. 이 시간 안의 알림을 한 메시지로 묶어 웹훅 레이트리밋을 피한다.
+    alert_flush_seconds: float = float(os.getenv("ALERT_FLUSH_SECONDS", "10"))
+    # 같은 키를 다시 보내지 않는 시간. 그 사이의 재발은 세었다가 "×N"으로 보고한다.
+    alert_suppress_seconds: float = float(os.getenv("ALERT_SUPPRESS_SECONDS", "300"))
+    # 한 메시지에 담을 임베드 상한. 초과분은 "외 N종"으로 접는다.
+    alert_max_per_flush: int = int(os.getenv("ALERT_MAX_PER_FLUSH", "5"))
 
     @property
     def is_production(self) -> bool:
