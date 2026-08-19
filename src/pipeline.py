@@ -30,7 +30,9 @@ from .detect import MockDetector, reconcile, reconcile_count
 from .pose import build_pose_model
 from .routing import route
 from .descriptor import build_slot_descriptors
+from .refine_policy import structural_refine_allowed
 from .search import candidate_stability, knn_geometric
+from .tracing import span
 from .skeleton_extraction import (
     apply_crop_result,
     assign_candidates,
@@ -62,10 +64,12 @@ class Pipeline:
     # ---- 메인 ----
     def process_cut(self, image, img_w: int = 512, img_h: int = 768) -> CutResult:
         # 1) VLM: 러프 → 제어 신호(shot·사람수·대략박스)
-        vlm: VLMAnalysis = self.vlm.analyze(image, img_w, img_h)
+        with span("vlm"):
+            vlm: VLMAnalysis = self.vlm.analyze(image, img_w, img_h)
 
         # 2) Shot 분기
-        r = route(vlm)                      # "skip" | "bust" | "core"
+        with span("route"):
+            r = route(vlm)                  # "skip" | "bust" | "core"
         if r == "skip":
             return CutResult(route="skip", count_confidence="n/a",
                              detector_count=0, vlm_count=vlm.num_people,
@@ -79,12 +83,15 @@ class Pipeline:
             return self._process_self_detecting(image, img_w, img_h, vlm)
 
         # 3) 검출 + VLM 사람 수 보정 (개수 일치=신뢰도 신호)
-        det_boxes = self.detector.detect(image, img_w, img_h)
-        rec = reconcile(det_boxes, vlm)
+        with span("detect"):
+            det_boxes = self.detector.detect(image, img_w, img_h)
+        with span("reconcile"):
+            rec = reconcile(det_boxes, vlm)
         boxes = rec["boxes"]
 
         # 4) 사람 수 분기: RTM candidate → VLM 슬롯 배정 → 기하 검색
-        skeletons = self.pose.estimate(image, boxes, img_w, img_h)
+        with span("pose_full"):
+            skeletons = self.pose.estimate(image, boxes, img_w, img_h)
         return self._process_slots(
             image, img_w, img_h, vlm, skeletons,
             detector_count=len(det_boxes), count_record=rec,
@@ -93,8 +100,10 @@ class Pipeline:
     def _process_self_detecting(self, image, img_w: int, img_h: int,
                                 vlm: VLMAnalysis) -> CutResult:
         """RTMPose Body path: pose inference itself is the first detection pass."""
-        skeletons = self.pose.estimate(image, None, img_w, img_h)
-        rec = reconcile_count(len(skeletons), vlm.num_people)
+        with span("pose_full"):
+            skeletons = self.pose.estimate(image, None, img_w, img_h)
+        with span("reconcile"):
+            rec = reconcile_count(len(skeletons), vlm.num_people)
         return self._process_slots(
             image, img_w, img_h, vlm, skeletons,
             detector_count=rec["detector_count"], count_record=rec,
@@ -104,8 +113,9 @@ class Pipeline:
                        vlm: VLMAnalysis, skeletons, detector_count: int,
                        count_record: dict) -> CutResult:
         """RTM candidate를 슬롯에 배정하고 필요한 슬롯만 crop 복구한다."""
-        assignment = assign_candidates(vlm.approx_boxes, list(skeletons),
-                                       img_w, img_h, CFG)
+        with span("slot_assignment"):
+            assignment = assign_candidates(vlm.approx_boxes, list(skeletons),
+                                           img_w, img_h, CFG)
         notes = list(count_record["notes"])
         count_confidence = count_record["confidence"]
         if assignment.invalid_vlm_box_reasons:
@@ -139,9 +149,10 @@ class Pipeline:
             slot.retry_reason = retry_reason
             slot.reasons.append(f"crop_retry:{retry_reason}")
             started = perf_counter()
-            crop_candidates = self.pose.estimate_crop_candidates(
-                image, slot.vlm_box, img_w, img_h
-            )
+            with span("pose_crop"):
+                crop_candidates = self.pose.estimate_crop_candidates(
+                    image, slot.vlm_box, img_w, img_h
+                )
             peer_boxes = [
                 other.vlm_box for other in assignment.slots
                 if other is not slot and other.vlm_box is not None
@@ -164,18 +175,22 @@ class Pipeline:
                     slot.skeleton is None or slot.state in ("suspect", "invalid")):
                 try_crop(slot, "pre_search_suspect")
 
-        slots = [finalize_slot(slot, CFG) for slot in assignment.slots]
+        with span("skeleton_finalize"):
+            slots = [finalize_slot(slot, CFG) for slot in assignment.slots]
         threshold_scale = 0.7 if count_confidence == "low" else 1.0
         processed: list[tuple[object, _SlotOutcome]] = []
         for slot in slots:
-            outcome = self._evaluate_slot(vlm, slot, threshold_scale)
+            with span("descriptor_search"):
+                outcome = self._evaluate_slot(vlm, slot, threshold_scale)
             if (outcome.stability is not None
                     and outcome.stability["status"] == "unstable"
                     and slot.retry_count == 0):
                 attempted, _ = try_crop(slot, "unstable_search")
                 if attempted:
-                    finalize_slot(slot, CFG)
-                    outcome = self._evaluate_slot(vlm, slot, threshold_scale)
+                    with span("skeleton_finalize"):
+                        finalize_slot(slot, CFG)
+                    with span("descriptor_search"):
+                        outcome = self._evaluate_slot(vlm, slot, threshold_scale)
 
             # crop 후에도 검색이 불안정하고 거리까지 coverage 임계 밖이면 자동 Top-5를
             # 책임질 수 없다. 거리가 임계 안이면 라이브러리 prior를 살려 soft fallback.
@@ -263,27 +278,50 @@ class Pipeline:
         유지해 어느 쪽도 suspect 스켈레톤을 refine하지 못하게 한다.
         """
         evidence = slot.evidence
-        configured_limbs = (
-            {"left_arm", "right_arm"}
-            if CFG.refine_limbs.lower() == "arms"
-            else {"left_arm", "right_arm", "left_leg", "right_leg"}
+        if CFG.refine_v2_enabled:
+            configured_limbs = {"left_arm", "right_arm"}
+            if CFG.refine_v2_lower_body:
+                configured_limbs.update({"left_leg", "right_leg"})
+        else:
+            configured_limbs = (
+                {"left_arm", "right_arm"}
+                if CFG.refine_limbs.lower() == "arms"
+                else {"left_arm", "right_arm", "left_leg", "right_leg"}
+            )
+        evidence_limbs = (
+            evidence.refinable_limbs if evidence is not None else ()
         )
+        if evidence is not None and not CFG.refine_v2_enabled:
+            # foreshortening soft eligibility는 v2.3 전용이다. v1에서 REFINE_LIMBS=all을
+            # 켠 기존 평가도 검색 mask 기준 하체 동작을 그대로 유지한다.
+            evidence_limbs = tuple(
+                limb for limb in evidence_limbs
+                if limb not in evidence.foreshortened_limbs
+            )
         refinable_limbs = tuple(
-            limb for limb in (evidence.refinable_limbs if evidence is not None else ())
-            if limb in configured_limbs
+            limb for limb in evidence_limbs if limb in configured_limbs
         )
-        allowed = bool(
-            confidence == "high"
-            and evidence is not None
-            and slot.state in ("valid", "partial")
-            and evidence.coverage_class in ("full", "reduced")
-            and refinable_limbs
-            and slot.slot_origin == "vlm"
-            and slot.skeleton_source == "full_image"
+        structural_allowed = bool(
+            evidence is not None
+            and structural_refine_allowed(
+                skeleton_state=slot.state,
+                coverage_class=evidence.coverage_class,
+                refinable_limbs=refinable_limbs,
+                slot_origin=slot.slot_origin,
+                skeleton_source=slot.skeleton_source,
+            )
+        )
+        # v1은 검색 confidence까지 실행 게이트로 사용한다. v2는 검색 거리/순위가
+        # 낮다는 이유만으로 차단하지 않고, 스켈레톤·소유권·coverage 안전성만 본다.
+        allowed = structural_allowed if CFG.refine_v2_enabled else bool(
+            confidence == "high" and structural_allowed
             and (slot.state == "valid" or slot.search_stability == "stable")
         )
         desc.refine_allowed = allowed
         desc.refinable_limbs = refinable_limbs
+        desc.quality_trace["refine_policy"] = (
+            "v2_structural" if CFG.refine_v2_enabled else "v1_search_and_structural"
+        )
         if desc.skeleton is not None and evidence is not None:
             desc.skeleton.scores = (
                 evidence.refine_scores if allowed

@@ -223,6 +223,37 @@ def test_extreme_distal_joint_masks_only_the_bad_endpoint():
     assert "left_arm" not in evidence.refinable_limbs
 
 
+def test_balance_only_seated_legs_keep_refine_scores_but_not_search_mask():
+    skeleton = _skeleton()
+    for root, middle, endpoint in ((11, 13, 15), (12, 14, 16)):
+        skeleton.keypoints[middle] = skeleton.keypoints[root] + [0.0, 5.0]
+        skeleton.keypoints[endpoint] = skeleton.keypoints[middle] + [0.0, 55.0]
+    owner = BBox(0, 0, 220, 260, "vlm")
+    evidence = analyze_skeleton(
+        skeleton, BBox(0, 0, 220, 260), owner_box=owner,
+    )
+    assert set(evidence.foreshortened_limbs) == {"left_leg", "right_leg"}
+    assert evidence.coverage_class == "reduced"
+    assert not evidence.valid_joint_mask[15]
+    assert not evidence.valid_joint_mask[16]
+    assert evidence.refine_valid_joint_mask[[13, 14, 15, 16]].all()
+    assert np.all(evidence.refine_scores[[13, 14, 15, 16]] > 0.0)
+    assert {"left_leg", "right_leg"}.issubset(evidence.refinable_limbs)
+
+
+def test_absolute_leg_length_outlier_stays_fail_closed_for_refine():
+    skeleton = _skeleton()
+    skeleton.keypoints[15] = skeleton.keypoints[13] + [0.0, 300.0]
+    evidence = analyze_skeleton(
+        skeleton, BBox(0, 0, 500, 500),
+        owner_box=BBox(0, 0, 500, 500, "vlm"),
+    )
+    assert "left_leg" not in evidence.foreshortened_limbs
+    assert "left_leg" in evidence.suspect_limbs
+    assert not evidence.refine_valid_joint_mask[15]
+    assert evidence.refine_scores[15] == 0.0
+
+
 def test_crop_candidate_does_not_replace_better_original():
     slot = assign_candidates(
         [BBox(20, 10, 180, 260, "vlm")], [_skeleton(cx=100)], 400, 300

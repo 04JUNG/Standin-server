@@ -36,6 +36,10 @@ from .collision import (ARM_JOINTS, arm_torso_penetration, collision_dict,
                         collision_status, hand_tip_offset)
 
 
+REFINE_CODE_VERSION = "v1.3"
+REFINE_V2_CODE_VERSION = "v2.4.0"
+
+
 # ---- 축소판 파라미터 (설계문서 §4-1) --------------------------------------
 # 러프 콘티의 변별점은 거의 항상 팔다리 각도다. 손목·발목·척추·목은 러프에서
 # 2~3px 노이즈로 그려져 오히려 잘못된 신호를 준다 → 베이스 고정.
@@ -100,7 +104,7 @@ def limb_observability(joints, frame, view, limb, tgt_dirs, tgt_ok, w) -> float:
 
     다리는 이 값이 컷마다 8배 범위로 흩어진다(전신 컷에서 또렷한 다리는 팔과 비슷,
     허벅지에서 잘린 컷은 팔의 1/10). 그래서 전역 on/off가 아니라 이 측정으로
-    사지별·컷별 판단을 한다. docs/REFINE_DESIGN.md §6-5.
+    사지별·컷별 판단을 한다. docs/REFINE_DESIGN.md.
     """
     sufs, _ = LIMBS[limb]
     mask = _mask_for([limb])
@@ -329,6 +333,8 @@ class RefineResult:
     svd_lambda_mult: tuple = ()      # P1b: 위 조합별 lambda 강화 배수
     limb_decisions: dict = field(default_factory=dict)  # 사지별 채택·탈락 사유와 P2 이동량
     bvh_text: Optional[str] = None   # 조정본 본문(LF). refined=True일 때만 채운다
+    refine_version: str = REFINE_CODE_VERSION
+    diagnostics: dict = field(default_factory=dict)
 
     @property
     def gain(self) -> float:
@@ -337,9 +343,25 @@ class RefineResult:
             return 0.0
         return float(1.0 - self.loss_final / self.loss_base)
 
+    @property
+    def refine_outcome(self) -> str:
+        """공백 유형과 섞지 않는 실행 결과 분류."""
+        if self.refined:
+            return "improved"
+        if self.reason in ("already_matched", "no_gain", "unchanged_geometry"):
+            return "unchanged"
+        if self.reason in {
+            "disabled", "skeleton_policy", "low_skeleton_score",
+            "base_mismatch", "multiframe_base", "insufficient_target_bones",
+            "low_observability", "no_solvable_joints", "entangled_set",
+        }:
+            return "not_attempted"
+        return "reverted"
+
     def to_dict(self) -> dict:
         d = asdict(self)
         d["gain"] = self.gain
+        d["refine_outcome"] = self.refine_outcome
         return d
 
 
@@ -479,6 +501,17 @@ class _NoProgress(RuntimeError):
     """최적화기가 시작점에서 움직이지 않았다 — 폴백으로 넘긴다."""
 
 
+class _RefineTimeout(RuntimeError):
+    """요청 latency 예산을 넘겨 solver를 중단했다."""
+
+
+def _check_deadline(deadline: Optional[float]) -> None:
+    if deadline is not None:
+        from time import monotonic
+        if monotonic() >= deadline:
+            raise _RefineTimeout("refine timeout")
+
+
 def _solve_numpy(residual, x0, lo, hi, max_iter, eps=1e-2):
     """
     scipy가 없을 때의 폴백 — 바운드 투영 Levenberg–Marquardt(수치 야코비안).
@@ -534,6 +567,8 @@ def refine_bvh(base_bvh: str,
                frame: int = 0,
                bone_weights: Optional[Sequence[float]] = None,
                allowed_limbs: Optional[Sequence[str]] = None,
+               deadline: Optional[float] = None,
+               refine_mode: str = "conservative",
                cfg=CFG) -> RefineResult:
     """
     베이스 BVH를 러프 2D 스켈레톤에 맞춰 미세조정한다.
@@ -548,6 +583,7 @@ def refine_bvh(base_bvh: str,
         search_distance:  /analyze가 낸 Top-1 거리. 주면 게이트 5(베이스 불일치) 작동
         allowed_limbs:    스켈레톤 품질 단계가 허용한 사지. None이면 기존 동작
         frame:            베이스 BVH에서 사용할 프레임(라이브러리 색인과 동일하게 0)
+        refine_mode:      v2.5 conservative | safe aggressive. v1은 conservative만 허용
 
     Returns:
         RefineResult. **refined=False면 bvh_path는 베이스 원본**이다(조정 폐기).
@@ -556,6 +592,20 @@ def refine_bvh(base_bvh: str,
     """
     if not os.path.exists(base_bvh):
         raise FileNotFoundError(base_bvh)
+
+    # v1의 실행 계약을 보존하기 위해 v2는 명시적 feature flag 뒤에서만 돈다.
+    # lazy import는 refine_v2가 이 모듈의 공용 FK/solver 헬퍼를 재사용할 때 생기는
+    # 모듈 초기화 순환을 피한다.
+    if cfg.refine_v2_enabled:
+        from .refine_v2 import refine_bvh_v2
+        return refine_bvh_v2(
+            base_bvh, target_keypoints, target_scores, view,
+            out_path=out_path, search_distance=search_distance, frame=frame,
+            bone_weights=bone_weights, allowed_limbs=allowed_limbs,
+            deadline=deadline, refine_mode=refine_mode, cfg=cfg,
+        )
+    if refine_mode != "conservative":
+        raise ValueError("aggressive refine_mode requires REFINE_V2_ENABLED=1")
 
     fail = lambda reason: RefineResult(False, reason, base_bvh,
                                        float("nan"), float("nan"), 0, "none")
@@ -726,6 +776,7 @@ def refine_bvh(base_bvh: str,
         params[cols] = base_params[cols]
 
     def residual(params):
+        _check_deadline(deadline)
         d, ok = fwd.dirs(params)
         m = ok & mask
         ang = ((d - tgt_dirs) * sqrt_w * m[:, None]).ravel()
@@ -745,6 +796,10 @@ def refine_bvh(base_bvh: str,
             # scipy가 없거나, 있어도 탐색을 못 한 경우 모두 numpy LM으로 간다.
             x, nfev = _solve_numpy(residual, base_params, lo, hi, cfg.refine_max_iter)
             backend = "numpy"
+    except _RefineTimeout:
+        for name in active:
+            limb_decisions[name]["reason"] = "timeout"
+        return decorate(fail("timeout"))
     except Exception:                      # 최적화기 내부 폭발도 폴백으로 흡수
         for name in active:
             limb_decisions[name]["reason"] = "diverged"

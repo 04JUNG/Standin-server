@@ -6,6 +6,8 @@ data/
 # refine/eval 산출물
 eval_refine/
 top5_out/
+.eval-cache/
+out/eval/
 
 # 테스트 러프/입력 이미지(작가 저작물일 수 있음)
 rough*.png

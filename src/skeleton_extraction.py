@@ -42,6 +42,8 @@ class SkeletonEvidence:
     suspect_limbs: tuple[str, ...] = ()
     quality_components: dict[str, float | int | bool] = field(default_factory=dict)
     reasons: list[str] = field(default_factory=list)
+    refine_valid_joint_mask: Optional[np.ndarray] = None
+    foreshortened_limbs: tuple[str, ...] = ()
 
     @property
     def searchable(self) -> bool:
@@ -60,7 +62,10 @@ class SkeletonEvidence:
     @property
     def refine_scores(self) -> np.ndarray:
         """구버전 클라이언트도 의심 사지를 풀지 못하게 만든 refine 전용 score."""
-        out = self.effective_scores
+        mask = (self.valid_joint_mask if self.refine_valid_joint_mask is None
+                else np.asarray(self.refine_valid_joint_mask, dtype=bool))
+        out = np.asarray(self.raw_scores, dtype=np.float32).copy()
+        out[~mask] = 0.0
         for limb in self.suspect_limbs:
             _, middle, endpoint = _LIMB_JOINTS[limb]
             out[[middle, endpoint]] = 0.0
@@ -253,6 +258,9 @@ def analyze_skeleton(skeleton: Optional[Skeleton], box: Optional[BBox] = None,
     if not finite.all():
         reasons.append("non_finite_keypoints")
     valid_joint = finite & (scores >= kpt_thr)
+    # 검색은 기존의 보수적 구조 mask를 유지하고, refine은 정상 단축투영을 별도
+    # soft eligibility로 살린다. 실제 길이/소유권 오류는 두 mask에서 모두 막는다.
+    refine_valid_joint = valid_joint.copy()
     anchors_valid = bool(valid_joint[ANCHOR_JOINTS].all())
     torso_scale = 0.0
     if anchors_valid:
@@ -274,6 +282,7 @@ def analyze_skeleton(skeleton: Optional[Skeleton], box: Optional[BBox] = None,
     }
     torso_suspect = False
     suspect_limbs: set[str] = set()
+    foreshortened_limbs: set[str] = set()
 
     # 합쳐진 두 인물의 어깨/골반을 한 몸통으로 연결한 경우를 강한 비율 이상으로
     # 감지한다. 웹툰 과장을 허용하도록 임계값은 정상 비율보다 넉넉하게 둔다.
@@ -310,13 +319,41 @@ def analyze_skeleton(skeleton: Optional[Skeleton], box: Optional[BBox] = None,
             reasons.append("torso_outside_slot")
             torso_suspect = True
 
-    # 사지의 두 segment를 몸통 길이와 비교한다. 명백한 길이 점프는 다른 인물의
-    # 관절이 붙은 강한 증거이므로 distal 관절을 마스킹한다. 단순히 다른 슬롯으로
-    # 뻗은 팔은 합법적인 포즈일 수 있어 suspect로만 남기고 A/B 검색에 맡긴다.
+    # 사지의 두 segment를 몸통 길이와 비교한다. 검색 mask는 기존 기준을 유지하되,
+    # 절대 길이와 소유권이 정상인 앉은 다리의 balance-only 이상은 refine에서만
+    # foreshortening soft eligibility로 살린다.
     for limb, (root, middle, endpoint) in _LIMB_JOINTS.items():
         if not (valid_joint[root] and valid_joint[middle] and valid_joint[endpoint]
                 and torso_normal):
             continue
+
+        owner_region = (_expanded_box(owner_box, cfg.slot_owner_padding)
+                        if owner_box is not None else None)
+        cross_slot = False
+        owner_distal_clean = (
+            owner_region is None
+            or (_point_in_box(kp[middle], owner_region)
+                and _point_in_box(kp[endpoint], owner_region))
+        )
+        if owner_box is not None and peers and _point_in_box(kp[root], owner_region):
+            distal = (kp[middle], kp[endpoint])
+            for peer in peers:
+                # 박스 자체가 크게 겹치면 소유권 증거가 약하다. 얽힘 장면의 정상 팔을
+                # 과도하게 지우지 않기 위해 별도 suspect도 만들지 않는다.
+                if bbox_iou(owner_box, peer) > cfg.slot_cross_owner_max_iou:
+                    continue
+                peer_hits = sum(_point_in_box(point, peer) for point in distal)
+                owner_misses = sum(
+                    not _point_in_box(point, owner_region) for point in distal
+                )
+                if peer_hits == 2 and owner_misses >= 1:
+                    cross_slot = True
+                    break
+        if cross_slot:
+            suspect_limbs.add(limb)
+            reasons.append(f"{limb}_cross_slot")
+            refine_valid_joint[[middle, endpoint]] = False
+
         first = float(np.linalg.norm(kp[middle] - kp[root]))
         second = float(np.linalg.norm(kp[endpoint] - kp[middle]))
         first_ratio = first / torso_scale
@@ -330,34 +367,30 @@ def analyze_skeleton(skeleton: Optional[Skeleton], box: Optional[BBox] = None,
         first_bad = first_ratio > length_limit
         second_bad = second_ratio > length_limit
         balance_bad = adjacent_ratio > cfg.skeleton_adjacent_segment_ratio_max
+        balance_only_foreshortening = bool(
+            limb.endswith("leg")
+            and balance_bad and not first_bad and not second_bad
+            and not torso_suspect and not cross_slot and owner_distal_clean
+        )
         if first_bad or second_bad or balance_bad:
             if first_bad or (balance_bad and first >= second):
                 # middle이 잘못되면 그 아래 endpoint의 소유권도 보장할 수 없다.
                 valid_joint[[middle, endpoint]] = False
+                if not balance_only_foreshortening:
+                    refine_valid_joint[[middle, endpoint]] = False
             else:
                 # 정상 upper segment는 살리고 튄 endpoint만 제거한다.
                 valid_joint[endpoint] = False
-            suspect_limbs.add(limb)
-            reasons.append(f"{limb}_length_outlier")
-            continue
-
-        if owner_box is None or not peers:
-            continue
-        owner_region = _expanded_box(owner_box, cfg.slot_owner_padding)
-        if not _point_in_box(kp[root], owner_region):
-            continue
-        distal = (kp[middle], kp[endpoint])
-        for peer in peers:
-            # 박스 자체가 크게 겹치면 소유권 증거가 약하다. 얽힘 장면의 정상 팔을
-            # 과도하게 지우지 않기 위해 별도 suspect도 만들지 않는다.
-            if bbox_iou(owner_box, peer) > cfg.slot_cross_owner_max_iou:
-                continue
-            peer_hits = sum(_point_in_box(point, peer) for point in distal)
-            owner_misses = sum(not _point_in_box(point, owner_region) for point in distal)
-            if peer_hits == 2 and owner_misses >= 1:
+                if not balance_only_foreshortening:
+                    refine_valid_joint[endpoint] = False
+            if balance_only_foreshortening:
+                foreshortened_limbs.add(limb)
+                quality[f"{limb}_foreshortening_ambiguous"] = True
+                reasons.append(f"{limb}_foreshortening_ambiguous")
+            else:
                 suspect_limbs.add(limb)
-                reasons.append(f"{limb}_cross_slot")
-                break
+                reasons.append(f"{limb}_length_outlier")
+            continue
 
     # 구조 마스킹을 적용한 뒤 coverage를 다시 계산한다.
     valid_bone = np.asarray(
@@ -373,6 +406,14 @@ def analyze_skeleton(skeleton: Optional[Skeleton], box: Optional[BBox] = None,
     complete_limbs = tuple(
         name for name, bone_indices in LIMB_BONES.items()
         if bool(valid_bone[list(bone_indices)].all())
+    )
+    refine_valid_bone = np.asarray(
+        [refine_valid_joint[a] and refine_valid_joint[b] for a, b in _BONES],
+        dtype=bool,
+    )
+    refine_complete_limbs = tuple(
+        name for name, bone_indices in LIMB_BONES.items()
+        if bool(refine_valid_bone[list(bone_indices)].all())
     )
     minimum_ok = finite.all() and valid_bones >= 4 and torso_bones >= 2 and torso_normal
     if not minimum_ok:
@@ -397,7 +438,7 @@ def analyze_skeleton(skeleton: Optional[Skeleton], box: Optional[BBox] = None,
 
     valid_limbs = (("torso",) + complete_limbs) if torso_normal else complete_limbs
     refinable = tuple(
-        limb for limb in complete_limbs if limb not in suspect_limbs
+        limb for limb in refine_complete_limbs if limb not in suspect_limbs
     ) if coverage in ("full", "reduced") and not torso_suspect else ()
     return SkeletonEvidence(
         state=state, coverage_class=coverage,
@@ -405,6 +446,8 @@ def analyze_skeleton(skeleton: Optional[Skeleton], box: Optional[BBox] = None,
         raw_scores=scores.copy(), valid_limbs=tuple(valid_limbs),
         refinable_limbs=tuple(refinable), valid_bone_count=valid_bones,
         torso_bone_count=torso_bones, torso_scale=torso_scale,
+        refine_valid_joint_mask=refine_valid_joint,
+        foreshortened_limbs=tuple(sorted(foreshortened_limbs)),
         suspect_limbs=tuple(sorted(suspect_limbs)), quality_components=quality,
         reasons=list(dict.fromkeys(reasons)),
     )

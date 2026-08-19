@@ -13,20 +13,24 @@ FastAPI 레이어 — 도원의 Python 추론 서버.
 """
 from __future__ import annotations
 
+import hashlib
 import io
 import json
 import os
 import re
 import time
 import uuid
+from dataclasses import asdict
 from datetime import datetime, timezone
 from contextlib import asynccontextmanager
+from typing import Optional
 
 import numpy as np
 from fastapi import FastAPI, File, Form, Request, UploadFile, HTTPException
 from fastapi.responses import FileResponse, JSONResponse, Response
 
 from src.config import CFG
+from src.bvh import parse_bvh
 from src.logging_setup import (configure_logging, log_error, log_info,
                                log_warn, request_id_var)
 from src import notify as alerts
@@ -34,10 +38,15 @@ from src.ops_metrics import COLLECTOR, TASK_ID
 from src.pipeline import Pipeline
 from src.library import build_synthetic_index
 from src.library_source import ensure_library
-from src.refine import refine_bvh
+from src.refine import (REFINE_CODE_VERSION, REFINE_V2_CODE_VERSION,
+                        refine_bvh)
+from src.refine_policy import structural_refine_allowed
+from src.pose_quarantine import (load_pose_quarantine, pose_quarantine_sha256,
+                                 quarantine_record)
 from src.repo import (FEATURE_VERSION, build_db, load_entries,
                       get_bvh_path, get_pose_meta)
 from src.thumbnails import THUMBNAIL_VIEWS, find_thumbnail, thumbnail_url
+from src.tracing import capture_trace, span
 from src.runtime_guard import (
     MockBackendError,
     actual_backend_names,
@@ -53,6 +62,11 @@ from api.models import (CutResultOut, PersonOut, CandidateOut, SkeletonOut,
 configure_logging()
 
 DB_PATH = os.getenv("DB_PATH", "data/poses.db")
+SOURCE_REVISION = (
+    os.getenv("SOURCE_REVISION")
+    or os.getenv("GIT_SHA")
+    or CFG.deployment_version
+)
 
 STATE: dict = {}
 
@@ -130,6 +144,8 @@ async def lifespan(app: FastAPI):
                  requestedVlm=CFG.vlm_provider, actualVlm=actual_vlm,
                  requestedPose=CFG.pose_backend, actualPose=actual_pose)
 
+    quarantine = load_pose_quarantine(CFG)      # 정책 파일 오류는 기동 시 fail-closed
+    STATE["quarantined_pose_count"] = len(quarantine)
     STATE["pipeline"] = pipeline
     STATE["db_path"] = DB_PATH
     STATE["pose_count"] = len(entries)
@@ -149,7 +165,62 @@ async def lifespan(app: FastAPI):
     alerts.flush()
 
 
-app = FastAPI(title="Standin Pose Pipeline", version="0.1.0", lifespan=lifespan)
+app = FastAPI(title="Standin Pose Pipeline", version="0.2.0", lifespan=lifespan)
+
+
+def _refine_capability() -> dict:
+    """평가 하네스가 v1/v2 실행 정체성을 fail-closed로 고정할 공개 정보."""
+    refine_config = {
+        key: value for key, value in asdict(CFG).items()
+        if key.startswith("refine_") or key in {
+            "distance_metric", "fallback_distance", "min_skeleton_score",
+            "fallback_pos_full", "fallback_pos_reduced",
+            "fallback_angle_full", "fallback_angle_reduced",
+            "fallback_hybrid_full", "fallback_hybrid_reduced",
+        }
+    }
+    code_version = (
+        REFINE_V2_CODE_VERSION if CFG.refine_v2_enabled else REFINE_CODE_VERSION
+    )
+    identity = {
+        "code_version": code_version,
+        "feature_version": FEATURE_VERSION,
+        "pose_library_version": CFG.pose_library_version,
+        "deployment_version": CFG.deployment_version,
+        "source_revision": SOURCE_REVISION,
+        "config": refine_config,
+        "pose_quarantine_sha256": pose_quarantine_sha256(CFG),
+    }
+    config_sha256 = hashlib.sha256(
+        json.dumps(identity, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    # production에서 기본 aggressive인데 selector가 꺼진 구성은 안전하지 않다.
+    config_valid = not (
+        CFG.is_production
+        and CFG.refine_v2_enabled
+        and CFG.refine_default_mode == "aggressive"
+        and not CFG.refine_v25_selector_enabled
+    )
+    return {
+        "enabled": bool(CFG.refine_enabled),
+        "v2_enabled": bool(CFG.refine_v2_enabled),
+        "torso_enabled": bool(CFG.refine_v2_torso_enabled),
+        "default_mode": CFG.refine_default_mode,
+        "selector_enabled": bool(CFG.refine_v25_selector_enabled),
+        "config_valid": bool(config_valid),
+        "pose_quarantine_sha256": pose_quarantine_sha256(CFG),
+        "code_version": code_version,
+        "supported_modes": (
+            ["conservative", "aggressive"]
+            if CFG.refine_v2_enabled else ["conservative"]
+        ),
+        "config_sha256": config_sha256,
+        "config": refine_config,
+        "feature_version": FEATURE_VERSION,
+        "pose_library_version": CFG.pose_library_version,
+        "deployment_version": CFG.deployment_version,
+        "source_revision": SOURCE_REVISION,
+    }
 
 
 # BFF가 붙여 보내는 요청 ID. 로그 주입을 막기 위해 형식을 검사하고, 어긋나면 새로 만든다.
@@ -226,6 +297,7 @@ def healthz():
         "provider": STATE.get("provider", CFG.vlm_provider),
         "pose_backend": STATE.get("pose_backend", CFG.pose_backend),
         "pose_count": pose_count,
+        "refine": _refine_capability(),
     }
     return body if ok else Response(
         content=json.dumps(body), status_code=503, media_type="application/json"
@@ -263,7 +335,8 @@ class _HintImg(str):
 
 
 @app.post("/analyze", response_model=CutResultOut)
-def analyze(file: UploadFile = File(...), hint: str = Form(default="")):
+def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
+            response: Response = None):
     data = file.file.read()
     image, w, h = _load_image(data)
     # dev 편의: mock provider일 때만 hint를 이미지 대용으로 사용
@@ -271,7 +344,12 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default="")):
         image = _HintImg(hint)
 
     pipe: Pipeline = STATE["pipeline"]
-    res = pipe.process_cut(image, w, h)
+    with capture_trace() as timing:
+        with span("pipeline_total"):
+            res = pipe.process_cut(image, w, h)
+    if response is not None:
+        response.headers["Server-Timing"] = timing.server_timing()
+        response.headers["X-Standin-Timing-Kind"] = "live-server-stage"
 
     people = []
     per_person = getattr(res, "person_candidates", [])
@@ -343,6 +421,13 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default="")):
 def get_pose_bvh(pose_id: str):
     """동원 핸드오프: 선택된 후보의 라이브러리 BVH 원본을 그대로 반환.
     CSP용 미러링/축 보정은 이 서비스가 아니라 동원의 내보내기 단계가 담당(결정 문서 참조)."""
+    quarantine = quarantine_record(pose_id, CFG)
+    if quarantine is not None:
+        raise HTTPException(
+            409,
+            f"pose_quarantined: {pose_id}; select the next Top-K candidate "
+            f"({quarantine['reason']})",
+        )
     path = get_bvh_path(STATE["db_path"], pose_id)
     if not path:
         raise HTTPException(404, f"unknown pose_id: {pose_id}")
@@ -380,71 +465,181 @@ def get_pose_thumbnail(pose_id: str, view: str):
 # (job_id, person_index, candidate_id)가 담당한다.
 
 
+def _file_sha256(path: str) -> str:
+    digest = hashlib.sha256()
+    with open(path, "rb") as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _effective_refine_mode(requested: Optional[str]) -> str:
+    """제품 mode를 한 번만 확정한다. v2가 꺼져 있으면 항상 conservative."""
+    if not CFG.refine_v2_enabled:
+        return "conservative"
+    return requested or CFG.refine_default_mode
+
+
 @app.post("/refine", response_model=RefineResponse)
 def refine(req: RefineRequest):
     """
-    작가가 고른 후보 1개를 러프에 맞춰 미세조정한다.
+    작가가 고른 후보 1개를 러프에 맞춰 safe aggressive 정책으로 조정한다.
 
     입력은 /analyze 응답을 그대로 되돌려주면 된다(러프 이미지 재전송 불필요).
     **refined=False는 오류가 아니다** — 안전 게이트가 조정을 버리고 베이스를 준 것이며,
-    이 경우 bvh_url은 원래의 /pose/{id}/bvh와 동등하다(§4-3 "좋아지거나, 그대로").
+    이 경우에도 bvh_url은 동일한 /pose/{id}/bvh다.
+
+    조정본은 응답의 `bvh` 본문으로만 나간다. 로컬 디스크에 남기지 않으므로 롤링 배포
+    중 다른 태스크가 응답해 404가 나는 경로가 없다(docs/REFINE_HANDOFF.md §3 4단계).
+    같은 선택을 다시 눌러도 재계산하지 않는 멱등성은 BFF의 refined_artifacts PK
+    (job_id, person_index, candidate_id)가 담당한다.
     """
+    effective_mode = _effective_refine_mode(req.refine_mode)
+    mode_requested = req.refine_mode or "default"
+
+    # 불량 asset은 검색에서 이미 빠지지만, 이전 cache로 고른 stale 선택은 여기서 막는다.
+    quarantine = quarantine_record(req.pose_id, CFG)
+    if quarantine is not None:
+        raise HTTPException(
+            409,
+            f"pose_quarantined: {req.pose_id}; select the next Top-K candidate "
+            f"({quarantine['reason']})",
+        )
+
     meta = get_pose_meta(STATE["db_path"], req.pose_id)
     if meta is None:
         raise HTTPException(404, f"unknown pose_id: {req.pose_id}")
     base = meta["bvh_path"]
     if not base or not os.path.exists(base):
         raise HTTPException(409, f"pose '{req.pose_id}' 등록됨(경로={base})이나 BVH 파일 미존재.")
-    if len(req.keypoints) != 17:
-        raise HTTPException(422, f"keypoints는 17개여야 합니다(받은 값: {len(req.keypoints)})")
-    if req.scores is not None and len(req.scores) != 17:
-        raise HTTPException(422, f"scores는 17개여야 합니다(받은 값: {len(req.scores)})")
+    try:
+        parse_bvh(base)
+    except (OSError, AssertionError, ValueError, IndexError) as exc:
+        raise HTTPException(
+            409, f"pose '{req.pose_id}'의 BVH를 파싱할 수 없습니다: {exc}"
+        ) from exc
 
-    if req.refine_allowed is False:
+    def _base_context() -> dict:
+        return {
+            "base_bvh_sha256": _file_sha256(base),
+            "refine_config_sha256": _refine_capability()["config_sha256"],
+            "pose_library_version": CFG.pose_library_version,
+            "deployment_version": CFG.deployment_version,
+            "feature_version": FEATURE_VERSION,
+            "source_revision": SOURCE_REVISION,
+        }
+
+    def _base_response(reason: str) -> RefineResponse:
         return RefineResponse(
             pose_id=req.pose_id, view=req.view, refined=False,
-            reason="skeleton_policy", bvh_url=f"/pose/{req.pose_id}/bvh",
+            reason=reason, bvh_url=f"/pose/{req.pose_id}/bvh", bvh=None,
             loss_base=None, loss_final=None, gain=None, backend="none",
+            refine_version=(REFINE_V2_CODE_VERSION if CFG.refine_v2_enabled
+                            else REFINE_CODE_VERSION),
+            refine_outcome="not_attempted",
+            diagnostics={
+                "mode_requested": mode_requested,
+                "mode_effective": effective_mode,
+                "mode_applied": "base",
+                "aggressive_attempted": False,
+                "aggressive_reason": reason,
+                "context": _base_context(),
+            },
         )
+
+    policy_lineage_present = bool(
+        req.refine_allowed is not None
+        or req.refinable_limbs is not None
+        or req.lower_body_observed is not None
+        or req.skeleton_state is not None
+        or req.coverage_class is not None
+        or req.slot_origin is not None
+        or req.skeleton_source is not None
+    )
+    # 하체 비관측이면 정책 단계에서 먼저 다리를 닫는다(v2.5.2 fail-closed).
+    effective_limbs = list(req.refinable_limbs or [])
+    if req.lower_body_observed is not True:
+        effective_limbs = [
+            limb for limb in effective_limbs
+            if limb not in {"left_leg", "right_leg"}
+        ]
+    policy_valid = bool(
+        req.refine_allowed is True
+        and structural_refine_allowed(
+            skeleton_state=req.skeleton_state,
+            coverage_class=req.coverage_class,
+            refinable_limbs=effective_limbs,
+            slot_origin=req.slot_origin,
+            skeleton_source=req.skeleton_source,
+        )
+    )
+    # policy lineage를 아예 안 보내는 legacy v1 호출은 그대로 호환된다. 한 번이라도
+    # /analyze 정책 필드를 보내면 v1·v2 모두 fail-closed로 재검증한다.
+    if (
+        req.refine_allowed is False
+        or (policy_lineage_present and not policy_valid)
+        or (CFG.refine_v2_enabled and not policy_valid)
+    ):
+        return _base_response("skeleton_policy")
 
     # 얽힘 세트는 조정하지 않는다. hug_01_A/B를 각자 돌리면 두 사람이 맞물리던
     # 정합(손이 어깨에 닿는 등)이 깨지는데, BVH는 상대 위치를 안 실으므로
     # 그 깨짐을 되돌릴 방법이 없다. 세트 refine은 세트 전체를 함께 푸는 별도 과제.
     if meta.get("set_id"):
-        return RefineResponse(
-            pose_id=req.pose_id, view=req.view, refined=False,
-            reason="entangled_set", bvh_url=f"/pose/{req.pose_id}/bvh",
-            loss_base=None, loss_final=None, gain=None, backend="none")
+        return _base_response("entangled_set")
 
+    timeout = max(float(CFG.refine_timeout_seconds), 0.0)
+    deadline = None if timeout == 0.0 else time.monotonic() + timeout
     try:
-        # out_path=None → 로컬 파일을 쓰지 않는다. 조정본은 응답 본문으로만 나간다.
+        # out_path=None → 로컬 파일을 쓰지 않는다. selector는 내부 임시파일로 최종
+        # 후보를 재검증하고, 채택본의 본문만 응답으로 나간다.
         res = refine_bvh(base, req.keypoints, req.scores, req.view,
                          out_path=None, search_distance=req.search_distance,
-                         allowed_limbs=req.refinable_limbs)
+                         allowed_limbs=req.refinable_limbs,
+                         lower_body_observed=req.lower_body_observed,
+                         refine_mode=effective_mode, deadline=deadline)
     except ValueError as exc:                      # 알 수 없는 view 등
         raise HTTPException(422, str(exc)) from exc
+    except (OSError, AssertionError) as exc:
+        raise HTTPException(409, f"refine BVH 처리 실패: {exc}") from exc
 
-    # 조정본은 응답 본문(bvh)으로만 나간다. 소비자가 두 번째 요청을 하지 않으므로
-    # 롤링 배포 중 다른 태스크가 응답해 404가 나는 경로가 없고, 로컬 디스크에
-    # 조정본이 무한정 쌓이지도 않는다(REFINE_HANDOFF §3).
-    #
-    # bvh_url은 refined 여부와 무관하게 항상 베이스를 가리킨다. 조정본에는 더 이상
-    # URL이 없다 — 소비자는 bvh를 받아 자기 저장소에 보관한다.
+    diagnostics = dict(res.diagnostics)
+    diagnostics.setdefault("mode_requested", mode_requested)
+    diagnostics.setdefault("mode_effective", effective_mode)
+    context = diagnostics.setdefault("context", {})
+    context.update({
+        "gap_type": req.gap_type,
+        "skeleton_state": req.skeleton_state,
+        "coverage_class": req.coverage_class,
+        "slot_origin": req.slot_origin,
+        "skeleton_source": req.skeleton_source,
+        "search_stability": req.search_stability,
+        "distance_metric": req.distance_metric or context.get("distance_metric"),
+        "confidence_threshold": req.confidence_threshold,
+        "refine_mode": effective_mode,
+        **_base_context(),
+    })
+
+    # bvh_url은 refined 여부와 무관하게 항상 베이스를 가리킨다. 조정본에는 URL이
+    # 없다 — 소비자는 bvh 본문을 받아 자기 저장소에 보관한다.
     return RefineResponse(
         pose_id=req.pose_id, view=req.view,
         refined=res.refined, reason=res.reason,
         bvh_url=f"/pose/{req.pose_id}/bvh",
-        bvh=res.bvh_text,
+        bvh=res.bvh_text if res.refined else None,
         loss_base=None if np.isnan(res.loss_base) else res.loss_base,
         loss_final=None if np.isnan(res.loss_final) else res.loss_final,
         gain=None if np.isnan(res.loss_base) else res.gain,
         backend=res.backend,
+        refine_version=res.refine_version,
+        refine_outcome=res.refine_outcome,
         limbs=list(res.limbs),
         limb_decisions=res.limb_decisions,
+        diagnostics=diagnostics,
     )
 
 
-# GET /refined/{handle}/bvh는 제거됐다(REFINE_HANDOFF §3 4단계).
+# GET /refined/{handle}/bvh는 제거됐다(docs/REFINE_HANDOFF.md §3 4단계).
 # 조정본은 POST /refine 응답의 bvh 필드로만 나가고, 보관은 소비자(BFF)가 한다.
 # 추론 컨테이너의 로컬 디스크에는 아무것도 남지 않는다.
 

@@ -14,6 +14,7 @@
 pip install numpy                 # 코어 실행에 필요한 유일한 의존성
 python scripts/run_demo.py        # mock으로 6개 케이스 end-to-end 데모
 python tests/test_smoke.py        # 스모크 테스트(핵심 계약 검증, pytest 불필요)
+python tests/test_refine_v2.py    # 승인된 refine v2 feature-flag·안전 계약
 ```
 
 **API 서버**(앱 서버 팀과의 HTTP 경계):
@@ -36,12 +37,21 @@ uvicorn api.app:app --reload          # http://127.0.0.1:8000/docs 에서 계약
               인증·Job·기록          POST /analyze (동기, 무인증)
                                      POST /refine   (고른 후보 → 러프에 맞춰 조정)
                                      GET  /pose/{id}/bvh
+                                     GET  /refined/{handle}/bvh
                                      POST /export-order
                                      GET  /healthz
 ```
 
 이 서버는 **동기·무인증·무상태 추론 API**다. 인증·Job 비동기·버전 프리픽스는 앱 서버가 감싼다.
 자세한 계약과 경계는 [`docs/API_CONTRACT.md`](docs/API_CONTRACT.md).
+
+Refine v2는 구현되어 있지만 holdout 승격 전까지 기본값은 꺼져 있다. 로컬/평가 서버에서만
+`REFINE_V2_ENABLED=1`로 켜며, 하체 단계가 승인되기 전 `REFINE_V2_TORSO=0`을 유지한다.
+합성 1차 스크리닝은 다음처럼 실행한다.
+
+```bash
+python scripts/eval_refine_v2_synthetic.py --bvh-dir data/bvh --out out/refine-v2-synthetic
+```
 
 ---
 
