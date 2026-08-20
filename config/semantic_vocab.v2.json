@@ -1,0 +1,248 @@
+{
+  "schema_version": 1,
+  "semantic_vocab_version": 2,
+  "status": "frozen_for_library_normalization",
+  "policy": {
+    "raw_labels_are_immutable": true,
+    "source_actions_are_context_not_pose_truth": true,
+    "unknown_is_preferred_to_unsupported_inference": true,
+    "runtime_action_enum_is_out_of_scope": true
+  },
+  "fields": {
+    "action_domain": {
+      "cardinality": "many",
+      "values": [
+        {"id": "unknown", "ko": "알 수 없음", "en": "unknown"},
+        {"id": "idle", "ko": "대기", "en": "idle"},
+        {"id": "locomotion", "ko": "이동", "en": "locomotion"},
+        {"id": "transition", "ko": "자세 전환", "en": "transition"},
+        {"id": "gesture", "ko": "제스처", "en": "gesture"},
+        {"id": "object_interaction", "ko": "물체 상호작용", "en": "object interaction"},
+        {"id": "daily_activity", "ko": "일상 행동", "en": "daily activity"},
+        {"id": "sport", "ko": "스포츠", "en": "sport"},
+        {"id": "combat", "ko": "전투", "en": "combat"},
+        {"id": "dance", "ko": "춤", "en": "dance"},
+        {"id": "exercise", "ko": "운동", "en": "exercise"},
+        {"id": "acrobatics", "ko": "곡예", "en": "acrobatics"},
+        {"id": "social_interaction", "ko": "사회적 상호작용", "en": "social interaction"},
+        {"id": "performance", "ko": "공연", "en": "performance"},
+        {"id": "other", "ko": "기타", "en": "other"}
+      ]
+    },
+    "action_ids": {
+      "cardinality": "many",
+      "values": [
+        {"id": "idle", "domain": "idle", "ko": "대기하기", "en": "idle"},
+        {"id": "hold_pose", "domain": "idle", "ko": "자세 유지", "en": "hold pose"},
+
+        {"id": "walk", "domain": "locomotion", "ko": "걷기", "en": "walk", "aliases_en": ["walking"]},
+        {"id": "run", "domain": "locomotion", "ko": "달리기", "en": "run", "aliases_en": ["running"]},
+        {"id": "step", "domain": "locomotion", "ko": "내딛기", "en": "step"},
+        {"id": "step_over", "domain": "locomotion", "ko": "장애물 넘기", "en": "step over"},
+        {"id": "climb", "domain": "locomotion", "ko": "오르기", "en": "climb"},
+        {"id": "crawl", "domain": "locomotion", "ko": "기어가기", "en": "crawl"},
+        {"id": "creep", "domain": "locomotion", "ko": "살금살금 걷기", "en": "creep"},
+        {"id": "limp", "domain": "locomotion", "ko": "절뚝거리기", "en": "limp"},
+        {"id": "march", "domain": "locomotion", "ko": "행진", "en": "march"},
+        {"id": "jump", "domain": "locomotion", "ko": "점프", "en": "jump"},
+        {"id": "swim", "domain": "locomotion", "ko": "수영", "en": "swim"},
+        {"id": "tightrope_walk", "domain": "locomotion", "ko": "줄타기", "en": "tightrope walk"},
+
+        {"id": "sit_down", "domain": "transition", "ko": "앉기", "en": "sit down"},
+        {"id": "stand_up", "domain": "transition", "ko": "일어서기", "en": "stand up"},
+        {"id": "get_up", "domain": "transition", "ko": "바닥에서 일어나기", "en": "get up"},
+        {"id": "fall", "domain": "transition", "ko": "넘어지기", "en": "fall"},
+        {"id": "land", "domain": "transition", "ko": "착지", "en": "land"},
+        {"id": "turn", "domain": "transition", "ko": "돌기", "en": "turn"},
+        {"id": "roll", "domain": "transition", "ko": "구르기", "en": "roll"},
+        {"id": "dive", "domain": "transition", "ko": "몸을 던지기", "en": "dive"},
+
+        {"id": "wave", "domain": "gesture", "ko": "손 흔들기", "en": "wave", "aliases_en": ["waving"]},
+        {"id": "point", "domain": "gesture", "ko": "가리키기", "en": "point"},
+        {"id": "clap", "domain": "gesture", "ko": "박수", "en": "clap"},
+        {"id": "raise_hand", "domain": "gesture", "ko": "손 들기", "en": "raise hand"},
+        {"id": "shrug", "domain": "gesture", "ko": "어깨 으쓱하기", "en": "shrug"},
+        {"id": "facepalm", "domain": "gesture", "ko": "얼굴 감싸기", "en": "facepalm"},
+        {"id": "fist_pump", "domain": "gesture", "ko": "주먹 들어 올리기", "en": "fist pump"},
+        {"id": "question_gesture", "domain": "gesture", "ko": "질문 제스처", "en": "question gesture"},
+        {"id": "dismiss_gesture", "domain": "gesture", "ko": "물러가라는 제스처", "en": "dismiss gesture"},
+
+        {"id": "reach", "domain": "object_interaction", "ko": "손 뻗기", "en": "reach"},
+        {"id": "grab", "domain": "object_interaction", "ko": "붙잡기", "en": "grab"},
+        {"id": "pick_up", "domain": "object_interaction", "ko": "집어 들기", "en": "pick up"},
+        {"id": "lift", "domain": "object_interaction", "ko": "들어 올리기", "en": "lift"},
+        {"id": "carry", "domain": "object_interaction", "ko": "운반하기", "en": "carry"},
+        {"id": "push", "domain": "object_interaction", "ko": "밀기", "en": "push"},
+        {"id": "pull", "domain": "object_interaction", "ko": "당기기", "en": "pull"},
+        {"id": "throw", "domain": "object_interaction", "ko": "던지기", "en": "throw"},
+        {"id": "place", "domain": "object_interaction", "ko": "내려놓기", "en": "place"},
+        {"id": "type", "domain": "object_interaction", "ko": "타이핑", "en": "type"},
+        {"id": "use_mouse", "domain": "object_interaction", "ko": "마우스 사용", "en": "use mouse"},
+        {"id": "text_message", "domain": "object_interaction", "ko": "문자 입력", "en": "text message"},
+        {"id": "phone_call", "domain": "object_interaction", "ko": "전화하기", "en": "phone call"},
+        {"id": "juggle", "domain": "object_interaction", "ko": "저글링", "en": "juggle"},
+
+        {"id": "cook", "domain": "daily_activity", "ko": "요리하기", "en": "cook"},
+        {"id": "dig", "domain": "daily_activity", "ko": "땅 파기", "en": "dig"},
+        {"id": "plant", "domain": "daily_activity", "ko": "심기", "en": "plant"},
+        {"id": "water", "domain": "daily_activity", "ko": "물 주기", "en": "water"},
+        {"id": "clean", "domain": "daily_activity", "ko": "청소하기", "en": "clean"},
+        {"id": "sweep", "domain": "daily_activity", "ko": "쓸기", "en": "sweep"},
+        {"id": "paint", "domain": "daily_activity", "ko": "칠하기", "en": "paint"},
+
+        {"id": "baseball_swing", "domain": "sport", "ko": "야구 스윙", "en": "baseball swing"},
+        {"id": "baseball_pitch", "domain": "sport", "ko": "야구 투구", "en": "baseball pitch"},
+        {"id": "golf_swing", "domain": "sport", "ko": "골프 스윙", "en": "golf swing"},
+        {"id": "basketball_dribble", "domain": "sport", "ko": "농구 드리블", "en": "basketball dribble"},
+        {"id": "soccer_kick", "domain": "sport", "ko": "축구공 차기", "en": "soccer kick"},
+        {"id": "skateboard", "domain": "sport", "ko": "스케이트보드 타기", "en": "skateboard"},
+
+        {"id": "boxing", "domain": "combat", "ko": "복싱", "en": "boxing"},
+        {"id": "punch", "domain": "combat", "ko": "주먹질", "en": "punch"},
+        {"id": "kick", "domain": "combat", "ko": "차기", "en": "kick"},
+        {"id": "block", "domain": "combat", "ko": "막기", "en": "block"},
+        {"id": "swordplay", "domain": "combat", "ko": "검술", "en": "swordplay"},
+        {"id": "threaten", "domain": "combat", "ko": "위협하기", "en": "threaten"},
+
+        {"id": "dance_step", "domain": "dance", "ko": "춤 스텝", "en": "dance step"},
+        {"id": "traditional_dance", "domain": "dance", "ko": "전통 춤", "en": "traditional dance"},
+        {"id": "arabesque", "domain": "dance", "ko": "아라베스크", "en": "arabesque"},
+        {"id": "pirouette", "domain": "dance", "ko": "피루엣", "en": "pirouette"},
+        {"id": "jete", "domain": "dance", "ko": "제테", "en": "jete"},
+        {"id": "floor_dance", "domain": "dance", "ko": "플로어 댄스", "en": "floor dance"},
+        {"id": "salsa", "domain": "dance", "ko": "살사", "en": "salsa"},
+        {"id": "charleston", "domain": "dance", "ko": "찰스턴", "en": "charleston"},
+
+        {"id": "stretch", "domain": "exercise", "ko": "스트레칭", "en": "stretch"},
+        {"id": "yoga", "domain": "exercise", "ko": "요가", "en": "yoga"},
+        {"id": "squat", "domain": "exercise", "ko": "스쿼트", "en": "squat"},
+        {"id": "jumping_jack", "domain": "exercise", "ko": "팔 벌려 뛰기", "en": "jumping jack"},
+        {"id": "balance", "domain": "exercise", "ko": "균형 잡기", "en": "balance"},
+
+        {"id": "handstand", "domain": "acrobatics", "ko": "물구나무", "en": "handstand"},
+        {"id": "cartwheel", "domain": "acrobatics", "ko": "옆돌기", "en": "cartwheel"},
+        {"id": "backflip", "domain": "acrobatics", "ko": "뒤공중돌기", "en": "backflip"},
+        {"id": "front_flip", "domain": "acrobatics", "ko": "앞공중돌기", "en": "front flip"},
+        {"id": "side_flip", "domain": "acrobatics", "ko": "옆공중돌기", "en": "side flip"},
+        {"id": "floor_freeze", "domain": "acrobatics", "ko": "플로어 프리즈", "en": "floor freeze"},
+
+        {"id": "talk", "domain": "social_interaction", "ko": "대화하기", "en": "talk"},
+        {"id": "greet", "domain": "social_interaction", "ko": "인사하기", "en": "greet"},
+        {"id": "handshake", "domain": "social_interaction", "ko": "악수", "en": "handshake"},
+        {"id": "kiss", "domain": "social_interaction", "ko": "키스", "en": "kiss"},
+        {"id": "laugh", "domain": "social_interaction", "ko": "웃기", "en": "laugh"},
+        {"id": "comfort", "domain": "social_interaction", "ko": "위로하기", "en": "comfort"},
+        {"id": "rescue", "domain": "social_interaction", "ko": "구조하기", "en": "rescue"},
+        {"id": "argue", "domain": "social_interaction", "ko": "다투기", "en": "argue"},
+
+        {"id": "sing", "domain": "performance", "ko": "노래하기", "en": "sing"},
+        {"id": "play_drums", "domain": "performance", "ko": "드럼 연주", "en": "play drums"},
+        {"id": "play_guitar", "domain": "performance", "ko": "기타 연주", "en": "play guitar"},
+        {"id": "play_piano", "domain": "performance", "ko": "피아노 연주", "en": "play piano"},
+        {"id": "play_saxophone", "domain": "performance", "ko": "색소폰 연주", "en": "play saxophone"},
+        {"id": "play_trumpet", "domain": "performance", "ko": "트럼펫 연주", "en": "play trumpet"}
+      ]
+    },
+    "posture": {
+      "cardinality": "many",
+      "values": [
+        {"id": "unknown", "ko": "알 수 없음", "en": "unknown"},
+        {"id": "standing", "ko": "서기", "en": "standing"},
+        {"id": "sitting", "ko": "앉기", "en": "sitting"},
+        {"id": "crouching", "ko": "쪼그리기", "en": "crouching"},
+        {"id": "kneeling", "ko": "무릎 꿇기", "en": "kneeling"},
+        {"id": "lying", "ko": "눕기", "en": "lying"},
+        {"id": "all_fours", "ko": "네발 지지", "en": "all fours"},
+        {"id": "one_leg_balance", "ko": "한발 균형", "en": "one-leg balance"},
+        {"id": "inverted", "ko": "역자세", "en": "inverted"},
+        {"id": "airborne", "ko": "공중", "en": "airborne"}
+      ]
+    },
+    "motion_phase": {
+      "cardinality": "one",
+      "values": [
+        {"id": "unknown", "ko": "알 수 없음", "en": "unknown"},
+        {"id": "preparation", "ko": "준비", "en": "preparation"},
+        {"id": "execution", "ko": "수행", "en": "execution"},
+        {"id": "impact", "ko": "접촉 순간", "en": "impact"},
+        {"id": "recovery", "ko": "회수", "en": "recovery"},
+        {"id": "hold", "ko": "유지", "en": "hold"},
+        {"id": "transition", "ko": "전환 중", "en": "transition"}
+      ]
+    },
+    "style_context": {
+      "cardinality": "many",
+      "values": [
+        {"id": "unknown", "ko": "알 수 없음", "en": "unknown"},
+        {"id": "traditional", "ko": "전통", "en": "traditional"},
+        {"id": "historical", "ko": "시대극", "en": "historical"},
+        {"id": "traditional_indian", "ko": "인도 전통", "en": "traditional Indian"},
+        {"id": "ballet", "ko": "발레", "en": "ballet"},
+        {"id": "breakdance", "ko": "브레이크댄스", "en": "breakdance"},
+        {"id": "salsa", "ko": "살사", "en": "salsa"},
+        {"id": "tai_chi", "ko": "태극권", "en": "tai chi"},
+        {"id": "martial_arts", "ko": "무술", "en": "martial arts"},
+        {"id": "comedic", "ko": "코믹", "en": "comedic"},
+        {"id": "dramatic", "ko": "극적", "en": "dramatic"},
+        {"id": "everyday", "ko": "일상적", "en": "everyday"}
+      ]
+    },
+    "intended_props": {
+      "cardinality": "many",
+      "values": [
+        {"id": "unknown", "ko": "알 수 없음", "en": "unknown"},
+        {"id": "sword", "ko": "검", "en": "sword"},
+        {"id": "great_sword", "ko": "대검", "en": "great sword"},
+        {"id": "shield", "ko": "방패", "en": "shield"},
+        {"id": "baseball_bat", "ko": "야구 방망이", "en": "baseball bat"},
+        {"id": "ball", "ko": "공", "en": "ball"},
+        {"id": "golf_club", "ko": "골프채", "en": "golf club"},
+        {"id": "phone", "ko": "휴대전화", "en": "phone"},
+        {"id": "laptop", "ko": "노트북", "en": "laptop"},
+        {"id": "keyboard", "ko": "키보드", "en": "keyboard"},
+        {"id": "mouse", "ko": "마우스", "en": "mouse"},
+        {"id": "rifle", "ko": "소총", "en": "rifle"},
+        {"id": "pistol", "ko": "권총", "en": "pistol"},
+        {"id": "guitar", "ko": "기타", "en": "guitar"},
+        {"id": "drums", "ko": "드럼", "en": "drums"},
+        {"id": "piano", "ko": "피아노", "en": "piano"},
+        {"id": "saxophone", "ko": "색소폰", "en": "saxophone"},
+        {"id": "trumpet", "ko": "트럼펫", "en": "trumpet"},
+        {"id": "clipboard", "ko": "클립보드", "en": "clipboard"},
+        {"id": "camera", "ko": "카메라", "en": "camera"},
+        {"id": "watering_can", "ko": "물뿌리개", "en": "watering can"},
+        {"id": "shovel", "ko": "삽", "en": "shovel"},
+        {"id": "toolbox", "ko": "공구함", "en": "toolbox"},
+        {"id": "chair", "ko": "의자", "en": "chair"},
+        {"id": "stool", "ko": "스툴", "en": "stool"},
+        {"id": "ladder", "ko": "사다리", "en": "ladder"},
+        {"id": "rope", "ko": "줄", "en": "rope"},
+        {"id": "skateboard", "ko": "스케이트보드", "en": "skateboard"}
+      ]
+    },
+    "interaction_kind": {
+      "cardinality": "one",
+      "values": [
+        {"id": "unknown", "ko": "알 수 없음", "en": "unknown"},
+        {"id": "solo", "ko": "1인", "en": "solo"},
+        {"id": "talking", "ko": "대화", "en": "talking"},
+        {"id": "hugging", "ko": "포옹", "en": "hugging"},
+        {"id": "holding_hands", "ko": "손잡기", "en": "holding hands"},
+        {"id": "kissing", "ko": "키스", "en": "kissing"},
+        {"id": "fighting", "ko": "싸움", "en": "fighting"},
+        {"id": "helping", "ko": "돕기", "en": "helping"},
+        {"id": "comforting", "ko": "위로하기", "en": "comforting"},
+        {"id": "pulling", "ko": "서로 당기기", "en": "pulling"},
+        {"id": "arm_wrestling", "ko": "팔씨름", "en": "arm wrestling"},
+        {"id": "group_activity", "ko": "단체 활동", "en": "group activity"}
+      ]
+    }
+  },
+  "evidence_kinds": [
+    "bvh_rule",
+    "source_catalog",
+    "filename_hint",
+    "vlm_contact_sheet",
+    "human_review"
+  ]
+}

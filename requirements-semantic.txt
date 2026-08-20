@@ -1,0 +1,5 @@
+# Offline pinned E5 semantic index/query runtime.
+# The exact versions are part of config/semantic_embedding.e5-small.v1.json.
+numpy>=1.24
+onnxruntime==1.28.0
+tokenizers==0.23.1

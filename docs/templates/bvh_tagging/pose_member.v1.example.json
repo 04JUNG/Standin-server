@@ -1,0 +1,74 @@
+{
+  "record_type": "pose_member_inventory",
+  "schema_version": 1,
+  "pose_id": "Waving_02_mirror",
+  "bvh": {
+    "relative_path": "data/bvh/Waving_02_mirror.bvh",
+    "sha256": "sha256:replace_with_actual_hash",
+    "frame_count": 1,
+    "joint_count": 64,
+    "root_joint": "mixamorig:Hips",
+    "joint_name_profile": "namespaced"
+  },
+  "provenance_refs": {
+    "source_clip_id": null,
+    "pose_lineage_id": "lineage:Waving_02_mirror",
+    "verification_status": "unverified"
+  },
+  "grouping": {
+    "mirror_group_id": "mirror:Waving_02",
+    "semantic_unit_id": "pose:Waving_02",
+    "pose_family_id": null,
+    "variant": {
+      "kind": "mirrored",
+      "mirror_of": "Waving_02",
+      "paired_member_present": true
+    },
+    "set": null
+  },
+  "filename_evidence": {
+    "parser_version": 1,
+    "raw_stem": "Waving_02_mirror",
+    "pattern": "named_clip_sample",
+    "label_en_hint": "Waving",
+    "original_title_hint": "Waving",
+    "source_collection_hint": null,
+    "provider_hint": null,
+    "native_subject_id_hint": null,
+    "native_clip_id_hint": null,
+    "source_clip_id_hint": "filename_hint:named:Waving",
+    "selected_frame_index_hint": null,
+    "frame_index_base_hint": null,
+    "sample_ordinal_hint": 2,
+    "retarget_profile_hint": null,
+    "derivation_hints": [],
+    "evidence_status": "proposed"
+  },
+  "posecode_evidence": null,
+  "validation": {
+    "parse_status": "pass",
+    "mapping_status": "pass",
+    "warnings": [
+      "license_unresolved",
+      "semantic_annotation_missing",
+      "source_unverified"
+    ],
+    "errors": []
+  },
+  "index_state": "needs_review",
+  "eligibility": {
+    "geometry_engineering": true,
+    "semantic_index": false,
+    "release": false,
+    "blockers": [
+      "source_unverified",
+      "license_unresolved",
+      "semantic_annotation_not_accepted"
+    ]
+  },
+  "review": {
+    "status": "generated",
+    "reviewed_fields": []
+  },
+  "content_revision": 1
+}

@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "policy_id": "library-exclusions-2026-08-18-v1",
+  "decision": {
+    "requested_by": "project_owner",
+    "requested_at": "2026-08-18",
+    "reason_codes": [
+      "missing_source_action_name",
+      "low_pose_quality"
+    ],
+    "disposition": "pending_physical_deletion"
+  },
+  "default_effect": {
+    "semantic_index": false,
+    "geometry_index": false,
+    "release": false
+  },
+  "source_clip_ids": [
+    "cmu:104_26",
+    "cmu:104_31",
+    "cmu:106_15",
+    "cmu:107_09",
+    "cmu:108_19",
+    "cmu:108_20",
+    "cmu:108_21",
+    "cmu:117_01",
+    "cmu:117_04",
+    "cmu:117_05",
+    "cmu:117_07",
+    "cmu:117_08",
+    "cmu:117_10",
+    "cmu:117_12",
+    "cmu:117_13",
+    "cmu:117_14",
+    "cmu:117_15",
+    "cmu:121_02",
+    "cmu:121_07",
+    "cmu:121_14",
+    "cmu:121_15",
+    "cmu:121_17",
+    "cmu:121_25",
+    "cmu:121_28",
+    "cmu:121_29",
+    "cmu:121_30",
+    "cmu:122_11",
+    "cmu:63_04",
+    "cmu:63_21",
+    "cmu:80_67",
+    "cmu:94_04",
+    "cmu:94_09",
+    "cmu:94_13",
+    "cmu:94_14",
+    "cmu:94_15"
+  ]
+}

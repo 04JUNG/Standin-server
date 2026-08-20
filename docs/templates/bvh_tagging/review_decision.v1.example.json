@@ -1,0 +1,33 @@
+{
+  "record_type": "review_decision",
+  "schema_version": 1,
+  "proposal_id": "sha256:replace_with_run_key",
+  "semantic_unit_id": "pose:Waving_02",
+  "based_on_content_revision": 1,
+  "decision": "accepted_with_edits",
+  "approval_scope": "reviewed_fields_only",
+  "unreviewed_field_policy": "drop_or_unknown",
+  "nested_review_status_policy": "decision_overlay",
+  "reviewed_fields": [
+    "semantic.caption_ko",
+    "semantic.aliases_ko",
+    "semantic.fine_actions",
+    "semantic.intended_props",
+    "semantic.unit_atoms",
+    "member_posecodes"
+  ],
+  "edits": {
+    "/semantic/caption_ko": "한 손을 들어 인사하는 선 자세",
+    "/semantic/aliases_ko": [
+      "인사",
+      "손 흔들기"
+    ]
+  },
+  "reason_codes": [
+    "filename_context_confirmed_by_human"
+  ],
+  "reviewer": "replace_with_reviewer_id",
+  "reviewed_at": "2026-08-13T15:00:00+09:00",
+  "rubric_version": 1,
+  "notes": []
+}

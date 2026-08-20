@@ -21,6 +21,7 @@ google-genai>=1.10,<3         # HttpOptions timeout 지원 범위를 고정. GEM
 # openai>=1.40                # gpt-5-mini 대안
 rtmlib>=0.0.13                # RTMPose Body(17kp)
 onnxruntime>=1.17
+# 시맨틱 dense 색인/질의는 별도 requirements-semantic.txt로 버전을 고정한다.
 opencv-python-headless>=4.9   # GUI 없는 ECS 컨테이너용 OpenCV
 # bvhio>=2.0                  # 실 BVH 파싱(library.load_bvh_pose)
 # --- 배포(선택) ---

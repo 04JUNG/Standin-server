@@ -28,6 +28,18 @@ uvicorn api.app:app --reload          # http://127.0.0.1:8000/docs 에서 계약
 > **API 키·무거운 모델 없이 바로 돈다.** mock VLM 어댑터 + 합성 포즈 인덱스가 기본값이다.
 > 실제 모델은 env 하나로 승격한다(아래 표).
 
+사용자 텍스트 semantic search를 로컬에서 함께 켜려면:
+
+```bash
+pip install -r requirements-semantic.txt
+python scripts/provision_semantic_encoder.py
+SEMANTIC_ENABLED=1 \
+SEMANTIC_BUILD_DIR=data/semantic/builds/217d56e31c42634ec920db8704dd151b088b2f12291d5e3726f5b34c9be50196 \
+uvicorn api.app:app --reload
+```
+
+요청·응답과 readiness 계약은 [`docs/SEMANTIC_API_2026-08-18.md`](docs/SEMANTIC_API_2026-08-18.md)를 따른다.
+
 ---
 
 ## 서비스 경계 (한눈에)
@@ -35,6 +47,7 @@ uvicorn api.app:app --reload          # http://127.0.0.1:8000/docs 에서 계약
 ```
 [Tauri 앱] ──> [앱 서버(친구들)] ──> [도원 추론 서버 = 이 저장소]
               인증·Job·기록          POST /analyze (동기, 무인증)
+                                     POST /semantic-search (사용자 텍스트, opt-in)
                                      POST /refine   (고른 후보 → 러프에 맞춰 조정)
                                      GET  /pose/{id}/bvh
                                      POST /export-order
@@ -70,6 +83,7 @@ python scripts/eval_refine_v2_synthetic.py --bvh-dir data/bvh --out out/refine-v
 | VLM provider | `VLM_PROVIDER=gemini` + `pip install google-genai pillow` + `GEMINI_API_KEY` | `src/vlm/client.py::build_vlm_client` |
 | 포즈 추정 | `POSE_BACKEND=rtmlib` + `pip install rtmlib onnxruntime opencv-python` | `src/pose.py::RTMPoseModel` |
 | 실 라이브러리 | `BVH_DIR=<폴더> python scripts/build_db.py` | `src/library.py::load_bvh_pose` |
+| 사용자 텍스트 의미 검색 | `SEMANTIC_ENABLED=1` + pinned build/model | `src/semantic_service.py` · `src/semantic_search.py` |
 
 `build_*()` 팩토리는 실패 시 조용히 mock으로 폴백한다 → 키가 없어도 파이프라인은 항상 돈다.
 설정값은 `.env`(예시: `.env.example`)로 주입. **`.env`·API 키·`data/`는 커밋 금지**(`.gitignore` 등록됨).
@@ -87,6 +101,8 @@ python scripts/eval_refine_v2_synthetic.py --bvh-dir data/bvh --out out/refine-v
 | 포즈 라이브러리 없음 | 합성 라이브러리 생성 후 기동 | **기동 실패** |
 | `VLM_PROVIDER=mock` 또는 `POSE_BACKEND=mock` | 그대로 기동 | **기동 실패** |
 | 라이브러리가 비어 있음(`pose_count=0`) | `/healthz` 503 | `/healthz` 503 |
+| optional semantic 준비 실패 | geometry 200, semantic endpoint 503 | geometry 200, semantic endpoint 503 |
+| `SEMANTIC_REQUIRED=1` semantic 준비 실패 | 기동/readiness 실패 | 기동/readiness 실패 |
 
 `build_*()`의 조용한 mock 폴백은 개발 편의를 위해 남아 있다. 프로덕션에서는
 `Pipeline` 초기화 후 실제 VLM·포즈 인스턴스를 검사하므로, 실백엔드 설정에서 키나

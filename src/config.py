@@ -61,6 +61,26 @@ class Config:
 
     index_path: str = os.getenv("INDEX_PATH", "data/index.pkl")
 
+    # --- 사용자 텍스트 semantic search ---
+    # 코어 설치에는 pinned E5가 없을 수 있으므로 명시적으로 활성화한다. REQUIRED=0이면
+    # 준비 실패가 geometry API readiness를 내리지 않고 semantic endpoint만 503이 된다.
+    semantic_enabled: bool = os.getenv("SEMANTIC_ENABLED", "0") == "1"
+    semantic_required: bool = os.getenv("SEMANTIC_REQUIRED", "0") == "1"
+    semantic_build_dir: str = os.getenv("SEMANTIC_BUILD_DIR", "")
+    semantic_builds_root: str = os.getenv(
+        "SEMANTIC_BUILDS_ROOT", "data/semantic/builds"
+    )
+    semantic_profile_path: str = os.getenv(
+        "SEMANTIC_PROFILE_PATH", "config/semantic_embedding.e5-small.v1.json"
+    )
+    semantic_models_root: str = os.getenv("SEMANTIC_MODELS_ROOT", "data/models")
+    semantic_max_concurrency: int = int(os.getenv("SEMANTIC_MAX_CONCURRENCY", "2"))
+    semantic_acquire_timeout_seconds: float = float(
+        os.getenv("SEMANTIC_ACQUIRE_TIMEOUT_SECONDS", "0.25")
+    )
+    semantic_cache_size: int = int(os.getenv("SEMANTIC_CACHE_SIZE", "256"))
+    semantic_top_k_max: int = int(os.getenv("SEMANTIC_TOP_K_MAX", "20"))
+
     # --- 라이브러리 프로비저닝(배포) ---
     # 이미지에 데이터를 넣을 수 없어(라이선스·용량) 기동 시 번들을 받아 푼다.
     # 예: s3://standin-assets/pose-library/v1.tar.gz  또는 https://...
@@ -370,6 +390,16 @@ class Config:
     refine_timeout_seconds: float = float(os.getenv("REFINE_TIMEOUT_SECONDS", "5.0"))
 
     def __post_init__(self) -> None:
+        if self.semantic_required and not self.semantic_enabled:
+            raise ValueError("SEMANTIC_REQUIRED=1 requires SEMANTIC_ENABLED=1")
+        if self.semantic_max_concurrency < 1:
+            raise ValueError("SEMANTIC_MAX_CONCURRENCY must be positive")
+        if self.semantic_acquire_timeout_seconds < 0.0:
+            raise ValueError("SEMANTIC_ACQUIRE_TIMEOUT_SECONDS must be non-negative")
+        if self.semantic_cache_size < 0:
+            raise ValueError("SEMANTIC_CACHE_SIZE must be non-negative")
+        if not 1 <= self.semantic_top_k_max <= 100:
+            raise ValueError("SEMANTIC_TOP_K_MAX must be in [1,100]")
         if self.refine_default_mode not in ("conservative", "aggressive"):
             raise ValueError(
                 "REFINE_DEFAULT_MODE must be 'conservative' or 'aggressive'"
