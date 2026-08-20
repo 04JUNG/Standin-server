@@ -1,4 +1,0 @@
-no,source_provider,source_clip_id,semantic_unit_id,pose_id,pose_description,action_name_proposed_ko,action_name_proposed_en,confidence,visual_evidence,ambiguity,decision,action_name_final,reviewer_notes
-1,CMU,cmu:104_26,pose:cmu_104_26_00785,cmu_104_26_00785,"정적 자세 특징: 상체를 뒤로 젖힘, 양팔을 넓게 벌림, 한쪽 팔을 어깨 위로 듦, 한쪽 발을 골반 뒤에 둠, 두 발을 넓게 벌림",바닥에 앉아 한팔 뻗기,seated floor reach,low,바닥에 앉아 두 다리를 뻗고 한팔을 위로 든 정적 자세,넘어짐·일어나기·춤 동작 중 어느 순간인지는 단일 프레임으로 구분 불가,,,
-8,CMU,cmu:117_01,pose:cmu_117_01_00665,cmu_117_01_00665,"정적 자세 특징: 팔꿈치를 폄, 한쪽 발을 골반 뒤에 둠, 두 발을 넓게 벌림",낮게 웅크려 옆으로 내딛기,low crouched side step,low,몸을 낮추고 한쪽 무릎을 깊게 굽힌 넓은 자세,춤·회피·런지 중 실제 의도 불명,,,
-30,CMU,cmu:80_67,pose:cmu_80_67_01745,cmu_80_67_01745,"정적 자세 특징: 상체를 세움, 두 발을 넓게 벌림",다리 벌리고 양손 모으기,wide step with hands together,low,한쪽 다리를 길게 벌리고 양손을 골반 앞쪽에 모음,CMU assorted motions의 해당 trial 설명이 비어 있어 실제 행동 의도 불명,,,
