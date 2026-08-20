@@ -26,11 +26,20 @@ RUN useradd --create-home --uid 10001 standin \
     && chown -R standin:standin /app
 USER standin
 
+# 배포 버전을 이미지에 굽는다. 로그의 `version` 필드가 이 값이 된다.
+#
+# 태스크 정의 env로 주지 않는 이유: env가 이미지 ENV를 덮어쓰는데, 어느 커밋이
+# 배포되는지 아는 것은 앱을 빌드한 워크플로뿐이다(CDK는 모른다). 이미지에 구우면
+# 나중에 cdk deploy가 돌아도 값이 사라지지 않고, 이미지와 버전이 함께 움직인다.
+#
+# ⚠ 이 뒤의 레이어는 값이 바뀔 때마다 캐시가 깨진다. 그래서 빌드 맨 끝에 둔다.
+ARG DEPLOYMENT_VERSION=development
 ENV APP_ENV=development \
     DATA_DIR=/app/data \
     DB_PATH=/app/data/poses.db \
     INDEX_PATH=/app/data/index.pkl \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    DEPLOYMENT_VERSION=$DEPLOYMENT_VERSION
 
 EXPOSE 8000
 

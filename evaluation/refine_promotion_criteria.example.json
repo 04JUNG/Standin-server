@@ -1,0 +1,33 @@
+{
+  "primary_mcid": 0.05,
+  "primary_ci_low_min": 0.0,
+  "major_worse_max": 0,
+  "changed_major_worse_vs_b0_max": 0,
+  "worst_slice_regression_max": 0.05,
+  "worst_slice_min_n": 30,
+  "minimum_n_eval": 350,
+  "minimum_clusters": 12,
+  "worst_slice_cohorts": [
+    "all",
+    "evidence:hand_pair",
+    "evidence:lower_pair",
+    "evidence:lap_contact",
+    "foreshortening_ambiguity:true"
+  ],
+  "usability_rubric_version": "artist-refine-rubric-v1",
+  "human_usable_categories": [
+    "direct",
+    "reference"
+  ],
+  "minimum_distinct_labelers": 2,
+  "minimum_duplicate_fraction": 0.15,
+  "minimum_hidden_repeat_fraction": 0.05,
+  "analysis_seed": 20260805,
+  "bootstrap_repetitions": 10000,
+  "report_version": "refine-report-v1",
+  "new_violation_rate_max": 0.0,
+  "exact_fallback_rate_min": 1.0,
+  "p95_latency_ms_max": 2000.0,
+  "timeout_error_rate_max": 0.01,
+  "b2_vs_b0_better_min": 1
+}

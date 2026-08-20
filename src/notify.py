@@ -39,6 +39,11 @@ _ICONS = {"P1": "🔴", "P2": "🟠", "P3": "⚪"}
 # 디스코드 임베드 필드 값 상한은 1024자다. 여유를 두고 자른다.
 _MAX_FIELD_VALUE = 900
 _SEND_TIMEOUT_SECONDS = 5
+# ⚠ UA를 반드시 명시한다. 디스코드 앞단 Cloudflare가 urllib의 기본값
+#   `Python-urllib/x.y`를 403(error code: 1010)으로 막는다 — 웹훅에 닿기도 전에 거부된다.
+#   2026-08-19에 이걸로 추론 서버 알림이 한 건도 배달되지 않았다(전송 3건 전부 403).
+#   BFF는 Node fetch의 기본 UA가 달라 멀쩡했기 때문에 한쪽에서만 조용히 깨져 있었다.
+_USER_AGENT = "Standin-inference (+https://github.com/04JUNG/Standin-server)"
 
 
 @dataclass
@@ -220,7 +225,7 @@ def _send(severity: str, entries: list[_Pending]) -> None:
     request = urllib.request.Request(
         webhook,
         data=json.dumps(body, ensure_ascii=False).encode("utf-8"),
-        headers={"Content-Type": "application/json"},
+        headers={"Content-Type": "application/json", "User-Agent": _USER_AGENT},
         method="POST",
     )
     try:

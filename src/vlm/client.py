@@ -43,6 +43,12 @@ def _coerce(analysis: dict, img_w: int, img_h: int) -> VLMAnalysis:
             continue
 
     num = int(analysis.get("num_people", len(boxes)) or 0)
+    raw_lower = analysis.get("lower_body_visible")
+    if isinstance(raw_lower, list) and len(raw_lower) == num:
+        lower_body_visible = [value is True for value in raw_lower]
+    else:
+        # 새 안전 lineage가 없으면 하체를 추측하지 않는다.
+        lower_body_visible = [False] * max(num, 0)
     return VLMAnalysis(
         num_people=num,
         shot=pick(Shot, analysis.get("shot"), Shot.FULL_HALF),
@@ -53,6 +59,7 @@ def _coerce(analysis: dict, img_w: int, img_h: int) -> VLMAnalysis:
         approx_boxes=boxes,
         dialogue=analysis.get("dialogue"),
         raw=analysis,
+        lower_body_visible=lower_body_visible,
     )
 
 
@@ -114,8 +121,14 @@ class MockVLMClient(BaseVLMClient):
                 BBox(0.05*img_w, 0.1*img_h, 0.5*img_w, 0.95*img_h, "vlm", 0.5),
                 BBox(0.5*img_w, 0.1*img_h, 0.95*img_w, 0.95*img_h, "vlm", 0.5),
             ]
-        return VLMAnalysis(num, shot, action, view, rel, boxes,
-                           dialogue=None, raw={"mock": True, "hint": hint})
+        lower_hidden = any(token in hint for token in (
+            "half_body", "half-body", "lower_hidden", "반신", "하체 비관측",
+        ))
+        return VLMAnalysis(
+            num, shot, action, view, rel, boxes,
+            dialogue=None, raw={"mock": True, "hint": hint},
+            lower_body_visible=[not lower_hidden] * num,
+        )
 
 
 class GeminiVLMClient(BaseVLMClient):
@@ -150,6 +163,10 @@ class GeminiVLMClient(BaseVLMClient):
         from google.genai import types
         part = self._to_part(image)
         attempts = max(1, CFG.gemini_max_attempts)
+        # 재시도가 BFF의 분석 상한(기본 120초)을 먹어 치우지 않게 VLM 단계 전체에 예산을 둔다.
+        # 예산이 없으면 timeout을 올릴 때마다 최악 지연이 attempts배로 늘어난다.
+        timeout_seconds = CFG.gemini_request_timeout_ms / 1000
+        deadline = time.monotonic() + CFG.gemini_total_budget_seconds
         for attempt in range(1, attempts + 1):
             started = time.monotonic()
             try:
@@ -172,13 +189,28 @@ class GeminiVLMClient(BaseVLMClient):
                 return _coerce(_extract_json(resp.text), img_w, img_h)
             except Exception as error:
                 status = _http_status(error)
-                retryable = status in (429, 503) and attempt < attempts
+                # timeout에는 HTTP 상태가 없어 여기서 status는 None이고 재시도 대상이 아니다.
+                # 의도된 동작이다 — 끊긴 호출도 Gemini 쪽에서는 계속 생성 중일 수 있어
+                # 재시도가 비용만 두 배로 쓴다(tests/test_vlm_gemini_resilience.py).
+                # 대신 데드라인 자체를 넉넉히 잡는 것으로 푼다(CFG 주석 참고).
+                transient = status in (429, 503)
+                # 남은 예산으로 한 번 더 시도할 수 없으면 재시도하지 않는다. 시도해 봐야
+                # BFF가 먼저 끊어 사용자는 원인을 알 수 없는 ANALYSIS_TIMEOUT을 받는다.
+                budget_left = (deadline - time.monotonic()) >= timeout_seconds
+                retryable = transient and attempt < attempts and budget_left
+                reason = (
+                    "retrying" if retryable
+                    else "not_transient" if not transient
+                    else "attempts_exhausted" if attempt >= attempts
+                    else "budget_exhausted"
+                )
                 log_warn(
                     "gemini_request",
                     model=self._model,
                     attempt=attempt,
                     status=status or "error",
                     retry=retryable,
+                    retryDecision=reason,
                     elapsedMs=round((time.monotonic() - started) * 1000),
                     errorCode=f"GEMINI_{status}" if status else "GEMINI_ERROR",
                 )
