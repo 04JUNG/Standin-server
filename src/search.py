@@ -15,6 +15,7 @@ import numpy as np
 from .schema import (LibraryEntry, PersonDescriptor, PoseCandidate, View)
 from .features import pose_distance, angle_distance, hybrid_distance
 from .config import CFG
+from .pose_quarantine import load_pose_quarantine
 
 
 def pose_family_id(pose_id: str, meta: dict | None = None) -> str:
@@ -65,7 +66,9 @@ def knn(entries: List[LibraryEntry], desc: PersonDescriptor,
         query_valid_mask=None) -> List[PoseCandidate]:
     """피처 kNN. View 우선순위를 거리 가중으로 반영."""
     top_n = top_n or CFG.top_n_search
-    pool = _tag_prefilter(entries, desc)
+    quarantined = load_pose_quarantine(CFG)
+    eligible = [e for e in entries if e.pose_id not in quarantined]
+    pool = _tag_prefilter(eligible, desc)
     q = desc.feature
     scored = []
     for e in pool:
@@ -113,6 +116,7 @@ def knn_geometric(entries, feature, top_k=None, query_valid_mask=None,
     (설계 결정: action/view는 기하와 중복이라 매칭에서 제외. 태그는 shot·사람수 제어용만.)
     같은 pose_id의 여러 view 중 최선 1개만 남겨 다양성 확보."""
     top_k = top_k or CFG.top_k_final
+    quarantined = load_pose_quarantine(CFG)
     scored = [PoseCandidate(pose_id=e.pose_id, view=e.view,
                             distance=_dist(
                                 feature, e.feature,
@@ -121,7 +125,7 @@ def knn_geometric(entries, feature, top_k=None, query_valid_mask=None,
                             ),
                             tags=e.tags, bvh_path=e.bvh_path,
                             pose_family_id=pose_family_id(e.pose_id, e.meta))
-              for e in entries]
+              for e in entries if e.pose_id not in quarantined]
     scored.sort(key=lambda c: c.distance)
     seen, out = set(), []
     for c in scored:

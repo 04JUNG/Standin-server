@@ -10,6 +10,7 @@ import numpy as np
 
 from .schema import VLMAnalysis, Skeleton, PersonDescriptor, BBox
 from .features import normalize_skeleton
+from .refine_policy import structural_refine_allowed
 
 
 def order_left_to_right(skeletons: List[Optional[Skeleton]],
@@ -79,11 +80,13 @@ def build_slot_descriptors(vlm: VLMAnalysis, slots) -> List[PersonDescriptor]:
             )
         refine_allowed = bool(
             searchable
-            and slot.state in ("valid", "partial")
-            and evidence.coverage_class in ("full", "reduced")
-            and evidence.refinable_limbs
-            and slot.slot_origin != "rtm_provisional"
-            and slot.skeleton_source != "crop_retry"
+            and structural_refine_allowed(
+                skeleton_state=slot.state,
+                coverage_class=evidence.coverage_class,
+                refinable_limbs=evidence.refinable_limbs,
+                slot_origin=slot.slot_origin,
+                skeleton_source=slot.skeleton_source,
+            )
             and (slot.state == "valid" or slot.search_stability == "stable")
         )
         # hard invalid 좌표(NaN/Inf 포함)는 네트워크 경계로 내보내지 않는다. raw 값은
@@ -112,6 +115,7 @@ def build_slot_descriptors(vlm: VLMAnalysis, slots) -> List[PersonDescriptor]:
             refine_allowed=refine_allowed,
             valid_limbs=(evidence.valid_limbs if evidence is not None else ()),
             refinable_limbs=(evidence.refinable_limbs if evidence is not None else ()),
+            lower_body_observed=bool(slot.lower_body_observed),
             raw_scores=(evidence.raw_scores.copy() if evidence is not None else None),
             search_stability=slot.search_stability,
             distance_metric=None,
@@ -125,6 +129,20 @@ def build_slot_descriptors(vlm: VLMAnalysis, slots) -> List[PersonDescriptor]:
                                      if evidence is not None else 0),
                 "torso_bone_count": (evidence.torso_bone_count
                                      if evidence is not None else 0),
+                "search_valid_joint_mask": (
+                    evidence.valid_joint_mask.astype(bool).tolist()
+                    if evidence is not None else []
+                ),
+                "refine_valid_joint_mask": (
+                    (evidence.valid_joint_mask
+                     if evidence.refine_valid_joint_mask is None
+                     else evidence.refine_valid_joint_mask).astype(bool).tolist()
+                    if evidence is not None else []
+                ),
+                "foreshortened_limbs": (
+                    list(evidence.foreshortened_limbs)
+                    if evidence is not None else []
+                ),
                 "quality_components": (dict(evidence.quality_components)
                                        if evidence is not None else {}),
                 "retry_count": slot.retry_count,

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "policy_id": "refine-pose-quarantine-2026-08-18-v1",
+  "entries": [
+    {
+      "pose_id": "rokoko_Flirty_mixamo_00321_mirror",
+      "reason": "bad_hand_asset_and_visible_mesh_penetration",
+      "fixture": "131056:p2",
+      "disposition": "exclude_and_promote_next_top_k"
+    },
+    {
+      "pose_id": "Dig And Plant Seeds_00165_mirror",
+      "reason": "visible_mesh_penetration_and_structural_search_mismatch",
+      "fixture": "171734:p0",
+      "disposition": "exclude_and_promote_next_top_k"
+    }
+  ]
+}

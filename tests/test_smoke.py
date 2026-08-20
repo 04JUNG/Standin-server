@@ -19,6 +19,10 @@ from src.thumbnails import find_thumbnail, thumbnail_url
 from src.vlm.client import MockVLMClient
 from api.models import SkeletonOut, ImageInfoOut, InferenceMetadataOut
 
+# 이 모듈의 refine 테스트는 v1 byte-for-byte 회귀 계약이다. 제품 기본값은
+# v2.5 safe-aggressive이므로 테스트가 환경 기본값에 끌려가지 않게 v1을 명시한다.
+CFG.refine_v2_enabled = False
+
 
 def _coco17_keypoints():
     return [[float(i), float(i + 1)] for i in range(17)]
