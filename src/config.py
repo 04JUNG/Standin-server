@@ -23,11 +23,27 @@ class Config:
     # --- VLM ---  provider: "mock"(오프라인 기본) | "gemini" | "openai"
     vlm_provider: str = os.getenv("VLM_PROVIDER", "mock")
     gemini_model: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
-    # Gemini HTTP 호출은 BFF의 전체 분석 timeout(기본 120초)보다 충분히 짧게 끝낸다.
-    # google-genai HttpOptions.timeout 단위는 밀리초다.
-    gemini_request_timeout_ms: int = int(os.getenv("GEMINI_REQUEST_TIMEOUT_MS", "20000"))
+    # Gemini HTTP 호출 1회의 상한. google-genai HttpOptions.timeout 단위는 밀리초다.
+    #
+    # ⚠ 20초는 짧았다. 2026-08-19 프로덕션에서 관측된 Gemini 호출 3건이 전부 실패했고
+    #   그중 2건이 20.0s·20.3s로 정확히 이 데드라인에 잘렸다(성공 표본 0건). 이 값을
+    #   도입하기 전에는 상한이 없어 느린 호출도 결국 끝났다 — 즉 이 값이 "느리지만
+    #   되던 것"을 "무조건 실패"로 바꿨다.
+    #
+    #   timeout에는 HTTP 상태가 없어 재시도 대상도 아니다(아래 attempts 주석 참고).
+    #   그래서 데드라인에 한 번 걸리면 그 분석은 그대로 끝난다.
+    gemini_request_timeout_ms: int = int(os.getenv("GEMINI_REQUEST_TIMEOUT_MS", "45000"))
     # attempts는 최초 호출을 포함한다. 429/503만 이 범위 안에서 재시도한다.
+    # timeout은 재시도하지 않는다 — 끊긴 호출도 Gemini 쪽에서는 계속 생성 중일 수 있어
+    # 재시도가 비용을 두 배로 쓰면서 같은 지연을 다시 겪게 만든다.
     gemini_max_attempts: int = int(os.getenv("GEMINI_MAX_ATTEMPTS", "3"))
+    # VLM 단계 전체(재시도 포함)에 쓸 수 있는 시간. BFF의 분석 상한이 120초이고 그 안에서
+    # 검출·포즈·검색도 끝나야 하므로, VLM이 예산을 다 먹으면 사용자는 원인을 알 수 없는
+    # ANALYSIS_TIMEOUT을 받는다. 남은 예산으로 한 번 더 시도할 수 없으면 재시도를 멈춘다.
+    #
+    # 이 값이 없으면 timeout을 45초로 올린 순간 429/503 재시도 3회가 135초가 되어
+    # BFF 상한을 넘는다.
+    gemini_total_budget_seconds: float = float(os.getenv("GEMINI_TOTAL_BUDGET_SECONDS", "75"))
     gemini_retry_base_seconds: float = float(os.getenv("GEMINI_RETRY_BASE_SECONDS", "0.5"))
     gemini_retry_max_seconds: float = float(os.getenv("GEMINI_RETRY_MAX_SECONDS", "2.0"))
     openai_model: str = os.getenv("OPENAI_MODEL", "gpt-5-mini")
