@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "dataset_id": "selected12-v1",
+  "purpose": "engineering",
+  "created_at": "2026-08-06T02:11:52+09:00",
+  "sealed_at": "2026-08-06T02:11:52+09:00",
+  "cut_manifest_sha256": "578c4bc40baa2a3990c89a0313a4da03ae62311fca82333dc2a6aec1b2db3403",
+  "person_gt_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "rubric_version": 1,
+  "counts": {
+    "files": 14,
+    "unique_image_contents": 12,
+    "scene_groups": null,
+    "gt_persons": 0,
+    "target_persons": 0
+  },
+  "split_unit": [
+    "artist_id",
+    "project_id",
+    "scene_group_id"
+  ]
+}

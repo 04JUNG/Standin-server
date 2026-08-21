@@ -1,5 +1,7 @@
 # API 계약 — 도원 추론 서버 (FastAPI)
 
+> 상태: 현재 계약 · 갱신일: 2026-08-11 · 기준 코드: `api/app.py`, `api/models.py`
+>
 > 이 문서는 **실제 구현된** HTTP 계약(`api/app.py`·`api/models.py`)을 문서화한다.
 > `/export-order`의 상세는 별도 문서(`docs/EXPORT_CONTRACT.md`)에 있고, 여기서는 전체 엔드포인트와
 > **앱 서버 팀 문서와의 경계·불일치**를 확정한다. 스키마의 단일 소스는 코드다 → FastAPI `/docs`(OpenAPI).
@@ -65,9 +67,18 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
   "view": "front",
   "keypoints": [[120.5, 88.0], ...],   // /analyze의 PersonOut.keypoints 그대로
   "scores":    [0.91, 0.87, ...],      // /analyze의 PersonOut.scores 그대로
-  "search_distance": 0.21,             // 그 후보의 distance(선택). 주면 안전 게이트가 켜진다
+  "search_distance": 0.21,             // v1 게이트, v2 진단 lineage
   "refine_allowed": true,              // PersonOut.refine_allowed 그대로
-  "refinable_limbs": ["left_arm"]      // PersonOut.refinable_limbs 그대로
+  "refinable_limbs": ["left_arm"],     // PersonOut.refinable_limbs 그대로
+  "skeleton_state": "valid",
+  "coverage_class": "full",
+  "slot_origin": "vlm",
+  "skeleton_source": "full_image",
+  "search_stability": "not_required",
+  "distance_metric": "pos",
+  "confidence_threshold": 0.45,
+  "gap_type": "unknown",               // 평가 라벨이며 실행 게이트가 아님
+  "refine_mode": null                   // 생략/null 권장. 서버 기본은 safe aggressive
 }
 // 응답
 {
@@ -76,7 +87,9 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
   "bvh_url": "/pose/Sitting Idle_01/bvh",   // 항상 베이스. 조정본에는 URL이 없다
   "bvh": "HIERARCHY\nROOT Hips\n...\nMOTION\nFrames: 1\n...",  // 조정본 본문(LF)
   "loss_base": 0.599, "loss_final": 0.004, "gain": 0.993,
-  "backend": "numpy",
+  "backend": "scipy+numpy",
+  "refine_version": "v2.5.3",
+  "refine_outcome": "improved",
   "limbs": ["right_arm"],
   "limb_decisions": {
     "left_arm": {
@@ -99,6 +112,18 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
         "sample_fraction": null, "collision_point": null
       }
     }
+  },
+  "diagnostics": {
+    "mode_requested": "aggressive",
+    "mode_applied": "aggressive",
+    "aggressive_attempted": true,
+    "aggressive_reason": "ok_partial",
+    "hybrid_loss_base": 0.72,
+    "hybrid_loss_solved": 0.10,
+    "hybrid_loss_adopted": 0.14,
+    "block_alphas": {"left_arm": 0.0, "right_arm": 0.75},
+    "torso": {"attempted": false, "accepted": false},
+    "aggressive_attempted": true
   }
 }
 ```
@@ -106,11 +131,23 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
 **`refined: false`는 오류가 아니다.** 안전 게이트가 조정을 버리고 베이스를 준 것이며,
 이때 `bvh_url`은 `/pose/{pose_id}/bvh`가 된다. 클라이언트는 `bvh_url`만 따라가면
 두 경우를 구분하지 않고 동작한다("좋아지거나, 그대로"). `reason` 값 목록은
-`REFINE_DESIGN.md` §4-3.
+`REFINE_DESIGN.md`의 안전 처리 기준.
 
-- `search_distance`를 **주는 것을 권장한다.** 검색이 실패한 컷에서 refine을 돌리면
-  틀린 포즈를 러프에 억지로 끼워맞춰 베이스보다 나빠진다. 이 값이 있어야 서버가 막는다.
-- 같은 입력은 같은 `bvh_url`을 돌려준다(해시 캐시). 작가가 같은 후보를 다시 눌러도 재계산 없음.
+- v1에서 `search_distance`는 베이스 불일치 게이트다. `REFINE_V2_ENABLED=1`에서는 거리·순위만으로
+  실행을 막지 않고 진단에 남긴다. 대신 `refine_allowed`, 스켈레톤 상태·coverage·소유권 lineage와
+  `refinable_limbs`를 모두 그대로 보내야 하며, 누락·불일치하면 fail-closed한다.
+- **조정본은 응답 `bvh` 본문으로만 나간다.** `bvh_url`은 `refined` 여부와 무관하게 항상 베이스
+  `/pose/{pose_id}/bvh`이며 조정본 다운로드 URL은 존재하지 않는다. 추론 서버는 조정본을 저장하지
+  않으므로 무상태이고, 재계산을 막는 멱등성은 BFF의 `refined_artifacts` PK가 담당한다
+  (`docs/REFINE_HANDOFF.md` §3 4단계).
+- `refine_mode`를 생략하거나 `null`로 보내면 서버 기본값을 따른다. 현재 제품 기본은
+  **safe aggressive**(`REFINE_DEFAULT_MODE=aggressive`)다. `aggressive`는 같은 hard safety gate
+  아래 보수적 단계를 먼저 실행하고 hand/lap/lower pair와 제한적 Foot counter-rotation을 추가
+  시도한다. 공격적 단계가 실패하면 보수적 artifact를, 보수적 단계도 실패하면 베이스를 반환한다.
+  `REFINE_V2_ENABLED=0`이면 요청값과 무관하게 effective mode는 `conservative`다.
+- `refine_outcome`은 `improved | unchanged | reverted | not_attempted`이며 `gap_type`과 섞지 않는다.
+  v2의 `diagnostics`에는 전체·부위별 base/solved/adopted direction·position·hybrid 손실,
+  3D 이동량, 안전 판정, 부분 채택 alpha, 몸통 local rotation과 버전 lineage가 들어간다.
 - `limbs`에는 P3까지 통과해 실제로 조정된 사지만 담긴다. `limb_decisions`는 고려한
   모든 사지의 채택 여부·탈락 사유·몸통 길이로 정규화한 3D 이동량을 담는다.
 - P1 solve까지 도달한 결과의 팔에는 `collision`이 추가된다. 동결된 팔도 진단하되
@@ -120,7 +157,9 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
 - 전체 `reason`에는 `collision_gate`(충돌 팔 복구 후 남은 사지 없음),
   `collision_unresolved`(복구 후 깊이 불변식 실패)가 포함된다. 사지 reason의
   `self_collision`은 해당 사지만 베이스로 복구됐다는 뜻이다.
-- 오류: 없는 `pose_id` → 404 · BVH 파일 미존재 → 409 · `keypoints`/`scores` 길이≠17 → 422.
+- 오류: 없는 `pose_id` → 404 · BVH 파일 미존재·파싱 불가 → 409 · 잘못된 shape 또는
+  NaN/Inf·음수 score → 422. solver timeout은 오류 응답 대신 `refined=false`, `reason=timeout`,
+  베이스 `bvh_url`로 복구한다.
 
 기본 주소: `uvicorn api.app:app --reload` → `http://127.0.0.1:8000`. **버전 프리픽스 없음**(`/analyze`, `/v1/analyze` 아님).
 
@@ -227,7 +266,7 @@ Content-Type: multipart/form-data
 | `slot_origin` | string | `vlm` · `rtm_provisional` |
 | `search_stability` | string \| null | `stable` · `ambiguous` · `unstable` · `not_required` · `not_available` |
 | `valid_limbs` / `refinable_limbs` | string[] | 검색에 남은 부위와 refine 허용 사지 |
-| `refine_allowed` | bool | 현재 스켈레톤·검색 결과에 refine을 적용해도 되는가 |
+| `refine_allowed` | bool | v1은 검색+구조 정책, v2는 스켈레톤·소유권·coverage 안전 정책의 실행 허가 |
 | `quality_reasons` / `quality_trace` | string[] / object | 구조 판정 사유와 배정·coverage·retry·검색 진단값 |
 
 **`candidates[]` (CandidateOut)**
