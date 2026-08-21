@@ -47,6 +47,7 @@ from src.repo import (FEATURE_VERSION, build_db, load_entries,
                       get_bvh_path, get_pose_meta)
 from src.thumbnails import THUMBNAIL_VIEWS, find_thumbnail, thumbnail_url
 from src.tracing import capture_trace, span
+from src.vlm.client import VLMUnavailable
 from src.runtime_guard import (
     MockBackendError,
     actual_backend_names,
@@ -342,6 +343,45 @@ class _HintImg(str):
     def hint(self): return str(self)
 
 
+# 상류(Gemini) 혼잡으로 분석을 못 한 경우 알려 주는 재시도 간격.
+# 관측된 스파이크는 수십 초~수 분 단위였다(2026-08-21). 너무 짧게 주면 붐비는 상류를
+# 우리가 더 두드리게 되고, 너무 길면 이미 풀린 뒤에도 사용자를 기다리게 한다.
+VLM_RETRY_AFTER_SECONDS = 30
+
+
+def _vlm_unavailable_response(exc: VLMUnavailable) -> HTTPException:
+    """상류 VLM 혼잡 → 503.
+
+    이 번역이 없으면 Gemini의 503이 처리되지 않은 예외로 미들웨어까지 올라가 500과
+    P2 UNHANDLED_ERROR 알림이 된다. 그러면 (1) 운영은 매번 "우리 버그"로 분류된 알림을
+    보고, (2) BFF는 500을 INFERENCE_FAILED로 접어 사용자에게 "다른 이미지로 다시
+    시도해 주세요"라고 안내한다 — 상류가 붐비는 동안에는 어떤 이미지도 실패한다.
+
+    오류 본문은 앱 서버(BFF)가 자기 오류 봉투로 옮겨 담는다(docs/API_CONTRACT.md §7).
+    """
+    log_warn("vlm_unavailable", "상류 VLM이 응답하지 못해 분석을 중단했다",
+             route="/analyze", errorCode="VLM_UNAVAILABLE",
+             upstreamStatus=exc.status, attempts=exc.attempts,
+             elapsedMs=round(exc.elapsed_seconds * 1000))
+    alerts.notify(
+        "P2", "VLM_UNAVAILABLE",
+        "VLM 상류 혼잡으로 분석 요청이 실패했습니다. 사용자에게는 재시도 안내가 나갑니다.",
+        key="P2:vlm_unavailable",
+        context={"상류 상태": exc.status or "timeout", "시도": exc.attempts,
+                 "소요(초)": round(exc.elapsed_seconds, 1),
+                 "모델": CFG.gemini_model},
+    )
+    return HTTPException(
+        status_code=503,
+        detail={
+            "code": "VLM_UNAVAILABLE",
+            "message": "분석 서버가 일시적으로 혼잡합니다. 잠시 후 다시 시도해 주세요.",
+            "retry_after_seconds": VLM_RETRY_AFTER_SECONDS,
+        },
+        headers={"Retry-After": str(VLM_RETRY_AFTER_SECONDS)},
+    )
+
+
 @app.post("/analyze", response_model=CutResultOut)
 def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
             response: Response = None):
@@ -354,7 +394,10 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
     pipe: Pipeline = STATE["pipeline"]
     with capture_trace() as timing:
         with span("pipeline_total"):
-            res = pipe.process_cut(image, w, h)
+            try:
+                res = pipe.process_cut(image, w, h)
+            except VLMUnavailable as exc:
+                raise _vlm_unavailable_response(exc) from exc
     if response is not None:
         response.headers["Server-Timing"] = timing.server_timing()
         response.headers["X-Standin-Timing-Kind"] = "live-server-stage"

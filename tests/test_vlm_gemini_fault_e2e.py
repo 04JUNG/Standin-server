@@ -17,7 +17,7 @@ from google import genai
 from google.genai import types
 
 from src.config import CFG
-from src.vlm.client import GeminiVLMClient
+from src.vlm.client import GeminiVLMClient, VLMUnavailable
 
 
 VALID_ANALYSIS = {
@@ -97,6 +97,9 @@ def fault_server(outcomes):
 
 
 def client_for(base_url: str, timeout_ms: int, monkeypatch) -> GeminiVLMClient:
+    # 요청 단위 timeout은 CFG에서 온다(클라이언트 생성 시 값은 어댑터가 덮어쓴다) —
+    # 남은 예산에 맞춰 시도마다 상한을 줄여야 하기 때문이다. 프로덕션도 같은 경로다.
+    monkeypatch.setattr(CFG, "gemini_request_timeout_ms", timeout_ms)
     sdk = genai.Client(
         api_key="fault-test-key",
         http_options=types.HttpOptions(base_url=base_url, timeout=timeout_ms),
@@ -117,18 +120,23 @@ def test_never_responding_transport_hits_real_sdk_timeout(monkeypatch):
         client = client_for(base_url, 100, monkeypatch)
         started = time.monotonic()
 
-        with pytest.raises(Exception) as raised:
+        with pytest.raises(VLMUnavailable) as raised:
             client.analyze("ignored", 100, 100)
 
         assert time.monotonic() - started < 1.0
         assert state["requests"] == 1
-        assert "timeout" in type(raised.value).__name__.lower()
+        # timeout은 재시도하지 않지만, 원인은 상류 지연이므로 503으로 번역될 수 있게
+        # VLMUnavailable로 감싼다. 실제 SDK 예외는 원인 사슬에 남는다.
+        assert "timeout" in type(raised.value.__cause__).__name__.lower()
 
 
 def test_real_sdk_503_is_retried_then_succeeds(monkeypatch):
     monkeypatch.setattr(CFG, "gemini_max_attempts", 3)
     with fault_server([503, 503, 200]) as (base_url, state):
-        client = client_for(base_url, 1_000, monkeypatch)
+        # 이 테스트가 보는 것은 "503을 재시도하는가"다. 부하가 걸린 CI에서 응답이 늦어
+        # 데드라인에 걸리면(=timeout, 재시도 대상 아님) 다른 이유로 빨개진다 — 그래서
+        # 상한을 넉넉히 준다.
+        client = client_for(base_url, 5_000, monkeypatch)
 
         result = client.analyze("ignored", 100, 100)
 
