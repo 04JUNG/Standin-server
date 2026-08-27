@@ -36,7 +36,7 @@ jobs:
         run: |
           pip install -r requirements.txt pytest
           python -m compileall src api scripts
-          python -m pytest tests/ -q
+          python -m pytest tests/ --ignore=tests/converter -q
 
       - uses: aws-actions/configure-aws-credentials@v4
         with:

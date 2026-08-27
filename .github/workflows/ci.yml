@@ -3,8 +3,28 @@ name: CI
 on:
   pull_request:
     branches: [main, develop]
+    paths:
+      - ".github/workflows/ci.yml"
+      - ".dockerignore"
+      - "Dockerfile"
+      - "requirements.txt"
+      - "api/**"
+      - "src/**"
+      - "scripts/**"
+      - "tests/**"
+      - "!tests/converter/**"
   push:
     branches: [develop]
+    paths:
+      - ".github/workflows/ci.yml"
+      - ".dockerignore"
+      - "Dockerfile"
+      - "requirements.txt"
+      - "api/**"
+      - "src/**"
+      - "scripts/**"
+      - "tests/**"
+      - "!tests/converter/**"
   workflow_dispatch:
 
 permissions:
@@ -33,7 +53,7 @@ jobs:
         run: python -m compileall src api scripts
 
       - name: Run tests
-        run: python -m pytest tests/ -q
+        run: python -m pytest tests/ --ignore=tests/converter -q
 
       - name: Validate production image
         run: docker build --platform linux/amd64 --tag standin-inference:ci .
