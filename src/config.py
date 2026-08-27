@@ -44,6 +44,15 @@ class Config:
     # 이 값이 없으면 timeout을 45초로 올린 순간 429/503 재시도 3회가 135초가 되어
     # BFF 상한을 넘는다.
     gemini_total_budget_seconds: float = float(os.getenv("GEMINI_TOTAL_BUDGET_SECONDS", "75"))
+    # 재시도 1회에 최소한 이만큼은 줘야 의미가 있다. 예산이 이보다 적게 남으면 멈춘다.
+    #
+    # ⚠ 이 값이 생기기 전에는 "남은 예산 ≥ **전체 timeout(45초)**"일 때만 재시도했고,
+    #   그래서 재시도가 사실상 사라져 있었다. 503은 4~35초 걸려서 돌아오므로 첫 시도만으로
+    #   예산의 절반이 날아간다(2026-08-21 프로덕션 실패 4건 중 2건이 budget_exhausted였고
+    #   그중 1건은 재시도를 **한 번도** 못 했다). 이제 시도 자체의 timeout을 남은 예산으로
+    #   줄여 잡으므로, 짧게 한 번 더 해 보는 편이 스파이크를 넘길 확률이 높다.
+    #   관측된 성공 호출은 4~29초(중앙값 ~10초)라 10초를 하한으로 둔다.
+    gemini_min_attempt_seconds: float = float(os.getenv("GEMINI_MIN_ATTEMPT_SECONDS", "10"))
     gemini_retry_base_seconds: float = float(os.getenv("GEMINI_RETRY_BASE_SECONDS", "0.5"))
     gemini_retry_max_seconds: float = float(os.getenv("GEMINI_RETRY_MAX_SECONDS", "2.0"))
     openai_model: str = os.getenv("OPENAI_MODEL", "gpt-5-mini")
