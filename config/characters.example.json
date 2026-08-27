@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "characters": {
+    "standin-master-v2": {
+      "display_name": "Standin Master V2",
+      "artifact_uri_env": "STANDIN_MASTER_V2_URI",
+      "sha256": "7c648b97a24a3bb4914b6e5d515708c33727979881d92ef916d5726e22301f3d",
+      "rig_profile": "mixamo",
+      "revision": "v2"
+    }
+  }
+}
