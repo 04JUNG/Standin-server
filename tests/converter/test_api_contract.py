@@ -38,16 +38,20 @@ class FakeRunner:
         if self.failure:
             raise self.failure
         artifact = b"FBX-result"
+        source_bvh_sha256 = hashlib.sha256(kwargs["bvh_bytes"]).hexdigest()
         report = {
             "src_profile": "mixamo_noprefix",
             "dst_profile": "mixamo",
             "mapped_bones": 22,
             "warnings": ["elapsed_sec=0.1"],
+            "source_bvh_sha256": source_bvh_sha256,
+            "mirrored": kwargs["mirror"],
         }
         return ConversionResult(
             conversion_id=kwargs["conversion_id"],
             artifact=artifact,
             artifact_sha256=hashlib.sha256(artifact).hexdigest(),
+            source_bvh_sha256=source_bvh_sha256,
             report=report,
         )
 
@@ -132,6 +136,9 @@ def test_convert_success_streams_fbx_and_required_headers(tmp_path):
     assert response.headers["x-standin-mapped-bones"] == "22"
     assert response.headers["x-standin-warning-count"] == "1"
     assert len(response.headers["x-standin-artifact-sha256"]) == 64
+    assert response.headers["x-standin-source-bvh-sha256"] == hashlib.sha256(
+        VALID_BVH
+    ).hexdigest()
     assert runner.calls[0]["mirror"] is True
 
 

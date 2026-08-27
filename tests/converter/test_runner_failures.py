@@ -40,6 +40,9 @@ report = {
     "solver_version": "chain-transport-v3.2",
     "character_id": job["character_id"],
     "character_sha256": job["character_sha256"],
+    "source_bvh_sha256": hashlib.sha256(
+        pathlib.Path(job["bvh_path"]).read_bytes()
+    ).hexdigest(),
     "retarget_sha256": "692e975d32f41e3406144763c7c0b7dbf0a586ff07732f09c4365e3233b13693",
     "ankle_policy_sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
     "output_mode": "rigged_rest",
@@ -54,6 +57,8 @@ report = {
     "artifact_sha256": hashlib.sha256(artifact).hexdigest(),
     "artifact_size": len(artifact),
 }
+if mode == "wrong_source_hash":
+    report["source_bvh_sha256"] = "0" * 64
 if mode == "rejected":
     report["error_code"] = "conversion_rejected"
     report["error_message"] = "bad mapping"
@@ -101,6 +106,9 @@ def test_runner_validates_success_and_cleans_tempdir(tmp_path):
     result = _convert(runner, tmp_path)
     assert result.artifact.startswith(b"Kaydara")
     assert result.artifact_sha256 == hashlib.sha256(result.artifact).hexdigest()
+    assert result.source_bvh_sha256 == hashlib.sha256(
+        b"HIERARCHY\nMOTION\n"
+    ).hexdigest()
     assert runner.inspect_blender().build_hash == "fbe6228777e7"
     assert list(jobs.iterdir()) == []
 
@@ -138,5 +146,12 @@ def test_runner_timeout_kills_job_and_cleans_tempdir(tmp_path):
 def test_runner_rejects_wrong_blender_version(tmp_path):
     runner, jobs = _runner(tmp_path, version="5.1.0")
     with pytest.raises(BlenderUnavailableError, match="5.2.0"):
+        _convert(runner, tmp_path)
+    assert list(jobs.iterdir()) == []
+
+
+def test_runner_rejects_source_bvh_lineage_mismatch(tmp_path):
+    runner, jobs = _runner(tmp_path, "wrong_source_hash")
+    with pytest.raises(WorkerIntegrityError, match="source_bvh_sha256"):
         _convert(runner, tmp_path)
     assert list(jobs.iterdir()) == []

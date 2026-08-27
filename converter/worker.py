@@ -177,6 +177,7 @@ def _frozen_lineage() -> dict[str, str]:
 def run_job(job: dict[str, Any]) -> dict[str, Any]:
     """Execute one validated job inside Blender and persist its report."""
     lineage = _frozen_lineage()
+    source_bvh_sha256 = _sha256(Path(job["bvh_path"]))
     from converter.convert import convert  # imports bpy only in this child process
     import bpy
 
@@ -211,6 +212,7 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
         "blender_build_hash": blender_build_hash,
         "character_id": job["character_id"],
         "character_sha256": job["character_sha256"],
+        "source_bvh_sha256": source_bvh_sha256,
         **lineage,
     })
     output = Path(job["output_path"])
@@ -264,6 +266,10 @@ def main(argv: list[str] | None = None) -> int:
             "error_type": type(exc).__name__,
             "error_message": str(exc)[:500],
         }
+        try:
+            payload["source_bvh_sha256"] = _sha256(Path(job["bvh_path"]))
+        except OSError:
+            pass
         try:
             _write_report(report_path, payload)
         except Exception:
