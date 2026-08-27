@@ -80,7 +80,7 @@ COPY converter_api/runner.py /app/converter_api/runner.py
 COPY converter_api/schemas.py /app/converter_api/schemas.py
 COPY config/characters.example.json /app/config/characters.example.json
 
-RUN useradd --system --uid 10001 --create-home --home-dir /home/standin standin \
+RUN /usr/sbin/useradd --system --uid 10001 --create-home --home-dir /home/standin standin \
     && mkdir --parents /characters "$CONVERTER_TEMP_ROOT" "$BLENDER_USER_RESOURCES" \
     && chown --recursive standin:standin \
         /app /characters /home/standin "$CONVERTER_TEMP_ROOT" "$BLENDER_USER_RESOURCES" \
