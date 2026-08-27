@@ -475,6 +475,10 @@ converter 이미지 검사는 반대로 고정 Blender 버전과 worker 실행 �
 - path-filtered deploy workflow
 - warm/cold latency 측정
 
+구현·운영 변수·내부망 계약은 `docs/FBX_CONVERTER_V3_2_PHASE5_DEPLOYMENT.md`를 따른다.
+2026-08-27 `standin-master-v2` 실제 모델의 `g1-move1`·Mixamo control 통합 결과를 사용자가
+육안 확인했다. 합성 fixture는 자동 회귀에만 사용하고 실제 품질 판정에는 사용하지 않는다.
+
 자동 배포는 infra 변수와 비용 정책을 확정한 뒤 연다.
 
 ## 12. CI·회귀 게이트
