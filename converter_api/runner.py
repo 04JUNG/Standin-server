@@ -109,6 +109,7 @@ class ConversionResult:
     conversion_id: str
     artifact: bytes
     artifact_sha256: str
+    source_bvh_sha256: str
     report: dict[str, Any]
 
 
@@ -212,6 +213,8 @@ class BlenderRunner:
         return [
             self.settings.blender_binary,
             "--background",
+            "--python-exit-code",
+            "1",
             "--python",
             str(worker),
             "--",
@@ -279,6 +282,7 @@ class BlenderRunner:
         conversion_id: str,
         character_id: str,
         character_sha256: str,
+        source_bvh_sha256: str,
         mirror: bool,
         returncode: int,
         combined_log: str,
@@ -298,6 +302,7 @@ class BlenderRunner:
             "solver_version": SOLVER_VERSION,
             "character_id": character_id,
             "character_sha256": character_sha256,
+            "source_bvh_sha256": source_bvh_sha256,
             "retarget_sha256": RETARGET_SHA256,
             "ankle_policy_sha256": ANKLE_POLICY_SHA256,
             "output_mode": OUTPUT_MODE,
@@ -339,6 +344,7 @@ class BlenderRunner:
             conversion_id=conversion_id,
             artifact=artifact,
             artifact_sha256=artifact_sha256,
+            source_bvh_sha256=source_bvh_sha256,
             report=report,
         )
 
@@ -395,6 +401,7 @@ class BlenderRunner:
             report_path = temp_dir / "report.json"
             job_path = temp_dir / "job.json"
             bvh_path.write_bytes(bvh_bytes)
+            source_bvh_sha256 = hashlib.sha256(bvh_bytes).hexdigest()
             job = {
                 "schema_version": JOB_SCHEMA_VERSION,
                 "conversion_id": conversion_id,
@@ -446,6 +453,7 @@ class BlenderRunner:
                 conversion_id=conversion_id,
                 character_id=character_id,
                 character_sha256=character_sha256,
+                source_bvh_sha256=source_bvh_sha256,
                 mirror=mirror,
                 returncode=process.returncode,
                 combined_log=combined_log,

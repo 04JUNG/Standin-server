@@ -324,6 +324,7 @@ def create_app(
             logging.INFO,
             "converter_complete",
             conversion_id=conversion_id,
+            source_bvh_sha256=result.source_bvh_sha256,
             artifact_sha256=result.artifact_sha256,
             report=report,
         )
@@ -332,6 +333,7 @@ def create_app(
             "Content-Disposition": f'attachment; filename="{filename}"',
             "X-Standin-Conversion-Id": conversion_id,
             "X-Standin-Solver-Version": SOLVER_VERSION,
+            "X-Standin-Source-BVH-SHA256": result.source_bvh_sha256,
             "X-Standin-Artifact-SHA256": result.artifact_sha256,
             "X-Standin-Source-Profile": _safe_header(report.get("src_profile")),
             "X-Standin-Target-Profile": _safe_header(report.get("dst_profile")),
