@@ -5,6 +5,7 @@ on:
     branches: [main, develop]
     paths:
       - ".github/workflows/converter-ci.yml"
+      - ".github/workflows/converter-deploy.yml"
       - ".dockerignore"
       - "Dockerfile.converter"
       - "requirements-converter.txt"
@@ -12,12 +13,15 @@ on:
       - "converter_api/**"
       - "config/characters.example.json"
       - "tests/converter/**"
+      - "deploy/ecs/**"
+      - "scripts/measure_converter_latency.py"
       - "qa/retarget/CHAIN_TRANSPORT_V3_1_ANKLE/**"
       - "qa/retarget/CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY/**"
   push:
     branches: [develop]
     paths:
       - ".github/workflows/converter-ci.yml"
+      - ".github/workflows/converter-deploy.yml"
       - ".dockerignore"
       - "Dockerfile.converter"
       - "requirements-converter.txt"
@@ -25,6 +29,8 @@ on:
       - "converter_api/**"
       - "config/characters.example.json"
       - "tests/converter/**"
+      - "deploy/ecs/**"
+      - "scripts/measure_converter_latency.py"
       - "qa/retarget/CHAIN_TRANSPORT_V3_1_ANKLE/**"
       - "qa/retarget/CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY/**"
   workflow_dispatch:
@@ -70,7 +76,9 @@ jobs:
             tests/converter/test_registry.py \
             tests/converter/test_runner_failures.py \
             tests/converter/test_api_contract.py \
-            tests/converter/test_refined_bvh_e2e.py
+            tests/converter/test_refined_bvh_e2e.py \
+            tests/converter/test_deployment_contract.py \
+            tests/converter/test_latency_probe.py
 
   inference-isolation:
     name: Inference image excludes bpy

@@ -1,0 +1,26 @@
+{
+  "serviceName": "standin-converter",
+  "launchType": "FARGATE",
+  "platformVersion": "LATEST",
+  "healthCheckGracePeriodSeconds": 120,
+  "networkConfiguration": {
+    "awsvpcConfiguration": {
+      "subnets": [
+        "<private-subnet-a>",
+        "<private-subnet-b>"
+      ],
+      "securityGroups": [
+        "<converter-sg-allow-bff-only>"
+      ],
+      "assignPublicIp": "DISABLED"
+    }
+  },
+  "deploymentConfiguration": {
+    "maximumPercent": 200,
+    "minimumHealthyPercent": 100,
+    "deploymentCircuitBreaker": {
+      "enable": true,
+      "rollback": true
+    }
+  }
+}
