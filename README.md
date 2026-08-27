@@ -68,6 +68,12 @@ uvicorn converter_api.app:app --port 8001
 [`docs/FBX_CONVERTER_V3_2_INTEGRATION_HANDOFF.md`](docs/FBX_CONVERTER_V3_2_INTEGRATION_HANDOFF.md)를
 따른다.
 
+BFF는 `refined=true`면 `/refine` 응답의 inline `bvh`, 아니면 base `bvh_url` 응답 바이트를
+최종 입력으로 선택한다. Converter 성공 응답의 `X-Standin-Source-BVH-SHA256`을 BFF가 계산한
+최종 BVH SHA와 대조한다. mirror는 `/convert`에서 한 번만 적용한다. Phase 3 상세는
+[`docs/FBX_CONVERTER_V3_2_PHASE3_BFF_HANDOFF.md`](docs/FBX_CONVERTER_V3_2_PHASE3_BFF_HANDOFF.md)를
+따른다.
+
 Blender converter 회귀는 repo root에서 아래처럼 실행한다. `--python-exit-code 1`은 Python
 traceback이 발생했는데 Blender가 종료코드 0을 반환하는 false pass를 막는다. 생성물 위치는
 `CONVERTER_TEST_ARTIFACT_ROOT`로 repo 밖 임시 디렉터리를 지정한다.
