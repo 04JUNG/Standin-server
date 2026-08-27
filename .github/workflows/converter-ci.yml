@@ -109,10 +109,12 @@ jobs:
     needs: contracts
     runs-on: ubuntu-latest
     env:
-      ARTIFACT_ROOT: ${{ runner.temp }}/standin-converter-ci
       CONTAINER_NAME: standin-converter-ci
     steps:
       - uses: actions/checkout@v4
+
+      - name: Configure runner artifact root
+        run: echo "ARTIFACT_ROOT=$RUNNER_TEMP/standin-converter-ci" >> "$GITHUB_ENV"
 
       - uses: docker/setup-buildx-action@v3
 
