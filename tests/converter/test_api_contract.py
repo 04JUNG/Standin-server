@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 import hashlib
+import io
 import json
+import logging
 from pathlib import Path
 import sys
 
 from fastapi.testclient import TestClient
 
-from converter_api.app import create_app
+from converter_api.app import configure_structured_logging, create_app
 from converter_api.registry import CharacterRegistry
 from converter_api.runner import (
     BlenderInfo,
@@ -135,11 +137,53 @@ def test_convert_success_streams_fbx_and_required_headers(tmp_path):
     assert response.headers["x-standin-target-profile"] == "mixamo"
     assert response.headers["x-standin-mapped-bones"] == "22"
     assert response.headers["x-standin-warning-count"] == "1"
+    assert response.headers["x-standin-task-cold-start"] == "false"
+    assert response.headers["server-timing"].startswith("queue;dur=")
     assert len(response.headers["x-standin-artifact-sha256"]) == 64
     assert response.headers["x-standin-source-bvh-sha256"] == hashlib.sha256(
         VALID_BVH
     ).hexdigest()
     assert runner.calls[0]["mirror"] is True
+
+
+def test_complete_log_has_cloudwatch_dimensions_and_latency(tmp_path, caplog):
+    with caplog.at_level(logging.INFO, logger="standin.converter"):
+        response = _post(_client(tmp_path))
+    conversion_id = response.headers["x-standin-conversion-id"]
+    payload = next(
+        json.loads(record.getMessage())
+        for record in reversed(caplog.records)
+        if '"event": "converter_complete"' in record.getMessage()
+    )
+    assert payload["service"] == "converter"
+    assert payload["version"] == "development"
+    assert payload["conversion_id"] == conversion_id
+    assert payload["task_cold_start"] is False
+    assert payload["queue_wait_ms"] == 0.0
+    assert payload["execution_ms"] == 0.0
+    assert payload["request_total_ms"] >= 0.0
+
+
+def test_structured_logger_writes_one_json_line_for_cloudwatch():
+    stream = io.StringIO()
+    logger = logging.getLogger("standin.converter.test-json")
+    logger.handlers.clear()
+    logger.propagate = False
+    configure_structured_logging(
+        logger,
+        {
+            "CONVERTER_JSON_LOGS": "1",
+            "CONVERTER_LOG_LEVEL": "INFO",
+        },
+    )
+    assert len(logger.handlers) == 1
+    logger.handlers[0].setStream(stream)
+    logger.info('{"conversion_id":"test-id","event":"converter_complete"}')
+    assert json.loads(stream.getvalue()) == {
+        "conversion_id": "test-id",
+        "event": "converter_complete",
+    }
+    logger.handlers.clear()
 
 
 def test_convert_rejects_path_filename_and_locked_options(tmp_path):

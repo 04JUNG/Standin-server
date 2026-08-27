@@ -8,7 +8,7 @@ that directory.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import hashlib
 import json
 import os
@@ -18,6 +18,7 @@ import signal
 import subprocess
 import tempfile
 import threading
+import time
 from typing import Any, Mapping
 
 from converter.protocol import (
@@ -111,6 +112,9 @@ class ConversionResult:
     artifact_sha256: str
     source_bvh_sha256: str
     report: dict[str, Any]
+    queue_wait_ms: float = 0.0
+    execution_ms: float = 0.0
+    task_cold_start: bool = False
 
 
 def sha256_file(path: Path) -> str:
@@ -140,6 +144,8 @@ class BlenderRunner:
         self._process_slots = threading.BoundedSemaphore(
             self.settings.max_concurrent_processes
         )
+        self._lifecycle_lock = threading.Lock()
+        self._completed_conversions = 0
 
     def _environment(self) -> dict[str, str]:
         env = dict(os.environ)
@@ -362,8 +368,14 @@ class BlenderRunner:
             raise ConversionRejectedError("BVH upload is empty")
         if type(mirror) is not bool:
             raise ConversionRejectedError("mirror must be boolean")
-        with self._process_slots:
-            return self._convert_one(
+        queue_started = time.monotonic()
+        self._process_slots.acquire()
+        queue_wait_ms = (time.monotonic() - queue_started) * 1000.0
+        with self._lifecycle_lock:
+            task_cold_start = self._completed_conversions == 0
+        execution_started = time.monotonic()
+        try:
+            result = self._convert_one(
                 bvh_bytes=bvh_bytes,
                 character_path=character_path,
                 character_id=character_id,
@@ -371,6 +383,17 @@ class BlenderRunner:
                 conversion_id=conversion_id,
                 mirror=mirror,
             )
+        finally:
+            execution_ms = (time.monotonic() - execution_started) * 1000.0
+            self._process_slots.release()
+        with self._lifecycle_lock:
+            self._completed_conversions += 1
+        return replace(
+            result,
+            queue_wait_ms=queue_wait_ms,
+            execution_ms=execution_ms,
+            task_cold_start=task_cold_start,
+        )
 
     def _convert_one(
         self,

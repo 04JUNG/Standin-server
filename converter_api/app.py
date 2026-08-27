@@ -8,6 +8,8 @@ import logging
 import os
 from pathlib import Path
 import re
+import sys
+import time
 import uuid
 from typing import Any
 
@@ -51,6 +53,31 @@ ALLOWED_BVH_TYPES = {
 DEFAULT_MAX_BVH_BYTES = 2 * 1024 * 1024
 
 
+def configure_structured_logging(
+    logger: logging.Logger = LOGGER,
+    environ: dict[str, str] | os._Environ[str] | None = None,
+) -> None:
+    """Make converter JSON records visible as one-line CloudWatch messages."""
+
+    values = os.environ if environ is None else environ
+    level_name = values.get("CONVERTER_LOG_LEVEL", "INFO").upper()
+    logger.setLevel(getattr(logging, level_name, logging.INFO))
+    json_stdout = values.get("CONVERTER_JSON_LOGS", "0").lower() in {
+        "1", "true", "yes", "on",
+    }
+    if not json_stdout:
+        return
+    if not any(getattr(handler, "_standin_json_stdout", False) for handler in logger.handlers):
+        handler = logging.StreamHandler(sys.stdout)
+        handler.setFormatter(logging.Formatter("%(message)s"))
+        handler._standin_json_stdout = True  # type: ignore[attr-defined]
+        logger.addHandler(handler)
+    logger.propagate = False
+
+
+configure_structured_logging()
+
+
 class ApiProblem(RuntimeError):
     def __init__(
         self,
@@ -81,7 +108,12 @@ def _error_response(problem: ApiProblem) -> JSONResponse:
 
 
 def _structured_log(level: int, event: str, **fields: Any) -> None:
-    payload = {"event": event, **fields}
+    payload = {
+        "event": event,
+        "service": "converter",
+        "version": os.getenv("DEPLOYMENT_VERSION", "development"),
+        **fields,
+    }
     LOGGER.log(level, json.dumps(payload, ensure_ascii=False, sort_keys=True))
 
 
@@ -151,7 +183,15 @@ def create_app(
     app.state.max_bvh_bytes = size_limit
 
     @app.exception_handler(ApiProblem)
-    async def api_problem_handler(_request: Request, exc: ApiProblem):
+    async def api_problem_handler(request: Request, exc: ApiProblem):
+        _structured_log(
+            logging.WARNING,
+            "converter_request_failed",
+            route=request.url.path,
+            status_code=exc.status_code,
+            error_code=exc.code,
+            conversion_id=exc.conversion_id,
+        )
         return _error_response(exc)
 
     @app.exception_handler(RequestValidationError)
@@ -240,6 +280,7 @@ def create_app(
         apply_root_translation: bool = Form(default=APPLY_ROOT_TRANSLATION),
     ):
         conversion_id = str(uuid.uuid4())
+        request_started = time.monotonic()
         try:
             if frame != FRAME or isinstance(frame, bool):
                 raise ApiProblem(
@@ -320,12 +361,20 @@ def create_app(
             ) from exc
 
         report = result.report
+        request_total_ms = (time.monotonic() - request_started) * 1000.0
+        queue_wait_ms = round(result.queue_wait_ms, 3)
+        execution_ms = round(result.execution_ms, 3)
+        request_total_ms = round(request_total_ms, 3)
         _structured_log(
             logging.INFO,
             "converter_complete",
             conversion_id=conversion_id,
             source_bvh_sha256=result.source_bvh_sha256,
             artifact_sha256=result.artifact_sha256,
+            task_cold_start=result.task_cold_start,
+            queue_wait_ms=queue_wait_ms,
+            execution_ms=execution_ms,
+            request_total_ms=request_total_ms,
             report=report,
         )
         filename = f"{resolved.metadata.character_id}-{conversion_id}.fbx"
@@ -339,6 +388,11 @@ def create_app(
             "X-Standin-Target-Profile": _safe_header(report.get("dst_profile")),
             "X-Standin-Mapped-Bones": str(int(report.get("mapped_bones", 0))),
             "X-Standin-Warning-Count": str(len(report.get("warnings") or [])),
+            "X-Standin-Task-Cold-Start": str(result.task_cold_start).lower(),
+            "Server-Timing": (
+                f"queue;dur={queue_wait_ms}, "
+                f"blender;dur={execution_ms}, total;dur={request_total_ms}"
+            ),
             "Content-Length": str(len(result.artifact)),
         }
         return StreamingResponse(

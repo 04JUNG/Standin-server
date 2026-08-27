@@ -155,3 +155,14 @@ def test_runner_rejects_source_bvh_lineage_mismatch(tmp_path):
     with pytest.raises(WorkerIntegrityError, match="source_bvh_sha256"):
         _convert(runner, tmp_path)
     assert list(jobs.iterdir()) == []
+
+
+def test_runner_records_queue_execution_and_task_cold_start(tmp_path):
+    runner, jobs = _runner(tmp_path)
+    first = _convert(runner, tmp_path)
+    second = _convert(runner, tmp_path)
+    assert first.task_cold_start is True
+    assert second.task_cold_start is False
+    assert first.queue_wait_ms >= 0.0
+    assert first.execution_ms > 0.0
+    assert list(jobs.iterdir()) == []
