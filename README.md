@@ -63,6 +63,18 @@ uvicorn converter_api.app:app --port 8001
 # GET /healthz · GET /characters · POST /convert
 ```
 
+Linux 운영 이미지는 Blender 5.2.0 공식 x64 archive와 checksum을 고정하며 추론 이미지와 별도로
+빌드한다. 캐릭터 FBX는 이미지에 넣지 않고 읽기 전용으로 마운트한다.
+
+```bash
+docker buildx build --platform linux/amd64 --load \
+  --file Dockerfile.converter --tag standin-converter:local .
+docker run --rm --platform linux/amd64 --publish 8001:8001 \
+  --env STANDIN_MASTER_V2_URI=/characters/standin-master-v2.fbx \
+  --mount type=bind,source=/absolute/standin-master-v2.fbx,target=/characters/standin-master-v2.fbx,readonly \
+  standin-converter:local
+```
+
 `POST /convert`는 BFF 내부망 전용 multipart API이며 `bvh` 업로드와 registry의
 `character_id`만 받는다. 사용자 URL이나 서버 파일 경로는 받지 않는다. 동결 solver와 통합 정본은
 [`docs/FBX_CONVERTER_V3_2_INTEGRATION_HANDOFF.md`](docs/FBX_CONVERTER_V3_2_INTEGRATION_HANDOFF.md)를

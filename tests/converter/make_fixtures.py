@@ -1,8 +1,10 @@
 """
 검증용 합성 자산 생성기 (실제 팀 모델·라이브러리가 없어도 파이프라인을 돌려보기 위함)
 
-  1) character.fbx  : mixamorig:* 이름의 T-pose 리그 + 스킨 메시
-  2) pose_raise.bvh : 접두사 없는 Mixamo 이름의 BVH (프로파일 자동판별 테스트 겸용)
+  1) character_mixamo.fbx               : mixamorig:* T-pose 리그 + 스킨 메시
+  2) pose_raise.bvh                      : 28건 회귀용 Mixamo BVH
+  3) character_mixamo_foot_mismatch.fbx : bilateral fallback 활성화용 rest mismatch
+  4) pose_raise_pelvis.bvh               : pelvis boundary 활성화용 frame-0 BVH
 
 T-pose 기준 좌표 (Blender Z-up, 미터):
   X = 좌우, Y = 앞뒤(+Y 뒤), Z = 높이
@@ -10,6 +12,8 @@ T-pose 기준 좌표 (Blender Z-up, 미터):
 
 from __future__ import annotations
 
+import hashlib
+import json
 import os
 import bpy
 from mathutils import Vector
@@ -55,7 +59,9 @@ ORDER = list(SKELETON.keys())
 # ---------------------------------------------------------------------------
 
 def build_character_fbx(out_path: str, naming: dict[str, str],
-                        add_leaf_bones: bool = True) -> str:
+                        add_leaf_bones: bool = True,
+                        skeleton: dict | None = None) -> str:
+    skeleton = skeleton or SKELETON
     bpy.ops.wm.read_factory_settings(use_empty=True)
 
     arm_data = bpy.data.armatures.new("Armature")
@@ -65,7 +71,7 @@ def build_character_fbx(out_path: str, naming: dict[str, str],
     bpy.ops.object.mode_set(mode="EDIT")
 
     for canon in ORDER:
-        head, tail, parent = SKELETON[canon]
+        head, tail, parent = skeleton[canon]
         eb = arm_data.edit_bones.new(naming[canon])
         eb.head, eb.tail = Vector(head), Vector(tail)
         eb.use_connect = False
@@ -76,7 +82,7 @@ def build_character_fbx(out_path: str, naming: dict[str, str],
     # 본마다 상자 하나 -> 합쳐서 몸통 메시로
     boxes = []
     for canon in ORDER:
-        head, tail, _ = SKELETON[canon]
+        head, tail, _ = skeleton[canon]
         h, t = Vector(head), Vector(tail)
         mid, vec = (h + t) / 2, (t - h)
         length = max(vec.length, 0.02)
@@ -142,7 +148,8 @@ LEAVES = {"head", "hand.L", "hand.R", "toe.L", "toe.R"}
 
 
 def build_bvh(out_path: str, naming: dict[str, str],
-              motion: dict[str, tuple[float, float, float]]) -> str:
+              motion: dict[str, tuple[float, float, float]],
+              motion_frame: int = 1) -> str:
     lines: list[str] = ["HIERARCHY"]
     order: list[str] = []          # 채널 순서 기록
 
@@ -175,7 +182,7 @@ def build_bvh(out_path: str, naming: dict[str, str],
     for f in range(frames):
         vals: list[str] = ["0.000000", "0.000000", "0.000000"]   # root position
         for canon in order:
-            z, x, y = motion.get(canon, (0, 0, 0)) if f == 1 else (0, 0, 0)
+            z, x, y = motion.get(canon, (0, 0, 0)) if f == motion_frame else (0, 0, 0)
             vals += [f"{z:.6f}", f"{x:.6f}", f"{y:.6f}"]
         lines.append(" ".join(vals))
 
@@ -190,6 +197,19 @@ if __name__ == "__main__":
     from converter.bone_map import MIXAMO, MIXAMO_NOPREFIX
 
     ch = build_character_fbx(os.path.join(ASSETS, "character_mixamo.fbx"), MIXAMO)
+    mismatch_skeleton = dict(SKELETON)
+    for side, x in (("L", 0.10), ("R", -0.10)):
+        mismatch_skeleton[f"foot.{side}"] = (
+            (x, 0.0, 0.10), (x, 0.16, 0.02), f"leg.{side}"
+        )
+        mismatch_skeleton[f"toe.{side}"] = (
+            (x, 0.16, 0.02), (x, 0.26, 0.02), f"foot.{side}"
+        )
+    mismatch_ch = build_character_fbx(
+        os.path.join(ASSETS, "character_mixamo_foot_mismatch.fbx"),
+        MIXAMO,
+        skeleton=mismatch_skeleton,
+    )
     bv = build_bvh(
         os.path.join(ASSETS, "pose_raise.bvh"),
         MIXAMO_NOPREFIX,
@@ -201,5 +221,43 @@ if __name__ == "__main__":
             "spine1": (0.0, 12.0, 0.0),
         },
     )
+    pelvis_bv = build_bvh(
+        os.path.join(ASSETS, "pose_raise_pelvis.bvh"),
+        MIXAMO_NOPREFIX,
+        motion={
+            "hips": (18.0, 7.0, 0.0),
+            "upperarm.L": (90.0, 0.0, 0.0),
+            "forearm.L": (30.0, 0.0, 0.0),
+            "upperarm.R": (45.0, 0.0, 0.0),
+            "leg.L": (0.0, -40.0, 0.0),
+            "spine1": (0.0, 12.0, 0.0),
+        },
+        motion_frame=0,
+    )
+    registry_path = os.path.join(ARTIFACT_ROOT, "characters.json")
+    with open(ch, "rb") as handle:
+        character_sha256 = hashlib.sha256(handle.read()).hexdigest()
+    with open(registry_path, "w", encoding="utf-8") as handle:
+        json.dump(
+            {
+                "schema_version": 1,
+                "characters": {
+                    "standin-master-v2": {
+                        "display_name": "Standin CI Character",
+                        "artifact_uri_env": "CONVERTER_CI_CHARACTER_URI",
+                        "sha256": character_sha256,
+                        "rig_profile": "mixamo",
+                        "revision": "synthetic-ci",
+                    }
+                },
+            },
+            handle,
+            indent=2,
+            sort_keys=True,
+        )
+        handle.write("\n")
     print("character:", ch)
+    print("mismatch character:", mismatch_ch)
     print("bvh      :", bv)
+    print("pelvis bvh:", pelvis_bv)
+    print("registry :", registry_path)
