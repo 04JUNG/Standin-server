@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Build a blind HTML review using real 3D Standin character renders.
+"""Build an HTML review using real 3D Standin character renders.
 
 The input reports come from ``scripts/eval_hybrid_search.py``. This builder
 deduplicates candidate ``pose + matched view`` pairs, optionally invokes
 Blender, copies rough inputs, and writes a self-contained local review page.
-Review choices persist in ``localStorage`` and can be exported as JSON.
+Algorithm labels and pose IDs are visible by default. Review choices persist in
+``localStorage`` and can be exported as JSON.
 """
 from __future__ import annotations
 
@@ -14,7 +15,6 @@ import hashlib
 import html
 import json
 from pathlib import Path
-import random
 import re
 import shutil
 import subprocess
@@ -61,21 +61,12 @@ def _sha256(path: Path) -> str:
     return "sha256:" + digest.hexdigest()
 
 
-def _render_name(hit: dict) -> str:
+def _render_name(hit: dict, render_view: str) -> str:
     identity = "\0".join([
-        hit["pose_id"], hit["view"], str(Path(hit["bvh_path"]).resolve()),
+        hit["pose_id"], render_view, str(Path(hit["bvh_path"]).resolve()),
     ])
     digest = hashlib.sha256(identity.encode("utf-8")).hexdigest()[:10]
-    return f"{_slug(hit['pose_id'])}__{hit['view']}__{digest}.png"
-
-
-def _blind_order(unit_id: str, arm_ids: list[str]) -> list[str]:
-    seed = int(hashlib.sha256(
-        f"hybrid-3d-review-v1\0{unit_id}".encode("utf-8")
-    ).hexdigest()[:16], 16)
-    shuffled = list(arm_ids)
-    random.Random(seed).shuffle(shuffled)
-    return shuffled
+    return f"{_slug(hit['pose_id'])}__review-{render_view}__{digest}.png"
 
 
 def _candidate_html(hit: dict, render_file: str, rank: int) -> str:
@@ -96,7 +87,7 @@ def _build_html(review: dict, output: Path) -> None:
     sections = []
     for unit in review["units"]:
         arm_rows = []
-        for blind_label, arm_id in zip(("A", "B", "C"), unit["blind_order"]):
+        for arm_id in ("position", "h0", "h2"):
             arm = unit["arms"][arm_id]
             candidates = "".join(
                 _candidate_html(hit, hit["render_file"], rank)
@@ -105,8 +96,7 @@ def _build_html(review: dict, output: Path) -> None:
             arm_rows.append(f"""
             <section class="arm-row" data-arm-id="{html.escape(arm_id)}">
               <header>
-                <strong>Result {blind_label}</strong>
-                <span class="arm-secret">{html.escape(arm['label'])}</span>
+                <strong>{html.escape(arm['label'])}</strong>
               </header>
               <div class="candidate-grid">{candidates}</div>
             </section>""")
@@ -114,7 +104,9 @@ def _build_html(review: dict, output: Path) -> None:
             f'<label><input type="radio" name="choice-{html.escape(unit["unit_id"])}" '
             f'value="{value}"> {label}</label>'
             for value, label in (
-                ("A", "A"), ("B", "B"), ("C", "C"),
+                ("position", "Position"),
+                ("h0", "Raw H0 · w=0.025"),
+                ("h2", "Conservative H2"),
                 ("tie", "동률"), ("unclear", "판단 불가"),
             )
         )
@@ -144,11 +136,10 @@ def _build_html(review: dict, output: Path) -> None:
         "schema_version": 1,
         "generated_at": review["generated_at"],
         "db_sha256": review["db_sha256"],
+        "render_view": review["render_view"],
         "units": [{
             "unit_id": unit["unit_id"],
-            "blind_mapping": {
-                blind: arm_id for blind, arm_id in zip(("A", "B", "C"), unit["blind_order"])
-            },
+            "algorithms": ["position", "h0", "h2"],
         } for unit in review["units"]],
     }, ensure_ascii=False).replace("</", "<\\/")
     page = f"""<!doctype html>
@@ -156,7 +147,7 @@ def _build_html(review: dict, output: Path) -> None:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Hybrid 3D Blind Review</title>
+  <title>Hybrid 3D Review</title>
   <style>
     :root {{ color-scheme: dark; font-family: Inter, Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }}
     * {{ box-sizing: border-box; }}
@@ -182,8 +173,7 @@ def _build_html(review: dict, output: Path) -> None:
     .arm-row {{ background: #161b22; border: 1px solid #30363d; border-radius: 9px; padding: 11px; }}
     .arm-row > header {{ display: flex; gap: 12px; align-items: baseline; min-height: 24px; }}
     .arm-row strong {{ font-size: 15px; }}
-    .arm-secret, .candidate-secret {{ display: none; color: #8b949e; font-size: 11px; overflow-wrap: anywhere; }}
-    body.unblinded .arm-secret, body.show-ids .candidate-secret {{ display: inline; }}
+    .candidate-secret {{ display: inline; color: #8b949e; font-size: 11px; overflow-wrap: anywhere; }}
     .candidate-grid {{ display: grid; grid-template-columns: repeat(5, minmax(128px, 1fr)); gap: 9px; }}
     .candidate {{ margin: 0; min-width: 0; background: #0d1117; border-radius: 7px; overflow: hidden; border: 1px solid #21262d; }}
     .candidate img {{ width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }}
@@ -212,10 +202,8 @@ def _build_html(review: dict, output: Path) -> None:
 </head>
 <body>
   <header class="topbar">
-    <div><h1>Hybrid 3D Blind Review</h1><span class="progress" id="progress">0 / {len(review['units'])} 평가</span></div>
+    <div><h1>Hybrid 3D Review</h1><span class="progress" id="progress">0 / {len(review['units'])} 평가 · 렌더 방향 {html.escape(review['render_view'])} 고정</span></div>
     <div class="toolbar">
-      <button type="button" id="toggle-ids">Pose ID 보기</button>
-      <button type="button" id="toggle-unblind">알고리즘 공개</button>
       <button type="button" class="primary" id="export">판정 JSON 내보내기</button>
     </div>
   </header>
@@ -224,14 +212,14 @@ def _build_html(review: dict, output: Path) -> None:
   <script>
   (() => {{
     const meta = JSON.parse(document.getElementById('review-meta').textContent);
-    const storageKey = 'standin-hybrid-3d-review:' + meta.db_sha256;
+    const storageKey = 'standin-hybrid-3d-review-unblinded:' + meta.db_sha256;
     let saved = {{}};
     try {{ saved = JSON.parse(localStorage.getItem(storageKey) || '{{}}'); }} catch (_) {{ saved = {{}}; }}
     const units = [...document.querySelectorAll('.review-unit')];
     const persist = () => {{ localStorage.setItem(storageKey, JSON.stringify(saved)); updateProgress(); }};
     const updateProgress = () => {{
       const done = units.filter(unit => saved[unit.dataset.unitId]?.choice).length;
-      document.getElementById('progress').textContent = `${{done}} / ${{units.length}} 평가`;
+      document.getElementById('progress').textContent = `${{done}} / ${{units.length}} 평가 · 렌더 방향 ${{meta.render_view}} 고정`;
     }};
     units.forEach(unit => {{
       const id = unit.dataset.unitId;
@@ -248,14 +236,6 @@ def _build_html(review: dict, output: Path) -> None:
         saved[id] = {{ ...(saved[id] || {{}}), note: event.target.value }}; refresh(); persist();
       }});
       refresh();
-    }});
-    document.getElementById('toggle-ids').addEventListener('click', event => {{
-      document.body.classList.toggle('show-ids');
-      event.currentTarget.textContent = document.body.classList.contains('show-ids') ? 'Pose ID 숨기기' : 'Pose ID 보기';
-    }});
-    document.getElementById('toggle-unblind').addEventListener('click', event => {{
-      document.body.classList.toggle('unblinded');
-      event.currentTarget.textContent = document.body.classList.contains('unblinded') ? '알고리즘 숨기기' : '알고리즘 공개';
     }});
     document.getElementById('export').addEventListener('click', () => {{
       const payload = {{ ...meta, exported_at: new Date().toISOString(), decisions: saved }};
@@ -316,10 +296,11 @@ def build(args: argparse.Namespace) -> dict:
                 bvh_path = Path(hit["bvh_path"]).resolve()
                 if not bvh_path.is_file():
                     raise FileNotFoundError(bvh_path)
-                render_file = _render_name(hit)
+                render_file = _render_name(hit, args.review_view)
                 jobs_by_name.setdefault(render_file, {
                     "pose_id": hit["pose_id"],
-                    "view": hit["view"],
+                    "view": args.review_view,
+                    "matched_view": hit["view"],
                     "bvh_path": str(bvh_path),
                     "output": str(render_dir / render_file),
                 })
@@ -330,7 +311,6 @@ def build(args: argparse.Namespace) -> dict:
             "person_index": row.get("person_index_left_to_right", 0),
             "rough_file": rough_name,
             "rough_sha256": _sha256(image),
-            "blind_order": _blind_order(unit_id, list(arms)),
             "arms": unit_arms,
         })
 
@@ -368,8 +348,9 @@ def build(args: argparse.Namespace) -> dict:
     review = {
         "schema_version": 1,
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "status": "blind_review_ready",
+        "status": "review_ready",
         "db_sha256": position_report["db"]["sha256"],
+        "render_view": args.review_view,
         "character": {
             "path": str(args.character.resolve()),
             "sha256": _sha256(args.character.resolve()),
@@ -401,6 +382,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--character", type=Path, default=DEFAULT_CHARACTER)
     parser.add_argument("--blender", type=Path, default=DEFAULT_BLENDER)
     parser.add_argument("--size", type=int, default=512)
+    parser.add_argument(
+        "--review-view",
+        choices=("front", "three_quarter", "side", "back"),
+        default="three_quarter",
+        help="모든 후보에 공통으로 적용할 3D 렌더 카메라 방향",
+    )
     parser.add_argument("--render", action="store_true")
     parser.add_argument("--force", action="store_true")
     return parser.parse_args(argv)

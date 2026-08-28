@@ -65,7 +65,42 @@ def add_area_light(name: str, location: Vector, target: Vector,
     point_at(light, target)
 
 
-def setup_scene(mesh, view: str, output: Path, size: int) -> None:
+def body_horizontal_axes(armature) -> tuple[Vector, Vector]:
+    """Return stable character-relative right/forward axes on the ground plane.
+
+    BVH files can carry different root yaw values. Deriving the camera from the
+    retargeted shoulder line makes ``front``/``three_quarter`` mean the same
+    body-relative direction for every candidate while preserving pose pitch,
+    roll, leaning, and falling.
+    """
+    by_suffix = {
+        bone.name.rsplit(":", 1)[-1].lower(): bone
+        for bone in armature.pose.bones
+    }
+
+    def world_head(suffix: str) -> Vector:
+        bone = by_suffix[suffix.lower()]
+        return armature.matrix_world @ bone.head
+
+    for left_name, right_name in (
+        ("LeftShoulder", "RightShoulder"),
+        ("LeftUpLeg", "RightUpLeg"),
+    ):
+        try:
+            right = world_head(right_name) - world_head(left_name)
+        except KeyError:
+            continue
+        right.y = 0.0
+        if right.length > 1e-5:
+            right.normalize()
+            # Rest-facing convention matches the existing +Z front camera
+            # when the Mixamo shoulder line points along +X.
+            forward = Vector((-right.z, 0.0, right.x)).normalized()
+            return right, forward
+    return Vector((1.0, 0.0, 0.0)), Vector((0.0, 0.0, 1.0))
+
+
+def setup_scene(mesh, armature, view: str, output: Path, size: int) -> None:
     scene = bpy.context.scene
     for engine in ("BLENDER_EEVEE_NEXT", "BLENDER_EEVEE"):
         try:
@@ -97,11 +132,12 @@ def setup_scene(mesh, view: str, output: Path, size: int) -> None:
     scene.collection.objects.link(camera)
     scene.camera = camera
     camera.data.type = "ORTHO"
+    right, forward = body_horizontal_axes(armature)
     offsets = {
-        "front": Vector((0.0, 0.0, extent * 3.0)),
-        "three_quarter": Vector((extent * 2.1, 0.0, extent * 2.1)),
-        "side": Vector((extent * 3.0, 0.0, 0.0)),
-        "back": Vector((0.0, 0.0, -extent * 3.0)),
+        "front": forward * (extent * 3.0),
+        "three_quarter": (right + forward).normalized() * (extent * 3.0),
+        "side": right * (extent * 3.0),
+        "back": -forward * (extent * 3.0),
     }
     if view not in offsets:
         raise ValueError(f"unsupported review view: {view}")
@@ -165,7 +201,7 @@ def render_job(job: dict, character: Path, size: int) -> dict:
         )
     source_armature.hide_render = True
     mesh = max(meshes, key=lambda item: len(item.data.vertices))
-    setup_scene(mesh, job["view"], destination, size)
+    setup_scene(mesh, destination_armature, job["view"], destination, size)
     bpy.ops.render.render(write_still=True)
     if not destination.is_file() or destination.stat().st_size == 0:
         raise RuntimeError("Blender did not create the render")
