@@ -14,11 +14,14 @@ from datetime import datetime, timezone
 import hashlib
 import html
 import json
+import math
 from pathlib import Path
 import re
 import shutil
 import subprocess
 import sys
+
+from PIL import Image
 
 
 REPO = Path(__file__).resolve().parent.parent
@@ -69,18 +72,73 @@ def _render_name(hit: dict, render_view: str) -> str:
     return f"{_slug(hit['pose_id'])}__review-{render_view}__{digest}.png"
 
 
-def _candidate_html(hit: dict, render_file: str, rank: int) -> str:
+def _candidate_key(hit: dict) -> str:
+    identity = "\0".join((hit["pose_id"], hit["view"], hit["bvh_path"]))
+    return hashlib.sha256(identity.encode("utf-8")).hexdigest()[:16]
+
+
+def _candidate_html(hit: dict, render_file: str, rank: int,
+                    unit_id: str, arm_id: str) -> str:
     pose = html.escape(hit["pose_id"])
     view = html.escape(hit["view"])
     distance = float(hit["rank_distance"])
+    candidate_key = html.escape(hit["candidate_key"])
+    control_id = html.escape(f"pick-{unit_id}-{arm_id}-{rank}")
     return f"""
-      <figure class="candidate">
+      <figure class="candidate" data-candidate-key="{candidate_key}">
         <img src="renders/{html.escape(render_file)}" alt="3D candidate rank {rank}: {pose}, {view}" loading="lazy">
         <figcaption>
           <span class="rank">#{rank}</span>
           <span class="candidate-secret"><code>{pose}</code><br>{view} · d={distance:.4f}</span>
+          <label class="pick-control" for="{control_id}">
+            <input id="{control_id}" type="checkbox" data-candidate-key="{candidate_key}"> 선택
+          </label>
         </figcaption>
       </figure>"""
+
+
+def _target_overlay(unit: dict) -> str:
+    if unit["person_count"] <= 1 or not unit.get("target_box"):
+        return ""
+    box = unit["target_box"]
+    style = (
+        f"left:{box['left']:.3f}%;top:{box['top']:.3f}%;"
+        f"width:{box['width']:.3f}%;height:{box['height']:.3f}%"
+    )
+    return (
+        f'<div class="target-box" style="{style}">'
+        f'<span>대상 p{unit["person_index"]}</span></div>'
+    )
+
+
+def _target_box(row: dict, image: Path) -> dict | None:
+    keypoints = row.get("frozen_keypoints") or []
+    valid = row.get("frozen_valid_mask") or [True] * len(keypoints)
+    points = [
+        (float(point[0]), float(point[1]))
+        for point, is_valid in zip(keypoints, valid)
+        if is_valid and len(point) >= 2
+        and math.isfinite(float(point[0])) and math.isfinite(float(point[1]))
+    ]
+    if len(points) < 2:
+        return None
+    with Image.open(image) as source:
+        image_width, image_height = source.size
+    xs, ys = zip(*points)
+    left, right = min(xs), max(xs)
+    top, bottom = min(ys), max(ys)
+    pad_x = max(image_width * 0.025, (right - left) * 0.12)
+    pad_y = max(image_height * 0.025, (bottom - top) * 0.10)
+    left = max(0.0, left - pad_x)
+    right = min(float(image_width), right + pad_x)
+    top = max(0.0, top - pad_y)
+    bottom = min(float(image_height), bottom + pad_y)
+    return {
+        "left": left / image_width * 100.0,
+        "top": top / image_height * 100.0,
+        "width": (right - left) / image_width * 100.0,
+        "height": (bottom - top) / image_height * 100.0,
+    }
 
 
 def _build_html(review: dict, output: Path) -> None:
@@ -90,26 +148,20 @@ def _build_html(review: dict, output: Path) -> None:
         for arm_id in ("position", "h0", "h2"):
             arm = unit["arms"][arm_id]
             candidates = "".join(
-                _candidate_html(hit, hit["render_file"], rank)
+                _candidate_html(
+                    hit, hit["render_file"], rank, unit["unit_id"], arm_id
+                )
                 for rank, hit in enumerate(arm["hits"], 1)
             )
             arm_rows.append(f"""
             <section class="arm-row" data-arm-id="{html.escape(arm_id)}">
               <header>
                 <strong>{html.escape(arm['label'])}</strong>
+                <span class="arm-count">0개 선택</span>
               </header>
               <div class="candidate-grid">{candidates}</div>
             </section>""")
-        choices = "".join(
-            f'<label><input type="radio" name="choice-{html.escape(unit["unit_id"])}" '
-            f'value="{value}"> {label}</label>'
-            for value, label in (
-                ("position", "Position"),
-                ("h0", "Raw H0 · w=0.025"),
-                ("h2", "Conservative H2"),
-                ("tie", "동률"), ("unclear", "판단 불가"),
-            )
-        )
+        target_overlay = _target_overlay(unit)
         sections.append(f"""
         <article class="review-unit" data-unit-id="{html.escape(unit['unit_id'])}">
           <header class="unit-heading">
@@ -118,14 +170,16 @@ def _build_html(review: dict, output: Path) -> None:
           </header>
           <div class="unit-layout">
             <aside class="rough-panel">
-              <img src="rough/{html.escape(unit['rough_file'])}" alt="rough input {html.escape(unit['unit_id'])}">
-              <p>러프 입력 · 대상 인물 p{unit['person_index']}</p>
+              <div class="rough-image-wrap">
+                <img src="rough/{html.escape(unit['rough_file'])}" alt="rough input {html.escape(unit['unit_id'])}">
+                {target_overlay}
+              </div>
+              <p>러프 입력 · 대상 p{unit['person_index']} / 전체 {unit['person_count']}명</p>
             </aside>
             <div class="arms">{''.join(arm_rows)}</div>
           </div>
           <fieldset class="decision">
-            <legend>가장 좋은 Top-5 결과</legend>
-            <div class="choice-row">{choices}</div>
+            <legend>평가 메모</legend>
             <label class="note-label">메모
               <textarea rows="2" placeholder="좋았던 후보, 실패한 관절, 판단 근거"></textarea>
             </label>
@@ -139,7 +193,18 @@ def _build_html(review: dict, output: Path) -> None:
         "render_view": review["render_view"],
         "units": [{
             "unit_id": unit["unit_id"],
-            "algorithms": ["position", "h0", "h2"],
+            "person_index": unit["person_index"],
+            "person_count": unit["person_count"],
+            "algorithms": {
+                arm_id: [{
+                    "key": hit["candidate_key"],
+                    "rank": rank,
+                    "pose_id": hit["pose_id"],
+                    "matched_view": hit["view"],
+                    "distance": hit["rank_distance"],
+                } for rank, hit in enumerate(unit["arms"][arm_id]["hits"], 1)]
+                for arm_id in ("position", "h0", "h2")
+            },
         } for unit in review["units"]],
     }, ensure_ascii=False).replace("</", "<\\/")
     page = f"""<!doctype html>
@@ -167,26 +232,30 @@ def _build_html(review: dict, output: Path) -> None:
     .saved-state {{ color: #8b949e; font-size: 13px; }}
     .unit-layout {{ display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 18px; align-items: start; }}
     .rough-panel {{ position: sticky; top: 76px; background: #161b22; border: 1px solid #30363d; border-radius: 9px; padding: 10px; }}
+    .rough-image-wrap {{ position: relative; }}
     .rough-panel img {{ width: 100%; max-height: 420px; object-fit: contain; display: block; background: #fff; border-radius: 5px; }}
     .rough-panel p {{ margin: 9px 2px 1px; color: #8b949e; font-size: 12px; }}
+    .target-box {{ position: absolute; border: 3px solid #ff453a; background: rgba(255,69,58,.10); border-radius: 5px; pointer-events: none; }}
+    .target-box span {{ position: absolute; left: -3px; top: -25px; padding: 3px 7px; border-radius: 5px 5px 0 0; background: #ff453a; color: white; font-size: 11px; font-weight: 700; white-space: nowrap; }}
     .arms {{ display: grid; gap: 12px; min-width: 0; }}
     .arm-row {{ background: #161b22; border: 1px solid #30363d; border-radius: 9px; padding: 11px; }}
     .arm-row > header {{ display: flex; gap: 12px; align-items: baseline; min-height: 24px; }}
     .arm-row strong {{ font-size: 15px; }}
+    .arm-count {{ color: #8b949e; font-size: 12px; }}
     .candidate-secret {{ display: inline; color: #8b949e; font-size: 11px; overflow-wrap: anywhere; }}
     .candidate-grid {{ display: grid; grid-template-columns: repeat(5, minmax(128px, 1fr)); gap: 9px; }}
-    .candidate {{ margin: 0; min-width: 0; background: #0d1117; border-radius: 7px; overflow: hidden; border: 1px solid #21262d; }}
+    .candidate {{ margin: 0; min-width: 0; background: #0d1117; border-radius: 7px; overflow: hidden; border: 2px solid #21262d; transition: border-color .12s, box-shadow .12s; }}
+    .candidate.selected {{ border-color: #2f81f7; box-shadow: 0 0 0 2px rgba(47,129,247,.22); }}
     .candidate img {{ width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }}
     .candidate figcaption {{ min-height: 30px; padding: 6px 7px; }}
     .rank {{ font-weight: 600; font-size: 12px; }}
+    .pick-control {{ display: flex; gap: 6px; align-items: center; width: max-content; margin-top: 8px; padding: 5px 8px; border-radius: 5px; background: #21262d; color: #e6edf3; cursor: pointer; font-size: 12px; }}
+    .pick-control input {{ accent-color: #2f81f7; }}
     code {{ color: #c9d1d9; }}
     .decision {{ margin: 14px 0 0 258px; border: 1px solid #30363d; border-radius: 9px; padding: 12px 14px 14px; }}
     .decision legend {{ padding: 0 6px; color: #c9d1d9; font-size: 13px; }}
-    .choice-row {{ display: flex; flex-wrap: wrap; gap: 14px; }}
-    .choice-row label {{ cursor: pointer; }}
     .note-label {{ display: grid; gap: 6px; margin-top: 11px; color: #8b949e; font-size: 12px; }}
     textarea {{ width: 100%; resize: vertical; background: #0d1117; color: #e6edf3; border: 1px solid #3d444d; border-radius: 6px; padding: 8px; }}
-    input[type=radio] {{ accent-color: #2f81f7; }}
     @media (max-width: 1000px) {{
       .unit-layout {{ grid-template-columns: 1fr; }}
       .rough-panel {{ position: static; width: min(300px, 100%); }}
@@ -212,26 +281,52 @@ def _build_html(review: dict, output: Path) -> None:
   <script>
   (() => {{
     const meta = JSON.parse(document.getElementById('review-meta').textContent);
-    const storageKey = 'standin-hybrid-3d-review-unblinded:' + meta.db_sha256;
+    const storageKey = 'standin-hybrid-3d-review-multiselect-v1:' + meta.db_sha256;
     let saved = {{}};
     try {{ saved = JSON.parse(localStorage.getItem(storageKey) || '{{}}'); }} catch (_) {{ saved = {{}}; }}
     const units = [...document.querySelectorAll('.review-unit')];
     const persist = () => {{ localStorage.setItem(storageKey, JSON.stringify(saved)); updateProgress(); }};
     const updateProgress = () => {{
-      const done = units.filter(unit => saved[unit.dataset.unitId]?.choice).length;
-      document.getElementById('progress').textContent = `${{done}} / ${{units.length}} 평가 · 렌더 방향 ${{meta.render_view}} 고정`;
+      const selected = Object.values(saved).reduce((total, state) =>
+        total + Object.values(state.selections || {{}}).reduce((sum, keys) => sum + keys.length, 0), 0);
+      document.getElementById('progress').textContent = `${{selected}}개 후보 선택 · 렌더 방향 ${{meta.render_view}} 고정`;
     }};
     units.forEach(unit => {{
       const id = unit.dataset.unitId;
       const state = saved[id] || {{}};
-      const radio = unit.querySelector(`input[value="${{state.choice || ''}}"]`);
-      if (radio) radio.checked = true;
       unit.querySelector('textarea').value = state.note || '';
       const status = unit.querySelector('.saved-state');
-      const refresh = () => {{ status.textContent = saved[id]?.choice ? '저장됨' : '미평가'; }};
-      unit.querySelectorAll('input[type=radio]').forEach(input => input.addEventListener('change', () => {{
-        saved[id] = {{ ...(saved[id] || {{}}), choice: input.value }}; refresh(); persist();
-      }}));
+      const refresh = () => {{
+        let unitTotal = 0;
+        unit.querySelectorAll('.arm-row').forEach(row => {{
+          const count = row.querySelectorAll('input[type=checkbox]:checked').length;
+          row.querySelector('.arm-count').textContent = `${{count}}개 선택`;
+          unitTotal += count;
+        }});
+        status.textContent = unitTotal ? `${{unitTotal}}개 선택됨` : '미선택';
+      }};
+      unit.querySelectorAll('.arm-row').forEach(row => {{
+        const armId = row.dataset.armId;
+        const selected = new Set(state.selections?.[armId] || []);
+        row.querySelectorAll('input[type=checkbox]').forEach(input => {{
+          input.checked = selected.has(input.dataset.candidateKey);
+          input.closest('.candidate').classList.toggle('selected', input.checked);
+          input.addEventListener('change', () => {{
+            const current = new Set(saved[id]?.selections?.[armId] || []);
+            if (input.checked) current.add(input.dataset.candidateKey);
+            else current.delete(input.dataset.candidateKey);
+            saved[id] = {{
+              ...(saved[id] || {{}}),
+              selections: {{
+                ...(saved[id]?.selections || {{}}),
+                [armId]: [...current],
+              }},
+            }};
+            input.closest('.candidate').classList.toggle('selected', input.checked);
+            refresh(); persist();
+          }});
+        }});
+      }});
       unit.querySelector('textarea').addEventListener('input', event => {{
         saved[id] = {{ ...(saved[id] || {{}}), note: event.target.value }}; refresh(); persist();
       }});
@@ -265,7 +360,12 @@ def build(args: argparse.Namespace) -> dict:
     position_report, position_units = _load_report(args.position_report.resolve())
     h0_report, h0_units = _load_report(args.h0_report.resolve())
     h2_report, h2_units = _load_report(args.h2_report.resolve())
-    frozen = {row["unit_id"]: row for row in _read_jsonl(args.frozen.resolve())}
+    frozen_rows = _read_jsonl(args.frozen.resolve())
+    frozen = {row["unit_id"]: row for row in frozen_rows}
+    people_per_image: dict[str, int] = {}
+    for frozen_row in frozen_rows:
+        image_key = str(Path(frozen_row["image"]).resolve())
+        people_per_image[image_key] = people_per_image.get(image_key, 0) + 1
     requested_units = tuple(args.unit or DEFAULT_UNITS)
 
     arms = {
@@ -304,11 +404,17 @@ def build(args: argparse.Namespace) -> dict:
                     "bvh_path": str(bvh_path),
                     "output": str(render_dir / render_file),
                 })
-                hits.append({**hit, "render_file": render_file})
+                hits.append({
+                    **hit,
+                    "candidate_key": _candidate_key(hit),
+                    "render_file": render_file,
+                })
             unit_arms[arm_id] = {"label": label, "metric": metric, "hits": hits}
         review_units.append({
             "unit_id": unit_id,
             "person_index": row.get("person_index_left_to_right", 0),
+            "person_count": people_per_image[str(image)],
+            "target_box": _target_box(row, image),
             "rough_file": rough_name,
             "rough_sha256": _sha256(image),
             "arms": unit_arms,
@@ -385,7 +491,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--review-view",
         choices=("front", "three_quarter", "side", "back"),
-        default="three_quarter",
+        default="front",
         help="모든 후보에 공통으로 적용할 3D 렌더 카메라 방향",
     )
     parser.add_argument("--render", action="store_true")
