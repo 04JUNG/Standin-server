@@ -291,6 +291,98 @@ def test_normal_pipeline_calls_full_pose_once_and_skips_crop():
     assert not any("ab_knn=" in note for note in result.notes)
 
 
+def test_half_body_search_masks_valid_knees_only_when_vlm_and_pose_agree():
+    class NoCompleteLegPose(MockPoseModel):
+        self_detecting = True
+
+        def estimate(self, image, boxes, img_w, img_h):
+            scores = np.full(17, 0.9, dtype=np.float32)
+            scores[[15, 16]] = 0.0  # 무릎은 유효하지만 양쪽 다리는 완성되지 않음
+            return [_skeleton(cx=img_w * 0.5, cy=img_h * 0.5,
+                              scale=img_h * 0.4, scores=scores)]
+
+        def estimate_crop_candidates(self, image, box, img_w, img_h):
+            return []
+
+    result = Pipeline(
+        build_synthetic_index(), vlm_client=MockVLMClient(),
+        pose_model=NoCompleteLegPose(),
+    ).process_cut(
+        _Img("full_half standing front 1p half_body"), 400, 300
+    )
+    trace = result.descriptors[0].quality_trace
+    evidence_mask = np.asarray(trace["evidence_valid_joint_mask"], dtype=bool)
+    search_mask = np.asarray(trace["search_valid_joint_mask"], dtype=bool)
+    assert trace["search_scope"] == "upper_body"
+    assert trace["lower_body_visibility_known"] is True
+    assert trace["lower_body_visibility_decision"] \
+        == "lower_visibility_upper_agreement"
+    assert evidence_mask[[13, 14]].all()  # 원래 유효했던 무릎도 상체 검색에서는 제거
+    assert not search_mask[[13, 14, 15, 16]].any()
+    assert result.person_candidates[0]
+    assert result.person_confidence[0] == "low"
+
+
+def test_valid_leg_evidence_overrides_vlm_half_body_misclassification():
+    class FullPose(MockPoseModel):
+        self_detecting = True
+
+        def estimate(self, image, boxes, img_w, img_h):
+            return [_skeleton(cx=img_w * 0.5, cy=img_h * 0.5,
+                              scale=img_h * 0.4)]
+
+    result = Pipeline(
+        build_synthetic_index(), vlm_client=MockVLMClient(),
+        pose_model=FullPose(),
+    ).process_cut(
+        _Img("full_half standing front 1p half_body"), 400, 300
+    )
+    trace = result.descriptors[0].quality_trace
+    search_mask = np.asarray(trace["search_valid_joint_mask"], dtype=bool)
+    assert trace["search_scope"] == "full_body"
+    assert trace["lower_body_visibility_decision"] \
+        == "lower_visibility_conflict_complete_leg"
+    assert search_mask[[13, 14, 15, 16]].all()
+    assert result.person_candidates[0]
+    assert result.person_confidence[0] == "low"
+
+
+def test_missing_vlm_visibility_lineage_never_forces_upper_body_search():
+    class MissingVisibilityVLM(BaseVLMClient):
+        def analyze(self, image, img_w, img_h):
+            return VLMAnalysis(
+                1, Shot.FULL_HALF, Action.STANDING, View.FRONT,
+                Relationship.SOLO,
+                [BBox(0.2 * img_w, 0.05 * img_h,
+                      0.8 * img_w, 0.95 * img_h, "vlm")],
+                lower_body_visible=[False],
+                # known lineage를 의도적으로 생략한다.
+            )
+
+    class NoCompleteLegPose(MockPoseModel):
+        self_detecting = True
+
+        def estimate(self, image, boxes, img_w, img_h):
+            scores = np.full(17, 0.9, dtype=np.float32)
+            scores[[15, 16]] = 0.0
+            return [_skeleton(cx=img_w * 0.5, cy=img_h * 0.5,
+                              scale=img_h * 0.4, scores=scores)]
+
+        def estimate_crop_candidates(self, image, box, img_w, img_h):
+            return []
+
+    result = Pipeline(
+        build_synthetic_index(), vlm_client=MissingVisibilityVLM(),
+        pose_model=NoCompleteLegPose(),
+    ).process_cut(_Img("missing-lineage"), 400, 300)
+    trace = result.descriptors[0].quality_trace
+    search_mask = np.asarray(trace["search_valid_joint_mask"], dtype=bool)
+    assert trace["search_scope"] == "full_body"
+    assert trace["lower_body_visibility_known"] is False
+    assert trace["lower_body_visibility_decision"] is None
+    assert search_mask[[13, 14]].all()  # 기존 관절별 mask를 그대로 보존
+
+
 def test_invalid_full_image_skeleton_retries_crop_once():
     invalid = _skeleton(cx=200, cy=150, scale=120)
     invalid.keypoints[0] = [np.nan, np.nan]
