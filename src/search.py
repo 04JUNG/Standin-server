@@ -18,11 +18,25 @@ from .config import CFG
 
 
 def pose_family_id(pose_id: str, meta: dict | None = None) -> str:
-    """원본과 `_mirror`를 stability 평가에서 같은 포즈 가족으로 접는다."""
+    """원본과 `_mirror`를 검색 결과에서 같은 포즈 가족으로 접는다."""
     if meta and meta.get("pose_family_id"):
         return str(meta["pose_family_id"])
     suffix = "_mirror"
     return pose_id[:-len(suffix)] if pose_id.lower().endswith(suffix) else pose_id
+
+
+def _best_per_pose_family(candidates: List[PoseCandidate], limit: int) -> List[PoseCandidate]:
+    """거리순 후보에서 pose family별 최선 하나만 남기고 ``limit``까지 채운다."""
+    seen_families, out = set(), []
+    for candidate in candidates:
+        family_id = candidate.pose_family_id or pose_family_id(candidate.pose_id)
+        if family_id in seen_families:
+            continue
+        seen_families.add(family_id)
+        out.append(candidate)
+        if len(out) >= limit:
+            break
+    return out
 
 
 def _dist(a, b, query_valid_mask=None, library_valid_mask=None,
@@ -78,13 +92,8 @@ def knn(entries: List[LibraryEntry], desc: PersonDescriptor,
             pose_family_id=pose_family_id(e.pose_id, e.meta),
         ))
     scored.sort(key=lambda c: c.distance)
-    # 같은 pose_id의 여러 view 중 최선 1개만 남겨 다양성 확보
-    seen, dedup = set(), []
-    for c in scored:
-        if c.pose_id in seen:
-            continue
-        seen.add(c.pose_id); dedup.append(c)
-    return dedup[:top_n]
+    # 같은 family의 여러 view·원본·mirror 중 최선 1개만 남기고 다음 family로 backfill.
+    return _best_per_pose_family(scored, top_n)
 
 
 def rerank(vlm_client, image, candidates: List[PoseCandidate],
@@ -111,7 +120,7 @@ def knn_geometric(entries, feature, top_k=None, query_valid_mask=None,
                   query_observable_bones=None):
     """순수 기하 kNN — 태그 사전필터·view 우선 없이 스켈레톤 거리만.
     (설계 결정: action/view는 기하와 중복이라 매칭에서 제외. 태그는 shot·사람수 제어용만.)
-    같은 pose_id의 여러 view 중 최선 1개만 남겨 다양성 확보."""
+    같은 pose family의 여러 view·원본·mirror 중 최선 1개만 남겨 다양성 확보."""
     top_k = top_k or CFG.top_k_final
     scored = [PoseCandidate(pose_id=e.pose_id, view=e.view,
                             distance=_dist(
@@ -123,14 +132,7 @@ def knn_geometric(entries, feature, top_k=None, query_valid_mask=None,
                             pose_family_id=pose_family_id(e.pose_id, e.meta))
               for e in entries]
     scored.sort(key=lambda c: c.distance)
-    seen, out = set(), []
-    for c in scored:
-        if c.pose_id in seen:
-            continue
-        seen.add(c.pose_id); out.append(c)
-        if len(out) >= top_k:
-            break
-    return out
+    return _best_per_pose_family(scored, top_k)
 
 
 def candidate_stability(candidates_a, candidates_b, entries,
