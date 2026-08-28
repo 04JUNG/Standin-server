@@ -33,6 +33,7 @@ DEFAULT_CHARACTER = (
     "standin-master-v1-rig-clean-mixamo-core.fbx"
 )
 DEFAULT_BLENDER = Path("/Applications/Blender.app/Contents/MacOS/Blender")
+RENDER_CACHE_VERSION = "anatomical-up-v1"
 DEFAULT_UNITS = (
     "4.56.21:p0", "131127:p0", "2.16.52:p2", "124702:p0",
     "131056:p0", "2.16.04:p0", "131127:p1",
@@ -77,16 +78,40 @@ def _candidate_key(hit: dict) -> str:
     return hashlib.sha256(identity.encode("utf-8")).hexdigest()[:16]
 
 
-def _candidate_html(hit: dict, render_file: str, rank: int,
-                    unit_id: str, arm_id: str) -> str:
+def _view_label(view: str) -> str:
+    return {"front": "정면", "three_quarter": "3/4", "side": "측면", "back": "후면"}[view]
+
+
+def _candidate_html(hit: dict, rank: int, unit_id: str, arm_id: str,
+                    primary_view: str, companion_view: str) -> str:
     pose = html.escape(hit["pose_id"])
     view = html.escape(hit["view"])
     distance = float(hit["rank_distance"])
     candidate_key = html.escape(hit["candidate_key"])
     control_id = html.escape(f"pick-{unit_id}-{arm_id}-{rank}")
+    primary_file = html.escape(hit["render_files"][primary_view])
+    companion_file = html.escape(hit["render_files"][companion_view])
+    primary_url = f"renders/{primary_file}?v={RENDER_CACHE_VERSION}"
+    companion_url = f"renders/{companion_file}?v={RENDER_CACHE_VERSION}"
+    primary_label = html.escape(_view_label(primary_view))
+    companion_label = html.escape(_view_label(companion_view))
     return f"""
       <figure class="candidate" data-candidate-key="{candidate_key}">
-        <img src="renders/{html.escape(render_file)}" alt="3D candidate rank {rank}: {pose}, {view}" loading="lazy">
+        <button type="button" class="pose-preview"
+                data-pose="{pose}" data-primary="{primary_url}"
+                data-primary-label="{primary_label}"
+                data-companion="{companion_url}"
+                data-companion-label="{companion_label}">
+          <img class="pose-primary" src="{primary_url}"
+               alt="{primary_label} 3D candidate rank {rank}: {pose}" loading="lazy">
+          <span class="view-badge">{primary_label}</span>
+          <span class="pose-inset">
+            <img src="{companion_url}"
+                 alt="{companion_label} 3D candidate rank {rank}: {pose}" loading="lazy">
+            <span>{companion_label}</span>
+          </span>
+          <span class="enlarge-hint">확대</span>
+        </button>
         <figcaption>
           <span class="rank">#{rank}</span>
           <span class="candidate-secret"><code>{pose}</code><br>{view} · d={distance:.4f}</span>
@@ -149,7 +174,8 @@ def _build_html(review: dict, output: Path) -> None:
             arm = unit["arms"][arm_id]
             candidates = "".join(
                 _candidate_html(
-                    hit, hit["render_file"], rank, unit["unit_id"], arm_id
+                    hit, rank, unit["unit_id"], arm_id,
+                    review["primary_view"], review["companion_view"],
                 )
                 for rank, hit in enumerate(arm["hits"], 1)
             )
@@ -190,7 +216,7 @@ def _build_html(review: dict, output: Path) -> None:
         "schema_version": 1,
         "generated_at": review["generated_at"],
         "db_sha256": review["db_sha256"],
-        "render_view": review["render_view"],
+        "render_views": [review["primary_view"], review["companion_view"]],
         "units": [{
             "unit_id": unit["unit_id"],
             "person_index": unit["person_index"],
@@ -246,7 +272,15 @@ def _build_html(review: dict, output: Path) -> None:
     .candidate-grid {{ display: grid; grid-template-columns: repeat(5, minmax(128px, 1fr)); gap: 9px; }}
     .candidate {{ margin: 0; min-width: 0; background: #0d1117; border-radius: 7px; overflow: hidden; border: 2px solid #21262d; transition: border-color .12s, box-shadow .12s; }}
     .candidate.selected {{ border-color: #2f81f7; box-shadow: 0 0 0 2px rgba(47,129,247,.22); }}
-    .candidate img {{ width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }}
+    .pose-preview {{ position: relative; display: block; width: 100%; padding: 0; border: 0; border-radius: 0; background: #171d24; overflow: hidden; }}
+    .pose-preview:hover {{ background: #171d24; }}
+    .pose-primary {{ width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }}
+    .view-badge, .enlarge-hint {{ position: absolute; top: 7px; padding: 3px 6px; border-radius: 4px; background: rgba(13,17,23,.82); color: #e6edf3; font-size: 10px; }}
+    .view-badge {{ left: 7px; }}
+    .enlarge-hint {{ right: 7px; opacity: .75; }}
+    .pose-inset {{ position: absolute; right: 8px; bottom: 8px; width: 34%; overflow: hidden; border: 2px solid #8b949e; border-radius: 6px; background: #171d24; box-shadow: 0 4px 14px rgba(0,0,0,.45); }}
+    .pose-inset img {{ width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }}
+    .pose-inset > span {{ position: absolute; left: 3px; top: 3px; padding: 2px 4px; border-radius: 3px; background: rgba(13,17,23,.82); color: white; font-size: 9px; }}
     .candidate figcaption {{ min-height: 30px; padding: 6px 7px; }}
     .rank {{ font-weight: 600; font-size: 12px; }}
     .pick-control {{ display: flex; gap: 6px; align-items: center; width: max-content; margin-top: 8px; padding: 5px 8px; border-radius: 5px; background: #21262d; color: #e6edf3; cursor: pointer; font-size: 12px; }}
@@ -256,6 +290,14 @@ def _build_html(review: dict, output: Path) -> None:
     .decision legend {{ padding: 0 6px; color: #c9d1d9; font-size: 13px; }}
     .note-label {{ display: grid; gap: 6px; margin-top: 11px; color: #8b949e; font-size: 12px; }}
     textarea {{ width: 100%; resize: vertical; background: #0d1117; color: #e6edf3; border: 1px solid #3d444d; border-radius: 6px; padding: 8px; }}
+    dialog {{ width: min(1100px, calc(100vw - 40px)); border: 1px solid #3d444d; border-radius: 12px; padding: 18px; background: #0d1117; color: #e6edf3; box-shadow: 0 24px 80px rgba(0,0,0,.65); }}
+    dialog::backdrop {{ background: rgba(0,0,0,.72); }}
+    dialog h2 {{ margin: 0 48px 14px 0; font-size: 17px; overflow-wrap: anywhere; }}
+    .modal-close {{ position: absolute; right: 14px; top: 12px; width: 36px; height: 36px; padding: 0; font-size: 24px; }}
+    .modal-views {{ display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }}
+    .modal-views figure {{ margin: 0; border: 1px solid #30363d; border-radius: 8px; overflow: hidden; background: #171d24; }}
+    .modal-views img {{ display: block; width: 100%; aspect-ratio: 1; object-fit: contain; }}
+    .modal-views figcaption {{ padding: 9px 12px; color: #c9d1d9; font-weight: 600; }}
     @media (max-width: 1000px) {{
       .unit-layout {{ grid-template-columns: 1fr; }}
       .rough-panel {{ position: static; width: min(300px, 100%); }}
@@ -266,17 +308,26 @@ def _build_html(review: dict, output: Path) -> None:
       .topbar {{ align-items: flex-start; flex-direction: column; }}
       main {{ padding: 14px; }}
       .candidate-grid {{ grid-template-columns: repeat(2, minmax(110px, 1fr)); }}
+      .modal-views {{ grid-template-columns: 1fr; }}
     }}
   </style>
 </head>
 <body>
   <header class="topbar">
-    <div><h1>Hybrid 3D Review</h1><span class="progress" id="progress">0 / {len(review['units'])} 평가 · 렌더 방향 {html.escape(review['render_view'])} 고정</span></div>
+    <div><h1>Hybrid 3D Review</h1><span class="progress" id="progress">0개 후보 선택 · 3/4 크게 + 정면 함께 보기</span></div>
     <div class="toolbar">
       <button type="button" class="primary" id="export">판정 JSON 내보내기</button>
     </div>
   </header>
   <main>{''.join(sections)}</main>
+  <dialog id="pose-modal">
+    <form method="dialog"><button class="modal-close" aria-label="닫기">×</button></form>
+    <h2 id="modal-pose"></h2>
+    <div class="modal-views">
+      <figure><img id="modal-primary" alt=""><figcaption id="modal-primary-label"></figcaption></figure>
+      <figure><img id="modal-companion" alt=""><figcaption id="modal-companion-label"></figcaption></figure>
+    </div>
+  </dialog>
   <script id="review-meta" type="application/json">{embedded}</script>
   <script>
   (() => {{
@@ -289,7 +340,7 @@ def _build_html(review: dict, output: Path) -> None:
     const updateProgress = () => {{
       const selected = Object.values(saved).reduce((total, state) =>
         total + Object.values(state.selections || {{}}).reduce((sum, keys) => sum + keys.length, 0), 0);
-      document.getElementById('progress').textContent = `${{selected}}개 후보 선택 · 렌더 방향 ${{meta.render_view}} 고정`;
+      document.getElementById('progress').textContent = `${{selected}}개 후보 선택 · 3/4 크게 + 정면 함께 보기`;
     }};
     units.forEach(unit => {{
       const id = unit.dataset.unitId;
@@ -332,6 +383,22 @@ def _build_html(review: dict, output: Path) -> None:
       }});
       refresh();
     }});
+    const modal = document.getElementById('pose-modal');
+    document.querySelectorAll('.pose-preview').forEach(preview => preview.addEventListener('click', () => {{
+      document.getElementById('modal-pose').textContent = preview.dataset.pose;
+      const primary = document.getElementById('modal-primary');
+      const companion = document.getElementById('modal-companion');
+      primary.src = preview.dataset.primary;
+      primary.alt = preview.dataset.primaryLabel + ' ' + preview.dataset.pose;
+      companion.src = preview.dataset.companion;
+      companion.alt = preview.dataset.companionLabel + ' ' + preview.dataset.pose;
+      document.getElementById('modal-primary-label').textContent = preview.dataset.primaryLabel;
+      document.getElementById('modal-companion-label').textContent = preview.dataset.companionLabel;
+      modal.showModal();
+    }}));
+    modal.addEventListener('click', event => {{
+      if (event.target === modal) modal.close();
+    }});
     document.getElementById('export').addEventListener('click', () => {{
       const payload = {{ ...meta, exported_at: new Date().toISOString(), decisions: saved }};
       const blob = new Blob([JSON.stringify(payload, null, 2)], {{ type: 'application/json' }});
@@ -367,6 +434,9 @@ def build(args: argparse.Namespace) -> dict:
         image_key = str(Path(frozen_row["image"]).resolve())
         people_per_image[image_key] = people_per_image.get(image_key, 0) + 1
     requested_units = tuple(args.unit or DEFAULT_UNITS)
+    primary_view = args.review_view
+    companion_view = "front" if primary_view != "front" else "three_quarter"
+    render_views = (primary_view, companion_view)
 
     arms = {
         "position": ("Position", position_units, "position"),
@@ -396,18 +466,21 @@ def build(args: argparse.Namespace) -> dict:
                 bvh_path = Path(hit["bvh_path"]).resolve()
                 if not bvh_path.is_file():
                     raise FileNotFoundError(bvh_path)
-                render_file = _render_name(hit, args.review_view)
-                jobs_by_name.setdefault(render_file, {
-                    "pose_id": hit["pose_id"],
-                    "view": args.review_view,
-                    "matched_view": hit["view"],
-                    "bvh_path": str(bvh_path),
-                    "output": str(render_dir / render_file),
-                })
+                render_files = {}
+                for render_view in render_views:
+                    render_file = _render_name(hit, render_view)
+                    render_files[render_view] = render_file
+                    jobs_by_name.setdefault(render_file, {
+                        "pose_id": hit["pose_id"],
+                        "view": render_view,
+                        "matched_view": hit["view"],
+                        "bvh_path": str(bvh_path),
+                        "output": str(render_dir / render_file),
+                    })
                 hits.append({
                     **hit,
                     "candidate_key": _candidate_key(hit),
-                    "render_file": render_file,
+                    "render_files": render_files,
                 })
             unit_arms[arm_id] = {"label": label, "metric": metric, "hits": hits}
         review_units.append({
@@ -456,7 +529,8 @@ def build(args: argparse.Namespace) -> dict:
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "status": "review_ready",
         "db_sha256": position_report["db"]["sha256"],
-        "render_view": args.review_view,
+        "primary_view": primary_view,
+        "companion_view": companion_view,
         "character": {
             "path": str(args.character.resolve()),
             "sha256": _sha256(args.character.resolve()),
@@ -491,8 +565,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--review-view",
         choices=("front", "three_quarter", "side", "back"),
-        default="front",
-        help="모든 후보에 공통으로 적용할 3D 렌더 카메라 방향",
+        default="three_quarter",
+        help="카드에서 크게 표시할 방향. 정면은 보조 이미지로 항상 함께 렌더",
     )
     parser.add_argument("--render", action="store_true")
     parser.add_argument("--force", action="store_true")

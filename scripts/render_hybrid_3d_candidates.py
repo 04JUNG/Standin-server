@@ -10,13 +10,12 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 from pathlib import Path
 import sys
 import traceback
 
 import bpy
-from mathutils import Vector
+from mathutils import Matrix, Vector
 
 
 REPO = Path(__file__).resolve().parent.parent
@@ -36,21 +35,33 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args(raw)
 
 
-def evaluated_bounds(mesh) -> tuple[Vector, Vector]:
+def evaluated_points(mesh) -> list[Vector]:
     depsgraph = bpy.context.evaluated_depsgraph_get()
     evaluated = mesh.evaluated_get(depsgraph)
     evaluated_mesh = evaluated.to_mesh()
     try:
-        points = [mesh.matrix_world @ vertex.co for vertex in evaluated_mesh.vertices]
-        lower = Vector(tuple(min(point[axis] for point in points) for axis in range(3)))
-        upper = Vector(tuple(max(point[axis] for point in points) for axis in range(3)))
-        return lower, upper
+        return [
+            (evaluated.matrix_world @ vertex.co).copy()
+            for vertex in evaluated_mesh.vertices
+        ]
     finally:
         evaluated.to_mesh_clear()
 
 
-def point_at(obj, target: Vector) -> None:
-    obj.rotation_euler = (target - obj.location).to_track_quat("-Z", "Y").to_euler()
+def point_at(obj, target: Vector,
+             world_up: Vector = Vector((0.0, 1.0, 0.0))) -> None:
+    direction = (target - obj.location).normalized()
+    world_up = world_up.normalized()
+    right = direction.cross(world_up)
+    if right.length < 1e-6:
+        world_up = Vector((0.0, 0.0, 1.0))
+        right = direction.cross(world_up)
+    right.normalize()
+    up = right.cross(direction).normalized()
+    back = -direction
+    # Matrix의 열을 카메라 local X(right), Y(up), Z(back)로 둔다.
+    rotation = Matrix((right, up, back)).transposed()
+    obj.rotation_euler = rotation.to_euler()
 
 
 def add_area_light(name: str, location: Vector, target: Vector,
@@ -65,13 +76,12 @@ def add_area_light(name: str, location: Vector, target: Vector,
     point_at(light, target)
 
 
-def body_horizontal_axes(armature) -> tuple[Vector, Vector]:
-    """Return stable character-relative right/forward axes on the ground plane.
+def body_axes(armature) -> tuple[Vector, Vector, Vector]:
+    """Return character-relative right/forward/up axes.
 
-    BVH files can carry different root yaw values. Deriving the camera from the
-    retargeted shoulder line makes ``front``/``three_quarter`` mean the same
-    body-relative direction for every candidate while preserving pose pitch,
-    roll, leaning, and falling.
+    BVH files can carry arbitrary root yaw/roll. The shoulder line defines
+    screen-right and pelvis-to-shoulder defines screen-up, so the review image
+    remains anatomically readable while preserving all joint relationships.
     """
     by_suffix = {
         bone.name.rsplit(":", 1)[-1].lower(): bone
@@ -82,25 +92,31 @@ def body_horizontal_axes(armature) -> tuple[Vector, Vector]:
         bone = by_suffix[suffix.lower()]
         return armature.matrix_world @ bone.head
 
-    for left_name, right_name in (
-        ("LeftShoulder", "RightShoulder"),
-        ("LeftUpLeg", "RightUpLeg"),
-    ):
-        try:
-            right = world_head(right_name) - world_head(left_name)
-        except KeyError:
-            continue
-        right.y = 0.0
-        if right.length > 1e-5:
+    try:
+        left = world_head("LeftShoulder")
+        right_point = world_head("RightShoulder")
+        pelvis = world_head("Hips")
+        shoulder_centre = (left + right_point) * 0.5
+        right = right_point - left
+        up = shoulder_centre - pelvis
+        if right.length > 1e-5 and up.length > 1e-5:
             right.normalize()
-            # Rest-facing convention matches the existing +Z front camera
-            # when the Mixamo shoulder line points along +X.
-            forward = Vector((-right.z, 0.0, right.x)).normalized()
-            return right, forward
-    return Vector((1.0, 0.0, 0.0)), Vector((0.0, 0.0, 1.0))
+            up = up - right * up.dot(right)
+            up.normalize()
+            forward = right.cross(up).normalized()
+            up = forward.cross(right).normalized()
+            return right, forward, up
+    except KeyError:
+        pass
+    return (
+        Vector((1.0, 0.0, 0.0)),
+        Vector((0.0, 0.0, 1.0)),
+        Vector((0.0, 1.0, 0.0)),
+    )
 
 
-def setup_scene(mesh, armature, view: str, output: Path, size: int) -> None:
+def setup_scene(mesh, pose_axes: tuple[Vector, Vector, Vector], view: str,
+                output: Path, size: int) -> None:
     scene = bpy.context.scene
     for engine in ("BLENDER_EEVEE_NEXT", "BLENDER_EEVEE"):
         try:
@@ -123,7 +139,9 @@ def setup_scene(mesh, armature, view: str, output: Path, size: int) -> None:
         background.inputs["Color"].default_value = (0.035, 0.042, 0.052, 1.0)
         background.inputs["Strength"].default_value = 0.45
 
-    lower, upper = evaluated_bounds(mesh)
+    points = evaluated_points(mesh)
+    lower = Vector(tuple(min(point[axis] for point in points) for axis in range(3)))
+    upper = Vector(tuple(max(point[axis] for point in points) for axis in range(3)))
     centre = (lower + upper) * 0.5
     extent = max(*(upper - lower), 1e-3)
 
@@ -132,7 +150,7 @@ def setup_scene(mesh, armature, view: str, output: Path, size: int) -> None:
     scene.collection.objects.link(camera)
     scene.camera = camera
     camera.data.type = "ORTHO"
-    right, forward = body_horizontal_axes(armature)
+    right, forward, up = pose_axes
     offsets = {
         "front": forward * (extent * 3.0),
         "three_quarter": (right + forward).normalized() * (extent * 3.0),
@@ -142,55 +160,55 @@ def setup_scene(mesh, armature, view: str, output: Path, size: int) -> None:
     if view not in offsets:
         raise ValueError(f"unsupported review view: {view}")
     camera.location = centre + offsets[view]
-    point_at(camera, centre)
-    size_xyz = upper - lower
+    point_at(camera, centre, up)
+    bpy.context.view_layer.update()
+    world_to_camera = camera.matrix_world.inverted()
+    camera_points = [world_to_camera @ point for point in points]
+    projected_width = (
+        max(point.x for point in camera_points)
+        - min(point.x for point in camera_points)
+    )
+    projected_height = (
+        max(point.y for point in camera_points)
+        - min(point.y for point in camera_points)
+    )
+    # 정사영 화면에 실제로 보이는 폭/높이만 사용한다. 카메라 깊이를
+    # 포함하면 누움·측면 포즈가 카드 안에서 지나치게 작아진다.
     camera.data.ortho_scale = max(
-        size_xyz.y * 1.18, max(size_xyz.x, size_xyz.z) * 1.32, 1.0
+        projected_height * 1.16, projected_width * 1.16, 1.0
     )
 
     add_area_light(
         "HybridReviewKey",
-        centre + Vector((extent * 1.8, extent * 1.8, extent * 2.2)),
+        centre + (right * 1.8 + up * 1.8 + forward * 2.2) * extent,
         centre,
         900.0,
         extent * 2.0,
     )
     add_area_light(
         "HybridReviewFill",
-        centre + Vector((-extent * 2.0, extent * 0.8, extent * 0.8)),
+        centre + (-right * 2.0 + up * 0.8 + forward * 0.8) * extent,
         centre,
         520.0,
         extent * 1.8,
     )
     add_area_light(
         "HybridReviewRim",
-        centre + Vector((0.0, extent * 1.2, -extent * 2.0)),
+        centre + (up * 1.2 - forward * 2.0) * extent,
         centre,
         700.0,
         extent * 1.4,
     )
 
-    # Y-up 캐릭터를 위한 XZ ground plane. Mesh와 겹치지 않게 약간 아래에 둔다.
-    bpy.ops.mesh.primitive_plane_add(
-        size=extent * 5.0,
-        location=(centre.x, lower.y - extent * 0.015, centre.z),
-        rotation=(math.radians(90.0), 0.0, 0.0),
-    )
-    ground = bpy.context.object
-    ground.name = "HybridReviewGround"
-    material = bpy.data.materials.new("HybridReviewGroundMaterial")
-    material.diffuse_color = (0.075, 0.085, 0.105, 1.0)
-    material.roughness = 0.92
-    ground.data.materials.append(material)
-
-
-def render_job(job: dict, character: Path, size: int) -> dict:
+def prepare_pose(job: dict, character: Path):
     rt.reset_scene()
-    destination = Path(job["output"]).resolve()
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.unlink(missing_ok=True)
-
     destination_armature, meshes = rt.import_character(str(character))
+    # 검수용 FBX에 남아 있는 Action/NLA가 render dependency-graph 평가 때
+    # 수동 리타기팅 포즈를 덮어쓰지 못하게 한다. 이 상태를 지우지 않으면
+    # 같은 BVH도 첫 번째와 두 번째 카메라 렌더가 서로 다른 포즈가 된다.
+    destination_armature.animation_data_clear()
+    for mesh in meshes:
+        mesh.animation_data_clear()
     source_armature = rt.import_bvh(str(Path(job["bvh_path"]).resolve()), frame=0)
     report = rt.ConvertReport(output_mode="review_render", frame=0)
     report = rt.retarget(source_armature, destination_armature, report=report)
@@ -201,7 +219,25 @@ def render_job(job: dict, character: Path, size: int) -> dict:
         )
     source_armature.hide_render = True
     mesh = max(meshes, key=lambda item: len(item.data.vertices))
-    setup_scene(mesh, destination_armature, job["view"], destination, size)
+    pose_axes = body_axes(destination_armature)
+    # 검수 이미지는 애니메이션이 필요 없다. 현재 포즈를 메시 정점에 굽고
+    # 리그를 제거해 이후 카메라/렌더 평가가 포즈를 바꿀 여지를 없앤다.
+    rt.apply_output_mode(destination_armature, meshes, "static_mesh")
+    return mesh, pose_axes, report
+
+
+def cleanup_render_setup() -> None:
+    for obj in list(bpy.data.objects):
+        if obj.name.startswith("HybridReview"):
+            bpy.data.objects.remove(obj, do_unlink=True)
+
+
+def render_prepared(job: dict, mesh, pose_axes, report, size: int) -> dict:
+    cleanup_render_setup()
+    destination = Path(job["output"]).resolve()
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.unlink(missing_ok=True)
+    setup_scene(mesh, pose_axes, job["view"], destination, size)
     bpy.ops.render.render(write_still=True)
     if not destination.is_file() or destination.stat().st_size == 0:
         raise RuntimeError("Blender did not create the render")
@@ -217,24 +253,51 @@ def main() -> int:
     manifest_path = args.manifest.resolve()
     character = args.character.resolve()
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    results = []
     jobs = manifest["jobs"]
-    for number, job in enumerate(jobs, 1):
-        destination = Path(job["output"]).resolve()
-        if destination.is_file() and not args.force:
-            results.append({"status": "cached", "output": str(destination)})
-            print(f"HYBRID_3D={number}/{len(jobs)}:cached:{job['pose_id']}:{job['view']}")
+    results = [None] * len(jobs)
+    groups: dict[tuple[str, str], list[tuple[int, dict]]] = {}
+    for index, job in enumerate(jobs):
+        key = (job["pose_id"], str(Path(job["bvh_path"]).resolve()))
+        groups.setdefault(key, []).append((index, job))
+
+    for grouped_jobs in groups.values():
+        pending = [
+            (index, job) for index, job in grouped_jobs
+            if args.force or not Path(job["output"]).resolve().is_file()
+        ]
+        for index, job in grouped_jobs:
+            if (index, job) not in pending:
+                results[index] = {
+                    "status": "cached",
+                    "output": str(Path(job["output"]).resolve()),
+                }
+        if not pending:
             continue
         try:
-            result = render_job(job, character, args.size)
+            mesh, pose_axes, report = prepare_pose(pending[0][1], character)
         except Exception as exc:
-            result = {
-                "status": "failed",
-                "output": str(destination),
-                "error": str(exc),
-                "traceback": traceback.format_exc(),
-            }
-        results.append(result)
+            for index, job in pending:
+                results[index] = {
+                    "status": "failed",
+                    "output": str(Path(job["output"]).resolve()),
+                    "error": str(exc),
+                    "traceback": traceback.format_exc(),
+                }
+            continue
+        for index, job in pending:
+            try:
+                results[index] = render_prepared(
+                    job, mesh, pose_axes, report, args.size
+                )
+            except Exception as exc:
+                results[index] = {
+                    "status": "failed",
+                    "output": str(Path(job["output"]).resolve()),
+                    "error": str(exc),
+                    "traceback": traceback.format_exc(),
+                }
+
+    for number, (job, result) in enumerate(zip(jobs, results), 1):
         print(
             f"HYBRID_3D={number}/{len(jobs)}:{result['status']}:"
             f"{job['pose_id']}:{job['view']}"
