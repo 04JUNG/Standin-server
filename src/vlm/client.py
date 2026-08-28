@@ -220,6 +220,7 @@ class GeminiVLMClient(BaseVLMClient):
                     attempt=attempt,
                     status="ok",
                     elapsedMs=round((self._clock() - started) * 1000),
+                    **_usage_fields(resp),
                 )
                 return _coerce(_extract_json(resp.text), img_w, img_h)
             except Exception as error:
@@ -274,6 +275,30 @@ class GeminiVLMClient(BaseVLMClient):
                 if delay:
                     self._sleep(self._jitter(delay * 0.8, delay * 1.2))
         raise RuntimeError("unreachable")
+
+
+def _usage_fields(resp) -> dict:
+    """응답의 사용량 메타데이터 → 로그 필드(과금 추적용).
+
+    thoughts/cached는 SDK·모델에 따라 없을 수 있고 테스트 대역에는 usage_metadata
+    자체가 없다. 사용량 로깅이 분석 호출을 실패시키면 안 되므로 전부 선택적으로 읽는다.
+    """
+    usage = getattr(resp, "usage_metadata", None)
+    if usage is None:
+        return {}
+    names = {
+        "promptTokens": "prompt_token_count",
+        "outputTokens": "candidates_token_count",
+        "thoughtTokens": "thoughts_token_count",   # 2.5 계열 사고 토큰(출력으로 과금)
+        "cachedTokens": "cached_content_token_count",
+        "totalTokens": "total_token_count",
+    }
+    fields = {}
+    for field, attr in names.items():
+        value = getattr(usage, attr, None)
+        if isinstance(value, int) and not isinstance(value, bool):
+            fields[field] = value
+    return fields
 
 
 def _http_status(error: Exception) -> int | None:

@@ -33,6 +33,13 @@ _REDACT_KEY = re.compile(
     re.IGNORECASE,
 )
 _REDACTED = "[redacted]"
+# 사용량 카운트는 비밀이 아니지만 키 이름에 'token'이 들어가 위 규칙에 걸린다.
+# 이름을 바꾸면 BFF·대시보드에서 읽기 어려워지므로 예외로 두되, **정확히 이 이름이고
+# 값이 정수일 때만** 통과시킨다. 문자열이 실려 오면(=비밀이 잘못 들어간 경우)
+# 규칙대로 다시 가려지므로 이름 기반 차단의 보장은 그대로다.
+_NUMERIC_KEY_ALLOW = frozenset({
+    "promptTokens", "outputTokens", "thoughtTokens", "cachedTokens", "totalTokens",
+})
 _MAX_STRING = 512
 _MAX_ITEMS = 20
 _MAX_DEPTH = 3
@@ -61,6 +68,10 @@ def _sanitize(fields: dict, depth: int = 0) -> dict:
         if value is None:
             continue
         if _REDACT_KEY.search(str(key)):
+            if (key in _NUMERIC_KEY_ALLOW
+                    and isinstance(value, int) and not isinstance(value, bool)):
+                output[key] = value
+                continue
             output[key] = _REDACTED
             continue
         output[key] = _sanitize_value(value, depth)

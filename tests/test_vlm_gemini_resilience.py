@@ -1,3 +1,4 @@
+import logging
 import time
 from types import SimpleNamespace
 
@@ -34,7 +35,9 @@ class FakeModels:
         self.calls += 1
         if isinstance(outcome, Exception):
             raise outcome
-        return SimpleNamespace(text=outcome)
+        if isinstance(outcome, str):
+            return SimpleNamespace(text=outcome)
+        return outcome            # 사용량 메타데이터까지 실은 완성 응답
 
 
 class FakeClock:
@@ -249,3 +252,36 @@ def test_retries_within_budget(monkeypatch):
     assert result.num_people == 1
     assert models.calls == 2
     assert len(sleeps) == 1
+
+
+def test_logs_token_usage_for_cost_tracking(monkeypatch, caplog):
+    """유료 티어에서 비용이 어디서 났는지 사후 추적하려면 호출당 사용량이 남아야 한다."""
+    response = SimpleNamespace(
+        text=valid_response(),
+        usage_metadata=SimpleNamespace(
+            prompt_token_count=812,
+            candidates_token_count=57,
+            thoughts_token_count=120,
+            total_token_count=989,
+        ),
+    )
+    client, _ = make_client(monkeypatch, [response], [])
+
+    with caplog.at_level(logging.INFO, logger="standin"):
+        client.analyze("ignored", 100, 100)
+
+    record = next(r for r in caplog.records
+                  if getattr(r, "event_type", None) == "gemini_request")
+    assert record.fields["promptTokens"] == 812
+    assert record.fields["outputTokens"] == 57
+    assert record.fields["thoughtTokens"] == 120
+    assert record.fields["totalTokens"] == 989
+    # 모델·SDK가 안 주는 값은 0이 아니라 필드 자체를 만들지 않는다(0과 미보고 구분).
+    assert "cachedTokens" not in record.fields
+
+
+def test_analyze_succeeds_when_sdk_reports_no_usage(monkeypatch):
+    """사용량 로깅이 분석 자체를 실패시키면 안 된다(구버전 SDK·응답 형태 변화)."""
+    client, _ = make_client(monkeypatch, [SimpleNamespace(text=valid_response())], [])
+
+    assert client.analyze("ignored", 100, 100).num_people == 1
