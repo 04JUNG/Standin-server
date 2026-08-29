@@ -1,0 +1,254 @@
+name: Converter CI
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - ".github/workflows/converter-ci.yml"
+      - ".github/workflows/converter-deploy.yml"
+      - ".dockerignore"
+      - "Dockerfile.converter"
+      - "requirements-converter.txt"
+      - "converter/**"
+      - "converter_api/**"
+      - "config/characters.example.json"
+      - "tests/converter/**"
+      - "deploy/ecs/**"
+      - "scripts/measure_converter_latency.py"
+      - "qa/retarget/CHAIN_TRANSPORT_V3_1_ANKLE/**"
+      - "qa/retarget/CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY/**"
+  push:
+    branches: [develop]
+    paths:
+      - ".github/workflows/converter-ci.yml"
+      - ".github/workflows/converter-deploy.yml"
+      - ".dockerignore"
+      - "Dockerfile.converter"
+      - "requirements-converter.txt"
+      - "converter/**"
+      - "converter_api/**"
+      - "config/characters.example.json"
+      - "tests/converter/**"
+      - "deploy/ecs/**"
+      - "scripts/measure_converter_latency.py"
+      - "qa/retarget/CHAIN_TRANSPORT_V3_1_ANKLE/**"
+      - "qa/retarget/CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: converter-ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  CONVERTER_IMAGE: standin-converter:ci
+  INFERENCE_IMAGE: standin-inference:converter-isolation-ci
+
+jobs:
+  contracts:
+    name: Converter Python contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements-converter.txt
+            requirements.txt
+
+      - name: Install contract-test dependencies
+        run: |
+          python -m pip install --requirement requirements-converter.txt
+          python -m pip install "numpy>=1.24" "Pillow>=10.0" httpx pytest
+
+      - name: Compile converter sources and tests
+        run: python -m compileall converter converter_api tests/converter
+
+      - name: Run worker, API, failure, and handoff contracts
+        run: |
+          python -m pytest -q \
+            tests/converter/test_worker_contract.py \
+            tests/converter/test_registry.py \
+            tests/converter/test_runner_failures.py \
+            tests/converter/test_api_contract.py \
+            tests/converter/test_refined_bvh_e2e.py \
+            tests/converter/test_deployment_contract.py \
+            tests/converter/test_latency_probe.py
+
+  inference-isolation:
+    name: Inference image excludes bpy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build inference image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          platforms: linux/amd64
+          load: true
+          tags: ${{ env.INFERENCE_IMAGE }}
+          cache-from: type=gha,scope=inference-converter-isolation
+          cache-to: type=gha,mode=max,scope=inference-converter-isolation
+
+      - name: Prove inference Python cannot load bpy
+        run: |
+          docker run --rm --platform linux/amd64 "$INFERENCE_IMAGE" \
+            python -c "import importlib.util,sys; sys.exit(0 if importlib.util.find_spec('bpy') is None else 1)"
+
+  converter-image:
+    name: Blender 5.2 image and real conversion
+    needs: contracts
+    runs-on: ubuntu-latest
+    env:
+      CONTAINER_NAME: standin-converter-ci
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure runner artifact root
+        run: echo "ARTIFACT_ROOT=$RUNNER_TEMP/standin-converter-ci" >> "$GITHUB_ENV"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Enforce explicit converter COPY allowlist
+        run: |
+          if grep -Eq '^[[:space:]]*COPY[[:space:]]+(--[^[:space:]]+[[:space:]]+)*\.[[:space:]]+\.?/?[[:space:]]*$' Dockerfile.converter; then
+            echo "Dockerfile.converter must not use COPY . ."
+            exit 1
+          fi
+
+      - name: Build pinned Linux/amd64 converter image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.converter
+          platforms: linux/amd64
+          load: true
+          tags: ${{ env.CONVERTER_IMAGE }}
+          cache-from: type=gha,scope=converter-image
+          cache-to: type=gha,mode=max,scope=converter-image
+
+      - name: Verify runtime isolation and Blender identity
+        run: |
+          docker run --rm --platform linux/amd64 "$CONVERTER_IMAGE" \
+            python -c "import importlib.util,sys; sys.exit(0 if importlib.util.find_spec('bpy') is None else 1)"
+          docker run --rm --platform linux/amd64 "$CONVERTER_IMAGE" \
+            python -c "from converter_api.runner import BlenderRunner; i=BlenderRunner().inspect_blender(refresh=True); assert (i.version,i.build_hash)==('5.2.0','fbe6228777e7')"
+          docker run --rm --platform linux/amd64 "$CONVERTER_IMAGE" \
+            /opt/blender/blender --background --python-exit-code 1 \
+            --python-expr "import bpy; assert bpy.app.version_string.startswith('5.2.0')"
+          docker run --rm --platform linux/amd64 "$CONVERTER_IMAGE" \
+            python -c "from pathlib import Path; root=Path('/app'); forbidden={'.fbx','.bvh','.blend','.png','.log'}; assert not [p for p in root.rglob('*') if p.is_file() and p.suffix.lower() in forbidden]; assert not any((root/d).exists() for d in ('api','src','tests','qa','out'))"
+
+      - name: Generate synthetic character and BVH fixtures
+        run: |
+          install -d -m 0777 "$ARTIFACT_ROOT"
+          docker run --rm --platform linux/amd64 \
+            --env CONVERTER_TEST_ARTIFACT_ROOT=/artifacts \
+            --mount type=bind,source="$ARTIFACT_ROOT",target=/artifacts \
+            --mount type=bind,source="$GITHUB_WORKSPACE/tests/converter",target=/app/tests/converter,readonly \
+            "$CONVERTER_IMAGE" \
+            /opt/blender/blender --background --python-exit-code 1 \
+            --python /app/tests/converter/make_fixtures.py
+
+      - name: Run frozen converter regression 28/28
+        run: |
+          docker run --rm --platform linux/amd64 \
+            --env CONVERTER_TEST_ARTIFACT_ROOT=/artifacts \
+            --mount type=bind,source="$ARTIFACT_ROOT",target=/artifacts \
+            --mount type=bind,source="$GITHUB_WORKSPACE/tests/converter",target=/app/tests/converter,readonly \
+            "$CONVERTER_IMAGE" \
+            /opt/blender/blender --background --python-exit-code 1 \
+            --python /app/tests/converter/test_convert.py
+
+      - name: Run V3.2 parent-coherent math controls 8/8
+        run: |
+          docker run --rm --platform linux/amd64 \
+            --mount type=bind,source="$ARTIFACT_ROOT",target=/artifacts \
+            --mount type=bind,source="$GITHUB_WORKSPACE/tests/converter",target=/app/tests/converter,readonly \
+            "$CONVERTER_IMAGE" \
+            /opt/blender/blender --background --python-exit-code 1 \
+            --python /app/tests/converter/test_v32_parent_coherent_math.py -- \
+            --variant-root /app --json /artifacts/v32-math.json
+
+      - name: Capture frozen V3.1 fallback reference
+        run: |
+          docker run --rm --platform linux/amd64 \
+            --mount type=bind,source="$ARTIFACT_ROOT",target=/artifacts \
+            --mount type=bind,source="$GITHUB_WORKSPACE/tests/converter",target=/app/tests/converter,readonly \
+            --mount type=bind,source="$GITHUB_WORKSPACE/qa/retarget/CHAIN_TRANSPORT_V3_1_ANKLE",target=/qa/v31,readonly \
+            "$CONVERTER_IMAGE" \
+            /opt/blender/blender --background --python-exit-code 1 \
+            --python /app/tests/converter/capture_v31_reference.py -- \
+            --variant-root /qa/v31 \
+            --bvh /artifacts/assets/pose_raise_pelvis.bvh \
+            --character /artifacts/assets/character_mixamo_foot_mismatch.fbx \
+            --out-fbx /artifacts/v31-reference.fbx \
+            --pre-export /artifacts/v31-pre-export.json \
+            --report /artifacts/v31-report.json
+
+      - name: Force bilateral exact V3.1 fallback
+        run: |
+          docker run --rm --platform linux/amd64 \
+            --mount type=bind,source="$ARTIFACT_ROOT",target=/artifacts \
+            --mount type=bind,source="$GITHUB_WORKSPACE/tests/converter",target=/app/tests/converter,readonly \
+            "$CONVERTER_IMAGE" \
+            /opt/blender/blender --background --python-exit-code 1 \
+            --python /app/tests/converter/test_v32_bilateral_fallback.py -- \
+            --variant-root /app \
+            --bvh /artifacts/assets/pose_raise_pelvis.bvh \
+            --character /artifacts/assets/character_mixamo_foot_mismatch.fbx \
+            --v31-pre-export /artifacts/v31-pre-export.json \
+            --v31-report /artifacts/v31-report.json \
+            --out-fbx /artifacts/v32-forced-fallback.fbx \
+            --json /artifacts/v32-forced-fallback.json
+
+      - name: Start real converter API
+        run: |
+          docker run --detach --platform linux/amd64 \
+            --name "$CONTAINER_NAME" \
+            --publish 127.0.0.1:8001:8001 \
+            --env CONVERTER_CHARACTER_REGISTRY=/fixtures/characters.json \
+            --env CONVERTER_CI_CHARACTER_URI=/fixtures/assets/character_mixamo.fbx \
+            --mount type=bind,source="$ARTIFACT_ROOT",target=/fixtures,readonly \
+            "$CONVERTER_IMAGE"
+
+      - name: Health and actual HTTP conversion smoke
+        run: |
+          curl --fail --silent --show-error \
+            --retry 30 --retry-delay 1 --retry-all-errors \
+            --output "$ARTIFACT_ROOT/health.json" \
+            http://127.0.0.1:8001/healthz
+          curl --fail --silent --show-error \
+            --dump-header "$ARTIFACT_ROOT/response.headers" \
+            --output "$ARTIFACT_ROOT/http-smoke.fbx" \
+            --form "bvh=@$ARTIFACT_ROOT/assets/pose_raise.bvh;type=application/octet-stream;filename=pose_raise.bvh" \
+            --form character_id=standin-master-v2 \
+            --form frame=0 \
+            --form mirror=false \
+            --form output_mode=rigged_rest \
+            --form apply_root_translation=false \
+            http://127.0.0.1:8001/convert
+          python tests/converter/verify_container_smoke.py \
+            --health "$ARTIFACT_ROOT/health.json" \
+            --headers "$ARTIFACT_ROOT/response.headers" \
+            --bvh "$ARTIFACT_ROOT/assets/pose_raise.bvh" \
+            --fbx "$ARTIFACT_ROOT/http-smoke.fbx"
+          docker exec "$CONTAINER_NAME" \
+            python -c "import importlib.util,sys; sys.exit(0 if importlib.util.find_spec('bpy') is None else 1)"
+          docker exec "$CONTAINER_NAME" \
+            python -c "from pathlib import Path; assert not any(Path('/tmp/standin-converter').iterdir())"
+
+      - name: Show converter logs and remove smoke container
+        if: always()
+        run: |
+          docker logs "$CONTAINER_NAME" 2>&1 || true
+          docker rm --force "$CONTAINER_NAME" >/dev/null 2>&1 || true

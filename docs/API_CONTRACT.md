@@ -48,7 +48,7 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
 | `GET` | `/healthz` | — | `{ok, env, provider, pose_backend, pose_count}` | 앱 서버 기동 확인(비정상 시 503) |
 | `POST` | `/analyze` | multipart PNG (+`hint`) | `CutResult` | 앱 서버 → 뷰어 Top-K 표시 |
 | `GET` | `/pose/{pose_id}/bvh` | 경로 파라미터 | `application/octet-stream` | 동원 내보내기 |
-| `POST` | `/export-order` | `ExportOrderRequest` | `ExportOrder` | 동원 내보내기 (→ `EXPORT_CONTRACT.md`) |
+| `POST` | `/export-order` | `ExportOrderRequest` | `ExportOrder` | base-only legacy 주문서 (→ `EXPORT_CONTRACT.md`) |
 | `GET` | `/docs` | — | OpenAPI UI | 사람(계약 확인) |
 | `POST` | `/refine` | `RefineRequest` | `RefineResponse` | 앱 서버 → 조정된 BVH 본문(응답 `bvh`) (→ `REFINE_DESIGN.md`) |
 
@@ -301,9 +301,12 @@ Content-Type: multipart/form-data
 
 ---
 
-## 5. `GET /pose/{pose_id}/bvh` — 라이브러리 BVH 원본
+## 5. `GET /pose/{pose_id}/bvh` — 라이브러리 base BVH 원본
 
-동원 핸드오프. 선택된 후보의 BVH 파일을 **가공 없이** 반환한다. CSP 미러링·축 보정은 이 서버가 아니라 **동원 내보내기 단계** 책임(`DECISIONS.md` 결정 3).
+BFF base 핸드오프. 선택된 후보의 BVH 파일을 **가공 없이** 반환한다. refine 성공 시 최종 BVH는
+이 URL이 아니라 `RefineResponse.bvh` inline 본문이다. BFF가 최종 바이트를 확정한 뒤 내부 Converter
+API가 V3.2 retarget과 요청된 mirror를 한 번 적용한다. CSP는 같은 mirror를 반복하지 않고 소재
+등록·배치와 다인 상대 위치 조정을 담당한다.
 
 | 상태 | 조건 | 본문 |
 |---|---|---|
@@ -327,7 +330,10 @@ Content-Type: multipart/form-data
 
 `ok: false`일 때는 **HTTP 503**으로 응답한다 — 후보를 하나도 낼 수 없는 상태라 로드밸런서·오케스트레이터가 트래픽을 보내지 않아야 한다.
 
-**`POST /export-order`** — 작가가 고른 하나 → 동원 주문서(`ExportOrder`). 상세 계약·예시(1인/2인/얽힘/스킵)는 **`docs/EXPORT_CONTRACT.md`** 참조. 요약: `/analyze`(Top-K 보여주기)와 **별개 계약**이며, DB에서 `bvh_url`·`set_id`·`tags`를 채워 완성한다.
+**`POST /export-order`** — 작가가 고른 base 포즈의 legacy 주문서(`ExportOrder`). 상세 계약·예시는
+**`docs/EXPORT_CONTRACT.md`** 참조. DB에서 base `bvh_url`·`set_id`·`tags`를 채우지만 inline refined
+artifact는 알지 못한다. 따라서 Phase 3 제품 export는 BFF가 final base/refined bytes를 먼저 확정한 뒤
+별도 내부 `POST /convert`를 호출한다.
 
 ---
 
@@ -392,7 +398,9 @@ Retry-After: 30
 3. **단계별 진행률** — 클라이언트 status enum(`detecting`/`skeleton`/`pose_search`/`rendering`…)은 세분화돼 있으나, 서버는 동기라 **중간 단계를 스트리밍하지 않는다**. 서버가 만들지 않는 진행률을 앱이 임의 생성하지 않는다(클라이언트 원칙과 일치).
 4. **업로드 검증** — 현재 서버는 크기·MIME 약검증(PIL 폴백). 최대 크기·허용 형식·손상 이미지 처리를 어느 층에서 강제할지(권장: 앱 서버 + 서버 방어적 재검증).
 5. **후보 개수·신뢰도 라벨** — `top_k_final=5` 기본이나 폴백 시 후보가 적거나 없을 수 있다(`route:"skip"`은 빈 배열). `matchLevel` 라벨 산출에 서버의 `count_confidence`/폴백 신호를 넘길지.
-6. **BVH 전달 방식** — URL 다운로드(`/pose/{id}/bvh`) vs 응답 바이트 인라인(작은 파일). `EXPORT_CONTRACT.md` §4와 동일한 미결 항목.
+6. **BVH 전달 방식** — ✅ 확정: base는 `/pose/{id}/bvh` 응답 바이트, refined는
+   `RefineResponse.bvh` inline UTF-8 바이트다. BFF가 둘 중 하나를 확정해 내부 Converter API로
+   multipart 업로드한다(`FBX_CONVERTER_V3_2_PHASE3_BFF_HANDOFF.md`).
 7. **인증 헤더 전파** — 앱 서버가 이 서버를 호출할 때 내부 인증(서비스 토큰/네트워크 격리)을 둘지. 현재 무인증이라 **공개 노출 금지**(내부망/로컬 전제).
 
 ---

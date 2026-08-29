@@ -1,22 +1,27 @@
-# 동원 Export 계약 — 선택 → BVH 주문서
+# Export 계약 — 선택 → 최종 BVH → FBX
 
-> 전체 흐름: 사용자 → **Tauri** → **FastAPI(도원)**: VLM·RTMPose·Retrieval → `/analyze`로 Top5 반환
-> → Tauri가 뷰어에 표시 → **사용자가 Top5 중 선택** → **`/export-order`** → **동원 Export**:
-> `pose_id → GET /pose/{id}/bvh` → CSP 미러링·축 보정 → **Clip Studio 내보내기**.
+> 현재 제품 흐름: 사용자 선택 → 선택적 `/refine` → **BFF가 최종 BVH 바이트 확정** → 내부
+> Converter API → V3.2 retarget FBX → BFF 저장·다운로드 → CSP 소재 배치.
+>
+> `POST /export-order`는 DB의 base `bvh_url`만 채우는 legacy 원본 주문서다. refined artifact나
+> 최종 FBX를 복원하지 못하므로 Phase 3 제품 export의 단일 소스로 사용하지 않는다.
 
 > ⚠ **BVH는 1인만 지원한다(위치도 미반영).** 그래서 **export item 1개 = 1인 BVH 1개**다.
 > 다인 컷은 인물 수만큼 item(=1인 BVH)이 나오고, 얽힘(포옹·격투)도 2인 BVH가 아니라
 > **1인 BVH 여러 개를 `set_id`로 묶어** 표현한다. 상대 위치는 BVH가 안 실으므로 작가가 CSP에서 맞춘다.
 
-**두 계약은 별개다:**
+**세 계약은 별개다:**
 - `/analyze` = "Top5 **보여주기**"(인물별 후보 리스트). → `CutResult`
-- `/export-order` = 작가가 **고른 하나**를 동원에게 넘기는 **주문서**. → `ExportOrder`  ← 이 문서
+- `/refine` = 고른 후보 하나의 조정본 inline `bvh` 또는 정상 base fallback. → `RefineResponse`
+- `/export-order` = base 선택만 표현하는 legacy 주문서. → `ExportOrder`
+- `/convert` = BFF가 확정한 최종 BVH 바이트를 V3.2 FBX로 변환하는 내부 계약.
 
-FastAPI가 DB에서 `bvh_url·set_id·tags`를 채워 완성된 주문서를 만든다(라이브러리 메타 단일 소스).
+FastAPI inference가 DB에서 legacy 주문서의 `bvh_url·set_id·tags`를 채운다. 최종 base/refined
+선택과 artifact 영속화는 BFF가 소유한다.
 
 ---
 
-## 1. 요청 — Tauri → 도원 (`POST /export-order`)
+## 1. Legacy 요청 — Tauri/BFF → inference (`POST /export-order`)
 
 작가 선택만 보낸다. 각 선택은 뷰어에서 클릭한 후보의 `pose_id`+`view`.
 
@@ -40,9 +45,9 @@ FastAPI가 DB에서 `bvh_url·set_id·tags`를 채워 완성된 주문서를 만
 
 ---
 
-## 2. 응답 — 도원 → 동원 (`ExportOrder`)
+## 2. Legacy 응답 — inference → BFF (`ExportOrder`)
 
-동원이 실제로 소비하는 최종 JSON.
+base 라이브러리 선택을 표현하는 JSON. refined 결과 이후의 최종 export에는 이 응답만 사용하지 않는다.
 
 ```json
 {
@@ -136,15 +141,51 @@ FastAPI가 DB에서 `bvh_url·set_id·tags`를 채워 완성된 주문서를 만
 
 ---
 
-## 4. 동원 단계에서 하는 일(계약 밖, 참고)
-받은 주문서로:
-1. 각 `bvh_url`에서 라이브러리 BVH 다운로드
-2. **CSP 좌표계 보정** — 좌우 반전(02 실험), 다리/루트 축(05 실험) → 이건 **도원이 아니라 동원 책임**
-3. 필요 시 파일명·소재 폴더 규칙 적용 후 Clip Studio 소재로 내보내기
+## 4. Phase 3 제품 export — BFF → Converter → CSP
 
-> ⚠ 확인 필요(동원): ① BVH를 URL 다운로드 vs 응답에 바이트 인라인 ② 미러링을 동원 단계에서(권장) vs 도원이 라이브러리에 미리 구움 ③ 다인 위치/앞뒤순서를 주문서에 넣을지(현재 미포함 — 작가가 CSP에서 조정 전제)
+BFF는 인물별 최종 BVH를 먼저 확정한다.
+
+```python
+if refine_response is not None and refine_response.refined:
+    assert refine_response.bvh
+    final_bvh_bytes = refine_response.bvh.encode("utf-8")
+    artifact_kind = "refined"
+else:
+    final_bvh_bytes = GET(base_bvh_url).content
+    artifact_kind = "base"
+```
+
+`RefineResponse.bvh_url`은 항상 베이스이므로 `refined=true`에서 사용하면 안 된다. BFF는 선택한
+바이트의 SHA256을 lineage에 기록하고 인물별로 내부 `POST /convert`를 한 번 호출한다.
+
+```text
+multipart bvh           = final_bvh_bytes
+character_id            = standin-master-v2 등 registry ID
+frame                   = 0
+mirror                  = false 또는 사용자의 명시값
+output_mode             = rigged_rest
+apply_root_translation  = false
+```
+
+성공 시 BFF는 다음을 검증하고 FBX를 자기 저장소에 publish한다.
+
+```text
+X-Standin-Source-BVH-SHA256 == sha256(final_bvh_bytes)
+X-Standin-Artifact-SHA256   == sha256(response body)
+X-Standin-Solver-Version    == chain-transport-v3.2
+```
+
+mirror는 Converter가 한 번만 적용한다. CSP는 같은 좌우 반전을 다시 하지 않고 소재 등록·배치와
+다인 상대 위치 조정을 담당한다. 다인 컷은 item 수만큼 독립 Converter 요청과 독립 FBX가 생긴다.
+`set_id`는 묶음 메타일 뿐 하나의 다인 BVH/FBX가 아니다.
+
+상세 BFF 구현·lineage·오류 계약은
+[`FBX_CONVERTER_V3_2_PHASE3_BFF_HANDOFF.md`](FBX_CONVERTER_V3_2_PHASE3_BFF_HANDOFF.md)를 따른다.
 
 ---
 
 ## 5. 스키마 참조
-`api/models.py`의 `ExportOrderRequest` / `ExportOrder` / `ExportItem`가 소스. FastAPI `/docs`(OpenAPI)에 자동 노출된다.
+
+- legacy `/export-order`: `api/models.py`의 `ExportOrderRequest` / `ExportOrder` / `ExportItem`
+- inference/refine → converter Phase 3: `FBX_CONVERTER_V3_2_PHASE3_BFF_HANDOFF.md`
+- 내부 `/convert`: `converter_api/app.py`와 converter OpenAPI `/docs`
