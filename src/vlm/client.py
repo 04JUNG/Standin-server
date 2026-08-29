@@ -83,11 +83,35 @@ class VLMUnavailable(RuntimeError):
     """
 
     def __init__(self, message: str, *, status: int | None = None,
-                 attempts: int = 0, elapsed_seconds: float = 0.0):
+                 attempts: int = 0, elapsed_seconds: float = 0.0,
+                 models_tried: tuple[str, ...] = ()):
         super().__init__(message)
         self.status = status
         self.attempts = attempts
         self.elapsed_seconds = elapsed_seconds
+        # 폴백 체인을 돌았으면 어디까지 태웠는지가 알림의 핵심 정보다. 이게 없으면
+        # 운영은 "1차 모델만 붐볐는지, 둘 다 붐볐는지"를 구분할 수 없다.
+        self.models_tried = models_tried
+
+
+class _ModelExhausted(Exception):
+    """한 모델이 상류 혼잡으로 소진됐다(내부 신호).
+
+    VLMUnavailable을 여기서 바로 올리지 않는 이유: 폴백 모델을 더 태울지, 시도 횟수를
+    어떻게 합산할지는 **체인 전체를 아는 쪽**만 정할 수 있다. 이 예외는 analyze() 밖으로
+    새지 않는다.
+    """
+
+    def __init__(self, *, status: int | None, attempts: int, reason: str,
+                 can_fallback: bool, cause: Exception):
+        super().__init__(reason)
+        self.status = status
+        self.attempts = attempts
+        self.reason = reason
+        # timeout은 폴백 대상이 아니다 — 끊긴 호출도 상류에서는 계속 생성 중일 수 있어
+        # 다른 모델을 또 태우면 비용만 두 배가 되고 지연은 그대로 예산을 먹는다.
+        self.can_fallback = can_fallback
+        self.cause = cause
 
 
 class BaseVLMClient:
@@ -180,16 +204,90 @@ class GeminiVLMClient(BaseVLMClient):
         buf = io.BytesIO(); img.convert("RGB").save(buf, format="PNG")
         return types.Part.from_bytes(data=buf.getvalue(), mime_type="image/png")
 
+    def _model_chain(self) -> list[str]:
+        """1차 모델 + 폴백 모델들.
+
+        503은 모델별 용량 풀의 문제라 같은 모델 재시도는 실패가 상관돼 있다. 중복은
+        제거한다 — 같은 풀을 두 번 두드릴 이유가 없다.
+        """
+        chain = [self._model]
+        for name in (CFG.gemini_fallback_models or "").split(","):
+            name = name.strip()
+            if name and name not in chain:
+                chain.append(name)
+        return chain
+
     def analyze(self, image, img_w: int, img_h: int) -> VLMAnalysis:
-        from google.genai import types
         part = self._to_part(image)
-        attempts = max(1, CFG.gemini_max_attempts)
         # 재시도가 BFF의 분석 상한(기본 120초)을 먹어 치우지 않게 VLM 단계 전체에 예산을 둔다.
         # 예산이 없으면 timeout을 올릴 때마다 최악 지연이 attempts배로 늘어난다.
-        full_timeout = CFG.gemini_request_timeout_ms / 1000
+        #
+        # 이 예산은 **폴백 모델까지 합쳐서** 쓴다. 모델을 늘려도 최악 지연은 그대로다 —
+        # 폴백은 "1차가 안 쓰고 남긴 예산"으로만 돈다(2026-08-28 관측: 3시도 소진에 18초,
+        # 75초 예산 중 57초가 남아 있었다).
         min_attempt = max(1.0, CFG.gemini_min_attempt_seconds)
         started_all = self._clock()
         deadline = started_all + CFG.gemini_total_budget_seconds
+
+        tried: list[str] = []
+        attempts_total = 0
+        last: _ModelExhausted | None = None
+
+        for model in self._model_chain():
+            left = deadline - self._clock()
+            if tried:
+                if left < min_attempt:
+                    # 예산이 없는데 폴백까지 태우면 BFF가 먼저 끊어 사용자는 원인을 알 수
+                    # 없는 ANALYSIS_TIMEOUT을 받는다. 여기서 멈추는 편이 낫다.
+                    log_warn("model_fallback", "남은 예산이 없어 폴백 모델을 건너뛴다",
+                             fromModel=tried[-1], toModel=model,
+                             budgetLeftSeconds=round(max(0.0, left), 1),
+                             errorCode="GEMINI_FALLBACK_SKIPPED")
+                    break
+                log_warn("model_fallback", "상류 혼잡으로 폴백 모델로 넘어간다",
+                         fromModel=tried[-1], toModel=model,
+                         upstreamStatus=(last.status if last else None) or "error",
+                         budgetLeftSeconds=round(left, 1),
+                         errorCode="GEMINI_FALLBACK")
+            is_primary = not tried
+            tried.append(model)
+            try:
+                return self._analyze_with_model(model, part, img_w, img_h,
+                                                deadline, min_attempt,
+                                                send_thinking=is_primary)
+            except _ModelExhausted as exhausted:
+                attempts_total += exhausted.attempts
+                last = exhausted
+                if not exhausted.can_fallback:
+                    break
+
+        if last is None:
+            raise RuntimeError("unreachable")
+        # 상류 혼잡을 파이프라인 버그와 같은 통로로 올리지 않는다(api/app.py가 503으로 번역).
+        raise VLMUnavailable(
+            f"VLM 상류가 응답하지 못했다({last.reason})",
+            status=last.status,
+            attempts=attempts_total,
+            elapsed_seconds=self._clock() - started_all,
+            models_tried=tuple(tried),
+        ) from last.cause
+
+    def _analyze_with_model(self, model: str, part, img_w: int, img_h: int,
+                            deadline: float, min_attempt: float,
+                            send_thinking: bool = True) -> VLMAnalysis:
+        """모델 하나로 남은 예산 안에서 시도한다.
+
+        상류 혼잡으로 소진되면 _ModelExhausted를 올린다 — 폴백 여부는 analyze()가 정한다.
+        반면 4xx와 파싱 오류는 우리 잘못이라 그대로 올려 보내 알림을 받는다. 이런 실패에
+        폴백 모델을 태우면 같은 이유로 또 실패하면서 비용만 두 배가 된다.
+        """
+        from google.genai import types
+        attempts = max(1, CFG.gemini_max_attempts)
+        full_timeout = CFG.gemini_request_timeout_ms / 1000
+        # 폴백 모델에는 사고 토큰 설정을 보내지 않는다 — lite 계열은 이 필드를 400으로
+        # 거부하고(2026-08-29 실측), 400은 폴백도 못 타는 "우리 잘못" 경로다. 폴백은
+        # 실패 직전의 마지막 수단이라 모델 기본값으로 두는 편이 안전하다.
+        thinking = _thinking_config(types) if send_thinking else None
         for attempt in range(1, attempts + 1):
             # ⚠ 이번 시도의 상한은 **남은 예산**이다. 전체 timeout을 그대로 쓰면 예산을
             #   넘겨 BFF가 먼저 끊는다. 반대로 "남은 예산이 전체 timeout보다 작으면
@@ -203,12 +301,15 @@ class GeminiVLMClient(BaseVLMClient):
             started = self._clock()
             try:
                 resp = self._client.models.generate_content(
-                    model=self._model,
+                    model=model,
                     contents=[prompts.USER_TEMPLATE, part],
                     config=types.GenerateContentConfig(
                         system_instruction=prompts.SYSTEM,
                         response_mime_type="application/json",
                         temperature=0,
+                        # 사고 토큰은 이 단계에 필요 없다(열거형 태깅). 호출을 짧게 만들어
+                        # 혼잡 구간에 머무는 시간과 과금을 함께 줄인다. None이면 안 보낸다.
+                        thinking_config=thinking,
                         # 요청 단위 상한. 클라이언트 생성 시의 값(전체 timeout)을 덮어쓴다.
                         http_options=types.HttpOptions(
                             timeout=int(timeout_seconds * 1000)),
@@ -216,7 +317,7 @@ class GeminiVLMClient(BaseVLMClient):
                 )
                 log_info(
                     "gemini_request",
-                    model=self._model,
+                    model=model,
                     attempt=attempt,
                     status="ok",
                     elapsedMs=round((self._clock() - started) * 1000),
@@ -246,7 +347,7 @@ class GeminiVLMClient(BaseVLMClient):
                 )
                 log_warn(
                     "gemini_request",
-                    model=self._model,
+                    model=model,
                     attempt=attempt,
                     status=status or "error",
                     retry=retryable,
@@ -258,12 +359,10 @@ class GeminiVLMClient(BaseVLMClient):
                 )
                 if not retryable:
                     if upstream:
-                        # 상류 혼잡을 파이프라인 버그와 같은 통로로 올리지 않는다.
-                        raise VLMUnavailable(
-                            f"VLM 상류가 응답하지 못했다({reason})",
-                            status=status,
-                            attempts=attempt,
-                            elapsed_seconds=self._clock() - started_all,
+                        raise _ModelExhausted(
+                            status=status, attempts=attempt, reason=reason,
+                            # 상태 코드가 있는 혼잡만 다른 용량 풀을 볼 가치가 있다.
+                            can_fallback=transient, cause=error,
                         ) from error
                     raise
                 delay = min(
@@ -275,6 +374,29 @@ class GeminiVLMClient(BaseVLMClient):
                 if delay:
                     self._sleep(self._jitter(delay * 0.8, delay * 1.2))
         raise RuntimeError("unreachable")
+
+
+def _thinking_config(types):
+    """사고 토큰 설정 → GenerateContentConfig.thinking_config (끄면 None).
+
+    None을 넘기면 SDK가 필드를 안 보낸다 = 모델 기본값. thinking_config 자체를 거부하는
+    구형 모델(2.0 계열 등)은 400을 돌려주는데, 400은 이 파일에서 "우리 잘못"으로 분류돼
+    알림이 된다 — 그래서 `none`으로 완전히 끌 수 있게 둔다.
+    """
+    raw = (CFG.gemini_thinking_budget or "").strip().lower()
+    if raw in ("", "none", "off"):
+        return None
+    thinking_cls = getattr(types, "ThinkingConfig", None)
+    if thinking_cls is None:      # SDK가 오래됐다. 설정은 무시하되 호출은 살린다.
+        log_warn("gemini_config", "SDK에 ThinkingConfig가 없어 사고 토큰 설정을 건너뛴다",
+                 errorCode="GEMINI_THINKING_UNSUPPORTED")
+        return None
+    try:
+        return thinking_cls(thinking_budget=int(raw))
+    except ValueError:
+        log_warn("gemini_config", "GEMINI_THINKING_BUDGET 값을 읽지 못해 모델 기본값을 쓴다",
+                 errorCode="GEMINI_THINKING_INVALID", detail=raw[:40])
+        return None
 
 
 def _usage_fields(resp) -> dict:

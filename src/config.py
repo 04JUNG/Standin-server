@@ -55,6 +55,34 @@ class Config:
     gemini_min_attempt_seconds: float = float(os.getenv("GEMINI_MIN_ATTEMPT_SECONDS", "10"))
     gemini_retry_base_seconds: float = float(os.getenv("GEMINI_RETRY_BASE_SECONDS", "0.5"))
     gemini_retry_max_seconds: float = float(os.getenv("GEMINI_RETRY_MAX_SECONDS", "2.0"))
+    # --- 폴백 모델 체인 ---
+    # 503은 **모델별 용량 풀**의 문제다. 같은 모델을 다시 두드리면 실패가 상관돼 있어
+    # 재시도 전부가 같은 스파이크에 그대로 걸린다(2026-08-28 프로덕션: 3시도가 전부 503,
+    # 18~37초 만에 소진 — 75초 예산 중 40~57초를 안 쓰고 버렸다).
+    #
+    # 1차 모델이 소진되면 **남은 예산으로 다른 모델**을 태운다. 용량 풀이 달라 실패가
+    # 비상관이다. 비우면 폴백 없음(이 설정이 생기기 전과 동일한 동작).
+    #
+    # ⚠ 폴백 모델은 태그 품질이 1차보다 낮을 수 있다. 그래도 "다른 모델의 태그"가
+    #   "분석 실패"보다 낫기 때문에 켠다 — 폴백은 실패 직전에만 돈다.
+    #
+    # ⚠ 모델 이름을 바꿀 때는 **반드시 실제 키로 확인**할 것. 2026-08-29 프로덕션 키
+    #   실측에서 `gemini-2.5-flash`와 `gemini-2.5-flash-lite`는 둘 다 404였다
+    #   ("no longer available to new users"). 이 프로젝트는 2.5 계열을 못 쓴다.
+    #   404는 이 파일에서 "우리 잘못"으로 분류돼 폴백도 안 타고 500 + 알림이 된다.
+    #   확인 수단: scripts/vlm_probe.py --model a,b
+    gemini_fallback_models: str = os.getenv("GEMINI_FALLBACK_MODELS", "gemini-flash-lite-latest")
+    # 사고 토큰 예산. 이 단계는 열거형 태깅(사람 수·shot)이라 추론 여력이 필요 없다 —
+    # 끄면 호출이 짧아져 혼잡 구간에 머무는 시간과 과금이 함께 준다.
+    #   "0"=끔(기본) / "-1"=동적 / 양수=상한 / "none"=필드를 아예 안 보냄
+    # 끈 뒤에는 gemini_request 로그의 thoughtTokens가 0이어야 한다(적용 확인 신호).
+    #
+    # ⚠ 이 값은 **1차 모델에만** 적용된다. lite 계열은 thinking_config 자체를 거부해
+    #   400 INVALID_ARGUMENT를 돌려주는데(2026-08-29 실측: gemini-flash-lite-latest,
+    #   gemini-3.5-flash-lite 모두 400), 400은 폴백도 안 타고 500 + 알림이 된다.
+    #   폴백은 "실패보다 나은 답"이 목적이라 모델 기본값으로 두는 편이 안전하다.
+    #   1차가 lite 계열이면 이 값을 "none"으로 두면 된다.
+    gemini_thinking_budget: str = os.getenv("GEMINI_THINKING_BUDGET", "0")
     openai_model: str = os.getenv("OPENAI_MODEL", "gpt-5-mini")
 
     # --- 검출/포즈 ---  "mock" | "rtmlib"

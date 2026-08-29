@@ -359,9 +359,13 @@ def _vlm_unavailable_response(exc: VLMUnavailable) -> HTTPException:
 
     오류 본문은 앱 서버(BFF)가 자기 오류 봉투로 옮겨 담는다(docs/API_CONTRACT.md §7).
     """
+    # 폴백 체인을 돌았으면 "어느 모델까지 붐볐는지"가 다음 조치를 가른다.
+    # 1차만 붐볐다 → 모델을 바꾼다. 둘 다 붐볐다 → 구글 전역 혼잡이라 기다리는 수밖에 없다.
+    models_tried = " → ".join(exc.models_tried) or CFG.gemini_model
     log_warn("vlm_unavailable", "상류 VLM이 응답하지 못해 분석을 중단했다",
              route="/analyze", errorCode="VLM_UNAVAILABLE",
              upstreamStatus=exc.status, attempts=exc.attempts,
+             modelsTried=models_tried,
              elapsedMs=round(exc.elapsed_seconds * 1000))
     alerts.notify(
         "P2", "VLM_UNAVAILABLE",
@@ -369,7 +373,7 @@ def _vlm_unavailable_response(exc: VLMUnavailable) -> HTTPException:
         key="P2:vlm_unavailable",
         context={"상류 상태": exc.status or "timeout", "시도": exc.attempts,
                  "소요(초)": round(exc.elapsed_seconds, 1),
-                 "모델": CFG.gemini_model},
+                 "모델": models_tried},
     )
     return HTTPException(
         status_code=503,

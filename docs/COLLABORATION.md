@@ -95,10 +95,13 @@ src/search.py  [7][8][9] kNN + rerank
 
 ```text
 VLM_PROVIDER=mock          # mock | gemini | openai
-GEMINI_REQUEST_TIMEOUT_MS=20000  # Gemini HTTP 1회 상한
-GEMINI_MAX_ATTEMPTS=3      # 최초 호출 포함, 429/503만 재시도
+GEMINI_REQUEST_TIMEOUT_MS=45000  # Gemini HTTP 1회 상한
+GEMINI_MAX_ATTEMPTS=3      # 최초 호출 포함, 429/503만 재시도(모델 1개당)
 GEMINI_RETRY_BASE_SECONDS=0.5
 GEMINI_RETRY_MAX_SECONDS=2.0
+GEMINI_TOTAL_BUDGET_SECONDS=75   # 폴백 모델까지 합친 VLM 단계 전체 예산
+GEMINI_FALLBACK_MODELS=gemini-flash-lite-latest  # 1차가 503으로 소진되면 태울 다른 용량 풀
+GEMINI_THINKING_BUDGET=0   # 1차 모델에만 적용. 0=끔 / -1=동적 / none=필드 미전송
 POSE_BACKEND=mock          # mock | rtmlib
 DB_PATH=data/poses.db      # ⚠ 동기화 폴더(드롭박스/OneDrive) 금지 — SQLite 락
 BVH_DIR=                   # 실 BVH 폴더(build_db 시)
