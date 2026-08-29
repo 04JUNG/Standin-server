@@ -458,3 +458,24 @@ def test_unreadable_thinking_budget_falls_back_to_model_default(monkeypatch):
 
     assert result.num_people == 1
     assert models.thinking[0] is None
+
+
+def test_thinking_config_is_not_sent_to_fallback_models(monkeypatch):
+    """폴백 모델에는 사고 토큰 설정을 보내지 않는다.
+
+    2026-08-29 프로덕션 키 실측: lite 계열(gemini-flash-lite-latest,
+    gemini-3.5-flash-lite)은 thinking_config를 400 INVALID_ARGUMENT로 거부한다.
+    400은 이 파일의 규칙상 "우리 잘못"이라 폴백도 못 타고 500 + 알림이 된다 —
+    상류 혼잡을 구제하려던 경로가 오히려 알림을 만드는 셈이다.
+    """
+    monkeypatch.setattr(CFG, "gemini_max_attempts", 1)
+    sleeps = []
+    client, models = make_client(
+        monkeypatch, [ApiFailure(503), valid_response()], sleeps,
+        fallbacks="backup-gemini",
+    )
+
+    client.analyze("ignored", 100, 100)
+
+    assert models.thinking[0].thinking_budget == 0, "1차에는 설정이 나가야 한다"
+    assert models.thinking[1] is None, "폴백에는 필드 자체를 안 보낸다"

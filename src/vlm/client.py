@@ -249,10 +249,12 @@ class GeminiVLMClient(BaseVLMClient):
                          upstreamStatus=(last.status if last else None) or "error",
                          budgetLeftSeconds=round(left, 1),
                          errorCode="GEMINI_FALLBACK")
+            is_primary = not tried
             tried.append(model)
             try:
                 return self._analyze_with_model(model, part, img_w, img_h,
-                                                deadline, min_attempt)
+                                                deadline, min_attempt,
+                                                send_thinking=is_primary)
             except _ModelExhausted as exhausted:
                 attempts_total += exhausted.attempts
                 last = exhausted
@@ -271,7 +273,8 @@ class GeminiVLMClient(BaseVLMClient):
         ) from last.cause
 
     def _analyze_with_model(self, model: str, part, img_w: int, img_h: int,
-                            deadline: float, min_attempt: float) -> VLMAnalysis:
+                            deadline: float, min_attempt: float,
+                            send_thinking: bool = True) -> VLMAnalysis:
         """모델 하나로 남은 예산 안에서 시도한다.
 
         상류 혼잡으로 소진되면 _ModelExhausted를 올린다 — 폴백 여부는 analyze()가 정한다.
@@ -281,6 +284,10 @@ class GeminiVLMClient(BaseVLMClient):
         from google.genai import types
         attempts = max(1, CFG.gemini_max_attempts)
         full_timeout = CFG.gemini_request_timeout_ms / 1000
+        # 폴백 모델에는 사고 토큰 설정을 보내지 않는다 — lite 계열은 이 필드를 400으로
+        # 거부하고(2026-08-29 실측), 400은 폴백도 못 타는 "우리 잘못" 경로다. 폴백은
+        # 실패 직전의 마지막 수단이라 모델 기본값으로 두는 편이 안전하다.
+        thinking = _thinking_config(types) if send_thinking else None
         for attempt in range(1, attempts + 1):
             # ⚠ 이번 시도의 상한은 **남은 예산**이다. 전체 timeout을 그대로 쓰면 예산을
             #   넘겨 BFF가 먼저 끊는다. 반대로 "남은 예산이 전체 timeout보다 작으면
@@ -302,7 +309,7 @@ class GeminiVLMClient(BaseVLMClient):
                         temperature=0,
                         # 사고 토큰은 이 단계에 필요 없다(열거형 태깅). 호출을 짧게 만들어
                         # 혼잡 구간에 머무는 시간과 과금을 함께 줄인다. None이면 안 보낸다.
-                        thinking_config=_thinking_config(types),
+                        thinking_config=thinking,
                         # 요청 단위 상한. 클라이언트 생성 시의 값(전체 timeout)을 덮어쓴다.
                         http_options=types.HttpOptions(
                             timeout=int(timeout_seconds * 1000)),
