@@ -46,9 +46,13 @@ def _coerce(analysis: dict, img_w: int, img_h: int) -> VLMAnalysis:
     raw_lower = analysis.get("lower_body_visible")
     if isinstance(raw_lower, list) and len(raw_lower) == num:
         lower_body_visible = [value is True for value in raw_lower]
+        lower_body_visibility_known = [
+            isinstance(value, bool) for value in raw_lower
+        ]
     else:
-        # 새 안전 lineage가 없으면 하체를 추측하지 않는다.
+        # refine은 fail-closed로 동결하되, 검색은 누락을 '반신'으로 해석하지 않는다.
         lower_body_visible = [False] * max(num, 0)
+        lower_body_visibility_known = [False] * max(num, 0)
     return VLMAnalysis(
         num_people=num,
         shot=pick(Shot, analysis.get("shot"), Shot.FULL_HALF),
@@ -60,6 +64,7 @@ def _coerce(analysis: dict, img_w: int, img_h: int) -> VLMAnalysis:
         dialogue=analysis.get("dialogue"),
         raw=analysis,
         lower_body_visible=lower_body_visible,
+        lower_body_visibility_known=lower_body_visibility_known,
     )
 
 
@@ -145,8 +150,14 @@ class MockVLMClient(BaseVLMClient):
         ))
         return VLMAnalysis(
             num, shot, action, view, rel, boxes,
-            dialogue=None, raw={"mock": True, "hint": hint},
+            dialogue=None,
+            raw={
+                "mock": True,
+                "hint": hint,
+                "lower_body_visible": [not lower_hidden] * num,
+            },
             lower_body_visible=[not lower_hidden] * num,
+            lower_body_visibility_known=[True] * num,
         )
 
 
