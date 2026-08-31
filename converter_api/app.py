@@ -2,16 +2,19 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+import hashlib
+import hmac
 import io
 import json
 import logging
 import os
-from pathlib import Path
 import re
 import sys
 import time
 import uuid
 from typing import Any
+import zipfile
 
 from fastapi import FastAPI, File, Form, Request, UploadFile
 from fastapi.exceptions import RequestValidationError
@@ -29,12 +32,14 @@ from converter_api.registry import (
     ArtifactUnavailableError,
     CharacterRegistry,
     RegistryError,
+    ResolvedCharacter,
     UnknownCharacterError,
 )
 from converter_api.runner import (
     BlenderRunner,
     BlenderUnavailableError,
     ConversionRejectedError,
+    ConversionResult,
     ConversionTimeoutError,
     RunnerError,
     WorkerIntegrityError,
@@ -44,6 +49,7 @@ from converter_api.schemas import CharactersResponse, HealthResponse
 
 LOGGER = logging.getLogger("standin.converter")
 SAFE_UPLOAD_NAME = re.compile(r"^[^/\\\x00]{1,255}$")
+SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 ALLOWED_BVH_TYPES = {
     "application/octet-stream",
     "application/x-bvh",
@@ -51,6 +57,11 @@ ALLOWED_BVH_TYPES = {
     "text/x-bvh",
 }
 DEFAULT_MAX_BVH_BYTES = 2 * 1024 * 1024
+ARTIFACT_KINDS = frozenset({"base", "refined"})
+BUNDLE_SCHEMA_VERSION = 1
+BUNDLE_BVH_NAME = "final.bvh"
+BUNDLE_FBX_NAME = "final.fbx"
+BUNDLE_MANIFEST_NAME = "manifest.json"
 
 
 def configure_structured_logging(
@@ -92,6 +103,15 @@ class ApiProblem(RuntimeError):
         self.code = code
         self.message = message
         self.conversion_id = conversion_id
+
+
+@dataclass(frozen=True)
+class CompletedConversion:
+    conversion_id: str
+    bvh_bytes: bytes
+    character: ResolvedCharacter
+    result: ConversionResult
+    common_headers: dict[str, str]
 
 
 def _error_response(problem: ApiProblem) -> JSONResponse:
@@ -157,6 +177,109 @@ def _safe_header(value: Any, fallback: str = "unknown") -> str:
     return re.sub(r"[^A-Za-z0-9._:+-]", "_", text)[:128] or fallback
 
 
+def _verify_result_integrity(
+    result: ConversionResult,
+    *,
+    conversion_id: str,
+    bvh_bytes: bytes,
+) -> None:
+    """Fail closed before any converter artifact crosses the HTTP boundary."""
+
+    mismatched: list[str] = []
+    source_sha256 = hashlib.sha256(bvh_bytes).hexdigest()
+    if result.conversion_id != conversion_id:
+        mismatched.append("conversion_id")
+    if not isinstance(result.artifact, bytes) or not result.artifact:
+        mismatched.append("artifact_empty")
+        artifact_sha256 = ""
+    else:
+        artifact_sha256 = hashlib.sha256(result.artifact).hexdigest()
+    if not isinstance(result.source_bvh_sha256, str) or not hmac.compare_digest(
+        result.source_bvh_sha256,
+        source_sha256,
+    ):
+        mismatched.append("source_bvh_sha256")
+    if not isinstance(result.artifact_sha256, str) or not hmac.compare_digest(
+        result.artifact_sha256,
+        artifact_sha256,
+    ):
+        mismatched.append("artifact_sha256")
+    if mismatched:
+        raise WorkerIntegrityError(
+            f"converter result integrity mismatch: {','.join(mismatched)}",
+            report=result.report,
+        )
+
+
+def _write_bundle_entry(archive: zipfile.ZipFile, name: str, payload: bytes) -> None:
+    """Write a regular, fixed-name entry without timestamps or path components."""
+
+    info = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
+    info.compress_type = zipfile.ZIP_STORED
+    info.create_system = 3
+    info.external_attr = (0o100600 & 0xFFFF) << 16
+    archive.writestr(info, payload)
+
+
+def _build_artifact_bundle(
+    completed: CompletedConversion,
+    *,
+    artifact_kind: str,
+    mirror: bool,
+) -> tuple[bytes, dict[str, Any]]:
+    """Return an atomic BVH+FBX bundle and its canonical integrity manifest."""
+
+    result = completed.result
+    metadata = completed.character.metadata
+    manifest: dict[str, Any] = {
+        "schema_version": BUNDLE_SCHEMA_VERSION,
+        "bundle_type": "standin-final-artifacts",
+        "conversion_id": completed.conversion_id,
+        "solver_version": SOLVER_VERSION,
+        "artifact_kind": artifact_kind,
+        "character": {
+            "character_id": metadata.character_id,
+            "revision": metadata.revision,
+            "rig_profile": metadata.rig_profile,
+        },
+        "options": {
+            "frame": FRAME,
+            "mirror": mirror,
+            "output_mode": OUTPUT_MODE,
+            "apply_root_translation": APPLY_ROOT_TRANSLATION,
+        },
+        "artifacts": {
+            "bvh": {
+                "filename": BUNDLE_BVH_NAME,
+                "media_type": "application/x-bvh",
+                "size": len(completed.bvh_bytes),
+                "sha256": result.source_bvh_sha256,
+            },
+            "fbx": {
+                "filename": BUNDLE_FBX_NAME,
+                "media_type": "application/octet-stream",
+                "size": len(result.artifact),
+                "sha256": result.artifact_sha256,
+            },
+        },
+    }
+    manifest_bytes = (
+        json.dumps(
+            manifest,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n"
+    ).encode("utf-8")
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, mode="w", allowZip64=True) as archive:
+        _write_bundle_entry(archive, BUNDLE_BVH_NAME, completed.bvh_bytes)
+        _write_bundle_entry(archive, BUNDLE_FBX_NAME, result.artifact)
+        _write_bundle_entry(archive, BUNDLE_MANIFEST_NAME, manifest_bytes)
+    return buffer.getvalue(), manifest
+
+
 def create_app(
     *,
     registry: CharacterRegistry | None = None,
@@ -175,7 +298,7 @@ def create_app(
 
     app = FastAPI(
         title="Standin Internal Converter",
-        version="1.0.0",
+        version="1.1.0",
         description="Internal BFF-only BVH to FBX conversion service",
     )
     app.state.registry = character_registry
@@ -260,28 +383,37 @@ def create_app(
             return payload
         return JSONResponse(status_code=503, content=payload)
 
-    @app.post(
-        "/convert",
-        responses={
-            200: {"content": {"application/octet-stream": {}}},
-            400: {"description": "Invalid option, character_id, or filename"},
-            413: {"description": "BVH upload too large"},
-            422: {"description": "BVH/profile/mapping rejected"},
-            503: {"description": "Character artifact or Blender unavailable"},
-            504: {"description": "Blender conversion timeout"},
-        },
-    )
-    def convert(
-        bvh: UploadFile = File(...),
-        character_id: str = Form(default="standin-master-v2"),
-        frame: int = Form(default=FRAME),
-        mirror: bool = Form(default=False),
-        output_mode: str = Form(default=OUTPUT_MODE),
-        apply_root_translation: bool = Form(default=APPLY_ROOT_TRANSLATION),
-    ):
+    def _execute_conversion(
+        *,
+        bvh: UploadFile,
+        character_id: str,
+        frame: int,
+        mirror: bool,
+        output_mode: str,
+        apply_root_translation: bool,
+        response_format: str,
+        artifact_kind: str | None = None,
+        expected_bvh_sha256: str | None = None,
+    ) -> CompletedConversion:
         conversion_id = str(uuid.uuid4())
         request_started = time.monotonic()
         try:
+            if artifact_kind is not None and artifact_kind not in ARTIFACT_KINDS:
+                raise ApiProblem(
+                    400,
+                    "INVALID_ARTIFACT_KIND",
+                    "artifact_kind must be base or refined",
+                    conversion_id=conversion_id,
+                )
+            if expected_bvh_sha256 is not None and not SHA256_RE.fullmatch(
+                expected_bvh_sha256
+            ):
+                raise ApiProblem(
+                    400,
+                    "INVALID_BVH_SHA256",
+                    "expected_bvh_sha256 must be 64 lowercase hex characters",
+                    conversion_id=conversion_id,
+                )
             if frame != FRAME or isinstance(frame, bool):
                 raise ApiProblem(
                     400, "INVALID_OPTION", f"frame must be {FRAME}",
@@ -298,6 +430,17 @@ def create_app(
                     conversion_id=conversion_id,
                 )
             bvh_bytes = _read_bvh(bvh, size_limit, conversion_id)
+            actual_bvh_sha256 = hashlib.sha256(bvh_bytes).hexdigest()
+            if expected_bvh_sha256 is not None and not hmac.compare_digest(
+                expected_bvh_sha256,
+                actual_bvh_sha256,
+            ):
+                raise ApiProblem(
+                    409,
+                    "SOURCE_BVH_SHA256_MISMATCH",
+                    "uploaded BVH does not match expected_bvh_sha256",
+                    conversion_id=conversion_id,
+                )
             resolved = character_registry.resolve(character_id)
             result = blender_runner.convert(
                 bvh_bytes=bvh_bytes,
@@ -306,6 +449,11 @@ def create_app(
                 character_sha256=resolved.metadata.sha256,
                 conversion_id=conversion_id,
                 mirror=mirror,
+            )
+            _verify_result_integrity(
+                result,
+                conversion_id=conversion_id,
+                bvh_bytes=bvh_bytes,
             )
         except ApiProblem:
             raise
@@ -371,19 +519,19 @@ def create_app(
             conversion_id=conversion_id,
             source_bvh_sha256=result.source_bvh_sha256,
             artifact_sha256=result.artifact_sha256,
+            response_format=response_format,
+            artifact_kind=artifact_kind,
             task_cold_start=result.task_cold_start,
             queue_wait_ms=queue_wait_ms,
             execution_ms=execution_ms,
             request_total_ms=request_total_ms,
             report=report,
         )
-        filename = f"{resolved.metadata.character_id}-{conversion_id}.fbx"
-        headers = {
-            "Content-Disposition": f'attachment; filename="{filename}"',
+        common_headers = {
             "X-Standin-Conversion-Id": conversion_id,
             "X-Standin-Solver-Version": SOLVER_VERSION,
             "X-Standin-Source-BVH-SHA256": result.source_bvh_sha256,
-            "X-Standin-Artifact-SHA256": result.artifact_sha256,
+            "X-Standin-FBX-Artifact-SHA256": result.artifact_sha256,
             "X-Standin-Source-Profile": _safe_header(report.get("src_profile")),
             "X-Standin-Target-Profile": _safe_header(report.get("dst_profile")),
             "X-Standin-Mapped-Bones": str(int(report.get("mapped_bones", 0))),
@@ -393,12 +541,126 @@ def create_app(
                 f"queue;dur={queue_wait_ms}, "
                 f"blender;dur={execution_ms}, total;dur={request_total_ms}"
             ),
+        }
+        return CompletedConversion(
+            conversion_id=conversion_id,
+            bvh_bytes=bvh_bytes,
+            character=resolved,
+            result=result,
+            common_headers=common_headers,
+        )
+
+    @app.post(
+        "/convert",
+        responses={
+            200: {"content": {"application/octet-stream": {}}},
+            400: {"description": "Invalid option, character_id, or filename"},
+            413: {"description": "BVH upload too large"},
+            422: {"description": "BVH/profile/mapping rejected"},
+            503: {"description": "Character artifact or Blender unavailable"},
+            504: {"description": "Blender conversion timeout"},
+        },
+    )
+    def convert(
+        bvh: UploadFile = File(...),
+        character_id: str = Form(default="standin-master-v2"),
+        frame: int = Form(default=FRAME),
+        mirror: bool = Form(default=False),
+        output_mode: str = Form(default=OUTPUT_MODE),
+        apply_root_translation: bool = Form(default=APPLY_ROOT_TRANSLATION),
+    ):
+        completed = _execute_conversion(
+            bvh=bvh,
+            character_id=character_id,
+            frame=frame,
+            mirror=mirror,
+            output_mode=output_mode,
+            apply_root_translation=apply_root_translation,
+            response_format="fbx",
+        )
+        result = completed.result
+        filename = (
+            f"{completed.character.metadata.character_id}-"
+            f"{completed.conversion_id}.fbx"
+        )
+        headers = {
+            **completed.common_headers,
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "X-Standin-Artifact-SHA256": result.artifact_sha256,
             "Content-Length": str(len(result.artifact)),
         }
         return StreamingResponse(
             io.BytesIO(result.artifact),
             status_code=200,
             media_type="application/octet-stream",
+            headers=headers,
+        )
+
+    @app.post(
+        "/convert-bundle",
+        responses={
+            200: {"content": {"application/zip": {}}},
+            400: {
+                "description": (
+                    "Invalid option, artifact_kind, character_id, or filename"
+                )
+            },
+            409: {"description": "Uploaded BVH SHA256 mismatch"},
+            413: {"description": "BVH upload too large"},
+            422: {"description": "BVH/profile/mapping rejected"},
+            503: {"description": "Character artifact or Blender unavailable"},
+            504: {"description": "Blender conversion timeout"},
+        },
+    )
+    def convert_bundle(
+        bvh: UploadFile = File(...),
+        artifact_kind: str = Form(...),
+        expected_bvh_sha256: str = Form(...),
+        character_id: str = Form(default="standin-master-v2"),
+        frame: int = Form(default=FRAME),
+        mirror: bool = Form(default=False),
+        output_mode: str = Form(default=OUTPUT_MODE),
+        apply_root_translation: bool = Form(default=APPLY_ROOT_TRANSLATION),
+    ):
+        completed = _execute_conversion(
+            bvh=bvh,
+            character_id=character_id,
+            frame=frame,
+            mirror=mirror,
+            output_mode=output_mode,
+            apply_root_translation=apply_root_translation,
+            response_format="bundle",
+            artifact_kind=artifact_kind,
+            expected_bvh_sha256=expected_bvh_sha256,
+        )
+        bundle, manifest = _build_artifact_bundle(
+            completed,
+            artifact_kind=artifact_kind,
+            mirror=mirror,
+        )
+        bundle_sha256 = hashlib.sha256(bundle).hexdigest()
+        filename = f"standin-artifacts-{completed.conversion_id}.zip"
+        headers = {
+            **completed.common_headers,
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "X-Standin-Artifact-Kind": artifact_kind,
+            "X-Standin-Artifact-SHA256": bundle_sha256,
+            "X-Standin-Bundle-SHA256": bundle_sha256,
+            "Content-Length": str(len(bundle)),
+        }
+        _structured_log(
+            logging.INFO,
+            "converter_bundle_complete",
+            conversion_id=completed.conversion_id,
+            artifact_kind=artifact_kind,
+            source_bvh_sha256=manifest["artifacts"]["bvh"]["sha256"],
+            fbx_artifact_sha256=manifest["artifacts"]["fbx"]["sha256"],
+            bundle_sha256=bundle_sha256,
+        )
+        return StreamingResponse(
+            io.BytesIO(bundle),
+            status_code=200,
+            media_type="application/zip",
             headers=headers,
         )
 

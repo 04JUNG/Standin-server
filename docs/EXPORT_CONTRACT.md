@@ -1,7 +1,8 @@
 # Export 계약 — 선택 → 최종 BVH → FBX
 
 > 현재 제품 흐름: 사용자 선택 → 선택적 `/refine` → **BFF가 최종 BVH 바이트 확정** → 내부
-> Converter API → V3.2 retarget FBX → BFF 저장·다운로드 → CSP 소재 배치.
+> Converter bundle API → V3.2 retarget FBX → BFF가 최종 BVH와 FBX를 함께 저장·다운로드 →
+> CSP 소재 배치.
 >
 > `POST /export-order`는 DB의 base `bvh_url`만 채우는 legacy 원본 주문서다. refined artifact나
 > 최종 FBX를 복원하지 못하므로 Phase 3 제품 export의 단일 소스로 사용하지 않는다.
@@ -14,7 +15,8 @@
 - `/analyze` = "Top5 **보여주기**"(인물별 후보 리스트). → `CutResult`
 - `/refine` = 고른 후보 하나의 조정본 inline `bvh` 또는 정상 base fallback. → `RefineResponse`
 - `/export-order` = base 선택만 표현하는 legacy 주문서. → `ExportOrder`
-- `/convert` = BFF가 확정한 최종 BVH 바이트를 V3.2 FBX로 변환하는 내부 계약.
+- `/convert-bundle` = 최종 BVH 원문과 그 바이트로 만든 V3.2 FBX를 무결성 manifest와 함께 반환.
+- `/convert` = 하위 호환용 FBX 단일 응답.
 
 FastAPI inference가 DB에서 legacy 주문서의 `bvh_url·set_id·tags`를 채운다. 최종 base/refined
 선택과 artifact 영속화는 BFF가 소유한다.
@@ -156,10 +158,12 @@ else:
 ```
 
 `RefineResponse.bvh_url`은 항상 베이스이므로 `refined=true`에서 사용하면 안 된다. BFF는 선택한
-바이트의 SHA256을 lineage에 기록하고 인물별로 내부 `POST /convert`를 한 번 호출한다.
+바이트의 SHA256을 lineage에 기록하고 인물별로 내부 `POST /convert-bundle`을 한 번 호출한다.
 
 ```text
 multipart bvh           = final_bvh_bytes
+artifact_kind           = base | refined (위 분기 결과를 명시)
+expected_bvh_sha256     = sha256(final_bvh_bytes)
 character_id            = standin-master-v2 등 registry ID
 frame                   = 0
 mirror                  = false 또는 사용자의 명시값
@@ -167,17 +171,31 @@ output_mode             = rigged_rest
 apply_root_translation  = false
 ```
 
-성공 시 BFF는 다음을 검증하고 FBX를 자기 저장소에 publish한다.
+성공 응답은 `application/zip`이며 고정된 세 엔트리만 가진다.
 
 ```text
-X-Standin-Source-BVH-SHA256 == sha256(final_bvh_bytes)
-X-Standin-Artifact-SHA256   == sha256(response body)
-X-Standin-Solver-Version    == chain-transport-v3.2
+final.bvh
+final.fbx
+manifest.json
+```
+
+BFF는 ZIP을 publish하기 전에 다음을 모두 검증하고, 통과한 `final.bvh`와 `final.fbx`를 같은 Job의
+최종 산출물로 저장한다.
+
+```text
+X-Standin-Artifact-SHA256          == sha256(response ZIP bytes)
+X-Standin-Bundle-SHA256            == sha256(response ZIP bytes)
+X-Standin-Source-BVH-SHA256        == sha256(final_bvh_bytes)
+X-Standin-FBX-Artifact-SHA256      == sha256(final.fbx)
+manifest.artifacts.bvh.sha256      == sha256(final.bvh)
+manifest.artifacts.fbx.sha256      == sha256(final.fbx)
+manifest.artifact_kind             == BFF가 선택한 artifact_kind
+X-Standin-Solver-Version           == chain-transport-v3.2
 ```
 
 mirror는 Converter가 한 번만 적용한다. CSP는 같은 좌우 반전을 다시 하지 않고 소재 등록·배치와
-다인 상대 위치 조정을 담당한다. 다인 컷은 item 수만큼 독립 Converter 요청과 독립 FBX가 생긴다.
-`set_id`는 묶음 메타일 뿐 하나의 다인 BVH/FBX가 아니다.
+다인 상대 위치 조정을 담당한다. 다인 컷은 item 수만큼 독립 Converter 요청과 독립
+`BVH + FBX` 쌍이 생긴다. `set_id`는 묶음 메타일 뿐 하나의 다인 BVH/FBX가 아니다.
 
 상세 BFF 구현·lineage·오류 계약은
 [`FBX_CONVERTER_V3_2_PHASE3_BFF_HANDOFF.md`](FBX_CONVERTER_V3_2_PHASE3_BFF_HANDOFF.md)를 따른다.
@@ -188,4 +206,4 @@ mirror는 Converter가 한 번만 적용한다. CSP는 같은 좌우 반전을 �
 
 - legacy `/export-order`: `api/models.py`의 `ExportOrderRequest` / `ExportOrder` / `ExportItem`
 - inference/refine → converter Phase 3: `FBX_CONVERTER_V3_2_PHASE3_BFF_HANDOFF.md`
-- 내부 `/convert`: `converter_api/app.py`와 converter OpenAPI `/docs`
+- 내부 `/convert-bundle` 및 호환 `/convert`: `converter_api/app.py`와 converter OpenAPI `/docs`

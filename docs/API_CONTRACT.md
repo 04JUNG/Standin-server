@@ -305,8 +305,8 @@ Content-Type: multipart/form-data
 
 BFF base 핸드오프. 선택된 후보의 BVH 파일을 **가공 없이** 반환한다. refine 성공 시 최종 BVH는
 이 URL이 아니라 `RefineResponse.bvh` inline 본문이다. BFF가 최종 바이트를 확정한 뒤 내부 Converter
-API가 V3.2 retarget과 요청된 mirror를 한 번 적용한다. CSP는 같은 mirror를 반복하지 않고 소재
-등록·배치와 다인 상대 위치 조정을 담당한다.
+bundle API가 V3.2 retarget과 요청된 mirror를 한 번 적용하고, 입력 최종 BVH와 생성 FBX를 함께
+반환한다. CSP는 같은 mirror를 반복하지 않고 소재 등록·배치와 다인 상대 위치 조정을 담당한다.
 
 | 상태 | 조건 | 본문 |
 |---|---|---|
@@ -333,7 +333,7 @@ API가 V3.2 retarget과 요청된 mirror를 한 번 적용한다. CSP는 같은 
 **`POST /export-order`** — 작가가 고른 base 포즈의 legacy 주문서(`ExportOrder`). 상세 계약·예시는
 **`docs/EXPORT_CONTRACT.md`** 참조. DB에서 base `bvh_url`·`set_id`·`tags`를 채우지만 inline refined
 artifact는 알지 못한다. 따라서 Phase 3 제품 export는 BFF가 final base/refined bytes를 먼저 확정한 뒤
-별도 내부 `POST /convert`를 호출한다.
+별도 내부 `POST /convert-bundle`을 호출한다. FBX 단일 응답인 `/convert`는 하위 호환용이다.
 
 ---
 
@@ -400,7 +400,8 @@ Retry-After: 30
 5. **후보 개수·신뢰도 라벨** — `top_k_final=5` 기본이나 폴백 시 후보가 적거나 없을 수 있다(`route:"skip"`은 빈 배열). `matchLevel` 라벨 산출에 서버의 `count_confidence`/폴백 신호를 넘길지.
 6. **BVH 전달 방식** — ✅ 확정: base는 `/pose/{id}/bvh` 응답 바이트, refined는
    `RefineResponse.bvh` inline UTF-8 바이트다. BFF가 둘 중 하나를 확정해 내부 Converter API로
-   multipart 업로드한다(`FBX_CONVERTER_V3_2_PHASE3_BFF_HANDOFF.md`).
+   multipart 업로드하고, 제품 export에서는 최종 BVH와 생성 FBX가 든 검증 가능한 bundle을 받는다
+   (`FBX_CONVERTER_V3_2_PHASE3_BFF_HANDOFF.md`).
 7. **인증 헤더 전파** — 앱 서버가 이 서버를 호출할 때 내부 인증(서비스 토큰/네트워크 격리)을 둘지. 현재 무인증이라 **공개 노출 금지**(내부망/로컬 전제).
 
 ---

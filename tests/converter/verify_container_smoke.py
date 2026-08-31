@@ -5,9 +5,11 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import io
 import json
 from pathlib import Path
 import uuid
+import zipfile
 
 
 def _args() -> argparse.Namespace:
@@ -16,6 +18,8 @@ def _args() -> argparse.Namespace:
     parser.add_argument("--headers", type=Path, required=True)
     parser.add_argument("--bvh", type=Path, required=True)
     parser.add_argument("--fbx", type=Path, required=True)
+    parser.add_argument("--bundle-headers", type=Path, required=True)
+    parser.add_argument("--bundle", type=Path, required=True)
     return parser.parse_args()
 
 
@@ -57,7 +61,41 @@ def main() -> int:
     assert int(headers["x-standin-warning-count"]) >= 0
     uuid.UUID(headers["x-standin-conversion-id"])
     assert int(headers["content-length"]) == len(artifact)
-    print("[PASS] converter container health and real HTTP conversion smoke")
+
+    bundle_headers = _headers(args.bundle_headers)
+    bundle_bytes = args.bundle.read_bytes()
+    assert bundle_headers["content-type"].startswith("application/zip")
+    assert bundle_headers["x-standin-artifact-kind"] == "base"
+    assert bundle_headers["x-standin-artifact-sha256"] == hashlib.sha256(
+        bundle_bytes
+    ).hexdigest()
+    assert bundle_headers["x-standin-bundle-sha256"] == bundle_headers[
+        "x-standin-artifact-sha256"
+    ]
+    with zipfile.ZipFile(io.BytesIO(bundle_bytes)) as bundle:
+        assert bundle.namelist() == ["final.bvh", "final.fbx", "manifest.json"]
+        bundled_bvh = bundle.read("final.bvh")
+        bundled_fbx = bundle.read("final.fbx")
+        manifest = json.loads(bundle.read("manifest.json"))
+    assert bundled_bvh == bvh
+    assert len(bundled_fbx) > 1_000
+    assert bundled_fbx.startswith(b"Kaydara FBX Binary")
+    assert manifest["artifact_kind"] == "base"
+    assert manifest["artifacts"]["bvh"]["sha256"] == hashlib.sha256(
+        bundled_bvh
+    ).hexdigest()
+    assert manifest["artifacts"]["fbx"]["sha256"] == hashlib.sha256(
+        bundled_fbx
+    ).hexdigest()
+    assert bundle_headers["x-standin-source-bvh-sha256"] == manifest[
+        "artifacts"
+    ]["bvh"]["sha256"]
+    assert bundle_headers["x-standin-fbx-artifact-sha256"] == manifest[
+        "artifacts"
+    ]["fbx"]["sha256"]
+    uuid.UUID(bundle_headers["x-standin-conversion-id"])
+    assert int(bundle_headers["content-length"]) == len(bundle_bytes)
+    print("[PASS] converter container FBX and BVH+FBX bundle HTTP smoke")
     return 0
 
 

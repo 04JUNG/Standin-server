@@ -60,7 +60,7 @@ import하지 않으며, 변환 1건마다 Blender 5.2 child process를 새로 �
 export STANDIN_MASTER_V2_URI=/absolute/read-only/standin-master-v2.fbx
 export BLENDER_BINARY=/absolute/path/to/blender
 uvicorn converter_api.app:app --port 8001
-# GET /healthz · GET /characters · POST /convert
+# GET /healthz · GET /characters · POST /convert · POST /convert-bundle
 ```
 
 Linux 운영 이미지는 Blender 5.2.0 공식 x64 archive와 checksum을 고정하며 추론 이미지와 별도로
@@ -75,14 +75,17 @@ docker run --rm --platform linux/amd64 --publish 8001:8001 \
   standin-converter:local
 ```
 
-`POST /convert`는 BFF 내부망 전용 multipart API이며 `bvh` 업로드와 registry의
-`character_id`만 받는다. 사용자 URL이나 서버 파일 경로는 받지 않는다. 동결 solver와 통합 정본은
+`POST /convert-bundle`은 제품용 BFF 내부망 multipart API다. 최종 `bvh` 업로드,
+`artifact_kind=base|refined`, BFF가 계산한 `expected_bvh_sha256`, registry의 `character_id`를 받아
+`final.bvh`, `final.fbx`, `manifest.json`이 든 ZIP을 원자적으로 반환한다. 기존 FBX 단일 응답이 필요한 소비자를 위해
+`POST /convert`도 유지한다. 두 API 모두 사용자 URL이나 서버 파일 경로는 받지 않는다. 동결 solver와 통합 정본은
 [`docs/FBX_CONVERTER_V3_2_INTEGRATION_HANDOFF.md`](docs/FBX_CONVERTER_V3_2_INTEGRATION_HANDOFF.md)를
 따른다.
 
 BFF는 `refined=true`면 `/refine` 응답의 inline `bvh`, 아니면 base `bvh_url` 응답 바이트를
-최종 입력으로 선택한다. Converter 성공 응답의 `X-Standin-Source-BVH-SHA256`을 BFF가 계산한
-최종 BVH SHA와 대조한다. mirror는 `/convert`에서 한 번만 적용한다. Phase 3 상세는
+최종 입력으로 선택한다. `/convert-bundle` 성공 응답을 받으면 ZIP·내부 BVH·내부 FBX의 SHA를
+응답 헤더와 `manifest.json`에 각각 대조한 뒤 두 파일을 함께 publish한다. mirror는 Converter에서
+한 번만 적용한다. Phase 3 상세는
 [`docs/FBX_CONVERTER_V3_2_PHASE3_BFF_HANDOFF.md`](docs/FBX_CONVERTER_V3_2_PHASE3_BFF_HANDOFF.md)를
 따른다.
 
