@@ -80,7 +80,8 @@ fixture, FBX/BVH/PNG, `outputs/`, `logs/`, `manifests/`는 이관하지 않는�
 ## 2. 제품 파이프라인에서 V3.2의 위치
 
 V3.2는 검색이나 refine solver가 아니다. 사용자가 고른 최종 BVH를 캐릭터 FBX에 입혀
-최종 FBX를 만드는 출력단 retarget solver다.
+최종 FBX를 만드는 출력단 retarget solver다. 제품 응답은 변환 입력이었던 최종 BVH도 함께
+보존해 `BVH + FBX` 쌍으로 제공한다.
 
 ```text
 콘티 이미지
@@ -107,7 +108,7 @@ Blender 5.2 background worker
   ├─ output mode 적용
   └─ FBX export
   ↓
-BFF 저장·다운로드 응답
+BFF가 최종 BVH + FBX를 같은 Job에 저장·다운로드 응답
   ↓
 CSP/사용자
 ```
@@ -169,7 +170,7 @@ Standin-server/
 │  └─ worker.py                      # Blender --python 진입점
 ├─ converter_api/
 │  ├─ __init__.py
-│  ├─ app.py                         # /convert, /characters, /healthz
+│  ├─ app.py                         # /convert-bundle, /convert, /characters, /healthz
 │  ├─ schemas.py
 │  ├─ registry.py                    # character_id → immutable metadata
 │  └─ runner.py                      # subprocess·timeout·tempdir·검증
@@ -210,11 +211,11 @@ else:
 - BFF는 선택·refine 응답과 최종 BVH의 SHA256을 같은 Job lineage에 기록해야 한다.
 - 다인 컷은 인물마다 1개 BVH를 독립 변환한다. `set_id`는 묶음 메타일 뿐 하나의 다인 BVH가 아니다.
 
-## 6. Converter 내부 API v1 계약
+## 6. Converter 내부 API v1.1 계약
 
 외부 공개 API가 아니라 BFF가 내부망에서 호출하는 계약이다.
 
-### 6.1 `POST /convert`
+### 6.1 `POST /convert` — FBX 단일 응답 호환 계약
 
 요청은 `multipart/form-data`로 고정한다.
 
@@ -263,12 +264,36 @@ X-Standin-Warning-Count: <count>
 클라이언트가 임의 URL이나 서버 파일 경로를 넘기게 하지 않는다. BVH는 업로드 바이트,
 캐릭터는 registry ID만 받는다. SSRF와 path traversal을 동시에 차단한다.
 
-### 6.2 `GET /characters`
+### 6.2 `POST /convert-bundle` — 제품용 BVH + FBX 계약
+
+요청 옵션은 `/convert`와 같고 `artifact_kind=base|refined` 및 BFF가 최종 BVH에서 계산한
+`expected_bvh_sha256`을 필수로 추가한다. API는 업로드 직후 해시를 대조해 불일치 시 Blender를
+실행하지 않고 409로 실패한다. 성공 응답은 `application/zip`이며 아래 고정 이름의 regular file
+세 개만 포함한다.
+
+```text
+final.bvh
+final.fbx
+manifest.json
+```
+
+- `final.bvh`는 요청 바이트와 정확히 같아야 한다. 개행·문자열 재직렬화를 하지 않는다.
+- `final.fbx`는 같은 요청 바이트를 worker에 전달해 만든 결과다.
+- `manifest.json`은 artifact kind, 변환 옵션, 두 파일의 크기·SHA256을 기록한다.
+- API는 runner 결과의 conversion id·입력 SHA·출력 SHA를 응답 직전에 독립 재검증한다.
+- ZIP 엔트리는 서버가 정한 고정 이름과 일반 파일 권한만 사용해 path traversal·symlink를 막는다.
+- ZIP 전체 SHA는 `X-Standin-Artifact-SHA256`과 `X-Standin-Bundle-SHA256`, FBX SHA는
+  `X-Standin-FBX-Artifact-SHA256`, BVH SHA는 `X-Standin-Source-BVH-SHA256`으로 반환한다.
+
+BFF는 ZIP과 내부 두 파일 및 manifest를 전부 검증한 후에만 두 산출물을 같은 Job에 publish한다.
+불일치나 변환 실패 때는 둘 다 publish하지 않는다.
+
+### 6.3 `GET /characters`
 
 사용 가능한 `character_id`, 표시 이름, rig profile, revision만 반환한다. 실제 로컬 경로·S3 URI는
 노출하지 않는다.
 
-### 6.3 `GET /healthz`
+### 6.4 `GET /healthz`
 
 다음을 확인한다.
 
@@ -424,10 +449,10 @@ HTTP 없이 worker부터 완성한다.
 
 - `converter_api/schemas.py`
 - character registry
-- `/healthz`, `/characters`, `/convert`
+- `/healthz`, `/characters`, `/convert`, `/convert-bundle`
 - 업로드 크기·확장자·내용 최소 검증
 - 변환 1건당 child process 1회
-- 성공 FBX streaming
+- 성공 FBX streaming 및 원자적 BVH+FBX bundle streaming
 - 구조화 report logging
 - 오류 봉투와 cleanup 테스트
 
@@ -513,7 +538,7 @@ converter 이미지 검사는 반대로 고정 Blender 버전과 worker 실행 �
 
 - BFF가 최종 base/refined BVH를 확정하는 규칙
 - 내부 Converter API 호출
-- 최종 FBX 다운로드 경로와 오류 처리
+- 최종 BVH·FBX 동시 다운로드 경로와 오류 처리
 - mirror 소유자 단일화
 - converter가 담당하는 rest/chain retarget과 CSP가 담당하는 소재 배치의 경계
 
@@ -551,8 +576,8 @@ docs(export): document BVH to FBX handoff
 
 다음이 모두 충족돼야 “전체 파이프라인 통합 완료”다.
 
-- 사용자 선택 base BVH가 최종 FBX로 다운로드됨
-- refine 성공 시 `RefineResponse.bvh`가 최종 FBX에 실제 반영됨
+- 사용자 선택 base BVH와 그 BVH로 만든 FBX가 한 쌍으로 다운로드됨
+- refine 성공 시 `RefineResponse.bvh` 원문과 이를 실제 반영한 FBX가 한 쌍으로 다운로드됨
 - refine 거부 시 base BVH가 정확히 사용됨
 - V3.2·V3.1 ankle policy·character·Blender lineage가 report에 남음
 - 추론 서비스는 Blender와 독립적으로 기존 배포·테스트를 유지함

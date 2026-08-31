@@ -77,6 +77,15 @@ def test_converter_deploy_is_gated_and_path_filtered():
     assert "container-name: inference" not in workflow
 
 
+def test_converter_ci_smokes_dual_artifact_bundle_endpoint():
+    workflow = (ROOT / ".github/workflows/converter-ci.yml").read_text()
+    assert "http://127.0.0.1:8001/convert-bundle" in workflow
+    assert "--form artifact_kind=base" in workflow
+    assert '--form "expected_bvh_sha256=$FINAL_BVH_SHA256"' in workflow
+    assert '--bundle "$ARTIFACT_ROOT/http-smoke.zip"' in workflow
+    assert '--bundle-headers "$ARTIFACT_ROOT/bundle-response.headers"' in workflow
+
+
 def test_converter_image_defines_runtime_healthcheck_and_json_logs():
     dockerfile = (ROOT / "Dockerfile.converter").read_text()
     assert "HEALTHCHECK --interval=30s" in dockerfile

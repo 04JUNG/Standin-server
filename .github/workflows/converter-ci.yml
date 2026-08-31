@@ -237,11 +237,26 @@ jobs:
             --form output_mode=rigged_rest \
             --form apply_root_translation=false \
             http://127.0.0.1:8001/convert
+          FINAL_BVH_SHA256="$(sha256sum "$ARTIFACT_ROOT/assets/pose_raise.bvh" | cut -d' ' -f1)"
+          curl --fail --silent --show-error \
+            --dump-header "$ARTIFACT_ROOT/bundle-response.headers" \
+            --output "$ARTIFACT_ROOT/http-smoke.zip" \
+            --form "bvh=@$ARTIFACT_ROOT/assets/pose_raise.bvh;type=application/octet-stream;filename=pose_raise.bvh" \
+            --form artifact_kind=base \
+            --form "expected_bvh_sha256=$FINAL_BVH_SHA256" \
+            --form character_id=standin-master-v2 \
+            --form frame=0 \
+            --form mirror=false \
+            --form output_mode=rigged_rest \
+            --form apply_root_translation=false \
+            http://127.0.0.1:8001/convert-bundle
           python tests/converter/verify_container_smoke.py \
             --health "$ARTIFACT_ROOT/health.json" \
             --headers "$ARTIFACT_ROOT/response.headers" \
             --bvh "$ARTIFACT_ROOT/assets/pose_raise.bvh" \
-            --fbx "$ARTIFACT_ROOT/http-smoke.fbx"
+            --fbx "$ARTIFACT_ROOT/http-smoke.fbx" \
+            --bundle-headers "$ARTIFACT_ROOT/bundle-response.headers" \
+            --bundle "$ARTIFACT_ROOT/http-smoke.zip"
           docker exec "$CONTAINER_NAME" \
             python -c "import importlib.util,sys; sys.exit(0 if importlib.util.find_spec('bpy') is None else 1)"
           docker exec "$CONTAINER_NAME" \

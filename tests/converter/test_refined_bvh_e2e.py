@@ -9,10 +9,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import hashlib
+import io
 import json
 import logging
 import os
 from pathlib import Path
+import zipfile
 
 from fastapi.testclient import TestClient
 import pytest
@@ -156,6 +158,18 @@ def _convert(client: TestClient, final: FinalBvh, *, mirror: bool = False):
     )
 
 
+def _convert_bundle(client: TestClient, final: FinalBvh, *, mirror: bool = False):
+    return client.post(
+        "/convert-bundle",
+        files={"bvh": ("final.bvh", final.data, "application/octet-stream")},
+        data={
+            "artifact_kind": final.artifact_kind,
+            "expected_bvh_sha256": final.sha256,
+            "mirror": str(mirror).lower(),
+        },
+    )
+
+
 def _complete_log(caplog, conversion_id: str) -> dict:
     payloads = []
     for record in caplog.records:
@@ -203,6 +217,27 @@ def test_base_bvh_url_reaches_converter_with_exact_lineage(
     _assert_lineage(response, final, caplog)
 
 
+def test_base_bundle_preserves_exact_fallback_bvh(monkeypatch, tmp_path):
+    inference = _inference_client(monkeypatch, tmp_path, {"base": BASE_BVH})
+    runner = LineageRunner()
+    converter = _converter_client(tmp_path, runner)
+    final = _select_final_bvh(
+        inference_client=inference,
+        base_bvh_url="/pose/base/bvh",
+        refine_response={"refined": False, "bvh": None},
+    )
+
+    response = _convert_bundle(converter, final)
+
+    assert response.status_code == 200
+    assert response.headers["x-standin-artifact-kind"] == "base"
+    with zipfile.ZipFile(io.BytesIO(response.content)) as bundle:
+        assert bundle.read("final.bvh") == BASE_BVH
+        manifest = json.loads(bundle.read("manifest.json"))
+    assert manifest["artifact_kind"] == "base"
+    assert manifest["artifacts"]["bvh"]["sha256"] == final.sha256
+
+
 def test_refined_true_uses_inline_bvh_without_fetching_base(
     monkeypatch, tmp_path, caplog,
 ):
@@ -221,6 +256,45 @@ def test_refined_true_uses_inline_bvh_without_fetching_base(
     assert final.artifact_kind == "refined"
     assert runner.calls[0]["bvh_bytes"] == REFINED_BVH_TEXT.encode("utf-8")
     _assert_lineage(response, final, caplog)
+
+
+def test_refined_bundle_preserves_exact_inline_bvh_and_matching_fbx(
+    monkeypatch, tmp_path, caplog,
+):
+    inference = _inference_client(monkeypatch, tmp_path, {})
+    runner = LineageRunner()
+    converter = _converter_client(tmp_path, runner)
+    final = _select_final_bvh(
+        inference_client=inference,
+        base_bvh_url="/pose/must-not-be-fetched/bvh",
+        refine_response={"refined": True, "bvh": REFINED_BVH_TEXT},
+    )
+
+    with caplog.at_level(logging.INFO, logger="standin.converter"):
+        response = _convert_bundle(converter, final)
+
+    assert response.status_code == 200
+    assert response.headers["x-standin-artifact-kind"] == "refined"
+    assert response.headers["x-standin-source-bvh-sha256"] == final.sha256
+    assert response.headers["x-standin-artifact-sha256"] == hashlib.sha256(
+        response.content
+    ).hexdigest()
+    with zipfile.ZipFile(io.BytesIO(response.content)) as bundle:
+        bundled_bvh = bundle.read("final.bvh")
+        bundled_fbx = bundle.read("final.fbx")
+        manifest = json.loads(bundle.read("manifest.json"))
+
+    assert bundled_bvh == REFINED_BVH_TEXT.encode("utf-8")
+    assert runner.calls[0]["bvh_bytes"] == bundled_bvh
+    assert bundled_fbx == f"FBX:{final.sha256}:mirror=0".encode("ascii")
+    assert manifest["artifact_kind"] == "refined"
+    assert manifest["artifacts"]["bvh"]["sha256"] == final.sha256
+    assert manifest["artifacts"]["fbx"]["sha256"] == hashlib.sha256(
+        bundled_fbx
+    ).hexdigest()
+    assert response.headers["x-standin-fbx-artifact-sha256"] == manifest[
+        "artifacts"
+    ]["fbx"]["sha256"]
 
 
 def test_refined_false_falls_back_to_exact_base_bvh(
