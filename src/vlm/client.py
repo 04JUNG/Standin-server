@@ -10,13 +10,19 @@ VLM 클라이언트 추상화.
 """
 from __future__ import annotations
 
+import base64
+import io
 import json
+import math
 import re
 from typing import Optional
 
 from ..schema import VLMAnalysis, BBox, Shot, Action, View, Relationship
 from ..config import CFG
 from . import prompts
+
+
+_MAX_VLM_PEOPLE = 20
 
 
 def _coerce(analysis: dict, img_w: int, img_h: int) -> VLMAnalysis:
@@ -27,19 +33,42 @@ def _coerce(analysis: dict, img_w: int, img_h: int) -> VLMAnalysis:
         except Exception:
             return default
 
+    raw_boxes = analysis.get("approx_boxes", []) or []
+    if not isinstance(raw_boxes, list):
+        raw_boxes = []
+    try:
+        num = int(analysis.get("num_people", len(raw_boxes)) or 0)
+    except (TypeError, ValueError, OverflowError):
+        num = len(raw_boxes)
+    num = max(0, min(num, _MAX_VLM_PEOPLE))
+
     boxes = []
-    for b in analysis.get("approx_boxes", []) or []:
+    # Keep a placeholder for a malformed box: per-person visibility arrays use
+    # the same model-provided order and must not shift to a different person.
+    for b in raw_boxes[:_MAX_VLM_PEOPLE]:
         try:
             # 0~1 정규화 좌표를 픽셀로 환산(대략)
+            coordinates = [float(b[key]) for key in ("x1", "y1", "x2", "y2")]
+            if not all(math.isfinite(value) for value in coordinates):
+                raise ValueError("non-finite VLM box")
             boxes.append(BBox(
-                x1=float(b["x1"]) * img_w, y1=float(b["y1"]) * img_h,
-                x2=float(b["x2"]) * img_w, y2=float(b["y2"]) * img_h,
+                x1=coordinates[0] * img_w, y1=coordinates[1] * img_h,
+                x2=coordinates[2] * img_w, y2=coordinates[3] * img_h,
                 source="vlm", score=0.5,
             ))
-        except Exception:
-            continue
+        except (KeyError, TypeError, ValueError, OverflowError):
+            boxes.append(None)
 
-    num = int(analysis.get("num_people", len(boxes)) or 0)
+    raw_lower = analysis.get("lower_body_visible")
+    if isinstance(raw_lower, list) and len(raw_lower) == num:
+        lower_body_visible = [value is True for value in raw_lower]
+        lower_body_visibility_known = [
+            isinstance(value, bool) for value in raw_lower
+        ]
+    else:
+        # refine은 fail-closed로 동결하되, 검색은 누락을 '반신'으로 해석하지 않는다.
+        lower_body_visible = [False] * max(num, 0)
+        lower_body_visibility_known = [False] * max(num, 0)
     return VLMAnalysis(
         num_people=num,
         shot=pick(Shot, analysis.get("shot"), Shot.FULL_HALF),
@@ -50,6 +79,8 @@ def _coerce(analysis: dict, img_w: int, img_h: int) -> VLMAnalysis:
         approx_boxes=boxes,
         dialogue=analysis.get("dialogue"),
         raw=analysis,
+        lower_body_visible=lower_body_visible,
+        lower_body_visibility_known=lower_body_visibility_known,
     )
 
 
@@ -111,8 +142,20 @@ class MockVLMClient(BaseVLMClient):
                 BBox(0.05*img_w, 0.1*img_h, 0.5*img_w, 0.95*img_h, "vlm", 0.5),
                 BBox(0.5*img_w, 0.1*img_h, 0.95*img_w, 0.95*img_h, "vlm", 0.5),
             ]
-        return VLMAnalysis(num, shot, action, view, rel, boxes,
-                           dialogue=None, raw={"mock": True, "hint": hint})
+        lower_hidden = any(token in hint for token in (
+            "half_body", "half-body", "lower_hidden", "반신", "하체 비관측",
+        ))
+        return VLMAnalysis(
+            num, shot, action, view, rel, boxes,
+            dialogue=None,
+            raw={
+                "mock": True,
+                "hint": hint,
+                "lower_body_visible": [not lower_hidden] * num,
+            },
+            lower_body_visible=[not lower_hidden] * num,
+            lower_body_visibility_known=[True] * num,
+        )
 
 
 class GeminiVLMClient(BaseVLMClient):
@@ -156,7 +199,30 @@ class OpenAIVLMClient(BaseVLMClient):
         self._client = OpenAI()
         self._model = model or CFG.openai_model
 
-    def analyze(self, image_data_url: str, img_w: int, img_h: int) -> VLMAnalysis:
+    @staticmethod
+    def _to_data_url(image) -> str:
+        """PIL/path/bytes input -> base64 PNG data URL accepted by vision APIs."""
+        if isinstance(image, str) and image.startswith("data:image/"):
+            return image
+        from PIL import Image
+
+        if isinstance(image, (bytes, bytearray, memoryview)):
+            source = Image.open(io.BytesIO(bytes(image)))
+        elif isinstance(image, str):
+            source = Image.open(image)
+        else:
+            source = image
+        buffer = io.BytesIO()
+        try:
+            source.convert("RGB").save(buffer, format="PNG")
+        finally:
+            if source is not image and hasattr(source, "close"):
+                source.close()
+        encoded = base64.b64encode(buffer.getvalue()).decode("ascii")
+        return f"data:image/png;base64,{encoded}"
+
+    def analyze(self, image, img_w: int, img_h: int) -> VLMAnalysis:
+        image_data_url = self._to_data_url(image)
         resp = self._client.chat.completions.create(
             model=self._model,
             response_format={"type": "json_object"},

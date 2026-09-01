@@ -78,6 +78,36 @@ def deserialize_skeleton(payload: dict):
     )
 
 
+def _serialize_rescue_context(context) -> dict | None:
+    if not isinstance(context, dict):
+        return None
+    boxes = context.get("detected_bboxes")
+    return {
+        "detector_model_path": context.get("detector_model_path"),
+        "detector_input_size_wh": list(
+            context.get("detector_input_size_wh", ())
+        ),
+        "detected_bboxes": (
+            np.asarray(boxes, dtype=np.float32).tolist()
+            if boxes is not None else None
+        ),
+    }
+
+
+def _deserialize_rescue_context(payload) -> dict | None:
+    if not isinstance(payload, dict):
+        return None
+    return {
+        "detector_model_path": payload.get("detector_model_path"),
+        "detector_input_size_wh": tuple(
+            payload.get("detector_input_size_wh", ())
+        ),
+        "detected_bboxes": np.asarray(
+            payload.get("detected_bboxes", []), dtype=np.float32
+        ).reshape(-1, 4),
+    }
+
+
 def _box_payload(box) -> dict | None:
     if box is None:
         return None
@@ -156,6 +186,23 @@ class RecordingPose:
         })
         return outputs
 
+    def estimate_with_rescue_context(self, image, boxes, img_w: int, img_h: int):
+        method = getattr(self.delegate, "estimate_with_rescue_context", None)
+        if callable(method):
+            outputs, context = method(image, boxes, img_w, img_h)
+        else:
+            outputs = self.delegate.estimate(image, boxes, img_w, img_h)
+            context = None
+        self.calls.append({
+            "operation": "full",
+            "boxes": [_box_payload(box) for box in boxes] if boxes is not None else None,
+            "img_w": int(img_w),
+            "img_h": int(img_h),
+            "outputs": [serialize_skeleton(item) for item in outputs],
+            "rescue_context": _serialize_rescue_context(context),
+        })
+        return outputs, context
+
     def estimate_crop_candidates(self, image, box, img_w: int, img_h: int):
         outputs = self.delegate.estimate_crop_candidates(image, box, img_w, img_h)
         self._record("crop_candidates", box, img_w, img_h, outputs)
@@ -167,12 +214,41 @@ class RecordingPose:
         self._record("crop_single", box, img_w, img_h, outputs)
         return output
 
+    def rescue_candidates(self, image, img_w: int, img_h: int):
+        outputs = self.delegate.rescue_candidates(image, img_w, img_h)
+        self._record("rescue_full", None, img_w, img_h, outputs)
+        return outputs
+
+    def rescue_candidates_with_context(
+        self, image, img_w: int, img_h: int, context,
+    ):
+        method = getattr(self.delegate, "rescue_candidates_with_context", None)
+        if context is not None and callable(method):
+            outputs = method(image, img_w, img_h, context)
+        else:
+            outputs = self.delegate.rescue_candidates(image, img_w, img_h)
+        self._record("rescue_full", None, img_w, img_h, outputs)
+        return outputs
+
+    def fallback_kpt_threshold(self) -> float:
+        return float(self.delegate.fallback_kpt_threshold())
+
+    def rescue_stage(self) -> str:
+        return str(self.delegate.rescue_stage())
+
+    def fallback_init_ms(self) -> float:
+        return float(self.delegate.fallback_init_ms())
+
 
 class ReplayPose:
     def __init__(self, payload: dict):
         self.self_detecting = bool(payload.get("self_detecting", False))
         self.calls = list(payload.get("calls", []))
         self.cursor = 0
+        self._rescue_stage = str(payload.get("rescue_stage", "off"))
+        self._fallback_kpt_threshold = float(
+            payload.get("fallback_kpt_threshold", 0.3)
+        )
 
     def _next(self, operation: str, img_w: int, img_h: int) -> dict:
         if self.cursor >= len(self.calls):
@@ -191,6 +267,13 @@ class ReplayPose:
         record = self._next("full", img_w, img_h)
         return [deserialize_skeleton(item) for item in record.get("outputs", [])]
 
+    def estimate_with_rescue_context(self, image, boxes, img_w: int, img_h: int):
+        record = self._next("full", img_w, img_h)
+        outputs = [
+            deserialize_skeleton(item) for item in record.get("outputs", [])
+        ]
+        return outputs, _deserialize_rescue_context(record.get("rescue_context"))
+
     def estimate_crop_candidates(self, image, box, img_w: int, img_h: int):
         record = self._next("crop_candidates", img_w, img_h)
         return [deserialize_skeleton(item) for item in record.get("outputs", [])]
@@ -199,6 +282,24 @@ class ReplayPose:
         record = self._next("crop_single", img_w, img_h)
         outputs = [deserialize_skeleton(item) for item in record.get("outputs", [])]
         return outputs[0] if outputs else None
+
+    def rescue_candidates(self, image, img_w: int, img_h: int):
+        record = self._next("rescue_full", img_w, img_h)
+        return [deserialize_skeleton(item) for item in record.get("outputs", [])]
+
+    def rescue_candidates_with_context(
+        self, image, img_w: int, img_h: int, context,
+    ):
+        return self.rescue_candidates(image, img_w, img_h)
+
+    def fallback_kpt_threshold(self) -> float:
+        return self._fallback_kpt_threshold
+
+    def rescue_stage(self) -> str:
+        return self._rescue_stage
+
+    def fallback_init_ms(self) -> float:
+        return 0.0
 
     @property
     def unused_calls(self) -> int:
@@ -226,6 +327,13 @@ def _package_version(name: str) -> str:
 
 
 def _pose_runtime_identity(delegate) -> dict:
+    runtime_identity = getattr(delegate, "runtime_identity", None)
+    if callable(runtime_identity):
+        identity = dict(runtime_identity())
+        identity["rtmlib"] = _package_version("rtmlib")
+        identity["onnxruntime"] = _package_version("onnxruntime")
+        identity["numpy"] = np.__version__
+        return identity
     identity = {
         "adapter": type(delegate).__name__,
         "rtmlib": _package_version("rtmlib"),
@@ -429,6 +537,8 @@ def capture_pose_fixture(
                     "schema_version": FIXTURE_SCHEMA_VERSION,
                     "image_sha256": cut["image_sha256"],
                     "self_detecting": recorder.self_detecting,
+                    "rescue_stage": recorder.rescue_stage(),
+                    "fallback_kpt_threshold": recorder.fallback_kpt_threshold(),
                     "calls": recorder.calls,
                 }
                 cache.put("pose", key, payload)

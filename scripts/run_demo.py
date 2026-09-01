@@ -14,6 +14,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.library import build_synthetic_index, save_index, load_index
 from src.config import CFG
 from src.pipeline import Pipeline
+from src.pose import MockPoseModel
+from src.vlm.client import MockVLMClient
 
 
 def _ensure_index():
@@ -43,7 +45,11 @@ def _print(title, res):
 
 def main():
     entries = _ensure_index()
-    pipe = Pipeline(entries)
+    # .env가 실 provider/backend를 가리켜도 이 스크립트의 "오프라인 mock" 계약은
+    # 변하지 않아야 한다. 팩토리를 타지 않고 mock 어댑터를 명시한다.
+    pipe = Pipeline(
+        entries, vlm_client=MockVLMClient(), pose_model=MockPoseModel()
+    )
 
     cases = [
         ("1인 전신 서기(정면)", _Img("full_half standing front 1p")),
