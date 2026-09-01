@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+from dataclasses import replace
 import hashlib
 import io
 import json
 import logging
 from pathlib import Path
 import sys
+import zipfile
 
 from fastapi.testclient import TestClient
 
@@ -58,6 +60,12 @@ class FakeRunner:
         )
 
 
+class BadIntegrityRunner(FakeRunner):
+    def convert(self, **kwargs):
+        result = super().convert(**kwargs)
+        return replace(result, source_bvh_sha256="0" * 64)
+
+
 def _registry(tmp_path: Path, *, expected_sha: str | None = None):
     artifact = tmp_path / "character.fbx"
     artifact.write_bytes(b"character")
@@ -92,6 +100,25 @@ def _post(client: TestClient, *, filename="pose.bvh", data=VALID_BVH, fields=Non
         "/convert",
         files={"bvh": (filename, data, "application/octet-stream")},
         data=fields or {},
+    )
+
+
+def _post_bundle(
+    client: TestClient,
+    *,
+    filename="pose.bvh",
+    data=VALID_BVH,
+    fields=None,
+):
+    payload = {
+        "artifact_kind": "refined",
+        "expected_bvh_sha256": hashlib.sha256(data).hexdigest(),
+    }
+    payload.update(fields or {})
+    return client.post(
+        "/convert-bundle",
+        files={"bvh": (filename, data, "application/octet-stream")},
+        data=payload,
     )
 
 
@@ -144,6 +171,99 @@ def test_convert_success_streams_fbx_and_required_headers(tmp_path):
         VALID_BVH
     ).hexdigest()
     assert runner.calls[0]["mirror"] is True
+
+
+def test_convert_bundle_returns_exact_bvh_fbx_and_manifest(tmp_path):
+    runner = FakeRunner()
+    response = _post_bundle(
+        _client(tmp_path, runner=runner),
+        fields={"mirror": "true"},
+    )
+
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "application/zip"
+    assert response.headers["content-disposition"].endswith('.zip"')
+    assert response.headers["x-standin-artifact-kind"] == "refined"
+    assert response.headers["x-standin-artifact-sha256"] == hashlib.sha256(
+        response.content
+    ).hexdigest()
+    assert response.headers["x-standin-bundle-sha256"] == response.headers[
+        "x-standin-artifact-sha256"
+    ]
+
+    with zipfile.ZipFile(io.BytesIO(response.content)) as bundle:
+        assert bundle.namelist() == ["final.bvh", "final.fbx", "manifest.json"]
+        assert bundle.read("final.bvh") == VALID_BVH
+        assert bundle.read("final.fbx") == b"FBX-result"
+        assert all(
+            "/" not in info.filename and "\\" not in info.filename
+            for info in bundle.infolist()
+        )
+        assert all(
+            (info.external_attr >> 16) & 0o170000 == 0o100000
+            for info in bundle.infolist()
+        )
+        manifest = json.loads(bundle.read("manifest.json"))
+
+    bvh_sha256 = hashlib.sha256(VALID_BVH).hexdigest()
+    fbx_sha256 = hashlib.sha256(b"FBX-result").hexdigest()
+    assert manifest["schema_version"] == 1
+    assert manifest["bundle_type"] == "standin-final-artifacts"
+    assert manifest["artifact_kind"] == "refined"
+    assert manifest["conversion_id"] == response.headers["x-standin-conversion-id"]
+    assert manifest["options"]["mirror"] is True
+    assert manifest["artifacts"]["bvh"] == {
+        "filename": "final.bvh",
+        "media_type": "application/x-bvh",
+        "size": len(VALID_BVH),
+        "sha256": bvh_sha256,
+    }
+    assert manifest["artifacts"]["fbx"] == {
+        "filename": "final.fbx",
+        "media_type": "application/octet-stream",
+        "size": len(b"FBX-result"),
+        "sha256": fbx_sha256,
+    }
+    assert response.headers["x-standin-source-bvh-sha256"] == bvh_sha256
+    assert response.headers["x-standin-fbx-artifact-sha256"] == fbx_sha256
+    assert runner.calls[0]["bvh_bytes"] == VALID_BVH
+    assert runner.calls[0]["mirror"] is True
+
+
+def test_convert_bundle_requires_explicit_valid_artifact_kind(tmp_path):
+    runner = FakeRunner()
+    client = _client(tmp_path, runner=runner)
+    missing = client.post(
+        "/convert-bundle",
+        files={"bvh": ("pose.bvh", VALID_BVH, "application/octet-stream")},
+    )
+    invalid = _post_bundle(client, fields={"artifact_kind": "unknown"})
+
+    assert missing.status_code == 400
+    assert missing.json()["error"]["code"] == "INVALID_REQUEST"
+    assert invalid.status_code == 400
+    assert invalid.json()["error"]["code"] == "INVALID_ARTIFACT_KIND"
+    assert runner.calls == []
+
+
+def test_convert_bundle_rejects_bvh_sha_mismatch_before_blender(tmp_path):
+    runner = FakeRunner()
+    response = _post_bundle(
+        _client(tmp_path, runner=runner),
+        fields={"expected_bvh_sha256": "0" * 64},
+    )
+
+    assert response.status_code == 409
+    assert response.json()["error"]["code"] == "SOURCE_BVH_SHA256_MISMATCH"
+    assert runner.calls == []
+
+
+def test_convert_fails_closed_when_runner_lineage_is_inconsistent(tmp_path):
+    response = _post(_client(tmp_path, runner=BadIntegrityRunner()))
+
+    assert response.status_code == 500
+    assert response.headers["content-type"].startswith("application/json")
+    assert response.json()["error"]["code"] == "WORKER_INTEGRITY_ERROR"
 
 
 def test_complete_log_has_cloudwatch_dimensions_and_latency(tmp_path, caplog):
@@ -243,5 +363,10 @@ def test_convert_is_503_on_character_hash_mismatch(tmp_path):
 
 def test_openapi_declares_multipart_convert_contract(tmp_path):
     payload = _client(tmp_path).get("/openapi.json").json()
+    assert payload["info"]["version"] == "1.1.0"
     request_body = payload["paths"]["/convert"]["post"]["requestBody"]
     assert "multipart/form-data" in request_body["content"]
+    bundle_body = payload["paths"]["/convert-bundle"]["post"]["requestBody"]
+    assert "multipart/form-data" in bundle_body["content"]
+    bundle_responses = payload["paths"]["/convert-bundle"]["post"]["responses"]
+    assert "application/zip" in bundle_responses["200"]["content"]

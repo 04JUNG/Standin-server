@@ -32,12 +32,16 @@ final_bvh_sha256 = sha256(final_bvh_bytes).hexdigest()
 - 조정본 문자열은 UTF-8로 인코딩한다. inference writer가 LF를 고정하므로 BFF가 개행을 다시
   직렬화하거나 정규화하지 않는다.
 
-## 2. Converter 호출과 SHA 대조
+## 2. Converter bundle 호출과 SHA 대조
 
-BFF는 최종 바이트를 확정한 뒤 내부 `POST /convert`를 multipart로 호출한다.
+BFF는 최종 바이트를 확정한 뒤 내부 `POST /convert-bundle`을 multipart로 호출한다. 기존
+`POST /convert`의 FBX 단일 응답은 하위 호환용이며, BVH와 FBX를 함께 제공하는 제품 export에는
+사용하지 않는다.
 
 ```text
 bvh                    final_bvh_bytes
+artifact_kind          위 분기에서 확정한 base | refined
+expected_bvh_sha256    final_bvh_sha256
 character_id           registry ID
 frame                   0
 mirror                  false 또는 사용자의 명시값
@@ -45,26 +49,46 @@ output_mode             rigged_rest
 apply_root_translation  false
 ```
 
-Converter는 입력 BVH SHA를 독립 계산해 worker report와 구조화 로그에 남기고 성공 응답에 다음
-헤더를 보낸다.
+Converter는 업로드 직후 `expected_bvh_sha256`을 먼저 대조한다. 불일치면 Blender를 실행하지 않고
+409 `SOURCE_BVH_SHA256_MISMATCH`로 종료한다. 일치한 입력의 BVH SHA와 출력 FBX SHA를 다시 독립
+검증한 뒤 아래 세 파일이 든 ZIP을 원자적으로 반환한다. 파일명은 고정이며 업로드 파일명을
+재사용하지 않는다.
+
+```text
+final.bvh       BFF가 보낸 최종 BVH와 byte-for-byte 동일
+final.fbx       위 BVH로 생성한 FBX
+manifest.json   artifact_kind·옵션·두 파일의 크기와 SHA256
+```
+
+성공 응답 헤더:
 
 ```text
 X-Standin-Conversion-Id
 X-Standin-Source-BVH-SHA256
-X-Standin-Artifact-SHA256
+X-Standin-FBX-Artifact-SHA256
+X-Standin-Bundle-SHA256
+X-Standin-Artifact-SHA256 (= bundle SHA256)
+X-Standin-Artifact-Kind
 X-Standin-Solver-Version
 ```
 
-BFF는 성공 응답을 publish하기 전에 다음을 검증한다.
+BFF는 성공 응답을 publish하기 전에 ZIP 엔트리가 정확히 `final.bvh`, `final.fbx`, `manifest.json`
+세 개인지 확인하고 다음을 모두 검증한다.
 
 ```text
-X-Standin-Source-BVH-SHA256 == final_bvh_sha256
-sha256(response FBX bytes)  == X-Standin-Artifact-SHA256
-X-Standin-Solver-Version    == chain-transport-v3.2
+sha256(response ZIP bytes)   == X-Standin-Artifact-SHA256
+sha256(response ZIP bytes)   == X-Standin-Bundle-SHA256
+sha256(final.bvh)            == final_bvh_sha256
+sha256(final.bvh)            == X-Standin-Source-BVH-SHA256
+sha256(final.fbx)            == X-Standin-FBX-Artifact-SHA256
+manifest의 두 SHA/크기       == 실제 두 파일
+manifest.artifact_kind       == BFF가 보낸 artifact_kind
+X-Standin-Solver-Version     == chain-transport-v3.2
 ```
 
-불일치는 lineage/integrity 오류다. 해당 FBX를 저장·배포하지 않는다. BFF 로그에는 자기 Job 식별자와
-converter의 `conversion_id`를 함께 기록해 양쪽 로그를 연결한다.
+불일치는 lineage/integrity 오류다. **BVH와 FBX 둘 다 저장·배포하지 않는다.** 검증이 모두 끝난 뒤
+같은 Job에 두 파일을 publish해야 한쪽만 보이는 부분 성공이 생기지 않는다. BFF 로그에는 자기 Job
+식별자와 converter의 `conversion_id`를 함께 기록해 양쪽 로그를 연결한다.
 
 최소 BFF lineage:
 
@@ -81,6 +105,7 @@ mirror
 conversion_id
 source_bvh_sha256
 fbx_artifact_sha256
+bundle_sha256
 solver_version
 ```
 
@@ -89,7 +114,7 @@ solver_version
 MVP에서 표준 BVH의 mirror는 Converter가 한 번만 적용한다.
 
 - 기본은 `mirror=false`다.
-- 사용자가 명시적으로 요청한 경우 BFF가 `/convert`의 `mirror=true`를 한 번 보낸다.
+- 사용자가 명시적으로 요청한 경우 BFF가 `/convert-bundle`의 `mirror=true`를 한 번 보낸다.
 - BFF는 BVH rotation을 직접 미러링하지 않는다.
 - Converter가 만든 FBX를 받는 CSP 단계는 같은 좌우 반전을 다시 적용하지 않는다.
 - CSP는 소재 등록·배치·상대 위치 조정을 소유한다.
@@ -102,8 +127,8 @@ MVP에서 표준 BVH의 mirror는 Converter가 한 번만 적용한다.
 다인 컷은 인물마다 최종 BVH 선택과 Converter 호출을 독립 수행한다.
 
 ```text
-person 0 -> final BVH 0 -> POST /convert -> FBX 0
-person 1 -> final BVH 1 -> POST /convert -> FBX 1
+person 0 -> final BVH 0 -> POST /convert-bundle -> (BVH 0 + FBX 0)
+person 1 -> final BVH 1 -> POST /convert-bundle -> (BVH 1 + FBX 1)
 ```
 
 - 두 인물의 BVH 바이트를 이어 붙이거나 하나의 Blender job에 넣지 않는다.
@@ -119,10 +144,12 @@ person 1 -> final BVH 1 -> POST /convert -> FBX 1
 | `refined=false` | 정상 베이스 선택 후 변환 |
 | `refined=true`, inline `bvh` 없음 | BFF 계약 오류, silent base fallback 금지 |
 | base BVH GET 404/409 | 다음 후보 선택 또는 원본 데이터 장애 처리 |
+| expected BVH SHA 불일치(409) | lineage 오류, Blender 미실행, bundle 미생성 |
 | converter 400/413/422 | BFF 입력·선택 계약 오류로 기록 |
-| converter 503/504/500 | FBX publish 금지, 재시도/사용자 오류 정책 적용 |
-| source BVH SHA 불일치 | integrity 오류, FBX 폐기 |
-| output FBX SHA 불일치 | integrity 오류, FBX 폐기 |
+| converter 503/504/500 | BVH·FBX publish 금지, 재시도/사용자 오류 정책 적용 |
+| ZIP 엔트리·bundle SHA 불일치 | integrity 오류, bundle 전체 폐기 |
+| source BVH SHA 불일치 | integrity 오류, bundle 전체 폐기 |
+| output FBX SHA 불일치 | integrity 오류, bundle 전체 폐기 |
 
 Converter 실패 뒤 base와 refined 사이를 임의로 바꿔 재시도하지 않는다. 입력 종류를 바꾸는 fallback은
 BFF가 사용자 결과와 lineage를 명시적으로 갱신하는 별도 결정이어야 한다.
@@ -138,5 +165,6 @@ BFF가 사용자 결과와 lineage를 명시적으로 갱신하는 별도 결정
 5. Converter 단일 mirror 전달
 6. 다인 item별 독립 변환
 7. BFF 계산 SHA = 응답 header = converter structured log = worker report
+8. refined 최종 BVH와 그 BVH로 만든 FBX가 한 bundle에 함께 들어가며 manifest SHA가 일치
 
 실제 BFF PR에서도 같은 시나리오를 공개 export URL과 영속 저장소까지 확장해 검증한다.
