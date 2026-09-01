@@ -47,6 +47,7 @@ from .skeleton_extraction import (
 _LOWER_DISTAL_JOINTS = np.asarray([13, 14, 15, 16], dtype=int)
 _ARM_LIMBS = frozenset({"left_arm", "right_arm"})
 _LEG_LIMBS = frozenset({"left_leg", "right_leg"})
+_HUMANART_RESCUE_TOP_K = 5
 
 
 @dataclass
@@ -449,10 +450,11 @@ class Pipeline:
         desc = build_slot_descriptors(vlm, [slot])[0]
         # Human-Art는 current-X의 metric 실험값을 상속하지 않는다. 검증한 계약대로
         # 보수적 관절 mask + position 검색을 독립적인 단일 query로 실행한다.
+        is_humanart_rescue = slot.skeleton_source == "fallback_full_image"
         search_metric = (
-            "pos" if slot.skeleton_source == "fallback_full_image"
-            else CFG.distance_metric.lower()
+            "pos" if is_humanart_rescue else CFG.distance_metric.lower()
         )
+        search_top_k = _HUMANART_RESCUE_TOP_K if is_humanart_rescue else None
         desc.distance_metric = search_metric
         if vlm.relationship.is_entangled:
             reason_code = "entangled_set_search_unavailable"
@@ -518,6 +520,7 @@ class Pipeline:
         candidates, confidence, reason = self._search_one(
             desc, slot.skeleton, threshold_scale=threshold_scale,
             query_valid_mask=search_mask, distance_metric=search_metric,
+            top_k=search_top_k,
         )
         threshold = CFG.fallback_threshold(
             search_metric, desc.coverage_class
@@ -576,6 +579,10 @@ class Pipeline:
 
         desc.quality_trace.update({
             "distance_metric": desc.distance_metric,
+            "search_top_k": (
+                search_top_k if search_top_k is not None else CFG.top_k_final
+            ),
+            "candidate_count": len(candidates),
             "rank_distance": desc.rank_distance,
             "confidence_threshold": desc.confidence_threshold,
             "search_stability": desc.search_stability,
@@ -652,7 +659,7 @@ class Pipeline:
     def _search_one(self, desc, skel, fallback_distance=None,
                     threshold_scale: float = 1.0,
                     query_valid_mask=None,
-                    distance_metric=None):
+                    distance_metric=None, top_k=None):
         # 슬롯 품질 검사를 거친 경로에서는 전체 평균 score를 신뢰도 대용으로 쓰지 않는다.
         if skel is None or desc.feature is None or desc.coverage_class == "insufficient":
             return [], "low", "스켈레톤 추출 실패 → 폴백(작가)"
@@ -664,6 +671,7 @@ class Pipeline:
             query_valid_mask = desc.valid_joint_mask
         cands = knn_geometric(
             self.entries, desc.feature,
+            top_k=top_k,
             query_valid_mask=query_valid_mask,
             search_index=self.search_index,
             metric=distance_metric,

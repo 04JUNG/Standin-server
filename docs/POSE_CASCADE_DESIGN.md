@@ -270,8 +270,9 @@ Human-Art full-image rescue로 넘어간다. 판정값은 `quality_trace.crop_ma
 
 Human-Art로 채택된 슬롯의 검색은 current-X metric 설정과 분리한다. 전역 `DISTANCE`가
 `angle` 또는 `hybrid`여도 `conservative_joint_mask(evidence)`를 query mask로 사용해
-벡터화 `pos` 검색을 정확히 한 번만 실행한다. base mask와의 A/B 검색이나 rescue 이후
-current-X crop은 실행하지 않으며, 반환은 항상 low-confidence·refine 금지다.
+벡터화 `pos` 검색을 정확히 한 번만 실행한다. 반환 수도 전역 `top_k_final`과 분리해
+**최대 5개 pose family**로 고정한다. base mask와의 A/B 검색이나 rescue 이후 current-X
+crop은 실행하지 않으며, 후보가 없으면 X, 후보가 있으면 항상 low-confidence·refine 금지다.
 
 > **주의.** 이 수정은 폴백과 **독립적으로 기본 경로의 crop 채택 결과를 바꾼다.**
 > 별도 커밋으로 분리하고, 19장 재실행으로 before/after와 거부 사유를 기록한 뒤 폴백을 얹는다.
