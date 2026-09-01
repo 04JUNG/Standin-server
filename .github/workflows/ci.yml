@@ -27,13 +27,42 @@ jobs:
           cache: pip
 
       - name: Install dependencies
-        run: pip install -r requirements.txt pytest
+        # mirror BVH contract tests import scipy, while production keeps scipy
+        # optional because runtime refine has a NumPy fallback.
+        run: pip install -r requirements.txt pytest "scipy>=1.11"
 
       - name: Compile Python sources
         run: python -m compileall src api scripts
 
-      - name: Run tests
-        run: python -m pytest tests/ -q
+      - name: Run pose cascade contract
+        run: python -m pytest -q tests/test_pose_cascade.py
+
+      # `data/` is intentionally absent from Git. Keep this list explicit so the
+      # clean-checkout gate cannot accidentally depend on a developer's local BVH,
+      # geometry DB, semantic build, or golden artifacts. The artifact-backed suite
+      # and its required bundle are documented in README.md and QA_SECURITY_RELEASE.md.
+      - name: Run hermetic tests
+        run: |
+          python -m pytest -q \
+            tests/test_bvh_parser_compat.py \
+            tests/test_hybrid_search.py \
+            tests/test_pose_contract.py \
+            tests/test_refine_evaluator.py \
+            tests/test_refine_evidence.py \
+            tests/test_refine_mesh.py \
+            tests/test_refine_render.py \
+            tests/test_refine_report.py \
+            tests/test_refine_three_arm.py \
+            tests/test_refine_v2.py \
+            tests/test_search_family_grouping.py \
+            tests/test_semantic_api.py \
+            tests/test_skeleton_extraction.py \
+            tests/test_smoke.py
+
+      - name: Run hermetic evaluation-harness contracts
+        run: |
+          python -m pytest -q tests/test_eval_harness.py \
+            -k "not test_mock_fixture_capture_and_replay_end_to_end and not test_fixture_capture_reuses_content_addressed_model_cache"
 
       - name: Validate production image
         run: docker build --platform linux/amd64 --tag standin-inference:ci .
