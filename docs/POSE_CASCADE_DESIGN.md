@@ -632,7 +632,7 @@ SLO 증거가 아니며, Human-Art 라이선스가 `pending`인 동안 live shad
 - [x] 실패 슬롯 3개 이상이어도 심각도 상위 **2개만** crop 재시도를 받음
 - [x] 이미 해결된 인물을 crop이 다시 검출해도 다른 실패 슬롯에 중복 배정하지 않음
 - [x] crop 후보 순서를 섞어도 명확한 owner 슬롯에만 배정
-- [ ] 재시도 순서가 VLM 박스 순서가 아니라 심각도 순 — 박스 순서를 섞어도 결과 동일(재현성)
+- [x] 재시도 순서가 VLM 박스 순서가 아니라 심각도 순 — 박스 순서를 섞어도 결과 동일(재현성)
 
 **기타**
 - [x] fixture cache가 cascade runtime identity와 rescue transcript를 구분

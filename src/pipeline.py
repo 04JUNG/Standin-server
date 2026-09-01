@@ -235,6 +235,8 @@ class Pipeline:
             needs_crop,
             key=lambda item: (
                 0 if item.skeleton is None else severity.get(item.state, 3),
+                float(item.vlm_box.x1),
+                float(item.vlm_box.y1),
                 item.slot_id,
             ),
         ):

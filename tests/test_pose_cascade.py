@@ -333,6 +333,44 @@ def test_crop_retry_budget_never_expands_past_two():
     assert pose.crop_calls == 2
 
 
+def test_crop_retry_priority_is_invariant_to_vlm_box_order():
+    left = BBox(0, 0, 100, 300, "vlm")
+    middle = BBox(100, 0, 200, 300, "vlm")
+    right = BBox(200, 0, 300, 300, "vlm")
+    left_suspect = _skeleton(left)
+    right_suspect = _skeleton(right)
+    left_suspect.scores[5] = 0.0
+    right_suspect.scores[5] = 0.0
+
+    class TrackingCrop(FakeCascadePose):
+        def __init__(self):
+            super().__init__(
+                [left_suspect, right_suspect], [], stage="off",
+            )
+            self.crop_box_xs = []
+
+        def estimate_crop_candidates(self, image, box, img_w, img_h):
+            self.crop_calls += 1
+            self.crop_box_xs.append(float(box.x1))
+            return []
+
+    def run(boxes):
+        pose = TrackingCrop()
+        result = _pipeline(boxes, pose).process_cut(_Image(), 300, 300)
+        retries_left_to_right = [
+            descriptor.quality_trace["retry_count"]
+            for descriptor in result.descriptors
+        ]
+        return pose.crop_box_xs, retries_left_to_right
+
+    forward = run([left, middle, right])
+    reversed_order = run([right, middle, left])
+
+    # middle은 missing이라 항상 1순위, 동률 suspect는 화면 좌표로 결정한다.
+    assert forward == reversed_order
+    assert forward == ([100.0, 0.0], [1, 1, 0])
+
+
 def test_crop_retry_rejects_neighbor_already_resolved_by_current_x():
     left = BBox(0, 0, 190, 300, "vlm")
     right = BBox(210, 0, 400, 300, "vlm")
