@@ -119,6 +119,7 @@ def test_humanart_rescue_uses_one_conservative_pos_search_even_if_global_metric_
     fallback.scores[9] = 0.0  # 불완전 왼팔: conservative mask가 elbow까지 제거
     pose = FakeCascadePose([], [fallback])
     original_metric = CFG.distance_metric
+    original_top_k = CFG.top_k_final
     original_knn = pipeline_module.knn_geometric
     calls = []
 
@@ -128,11 +129,13 @@ def test_humanart_rescue_uses_one_conservative_pos_search_even_if_global_metric_
 
     try:
         CFG.distance_metric = "angle"
+        CFG.top_k_final = 2
         pipeline_module.knn_geometric = recording_knn
         result = _pipeline([box], pose).process_cut(_Image(), 400, 300)
     finally:
         pipeline_module.knn_geometric = original_knn
         CFG.distance_metric = original_metric
+        CFG.top_k_final = original_top_k
 
     descriptor = result.descriptors[0]
     trace = descriptor.quality_trace
@@ -142,8 +145,29 @@ def test_humanart_rescue_uses_one_conservative_pos_search_even_if_global_metric_
     assert trace["search_scope"] == "humanart_conservative"
     assert len(calls) == 1
     assert calls[0]["metric"] == "pos"
+    assert calls[0]["top_k"] == 5
     assert not search_mask[7] and not search_mask[9]
-    assert result.person_candidates[0]
+    assert len(result.person_candidates[0]) == 5
+    assert trace["search_top_k"] == 5
+    assert trace["candidate_count"] == 5
+    assert result.person_confidence[0] == "low"
+    assert descriptor.refine_allowed is False
+
+
+def test_humanart_rescue_returns_x_when_pos_library_has_no_candidate():
+    box = BBox(0, 0, 200, 300, "vlm")
+    pose = FakeCascadePose([], [_skeleton(box)])
+    result = Pipeline(
+        [], vlm_client=FixedVLM([box]), pose_model=pose,
+    ).process_cut(_Image(), 400, 300)
+
+    descriptor = result.descriptors[0]
+    assert descriptor.skeleton_source == "fallback_full_image"
+    assert descriptor.distance_metric == "pos"
+    assert descriptor.quality_trace["search_scope"] == "humanart_conservative"
+    assert descriptor.quality_trace["search_top_k"] == 5
+    assert descriptor.quality_trace["candidate_count"] == 0
+    assert result.person_candidates[0] == []  # API의 X 계약
     assert result.person_confidence[0] == "low"
     assert descriptor.refine_allowed is False
 
