@@ -213,10 +213,11 @@ jobs:
           docker run --rm --platform linux/amd64 \
             --mount type=bind,source="$ARTIFACT_ROOT",target=/artifacts \
             --mount type=bind,source="$GITHUB_WORKSPACE/tests/converter",target=/app/tests/converter,readonly \
+            --mount type=bind,source="$GITHUB_WORKSPACE/qa/retarget/CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY",target=/qa/v32,readonly \
             "$CONVERTER_IMAGE" \
             /opt/blender/blender --background --python-exit-code 1 \
             --python /app/tests/converter/test_v32_bilateral_fallback.py -- \
-            --variant-root /app \
+            --variant-root /qa/v32 \
             --bvh /artifacts/assets/pose_raise_pelvis.bvh \
             --character /artifacts/assets/character_mixamo_foot_mismatch.fbx \
             --v31-pre-export /artifacts/v31-pre-export.json \
