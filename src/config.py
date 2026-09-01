@@ -14,6 +14,17 @@ except ImportError:
     pass
 
 
+def _env_bool(name: str, default: bool) -> bool:
+    """Parse boolean envs strictly so typos cannot silently flip safety flags."""
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    normalized = raw.strip()
+    if normalized not in {"0", "1"}:
+        raise ValueError(f"{name} must be exactly '0' or '1'")
+    return normalized == "1"
+
+
 @dataclass
 class Config:
     # --- 실행 환경 ---  "development"(기본) | "production"
@@ -59,6 +70,12 @@ class Config:
 
     # --- 검출/포즈 ---  "mock" | "rtmlib"
     pose_backend: str = os.getenv("POSE_BACKEND", "mock")
+    # 배포 단위 variant. 미설정=current-X 현행 경로이며 Human-Art는 manifest와
+    # 명시적인 canary stage가 모두 있어야만 초기화된다.
+    pose_model_variant: str = os.getenv("POSE_MODEL_VARIANT", "current-x")
+    pose_model_manifest: str = os.getenv("POSE_MODEL_MANIFEST", "")
+    pose_canary_stage: str = os.getenv("POSE_CANARY_STAGE", "off")
+    pose_strict: bool = _env_bool("POSE_STRICT", False)
 
     # --- 검색 ---
     top_n_search: int = 20     # kNN 1차 후보 수(→ rerank 입력)
@@ -109,6 +126,11 @@ class Config:
     # 실데이터로 보정: 좋은 매칭 ~0.15, 앉기-서기 ~0.36, 추출실패 ~0.6+ 관측.
     # 검색 거리: "pos"(위치L2·기본) | "angle"(뼈 방향·비율 불변) | "hybrid"
     distance_metric: str = os.getenv("DISTANCE", "pos")
+    # pos 행렬 검색의 운영 롤백 스위치. false면 동일한 거리·family 정책의
+    # 기존 scalar 경로로 복구하며 서버 재시작 외 DB 재빌드는 필요 없다.
+    position_search_vectorized: bool = _env_bool(
+        "POSITION_SEARCH_VECTORIZED", True
+    )
     hybrid_w: float = float(os.getenv("HYBRID_W", "0.7"))   # hybrid에서 각도 비중
     fallback_distance: float = float(os.getenv("FALLBACK_DISTANCE", "0.45"))
     # mask-aware 거리는 coverage마다 분모가 달라 raw distance를 서로 직접 비교할 수 없다.
@@ -153,11 +175,21 @@ class Config:
     # 공통 body 관절의 평균 거리를 박스 대각선으로 정규화해 함께 확인한다.
     slot_duplicate_keypoint_distance: float = float(os.getenv(
         "SLOT_DUPLICATE_KEYPOINT_DISTANCE", "0.08"))
+    # current-X↔Human-Art 교차 중복 제거는 별도 실측값을 사용한다. 관절 score
+    # threshold는 두 모델 모두 current-X 기준(기본 0.30)을 적용해야 동일인 검출률이 유지된다.
+    pose_fallback_duplicate_iou: float = float(os.getenv(
+        "POSE_FALLBACK_DUPLICATE_IOU", "0.50"))
+    pose_fallback_duplicate_distance: float = float(os.getenv(
+        "POSE_FALLBACK_DUPLICATE_DISTANCE", "0.10"))
     slot_owner_padding: float = float(os.getenv("SLOT_OWNER_PADDING", "0.15"))
     slot_cross_owner_max_iou: float = float(os.getenv(
         "SLOT_CROSS_OWNER_MAX_IOU", "0.50"))
     slot_provisional_max_iou: float = float(os.getenv("SLOT_PROVISIONAL_MAX_IOU", "0.20"))
+    # 실패 슬롯은 심각도 순으로 재시도하되 비정상 다인 컷에서 추론 수가 무한히
+    # 늘지 않도록 컷당 두 번으로 제한한다. max_per_cut은 기본 예산,
+    # hard_cap은 어떤 설정에서도 넘을 수 없는 절대 상한이다.
     slot_crop_max_per_cut: int = int(os.getenv("SLOT_CROP_MAX_PER_CUT", "2"))
+    slot_crop_hard_cap: int = int(os.getenv("SLOT_CROP_HARD_CAP", "2"))
     slot_crop_padding: float = float(os.getenv("SLOT_CROP_PADDING", "0.20"))
     # 음수면 family overlap만 판정하고 Top-1 angle은 진단값으로만 기록한다.
     # 고정 평가셋 보정 뒤 양수로 설정하면 두 조건을 함께 게이트한다.

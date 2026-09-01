@@ -23,7 +23,7 @@ import uuid
 from dataclasses import asdict
 from datetime import datetime, timezone
 from contextlib import asynccontextmanager
-from typing import Optional
+from typing import Annotated, Optional
 
 import numpy as np
 from fastapi import FastAPI, File, Form, Request, UploadFile, HTTPException
@@ -36,6 +36,7 @@ from src.logging_setup import (configure_logging, log_error, log_info,
 from src import notify as alerts
 from src.ops_metrics import COLLECTOR, TASK_ID
 from src.pipeline import Pipeline
+from src.pose_rescue import parse_rescue_request
 from src.library import build_synthetic_index
 from src.library_source import ensure_library
 from src.refine import (REFINE_CODE_VERSION, REFINE_V2_CODE_VERSION,
@@ -384,7 +385,18 @@ def _vlm_unavailable_response(exc: VLMUnavailable) -> HTTPException:
 
 @app.post("/analyze", response_model=CutResultOut)
 def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
+            rescue: Annotated[str, Form()] = "",
             response: Response = None):
+    try:
+        rescue_request = parse_rescue_request(rescue)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "code": "invalid_rescue_selector",
+                "message": str(exc),
+            },
+        ) from exc
     data = file.file.read()
     image, w, h = _load_image(data)
     # dev 편의: mock provider일 때만 hint를 이미지 대용으로 사용
@@ -395,7 +407,9 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
     with capture_trace() as timing:
         with span("pipeline_total"):
             try:
-                res = pipe.process_cut(image, w, h)
+                res = pipe.process_cut(
+                    image, w, h, rescue_request=rescue_request,
+                )
             except VLMUnavailable as exc:
                 raise _vlm_unavailable_response(exc) from exc
     if response is not None:

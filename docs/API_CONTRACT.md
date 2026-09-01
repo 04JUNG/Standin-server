@@ -46,7 +46,7 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
 | 메서드 | 경로 | 입력 | 출력 | 소비자 |
 |---|---|---|---|---|
 | `GET` | `/healthz` | — | `{ok, env, provider, pose_backend, pose_count}` | 앱 서버 기동 확인(비정상 시 503) |
-| `POST` | `/analyze` | multipart PNG (+`hint`) | `CutResult` | 앱 서버 → 뷰어 Top-K 표시 |
+| `POST` | `/analyze` | multipart PNG (+`hint`, `rescue`) | `CutResult` | 앱 서버 → 뷰어 Top-K 표시 |
 | `GET` | `/pose/{pose_id}/bvh` | 경로 파라미터 | `application/octet-stream` | 동원 내보내기 |
 | `POST` | `/export-order` | `ExportOrderRequest` | `ExportOrder` | base-only legacy 주문서 (→ `EXPORT_CONTRACT.md`) |
 | `GET` | `/docs` | — | OpenAPI UI | 사람(계약 확인) |
@@ -180,6 +180,7 @@ Content-Type: multipart/form-data
 |---|:---:|---|
 | `file` | ✅ | 러프 콘티 컷 이미지(PNG). `UploadFile`로 수신, PIL로 RGB 로드 |
 | `hint` | — | **mock provider 전용 dev 편의**. `VLM_PROVIDER=mock`일 때만 이미지 대용 힌트 문자열로 사용, 실모델이면 무시 |
+| `rescue` | — | `auto`/빈 값은 실패 슬롯 자동 rescue, `all`은 모든 슬롯 재검토, `0,2`는 최종 좌→우 인물 index 선택. 형식 오류는 `422 invalid_rescue_selector` |
 
 ⚠ 현재 서버는 파일 크기·MIME을 강하게 검증하지 않는다(PIL 로드 실패 시 512×768 더미로 폴백). 업로드 검증은 앞단(앱 서버/Tauri) 책임 — 보강 항목은 §8-4.
 
