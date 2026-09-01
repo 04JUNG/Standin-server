@@ -15,6 +15,7 @@ from converter.protocol import (
     JOB_SCHEMA_VERSION,
     OUTPUT_MODE,
     RETARGET_SHA256,
+    SOLVER_MANIFEST_SHA256,
 )
 from converter.worker import JobValidationError, load_job
 
@@ -39,6 +40,7 @@ def _job(tmp_path: Path) -> tuple[Path, dict]:
         "output_mode": OUTPUT_MODE,
         "apply_root_translation": APPLY_ROOT_TRANSLATION,
         "embed_textures": EMBED_TEXTURES,
+        "force_exact_v324": False,
     }
     path = tmp_path / "job.json"
     path.write_text(json.dumps(payload), encoding="utf-8")
@@ -67,6 +69,7 @@ def test_valid_job_preserves_locked_options(tmp_path):
         ("output_mode", "rigged_anim"),
         ("apply_root_translation", 0),
         ("embed_textures", 0),
+        ("force_exact_v324", 0),
     ],
 )
 def test_job_rejects_unlocked_or_wrongly_typed_options(tmp_path, field, value):
@@ -89,3 +92,8 @@ def test_frozen_protocol_hashes_match_promoted_files():
     root = Path(__file__).resolve().parents[2]
     assert hashlib.sha256((root / "converter/retarget.py").read_bytes()).hexdigest() == RETARGET_SHA256
     assert hashlib.sha256((root / "converter/ankle_policy.json").read_bytes()).hexdigest() == ANKLE_POLICY_SHA256
+    manifest = root / "converter/SHA256SUMS.v325"
+    assert hashlib.sha256(manifest.read_bytes()).hexdigest() == SOLVER_MANIFEST_SHA256
+    for line in manifest.read_text(encoding="utf-8").splitlines():
+        expected, relative = line.split("  ", 1)
+        assert hashlib.sha256((manifest.parent / relative).read_bytes()).hexdigest() == expected

@@ -37,14 +37,16 @@ output.write_bytes(artifact)
 report = {
     "ok": mode != "rejected",
     "conversion_id": job["conversion_id"],
-    "solver_version": "chain-transport-v3.2",
+    "solver_version": "chain-transport-v3.2.5",
     "character_id": job["character_id"],
     "character_sha256": job["character_sha256"],
     "source_bvh_sha256": hashlib.sha256(
         pathlib.Path(job["bvh_path"]).read_bytes()
     ).hexdigest(),
-    "retarget_sha256": "692e975d32f41e3406144763c7c0b7dbf0a586ff07732f09c4365e3233b13693",
+    "retarget_sha256": "be57c8eaf7144994a9015783e244a418d70f57b18cef01218fe850b028334cbd",
     "ankle_policy_sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+    "solver_manifest_sha256": "3693d91cc1607e787bdb7997201cd8a78b90e79740d60003c30d2a42536466ae",
+    "force_exact_v324": job["force_exact_v324"],
     "output_mode": "rigged_rest",
     "frame": 0,
     "mirrored": False,

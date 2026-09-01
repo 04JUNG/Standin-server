@@ -169,6 +169,19 @@ jobs:
             /opt/blender/blender --background --python-exit-code 1 \
             --python /app/tests/converter/test_convert.py
 
+      - name: Verify promoted V3.2.5 and V3.2.4 kill switch
+        run: |
+          docker run --rm --platform linux/amd64 \
+            --mount type=bind,source="$ARTIFACT_ROOT",target=/artifacts \
+            --mount type=bind,source="$GITHUB_WORKSPACE/tests/converter",target=/app/tests/converter,readonly \
+            "$CONVERTER_IMAGE" \
+            /opt/blender/blender --background --python-exit-code 1 \
+            --python /app/tests/converter/test_v325_runtime.py -- \
+            --bvh /artifacts/assets/pose_raise.bvh \
+            --character /artifacts/assets/character_mixamo.fbx \
+            --out-dir /artifacts/v325-runtime \
+            --json /artifacts/v325-runtime.json
+
       - name: Run V3.2 parent-coherent math controls 8/8
         run: |
           docker run --rm --platform linux/amd64 \
