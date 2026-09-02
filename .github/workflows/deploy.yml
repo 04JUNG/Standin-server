@@ -60,9 +60,16 @@ jobs:
           context: .
           platforms: linux/amd64
           push: true
+          # ⚠ `latest`는 **main에서만** 옮긴다.
+          #
+          # 저장소를 두 환경이 공유하고, 프로덕션 CDK 태스크 정의가 `:latest`를
+          # 참조한다. develop 빌드가 `latest`를 옮기면, 그 뒤 누군가 돌린
+          # `cdk deploy StandinApp`이 서비스를 CDK 리비전으로 되돌리면서
+          # **develop 코드를 프로덕션에 올린다**. SHA 태그는 항상 푸시한다 —
+          # 배포는 그쪽을 쓰고, `latest`는 "프로덕션에 있는 것"이라는 뜻만 유지한다.
           tags: |
             ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
-            ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
+            ${{ github.ref == 'refs/heads/main' && format('{0}/{1}:latest', steps.ecr.outputs.registry, env.ECR_REPOSITORY) || '' }}
           # 로그의 version 필드가 된다. 이미지에 구워야 cdk deploy가 돌아도 남는다.
           build-args: |
             DEPLOYMENT_VERSION=${{ github.sha }}
