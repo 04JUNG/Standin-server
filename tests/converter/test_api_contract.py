@@ -159,7 +159,7 @@ def test_convert_success_streams_fbx_and_required_headers(tmp_path):
     assert response.status_code == 200
     assert response.content == b"FBX-result"
     assert response.headers["content-type"] == "application/octet-stream"
-    assert response.headers["x-standin-solver-version"] == "chain-transport-v3.2"
+    assert response.headers["x-standin-solver-version"] == "chain-transport-v3.2.5"
     assert response.headers["x-standin-source-profile"] == "mixamo_noprefix"
     assert response.headers["x-standin-target-profile"] == "mixamo"
     assert response.headers["x-standin-mapped-bones"] == "22"

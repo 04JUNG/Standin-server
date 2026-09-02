@@ -6,7 +6,7 @@ Blender(bpy) 안에서 실행된다. `bpy` 모듈(pip install bpy) 또는
 
 핵심 설계
 ---------
-* **승격된 V3.2.1 palm-roll 단계는 frozen V3.2 손 결과에
+* **QA 후보 CHAIN_TRANSPORT_V3_2_1_PALM_ROLL_QA는 frozen V3.2 손 결과에
   roll 하나만 opt-in으로 추가한다.** 손가락의 posed tail/fingertip은 쓰지 않고,
   first-phalanx rest base 두 개로 palm normal을 만든다. source hand pose delta로 그
   normal을 옮긴 뒤 frozen V3.2 hand 길이축 주위 signed roll만 적용한다. ``mu=0``은
@@ -58,7 +58,7 @@ Blender(bpy) 안에서 실행된다. `bpy` 모듈(pip install bpy) 또는
   shin을 따라 안전하게 폴백한다. source local roll/twist와 불안정한 target rest normal은
   active limb에 전송하지 않는다. edge가 퇴화하거나 최소회전이 175°를 넘으면 좌우
   체인 전체를 기존 식 ``delta @ rot(R_target_rest)`` 로 폴백한다. hips/shoulder/torso는
-  이 승격 체인에서 기존 식을 유지한다.
+  이 QA 실험에서 기존 식을 유지한다.
 
 * **출력 모드 3종** (CSP 가 애니메이션을 평가하지 않을 위험에 대한 보험):
   - static_mesh : 아마추어 모디파이어 적용 후 본 삭제. 순수 포즈 메시.
@@ -1501,8 +1501,8 @@ def retarget(
         "policy_sha256": _QA_PALM_POLICY_SHA256,
         "requested_mu": selected_palm_mu,
         "default_is_exact_parent": _QA_PALM_POLICY["default_mu"] == 0.0,
-        "operational_status": "PROMOTED_RUNTIME",
-        "actual_mesh_gate": "V3.2.5_SELECTOR",
+        "operational_status": "QA_ONLY_NOT_PROMOTED",
+        "actual_mesh_gate": "PENDING_EXTERNAL_MESH_GATE",
         "hands": dict(_QA_PALM_DIAGNOSTICS),
     }
     rep.chain_diagnostics = dict(_QA_CHAIN_FRAME_DIAGNOSTICS)

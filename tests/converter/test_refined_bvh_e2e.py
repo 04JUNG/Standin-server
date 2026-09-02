@@ -191,7 +191,7 @@ def _assert_lineage(response, final: FinalBvh, caplog) -> None:
     assert response.headers["x-standin-artifact-sha256"] == hashlib.sha256(
         response.content
     ).hexdigest()
-    assert response.headers["x-standin-solver-version"] == "chain-transport-v3.2"
+    assert response.headers["x-standin-solver-version"] == "chain-transport-v3.2.5"
     payload = _complete_log(caplog, conversion_id)
     assert payload["source_bvh_sha256"] == final.sha256
     assert payload["report"]["source_bvh_sha256"] == final.sha256
