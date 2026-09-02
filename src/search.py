@@ -41,13 +41,14 @@ def _best_per_pose_family(candidates: List[PoseCandidate], limit: int) -> List[P
 
 
 def _dist(a, b, query_valid_mask=None, library_valid_mask=None,
-          query_observable_bones=None, library_observable_bones=None):
+          query_observable_bones=None, library_observable_bones=None,
+          metric=None):
     # 라이브러리 body mapping 완전성은 entry 생성 시 assertion으로 보장된다.
     # None을 넘겨 0좌표로 결측을 추론하면 side view의 정상 hip이 사라질 수 있으므로
     # 검색에서는 명시적으로 전 관절 유효 mask를 쓴다.
     if library_valid_mask is None:
         library_valid_mask = np.ones(17, dtype=bool)
-    m = CFG.distance_metric.lower()
+    m = (metric or CFG.distance_metric).lower()
     if m == "angle":
         return angle_distance(
             a, b, query_valid_mask, library_valid_mask,
@@ -120,17 +121,19 @@ def search(entries, desc, vlm_client=None, image=None,
 
 
 def knn_geometric(entries, feature, top_k=None, query_valid_mask=None,
-                  query_observable_bones=None):
+                  query_observable_bones=None, metric=None):
     """순수 기하 kNN — 태그 사전필터·view 우선 없이 스켈레톤 거리만.
     (설계 결정: action/view는 기하와 중복이라 매칭에서 제외. 태그는 shot·사람수 제어용만.)
     같은 pose family의 여러 view·원본·mirror 중 최선 1개만 남겨 다양성 확보."""
     top_k = top_k or CFG.top_k_final
     quarantined = load_pose_quarantine(CFG)
+    metric = (metric or CFG.distance_metric).lower()
     scored = [PoseCandidate(pose_id=e.pose_id, view=e.view,
                             distance=_dist(
                                 feature, e.feature,
                                 query_valid_mask=query_valid_mask,
                                 query_observable_bones=query_observable_bones,
+                                metric=metric,
                             ),
                             tags=e.tags, bvh_path=e.bvh_path,
                             pose_family_id=pose_family_id(e.pose_id, e.meta))

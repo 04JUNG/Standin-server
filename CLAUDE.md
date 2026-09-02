@@ -58,6 +58,8 @@ webtoon-pose-mvp/
 ├─ docs/
 │  ├─ PIPELINE_OVERVIEW.md 전체 파이프라인 자립 설명(외부 LLM 인수인계용 — 규약·수식·불변식)
 │  ├─ API_CONTRACT.md     전체 HTTP 계약(/analyze·/pose·/healthz) + 앱서버 경계·불일치
+│  ├─ POSE_CASCADE_DESIGN.md current-X 실패 → Human-Art M rescue cascade 구현·롤백 계약
+│  ├─ POSE_CASCADE_ROLLOUT_GATE_2026-09-01.md rescue cascade 승격·롤백 게이트 기록
 │  ├─ MVP_RELEASE.md      작가 실사용 30분 시연 컷라인·체크리스트(현재 목표의 단일 소스)
 │  ├─ REFINE_DESIGN.md    포즈 미세조정(refine) 설계 — 축소판 파라미터·안전 게이트
 │  ├─ REFINE_NEXT.md      refine 개선 방향·우선순위(원인 1개 → 입자도 3개) ★ 다음 작업 시작점
@@ -71,6 +73,7 @@ webtoon-pose-mvp/
 │  └─ ROADMAP.md          우선순위와 다음 액션(SEARCH_EVAL 기반)
 ├─ scripts/
 │  ├─ run_demo.py         mock로 6개 케이스 end-to-end 데모
+│  ├─ compare_pose_canary.py current-X와 cascade canary 결과 비교
 │  ├─ build_db.py         합성/실 BVH → SQLite 빌드(BVH_DIR env로 실 폴더)
 │  ├─ mixamo_fbx_to_bvh.py  Mixamo FBX → 포즈별 1프레임 BVH(Blender)
 │  ├─ bvh_contact_sheet.py  BVH 폴더 → COCO17 스틱피겨 시트(투영 검수)
@@ -82,7 +85,9 @@ webtoon-pose-mvp/
 │  └─ vlm_tag.py           러프→VLM 태그(shot/action/view/count) 측정(5순위)
 │  └─ deploy_pose_library.py  라이브러리 검증→S3 업로드→추론 서비스 재기동(운영자용)
 ├─ tests/
-│  └─ test_smoke.py       핵심 계약 검증(pytest 불필요, 자체 러너 내장)
+│  ├─ test_smoke.py       핵심 계약 검증(pytest 불필요, 자체 러너 내장)
+│  ├─ test_pose_cascade.py rescue 트리거·배정 가드·lazy init·오류 복구 계약
+│  └─ test_pose_contract.py 모델 calibration·manifest·runtime 계약
 ├─ data/
 │  ├─ poses.db            (자동 생성) SQLite 라이브러리 = 검색 단일 소스
 │  ├─ bvh/                원본 BVH 파일(동원이 /pose/{id}/bvh로 받는 실체)
@@ -95,6 +100,10 @@ webtoon-pose-mvp/
    ├─ routing.py          [2] 3갈래 라우팅 core/bust/skip
    ├─ detect.py           [3] 검출기 + reconcile(개수 일치=신뢰도 신호)
    ├─ pose.py             [4] RTMPose Body 래퍼(mock/rtmlib)
+   ├─ pose_cascade.py     [4] current-X primary + Human-Art M lazy full-image rescue
+   ├─ pose_contract.py    [4] 모델별 calibration manifest 검증
+   ├─ pose_humanart.py    [4] Human-Art M adapter
+   ├─ pose_rescue.py      [4] 실패 슬롯·중복·소유권 가드와 전역 배정
    ├─ bvh.py              BVH 파싱+FK+관절명→COCO17 매핑(라이브러리·검수 공용 소스)
    ├─ features.py         스켈레톤→정규화 피처(쿼리·라이브러리 공용, 반드시 동일)
    ├─ refine.py           [10] 선택 포즈 미세조정 — 팔·다리 회전만, 안전 게이트로 폐기 판정
