@@ -1,8 +1,8 @@
-name: Deploy beta
+name: Deploy
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   workflow_dispatch:
 
 permissions:
@@ -10,20 +10,26 @@ permissions:
   contents: read
 
 concurrency:
-  group: deploy-inference-beta
+  # 환경별로 나눈다 — staging 배포가 진행 중인 프로덕션 배포를 막지 않는다.
+  group: deploy-inference-${{ github.ref_name }}
   cancel-in-progress: false
 
 env:
   ECR_REPOSITORY: standin/inference
-  ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
-  ECS_SERVICE: ${{ vars.ECS_SERVICE }}
 
 jobs:
   deploy:
-    name: Deploy beta
+    name: Deploy
     if: vars.AUTO_DEPLOY_ENABLED == 'true'
     runs-on: ubuntu-latest
-    environment: beta
+    # main만 프로덕션이다. 그 외 브랜치는 전부 staging으로 간다.
+    environment: ${{ github.ref == 'refs/heads/main' && 'beta' || 'staging' }}
+    env:
+      # ⚠ 이 값들은 **job 레벨**에 있어야 한다. 워크플로 레벨 env의 vars는
+      #   environment 변수를 보지 못하고 저장소 변수(프로덕션 값)만 읽는다 —
+      #   거기 두면 staging 배포가 프로덕션 클러스터로 나간다.
+      ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
+      ECS_SERVICE: ${{ vars.ECS_SERVICE }}
     steps:
       - uses: actions/checkout@v4
 
