@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "status": "QA_ONLY_NOT_PROMOTED",
+  "parent_variant": "CHAIN_TRANSPORT_V3_2_2_ANKLE_SWING_QA",
+  "parent_module_sha256": "7e5a184a0a935ed65f1f35987c77d7b010dbd867bf27ef67300a94332a4421fb",
+  "parent_palm_roll_mu": 0.5,
+  "candidate_mu": [0.0, 0.5, 1.0, 1.25, 1.5],
+  "activation": {
+    "bend_error_min_deg": 8.0,
+    "output_rest_motion_min_deg": 65.0,
+    "extreme_output_rest_motion_deg": 75.0,
+    "clearance_p01_max_leg_ratio": 0.08,
+    "area_ratio_p01_min": 0.65,
+    "edge_ratio_min": 0.5,
+    "log_edge_strain_p99_max": 0.55
+  },
+  "eligibility": {
+    "minimum_bend_improvement_deg": 1.0,
+    "maximum_correction_twist_deg": 0.05,
+    "maximum_proximal_matrix_error": 1e-6,
+    "maximum_toe_relative_rotation_error_deg": 0.001,
+    "area_ratio_p01_regression": 0.02,
+    "edge_ratio_min_regression": 0.02,
+    "log_edge_strain_p99_regression": 0.03,
+    "clearance_p01_regression_leg_ratio": 0.003,
+    "dihedral_change_p99_regression_deg": 2.0,
+    "minimum_clearance_improvement_leg_ratio": 0.002,
+    "minimum_area_p01_improvement": 0.02,
+    "minimum_log_strain_improvement": 0.02
+  },
+  "measurement": {
+    "roi_radius_leg_ratio": 0.32,
+    "roi_radius_foot_ratio": 1.25,
+    "minimum_limb_weight": 0.15,
+    "foot_weight_min": 0.25,
+    "calf_weight_min": 0.25,
+    "foot_distal_min_ratio": 0.15,
+    "calf_proximal_min_ratio": 0.10,
+    "calf_proximal_max_ratio": 0.75,
+    "minimum_roi_vertices": 20,
+    "minimum_roi_triangles": 20,
+    "minimum_clearance_vertices": 8
+  },
+  "stronger_swing": {
+    "maximum_target_overshoot_deg": 12.0,
+    "rescue_clearance_p01_leg_ratio": 0.05,
+    "rescue_area_ratio_p01": 0.45,
+    "rescue_edge_ratio_min": 0.30,
+    "rescue_log_edge_strain_p99": 0.42,
+    "rescue_dihedral_change_p99_deg": 12.0
+  }
+}

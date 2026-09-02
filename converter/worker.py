@@ -29,6 +29,7 @@ from converter.protocol import (  # noqa: E402 - repo path is intentional
     JOB_SCHEMA_VERSION,
     OUTPUT_MODE,
     RETARGET_SHA256,
+    SOLVER_MANIFEST_SHA256,
     SOLVER_VERSION,
 )
 
@@ -88,6 +89,7 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
         "character_fbx", "output_path", "report_path", "character_id",
         "character_sha256", "frame", "mirror", "output_mode",
         "apply_root_translation", "embed_textures",
+        "force_exact_v324",
     }
     unknown = set(raw) - required
     missing = required - set(raw)
@@ -114,6 +116,8 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
         raise JobValidationError("apply_root_translation must be false")
     if raw["embed_textures"] is not EMBED_TEXTURES:
         raise JobValidationError("embed_textures must be false")
+    if type(raw["force_exact_v324"]) is not bool:
+        raise JobValidationError("force_exact_v324 must be boolean")
 
     unresolved_temp = _absolute_path(raw["temp_dir"], "temp_dir")
     if unresolved_temp.is_symlink():
@@ -162,15 +166,30 @@ def _write_report(path: Path, payload: dict[str, Any]) -> None:
 def _frozen_lineage() -> dict[str, str]:
     retarget = Path(__file__).with_name("retarget.py")
     ankle_policy = Path(__file__).with_name("ankle_policy.json")
+    manifest = Path(__file__).with_name("SHA256SUMS.v325")
     actual_retarget = _sha256(retarget)
     actual_ankle = _sha256(ankle_policy)
     if actual_retarget != RETARGET_SHA256:
         raise FrozenLineageError("frozen retarget.py SHA256 mismatch")
     if actual_ankle != ANKLE_POLICY_SHA256:
         raise FrozenLineageError("frozen ankle_policy.json SHA256 mismatch")
+    actual_manifest = _sha256(manifest)
+    if actual_manifest != SOLVER_MANIFEST_SHA256:
+        raise FrozenLineageError("frozen V3.2.5 manifest SHA256 mismatch")
+    root = manifest.parent.resolve(strict=True)
+    for line in manifest.read_text(encoding="utf-8").splitlines():
+        expected, relative = line.split("  ", 1)
+        candidate = (root / relative).resolve(strict=True)
+        try:
+            candidate.relative_to(root)
+        except ValueError as exc:
+            raise FrozenLineageError("solver manifest path escaped converter root") from exc
+        if _sha256(candidate) != expected:
+            raise FrozenLineageError(f"solver manifest mismatch: {relative}")
     return {
         "retarget_sha256": actual_retarget,
         "ankle_policy_sha256": actual_ankle,
+        "solver_manifest_sha256": actual_manifest,
     }
 
 
@@ -203,6 +222,7 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
         output_mode=OUTPUT_MODE,
         apply_root_translation=APPLY_ROOT_TRANSLATION,
         embed_textures=EMBED_TEXTURES,
+        force_exact_v324=job["force_exact_v324"],
     )
     payload = report.as_dict()
     payload.update({
@@ -214,6 +234,7 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
         "character_sha256": job["character_sha256"],
         "source_bvh_sha256": source_bvh_sha256,
         **lineage,
+        "force_exact_v324": job["force_exact_v324"],
     })
     output = Path(job["output_path"])
     if report.ok:

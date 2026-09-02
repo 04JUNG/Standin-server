@@ -31,6 +31,7 @@ from converter.protocol import (
     JOB_SCHEMA_VERSION,
     OUTPUT_MODE,
     RETARGET_SHA256,
+    SOLVER_MANIFEST_SHA256,
     SOLVER_VERSION,
 )
 
@@ -67,6 +68,18 @@ class BlenderInfo:
     build_hash: str
 
 
+def _env_bool(name: str, default: bool = False) -> bool:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    normalized = raw.strip().lower()
+    if normalized in {"1", "true", "yes", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "off"}:
+        return False
+    raise ValueError(f"{name} must be a boolean")
+
+
 @dataclass(frozen=True)
 class RunnerSettings:
     blender_binary: str
@@ -78,6 +91,7 @@ class RunnerSettings:
     max_concurrent_processes: int = 1
     temp_root: Path | None = None
     process_env: Mapping[str, str] | None = None
+    force_exact_v324: bool = False
 
     @classmethod
     def from_env(cls, repo_root: Path | None = None) -> "RunnerSettings":
@@ -102,6 +116,7 @@ class RunnerSettings:
                 os.getenv("CONVERTER_MAX_CONCURRENT_PROCESSES", "1")
             ),
             temp_root=Path(temp_value).resolve() if temp_value else None,
+            force_exact_v324=_env_bool("CONVERTER_FORCE_EXACT_V324"),
         )
 
 
@@ -137,6 +152,8 @@ class BlenderRunner:
             raise ValueError("converter terminate_grace_seconds must be non-negative")
         if self.settings.max_concurrent_processes <= 0:
             raise ValueError("converter max_concurrent_processes must be positive")
+        if type(self.settings.force_exact_v324) is not bool:
+            raise ValueError("converter force_exact_v324 must be boolean")
         if not re.fullmatch(r"[0-9a-f]{8,40}", self.settings.expected_blender_build_hash):
             raise ValueError("expected Blender build hash is invalid")
         self._blender_info: BlenderInfo | None = None
@@ -311,6 +328,8 @@ class BlenderRunner:
             "source_bvh_sha256": source_bvh_sha256,
             "retarget_sha256": RETARGET_SHA256,
             "ankle_policy_sha256": ANKLE_POLICY_SHA256,
+            "solver_manifest_sha256": SOLVER_MANIFEST_SHA256,
+            "force_exact_v324": self.settings.force_exact_v324,
             "output_mode": OUTPUT_MODE,
             "frame": FRAME,
             "mirrored": mirror,
@@ -440,6 +459,7 @@ class BlenderRunner:
                 "output_mode": OUTPUT_MODE,
                 "apply_root_translation": APPLY_ROOT_TRANSLATION,
                 "embed_textures": EMBED_TEXTURES,
+                "force_exact_v324": self.settings.force_exact_v324,
             }
             job_path.write_text(
                 json.dumps(job, sort_keys=True, separators=(",", ":")) + "\n",
