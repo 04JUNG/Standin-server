@@ -8,21 +8,12 @@ Pose Search: 태그 사전필터 → kNN → (선택) VLM rerank.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import List
 
 import numpy as np
 
 from .schema import (LibraryEntry, PersonDescriptor, PoseCandidate, View)
-from .features import (
-    _ALL_JOINTS_VALID,
-    _BODY,
-    _as_joint_mask,
-    _pose_distance_selected,
-    angle_distance,
-    hybrid_distance,
-    pose_distance,
-)
+from .features import pose_distance, angle_distance, hybrid_distance
 from .config import CFG
 from .pose_quarantine import load_pose_quarantine
 
@@ -50,13 +41,14 @@ def _best_per_pose_family(candidates: List[PoseCandidate], limit: int) -> List[P
 
 
 def _dist(a, b, query_valid_mask=None, library_valid_mask=None,
-          query_observable_bones=None, library_observable_bones=None):
+          query_observable_bones=None, library_observable_bones=None,
+          metric=None):
     # 라이브러리 body mapping 완전성은 entry 생성 시 assertion으로 보장된다.
     # None을 넘겨 0좌표로 결측을 추론하면 side view의 정상 hip이 사라질 수 있으므로
     # 검색에서는 명시적으로 전 관절 유효 mask를 쓴다.
     if library_valid_mask is None:
         library_valid_mask = np.ones(17, dtype=bool)
-    m = CFG.distance_metric.lower()
+    m = (metric or CFG.distance_metric).lower()
     if m == "angle":
         return angle_distance(
             a, b, query_valid_mask, library_valid_mask,
@@ -68,86 +60,6 @@ def _dist(a, b, query_valid_mask=None, library_valid_mask=None,
             query_observable_bones, library_observable_bones,
         )
     return pose_distance(a, b, query_valid_mask, library_valid_mask)
-
-
-@dataclass(frozen=True)
-class PositionSearchIndex:
-    """운영 ``pos`` 검색용 immutable feature 행렬.
-
-    라이브러리 업로드 뒤 ``Pipeline``이 다시 만들어질 때 DB 엔트리에서 자동으로
-    재구성된다. quarantine은 행렬에서 제거하지 않고 검색마다 적용해 파일 갱신을
-    즉시 반영한다.
-    """
-
-    entries: tuple[LibraryEntry, ...]
-    features: np.ndarray
-    family_ids: tuple[str, ...]
-
-    @classmethod
-    def build(cls, entries) -> "PositionSearchIndex":
-        frozen_entries = tuple(entries)
-        if frozen_entries:
-            features = np.stack([
-                np.asarray(entry.feature, dtype=np.float32).reshape(17, 2)
-                for entry in frozen_entries
-            ])
-            if not np.isfinite(features).all():
-                raise ValueError("library features contain NaN/Inf")
-        else:
-            features = np.empty((0, 17, 2), dtype=np.float32)
-        features = np.ascontiguousarray(features, dtype=np.float32)
-        features.setflags(write=False)
-        return cls(
-            entries=frozen_entries,
-            features=features,
-            family_ids=tuple(
-                pose_family_id(entry.pose_id, entry.meta)
-                for entry in frozen_entries
-            ),
-        )
-
-    @property
-    def memory_bytes(self) -> int:
-        return int(self.features.nbytes)
-
-    def search(self, feature, *, top_k: int,
-               query_valid_mask=None,
-               quarantined_pose_ids=()) -> List[PoseCandidate]:
-        """모든 projection의 동일한 위치-L2를 한 번에 계산한다."""
-        query_mask = _as_joint_mask(query_valid_mask)
-        body = _BODY[query_mask[_BODY]]
-        row_count = len(self.entries)
-        if len(body) == 0:
-            distances = np.full(row_count, np.inf, dtype=np.float32)
-        else:
-            query = np.asarray(feature, dtype=np.float32).reshape(17, 2)
-            delta = self.features[:, body] - query[body]
-            distances = np.linalg.norm(delta, axis=2).mean(axis=1)
-
-        order = np.argsort(distances, kind="stable")
-        quarantine = frozenset(str(value) for value in quarantined_pose_ids)
-        seen_families: set[str] = set()
-        candidates: list[PoseCandidate] = []
-        for raw_row in order:
-            row = int(raw_row)
-            entry = self.entries[row]
-            if entry.pose_id in quarantine:
-                continue
-            family_id = self.family_ids[row]
-            if family_id in seen_families:
-                continue
-            seen_families.add(family_id)
-            candidates.append(PoseCandidate(
-                pose_id=entry.pose_id,
-                view=entry.view,
-                distance=float(distances[row]),
-                tags=entry.tags,
-                bvh_path=entry.bvh_path,
-                pose_family_id=family_id,
-            ))
-            if len(candidates) >= top_k:
-                break
-        return candidates
 
 
 def _tag_prefilter(entries: List[LibraryEntry], desc: PersonDescriptor) -> List[LibraryEntry]:
@@ -209,37 +121,19 @@ def search(entries, desc, vlm_client=None, image=None,
 
 
 def knn_geometric(entries, feature, top_k=None, query_valid_mask=None,
-                  query_observable_bones=None, search_index=None,
-                  metric=None):
+                  query_observable_bones=None, metric=None):
     """순수 기하 kNN — 태그 사전필터·view 우선 없이 스켈레톤 거리만.
     (설계 결정: action/view는 기하와 중복이라 매칭에서 제외. 태그는 shot·사람수 제어용만.)
     같은 pose family의 여러 view·원본·mirror 중 최선 1개만 남겨 다양성 확보."""
     top_k = top_k or CFG.top_k_final
     quarantined = load_pose_quarantine(CFG)
     metric = (metric or CFG.distance_metric).lower()
-    if search_index is not None and metric == "pos":
-        return search_index.search(
-            feature,
-            top_k=top_k,
-            query_valid_mask=query_valid_mask,
-            quarantined_pose_ids=quarantined,
-        )
-    if metric == "pos":
-        normalized_mask = _as_joint_mask(query_valid_mask)
-        body = _BODY[normalized_mask[_BODY]]
-        distance_query = np.asarray(feature, dtype=np.float32).reshape(17, 2)
-    else:
-        body = None
-        distance_query = feature
     scored = [PoseCandidate(pose_id=e.pose_id, view=e.view,
-                            distance=(
-                                _pose_distance_selected(
-                                    distance_query, e.feature, body,
-                                ) if metric == "pos" else _dist(
-                                    distance_query, e.feature,
-                                    query_valid_mask=query_valid_mask,
-                                    query_observable_bones=query_observable_bones,
-                                )
+                            distance=_dist(
+                                feature, e.feature,
+                                query_valid_mask=query_valid_mask,
+                                query_observable_bones=query_observable_bones,
+                                metric=metric,
                             ),
                             tags=e.tags, bvh_path=e.bvh_path,
                             pose_family_id=pose_family_id(e.pose_id, e.meta))

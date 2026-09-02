@@ -60,39 +60,17 @@ def cosine_distance(a: np.ndarray, b: np.ndarray) -> float:
 
 
 # COCO17에서 얼굴 5점(0~4) 제외한 몸통 12관절 인덱스.
-# 검색 후보마다 list→ndarray 변환을 반복하지 않도록 모듈 상수로 고정한다.
-_BODY = np.asarray(
-    [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], dtype=np.intp,
-)
-_BODY.setflags(write=False)
-
-# 라이브러리 projection은 build/load 계약상 COCO17 전 관절이 유효하다.
-# 검색 후보마다 np.ones(17)을 새로 만들지 않도록 읽기 전용 상수를 공유한다.
-_ALL_JOINTS_VALID = np.ones(17, dtype=bool)
-_ALL_JOINTS_VALID.setflags(write=False)
+_BODY = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
 
 
 def _as_joint_mask(mask: np.ndarray | None) -> np.ndarray:
     """17관절 bool mask로 정규화한다. 잘못된 형상은 조용히 쓰지 않는다."""
     if mask is None:
-        return _ALL_JOINTS_VALID
-    if (isinstance(mask, np.ndarray) and mask.dtype == np.bool_
-            and mask.shape == (17,)):
-        return mask
+        return np.ones(17, dtype=bool)
     out = np.asarray(mask, dtype=bool).reshape(-1)
     if out.shape != (17,):
         raise ValueError(f"joint mask must have shape (17,), got {out.shape}")
     return out
-
-
-def _pose_distance_selected(a: np.ndarray, b: np.ndarray,
-                            body: np.ndarray) -> float:
-    """이미 검증·선택한 body 관절로 위치 거리를 계산하는 검색 hot path."""
-    if len(body) == 0:
-        return float("inf")
-    A = np.asarray(a, dtype=np.float32).reshape(17, 2)
-    B = np.asarray(b, dtype=np.float32).reshape(17, 2)
-    return float(np.linalg.norm(A[body] - B[body], axis=1).mean())
 
 
 def pose_distance(a: np.ndarray, b: np.ndarray,
@@ -103,9 +81,14 @@ def pose_distance(a: np.ndarray, b: np.ndarray,
     cosine을 대체(cosine은 팔 굽힘 같은 국소 차이를 못 잡고 큰 차이와 뒤섞임 — 실측).
     얼굴점(0~4)은 BVH에 없어 head로 근사되므로 제외(쿼리·라이브러리 비대칭 회피).
     """
+    A = np.asarray(a, dtype=np.float32).reshape(17, 2)
+    B = np.asarray(b, dtype=np.float32).reshape(17, 2)
     valid = _as_joint_mask(a_valid_mask) & _as_joint_mask(b_valid_mask)
-    body = _BODY[valid[_BODY]]
-    return _pose_distance_selected(a, b, body)
+    body_valid = valid[np.asarray(_BODY)]
+    if not body_valid.any():
+        return float("inf")
+    body = np.asarray(_BODY)[body_valid]
+    return float(np.linalg.norm(A[body] - B[body], axis=1).mean())
 
 
 # ---- 비율 불변(뼈 방향/각도) 거리 ------------------------------------------
