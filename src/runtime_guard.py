@@ -14,6 +14,32 @@ class MockBackendError(RuntimeError):
     """프로덕션 파이프라인이 mock 백엔드로 초기화됐다."""
 
 
+def pose_runtime_identity(pipeline: "Pipeline") -> dict:
+    """Return stable model identity without trusting an env/backend label."""
+    pose = pipeline.pose
+    if isinstance(pose, MockPoseModel):
+        return {
+            "model_id": "mock",
+            "build_id": "mock",
+            "backend": "mock",
+            "adapter": type(pose).__name__,
+            "initialized": True,
+        }
+    runtime_identity = getattr(pose, "runtime_identity", None)
+    if callable(runtime_identity):
+        identity = dict(runtime_identity())
+        identity.setdefault("adapter", type(pose).__name__)
+        identity.setdefault("initialized", True)
+        return identity
+    return {
+        "model_id": "current-x",
+        "build_id": "rtmlib-performance-runtime-default",
+        "backend": "rtmlib",
+        "adapter": type(pose).__name__,
+        "initialized": True,
+    }
+
+
 def actual_backend_names(
     pipeline: "Pipeline",
     requested_vlm: str,
@@ -31,6 +57,7 @@ def ensure_production_backends(
     is_production: bool,
     requested_vlm: str,
     requested_pose: str,
+    requested_pose_variant: str = "current-x",
 ) -> None:
     """프로덕션에서 팩토리의 조용한 mock 폴백을 포함해 mock 사용을 차단한다."""
     if not is_production:
@@ -58,3 +85,46 @@ def ensure_production_backends(
             "프로덕션에서 mock 백엔드로 초기화되었습니다: "
             f"{', '.join(mocked)}. API 키와 런타임 의존성을 확인하세요."
         )
+
+    identity = pose_runtime_identity(pipeline)
+    requested_variant = requested_pose_variant.strip().lower()
+    if identity.get("model_id") != requested_variant:
+        raise MockBackendError(
+            "포즈 model identity가 요청과 다릅니다: "
+            f"requested={requested_variant}, actual={identity.get('model_id')}, "
+            f"adapter={identity.get('adapter')}"
+        )
+    if requested_variant == "humanart-m":
+        if identity.get("license_review") != "approved":
+            raise MockBackendError("Human-Art production requires approved license review")
+        if identity.get("status") not in {"shadow", "canary", "promoted"}:
+            raise MockBackendError(
+                "Human-Art production manifest must be shadow/canary/promoted, "
+                f"got {identity.get('status')}"
+            )
+    if requested_variant == "cascade":
+        primary = identity.get("primary")
+        fallback = identity.get("fallback")
+        if not isinstance(primary, dict) or primary.get("model_id") != "current-x":
+            raise MockBackendError(
+                "cascade production primary must be current-x"
+            )
+        if not isinstance(fallback, dict) or fallback.get("model_id") != "humanart-m":
+            raise MockBackendError(
+                "cascade production fallback must be humanart-m"
+            )
+        if fallback.get("license_review") != "approved":
+            raise MockBackendError(
+                "cascade Human-Art fallback requires approved license review"
+            )
+        if fallback.get("status") not in {"shadow", "canary", "promoted"}:
+            raise MockBackendError(
+                "cascade Human-Art manifest must be shadow/canary/promoted, "
+                f"got {fallback.get('status')}"
+            )
+        if identity.get("canary_stage") not in {
+            "shadow", "canary-5", "canary-25", "canary-50", "canary-100",
+        }:
+            raise MockBackendError("cascade has no approved canary stage")
+        if identity.get("fallback_contract_ready") is not True:
+            raise MockBackendError("cascade fallback contract is not ready")

@@ -11,6 +11,7 @@ VLM 클라이언트 추상화.
 from __future__ import annotations
 
 import json
+import math
 import random
 import re
 import time
@@ -22,6 +23,9 @@ from ..logging_setup import log_info, log_warn
 from . import prompts
 
 
+_MAX_VLM_PEOPLE = 20
+
+
 def _coerce(analysis: dict, img_w: int, img_h: int) -> VLMAnalysis:
     """VLM이 준 dict(JSON)를 타입 안전한 VLMAnalysis로 변환. 잘못된 값은 안전 폴백."""
     def pick(enum_cls, val, default):
@@ -30,19 +34,32 @@ def _coerce(analysis: dict, img_w: int, img_h: int) -> VLMAnalysis:
         except Exception:
             return default
 
+    raw_boxes = analysis.get("approx_boxes", []) or []
+    if not isinstance(raw_boxes, list):
+        raw_boxes = []
+    try:
+        num = int(analysis.get("num_people", len(raw_boxes)) or 0)
+    except (TypeError, ValueError, OverflowError):
+        num = len(raw_boxes)
+    num = max(0, min(num, _MAX_VLM_PEOPLE))
+
     boxes = []
-    for b in analysis.get("approx_boxes", []) or []:
+    # Keep a placeholder for a malformed box: per-person visibility arrays use
+    # the same model-provided order and must not shift to a different person.
+    for b in raw_boxes[:_MAX_VLM_PEOPLE]:
         try:
             # 0~1 정규화 좌표를 픽셀로 환산(대략)
+            coordinates = [float(b[key]) for key in ("x1", "y1", "x2", "y2")]
+            if not all(math.isfinite(value) for value in coordinates):
+                raise ValueError("non-finite VLM box")
             boxes.append(BBox(
-                x1=float(b["x1"]) * img_w, y1=float(b["y1"]) * img_h,
-                x2=float(b["x2"]) * img_w, y2=float(b["y2"]) * img_h,
+                x1=coordinates[0] * img_w, y1=coordinates[1] * img_h,
+                x2=coordinates[2] * img_w, y2=coordinates[3] * img_h,
                 source="vlm", score=0.5,
             ))
-        except Exception:
-            continue
+        except (KeyError, TypeError, ValueError, OverflowError):
+            boxes.append(None)
 
-    num = int(analysis.get("num_people", len(boxes)) or 0)
     raw_lower = analysis.get("lower_body_visible")
     if isinstance(raw_lower, list) and len(raw_lower) == num:
         lower_body_visible = [value is True for value in raw_lower]

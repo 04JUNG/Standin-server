@@ -6,7 +6,13 @@ Blender(bpy) 안에서 실행된다. `bpy` 모듈(pip install bpy) 또는
 
 핵심 설계
 ---------
-* **QA 후보 CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY는 Hips-UpLeg 경계를 잇는다.**
+* **승격된 V3.2.1 palm-roll 단계는 frozen V3.2 손 결과에
+  roll 하나만 opt-in으로 추가한다.** 손가락의 posed tail/fingertip은 쓰지 않고,
+  first-phalanx rest base 두 개로 palm normal을 만든다. source hand pose delta로 그
+  normal을 옮긴 뒤 frozen V3.2 hand 길이축 주위 signed roll만 적용한다. ``mu=0``은
+  frozen V3.2와 exact 동일하며, 측정 불가·퇴화는 손별로 exact fallback한다.
+
+* **부모 CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY는 Hips-UpLeg 경계를 잇는다.**
   Hips의 legacy 결과와 root translation은 바꾸지 않는다. 활성 다리 체인은 target
   rest 허벅지를 Identity에서 시작하지 않고, 실제 target Hips rest->output 수송
   ``G_H``에서 시작한다.
@@ -52,7 +58,7 @@ Blender(bpy) 안에서 실행된다. `bpy` 모듈(pip install bpy) 또는
   shin을 따라 안전하게 폴백한다. source local roll/twist와 불안정한 target rest normal은
   active limb에 전송하지 않는다. edge가 퇴화하거나 최소회전이 175°를 넘으면 좌우
   체인 전체를 기존 식 ``delta @ rot(R_target_rest)`` 로 폴백한다. hips/shoulder/torso는
-  이 QA 실험에서 기존 식을 유지한다.
+  이 승격 체인에서 기존 식을 유지한다.
 
 * **출력 모드 3종** (CSP 가 애니메이션을 평가하지 않을 위험에 대한 보험):
   - static_mesh : 아마추어 모디파이어 적용 후 본 삭제. 순수 포즈 메시.
@@ -108,6 +114,17 @@ class ConvertReport:
     chain_diagnostics: dict[str, dict] = field(default_factory=dict)
     chain_fallbacks: list[str] = field(default_factory=list)
     terminal_follow_bones: list[str] = field(default_factory=list)
+    # V3.2.1 Palm Roll QA — 키는 canonical hand.L / hand.R
+    palm_roll_requested_deg: dict[str, float] = field(default_factory=dict)
+    palm_roll_applied_deg: dict[str, float] = field(default_factory=dict)
+    palm_roll_mu: dict[str, float] = field(default_factory=dict)
+    palm_landmark_roles: dict[str, list[str]] = field(default_factory=dict)
+    palm_plane_sin: dict[str, float] = field(default_factory=dict)
+    palm_frame_status: dict[str, str] = field(default_factory=dict)
+    palm_roll_mode: dict[str, str] = field(default_factory=dict)
+    palm_fallback_reason: dict[str, str | None] = field(default_factory=dict)
+    palm_roll_bones: list[str] = field(default_factory=list)
+    palm_roll_fallback_bones: list[str] = field(default_factory=list)
 
     def as_dict(self) -> dict:
         return asdict(self)
@@ -212,10 +229,10 @@ _ROOT_REASON = "루트 본은 축이 리그 관례라 방향 전송 대상이 �
 # ---------------------------------------------------------------------------
 # QA 전용 체인 프레임 후보. production 파일에는 존재하지 않는다.
 # ---------------------------------------------------------------------------
-_QA_VARIANT_NAME = "CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY"
-_QA_CHAIN_SOLVER = "parent_coherent_leg_transport_with_v31_soft_cap_ankle"
-_QA_PARENT_VARIANT = "CHAIN_TRANSPORT_V3_1_ANKLE"
-_QA_PARENT_RETARGET_SHA256 = "f6d9a35268ff18173d9280baf8e502f5e258dbaeb8de4ffb4dd83637c19e9c6b"
+_QA_VARIANT_NAME = "CHAIN_TRANSPORT_V3_2_1_PALM_ROLL_QA"
+_QA_CHAIN_SOLVER = "v32_parent_coherent_transport_plus_opt_in_palm_roll"
+_QA_PARENT_VARIANT = "CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY"
+_QA_PARENT_RETARGET_SHA256 = "692e975d32f41e3406144763c7c0b7dbf0a586ff07732f09c4365e3233b13693"
 _QA_ARM_CHAINS = {
     "arm.L": ("upperarm.L", "forearm.L", "hand.L"),
     "arm.R": ("upperarm.R", "forearm.R", "hand.R"),
@@ -232,6 +249,7 @@ _QA_EDGE_REL_EPS = 1e-5
 _QA_FROZEN_FOOT_INCREMENT_MAX_DEG = 120.0
 _QA_FROZEN_FOOT_INCREMENT_MAX_RAD = math.radians(_QA_FROZEN_FOOT_INCREMENT_MAX_DEG)
 _QA_ANKLE_POLICY_PATH = os.path.join(os.path.dirname(__file__), "ankle_policy.json")
+_QA_PALM_POLICY_PATH = os.path.join(os.path.dirname(__file__), "palm_roll_policy.json")
 
 # 러너가 읽는 QA 계측. 변환 시작마다 비운다.
 _QA_SOLVER_MODE_BY_BONE: dict[str, str] = {}
@@ -239,6 +257,7 @@ _QA_CHAIN_FRAME_DIAGNOSTICS: dict[str, dict] = {}
 _QA_CHAIN_FALLBACKS: list[str] = []
 _QA_TERMINAL_FOLLOW_BONES: list[str] = []
 _QA_PELVIS_BOUNDARY_FALLBACKS: list[str] = []
+_QA_PALM_DIAGNOSTICS: dict[str, dict] = {}
 
 
 def _policy_number(value: object, label: str) -> float:
@@ -314,6 +333,102 @@ def _load_ankle_policy() -> tuple[dict, str]:
 
 
 _QA_ANKLE_POLICY, _QA_ANKLE_POLICY_SHA256 = _load_ankle_policy()
+
+
+def _load_palm_roll_policy() -> tuple[dict, str]:
+    """모든 source/character에 공통인 QA mu ladder를 fail-closed로 읽는다."""
+    try:
+        with open(_QA_PALM_POLICY_PATH, "rb") as handle:
+            raw = handle.read()
+    except OSError as exc:
+        raise RuntimeError(
+            f"palm roll policy를 읽을 수 없다: {_QA_PALM_POLICY_PATH}"
+        ) from exc
+    try:
+        payload = json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise RuntimeError("palm roll policy JSON이 유효하지 않다") from exc
+    if not isinstance(payload, dict) or payload.get("schema_version") != 1:
+        raise RuntimeError("palm roll policy schema_version must be 1")
+    if payload.get("selector") != "uniform_mu_ladder":
+        raise RuntimeError("palm roll policy selector must be uniform_mu_ladder")
+
+    raw_candidates = payload.get("mu_candidates")
+    if not isinstance(raw_candidates, list) or not raw_candidates:
+        raise RuntimeError("palm roll policy mu_candidates must be a non-empty list")
+    candidates = [
+        _policy_number(v, f"palm.mu_candidates[{i}]")
+        for i, v in enumerate(raw_candidates)
+    ]
+    if candidates != sorted(set(candidates)):
+        raise RuntimeError("palm roll policy mu_candidates must be sorted and unique")
+    if any(v < 0.0 or v > 1.0 for v in candidates):
+        raise RuntimeError("palm roll policy mu_candidates must be in [0, 1]")
+    if 0.0 not in candidates or 1.0 not in candidates:
+        raise RuntimeError("palm roll policy mu_candidates must contain 0 and 1")
+
+    default_mu = _policy_number(payload.get("default_mu"), "palm.default_mu")
+    if default_mu not in candidates:
+        raise RuntimeError("palm roll policy default_mu must be one of mu_candidates")
+    identity_deg = _policy_number(payload.get("identity_deg"), "palm.identity_deg")
+    degenerate_deg = _policy_number(
+        payload.get("degenerate_deg"), "palm.degenerate_deg"
+    )
+    min_plane_deg = _policy_number(
+        payload.get("min_plane_deg"), "palm.min_plane_deg"
+    )
+    if not 0.0 < identity_deg < degenerate_deg < 180.0:
+        raise RuntimeError(
+            "palm roll policy angles must satisfy 0 < identity < degenerate < 180"
+        )
+    if not 0.0 < min_plane_deg < 90.0:
+        raise RuntimeError("palm roll policy min_plane_deg must be in (0, 90)")
+    normalized = {
+        "schema_version": 1,
+        "selector": "uniform_mu_ladder",
+        "mu_candidates": candidates,
+        "default_mu": default_mu,
+        "identity_deg": identity_deg,
+        "degenerate_deg": degenerate_deg,
+        "min_plane_deg": min_plane_deg,
+    }
+    return normalized, hashlib.sha256(raw).hexdigest()
+
+
+_QA_PALM_POLICY, _QA_PALM_POLICY_SHA256 = _load_palm_roll_policy()
+
+
+def _validated_one_palm_mu(value: object, label: str) -> float:
+    selected = _policy_number(value, label)
+    if selected not in _QA_PALM_POLICY["mu_candidates"]:
+        raise ValueError(
+            f"{label} must be one of {_QA_PALM_POLICY['mu_candidates']}, "
+            f"got {selected}"
+        )
+    return selected
+
+
+def _validated_palm_mu_by_hand(
+    value: float | dict[str, float] | None,
+) -> dict[str, float]:
+    """같은 전역 ladder 안에서 좌우 손을 독립 선택한다."""
+    hands = ("hand.L", "hand.R")
+    if value is None:
+        return {hand: _QA_PALM_POLICY["default_mu"] for hand in hands}
+    if isinstance(value, dict):
+        unknown = sorted(set(value) - set(hands))
+        missing = sorted(set(hands) - set(value))
+        if unknown or missing:
+            raise ValueError(
+                f"palm_roll_mu dict must contain exactly {list(hands)}; "
+                f"missing={missing}, unknown={unknown}"
+            )
+        return {
+            hand: _validated_one_palm_mu(value[hand], f"palm_roll_mu.{hand}")
+            for hand in hands
+        }
+    selected = _validated_one_palm_mu(value, "palm_roll_mu")
+    return {hand: selected for hand in hands}
 
 
 def _ankle_policy_for_profile(profile: str) -> dict:
@@ -539,88 +654,257 @@ def _source_rot(m: Matrix, mirror: bool) -> Matrix:
     return (_MIRROR_X @ r @ _MIRROR_X) if mirror else r
 
 
-def _descendant_landmarks(arm: bpy.types.Object, hand_name: str, *, pose: bool,
-                          reflect_x: bool = False) -> dict[str, tuple[str, Vector]]:
-    """손 아래의 실제 finger landmark를 이름/토폴로지로 찾는다.
+def _vector_is_finite(v: Vector) -> bool:
+    return all(math.isfinite(float(x)) for x in v)
 
-    canonical 22본 밖의 보조 landmark이며 매핑 상수는 만들지 않는다. index/pinky가
-    있으면 그 쌍을, CMU처럼 pinky가 없으면 index/thumb를 쓸 수 있도록 role만 분류한다.
+
+def _matrix_is_finite(m: Matrix) -> bool:
+    return all(math.isfinite(float(x)) for row in m for x in row)
+
+
+def _finger_role(name: str) -> tuple[str | None, bool]:
+    """이름은 role 탐색에만 쓴다. 각도·보정량을 source명으로 분기하지 않는다."""
+    low = name.lower()
+    if "thumb" in low:
+        return "thumb", True
+    if "index" in low:
+        return "index", True
+    if "pinky" in low or "little" in low:
+        return "pinky", True
+    if "fingerbase" in low:
+        return "index", False
+    return None, False
+
+
+def _rest_palm_landmarks(
+    arm: bpy.types.Object,
+    hand_name: str,
+    *,
+    reflect_x: bool = False,
+) -> tuple[Vector, dict[str, tuple[str, Vector]], dict]:
+    """finger의 *rest head/base*만 반환한다.
+
+    첫 phalanx head가 hand origin과 겹치면 같은 role의 더 바깥 descendant head를
+    사용한다. posed head/tail/fingertip과 finger local rotation은 절대 읽지 않는다.
     """
     root = arm.data.bones[hand_name]
-    queue = [(child, 1) for child in root.children]
-    candidates: dict[str, list[tuple[int, int, str, Vector]]] = {
-        "index": [], "pinky": [], "thumb": []
-    }
-    while queue:
-        bone, depth = queue.pop(0)
-        low = bone.name.lower()
-        role = None
-        explicit = 0
-        if "thumb" in low:
-            role, explicit = "thumb", 1
-        elif "index" in low:
-            role, explicit = "index", 1
-        elif "pinky" in low or "little" in low:
-            role, explicit = "pinky", 1
-        elif "fingerbase" in low:
-            role, explicit = "index", 0
-        if role:
-            # head가 hand origin과 겹치는 BVH(CMU zero-length hand)가 있으므로
-            # landmark는 선택한 첫 phalanx의 tail을 쓴다.
-            if pose:
-                p = arm.matrix_world @ arm.pose.bones[bone.name].tail
-            else:
-                p = arm.matrix_world @ bone.tail_local
-            p = p.copy()
-            if reflect_x:
-                p = _reflect_x(p)
-            candidates[role].append((-explicit, depth, bone.name, p))
-        queue.extend((child, depth + 1) for child in bone.children)
-    out: dict[str, tuple[str, Vector]] = {}
-    for role, rows in candidates.items():
-        if rows:
-            row = sorted(rows, key=lambda x: (x[0], x[1], x[2]))[0]
-            out[role] = (row[2], row[3])
-    return out
-
-
-def _palm_frame(arm: bpy.types.Object, hand_name: str, *, pose: bool,
-                reflect_x: bool, roles: tuple[str, str] | None = None
-                ) -> tuple[Matrix | None, str, dict]:
-    marks = _descendant_landmarks(arm, hand_name, pose=pose, reflect_x=reflect_x)
-    if pose:
-        origin = arm.matrix_world @ arm.pose.bones[hand_name].head
-    else:
-        origin = arm.matrix_world @ arm.data.bones[hand_name].head_local
-    origin = origin.copy()
+    origin = (arm.matrix_world @ root.head_local).copy()
     if reflect_x:
         origin = _reflect_x(origin)
-    if roles is None:
-        roles = (("index", "pinky") if "index" in marks and "pinky" in marks
-                 else ("index", "thumb") if "index" in marks and "thumb" in marks
-                 else None)
-    info = {"landmarks": {k: v[0] for k, v in marks.items()},
-            "roles": list(roles) if roles else None}
-    if roles is None or any(r not in marks for r in roles):
-        return None, "서로 다른 두 finger landmark가 없다", info
-    a = marks[roles[0]][1] - origin
-    b = marks[roles[1]][1] - origin
-    if a.length <= _DIR_EPS or b.length <= _DIR_EPS:
-        return None, "finger landmark ray 길이가 0이다", info
-    ua, ub = a.normalized(), b.normalized()
-    normal = ua.cross(ub)
-    info["plane_sin"] = normal.length
-    if normal.length < math.sin(math.radians(2.0)):
-        return None, "finger landmark가 거의 일직선이다", info
-    forward = ua + ub
-    if forward.length <= _DIR_EPS:
-        forward = ua
-    frame, why = _frame_from_direction_normal(forward, normal)
-    if frame is not None:
-        info["normal"] = list(normal.normalized())
-        info["forward"] = list(forward.normalized())
-        info["determinant"] = frame.to_3x3().determinant()
-    return frame, why, info
+    rows: dict[str, list[tuple[int, int, str, Vector, float]]] = {
+        "index": [], "pinky": [], "thumb": []
+    }
+    queue = [(child, 1) for child in root.children]
+    while queue:
+        bone, depth = queue.pop(0)
+        role, explicit = _finger_role(bone.name)
+        if role:
+            point = (arm.matrix_world @ bone.head_local).copy()
+            if reflect_x:
+                point = _reflect_x(point)
+            ray_len = (point - origin).length
+            # 명시 role 우선, 그 안에서는 가장 가까운 유효 base 우선.
+            rows[role].append((0 if explicit else 1, depth, bone.name, point, ray_len))
+        queue.extend((child, depth + 1) for child in bone.children)
+
+    marks: dict[str, tuple[str, Vector]] = {}
+    skipped_zero: dict[str, list[str]] = {}
+    for role, candidates in rows.items():
+        ordered = sorted(candidates, key=lambda r: (r[0], r[1], r[2]))
+        skipped_zero[role] = [r[2] for r in ordered if r[4] <= _DIR_EPS]
+        valid = next((r for r in ordered if r[4] > _DIR_EPS), None)
+        if valid is not None:
+            marks[role] = (valid[2], valid[3])
+    return origin, marks, {
+        "landmarks": {role: row[0] for role, row in marks.items()},
+        "zero_base_candidates": skipped_zero,
+        "uses_pose_geometry": False,
+        "uses_tail_or_fingertip": False,
+    }
+
+
+def _common_palm_roles(
+    source_marks: dict[str, tuple[str, Vector]],
+    target_marks: dict[str, tuple[str, Vector]],
+) -> tuple[str, str] | None:
+    for pair in (("index", "pinky"), ("index", "thumb")):
+        if all(role in source_marks and role in target_marks for role in pair):
+            return pair
+    return None
+
+
+def _palm_frame_from_rest_landmarks(
+    origin: Vector,
+    marks: dict[str, tuple[str, Vector]],
+    roles: tuple[str, str],
+) -> tuple[dict | None, str, dict]:
+    info = {
+        "roles": list(roles),
+        "landmarks": {role: marks[role][0] for role in roles if role in marks},
+    }
+    if any(role not in marks for role in roles):
+        return None, "같은 semantic landmark role pair가 없다", info
+    ray_a = marks[roles[0]][1] - origin
+    ray_b = marks[roles[1]][1] - origin
+    if (
+        ray_a.length <= _DIR_EPS or ray_b.length <= _DIR_EPS
+        or not _vector_is_finite(ray_a) or not _vector_is_finite(ray_b)
+    ):
+        return None, "finger rest base ray가 0이거나 non-finite다", info
+
+    a, b = ray_a.normalized(), ray_b.normalized()
+    normal_raw = a.cross(b)
+    plane_sin = normal_raw.length
+    info["plane_sin"] = plane_sin
+    min_sin = math.sin(math.radians(_QA_PALM_POLICY["min_plane_deg"]))
+    if not math.isfinite(plane_sin) or plane_sin < min_sin:
+        return None, (
+            f"finger rest base가 거의 일직선이다(sin={plane_sin:.6f})"
+        ), info
+
+    normal = normal_raw.normalized()
+    forward = a + b
+    if forward.length <= _DIR_EPS or not _vector_is_finite(forward):
+        return None, "palm forward가 퇴화했다", info
+    forward.normalize()
+    side = normal.cross(forward)
+    if side.length <= _DIR_EPS or not _vector_is_finite(side):
+        return None, "palm side가 퇴화했다", info
+    side.normalize()
+    normal = forward.cross(side).normalized()
+    frame = Matrix((
+        (forward.x, side.x, normal.x, 0.0),
+        (forward.y, side.y, normal.y, 0.0),
+        (forward.z, side.z, normal.z, 0.0),
+        (0.0, 0.0, 0.0, 1.0),
+    ))
+    determinant = frame.to_3x3().determinant()
+    info.update({
+        "forward": list(forward),
+        "normal": list(normal),
+        "determinant": determinant,
+    })
+    if not _matrix_is_finite(frame) or abs(determinant - 1.0) > 1e-5:
+        return None, f"palm frame이 proper rotation이 아니다(det={determinant})", info
+    return {"frame": frame, "forward": forward, "normal": normal}, "", info
+
+
+def _signed_angle_about_axis(
+    start: Vector, target: Vector, axis: Vector
+) -> tuple[float | None, str]:
+    """axis 수직면에서 start -> target signed angle(rad)을 반환한다."""
+    if axis.length <= _DIR_EPS or not _vector_is_finite(axis):
+        return None, "roll axis가 0이거나 non-finite다"
+    u = axis.normalized()
+    a = start - u * start.dot(u)
+    b = target - u * target.dot(u)
+    if (
+        a.length <= _DIR_EPS or b.length <= _DIR_EPS
+        or not _vector_is_finite(a) or not _vector_is_finite(b)
+    ):
+        return None, "palm normal의 roll-plane projection이 퇴화했다"
+    a.normalize()
+    b.normalize()
+    value = math.atan2(u.dot(a.cross(b)), max(-1.0, min(1.0, a.dot(b))))
+    if not math.isfinite(value):
+        return None, "signed palm roll이 non-finite다"
+    return value, ""
+
+
+def _solve_palm_roll(
+    *,
+    source_rest_rotation: Matrix,
+    source_pose_rotation: Matrix,
+    source_frame: dict,
+    target_rest_rotation: Matrix,
+    target_frame: dict,
+    baseline_rotation: Matrix,
+    mu: float,
+) -> tuple[Matrix, dict]:
+    """frozen V3.2 hand에 길이축 roll 하나만 더한다."""
+    source_delta = source_pose_rotation @ source_rest_rotation.inverted()
+    source_pose_normal = source_delta.to_3x3() @ source_frame["normal"]
+    q0 = baseline_rotation @ target_rest_rotation.inverted()
+    baseline_normal = q0.to_3x3() @ target_frame["normal"]
+    axis = q0.to_3x3() @ target_frame["forward"]
+    theta, reason = _signed_angle_about_axis(
+        baseline_normal, source_pose_normal, axis
+    )
+    diag = {
+        "policy_sha256": _QA_PALM_POLICY_SHA256,
+        "mu_candidates": list(_QA_PALM_POLICY["mu_candidates"]),
+        "selected_mu": mu,
+        "mesh_gate": "PENDING_EXTERNAL_MESH_GATE",
+        "source_absolute_rest_copied": False,
+        "finger_pose_geometry_used": False,
+    }
+    if theta is None:
+        diag.update({"mode": "fallback", "fallback_reason": reason})
+        return baseline_rotation.copy(), diag
+
+    requested_deg = math.degrees(theta)
+    diag["requested_deg"] = requested_deg
+    if abs(requested_deg) >= _QA_PALM_POLICY["degenerate_deg"]:
+        diag.update({
+            "mode": "fallback",
+            "fallback_reason": (
+                f"requested palm roll {requested_deg:.3f}deg is near 180deg"
+            ),
+        })
+        return baseline_rotation.copy(), diag
+
+    # 모든 ladder 후보는 같은 frozen baseline에서 독립 생성한다. 반복 누적 금지.
+    candidate_rows = []
+    for candidate_mu in _QA_PALM_POLICY["mu_candidates"]:
+        applied = theta * candidate_mu
+        candidate_normal = (
+            Matrix.Rotation(applied, 4, axis.normalized()).to_3x3()
+            @ baseline_normal
+        )
+        residual, residual_reason = _signed_angle_about_axis(
+            candidate_normal, source_pose_normal, axis
+        )
+        candidate_rows.append({
+            "mu": candidate_mu,
+            "applied_deg": math.degrees(applied),
+            "palm_error_deg": (
+                None if residual is None else abs(math.degrees(residual))
+            ),
+            "numeric_status": "ok" if residual is not None else residual_reason,
+            "mesh_gate": "PENDING_EXTERNAL_MESH_GATE",
+        })
+    diag["candidates"] = candidate_rows
+
+    if abs(requested_deg) < _QA_PALM_POLICY["identity_deg"]:
+        diag.update({
+            "mode": "identity",
+            "applied_deg": 0.0,
+            "fallback_reason": None,
+            "identity_reason": "requested roll under identity threshold",
+        })
+        return baseline_rotation.copy(), diag
+
+    applied = theta * mu
+    result = Matrix.Rotation(applied, 4, axis.normalized()) @ baseline_rotation
+    if not _matrix_is_finite(result) or result.to_3x3().determinant() < 0.999:
+        diag.update({
+            "mode": "fallback",
+            "applied_deg": 0.0,
+            "fallback_reason": "candidate matrix is non-finite or not a proper rotation",
+        })
+        return baseline_rotation.copy(), diag
+    diag.update({
+        "mode": "corrected" if mu > 0.0 else "identity",
+        "applied_deg": math.degrees(applied),
+        "fallback_reason": None,
+        "axis": list(axis.normalized()),
+        "longitudinal_direction_error_deg": _angle_deg(
+            axis,
+            (result @ target_rest_rotation.inverted()).to_3x3()
+            @ target_frame["forward"],
+        ),
+    })
+    return result, diag
 
 
 def _hierarchy_order(arm: bpy.types.Object, names: list[str]) -> list[str]:
@@ -643,14 +927,17 @@ def retarget(
     dst_profile: str | None = None,
     mirror: bool = False,
     apply_root_translation: bool = False,
+    palm_roll_mu: float | dict[str, float] | None = None,
     report: ConvertReport | None = None,
 ) -> ConvertReport:
     rep = report or ConvertReport()
+    selected_palm_mu = _validated_palm_mu_by_hand(palm_roll_mu)
     _QA_SOLVER_MODE_BY_BONE.clear()
     _QA_CHAIN_FRAME_DIAGNOSTICS.clear()
     _QA_CHAIN_FALLBACKS.clear()
     _QA_TERMINAL_FOLLOW_BONES.clear()
     _QA_PELVIS_BOUNDARY_FALLBACKS.clear()
+    _QA_PALM_DIAGNOSTICS.clear()
 
     src_names = [b.name for b in src_arm.data.bones]
     dst_names = [b.name for b in dst_arm.data.bones]
@@ -765,6 +1052,129 @@ def retarget(
     }
     _QA_CHAIN_FRAME_DIAGNOSTICS["_pelvis_boundary"] = pelvis_diag
 
+    def record_palm_fallback(hand: str, reason: str, *, status: str,
+                             detail: dict | None = None) -> None:
+        """해당 손만 현재 frozen V3.2 결과에 남긴다."""
+        rep.palm_roll_requested_deg.setdefault(hand, 0.0)
+        rep.palm_roll_applied_deg[hand] = 0.0
+        rep.palm_roll_mu[hand] = 0.0
+        rep.palm_frame_status[hand] = status
+        rep.palm_roll_mode[hand] = "fallback"
+        rep.palm_fallback_reason[hand] = reason
+        if hand not in rep.palm_roll_fallback_bones:
+            rep.palm_roll_fallback_bones.append(hand)
+        payload = {
+            "mode": "fallback",
+            "fallback_reason": reason,
+            "frame_status": status,
+            "selected_mu": 0.0,
+            "mesh_gate": "NOT_RUN_FALLBACK",
+        }
+        if detail:
+            payload.update(detail)
+        _QA_PALM_DIAGNOSTICS[hand] = payload
+
+    def apply_palm_roll(
+        hand: str,
+        source_hand: str,
+        target_hand: str,
+        baseline: Matrix,
+    ) -> Matrix:
+        """한 손만 독립 계산한다. 실패 시 baseline을 bit-exact하게 반환한다."""
+        try:
+            src_origin, src_marks, src_discovery = _rest_palm_landmarks(
+                src_arm, source_hand, reflect_x=mirror
+            )
+            dst_origin, dst_marks, dst_discovery = _rest_palm_landmarks(
+                dst_arm, target_hand, reflect_x=False
+            )
+        except (KeyError, RuntimeError, ValueError) as exc:
+            record_palm_fallback(
+                hand, f"landmark discovery failed: {exc}",
+                status="landmark_discovery_failed",
+            )
+            return baseline
+
+        roles = _common_palm_roles(src_marks, dst_marks)
+        if roles is None:
+            detail = {
+                "source_discovery": src_discovery,
+                "target_discovery": dst_discovery,
+            }
+            record_palm_fallback(
+                hand,
+                "source와 target에 공통인 index+pinky/index+thumb pair가 없다",
+                status="landmark_pair_missing",
+                detail=detail,
+            )
+            return baseline
+
+        rep.palm_landmark_roles[hand] = list(roles)
+        src_frame, src_reason, src_info = _palm_frame_from_rest_landmarks(
+            src_origin, src_marks, roles
+        )
+        dst_frame, dst_reason, dst_info = _palm_frame_from_rest_landmarks(
+            dst_origin, dst_marks, roles
+        )
+        plane_values = [
+            float(info["plane_sin"])
+            for info in (src_info, dst_info)
+            if "plane_sin" in info and math.isfinite(float(info["plane_sin"]))
+        ]
+        if plane_values:
+            rep.palm_plane_sin[hand] = min(plane_values)
+        frame_detail = {
+            "roles": list(roles),
+            "source_discovery": src_discovery,
+            "target_discovery": dst_discovery,
+            "source_frame": src_info,
+            "target_frame": dst_info,
+        }
+        if src_frame is None or dst_frame is None:
+            record_palm_fallback(
+                hand, src_reason or dst_reason,
+                status="palm_frame_degenerate",
+                detail=frame_detail,
+            )
+            return baseline
+
+        result, palm_diag = _solve_palm_roll(
+            source_rest_rotation=_source_rot(
+                _rest_world(src_arm, source_hand), mirror
+            ),
+            source_pose_rotation=_source_rot(
+                _pose_world(src_arm, source_hand), mirror
+            ),
+            source_frame=src_frame,
+            target_rest_rotation=_rot_only(_rest_world(dst_arm, target_hand)),
+            target_frame=dst_frame,
+            baseline_rotation=baseline,
+            mu=selected_palm_mu[hand],
+        )
+        palm_diag.update(frame_detail)
+        _QA_PALM_DIAGNOSTICS[hand] = palm_diag
+        rep.palm_frame_status[hand] = "ok"
+        rep.palm_roll_requested_deg[hand] = float(
+            palm_diag.get("requested_deg", 0.0)
+        )
+        mode = palm_diag["mode"]
+        rep.palm_roll_mode[hand] = mode
+        rep.palm_fallback_reason[hand] = palm_diag.get("fallback_reason")
+        if mode == "fallback":
+            rep.palm_roll_applied_deg[hand] = 0.0
+            rep.palm_roll_mu[hand] = 0.0
+            rep.palm_frame_status[hand] = "numeric_fallback"
+            if hand not in rep.palm_roll_fallback_bones:
+                rep.palm_roll_fallback_bones.append(hand)
+            return baseline
+
+        applied = float(palm_diag.get("applied_deg", 0.0))
+        rep.palm_roll_applied_deg[hand] = applied
+        rep.palm_roll_mu[hand] = selected_palm_mu[hand] if mode == "corrected" else 0.0
+        if mode == "corrected":
+            rep.palm_roll_bones.append(hand)
+        return result
+
     # 팔: upperarm에서 최소 swing을 시작하고, 그 프레임에서 forearm에 필요한 최소
     # 굽힘만 누적한다. hand는 최종 forearm 수송을 따라 target wrist rest 관계를 보존한다.
     for name, bones in _QA_ARM_CHAINS.items():
@@ -772,6 +1182,10 @@ def retarget(
         _QA_CHAIN_FRAME_DIAGNOSTICS[name] = diag
         if not all(c in pair_by_canon for c in bones):
             fallback_chain(name, bones, "canonical chain 매핑 누락", diag)
+            record_palm_fallback(
+                bones[2], "parent arm chain mapping missing",
+                status="parent_chain_fallback",
+            )
             continue
         fore, hand = bones[1], bones[2]
         s_fore, d_fore = pair_by_canon[fore]
@@ -802,6 +1216,18 @@ def retarget(
                 _QA_SOLVER_MODE_BY_BONE[canon] = "legacy_compatible_chain"
             diag.update({"activated": False,
                          "activation_reason": "rest direction/wrist frame already compatible"})
+            rep.palm_roll_requested_deg[hand] = 0.0
+            rep.palm_roll_applied_deg[hand] = 0.0
+            rep.palm_roll_mu[hand] = 0.0
+            rep.palm_frame_status[hand] = "inactive_compatible_chain"
+            rep.palm_roll_mode[hand] = "identity"
+            rep.palm_fallback_reason[hand] = None
+            _QA_PALM_DIAGNOSTICS[hand] = {
+                "mode": "identity",
+                "frame_status": "inactive_compatible_chain",
+                "selected_mu": 0.0,
+                "mesh_gate": "NOT_NEEDED_COMPATIBLE_CHAIN",
+            }
             continue
         diag.update({"activated": True,
                      "activation_reason": "rest direction or wrist frame mismatch"})
@@ -812,6 +1238,9 @@ def retarget(
         diag["target_edge_lengths"] = lens_d
         if es is None or ed is None:
             fallback_chain(name, bones, why_es or why_ed, diag)
+            record_palm_fallback(
+                hand, why_es or why_ed, status="parent_chain_fallback"
+            )
             continue
         diag.update({
             "source_bend_deg": _angle_deg(es[0], es[1]),
@@ -822,18 +1251,27 @@ def retarget(
         diag["incremental_min_rotation_deg"] = increments
         if maps is None:
             fallback_chain(name, bones, reason, diag)
+            record_palm_fallback(
+                hand, reason, status="parent_chain_fallback"
+            )
             continue
         for i, canon in enumerate(bones[:2]):
             d = pair_by_canon[canon][1]
             desired_rot[canon] = maps[i] @ _rot_only(_rest_world(dst_arm, d))
             _QA_SOLVER_MODE_BY_BONE[canon] = "chain_transport"
-        desired_rot[hand] = maps[1] @ _rot_only(_rest_world(dst_arm, d_hand))
-        _QA_SOLVER_MODE_BY_BONE[hand] = "terminal_follow"
+        frozen_hand = maps[1] @ _rot_only(_rest_world(dst_arm, d_hand))
+        desired_rot[hand] = apply_palm_roll(hand, s_hand, d_hand, frozen_hand)
+        _QA_SOLVER_MODE_BY_BONE[hand] = (
+            "terminal_follow_palm_roll"
+            if rep.palm_roll_mode.get(hand) == "corrected"
+            else "terminal_follow"
+        )
         _QA_TERMINAL_FOLLOW_BONES.append(hand)
         rep.terminal_follow_bones.append(hand)
         diag["applied_bones"] = list(bones[:2])
         diag["terminal_follow_bones"] = [hand]
         diag["frame_determinants"] = [q.to_3x3().determinant() for q in maps]
+        diag["palm_roll"] = _QA_PALM_DIAGNOSTICS.get(hand, {})
 
     def solve_leg_maps(es: list[Vector], ed: list[Vector], initial: Matrix
                        ) -> tuple[dict | None, str]:
@@ -1056,6 +1494,17 @@ def retarget(
         diag["frame_determinants"] = [q.to_3x3().determinant() for q in maps]
 
     rep.solver_mode_by_bone = dict(_QA_SOLVER_MODE_BY_BONE)
+    _QA_CHAIN_FRAME_DIAGNOSTICS["_palm_roll"] = {
+        "variant": _QA_VARIANT_NAME,
+        "parent_variant": _QA_PARENT_VARIANT,
+        "parent_retarget_sha256": _QA_PARENT_RETARGET_SHA256,
+        "policy_sha256": _QA_PALM_POLICY_SHA256,
+        "requested_mu": selected_palm_mu,
+        "default_is_exact_parent": _QA_PALM_POLICY["default_mu"] == 0.0,
+        "operational_status": "PROMOTED_RUNTIME",
+        "actual_mesh_gate": "V3.2.5_SELECTOR",
+        "hands": dict(_QA_PALM_DIAGNOSTICS),
+    }
     rep.chain_diagnostics = dict(_QA_CHAIN_FRAME_DIAGNOSTICS)
 
     # 모든 회전을 source pose/target rest에서 먼저 확정한 뒤에만 pose를 변경한다.

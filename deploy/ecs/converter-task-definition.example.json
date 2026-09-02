@@ -70,6 +70,10 @@
           "value": "1"
         },
         {
+          "name": "CONVERTER_FORCE_EXACT_V324",
+          "value": "false"
+        },
+        {
           "name": "CONVERTER_MAX_BVH_BYTES",
           "value": "2097152"
         },

@@ -39,6 +39,7 @@ def test_converter_task_is_isolated_internal_fargate_contract():
     env = _environment(container)
     assert env["CONVERTER_TIMEOUT_SECONDS"] == "30"
     assert env["CONVERTER_MAX_CONCURRENT_PROCESSES"] == "1"
+    assert env["CONVERTER_FORCE_EXACT_V324"] == "false"
     assert env["CONVERTER_JSON_LOGS"] == "1"
     assert env["STANDIN_MASTER_V2_URI"].startswith("/characters/")
     character_mount = next(

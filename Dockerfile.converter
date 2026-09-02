@@ -68,8 +68,18 @@ RUN python -m pip install --requirement /app/requirements-converter.txt
 # Runtime allowlist: no inference source, tests, QA snapshots, or user artifacts.
 COPY converter/__init__.py /app/converter/__init__.py
 COPY converter/ankle_policy.json /app/converter/ankle_policy.json
+COPY converter/SHA256SUMS.v325 /app/converter/SHA256SUMS.v325
+COPY converter/airborne_plantar.py /app/converter/airborne_plantar.py
+COPY converter/airborne_plantar_policy.json /app/converter/airborne_plantar_policy.json
+COPY converter/ankle_clearance.py /app/converter/ankle_clearance.py
+COPY converter/ankle_clearance_policy.json /app/converter/ankle_clearance_policy.json
+COPY converter/ankle_swing.py /app/converter/ankle_swing.py
+COPY converter/ankle_swing_policy.json /app/converter/ankle_swing_policy.json
 COPY converter/bone_map.py /app/converter/bone_map.py
 COPY converter/convert.py /app/converter/convert.py
+COPY converter/foot_plant.py /app/converter/foot_plant.py
+COPY converter/foot_plant_policy.json /app/converter/foot_plant_policy.json
+COPY converter/palm_roll_policy.json /app/converter/palm_roll_policy.json
 COPY converter/protocol.py /app/converter/protocol.py
 COPY converter/retarget.py /app/converter/retarget.py
 COPY converter/worker.py /app/converter/worker.py

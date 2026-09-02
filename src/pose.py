@@ -6,6 +6,7 @@ MVP 범위(1인·곧은 자세)에서 파인튜닝 없이 동작함이 실증됨
 """
 from __future__ import annotations
 
+from pathlib import Path
 from typing import List, Optional
 
 import numpy as np
@@ -49,6 +50,19 @@ class BasePoseModel:
         """슬롯 복구용 후보 목록. 단일 결과 백엔드는 0~1개로 호환한다."""
         result = self.estimate_crop(image, box, img_w, img_h)
         return [result] if result is not None else []
+
+    def rescue_candidates(self, image, img_w: int, img_h: int) -> List[Skeleton]:
+        """Secondary full-image candidates. Non-cascade models are a no-op."""
+        return []
+
+    def fallback_kpt_threshold(self) -> float:
+        return float(CFG.skeleton_kpt_threshold)
+
+    def rescue_stage(self) -> str:
+        return "off"
+
+    def fallback_init_ms(self) -> float:
+        return 0.0
 
 
 class MockPoseModel(BasePoseModel):
@@ -100,11 +114,53 @@ class RTMPoseModel(BasePoseModel):
         from rtmlib import Body            # 지연 import
         self.model = Body(mode="performance", backend="onnxruntime", device="cpu")
 
+    @staticmethod
+    def _skeletons(keypoints, scores) -> List[Skeleton]:
+        return [
+            Skeleton(
+                np.asarray(points, dtype=np.float32),
+                np.asarray(score, dtype=np.float32),
+            )
+            for points, score in zip(keypoints, scores)
+        ]
+
+    def detector_contract(self) -> dict | None:
+        """Return the concrete detector session identity used by current-X."""
+        if getattr(self.model, "one_stage", False):
+            return None
+        detector = self.model.det_model
+        return {
+            "model_path": str(Path(detector.onnx_model).resolve()),
+            "input_size_wh": tuple(detector.model_input_size),
+            "component": detector,
+        }
+
+    def estimate_with_rescue_context(self, image, boxes, img_w, img_h):
+        """Run current-X once and retain its detector boxes for cascade rescue.
+
+        The context is request-local data returned to ``Pipeline``; no mutable
+        last-request cache is kept on the shared model instance.
+        """
+        bgr = _load_bgr(image)
+        if getattr(self.model, "one_stage", False):
+            keypoints, scores = self.model(bgr)
+            return self._skeletons(keypoints, scores), None
+        detector = self.model.det_model
+        detected = detector(bgr)
+        keypoints, scores = self.model.pose_model(bgr, bboxes=detected)
+        context = {
+            "detector_model_path": str(Path(detector.onnx_model).resolve()),
+            "detector_input_size_wh": tuple(detector.model_input_size),
+            "detected_bboxes": np.asarray(detected, dtype=np.float32).copy(),
+        }
+        return self._skeletons(keypoints, scores), context
+
     def estimate(self, image, boxes, img_w, img_h):
         # 한글/유니코드 경로는 _load_bgr가 cv2.imdecode(np.fromfile)로 안전 로드.
-        kpts, scores = self.model(_load_bgr(image))   # (N,17,2), (N,17)
-        return [Skeleton(np.asarray(k, dtype=np.float32), np.asarray(s, dtype=np.float32))
-                for k, s in zip(kpts, scores)]
+        skeletons, _context = self.estimate_with_rescue_context(
+            image, boxes, img_w, img_h
+        )
+        return skeletons
 
     def estimate_crop_candidates(self, image, box: BBox, img_w, img_h) -> List[Skeleton]:
         img = _load_bgr(image)
@@ -134,10 +190,55 @@ class RTMPoseModel(BasePoseModel):
 
 
 def build_pose_model() -> BasePoseModel:
+    variant = CFG.pose_model_variant.strip().lower()
+    if variant == "cascade":
+        if CFG.pose_backend.lower() != "rtmlib":
+            message = (
+                "cascade requires POSE_BACKEND=rtmlib, "
+                f"got {CFG.pose_backend!r}"
+            )
+            if CFG.pose_strict or CFG.is_production:
+                raise RuntimeError(message)
+            print(f"[pose] {message} → mock 폴백")
+            return MockPoseModel()
+        try:
+            from .pose_cascade import CascadePoseModel
+            return CascadePoseModel()
+        except Exception as e:
+            if CFG.pose_strict or CFG.is_production:
+                raise
+            print(f"[pose] cascade 초기화 실패({e}) → mock 폴백")
+            return MockPoseModel()
+    if variant == "humanart-m":
+        if CFG.pose_backend.lower() != "rtmlib":
+            message = (
+                "humanart-m requires POSE_BACKEND=rtmlib, "
+                f"got {CFG.pose_backend!r}"
+            )
+            if CFG.pose_strict or CFG.is_production:
+                raise RuntimeError(message)
+            print(f"[pose] {message} → mock 폴백")
+            return MockPoseModel()
+        try:
+            from .pose_humanart import HumanArtPoseModel
+            return HumanArtPoseModel()
+        except Exception as e:
+            if CFG.pose_strict or CFG.is_production:
+                raise
+            print(f"[pose] humanart-m 초기화 실패({e}) → mock 폴백")
+            return MockPoseModel()
+    if variant != "current-x":
+        message = f"unknown POSE_MODEL_VARIANT={CFG.pose_model_variant!r}"
+        if CFG.pose_strict or CFG.is_production:
+            raise RuntimeError(message)
+        print(f"[pose] {message} → mock 폴백")
+        return MockPoseModel()
     if CFG.pose_backend.lower() == "rtmlib":
         try:
             return RTMPoseModel()
         except Exception as e:
+            if CFG.pose_strict or CFG.is_production:
+                raise
             # 조용한 폴백은 프로덕션에서 runtime_guard가 기동을 막는다. 여기서는
             # "왜" 폴백했는지를 남긴다 — 가드가 잡은 뒤 원인을 찾는 유일한 단서다.
             log_warn("backend_fallback", "rtmlib 초기화 실패 → mock 폴백",

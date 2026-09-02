@@ -37,7 +37,7 @@ def main() -> int:
     args = _args()
     health = json.loads(args.health.read_text(encoding="utf-8"))
     assert health["ok"] is True
-    assert health["solver_version"] == "chain-transport-v3.2"
+    assert health["solver_version"] == "chain-transport-v3.2.5"
     assert health["checks"]["blender"] == {
         "ok": True,
         "version": "5.2.0",
@@ -52,7 +52,7 @@ def main() -> int:
     assert len(artifact) > 1_000
     assert artifact.startswith(b"Kaydara FBX Binary")
     assert headers["content-type"].startswith("application/octet-stream")
-    assert headers["x-standin-solver-version"] == "chain-transport-v3.2"
+    assert headers["x-standin-solver-version"] == "chain-transport-v3.2.5"
     assert headers["x-standin-source-bvh-sha256"] == hashlib.sha256(bvh).hexdigest()
     assert headers["x-standin-artifact-sha256"] == hashlib.sha256(artifact).hexdigest()
     assert headers["x-standin-source-profile"] == "mixamo_noprefix"
