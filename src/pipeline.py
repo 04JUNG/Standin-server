@@ -33,7 +33,7 @@ from .pose_rescue import parse_rescue_request, rescue_slots
 from .routing import route
 from .descriptor import build_slot_descriptors
 from .refine_policy import structural_refine_allowed
-from .search import candidate_stability, knn_geometric
+from .search import PositionSearchIndex, candidate_stability, knn_geometric
 from .tracing import span
 from .skeleton_extraction import (
     apply_crop_result,
@@ -64,7 +64,13 @@ class _SlotOutcome:
 class Pipeline:
     def __init__(self, entries, vlm_client: BaseVLMClient | None = None,
                  detector=None, pose_model=None):
-        self.entries = entries
+        # 검색 행렬과 메타데이터가 실행 중 서로 어긋나지 않도록 같은 immutable
+        # snapshot을 공유한다. 라이브러리 갱신은 새 Pipeline 생성 시 자동 반영된다.
+        self.entries = tuple(entries)
+        self.search_index = (
+            PositionSearchIndex.build(self.entries)
+            if CFG.position_search_vectorized else None
+        )
         self.vlm = vlm_client or build_vlm_client()
         self.detector = detector or MockDetector()
         self.pose = pose_model or build_pose_model()
@@ -543,6 +549,7 @@ class Pipeline:
                 conservative_candidates = knn_geometric(
                     self.entries, desc.feature,
                     query_valid_mask=conservative_mask,
+                    search_index=self.search_index,
                     metric=search_metric,
                 )
                 stability = candidate_stability(
@@ -668,6 +675,7 @@ class Pipeline:
             self.entries, desc.feature,
             top_k=top_k,
             query_valid_mask=query_valid_mask,
+            search_index=self.search_index,
             metric=distance_metric,
         )
         if not cands:

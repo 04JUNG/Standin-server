@@ -126,6 +126,11 @@ class Config:
     # 실데이터로 보정: 좋은 매칭 ~0.15, 앉기-서기 ~0.36, 추출실패 ~0.6+ 관측.
     # 검색 거리: "pos"(위치L2·기본) | "angle"(뼈 방향·비율 불변) | "hybrid"
     distance_metric: str = os.getenv("DISTANCE", "pos")
+    # pos metric의 projection 전체를 NumPy 행렬로 계산한다. 0이면 기존 scalar
+    # 구현으로 즉시 복구하며 후보 정책·정렬·family dedup은 동일하게 유지한다.
+    position_search_vectorized: bool = _env_bool(
+        "POSITION_SEARCH_VECTORIZED", True
+    )
     hybrid_w: float = float(os.getenv("HYBRID_W", "0.7"))   # hybrid에서 각도 비중
     fallback_distance: float = float(os.getenv("FALLBACK_DISTANCE", "0.45"))
     # mask-aware 거리는 coverage마다 분모가 달라 raw distance를 서로 직접 비교할 수 없다.
