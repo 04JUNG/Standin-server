@@ -90,12 +90,32 @@ jobs:
             --task-definition "$TASK_DEFINITION" \
             --query taskDefinition > taskdef.json
 
+      - name: Verify Human-Art promotion prerequisites
+        if: ${{ (vars.POSE_MODEL_VARIANT || 'cascade') == 'cascade' }}
+        run: |
+          jq -e '
+            .containerDefinitions[]
+            | select(.name == "inference")
+            | [.environment[]?
+                | select(.name == "POSE_MODEL_MANIFEST" and (.value | length > 0))]
+            | length == 1
+          ' taskdef.json
+
       - uses: aws-actions/amazon-ecs-render-task-definition@v1
         id: render
         with:
           task-definition: taskdef.json
           container-name: inference
           image: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          # 기본은 전체 요청에서 current-X 실패 슬롯에 Human-Art rescue를 적용한다.
+          # 긴급 롤백은 environment vars를 POSE_MODEL_VARIANT=current-x,
+          # POSE_CANARY_STAGE=off로 바꾼 뒤 workflow_dispatch를 실행한다.
+          environment-variables: |
+            APP_ENV=production
+            POSE_BACKEND=rtmlib
+            POSE_MODEL_VARIANT=${{ vars.POSE_MODEL_VARIANT || 'cascade' }}
+            POSE_CANARY_STAGE=${{ vars.POSE_CANARY_STAGE || 'canary-100' }}
+            POSE_STRICT=1
 
       - uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:

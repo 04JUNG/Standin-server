@@ -117,10 +117,18 @@ python scripts/eval_refine_v2_synthetic.py --bvh-dir data/bvh --out out/refine-v
 |---|---|---|
 | VLM provider | `VLM_PROVIDER=gemini` + `pip install google-genai pillow` + `GEMINI_API_KEY` | `src/vlm/client.py::build_vlm_client` |
 | 포즈 추정 | `POSE_BACKEND=rtmlib` + `pip install rtmlib onnxruntime opencv-python` | `src/pose.py::RTMPoseModel` |
+| 전체 Human-Art rescue | `POSE_MODEL_VARIANT=cascade` + manifest + `POSE_CANARY_STAGE=canary-100` + `POSE_STRICT=1` | `src/pose_cascade.py` · `src/runtime_guard.py` |
 | 실 라이브러리 | `BVH_DIR=<폴더> python scripts/build_db.py` | `src/library.py::load_bvh_pose` |
 
 `build_*()` 팩토리는 실패 시 조용히 mock으로 폴백한다 → 키가 없어도 파이프라인은 항상 돈다.
 설정값은 `.env`(예시: `.env.example`)로 주입. **`.env`·API 키·`data/`는 커밋 금지**(`.gitignore` 등록됨).
+
+배포 workflow는 기본적으로 `cascade`와 `canary-100`을 ECS task definition에 주입한다.
+이는 모든 요청을 cascade 경로에 넣되, Human-Art는 current-X가 해결하지 못한 슬롯이 있을 때만
+실행한다는 뜻이다. 기존 task definition에는 컨테이너에서 읽을 수 있는
+`POSE_MODEL_MANIFEST`가 미리 설정돼 있어야 하며, 없으면 배포가 변환 단계 전에 중단된다.
+긴급 롤백은 배포 환경 변수 `POSE_MODEL_VARIANT=current-x`, `POSE_CANARY_STAGE=off`를 설정한 뒤
+workflow를 다시 실행한다.
 
 ---
 
