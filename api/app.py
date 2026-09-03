@@ -515,7 +515,7 @@ def get_pose_bvh(pose_id: str):
 
 
 @app.get("/pose/{pose_id}/thumbnail")
-def get_pose_thumbnail(pose_id: str, view: str):
+def get_pose_thumbnail(pose_id: str, view: str, request: Request):
     """번들에 포함된 후보 시점 썸네일을 반환한다."""
     if view not in THUMBNAIL_VIEWS:
         raise HTTPException(400, f"unsupported thumbnail view: {view}")
@@ -529,10 +529,28 @@ def get_pose_thumbnail(pose_id: str, view: str):
     #   PNG로 잘못 알려 주면 BFF가 그 값을 그대로 프록시해 클라이언트까지 전달된다.
     #   `blobToDataUrl`이 그 MIME으로 data URL을 만들기 때문에, 스니핑이 관대하지 않은
     #   WebView에서는 썸네일이 그려지지 않는다.
+    #
+    # ETag를 함께 준다. 썸네일 URL은 포즈·시점마다 고정인데 **내용은 번들을 갈아끼우면
+    # 바뀐다**. 검증자 없이 max-age만 두면 클라이언트가 24시간 동안 옛 그림을 계속
+    # 보여 준다 — 2026-09-03 번들 교체 때 실제로 그랬다(렌더가 바뀌었는데 캐시된 옛
+    # 썸네일이 남아, 이미 본 포즈만 예전 그림으로 보였다).
+    #
+    # 파일 stat으로 만든다. 내용 해시가 더 정확하지만 요청마다 4~5 KB를 읽어야 하고,
+    # 번들이 바뀌면 파일이 통째로 교체되므로 크기·mtime이면 충분하다.
+    stat = path.stat()
+    etag = '"%x-%x"' % (int(stat.st_mtime), stat.st_size)
+    if request.headers.get("if-none-match") == etag:
+        return Response(status_code=304, headers={
+            "ETag": etag,
+            "Cache-Control": "private, max-age=86400",
+        })
     return FileResponse(
         path,
         media_type=mimetypes.guess_type(path.name)[0] or "application/octet-stream",
-        headers={"Cache-Control": "private, max-age=86400"},
+        headers={
+            "ETag": etag,
+            "Cache-Control": "private, max-age=86400",
+        },
     )
 
 
