@@ -331,9 +331,9 @@ role로 전용 temp cache에 내려받고, worker 실행 전 registry SHA-256을
 받지 않는다.
 동일 `character_id`의 내용이 바뀌면 안 된다. 변경은 새 revision·새 해시로 등록한다.
 
-현재 registry에는 기본 남성 `standin-master-v2`와 별도 여성 `standin-female-v2` metadata가
-있다. 여성 URI를 배포 환경에 넣기 전에는 `/characters`에 노출되지 않는다. 여성 asset의
-육안 승인과 업로드가 끝난 뒤에만 `STANDIN_FEMALE_V2_URI`를 설정한다.
+현재 registry에는 기본 남성 `standin-master-v2`와 beta 운영 승인 여성
+`standin-female-v2-lbs` metadata가 있다. beta 배포에는 승인 artifact를 업로드한 뒤
+`STANDIN_FEMALE_V2_LBS_URI`를 설정한다. URI가 없는 환경에서는 `/characters`에 노출되지 않는다.
 
 ## 8. Blender 실행 계약
 

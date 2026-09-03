@@ -129,8 +129,9 @@ def test_packaged_registry_declares_distinct_male_and_female_artifacts():
     )
 
     male = registry.metadata("standin-master-v2")
-    female = registry.metadata("standin-female-v2")
+    female = registry.metadata("standin-female-v2-lbs")
     assert male.artifact_uri_env == "STANDIN_MASTER_V2_URI"
     assert male.sha256 == "7c648b97a24a3bb4914b6e5d515708c33727979881d92ef916d5726e22301f3d"
-    assert female.artifact_uri_env == "STANDIN_FEMALE_V2_URI"
+    assert female.artifact_uri_env == "STANDIN_FEMALE_V2_LBS_URI"
     assert female.sha256 == "96cd01717ed48ce416333c21dc68e8d62d185e91e016056c9eae305e8c37a186"
+    assert female.revision == "v2"
