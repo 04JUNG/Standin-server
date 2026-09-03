@@ -556,7 +556,7 @@ def test_v25_api_base_fallback_has_no_inline_bvh():
     with tempfile.TemporaryDirectory() as directory:
         base = _synthetic_bvh(directory, "base.bvh")
         request = RefineRequest(
-            pose_id="pose", view="front",
+            pose_id="pose", view="back",
             keypoints=np.zeros((17, 2)).tolist(),
             refine_allowed=False,
         )
@@ -577,6 +577,7 @@ def test_v25_api_base_fallback_has_no_inline_bvh():
         assert response.reason == "skeleton_policy"
         assert response.bvh is None
         assert response.thumbnail is not None
+        assert response.thumbnail.view == "back"
         assert base64.b64decode(response.thumbnail.data, validate=True).startswith(
             b"\x89PNG\r\n\x1a\n"
         )

@@ -227,7 +227,7 @@ BFF의 `refined_artifacts` PK(`job_id, person_index, candidate_id`)가 같은 �
   돌려주고, 추론 API는 이 경로로 호출한다. 평가·진단 스크립트는 계속 `out_path`를 준다
 - `REFINE_DIR` 설정 제거
 - `bvh_url`은 refined 여부와 무관하게 항상 `/pose/{id}/bvh`(베이스)
-- 최종 결과의 front PNG는 같은 `/refine` 응답의 `thumbnail`에 base64로 인라인한다.
+- 최종 결과를 선택 후보의 매칭 `view`로 그린 PNG는 같은 `/refine` 응답의 `thumbnail`에 base64로 인라인한다.
   기존 후보와 같은 `warm-mannequin-v1` 렌더러를 쓰며 PNG도 로컬에 저장하지 않는다
 
 4번의 전제는 리뷰에서 확인됐다(2026-08-07). `/refined/{handle}/bvh`를 HTTP로 읽는 코드는

@@ -169,7 +169,7 @@ class RefineRequest(BaseModel):
 
 class RefineThumbnailOut(BaseModel):
     """Stateless PNG artifact returned with the final refine result."""
-    view: Literal["front"] = "front"
+    view: Literal["front", "three_quarter", "side", "back"]
     media_type: Literal["image/png"] = "image/png"
     encoding: Literal["base64"] = "base64"
     data: str = Field(..., description="base64-encoded 256×256 PNG bytes")
@@ -201,8 +201,9 @@ class RefineResponse(BaseModel):
                           "자기 저장소에 보관해야 한다.")
     thumbnail: Optional[RefineThumbnailOut] = Field(
         None,
-        description=("최종 결과의 front 256×256 PNG. 조정본/베이스 모두 같은 "
-                     "마네킹 렌더러를 쓰며 base64로 인라인 반환한다."),
+        description=("선택 후보의 매칭 view로 그린 최종 결과 256×256 PNG. "
+                     "조정본/베이스 모두 같은 마네킹 렌더러를 쓰며 base64로 "
+                     "인라인 반환한다."),
     )
     loss_base: Optional[float] = Field(None, description="조정 전 각도 손실")
     loss_final: Optional[float] = Field(None, description="조정 후 각도 손실")

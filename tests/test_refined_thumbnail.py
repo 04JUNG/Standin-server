@@ -25,8 +25,8 @@ from tests.test_smoke import _synthetic_bvh
 from scripts.deploy_pose_library import make_archive
 
 
-def _image_from_payload(payload) -> Image.Image:
-    assert payload.view == "front"
+def _image_from_payload(payload, expected_view: str) -> Image.Image:
+    assert payload.view == expected_view
     assert payload.media_type == "image/png"
     assert payload.encoding == "base64"
     assert payload.renderer_version == THUMBNAIL_RENDERER_VERSION
@@ -37,15 +37,24 @@ def test_batch_and_refine_share_the_same_renderer():
     assert batch_renderer.render_bvh_thumbnail is render_bvh_thumbnail
 
 
-def test_refine_thumbnail_encodes_front_png_for_path_and_inline_bvh():
+def test_refine_thumbnail_uses_selected_view_for_path_and_inline_bvh():
     with tempfile.TemporaryDirectory() as directory:
         bvh = Path(_synthetic_bvh(directory, "pose.bvh"))
-        from_path = _image_from_payload(api_app._refine_thumbnail(bvh_path=str(bvh)))
+        front = _image_from_payload(
+            api_app._refine_thumbnail(view="front", bvh_path=str(bvh)), "front"
+        )
+        from_path = _image_from_payload(
+            api_app._refine_thumbnail(view="side", bvh_path=str(bvh)), "side"
+        )
         from_text = _image_from_payload(
-            api_app._refine_thumbnail(bvh_text=bvh.read_text(encoding="utf-8"))
+            api_app._refine_thumbnail(
+                view="side", bvh_text=bvh.read_text(encoding="utf-8")
+            ),
+            "side",
         )
         assert from_path.size == from_text.size == (256, 256)
         assert ImageChops.difference(from_path, from_text).getbbox() is None
+        assert ImageChops.difference(front, from_path).getbbox() is not None
 
 
 def test_pose_bundle_includes_thumbnail_manifest():

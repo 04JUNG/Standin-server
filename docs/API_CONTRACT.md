@@ -51,7 +51,7 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
 | `GET` | `/pose/{pose_id}/bvh` | 경로 파라미터 | `application/octet-stream` | 동원 내보내기 |
 | `POST` | `/export-order` | `ExportOrderRequest` | `ExportOrder` | base-only legacy 주문서 (→ `EXPORT_CONTRACT.md`) |
 | `GET` | `/docs` | — | OpenAPI UI | 사람(계약 확인) |
-| `POST` | `/refine` | `RefineRequest` | `RefineResponse` | 앱 서버 → 조정된 BVH와 front PNG 본문(응답 `bvh`, `thumbnail`) |
+| `POST` | `/refine` | `RefineRequest` | `RefineResponse` | 앱 서버 → 조정된 BVH와 후보 매칭 시점 PNG 본문(응답 `bvh`, `thumbnail`) |
 
 > `PersonOut`에 **`keypoints`(17×2, 이미지 픽셀)** · **`scores`(17)** 가 포함된다.
 > `/analyze`가 이미 추출하는 값이라 연산 추가는 0이며, `/refine`을 순수 함수로 만들기 위한 것이다.
@@ -143,8 +143,9 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
 두 경우를 구분하지 않고 동작한다("좋아지거나, 그대로"). `reason` 값 목록은
 `REFINE_DESIGN.md`의 안전 처리 기준.
 
-`thumbnail`은 최종 결과를 기존 후보와 같은 `warm-mannequin-v1` 코드로 그린 front 고정
-256×256 PNG다. `refined=true`면 조정 BVH, `false`면 정확한 베이스 BVH를 렌더링하므로 UI는
+`thumbnail`은 최종 결과를 기존 후보와 같은 `warm-mannequin-v1` 코드 및 요청의 `view`로 그린
+256×256 PNG다. 즉 사용자가 고른 후보 썸네일의 방향을 유지한다. `refined=true`면 조정 BVH,
+`false`면 정확한 베이스 BVH를 렌더링하므로 UI는
 두 경우 모두 `data:image/png;base64,{thumbnail.data}`로 표시할 수 있다. 추론 서버에는 PNG나
 조정 BVH를 영속 저장하지 않는다.
 

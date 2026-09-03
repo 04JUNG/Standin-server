@@ -3,7 +3,7 @@ FastAPI 레이어 — 도원의 Python 추론 서버.
 
 경계: [앱 서버 팀] --HTTP--> [이 서비스]  (문서화된 OpenAPI 계약 = /docs)
   POST /analyze         멀티파트 PNG 러프 컷 → CutResult(JSON)
-  POST /refine          선택 포즈 → 조정 BVH + front PNG(JSON 인라인)
+  POST /refine          선택 포즈 → 조정 BVH + 매칭 시점 PNG(JSON 인라인)
   GET  /pose/{id}/bvh   후보 pose_id → 라이브러리 BVH 파일(동원 내보내기 팀이 소비)
   GET  /healthz         기동 확인
 
@@ -547,21 +547,21 @@ def _file_sha256(path: str) -> str:
 
 
 def _refine_thumbnail(
-    *, bvh_path: Optional[str] = None, bvh_text: Optional[str] = None
+    *, view: str, bvh_path: Optional[str] = None, bvh_text: Optional[str] = None
 ) -> RefineThumbnailOut:
-    """Render a front PNG without persisting a refined artifact on this server."""
+    """Render the selected candidate view without persisting a refined artifact."""
     if (bvh_path is None) == (bvh_text is None):
         raise ValueError("provide exactly one thumbnail BVH source")
 
     try:
         if bvh_text is None:
-            image = render_bvh_thumbnail(str(bvh_path), "front")
+            image = render_bvh_thumbnail(str(bvh_path), view)
         else:
             with tempfile.TemporaryDirectory(prefix="standin-refine-thumbnail-") as directory:
                 temporary_bvh = os.path.join(directory, "refined.bvh")
                 with open(temporary_bvh, "w", encoding="utf-8", newline="\n") as sink:
                     sink.write(bvh_text)
-                image = render_bvh_thumbnail(temporary_bvh, "front")
+                image = render_bvh_thumbnail(temporary_bvh, view)
         encoded = io.BytesIO()
         image.save(encoded, format="PNG", optimize=True)
     except (OSError, AssertionError, ValueError, IndexError) as exc:
@@ -574,6 +574,7 @@ def _refine_thumbnail(
         ) from exc
 
     return RefineThumbnailOut(
+        view=view,
         data=base64.b64encode(encoded.getvalue()).decode("ascii"),
         renderer_version=THUMBNAIL_RENDERER_VERSION,
     )
@@ -639,7 +640,7 @@ def refine(req: RefineRequest):
         return RefineResponse(
             pose_id=req.pose_id, view=req.view, refined=False,
             reason=reason, bvh_url=f"/pose/{req.pose_id}/bvh", bvh=None,
-            thumbnail=_refine_thumbnail(bvh_path=base),
+            thumbnail=_refine_thumbnail(view=req.view, bvh_path=base),
             loss_base=None, loss_final=None, gain=None, backend="none",
             refine_version=(REFINE_V2_CODE_VERSION if CFG.refine_v2_enabled
                             else REFINE_CODE_VERSION),
@@ -739,9 +740,9 @@ def refine(req: RefineRequest):
         bvh_url=f"/pose/{req.pose_id}/bvh",
         bvh=res.bvh_text if res.refined else None,
         thumbnail=(
-            _refine_thumbnail(bvh_text=res.bvh_text)
+            _refine_thumbnail(view=req.view, bvh_text=res.bvh_text)
             if res.refined
-            else _refine_thumbnail(bvh_path=base)
+            else _refine_thumbnail(view=req.view, bvh_path=base)
         ),
         loss_base=None if np.isnan(res.loss_base) else res.loss_base,
         loss_final=None if np.isnan(res.loss_final) else res.loss_final,

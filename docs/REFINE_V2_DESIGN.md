@@ -94,7 +94,7 @@ Top-N/Top-5 후보를 사용자에게 보여주기 전에 전부 refine하거나
 
 `/analyze`는 베이스 Top-5와 기존 베이스 썸네일을 먼저 반환하며 선행 refine 완료를 기다리지
 않는다. 사용자가 후보를 선택하면 그 후보 하나만 refine하고, 응답의 인라인 `bvh`를 3D 뷰어와
-export에 사용한다. 같은 응답의 `thumbnail`은 최종 BVH를 기존 후보와 같은 렌더러로 그린 front
+export에 사용한다. 같은 응답의 `thumbnail`은 최종 BVH를 기존 후보와 같은 렌더러·매칭 view로 그린
 PNG이므로 선택 결과 카드에서 즉시 확인할 수 있다. Top-5 전체의 선행 refined PNG 생성은 하지 않는다.
 
 post-click 지연이 실제 사용자 이탈 원인으로 측정되면 Top-1 또는 hover 후보의 저우선 백그라운드
@@ -1000,7 +1000,7 @@ PASS로 만들지 않고 `INCONCLUSIVE`를 반환한다. 실행·라벨 절차�
 
 후보 카드의 정적 썸네일은 베이스 포즈를 나타낸다. 선택 후 `/refine`은 최종 BVH와 함께
 `thumbnail={view,media_type,encoding,data,width,height,renderer_version}`를 반환한다. `data`는
-`warm-mannequin-v1`이 front 고정 256×256로 렌더링한 PNG의 base64이며, 조정이 폐기된 경우에도
+`warm-mannequin-v1`이 요청의 후보 매칭 view로 256×256 렌더링한 PNG의 base64이며, 조정이 폐기된 경우에도
 베이스 BVH를 같은 방식으로 렌더링한다. PNG와 조정 BVH 모두 추론 서버에 영속 저장하지 않는다.
 
 BFF·클라이언트·export는 조정본이 있으면 응답의 인라인 `bvh`를 끝까지 보존해야 한다.
