@@ -90,14 +90,16 @@ jobs:
             --task-definition "$TASK_DEFINITION" \
             --query taskDefinition > taskdef.json
 
-      - name: Verify Human-Art promotion prerequisites
+      - name: Verify Human-Art model source
         if: ${{ (vars.POSE_MODEL_VARIANT || 'cascade') == 'cascade' }}
+        # 모델 URI는 환경별 assets 버킷을 소유한 CDK/CloudFormation이 task
+        # definition에 넣는다. 앱 workflow는 값을 덮어쓰지 않고 존재만 확인한다.
         run: |
           jq -e '
             .containerDefinitions[]
             | select(.name == "inference")
             | [.environment[]?
-                | select(.name == "POSE_MODEL_MANIFEST" and (.value | length > 0))]
+                | select(.name == "POSE_MODEL_URI" and (.value | length > 0))]
             | length == 1
           ' taskdef.json
 
