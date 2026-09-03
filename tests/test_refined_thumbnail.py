@@ -57,6 +57,36 @@ def test_refine_thumbnail_uses_selected_view_for_path_and_inline_bvh():
         assert ImageChops.difference(front, from_path).getbbox() is not None
 
 
+def test_refine_thumbnail_returns_none_instead_of_failing_the_request():
+    """렌더 실패는 오류가 아니다 — None으로 수렴하고 예외를 밖으로 내보내지 않는다."""
+    def _explode(*_args, **_kwargs):
+        raise RuntimeError("renderer exploded")
+
+    with tempfile.TemporaryDirectory() as directory:
+        bvh = Path(_synthetic_bvh(directory, "pose.bvh"))
+        original = api_app.render_bvh_thumbnail
+        try:
+            api_app.render_bvh_thumbnail = _explode
+            assert api_app._refine_thumbnail(view="front", bvh_path=str(bvh)) is None
+            assert api_app._refine_thumbnail(
+                view="front", bvh_text=bvh.read_text(encoding="utf-8")
+            ) is None
+        finally:
+            api_app.render_bvh_thumbnail = original
+
+
+def test_refine_thumbnail_still_rejects_an_ambiguous_source():
+    """호출측 버그는 계속 즉시 터져야 한다. 렌더 실패를 삼키는 것과 다른 이야기다."""
+    with tempfile.TemporaryDirectory() as directory:
+        bvh = Path(_synthetic_bvh(directory, "pose.bvh"))
+        for kwargs in ({}, {"bvh_path": str(bvh), "bvh_text": "HIERARCHY"}):
+            try:
+                api_app._refine_thumbnail(view="front", **kwargs)
+            except ValueError:
+                continue
+            raise AssertionError(f"expected ValueError for {kwargs!r}")
+
+
 def test_pose_bundle_includes_thumbnail_manifest():
     with tempfile.TemporaryDirectory() as directory:
         root = Path(directory)

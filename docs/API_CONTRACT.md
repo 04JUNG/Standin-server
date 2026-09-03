@@ -149,6 +149,12 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
 두 경우 모두 `data:image/png;base64,{thumbnail.data}`로 표시할 수 있다. 추론 서버에는 PNG나
 조정 BVH를 영속 저장하지 않는다.
 
+**렌더 실패는 오류가 아니다.** 그릴 수 없으면 `thumbnail`을 `null`로 두고 나머지는 그대로 준다
+(`refine_thumbnail_failed` 로그만 남는다). 썸네일은 확인 화면이 쓰는 부가 산출물이므로, 그림
+때문에 응답을 실패시키면 소비자가 그걸 상류 장애로 읽고 **방금 계산한 조정 결과까지 버린다** —
+사용자는 그림 한 장 대신 더 나쁜 포즈를 저장하게 된다. 소비자는 `thumbnail` 없음을 정상으로
+다루고 후보 썸네일로 폴백한다.
+
 - v1에서 `search_distance`는 베이스 불일치 게이트다. `REFINE_V2_ENABLED=1`에서는 거리·순위만으로
   실행을 막지 않고 진단에 남긴다. 대신 `refine_allowed`, 스켈레톤 상태·coverage·소유권 lineage와
   `refinable_limbs`를 모두 그대로 보내야 하며, 누락·불일치하면 fail-closed한다.

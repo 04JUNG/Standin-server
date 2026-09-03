@@ -571,8 +571,14 @@ def _file_sha256(path: str) -> str:
 
 def _refine_thumbnail(
     *, view: str, bvh_path: Optional[str] = None, bvh_text: Optional[str] = None
-) -> RefineThumbnailOut:
-    """Render the selected candidate view without persisting a refined artifact."""
+) -> Optional[RefineThumbnailOut]:
+    """Render the selected candidate view without persisting a refined artifact.
+
+    렌더 실패는 **오류가 아니다.** 썸네일은 확인 화면이 쓰는 부가 산출물이고 조정
+    자체와 무관하다. 여기서 예외를 던지면 그림 한 장 때문에 방금 계산한 조정 결과가
+    통째로 버려지고(소비자는 베이스로 전환한다) 사용자는 더 나쁜 포즈를 저장하게 된다.
+    그래서 실패는 None으로 수렴시키고 로그로만 남긴다 — 화면은 후보 썸네일로 폴백한다.
+    """
     if (bvh_path is None) == (bvh_text is None):
         raise ValueError("provide exactly one thumbnail BVH source")
 
@@ -587,14 +593,15 @@ def _refine_thumbnail(
                 image = render_bvh_thumbnail(temporary_bvh, view)
         encoded = io.BytesIO()
         image.save(encoded, format="PNG", optimize=True)
-    except (OSError, AssertionError, ValueError, IndexError) as exc:
-        raise HTTPException(
-            409,
-            detail={
-                "code": "refine_thumbnail_failed",
-                "message": "final refine result could not be rendered as a thumbnail",
-            },
-        ) from exc
+    except Exception:
+        # 좁게 잡지 않는다. 렌더러·PIL·파일시스템 어느 층에서 무엇이 나오든 결론은
+        # 같다("그림 없음"). 예외 종류를 빠뜨리면 그때마다 refine이 통째로 실패한다.
+        log_warn("refine_thumbnail_failed",
+                 "최종 결과를 썸네일로 렌더하지 못해 그림 없이 응답한다",
+                 route="/refine", view=view,
+                 source="refined" if bvh_text is not None else "base",
+                 exc_info=True)
+        return None
 
     return RefineThumbnailOut(
         view=view,

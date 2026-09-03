@@ -203,7 +203,8 @@ class RefineResponse(BaseModel):
         None,
         description=("선택 후보의 매칭 view로 그린 최종 결과 256×256 PNG. "
                      "조정본/베이스 모두 같은 마네킹 렌더러를 쓰며 base64로 "
-                     "인라인 반환한다."),
+                     "인라인 반환한다. 렌더에 실패하면 null이다 — 오류가 아니라 "
+                     "'그림 없음'이며 나머지 필드는 그대로 유효하다."),
     )
     loss_base: Optional[float] = Field(None, description="조정 전 각도 손실")
     loss_final: Optional[float] = Field(None, description="조정 후 각도 손실")
