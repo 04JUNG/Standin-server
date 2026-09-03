@@ -38,6 +38,7 @@ ENV APP_ENV=development \
     DATA_DIR=/app/data \
     DB_PATH=/app/data/poses.db \
     INDEX_PATH=/app/data/index.pkl \
+    POSE_MODELS_ROOT=/app/data/pose-models \
     PYTHONUNBUFFERED=1 \
     DEPLOYMENT_VERSION=$DEPLOYMENT_VERSION
 
