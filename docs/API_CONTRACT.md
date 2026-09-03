@@ -1,6 +1,6 @@
 # API 계약 — 도원 추론 서버 (FastAPI)
 
-> 상태: 현재 계약 · 갱신일: 2026-08-11 · 기준 코드: `api/app.py`, `api/models.py`
+> 상태: 현재 계약 · 갱신일: 2026-09-03 · 기준 코드: `api/app.py`, `api/models.py`
 >
 > 이 문서는 **실제 구현된** HTTP 계약(`api/app.py`·`api/models.py`)을 문서화한다.
 > `/export-order`의 상세는 별도 문서(`docs/EXPORT_CONTRACT.md`)에 있고, 여기서는 전체 엔드포인트와
@@ -31,7 +31,8 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
 
 ## 1. 기본 원칙
 
-- 응답은 JSON. 무거운 산출물(BVH)은 **바이트 스트림 다운로드**(base64 인라인 아님).
+- 응답은 JSON. base BVH는 바이트 스트림으로 받고, refine 결과 BVH와 PNG preview는
+  다중 인스턴스에서도 유실되지 않도록 `/refine` JSON에 인라인한다.
 - 시간은 ISO 8601(`/export-order`의 `created_at`).
 - ID는 string(`pose_id`, `cut_id`).
 - **좌표는 검출기·포즈 모델만 생성**한다(VLM은 개수·의미 태그만) — 태그 어휘는 §4.
@@ -50,7 +51,7 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
 | `GET` | `/pose/{pose_id}/bvh` | 경로 파라미터 | `application/octet-stream` | 동원 내보내기 |
 | `POST` | `/export-order` | `ExportOrderRequest` | `ExportOrder` | base-only legacy 주문서 (→ `EXPORT_CONTRACT.md`) |
 | `GET` | `/docs` | — | OpenAPI UI | 사람(계약 확인) |
-| `POST` | `/refine` | `RefineRequest` | `RefineResponse` | 앱 서버 → 조정된 BVH 본문(응답 `bvh`) (→ `REFINE_DESIGN.md`) |
+| `POST` | `/refine` | `RefineRequest` | `RefineResponse` | 앱 서버 → 조정된 BVH와 front PNG 본문(응답 `bvh`, `thumbnail`) |
 
 > `PersonOut`에 **`keypoints`(17×2, 이미지 픽셀)** · **`scores`(17)** 가 포함된다.
 > `/analyze`가 이미 추출하는 값이라 연산 추가는 0이며, `/refine`을 순수 함수로 만들기 위한 것이다.
@@ -86,6 +87,15 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
   "refined": true, "reason": "ok_partial",
   "bvh_url": "/pose/Sitting Idle_01/bvh",   // 항상 베이스. 조정본에는 URL이 없다
   "bvh": "HIERARCHY\nROOT Hips\n...\nMOTION\nFrames: 1\n...",  // 조정본 본문(LF)
+  "thumbnail": {
+    "view": "front",
+    "media_type": "image/png",
+    "encoding": "base64",
+    "data": "iVBORw0KGgoAAA...",
+    "width": 256,
+    "height": 256,
+    "renderer_version": "warm-mannequin-v1"
+  },
   "loss_base": 0.599, "loss_final": 0.004, "gain": 0.993,
   "backend": "scipy+numpy",
   "refine_version": "v2.5.3",
@@ -133,10 +143,16 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
 두 경우를 구분하지 않고 동작한다("좋아지거나, 그대로"). `reason` 값 목록은
 `REFINE_DESIGN.md`의 안전 처리 기준.
 
+`thumbnail`은 최종 결과를 기존 후보와 같은 `warm-mannequin-v1` 코드로 그린 front 고정
+256×256 PNG다. `refined=true`면 조정 BVH, `false`면 정확한 베이스 BVH를 렌더링하므로 UI는
+두 경우 모두 `data:image/png;base64,{thumbnail.data}`로 표시할 수 있다. 추론 서버에는 PNG나
+조정 BVH를 영속 저장하지 않는다.
+
 - v1에서 `search_distance`는 베이스 불일치 게이트다. `REFINE_V2_ENABLED=1`에서는 거리·순위만으로
   실행을 막지 않고 진단에 남긴다. 대신 `refine_allowed`, 스켈레톤 상태·coverage·소유권 lineage와
   `refinable_limbs`를 모두 그대로 보내야 하며, 누락·불일치하면 fail-closed한다.
-- **조정본은 응답 `bvh` 본문으로만 나간다.** `bvh_url`은 `refined` 여부와 무관하게 항상 베이스
+- **조정본은 응답 `bvh` 본문으로만 나간다.** 사용자 preview는 같은 응답의 `thumbnail`이다.
+  `bvh_url`은 `refined` 여부와 무관하게 항상 베이스
   `/pose/{pose_id}/bvh`이며 조정본 다운로드 URL은 존재하지 않는다. 추론 서버는 조정본을 저장하지
   않으므로 무상태이고, 재계산을 막는 멱등성은 BFF의 `refined_artifacts` PK가 담당한다
   (`docs/REFINE_HANDOFF.md` §3 4단계).

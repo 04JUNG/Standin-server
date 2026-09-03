@@ -51,7 +51,8 @@ Refine는 v2.5 safe aggressive가 제품 기본이다(`REFINE_V2_ENABLED=1`,
 `REFINE_DEFAULT_MODE=conservative` → `REFINE_V2_ENABLED=0` 순이다.
 
 조정본은 `POST /refine` 응답의 `bvh` 본문으로만 나간다. 로컬 디스크에 남기지 않으므로 조정본
-다운로드 URL은 없다(`docs/REFINE_HANDOFF.md` §3 4단계).
+다운로드 URL은 없다(`docs/REFINE_HANDOFF.md` §3 4단계). 같은 응답의 `thumbnail`에는 최종
+결과를 기존 후보와 같은 스타일로 그린 front 256×256 PNG가 base64로 들어간다.
 
 선택된 최종 BVH를 캐릭터 FBX로 바꾸는 출력단은 별도 내부 서비스다. 추론 프로세스는 Blender를
 import하지 않으며, 변환 1건마다 Blender 5.2 child process를 새로 실행한다.
@@ -156,8 +157,12 @@ workflow를 다시 실행한다.
 업로드 → 재기동 → 확인을 한 번에 하고, 번들이 잘못됐으면 업로드 자체를 막는다.
 
 ```bash
+python scripts/render_bvh_thumbnails.py data/bvh data/thumbs
 python scripts/deploy_pose_library.py data/
 ```
+
+렌더 명령은 4개 view PNG와 `data/thumbs/thumbnail_manifest.json`을 함께 만든다. 배포 스크립트는
+`thumbs/` 전체를 압축하므로 manifest도 번들의 `thumbs/thumbnail_manifest.json`으로 포함된다.
 
 수동으로 번들만 만들 때는 다음과 같다. **`thumbs`를 빠뜨리지 않는다** — 빠져도 에러가 나지
 않고 썸네일만 조용히 사라진다(`src/thumbnails.py`가 파일이 없으면 `None`을 돌려준다).

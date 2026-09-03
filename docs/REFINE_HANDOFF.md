@@ -227,6 +227,8 @@ BFF의 `refined_artifacts` PK(`job_id, person_index, candidate_id`)가 같은 �
   돌려주고, 추론 API는 이 경로로 호출한다. 평가·진단 스크립트는 계속 `out_path`를 준다
 - `REFINE_DIR` 설정 제거
 - `bvh_url`은 refined 여부와 무관하게 항상 `/pose/{id}/bvh`(베이스)
+- 최종 결과의 front PNG는 같은 `/refine` 응답의 `thumbnail`에 base64로 인라인한다.
+  기존 후보와 같은 `warm-mannequin-v1` 렌더러를 쓰며 PNG도 로컬에 저장하지 않는다
 
 4번의 전제는 리뷰에서 확인됐다(2026-08-07). `/refined/{handle}/bvh`를 HTTP로 읽는 코드는
 없고, 평가·진단 스크립트(`run_batch_pipeline.py`, `eval_refine_batch.py`, `diag_refine_3d.py`,
@@ -236,7 +238,7 @@ BFF의 `refined_artifacts` PK(`job_id, person_index, candidate_id`)가 같은 �
 ### 검증
 
 - **server**: `refined=true`면 `bvh`가 비어 있지 않고 `refined=false`면 `None`인지. 계약
-  fixture에 추가한다.
+  fixture에 추가한다. 두 경우 모두 `thumbnail`이 유효한 256×256 PNG인지 확인한다.
 - **app-server**: `bvh`가 있으면 `fetchUpstreamPath`를 **호출하지 않고** 저장하는지, 없으면
   폴백하는지. 기존 `RefineDeps` 주입 구조로 DB·S3 없이 검증할 수 있다.
 - **통합**: 추론 태스크를 교체한 뒤에도 export가 성공하는지(E2E-08). 이 변경의 목적이므로
