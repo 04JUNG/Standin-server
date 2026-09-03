@@ -120,7 +120,7 @@ python scripts/eval_refine_v2_synthetic.py --bvh-dir data/bvh --out out/refine-v
 |---|---|---|
 | VLM provider | `VLM_PROVIDER=gemini` + `pip install google-genai pillow` + `GEMINI_API_KEY` | `src/vlm/client.py::build_vlm_client` |
 | 포즈 추정 | `POSE_BACKEND=rtmlib` + `pip install rtmlib onnxruntime opencv-python` | `src/pose.py::RTMPoseModel` |
-| 전체 Human-Art rescue | `POSE_MODEL_VARIANT=cascade` + manifest + `POSE_CANARY_STAGE=canary-100` + `POSE_STRICT=1` | `src/pose_cascade.py` · `src/runtime_guard.py` |
+| 전체 Human-Art rescue | `POSE_MODEL_VARIANT=cascade` + manifest URI + `POSE_CANARY_STAGE=canary-100` + `POSE_STRICT=1` | `src/pose_cascade.py` · `src/pose_model_source.py` · `src/runtime_guard.py` |
 | 실 라이브러리 | `BVH_DIR=<폴더> python scripts/build_db.py` | `src/library.py::load_bvh_pose` |
 
 `build_*()` 팩토리는 실패 시 조용히 mock으로 폴백한다 → 키가 없어도 파이프라인은 항상 돈다.
@@ -128,8 +128,14 @@ python scripts/eval_refine_v2_synthetic.py --bvh-dir data/bvh --out out/refine-v
 
 배포 workflow는 기본적으로 `cascade`와 `canary-100`을 ECS task definition에 주입한다.
 이는 모든 요청을 cascade 경로에 넣되, Human-Art는 current-X가 해결하지 못한 슬롯이 있을 때만
-실행한다는 뜻이다. 기존 task definition에는 컨테이너에서 읽을 수 있는
-`POSE_MODEL_MANIFEST`가 미리 설정돼 있어야 하며, 없으면 배포가 변환 단계 전에 중단된다.
+실행한다는 뜻이다. GitHub `beta` 환경의 `POSE_MODEL_URI`는 S3의 immutable
+`manifest.json` 객체를 가리켜야 하며, 없으면 배포가 task definition 변경 전에 중단된다.
+서버는 manifest와 같은 prefix의 `model.onnx`, `detector.onnx`를 staging으로 내려받아
+크기·SHA-256·runtime 계약을 검증한다. 통과한 build만
+`POSE_MODELS_ROOT/humanart-m/<build_id>/`에 원자적으로 공개하고 확정된 로컬 manifest
+경로를 pose factory에 전달한다. 원격 manifest의 artifact 경로는 같은 prefix 안의 단일
+상대 파일명이어야 한다. 수동 read-only mount 환경은 `POSE_MODEL_URI` 없이 기존
+`POSE_MODEL_MANIFEST` 절대 경로를 사용할 수 있다.
 긴급 롤백은 배포 환경 변수 `POSE_MODEL_VARIANT=current-x`, `POSE_CANARY_STAGE=off`를 설정한 뒤
 workflow를 다시 실행한다.
 

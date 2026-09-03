@@ -97,7 +97,8 @@ runtime identity의 detector model/hash를 계측해야 한다.
 ```dotenv
 POSE_BACKEND=rtmlib
 POSE_MODEL_VARIANT=cascade
-POSE_MODEL_MANIFEST=/absolute/path/to/humanart-m.manifest.json
+POSE_MODEL_URI=s3://<assets>/pose-models/humanart-m/<build>/manifest.json
+POSE_MODELS_ROOT=/app/data/pose-models
 POSE_CANARY_STAGE=shadow
 POSE_STRICT=1
 
@@ -108,7 +109,11 @@ SLOT_CROP_MAX_PER_CUT=2
 SLOT_CROP_HARD_CAP=2
 ```
 
-`POSE_MODEL_MANIFEST`는 cascade에서 fallback인 Human-Art M의 immutable bundle을 가리킨다.
+`POSE_MODEL_URI`는 cascade fallback인 Human-Art M의 원격 immutable manifest를 가리킨다.
+기동 시 서버가 manifest와 선언된 ONNX 두 개를 staging에 받고 크기·SHA-256·runtime 계약을
+검증한 뒤 `POSE_MODELS_ROOT/humanart-m/<build_id>/`에 원자적으로 공개한다. 검증 후 확정된
+로컬 manifest 경로가 내부 `POSE_MODEL_MANIFEST` 값이 된다. 수동 read-only mount를 쓰는
+환경은 `POSE_MODEL_URI` 없이 기존 `POSE_MODEL_MANIFEST` 절대 경로를 직접 지정할 수 있다.
 current-X는 기존 `RTMPoseModel` runtime 설정을 그대로 사용한다.
 
 ### 2.2 두 calibration 프로필의 분리 (D4)

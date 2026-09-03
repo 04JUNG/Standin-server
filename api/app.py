@@ -43,6 +43,7 @@ from src.pipeline import Pipeline
 from src.pose_rescue import parse_rescue_request
 from src.library import build_synthetic_index
 from src.library_source import ensure_library
+from src.pose_model_source import PoseModelFetchError, ensure_pose_model
 from src.refine import (REFINE_CODE_VERSION, REFINE_V2_CODE_VERSION,
                         refine_bvh)
 from src.refine_policy import structural_refine_allowed
@@ -113,6 +114,32 @@ def _ensure_db():
     return load_entries(DB_PATH)
 
 
+def _ensure_pose_model_bundle():
+    """Provision an explicitly configured remote Human-Art bundle once."""
+    if CFG.pose_model_variant not in {"cascade", "humanart-m"}:
+        return None
+    if not CFG.pose_model_uri:
+        return None  # Existing volume/manual POSE_MODEL_MANIFEST stays valid.
+    try:
+        result = ensure_pose_model(
+            CFG.pose_model_uri,
+            CFG.pose_models_root,
+            expected_model_id="humanart-m",
+        )
+    except PoseModelFetchError as exc:
+        raise StartupError(f"Human-Art 모델 번들 준비 실패: {exc}") from exc
+    # Config is created at module import, but Pipeline/pose factory is created
+    # later in lifespan.  Inject the verified local path without mutating env.
+    CFG.pose_model_manifest = str(result.manifest_path)
+    log_info(
+        "pose_model_bundle",
+        "Human-Art 모델 번들 준비 완료",
+        buildId=result.build_id,
+        fetched=result.fetched,
+    )
+    return result
+
+
 def _check_backends(pipeline: Pipeline) -> None:
     """프로덕션에서 실제로 생성된 mock 백엔드로 뜨는 것을 막는다."""
     try:
@@ -121,6 +148,7 @@ def _check_backends(pipeline: Pipeline) -> None:
             is_production=CFG.is_production,
             requested_vlm=CFG.vlm_provider,
             requested_pose=CFG.pose_backend,
+            requested_pose_variant=CFG.pose_model_variant,
         )
     except MockBackendError as exc:
         raise StartupError(str(exc)) from exc
@@ -130,6 +158,7 @@ def _check_backends(pipeline: Pipeline) -> None:
 async def lifespan(app: FastAPI):
     try:
         entries = _ensure_db()                      # 1회 로드
+        model_bundle = _ensure_pose_model_bundle()  # S3 bundle → local manifest
         pipeline = Pipeline(entries)                # VLM/검출/포즈 팩토리도 1회 초기화
         _check_backends(pipeline)                   # 팩토리 폴백 후 실제 인스턴스 검사
     except Exception as exc:
@@ -162,6 +191,12 @@ async def lifespan(app: FastAPI):
     STATE["quarantined_pose_count"] = len(quarantine)
     STATE["provider"] = actual_vlm
     STATE["pose_backend"] = actual_pose
+    if model_bundle is not None:
+        STATE["pose_model_bundle"] = {
+            "model_id": model_bundle.model_id,
+            "build_id": model_bundle.build_id,
+            "fetched": model_bundle.fetched,
+        }
     log_info("startup", "준비 완료", poseCount=len(entries), env=CFG.app_env,
              vlm=actual_vlm, pose=actual_pose, libraryVersion=CFG.pose_library_version)
     alerts.notify(

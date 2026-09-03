@@ -18,12 +18,14 @@ def test_deploy_defaults_to_full_cascade_with_strict_startup():
     assert "POSE_STRICT=1" in workflow
 
 
-def test_deploy_requires_existing_manifest_and_keeps_fast_rollback():
+def test_deploy_requires_remote_manifest_uri_and_keeps_fast_rollback():
     workflow = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(
         encoding="utf-8"
     )
 
-    assert "Verify Human-Art promotion prerequisites" in workflow
-    assert 'select(.name == "POSE_MODEL_MANIFEST"' in workflow
+    assert "Verify Human-Art model source" in workflow
+    assert 'run: test -n "$POSE_MODEL_URI"' in workflow
+    assert "POSE_MODEL_URI=${{ vars.POSE_MODEL_URI }}" in workflow
+    assert "POSE_MODELS_ROOT=/app/data/pose-models" in workflow
     assert "POSE_MODEL_VARIANT=current-x" in workflow
     assert "POSE_CANARY_STAGE=off" in workflow
