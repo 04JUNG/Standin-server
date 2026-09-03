@@ -63,16 +63,20 @@ pose_projections(id PK, pose_id FK, view, feature_blob, feature_version)
 
 **★ 확정에 따른 실구현 디테일 2개**
 - **키프레임 추출**: BVH는 애니메이션(여러 프레임). 정지 포즈 소재는 대표 1프레임, 모션 클립은 고정 간격 또는 수동으로 키프레임 몇 개만 뽑아 각각 1 pose로 등록. (전량 프레임 색인 금지 — 중복만 늘어남)
-- **BVH 파일 위치**: DB엔 경로만(`data/bvh/{pose_id}.bvh`), 실체는 파일시스템. 스케일 시 오브젝트 스토리지(S3 등)로 경로만 교체. 동원은 `/pose/{id}/bvh`로 이 파일을 받음(결정 3).
+- **BVH 파일 위치**: DB엔 경로만(`data/bvh/{pose_id}.bvh`), 실체는 파일시스템. 스케일 시 오브젝트 스토리지(S3 등)로 경로만 교체. BFF는 base 선택에서 `/pose/{id}/bvh`로 이 파일을 받음(결정 3).
 
 **실데이터 연결점(TODO)**: `library.load_bvh_pose()`에 BVH 파서(bvhio 등) + BVH 관절명→COCO17 매핑.
 CSP 실험에서 '구조 기반 매핑' 확인됨(이름 관대) → 매핑 규칙 자유도 있음. 이후 `scripts/build_db.py`가 폴더 순회로 채움.
 
 ---
 
-## 결정 3 — 동원(내보내기)에게 전달하는 방식
+## 결정 3 — base BVH 제공과 최종 Converter 핸드오프
 
-**패턴 A 채택: 라이브러리의 단일 소스는 도원 서비스. 동원은 BVH를 URL로 받는다.**
+**패턴 A 유지: 라이브러리 base BVH의 단일 소스는 inference 서비스다.**
+
+> 2026-08-27 V3.2 Converter 통합으로 downstream 책임을 갱신했다. `/pose/{id}/bvh`는 계속
+> base 원본의 단일 소스지만, refine 성공 시 최종 입력은 inline `RefineResponse.bvh`다. BFF가
+> 최종 바이트를 하나로 확정해 별도 내부 Converter API에 넘긴다.
 
 ```
 POST /analyze  → CutResult {
@@ -82,29 +86,35 @@ POST /analyze  → CutResult {
 GET  /pose/{pose_id}/bvh   → 라이브러리 BVH 원본(application/octet-stream)
 ```
 
-흐름: 앱이 `/analyze`로 Top-K 후보를 받아 뷰어에 표시 → 작가가 1개 선택 →
-그 후보의 `bvh_url`을 **동원 내보내기 단계**가 가져가 CSP로 넘김.
+흐름: 앱이 `/analyze`로 Top-K 후보를 받아 표시 → 작가가 1개 선택 → 선택적 `/refine` →
+BFF가 base URL 응답 또는 refined inline 본문 중 최종 BVH 바이트를 확정 → 내부 `/convert` →
+V3.2 FBX → BFF 저장·다운로드 → CSP 배치.
 
 **책임 분리 (경계선)**
 | 단계 | 소유 | 내용 |
 |------|------|------|
-| pose_id·후보·라이브러리 BVH 제공 | **도원** | 검색 결과 + `/pose/{id}/bvh` |
-| CSP용 최종 BVH 변환 | **동원** | 아래 3가지 CSP 좌표계 보정 |
+| pose_id·후보·base BVH 제공 | **inference** | 검색 결과 + `/pose/{id}/bvh` |
+| 최종 base/refined 바이트 확정·SHA lineage | **BFF** | inline refined 우선, 아니면 base GET |
+| BVH→FBX rest/chain retarget·명시적 mirror | **Converter** | Blender 5.2 + 동결 V3.2 |
+| FBX 저장·공개 다운로드 | **BFF** | conversion_id와 입출력 SHA 기록 |
+| 소재 등록·다인 상대 위치·CSP 배치 | **CSP/작가** | Converter mirror를 반복하지 않음 |
 
-**동원이 맡는 CSP 보정(스프린트3 실험 잔여 과제 = 출력단 이슈)**
-- **좌우 반전**(02_armraise에서 관찰) — CSP 좌표계 규칙에 맞춘 미러링
-- **다리/루트 축·부호**(05_sitting 부분 적용) — 하반신 회전 축 보정
-- **iPad 임포트** 확인
-→ 이건 "라이브러리 포즈가 무엇인가(도원)"가 아니라 "CSP에 어떻게 정확히 앉히나(동원)"의 문제라 출력단이 소유하는 게 맞음.
+Converter 도입 전 CSP가 맡았던 BVH 좌우 반전·다리/루트 retarget은 동결 V3.2 출력단으로
+이동했다. MVP의 mirror는 Converter 요청에서 정확히 한 번 적용한다. CSP는 iPad/CSP 소재 등록과
+배치를 확인하되 같은 BVH 수학을 다시 적용하지 않는다.
 
-**왜 패턴 A인가 (vs 동원이 라이브러리 사본 보유)**
+**왜 패턴 A인가 (vs BFF/Converter가 라이브러리 사본 보유)**
 - 라이브러리 **단일 소스** 유지 → 두 서비스가 BVH 사본을 동기화할 필요 없음.
-- 도원은 "어떤 포즈 + BVH 줘", 동원은 "CSP에 정확히 착지" — 관심사 분리가 깨끗.
+- inference는 후보와 base BVH, BFF는 최종 선택, Converter는 FBX 변환, CSP는 배치를 소유한다.
 
-**⚠ 확인 필요 (동원과)**
-1. BVH를 **URL 다운로드**로 받을지, `/analyze` 응답에 **바이트 인라인**으로 넣을지(작은 파일이라 인라인도 가능).
-2. 미러링/축 보정을 **정말 출력단(동원)**에서 할지, 도원이 라이브러리 저장 시 CSP 규격으로 미리 구워둘지. (전자 권장 — 라이브러리는 표준 BVH로 두고 CSP 종속성은 출력단에 격리)
-3. 다인 컷: 비얽힘 2인은 **인물별 BVH 2개**(작가가 각각 배치), 얽힘은 **2인 세트 1개**. 앱/뷰어가 이 구분을 어떻게 UI로 풀지.
+확정된 전달 방식:
+
+1. base는 URL 응답 바이트, refined는 `/refine` inline 본문을 BFF가 받는다.
+2. BFF는 최종 바이트를 multipart로 Converter에 업로드한다.
+3. mirror는 Converter에서 한 번만 적용한다.
+4. 다인은 인물별 독립 BVH→FBX이며, `set_id`는 묶음 메타다.
+
+세부 계약은 `docs/FBX_CONVERTER_V3_2_PHASE3_BFF_HANDOFF.md`를 따른다.
 
 ---
 
@@ -160,5 +170,5 @@ GET  /pose/{pose_id}/bvh   → 라이브러리 BVH 원본(application/octet-stre
 - **DB = SQLite**(단일 파일, 태그=컬럼), 스케일 시 `repo.py`만 pgvector/LanceDB로 교체.
 - **저장 = 2D 키포인트 34차원 BLOB + 뷰별 미리 투영, BVH는 파일 경로**(확정). feature_version으로 정규화 정합성 보증.
 - **태깅 = 라이브러리 action/shot은 VLM 반자동+검수(쿼리와 동일 어휘), view는 투영각에서 확정, relationship은 등록 시 지정.**
-- **핸드오프 = 도원이 `/pose/{id}/bvh`로 BVH 제공, 동원이 CSP 미러링·축 보정 담당.** 라이브러리는 단일 소스.
+- **핸드오프 = inference가 base BVH 제공, BFF가 final base/refined bytes 확정, Converter가 V3.2 FBX·mirror 담당.** 라이브러리는 단일 소스.
 - **계층 = 얇은 앱 서버(BFF) 분리**(인증·Job·기록·`/v1`은 BFF, 추론 서버는 순수 추론 유지). 단일 처리는 소규모·단기 MVP 한정. `/analyze` 인터페이스는 불변.

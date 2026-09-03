@@ -7,12 +7,22 @@ __pycache__/
 .venv/
 venv/
 .pytest_cache/
+# 로컬 QA·벤치·생성 산출물(런타임 이미지 불필요)
+pose_bench/
+out/
+assets/
+tmp/
+qa/
 # 데이터·모델·시크릿(이미지에 넣지 않음 — 런타임 생성/마운트)
 data/
 *.db
 *.db-journal
 *.onnx
 *.png
+*.fbx
+*.bvh
+*.blend
+*.log
 tags.csv
 .env
 .env.*

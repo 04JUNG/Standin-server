@@ -51,7 +51,58 @@ Refine는 v2.5 safe aggressive가 제품 기본이다(`REFINE_V2_ENABLED=1`,
 `REFINE_DEFAULT_MODE=conservative` → `REFINE_V2_ENABLED=0` 순이다.
 
 조정본은 `POST /refine` 응답의 `bvh` 본문으로만 나간다. 로컬 디스크에 남기지 않으므로 조정본
-다운로드 URL은 없다(`docs/REFINE_HANDOFF.md` §3 4단계).
+다운로드 URL은 없다(`docs/REFINE_HANDOFF.md` §3 4단계). 같은 응답의 `thumbnail`에는 최종
+결과를 기존 후보와 같은 스타일·매칭 시점으로 그린 256×256 PNG가 base64로 들어간다. 그리지
+못하면 `thumbnail`만 `null`이고 조정 결과는 그대로 나간다 — 그림 실패로 응답을 버리면 사용자가
+더 나쁜 포즈를 저장하게 된다.
+
+선택된 최종 BVH를 캐릭터 FBX로 바꾸는 출력단은 별도 내부 서비스다. 추론 프로세스는 Blender를
+import하지 않으며, 변환 1건마다 Blender 5.2 child process를 새로 실행한다.
+
+```bash
+export STANDIN_MASTER_V2_URI=/absolute/read-only/standin-master-v2.fbx
+export BLENDER_BINARY=/absolute/path/to/blender
+uvicorn converter_api.app:app --port 8001
+# GET /healthz · GET /characters · POST /convert · POST /convert-bundle
+```
+
+Linux 운영 이미지는 Blender 5.2.0 공식 x64 archive와 checksum을 고정하며 추론 이미지와 별도로
+빌드한다. 캐릭터 FBX는 이미지에 넣지 않고 읽기 전용으로 마운트한다.
+
+```bash
+docker buildx build --platform linux/amd64 --load \
+  --file Dockerfile.converter --tag standin-converter:local .
+docker run --rm --platform linux/amd64 --publish 8001:8001 \
+  --env STANDIN_MASTER_V2_URI=/characters/standin-master-v2.fbx \
+  --mount type=bind,source=/absolute/standin-master-v2.fbx,target=/characters/standin-master-v2.fbx,readonly \
+  standin-converter:local
+```
+
+`POST /convert-bundle`은 제품용 BFF 내부망 multipart API다. 최종 `bvh` 업로드,
+`artifact_kind=base|refined`, BFF가 계산한 `expected_bvh_sha256`, registry의 `character_id`를 받아
+`final.bvh`, `final.fbx`, `manifest.json`이 든 ZIP을 원자적으로 반환한다. 기존 FBX 단일 응답이 필요한 소비자를 위해
+`POST /convert`도 유지한다. 두 API 모두 사용자 URL이나 서버 파일 경로는 받지 않는다. 동결 solver와 통합 정본은
+[`docs/FBX_CONVERTER_V3_2_INTEGRATION_HANDOFF.md`](docs/FBX_CONVERTER_V3_2_INTEGRATION_HANDOFF.md)를
+따른다.
+
+BFF는 `refined=true`면 `/refine` 응답의 inline `bvh`, 아니면 base `bvh_url` 응답 바이트를
+최종 입력으로 선택한다. `/convert-bundle` 성공 응답을 받으면 ZIP·내부 BVH·내부 FBX의 SHA를
+응답 헤더와 `manifest.json`에 각각 대조한 뒤 두 파일을 함께 publish한다. mirror는 Converter에서
+한 번만 적용한다. Phase 3 상세는
+[`docs/FBX_CONVERTER_V3_2_PHASE3_BFF_HANDOFF.md`](docs/FBX_CONVERTER_V3_2_PHASE3_BFF_HANDOFF.md)를
+따른다.
+
+Blender converter 회귀는 repo root에서 아래처럼 실행한다. `--python-exit-code 1`은 Python
+traceback이 발생했는데 Blender가 종료코드 0을 반환하는 false pass를 막는다. 생성물 위치는
+`CONVERTER_TEST_ARTIFACT_ROOT`로 repo 밖 임시 디렉터리를 지정한다.
+
+```bash
+export CONVERTER_TEST_ARTIFACT_ROOT=/absolute/path/to/temporary-directory
+/path/to/blender --background --python-use-system-env --python-exit-code 1 \
+  --python tests/converter/make_fixtures.py
+/path/to/blender --background --python-use-system-env --python-exit-code 1 \
+  --python tests/converter/test_convert.py
+```
 
 합성 1차 스크리닝은 다음처럼 실행한다.
 
@@ -69,10 +120,18 @@ python scripts/eval_refine_v2_synthetic.py --bvh-dir data/bvh --out out/refine-v
 |---|---|---|
 | VLM provider | `VLM_PROVIDER=gemini` + `pip install google-genai pillow` + `GEMINI_API_KEY` | `src/vlm/client.py::build_vlm_client` |
 | 포즈 추정 | `POSE_BACKEND=rtmlib` + `pip install rtmlib onnxruntime opencv-python` | `src/pose.py::RTMPoseModel` |
+| 전체 Human-Art rescue | `POSE_MODEL_VARIANT=cascade` + manifest + `POSE_CANARY_STAGE=canary-100` + `POSE_STRICT=1` | `src/pose_cascade.py` · `src/runtime_guard.py` |
 | 실 라이브러리 | `BVH_DIR=<폴더> python scripts/build_db.py` | `src/library.py::load_bvh_pose` |
 
 `build_*()` 팩토리는 실패 시 조용히 mock으로 폴백한다 → 키가 없어도 파이프라인은 항상 돈다.
 설정값은 `.env`(예시: `.env.example`)로 주입. **`.env`·API 키·`data/`는 커밋 금지**(`.gitignore` 등록됨).
+
+배포 workflow는 기본적으로 `cascade`와 `canary-100`을 ECS task definition에 주입한다.
+이는 모든 요청을 cascade 경로에 넣되, Human-Art는 current-X가 해결하지 못한 슬롯이 있을 때만
+실행한다는 뜻이다. 기존 task definition에는 컨테이너에서 읽을 수 있는
+`POSE_MODEL_MANIFEST`가 미리 설정돼 있어야 하며, 없으면 배포가 변환 단계 전에 중단된다.
+긴급 롤백은 배포 환경 변수 `POSE_MODEL_VARIANT=current-x`, `POSE_CANARY_STAGE=off`를 설정한 뒤
+workflow를 다시 실행한다.
 
 ---
 
@@ -100,8 +159,12 @@ python scripts/eval_refine_v2_synthetic.py --bvh-dir data/bvh --out out/refine-v
 업로드 → 재기동 → 확인을 한 번에 하고, 번들이 잘못됐으면 업로드 자체를 막는다.
 
 ```bash
+python scripts/render_bvh_thumbnails.py data/bvh data/thumbs
 python scripts/deploy_pose_library.py data/
 ```
+
+렌더 명령은 4개 view PNG와 `data/thumbs/thumbnail_manifest.json`을 함께 만든다. 배포 스크립트는
+`thumbs/` 전체를 압축하므로 manifest도 번들의 `thumbs/thumbnail_manifest.json`으로 포함된다.
 
 수동으로 번들만 만들 때는 다음과 같다. **`thumbs`를 빠뜨리지 않는다** — 빠져도 에러가 나지
 않고 썸네일만 조용히 사라진다(`src/thumbnails.py`가 파일이 없으면 `None`을 돌려준다).

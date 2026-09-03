@@ -331,16 +331,17 @@ BFF 체크리스트:
 `/pose/{pose_id}/bvh`를 다시 채운다. 따라서 refine 후 기존 `/export-order`만 호출하면 조정본이 아니라
 원본 BVH가 export될 수 있다.
 
-v2.5 BFF의 임시 확정 규칙은 다음과 같다.
+V3.2 Converter 통합 뒤 BFF의 확정 규칙은 다음과 같다.
 
-- `/refine`을 호출한 사람은 `RefineResponse.bvh_url`을 최종 BVH 소스로 보관한다.
-- refine을 호출하지 않은 사람은 선택 candidate의 `bvh_url`을 사용한다.
-- downstream export 주문을 조립할 때 위 최종 URL을 사용한다.
+- `refined=true`면 `RefineResponse.bvh` 문자열을 UTF-8로 인코딩한 바이트가 최종 BVH다.
+- `refined=false` 또는 refine 미호출이면 base `bvh_url` 응답의 원본 바이트가 최종 BVH다.
+- `RefineResponse.bvh_url`은 refined 여부와 무관하게 항상 베이스다. `refined=true`에서 이 URL을
+  최종 소스로 쓰면 조정이 조용히 사라진다.
 - 현 `POST /export-order`는 **원본-only legacy 경로**로 취급한다.
+- BFF는 최종 바이트 SHA256을 lineage에 기록하고 내부 Converter API에 multipart 업로드한다.
 
-장기적으로는 BFF export DTO에 `final_bvh_url` 또는 `artifact`를 추가해야 한다. 이 변경은 inference의
-`POST /refine` 계약과 별도이며, backend/export 담당자가 합의할 항목이다. 합의 전에는 BFF가 최종 URL을
-잃지 않는 것이 핵심이다.
+내부 Converter 성공 응답의 `X-Standin-Source-BVH-SHA256`이 BFF가 계산한 최종 SHA와 일치해야
+한다. 상세 계약은 `FBX_CONVERTER_V3_2_PHASE3_BFF_HANDOFF.md`를 따른다.
 
 추론 서버는 조정본을 저장하지 않는다. 따라서 추론 태스크 수·롤링 배포와 무관하며, 단일 태스크
 운영 제약도 없다. 대신 **응답을 받은 BFF가 곧바로 보관하지 않으면 조정본은 사라진다** —
@@ -414,9 +415,10 @@ REFINE_ENABLED=0
 - [ ] 생략된 `refine_mode`가 safe aggressive라는 점을 반영했다.
 - [ ] `refined=false`도 성공 응답으로 처리하고 `bvh_url`을 사용한다.
 - [ ] BFF upstream timeout이 7초 이상이다.
-- [ ] 최종 export가 `/refine` 응답의 `bvh` 본문을 잃지 않고 영속 저장한다.
+- [ ] 최종 export가 `/refine` 응답의 `bvh` 본문을 잃지 않고 Converter에 전달한다.
 - [ ] `/export-order`의 원본-only 제한을 backend/export 담당이 인지했다.
-- [ ] refined export 주문은 BFF가 자기 저장소 기준으로 조립한다는 점에 합의했다.
+- [ ] BFF 계산 final BVH SHA와 Converter source BVH SHA를 대조한다.
+- [ ] refined export artifact와 최종 FBX는 BFF가 자기 저장소 기준으로 조립한다.
 - [ ] 배포 시 `/healthz.refine` capability를 검증한다.
 - [ ] 장애 시 conservative → v1 → disabled rollback 순서를 공유했다.
 

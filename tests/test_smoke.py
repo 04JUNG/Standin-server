@@ -264,8 +264,8 @@ def test_thumbnail_lookup_uses_pose_and_view_without_path_escape():
     with tempfile.TemporaryDirectory() as tmp:
         thumbs = Path(tmp) / "thumbs"
         thumbs.mkdir()
-        expected = thumbs / "Wave Pose__front.png"
-        expected.write_bytes(b"png")
+        expected = thumbs / "Wave Pose__front.jpg"
+        expected.write_bytes(b"jpg")
 
         assert find_thumbnail(tmp, "Wave Pose", "front") == expected.resolve()
         assert thumbnail_url(tmp, "Wave Pose", "front") == (
@@ -370,6 +370,47 @@ def _bvh_with_rotation(tmpdir, name, joint_suffix, deg):
     fr[ch[0]] = deg
     import os
     return write_single_frame_bvh(src, fr, os.path.join(tmpdir, name))
+
+
+def test_bvh_parser_accepts_compact_hierarchy_motion_boundary():
+    """UAL2-style ``}MOTION`` must parse without rewriting source assets."""
+    import tempfile
+    from src.bvh import load_coco17, parse_bvh, single_frame_bvh_text
+
+    with tempfile.TemporaryDirectory() as d:
+        path = _synthetic_bvh(d, "compact.bvh")
+        text = open(path, encoding="utf-8").read()
+        assert "}\nMOTION" in text
+        with open(path, "w", encoding="utf-8", newline="\n") as target:
+            target.write(text.replace("}\nMOTION", "}MOTION"))
+
+        joints, frames = parse_bvh(path)
+        keypoints, scores = load_coco17(path)
+        assert len(joints) > 0
+        assert frames.shape[0] == 1
+        assert keypoints.shape == (17, 3)
+        assert scores.shape == (17,)
+        rewritten = single_frame_bvh_text(path, frames[0])
+        assert "}\nMOTION\n" in rewritten
+        assert "}MOTION" not in rewritten
+
+
+def test_bvh_parser_reports_missing_motion_section():
+    """Malformed BVH should fail clearly instead of leaking an IndexError."""
+    import os
+    import tempfile
+    from src.bvh import parse_bvh
+
+    with tempfile.TemporaryDirectory() as d:
+        path = os.path.join(d, "missing-motion.bvh")
+        with open(path, "w", encoding="utf-8") as target:
+            target.write("HIERARCHY\nROOT Hips\n{\nOFFSET 0 0 0\n}\n")
+        try:
+            parse_bvh(path)
+        except ValueError as exc:
+            assert "MOTION section is missing" in str(exc)
+        else:
+            raise AssertionError("missing MOTION section was accepted")
 
 
 def _bvh_with_rotations(tmpdir, name, rotations):

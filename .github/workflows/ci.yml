@@ -5,6 +5,16 @@ on:
     branches: [main, develop]
   push:
     branches: [develop]
+    paths:
+      - ".github/workflows/ci.yml"
+      - ".dockerignore"
+      - "Dockerfile"
+      - "requirements.txt"
+      - "api/**"
+      - "src/**"
+      - "scripts/**"
+      - "tests/**"
+      - "!tests/converter/**"
   workflow_dispatch:
 
 permissions:
@@ -27,13 +37,18 @@ jobs:
           cache: pip
 
       - name: Install dependencies
-        run: pip install -r requirements.txt pytest
+        # mirror BVH contract tests import scipy, while production keeps scipy
+        # optional because runtime refine has a NumPy fallback.
+        run: pip install -r requirements.txt pytest "scipy>=1.11"
 
       - name: Compile Python sources
         run: python -m compileall src api scripts
 
+      - name: Run pose cascade contract
+        run: python -m pytest -q tests/test_pose_cascade.py
+
       - name: Run tests
-        run: python -m pytest tests/ -q
+        run: python -m pytest tests/ --ignore=tests/converter -q
 
       - name: Validate production image
         run: docker build --platform linux/amd64 --tag standin-inference:ci .

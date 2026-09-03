@@ -1,0 +1,121 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[2]
+
+
+def _environment(container: dict) -> dict[str, str]:
+    return {item["name"]: item["value"] for item in container["environment"]}
+
+
+def test_repository_forces_lf_for_converter_integrity_hashes():
+    attributes = (ROOT / ".gitattributes").read_text()
+    assert "* text=auto eol=lf" in attributes
+
+
+def test_converter_task_is_isolated_internal_fargate_contract():
+    task = json.loads(
+        (ROOT / "deploy/ecs/converter-task-definition.example.json").read_text()
+    )
+    assert task["family"] == "standin-converter"
+    assert task["networkMode"] == "awsvpc"
+    assert task["requiresCompatibilities"] == ["FARGATE"]
+    assert task["runtimePlatform"]["cpuArchitecture"] == "X86_64"
+    assert int(task["cpu"]) == 1024
+    assert int(task["memory"]) == 2048
+
+    assert [item["name"] for item in task["containerDefinitions"]] == ["converter"]
+    container = task["containerDefinitions"][0]
+    assert "/standin/converter:" in container["image"]
+    assert container["user"] == "10001:10001"
+    assert container["portMappings"][0]["containerPort"] == 8001
+    assert container["stopTimeout"] > 30
+    assert "/healthz" in " ".join(container["healthCheck"]["command"])
+    assert container["healthCheck"]["startPeriod"] >= 120
+    assert container["logConfiguration"]["logDriver"] == "awslogs"
+    assert (
+        container["logConfiguration"]["options"]["awslogs-group"]
+        == "/ecs/standin/converter"
+    )
+
+    env = _environment(container)
+    assert env["CONVERTER_TIMEOUT_SECONDS"] == "30"
+    assert env["CONVERTER_MAX_CONCURRENT_PROCESSES"] == "1"
+    assert env["CONVERTER_FORCE_EXACT_V324"] == "false"
+    assert env["CONVERTER_JSON_LOGS"] == "1"
+    assert env["STANDIN_MASTER_V2_URI"].startswith("s3://")
+    assert env["STANDIN_MASTER_V2_URI"].endswith(
+        "/characters/standin-master-v2.fbx"
+    )
+    assert not container.get("mountPoints")
+    assert all(item["name"] != "inference" for item in task["containerDefinitions"])
+
+
+def test_converter_service_network_has_no_public_ip():
+    service = json.loads(
+        (ROOT / "deploy/ecs/converter-service-network.example.json").read_text()
+    )
+    assert service["serviceName"] == "standin-converter"
+    assert service["launchType"] == "FARGATE"
+    assert service["healthCheckGracePeriodSeconds"] >= 120
+    network = service["networkConfiguration"]["awsvpcConfiguration"]
+    assert network["assignPublicIp"] == "DISABLED"
+    assert network["subnets"]
+    assert all("private" in subnet for subnet in network["subnets"])
+    assert network["securityGroups"] == ["<converter-sg-allow-bff-only>"]
+    breaker = service["deploymentConfiguration"]["deploymentCircuitBreaker"]
+    assert breaker == {"enable": True, "rollback": True}
+
+
+def test_converter_deploy_is_gated_and_path_filtered():
+    workflow = (ROOT / ".github/workflows/converter-deploy.yml").read_text()
+    assert "ECR_REPOSITORY: standin/converter" in workflow
+    assert "CONVERTER_AUTO_DEPLOY_ENABLED == 'true'" in workflow
+    assert "branches: [main, develop]" in workflow
+    assert (
+        "environment: ${{ github.ref == 'refs/heads/main' && 'beta' || 'staging' }}"
+        in workflow
+    )
+    assert "ECS_CLUSTER: ${{ vars.CONVERTER_ECS_CLUSTER }}" in workflow
+    assert "ECS_SERVICE: ${{ vars.CONVERTER_ECS_SERVICE }}" in workflow
+    assert "aws-region: ${{ vars.AWS_REGION }}" in workflow
+    assert ":latest'" in workflow
+    assert ":develop'" in workflow
+    assert "Verify isolated ECR target exists" in workflow
+    assert "Verify optional isolated ECS target exists" in workflow
+    assert workflow.count("if: env.ECS_SERVICE != ''") == 4
+    assert 'file: Dockerfile.converter' in workflow
+    assert 'container-name: converter' in workflow
+    assert '"converter/**"' in workflow
+    assert '"converter_api/**"' in workflow
+    assert '"deploy/ecs/**"' in workflow
+    assert "container-name: inference" not in workflow
+
+
+def test_converter_ci_smokes_dual_artifact_bundle_endpoint():
+    workflow = (ROOT / ".github/workflows/converter-ci.yml").read_text()
+    assert "http://127.0.0.1:8001/convert-bundle" in workflow
+    assert "--form artifact_kind=base" in workflow
+    assert '--form "expected_bvh_sha256=$FINAL_BVH_SHA256"' in workflow
+    assert '--bundle "$ARTIFACT_ROOT/http-smoke.zip"' in workflow
+    assert '--bundle-headers "$ARTIFACT_ROOT/bundle-response.headers"' in workflow
+
+
+def test_required_pr_checks_workflow_is_not_path_filtered():
+    workflow = (ROOT / ".github/workflows/ci.yml").read_text()
+    pull_request_trigger = workflow.split("  pull_request:", 1)[1].split(
+        "  push:", 1
+    )[0]
+    assert "paths:" not in pull_request_trigger
+    assert "name: PR checks" in workflow
+
+
+def test_converter_image_defines_runtime_healthcheck_and_json_logs():
+    dockerfile = (ROOT / "Dockerfile.converter").read_text()
+    assert "HEALTHCHECK --interval=30s" in dockerfile
+    assert "http://127.0.0.1:8001/healthz" in dockerfile
+    assert "CONVERTER_JSON_LOGS=1" in dockerfile
+    assert "DEPLOYMENT_VERSION=$DEPLOYMENT_VERSION" in dockerfile

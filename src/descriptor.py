@@ -11,6 +11,7 @@ import numpy as np
 from .schema import VLMAnalysis, Skeleton, PersonDescriptor, BBox
 from .features import normalize_skeleton
 from .refine_policy import structural_refine_allowed
+from .config import CFG
 
 
 def order_left_to_right(skeletons: List[Optional[Skeleton]],
@@ -50,7 +51,9 @@ def build_descriptors(vlm: VLMAnalysis,
     """
     out = []
     for i, sk in enumerate(skeletons):
-        feat = normalize_skeleton(sk.keypoints, sk.scores) if sk is not None else None
+        feat = normalize_skeleton(
+            sk.keypoints, sk.scores, kpt_thr=CFG.skeleton_kpt_threshold
+        ) if sk is not None else None
         box = boxes[i] if i < len(boxes) else None
         out.append(PersonDescriptor(
             shot=vlm.shot, action=vlm.action, view=vlm.view,
@@ -76,7 +79,9 @@ def build_slot_descriptors(vlm: VLMAnalysis, slots) -> List[PersonDescriptor]:
         feature = None
         if searchable:
             feature = normalize_skeleton(
-                skeleton.keypoints, skeleton.scores, valid_mask=valid_mask
+                skeleton.keypoints, skeleton.scores,
+                kpt_thr=CFG.skeleton_kpt_threshold,
+                valid_mask=valid_mask,
             )
         refine_allowed = bool(
             searchable
@@ -122,6 +127,9 @@ def build_slot_descriptors(vlm: VLMAnalysis, slots) -> List[PersonDescriptor]:
             rank_distance=slot.rank_distance,
             confidence_threshold=slot.confidence_threshold,
             quality_trace={
+                "vlm_person_index": (
+                    slot.slot_id if slot.slot_origin == "vlm" else None
+                ),
                 "assigned_rtm_index": slot.assigned_rtm_index,
                 "assignment_cost": slot.assignment_cost,
                 "assignment_margin": slot.assignment_margin,
@@ -148,6 +156,8 @@ def build_slot_descriptors(vlm: VLMAnalysis, slots) -> List[PersonDescriptor]:
                 "retry_count": slot.retry_count,
                 "retry_reason": slot.retry_reason,
                 "retry_elapsed_ms": round(float(slot.retry_elapsed_ms), 3),
+                "crop_mapping": dict(slot.crop_trace),
+                "pose_rescue": dict(slot.rescue_trace),
             },
             quality_reasons=list(dict.fromkeys(slot.reasons)),
         ))

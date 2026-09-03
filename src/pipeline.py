@@ -4,7 +4,8 @@
 설계 결정 반영:
   · VLM 태그 = shot + 사람 수 (제어 신호). action/view/relationship는 매칭에 안 씀.
   · 매칭 = 스켈레톤 기하(knn_geometric). 태그 필터 없음.
-  · 얽힘·추출실패·라이브러리 공백 = 거리/score 임계값으로 '저신뢰 → 폴백'.
+  · 얽힘은 set-aware 검색 전까지 명시적 안전 폴백.
+  · 추출실패·라이브러리 공백 = 거리/score 임계값으로 '저신뢰 → 폴백'.
 
 흐름:
   VLM.analyze → shot · 사람 수 · 대략박스
@@ -28,10 +29,11 @@ from .config import CFG
 from .vlm.client import build_vlm_client, BaseVLMClient
 from .detect import MockDetector, reconcile, reconcile_count
 from .pose import build_pose_model
+from .pose_rescue import parse_rescue_request, rescue_slots
 from .routing import route
 from .descriptor import build_slot_descriptors
 from .refine_policy import structural_refine_allowed
-from .search import candidate_stability, knn_geometric
+from .search import PositionSearchIndex, candidate_stability, knn_geometric
 from .tracing import span
 from .skeleton_extraction import (
     apply_crop_result,
@@ -40,6 +42,12 @@ from .skeleton_extraction import (
     finalize_slot,
     select_crop_candidate,
 )
+
+
+_LOWER_DISTAL_JOINTS = np.asarray([13, 14, 15, 16], dtype=int)
+_ARM_LIMBS = frozenset({"left_arm", "right_arm"})
+_LEG_LIMBS = frozenset({"left_leg", "right_leg"})
+_HUMANART_RESCUE_TOP_K = 5
 
 
 @dataclass
@@ -56,13 +64,21 @@ class _SlotOutcome:
 class Pipeline:
     def __init__(self, entries, vlm_client: BaseVLMClient | None = None,
                  detector=None, pose_model=None):
-        self.entries = entries
+        # 검색 행렬과 메타데이터가 실행 중 서로 어긋나지 않도록 같은 immutable
+        # snapshot을 공유한다. 라이브러리 갱신은 새 Pipeline 생성 시 자동 반영된다.
+        self.entries = tuple(entries)
+        self.search_index = (
+            PositionSearchIndex.build(self.entries)
+            if CFG.position_search_vectorized else None
+        )
         self.vlm = vlm_client or build_vlm_client()
         self.detector = detector or MockDetector()
         self.pose = pose_model or build_pose_model()
 
     # ---- 메인 ----
-    def process_cut(self, image, img_w: int = 512, img_h: int = 768) -> CutResult:
+    def process_cut(self, image, img_w: int = 512, img_h: int = 768,
+                    rescue_request=None) -> CutResult:
+        rescue_request = parse_rescue_request(rescue_request)
         # 1) VLM: 러프 → 제어 신호(shot·사람수·대략박스)
         with span("vlm"):
             vlm: VLMAnalysis = self.vlm.analyze(image, img_w, img_h)
@@ -80,7 +96,9 @@ class Pipeline:
                              notes=["흉상 컷 → 상체 방향·앵글(MVP 후순위). 검색 스킵."])
 
         if getattr(self.pose, "self_detecting", False):
-            return self._process_self_detecting(image, img_w, img_h, vlm)
+            return self._process_self_detecting(
+                image, img_w, img_h, vlm, rescue_request
+            )
 
         # 3) 검출 + VLM 사람 수 보정 (개수 일치=신뢰도 신호)
         with span("detect"):
@@ -95,43 +113,72 @@ class Pipeline:
         return self._process_slots(
             image, img_w, img_h, vlm, skeletons,
             detector_count=len(det_boxes), count_record=rec,
+            rescue_request=rescue_request,
+            rescue_context=None,
         )
 
     def _process_self_detecting(self, image, img_w: int, img_h: int,
-                                vlm: VLMAnalysis) -> CutResult:
+                                vlm: VLMAnalysis, rescue_request) -> CutResult:
         """RTMPose Body path: pose inference itself is the first detection pass."""
+        rescue_context = None
         with span("pose_full"):
-            skeletons = self.pose.estimate(image, None, img_w, img_h)
+            estimate_with_context = getattr(
+                self.pose, "estimate_with_rescue_context", None
+            )
+            if callable(estimate_with_context):
+                skeletons, rescue_context = estimate_with_context(
+                    image, None, img_w, img_h
+                )
+            else:
+                skeletons = self.pose.estimate(image, None, img_w, img_h)
         with span("reconcile"):
             rec = reconcile_count(len(skeletons), vlm.num_people)
         return self._process_slots(
             image, img_w, img_h, vlm, skeletons,
             detector_count=rec["detector_count"], count_record=rec,
+            rescue_request=rescue_request,
+            rescue_context=rescue_context,
         )
 
     def _process_slots(self, image, img_w: int, img_h: int,
                        vlm: VLMAnalysis, skeletons, detector_count: int,
-                       count_record: dict) -> CutResult:
+                       count_record: dict, rescue_request,
+                       rescue_context=None) -> CutResult:
         """RTM candidate를 슬롯에 배정하고 필요한 슬롯만 crop 복구한다."""
         with span("slot_assignment"):
             assignment = assign_candidates(vlm.approx_boxes, list(skeletons),
-                                           img_w, img_h, CFG)
+                                           img_w, img_h, CFG,
+                                           expected_count=vlm.num_people)
         for slot in assignment.slots:
-            slot.lower_body_observed = bool(
+            explicitly_visible = bool(
                 slot.slot_origin == "vlm"
                 and slot.slot_id < len(vlm.lower_body_visible)
                 and vlm.lower_body_visible[slot.slot_id] is True
             )
+            slot.lower_body_visibility_known = bool(
+                explicitly_visible
+                or (
+                    slot.slot_origin == "vlm"
+                    and slot.slot_id < len(vlm.lower_body_visibility_known)
+                    and vlm.lower_body_visibility_known[slot.slot_id] is True
+                )
+            )
+            slot.lower_body_observed = explicitly_visible
         notes = list(count_record["notes"])
-        count_confidence = count_record["confidence"]
+        # 개수 신뢰도는 detector↔VLM 개수 일치라는 단일 신호다.
+        # 박스/슬롯 품질은 notes와 인물별 품질로 분리해 기록한다.
+        count_confidence = (
+            "high" if detector_count == vlm.num_people else "low"
+        )
         if assignment.invalid_vlm_box_reasons:
-            count_confidence = "low"
             notes.append(
                 "VLM 박스 무효: " + ", ".join(assignment.invalid_vlm_box_reasons)
             )
-        valid_vlm_slots = sum(slot.slot_origin == "vlm" for slot in assignment.slots)
+        valid_vlm_slots = sum(
+            slot.slot_origin == "vlm" and slot.vlm_box is not None
+            for slot in assignment.slots
+        )
         if valid_vlm_slots != vlm.num_people:
-            count_confidence = "low"
             notes.append(
                 f"유효 VLM 슬롯 {valid_vlm_slots}개 != VLM 사람 수 {vlm.num_people}"
             )
@@ -143,12 +190,13 @@ class Pipeline:
 
         crop_attempts = 0
         recovered = 0
+        crop_budget = 0
 
         def try_crop(slot, retry_reason: str) -> tuple[bool, bool]:
             """같은 슬롯에 단 한 번만 crop하고, 시도/개선 여부를 분리해 반환한다."""
             nonlocal crop_attempts, recovered
             if (slot.vlm_box is None or slot.retry_count >= 1
-                    or crop_attempts >= CFG.slot_crop_max_per_cut):
+                    or crop_attempts >= crop_budget):
                 return False, False
             crop_attempts += 1
             slot.retry_count += 1
@@ -159,12 +207,8 @@ class Pipeline:
                 crop_candidates = self.pose.estimate_crop_candidates(
                     image, slot.vlm_box, img_w, img_h
                 )
-            peer_boxes = [
-                other.vlm_box for other in assignment.slots
-                if other is not slot and other.vlm_box is not None
-            ]
             selected = select_crop_candidate(
-                slot, crop_candidates, CFG, peer_boxes=peer_boxes
+                slot, crop_candidates, CFG, peer_slots=assignment.slots
             )
             slot.retry_elapsed_ms += (perf_counter() - started) * 1000.0
             if selected is None:
@@ -176,13 +220,61 @@ class Pipeline:
 
         # missing·소유권/몸통 suspect는 검색 전에 복구한다. 한쪽 사지만 의심되는
         # partial은 먼저 검색 안정성을 본 뒤, 실제로 불안정할 때만 아래에서 재시도한다.
-        for slot in assignment.slots:
+        needs_crop = [
+            slot for slot in assignment.slots
             if slot.vlm_box is not None and (
-                    slot.skeleton is None or slot.state in ("suspect", "invalid")):
-                try_crop(slot, "pre_search_suspect")
+                slot.skeleton is None or slot.state in ("suspect", "invalid")
+            )
+        ]
+        crop_budget = min(
+            CFG.slot_crop_hard_cap,
+            max(CFG.slot_crop_max_per_cut, len(needs_crop)),
+        )
+        severity = {"missing": 0, "invalid": 1, "suspect": 2}
+        for slot in sorted(
+            needs_crop,
+            key=lambda item: (
+                0 if item.skeleton is None else severity.get(item.state, 3),
+                float(item.vlm_box.x1),
+                float(item.vlm_box.y1),
+                item.slot_id,
+            ),
+        ):
+            try_crop(slot, "pre_search_suspect")
 
         with span("skeleton_finalize"):
             slots = [finalize_slot(slot, CFG) for slot in assignment.slots]
+        with span("pose_rescue"):
+            rescue = rescue_slots(
+                slots, self.pose, image, img_w, img_h, CFG,
+                request=rescue_request, rescue_context=rescue_context,
+            )
+        rescue_summary = rescue.to_trace()
+        for slot in slots:
+            if slot.rescue_trace:
+                slot.rescue_trace["cut_summary"] = rescue_summary
+        if rescue.triggered:
+            notes.append(
+                f"Human-Art 폴백 {rescue.trigger}: 대상 {rescue.target_count}명, "
+                f"채택 {rescue.accepted}명"
+                + (f", shadow 채택예정 {rescue.would_accept}명"
+                   if rescue.stage == "shadow" else "")
+                + f", {rescue.elapsed_ms:.1f}ms"
+            )
+            if rescue.error:
+                notes.append(f"Human-Art 폴백 오류: {rescue.error}; current-X 결과 유지")
+            if rescue.rejected_reasons:
+                notes.append(
+                    "Human-Art 폴백 거부: "
+                    + ",".join(dict.fromkeys(rescue.rejected_reasons))
+                )
+        elif rescue_request.manual and rescue.stage == "off":
+            notes.append("수동 Human-Art 폴백 요청 무시: cascade 비활성")
+        elif rescue.rejected_reasons:
+            notes.append(
+                "Human-Art 폴백 요청 거부: "
+                + ",".join(dict.fromkeys(rescue.rejected_reasons))
+            )
         threshold_scale = 0.7 if count_confidence == "low" else 1.0
         processed: list[tuple[object, _SlotOutcome]] = []
         for slot in slots:
@@ -190,7 +282,8 @@ class Pipeline:
                 outcome = self._evaluate_slot(vlm, slot, threshold_scale)
             if (outcome.stability is not None
                     and outcome.stability["status"] == "unstable"
-                    and slot.retry_count == 0):
+                    and slot.retry_count == 0
+                    and slot.skeleton_source != "fallback_full_image"):
                 attempted, _ = try_crop(slot, "unstable_search")
                 if attempted:
                     with span("skeleton_finalize"):
@@ -276,12 +369,14 @@ class Pipeline:
             f"low/폴백={low_count}, top_k={CFG.top_k_final})")
         return result
 
-    def _apply_refine_policy(self, desc, slot, confidence: str) -> None:
+    def _apply_refine_policy(self, desc, slot, confidence: str,
+                             has_candidates: bool = True) -> None:
         """검색 결정과 구조 품질을 /refine 입력 score에 끝까지 반영한다.
 
         새 클라이언트는 ``refine_allowed/refinable_limbs``를 읽고, 구버전은 scores만
         되돌려준다. 금지 상태에서 effective score를 0으로 만드는 하위호환 안전장치를
-        유지해 어느 쪽도 suspect 스켈레톤을 refine하지 못하게 한다.
+        유지해 어느 쪽도 suspect 스켈레톤을 refine하지 못하게 한다. v2가 검색
+        거리/순위를 gate로 쓰지 않더라도 조정할 base candidate 존재는 필수다.
         """
         evidence = slot.evidence
         if CFG.refine_v2_enabled:
@@ -324,9 +419,14 @@ class Pipeline:
         )
         # v1은 검색 confidence까지 실행 게이트로 사용한다. v2는 검색 거리/순위가
         # 낮다는 이유만으로 차단하지 않고, 스켈레톤·소유권·coverage 안전성만 본다.
-        allowed = structural_allowed if CFG.refine_v2_enabled else bool(
-            confidence == "high" and structural_allowed
-            and (slot.state == "valid" or slot.search_stability == "stable")
+        allowed = bool(
+            has_candidates
+            and (
+                structural_allowed if CFG.refine_v2_enabled else bool(
+                    confidence == "high" and structural_allowed
+                    and (slot.state == "valid" or slot.search_stability == "stable")
+                )
+            )
         )
         desc.refine_allowed = allowed
         desc.refinable_limbs = refinable_limbs
@@ -338,6 +438,8 @@ class Pipeline:
         desc.quality_trace["refine_policy"] = (
             "v2_structural" if CFG.refine_v2_enabled else "v1_search_and_structural"
         )
+        if not has_candidates:
+            desc.quality_trace["refine_policy_block"] = "no_candidates"
         if desc.skeleton is not None and evidence is not None:
             desc.skeleton.scores = (
                 evidence.refine_scores if allowed
@@ -348,12 +450,82 @@ class Pipeline:
                        threshold_scale: float) -> _SlotOutcome:
         """한 슬롯의 masked 검색·A/B 안정성·refine 정책을 한 번에 계산한다."""
         desc = build_slot_descriptors(vlm, [slot])[0]
-        desc.distance_metric = CFG.distance_metric.lower()
+        # Human-Art는 current-X의 metric 실험값을 상속하지 않는다. 검증한 계약대로
+        # 보수적 관절 mask + position 검색을 독립적인 단일 query로 실행한다.
+        is_humanart_rescue = slot.skeleton_source == "fallback_full_image"
+        search_metric = (
+            "pos" if is_humanart_rescue else CFG.distance_metric.lower()
+        )
+        search_top_k = _HUMANART_RESCUE_TOP_K if is_humanart_rescue else None
+        desc.distance_metric = search_metric
+        if vlm.relationship.is_entangled:
+            reason_code = "entangled_set_search_unavailable"
+            if reason_code not in slot.reasons:
+                slot.reasons.append(reason_code)
+            slot.search_stability = "not_available"
+            slot.rank_distance = None
+            slot.confidence_threshold = None
+            desc.search_stability = "not_available"
+            desc.rank_distance = None
+            desc.confidence_threshold = None
+            desc.quality_trace.update({
+                "search_scope": "entangled_set",
+                "lower_body_visibility_known": bool(
+                    slot.lower_body_visibility_known
+                ),
+                "lower_body_visibility_decision": reason_code,
+                "evidence_valid_joint_mask": (
+                    desc.valid_joint_mask.astype(bool).tolist()
+                    if desc.valid_joint_mask is not None else []
+                ),
+                "search_valid_joint_mask": [],
+                "distance_metric": desc.distance_metric,
+                "rank_distance": None,
+                "confidence_threshold": None,
+                "search_stability": "not_available",
+                "fallback_reason": reason_code,
+            })
+            self._apply_refine_policy(
+                desc, slot, "low", has_candidates=False
+            )
+            # 세트 전체를 함께 푸는 검색/refine이 없는 현재에는
+            # 개별 인물의 사지 허용 자체가 잘못된 신호가 된다.
+            desc.refinable_limbs = ()
+            return _SlotOutcome(
+                descriptor=desc,
+                candidates=[],
+                confidence="low",
+                reason=("얽힘 세트 검색 미구현 → "
+                        "개별 solo 후보 대신 안전 폴백"),
+                hard_fallback=True,
+            )
+        search_mask, search_scope, visibility_reason = self._search_mask_policy(
+            desc, slot
+        )
+        desc.quality_trace.update({
+            "search_scope": search_scope,
+            "lower_body_visibility_known": bool(
+                slot.lower_body_visibility_known
+            ),
+            "lower_body_visibility_decision": visibility_reason,
+            "evidence_valid_joint_mask": (
+                desc.valid_joint_mask.astype(bool).tolist()
+                if desc.valid_joint_mask is not None else []
+            ),
+            "search_valid_joint_mask": (
+                search_mask.astype(bool).tolist()
+                if search_mask is not None else []
+            ),
+        })
+        if visibility_reason and visibility_reason not in slot.reasons:
+            slot.reasons.append(visibility_reason)
         candidates, confidence, reason = self._search_one(
-            desc, slot.skeleton, threshold_scale=threshold_scale
+            desc, slot.skeleton, threshold_scale=threshold_scale,
+            query_valid_mask=search_mask, distance_metric=search_metric,
+            top_k=search_top_k,
         )
         threshold = CFG.fallback_threshold(
-            CFG.distance_metric, desc.coverage_class
+            search_metric, desc.coverage_class
         )
         if threshold is not None:
             threshold *= threshold_scale
@@ -370,11 +542,15 @@ class Pipeline:
                 and desc.coverage_class in ("full", "reduced")
                 and slot.state in ("partial", "suspect")):
             conservative_mask = conservative_joint_mask(slot.evidence)
-            if not np.array_equal(conservative_mask, desc.valid_joint_mask):
+            if search_scope == "upper_body":
+                conservative_mask[_LOWER_DISTAL_JOINTS] = False
+            if not np.array_equal(conservative_mask, search_mask):
                 started = perf_counter()
                 conservative_candidates = knn_geometric(
                     self.entries, desc.feature,
                     query_valid_mask=conservative_mask,
+                    search_index=self.search_index,
+                    metric=search_metric,
                 )
                 stability = candidate_stability(
                     candidates, conservative_candidates, self.entries,
@@ -405,6 +581,10 @@ class Pipeline:
 
         desc.quality_trace.update({
             "distance_metric": desc.distance_metric,
+            "search_top_k": (
+                search_top_k if search_top_k is not None else CFG.top_k_final
+            ),
+            "candidate_count": len(candidates),
             "rank_distance": desc.rank_distance,
             "confidence_threshold": desc.confidence_threshold,
             "search_stability": desc.search_stability,
@@ -417,19 +597,71 @@ class Pipeline:
 
         # provisional·모호한 소유권·crop 복구는 거리와 무관하게 high가 될 수 없다.
         if (slot.slot_origin == "rtm_provisional" or slot.state == "suspect"
-                or slot.skeleton_source == "crop_retry") and confidence == "high":
+                or slot.skeleton_source in {"crop_retry", "fallback_full_image"}
+                ) and confidence == "high":
             confidence = "low"
             reason = "복구/provisional/소유권 의심 → 베이스 Top-5만 제공"
 
-        self._apply_refine_policy(desc, slot, confidence)
+        # 상체 검색 거리는 전신 coverage 임계값과 직접 비교할 수 없다. 또한 VLM과
+        # 유효 다리 증거가 충돌한 경우에는 전신 순위를 보존하되 confidence만 낮춘다.
+        if search_scope == "upper_body" and confidence == "high":
+            confidence = "low"
+            reason = "하체 비관측 합의 → 상체 기준 Top-5만 제공"
+        elif visibility_reason == "lower_visibility_conflict_complete_leg" \
+                and confidence == "high":
+            confidence = "low"
+            reason = "VLM 하체 비관측과 유효 다리 충돌 → 전신 Top-5만 제공"
+
+        self._apply_refine_policy(
+            desc, slot, confidence, has_candidates=bool(candidates)
+        )
         return _SlotOutcome(
             descriptor=desc, candidates=candidates, confidence=confidence,
             reason=reason, stability=stability, ab_elapsed_ms=elapsed_ms,
         )
 
+    @staticmethod
+    def _search_mask_policy(desc, slot):
+        """VLM은 prior로만 쓰고, 유효 다리가 있으면 전신 검색을 우선한다.
+
+        명시적 VLM 비관측과 스켈레톤의 '완성 다리 없음'이 합의한 경우에만
+        무릎·발목을 검색에서 제거한다. lineage 누락, 유효 다리와의 충돌, 상체
+        불충분은 기존 mask를 그대로 사용한다.
+        """
+        if desc.valid_joint_mask is None:
+            return None, "full_body", None
+        evidence = slot.evidence
+        if (slot.skeleton_source == "fallback_full_image"
+                and evidence is not None):
+            return (
+                conservative_joint_mask(evidence),
+                "humanart_conservative",
+                None,
+            )
+        mask = np.asarray(desc.valid_joint_mask, dtype=bool).copy()
+        if (not slot.lower_body_visibility_known
+                or slot.lower_body_observed
+                or evidence is None):
+            return mask, "full_body", None
+
+        valid_limbs = set(evidence.valid_limbs)
+        if valid_limbs & _LEG_LIMBS:
+            return mask, "full_body", "lower_visibility_conflict_complete_leg"
+
+        upper_searchable = bool(
+            "torso" in valid_limbs and valid_limbs & _ARM_LIMBS
+        )
+        if not upper_searchable:
+            return mask, "full_body", "lower_visibility_upper_insufficient"
+
+        mask[_LOWER_DISTAL_JOINTS] = False
+        return mask, "upper_body", "lower_visibility_upper_agreement"
+
     # ---- 인물 1명: 스켈레톤 → 기하검색 → 신뢰도 판정 ----
     def _search_one(self, desc, skel, fallback_distance=None,
-                    threshold_scale: float = 1.0):
+                    threshold_scale: float = 1.0,
+                    query_valid_mask=None,
+                    distance_metric=None, top_k=None):
         # 슬롯 품질 검사를 거친 경로에서는 전체 평균 score를 신뢰도 대용으로 쓰지 않는다.
         if skel is None or desc.feature is None or desc.coverage_class == "insufficient":
             return [], "low", "스켈레톤 추출 실패 → 폴백(작가)"
@@ -437,9 +669,14 @@ class Pipeline:
                 float(np.mean(skel.scores)) < CFG.min_skeleton_score:
             return [], "low", "스켈레톤 추출 실패 → 폴백(작가)"
 
+        if query_valid_mask is None:
+            query_valid_mask = desc.valid_joint_mask
         cands = knn_geometric(
             self.entries, desc.feature,
-            query_valid_mask=desc.valid_joint_mask,
+            top_k=top_k,
+            query_valid_mask=query_valid_mask,
+            search_index=self.search_index,
+            metric=distance_metric,
         )
         if not cands:
             return [], "low", "후보 없음 → 폴백"
@@ -448,7 +685,8 @@ class Pipeline:
         if desc.coverage_class == "sparse":
             return cands, "low", "coverage=sparse → 베이스 Top-5만 제공(refine 금지)"
 
-        threshold = CFG.fallback_threshold(CFG.distance_metric, desc.coverage_class)
+        metric = (distance_metric or CFG.distance_metric).lower()
+        threshold = CFG.fallback_threshold(metric, desc.coverage_class)
         if fallback_distance is not None:
             threshold = fallback_distance
         if threshold is None:

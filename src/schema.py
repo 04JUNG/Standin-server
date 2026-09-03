@@ -111,6 +111,9 @@ class VLMAnalysis:
     # approx_boxes와 같은 순서. false/누락이면 해당 인물의 모든 하체 refine을
     # fail-closed로 차단한다. 정밀 좌표가 아니라 crop/가시성 제어 신호다.
     lower_body_visible: list[bool] = field(default_factory=list)
+    # lower_body_visible 값이 실제 provider 응답에서 왔는지 나타낸다. 누락을 false와
+    # 구분해야 검색이 전신을 반신으로 조용히 오분류하지 않는다.
+    lower_body_visibility_known: list[bool] = field(default_factory=list)
 
 
 @dataclass

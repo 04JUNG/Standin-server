@@ -14,6 +14,17 @@ except ImportError:
     pass
 
 
+def _env_bool(name: str, default: bool) -> bool:
+    """Parse boolean envs strictly so typos cannot silently flip safety flags."""
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    normalized = raw.strip()
+    if normalized not in {"0", "1"}:
+        raise ValueError(f"{name} must be exactly '0' or '1'")
+    return normalized == "1"
+
+
 @dataclass
 class Config:
     # --- 실행 환경 ---  "development"(기본) | "production"
@@ -55,38 +66,16 @@ class Config:
     gemini_min_attempt_seconds: float = float(os.getenv("GEMINI_MIN_ATTEMPT_SECONDS", "10"))
     gemini_retry_base_seconds: float = float(os.getenv("GEMINI_RETRY_BASE_SECONDS", "0.5"))
     gemini_retry_max_seconds: float = float(os.getenv("GEMINI_RETRY_MAX_SECONDS", "2.0"))
-    # --- 폴백 모델 체인 ---
-    # 503은 **모델별 용량 풀**의 문제다. 같은 모델을 다시 두드리면 실패가 상관돼 있어
-    # 재시도 전부가 같은 스파이크에 그대로 걸린다(2026-08-28 프로덕션: 3시도가 전부 503,
-    # 18~37초 만에 소진 — 75초 예산 중 40~57초를 안 쓰고 버렸다).
-    #
-    # 1차 모델이 소진되면 **남은 예산으로 다른 모델**을 태운다. 용량 풀이 달라 실패가
-    # 비상관이다. 비우면 폴백 없음(이 설정이 생기기 전과 동일한 동작).
-    #
-    # ⚠ 폴백 모델은 태그 품질이 1차보다 낮을 수 있다. 그래도 "다른 모델의 태그"가
-    #   "분석 실패"보다 낫기 때문에 켠다 — 폴백은 실패 직전에만 돈다.
-    #
-    # ⚠ 모델 이름을 바꿀 때는 **반드시 실제 키로 확인**할 것. 2026-08-29 프로덕션 키
-    #   실측에서 `gemini-2.5-flash`와 `gemini-2.5-flash-lite`는 둘 다 404였다
-    #   ("no longer available to new users"). 이 프로젝트는 2.5 계열을 못 쓴다.
-    #   404는 이 파일에서 "우리 잘못"으로 분류돼 폴백도 안 타고 500 + 알림이 된다.
-    #   확인 수단: scripts/vlm_probe.py --model a,b
-    gemini_fallback_models: str = os.getenv("GEMINI_FALLBACK_MODELS", "gemini-flash-lite-latest")
-    # 사고 토큰 예산. 이 단계는 열거형 태깅(사람 수·shot)이라 추론 여력이 필요 없다 —
-    # 끄면 호출이 짧아져 혼잡 구간에 머무는 시간과 과금이 함께 준다.
-    #   "0"=끔(기본) / "-1"=동적 / 양수=상한 / "none"=필드를 아예 안 보냄
-    # 끈 뒤에는 gemini_request 로그의 thoughtTokens가 0이어야 한다(적용 확인 신호).
-    #
-    # ⚠ 이 값은 **1차 모델에만** 적용된다. lite 계열은 thinking_config 자체를 거부해
-    #   400 INVALID_ARGUMENT를 돌려주는데(2026-08-29 실측: gemini-flash-lite-latest,
-    #   gemini-3.5-flash-lite 모두 400), 400은 폴백도 안 타고 500 + 알림이 된다.
-    #   폴백은 "실패보다 나은 답"이 목적이라 모델 기본값으로 두는 편이 안전하다.
-    #   1차가 lite 계열이면 이 값을 "none"으로 두면 된다.
-    gemini_thinking_budget: str = os.getenv("GEMINI_THINKING_BUDGET", "0")
     openai_model: str = os.getenv("OPENAI_MODEL", "gpt-5-mini")
 
     # --- 검출/포즈 ---  "mock" | "rtmlib"
     pose_backend: str = os.getenv("POSE_BACKEND", "mock")
+    # 배포 단위 variant. 미설정=current-X 현행 경로이며 Human-Art는 manifest와
+    # 명시적인 canary stage가 모두 있어야만 초기화된다.
+    pose_model_variant: str = os.getenv("POSE_MODEL_VARIANT", "current-x")
+    pose_model_manifest: str = os.getenv("POSE_MODEL_MANIFEST", "")
+    pose_canary_stage: str = os.getenv("POSE_CANARY_STAGE", "off")
+    pose_strict: bool = _env_bool("POSE_STRICT", False)
 
     # --- 검색 ---
     top_n_search: int = 20     # kNN 1차 후보 수(→ rerank 입력)
@@ -137,6 +126,11 @@ class Config:
     # 실데이터로 보정: 좋은 매칭 ~0.15, 앉기-서기 ~0.36, 추출실패 ~0.6+ 관측.
     # 검색 거리: "pos"(위치L2·기본) | "angle"(뼈 방향·비율 불변) | "hybrid"
     distance_metric: str = os.getenv("DISTANCE", "pos")
+    # pos metric의 projection 전체를 NumPy 행렬로 계산한다. 0이면 기존 scalar
+    # 구현으로 즉시 복구하며 후보 정책·정렬·family dedup은 동일하게 유지한다.
+    position_search_vectorized: bool = _env_bool(
+        "POSITION_SEARCH_VECTORIZED", True
+    )
     hybrid_w: float = float(os.getenv("HYBRID_W", "0.7"))   # hybrid에서 각도 비중
     fallback_distance: float = float(os.getenv("FALLBACK_DISTANCE", "0.45"))
     # mask-aware 거리는 coverage마다 분모가 달라 raw distance를 서로 직접 비교할 수 없다.
@@ -181,11 +175,21 @@ class Config:
     # 공통 body 관절의 평균 거리를 박스 대각선으로 정규화해 함께 확인한다.
     slot_duplicate_keypoint_distance: float = float(os.getenv(
         "SLOT_DUPLICATE_KEYPOINT_DISTANCE", "0.08"))
+    # current-X↔Human-Art 교차 중복 제거는 별도 실측값을 사용한다. 관절 score
+    # threshold는 두 모델 모두 current-X 기준(기본 0.30)을 적용해야 동일인 검출률이 유지된다.
+    pose_fallback_duplicate_iou: float = float(os.getenv(
+        "POSE_FALLBACK_DUPLICATE_IOU", "0.50"))
+    pose_fallback_duplicate_distance: float = float(os.getenv(
+        "POSE_FALLBACK_DUPLICATE_DISTANCE", "0.10"))
     slot_owner_padding: float = float(os.getenv("SLOT_OWNER_PADDING", "0.15"))
     slot_cross_owner_max_iou: float = float(os.getenv(
         "SLOT_CROSS_OWNER_MAX_IOU", "0.50"))
     slot_provisional_max_iou: float = float(os.getenv("SLOT_PROVISIONAL_MAX_IOU", "0.20"))
+    # 실패 슬롯은 심각도 순으로 재시도하되 비정상 다인 컷에서 추론 수가 무한히
+    # 늘지 않도록 컷당 두 번으로 제한한다. max_per_cut은 기본 예산,
+    # hard_cap은 어떤 설정에서도 넘을 수 없는 절대 상한이다.
     slot_crop_max_per_cut: int = int(os.getenv("SLOT_CROP_MAX_PER_CUT", "2"))
+    slot_crop_hard_cap: int = int(os.getenv("SLOT_CROP_HARD_CAP", "2"))
     slot_crop_padding: float = float(os.getenv("SLOT_CROP_PADDING", "0.20"))
     # 음수면 family overlap만 판정하고 Top-1 angle은 진단값으로만 기록한다.
     # 고정 평가셋 보정 뒤 양수로 설정하면 두 조건을 함께 게이트한다.

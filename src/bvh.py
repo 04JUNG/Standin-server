@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import math
 import os
+import re
 
 import numpy as np
 
@@ -21,7 +22,11 @@ from .schema import COCO17
 
 # ---------- 파싱 ----------
 def parse_bvh(path: str):
-    toks = open(path).read().split()
+    # Some valid exporters omit whitespace at structural boundaries (for
+    # example ``}MOTION``).  Tokenize braces independently instead of relying
+    # on whitespace so those files follow the same parser path as ``}\nMOTION``.
+    with open(path, encoding="utf-8-sig") as source:
+        toks = re.findall(r"[{}]|[^\s{}]+", source.read())
     i = 0
     joints = []          # [name, parent_idx, offset(3,), channels(list), is_end]
     stack = []
@@ -31,8 +36,10 @@ def parse_bvh(path: str):
         joints.append([name, parent, np.zeros(3), [], is_end])
         return len(joints) - 1
 
-    assert toks[i] == "HIERARCHY"; i += 1
-    while toks[i] != "MOTION":
+    if not toks or toks[i] != "HIERARCHY":
+        raise ValueError(f"HIERARCHY section is missing: {path}")
+    i += 1
+    while i < len(toks) and toks[i] != "MOTION":
         t = toks[i]
         if t in ("ROOT", "JOINT"):
             add(toks[i + 1]); i += 2
@@ -48,9 +55,15 @@ def parse_bvh(path: str):
             n = int(toks[i + 1]); joints[stack[-1]][3] = toks[i + 2:i + 2 + n]; i += 2 + n
         else:
             i += 1
+    if i >= len(toks):
+        raise ValueError(f"MOTION section is missing: {path}")
     i += 1
-    assert toks[i] == "Frames:"; nframes = int(toks[i + 1]); i += 2
-    assert toks[i] == "Frame"; i += 3         # 'Frame' 'Time:' value
+    if i + 1 >= len(toks) or toks[i] != "Frames:":
+        raise ValueError(f"Frames header is missing: {path}")
+    nframes = int(toks[i + 1]); i += 2
+    if i + 2 >= len(toks) or toks[i] != "Frame" or toks[i + 1] != "Time:":
+        raise ValueError(f"Frame Time header is missing: {path}")
+    i += 3
     nch = sum(len(j[3]) for j in joints)
     data = np.array(list(map(float, toks[i:i + nframes * nch]))).reshape(nframes, nch)
     return joints, data
@@ -119,10 +132,15 @@ def rotation_channel_indices(joints, joint_idx: int):
 
 def hierarchy_text(path: str) -> str:
     """원본 BVH의 HIERARCHY 블록을 텍스트 그대로 반환(MOTION 직전까지)."""
-    lines = open(path).read().splitlines()
-    for i, ln in enumerate(lines):
-        if ln.strip().upper() == "MOTION":
-            return "\n".join(lines[:i])
+    with open(path, encoding="utf-8-sig") as source:
+        text = source.read()
+    marker = re.search(
+        r"(?P<motion>(?<![A-Za-z0-9_:])MOTION(?![A-Za-z0-9_:]))\s+Frames:",
+        text,
+        re.I,
+    )
+    if marker is not None:
+        return text[:marker.start("motion")].rstrip("\r\n")
     raise ValueError(f"MOTION 섹션이 없습니다: {path}")
 
 
