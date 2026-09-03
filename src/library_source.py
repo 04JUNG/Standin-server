@@ -11,7 +11,7 @@
     poses.db
     index.pkl                    (선택 — 없으면 첫 기동에 재계산)
     bvh/*.bvh                    (선택 — /pose/{id}/bvh 응답에 필요)
-    thumbs/<id>__<view>.png      (선택 — 빠지면 썸네일이 조용히 사라진다)
+    thumbs/<id>__<view>.jpg      (선택 — 빠지면 썸네일이 조용히 사라진다)
     thumbs/thumbnail_manifest.json
 
 만드는 법 — 검증까지 해주는 배포 스크립트를 쓴다:
