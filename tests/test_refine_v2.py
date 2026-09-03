@@ -585,6 +585,60 @@ def test_v25_api_base_fallback_has_no_inline_bvh():
         assert response.refine_outcome == "not_attempted"
 
 
+def test_v25_api_keeps_the_refinement_when_the_thumbnail_cannot_be_rendered():
+    """썸네일 렌더 실패가 조정 결과를 버리게 하면 안 된다.
+
+    이전에는 `_refine_thumbnail`이 409를 던져 `/refine` 전체가 실패했다. 소비자(BFF)는
+    그걸 상류 장애로 읽고 베이스로 전환하므로, **그림 한 장 때문에 방금 계산한 더 나은
+    포즈가 저장되지 못했다.** 썸네일은 부가 산출물이므로 없이 응답하는 것이 맞다.
+    """
+    import api.app as api_app
+    from api.models import RefineRequest
+
+    def _explode(*_args, **_kwargs):
+        # 옛 except 튜플(OSError·AssertionError·ValueError·IndexError)에 없는 종류를
+        # 일부러 고른다. 예외 종류를 좁게 잡으면 다시 500으로 새어 나간다.
+        raise RuntimeError("renderer exploded")
+
+    with tempfile.TemporaryDirectory() as directory:
+        base = _synthetic_bvh(directory, "base.bvh")
+        target = _bvh_with_rotation(directory, "target.bvh", "LeftArm", 15.0)
+        keypoints, scores = _target_kp(target)
+        request = RefineRequest(
+            pose_id="pose", view="front", keypoints=keypoints.tolist(),
+            scores=scores.tolist(), refine_allowed=True,
+            refinable_limbs=["left_arm"], lower_body_observed=False,
+            skeleton_state="valid", coverage_class="full", slot_origin="vlm",
+            skeleton_source="full_image", gap_type="unknown",
+        )
+        original_meta = api_app.get_pose_meta
+        original_render = api_app.render_bvh_thumbnail
+        original_flag = CFG.refine_v2_enabled
+        original_obs = CFG.refine_observability_gate
+        original_state = dict(api_app.STATE)
+        try:
+            api_app.STATE["db_path"] = os.path.join(directory, "unused.db")
+            api_app.get_pose_meta = lambda *_args: {
+                "bvh_path": base, "set_id": None,
+            }
+            api_app.render_bvh_thumbnail = _explode
+            CFG.refine_v2_enabled = True
+            CFG.refine_observability_gate = False
+            response = api_app.refine(request)
+        finally:
+            api_app.get_pose_meta = original_meta
+            api_app.render_bvh_thumbnail = original_render
+            CFG.refine_v2_enabled = original_flag
+            CFG.refine_observability_gate = original_obs
+            api_app.STATE.clear()
+            api_app.STATE.update(original_state)
+
+        assert response.refined, response.reason
+        assert response.bvh and response.bvh.startswith("HIERARCHY")
+        # 그림만 없다. 소비자는 이걸 오류가 아니라 "썸네일 없음"으로 다룬다.
+        assert response.thumbnail is None
+
+
 def test_v25_selector_accepts_only_common_metric_positive_gain():
     from src.refine_selector import select_aggressive
     from src.refine_v2 import _JOINT_DELTA_LIMITS

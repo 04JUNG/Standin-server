@@ -52,7 +52,9 @@ Refine는 v2.5 safe aggressive가 제품 기본이다(`REFINE_V2_ENABLED=1`,
 
 조정본은 `POST /refine` 응답의 `bvh` 본문으로만 나간다. 로컬 디스크에 남기지 않으므로 조정본
 다운로드 URL은 없다(`docs/REFINE_HANDOFF.md` §3 4단계). 같은 응답의 `thumbnail`에는 최종
-결과를 기존 후보와 같은 스타일·매칭 시점으로 그린 256×256 PNG가 base64로 들어간다.
+결과를 기존 후보와 같은 스타일·매칭 시점으로 그린 256×256 PNG가 base64로 들어간다. 그리지
+못하면 `thumbnail`만 `null`이고 조정 결과는 그대로 나간다 — 그림 실패로 응답을 버리면 사용자가
+더 나쁜 포즈를 저장하게 된다.
 
 선택된 최종 BVH를 캐릭터 FBX로 바꾸는 출력단은 별도 내부 서비스다. 추론 프로세스는 Blender를
 import하지 않으며, 변환 1건마다 Blender 5.2 child process를 새로 실행한다.
