@@ -264,8 +264,8 @@ def test_thumbnail_lookup_uses_pose_and_view_without_path_escape():
     with tempfile.TemporaryDirectory() as tmp:
         thumbs = Path(tmp) / "thumbs"
         thumbs.mkdir()
-        expected = thumbs / "Wave Pose__front.png"
-        expected.write_bytes(b"png")
+        expected = thumbs / "Wave Pose__front.jpg"
+        expected.write_bytes(b"jpg")
 
         assert find_thumbnail(tmp, "Wave Pose", "front") == expected.resolve()
         assert thumbnail_url(tmp, "Wave Pose", "front") == (
