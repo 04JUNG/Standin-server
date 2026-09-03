@@ -18,6 +18,7 @@ import base64
 import hashlib
 import io
 import json
+import mimetypes
 import os
 import re
 import tempfile
@@ -515,7 +516,7 @@ def get_pose_bvh(pose_id: str):
 
 @app.get("/pose/{pose_id}/thumbnail")
 def get_pose_thumbnail(pose_id: str, view: str):
-    """번들에 포함된 후보 시점 PNG를 반환한다."""
+    """번들에 포함된 후보 시점 썸네일을 반환한다."""
     if view not in THUMBNAIL_VIEWS:
         raise HTTPException(400, f"unsupported thumbnail view: {view}")
     if get_pose_meta(STATE["db_path"], pose_id) is None:
@@ -524,9 +525,13 @@ def get_pose_thumbnail(pose_id: str, view: str):
     path = find_thumbnail(CFG.data_dir, pose_id, view)
     if path is None:
         raise HTTPException(404, f"thumbnail not found: pose_id={pose_id}, view={view}")
+    # ⚠ media_type을 하드코딩하지 않는다. 번들 썸네일이 2026-09-03부터 JPEG이고,
+    #   PNG로 잘못 알려 주면 BFF가 그 값을 그대로 프록시해 클라이언트까지 전달된다.
+    #   `blobToDataUrl`이 그 MIME으로 data URL을 만들기 때문에, 스니핑이 관대하지 않은
+    #   WebView에서는 썸네일이 그려지지 않는다.
     return FileResponse(
         path,
-        media_type="image/png",
+        media_type=mimetypes.guess_type(path.name)[0] or "application/octet-stream",
         headers={"Cache-Control": "private, max-age=86400"},
     )
 
