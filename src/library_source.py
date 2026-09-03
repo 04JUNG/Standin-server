@@ -1,6 +1,6 @@
 """포즈 라이브러리 프로비저닝.
 
-라이브러리(poses.db · index.pkl · bvh/)는 이미지에 넣을 수 없다:
+라이브러리(poses.db · index.pkl · bvh/ · thumbs/)는 이미지에 넣을 수 없다:
   · Mixamo/CMU 재배포 금지 조항 → .gitignore로 커밋 차단
   · .dockerignore로 이미지에서도 제외
 
@@ -11,9 +11,11 @@
     poses.db
     index.pkl                    (선택 — 없으면 첫 기동에 재계산)
     bvh/*.bvh                    (선택 — /pose/{id}/bvh 응답에 필요)
-    thumbs/<id>__<view>.png      (선택 — 빠지면 썸네일이 조용히 사라진다)
+    thumbs/<id>__<view>.jpg      (선택 — 빠지면 썸네일이 조용히 사라진다)
+    thumbs/thumbnail_manifest.json
 
 만드는 법 — 검증까지 해주는 배포 스크립트를 쓴다:
+    python scripts/render_bvh_thumbnails.py data/bvh data/thumbs
     python scripts/deploy_pose_library.py data/
 
 직접 만들 때(thumbs를 빠뜨리지 않는다):

@@ -3,6 +3,7 @@ FastAPI 레이어 — 도원의 Python 추론 서버.
 
 경계: [앱 서버 팀] --HTTP--> [이 서비스]  (문서화된 OpenAPI 계약 = /docs)
   POST /analyze         멀티파트 PNG 러프 컷 → CutResult(JSON)
+  POST /refine          선택 포즈 → 조정 BVH + 매칭 시점 PNG(JSON 인라인)
   GET  /pose/{id}/bvh   후보 pose_id → 라이브러리 BVH 파일(동원 내보내기 팀이 소비)
   GET  /healthz         기동 확인
 
@@ -13,17 +14,20 @@ FastAPI 레이어 — 도원의 Python 추론 서버.
 """
 from __future__ import annotations
 
+import base64
 import hashlib
 import io
 import json
+import mimetypes
 import os
 import re
+import tempfile
 import time
 import uuid
 from dataclasses import asdict
 from datetime import datetime, timezone
 from contextlib import asynccontextmanager
-from typing import Optional
+from typing import Annotated, Optional
 
 import numpy as np
 from fastapi import FastAPI, File, Form, Request, UploadFile, HTTPException
@@ -36,6 +40,7 @@ from src.logging_setup import (configure_logging, log_error, log_info,
 from src import notify as alerts
 from src.ops_metrics import COLLECTOR, TASK_ID
 from src.pipeline import Pipeline
+from src.pose_rescue import parse_rescue_request
 from src.library import build_synthetic_index
 from src.library_source import ensure_library
 from src.refine import (REFINE_CODE_VERSION, REFINE_V2_CODE_VERSION,
@@ -46,6 +51,10 @@ from src.pose_quarantine import (load_pose_quarantine, pose_quarantine_sha256,
 from src.repo import (FEATURE_VERSION, build_db, load_entries,
                       get_bvh_path, get_pose_meta)
 from src.thumbnails import THUMBNAIL_VIEWS, find_thumbnail, thumbnail_url
+from src.thumbnail_renderer import (
+    THUMBNAIL_RENDERER_VERSION,
+    render_bvh_thumbnail,
+)
 from src.tracing import capture_trace, span
 from src.vlm.client import VLMUnavailable
 from src.runtime_guard import (
@@ -55,7 +64,7 @@ from src.runtime_guard import (
 )
 from api.models import (CutResultOut, PersonOut, CandidateOut, SkeletonOut,
                         ImageInfoOut, InferenceMetadataOut,
-                        RefineRequest, RefineResponse,
+                        RefineRequest, RefineResponse, RefineThumbnailOut,
                         ExportOrderRequest, ExportOrder, ExportItem)
 
 # uvicorn이 자기 로깅을 세운 뒤 이 모듈을 import한다. 여기서 덮어써야 로그가
@@ -167,7 +176,7 @@ async def lifespan(app: FastAPI):
     alerts.flush()
 
 
-app = FastAPI(title="Standin Pose Pipeline", version="0.2.0", lifespan=lifespan)
+app = FastAPI(title="Standin Pose Pipeline", version="0.2.1", lifespan=lifespan)
 
 
 def _refine_capability() -> dict:
@@ -359,13 +368,9 @@ def _vlm_unavailable_response(exc: VLMUnavailable) -> HTTPException:
 
     오류 본문은 앱 서버(BFF)가 자기 오류 봉투로 옮겨 담는다(docs/API_CONTRACT.md §7).
     """
-    # 폴백 체인을 돌았으면 "어느 모델까지 붐볐는지"가 다음 조치를 가른다.
-    # 1차만 붐볐다 → 모델을 바꾼다. 둘 다 붐볐다 → 구글 전역 혼잡이라 기다리는 수밖에 없다.
-    models_tried = " → ".join(exc.models_tried) or CFG.gemini_model
     log_warn("vlm_unavailable", "상류 VLM이 응답하지 못해 분석을 중단했다",
              route="/analyze", errorCode="VLM_UNAVAILABLE",
              upstreamStatus=exc.status, attempts=exc.attempts,
-             modelsTried=models_tried,
              elapsedMs=round(exc.elapsed_seconds * 1000))
     alerts.notify(
         "P2", "VLM_UNAVAILABLE",
@@ -373,7 +378,7 @@ def _vlm_unavailable_response(exc: VLMUnavailable) -> HTTPException:
         key="P2:vlm_unavailable",
         context={"상류 상태": exc.status or "timeout", "시도": exc.attempts,
                  "소요(초)": round(exc.elapsed_seconds, 1),
-                 "모델": models_tried},
+                 "모델": CFG.gemini_model},
     )
     return HTTPException(
         status_code=503,
@@ -388,7 +393,18 @@ def _vlm_unavailable_response(exc: VLMUnavailable) -> HTTPException:
 
 @app.post("/analyze", response_model=CutResultOut)
 def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
+            rescue: Annotated[str, Form()] = "",
             response: Response = None):
+    try:
+        rescue_request = parse_rescue_request(rescue)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "code": "invalid_rescue_selector",
+                "message": str(exc),
+            },
+        ) from exc
     data = file.file.read()
     image, w, h = _load_image(data)
     # dev 편의: mock provider일 때만 hint를 이미지 대용으로 사용
@@ -399,7 +415,9 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
     with capture_trace() as timing:
         with span("pipeline_total"):
             try:
-                res = pipe.process_cut(image, w, h)
+                res = pipe.process_cut(
+                    image, w, h, rescue_request=rescue_request,
+                )
             except VLMUnavailable as exc:
                 raise _vlm_unavailable_response(exc) from exc
     if response is not None:
@@ -497,8 +515,8 @@ def get_pose_bvh(pose_id: str):
 
 
 @app.get("/pose/{pose_id}/thumbnail")
-def get_pose_thumbnail(pose_id: str, view: str):
-    """번들에 포함된 후보 시점 PNG를 반환한다."""
+def get_pose_thumbnail(pose_id: str, view: str, request: Request):
+    """번들에 포함된 후보 시점 썸네일을 반환한다."""
     if view not in THUMBNAIL_VIEWS:
         raise HTTPException(400, f"unsupported thumbnail view: {view}")
     if get_pose_meta(STATE["db_path"], pose_id) is None:
@@ -507,10 +525,32 @@ def get_pose_thumbnail(pose_id: str, view: str):
     path = find_thumbnail(CFG.data_dir, pose_id, view)
     if path is None:
         raise HTTPException(404, f"thumbnail not found: pose_id={pose_id}, view={view}")
+    # ⚠ media_type을 하드코딩하지 않는다. 번들 썸네일이 2026-09-03부터 JPEG이고,
+    #   PNG로 잘못 알려 주면 BFF가 그 값을 그대로 프록시해 클라이언트까지 전달된다.
+    #   `blobToDataUrl`이 그 MIME으로 data URL을 만들기 때문에, 스니핑이 관대하지 않은
+    #   WebView에서는 썸네일이 그려지지 않는다.
+    #
+    # ETag를 함께 준다. 썸네일 URL은 포즈·시점마다 고정인데 **내용은 번들을 갈아끼우면
+    # 바뀐다**. 검증자 없이 max-age만 두면 클라이언트가 24시간 동안 옛 그림을 계속
+    # 보여 준다 — 2026-09-03 번들 교체 때 실제로 그랬다(렌더가 바뀌었는데 캐시된 옛
+    # 썸네일이 남아, 이미 본 포즈만 예전 그림으로 보였다).
+    #
+    # 파일 stat으로 만든다. 내용 해시가 더 정확하지만 요청마다 4~5 KB를 읽어야 하고,
+    # 번들이 바뀌면 파일이 통째로 교체되므로 크기·mtime이면 충분하다.
+    stat = path.stat()
+    etag = '"%x-%x"' % (int(stat.st_mtime), stat.st_size)
+    if request.headers.get("if-none-match") == etag:
+        return Response(status_code=304, headers={
+            "ETag": etag,
+            "Cache-Control": "private, max-age=86400",
+        })
     return FileResponse(
         path,
-        media_type="image/png",
-        headers={"Cache-Control": "private, max-age=86400"},
+        media_type=mimetypes.guess_type(path.name)[0] or "application/octet-stream",
+        headers={
+            "ETag": etag,
+            "Cache-Control": "private, max-age=86400",
+        },
     )
 
 
@@ -527,6 +567,47 @@ def _file_sha256(path: str) -> str:
         for chunk in iter(lambda: source.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def _refine_thumbnail(
+    *, view: str, bvh_path: Optional[str] = None, bvh_text: Optional[str] = None
+) -> Optional[RefineThumbnailOut]:
+    """Render the selected candidate view without persisting a refined artifact.
+
+    렌더 실패는 **오류가 아니다.** 썸네일은 확인 화면이 쓰는 부가 산출물이고 조정
+    자체와 무관하다. 여기서 예외를 던지면 그림 한 장 때문에 방금 계산한 조정 결과가
+    통째로 버려지고(소비자는 베이스로 전환한다) 사용자는 더 나쁜 포즈를 저장하게 된다.
+    그래서 실패는 None으로 수렴시키고 로그로만 남긴다 — 화면은 후보 썸네일로 폴백한다.
+    """
+    if (bvh_path is None) == (bvh_text is None):
+        raise ValueError("provide exactly one thumbnail BVH source")
+
+    try:
+        if bvh_text is None:
+            image = render_bvh_thumbnail(str(bvh_path), view)
+        else:
+            with tempfile.TemporaryDirectory(prefix="standin-refine-thumbnail-") as directory:
+                temporary_bvh = os.path.join(directory, "refined.bvh")
+                with open(temporary_bvh, "w", encoding="utf-8", newline="\n") as sink:
+                    sink.write(bvh_text)
+                image = render_bvh_thumbnail(temporary_bvh, view)
+        encoded = io.BytesIO()
+        image.save(encoded, format="PNG", optimize=True)
+    except Exception:
+        # 좁게 잡지 않는다. 렌더러·PIL·파일시스템 어느 층에서 무엇이 나오든 결론은
+        # 같다("그림 없음"). 예외 종류를 빠뜨리면 그때마다 refine이 통째로 실패한다.
+        log_warn("refine_thumbnail_failed",
+                 "최종 결과를 썸네일로 렌더하지 못해 그림 없이 응답한다",
+                 route="/refine", view=view,
+                 source="refined" if bvh_text is not None else "base",
+                 exc_info=True)
+        return None
+
+    return RefineThumbnailOut(
+        view=view,
+        data=base64.b64encode(encoded.getvalue()).decode("ascii"),
+        renderer_version=THUMBNAIL_RENDERER_VERSION,
+    )
 
 
 def _effective_refine_mode(requested: Optional[str]) -> str:
@@ -589,6 +670,7 @@ def refine(req: RefineRequest):
         return RefineResponse(
             pose_id=req.pose_id, view=req.view, refined=False,
             reason=reason, bvh_url=f"/pose/{req.pose_id}/bvh", bvh=None,
+            thumbnail=_refine_thumbnail(view=req.view, bvh_path=base),
             loss_base=None, loss_final=None, gain=None, backend="none",
             refine_version=(REFINE_V2_CODE_VERSION if CFG.refine_v2_enabled
                             else REFINE_CODE_VERSION),
@@ -687,6 +769,11 @@ def refine(req: RefineRequest):
         refined=res.refined, reason=res.reason,
         bvh_url=f"/pose/{req.pose_id}/bvh",
         bvh=res.bvh_text if res.refined else None,
+        thumbnail=(
+            _refine_thumbnail(view=req.view, bvh_text=res.bvh_text)
+            if res.refined
+            else _refine_thumbnail(view=req.view, bvh_path=base)
+        ),
         loss_base=None if np.isnan(res.loss_base) else res.loss_base,
         loss_final=None if np.isnan(res.loss_final) else res.loss_final,
         gain=None if np.isnan(res.loss_base) else res.gain,

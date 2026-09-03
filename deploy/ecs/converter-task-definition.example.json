@@ -1,0 +1,103 @@
+{
+  "family": "standin-converter",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  },
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::<account-id>:role/standin-ecs-execution",
+  "taskRoleArn": "arn:aws:iam::<account-id>:role/standin-converter-task",
+  "ephemeralStorage": {
+    "sizeInGiB": 30
+  },
+  "containerDefinitions": [
+    {
+      "name": "converter",
+      "image": "<account-id>.dkr.ecr.<region>.amazonaws.com/standin/converter:<git-sha>",
+      "essential": true,
+      "user": "10001:10001",
+      "readonlyRootFilesystem": false,
+      "portMappings": [
+        {
+          "name": "converter-http",
+          "containerPort": 8001,
+          "hostPort": 8001,
+          "protocol": "tcp",
+          "appProtocol": "http"
+        }
+      ],
+      "environment": [
+        {
+          "name": "APP_ENV",
+          "value": "beta"
+        },
+        {
+          "name": "CONVERTER_CHARACTER_REGISTRY",
+          "value": "/app/config/characters.example.json"
+        },
+        {
+          "name": "STANDIN_MASTER_V2_URI",
+          "value": "s3://<assets-bucket>/characters/standin-master-v2.fbx"
+        },
+        {
+          "name": "CONVERTER_TIMEOUT_SECONDS",
+          "value": "30"
+        },
+        {
+          "name": "CONVERTER_TERMINATE_GRACE_SECONDS",
+          "value": "2"
+        },
+        {
+          "name": "CONVERTER_MAX_CONCURRENT_PROCESSES",
+          "value": "1"
+        },
+        {
+          "name": "CONVERTER_FORCE_EXACT_V324",
+          "value": "false"
+        },
+        {
+          "name": "CONVERTER_MAX_BVH_BYTES",
+          "value": "2097152"
+        },
+        {
+          "name": "CONVERTER_JSON_LOGS",
+          "value": "1"
+        },
+        {
+          "name": "CONVERTER_LOG_LEVEL",
+          "value": "INFO"
+        }
+      ],
+      "linuxParameters": {
+        "initProcessEnabled": true
+      },
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "python -c \"import json,urllib.request,sys; r=urllib.request.urlopen('http://127.0.0.1:8001/healthz',timeout=10); p=json.load(r); sys.exit(0 if r.status==200 and p.get('ok') is True else 1)\""
+        ],
+        "interval": 30,
+        "timeout": 15,
+        "retries": 3,
+        "startPeriod": 120
+      },
+      "stopTimeout": 45,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-create-group": "false",
+          "awslogs-group": "/ecs/standin/converter",
+          "awslogs-region": "<region>",
+          "awslogs-stream-prefix": "converter",
+          "mode": "non-blocking",
+          "max-buffer-size": "25m"
+        }
+      }
+    }
+  ]
+}

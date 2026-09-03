@@ -1,6 +1,6 @@
 # API 계약 — 도원 추론 서버 (FastAPI)
 
-> 상태: 현재 계약 · 갱신일: 2026-08-11 · 기준 코드: `api/app.py`, `api/models.py`
+> 상태: 현재 계약 · 갱신일: 2026-09-03 · 기준 코드: `api/app.py`, `api/models.py`
 >
 > 이 문서는 **실제 구현된** HTTP 계약(`api/app.py`·`api/models.py`)을 문서화한다.
 > `/export-order`의 상세는 별도 문서(`docs/EXPORT_CONTRACT.md`)에 있고, 여기서는 전체 엔드포인트와
@@ -31,7 +31,8 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
 
 ## 1. 기본 원칙
 
-- 응답은 JSON. 무거운 산출물(BVH)은 **바이트 스트림 다운로드**(base64 인라인 아님).
+- 응답은 JSON. base BVH는 바이트 스트림으로 받고, refine 결과 BVH와 PNG preview는
+  다중 인스턴스에서도 유실되지 않도록 `/refine` JSON에 인라인한다.
 - 시간은 ISO 8601(`/export-order`의 `created_at`).
 - ID는 string(`pose_id`, `cut_id`).
 - **좌표는 검출기·포즈 모델만 생성**한다(VLM은 개수·의미 태그만) — 태그 어휘는 §4.
@@ -46,11 +47,11 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
 | 메서드 | 경로 | 입력 | 출력 | 소비자 |
 |---|---|---|---|---|
 | `GET` | `/healthz` | — | `{ok, env, provider, pose_backend, pose_count}` | 앱 서버 기동 확인(비정상 시 503) |
-| `POST` | `/analyze` | multipart PNG (+`hint`) | `CutResult` | 앱 서버 → 뷰어 Top-K 표시 |
+| `POST` | `/analyze` | multipart PNG (+`hint`, `rescue`) | `CutResult` | 앱 서버 → 뷰어 Top-K 표시 |
 | `GET` | `/pose/{pose_id}/bvh` | 경로 파라미터 | `application/octet-stream` | 동원 내보내기 |
-| `POST` | `/export-order` | `ExportOrderRequest` | `ExportOrder` | 동원 내보내기 (→ `EXPORT_CONTRACT.md`) |
+| `POST` | `/export-order` | `ExportOrderRequest` | `ExportOrder` | base-only legacy 주문서 (→ `EXPORT_CONTRACT.md`) |
 | `GET` | `/docs` | — | OpenAPI UI | 사람(계약 확인) |
-| `POST` | `/refine` | `RefineRequest` | `RefineResponse` | 앱 서버 → 조정된 BVH 본문(응답 `bvh`) (→ `REFINE_DESIGN.md`) |
+| `POST` | `/refine` | `RefineRequest` | `RefineResponse` | 앱 서버 → 조정된 BVH와 후보 매칭 시점 PNG 본문(응답 `bvh`, `thumbnail`) |
 
 > `PersonOut`에 **`keypoints`(17×2, 이미지 픽셀)** · **`scores`(17)** 가 포함된다.
 > `/analyze`가 이미 추출하는 값이라 연산 추가는 0이며, `/refine`을 순수 함수로 만들기 위한 것이다.
@@ -86,6 +87,15 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
   "refined": true, "reason": "ok_partial",
   "bvh_url": "/pose/Sitting Idle_01/bvh",   // 항상 베이스. 조정본에는 URL이 없다
   "bvh": "HIERARCHY\nROOT Hips\n...\nMOTION\nFrames: 1\n...",  // 조정본 본문(LF)
+  "thumbnail": {
+    "view": "front",
+    "media_type": "image/png",
+    "encoding": "base64",
+    "data": "iVBORw0KGgoAAA...",
+    "width": 256,
+    "height": 256,
+    "renderer_version": "warm-mannequin-v1"
+  },
   "loss_base": 0.599, "loss_final": 0.004, "gain": 0.993,
   "backend": "scipy+numpy",
   "refine_version": "v2.5.3",
@@ -133,10 +143,23 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
 두 경우를 구분하지 않고 동작한다("좋아지거나, 그대로"). `reason` 값 목록은
 `REFINE_DESIGN.md`의 안전 처리 기준.
 
+`thumbnail`은 최종 결과를 기존 후보와 같은 `warm-mannequin-v1` 코드 및 요청의 `view`로 그린
+256×256 PNG다. 즉 사용자가 고른 후보 썸네일의 방향을 유지한다. `refined=true`면 조정 BVH,
+`false`면 정확한 베이스 BVH를 렌더링하므로 UI는
+두 경우 모두 `data:image/png;base64,{thumbnail.data}`로 표시할 수 있다. 추론 서버에는 PNG나
+조정 BVH를 영속 저장하지 않는다.
+
+**렌더 실패는 오류가 아니다.** 그릴 수 없으면 `thumbnail`을 `null`로 두고 나머지는 그대로 준다
+(`refine_thumbnail_failed` 로그만 남는다). 썸네일은 확인 화면이 쓰는 부가 산출물이므로, 그림
+때문에 응답을 실패시키면 소비자가 그걸 상류 장애로 읽고 **방금 계산한 조정 결과까지 버린다** —
+사용자는 그림 한 장 대신 더 나쁜 포즈를 저장하게 된다. 소비자는 `thumbnail` 없음을 정상으로
+다루고 후보 썸네일로 폴백한다.
+
 - v1에서 `search_distance`는 베이스 불일치 게이트다. `REFINE_V2_ENABLED=1`에서는 거리·순위만으로
   실행을 막지 않고 진단에 남긴다. 대신 `refine_allowed`, 스켈레톤 상태·coverage·소유권 lineage와
   `refinable_limbs`를 모두 그대로 보내야 하며, 누락·불일치하면 fail-closed한다.
-- **조정본은 응답 `bvh` 본문으로만 나간다.** `bvh_url`은 `refined` 여부와 무관하게 항상 베이스
+- **조정본은 응답 `bvh` 본문으로만 나간다.** 사용자 preview는 같은 응답의 `thumbnail`이다.
+  `bvh_url`은 `refined` 여부와 무관하게 항상 베이스
   `/pose/{pose_id}/bvh`이며 조정본 다운로드 URL은 존재하지 않는다. 추론 서버는 조정본을 저장하지
   않으므로 무상태이고, 재계산을 막는 멱등성은 BFF의 `refined_artifacts` PK가 담당한다
   (`docs/REFINE_HANDOFF.md` §3 4단계).
@@ -180,6 +203,7 @@ Content-Type: multipart/form-data
 |---|:---:|---|
 | `file` | ✅ | 러프 콘티 컷 이미지(PNG). `UploadFile`로 수신, PIL로 RGB 로드 |
 | `hint` | — | **mock provider 전용 dev 편의**. `VLM_PROVIDER=mock`일 때만 이미지 대용 힌트 문자열로 사용, 실모델이면 무시 |
+| `rescue` | — | `auto`/빈 값은 실패 슬롯 자동 rescue, `all`은 모든 슬롯 재검토, `0,2`는 최종 좌→우 인물 index 선택. 형식 오류는 `422 invalid_rescue_selector` |
 
 ⚠ 현재 서버는 파일 크기·MIME을 강하게 검증하지 않는다(PIL 로드 실패 시 512×768 더미로 폴백). 업로드 검증은 앞단(앱 서버/Tauri) 책임 — 보강 항목은 §8-4.
 
@@ -301,9 +325,12 @@ Content-Type: multipart/form-data
 
 ---
 
-## 5. `GET /pose/{pose_id}/bvh` — 라이브러리 BVH 원본
+## 5. `GET /pose/{pose_id}/bvh` — 라이브러리 base BVH 원본
 
-동원 핸드오프. 선택된 후보의 BVH 파일을 **가공 없이** 반환한다. CSP 미러링·축 보정은 이 서버가 아니라 **동원 내보내기 단계** 책임(`DECISIONS.md` 결정 3).
+BFF base 핸드오프. 선택된 후보의 BVH 파일을 **가공 없이** 반환한다. refine 성공 시 최종 BVH는
+이 URL이 아니라 `RefineResponse.bvh` inline 본문이다. BFF가 최종 바이트를 확정한 뒤 내부 Converter
+bundle API가 V3.2 retarget과 요청된 mirror를 한 번 적용하고, 입력 최종 BVH와 생성 FBX를 함께
+반환한다. CSP는 같은 mirror를 반복하지 않고 소재 등록·배치와 다인 상대 위치 조정을 담당한다.
 
 | 상태 | 조건 | 본문 |
 |---|---|---|
@@ -327,7 +354,10 @@ Content-Type: multipart/form-data
 
 `ok: false`일 때는 **HTTP 503**으로 응답한다 — 후보를 하나도 낼 수 없는 상태라 로드밸런서·오케스트레이터가 트래픽을 보내지 않아야 한다.
 
-**`POST /export-order`** — 작가가 고른 하나 → 동원 주문서(`ExportOrder`). 상세 계약·예시(1인/2인/얽힘/스킵)는 **`docs/EXPORT_CONTRACT.md`** 참조. 요약: `/analyze`(Top-K 보여주기)와 **별개 계약**이며, DB에서 `bvh_url`·`set_id`·`tags`를 채워 완성한다.
+**`POST /export-order`** — 작가가 고른 base 포즈의 legacy 주문서(`ExportOrder`). 상세 계약·예시는
+**`docs/EXPORT_CONTRACT.md`** 참조. DB에서 base `bvh_url`·`set_id`·`tags`를 채우지만 inline refined
+artifact는 알지 못한다. 따라서 Phase 3 제품 export는 BFF가 final base/refined bytes를 먼저 확정한 뒤
+별도 내부 `POST /convert-bundle`을 호출한다. FBX 단일 응답인 `/convert`는 하위 호환용이다.
 
 ---
 
@@ -392,7 +422,10 @@ Retry-After: 30
 3. **단계별 진행률** — 클라이언트 status enum(`detecting`/`skeleton`/`pose_search`/`rendering`…)은 세분화돼 있으나, 서버는 동기라 **중간 단계를 스트리밍하지 않는다**. 서버가 만들지 않는 진행률을 앱이 임의 생성하지 않는다(클라이언트 원칙과 일치).
 4. **업로드 검증** — 현재 서버는 크기·MIME 약검증(PIL 폴백). 최대 크기·허용 형식·손상 이미지 처리를 어느 층에서 강제할지(권장: 앱 서버 + 서버 방어적 재검증).
 5. **후보 개수·신뢰도 라벨** — `top_k_final=5` 기본이나 폴백 시 후보가 적거나 없을 수 있다(`route:"skip"`은 빈 배열). `matchLevel` 라벨 산출에 서버의 `count_confidence`/폴백 신호를 넘길지.
-6. **BVH 전달 방식** — URL 다운로드(`/pose/{id}/bvh`) vs 응답 바이트 인라인(작은 파일). `EXPORT_CONTRACT.md` §4와 동일한 미결 항목.
+6. **BVH 전달 방식** — ✅ 확정: base는 `/pose/{id}/bvh` 응답 바이트, refined는
+   `RefineResponse.bvh` inline UTF-8 바이트다. BFF가 둘 중 하나를 확정해 내부 Converter API로
+   multipart 업로드하고, 제품 export에서는 최종 BVH와 생성 FBX가 든 검증 가능한 bundle을 받는다
+   (`FBX_CONVERTER_V3_2_PHASE3_BFF_HANDOFF.md`).
 7. **인증 헤더 전파** — 앱 서버가 이 서버를 호출할 때 내부 인증(서비스 토큰/네트워크 격리)을 둘지. 현재 무인증이라 **공개 노출 금지**(내부망/로컬 전제).
 
 ---

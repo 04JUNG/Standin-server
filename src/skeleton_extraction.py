@@ -92,7 +92,10 @@ class PersonSlot:
     confidence_threshold: Optional[float] = None
     retry_reason: Optional[str] = None
     retry_elapsed_ms: float = 0.0
+    crop_trace: dict = field(default_factory=dict)
+    rescue_trace: dict = field(default_factory=dict)
     lower_body_observed: bool = False
+    lower_body_visibility_known: bool = False
 
     @property
     def result_box(self) -> Optional[BBox]:
@@ -104,6 +107,19 @@ class AssignmentResult:
     slots: list[PersonSlot]
     unmatched_candidate_indices: list[int]
     invalid_vlm_box_reasons: list[str]
+
+
+@dataclass(frozen=True)
+class CropSelection:
+    """한 crop 후보가 어느 실패 슬롯 소유인지 검증한 결과."""
+
+    skeleton: Skeleton
+    evidence: SkeletonEvidence
+    box: BBox
+    candidate_index: int
+    assignment_cost: float
+    owner_margin: Optional[float]
+    fit_score: float
 
 
 _LIMB_JOINTS = {
@@ -137,18 +153,24 @@ def _finite_box(box: BBox) -> bool:
     return bool(np.isfinite([box.x1, box.y1, box.x2, box.y2]).all())
 
 
-def validate_vlm_boxes(boxes: Iterable[BBox], img_w: int, img_h: int,
+def validate_vlm_boxes(boxes: Iterable[Optional[BBox]], img_w: int, img_h: int,
                        min_area_ratio: float | None = None
-                       ) -> tuple[list[BBox], list[str]]:
-    """VLM 박스를 clamp하고 유효한 박스만 슬롯 입력으로 보존한다."""
+                       ) -> tuple[list[Optional[BBox]], list[str]]:
+    """VLM 박스를 clamp하되 원래 인물 index를 보존한다.
+
+    무효 박스를 목록에서 제거하면 뒤 인물의 가시성 같은 parallel
+    metadata가 앞 인물에 붙는다. 따라서 해당 자리를 ``None`` placeholder로
+    남겨 상위 파이프라인이 fail-closed missing slot을 만들 수 있게 한다.
+    """
     min_area_ratio = (CFG.slot_min_box_area_ratio if min_area_ratio is None
                       else float(min_area_ratio))
     min_area = max(1.0, float(img_w * img_h) * min_area_ratio)
-    valid: list[BBox] = []
+    valid: list[Optional[BBox]] = []
     reasons: list[str] = []
     for index, box in enumerate(boxes or []):
         if not isinstance(box, BBox) or not _finite_box(box):
             reasons.append(f"vlm_box_{index}:non_finite")
+            valid.append(None)
             continue
         x1 = float(np.clip(box.x1, 0, img_w))
         y1 = float(np.clip(box.y1, 0, img_h))
@@ -156,9 +178,11 @@ def validate_vlm_boxes(boxes: Iterable[BBox], img_w: int, img_h: int,
         y2 = float(np.clip(box.y2, 0, img_h))
         if x1 >= x2 or y1 >= y2:
             reasons.append(f"vlm_box_{index}:degenerate")
+            valid.append(None)
             continue
         if (x2 - x1) * (y2 - y1) < min_area:
             reasons.append(f"vlm_box_{index}:too_small")
+            valid.append(None)
             continue
         valid.append(BBox(x1, y1, x2, y2, source="vlm", score=box.score))
     return valid, reasons
@@ -565,13 +589,51 @@ def _hungarian(cost: np.ndarray) -> list[int]:
     return assignment
 
 
-def assign_candidates(vlm_boxes: Iterable[BBox], candidates: list[Skeleton],
-                      img_w: int, img_h: int, cfg=CFG) -> AssignmentResult:
-    """VLM 슬롯과 RTM candidate를 전역 일대일 배정하고 안전한 provisional을 남긴다."""
+def assign_candidates(vlm_boxes: Iterable[Optional[BBox]], candidates: list[Skeleton],
+                      img_w: int, img_h: int, cfg=CFG,
+                      expected_count: int | None = None) -> AssignmentResult:
+    """VLM 슬롯과 RTM candidate를 전역 일대일 배정한다.
+
+    ``expected_count``가 주어지면 무효/누락 박스도 placeholder로
+    남기고 그 cardinality를 넘는 provisional 슬롯을 승격하지 않는다.
+    """
+    raw_boxes = list(vlm_boxes or [])
+    if expected_count is not None:
+        expected_count = max(0, int(expected_count))
+        if len(raw_boxes) > expected_count:
+            overflow_start = expected_count
+            raw_boxes = raw_boxes[:expected_count]
+        else:
+            overflow_start = None
+        missing_start = len(raw_boxes)
+        if missing_start < expected_count:
+            raw_boxes.extend([None] * (expected_count - missing_start))
+    else:
+        overflow_start = None
+        missing_start = len(raw_boxes)
+
     valid_boxes, invalid_reasons = validate_vlm_boxes(
-        vlm_boxes, img_w, img_h, cfg.slot_min_box_area_ratio
+        raw_boxes, img_w, img_h, cfg.slot_min_box_area_ratio
     )
-    slots = [PersonSlot(i, "vlm", vlm_box=box) for i, box in enumerate(valid_boxes)]
+    if expected_count is not None:
+        for index in range(missing_start, expected_count):
+            marker = f"vlm_box_{index}:non_finite"
+            if marker in invalid_reasons:
+                invalid_reasons[invalid_reasons.index(marker)] = f"vlm_box_{index}:missing"
+        if overflow_start is not None:
+            invalid_reasons.append(
+                f"vlm_box_{overflow_start}+:exceeds_num_people"
+            )
+
+    slots = []
+    for index, box in enumerate(valid_boxes):
+        slot = PersonSlot(index, "vlm", vlm_box=box)
+        if box is None:
+            slot.reasons.extend(
+                reason for reason in invalid_reasons
+                if reason.startswith(f"vlm_box_{index}:")
+            )
+        slots.append(slot)
     candidate_boxes = [skeleton_bbox(s, cfg.skeleton_kpt_threshold) for s in candidates]
     evidence = [analyze_skeleton(s, b, cfg.skeleton_kpt_threshold,
                                  cfg.skeleton_torso_min_box_ratio)
@@ -589,6 +651,7 @@ def assign_candidates(vlm_boxes: Iterable[BBox], candidates: list[Skeleton],
     if slots:
         real_cost = np.asarray([
             [assignment_cost(slot.vlm_box, box, candidate)
+             if slot.vlm_box is not None else float("inf")
              for box, candidate in zip(candidate_boxes, candidates)]
             for slot in slots
         ], dtype=np.float64)
@@ -664,7 +727,12 @@ def assign_candidates(vlm_boxes: Iterable[BBox], candidates: list[Skeleton],
     unmatched = [i for i in range(len(candidates)) if i not in used]
     accepted_boxes = [slot.skeleton_box for slot in slots if slot.skeleton_box is not None]
     next_id = len(slots)
+    provisional_capacity = (
+        None if expected_count is None else max(0, expected_count - len(slots))
+    )
     for index in unmatched:
+        if provisional_capacity is not None and provisional_capacity <= 0:
+            break
         ev = evidence[index]
         box = candidate_boxes[index]
         if (index in duplicate_indices or box is None
@@ -686,6 +754,8 @@ def assign_candidates(vlm_boxes: Iterable[BBox], candidates: list[Skeleton],
         accepted_boxes.append(box)
         used.add(index)
         next_id += 1
+        if provisional_capacity is not None:
+            provisional_capacity -= 1
 
     return AssignmentResult(
         slots=slots,
@@ -724,38 +794,174 @@ def _candidate_fit_score(skeleton: Skeleton, slot_box: BBox,
 
 
 def select_crop_candidate(slot: PersonSlot, candidates: list[Skeleton], cfg=CFG,
-                          peer_boxes: Iterable[BBox] = ()
-                          ) -> Optional[tuple[Skeleton, SkeletonEvidence, BBox]]:
-    """평균 score 대신 슬롯 적합도+구조 품질로 crop 결과를 선택한다."""
+                          peer_boxes: Iterable[BBox] = (),
+                          peer_slots: Iterable[PersonSlot] = ()
+                          ) -> Optional[CropSelection]:
+    """crop 후보를 대상 실패 슬롯에 fail-closed로 매핑한다.
+
+    crop 안에서 검출된 첫 사람을 곧바로 쓰지 않는다. 후보를 전체 이미지 좌표로
+    비교해 (1) 이미 해결된 다른 슬롯의 인물과 중복되지 않고, (2) 대상 슬롯이
+    다른 VLM 슬롯보다 명확히 더 좋은 owner이며, (3) 후보끼리도 모호하지 않을
+    때만 하나를 고른다. 이 검사는 crop 호출이 순차 실행돼도 같은 사람이 두
+    슬롯을 채우는 것을 막는다.
+    """
     if slot.vlm_box is None:
+        slot.crop_trace = {
+            "target_slot_id": slot.slot_id,
+            "candidate_count": len(candidates),
+            "accepted": False,
+            "rejected_reason": "missing_target_box",
+        }
         return None
-    best: Optional[tuple[float, Skeleton, SkeletonEvidence, BBox]] = None
-    for candidate in candidates:
+
+    peers = [other for other in peer_slots if other is not slot]
+    boxes = [box for box in peer_boxes if box is not None]
+    boxes.extend(
+        other.vlm_box for other in peers
+        if other.vlm_box is not None
+    )
+    resolved = [
+        other for other in peers
+        if other.skeleton is not None
+        and other.skeleton_box is not None
+        and other.state not in {"missing", "invalid"}
+        and other.evidence is not None
+        and other.evidence.coverage_class != "insufficient"
+    ]
+    candidate_trace = []
+    eligible: list[CropSelection] = []
+    for index, candidate in enumerate(candidates):
         score, evidence, box = _candidate_fit_score(
-            candidate, slot.vlm_box, peer_boxes, cfg
+            candidate, slot.vlm_box, boxes, cfg
         )
-        if box is not None and (best is None or score > best[0]):
-            best = (score, candidate, evidence, box)
-    if best is None or not np.isfinite(best[0]):
+        trace = {"candidate_index": index}
+        if box is None or not np.isfinite(score):
+            trace["rejected_reason"] = "invalid_candidate"
+            candidate_trace.append(trace)
+            continue
+        if any(are_duplicate_skeletons(
+                candidate, other.skeleton, box, other.skeleton_box, cfg
+                ) for other in resolved):
+            trace["rejected_reason"] = "duplicate_of_resolved"
+            candidate_trace.append(trace)
+            continue
+        if any("cross_slot" in reason for reason in evidence.reasons):
+            trace["rejected_reason"] = "cross_slot_ownership"
+            candidate_trace.append(trace)
+            continue
+        if evidence.coverage_class == "insufficient" \
+                or evidence.state not in {"valid", "partial"}:
+            trace["rejected_reason"] = "invalid_structure"
+            candidate_trace.append(trace)
+            continue
+
+        cost = assignment_cost(slot.vlm_box, box, candidate)
+        peer_costs = [
+            assignment_cost(peer_box, box, candidate)
+            for peer_box in boxes
+        ]
+        best_peer_cost = min(peer_costs, default=float("inf"))
+        owner_margin = best_peer_cost - cost
+        trace.update({
+            "assignment_cost": round(float(cost), 6),
+            "owner_margin": (
+                None if np.isinf(owner_margin)
+                else round(float(owner_margin), 6)
+            ),
+        })
+        if not np.isfinite(cost) or cost > cfg.slot_assignment_max_cost:
+            trace["rejected_reason"] = "assignment_cost_exceeded"
+            candidate_trace.append(trace)
+            continue
+        if (np.isfinite(best_peer_cost)
+                and owner_margin < cfg.slot_assignment_ambiguity_margin):
+            trace["rejected_reason"] = "ambiguous_owner"
+            candidate_trace.append(trace)
+            continue
+        eligible.append(CropSelection(
+            skeleton=candidate,
+            evidence=evidence,
+            box=box,
+            candidate_index=index,
+            assignment_cost=float(cost),
+            owner_margin=(None if np.isinf(owner_margin)
+                          else float(owner_margin)),
+            fit_score=float(score),
+        ))
+        candidate_trace.append(trace)
+
+    # 같은 사람을 여러 번 검출한 후보는 target cost가 가장 낮은 하나만 남긴다.
+    # 서로 다른 사람이 비슷한 cost로 target을 주장하면 임의 선택하지 않는다.
+    unique: list[CropSelection] = []
+    for item in sorted(
+            eligible,
+            key=lambda value: (
+                value.assignment_cost, -value.fit_score, value.candidate_index
+            )):
+        if any(are_duplicate_skeletons(
+                item.skeleton, kept.skeleton, item.box, kept.box, cfg
+                ) for kept in unique):
+            candidate_trace[item.candidate_index]["rejected_reason"] = \
+                "duplicate_crop_candidate"
+            continue
+        unique.append(item)
+
+    base_trace = {
+        "target_slot_id": slot.slot_id,
+        "candidate_count": len(candidates),
+        "accepted": False,
+        "candidates": candidate_trace,
+    }
+    if not unique:
+        reasons = [
+            value.get("rejected_reason") for value in candidate_trace
+            if value.get("rejected_reason")
+        ]
+        base_trace["rejected_reason"] = (
+            reasons[0] if reasons and len(set(reasons)) == 1
+            else "no_unambiguous_owner"
+        )
+        slot.crop_trace = base_trace
+        return None
+    best = unique[0]
+    if (len(unique) >= 2
+            and unique[1].assignment_cost - best.assignment_cost
+            < cfg.slot_assignment_ambiguity_margin):
+        base_trace["rejected_reason"] = "ambiguous_crop_candidates"
+        slot.crop_trace = base_trace
         return None
     if slot.skeleton is not None:
         original_score, _, _ = _candidate_fit_score(
-            slot.skeleton, slot.vlm_box, peer_boxes, cfg
+            slot.skeleton, slot.vlm_box, boxes, cfg
         )
-        if best[0] <= original_score + 0.1:
+        if best.fit_score <= original_score + 0.1:
+            base_trace["rejected_reason"] = "no_structural_improvement"
+            slot.crop_trace = base_trace
             return None
-    return best[1], best[2], best[3]
+    base_trace.update({
+        "accepted": True,
+        "selected_candidate_index": best.candidate_index,
+        "assignment_cost": round(best.assignment_cost, 6),
+        "owner_margin": (
+            None if best.owner_margin is None
+            else round(best.owner_margin, 6)
+        ),
+        "rejected_reason": None,
+    })
+    slot.crop_trace = base_trace
+    return best
 
 
-def apply_crop_result(slot: PersonSlot,
-                      selected: tuple[Skeleton, SkeletonEvidence, BBox]) -> None:
-    skeleton, evidence, box = selected
-    slot.skeleton = skeleton
-    slot.skeleton_box = box
-    slot.evidence = evidence
-    slot.state = evidence.state
+def apply_crop_result(slot: PersonSlot, selected: CropSelection) -> None:
+    slot.skeleton = selected.skeleton
+    slot.skeleton_box = selected.box
+    slot.evidence = selected.evidence
+    slot.state = selected.evidence.state
     slot.skeleton_source = "crop_retry"
-    slot.reasons.extend(evidence.reasons)
+    slot.assignment_cost = selected.assignment_cost
+    slot.assignment_margin = selected.owner_margin
+    slot.assigned_rtm_index = None
+    slot.reasons.extend(selected.evidence.reasons)
     slot.reasons.append("crop_recovered")
 
 
