@@ -9,8 +9,9 @@
   `7c648b97a24a3bb4914b6e5d515708c33727979881d92ef916d5726e22301f3d` 확인.
 - 2026-08-27 실제 모델의 `g1-move1`과 Mixamo control 통합 FBX를 사용자 육안 확인 완료.
 - converter image·API·실제 모델 로컬 Linux/amd64 검증 완료.
-- AWS 리소스 생성과 배포는 아직 하지 않았다. 아래 변수와 비용 정책이 확정될 때까지
-  `CONVERTER_AUTO_DEPLOY_ENABLED`를 설정하지 않는다.
+- 인프라 배선은 `Standin-infra#35`에 있으나 아직 merge·배포되지 않았다.
+- 실측에 따라 초기 task 크기는 1 vCPU / 2 GiB로 정한다. 실제 캐릭터의 staging 측정 전까지
+  `CONVERTER_AUTO_DEPLOY_ENABLED=true`로 바꾸지 않는다.
 
 ## 런타임 분리
 
@@ -34,13 +35,14 @@ ECS service는 `awsvpc`와 private subnet을 사용하고 `assignPublicIp=DISABL
 - inbound: BFF security group에서 converter port `8001`만 허용
 - internet-facing ALB와 public DNS 생성 금지
 - 호출 주소: private Cloud Map 또는 internal ALB
-- character EFS access point를 `/characters`에 read-only mount
+- registry의 `s3://` URI를 ECS task role로 내려받아 SHA-256 검증 후 전용 temp cache에 보관
 - `standin-master-v2.fbx`는 Git·image·CloudWatch log에 넣지 않음
-- task role은 character EFS mount에 필요한 권한만 부여
+- task role은 등록된 character object를 읽는 데 필요한 `s3:GetObject`만 부여
 - execution role은 ECR pull과 `/ecs/standin/converter` log write만 허용
 
-EFS 대신 S3 bootstrap을 선택하려면 task 시작 전에 해시가 고정된 artifact를 내려받는 별도 init
-계약이 필요하다. 현재 예시는 read-only EFS를 정본으로 둔다.
+private subnet에서 S3를 읽으려면 S3 gateway endpoint 또는 승인된 egress 경로가 필요하다.
+`converter_api.registry`는 HTTP(S)를 받지 않고, 환경변수로 지정한 S3 object만 lazy download한다.
+다운로드 결과가 registry hash와 다르면 cache와 응답 artifact로 승격하지 않는다.
 
 ## Health와 timeout
 
@@ -78,22 +80,31 @@ report
 
 ## 배포 workflow
 
-`.github/workflows/converter-deploy.yml`은 converter 경로가 `main`에서 바뀔 때만 후보가 된다.
-실제 job은 repository variable `CONVERTER_AUTO_DEPLOY_ENABLED=true`일 때만 실행된다.
+`.github/workflows/converter-deploy.yml`은 converter 경로가 `main` 또는 `develop`에서 바뀔 때
+후보가 된다. `main`은 GitHub environment `beta`와 `:latest`, `develop`은 `staging`과
+`:develop`을 사용한다. 실제 job은 repository variable
+`CONVERTER_AUTO_DEPLOY_ENABLED=true`일 때만 실행된다.
 
-필수 GitHub variables:
+repository-level GitHub variables:
 
 ```text
 CONVERTER_AUTO_DEPLOY_ENABLED
 CONVERTER_AWS_DEPLOY_ROLE
-CONVERTER_AWS_REGION
+AWS_REGION
+```
+
+`beta`와 `staging` environment에 각각 필요한 variables:
+
+```text
 CONVERTER_ECS_CLUSTER
 CONVERTER_ECS_SERVICE
 ```
 
-워크플로는 기존 converter ECS service의 현재 task definition을 내려받고 `converter` container
-image만 새 Git SHA로 교체한다. `inference` container가 발견되면 배포 전 실패한다. ECR repository와
-ECS service를 자동 생성하지 않으므로 infra 소유자가 먼저 준비해야 한다.
+초기 부트스트랩에서는 `CONVERTER_ECS_SERVICE`를 비워 둔다. 이때 워크플로는 ECR image만
+빌드·push하고 ECS 단계는 건너뛴다. 그 image tag로 infra가 converter service를 만든 뒤 환경별
+service 변수를 채우고 다시 실행한다. 이후에는 현재 task definition의 `converter` container
+image만 새 Git SHA로 교체한다. `inference` container가 발견되면 배포 전에 실패한다. ECR
+repository와 ECS service 자체는 infra가 준비한다.
 
 ## warm/cold latency 측정
 
@@ -139,9 +150,9 @@ network transfer를 포함한 wall 20회를 다시 측정하기 전에는 SLO PA
 ## 아직 필요한 운영 결정
 
 1. beta/prod private subnet·security group·Cloud Map/internal ALB 선택
-2. EFS filesystem/access point와 character 배포 책임자
+2. production/staging assets bucket에 승인 character 업로드 및 S3 endpoint 확인
 3. 최소 task `0` 또는 `1` 비용·UX 결정
-4. CPU 2 vCPU / memory 4 GiB에서 실제 ECS 20회 측정 후 조정
+4. CPU 1 vCPU / memory 2 GiB에서 실제 캐릭터 ECS 20회 측정 후 조정
 5. CloudWatch retention·alarm: 5xx, timeout, p95, unhealthy task
 6. BFF converter base URL과 connect/read timeout
 

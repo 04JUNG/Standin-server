@@ -7,6 +7,13 @@
       "sha256": "7c648b97a24a3bb4914b6e5d515708c33727979881d92ef916d5726e22301f3d",
       "rig_profile": "mixamo",
       "revision": "v2"
+    },
+    "standin-female-v2-lbs": {
+      "display_name": "Standin Female V2 LBS",
+      "artifact_uri_env": "STANDIN_FEMALE_V2_LBS_URI",
+      "sha256": "96cd01717ed48ce416333c21dc68e8d62d185e91e016056c9eae305e8c37a186",
+      "rig_profile": "mixamo",
+      "revision": "v2"
     }
   }
 }

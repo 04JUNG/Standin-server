@@ -8,26 +8,13 @@
     "cpuArchitecture": "X86_64",
     "operatingSystemFamily": "LINUX"
   },
-  "cpu": "2048",
-  "memory": "4096",
+  "cpu": "1024",
+  "memory": "2048",
   "executionRoleArn": "arn:aws:iam::<account-id>:role/standin-ecs-execution",
   "taskRoleArn": "arn:aws:iam::<account-id>:role/standin-converter-task",
   "ephemeralStorage": {
     "sizeInGiB": 30
   },
-  "volumes": [
-    {
-      "name": "characters",
-      "efsVolumeConfiguration": {
-        "fileSystemId": "<converter-character-efs-id>",
-        "transitEncryption": "ENABLED",
-        "authorizationConfig": {
-          "accessPointId": "<converter-character-access-point-id>",
-          "iam": "ENABLED"
-        }
-      }
-    }
-  ],
   "containerDefinitions": [
     {
       "name": "converter",
@@ -55,7 +42,7 @@
         },
         {
           "name": "STANDIN_MASTER_V2_URI",
-          "value": "/characters/standin-master-v2.fbx"
+          "value": "s3://<assets-bucket>/characters/standin-master-v2.fbx"
         },
         {
           "name": "CONVERTER_TIMEOUT_SECONDS",
@@ -84,13 +71,6 @@
         {
           "name": "CONVERTER_LOG_LEVEL",
           "value": "INFO"
-        }
-      ],
-      "mountPoints": [
-        {
-          "sourceVolume": "characters",
-          "containerPath": "/characters",
-          "readOnly": true
         }
       ],
       "linuxParameters": {
