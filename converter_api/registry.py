@@ -9,14 +9,16 @@ import json
 import os
 from pathlib import Path
 import re
+import tempfile
 from types import MappingProxyType
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping
 from urllib.parse import unquote, urlparse
 
 
 CHARACTER_ID_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{0,63}$")
 ENV_NAME_RE = re.compile(r"^[A-Z][A-Z0-9_]{0,127}$")
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+ArtifactFetcher = Callable[[str, Path], None]
 
 
 class RegistryError(RuntimeError):
@@ -71,6 +73,31 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _download_s3(uri: str, destination: Path) -> None:
+    """Download one trusted registry artifact with the ECS task role."""
+
+    parsed = urlparse(uri)
+    key = unquote(parsed.path.lstrip("/"))
+    if (
+        parsed.scheme != "s3"
+        or not parsed.netloc
+        or not key
+        or not key.lower().endswith(".fbx")
+        or parsed.params
+        or parsed.query
+        or parsed.fragment
+    ):
+        raise ArtifactUnavailableError("character artifact S3 URI is invalid")
+    try:
+        import boto3  # type: ignore[import-untyped]
+
+        boto3.client("s3").download_file(parsed.netloc, key, str(destination))
+    except ArtifactUnavailableError:
+        raise
+    except Exception as exc:
+        raise ArtifactUnavailableError("character artifact download failed") from exc
+
+
 def _required_string(raw: Mapping[str, Any], key: str, character_id: str) -> str:
     value = raw.get(key)
     if not isinstance(value, str) or not value.strip():
@@ -85,10 +112,21 @@ class CharacterRegistry:
         *,
         default_character_id: str = "standin-master-v2",
         environ: Mapping[str, str] | None = None,
+        artifact_cache_dir: str | os.PathLike[str] | None = None,
+        artifact_fetcher: ArtifactFetcher | None = None,
     ):
         self.config_path = Path(config_path).resolve()
         self.default_character_id = default_character_id
         self._environ = environ if environ is not None else os.environ
+        temp_root = self._environ.get(
+            "CONVERTER_TEMP_ROOT", "/tmp/standin-converter"
+        )
+        self._artifact_cache_dir = Path(
+            artifact_cache_dir
+            or self._environ.get("CONVERTER_CHARACTER_CACHE_DIR", "")
+            or (Path(temp_root) / "characters")
+        ).resolve()
+        self._artifact_fetcher = artifact_fetcher or _download_s3
         self._characters = MappingProxyType(self._load())
         if self.default_character_id not in self._characters:
             raise RegistryConfigError("default character_id is not registered")
@@ -165,16 +203,73 @@ class CharacterRegistry:
             raise ArtifactUnavailableError("character artifact path must be absolute")
         return path
 
+    def _cached_s3_artifact(
+        self,
+        uri: str,
+        metadata: CharacterMetadata,
+    ) -> Path:
+        cache_path = (
+            self._artifact_cache_dir
+            / f"{metadata.character_id}-{metadata.sha256}.fbx"
+        )
+        try:
+            if (
+                cache_path.is_file()
+                and hmac.compare_digest(_sha256(cache_path), metadata.sha256)
+            ):
+                return cache_path
+            self._artifact_cache_dir.mkdir(parents=True, exist_ok=True)
+        except OSError as exc:
+            raise ArtifactUnavailableError(
+                "character artifact cache is unavailable"
+            ) from exc
+
+        temporary: Path | None = None
+        try:
+            with tempfile.NamedTemporaryFile(
+                dir=self._artifact_cache_dir,
+                prefix=f".{metadata.character_id}-",
+                suffix=".part",
+                delete=False,
+            ) as handle:
+                temporary = Path(handle.name)
+            self._artifact_fetcher(uri, temporary)
+            if not temporary.is_file():
+                raise ArtifactUnavailableError("character artifact download failed")
+            actual = _sha256(temporary)
+            if not hmac.compare_digest(actual, metadata.sha256):
+                raise ArtifactIntegrityError("character artifact SHA256 mismatch")
+            os.replace(temporary, cache_path)
+            temporary = None
+            return cache_path
+        except RegistryError:
+            raise
+        except OSError as exc:
+            raise ArtifactUnavailableError(
+                "character artifact cache is unavailable"
+            ) from exc
+        except Exception as exc:
+            raise ArtifactUnavailableError("character artifact download failed") from exc
+        finally:
+            if temporary is not None:
+                try:
+                    temporary.unlink(missing_ok=True)
+                except OSError:
+                    pass
+
     def resolve(self, character_id: str) -> ResolvedCharacter:
         metadata = self.metadata(character_id)
         value = self._environ.get(metadata.artifact_uri_env, "").strip()
         if not value:
             raise ArtifactUnavailableError("character artifact is not configured")
-        unresolved = self._local_artifact_path(value)
-        try:
-            path = unresolved.resolve(strict=True)
-        except OSError as exc:
-            raise ArtifactUnavailableError("character artifact is unavailable") from exc
+        if urlparse(value).scheme == "s3":
+            path = self._cached_s3_artifact(value, metadata)
+        else:
+            unresolved = self._local_artifact_path(value)
+            try:
+                path = unresolved.resolve(strict=True)
+            except OSError as exc:
+                raise ArtifactUnavailableError("character artifact is unavailable") from exc
         if not path.is_file() or path.suffix.lower() != ".fbx":
             raise ArtifactUnavailableError("character artifact is not an FBX file")
         try:

@@ -11,6 +11,11 @@ def _environment(container: dict) -> dict[str, str]:
     return {item["name"]: item["value"] for item in container["environment"]}
 
 
+def test_repository_forces_lf_for_converter_integrity_hashes():
+    attributes = (ROOT / ".gitattributes").read_text()
+    assert "* text=auto eol=lf" in attributes
+
+
 def test_converter_task_is_isolated_internal_fargate_contract():
     task = json.loads(
         (ROOT / "deploy/ecs/converter-task-definition.example.json").read_text()
@@ -19,8 +24,8 @@ def test_converter_task_is_isolated_internal_fargate_contract():
     assert task["networkMode"] == "awsvpc"
     assert task["requiresCompatibilities"] == ["FARGATE"]
     assert task["runtimePlatform"]["cpuArchitecture"] == "X86_64"
-    assert int(task["cpu"]) >= 2048
-    assert int(task["memory"]) >= 4096
+    assert int(task["cpu"]) == 1024
+    assert int(task["memory"]) == 2048
 
     assert [item["name"] for item in task["containerDefinitions"]] == ["converter"]
     container = task["containerDefinitions"][0]
@@ -41,12 +46,11 @@ def test_converter_task_is_isolated_internal_fargate_contract():
     assert env["CONVERTER_MAX_CONCURRENT_PROCESSES"] == "1"
     assert env["CONVERTER_FORCE_EXACT_V324"] == "false"
     assert env["CONVERTER_JSON_LOGS"] == "1"
-    assert env["STANDIN_MASTER_V2_URI"].startswith("/characters/")
-    character_mount = next(
-        mount for mount in container["mountPoints"]
-        if mount["containerPath"] == "/characters"
+    assert env["STANDIN_MASTER_V2_URI"].startswith("s3://")
+    assert env["STANDIN_MASTER_V2_URI"].endswith(
+        "/characters/standin-master-v2.fbx"
     )
-    assert character_mount["readOnly"] is True
+    assert not container.get("mountPoints")
     assert all(item["name"] != "inference" for item in task["containerDefinitions"])
 
 
@@ -70,6 +74,19 @@ def test_converter_deploy_is_gated_and_path_filtered():
     workflow = (ROOT / ".github/workflows/converter-deploy.yml").read_text()
     assert "ECR_REPOSITORY: standin/converter" in workflow
     assert "CONVERTER_AUTO_DEPLOY_ENABLED == 'true'" in workflow
+    assert "branches: [main, develop]" in workflow
+    assert (
+        "environment: ${{ github.ref == 'refs/heads/main' && 'beta' || 'staging' }}"
+        in workflow
+    )
+    assert "ECS_CLUSTER: ${{ vars.CONVERTER_ECS_CLUSTER }}" in workflow
+    assert "ECS_SERVICE: ${{ vars.CONVERTER_ECS_SERVICE }}" in workflow
+    assert "aws-region: ${{ vars.AWS_REGION }}" in workflow
+    assert ":latest'" in workflow
+    assert ":develop'" in workflow
+    assert "Verify isolated ECR target exists" in workflow
+    assert "Verify optional isolated ECS target exists" in workflow
+    assert workflow.count("if: env.ECS_SERVICE != ''") == 4
     assert 'file: Dockerfile.converter' in workflow
     assert 'container-name: converter' in workflow
     assert '"converter/**"' in workflow
