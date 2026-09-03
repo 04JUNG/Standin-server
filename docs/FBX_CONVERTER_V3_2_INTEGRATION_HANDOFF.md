@@ -326,8 +326,14 @@ FBX 본체를 Git이나 Docker image에 넣지 않는다. metadata만 추적한�
 }
 ```
 
-배포 시 S3에서 내려받거나 read-only volume으로 마운트하고, worker 실행 전 해시를 검증한다.
+배포 시 절대 경로·`file://` read-only volume 또는 `s3://` object를 지정한다. S3는 ECS task
+role로 전용 temp cache에 내려받고, worker 실행 전 registry SHA-256을 검증한다. HTTP(S) URI는
+받지 않는다.
 동일 `character_id`의 내용이 바뀌면 안 된다. 변경은 새 revision·새 해시로 등록한다.
+
+현재 registry에는 기본 남성 `standin-master-v2`와 별도 여성 `standin-female-v2` metadata가
+있다. 여성 URI를 배포 환경에 넣기 전에는 `/characters`에 노출되지 않는다. 여성 asset의
+육안 승인과 업로드가 끝난 뒤에만 `STANDIN_FEMALE_V2_URI`를 설정한다.
 
 ## 8. Blender 실행 계약
 
