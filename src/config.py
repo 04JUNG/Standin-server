@@ -1,6 +1,7 @@
 """전역 설정. 실제 모델/키는 환경변수로 주입하고, 없으면 mock으로 폴백한다."""
 from __future__ import annotations
 
+import math
 import os
 from dataclasses import dataclass
 
@@ -78,6 +79,11 @@ class Config:
     # POSE_MODEL_MANIFEST만 지정하면 된다.
     pose_model_uri: str = os.getenv("POSE_MODEL_URI", "")
     pose_models_root: str = os.getenv("POSE_MODELS_ROOT", "data/pose-models")
+    # manifest + ONNX 2개 다운로드와 검증에 허용하는 전체 wall-clock 예산.
+    # Fargate health-check grace period는 current-X 초기화까지 포함해 이보다 길어야 한다.
+    pose_model_download_budget_seconds: float = float(
+        os.getenv("POSE_MODEL_DOWNLOAD_BUDGET_SECONDS", "300")
+    )
     pose_model_manifest: str = os.getenv("POSE_MODEL_MANIFEST", "")
     pose_canary_stage: str = os.getenv("POSE_CANARY_STAGE", "off")
     pose_strict: bool = _env_bool("POSE_STRICT", False)
@@ -421,6 +427,11 @@ class Config:
         self.pose_model_manifest = self.pose_model_manifest.strip()
         if not self.pose_models_root:
             raise ValueError("POSE_MODELS_ROOT must be non-empty")
+        if (
+            not math.isfinite(self.pose_model_download_budget_seconds)
+            or self.pose_model_download_budget_seconds <= 0
+        ):
+            raise ValueError("POSE_MODEL_DOWNLOAD_BUDGET_SECONDS must be positive")
         if self.refine_default_mode not in ("conservative", "aggressive"):
             raise ValueError(
                 "REFINE_DEFAULT_MODE must be 'conservative' or 'aggressive'"

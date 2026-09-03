@@ -92,9 +92,16 @@ jobs:
 
       - name: Verify Human-Art model source
         if: ${{ (vars.POSE_MODEL_VARIANT || 'cascade') == 'cascade' }}
-        env:
-          POSE_MODEL_URI: ${{ vars.POSE_MODEL_URI }}
-        run: test -n "$POSE_MODEL_URI"
+        # 모델 URI는 환경별 assets 버킷을 소유한 CDK/CloudFormation이 task
+        # definition에 넣는다. 앱 workflow는 값을 덮어쓰지 않고 존재만 확인한다.
+        run: |
+          jq -e '
+            .containerDefinitions[]
+            | select(.name == "inference")
+            | [.environment[]?
+                | select(.name == "POSE_MODEL_URI" and (.value | length > 0))]
+            | length == 1
+          ' taskdef.json
 
       - uses: aws-actions/amazon-ecs-render-task-definition@v1
         id: render
@@ -109,8 +116,6 @@ jobs:
             APP_ENV=production
             POSE_BACKEND=rtmlib
             POSE_MODEL_VARIANT=${{ vars.POSE_MODEL_VARIANT || 'cascade' }}
-            POSE_MODEL_URI=${{ vars.POSE_MODEL_URI }}
-            POSE_MODELS_ROOT=/app/data/pose-models
             POSE_CANARY_STAGE=${{ vars.POSE_CANARY_STAGE || 'canary-100' }}
             POSE_STRICT=1
 

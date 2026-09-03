@@ -12,10 +12,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import json
+import math
 import os
 from pathlib import Path, PurePosixPath
 import re
 import tempfile
+import time
 from typing import BinaryIO, Callable
 from urllib.parse import urljoin, urlsplit
 import urllib.request
@@ -26,7 +28,8 @@ from .pose_contract import PoseContractError, load_pose_bundle, sha256_file
 _MAX_MANIFEST_BYTES = 1024 * 1024
 _MAX_ARTIFACT_BYTES = 1024 * 1024 * 1024
 _MAX_BUNDLE_BYTES = 1024 * 1024 * 1024
-_DOWNLOAD_TIMEOUT_SECONDS = 60
+_REQUEST_TIMEOUT_SECONDS = 60.0
+_DEFAULT_DOWNLOAD_BUDGET_SECONDS = 300.0
 _BUILD_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 
@@ -41,6 +44,7 @@ class PoseModelProvisioningResult:
     model_id: str
     build_id: str
     fetched: bool
+    elapsed_seconds: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -51,6 +55,15 @@ class _ArtifactSpec:
     sha256: str
 
 
+def _remaining_seconds(deadline: float | None) -> float | None:
+    if deadline is None:
+        return None
+    remaining = deadline - time.monotonic()
+    if remaining <= 0:
+        raise PoseModelFetchError("pose-model bundle 다운로드 시간 예산을 초과했습니다")
+    return remaining
+
+
 def _copy_limited(
     source: BinaryIO,
     output: BinaryIO,
@@ -58,6 +71,7 @@ def _copy_limited(
     max_bytes: int,
     declared_size: int | None = None,
     expected_size: int | None = None,
+    deadline: float | None = None,
 ) -> int:
     if declared_size is not None:
         if declared_size < 0 or declared_size > max_bytes:
@@ -69,7 +83,12 @@ def _copy_limited(
             )
     total = 0
     while True:
+        remaining = _remaining_seconds(deadline)
+        set_socket_timeout = getattr(source, "set_socket_timeout", None)
+        if remaining is not None and callable(set_socket_timeout):
+            set_socket_timeout(max(0.001, min(_REQUEST_TIMEOUT_SECONDS, remaining)))
         chunk = source.read(1024 * 1024)
+        _remaining_seconds(deadline)
         if not chunk:
             break
         total += len(chunk)
@@ -89,7 +108,12 @@ def _copy_limited(
 
 
 def _download_s3(
-    uri: str, destination: Path, *, max_bytes: int, expected_size: int | None,
+    uri: str,
+    destination: Path,
+    *,
+    max_bytes: int,
+    expected_size: int | None,
+    deadline: float | None,
 ) -> None:
     parsed = urlsplit(uri)
     bucket = parsed.netloc
@@ -98,11 +122,26 @@ def _download_s3(
         raise PoseModelFetchError(f"S3 URI 형식이 잘못됐습니다: {uri}")
     try:
         import boto3  # type: ignore[import-untyped]
+        from botocore.config import Config  # type: ignore[import-untyped]
     except ImportError as exc:  # pragma: no cover - deployment dependency
         raise PoseModelFetchError(
             f"{uri} 를 받으려면 boto3가 필요합니다"
         ) from exc
-    response = boto3.client("s3").get_object(Bucket=bucket, Key=key)
+    remaining = _remaining_seconds(deadline)
+    request_timeout = _REQUEST_TIMEOUT_SECONDS
+    if remaining is not None:
+        request_timeout = max(0.001, min(request_timeout, remaining))
+    # Disable SDK retries here so one request cannot silently multiply the
+    # startup budget. ECS will replace a task after a fail-closed startup.
+    client = boto3.client(
+        "s3",
+        config=Config(
+            connect_timeout=request_timeout,
+            read_timeout=request_timeout,
+            retries={"total_max_attempts": 1, "mode": "standard"},
+        ),
+    )
+    response = client.get_object(Bucket=bucket, Key=key)
     body = response["Body"]
     try:
         with destination.open("wb") as output:
@@ -112,16 +151,26 @@ def _download_s3(
                 max_bytes=max_bytes,
                 declared_size=response.get("ContentLength"),
                 expected_size=expected_size,
+                deadline=deadline,
             )
     finally:
         body.close()
 
 
 def _download_http(
-    uri: str, destination: Path, *, max_bytes: int, expected_size: int | None,
+    uri: str,
+    destination: Path,
+    *,
+    max_bytes: int,
+    expected_size: int | None,
+    deadline: float | None,
 ) -> None:
+    remaining = _remaining_seconds(deadline)
+    request_timeout = _REQUEST_TIMEOUT_SECONDS
+    if remaining is not None:
+        request_timeout = max(0.001, min(request_timeout, remaining))
     with urllib.request.urlopen(  # noqa: S310
-        uri, timeout=_DOWNLOAD_TIMEOUT_SECONDS
+        uri, timeout=request_timeout
     ) as response, destination.open("wb") as output:
         raw_length = response.headers.get("Content-Length")
         try:
@@ -136,22 +185,30 @@ def _download_http(
             max_bytes=max_bytes,
             declared_size=declared_size,
             expected_size=expected_size,
+            deadline=deadline,
         )
 
 
 def _download_object(
-    uri: str, destination: Path, *, max_bytes: int, expected_size: int | None,
+    uri: str,
+    destination: Path,
+    *,
+    max_bytes: int,
+    expected_size: int | None,
+    deadline: float | None,
 ) -> None:
     try:
         if uri.startswith("s3://"):
             _download_s3(
                 uri, destination, max_bytes=max_bytes,
                 expected_size=expected_size,
+                deadline=deadline,
             )
         elif uri.startswith(("https://", "http://")):
             _download_http(
                 uri, destination, max_bytes=max_bytes,
                 expected_size=expected_size,
+                deadline=deadline,
             )
         else:
             raise PoseModelFetchError(
@@ -245,10 +302,15 @@ def ensure_pose_model(
     *,
     expected_model_id: str = "humanart-m",
     downloader: Callable[..., None] | None = None,
+    total_budget_seconds: float = _DEFAULT_DOWNLOAD_BUDGET_SECONDS,
 ) -> PoseModelProvisioningResult:
     """Download, validate, and atomically publish one immutable model build."""
     if not uri:
         raise PoseModelFetchError("POSE_MODEL_URI가 비어 있습니다")
+    if not math.isfinite(total_budget_seconds) or total_budget_seconds <= 0:
+        raise PoseModelFetchError("pose-model 다운로드 시간 예산은 양수여야 합니다")
+    started = time.monotonic()
+    deadline = started + total_budget_seconds
     fetch = downloader or _download_object
     root = Path(models_root).expanduser().resolve()
     try:
@@ -267,6 +329,7 @@ def ensure_pose_model(
                 downloaded_manifest,
                 max_bytes=_MAX_MANIFEST_BYTES,
                 expected_size=None,
+                deadline=deadline,
             )
             _, build_id, artifacts = _read_manifest(
                 downloaded_manifest, expected_model_id=expected_model_id
@@ -300,8 +363,13 @@ def ensure_pose_model(
                         f"동일 build_id의 manifest가 이미 다른 내용으로 존재합니다: {build_id}"
                     )
                 _validate_installed(destination_manifest, expected_model_id)
+                _remaining_seconds(deadline)
                 return PoseModelProvisioningResult(
-                    destination_manifest, expected_model_id, build_id, False
+                    destination_manifest,
+                    expected_model_id,
+                    build_id,
+                    False,
+                    time.monotonic() - started,
                 )
 
             staged_build = staging_root / "build"
@@ -315,13 +383,11 @@ def ensure_pose_model(
                     target,
                     max_bytes=_MAX_ARTIFACT_BYTES,
                     expected_size=artifact.size_bytes,
+                    deadline=deadline,
                 )
-                if sha256_file(target) != artifact.sha256:
-                    raise PoseModelFetchError(
-                        f"{artifact.label} artifact SHA-256이 manifest와 일치하지 않습니다"
-                    )
 
             _validate_installed(staged_manifest, expected_model_id)
+            _remaining_seconds(deadline)
             try:
                 os.replace(staged_build, destination)
             except OSError as exc:
@@ -331,8 +397,13 @@ def ensure_pose_model(
                     and sha256_file(destination_manifest) == sha256_file(staged_manifest)
                 ):
                     _validate_installed(destination_manifest, expected_model_id)
+                    _remaining_seconds(deadline)
                     return PoseModelProvisioningResult(
-                        destination_manifest, expected_model_id, build_id, False
+                        destination_manifest,
+                        expected_model_id,
+                        build_id,
+                        False,
+                        time.monotonic() - started,
                     )
                 raise PoseModelFetchError(
                     f"pose-model build를 원자적으로 공개하지 못했습니다: {destination}"
@@ -345,7 +416,11 @@ def ensure_pose_model(
         ) from exc
 
     return PoseModelProvisioningResult(
-        destination_manifest, expected_model_id, build_id, True
+        destination_manifest,
+        expected_model_id,
+        build_id,
+        True,
+        time.monotonic() - started,
     )
 
 

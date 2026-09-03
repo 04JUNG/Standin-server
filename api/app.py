@@ -125,6 +125,7 @@ def _ensure_pose_model_bundle():
             CFG.pose_model_uri,
             CFG.pose_models_root,
             expected_model_id="humanart-m",
+            total_budget_seconds=CFG.pose_model_download_budget_seconds,
         )
     except PoseModelFetchError as exc:
         raise StartupError(f"Human-Art 모델 번들 준비 실패: {exc}") from exc
@@ -136,6 +137,7 @@ def _ensure_pose_model_bundle():
         "Human-Art 모델 번들 준비 완료",
         buildId=result.build_id,
         fetched=result.fetched,
+        durationMs=round(result.elapsed_seconds * 1000),
     )
     return result
 

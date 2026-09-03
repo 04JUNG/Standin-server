@@ -8,6 +8,8 @@ import os
 from pathlib import Path
 import sys
 import tempfile
+import time
+import types
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -18,6 +20,7 @@ from src.pose_model_source import (
     PoseModelFetchError,
     PoseModelProvisioningResult,
     _copy_limited,
+    _download_s3,
     ensure_pose_model,
 )
 
@@ -116,14 +119,17 @@ def _objects(manifest: dict, pose: bytes, detector: bytes) -> dict[str, bytes]:
 
 
 def _downloader(objects: dict[str, bytes], calls: list[str]):
-    def download(uri, destination, *, max_bytes, expected_size):
+    def download(uri, destination, *, max_bytes, expected_size, deadline):
         calls.append(uri)
         payload = objects[uri]
-        if len(payload) > max_bytes:
-            raise PoseModelFetchError("test object exceeds max_bytes")
-        if expected_size is not None and len(payload) != expected_size:
-            raise PoseModelFetchError("test object has wrong size")
-        destination.write_bytes(payload)
+        with destination.open("wb") as output:
+            _copy_limited(
+                io.BytesIO(payload),
+                output,
+                max_bytes=max_bytes,
+                expected_size=expected_size,
+                deadline=deadline,
+            )
 
     return download
 
@@ -140,6 +146,76 @@ def test_model_download_stream_enforces_declared_expected_and_actual_sizes() -> 
         except PoseModelFetchError:
             continue
         raise AssertionError(f"invalid model download size passed: {options}")
+
+
+def test_model_download_stream_enforces_total_deadline() -> None:
+    try:
+        _copy_limited(
+            io.BytesIO(b"model"),
+            io.BytesIO(),
+            max_bytes=10,
+            deadline=time.monotonic() - 1.0,
+        )
+    except PoseModelFetchError as exc:
+        assert "시간 예산" in str(exc)
+    else:
+        raise AssertionError("expired model download budget was accepted")
+
+
+def test_s3_download_has_bounded_socket_timeouts_and_no_hidden_retries() -> None:
+    captured: dict = {}
+
+    class FakeConfig:
+        def __init__(self, **kwargs):
+            captured["config"] = kwargs
+
+    class FakeClient:
+        def get_object(self, *, Bucket, Key):
+            captured["bucket"] = Bucket
+            captured["key"] = Key
+            return {"Body": io.BytesIO(b"model"), "ContentLength": 5}
+
+    fake_boto3 = types.ModuleType("boto3")
+
+    def client(service, *, config):
+        captured["service"] = service
+        captured["client_config"] = config
+        return FakeClient()
+
+    fake_boto3.client = client
+    fake_botocore_config = types.ModuleType("botocore.config")
+    fake_botocore_config.Config = FakeConfig
+    previous_boto3 = sys.modules.get("boto3")
+    previous_botocore_config = sys.modules.get("botocore.config")
+    try:
+        sys.modules["boto3"] = fake_boto3
+        sys.modules["botocore.config"] = fake_botocore_config
+        with tempfile.TemporaryDirectory() as directory:
+            destination = Path(directory) / "model.onnx"
+            _download_s3(
+                "s3://assets/prefix/model.onnx",
+                destination,
+                max_bytes=10,
+                expected_size=5,
+                deadline=time.monotonic() + 10.0,
+            )
+            assert destination.read_bytes() == b"model"
+    finally:
+        if previous_boto3 is None:
+            sys.modules.pop("boto3", None)
+        else:
+            sys.modules["boto3"] = previous_boto3
+        if previous_botocore_config is None:
+            sys.modules.pop("botocore.config", None)
+        else:
+            sys.modules["botocore.config"] = previous_botocore_config
+
+    assert captured["service"] == "s3"
+    assert captured["bucket"] == "assets"
+    assert captured["key"] == "prefix/model.onnx"
+    assert 0 < captured["config"]["connect_timeout"] <= 10.0
+    assert 0 < captured["config"]["read_timeout"] <= 10.0
+    assert captured["config"]["retries"]["total_max_attempts"] == 1
 
 
 def test_remote_bundle_is_verified_and_atomically_published() -> None:
@@ -162,6 +238,7 @@ def test_remote_bundle_is_verified_and_atomically_published() -> None:
             / "manifest.json"
         )
         assert result.manifest_path.is_file()
+        assert result.elapsed_seconds >= 0
         assert (result.manifest_path.parent / "model.onnx").read_bytes() == pose
         assert (result.manifest_path.parent / "detector.onnx").read_bytes() == detector
         bundle = load_pose_bundle(result.manifest_path, expected_model_id="humanart-m")
@@ -207,7 +284,7 @@ def test_bad_hash_never_publishes_a_partial_build() -> None:
                 downloader=_downloader(objects, []),
             )
         except PoseModelFetchError as exc:
-            assert "SHA-256" in str(exc)
+            assert "hash mismatch" in str(exc)
         else:
             raise AssertionError("bad model hash was accepted")
         assert not (Path(directory) / "humanart-m" / payload["build_id"]).exists()
@@ -237,6 +314,7 @@ def test_startup_uses_provisioned_local_manifest_without_mutating_env() -> None:
         CFG.pose_model_variant,
         CFG.pose_model_uri,
         CFG.pose_models_root,
+        CFG.pose_model_download_budget_seconds,
         CFG.pose_model_manifest,
     )
     original = api_app.ensure_pose_model
@@ -245,14 +323,22 @@ def test_startup_uses_provisioned_local_manifest_without_mutating_env() -> None:
         CFG.pose_model_variant = "cascade"
         CFG.pose_model_uri = _MANIFEST_URI
         CFG.pose_models_root = "/models"
+        CFG.pose_model_download_budget_seconds = 123.0
         CFG.pose_model_manifest = ""
         expected = Path("/models/humanart-m/build/manifest.json")
-        api_app.ensure_pose_model = lambda *args, **kwargs: (
-            PoseModelProvisioningResult(expected, "humanart-m", "build", True)
-        )
+        captured: dict = {}
+
+        def provision(*args, **kwargs):
+            captured.update(kwargs)
+            return PoseModelProvisioningResult(
+                expected, "humanart-m", "build", True, 1.25
+            )
+
+        api_app.ensure_pose_model = provision
         result = api_app._ensure_pose_model_bundle()
         assert result is not None
         assert CFG.pose_model_manifest == str(expected)
+        assert captured["total_budget_seconds"] == 123.0
         assert os.environ.get("POSE_MODEL_MANIFEST") == original_env
     finally:
         api_app.ensure_pose_model = original
@@ -260,6 +346,7 @@ def test_startup_uses_provisioned_local_manifest_without_mutating_env() -> None:
             CFG.pose_model_variant,
             CFG.pose_model_uri,
             CFG.pose_models_root,
+            CFG.pose_model_download_budget_seconds,
             CFG.pose_model_manifest,
         ) = previous
 

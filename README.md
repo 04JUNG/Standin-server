@@ -128,14 +128,20 @@ python scripts/eval_refine_v2_synthetic.py --bvh-dir data/bvh --out out/refine-v
 
 배포 workflow는 기본적으로 `cascade`와 `canary-100`을 ECS task definition에 주입한다.
 이는 모든 요청을 cascade 경로에 넣되, Human-Art는 current-X가 해결하지 못한 슬롯이 있을 때만
-실행한다는 뜻이다. GitHub `beta` 환경의 `POSE_MODEL_URI`는 S3의 immutable
-`manifest.json` 객체를 가리켜야 하며, 없으면 배포가 task definition 변경 전에 중단된다.
+실행한다는 뜻이다. 환경별 assets 버킷을 소유한 CDK/CloudFormation이 ECS task
+definition의 `POSE_MODEL_URI`에 S3의 immutable `manifest.json` 객체를 넣는다. 앱 배포
+workflow는 이 값을 덮어쓰지 않고 현재 task definition에 존재하는지만 확인한다. 따라서
+CDK 배포가 task revision을 되돌려도 모델 URI가 사라지지 않는다.
 서버는 manifest와 같은 prefix의 `model.onnx`, `detector.onnx`를 staging으로 내려받아
 크기·SHA-256·runtime 계약을 검증한다. 통과한 build만
 `POSE_MODELS_ROOT/humanart-m/<build_id>/`에 원자적으로 공개하고 확정된 로컬 manifest
 경로를 pose factory에 전달한다. 원격 manifest의 artifact 경로는 같은 prefix 안의 단일
 상대 파일명이어야 한다. 수동 read-only mount 환경은 `POSE_MODEL_URI` 없이 기존
 `POSE_MODEL_MANIFEST` 절대 경로를 사용할 수 있다.
+`POSE_MODEL_DOWNLOAD_BUDGET_SECONDS`는 manifest·ONNX 2개 다운로드와 검증의 전체
+wall-clock 예산이며 기본 300초다. S3/HTTP 개별 요청은 최대 60초로 제한한다. Fargate
+health-check grace period는 이 단계 뒤의 current-X 초기화까지 포함한 staging 실측값으로
+정한다.
 긴급 롤백은 배포 환경 변수 `POSE_MODEL_VARIANT=current-x`, `POSE_CANARY_STAGE=off`를 설정한 뒤
 workflow를 다시 실행한다.
 
