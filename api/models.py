@@ -167,6 +167,17 @@ class RefineRequest(BaseModel):
         return value
 
 
+class RefineThumbnailOut(BaseModel):
+    """Stateless PNG artifact returned with the final refine result."""
+    view: Literal["front", "three_quarter", "side", "back"]
+    media_type: Literal["image/png"] = "image/png"
+    encoding: Literal["base64"] = "base64"
+    data: str = Field(..., description="base64-encoded 256×256 PNG bytes")
+    width: Literal[256] = 256
+    height: Literal[256] = 256
+    renderer_version: str = "warm-mannequin-v1"
+
+
 class RefineResponse(BaseModel):
     """refined=False여도 오류가 아니다 — 안전 게이트가 조정을 버리고 베이스를 준 것."""
     pose_id: str
@@ -188,6 +199,12 @@ class RefineResponse(BaseModel):
         None, description="조정본 BVH 본문(LF 개행). refined=true일 때만 채운다. "
                           "조정본을 얻는 **유일한** 경로이므로 소비자는 이 값을 받아 "
                           "자기 저장소에 보관해야 한다.")
+    thumbnail: Optional[RefineThumbnailOut] = Field(
+        None,
+        description=("선택 후보의 매칭 view로 그린 최종 결과 256×256 PNG. "
+                     "조정본/베이스 모두 같은 마네킹 렌더러를 쓰며 base64로 "
+                     "인라인 반환한다."),
+    )
     loss_base: Optional[float] = Field(None, description="조정 전 각도 손실")
     loss_final: Optional[float] = Field(None, description="조정 후 각도 손실")
     gain: Optional[float] = Field(None, description="손실 감소율(0.3=30% 개선)")

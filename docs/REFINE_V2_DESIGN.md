@@ -93,9 +93,9 @@ Top-N/Top-5 후보를 사용자에게 보여주기 전에 전부 refine하거나
 교체하거나, refine 결과로 Top-5를 재정렬하는 기능은 이번 범위에 포함하지 않는다.
 
 `/analyze`는 베이스 Top-5와 기존 베이스 썸네일을 먼저 반환하며 선행 refine 완료를 기다리지
-않는다. 사용자가 후보를 선택하면 그 후보 하나만 refine하고, 반환된 `bvh_url`을 클라이언트 3D
-뷰어에서 확인한 뒤 export한다. refined BVH 생성만으로 refined 썸네일이 생기지는 않으므로,
-서버의 후보별 refined PNG 생성은 이번 v2의 필수 범위로 두지 않는다.
+않는다. 사용자가 후보를 선택하면 그 후보 하나만 refine하고, 응답의 인라인 `bvh`를 3D 뷰어와
+export에 사용한다. 같은 응답의 `thumbnail`은 최종 BVH를 기존 후보와 같은 렌더러·매칭 view로 그린
+PNG이므로 선택 결과 카드에서 즉시 확인할 수 있다. Top-5 전체의 선행 refined PNG 생성은 하지 않는다.
 
 post-click 지연이 실제 사용자 이탈 원인으로 측정되면 Top-1 또는 hover 후보의 저우선 백그라운드
 prefetch를 별도 최적화로 실험한다. 이 경우에도 베이스 Top-5 노출을 막지 않고, 사용자가 선택한
@@ -998,17 +998,18 @@ PASS로 만들지 않고 `INCONCLUSIVE`를 반환한다. 실행·라벨 절차�
 - 선행 refine timeout 후 Top-5 전체를 복구하는 정책
 - 합성 후보를 위한 새 candidate identity
 
-후보 카드의 정적 썸네일은 베이스 포즈를 나타낸다. refine 결과의 확인 기준은 `/refine`이 반환한
-`bvh_url`을 사용한 선택 후보의 3D preview다. refined 썸네일을 저장·공유해야 하는 요구가 생기면
-BVH와 동일한 artifact identity 및 body·camera·renderer version을 사용하는 별도 계약으로 설계한다.
+후보 카드의 정적 썸네일은 베이스 포즈를 나타낸다. 선택 후 `/refine`은 최종 BVH와 함께
+`thumbnail={view,media_type,encoding,data,width,height,renderer_version}`를 반환한다. `data`는
+`warm-mannequin-v1`이 요청의 후보 매칭 view로 256×256 렌더링한 PNG의 base64이며, 조정이 폐기된 경우에도
+베이스 BVH를 같은 방식으로 렌더링한다. PNG와 조정 BVH 모두 추론 서버에 영속 저장하지 않는다.
 
-기존 선택 후 `/refine` 경로에서는 응답의 `bvh_url`이 조정본 또는 베이스를 가리킨다는 계약을
-유지한다. BFF·클라이언트·export는 사용자가 실제 선택한 결과의 `bvh_url`을 끝까지 보존해야 한다.
+BFF·클라이언트·export는 조정본이 있으면 응답의 인라인 `bvh`를 끝까지 보존해야 한다.
+`bvh_url`은 하위 호환용 베이스 URL이며 조정본을 가리키지 않는다.
 
 현재 legacy 추론 서버의 `/export-order`는 `pose_id + view`만 받아 항상 베이스
 `/pose/{id}/bvh`를 다시 만든다. 따라서 **이 endpoint는 v2 조정본 export 경로로 사용하지 않는다.**
-제품 기준인 BFF candidate export가 `/refine`의 반환 `bvh_url` 또는 refined handle을 선택 결과에
-저장해 전달한다. legacy endpoint까지 v2에 포함하려면 optional refined artifact 필드를 추가하는
+제품 기준인 BFF candidate export가 `/refine`의 인라인 `bvh`를 선택 결과에 저장해 전달한다.
+legacy endpoint까지 v2에 포함하려면 optional refined artifact 필드를 추가하는
 별도 API 계약 승인을 먼저 받는다.
 
 추론 서버는 조정본을 저장하지 않는다(무상태 인라인 전달). 따라서 오래된 v1 조정본이 재사용될

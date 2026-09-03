@@ -1,6 +1,7 @@
 """승인된 Refine v2의 feature-flag 경로와 안전 계약 테스트."""
 from __future__ import annotations
 
+import base64
 import copy
 import json
 import os
@@ -530,6 +531,11 @@ def test_v25_api_returns_inline_bvh_and_leaves_no_local_artifact():
         # 조정본을 얻는 유일한 경로는 응답 본문이다.
         assert response.bvh and response.bvh.startswith("HIERARCHY")
         assert "\r\n" not in response.bvh
+        assert response.thumbnail is not None
+        assert response.thumbnail.view == "front"
+        assert base64.b64decode(response.thumbnail.data, validate=True).startswith(
+            b"\x89PNG\r\n\x1a\n"
+        )
         # bvh_url은 refined 여부와 무관하게 항상 베이스를 가리킨다.
         assert response.bvh_url == "/pose/pose/bvh"
         assert response.refine_version == REFINE_V2_CODE_VERSION
@@ -550,7 +556,7 @@ def test_v25_api_base_fallback_has_no_inline_bvh():
     with tempfile.TemporaryDirectory() as directory:
         base = _synthetic_bvh(directory, "base.bvh")
         request = RefineRequest(
-            pose_id="pose", view="front",
+            pose_id="pose", view="back",
             keypoints=np.zeros((17, 2)).tolist(),
             refine_allowed=False,
         )
@@ -570,6 +576,11 @@ def test_v25_api_base_fallback_has_no_inline_bvh():
         assert response.refined is False
         assert response.reason == "skeleton_policy"
         assert response.bvh is None
+        assert response.thumbnail is not None
+        assert response.thumbnail.view == "back"
+        assert base64.b64decode(response.thumbnail.data, validate=True).startswith(
+            b"\x89PNG\r\n\x1a\n"
+        )
         assert response.bvh_url == "/pose/pose/bvh"
         assert response.refine_outcome == "not_attempted"
 
