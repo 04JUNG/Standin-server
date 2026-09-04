@@ -169,11 +169,13 @@ def main() -> int:
         assert int(thumbnail_headers["content-length"]) == len(thumbnail)
         width, height, colors = _png_pixels(thumbnail)
         assert (width, height) == (256, 256), (width, height)
-        # 회색 배경 위에 어두운 캐릭터가 있어야 한다. 한 색이면 GL 없는 컨테이너에서
-        # EEVEE가 검은/빈 프레임을 쓴 것이고, 그 그림은 preview로 쓸 수 없다.
+        # 현재 라이브러리와 같은 밝은 남성 모델 + 회색 배경이어야 한다. 캐릭터가
+        # 반드시 절대 명도 90 미만이어야 한다는 옛 실루엣 가정은 합성 CI 리그와
+        # 실제 라이브러리 렌더 모두에 맞지 않으므로, 충분한 명도 범위를 검증한다.
         assert len(colors) >= 32, f"thumbnail is nearly uniform ({len(colors)} colors)"
-        assert any(sum(color) / 3 > 120 for color in colors), "no background tone"
-        assert any(sum(color) / 3 < 90 for color in colors), "no character silhouette"
+        luminances = [sum(color) / 3 for color in colors]
+        assert max(luminances) > 120, "no background/model tone"
+        assert max(luminances) - min(luminances) >= 24, "no visible character contrast"
         print(
             "[PASS] converter container thumbnail HTTP smoke "
             f"(engine={thumbnail_headers['x-standin-thumbnail-engine']}, colors={len(colors)})"
