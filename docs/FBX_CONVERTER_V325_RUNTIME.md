@@ -23,6 +23,19 @@ V3.2.4 FBX를 byte-exact로 복구한다.
   FBX를 내보내지 않는다.
 - Docker image는 명시적 allowlist로 운영 파일만 복사한다.
 
+## 썸네일 렌더 단계 (`POST /render-thumbnail`, 2026-09-04)
+
+변환 뒤에 선택적으로 붙는 단계다. runner가 job에 `thumbnail` 블록(view·resolution·samples·
+engines·tempdir 안의 PNG 경로)을 넣으면 worker는 **내보낸 FBX 바이트를 빈 씬에 다시
+임포트**해 `converter/thumbnail_render.py`로 렌더한다(라이브러리 썸네일 빌드와 같은
+anatomical 카메라·재질·조명). report의 `thumbnail`(sha256·size·engine)을 runner가 다시
+검증한 뒤 API가 256px PNG/JPEG로 줄여 준다.
+
+- solver 동결 범위(`SHA256SUMS.v325`) 밖이다. `convert.py`·`retarget.py`는 건드리지 않는다.
+- `thumbnail: null`이면 기존 `/convert`·`/convert-bundle`과 바이트 단위로 같은 동작이다.
+- job schema는 `3`이다(`thumbnail` 키 필수, null 허용).
+- 렌더 실패는 `thumbnail_render_failed` → API `500 THUMBNAIL_RENDER_FAILED`. FBX는 버린다.
+
 ## 비상 복구
 
 `CONVERTER_FORCE_EXACT_V324=true`를 converter 서비스 환경변수로 설정하면 runner가

@@ -18,6 +18,7 @@ from converter.protocol import (
     SOLVER_MANIFEST_SHA256,
 )
 from converter.worker import JobValidationError, load_job
+from converter.thumbnail_render import _image_has_contrast
 
 
 def _job(tmp_path: Path) -> tuple[Path, dict]:
@@ -41,6 +42,7 @@ def _job(tmp_path: Path) -> tuple[Path, dict]:
         "apply_root_translation": APPLY_ROOT_TRANSLATION,
         "embed_textures": EMBED_TEXTURES,
         "force_exact_v324": False,
+        "thumbnail": None,
     }
     path = tmp_path / "job.json"
     path.write_text(json.dumps(payload), encoding="utf-8")
@@ -78,6 +80,104 @@ def test_job_rejects_unlocked_or_wrongly_typed_options(tmp_path, field, value):
     job_path.write_text(json.dumps(payload), encoding="utf-8")
     with pytest.raises(JobValidationError):
         load_job(job_path)
+
+
+def _thumbnail(tmp_path: Path, **overrides) -> dict:
+    block = {
+        "view": "front",
+        "resolution": 256,
+        "samples": 8,
+        "engines": ["BLENDER_EEVEE", "CYCLES"],
+        "output_path": str(tmp_path / "thumbnail.png"),
+    }
+    block.update(overrides)
+    return block
+
+
+def test_job_accepts_optional_thumbnail_block(tmp_path):
+    job_path, payload = _job(tmp_path)
+    payload["thumbnail"] = _thumbnail(tmp_path)
+    job_path.write_text(json.dumps(payload), encoding="utf-8")
+    result = load_job(job_path)
+    assert result["thumbnail"] == _thumbnail(tmp_path)
+
+
+def test_job_without_thumbnail_key_is_rejected(tmp_path):
+    """schema v3부터 thumbnail은 null이라도 반드시 실려야 한다(runner가 항상 쓴다)."""
+    job_path, payload = _job(tmp_path)
+    del payload["thumbnail"]
+    job_path.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(JobValidationError, match="thumbnail"):
+        load_job(job_path)
+
+
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"view": "top"},
+        {"resolution": 32},
+        {"resolution": 4096},
+        {"resolution": "640"},
+        {"resolution": True},
+        {"samples": 0},
+        {"samples": 1000},
+        {"engines": []},
+        {"engines": ["WORKBENCH"]},
+        {"engines": ["CYCLES", "CYCLES"]},
+        {"engines": "CYCLES"},
+        {"output_path": "thumbnail.png"},
+        {"output_path": "/tmp/thumbnail.jpg"},
+        {"extra": 1},
+    ],
+)
+def test_job_rejects_malformed_thumbnail_block(tmp_path, overrides):
+    job_path, payload = _job(tmp_path)
+    payload["thumbnail"] = _thumbnail(tmp_path, **overrides)
+    job_path.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(JobValidationError, match="thumbnail"):
+        load_job(job_path)
+
+
+def test_job_rejects_thumbnail_path_outside_or_colliding(tmp_path):
+    job_path, payload = _job(tmp_path)
+    payload["thumbnail"] = _thumbnail(
+        tmp_path, output_path=str(tmp_path.parent / "escaped.png")
+    )
+    job_path.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(JobValidationError, match="inside"):
+        load_job(job_path)
+    existing = tmp_path / "existing.png"
+    existing.write_bytes(b"png")
+    payload["thumbnail"] = _thumbnail(tmp_path, output_path=str(existing))
+    job_path.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(JobValidationError, match="fresh"):
+        load_job(job_path)
+
+
+def test_thumbnail_render_module_does_not_import_bpy_at_import_time():
+    import converter.thumbnail_render  # noqa: F401
+
+    assert "bpy" not in sys.modules
+    assert "mathutils" not in sys.modules
+
+
+class _ImagePixels:
+    def __init__(self, width: int, height: int, colours: list[tuple[float, float, float]]):
+        self.size = (width, height)
+        self.pixels = [
+            channel
+            for index in range(width * height)
+            for channel in (*colours[index % len(colours)], 1.0)
+        ]
+
+
+def test_thumbnail_render_rejects_uniform_frames_before_engine_acceptance():
+    uniform = _ImagePixels(32, 32, [(0.0, 0.0, 0.0)])
+    visible_subject = _ImagePixels(
+        32, 32, [(0.62, 0.62, 0.62), (0.20, 0.22, 0.26)]
+    )
+    assert not _image_has_contrast(uniform)
+    assert _image_has_contrast(visible_subject)
 
 
 def test_job_rejects_output_path_outside_tempdir(tmp_path):

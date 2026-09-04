@@ -168,14 +168,25 @@ class RefineRequest(BaseModel):
 
 
 class RefineThumbnailOut(BaseModel):
-    """Stateless PNG artifact returned with the final refine result."""
+    """Stateless preview image returned inline with the final refine result.
+
+    2026-09-04부터 후보 썸네일과 같은 렌더러(V3.2.5 converter가 변환한 FBX 남성
+    모델의 anatomical 카메라 렌더)로 그린다. ``renderer_version``이
+    ``fbx-anatomical-…``이면 그 경로, ``warm-mannequin-v1``이면 옛 2D 마네킹이다.
+    ``media_type``은 기본 PNG이며 서버 설정(REFINE_THUMBNAIL_FORMAT)으로 JPEG가 될
+    수 있으므로 표시할 때는 ``data:{media_type};base64,{data}``로 조립한다.
+    """
     view: Literal["front", "three_quarter", "side", "back"]
-    media_type: Literal["image/png"] = "image/png"
+    media_type: Literal["image/png", "image/jpeg"] = "image/png"
     encoding: Literal["base64"] = "base64"
-    data: str = Field(..., description="base64-encoded 256×256 PNG bytes")
+    data: str = Field(..., description="base64-encoded 256×256 image bytes")
     width: Literal[256] = 256
     height: Literal[256] = 256
-    renderer_version: str = "warm-mannequin-v1"
+    renderer_version: str = Field(
+        "fbx-anatomical-v1",
+        description="그린 렌더러. fbx-anatomical-v1/<character_id> | "
+                    "fbx-anatomical-v1/library | warm-mannequin-v1",
+    )
 
 
 class RefineResponse(BaseModel):
@@ -201,10 +212,10 @@ class RefineResponse(BaseModel):
                           "자기 저장소에 보관해야 한다.")
     thumbnail: Optional[RefineThumbnailOut] = Field(
         None,
-        description=("선택 후보의 매칭 view로 그린 최종 결과 256×256 PNG. "
-                     "조정본/베이스 모두 같은 마네킹 렌더러를 쓰며 base64로 "
-                     "인라인 반환한다. 렌더에 실패하면 null이다 — 오류가 아니라 "
-                     "'그림 없음'이며 나머지 필드는 그대로 유효하다."),
+        description=("선택 후보의 매칭 view로 그린 최종 결과 256×256 이미지. "
+                     "후보 썸네일과 같은 FBX 남성 모델 렌더러(converter)를 쓰며 "
+                     "base64로 인라인 반환한다. 렌더에 실패하면 null이다 — 오류가 "
+                     "아니라 '그림 없음'이며 나머지 필드는 그대로 유효하다."),
     )
     loss_base: Optional[float] = Field(None, description="조정 전 각도 손실")
     loss_final: Optional[float] = Field(None, description="조정 후 각도 손실")

@@ -10,6 +10,7 @@ import sys
 import zipfile
 
 from fastapi.testclient import TestClient
+import pytest
 
 from converter_api.app import configure_structured_logging, create_app
 from converter_api.registry import CharacterRegistry
@@ -19,6 +20,9 @@ from converter_api.runner import (
     ConversionRejectedError,
     ConversionResult,
     ConversionTimeoutError,
+    RunnerSettings,
+    ThumbnailRenderFailedError,
+    ThumbnailRequest,
     WorkerIntegrityError,
 )
 
@@ -26,10 +30,25 @@ from converter_api.runner import (
 VALID_BVH = b"HIERARCHY\nROOT Hips\n{\n}\nMOTION\nFrames: 1\nFrame Time: 0.033333\n"
 
 
+def _fake_png(size: int = 640) -> bytes:
+    from PIL import Image
+
+    image = Image.new("RGB", (size, size), (158, 158, 158))
+    for x in range(size // 4, size * 3 // 4):
+        for y in range(size // 8, size * 7 // 8):
+            image.putpixel((x, y), (51, 56, 66))
+    buffer = io.BytesIO()
+    image.save(buffer, format="PNG")
+    return buffer.getvalue()
+
+
 class FakeRunner:
     def __init__(self, failure=None):
         self.failure = failure
         self.calls = []
+        self.settings = RunnerSettings(
+            blender_binary="fake-blender", worker_path=Path("worker.py"),
+        )
 
     def inspect_blender(self, *, refresh=False):
         return BlenderInfo(version="5.2.0", build_hash="fbe6228777e7")
@@ -51,12 +70,31 @@ class FakeRunner:
             "source_bvh_sha256": source_bvh_sha256,
             "mirrored": kwargs["mirror"],
         }
+        thumbnail = kwargs.get("thumbnail")
+        thumbnail_png = None
+        thumbnail_report = None
+        if thumbnail is not None:
+            thumbnail_png = _fake_png(thumbnail.resolution)
+            thumbnail_report = {
+                "view": thumbnail.view,
+                "camera_convention": f"anatomical_{thumbnail.view}_from_shoulders_hips",
+                "resolution": thumbnail.resolution,
+                "samples": thumbnail.samples,
+                "engine": thumbnail.engines[0],
+                "engine_attempts": [],
+                "bbox_min": [0.0, 0.0, 0.0],
+                "bbox_max": [1.0, 1.0, 1.0],
+                "sha256": hashlib.sha256(thumbnail_png).hexdigest(),
+                "size": len(thumbnail_png),
+            }
         return ConversionResult(
             conversion_id=kwargs["conversion_id"],
             artifact=artifact,
             artifact_sha256=hashlib.sha256(artifact).hexdigest(),
             source_bvh_sha256=source_bvh_sha256,
             report=report,
+            thumbnail_png=thumbnail_png,
+            thumbnail_report=thumbnail_report,
         )
 
 
@@ -363,10 +401,141 @@ def test_convert_is_503_on_character_hash_mismatch(tmp_path):
 
 def test_openapi_declares_multipart_convert_contract(tmp_path):
     payload = _client(tmp_path).get("/openapi.json").json()
-    assert payload["info"]["version"] == "1.1.0"
+    assert payload["info"]["version"] == "1.2.0"
     request_body = payload["paths"]["/convert"]["post"]["requestBody"]
     assert "multipart/form-data" in request_body["content"]
     bundle_body = payload["paths"]["/convert-bundle"]["post"]["requestBody"]
     assert "multipart/form-data" in bundle_body["content"]
     bundle_responses = payload["paths"]["/convert-bundle"]["post"]["responses"]
     assert "application/zip" in bundle_responses["200"]["content"]
+    thumbnail_body = payload["paths"]["/render-thumbnail"]["post"]["requestBody"]
+    assert "multipart/form-data" in thumbnail_body["content"]
+    thumbnail_responses = payload["paths"]["/render-thumbnail"]["post"]["responses"]
+    assert "image/png" in thumbnail_responses["200"]["content"]
+    assert "image/jpeg" in thumbnail_responses["200"]["content"]
+
+
+def _post_thumbnail(client: TestClient, *, data=VALID_BVH, fields=None, filename="pose.bvh"):
+    return client.post(
+        "/render-thumbnail",
+        files={"bvh": (filename, data, "application/octet-stream")},
+        data=fields or {},
+    )
+
+
+def test_render_thumbnail_returns_service_png_by_default(tmp_path):
+    from PIL import Image
+
+    runner = FakeRunner()
+    response = _post_thumbnail(_client(tmp_path, runner=runner))
+    assert response.status_code == 200, response.text
+    assert response.headers["content-type"] == "image/png"
+    assert response.headers["X-Standin-Thumbnail-Renderer"] == "fbx-anatomical-v1"
+    assert response.headers["X-Standin-Thumbnail-View"] == "front"
+    assert response.headers["X-Standin-Thumbnail-Engine"] == "BLENDER_EEVEE"
+    assert response.headers["X-Standin-Thumbnail-Render-Resolution"] == "256"
+    assert response.headers["X-Standin-Thumbnail-Size"] == "256"
+    assert response.headers["X-Standin-Solver-Version"] == "chain-transport-v3.2.5"
+    assert response.headers["X-Standin-Source-BVH-SHA256"] == hashlib.sha256(VALID_BVH).hexdigest()
+    assert response.headers["Cache-Control"] == "private, no-store"
+    assert response.headers["X-Standin-Thumbnail-SHA256"] == hashlib.sha256(response.content).hexdigest()
+    assert response.headers["Content-Length"] == str(len(response.content))
+    with Image.open(io.BytesIO(response.content)) as image:
+        assert image.format == "PNG"
+        assert image.size == (256, 256)
+        assert len(image.convert("RGB").getcolors(4096)) > 1
+    # 변환 옵션은 동결값으로 잠겨 있고, 렌더 요청은 runner 설정에서 온다.
+    call = runner.calls[0]
+    assert call["mirror"] is False
+    assert call["thumbnail"] == ThumbnailRequest(view="front")
+
+
+def test_render_thumbnail_honors_view_size_and_jpeg(tmp_path):
+    from PIL import Image
+
+    runner = FakeRunner()
+    response = _post_thumbnail(
+        _client(tmp_path, runner=runner),
+        fields={"view": "three_quarter", "size": "128", "format": "jpeg", "quality": "70"},
+    )
+    assert response.status_code == 200, response.text
+    assert response.headers["content-type"] == "image/jpeg"
+    assert response.headers["X-Standin-Thumbnail-View"] == "three_quarter"
+    assert response.headers["X-Standin-Thumbnail-Size"] == "128"
+    assert response.headers["Content-Disposition"].endswith("-three_quarter.jpg\"")
+    with Image.open(io.BytesIO(response.content)) as image:
+        assert image.format == "JPEG"
+        assert image.size == (128, 128)
+    assert runner.calls[0]["thumbnail"].view == "three_quarter"
+
+
+@pytest.mark.parametrize(
+    "fields",
+    [
+        {"view": "top"},
+        {"size": "16"},
+        {"size": "4096"},
+        {"size": "abc"},
+        {"format": "gif"},
+        {"quality": "0"},
+        {"quality": "101"},
+    ],
+)
+def test_render_thumbnail_rejects_bad_options_before_blender(tmp_path, fields):
+    runner = FakeRunner()
+    response = _post_thumbnail(_client(tmp_path, runner=runner), fields=fields)
+    assert response.status_code == 400, response.text
+    assert response.json()["error"]["code"].startswith("INVALID")
+    assert runner.calls == []
+
+
+def test_render_thumbnail_rejects_bad_bvh_and_unknown_character(tmp_path):
+    runner = FakeRunner()
+    client = _client(tmp_path, runner=runner)
+    assert _post_thumbnail(client, data=b"not a bvh").status_code == 422
+    assert _post_thumbnail(client, fields={"character_id": "nope"}).status_code == 400
+    assert _post_thumbnail(client, filename="../x.bvh").status_code == 400
+    assert runner.calls == []
+
+
+def test_render_thumbnail_maps_render_failure_to_500_envelope(tmp_path, caplog):
+    runner = FakeRunner(failure=ThumbnailRenderFailedError("all engines failed"))
+    with caplog.at_level(logging.ERROR, logger="standin.converter"):
+        response = _post_thumbnail(_client(tmp_path, runner=runner))
+    assert response.status_code == 500
+    body = response.json()["error"]
+    assert body["code"] == "THUMBNAIL_RENDER_FAILED"
+    assert body["conversion_id"]
+    assert any("converter_thumbnail_failed" in record.getMessage() for record in caplog.records)
+
+
+def test_render_thumbnail_fails_closed_without_runner_thumbnail(tmp_path):
+    class ForgetfulRunner(FakeRunner):
+        def convert(self, **kwargs):
+            result = super().convert(**kwargs)
+            return replace(result, thumbnail_png=None, thumbnail_report=None)
+
+    response = _post_thumbnail(_client(tmp_path, runner=ForgetfulRunner()))
+    assert response.status_code == 500
+    assert response.json()["error"]["code"] == "THUMBNAIL_MISSING"
+
+
+def test_render_thumbnail_logs_completion_with_engine(tmp_path, caplog):
+    with caplog.at_level(logging.INFO, logger="standin.converter"):
+        response = _post_thumbnail(_client(tmp_path), fields={"view": "back"})
+    assert response.status_code == 200
+    events = [json.loads(record.getMessage()) for record in caplog.records
+              if record.getMessage().startswith("{")]
+    complete = [event for event in events if event["event"] == "converter_thumbnail_complete"]
+    assert complete and complete[0]["view"] == "back"
+    assert complete[0]["engine"] == "BLENDER_EEVEE"
+    assert complete[0]["format"] == "png"
+    assert complete[0]["thumbnail_sha256"] == hashlib.sha256(response.content).hexdigest()
+
+
+def test_convert_endpoints_do_not_request_a_thumbnail(tmp_path):
+    runner = FakeRunner()
+    client = _client(tmp_path, runner=runner)
+    assert _post(client).status_code == 200
+    assert _post_bundle(client).status_code == 200
+    assert all(call["thumbnail"] is None for call in runner.calls)
