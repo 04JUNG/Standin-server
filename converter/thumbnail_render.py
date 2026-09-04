@@ -85,20 +85,16 @@ def _body_axes(armature):
     return right, forward, up
 
 
-def available_engines() -> set[str]:
+def _activate_cycles() -> None:
     import bpy
 
     # Official Blender builds ship Cycles as an add-on. In a fresh background
-    # process it may not be registered in RenderSettings yet, so activate it
-    # before checking the enum. This provides the CPU fallback when headless
-    # EEVEE writes a flat frame without raising an exception.
+    # process it may not be registered yet, so ask Blender to activate it before
+    # assigning ``scene.render.engine``. Do not infer support from the static RNA
+    # enum: dynamically registered engines can be absent from that list even
+    # though assigning ``CYCLES`` is valid.
     if "cycles" not in bpy.context.preferences.addons:
-        try:
-            bpy.ops.preferences.addon_enable(module="cycles")
-        except Exception:
-            pass
-    prop = bpy.types.RenderSettings.bl_rna.properties["engine"]
-    return {item.identifier for item in prop.enum_items}
+        bpy.ops.preferences.addon_enable(module="cycles")
 
 
 def _image_has_contrast(image, *, minimum_delta: float = 0.05) -> bool:
@@ -130,6 +126,8 @@ def _image_has_contrast(image, *, minimum_delta: float = 0.05) -> bool:
 
 
 def _configure_engine(scene, engine: str, samples: int) -> None:
+    if engine == "CYCLES":
+        _activate_cycles()
     scene.render.engine = engine
     if engine == "CYCLES":
         scene.cycles.device = "CPU"
@@ -286,13 +284,9 @@ def render_artifact_view(
     scene = bpy.context.scene
     scene.render.filepath = str(output.resolve())
 
-    supported = available_engines()
     attempts: list[dict[str, str]] = []
     used_engine: str | None = None
     for engine in engines:
-        if engine not in supported:
-            attempts.append({"engine": engine, "error": "engine unavailable"})
-            continue
         output.unlink(missing_ok=True)
         try:
             _configure_engine(scene, engine, samples)
@@ -324,4 +318,4 @@ def render_artifact_view(
     }
 
 
-__all__ = ["ThumbnailRenderError", "available_engines", "render_artifact_view"]
+__all__ = ["ThumbnailRenderError", "render_artifact_view"]
