@@ -18,6 +18,7 @@ from converter.protocol import (
     SOLVER_MANIFEST_SHA256,
 )
 from converter.worker import JobValidationError, load_job
+from converter.thumbnail_render import _image_has_contrast
 
 
 def _job(tmp_path: Path) -> tuple[Path, dict]:
@@ -158,6 +159,25 @@ def test_thumbnail_render_module_does_not_import_bpy_at_import_time():
 
     assert "bpy" not in sys.modules
     assert "mathutils" not in sys.modules
+
+
+class _ImagePixels:
+    def __init__(self, width: int, height: int, colours: list[tuple[float, float, float]]):
+        self.size = (width, height)
+        self.pixels = [
+            channel
+            for index in range(width * height)
+            for channel in (*colours[index % len(colours)], 1.0)
+        ]
+
+
+def test_thumbnail_render_rejects_uniform_frames_before_engine_acceptance():
+    uniform = _ImagePixels(32, 32, [(0.0, 0.0, 0.0)])
+    visible_subject = _ImagePixels(
+        32, 32, [(0.62, 0.62, 0.62), (0.20, 0.22, 0.26)]
+    )
+    assert not _image_has_contrast(uniform)
+    assert _image_has_contrast(visible_subject)
 
 
 def test_job_rejects_output_path_outside_tempdir(tmp_path):

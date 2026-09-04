@@ -19,11 +19,13 @@ from pathlib import Path
 from urllib import error as urllib_error
 
 import pytest
+import numpy as np
 from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import api.app as api_app
+from api.models import RefineRequest
 from src.config import CFG
 from src.refine_thumbnail import (
     ConverterThumbnailRenderer,
@@ -170,6 +172,39 @@ def test_base_reuses_the_library_thumbnail_without_calling_converter(tmp_path):
     assert rendered.origin == "converter"
     assert fake.requests[-1]["fields"]["__filename__"] == "base.bvh"
     assert fake.requests[-1]["bvh"] == Path(bvh).read_bytes()
+
+
+def test_api_policy_fallback_reuses_the_library_thumbnail(monkeypatch, tmp_path):
+    thumbs = tmp_path / "thumbs"
+    thumbs.mkdir()
+    Image.new("RGB", (256, 256), (120, 120, 120)).save(
+        thumbs / "pose__front.jpg", format="JPEG", quality=78
+    )
+    base = _synthetic_bvh(str(tmp_path), "pose.bvh")
+    fake = _FakeConverter()
+    monkeypatch.setitem(
+        api_app.STATE,
+        "thumbnail_renderer",
+        _renderer(fake, data_dir=str(tmp_path), image_format="jpeg"),
+    )
+    monkeypatch.setitem(api_app.STATE, "db_path", str(tmp_path / "unused.db"))
+    monkeypatch.setattr(
+        api_app,
+        "get_pose_meta",
+        lambda *_args: {"bvh_path": base, "set_id": None},
+    )
+
+    response = api_app.refine(RefineRequest(
+        pose_id="pose",
+        view="front",
+        keypoints=np.zeros((17, 2)).tolist(),
+        refine_allowed=False,
+    ))
+
+    assert response.refined is False
+    assert response.thumbnail is not None
+    assert response.thumbnail.renderer_version == LIBRARY_RENDERER_VERSION
+    assert fake.requests == []
 
 
 def test_refined_never_reuses_the_library_thumbnail(tmp_path):

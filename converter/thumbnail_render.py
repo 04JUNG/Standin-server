@@ -84,6 +84,34 @@ def available_engines() -> set[str]:
     return {item.identifier for item in prop.enum_items}
 
 
+def _image_has_contrast(image, *, minimum_delta: float = 0.05) -> bool:
+    """Reject an apparently successful headless render that is one flat colour.
+
+    Some EEVEE/GL failures still write a valid PNG. Sampling Blender's in-memory
+    render result lets the caller try the next configured engine before that
+    unusable frame leaves the converter.
+    """
+    width, height = (int(value) for value in image.size)
+    if width <= 0 or height <= 0:
+        return False
+    pixels = image.pixels
+    step_x = max(1, width // 32)
+    step_y = max(1, height // 32)
+    darkest = float("inf")
+    lightest = float("-inf")
+    for y in range(step_y // 2, height, step_y):
+        for x in range(step_x // 2, width, step_x):
+            offset = (y * width + x) * 4
+            luminance = (
+                float(pixels[offset]) * 0.2126
+                + float(pixels[offset + 1]) * 0.7152
+                + float(pixels[offset + 2]) * 0.0722
+            )
+            darkest = min(darkest, luminance)
+            lightest = max(lightest, luminance)
+    return lightest - darkest >= minimum_delta
+
+
 def _configure_engine(scene, engine: str, samples: int) -> None:
     scene.render.engine = engine
     if engine == "CYCLES":
@@ -254,6 +282,9 @@ def render_artifact_view(
             bpy.ops.render.render(write_still=True)
             if not output.is_file() or output.stat().st_size <= 0:
                 raise ThumbnailRenderError("render finished without writing a PNG")
+            render_result = bpy.data.images.get("Render Result")
+            if render_result is None or not _image_has_contrast(render_result):
+                raise ThumbnailRenderError("render produced a nearly uniform frame")
         except Exception as exc:  # noqa: BLE001 - 다음 엔진으로 넘어간다
             attempts.append({"engine": engine, "error": f"{type(exc).__name__}: {exc}"[:300]})
             output.unlink(missing_ok=True)

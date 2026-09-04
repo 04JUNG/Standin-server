@@ -752,7 +752,9 @@ def refine(req: RefineRequest):
         return RefineResponse(
             pose_id=req.pose_id, view=req.view, refined=False,
             reason=reason, bvh_url=f"/pose/{req.pose_id}/bvh", bvh=None,
-            thumbnail=_refine_thumbnail(view=req.view, bvh_path=base),
+            thumbnail=_refine_thumbnail(
+                view=req.view, bvh_path=base, pose_id=req.pose_id, refined=False,
+            ),
             loss_base=None, loss_final=None, gain=None, backend="none",
             refine_version=(REFINE_V2_CODE_VERSION if CFG.refine_v2_enabled
                             else REFINE_CODE_VERSION),
