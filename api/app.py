@@ -165,6 +165,9 @@ async def lifespan(app: FastAPI):
         model_bundle = _ensure_pose_model_bundle()  # S3 bundle → local manifest
         pipeline = Pipeline(entries)                # VLM/검출/포즈 팩토리도 1회 초기화
         _check_backends(pipeline)                   # 팩토리 폴백 후 실제 인스턴스 검사
+        # production에서 converter 주소가 없으면 여기서 기동이 실패한다(옛 마네킹을
+        # 조용히 서빙하지 않는다). 개발은 경고 후 마네킹으로 폴백한다.
+        thumbnail_renderer = _build_thumbnail_renderer()
     except Exception as exc:
         # 기동 실패는 컨테이너가 뜨지 않는다는 뜻이고, 그 상태에서는 앱이 더 이상
         # 아무것도 보고할 수 없다. 죽기 전에 동기로 한 번 보낸다.
@@ -188,9 +191,6 @@ async def lifespan(app: FastAPI):
                  requestedPose=CFG.pose_backend, actualPose=actual_pose)
 
     quarantine = load_pose_quarantine(CFG)      # 정책 파일 오류는 기동 시 fail-closed
-    # production에서 converter 주소가 없으면 여기서 기동이 실패한다(옛 마네킹을
-    # 조용히 서빙하지 않는다). 개발은 경고 후 마네킹으로 폴백한다.
-    thumbnail_renderer = _build_thumbnail_renderer()
     STATE["thumbnail_renderer"] = thumbnail_renderer
     STATE["quarantined_pose_count"] = len(quarantine)
     STATE["pipeline"] = pipeline
