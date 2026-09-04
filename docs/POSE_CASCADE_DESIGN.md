@@ -120,6 +120,8 @@ SLOT_CROP_HARD_CAP=2
 다운로드/검증은 기본 300초 전체 예산과 S3/HTTP 요청당 최대 60초 제한을 사용하며,
 `pose_model_bundle.durationMs` 로그로 staging 콜드 스타트를 실측한다. ECS health-check
 grace period는 이후 current-X 초기화 시간까지 포함해 별도로 잡아야 한다.
+S3 socket 제한은 botocore client `Config`가 소유한다. 작은 응답이 이미 버퍼링된 경우
+하위 socket이 없을 수 있으므로 `StreamingBody.set_socket_timeout()`을 직접 호출하지 않는다.
 current-X는 기존 `RTMPoseModel` runtime 설정을 그대로 사용한다.
 
 ### 2.2 두 calibration 프로필의 분리 (D4)
