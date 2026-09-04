@@ -162,7 +162,24 @@ def test_model_download_stream_enforces_total_deadline() -> None:
         raise AssertionError("expired model download budget was accepted")
 
 
-def test_s3_download_has_bounded_socket_timeouts_and_no_hidden_retries() -> None:
+def test_copy_limited_never_mutates_botocore_streaming_body_socket() -> None:
+    class BufferedStreamingBody(io.BytesIO):
+        def set_socket_timeout(self, _timeout):
+            raise AttributeError("'NoneType' object has no attribute 'raw'")
+
+    output = io.BytesIO()
+    copied = _copy_limited(
+        BufferedStreamingBody(b"manifest"),
+        output,
+        max_bytes=32,
+        expected_size=8,
+        deadline=time.monotonic() + 10.0,
+    )
+    assert copied == 8
+    assert output.getvalue() == b"manifest"
+
+
+def test_s3_download_configures_client_timeouts_and_no_hidden_retries() -> None:
     captured: dict = {}
 
     class FakeConfig:

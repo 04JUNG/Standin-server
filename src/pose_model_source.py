@@ -83,10 +83,11 @@ def _copy_limited(
             )
     total = 0
     while True:
-        remaining = _remaining_seconds(deadline)
-        set_socket_timeout = getattr(source, "set_socket_timeout", None)
-        if remaining is not None and callable(set_socket_timeout):
-            set_socket_timeout(max(0.001, min(_REQUEST_TIMEOUT_SECONDS, remaining)))
+        # Socket limits belong to the HTTP/S3 client configuration. Calling
+        # botocore StreamingBody.set_socket_timeout() here can fail when the
+        # response's private urllib3 socket is no longer reachable (including
+        # after a small body has already been buffered).
+        _remaining_seconds(deadline)
         chunk = source.read(1024 * 1024)
         _remaining_seconds(deadline)
         if not chunk:
