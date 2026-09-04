@@ -97,8 +97,8 @@ def _activate_cycles() -> None:
         bpy.ops.preferences.addon_enable(module="cycles")
 
 
-def _image_has_contrast(image, *, minimum_delta: float = 0.05) -> bool:
-    """Reject an apparently successful headless render that is one flat colour.
+def _image_contrast_range(image) -> tuple[float, float]:
+    """Return sampled luminance extrema for an in-memory Blender image.
 
     Some EEVEE/GL failures still write a valid PNG. Sampling Blender's in-memory
     render result lets the caller try the next configured engine before that
@@ -106,7 +106,7 @@ def _image_has_contrast(image, *, minimum_delta: float = 0.05) -> bool:
     """
     width, height = (int(value) for value in image.size)
     if width <= 0 or height <= 0:
-        return False
+        return (0.0, 0.0)
     pixels = image.pixels
     step_x = max(1, width // 32)
     step_y = max(1, height // 32)
@@ -122,6 +122,13 @@ def _image_has_contrast(image, *, minimum_delta: float = 0.05) -> bool:
             )
             darkest = min(darkest, luminance)
             lightest = max(lightest, luminance)
+    if darkest == float("inf") or lightest == float("-inf"):
+        return (0.0, 0.0)
+    return darkest, lightest
+
+
+def _image_has_contrast(image, *, minimum_delta: float = 0.05) -> bool:
+    darkest, lightest = _image_contrast_range(image)
     return lightest - darkest >= minimum_delta
 
 
@@ -294,8 +301,15 @@ def render_artifact_view(
             if not output.is_file() or output.stat().st_size <= 0:
                 raise ThumbnailRenderError("render finished without writing a PNG")
             render_result = bpy.data.images.get("Render Result")
-            if render_result is None or not _image_has_contrast(render_result):
-                raise ThumbnailRenderError("render produced a nearly uniform frame")
+            if render_result is None:
+                raise ThumbnailRenderError("render produced no Render Result")
+            darkest, lightest = _image_contrast_range(render_result)
+            if lightest - darkest < 0.05:
+                raise ThumbnailRenderError(
+                    "render produced a nearly uniform frame "
+                    f"(sampled_luminance_min={darkest:.6f}, "
+                    f"max={lightest:.6f}, delta={lightest - darkest:.6f})"
+                )
         except Exception as exc:  # noqa: BLE001 - 다음 엔진으로 넘어간다
             attempts.append({"engine": engine, "error": f"{type(exc).__name__}: {exc}"[:300]})
             output.unlink(missing_ok=True)
