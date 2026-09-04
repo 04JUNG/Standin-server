@@ -24,10 +24,10 @@ EMBED_TEXTURES = False
 THUMBNAIL_RENDERER_VERSION = "fbx-anatomical-v1"
 THUMBNAIL_VIEWS = ("front", "three_quarter", "side", "back")
 THUMBNAIL_CAMERA_CONVENTION = "anatomical_{view}_from_shoulders_hips"
-THUMBNAIL_RENDER_RESOLUTION = 640      # 라이브러리 빌드와 동일한 원본 렌더 해상도
+THUMBNAIL_RENDER_RESOLUTION = 256      # live preview 최종 크기(CPU Cycles 지연 상한)
 THUMBNAIL_MIN_RENDER_RESOLUTION = 64
 THUMBNAIL_MAX_RENDER_RESOLUTION = 1024
-THUMBNAIL_RENDER_SAMPLES = 16          # 256px로 줄이므로 라이브러리의 64보다 적어도 충분
+THUMBNAIL_RENDER_SAMPLES = 8           # headless CPU Cycles의 실시간 preview 예산
 THUMBNAIL_MAX_RENDER_SAMPLES = 256
 # 앞에서부터 시도한다. headless 컨테이너에서 EEVEE(GL)가 못 뜨면 Cycles(CPU)로 넘어간다.
 THUMBNAIL_ENGINES = ("BLENDER_EEVEE", "CYCLES")

@@ -433,7 +433,7 @@ def test_render_thumbnail_returns_service_png_by_default(tmp_path):
     assert response.headers["X-Standin-Thumbnail-Renderer"] == "fbx-anatomical-v1"
     assert response.headers["X-Standin-Thumbnail-View"] == "front"
     assert response.headers["X-Standin-Thumbnail-Engine"] == "BLENDER_EEVEE"
-    assert response.headers["X-Standin-Thumbnail-Render-Resolution"] == "640"
+    assert response.headers["X-Standin-Thumbnail-Render-Resolution"] == "256"
     assert response.headers["X-Standin-Thumbnail-Size"] == "256"
     assert response.headers["X-Standin-Solver-Version"] == "chain-transport-v3.2.5"
     assert response.headers["X-Standin-Source-BVH-SHA256"] == hashlib.sha256(VALID_BVH).hexdigest()

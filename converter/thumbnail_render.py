@@ -88,6 +88,15 @@ def _body_axes(armature):
 def available_engines() -> set[str]:
     import bpy
 
+    # Official Blender builds ship Cycles as an add-on. In a fresh background
+    # process it may not be registered in RenderSettings yet, so activate it
+    # before checking the enum. This provides the CPU fallback when headless
+    # EEVEE writes a flat frame without raising an exception.
+    if "cycles" not in bpy.context.preferences.addons:
+        try:
+            bpy.ops.preferences.addon_enable(module="cycles")
+        except Exception:
+            pass
     prop = bpy.types.RenderSettings.bl_rna.properties["engine"]
     return {item.identifier for item in prop.enum_items}
 

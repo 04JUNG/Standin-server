@@ -85,8 +85,8 @@ def test_job_rejects_unlocked_or_wrongly_typed_options(tmp_path, field, value):
 def _thumbnail(tmp_path: Path, **overrides) -> dict:
     block = {
         "view": "front",
-        "resolution": 640,
-        "samples": 16,
+        "resolution": 256,
+        "samples": 8,
         "engines": ["BLENDER_EEVEE", "CYCLES"],
         "output_path": str(tmp_path / "thumbnail.png"),
     }
