@@ -98,11 +98,12 @@ def _activate_cycles() -> None:
 
 
 def _image_contrast_range(image) -> tuple[float, float]:
-    """Return sampled luminance extrema for an in-memory Blender image.
+    """Return sampled luminance extrema for a Blender image.
 
-    Some EEVEE/GL failures still write a valid PNG. Sampling Blender's in-memory
-    render result lets the caller try the next configured engine before that
-    unusable frame leaves the converter.
+    Some EEVEE/GL failures still write a valid but flat PNG. The caller reloads
+    the written file before using this helper because background Blender can
+    expose an all-zero ``Render Result`` buffer even when ``write_still`` wrote
+    the actual display-transformed pixels correctly.
     """
     width, height = (int(value) for value in image.size)
     if width <= 0 or height <= 0:
@@ -300,10 +301,11 @@ def render_artifact_view(
             bpy.ops.render.render(write_still=True)
             if not output.is_file() or output.stat().st_size <= 0:
                 raise ThumbnailRenderError("render finished without writing a PNG")
-            render_result = bpy.data.images.get("Render Result")
-            if render_result is None:
-                raise ThumbnailRenderError("render produced no Render Result")
-            darkest, lightest = _image_contrast_range(render_result)
+            written_image = bpy.data.images.load(str(output.resolve()), check_existing=False)
+            try:
+                darkest, lightest = _image_contrast_range(written_image)
+            finally:
+                bpy.data.images.remove(written_image)
             if lightest - darkest < 0.05:
                 raise ThumbnailRenderError(
                     "render produced a nearly uniform frame "
