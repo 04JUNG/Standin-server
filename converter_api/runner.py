@@ -33,6 +33,13 @@ from converter.protocol import (
     RETARGET_SHA256,
     SOLVER_MANIFEST_SHA256,
     SOLVER_VERSION,
+    THUMBNAIL_ENGINES,
+    THUMBNAIL_MAX_RENDER_RESOLUTION,
+    THUMBNAIL_MAX_RENDER_SAMPLES,
+    THUMBNAIL_MIN_RENDER_RESOLUTION,
+    THUMBNAIL_RENDER_RESOLUTION,
+    THUMBNAIL_RENDER_SAMPLES,
+    THUMBNAIL_VIEWS,
 )
 
 
@@ -62,6 +69,12 @@ class WorkerIntegrityError(RunnerError):
     code = "WORKER_INTEGRITY_ERROR"
 
 
+class ThumbnailRenderFailedError(RunnerError):
+    """변환은 됐지만 Blender가 preview PNG를 쓰지 못했다(모든 엔진 실패)."""
+
+    code = "THUMBNAIL_RENDER_FAILED"
+
+
 @dataclass(frozen=True)
 class BlenderInfo:
     version: str
@@ -80,6 +93,45 @@ def _env_bool(name: str, default: bool = False) -> bool:
     raise ValueError(f"{name} must be a boolean")
 
 
+def _env_engines(name: str) -> tuple[str, ...]:
+    raw = os.getenv(name)
+    if raw is None or not raw.strip():
+        return THUMBNAIL_ENGINES
+    engines = tuple(item.strip() for item in raw.split(",") if item.strip())
+    if not engines or any(engine not in THUMBNAIL_ENGINES for engine in engines):
+        raise ValueError(f"{name} must list engines from {list(THUMBNAIL_ENGINES)}")
+    if len(set(engines)) != len(engines):
+        raise ValueError(f"{name} must not repeat an engine")
+    return engines
+
+
+@dataclass(frozen=True)
+class ThumbnailRequest:
+    """한 변환에 얹는 선택 렌더 단계. 값은 runner 설정에서만 오고 HTTP 입력이 아니다."""
+
+    view: str = "front"
+    resolution: int = THUMBNAIL_RENDER_RESOLUTION
+    samples: int = THUMBNAIL_RENDER_SAMPLES
+    engines: tuple[str, ...] = THUMBNAIL_ENGINES
+
+    def __post_init__(self) -> None:
+        if self.view not in THUMBNAIL_VIEWS:
+            raise ValueError(f"unsupported thumbnail view: {self.view}")
+        if (
+            type(self.resolution) is not int
+            or not THUMBNAIL_MIN_RENDER_RESOLUTION
+            <= self.resolution
+            <= THUMBNAIL_MAX_RENDER_RESOLUTION
+        ):
+            raise ValueError("thumbnail resolution is out of range")
+        if type(self.samples) is not int or not 1 <= self.samples <= THUMBNAIL_MAX_RENDER_SAMPLES:
+            raise ValueError("thumbnail samples are out of range")
+        if not self.engines or any(engine not in THUMBNAIL_ENGINES for engine in self.engines):
+            raise ValueError("thumbnail engines must come from the frozen engine list")
+        if len(set(self.engines)) != len(self.engines):
+            raise ValueError("thumbnail engines must be unique")
+
+
 @dataclass(frozen=True)
 class RunnerSettings:
     blender_binary: str
@@ -92,6 +144,9 @@ class RunnerSettings:
     temp_root: Path | None = None
     process_env: Mapping[str, str] | None = None
     force_exact_v324: bool = False
+    thumbnail_resolution: int = THUMBNAIL_RENDER_RESOLUTION
+    thumbnail_samples: int = THUMBNAIL_RENDER_SAMPLES
+    thumbnail_engines: tuple[str, ...] = THUMBNAIL_ENGINES
 
     @classmethod
     def from_env(cls, repo_root: Path | None = None) -> "RunnerSettings":
@@ -117,6 +172,21 @@ class RunnerSettings:
             ),
             temp_root=Path(temp_value).resolve() if temp_value else None,
             force_exact_v324=_env_bool("CONVERTER_FORCE_EXACT_V324"),
+            thumbnail_resolution=int(os.getenv(
+                "CONVERTER_THUMBNAIL_RENDER_RESOLUTION", str(THUMBNAIL_RENDER_RESOLUTION)
+            )),
+            thumbnail_samples=int(os.getenv(
+                "CONVERTER_THUMBNAIL_RENDER_SAMPLES", str(THUMBNAIL_RENDER_SAMPLES)
+            )),
+            thumbnail_engines=_env_engines("CONVERTER_THUMBNAIL_ENGINES"),
+        )
+
+    def thumbnail_request(self, view: str) -> ThumbnailRequest:
+        return ThumbnailRequest(
+            view=view,
+            resolution=self.thumbnail_resolution,
+            samples=self.thumbnail_samples,
+            engines=self.thumbnail_engines,
         )
 
 
@@ -130,6 +200,9 @@ class ConversionResult:
     queue_wait_ms: float = 0.0
     execution_ms: float = 0.0
     task_cold_start: bool = False
+    # 썸네일을 요청한 변환에서만 채운다. 원본 렌더 해상도의 PNG 바이트다.
+    thumbnail_png: bytes | None = None
+    thumbnail_report: dict[str, Any] | None = None
 
 
 def sha256_file(path: Path) -> str:
@@ -286,6 +359,8 @@ class BlenderRunner:
         message = str(report.get("error_message") or "conversion failed")[:300]
         if code in {"invalid_input", "conversion_rejected"}:
             return ConversionRejectedError(message, report=report)
+        if code == "thumbnail_render_failed":
+            return ThumbnailRenderFailedError(message, report=report)
         return WorkerIntegrityError("Blender worker failed", report=report)
 
     @staticmethod
@@ -309,6 +384,8 @@ class BlenderRunner:
         mirror: bool,
         returncode: int,
         combined_log: str,
+        thumbnail: ThumbnailRequest | None = None,
+        thumbnail_path: Path | None = None,
     ) -> ConversionResult:
         if not report.get("ok"):
             raise self._report_error(report)
@@ -365,13 +442,78 @@ class BlenderRunner:
                 "artifact size does not match worker report", report=report
             )
         artifact = output_path.read_bytes()
+        thumbnail_png: bytes | None = None
+        thumbnail_report: dict[str, Any] | None = None
+        if thumbnail is not None:
+            assert thumbnail_path is not None
+            thumbnail_png, thumbnail_report = self._validate_thumbnail(
+                report=report,
+                request=thumbnail,
+                png_path=thumbnail_path,
+                temp_dir=temp_dir,
+            )
         return ConversionResult(
             conversion_id=conversion_id,
             artifact=artifact,
             artifact_sha256=artifact_sha256,
             source_bvh_sha256=source_bvh_sha256,
             report=report,
+            thumbnail_png=thumbnail_png,
+            thumbnail_report=thumbnail_report,
         )
+
+    def _validate_thumbnail(
+        self,
+        *,
+        report: dict[str, Any],
+        request: ThumbnailRequest,
+        png_path: Path,
+        temp_dir: Path,
+    ) -> tuple[bytes, dict[str, Any]]:
+        """worker가 보고한 preview가 요청과 일치하고 tempdir 안에 있는지 확인한다."""
+        rendered = report.get("thumbnail")
+        if not isinstance(rendered, dict):
+            raise WorkerIntegrityError(
+                "worker report lacks the requested thumbnail", report=report
+            )
+        if not self._inside(png_path, temp_dir) or png_path.is_symlink():
+            raise WorkerIntegrityError(
+                "thumbnail output escaped the job tempdir", report=report
+            )
+        if rendered.get("path") != str(png_path):
+            raise WorkerIntegrityError(
+                "thumbnail report path does not match the job", report=report
+            )
+        if not png_path.is_file() or png_path.stat().st_size <= 0:
+            raise WorkerIntegrityError(
+                "thumbnail PNG is missing or empty", report=report
+            )
+        expected = {
+            "view": request.view,
+            "resolution": request.resolution,
+            "samples": request.samples,
+        }
+        mismatched = [key for key, value in expected.items() if rendered.get(key) != value]
+        if rendered.get("engine") not in request.engines:
+            mismatched.append("engine")
+        if mismatched:
+            raise WorkerIntegrityError(
+                f"thumbnail report mismatch: {','.join(sorted(mismatched))}",
+                report=report,
+            )
+        png_sha256 = sha256_file(png_path)
+        if rendered.get("sha256") != png_sha256:
+            raise WorkerIntegrityError(
+                "thumbnail SHA256 does not match worker report", report=report
+            )
+        if rendered.get("size") != png_path.stat().st_size:
+            raise WorkerIntegrityError(
+                "thumbnail size does not match worker report", report=report
+            )
+        data = png_path.read_bytes()
+        if not data.startswith(b"\x89PNG\r\n\x1a\n"):
+            raise WorkerIntegrityError("thumbnail output is not a PNG", report=report)
+        return data, {key: value for key, value in rendered.items() if key != "path"}
 
     def convert(
         self,
@@ -382,11 +524,14 @@ class BlenderRunner:
         character_sha256: str,
         conversion_id: str,
         mirror: bool = False,
+        thumbnail: ThumbnailRequest | None = None,
     ) -> ConversionResult:
         if not bvh_bytes:
             raise ConversionRejectedError("BVH upload is empty")
         if type(mirror) is not bool:
             raise ConversionRejectedError("mirror must be boolean")
+        if thumbnail is not None and not isinstance(thumbnail, ThumbnailRequest):
+            raise ValueError("thumbnail must be a ThumbnailRequest")
         queue_started = time.monotonic()
         self._process_slots.acquire()
         queue_wait_ms = (time.monotonic() - queue_started) * 1000.0
@@ -401,6 +546,7 @@ class BlenderRunner:
                 character_sha256=character_sha256,
                 conversion_id=conversion_id,
                 mirror=mirror,
+                thumbnail=thumbnail,
             )
         finally:
             execution_ms = (time.monotonic() - execution_started) * 1000.0
@@ -423,6 +569,7 @@ class BlenderRunner:
         character_sha256: str,
         conversion_id: str,
         mirror: bool,
+        thumbnail: ThumbnailRequest | None = None,
     ) -> ConversionResult:
         if not character_path.is_file() or character_path.suffix.lower() != ".fbx":
             raise WorkerIntegrityError("character artifact is not a regular FBX file")
@@ -442,6 +589,7 @@ class BlenderRunner:
             output_path = temp_dir / "artifact.fbx"
             report_path = temp_dir / "report.json"
             job_path = temp_dir / "job.json"
+            thumbnail_path = temp_dir / "thumbnail.png"
             bvh_path.write_bytes(bvh_bytes)
             source_bvh_sha256 = hashlib.sha256(bvh_bytes).hexdigest()
             job = {
@@ -460,6 +608,13 @@ class BlenderRunner:
                 "apply_root_translation": APPLY_ROOT_TRANSLATION,
                 "embed_textures": EMBED_TEXTURES,
                 "force_exact_v324": self.settings.force_exact_v324,
+                "thumbnail": None if thumbnail is None else {
+                    "view": thumbnail.view,
+                    "resolution": thumbnail.resolution,
+                    "samples": thumbnail.samples,
+                    "engines": list(thumbnail.engines),
+                    "output_path": str(thumbnail_path),
+                },
             }
             job_path.write_text(
                 json.dumps(job, sort_keys=True, separators=(",", ":")) + "\n",
@@ -500,6 +655,8 @@ class BlenderRunner:
                 mirror=mirror,
                 returncode=process.returncode,
                 combined_log=combined_log,
+                thumbnail=thumbnail,
+                thumbnail_path=thumbnail_path,
             )
 
 
@@ -512,6 +669,8 @@ __all__ = [
     "ConversionTimeoutError",
     "RunnerError",
     "RunnerSettings",
+    "ThumbnailRenderFailedError",
+    "ThumbnailRequest",
     "WorkerIntegrityError",
     "sha256_file",
 ]

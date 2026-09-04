@@ -8,8 +8,10 @@ import hashlib
 import io
 import json
 from pathlib import Path
+import struct
 import uuid
 import zipfile
+import zlib
 
 
 def _args() -> argparse.Namespace:
@@ -20,7 +22,59 @@ def _args() -> argparse.Namespace:
     parser.add_argument("--fbx", type=Path, required=True)
     parser.add_argument("--bundle-headers", type=Path, required=True)
     parser.add_argument("--bundle", type=Path, required=True)
+    parser.add_argument("--thumbnail-headers", type=Path)
+    parser.add_argument("--thumbnail", type=Path)
     return parser.parse_args()
+
+
+def _png_pixels(data: bytes) -> tuple[int, int, set[bytes]]:
+    """표준 라이브러리만으로 8-bit RGB PNG를 풀어 크기와 색 집합을 돌려준다."""
+    assert data.startswith(b"\x89PNG\r\n\x1a\n"), "thumbnail is not a PNG"
+    offset = 8
+    width = height = 0
+    channels = 0
+    idat = bytearray()
+    while offset < len(data):
+        length, kind = struct.unpack(">I4s", data[offset:offset + 8])
+        body = data[offset + 8:offset + 8 + length]
+        if kind == b"IHDR":
+            width, height, depth, color = struct.unpack(">IIBB", body[:10])
+            assert depth == 8, f"unexpected PNG bit depth {depth}"
+            assert color in (2, 6), f"unexpected PNG color type {color}"
+            channels = 3 if color == 2 else 4
+        elif kind == b"IDAT":
+            idat.extend(body)
+        elif kind == b"IEND":
+            break
+        offset += 12 + length
+    raw = zlib.decompress(bytes(idat))
+    stride = width * channels
+    colors: set[bytes] = set()
+    previous = bytearray(stride)
+    position = 0
+    for _row in range(height):
+        filter_type = raw[position]
+        line = bytearray(raw[position + 1:position + 1 + stride])
+        position += 1 + stride
+        for index in range(stride):
+            left = line[index - channels] if index >= channels else 0
+            up = previous[index]
+            upper_left = previous[index - channels] if index >= channels else 0
+            if filter_type == 1:
+                line[index] = (line[index] + left) & 0xFF
+            elif filter_type == 2:
+                line[index] = (line[index] + up) & 0xFF
+            elif filter_type == 3:
+                line[index] = (line[index] + ((left + up) >> 1)) & 0xFF
+            elif filter_type == 4:
+                paeth = left + up - upper_left
+                pa, pb, pc = abs(paeth - left), abs(paeth - up), abs(paeth - upper_left)
+                predictor = left if pa <= pb and pa <= pc else up if pb <= pc else upper_left
+                line[index] = (line[index] + predictor) & 0xFF
+        for index in range(0, stride, channels):
+            colors.add(bytes(line[index:index + 3]))
+        previous = line
+    return width, height, colors
 
 
 def _headers(path: Path) -> dict[str, str]:
@@ -95,6 +149,36 @@ def main() -> int:
     ]["fbx"]["sha256"]
     uuid.UUID(bundle_headers["x-standin-conversion-id"])
     assert int(bundle_headers["content-length"]) == len(bundle_bytes)
+
+    if args.thumbnail is not None or args.thumbnail_headers is not None:
+        assert args.thumbnail is not None and args.thumbnail_headers is not None
+        thumbnail_headers = _headers(args.thumbnail_headers)
+        thumbnail = args.thumbnail.read_bytes()
+        assert thumbnail_headers["content-type"].startswith("image/png")
+        assert thumbnail_headers["x-standin-thumbnail-renderer"] == "fbx-anatomical-v1"
+        assert thumbnail_headers["x-standin-thumbnail-view"] == "front"
+        assert thumbnail_headers["x-standin-thumbnail-size"] == "256"
+        assert thumbnail_headers["x-standin-thumbnail-engine"] in {"BLENDER_EEVEE", "CYCLES"}
+        assert thumbnail_headers["x-standin-thumbnail-sha256"] == hashlib.sha256(
+            thumbnail
+        ).hexdigest()
+        assert thumbnail_headers["x-standin-source-bvh-sha256"] == hashlib.sha256(
+            bvh
+        ).hexdigest()
+        uuid.UUID(thumbnail_headers["x-standin-conversion-id"])
+        assert int(thumbnail_headers["content-length"]) == len(thumbnail)
+        width, height, colors = _png_pixels(thumbnail)
+        assert (width, height) == (256, 256), (width, height)
+        # 회색 배경 위에 어두운 캐릭터가 있어야 한다. 한 색이면 GL 없는 컨테이너에서
+        # EEVEE가 검은/빈 프레임을 쓴 것이고, 그 그림은 preview로 쓸 수 없다.
+        assert len(colors) >= 32, f"thumbnail is nearly uniform ({len(colors)} colors)"
+        assert any(sum(color) / 3 > 120 for color in colors), "no background tone"
+        assert any(sum(color) / 3 < 90 for color in colors), "no character silhouette"
+        print(
+            "[PASS] converter container thumbnail HTTP smoke "
+            f"(engine={thumbnail_headers['x-standin-thumbnail-engine']}, colors={len(colors)})"
+        )
+
     print("[PASS] converter container FBX and BVH+FBX bundle HTTP smoke")
     return 0
 

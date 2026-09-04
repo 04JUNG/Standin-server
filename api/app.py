@@ -3,7 +3,8 @@ FastAPI 레이어 — 도원의 Python 추론 서버.
 
 경계: [앱 서버 팀] --HTTP--> [이 서비스]  (문서화된 OpenAPI 계약 = /docs)
   POST /analyze         멀티파트 PNG 러프 컷 → CutResult(JSON)
-  POST /refine          선택 포즈 → 조정 BVH + 매칭 시점 PNG(JSON 인라인)
+  POST /refine          선택 포즈 → 조정 BVH + 매칭 시점 preview(JSON 인라인,
+                        converter의 V3.2.5 FBX 남성 모델 렌더 = 후보 썸네일과 동일)
   GET  /pose/{id}/bvh   후보 pose_id → 라이브러리 BVH 파일(동원 내보내기 팀이 소비)
   GET  /healthz         기동 확인
 
@@ -21,7 +22,6 @@ import json
 import mimetypes
 import os
 import re
-import tempfile
 import time
 import uuid
 from dataclasses import asdict
@@ -52,9 +52,11 @@ from src.pose_quarantine import (load_pose_quarantine, pose_quarantine_sha256,
 from src.repo import (FEATURE_VERSION, build_db, load_entries,
                       get_bvh_path, get_pose_meta)
 from src.thumbnails import THUMBNAIL_VIEWS, find_thumbnail, thumbnail_url
-from src.thumbnail_renderer import (
-    THUMBNAIL_RENDERER_VERSION,
-    render_bvh_thumbnail,
+from src.thumbnail_renderer import render_bvh_thumbnail
+from src.refine_thumbnail import (
+    RefineThumbnailRenderer,
+    ThumbnailSource,
+    build_refine_thumbnail_renderer,
 )
 from src.tracing import capture_trace, span
 from src.vlm.client import VLMUnavailable
@@ -186,6 +188,10 @@ async def lifespan(app: FastAPI):
                  requestedPose=CFG.pose_backend, actualPose=actual_pose)
 
     quarantine = load_pose_quarantine(CFG)      # 정책 파일 오류는 기동 시 fail-closed
+    # production에서 converter 주소가 없으면 여기서 기동이 실패한다(옛 마네킹을
+    # 조용히 서빙하지 않는다). 개발은 경고 후 마네킹으로 폴백한다.
+    thumbnail_renderer = _build_thumbnail_renderer()
+    STATE["thumbnail_renderer"] = thumbnail_renderer
     STATE["quarantined_pose_count"] = len(quarantine)
     STATE["pipeline"] = pipeline
     STATE["db_path"] = DB_PATH
@@ -200,7 +206,8 @@ async def lifespan(app: FastAPI):
             "fetched": model_bundle.fetched,
         }
     log_info("startup", "준비 완료", poseCount=len(entries), env=CFG.app_env,
-             vlm=actual_vlm, pose=actual_pose, libraryVersion=CFG.pose_library_version)
+             vlm=actual_vlm, pose=actual_pose, libraryVersion=CFG.pose_library_version,
+             thumbnailRenderer=thumbnail_renderer.name)
     alerts.notify(
         "P3", "STARTUP",
         f"추론 서버 기동 — 포즈 {len(entries)}개, vlm={actual_vlm}, pose={actual_pose}",
@@ -353,6 +360,11 @@ def healthz():
         "pose_count": pose_count,
         "quarantined_pose_count": STATE.get("quarantined_pose_count", 0),
         "refine": capability,
+        "refine_thumbnail": {
+            "renderer": getattr(STATE.get("thumbnail_renderer"), "name", None),
+            "configured": CFG.thumbnail_renderer,
+            "format": CFG.thumbnail_format,
+        },
     }
     return body if ok else Response(
         content=json.dumps(body), status_code=503, media_type="application/json"
@@ -606,44 +618,77 @@ def _file_sha256(path: str) -> str:
     return digest.hexdigest()
 
 
+def _build_thumbnail_renderer() -> RefineThumbnailRenderer:
+    """env(REFINE_THUMBNAIL_RENDERER)로 구현을 고른다.
+
+    마네킹 경로는 모듈 전역 ``render_bvh_thumbnail``을 **호출 시점에** 찾는다 —
+    테스트가 그 이름을 바꿔 끼워 렌더 실패를 흉내 내기 때문이다.
+    """
+    return build_refine_thumbnail_renderer(
+        CFG, mannequin_render=lambda path, view: render_bvh_thumbnail(path, view),
+    )
+
+
+def _thumbnail_renderer() -> RefineThumbnailRenderer:
+    """lifespan이 만든 렌더러. lifespan 없이 함수를 직접 부르는 테스트는 그때 만든다."""
+    renderer = STATE.get("thumbnail_renderer")
+    if renderer is None:
+        renderer = _build_thumbnail_renderer()
+        STATE["thumbnail_renderer"] = renderer
+    return renderer
+
+
 def _refine_thumbnail(
-    *, view: str, bvh_path: Optional[str] = None, bvh_text: Optional[str] = None
+    *,
+    view: str,
+    bvh_path: Optional[str] = None,
+    bvh_text: Optional[str] = None,
+    pose_id: Optional[str] = None,
+    refined: Optional[bool] = None,
 ) -> Optional[RefineThumbnailOut]:
     """Render the selected candidate view without persisting a refined artifact.
+
+    후보 썸네일과 같은 렌더러(converter의 V3.2.5 FBX 남성 모델 렌더)로 그린다.
+    ``refined``를 생략하면 ``bvh_text``가 있는 쪽을 조정본으로 본다.
 
     렌더 실패는 **오류가 아니다.** 썸네일은 확인 화면이 쓰는 부가 산출물이고 조정
     자체와 무관하다. 여기서 예외를 던지면 그림 한 장 때문에 방금 계산한 조정 결과가
     통째로 버려지고(소비자는 베이스로 전환한다) 사용자는 더 나쁜 포즈를 저장하게 된다.
     그래서 실패는 None으로 수렴시키고 로그로만 남긴다 — 화면은 후보 썸네일로 폴백한다.
     """
-    if (bvh_path is None) == (bvh_text is None):
-        raise ValueError("provide exactly one thumbnail BVH source")
-
+    # 호출측 버그(소스 둘/없음)는 여기서 즉시 터져야 한다 — 렌더 실패와 다른 이야기다.
+    source = ThumbnailSource(
+        view=view, bvh_path=bvh_path, bvh_text=bvh_text, pose_id=pose_id,
+        refined=(bvh_text is not None) if refined is None else bool(refined),
+    )
+    started = time.monotonic()
     try:
-        if bvh_text is None:
-            image = render_bvh_thumbnail(str(bvh_path), view)
-        else:
-            with tempfile.TemporaryDirectory(prefix="standin-refine-thumbnail-") as directory:
-                temporary_bvh = os.path.join(directory, "refined.bvh")
-                with open(temporary_bvh, "w", encoding="utf-8", newline="\n") as sink:
-                    sink.write(bvh_text)
-                image = render_bvh_thumbnail(temporary_bvh, view)
-        encoded = io.BytesIO()
-        image.save(encoded, format="PNG", optimize=True)
+        renderer = _thumbnail_renderer()
+        rendered = renderer.render(source)
     except Exception:
-        # 좁게 잡지 않는다. 렌더러·PIL·파일시스템 어느 층에서 무엇이 나오든 결론은
-        # 같다("그림 없음"). 예외 종류를 빠뜨리면 그때마다 refine이 통째로 실패한다.
+        # 좁게 잡지 않는다. 렌더러·HTTP·PIL·파일시스템 어느 층에서 무엇이 나오든
+        # 결론은 같다("그림 없음"). 예외 종류를 빠뜨리면 그때마다 refine이 통째로 실패한다.
         log_warn("refine_thumbnail_failed",
                  "최종 결과를 썸네일로 렌더하지 못해 그림 없이 응답한다",
                  route="/refine", view=view,
-                 source="refined" if bvh_text is not None else "base",
+                 source="refined" if source.refined else "base",
+                 renderer=getattr(STATE.get("thumbnail_renderer"), "name", "unbuilt"),
+                 elapsedMs=round((time.monotonic() - started) * 1000.0, 1),
                  exc_info=True)
         return None
 
+    log_info("refine_thumbnail", "preview 준비",
+             route="/refine", view=view, source="refined" if source.refined else "base",
+             origin=rendered.origin, renderer=rendered.renderer_version,
+             mediaType=rendered.media_type, bytes=len(rendered.data),
+             elapsedMs=round((time.monotonic() - started) * 1000.0, 1))
     return RefineThumbnailOut(
         view=view,
-        data=base64.b64encode(encoded.getvalue()).decode("ascii"),
-        renderer_version=THUMBNAIL_RENDERER_VERSION,
+        media_type=rendered.media_type,
+        data=base64.b64encode(rendered.data).decode("ascii"),
+        width=rendered.width,
+        height=rendered.height,
+        renderer_version=rendered.renderer_version,
     )
 
 
@@ -807,9 +852,13 @@ def refine(req: RefineRequest):
         bvh_url=f"/pose/{req.pose_id}/bvh",
         bvh=res.bvh_text if res.refined else None,
         thumbnail=(
-            _refine_thumbnail(view=req.view, bvh_text=res.bvh_text)
+            _refine_thumbnail(
+                view=req.view, bvh_text=res.bvh_text, pose_id=req.pose_id, refined=True,
+            )
             if res.refined
-            else _refine_thumbnail(view=req.view, bvh_path=base)
+            else _refine_thumbnail(
+                view=req.view, bvh_path=base, pose_id=req.pose_id, refined=False,
+            )
         ),
         loss_base=None if np.isnan(res.loss_base) else res.loss_base,
         loss_final=None if np.isnan(res.loss_final) else res.loss_final,

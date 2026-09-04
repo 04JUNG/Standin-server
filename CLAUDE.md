@@ -24,6 +24,8 @@ BVH_DIR=data/bvh python scripts/build_db.py   # 실 BVH 폴더 → SQLite
 uvicorn api.app:app --reload          # http://127.0.0.1:8000/docs 에서 계약 확인
 #   POST /analyze (멀티파트 PNG) → CutResult / GET /pose/{id}/bvh / GET /healthz
 #   POST /refine (고른 후보 1개를 러프에 맞춰 조정) → 응답 bvh 필드에 조정본 본문
+#   /refine 응답 thumbnail은 converter 서비스(/render-thumbnail, V3.2.5 FBX 남성 모델)가
+#   그린다 → 로컬은 REFINE_THUMBNAIL_CONVERTER_URL 없이 옛 마네킹으로 폴백(경고 로그)
 REFINE_ENABLED=0 uvicorn api.app:app   # refine 비상 스위치(시연 중 이상 동작 시)
 #   DB_PATH env로 위치 지정(동기화 폴더 금지 — SQLite 락). 기본 data/poses.db
 ```
@@ -107,6 +109,8 @@ webtoon-pose-mvp/
    ├─ bvh.py              BVH 파싱+FK+관절명→COCO17 매핑(라이브러리·검수 공용 소스)
    ├─ features.py         스켈레톤→정규화 피처(쿼리·라이브러리 공용, 반드시 동일)
    ├─ refine.py           [10] 선택 포즈 미세조정 — 팔·다리 회전만, 안전 게이트로 폐기 판정
+   ├─ refine_thumbnail.py  /refine preview 렌더러 — converter(/render-thumbnail, 후보 썸네일과 동일) | mannequin(옛 2D) + env 팩토리
+   ├─ thumbnail_renderer.py 옛 2D 마네킹 렌더러(warm-mannequin-v1) — 배치 스크립트·비상 복구용
    ├─ descriptor.py       [6] VLM 태그 + 피처 결합(JSON, LLM 불필요)
    ├─ library.py          [7] 3D→다중카메라 2D 투영 색인(합성/실BVH)
    ├─ repo.py             DB 저장소(SQLite): 스키마·feature BLOB·bvh 경로 레지스트리

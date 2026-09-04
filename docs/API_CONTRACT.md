@@ -51,7 +51,7 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
 | `GET` | `/pose/{pose_id}/bvh` | 경로 파라미터 | `application/octet-stream` | 동원 내보내기 |
 | `POST` | `/export-order` | `ExportOrderRequest` | `ExportOrder` | base-only legacy 주문서 (→ `EXPORT_CONTRACT.md`) |
 | `GET` | `/docs` | — | OpenAPI UI | 사람(계약 확인) |
-| `POST` | `/refine` | `RefineRequest` | `RefineResponse` | 앱 서버 → 조정된 BVH와 후보 매칭 시점 PNG 본문(응답 `bvh`, `thumbnail`) |
+| `POST` | `/refine` | `RefineRequest` | `RefineResponse` | 앱 서버 → 조정된 BVH와 후보 매칭 시점 preview 이미지 본문(응답 `bvh`, `thumbnail`) |
 
 > `PersonOut`에 **`keypoints`(17×2, 이미지 픽셀)** · **`scores`(17)** 가 포함된다.
 > `/analyze`가 이미 추출하는 값이라 연산 추가는 0이며, `/refine`을 순수 함수로 만들기 위한 것이다.
@@ -94,7 +94,7 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
     "data": "iVBORw0KGgoAAA...",
     "width": 256,
     "height": 256,
-    "renderer_version": "warm-mannequin-v1"
+    "renderer_version": "fbx-anatomical-v1/standin-master-v2"
   },
   "loss_base": 0.599, "loss_final": 0.004, "gain": 0.993,
   "backend": "scipy+numpy",
@@ -143,11 +143,28 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
 두 경우를 구분하지 않고 동작한다("좋아지거나, 그대로"). `reason` 값 목록은
 `REFINE_DESIGN.md`의 안전 처리 기준.
 
-`thumbnail`은 최종 결과를 기존 후보와 같은 `warm-mannequin-v1` 코드 및 요청의 `view`로 그린
-256×256 PNG다. 즉 사용자가 고른 후보 썸네일의 방향을 유지한다. `refined=true`면 조정 BVH,
-`false`면 정확한 베이스 BVH를 렌더링하므로 UI는
-두 경우 모두 `data:image/png;base64,{thumbnail.data}`로 표시할 수 있다. 추론 서버에는 PNG나
-조정 BVH를 영속 저장하지 않는다.
+`thumbnail`은 최종 결과를 **후보 썸네일과 같은 렌더러**로 요청의 `view`에서 그린 256×256
+이미지다. 즉 사용자가 고른 후보 썸네일의 방향을 유지하고, 그림체도 같다. 2026-09-04부터
+그 렌더러는 converter 서비스의 `POST /render-thumbnail`이다 — 조정 BVH를 V3.2.5
+(`chain-transport-v3.2.5`)로 `standin-master-v2`(FBX 남성 모델)에 리타게팅한 뒤
+라이브러리 썸네일 빌드와 같은 anatomical 카메라·재질·조명으로 Blender 렌더한다.
+
+- `refined=true` → 조정 BVH를 converter로 그린다. `renderer_version`은
+  `fbx-anatomical-v1/<character_id>`.
+- `refined=false` → 베이스는 라이브러리 BVH 그대로이므로 번들의 후보 썸네일
+  (`thumbs/<pose_id>__<view>.jpg`, 같은 렌더러로 이미 구운 파일)을 돌려준다.
+  `renderer_version`은 `fbx-anatomical-v1/library`. 번들에 그 view가 없으면 converter로 그린다.
+- `media_type`은 기본 `image/png`이고 서버 설정(`REFINE_THUMBNAIL_FORMAT=jpeg`)으로 JPEG가
+  될 수 있다. UI는 `data:{thumbnail.media_type};base64,{thumbnail.data}`로 조립한다
+  (`image/png`를 하드코딩하지 말 것).
+- `renderer_version`이 `warm-mannequin-v1`이면 옛 2D 마네킹이다. 서버가
+  `REFINE_THUMBNAIL_RENDERER=mannequin`으로 비상 복구 중이거나 개발 모드에서 converter
+  주소 없이 뜬 경우다. production은 converter 주소가 없으면 기동하지 않는다.
+
+추론 서버에는 이미지나 조정 BVH를 영속 저장하지 않는다. converter 왕복(변환 ~3s + 렌더)은
+`REFINE_THUMBNAIL_TIMEOUT_SECONDS`(기본 20초) 안에 끝나야 하며, 넘으면 아래 규칙대로
+`thumbnail: null`이다. 즉 `/refine` 전체 지연은 refine 예산(`REFINE_TIMEOUT_SECONDS`)에
+이 시간이 더해질 수 있다 — BFF의 `/refine` read timeout은 그 합보다 커야 한다.
 
 **렌더 실패는 오류가 아니다.** 그릴 수 없으면 `thumbnail`을 `null`로 두고 나머지는 그대로 준다
 (`refine_thumbnail_failed` 로그만 남는다). 썸네일은 확인 화면이 쓰는 부가 산출물이므로, 그림

@@ -112,6 +112,29 @@ class Config:
         "REFINE_POSE_QUARANTINE_PATH", "config/refine_pose_quarantine.v1.json"
     )
 
+    # --- /refine 결과 썸네일 ---
+    # 필드명이 refine_*가 아닌 이유: _refine_capability()가 refine_* 설정 전부를 실행
+    # 정체성 해시에 넣는데, 썸네일은 조정 결과에 영향이 없으므로 그 해시에서 뺀다.
+    #   converter  — converter 서비스 POST /render-thumbnail(V3.2.5 FBX 남성 모델,
+    #                라이브러리 썸네일과 같은 카메라·재질). 제품 기본.
+    #   mannequin  — 옛 2D 마네킹(warm-mannequin-v1). 비상 복구·오프라인 개발용.
+    thumbnail_renderer: str = os.getenv("REFINE_THUMBNAIL_RENDERER", "converter")
+    # 예: http://standin-converter.internal:8001  (BFF가 쓰는 converter 주소와 같다)
+    thumbnail_converter_url: str = os.getenv("REFINE_THUMBNAIL_CONVERTER_URL", "")
+    thumbnail_character_id: str = os.getenv(
+        "REFINE_THUMBNAIL_CHARACTER_ID", "standin-master-v2"
+    )
+    # 변환(~3s)+렌더 한 번의 상한. 초과하면 그림 없이 응답한다(조정 결과는 유지).
+    thumbnail_timeout_seconds: float = float(
+        os.getenv("REFINE_THUMBNAIL_TIMEOUT_SECONDS", "20")
+    )
+    # 응답 thumbnail.media_type. 클라이언트가 media_type을 읽는 것을 확인하기 전까지
+    # 기존 계약(image/png)을 유지한다. jpeg는 라이브러리 번들과 같은 5KB 크기.
+    thumbnail_format: str = os.getenv("REFINE_THUMBNAIL_FORMAT", "png")
+    # refined=false(베이스 그대로)면 converter를 부르지 않고 번들의 후보 썸네일
+    # (같은 렌더러로 이미 구운 파일)을 돌려준다. 0이면 항상 converter를 부른다.
+    thumbnail_reuse_library: bool = _env_bool("REFINE_THUMBNAIL_REUSE_LIBRARY", True)
+
     # --- 관측성(로그·알림) --- 마스터독스 「관측성 — 로그·모니터링·디스코드 알림」
     log_level: str = os.getenv("LOG_LEVEL", "INFO")
     # 장애 알림 웹훅. ⚠ URL 자체가 비밀이다 — URL을 아는 누구나 그 채널에 글을 쓸 수 있다.
@@ -422,6 +445,19 @@ class Config:
     refine_timeout_seconds: float = float(os.getenv("REFINE_TIMEOUT_SECONDS", "5.0"))
 
     def __post_init__(self) -> None:
+        self.thumbnail_renderer = self.thumbnail_renderer.strip().lower()
+        if self.thumbnail_renderer not in ("converter", "mannequin"):
+            raise ValueError(
+                "REFINE_THUMBNAIL_RENDERER must be 'converter' or 'mannequin'"
+            )
+        self.thumbnail_converter_url = self.thumbnail_converter_url.strip().rstrip("/")
+        self.thumbnail_format = self.thumbnail_format.strip().lower()
+        if self.thumbnail_format not in ("png", "jpeg"):
+            raise ValueError("REFINE_THUMBNAIL_FORMAT must be 'png' or 'jpeg'")
+        if self.thumbnail_timeout_seconds <= 0.0:
+            raise ValueError("REFINE_THUMBNAIL_TIMEOUT_SECONDS must be positive")
+        if not self.thumbnail_character_id.strip():
+            raise ValueError("REFINE_THUMBNAIL_CHARACTER_ID must not be empty")
         self.pose_model_uri = self.pose_model_uri.strip()
         self.pose_models_root = self.pose_models_root.strip()
         self.pose_model_manifest = self.pose_model_manifest.strip()

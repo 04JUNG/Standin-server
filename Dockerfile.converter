@@ -82,6 +82,7 @@ COPY converter/foot_plant_policy.json /app/converter/foot_plant_policy.json
 COPY converter/palm_roll_policy.json /app/converter/palm_roll_policy.json
 COPY converter/protocol.py /app/converter/protocol.py
 COPY converter/retarget.py /app/converter/retarget.py
+COPY converter/thumbnail_render.py /app/converter/thumbnail_render.py
 COPY converter/worker.py /app/converter/worker.py
 COPY converter_api/__init__.py /app/converter_api/__init__.py
 COPY converter_api/app.py /app/converter_api/app.py
