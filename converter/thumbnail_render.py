@@ -46,18 +46,26 @@ def _body_axes(armature):
         for bone in armature.pose.bones
     }
 
-    def head(suffix: str):
+    def bone(suffix: str):
         try:
-            bone = by_suffix[suffix.lower()]
+            return by_suffix[suffix.lower()]
         except KeyError as exc:
             raise ThumbnailRenderError(
                 f"target rig lacks {suffix}; cannot derive anatomical camera"
             ) from exc
-        return armature.matrix_world @ bone.head
 
-    left = head("LeftShoulder")
-    right_point = head("RightShoulder")
-    pelvis = head("Hips")
+    left_shoulder = bone("LeftShoulder")
+    right_shoulder = bone("RightShoulder")
+    left = armature.matrix_world @ left_shoulder.head
+    right_point = armature.matrix_world @ right_shoulder.head
+    # Mixamo rigs may attach both shoulder bones at the same spine point and
+    # fan them out through their tails. Preserve the established head-based
+    # convention where it is usable, and fall back to the actual arm roots
+    # only for that degenerate topology.
+    if (left - right_point).length <= 1.0e-5:
+        left = armature.matrix_world @ left_shoulder.tail
+        right_point = armature.matrix_world @ right_shoulder.tail
+    pelvis = armature.matrix_world @ bone("Hips").head
     shoulder_center = (left + right_point) * 0.5
     # 이 부호가 라이브러리 ``front`` 썸네일의 정면 방향과 일치한다.
     right = left - right_point
