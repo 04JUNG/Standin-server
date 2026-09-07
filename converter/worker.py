@@ -31,6 +31,15 @@ from converter.protocol import (  # noqa: E402 - repo path is intentional
     RETARGET_SHA256,
     SOLVER_MANIFEST_SHA256,
     SOLVER_VERSION,
+    THUMBNAIL_ENGINES,
+    THUMBNAIL_MAX_RENDER_RESOLUTION,
+    THUMBNAIL_MAX_RENDER_SAMPLES,
+    THUMBNAIL_MIN_RENDER_RESOLUTION,
+    THUMBNAIL_VIEWS,
+)
+from converter.thumbnail_render import (  # noqa: E402 - bpy는 함수 안에서만 import한다
+    ThumbnailRenderError,
+    render_artifact_view,
 )
 
 
@@ -89,7 +98,7 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
         "character_fbx", "output_path", "report_path", "character_id",
         "character_sha256", "frame", "mirror", "output_mode",
         "apply_root_translation", "embed_textures",
-        "force_exact_v324",
+        "force_exact_v324", "thumbnail",
     }
     unknown = set(raw) - required
     missing = required - set(raw)
@@ -143,6 +152,8 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
     if output.exists() or report.exists():
         raise JobValidationError("output/report paths must not already exist")
 
+    thumbnail = _validate_thumbnail(raw["thumbnail"], temp_dir, output, report)
+
     normalized = dict(raw)
     normalized.update({
         "temp_dir": str(temp_dir),
@@ -150,8 +161,69 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
         "character_fbx": str(character),
         "output_path": str(output),
         "report_path": str(report),
+        "thumbnail": thumbnail,
     })
     return normalized
+
+
+_THUMBNAIL_FIELDS = {"view", "resolution", "samples", "engines", "output_path"}
+
+
+def _validate_thumbnail(
+    raw: Any, temp_dir: Path, output: Path, report: Path,
+) -> dict[str, Any] | None:
+    """선택 썸네일 단계의 계약. ``None``이면 변환만 한다."""
+    if raw is None:
+        return None
+    if not isinstance(raw, dict):
+        raise JobValidationError("thumbnail must be null or an object")
+    unknown = set(raw) - _THUMBNAIL_FIELDS
+    missing = _THUMBNAIL_FIELDS - set(raw)
+    if missing or unknown:
+        raise JobValidationError(
+            "thumbnail fields mismatch "
+            f"(missing={sorted(missing)}, unknown={sorted(unknown)})"
+        )
+    if raw["view"] not in THUMBNAIL_VIEWS:
+        raise JobValidationError("thumbnail.view is not a supported anatomical view")
+    resolution = raw["resolution"]
+    if (
+        type(resolution) is not int
+        or not THUMBNAIL_MIN_RENDER_RESOLUTION <= resolution <= THUMBNAIL_MAX_RENDER_RESOLUTION
+    ):
+        raise JobValidationError(
+            "thumbnail.resolution must be an int in "
+            f"[{THUMBNAIL_MIN_RENDER_RESOLUTION}, {THUMBNAIL_MAX_RENDER_RESOLUTION}]"
+        )
+    samples = raw["samples"]
+    if type(samples) is not int or not 1 <= samples <= THUMBNAIL_MAX_RENDER_SAMPLES:
+        raise JobValidationError(
+            f"thumbnail.samples must be an int in [1, {THUMBNAIL_MAX_RENDER_SAMPLES}]"
+        )
+    engines = raw["engines"]
+    if (
+        not isinstance(engines, list) or not engines
+        or any(engine not in THUMBNAIL_ENGINES for engine in engines)
+        or len(set(engines)) != len(engines)
+    ):
+        raise JobValidationError(
+            f"thumbnail.engines must be a non-empty unique subset of {list(THUMBNAIL_ENGINES)}"
+        )
+    png = _inside(
+        _absolute_path(raw["output_path"], "thumbnail.output_path"),
+        temp_dir, "thumbnail.output_path",
+    )
+    if png.suffix.lower() != ".png":
+        raise JobValidationError("thumbnail.output_path extension must be .png")
+    if png in {output, report} or png.exists():
+        raise JobValidationError("thumbnail.output_path must be a fresh path")
+    return {
+        "view": raw["view"],
+        "resolution": resolution,
+        "samples": samples,
+        "engines": list(engines),
+        "output_path": str(png),
+    }
 
 
 def _write_report(path: Path, payload: dict[str, Any]) -> None:
@@ -244,10 +316,38 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
             )
         payload["artifact_sha256"] = _sha256(output)
         payload["artifact_size"] = output.stat().st_size
+        if job["thumbnail"] is not None:
+            payload["thumbnail"] = _render_thumbnail(job["thumbnail"], output)
     else:
         payload["error_code"] = "conversion_rejected"
         payload["error_message"] = "converter rejected the BVH/profile mapping"
     return payload
+
+
+def _render_thumbnail(request: dict[str, Any], artifact: Path) -> dict[str, Any]:
+    """변환이 끝난 뒤 산출물 FBX를 다시 임포트해 preview PNG를 쓴다.
+
+    변환 성공 뒤에만 돈다. 실패는 :class:`ThumbnailRenderError`로 올라가고 main이
+    ``thumbnail_render_failed``로 보고한다 — 썸네일을 요청한 호출자에게 그림 없는
+    성공은 의미가 없으므로 job 전체를 실패로 처리한다(FBX만 원하면 요청하지 않는다).
+    """
+    png = Path(request["output_path"])
+    rendered = render_artifact_view(
+        artifact_fbx=artifact,
+        output_png=png,
+        view=request["view"],
+        resolution=request["resolution"],
+        samples=request["samples"],
+        engines=tuple(request["engines"]),
+    )
+    if not png.is_file() or png.is_symlink() or png.stat().st_size <= 0:
+        raise ArtifactValidationError("thumbnail render reported success without a PNG")
+    return {
+        **rendered,
+        "path": str(png),
+        "sha256": _sha256(png),
+        "size": png.stat().st_size,
+    }
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -274,9 +374,14 @@ def main(argv: list[str] | None = None) -> int:
         print(f"[OK] conversion {job['conversion_id']}")
         return 0
     except Exception as exc:
-        error_code = "internal_error" if isinstance(
-            exc, (FrozenLineageError, ArtifactValidationError)
-        ) else "invalid_input" if isinstance(exc, (ValueError, RuntimeError)) else "internal_error"
+        if isinstance(exc, ThumbnailRenderError):
+            error_code = "thumbnail_render_failed"
+        elif isinstance(exc, (FrozenLineageError, ArtifactValidationError)):
+            error_code = "internal_error"
+        elif isinstance(exc, (ValueError, RuntimeError)):
+            error_code = "invalid_input"
+        else:
+            error_code = "internal_error"
         payload = {
             "ok": False,
             "conversion_id": job["conversion_id"],

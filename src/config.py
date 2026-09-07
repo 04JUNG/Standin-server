@@ -1,6 +1,7 @@
 """전역 설정. 실제 모델/키는 환경변수로 주입하고, 없으면 mock으로 폴백한다."""
 from __future__ import annotations
 
+import math
 import os
 from dataclasses import dataclass
 
@@ -73,6 +74,16 @@ class Config:
     # 배포 단위 variant. 미설정=current-X 현행 경로이며 Human-Art는 manifest와
     # 명시적인 canary stage가 모두 있어야만 초기화된다.
     pose_model_variant: str = os.getenv("POSE_MODEL_VARIANT", "current-x")
+    # 원격 manifest URI가 있으면 기동 시 model/detector를 검증해 로컬에 원자 공개한
+    # 뒤 pose_model_manifest를 그 로컬 경로로 채운다. 수동 볼륨 배포는 기존
+    # POSE_MODEL_MANIFEST만 지정하면 된다.
+    pose_model_uri: str = os.getenv("POSE_MODEL_URI", "")
+    pose_models_root: str = os.getenv("POSE_MODELS_ROOT", "data/pose-models")
+    # manifest + ONNX 2개 다운로드와 검증에 허용하는 전체 wall-clock 예산.
+    # Fargate health-check grace period는 current-X 초기화까지 포함해 이보다 길어야 한다.
+    pose_model_download_budget_seconds: float = float(
+        os.getenv("POSE_MODEL_DOWNLOAD_BUDGET_SECONDS", "300")
+    )
     pose_model_manifest: str = os.getenv("POSE_MODEL_MANIFEST", "")
     pose_canary_stage: str = os.getenv("POSE_CANARY_STAGE", "off")
     pose_strict: bool = _env_bool("POSE_STRICT", False)
@@ -100,6 +111,29 @@ class Config:
     refine_pose_quarantine_path: str = os.getenv(
         "REFINE_POSE_QUARANTINE_PATH", "config/refine_pose_quarantine.v1.json"
     )
+
+    # --- /refine 결과 썸네일 ---
+    # 필드명이 refine_*가 아닌 이유: _refine_capability()가 refine_* 설정 전부를 실행
+    # 정체성 해시에 넣는데, 썸네일은 조정 결과에 영향이 없으므로 그 해시에서 뺀다.
+    #   converter  — converter 서비스 POST /render-thumbnail(V3.2.5 FBX 남성 모델,
+    #                라이브러리 썸네일과 같은 카메라·재질). 제품 기본.
+    #   mannequin  — 옛 2D 마네킹(warm-mannequin-v1). 비상 복구·오프라인 개발용.
+    thumbnail_renderer: str = os.getenv("REFINE_THUMBNAIL_RENDERER", "converter")
+    # 예: http://standin-converter.internal:8001  (BFF가 쓰는 converter 주소와 같다)
+    thumbnail_converter_url: str = os.getenv("REFINE_THUMBNAIL_CONVERTER_URL", "")
+    thumbnail_character_id: str = os.getenv(
+        "REFINE_THUMBNAIL_CHARACTER_ID", "standin-master-v2"
+    )
+    # 변환(~3s)+렌더 한 번의 상한. 초과하면 그림 없이 응답한다(조정 결과는 유지).
+    thumbnail_timeout_seconds: float = float(
+        os.getenv("REFINE_THUMBNAIL_TIMEOUT_SECONDS", "20")
+    )
+    # 응답 thumbnail.media_type. 클라이언트가 media_type을 읽는 것을 확인하기 전까지
+    # 기존 계약(image/png)을 유지한다. jpeg는 라이브러리 번들과 같은 5KB 크기.
+    thumbnail_format: str = os.getenv("REFINE_THUMBNAIL_FORMAT", "png")
+    # refined=false(베이스 그대로)면 converter를 부르지 않고 번들의 후보 썸네일
+    # (같은 렌더러로 이미 구운 파일)을 돌려준다. 0이면 항상 converter를 부른다.
+    thumbnail_reuse_library: bool = _env_bool("REFINE_THUMBNAIL_REUSE_LIBRARY", True)
 
     # --- 관측성(로그·알림) --- 마스터독스 「관측성 — 로그·모니터링·디스코드 알림」
     log_level: str = os.getenv("LOG_LEVEL", "INFO")
@@ -411,6 +445,29 @@ class Config:
     refine_timeout_seconds: float = float(os.getenv("REFINE_TIMEOUT_SECONDS", "5.0"))
 
     def __post_init__(self) -> None:
+        self.thumbnail_renderer = self.thumbnail_renderer.strip().lower()
+        if self.thumbnail_renderer not in ("converter", "mannequin"):
+            raise ValueError(
+                "REFINE_THUMBNAIL_RENDERER must be 'converter' or 'mannequin'"
+            )
+        self.thumbnail_converter_url = self.thumbnail_converter_url.strip().rstrip("/")
+        self.thumbnail_format = self.thumbnail_format.strip().lower()
+        if self.thumbnail_format not in ("png", "jpeg"):
+            raise ValueError("REFINE_THUMBNAIL_FORMAT must be 'png' or 'jpeg'")
+        if self.thumbnail_timeout_seconds <= 0.0:
+            raise ValueError("REFINE_THUMBNAIL_TIMEOUT_SECONDS must be positive")
+        if not self.thumbnail_character_id.strip():
+            raise ValueError("REFINE_THUMBNAIL_CHARACTER_ID must not be empty")
+        self.pose_model_uri = self.pose_model_uri.strip()
+        self.pose_models_root = self.pose_models_root.strip()
+        self.pose_model_manifest = self.pose_model_manifest.strip()
+        if not self.pose_models_root:
+            raise ValueError("POSE_MODELS_ROOT must be non-empty")
+        if (
+            not math.isfinite(self.pose_model_download_budget_seconds)
+            or self.pose_model_download_budget_seconds <= 0
+        ):
+            raise ValueError("POSE_MODEL_DOWNLOAD_BUDGET_SECONDS must be positive")
         if self.refine_default_mode not in ("conservative", "aggressive"):
             raise ValueError(
                 "REFINE_DEFAULT_MODE must be 'conservative' or 'aggressive'"

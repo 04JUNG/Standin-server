@@ -3,4 +3,6 @@ boto3==1.40.24
 fastapi==0.141.1
 pydantic==2.13.4
 python-multipart==0.0.32
+# /render-thumbnail: Blender가 쓴 원본 PNG를 서비스 크기(256px JPEG/PNG)로 줄인다.
+Pillow==12.2.0
 uvicorn==0.52.0

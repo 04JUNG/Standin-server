@@ -264,17 +264,39 @@ jobs:
             --form output_mode=rigged_rest \
             --form apply_root_translation=false \
             http://127.0.0.1:8001/convert-bundle
+          curl --fail --silent --show-error \
+            --dump-header "$ARTIFACT_ROOT/thumbnail-response.headers" \
+            --output "$ARTIFACT_ROOT/http-smoke-thumbnail.png" \
+            --form "bvh=@$ARTIFACT_ROOT/assets/pose_raise.bvh;type=application/octet-stream;filename=pose_raise.bvh" \
+            --form character_id=standin-master-v2 \
+            --form view=front \
+            --form size=256 \
+            --form format=png \
+            http://127.0.0.1:8001/render-thumbnail
           python tests/converter/verify_container_smoke.py \
             --health "$ARTIFACT_ROOT/health.json" \
             --headers "$ARTIFACT_ROOT/response.headers" \
             --bvh "$ARTIFACT_ROOT/assets/pose_raise.bvh" \
             --fbx "$ARTIFACT_ROOT/http-smoke.fbx" \
             --bundle-headers "$ARTIFACT_ROOT/bundle-response.headers" \
-            --bundle "$ARTIFACT_ROOT/http-smoke.zip"
+            --bundle "$ARTIFACT_ROOT/http-smoke.zip" \
+            --thumbnail-headers "$ARTIFACT_ROOT/thumbnail-response.headers" \
+            --thumbnail "$ARTIFACT_ROOT/http-smoke-thumbnail.png"
           docker exec "$CONTAINER_NAME" \
             python -c "import importlib.util,sys; sys.exit(0 if importlib.util.find_spec('bpy') is None else 1)"
           docker exec "$CONTAINER_NAME" \
             python -c "from pathlib import Path; assert not any(Path('/tmp/standin-converter').iterdir())"
+
+      - name: Upload thumbnail smoke render
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: converter-thumbnail-smoke
+          path: |
+            ${{ env.ARTIFACT_ROOT }}/http-smoke-thumbnail.png
+            ${{ env.ARTIFACT_ROOT }}/thumbnail-response.headers
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Show converter logs and remove smoke container
         if: always()

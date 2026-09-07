@@ -65,7 +65,7 @@ def test_converter_service_network_has_no_public_ip():
     assert network["assignPublicIp"] == "DISABLED"
     assert network["subnets"]
     assert all("private" in subnet for subnet in network["subnets"])
-    assert network["securityGroups"] == ["<converter-sg-allow-bff-only>"]
+    assert network["securityGroups"] == ["<converter-sg-allow-bff-and-inference>"]
     breaker = service["deploymentConfiguration"]["deploymentCircuitBreaker"]
     assert breaker == {"enable": True, "rollback": True}
 
@@ -102,6 +102,19 @@ def test_converter_ci_smokes_dual_artifact_bundle_endpoint():
     assert '--form "expected_bvh_sha256=$FINAL_BVH_SHA256"' in workflow
     assert '--bundle "$ARTIFACT_ROOT/http-smoke.zip"' in workflow
     assert '--bundle-headers "$ARTIFACT_ROOT/bundle-response.headers"' in workflow
+
+
+def test_converter_ci_smokes_refine_thumbnail_endpoint_with_real_blender():
+    """headless 컨테이너에서 EEVEE/Cycles가 실제로 그림을 쓰는지는 CI만 증명한다."""
+    workflow = (ROOT / ".github/workflows/converter-ci.yml").read_text()
+    assert "http://127.0.0.1:8001/render-thumbnail" in workflow
+    assert "--form view=front" in workflow
+    assert '--thumbnail "$ARTIFACT_ROOT/http-smoke-thumbnail.png"' in workflow
+    assert '--thumbnail-headers "$ARTIFACT_ROOT/thumbnail-response.headers"' in workflow
+    dockerfile = (ROOT / "Dockerfile.converter").read_text()
+    assert "COPY converter/thumbnail_render.py /app/converter/thumbnail_render.py" in dockerfile
+    requirements = (ROOT / "requirements-converter.txt").read_text()
+    assert "Pillow==" in requirements
 
 
 def test_required_pr_checks_workflow_is_not_path_filtered():

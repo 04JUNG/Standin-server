@@ -21,11 +21,15 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, StreamingResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from PIL import Image
+
 from converter.protocol import (
     APPLY_ROOT_TRANSLATION,
     FRAME,
     OUTPUT_MODE,
     SOLVER_VERSION,
+    THUMBNAIL_RENDERER_VERSION,
+    THUMBNAIL_VIEWS,
 )
 from converter_api.registry import (
     ArtifactIntegrityError,
@@ -42,6 +46,8 @@ from converter_api.runner import (
     ConversionResult,
     ConversionTimeoutError,
     RunnerError,
+    ThumbnailRenderFailedError,
+    ThumbnailRequest,
     WorkerIntegrityError,
 )
 from converter_api.schemas import CharactersResponse, HealthResponse
@@ -62,6 +68,15 @@ BUNDLE_SCHEMA_VERSION = 1
 BUNDLE_BVH_NAME = "final.bvh"
 BUNDLE_FBX_NAME = "final.fbx"
 BUNDLE_MANIFEST_NAME = "manifest.json"
+# 서비스 썸네일 계약(2026-09-03 라이브러리 번들과 동일): 256×256, JPEG q78 또는 PNG.
+THUMBNAIL_DEFAULT_SIZE = 256
+THUMBNAIL_MIN_SIZE = 64
+THUMBNAIL_MAX_SIZE = 640
+THUMBNAIL_FORMATS = {
+    "png": ("PNG", "image/png", "png"),
+    "jpeg": ("JPEG", "image/jpeg", "jpg"),
+}
+THUMBNAIL_DEFAULT_JPEG_QUALITY = 78
 
 
 def configure_structured_logging(
@@ -298,8 +313,11 @@ def create_app(
 
     app = FastAPI(
         title="Standin Internal Converter",
-        version="1.1.0",
-        description="Internal BFF-only BVH to FBX conversion service",
+        version="1.2.0",
+        description=(
+            "Internal BVH to FBX conversion service "
+            "(BFF export bundles, inference refine thumbnails)"
+        ),
     )
     app.state.registry = character_registry
     app.state.runner = blender_runner
@@ -394,6 +412,7 @@ def create_app(
         response_format: str,
         artifact_kind: str | None = None,
         expected_bvh_sha256: str | None = None,
+        thumbnail: ThumbnailRequest | None = None,
     ) -> CompletedConversion:
         conversion_id = str(uuid.uuid4())
         request_started = time.monotonic()
@@ -449,6 +468,7 @@ def create_app(
                 character_sha256=resolved.metadata.sha256,
                 conversion_id=conversion_id,
                 mirror=mirror,
+                thumbnail=thumbnail,
             )
             _verify_result_integrity(
                 result,
@@ -495,6 +515,20 @@ def create_app(
                 422, exc.code, "BVH/profile/mapping was rejected",
                 conversion_id=conversion_id,
             ) from exc
+        except ThumbnailRenderFailedError as exc:
+            # 변환은 됐는데 Blender가 preview를 못 썼다. 호출자(추론 /refine)는
+            # 그림 없이 응답하므로 502가 아니라 우리 쪽 렌더 장애로 분류한다.
+            _structured_log(
+                logging.ERROR,
+                "converter_thumbnail_failed",
+                conversion_id=conversion_id,
+                error_code=exc.code,
+                report=exc.report,
+            )
+            raise ApiProblem(
+                500, exc.code, "Blender could not render the thumbnail",
+                conversion_id=conversion_id,
+            ) from exc
         except (WorkerIntegrityError, RunnerError) as exc:
             _structured_log(
                 logging.ERROR,
@@ -521,6 +555,11 @@ def create_app(
             artifact_sha256=result.artifact_sha256,
             response_format=response_format,
             artifact_kind=artifact_kind,
+            thumbnail_view=None if thumbnail is None else thumbnail.view,
+            thumbnail_engine=(
+                None if result.thumbnail_report is None
+                else result.thumbnail_report.get("engine")
+            ),
             task_cold_start=result.task_cold_start,
             queue_wait_ms=queue_wait_ms,
             execution_ms=execution_ms,
@@ -664,7 +703,142 @@ def create_app(
             headers=headers,
         )
 
+    @app.post(
+        "/render-thumbnail",
+        responses={
+            200: {"content": {"image/png": {}, "image/jpeg": {}}},
+            400: {"description": "Invalid option, view, size, format, character_id, or filename"},
+            413: {"description": "BVH upload too large"},
+            422: {"description": "BVH/profile/mapping rejected"},
+            500: {"description": "Blender rendered no thumbnail"},
+            503: {"description": "Character artifact or Blender unavailable"},
+            504: {"description": "Blender conversion timeout"},
+        },
+    )
+    def render_thumbnail(
+        bvh: UploadFile = File(...),
+        character_id: str = Form(default="standin-master-v2"),
+        view: str = Form(default="front"),
+        size: int = Form(default=THUMBNAIL_DEFAULT_SIZE),
+        format: str = Form(default="png"),
+        quality: int = Form(default=THUMBNAIL_DEFAULT_JPEG_QUALITY),
+        mirror: bool = Form(default=False),
+    ):
+        """BVH 하나를 변환한 뒤 라이브러리 썸네일과 같은 카메라로 preview를 그린다.
+
+        추론 서버 ``POST /refine``이 조정본 BVH로 호출한다. 후보 썸네일(라이브러리
+        번들)과 같은 캐릭터·solver·카메라·재질을 쓰므로 작가가 보는 두 그림이 같은
+        스타일이 된다. FBX는 반환하지 않는다(내보내기는 ``/convert-bundle``).
+        """
+        if view not in THUMBNAIL_VIEWS:
+            raise ApiProblem(
+                400, "INVALID_VIEW", f"view must be one of {sorted(THUMBNAIL_VIEWS)}",
+            )
+        if isinstance(size, bool) or not THUMBNAIL_MIN_SIZE <= size <= THUMBNAIL_MAX_SIZE:
+            raise ApiProblem(
+                400, "INVALID_SIZE",
+                f"size must be an int in [{THUMBNAIL_MIN_SIZE}, {THUMBNAIL_MAX_SIZE}]",
+            )
+        image_format = format.strip().lower()
+        if image_format == "jpg":
+            image_format = "jpeg"
+        if image_format not in THUMBNAIL_FORMATS:
+            raise ApiProblem(400, "INVALID_FORMAT", "format must be png or jpeg")
+        if isinstance(quality, bool) or not 1 <= quality <= 100:
+            raise ApiProblem(400, "INVALID_QUALITY", "quality must be in [1, 100]")
+
+        request = blender_runner.settings.thumbnail_request(view)
+        completed = _execute_conversion(
+            bvh=bvh,
+            character_id=character_id,
+            frame=FRAME,
+            mirror=mirror,
+            output_mode=OUTPUT_MODE,
+            apply_root_translation=APPLY_ROOT_TRANSLATION,
+            response_format="thumbnail",
+            thumbnail=request,
+        )
+        result = completed.result
+        if result.thumbnail_png is None or result.thumbnail_report is None:
+            raise ApiProblem(
+                500, "THUMBNAIL_MISSING", "conversion completed without a thumbnail",
+                conversion_id=completed.conversion_id,
+            )
+        pil_format, media_type, extension = THUMBNAIL_FORMATS[image_format]
+        try:
+            image_bytes = _encode_thumbnail(
+                result.thumbnail_png, size=size, pil_format=pil_format, quality=quality,
+            )
+        except (OSError, ValueError) as exc:
+            _structured_log(
+                logging.ERROR,
+                "converter_thumbnail_failed",
+                conversion_id=completed.conversion_id,
+                error_code="THUMBNAIL_ENCODE_FAILED",
+                error_type=type(exc).__name__,
+            )
+            raise ApiProblem(
+                500, "THUMBNAIL_ENCODE_FAILED", "rendered thumbnail could not be encoded",
+                conversion_id=completed.conversion_id,
+            ) from exc
+        thumbnail_sha256 = hashlib.sha256(image_bytes).hexdigest()
+        rendered = result.thumbnail_report
+        filename = (
+            f"{completed.character.metadata.character_id}-"
+            f"{completed.conversion_id}-{view}.{extension}"
+        )
+        headers = {
+            **completed.common_headers,
+            "Content-Disposition": f'inline; filename="{filename}"',
+            "Cache-Control": "private, no-store",
+            "Content-Length": str(len(image_bytes)),
+            "X-Standin-Thumbnail-Renderer": THUMBNAIL_RENDERER_VERSION,
+            "X-Standin-Thumbnail-View": view,
+            "X-Standin-Thumbnail-Engine": _safe_header(rendered.get("engine")),
+            "X-Standin-Thumbnail-Render-Resolution": str(int(rendered.get("resolution", 0))),
+            "X-Standin-Thumbnail-Size": str(size),
+            "X-Standin-Thumbnail-SHA256": thumbnail_sha256,
+            "X-Standin-Artifact-SHA256": thumbnail_sha256,
+        }
+        _structured_log(
+            logging.INFO,
+            "converter_thumbnail_complete",
+            conversion_id=completed.conversion_id,
+            view=view,
+            size=size,
+            format=image_format,
+            engine=rendered.get("engine"),
+            engine_attempts=rendered.get("engine_attempts"),
+            render_resolution=rendered.get("resolution"),
+            thumbnail_sha256=thumbnail_sha256,
+            thumbnail_bytes=len(image_bytes),
+            source_bvh_sha256=result.source_bvh_sha256,
+            fbx_artifact_sha256=result.artifact_sha256,
+        )
+        return StreamingResponse(
+            io.BytesIO(image_bytes),
+            status_code=200,
+            media_type=media_type,
+            headers=headers,
+        )
+
     return app
+
+
+def _encode_thumbnail(
+    png_bytes: bytes, *, size: int, pil_format: str, quality: int,
+) -> bytes:
+    """원본 렌더 PNG를 서비스 크기로 줄여 인코딩한다(라이브러리 빌드의 sips 단계에 해당)."""
+    with Image.open(io.BytesIO(png_bytes)) as source:
+        image = source.convert("RGB")
+    if image.size != (size, size):
+        image = image.resize((size, size), Image.Resampling.LANCZOS)
+    encoded = io.BytesIO()
+    if pil_format == "JPEG":
+        image.save(encoded, format="JPEG", quality=quality, optimize=True)
+    else:
+        image.save(encoded, format="PNG", optimize=True)
+    return encoded.getvalue()
 
 
 app = create_app()
