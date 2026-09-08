@@ -10,7 +10,7 @@
         "<private-subnet-b>"
       ],
       "securityGroups": [
-        "<converter-sg-allow-bff-only>"
+        "<converter-sg-allow-bff-and-inference>"
       ],
       "assignPublicIp": "DISABLED"
     }

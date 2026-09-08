@@ -22,7 +22,7 @@
 | task container | `inference`, port 8000 | `converter`, port 8001 |
 | image | `Dockerfile` | `Dockerfile.converter` |
 | Blender/bpy | 금지 | Blender 자식 프로세스에서만 허용 |
-| 외부 노출 | 기존 BFF 경계 | BFF에서만 접근 가능한 내부망 |
+| 외부 노출 | 기존 BFF 경계 | BFF·inference에서만 접근 가능한 내부망 |
 
 `deploy/ecs/converter-task-definition.example.json`은 converter 전용 Fargate task의 기준이다.
 `deploy/ecs/converter-service-network.example.json`은 public IP를 금지하는 service network 기준이다.
@@ -32,7 +32,9 @@ inference task definition이나 service에 converter container를 추가하지 �
 
 ECS service는 `awsvpc`와 private subnet을 사용하고 `assignPublicIp=DISABLED`로 만든다.
 
-- inbound: BFF security group에서 converter port `8001`만 허용
+- inbound: BFF security group과 **inference security group**에서 converter port `8001`만 허용
+  (inference는 2026-09-04부터 `POST /refine` preview를 `POST /render-thumbnail`로 그린다 —
+  `docs/API_CONTRACT.md` §refine thumbnail)
 - internet-facing ALB와 public DNS 생성 금지
 - 호출 주소: private Cloud Map 또는 internal ALB
 - registry의 `s3://` URI를 ECS task role로 내려받아 SHA-256 검증 후 전용 temp cache에 보관
@@ -43,6 +45,26 @@ ECS service는 `awsvpc`와 private subnet을 사용하고 `assignPublicIp=DISABL
 private subnet에서 S3를 읽으려면 S3 gateway endpoint 또는 승인된 egress 경로가 필요하다.
 `converter_api.registry`는 HTTP(S)를 받지 않고, 환경변수로 지정한 S3 object만 lazy download한다.
 다운로드 결과가 registry hash와 다르면 cache와 응답 artifact로 승격하지 않는다.
+
+## inference → converter (refine preview)
+
+`POST /render-thumbnail`은 BFF가 아니라 **inference 서비스**가 부른다. 조정본 BVH를
+V3.2.5로 변환한 뒤 라이브러리 썸네일과 같은 anatomical 카메라로 렌더해 256px 이미지를
+돌려준다(FBX는 반환하지 않는다). 배포에 필요한 것:
+
+1. converter security group inbound에 inference SG → `8001` 추가
+2. inference task definition environment에 `REFINE_THUMBNAIL_CONVERTER_URL`
+   (BFF가 쓰는 converter 내부 주소와 같은 값, 예 `http://standin-converter.internal:8001`)
+   — `POSE_MODEL_URI`처럼 infra가 넣고 `deploy.yml`은 존재만 확인한다
+3. converter 이미지는 `Pillow`가 필요하다(`requirements-converter.txt`)
+
+렌더 엔진은 `CONVERTER_THUMBNAIL_ENGINES`(기본 `BLENDER_EEVEE,CYCLES`) 순서로 시도한다.
+Fargate에는 GPU가 없으므로 EEVEE는 Mesa 소프트웨어 GL로 돌거나 실패할 수 있다. 실패하면
+같은 프로세스에서 Cycles(CPU)로 넘어가고 응답 헤더 `X-Standin-Thumbnail-Engine`과
+`converter_thumbnail_complete` 로그의 `engine`/`engine_attempts`에 무엇을 썼는지 남는다.
+EEVEE가 프로세스를 죽이는 환경이면 `CONVERTER_THUMBNAIL_ENGINES=CYCLES`로 고정한다.
+`converter-ci.yml`의 HTTP smoke가 실제 Blender 5.2 이미지에서 `/render-thumbnail`을
+호출해 256×256이고 회색 배경 위에 어두운 실루엣이 있는지 검사한다(단색이면 실패).
 
 ## Health와 timeout
 
