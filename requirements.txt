@@ -19,8 +19,13 @@ Pillow>=10.0                 # 업로드 PNG 로드
 # --- 실제 모델 연결 시(선택) ---
 google-genai>=1.10,<3         # HttpOptions timeout 지원 범위를 고정. GEMINI_MODEL=gemini-2.5-flash 등
 # openai>=1.40                # gpt-5-mini 대안
-rtmlib>=0.0.13                # RTMPose Body(17kp)
-onnxruntime>=1.17
+# ⚠ 아래 두 줄은 pose 번들 계약이 고정한다. manifest의 runtime.rtmlib /
+#   runtime.onnxruntime과 문자열이 정확히 같아야 한다(pose_contract.load_pose_bundle은
+#   != 비교라 패치 하나만 달라도 막는다). 범위 핀으로 되돌리면 이미지를
+#   다시 빌드하는 것만으로 POSE_MODEL_VARIANT=cascade 기동이 깨진다.
+#   기준 번들: humanart-m / 20260828.codex1-fp32-cpu-raw-simcc
+rtmlib==0.0.15                # RTMPose Body(17kp)
+onnxruntime==1.28.0
 opencv-python-headless>=4.9   # GUI 없는 ECS 컨테이너용 OpenCV
 # bvhio>=2.0                  # 실 BVH 파싱(library.load_bvh_pose)
 # --- 배포(선택) ---
