@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import math
 from dataclasses import dataclass
 
 # .env 자동 로드. 아래 dataclass 필드 기본값이 클래스 정의 시점에 os.getenv로
@@ -49,6 +50,23 @@ class Config:
     top_n_search: int = 20     # kNN 1차 후보 수(→ rerank 입력)
     top_k_final: int = 5       # 작가에게 보여줄 최종 후보 수
     use_rerank: bool = os.getenv("USE_RERANK", "1") == "1"
+
+    # --- 실험 검색(A/B1) ---
+    # 운영 semantic/search 모듈과 분리된 src.experimental 경로만 제어한다.
+    # A는 full-body + 완전한 하체에서 확실한 non_stand 쿼리일 때만
+    # 다중 projection이 모두 stand로 합의한 라이브러리 pose를 제외한다.
+    experimental_a_support_mode: str = os.getenv(
+        "EXPERIMENTAL_A_SUPPORT_MODE", "off"
+    )
+    experimental_a_max_distance_ratio: float = float(os.getenv(
+        "EXPERIMENTAL_A_MAX_DISTANCE_RATIO", "1.25"
+    ))
+    # B1 off: import/build/trace 없음(기존 결과 완전 보존)
+    # B1 shadow: 기존 순서를 반환하고 제안 순위만 quality_trace에 기록
+    # B1 on: 기존 geometry Top-K의 후보 집합·distance는 유지하고 순서만 변경
+    experimental_b1_pose_fact_mode: str = os.getenv(
+        "EXPERIMENTAL_B1_POSE_FACT_MODE", "off"
+    )
 
     # 같은 view면 거리에 이 값을 곱함(1 미만=우대). '필터'가 아니라 '우선순위'.
     view_priority_weight: float = 0.85
@@ -328,6 +346,27 @@ class Config:
         "REFINE_V2_GROUND_TOLERANCE", "0.08"))
     # 요청별 cooperative timeout. solver residual 경계에서 중단하고 베이스로 복구한다.
     refine_timeout_seconds: float = float(os.getenv("REFINE_TIMEOUT_SECONDS", "5.0"))
+
+    def __post_init__(self) -> None:
+        self.experimental_a_support_mode = (
+            self.experimental_a_support_mode.strip().lower()
+        )
+        self.experimental_b1_pose_fact_mode = (
+            self.experimental_b1_pose_fact_mode.strip().lower()
+        )
+        if self.experimental_a_support_mode not in {"off", "shadow", "on"}:
+            raise ValueError(
+                "EXPERIMENTAL_A_SUPPORT_MODE must be off, shadow, or on"
+            )
+        if (not math.isfinite(self.experimental_a_max_distance_ratio)
+                or self.experimental_a_max_distance_ratio < 1.0):
+            raise ValueError(
+                "EXPERIMENTAL_A_MAX_DISTANCE_RATIO must be finite and at least 1.0"
+            )
+        if self.experimental_b1_pose_fact_mode not in {"off", "shadow", "on"}:
+            raise ValueError(
+                "EXPERIMENTAL_B1_POSE_FACT_MODE must be off, shadow, or on"
+            )
 
 
 CFG = Config()

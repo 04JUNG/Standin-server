@@ -71,6 +71,23 @@ class Pipeline:
             PositionSearchIndex.build(self.entries)
             if CFG.position_search_vectorized else None
         )
+        # A/B1은 운영 검색과 다른 namespace에서만 존재하며 default-off다.
+        # 둘 다 off면 import/build/trace 자체가 없어 기존 경로를 완전히 보존한다.
+        self._experimental_search_bundle = None
+        self._experimental_search_init_error = None
+        enable_a = CFG.experimental_a_support_mode != "off"
+        enable_b1 = CFG.experimental_b1_pose_fact_mode != "off"
+        if enable_a or enable_b1:
+            try:
+                from .experimental.search_bundle import ExperimentalSearchBundle
+                self._experimental_search_bundle = ExperimentalSearchBundle.build(
+                    self.entries, enable_a=enable_a, enable_b1=enable_b1,
+                )
+            except Exception:
+                # 실험 인덱스 이상이 운영 geometry 검색을 내리면 안 된다.
+                self._experimental_search_init_error = (
+                    "experimental_search_bundle_build_failed"
+                )
         self.vlm = vlm_client or build_vlm_client()
         self.detector = detector or MockDetector()
         self.pose = pose_model or build_pose_model()
@@ -335,7 +352,14 @@ class Pipeline:
             descriptors=descs, notes=notes,
         )
         for index, (slot, outcome) in enumerate(processed):
-            candidates = outcome.candidates
+            # crop/fallback/confidence/refine 판단이 모두 끝난 뒤 A→B1 순서로
+            # 적용한다. 두 실험 모두 기존 geometry safety 판정에는 관여하지 않는다.
+            candidates = self._apply_experimental_a(
+                outcome.descriptor, outcome.candidates
+            )
+            candidates = self._apply_experimental_b1(
+                outcome.descriptor, candidates
+            )
             confidence = outcome.confidence
             reason = outcome.reason
             if outcome.stability is not None:
@@ -366,6 +390,119 @@ class Pipeline:
             f"인물 {len(descs)}명 처리 (high={result.person_confidence.count('high')}, "
             f"low/폴백={low_count}, top_k={CFG.top_k_final})")
         return result
+
+    def _experimental_trace_identity(self) -> dict:
+        bundle = self._experimental_search_bundle
+        return {} if bundle is None else bundle.trace_identity()
+
+    def _apply_experimental_a(self, desc, candidates):
+        """Fail-open minimal support gate; ``off`` is an exact rollback."""
+        mode = CFG.experimental_a_support_mode
+        if mode == "off":
+            return candidates
+
+        trace = {"mode": mode, "applied": False}
+        bundle = self._experimental_search_bundle
+        gate = None if bundle is None else bundle.a_support_gate
+        if gate is None:
+            trace["reason"] = (
+                self._experimental_search_init_error
+                or "a_support_gate_not_available"
+            )
+            desc.quality_trace["experimental_a_support"] = trace
+            return candidates
+        trace.update(self._experimental_trace_identity())
+        if desc.feature is None or not candidates:
+            trace["reason"] = "query_or_candidates_unavailable"
+            desc.quality_trace["experimental_a_support"] = trace
+            return candidates
+
+        valid_mask = desc.valid_joint_mask
+        try:
+            normalized_mask = np.asarray(valid_mask, dtype=bool).reshape(-1)
+            lower_body_complete = bool(
+                normalized_mask.size == 17
+                and normalized_mask[11:17].all()
+            )
+        except (TypeError, ValueError):
+            lower_body_complete = False
+        eligibility = {
+            "skeleton_state": desc.skeleton_state,
+            "coverage_class": desc.coverage_class,
+            "search_scope": desc.quality_trace.get("search_scope"),
+            "lower_body_complete": lower_body_complete,
+        }
+        trace["eligibility"] = eligibility
+        if not (
+            desc.skeleton_state == "valid"
+            and desc.coverage_class == "full"
+            and eligibility["search_scope"] == "full_body"
+            and lower_body_complete
+        ):
+            trace["reason"] = "query_not_structurally_eligible"
+            desc.quality_trace["experimental_a_support"] = trace
+            return candidates
+
+        try:
+            result = gate.evaluate(
+                desc.feature,
+                valid_mask,
+                candidates,
+                metric=desc.distance_metric or CFG.distance_metric,
+                max_distance_ratio=CFG.experimental_a_max_distance_ratio,
+            )
+        except Exception:
+            trace["reason"] = "a_support_evaluation_failed"
+            desc.quality_trace["experimental_a_support"] = trace
+            return candidates
+
+        trace.update(result.trace)
+        trace["applied"] = mode == "on" and bool(trace["gate_eligible"])
+        desc.quality_trace["experimental_a_support"] = trace
+        if trace["applied"]:
+            return list(result.suggested_candidates)
+        return candidates
+
+    def _apply_experimental_b1(self, desc, candidates):
+        """Fail-open B1 hook; ``off`` is an exact production rollback."""
+        mode = CFG.experimental_b1_pose_fact_mode
+        if mode == "off":
+            return candidates
+
+        trace = {
+            "mode": mode,
+            "applied": False,
+        }
+        bundle = self._experimental_search_bundle
+        reranker = None if bundle is None else bundle.b1_pose_fact_reranker
+        if reranker is None:
+            trace["reason"] = (
+                self._experimental_search_init_error
+                or "b1_index_not_available"
+            )
+            desc.quality_trace["experimental_b1_pose_fact"] = trace
+            return candidates
+        trace.update(self._experimental_trace_identity())
+        if desc.feature is None or not candidates:
+            trace["reason"] = "query_or_candidates_unavailable"
+            desc.quality_trace["experimental_b1_pose_fact"] = trace
+            return candidates
+
+        try:
+            result = reranker.evaluate(
+                desc.feature, desc.valid_joint_mask, candidates
+            )
+        except Exception:
+            trace["reason"] = "b1_evaluation_failed"
+            desc.quality_trace["experimental_b1_pose_fact"] = trace
+            return candidates
+
+        trace.update(result.trace)
+        trace["applied"] = mode == "on"
+        desc.quality_trace["experimental_b1_pose_fact"] = trace
+        if mode == "on":
+            return list(result.suggested_candidates)
+        return candidates
 
     def _apply_refine_policy(self, desc, slot, confidence: str,
                              has_candidates: bool = True) -> None:
