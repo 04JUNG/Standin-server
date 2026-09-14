@@ -78,10 +78,60 @@ EXPERIMENTAL_B1_POSE_FACT_MODE=off    # off | shadow | on
 권장 승격 순서는 `둘 다 off → A shadow → B1 shadow → A on → B1 on`이다. A/B1을
 독립적으로 끌 수 있으므로 어느 단계에서 문제가 생겼는지 분리할 수 있다.
 
+## 오프라인 Shadow 평가기
+
+운영 플래그를 켜지 않고 동일한 frozen query에서 `baseline / A / B1 / A+B1`을
+한 번에 비교한다. 입력 DB와 query JSON은 read-only로 열고, 결과는 이 실험
+디렉터리 아래에만 새 폴더로 원자적으로 게시한다. 기존 결과 폴더는 덮어쓰지
+않는다.
+
+```bash
+.venv/bin/python experiments/b1_pose_facts/shadow_eval.py run \
+  --query-root out/eval/in_refine_auto_full_rerun_20260814 \
+  --db data/poses.db \
+  --thumbnail-root data/thumbs \
+  --top-k 5 --metric pos --max-distance-ratio 1.25
+```
+
+생성물은 `experiments/b1_pose_facts/results/shadow-<UTC>/` 아래에 있다.
+
+- `manifest.json`: 코드/DB/query/quarantine/snapshot fingerprint와 실행 파라미터
+- `records.json`, `summary.json`, `REPORT.md`: 네 조건의 counterfactual과 불변식
+- `review/index.html`: 조건·순위·거리·pose ID를 숨긴 로컬 블라인드 검수 화면
+- `review/mapping.hidden.json`: 검수 완료 전 열지 않는 조건/후보 매핑
+
+검수 화면은 네 조건 후보의 합집합을 섞어서 보여준다. 같은 후보는 조건별로
+반복 판정하지 않고 딱 한 번 `usable | editable | unusable`로 판정한다. 쿼리의
+최소 지지 형태도 `stand | non_stand | unknown`으로 별도 판정한다. 모든 항목을
+채운 뒤 `answers.json`을 내보내고 다음처럼 채점한다.
+
+```bash
+.venv/bin/python experiments/b1_pose_facts/shadow_eval.py score \
+  --run experiments/b1_pose_facts/results/shadow-<UTC> \
+  --answers /path/to/answers.json
+```
+
+채점기는 불완전 답변, 다른 run의 답변, hidden mapping hash 불일치를 거부한다.
+`scores/answers-<답변 해시>/`의 `score_summary.json`, `score_records.json`,
+`SCORE_REPORT.md`에 Top-1 strict usable, Top-1 workable(`usable + editable`),
+workable@K, MRR과 baseline 대비 paired 변화를 기록한다. 같은 답변의 점수 폴더는
+덮어쓰지 않으며 여러 리뷰 결과도 답변 해시별로 분리한다.
+
+승격 체크는 평가 전에 코드로 고정한다.
+
+- A: predicted non-stand 최소 10개, human non-stand precision 0.90 이상,
+  human stand/unknown 쿼리의 순서 변경 0개
+- B1: 평가 쿼리 최소 20개, Top-1 workable 절대 향상 0.10 이상,
+  전체 쿼리 기준 Top-1 regression 0.05 이하
+
+표본 수가 부족하면 `PASS`가 아니라 `INSUFFICIENT`다. 블라인드 라벨 전의
+`run` 결과는 정확도 결론이 아닌 engineering shadow 결과로만 취급한다.
+
 ## 검증
 
 ```bash
 .venv/bin/python tests/experimental/test_a_b1_search.py
+.venv/bin/python tests/experimental/test_shadow_eval.py
 .venv/bin/python tests/test_search_family_grouping.py
 .venv/bin/python tests/test_smoke.py
 ```
