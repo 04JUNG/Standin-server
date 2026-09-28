@@ -2,7 +2,7 @@
 
 > 문서 소유: Standin 기술팀 · 갱신: 2026-09-24 · 대상: Standin 추론 서버를 이어받는 기술팀원
 > 기준: 기술팀 작업 트리. 원격 `main`에 아직 없는 참조 파일과 기능은 후속 반영 대상이다.
-> 상세 파일·변경 지침은 [AI 작업용 인수인계](HANDOFF_AI.md), 문서별 현재 기준은 [문서 안내](README.md)에 있다.
+> 상세 파일·변경 지침은 [AI 작업용 인수인계](HANDOFF_AI.md)에 있다. GitHub `main`만 기준으로 인계할 때는 [원격 기준 사람용](HANDOFF_GITHUB_HUMAN.md)과 [원격 기준 AI용](HANDOFF_GITHUB_AI.md)을 사용한다.
 
 ## 이 서버가 맡는 일
 

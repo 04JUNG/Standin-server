@@ -9,6 +9,7 @@ source_snapshot: Standin technical-team working tree; referenced files absent fr
 entrypoint: src/pipeline.py::Pipeline.process_cut
 external_contract: api/models.py + docs/API_CONTRACT.md
 companion: docs/HANDOFF_HUMAN.md
+github_main_companion: docs/HANDOFF_GITHUB_AI.md
 ---
 
 # Standin 기술팀 인수인계 — AI 작업용
