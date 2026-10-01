@@ -1,5 +1,7 @@
 # Standin-server
 
+> 검색 라우팅 참고 워크트리: [handoff/search-routing/README.md](handoff/search-routing/README.md)
+
 웹툰 러프 콘티 컷 1장(.png) → 가까운 **포즈 Top-K 후보**를 반환하는 Python 추론 서버.
 전체 제품(Standin) 파이프라인 중 **VLM 분석 → 포즈 검색** 구간을 담당한다(담당: 도원).
 
