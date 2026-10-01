@@ -86,14 +86,26 @@ class Pipeline:
         # 2) Shot 분기
         with span("route"):
             r = route(vlm)                  # "skip" | "bust" | "core"
-        if r == "skip":
-            return CutResult(route="skip", count_confidence="n/a",
-                             detector_count=0, vlm_count=vlm.num_people,
-                             notes=["얼굴 컷 → 배치 스킵(작가 직접)"])
-        if r == "bust":
-            return CutResult(route="bust", count_confidence="n/a",
-                             detector_count=0, vlm_count=vlm.num_people,
-                             notes=["흉상 컷 → 상체 방향·앵글(MVP 후순위). 검색 스킵."])
+        if r in ("skip", "bust"):
+            # Keep people/framing metadata even when search is not supported.
+            # No pose inference, invented joints, or candidate generation here.
+            assignment = assign_candidates(
+                vlm.approx_boxes, [], img_w, img_h, CFG,
+                expected_count=vlm.num_people,
+            )
+            slots = sorted(assignment.slots, key=lambda slot: (
+                slot.result_box.x1 if slot.result_box else float("inf"),
+                slot.slot_id,
+            ))
+            descs = build_slot_descriptors(vlm, slots)
+            return CutResult(
+                route=r, count_confidence="n/a", detector_count=0,
+                vlm_count=vlm.num_people, descriptors=descs,
+                person_candidates=[[] for _ in descs],
+                person_confidence=["low" for _ in descs],
+                notes=["두상 포즈 검색은 아직 지원하지 않습니다." if r == "skip"
+                       else "흉상 포즈 검색은 아직 지원하지 않습니다."],
+            )
 
         if getattr(self.pose, "self_detecting", False):
             return self._process_self_detecting(

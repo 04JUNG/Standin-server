@@ -1,6 +1,6 @@
 # API 계약 — 도원 추론 서버 (FastAPI)
 
-> 상태: 현재 계약 · 갱신일: 2026-09-03 · 기준 코드: `api/app.py`, `api/models.py`
+> 상태: 현재 계약 · 갱신일: 2026-10-02 · 기준 코드: `api/app.py`, `api/models.py`
 >
 > 이 문서는 **실제 구현된** HTTP 계약(`api/app.py`·`api/models.py`)을 문서화한다.
 > `/export-order`의 상세는 별도 문서(`docs/EXPORT_CONTRACT.md`)에 있고, 여기서는 전체 엔드포인트와
@@ -266,12 +266,17 @@ Content-Type: multipart/form-data
 | `count_confidence` | string | `high`(검출기 개수 = VLM 개수) \| `low`(불일치 → 저신뢰 폴백) \| `n/a` |
 | `detector_count` | int | 검출기가 센 사람 수 |
 | `vlm_count` | int | VLM이 센 사람 수 (둘의 일치가 신뢰도 신호 — `CLAUDE.md` 불변식 §2) |
-| `people` | Person[] | 인물별 결과. `route:"skip"`이면 빈 배열 |
+| `people` | Person[] | 인물별 결과. `bust`/`skip`에도 인물·범위 메타데이터 유지, 후보는 빈 배열 |
 | `notes` | string[] | 폴백 사유 등 사람이 읽는 메모 |
 | `image` | object | 분석 기준 원본의 `width`, `height` |
 | `inference_metadata` | object | 배포·VLM·포즈 backend/model·포즈 라이브러리·feature schema 버전 |
 
 **`people[]` (PersonOut)**
+
+`output_scope`는 `{ "detected": "full" | "half" | "bust" | "head" | null,
+"source": "vlm_person" | "legacy_shot" | "unknown" }`이다. 기존 `shot`과 독립적인
+출력 구도 메타데이터이며 검색/refine 정책을 바꾸지 않는다. 판별·BFF 저장·앱 계약은
+[BODY_SCOPE.md](BODY_SCOPE.md)에 있다. 실제 부분 미리보기/FBX 크롭은 후속 단계다.
 
 | 필드 | 타입 | 의미 |
 |---|---|---|

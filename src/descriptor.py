@@ -12,6 +12,7 @@ from .schema import VLMAnalysis, Skeleton, PersonDescriptor, BBox
 from .features import normalize_skeleton
 from .refine_policy import structural_refine_allowed
 from .config import CFG
+from .body_scope import detect_scope
 
 
 def order_left_to_right(skeletons: List[Optional[Skeleton]],
@@ -160,5 +161,8 @@ def build_slot_descriptors(vlm: VLMAnalysis, slots) -> List[PersonDescriptor]:
                 "pose_rescue": dict(slot.rescue_trace),
             },
             quality_reasons=list(dict.fromkeys(slot.reasons)),
+            output_scope=detect_scope(
+                vlm, slot.slot_id if slot.slot_origin == "vlm" else None,
+            ),
         ))
     return out

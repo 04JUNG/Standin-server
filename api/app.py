@@ -470,6 +470,7 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
             refine_allowed=desc.refine_allowed,
             quality_trace=desc.quality_trace,
             quality_reasons=desc.quality_reasons,
+            output_scope=asdict(desc.output_scope),
         ))
     vlm_model = (CFG.gemini_model if STATE.get("provider") == "gemini"
                  else CFG.openai_model if STATE.get("provider") == "openai"
