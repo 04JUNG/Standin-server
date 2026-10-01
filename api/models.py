@@ -74,7 +74,7 @@ class PersonOut(BaseModel):
     skeleton_source: str = Field(
         "full_image", description="none | full_image | crop_retry")
     coverage_class: str = Field(
-        "full", description="full | reduced | sparse | insufficient")
+        "full", description="full | reduced | sparse | upper_only | insufficient")
     slot_origin: str = Field("vlm", description="vlm | rtm_provisional")
     search_stability: Optional[str] = Field(
         None, description="stable | ambiguous | unstable | not_required | not_available")

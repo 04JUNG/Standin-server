@@ -126,7 +126,7 @@ webtoon-pose-mvp/
 ```
 VLM.analyze  ── 1회 호출로 개수·shot·action·view·relationship·대략박스 확보
   │            (검출 보정[§7]과 의미 태그[§5]가 같은 결과를 공유 — 중복 호출 안 함)
-  ├─ route      face→"skip"(조기 종료) / bust→"bust"(검색 스킵) / full_half→"core"
+  ├─ route      두상만 있는 face→"skip" / bust·full_half·혼합 구도→"core" (관측 관절 검색)
   ├─ detect + reconcile   검출기 개수 vs VLM 개수
   ├─ pose.estimate        각 박스에서 17kp 스켈레톤
   ├─ build_descriptors    태그 + 정규화 피처 결합
@@ -138,7 +138,7 @@ VLM.analyze  ── 1회 호출로 개수·shot·action·view·relationship·대
 1. **VLM 태그 = shot + 사람 수(제어 신호)만.** action/view/relationship는 매칭에 안 쓴다(기하와 중복). shot→라우팅(skip/bust/core), 사람 수→분기(N명→N BVH). 관절 좌표는 VLM이 생성 안 함(검출기·포즈 모델 몫).
 2. **개수 일치 = 스케일 무관 신뢰도 신호.** rtmlib score는 모델마다 스케일이 달라(Body 0.1~0.2 vs Wholebody 1.4~7.5) 신뢰도로 못 쓴다. 대신 `detect.py::reconcile`이 "검출기 개수 vs VLM 개수" 이진 일치로 `high`/`low`를 낸다. 불일치=폴백 후보. 이 신호를 다른 것으로 바꾸지 말 것.
 3. **얽힘·공백 = 폴백(신뢰도 분기).** 매칭은 순수 기하라 별도 얽힘 태그가 없다. 대신 `pipeline._search_one`이 스켈레톤 score 낮음(추출 실패) 또는 Top-1 거리 > `CFG.fallback_distance`(라이브러리 공백·얽힘)면 `person_confidence='low'`로 폴백(작가). 임계값은 실데이터로 보정.
-4. **피처 공간의 대칭성.** 쿼리(추출 스켈레톤)와 라이브러리(3D→2D 투영)가 **반드시 같은** `features.normalize_skeleton`을 통과해야 kNN이 성립한다. 정규화는 힙 중심 이동 + 몸통 길이 스케일 + 결측 관절 마스킹(카메라·인물 크기 불변). 한쪽만 바꾸면 검색이 조용히 망가진다. 3D 포즈→피처는 `library.pose_to_feature`가 단일 소스이고 **색인과 refine이 이 함수를 공유**한다(`test_feature_space_symmetry_shared_function`이 감시).
+4. **피처 공간의 대칭성.** 전신 쿼리와 라이브러리는 같은 `features.normalize_skeleton`을 통과한다(힙 중심·몸통 길이·결측 마스킹). 3D 포즈→피처는 `library.pose_to_feature`를 색인과 refine이 공유한다. `upper_only` 검색은 별도로 쿼리와 저장 투영 양쪽에 `partial_pose.shoulder_frame`을 적용해 힙 기준을 상쇄한다. 한쪽만 정규화를 바꾸면 안 된다. 상체 거리에는 전신 임계값을 쓰지 않으며 refine은 금지한다. 상세: `docs/BODY_SCOPE.md`.
 5. **Descriptor 결합에 LLM 불필요.** VLM 태그 + 스켈레톤 피처는 `descriptor.py`에서 JSON 구조화로만 합친다.
 6. **얽힘 관계는 세트로.** `Relationship.HUGGING`/`FIGHTING`은 `is_entangled` → 2인 상호작용 포즈를 한 덩어리로 검색(개별 인물 분해가 실패하는 케이스).
 7. **refine은 좋아지거나, 그대로.** `refine.py`는 검색된 베이스 포즈의 **팔 회전만** 러프에 맞춰 돌린다(기본 `REFINE_LIMBS=arms`. 루트/힙 위치·척추·손목·**다리** 고정). 다리는 투영 관측 감도가 팔의 1/3.4라 손실이 못 보는 방향으로 크게 움직인다 — 3D 정규화·이동량 게이트 없이 켜지 말 것(`REFINE_DESIGN.md` §6-4). 안전 게이트 중 하나라도 걸리면 조정을 버리고 베이스를 그대로 반환한다 — refine이 결과를 나쁘게 만드는 경로는 존재하면 안 된다. 특히 **검색이 실패한 컷에는 refine을 돌리지 않는다**(틀린 베이스를 러프에 끼워맞추면 더 이상해진다). 게이트를 약화시키는 방향으로 바꾸지 말 것. 상세: `docs/REFINE_DESIGN.md`.

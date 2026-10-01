@@ -1,4 +1,4 @@
-"""Framing metadata must neither change matching nor relax refine safety gates."""
+"""Per-person framing lineage and geometry-based search/refine safety gates."""
 import io
 from dataclasses import asdict
 
@@ -54,7 +54,7 @@ def test_slot_identity_survives_sort_and_detector_provisional_is_unknown():
     assert all(not d.refine_allowed for d in descs)
 
 
-@pytest.mark.parametrize("hint,route,scope", [("bust", "bust", "bust"), ("face", "skip", "head")])
+@pytest.mark.parametrize("hint,route,scope", [("face", "skip", "head")])
 def test_skipped_search_keeps_people_without_inventing_skeleton(hint, route, scope):
     class NoPose:
         def estimate(self, *args):
@@ -69,7 +69,7 @@ def test_skipped_search_keeps_people_without_inventing_skeleton(hint, route, sco
     assert [d.output_scope.detected.value for d in result.descriptors] == [scope, scope]
 
 
-def test_framing_metadata_does_not_change_search_or_refine_policy():
+def test_full_geometry_is_preserved_when_crop_metadata_conflicts():
     class ScopedMock(MockVLMClient):
         def __init__(self, scope):
             self.scope = scope
@@ -81,7 +81,7 @@ def test_framing_metadata_does_not_change_search_or_refine_policy():
 
     index = build_synthetic_index()
     results = [Pipeline(index, vlm_client=ScopedMock(scope), pose_model=MockPoseModel())
-               .process_cut("standing") for scope in [BodyScope.FULL, BodyScope.HEAD]]
+               .process_cut("standing") for scope in [BodyScope.FULL, BodyScope.HALF]]
     left, right = results
     assert left.route == right.route == "core"
     assert [[(c.pose_id, c.distance) for c in cs] for cs in left.person_candidates] == [
@@ -90,7 +90,7 @@ def test_framing_metadata_does_not_change_search_or_refine_policy():
         (d.refine_allowed, d.lower_body_observed) for d in right.descriptors]
 
 
-def test_api_serializes_per_person_detection_on_skipped_route(monkeypatch):
+def test_api_serializes_per_person_detection_on_mixed_route(monkeypatch):
     import api.app as api_app
 
     vlm = _coerce(payload(shot="bust", body_scopes=["bust", "head"]), 512, 768)
@@ -107,4 +107,6 @@ def test_api_serializes_per_person_detection_on_skipped_route(monkeypatch):
     people = result.model_dump(mode="json")["people"]
     assert [p["output_scope"]["detected"] for p in people] == ["head", "bust"]
     assert [p["index"] for p in people] == [0, 1]
-    assert all(p["candidates"] == [] for p in people)
+    assert people[0]["candidates"] == []
+    assert "head_search_unsupported" in people[0]["quality_reasons"]
+    assert people[1]["candidates"]
