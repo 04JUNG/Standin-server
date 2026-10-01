@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import hashlib
+import base64
 import hmac
 import io
 import json
@@ -45,6 +46,7 @@ from converter_api.runner import (
     WorkerIntegrityError,
 )
 from converter_api.schemas import CharactersResponse, HealthResponse
+from converter.framing import FRAMING_VERSION, OUTPUT_SCOPES, PREVIEW_VIEWS
 
 
 LOGGER = logging.getLogger("standin.converter")
@@ -247,6 +249,8 @@ def _build_artifact_bundle(
             "mirror": mirror,
             "output_mode": OUTPUT_MODE,
             "apply_root_translation": APPLY_ROOT_TRANSLATION,
+            "output_scope": result.report.get("output_scope", "full"),
+            "framing_version": result.report.get("framing_version"),
         },
         "artifacts": {
             "bvh": {
@@ -377,6 +381,10 @@ def create_app(
         payload = {
             "ok": ok,
             "solver_version": SOLVER_VERSION,
+            "framing_version": FRAMING_VERSION,
+            "output_scopes": (sorted(OUTPUT_SCOPES) if not getattr(
+                getattr(blender_runner, "settings", None), "force_exact_v324", False
+            ) else ["full"]),
             "checks": checks,
         }
         if ok:
@@ -394,10 +402,15 @@ def create_app(
         response_format: str,
         artifact_kind: str | None = None,
         expected_bvh_sha256: str | None = None,
+        output_scope: str = "full",
+        preview_view: str | None = None,
     ) -> CompletedConversion:
         conversion_id = str(uuid.uuid4())
         request_started = time.monotonic()
         try:
+            if output_scope not in OUTPUT_SCOPES or (preview_view is not None and preview_view not in PREVIEW_VIEWS):
+                raise ApiProblem(400, "INVALID_OPTION", "invalid output scope or preview view",
+                                 conversion_id=conversion_id)
             if artifact_kind is not None and artifact_kind not in ARTIFACT_KINDS:
                 raise ApiProblem(
                     400,
@@ -449,12 +462,18 @@ def create_app(
                 character_sha256=resolved.metadata.sha256,
                 conversion_id=conversion_id,
                 mirror=mirror,
+                output_scope=output_scope,
+                preview_view=preview_view,
             )
             _verify_result_integrity(
                 result,
                 conversion_id=conversion_id,
                 bvh_bytes=bvh_bytes,
             )
+            if output_scope != "full" or preview_view:
+                if (result.report.get("output_scope") != output_scope
+                        or result.report.get("framing_version") != FRAMING_VERSION):
+                    raise WorkerIntegrityError("output framing lineage mismatch")
         except ApiProblem:
             raise
         except UnknownCharacterError as exc:
@@ -530,6 +549,8 @@ def create_app(
         common_headers = {
             "X-Standin-Conversion-Id": conversion_id,
             "X-Standin-Solver-Version": SOLVER_VERSION,
+            "X-Standin-Output-Scope": output_scope,
+            "X-Standin-Framing-Version": FRAMING_VERSION,
             "X-Standin-Source-BVH-SHA256": result.source_bvh_sha256,
             "X-Standin-FBX-Artifact-SHA256": result.artifact_sha256,
             "X-Standin-Source-Profile": _safe_header(report.get("src_profile")),
@@ -568,6 +589,7 @@ def create_app(
         mirror: bool = Form(default=False),
         output_mode: str = Form(default=OUTPUT_MODE),
         apply_root_translation: bool = Form(default=APPLY_ROOT_TRANSLATION),
+        output_scope: str = Form(default="full"),
     ):
         completed = _execute_conversion(
             bvh=bvh,
@@ -577,6 +599,7 @@ def create_app(
             output_mode=output_mode,
             apply_root_translation=apply_root_translation,
             response_format="fbx",
+            output_scope=output_scope,
         )
         result = completed.result
         filename = (
@@ -621,6 +644,7 @@ def create_app(
         mirror: bool = Form(default=False),
         output_mode: str = Form(default=OUTPUT_MODE),
         apply_root_translation: bool = Form(default=APPLY_ROOT_TRANSLATION),
+        output_scope: str = Form(default="full"),
     ):
         completed = _execute_conversion(
             bvh=bvh,
@@ -630,6 +654,7 @@ def create_app(
             output_mode=output_mode,
             apply_root_translation=apply_root_translation,
             response_format="bundle",
+            output_scope=output_scope,
             artifact_kind=artifact_kind,
             expected_bvh_sha256=expected_bvh_sha256,
         )
@@ -663,6 +688,44 @@ def create_app(
             media_type="application/zip",
             headers=headers,
         )
+
+    @app.post("/convert-framed")
+    def convert_framed(
+        bvh: UploadFile = File(...),
+        character_id: str = Form(default="standin-master-v2"),
+        output_scope: str = Form(default="full"),
+        preview_view: str = Form(default="front"),
+        expected_bvh_sha256: str = Form(...),
+    ):
+        """One verified FBX plus its own reimported preview, in a single response."""
+        completed = _execute_conversion(
+            bvh=bvh, character_id=character_id, frame=FRAME, mirror=False,
+            output_mode=OUTPUT_MODE, apply_root_translation=APPLY_ROOT_TRANSLATION,
+            response_format="framed", expected_bvh_sha256=expected_bvh_sha256,
+            output_scope=output_scope, preview_view=preview_view,
+        )
+        result = completed.result
+        if (not result.preview.startswith(b"\x89PNG\r\n\x1a\n")
+                or len(result.preview) > 4 * 1024 * 1024
+                or len(result.artifact) > 30 * 1024 * 1024
+                or result.report.get("preview_view") != preview_view
+                or result.report.get("preview_size") != len(result.preview)
+                or hashlib.sha256(result.preview).hexdigest() != result.report.get("preview_sha256")):
+            raise ApiProblem(500, "WORKER_INTEGRITY_ERROR", "preview integrity mismatch")
+        return {
+            "conversion_id": completed.conversion_id,
+            "solver_version": SOLVER_VERSION,
+            "framing_version": FRAMING_VERSION,
+            "output_scope": output_scope,
+            "preview_view": preview_view,
+            "character_id": completed.character.metadata.character_id,
+            "character_sha256": completed.character.metadata.sha256,
+            "source_bvh_sha256": result.source_bvh_sha256,
+            "fbx_sha256": result.artifact_sha256,
+            "preview_sha256": result.report["preview_sha256"],
+            "fbx_base64": base64.b64encode(result.artifact).decode("ascii"),
+            "preview_base64": base64.b64encode(result.preview).decode("ascii"),
+        }
 
     return app
 

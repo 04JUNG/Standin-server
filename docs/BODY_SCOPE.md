@@ -62,7 +62,7 @@ VLM `body_scopes`는 `approx_boxes`와 같은 순서/길이다. 불확실한 값
 
 1단계는 판별과 설정 저장이다. **`outputScopeCropping=false`**이며 화면에도
 "범위 설정만 저장됩니다. 현재 미리보기와 파일은 전신입니다."를 표시한다.
-2단계 관측 영역 검색은 아래와 같다. 카메라 크롭, FBX 메시 절단은 아직 구현하지 않았다.
+2단계 관측 영역 검색은 아래와 같다. 3단계 FBX 메시 절단·결과 미리보기는 하단에 설명한다.
 현재 BVH/FBX export 파라미터나 converter의 고정된 worker 계약에는 범위를 넣지 않는다.
 
 다음 출력 단계는 full rig를 유지한
@@ -133,6 +133,65 @@ masked 손목 독립성, 실제 관측 부족·소유권·길이 이상·퇴화 
 운영 배포 및 실제 PostgreSQL/VLM/네이티브 앱 검증은 포함하지 않았다.
 
 ## 검증
+
+### 3단계: FBX 메시 절단과 실제 결과 미리보기 (2026-10-02)
+
+`converter/framing.py`의 `skin-regions-v1`은 고정된 v3.2.5 전신 리타게팅 뒤에
+별도 후처리로 실행한다. 원본 BVH와 52개 뼈대의 이름·계층·bind transform은 유지한다.
+전신/기존 요청은 바이트를 다시 저장하지 않는다. `force_exact_v324`에서는 부분 출력을 거부한다.
+
+| 출력 | 남기는 메시 |
+|---|---|
+| full | 원본 전체 |
+| half | 척추 위 상체, 양팔·손·손가락 |
+| bust | 가슴·어깨·목·머리, 팔 제외 |
+| head | 머리 중심, skin weight에 따라 목 경계 일부 |
+
+절단은 월드 높이가 아니라 리그의 부위별 skin weight 합계 0.5 경계를 사용한다.
+그래서 발차기에서 높이 올라온 발은 제거되고, 아래로 내린 손은 유지된다.
+BMesh가 경계의 위치·UV·가중치를 보간하고 새 절단면만 막는다. 기존 구멍은 수선하지 않는다.
+부위 anchor 누락, shape key, 무가중치 정점, 열린 절단면은 실패 처리한다.
+옷·머리카락·소품 등 임의 다중 메시 리그는 호환을 보장하지 않는다.
+경계는 평면 조각상이 아니라 skin weight에 따른 윤곽이므로 약간 굴곡질 수 있다.
+
+내부 `POST /convert-framed`는 BVH, character_id, output_scope, preview_view,
+expected_bvh_sha256를 받고, 최종 FBX를 다시 import하여 512px PNG를 렌더링한다.
+응답은 source/FBX/PNG SHA256, solver/framing 버전, 범위·뷰·캐릭터와 두 바이너리의
+base64 JSON이다. FBX 30MiB, PNG 4MiB를 넘으면 거부한다. API 프로세스는 bpy를 import하지 않는다.
+`/convert`와 `/convert-bundle`도 optional output_scope를 받으며 기본값은 full이다.
+
+BFF `GET /v1/pose-candidates/:id/framed`:
+
+- 필수 jobId/personIndex/candidateId/outputScope, format=preview 또는 fbx; optional characterId.
+- 매번 소유 Job, 확정된 후보, poseId 일치, 서버에 저장된 resolved scope를 검사한다.
+  변환이 끝난 뒤 범위·확정을 다시 확인한다. 오래된 요청은 `409 OUTPUT_SCOPE_CHANGED`다.
+- 기존 refine 서비스가 확정한 최종 BVH만 사용한다. 격리된 베이스는 내보내지 않는다.
+- SHA/버전/범위/캐릭터/파일 시그니처 검증 후 동일 FBX+PNG 쌍을 최대 10분/128MiB 캐시한다.
+  소유 설치·Job·인물·후보·BVH SHA·모델·범위·버전별 격리, 동시 miss는 4개 제한이다.
+  응답은 `private, no-store`. 기존 `/export`와 BVH 동작은 유지한다.
+- `outputScopeCropping=true`는 건강한 converter의 버전과 네 범위 지원이 확인될 때만 노출한다.
+  상태 조회는 30초 캐시한다. 구 converter, 장애, exact-v324에서는 false다.
+
+앱/바는 보정 완료 후 저장 직전 확인 화면에서 **정면 실제 FBX 미리보기**를 요청한다.
+인물별 범위와 저장할 체형이 다운로드와 같은 URL 빌더를 쓴다. 생성 중/실패 시 저장 버튼을
+잠그며 재시도와 후보 돌아가기를 제공한다. 실패 시 전신 그림으로 대체하지 않는다.
+후보 비교 카드 자체는 기존 라이브러리 썸네일이다. BVH 저장에는 전신 뼈대 안내를 표시한다.
+부분 출력은 얼굴만 있는 입력의 자동 방향 검색을 추가하지 않는다. 그 검색은 별도 검증 대상이며
+`HEAD_SEARCH_UNSUPPORTED`를 유지한다. 전신/상체에서 고른 후보를 두상으로 출력할 수 있다.
+
+검증: Windows Blender 5.2.0 LTS의 실제 기본 체형과 로맨스·옆차기·공중 옆차기에서
+3포즈×4범위=12개 FBX/PNG를 만들고 재import했다. 뼈 이름/계층/행렬(오차<1e-4),
+UV layer 보존, 부분 정점 감소, full SHA 동일 검사를 통과했다. 12개 렌더를 시각 확인했다.
+실 Blender worker→FastAPI `/convert-framed` 1건에서도 source/FBX/PNG SHA가 일치했다.
+재현 스크립트는 `scripts/verify_output_framing.py`; 산출물은 `data/dev/body-scope/framing-qa/`.
+실제 UI 컴포넌트에 이 PNG를 공급한 격리 Mock에서 앱 960×640, 바 720×460,
+변환 실패 시 저장 차단을 확인했다. 캡처: `data/dev/body-scope/framing-review-bar.jpg`.
+다른 체형·운영 PostgreSQL·Linux 컨테이너·macOS·Tauri/CSP 실제 import는 미검증이다.
+전신 뼈대를 유지하므로 외부 프로그램의 자동 화면 맞춤은 전신 bounds를 사용할 수 있다.
+
+최종 자동 검사: Python converter 관련 60개, BFF 출력 계약 관련 46개,
+앱 포즈/저장 기능 85개 통과. 앱/BFF TypeScript, 변경 UI ESLint, Python compileall,
+앱 Vite 빌드 통과. Vite의 500kB 초과 번들 안내는 남아 있다.
 
 - `tests/test_body_scope.py`: 누락/오류/혼합 구도, 슬롯 정렬, 조기 종료 API,
   범위 변경 전후 검색 순위/거리/refine 정책 유지.

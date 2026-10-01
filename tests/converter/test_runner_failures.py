@@ -3,6 +3,8 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 import time
+import subprocess
+import sys
 
 import pytest
 
@@ -14,6 +16,19 @@ from converter_api.runner import (
     RunnerSettings,
     WorkerIntegrityError,
 )
+
+
+@pytest.fixture(autouse=True)
+def launch_python_fixture_portably(monkeypatch):
+    """Run the fake Python binary without relying on POSIX shebang dispatch."""
+    original = subprocess.Popen
+
+    def launch(args, *positional, **kwargs):
+        if Path(args[0]).name == "fake_blender":
+            args = [sys.executable, *args]
+        return original(args, *positional, **kwargs)
+
+    monkeypatch.setattr(subprocess, "Popen", launch)
 
 
 FAKE_BLENDER = r'''#!/usr/bin/env python3

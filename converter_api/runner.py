@@ -34,6 +34,7 @@ from converter.protocol import (
     SOLVER_MANIFEST_SHA256,
     SOLVER_VERSION,
 )
+from converter.framing import FRAMING_VERSION, PREVIEW_VIEWS, validate_scope
 
 
 class RunnerError(RuntimeError):
@@ -130,6 +131,7 @@ class ConversionResult:
     queue_wait_ms: float = 0.0
     execution_ms: float = 0.0
     task_cold_start: bool = False
+    preview: bytes = b""
 
 
 def sha256_file(path: Path) -> str:
@@ -309,6 +311,8 @@ class BlenderRunner:
         mirror: bool,
         returncode: int,
         combined_log: str,
+        output_scope: str = "full",
+        preview_view: str | None = None,
     ) -> ConversionResult:
         if not report.get("ok"):
             raise self._report_error(report)
@@ -336,6 +340,9 @@ class BlenderRunner:
             "blender_build_hash": self.settings.expected_blender_build_hash,
         }
         mismatched = [key for key, value in expected.items() if report.get(key) != value]
+        if output_scope != "full" or preview_view:
+            if report.get("output_scope") != output_scope or report.get("framing_version") != FRAMING_VERSION:
+                mismatched.append("output_scope/framing_version")
         if mismatched:
             raise WorkerIntegrityError(
                 f"worker report lineage mismatch: {','.join(sorted(mismatched))}",
@@ -365,12 +372,24 @@ class BlenderRunner:
                 "artifact size does not match worker report", report=report
             )
         artifact = output_path.read_bytes()
+        preview = b""
+        if preview_view:
+            preview_path = temp_dir / "preview.png"
+            if (report.get("preview_view") != preview_view or not preview_path.is_file()
+                    or preview_path.is_symlink()):
+                raise WorkerIntegrityError("preview output missing or mismatched")
+            preview = preview_path.read_bytes()
+            if (not preview.startswith(b"\x89PNG\r\n\x1a\n")
+                    or hashlib.sha256(preview).hexdigest() != report.get("preview_sha256")
+                    or len(preview) != report.get("preview_size")):
+                raise WorkerIntegrityError("preview integrity check failed")
         return ConversionResult(
             conversion_id=conversion_id,
             artifact=artifact,
             artifact_sha256=artifact_sha256,
             source_bvh_sha256=source_bvh_sha256,
             report=report,
+            preview=preview,
         )
 
     def convert(
@@ -382,11 +401,21 @@ class BlenderRunner:
         character_sha256: str,
         conversion_id: str,
         mirror: bool = False,
+        output_scope: str = "full",
+        preview_view: str | None = None,
     ) -> ConversionResult:
         if not bvh_bytes:
             raise ConversionRejectedError("BVH upload is empty")
         if type(mirror) is not bool:
             raise ConversionRejectedError("mirror must be boolean")
+        try:
+            validate_scope(output_scope)
+        except (TypeError, ValueError) as exc:
+            raise ConversionRejectedError("invalid output_scope") from exc
+        if preview_view is not None and preview_view not in PREVIEW_VIEWS:
+            raise ConversionRejectedError("invalid preview_view")
+        if self.settings.force_exact_v324 and output_scope != "full":
+            raise ConversionRejectedError("exact V3.2.4 mode permits full framing only")
         queue_started = time.monotonic()
         self._process_slots.acquire()
         queue_wait_ms = (time.monotonic() - queue_started) * 1000.0
@@ -401,6 +430,8 @@ class BlenderRunner:
                 character_sha256=character_sha256,
                 conversion_id=conversion_id,
                 mirror=mirror,
+                output_scope=output_scope,
+                preview_view=preview_view,
             )
         finally:
             execution_ms = (time.monotonic() - execution_started) * 1000.0
@@ -423,6 +454,8 @@ class BlenderRunner:
         character_sha256: str,
         conversion_id: str,
         mirror: bool,
+        output_scope: str = "full",
+        preview_view: str | None = None,
     ) -> ConversionResult:
         if not character_path.is_file() or character_path.suffix.lower() != ".fbx":
             raise WorkerIntegrityError("character artifact is not a regular FBX file")
@@ -460,6 +493,8 @@ class BlenderRunner:
                 "apply_root_translation": APPLY_ROOT_TRANSLATION,
                 "embed_textures": EMBED_TEXTURES,
                 "force_exact_v324": self.settings.force_exact_v324,
+                "output_scope": output_scope,
+                "preview_view": preview_view,
             }
             job_path.write_text(
                 json.dumps(job, sort_keys=True, separators=(",", ":")) + "\n",
@@ -500,6 +535,8 @@ class BlenderRunner:
                 mirror=mirror,
                 returncode=process.returncode,
                 combined_log=combined_log,
+                output_scope=output_scope,
+                preview_view=preview_view,
             )
 
 
