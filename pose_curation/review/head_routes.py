@@ -13,6 +13,7 @@ from ..head.candidates import HeadCandidates
 from ..storage import sha256
 from .framing import NativeReference
 from .orientation_routes import orientation_router
+from .head_review_routes import head_review_router
 
 
 class FaceInput(BaseModel):
@@ -54,6 +55,9 @@ def head_router(curation, assets, previews):
         orientation_router(
             previews, reference, base_path="/api/head", scopes={"head", "bust"}
         )
+    )
+    router.include_router(
+        head_review_router(curation, queries, candidates, previews, reference)
     )
 
     @router.get("/head")

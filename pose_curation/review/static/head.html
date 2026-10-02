@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>두상·흉상 시점 작업실</title><link rel="stylesheet" href="/static/style.css?v=head-1"><link rel="stylesheet" href="/static/scoped.css?v=1"><link rel="stylesheet" href="/static/head.css?v=2"></head>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>두상·흉상 시점 작업실</title><link rel="stylesheet" href="/static/style.css?v=head-1"><link rel="stylesheet" href="/static/scoped.css?v=1"><link rel="stylesheet" href="/static/head.css?v=3"></head>
 <body class="scoped-page head-page"><main>
 <header class="page-header"><div><a class="text-link" href="/scoped">← 상체 포즈·러프 시점</a><h1>두상·흉상 시점 작업실</h1><p>얼굴 후보를 선택해 각도를 맞추고, 기본 캐릭터로 확인한 뒤 FBX를 내려받으세요.</p></div></header>
 <p class="head-notice">자동 검출한 얼굴 후보에서 원하는 그림 얼굴을 선택하세요. 후보가 없거나 가려진 얼굴은 기준점·각도로 직접 맞출 수 있습니다. 흉상의 어깨 자세·표정은 기본 형태입니다.</p>
@@ -29,5 +29,16 @@
 <div id="angle-downloads" class="angle-downloads" hidden><a id="angle-fbx" class="quiet-button">이 각도 FBX ↓</a><a id="angle-settings" class="text-link">각도 설정 JSON ↓</a></div>
 <details class="rough-comparison"><summary>얼굴 러프 겹쳐 보기</summary><button id="head-overlay-crop" class="quiet-button" disabled>지정한 얼굴 영역 겹치기</button><button id="head-overlay-clear" class="quiet-button">겹침 숨기기</button><label>다른 비교 이미지 <input id="rough-file" type="file" accept="image/png,image/jpeg,image/webp"></label><label for="rough-opacity">러프 불투명도</label><input id="rough-opacity" type="range" min="0" max="100" value="45"><label for="head-overlay-scale">비교 이미지 크기</label><input id="head-overlay-scale" type="range" min="50" max="200" value="100"><label for="head-overlay-x">비교 이미지 좌우 위치</label><input id="head-overlay-x" type="range" min="-50" max="50" value="0"><label for="head-overlay-y">비교 이미지 위아래 위치</label><input id="head-overlay-y" type="range" min="-50" max="50" value="0"><p class="preview-caption">겹침 위치·크기는 비교 화면에만 적용됩니다.</p></details>
 <p class="preview-caption">출력은 FBX만 제공합니다. CSP에서는 정면·평행 투영 카메라로 확인해 주세요. 기존 레이어의 카메라는 파일로 변경되지 않습니다.</p>
+</section>
+<section class="head-review-panel" aria-label="얼굴 각도 검수 기록">
+<h2>3. 각도·검수 저장</h2>
+<p class="preview-caption">대상 얼굴별로 저장합니다. 채택할 때는 현재 각도의 출력 미리보기를 확인해 주세요. 검수 기록은 이 PC에 보관됩니다.</p>
+<label for="head-review-decision">검수 판정</label><select id="head-review-decision"><option value="hold">보류</option><option value="accepted">채택</option><option value="rejected">제외</option></select>
+<label for="head-review-note">각도 검수 메모</label><textarea id="head-review-note" rows="3" maxlength="2000" placeholder="시선·기울기·가림 등 확인한 내용"></textarea>
+<label class="head-review-confirm"><input id="head-review-confirm" type="checkbox">현재 각도의 FBX 미리보기를 확인했습니다</label>
+<div class="head-actions"><button id="head-review-save" class="primary-button" disabled>각도·검수 저장</button><button id="head-review-reload" class="quiet-button">저장 목록 새로고침</button></div>
+<p id="head-review-status" class="preview-caption" role="status"></p>
+<label for="head-review-records">저장한 얼굴·각도</label><select id="head-review-records"></select>
+<button id="head-review-restore" class="quiet-button" disabled>저장한 각도 불러오기</button>
 </section></section></div>
-</main><script type="module" src="/static/head.js?v=4"></script></body></html>
+</main><script type="module" src="/static/head.js?v=5"></script></body></html>

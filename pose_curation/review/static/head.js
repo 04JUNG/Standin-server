@@ -1,13 +1,27 @@
 import {request} from './api.js?v=qa-20261002';
 import {OrientationPreview} from './orientation.js?v=head-1';
 import {FaceCandidates} from './head-candidates.js?v=1';
+import {HeadAngleReviews} from './head-reviews.js?v=1';
 
 const $ = id => document.getElementById(id);
 const preview = new OrientationPreview({endpointBase: '/api/head'});
 let config, query, points = Array(6).fill(null), active = 0, fitResult, revision = 0, fitController, recordUrl;
 const svgNS = 'http://www.w3.org/2000/svg';
+const angleReviews = new HeadAngleReviews({
+  context: () => ({query, reference:config?.reference, scope:$('head-scope').value, angles:preview.angles()}),
+  restore: row => {
+    clearFit();
+    points = row.provenance.points || Array(6).fill(null);
+    $('head-scope').value = row.scope;
+    preview.setContext(config.reference, row.scope);
+    preview.applySuggestion(row.angles);
+    angleReviews.setTarget(row.provenance.candidate ? {candidate:row.provenance.candidate} : {points:row.provenance.points});
+    draw();
+    $('head-status').textContent = '저장한 대상 얼굴·각도를 불러왔습니다. 기본 모델 미리보기를 다시 생성해 주세요.';
+  }
+});
 const faces = new FaceCandidates({
-  onStart: () => {clearFit(); points = Array(6).fill(null); draw();},
+  onStart: () => {clearFit(); angleReviews.setTarget(null); points = Array(6).fill(null); draw();},
   onSelected: result => acceptFit(result, '자동 검출 기준점')
 });
 
@@ -53,6 +67,7 @@ function draw() {
 }
 
 function acceptFit(result, origin) {
+  angleReviews.setTarget(result.source === 'detected_face_user_selected' ? {candidate:result.id} : {points:result.points});
   fitResult = result; preview.applySuggestion(result.orientation); draw();
   $('head-status').textContent = `${origin} 차이 ${(100*result.error).toFixed(1)}% · 참고 각도입니다. 주황색 투영과 초록색 점을 비교하고 실제 모델을 생성해 확인하세요.`;
   recordUrl = URL.createObjectURL(new Blob([JSON.stringify(result,null,2)], {type:'application/json'}));
@@ -62,6 +77,10 @@ function acceptFit(result, origin) {
 function selectQuery() {
   clearFit();
   query = config.items.find(row => row.key === $('head-query').value);
+  angleReviews.setTarget(null);
+  angleReviews.load(query);
+  $('head-review-note').value = '';
+  $('head-review-decision').value = 'hold';
   points = Array(6).fill(null); active = 0;
   $('angle-rough').hidden = true;
   $('angle-rough').removeAttribute('src');
@@ -123,6 +142,7 @@ $('head-overlay').addEventListener('pointerdown', event => {
   const p = new DOMPoint(event.clientX, event.clientY).matrixTransform(matrix.inverse());
   if (p.x < 0 || p.y < 0 || p.x >= query.size[0] || p.y >= query.size[1]) return;
   clearFit(); points[active] = [p.x, p.y];
+  angleReviews.setTarget(null);
   const next = points.findIndex(p => p === null);
   if (next >= 0) active = next;
   $('head-status').textContent = next >= 0 ? `${active+1}번 ${config.labels[active]}을 지정해 주세요.` : '6개 점을 확인한 뒤 각도 추천을 눌러 주세요.';
@@ -132,6 +152,7 @@ $('head-query').addEventListener('change', selectQuery);
 function manualAngleChange() {
   const hadResult = Boolean(fitResult);
   clearFit({invalidatePreview: false}); draw();
+  angleReviews.changed();
   if (hadResult) $('head-status').textContent = '각도를 직접 변경했습니다. 이전 추천 점 겹침을 지웠습니다.';
 }
 for (const name of ['yaw','pitch','roll']) {
@@ -144,9 +165,10 @@ $('head-scope').addEventListener('change', () => {
   const angles = preview.angles();
   preview.setContext(config.reference, $('head-scope').value);
   preview.applySuggestion(angles);
+  angleReviews.changed();
   $('angle-status').textContent = '출력 범위가 바뀌었습니다. 미리보기·파일을 다시 생성해 주세요.';
 });
-$('head-reset').addEventListener('click', () => {clearFit(); points = Array(6).fill(null); active = 0; draw(); $('head-status').textContent = '기준점을 초기화했습니다.';});
+$('head-reset').addEventListener('click', () => {clearFit(); angleReviews.setTarget(null); points = Array(6).fill(null); active = 0; draw(); $('head-status').textContent = '기준점을 초기화했습니다.';});
 $('head-fit').addEventListener('click', async () => {
   if (!query || query.excluded || !points.every(Boolean)) return;
   clearFit(); const token = revision;
