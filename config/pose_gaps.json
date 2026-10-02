@@ -1,0 +1,25 @@
+{
+  "version": "pose_gaps-2026-10-02.1",
+  "note": "τ 값은 src/config.py:125-127의 기준선(좋은 매칭 ≈0.15, 앉기/서기 ≈0.36, 추출 실패 0.6+)과 BFF matchLevel 경계(0.25/0.45)에서 시작한다. 첫 운영 스냅샷 뒤 거리 구간별 선택률로 다시 맞춘다.",
+  "tau_soft": 0.25,
+  "tau_strong": 0.35,
+  "tau_fill": 0.20,
+  "extraction_cap": 0.60,
+  "eps_cluster": 0.22,
+  "k_min_installations": 3,
+  "min_common_joints": 10,
+  "kpt_threshold": 0.3,
+  "fidelity_min_share": 0.99,
+  "fidelity_tolerance": 0.0001,
+  "ttl_days": 14,
+  "max_snapshot_age_days": 7,
+  "gate": {
+    "improve_delta": -0.02,
+    "regress_delta": 0.02,
+    "max_regressed_share": 0.02,
+    "high_edge": 0.25,
+    "high_slack": 0.05,
+    "max_family_share_floor": 0.05,
+    "max_family_share_multiplier": 3.0
+  }
+}
