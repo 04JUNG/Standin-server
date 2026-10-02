@@ -41,6 +41,7 @@ from converter.thumbnail_render import (  # noqa: E402 - bpy는 함수 안에서
     ThumbnailRenderError,
     render_artifact_view,
 )
+from converter.framing import FRAMING_VERSION, PREVIEW_VIEWS, validate_scope
 
 
 class JobValidationError(ValueError):
@@ -100,7 +101,7 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
         "apply_root_translation", "embed_textures",
         "force_exact_v324", "thumbnail",
     }
-    unknown = set(raw) - required
+    unknown = set(raw) - required - {"output_scope", "preview_view"}
     missing = required - set(raw)
     if missing or unknown:
         raise JobValidationError(
@@ -127,6 +128,15 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
         raise JobValidationError("embed_textures must be false")
     if type(raw["force_exact_v324"]) is not bool:
         raise JobValidationError("force_exact_v324 must be boolean")
+    try:
+        output_scope = validate_scope(raw.get("output_scope", "full"))
+    except (TypeError, ValueError) as exc:
+        raise JobValidationError("invalid output_scope") from exc
+    preview_view = raw.get("preview_view")
+    if preview_view is not None and preview_view not in PREVIEW_VIEWS:
+        raise JobValidationError("invalid preview_view")
+    if raw["force_exact_v324"] and output_scope != "full":
+        raise JobValidationError("exact V3.2.4 mode permits full framing only")
 
     unresolved_temp = _absolute_path(raw["temp_dir"], "temp_dir")
     if unresolved_temp.is_symlink():
@@ -156,6 +166,8 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
 
     normalized = dict(raw)
     normalized.update({
+        "output_scope": output_scope,
+        "preview_view": preview_view,
         "temp_dir": str(temp_dir),
         "bvh_path": str(bvh_path),
         "character_fbx": str(character),
@@ -297,6 +309,21 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
         force_exact_v324=job["force_exact_v324"],
     )
     payload = report.as_dict()
+    if report.ok:
+        from converter.framing import process_output
+        scope = job.get("output_scope", "full")
+        preview_view = job.get("preview_view")
+        preview_path = Path(job["temp_dir"]) / "preview.png" if preview_view else None
+        payload["framing"] = process_output(
+            job["output_path"], scope, preview_path=preview_path,
+            view=preview_view or "front",
+        )
+        payload["output_scope"] = scope
+        payload["framing_version"] = FRAMING_VERSION
+        if preview_path:
+            payload["preview_view"] = preview_view
+            payload["preview_sha256"] = _sha256(preview_path)
+            payload["preview_size"] = preview_path.stat().st_size
     payload.update({
         "conversion_id": job["conversion_id"],
         "solver_version": SOLVER_VERSION,

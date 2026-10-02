@@ -12,6 +12,8 @@ from .schema import VLMAnalysis, Skeleton, PersonDescriptor, BBox
 from .features import normalize_skeleton
 from .refine_policy import structural_refine_allowed
 from .config import CFG
+from .body_scope import detect_scope
+from .partial_pose import shoulder_frame
 
 
 def order_left_to_right(skeletons: List[Optional[Skeleton]],
@@ -77,7 +79,10 @@ def build_slot_descriptors(vlm: VLMAnalysis, slots) -> List[PersonDescriptor]:
                           and evidence.searchable and slot.state not in ("missing", "invalid"))
         valid_mask = evidence.valid_joint_mask.copy() if evidence is not None else None
         feature = None
-        if searchable:
+        if searchable and evidence.coverage_class == "upper_only":
+            feature = shoulder_frame(skeleton.keypoints)[0].reshape(-1)
+            feature.reshape(17, 2)[~valid_mask] = 0.0
+        elif searchable:
             feature = normalize_skeleton(
                 skeleton.keypoints, skeleton.scores,
                 kpt_thr=CFG.skeleton_kpt_threshold,
@@ -160,5 +165,8 @@ def build_slot_descriptors(vlm: VLMAnalysis, slots) -> List[PersonDescriptor]:
                 "pose_rescue": dict(slot.rescue_trace),
             },
             quality_reasons=list(dict.fromkeys(slot.reasons)),
+            output_scope=detect_scope(
+                vlm, slot.slot_id if slot.slot_origin == "vlm" else None,
+            ),
         ))
     return out

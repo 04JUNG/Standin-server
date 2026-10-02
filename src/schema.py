@@ -14,6 +14,8 @@ import json
 
 import numpy as np
 
+from .body_scope import BodyScope, ScopeDetection
+
 
 # ---- 열거형(Controlled Vocabulary) ---------------------------------------
 # ⚠ 라이브러리 태깅 전에 반드시 고정해야 하는 어휘(설계문서 v2 §12-3단계).
@@ -114,6 +116,8 @@ class VLMAnalysis:
     # lower_body_visible 값이 실제 provider 응답에서 왔는지 나타낸다. 누락을 false와
     # 구분해야 검색이 전신을 반신으로 조용히 오분류하지 않는다.
     lower_body_visibility_known: list[bool] = field(default_factory=list)
+    # Composition, in provider approx_boxes order. None means uncertain/omitted.
+    body_scopes: list[Optional[BodyScope]] = field(default_factory=list)
 
 
 @dataclass
@@ -143,6 +147,7 @@ class PersonDescriptor:
     confidence_threshold: Optional[float] = None
     quality_trace: dict = field(default_factory=dict)
     quality_reasons: list[str] = field(default_factory=list)
+    output_scope: ScopeDetection = field(default_factory=ScopeDetection)
 
     def tag_dict(self) -> dict:
         return {
