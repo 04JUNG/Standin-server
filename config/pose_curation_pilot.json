@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "source": "100style",
+  "styles": ["Angry", "Depressed", "Elated", "Proud", "Old", "Drunk", "Crouched", "BentForward", "ArmsFolded", "HandsInPockets", "ArmsAboveHead", "ArmsBehindBack", "OnPhoneLeft", "OnPhoneRight", "Lunge", "ShieldedLeft", "Tiptoe", "Waving", "Neutral", "Strutting"],
+  "movements": ["ID", "FW", "FR"],
+  "poses_per_clip": 3,
+  "sample_hz": 8,
+  "minimum_separation_seconds": 0.3,
+  "minimum_pose_distance": 0.12,
+  "near_duplicate_distance": 0.16
+}

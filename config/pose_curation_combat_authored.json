@@ -1,0 +1,862 @@
+{
+  "schema_version": 1,
+  "rig_source": "data/curation/sources/quaternius/export-1/pool/combat_ual1_Punch_Cross_f00000.bvh",
+  "rig_sha256": "fd3d02eb9cb307eb0700f48ef4cc6d0a90fdf595c1f6c8b66bd40dd93844544b",
+  "coordinate_system": "metres; X left, Y up, Z forward; authored 3D targets and bend poles, not detected query coordinates",
+  "poses": [
+    {
+      "hip_height": 0.92,
+      "root_xyz": [
+        0,
+        15,
+        18
+      ],
+      "spine_pitch": 0,
+      "left_arm": [
+        [
+          0.14,
+          1.48,
+          0.43
+        ],
+        [
+          0.26,
+          1.21,
+          0.32
+        ]
+      ],
+      "right_arm": [
+        [
+          -0.4,
+          1.5,
+          0.36
+        ],
+        [
+          -0.59,
+          1.2,
+          0.22
+        ]
+      ],
+      "left_leg": [
+        [
+          0.84,
+          1.27,
+          0.03
+        ],
+        [
+          0.48,
+          1.32,
+          0.17
+        ]
+      ],
+      "right_leg": [
+        [
+          -0.22,
+          0.105,
+          -0.02
+        ],
+        [
+          -0.2,
+          0.54,
+          0.12
+        ]
+      ],
+      "id": "side_kick",
+      "label": "높은 옆차기",
+      "reference_roughs": [
+        "rough_289"
+      ],
+      "left_foot": {
+        "mode": "follow_shin",
+        "pitch_degrees": -10
+      },
+      "right_foot": {
+        "mode": "planted",
+        "pitch_degrees": 0
+      },
+      "head_yaw": 50
+    },
+    {
+      "hip_height": 0.95,
+      "root_xyz": [
+        -10,
+        0,
+        3
+      ],
+      "spine_pitch": 0,
+      "left_arm": [
+        [
+          0.22,
+          1.48,
+          0.28
+        ],
+        [
+          0.37,
+          1.2,
+          0.04
+        ]
+      ],
+      "right_arm": [
+        [
+          -0.21,
+          1.49,
+          0.3
+        ],
+        [
+          -0.38,
+          1.22,
+          0.01
+        ]
+      ],
+      "left_leg": [
+        [
+          0.11,
+          1.28,
+          0.78
+        ],
+        [
+          0.13,
+          1.31,
+          0.4
+        ]
+      ],
+      "right_leg": [
+        [
+          -0.12,
+          0.105,
+          -0.02
+        ],
+        [
+          -0.12,
+          0.53,
+          0.08
+        ]
+      ],
+      "id": "front_kick",
+      "label": "전방 높은 킥",
+      "reference_roughs": [
+        "rough_293",
+        "rough_294",
+        "rough_295"
+      ],
+      "left_foot": {
+        "mode": "follow_shin",
+        "pitch_degrees": -10
+      },
+      "right_foot": {
+        "mode": "planted",
+        "pitch_degrees": 0
+      }
+    },
+    {
+      "hip_height": 1.25,
+      "root_xyz": [
+        5,
+        15,
+        22
+      ],
+      "spine_pitch": 0,
+      "left_arm": [
+        [
+          0.14,
+          1.81,
+          0.43
+        ],
+        [
+          0.26,
+          1.51,
+          0.32
+        ]
+      ],
+      "right_arm": [
+        [
+          -0.48,
+          1.83,
+          0.36
+        ],
+        [
+          -0.64,
+          1.54,
+          0.22
+        ]
+      ],
+      "left_leg": [
+        [
+          0.84,
+          1.49,
+          0.03
+        ],
+        [
+          0.46,
+          1.53,
+          0.17
+        ]
+      ],
+      "right_leg": [
+        [
+          -0.08,
+          1.23,
+          -0.26
+        ],
+        [
+          -0.08,
+          0.88,
+          0.22
+        ]
+      ],
+      "id": "flying_side_kick",
+      "label": "공중 옆차기",
+      "reference_roughs": [
+        "rough_282",
+        "rough_289"
+      ],
+      "left_foot": {
+        "mode": "follow_shin",
+        "pitch_degrees": 12
+      },
+      "right_foot": {
+        "mode": "follow_shin",
+        "pitch_degrees": 5
+      },
+      "head_yaw": 50
+    },
+    {
+      "hip_height": 1.25,
+      "root_xyz": [
+        -12,
+        0,
+        4
+      ],
+      "spine_pitch": 0,
+      "left_arm": [
+        [
+          0.21,
+          1.73,
+          0.28
+        ],
+        [
+          0.4,
+          1.5,
+          0.07
+        ]
+      ],
+      "right_arm": [
+        [
+          -0.27,
+          1.73,
+          0.27
+        ],
+        [
+          -0.4,
+          1.43,
+          0.03
+        ]
+      ],
+      "left_leg": [
+        [
+          0.13,
+          1.43,
+          0.78
+        ],
+        [
+          0.14,
+          1.49,
+          0.42
+        ]
+      ],
+      "right_leg": [
+        [
+          -0.1,
+          1.25,
+          -0.3
+        ],
+        [
+          -0.1,
+          0.9,
+          0.3
+        ]
+      ],
+      "id": "flying_front_kick",
+      "label": "공중 전방 킥",
+      "reference_roughs": [
+        "rough_293",
+        "rough_294",
+        "rough_295"
+      ],
+      "left_foot": {
+        "mode": "follow_shin",
+        "pitch_degrees": -10
+      },
+      "right_foot": {
+        "mode": "follow_shin",
+        "pitch_degrees": -10
+      }
+    },
+    {
+      "hip_height": 1.3,
+      "root_xyz": [
+        5,
+        0,
+        0
+      ],
+      "spine_pitch": 0,
+      "left_arm": [
+        [
+          0.23,
+          1.76,
+          0.25
+        ],
+        [
+          0.48,
+          1.52,
+          0.07
+        ]
+      ],
+      "right_arm": [
+        [
+          -0.23,
+          1.76,
+          0.25
+        ],
+        [
+          -0.48,
+          1.52,
+          0.07
+        ]
+      ],
+      "left_leg": [
+        [
+          0.82,
+          1.42,
+          0.09
+        ],
+        [
+          0.48,
+          1.46,
+          0.2
+        ]
+      ],
+      "right_leg": [
+        [
+          -0.82,
+          1.42,
+          0.09
+        ],
+        [
+          -0.48,
+          1.46,
+          0.2
+        ]
+      ],
+      "id": "air_split",
+      "label": "공중 벌려차기",
+      "reference_roughs": [
+        "rough_299"
+      ],
+      "left_foot": {
+        "mode": "follow_shin",
+        "pitch_degrees": -10
+      },
+      "right_foot": {
+        "mode": "follow_shin",
+        "pitch_degrees": -10
+      },
+      "head_pitch": -5
+    },
+    {
+      "hip_height": 0.62,
+      "root_xyz": [
+        42,
+        0,
+        0
+      ],
+      "spine_pitch": 0,
+      "left_arm": [
+        [
+          0.35,
+          0.67,
+          0.91
+        ],
+        [
+          0.72,
+          0.78,
+          0.49
+        ]
+      ],
+      "right_arm": [
+        [
+          -0.6,
+          1.03,
+          -0.1
+        ],
+        [
+          -0.76,
+          0.87,
+          0.1
+        ]
+      ],
+      "left_leg": [
+        [
+          0.28,
+          0.1,
+          0.49
+        ],
+        [
+          0.35,
+          0.54,
+          0.57
+        ]
+      ],
+      "right_leg": [
+        [
+          -0.28,
+          0.1,
+          -0.57
+        ],
+        [
+          -0.4,
+          0.48,
+          -0.35
+        ]
+      ],
+      "id": "low_dash",
+      "label": "낮은 돌진",
+      "reference_roughs": [
+        "rough_285",
+        "rough_288",
+        "rough_309"
+      ],
+      "left_foot": {
+        "mode": "planted",
+        "pitch_degrees": 0
+      },
+      "right_foot": {
+        "mode": "planted",
+        "pitch_degrees": 0
+      }
+    },
+    {
+      "hip_height": 0.48,
+      "root_xyz": [
+        32,
+        0,
+        5
+      ],
+      "spine_pitch": 0,
+      "left_arm": [
+        [
+          0.31,
+          0.25,
+          0.43
+        ],
+        [
+          0.48,
+          0.55,
+          0.46
+        ]
+      ],
+      "right_arm": [
+        [
+          -0.37,
+          0.96,
+          0.43
+        ],
+        [
+          -0.49,
+          0.65,
+          0.32
+        ]
+      ],
+      "left_leg": [
+        [
+          0.33,
+          0.105,
+          0.25
+        ],
+        [
+          0.39,
+          0.43,
+          0.48
+        ]
+      ],
+      "right_leg": [
+        [
+          -0.32,
+          0.105,
+          -0.16
+        ],
+        [
+          -0.43,
+          0.41,
+          0.18
+        ]
+      ],
+      "id": "deep_landing",
+      "label": "낮은 착지",
+      "reference_roughs": [
+        "rough_287",
+        "rough_315",
+        "rough_318"
+      ],
+      "left_foot": {
+        "mode": "planted",
+        "pitch_degrees": 0
+      },
+      "right_foot": {
+        "mode": "planted",
+        "pitch_degrees": 0
+      },
+      "head_pitch": -15
+    },
+    {
+      "hip_height": 0.52,
+      "root_xyz": [
+        40,
+        0,
+        -18
+      ],
+      "spine_pitch": 0,
+      "left_arm": [
+        [
+          0.6,
+          0.12,
+          0.5
+        ],
+        [
+          0.65,
+          0.54,
+          0.6
+        ]
+      ],
+      "right_arm": [
+        [
+          -0.55,
+          1.0,
+          -0.16
+        ],
+        [
+          -0.7,
+          0.88,
+          0.1
+        ]
+      ],
+      "left_leg": [
+        [
+          0.45,
+          0.1,
+          0.2
+        ],
+        [
+          0.53,
+          0.5,
+          0.46
+        ]
+      ],
+      "right_leg": [
+        [
+          -0.52,
+          0.1,
+          -0.24
+        ],
+        [
+          -0.53,
+          0.5,
+          0.15
+        ]
+      ],
+      "id": "ground_reach",
+      "label": "한 손을 뻗는 낮은 착지",
+      "reference_roughs": [
+        "rough_290"
+      ],
+      "left_foot": {
+        "mode": "planted",
+        "pitch_degrees": 0
+      },
+      "right_foot": {
+        "mode": "planted",
+        "pitch_degrees": 0
+      }
+    },
+    {
+      "hip_height": 1.0,
+      "root_xyz": [
+        -6,
+        0,
+        0
+      ],
+      "spine_pitch": 0,
+      "left_arm": [
+        [
+          0.22,
+          1.56,
+          0.27
+        ],
+        [
+          0.37,
+          1.31,
+          0.04
+        ]
+      ],
+      "right_arm": [
+        [
+          -0.22,
+          1.58,
+          0.28
+        ],
+        [
+          -0.37,
+          1.3,
+          0.02
+        ]
+      ],
+      "left_leg": [
+        [
+          0.16,
+          0.85,
+          0.37
+        ],
+        [
+          0.18,
+          1.38,
+          0.63
+        ]
+      ],
+      "right_leg": [
+        [
+          -0.17,
+          0.1,
+          0
+        ],
+        [
+          -0.25,
+          0.6,
+          0.4
+        ]
+      ],
+      "id": "knee_strike",
+      "label": "무릎 올려 타격",
+      "reference_roughs": [
+        "rough_282"
+      ],
+      "left_foot": {
+        "mode": "follow_shin",
+        "pitch_degrees": -10
+      },
+      "right_foot": {
+        "mode": "planted",
+        "pitch_degrees": 0
+      }
+    },
+    {
+      "hip_height": 0.78,
+      "root_xyz": [
+        20,
+        0,
+        0
+      ],
+      "spine_pitch": 0,
+      "left_arm": [
+        [
+          0.3,
+          1.27,
+          0.85
+        ],
+        [
+          0.64,
+          1.1,
+          0.46
+        ]
+      ],
+      "right_arm": [
+        [
+          -0.26,
+          1.15,
+          0.28
+        ],
+        [
+          -0.65,
+          1.15,
+          0.05
+        ]
+      ],
+      "left_leg": [
+        [
+          0.4,
+          0.1,
+          0.45
+        ],
+        [
+          0.5,
+          0.5,
+          0.5
+        ]
+      ],
+      "right_leg": [
+        [
+          -0.38,
+          0.1,
+          -0.43
+        ],
+        [
+          -0.48,
+          0.5,
+          -0.1
+        ]
+      ],
+      "id": "long_punch",
+      "label": "체중을 실은 스트레이트",
+      "reference_roughs": [
+        "user_0811690df0b3"
+      ],
+      "left_foot": {
+        "mode": "planted",
+        "pitch_degrees": 0
+      },
+      "right_foot": {
+        "mode": "planted",
+        "pitch_degrees": 0
+      }
+    },
+    {
+      "hip_height": 0.68,
+      "root_xyz": [
+        15,
+        0,
+        30
+      ],
+      "spine_pitch": 0,
+      "left_arm": [
+        [
+          0.43,
+          1.12,
+          0.53
+        ],
+        [
+          0.66,
+          1.03,
+          0.1
+        ]
+      ],
+      "right_arm": [
+        [
+          -0.25,
+          1.28,
+          0.35
+        ],
+        [
+          -0.6,
+          1.22,
+          0.01
+        ]
+      ],
+      "left_leg": [
+        [
+          0.49,
+          0.1,
+          0.11
+        ],
+        [
+          0.65,
+          0.5,
+          0.5
+        ]
+      ],
+      "right_leg": [
+        [
+          -0.47,
+          0.1,
+          -0.1
+        ],
+        [
+          -0.65,
+          0.5,
+          0.4
+        ]
+      ],
+      "id": "wide_evade",
+      "label": "몸을 비트는 회피",
+      "reference_roughs": [
+        "rough_288",
+        "rough_291"
+      ],
+      "left_foot": {
+        "mode": "planted",
+        "pitch_degrees": 0
+      },
+      "right_foot": {
+        "mode": "planted",
+        "pitch_degrees": 0
+      }
+    },
+    {
+      "hip_height": 1.35,
+      "root_xyz": [
+        28,
+        0,
+        0
+      ],
+      "spine_pitch": 0,
+      "left_arm": [
+        [
+          0.6,
+          1.28,
+          0.1
+        ],
+        [
+          0.71,
+          1.64,
+          0.12
+        ]
+      ],
+      "right_arm": [
+        [
+          -0.58,
+          1.42,
+          0.05
+        ],
+        [
+          -0.68,
+          1.74,
+          0.1
+        ]
+      ],
+      "left_leg": [
+        [
+          0.28,
+          0.85,
+          0.16
+        ],
+        [
+          0.46,
+          1.43,
+          0.54
+        ]
+      ],
+      "right_leg": [
+        [
+          -0.34,
+          0.92,
+          -0.06
+        ],
+        [
+          -0.4,
+          1.48,
+          0.5
+        ]
+      ],
+      "id": "air_tuck",
+      "label": "공중 몸 웅크리기",
+      "reference_roughs": [
+        "user_b31d5ee761e5"
+      ],
+      "left_foot": {
+        "mode": "follow_shin",
+        "pitch_degrees": -10
+      },
+      "right_foot": {
+        "mode": "follow_shin",
+        "pitch_degrees": -10
+      }
+    }
+  ]
+}

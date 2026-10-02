@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "source": "100style",
+  "styles": ["Kick", "Punch", "KarateChop", "TwoFootJump", "LeftHop", "RightHop", "Skip", "HighKnees", "Rushed", "SpinClock", "SpinAntiClock", "WhirlArms"],
+  "movements": ["ID", "FW", "FR"],
+  "poses_per_clip": 4,
+  "sample_hz": 12,
+  "minimum_separation_seconds": 0.3,
+  "minimum_pose_distance": 0.20,
+  "near_duplicate_distance": 0.16
+}

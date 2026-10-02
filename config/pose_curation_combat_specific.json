@@ -1,0 +1,364 @@
+{
+  "schema_version": 1,
+  "rig_source": "data/curation/sources/quaternius/export-1/pool/combat_ual1_Punch_Cross_f00000.bvh",
+  "rig_sha256": "fd3d02eb9cb307eb0700f48ef4cc6d0a90fdf595c1f6c8b66bd40dd93844544b",
+  "coordinate_system": "metres; X left, Y up, Z forward; authored 3D targets and bend poles, not detected query coordinates",
+  "poses": [
+    {
+      "hip_height": 0.6,
+      "root_xyz": [
+        -38,
+        0,
+        0
+      ],
+      "spine_pitch": 0,
+      "left_arm": [
+        [
+          0.47,
+          0.51,
+          -0.32
+        ],
+        [
+          0.65,
+          0.72,
+          -0.4
+        ]
+      ],
+      "right_arm": [
+        [
+          -0.36,
+          0.62,
+          -0.38
+        ],
+        [
+          -0.65,
+          0.83,
+          -0.45
+        ]
+      ],
+      "left_leg": [
+        [
+          0.3,
+          1.03,
+          0.69
+        ],
+        [
+          0.28,
+          1.16,
+          0.3
+        ]
+      ],
+      "right_leg": [
+        [
+          -0.28,
+          0.88,
+          0.72
+        ],
+        [
+          -0.26,
+          1.09,
+          0.36
+        ]
+      ],
+      "id": "reclining_double_kick",
+      "label": "뒤로 젖혀 양발을 드는 방어",
+      "reference_roughs": [
+        "rough_292",
+        "rough_293",
+        "rough_294",
+        "rough_295"
+      ],
+      "left_foot": {
+        "mode": "follow_shin",
+        "pitch_degrees": -10
+      },
+      "right_foot": {
+        "mode": "follow_shin",
+        "pitch_degrees": -10
+      }
+    },
+    {
+      "hip_height": 1.1,
+      "root_xyz": [
+        65,
+        0,
+        -8
+      ],
+      "spine_pitch": 0,
+      "left_arm": [
+        [
+          0.08,
+          1.55,
+          1.06
+        ],
+        [
+          0.25,
+          1.4,
+          0.72
+        ]
+      ],
+      "right_arm": [
+        [
+          -0.34,
+          1.44,
+          0.53
+        ],
+        [
+          -0.57,
+          1.3,
+          0.28
+        ]
+      ],
+      "left_leg": [
+        [
+          0.12,
+          1.15,
+          -0.74
+        ],
+        [
+          0.13,
+          0.98,
+          -0.35
+        ]
+      ],
+      "right_leg": [
+        [
+          -0.12,
+          1.4,
+          -0.5
+        ],
+        [
+          -0.12,
+          0.85,
+          -0.32
+        ]
+      ],
+      "id": "horizontal_dash",
+      "label": "공중 수평 돌진",
+      "reference_roughs": [
+        "rough_291"
+      ],
+      "left_foot": {
+        "mode": "follow_shin",
+        "pitch_degrees": -10
+      },
+      "right_foot": {
+        "mode": "follow_shin",
+        "pitch_degrees": -10
+      },
+      "head_pitch": -25
+    },
+    {
+      "hip_height": 1.1,
+      "root_xyz": [
+        85,
+        0,
+        0
+      ],
+      "spine_pitch": 0,
+      "left_arm": [
+        [
+          0.68,
+          1.27,
+          0.57
+        ],
+        [
+          0.6,
+          1.22,
+          0.89
+        ]
+      ],
+      "right_arm": [
+        [
+          -0.68,
+          1.27,
+          0.57
+        ],
+        [
+          -0.6,
+          1.22,
+          0.89
+        ]
+      ],
+      "left_leg": [
+        [
+          0.2,
+          1.48,
+          -0.58
+        ],
+        [
+          0.4,
+          1.0,
+          -0.4
+        ]
+      ],
+      "right_leg": [
+        [
+          -0.2,
+          1.35,
+          -0.58
+        ],
+        [
+          -0.4,
+          0.95,
+          -0.3
+        ]
+      ],
+      "id": "aerial_dive",
+      "label": "팔을 펼친 공중 급강하",
+      "reference_roughs": [
+        "rough_299"
+      ],
+      "left_foot": {
+        "mode": "follow_shin",
+        "pitch_degrees": -10
+      },
+      "right_foot": {
+        "mode": "follow_shin",
+        "pitch_degrees": -10
+      }
+    },
+    {
+      "hip_height": 0.43,
+      "root_xyz": [
+        12,
+        0,
+        0
+      ],
+      "spine_pitch": 0,
+      "left_arm": [
+        [
+          -0.1,
+          0.92,
+          0.36
+        ],
+        [
+          0.55,
+          0.69,
+          0.27
+        ]
+      ],
+      "right_arm": [
+        [
+          0.1,
+          0.85,
+          0.4
+        ],
+        [
+          -0.55,
+          0.65,
+          0.27
+        ]
+      ],
+      "left_leg": [
+        [
+          0.36,
+          0.1,
+          0.05
+        ],
+        [
+          0.43,
+          0.5,
+          0.49
+        ]
+      ],
+      "right_leg": [
+        [
+          -0.36,
+          0.1,
+          0.05
+        ],
+        [
+          -0.43,
+          0.5,
+          0.49
+        ]
+      ],
+      "id": "compact_guard",
+      "label": "낮게 앉아 팔을 모은 방어",
+      "reference_roughs": [
+        "rough_315",
+        "rough_318",
+        "rough_320"
+      ],
+      "left_foot": {
+        "mode": "planted",
+        "pitch_degrees": 0
+      },
+      "right_foot": {
+        "mode": "planted",
+        "pitch_degrees": 0
+      }
+    },
+    {
+      "hip_height": 0.66,
+      "root_xyz": [
+        48,
+        0,
+        15
+      ],
+      "spine_pitch": 0,
+      "left_arm": [
+        [
+          0.55,
+          0.35,
+          0.79
+        ],
+        [
+          0.55,
+          0.73,
+          0.63
+        ]
+      ],
+      "right_arm": [
+        [
+          -0.6,
+          1.5,
+          0.13
+        ],
+        [
+          -0.55,
+          1.41,
+          0.38
+        ]
+      ],
+      "left_leg": [
+        [
+          0.46,
+          0.1,
+          0.16
+        ],
+        [
+          0.56,
+          0.5,
+          0.45
+        ]
+      ],
+      "right_leg": [
+        [
+          -0.4,
+          0.1,
+          -0.4
+        ],
+        [
+          -0.54,
+          0.5,
+          -0.1
+        ]
+      ],
+      "id": "diagonal_weapon",
+      "label": "대각선으로 길게 뻗는 무기 자세",
+      "reference_roughs": [
+        "rough_290"
+      ],
+      "left_foot": {
+        "mode": "planted",
+        "pitch_degrees": 0
+      },
+      "right_foot": {
+        "mode": "planted",
+        "pitch_degrees": 0
+      }
+    }
+  ]
+}

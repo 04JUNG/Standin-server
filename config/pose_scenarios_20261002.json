@@ -1,0 +1,4061 @@
+{
+  "schema_version": 1,
+  "rig_source": "data/curation/sources/quaternius/export-1/pool/combat_ual1_Punch_Cross_f00000.bvh",
+  "rig_sha256": "fd3d02eb9cb307eb0700f48ef4cc6d0a90fdf595c1f6c8b66bd40dd93844544b",
+  "scenes": [
+    {
+      "id": "webtoon_daily_01",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "앉아서 머리 말리기",
+      "stance": "sit",
+      "gesture": "hair_dry",
+      "props": "dryer:R",
+      "hands": [
+        "open",
+        "grip"
+      ],
+      "lean": 0,
+      "look": 15
+    },
+    {
+      "id": "webtoon_daily_02",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "서서 옆머리 말리기",
+      "stance": "stand",
+      "gesture": "hair_dry",
+      "props": "dryer:R",
+      "hands": [
+        "open",
+        "grip"
+      ],
+      "lean": 0,
+      "look": -15,
+      "left_wrist": [
+        0.24,
+        0.73,
+        0.1
+      ],
+      "right_wrist": [
+        -0.38,
+        0.7,
+        0.11
+      ]
+    },
+    {
+      "id": "webtoon_daily_03",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "양팔 올려 기지개 켜기",
+      "stance": "stand",
+      "gesture": "stretch_up",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "lean": -4,
+      "look": 0
+    },
+    {
+      "id": "webtoon_daily_04",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "앉아서 옆구리 스트레칭",
+      "stance": "sit",
+      "gesture": "stretch_side",
+      "props": "",
+      "hands": [
+        "open",
+        "relaxed"
+      ],
+      "lean": 0,
+      "look": 20,
+      "root_xyz": [
+        0,
+        0,
+        8
+      ]
+    },
+    {
+      "id": "webtoon_daily_05",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "가슴 펴고 어깨 스트레칭",
+      "stance": "wide",
+      "gesture": "stretch_open",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "lean": -5,
+      "look": 0
+    },
+    {
+      "id": "webtoon_daily_06",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "뒷짐 지고 가슴 스트레칭",
+      "stance": "relaxed",
+      "gesture": "stretch_back",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ],
+      "lean": -5,
+      "look": 0
+    },
+    {
+      "id": "webtoon_daily_07",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "앉아서 상체 숙여 허리 늘리기",
+      "stance": "sit_open",
+      "gesture": "hands_knees",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "lean": 22,
+      "look": 0
+    },
+    {
+      "id": "webtoon_daily_08",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "컵을 들어 물 마시기",
+      "stance": "stand",
+      "gesture": "drink",
+      "props": "cup:R",
+      "hands": [
+        "relaxed",
+        "cup"
+      ],
+      "lean": 0,
+      "look": -8
+    },
+    {
+      "id": "webtoon_daily_09",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "앉아서 머그컵 양손으로 감싸기",
+      "stance": "sit",
+      "gesture": "cup_both",
+      "props": "cup:B",
+      "hands": [
+        "cup",
+        "cup"
+      ],
+      "lean": 0,
+      "look": 0
+    },
+    {
+      "id": "webtoon_daily_10",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "친구에게 컵 건네기",
+      "stance": "step",
+      "gesture": "offer",
+      "props": "cup:R",
+      "hands": [
+        "relaxed",
+        "cup"
+      ],
+      "lean": 2,
+      "look": -20
+    },
+    {
+      "id": "webtoon_daily_11",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "쟁반에 컵을 올려 나르기",
+      "stance": "step",
+      "gesture": "tray",
+      "props": "tray:B",
+      "hands": [
+        "support",
+        "support"
+      ],
+      "lean": -3,
+      "look": 0
+    },
+    {
+      "id": "webtoon_daily_12",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "무거운 상자를 허리 높이로 들기",
+      "stance": "wide",
+      "gesture": "box",
+      "props": "crate:B",
+      "hands": [
+        "cup",
+        "cup"
+      ],
+      "lean": -5,
+      "look": 0
+    },
+    {
+      "id": "webtoon_daily_13",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "쪼그려 바닥 상자 들어 올리기",
+      "stance": "squat",
+      "gesture": "lift_low",
+      "props": "crate:B",
+      "hands": [
+        "cup",
+        "cup"
+      ],
+      "lean": 24,
+      "look": 0
+    },
+    {
+      "id": "webtoon_daily_14",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "무거운 짐을 가슴에 받쳐 들기",
+      "stance": "wide",
+      "gesture": "box_high",
+      "props": "crate:B",
+      "hands": [
+        "cup",
+        "cup"
+      ],
+      "lean": -7,
+      "look": 0
+    },
+    {
+      "id": "webtoon_daily_15",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "선반 위로 상자 올리기",
+      "stance": "stand",
+      "gesture": "lift_overhead",
+      "props": "crate:B",
+      "hands": [
+        "cup",
+        "cup"
+      ],
+      "lean": 0,
+      "look": 0
+    },
+    {
+      "id": "webtoon_daily_16",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "한 손으로 장바구니 들기",
+      "stance": "relaxed",
+      "gesture": "bag",
+      "props": "bag:R",
+      "hands": [
+        "relaxed",
+        "grip"
+      ],
+      "lean": 0,
+      "look": 10
+    },
+    {
+      "id": "webtoon_daily_17",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "양손으로 빨래 바구니 옮기기",
+      "stance": "stand",
+      "gesture": "box",
+      "props": "basket:B",
+      "hands": [
+        "cup",
+        "cup"
+      ],
+      "lean": 0,
+      "look": -10,
+      "left_wrist": [
+        0.33,
+        0.2,
+        0.31
+      ],
+      "right_wrist": [
+        -0.33,
+        0.2,
+        0.31
+      ]
+    },
+    {
+      "id": "webtoon_daily_18",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "앉아서 책 읽기",
+      "stance": "sit",
+      "gesture": "read",
+      "props": "book:B",
+      "hands": [
+        "support",
+        "support"
+      ],
+      "lean": 3,
+      "look": 0,
+      "nod": 12
+    },
+    {
+      "id": "webtoon_daily_19",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "서서 휴대폰 확인하기",
+      "stance": "relaxed",
+      "gesture": "cup",
+      "props": "phone:R",
+      "hands": [
+        "relaxed",
+        "grip"
+      ],
+      "lean": 0,
+      "look": 0,
+      "right_wrist": [
+        -0.12,
+        0.37,
+        0.34
+      ],
+      "nod": 14
+    },
+    {
+      "id": "webtoon_daily_20",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "귀에 휴대폰 대고 통화하기",
+      "stance": "step",
+      "gesture": "phone",
+      "props": "phone:R",
+      "hands": [
+        "relaxed",
+        "grip"
+      ],
+      "lean": 0,
+      "look": -12
+    },
+    {
+      "id": "webtoon_daily_21",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "앉아서 노트에 글쓰기",
+      "stance": "sit",
+      "gesture": "write",
+      "props": "pen:R",
+      "hands": [
+        "support",
+        "pinch"
+      ],
+      "lean": 7,
+      "look": 0,
+      "right_wrist": [
+        -0.12,
+        0.28,
+        0.43
+      ]
+    },
+    {
+      "id": "webtoon_daily_22",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "앉아서 키보드 타이핑하기",
+      "stance": "sit_open",
+      "gesture": "type",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "lean": 6,
+      "look": 0,
+      "left_wrist": [
+        0.19,
+        0.24,
+        0.41
+      ],
+      "right_wrist": [
+        -0.19,
+        0.24,
+        0.41
+      ]
+    },
+    {
+      "id": "webtoon_daily_23",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "서서 냄비 젓기",
+      "stance": "stand",
+      "gesture": "stir",
+      "props": "spoon:R",
+      "hands": [
+        "support",
+        "grip"
+      ],
+      "lean": 7,
+      "look": 0,
+      "left_wrist": [
+        0.28,
+        0.24,
+        0.35
+      ],
+      "left_pole": [
+        0.4,
+        0.3,
+        0.45
+      ]
+    },
+    {
+      "id": "webtoon_daily_24",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "도마 위에서 채소 썰기",
+      "stance": "stand",
+      "gesture": "cut",
+      "props": "knife:R",
+      "hands": [
+        "support",
+        "grip"
+      ],
+      "lean": 10,
+      "look": 0,
+      "right_wrist": [
+        -0.23,
+        0.28,
+        0.38
+      ],
+      "right_pole": [
+        -0.4,
+        0.3,
+        0.45
+      ]
+    },
+    {
+      "id": "webtoon_daily_25",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "양치질하기",
+      "stance": "stand",
+      "gesture": "brush",
+      "props": "brush:R",
+      "hands": [
+        "relaxed",
+        "pinch"
+      ],
+      "lean": 0,
+      "look": -7
+    },
+    {
+      "id": "webtoon_daily_26",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "세면대에서 손 씻기",
+      "stance": "wide",
+      "gesture": "wash",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "lean": 15,
+      "look": 0
+    },
+    {
+      "id": "webtoon_daily_27",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "수건으로 머리 닦기",
+      "stance": "stand",
+      "gesture": "towel",
+      "props": "towel:B",
+      "hands": [
+        "support",
+        "support"
+      ],
+      "lean": 5,
+      "look": 0
+    },
+    {
+      "id": "webtoon_daily_28",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "머리 뒤에서 묶기",
+      "stance": "stand",
+      "gesture": "hair_tie",
+      "props": "",
+      "hands": [
+        "pinch",
+        "pinch"
+      ],
+      "lean": 0,
+      "look": 0
+    },
+    {
+      "id": "webtoon_daily_29",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "앉아서 앞머리 빗기",
+      "stance": "sit",
+      "gesture": "comb",
+      "props": "comb:R",
+      "hands": [
+        "relaxed",
+        "grip"
+      ],
+      "lean": 0,
+      "look": 0
+    },
+    {
+      "id": "webtoon_daily_30",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "선반의 물건을 향해 손 뻗기",
+      "stance": "tiptoe",
+      "gesture": "reach_up",
+      "props": "jar:R",
+      "hands": [
+        "relaxed",
+        "cup"
+      ],
+      "lean": 0,
+      "look": -18
+    },
+    {
+      "id": "webtoon_daily_31",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "쪼그려 낮은 물건 줍기",
+      "stance": "squat",
+      "gesture": "reach_low",
+      "props": "phone:R",
+      "hands": [
+        "open",
+        "pinch"
+      ],
+      "lean": 25,
+      "look": -10,
+      "height": -0.13,
+      "root_xyz": [
+        35,
+        0,
+        0
+      ],
+      "right_wrist": [
+        -0.24,
+        -0.14,
+        0.41
+      ],
+      "left_wrist": [
+        0.27,
+        0.18,
+        0.27
+      ]
+    },
+    {
+      "id": "webtoon_daily_32",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "무거운 문 밀어 열기",
+      "stance": "lunge",
+      "gesture": "push",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "lean": 12,
+      "look": 0
+    },
+    {
+      "id": "webtoon_daily_33",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "큰 서랍을 양손으로 당기기",
+      "stance": "backstep",
+      "gesture": "pull",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": -6,
+      "look": 0
+    },
+    {
+      "id": "webtoon_daily_34",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "우산을 들고 걷기",
+      "stance": "step",
+      "gesture": "umbrella",
+      "props": "umbrella:R",
+      "hands": [
+        "relaxed",
+        "grip"
+      ],
+      "lean": 0,
+      "look": -10
+    },
+    {
+      "id": "webtoon_daily_35",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "문 앞에서 손 흔들기",
+      "stance": "stand",
+      "gesture": "wave",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "open"
+      ],
+      "lean": 0,
+      "look": -20
+    },
+    {
+      "id": "webtoon_daily_36",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "앉아서 턱 괴기",
+      "stance": "sit_turn",
+      "gesture": "cheek_rest",
+      "props": "",
+      "hands": [
+        "support",
+        "relaxed"
+      ],
+      "lean": 3,
+      "look": -15
+    },
+    {
+      "id": "webtoon_daily_37",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "한 손으로 접시 받치기",
+      "stance": "stand",
+      "gesture": "offer",
+      "props": "plate:R",
+      "hands": [
+        "relaxed",
+        "support"
+      ],
+      "lean": 0,
+      "look": 0,
+      "right_wrist": [
+        -0.3,
+        0.2,
+        0.36
+      ]
+    },
+    {
+      "id": "webtoon_daily_38",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "앞치마 끈을 뒤로 묶기",
+      "stance": "stand",
+      "gesture": "stretch_back",
+      "props": "",
+      "hands": [
+        "pinch",
+        "pinch"
+      ],
+      "lean": 8,
+      "look": 0,
+      "left_wrist": [
+        0.18,
+        0.08,
+        -0.13
+      ],
+      "right_wrist": [
+        -0.18,
+        0.08,
+        -0.13
+      ]
+    },
+    {
+      "id": "webtoon_daily_39",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "의자에서 일어나며 팔 내리기",
+      "stance": "squat",
+      "gesture": "hands_knees",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "lean": 14,
+      "look": 0,
+      "height": 0.08
+    },
+    {
+      "id": "webtoon_daily_40",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "피곤해서 앉아 얼굴 감싸기",
+      "stance": "sit",
+      "gesture": "cry",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "lean": 9,
+      "look": 0
+    },
+    {
+      "id": "webtoon_daily_41",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "창밖을 보며 커피 들기",
+      "stance": "relaxed",
+      "gesture": "cup",
+      "props": "cup:R",
+      "hands": [
+        "relaxed",
+        "cup"
+      ],
+      "lean": 0,
+      "look": 30
+    },
+    {
+      "id": "webtoon_daily_42",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "빗자루로 바닥 쓸기",
+      "stance": "wide",
+      "gesture": "spear",
+      "props": "broom:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 10,
+      "look": -15,
+      "left_wrist": [
+        0.12,
+        0.39,
+        0.32
+      ],
+      "right_wrist": [
+        -0.13,
+        0.27,
+        0.37
+      ],
+      "right_pole": [
+        -0.36,
+        0.28,
+        0.45
+      ]
+    },
+    {
+      "id": "webtoon_daily_43",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "걸레를 양손으로 짜기",
+      "stance": "stand",
+      "gesture": "cup_both",
+      "props": "towel:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 7,
+      "look": 0,
+      "left_wrist": [
+        0.18,
+        0.33,
+        0.37
+      ],
+      "right_wrist": [
+        -0.18,
+        0.33,
+        0.37
+      ],
+      "left_pole": [
+        0.4,
+        0.3,
+        0.45
+      ],
+      "right_pole": [
+        -0.4,
+        0.3,
+        0.45
+      ]
+    },
+    {
+      "id": "webtoon_daily_44",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "화분에 물 주기",
+      "stance": "stand",
+      "gesture": "offer",
+      "props": "watering_can:R",
+      "hands": [
+        "relaxed",
+        "grip"
+      ],
+      "lean": 5,
+      "look": -12,
+      "right_wrist": [
+        -0.3,
+        0.26,
+        0.38
+      ]
+    },
+    {
+      "id": "webtoon_daily_45",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "베개를 품에 안고 앉기",
+      "stance": "sit",
+      "gesture": "box_high",
+      "props": "pillow:B",
+      "hands": [
+        "cup",
+        "cup"
+      ],
+      "lean": 2,
+      "look": 0,
+      "left_wrist": [
+        0.27,
+        0.24,
+        0.29
+      ],
+      "right_wrist": [
+        -0.27,
+        0.24,
+        0.29
+      ]
+    },
+    {
+      "id": "webtoon_daily_46",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "큰 가방을 양손으로 끌어올리기",
+      "stance": "wide",
+      "gesture": "lift_low",
+      "props": "bag:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 14,
+      "look": 0,
+      "left_wrist": [
+        0.18,
+        0.12,
+        0.26
+      ],
+      "right_wrist": [
+        -0.18,
+        0.12,
+        0.26
+      ]
+    },
+    {
+      "id": "webtoon_daily_47",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "세탁물을 양팔에 받쳐 들기",
+      "stance": "stand",
+      "gesture": "tray",
+      "props": "laundry:B",
+      "hands": [
+        "cup",
+        "cup"
+      ],
+      "lean": 0,
+      "look": 0,
+      "left_wrist": [
+        0.24,
+        0.18,
+        0.28
+      ],
+      "right_wrist": [
+        -0.24,
+        0.2,
+        0.28
+      ]
+    },
+    {
+      "id": "webtoon_daily_48",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "작은 사진을 가까이 들여다보기",
+      "stance": "sit",
+      "gesture": "read",
+      "props": "photo:B",
+      "hands": [
+        "pinch",
+        "pinch"
+      ],
+      "lean": 0,
+      "look": 0,
+      "left_wrist": [
+        0.1,
+        0.52,
+        0.29
+      ],
+      "right_wrist": [
+        -0.1,
+        0.52,
+        0.29
+      ],
+      "nod": 6
+    },
+    {
+      "id": "webtoon_daily_49",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "책을 한 팔에 끼고 손 흔들기",
+      "stance": "stand",
+      "gesture": "wave",
+      "props": "book:L",
+      "hands": [
+        "support",
+        "open"
+      ],
+      "lean": 0,
+      "look": -15,
+      "left_wrist": [
+        0.25,
+        0.28,
+        0.29
+      ]
+    },
+    {
+      "id": "webtoon_daily_50",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "밀대를 잡고 바닥 닦기",
+      "stance": "lunge",
+      "gesture": "spear_thrust",
+      "props": "mop:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 12,
+      "look": 0,
+      "left_wrist": [
+        0.15,
+        0.41,
+        0.37
+      ],
+      "right_wrist": [
+        -0.13,
+        0.29,
+        0.4
+      ],
+      "root_xyz": [
+        0,
+        0,
+        0
+      ],
+      "right_pole": [
+        -0.36,
+        0.3,
+        0.45
+      ]
+    },
+    {
+      "id": "webtoon_fantasy_01",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "장검을 낮춰 든 기사",
+      "stance": "stand",
+      "gesture": "sword_low",
+      "props": "sword:R:down",
+      "hands": [
+        "relaxed",
+        "grip"
+      ],
+      "lean": 0,
+      "look": -10
+    },
+    {
+      "id": "webtoon_fantasy_02",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "양손 검을 세워 경계하기",
+      "stance": "wide",
+      "gesture": "sword_two",
+      "props": "greatsword:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 0,
+      "look": 0,
+      "left_wrist": [
+        0.16,
+        0.42,
+        0.4
+      ],
+      "right_wrist": [
+        -0.15,
+        0.3,
+        0.4
+      ],
+      "right_pole": [
+        -0.5,
+        0.24,
+        0.18
+      ]
+    },
+    {
+      "id": "webtoon_fantasy_03",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "대검을 머리 위로 치켜들기",
+      "stance": "wide",
+      "gesture": "sword_overhead",
+      "props": "greatsword:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": -4,
+      "look": 0
+    },
+    {
+      "id": "webtoon_fantasy_04",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "검과 방패로 통로 지키기",
+      "stance": "wide",
+      "gesture": "shield",
+      "props": "sword:R;shield:L",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 0,
+      "look": 0
+    },
+    {
+      "id": "webtoon_fantasy_05",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "창을 들고 보초 서기",
+      "stance": "stand",
+      "gesture": "staff",
+      "props": "spear:R",
+      "hands": [
+        "relaxed",
+        "grip"
+      ],
+      "lean": 0,
+      "look": -25
+    },
+    {
+      "id": "webtoon_fantasy_06",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "긴 창을 양손으로 겨누기",
+      "stance": "lunge",
+      "gesture": "spear",
+      "props": "spear:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 3,
+      "look": 0
+    },
+    {
+      "id": "webtoon_fantasy_07",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "지팡이를 짚고 주문 외우기",
+      "stance": "stand",
+      "gesture": "staff",
+      "props": "staff:R",
+      "hands": [
+        "open",
+        "grip"
+      ],
+      "lean": 0,
+      "look": 10,
+      "left_wrist": [
+        0.34,
+        0.51,
+        0.34
+      ]
+    },
+    {
+      "id": "webtoon_fantasy_08",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "양손 사이에 마법 구체 모으기",
+      "stance": "wide",
+      "gesture": "orb",
+      "props": "orb:B",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "lean": 0,
+      "look": 0
+    },
+    {
+      "id": "webtoon_fantasy_09",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "한 손을 뻗어 화염 주문 시전",
+      "stance": "lunge",
+      "gesture": "spell",
+      "props": "wand:R",
+      "hands": [
+        "open",
+        "pinch"
+      ],
+      "lean": 5,
+      "look": -15
+    },
+    {
+      "id": "webtoon_fantasy_10",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "무릎 꿇고 치유 주문 시전",
+      "stance": "kneel",
+      "gesture": "offer_both",
+      "props": "orb:B",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "lean": 6,
+      "look": 0
+    },
+    {
+      "id": "webtoon_fantasy_11",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "두루마리를 펼쳐 읽기",
+      "stance": "stand",
+      "gesture": "read",
+      "props": "scroll:B",
+      "hands": [
+        "pinch",
+        "pinch"
+      ],
+      "lean": 0,
+      "look": 0
+    },
+    {
+      "id": "webtoon_fantasy_12",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "마법책을 들고 다른 손으로 시전",
+      "stance": "wide",
+      "gesture": "spell",
+      "props": "book:L",
+      "hands": [
+        "support",
+        "open"
+      ],
+      "lean": 0,
+      "look": -12,
+      "left_wrist": [
+        0.25,
+        0.35,
+        0.35
+      ]
+    },
+    {
+      "id": "webtoon_fantasy_13",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "작은 물약병을 마시기",
+      "stance": "stand",
+      "gesture": "drink",
+      "props": "potion:R",
+      "hands": [
+        "relaxed",
+        "cup"
+      ],
+      "lean": -3,
+      "look": 0
+    },
+    {
+      "id": "webtoon_fantasy_14",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "동료에게 물약 건네기",
+      "stance": "step",
+      "gesture": "offer",
+      "props": "potion:R",
+      "hands": [
+        "open",
+        "cup"
+      ],
+      "lean": 0,
+      "look": -20
+    },
+    {
+      "id": "webtoon_fantasy_15",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "허리 높이로 랜턴 들기",
+      "stance": "step",
+      "gesture": "bag",
+      "props": "lantern:R",
+      "hands": [
+        "relaxed",
+        "grip"
+      ],
+      "lean": 0,
+      "look": -10,
+      "right_wrist": [
+        -0.34,
+        0.15,
+        0.23
+      ]
+    },
+    {
+      "id": "webtoon_fantasy_16",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "횃불을 높이 들어 길 살피기",
+      "stance": "wide",
+      "gesture": "reach_up",
+      "props": "torch:R",
+      "hands": [
+        "relaxed",
+        "grip"
+      ],
+      "lean": 0,
+      "look": -25
+    },
+    {
+      "id": "webtoon_fantasy_17",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "보물상자 뚜껑 열기",
+      "stance": "squat",
+      "gesture": "push",
+      "props": "chest:B",
+      "hands": [
+        "cup",
+        "cup"
+      ],
+      "lean": 15,
+      "look": 0,
+      "left_wrist": [
+        0.29,
+        0.2,
+        0.45
+      ],
+      "right_wrist": [
+        -0.29,
+        0.2,
+        0.45
+      ]
+    },
+    {
+      "id": "webtoon_fantasy_18",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "무거운 보물상자 옮기기",
+      "stance": "wide",
+      "gesture": "box",
+      "props": "chest:B",
+      "hands": [
+        "cup",
+        "cup"
+      ],
+      "lean": -6,
+      "look": 5,
+      "left_wrist": [
+        0.34,
+        0.2,
+        0.3
+      ],
+      "right_wrist": [
+        -0.34,
+        0.2,
+        0.3
+      ]
+    },
+    {
+      "id": "webtoon_fantasy_19",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "한쪽 무릎 꿇고 검 바치기",
+      "stance": "kneel",
+      "gesture": "tray",
+      "props": "sword:B",
+      "hands": [
+        "support",
+        "support"
+      ],
+      "lean": 3,
+      "look": 0
+    },
+    {
+      "id": "webtoon_fantasy_20",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "기사 서약하며 가슴에 손 얹기",
+      "stance": "stand",
+      "gesture": "hand_chest",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "fist"
+      ],
+      "lean": 0,
+      "look": 0,
+      "nod": 15
+    },
+    {
+      "id": "webtoon_fantasy_21",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "왕관을 양손으로 들어 올리기",
+      "stance": "stand",
+      "gesture": "offer_both",
+      "props": "crown:B",
+      "hands": [
+        "support",
+        "support"
+      ],
+      "lean": 0,
+      "look": 0,
+      "left_wrist": [
+        0.21,
+        0.61,
+        0.34
+      ],
+      "right_wrist": [
+        -0.21,
+        0.61,
+        0.34
+      ]
+    },
+    {
+      "id": "webtoon_fantasy_22",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "성배를 양손으로 받들기",
+      "stance": "stand",
+      "gesture": "cup_both",
+      "props": "goblet:B",
+      "hands": [
+        "cup",
+        "cup"
+      ],
+      "lean": 0,
+      "look": 0,
+      "left_wrist": [
+        0.11,
+        0.49,
+        0.35
+      ],
+      "right_wrist": [
+        -0.11,
+        0.49,
+        0.35
+      ]
+    },
+    {
+      "id": "webtoon_fantasy_23",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "활시위를 당겨 조준하기",
+      "stance": "wide",
+      "gesture": "bow_draw",
+      "props": "bow:L",
+      "hands": [
+        "grip",
+        "pinch"
+      ],
+      "lean": 0,
+      "look": 65
+    },
+    {
+      "id": "webtoon_fantasy_24",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "활을 낮추고 대기하기",
+      "stance": "relaxed",
+      "gesture": "bag",
+      "props": "bow:L",
+      "hands": [
+        "grip",
+        "relaxed"
+      ],
+      "lean": 0,
+      "look": 30,
+      "left_wrist": [
+        0.37,
+        0.18,
+        0.19
+      ],
+      "right_wrist": [
+        -0.25,
+        0.13,
+        0.2
+      ]
+    },
+    {
+      "id": "webtoon_fantasy_25",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "석궁을 양손으로 조준하기",
+      "stance": "wide",
+      "gesture": "gun",
+      "props": "crossbow:B",
+      "hands": [
+        "support",
+        "grip"
+      ],
+      "lean": 2,
+      "look": 0
+    },
+    {
+      "id": "webtoon_fantasy_26",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "도끼를 어깨 높이로 들기",
+      "stance": "wide",
+      "gesture": "sword_high",
+      "props": "axe:R",
+      "hands": [
+        "relaxed",
+        "grip"
+      ],
+      "lean": 0,
+      "look": -20,
+      "right_wrist": [
+        -0.4,
+        0.65,
+        0.08
+      ]
+    },
+    {
+      "id": "webtoon_fantasy_27",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "망치를 양손으로 들어 올리기",
+      "stance": "wide",
+      "gesture": "sword_overhead",
+      "props": "hammer:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 0,
+      "look": 0,
+      "left_wrist": [
+        0.14,
+        0.79,
+        0.28
+      ],
+      "right_wrist": [
+        -0.14,
+        0.7,
+        0.31
+      ]
+    },
+    {
+      "id": "webtoon_fantasy_28",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "곡괭이로 광석을 캐기 전 준비",
+      "stance": "wide",
+      "gesture": "spear",
+      "props": "pickaxe:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 8,
+      "look": 0
+    },
+    {
+      "id": "webtoon_fantasy_29",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "작은 보석을 손바닥에 올려 보기",
+      "stance": "stand",
+      "gesture": "cup",
+      "props": "gem:R",
+      "hands": [
+        "relaxed",
+        "open"
+      ],
+      "lean": 0,
+      "look": -10,
+      "right_wrist": [
+        -0.22,
+        0.4,
+        0.34
+      ],
+      "nod": 10
+    },
+    {
+      "id": "webtoon_fantasy_30",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "전령의 편지를 펼쳐 읽기",
+      "stance": "relaxed",
+      "gesture": "read",
+      "props": "letter:B",
+      "hands": [
+        "pinch",
+        "pinch"
+      ],
+      "lean": 0,
+      "look": 15,
+      "left_wrist": [
+        0.12,
+        0.41,
+        0.34
+      ],
+      "right_wrist": [
+        -0.12,
+        0.41,
+        0.34
+      ]
+    },
+    {
+      "id": "webtoon_fantasy_31",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "검집에서 검을 뽑기 시작하기",
+      "stance": "wide",
+      "gesture": "sword_two",
+      "props": "sword:R",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 0,
+      "look": -20,
+      "left_wrist": [
+        0.25,
+        0.13,
+        0.25
+      ],
+      "right_wrist": [
+        -0.12,
+        0.35,
+        0.42
+      ],
+      "right_pole": [
+        -0.4,
+        0.3,
+        0.45
+      ]
+    },
+    {
+      "id": "webtoon_fantasy_32",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "한 손에 단검을 숨기고 경계",
+      "stance": "relaxed",
+      "gesture": "sword_low",
+      "props": "dagger:R:down",
+      "hands": [
+        "relaxed",
+        "grip"
+      ],
+      "lean": 0,
+      "look": 30,
+      "right_wrist": [
+        -0.33,
+        0.06,
+        0.04
+      ]
+    },
+    {
+      "id": "webtoon_fantasy_33",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "쌍단검을 들고 낮게 경계",
+      "stance": "wide",
+      "gesture": "daggers",
+      "props": "dagger:L;dagger:R",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 5,
+      "look": 0
+    },
+    {
+      "id": "webtoon_fantasy_34",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "방패 뒤에서 몸 낮추기",
+      "stance": "squat",
+      "gesture": "shield",
+      "props": "sword:R;shield:L",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 9,
+      "look": 0
+    },
+    {
+      "id": "webtoon_fantasy_35",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "장창을 가로로 세워 길 막기",
+      "stance": "wide",
+      "gesture": "spear",
+      "props": "spear:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 0,
+      "look": 20,
+      "left_wrist": [
+        0.38,
+        0.41,
+        0.35
+      ],
+      "right_wrist": [
+        -0.38,
+        0.4,
+        0.35
+      ]
+    },
+    {
+      "id": "webtoon_fantasy_36",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "마법봉으로 바닥의 문양 가리키기",
+      "stance": "wide",
+      "gesture": "reach_low",
+      "props": "wand:R",
+      "hands": [
+        "open",
+        "pinch"
+      ],
+      "lean": 12,
+      "look": -15,
+      "right_wrist": [
+        -0.24,
+        0.15,
+        0.43
+      ]
+    },
+    {
+      "id": "webtoon_fantasy_37",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "공중에 주문 문양 그리기",
+      "stance": "stand",
+      "gesture": "wave",
+      "props": "wand:R",
+      "hands": [
+        "relaxed",
+        "pinch"
+      ],
+      "lean": 0,
+      "look": -10,
+      "right_wrist": [
+        -0.39,
+        0.61,
+        0.34
+      ]
+    },
+    {
+      "id": "webtoon_fantasy_38",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "성직자가 두 손 모아 기도",
+      "stance": "stand",
+      "gesture": "prayer",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "lean": 0,
+      "look": 0,
+      "nod": 12
+    },
+    {
+      "id": "webtoon_fantasy_39",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "무릎 꿇고 간절히 기도",
+      "stance": "kneel",
+      "gesture": "prayer",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "lean": 7,
+      "look": 0,
+      "nod": 15
+    },
+    {
+      "id": "webtoon_fantasy_40",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "손바닥을 펴서 마법 장벽 유지",
+      "stance": "lunge",
+      "gesture": "push",
+      "props": "barrier:B",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "lean": 5,
+      "look": 0
+    },
+    {
+      "id": "webtoon_fantasy_41",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "양팔 벌려 넓은 결계 시전",
+      "stance": "wide",
+      "gesture": "stretch_open",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "lean": 0,
+      "look": 0,
+      "left_wrist": [
+        0.61,
+        0.58,
+        0.17
+      ],
+      "right_wrist": [
+        -0.61,
+        0.58,
+        0.17
+      ]
+    },
+    {
+      "id": "webtoon_fantasy_42",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "로브 차림으로 마법서를 품기",
+      "stance": "stand",
+      "gesture": "box_high",
+      "props": "book:B",
+      "hands": [
+        "support",
+        "support"
+      ],
+      "lean": 0,
+      "look": 15,
+      "left_wrist": [
+        0.19,
+        0.29,
+        0.23
+      ],
+      "right_wrist": [
+        -0.19,
+        0.29,
+        0.23
+      ]
+    },
+    {
+      "id": "webtoon_fantasy_43",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "두 손으로 대형 열쇠 돌리기",
+      "stance": "lunge",
+      "gesture": "pull",
+      "props": "key:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 5,
+      "look": -15,
+      "left_wrist": [
+        0.12,
+        0.39,
+        0.46
+      ],
+      "right_wrist": [
+        -0.12,
+        0.31,
+        0.46
+      ]
+    },
+    {
+      "id": "webtoon_fantasy_44",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "양손으로 무거운 바위 받치기",
+      "stance": "wide",
+      "gesture": "box_high",
+      "props": "boulder:B",
+      "hands": [
+        "cup",
+        "cup"
+      ],
+      "lean": -7,
+      "look": 0,
+      "left_wrist": [
+        0.34,
+        0.29,
+        0.33
+      ],
+      "right_wrist": [
+        -0.34,
+        0.29,
+        0.33
+      ]
+    },
+    {
+      "id": "webtoon_fantasy_45",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "보석 주머니를 상대에게 내밀기",
+      "stance": "step",
+      "gesture": "offer",
+      "props": "pouch:R",
+      "hands": [
+        "open",
+        "pinch"
+      ],
+      "lean": 0,
+      "look": -12,
+      "right_wrist": [
+        -0.25,
+        0.31,
+        0.4
+      ]
+    },
+    {
+      "id": "webtoon_fantasy_46",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "앉아서 단검 날을 살펴보기",
+      "stance": "sit",
+      "gesture": "read",
+      "props": "dagger:B",
+      "hands": [
+        "support",
+        "grip"
+      ],
+      "lean": 4,
+      "look": 0,
+      "left_wrist": [
+        0.24,
+        0.36,
+        0.36
+      ],
+      "right_wrist": [
+        -0.22,
+        0.29,
+        0.37
+      ]
+    },
+    {
+      "id": "webtoon_fantasy_47",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "앉아서 활시위를 점검하기",
+      "stance": "sit_open",
+      "gesture": "spear",
+      "props": "bow:B",
+      "hands": [
+        "grip",
+        "pinch"
+      ],
+      "lean": 8,
+      "look": 20
+    },
+    {
+      "id": "webtoon_fantasy_48",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "손을 펼쳐 작은 정령 맞이하기",
+      "stance": "stand",
+      "gesture": "offer_both",
+      "props": "orb:B",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "lean": 0,
+      "look": 0,
+      "left_wrist": [
+        0.24,
+        0.47,
+        0.39
+      ],
+      "right_wrist": [
+        -0.24,
+        0.47,
+        0.39
+      ]
+    },
+    {
+      "id": "webtoon_fantasy_49",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "사냥감을 향해 창끝 들어 올리기",
+      "stance": "backstep",
+      "gesture": "spear_thrust",
+      "props": "spear:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 0,
+      "look": -15,
+      "left_wrist": [
+        0.27,
+        0.59,
+        0.42
+      ],
+      "right_wrist": [
+        -0.22,
+        0.39,
+        0.35
+      ]
+    },
+    {
+      "id": "webtoon_fantasy_50",
+      "category": "fantasy",
+      "category_label": "판타지",
+      "label": "의식용 잔을 머리 위로 받들기",
+      "stance": "stand",
+      "gesture": "lift_overhead",
+      "props": "goblet:B",
+      "hands": [
+        "cup",
+        "cup"
+      ],
+      "lean": 0,
+      "look": 0,
+      "left_wrist": [
+        0.12,
+        0.87,
+        0.19
+      ],
+      "right_wrist": [
+        -0.12,
+        0.87,
+        0.19
+      ]
+    },
+    {
+      "id": "webtoon_combat_01",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "한손 검으로 정면 경계",
+      "stance": "wide",
+      "gesture": "sword_front",
+      "props": "sword:R",
+      "hands": [
+        "fist",
+        "grip"
+      ],
+      "lean": 0,
+      "look": 0
+    },
+    {
+      "id": "webtoon_combat_02",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "검을 아래로 내리친 마무리",
+      "stance": "lunge",
+      "gesture": "sword_two",
+      "props": "sword:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 10,
+      "look": 0,
+      "left_wrist": [
+        0.16,
+        0.25,
+        0.4
+      ],
+      "right_wrist": [
+        -0.14,
+        0.19,
+        0.39
+      ]
+    },
+    {
+      "id": "webtoon_combat_03",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "검을 위로 베어 올리는 준비",
+      "stance": "backstep",
+      "gesture": "sword_low",
+      "props": "sword:R",
+      "hands": [
+        "fist",
+        "grip"
+      ],
+      "lean": 5,
+      "look": -12,
+      "right_wrist": [
+        -0.34,
+        0.1,
+        0.21
+      ]
+    },
+    {
+      "id": "webtoon_combat_04",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "양손 검으로 머리 위 공격 막기",
+      "stance": "wide",
+      "gesture": "sword_overhead",
+      "props": "greatsword:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 0,
+      "look": 0,
+      "left_wrist": [
+        0.23,
+        0.75,
+        0.31
+      ],
+      "right_wrist": [
+        -0.23,
+        0.73,
+        0.31
+      ]
+    },
+    {
+      "id": "webtoon_combat_05",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "옆으로 돌아 검 찌르기",
+      "stance": "lunge",
+      "gesture": "jab",
+      "props": "sword:R:forward",
+      "hands": [
+        "fist",
+        "grip"
+      ],
+      "lean": 5,
+      "look": -20
+    },
+    {
+      "id": "webtoon_combat_06",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "검을 대각선 위로 치켜들기",
+      "stance": "backstep",
+      "gesture": "sword_high",
+      "props": "sword:R",
+      "hands": [
+        "fist",
+        "grip"
+      ],
+      "lean": 0,
+      "look": -15
+    },
+    {
+      "id": "webtoon_combat_07",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "양손 검으로 앞으로 밀어 막기",
+      "stance": "lunge",
+      "gesture": "sword_two",
+      "props": "greatsword:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 7,
+      "look": 0,
+      "left_wrist": [
+        0.16,
+        0.49,
+        0.43
+      ],
+      "right_wrist": [
+        -0.13,
+        0.41,
+        0.43
+      ]
+    },
+    {
+      "id": "webtoon_combat_08",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "검을 든 채 뒤로 물러서기",
+      "stance": "backstep",
+      "gesture": "sword_front",
+      "props": "sword:R",
+      "hands": [
+        "open",
+        "grip"
+      ],
+      "lean": -3,
+      "look": 0
+    },
+    {
+      "id": "webtoon_combat_09",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "무릎 굽혀 검을 낮게 겨누기",
+      "stance": "squat",
+      "gesture": "sword_front",
+      "props": "sword:R",
+      "hands": [
+        "fist",
+        "grip"
+      ],
+      "lean": 8,
+      "look": 0
+    },
+    {
+      "id": "webtoon_combat_10",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "방패를 앞으로 밀어 돌진 준비",
+      "stance": "lunge",
+      "gesture": "shield",
+      "props": "sword:R;shield:L",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 10,
+      "look": 0,
+      "left_wrist": [
+        0.23,
+        0.5,
+        0.43
+      ]
+    },
+    {
+      "id": "webtoon_combat_11",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "방패로 머리 보호하기",
+      "stance": "wide",
+      "gesture": "shield",
+      "props": "shield:L;dagger:R",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 0,
+      "look": 0,
+      "left_wrist": [
+        0.2,
+        0.69,
+        0.29
+      ]
+    },
+    {
+      "id": "webtoon_combat_12",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "방패 옆으로 짧은 검 내밀기",
+      "stance": "lunge",
+      "gesture": "shield",
+      "props": "shield:L;sword:R",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 4,
+      "look": 0,
+      "right_wrist": [
+        -0.32,
+        0.39,
+        0.46
+      ]
+    },
+    {
+      "id": "webtoon_combat_13",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "장창으로 정면 찌르기",
+      "stance": "lunge",
+      "gesture": "spear_thrust",
+      "props": "spear:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 8,
+      "look": 0
+    },
+    {
+      "id": "webtoon_combat_14",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "장창을 몸 앞으로 끌어당기기",
+      "stance": "backstep",
+      "gesture": "spear",
+      "props": "spear:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": -4,
+      "look": 0,
+      "left_wrist": [
+        0.23,
+        0.36,
+        0.35
+      ],
+      "right_wrist": [
+        -0.27,
+        0.16,
+        0.25
+      ]
+    },
+    {
+      "id": "webtoon_combat_15",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "창을 가로로 들어 공격 막기",
+      "stance": "wide",
+      "gesture": "spear",
+      "props": "spear:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 0,
+      "look": 0,
+      "left_wrist": [
+        0.36,
+        0.58,
+        0.37
+      ],
+      "right_wrist": [
+        -0.36,
+        0.58,
+        0.37
+      ]
+    },
+    {
+      "id": "webtoon_combat_16",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "낮은 자세로 창끝 겨누기",
+      "stance": "squat",
+      "gesture": "spear_thrust",
+      "props": "spear:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 8,
+      "look": 0
+    },
+    {
+      "id": "webtoon_combat_17",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "창끝을 위로 세워 올려치기 준비",
+      "stance": "wide",
+      "gesture": "spear",
+      "props": "spear:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 0,
+      "look": -15,
+      "left_wrist": [
+        0.2,
+        0.69,
+        0.33
+      ],
+      "right_wrist": [
+        -0.17,
+        0.32,
+        0.34
+      ]
+    },
+    {
+      "id": "webtoon_combat_18",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "양손 도끼 내리치기 준비",
+      "stance": "wide",
+      "gesture": "sword_overhead",
+      "props": "axe:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": -3,
+      "look": 0
+    },
+    {
+      "id": "webtoon_combat_19",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "도끼를 아래로 내리친 자세",
+      "stance": "lunge",
+      "gesture": "sword_two",
+      "props": "axe:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 14,
+      "look": 0,
+      "left_wrist": [
+        0.16,
+        0.21,
+        0.36
+      ],
+      "right_wrist": [
+        -0.14,
+        0.15,
+        0.35
+      ]
+    },
+    {
+      "id": "webtoon_combat_20",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "망치를 들어 방어선 돌파 준비",
+      "stance": "backstep",
+      "gesture": "sword_high",
+      "props": "hammer:R",
+      "hands": [
+        "fist",
+        "grip"
+      ],
+      "lean": 0,
+      "look": -15,
+      "right_wrist": [
+        -0.33,
+        0.72,
+        0.17
+      ],
+      "left_wrist": [
+        0.3,
+        0.4,
+        0.22
+      ]
+    },
+    {
+      "id": "webtoon_combat_21",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "쌍단검으로 상체 방어",
+      "stance": "wide",
+      "gesture": "daggers",
+      "props": "dagger:L;dagger:R",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 0,
+      "look": 0
+    },
+    {
+      "id": "webtoon_combat_22",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "단검으로 짧게 정면 찌르기",
+      "stance": "lunge",
+      "gesture": "jab",
+      "props": "dagger:R:forward",
+      "hands": [
+        "fist",
+        "grip"
+      ],
+      "lean": 6,
+      "look": -8,
+      "right_wrist": [
+        -0.22,
+        0.42,
+        0.5
+      ]
+    },
+    {
+      "id": "webtoon_combat_23",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "단검을 역수로 들고 경계",
+      "stance": "relaxed",
+      "gesture": "daggers",
+      "props": "dagger:L;dagger:R",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 0,
+      "look": 15,
+      "left_wrist": [
+        0.33,
+        0.18,
+        0.2
+      ],
+      "right_wrist": [
+        -0.34,
+        0.43,
+        0.26
+      ]
+    },
+    {
+      "id": "webtoon_combat_24",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "활을 서서 완전히 당겨 조준",
+      "stance": "lunge",
+      "gesture": "bow_draw",
+      "props": "bow:L",
+      "hands": [
+        "grip",
+        "pinch"
+      ],
+      "lean": 0,
+      "look": 70
+    },
+    {
+      "id": "webtoon_combat_25",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "한쪽 무릎 꿇고 활 조준",
+      "stance": "kneel",
+      "gesture": "bow_draw",
+      "props": "bow:L",
+      "hands": [
+        "grip",
+        "pinch"
+      ],
+      "lean": 0,
+      "look": 65
+    },
+    {
+      "id": "webtoon_combat_26",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "권총을 양손으로 수평 조준",
+      "stance": "wide",
+      "gesture": "gun",
+      "props": "pistol:R",
+      "hands": [
+        "support",
+        "grip"
+      ],
+      "lean": 4,
+      "look": 0
+    },
+    {
+      "id": "webtoon_combat_27",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "한쪽 무릎 꿇고 권총 조준",
+      "stance": "kneel",
+      "gesture": "gun",
+      "props": "pistol:R",
+      "hands": [
+        "support",
+        "grip"
+      ],
+      "lean": 5,
+      "look": 0
+    },
+    {
+      "id": "webtoon_combat_28",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "권총을 한손으로 겨누기",
+      "stance": "lunge",
+      "gesture": "jab",
+      "props": "pistol:R",
+      "hands": [
+        "fist",
+        "grip"
+      ],
+      "lean": 3,
+      "look": 0,
+      "left_wrist": [
+        0.25,
+        0.16,
+        0.21
+      ]
+    },
+    {
+      "id": "webtoon_combat_29",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "양주먹으로 얼굴 가드하기",
+      "stance": "wide",
+      "gesture": "guard",
+      "props": "",
+      "hands": [
+        "fist",
+        "fist"
+      ],
+      "lean": 3,
+      "look": 0
+    },
+    {
+      "id": "webtoon_combat_30",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "앞손 잽을 뻗기",
+      "stance": "lunge",
+      "gesture": "jab",
+      "props": "",
+      "hands": [
+        "fist",
+        "fist"
+      ],
+      "lean": 8,
+      "look": 0
+    },
+    {
+      "id": "webtoon_combat_31",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "상체를 뒤로 빼며 공격 피하기",
+      "stance": "backstep",
+      "gesture": "dodge",
+      "props": "",
+      "hands": [
+        "fist",
+        "fist"
+      ],
+      "lean": -10,
+      "look": 0
+    },
+    {
+      "id": "webtoon_combat_32",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "낮게 웅크려 공격 피하기",
+      "stance": "squat",
+      "gesture": "dodge",
+      "props": "",
+      "hands": [
+        "fist",
+        "fist"
+      ],
+      "lean": 14,
+      "look": 0
+    },
+    {
+      "id": "webtoon_combat_33",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "팔꿈치를 앞으로 세워 막기",
+      "stance": "wide",
+      "gesture": "elbow",
+      "props": "",
+      "hands": [
+        "fist",
+        "fist"
+      ],
+      "lean": 4,
+      "look": 0
+    },
+    {
+      "id": "webtoon_combat_34",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "양손을 뻗어 상대 밀치기",
+      "stance": "lunge",
+      "gesture": "push",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "lean": 15,
+      "look": 0
+    },
+    {
+      "id": "webtoon_combat_35",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "양손으로 상대의 팔 붙잡기",
+      "stance": "wide",
+      "gesture": "grapple",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 8,
+      "look": 0
+    },
+    {
+      "id": "webtoon_combat_36",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "공격을 맞고 상체 뒤로 젖히기",
+      "stance": "backstep",
+      "gesture": "recoil",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "lean": -18,
+      "look": 0
+    },
+    {
+      "id": "webtoon_combat_37",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "한손으로 배를 감싸고 버티기",
+      "stance": "wide",
+      "gesture": "guard",
+      "props": "",
+      "hands": [
+        "support",
+        "fist"
+      ],
+      "lean": 18,
+      "look": 0,
+      "left_wrist": [
+        0.05,
+        0.18,
+        0.24
+      ]
+    },
+    {
+      "id": "webtoon_combat_38",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "한쪽 무릎으로 바닥 짚고 가드",
+      "stance": "kneel",
+      "gesture": "guard",
+      "props": "",
+      "hands": [
+        "fist",
+        "fist"
+      ],
+      "lean": 10,
+      "look": 0,
+      "left_wrist": [
+        0.29,
+        0.16,
+        0.32
+      ]
+    },
+    {
+      "id": "webtoon_combat_39",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "양손 방어하며 천천히 전진",
+      "stance": "step",
+      "gesture": "guard",
+      "props": "",
+      "hands": [
+        "fist",
+        "fist"
+      ],
+      "lean": 5,
+      "look": -10
+    },
+    {
+      "id": "webtoon_combat_40",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "벽을 등지고 양팔로 방어",
+      "stance": "wide",
+      "gesture": "recoil",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "lean": 0,
+      "look": 0,
+      "left_wrist": [
+        0.33,
+        0.61,
+        0.23
+      ],
+      "right_wrist": [
+        -0.33,
+        0.61,
+        0.23
+      ]
+    },
+    {
+      "id": "webtoon_combat_41",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "투척 무기를 머리 뒤로 들기",
+      "stance": "backstep",
+      "gesture": "throw",
+      "props": "dagger:R",
+      "hands": [
+        "open",
+        "grip"
+      ],
+      "lean": 0,
+      "look": -15
+    },
+    {
+      "id": "webtoon_combat_42",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "무거운 돌을 들어 던질 준비",
+      "stance": "wide",
+      "gesture": "box_high",
+      "props": "boulder:B",
+      "hands": [
+        "cup",
+        "cup"
+      ],
+      "lean": -8,
+      "look": 0,
+      "left_wrist": [
+        0.3,
+        0.45,
+        0.33
+      ],
+      "right_wrist": [
+        -0.3,
+        0.45,
+        0.33
+      ]
+    },
+    {
+      "id": "webtoon_combat_43",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "허리 높이의 로프를 당겨 버티기",
+      "stance": "backstep",
+      "gesture": "pull",
+      "props": "rope:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": -10,
+      "look": 0,
+      "left_wrist": [
+        0.23,
+        0.31,
+        0.36
+      ],
+      "right_wrist": [
+        -0.23,
+        0.35,
+        0.36
+      ],
+      "left_pole": [
+        0.42,
+        0.3,
+        0.44
+      ],
+      "right_pole": [
+        -0.42,
+        0.3,
+        0.44
+      ]
+    },
+    {
+      "id": "webtoon_combat_44",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "긴 봉으로 하단 공격 막기",
+      "stance": "wide",
+      "gesture": "spear",
+      "props": "staff:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 10,
+      "look": 0,
+      "left_wrist": [
+        0.36,
+        0.24,
+        0.35
+      ],
+      "right_wrist": [
+        -0.36,
+        0.24,
+        0.35
+      ]
+    },
+    {
+      "id": "webtoon_combat_45",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "봉을 세워 몸 옆에서 방어",
+      "stance": "backstep",
+      "gesture": "staff",
+      "props": "staff:R",
+      "hands": [
+        "fist",
+        "grip"
+      ],
+      "lean": 0,
+      "look": 15,
+      "right_wrist": [
+        -0.3,
+        0.51,
+        0.33
+      ]
+    },
+    {
+      "id": "webtoon_combat_46",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "양손 검을 겨눈 채 한쪽 무릎 꿇기",
+      "stance": "kneel",
+      "gesture": "sword_two",
+      "props": "greatsword:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 5,
+      "look": 0
+    },
+    {
+      "id": "webtoon_combat_47",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "낮게 웅크려 한 손으로 균형 잡기",
+      "stance": "squat",
+      "gesture": "guard",
+      "props": "",
+      "hands": [
+        "open",
+        "fist"
+      ],
+      "lean": 25,
+      "look": 0,
+      "left_wrist": [
+        0.27,
+        -0.14,
+        0.4
+      ],
+      "height": -0.13,
+      "root_xyz": [
+        35,
+        0,
+        0
+      ],
+      "right_wrist": [
+        -0.26,
+        0.18,
+        0.35
+      ]
+    },
+    {
+      "id": "webtoon_combat_48",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "무거운 장애물을 밀어내기",
+      "stance": "lunge",
+      "gesture": "push",
+      "props": "crate:B",
+      "hands": [
+        "cup",
+        "cup"
+      ],
+      "lean": 18,
+      "look": 0,
+      "left_wrist": [
+        0.32,
+        0.31,
+        0.45
+      ],
+      "right_wrist": [
+        -0.32,
+        0.31,
+        0.45
+      ]
+    },
+    {
+      "id": "webtoon_combat_49",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "부상당한 팔을 반대 손으로 지탱",
+      "stance": "stand",
+      "gesture": "cup_both",
+      "props": "",
+      "hands": [
+        "support",
+        "relaxed"
+      ],
+      "lean": 5,
+      "look": -15,
+      "left_wrist": [
+        0.12,
+        0.32,
+        0.24
+      ],
+      "right_wrist": [
+        -0.17,
+        0.24,
+        0.25
+      ]
+    },
+    {
+      "id": "webtoon_combat_50",
+      "category": "combat",
+      "category_label": "전투",
+      "label": "양팔을 벌려 동료를 뒤로 보호",
+      "stance": "wide",
+      "gesture": "stretch_open",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "lean": 0,
+      "look": 15,
+      "left_wrist": [
+        0.59,
+        0.46,
+        0.18
+      ],
+      "right_wrist": [
+        -0.59,
+        0.43,
+        0.18
+      ]
+    },
+    {
+      "id": "webtoon_romance_01",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "두 손으로 따뜻한 컵 건네기",
+      "stance": "stand",
+      "gesture": "offer_both",
+      "props": "cup:B",
+      "hands": [
+        "cup",
+        "cup"
+      ],
+      "lean": 3,
+      "look": 0,
+      "left_wrist": [
+        0.13,
+        0.37,
+        0.43
+      ],
+      "right_wrist": [
+        -0.13,
+        0.37,
+        0.43
+      ],
+      "left_pole": [
+        0.4,
+        0.3,
+        0.44
+      ],
+      "right_pole": [
+        -0.4,
+        0.3,
+        0.44
+      ]
+    },
+    {
+      "id": "webtoon_romance_02",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "앉아서 함께 차 마시며 듣기",
+      "stance": "sit_turn",
+      "gesture": "cup",
+      "props": "cup:R",
+      "hands": [
+        "relaxed",
+        "cup"
+      ],
+      "lean": 0,
+      "look": -25
+    },
+    {
+      "id": "webtoon_romance_03",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "꽃 한 송이를 내밀기",
+      "stance": "step",
+      "gesture": "offer",
+      "props": "flower:R",
+      "hands": [
+        "relaxed",
+        "pinch"
+      ],
+      "lean": 0,
+      "look": -15
+    },
+    {
+      "id": "webtoon_romance_04",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "꽃다발을 품에 안기",
+      "stance": "stand",
+      "gesture": "box_high",
+      "props": "bouquet:B",
+      "hands": [
+        "support",
+        "support"
+      ],
+      "lean": 0,
+      "look": 12,
+      "left_wrist": [
+        0.23,
+        0.27,
+        0.28
+      ],
+      "right_wrist": [
+        -0.23,
+        0.31,
+        0.28
+      ]
+    },
+    {
+      "id": "webtoon_romance_05",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "작은 선물 상자를 양손으로 건네기",
+      "stance": "stand",
+      "gesture": "offer_both",
+      "props": "gift:B",
+      "hands": [
+        "support",
+        "support"
+      ],
+      "lean": 5,
+      "look": 0,
+      "left_wrist": [
+        0.18,
+        0.34,
+        0.44
+      ],
+      "right_wrist": [
+        -0.18,
+        0.34,
+        0.44
+      ]
+    },
+    {
+      "id": "webtoon_romance_06",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "선물 상자를 가슴에 안고 기뻐하기",
+      "stance": "relaxed",
+      "gesture": "box_high",
+      "props": "gift:B",
+      "hands": [
+        "support",
+        "support"
+      ],
+      "lean": -3,
+      "look": -15,
+      "left_wrist": [
+        0.22,
+        0.37,
+        0.25
+      ],
+      "right_wrist": [
+        -0.22,
+        0.37,
+        0.25
+      ]
+    },
+    {
+      "id": "webtoon_romance_07",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "편지를 두 손으로 내밀며 고백",
+      "stance": "bow",
+      "gesture": "offer_both",
+      "props": "letter:B",
+      "hands": [
+        "pinch",
+        "pinch"
+      ],
+      "lean": 12,
+      "look": 0,
+      "left_wrist": [
+        0.13,
+        0.26,
+        0.48
+      ],
+      "right_wrist": [
+        -0.13,
+        0.26,
+        0.48
+      ]
+    },
+    {
+      "id": "webtoon_romance_08",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "앉아서 러브레터 읽기",
+      "stance": "sit",
+      "gesture": "read",
+      "props": "letter:B",
+      "hands": [
+        "pinch",
+        "pinch"
+      ],
+      "lean": 2,
+      "look": -8,
+      "left_wrist": [
+        0.12,
+        0.38,
+        0.35
+      ],
+      "right_wrist": [
+        -0.12,
+        0.38,
+        0.35
+      ]
+    },
+    {
+      "id": "webtoon_romance_09",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "받은 편지를 가슴에 누르기",
+      "stance": "stand",
+      "gesture": "hand_chest",
+      "props": "letter:R",
+      "hands": [
+        "relaxed",
+        "support"
+      ],
+      "lean": 0,
+      "look": 15,
+      "right_wrist": [
+        -0.06,
+        0.46,
+        0.25
+      ]
+    },
+    {
+      "id": "webtoon_romance_10",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "수줍게 두 손 모으고 서기",
+      "stance": "relaxed",
+      "gesture": "shy",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ],
+      "lean": 3,
+      "look": -20
+    },
+    {
+      "id": "webtoon_romance_11",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "옆 사람에게 손 내밀기",
+      "stance": "stand",
+      "gesture": "handhold",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "open"
+      ],
+      "lean": 0,
+      "look": -35,
+      "right_wrist": [
+        -0.42,
+        0.16,
+        0.24
+      ]
+    },
+    {
+      "id": "webtoon_romance_12",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "손을 잡고 한 걸음 이끌기",
+      "stance": "step",
+      "gesture": "handhold",
+      "props": "",
+      "hands": [
+        "open",
+        "grip"
+      ],
+      "lean": 0,
+      "look": 30,
+      "right_wrist": [
+        -0.49,
+        0.19,
+        0.22
+      ]
+    },
+    {
+      "id": "webtoon_romance_13",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "포옹을 위해 두 팔 벌리기",
+      "stance": "stand",
+      "gesture": "hug",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "lean": 0,
+      "look": 0
+    },
+    {
+      "id": "webtoon_romance_14",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "상대를 안는 팔 높이 만들기",
+      "stance": "step",
+      "gesture": "hug",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ],
+      "lean": 4,
+      "look": 0,
+      "left_wrist": [
+        0.28,
+        0.54,
+        0.36
+      ],
+      "right_wrist": [
+        -0.28,
+        0.38,
+        0.37
+      ]
+    },
+    {
+      "id": "webtoon_romance_15",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "앉은 상대를 향해 몸 숙여 손 내밀기",
+      "stance": "bow",
+      "gesture": "offer",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "lean": 17,
+      "look": -12,
+      "right_wrist": [
+        -0.22,
+        0.2,
+        0.44
+      ]
+    },
+    {
+      "id": "webtoon_romance_16",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "상대의 뺨을 향해 손 뻗기",
+      "stance": "stand",
+      "gesture": "touch_cheek",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "open"
+      ],
+      "lean": 0,
+      "look": -15
+    },
+    {
+      "id": "webtoon_romance_17",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "상대의 머리를 쓰다듬기",
+      "stance": "stand",
+      "gesture": "reach_up",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "open"
+      ],
+      "lean": 0,
+      "look": -10,
+      "right_wrist": [
+        -0.22,
+        0.74,
+        0.4
+      ]
+    },
+    {
+      "id": "webtoon_romance_18",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "상대의 어깨에 손 얹기",
+      "stance": "step",
+      "gesture": "touch_cheek",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "open"
+      ],
+      "lean": 0,
+      "look": -20,
+      "right_wrist": [
+        -0.29,
+        0.46,
+        0.43
+      ]
+    },
+    {
+      "id": "webtoon_romance_19",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "옷깃을 고쳐주려고 양손 뻗기",
+      "stance": "stand",
+      "gesture": "offer_both",
+      "props": "",
+      "hands": [
+        "pinch",
+        "pinch"
+      ],
+      "lean": 0,
+      "look": 0,
+      "left_wrist": [
+        0.13,
+        0.53,
+        0.44
+      ],
+      "right_wrist": [
+        -0.13,
+        0.48,
+        0.44
+      ]
+    },
+    {
+      "id": "webtoon_romance_20",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "우산을 상대 쪽으로 기울여 들기",
+      "stance": "step",
+      "gesture": "umbrella",
+      "props": "umbrella:R",
+      "hands": [
+        "relaxed",
+        "grip"
+      ],
+      "lean": 0,
+      "look": -25,
+      "right_wrist": [
+        -0.37,
+        0.6,
+        0.27
+      ]
+    },
+    {
+      "id": "webtoon_romance_21",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "비를 피하며 가방을 머리 위에 들기",
+      "stance": "wide",
+      "gesture": "lift_overhead",
+      "props": "bag:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 5,
+      "look": 0,
+      "left_wrist": [
+        0.21,
+        0.87,
+        0.12
+      ],
+      "right_wrist": [
+        -0.21,
+        0.87,
+        0.12
+      ]
+    },
+    {
+      "id": "webtoon_romance_22",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "기쁜 표정으로 크게 손 흔들기",
+      "stance": "tiptoe",
+      "gesture": "wave",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "lean": 0,
+      "look": -20
+    },
+    {
+      "id": "webtoon_romance_23",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "앉아서 턱을 괴고 상대 바라보기",
+      "stance": "sit",
+      "gesture": "cheek_rest",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ],
+      "lean": 0,
+      "look": -30
+    },
+    {
+      "id": "webtoon_romance_24",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "수줍게 머리카락을 귀 뒤로 넘기기",
+      "stance": "stand",
+      "gesture": "comb",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "open"
+      ],
+      "lean": 0,
+      "look": -25,
+      "right_wrist": [
+        -0.2,
+        0.68,
+        0.09
+      ]
+    },
+    {
+      "id": "webtoon_romance_25",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "한손으로 입을 가리고 웃기",
+      "stance": "relaxed",
+      "gesture": "brush",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "open"
+      ],
+      "lean": 0,
+      "look": 15,
+      "right_wrist": [
+        -0.08,
+        0.66,
+        0.24
+      ]
+    },
+    {
+      "id": "webtoon_romance_26",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "놀라서 두 손을 가슴 앞에 들기",
+      "stance": "stand",
+      "gesture": "heart",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "lean": -3,
+      "look": 0,
+      "left_wrist": [
+        0.17,
+        0.52,
+        0.28
+      ],
+      "right_wrist": [
+        -0.17,
+        0.49,
+        0.28
+      ]
+    },
+    {
+      "id": "webtoon_romance_27",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "양손으로 얼굴 가리고 부끄러워하기",
+      "stance": "stand",
+      "gesture": "cry",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "lean": 4,
+      "look": 0
+    },
+    {
+      "id": "webtoon_romance_28",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "앉아서 무릎을 모으고 손 포개기",
+      "stance": "sit",
+      "gesture": "shy",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ],
+      "lean": 20,
+      "look": -15,
+      "left_wrist": [
+        0.1,
+        0.12,
+        0.29
+      ],
+      "right_wrist": [
+        -0.08,
+        0.13,
+        0.3
+      ],
+      "overrides": {
+        "left_leg": [
+          [
+            0.075,
+            0.105,
+            0.38
+          ],
+          [
+            0.01,
+            0.3,
+            0.7
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.075,
+            0.105,
+            0.38
+          ],
+          [
+            -0.01,
+            0.3,
+            0.7
+          ]
+        ]
+      }
+    },
+    {
+      "id": "webtoon_romance_29",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "옆자리를 손으로 권하기",
+      "stance": "sit_turn",
+      "gesture": "offer",
+      "props": "",
+      "hands": [
+        "support",
+        "open"
+      ],
+      "lean": 0,
+      "look": -30,
+      "right_wrist": [
+        -0.38,
+        0.11,
+        0.18
+      ]
+    },
+    {
+      "id": "webtoon_romance_30",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "책 한 권을 함께 보려고 펼치기",
+      "stance": "sit_turn",
+      "gesture": "read",
+      "props": "book:B",
+      "hands": [
+        "support",
+        "support"
+      ],
+      "lean": 0,
+      "look": -20,
+      "left_wrist": [
+        0.18,
+        0.28,
+        0.42
+      ],
+      "right_wrist": [
+        -0.18,
+        0.28,
+        0.42
+      ]
+    },
+    {
+      "id": "webtoon_romance_31",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "도시락을 상대에게 건네기",
+      "stance": "sit",
+      "gesture": "offer_both",
+      "props": "lunchbox:B",
+      "hands": [
+        "support",
+        "support"
+      ],
+      "lean": 6,
+      "look": 0,
+      "left_wrist": [
+        0.23,
+        0.28,
+        0.41
+      ],
+      "right_wrist": [
+        -0.23,
+        0.28,
+        0.41
+      ]
+    },
+    {
+      "id": "webtoon_romance_32",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "숟가락으로 한입 권하기",
+      "stance": "sit",
+      "gesture": "offer",
+      "props": "spoon:R",
+      "hands": [
+        "support",
+        "grip"
+      ],
+      "lean": 0,
+      "look": -10,
+      "right_wrist": [
+        -0.16,
+        0.49,
+        0.45
+      ],
+      "left_wrist": [
+        0.24,
+        0.24,
+        0.31
+      ],
+      "left_pole": [
+        0.4,
+        0.3,
+        0.45
+      ]
+    },
+    {
+      "id": "webtoon_romance_33",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "작은 케이크를 양손으로 받치기",
+      "stance": "stand",
+      "gesture": "tray",
+      "props": "cake:B",
+      "hands": [
+        "support",
+        "support"
+      ],
+      "lean": 0,
+      "look": 0,
+      "left_wrist": [
+        0.22,
+        0.27,
+        0.39
+      ],
+      "right_wrist": [
+        -0.22,
+        0.27,
+        0.39
+      ]
+    },
+    {
+      "id": "webtoon_romance_34",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "촛불을 불기 위해 몸 기울이기",
+      "stance": "bow",
+      "gesture": "tray",
+      "props": "cake:B",
+      "hands": [
+        "support",
+        "support"
+      ],
+      "lean": 18,
+      "look": 0,
+      "left_wrist": [
+        0.22,
+        0.18,
+        0.39
+      ],
+      "right_wrist": [
+        -0.22,
+        0.18,
+        0.39
+      ],
+      "nod": 10
+    },
+    {
+      "id": "webtoon_romance_35",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "목도리를 건네기",
+      "stance": "stand",
+      "gesture": "offer_both",
+      "props": "scarf:B",
+      "hands": [
+        "pinch",
+        "pinch"
+      ],
+      "lean": 0,
+      "look": 0,
+      "left_wrist": [
+        0.28,
+        0.39,
+        0.43
+      ],
+      "right_wrist": [
+        -0.28,
+        0.39,
+        0.43
+      ]
+    },
+    {
+      "id": "webtoon_romance_36",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "양손으로 상대에게 목도리 둘러주기",
+      "stance": "stand",
+      "gesture": "hug",
+      "props": "scarf:B",
+      "hands": [
+        "pinch",
+        "pinch"
+      ],
+      "lean": 2,
+      "look": 0,
+      "left_wrist": [
+        0.26,
+        0.63,
+        0.36
+      ],
+      "right_wrist": [
+        -0.26,
+        0.63,
+        0.36
+      ]
+    },
+    {
+      "id": "webtoon_romance_37",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "한쪽 무릎 꿇고 반지 상자 내밀기",
+      "stance": "kneel",
+      "gesture": "offer_both",
+      "props": "ringbox:B",
+      "hands": [
+        "pinch",
+        "support"
+      ],
+      "lean": 0,
+      "look": 0,
+      "left_wrist": [
+        0.17,
+        0.35,
+        0.4
+      ],
+      "right_wrist": [
+        -0.17,
+        0.32,
+        0.4
+      ]
+    },
+    {
+      "id": "webtoon_romance_38",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "반지 낀 손을 들어 바라보기",
+      "stance": "stand",
+      "gesture": "cup",
+      "props": "",
+      "hands": [
+        "open",
+        "relaxed"
+      ],
+      "lean": 0,
+      "look": 0,
+      "left_wrist": [
+        0.17,
+        0.54,
+        0.31
+      ],
+      "right_wrist": [
+        -0.24,
+        0.13,
+        0.18
+      ],
+      "nod": 8
+    },
+    {
+      "id": "webtoon_romance_39",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "상대의 손을 양손으로 감싸기",
+      "stance": "stand",
+      "gesture": "offer_both",
+      "props": "",
+      "hands": [
+        "cup",
+        "cup"
+      ],
+      "lean": 3,
+      "look": -10,
+      "left_wrist": [
+        0.12,
+        0.33,
+        0.4
+      ],
+      "right_wrist": [
+        -0.12,
+        0.36,
+        0.4
+      ]
+    },
+    {
+      "id": "webtoon_romance_40",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "뒤돌아보며 손 흔들기",
+      "stance": "step",
+      "gesture": "wave",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "open"
+      ],
+      "lean": 0,
+      "look": 45,
+      "right_wrist": [
+        -0.4,
+        0.62,
+        0.2
+      ]
+    },
+    {
+      "id": "webtoon_romance_41",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "가슴에 손 얹고 안도하기",
+      "stance": "relaxed",
+      "gesture": "hand_chest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "lean": 0,
+      "look": -12,
+      "nod": 10
+    },
+    {
+      "id": "webtoon_romance_42",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "울며 손등으로 눈가 닦기",
+      "stance": "stand",
+      "gesture": "brush",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ],
+      "lean": 6,
+      "look": 10,
+      "right_wrist": [
+        -0.12,
+        0.72,
+        0.22
+      ]
+    },
+    {
+      "id": "webtoon_romance_43",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "상대에게 손수건 건네기",
+      "stance": "step",
+      "gesture": "offer",
+      "props": "handkerchief:R",
+      "hands": [
+        "open",
+        "pinch"
+      ],
+      "lean": 2,
+      "look": -18,
+      "right_wrist": [
+        -0.2,
+        0.42,
+        0.44
+      ]
+    },
+    {
+      "id": "webtoon_romance_44",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "상대의 손수건을 양손으로 받기",
+      "stance": "stand",
+      "gesture": "cup_both",
+      "props": "handkerchief:B",
+      "hands": [
+        "pinch",
+        "pinch"
+      ],
+      "lean": 4,
+      "look": 0,
+      "left_wrist": [
+        0.1,
+        0.27,
+        0.35
+      ],
+      "right_wrist": [
+        -0.1,
+        0.27,
+        0.35
+      ]
+    },
+    {
+      "id": "webtoon_romance_45",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "짐을 대신 들어주려고 두 손 뻗기",
+      "stance": "wide",
+      "gesture": "offer_both",
+      "props": "bag:B",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "lean": 8,
+      "look": 0,
+      "left_wrist": [
+        0.24,
+        0.17,
+        0.35
+      ],
+      "right_wrist": [
+        -0.24,
+        0.17,
+        0.35
+      ]
+    },
+    {
+      "id": "webtoon_romance_46",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "큰 곰인형을 품에 안고 걷기",
+      "stance": "step",
+      "gesture": "box_high",
+      "props": "teddy:B",
+      "hands": [
+        "cup",
+        "cup"
+      ],
+      "lean": 0,
+      "look": 10,
+      "left_wrist": [
+        0.31,
+        0.28,
+        0.31
+      ],
+      "right_wrist": [
+        -0.31,
+        0.28,
+        0.31
+      ]
+    },
+    {
+      "id": "webtoon_romance_47",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "사진을 찍자며 휴대폰 들어 올리기",
+      "stance": "stand",
+      "gesture": "reach_up",
+      "props": "phone:R",
+      "hands": [
+        "open",
+        "grip"
+      ],
+      "lean": 0,
+      "look": -20,
+      "right_wrist": [
+        -0.38,
+        0.77,
+        0.36
+      ]
+    },
+    {
+      "id": "webtoon_romance_48",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "사진을 보며 손가락으로 가리키기",
+      "stance": "sit",
+      "gesture": "read",
+      "props": "photo:L",
+      "hands": [
+        "pinch",
+        "pinch"
+      ],
+      "lean": 4,
+      "look": 0,
+      "left_wrist": [
+        0.2,
+        0.37,
+        0.38
+      ],
+      "right_wrist": [
+        -0.04,
+        0.42,
+        0.4
+      ]
+    },
+    {
+      "id": "webtoon_romance_49",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "춤을 청하며 한 손을 내밀기",
+      "stance": "stand",
+      "gesture": "offer",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "open"
+      ],
+      "lean": 7,
+      "look": -20,
+      "right_wrist": [
+        -0.31,
+        0.27,
+        0.43
+      ]
+    },
+    {
+      "id": "webtoon_romance_50",
+      "category": "romance",
+      "category_label": "로맨스",
+      "label": "춤추기 전 한 손을 높여 맞잡기",
+      "stance": "step",
+      "gesture": "wave",
+      "props": "",
+      "hands": [
+        "open",
+        "cup"
+      ],
+      "lean": 0,
+      "look": -25,
+      "left_wrist": [
+        0.28,
+        0.29,
+        0.26
+      ],
+      "right_wrist": [
+        -0.38,
+        0.69,
+        0.26
+      ]
+    }
+  ]
+}
