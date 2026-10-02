@@ -6,6 +6,16 @@ from urllib.parse import quote
 
 
 THUMBNAIL_VIEWS = frozenset({"front", "back", "side", "three_quarter"})
+THUMBNAIL_EXTENSION = ".jpg"
+
+
+def thumbnail_filename(pose_id: str, view: str) -> str:
+    """번들 안의 썸네일 파일 이름. 서버·배포 검증·번들 빌더가 이 함수 하나만 쓴다.
+
+    확장자를 여러 곳에 적어 두면 2026-09 PNG→JPEG 전환 때처럼 검증기만 옛 확장자를
+    찾다가 정상 번들을 막는다.
+    """
+    return f"{pose_id}__{view}{THUMBNAIL_EXTENSION}"
 
 
 def find_thumbnail(data_dir: str, pose_id: str, view: str) -> Path | None:
@@ -19,7 +29,7 @@ def find_thumbnail(data_dir: str, pose_id: str, view: str) -> Path | None:
         return None
 
     root = (Path(data_dir) / "thumbs").resolve()
-    candidate = (root / f"{pose_id}__{view}.jpg").resolve()
+    candidate = (root / thumbnail_filename(pose_id, view)).resolve()
     try:
         candidate.relative_to(root)
     except ValueError:
