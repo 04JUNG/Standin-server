@@ -51,8 +51,9 @@ python scripts/deploy_pose_library.py data/bundles/next
   BetaData key·버킷, 로컬 경로가 있으면 실패. 값 자체는 출력하지 않는다.
   자산 버킷은 버전 관리라 한 번 올라간 값은 이전 버전에 남는다.
 - **리그 호환**: 운영 FBX 변환기(`converter.bone_map.resolve_profile`)가 모르는 리그는 실패.
-  검색에는 나오는데 내보내기가 안 되는 포즈를 막는다. 100STYLE 리그는 지금 변환기에
-  등록돼 있지 않다(렌더 워커에서만 등록). 정식 등록 전까지는 `--exclude-unresolved-rigs`로 뺀다.
+  검색에는 나오는데 내보내기가 안 되는 포즈를 막는다. 100STYLE 리그는 #60
+  (`converter/bone_map.py`의 `100style` 프로파일)이 병합된 뒤부터 통과한다. 그 전에 번들을
+  만들면 `--exclude-unresolved-rigs`로 빼야 한다. 100STYLE 포즈는 refine 조정 없이 베이스로 나간다.
 - **manifest**: 형식, `db_sha256`, `content_sha256`(번들 전체를 다시 해시)이 맞아야 한다.
   없으면 실패하고, 옛 번들을 꼭 올려야 할 때만 `--allow-no-manifest`.
 - **재생 게이트**: `replay_gate.status`가 `passed`(또는 내용이 부모와 같은 `not_required`)여야
