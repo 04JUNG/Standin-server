@@ -14,6 +14,8 @@ from ..storage import sha256
 from .framing import NativeReference
 from .orientation_routes import orientation_router
 from .head_review_routes import head_review_router
+from .head_exports import ReferenceExportSpec, configure_reference
+from .head_adjustments import head_adjustment_router
 
 
 class FaceInput(BaseModel):
@@ -53,12 +55,18 @@ def head_router(curation, assets, previews):
 
     router.include_router(
         orientation_router(
-            previews, reference, base_path="/api/head", scopes={"head", "bust"}
+            previews,
+            reference,
+            base_path="/api/head",
+            scopes={"head", "bust"},
+            spec_model=ReferenceExportSpec,
+            configure_pose=configure_reference,
         )
     )
     router.include_router(
         head_review_router(curation, queries, candidates, previews, reference)
     )
+    router.include_router(head_adjustment_router(queries))
 
     @router.get("/head")
     def page():

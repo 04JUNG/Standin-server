@@ -4,8 +4,9 @@ const $ = id => document.getElementById(id);
 const names = ['yaw', 'pitch', 'roll'];
 
 export class OrientationPreview {
-  constructor({endpointBase = '/api/poses'} = {}) {
+  constructor({endpointBase = '/api/poses', extraSpec = () => ({})} = {}) {
     this.endpointBase = endpointBase;
+    this.extraSpec = extraSpec;
     this.sequence = 0;
     this.mode = 'views';
     this.saved = new Map();
@@ -114,7 +115,10 @@ export class OrientationPreview {
     if (names.some(name => !$(name + '-number').validity.valid || $(name + '-number').value === '')) return;
     this.invalidate();
     const sequence = this.sequence;
-    const spec = {scope: this.scope, ...this.angles(), content_hash: this.pose.content_hash};
+    let extras;
+    try { extras = this.extraSpec(); }
+    catch(error) { $('angle-status').textContent = error.message; return; }
+    const spec = {scope: this.scope, ...this.angles(), content_hash: this.pose.content_hash, ...extras};
     const endpoint = `${this.endpointBase}/${this.pose.key}/oriented`;
     const params = new URLSearchParams(spec);
     this.controller = new AbortController();

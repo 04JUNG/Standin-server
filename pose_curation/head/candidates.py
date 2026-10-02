@@ -14,7 +14,7 @@ from ..orientation import Orientation
 from ..storage import contained_path, read_json, sha256, write_json
 
 VERSION = "head-candidates-v1"
-OBSERVATIONS = ("crop-observations", "anime-observations")
+OBSERVATIONS = ("crop-observations", "anime-observations", "recovery-observations")
 
 
 def code_revision():
@@ -27,6 +27,7 @@ def code_revision():
         package / "regions.py",
         package / "crop_experiment.py",
         package / "anime_experiment.py",
+        package / "recovery_experiment.py",
         package.parent / "orientation.py",
         package.parent / "scoped/matching.py",
     ]
@@ -131,12 +132,27 @@ def build(curation: Path):
                     and config.get("regions_sha256")
                     == sha256(Path(__file__).with_name("regions.py"))
                 )
-            else:
+            elif kind == "anime-observations":
                 valid = (
                     config.get("version") == "anime-box-mediapipe-v1"
                     and config.get("weight_hashes") == WEIGHT_HASHES
                     and config.get("face_model_sha256") == MODEL_SHA256
                     and config.get("anime_face_detector") == "0.1.0"
+                )
+            else:
+                valid = (
+                    config.get("version") == "crop-recovery-mediapipe-v1"
+                    and config.get("model_sha256") == MODEL_SHA256
+                    and config.get("code_sha256")
+                    == sha256(Path(__file__).with_name("recovery_experiment.py"))
+                    and bool(raw.get("inputs"))
+                    and set(raw["inputs"]).issubset(
+                        {"anime-observations", "crop-observations"}
+                    )
+                    and all(
+                        sha256(root / kind / f"{row['key']}.json") == digest
+                        for kind, digest in raw.get("inputs", {}).items()
+                    )
                 )
             if not valid:
                 raise ValueError(f"Stale observation recipe: {relative}")
@@ -166,11 +182,11 @@ def build(curation: Path):
                         "excluded_reference": reviews.get(source, {}).get(
                             "excluded", False
                         ),
-                        "detector": (
-                            "그림 얼굴 검출"
-                            if kind == "anime-observations"
-                            else "몸 관측 기반 얼굴 확대"
-                        ),
+                        "detector": {
+                            "anime-observations": "그림 얼굴 검출",
+                            "crop-observations": "몸 관측 기반 얼굴 확대",
+                            "recovery-observations": "회전·확대 재검출",
+                        }[kind],
                     }
                 )
             if sha256(path) != raw_hash:

@@ -57,26 +57,31 @@ export class HeadAngleReviews {
       for (const row of result.items) {
         const option = document.createElement('option'); option.value = row.revision;
         const a = row.angles;
-        option.textContent = `${labels[row.status]} · ${row.scope === 'head' ? '두상' : '흉상'} · ${a.yaw}/${a.pitch}/${a.roll}° · ${row.provenance.candidate ? '후보 '+(row.provenance.face_number || '') : '직접 지정'}${row.current ? '' : ' · 재검수 필요'}`;
+        const targetLabel = row.provenance.candidate ? '후보 '+(row.provenance.face_number || '') : row.provenance.region ? '영역 지정' : '기준점 지정';
+        option.textContent = `${labels[row.status]} · ${row.scope === 'head' ? '두상' : '흉상'} · ${a.yaw}/${a.pitch}/${a.roll}° · ${targetLabel}${row.current ? '' : ' · 재검수 필요'}`;
         option.title = row.stale_reason || row.note;
         $('head-review-records').append(option);
       }
       this.updateRestore();
-      $('head-review-status').textContent = result.items.length ? `얼굴·범위별 최근 기록 ${result.items.length}개. 불러오기를 누르면 저장한 각도로 돌아갑니다.` : '저장한 기록이 없습니다. 얼굴 후보 또는 기준점 6개를 선택해 주세요.';
+      $('head-review-status').textContent = result.items.length ? `얼굴·범위별 최근 기록 ${result.items.length}개. 불러오기를 누르면 저장한 각도로 돌아갑니다.` : '저장한 기록이 없습니다. 얼굴 후보·기준점 또는 얼굴 영역을 지정해 주세요.';
     } catch(error) {
       if (sequence === this.sequence && error.name !== 'AbortError') $('head-review-status').textContent = error.message;
     }
   }
 
   async save() {
-    const context = this.context();
+    let context;
+    try { context = this.context(); }
+    catch(error) { $('head-review-status').textContent = error.message; return; }
     if (!context.query || !this.target || context.query.excluded) return;
     if (['yaw','pitch','roll'].some(name => !$(name+'-number').validity.valid || $(name+'-number').value === '')) {
       $('head-review-status').textContent = '각도 범위 안의 숫자를 입력해 주세요.'; return;
     }
     const same = row => row.scope === context.scope && (this.target.candidate
       ? row.provenance.candidate === this.target.candidate
-      : JSON.stringify(row.provenance.points) === JSON.stringify(this.target.points));
+      : this.target.region
+        ? JSON.stringify(row.provenance.region) === JSON.stringify(this.target.region)
+        : JSON.stringify(row.provenance.points) === JSON.stringify(this.target.points));
     const previous = this.items.find(same);
     const href = $('angle-fbx').getAttribute('href');
     const previewVisible = !$('angle-image').hidden && $('angle-image').complete && $('angle-image').naturalWidth && !$('angle-downloads').hidden;
@@ -93,7 +98,7 @@ export class HeadAngleReviews {
       await request(`/api/head/queries/${encodeURIComponent(context.query.key)}/angle-reviews`, {
         method:'POST',headers:{'Content-Type':'application/json','X-Pose-Review':'1'},
         body:JSON.stringify({content_hash:context.query.content_hash,reference_hash:context.reference.content_hash,
-          scope:context.scope,...this.target,angles:context.angles,status,note:$('head-review-note').value,
+          scope:context.scope,...this.target,angles:context.angles,body_angles:context.bodyAngles || null,shoulder_points:context.shoulderPoints || null,status,note:$('head-review-note').value,
           expected_revision:previous?.revision || 0,preview_version:version,visual_confirmed:confirmed})
       });
       if (sequence !== this.sequence) return;

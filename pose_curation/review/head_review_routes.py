@@ -12,7 +12,9 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from ..head.candidates import code_revision
 from ..head.fitting import CANONICAL_SHA256, MANUAL_INDICES, canonical, fit_manual
 from ..head.reviews import HeadReviewStore
+from ..head.bust import validate_region, shoulder_roll
 from ..orientation import Orientation
+from .head_exports import with_body
 
 
 class ReviewAngles(BaseModel):
@@ -31,7 +33,12 @@ class HeadAngleReview(BaseModel):
     points: list[tuple[float, float]] | None = Field(
         default=None, min_length=6, max_length=6
     )
+    region: list[float] | None = Field(default=None, min_length=4, max_length=4)
     angles: ReviewAngles
+    body_angles: ReviewAngles | None = None
+    shoulder_points: list[tuple[float, float]] | None = Field(
+        default=None, min_length=2, max_length=2
+    )
     status: Literal["accepted", "hold", "rejected"]
     note: str = Field(default="", max_length=2000)
     expected_revision: int = Field(default=0, ge=0)
@@ -40,10 +47,12 @@ class HeadAngleReview(BaseModel):
 
     @model_validator(mode="after")
     def one_target(self):
-        if (self.candidate is None) == (self.points is None):
-            raise ValueError(
-                "얼굴 후보 또는 직접 지정한 6개 기준점 중 하나가 필요합니다."
-            )
+        if sum(v is not None for v in (self.candidate, self.points, self.region)) != 1:
+            raise ValueError("얼굴 후보, 6개 기준점, 얼굴 영역 중 하나가 필요합니다.")
+        if self.body_angles is not None and self.scope != "bust":
+            raise ValueError("몸통 방향은 흉상에서만 지정할 수 있습니다.")
+        if self.shoulder_points is not None and self.body_angles is None:
+            raise ValueError("어깨 관측은 흉상의 몸통 방향과 함께 저장해야 합니다.")
         return self
 
 
@@ -51,7 +60,16 @@ def head_review_router(curation, queries, candidates, previews, reference):
     router = APIRouter()
     store = HeadReviewStore(curation / "head-direction/angle-reviews.sqlite")
 
-    def target(key, query, candidate, points):
+    def target(key, query, candidate, points, region):
+        if region is not None:
+            region = validate_region(region, query["size"])
+            digest = hashlib.sha256(json.dumps(region).encode()).hexdigest()[:24]
+            return "region:" + digest, {
+                "region": region,
+                "code_revision": code_revision(),
+                "source": "manual_region",
+                "original_orientation": None,
+            }
         if candidate is not None:
             result = candidates.selected(key, query["content_hash"], candidate)
             return "candidate:" + candidate, {
@@ -96,6 +114,10 @@ def head_review_router(curation, queries, candidates, previews, reference):
                         )
                     if row["status"] == "accepted":
                         angles = Orientation(**row["angles"])
+                        body = row.get("body_angles")
+                        pose = with_body(
+                            pose, angles, Orientation(**body) if body else None
+                        )
                         current = previews.status(
                             pose, row["scope"], orientation=angles
                         )
@@ -128,8 +150,23 @@ def head_review_router(curation, queries, candidates, previews, reference):
                 raise ValueError(
                     "기본 캐릭터가 변경되었습니다. 화면을 새로 불러와 주세요."
                 )
-            identity, provenance = target(key, query, spec.candidate, spec.points)
+            identity, provenance = target(
+                key, query, spec.candidate, spec.points, spec.region
+            )
             angles = Orientation(**spec.angles.model_dump())
+            body = (
+                Orientation(**spec.body_angles.model_dump())
+                if spec.body_angles
+                else None
+            )
+            pose = with_body(pose, angles, body)
+            if spec.shoulder_points is not None:
+                measured = shoulder_roll(spec.shoulder_points, query["size"], body)
+                difference = abs((measured.roll - body.roll + 180) % 360 - 180)
+                if difference > 0.05:
+                    raise ValueError(
+                        "저장할 몸통 기울기와 어깨 관측이 다릅니다. 어깨선을 다시 적용해 주세요."
+                    )
             if spec.status == "accepted":
                 current = previews.status(pose, spec.scope, orientation=angles)
                 if (
@@ -149,6 +186,12 @@ def head_review_router(curation, queries, candidates, previews, reference):
                     name: getattr(angles, name) for name in ("yaw", "pitch", "roll")
                 },
                 "status": spec.status,
+                "shoulder_points": spec.shoulder_points,
+                "body_angles": (
+                    {name: getattr(body, name) for name in ("yaw", "pitch", "roll")}
+                    if body
+                    else None
+                ),
                 "note": spec.note,
                 "provenance": provenance,
                 "preview_version": (

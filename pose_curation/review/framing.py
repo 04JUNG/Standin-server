@@ -62,6 +62,14 @@ class FramedPreviews:
             value['native_worker'] = sha256(PROJECT / 'pose_curation/rendering/neutral_worker.py')
         if orientation is not None:
             value['orientation'] = orientation.public()
+            if pose.metadata.get('bust_body') is not None:
+                if not isinstance(pose, NativeReference) or scope != 'bust':
+                    raise ValueError('몸통 방향 분리는 기본 흉상에서만 지원합니다.')
+                from ..head.bust import relative_rotation
+                relative_rotation(orientation, Orientation(**pose.metadata['bust_body']))
+                value['bust_body'] = pose.metadata['bust_body']
+                value['bust_worker'] = sha256(PROJECT / 'pose_curation/rendering/bust_worker.py')
+                value['bust_math'] = sha256(PROJECT / 'pose_curation/head/bust.py')
         return hashlib.sha256(json.dumps(value, sort_keys=True).encode()).hexdigest()
 
     def _cached(self, fingerprint):
@@ -169,6 +177,9 @@ class FramedPreviews:
                 job['metadata'].update(source_kind='native_reference', character_sha256=pose.content_hash,
                                        shoulder_pose='neutral_not_inferred', face_expression='neutral')
             worker = 'oriented_worker.py'
+            if pose.metadata.get('bust_body') is not None:
+                job['bust_body'] = pose.metadata['bust_body']
+                worker = 'bust_worker.py'
         write_json(directory / 'job.json', job)
         command = [str(self.blender), '--background', '--factory-startup', '--threads', '2',
                    '--python-exit-code', '1', '--python',

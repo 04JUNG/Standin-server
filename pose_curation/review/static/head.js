@@ -1,32 +1,49 @@
 import {request} from './api.js?v=qa-20261002';
-import {OrientationPreview} from './orientation.js?v=head-1';
+import {OrientationPreview} from './orientation.js?v=head-2';
 import {FaceCandidates} from './head-candidates.js?v=1';
-import {HeadAngleReviews} from './head-reviews.js?v=1';
+import {HeadAngleReviews} from './head-reviews.js?v=2';
+import {BustControls} from './head-bust.js?v=1';
 
 const $ = id => document.getElementById(id);
-const preview = new OrientationPreview({endpointBase: '/api/head'});
+const preview = new OrientationPreview({endpointBase: '/api/head', extraSpec: () => bust.extraSpec()});
 let config, query, points = Array(6).fill(null), active = 0, fitResult, revision = 0, fitController, recordUrl;
+let inputMode = 'landmarks', corners = [], region = null, shoulders = [];
 const svgNS = 'http://www.w3.org/2000/svg';
 const angleReviews = new HeadAngleReviews({
-  context: () => ({query, reference:config?.reference, scope:$('head-scope').value, angles:preview.angles()}),
+  context: () => ({query, reference:config?.reference, scope:$('head-scope').value, angles:preview.angles(), get bodyAngles() { return bust.angles(); }, get shoulderPoints() { return bust.enabled() ? bust.points : null; }}),
   restore: row => {
     clearFit();
     points = row.provenance.points || Array(6).fill(null);
+    region = row.provenance.region || null; corners = []; shoulders = []; inputMode = 'landmarks';
     $('head-scope').value = row.scope;
     preview.setContext(config.reference, row.scope);
     preview.applySuggestion(row.angles);
-    angleReviews.setTarget(row.provenance.candidate ? {candidate:row.provenance.candidate} : {points:row.provenance.points});
+    bust.restore(row.body_angles, row.shoulder_points);
+    shoulders = row.shoulder_points || [];
+    angleReviews.setTarget(row.provenance.candidate ? {candidate:row.provenance.candidate} : region ? {region} : {points:row.provenance.points});
     draw();
     $('head-status').textContent = '저장한 대상 얼굴·각도를 불러왔습니다. 기본 모델 미리보기를 다시 생성해 주세요.';
+    $('angle-status').textContent = '저장한 각도입니다. 미리보기·파일을 다시 생성해 확인해 주세요.';
   }
 });
 const faces = new FaceCandidates({
-  onStart: () => {clearFit(); angleReviews.setTarget(null); points = Array(6).fill(null); draw();},
+  onStart: () => {clearFit(); bust.restore(null); angleReviews.setTarget(null); points = Array(6).fill(null); region = null; corners = []; shoulders = []; inputMode = 'landmarks'; draw();},
   onSelected: result => acceptFit(result, '자동 검출 기준점')
+});
+const bust = new BustControls({
+  faceAngles: () => preview.angles(), query: () => query,
+  changed: () => {preview.invalidate(); angleReviews.changed();},
+  pickShoulders: () => {
+    if (!query || query.excluded) return;
+    inputMode = 'shoulders'; shoulders = []; draw();
+    $('head-status').textContent = '그림에서 같은 인물의 화면 왼쪽 어깨, 오른쪽 어깨 순서로 눌러 주세요.';
+    $('head-image').scrollIntoView({block:'center',behavior:'smooth'});
+  }
 });
 
 function clearFit({invalidatePreview = true} = {}) {
   ++revision;
+  bust.cancel();
   fitController?.abort();
   faces.cancelApply();
   fitResult = null;
@@ -62,8 +79,15 @@ function draw() {
   points.forEach((p,i) => p && marker(p, '#287959', String(i+1)));
   if (fitResult?.source === 'detected_face_user_selected') fitResult.points.forEach(p => marker(p, '#287959'));
   fitResult?.projected.forEach(p => marker(p, '#ce7429'));
+  corners.forEach(p => marker(p, '#7352a2'));
+  shoulders.forEach((p,i) => marker(p, '#245baf', `어깨 ${i+1}`));
+  if (region) {
+    const box = document.createElementNS(svgNS, 'rect');
+    for (const [k,v] of Object.entries({x:region[0],y:region[1],width:region[2]-region[0],height:region[3]-region[1],fill:'none',stroke:'#7352a2','stroke-width':radius*.6})) box.setAttribute(k,v);
+    $('head-overlay').append(box);
+  }
   $('head-fit').disabled = query.excluded || !points.every(Boolean) || !$('head-image').complete;
-  $('head-overlay-crop').disabled = !points.every(Boolean) && !fitResult?.points;
+  $('head-overlay-crop').disabled = !region && !points.every(Boolean) && !fitResult?.points;
 }
 
 function acceptFit(result, origin) {
@@ -76,6 +100,9 @@ function acceptFit(result, origin) {
 
 function selectQuery() {
   clearFit();
+  $('head-region').disabled = true;
+  $('body-shoulders').disabled = true;
+  bust.cancel(); bust.restore(null); region = null; corners = []; shoulders = []; inputMode = 'landmarks';
   query = config.items.find(row => row.key === $('head-query').value);
   angleReviews.setTarget(null);
   angleReviews.load(query);
@@ -94,7 +121,12 @@ function selectQuery() {
     $('head-status').textContent = '이 목록에 이미지가 없습니다. 오른쪽에서 직접 각도를 조절할 수 있습니다.'; return;
   }
   $('head-overlay').setAttribute('viewBox', `0 0 ${query.size.join(' ')}`);
-  $('head-image').onload = () => { draw(); faces.render(); $('head-status').textContent = query.excluded ? `제외한 이미지 · ${query.exclusion_reason}` : '얼굴 후보를 선택하거나 기준점을 직접 지정해 주세요.'; };
+  $('head-image').onload = () => {
+    $('head-region').disabled = query.excluded;
+    $('body-shoulders').disabled = query.excluded;
+    draw(); faces.render();
+    $('head-status').textContent = query.excluded ? `제외한 이미지 · ${query.exclusion_reason}` : '얼굴 후보를 선택하거나 기준점·머리 영역을 직접 지정해 주세요.';
+  };
   $('head-image').onerror = () => { $('head-status').textContent = '러프를 읽지 못했습니다. 다시 선택해 주세요.'; $('head-fit').disabled = true; };
   $('head-image').src = `/api/head/queries/${encodeURIComponent(query.key)}/image`;
   faces.load(query, $('head-image'));
@@ -141,6 +173,29 @@ $('head-overlay').addEventListener('pointerdown', event => {
   if (!matrix) return;
   const p = new DOMPoint(event.clientX, event.clientY).matrixTransform(matrix.inverse());
   if (p.x < 0 || p.y < 0 || p.x >= query.size[0] || p.y >= query.size[1]) return;
+  if (inputMode === 'shoulders') {
+    shoulders.push([p.x,p.y]);
+    if (shoulders.length === 2) { inputMode = 'landmarks'; bust.fitShoulders(shoulders); }
+    $('head-status').textContent = shoulders.length === 1 ? '화면 오른쪽 어깨를 눌러 주세요.' : '어깨 기울기를 계산합니다. 오른쪽 몸통 설정에서 확인하세요.';
+    draw(); return;
+  }
+  if (inputMode === 'region') {
+    clearFit(); corners.push([p.x,p.y]);
+    if (corners.length === 2) {
+      const [a,b] = corners;
+      const box = [Math.min(a[0],b[0]),Math.min(a[1],b[1]),Math.max(a[0],b[0]),Math.max(a[1],b[1])];
+      corners = [];
+      if (box[2]-box[0] < 16 || box[3]-box[1] < 16) {
+        $('head-status').textContent = '얼굴 영역이 너무 작습니다. 16px 이상으로 다시 지정해 주세요.';
+      } else {
+        region = box; inputMode = 'landmarks'; angleReviews.setTarget({region});
+        $('head-status').textContent = '얼굴 영역을 지정했습니다. 측면·후면 버튼과 각도로 맞춘 뒤 미리보기를 생성하고 저장하세요.';
+      }
+    } else $('head-status').textContent = '얼굴 영역의 반대쪽 모서리를 눌러 주세요.';
+    draw(); return;
+  }
+  region = null; corners = [];
+  bust.restore(null); shoulders = [];
   clearFit(); points[active] = [p.x, p.y];
   angleReviews.setTarget(null);
   const next = points.findIndex(p => p === null);
@@ -165,10 +220,17 @@ $('head-scope').addEventListener('change', () => {
   const angles = preview.angles();
   preview.setContext(config.reference, $('head-scope').value);
   preview.applySuggestion(angles);
+  bust.update();
   angleReviews.changed();
   $('angle-status').textContent = '출력 범위가 바뀌었습니다. 미리보기·파일을 다시 생성해 주세요.';
 });
-$('head-reset').addEventListener('click', () => {clearFit(); angleReviews.setTarget(null); points = Array(6).fill(null); active = 0; draw(); $('head-status').textContent = '기준점을 초기화했습니다.';});
+$('head-reset').addEventListener('click', () => {clearFit(); bust.cancel(); angleReviews.setTarget(null); points = Array(6).fill(null); region = null; corners = []; shoulders = []; inputMode = 'landmarks'; active = 0; draw(); $('head-status').textContent = '기준점을 초기화했습니다.';});
+$('head-region').addEventListener('click', () => {
+  if (!query || query.excluded) return;
+  clearFit(); bust.restore(null); angleReviews.setTarget(null); points = Array(6).fill(null); region = null; corners = []; shoulders = []; inputMode = 'region'; draw();
+  $('head-status').textContent = '대상 머리 전체를 감싸는 영역의 두 모서리를 눌러 주세요. 가려진 눈·코를 지정할 필요는 없습니다.';
+  $('head-image').scrollIntoView({block:'center',behavior:'smooth'});
+});
 $('head-fit').addEventListener('click', async () => {
   if (!query || query.excluded || !points.every(Boolean)) return;
   clearFit(); const token = revision;
@@ -182,7 +244,7 @@ $('head-fit').addEventListener('click', async () => {
   finally { if (token === revision) draw(); }
 });
 $('head-overlay-crop').addEventListener('click', () => {
-  const selectedPoints = points.every(Boolean) ? points : fitResult?.points;
+  const selectedPoints = region ? [region.slice(0,2),region.slice(2)] : points.every(Boolean) ? points : fitResult?.points;
   if (!selectedPoints) return;
   const xs = selectedPoints.map(p=>p[0]), ys = selectedPoints.map(p=>p[1]);
   const cx = (Math.min(...xs)+Math.max(...xs))/2, cy = (Math.min(...ys)+Math.max(...ys))/2;
@@ -198,7 +260,7 @@ for (const name of ['scale','x','y']) $('head-overlay-'+name).addEventListener('
 
 try {
   config = await request('/api/head');
-  config.labels.forEach((label,index) => { const button = document.createElement('button'); button.dataset.index = index; button.textContent = `${index+1}. ${label}`; button.addEventListener('click', () => { active = index; draw(); }); $('head-anchors').append(button); });
+  config.labels.forEach((label,index) => { const button = document.createElement('button'); button.dataset.index = index; button.textContent = `${index+1}. ${label}`; button.addEventListener('click', () => { inputMode = 'landmarks'; active = index; draw(); }); $('head-anchors').append(button); });
   preview.setContext(config.reference, $('head-scope').value);
   $('head-query').disabled = false;
   if (!config.automatic_enabled) $('head-list-mode').value = 'active';
