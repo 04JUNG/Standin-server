@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="ko">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Standin · 러프 비교</title><link rel="stylesheet" href="/static/coverage.css"></head>
+<body>
+  <header><a href="/">← 포즈 라이브러리</a><span>STANDIN / COVERAGE</span></header>
+  <main>
+    <div class="eyebrow">ROUGH → POSE</div><h1>러프에 필요한 자세</h1>
+    <p class="intro">실제 러프에서 찾은 빈틈과 새로 추가한 전투 자세를 비교하세요.</p>
+    <section id="summary" class="summary" aria-label="분석 요약"></section>
+    <p id="method" class="note"></p>
+    <div class="filters"><label>사례 분류 <select id="filter"><option value="all">전체 부족 사례</option><option value="library">포즈 부족</option><option value="extraction">관절 인식 문제</option><option value="camera">원근·시점 문제</option><option value="partial">부분 신체·겹침</option></select></label>
+    <label>검색 <input id="search" type="search" placeholder="러프 번호, 동작 이름" /></label></div>
+    <p id="count" role="status"></p><section id="cases" aria-label="러프별 비교"></section>
+    <details><summary>분석 범위와 남은 한계</summary><div id="limitations"></div></details>
+    <details id="inventory-panel"><summary>전체 439장 자동 검색 기록</summary><p>전신 검출 수와 자동 검색 결과입니다. 품질 판정 목록이 아니며, 검출 번호마다 서로 다른 인물 또는 오검출일 수 있습니다.</p><div class="table-scroll"><table><thead><tr><th>익명 이미지</th><th>검출</th><th>신체 관절</th><th>확장 전 거리</th><th>확장 후 거리</th></tr></thead><tbody id="inventory"></tbody></table></div></details>
+    <p><a href="/api/coverage" download="rough-coverage.json">분석 데이터 내려받기 ↓</a></p>
+  </main><script type="module" src="/static/coverage.js?v=anatomy-20261001"></script>
+</body></html>

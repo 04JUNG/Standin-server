@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Standin · 포즈 라이브러리</title>
+  <link rel="stylesheet" href="/static/style.css?v=orientation-20261002">
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="/" aria-label="Standin 홈"><span class="brand-mark">S</span>STANDIN<span class="brand-dot">●</span></a>
+    <div class="workspace-label">POSE WORKSPACE</div>
+    <h2 class="nav-heading">라이브러리</h2>
+    <nav id="groups" aria-label="라이브러리 구분">
+      <button class="nav-item active" data-group="all"><span>전체 포즈</span><b id="count-all">—</b></button>
+      <button class="nav-item" data-group="existing"><span><i class="dot existing"></i>기존 라이브러리</span><b id="count-existing">—</b></button>
+      <button class="nav-item" data-group="new"><span><i class="dot new"></i>이번에 추가한 후보</span><b id="count-new">—</b></button>
+      <button class="nav-item" data-group="excluded"><span>제외한 포즈</span><b id="count-excluded">—</b></button>
+    </nav>
+    <a class="export-link" href="/coverage">러프별 부족 포즈·개선 비교 ↗</a>
+    <a class="export-link" href="/scoped">상체 대표 포즈·러프 시점 맞추기 ↗</a>
+    <a class="export-link" href="/head">두상·흉상 시점 작업실 ↗</a>
+    <a class="export-link" href="/qa">통합 검수 결과·대기 목록 ↗</a>
+    <a class="export-link" href="/scenarios">웹툰 상황별 200개 포즈 ↗</a>
+    <div class="sidebar-note"><span class="eyebrow">REVIEW FLOW</span><h3>좋은 자세를 모으는 공간</h3><p>제외 후 저장하면 라이브러리에서 빠집니다. 제외 목록에서 대기·채택으로 다시 저장하면 복구됩니다.</p></div>
+    <div class="review-progress"><div><span>검수 기록</span><b id="review-count">0개</b></div><progress id="review-progress" value="0" max="1"></progress><p>검수 결과는 로컬에 보관됩니다.</p></div>
+    <a class="export-link" href="/api/reviews/export" download="pose-reviews.json">검수 기록 내려받기 ↗</a>
+    <div class="sidebar-footer"><span class="live-dot"></span>로컬 검수 서버</div>
+  </aside>
+  <main>
+    <header class="page-header"><div><div class="eyebrow">LIBRARY / CURATION</div><h1>포즈 라이브러리<span id="total-heading">—</span></h1><p>기존 포즈와 새로운 가능성을 한눈에.</p></div><button class="quiet-button" id="refresh">↻ 새로고침</button></header>
+    <div id="notice" class="notice" hidden></div>
+    <section class="collection-strip" aria-label="라이브러리 안내"><div><span class="collection-icon">↗</span><div><strong id="collection-title">새로운 자세를 검수해 보세요</strong><p id="collection-description">기존 포즈와 수집·제작한 전투 자세를 같은 캐릭터의 4방향 미리보기로 비교하세요.</p></div></div><span class="collection-tag">기존 / 신규 구분</span></section>
+    <section class="toolbar" aria-label="포즈 필터">
+      <select id="library-scope" aria-label="대표 라이브러리"><option value="all">전체 라이브러리</option><option value="half">반신 대표 포즈</option><option value="bust">흉상 대표 포즈</option></select>
+      <label class="search"><span>⌕</span><input id="search" type="search" placeholder="포즈 이름, 스타일 검색" aria-label="포즈 검색"></label>
+      <select id="status-filter" aria-label="검수 상태"><option value="all">모든 검수 상태</option><option value="pending">검수 대기</option><option value="accepted">채택</option><option value="hold">보류</option><option value="rejected">제외</option></select>
+      <select id="batch-filter" aria-label="생성 배치"><option value="">모든 배치</option></select>
+      <select id="category-filter" aria-label="상황 카테고리"><option value="">모든 카테고리</option><option value="daily">일상</option><option value="fantasy">판타지</option><option value="combat">전투</option><option value="romance">로맨스</option></select>
+    </section>
+    <div class="list-heading"><span id="result-count" aria-live="polite">불러오는 중…</span><div id="view-switch" class="segmented" aria-label="미리보기 방향"><button data-view="front" class="active">정면</button><button data-view="three_quarter">45°</button><button data-view="side">측면</button><button data-view="back">후면</button></div></div>
+    <section id="grid" class="pose-grid" aria-label="포즈 목록"></section>
+    <div id="empty" class="empty" hidden><span>⌕</span><h2>일치하는 포즈가 없습니다</h2><p>검색어나 검수 상태를 바꿔 보세요.</p></div>
+    <footer class="pagination"><button id="previous" class="quiet-button">← 이전</button><span id="page-label"></span><button id="next" class="quiet-button">다음 →</button></footer>
+  </main>
+  <dialog id="detail-dialog" aria-labelledby="detail-title">
+    <header class="dialog-header"><div><span id="detail-badge" class="badge"></span><h2 id="detail-title"></h2></div><button id="close-detail" class="icon-button" aria-label="포즈 상세 닫기">✕</button></header>
+    <div class="detail-layout">
+      <section class="visual-panel">
+        <div class="visual-tabs"><button class="active" data-mode="preview">4방향 미리보기</button><button data-mode="skeleton">3D 골격</button></div>
+        <div id="preview-panel">
+          <div id="scope-switch" class="segmented scope-switch" aria-label="미리보기 신체 범위"><button data-scope="full" class="active" aria-pressed="true">전신</button><button data-scope="half" aria-pressed="false">반신</button><button data-scope="bust" aria-pressed="false">흉상</button><button data-scope="head" aria-pressed="false">두상</button></div>
+          <p id="scope-status" class="preview-caption" role="status"></p><button id="scope-retry" class="quiet-button" hidden>미리보기 다시 생성</button>
+          <div id="preview-style" class="segmented" aria-label="미리보기 방식"><button data-style="views" class="active" aria-pressed="true">4방향 검수</button><button data-style="oriented" aria-pressed="false">자유 각도·내보내기</button></div>
+          <div id="standard-preview"><div class="hero-image"><img id="detail-image" alt="선택한 포즈 미리보기"><span id="detail-pending" class="preview-pending" hidden>캐릭터 미리보기 준비 중</span></div><div id="detail-views" class="view-thumbnails"></div></div>
+          <section id="orientation-panel" hidden aria-label="자유 각도 출력">
+            <div class="angle-controls">
+              <label for="yaw-angle">좌우 시점 <output id="yaw-value">0°</output></label><input id="yaw-angle" type="range" min="-180" max="180" value="0" step="0.01"><input id="yaw-number" aria-label="좌우 시점 각도" type="number" min="-180" max="180" step="0.01" value="0" required>
+              <label for="pitch-angle">높낮이 <output id="pitch-value">0°</output></label><input id="pitch-angle" type="range" min="-90" max="90" value="0" step="0.01"><input id="pitch-number" aria-label="높낮이 각도" type="number" min="-90" max="90" step="0.01" value="0" required>
+              <label for="roll-angle">화면 기울기 <output id="roll-value">0°</output></label><input id="roll-angle" type="range" min="-180" max="180" value="0" step="0.01"><input id="roll-number" aria-label="화면 기울기 각도" type="number" min="-180" max="180" step="0.01" value="0" required>
+            </div>
+            <div id="angle-presets" class="segmented" aria-label="각도 프리셋"><button data-yaw="0">정면·초기화</button><button data-yaw="45">45°</button><button data-yaw="90">측면</button><button data-yaw="180">후면</button></div>
+            <p class="preview-caption">높낮이 +는 위에서, −는 아래에서 봅니다. 기울기 +는 시계 방향입니다. 각도는 모델 전체에 반영되며 관절 자세는 유지됩니다.</p>
+            <button id="angle-generate" class="primary-button">이 각도로 미리보기·파일 생성</button>
+            <p id="angle-status" class="preview-caption" role="status"></p>
+            <div class="hero-image angle-image-box"><img id="angle-image" alt="내보낼 파일의 실제 방향 미리보기" hidden><img id="angle-rough" alt="비교용 러프" hidden></div>
+            <details class="rough-comparison"><summary>러프 겹쳐 보기</summary><label>이미지 선택 <input id="rough-file" type="file" accept="image/png,image/jpeg,image/webp"></label><label for="rough-opacity">러프 투명도</label><input id="rough-opacity" type="range" min="0" max="100" value="45"><p class="preview-caption">선택한 이미지는 이 브라우저에서만 표시됩니다. <a href="/scoped" target="_blank" rel="noopener">저장된 러프로 자동 시점 비교 ↗</a></p></details>
+            <div id="angle-downloads" class="angle-downloads" hidden><a id="angle-fbx" class="quiet-button">이 각도 FBX ↓</a><a id="angle-settings" class="text-link">각도 설정 JSON ↓</a></div>
+            <p class="preview-caption">각도와 출력 범위는 FBX에 적용합니다. CSP에서는 정면·평행 투영 카메라로 확인해 주세요. BVH가 필요하면 아래 ‘원본 BVH’로 원래 자세의 전신 골격을 내려받으세요.</p>
+          </section>
+        </div>
+        <div id="skeleton-panel" hidden>
+          <div id="hand-focus" class="segmented hand-focus" aria-label="골격 확대 영역" hidden>
+            <button data-hand="" class="active">전체 몸</button>
+            <button data-hand="Left">왼손 확대</button>
+            <button data-hand="Right">오른손 확대</button>
+          </div>
+          <canvas id="skeleton-canvas" aria-label="회전 가능한 3D 포즈 골격"></canvas>
+          <div class="viewer-controls"><span>드래그 회전 · 휠 확대</span><button id="reset-camera" class="quiet-button">시점 초기화</button></div>
+        </div>
+        <p id="preview-caption" class="preview-caption"></p>
+        <div class="detail-navigation"><button id="detail-prev" class="quiet-button">← 이전 포즈</button><a id="download-bvh" class="text-link">원본 BVH ↓</a><button id="detail-next" class="quiet-button">다음 포즈 →</button></div>
+      </section>
+      <section class="review-panel">
+        <div class="eyebrow">POSE DETAILS</div><div id="metadata" class="metadata"></div>
+        <div id="nearest-section" class="nearest-section" hidden><span class="eyebrow">가장 비슷한 기존 포즈</span><div class="nearest-card"><img id="nearest-image" alt="유사 기존 포즈"><div><strong id="nearest-name"></strong><p id="nearest-distance"></p><button id="open-nearest" class="text-link">기존 포즈 열기 ↗</button></div></div></div>
+        <form id="review-form"><fieldset id="visual-checklist" class="qa-checks" hidden></fieldset><label class="field-label">검수 결과</label><div id="decision-buttons" class="decision-buttons"><button type="button" data-status="accepted">✓ 채택</button><button type="button" data-status="hold">◷ 보류</button><button type="button" data-status="rejected">✕ 제외</button><button type="button" data-status="pending" class="pending-button">대기</button></div><label for="review-note" class="field-label">검수 메모</label><textarea id="review-note" rows="3" maxlength="2000" placeholder="접지, 팔·다리 방향, 실루엣 등 확인한 내용을 남겨 주세요."></textarea><div class="save-row"><span id="save-state" role="status"></span><button class="primary-button" type="submit">검수 저장</button></div></form>
+      </section>
+    </div>
+  </dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <script type="module" src="/static/app.js?v=scoped-20261002-3"></script>
+</body>
+</html>

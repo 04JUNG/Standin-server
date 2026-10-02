@@ -10,6 +10,10 @@
 
 ## 빠른 시작
 
+포즈 자료 수집, 1프레임 BVH 생성, 서비스 캐릭터 미리보기 및 기존/신규 검수 화면은
+[`docs/POSE_CURATION.md`](docs/POSE_CURATION.md)를 참고한다. 로컬 검수 서버는
+`python -m pose_curation serve --port 8765`로 실행한다.
+
 ```bash
 pip install numpy                 # 코어 실행에 필요한 유일한 의존성
 python scripts/run_demo.py        # mock으로 6개 케이스 end-to-end 데모
@@ -195,6 +199,14 @@ POSE_LIBRARY_URI=s3://<bucket>/pose-library/v1.tar.gz
 ---
 
 ## 문서 맵
+
+포즈 라이브러리 검수: [기준·자동 실행 명령](docs/POSE_REVIEW_STANDARD.md).
+`python -m pose_curation qa --prepare`로 검사·미리보기 준비·시각 검수 대기 목록을 생성한다.
+
+웹툰 상황별 일상·판타지·전투·로맨스 50개씩의 제작 설정과 절차는
+[포즈 큐레이션 문서](docs/POSE_CURATION.md#웹툰-상황별-포즈-200개-2026-10-02)에 있다.
+로컬 검수 서버의 `/scenarios`에서 상황 목록을, `/?category=daily` 등에서
+카테고리별 미리보기를 볼 수 있다. 소품은 배치 가이드이고 BVH에는 인물만 포함된다.
 
 읽는 순서:
 

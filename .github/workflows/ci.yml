@@ -10,6 +10,12 @@ on:
       - ".dockerignore"
       - "Dockerfile"
       - "requirements.txt"
+      - "requirements-curation*.txt"
+      - "requirements-head-direction.txt"
+      - "requirements-anime-head.txt"
+      - "pose_curation/**"
+      - "config/pose_curation*.json"
+      - "config/pose_scenarios*.json"
       - "api/**"
       - "src/**"
       - "scripts/**"
@@ -42,7 +48,7 @@ jobs:
         run: pip install -r requirements.txt pytest "scipy>=1.11"
 
       - name: Compile Python sources
-        run: python -m compileall src api scripts
+        run: python -m compileall src api scripts pose_curation
 
       - name: Run pose cascade contract
         run: python -m pytest -q tests/test_pose_cascade.py
