@@ -19,6 +19,7 @@ from typing import Optional
 
 from ..schema import VLMAnalysis, BBox, Shot, Action, View, Relationship
 from ..config import CFG
+from ..body_scope import BodyScope, parse_person_scopes
 from ..logging_setup import log_info, log_warn
 from . import prompts
 
@@ -82,6 +83,7 @@ def _coerce(analysis: dict, img_w: int, img_h: int) -> VLMAnalysis:
         raw=analysis,
         lower_body_visible=lower_body_visible,
         lower_body_visibility_known=lower_body_visibility_known,
+        body_scopes=parse_person_scopes(analysis.get("body_scopes"), num),
     )
 
 
@@ -137,7 +139,7 @@ class MockVLMClient(BaseVLMClient):
         shot = Shot.FULL_HALF
         if "bust" in hint or "흉상" in hint:
             shot = Shot.BUST
-        elif "face" in hint or "얼굴" in hint:
+        elif "face" in hint or "head" in hint or "얼굴" in hint or "두상" in hint:
             shot = Shot.FACE
 
         action = Action.STANDING
@@ -175,6 +177,11 @@ class MockVLMClient(BaseVLMClient):
             },
             lower_body_visible=[not lower_hidden] * num,
             lower_body_visibility_known=[True] * num,
+            body_scopes=[
+                BodyScope.HEAD if shot == Shot.FACE else
+                BodyScope.BUST if shot == Shot.BUST else
+                BodyScope.HALF if lower_hidden else BodyScope.FULL
+            ] * num,
         )
 
 
