@@ -134,6 +134,9 @@ jobs:
             POSE_CANARY_STAGE=${{ vars.POSE_CANARY_STAGE || 'canary-100' }}
             POSE_STRICT=1
             REFINE_THUMBNAIL_RENDERER=${{ vars.REFINE_THUMBNAIL_RENDERER || 'converter' }}
+            # VLM 프롬프트(src/vlm/prompts.py). 바꾸기 전에 standin_eval run vlm-compare를 통과시킨다.
+            # 되돌릴 때는 environment var를 지우거나 p1-scope로 두고 workflow_dispatch를 실행한다.
+            VLM_PROMPT_VERSION=${{ vars.VLM_PROMPT_VERSION || 'p1-scope' }}
 
       - uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
