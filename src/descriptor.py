@@ -13,6 +13,7 @@ from .features import normalize_skeleton
 from .refine_policy import structural_refine_allowed
 from .config import CFG
 from .body_scope import detect_scope
+from .person_tags import detect_person_tags
 from .partial_pose import shoulder_frame
 
 
@@ -166,6 +167,9 @@ def build_slot_descriptors(vlm: VLMAnalysis, slots) -> List[PersonDescriptor]:
             },
             quality_reasons=list(dict.fromkeys(slot.reasons)),
             output_scope=detect_scope(
+                vlm, slot.slot_id if slot.slot_origin == "vlm" else None,
+            ),
+            person_tags=detect_person_tags(
                 vlm, slot.slot_id if slot.slot_origin == "vlm" else None,
             ),
         ))

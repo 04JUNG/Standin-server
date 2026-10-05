@@ -20,6 +20,7 @@ from typing import Optional
 from ..schema import VLMAnalysis, BBox, Shot, Action, View, Relationship
 from ..config import CFG
 from ..body_scope import BodyScope, parse_person_scopes
+from ..person_tags import parse_person_values, stated_value
 from ..logging_setup import log_info, log_warn
 from . import prompts
 
@@ -61,16 +62,8 @@ def _coerce(analysis: dict, img_w: int, img_h: int) -> VLMAnalysis:
         except (KeyError, TypeError, ValueError, OverflowError):
             boxes.append(None)
 
-    raw_lower = analysis.get("lower_body_visible")
-    if isinstance(raw_lower, list) and len(raw_lower) == num:
-        lower_body_visible = [value is True for value in raw_lower]
-        lower_body_visibility_known = [
-            isinstance(value, bool) for value in raw_lower
-        ]
-    else:
-        # refine은 fail-closed로 동결하되, 검색은 누락을 '반신'으로 해석하지 않는다.
-        lower_body_visible = [False] * max(num, 0)
-        lower_body_visibility_known = [False] * max(num, 0)
+    lower_body_visible, lower_body_visibility_known = parse_lower_body(
+        analysis.get("lower_body_visible"), num)
     return VLMAnalysis(
         num_people=num,
         shot=pick(Shot, analysis.get("shot"), Shot.FULL_HALF),
@@ -84,7 +77,23 @@ def _coerce(analysis: dict, img_w: int, img_h: int) -> VLMAnalysis:
         lower_body_visible=lower_body_visible,
         lower_body_visibility_known=lower_body_visibility_known,
         body_scopes=parse_person_scopes(analysis.get("body_scopes"), num),
+        person_actions=parse_person_values(analysis.get("person_actions"), num, Action),
+        person_views=parse_person_values(analysis.get("person_views"), num, View),
+        stated_tags={
+            "shot": stated_value(analysis.get("shot"), Shot),
+            "action": stated_value(analysis.get("action"), Action),
+            "view": stated_value(analysis.get("view"), View),
+            "relationship": stated_value(analysis.get("relationship"), Relationship),
+        },
     )
+
+
+def parse_lower_body(raw: object, count: int) -> tuple[list[bool], list[bool]]:
+    """approx_boxes 순서의 하체 가시성과, 그 값이 실제 provider 응답에서 왔는지."""
+    if isinstance(raw, list) and len(raw) == count:
+        return [value is True for value in raw], [isinstance(value, bool) for value in raw]
+    # refine은 fail-closed로 동결하되, 검색은 누락을 '반신'으로 해석하지 않는다.
+    return [False] * max(count, 0), [False] * max(count, 0)
 
 
 def _extract_json(text: str) -> dict:
@@ -167,14 +176,20 @@ class MockVLMClient(BaseVLMClient):
         lower_hidden = any(token in hint for token in (
             "half_body", "half-body", "lower_hidden", "반신", "하체 비관측",
         ))
+        # 인물별 태그를 묻는 프롬프트일 때만 실제 provider처럼 인물별 배열을 돌려준다.
+        person_tags = CFG.vlm_prompt_version in prompts.PERSON_TAG_VERSIONS
+        raw = {
+            "mock": True,
+            "hint": hint,
+            "lower_body_visible": [not lower_hidden] * num,
+        }
+        if person_tags:
+            raw["person_actions"] = [action.value] * num
+            raw["person_views"] = [view.value] * num
         return VLMAnalysis(
             num, shot, action, view, rel, boxes,
             dialogue=None,
-            raw={
-                "mock": True,
-                "hint": hint,
-                "lower_body_visible": [not lower_hidden] * num,
-            },
+            raw=raw,
             lower_body_visible=[not lower_hidden] * num,
             lower_body_visibility_known=[True] * num,
             body_scopes=[
@@ -182,6 +197,10 @@ class MockVLMClient(BaseVLMClient):
                 BodyScope.BUST if shot == Shot.BUST else
                 BodyScope.HALF if lower_hidden else BodyScope.FULL
             ] * num,
+            person_actions=[action] * num if person_tags else [],
+            person_views=[view] * num if person_tags else [],
+            stated_tags={"shot": shot.value, "action": action.value,
+                         "view": view.value, "relationship": rel.value},
         )
 
 
@@ -239,7 +258,7 @@ class GeminiVLMClient(BaseVLMClient):
             try:
                 resp = self._client.models.generate_content(
                     model=self._model,
-                    contents=[prompts.USER_TEMPLATE, part],
+                    contents=[prompts.user_template(CFG.vlm_prompt_version), part],
                     config=types.GenerateContentConfig(
                         system_instruction=prompts.SYSTEM,
                         response_mime_type="application/json",
@@ -353,7 +372,7 @@ class OpenAIVLMClient(BaseVLMClient):
             messages=[
                 {"role": "system", "content": prompts.SYSTEM},
                 {"role": "user", "content": [
-                    {"type": "text", "text": prompts.USER_TEMPLATE},
+                    {"type": "text", "text": prompts.user_template(CFG.vlm_prompt_version)},
                     {"type": "image_url", "image_url": {"url": image_data_url}},
                 ]},
             ],
@@ -363,6 +382,8 @@ class OpenAIVLMClient(BaseVLMClient):
 
 def build_vlm_client() -> BaseVLMClient:
     """CFG.vlm_provider에 따라 어댑터 생성. 실패 시 mock 폴백."""
+    # 프롬프트 버전 오타는 폴백할 일이 아니다. 아래 try 밖에서 확인해 기동을 멈춘다.
+    prompts.user_template(CFG.vlm_prompt_version)
     p = CFG.vlm_provider.lower()
     try:
         if p == "gemini":

@@ -520,6 +520,7 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
             quality_trace=desc.quality_trace,
             quality_reasons=desc.quality_reasons,
             output_scope=asdict(desc.output_scope),
+            person_tags=asdict(desc.person_tags),
         ))
     vlm_model = (CFG.gemini_model if STATE.get("provider") == "gemini"
                  else CFG.openai_model if STATE.get("provider") == "openai"
@@ -528,11 +529,13 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
         route=res.route, count_confidence=res.count_confidence,
         detector_count=res.detector_count, vlm_count=res.vlm_count,
         people=people, notes=res.notes,
+        vlm_tags=getattr(res, "vlm_tags", None),
         image=ImageInfoOut(width=w, height=h),
         inference_metadata=InferenceMetadataOut(
             deployment_version=CFG.deployment_version,
             vlm_provider=STATE.get("provider", CFG.vlm_provider),
             vlm_model=vlm_model,
+            vlm_prompt_version=CFG.vlm_prompt_version,
             pose_backend=STATE.get("pose_backend", CFG.pose_backend),
             pose_model_version=os.getenv("POSE_MODEL_VERSION", "runtime-default"),
             pose_library_version=CFG.pose_library_version,

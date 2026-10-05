@@ -139,7 +139,7 @@ VLM.analyze  ── 1회 호출로 개수·shot·action·view·relationship·대
 
 핵심 설계 불변식(수정 시 반드시 지킬 것):
 
-1. **VLM 태그 = shot + 사람 수(제어 신호)만.** action/view/relationship는 매칭에 안 쓴다(기하와 중복). shot→라우팅(skip/bust/core), 사람 수→분기(N명→N BVH). 관절 좌표는 VLM이 생성 안 함(검출기·포즈 모델 몫).
+1. **VLM 태그 = shot + 사람 수(제어 신호)만.** action/view/relationship는 매칭에 안 쓴다(기하와 중복). shot→라우팅(skip/bust/core), 사람 수→분기(N명→N BVH). 관절 좌표는 VLM이 생성 안 함(검출기·포즈 모델 몫). 인물별 action·view(`person_tags.py`, `PersonOut.person_tags`)도 기록용 메타데이터일 뿐 매칭·라우팅·refine의 입력이 아니다(`tests/test_person_tags.py`가 검색 결과 불변과 사용처를 검사한다).
 2. **개수 일치 = 스케일 무관 신뢰도 신호.** rtmlib score는 모델마다 스케일이 달라(Body 0.1~0.2 vs Wholebody 1.4~7.5) 신뢰도로 못 쓴다. 대신 `detect.py::reconcile`이 "검출기 개수 vs VLM 개수" 이진 일치로 `high`/`low`를 낸다. 불일치=폴백 후보. 이 신호를 다른 것으로 바꾸지 말 것.
 3. **얽힘·공백 = 폴백(신뢰도 분기).** 매칭은 순수 기하라 별도 얽힘 태그가 없다. 대신 `pipeline._search_one`이 스켈레톤 score 낮음(추출 실패) 또는 Top-1 거리 > `CFG.fallback_distance`(라이브러리 공백·얽힘)면 `person_confidence='low'`로 폴백(작가). 임계값은 실데이터로 보정.
 4. **피처 공간의 대칭성.** 전신 쿼리와 라이브러리는 같은 `features.normalize_skeleton`을 통과한다(힙 중심·몸통 길이·결측 마스킹). 3D 포즈→피처는 `library.pose_to_feature`를 색인과 refine이 공유한다. `upper_only` 검색은 별도로 쿼리와 저장 투영 양쪽에 `partial_pose.shoulder_frame`을 적용해 힙 기준을 상쇄한다. 한쪽만 정규화를 바꾸면 안 된다. 상체 거리에는 전신 임계값을 쓰지 않으며 refine은 금지한다. 상세: `docs/BODY_SCOPE.md`.

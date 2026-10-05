@@ -9,6 +9,7 @@ from typing import Annotated, List, Literal, Optional
 from pydantic import BaseModel, Field, field_validator
 
 from src.body_scope import BodyScope
+from src.schema import Action, Relationship, Shot, View
 
 
 class CandidateOut(BaseModel):
@@ -41,6 +42,8 @@ class InferenceMetadataOut(BaseModel):
     deployment_version: str
     vlm_provider: str
     vlm_model: str
+    # 어느 VLM 프롬프트가 답했는지(src/vlm/prompts.py의 USER_TEMPLATES 키).
+    vlm_prompt_version: Optional[str] = None
     pose_backend: str
     pose_model_version: str
     pose_library_version: str
@@ -50,6 +53,21 @@ class InferenceMetadataOut(BaseModel):
 class ScopeDetectionOut(BaseModel):
     detected: Optional[BodyScope] = None
     source: Literal["vlm_person", "legacy_shot", "unknown"] = "unknown"
+
+
+class PersonTagsOut(BaseModel):
+    """인물별 action·view. 기록용이며 검색·라우팅·refine에 쓰지 않는다(src/person_tags.py)."""
+    action: Optional[Action] = None
+    view: Optional[View] = None
+    source: Literal["vlm_person", "legacy_cut", "unknown"] = "unknown"
+
+
+class VlmTagsOut(BaseModel):
+    """VLM이 컷에 대해 실제로 말한 태그. people[].tags와 달리 잘못된 값을 기본값으로 채우지 않는다."""
+    shot: Optional[Shot] = None
+    action: Optional[Action] = None
+    view: Optional[View] = None
+    relationship: Optional[Relationship] = None
 
 
 class PersonOut(BaseModel):
@@ -92,6 +110,7 @@ class PersonOut(BaseModel):
     quality_trace: dict = Field(default_factory=dict)
     quality_reasons: List[str] = Field(default_factory=list)
     output_scope: ScopeDetectionOut = Field(default_factory=ScopeDetectionOut)
+    person_tags: PersonTagsOut = Field(default_factory=PersonTagsOut)
 
 
 class CutResultOut(BaseModel):
@@ -103,6 +122,7 @@ class CutResultOut(BaseModel):
     notes: List[str] = []
     image: ImageInfoOut
     inference_metadata: InferenceMetadataOut
+    vlm_tags: Optional[VlmTagsOut] = None
 
 
 # ==== 포즈 미세조정 (docs/REFINE_DESIGN.md) ================================
