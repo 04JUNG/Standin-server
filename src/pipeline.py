@@ -10,7 +10,7 @@
 흐름:
   VLM.analyze → shot · 사람 수 · 대략박스
     ├ shot=face      → skip  (얼굴 컷: 작가 직접)
-    ├ shot=bust      → bust  (흉상: 상체 처리 — MVP 후순위, 검색 스킵)
+    ├ shot=bust      → core  (실제로 관측된 상체 관절 검색)
     └ shot=full_half → core:
          [검출] + [VLM 사람 수 보정]  → 인물별 박스
          인물마다: 스켈레톤 추출 → 기하 kNN → BVH Top-K
@@ -32,8 +32,9 @@ from .pose import build_pose_model
 from .pose_rescue import parse_rescue_request, rescue_slots
 from .routing import route
 from .descriptor import build_slot_descriptors
+from .body_scope import BodyScope, detect_scope
 from .refine_policy import structural_refine_allowed
-from .search import PositionSearchIndex, candidate_stability, knn_geometric
+from .search import PositionSearchIndex, candidate_stability, knn_geometric, knn_upper_body
 from .tracing import span
 from .skeleton_extraction import (
     apply_crop_result,
@@ -86,14 +87,32 @@ class Pipeline:
         # 2) Shot 분기
         with span("route"):
             r = route(vlm)                  # "skip" | "bust" | "core"
-        if r == "skip":
-            return CutResult(route="skip", count_confidence="n/a",
-                             detector_count=0, vlm_count=vlm.num_people,
-                             notes=["얼굴 컷 → 배치 스킵(작가 직접)"])
-        if r == "bust":
-            return CutResult(route="bust", count_confidence="n/a",
-                             detector_count=0, vlm_count=vlm.num_people,
-                             notes=["흉상 컷 → 상체 방향·앵글(MVP 후순위). 검색 스킵."])
+        # A cut-level label must not hide a searchable person in a mixed shot.
+        all_head = r == "skip" and all(
+            detect_scope(vlm, i).detected in (None, BodyScope.HEAD)
+            for i in range(vlm.num_people)
+        )
+        if all_head:
+            # Keep people/framing metadata even when search is not supported.
+            # No pose inference, invented joints, or candidate generation here.
+            assignment = assign_candidates(
+                vlm.approx_boxes, [], img_w, img_h, CFG,
+                expected_count=vlm.num_people,
+            )
+            slots = sorted(assignment.slots, key=lambda slot: (
+                slot.result_box.x1 if slot.result_box else float("inf"),
+                slot.slot_id,
+            ))
+            descs = build_slot_descriptors(vlm, slots)
+            for desc in descs:
+                desc.quality_reasons.append("head_search_unsupported")
+            return CutResult(
+                route=r, count_confidence="n/a", detector_count=0,
+                vlm_count=vlm.num_people, descriptors=descs,
+                person_candidates=[[] for _ in descs],
+                person_confidence=["low" for _ in descs],
+                notes=["두상 포즈 검색은 아직 지원하지 않습니다."],
+            )
 
         if getattr(self.pose, "self_detecting", False):
             return self._process_self_detecting(
@@ -450,6 +469,17 @@ class Pipeline:
                        threshold_scale: float) -> _SlotOutcome:
         """한 슬롯의 masked 검색·A/B 안정성·refine 정책을 한 번에 계산한다."""
         desc = build_slot_descriptors(vlm, [slot])[0]
+        if desc.output_scope.detected == BodyScope.HEAD:
+            slot.reasons.append("head_search_unsupported")
+            desc.skeleton = None
+            desc.feature = None
+            desc.quality_trace["search_scope"] = "head_unsupported"
+            self._apply_refine_policy(desc, slot, "low", has_candidates=False)
+            desc.refinable_limbs = ()
+            return _SlotOutcome(
+                descriptor=desc, candidates=[], confidence="low",
+                reason="두상 방향용 관측·색인 미지원 → 안전 폴백", hard_fallback=True,
+            )
         # Human-Art는 current-X의 metric 실험값을 상속하지 않는다. 검증한 계약대로
         # 보수적 관절 mask + position 검색을 독립적인 단일 query로 실행한다.
         is_humanart_rescue = slot.skeleton_source == "fallback_full_image"
@@ -498,6 +528,37 @@ class Pipeline:
                 reason=("얽힘 세트 검색 미구현 → "
                         "개별 solo 후보 대신 안전 폴백"),
                 hard_fallback=True,
+            )
+        if desc.coverage_class == "upper_only":
+            # This tier passes its own observed geometry checks, never the full
+            # torso/IK gates. Ambiguous ownership cannot enter partial retrieval.
+            candidates = []
+            if (slot.state == "partial" and slot.slot_origin == "vlm"
+                    and desc.feature is not None):
+                candidates = knn_upper_body(
+                    self.entries, desc.feature, desc.valid_joint_mask,
+                    search_index=self.search_index,
+                )
+            slot.rank_distance = candidates[0].distance if candidates else None
+            slot.confidence_threshold = None
+            slot.search_stability = "not_available"
+            desc.distance_metric = "upper_pos"
+            desc.rank_distance = slot.rank_distance
+            desc.confidence_threshold = None
+            desc.search_stability = slot.search_stability
+            desc.quality_trace.update({
+                "search_scope": "upper_body",
+                "normalization": "shoulder_width_v1",
+                "distance_metric": "upper_pos",
+                "rank_distance": desc.rank_distance,
+                "confidence_threshold": None,
+                "candidate_count": len(candidates),
+                "search_stability": "not_available",
+            })
+            self._apply_refine_policy(desc, slot, "low", has_candidates=bool(candidates))
+            return _SlotOutcome(
+                descriptor=desc, candidates=candidates, confidence="low",
+                reason="관측된 어깨·팔 기준 참고 후보; 자동 보정 금지",
             )
         search_mask, search_scope, visibility_reason = self._search_mask_policy(
             desc, slot

@@ -20,6 +20,7 @@ USER_TEMPLATE = """이 컷을 분석해서 아래 JSON 스키마로만 답하라
   "relationship": "solo" | "talking" | "hugging" | "holding_hands" | "fighting",
   "approx_boxes": [ {{"x1":0~1,"y1":0~1,"x2":0~1,"y2":0~1}}, ... ],
   "lower_body_visible": [<인물별 true | false>, ...],
+  "body_scopes": [<인물별 "full" | "half" | "bust" | "head" | null>, ...],
   "dialogue": "<말풍선 텍스트 있으면, 없으면 null>"
 }}
 
@@ -29,5 +30,12 @@ USER_TEMPLATE = """이 컷을 분석해서 아래 JSON 스키마로만 답하라
 - lower_body_visible: approx_boxes와 같은 순서. 해당 인물의 양쪽 골반·무릎·발목이 러프에 실제로
   그려져 식별 가능할 때만 true. 반신 컷, 가구/다른 인물에 가림, 화면 밖 잘림, 추측해야 하면 false.
 - num_people는 0~20 범위이며 approx_boxes 개수와 반드시 같아야 한다.
+- body_scopes: approx_boxes와 같은 순서·개수로 인물별 화면 구도를 판단한다.
+  full=머리부터 발까지 전신 구도, half=허리/골반/허벅지 부근에서 잘린 반신 구도,
+  bust=가슴 위와 어깨가 보이는 흉상, head=머리·얼굴 중심(목 일부 포함)의 두상.
+  다른 인물/물체에 가려진 관절과 화면 밖으로 잘린 구도는 다르다. 다리가 가려졌거나
+  포즈 추정이 어려운 것만으로 half로 바꾸지 마라. 무릎 근처의 애매한 잘림,
+  구도 판단이 어려운 러프는 null. 컷 안의 모든 사람에게 같은 값을 복사하지 마라.
+  body_scopes는 출력 범위 메타데이터이며 기존 shot 및 lower_body_visible 기준을 바꾸지 않는다.
 - 확신이 없으면 가장 그럴듯한 값을 고르되, 좌표를 지어내지 마라(대략이면 충분).
 """
