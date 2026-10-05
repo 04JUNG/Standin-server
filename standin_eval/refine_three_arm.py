@@ -1571,11 +1571,11 @@ def run_refine_evaluation(
         if frozen_criteria_path.exists():
             sealed_paths.append("promotion_criteria.frozen.json")
         sealed_paths.extend(
-            str(path.relative_to(run_dir))
+            path.relative_to(run_dir).as_posix()
             for path in sorted((run_dir / "artifacts").rglob("*.bvh"))
         )
         sealed_paths.extend(
-            str(path.relative_to(run_dir))
+            path.relative_to(run_dir).as_posix()
             for path in sorted((run_dir / "renders").glob("*.svg"))
         )
         manifest["result_seal"] = _seal_result_files(

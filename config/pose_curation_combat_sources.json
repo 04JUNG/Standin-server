@@ -1,0 +1,55 @@
+{
+  "sources": [
+    {
+      "version": 1,
+      "source": "data/curation/sources/quaternius/ual1-standard.glb",
+      "output": "data/curation/sources/quaternius/export-1",
+      "actions": [
+        "Punch_Cross",
+        "Punch_Jab",
+        "Punch_Enter",
+        "Sword_Attack",
+        "Sprint_Loop",
+        "Roll",
+        "Jump_Land",
+        "Jump_Start",
+        "Crouch_Fwd_Loop",
+        "Crouch_Idle_Loop",
+        "Hit_Chest",
+        "Hit_Head",
+        "Death01",
+        "Spell_Simple_Shoot"
+      ],
+      "frame_step": 2,
+      "archive_url": "https://opengameart.org/sites/default/files/universal_animation_librarystandard.zip",
+      "archive_sha256": "18ff1a7215f4852b320203e8aaf02a1578b5c8eef9027fbaedfcedc7b85a3ac2",
+      "glb_sha256": "1b7bf67866360665426bb99e4c71bd619f19b408453c24e30f0c3071601eee5c"
+    },
+    {
+      "version": 2,
+      "source": "data/curation/sources/quaternius/ual2-standard.glb",
+      "output": "data/curation/sources/quaternius/export-2",
+      "actions": [
+        "Melee_Hook",
+        "Hit_Knockback",
+        "NinjaJump_Idle_Loop",
+        "NinjaJump_Land",
+        "NinjaJump_Start",
+        "Shield_Dash_RM",
+        "Sword_Dash_RM",
+        "Sword_Regular_A",
+        "Sword_Regular_B",
+        "Sword_Regular_C",
+        "Sword_Block",
+        "Slide_Loop",
+        "Slide_Start",
+        "OverhandThrow",
+        "Idle_Shield_Break"
+      ],
+      "frame_step": 2,
+      "archive_url": "https://opengameart.org/sites/default/files/universal_animation_library_2standard.zip",
+      "archive_sha256": "ec0e40d6d78fe9aaad59e322f40865a8675c22f0745e291622e54520391a9217",
+      "glb_sha256": "0815dd05531cae9bc313fc9c0ba81330bc72f8e19ec45f73738e74ddc5796a43"
+    }
+  ]
+}
