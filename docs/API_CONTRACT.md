@@ -275,11 +275,18 @@ Content-Type: multipart/form-data
     "vlm_model": "gemini-2.5-flash",
     "pose_backend": "rtmlib",
     "pose_model_version": "runtime-default",
-    "pose_library_version": "v1",
-    "feature_version": 1
+    "pose_library_version": "lib-20261002-91b57d0f",
+    "feature_version": 1,
+    "pose_library_sha256": "91b57d0f…"
   }
 }
 ```
+
+`pose_library_version`은 번들 루트의 `library_manifest.json`에서 온다(내용 해시에서 만든
+`lib-YYYYMMDD-<hash8>`, `docs/POSE_LIBRARY_BUNDLE.md`). manifest가 없는 옛 번들이면
+env `POSE_LIBRARY_VERSION`(기본 `v1`)이고 `pose_library_sha256`은 `null`이다. 프로덕션에서
+manifest가 `poses.db`와 맞지 않으면 기동하지 않는다. `GET /healthz`의 `pose_library`
+(`version`·`source`(manifest\|env)·`content_sha256`·`db_sha256`)로 떠 있는 번들을 확인한다.
 
 **최상위 필드**
 
