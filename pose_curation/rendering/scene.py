@@ -1,0 +1,84 @@
+"""Blender-only camera and studio setup for service-style character thumbnails."""
+from __future__ import annotations
+
+import math
+from pathlib import Path
+
+import bpy
+from mathutils import Vector
+
+VIEWS = {"front": 0, "three_quarter": 45, "side": 90, "back": 180}
+
+
+def _world_vertices() -> list[Vector]:
+    points = []
+    graph = bpy.context.evaluated_depsgraph_get()
+    for obj in bpy.context.scene.objects:
+        if obj.type != "MESH":
+            continue
+        evaluated = obj.evaluated_get(graph)
+        mesh = evaluated.to_mesh()
+        try:
+            points.extend(evaluated.matrix_world @ vertex.co for vertex in mesh.vertices)
+        finally:
+            evaluated.to_mesh_clear()
+    if not points or not all(math.isfinite(v) for p in points for v in p):
+        raise ValueError("character mesh is empty or non-finite")
+    return points
+
+
+def render_views(directory: Path, pose_id: str, *, resolution: int = 256) -> dict[str, Path]:
+    scene = bpy.context.scene
+    scene.render.engine = "BLENDER_WORKBENCH"
+    scene.render.resolution_x = scene.render.resolution_y = resolution
+    scene.render.resolution_percentage = 100
+    scene.render.image_settings.file_format = "JPEG"
+    scene.render.image_settings.color_mode = "RGB"
+    scene.render.image_settings.quality = 78
+    scene.render.film_transparent = False
+    scene.view_settings.view_transform = "Standard"
+    shading = scene.display.shading
+    shading.light = "STUDIO"
+    light = bpy.context.preferences.studio_lights.load(str(Path(__file__).with_name("neutral.sl")), "STUDIO")
+    shading.studio_light = light.name
+    shading.studiolight_rotate_z = 0
+    shading.color_type = "SINGLE"
+    shading.single_color = (1.0, 1.0, 1.0)
+    shading.show_shadows = True
+    shading.show_cavity = False
+    shading.cavity_type = "BOTH"
+    shading.show_specular_highlight = False
+    shading.show_object_outline = False
+    shading.background_type = "WORLD"
+    if scene.world is None:
+        scene.world = bpy.data.worlds.new("Preview Background")
+    # Standard sRGB conversion yields the neutral #999 background of the library.
+    scene.world.color = (0.31855, 0.31855, 0.31855)
+    scene.display.render_aa = "32"
+
+    points = _world_vertices()
+    low = Vector(tuple(min(p[i] for p in points) for i in range(3)))
+    high = Vector(tuple(max(p[i] for p in points) for i in range(3)))
+    center = (low + high) / 2
+    extent = max((high - low).length, 1)
+    camera_data = bpy.data.cameras.new("Review Camera")
+    camera = bpy.data.objects.new("Review Camera", camera_data)
+    scene.collection.objects.link(camera)
+    scene.camera = camera
+    camera_data.type = "ORTHO"
+    camera_data.clip_start = extent / 1000
+    camera_data.clip_end = extent * 20
+    directory.mkdir(parents=True, exist_ok=True)
+    result = {}
+    for view, yaw in VIEWS.items():
+        angle = math.radians(yaw)
+        direction = Vector((math.sin(angle), -math.cos(angle), 0))
+        camera.location = center + direction * extent * 3
+        camera.rotation_euler = (center - camera.location).to_track_quat("-Z", "Y").to_euler()
+        right = Vector((math.cos(angle), math.sin(angle), 0))
+        horizontal = [p.dot(right) for p in points]
+        camera_data.ortho_scale = max(high.z - low.z, max(horizontal) - min(horizontal)) * 1.16
+        scene.render.filepath = str(directory / f"{pose_id}__{view}.jpg")
+        bpy.ops.render.render(write_still=True)
+        result[view] = Path(scene.render.filepath)
+    return result

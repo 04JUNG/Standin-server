@@ -111,7 +111,7 @@ def main() -> None:
             jobs.append({
                 "pose_id": bvh_path.stem,
                 "view": view,
-                "bvh_path": os.path.relpath(bvh_path.resolve(), output_root),
+                "bvh_path": Path(os.path.relpath(bvh_path.resolve(), output_root)).as_posix(),
                 "output": output.name,
             })
             results.append({
@@ -124,7 +124,7 @@ def main() -> None:
             if record is not None:
                 rendered = record.setdefault("rendered_thumbnails", {})
                 rendered[view] = {
-                    "path": str(output.relative_to(args.output_dir.parent)),
+                    "path": output.relative_to(args.output_dir.parent).as_posix(),
                     "sha256": digest,
                 }
 
@@ -135,7 +135,7 @@ def main() -> None:
         "schema_version": 1,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "renderer_version": THUMBNAIL_RENDERER_VERSION,
-        "source_bvh_dir": os.path.relpath(args.bvh_dir.resolve(), output_root),
+        "source_bvh_dir": Path(os.path.relpath(args.bvh_dir.resolve(), output_root)).as_posix(),
         "render_size": args.size,
         "views": views,
         "status": "complete",

@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="ko">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>상체 라이브러리 · 러프 각도 비교</title><link rel="stylesheet" href="/static/style.css?v=scoped-20261002"><link rel="stylesheet" href="/static/scoped.css?v=1"></head>
+<body class="scoped-page"><main>
+  <header class="page-header"><div><a class="text-link" href="/">← 전체 포즈 라이브러리</a><h1>상체 포즈와 러프 시점</h1><p>대표 포즈를 고르고, 러프에 맞춘 각도로 미리보기와 파일을 만드세요.</p></div></header>
+  <div id="scope-summary" class="collection-strip">대표 라이브러리를 불러오는 중…</div>
+  <nav class="scope-links"><a class="quiet-button" href="/?library_scope=half">반신 대표 포즈 보기 ↗</a><a class="quiet-button" href="/?library_scope=bust">흉상 대표 포즈 보기 ↗</a><a class="quiet-button" href="/head">두상·흉상 시점 작업실 ↗</a></nav>
+  <p class="preview-caption">하체 차이를 묶고 팔·허리·목·머리의 차이를 남겼습니다. 손 모양·소품별 차이는 전체 라이브러리에서 확인하세요. 두상과 팔이 보이지 않는 흉상은 상세 화면에서 수동으로 각도를 맞출 수 있습니다.</p>
+  <section class="toolbar"><label for="rough-filter">러프 범위</label><select id="rough-filter"><option value="upper">상체 관측만 있는 러프</option><option value="all">전체 러프의 상체 비교</option><option value="supplied">제공한 러프의 상체 비교</option></select><label for="rough-select">러프·인물</label><select id="rough-select"></select><button id="fit-rough" class="primary-button" disabled>이 러프에 맞는 포즈·각도 찾기</button></section>
+  <p class="preview-caption">자동 비교는 양쪽 어깨와 최소 한쪽 팔꿈치·손목이 충분히 검출된 인물에만 제공됩니다. 전신 러프에서도 상체만 비교하며, 출력 범위 판별과는 별개입니다.</p>
+  <p id="match-status" role="status">기존에 로컬 검수한 러프를 불러옵니다.</p>
+  <section class="rough-workspace">
+    <div><div class="rough-stage"><img id="query-image" alt="선택한 익명 러프"><svg id="query-overlay" aria-label="검출 관절과 후보 관절 겹침 비교"></svg></div><p class="preview-caption"><span class="observed-legend">● 초록: 실제 검출 관절</span> · <span class="candidate-legend">● 주황: 후보의 투영</span><br>다인 러프는 선택한 인물의 팔을 맞게 검출했는지 먼저 확인하세요.</p></div>
+    <div><h2>추천 후보</h2><p class="preview-caption">정확도 확정 전 참고 후보입니다. 원근·앞뒤 방향·가림은 2D 관절만으로 확정할 수 없습니다. 얼굴·숨은 하체는 점수에 쓰지 않습니다.</p><div id="match-results" class="match-results"></div></div>
+  </section>
+</main><script type="module" src="/static/scoped.js?v=2"></script></body></html>

@@ -54,6 +54,9 @@ def fault_server(outcomes):
         protocol_version = "HTTP/1.1"
 
         def do_POST(self):  # noqa: N802 — BaseHTTPRequestHandler contract
+            # Drain the request before closing the connection. Unread POST bytes
+            # can reset the socket on Windows and mask the intended HTTP 503.
+            self.rfile.read(int(self.headers.get("Content-Length", "0")))
             index = state["requests"]
             state["requests"] += 1
             outcome = state["outcomes"][min(index, len(state["outcomes"]) - 1)]
