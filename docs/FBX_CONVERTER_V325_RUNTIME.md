@@ -36,6 +36,26 @@ anatomical 카메라·재질·조명). report의 `thumbnail`(sha256·size·engin
 - job schema는 `3`이다(`thumbnail` 키 필수, null 허용).
 - 렌더 실패는 `thumbnail_render_failed` → API `500 THUMBNAIL_RENDER_FAILED`. FBX는 버린다.
 
+## 100STYLE 리그 프로파일 (2026-10-02)
+
+`converter/bone_map.py`에 `100style` 프로파일(`STYLE100`)을 더했다. 100STYLE(CC BY 4.0)에서
+뽑은 정리 포즈를 운영에서 FBX로 내보낼 수 있게 하기 위한 **매핑 데이터 추가**이고,
+solver 단계(V3.2.1~V3.2.5)와 기존 프로파일은 바뀌지 않았다. `bone_map.py`가 동결 범위에
+있으므로 `SHA256SUMS.v325`의 해당 줄과 `protocol.SOLVER_MANIFEST_SHA256`를 함께 갱신했다.
+
+- 이름 체계가 다르다: 100STYLE의 `LeftShoulder`는 상완, `LeftElbow`는 전완, `LeftCollar`는
+  쇄골이다(CMU·Mixamo의 `LeftShoulder`는 쇄골). 상부 척추는 Chest3를 건너뛰고 Chest4에 매핑한다.
+- 판별 회귀: 운영 번들 BVH 1,248개(mixamo 635·cmu_bvh 353·mixamo_noprefix 260)의
+  `resolve_profile` 결과가 변경 전후 동일. 정리 배치의 100STYLE BVH 296개는 판별 불가 →
+  `100style`. 순수 파이썬 계약은 `tests/test_converter_profiles.py`.
+- 실변환: Blender 5.2 운영 worker(동결 lineage 검증 포함)로 100STYLE 포즈를 Standin Master V2에
+  변환 — 자동 판별 `100style`, 매핑 22본, `pose_fidelity_rmse` 0.150(골격 기준 0.142, Δ0.008),
+  degenerate·missing·chain fallback 없음. 경고는 어깨 rest swing 17.8°(런타임 보정으로 흡수).
+  변경 전 converter는 같은 입력을 "알려진 리그 프로파일과 매칭 실패(최대 일치 5본)"로 거부했다.
+- 손가락: 다른 프로파일과 같이 canonical 22본만 변환한다(손가락은 캐릭터 기본 자세).
+- refine(`src/refine.py`)은 `LeftArm`/`LeftForeArm` 이름으로 사지를 찾으므로 100STYLE 포즈는
+  조정 없이 베이스를 돌려준다(`no_solvable_joints`). refine 지원은 별도 평가가 필요하다.
+
 ## 비상 복구
 
 `CONVERTER_FORCE_EXACT_V324=true`를 converter 서비스 환경변수로 설정하면 runner가
