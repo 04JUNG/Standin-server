@@ -1,6 +1,6 @@
 # API 계약 — 도원 추론 서버 (FastAPI)
 
-> 상태: 현재 계약 · 갱신일: 2026-09-03 · 기준 코드: `api/app.py`, `api/models.py`
+> 상태: 현재 계약 · 갱신일: 2026-10-02 · 기준 코드: `api/app.py`, `api/models.py`
 >
 > 이 문서는 **실제 구현된** HTTP 계약(`api/app.py`·`api/models.py`)을 문서화한다.
 > `/export-order`의 상세는 별도 문서(`docs/EXPORT_CONTRACT.md`)에 있고, 여기서는 전체 엔드포인트와
@@ -172,6 +172,12 @@ API와 이 서버의 API는 **의도적으로 다르다**(§7에서 대조·확�
 사용자는 그림 한 장 대신 더 나쁜 포즈를 저장하게 된다. 소비자는 `thumbnail` 없음을 정상으로
 다루고 후보 썸네일로 폴백한다.
 
+**렌더 실패는 오류가 아니다.** 그릴 수 없으면 `thumbnail`을 `null`로 두고 나머지는 그대로 준다
+(`refine_thumbnail_failed` 로그만 남는다). 썸네일은 확인 화면이 쓰는 부가 산출물이므로, 그림
+때문에 응답을 실패시키면 소비자가 그걸 상류 장애로 읽고 **방금 계산한 조정 결과까지 버린다** —
+사용자는 그림 한 장 대신 더 나쁜 포즈를 저장하게 된다. 소비자는 `thumbnail` 없음을 정상으로
+다루고 후보 썸네일로 폴백한다.
+
 - v1에서 `search_distance`는 베이스 불일치 게이트다. `REFINE_V2_ENABLED=1`에서는 거리·순위만으로
   실행을 막지 않고 진단에 남긴다. 대신 `refine_allowed`, 스켈레톤 상태·coverage·소유권 lineage와
   `refinable_limbs`를 모두 그대로 보내야 하며, 누락·불일치하면 fail-closed한다.
@@ -279,16 +285,21 @@ Content-Type: multipart/form-data
 
 | 필드 | 타입 | 의미 |
 |---|---|---|
-| `route` | string | `core`(전신·반신, 검색 수행) \| `bust`(흉상, 검색 스킵) \| `skip`(얼굴, 조기 종료) |
+| `route` | string | `core`(전신·반신·흉상, 관측 검색) \| `bust`(구 서버의 흉상 검색 스킵) \| `skip`(두상만 있는 컷, 조기 종료) |
 | `count_confidence` | string | `high`(검출기 개수 = VLM 개수) \| `low`(불일치 → 저신뢰 폴백) \| `n/a` |
 | `detector_count` | int | 검출기가 센 사람 수 |
 | `vlm_count` | int | VLM이 센 사람 수 (둘의 일치가 신뢰도 신호 — `CLAUDE.md` 불변식 §2) |
-| `people` | Person[] | 인물별 결과. `route:"skip"`이면 빈 배열 |
+| `people` | Person[] | 인물별 결과. `skip`에도 인물·범위 메타데이터 유지, 후보는 빈 배열. 혼합 컷은 인물별 검색 가능 여부가 다를 수 있음 |
 | `notes` | string[] | 폴백 사유 등 사람이 읽는 메모 |
 | `image` | object | 분석 기준 원본의 `width`, `height` |
 | `inference_metadata` | object | 배포·VLM·포즈 backend/model·포즈 라이브러리·feature schema 버전 |
 
 **`people[]` (PersonOut)**
+
+`output_scope`는 `{ "detected": "full" | "half" | "bust" | "head" | null,
+"source": "vlm_person" | "legacy_shot" | "unknown" }`이다. 기존 `shot`과 독립적인
+출력 구도 메타데이터이며 검색/refine 정책을 바꾸지 않는다. 판별·BFF 저장·앱 계약은
+[BODY_SCOPE.md](BODY_SCOPE.md)에 있다. 실제 부분 미리보기/FBX 크롭은 후속 단계다.
 
 | 필드 | 타입 | 의미 |
 |---|---|---|
@@ -303,7 +314,7 @@ Content-Type: multipart/form-data
 | `confidence` | string | `high` 또는 `low` |
 | `skeleton_state` | string | `valid` · `partial` · `suspect` · `missing` · `invalid` |
 | `skeleton_source` | string | `full_image` · `crop_retry` · `none` |
-| `coverage_class` | string | `full` · `reduced` · `sparse` · `insufficient` |
+| `coverage_class` | string | `full` · `reduced` · `sparse` · `upper_only` · `insufficient` |
 | `slot_origin` | string | `vlm` · `rtm_provisional` |
 | `search_stability` | string \| null | `stable` · `ambiguous` · `unstable` · `not_required` · `not_available` |
 | `valid_limbs` / `refinable_limbs` | string[] | 검색에 남은 부위와 refine 허용 사지 |
@@ -458,3 +469,15 @@ Retry-After: 30
 | 검색 파라미터(`top_k_final` 등) | `src/config.py` |
 
 OpenAPI 자동 문서: 서버 기동 후 **`http://127.0.0.1:8000/docs`**. 이 문서와 `/docs`가 어긋나면 **코드가 정본**이고, 이 문서를 갱신한다(`05` 문서 도입 시 "API 변경은 문서 동시 수정" 규칙 적용).
+
+## 관측 상체 검색 추가 (2026-10-02)
+
+- 흉상도 추출·검색을 수행하며 응답 `route=core`. 골반을 관측하지 못했으나
+  어깨·팔 기하가 충분하면 `coverage_class=upper_only`, `distance_metric=upper_pos`.
+- 전신과 별도 정규화를 사용하므로 항상 `confidence=low`, `confidence_threshold=null`,
+  `refine_allowed=false`, `refinable_limbs=[]`, `scores=0`인 참고 후보다.
+- 두상 인물은 `quality_reasons`에 `head_search_unsupported`, 후보는 빈 배열.
+  전원 두상인 컷은 `route=skip`; 혼합 컷은 다른 인물을 정상 처리한다.
+- `output_scope`는 출력 메타데이터다. 수동 설정으로 관측/검색/refine 정책을 바꾸지 않는다.
+- 기존 full-body 피처 버전/DB/BVH/export 계약은 그대로다. 자세한 기준과 제한은
+  [BODY_SCOPE.md](BODY_SCOPE.md)의 2단계를 참조한다.
