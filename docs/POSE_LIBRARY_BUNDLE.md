@@ -77,13 +77,15 @@ DB와 어긋난 pickle이 섞인다. 반대로 `ATTRIBUTION.md`는 이제 넣는
 | `replay_gate` | `not_run` → `record-gate`로 `passed`/`failed`. 보고서 해시·기준 버전 포함 |
 | `privacy_scan`, `compat` | 빌더가 통과시킨 검사. `compat.excluded`에 리그 때문에 뺀 포즈 |
 
-## 아직 남은 것
+## 서버가 버전을 싣는 방식
 
-- 서버가 기동할 때 manifest를 읽어 `/healthz`와 응답의 `pose_library_version`에 싣는 배선
-  (`src/library_manifest.py::resolve_library_identity`는 준비돼 있다). manifest가 없거나 맞지
-  않으면 env 값으로 폴백하므로, 옛 번들로 롤백해도 기동은 된다.
-- 재생 게이트 자체(`pose_gaps`)는 별도 변경이다. 이 문서의 `record-gate`는 그 보고서를 받는
-  자리만 만든다.
+추론 서버는 기동할 때 `poses.db` 옆의 manifest를 읽어 `CFG.pose_library_version`에 넣는다
+(`api/app.py::_resolve_library_identity`). `/analyze`의 `inference_metadata`, `/refine`의 식별자,
+`/healthz`의 `pose_library`가 모두 같은 값을 쓴다. manifest가 없으면 env 값으로 폴백하므로
+옛 번들로 롤백해도 기동은 되고, 프로덕션에서 manifest가 DB와 맞지 않으면 기동을 막는다.
+
+재생 게이트는 `python -m pose_gaps gate`(`docs/POSE_GAP_LOOP.md`)가 만든 보고서를
+`record-gate`로 manifest에 기록한다.
 
 ## 로컬 실행 메모
 

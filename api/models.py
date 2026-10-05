@@ -46,8 +46,11 @@ class InferenceMetadataOut(BaseModel):
     vlm_prompt_version: Optional[str] = None
     pose_backend: str
     pose_model_version: str
+    # 번들 library_manifest.json의 버전(lib-YYYYMMDD-<hash8>). manifest 없는 번들이면 env 값.
     pose_library_version: str
     feature_version: int
+    # 번들 내용 해시. manifest 없는 번들이면 null.
+    pose_library_sha256: Optional[str] = None
 
 
 class ScopeDetectionOut(BaseModel):
