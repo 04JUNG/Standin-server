@@ -299,7 +299,8 @@ manifest가 `poses.db`와 맞지 않으면 기동하지 않는다. `GET /healthz
 | `people` | Person[] | 인물별 결과. `skip`에도 인물·범위 메타데이터 유지, 후보는 빈 배열. 혼합 컷은 인물별 검색 가능 여부가 다를 수 있음 |
 | `notes` | string[] | 폴백 사유 등 사람이 읽는 메모 |
 | `image` | object | 분석 기준 원본의 `width`, `height` |
-| `inference_metadata` | object | 배포·VLM·포즈 backend/model·포즈 라이브러리·feature schema 버전 |
+| `inference_metadata` | object | 배포·VLM·포즈 backend/model·포즈 라이브러리·feature schema 버전. `vlm_prompt_version`은 답한 VLM 프롬프트(`p1-scope` \| `p2-person-tags`) |
+| `vlm_tags` | object \| null | VLM이 컷에 대해 실제로 말한 `shot`·`action`·`view`·`relationship`. 어휘 밖이거나 없으면 그 칸이 `null`이다(`people[].tags`는 기본값으로 채운다) |
 
 **`people[]` (PersonOut)**
 
@@ -307,6 +308,21 @@ manifest가 `poses.db`와 맞지 않으면 기동하지 않는다. `GET /healthz
 "source": "vlm_person" | "legacy_shot" | "unknown" }`이다. 기존 `shot`과 독립적인
 출력 구도 메타데이터이며 검색/refine 정책을 바꾸지 않는다. 판별·BFF 저장·앱 계약은
 [BODY_SCOPE.md](BODY_SCOPE.md)에 있다. 실제 부분 미리보기/FBX 크롭은 후속 단계다.
+
+`person_tags`는 `{ "action": Action | null, "view": View | null,
+"source": "vlm_person" | "legacy_cut" | "unknown" }`이다(§4 어휘). 그 인물의 행동과 몸이
+향한 방향을 VLM이 인물마다 따로 판단한 값이며, 컷 단위 `tags`와 달리 모르면 `null`이다.
+라이브러리 공백 분석(`docs/POSE_GAP_LOOP.md`)에 쓰는 기록용이고 검색·라우팅·refine에는
+쓰지 않는다(`CLAUDE.md` 불변식 1).
+
+- `vlm_person`: `p2-person-tags` 프롬프트가 인물별로 답했다. VLM이 만든 인물 슬롯에만 붙는다.
+- `legacy_cut`: 인물별로 묻지 않은 프롬프트(`p1-scope`)에서 사람이 1명인 컷. VLM이 실제로 말한
+  컷 값을 그 인물의 값으로 쓴다. 기본값으로 채운 컷 값은 쓰지 않는다.
+- `unknown`: 그 밖의 경우. 여러 명인 컷의 컷 값은 각 인물을 설명하지 못하므로 복사하지 않는다.
+
+프롬프트는 env `VLM_PROMPT_VERSION`으로 고른다(기본 `p1-scope`). 모르는 값이면 기동이 멈춘다.
+`p2-person-tags`는 p1에 인물별 배열 두 개와 판단 기준만 더하며, 켜기 전에 같은 평가셋에서
+route·인원수·박스가 흔들리지 않는지 비교한다.
 
 | 필드 | 타입 | 의미 |
 |---|---|---|
@@ -327,6 +343,8 @@ manifest가 `poses.db`와 맞지 않으면 기동하지 않는다. `GET /healthz
 | `valid_limbs` / `refinable_limbs` | string[] | 검색에 남은 부위와 refine 허용 사지 |
 | `refine_allowed` | bool | v1은 검색+구조 정책, v2는 스켈레톤·소유권·coverage 안전 정책의 실행 허가 |
 | `quality_reasons` / `quality_trace` | string[] / object | 구조 판정 사유와 배정·coverage·retry·검색 진단값 |
+| `output_scope` | object | 출력 구도(위 설명) |
+| `person_tags` | object | 인물별 action·view와 출처(위 설명). 검색에 쓰지 않는다 |
 
 **`candidates[]` (CandidateOut)**
 

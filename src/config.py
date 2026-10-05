@@ -34,6 +34,8 @@ class Config:
 
     # --- VLM ---  provider: "mock"(오프라인 기본) | "gemini" | "openai"
     vlm_provider: str = os.getenv("VLM_PROVIDER", "mock")
+    # src/vlm/prompts.py의 USER_TEMPLATES 키. 모르는 값이면 VLM 클라이언트를 만들 때 기동이 멈춘다.
+    vlm_prompt_version: str = os.getenv("VLM_PROMPT_VERSION", "p1-scope")
     gemini_model: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
     # Gemini HTTP 호출 1회의 상한. google-genai HttpOptions.timeout 단위는 밀리초다.
     #

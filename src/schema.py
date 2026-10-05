@@ -15,6 +15,7 @@ import json
 import numpy as np
 
 from .body_scope import BodyScope, ScopeDetection
+from .person_tags import PersonTags
 
 
 # ---- 열거형(Controlled Vocabulary) ---------------------------------------
@@ -118,6 +119,14 @@ class VLMAnalysis:
     lower_body_visibility_known: list[bool] = field(default_factory=list)
     # Composition, in provider approx_boxes order. None means uncertain/omitted.
     body_scopes: list[Optional[BodyScope]] = field(default_factory=list)
+    # 인물별 의미 태그(approx_boxes 순서, None=모름). 기록용 메타데이터일 뿐 매칭·라우팅·
+    # refine의 입력이 아니다(src/person_tags.py). 프롬프트가 인물별로 묻지 않으면 비어 있다.
+    person_actions: list[Optional[Action]] = field(default_factory=list)
+    person_views: list[Optional[View]] = field(default_factory=list)
+    # 위 shot·action·view·relationship은 잘못된 값을 기본값(full_half·other·front 등)으로
+    # 바꾼다. 이 칸은 provider가 실제로 말한 값만 담고, 어휘 밖이거나 없으면 None이다.
+    # 칸 전체가 None이면 추적하지 않은 분석이다(테스트가 직접 만든 VLMAnalysis 등).
+    stated_tags: Optional[dict] = None
 
 
 @dataclass
@@ -148,6 +157,8 @@ class PersonDescriptor:
     quality_trace: dict = field(default_factory=dict)
     quality_reasons: list[str] = field(default_factory=list)
     output_scope: ScopeDetection = field(default_factory=ScopeDetection)
+    # 인물별 action·view. tag_dict()의 컷 단위 값과 별개이며 검색은 읽지 않는다.
+    person_tags: PersonTags = field(default_factory=PersonTags)
 
     def tag_dict(self) -> dict:
         return {
@@ -170,6 +181,8 @@ class CutResult:
     person_candidates: list = field(default_factory=list)  # 인물별 Top-K
     person_confidence: list = field(default_factory=list)  # 인물별 'high'|'low(폴백)'
     notes: list = field(default_factory=list)
+    # VLM이 이 컷에 대해 실제로 말한 shot·action·view·relationship(VLMAnalysis.stated_tags).
+    vlm_tags: Optional[dict] = None
 
 
 @dataclass

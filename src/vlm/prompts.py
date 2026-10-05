@@ -1,6 +1,10 @@
 """
 VLM 프롬프트. 원칙(설계문서 v2 §3-4): 개수·종류·의미까지만, 좌표 생성 금지.
 approx_boxes는 0~1 정규화 좌표의 '대략' 박스만 허용(정밀 박스는 검출기 몫).
+
+프롬프트는 버전으로 고른다(env `VLM_PROMPT_VERSION`, 기본 `p1-scope`). 새 버전은 같은
+이미지에서 route·인원수·박스가 흔들리지 않는지 평가로 확인한 뒤에 켠다. 응답의
+`inference_metadata.vlm_prompt_version`이 어느 프롬프트가 답했는지 남긴다.
 """
 
 SYSTEM = (
@@ -39,3 +43,45 @@ USER_TEMPLATE = """이 컷을 분석해서 아래 JSON 스키마로만 답하라
   body_scopes는 출력 범위 메타데이터이며 기존 shot 및 lower_body_visible 기준을 바꾸지 않는다.
 - 확신이 없으면 가장 그럴듯한 값을 고르되, 좌표를 지어내지 마라(대략이면 충분).
 """
+
+# p2-person-tags: p1-scope에 인물별 action·view만 더한다. 나머지 문장은 그대로 둔다.
+# 기존 항목의 판단이 함께 달라지면 평가에서 원인을 가를 수 없기 때문이다.
+_PERSON_TAG_FIELDS = (
+    '  "person_actions": [<인물별 "standing" | "sitting" | "walking" | "running" | '
+    '"reaching" | "lying" | "other" | null>, ...],\n'
+    '  "person_views": [<인물별 "front" | "side" | "back" | "three_quarter" | null>, ...],\n'
+)
+_PERSON_TAG_RULES = (
+    "- person_actions·person_views: approx_boxes와 같은 순서·개수로 인물마다 따로 판단한다.\n"
+    "  컷 대표값(action·view)을 모든 인물에 복사하지 마라. 그 인물의 행동이나 몸이 향한 방향을\n"
+    "  러프에서 판단하기 어려우면 null. 기록용 값이며 다른 항목의 판단 기준을 바꾸지 않는다.\n"
+)
+
+
+def _insert_before(text: str, anchor: str, addition: str) -> str:
+    if text.count(anchor) != 1:
+        raise RuntimeError(f"prompt anchor is not unique: {anchor!r}")
+    return text.replace(anchor, addition + anchor)
+
+
+USER_TEMPLATE_P2 = _insert_before(
+    _insert_before(USER_TEMPLATE, '  "dialogue":', _PERSON_TAG_FIELDS),
+    "- 확신이 없으면 가장 그럴듯한 값을 고르되", _PERSON_TAG_RULES,
+)
+
+DEFAULT_PROMPT_VERSION = "p1-scope"
+USER_TEMPLATES = {
+    "p1-scope": USER_TEMPLATE,
+    "p2-person-tags": USER_TEMPLATE_P2,
+}
+# 인물별 action·view를 묻는 버전. mock VLM이 같은 모양의 응답을 흉내 낼 때 쓴다.
+PERSON_TAG_VERSIONS = frozenset({"p2-person-tags"})
+
+
+def user_template(version: str) -> str:
+    try:
+        return USER_TEMPLATES[version]
+    except KeyError:
+        raise ValueError(
+            f"unknown VLM_PROMPT_VERSION {version!r}; expected one of {sorted(USER_TEMPLATES)}"
+        ) from None

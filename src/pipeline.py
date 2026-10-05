@@ -112,6 +112,7 @@ class Pipeline:
                 person_candidates=[[] for _ in descs],
                 person_confidence=["low" for _ in descs],
                 notes=["두상 포즈 검색은 아직 지원하지 않습니다."],
+                vlm_tags=vlm.stated_tags,
             )
 
         if getattr(self.pose, "self_detecting", False):
@@ -353,7 +354,7 @@ class Pipeline:
         result = CutResult(
             route="core", count_confidence=count_confidence,
             detector_count=detector_count, vlm_count=vlm.num_people,
-            descriptors=descs, notes=notes,
+            descriptors=descs, notes=notes, vlm_tags=vlm.stated_tags,
         )
         for index, (slot, outcome) in enumerate(processed):
             candidates = outcome.candidates
