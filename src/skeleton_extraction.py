@@ -14,6 +14,7 @@ import numpy as np
 from .config import CFG
 from .features import _BONES
 from .schema import BBox, Skeleton
+from .partial_pose import observed_upper_body
 
 
 BODY_JOINTS = np.arange(5, 17, dtype=int)
@@ -283,6 +284,27 @@ def analyze_skeleton(skeleton: Optional[Skeleton], box: Optional[BBox] = None,
     if not finite.all():
         reasons.append("non_finite_keypoints")
     valid_joint = finite & (scores >= kpt_thr)
+    peer_boxes = tuple(peer_boxes)
+    # Missing hips are not repaired or invented. A separate search-only tier uses
+    # real shoulder/arm geometry and cannot satisfy full-body/refine gates.
+    if finite.all():
+        upper = observed_upper_body(
+            kp, valid_joint, owner_box=owner_box, peer_boxes=peer_boxes, cfg=cfg,
+        )
+        if upper is not None:
+            upper_bones = np.asarray(
+                [upper.mask[a] and upper.mask[b] for a, b in _BONES], dtype=bool,
+            )
+            return SkeletonEvidence(
+                state="partial", coverage_class="upper_only",
+                valid_joint_mask=upper.mask, valid_bone_mask=upper_bones,
+                raw_scores=scores.copy(), valid_limbs=upper.limbs,
+                refinable_limbs=(), valid_bone_count=int(upper_bones.sum()),
+                torso_bone_count=1, torso_scale=0.0,
+                refine_valid_joint_mask=np.zeros(17, dtype=bool),
+                quality_components={"shoulder_width": upper.shoulder_width},
+                reasons=list(upper.reasons),
+            )
     # 검색은 기존의 보수적 구조 mask를 유지하고, refine은 정상 단축투영을 별도
     # soft eligibility로 살린다. 실제 길이/소유권 오류는 두 mask에서 모두 막는다.
     refine_valid_joint = valid_joint.copy()

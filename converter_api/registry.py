@@ -13,6 +13,7 @@ import tempfile
 from types import MappingProxyType
 from typing import Any, Callable, Mapping
 from urllib.parse import unquote, urlparse
+from urllib.request import url2pathname
 
 
 CHARACTER_ID_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{0,63}$")
@@ -190,11 +191,14 @@ class CharacterRegistry:
 
     @staticmethod
     def _local_artifact_path(value: str) -> Path:
+        # A native Windows drive prefix is a path, not a URI scheme.
+        if Path(value).is_absolute():
+            return Path(value)
         parsed = urlparse(value)
         if parsed.scheme == "file":
             if parsed.netloc not in ("", "localhost"):
                 raise ArtifactUnavailableError("character artifact URI is unavailable")
-            path = Path(unquote(parsed.path))
+            path = Path(url2pathname(parsed.path))
         elif parsed.scheme:
             raise ArtifactUnavailableError("character artifact is not locally mounted")
         else:

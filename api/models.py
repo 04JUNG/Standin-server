@@ -8,6 +8,8 @@ import math
 from typing import Annotated, List, Literal, Optional
 from pydantic import BaseModel, Field, field_validator
 
+from src.body_scope import BodyScope
+
 
 class CandidateOut(BaseModel):
     pose_id: str
@@ -45,6 +47,11 @@ class InferenceMetadataOut(BaseModel):
     feature_version: int
 
 
+class ScopeDetectionOut(BaseModel):
+    detected: Optional[BodyScope] = None
+    source: Literal["vlm_person", "legacy_shot", "unknown"] = "unknown"
+
+
 class PersonOut(BaseModel):
     index: int
     box: Optional[List[float]] = Field(None, description="[x1,y1,x2,y2] 픽셀")
@@ -67,7 +74,7 @@ class PersonOut(BaseModel):
     skeleton_source: str = Field(
         "full_image", description="none | full_image | crop_retry")
     coverage_class: str = Field(
-        "full", description="full | reduced | sparse | insufficient")
+        "full", description="full | reduced | sparse | upper_only | insufficient")
     slot_origin: str = Field("vlm", description="vlm | rtm_provisional")
     search_stability: Optional[str] = Field(
         None, description="stable | ambiguous | unstable | not_required | not_available")
@@ -84,6 +91,7 @@ class PersonOut(BaseModel):
     refine_allowed: bool = False
     quality_trace: dict = Field(default_factory=dict)
     quality_reasons: List[str] = Field(default_factory=list)
+    output_scope: ScopeDetectionOut = Field(default_factory=ScopeDetectionOut)
 
 
 class CutResultOut(BaseModel):
