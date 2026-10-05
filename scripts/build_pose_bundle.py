@@ -64,7 +64,9 @@ from src.thumbnails import THUMBNAIL_VIEWS, thumbnail_filename
 THUMB_SIZE = 256
 THUMB_QUALITY = 78
 NEW_THUMB_SOURCE = "curation_character_v1"
-SAFE_STEM = re.compile(r"^[A-Za-z0-9][A-Za-z0-9 _.\-]*$")
+# 기존 운영 BVH에는 "Jumping Down (1)_00028.bvh"처럼 괄호가 들어간다.
+# 경로 구분자는 여전히 거부하면서 배포 중인 파일 이름은 보존한다.
+SAFE_STEM = re.compile(r"^[A-Za-z0-9][A-Za-z0-9 _.()\-]*$")
 VIEW_ORDER = ("front", "three_quarter", "side", "back")
 
 
