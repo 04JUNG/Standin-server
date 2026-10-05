@@ -42,6 +42,8 @@ from src.ops_metrics import COLLECTOR, TASK_ID
 from src.pipeline import Pipeline
 from src.pose_rescue import parse_rescue_request
 from src.library import build_synthetic_index
+from src.library_manifest import (MANIFEST_NAME, LibraryManifestError,
+                                  resolve_library_identity)
 from src.library_source import ensure_library
 from src.pose_model_source import PoseModelFetchError, ensure_pose_model
 from src.refine import (REFINE_CODE_VERSION, REFINE_V2_CODE_VERSION,
@@ -116,6 +118,32 @@ def _ensure_db():
     return load_entries(DB_PATH)
 
 
+def _resolve_library_identity() -> dict:
+    """번들의 library_manifest.json으로 응답에 실을 라이브러리 버전을 정한다.
+
+    S3 key와 POSE_LIBRARY_VERSION env가 고정("v1")이라, 이것 없이는 어느 번들이 답했는지
+    BFF가 알 수 없다. manifest는 poses.db와 같은 번들 루트에 있다.
+      · 있고 poses.db와 맞으면 그 버전(lib-YYYYMMDD-<hash8>)을 쓴다.
+      · 없으면 env를 쓴다 — manifest 없는 옛 번들로 롤백해도 기동은 된다.
+      · 있는데 맞지 않으면 프로덕션은 기동을 막는다. 틀린 버전을 내보내면 전후 측정이
+        엉뚱한 번들에 귀속된다. 개발은 경고 후 env로 폴백한다.
+    내용 전체 해시는 배포 검증기가 업로드 전에 이미 확인하므로 여기서는 DB 해시만 본다.
+    """
+    root = os.path.dirname(os.path.abspath(DB_PATH))
+    try:
+        identity = resolve_library_identity(
+            root, fallback_version=CFG.pose_library_version,
+            strict=CFG.is_production, check_content=False,
+        )
+    except LibraryManifestError as exc:
+        raise StartupError(f"{MANIFEST_NAME}이 번들과 맞지 않습니다: {exc}") from exc
+    if identity.source == "env" and os.path.exists(os.path.join(root, MANIFEST_NAME)):
+        log_warn("pose_library", "library manifest가 번들과 맞지 않아 env 버전을 씁니다",
+                 errorCode="LIBRARY_MANIFEST_MISMATCH", libraryVersion=identity.version)
+    CFG.pose_library_version = identity.version
+    return identity.to_dict()
+
+
 def _ensure_pose_model_bundle():
     """Provision an explicitly configured remote Human-Art bundle once."""
     if CFG.pose_model_variant not in {"cascade", "humanart-m"}:
@@ -162,6 +190,7 @@ def _check_backends(pipeline: Pipeline) -> None:
 async def lifespan(app: FastAPI):
     try:
         entries = _ensure_db()                      # 1회 로드
+        library_identity = _resolve_library_identity()  # 응답에 실을 번들 버전
         model_bundle = _ensure_pose_model_bundle()  # S3 bundle → local manifest
         pipeline = Pipeline(entries)                # VLM/검출/포즈 팩토리도 1회 초기화
         _check_backends(pipeline)                   # 팩토리 폴백 후 실제 인스턴스 검사
@@ -195,6 +224,7 @@ async def lifespan(app: FastAPI):
     STATE["quarantined_pose_count"] = len(quarantine)
     STATE["pipeline"] = pipeline
     STATE["db_path"] = DB_PATH
+    STATE["pose_library"] = library_identity
     STATE["pose_count"] = len(entries)
     STATE["quarantined_pose_count"] = len(quarantine)
     STATE["provider"] = actual_vlm
@@ -359,6 +389,8 @@ def healthz():
         "pose_backend": STATE.get("pose_backend", CFG.pose_backend),
         "pose_count": pose_count,
         "quarantined_pose_count": STATE.get("quarantined_pose_count", 0),
+        # 어느 번들이 떠 있는지: version·source(manifest|env)·content_sha256·db_sha256
+        "pose_library": STATE.get("pose_library"),
         "refine": capability,
         "refine_thumbnail": {
             "renderer": getattr(STATE.get("thumbnail_renderer"), "name", None),
@@ -536,6 +568,7 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
             pose_backend=STATE.get("pose_backend", CFG.pose_backend),
             pose_model_version=os.getenv("POSE_MODEL_VERSION", "runtime-default"),
             pose_library_version=CFG.pose_library_version,
+            pose_library_sha256=(STATE.get("pose_library") or {}).get("content_sha256"),
             feature_version=FEATURE_VERSION,
         ),
     )
