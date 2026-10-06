@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "source": "100style",
+  "styles": [
+    "Balance", "Swimming", "Rocket", "Aeroplane",
+    "BeatChest", "LawnMower", "SwingArmsRound", "GracefulArms"
+  ],
+  "movements": ["ID", "FR"],
+  "poses_per_clip": 2,
+  "sample_hz": 10,
+  "minimum_separation_seconds": 0.35,
+  "minimum_pose_distance": 0.23,
+  "near_duplicate_distance": 0.16
+}

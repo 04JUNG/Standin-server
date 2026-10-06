@@ -11,7 +11,7 @@ from src.bvh import parse_bvh, fk, coco17_from_fk
 from pose_curation.candidates import build_candidates
 from pose_curation.hands.bvh import augment
 from pose_curation.selection import select_frames
-from pose_curation.storage import sha256, write_json, utc_now
+from pose_curation.storage import read_json, sha256, write_json, utc_now
 from pose_curation.sources.rebase import export
 from pose_curation.torso import reconstruct_accad
 
@@ -31,11 +31,17 @@ CLIPS = {
 }
 
 
-def run(source_dir, batch, count=2):
+def run(source_dir, batch, count=2, *, clips=None, id_prefix="combat_accad"):
     if (batch / "manifest.json").exists():
         raise ValueError("choose a new batch")
+    clips = clips or CLIPS
     poses = []
-    for clip, label in CLIPS.items():
+    for clip, description in clips.items():
+        details = {"style": description} if isinstance(description, str) else description
+        label = details["style"]
+        hands_style = details.get("hands", ["fist", "fist"])
+        if len(hands_style) != 2 or any(hand not in {"fist", "open", "relaxed"} for hand in hands_style):
+            raise ValueError(f"invalid hand styles for {clip}")
         source = source_dir / f"Male2_{clip}.bvh"
         joints, frames = parse_bvh(str(source))
         match = re.search(r"Frame\s+Time:\s*([\d.eE+-]+)", source.read_text())
@@ -61,7 +67,7 @@ def run(source_dir, batch, count=2):
         )
         for pick in picks:
             frame = indices[pick.sample_index]
-            identity = f"combat_accad_{clip}_f{frame:05d}"
+            identity = f"{id_prefix}_{clip}_f{frame:05d}"
             body = batch / "body" / (identity + ".bvh")
             rebased = batch / "rebased-body" / (identity + ".bvh")
             path = batch / "bvh" / (identity + ".bvh")
@@ -70,13 +76,14 @@ def run(source_dir, batch, count=2):
                 "Original FK preservation is checked at rest-axis rebase, before the explicit torso reconstruction and optional arm clearance."
             )
             torso = reconstruct_accad(rebased, body)
-            hands = augment(body, path, left="fist", right="fist")
+            hands = augment(body, path, left=hands_style[0], right=hands_style[1])
             poses.append(
                 {
                     "pose_id": identity,
                     "clip": clip,
                     "style": label,
-                    "movement": "combat",
+                    "movement": details.get("movement", "combat"),
+                    **{key: details[key] for key in ("category", "category_label") if key in details},
                     "source": "accad",
                     "author": "ACCAD / The Ohio State University",
                     "license": "CC-BY-3.0",
@@ -97,7 +104,7 @@ def run(source_dir, batch, count=2):
                     "torso_correction": torso,
                     "hand_augmentation": {**hands, "captured_from_source": False},
                     "near_duplicate": False,
-                    "transform": "Rest axes rebased; internal spine reconstructed from pelvis/chest landmarks; external body landmarks preserved; root travel removed and facing aligned; 30 procedural fist joints added.",
+                    "transform": "Rest axes rebased; internal spine reconstructed from pelvis/chest landmarks; external body landmarks preserved; root travel removed and facing aligned; 30 procedural finger joints added.",
                 }
             )
     projections = build_candidates(poses, batch, batch.name)
@@ -126,5 +133,8 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--source", type=Path, required=True)
     p.add_argument("--batch", type=Path, required=True)
+    p.add_argument("--config", type=Path)
+    p.add_argument("--count", type=int, default=2)
     a = p.parse_args()
-    print(run(a.source, a.batch))
+    config = read_json(a.config) if a.config else {}
+    print(run(a.source, a.batch, a.count, clips=config.get("clips"), id_prefix=config.get("id_prefix", "combat_accad")))

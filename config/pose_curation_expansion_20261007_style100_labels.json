@@ -1,0 +1,10 @@
+{
+  "Aeroplane": {"style": "비행 자세를 연상시키는 이동", "movement": "hero", "category": "hero", "category_label": "히어로"},
+  "Balance": {"style": "균형 잡으며 이동", "movement": "sports", "category": "sports", "category_label": "스포츠"},
+  "BeatChest": {"style": "가슴 두드리며 이동", "movement": "hero", "category": "hero", "category_label": "히어로"},
+  "GracefulArms": {"style": "팔을 부드럽게 뻗으며 이동", "movement": "sports", "category": "sports", "category_label": "스포츠"},
+  "LawnMower": {"style": "잔디깎이 동작을 흉내 낸 이동", "movement": "daily", "category": "daily", "category_label": "일상"},
+  "Rocket": {"style": "로켓처럼 팔을 뻗으며 이동", "movement": "hero", "category": "hero", "category_label": "히어로"},
+  "Swimming": {"style": "수영 팔동작을 흉내 낸 이동", "movement": "sports", "category": "sports", "category_label": "스포츠"},
+  "SwingArmsRound": {"style": "팔 원 그리며 몸풀기", "movement": "sports", "category": "sports", "category_label": "스포츠"}
+}
