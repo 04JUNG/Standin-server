@@ -129,3 +129,34 @@ python -m pose_gaps measure --production data/bundles/next --parent data/bundles
   `search_valid_joint_mask`, `raw_scores`는 `analysis_people.raw_scores_json`이다.
   `skeleton_json.scores`는 refine이 막히면 0으로 저장되므로 쿼리 재현에 쓰지 않는다.
 - 행은 BFF의 원본 테이블 위 뷰에서 나오므로, 작업 삭제·동의 철회·365일 정리와 함께 사라진다.
+
+## 인물별 태그와 프롬프트 전환
+
+공백 군집의 태그 히스토그램(`person_action`·`person_view`)은 export 항목의 `person.tags`에서 온다.
+값은 추론 `PersonOut.person_tags`이고 `source`가 출처를 알려 준다(`docs/API_CONTRACT.md`).
+
+- `p1-scope`(지금 운영): 인물별로 묻지 않는다. 사람이 1명인 컷만 VLM이 실제로 말한 컷 값을
+  `legacy_cut`으로 쓰고, 여러 명인 컷은 `unknown`이다.
+- `p2-person-tags`: 인물마다 `vlm_person`으로 받는다. 켜기 전에 아래 게이트를 통과해야 한다.
+
+```bash
+# 평가 데이터셋(selected12와, provider에 보낼 권리가 확인된 제공 러프만)에서 A/B를 번갈아 5회씩
+python -m standin_eval run vlm-compare --dataset <id> --provider gemini --a p1-scope --b p2-person-tags
+```
+
+같은 프롬프트끼리의 차이(A↔A)를 잡음 바닥으로 두고 A↔B를 잰다(`standin_eval/vlm_compare.py::GATE`).
+
+| 항목 | 통과 기준 |
+|---|---|
+| B 파싱 실패 | 0건 |
+| route 변화 | 잡음 바닥 + 2%p 이하 |
+| 인원수 일치율 | 잡음 바닥 − 3%p 이상 |
+| 박스 IoU 중앙값 | 하락 0.03 이하 |
+| 얽힘 판정 변화 | 잡음 바닥 + 1건 이하 |
+| 지연 p95 | +15% 이하 |
+| 인물 배열 정렬률 | 95% 이상 |
+
+통과하면 staging부터 GitHub environment 변수 `VLM_PROMPT_VERSION=p2-person-tags`를 두고 배포
+워크플로를 다시 실행한다(`.github/workflows/deploy.yml`). beta도 같은 방식이고, 7일 동안 지표를
+본다. 되돌릴 때는 변수를 지우고(기본 `p1-scope`) 워크플로를 다시 실행한다. 응답의
+`inference_metadata.vlm_prompt_version`과 BFF에 저장된 값으로 어느 프롬프트가 답했는지 구분된다.
