@@ -1,0 +1,14 @@
+{
+  "id_prefix": "expansion_accad",
+  "clips": {
+    "B17_WalkToHopToWalk": {"style": "걸음에서 한 발 도약", "movement": "sports", "category": "sports", "category_label": "스포츠", "hands": ["relaxed", "relaxed"]},
+    "B18_WalkToLeapToWalk": {"style": "멀리뛰기 진입", "movement": "sports", "category": "sports", "category_label": "스포츠", "hands": ["relaxed", "relaxed"]},
+    "C24_QuickSidestepLeft": {"style": "왼쪽 빠른 사이드스텝", "movement": "sports", "category": "sports", "category_label": "스포츠", "hands": ["relaxed", "relaxed"]},
+    "D9_WarmUpToReadyToWarmUp": {"style": "몸풀기에서 준비 자세", "movement": "sports", "category": "sports", "category_label": "스포츠", "hands": ["relaxed", "relaxed"]},
+    "D9_Victory1": {"style": "승리 세리머니", "movement": "sports", "category": "sports", "category_label": "스포츠", "hands": ["open", "open"]},
+    "D10_Victory2": {"style": "승리의 양팔 동작", "movement": "hero", "category": "hero", "category_label": "히어로", "hands": ["open", "open"]},
+    "A5_PickUpBox": {"style": "상자 집어 들기", "movement": "daily", "category": "daily", "category_label": "일상", "hands": ["relaxed", "relaxed"]},
+    "A6_BoxLift": {"style": "상자 들어 올리기", "movement": "daily", "category": "daily", "category_label": "일상", "hands": ["relaxed", "relaxed"]},
+    "B20_WalkWithBox": {"style": "상자 들고 걷기", "movement": "daily", "category": "daily", "category_label": "일상", "hands": ["relaxed", "relaxed"]}
+  }
+}
