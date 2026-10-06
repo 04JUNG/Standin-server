@@ -1,0 +1,524 @@
+{
+  "Swim_Fwd_Loop": {
+    "style": "수영 전진",
+    "movement": "sports",
+    "category": "sports",
+    "category_label": "스포츠"
+  },
+  "Dance_Loop": {
+    "style": "댄스 스텝",
+    "movement": "sports",
+    "category": "sports",
+    "category_label": "스포츠"
+  },
+  "Jump_Loop": {
+    "style": "공중 점프",
+    "movement": "sports",
+    "category": "sports",
+    "category_label": "스포츠"
+  },
+  "Roll_RM": {
+    "style": "구르며 착지",
+    "movement": "hero",
+    "category": "hero",
+    "category_label": "히어로"
+  },
+  "Spell_Simple_Enter": {
+    "style": "이능력 발동 준비",
+    "movement": "superpower",
+    "category": "superpower",
+    "category_label": "이능력"
+  },
+  "Spell_Simple_Exit": {
+    "style": "이능력 발동 마무리",
+    "movement": "superpower",
+    "category": "superpower",
+    "category_label": "이능력"
+  },
+  "Spell_Simple_Idle_Loop": {
+    "style": "이능력 유지",
+    "movement": "superpower",
+    "category": "superpower",
+    "category_label": "이능력"
+  },
+  "Sword_Idle": {
+    "style": "검 대기",
+    "movement": "hero",
+    "category": "hero",
+    "category_label": "히어로"
+  },
+  "Pistol_Idle_Loop": {
+    "style": "권총 경계",
+    "movement": "hero",
+    "category": "hero",
+    "category_label": "히어로"
+  },
+  "Shield_OneShot": {
+    "style": "방패 방어",
+    "movement": "hero",
+    "category": "hero",
+    "category_label": "히어로"
+  },
+  "Idle_Shield_Loop": {
+    "style": "방패 대기",
+    "movement": "hero",
+    "category": "hero",
+    "category_label": "히어로"
+  },
+  "Sword_Regular_Combo": {
+    "style": "검 연속 공격",
+    "movement": "hero",
+    "category": "hero",
+    "category_label": "히어로"
+  },
+  "Slide_Exit": {
+    "style": "슬라이딩 후 회복",
+    "movement": "sports",
+    "category": "sports",
+    "category_label": "스포츠"
+  },
+  "Slide_Loop": {
+    "style": "슬라이딩",
+    "movement": "sports",
+    "category": "sports",
+    "category_label": "스포츠"
+  },
+  "ClimbUp_1m_RM": {
+    "style": "턱 올라가기",
+    "movement": "sports",
+    "category": "sports",
+    "category_label": "스포츠"
+  },
+  "Chest_Open": {
+    "style": "힘을 모으며 상체 숙이기",
+    "movement": "superpower",
+    "category": "superpower",
+    "category_label": "이능력"
+  },
+  "Interact": {
+    "style": "손 내밀어 상호작용",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "PickUp_Table": {
+    "style": "탁자 위 물건 집기",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "Sitting_Enter": {
+    "style": "앉기",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "Sitting_Exit": {
+    "style": "일어나기",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "Sitting_Talking_Loop": {
+    "style": "앉아 이야기하기",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "Farm_Harvest": {
+    "style": "작물 거두기",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "Farm_PlantSeed": {
+    "style": "씨앗 심기",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "Farm_Watering": {
+    "style": "물 주기",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "Walk_Carry_Loop": {
+    "style": "물건 들고 걷기",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "TreeChopping_Loop": {
+    "style": "도끼질",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "Idle_TalkingPhone_Loop": {
+    "style": "통화하기",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "Idle_Lantern_Loop": {
+    "style": "등불 들기",
+    "movement": "fantasy",
+    "category": "fantasy",
+    "category_label": "판타지"
+  },
+  "Crouch_Fwd_Loop": {
+    "style": "몸 낮춰 이동",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "Crouch_Idle_Loop": {
+    "style": "낮게 앉아 대기",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "Driving_Loop": {
+    "style": "운전하기",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "Fixing_Kneeling": {
+    "style": "무릎 꿇고 수리하기",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "Idle_Loop": {
+    "style": "서서 쉬기",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "Idle_Talking_Loop": {
+    "style": "서서 대화하기",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "Idle_Torch_Loop": {
+    "style": "횃불 들기",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "Push_Loop": {
+    "style": "앞으로 밀기",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "Sitting_Idle_Loop": {
+    "style": "의자에 앉아 쉬기",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "Walk_Formal_Loop": {
+    "style": "격식 있게 걷기",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "Walk_Loop": {
+    "style": "걷기",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "Consume": {
+    "style": "음식 먹기",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "Idle_FoldArms_Loop": {
+    "style": "팔짱 끼기",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "Idle_No_Loop": {
+    "style": "고개 저어 거절",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "Idle_Rail_Call": {
+    "style": "난간에서 누군가 부르기",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "Idle_Rail_Loop": {
+    "style": "난간에 기대기",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "LayToIdle": {
+    "style": "누웠다가 일어나기",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "Yes": {
+    "style": "고개 끄덕이기",
+    "movement": "daily",
+    "category": "daily",
+    "category_label": "일상"
+  },
+  "Jog_Fwd_Loop": {
+    "style": "조깅",
+    "movement": "sports",
+    "category": "sports",
+    "category_label": "스포츠"
+  },
+  "Jump_Land": {
+    "style": "점프 착지",
+    "movement": "sports",
+    "category": "sports",
+    "category_label": "스포츠"
+  },
+  "Jump_Start": {
+    "style": "점프 도약",
+    "movement": "sports",
+    "category": "sports",
+    "category_label": "스포츠"
+  },
+  "Sprint_Loop": {
+    "style": "전력 질주",
+    "movement": "sports",
+    "category": "sports",
+    "category_label": "스포츠"
+  },
+  "Swim_Idle_Loop": {
+    "style": "물속에서 균형 잡기",
+    "movement": "sports",
+    "category": "sports",
+    "category_label": "스포츠"
+  },
+  "OverhandThrow": {
+    "style": "머리 위로 공 던지기",
+    "movement": "sports",
+    "category": "sports",
+    "category_label": "스포츠"
+  },
+  "Slide_Start": {
+    "style": "슬라이딩 진입",
+    "movement": "sports",
+    "category": "sports",
+    "category_label": "스포츠"
+  },
+  "NinjaJump_Idle_Loop": {
+    "style": "닌자 공중 자세",
+    "movement": "hero",
+    "category": "hero",
+    "category_label": "히어로"
+  },
+  "NinjaJump_Land": {
+    "style": "닌자 점프 착지",
+    "movement": "hero",
+    "category": "hero",
+    "category_label": "히어로"
+  },
+  "NinjaJump_Start": {
+    "style": "닌자 도약",
+    "movement": "hero",
+    "category": "hero",
+    "category_label": "히어로"
+  },
+  "Shield_Dash_RM": {
+    "style": "방패 앞세워 돌진",
+    "movement": "hero",
+    "category": "hero",
+    "category_label": "히어로"
+  },
+  "Sword_Dash_RM": {
+    "style": "검 들고 돌진",
+    "movement": "hero",
+    "category": "hero",
+    "category_label": "히어로"
+  },
+  "Roll": {
+    "style": "구르기",
+    "movement": "hero",
+    "category": "hero",
+    "category_label": "히어로"
+  },
+  "Death01": {
+    "style": "타격 후 쓰러지기",
+    "movement": "combat",
+    "category": "combat",
+    "category_label": "전투"
+  },
+  "Hit_Chest": {
+    "style": "가슴 타격 반응",
+    "movement": "combat",
+    "category": "combat",
+    "category_label": "전투"
+  },
+  "Hit_Head": {
+    "style": "머리 타격 반응",
+    "movement": "combat",
+    "category": "combat",
+    "category_label": "전투"
+  },
+  "Hit_Knockback": {
+    "style": "맞고 뒤로 밀리기",
+    "movement": "combat",
+    "category": "combat",
+    "category_label": "전투"
+  },
+  "Hit_Knockback_RM": {
+    "style": "강한 타격에 날아가기",
+    "movement": "combat",
+    "category": "combat",
+    "category_label": "전투"
+  },
+  "Punch_Cross": {
+    "style": "크로스 펀치",
+    "movement": "combat",
+    "category": "combat",
+    "category_label": "전투"
+  },
+  "Punch_Enter": {
+    "style": "주먹 가드 진입",
+    "movement": "combat",
+    "category": "combat",
+    "category_label": "전투"
+  },
+  "Punch_Jab": {
+    "style": "잽",
+    "movement": "combat",
+    "category": "combat",
+    "category_label": "전투"
+  },
+  "Melee_Hook": {
+    "style": "훅 공격",
+    "movement": "combat",
+    "category": "combat",
+    "category_label": "전투"
+  },
+  "Melee_Hook_Rec": {
+    "style": "훅 공격 후 회복",
+    "movement": "combat",
+    "category": "combat",
+    "category_label": "전투"
+  },
+  "Idle_Shield_Break": {
+    "style": "방패 방어가 무너짐",
+    "movement": "combat",
+    "category": "combat",
+    "category_label": "전투"
+  },
+  "Sword_Block": {
+    "style": "검으로 막기",
+    "movement": "combat",
+    "category": "combat",
+    "category_label": "전투"
+  },
+  "Sword_Attack": {
+    "style": "검으로 베기",
+    "movement": "combat",
+    "category": "combat",
+    "category_label": "전투"
+  },
+  "Sword_Attack_RM": {
+    "style": "이동하며 검으로 베기",
+    "movement": "combat",
+    "category": "combat",
+    "category_label": "전투"
+  },
+  "Sword_Regular_A": {
+    "style": "검 가로 베기",
+    "movement": "combat",
+    "category": "combat",
+    "category_label": "전투"
+  },
+  "Sword_Regular_A_Rec": {
+    "style": "검 가로 베기 후 회복",
+    "movement": "combat",
+    "category": "combat",
+    "category_label": "전투"
+  },
+  "Sword_Regular_B": {
+    "style": "검 반대 방향 베기",
+    "movement": "combat",
+    "category": "combat",
+    "category_label": "전투"
+  },
+  "Sword_Regular_B_Rec": {
+    "style": "검 베기 후 자세 회복",
+    "movement": "combat",
+    "category": "combat",
+    "category_label": "전투"
+  },
+  "Sword_Regular_C": {
+    "style": "검 연속기 마무리",
+    "movement": "combat",
+    "category": "combat",
+    "category_label": "전투"
+  },
+  "Pistol_Aim_Down": {
+    "style": "권총 아래 조준",
+    "movement": "shooting",
+    "category": "shooting",
+    "category_label": "사격"
+  },
+  "Pistol_Aim_Neutral": {
+    "style": "권총 전방 조준",
+    "movement": "shooting",
+    "category": "shooting",
+    "category_label": "사격"
+  },
+  "Pistol_Aim_Up": {
+    "style": "권총 위 조준",
+    "movement": "shooting",
+    "category": "shooting",
+    "category_label": "사격"
+  },
+  "Pistol_Reload": {
+    "style": "권총 재장전",
+    "movement": "shooting",
+    "category": "shooting",
+    "category_label": "사격"
+  },
+  "Pistol_Shoot": {
+    "style": "권총 발사",
+    "movement": "shooting",
+    "category": "shooting",
+    "category_label": "사격"
+  },
+  "Spell_Simple_Shoot": {
+    "style": "한손 마법 발사",
+    "movement": "superpower",
+    "category": "superpower",
+    "category_label": "이능력"
+  },
+  "Zombie_Idle_Loop": {
+    "style": "좀비 대기",
+    "movement": "fantasy",
+    "category": "fantasy",
+    "category_label": "판타지"
+  },
+  "Zombie_Scratch": {
+    "style": "좀비 할퀴기",
+    "movement": "fantasy",
+    "category": "fantasy",
+    "category_label": "판타지"
+  },
+  "Zombie_Walk_Fwd_Loop": {
+    "style": "좀비 비틀거리며 걷기",
+    "movement": "fantasy",
+    "category": "fantasy",
+    "category_label": "판타지"
+  }
+}

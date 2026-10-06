@@ -16,6 +16,18 @@ VIEWS = {"front", "three_quarter", "side", "back"}
 PROJECT = Path(__file__).resolve().parents[2]
 
 
+def read_render_result(path: Path) -> dict:
+    """Windows can briefly deny reads while a worker replaces its result file."""
+    for attempt in range(5):
+        try:
+            return read_json(path)
+        except PermissionError:
+            if attempt == 4:
+                raise
+            time.sleep(0.1)
+    raise AssertionError("unreachable")
+
+
 def render_identity(character: Path, blender: Path) -> dict:
     character_hash = sha256(character)
     if character_hash != CHARACTER_SHA256:
@@ -81,7 +93,7 @@ def run(batch: Path, blender: Path, character: Path, *, workers: int = 2,
     pending = []
     for pose in poses:
         result_path = result_dir / f"{pose['pose_id']}.json"
-        if result_path.is_file() and apply_result(batch, pose, read_json(result_path), fingerprint, identity):
+        if result_path.is_file() and apply_result(batch, pose, read_render_result(result_path), fingerprint, identity):
             continue
         if result_path.is_file():
             result_path.unlink()  # retry only this invalid per-pose render result
@@ -123,7 +135,7 @@ def run(batch: Path, blender: Path, character: Path, *, workers: int = 2,
                     path = result_dir / f"{pid}.json"
                     if pid in seen or not path.is_file():
                         continue
-                    result = read_json(path)
+                    result = read_render_result(path)
                     if apply_result(batch, pose, result, fingerprint, identity):
                         progress["completed"] += 1
                         print(f"Character previews {progress['completed']}/{len(poses)}: {pid}", flush=True)

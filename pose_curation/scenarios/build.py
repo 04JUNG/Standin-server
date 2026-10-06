@@ -55,7 +55,7 @@ def set_hands(path, styles):
     write_single_frame_bvh(str(path), frame, str(path))
 
 
-def build(config_path, batch, *, pose_ids=None):
+def build(config_path, batch, *, pose_ids=None, reference=None):
     config_path, batch = Path(config_path), Path(batch)
     if (batch / "manifest.json").exists():
         raise ValueError("choose a new batch; reviewed revisions are immutable")
@@ -130,7 +130,7 @@ def build(config_path, batch, *, pose_ids=None):
     duplicates = [ids for ids in groups.values() if len(ids) > 1]
     if duplicates:
         raise ValueError(f"identical BVHs need explicit distinct targets: {duplicates}")
-    annotate(records, batch)
+    annotate(records, batch, reference=reference)
     projections = build_candidates(records, batch, batch.name)
     result = {
         "schema_version": 1,

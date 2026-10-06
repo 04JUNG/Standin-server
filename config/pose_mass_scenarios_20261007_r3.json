@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "rig_source": "data/curation/sources/quaternius/export-1/pool/combat_ual1_Punch_Cross_f00000.bvh",
+  "rig_sha256": "fd3d02eb9cb307eb0700f48ef4cc6d0a90fdf595c1f6c8b66bd40dd93844544b",
+  "scenes": [
+    {
+      "id": "mass_daily_floor_read_r3",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "바닥에 다리 뻗고 책 읽기",
+      "stance": "sit_open",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "support"
+      ],
+      "left_wrist": [
+        0.19,
+        0.34,
+        0.37
+      ],
+      "right_wrist": [
+        -0.19,
+        0.34,
+        0.37
+      ],
+      "height": -0.38,
+      "support": "",
+      "overrides": {
+        "left_leg": [
+          [
+            0.23,
+            0.12,
+            0.65
+          ],
+          [
+            0.25,
+            0.36,
+            0.49
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.23,
+            0.12,
+            0.65
+          ],
+          [
+            -0.25,
+            0.36,
+            0.49
+          ]
+        ],
+        "left_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 0
+        },
+        "right_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 0
+        }
+      },
+      "revision_reason": "4방향 시각 검수: 바닥 앉기에서 엉덩이가 떠 있어 골반 높이를 낮춤."
+    },
+    {
+      "id": "mass_daily_floor_one_knee_r3",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "바닥에 한 무릎 세우고 쉬기",
+      "stance": "sit_open",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ],
+      "left_wrist": [
+        0.25,
+        0.37,
+        0.36
+      ],
+      "right_wrist": [
+        -0.34,
+        0.06,
+        0.04
+      ],
+      "height": -0.38,
+      "support": "",
+      "overrides": {
+        "left_leg": [
+          [
+            0.25,
+            0.13,
+            0.4
+          ],
+          [
+            0.29,
+            0.45,
+            0.43
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.31,
+            0.14,
+            0.63
+          ],
+          [
+            -0.35,
+            0.36,
+            0.46
+          ]
+        ],
+        "right_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 0
+        }
+      },
+      "revision_reason": "골반을 바닥 앉기 높이로 낮추고 왼손을 세운 무릎 위로 이동."
+    },
+    {
+      "id": "mass_basketball_low_dribble_r3",
+      "category": "sports",
+      "category_label": "스포츠",
+      "label": "농구 낮은 드리블",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.35,
+        0.35,
+        0.23
+      ],
+      "right_wrist": [
+        -0.32,
+        0.0,
+        0.35
+      ],
+      "lean": 10,
+      "nod": 12,
+      "revision_reason": "두 번째 시안의 오른손 도달 5.99cm 초과를 몸 전체의 전방 숙임으로 보정.",
+      "root_xyz": [
+        25,
+        0,
+        0
+      ]
+    }
+  ]
+}

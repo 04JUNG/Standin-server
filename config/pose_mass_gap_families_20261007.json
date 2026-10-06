@@ -1,0 +1,17 @@
+{
+  "minimum_net_additions": 100,
+  "families": [
+    {"family": "basketball", "label": "농구", "pattern": "basketball|농구"},
+    {"family": "volleyball", "label": "배구", "pattern": "volleyball|배구"},
+    {"family": "racket_sports", "label": "테니스·배드민턴", "pattern": "tennis|badminton|테니스|배드민턴"},
+    {"family": "baseball", "label": "야구", "pattern": "baseball|야구"},
+    {"family": "golf", "label": "골프", "pattern": "golf|골프"},
+    {"family": "winter_sports", "label": "빙상·스키·보드", "pattern": "skating|ski_|snowboard|스케이팅|스키|스노보드"},
+    {"family": "athletic_transitions", "label": "도약·착지·방향 전환", "pattern": "hop|leap|landing|sidestep|change.direction|도약|착지|방향 전환|사이드스텝"},
+    {"family": "ground_life", "label": "바닥 생활·기어가기", "pattern": "crawl|lie.to|crouch.to.lie|floor.read|floor.one.knee|기어가기|바닥에|누웠다가|누운 자세"},
+    {"family": "daily_chores", "label": "가사·몸단장", "pattern": "vacuum|ironing|laundry|sweep.floor|window.wipe|shoe|lace|towel.hair|청소기|다리미|빨래|창문 닦기|신발|신발끈|머리 닦기"},
+    {"family": "superpowers", "label": "이능력·방출·염동력", "pattern": "superpower|power_|염동력|방어막|에너지|이능력|방출"},
+    {"family": "hero_flight", "label": "히어로 비행·공중 회피·구조", "pattern": "hero_|비행|공중 회피|공중에서 구조|hover"},
+    {"family": "martial_phases", "label": "무술 공격·회피·가드 국면", "pattern": "kick|punch|jab|hook|dodge|backfist|가드|차기|잽|훅|어퍼컷"}
+  ]
+}
