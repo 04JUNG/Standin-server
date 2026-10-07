@@ -518,3 +518,10 @@ BFF가 저장한 값을 Converter로 전달한다. `rotation`은 원본 BVH Y-up
 원래 방향이며, 새 카메라를 구 4방향 정적 썸네일로 대신 표현해서는 안 된다.
 관측이 부족하거나 정면이 모호하면 camera=null이다. 구 작업은 기존 동작을 유지한다.
 세부 내용: [후보 카메라](CANDIDATE_CAMERA_ALIGNMENT.md).
+
+## Precomputed candidate previews
+
+The internal converter additionally serves read-only
+`GET /pose-preview/{source_sha}?character_id=...` (`model/gltf-binary`).
+It never runs inference or Blender. Configuration, identity, failure behavior
+and client/BFF integration are specified in [PRECOMPUTED_POSE_PREVIEWS.md](PRECOMPUTED_POSE_PREVIEWS.md).
