@@ -71,6 +71,7 @@ from api.models import (CutResultOut, PersonOut, CandidateOut, SkeletonOut,
                         ImageInfoOut, InferenceMetadataOut,
                         RefineRequest, RefineResponse, RefineThumbnailOut,
                         ExportOrderRequest, ExportOrder, ExportItem)
+from api.candidate_presentation import candidate_camera, refine_in_camera
 
 # uvicorn이 자기 로깅을 세운 뒤 이 모듈을 import한다. 여기서 덮어써야 로그가
 # JSON 한 종류로 남는다(그대로 두면 uvicorn 형식과 우리 형식이 섞인다).
@@ -528,6 +529,7 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
                 tags=c.tags, rerank_score=c.rerank_score,
                 bvh_url=f"/pose/{c.pose_id}/bvh",
                 thumbnail_url=thumbnail_url(CFG.data_dir, c.pose_id, c.view.value),
+                camera=candidate_camera(STATE.get("db_path"), c, desc),
             ) for c in cands],
             # 이미 추출한 스켈레톤을 실어 보낸다(연산 추가 0) → /refine이 순수 함수가 된다.
             keypoints=np.asarray(skel.keypoints, dtype=float).reshape(-1, 2).tolist()
@@ -682,6 +684,7 @@ def _refine_thumbnail(
     bvh_text: Optional[str] = None,
     pose_id: Optional[str] = None,
     refined: Optional[bool] = None,
+    camera_rotation: Optional[list] = None,
 ) -> Optional[RefineThumbnailOut]:
     """Render the selected candidate view without persisting a refined artifact.
 
@@ -697,6 +700,7 @@ def _refine_thumbnail(
     source = ThumbnailSource(
         view=view, bvh_path=bvh_path, bvh_text=bvh_text, pose_id=pose_id,
         refined=(bvh_text is not None) if refined is None else bool(refined),
+        camera_rotation=camera_rotation,
     )
     started = time.monotonic()
     try:
@@ -774,6 +778,9 @@ def refine(req: RefineRequest):
         raise HTTPException(
             409, f"pose '{req.pose_id}'의 BVH를 파싱할 수 없습니다: {exc}"
         ) from exc
+    if req.camera and req.camera.source_bvh_sha256 != _file_sha256(base):
+        # Also validate before policy/base fallbacks, which can render a preview.
+        raise HTTPException(422, "candidate camera source changed; analyze again")
 
     def _base_context() -> dict:
         return {
@@ -791,6 +798,7 @@ def refine(req: RefineRequest):
             reason=reason, bvh_url=f"/pose/{req.pose_id}/bvh", bvh=None,
             thumbnail=_refine_thumbnail(
                 view=req.view, bvh_path=base, pose_id=req.pose_id, refined=False,
+                camera_rotation=req.camera.rotation if req.camera else None,
             ),
             loss_base=None, loss_final=None, gain=None, backend="none",
             refine_version=(REFINE_V2_CODE_VERSION if CFG.refine_v2_enabled
@@ -852,7 +860,8 @@ def refine(req: RefineRequest):
     try:
         # out_path=None → 로컬 파일을 쓰지 않는다. selector는 내부 임시파일로 최종
         # 후보를 재검증하고, 채택본의 본문만 응답으로 나간다.
-        res = refine_bvh(base, req.keypoints, req.scores, req.view,
+        res = refine_in_camera(refine_bvh, base, req.keypoints, req.scores, req.view,
+                         camera=req.camera,
                          out_path=None, search_distance=req.search_distance,
                          # 하체 비관측이면 정책 단계에서 이미 걸러낸 목록을 넘긴다.
                          # v2는 내부에서 한 번 더 막지만, REFINE_V2_ENABLED=0으로
@@ -893,10 +902,12 @@ def refine(req: RefineRequest):
         thumbnail=(
             _refine_thumbnail(
                 view=req.view, bvh_text=res.bvh_text, pose_id=req.pose_id, refined=True,
+                camera_rotation=req.camera.rotation if req.camera else None,
             )
             if res.refined
             else _refine_thumbnail(
                 view=req.view, bvh_path=base, pose_id=req.pose_id, refined=False,
+                camera_rotation=req.camera.rotation if req.camera else None,
             )
         ),
         loss_base=None if np.isnan(res.loss_base) else res.loss_base,

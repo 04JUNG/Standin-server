@@ -506,3 +506,15 @@ OpenAPI 자동 문서: 서버 기동 후 **`http://127.0.0.1:8000/docs`**. 이 �
 - `output_scope`는 출력 메타데이터다. 수동 설정으로 관측/검색/refine 정책을 바꾸지 않는다.
 - 기존 full-body 피처 버전/DB/BVH/export 계약은 그대로다. 자세한 기준과 제한은
   [BODY_SCOPE.md](BODY_SCOPE.md)의 2단계를 참조한다.
+# 후보 표시 카메라 (2026-10-07 추가)
+
+`CandidateOut.camera`는 선택적 `candidate-camera-v1` 메타데이터다. 기존 `view`는
+검색 투영 식별자로 유지된다. 화면에는 `camera.display_view`를 사용하고, 회전행렬은
+BFF가 저장한 값을 Converter로 전달한다. `rotation`은 원본 BVH Y-up 좌표에서 고정
+정면 카메라 좌표로 가는 3×3 proper rotation이다. 원본은 `source_bvh_sha256`으로 묶인다.
+
+`POST /refine`에 같은 `camera`를 전달하면 카메라 좌표에서 조정한 후 BVH를 원래
+좌표로 복구한다. SHA가 달라지면 422로 거절한다. 카메라 유무와 관계없이 BVH 다운로드는
+원래 방향이며, 새 카메라를 구 4방향 정적 썸네일로 대신 표현해서는 안 된다.
+관측이 부족하거나 정면이 모호하면 camera=null이다. 구 작업은 기존 동작을 유지한다.
+세부 내용: [후보 카메라](CANDIDATE_CAMERA_ALIGNMENT.md).

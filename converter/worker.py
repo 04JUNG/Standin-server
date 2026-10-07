@@ -101,7 +101,7 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
         "apply_root_translation", "embed_textures",
         "force_exact_v324", "thumbnail",
     }
-    unknown = set(raw) - required - {"output_scope", "preview_view"}
+    unknown = set(raw) - required - {"output_scope", "preview_view", "camera_rotation"}
     missing = required - set(raw)
     if missing or unknown:
         raise JobValidationError(
@@ -133,6 +133,15 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
     except (TypeError, ValueError) as exc:
         raise JobValidationError("invalid output_scope") from exc
     preview_view = raw.get("preview_view")
+    from converter.camera import validate_rotation
+    try:
+        camera_rotation = validate_rotation(raw.get("camera_rotation"))
+    except ValueError as exc:
+        raise JobValidationError(str(exc)) from exc
+    if camera_rotation is not None and (preview_view != "front" or raw["mirror"] or raw["thumbnail"]):
+        raise JobValidationError("aligned output requires front preview without mirror/anatomical thumbnail")
+    if camera_rotation is not None and raw["force_exact_v324"]:
+        raise JobValidationError("exact V3.2.4 mode does not permit camera rotation")
     if preview_view is not None and preview_view not in PREVIEW_VIEWS:
         raise JobValidationError("invalid preview_view")
     if raw["force_exact_v324"] and output_scope != "full":
@@ -168,6 +177,7 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
     normalized.update({
         "output_scope": output_scope,
         "preview_view": preview_view,
+        "camera_rotation": camera_rotation,
         "temp_dir": str(temp_dir),
         "bvh_path": str(bvh_path),
         "character_fbx": str(character),
@@ -317,7 +327,9 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
         payload["framing"] = process_output(
             job["output_path"], scope, preview_path=preview_path,
             view=preview_view or "front",
+            camera_rotation=job.get("camera_rotation"),
         )
+        payload["camera_rotation"] = job.get("camera_rotation")
         payload["output_scope"] = scope
         payload["framing_version"] = FRAMING_VERSION
         if preview_path:

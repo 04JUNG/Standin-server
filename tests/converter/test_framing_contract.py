@@ -19,6 +19,7 @@ class FramedRunner(FakeRunner):
         result = super().convert(**kwargs)
         preview = b"\x89PNG\r\n\x1a\nfixture"
         report = {**result.report, "output_scope": kwargs["output_scope"],
+                  "camera_rotation": kwargs.get("camera_rotation"),
                   "framing_version": FRAMING_VERSION, "preview_view": kwargs["preview_view"],
                   "preview_sha256": hashlib.sha256(preview).hexdigest(), "preview_size": len(preview)}
         if self.corrupt:
@@ -72,3 +73,25 @@ def test_anatomical_regions_keep_hands_only_in_half():
     assert 'hand.L' not in retained_roles('bust')
     assert retained_roles('head') == {'head'}
     assert 'upperleg.L' not in retained_roles('half')
+
+
+def test_aligned_pair_preserves_exact_requested_rotation(tmp_path):
+    rotation = [[0, 0, -1], [0, 1, 0], [1, 0, 0]]
+    runner = FramedRunner()
+    response = post(_client(tmp_path, runner=runner), camera_rotation=json.dumps(rotation))
+    assert response.status_code == 200, response.text
+    assert response.json()['camera_rotation'] == rotation
+    assert runner.calls[0]['camera_rotation'] == rotation
+
+
+@pytest.mark.parametrize('rotation', ['null', 'NaN', '[1,2,3]', '[[1,0,0],[0,1,0],[0,0,-1]]'])
+def test_invalid_camera_never_calls_blender(tmp_path, rotation):
+    runner = FramedRunner()
+    assert post(_client(tmp_path, runner=runner), camera_rotation=rotation).status_code == 400
+    assert not runner.calls
+
+
+def test_converter_cannot_silently_ignore_camera(tmp_path):
+    runner = FramedRunner(); runner.corrupt = 'camera_rotation'
+    rotation = [[0, 0, -1], [0, 1, 0], [1, 0, 0]]
+    assert post(_client(tmp_path, runner=runner), camera_rotation=json.dumps(rotation)).status_code == 500
