@@ -778,6 +778,9 @@ def refine(req: RefineRequest):
         raise HTTPException(
             409, f"pose '{req.pose_id}'의 BVH를 파싱할 수 없습니다: {exc}"
         ) from exc
+    if req.camera and req.camera.source_bvh_sha256 != _file_sha256(base):
+        # Also validate before policy/base fallbacks, which can render a preview.
+        raise HTTPException(422, "candidate camera source changed; analyze again")
 
     def _base_context() -> dict:
         return {

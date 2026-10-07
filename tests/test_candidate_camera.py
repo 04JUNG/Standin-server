@@ -97,3 +97,31 @@ def test_sparse_observation_does_not_invent_camera(monkeypatch, tmp_path):
     monkeypatch.setattr(camera, '_source', lambda *args: (points, np.ones(17), 0, 'a'*64))
     scores = np.zeros(17); scores[:7] = 1
     assert camera.fit_camera(path, points[:, :2], scores, 'front') is None
+
+
+def test_refine_uses_display_frame_then_restores_output_root(tmp_path):
+    from src.refine import RefineResult
+    path = tmp_path / 'pose.bvh'; bvh_file(path, 'ZXY')
+    joints, original = parse_bvh(str(path))
+    matrix = camera.camera_matrix(137, 24, -11)
+    spec = SimpleNamespace(rotation=matrix.tolist(),
+                           source_bvh_sha256=hashlib.sha256(path.read_bytes()).hexdigest())
+
+    def solver(aligned, keypoints, scores, view, **kwargs):
+        assert view == 'front'
+        jj, ff = parse_bvh(aligned)
+        before, display = fk(joints, original[0]), fk(jj, ff[0])
+        for i, position in before.items():
+            assert np.allclose(display[i], matrix @ (position-before[0]) + before[0])
+        # A real solver changes local limb channels; the wrapper must retain it.
+        text = Path(aligned).read_text()
+        values = text.splitlines()[-1].split(); values[6] = str(float(values[6]) + 7)
+        text = '\n'.join(text.splitlines()[:-1]) + '\n' + ' '.join(values) + '\n'
+        return RefineResult(True, 'ok', None, .2, .1, 1, 'test', bvh_text=text)
+
+    result = refine_in_camera(solver, str(path), [], [], 'back', camera=spec)
+    restored = tmp_path/'output.bvh'; restored.write_text(result.bvh_text)
+    jj, ff = parse_bvh(str(restored))
+    expected = original[0].copy(); expected[6] += 7
+    for i, position in fk(joints, expected).items():
+        assert np.allclose(fk(jj, ff[0])[i], position)
