@@ -327,6 +327,30 @@ def create_app(
     app.state.runner = blender_runner
     app.state.max_bvh_bytes = size_limit
 
+    from converter_api.preview_models import PreviewModelStore
+    from converter.preview_model import MODEL_VERSION
+    preview_models = PreviewModelStore()
+    app.state.preview_models = preview_models
+
+    @app.get("/pose-preview/{source_sha}")
+    def pose_preview(source_sha: str, character_id: str = "standin-master-v2"):
+        if not SHA256_RE.fullmatch(source_sha):
+            raise ApiProblem(400, "INVALID_INPUT", "invalid source digest")
+        try:
+            metadata = character_registry.metadata(character_id)
+            data, manifest = preview_models.get(source_sha, metadata.sha256)
+        except (FileNotFoundError, UnknownCharacterError):
+            raise ApiProblem(404, "PREVIEW_NOT_READY", "precomputed model unavailable")
+        except Exception:
+            raise ApiProblem(503, "PREVIEW_UNAVAILABLE", "preview model unavailable")
+        return StreamingResponse(io.BytesIO(data), media_type="model/gltf-binary", headers={
+            "Content-Length": str(len(data)), "Cache-Control": "private, no-store",
+            "X-Standin-Model-Version": MODEL_VERSION,
+            "X-Standin-Artifact-SHA256": manifest["sha256"],
+            "X-Standin-Character-SHA256": metadata.sha256,
+            "X-Standin-Source-BVH-SHA256": source_sha,
+        })
+
     @app.exception_handler(ApiProblem)
     async def api_problem_handler(request: Request, exc: ApiProblem):
         _structured_log(
