@@ -12,6 +12,25 @@ from src.body_scope import BodyScope
 from src.schema import Action, Relationship, Shot, View
 
 
+class CandidateCamera(BaseModel):
+    version: Literal["candidate-camera-v1"]
+    rotation: List[List[float]]
+    source_bvh_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    reference: Literal["pelvis-torso-yaw"]
+    canonical_yaw: float
+    display_view: Literal["front", "back", "side", "three_quarter"]
+    status: Literal["fitted", "canonical_fallback"]
+    fit_error: float
+    facing_source: Literal["person_observation", "geometry_only"]
+    depth_ambiguous: bool
+
+    @field_validator("rotation", mode="before")
+    @classmethod
+    def _rotation(cls, value):
+        from converter.camera import validate_rotation
+        return validate_rotation(value)
+
+
 class CandidateOut(BaseModel):
     pose_id: str
     view: str
@@ -20,6 +39,7 @@ class CandidateOut(BaseModel):
     rerank_score: Optional[float] = None
     bvh_url: str = Field(..., description="동원 내보내기 팀이 받는 라이브러리 BVH 다운로드 경로")
     thumbnail_url: Optional[str] = Field(None, description="후보 시점 PNG 썸네일의 내부 다운로드 경로")
+    camera: Optional[CandidateCamera] = None
 
 
 Point2D = Annotated[List[float], Field(min_length=2, max_length=2)]
@@ -59,7 +79,7 @@ class ScopeDetectionOut(BaseModel):
 
 
 class PersonTagsOut(BaseModel):
-    """인물별 action·view. 기록용이며 검색·라우팅·refine에 쓰지 않는다(src/person_tags.py)."""
+    """인물별 관측 태그. 검색에는 미사용; view는 API의 표시 카메라 제약에만 사용."""
     action: Optional[Action] = None
     view: Optional[View] = None
     source: Literal["vlm_person", "legacy_cut", "unknown"] = "unknown"
@@ -132,6 +152,7 @@ class CutResultOut(BaseModel):
 # 작가가 Top-K 중 '고른 1개'만 러프에 맞춰 조정한다. 계산은 커밋된 포즈에만 든다.
 
 class RefineRequest(BaseModel):
+    camera: Optional[CandidateCamera] = None
     pose_id: str = Field(..., description="작가가 고른 후보의 pose_id")
     view: Literal["front", "three_quarter", "side", "back"] = Field(
         ..., description="그 후보의 view(=매칭된 투영 각도)")
