@@ -1,0 +1,480 @@
+{
+  "body_matching": {
+    "schema_version": "body-match.v1",
+    "mode": "shadow",
+    "status": "ok",
+    "people": [
+      {
+        "person_index": 0,
+        "person_id": "869d654dd4b086e6ef4b1c3b079a7e4d1c118c33016a66007b7e57b5b4b98807:p0",
+        "auto_body_id": "muscular",
+        "applied_body_id": null,
+        "selected_asset": {
+          "body_id": "muscular",
+          "body_version": "v1",
+          "asset_sha256": "2c7fcfa711c033e852bad2a4253e5546fdf16ded6ae8411dc514951809902ded",
+          "rig_version": "fixture",
+          "measurement_version": "fixture.v1"
+        },
+        "selection_source": "auto_best_effort",
+        "selection_state": "selected",
+        "diagnostic": "uncertain",
+        "reason_codes": [
+          "presentation_unresolved_default_is_not_gender_detection",
+          "target_projection_missing_geometry_not_scored",
+          "uncalibrated_rank_score",
+          "library_coverage_unvalidated"
+        ],
+        "acceptance_probability": null,
+        "candidates": [
+          {
+            "body_id": "muscular",
+            "body_version": "v1",
+            "rank": 1,
+            "rank_score": 0.0,
+            "acceptance_probability": null,
+            "score_spread": 0.0
+          },
+          {
+            "body_id": "regular",
+            "body_version": "v1",
+            "rank": 2,
+            "rank_score": 0.21428571428571427,
+            "acceptance_probability": null,
+            "score_spread": 0.0
+          },
+          {
+            "body_id": "slim",
+            "body_version": "v1",
+            "rank": 3,
+            "rank_score": 0.25,
+            "acceptance_probability": null,
+            "score_spread": 0.0
+          }
+        ],
+        "observations": {
+          "schema_version": "body-observation.v3.presentation",
+          "person_id": "869d654dd4b086e6ef4b1c3b079a7e4d1c118c33016a66007b7e57b5b4b98807:p0",
+          "attributes": {
+            "head_ratio_class": {
+              "value": "h7",
+              "visibility": "visible",
+              "evidence": "fixture"
+            },
+            "body_build": {
+              "value": "muscular",
+              "visibility": "visible",
+              "evidence": "fixture"
+            },
+            "frame_width": {
+              "value": "regular",
+              "visibility": "visible",
+              "evidence": "fixture"
+            },
+            "limb_proportion": {
+              "value": "regular",
+              "visibility": "visible",
+              "evidence": "fixture"
+            },
+            "muscularity_visual": {
+              "value": 3,
+              "visibility": "visible",
+              "evidence": "fixture"
+            },
+            "soft_volume": {
+              "value": 1,
+              "visibility": "visible",
+              "evidence": "fixture"
+            },
+            "volume_distribution": {
+              "value": "even",
+              "visibility": "visible",
+              "evidence": "fixture"
+            }
+          },
+          "geometry": {
+            "shoulder_torso": 0.6666666666666666,
+            "hip_torso": 0.3333333333333333,
+            "left_arm_torso": 0.873682026727274,
+            "right_arm_torso": 0.873682026727274,
+            "left_leg_torso": 1.3349989596333858,
+            "right_leg_torso": 1.3349989596333858
+          },
+          "geometry_version": "body-projected-ratios.v1",
+          "clothing_occlusion": false,
+          "foreshortening": false,
+          "ownership_ambiguous": false,
+          "crop_box": [
+            0,
+            0,
+            100,
+            200
+          ],
+          "provider_error": null,
+          "reason_codes": [],
+          "coverage": null,
+          "full_body_visible": null,
+          "presentation": null
+        },
+        "pose_bindings": [
+          {
+            "pose_id": "pose-0",
+            "view": "front",
+            "pose_sha256": "d1983cfb5a41d1e65cf0814e8b7a6899278cbf37b2e95561b7868b61dba078e0"
+          },
+          {
+            "pose_id": "pose-1",
+            "view": "front",
+            "pose_sha256": "db8c592a0acdc6092b97311ea26a917838172b136ecb0c1328c7304448788c19"
+          },
+          {
+            "pose_id": "pose-2",
+            "view": "front",
+            "pose_sha256": "141ea0fc2d79d1381a283903d66295acb239f1c5c23c591571e2c0b67a80a24e"
+          },
+          {
+            "pose_id": "pose-3",
+            "view": "front",
+            "pose_sha256": "10573785231566612108576252d3ecd8f2610597ebbd1eae09c8537cc47b4c9e"
+          },
+          {
+            "pose_id": "pose-4",
+            "view": "front",
+            "pose_sha256": "512d6f47f52976caf797594653eed6797bea2b3ca886a1f1970b099ddcbe5a16"
+          }
+        ],
+        "render_required": false,
+        "manual_change_scope": "current_cut_person",
+        "presentation_selection": {
+          "observed": null,
+          "visibility": "unknown",
+          "mode": "unresolved",
+          "reason_codes": [
+            "presentation_unresolved_default_is_not_gender_detection"
+          ],
+          "eligible_before": 4,
+          "eligible_after": 4
+        },
+        "tied_body_ids": [
+          "muscular"
+        ],
+        "scorer_version": "body-score.v2.presentation-gate.uncalibrated",
+        "calibrator_version": null,
+        "geometry_hypotheses": [],
+        "evidence_axes": [
+          "head_ratio_class",
+          "body_build",
+          "frame_width",
+          "limb_proportion",
+          "muscularity_visual",
+          "soft_volume",
+          "volume_distribution"
+        ]
+      }
+    ],
+    "reason": null,
+    "input_sha256": "869d654dd4b086e6ef4b1c3b079a7e4d1c118c33016a66007b7e57b5b4b98807",
+    "catalog_version": "test.v1",
+    "catalog_sha256": "f8b65d3df7bd2e9c5d16b898675b13b5be836f1fc6b7632e8ef03cb02d23509b",
+    "prompt_version": "body-attributes.v3.presentation",
+    "provider_requested": "mock",
+    "provider_actual": "recorded_test",
+    "model": "fixture.v1",
+    "is_mock": false,
+    "pose_order_preserved": true,
+    "rendering_executed": false,
+    "elapsed_ms": 1.114,
+    "catalog_issues": []
+  },
+  "route": "core",
+  "count_confidence": "high",
+  "detector_count": 1,
+  "vlm_count": 1,
+  "people": [
+    {
+      "index": 0,
+      "box": [
+        0.0,
+        0.0,
+        100.0,
+        200.0
+      ],
+      "tags": {
+        "shot": "full_half",
+        "action": "standing",
+        "view": "front",
+        "relationship": "solo"
+      },
+      "skeleton": {
+        "schema_version": "coco17-v1",
+        "keypoints": [
+          [
+            50.0,
+            10.0
+          ],
+          [
+            50.0,
+            10.0
+          ],
+          [
+            50.0,
+            10.0
+          ],
+          [
+            50.0,
+            10.0
+          ],
+          [
+            50.0,
+            10.0
+          ],
+          [
+            30.0,
+            40.0
+          ],
+          [
+            70.0,
+            40.0
+          ],
+          [
+            20.0,
+            65.0
+          ],
+          [
+            80.0,
+            65.0
+          ],
+          [
+            15.0,
+            90.0
+          ],
+          [
+            85.0,
+            90.0
+          ],
+          [
+            40.0,
+            100.0
+          ],
+          [
+            60.0,
+            100.0
+          ],
+          [
+            38.0,
+            140.0
+          ],
+          [
+            62.0,
+            140.0
+          ],
+          [
+            36.0,
+            180.0
+          ],
+          [
+            64.0,
+            180.0
+          ]
+        ],
+        "scores": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "candidates": [
+        {
+          "pose_id": "pose-0",
+          "view": "front",
+          "distance": 0.0,
+          "tags": {},
+          "rerank_score": null,
+          "bvh_url": "/pose/pose-0/bvh",
+          "thumbnail_url": null
+        },
+        {
+          "pose_id": "pose-1",
+          "view": "front",
+          "distance": 1.0,
+          "tags": {},
+          "rerank_score": null,
+          "bvh_url": "/pose/pose-1/bvh",
+          "thumbnail_url": null
+        },
+        {
+          "pose_id": "pose-2",
+          "view": "front",
+          "distance": 2.0,
+          "tags": {},
+          "rerank_score": null,
+          "bvh_url": "/pose/pose-2/bvh",
+          "thumbnail_url": null
+        },
+        {
+          "pose_id": "pose-3",
+          "view": "front",
+          "distance": 3.0,
+          "tags": {},
+          "rerank_score": null,
+          "bvh_url": "/pose/pose-3/bvh",
+          "thumbnail_url": null
+        },
+        {
+          "pose_id": "pose-4",
+          "view": "front",
+          "distance": 4.0,
+          "tags": {},
+          "rerank_score": null,
+          "bvh_url": "/pose/pose-4/bvh",
+          "thumbnail_url": null
+        }
+      ],
+      "keypoints": [
+        [
+          50.0,
+          10.0
+        ],
+        [
+          50.0,
+          10.0
+        ],
+        [
+          50.0,
+          10.0
+        ],
+        [
+          50.0,
+          10.0
+        ],
+        [
+          50.0,
+          10.0
+        ],
+        [
+          30.0,
+          40.0
+        ],
+        [
+          70.0,
+          40.0
+        ],
+        [
+          20.0,
+          65.0
+        ],
+        [
+          80.0,
+          65.0
+        ],
+        [
+          15.0,
+          90.0
+        ],
+        [
+          85.0,
+          90.0
+        ],
+        [
+          40.0,
+          100.0
+        ],
+        [
+          60.0,
+          100.0
+        ],
+        [
+          38.0,
+          140.0
+        ],
+        [
+          62.0,
+          140.0
+        ],
+        [
+          36.0,
+          180.0
+        ],
+        [
+          64.0,
+          180.0
+        ]
+      ],
+      "scores": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "raw_scores": null,
+      "confidence": "low",
+      "skeleton_state": "valid",
+      "skeleton_source": "full_image",
+      "coverage_class": "full",
+      "slot_origin": "detector",
+      "search_stability": null,
+      "distance_metric": null,
+      "rank_distance": null,
+      "confidence_threshold": null,
+      "valid_limbs": [],
+      "refinable_limbs": [],
+      "lower_body_observed": false,
+      "refine_allowed": true,
+      "quality_trace": {},
+      "quality_reasons": [],
+      "output_scope": {
+        "detected": null,
+        "source": "unknown"
+      },
+      "person_tags": {
+        "action": null,
+        "view": null,
+        "source": "unknown"
+      }
+    }
+  ],
+  "notes": [],
+  "image": {
+    "width": 200,
+    "height": 200
+  },
+  "inference_metadata": {
+    "deployment_version": "development",
+    "vlm_provider": "mock",
+    "vlm_model": "mock",
+    "vlm_prompt_version": "p1-scope",
+    "pose_backend": "mock",
+    "pose_model_version": "runtime-default",
+    "pose_library_version": "v1",
+    "feature_version": 1,
+    "pose_library_sha256": null
+  },
+  "vlm_tags": null
+}

@@ -1,0 +1,2678 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Standin Pose Pipeline",
+    "version": "0.2.1"
+  },
+  "paths": {
+    "/analyze": {
+      "post": {
+        "summary": "Analyze",
+        "operationId": "analyze_analyze_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_analyze_analyze_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CutResultOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Action": {
+        "type": "string",
+        "enum": [
+          "standing",
+          "sitting",
+          "walking",
+          "running",
+          "reaching",
+          "lying",
+          "other"
+        ],
+        "title": "Action"
+      },
+      "BodyAssetRef": {
+        "properties": {
+          "body_id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Body Id"
+          },
+          "body_version": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Body Version"
+          },
+          "asset_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Asset Sha256"
+          },
+          "rig_version": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Rig Version"
+          },
+          "measurement_version": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Measurement Version"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "body_id",
+          "body_version",
+          "asset_sha256",
+          "rig_version",
+          "measurement_version"
+        ],
+        "title": "BodyAssetRef"
+      },
+      "BodyAttributeOut_Annotated_int__FieldInfo_annotation_NoneType__required_True__metadata__Strict_strict_True___Ge_ge_0___Le_le_4_____": {
+        "properties": {
+          "value": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 4.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "visible",
+              "uncertain",
+              "unknown"
+            ],
+            "title": "Visibility"
+          },
+          "evidence": {
+            "type": "string",
+            "title": "Evidence"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "value",
+          "visibility",
+          "evidence"
+        ],
+        "title": "BodyAttributeOut[Annotated[int, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), Ge(ge=0), Le(le=4)])]]"
+      },
+      "BodyAttributeOut_Literal__even____abdomen____lower_body___": {
+        "properties": {
+          "value": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "even",
+                  "abdomen",
+                  "lower_body"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "visible",
+              "uncertain",
+              "unknown"
+            ],
+            "title": "Visibility"
+          },
+          "evidence": {
+            "type": "string",
+            "title": "Evidence"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "value",
+          "visibility",
+          "evidence"
+        ],
+        "title": "BodyAttributeOut[Literal['even', 'abdomen', 'lower_body']]"
+      },
+      "BodyAttributeOut_Literal__h3____h4____h5____h6____h7____h8___": {
+        "properties": {
+          "value": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "h3",
+                  "h4",
+                  "h5",
+                  "h6",
+                  "h7",
+                  "h8"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "visible",
+              "uncertain",
+              "unknown"
+            ],
+            "title": "Visibility"
+          },
+          "evidence": {
+            "type": "string",
+            "title": "Evidence"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "value",
+          "visibility",
+          "evidence"
+        ],
+        "title": "BodyAttributeOut[Literal['h3', 'h4', 'h5', 'h6', 'h7', 'h8']]"
+      },
+      "BodyAttributeOut_Literal__narrow____regular____broad___": {
+        "properties": {
+          "value": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "narrow",
+                  "regular",
+                  "broad"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "visible",
+              "uncertain",
+              "unknown"
+            ],
+            "title": "Visibility"
+          },
+          "evidence": {
+            "type": "string",
+            "title": "Evidence"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "value",
+          "visibility",
+          "evidence"
+        ],
+        "title": "BodyAttributeOut[Literal['narrow', 'regular', 'broad']]"
+      },
+      "BodyAttributeOut_Literal__short____regular____long___": {
+        "properties": {
+          "value": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "short",
+                  "regular",
+                  "long"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "visible",
+              "uncertain",
+              "unknown"
+            ],
+            "title": "Visibility"
+          },
+          "evidence": {
+            "type": "string",
+            "title": "Evidence"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "value",
+          "visibility",
+          "evidence"
+        ],
+        "title": "BodyAttributeOut[Literal['short', 'regular', 'long']]"
+      },
+      "BodyAttributeOut_Literal__small_frame____slim____regular____athletic____muscular____chubby____large_frame___": {
+        "properties": {
+          "value": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "small_frame",
+                  "slim",
+                  "regular",
+                  "athletic",
+                  "muscular",
+                  "chubby",
+                  "large_frame"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "visible",
+              "uncertain",
+              "unknown"
+            ],
+            "title": "Visibility"
+          },
+          "evidence": {
+            "type": "string",
+            "title": "Evidence"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "value",
+          "visibility",
+          "evidence"
+        ],
+        "title": "BodyAttributeOut[Literal['small_frame', 'slim', 'regular', 'athletic', 'muscular', 'chubby', 'large_frame']]"
+      },
+      "BodyAttributesOut": {
+        "properties": {
+          "head_ratio_class": {
+            "$ref": "#/components/schemas/BodyAttributeOut_Literal__h3____h4____h5____h6____h7____h8___"
+          },
+          "body_build": {
+            "$ref": "#/components/schemas/BodyAttributeOut_Literal__small_frame____slim____regular____athletic____muscular____chubby____large_frame___"
+          },
+          "frame_width": {
+            "$ref": "#/components/schemas/BodyAttributeOut_Literal__narrow____regular____broad___"
+          },
+          "limb_proportion": {
+            "$ref": "#/components/schemas/BodyAttributeOut_Literal__short____regular____long___"
+          },
+          "muscularity_visual": {
+            "$ref": "#/components/schemas/BodyAttributeOut_Annotated_int__FieldInfo_annotation_NoneType__required_True__metadata__Strict_strict_True___Ge_ge_0___Le_le_4_____"
+          },
+          "soft_volume": {
+            "$ref": "#/components/schemas/BodyAttributeOut_Annotated_int__FieldInfo_annotation_NoneType__required_True__metadata__Strict_strict_True___Ge_ge_0___Le_le_4_____"
+          },
+          "volume_distribution": {
+            "$ref": "#/components/schemas/BodyAttributeOut_Literal__even____abdomen____lower_body___"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "head_ratio_class",
+          "body_build",
+          "frame_width",
+          "limb_proportion",
+          "muscularity_visual",
+          "soft_volume",
+          "volume_distribution"
+        ],
+        "title": "BodyAttributesOut"
+      },
+      "BodyCandidateOut": {
+        "properties": {
+          "body_id": {
+            "type": "string",
+            "title": "Body Id"
+          },
+          "body_version": {
+            "type": "string",
+            "title": "Body Version"
+          },
+          "rank": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Rank"
+          },
+          "rank_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rank Score"
+          },
+          "acceptance_probability": {
+            "type": "null",
+            "title": "Acceptance Probability"
+          },
+          "score_spread": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score Spread"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "body_id",
+          "body_version",
+          "rank",
+          "rank_score"
+        ],
+        "title": "BodyCandidateOut"
+      },
+      "BodyCoverageOut": {
+        "properties": {
+          "head": {
+            "type": "string",
+            "enum": [
+              "visible",
+              "uncertain",
+              "unknown"
+            ],
+            "title": "Head"
+          },
+          "torso": {
+            "type": "string",
+            "enum": [
+              "visible",
+              "uncertain",
+              "unknown"
+            ],
+            "title": "Torso"
+          },
+          "arms": {
+            "type": "string",
+            "enum": [
+              "visible",
+              "uncertain",
+              "unknown"
+            ],
+            "title": "Arms"
+          },
+          "legs": {
+            "type": "string",
+            "enum": [
+              "visible",
+              "uncertain",
+              "unknown"
+            ],
+            "title": "Legs"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "head",
+          "torso",
+          "arms",
+          "legs"
+        ],
+        "title": "BodyCoverageOut"
+      },
+      "BodyMatchingOut": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "const": "body-match.v1",
+            "title": "Schema Version"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "auto",
+              "shadow"
+            ],
+            "title": "Mode"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "partial",
+              "unavailable",
+              "not_applicable"
+            ],
+            "title": "Status"
+          },
+          "people": {
+            "items": {
+              "$ref": "#/components/schemas/BodyPersonOut"
+            },
+            "type": "array",
+            "title": "People"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "input_sha256": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input Sha256"
+          },
+          "catalog_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Catalog Version"
+          },
+          "catalog_sha256": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Catalog Sha256"
+          },
+          "prompt_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt Version"
+          },
+          "provider_requested": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Requested"
+          },
+          "provider_actual": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Actual"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "is_mock": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Mock"
+          },
+          "pose_order_preserved": {
+            "type": "boolean",
+            "const": true,
+            "title": "Pose Order Preserved",
+            "default": true
+          },
+          "rendering_executed": {
+            "type": "boolean",
+            "const": false,
+            "title": "Rendering Executed",
+            "default": false
+          },
+          "elapsed_ms": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Elapsed Ms"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "schema_version",
+          "mode",
+          "status",
+          "people"
+        ],
+        "title": "BodyMatchingOut"
+      },
+      "BodyObservationOut": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "title": "Schema Version"
+          },
+          "person_id": {
+            "type": "string",
+            "title": "Person Id"
+          },
+          "attributes": {
+            "$ref": "#/components/schemas/BodyAttributesOut"
+          },
+          "geometry": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Geometry"
+          },
+          "geometry_version": {
+            "type": "string",
+            "title": "Geometry Version"
+          },
+          "clothing_occlusion": {
+            "type": "boolean",
+            "title": "Clothing Occlusion"
+          },
+          "foreshortening": {
+            "type": "boolean",
+            "title": "Foreshortening"
+          },
+          "ownership_ambiguous": {
+            "type": "boolean",
+            "title": "Ownership Ambiguous"
+          },
+          "crop_box": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Crop Box"
+          },
+          "provider_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Error"
+          },
+          "reason_codes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Reason Codes"
+          },
+          "coverage": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BodyCoverageOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "full_body_visible": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Body Visible"
+          },
+          "presentation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PresentationOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "schema_version",
+          "person_id",
+          "attributes",
+          "geometry",
+          "geometry_version",
+          "clothing_occlusion",
+          "foreshortening",
+          "ownership_ambiguous",
+          "crop_box",
+          "provider_error",
+          "reason_codes"
+        ],
+        "title": "BodyObservationOut"
+      },
+      "BodyPersonOut": {
+        "properties": {
+          "person_index": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Person Index"
+          },
+          "person_id": {
+            "type": "string",
+            "title": "Person Id"
+          },
+          "auto_body_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Auto Body Id"
+          },
+          "applied_body_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Applied Body Id"
+          },
+          "selected_asset": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BodyAssetRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "selection_source": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "auto_best_effort",
+                  "auto_default",
+                  "auto_visual_best_effort"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Selection Source"
+          },
+          "selection_state": {
+            "type": "string",
+            "enum": [
+              "selected",
+              "unavailable"
+            ],
+            "title": "Selection State"
+          },
+          "diagnostic": {
+            "type": "string",
+            "title": "Diagnostic"
+          },
+          "reason_codes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Reason Codes"
+          },
+          "acceptance_probability": {
+            "type": "null",
+            "title": "Acceptance Probability"
+          },
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/BodyCandidateOut"
+            },
+            "type": "array",
+            "title": "Candidates"
+          },
+          "observations": {
+            "$ref": "#/components/schemas/BodyObservationOut"
+          },
+          "pose_bindings": {
+            "items": {
+              "$ref": "#/components/schemas/BodyPoseBindingOut"
+            },
+            "type": "array",
+            "title": "Pose Bindings"
+          },
+          "render_required": {
+            "type": "boolean",
+            "title": "Render Required"
+          },
+          "manual_change_scope": {
+            "type": "string",
+            "const": "current_cut_person",
+            "title": "Manual Change Scope"
+          },
+          "presentation_selection": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PresentationSelectionOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tied_body_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tied Body Ids"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "person_index",
+          "person_id",
+          "auto_body_id",
+          "applied_body_id",
+          "selected_asset",
+          "selection_source",
+          "selection_state",
+          "diagnostic",
+          "reason_codes",
+          "candidates",
+          "observations",
+          "pose_bindings",
+          "render_required",
+          "manual_change_scope"
+        ],
+        "title": "BodyPersonOut"
+      },
+      "BodyPoseBindingOut": {
+        "properties": {
+          "pose_id": {
+            "type": "string",
+            "title": "Pose Id"
+          },
+          "view": {
+            "type": "string",
+            "enum": [
+              "front",
+              "three_quarter",
+              "side",
+              "back",
+              "side_opposite",
+              "three_quarter_opposite"
+            ],
+            "title": "View"
+          },
+          "pose_sha256": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pose Sha256"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "pose_id",
+          "view",
+          "pose_sha256"
+        ],
+        "title": "BodyPoseBindingOut"
+      },
+      "BodyPreview": {
+        "properties": {
+          "candidate_index": {
+            "type": "integer",
+            "title": "Candidate Index"
+          },
+          "pose_id": {
+            "type": "string",
+            "title": "Pose Id"
+          },
+          "view": {
+            "type": "string",
+            "enum": [
+              "front",
+              "three_quarter",
+              "side",
+              "back",
+              "side_opposite",
+              "three_quarter_opposite"
+            ],
+            "title": "View"
+          },
+          "source_pose_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Source Pose Sha256"
+          },
+          "media_type": {
+            "type": "string",
+            "const": "image/png",
+            "title": "Media Type",
+            "default": "image/png"
+          },
+          "data": {
+            "type": "string",
+            "title": "Data",
+            "description": "base64 PNG of the selected FBX body"
+          },
+          "preview_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Preview Sha256"
+          },
+          "width": {
+            "type": "integer",
+            "const": 256,
+            "title": "Width",
+            "default": 256
+          },
+          "height": {
+            "type": "integer",
+            "const": 256,
+            "title": "Height",
+            "default": 256
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "candidate_index",
+          "pose_id",
+          "view",
+          "source_pose_sha256",
+          "data",
+          "preview_sha256"
+        ],
+        "title": "BodyPreview"
+      },
+      "BodyPreviewResult": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "const": "body-preview.v1",
+            "title": "Schema Version",
+            "default": "body-preview.v1"
+          },
+          "request_id": {
+            "type": "string",
+            "title": "Request Id"
+          },
+          "person_id": {
+            "type": "string",
+            "title": "Person Id"
+          },
+          "selection_revision": {
+            "type": "integer",
+            "title": "Selection Revision"
+          },
+          "body": {
+            "$ref": "#/components/schemas/BodyAssetRef"
+          },
+          "character_id": {
+            "type": "string",
+            "title": "Character Id"
+          },
+          "catalog_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Catalog Sha256"
+          },
+          "retarget_version": {
+            "type": "string",
+            "title": "Retarget Version"
+          },
+          "renderer_version": {
+            "type": "string",
+            "title": "Renderer Version"
+          },
+          "status": {
+            "type": "string",
+            "const": "ready",
+            "title": "Status",
+            "default": "ready"
+          },
+          "previews": {
+            "items": {
+              "$ref": "#/components/schemas/BodyPreview"
+            },
+            "type": "array",
+            "title": "Previews"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "request_id",
+          "person_id",
+          "selection_revision",
+          "body",
+          "character_id",
+          "catalog_sha256",
+          "retarget_version",
+          "renderer_version",
+          "previews"
+        ],
+        "title": "BodyPreviewResult"
+      },
+      "BodyRenderRequest": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "const": "body-render.v1",
+            "title": "Schema Version",
+            "default": "body-render.v1"
+          },
+          "request_id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Request Id"
+          },
+          "analysis_input_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Analysis Input Sha256"
+          },
+          "person_id": {
+            "type": "string",
+            "title": "Person Id"
+          },
+          "person_index": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Person Index"
+          },
+          "selection_revision": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Selection Revision"
+          },
+          "selection_source": {
+            "type": "string",
+            "enum": [
+              "auto",
+              "user_override"
+            ],
+            "title": "Selection Source"
+          },
+          "catalog_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Catalog Sha256"
+          },
+          "body": {
+            "$ref": "#/components/schemas/BodyAssetRef"
+          },
+          "retarget_version": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Retarget Version"
+          },
+          "renderer_version": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Renderer Version"
+          },
+          "poses": {
+            "items": {
+              "$ref": "#/components/schemas/RenderPoseRef"
+            },
+            "type": "array",
+            "maxItems": 5,
+            "minItems": 1,
+            "title": "Poses"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "request_id",
+          "analysis_input_sha256",
+          "person_id",
+          "person_index",
+          "selection_revision",
+          "selection_source",
+          "catalog_sha256",
+          "body",
+          "retarget_version",
+          "renderer_version",
+          "poses"
+        ],
+        "title": "BodyRenderRequest"
+      },
+      "BodyScope": {
+        "type": "string",
+        "enum": [
+          "full",
+          "half",
+          "bust",
+          "head"
+        ],
+        "title": "BodyScope"
+      },
+      "Body_analyze_analyze_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          },
+          "hint": {
+            "type": "string",
+            "title": "Hint",
+            "default": ""
+          },
+          "rescue": {
+            "type": "string",
+            "title": "Rescue",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_analyze_analyze_post"
+      },
+      "CandidateOut": {
+        "properties": {
+          "pose_id": {
+            "type": "string",
+            "title": "Pose Id"
+          },
+          "view": {
+            "type": "string",
+            "title": "View"
+          },
+          "distance": {
+            "type": "number",
+            "title": "Distance"
+          },
+          "tags": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Tags"
+          },
+          "rerank_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rerank Score"
+          },
+          "bvh_url": {
+            "type": "string",
+            "title": "Bvh Url",
+            "description": "동원 내보내기 팀이 받는 라이브러리 BVH 다운로드 경로"
+          },
+          "thumbnail_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thumbnail Url",
+            "description": "후보 시점 PNG 썸네일의 내부 다운로드 경로"
+          }
+        },
+        "type": "object",
+        "required": [
+          "pose_id",
+          "view",
+          "distance",
+          "tags",
+          "bvh_url"
+        ],
+        "title": "CandidateOut"
+      },
+      "CutResultOut": {
+        "properties": {
+          "body_matching": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BodyMatchingOut"
+              },
+              {
+                "$ref": "#/components/schemas/EmptyBodyMatchingOut"
+              }
+            ],
+            "title": "Body Matching"
+          },
+          "route": {
+            "type": "string",
+            "title": "Route",
+            "description": "core | bust | skip"
+          },
+          "count_confidence": {
+            "type": "string",
+            "title": "Count Confidence",
+            "description": "high(개수 일치) | low(불일치→폴백) | n/a"
+          },
+          "detector_count": {
+            "type": "integer",
+            "title": "Detector Count"
+          },
+          "vlm_count": {
+            "type": "integer",
+            "title": "Vlm Count"
+          },
+          "people": {
+            "items": {
+              "$ref": "#/components/schemas/PersonOut"
+            },
+            "type": "array",
+            "title": "People",
+            "default": []
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Notes",
+            "default": []
+          },
+          "image": {
+            "$ref": "#/components/schemas/ImageInfoOut"
+          },
+          "inference_metadata": {
+            "$ref": "#/components/schemas/InferenceMetadataOut"
+          },
+          "vlm_tags": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VlmTagsOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "route",
+          "count_confidence",
+          "detector_count",
+          "vlm_count",
+          "image",
+          "inference_metadata"
+        ],
+        "title": "CutResultOut"
+      },
+      "EmptyBodyMatchingOut": {
+        "properties": {},
+        "additionalProperties": false,
+        "type": "object",
+        "title": "EmptyBodyMatchingOut",
+        "description": "Off/legacy representation stays exactly {}."
+      },
+      "ExportItem": {
+        "properties": {
+          "person_index": {
+            "type": "integer",
+            "title": "Person Index"
+          },
+          "pose_id": {
+            "type": "string",
+            "title": "Pose Id"
+          },
+          "bvh_url": {
+            "type": "string",
+            "title": "Bvh Url",
+            "description": "GET으로 1인 BVH 원본을 읽는 경로(단일 소스)"
+          },
+          "view": {
+            "type": "string",
+            "title": "View"
+          },
+          "set_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Set Id",
+            "description": "얽힘 그룹 id. 같은 값끼리 한 장면(상대 위치는 작가)"
+          },
+          "set_role": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Set Role",
+            "description": "세트 내 역할(A/B 등). solo면 null"
+          },
+          "tags": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Tags"
+          }
+        },
+        "type": "object",
+        "required": [
+          "person_index",
+          "pose_id",
+          "bvh_url",
+          "view",
+          "tags"
+        ],
+        "title": "ExportItem",
+        "description": "동원이 실제로 소비하는 항목(DB에서 강화됨)."
+      },
+      "ExportOrder": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "title": "Schema Version",
+            "default": "1.0"
+          },
+          "cut_id": {
+            "type": "string",
+            "title": "Cut Id"
+          },
+          "source_image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Image"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ExportItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Notes",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "cut_id",
+          "created_at",
+          "items"
+        ],
+        "title": "ExportOrder",
+        "description": "동원한테 보내는 최종 JSON. item 1개 = 1인 BVH 1개(BVH는 다인 미지원).\nCSP 미러링·축 보정은 동원 단계 책임."
+      },
+      "ExportOrderRequest": {
+        "properties": {
+          "cut_id": {
+            "type": "string",
+            "title": "Cut Id",
+            "description": "컷 식별자(회차_컷번호 등)"
+          },
+          "source_image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Image",
+            "description": "원본 러프 파일명(추적용)"
+          },
+          "selections": {
+            "items": {
+              "$ref": "#/components/schemas/ExportSelection"
+            },
+            "type": "array",
+            "title": "Selections"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cut_id",
+          "selections"
+        ],
+        "title": "ExportOrderRequest"
+      },
+      "ExportSelection": {
+        "properties": {
+          "person_index": {
+            "type": "integer",
+            "title": "Person Index",
+            "description": "컷 안 인물 인덱스(0부터)"
+          },
+          "pose_id": {
+            "type": "string",
+            "title": "Pose Id",
+            "description": "선택한 후보의 pose_id"
+          },
+          "view": {
+            "type": "string",
+            "title": "View",
+            "description": "선택한 후보의 view(=매칭된 투영 각도)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "person_index",
+          "pose_id",
+          "view"
+        ],
+        "title": "ExportSelection",
+        "description": "Tauri가 보내는 입력: 작가가 person별로 고른 후보."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ImageInfoOut": {
+        "properties": {
+          "width": {
+            "type": "integer",
+            "title": "Width"
+          },
+          "height": {
+            "type": "integer",
+            "title": "Height"
+          }
+        },
+        "type": "object",
+        "required": [
+          "width",
+          "height"
+        ],
+        "title": "ImageInfoOut"
+      },
+      "InferenceMetadataOut": {
+        "properties": {
+          "deployment_version": {
+            "type": "string",
+            "title": "Deployment Version"
+          },
+          "vlm_provider": {
+            "type": "string",
+            "title": "Vlm Provider"
+          },
+          "vlm_model": {
+            "type": "string",
+            "title": "Vlm Model"
+          },
+          "vlm_prompt_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vlm Prompt Version"
+          },
+          "pose_backend": {
+            "type": "string",
+            "title": "Pose Backend"
+          },
+          "pose_model_version": {
+            "type": "string",
+            "title": "Pose Model Version"
+          },
+          "pose_library_version": {
+            "type": "string",
+            "title": "Pose Library Version"
+          },
+          "feature_version": {
+            "type": "integer",
+            "title": "Feature Version"
+          },
+          "pose_library_sha256": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pose Library Sha256"
+          }
+        },
+        "type": "object",
+        "required": [
+          "deployment_version",
+          "vlm_provider",
+          "vlm_model",
+          "pose_backend",
+          "pose_model_version",
+          "pose_library_version",
+          "feature_version"
+        ],
+        "title": "InferenceMetadataOut"
+      },
+      "PersonOut": {
+        "properties": {
+          "index": {
+            "type": "integer",
+            "title": "Index"
+          },
+          "box": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Box",
+            "description": "[x1,y1,x2,y2] 픽셀"
+          },
+          "tags": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Tags"
+          },
+          "skeleton": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SkeletonOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/CandidateOut"
+            },
+            "type": "array",
+            "title": "Candidates"
+          },
+          "keypoints": {
+            "anyOf": [
+              {
+                "items": {
+                  "items": {
+                    "type": "number"
+                  },
+                  "type": "array"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Keypoints",
+            "description": "러프에서 추출한 2D 스켈레톤 (17×2, 이미지 픽셀 좌표)"
+          },
+          "scores": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scores",
+            "description": "관절별 신뢰도 (17,). 낮은 관절은 refine 손실에서 제외됨"
+          },
+          "raw_scores": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Raw Scores",
+            "description": "평가용 RTMPose 원본 score. scores는 구조 마스킹/안전정책 반영값"
+          },
+          "confidence": {
+            "type": "string",
+            "title": "Confidence",
+            "description": "high | low",
+            "default": "low"
+          },
+          "skeleton_state": {
+            "type": "string",
+            "title": "Skeleton State",
+            "description": "valid | partial | suspect | missing | invalid",
+            "default": "valid"
+          },
+          "skeleton_source": {
+            "type": "string",
+            "title": "Skeleton Source",
+            "description": "none | full_image | crop_retry",
+            "default": "full_image"
+          },
+          "coverage_class": {
+            "type": "string",
+            "title": "Coverage Class",
+            "description": "full | reduced | sparse | upper_only | insufficient",
+            "default": "full"
+          },
+          "slot_origin": {
+            "type": "string",
+            "title": "Slot Origin",
+            "description": "vlm | rtm_provisional",
+            "default": "vlm"
+          },
+          "search_stability": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Search Stability",
+            "description": "stable | ambiguous | unstable | not_required | not_available"
+          },
+          "distance_metric": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance Metric"
+          },
+          "rank_distance": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rank Distance"
+          },
+          "confidence_threshold": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence Threshold"
+          },
+          "valid_limbs": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Valid Limbs"
+          },
+          "refinable_limbs": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Refinable Limbs"
+          },
+          "lower_body_observed": {
+            "type": "boolean",
+            "title": "Lower Body Observed",
+            "description": "VLM이 해당 인물의 양쪽 골반·무릎·발목을 실제 관측했다고 판정했는지. false면 모든 하체 refine 차단",
+            "default": false
+          },
+          "refine_allowed": {
+            "type": "boolean",
+            "title": "Refine Allowed",
+            "default": false
+          },
+          "quality_trace": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Quality Trace"
+          },
+          "quality_reasons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Quality Reasons"
+          },
+          "output_scope": {
+            "$ref": "#/components/schemas/ScopeDetectionOut"
+          },
+          "person_tags": {
+            "$ref": "#/components/schemas/PersonTagsOut"
+          }
+        },
+        "type": "object",
+        "required": [
+          "index",
+          "tags",
+          "candidates"
+        ],
+        "title": "PersonOut"
+      },
+      "PersonTagsOut": {
+        "properties": {
+          "action": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Action"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "view": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/View"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "vlm_person",
+              "legacy_cut",
+              "unknown"
+            ],
+            "title": "Source",
+            "default": "unknown"
+          }
+        },
+        "type": "object",
+        "title": "PersonTagsOut",
+        "description": "인물별 action·view. 기록용이며 검색·라우팅·refine에 쓰지 않는다(src/person_tags.py)."
+      },
+      "PresentationOut": {
+        "properties": {
+          "value": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "feminine",
+                  "masculine",
+                  "androgynous"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "visible",
+              "uncertain",
+              "unknown"
+            ],
+            "title": "Visibility"
+          },
+          "cues": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "face_design",
+                "body_contour",
+                "hair_design",
+                "costume_design"
+              ]
+            },
+            "type": "array",
+            "title": "Cues"
+          },
+          "evidence": {
+            "type": "string",
+            "title": "Evidence"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "value",
+          "visibility",
+          "cues",
+          "evidence"
+        ],
+        "title": "PresentationOut"
+      },
+      "PresentationSelectionOut": {
+        "properties": {
+          "observed": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "feminine",
+                  "masculine",
+                  "androgynous"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observed"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "visible",
+              "uncertain",
+              "unknown"
+            ],
+            "title": "Visibility"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "compatible_candidates",
+              "tie_or_default",
+              "unresolved",
+              "matching_style_unavailable"
+            ],
+            "title": "Mode"
+          },
+          "reason_codes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Reason Codes"
+          },
+          "eligible_before": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Eligible Before"
+          },
+          "eligible_after": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Eligible After"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "observed",
+          "visibility",
+          "mode",
+          "reason_codes",
+          "eligible_before",
+          "eligible_after"
+        ],
+        "title": "PresentationSelectionOut"
+      },
+      "RefineRequest": {
+        "properties": {
+          "pose_id": {
+            "type": "string",
+            "title": "Pose Id",
+            "description": "작가가 고른 후보의 pose_id"
+          },
+          "view": {
+            "type": "string",
+            "enum": [
+              "front",
+              "three_quarter",
+              "side",
+              "back"
+            ],
+            "title": "View",
+            "description": "그 후보의 view(=매칭된 투영 각도)"
+          },
+          "keypoints": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array",
+              "maxItems": 2,
+              "minItems": 2
+            },
+            "type": "array",
+            "maxItems": 17,
+            "minItems": 17,
+            "title": "Keypoints",
+            "description": "/analyze가 준 PersonOut.keypoints를 그대로 (17×2)"
+          },
+          "scores": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array",
+                "maxItems": 17,
+                "minItems": 17
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scores",
+            "description": "/analyze가 준 PersonOut.scores를 그대로 (17,)"
+          },
+          "search_distance": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Search Distance",
+            "description": "그 후보의 distance. v1에서는 베이스 불일치 게이트, v2.5에서는 실행을 막지 않는 검색 lineage"
+          },
+          "refine_allowed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refine Allowed",
+            "description": "/analyze가 준 값을 그대로 전달. false면 차단하며 v2.5에서는 policy lineage로 필수"
+          },
+          "refinable_limbs": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refinable Limbs",
+            "description": "/analyze가 허용한 사지만 그대로 전달. 예: left_arm. v2.5 policy lineage로 필수"
+          },
+          "lower_body_observed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lower Body Observed",
+            "description": "/analyze가 준 값을 그대로 전달. true가 아니면 leg/lower_pair/leg-driving lap_contact/ankle 조정을 모두 차단"
+          },
+          "skeleton_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Skeleton State",
+            "description": "/analyze의 skeleton_state; v2 진단 lineage"
+          },
+          "coverage_class": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Coverage Class",
+            "description": "/analyze의 coverage_class; v2 진단 lineage"
+          },
+          "slot_origin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slot Origin",
+            "description": "/analyze의 slot_origin; 인물 소유권 lineage"
+          },
+          "skeleton_source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Skeleton Source",
+            "description": "/analyze의 skeleton_source; 인물 소유권 lineage"
+          },
+          "search_stability": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Search Stability",
+            "description": "partial 스켈레톤의 보수적 mask 검색 안정성"
+          },
+          "distance_metric": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance Metric",
+            "description": "후보를 검색할 때 사용한 거리 metric"
+          },
+          "confidence_threshold": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence Threshold",
+            "description": "검색 당시 metric×coverage confidence threshold"
+          },
+          "gap_type": {
+            "type": "string",
+            "enum": [
+              "near_gap",
+              "structural_gap",
+              "unknown"
+            ],
+            "title": "Gap Type",
+            "description": "평가 라벨. refine 실행 게이트로 사용하지 않음",
+            "default": "unknown"
+          },
+          "refine_mode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "conservative",
+                  "aggressive"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refine Mode",
+            "description": "v2.5 조정 정책. 생략/null이면 서버 REFINE_DEFAULT_MODE를 사용. aggressive도 final selector 실패 시 conservative/base로 복구"
+          }
+        },
+        "type": "object",
+        "required": [
+          "pose_id",
+          "view",
+          "keypoints"
+        ],
+        "title": "RefineRequest"
+      },
+      "RefineResponse": {
+        "properties": {
+          "pose_id": {
+            "type": "string",
+            "title": "Pose Id"
+          },
+          "view": {
+            "type": "string",
+            "title": "View"
+          },
+          "refined": {
+            "type": "boolean",
+            "title": "Refined",
+            "description": "조정본이 나왔는가. False면 bvh_url=베이스"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason",
+            "description": "ok | disabled | entangled_set | skeleton_policy | low_skeleton_score | base_mismatch | multiframe_base | insufficient_target_bones | low_observability | no_solvable_joints | already_matched | no_gain | ok_partial | movement_gate | global_no_gain | collision_gate | collision_unresolved | joint_limit | safety_gate | unchanged_geometry | timeout | final_collision_gate | final_extension_gate | diverged"
+          },
+          "bvh_url": {
+            "type": "string",
+            "title": "Bvh Url",
+            "description": "베이스 BVH 경로(/pose/{id}/bvh). refined 여부와 무관하게 항상 베이스다 — 조정본에는 URL이 없다."
+          },
+          "bvh": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bvh",
+            "description": "조정본 BVH 본문(LF 개행). refined=true일 때만 채운다. 조정본을 얻는 **유일한** 경로이므로 소비자는 이 값을 받아 자기 저장소에 보관해야 한다."
+          },
+          "thumbnail": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RefineThumbnailOut"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "선택 후보의 매칭 view로 그린 최종 결과 256×256 이미지. 후보 썸네일과 같은 FBX 남성 모델 렌더러(converter)를 쓰며 base64로 인라인 반환한다. 렌더에 실패하면 null이다 — 오류가 아니라 '그림 없음'이며 나머지 필드는 그대로 유효하다."
+          },
+          "loss_base": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Loss Base",
+            "description": "조정 전 각도 손실"
+          },
+          "loss_final": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Loss Final",
+            "description": "조정 후 각도 손실"
+          },
+          "gain": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gain",
+            "description": "손실 감소율(0.3=30% 개선)"
+          },
+          "backend": {
+            "type": "string",
+            "title": "Backend",
+            "description": "scipy | numpy | scipy+numpy | none"
+          },
+          "refine_version": {
+            "type": "string",
+            "title": "Refine Version",
+            "description": "실행한 refine policy/code 버전",
+            "default": "v2.5.1"
+          },
+          "refine_outcome": {
+            "type": "string",
+            "enum": [
+              "improved",
+              "unchanged",
+              "reverted",
+              "not_attempted"
+            ],
+            "title": "Refine Outcome",
+            "description": "gap_type과 독립인 적용 결과",
+            "default": "not_attempted"
+          },
+          "limbs": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Limbs",
+            "description": "P3까지 통과해 최종 조정된 사지"
+          },
+          "limb_decisions": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Limb Decisions",
+            "description": "고려한 사지별 채택 여부·사유, 몸통 정규화 3D 이동량, 베이스 상대 손·전완-몸통 충돌 진단"
+          },
+          "diagnostics": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Diagnostics",
+            "description": "v2의 base/solved/adopted 손실·안전·버전 lineage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "pose_id",
+          "view",
+          "refined",
+          "reason",
+          "bvh_url",
+          "backend"
+        ],
+        "title": "RefineResponse",
+        "description": "refined=False여도 오류가 아니다 — 안전 게이트가 조정을 버리고 베이스를 준 것."
+      },
+      "RefineThumbnailOut": {
+        "properties": {
+          "view": {
+            "type": "string",
+            "enum": [
+              "front",
+              "three_quarter",
+              "side",
+              "back"
+            ],
+            "title": "View"
+          },
+          "media_type": {
+            "type": "string",
+            "enum": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "title": "Media Type",
+            "default": "image/png"
+          },
+          "encoding": {
+            "type": "string",
+            "const": "base64",
+            "title": "Encoding",
+            "default": "base64"
+          },
+          "data": {
+            "type": "string",
+            "title": "Data",
+            "description": "base64-encoded 256×256 image bytes"
+          },
+          "width": {
+            "type": "integer",
+            "const": 256,
+            "title": "Width",
+            "default": 256
+          },
+          "height": {
+            "type": "integer",
+            "const": 256,
+            "title": "Height",
+            "default": 256
+          },
+          "renderer_version": {
+            "type": "string",
+            "title": "Renderer Version",
+            "description": "그린 렌더러. fbx-anatomical-v1/<character_id> | fbx-anatomical-v1/library | warm-mannequin-v1",
+            "default": "fbx-anatomical-v1"
+          }
+        },
+        "type": "object",
+        "required": [
+          "view",
+          "data"
+        ],
+        "title": "RefineThumbnailOut",
+        "description": "Stateless preview image returned inline with the final refine result.\n\n2026-09-04부터 후보 썸네일과 같은 렌더러(V3.2.5 converter가 변환한 FBX 남성\n모델의 anatomical 카메라 렌더)로 그린다. ``renderer_version``이\n``fbx-anatomical-…``이면 그 경로, ``warm-mannequin-v1``이면 옛 2D 마네킹이다.\n``media_type``은 기본 PNG이며 서버 설정(REFINE_THUMBNAIL_FORMAT)으로 JPEG가 될\n수 있으므로 표시할 때는 ``data:{media_type};base64,{data}``로 조립한다."
+      },
+      "Relationship": {
+        "type": "string",
+        "enum": [
+          "solo",
+          "talking",
+          "hugging",
+          "holding_hands",
+          "fighting"
+        ],
+        "title": "Relationship"
+      },
+      "RenderPoseRef": {
+        "properties": {
+          "candidate_index": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Candidate Index"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "library",
+              "refined"
+            ],
+            "title": "Kind",
+            "default": "library"
+          },
+          "pose_id": {
+            "type": "string",
+            "title": "Pose Id"
+          },
+          "view": {
+            "type": "string",
+            "enum": [
+              "front",
+              "three_quarter",
+              "side",
+              "back",
+              "side_opposite",
+              "three_quarter_opposite"
+            ],
+            "title": "View"
+          },
+          "bvh_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bvh Url"
+          },
+          "bvh": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000000,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bvh"
+          },
+          "pose_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Pose Sha256"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "candidate_index",
+          "pose_id",
+          "view",
+          "pose_sha256"
+        ],
+        "title": "RenderPoseRef"
+      },
+      "ScopeDetectionOut": {
+        "properties": {
+          "detected": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BodyScope"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "vlm_person",
+              "legacy_shot",
+              "unknown"
+            ],
+            "title": "Source",
+            "default": "unknown"
+          }
+        },
+        "type": "object",
+        "title": "ScopeDetectionOut"
+      },
+      "Shot": {
+        "type": "string",
+        "enum": [
+          "full_half",
+          "bust",
+          "face"
+        ],
+        "title": "Shot"
+      },
+      "SkeletonOut": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "const": "coco17-v1",
+            "title": "Schema Version",
+            "default": "coco17-v1"
+          },
+          "keypoints": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array",
+              "maxItems": 2,
+              "minItems": 2
+            },
+            "type": "array",
+            "maxItems": 17,
+            "minItems": 17,
+            "title": "Keypoints"
+          },
+          "scores": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 17,
+            "minItems": 17,
+            "title": "Scores"
+          }
+        },
+        "type": "object",
+        "required": [
+          "keypoints",
+          "scores"
+        ],
+        "title": "SkeletonOut"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "View": {
+        "type": "string",
+        "enum": [
+          "front",
+          "side",
+          "back",
+          "three_quarter"
+        ],
+        "title": "View"
+      },
+      "VlmTagsOut": {
+        "properties": {
+          "shot": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Shot"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "action": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Action"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "view": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/View"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "relationship": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Relationship"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "title": "VlmTagsOut",
+        "description": "VLM이 컷에 대해 실제로 말한 태그. people[].tags와 달리 잘못된 값을 기본값으로 채우지 않는다."
+      }
+    }
+  }
+}

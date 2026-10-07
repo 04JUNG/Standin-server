@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field, field_validator
 
 from src.body_scope import BodyScope
 from src.schema import Action, Relationship, Shot, View
+from .body_models import BodyMatchingOut, EmptyBodyMatchingOut
 
 
 class CandidateOut(BaseModel):
@@ -117,6 +118,7 @@ class PersonOut(BaseModel):
 
 
 class CutResultOut(BaseModel):
+    body_matching: BodyMatchingOut | EmptyBodyMatchingOut = Field(default_factory=EmptyBodyMatchingOut)
     route: str = Field(..., description="core | bust | skip")
     count_confidence: str = Field(..., description="high(개수 일치) | low(불일치→폴백) | n/a")
     detector_count: int

@@ -1,0 +1,60 @@
+{
+  "schema_version": "body-render-result.v1",
+  "request_id": "render-1",
+  "person_id": "869d654dd4b086e6ef4b1c3b079a7e4d1c118c33016a66007b7e57b5b4b98807:p0",
+  "selection_revision": 0,
+  "body_id": "muscular",
+  "body_version": "v1",
+  "asset_sha256": "2c7fcfa711c033e852bad2a4253e5546fdf16ded6ae8411dc514951809902ded",
+  "retarget_version": "fixture-r1",
+  "renderer_version": "fixture-v1",
+  "status": "ready",
+  "artifacts": [
+    {
+      "candidate_index": 0,
+      "pose_id": "pose-0",
+      "view": "front",
+      "source_pose_sha256": "d1983cfb5a41d1e65cf0814e8b7a6899278cbf37b2e95561b7868b61dba078e0",
+      "preview_url": "/fixture/0.png",
+      "fbx_url": "/fixture/0.fbx",
+      "fbx_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "candidate_index": 1,
+      "pose_id": "pose-1",
+      "view": "front",
+      "source_pose_sha256": "db8c592a0acdc6092b97311ea26a917838172b136ecb0c1328c7304448788c19",
+      "preview_url": "/fixture/1.png",
+      "fbx_url": "/fixture/1.fbx",
+      "fbx_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "candidate_index": 2,
+      "pose_id": "pose-2",
+      "view": "front",
+      "source_pose_sha256": "141ea0fc2d79d1381a283903d66295acb239f1c5c23c591571e2c0b67a80a24e",
+      "preview_url": "/fixture/2.png",
+      "fbx_url": "/fixture/2.fbx",
+      "fbx_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "candidate_index": 3,
+      "pose_id": "pose-3",
+      "view": "front",
+      "source_pose_sha256": "10573785231566612108576252d3ecd8f2610597ebbd1eae09c8537cc47b4c9e",
+      "preview_url": "/fixture/3.png",
+      "fbx_url": "/fixture/3.fbx",
+      "fbx_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "candidate_index": 4,
+      "pose_id": "pose-4",
+      "view": "front",
+      "source_pose_sha256": "512d6f47f52976caf797594653eed6797bea2b3ca886a1f1970b099ddcbe5a16",
+      "preview_url": "/fixture/4.png",
+      "fbx_url": "/fixture/4.fbx",
+      "fbx_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  ],
+  "error_code": null
+}

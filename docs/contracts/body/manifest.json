@@ -1,0 +1,13 @@
+{
+  "description": "Synthetic contract fixtures only. No real roughs, usable FBX, network calls or renderer execution.",
+  "implemented_http": [
+    "POST /analyze additive typed body_matching",
+    "POST /body/render selected-body PNG previews"
+  ],
+  "proposed_external_transport": [
+    "BodySelectionChange",
+    "BodyRenderResult (future FBX artifact jobs)",
+    "BodyExportEnvelope"
+  ],
+  "generation_command": "python scripts/export_body_api_contract.py"
+}

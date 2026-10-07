@@ -1,0 +1,143 @@
+{
+  "$defs": {
+    "BodyRenderArtifact": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_index": {
+          "minimum": 0,
+          "title": "Candidate Index",
+          "type": "integer"
+        },
+        "pose_id": {
+          "title": "Pose Id",
+          "type": "string"
+        },
+        "view": {
+          "enum": [
+            "front",
+            "three_quarter",
+            "side",
+            "back",
+            "side_opposite",
+            "three_quarter_opposite"
+          ],
+          "title": "View",
+          "type": "string"
+        },
+        "source_pose_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Pose Sha256",
+          "type": "string"
+        },
+        "preview_url": {
+          "title": "Preview Url",
+          "type": "string"
+        },
+        "fbx_url": {
+          "title": "Fbx Url",
+          "type": "string"
+        },
+        "fbx_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Fbx Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "candidate_index",
+        "pose_id",
+        "view",
+        "source_pose_sha256",
+        "preview_url",
+        "fbx_url",
+        "fbx_sha256"
+      ],
+      "title": "BodyRenderArtifact",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "body-render-result.v1",
+      "default": "body-render-result.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "request_id": {
+      "title": "Request Id",
+      "type": "string"
+    },
+    "person_id": {
+      "title": "Person Id",
+      "type": "string"
+    },
+    "selection_revision": {
+      "minimum": 0,
+      "title": "Selection Revision",
+      "type": "integer"
+    },
+    "body_id": {
+      "title": "Body Id",
+      "type": "string"
+    },
+    "body_version": {
+      "title": "Body Version",
+      "type": "string"
+    },
+    "asset_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Asset Sha256",
+      "type": "string"
+    },
+    "retarget_version": {
+      "title": "Retarget Version",
+      "type": "string"
+    },
+    "renderer_version": {
+      "title": "Renderer Version",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "ready",
+        "failed"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "artifacts": {
+      "items": {
+        "$ref": "#/$defs/BodyRenderArtifact"
+      },
+      "title": "Artifacts",
+      "type": "array"
+    },
+    "error_code": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Error Code"
+    }
+  },
+  "required": [
+    "request_id",
+    "person_id",
+    "selection_revision",
+    "body_id",
+    "body_version",
+    "asset_sha256",
+    "retarget_version",
+    "renderer_version",
+    "status",
+    "artifacts"
+  ],
+  "title": "BodyRenderResult",
+  "type": "object"
+}

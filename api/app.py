@@ -15,6 +15,8 @@ FastAPI 레이어 — 도원의 Python 추론 서버.
 """
 from __future__ import annotations
 
+from .body_models import validated_body_sidecar
+
 import base64
 import hashlib
 import io
@@ -558,6 +560,7 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
                  else CFG.openai_model if STATE.get("provider") == "openai"
                  else "mock")
     return CutResultOut(
+        body_matching=validated_body_sidecar(res.body_matching, people),
         route=res.route, count_confidence=res.count_confidence,
         detector_count=res.detector_count, vlm_count=res.vlm_count,
         people=people, notes=res.notes,
@@ -942,3 +945,9 @@ def export_order(req: ExportOrderRequest):
         created_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
         items=items, notes=notes,
     )
+
+# Body rendering is an explicit follow-up; /analyze keeps its existing latency.
+from api.body_render import build_body_router
+app.include_router(build_body_router(
+    resolve_pose=lambda pose_id: get_bvh_path(STATE.get("db_path", DB_PATH), pose_id),
+))

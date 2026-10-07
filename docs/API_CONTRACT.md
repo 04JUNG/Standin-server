@@ -506,3 +506,8 @@ OpenAPI 자동 문서: 서버 기동 후 **`http://127.0.0.1:8000/docs`**. 이 �
 - `output_scope`는 출력 메타데이터다. 수동 설정으로 관측/검색/refine 정책을 바꾸지 않는다.
 - 기존 full-body 피처 버전/DB/BVH/export 계약은 그대로다. 자세한 기준과 제한은
   [BODY_SCOPE.md](BODY_SCOPE.md)의 2단계를 참조한다.
+
+
+## 체형 선택·렌더 추가 계약
+
+`/analyze.body_matching`과 `POST /body/render`는 [체형 파이프라인 API 계약](BODY_PIPELINE_API_CONTRACT.md)을 따른다. 기존 포즈 검색·`/refine`·ExportOrder 1.0은 유지한다. 조정본은 `/refine.bvh` 본문이며 bvh_url은 항상 원본이다. 체형 렌더는 선택 FBX의 PNG를 반환하고, 최종 체형 포함 Export는 별도 envelope 소비가 필요하다.

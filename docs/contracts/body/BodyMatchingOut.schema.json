@@ -1,0 +1,1039 @@
+{
+  "$defs": {
+    "BodyAssetRef": {
+      "additionalProperties": true,
+      "properties": {
+        "body_id": {
+          "minLength": 1,
+          "title": "Body Id",
+          "type": "string"
+        },
+        "body_version": {
+          "minLength": 1,
+          "title": "Body Version",
+          "type": "string"
+        },
+        "asset_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Asset Sha256",
+          "type": "string"
+        },
+        "rig_version": {
+          "minLength": 1,
+          "title": "Rig Version",
+          "type": "string"
+        },
+        "measurement_version": {
+          "minLength": 1,
+          "title": "Measurement Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "body_id",
+        "body_version",
+        "asset_sha256",
+        "rig_version",
+        "measurement_version"
+      ],
+      "title": "BodyAssetRef",
+      "type": "object"
+    },
+    "BodyAttributeOut_Annotated_int__FieldInfo_annotation_NoneType__required_True__metadata__Strict_strict_True___Ge_ge_0___Le_le_4_____": {
+      "additionalProperties": true,
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "maximum": 4,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "visibility": {
+          "enum": [
+            "visible",
+            "uncertain",
+            "unknown"
+          ],
+          "title": "Visibility",
+          "type": "string"
+        },
+        "evidence": {
+          "title": "Evidence",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value",
+        "visibility",
+        "evidence"
+      ],
+      "title": "BodyAttributeOut[Annotated[int, FieldInfo(annotation=NoneType, required=True, metadata=[Strict(strict=True), Ge(ge=0), Le(le=4)])]]",
+      "type": "object"
+    },
+    "BodyAttributeOut_Literal__even____abdomen____lower_body___": {
+      "additionalProperties": true,
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "enum": [
+                "even",
+                "abdomen",
+                "lower_body"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "visibility": {
+          "enum": [
+            "visible",
+            "uncertain",
+            "unknown"
+          ],
+          "title": "Visibility",
+          "type": "string"
+        },
+        "evidence": {
+          "title": "Evidence",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value",
+        "visibility",
+        "evidence"
+      ],
+      "title": "BodyAttributeOut[Literal['even', 'abdomen', 'lower_body']]",
+      "type": "object"
+    },
+    "BodyAttributeOut_Literal__h3____h4____h5____h6____h7____h8___": {
+      "additionalProperties": true,
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "enum": [
+                "h3",
+                "h4",
+                "h5",
+                "h6",
+                "h7",
+                "h8"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "visibility": {
+          "enum": [
+            "visible",
+            "uncertain",
+            "unknown"
+          ],
+          "title": "Visibility",
+          "type": "string"
+        },
+        "evidence": {
+          "title": "Evidence",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value",
+        "visibility",
+        "evidence"
+      ],
+      "title": "BodyAttributeOut[Literal['h3', 'h4', 'h5', 'h6', 'h7', 'h8']]",
+      "type": "object"
+    },
+    "BodyAttributeOut_Literal__narrow____regular____broad___": {
+      "additionalProperties": true,
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "enum": [
+                "narrow",
+                "regular",
+                "broad"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "visibility": {
+          "enum": [
+            "visible",
+            "uncertain",
+            "unknown"
+          ],
+          "title": "Visibility",
+          "type": "string"
+        },
+        "evidence": {
+          "title": "Evidence",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value",
+        "visibility",
+        "evidence"
+      ],
+      "title": "BodyAttributeOut[Literal['narrow', 'regular', 'broad']]",
+      "type": "object"
+    },
+    "BodyAttributeOut_Literal__short____regular____long___": {
+      "additionalProperties": true,
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "enum": [
+                "short",
+                "regular",
+                "long"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "visibility": {
+          "enum": [
+            "visible",
+            "uncertain",
+            "unknown"
+          ],
+          "title": "Visibility",
+          "type": "string"
+        },
+        "evidence": {
+          "title": "Evidence",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value",
+        "visibility",
+        "evidence"
+      ],
+      "title": "BodyAttributeOut[Literal['short', 'regular', 'long']]",
+      "type": "object"
+    },
+    "BodyAttributeOut_Literal__small_frame____slim____regular____athletic____muscular____chubby____large_frame___": {
+      "additionalProperties": true,
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "enum": [
+                "small_frame",
+                "slim",
+                "regular",
+                "athletic",
+                "muscular",
+                "chubby",
+                "large_frame"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "visibility": {
+          "enum": [
+            "visible",
+            "uncertain",
+            "unknown"
+          ],
+          "title": "Visibility",
+          "type": "string"
+        },
+        "evidence": {
+          "title": "Evidence",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value",
+        "visibility",
+        "evidence"
+      ],
+      "title": "BodyAttributeOut[Literal['small_frame', 'slim', 'regular', 'athletic', 'muscular', 'chubby', 'large_frame']]",
+      "type": "object"
+    },
+    "BodyAttributesOut": {
+      "additionalProperties": true,
+      "properties": {
+        "head_ratio_class": {
+          "$ref": "#/$defs/BodyAttributeOut_Literal__h3____h4____h5____h6____h7____h8___"
+        },
+        "body_build": {
+          "$ref": "#/$defs/BodyAttributeOut_Literal__small_frame____slim____regular____athletic____muscular____chubby____large_frame___"
+        },
+        "frame_width": {
+          "$ref": "#/$defs/BodyAttributeOut_Literal__narrow____regular____broad___"
+        },
+        "limb_proportion": {
+          "$ref": "#/$defs/BodyAttributeOut_Literal__short____regular____long___"
+        },
+        "muscularity_visual": {
+          "$ref": "#/$defs/BodyAttributeOut_Annotated_int__FieldInfo_annotation_NoneType__required_True__metadata__Strict_strict_True___Ge_ge_0___Le_le_4_____"
+        },
+        "soft_volume": {
+          "$ref": "#/$defs/BodyAttributeOut_Annotated_int__FieldInfo_annotation_NoneType__required_True__metadata__Strict_strict_True___Ge_ge_0___Le_le_4_____"
+        },
+        "volume_distribution": {
+          "$ref": "#/$defs/BodyAttributeOut_Literal__even____abdomen____lower_body___"
+        }
+      },
+      "required": [
+        "head_ratio_class",
+        "body_build",
+        "frame_width",
+        "limb_proportion",
+        "muscularity_visual",
+        "soft_volume",
+        "volume_distribution"
+      ],
+      "title": "BodyAttributesOut",
+      "type": "object"
+    },
+    "BodyCandidateOut": {
+      "additionalProperties": true,
+      "properties": {
+        "body_id": {
+          "title": "Body Id",
+          "type": "string"
+        },
+        "body_version": {
+          "title": "Body Version",
+          "type": "string"
+        },
+        "rank": {
+          "minimum": 1,
+          "title": "Rank",
+          "type": "integer"
+        },
+        "rank_score": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Rank Score"
+        },
+        "acceptance_probability": {
+          "default": null,
+          "title": "Acceptance Probability",
+          "type": "null"
+        },
+        "score_spread": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Score Spread"
+        }
+      },
+      "required": [
+        "body_id",
+        "body_version",
+        "rank",
+        "rank_score"
+      ],
+      "title": "BodyCandidateOut",
+      "type": "object"
+    },
+    "BodyCoverageOut": {
+      "additionalProperties": true,
+      "properties": {
+        "head": {
+          "enum": [
+            "visible",
+            "uncertain",
+            "unknown"
+          ],
+          "title": "Head",
+          "type": "string"
+        },
+        "torso": {
+          "enum": [
+            "visible",
+            "uncertain",
+            "unknown"
+          ],
+          "title": "Torso",
+          "type": "string"
+        },
+        "arms": {
+          "enum": [
+            "visible",
+            "uncertain",
+            "unknown"
+          ],
+          "title": "Arms",
+          "type": "string"
+        },
+        "legs": {
+          "enum": [
+            "visible",
+            "uncertain",
+            "unknown"
+          ],
+          "title": "Legs",
+          "type": "string"
+        }
+      },
+      "required": [
+        "head",
+        "torso",
+        "arms",
+        "legs"
+      ],
+      "title": "BodyCoverageOut",
+      "type": "object"
+    },
+    "BodyObservationOut": {
+      "additionalProperties": true,
+      "properties": {
+        "schema_version": {
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "person_id": {
+          "title": "Person Id",
+          "type": "string"
+        },
+        "attributes": {
+          "$ref": "#/$defs/BodyAttributesOut"
+        },
+        "geometry": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Geometry",
+          "type": "object"
+        },
+        "geometry_version": {
+          "title": "Geometry Version",
+          "type": "string"
+        },
+        "clothing_occlusion": {
+          "title": "Clothing Occlusion",
+          "type": "boolean"
+        },
+        "foreshortening": {
+          "title": "Foreshortening",
+          "type": "boolean"
+        },
+        "ownership_ambiguous": {
+          "title": "Ownership Ambiguous",
+          "type": "boolean"
+        },
+        "crop_box": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Crop Box"
+        },
+        "provider_error": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Provider Error"
+        },
+        "reason_codes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "coverage": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BodyCoverageOut"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "full_body_visible": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Full Body Visible"
+        },
+        "presentation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PresentationOut"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "schema_version",
+        "person_id",
+        "attributes",
+        "geometry",
+        "geometry_version",
+        "clothing_occlusion",
+        "foreshortening",
+        "ownership_ambiguous",
+        "crop_box",
+        "provider_error",
+        "reason_codes"
+      ],
+      "title": "BodyObservationOut",
+      "type": "object"
+    },
+    "BodyPersonOut": {
+      "additionalProperties": true,
+      "properties": {
+        "person_index": {
+          "minimum": 0,
+          "title": "Person Index",
+          "type": "integer"
+        },
+        "person_id": {
+          "title": "Person Id",
+          "type": "string"
+        },
+        "auto_body_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Auto Body Id"
+        },
+        "applied_body_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Applied Body Id"
+        },
+        "selected_asset": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BodyAssetRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "selection_source": {
+          "anyOf": [
+            {
+              "enum": [
+                "auto_best_effort",
+                "auto_default",
+                "auto_visual_best_effort"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Selection Source"
+        },
+        "selection_state": {
+          "enum": [
+            "selected",
+            "unavailable"
+          ],
+          "title": "Selection State",
+          "type": "string"
+        },
+        "diagnostic": {
+          "title": "Diagnostic",
+          "type": "string"
+        },
+        "reason_codes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "acceptance_probability": {
+          "default": null,
+          "title": "Acceptance Probability",
+          "type": "null"
+        },
+        "candidates": {
+          "items": {
+            "$ref": "#/$defs/BodyCandidateOut"
+          },
+          "title": "Candidates",
+          "type": "array"
+        },
+        "observations": {
+          "$ref": "#/$defs/BodyObservationOut"
+        },
+        "pose_bindings": {
+          "items": {
+            "$ref": "#/$defs/BodyPoseBindingOut"
+          },
+          "title": "Pose Bindings",
+          "type": "array"
+        },
+        "render_required": {
+          "title": "Render Required",
+          "type": "boolean"
+        },
+        "manual_change_scope": {
+          "const": "current_cut_person",
+          "title": "Manual Change Scope",
+          "type": "string"
+        },
+        "presentation_selection": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PresentationSelectionOut"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "tied_body_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Tied Body Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "person_index",
+        "person_id",
+        "auto_body_id",
+        "applied_body_id",
+        "selected_asset",
+        "selection_source",
+        "selection_state",
+        "diagnostic",
+        "reason_codes",
+        "candidates",
+        "observations",
+        "pose_bindings",
+        "render_required",
+        "manual_change_scope"
+      ],
+      "title": "BodyPersonOut",
+      "type": "object"
+    },
+    "BodyPoseBindingOut": {
+      "additionalProperties": true,
+      "properties": {
+        "pose_id": {
+          "title": "Pose Id",
+          "type": "string"
+        },
+        "view": {
+          "enum": [
+            "front",
+            "three_quarter",
+            "side",
+            "back",
+            "side_opposite",
+            "three_quarter_opposite"
+          ],
+          "title": "View",
+          "type": "string"
+        },
+        "pose_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Pose Sha256"
+        }
+      },
+      "required": [
+        "pose_id",
+        "view",
+        "pose_sha256"
+      ],
+      "title": "BodyPoseBindingOut",
+      "type": "object"
+    },
+    "PresentationOut": {
+      "additionalProperties": true,
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "enum": [
+                "feminine",
+                "masculine",
+                "androgynous"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "visibility": {
+          "enum": [
+            "visible",
+            "uncertain",
+            "unknown"
+          ],
+          "title": "Visibility",
+          "type": "string"
+        },
+        "cues": {
+          "items": {
+            "enum": [
+              "face_design",
+              "body_contour",
+              "hair_design",
+              "costume_design"
+            ],
+            "type": "string"
+          },
+          "title": "Cues",
+          "type": "array"
+        },
+        "evidence": {
+          "title": "Evidence",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value",
+        "visibility",
+        "cues",
+        "evidence"
+      ],
+      "title": "PresentationOut",
+      "type": "object"
+    },
+    "PresentationSelectionOut": {
+      "additionalProperties": true,
+      "properties": {
+        "observed": {
+          "anyOf": [
+            {
+              "enum": [
+                "feminine",
+                "masculine",
+                "androgynous"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Observed"
+        },
+        "visibility": {
+          "enum": [
+            "visible",
+            "uncertain",
+            "unknown"
+          ],
+          "title": "Visibility",
+          "type": "string"
+        },
+        "mode": {
+          "enum": [
+            "compatible_candidates",
+            "tie_or_default",
+            "unresolved",
+            "matching_style_unavailable"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "reason_codes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "eligible_before": {
+          "minimum": 0,
+          "title": "Eligible Before",
+          "type": "integer"
+        },
+        "eligible_after": {
+          "minimum": 0,
+          "title": "Eligible After",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "observed",
+        "visibility",
+        "mode",
+        "reason_codes",
+        "eligible_before",
+        "eligible_after"
+      ],
+      "title": "PresentationSelectionOut",
+      "type": "object"
+    }
+  },
+  "additionalProperties": true,
+  "properties": {
+    "schema_version": {
+      "const": "body-match.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "mode": {
+      "enum": [
+        "auto",
+        "shadow"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "ok",
+        "partial",
+        "unavailable",
+        "not_applicable"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "people": {
+      "items": {
+        "$ref": "#/$defs/BodyPersonOut"
+      },
+      "title": "People",
+      "type": "array"
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reason"
+    },
+    "input_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Input Sha256"
+    },
+    "catalog_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Catalog Version"
+    },
+    "catalog_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Catalog Sha256"
+    },
+    "prompt_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Prompt Version"
+    },
+    "provider_requested": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Provider Requested"
+    },
+    "provider_actual": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Provider Actual"
+    },
+    "model": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Model"
+    },
+    "is_mock": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Is Mock"
+    },
+    "pose_order_preserved": {
+      "const": true,
+      "default": true,
+      "title": "Pose Order Preserved",
+      "type": "boolean"
+    },
+    "rendering_executed": {
+      "const": false,
+      "default": false,
+      "title": "Rendering Executed",
+      "type": "boolean"
+    },
+    "elapsed_ms": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Elapsed Ms"
+    }
+  },
+  "required": [
+    "schema_version",
+    "mode",
+    "status",
+    "people"
+  ],
+  "title": "BodyMatchingOut",
+  "type": "object"
+}

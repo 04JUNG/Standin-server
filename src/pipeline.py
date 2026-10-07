@@ -64,7 +64,7 @@ class _SlotOutcome:
 
 class Pipeline:
     def __init__(self, entries, vlm_client: BaseVLMClient | None = None,
-                 detector=None, pose_model=None):
+                 detector=None, pose_model=None, body_matcher=None):
         # 검색 행렬과 메타데이터가 실행 중 서로 어긋나지 않도록 같은 immutable
         # snapshot을 공유한다. 라이브러리 갱신은 새 Pipeline 생성 시 자동 반영된다.
         self.entries = tuple(entries)
@@ -72,6 +72,7 @@ class Pipeline:
             PositionSearchIndex.build(self.entries)
             if CFG.position_search_vectorized else None
         )
+        self.body_matcher = body_matcher
         self.vlm = vlm_client or build_vlm_client()
         self.detector = detector or MockDetector()
         self.pose = pose_model or build_pose_model()
@@ -79,6 +80,13 @@ class Pipeline:
     # ---- 메인 ----
     def process_cut(self, image, img_w: int = 512, img_h: int = 768,
                     rescue_request=None) -> CutResult:
+        result = self._process_cut(image, img_w, img_h, rescue_request)
+        if CFG.body_matching_mode != "off":
+            from .experimental.body_matching.service import attach_body_matching
+            attach_body_matching(self, image, result, CFG)
+        return result
+
+    def _process_cut(self, image, img_w, img_h, rescue_request):
         rescue_request = parse_rescue_request(rescue_request)
         # 1) VLM: 러프 → 제어 신호(shot·사람수·대략박스)
         with span("vlm"):

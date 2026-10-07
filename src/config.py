@@ -71,6 +71,14 @@ class Config:
     gemini_retry_max_seconds: float = float(os.getenv("GEMINI_RETRY_MAX_SECONDS", "2.0"))
     openai_model: str = os.getenv("OPENAI_MODEL", "gpt-5-mini")
 
+    # Body sidecar: observe/choose one FBX without changing existing pose search.
+    body_matching_mode: str = os.getenv("BODY_MATCHING_MODE", "off")
+    body_catalog_path: str = os.getenv("BODY_CATALOG_PATH", "config/body_catalog.v1.json")
+    body_vlm_provider: str = os.getenv("BODY_VLM_PROVIDER", "mock")
+    body_vlm_model: str = os.getenv("BODY_VLM_MODEL", "gemini-2.5-flash")
+    body_timeout_seconds: float = float(os.getenv("BODY_TIMEOUT_SECONDS", "12"))
+    body_max_people: int = int(os.getenv("BODY_MAX_PEOPLE", "8"))
+
     # --- 검출/포즈 ---  "mock" | "rtmlib"
     pose_backend: str = os.getenv("POSE_BACKEND", "mock")
     # 배포 단위 variant. 미설정=current-X 현행 경로이며 Human-Art는 manifest와
@@ -447,6 +455,14 @@ class Config:
     refine_timeout_seconds: float = float(os.getenv("REFINE_TIMEOUT_SECONDS", "5.0"))
 
     def __post_init__(self) -> None:
+        if self.body_matching_mode not in {"off", "shadow", "auto"}:
+            raise ValueError("BODY_MATCHING_MODE must be off, shadow or auto")
+        if self.body_vlm_provider not in {"mock", "gemini"}:
+            raise ValueError("BODY_VLM_PROVIDER must be mock or gemini")
+        if not math.isfinite(self.body_timeout_seconds) or self.body_timeout_seconds <= 0:
+            raise ValueError("BODY_TIMEOUT_SECONDS must be positive and finite")
+        if not 1 <= self.body_max_people <= 20:
+            raise ValueError("BODY_MAX_PEOPLE must be in [1,20]")
         self.thumbnail_renderer = self.thumbnail_renderer.strip().lower()
         if self.thumbnail_renderer not in ("converter", "mannequin"):
             raise ValueError(

@@ -67,3 +67,6 @@ Thumbs.db
 .vscode/
 .idea/
 *.pem
+
+# Local body evaluation assets and render evidence (not PR inputs)
+/artifacts/body-render-api/
