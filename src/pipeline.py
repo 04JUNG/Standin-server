@@ -19,6 +19,7 @@
 """
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from time import perf_counter
 
@@ -32,6 +33,8 @@ from .pose import build_pose_model
 from .pose_rescue import parse_rescue_request, rescue_slots
 from .routing import route
 from .descriptor import build_slot_descriptors
+from .person_tags import apply_person_tags
+from .logging_setup import log_warn
 from .body_scope import BodyScope, detect_scope
 from .refine_policy import structural_refine_allowed
 from .search import PositionSearchIndex, candidate_stability, knn_geometric, knn_upper_body
@@ -76,6 +79,39 @@ class Pipeline:
         self.detector = detector or MockDetector()
         self.pose = pose_model or build_pose_model()
 
+    # ---- 인물별 태그(기록용, 별도 호출) ----
+    def _start_person_tags(self, image, img_w: int, img_h: int, vlm) -> None:
+        """태그 호출을 백그라운드로 띄운다. 끄면(기본) 아무 일도 하지 않는다."""
+        vlm._person_tags_future = None
+        if not CFG.vlm_person_tags or vlm.num_people <= 0:
+            return
+        boxes = [
+            None if box is None else (
+                box.x1 / img_w, box.y1 / img_h, box.x2 / img_w, box.y2 / img_h)
+            for box in vlm.approx_boxes[:vlm.num_people]
+        ]
+        # 박스 수가 인원수와 다르면 묻지 않는다. 길이가 어긋난 배열은 어차피 버려진다.
+        if len(boxes) != vlm.num_people:
+            return
+        executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="person-tags")
+        vlm._person_tags_future = executor.submit(self.vlm.tag_people, image, boxes)
+        executor.shutdown(wait=False)
+
+    def _join_person_tags(self, vlm) -> None:
+        """태그 호출 결과를 합친다. 늦거나 실패하면 태그 없이 간다."""
+        future = getattr(vlm, "_person_tags_future", None)
+        if future is None:
+            return
+        vlm._person_tags_future = None
+        budget = max(0.1, CFG.vlm_person_tags_timeout_ms / 1000)
+        try:
+            payload = future.result(timeout=budget)
+        except Exception as error:  # noqa: BLE001 - 분석을 막지 않는다
+            log_warn("person_tags_join", status="failed", errorType=type(error).__name__)
+            future.cancel()
+            return
+        apply_person_tags(vlm, payload)
+
     # ---- 메인 ----
     def process_cut(self, image, img_w: int = 512, img_h: int = 768,
                     rescue_request=None) -> CutResult:
@@ -83,6 +119,12 @@ class Pipeline:
         # 1) VLM: 러프 → 제어 신호(shot·사람수·대략박스)
         with span("vlm"):
             vlm: VLMAnalysis = self.vlm.analyze(image, img_w, img_h)
+
+        # 1-b) 인물별 태그는 **별도 호출**로 받는다(기록용). 분석 프롬프트를 건드리지
+        #      않으므로 route·인원수·박스가 이 호출 때문에 달라질 수 없다.
+        #      스켈레톤 추출과 겹쳐 돌려 지연을 숨긴다 — 결과는 descriptor를 만들기
+        #      직전에 합친다(`_join_person_tags`).
+        self._start_person_tags(image, img_w, img_h, vlm)
 
         # 2) Shot 분기
         with span("route"):
@@ -103,6 +145,7 @@ class Pipeline:
                 slot.result_box.x1 if slot.result_box else float("inf"),
                 slot.slot_id,
             ))
+            self._join_person_tags(vlm)
             descs = build_slot_descriptors(vlm, slots)
             for desc in descs:
                 desc.quality_reasons.append("head_search_unsupported")
@@ -469,6 +512,8 @@ class Pipeline:
     def _evaluate_slot(self, vlm: VLMAnalysis, slot,
                        threshold_scale: float) -> _SlotOutcome:
         """한 슬롯의 masked 검색·A/B 안정성·refine 정책을 한 번에 계산한다."""
+        # 태그 호출이 아직 안 끝났으면 여기서 합친다. 두 번째 슬롯부터는 바로 지나간다.
+        self._join_person_tags(vlm)
         desc = build_slot_descriptors(vlm, [slot])[0]
         if desc.output_scope.detected == BodyScope.HEAD:
             slot.reasons.append("head_search_unsupported")
