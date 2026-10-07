@@ -123,6 +123,36 @@ def _pair_stats(pairs: Iterable[tuple[Sample, Sample]]) -> dict:
     }
 
 
+def per_cut_disagreement(by_cut: dict) -> list[dict]:
+    """컷별로 A↔B가 어긋난 쌍 수. 전체 비율만으로는 "몇몇 컷이 끄는지"를 알 수 없다.
+
+    남기는 값은 컷 ID와 숫자뿐이다 — 이미지도 응답 원문도 보고서에 넣지 않는다.
+    어긋남이 0인 컷은 빼서 보고서가 컷 수만큼 길어지지 않게 한다.
+    """
+    rows = []
+    for cut_id, arms in by_cut.items():
+        a = [s for s in arms["A"] if s.ok]
+        b = [s for s in arms["B"] if s.ok]
+        pairs = list(product(a, b))
+        if not pairs:
+            continue
+        count_bad = sum(1 for first, second in pairs if first.num_people != second.num_people)
+        route_bad = sum(1 for first, second in pairs if first.route != second.route)
+        if not count_bad and not route_bad:
+            continue
+        rows.append({
+            "cut_id": cut_id,
+            "cross_pairs": len(pairs),
+            "count_mismatch_pairs": count_bad,
+            "route_mismatch_pairs": route_bad,
+            # 어느 쪽이 몇 명으로 봤는지. 한쪽만 흔들리는지 둘 다 흔들리는지 구분된다.
+            "a_counts": sorted({s.num_people for s in a if s.num_people is not None}),
+            "b_counts": sorted({s.num_people for s in b if s.num_people is not None}),
+        })
+    rows.sort(key=lambda row: (-row["count_mismatch_pairs"], -row["route_mismatch_pairs"]))
+    return rows
+
+
 def evaluate(samples: list[Sample], gate: dict = GATE) -> dict:
     """샘플 목록 → 지표와 통과 여부. 순수 함수다."""
     by_cut: dict[str, dict[str, list[Sample]]] = {}
@@ -187,6 +217,8 @@ def evaluate(samples: list[Sample], gate: dict = GATE) -> dict:
         "gate": dict(gate),
         "cuts": len(by_cut),
         "samples": {"A": len(a_ok) + failures["A"], "B": len(b_ok) + failures["B"]},
+        # 진단용. 어긋난 컷만 들어간다(많이 어긋난 순).
+        "per_cut_disagreement": per_cut_disagreement(by_cut),
     }
 
 
