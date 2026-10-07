@@ -227,6 +227,13 @@ POSE_LIBRARY_URI=s3://<bucket>/pose-library/v1.tar.gz
 
 ## 테스트
 
+### 선택 실행: RTMPose + Gemini 관절 보완
+
+기존 HTTP API를 변경하지 않는 v3.2 추출 모듈과 CLI는
+[`docs/HYBRID_POSE_V32.md`](docs/HYBRID_POSE_V32.md)를 참고하세요.
+흐름은 RTM → 평가 1회 → 필요 시 부분 수정 1회 → 코드 검사이며,
+수정 후 VLM 재평가는 없습니다. 20초 목표는 아직 미달성입니다.
+
 ```bash
 python tests/test_smoke.py                    # 전체 스모크(자체 러너 내장, pytest 불필요)
 python tests/test_smoke.py 2>&1 | grep FAIL   # 실패만 보기
