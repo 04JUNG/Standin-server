@@ -399,6 +399,7 @@ def create_app(
         payload = {
             "ok": ok,
             "solver_version": SOLVER_VERSION,
+            "camera_version": "candidate-camera-v1",
             "framing_version": FRAMING_VERSION,
             "output_scopes": (sorted(OUTPUT_SCOPES) if not getattr(
                 getattr(blender_runner, "settings", None), "force_exact_v324", False
@@ -423,6 +424,7 @@ def create_app(
         thumbnail: ThumbnailRequest | None = None,
         output_scope: str = "full",
         preview_view: str | None = None,
+        camera_rotation: list | None = None,
     ) -> CompletedConversion:
         conversion_id = str(uuid.uuid4())
         request_started = time.monotonic()
@@ -484,7 +486,10 @@ def create_app(
                 thumbnail=thumbnail,
                 output_scope=output_scope,
                 preview_view=preview_view,
+                **({"camera_rotation": camera_rotation} if camera_rotation is not None else {}),
             )
+            if camera_rotation is not None and result.report.get("camera_rotation") != camera_rotation:
+                raise WorkerIntegrityError("camera rotation lineage mismatch")
             _verify_result_integrity(
                 result,
                 conversion_id=conversion_id,
@@ -854,13 +859,21 @@ def create_app(
         output_scope: str = Form(default="full"),
         preview_view: str = Form(default="front"),
         expected_bvh_sha256: str = Form(...),
+        camera_rotation: str | None = Form(default=None),
     ):
         """One verified FBX plus its own reimported preview, in a single response."""
+        from converter.camera import validate_rotation
+        try:
+            rotation = validate_rotation(json.loads(camera_rotation)) if camera_rotation is not None else None
+            if camera_rotation is not None and (rotation is None or preview_view != "front"):
+                raise ValueError("aligned output requires front preview and a matrix")
+        except (ValueError, TypeError) as exc:
+            raise ApiProblem(400, "INVALID_OPTION", "invalid camera_rotation") from exc
         completed = _execute_conversion(
             bvh=bvh, character_id=character_id, frame=FRAME, mirror=False,
             output_mode=OUTPUT_MODE, apply_root_translation=APPLY_ROOT_TRANSLATION,
             response_format="framed", expected_bvh_sha256=expected_bvh_sha256,
-            output_scope=output_scope, preview_view=preview_view,
+            output_scope=output_scope, preview_view=preview_view, camera_rotation=rotation,
         )
         result = completed.result
         if (not result.preview.startswith(b"\x89PNG\r\n\x1a\n")
@@ -881,6 +894,7 @@ def create_app(
             "source_bvh_sha256": result.source_bvh_sha256,
             "fbx_sha256": result.artifact_sha256,
             "preview_sha256": result.report["preview_sha256"],
+            "camera_rotation": rotation,
             "fbx_base64": base64.b64encode(result.artifact).decode("ascii"),
             "preview_base64": base64.b64encode(result.preview).decode("ascii"),
         }

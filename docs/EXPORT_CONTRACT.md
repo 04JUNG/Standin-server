@@ -207,3 +207,13 @@ mirror는 Converter가 한 번만 적용한다. CSP는 같은 좌우 반전을 �
 - legacy `/export-order`: `api/models.py`의 `ExportOrderRequest` / `ExportOrder` / `ExportItem`
 - inference/refine → converter Phase 3: `FBX_CONVERTER_V3_2_PHASE3_BFF_HANDOFF.md`
 - 내부 `/convert-bundle` 및 호환 `/convert`: `converter_api/app.py`와 converter OpenAPI `/docs`
+# 후보 카메라와 FBX (2026-10-07 추가)
+
+`POST /convert-framed`는 선택적 multipart `camera_rotation`을 받는다(JSON 3×3
+proper rotation, Y-up). 사용 시 `preview_view=front`만 허용한다. 동결 solver 후
+완성 모델 전체를 회전하고 저장한 FBX를 다시 읽어 preview를 만든다. 응답은 실제 적용한
+`camera_rotation`을 그대로 되돌려준다. BFF는 요청과 다르거나 누락되면 실패 처리한다.
+
+카메라는 FBX와 preview에만 적용한다. BVH는 회전하지 않는다. Mirror와 카메라를
+동시에 요청하는 경로는 지원하지 않으며, exact V3.2.4도 회전을 허용하지 않는다.
+전신·반신·흉상·두상 모두 같은 행렬을 사용한다. 관절·손가락의 상대 회전은 바꾸지 않는다.

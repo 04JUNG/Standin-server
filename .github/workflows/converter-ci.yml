@@ -76,6 +76,7 @@ jobs:
             tests/converter/test_registry.py \
             tests/converter/test_runner_failures.py \
             tests/converter/test_api_contract.py \
+            tests/converter/test_framing_contract.py \
             tests/converter/test_refined_bvh_e2e.py \
             tests/converter/test_deployment_contract.py \
             tests/converter/test_latency_probe.py

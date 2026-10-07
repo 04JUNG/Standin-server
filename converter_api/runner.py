@@ -148,6 +148,7 @@ class RunnerSettings:
     thumbnail_resolution: int = THUMBNAIL_RENDER_RESOLUTION
     thumbnail_samples: int = THUMBNAIL_RENDER_SAMPLES
     thumbnail_engines: tuple[str, ...] = THUMBNAIL_ENGINES
+    camera_timeout_seconds: float = 60.0
 
     @classmethod
     def from_env(cls, repo_root: Path | None = None) -> "RunnerSettings":
@@ -165,6 +166,7 @@ class RunnerSettings:
                 "BLENDER_EXPECTED_BUILD_HASH", EXPECTED_BLENDER_BUILD_HASH
             ),
             timeout_seconds=float(os.getenv("CONVERTER_TIMEOUT_SECONDS", "30")),
+            camera_timeout_seconds=float(os.getenv("CONVERTER_CAMERA_TIMEOUT_SECONDS", "60")),
             terminate_grace_seconds=float(
                 os.getenv("CONVERTER_TERMINATE_GRACE_SECONDS", "2")
             ),
@@ -223,6 +225,8 @@ class BlenderRunner:
         self.settings = settings or RunnerSettings.from_env()
         if self.settings.timeout_seconds <= 0:
             raise ValueError("converter timeout_seconds must be positive")
+        if self.settings.camera_timeout_seconds <= 0:
+            raise ValueError("camera timeout_seconds must be positive")
         if self.settings.terminate_grace_seconds < 0:
             raise ValueError("converter terminate_grace_seconds must be non-negative")
         if self.settings.max_concurrent_processes <= 0:
@@ -390,6 +394,7 @@ class BlenderRunner:
         thumbnail_path: Path | None = None,
         output_scope: str = "full",
         preview_view: str | None = None,
+        camera_rotation: list | None = None,
     ) -> ConversionResult:
         if not report.get("ok"):
             raise self._report_error(report)
@@ -417,6 +422,8 @@ class BlenderRunner:
             "blender_build_hash": self.settings.expected_blender_build_hash,
         }
         mismatched = [key for key, value in expected.items() if report.get(key) != value]
+        if camera_rotation is not None and report.get("camera_rotation") != camera_rotation:
+            mismatched.append("camera_rotation")
         if output_scope != "full" or preview_view:
             if report.get("output_scope") != output_scope or report.get("framing_version") != FRAMING_VERSION:
                 mismatched.append("output_scope/framing_version")
@@ -546,6 +553,7 @@ class BlenderRunner:
         thumbnail: ThumbnailRequest | None = None,
         output_scope: str = "full",
         preview_view: str | None = None,
+        camera_rotation: list | None = None,
     ) -> ConversionResult:
         if not bvh_bytes:
             raise ConversionRejectedError("BVH upload is empty")
@@ -561,6 +569,13 @@ class BlenderRunner:
             raise ConversionRejectedError("invalid preview_view")
         if self.settings.force_exact_v324 and output_scope != "full":
             raise ConversionRejectedError("exact V3.2.4 mode permits full framing only")
+        from converter.camera import validate_rotation
+        try:
+            validate_rotation(camera_rotation)
+        except ValueError as exc:
+            raise ConversionRejectedError(str(exc)) from exc
+        if camera_rotation is not None and (preview_view != "front" or mirror or thumbnail or self.settings.force_exact_v324):
+            raise ConversionRejectedError("invalid aligned camera options")
         queue_started = time.monotonic()
         self._process_slots.acquire()
         queue_wait_ms = (time.monotonic() - queue_started) * 1000.0
@@ -578,6 +593,7 @@ class BlenderRunner:
                 thumbnail=thumbnail,
                 output_scope=output_scope,
                 preview_view=preview_view,
+                camera_rotation=camera_rotation,
             )
         finally:
             execution_ms = (time.monotonic() - execution_started) * 1000.0
@@ -603,6 +619,7 @@ class BlenderRunner:
         thumbnail: ThumbnailRequest | None = None,
         output_scope: str = "full",
         preview_view: str | None = None,
+        camera_rotation: list | None = None,
     ) -> ConversionResult:
         if not character_path.is_file() or character_path.suffix.lower() != ".fbx":
             raise WorkerIntegrityError("character artifact is not a regular FBX file")
@@ -650,6 +667,7 @@ class BlenderRunner:
                 },
                 "output_scope": output_scope,
                 "preview_view": preview_view,
+                "camera_rotation": camera_rotation,
             }
             job_path.write_text(
                 json.dumps(job, sort_keys=True, separators=(",", ":")) + "\n",
@@ -670,7 +688,9 @@ class BlenderRunner:
             except OSError as exc:
                 raise BlenderUnavailableError("Blender process could not start") from exc
             try:
-                stdout, stderr = process.communicate(timeout=self.settings.timeout_seconds)
+                timeout = (max(self.settings.timeout_seconds, self.settings.camera_timeout_seconds)
+                           if camera_rotation is not None else self.settings.timeout_seconds)
+                stdout, stderr = process.communicate(timeout=timeout)
             except subprocess.TimeoutExpired as exc:
                 self._terminate_process_group(
                     process, self.settings.terminate_grace_seconds
@@ -694,6 +714,7 @@ class BlenderRunner:
                 thumbnail_path=thumbnail_path,
                 output_scope=output_scope,
                 preview_view=preview_view,
+                camera_rotation=camera_rotation,
             )
 
 

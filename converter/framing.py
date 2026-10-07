@@ -130,7 +130,7 @@ def crop_meshes(arm, meshes, scope: str) -> dict:
             "vertices_after": after, "cap_faces": caps, "bones_preserved": len(bones)}
 
 
-def render_preview(meshes, output: Path, view="front") -> None:
+def render_preview(meshes, output: Path, view="front", *, aligned=False) -> None:
     """Frame the visible cropped mesh, not the retained full skeleton."""
     import math
     import bpy
@@ -147,7 +147,7 @@ def render_preview(meshes, output: Path, view="front") -> None:
     radius = max((p-center).length for p in points)
     angle = {"front": 0, "three_quarter": 45, "side": 90, "back": 180}[view]
     yaw = math.radians(angle)
-    direction = Vector((math.sin(yaw), -math.cos(yaw), .07))
+    direction = Vector((math.sin(yaw), -math.cos(yaw), 0 if aligned else .07))
     camera_data = bpy.data.cameras.new("scope-preview")
     camera = bpy.data.objects.new("scope-preview", camera_data)
     bpy.context.collection.objects.link(camera)
@@ -165,30 +165,38 @@ def render_preview(meshes, output: Path, view="front") -> None:
     scene.display.shading.show_shadows = True
     scene.display.shading.show_cavity = True
     scene.display.shading.background_type = 'WORLD'
+    if aligned:
+        scene.display.render_aa = '8'
     if scene.world is None:
         scene.world = bpy.data.worlds.new("scope-preview-world")
     scene.world.color = (.14, .15, .17)
-    scene.render.resolution_x = scene.render.resolution_y = 512
+    scene.render.resolution_x = scene.render.resolution_y = 256 if aligned else 512
     scene.render.resolution_percentage = 100
     scene.render.image_settings.file_format = 'PNG'
     scene.render.filepath = str(output)
     bpy.ops.render.render(write_still=True)
 
 
-def process_output(path, scope="full", *, preview_path=None, view="front") -> dict:
+def process_output(path, scope="full", *, preview_path=None, view="front", camera_rotation=None) -> dict:
     from converter import retarget as rt
+    from converter.camera import validate_rotation, rotate_scene
 
     validate_scope(scope)
-    if scope == "full" and preview_path is None:
+    validate_rotation(camera_rotation)
+    if camera_rotation is not None and view != "front":
+        raise ValueError("aligned output requires a fixed front camera")
+    if scope == "full" and preview_path is None and camera_rotation is None:
         return {"version": FRAMING_VERSION, "scope": scope}
     rt.reset_scene()
     arm, meshes = rt.import_character(str(path))
     report = crop_meshes(arm, meshes, scope)
-    if scope != "full":
+    if camera_rotation is not None:
+        rotate_scene(arm, camera_rotation)
+    if scope != "full" or camera_rotation is not None:
         rt.export_fbx(str(path), embed_textures=False)
     if preview_path:
         # Reimport the actual delivered FBX; preview/export cannot silently diverge.
         rt.reset_scene()
         _, meshes = rt.import_character(str(path))
-        render_preview(meshes, Path(preview_path), view)
+        render_preview(meshes, Path(preview_path), view, aligned=camera_rotation is not None)
     return report
