@@ -192,3 +192,62 @@ def test_report_from_a_dataset_keeps_only_ids_and_numbers(tmp_path):
     stored = Path(report["report_path"]).read_text(encoding="utf-8")
     assert "secret-rough-name" not in stored
     assert json.loads(stored)["prompts"] == {"A": "p1-scope", "B": "p2-person-tags"}
+
+
+# ── 컷별 불일치 집계 ──────────────────────────────────────────────────
+
+
+def _sample(cut_id, arm, *, route="core", num_people=2, ok=True):
+    from standin_eval.vlm_compare import Sample
+
+    return Sample(cut_id=cut_id, arm=arm, ok=ok, latency_ms=100.0,
+                  route=route, num_people=num_people, entangled=False, boxes=[])
+
+
+def test_per_cut_rows_only_cover_cuts_that_disagree():
+    # 전체 비율만 보면 "몇몇 컷이 끄는지"를 알 수 없다. 그걸 보려고 넣은 집계다.
+    samples = [
+        _sample("agree", "A"), _sample("agree", "B"),
+        _sample("route-differs", "A", route="core"),
+        _sample("route-differs", "B", route="bust"),
+    ]
+    rows = evaluate(samples)["per_cut_disagreement"]
+    assert [row["cut_id"] for row in rows] == ["route-differs"]
+    assert rows[0]["route_mismatch_pairs"] == 1
+    assert rows[0]["count_mismatch_pairs"] == 0
+
+
+def test_rows_say_what_each_arm_saw():
+    samples = [
+        _sample("c", "A", num_people=3), _sample("c", "A", num_people=3),
+        _sample("c", "B", num_people=5), _sample("c", "B", num_people=8),
+    ]
+    row = evaluate(samples)["per_cut_disagreement"][0]
+    # 한쪽만 흔들리는지 둘 다 흔들리는지 구분돼야 원인을 좁힐 수 있다.
+    assert row["a_counts"] == [3]
+    assert row["b_counts"] == [5, 8]
+    assert row["count_mismatch_pairs"] == row["cross_pairs"] == 4
+
+
+def test_worst_cuts_come_first():
+    samples = [
+        _sample("mild", "A", route="core"), _sample("mild", "A", route="core"),
+        _sample("mild", "B", route="core"), _sample("mild", "B", route="bust"),
+        _sample("bad", "A", route="core"), _sample("bad", "A", route="core"),
+        _sample("bad", "B", route="bust"), _sample("bad", "B", route="bust"),
+    ]
+    rows = evaluate(samples)["per_cut_disagreement"]
+    assert [row["cut_id"] for row in rows] == ["bad", "mild"]
+
+
+def test_failed_samples_do_not_make_a_row():
+    samples = [_sample("c", "A"), _sample("c", "B", ok=False)]
+    assert evaluate(samples)["per_cut_disagreement"] == []
+
+
+def test_rows_carry_no_image_or_response_text():
+    # 보고서에 남기는 것은 컷 ID와 숫자뿐이다.
+    samples = [_sample("c", "A", route="core"), _sample("c", "B", route="bust")]
+    row = evaluate(samples)["per_cut_disagreement"][0]
+    assert set(row) == {"cut_id", "cross_pairs", "count_mismatch_pairs",
+                        "route_mismatch_pairs", "a_counts", "b_counts"}
