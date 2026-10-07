@@ -135,28 +135,44 @@ python -m pose_gaps measure --production data/bundles/next --parent data/bundles
 공백 군집의 태그 히스토그램(`person_action`·`person_view`)은 export 항목의 `person.tags`에서 온다.
 값은 추론 `PersonOut.person_tags`이고 `source`가 출처를 알려 준다(`docs/API_CONTRACT.md`).
 
-- `p1-scope`(지금 운영): 인물별로 묻지 않는다. 사람이 1명인 컷만 VLM이 실제로 말한 컷 값을
-  `legacy_cut`으로 쓰고, 여러 명인 컷은 `unknown`이다.
-- `p2-person-tags`: 인물마다 `vlm_person`으로 받는다. 켜기 전에 아래 게이트를 통과해야 한다.
+인물별 태그는 **분석과 별도의 VLM 호출**로 받는다. 분석 프롬프트(`p1-scope`)는 그대로 둔다.
+
+| 상태 | 뜻 |
+|---|---|
+| `vlm_person` | 태그 호출이 그 인물에 대해 답했다 |
+| `legacy_cut` | 1인 컷에서 VLM이 말한 컷 값을 그 사람 것으로 봤다(태그 호출을 하지 않은 Job) |
+| `unknown` | 물었으나 모른다고 했거나, 배열이 어긋나 통째로 버렸다 |
 
 ```bash
-# 평가 데이터셋(selected12와, provider에 보낼 권리가 확인된 제공 러프만)에서 A/B를 번갈아 5회씩
-python -m standin_eval run vlm-compare --dataset <id> --provider gemini --a p1-scope --b p2-person-tags
+VLM_PERSON_TAGS=1                  # 끄면(기본) 두 번째 호출을 하지 않는다
+VLM_PERSON_TAGS_TIMEOUT_MS=15000   # 이 안에 안 오면 태그 없이 응답한다
 ```
 
-같은 프롬프트끼리의 차이(A↔A)를 잡음 바닥으로 두고 A↔B를 잰다(`standin_eval/vlm_compare.py::GATE`).
+- 호출은 스켈레톤 추출과 겹쳐 돌고, descriptor를 만들기 직전에 합친다(`pipeline.py::_join_person_tags`).
+- 실패·지연·엉뚱한 응답 어느 쪽이든 분석 결과는 바뀌지 않는다. 배열 길이가 인원수와 다르면
+  통째로 버린다 — 한 칸이 밀리면 다른 사람의 태그가 붙는다.
+- 묻기는 했는데 답이 비었으면 `unknown`이다. 묻지 않은 Job(`legacy_cut` 경로)과 구분된다.
 
-| 항목 | 통과 기준 |
-|---|---|
-| B 파싱 실패 | 0건 |
-| route 변화 | 잡음 바닥 + 2%p 이하 |
-| 인원수 일치율 | 잡음 바닥 − 3%p 이상 |
-| 박스 IoU 중앙값 | 하락 0.03 이하 |
-| 얽힘 판정 변화 | 잡음 바닥 + 1건 이하 |
-| 지연 p95 | +15% 이하 |
-| 인물 배열 정렬률 | 95% 이상 |
+## 왜 한 호출에 합치지 않았나
 
-통과하면 staging부터 GitHub environment 변수 `VLM_PROMPT_VERSION=p2-person-tags`를 두고 배포
-워크플로를 다시 실행한다(`.github/workflows/deploy.yml`). beta도 같은 방식이고, 7일 동안 지표를
-본다. 되돌릴 때는 변수를 지우고(기본 `p1-scope`) 워크플로를 다시 실행한다. 응답의
-`inference_metadata.vlm_prompt_version`과 BFF에 저장된 값으로 어느 프롬프트가 답했는지 구분된다.
+처음에는 분석 프롬프트에 인물별 항목을 더한 `p2-person-tags`로 갔다. 그 프롬프트는 `vlm-compare`
+게이트를 끝내 통과하지 못했다. **같은 호출에서 route가 함께 흔들리기 때문이다.**
+
+| 측정(제공 러프, gemini-3.5-flash) | route 변화 초과 | 비고 |
+|---|---|---|
+| 48컷 × 5회 (2026-10-06) | +3.33%p | 기준 +2%p |
+| 48컷 × 5회, 판단 순서 문장 추가 | −0.44%p | 인원수·지연이 대신 걸림(표본 잡음) |
+| 96컷 × 5회 | +2.54%p | |
+| 96컷 × 5회, `shot` 경계선 재명시 | +2.72%p | 걸리는 컷만 바뀜 |
+
+문구를 고칠 때마다 **걸리는 컷이 옮겨 다녔다.** 마지막 측정에서 96컷 중 세 컷이 초과분 전부를
+만들었고(그 셋을 빼면 −0.42%p), 그 셋은 앞선 측정의 셋과 달랐다. 원인은 분명했다 — 인물별
+배열을 채우면서 모델이 `shot`을 "그 인물이 어디까지 보이는가"로 판단한다. 허리에서 잘린 2인 컷이
+`core`→`bust`로, 어깨까지 걸친 얼굴 컷이 `bust`→`face`(=skip)로 갈렸다.
+
+호출을 나누면 이 문제가 **구조적으로** 사라진다. 분석 프롬프트가 바뀌지 않으므로 route·인원수·
+박스가 달라질 수 없다. 실측으로도 태그 on/off에서 세 값이 모두 같았다. 대가는 호출 1회와 그
+비용, 그리고 겹쳐 돌려도 다 가려지지 않는 지연이다.
+
+`p2-person-tags` 프롬프트는 코드에 남아 있지만 쓰지 않는다. `VLM_PROMPT_VERSION`은 `p1-scope`로
+둔다. 다시 합치려는 시도가 있으면 위 표를 먼저 보라.

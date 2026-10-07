@@ -44,6 +44,26 @@ def stated_value(raw: object, enum_cls: type[Enum]) -> Optional[str]:
     return None
 
 
+def apply_person_tags(vlm: "VLMAnalysis", payload: Optional[dict]) -> bool:
+    """태그 전용 호출의 응답을 VLMAnalysis에 싣는다. 실은 값이 하나라도 있으면 True.
+
+    배열 길이가 인원수와 다르면 통째로 버린다(`parse_person_values`). 한 칸이 밀리면
+    다른 사람의 태그가 붙기 때문이다. 버린 경우에도 "물어보긴 했다"는 사실은 raw에
+    남긴다 — 그래야 1인 컷에서 컷 값을 빌려 쓰는 legacy_cut 경로가 열리지 않는다.
+    """
+    from .schema import Action, View
+
+    if not isinstance(payload, dict):
+        return False
+    actions = parse_person_values(payload.get("person_actions"), vlm.num_people, Action)
+    views = parse_person_values(payload.get("person_views"), vlm.num_people, View)
+    vlm.person_actions = actions
+    vlm.person_views = views
+    for key in PERSON_TAG_KEYS:
+        vlm.raw[key] = payload.get(key)
+    return any(value is not None for value in (*actions, *views))
+
+
 def detect_person_tags(vlm: "VLMAnalysis", person_index: Optional[int]) -> PersonTags:
     # Only a VLM-owned slot has a per-person semantic identity.
     if person_index is None:

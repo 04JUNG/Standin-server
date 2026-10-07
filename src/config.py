@@ -36,6 +36,12 @@ class Config:
     vlm_provider: str = os.getenv("VLM_PROVIDER", "mock")
     # src/vlm/prompts.py의 USER_TEMPLATES 키. 모르는 값이면 VLM 클라이언트를 만들 때 기동이 멈춘다.
     vlm_prompt_version: str = os.getenv("VLM_PROMPT_VERSION", "p1-scope")
+    # 인물별 태그를 받을지. 분석 호출과 분리된 두 번째 VLM 호출이라 켜면 비용이 는다.
+    # 실패해도 분석은 그대로 나간다 — 태그만 비고(unknown), 라우팅·검색은 영향이 없다.
+    vlm_person_tags: bool = os.getenv("VLM_PERSON_TAGS", "0") == "1"
+    # 태그 호출 한 번의 상한. 분석 호출(기본 45초)보다 짧게 둔다 — 늦게 오는 기록용
+    # 값 때문에 사용자가 기다리지 않게 한다.
+    vlm_person_tags_timeout_ms: int = int(os.getenv("VLM_PERSON_TAGS_TIMEOUT_MS", "15000"))
     gemini_model: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
     # Gemini HTTP 호출 1회의 상한. google-genai HttpOptions.timeout 단위는 밀리초다.
     #
