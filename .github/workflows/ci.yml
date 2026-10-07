@@ -43,9 +43,7 @@ jobs:
           cache: pip
 
       - name: Install dependencies
-        # mirror BVH contract tests import scipy, while production keeps scipy
-        # optional because runtime refine has a NumPy fallback.
-        run: pip install -r requirements.txt pytest "scipy>=1.11"
+        run: pip install -r requirements.txt pytest
 
       - name: Compile Python sources
         run: python -m compileall src api scripts pose_curation
