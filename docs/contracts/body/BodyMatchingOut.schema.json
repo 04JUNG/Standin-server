@@ -598,8 +598,7 @@
             {
               "enum": [
                 "auto_best_effort",
-                "auto_default",
-                "auto_visual_best_effort"
+                "auto_default"
               ],
               "type": "string"
             },

@@ -50,8 +50,7 @@ def _overlapping(a, b):
 
 class BodyMatchingService:
     def __init__(self, catalog_path, *, client=None, provider="mock", model="gemini-2.5-flash",
-                 timeout_seconds=12.0, max_people=8, cache_size=128, visual_selector=None):
-        self.visual_selector = visual_selector
+                 timeout_seconds=12.0, max_people=8, cache_size=128):
         self.catalog_path = str(catalog_path)
         if not math.isfinite(timeout_seconds) or timeout_seconds <= 0 or not 1 <= max_people <= 20:
             raise ValueError("invalid_body_runtime_limits")
@@ -179,14 +178,6 @@ class BodyMatchingService:
                 decision = {"auto_body_id": None, "selected_asset": None, "candidates": [],
                             "selection_source": None, "diagnostic": "catalog_error", "reason_codes": [catalog_error],
                             "acceptance_probability": None}
-            if self.visual_selector is not None and catalog is not None and decision["auto_body_id"] and pil is not None and boxes[index]:
-                try:
-                    from .presentation import presentation_candidates
-                    visual_assets, _, _ = presentation_candidates(catalog.eligible([p["pose_id"] for p in poses]),
-                        obs, catalog.default_body_id, catalog.presentation_defaults)
-                    decision = self.visual_selector.select(pil.crop(boxes[index]), obs, visual_assets, decision)
-                except Exception as exc:
-                    decision["visual_comparison"] = {"accepted": False, "reason": "visual_provider_" + type(exc).__name__}
             selected = decision["auto_body_id"]
             person = {"person_index": index, "person_id": obs["person_id"], **decision,
                       "observations": obs, "pose_bindings": poses,

@@ -945,9 +945,3 @@ def export_order(req: ExportOrderRequest):
         created_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
         items=items, notes=notes,
     )
-
-# Body rendering is an explicit follow-up; /analyze keeps its existing latency.
-from api.body_render import build_body_router
-app.include_router(build_body_router(
-    resolve_pose=lambda pose_id: get_bvh_path(STATE.get("db_path", DB_PATH), pose_id),
-))

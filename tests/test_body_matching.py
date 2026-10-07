@@ -59,7 +59,7 @@ def cut(count=1):
     return result
 
 
-class BodyMatchingTests(unittest.TestCase):
+class BodyMatchingFixture(unittest.TestCase):
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
@@ -82,6 +82,9 @@ class BodyMatchingTests(unittest.TestCase):
     def run_service(self,client=None,result=None,**kwargs):
         return BodyMatchingService(self.path,client=client or FixtureClient()).analyze(self.image,result or cut(),**kwargs)
 
+
+
+class BodyMatchingTests(BodyMatchingFixture):
     def test_visual_selection_and_pose_preservation(self):
         result=cut();before=dumps(result)
         output=self.run_service(result=result)

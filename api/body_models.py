@@ -1,4 +1,4 @@
-"""Typed additive /analyze body sidecar; external render/export are separate contracts."""
+"""Typed optional /analyze body observation and selection sidecar."""
 from __future__ import annotations
 from typing import Annotated, Literal, Generic, TypeVar
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 Sha256 = Annotated[str, Field(pattern=r'^[0-9a-f]{64}$')]
 Visibility = Literal['visible','uncertain','unknown']
 ProjectionView = Literal['front','three_quarter','side','back','side_opposite','three_quarter_opposite']
-SelectionSource = Literal['auto_best_effort','auto_default','auto_visual_best_effort']
+SelectionSource = Literal['auto_best_effort','auto_default']
 
 
 class BodyWireModel(BaseModel):

@@ -586,8 +586,6 @@ def create_app(
             report=report,
         )
         common_headers = {
-            "X-Standin-Character-Id": resolved.metadata.character_id,
-            "X-Standin-Character-SHA256": resolved.metadata.sha256,
             "X-Standin-Conversion-Id": conversion_id,
             "X-Standin-Solver-Version": SOLVER_VERSION,
             "X-Standin-Output-Scope": output_scope,
@@ -750,7 +748,6 @@ def create_app(
         format: str = Form(default="png"),
         quality: int = Form(default=THUMBNAIL_DEFAULT_JPEG_QUALITY),
         mirror: bool = Form(default=False),
-        expected_character_sha256: str | None = Form(default=None),
     ):
         """BVH 하나를 변환한 뒤 라이브러리 썸네일과 같은 카메라로 preview를 그린다.
 
@@ -758,13 +755,6 @@ def create_app(
         번들)과 같은 캐릭터·solver·카메라·재질을 쓰므로 작가가 보는 두 그림이 같은
         스타일이 된다. FBX는 반환하지 않는다(내보내기는 ``/convert-bundle``).
         """
-        if expected_character_sha256 is not None:
-            try:
-                metadata = character_registry.metadata(character_id)
-            except UnknownCharacterError:
-                raise ApiProblem(400, "UNKNOWN_CHARACTER", "unknown character_id")
-            if metadata.sha256 != expected_character_sha256:
-                raise ApiProblem(409, "CHARACTER_HASH_MISMATCH", "character asset changed")
         if view not in THUMBNAIL_VIEWS:
             raise ApiProblem(
                 400, "INVALID_VIEW", f"view must be one of {sorted(THUMBNAIL_VIEWS)}",

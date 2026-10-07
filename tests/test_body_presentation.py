@@ -2,7 +2,7 @@
 import copy,json,sys,unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from tests.test_body_matching import person_payload, attributes, BodyMatchingTests, FixtureClient, cut
+from tests.test_body_matching import person_payload, attributes, BodyMatchingFixture, FixtureClient, cut
 from src.experimental.body_matching.presentation import parse_presentation, presentation_candidates
 from src.experimental.body_matching.schema import parse_person,unknown_attributes
 from src.experimental.body_matching.selection import compare_body_shapes
@@ -82,7 +82,7 @@ class PresentationTests(unittest.TestCase):
         self.assertEqual(d['auto_body_id'],'masculine-regular')
 
 
-class Fixture(BodyMatchingTests):
+class Fixture(BodyMatchingFixture):
     def test_catalog_rejects_mislabeled_presentation_default(self):
         self.raw['presentation_defaults']={'feminine':'regular'}
         self.raw['assets'][0]['metadata']={'presentation_style':'masculine'};self.write()
