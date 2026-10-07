@@ -1,0 +1,4117 @@
+{
+  "schema_version": 1,
+  "rig_source": "data/curation/sources/quaternius/export-1/pool/combat_ual1_Punch_Cross_f00000.bvh",
+  "rig_sha256": "fd3d02eb9cb307eb0700f48ef4cc6d0a90fdf595c1f6c8b66bd40dd93844544b",
+  "scenes": [
+    {
+      "id": "sd_volleyball_01",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "volleyball",
+      "plan_action": 1,
+      "label": "한 발 내디디며 언더핸드 서브",
+      "stance": "step",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "open"
+      ],
+      "left_wrist": [
+        0.23,
+        0.26,
+        0.4
+      ],
+      "right_wrist": [
+        -0.4,
+        0.01,
+        0.2
+      ],
+      "lean": 7
+    },
+    {
+      "id": "sd_volleyball_02",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "volleyball",
+      "plan_action": 2,
+      "label": "점프서브 공중 타격",
+      "stance": "stand",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.42,
+        0.53,
+        0.22
+      ],
+      "right_wrist": [
+        -0.24,
+        0.96,
+        0.22
+      ],
+      "overrides": {
+        "left_leg": [
+          [
+            0.23,
+            0.27,
+            -0.12
+          ],
+          [
+            0.3,
+            0.62,
+            0.48
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.16,
+            0.39,
+            -0.12
+          ],
+          [
+            -0.3,
+            0.6,
+            0.45
+          ]
+        ],
+        "left_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        },
+        "right_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        }
+      },
+      "world_xyz": [
+        -8,
+        0,
+        -6
+      ]
+    },
+    {
+      "id": "sd_volleyball_03",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "volleyball",
+      "plan_action": 3,
+      "label": "스파이크 팔을 뒤로 당기는 도약",
+      "stance": "stand",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.31,
+        0.85,
+        0.22
+      ],
+      "right_wrist": [
+        -0.44,
+        0.75,
+        -0.07
+      ],
+      "overrides": {
+        "left_leg": [
+          [
+            0.2,
+            0.4,
+            -0.08
+          ],
+          [
+            0.3,
+            0.62,
+            0.48
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.23,
+            0.31,
+            -0.17
+          ],
+          [
+            -0.3,
+            0.6,
+            0.45
+          ]
+        ],
+        "left_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        },
+        "right_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        }
+      },
+      "world_xyz": [
+        -10,
+        0,
+        -3
+      ],
+      "right_pole": [
+        -0.57,
+        0.55,
+        -0.18
+      ]
+    },
+    {
+      "id": "sd_volleyball_04",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "volleyball",
+      "plan_action": 4,
+      "label": "스파이크 타격 후 팔로스루",
+      "stance": "step",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.47,
+        0.4,
+        0.21
+      ],
+      "right_wrist": [
+        -0.12,
+        0.39,
+        0.59
+      ],
+      "overrides": {
+        "left_leg": [
+          [
+            0.29,
+            0.38,
+            0.15
+          ],
+          [
+            0.3,
+            0.62,
+            0.48
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.18,
+            0.21,
+            -0.14
+          ],
+          [
+            -0.3,
+            0.6,
+            0.45
+          ]
+        ],
+        "left_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        },
+        "right_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        }
+      },
+      "world_xyz": [
+        18,
+        0,
+        4
+      ]
+    },
+    {
+      "id": "sd_volleyball_05",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "volleyball",
+      "plan_action": 5,
+      "label": "왼쪽으로 치우친 낮은 리시브",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "fist",
+        "support"
+      ],
+      "left_wrist": [
+        0.32,
+        0.08,
+        0.43
+      ],
+      "right_wrist": [
+        0.09,
+        0.09,
+        0.46
+      ],
+      "height": -0.12,
+      "lean": 18
+    },
+    {
+      "id": "sd_volleyball_06",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "volleyball",
+      "plan_action": 6,
+      "label": "오른쪽 한팔 디그",
+      "stance": "kneel",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.42,
+        0.3,
+        0.17
+      ],
+      "right_wrist": [
+        -0.55,
+        0.0,
+        0.3
+      ],
+      "lean": 22,
+      "root_xyz": [
+        0,
+        0,
+        8
+      ]
+    },
+    {
+      "id": "sd_volleyball_07",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "volleyball",
+      "plan_action": 7,
+      "label": "무릎을 낮춘 언더핸드 토스",
+      "stance": "squat",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "support"
+      ],
+      "left_wrist": [
+        0.1,
+        0.19,
+        0.57
+      ],
+      "right_wrist": [
+        -0.1,
+        0.19,
+        0.57
+      ],
+      "height": 0.01,
+      "lean": 10
+    },
+    {
+      "id": "sd_volleyball_08",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "volleyball",
+      "plan_action": 8,
+      "label": "뒤로 넘기는 백토스",
+      "stance": "step",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.24,
+        0.91,
+        -0.06
+      ],
+      "right_wrist": [
+        -0.24,
+        0.91,
+        -0.06
+      ],
+      "lean": -8,
+      "nod": -15,
+      "left_pole": [
+        0.48,
+        0.6,
+        0.03
+      ],
+      "right_pole": [
+        -0.48,
+        0.6,
+        0.03
+      ]
+    },
+    {
+      "id": "sd_volleyball_09",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "volleyball",
+      "plan_action": 9,
+      "label": "사이드스텝 후 양손 블로킹",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.35,
+        0.91,
+        0.28
+      ],
+      "right_wrist": [
+        -0.34,
+        0.91,
+        0.28
+      ],
+      "overrides": {
+        "left_leg": [
+          [
+            0.28,
+            0.22,
+            0.02
+          ],
+          [
+            0.3,
+            0.62,
+            0.48
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.26,
+            0.3,
+            -0.04
+          ],
+          [
+            -0.3,
+            0.6,
+            0.45
+          ]
+        ],
+        "left_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        },
+        "right_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        }
+      },
+      "world_xyz": [
+        0,
+        0,
+        -10
+      ]
+    },
+    {
+      "id": "sd_volleyball_10",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "volleyball",
+      "plan_action": 10,
+      "label": "착지하며 다음 수비 준비",
+      "stance": "squat",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.47,
+        0.3,
+        0.34
+      ],
+      "right_wrist": [
+        -0.41,
+        0.23,
+        0.37
+      ],
+      "height": 0.1,
+      "lean": 13
+    },
+    {
+      "id": "sd_racket_01",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "racket",
+      "plan_action": 1,
+      "label": "테니스 포핸드 임팩트",
+      "stance": "lunge",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "grip"
+      ],
+      "left_wrist": [
+        0.49,
+        0.32,
+        0.08
+      ],
+      "right_wrist": [
+        -0.25,
+        0.43,
+        0.59
+      ],
+      "root_xyz": [
+        0,
+        -12,
+        0
+      ]
+    },
+    {
+      "id": "sd_racket_02",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "racket",
+      "plan_action": 2,
+      "label": "테니스 한손 백핸드 팔로스루",
+      "stance": "step",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "grip"
+      ],
+      "left_wrist": [
+        0.25,
+        0.3,
+        0.24
+      ],
+      "right_wrist": [
+        -0.64,
+        0.58,
+        0.12
+      ],
+      "root_xyz": [
+        0,
+        18,
+        0
+      ]
+    },
+    {
+      "id": "sd_racket_03",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "racket",
+      "plan_action": 3,
+      "label": "테니스 양손 백핸드 임팩트",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.3,
+        0.4,
+        0.52
+      ],
+      "right_wrist": [
+        0.1,
+        0.39,
+        0.51
+      ],
+      "root_xyz": [
+        0,
+        15,
+        0
+      ]
+    },
+    {
+      "id": "sd_racket_04",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "racket",
+      "plan_action": 4,
+      "label": "테니스 서브 라켓 드롭",
+      "stance": "step",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "grip"
+      ],
+      "left_wrist": [
+        0.26,
+        0.94,
+        0.24
+      ],
+      "right_wrist": [
+        -0.27,
+        0.71,
+        -0.14
+      ],
+      "right_pole": [
+        -0.53,
+        0.61,
+        -0.08
+      ],
+      "lean": -7
+    },
+    {
+      "id": "sd_racket_05",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "racket",
+      "plan_action": 5,
+      "label": "테니스 서브 공중 타격",
+      "stance": "stand",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "grip"
+      ],
+      "left_wrist": [
+        0.35,
+        0.49,
+        0.24
+      ],
+      "right_wrist": [
+        -0.19,
+        0.99,
+        0.19
+      ],
+      "overrides": {
+        "left_leg": [
+          [
+            0.14,
+            0.35,
+            -0.18
+          ],
+          [
+            0.3,
+            0.62,
+            0.48
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.22,
+            0.2,
+            -0.12
+          ],
+          [
+            -0.3,
+            0.6,
+            0.45
+          ]
+        ],
+        "left_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        },
+        "right_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        }
+      },
+      "world_xyz": [
+        8,
+        0,
+        5
+      ]
+    },
+    {
+      "id": "sd_racket_06",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "racket",
+      "plan_action": 6,
+      "label": "테니스 낮은 발리",
+      "stance": "lunge",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "grip"
+      ],
+      "left_wrist": [
+        0.39,
+        0.4,
+        0.12
+      ],
+      "right_wrist": [
+        -0.34,
+        -0.08,
+        0.45
+      ],
+      "lean": 24,
+      "height": -0.05
+    },
+    {
+      "id": "sd_racket_07",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "racket",
+      "plan_action": 7,
+      "label": "배드민턴 점프 스매시",
+      "stance": "step",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "grip"
+      ],
+      "left_wrist": [
+        0.39,
+        0.56,
+        0.27
+      ],
+      "right_wrist": [
+        -0.26,
+        0.86,
+        0.43
+      ],
+      "overrides": {
+        "left_leg": [
+          [
+            0.32,
+            0.5,
+            0.17
+          ],
+          [
+            0.3,
+            0.62,
+            0.48
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.23,
+            0.28,
+            -0.16
+          ],
+          [
+            -0.3,
+            0.6,
+            0.45
+          ]
+        ],
+        "left_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        },
+        "right_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        }
+      },
+      "world_xyz": [
+        12,
+        0,
+        -12
+      ]
+    },
+    {
+      "id": "sd_racket_08",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "racket",
+      "plan_action": 8,
+      "label": "배드민턴 백핸드 클리어",
+      "stance": "backstep",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "grip"
+      ],
+      "left_wrist": [
+        0.34,
+        0.38,
+        0.16
+      ],
+      "right_wrist": [
+        0.13,
+        0.8,
+        0.28
+      ],
+      "root_xyz": [
+        0,
+        20,
+        0
+      ],
+      "right_pole": [
+        -0.37,
+        0.7,
+        0.1
+      ]
+    },
+    {
+      "id": "sd_racket_09",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "racket",
+      "plan_action": 9,
+      "label": "배드민턴 네트 앞 런지",
+      "stance": "lunge",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "grip"
+      ],
+      "left_wrist": [
+        0.53,
+        0.38,
+        -0.02
+      ],
+      "right_wrist": [
+        -0.27,
+        0.22,
+        0.6
+      ],
+      "height": -0.1,
+      "lean": 18
+    },
+    {
+      "id": "sd_racket_10",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "racket",
+      "plan_action": 10,
+      "label": "배드민턴 수비 리프트",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "grip"
+      ],
+      "left_wrist": [
+        0.37,
+        0.46,
+        0.27
+      ],
+      "right_wrist": [
+        -0.43,
+        0.09,
+        0.36
+      ],
+      "lean": 13
+    },
+    {
+      "id": "sd_golf_bowling_07",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "golf_bowling",
+      "plan_action": 7,
+      "label": "볼링 볼을 가슴 앞에 준비",
+      "stance": "step",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "cup"
+      ],
+      "left_wrist": [
+        0.15,
+        0.35,
+        0.4
+      ],
+      "right_wrist": [
+        -0.19,
+        0.34,
+        0.4
+      ]
+    },
+    {
+      "id": "sd_golf_bowling_08",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "golf_bowling",
+      "plan_action": 8,
+      "label": "볼링 백스윙",
+      "stance": "lunge",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "cup"
+      ],
+      "left_wrist": [
+        0.57,
+        0.43,
+        0.14
+      ],
+      "right_wrist": [
+        -0.39,
+        0.31,
+        -0.3
+      ],
+      "right_pole": [
+        -0.54,
+        0.3,
+        -0.08
+      ],
+      "lean": 15
+    },
+    {
+      "id": "sd_golf_bowling_09",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "golf_bowling",
+      "plan_action": 9,
+      "label": "볼링 낮은 릴리스",
+      "stance": "lunge",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "cup"
+      ],
+      "left_wrist": [
+        0.57,
+        0.46,
+        0.13
+      ],
+      "right_wrist": [
+        -0.21,
+        -0.1,
+        0.47
+      ],
+      "lean": 24,
+      "height": -0.08
+    },
+    {
+      "id": "sd_golf_bowling_10",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "golf_bowling",
+      "plan_action": 10,
+      "label": "볼링 릴리스 후 한발 균형",
+      "stance": "step",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.56,
+        0.45,
+        0.15
+      ],
+      "right_wrist": [
+        -0.24,
+        0.64,
+        0.43
+      ],
+      "overrides": {
+        "left_leg": [
+          [
+            0.2,
+            0.105,
+            0.23
+          ],
+          [
+            0.35,
+            0.48,
+            0.65
+          ]
+        ],
+        "right_leg": [
+          [
+            0.2,
+            0.24,
+            -0.38
+          ],
+          [
+            -0.35,
+            0.48,
+            0.65
+          ]
+        ]
+      },
+      "lean": 13
+    },
+    {
+      "id": "sd_other_ball_01",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "other_ball",
+      "plan_action": 1,
+      "label": "탁구 낮은 서브 준비",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "grip"
+      ],
+      "left_wrist": [
+        0.19,
+        0.24,
+        0.46
+      ],
+      "right_wrist": [
+        -0.29,
+        0.3,
+        0.32
+      ],
+      "lean": 18
+    },
+    {
+      "id": "sd_other_ball_02",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "other_ball",
+      "plan_action": 2,
+      "label": "탁구 포핸드 드라이브",
+      "stance": "lunge",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "grip"
+      ],
+      "left_wrist": [
+        0.43,
+        0.32,
+        0.11
+      ],
+      "right_wrist": [
+        -0.39,
+        0.46,
+        0.47
+      ],
+      "root_xyz": [
+        0,
+        -14,
+        0
+      ],
+      "lean": 8
+    },
+    {
+      "id": "sd_other_ball_03",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "other_ball",
+      "plan_action": 3,
+      "label": "탁구 백핸드 리턴",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "grip"
+      ],
+      "left_wrist": [
+        0.41,
+        0.29,
+        0.18
+      ],
+      "right_wrist": [
+        0.07,
+        0.38,
+        0.49
+      ],
+      "root_xyz": [
+        0,
+        15,
+        0
+      ]
+    },
+    {
+      "id": "sd_other_ball_04",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "other_ball",
+      "plan_action": 4,
+      "label": "탁구 옆으로 뻗어 공 받기",
+      "stance": "lunge",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "grip"
+      ],
+      "left_wrist": [
+        0.47,
+        0.37,
+        0.12
+      ],
+      "right_wrist": [
+        -0.61,
+        0.3,
+        0.31
+      ],
+      "height": -0.08,
+      "root_xyz": [
+        0,
+        0,
+        9
+      ]
+    },
+    {
+      "id": "sd_other_ball_05",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "other_ball",
+      "plan_action": 5,
+      "label": "핸드볼 점프슛",
+      "stance": "step",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "cup"
+      ],
+      "left_wrist": [
+        0.41,
+        0.55,
+        0.24
+      ],
+      "right_wrist": [
+        -0.3,
+        0.85,
+        0.33
+      ],
+      "overrides": {
+        "left_leg": [
+          [
+            0.28,
+            0.51,
+            0.3
+          ],
+          [
+            0.3,
+            0.62,
+            0.48
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.15,
+            0.22,
+            -0.13
+          ],
+          [
+            -0.3,
+            0.6,
+            0.45
+          ]
+        ],
+        "left_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        },
+        "right_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        }
+      },
+      "world_xyz": [
+        7,
+        0,
+        -5
+      ]
+    },
+    {
+      "id": "sd_other_ball_06",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "other_ball",
+      "plan_action": 6,
+      "label": "핸드볼 옆팔 패스",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "cup"
+      ],
+      "left_wrist": [
+        0.28,
+        0.41,
+        0.41
+      ],
+      "right_wrist": [
+        -0.64,
+        0.46,
+        0.03
+      ],
+      "root_xyz": [
+        0,
+        -15,
+        0
+      ]
+    },
+    {
+      "id": "sd_other_ball_07",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "other_ball",
+      "plan_action": 7,
+      "label": "핸드볼 골키퍼 팔다리 벌려 방어",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.61,
+        0.67,
+        0.06
+      ],
+      "right_wrist": [
+        -0.52,
+        0.8,
+        0.07
+      ],
+      "overrides": {
+        "left_leg": [
+          [
+            0.53,
+            0.4,
+            0.11
+          ],
+          [
+            0.3,
+            0.62,
+            0.48
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.16,
+            0.24,
+            -0.04
+          ],
+          [
+            -0.3,
+            0.6,
+            0.45
+          ]
+        ],
+        "left_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        },
+        "right_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        }
+      }
+    },
+    {
+      "id": "sd_other_ball_08",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "other_ball",
+      "plan_action": 8,
+      "label": "럭비 공 안고 낮게 돌파",
+      "stance": "lunge",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "cup",
+        "cup"
+      ],
+      "left_wrist": [
+        0.13,
+        0.33,
+        0.36
+      ],
+      "right_wrist": [
+        -0.21,
+        0.26,
+        0.32
+      ],
+      "lean": 23,
+      "root_xyz": [
+        0,
+        -12,
+        0
+      ]
+    },
+    {
+      "id": "sd_other_ball_09",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "other_ball",
+      "plan_action": 9,
+      "label": "럭비 양손 옆 패스",
+      "stance": "step",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "cup",
+        "support"
+      ],
+      "left_wrist": [
+        0.47,
+        0.35,
+        0.32
+      ],
+      "right_wrist": [
+        0.18,
+        0.32,
+        0.42
+      ],
+      "root_xyz": [
+        0,
+        17,
+        0
+      ]
+    },
+    {
+      "id": "sd_other_ball_10",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "other_ball",
+      "plan_action": 10,
+      "label": "럭비 몸을 낮춰 태클 준비",
+      "stance": "lunge",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.41,
+        0.08,
+        0.42
+      ],
+      "right_wrist": [
+        -0.41,
+        0.11,
+        0.46
+      ],
+      "lean": 30,
+      "height": -0.12
+    },
+    {
+      "id": "sd_athletics_01",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "athletics",
+      "plan_action": 1,
+      "label": "단거리 스타트 블록에서 밀어내기",
+      "stance": "lunge",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.39,
+        0.31,
+        0.27
+      ],
+      "right_wrist": [
+        -0.24,
+        0.52,
+        0.35
+      ],
+      "lean": 33,
+      "overrides": {
+        "left_leg": [
+          [
+            0.21,
+            0.105,
+            0.4
+          ],
+          [
+            0.35,
+            0.48,
+            0.65
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.17,
+            0.16,
+            -0.46
+          ],
+          [
+            -0.35,
+            0.48,
+            0.65
+          ]
+        ]
+      }
+    },
+    {
+      "id": "sd_athletics_03",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "athletics",
+      "plan_action": 3,
+      "label": "결승선에서 가슴 내밀기",
+      "stance": "step",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.47,
+        0.18,
+        -0.04
+      ],
+      "right_wrist": [
+        -0.47,
+        0.16,
+        -0.03
+      ],
+      "lean": 24
+    },
+    {
+      "id": "sd_athletics_04",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "athletics",
+      "plan_action": 4,
+      "label": "허들 위 앞다리 뻗기",
+      "stance": "stand",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.34,
+        0.33,
+        0.44
+      ],
+      "right_wrist": [
+        -0.42,
+        0.5,
+        0.27
+      ],
+      "overrides": {
+        "left_leg": [
+          [
+            0.17,
+            0.54,
+            0.68
+          ],
+          [
+            0.3,
+            0.62,
+            0.48
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.4,
+            0.39,
+            -0.04
+          ],
+          [
+            -0.3,
+            0.6,
+            0.45
+          ]
+        ],
+        "left_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        },
+        "right_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        }
+      },
+      "world_xyz": [
+        8,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "sd_athletics_07",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "athletics",
+      "plan_action": 7,
+      "label": "멀리뛰기 공중 다리 모으기",
+      "stance": "stand",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.31,
+        0.65,
+        0.39
+      ],
+      "right_wrist": [
+        -0.31,
+        0.65,
+        0.39
+      ],
+      "overrides": {
+        "left_leg": [
+          [
+            0.22,
+            0.34,
+            0.67
+          ],
+          [
+            0.3,
+            0.62,
+            0.48
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.22,
+            0.34,
+            0.65
+          ],
+          [
+            -0.3,
+            0.6,
+            0.45
+          ]
+        ],
+        "left_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        },
+        "right_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        }
+      },
+      "world_xyz": [
+        -8,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "sd_athletics_08",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "athletics",
+      "plan_action": 8,
+      "label": "창던지기 팔을 뒤로 당기기",
+      "stance": "lunge",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "grip"
+      ],
+      "left_wrist": [
+        0.48,
+        0.54,
+        0.33
+      ],
+      "right_wrist": [
+        -0.54,
+        0.64,
+        -0.08
+      ],
+      "right_pole": [
+        -0.63,
+        0.4,
+        -0.14
+      ],
+      "root_xyz": [
+        0,
+        -22,
+        0
+      ]
+    },
+    {
+      "id": "sd_athletics_10",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "athletics",
+      "plan_action": 10,
+      "label": "포환을 목 옆에서 밀어내기",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "fist"
+      ],
+      "left_wrist": [
+        0.45,
+        0.61,
+        0.25
+      ],
+      "right_wrist": [
+        -0.27,
+        0.62,
+        0.18
+      ],
+      "root_xyz": [
+        0,
+        -15,
+        0
+      ],
+      "right_pole": [
+        -0.58,
+        0.49,
+        0.18
+      ]
+    },
+    {
+      "id": "sd_fitness_01",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "fitness",
+      "plan_action": 1,
+      "label": "양손 덤벨 숄더프레스",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.38,
+        0.88,
+        0.11
+      ],
+      "right_wrist": [
+        -0.38,
+        0.88,
+        0.11
+      ]
+    },
+    {
+      "id": "sd_fitness_02",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "fitness",
+      "plan_action": 2,
+      "label": "한손 덤벨 로우",
+      "stance": "lunge",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "grip"
+      ],
+      "left_wrist": [
+        0.35,
+        0.06,
+        0.46
+      ],
+      "right_wrist": [
+        -0.34,
+        0.36,
+        0.12
+      ],
+      "lean": 28
+    },
+    {
+      "id": "sd_fitness_03",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "fitness",
+      "plan_action": 3,
+      "label": "덤벨 런지 바닥 지점",
+      "stance": "lunge",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.31,
+        -0.03,
+        0.09
+      ],
+      "right_wrist": [
+        -0.31,
+        -0.03,
+        0.09
+      ],
+      "height": -0.12
+    },
+    {
+      "id": "sd_fitness_04",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "fitness",
+      "plan_action": 4,
+      "label": "데드리프트 바를 잡는 시작",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.29,
+        -0.11,
+        0.34
+      ],
+      "right_wrist": [
+        -0.29,
+        -0.11,
+        0.34
+      ],
+      "height": -0.15,
+      "lean": 28
+    },
+    {
+      "id": "sd_fitness_05",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "fitness",
+      "plan_action": 5,
+      "label": "데드리프트 무릎 통과 지점",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.3,
+        0.02,
+        0.23
+      ],
+      "right_wrist": [
+        -0.3,
+        0.02,
+        0.23
+      ],
+      "height": -0.05,
+      "lean": 15
+    },
+    {
+      "id": "sd_fitness_06",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "fitness",
+      "plan_action": 6,
+      "label": "케틀벨 스윙 정점",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.13,
+        0.62,
+        0.51
+      ],
+      "right_wrist": [
+        -0.13,
+        0.62,
+        0.51
+      ],
+      "lean": -3
+    },
+    {
+      "id": "sd_fitness_07",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "fitness",
+      "plan_action": 7,
+      "label": "푸시업 몸을 낮춘 지점",
+      "stance": "stand",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.4,
+        0.42,
+        0.24
+      ],
+      "right_wrist": [
+        -0.4,
+        0.42,
+        0.24
+      ],
+      "world_xyz": [
+        90,
+        0,
+        0
+      ],
+      "air_clearance": 0.03,
+      "left_pole": [
+        0.56,
+        0.35,
+        0.13
+      ],
+      "right_pole": [
+        -0.56,
+        0.35,
+        0.13
+      ]
+    },
+    {
+      "id": "sd_fitness_08",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "fitness",
+      "plan_action": 8,
+      "label": "플랭크 한팔 앞으로 뻗기",
+      "stance": "stand",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.21,
+        0.98,
+        0.07
+      ],
+      "right_wrist": [
+        -0.23,
+        0.43,
+        0.46
+      ],
+      "world_xyz": [
+        90,
+        0,
+        0
+      ],
+      "air_clearance": 0.03
+    },
+    {
+      "id": "sd_fitness_09",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "fitness",
+      "plan_action": 9,
+      "label": "사이드 플랭크",
+      "stance": "stand",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.62,
+        0.51,
+        0.04
+      ],
+      "right_wrist": [
+        -0.62,
+        0.51,
+        0.04
+      ],
+      "world_xyz": [
+        0,
+        0,
+        90
+      ],
+      "air_clearance": 0.03
+    },
+    {
+      "id": "sd_fitness_10",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "fitness",
+      "plan_action": 10,
+      "label": "누워서 한쪽 무릎 당기기",
+      "stance": "stand",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.26,
+        0.08,
+        0.4
+      ],
+      "right_wrist": [
+        -0.24,
+        0.19,
+        0.34
+      ],
+      "overrides": {
+        "left_leg": [
+          [
+            0.2,
+            0.56,
+            0.34
+          ],
+          [
+            0.3,
+            0.62,
+            0.48
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.18,
+            0.13,
+            0.03
+          ],
+          [
+            -0.3,
+            0.6,
+            0.45
+          ]
+        ],
+        "left_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        },
+        "right_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        }
+      },
+      "world_xyz": [
+        -90,
+        0,
+        0
+      ],
+      "air_clearance": 0.04
+    },
+    {
+      "id": "sd_outdoor_01",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "outdoor",
+      "plan_action": 1,
+      "label": "자전거 상체 낮춘 스프린트",
+      "stance": "sit",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.25,
+        0.27,
+        0.51
+      ],
+      "right_wrist": [
+        -0.25,
+        0.27,
+        0.51
+      ],
+      "lean": 30,
+      "support": "",
+      "overrides": {
+        "left_leg": [
+          [
+            0.18,
+            0.1,
+            0.28
+          ],
+          [
+            0.35,
+            0.48,
+            0.65
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.18,
+            0.36,
+            0.25
+          ],
+          [
+            -0.35,
+            0.48,
+            0.65
+          ]
+        ]
+      }
+    },
+    {
+      "id": "sd_outdoor_02",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "outdoor",
+      "plan_action": 2,
+      "label": "자전거 안장에서 일어나 페달 밟기",
+      "stance": "step",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.29,
+        0.24,
+        0.5
+      ],
+      "right_wrist": [
+        -0.29,
+        0.24,
+        0.5
+      ],
+      "lean": 25,
+      "overrides": {
+        "left_leg": [
+          [
+            0.18,
+            0.105,
+            0.1
+          ],
+          [
+            0.35,
+            0.48,
+            0.65
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.18,
+            0.3,
+            0.23
+          ],
+          [
+            -0.35,
+            0.48,
+            0.65
+          ]
+        ]
+      }
+    },
+    {
+      "id": "sd_outdoor_06",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "outdoor",
+      "plan_action": 6,
+      "label": "암벽 양손 위 홀드 잡기",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.32,
+        0.93,
+        0.26
+      ],
+      "right_wrist": [
+        -0.34,
+        0.85,
+        0.36
+      ],
+      "overrides": {
+        "left_leg": [
+          [
+            0.3,
+            0.35,
+            0.21
+          ],
+          [
+            0.35,
+            0.48,
+            0.65
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.3,
+            0.16,
+            0.12
+          ],
+          [
+            -0.35,
+            0.48,
+            0.65
+          ]
+        ]
+      }
+    },
+    {
+      "id": "sd_outdoor_07",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "outdoor",
+      "plan_action": 7,
+      "label": "암벽 한손을 멀리 뻗기",
+      "stance": "step",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.49,
+        0.95,
+        0.16
+      ],
+      "right_wrist": [
+        -0.34,
+        0.61,
+        0.28
+      ],
+      "overrides": {
+        "left_leg": [
+          [
+            0.32,
+            0.49,
+            0.23
+          ],
+          [
+            0.35,
+            0.48,
+            0.65
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.23,
+            0.18,
+            0.04
+          ],
+          [
+            -0.35,
+            0.48,
+            0.65
+          ]
+        ]
+      }
+    },
+    {
+      "id": "sd_outdoor_10",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "outdoor",
+      "plan_action": 10,
+      "label": "로프를 잡고 몸 뒤로 기울이기",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.18,
+        0.54,
+        0.47
+      ],
+      "right_wrist": [
+        -0.18,
+        0.32,
+        0.41
+      ],
+      "root_xyz": [
+        -18,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "sd_sport_between_02",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "sport_between",
+      "plan_action": 2,
+      "label": "벽에 손 대고 종아리 늘리기",
+      "stance": "lunge",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.29,
+        0.57,
+        0.49
+      ],
+      "right_wrist": [
+        -0.29,
+        0.57,
+        0.49
+      ],
+      "lean": 8
+    },
+    {
+      "id": "sd_sport_between_03",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "sport_between",
+      "plan_action": 3,
+      "label": "앉아 발끝 잡고 햄스트링 늘리기",
+      "stance": "sit_open",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.23,
+        -0.04,
+        0.63
+      ],
+      "right_wrist": [
+        -0.23,
+        -0.04,
+        0.63
+      ],
+      "height": -0.36,
+      "lean": 28,
+      "support": "",
+      "overrides": {
+        "left_leg": [
+          [
+            0.23,
+            0.13,
+            0.65
+          ],
+          [
+            0.35,
+            0.48,
+            0.65
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.23,
+            0.13,
+            0.65
+          ],
+          [
+            -0.35,
+            0.48,
+            0.65
+          ]
+        ]
+      }
+    },
+    {
+      "id": "sd_sport_between_08",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "sport_between",
+      "plan_action": 8,
+      "label": "한손 물병을 높여 마시기",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "cup"
+      ],
+      "left_wrist": [
+        0.36,
+        0.06,
+        0.12
+      ],
+      "right_wrist": [
+        -0.14,
+        0.78,
+        0.22
+      ],
+      "nod": -12,
+      "right_pole": [
+        -0.54,
+        0.49,
+        0.22
+      ]
+    },
+    {
+      "id": "sd_sport_between_09",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "sport_between",
+      "plan_action": 9,
+      "label": "벤치에서 수건으로 목 닦기",
+      "stance": "sit_open",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "relaxed"
+      ],
+      "left_wrist": [
+        0.24,
+        0.55,
+        0.08
+      ],
+      "right_wrist": [
+        -0.3,
+        0.34,
+        0.27
+      ],
+      "left_pole": [
+        0.49,
+        0.31,
+        0.14
+      ]
+    },
+    {
+      "id": "sd_eating_01",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "eating",
+      "plan_action": 1,
+      "label": "앉아서 숟가락을 입으로 가져가기",
+      "stance": "sit",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "pinch"
+      ],
+      "left_wrist": [
+        0.24,
+        0.16,
+        0.38
+      ],
+      "right_wrist": [
+        -0.1,
+        0.59,
+        0.28
+      ],
+      "nod": 9
+    },
+    {
+      "id": "sd_eating_02",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "eating",
+      "plan_action": 2,
+      "label": "앉아서 젓가락으로 반찬 집기",
+      "stance": "sit_turn",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "pinch"
+      ],
+      "left_wrist": [
+        0.23,
+        0.25,
+        0.37
+      ],
+      "right_wrist": [
+        -0.12,
+        0.25,
+        0.54
+      ],
+      "lean": 12,
+      "nod": 15
+    },
+    {
+      "id": "sd_eating_03",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "eating",
+      "plan_action": 3,
+      "label": "그릇을 한손에 들고 식사",
+      "stance": "sit_open",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "cup",
+        "pinch"
+      ],
+      "left_wrist": [
+        0.21,
+        0.41,
+        0.3
+      ],
+      "right_wrist": [
+        -0.1,
+        0.6,
+        0.3
+      ],
+      "nod": 8
+    },
+    {
+      "id": "sd_eating_04",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "eating",
+      "plan_action": 4,
+      "label": "양손으로 샌드위치 먹기",
+      "stance": "sit",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "cup",
+        "cup"
+      ],
+      "left_wrist": [
+        0.12,
+        0.59,
+        0.3
+      ],
+      "right_wrist": [
+        -0.12,
+        0.59,
+        0.3
+      ],
+      "nod": 9,
+      "left_pole": [
+        0.39,
+        0.31,
+        0.28
+      ],
+      "right_pole": [
+        -0.39,
+        0.31,
+        0.28
+      ]
+    },
+    {
+      "id": "sd_eating_05",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "eating",
+      "plan_action": 5,
+      "label": "앞으로 숙여 면 먹기",
+      "stance": "sit",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "cup",
+        "pinch"
+      ],
+      "left_wrist": [
+        0.17,
+        0.32,
+        0.42
+      ],
+      "right_wrist": [
+        -0.08,
+        0.46,
+        0.42
+      ],
+      "lean": 20,
+      "nod": 18
+    },
+    {
+      "id": "sd_eating_07",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "eating",
+      "plan_action": 7,
+      "label": "앉아서 물병 뚜껑 열기",
+      "stance": "sit_open",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "cup",
+        "grip"
+      ],
+      "left_wrist": [
+        0.12,
+        0.22,
+        0.41
+      ],
+      "right_wrist": [
+        -0.08,
+        0.34,
+        0.39
+      ]
+    },
+    {
+      "id": "sd_eating_09",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "eating",
+      "plan_action": 9,
+      "label": "옆 사람에게 접시 건네기",
+      "stance": "sit_turn",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "support"
+      ],
+      "left_wrist": [
+        0.44,
+        0.31,
+        0.39
+      ],
+      "right_wrist": [
+        0.15,
+        0.33,
+        0.43
+      ],
+      "root_xyz": [
+        0,
+        18,
+        0
+      ]
+    },
+    {
+      "id": "sd_eating_10",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "eating",
+      "plan_action": 10,
+      "label": "식사 후 입을 냅킨으로 닦기",
+      "stance": "sit_open",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "pinch"
+      ],
+      "left_wrist": [
+        0.24,
+        0.04,
+        0.24
+      ],
+      "right_wrist": [
+        -0.08,
+        0.63,
+        0.29
+      ],
+      "right_pole": [
+        -0.5,
+        0.37,
+        0.21
+      ]
+    },
+    {
+      "id": "sd_cooking_04",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "cooking",
+      "plan_action": 4,
+      "label": "프라이팬 손잡이를 잡고 뒤집기",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.2,
+        0.26,
+        0.47
+      ],
+      "right_wrist": [
+        -0.24,
+        0.3,
+        0.54
+      ],
+      "lean": 5
+    },
+    {
+      "id": "sd_cooking_05",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "cooking",
+      "plan_action": 5,
+      "label": "냄비 뚜껑을 들어 확인",
+      "stance": "step",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "pinch"
+      ],
+      "left_wrist": [
+        0.28,
+        0.12,
+        0.3
+      ],
+      "right_wrist": [
+        -0.18,
+        0.52,
+        0.43
+      ],
+      "nod": 12
+    },
+    {
+      "id": "sd_cooking_06",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "cooking",
+      "plan_action": 6,
+      "label": "주전자로 컵에 물 따르기",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "grip"
+      ],
+      "left_wrist": [
+        0.16,
+        0.16,
+        0.44
+      ],
+      "right_wrist": [
+        -0.31,
+        0.44,
+        0.38
+      ],
+      "nod": 12
+    },
+    {
+      "id": "sd_cooking_07",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "cooking",
+      "plan_action": 7,
+      "label": "냉장고 아래 칸에서 꺼내기",
+      "stance": "squat",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.38,
+        0.2,
+        0.21
+      ],
+      "right_wrist": [
+        -0.27,
+        0.05,
+        0.5
+      ],
+      "height": 0.03,
+      "lean": 18,
+      "nod": 16
+    },
+    {
+      "id": "sd_cooking_08",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "cooking",
+      "plan_action": 8,
+      "label": "높은 선반에서 접시 꺼내기",
+      "stance": "tiptoe",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "grip"
+      ],
+      "left_wrist": [
+        0.31,
+        0.43,
+        0.29
+      ],
+      "right_wrist": [
+        -0.25,
+        0.98,
+        0.22
+      ],
+      "nod": -12
+    },
+    {
+      "id": "sd_cooking_09",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "cooking",
+      "plan_action": 9,
+      "label": "오븐에서 양손으로 쟁반 꺼내기",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "support"
+      ],
+      "left_wrist": [
+        0.29,
+        0.05,
+        0.51
+      ],
+      "right_wrist": [
+        -0.29,
+        0.05,
+        0.51
+      ],
+      "lean": 20,
+      "height": -0.1
+    },
+    {
+      "id": "sd_cleaning_02",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "cleaning",
+      "plan_action": 2,
+      "label": "설거지 후 접시 물기 닦기",
+      "stance": "stand",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "cup",
+        "pinch"
+      ],
+      "left_wrist": [
+        0.18,
+        0.36,
+        0.34
+      ],
+      "right_wrist": [
+        -0.22,
+        0.41,
+        0.38
+      ],
+      "look": 8
+    },
+    {
+      "id": "sd_cleaning_05",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "cleaning",
+      "plan_action": 5,
+      "label": "쪼그려 바닥 걸레질",
+      "stance": "kneel",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.29,
+        0.07,
+        0.42
+      ],
+      "right_wrist": [
+        -0.29,
+        -0.12,
+        0.4
+      ],
+      "lean": 30,
+      "nod": 18
+    },
+    {
+      "id": "sd_cleaning_06",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "cleaning",
+      "plan_action": 6,
+      "label": "빨래 바구니를 옆구리에 들기",
+      "stance": "step",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "support"
+      ],
+      "left_wrist": [
+        0.27,
+        0.25,
+        0.31
+      ],
+      "right_wrist": [
+        -0.36,
+        0.13,
+        0.25
+      ]
+    },
+    {
+      "id": "sd_cleaning_07",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "cleaning",
+      "plan_action": 7,
+      "label": "양손으로 젖은 수건 짜기",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.12,
+        0.31,
+        0.45
+      ],
+      "right_wrist": [
+        -0.12,
+        0.21,
+        0.45
+      ],
+      "lean": 7
+    },
+    {
+      "id": "sd_cleaning_09",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "cleaning",
+      "plan_action": 9,
+      "label": "앉아서 큰 수건 접기",
+      "stance": "sit_open",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "pinch",
+        "pinch"
+      ],
+      "left_wrist": [
+        0.35,
+        0.22,
+        0.43
+      ],
+      "right_wrist": [
+        -0.35,
+        0.22,
+        0.43
+      ],
+      "lean": 7
+    },
+    {
+      "id": "sd_cleaning_10",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "cleaning",
+      "plan_action": 10,
+      "label": "세탁기에서 몸을 숙여 꺼내기",
+      "stance": "squat",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.22,
+        0.0,
+        0.49
+      ],
+      "right_wrist": [
+        -0.22,
+        0.04,
+        0.49
+      ],
+      "lean": 24,
+      "height": 0.03
+    },
+    {
+      "id": "sd_dressing_05",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "dressing",
+      "plan_action": 5,
+      "label": "한발로 서서 바지 끌어올리기",
+      "stance": "stand",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.24,
+        0.0,
+        0.08
+      ],
+      "right_wrist": [
+        -0.24,
+        0.0,
+        0.08
+      ],
+      "overrides": {
+        "left_leg": [
+          [
+            0.18,
+            0.105,
+            0.02
+          ],
+          [
+            0.3,
+            0.62,
+            0.48
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.23,
+            0.44,
+            0.34
+          ],
+          [
+            -0.3,
+            0.6,
+            0.45
+          ]
+        ],
+        "left_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        },
+        "right_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        }
+      }
+    },
+    {
+      "id": "sd_dressing_06",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "dressing",
+      "plan_action": 6,
+      "label": "의자에서 한발을 올려 양말 신기",
+      "stance": "sit_open",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "pinch",
+        "grip"
+      ],
+      "left_wrist": [
+        0.3,
+        -0.05,
+        0.42
+      ],
+      "right_wrist": [
+        0.03,
+        -0.06,
+        0.43
+      ],
+      "lean": 24,
+      "overrides": {
+        "left_leg": [
+          [
+            0.22,
+            0.105,
+            0.33
+          ],
+          [
+            0.35,
+            0.48,
+            0.65
+          ]
+        ],
+        "right_leg": [
+          [
+            0.08,
+            0.42,
+            0.4
+          ],
+          [
+            -0.35,
+            0.48,
+            0.65
+          ]
+        ]
+      }
+    },
+    {
+      "id": "sd_dressing_07",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "dressing",
+      "plan_action": 7,
+      "label": "앉아서 신발 뒤축 당기기",
+      "stance": "sit_open",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "pinch",
+        "relaxed"
+      ],
+      "left_wrist": [
+        0.31,
+        -0.14,
+        0.36
+      ],
+      "right_wrist": [
+        -0.23,
+        0.02,
+        0.23
+      ],
+      "lean": 28,
+      "overrides": {
+        "left_leg": [
+          [
+            0.24,
+            0.22,
+            0.43
+          ],
+          [
+            0.35,
+            0.48,
+            0.65
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.23,
+            0.105,
+            0.34
+          ],
+          [
+            -0.35,
+            0.48,
+            0.65
+          ]
+        ]
+      }
+    },
+    {
+      "id": "sd_dressing_08",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "dressing",
+      "plan_action": 8,
+      "label": "한쪽 무릎 꿇고 신발끈 묶기",
+      "stance": "kneel",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "pinch",
+        "pinch"
+      ],
+      "left_wrist": [
+        0.23,
+        -0.19,
+        0.38
+      ],
+      "right_wrist": [
+        0.01,
+        -0.16,
+        0.41
+      ],
+      "lean": 30,
+      "nod": 18
+    },
+    {
+      "id": "sd_dressing_09",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "dressing",
+      "plan_action": 9,
+      "label": "선 채 한쪽 신발 털기",
+      "stance": "stand",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "grip"
+      ],
+      "left_wrist": [
+        0.32,
+        0.17,
+        0.14
+      ],
+      "right_wrist": [
+        -0.25,
+        0.01,
+        0.2
+      ],
+      "overrides": {
+        "left_leg": [
+          [
+            0.15,
+            0.105,
+            0
+          ],
+          [
+            0.3,
+            0.62,
+            0.48
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.25,
+            0.41,
+            0.39
+          ],
+          [
+            -0.3,
+            0.6,
+            0.45
+          ]
+        ],
+        "left_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        },
+        "right_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        }
+      }
+    },
+    {
+      "id": "sd_dressing_10",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "dressing",
+      "plan_action": 10,
+      "label": "가방 한쪽 어깨끈 고쳐 메기",
+      "stance": "step",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "grip"
+      ],
+      "left_wrist": [
+        0.31,
+        0.11,
+        0.14
+      ],
+      "right_wrist": [
+        -0.23,
+        0.58,
+        0.18
+      ],
+      "right_pole": [
+        -0.47,
+        0.35,
+        0.18
+      ]
+    },
+    {
+      "id": "sd_desk_01",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "desk",
+      "plan_action": 1,
+      "label": "책상에 한팔 기대 필기",
+      "stance": "sit_turn",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "pinch"
+      ],
+      "left_wrist": [
+        0.3,
+        0.19,
+        0.42
+      ],
+      "right_wrist": [
+        -0.08,
+        0.18,
+        0.49
+      ],
+      "lean": 12,
+      "nod": 13
+    },
+    {
+      "id": "sd_desk_02",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "desk",
+      "plan_action": 2,
+      "label": "책장을 한손으로 넘기기",
+      "stance": "sit",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "pinch"
+      ],
+      "left_wrist": [
+        0.18,
+        0.34,
+        0.37
+      ],
+      "right_wrist": [
+        -0.07,
+        0.4,
+        0.42
+      ],
+      "nod": 14
+    },
+    {
+      "id": "sd_desk_04",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "desk",
+      "plan_action": 4,
+      "label": "노트북 화면을 가까이 들여다보기",
+      "stance": "sit",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ],
+      "left_wrist": [
+        0.26,
+        0.17,
+        0.43
+      ],
+      "right_wrist": [
+        -0.25,
+        0.19,
+        0.45
+      ],
+      "lean": 23,
+      "nod": 16
+    },
+    {
+      "id": "sd_desk_06",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "desk",
+      "plan_action": 6,
+      "label": "의자에서 뒤돌아 자료 받기",
+      "stance": "sit_turn",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "support"
+      ],
+      "left_wrist": [
+        0.3,
+        0.05,
+        0.14
+      ],
+      "right_wrist": [
+        -0.44,
+        0.4,
+        0.29
+      ],
+      "root_xyz": [
+        0,
+        -24,
+        0
+      ],
+      "look": -24
+    },
+    {
+      "id": "sd_desk_08",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "desk",
+      "plan_action": 8,
+      "label": "앉아서 종이를 양손으로 펼치기",
+      "stance": "sit_open",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "pinch",
+        "pinch"
+      ],
+      "left_wrist": [
+        0.39,
+        0.39,
+        0.37
+      ],
+      "right_wrist": [
+        -0.39,
+        0.39,
+        0.37
+      ],
+      "nod": 12
+    },
+    {
+      "id": "sd_desk_09",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "desk",
+      "plan_action": 9,
+      "label": "한손 자로 고정하고 선 긋기",
+      "stance": "sit",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "pinch"
+      ],
+      "left_wrist": [
+        0.18,
+        0.21,
+        0.48
+      ],
+      "right_wrist": [
+        -0.2,
+        0.24,
+        0.53
+      ],
+      "lean": 10
+    },
+    {
+      "id": "sd_rest_01",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "rest",
+      "plan_action": 1,
+      "label": "소파에 비스듬히 기대 앉기",
+      "stance": "sit_open",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.33,
+        0.18,
+        -0.03
+      ],
+      "right_wrist": [
+        -0.26,
+        0.24,
+        0.16
+      ],
+      "root_xyz": [
+        -12,
+        0,
+        -9
+      ],
+      "look": -10
+    },
+    {
+      "id": "sd_rest_03",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "rest",
+      "plan_action": 3,
+      "label": "옆으로 누워 팔베개",
+      "stance": "relaxed",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.15,
+        0.72,
+        0.13
+      ],
+      "right_wrist": [
+        -0.35,
+        0.13,
+        0.22
+      ],
+      "world_xyz": [
+        0,
+        0,
+        -90
+      ],
+      "air_clearance": 0.08,
+      "left_pole": [
+        0.36,
+        0.5,
+        0.1
+      ]
+    },
+    {
+      "id": "sd_rest_04",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "rest",
+      "plan_action": 4,
+      "label": "바로 누워 한쪽 팔 눈 위에 얹기",
+      "stance": "stand",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.08,
+        0.74,
+        0.18
+      ],
+      "right_wrist": [
+        -0.32,
+        0.07,
+        0.08
+      ],
+      "world_xyz": [
+        -90,
+        0,
+        0
+      ],
+      "air_clearance": 0.08,
+      "left_pole": [
+        0.46,
+        0.56,
+        0.19
+      ]
+    },
+    {
+      "id": "sd_rest_05",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "rest",
+      "plan_action": 5,
+      "label": "엎드려 두 팔로 턱 받치기",
+      "stance": "stand",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.16,
+        0.64,
+        0.29
+      ],
+      "right_wrist": [
+        -0.16,
+        0.64,
+        0.29
+      ],
+      "world_xyz": [
+        90,
+        0,
+        0
+      ],
+      "air_clearance": 0.04,
+      "left_pole": [
+        0.3,
+        0.36,
+        0.4
+      ],
+      "right_pole": [
+        -0.3,
+        0.36,
+        0.4
+      ]
+    },
+    {
+      "id": "sd_rest_06",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "rest",
+      "plan_action": 6,
+      "label": "침대 가장자리에 앉아 몸 일으키기",
+      "stance": "sit",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "support"
+      ],
+      "left_wrist": [
+        0.3,
+        0.02,
+        0.1
+      ],
+      "right_wrist": [
+        -0.29,
+        0.03,
+        0.13
+      ],
+      "lean": 24
+    },
+    {
+      "id": "sd_rest_07",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "rest",
+      "plan_action": 7,
+      "label": "이불을 가슴 쪽으로 끌어당기기",
+      "stance": "sit",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.16,
+        0.47,
+        0.29
+      ],
+      "right_wrist": [
+        -0.16,
+        0.47,
+        0.29
+      ],
+      "root_xyz": [
+        -12,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "sd_rest_08",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "rest",
+      "plan_action": 8,
+      "label": "바닥에 앉아 한팔 뒤로 짚기",
+      "stance": "sit_open",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.4,
+        0.1,
+        -0.13
+      ],
+      "right_wrist": [
+        -0.27,
+        0.24,
+        0.25
+      ],
+      "height": -0.33,
+      "support": "",
+      "overrides": {
+        "left_leg": [
+          [
+            0.29,
+            0.11,
+            0.63
+          ],
+          [
+            0.35,
+            0.48,
+            0.65
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.24,
+            0.17,
+            0.48
+          ],
+          [
+            -0.35,
+            0.48,
+            0.65
+          ]
+        ]
+      },
+      "root_xyz": [
+        -8,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "sd_rest_10",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "rest",
+      "plan_action": 10,
+      "label": "누운 채 한손으로 휴대폰 보기",
+      "stance": "stand",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "grip"
+      ],
+      "left_wrist": [
+        0.2,
+        0.29,
+        0.24
+      ],
+      "right_wrist": [
+        -0.17,
+        0.52,
+        0.45
+      ],
+      "world_xyz": [
+        -90,
+        0,
+        0
+      ],
+      "air_clearance": 0.08
+    },
+    {
+      "id": "sd_carry_shopping_03",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "carry_shopping",
+      "plan_action": 3,
+      "label": "머리 위 선반에 상자 밀어넣기",
+      "stance": "step",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "support"
+      ],
+      "left_wrist": [
+        0.29,
+        0.8,
+        0.32
+      ],
+      "right_wrist": [
+        -0.29,
+        0.8,
+        0.32
+      ],
+      "nod": -10
+    },
+    {
+      "id": "sd_carry_shopping_04",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "carry_shopping",
+      "plan_action": 4,
+      "label": "긴 물건을 한쪽 어깨에 메기",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "grip"
+      ],
+      "left_wrist": [
+        0.4,
+        0.11,
+        0.12
+      ],
+      "right_wrist": [
+        -0.27,
+        0.69,
+        0.11
+      ],
+      "root_xyz": [
+        0,
+        0,
+        7
+      ]
+    },
+    {
+      "id": "sd_carry_shopping_06",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "carry_shopping",
+      "plan_action": 6,
+      "label": "쇼핑카트를 양손으로 밀기",
+      "stance": "step",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.31,
+        0.21,
+        0.46
+      ],
+      "right_wrist": [
+        -0.31,
+        0.21,
+        0.46
+      ],
+      "lean": 7
+    },
+    {
+      "id": "sd_carry_shopping_07",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "carry_shopping",
+      "plan_action": 7,
+      "label": "카트 아래 칸에 짐 놓기",
+      "stance": "kneel",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "support"
+      ],
+      "left_wrist": [
+        0.23,
+        -0.06,
+        0.49
+      ],
+      "right_wrist": [
+        -0.23,
+        -0.06,
+        0.49
+      ],
+      "lean": 24
+    },
+    {
+      "id": "sd_carry_shopping_08",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "carry_shopping",
+      "plan_action": 8,
+      "label": "진열대 아래 물건 비교하기",
+      "stance": "squat",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "cup",
+        "cup"
+      ],
+      "left_wrist": [
+        0.24,
+        0.31,
+        0.26
+      ],
+      "right_wrist": [
+        -0.35,
+        0.29,
+        0.39
+      ],
+      "look": -12
+    },
+    {
+      "id": "sd_carry_shopping_09",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "carry_shopping",
+      "plan_action": 9,
+      "label": "한손 지갑 한손으로 계산하기",
+      "stance": "step",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "cup",
+        "pinch"
+      ],
+      "left_wrist": [
+        0.21,
+        0.25,
+        0.33
+      ],
+      "right_wrist": [
+        -0.29,
+        0.37,
+        0.43
+      ],
+      "nod": 10
+    },
+    {
+      "id": "sd_home_transit_01",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "home_transit",
+      "plan_action": 1,
+      "label": "한손으로 문을 당기며 몸 돌리기",
+      "stance": "backstep",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "grip"
+      ],
+      "left_wrist": [
+        0.38,
+        0.17,
+        0.21
+      ],
+      "right_wrist": [
+        -0.48,
+        0.4,
+        0.25
+      ],
+      "root_xyz": [
+        0,
+        -18,
+        0
+      ]
+    },
+    {
+      "id": "sd_home_transit_02",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "home_transit",
+      "plan_action": 2,
+      "label": "열쇠를 낮은 자물쇠에 넣기",
+      "stance": "bow",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "pinch"
+      ],
+      "left_wrist": [
+        0.28,
+        0.1,
+        0.22
+      ],
+      "right_wrist": [
+        -0.17,
+        0.03,
+        0.46
+      ],
+      "lean": 20,
+      "nod": 20
+    },
+    {
+      "id": "sd_home_transit_03",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "home_transit",
+      "plan_action": 3,
+      "label": "커튼을 양쪽으로 벌리기",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.57,
+        0.8,
+        0.1
+      ],
+      "right_wrist": [
+        -0.57,
+        0.8,
+        0.1
+      ],
+      "nod": -8
+    },
+    {
+      "id": "sd_home_transit_04",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "home_transit",
+      "plan_action": 4,
+      "label": "한무릎으로 콘센트 꽂기",
+      "stance": "kneel",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "pinch"
+      ],
+      "left_wrist": [
+        0.33,
+        0.21,
+        0.24
+      ],
+      "right_wrist": [
+        -0.24,
+        -0.12,
+        0.43
+      ],
+      "lean": 24,
+      "nod": 18
+    },
+    {
+      "id": "sd_home_transit_06",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "home_transit",
+      "plan_action": 6,
+      "label": "젖은 우산을 아래로 흔들기",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "grip"
+      ],
+      "left_wrist": [
+        0.29,
+        0.08,
+        0.11
+      ],
+      "right_wrist": [
+        -0.4,
+        0.03,
+        0.26
+      ],
+      "lean": 8
+    },
+    {
+      "id": "sd_home_transit_07",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "home_transit",
+      "plan_action": 7,
+      "label": "버스 손잡이를 잡고 균형 잡기",
+      "stance": "step",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "grip"
+      ],
+      "left_wrist": [
+        0.31,
+        0.16,
+        0.17
+      ],
+      "right_wrist": [
+        -0.2,
+        0.94,
+        0.19
+      ],
+      "root_xyz": [
+        0,
+        0,
+        8
+      ]
+    },
+    {
+      "id": "sd_home_transit_08",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "home_transit",
+      "plan_action": 8,
+      "label": "앉아 안전벨트를 반대편으로 당기기",
+      "stance": "sit_turn",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "grip"
+      ],
+      "left_wrist": [
+        0.25,
+        0.03,
+        0.15
+      ],
+      "right_wrist": [
+        0.09,
+        0.49,
+        0.37
+      ],
+      "look": 20
+    },
+    {
+      "id": "sd_home_transit_10",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "home_transit",
+      "plan_action": 10,
+      "label": "휴대폰을 양손 높이 들어 사진 찍기",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.19,
+        0.77,
+        0.4
+      ],
+      "right_wrist": [
+        -0.19,
+        0.77,
+        0.4
+      ],
+      "nod": -8
+    },
+    {
+      "id": "sd_care_hobby_02",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "care_hobby",
+      "plan_action": 2,
+      "label": "아이 눈높이로 무릎 낮추기",
+      "stance": "squat",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.42,
+        0.35,
+        0.38
+      ],
+      "right_wrist": [
+        -0.42,
+        0.35,
+        0.38
+      ],
+      "height": 0.02,
+      "lean": 9
+    },
+    {
+      "id": "sd_care_hobby_03",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "care_hobby",
+      "plan_action": 3,
+      "label": "바닥의 반려동물 쓰다듬기",
+      "stance": "kneel",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.32,
+        0.22,
+        0.23
+      ],
+      "right_wrist": [
+        -0.32,
+        -0.09,
+        0.43
+      ],
+      "lean": 25,
+      "nod": 20
+    },
+    {
+      "id": "sd_care_hobby_04",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "care_hobby",
+      "plan_action": 4,
+      "label": "양손으로 작은 화분 옮기기",
+      "stance": "step",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "cup",
+        "cup"
+      ],
+      "left_wrist": [
+        0.22,
+        0.15,
+        0.38
+      ],
+      "right_wrist": [
+        -0.22,
+        0.15,
+        0.38
+      ],
+      "lean": 4
+    },
+    {
+      "id": "sd_care_hobby_05",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "care_hobby",
+      "plan_action": 5,
+      "label": "몸을 숙여 화분에 물 주기",
+      "stance": "bow",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "grip"
+      ],
+      "left_wrist": [
+        0.31,
+        0.13,
+        0.18
+      ],
+      "right_wrist": [
+        -0.38,
+        0.09,
+        0.39
+      ],
+      "lean": 24,
+      "nod": 16
+    },
+    {
+      "id": "sd_care_hobby_06",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "care_hobby",
+      "plan_action": 6,
+      "label": "쪼그려 모종 심기",
+      "stance": "squat",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "pinch",
+        "support"
+      ],
+      "left_wrist": [
+        0.16,
+        -0.09,
+        0.36
+      ],
+      "right_wrist": [
+        -0.23,
+        -0.06,
+        0.4
+      ],
+      "lean": 21
+    },
+    {
+      "id": "sd_care_hobby_07",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "care_hobby",
+      "plan_action": 7,
+      "label": "한손으로 높은 가지 잡고 다듬기",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "pinch"
+      ],
+      "left_wrist": [
+        0.38,
+        0.84,
+        0.31
+      ],
+      "right_wrist": [
+        -0.2,
+        0.74,
+        0.37
+      ],
+      "nod": -10
+    },
+    {
+      "id": "sd_care_hobby_08",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "care_hobby",
+      "plan_action": 8,
+      "label": "앉아서 기타를 안고 연주",
+      "stance": "sit_open",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "pinch"
+      ],
+      "left_wrist": [
+        0.46,
+        0.38,
+        0.23
+      ],
+      "right_wrist": [
+        -0.17,
+        0.27,
+        0.38
+      ],
+      "look": 10
+    }
+  ]
+}
