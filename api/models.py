@@ -153,6 +153,7 @@ class CutResultOut(BaseModel):
 # 작가가 Top-K 중 '고른 1개'만 러프에 맞춰 조정한다. 계산은 커밋된 포즈에만 든다.
 
 class RefineRequest(BaseModel):
+    render_thumbnail: bool = True
     camera: Optional[CandidateCamera] = None
     pose_id: str = Field(..., description="작가가 고른 후보의 pose_id")
     view: Literal["front", "three_quarter", "side", "back"] = Field(

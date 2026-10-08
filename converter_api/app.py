@@ -430,6 +430,13 @@ def create_app(
             ) else ["full"]),
             "checks": checks,
         }
+        from converter.framed_model import revision
+        payload["preview_model_revision"] = (revision() if not getattr(
+            getattr(blender_runner, "settings", None), "force_exact_v324", False) else None)
+        payload["character_hashes"] = {
+            c["character_id"]: character_registry.metadata(c["character_id"]).sha256
+            for c in character_registry.list_public(available_only=True)
+        }
         if ok:
             return payload
         return JSONResponse(status_code=503, content=payload)
@@ -449,6 +456,7 @@ def create_app(
         output_scope: str = "full",
         preview_view: str | None = None,
         camera_rotation: list | None = None,
+        preview_model: bool = False,
     ) -> CompletedConversion:
         conversion_id = str(uuid.uuid4())
         request_started = time.monotonic()
@@ -511,6 +519,7 @@ def create_app(
                 output_scope=output_scope,
                 preview_view=preview_view,
                 **({"camera_rotation": camera_rotation} if camera_rotation is not None else {}),
+                **({"preview_model": True} if preview_model else {}),
             )
             if camera_rotation is not None and result.report.get("camera_rotation") != camera_rotation:
                 raise WorkerIntegrityError("camera rotation lineage mismatch")
@@ -519,7 +528,7 @@ def create_app(
                 conversion_id=conversion_id,
                 bvh_bytes=bvh_bytes,
             )
-            if output_scope != "full" or preview_view:
+            if output_scope != "full" or preview_view or preview_model:
                 if (result.report.get("output_scope") != output_scope
                         or result.report.get("framing_version") != FRAMING_VERSION):
                     raise WorkerIntegrityError("output framing lineage mismatch")
@@ -884,8 +893,11 @@ def create_app(
         preview_view: str = Form(default="front"),
         expected_bvh_sha256: str = Form(...),
         camera_rotation: str | None = Form(default=None),
+        preview_format: str = Form(default="png"),
     ):
         """One verified FBX plus its own reimported preview, in a single response."""
+        if preview_format not in ("png", "model") or (preview_format == "model" and preview_view != "front"):
+            raise ApiProblem(400, "INVALID_OPTION", "invalid preview_format")
         from converter.camera import validate_rotation
         try:
             rotation = validate_rotation(json.loads(camera_rotation)) if camera_rotation is not None else None
@@ -897,9 +909,38 @@ def create_app(
             bvh=bvh, character_id=character_id, frame=FRAME, mirror=False,
             output_mode=OUTPUT_MODE, apply_root_translation=APPLY_ROOT_TRANSLATION,
             response_format="framed", expected_bvh_sha256=expected_bvh_sha256,
-            output_scope=output_scope, preview_view=preview_view, camera_rotation=rotation,
+            output_scope=output_scope, preview_view=preview_view if preview_format == "png" else None,
+            camera_rotation=rotation, preview_model=preview_format == "model",
         )
         result = completed.result
+        if preview_format == "model":
+            from converter.framed_model import MODEL_VERSION, metadata, revision
+            try:
+                meta = metadata(result.preview_model)
+                expected = {
+                    "version": MODEL_VERSION, "revision": revision(), "scope": output_scope,
+                    "camera_rotation": rotation, "base_fbx_sha256": result.artifact_sha256,
+                    "source_bvh_sha256": result.source_bvh_sha256,
+                    "character_id": completed.character.metadata.character_id,
+                    "character_sha256": completed.character.metadata.sha256,
+                }
+                if any(meta.get(k) != v for k, v in expected.items()) or len(result.artifact) > 30 * 1024 * 1024:
+                    raise ValueError("model lineage")
+            except (ValueError, KeyError, TypeError) as exc:
+                raise ApiProblem(500, "WORKER_INTEGRITY_ERROR", "model integrity mismatch") from exc
+            return {
+                "conversion_id": completed.conversion_id, "solver_version": SOLVER_VERSION,
+                "framing_version": FRAMING_VERSION, "output_scope": output_scope,
+                "preview_view": "front", "preview_format": "model",
+                "preview_model_revision": revision(), "camera_rotation": rotation,
+                "character_id": completed.character.metadata.character_id,
+                "character_sha256": completed.character.metadata.sha256,
+                "source_bvh_sha256": result.source_bvh_sha256,
+                "fbx_sha256": result.artifact_sha256,
+                "preview_sha256": hashlib.sha256(result.preview_model).hexdigest(),
+                "fbx_base64": base64.b64encode(result.artifact).decode("ascii"),
+                "preview_base64": base64.b64encode(result.preview_model).decode("ascii"),
+            }
         if (not result.preview.startswith(b"\x89PNG\r\n\x1a\n")
                 or len(result.preview) > 4 * 1024 * 1024
                 or len(result.artifact) > 30 * 1024 * 1024

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import base64
 import hashlib
 import io
 import json
@@ -24,6 +25,7 @@ def _args() -> argparse.Namespace:
     parser.add_argument("--bundle", type=Path, required=True)
     parser.add_argument("--thumbnail-headers", type=Path)
     parser.add_argument("--thumbnail", type=Path)
+    parser.add_argument("--review-model", type=Path)
     return parser.parse_args()
 
 
@@ -99,6 +101,25 @@ def main() -> int:
     }
     assert health["checks"]["tempdir"]["ok"] is True
     assert health["checks"]["default_character"]["ok"] is True
+
+    if args.review_model:
+        pair = json.loads(args.review_model.read_text(encoding="utf-8"))
+        fbx = base64.b64decode(pair["fbx_base64"], validate=True)
+        model = base64.b64decode(pair["preview_base64"], validate=True)
+        assert fbx.startswith(b"Kaydara FBX Binary")
+        assert pair["fbx_sha256"] == hashlib.sha256(fbx).hexdigest()
+        assert pair["preview_sha256"] == hashlib.sha256(model).hexdigest()
+        assert pair["preview_format"] == "model"
+        magic, version, size, json_size, kind = struct.unpack_from("<5I", model)
+        assert (magic, version, size, kind) == (0x46546C67, 2, len(model), 0x4E4F534A)
+        meta = json.loads(model[20:20 + json_size])["asset"]["extras"]
+        assert meta["version"] == "framed-mesh-v1"
+        assert meta["revision"] == health["preview_model_revision"] == pair["preview_model_revision"]
+        assert meta["base_fbx_sha256"] == pair["fbx_sha256"]
+        assert meta["source_bvh_sha256"] == hashlib.sha256(args.bvh.read_bytes()).hexdigest()
+        assert meta["character_sha256"] == health["character_hashes"]["standin-master-v2"]
+        assert meta["scope"] == pair["output_scope"] == "full"
+        assert meta["camera_rotation"] == pair["camera_rotation"] == [[0, 0, -1], [0, 1, 0], [1, 0, 0]]
 
     headers = _headers(args.headers)
     artifact = args.fbx.read_bytes()
