@@ -8,7 +8,7 @@
     python scripts/build_pose_bundle.py curated \
         --curated-db data/curation/library/poses.db --curation-dir data/curation \
         --base data/_s3/pose-library-v1.tar.gz --out data/bundles/next \
-        --exclude-unresolved-rigs
+        --exclude-unresolved-rigs --exclude-private-identifiers
 
     # 재생 게이트 보고서를 manifest에 기록한다(배포 검증기가 이 결과를 본다).
     python scripts/build_pose_bundle.py record-gate \
@@ -307,7 +307,7 @@ def _write_attribution(out: Path, base: Path, sources: Counter) -> None:
 
 def build_curated(curated_db: Path, curation_dir: Path, base_source: Path, out: Path, *,
                   parent_version: str = LEGACY_VERSION, exclude_unresolved_rigs: bool = False,
-                  force: bool = False) -> dict:
+                  exclude_private_identifiers: bool = False, force: bool = False) -> dict:
     """정리 DB → 배포 번들. 기존 포즈는 기준 번들의 BVH·썸네일을, 신규 포즈는 배치 산출물을 쓴다."""
     if not curated_db.is_file():
         raise BundleError(f"정리 DB가 없습니다: {curated_db}")
@@ -345,10 +345,18 @@ def build_curated(curated_db: Path, curation_dir: Path, base_source: Path, out: 
         rows = list(target.execute("SELECT rowid, pose_id, bvh_path, meta_json FROM poses"))
         for row in rows:
             pose_id = row["pose_id"]
-            if privacy_findings(pose_id):
-                raise BundleError(f"pose_id에 사용자 식별자로 보이는 값이 있습니다(rowid {row['rowid']}). "
-                                  "정리 단계에서 포즈를 제외하거나 ID를 바꾸세요")
             meta = json.loads(row["meta_json"] or "{}")
+            if privacy_findings(pose_id):
+                if not exclude_private_identifiers:
+                    raise BundleError(f"pose_id에 사용자 식별자로 보이는 값이 있습니다(rowid {row['rowid']}). "
+                                      "정리 단계에서 포즈를 제외하거나 ID를 바꾸세요")
+                # Never copy the private pose ID, BVH, thumbnail or metadata
+                # into the release, including its exclusion report.
+                excluded.append({"source_rowid": row["rowid"], "reason": "private_identifier",
+                                 "group": meta.get("curation_group"), "batch_id": meta.get("batch_id")})
+                target.execute("DELETE FROM pose_projections WHERE pose_id=?", (pose_id,))
+                target.execute("DELETE FROM poses WHERE pose_id=?", (pose_id,))
+                continue
             group = meta.get("curation_group")
             if group == "existing":
                 name = Path(str(row["bvh_path"]).replace("\\", "/")).name
@@ -420,7 +428,7 @@ def build_curated(curated_db: Path, curation_dir: Path, base_source: Path, out: 
         _write_attribution(out, base, sources)
         parent = _parent_of(base, parent_version)
 
-    curated_manifest = curation_dir / "library" / "manifest.json"
+    curated_manifest = curated_db.parent / "manifest.json"
     curation = {
         "mode": "curated",
         "curated_db_sha256": sha256_file(curated_db),
@@ -475,6 +483,8 @@ def main() -> int:
                          default=os.getenv("POSE_LIBRARY_VERSION", LEGACY_VERSION))
     curated.add_argument("--exclude-unresolved-rigs", action="store_true",
                          help="운영 변환기가 모르는 리그의 포즈를 빼고 만든다(manifest에 기록)")
+    curated.add_argument("--exclude-private-identifiers", action="store_true",
+                         help="사용자 식별자를 포함한 포즈를 로컬 검수에만 남기고 번들에서는 제외")
     curated.add_argument("--force", action="store_true")
 
     gate = sub.add_parser("record-gate", help="재생 게이트 결과를 manifest에 기록")
@@ -492,7 +502,9 @@ def main() -> int:
             manifest = build_curated(
                 Path(args.curated_db), Path(args.curation_dir), Path(args.base), out,
                 parent_version=args.parent_version,
-                exclude_unresolved_rigs=args.exclude_unresolved_rigs, force=args.force)
+                exclude_unresolved_rigs=args.exclude_unresolved_rigs,
+                exclude_private_identifiers=args.exclude_private_identifiers,
+                force=args.force)
             _print_done(out, manifest)
             if manifest["compat"]["excluded"]:
                 print(f"  변환기가 모르는 리그로 뺀 포즈 {len(manifest['compat']['excluded'])}개"
