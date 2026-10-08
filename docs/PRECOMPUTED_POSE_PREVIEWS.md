@@ -92,6 +92,9 @@ can still cause a conversion. No production publishing is implied by a local bak
 The app retains the static GLB on the GPU for review and redraws on resize. An
 unrefined full-body selection can immediately use its precomputed surface while
 the paired FBX prepares. A refined or cropped selection waits for its final model.
+The BFF decides library eligibility from its stored refine artifact, even if the
+client missed the refine response. Saving pins the reviewed source and character
+hashes (plus final exporter revision for framed models); changes require review.
 WebGL failure uses the exact scoped PNG and exports that PNG's paired FBX.
 Refine requests in the new FBX flow skip the intermediate thumbnail only; the
 solver, acceptance policy and accepted BVH are unchanged.
@@ -115,3 +118,17 @@ converter client and Blender; production database/S3 latency was excluded.
 Roll out converter/inference first, BFF second, client last; absent capability
 retains the legacy PNG path. The new exporter does not invalidate posed-mesh-v1
 keys or modify the frozen solver manifest.
+
+The isolated local library cache was completed and audited against the registered
+2026-10-08 library snapshot: **1,968 poses × 2 characters = 3,936 valid GLBs**,
+4,728,087,864 GLB bytes. This includes 520 newly baked models and 3,416 verified
+existing models linked into the isolated cache. Four female-model timeouts were
+retried successfully; the final `coverage.json` has no missing entries. Each entry
+was checked through the serving store for source/character lineage and content
+digest. Cache assets remain local and are not included in Git or published to S3.
+
+Final checks: server converter/refine suite 173 passed and 1 skipped; application
+smoke 54/54; BFF 270 tests; client review/export 105 tests, production build and
+changed-file lint passed. Source-change, stale-character and lost-refine-response
+cases are covered. The Blender-specific Python scripts were excluded from normal
+pytest collection and exercised through the real Blender probes above.
