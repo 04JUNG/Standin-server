@@ -145,6 +145,28 @@ def _resolve_library_identity() -> dict:
     return identity.to_dict()
 
 
+def _pose_model_version() -> str:
+    """어느 추출 모델이 답했는지. 라이브러리 버전과 같은 역할을 모델 쪽에서 한다.
+
+    예전에는 `POSE_MODEL_VERSION` env가 없으면 `runtime-default`라는 상수가 나갔다. 그
+    값으로는 "모델을 바꿨더니 추출이 나아졌나"를 되짚을 수 없다 — 실제로 staging에서
+    cascade가 도는 동안에도 기록에는 `runtime-default`만 남았다(2026-10-08).
+
+    번들을 받아 왔으면 그 정체(`model_id@build_id`)를 쓴다. 없으면 적어도 어떤 변이로
+    설정됐는지는 남긴다. env는 명시적 덮어쓰기로 그대로 존중한다.
+    """
+    override = os.getenv("POSE_MODEL_VERSION")
+    if override:
+        return override
+    bundle = STATE.get("pose_model_bundle") or {}
+    model_id, build_id = bundle.get("model_id"), bundle.get("build_id")
+    if model_id and build_id:
+        return f"{model_id}@{build_id}"
+    if model_id:
+        return str(model_id)
+    return CFG.pose_model_variant
+
+
 def _ensure_pose_model_bundle():
     """Provision an explicitly configured remote Human-Art bundle once."""
     if CFG.pose_model_variant not in {"cascade", "humanart-m"}:
@@ -571,7 +593,7 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
             vlm_model=vlm_model,
             vlm_prompt_version=CFG.vlm_prompt_version,
             pose_backend=STATE.get("pose_backend", CFG.pose_backend),
-            pose_model_version=os.getenv("POSE_MODEL_VERSION", "runtime-default"),
+            pose_model_version=_pose_model_version(),
             pose_library_version=CFG.pose_library_version,
             pose_library_sha256=(STATE.get("pose_library") or {}).get("content_sha256"),
             feature_version=FEATURE_VERSION,
