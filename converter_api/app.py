@@ -329,16 +329,44 @@ def create_app(
 
     from converter_api.preview_models import PreviewModelStore
     from converter.preview_model import MODEL_VERSION
+    from converter_api.body_preview import preview_contract
     preview_models = PreviewModelStore()
     app.state.preview_models = preview_models
 
+    def verify_preview_revision(expected: str | None):
+        contract = preview_contract()
+        if expected is not None:
+            if not SHA256_RE.fullmatch(expected):
+                raise ApiProblem(400, "INVALID_PREVIEW_REVISION", "invalid preview revision")
+            if not hmac.compare_digest(expected, contract["preview_revision"]):
+                raise ApiProblem(409, "PREVIEW_REVISION_MISMATCH", "preview runtime changed")
+        return contract
+
+    def verify_character_sha(expected: str | None, actual: str | None = None):
+        if expected is not None:
+            if not SHA256_RE.fullmatch(expected):
+                raise ApiProblem(400, "INVALID_CHARACTER_SHA256", "invalid character digest")
+            if actual is not None and not hmac.compare_digest(expected, actual):
+                raise ApiProblem(409, "CHARACTER_SHA256_MISMATCH", "character asset changed")
+
+    @app.get("/preview-contract")
+    def read_preview_contract():
+        return preview_contract()
+
     @app.get("/pose-preview/{source_sha}")
-    def pose_preview(source_sha: str, character_id: str = "standin-master-v2"):
+    def pose_preview(source_sha: str, character_id: str = "standin-master-v2",
+                     expected_character_sha256: str | None = None,
+                     expected_preview_revision: str | None = None):
         if not SHA256_RE.fullmatch(source_sha):
             raise ApiProblem(400, "INVALID_INPUT", "invalid source digest")
+        contract = verify_preview_revision(expected_preview_revision)
+        verify_character_sha(expected_character_sha256)
         try:
             metadata = character_registry.metadata(character_id)
+            verify_character_sha(expected_character_sha256, metadata.sha256)
             data, manifest = preview_models.get(source_sha, metadata.sha256)
+        except ApiProblem:
+            raise
         except (FileNotFoundError, UnknownCharacterError):
             raise ApiProblem(404, "PREVIEW_NOT_READY", "precomputed model unavailable")
         except Exception:
@@ -346,6 +374,8 @@ def create_app(
         return StreamingResponse(io.BytesIO(data), media_type="model/gltf-binary", headers={
             "Content-Length": str(len(data)), "Cache-Control": "private, no-store",
             "X-Standin-Model-Version": MODEL_VERSION,
+            "X-Standin-Model-Revision": contract["model_revision"],
+            "X-Standin-Preview-Revision": contract["preview_revision"],
             "X-Standin-Artifact-SHA256": manifest["sha256"],
             "X-Standin-Character-SHA256": metadata.sha256,
             "X-Standin-Source-BVH-SHA256": source_sha,
@@ -445,6 +475,7 @@ def create_app(
         response_format: str,
         artifact_kind: str | None = None,
         expected_bvh_sha256: str | None = None,
+        expected_character_sha256: str | None = None,
         thumbnail: ThumbnailRequest | None = None,
         output_scope: str = "full",
         preview_view: str | None = None,
@@ -499,7 +530,12 @@ def create_app(
                     "uploaded BVH does not match expected_bvh_sha256",
                     conversion_id=conversion_id,
                 )
+            # Check immutable registry metadata before fetching the FBX or starting Blender.
+            if expected_character_sha256 is not None:
+                verify_character_sha(expected_character_sha256)
+                verify_character_sha(expected_character_sha256, character_registry.metadata(character_id).sha256)
             resolved = character_registry.resolve(character_id)
+            verify_character_sha(expected_character_sha256, resolved.metadata.sha256)
             result = blender_runner.convert(
                 bvh_bytes=bvh_bytes,
                 character_path=resolved.path,
@@ -883,9 +919,12 @@ def create_app(
         output_scope: str = Form(default="full"),
         preview_view: str = Form(default="front"),
         expected_bvh_sha256: str = Form(...),
+        expected_character_sha256: str | None = Form(default=None),
+        expected_preview_revision: str | None = Form(default=None),
         camera_rotation: str | None = Form(default=None),
     ):
         """One verified FBX plus its own reimported preview, in a single response."""
+        contract = verify_preview_revision(expected_preview_revision)
         from converter.camera import validate_rotation
         try:
             rotation = validate_rotation(json.loads(camera_rotation)) if camera_rotation is not None else None
@@ -897,6 +936,7 @@ def create_app(
             bvh=bvh, character_id=character_id, frame=FRAME, mirror=False,
             output_mode=OUTPUT_MODE, apply_root_translation=APPLY_ROOT_TRANSLATION,
             response_format="framed", expected_bvh_sha256=expected_bvh_sha256,
+            expected_character_sha256=expected_character_sha256,
             output_scope=output_scope, preview_view=preview_view, camera_rotation=rotation,
         )
         result = completed.result
@@ -911,6 +951,7 @@ def create_app(
             "conversion_id": completed.conversion_id,
             "solver_version": SOLVER_VERSION,
             "framing_version": FRAMING_VERSION,
+            "preview_revision": contract["preview_revision"],
             "output_scope": output_scope,
             "preview_view": preview_view,
             "character_id": completed.character.metadata.character_id,

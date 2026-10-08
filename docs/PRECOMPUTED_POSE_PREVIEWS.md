@@ -77,3 +77,46 @@ actual staging FBX: 24,988 vertices, max relative nearest-surface error
 `5.69e-7`, RMS coordinate error `2.02e-7`. Both use the same stored camera.
 Further deployed latency and coverage must be recorded before rollout is called
 complete. Large library bakes report their own coverage; fallback is intentional.
+
+## Stored body selection contract (2026-10-08)
+
+The BFF body-preview API can now pin the registered character bytes and render
+runtime, instead of trusting only a character ID. This is additive: legacy callers
+may omit the new fields.
+
+`GET /preview-contract` is a lightweight internal read. It does not access the
+character registry, download FBX or start Blender. Its `body-preview-runtime.v1`
+response contains `preview_revision`, `model_version`, `model_revision`,
+`solver_version` and `framing_version`. Preview revision hashes the existing model
+revision plus the framing/camera/worker/contract sources, with normalized line
+endings. It changes when the render implementation or frozen runtime changes.
+
+New optional inputs:
+
+- `/pose-preview/{source_sha}` query: `expected_character_sha256`,
+  `expected_preview_revision` (alongside the existing `character_id`).
+- `/convert-framed` multipart: the same two fields, alongside the existing BVH,
+  `expected_bvh_sha256`, character, scope and camera inputs.
+
+Invalid digests return 400. A valid but different body digest or preview revision
+returns 409 (`CHARACTER_SHA256_MISMATCH` / `PREVIEW_REVISION_MISMATCH`) before
+starting Blender. The body check compares registry metadata before materializing
+an FBX; registry/runner/worker still verify the actual bytes. GLB reads keep using
+the existing content-addressed, validated offline store. Missing GLB does not
+start a bake or choose a default body.
+
+GLB responses now include `X-Standin-Model-Revision` and
+`X-Standin-Preview-Revision`. Framed JSON includes `preview_revision`. The BFF
+must compare these, the existing character/source digests, and embedded GLB
+identity against the saved body selection; it rechecks the selection before
+returning bytes. A retired runtime response must not replace newer previews.
+
+The deployment Dockerfile explicitly includes `converter_api/body_preview.py`.
+Deploy this converter contract before the dependent BFF preview API. Full client
+UX / final export confirmation is a later phase; this change does not enable it.
+
+Validation: 80 targeted tests passed using real FastAPI routes with fixture
+assets/runner, including the old API contracts and importing the runtime contract
+from the Docker COPY allowlist. This is contract/packaging validation, not an
+actual Docker build, Blender mesh check or production deployment. No new body
+assets were registered or published by this change.
