@@ -114,3 +114,5 @@ python scripts/export_body_api_contract.py
 ```
 
 [HTTP 필드·실패 계약](BODY_PIPELINE_API_CONTRACT.md). BFF·클라이언트 연결 전 필수 충돌 검토는 마스터 독스의 `체형 선택/필수_수정사항_2026-10-07.md`를 따른다. 이번 PR은 그 제품 연동의 완료를 주장하지 않는다.
+
+2026-10-08 보완: 명확한 디자인 단서로 체형군을 좁힌 뒤 기본 체격을 선택하면 `auto_presentation_default`로 구분한다. BFF가 근거 없는 `auto_default`와 혼동해 반대 체형 기본값으로 되돌리지 않도록 한다. 상세 계약은 BODY_PIPELINE_API_CONTRACT.md를 따른다.

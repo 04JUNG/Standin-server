@@ -24,7 +24,7 @@ Python 응답은 `BodyMatchingOut | EmptyBodyMatchingOut`이다. JSON은 object�
 | observations | 속성 값·가시성·근거·coverage·소유권·캐릭터 디자인 표현 |
 | auto_body_id / selected_asset | 추천 체형 및 body/rig/measurement 버전·asset hash |
 | applied_body_id | auto에서 추천 ID, shadow에서 null. 외부 적용 대상으로 선택됐다는 뜻이며 메시/썸네일 적용 완료를 뜻하지 않음 |
-| selection_source | auto_best_effort / auto_default. 후자는 기본값 선택이며 감지 정확도 성공이 아님 |
+| selection_source | auto_best_effort / auto_presentation_default / auto_default. presentation_default는 명확한 인물 디자인 단서에 맞는 체형군 안에서 기본 체격을 선택. auto_default는 시각 근거 없는 기본값 |
 | diagnostic / reason_codes | 근거 부족·provider 실패·자산 없음 등 |
 | candidates / tied_body_ids | 상위 체형 최대 3개 및 동점 목록. 포즈 Top-5와 별개 |
 | presentation_selection | 디자인 계열 관측으로 후보 제한/동점/기본값을 결정한 기록 |
@@ -55,3 +55,7 @@ Python 응답은 `BodyMatchingOut | EmptyBodyMatchingOut`이다. JSON은 object�
 예제는 합성 계약 fixture이며 실제 러프 정확도·사용 가능한 FBX·렌더 증거가 아니다. `python scripts/export_body_api_contract.py`로 생성한다. 전체 OpenAPI는 실행 서버 `/openapi.json` 및 `/docs`에서 확인한다.
 
 [구현·설정·하드코딩 점검·실제 평가 한계](BODY_MATCHING_IMPLEMENTATION.md).
+
+### 디자인 단서만 관측된 경우
+
+`auto_presentation_default`는 소유권이 명확하고 visible 여성형/남성형 디자인 단서로 compatible_candidates를 구성했지만 비교 가능한 체격·투영 점수가 없을 때 사용한다. 체격·근육·등신을 감지했다는 뜻이 아니며 일치율은 계속 null이다. 약한 단서·헤어/의상만의 단서·소유권 불명·호환 체형 부재는 이 출처로 승격하지 않는다. BFF는 이 출처와 presentation 진단을 검증하여 선택을 유지한다. 사용자 manual/fixed_default 우선순위는 유지한다. 기존 BFF는 새 출처를 unavailable로 처리하므로 BFF 지원 후 감지 변경을 활성화한다.

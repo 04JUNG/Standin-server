@@ -14,11 +14,11 @@ from tests.test_body_matching import BodyMatchingFixture, FixtureClient, cut
 
 
 class BodyAPIContractTests(BodyMatchingFixture):
-    def response(self,mode='auto',broken=None):
+    def response(self,mode='auto',broken=None,client=None):
         result=cut()
         for i,c in enumerate(result.person_candidates[0]):
             path=self.root/f'pose-{i}.bvh';path.write_bytes(b'TEST BVH FIXTURE '+str(i).encode());c.bvh_path=str(path)
-        result.body_matching={} if mode=='off' else BodyMatchingService(self.path,client=FixtureClient()).analyze(self.image,result,mode=mode)
+        result.body_matching={} if mode=='off' else BodyMatchingService(self.path,client=client or FixtureClient()).analyze(self.image,result,mode=mode)
         if broken:broken(result.body_matching)
         class Pipe:
             def process_cut(self,*args,**kwargs):return result
@@ -41,6 +41,24 @@ class BodyAPIContractTests(BodyMatchingFixture):
         self.assertFalse(body['rendering_executed'])
         self.assertEqual([x['pose_id'] for x in p['pose_bindings']],[x['pose_id'] for x in d['people'][0]['candidates']])
         self.assertIsInstance(CutResultOut.model_validate(d).body_matching,BodyMatchingOut)
+
+    def test_http_preserves_presentation_only_selection_source(self):
+        from tests.test_body_matching import person_payload
+        from tests.test_body_presentation import presentation
+        from src.experimental.body_matching.schema import unknown_attributes
+        for asset in self.raw['assets']:
+            asset['metadata']={'presentation_style': 'feminine' if asset['body_id']=='regular' else 'masculine'}
+        self.write()
+        class Client(FixtureClient):
+            def analyze(self, crops):
+                return {key: dict(person_payload(key), attributes=unknown_attributes(),
+                                  presentation=presentation()) for key, _ in crops}
+        data=self.response(client=Client())
+        person=data['body_matching']['people'][0]
+        self.assertEqual(person['selection_source'],'auto_presentation_default')
+        self.assertEqual(person['auto_body_id'],'regular')
+        self.assertEqual(person['observations']['presentation']['visibility'],'visible')
+        self.assertEqual(len(data['people'][0]['candidates']),5)
 
     def test_http_shadow_cannot_render(self):
         d=CutResultOut.model_validate(self.response('shadow'))

@@ -32,8 +32,22 @@ def select(obs,candidates=None):
 class PresentationTests(unittest.TestCase):
     def test_female_style_survives_hidden_shape_and_uses_female_default(self):
         o=observe();o['attributes']=unknown_attributes();d=select(o)
-        self.assertEqual(d['auto_body_id'],'feminine-regular');self.assertEqual(d['selection_source'],'auto_default')
+        self.assertEqual(d['auto_body_id'],'feminine-regular');self.assertEqual(d['selection_source'],'auto_presentation_default')
         self.assertEqual(d['presentation_selection']['mode'],'compatible_candidates')
+
+    def test_presentation_default_requires_strong_owned_supported_style(self):
+        for style in ('feminine', 'masculine'):
+            o=observe(style);o['attributes']=unknown_attributes()
+            self.assertEqual(select(o)['selection_source'],'auto_presentation_default')
+            for presentation_value in (presentation(style, 'uncertain'),
+                                       presentation(style, cues=['hair_design']),
+                                       presentation(None, 'unknown')):
+                o['presentation']=presentation_value
+                self.assertEqual(select(o)['selection_source'],'auto_default')
+        o=observe();o['attributes']=unknown_attributes();o['ownership_ambiguous']=True
+        self.assertEqual(select(o)['selection_source'],'auto_default')
+        o=observe();o['attributes']=unknown_attributes()
+        self.assertEqual(select(o,[assets()[0]])['selection_source'],'auto_default')
 
     def test_muscular_female_keeps_muscularity(self):
         d=select(observe('feminine','muscular'));self.assertEqual(d['auto_body_id'],'feminine-muscular')

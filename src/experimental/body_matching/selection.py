@@ -98,7 +98,12 @@ def _select(candidates, observation, poses, default_body_id, *, unavailable_reas
     else:
         selected = next((a for a in candidates if a["body_id"] == default_body_id),
                         min(candidates, key=tie_key))
-        source = "auto_default"
+        # Strong, owned presentation is useful evidence even when shape is hidden.
+        # Keep it distinct from a default selected without visual evidence.
+        source = ("auto_presentation_default"
+                  if presentation_trace["mode"] == "compatible_candidates"
+                  and presentation_trace["visibility"] == "visible"
+                  else "auto_default")
         diagnostic = "provider_error" if observation.get("provider_error") else "insufficient_evidence"
         reasons.append("no_comparable_evidence")
     base.update(auto_body_id=selected["body_id"], selection_source=source, diagnostic=diagnostic,

@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 Sha256 = Annotated[str, Field(pattern=r'^[0-9a-f]{64}$')]
 Visibility = Literal['visible','uncertain','unknown']
 ProjectionView = Literal['front','three_quarter','side','back','side_opposite','three_quarter_opposite']
-SelectionSource = Literal['auto_best_effort','auto_default']
+SelectionSource = Literal['auto_best_effort','auto_default','auto_presentation_default']
 
 
 class BodyWireModel(BaseModel):
