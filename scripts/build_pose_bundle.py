@@ -507,7 +507,7 @@ def main() -> int:
                 force=args.force)
             _print_done(out, manifest)
             if manifest["compat"]["excluded"]:
-                print(f"  변환기가 모르는 리그로 뺀 포즈 {len(manifest['compat']['excluded'])}개"
+                print(f"  배포 조건에 따라 뺀 포즈 {len(manifest['compat']['excluded'])}개"
                       " (manifest.compat.excluded)")
         else:
             manifest = record_gate(Path(args.bundle), Path(args.report))
