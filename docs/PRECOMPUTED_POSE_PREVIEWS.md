@@ -61,8 +61,9 @@ and checksum. The app uses a single lazy-loaded Three.js renderer to snapshot
 cards and rejects external GLB resources. Navigation cancellation stops fallback
 work. Missing assets/WebGL use the existing authenticated aligned PNG.
 
-Only a selected pose proceeds to the existing FBX/refine/crop conversion. Final
-FBX verification still uses its paired converter PNG; BVH remains unrotated.
+Only a selected pose proceeds to FBX/refine/crop conversion. Clients supporting
+`modelPreview` can now review the paired `framed-mesh-v1` surface without a PNG;
+older clients retain paired PNG verification. BVH remains unrotated.
 Unset `POSE_PREVIEW_URI` or roll back the BFF/client to use the original path.
 
 ## Verification (2026-10-07)
@@ -77,3 +78,38 @@ actual staging FBX: 24,988 vertices, max relative nearest-surface error
 `5.69e-7`, RMS coordinate error `2.02e-7`. Both use the same stored camera.
 Further deployed latency and coverage must be recorded before rollout is called
 complete. Large library bakes report their own coverage; fallback is intentional.
+
+## Final review and export reuse (2026-10-08)
+
+The converter's opt-in `preview_format=model` performs the existing retarget,
+crop and camera transform, then bakes the actual final FBX in the same worker.
+The BFF validates both hashes and model lineage, coalesces pending requests, and
+retains the FBX/GLB pair for up to 10 minutes within a 128 MiB process-local cache.
+Keys include ownership, BVH digest, character digest, scope, camera and exporter
+revision. This is a per-instance cache; restart, eviction or another BFF instance
+can still cause a conversion. No production publishing is implied by a local bake.
+
+The app retains the static GLB on the GPU for review and redraws on resize. An
+unrefined full-body selection can immediately use its precomputed surface while
+the paired FBX prepares. A refined or cropped selection waits for its final model.
+WebGL failure uses the exact scoped PNG and exports that PNG's paired FBX.
+Refine requests in the new FBX flow skip the intermediate thumbnail only; the
+solver, acceptance policy and accepted BVH are unchanged.
+
+Local Windows validation used Blender 5.2.0/fbe6228777e7 and actual rig assets:
+
+| Check | Observed result |
+| --- | --- |
+| Real FBX/GLB generation | Male full/half/bust/head, female full, Mixamo/100STYLE/CMU and refined input passed |
+| Refined sample, final model vs final PNG | 9.61 s vs 14.88 s; one sample each during concurrent library baking |
+| Real BFF → converter HTTP → Blender | 9.69 s preparation; 78.74 ms subsequent FBX response; exactly one conversion |
+| Paired file identity | Downloaded FBX SHA equals GLB `base_fbx_sha256`; unauthorized cache hit rejected |
+| Actual review component in Chromium | Six cases rendered; warm fetch + first frame 269–585 ms; close/reopen passed |
+| Initial development module load | 3.73–3.96 s while Vite transformed modules and library baking ran |
+
+These are local probes, not deployment latency guarantees. Browser verification
+used the actual React review component with real generated models. Tauri native
+save, CSP import, macOS and production traffic require release validation.
+Roll out converter/inference first, BFF second, client last; absent capability
+retains the legacy PNG path. The new exporter does not invalidate posed-mesh-v1
+keys or modify the frozen solver manifest.

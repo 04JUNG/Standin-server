@@ -24,6 +24,8 @@ class HealthResponse(BaseModel):
     checks: dict[str, Any]
     framing_version: str | None = None
     output_scopes: list[str] = []
+    preview_model_revision: str | None = None
+    character_hashes: dict[str, str] = {}
 
 
 class ErrorDetail(BaseModel):
