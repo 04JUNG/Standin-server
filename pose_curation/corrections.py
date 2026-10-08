@@ -102,7 +102,14 @@ def _rotate_arms(source, destination, sides, degrees, *, mode):
     }
 
 
-def revise(batch: Path, selection: dict[str, list[str]], revision: str, degrees=8.0):
+def revise(batch: Path, selection: dict[str, list[str]], revision: str, degrees=8.0, *, mode="outward"):
+    """Archive and apply a bounded clearance edit; invalidate all old evidence.
+
+    Forward motion helps captured hands meet the thicker preview character's
+    chest clearance. Both directions share the existing cumulative 16° budget.
+    """
+    if mode not in {"outward", "forward"}:
+        raise ValueError("clearance mode must be outward or forward")
     batch = batch.resolve()
     manifest = read_json(batch / "manifest.json")
     if manifest.get("character_render", {}).get("status") == "rendering":
@@ -130,7 +137,8 @@ def revise(batch: Path, selection: dict[str, list[str]], revision: str, degrees=
         backup.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, backup)
         prepared = archive / "prepared" / source.name
-        check = widen_arms(source, prepared, selection[pose["pose_id"]], degrees)
+        correction = widen_arms if mode == "outward" else advance_arms
+        check = correction(source, prepared, selection[pose["pose_id"]], degrees)
         old_hash = pose["bvh_sha256"]
         prepared_files.append((prepared, source))
         pose.update(

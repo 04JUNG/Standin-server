@@ -10,11 +10,10 @@ Pillow>=10.0                 # 업로드 PNG 로드
 
 # DB: SQLite는 파이썬 표준 라이브러리(sqlite3) — 별도 설치 불필요
 
-# --- 포즈 미세조정(refine) — 선택 ---
-# 없어도 동작한다. src/refine.py가 numpy 전용 LM으로 폴백한다(코어=numpy 원칙 유지).
-# 다만 폴백은 수치 야코비안이라 느리다(실측: 조정 1건당 numpy ~0.9s vs scipy ~0.2s).
-# 시연 서버에는 넣는 것을 권장.
-# scipy>=1.11
+# --- 후보 카메라·포즈 미세조정 ---
+# 카메라 연속 각도 fitting과 BVH 루트 회전 왕복 검증의 필수 의존성.
+# refine 단독 NumPy fallback은 그대로 유지한다.
+scipy>=1.11,<2
 
 # --- 실제 모델 연결 시(선택) ---
 google-genai>=1.10,<3         # HttpOptions timeout 지원 범위를 고정. GEMINI_MODEL=gemini-2.5-flash 등

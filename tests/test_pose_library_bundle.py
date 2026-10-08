@@ -336,6 +336,19 @@ def test_curated_refuses_user_derived_pose_ids_and_changed_bvh(tmp_path):
     with pytest.raises(BundleError, match="사용자 식별자"):
         build_curated(curated_db, curation, base, tmp_path / "out")
 
+    release = tmp_path / "release"
+    manifest = build_curated(curated_db, curation, base, release,
+                             exclude_private_identifiers=True)
+    assert manifest["counts"]["poses"] == 2
+    assert manifest["compat"]["excluded"] == [{
+        "source_rowid": 3, "reason": "private_identifier",
+        "group": "new", "batch_id": "gap-20261002",
+    }]
+    assert USER_HASH.encode() not in (release / "poses.db").read_bytes()
+    assert USER_HASH not in (release / MANIFEST_NAME).read_text(encoding="utf-8")
+    assert not list(release.rglob(f"*{USER_HASH}*"))
+    verify_manifest(release)
+
     other = tmp_path / "other"
     other.mkdir()
     base2 = make_base(other / "base")

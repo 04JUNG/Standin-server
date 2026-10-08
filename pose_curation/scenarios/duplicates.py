@@ -9,10 +9,10 @@ from ..quality import ReferenceIndex
 from ..storage import contained_path, read_json, write_json
 
 
-def annotate(records, batch, data_dir=Path("data")):
+def annotate(records, batch, data_dir=Path("data"), *, reference=None):
     if not records:
         raise ValueError("no scenarios to compare")
-    reference = ReferenceIndex.load(data_dir)
+    reference = reference if reference is not None else ReferenceIndex.load(data_dir)
     points = [load_coco17(str(contained_path(batch, p["bvh"])))[0] for p in records]
     bodies = np.stack([normalized_body(p) for p in points])
     for i, (pose, points3d) in enumerate(zip(records, points)):

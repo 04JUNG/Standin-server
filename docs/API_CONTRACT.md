@@ -511,3 +511,23 @@ OpenAPI 자동 문서: 서버 기동 후 **`http://127.0.0.1:8000/docs`**. 이 �
 ## 선택적 체형 관측·자동선택 결과
 
 `BODY_MATCHING_MODE=off`(기본값)에서는 `/analyze.body_matching={}`이다. `shadow|auto`에서는 인물별 관측·자동선택 결과를 추가한다. 기존 people/포즈 순위/검색·refine 정책은 그대로다. 스키마·오류·catalog 승인 조건은 [체형 감지·선택 API 계약](BODY_PIPELINE_API_CONTRACT.md)을 따른다. 이 필드는 기존 클라이언트의 수동 선택을 덮어쓰지 않으며, 렌더·BFF 상태 저장·Export는 실행하지 않는다.
+
+# 후보 표시 카메라 (2026-10-07 추가)
+
+`CandidateOut.camera`는 선택적 `candidate-camera-v1` 메타데이터다. 기존 `view`는
+검색 투영 식별자로 유지된다. 화면에는 `camera.display_view`를 사용하고, 회전행렬은
+BFF가 저장한 값을 Converter로 전달한다. `rotation`은 원본 BVH Y-up 좌표에서 고정
+정면 카메라 좌표로 가는 3×3 proper rotation이다. 원본은 `source_bvh_sha256`으로 묶인다.
+
+`POST /refine`에 같은 `camera`를 전달하면 카메라 좌표에서 조정한 후 BVH를 원래
+좌표로 복구한다. SHA가 달라지면 422로 거절한다. 카메라 유무와 관계없이 BVH 다운로드는
+원래 방향이며, 새 카메라를 구 4방향 정적 썸네일로 대신 표현해서는 안 된다.
+관측이 부족하거나 정면이 모호하면 camera=null이다. 구 작업은 기존 동작을 유지한다.
+세부 내용: [후보 카메라](CANDIDATE_CAMERA_ALIGNMENT.md).
+
+## Precomputed candidate previews
+
+The internal converter additionally serves read-only
+`GET /pose-preview/{source_sha}?character_id=...` (`model/gltf-binary`).
+It never runs inference or Blender. Configuration, identity, failure behavior
+and client/BFF integration are specified in [PRECOMPUTED_POSE_PREVIEWS.md](PRECOMPUTED_POSE_PREVIEWS.md).

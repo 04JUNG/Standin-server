@@ -127,6 +127,13 @@ class BaseVLMClient:
     def analyze(self, image, img_w: int, img_h: int) -> VLMAnalysis:  # noqa
         raise NotImplementedError
 
+    def tag_people(self, image, boxes: list) -> Optional[dict]:
+        """인물별 태그만 받는 두 번째 호출. 지원하지 않거나 실패하면 None.
+
+        분석 호출과 분리돼 있어 이 호출이 어떻게 되든 route·인원수·박스는 바뀌지 않는다.
+        """
+        return None
+
     def rerank(self, image, candidates: list, query_tags: dict) -> list:
         """
         Top-N 후보를 의미 기준으로 재정렬(선택). 기본은 no-op(순서 유지).
@@ -233,6 +240,35 @@ class GeminiVLMClient(BaseVLMClient):
         img = Image.open(image) if isinstance(image, str) else image
         buf = io.BytesIO(); img.convert("RGB").save(buf, format="PNG")
         return types.Part.from_bytes(data=buf.getvalue(), mime_type="image/png")
+
+    def tag_people(self, image, boxes: list) -> Optional[dict]:
+        """태그 전용 호출. 재시도하지 않는다 — 기록용 값이라 사용자를 기다리게 하지 않는다."""
+        from google.genai import types
+
+        started = self._clock()
+        try:
+            resp = self._client.models.generate_content(
+                model=self._model,
+                contents=[prompts.person_tags_prompt(boxes), self._to_part(image)],
+                config=types.GenerateContentConfig(
+                    system_instruction=prompts.PERSON_TAGS_SYSTEM,
+                    response_mime_type="application/json",
+                    temperature=0,
+                    http_options=types.HttpOptions(
+                        timeout=CFG.vlm_person_tags_timeout_ms),
+                ),
+            )
+            payload = _extract_json(resp.text)
+            log_info("gemini_person_tags", model=self._model, status="ok",
+                     people=len(boxes),
+                     elapsedMs=round((self._clock() - started) * 1000))
+            return payload if isinstance(payload, dict) else None
+        except Exception as error:
+            # 실패를 올려 보내지 않는다. 분석은 이미 끝났고 태그는 없어도 되는 값이다.
+            log_warn("gemini_person_tags", model=self._model, status="failed",
+                     errorType=type(error).__name__,
+                     elapsedMs=round((self._clock() - started) * 1000))
+            return None
 
     def analyze(self, image, img_w: int, img_h: int) -> VLMAnalysis:
         from google.genai import types

@@ -327,6 +327,30 @@ def create_app(
     app.state.runner = blender_runner
     app.state.max_bvh_bytes = size_limit
 
+    from converter_api.preview_models import PreviewModelStore
+    from converter.preview_model import MODEL_VERSION
+    preview_models = PreviewModelStore()
+    app.state.preview_models = preview_models
+
+    @app.get("/pose-preview/{source_sha}")
+    def pose_preview(source_sha: str, character_id: str = "standin-master-v2"):
+        if not SHA256_RE.fullmatch(source_sha):
+            raise ApiProblem(400, "INVALID_INPUT", "invalid source digest")
+        try:
+            metadata = character_registry.metadata(character_id)
+            data, manifest = preview_models.get(source_sha, metadata.sha256)
+        except (FileNotFoundError, UnknownCharacterError):
+            raise ApiProblem(404, "PREVIEW_NOT_READY", "precomputed model unavailable")
+        except Exception:
+            raise ApiProblem(503, "PREVIEW_UNAVAILABLE", "preview model unavailable")
+        return StreamingResponse(io.BytesIO(data), media_type="model/gltf-binary", headers={
+            "Content-Length": str(len(data)), "Cache-Control": "private, no-store",
+            "X-Standin-Model-Version": MODEL_VERSION,
+            "X-Standin-Artifact-SHA256": manifest["sha256"],
+            "X-Standin-Character-SHA256": metadata.sha256,
+            "X-Standin-Source-BVH-SHA256": source_sha,
+        })
+
     @app.exception_handler(ApiProblem)
     async def api_problem_handler(request: Request, exc: ApiProblem):
         _structured_log(
@@ -399,6 +423,7 @@ def create_app(
         payload = {
             "ok": ok,
             "solver_version": SOLVER_VERSION,
+            "camera_version": "candidate-camera-v1",
             "framing_version": FRAMING_VERSION,
             "output_scopes": (sorted(OUTPUT_SCOPES) if not getattr(
                 getattr(blender_runner, "settings", None), "force_exact_v324", False
@@ -423,6 +448,7 @@ def create_app(
         thumbnail: ThumbnailRequest | None = None,
         output_scope: str = "full",
         preview_view: str | None = None,
+        camera_rotation: list | None = None,
     ) -> CompletedConversion:
         conversion_id = str(uuid.uuid4())
         request_started = time.monotonic()
@@ -484,7 +510,10 @@ def create_app(
                 thumbnail=thumbnail,
                 output_scope=output_scope,
                 preview_view=preview_view,
+                **({"camera_rotation": camera_rotation} if camera_rotation is not None else {}),
             )
+            if camera_rotation is not None and result.report.get("camera_rotation") != camera_rotation:
+                raise WorkerIntegrityError("camera rotation lineage mismatch")
             _verify_result_integrity(
                 result,
                 conversion_id=conversion_id,
@@ -854,13 +883,21 @@ def create_app(
         output_scope: str = Form(default="full"),
         preview_view: str = Form(default="front"),
         expected_bvh_sha256: str = Form(...),
+        camera_rotation: str | None = Form(default=None),
     ):
         """One verified FBX plus its own reimported preview, in a single response."""
+        from converter.camera import validate_rotation
+        try:
+            rotation = validate_rotation(json.loads(camera_rotation)) if camera_rotation is not None else None
+            if camera_rotation is not None and (rotation is None or preview_view != "front"):
+                raise ValueError("aligned output requires front preview and a matrix")
+        except (ValueError, TypeError) as exc:
+            raise ApiProblem(400, "INVALID_OPTION", "invalid camera_rotation") from exc
         completed = _execute_conversion(
             bvh=bvh, character_id=character_id, frame=FRAME, mirror=False,
             output_mode=OUTPUT_MODE, apply_root_translation=APPLY_ROOT_TRANSLATION,
             response_format="framed", expected_bvh_sha256=expected_bvh_sha256,
-            output_scope=output_scope, preview_view=preview_view,
+            output_scope=output_scope, preview_view=preview_view, camera_rotation=rotation,
         )
         result = completed.result
         if (not result.preview.startswith(b"\x89PNG\r\n\x1a\n")
@@ -881,6 +918,7 @@ def create_app(
             "source_bvh_sha256": result.source_bvh_sha256,
             "fbx_sha256": result.artifact_sha256,
             "preview_sha256": result.report["preview_sha256"],
+            "camera_rotation": rotation,
             "fbx_base64": base64.b64encode(result.artifact).decode("ascii"),
             "preview_base64": base64.b64encode(result.preview).decode("ascii"),
         }

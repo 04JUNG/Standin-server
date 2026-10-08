@@ -129,6 +129,8 @@ jobs:
           # POSE_CANARY_STAGE=off로 바꾼 뒤 workflow_dispatch를 실행한다.
           # VLM_PROMPT_VERSION은 src/vlm/prompts.py의 버전이다. 바꾸기 전에 standin_eval run
           # vlm-compare를 통과시키고, 되돌릴 때는 environment var를 지우거나 p1-scope로 둔다.
+          # VLM_PERSON_TAGS=1이면 인물별 태그를 별도 호출로 받는다(기록용). 분석 호출은
+          # 그대로라 route·인원수·박스는 영향이 없다. 되돌리려면 0으로 두거나 지운다.
           # ⚠ 아래 블록(|) 안에는 주석을 쓰지 않는다. YAML 블록 안의 #은 주석이 아니라 값이라
           #   렌더 액션이 그 줄을 환경 변수로 읽다가 배포가 실패한다.
           environment-variables: |
@@ -139,6 +141,8 @@ jobs:
             POSE_STRICT=1
             REFINE_THUMBNAIL_RENDERER=${{ vars.REFINE_THUMBNAIL_RENDERER || 'converter' }}
             VLM_PROMPT_VERSION=${{ vars.VLM_PROMPT_VERSION || 'p1-scope' }}
+            VLM_PERSON_TAGS=${{ vars.VLM_PERSON_TAGS || '0' }}
+            VLM_PERSON_TAGS_TIMEOUT_MS=${{ vars.VLM_PERSON_TAGS_TIMEOUT_MS || '15000' }}
 
       - uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:

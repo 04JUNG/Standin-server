@@ -1,0 +1,3277 @@
+{
+  "schema_version": 1,
+  "rig_source": "data/curation/sources/quaternius/export-1/pool/combat_ual1_Punch_Cross_f00000.bvh",
+  "rig_sha256": "fd3d02eb9cb307eb0700f48ef4cc6d0a90fdf595c1f6c8b66bd40dd93844544b",
+  "scenes": [
+    {
+      "id": "sd_volleyball_01_r2",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "volleyball",
+      "plan_action": 1,
+      "label": "한 발 내디디며 언더핸드 서브",
+      "stance": "step",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "open"
+      ],
+      "left_wrist": [
+        0.23,
+        0.26,
+        0.4
+      ],
+      "right_wrist": [
+        -0.4,
+        0.01,
+        0.2
+      ],
+      "lean": 7,
+      "overrides": {
+        "right_arm": [
+          [
+            -0.369806,
+            0.955406,
+            0.16618
+          ],
+          [
+            -0.51,
+            1.15,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.4,
+              0.88,
+              0.2
+            ],
+            "target": [
+              -0.3698061639960767,
+              0.9554064445515162,
+              0.16618006149235443
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_volleyball_04_r2",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "volleyball",
+      "plan_action": 4,
+      "label": "스파이크 타격 후 팔로스루",
+      "stance": "step",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.47,
+        0.4,
+        0.21
+      ],
+      "right_wrist": [
+        -0.12,
+        0.39,
+        0.59
+      ],
+      "overrides": {
+        "left_leg": [
+          [
+            0.29,
+            0.38,
+            0.15
+          ],
+          [
+            0.3,
+            0.62,
+            0.48
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.18,
+            0.21,
+            -0.14
+          ],
+          [
+            -0.3,
+            0.6,
+            0.45
+          ]
+        ],
+        "left_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        },
+        "right_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        },
+        "right_arm": [
+          [
+            -0.1365,
+            1.290774,
+            0.439596
+          ],
+          [
+            -0.51,
+            1.15,
+            0.18
+          ]
+        ]
+      },
+      "world_xyz": [
+        18,
+        0,
+        4
+      ],
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.12,
+              1.26,
+              0.59
+            ],
+            "target": [
+              -0.1364998680126144,
+              1.2907739030983096,
+              0.4395962327979705
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_volleyball_05_r2",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "volleyball",
+      "plan_action": 5,
+      "label": "왼쪽으로 치우친 낮은 리시브",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "fist",
+        "support"
+      ],
+      "left_wrist": [
+        0.32,
+        0.08,
+        0.43
+      ],
+      "right_wrist": [
+        0.09,
+        0.09,
+        0.46
+      ],
+      "height": -0.12,
+      "lean": 18,
+      "overrides": {
+        "left_arm": [
+          [
+            0.298236,
+            0.856832,
+            0.360126
+          ],
+          [
+            0.51,
+            0.98,
+            0.18
+          ]
+        ],
+        "right_arm": [
+          [
+            0.021334,
+            0.897716,
+            0.352516
+          ],
+          [
+            -0.51,
+            0.98,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "left_arm",
+            "previous_target": [
+              0.32,
+              0.7799999999999999,
+              0.43
+            ],
+            "target": [
+              0.2982356785756344,
+              0.8568319269599203,
+              0.36012599630872016
+            ]
+          },
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              0.09,
+              0.7899999999999999,
+              0.46
+            ],
+            "target": [
+              0.021333879779283027,
+              0.8977164577124979,
+              0.3525156450736212
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_volleyball_06_r2",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "volleyball",
+      "plan_action": 6,
+      "label": "오른쪽 한팔 디그",
+      "stance": "kneel",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.42,
+        0.3,
+        0.17
+      ],
+      "right_wrist": [
+        -0.55,
+        0.0,
+        0.3
+      ],
+      "lean": 22,
+      "root_xyz": [
+        0,
+        0,
+        8
+      ],
+      "overrides": {
+        "right_arm": [
+          [
+            -0.498449,
+            0.519986,
+            0.252726
+          ],
+          [
+            -0.51,
+            0.71,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.55,
+              0.43,
+              0.3
+            ],
+            "target": [
+              -0.4984488797856118,
+              0.5199858122147344,
+              0.2527261933446665
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_volleyball_07_r2",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "volleyball",
+      "plan_action": 7,
+      "label": "무릎을 낮춘 언더핸드 토스",
+      "stance": "squat",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "support"
+      ],
+      "left_wrist": [
+        0.1,
+        0.19,
+        0.57
+      ],
+      "right_wrist": [
+        -0.1,
+        0.19,
+        0.57
+      ],
+      "height": 0.01,
+      "lean": 10,
+      "overrides": {
+        "left_arm": [
+          [
+            0.122539,
+            0.843672,
+            0.425534
+          ],
+          [
+            0.51,
+            0.8500000000000001,
+            0.18
+          ]
+        ],
+        "right_arm": [
+          [
+            -0.122539,
+            0.843673,
+            0.425534
+          ],
+          [
+            -0.51,
+            0.8500000000000001,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "left_arm",
+            "previous_target": [
+              0.1,
+              0.76,
+              0.57
+            ],
+            "target": [
+              0.12253874671175627,
+              0.8436724524662682,
+              0.4255344485481652
+            ]
+          },
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.1,
+              0.76,
+              0.57
+            ],
+            "target": [
+              -0.12253876486621225,
+              0.8436725315208604,
+              0.42553430530916164
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_racket_01_r2",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "racket",
+      "plan_action": 1,
+      "label": "테니스 포핸드 임팩트",
+      "stance": "lunge",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "grip"
+      ],
+      "left_wrist": [
+        0.49,
+        0.32,
+        0.08
+      ],
+      "right_wrist": [
+        -0.25,
+        0.43,
+        0.59
+      ],
+      "root_xyz": [
+        0,
+        -12,
+        0
+      ],
+      "overrides": {
+        "right_arm": [
+          [
+            -0.232717,
+            1.21484,
+            0.406551
+          ],
+          [
+            -0.51,
+            1.04,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.25,
+              1.19,
+              0.59
+            ],
+            "target": [
+              -0.23271670147830176,
+              1.2148396552360727,
+              0.4065507978380835
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_racket_03_r2",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "racket",
+      "plan_action": 3,
+      "label": "테니스 양손 백핸드 임팩트",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.3,
+        0.4,
+        0.52
+      ],
+      "right_wrist": [
+        0.1,
+        0.39,
+        0.51
+      ],
+      "root_xyz": [
+        0,
+        15,
+        0
+      ],
+      "overrides": {
+        "left_arm": [
+          [
+            0.274935,
+            1.246228,
+            0.385893
+          ],
+          [
+            0.51,
+            1.1,
+            0.18
+          ]
+        ],
+        "right_arm": [
+          [
+            0.054791,
+            1.230955,
+            0.42793
+          ],
+          [
+            -0.51,
+            1.1,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "left_arm",
+            "previous_target": [
+              0.3,
+              1.22,
+              0.52
+            ],
+            "target": [
+              0.2749349501298319,
+              1.246227784927445,
+              0.3858930659107459
+            ]
+          },
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              0.1,
+              1.21,
+              0.51
+            ],
+            "target": [
+              0.05479050989469594,
+              1.2309546298839091,
+              0.42793012121628293
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_racket_06_r2",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "racket",
+      "plan_action": 6,
+      "label": "테니스 낮은 발리",
+      "stance": "lunge",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "grip"
+      ],
+      "left_wrist": [
+        0.39,
+        0.4,
+        0.12
+      ],
+      "right_wrist": [
+        -0.34,
+        -0.08,
+        0.45
+      ],
+      "lean": 24,
+      "height": -0.05,
+      "overrides": {
+        "right_arm": [
+          [
+            -0.294809,
+            0.816218,
+            0.327077
+          ],
+          [
+            -0.51,
+            0.99,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.34,
+              0.63,
+              0.45
+            ],
+            "target": [
+              -0.2948088738095322,
+              0.8162178099265357,
+              0.32707713240489183
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_racket_07_r2",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "racket",
+      "plan_action": 7,
+      "label": "배드민턴 점프 스매시",
+      "stance": "step",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "grip"
+      ],
+      "left_wrist": [
+        0.39,
+        0.56,
+        0.27
+      ],
+      "right_wrist": [
+        -0.26,
+        0.86,
+        0.43
+      ],
+      "overrides": {
+        "left_leg": [
+          [
+            0.32,
+            0.5,
+            0.17
+          ],
+          [
+            0.3,
+            0.62,
+            0.48
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.23,
+            0.28,
+            -0.16
+          ],
+          [
+            -0.3,
+            0.6,
+            0.45
+          ]
+        ],
+        "left_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        },
+        "right_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        },
+        "right_arm": [
+          [
+            -0.250507,
+            1.683176,
+            0.360942
+          ],
+          [
+            -0.51,
+            1.15,
+            0.18
+          ]
+        ]
+      },
+      "world_xyz": [
+        12,
+        0,
+        -12
+      ],
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.26,
+              1.73,
+              0.43
+            ],
+            "target": [
+              -0.2505069277888442,
+              1.6831760215444178,
+              0.3609418308721554
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_racket_09_r2",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "racket",
+      "plan_action": 9,
+      "label": "배드민턴 네트 앞 런지",
+      "stance": "lunge",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "grip"
+      ],
+      "left_wrist": [
+        0.53,
+        0.38,
+        -0.02
+      ],
+      "right_wrist": [
+        -0.27,
+        0.22,
+        0.6
+      ],
+      "height": -0.1,
+      "lean": 18,
+      "overrides": {
+        "right_arm": [
+          [
+            -0.25284,
+            0.948601,
+            0.472284
+          ],
+          [
+            -0.51,
+            0.9400000000000001,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.27,
+              0.88,
+              0.6
+            ],
+            "target": [
+              -0.2528396976019735,
+              0.9486006952019926,
+              0.47228376139373235
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_racket_10_r2",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "racket",
+      "plan_action": 10,
+      "label": "배드민턴 수비 리프트",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "grip"
+      ],
+      "left_wrist": [
+        0.37,
+        0.46,
+        0.27
+      ],
+      "right_wrist": [
+        -0.43,
+        0.09,
+        0.36
+      ],
+      "lean": 13,
+      "overrides": {
+        "right_arm": [
+          [
+            -0.39077,
+            0.982833,
+            0.299875
+          ],
+          [
+            -0.51,
+            1.1,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.43,
+              0.9099999999999999,
+              0.36
+            ],
+            "target": [
+              -0.39076976020982385,
+              0.9828331364916326,
+              0.29987452011948207
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_golf_bowling_09_r2",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "golf_bowling",
+      "plan_action": 9,
+      "label": "볼링 낮은 릴리스",
+      "stance": "lunge",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "cup"
+      ],
+      "left_wrist": [
+        0.57,
+        0.46,
+        0.13
+      ],
+      "right_wrist": [
+        -0.21,
+        -0.1,
+        0.47
+      ],
+      "lean": 24,
+      "height": -0.08,
+      "overrides": {
+        "right_arm": [
+          [
+            -0.20426,
+            0.779877,
+            0.335905
+          ],
+          [
+            -0.51,
+            0.9600000000000001,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.21,
+              0.5800000000000001,
+              0.47
+            ],
+            "target": [
+              -0.20425993713497897,
+              0.7798773498881941,
+              0.3359046168442332
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_other_ball_03_r2",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "other_ball",
+      "plan_action": 3,
+      "label": "탁구 백핸드 리턴",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "grip"
+      ],
+      "left_wrist": [
+        0.41,
+        0.29,
+        0.18
+      ],
+      "right_wrist": [
+        0.07,
+        0.38,
+        0.49
+      ],
+      "root_xyz": [
+        0,
+        15,
+        0
+      ],
+      "overrides": {
+        "right_arm": [
+          [
+            0.040146,
+            1.21659,
+            0.431838
+          ],
+          [
+            -0.51,
+            1.1,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              0.07,
+              1.2,
+              0.49
+            ],
+            "target": [
+              0.0401457038430649,
+              1.216589546776527,
+              0.43183760503013385
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_other_ball_09_r2",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "other_ball",
+      "plan_action": 9,
+      "label": "럭비 양손 옆 패스",
+      "stance": "step",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "cup",
+        "support"
+      ],
+      "left_wrist": [
+        0.47,
+        0.35,
+        0.32
+      ],
+      "right_wrist": [
+        0.18,
+        0.32,
+        0.42
+      ],
+      "root_xyz": [
+        0,
+        17,
+        0
+      ],
+      "overrides": {
+        "right_arm": [
+          [
+            0.129621,
+            1.217942,
+            0.36132
+          ],
+          [
+            -0.51,
+            1.15,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              0.18,
+              1.19,
+              0.42
+            ],
+            "target": [
+              0.12962116171061372,
+              1.2179420608080185,
+              0.3613196886883762
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_other_ball_10_r2",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "other_ball",
+      "plan_action": 10,
+      "label": "럭비 몸을 낮춰 태클 준비",
+      "stance": "lunge",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.41,
+        0.08,
+        0.42
+      ],
+      "right_wrist": [
+        -0.41,
+        0.11,
+        0.46
+      ],
+      "lean": 30,
+      "height": -0.12,
+      "overrides": {
+        "left_arm": [
+          [
+            0.379,
+            0.783391,
+            0.371022
+          ],
+          [
+            0.51,
+            0.92,
+            0.18
+          ]
+        ],
+        "right_arm": [
+          [
+            -0.378158,
+            0.810732,
+            0.403852
+          ],
+          [
+            -0.51,
+            0.92,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "left_arm",
+            "previous_target": [
+              0.41,
+              0.72,
+              0.42
+            ],
+            "target": [
+              0.3789999461604645,
+              0.7833907271217866,
+              0.37102181465209527
+            ]
+          },
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.41,
+              0.75,
+              0.46
+            ],
+            "target": [
+              -0.3781582926815749,
+              0.8107319056585642,
+              0.40385222402654836
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_athletics_07_r2",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "athletics",
+      "plan_action": 7,
+      "label": "멀리뛰기 공중 다리 모으기",
+      "stance": "stand",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.31,
+        0.65,
+        0.39
+      ],
+      "right_wrist": [
+        -0.31,
+        0.65,
+        0.39
+      ],
+      "overrides": {
+        "left_leg": [
+          [
+            0.208504,
+            0.391372,
+            0.611327
+          ],
+          [
+            0.3,
+            0.62,
+            0.48
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.210504,
+            0.382434,
+            0.602984
+          ],
+          [
+            -0.3,
+            0.6,
+            0.45
+          ]
+        ],
+        "left_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        },
+        "right_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        }
+      },
+      "world_xyz": [
+        -8,
+        0,
+        0
+      ],
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "left_leg",
+            "previous_target": [
+              0.22,
+              0.34,
+              0.67
+            ],
+            "target": [
+              0.20850412289402295,
+              0.39137168448977455,
+              0.6113271236727769
+            ]
+          },
+          {
+            "limb": "right_leg",
+            "previous_target": [
+              -0.22,
+              0.34,
+              0.65
+            ],
+            "target": [
+              -0.21050408733660841,
+              0.38243445011829613,
+              0.6029843169037362
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_fitness_02_r2",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "fitness",
+      "plan_action": 2,
+      "label": "한손 덤벨 로우",
+      "stance": "lunge",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "grip"
+      ],
+      "left_wrist": [
+        0.35,
+        0.06,
+        0.46
+      ],
+      "right_wrist": [
+        -0.34,
+        0.36,
+        0.12
+      ],
+      "lean": 28,
+      "overrides": {
+        "left_arm": [
+          [
+            0.32167,
+            0.903804,
+            0.389403
+          ],
+          [
+            0.51,
+            1.04,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "left_arm",
+            "previous_target": [
+              0.35,
+              0.8200000000000001,
+              0.46
+            ],
+            "target": [
+              0.32166950324221244,
+              0.9038039146912256,
+              0.389402700697805
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_fitness_03_r2",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "fitness",
+      "plan_action": 3,
+      "label": "덤벨 런지 바닥 지점",
+      "stance": "lunge",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.31,
+        -0.03,
+        0.09
+      ],
+      "right_wrist": [
+        -0.31,
+        -0.03,
+        0.09
+      ],
+      "height": -0.12,
+      "overrides": {
+        "left_arm": [
+          [
+            0.29612,
+            0.675123,
+            0.071736
+          ],
+          [
+            0.51,
+            0.92,
+            0.18
+          ]
+        ],
+        "right_arm": [
+          [
+            -0.29612,
+            0.675123,
+            0.071736
+          ],
+          [
+            -0.51,
+            0.92,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "left_arm",
+            "previous_target": [
+              0.31,
+              0.61,
+              0.09
+            ],
+            "target": [
+              0.2961197854501433,
+              0.675123012068367,
+              0.07173592953255495
+            ]
+          },
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.31,
+              0.61,
+              0.09
+            ],
+            "target": [
+              -0.2961197458044367,
+              0.6751231967336051,
+              0.07173588334857074
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_fitness_04_r2",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "fitness",
+      "plan_action": 4,
+      "label": "데드리프트 바를 잡는 시작",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.29,
+        -0.11,
+        0.34
+      ],
+      "right_wrist": [
+        -0.29,
+        -0.11,
+        0.34
+      ],
+      "height": -0.15,
+      "lean": 28,
+      "overrides": {
+        "left_arm": [
+          [
+            0.264457,
+            0.726036,
+            0.268664
+          ],
+          [
+            0.51,
+            0.95,
+            0.18
+          ]
+        ],
+        "right_arm": [
+          [
+            -0.264457,
+            0.726036,
+            0.268663
+          ],
+          [
+            -0.51,
+            0.95,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "left_arm",
+            "previous_target": [
+              0.29,
+              0.5599999999999999,
+              0.34
+            ],
+            "target": [
+              0.2644568752426337,
+              0.7260361535373008,
+              0.2686635060494925
+            ]
+          },
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.29,
+              0.5599999999999999,
+              0.34
+            ],
+            "target": [
+              -0.264456841780784,
+              0.7260363154680851,
+              0.2686634410306105
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_fitness_06_r2",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "fitness",
+      "plan_action": 6,
+      "label": "케틀벨 스윙 정점",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.13,
+        0.62,
+        0.51
+      ],
+      "right_wrist": [
+        -0.13,
+        0.62,
+        0.51
+      ],
+      "lean": -3,
+      "overrides": {
+        "left_arm": [
+          [
+            0.138459,
+            1.426439,
+            0.429512
+          ],
+          [
+            0.51,
+            1.1,
+            0.18
+          ]
+        ],
+        "right_arm": [
+          [
+            -0.138459,
+            1.426439,
+            0.429511
+          ],
+          [
+            -0.51,
+            1.1,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "left_arm",
+            "previous_target": [
+              0.13,
+              1.44,
+              0.51
+            ],
+            "target": [
+              0.13845897674460614,
+              1.4264389680413851,
+              0.42951151905599605
+            ]
+          },
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.13,
+              1.44,
+              0.51
+            ],
+            "target": [
+              -0.13845899131520267,
+              1.426438938693564,
+              0.4295113585999075
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_fitness_10_r2",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "fitness",
+      "plan_action": 10,
+      "label": "누워서 한쪽 무릎 당기기",
+      "stance": "stand",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.26,
+        0.08,
+        0.4
+      ],
+      "right_wrist": [
+        -0.24,
+        0.19,
+        0.34
+      ],
+      "overrides": {
+        "left_leg": [
+          [
+            0.2,
+            0.56,
+            0.34
+          ],
+          [
+            0.3,
+            0.62,
+            0.48
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.18,
+            0.13,
+            0.03
+          ],
+          [
+            -0.3,
+            0.6,
+            0.45
+          ]
+        ],
+        "left_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        },
+        "right_foot": {
+          "mode": "follow_shin",
+          "pitch_degrees": 10
+        },
+        "left_arm": [
+          [
+            0.246477,
+            1.078189,
+            0.307582
+          ],
+          [
+            0.51,
+            1.19,
+            0.18
+          ]
+        ]
+      },
+      "world_xyz": [
+        -90,
+        0,
+        0
+      ],
+      "air_clearance": 0.04,
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "left_arm",
+            "previous_target": [
+              0.26,
+              0.99,
+              0.4
+            ],
+            "target": [
+              0.24647678270632958,
+              1.0781888369441437,
+              0.3075815041800196
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_outdoor_10_r2",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "outdoor",
+      "plan_action": 10,
+      "label": "로프를 잡고 몸 뒤로 기울이기",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.18,
+        0.54,
+        0.47
+      ],
+      "right_wrist": [
+        -0.18,
+        0.32,
+        0.41
+      ],
+      "root_xyz": [
+        -18,
+        0,
+        0
+      ],
+      "overrides": {
+        "left_arm": [
+          [
+            0.183065,
+            1.348082,
+            0.290605
+          ],
+          [
+            0.51,
+            1.1,
+            0.18
+          ]
+        ],
+        "right_arm": [
+          [
+            -0.182552,
+            1.177262,
+            0.273451
+          ],
+          [
+            -0.51,
+            1.1,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "left_arm",
+            "previous_target": [
+              0.18,
+              1.3599999999999999,
+              0.47
+            ],
+            "target": [
+              0.1830645520342827,
+              1.348081966710152,
+              0.2906048135956861
+            ]
+          },
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.18,
+              1.14,
+              0.41
+            ],
+            "target": [
+              -0.1825524623182575,
+              1.1772622557871593,
+              0.2734511905924908
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_sport_between_03_r2",
+      "category": "sports",
+      "category_label": "스포츠",
+      "family": "sport_between",
+      "plan_action": 3,
+      "label": "앉아 발끝 잡고 햄스트링 늘리기",
+      "stance": "sit_open",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.23,
+        -0.04,
+        0.63
+      ],
+      "right_wrist": [
+        -0.23,
+        -0.04,
+        0.63
+      ],
+      "height": -0.36,
+      "lean": 28,
+      "support": "",
+      "overrides": {
+        "left_leg": [
+          [
+            0.23,
+            0.13,
+            0.65
+          ],
+          [
+            0.35,
+            0.48,
+            0.65
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.23,
+            0.13,
+            0.65
+          ],
+          [
+            -0.35,
+            0.48,
+            0.65
+          ]
+        ],
+        "left_arm": [
+          [
+            0.216556,
+            0.300309,
+            0.430997
+          ],
+          [
+            0.51,
+            0.42000000000000004,
+            0.18
+          ]
+        ],
+        "right_arm": [
+          [
+            -0.216556,
+            0.300309,
+            0.430997
+          ],
+          [
+            -0.51,
+            0.42000000000000004,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "left_arm",
+            "previous_target": [
+              0.23,
+              0.1,
+              0.63
+            ],
+            "target": [
+              0.2165560266685135,
+              0.30030874249744843,
+              0.43099696030403756
+            ]
+          },
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.23,
+              0.1,
+              0.63
+            ],
+            "target": [
+              -0.21655601246472744,
+              0.3003088614936587,
+              0.43099684064890226
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_eating_02_r2",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "eating",
+      "plan_action": 2,
+      "label": "앉아서 젓가락으로 반찬 집기",
+      "stance": "sit_turn",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "pinch"
+      ],
+      "left_wrist": [
+        0.23,
+        0.25,
+        0.37
+      ],
+      "right_wrist": [
+        -0.12,
+        0.25,
+        0.54
+      ],
+      "lean": 12,
+      "nod": 15,
+      "overrides": {
+        "right_arm": [
+          [
+            -0.131957,
+            0.816868,
+            0.448592
+          ],
+          [
+            -0.51,
+            0.8,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.12,
+              0.77,
+              0.54
+            ],
+            "target": [
+              -0.1319574724196318,
+              0.8168683222259048,
+              0.4485915433395203
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_eating_09_r2",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "eating",
+      "plan_action": 9,
+      "label": "옆 사람에게 접시 건네기",
+      "stance": "sit_turn",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "support"
+      ],
+      "left_wrist": [
+        0.44,
+        0.31,
+        0.39
+      ],
+      "right_wrist": [
+        0.15,
+        0.33,
+        0.43
+      ],
+      "root_xyz": [
+        0,
+        18,
+        0
+      ],
+      "overrides": {
+        "left_arm": [
+          [
+            0.398672,
+            0.863744,
+            0.308998
+          ],
+          [
+            0.51,
+            0.8,
+            0.18
+          ]
+        ],
+        "right_arm": [
+          [
+            0.112188,
+            0.871763,
+            0.381187
+          ],
+          [
+            -0.51,
+            0.8,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "left_arm",
+            "previous_target": [
+              0.44,
+              0.8300000000000001,
+              0.39
+            ],
+            "target": [
+              0.39867220525062,
+              0.8637437669595516,
+              0.30899754710086047
+            ]
+          },
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              0.15,
+              0.8500000000000001,
+              0.43
+            ],
+            "target": [
+              0.11218835370858798,
+              0.8717629986512683,
+              0.3811874350863215
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_cooking_04_r2",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "cooking",
+      "plan_action": 4,
+      "label": "프라이팬 손잡이를 잡고 뒤집기",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.2,
+        0.26,
+        0.47
+      ],
+      "right_wrist": [
+        -0.24,
+        0.3,
+        0.54
+      ],
+      "lean": 5,
+      "overrides": {
+        "right_arm": [
+          [
+            -0.231643,
+            1.159685,
+            0.438816
+          ],
+          [
+            -0.51,
+            1.1,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.24,
+              1.1199999999999999,
+              0.54
+            ],
+            "target": [
+              -0.2316432224725975,
+              1.1596854955286784,
+              0.43881601052046815
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_cooking_06_r2",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "cooking",
+      "plan_action": 6,
+      "label": "주전자로 컵에 물 따르기",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "grip"
+      ],
+      "left_wrist": [
+        0.16,
+        0.16,
+        0.44
+      ],
+      "right_wrist": [
+        -0.31,
+        0.44,
+        0.38
+      ],
+      "nod": 12,
+      "overrides": {
+        "left_arm": [
+          [
+            0.165385,
+            1.041461,
+            0.354687
+          ],
+          [
+            0.51,
+            1.1,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "left_arm",
+            "previous_target": [
+              0.16,
+              0.98,
+              0.44
+            ],
+            "target": [
+              0.16538478784782695,
+              1.0414610698780336,
+              0.3546872015062753
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_cooking_07_r2",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "cooking",
+      "plan_action": 7,
+      "label": "냉장고 아래 칸에서 꺼내기",
+      "stance": "squat",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.38,
+        0.2,
+        0.21
+      ],
+      "right_wrist": [
+        -0.27,
+        0.05,
+        0.5
+      ],
+      "height": 0.03,
+      "lean": 18,
+      "nod": 16,
+      "overrides": {
+        "right_arm": [
+          [
+            -0.250944,
+            0.757658,
+            0.382575
+          ],
+          [
+            -0.51,
+            0.8700000000000001,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.27,
+              0.6400000000000001,
+              0.5
+            ],
+            "target": [
+              -0.2509440461763415,
+              0.7576578035406618,
+              0.38257469426487234
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_cooking_09_r2",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "cooking",
+      "plan_action": 9,
+      "label": "오븐에서 양손으로 쟁반 꺼내기",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "support"
+      ],
+      "left_wrist": [
+        0.29,
+        0.05,
+        0.51
+      ],
+      "right_wrist": [
+        -0.29,
+        0.05,
+        0.51
+      ],
+      "lean": 20,
+      "height": -0.1,
+      "overrides": {
+        "left_arm": [
+          [
+            0.265778,
+            0.88897,
+            0.391041
+          ],
+          [
+            0.51,
+            1.0,
+            0.18
+          ]
+        ],
+        "right_arm": [
+          [
+            -0.265778,
+            0.88897,
+            0.391041
+          ],
+          [
+            -0.51,
+            1.0,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "left_arm",
+            "previous_target": [
+              0.29,
+              0.77,
+              0.51
+            ],
+            "target": [
+              0.26577783485339807,
+              0.8889696881492832,
+              0.3910412554960799
+            ]
+          },
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.29,
+              0.77,
+              0.51
+            ],
+            "target": [
+              -0.2657778013494668,
+              0.8889698139024258,
+              0.3910411397913956
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_cleaning_05_r2",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "cleaning",
+      "plan_action": 5,
+      "label": "쪼그려 바닥 걸레질",
+      "stance": "kneel",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.29,
+        0.07,
+        0.42
+      ],
+      "right_wrist": [
+        -0.29,
+        -0.12,
+        0.4
+      ],
+      "lean": 30,
+      "nod": 18,
+      "overrides": {
+        "right_arm": [
+          [
+            -0.261609,
+            0.496953,
+            0.306063
+          ],
+          [
+            -0.51,
+            0.71,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.29,
+              0.31,
+              0.4
+            ],
+            "target": [
+              -0.2616090448475117,
+              0.496952890277387,
+              0.3060625849064845
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_cleaning_10_r2",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "cleaning",
+      "plan_action": 10,
+      "label": "세탁기에서 몸을 숙여 꺼내기",
+      "stance": "squat",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.22,
+        0.0,
+        0.49
+      ],
+      "right_wrist": [
+        -0.22,
+        0.04,
+        0.49
+      ],
+      "lean": 24,
+      "height": 0.03,
+      "overrides": {
+        "left_arm": [
+          [
+            0.212969,
+            0.722684,
+            0.379193
+          ],
+          [
+            0.51,
+            0.8700000000000001,
+            0.18
+          ]
+        ],
+        "right_arm": [
+          [
+            -0.21393,
+            0.735899,
+            0.394346
+          ],
+          [
+            -0.51,
+            0.8700000000000001,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "left_arm",
+            "previous_target": [
+              0.22,
+              0.5900000000000001,
+              0.49
+            ],
+            "target": [
+              0.2129688346088579,
+              0.7226839873915539,
+              0.3791925933172633
+            ]
+          },
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.22,
+              0.6300000000000001,
+              0.49
+            ],
+            "target": [
+              -0.213930346421673,
+              0.7358993172775203,
+              0.394345582709797
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_dressing_06_r2",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "dressing",
+      "plan_action": 6,
+      "label": "의자에서 한발을 올려 양말 신기",
+      "stance": "sit_open",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "pinch",
+        "grip"
+      ],
+      "left_wrist": [
+        0.3,
+        -0.05,
+        0.42
+      ],
+      "right_wrist": [
+        0.03,
+        -0.06,
+        0.43
+      ],
+      "lean": 24,
+      "overrides": {
+        "left_leg": [
+          [
+            0.22,
+            0.105,
+            0.33
+          ],
+          [
+            0.35,
+            0.48,
+            0.65
+          ]
+        ],
+        "right_leg": [
+          [
+            0.08,
+            0.42,
+            0.4
+          ],
+          [
+            -0.35,
+            0.48,
+            0.65
+          ]
+        ],
+        "left_arm": [
+          [
+            0.272172,
+            0.599377,
+            0.324021
+          ],
+          [
+            0.51,
+            0.78,
+            0.18
+          ]
+        ],
+        "right_arm": [
+          [
+            -0.035961,
+            0.615462,
+            0.316198
+          ],
+          [
+            -0.51,
+            0.78,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "left_arm",
+            "previous_target": [
+              0.3,
+              0.45,
+              0.42
+            ],
+            "target": [
+              0.2721722353933879,
+              0.599377034270909,
+              0.3240207799197734
+            ]
+          },
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              0.03,
+              0.44,
+              0.43
+            ],
+            "target": [
+              -0.03596104600080352,
+              0.6154617853363431,
+              0.31619795204735013
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_dressing_07_r2",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "dressing",
+      "plan_action": 7,
+      "label": "앉아서 신발 뒤축 당기기",
+      "stance": "sit_open",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "pinch",
+        "relaxed"
+      ],
+      "left_wrist": [
+        0.31,
+        -0.14,
+        0.36
+      ],
+      "right_wrist": [
+        -0.23,
+        0.02,
+        0.23
+      ],
+      "lean": 28,
+      "overrides": {
+        "left_leg": [
+          [
+            0.24,
+            0.22,
+            0.43
+          ],
+          [
+            0.35,
+            0.48,
+            0.65
+          ]
+        ],
+        "right_leg": [
+          [
+            -0.23,
+            0.105,
+            0.34
+          ],
+          [
+            -0.35,
+            0.48,
+            0.65
+          ]
+        ],
+        "left_arm": [
+          [
+            0.274748,
+            0.559298,
+            0.27225
+          ],
+          [
+            0.51,
+            0.78,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "left_arm",
+            "previous_target": [
+              0.31,
+              0.36,
+              0.36
+            ],
+            "target": [
+              0.2747476215286743,
+              0.5592975716077884,
+              0.2722504204254052
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_dressing_08_r2",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "dressing",
+      "plan_action": 8,
+      "label": "한쪽 무릎 꿇고 신발끈 묶기",
+      "stance": "kneel",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "pinch",
+        "pinch"
+      ],
+      "left_wrist": [
+        0.23,
+        -0.19,
+        0.38
+      ],
+      "right_wrist": [
+        0.01,
+        -0.16,
+        0.41
+      ],
+      "lean": 30,
+      "nod": 18,
+      "overrides": {
+        "left_arm": [
+          [
+            0.217255,
+            0.4795,
+            0.278115
+          ],
+          [
+            0.51,
+            0.71,
+            0.18
+          ]
+        ],
+        "right_arm": [
+          [
+            -0.059319,
+            0.505521,
+            0.295126
+          ],
+          [
+            -0.51,
+            0.71,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "left_arm",
+            "previous_target": [
+              0.23,
+              0.24,
+              0.38
+            ],
+            "target": [
+              0.2172553550229147,
+              0.4794997969814294,
+              0.2781150468588066
+            ]
+          },
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              0.01,
+              0.27,
+              0.41
+            ],
+            "target": [
+              -0.059319014459150166,
+              0.5055212616949138,
+              0.29512584384268886
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_desk_01_r2",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "desk",
+      "plan_action": 1,
+      "label": "책상에 한팔 기대 필기",
+      "stance": "sit_turn",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "pinch"
+      ],
+      "left_wrist": [
+        0.3,
+        0.19,
+        0.42
+      ],
+      "right_wrist": [
+        -0.08,
+        0.18,
+        0.49
+      ],
+      "lean": 12,
+      "nod": 13,
+      "overrides": {
+        "right_arm": [
+          [
+            -0.098518,
+            0.758222,
+            0.407315
+          ],
+          [
+            -0.51,
+            0.8,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.08,
+              0.7,
+              0.49
+            ],
+            "target": [
+              -0.0985183005447087,
+              0.7582222650675641,
+              0.40731529771014385
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_desk_09_r2",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "desk",
+      "plan_action": 9,
+      "label": "한손 자로 고정하고 선 긋기",
+      "stance": "sit",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "pinch"
+      ],
+      "left_wrist": [
+        0.18,
+        0.21,
+        0.48
+      ],
+      "right_wrist": [
+        -0.2,
+        0.24,
+        0.53
+      ],
+      "lean": 10,
+      "overrides": {
+        "left_arm": [
+          [
+            0.181507,
+            0.760663,
+            0.416816
+          ],
+          [
+            0.51,
+            0.79,
+            0.18
+          ]
+        ],
+        "right_arm": [
+          [
+            -0.198656,
+            0.798299,
+            0.438923
+          ],
+          [
+            -0.51,
+            0.79,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "left_arm",
+            "previous_target": [
+              0.18,
+              0.72,
+              0.48
+            ],
+            "target": [
+              0.18150664321892326,
+              0.760662905777675,
+              0.41681591037026905
+            ]
+          },
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.2,
+              0.75,
+              0.53
+            ],
+            "target": [
+              -0.19865634021770637,
+              0.7982994381992108,
+              0.43892312050925875
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_carry_shopping_06_r2",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "carry_shopping",
+      "plan_action": 6,
+      "label": "쇼핑카트를 양손으로 밀기",
+      "stance": "step",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "grip",
+        "grip"
+      ],
+      "left_wrist": [
+        0.31,
+        0.21,
+        0.46
+      ],
+      "right_wrist": [
+        -0.31,
+        0.21,
+        0.46
+      ],
+      "lean": 7,
+      "overrides": {
+        "left_arm": [
+          [
+            0.294043,
+            1.123198,
+            0.393375
+          ],
+          [
+            0.51,
+            1.15,
+            0.18
+          ]
+        ],
+        "right_arm": [
+          [
+            -0.294043,
+            1.123198,
+            0.393375
+          ],
+          [
+            -0.51,
+            1.15,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "left_arm",
+            "previous_target": [
+              0.31,
+              1.08,
+              0.46
+            ],
+            "target": [
+              0.2940427993484145,
+              1.123198120976032,
+              0.3933754753982771
+            ]
+          },
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.31,
+              1.08,
+              0.46
+            ],
+            "target": [
+              -0.2940427655106843,
+              1.123198213866456,
+              0.3933753299537166
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_carry_shopping_07_r2",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "carry_shopping",
+      "plan_action": 7,
+      "label": "카트 아래 칸에 짐 놓기",
+      "stance": "kneel",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "support"
+      ],
+      "left_wrist": [
+        0.23,
+        -0.06,
+        0.49
+      ],
+      "right_wrist": [
+        -0.23,
+        -0.06,
+        0.49
+      ],
+      "lean": 24,
+      "overrides": {
+        "left_arm": [
+          [
+            0.218632,
+            0.546128,
+            0.357863
+          ],
+          [
+            0.51,
+            0.71,
+            0.18
+          ]
+        ],
+        "right_arm": [
+          [
+            -0.218632,
+            0.546128,
+            0.357863
+          ],
+          [
+            -0.51,
+            0.71,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "left_arm",
+            "previous_target": [
+              0.23,
+              0.37,
+              0.49
+            ],
+            "target": [
+              0.21863151691104205,
+              0.5461281404806729,
+              0.35786266732359967
+            ]
+          },
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.23,
+              0.37,
+              0.49
+            ],
+            "target": [
+              -0.2186315011090068,
+              0.5461282778045038,
+              0.35786256508011155
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_home_transit_02_r2",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "home_transit",
+      "plan_action": 2,
+      "label": "열쇠를 낮은 자물쇠에 넣기",
+      "stance": "bow",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "pinch"
+      ],
+      "left_wrist": [
+        0.28,
+        0.1,
+        0.22
+      ],
+      "right_wrist": [
+        -0.17,
+        0.03,
+        0.46
+      ],
+      "lean": 20,
+      "nod": 20,
+      "overrides": {
+        "right_arm": [
+          [
+            -0.174759,
+            1.009062,
+            0.366161
+          ],
+          [
+            -0.51,
+            1.15,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.17,
+              0.9,
+              0.46
+            ],
+            "target": [
+              -0.17475947217085613,
+              1.0090616070730873,
+              0.3661610087454902
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_home_transit_04_r2",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "home_transit",
+      "plan_action": 4,
+      "label": "한무릎으로 콘센트 꽂기",
+      "stance": "kneel",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "support",
+        "pinch"
+      ],
+      "left_wrist": [
+        0.33,
+        0.21,
+        0.24
+      ],
+      "right_wrist": [
+        -0.24,
+        -0.12,
+        0.43
+      ],
+      "lean": 24,
+      "nod": 18,
+      "overrides": {
+        "right_arm": [
+          [
+            -0.224879,
+            0.514425,
+            0.309646
+          ],
+          [
+            -0.51,
+            0.71,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.24,
+              0.31,
+              0.43
+            ],
+            "target": [
+              -0.22487881904715434,
+              0.5144253618333292,
+              0.30964629820233974
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_home_transit_06_r2",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "home_transit",
+      "plan_action": 6,
+      "label": "젖은 우산을 아래로 흔들기",
+      "stance": "wide",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "grip"
+      ],
+      "left_wrist": [
+        0.29,
+        0.08,
+        0.11
+      ],
+      "right_wrist": [
+        -0.4,
+        0.03,
+        0.26
+      ],
+      "lean": 8,
+      "overrides": {
+        "right_arm": [
+          [
+            -0.367665,
+            0.927732,
+            0.215184
+          ],
+          [
+            -0.51,
+            1.1,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.4,
+              0.85,
+              0.26
+            ],
+            "target": [
+              -0.367664663561053,
+              0.9277322968991227,
+              0.21518415549408088
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_care_hobby_03_r2",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "care_hobby",
+      "plan_action": 3,
+      "label": "바닥의 반려동물 쓰다듬기",
+      "stance": "kneel",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "open",
+        "open"
+      ],
+      "left_wrist": [
+        0.32,
+        0.22,
+        0.23
+      ],
+      "right_wrist": [
+        -0.32,
+        -0.09,
+        0.43
+      ],
+      "lean": 25,
+      "nod": 20,
+      "overrides": {
+        "right_arm": [
+          [
+            -0.281987,
+            0.523897,
+            0.317797
+          ],
+          [
+            -0.51,
+            0.71,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.32,
+              0.33999999999999997,
+              0.43
+            ],
+            "target": [
+              -0.28198732486173833,
+              0.523896861657819,
+              0.3177972831903847
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_care_hobby_05_r2",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "care_hobby",
+      "plan_action": 5,
+      "label": "몸을 숙여 화분에 물 주기",
+      "stance": "bow",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "relaxed",
+        "grip"
+      ],
+      "left_wrist": [
+        0.31,
+        0.13,
+        0.18
+      ],
+      "right_wrist": [
+        -0.38,
+        0.09,
+        0.39
+      ],
+      "lean": 24,
+      "nod": 16,
+      "overrides": {
+        "right_arm": [
+          [
+            -0.3575,
+            1.012663,
+            0.348991
+          ],
+          [
+            -0.51,
+            1.15,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.38,
+              0.96,
+              0.39
+            ],
+            "target": [
+              -0.357500294514073,
+              1.012663388136852,
+              0.34899073046236606
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sd_care_hobby_06_r2",
+      "category": "daily",
+      "category_label": "일상",
+      "family": "care_hobby",
+      "plan_action": 6,
+      "label": "쪼그려 모종 심기",
+      "stance": "squat",
+      "gesture": "rest",
+      "props": "",
+      "hands": [
+        "pinch",
+        "support"
+      ],
+      "left_wrist": [
+        0.16,
+        -0.09,
+        0.36
+      ],
+      "right_wrist": [
+        -0.23,
+        -0.06,
+        0.4
+      ],
+      "lean": 21,
+      "overrides": {
+        "left_arm": [
+          [
+            0.168377,
+            0.63322,
+            0.274116
+          ],
+          [
+            0.51,
+            0.8400000000000001,
+            0.18
+          ]
+        ],
+        "right_arm": [
+          [
+            -0.22023,
+            0.65168,
+            0.305883
+          ],
+          [
+            -0.51,
+            0.8400000000000001,
+            0.18
+          ]
+        ]
+      },
+      "target_revision": {
+        "reason": "Unreachable authored endpoint; refit to actor limb lengths. Requires fresh visual review.",
+        "changes": [
+          {
+            "limb": "left_arm",
+            "previous_target": [
+              0.16,
+              0.4700000000000001,
+              0.36
+            ],
+            "target": [
+              0.1683771239536753,
+              0.6332197165627552,
+              0.2741157556951588
+            ]
+          },
+          {
+            "limb": "right_arm",
+            "previous_target": [
+              -0.23,
+              0.5,
+              0.4
+            ],
+            "target": [
+              -0.2202304815157594,
+              0.6516803092062499,
+              0.3058832704431406
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

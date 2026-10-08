@@ -69,6 +69,51 @@ USER_TEMPLATE_P2 = _insert_before(
     "- 확신이 없으면 가장 그럴듯한 값을 고르되", _PERSON_TAG_RULES,
 )
 
+# ── 인물별 태그 전용 호출 ────────────────────────────────────────────
+#
+# 분석 프롬프트에 인물별 항목을 더하면 route가 함께 흔들린다. 2026-10-06~08에 세 번
+# 측정했고(48컷 2회·96컷 2회, 총 2,880호출) 문구를 두 번 고쳐도 초과분이 2.5~2.7%p에
+# 머물렀다. 고치면 걸리는 컷만 바뀌었다 — 96컷 중 세 컷이 초과분 전부를 만들었고 그
+# 세 컷은 수정할 때마다 다른 컷으로 옮겨 갔다. 기록은 docs/POSE_GAP_LOOP.md에 있다.
+#
+# 그래서 태그는 **별도 호출**로 받는다. 분석 프롬프트(p1-scope)는 한 글자도 바뀌지 않으므로
+# route·인원수·박스가 구조적으로 흔들릴 수 없다. 대가는 호출 1회와 그 비용이다.
+PERSON_TAGS_SYSTEM = (
+    "너는 이미 분석이 끝난 웹툰 러프 컷에서 인물별 의미 태그만 채우는 도우미다. "
+    "사람 수와 위치는 이미 정해져 있다. 그 수를 바꾸거나 사람을 새로 찾지 마라. "
+    "관절 좌표나 픽셀 위치는 추정하지 마라."
+)
+
+PERSON_TAGS_TEMPLATE = """이 컷에는 사람이 {count}명 있고, 위치는 아래와 같다(0~1 정규화, 좌→우 순서).
+
+{boxes}
+
+각 인물의 행동과 몸이 향한 방향만 판단해 아래 JSON으로만 답하라. 설명 문장 금지.
+
+{{
+  "person_actions": [<인물별 "standing" | "sitting" | "walking" | "running" | "reaching" | "lying" | "other" | null>, ...],
+  "person_views": [<인물별 "front" | "side" | "back" | "three_quarter" | null>, ...]
+}}
+
+규칙:
+- 두 배열의 길이는 반드시 {count}이고, 순서는 위 목록과 같다.
+- 한 인물의 값을 다른 인물에 복사하지 마라. 러프에서 판단하기 어려우면 그 자리만 null.
+- 사람 수를 다시 세지 마라. 위에 적힌 {count}명이 전부다.
+"""
+
+
+def person_tags_prompt(boxes) -> str:
+    """태그 전용 프롬프트. boxes는 0~1 정규화된 (x1, y1, x2, y2) 목록이다."""
+    lines = []
+    for index, box in enumerate(boxes):
+        if box is None:
+            lines.append(f"- {index}번: 위치 불명")
+            continue
+        x1, y1, x2, y2 = (round(float(value), 3) for value in box)
+        lines.append(f"- {index}번: x {x1}~{x2}, y {y1}~{y2}")
+    return PERSON_TAGS_TEMPLATE.format(count=len(boxes), boxes="\n".join(lines))
+
+
 DEFAULT_PROMPT_VERSION = "p1-scope"
 USER_TEMPLATES = {
     "p1-scope": USER_TEMPLATE,

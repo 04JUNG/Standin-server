@@ -1,0 +1,34 @@
+{
+  "sources": [
+    {
+      "version": 1,
+      "source": "data/curation/sources/quaternius/ual1-standard.glb",
+      "output": "data/curation/sources/quaternius/export-expansion-20261007-1",
+      "actions": [
+        "Swim_Fwd_Loop", "Spell_Simple_Enter", "Spell_Simple_Exit",
+        "Spell_Simple_Idle_Loop", "Sword_Idle", "Pistol_Idle_Loop",
+        "Interact", "PickUp_Table", "Sitting_Enter", "Sitting_Exit",
+        "Sitting_Talking_Loop", "Dance_Loop", "Roll_RM", "Jump_Loop"
+      ],
+      "frame_step": 4,
+      "archive_url": "https://opengameart.org/sites/default/files/universal_animation_librarystandard.zip",
+      "archive_sha256": "18ff1a7215f4852b320203e8aaf02a1578b5c8eef9027fbaedfcedc7b85a3ac2",
+      "glb_sha256": "1b7bf67866360665426bb99e4c71bd619f19b408453c24e30f0c3071601eee5c"
+    },
+    {
+      "version": 2,
+      "source": "data/curation/sources/quaternius/ual2-standard.glb",
+      "output": "data/curation/sources/quaternius/export-expansion-20261007-2",
+      "actions": [
+        "Chest_Open", "ClimbUp_1m_RM", "Farm_Harvest", "Farm_PlantSeed",
+        "Farm_Watering", "Shield_OneShot", "Slide_Exit", "Slide_Loop",
+        "Walk_Carry_Loop", "TreeChopping_Loop", "Idle_TalkingPhone_Loop",
+        "Idle_Lantern_Loop", "Idle_Shield_Loop", "Sword_Regular_Combo"
+      ],
+      "frame_step": 4,
+      "archive_url": "https://opengameart.org/sites/default/files/universal_animation_library_2standard.zip",
+      "archive_sha256": "ec0e40d6d78fe9aaad59e322f40865a8675c22f0745e291622e54520391a9217",
+      "glb_sha256": "0815dd05531cae9bc313fc9c0ba81330bc72f8e19ec45f73738e74ddc5796a43"
+    }
+  ]
+}

@@ -6,11 +6,12 @@ import { OrientationPreview } from "./orientation.js?v=scoped-20261002";
 const $ = (id) => document.getElementById(id);
 const statusLabels = { pending: "검수 대기", accepted: "채택", hold: "보류", rejected: "제외" };
 const viewLabels = { front: "정면", three_quarter: "45°", side: "측면", back: "후면" };
-const movementLabels = { ID: "정지 자세", FW: "걷기", FR: "달리기", combat: "전투" };
-const sourceLabel = meta => ({"100style": "100STYLE", quaternius: "Quaternius", accad: "ACCAD 모션캡처", authored_combat: "직접 제작", authored_scenario: "상황별 제작"}[meta.source] || meta.source || "신규");
+const movementLabels = { ID: "정지 자세", FW: "걷기", FR: "달리기", combat: "전투", sports: "스포츠", daily: "일상" };
+const sourceLabel = meta => ({"100style": "100STYLE", quaternius: "Quaternius", accad: "ACCAD 모션캡처", cmu: "CMU 모션캡처", authored_combat: "직접 제작", authored_scenario: "상황별 제작"}[meta.source] || meta.source || "신규");
 const initialParams = new URLSearchParams(location.search);
 const initialCategory = initialParams.get('category') || '';
-const state = { group: "all", q: "", status: "all", batch: initialParams.get('batch') || "", category: initialCategory, offset: 0, limit: 48, view: "front", items: [], total: 0 };
+const initialStatus = initialParams.get('status') || 'all';
+const state = { group: "all", q: initialParams.get('q') || "", status: Object.hasOwn(statusLabels, initialStatus) ? initialStatus : "all", batch: initialParams.get('batch') || "", category: initialCategory, offset: 0, limit: 48, view: "front", items: [], total: 0 };
 state.library_scope = ['half','bust'].includes(initialParams.get('library_scope')) ? initialParams.get('library_scope') : 'all';
 const drafts = new Map();
 let activePose = null, decision = "pending", loadSequence = 0, detailSequence = 0, toastTimer;
@@ -217,6 +218,7 @@ async function openDetail(key) {
     if (meta.selection) rows.push(metadataRow("선택 이유", { held_pose: "자세가 유지되는 구간", expressive_extreme: "자세 변화의 정점", limb_extreme: "팔다리 움직임의 정점", phase_coverage: "동작 단계의 대표 자세" }[meta.selection.reason] || meta.selection.reason));
     if (meta.source === "authored_combat" || meta.source === "authored_scenario") rows.push(metadataRow("제작 방식", "3D 자세 설계 · 모션캡처 및 러프 관절 추론 데이터가 아닙니다."));
     if (meta.category_label) rows.push(metadataRow("상황 카테고리", meta.category_label));
+    if (meta.set_id) rows.push(metadataRow("2인 포즈 세트", `${meta.set_id} · 인물 ${meta.set_role} · 각 인물은 별도 BVH`));
     if (meta.nearest_scenario) rows.push(metadataRow("가장 비슷한 상황 포즈", `${meta.nearest_scenario.pose_id} · 골격 거리 ${meta.nearest_scenario.distance.toFixed(3)}`));
     if (meta.prop_guides) rows.push(metadataRow("소품 미리보기", "파지·배치 확인용 단순 도형입니다. BVH에는 인물의 관절만 포함됩니다."));
     if (meta.category === 'romance') rows.push(metadataRow("인물 배치", "인물 1명의 자세입니다. 상대와의 거리는 장면에서 맞춰 주세요."));
@@ -381,6 +383,8 @@ $("review-form").addEventListener("submit", async (event) => {
 });
 
 $("category-filter").value = initialCategory;
+$("search").value = state.q;
+$("status-filter").value = state.status;
 Promise.all([refreshSummary(), loadPage()]).then(async () => {
   const key = new URLSearchParams(location.search).get("pose");
   if (key) {
