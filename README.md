@@ -243,8 +243,10 @@ POSE_LIBRARY_URI=s3://<bucket>/pose-library/v1.tar.gz
 
 기존 HTTP API를 변경하지 않는 v3.2 추출 모듈과 CLI는
 [`docs/HYBRID_POSE_V32.md`](docs/HYBRID_POSE_V32.md)를 참고하세요.
-흐름은 RTM → 평가 1회 → 필요 시 부분 수정 1회 → 코드 검사이며,
-수정 후 VLM 재평가는 없습니다. 20초 목표는 아직 미달성입니다.
+기본 흐름은 Human-Art RTM → Gemini 검토·부분 수정 단일 호출(Low) → 코드 검사이며,
+수정 후 VLM 재평가는 없습니다. 기존 2단계/기본 추론은 명시적 옵션으로 유지합니다.
+Low 실험 공통 성공 24컷 평균은 14.82초지만 전체 27컷 중 3컷은 검증 오류였으며,
+운영 환경의 20초 보장이나 품질 승인으로 해석하지 않습니다.
 
 ```bash
 python tests/test_smoke.py                    # 전체 스모크(자체 러너 내장, pytest 불필요)
