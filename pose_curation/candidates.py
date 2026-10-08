@@ -15,11 +15,15 @@ def build_candidates(poses: list[dict], batch_dir: Path, batch: str) -> int:
         kp, scores = load_coco17(str(bvh))
         action = {"FW": "walking", "FR": "running"}.get(pose["movement"], "other")
         generated = build_entries_from_pose(pose["pose_id"], kp,
-            {"shot": "full_half", "action": action, "relationship": "solo"}, str(bvh), scores)
+            {"shot": "full_half", "action": action,
+             "relationship": pose.get("relationship", "solo")}, str(bvh), scores)
         for entry in generated:
             entry.meta = {"source": pose["source"], "license": pose["license"], "author": pose["author"],
                           "source_url": pose["source_url"], "source_frame_0based": pose["source_frame_0based"],
                           "pose_family_id": pose.get("pose_family_id", pose["pose_id"].removesuffix("_mirror")), "batch_id": batch, "review_status": "pending"}
+            for field in ("set_id", "set_role"):
+                if pose.get(field):
+                    entry.meta[field] = pose[field]
             if pose.get("composition_variant"):
                 entry.meta["composition_variant"] = pose["composition_variant"]
             if "hand_augmentation" in pose:

@@ -21,7 +21,8 @@ from .storage import sha256, utc_now, write_json
 from .qa.checks import inspect_pose
 
 
-def run(data_dir: Path, curation_dir: Path) -> dict:
+def run(data_dir: Path, curation_dir: Path, *, destination_dir: Path | None = None) -> dict:
+    """Build the reviewed snapshot, optionally beside a currently used library."""
     catalog = Catalog(data_dir, curation_dir)
     if catalog.errors:
         raise ValueError(f"invalid candidate manifests: {catalog.errors}")
@@ -30,7 +31,7 @@ def run(data_dir: Path, curation_dir: Path) -> dict:
     poses = catalog.all()
     bases = {p.pose_id: p for p in poses}
     selected = [p for p in poses if is_publishable(p, reviews)]
-    destination = curation_dir / "library"
+    destination = destination_dir or curation_dir / "library"
     destination.mkdir(parents=True, exist_ok=True)
     summary = {
         "schema_version": 1,

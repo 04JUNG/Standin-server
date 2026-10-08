@@ -296,6 +296,18 @@ def test_exclusion_removes_pose_from_default_library_and_export_but_is_restorabl
     assert sha256(data / "poses.db") == baseline_hash
 
 
+def test_publication_can_write_an_alternate_snapshot(library):
+    from pose_curation.publication import run as publish
+
+    data, _ = library
+    curation = data / "curation"
+    destination = curation / "library-next"
+    result = publish(data, curation, destination_dir=destination)
+    assert result["poses"] == 1
+    assert (destination / "poses.db").is_file()
+    assert not (curation / "library/poses.db").exists()
+
+
 def test_publication_requires_current_review_and_previews_and_preserves_last_good_db(library):
     from pose_curation.publication import run as publish
     from pose_curation.review.catalog import Catalog

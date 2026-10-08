@@ -1,0 +1,48 @@
+{
+  "rig_source": "data/curation/sources/quaternius/export-1/pool/combat_ual1_Punch_Cross_f00000.bvh",
+  "rig_sha256": "fd3d02eb9cb307eb0700f48ef4cc6d0a90fdf595c1f6c8b66bd40dd93844544b",
+  "scenes": [
+    {
+      "id": "story_seated_ledge_recline",
+      "label": "턱에 기대 한쪽 다리를 길게 뻗고 앉기",
+      "category": "daily",
+      "category_label": "앉기·동행",
+      "stance": "sit_open",
+      "gesture": "rest",
+      "props": "",
+      "support": "seat",
+      "hands": ["support", "support"],
+      "lean": -10,
+      "look": 11,
+      "left_wrist": [0.36, -0.03, -0.13],
+      "right_wrist": [-0.32, -0.04, -0.1],
+      "left_pole": [0.53, 0.27, -0.22],
+      "right_pole": [-0.49, 0.26, -0.19],
+      "overrides": {
+        "left_leg": [[0.25, 0.10, 0.69], [0.37, 0.44, 0.34]],
+        "right_leg": [[-0.25, 0.10, 0.42], [-0.28, 0.55, 0.5]]
+      }
+    },
+    {
+      "id": "story_seated_ledge_knees_hug",
+      "label": "턱에 앉아 무릎에 팔을 얹고 몸을 웅크리기",
+      "category": "daily",
+      "category_label": "앉기·동행",
+      "stance": "sit_open",
+      "gesture": "knees_hug",
+      "props": "",
+      "support": "seat",
+      "hands": ["relaxed", "relaxed"],
+      "lean": 17,
+      "nod": 9,
+      "left_wrist": [0.14, 0.38, 0.48],
+      "right_wrist": [-0.14, 0.38, 0.47],
+      "left_pole": [0.44, 0.48, 0.35],
+      "right_pole": [-0.43, 0.48, 0.35],
+      "overrides": {
+        "left_leg": [[0.16, 0.33, 0.48], [0.22, 1.06, 0.45]],
+        "right_leg": [[-0.16, 0.33, 0.48], [-0.22, 1.06, 0.45]]
+      }
+    }
+  ]
+}

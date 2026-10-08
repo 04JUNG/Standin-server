@@ -218,6 +218,7 @@ async function openDetail(key) {
     if (meta.selection) rows.push(metadataRow("선택 이유", { held_pose: "자세가 유지되는 구간", expressive_extreme: "자세 변화의 정점", limb_extreme: "팔다리 움직임의 정점", phase_coverage: "동작 단계의 대표 자세" }[meta.selection.reason] || meta.selection.reason));
     if (meta.source === "authored_combat" || meta.source === "authored_scenario") rows.push(metadataRow("제작 방식", "3D 자세 설계 · 모션캡처 및 러프 관절 추론 데이터가 아닙니다."));
     if (meta.category_label) rows.push(metadataRow("상황 카테고리", meta.category_label));
+    if (meta.set_id) rows.push(metadataRow("2인 포즈 세트", `${meta.set_id} · 인물 ${meta.set_role} · 각 인물은 별도 BVH`));
     if (meta.nearest_scenario) rows.push(metadataRow("가장 비슷한 상황 포즈", `${meta.nearest_scenario.pose_id} · 골격 거리 ${meta.nearest_scenario.distance.toFixed(3)}`));
     if (meta.prop_guides) rows.push(metadataRow("소품 미리보기", "파지·배치 확인용 단순 도형입니다. BVH에는 인물의 관절만 포함됩니다."));
     if (meta.category === 'romance') rows.push(metadataRow("인물 배치", "인물 1명의 자세입니다. 상대와의 거리는 장면에서 맞춰 주세요."));
