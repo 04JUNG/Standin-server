@@ -9,7 +9,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-from .contracts import merge_repair, validate_evaluation
+from .contracts import merge_repair, merge_single_response, validate_evaluation
 from .render import context, overlay, png_bytes
 from .schema import COCO17, keypoint_bounds, validate_prediction
 
@@ -69,18 +69,25 @@ class HybridPosePipeline:
     Failure returns final=None plus the preserved RTM proposal, never a pass.
     """
 
-    def __init__(self, pose_model, reviewer, threshold=0.3):
+    def __init__(self, pose_model, reviewer, threshold=0.3, mode="single"):
         if not math.isfinite(threshold) or not 0 <= threshold <= 1:
             raise ValueError("Threshold must be finite within 0..1")
+        if mode not in {"single", "two-stage"}:
+            raise ValueError("Mode must be single or two-stage")
         self.pose_model = pose_model
         self.reviewer = reviewer
         self.threshold = threshold
+        self.mode = mode
 
     def extract(self, image_path, artifact=None):
         started = time.perf_counter()
         save = artifact if artifact is not None else lambda name, value: None
         result = {
-            "protocol": "hybrid-evaluate-repair-v3.2",
+            "protocol": (
+                "hybrid-single-review-repair-v3.2"
+                if self.mode == "single"
+                else "hybrid-evaluate-repair-v3.2"
+            ),
             "status": "error",
             "delivery_status": "incomplete",
             "quality_review": "unreviewed",
@@ -128,16 +135,28 @@ class HybridPosePipeline:
             save("context.json", ctx)
             result["timings_ms"][stage] = (time.perf_counter() - stage_started) * 1000
 
-            stage, stage_started = "evaluation", time.perf_counter()
+            stage = "single_review_repair" if self.mode == "single" else "evaluation"
+            stage_started = time.perf_counter()
             result["api_calls_started"] += 1
-            evaluation, raw = self.reviewer.request(stage, original, marked, ctx)
-            save("evaluation.response.json", raw)
+            response, raw = self.reviewer.request(stage, original, marked, ctx)
+            save(stage + ".response.json", raw)
+            result["timings_ms"][stage] = (time.perf_counter() - stage_started) * 1000
+            stage, stage_started = "code_validation", time.perf_counter()
+            if self.mode == "single":
+                # Save the response before validation; never relabel rejected patches.
+                save("single_review_repair.json", response)
+                final, audit = merge_single_response(base, response)
+                evaluation, patch = response["evaluation"], response["patch"]
+                result["repair"] = copy.deepcopy(patch)
+                save("repair.json", patch)
+            else:
+                evaluation = response
             validate_evaluation(evaluation, base)
             result["evaluation"] = copy.deepcopy(evaluation)
             save("evaluation.json", evaluation)
             result["timings_ms"][stage] = (time.perf_counter() - stage_started) * 1000
 
-            if evaluation["decision"] == "repair":
+            if evaluation["decision"] == "repair" and self.mode == "two-stage":
                 stage, stage_started = "repair", time.perf_counter()
                 result["api_calls_started"] += 1
                 patch, raw = self.reviewer.request(
@@ -151,12 +170,13 @@ class HybridPosePipeline:
                 ) * 1000
                 stage, stage_started = "code_validation", time.perf_counter()
                 final, audit = merge_repair(base, evaluation, patch)
+            if evaluation["decision"] == "repair":
                 delivery = (
                     "repair_unverified_review_needed"
                     if audit["unresolved"] or audit["uncertainties"]
                     else "repair_unverified"
                 )
-            else:
+            elif self.mode == "two-stage":
                 stage, stage_started = "code_validation", time.perf_counter()
                 final = copy.deepcopy(base)
                 audit = {
@@ -165,6 +185,12 @@ class HybridPosePipeline:
                     "uncertainties": evaluation["uncertainties"],
                     "visual_reassessment": False,
                 }
+                delivery = (
+                    "review_needed"
+                    if evaluation["decision"] == "review_needed"
+                    else "rtm_kept"
+                )
+            else:
                 delivery = (
                     "review_needed"
                     if evaluation["decision"] == "review_needed"
