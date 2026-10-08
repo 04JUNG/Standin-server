@@ -110,6 +110,8 @@ Local Windows validation used Blender 5.2.0/fbe6228777e7 and actual rig assets:
 These are local probes, not deployment latency guarantees. Browser verification
 used the actual React review component with real generated models. Tauri native
 save, CSP import, macOS and production traffic require release validation.
+The BFF probe used fixture job/ownership storage with the actual framed route,
+converter client and Blender; production database/S3 latency was excluded.
 Roll out converter/inference first, BFF second, client last; absent capability
 retains the legacy PNG path. The new exporter does not invalidate posed-mesh-v1
 keys or modify the frozen solver manifest.
