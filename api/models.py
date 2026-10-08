@@ -75,7 +75,8 @@ class InferenceMetadataOut(BaseModel):
 
 class ScopeDetectionOut(BaseModel):
     detected: Optional[BodyScope] = None
-    source: Literal["vlm_person", "legacy_shot", "unknown"] = "unknown"
+    # observed_legs: VLM은 half/bust였지만 화면 안 무릎이 관측돼 full로 올린 값.
+    source: Literal["vlm_person", "legacy_shot", "observed_legs", "unknown"] = "unknown"
 
 
 class PersonTagsOut(BaseModel):

@@ -14,6 +14,13 @@
 
 VLM `body_scopes`는 `approx_boxes`와 같은 순서/길이다. 불확실한 값은 null.
 다른 물체에 가려진 하체, 낮은 관절 점수, `lower_body_observed=false`는 반신 판별의 근거가 아니다.
+반대 방향은 근거가 된다. 포즈 모델이 화면 안에서 무릎을 관측한 인물(골반·무릎이 구조 mask를
+통과하고 소유권 의심 다리가 아님)은 허리·골반·허벅지에서 잘린 구도일 수 없으므로, VLM이
+half/bust로 판별해도 `full`로 올리고 `source=observed_legs`로 표시한다. 다리를 잘라 내는
+출력이 실제로 그려진 다리를 지우지 않게 하기 위함이다. 범위는 넓히기만 하고 좁히지 않는다.
+head는 별도 검색 미지원 경로라 올리지 않는다. VLM 원래 값은
+`quality_trace.output_scope_promotion`에 남는다. 출력 메타데이터일 뿐이며
+`lower_body_observed`·검색·refine 정책은 바뀌지 않는다(`src/body_scope.py`).
 배열 길이가 다르면 전부 unknown, 항목이 잘못되면 해당 자리만 unknown으로 유지한다.
 슬롯 ID로 연결한 뒤 화면 좌→우로 정렬한다. 잠정 검출 인물에는 VLM 값을 추측해서 붙이지 않는다.
 옛 VLM 응답은 단인 bust/face만 `legacy_shot`으로 사용할 수 있다.
@@ -27,7 +34,7 @@ VLM `body_scopes`는 `approx_boxes`와 같은 순서/길이다. 불확실한 값
 {"detected": "half", "source": "vlm_person"}
 ```
 
-`detected`: full/half/bust/head/null. `source`: vlm_person/legacy_shot/unknown.
+`detected`: full/half/bust/head/null. `source`: vlm_person/legacy_shot/observed_legs/unknown.
 흉상은 2단계부터 실제 관측 관절로 검색한다. 두상만 있는 컷은 인물/박스/범위를
 유지하고 후보는 빈 배열, 관절은 null, refine은 금지다. 검색 미지원을 사람 미검출로 표현하지 않는다.
 
