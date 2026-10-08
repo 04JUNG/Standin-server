@@ -176,7 +176,7 @@ def main() -> int:
         thumbnail_headers = _headers(args.thumbnail_headers)
         thumbnail = args.thumbnail.read_bytes()
         assert thumbnail_headers["content-type"].startswith("image/png")
-        assert thumbnail_headers["x-standin-thumbnail-renderer"] == "fbx-anatomical-v1"
+        assert thumbnail_headers["x-standin-thumbnail-renderer"] == "fbx-anatomical-soft-v2"
         assert thumbnail_headers["x-standin-thumbnail-view"] == "front"
         assert thumbnail_headers["x-standin-thumbnail-size"] == "256"
         assert thumbnail_headers["x-standin-thumbnail-engine"] in {"BLENDER_EEVEE", "CYCLES"}

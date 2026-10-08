@@ -78,6 +78,7 @@ jobs:
             tests/converter/test_runner_failures.py \
             tests/converter/test_api_contract.py \
             tests/converter/test_preview_models.py \
+            tests/converter/test_preview_style.py \
             tests/converter/test_framing_contract.py \
             tests/converter/test_review_model.py \
             tests/converter/test_refined_bvh_e2e.py \
@@ -172,6 +173,15 @@ jobs:
             "$CONVERTER_IMAGE" \
             /opt/blender/blender --background --python-exit-code 1 \
             --python /app/tests/converter/test_convert.py
+
+      - name: Verify soft preview lighting in headless Blender
+        run: |
+          docker run --rm --platform linux/amd64 \
+            --mount type=bind,source="$ARTIFACT_ROOT",target=/artifacts \
+            --mount type=bind,source="$GITHUB_WORKSPACE/tests/converter",target=/app/tests/converter,readonly \
+            "$CONVERTER_IMAGE" \
+            /opt/blender/blender --background --python-exit-code 1 \
+            --python /app/tests/converter/verify_preview_lighting.py -- /artifacts/preview-lighting.png
 
       - name: Verify promoted V3.2.5 and V3.2.4 kill switch
         run: |
@@ -308,6 +318,7 @@ jobs:
           name: converter-thumbnail-smoke
           path: |
             ${{ env.ARTIFACT_ROOT }}/http-smoke-thumbnail.png
+            ${{ env.ARTIFACT_ROOT }}/preview-lighting.png
             ${{ env.ARTIFACT_ROOT }}/thumbnail-response.headers
           if-no-files-found: ignore
           retention-days: 7

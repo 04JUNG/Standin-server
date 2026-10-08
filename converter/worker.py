@@ -337,6 +337,8 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
         payload["output_scope"] = scope
         payload["framing_version"] = FRAMING_VERSION
         if preview_path:
+            from converter.preview_style import PREVIEW_STYLE_VERSION
+            payload["preview_style_version"] = PREVIEW_STYLE_VERSION
             payload["preview_view"] = preview_view
             payload["preview_sha256"] = _sha256(preview_path)
             payload["preview_size"] = preview_path.stat().st_size

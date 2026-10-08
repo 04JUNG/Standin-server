@@ -135,6 +135,7 @@ def render_preview(meshes, output: Path, view="front", *, aligned=False) -> None
     import math
     import bpy
     from mathutils import Vector
+    from converter.preview_style import configure_workbench
 
     if view not in PREVIEW_VIEWS:
         raise ValueError("unsupported preview view")
@@ -158,18 +159,9 @@ def render_preview(meshes, output: Path, view="front", *, aligned=False) -> None
     camera_data.clip_end = max(radius*20, 100)
     scene = bpy.context.scene
     scene.camera = camera
-    scene.render.engine = 'BLENDER_WORKBENCH'
-    scene.display.shading.light = 'STUDIO'
-    scene.display.shading.color_type = 'SINGLE'
-    scene.display.shading.single_color = (.72, .74, .76)
-    scene.display.shading.show_shadows = True
-    scene.display.shading.show_cavity = True
-    scene.display.shading.background_type = 'WORLD'
+    configure_workbench(scene)
     if aligned:
         scene.display.render_aa = '8'
-    if scene.world is None:
-        scene.world = bpy.data.worlds.new("scope-preview-world")
-    scene.world.color = (.14, .15, .17)
     scene.render.resolution_x = scene.render.resolution_y = 256 if aligned else 512
     scene.render.resolution_percentage = 100
     scene.render.image_settings.file_format = 'PNG'
