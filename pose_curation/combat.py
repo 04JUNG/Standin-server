@@ -87,6 +87,7 @@ def run(
                         key: label[key]
                         for key in (
                             "style",
+                            "movement",
                             "category",
                             "category_label",
                             "prop_guides",

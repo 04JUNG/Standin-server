@@ -1,0 +1,246 @@
+{
+  "schema_version": 1,
+  "source": "CMU Graphics Lab",
+  "source_base": "https://mocap.cs.cmu.edu/subjects",
+  "license_url": "https://mocap.cs.cmu.edu/",
+  "groups": [
+    {
+      "subject": "13",
+      "fps": 120,
+      "category": "daily",
+      "family": "rest",
+      "clips": {
+        "01": "높은 의자에 앉고 일어나기",
+        "04": "낮은 의자에서 턱 괴기",
+        "05": "앉아 두 손으로 턱 받치기",
+        "14": "웃으며 몸 움직이기"
+      }
+    },
+    {
+      "subject": "13",
+      "fps": 120,
+      "category": "daily",
+      "family": "eating",
+      "clips": {
+        "07": "음료 병뚜껑 열고 마시기"
+      }
+    },
+    {
+      "subject": "13",
+      "fps": 120,
+      "category": "daily",
+      "family": "home_transit",
+      "clips": {
+        "10": "발끝 들고 높은 곳 잡기",
+        "26": "손짓으로 방향 안내",
+        "35": "계단 올라가기"
+      }
+    },
+    {
+      "subject": "13",
+      "fps": 120,
+      "category": "daily",
+      "family": "cleaning",
+      "clips": {
+        "20": "유리창 닦기 다른 배우",
+        "23": "빗자루 쓸기 다른 배우"
+      }
+    },
+    {
+      "subject": "13",
+      "fps": 120,
+      "category": "sports",
+      "family": "fitness",
+      "clips": {
+        "29": "팔벌려 뛰기·스쿼트·옆구리 비틀기"
+      }
+    },
+    {
+      "subject": "13",
+      "fps": 120,
+      "category": "daily",
+      "family": "care_hobby",
+      "clips": {
+        "33": "사다리 올라가기"
+      }
+    },
+    {
+      "subject": "14",
+      "fps": 120,
+      "category": "sports",
+      "family": "fitness",
+      "clips": {
+        "06": "조깅·스쿼트·전신 스트레칭",
+        "20": "양팔 벌려 뛰고 몸 굽히기"
+      }
+    },
+    {
+      "subject": "14",
+      "fps": 120,
+      "category": "daily",
+      "family": "cleaning",
+      "clips": {
+        "13": "대걸레로 바닥 닦기"
+      }
+    },
+    {
+      "subject": "14",
+      "fps": 120,
+      "category": "daily",
+      "family": "rest",
+      "clips": {
+        "27": "높은 의자 앉고 일어서기",
+        "29": "낮은 의자에 앉아 다리 흔들기",
+        "30": "앉아서 무릎 위 발목 올리고 턱 괴기"
+      }
+    },
+    {
+      "subject": "14",
+      "fps": 120,
+      "category": "daily",
+      "family": "eating",
+      "clips": {
+        "37": "음료수 마시기"
+      }
+    },
+    {
+      "subject": "42",
+      "fps": 120,
+      "category": "sports",
+      "family": "fitness",
+      "clips": {
+        "01": "목·어깨·팔·다리 스트레칭"
+      }
+    },
+    {
+      "subject": "111",
+      "fps": 120,
+      "category": "daily",
+      "family": "rest",
+      "clips": {
+        "06": "바닥에서 일어나기",
+        "12": "눕기",
+        "21": "누워 몸 뒤집기",
+        "32": "기지개와 하품"
+      }
+    },
+    {
+      "subject": "111",
+      "fps": 120,
+      "category": "daily",
+      "family": "home_transit",
+      "clips": {
+        "29": "장애물 넘어 걷기"
+      }
+    },
+    {
+      "subject": "111",
+      "fps": 120,
+      "category": "daily",
+      "family": "carry_shopping",
+      "clips": {
+        "36": "물건 들고 걷기"
+      }
+    },
+    {
+      "subject": "111",
+      "fps": 120,
+      "category": "sports",
+      "family": "fitness",
+      "clips": {
+        "38": "요가 첫 번째 루틴",
+        "40": "요가 세 번째 루틴"
+      }
+    },
+    {
+      "subject": "113",
+      "fps": 120,
+      "category": "daily",
+      "family": "rest",
+      "clips": {
+        "15": "의자에 앉고 일어나기",
+        "23": "기지개 켜며 하품"
+      }
+    },
+    {
+      "subject": "113",
+      "fps": 120,
+      "category": "daily",
+      "family": "home_transit",
+      "clips": {
+        "19": "계단 오르내리기"
+      }
+    },
+    {
+      "subject": "113",
+      "fps": 120,
+      "category": "sports",
+      "family": "fitness",
+      "clips": {
+        "28": "요가 다른 배우 첫 루틴",
+        "29": "요가 다른 배우 두 번째 루틴"
+      }
+    },
+    {
+      "subject": "114",
+      "fps": 120,
+      "category": "daily",
+      "family": "rest",
+      "clips": {
+        "02": "누운 자세에서 일어나기",
+        "05": "의자에 앉아 있기",
+        "16": "앉아서 스트레칭"
+      }
+    },
+    {
+      "subject": "143",
+      "fps": 120,
+      "category": "daily",
+      "family": "carry_shopping",
+      "clips": {
+        "10": "공구 상자 집어 들기",
+        "11": "상자 집어 들기",
+        "13": "세탁 바구니 집어 들기"
+      }
+    },
+    {
+      "subject": "143",
+      "fps": 120,
+      "category": "daily",
+      "family": "rest",
+      "clips": {
+        "18": "앉았다 일어나기",
+        "19": "스툴에 앉았다 일어나기",
+        "30": "기지개와 하품 다른 배우"
+      }
+    },
+    {
+      "subject": "143",
+      "fps": 120,
+      "category": "sports",
+      "family": "other_ball",
+      "clips": {
+        "22": "미식축구 공 잡고 던지기"
+      }
+    },
+    {
+      "subject": "143",
+      "fps": 120,
+      "category": "daily",
+      "family": "cleaning",
+      "clips": {
+        "26": "창문 닦기 다른 동작",
+        "28": "긴 빗자루로 밀어 쓸기"
+      }
+    },
+    {
+      "subject": "143",
+      "fps": 120,
+      "category": "daily",
+      "family": "care_hobby",
+      "clips": {
+        "37": "사다리 오르내리기"
+      }
+    }
+  ]
+}

@@ -6,11 +6,12 @@ import { OrientationPreview } from "./orientation.js?v=scoped-20261002";
 const $ = (id) => document.getElementById(id);
 const statusLabels = { pending: "검수 대기", accepted: "채택", hold: "보류", rejected: "제외" };
 const viewLabels = { front: "정면", three_quarter: "45°", side: "측면", back: "후면" };
-const movementLabels = { ID: "정지 자세", FW: "걷기", FR: "달리기", combat: "전투" };
-const sourceLabel = meta => ({"100style": "100STYLE", quaternius: "Quaternius", accad: "ACCAD 모션캡처", authored_combat: "직접 제작", authored_scenario: "상황별 제작"}[meta.source] || meta.source || "신규");
+const movementLabels = { ID: "정지 자세", FW: "걷기", FR: "달리기", combat: "전투", sports: "스포츠", daily: "일상" };
+const sourceLabel = meta => ({"100style": "100STYLE", quaternius: "Quaternius", accad: "ACCAD 모션캡처", cmu: "CMU 모션캡처", authored_combat: "직접 제작", authored_scenario: "상황별 제작"}[meta.source] || meta.source || "신규");
 const initialParams = new URLSearchParams(location.search);
 const initialCategory = initialParams.get('category') || '';
-const state = { group: "all", q: "", status: "all", batch: initialParams.get('batch') || "", category: initialCategory, offset: 0, limit: 48, view: "front", items: [], total: 0 };
+const initialStatus = initialParams.get('status') || 'all';
+const state = { group: "all", q: initialParams.get('q') || "", status: Object.hasOwn(statusLabels, initialStatus) ? initialStatus : "all", batch: initialParams.get('batch') || "", category: initialCategory, offset: 0, limit: 48, view: "front", items: [], total: 0 };
 state.library_scope = ['half','bust'].includes(initialParams.get('library_scope')) ? initialParams.get('library_scope') : 'all';
 const drafts = new Map();
 let activePose = null, decision = "pending", loadSequence = 0, detailSequence = 0, toastTimer;
@@ -381,6 +382,8 @@ $("review-form").addEventListener("submit", async (event) => {
 });
 
 $("category-filter").value = initialCategory;
+$("search").value = state.q;
+$("status-filter").value = state.status;
 Promise.all([refreshSummary(), loadPage()]).then(async () => {
   const key = new URLSearchParams(location.search).get("pose");
   if (key) {
