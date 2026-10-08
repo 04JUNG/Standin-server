@@ -305,7 +305,9 @@ manifest가 `poses.db`와 맞지 않으면 기동하지 않는다. `GET /healthz
 **`people[]` (PersonOut)**
 
 `output_scope`는 `{ "detected": "full" | "half" | "bust" | "head" | null,
-"source": "vlm_person" | "legacy_shot" | "unknown" }`이다. 기존 `shot`과 독립적인
+"source": "vlm_person" | "legacy_shot" | "observed_legs" | "unknown" }`이다.
+`observed_legs`는 VLM이 half/bust로 판별했지만 화면 안에서 무릎이 관측돼 `full`로 올린 값이다
+(원래 값은 `quality_trace.output_scope_promotion`). 기존 `shot`과 독립적인
 출력 구도 메타데이터이며 검색/refine 정책을 바꾸지 않는다. 판별·BFF 저장·앱 계약은
 [BODY_SCOPE.md](BODY_SCOPE.md)에 있다. 실제 부분 미리보기/FBX 크롭은 후속 단계다.
 
