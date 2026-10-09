@@ -6,6 +6,7 @@ from pathlib import Path
 
 import bpy
 from mathutils import Vector
+from converter.preview_style import configure_workbench
 
 VIEWS = {"front": 0, "three_quarter": 45, "side": 90, "back": 180}
 
@@ -29,31 +30,12 @@ def _world_vertices() -> list[Vector]:
 
 def render_views(directory: Path, pose_id: str, *, resolution: int = 256) -> dict[str, Path]:
     scene = bpy.context.scene
-    scene.render.engine = "BLENDER_WORKBENCH"
+    configure_workbench(scene)
     scene.render.resolution_x = scene.render.resolution_y = resolution
     scene.render.resolution_percentage = 100
     scene.render.image_settings.file_format = "JPEG"
     scene.render.image_settings.color_mode = "RGB"
     scene.render.image_settings.quality = 78
-    scene.render.film_transparent = False
-    scene.view_settings.view_transform = "Standard"
-    shading = scene.display.shading
-    shading.light = "STUDIO"
-    light = bpy.context.preferences.studio_lights.load(str(Path(__file__).with_name("neutral.sl")), "STUDIO")
-    shading.studio_light = light.name
-    shading.studiolight_rotate_z = 0
-    shading.color_type = "SINGLE"
-    shading.single_color = (1.0, 1.0, 1.0)
-    shading.show_shadows = True
-    shading.show_cavity = False
-    shading.cavity_type = "BOTH"
-    shading.show_specular_highlight = False
-    shading.show_object_outline = False
-    shading.background_type = "WORLD"
-    if scene.world is None:
-        scene.world = bpy.data.worlds.new("Preview Background")
-    # Standard sRGB conversion yields the neutral #999 background of the library.
-    scene.world.color = (0.31855, 0.31855, 0.31855)
     scene.display.render_aa = "32"
 
     points = _world_vertices()

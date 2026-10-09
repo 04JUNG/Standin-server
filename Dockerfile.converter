@@ -83,12 +83,15 @@ COPY converter/palm_roll_policy.json /app/converter/palm_roll_policy.json
 COPY converter/protocol.py /app/converter/protocol.py
 COPY converter/retarget.py /app/converter/retarget.py
 COPY converter/thumbnail_render.py /app/converter/thumbnail_render.py
+COPY converter/preview_style.py /app/converter/preview_style.py
+COPY converter/preview_studio.sl /app/converter/preview_studio.sl
 COPY converter/worker.py /app/converter/worker.py
 COPY converter/framing.py /app/converter/framing.py
 COPY converter/camera.py /app/converter/camera.py
 COPY converter/preview_model.py /app/converter/preview_model.py
 COPY converter/framed_model.py /app/converter/framed_model.py
 COPY converter_api/preview_models.py /app/converter_api/preview_models.py
+COPY converter_api/body_preview.py /app/converter_api/body_preview.py
 COPY converter_api/__init__.py /app/converter_api/__init__.py
 COPY converter_api/app.py /app/converter_api/app.py
 COPY converter_api/registry.py /app/converter_api/registry.py

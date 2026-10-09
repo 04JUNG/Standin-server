@@ -34,7 +34,8 @@ def render_identity(character: Path, blender: Path) -> dict:
         raise ValueError("expected the registered Standin Master V2 character")
     modules = sorted((PROJECT / "converter").glob("*.py"))
     modules += sorted((PROJECT / "converter").glob("*.json"))
-    modules += [Path(__file__).with_name(name) for name in ("profiles.py", "scene.py", "worker.py", "neutral.sl", "fingers.py", "anatomy.py", "props.py")]
+    modules += sorted((PROJECT / "converter").glob("*.sl"))
+    modules += [Path(__file__).with_name(name) for name in ("profiles.py", "scene.py", "worker.py", "fingers.py", "anatomy.py", "props.py")]
     modules += [PROJECT / "pose_curation" / "anatomy.py", PROJECT / "src" / "collision.py"]
     modules += [PROJECT / "pose_curation" / "hands" / "presets.py"]
     modules += [PROJECT / "pose_curation" / "qa" / "policy.py"]
