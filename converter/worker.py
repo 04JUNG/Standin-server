@@ -101,7 +101,7 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
         "apply_root_translation", "embed_textures",
         "force_exact_v324", "thumbnail",
     }
-    unknown = set(raw) - required - {"output_scope", "preview_view", "camera_rotation"}
+    unknown = set(raw) - required - {"output_scope", "preview_view", "camera_rotation", "preview_model"}
     missing = required - set(raw)
     if missing or unknown:
         raise JobValidationError(
@@ -133,12 +133,16 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
     except (TypeError, ValueError) as exc:
         raise JobValidationError("invalid output_scope") from exc
     preview_view = raw.get("preview_view")
+    preview_model = raw.get("preview_model", False)
+    if type(preview_model) is not bool or (preview_model and (
+            preview_view is not None or raw["thumbnail"] or raw["mirror"] or raw["force_exact_v324"])):
+        raise JobValidationError("invalid preview_model options")
     from converter.camera import validate_rotation
     try:
         camera_rotation = validate_rotation(raw.get("camera_rotation"))
     except ValueError as exc:
         raise JobValidationError(str(exc)) from exc
-    if camera_rotation is not None and (preview_view != "front" or raw["mirror"] or raw["thumbnail"]):
+    if camera_rotation is not None and ((preview_view != "front" and not preview_model) or raw["mirror"] or raw["thumbnail"]):
         raise JobValidationError("aligned output requires front preview without mirror/anatomical thumbnail")
     if camera_rotation is not None and raw["force_exact_v324"]:
         raise JobValidationError("exact V3.2.4 mode does not permit camera rotation")
@@ -333,6 +337,8 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
         payload["output_scope"] = scope
         payload["framing_version"] = FRAMING_VERSION
         if preview_path:
+            from converter.preview_style import PREVIEW_STYLE_VERSION
+            payload["preview_style_version"] = PREVIEW_STYLE_VERSION
             payload["preview_view"] = preview_view
             payload["preview_sha256"] = _sha256(preview_path)
             payload["preview_size"] = preview_path.stat().st_size
@@ -355,6 +361,14 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
             )
         payload["artifact_sha256"] = _sha256(output)
         payload["artifact_size"] = output.stat().st_size
+        if job.get("preview_model"):
+            from converter.framed_model import bake_final
+            payload["preview_model"] = bake_final(output, Path(job["temp_dir"]) / "preview.glb", {
+                "source_bvh_sha256": source_bvh_sha256,
+                "character_id": job["character_id"], "character_sha256": job["character_sha256"],
+                "scope": job.get("output_scope", "full"),
+                "camera_rotation": job.get("camera_rotation"),
+            })
         if job["thumbnail"] is not None:
             payload["thumbnail"] = _render_thumbnail(job["thumbnail"], output)
     else:

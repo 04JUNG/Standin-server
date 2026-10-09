@@ -350,7 +350,8 @@ class Pipeline:
         processed: list[tuple[object, _SlotOutcome]] = []
         for slot in slots:
             with span("descriptor_search"):
-                outcome = self._evaluate_slot(vlm, slot, threshold_scale)
+                outcome = self._evaluate_slot(
+                    vlm, slot, threshold_scale, (img_w, img_h))
             if (outcome.stability is not None
                     and outcome.stability["status"] == "unstable"
                     and slot.retry_count == 0
@@ -360,7 +361,8 @@ class Pipeline:
                     with span("skeleton_finalize"):
                         finalize_slot(slot, CFG)
                     with span("descriptor_search"):
-                        outcome = self._evaluate_slot(vlm, slot, threshold_scale)
+                        outcome = self._evaluate_slot(
+                            vlm, slot, threshold_scale, (img_w, img_h))
 
             # crop 후에도 검색이 불안정하고 거리까지 coverage 임계 밖이면 자동 Top-5를
             # 책임질 수 없다. 거리가 임계 안이면 라이브러리 prior를 살려 soft fallback.
@@ -383,6 +385,11 @@ class Pipeline:
                     outcome.descriptor.skeleton_state = "invalid"
                     outcome.descriptor.refine_allowed = False
                     outcome.descriptor.skeleton = None
+                    # 폐기한 스켈레톤의 무릎은 출력 범위 승격 근거도 될 수 없다.
+                    if outcome.descriptor.quality_trace.pop(
+                            "output_scope_promotion", None) is not None:
+                        outcome.descriptor.output_scope = detect_scope(
+                            vlm, slot.slot_id if slot.slot_origin == "vlm" else None)
                 else:
                     outcome.confidence = "low"
                     outcome.reason = "보수적 mask에서 Top-5 불안정 → soft fallback"
@@ -517,12 +524,12 @@ class Pipeline:
                 else np.zeros(17, dtype=np.float32)
             )
 
-    def _evaluate_slot(self, vlm: VLMAnalysis, slot,
-                       threshold_scale: float) -> _SlotOutcome:
+    def _evaluate_slot(self, vlm: VLMAnalysis, slot, threshold_scale: float,
+                       image_size: tuple[int, int] | None = None) -> _SlotOutcome:
         """한 슬롯의 masked 검색·A/B 안정성·refine 정책을 한 번에 계산한다."""
         # 태그 호출이 아직 안 끝났으면 여기서 합친다. 두 번째 슬롯부터는 바로 지나간다.
         self._join_person_tags(vlm)
-        desc = build_slot_descriptors(vlm, [slot])[0]
+        desc = build_slot_descriptors(vlm, [slot], image_size=image_size)[0]
         if desc.output_scope.detected == BodyScope.HEAD:
             slot.reasons.append("head_search_unsupported")
             desc.skeleton = None

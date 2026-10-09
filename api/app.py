@@ -824,7 +824,7 @@ def refine(req: RefineRequest):
             thumbnail=_refine_thumbnail(
                 view=req.view, bvh_path=base, pose_id=req.pose_id, refined=False,
                 camera_rotation=req.camera.rotation if req.camera else None,
-            ),
+            ) if req.render_thumbnail else None,
             loss_base=None, loss_final=None, gain=None, backend="none",
             refine_version=(REFINE_V2_CODE_VERSION if CFG.refine_v2_enabled
                             else REFINE_CODE_VERSION),
@@ -924,7 +924,7 @@ def refine(req: RefineRequest):
         refined=res.refined, reason=res.reason,
         bvh_url=f"/pose/{req.pose_id}/bvh",
         bvh=res.bvh_text if res.refined else None,
-        thumbnail=(
+        thumbnail=None if not req.render_thumbnail else (
             _refine_thumbnail(
                 view=req.view, bvh_text=res.bvh_text, pose_id=req.pose_id, refined=True,
                 camera_rotation=req.camera.rotation if req.camera else None,

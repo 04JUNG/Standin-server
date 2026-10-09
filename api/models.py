@@ -76,7 +76,8 @@ class InferenceMetadataOut(BaseModel):
 
 class ScopeDetectionOut(BaseModel):
     detected: Optional[BodyScope] = None
-    source: Literal["vlm_person", "legacy_shot", "unknown"] = "unknown"
+    # observed_legs: VLM은 half/bust였지만 화면 안 무릎이 관측돼 full로 올린 값.
+    source: Literal["vlm_person", "legacy_shot", "observed_legs", "unknown"] = "unknown"
 
 
 class PersonTagsOut(BaseModel):
@@ -154,6 +155,7 @@ class CutResultOut(BaseModel):
 # 작가가 Top-K 중 '고른 1개'만 러프에 맞춰 조정한다. 계산은 커밋된 포즈에만 든다.
 
 class RefineRequest(BaseModel):
+    render_thumbnail: bool = True
     camera: Optional[CandidateCamera] = None
     pose_id: str = Field(..., description="작가가 고른 후보의 pose_id")
     view: Literal["front", "three_quarter", "side", "back"] = Field(
