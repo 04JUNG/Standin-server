@@ -2,15 +2,18 @@
 import io
 from dataclasses import asdict
 
+import numpy as np
 import pytest
 from fastapi import UploadFile
 from PIL import Image
 
-from src.body_scope import BodyScope, detect_scope
+from src.body_scope import (BodyScope, ScopeDetection, detect_scope, observed_legs,
+                            promote_for_observed_legs)
 from src.descriptor import build_slot_descriptors
 from src.library import build_synthetic_index
 from src.pipeline import Pipeline
 from src.pose import MockPoseModel
+from src.schema import Skeleton
 from src.skeleton_extraction import PersonSlot
 from src.vlm.client import MockVLMClient, _coerce
 
@@ -105,8 +108,92 @@ def test_api_serializes_per_person_detection_on_mixed_route(monkeypatch):
     data.seek(0)
     result = api_app.analyze(UploadFile(file=data, filename="scope.png"), hint="", rescue="")
     people = result.model_dump(mode="json")["people"]
-    assert [p["output_scope"]["detected"] for p in people] == ["head", "bust"]
+    # The mock pose draws knees for the bust person, so that label cannot crop legs.
+    assert [p["output_scope"] for p in people] == [
+        {"detected": "head", "source": "vlm_person"},
+        {"detected": "full", "source": "observed_legs"},
+    ]
+    assert people[1]["quality_trace"]["output_scope_promotion"]["vlm_detected"] == "bust"
     assert [p["index"] for p in people] == [0, 1]
     assert people[0]["candidates"] == []
     assert "head_search_unsupported" in people[0]["quality_reasons"]
     assert people[1]["candidates"]
+
+
+def standing_skeleton(leg_score=0.9):
+    """Front-facing person fully inside a 600x500 frame: hips y=250, knees 350, ankles 450."""
+    points = np.zeros((17, 2), dtype=np.float32)
+    points[:5] = [150, 40]
+    points[5:11] = [[190, 100], [110, 100], [220, 150], [80, 150], [230, 205], [70, 205]]
+    points[11:] = [[175, 250], [125, 250], [175, 350], [125, 350], [175, 450], [125, 450]]
+    scores = np.full(17, 0.9, dtype=np.float32)
+    scores[13:] = leg_score
+    return Skeleton(points, scores)
+
+
+def test_knee_must_be_observed_inside_the_frame_and_owned():
+    points = standing_skeleton().keypoints
+    mask = np.ones(17, dtype=bool)
+    assert observed_legs(points, mask, (), (600, 500)) == ("left_leg", "right_leg")
+    # A knee predicted below the frame edge is a guess about an off-screen joint.
+    assert observed_legs(points, mask, (), (600, 350)) == ()
+    hidden_left_knee = mask.copy()
+    hidden_left_knee[13] = False
+    assert observed_legs(points, hidden_left_knee, (), (600, 500)) == ("right_leg",)
+    assert observed_legs(points, mask, ("left_leg", "right_leg"), (600, 500)) == ()
+
+
+@pytest.mark.parametrize("scope", [BodyScope.HALF, BodyScope.BUST])
+def test_observed_legs_promote_only_leg_cutting_scopes(scope):
+    for source in ("vlm_person", "legacy_shot"):
+        promoted = promote_for_observed_legs(ScopeDetection(scope, source), ("left_leg",))
+        assert promoted == ScopeDetection(BodyScope.FULL, "observed_legs")
+        unchanged = ScopeDetection(scope, source)
+        assert promote_for_observed_legs(unchanged, ()) is unchanged
+    for kept in (ScopeDetection(), ScopeDetection(BodyScope.FULL, "vlm_person"),
+                 ScopeDetection(BodyScope.HEAD, "vlm_person")):
+        assert promote_for_observed_legs(kept, ("left_leg", "right_leg")) is kept
+
+
+class _FixedPose:
+    self_detecting = True
+
+    def __init__(self, skeleton):
+        self.skeleton = skeleton
+
+    def estimate(self, *args):
+        return [self.skeleton]
+
+    def estimate_crop_candidates(self, *args):
+        return []
+
+
+def _half_labelled_cut(skeleton):
+    class VLM:
+        def analyze(self, *args):
+            return _coerce({
+                "num_people": 1, "shot": "full_half", "body_scopes": ["half"],
+                "approx_boxes": [{"x1": .05, "y1": .02, "x2": .45, "y2": .98}],
+            }, 600, 500)
+
+    pipe = Pipeline(build_synthetic_index(), vlm_client=VLM(), pose_model=_FixedPose(skeleton))
+    return pipe.process_cut(None, 600, 500)
+
+
+def test_half_label_with_observed_knees_is_output_as_full():
+    result = _half_labelled_cut(standing_skeleton())
+    desc = result.descriptors[0]
+    assert desc.output_scope == ScopeDetection(BodyScope.FULL, "observed_legs")
+    assert desc.quality_trace["output_scope_promotion"] == {
+        "vlm_detected": "half", "vlm_source": "vlm_person",
+        "observed_legs": ["left_leg", "right_leg"],
+    }
+    # Output framing only: the fail-closed refine visibility gate is untouched.
+    assert desc.lower_body_observed is False
+    assert result.person_candidates[0]
+
+
+def test_half_label_without_observed_knees_stays_half():
+    desc = _half_labelled_cut(standing_skeleton(leg_score=0.0)).descriptors[0]
+    assert desc.output_scope == ScopeDetection(BodyScope.HALF, "vlm_person")
+    assert "output_scope_promotion" not in desc.quality_trace

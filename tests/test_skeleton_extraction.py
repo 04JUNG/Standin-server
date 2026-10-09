@@ -5,6 +5,7 @@ import sys
 import tempfile
 
 import numpy as np
+import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -518,7 +519,8 @@ def test_unstable_partial_retries_crop_once_then_researches():
     assert any("crop_retry:unstable_search" in note for note in result.notes)
 
 
-def test_unstable_partial_above_distance_threshold_becomes_hard_fallback():
+@pytest.mark.parametrize("scope", ["full", "half"])
+def test_unstable_partial_above_distance_threshold_becomes_hard_fallback(scope):
     scores = np.full(17, 0.9, dtype=np.float32)
     scores[10] = 0.0
     partial = _skeleton(cx=200, cy=150, scale=120, scores=scores)
@@ -555,14 +557,19 @@ def test_unstable_partial_above_distance_threshold_becomes_hard_fallback():
             return []
 
     pose = FailedRetryPose()
+    hint = "full_half standing front 1p" + (" half_body" if scope == "half" else "")
     result = Pipeline(
         entries, vlm_client=MockVLMClient(), pose_model=pose
-    ).process_cut(_Img("full_half standing front 1p"), 400, 300)
+    ).process_cut(_Img(hint), 400, 300)
     assert pose.crop_calls == 1
     assert result.person_candidates[0] == []
     assert result.descriptors[0].skeleton_state == "invalid"
     assert not result.descriptors[0].refine_allowed
     assert any("hard fallback" in note for note in result.notes)
+    # A discarded skeleton's knees cannot widen the VLM output scope either.
+    assert result.descriptors[0].output_scope.detected.value == scope
+    assert result.descriptors[0].output_scope.source == "vlm_person"
+    assert "output_scope_promotion" not in result.descriptors[0].quality_trace
 
 
 def test_crop_recovered_slot_remains_low_confidence():

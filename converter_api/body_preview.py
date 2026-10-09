@@ -13,7 +13,7 @@ def preview_contract() -> dict:
     # Include render/camera implementation as well as frozen solver + Blender lineage.
     digest.update(model_revision().encode())
     for name in ("converter/framing.py", "converter/camera.py", "converter/worker.py",
-                 "converter_api/body_preview.py"):
+                 "converter/framed_model.py", "converter_api/body_preview.py"):
         digest.update(name.encode())
         digest.update((root / name).read_bytes().replace(b"\r\n", b"\n"))
     return {

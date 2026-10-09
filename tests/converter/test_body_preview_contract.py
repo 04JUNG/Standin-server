@@ -98,3 +98,19 @@ def test_runtime_contract_imports_from_exact_docker_copy_allowlist(tmp_path):
         cwd=tmp_path, capture_output=True, text=True)
     assert process.returncode == 0, process.stderr
     assert json.loads(process.stdout) == preview_contract()
+
+@pytest.mark.parametrize("expected,status", [(hashlib.sha256(b"character").hexdigest(), 200), ("a"*64, 409)])
+def test_final_model_keeps_body_and_runtime_contract(tmp_path, expected, status):
+    from tests.converter.test_review_model import ModelRunner
+    runner = ModelRunner()
+    client = _client(tmp_path, runner=runner)
+    contract = client.get("/preview-contract").json()
+    response = post(client, preview_format="model", expected_character_sha256=expected,
+                    expected_preview_revision=contract["preview_revision"])
+    assert response.status_code == status, response.text
+    if status == 200:
+        assert response.json()["preview_revision"] == contract["preview_revision"]
+        assert response.json()["character_sha256"] == expected
+        assert response.json()["preview_format"] == "model"
+    else:
+        assert not runner.calls

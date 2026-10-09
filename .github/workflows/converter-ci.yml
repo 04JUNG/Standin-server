@@ -78,7 +78,10 @@ jobs:
             tests/converter/test_runner_failures.py \
             tests/converter/test_api_contract.py \
             tests/converter/test_preview_models.py \
+            tests/converter/test_body_preview_contract.py \
+            tests/converter/test_preview_style.py \
             tests/converter/test_framing_contract.py \
+            tests/converter/test_review_model.py \
             tests/converter/test_refined_bvh_e2e.py \
             tests/converter/test_deployment_contract.py \
             tests/converter/test_latency_probe.py
@@ -171,6 +174,15 @@ jobs:
             "$CONVERTER_IMAGE" \
             /opt/blender/blender --background --python-exit-code 1 \
             --python /app/tests/converter/test_convert.py
+
+      - name: Verify soft preview lighting in headless Blender
+        run: |
+          docker run --rm --platform linux/amd64 \
+            --mount type=bind,source="$ARTIFACT_ROOT",target=/artifacts \
+            --mount type=bind,source="$GITHUB_WORKSPACE/tests/converter",target=/app/tests/converter,readonly \
+            "$CONVERTER_IMAGE" \
+            /opt/blender/blender --background --python-exit-code 1 \
+            --python /app/tests/converter/verify_preview_lighting.py -- /artifacts/preview-lighting.png
 
       - name: Verify promoted V3.2.5 and V3.2.4 kill switch
         run: |
@@ -276,6 +288,15 @@ jobs:
             --form size=256 \
             --form format=png \
             http://127.0.0.1:8001/render-thumbnail
+          curl --fail --silent --show-error \
+            --output "$ARTIFACT_ROOT/http-review-model.json" \
+            --form "bvh=@$ARTIFACT_ROOT/assets/pose_raise.bvh;type=application/octet-stream;filename=pose_raise.bvh" \
+            --form "expected_bvh_sha256=$FINAL_BVH_SHA256" \
+            --form character_id=standin-master-v2 \
+            --form output_scope=full \
+            --form preview_format=model \
+            --form 'camera_rotation=[[0,0,-1],[0,1,0],[1,0,0]]' \
+            http://127.0.0.1:8001/convert-framed
           python tests/converter/verify_container_smoke.py \
             --health "$ARTIFACT_ROOT/health.json" \
             --headers "$ARTIFACT_ROOT/response.headers" \
@@ -284,7 +305,8 @@ jobs:
             --bundle-headers "$ARTIFACT_ROOT/bundle-response.headers" \
             --bundle "$ARTIFACT_ROOT/http-smoke.zip" \
             --thumbnail-headers "$ARTIFACT_ROOT/thumbnail-response.headers" \
-            --thumbnail "$ARTIFACT_ROOT/http-smoke-thumbnail.png"
+            --thumbnail "$ARTIFACT_ROOT/http-smoke-thumbnail.png" \
+            --review-model "$ARTIFACT_ROOT/http-review-model.json"
           docker exec "$CONTAINER_NAME" \
             python -c "import importlib.util,sys; sys.exit(0 if importlib.util.find_spec('bpy') is None else 1)"
           docker exec "$CONTAINER_NAME" \
@@ -297,6 +319,7 @@ jobs:
           name: converter-thumbnail-smoke
           path: |
             ${{ env.ARTIFACT_ROOT }}/http-smoke-thumbnail.png
+            ${{ env.ARTIFACT_ROOT }}/preview-lighting.png
             ${{ env.ARTIFACT_ROOT }}/thumbnail-response.headers
           if-no-files-found: ignore
           retention-days: 7

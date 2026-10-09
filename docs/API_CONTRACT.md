@@ -305,7 +305,9 @@ manifest가 `poses.db`와 맞지 않으면 기동하지 않는다. `GET /healthz
 **`people[]` (PersonOut)**
 
 `output_scope`는 `{ "detected": "full" | "half" | "bust" | "head" | null,
-"source": "vlm_person" | "legacy_shot" | "unknown" }`이다. 기존 `shot`과 독립적인
+"source": "vlm_person" | "legacy_shot" | "observed_legs" | "unknown" }`이다.
+`observed_legs`는 VLM이 half/bust로 판별했지만 화면 안에서 무릎이 관측돼 `full`로 올린 값이다
+(원래 값은 `quality_trace.output_scope_promotion`). 기존 `shot`과 독립적인
 출력 구도 메타데이터이며 검색/refine 정책을 바꾸지 않는다. 판별·BFF 저장·앱 계약은
 [BODY_SCOPE.md](BODY_SCOPE.md)에 있다. 실제 부분 미리보기/FBX 크롭은 후속 단계다.
 
@@ -525,3 +527,25 @@ The internal converter additionally serves read-only
 `GET /pose-preview/{source_sha}?character_id=...` (`model/gltf-binary`).
 It never runs inference or Blender. Configuration, identity, failure behavior
 and client/BFF integration are specified in [PRECOMPUTED_POSE_PREVIEWS.md](PRECOMPUTED_POSE_PREVIEWS.md).
+
+## 저장 전 모델 미리보기 (2026-10-08)
+
+`POST /refine`의 선택 필드 `render_thumbnail`은 기본 `true`다. `false`이면
+보정·수락/기각·BVH·안전 정책을 그대로 실행하고 `thumbnail=null`을 반환한다.
+BFF/앱이 최종 출력의 모델 미리보기를 준비할 때만 사용한다.
+
+내부 Converter `POST /convert-framed`에 `preview_format=model`을 보내면
+PNG 렌더 없이 최종 FBX와 그 FBX를 재임포트한 정적 GLB를 함께 반환한다.
+기본값 `png`는 기존 동작이다. 모델 형식은 `preview_view=front`만 허용한다.
+`preview_base64`/`preview_sha256`은 이 경우 GLB 바이트/해시이며,
+`preview_format=model`, `preview_model_revision`이 추가된다. 기존 카메라·체형·
+BVH SHA·범위·FBX SHA 필드도 유지된다. GLB의 `asset.extras`에는
+`version=framed-mesh-v1`, `revision`, `scope`, `camera_rotation`,
+`base_fbx_sha256`, `source_bvh_sha256`, `character_id`, `character_sha256`가 있다.
+모델에는 카메라 회전/출력 범위가 이미 적용되어 있으므로 다시 회전시키지 않는다.
+메시만 정적이며 FBX의 뼈대 구조나 frozen solver를 변경하지 않는다.
+
+Converter `/healthz`의 `preview_model_revision`과 `character_hashes`로 지원 여부와
+캐시 세대를 확인한다. exact V3.2.4 모드에서는 모델 capability가 꺼진다.
+모델 export용 모듈은 기존 `posed-mesh-v1` exporter와 분리하여 기존 사전 생성
+라이브러리의 키를 무효화하지 않는다. 배포 순서는 Converter/추론 → BFF → 앱이다.

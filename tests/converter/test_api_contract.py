@@ -430,7 +430,7 @@ def test_render_thumbnail_returns_service_png_by_default(tmp_path):
     response = _post_thumbnail(_client(tmp_path, runner=runner))
     assert response.status_code == 200, response.text
     assert response.headers["content-type"] == "image/png"
-    assert response.headers["X-Standin-Thumbnail-Renderer"] == "fbx-anatomical-v1"
+    assert response.headers["X-Standin-Thumbnail-Renderer"] == "fbx-anatomical-soft-v2"
     assert response.headers["X-Standin-Thumbnail-View"] == "front"
     assert response.headers["X-Standin-Thumbnail-Engine"] == "BLENDER_EEVEE"
     assert response.headers["X-Standin-Thumbnail-Render-Resolution"] == "256"

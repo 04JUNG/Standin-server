@@ -207,6 +207,7 @@ class ConversionResult:
     thumbnail_png: bytes | None = None
     thumbnail_report: dict[str, Any] | None = None
     preview: bytes = b""
+    preview_model: bytes = b""
 
 
 def sha256_file(path: Path) -> str:
@@ -395,6 +396,7 @@ class BlenderRunner:
         output_scope: str = "full",
         preview_view: str | None = None,
         camera_rotation: list | None = None,
+        preview_model: bool = False,
     ) -> ConversionResult:
         if not report.get("ok"):
             raise self._report_error(report)
@@ -424,7 +426,7 @@ class BlenderRunner:
         mismatched = [key for key, value in expected.items() if report.get(key) != value]
         if camera_rotation is not None and report.get("camera_rotation") != camera_rotation:
             mismatched.append("camera_rotation")
-        if output_scope != "full" or preview_view:
+        if output_scope != "full" or preview_view or preview_model:
             if report.get("output_scope") != output_scope or report.get("framing_version") != FRAMING_VERSION:
                 mismatched.append("output_scope/framing_version")
         if mismatched:
@@ -477,6 +479,30 @@ class BlenderRunner:
                     or hashlib.sha256(preview).hexdigest() != report.get("preview_sha256")
                     or len(preview) != report.get("preview_size")):
                 raise WorkerIntegrityError("preview integrity check failed")
+        model = b""
+        if preview_model:
+            from converter.framed_model import MODEL_VERSION, metadata, revision
+            model_path = temp_dir / "preview.glb"
+            try:
+                if model_path.is_symlink():
+                    raise ValueError("symlink model")
+                model = model_path.read_bytes()
+                meta = metadata(model)
+                expected_meta = {
+                    "version": MODEL_VERSION, "revision": revision(), "scope": output_scope,
+                    "camera_rotation": camera_rotation, "character_id": character_id,
+                    "character_sha256": character_sha256, "source_bvh_sha256": source_bvh_sha256,
+                    "base_fbx_sha256": artifact_sha256,
+                    "solver_manifest_sha256": SOLVER_MANIFEST_SHA256,
+                    "coordinates": "Y-up-hips-origin",
+                }
+                if any(meta.get(k) != v for k, v in expected_meta.items()):
+                    raise ValueError("model lineage")
+                if report.get("preview_model") != {
+                        **meta, "sha256": hashlib.sha256(model).hexdigest(), "size": len(model)}:
+                    raise ValueError("model hash")
+            except (OSError, ValueError, KeyError, TypeError) as exc:
+                raise WorkerIntegrityError("preview model integrity mismatch") from exc
         return ConversionResult(
             conversion_id=conversion_id,
             artifact=artifact,
@@ -486,6 +512,7 @@ class BlenderRunner:
             thumbnail_png=thumbnail_png,
             thumbnail_report=thumbnail_report,
             preview=preview,
+            preview_model=model,
         )
 
     def _validate_thumbnail(
@@ -554,6 +581,7 @@ class BlenderRunner:
         output_scope: str = "full",
         preview_view: str | None = None,
         camera_rotation: list | None = None,
+        preview_model: bool = False,
     ) -> ConversionResult:
         if not bvh_bytes:
             raise ConversionRejectedError("BVH upload is empty")
@@ -574,7 +602,10 @@ class BlenderRunner:
             validate_rotation(camera_rotation)
         except ValueError as exc:
             raise ConversionRejectedError(str(exc)) from exc
-        if camera_rotation is not None and (preview_view != "front" or mirror or thumbnail or self.settings.force_exact_v324):
+        if type(preview_model) is not bool or (preview_model and (
+                preview_view is not None or mirror or thumbnail or self.settings.force_exact_v324)):
+            raise ConversionRejectedError("invalid preview model options")
+        if camera_rotation is not None and ((preview_view != "front" and not preview_model) or mirror or thumbnail or self.settings.force_exact_v324):
             raise ConversionRejectedError("invalid aligned camera options")
         queue_started = time.monotonic()
         self._process_slots.acquire()
@@ -594,6 +625,7 @@ class BlenderRunner:
                 output_scope=output_scope,
                 preview_view=preview_view,
                 camera_rotation=camera_rotation,
+                preview_model=preview_model,
             )
         finally:
             execution_ms = (time.monotonic() - execution_started) * 1000.0
@@ -620,6 +652,7 @@ class BlenderRunner:
         output_scope: str = "full",
         preview_view: str | None = None,
         camera_rotation: list | None = None,
+        preview_model: bool = False,
     ) -> ConversionResult:
         if not character_path.is_file() or character_path.suffix.lower() != ".fbx":
             raise WorkerIntegrityError("character artifact is not a regular FBX file")
@@ -668,6 +701,7 @@ class BlenderRunner:
                 "output_scope": output_scope,
                 "preview_view": preview_view,
                 "camera_rotation": camera_rotation,
+                "preview_model": preview_model,
             }
             job_path.write_text(
                 json.dumps(job, sort_keys=True, separators=(",", ":")) + "\n",
@@ -715,6 +749,7 @@ class BlenderRunner:
                 output_scope=output_scope,
                 preview_view=preview_view,
                 camera_rotation=camera_rotation,
+                preview_model=preview_model,
             )
 
 
