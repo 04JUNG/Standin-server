@@ -78,6 +78,7 @@ jobs:
             tests/converter/test_runner_failures.py \
             tests/converter/test_api_contract.py \
             tests/converter/test_preview_models.py \
+            tests/converter/test_body_preview_contract.py \
             tests/converter/test_preview_style.py \
             tests/converter/test_framing_contract.py \
             tests/converter/test_review_model.py \
