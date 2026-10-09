@@ -1,0 +1,5 @@
+{
+  "scope": "Optional POST /analyze body_matching only",
+  "evidence": "Synthetic contract fixtures, not real assets or accuracy results.",
+  "generation_command": "python scripts/export_body_api_contract.py"
+}
