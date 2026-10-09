@@ -508,6 +508,12 @@ OpenAPI 자동 문서: 서버 기동 후 **`http://127.0.0.1:8000/docs`**. 이 �
 - `output_scope`는 출력 메타데이터다. 수동 설정으로 관측/검색/refine 정책을 바꾸지 않는다.
 - 기존 full-body 피처 버전/DB/BVH/export 계약은 그대로다. 자세한 기준과 제한은
   [BODY_SCOPE.md](BODY_SCOPE.md)의 2단계를 참조한다.
+
+
+## 선택적 체형 관측·자동선택 결과
+
+`BODY_MATCHING_MODE=off`(기본값)에서는 `/analyze.body_matching={}`이다. `shadow|auto`에서는 인물별 관측·자동선택 결과를 추가한다. 기존 people/포즈 순위/검색·refine 정책은 그대로다. 스키마·오류·catalog 승인 조건은 [체형 감지·선택 API 계약](BODY_PIPELINE_API_CONTRACT.md)을 따른다. 이 필드는 기존 클라이언트의 수동 선택을 덮어쓰지 않으며, 렌더·BFF 상태 저장·Export는 실행하지 않는다.
+
 # 후보 표시 카메라 (2026-10-07 추가)
 
 `CandidateOut.camera`는 선택적 `candidate-camera-v1` 메타데이터다. 기존 `view`는

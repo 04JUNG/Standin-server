@@ -184,6 +184,8 @@ class CutResult:
     # VLM이 이 컷에 대해 실제로 말한 shot·action·view·relationship(VLMAnalysis.stated_tags).
     vlm_tags: Optional[dict] = None
 
+    body_matching: dict = field(default_factory=dict)
+
 
 @dataclass
 class LibraryEntry:

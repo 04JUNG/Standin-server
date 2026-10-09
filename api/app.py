@@ -15,6 +15,8 @@ FastAPI 레이어 — 도원의 Python 추론 서버.
 """
 from __future__ import annotations
 
+from .body_models import validated_body_sidecar
+
 import base64
 import hashlib
 import io
@@ -582,6 +584,7 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
                  else CFG.openai_model if STATE.get("provider") == "openai"
                  else "mock")
     return CutResultOut(
+        body_matching=validated_body_sidecar(res.body_matching, people),
         route=res.route, count_confidence=res.count_confidence,
         detector_count=res.detector_count, vlm_count=res.vlm_count,
         people=people, notes=res.notes,
