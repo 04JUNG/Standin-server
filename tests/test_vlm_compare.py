@@ -176,8 +176,16 @@ def test_matched_box_iou_pairs_each_box_once():
     assert matched_box_iou([], [box]) is None
 
 
-def test_report_from_a_dataset_keeps_only_ids_and_numbers(tmp_path):
+def test_report_from_a_dataset_keeps_only_ids_and_numbers(tmp_path, monkeypatch):
     from PIL import Image
+    import standin_eval.vlm_compare as compare
+
+    # This tests serialized report contents; scheduler jitter in a near-zero
+    # mock call must not decide the production latency gate outcome here.
+    original_run = compare.run_vlm_compare
+    def deterministic_run(*args, **kwargs):
+        return original_run(*args, **kwargs, clock=_Clock())
+    monkeypatch.setattr(compare, "run_vlm_compare", deterministic_run)
 
     image_path = tmp_path / "secret-rough-name.png"
     Image.new("RGB", (32, 48), "white").save(image_path)
