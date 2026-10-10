@@ -51,6 +51,7 @@ from src.pose_model_source import PoseModelFetchError, ensure_pose_model
 from src.refine import (REFINE_CODE_VERSION, REFINE_V2_CODE_VERSION,
                         refine_bvh)
 from src.refine_policy import structural_refine_allowed
+from src.pose_catalog import build_catalog, folders as pose_catalog_folders, page as pose_catalog_page
 from src.pose_quarantine import (load_pose_quarantine, pose_quarantine_sha256,
                                  quarantine_record)
 from src.repo import (FEATURE_VERSION, build_db, load_entries,
@@ -625,6 +626,33 @@ def get_pose_bvh(pose_id: str):
                  f"실 라이브러리 빌드 전 단계.")
     return FileResponse(path, media_type="application/octet-stream",
                         filename=f"{pose_id}.bvh")
+
+
+def _pose_catalog():
+    """라이브러리 목록. Pipeline이 바뀌면(번들 교체·재기동) 다시 만든다."""
+    pipeline = STATE.get("pipeline")
+    if pipeline is None:
+        raise HTTPException(503, "library is not loaded")
+    cached = STATE.get("pose_catalog")
+    if cached is None or cached[0] is not pipeline:
+        cached = (pipeline, build_catalog(pipeline.entries))
+        STATE["pose_catalog"] = cached
+    return cached[1]
+
+
+@app.get("/poses/folders")
+def get_pose_folders():
+    """포즈 라이브러리의 출처별·분류별 폴더와 포즈 수(관리자 모아 보기)."""
+    return pose_catalog_folders(_pose_catalog())
+
+
+@app.get("/poses")
+def list_poses(source: str = "", category: str = "", q: str = "", cursor: str = "", limit: int = 48):
+    """포즈 라이브러리 한 페이지. 검색이 쓰는 목록 그대로라 격리된 포즈는 나오지 않는다."""
+    if limit < 1 or limit > 96:
+        raise HTTPException(400, "limit must be between 1 and 96")
+    return pose_catalog_page(_pose_catalog(), source=source or None, category=category or None,
+                             query=q or None, cursor=cursor or None, limit=limit)
 
 
 @app.get("/pose/{pose_id}/thumbnail")
