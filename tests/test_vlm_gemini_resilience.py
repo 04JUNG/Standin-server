@@ -5,6 +5,7 @@ import pytest
 
 from src.config import CFG
 from src.vlm.client import GeminiVLMClient, VLMUnavailable
+from tests.test_vlm_failure_classification import quota_error
 
 
 class ApiFailure(Exception):
@@ -26,6 +27,8 @@ class FakeModels:
     def generate_content(self, **kwargs):
         config = kwargs.get("config")
         http_options = getattr(config, "http_options", None)
+        if "retry_options" in type(http_options).model_fields:
+            assert http_options.retry_options.attempts == 1
         if http_options is not None and http_options.timeout is not None:
             self.timeouts.append(http_options.timeout / 1000)
         if self.on_call is not None:
@@ -110,6 +113,39 @@ def test_retries_503_then_succeeds(monkeypatch):
     assert result.num_people == 1
     assert models.calls == 3
     assert sleeps == [0.5, 1.0]
+
+
+def test_daily_quota_does_not_retry(monkeypatch):
+    sleeps = []
+    client, models = make_client(monkeypatch, [quota_error("GenerateRequestsPerDay", delay="20s")], sleeps)
+    with pytest.raises(VLMUnavailable) as raised:
+        client.analyze("ignored", 100, 100)
+    assert raised.value.reason == "daily_quota_exhausted"
+    assert raised.value.retryable is False
+    assert models.calls == 1
+    assert sleeps == []
+
+
+def test_provider_cooldown_is_not_capped_at_two_seconds(monkeypatch):
+    monkeypatch.setattr(CFG, "gemini_total_budget_seconds", 75)
+    monkeypatch.setattr(CFG, "gemini_min_attempt_seconds", 10)
+    sleeps = []
+    client, models = make_client(monkeypatch, [quota_error("PerMinute", delay="35s"), valid_response()], sleeps, FakeClock())
+    client.analyze("ignored", 100, 100)
+    assert models.calls == 2
+    assert sleeps == [35]
+
+
+def test_provider_cooldown_over_budget_is_returned_not_shortened(monkeypatch):
+    monkeypatch.setattr(CFG, "gemini_total_budget_seconds", 75)
+    sleeps = []
+    client, models = make_client(monkeypatch, [quota_error("PerMinute", delay="120s")], sleeps, FakeClock())
+    with pytest.raises(VLMUnavailable) as raised:
+        client.analyze("ignored", 100, 100)
+    assert raised.value.reason == "rate_limited"
+    assert raised.value.retry_after_seconds == 120
+    assert models.calls == 1
+    assert sleeps == []
 
 
 def test_stops_after_bounded_429_attempts(monkeypatch):

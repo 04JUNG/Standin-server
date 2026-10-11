@@ -464,6 +464,14 @@ class _HintImg(str):
 # 우리가 더 두드리게 되고, 너무 길면 이미 풀린 뒤에도 사용자를 기다리게 한다.
 VLM_RETRY_AFTER_SECONDS = 30
 
+_VLM_FAILURE_MESSAGES = {
+    "rate_limited": "AI 분석 요청 한도에 일시적으로 도달했습니다. 잠시 후 다시 시도해 주세요.",
+    "daily_quota_exhausted": "AI 분석의 일일 사용 한도가 소진됐습니다. 한도 초기화 또는 운영자 확인이 필요합니다.",
+    "upstream_unavailable": "AI 분석 서비스가 일시적으로 혼잡하거나 이용 불가 상태입니다. 잠시 후 다시 시도해 주세요.",
+    "timeout": "AI 분석 응답 시간이 초과됐습니다. 잠시 후 다시 시도해 주세요.",
+    "upstream_error": "AI 분석 서비스에 일시적인 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+}
+
 
 def _vlm_unavailable_response(exc: VLMUnavailable) -> HTTPException:
     """상류 VLM 혼잡 → 503.
@@ -475,15 +483,23 @@ def _vlm_unavailable_response(exc: VLMUnavailable) -> HTTPException:
 
     오류 본문은 앱 서버(BFF)가 자기 오류 봉투로 옮겨 담는다(docs/API_CONTRACT.md §7).
     """
+    from math import ceil
+
+    reason = exc.reason if exc.reason in _VLM_FAILURE_MESSAGES else "upstream_error"
+    retryable = reason != "daily_quota_exhausted"
+    retry_after = max(VLM_RETRY_AFTER_SECONDS, ceil(exc.retry_after_seconds or 0)) if retryable else None
+    message = _VLM_FAILURE_MESSAGES[reason]
     log_warn("vlm_unavailable", "상류 VLM이 응답하지 못해 분석을 중단했다",
              route="/analyze", errorCode="VLM_UNAVAILABLE",
+             failureReason=reason, retryable=retryable, retryAfterSeconds=retry_after,
              upstreamStatus=exc.status, attempts=exc.attempts,
              elapsedMs=round(exc.elapsed_seconds * 1000))
     alerts.notify(
         "P2", "VLM_UNAVAILABLE",
-        "VLM 상류 혼잡으로 분석 요청이 실패했습니다. 사용자에게는 재시도 안내가 나갑니다.",
-        key="P2:vlm_unavailable",
+        message,
+        key=f"P2:vlm_unavailable:{reason}",
         context={"상류 상태": exc.status or "timeout", "시도": exc.attempts,
+                 "원인": reason, "재시도 가능": retryable,
                  "소요(초)": round(exc.elapsed_seconds, 1),
                  "모델": CFG.gemini_model},
     )
@@ -491,10 +507,12 @@ def _vlm_unavailable_response(exc: VLMUnavailable) -> HTTPException:
         status_code=503,
         detail={
             "code": "VLM_UNAVAILABLE",
-            "message": "분석 서버가 일시적으로 혼잡합니다. 잠시 후 다시 시도해 주세요.",
-            "retry_after_seconds": VLM_RETRY_AFTER_SECONDS,
+            "message": message,
+            "reason": reason,
+            "retryable": retryable,
+            "retry_after_seconds": retry_after,
         },
-        headers={"Retry-After": str(VLM_RETRY_AFTER_SECONDS)},
+        headers={"Retry-After": str(retry_after)} if retry_after is not None else {},
     )
 
 

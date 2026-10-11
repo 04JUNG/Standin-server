@@ -434,10 +434,11 @@ artifact는 알지 못한다. 따라서 Phase 3 제품 export는 BFF가 final ba
 - **앱 서버가 `{error:{code,...}}` 봉투를 소유**한다 — 이 추론 서버의 `{detail}`을 받아 code로 매핑·requestId 부여. 도원 서버는 내부 계층이라 기본 형식 유지로 충분.
 - 만약 Tauri가 이 서버를 **직접** 부르는 구조로 확정되면, 여기에 `{error:{code}}` 봉투를 도입해야 함(§8-1의 결론에 종속).
 
-### 7-1. 상류 VLM 혼잡 — `POST /analyze` → `503 VLM_UNAVAILABLE`
+### 7-1. 상류 VLM 오류 원인 — `POST /analyze` → `503 VLM_UNAVAILABLE`
 
-VLM(Gemini)이 429·5xx로 거절하거나 데드라인에 걸려 **재시도 예산을 다 쓴** 경우다.
-서버 버그가 아니라 상류 상태이므로 500이 아니라 **503**으로 답하고, `Retry-After`를 함께 준다.
+VLM(Gemini)의 429·5xx·시간 초과를 서버 버그와 구분한다. 기존 BFF 호환을 위해
+HTTP **503**과 `code=VLM_UNAVAILABLE`은 유지하고, `reason`과 `retryable`을 추가한다.
+503 자체만으로 혼잡이나 사용자 사용량 초과를 단정하면 안 된다.
 
 ```http
 HTTP/1.1 503 Service Unavailable
@@ -448,17 +449,37 @@ Retry-After: 30
 {
   "detail": {
     "code": "VLM_UNAVAILABLE",
-    "message": "분석 서버가 일시적으로 혼잡합니다. 잠시 후 다시 시도해 주세요.",
+    "message": "AI 분석 요청 한도에 일시적으로 도달했습니다. 잠시 후 다시 시도해 주세요.",
+    "reason": "rate_limited",
+    "retryable": true,
     "retry_after_seconds": 30
   }
 }
 ```
 
+| `reason` | 근거 | `retryable` / 다음 행동 |
+|---|---|---|
+| `rate_limited` | 429, 명확한 일일 한도 근거 없음 | true / 안내된 시간 후 재시도 |
+| `daily_quota_exhausted` | 429 + QuotaFailure의 quotaId 또는 quotaMetric에 명시된 per-day/daily | false / 한도 초기화 또는 운영자 확인 |
+| `upstream_unavailable` | 503 | true / 상류 혼잡·일시 이용 불가, 잠시 후 재시도 |
+| `timeout` | 요청 시간 초과 | true / 잠시 후 사용자 재시도; 서버 내부 자동 재시도 없음 |
+| `upstream_error` | 기타 5xx | true / 상류 오류, 잠시 후 재시도 |
+
+- `retryable`은 **사용자/BFF의 후속 재시도 가능 여부**이며 서버가 재시도했다는 뜻이 아니다.
+  일일 한도 소진은 즉시 반복 호출하지 않는다. 초기화 시각은 추정하지 않는다.
+- 일일 한도 소진 시 `retry_after_seconds=null`, `Retry-After` 헤더 없음.
+  그 외에는 기본 30초와 상류 `RetryInfo.retryDelay`/`Retry-After` 중 큰 값을 초 단위로 올림한다.
+- 서버 내부 재시도도 상류 대기 시간을 줄이지 않는다. 대기 후 다음 시도가 전체 예산에
+  들어가지 않으면 즉시 오류를 반환한다. SDK 내부 중첩 재시도는 끄고 기존 횟수·시간 예산으로 관리한다.
+- 단순 `RESOURCE_EXHAUSTED`나 무료 요금제라는 이유만으로 일일 한도로 분류하지 않는다.
+  원인이 불명확한 429는 `rate_limited`로 남긴다. 키·원본 응답·입력 이미지는 안내/로그에 넣지 않는다.
+
 - 이 경로에서만 `detail`이 문자열이 아니라 객체다. 기계가 읽을 코드가 필요해서다(BFF가
   자기 오류 봉투의 code로 옮겨 담는다).
-- **앱 서버 할 일:** 이 503을 `INFERENCE_FAILED`로 접지 말 것. 접으면 사용자가
-  "다른 이미지로 다시 시도해 주세요"라는 잘못된 안내를 받는다 — 상류가 붐비는 동안에는
-  어떤 이미지도 실패한다. 재시도 안내(잠시 후 다시)로 번역해야 한다.
+- **앱 서버/클라이언트 연동 필요:** 기존 code는 유지하되 `reason`, `message`, `retryable`,
+  `retry_after_seconds`도 오류 봉투로 전달한다. `retryable=false`에는 반복 재시도 대신 한도 확인을
+  안내하고, true에는 대기 시간을 반영한다. 이 서버 PR만으로 BFF/UI 안내가 자동 변경되지는 않는다.
+  `INFERENCE_FAILED`나 하나의 혼잡 문구로 덮어쓰지 않는다.
 - 400·422(잘못된 요청)와 500(우리 버그)은 그대로다. 이 구분이 알림 분류의 기준이기도 하다
   (503은 `VLM_UNAVAILABLE`, 500은 `UNHANDLED_ERROR`).
 
