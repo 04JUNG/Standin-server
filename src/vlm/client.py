@@ -23,6 +23,7 @@ from ..body_scope import BodyScope, parse_person_scopes
 from ..person_tags import parse_person_values, stated_value
 from ..logging_setup import log_info, log_warn
 from . import prompts
+from .failures import classify_failure, failure_reason
 
 
 _MAX_VLM_PEOPLE = 20
@@ -105,22 +106,26 @@ def _extract_json(text: str) -> dict:
 
 
 class VLMUnavailable(RuntimeError):
-    """상류 VLM이 **일시적으로** 요청을 처리하지 못했다(429·5xx 소진, 데드라인).
+    """상류 VLM이 요청을 처리하지 못했다(요청 제한·일일 한도·5xx·데드라인).
 
     파이프라인 버그와 구분하기 위한 타입이다. 이 구분이 없으면 Gemini 과부하가
     `/analyze`에서 처리되지 않은 예외로 올라가 500 + P2 UNHANDLED_ERROR 알림이 되고,
     사용자는 "다른 이미지로 다시 시도해 주세요"라는 잘못된 안내를 받는다. 다른 이미지를
     넣어도 상류가 붐비는 동안에는 똑같이 실패한다.
 
-    호출자(api/app.py)가 503 + Retry-After로 번역한다.
+    호출자(api/app.py)가 503과 원인별 재시도 안내로 번역한다.
     """
 
     def __init__(self, message: str, *, status: int | None = None,
-                 attempts: int = 0, elapsed_seconds: float = 0.0):
+                 attempts: int = 0, elapsed_seconds: float = 0.0,
+                 reason: str | None = None, retry_after_seconds: float | None = None):
         super().__init__(message)
         self.status = status
         self.attempts = attempts
         self.elapsed_seconds = elapsed_seconds
+        self.reason = reason or failure_reason(status, timed_out=status is None)
+        self.retryable = self.reason != "daily_quota_exhausted"
+        self.retry_after_seconds = retry_after_seconds
 
 
 class BaseVLMClient:
@@ -300,8 +305,7 @@ class GeminiVLMClient(BaseVLMClient):
                         response_mime_type="application/json",
                         temperature=0,
                         # 요청 단위 상한. 클라이언트 생성 시의 값(전체 timeout)을 덮어쓴다.
-                        http_options=types.HttpOptions(
-                            timeout=int(timeout_seconds * 1000)),
+                        http_options=_gemini_attempt_options(types, int(timeout_seconds * 1000)),
                     ),
                 )
                 log_info(
@@ -314,21 +318,24 @@ class GeminiVLMClient(BaseVLMClient):
                 return _coerce(_extract_json(resp.text), img_w, img_h)
             except Exception as error:
                 status = _http_status(error)
-                # 429와 5xx는 상류 혼잡이다. timeout도 같은 부류로 본다 — 원인은 달라도
-                # 사용자가 할 수 있는 일("잠시 후 다시")이 같고, 둘 다 우리 버그가 아니다.
-                # 반면 4xx와 파싱 오류는 우리 잘못이므로 그대로 올려 보내 알림을 받는다.
                 timed_out = _is_timeout(error)
-                transient = status == 429 or (status is not None and 500 <= status < 600)
-                upstream = transient or timed_out
+                failure, retry_after = classify_failure(error, status, timed_out=timed_out)
+                upstream = status == 429 or (status is not None and 500 <= status < 600) or timed_out
+                transient = upstream and not timed_out and failure != "daily_quota_exhausted"
                 left = deadline - self._clock()
+                base_delay = min(CFG.gemini_retry_base_seconds * (2 ** (attempt - 1)),
+                                 CFG.gemini_retry_max_seconds)
+                delay = max(0.0, self._jitter(base_delay * 0.8, base_delay * 1.2),
+                            retry_after or 0.0)
                 # 남은 예산으로 의미 있는 시도를 한 번 더 할 수 있을 때만 재시도한다.
-                budget_left = left >= min_attempt
+                budget_left = left >= delay + min_attempt
                 # timeout은 재시도하지 않는다 — 끊긴 호출도 Gemini 쪽에서는 계속 생성
                 # 중일 수 있어 재시도가 비용만 두 배로 쓴다. 대신 데드라인을 넉넉히 잡는다.
                 retryable = transient and attempt < attempts and budget_left
                 reason = (
                     "retrying" if retryable
                     else "timed_out" if timed_out
+                    else "daily_quota_exhausted" if failure == "daily_quota_exhausted"
                     else "not_transient" if not transient
                     else "attempts_exhausted" if attempt >= attempts
                     else "budget_exhausted"
@@ -340,6 +347,8 @@ class GeminiVLMClient(BaseVLMClient):
                     status=status or "error",
                     retry=retryable,
                     retryDecision=reason,
+                    failureReason=failure if upstream else None,
+                    retryAfterSeconds=retry_after,
                     timeoutSeconds=round(timeout_seconds, 1),
                     budgetLeftSeconds=round(max(0.0, left), 1),
                     elapsedMs=round((self._clock() - started) * 1000),
@@ -353,17 +362,22 @@ class GeminiVLMClient(BaseVLMClient):
                             status=status,
                             attempts=attempt,
                             elapsed_seconds=self._clock() - started_all,
+                            reason=failure,
+                            retry_after_seconds=retry_after,
                         ) from error
                     raise
-                delay = min(
-                    CFG.gemini_retry_base_seconds * (2 ** (attempt - 1)),
-                    CFG.gemini_retry_max_seconds,
-                )
-                # 대기도 예산을 먹는다. 다음 시도 몫을 남기지 못할 만큼은 쉬지 않는다.
-                delay = max(0.0, min(delay, left - min_attempt))
                 if delay:
-                    self._sleep(self._jitter(delay * 0.8, delay * 1.2))
+                    self._sleep(delay)
         raise RuntimeError("unreachable")
+
+
+def _gemini_attempt_options(types, timeout_ms):
+    # SDK 1.10 has no retry layer/options; newer SDKs must not nest retries
+    # under our quota classification and total request budget.
+    options = {"timeout": timeout_ms}
+    if "retry_options" in types.HttpOptions.model_fields:
+        options["retry_options"] = types.HttpRetryOptions(attempts=1)
+    return types.HttpOptions(**options)
 
 
 def _http_status(error: Exception) -> int | None:
