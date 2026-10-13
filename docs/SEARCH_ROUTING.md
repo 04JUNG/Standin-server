@@ -298,4 +298,74 @@ BVH의 현재 내용은 요청 중 다시 읽지 않으므로, **BVH/대표 프�
 증거: `tmp/semantic-body-v1.json`, `tmp/routing-eval-bvh-body-v3-final/{ablation.json,REPORT.md}`,
 `tmp/routing-eval-bvh-fixture-ablation-final/ablation.json`,
 `tmp/routing-eval-replay-bvh-v3-release/results.json`.
+
+## 핵심 팔 관계와 미리보기 시점(v4, 2026-10-13)
+
+기본 비활성 `SEMANTIC_SHAPE_INDEX_PATH` 옵션을 추가했다. `scripts/build_semantic_shape_index.py`
+는 원본 BVH frame 0에서 몸통 축 기준 손 위치를 계산하고 24개 정사영 시점의 가시성을
+미리 기록한다. 새 raw RTMPose 기준·기하 피처·러프 좌표 생성은 없다.
+
+- **팔짱**: reviewed fold_arms 검색 태그 AND 가슴 높이 손 교차가 필요하다.
+  무릎을 감싸 손목만 겹친 자세나 머리 위 스트레칭은 팔짱으로 인정하지 않는다.
+- **V자 팔**: 양손 모두 몸통 축 위쪽·바깥쪽에 있고 양팔 벌림각이 범위 안에 있어야 한다.
+  한 팔만 올리거나 T자·좁은 수직 팔은 제외한다. 임계값은 실험적이며 정확도 점수가 아니다.
+- 명확한 관계를 query의 action 또는 관찰 문장에서 읽었으면 hard filter다.
+  약한 coarse arms=raised/spread 점수나 장면/행동 점수가 필수 관계를 덮어쓰지 못한다.
+- 구체적인 자세도 함께 요구한다(예: sitting+fold_arms). 검증 조합 없음은 no_result와
+  `critical_pose_combination_unverified`를 반환한다. 실제 라이브러리 부재 증명은 아니다.
+- yaw 0/45/90/180 × pitch 0/30/60/80/-30/-60, roll=0. 관계 가시성 통과 안에서 작은 pitch를
+  우선해 투영 몸통이 짧아진 각도의 비율 점수만 극대화하지 않는다. 명시한 부감/앙각 단서는
+  body_details·search_text·context_evidence에서만 읽고 낙하라는 행동명으로 시점을 추정하지 않는다.
+- `pose.preview_camera`는 미리보기일 뿐 저장된 BVH 회전이 아니다. 동일한 포즈를 카메라만 바꿔
+  비교한다. 원근·얼굴 방향·전체 실루엣 픽셀 맞춤은 미구현이다. API의 matched에 선택 근거와
+  hint_satisfied를 기록한다. 4 yaw 썸네일에는 pitch가 적용되지 않았음을 eval 보고서에 명시한다.
+- 명시한 v4 색인이 손상되면 error로 끝낸다. 핵심 조건을 누락했던 v3로 조용히 폴백하지 않는다.
+  v4를 지정하지 않은 기존 v2/v3 검색과 SEARCH_ROUTING=0 경로는 유지한다.
+
+생성 예:
+
+```sh
+python scripts/build_semantic_shape_index.py --db <bundle>/poses.db \
+  --tags <viewer>/dist/data/search-v2.json --bvh-root <bundle>/bvh \
+  --detail-tags <viewer>/dist/data/tagging-v1.json --out tmp/semantic-shapes-v1.json
+```
+
+색인은 태그 canonical SHA·설정·frame·개별 BVH SHA를 보존한다. 입력 BVH/태그가 바뀌면
+재생성해야 한다. 요청 중 파일별 BVH SHA 재검증이나 BVH 렌더링은 수행하지 않는다.
+
+### 같은 러프 전후 실험
+
+1,981개 BVH 처리 성공(실패 0). 팔짱 검증 2개는 standing 원본/미러이고 몸 기준 V 검증은
+30개다(정확한 러프 일치 30개라는 뜻 아님). 기존 Gemini 설명을 고정한 8장/11슬롯에서
+T013 슬롯 2는 스트레칭 오답 5개 → 검증 후보 0개, T028 슬롯 1은 다이빙 5개 → V 후보 3개다.
+나머지 semantic 6슬롯의 Top5는 동일하며 geometric T044와 부분 인물의 미판정도 유지된다.
+
+새 Gemini 3.8 Flash/current-X 동일 승인 8장 실험은 분석 8회+설명 7회(5성공/2upstream_error).
+T013·T028 별도 진단 1회에서는 T013이 다시 upstream_error, T028이 성공했다.
+새 T028은 행동 stretch를 출력했지만 V 조건을 보존하여 동일한 새 1위를 반환한다.
+context_evidence 시점 전달 및 작은 pitch 우선 수정은 저장된 실호출 설명의 최종 재검색으로
+확인했다. 원본 live 기록을 덮어쓰지 않았다. T013의 새 end-to-end 성공은 아직 미검증이다.
+정면 부감 비교에서는 V 실루엣이 깨지거나 반대 yaw에서 몸/다리 방향이 달라지는 한계가 확인됐다.
+팔 형태는 개선됐지만 전체 구도 일치는 해결되지 않았으며 accuracy 수치로 표현하지 않는다.
+
+증거: `tmp/routing-shapes-v4-frozen-eight/ablation.json`,
+`tmp/routing-eval-live-v4-eight-20261013/results.json`,
+`tmp/routing-eval-live-v4-critical-diagnostic-20261013/results.json`,
+`tmp/routing-shapes-v4-fresh-diagnostic-ablation/ablation.json`,
+`tmp/routing-shapes-v4-report/{COMPARISON_REPORT.md,camera-evidence.json}`.
+카메라 PNG는 기존 BVH의 COCO17 관절 마네킹이며 실제 FBX 메시 재렌더가 아니다.
+Gemini 프롬프트는 d2 그대로, 자동 설명 재시도 없음. PR·push·배포 없음.
+검증: 서버 테스트 872 passed/8 skipped/22 subtests, 스모크 54/54.
+Blender 전용 tests/converter는 bpy/mathutils 런타임이 없어 제외했다.
+전후 화면의 두 러프×두 설명 출처×전체 후보 버튼·이미지와 320/360/736px 표시를 검증했다.
+
+### 04J-285 검색기 통합 경계(아직 통합하지 않음)
+
+라우터는 기존 SemanticSearcher 계약에만 의존한다. 최종 통합에서는 285의
+`SemanticSearchService.search`/`semantic_search(index,text,source='vlm',tags,top_k,settings)`를
+어댑터로 호출하고 ok/no_result/error를 SemanticSearchResult로 변환한다.
+관찰·critical_relations·카메라 진단은 후보 검증 경계에서 보존해야 한다. Top5 반환 뒤에만
+필터하면 일치 포즈를 놓칠 수 있으므로 전체 후보 풀 또는 검색기의 필수 조건 인터페이스가 필요하다.
+기하 후보와 의미 score는 계속 분리하고 refine_allowed=false를 유지한다.
+현재 v4는 임시 검색기 실험이며 285의 worktree/태그/BVH를 수정하거나 별도의 운영 검색기로 배포하지 않는다.
 후속: 관점별 몸 배치, 좌우 팔·다리 구분, 작가 판정이 있는 다른 동작 홀드아웃이 필요하다.

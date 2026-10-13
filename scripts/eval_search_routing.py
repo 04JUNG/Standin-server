@@ -193,7 +193,8 @@ def _routed_top5(result, index):
     record = result.person_routing[index] if index < len(result.person_routing) else None
     if record and record["route"] == "semantic":
         hits = result.person_semantic_candidates[index] or []
-        return [{"pose_id": h["pose_id"], "view": "front", "score": h["score"]}
+        return [{"pose_id": h["pose_id"], "view": h.get("pose", {}).get("view", "front"), "score": h["score"],
+                 **({"preview_camera": h["pose"]["preview_camera"]} if h.get("pose", {}).get("preview_camera") else {})}
                 for h in hits[:5]]
     return _top5(result, index)
 
@@ -417,6 +418,8 @@ def _write_html(args, results):
         for cand in cands:
             src = thumb(cand["pose_id"], cand.get("view", "front"))
             label = f"{cand['pose_id'][:22]}<br>{key}={cand.get(key)}"
+            if cand.get("preview_camera"):
+                label += "<br>기존 yaw 썸네일 · pitch 미적용"
             cells.append(f"<figure><img src='{src}' loading='lazy'><figcaption>{label}"
                          f"</figcaption></figure>" if src else f"<figure>{label}</figure>")
         return "".join(cells) or "<span class=muted>후보 없음</span>"

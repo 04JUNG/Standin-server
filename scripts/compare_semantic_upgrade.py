@@ -109,12 +109,13 @@ def _write_reranked(args, data, rows, backend):
             if route == "semantic" and updated:
                 hits = updated["new"]
                 person["semantic_candidates"] = hits
-                person["routed_top5"] = [{"pose_id": h["pose_id"], "view": "front", "score": h["score"]}
+                person["routed_top5"] = [{"pose_id": h["pose_id"], "view": h.get("pose", {}).get("view", "front"), "score": h["score"],
+                                         **({"preview_camera": h["pose"]["preview_camera"]} if h.get("pose", {}).get("preview_camera") else {})}
                                          for h in hits]
                 person["routing"]["search"].update({
                     "backend": backend, "status": updated["new_status"],
                     "top": [{"pose_id": h["pose_id"], "score": h["score"]} for h in hits],
-                    "reason": None if hits else "no_pose_above_min_score",
+                    "reason": None if hits else updated.get("new_reason", "no_pose_above_min_score"),
                 })
                 person["routing"]["elapsed_ms"].pop("semantic_search_ms", None)
             semantic = (person.get("routing") or {}).get("semantic_evidence") or {}

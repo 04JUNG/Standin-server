@@ -72,6 +72,8 @@ class SemanticQuery:
     body_details: str = ""
     body_observations: dict = field(default_factory=dict)
     min_body_matches: int = 2
+    # View wording is used only for semantic preview, never geometry/refine.
+    context_evidence: str = ""
 
     @classmethod
     def from_description(cls, description, generic_postures=("standing",),
@@ -85,6 +87,7 @@ class SemanticQuery:
             body_details=description.body_details or "",
             body_observations=dict(getattr(description, "body_observations", {}) or {}),
             min_body_matches=int(min_body_matches),
+            context_evidence=getattr(description, "context_evidence", "") or "",
         )
 
     def to_dict(self) -> dict:
@@ -137,11 +140,15 @@ class TagSemanticSearcher:
     backend = "tag-v2-body-grounded-interim"
 
     def __init__(self, records: Iterable[dict], *, library_pose_ids: Optional[set] = None,
-                 min_score: float = 3.0, body_metadata: Optional[dict] = None):
+                 min_score: float = 3.0, body_metadata: Optional[dict] = None,
+                 shape_metadata: Optional[dict] = None):
         self.min_score = float(min_score)
         self.body_metadata = body_metadata or {}
         if self.body_metadata:
             self.backend = "tag-v3-bvh-body-interim"
+        self.shape_metadata = shape_metadata or {}
+        if self.shape_metadata:
+            self.backend = "tag-v4-critical-shapes-interim"
         self._poses = []
         for record in records:
             pose_id = record.get("pose_id")
@@ -165,6 +172,7 @@ class TagSemanticSearcher:
 
     @classmethod
     def from_file(cls, path: str, *, body_index_path: Optional[str] = None,
+                  shape_index_path: Optional[str] = None,
                   **kwargs) -> "TagSemanticSearcher":
         with open(path, encoding="utf-8") as handle:
             data = json.load(handle)
@@ -174,6 +182,9 @@ class TagSemanticSearcher:
         if body_index_path:
             from .semantic_body_index import load_body_index
             kwargs["body_metadata"] = load_body_index(body_index_path, records)
+        if shape_index_path:
+            from .semantic_shapes import load_shape_index
+            kwargs["shape_metadata"] = load_shape_index(shape_index_path, records)
         return cls(records, **kwargs)
 
     def __len__(self) -> int:
@@ -189,8 +200,17 @@ class TagSemanticSearcher:
                 backend=self.backend, elapsed_ms=(perf_counter() - started) * 1000.0)
         status = "ok" if hits else "no_result"
         return SemanticSearchResult(
-            status, hits=hits, reason=None if hits else "no_pose_above_min_score",
+            status, hits=hits, reason=None if hits else self._empty_reason(query),
             backend=self.backend, elapsed_ms=(perf_counter() - started) * 1000.0)
+
+    def _empty_reason(self, query):
+        if self.shape_metadata:
+            from .semantic_shapes import critical_relations
+            required = critical_relations(query)
+            if required:
+                return "critical_pose_combination_unverified:" + "+".join(
+                    sorted(required) + sorted(set(query.postures) - set(query.generic_postures)))
+        return "no_pose_above_min_score"
 
     def _rank(self, query: SemanticQuery, top_k: int) -> list[SemanticHit]:
         if not self._poses or top_k <= 0:
@@ -200,6 +220,13 @@ class TagSemanticSearcher:
         shape_actions = wanted["actions"] - set(query.generic_actions)
         query_grams = _bigrams(query.body_details + " " + query.text)
         observed = query_observations(query.body_details, query.body_observations)
+        required = set()
+        if self.shape_metadata:
+            from .semantic_shapes import critical_relations, camera_hint, choose_camera
+            required = critical_relations(query)
+            if required:
+                # A crossed arm is not overhead; a V is more specific than 'spread'.
+                observed.pop("arms", None)
         explicit = validated_observations(query.body_observations)
         # Body measurements cannot disambiguate a weak query. Require distinctive
         # cues in attributes actually measured by v1 (no forward/backward torso).
@@ -210,7 +237,18 @@ class TagSemanticSearcher:
         use_measured = specific_observation_count(reliable_intrinsic) >= max(1, query.min_body_matches)
         scored = []
         for pose_id, tags, grams, record, text, body in self._poses:
-            measured = self.body_metadata.get(pose_id) if use_measured else None
+            selected_camera = None
+            if required:
+                profile = self.shape_metadata.get(pose_id)
+                if profile is None or not all(profile["relations"].get(k) is True for k in required):
+                    continue
+                # Do not substitute standing arms for a requested seated whole pose.
+                if shape_postures and not tags["postures"] & shape_postures:
+                    continue
+                selected_camera = choose_camera(profile, required, camera_hint(query))
+                if selected_camera is None:
+                    continue
+            measured = self.body_metadata.get(pose_id) if use_measured or required else None
             if measured is not None:
                 # Measurement's unknown is neutral; never fill it with a text guess.
                 body = dict(measured["observations"])
@@ -221,17 +259,18 @@ class TagSemanticSearcher:
             body_supported = (specific_observation_count(observed) >= query.min_body_matches
                               and len(detail["matched"]) >= query.min_body_matches)
             if not ((tags["postures"] & shape_postures)
-                    or (tags["actions"] & shape_actions) or body_supported):
+                    or (tags["actions"] & shape_actions) or body_supported or required):
                 continue
             # Multiple speculative actions and generic standing cannot pile up score.
-            action_weight = (_GROUNDED_ACTION_WEIGHT if self.body_metadata and use_measured
+            action_weight = (_GROUNDED_ACTION_WEIGHT if self.body_metadata and (use_measured or required)
                              else _WEIGHTS["actions"])
             shape_score = (action_weight * bool(tags["actions"] & shape_actions)
                            + _WEIGHTS["postures"] * bool(tags["postures"] & shape_postures))
             context_score = min(_CONTEXT_MAX_SCORE, sum(
                 _WEIGHTS[name] * len(values) for name, values in matched.items()
                 if name not in ("postures", "actions")))
-            score = shape_score + context_score + detail["reward"] - detail["penalty"]
+            relation_score = 4.0 * len(required)
+            score = shape_score + context_score + detail["reward"] - detail["penalty"] + relation_score
             text_overlap = 0.0
             if query_grams and grams:
                 text_overlap = len(query_grams & grams) / float(len(query_grams | grams))
@@ -249,11 +288,24 @@ class TagSemanticSearcher:
                     "text": round(_TEXT_WEIGHT * text_overlap, 4),
                 },
             }
+            if required:
+                explanation["critical_relations"] = {"required": sorted(required), "verified": sorted(required),
+                                                      "source": "reviewed_action+BVH" if "fold_arms" in required else "BVH_body_relative"}
+                explanation["score_components"]["critical_relations"] = relation_score
+                explanation["camera_comparison"] = {
+                    "selected": selected_camera["camera"],
+                    "hint": camera_hint(query), "kind": "qualitative_visibility_not_pixel_fit",
+                    "hint_satisfied": (camera_hint(query) is None or
+                        (selected_camera["camera"]["pitch_deg"] > 0 if camera_hint(query)=="high_angle"
+                         else selected_camera["camera"]["pitch_deg"] < 0)),
+                    "default_front": self.shape_metadata[pose_id]["views"][0],
+                    "selected_evidence": selected_camera,
+                }
             if self.body_metadata:
                 explanation["body_index_usage"] = {
-                    "query_eligible": use_measured,
+                    "query_eligible": bool(use_measured or required),
                     "reason": ("measured" if measured is not None else
-                               "pose_metadata_missing" if use_measured else
+                               "pose_metadata_missing" if use_measured or required else
                                "insufficient_intrinsic_query_observations"),
                     "action_weight": action_weight,
                 }
@@ -278,6 +330,9 @@ class TagSemanticSearcher:
                     "groups": record.get("groups") or {},
                     "status": record.get("status"),
                     "bvh_url": f"/pose/{pose_id}/bvh",
+                    **({"preview_camera": matched["camera_comparison"]["selected"],
+                        "view": matched["camera_comparison"]["selected"]["view"]}
+                       if "camera_comparison" in matched else {}),
                 },
             ))
             if len(hits) >= top_k:
@@ -299,12 +354,20 @@ class UnavailableSemanticSearcher:
 
 def build_semantic_searcher(path: Optional[str] = None, *,
                             library_pose_ids: Optional[set] = None,
-                            body_index_path: Optional[str] = None):
+                            body_index_path: Optional[str] = None,
+                            shape_index_path: Optional[str] = None):
     """env SEMANTIC_TAGS_PATH(기본 data/search-v2.json)에서 임시 검색기를 만든다."""
     path = path or os.getenv("SEMANTIC_TAGS_PATH", "data/search-v2.json")
     body_index_path = body_index_path or os.getenv("SEMANTIC_BODY_INDEX_PATH")
+    shape_index_path = shape_index_path or os.getenv("SEMANTIC_SHAPE_INDEX_PATH")
     try:
-        if body_index_path:
+        if shape_index_path:
+            # Fail closed for an explicitly requested critical index; no silent
+            # return to the old ranking that dropped the required arm relation.
+            searcher = TagSemanticSearcher.from_file(path, library_pose_ids=library_pose_ids,
+                                                     body_index_path=body_index_path,
+                                                     shape_index_path=shape_index_path)
+        elif body_index_path:
             try:
                 searcher = TagSemanticSearcher.from_file(
                     path, library_pose_ids=library_pose_ids, body_index_path=body_index_path)

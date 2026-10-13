@@ -605,3 +605,18 @@ score_components를 추가로 포함할 수 있다. 미관측 속성은 중립�
 러프에서 좌표·각도를 생성한 값이 아니며 기하 피처/distance/refine에는 입력하지 않는다.
 불충분한 intrinsic 관찰은 기존 문장 검색을 유지하고, 색인 누락·버전/코퍼스 불일치·손상은
 경고 로그와 함께 v2로 폴백한다. 새 색인은 기본 비활성이고 외부 응답 형태는 그대로다.
+
+선택적 핵심 관계 색인(v4): `SEMANTIC_SHAPE_INDEX_PATH`를 명시하면
+backend=`tag-v4-critical-shapes-interim`이다. 명확한 `fold_arms` 또는 양팔 V자
+쿼리는 해당 관계가 검증된 후보만 반환한다. 명시한 비일반 자세(예: sitting)도 일치해야 한다.
+검증 후보 없음은 `no_result`, reason=`critical_pose_combination_unverified:<관계+자세>`이며
+라이브러리 전체의 실제 부재를 증명하는 값은 아니다. 색인 손상·누락은 `error`이고
+핵심 조건을 놓친 이전 검색기로 조용히 폴백하지 않는다.
+
+`matched.critical_relations`는 required·verified·근거 source를 담는다.
+`matched.camera_comparison`은 24개 정사영 시점 중 관계의 가시성을 비교한 진단이며
+`kind=qualitative_visibility_not_pixel_fit`이다. `pose.preview_camera`의 yaw_deg·pitch_deg·roll_deg는
+**라이브러리 BVH 미리보기 카메라** 설정이고 러프에서 추정한 관절 각도나 포즈 수정값이 아니다.
+기존 `pose.view`는 yaw 라벨만 나타내므로 기존 4방향 JPG만으로 pitch 적용 결과를 표시하면 안 된다.
+BVH·기하 후보·distance·refine은 바뀌지 않는다. 몸 기준 V 관계와 화면에서 보이는 V 관계는
+구별한다. 위/아래에서 보는 단서가 문장에 명시되지 않으면 러프와 같은 시점이라고 보장하지 않는다.
