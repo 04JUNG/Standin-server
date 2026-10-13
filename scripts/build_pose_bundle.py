@@ -38,6 +38,7 @@ import sys
 import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT = Path(__file__).resolve().parents[1]
 
 if sys.platform == "win32":
     for _stream in (sys.stdout, sys.stderr):
@@ -51,8 +52,12 @@ from scripts.pose_bundle_policy import converter_profile, privacy_findings, sani
 from src.library_manifest import (
     LEGACY_VERSION,
     SKIP_NAMES,
+    SEMANTIC_DIR,
+    SEMANTIC_TAGS,
+    SEMANTIC_TAXONOMY,
     LibraryManifestError,
     build_manifest,
+    semantic_files_sha256,
     content_sha256,
     read_manifest,
     sha256_file,
@@ -108,7 +113,7 @@ def _parent_of(source_dir: Path, fallback_version: str) -> dict:
 
 
 def _finish(out: Path, *, parent: dict, curation: dict, replay_gate: dict,
-            compat: dict, content: str | None = None) -> dict:
+            compat: dict, content: str | None = None, semantic: dict | None = None) -> dict:
     """배포 검증기를 manifest 없이 돌리고, 통과하면 manifest를 쓴다.
 
     `content`는 방금 계산한 out의 내용 해시다. 작은 파일 수천 개를 Windows에서 거듭
@@ -128,6 +133,8 @@ def _finish(out: Path, *, parent: dict, curation: dict, replay_gate: dict,
         compat=compat,
         content=content,
     )
+    if semantic:
+        manifest["semantic"] = semantic
     write_manifest(out, manifest)
     # 내용 해시는 build_manifest가 방금 같은 폴더로 정했다. 여기서는 형식·DB 해시만 본다.
     verify_manifest(out, manifest, check_content=False)
@@ -145,7 +152,7 @@ def _print_done(out: Path, manifest: dict) -> None:
 
 
 # ── baseline ──────────────────────────────────────────────────────────
-_PAYLOAD = ("poses.db", "bvh", "thumbs", "ATTRIBUTION.md")
+_PAYLOAD = ("poses.db", "bvh", "thumbs", "ATTRIBUTION.md", SEMANTIC_DIR)
 
 
 def build_baseline(source: Path, out: Path, *, parent_version: str = LEGACY_VERSION,
@@ -161,6 +168,7 @@ def build_baseline(source: Path, out: Path, *, parent_version: str = LEGACY_VERS
 
         _safe_extract(source, out)
         parent_manifest = read_manifest(out)
+        source_manifest = parent_manifest
         for child in list(out.iterdir()):
             if child.name not in _PAYLOAD:
                 shutil.rmtree(child) if child.is_dir() else child.unlink()
@@ -181,6 +189,7 @@ def build_baseline(source: Path, out: Path, *, parent_version: str = LEGACY_VERS
                 shutil.copy2(origin, out / name)
         content = content_sha256(out)
         parent = _parent_of(source, parent_version)
+        source_manifest = read_manifest(source)
         if parent["content_sha256"] != content:
             raise BundleError("복사한 내용이 원본과 다릅니다(원본 번들이 바뀌는 중일 수 있습니다)")
     else:
@@ -188,10 +197,15 @@ def build_baseline(source: Path, out: Path, *, parent_version: str = LEGACY_VERS
 
     curation = {"mode": "baseline",
                 "source_sha256": sha256_file(source) if source.is_file() else None}
+    # 시맨틱 태그는 바이트 그대로 옮겼고 DB도 같으므로 원본의 검증 기록을 이어받는다.
+    semantic = (source_manifest or {}).get("semantic") if (out / SEMANTIC_DIR).exists() else None
+    if (out / SEMANTIC_DIR).exists() and not semantic:
+        shutil.rmtree(out / SEMANTIC_DIR)  # 기록 없는 태그는 들고 가지 않는다(attach-semantic으로 다시)
     return _finish(out, parent=parent, curation=curation,
                    replay_gate={"status": "not_required",
                                 "reason": "baseline: content identical to parent"},
-                   compat={"status": "passed", "excluded": []}, content=content)
+                   compat={"status": "passed", "excluded": []}, content=content,
+                   semantic=semantic)
 
 
 # ── curated ───────────────────────────────────────────────────────────
@@ -441,6 +455,51 @@ def build_curated(curated_db: Path, curation_dir: Path, base_source: Path, out: 
                    replay_gate={"status": "not_run"}, compat=compat)
 
 
+# ── attach-semantic ───────────────────────────────────────────────────
+def attach_semantic(bundle: Path, tags: Path, taxonomy: Path, *,
+                    lexicon: Path | None = None) -> dict:
+    """04J-284 태그 v2를 번들 `semantic/`에 넣고 manifest.semantic에 검증 결과를 남긴다.
+
+    `library_version`·`content_sha256`·재생 게이트는 바뀌지 않는다(태그는 기하 검색과 무관).
+    서버와 같은 로더(`SemanticIndex.load`)로 검증한다: 태그의 source_db_sha256이 번들 DB와
+    같은지, 태그의 pose_id가 모두 DB에 있는지, 어휘·사전이 맞는지.
+    """
+    from src.semantic_search import SemanticIndex, SemanticSearchError
+
+    manifest = verify_manifest(bundle, check_semantic=False)
+    lexicon = lexicon or ROOT / "config" / "semantic_lexicon.v1.json"
+    try:
+        index = SemanticIndex.load(tags_path=str(tags), taxonomy_path=str(taxonomy),
+                                   lexicon_path=str(lexicon), db_path=str(bundle / "poses.db"),
+                                   verify_db_sha256=True)
+    except SemanticSearchError as exc:
+        raise BundleError(f"시맨틱 태그 검증 실패({exc.code}): {exc.message} {exc.detail or ''}") from exc
+    target = bundle / SEMANTIC_DIR
+    target.mkdir(exist_ok=True)
+    shutil.copy2(tags, target / SEMANTIC_TAGS)
+    shutil.copy2(taxonomy, target / SEMANTIC_TAXONOMY)
+    con = sqlite3.connect((bundle / "poses.db").resolve().as_uri() + "?mode=ro", uri=True)
+    try:
+        db_ids = {row[0] for row in con.execute("SELECT pose_id FROM poses")}
+    finally:
+        con.close()
+    tagged = set(index.pose_records) & {d.pose_id for d in index.docs}
+    manifest["semantic"] = {
+        "status": "passed",
+        "files": semantic_files_sha256(bundle),
+        "source_db_sha256": index.identity["db_sha256"],
+        "tags_version": index.identity["tags_version"],
+        "lexicon_version": index.identity["lexicon_version"],
+        "lexicon_skipped_keys": index.identity["lexicon_skipped_keys"],
+        "tagged_poses": len(tagged),
+        "untagged_poses": len(db_ids - tagged),
+        "recorded_at": datetime.now(timezone.utc).isoformat(),
+    }
+    write_manifest(bundle, manifest)
+    verify_manifest(bundle, manifest, check_content=False)
+    return manifest
+
+
 # ── record-gate ───────────────────────────────────────────────────────
 def record_gate(bundle: Path, report_path: Path) -> dict:
     """재생 게이트 보고서(JSON)의 결과를 manifest에 남긴다. 번들 내용·버전은 바뀌지 않는다."""
@@ -487,6 +546,12 @@ def main() -> int:
                          help="사용자 식별자를 포함한 포즈를 로컬 검수에만 남기고 번들에서는 제외")
     curated.add_argument("--force", action="store_true")
 
+    sem = sub.add_parser("attach-semantic",
+                         help="자연어 검색 태그(search-v2.json·taxonomy)를 번들에 넣는다")
+    sem.add_argument("--bundle", required=True)
+    sem.add_argument("--tags", required=True, help="pose-library-viewer dist/data/search-v2.json")
+    sem.add_argument("--taxonomy", required=True, help="dist/data/search-taxonomy-v2.json")
+
     gate = sub.add_parser("record-gate", help="재생 게이트 결과를 manifest에 기록")
     gate.add_argument("--bundle", required=True)
     gate.add_argument("--report", required=True)
@@ -509,6 +574,11 @@ def main() -> int:
             if manifest["compat"]["excluded"]:
                 print(f"  배포 조건에 따라 뺀 포즈 {len(manifest['compat']['excluded'])}개"
                       " (manifest.compat.excluded)")
+        elif args.command == "attach-semantic":
+            manifest = attach_semantic(Path(args.bundle), Path(args.tags), Path(args.taxonomy))
+            sem_info = manifest["semantic"]
+            print(f"semantic 태그 연결: {sem_info['tagged_poses']}개 포즈"
+                  f" (태그 없음 {sem_info['untagged_poses']}) · {manifest['library_version']} 그대로")
         else:
             manifest = record_gate(Path(args.bundle), Path(args.report))
             print(f"replay_gate = {manifest['replay_gate']['status']} "

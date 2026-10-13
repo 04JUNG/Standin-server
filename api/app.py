@@ -51,6 +51,8 @@ from src.pose_model_source import PoseModelFetchError, ensure_pose_model
 from src.refine import (REFINE_CODE_VERSION, REFINE_V2_CODE_VERSION,
                         refine_bvh)
 from src.refine_policy import structural_refine_allowed
+from src.semantic_search import (STATUS_ERROR, ErrorCode, SemanticSearchService,
+                                 settings_from_config as semantic_settings_from_config)
 from src.pose_catalog import build_catalog, folders as pose_catalog_folders, page as pose_catalog_page
 from src.pose_quarantine import (load_pose_quarantine, pose_quarantine_sha256,
                                  quarantine_record)
@@ -73,7 +75,8 @@ from src.runtime_guard import (
 from api.models import (CutResultOut, PersonOut, CandidateOut, SkeletonOut,
                         ImageInfoOut, InferenceMetadataOut,
                         RefineRequest, RefineResponse, RefineThumbnailOut,
-                        ExportOrderRequest, ExportOrder, ExportItem)
+                        ExportOrderRequest, ExportOrder, ExportItem,
+                        SemanticSearchRequest, SemanticSearchResponse)
 from api.candidate_presentation import candidate_camera, refine_in_camera
 
 # uvicorn이 자기 로깅을 세운 뒤 이 모듈을 import한다. 여기서 덮어써야 로그가
@@ -246,6 +249,8 @@ async def lifespan(app: FastAPI):
                  requestedPose=CFG.pose_backend, actualPose=actual_pose)
 
     quarantine = load_pose_quarantine(CFG)      # 정책 파일 오류는 기동 시 fail-closed
+    semantic = _load_semantic(pipeline, library_identity)
+    STATE["semantic"] = semantic
     STATE["thumbnail_renderer"] = thumbnail_renderer
     STATE["quarantined_pose_count"] = len(quarantine)
     STATE["pipeline"] = pipeline
@@ -277,6 +282,29 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Standin Pose Pipeline", version="0.2.1", lifespan=lifespan)
+
+
+def _load_semantic(pipeline: Pipeline, library_identity: dict) -> SemanticSearchService:
+    """시맨틱 색인을 1회 올린다. 실패해도 기동은 계속한다(기하 검색과 독립).
+
+    SEMANTIC_REQUIRED=1이면 /healthz가 준비 실패를 unhealthy로 보고한다. 색인 대상은
+    기하 검색이 쓰는 `pipeline.entries`의 pose_id로 제한해 격리 포즈가 똑같이 빠진다.
+    """
+    allowed = {entry.pose_id for entry in pipeline.entries}
+    service = SemanticSearchService.from_config(
+        CFG, db_path=DB_PATH, allowed_pose_ids=allowed,
+        library_version=(library_identity or {}).get("version"),
+    )
+    if service.ready:
+        log_info("semantic", "시맨틱 색인 준비 완료", poseCount=service.index.pose_count,
+                 encoder=service.index.identity["encoder"],
+                 tagsVersion=service.index.identity["tags_version"])
+    else:
+        emit = log_warn if CFG.semantic_enabled else log_info
+        emit("semantic", "시맨틱 색인 없음 — /semantic-search는 error로 답한다",
+             errorCode=service.load_error.code if service.load_error else None,
+             detail=(service.load_error.message if service.load_error else "")[:300])
+    return service
 
 
 def _refine_capability() -> dict:
@@ -407,7 +435,12 @@ def healthz():
     # ECS/ALB가 이 응답으로 태스크 교체를 판단한다.
     pose_count = STATE.get("pose_count", 0)
     capability = _refine_capability()
+    semantic = STATE.get("semantic")
+    semantic_health = semantic.health() if semantic else {"ready": False,
+                                                           "error_code": ErrorCode.INDEX_NOT_LOADED}
     ok = "pipeline" in STATE and pose_count > 0 and capability["config_valid"]
+    if CFG.semantic_required and not semantic_health["ready"]:
+        ok = False
     body = {
         "ok": ok,
         "env": CFG.app_env,
@@ -418,6 +451,7 @@ def healthz():
         # 어느 번들이 떠 있는지: version·source(manifest|env)·content_sha256·db_sha256
         "pose_library": STATE.get("pose_library"),
         "refine": capability,
+        "semantic": {**semantic_health, "required": bool(CFG.semantic_required)},
         "refine_thumbnail": {
             "renderer": getattr(STATE.get("thumbnail_renderer"), "name", None),
             "configured": CFG.thumbnail_renderer,
@@ -671,6 +705,66 @@ def list_poses(source: str = "", category: str = "", q: str = "", cursor: str = 
         raise HTTPException(400, "limit must be between 1 and 96")
     return pose_catalog_page(_pose_catalog(), source=source or None, category=category or None,
                              query=q or None, cursor=cursor or None, limit=limit)
+
+
+def _log_semantic(req: SemanticSearchRequest, result: dict) -> None:
+    """요청 1건 = 로그 1줄. 원문은 사용자 입력이라 기본으로 남기지 않는다(SEMANTIC_LOG_QUERY_TEXT=1).
+
+    라이브러리 공백 분석에 쓰는 것은 상태·점수·태그 개념(어휘 값)·모르는 단어 수다.
+    """
+    query = result.get("query") or {}
+    candidates = result.get("candidates") or []
+    near = result.get("near_misses") or []
+    fields = dict(
+        status=result["status"], source=req.source,
+        errorCode=(result.get("error") or {}).get("code", "").upper() or None,
+        candidateCount=len(candidates),
+        topScore=(candidates[0]["score"] if candidates else (near[0]["score"] if near else None)),
+        topPoseId=candidates[0]["pose_id"] if candidates else None,
+        concepts=[t["value"] for c in query.get("concepts", []) for t in c.get("tags", [])][:20],
+        tagCount=len(req.tags or []),
+        unknownWordCount=len(query.get("unknown_words", [])),
+        queryChars=len(req.query or ""),
+        durationMs=result.get("elapsed_ms"),
+    )
+    if CFG.semantic_log_query_text:
+        fields["queryText"] = (req.query or "")[:200]
+        fields["unknownWords"] = query.get("unknown_words", [])[:10]
+    emit = log_warn if result["status"] == STATUS_ERROR else log_info
+    emit("semantic_search", "", **fields)
+
+
+#: error.code → HTTP 상태. 본문은 상태와 무관하게 SemanticSearchResponse 하나다.
+_SEMANTIC_HTTP_STATUS = {
+    ErrorCode.INVALID_QUERY: 422,
+    ErrorCode.INVALID_SOURCE: 422,
+    ErrorCode.INVALID_TAGS: 422,
+    ErrorCode.INDEX_NOT_LOADED: 503,
+    ErrorCode.INDEX_LOAD_FAILED: 503,
+    ErrorCode.INDEX_VERSION_MISMATCH: 503,
+    ErrorCode.INDEX_INCONSISTENT: 503,
+    ErrorCode.ENCODER_FAILED: 503,
+}
+
+
+@app.post("/semantic-search", response_model=SemanticSearchResponse,
+          response_model_by_alias=True)
+def semantic_search_route(req: SemanticSearchRequest):
+    """자연어 → 기존 라이브러리 포즈 Top-K + 포즈 JSON(04J-285).
+
+    ok·no_result는 200. error는 원인별 4xx/5xx이며 본문 형식은 같다(``error.code``로 분기).
+    기하 검색(/analyze)과 독립이고 refine 대상이 아니다(``refine_allowed=false``).
+    """
+    service = STATE.get("semantic")
+    if service is None:
+        service = SemanticSearchService(None, semantic_settings_from_config(CFG))
+    result = service.search(req.query, source=req.source, top_k=req.top_k, tags=req.tags or None)
+    _log_semantic(req, result)
+    if result["status"] == STATUS_ERROR:
+        code = result["error"]["code"]
+        return JSONResponse(status_code=_SEMANTIC_HTTP_STATUS.get(code, 500),
+                            content=SemanticSearchResponse(**result).model_dump(by_alias=True))
+    return result
 
 
 @app.get("/pose/{pose_id}/thumbnail")

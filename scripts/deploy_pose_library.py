@@ -86,7 +86,7 @@ PROFILE = os.getenv("AWS_PROFILE", "standin-inference")
 # poses.db와 어긋난 오래된 pickle이 번들에 섞인다.
 BUNDLE_DB = "poses.db"
 BUNDLE_OPTIONAL = [MANIFEST_NAME, "ATTRIBUTION.md"]
-BUNDLE_DIRS = ["bvh", "thumbs"]
+BUNDLE_DIRS = ["bvh", "thumbs", "semantic"]  # semantic/: 04J-285 자연어 검색 태그(선택)
 _SKIP_NAMES = {"__pycache__", ".DS_Store", "Thumbs.db"}
 DEFAULT_LOG = Path("data") / "deploys.jsonl"
 
@@ -112,7 +112,8 @@ def _fail(label: str, detail: str) -> None:
 # ── 1. 검증 ────────────────────────────────────────────────────────────
 def validate(data_dir: Path, allow_missing_thumbs: bool = False, *,
              allow_no_manifest: bool = False,
-             skip_gate_reason: str | None = None) -> dict:
+             skip_gate_reason: str | None = None,
+             require_semantic: bool = False) -> dict:
     """서버가 기동 시 실제로 요구하는 조건과, 번들에 들어가면 안 되는 것을 검사한다.
 
     각 항목은 서버 코드의 어느 지점이 그것을 강제하는지 대응된다. 여기서 막지 못하면
@@ -135,7 +136,37 @@ def validate(data_dir: Path, allow_missing_thumbs: bool = False, *,
     finally:
         con.close()
     summary["manifest"] = _check_manifest(data_dir, allow_no_manifest, skip_gate_reason)
+    summary["semantic"] = _check_semantic(data_dir, summary["manifest"], require_semantic)
     return summary
+
+
+def _check_semantic(data_dir: Path, manifest: dict | None, required: bool) -> dict | None:
+    """semantic/ 태그가 있으면 서버와 같은 로더로 올려 본다. 없으면 /semantic-search만 503.
+
+    manifest 해시·DB 일치는 _check_manifest(verify_manifest)가 이미 봤다. 여기서는 실제로
+    색인이 올라가는지(어휘·ID 정합성)를 확인한다.
+    """
+    sem_dir = data_dir / "semantic"
+    if not sem_dir.is_dir():
+        if required:
+            _fail("semantic", "없음(--require-semantic)")
+            raise DeployError(
+                "semantic/ 태그가 없습니다. → python scripts/build_pose_bundle.py attach-semantic --help")
+        print(f"      {_pad('semantic', 16)} {_pad('없음 — /semantic-search는 503', 38)} SKIP")
+        return None
+    from src.semantic_search import SemanticIndex, SemanticSearchError
+
+    try:
+        index = SemanticIndex.load(
+            tags_path=str(sem_dir / "search-v2.json"),
+            taxonomy_path=str(sem_dir / "search-taxonomy-v2.json"),
+            lexicon_path=str(Path(__file__).resolve().parents[1] / "config" / "semantic_lexicon.v1.json"),
+            db_path=str(data_dir / BUNDLE_DB), verify_db_sha256=True)
+    except SemanticSearchError as exc:
+        _fail("semantic", exc.code)
+        raise DeployError(f"시맨틱 색인이 올라가지 않습니다: {exc.message}") from exc
+    _ok("semantic", f"{index.pose_count}개 · 사전 {index.identity['lexicon_version']}")
+    return {"pose_count": index.pose_count, "tags_sha256": index.identity["tags_sha256"]}
 
 
 def _validate_db(con: sqlite3.Connection, data_dir: Path, allow_missing_thumbs: bool) -> dict:
@@ -369,7 +400,7 @@ def _check_manifest(data_dir: Path, allow_missing: bool,
 
 # ── 2. 압축 ────────────────────────────────────────────────────────────
 def make_archive(data_dir: Path, out_path: Path) -> int:
-    """번들 루트에 poses.db · library_manifest.json · ATTRIBUTION.md · bvh/ · thumbs/ 를
+    """번들 루트에 poses.db · library_manifest.json · ATTRIBUTION.md · bvh/ · thumbs/ · semantic/ 를
     담는다(`tar -C data`와 동일). index.pkl은 서버가 읽지 않으므로 넣지 않는다.
 
     tar CLI 대신 tarfile을 쓴다 — Git Bash에서 'C:/...' 경로를 원격 호스트로 오인하는
@@ -467,7 +498,8 @@ def cmd_deploy(args) -> None:
     print(f"[1/5] 번들 검증              ({data_dir})")
     summary = validate(data_dir, args.allow_missing_thumbs,
                        allow_no_manifest=args.allow_no_manifest,
-                       skip_gate_reason=args.reason if args.skip_gate else None)
+                       skip_gate_reason=args.reason if args.skip_gate else None,
+                       require_semantic=args.require_semantic)
     manifest = summary.get("manifest") or {}
     if (data_dir / "index.pkl").is_file():
         print("      index.pkl은 번들에 넣지 않습니다(서버가 읽지 않음).")
@@ -482,6 +514,7 @@ def cmd_deploy(args) -> None:
         "action": "deploy",
         "library_version": manifest.get("library_version"),
         "content_sha256": manifest.get("content_sha256"),
+        "semantic_tags_sha256": (summary.get("semantic") or {}).get("tags_sha256"),
         "skip_gate_reason": args.reason if args.skip_gate else None,
     }
     with tempfile.TemporaryDirectory() as tmp:
@@ -555,6 +588,8 @@ def main() -> int:
                    help="검증만 하고 업로드하지 않는다")
     p.add_argument("--rollback", action="store_true",
                    help="S3의 직전 번들로 되돌리고 재기동한다")
+    p.add_argument("--require-semantic", action="store_true",
+                   help="semantic/ 태그가 없으면 실패(SEMANTIC_REQUIRED=1 운영용)")
     p.add_argument("--allow-missing-thumbs", action="store_true",
                    help="썸네일 누락을 실패로 보지 않는다(썸네일이 조용히 사라집니다)")
     p.add_argument("--timeout-min", type=int, default=10,

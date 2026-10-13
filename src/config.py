@@ -128,6 +128,50 @@ class Config:
         "REFINE_POSE_QUARANTINE_PATH", "config/refine_pose_quarantine.v1.json"
     )
 
+    # --- 시맨틱(자연어) 검색 — 04J-285, docs/SEMANTIC_SEARCH.md ---
+    # 기하 검색과 별개 경로다. 색인을 못 올려도 /analyze·/refine은 그대로 돈다
+    # (SEMANTIC_REQUIRED=1일 때만 /healthz가 unhealthy가 된다).
+    semantic_enabled: bool = _env_bool("SEMANTIC_ENABLED", True)
+    semantic_required: bool = _env_bool("SEMANTIC_REQUIRED", False)
+    # 04J-284 태깅 v2 산출물. 비우면 DATA_DIR/semantic/ 아래 기본 파일명을 쓴다.
+    semantic_tags_path: str = os.getenv("SEMANTIC_TAGS_PATH", "")
+    semantic_taxonomy_path: str = os.getenv("SEMANTIC_TAXONOMY_PATH", "")
+    semantic_lexicon_path: str = os.getenv(
+        "SEMANTIC_LEXICON_PATH", "config/semantic_lexicon.v1.json"
+    )
+    # 태그 파일의 source_db_sha256이 떠 있는 poses.db와 다르면 색인을 올리지 않는다.
+    semantic_verify_db_sha256: bool = _env_bool("SEMANTIC_VERIFY_DB_SHA256", True)
+    semantic_top_k: int = int(os.getenv("SEMANTIC_TOP_K", "5"))
+    semantic_max_top_k: int = int(os.getenv("SEMANTIC_MAX_TOP_K", "20"))
+    # 점수 0~1. 설정과 개발 평가의 한계는 docs/SEMANTIC_SEARCH.md에 설명한다.
+    semantic_min_score_user: float = float(os.getenv("SEMANTIC_MIN_SCORE_USER", "0.40"))
+    semantic_min_score_vlm: float = float(os.getenv("SEMANTIC_MIN_SCORE_VLM", "0.35"))
+    semantic_weight_concept: float = float(os.getenv("SEMANTIC_WEIGHT_CONCEPT", "0.55"))
+    semantic_weight_body: float = float(os.getenv("SEMANTIC_WEIGHT_BODY", "0.20"))
+    semantic_weight_text: float = float(os.getenv("SEMANTIC_WEIGHT_TEXT", "0.25"))
+    semantic_text_cos_ref: float = float(os.getenv("SEMANTIC_TEXT_COS_REF", "0.45"))
+    semantic_coverage_floor: float = float(os.getenv("SEMANTIC_COVERAGE_FLOOR", "0.45"))
+    # 라이브러리 어디에도 없는 쿼리 단어 비율 u → 점수 × (1-u)^power (라이브러리 공백 신호).
+    semantic_unknown_word_power: float = float(os.getenv("SEMANTIC_UNKNOWN_WORD_POWER", "1.0"))
+    # 상·하체 묘사 구절 안 동작어를 못 맞췄을 때의 감점 무게(모양은 body 성분이 잰다).
+    semantic_body_manner_miss_weight: float = float(
+        os.getenv("SEMANTIC_BODY_MANNER_MISS_WEIGHT", "0.5"))
+    semantic_text_only_factor: float = float(os.getenv("SEMANTIC_TEXT_ONLY_FACTOR", "0.75"))
+    # 원본·미러 쌍을 후보 하나로 묶는다(다른 쪽은 mirror_alternates로 남긴다).
+    semantic_collapse_mirrors: bool = _env_bool("SEMANTIC_COLLAPSE_MIRRORS", True)
+    # 문장 임베딩(dense) 성분 — src/semantic_embedding.py. 운영 기본은 꺼짐.
+    # 켜려면 SEMANTIC_DENSE_ENABLED=1 + SEMANTIC_WEIGHT_DENSE>0 + 모델 파일.
+    semantic_dense_enabled: bool = _env_bool("SEMANTIC_DENSE_ENABLED", False)
+    semantic_embedding_dir: str = os.getenv("SEMANTIC_EMBEDDING_DIR", "")
+    semantic_weight_dense: float = float(os.getenv("SEMANTIC_WEIGHT_DENSE", "0.0"))
+    semantic_dense_lo: float = float(os.getenv("SEMANTIC_DENSE_LO", "0.78"))
+    semantic_dense_hi: float = float(os.getenv("SEMANTIC_DENSE_HI", "0.90"))
+    # 요청 로그에 쿼리 원문·모르는 단어를 남길지. 사용자 입력이라 기본은 끈다.
+    semantic_log_query_text: bool = _env_bool("SEMANTIC_LOG_QUERY_TEXT", False)
+
+    # Explicit reviewed preferences are opt-in and do not generalize to new sentences.
+    semantic_review_preferences_path: str = os.getenv("SEMANTIC_REVIEW_PREFERENCES_PATH", "")
+
     # --- /refine 결과 썸네일 ---
     # 필드명이 refine_*가 아닌 이유: _refine_capability()가 refine_* 설정 전부를 실행
     # 정체성 해시에 넣는데, 썸네일은 조정 결과에 영향이 없으므로 그 해시에서 뺀다.

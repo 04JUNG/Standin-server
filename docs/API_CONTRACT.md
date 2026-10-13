@@ -576,3 +576,14 @@ Converter `/healthz`의 `preview_model_revision`과 `character_hashes`로 지원
 캐시 세대를 확인한다. exact V3.2.4 모드에서는 모델 capability가 꺼진다.
 모델 export용 모듈은 기존 `posed-mesh-v1` exporter와 분리하여 기존 사전 생성
 라이브러리의 키를 무효화하지 않는다. 배포 순서는 Converter/추론 → BFF → 앱이다.
+
+## POST /semantic-search
+
+직접 자연어 또는 검증된 태그로 기존 포즈 후보와 해당 JSON을 반환하는 별도 경로다.
+`ok`와 `no_result`는 200, `error`는 원인별 422/503/500이다. 후보 ID와 JSON ID가 같으며
+시맨틱 후보는 `refine_allowed=false`다. 요청·상태·근거·선호 재정렬은
+[SEMANTIC_SEARCH.md](SEMANTIC_SEARCH.md)가 정본이다.
+
+`/healthz.semantic`은 색인 정체성과 준비 상태를 표시한다. 준비 실패는 기본적으로 기존
+기하 서비스의 health를 막지 않고, `SEMANTIC_REQUIRED=1`일 때만 전체 unhealthy가 된다.
+이 변경은 `/analyze` 응답, VLM 호출, 동적 라우팅을 추가하지 않는다.
