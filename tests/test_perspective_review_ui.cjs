@@ -11,9 +11,11 @@ let activeBrowser;
   await page.goto(pathToFileURL(process.argv[2]).href);
   const frame=await page.locator('iframe').count()?page.frameLocator('iframe'):page;
   const root=frame.locator('#rough-perspective-review');
+  const recovered=process.argv[5]==='recovery';
   await root.locator('[data-query] option').last().waitFor({state:'attached'});
   assert.equal(await root.locator('[data-query] option').count(),10);
-  assert.equal(await root.locator('[data-query]').inputValue(),'rough_298');
+  assert.equal(await root.locator('[data-query]').inputValue(),recovered?'rough_178':'rough_298');
+  if(recovered)await root.locator('[data-query]').selectOption('rough_298');
   await root.locator('[data-input]').evaluate(im=>im.decode());
   for(const arm of ['before','after']){
     assert.equal(await root.locator(`[data-ranks="${arm}"] button`).count(),5);
@@ -34,9 +36,23 @@ let activeBrowser;
   await root.locator('[data-note]').fill('TEST ONLY · isolated context');
   assert.match(await root.locator('[data-progress]').textContent(),/1장 검수 완료/);
   await root.locator('[data-query]').selectOption('rough_178');
-  assert.match(await root.locator('[data-status]').textContent(),/검색 실패/);
+  assert.match(await root.locator('[data-status]').textContent(),recovered?/Before 추출 실패/:/검색 실패/);
   assert.equal(await root.locator('[data-image="before"]').isVisible(),false);
-  assert.equal(await root.locator('[data-rating-controls]').isVisible(),false);
+  assert.equal(await root.locator('[data-rating-controls]').isVisible(),recovered);
+  if(recovered){
+    await root.locator('[data-image="after"]').evaluate(im=>im.decode());
+    assert.equal(await root.locator('[data-ranks="after"] button').count(),5);
+    for(const id of ['rough_315','rough_288','rough_301','rough_291']){
+      await root.locator('[data-query]').selectOption(id);
+      assert.match(await root.locator('[data-label="after"]').textContent(),/실제 팔꿈치/);
+      for(const arm of ['before','after'])for(let i=0;i<5;i++){
+        await root.locator(`[data-ranks="${arm}"] button`).nth(i).click();
+        await root.locator(`[data-image="${arm}"]`).evaluate(im=>im.decode());
+      }
+      await root.locator('[data-ranks="after"] button').first().click();
+      await page.screenshot({path:`/private/tmp/standin-cues-${id}.png`,fullPage:true});
+    }
+  }
   await root.locator('[data-query]').selectOption('rough_298');
   assert.equal(await root.locator('[data-useful="after"]').inputValue(),'yes');
   assert.equal(await root.locator('[data-note]').inputValue(),'TEST ONLY · isolated context');
