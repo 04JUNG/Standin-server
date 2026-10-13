@@ -1,0 +1,4630 @@
+{
+  "version": "semantic-100-visual-review-v1",
+  "date": "2026-10-13",
+  "scope": "100개 입력의 1위 포즈 정면·측면을 모델이 직접 대조. Top-5 전체 정밀도나 사용자 검수/독립 검증이 아님. 이 입력집으로 개선했으므로 개발세트 성과다.",
+  "criteria": {
+    "match": "핵심 자세·행동이 일치하며 명백한 주요 조건 충돌 없음",
+    "partial": "행동 계열은 맞지만 단계·방향·신체 관계·대상·의도 중 주요 조건이 부족",
+    "wrong": "다른 행동/대상/자세가 1위",
+    "no_result": "임계값 이상 후보 없음. 실제 포즈 부재를 뜻하지 않음"
+  },
+  "summary": {
+    "baseline": {
+      "match": 40,
+      "partial": 22,
+      "wrong": 26,
+      "no_result": 12
+    },
+    "final": {
+      "match": 51,
+      "partial": 25,
+      "wrong": 14,
+      "no_result": 10
+    },
+    "baseline_status": {
+      "queries": 100,
+      "returned": 88,
+      "no_result": 12,
+      "errors": 0,
+      "latency_p50_ms": 13.185,
+      "latency_max_ms": 24.13,
+      "warning": "응답 상태는 정확도가 아니다. 시각 검토를 별도 기록한다."
+    },
+    "final_status": {
+      "queries": 100,
+      "returned": 90,
+      "no_result": 10,
+      "errors": 0,
+      "latency_p50_ms": 12.86,
+      "latency_max_ms": 29.47,
+      "warning": "응답 상태는 정확도가 아니다. 시각 검토를 별도 기록한다."
+    },
+    "by_category": {
+      "짧고 모호한 입력": {
+        "match": 10,
+        "partial": 0,
+        "wrong": 0,
+        "no_result": 0
+      },
+      "맨손 전투": {
+        "match": 2,
+        "partial": 6,
+        "wrong": 1,
+        "no_result": 1
+      },
+      "무기를 쓰는 장면": {
+        "match": 8,
+        "partial": 1,
+        "wrong": 0,
+        "no_result": 1
+      },
+      "방어·피격·회피": {
+        "match": 6,
+        "partial": 2,
+        "wrong": 2,
+        "no_result": 0
+      },
+      "공을 사용하는 스포츠": {
+        "match": 6,
+        "partial": 4,
+        "wrong": 0,
+        "no_result": 0
+      },
+      "이동·착지·운동": {
+        "match": 5,
+        "partial": 2,
+        "wrong": 3,
+        "no_result": 0
+      },
+      "일상·생활": {
+        "match": 4,
+        "partial": 2,
+        "wrong": 3,
+        "no_result": 1
+      },
+      "감정·몸짓": {
+        "match": 4,
+        "partial": 3,
+        "wrong": 1,
+        "no_result": 2
+      },
+      "사람 사이의 상호작용": {
+        "match": 1,
+        "partial": 3,
+        "wrong": 2,
+        "no_result": 4
+      },
+      "배경·순서·목적이 섞인 입력": {
+        "match": 5,
+        "partial": 2,
+        "wrong": 2,
+        "no_result": 1
+      }
+    }
+  },
+  "rows": [
+    {
+      "id": "Q001",
+      "category": "짧고 모호한 입력",
+      "text": "싸우는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "g1__M_Move7__p01_f0125",
+          0.7465,
+          "한 무릎을 들고 얼굴 앞에 손을 세우는 자세"
+        ],
+        [
+          "combat_ual2_Melee_Hook_f00600",
+          0.7306,
+          "다리를 넓게 벌리고 몸을 비틀어 훅을 날리는 자세"
+        ],
+        [
+          "combat_ual2_Sword_Regular_A_Rec_f00800",
+          0.7135,
+          "검을 가로로 벤 뒤 몸을 세우는 자세"
+        ],
+        [
+          "combat_ual2_Melee_Hook_f00800",
+          0.7062,
+          "상체를 깊이 비틀며 크게 휘두르는 훅 자세"
+        ],
+        [
+          "g1__M_Move8__n02_f0192",
+          0.7016,
+          "몸을 낮춰 한 다리를 앞으로 뻗어 차는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "g1__M_Move7__p01_f0125",
+          0.7465,
+          "한 무릎을 들고 얼굴 앞에 손을 세우는 자세"
+        ],
+        [
+          "combat_ual2_Melee_Hook_f00600",
+          0.7306,
+          "다리를 넓게 벌리고 몸을 비틀어 훅을 날리는 자세"
+        ],
+        [
+          "combat_ual2_Sword_Regular_A_Rec_f00800",
+          0.7135,
+          "검을 가로로 벤 뒤 몸을 세우는 자세"
+        ],
+        [
+          "combat_ual2_Melee_Hook_f00800",
+          0.7062,
+          "상체를 깊이 비틀며 크게 휘두르는 훅 자세"
+        ],
+        [
+          "g1__M_Move8__n02_f0192",
+          0.7016,
+          "몸을 낮춰 한 다리를 앞으로 뻗어 차는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q002",
+      "category": "짧고 모호한 입력",
+      "text": "착지하는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "sd_cmu_49_06_f00354",
+          0.8852,
+          "착지 후 한 팔을 높이고 몸을 다시 세우는 자세"
+        ],
+        [
+          "Jumping Down_00056",
+          0.8846,
+          "착지하며 양팔을 크게 펼쳐 균형 잡는 자세"
+        ],
+        [
+          "sd_volleyball_10",
+          0.8465,
+          "착지하며 무릎을 굽혀 다음 배구 수비를 준비하는 자세"
+        ],
+        [
+          "sd_athletics_07_r2",
+          0.8445,
+          "멀리뛰기 중 두 다리를 앞으로 모아 착지를 준비하는 자세"
+        ],
+        [
+          "expansion_accad_D9_Victory1_f00105",
+          0.8399,
+          "낮게 착지하며 한 팔을 치켜드는 영웅 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "sd_cmu_49_06_f00354",
+          0.8852,
+          "착지 후 한 팔을 높이고 몸을 다시 세우는 자세"
+        ],
+        [
+          "Jumping Down_00056",
+          0.8846,
+          "착지하며 양팔을 크게 펼쳐 균형 잡는 자세"
+        ],
+        [
+          "sd_volleyball_10",
+          0.8465,
+          "착지하며 무릎을 굽혀 다음 배구 수비를 준비하는 자세"
+        ],
+        [
+          "sd_athletics_07_r2",
+          0.8445,
+          "멀리뛰기 중 두 다리를 앞으로 모아 착지를 준비하는 자세"
+        ],
+        [
+          "expansion_accad_D9_Victory1_f00105",
+          0.8399,
+          "낮게 착지하며 한 팔을 치켜드는 영웅 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q003",
+      "category": "짧고 모호한 입력",
+      "text": "야구공을 던지는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "sd_cmu_124_01_f00424",
+          0.9867,
+          "팔을 머리 위로 휘둘러 야구공을 던지는 자세"
+        ],
+        [
+          "UAL2__OverhandThrow__p02_f0021",
+          0.843,
+          "한 무릎을 높이 들어 몸을 회전하며 야구공 투구를 준비하는 자세."
+        ],
+        [
+          "sd_cmu_124_13_f00264",
+          0.816,
+          "상체를 낮추고 팔을 아래에서 휘둘러 던지는 자세"
+        ],
+        [
+          "g1__M_Move17__p04_f0829",
+          0.8127,
+          "한 무릎을 높이 들고 몸을 틀어 야구공 투구를 준비하는 자세. 큰 걸음 동작에도 활용 가능."
+        ],
+        [
+          "mass_baseball_pitch_windup",
+          0.7935,
+          "한 무릎을 높이 들고 양손을 가슴 앞에 모아 야구 투구를 준비하는 자세."
+        ]
+      ],
+      "baseline_top": [
+        [
+          "sd_cmu_124_01_f00424",
+          0.9867,
+          "팔을 머리 위로 휘둘러 야구공을 던지는 자세"
+        ],
+        [
+          "UAL2__OverhandThrow__p02_f0021",
+          0.843,
+          "한 무릎을 높이 들어 몸을 회전하며 야구공 투구를 준비하는 자세."
+        ],
+        [
+          "sd_cmu_124_13_f00264",
+          0.816,
+          "상체를 낮추고 팔을 아래에서 휘둘러 던지는 자세"
+        ],
+        [
+          "g1__M_Move17__p04_f0829",
+          0.8127,
+          "한 무릎을 높이 들고 몸을 틀어 야구공 투구를 준비하는 자세. 큰 걸음 동작에도 활용 가능."
+        ],
+        [
+          "mass_baseball_pitch_windup",
+          0.7935,
+          "한 무릎을 높이 들고 양손을 가슴 앞에 모아 야구 투구를 준비하는 자세."
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q004",
+      "category": "짧고 모호한 입력",
+      "text": "도망치는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "cmu_104_16_00006_mirror",
+          0.6974,
+          "팔을 들어 반응하며 한 다리를 뒤로 접어 뛰는 자세"
+        ],
+        [
+          "cmu_120_16_00971_mirror",
+          0.6901,
+          "머리 주변에 손을 든 채 급히 뛰어가는 자세"
+        ],
+        [
+          "combat_ual1_Crouch_Fwd_Loop_f02000",
+          0.6269,
+          "상체를 숙이고 무릎을 낮춰 앞으로 이동하는 자세"
+        ],
+        [
+          "combat_ual1_Crouch_Fwd_Loop_f00600",
+          0.6233,
+          "몸을 낮추고 한쪽 무릎을 앞에 둔 채 조용히 이동하는 자세"
+        ],
+        [
+          "UAL1__Crouch_Fwd_Loop__p02_f0040_mirror",
+          0.6188,
+          "몸을 낮춘 채 한쪽 무릎을 앞으로 올려 이동하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "cmu_104_16_00006_mirror",
+          0.6974,
+          "팔을 들어 반응하며 한 다리를 뒤로 접어 뛰는 자세"
+        ],
+        [
+          "cmu_120_16_00971_mirror",
+          0.6901,
+          "머리 주변에 손을 든 채 급히 뛰어가는 자세"
+        ],
+        [
+          "combat_ual1_Crouch_Fwd_Loop_f02000",
+          0.6269,
+          "상체를 숙이고 무릎을 낮춰 앞으로 이동하는 자세"
+        ],
+        [
+          "combat_ual1_Crouch_Fwd_Loop_f00600",
+          0.6233,
+          "몸을 낮추고 한쪽 무릎을 앞에 둔 채 조용히 이동하는 자세"
+        ],
+        [
+          "UAL1__Crouch_Fwd_Loop__p02_f0040_mirror",
+          0.6188,
+          "몸을 낮춘 채 한쪽 무릎을 앞으로 올려 이동하는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q005",
+      "category": "짧고 모호한 입력",
+      "text": "넘어지는 순간",
+      "status": "ok",
+      "top": [
+        [
+          "combat_ual1_Death01_f02200",
+          0.4324,
+          "몸에 힘이 빠져 뒤로 넘어지며 쓰러지는 자세"
+        ],
+        [
+          "rokoko_Tightrope_Falloff_mixamo_00575",
+          0.4163,
+          "줄 위에서 중심을 잃고 옆으로 기울어지는 자세"
+        ],
+        [
+          "Big Side Hit_00009",
+          0.4008,
+          "옆에서 맞은 듯 몸이 들리고 뒤로 밀려나는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "combat_ual1_Death01_f02200",
+          0.4324,
+          "몸에 힘이 빠져 뒤로 넘어지며 쓰러지는 자세"
+        ],
+        [
+          "rokoko_Tightrope_Falloff_mixamo_00575",
+          0.4163,
+          "줄 위에서 중심을 잃고 옆으로 기울어지는 자세"
+        ],
+        [
+          "Big Side Hit_00009",
+          0.4008,
+          "옆에서 맞은 듯 몸이 들리고 뒤로 밀려나는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q006",
+      "category": "짧고 모호한 입력",
+      "text": "앉아서 쉬는 모습",
+      "status": "ok",
+      "top": [
+        [
+          "rokoko_Lawyer_02_mixamo_01095_mirror",
+          0.8494,
+          "양팔을 몸 옆에 내려 앉아 쉬는 자세"
+        ],
+        [
+          "MH__callharvey3d_sittinglegscrossed_mirror",
+          0.845,
+          "다리를 넓게 꼬고 앉아 쉬는 자세"
+        ],
+        [
+          "webtoon_daily_36",
+          0.8436,
+          "앉아서 한 손으로 턱을 괴고 생각하는 자세"
+        ],
+        [
+          "MH__anrico_sitting04",
+          0.8419,
+          "앉아서 한 손을 턱과 볼에 대고 생각하는 자세"
+        ],
+        [
+          "MH__anrico_sitting07",
+          0.8417,
+          "앉아서 다리를 교차하고 두 손을 뒤로 짚는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "rokoko_Lawyer_02_mixamo_01095_mirror",
+          0.8494,
+          "양팔을 몸 옆에 내려 앉아 쉬는 자세"
+        ],
+        [
+          "MH__callharvey3d_sittinglegscrossed_mirror",
+          0.845,
+          "다리를 넓게 꼬고 앉아 쉬는 자세"
+        ],
+        [
+          "webtoon_daily_36",
+          0.8436,
+          "앉아서 한 손으로 턱을 괴고 생각하는 자세"
+        ],
+        [
+          "MH__anrico_sitting04",
+          0.8419,
+          "앉아서 한 손을 턱과 볼에 대고 생각하는 자세"
+        ],
+        [
+          "MH__anrico_sitting07",
+          0.8417,
+          "앉아서 다리를 교차하고 두 손을 뒤로 짚는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q007",
+      "category": "짧고 모호한 입력",
+      "text": "놀라는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "cmu_14_16_03756_mirror",
+          0.8324,
+          "한 손을 가슴 옆에 펴고 한 발을 들며 놀라는 자세"
+        ],
+        [
+          "cmu_55_03_00431",
+          0.8217,
+          "손바닥을 높이 펼치고 몸을 뒤로 빼며 놀라는 자세"
+        ],
+        [
+          "rokoko_FistPumps_mixamo_00838",
+          0.8211,
+          "무릎을 굽히고 두 손을 가슴에 모아 놀라는 자세"
+        ],
+        [
+          "cmu_105_15_02459",
+          0.8197,
+          "한 손을 높이 펴고 무릎을 접어 놀라는 듯한 자세"
+        ],
+        [
+          "cmu_74_08_00008_mirror",
+          0.8137,
+          "낮게 웅크리며 손을 들어 놀라는 듯한 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "cmu_14_16_03756_mirror",
+          0.8324,
+          "한 손을 가슴 옆에 펴고 한 발을 들며 놀라는 자세"
+        ],
+        [
+          "cmu_55_03_00431",
+          0.8217,
+          "손바닥을 높이 펼치고 몸을 뒤로 빼며 놀라는 자세"
+        ],
+        [
+          "rokoko_FistPumps_mixamo_00838",
+          0.8211,
+          "무릎을 굽히고 두 손을 가슴에 모아 놀라는 자세"
+        ],
+        [
+          "cmu_105_15_02459",
+          0.8197,
+          "한 손을 높이 펴고 무릎을 접어 놀라는 듯한 자세"
+        ],
+        [
+          "cmu_74_08_00008_mirror",
+          0.8137,
+          "낮게 웅크리며 손을 들어 놀라는 듯한 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q008",
+      "category": "짧고 모호한 입력",
+      "text": "누군가를 기다리는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "rokoko_FootTapping_mixamo_00114",
+          0.4017,
+          "양손을 허리에 두고 기다리는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "rokoko_FootTapping_mixamo_00114",
+          0.4017,
+          "양손을 허리에 두고 기다리는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q009",
+      "category": "짧고 모호한 입력",
+      "text": "춤추는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "cmu_14_18_02851_mirror",
+          0.8959,
+          "한 손을 높이고 다른 팔을 옆으로 펼쳐 춤추는 자세"
+        ],
+        [
+          "rokoko_HappyDance_mixamo_00224",
+          0.8931,
+          "손을 가슴 앞에 들고 가볍게 춤추는 자세"
+        ],
+        [
+          "g1__M_Move18__n01_f0330",
+          0.8831,
+          "한 발을 옆으로 들고 팔을 굽혀 춤추는 자세"
+        ],
+        [
+          "rokoko_HappyDance_mixamo_00229_mirror",
+          0.8771,
+          "손바닥을 펼치며 가볍게 춤추는 자세"
+        ],
+        [
+          "rokoko_HappyDance_mixamo_00311",
+          0.8376,
+          "양손을 어깨 가까이 올리고 고개를 숙여 춤추는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "cmu_14_18_02851_mirror",
+          0.8959,
+          "한 손을 높이고 다른 팔을 옆으로 펼쳐 춤추는 자세"
+        ],
+        [
+          "rokoko_HappyDance_mixamo_00224",
+          0.8931,
+          "손을 가슴 앞에 들고 가볍게 춤추는 자세"
+        ],
+        [
+          "g1__M_Move18__n01_f0330",
+          0.8831,
+          "한 발을 옆으로 들고 팔을 굽혀 춤추는 자세"
+        ],
+        [
+          "rokoko_HappyDance_mixamo_00229_mirror",
+          0.8771,
+          "손바닥을 펼치며 가볍게 춤추는 자세"
+        ],
+        [
+          "rokoko_HappyDance_mixamo_00311",
+          0.8376,
+          "양손을 어깨 가까이 올리고 고개를 숙여 춤추는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q010",
+      "category": "짧고 모호한 입력",
+      "text": "몸 푸는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "cmu_143_16_00087",
+          0.6868,
+          "고개를 숙이고 한 무릎을 높게 들어 몸을 푸는 자세"
+        ],
+        [
+          "style100_SwingArmsRound_FR_f000741_26c31151",
+          0.6513,
+          "팔로 큰 원을 그리며 몸을 푸는 자세"
+        ],
+        [
+          "Arm Stretching_00054_mirror",
+          0.6512,
+          "한 팔을 가슴 앞으로 당겨 어깨를 푸는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "cmu_143_16_00087",
+          0.6868,
+          "고개를 숙이고 한 무릎을 높게 들어 몸을 푸는 자세"
+        ],
+        [
+          "style100_SwingArmsRound_FR_f000741_26c31151",
+          0.6513,
+          "팔로 큰 원을 그리며 몸을 푸는 자세"
+        ],
+        [
+          "Arm Stretching_00054_mirror",
+          0.6512,
+          "한 팔을 가슴 앞으로 당겨 어깨를 푸는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q011",
+      "category": "맨손 전투",
+      "text": "상대 얼굴을 향해 주먹을 날리는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "mass_accad_E12_BackfistRight_f00028",
+          0.598,
+          "팔을 가로로 뻗어 등주먹을 날리는 자세"
+        ],
+        [
+          "mass_hero_flying_fist",
+          0.5289,
+          "주먹을 앞세우고 몸을 수평으로 날리는 자세"
+        ],
+        [
+          "combat_ual1_Punch_Jab_f00600",
+          0.5229,
+          "한 팔을 길게 뻗어 잽을 날리는 자세"
+        ],
+        [
+          "combat_ual2_Melee_Hook_f00600",
+          0.5155,
+          "다리를 넓게 벌리고 몸을 비틀어 훅을 날리는 자세"
+        ],
+        [
+          "combat_ual1_Punch_Cross_f00800",
+          0.489,
+          "한 주먹을 앞으로 뻗고 반대 손으로 얼굴을 지키는 펀치"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "mass_accad_E12_BackfistRight_f00028",
+          0.598,
+          "팔을 가로로 뻗어 등주먹을 날리는 자세"
+        ],
+        [
+          "mass_hero_flying_fist",
+          0.5289,
+          "주먹을 앞세우고 몸을 수평으로 날리는 자세"
+        ],
+        [
+          "combat_ual1_Punch_Jab_f00600",
+          0.5229,
+          "한 팔을 길게 뻗어 잽을 날리는 자세"
+        ],
+        [
+          "combat_ual2_Melee_Hook_f00600",
+          0.5155,
+          "다리를 넓게 벌리고 몸을 비틀어 훅을 날리는 자세"
+        ],
+        [
+          "combat_ual1_Punch_Cross_f00800",
+          0.489,
+          "한 주먹을 앞으로 뻗고 반대 손으로 얼굴을 지키는 펀치"
+        ]
+      ],
+      "baseline_verdict": "partial",
+      "final_verdict": "partial",
+      "visual_note": "등주먹 공격. 얼굴을 향하는 직선 펀치로는 부분 일치."
+    },
+    {
+      "id": "Q012",
+      "category": "맨손 전투",
+      "text": "한 대 때리려고 주먹을 뒤로 당긴 자세",
+      "status": "ok",
+      "top": [
+        [
+          "combat_accad_E5_HookLeft_f00023",
+          0.4639,
+          "한 주먹을 얼굴 앞에 두고 몸을 틀어 훅을 준비하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "exaggerated_drive_punch",
+          0.4735,
+          "앞으로 파고들며 주먹을 길게 내지르는 자세"
+        ],
+        [
+          "mass_accad_E12_BackfistRight_f00028",
+          0.4719,
+          "팔을 가로로 뻗어 등주먹을 날리는 자세"
+        ],
+        [
+          "Punching Bag_00062",
+          0.4715,
+          "한 팔을 앞으로 길게 뻗어 주먹을 지르는 자세"
+        ],
+        [
+          "combat_accad_E5_HookLeft_f00023",
+          0.4639,
+          "한 주먹을 얼굴 앞에 두고 몸을 틀어 훅을 준비하는 자세"
+        ],
+        [
+          "mass_hero_flying_fist",
+          0.4616,
+          "주먹을 앞세우고 몸을 수평으로 날리는 자세"
+        ]
+      ],
+      "baseline_verdict": "wrong",
+      "final_verdict": "partial",
+      "visual_note": "훅 준비는 찾지만 주먹을 몸 뒤로 당기는 위치는 덜 맞음."
+    },
+    {
+      "id": "Q013",
+      "category": "맨손 전투",
+      "text": "주먹을 연달아 날리는 복서",
+      "status": "ok",
+      "top": [
+        [
+          "mass_accad_E12_BackfistRight_f00028",
+          0.4012,
+          "팔을 가로로 뻗어 등주먹을 날리는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "mass_accad_E12_BackfistRight_f00028",
+          0.4012,
+          "팔을 가로로 뻗어 등주먹을 날리는 자세"
+        ]
+      ],
+      "baseline_verdict": "partial",
+      "final_verdict": "partial",
+      "visual_note": "단일 펀치는 찾지만 연속 동작은 정적 포즈로 표현 못함."
+    },
+    {
+      "id": "Q014",
+      "category": "맨손 전투",
+      "text": "상대 배를 무릎으로 올려치는 장면",
+      "status": "ok",
+      "top": [
+        [
+          "combat_authored_knee_strike_mirror",
+          0.5857,
+          "한 발로 버티며 무릎으로 앞쪽을 올려치는 자세"
+        ],
+        [
+          "mass_volleyball_spike_ready",
+          0.4814,
+          "한 무릎과 팔을 올려 배구 스파이크를 준비하는 자세"
+        ],
+        [
+          "webtoon_combat_17",
+          0.4427,
+          "창끝을 위로 세워 올려치기를 준비하는 자세"
+        ],
+        [
+          "combat_authored_diagonal_weapon_mirror",
+          0.431,
+          "몸을 비틀어 한 팔을 뒤위로 올린 내려치기 준비 자세"
+        ],
+        [
+          "dynamic_fantasy_twohand_cleave",
+          0.4269,
+          "한 무릎을 들고 양손 검을 머리 위로 들어 내리치려는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "combat_pair_airborne_press_attacker",
+          0.4098,
+          "공중에서 몸을 낮추고 두 팔로 상대를 덮치는 자세"
+        ]
+      ],
+      "baseline_verdict": "wrong",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q015",
+      "category": "맨손 전투",
+      "text": "몸을 돌리면서 옆으로 발차기하는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "mass_accad_G20_ReverseSpinCrescentRight_f00021",
+          0.8625,
+          "몸을 돌리면서 무릎을 들어 차려는 자세"
+        ],
+        [
+          "combat_accad_G4_SpinningBackKick_f00036",
+          0.8056,
+          "몸을 뒤로 돌리면서 한 다리를 길게 뻗는 뒤차기 자세"
+        ],
+        [
+          "cmu_54_23_03684",
+          0.798,
+          "몸을 옆으로 돌리며 두 다리를 펼치는 회전 발차기 자세"
+        ],
+        [
+          "mass_accad_G19_ReverseSpinCrescentLeft_f00036",
+          0.7511,
+          "뒤로 몸을 돌리며 다리를 들어 차는 자세"
+        ],
+        [
+          "Hurricane Kick_00016",
+          0.7507,
+          "한 다리를 길게 뻗어 몸을 돌리며 차는 공중 발차기"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "mass_accad_G20_ReverseSpinCrescentRight_f00021",
+          0.8625,
+          "몸을 돌리면서 무릎을 들어 차려는 자세"
+        ],
+        [
+          "combat_accad_G4_SpinningBackKick_f00036",
+          0.8056,
+          "몸을 뒤로 돌리면서 한 다리를 길게 뻗는 뒤차기 자세"
+        ],
+        [
+          "cmu_54_23_03684",
+          0.798,
+          "몸을 옆으로 돌리며 두 다리를 펼치는 회전 발차기 자세"
+        ],
+        [
+          "mass_accad_G19_ReverseSpinCrescentLeft_f00036",
+          0.7511,
+          "뒤로 몸을 돌리며 다리를 들어 차는 자세"
+        ],
+        [
+          "Hurricane Kick_00016",
+          0.7507,
+          "한 다리를 길게 뻗어 몸을 돌리며 차는 공중 발차기"
+        ]
+      ],
+      "baseline_verdict": "partial",
+      "final_verdict": "partial",
+      "visual_note": "회전 발차기 계열이지만 무릎을 접은 준비 단계가 1위."
+    },
+    {
+      "id": "Q016",
+      "category": "맨손 전투",
+      "text": "한쪽 다리로 버티고 높게 발을 차는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "cmu_55_09_03014",
+          0.6428,
+          "팔을 가슴 앞에 모으고 한쪽 다리로 옆을 차는 자세"
+        ],
+        [
+          "combat_accad_G8_RoundhouseLeft_f00024",
+          0.6275,
+          "상체를 틀며 한쪽 다리를 높게 휘두르는 돌려차기 자세"
+        ],
+        [
+          "sd_cmu_10_01_f00594",
+          0.566,
+          "한쪽 발을 앞으로 내밀어 축구공을 차는 자세"
+        ],
+        [
+          "Hurricane Kick_00016_mirror",
+          0.5647,
+          "몸을 회전하며 한쪽 다리를 수평으로 뻗는 발차기"
+        ],
+        [
+          "cmu_131_10_00253_mirror",
+          0.5536,
+          "발을 정면으로 뻗고 한 다리로 서 있는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "cmu_55_09_03014",
+          0.6428,
+          "팔을 가슴 앞에 모으고 한쪽 다리로 옆을 차는 자세"
+        ],
+        [
+          "combat_accad_G8_RoundhouseLeft_f00024",
+          0.6275,
+          "상체를 틀며 한쪽 다리를 높게 휘두르는 돌려차기 자세"
+        ],
+        [
+          "sd_cmu_10_01_f00594",
+          0.566,
+          "한쪽 발을 앞으로 내밀어 축구공을 차는 자세"
+        ],
+        [
+          "Hurricane Kick_00016_mirror",
+          0.5647,
+          "몸을 회전하며 한쪽 다리를 수평으로 뻗는 발차기"
+        ],
+        [
+          "cmu_131_10_00253_mirror",
+          0.5536,
+          "발을 정면으로 뻗고 한 다리로 서 있는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q017",
+      "category": "맨손 전투",
+      "text": "싸우기 전에 두 주먹을 올리고 상대를 노려보는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "combat_ual1_Punch_Cross_f01800",
+          0.4465,
+          "두 주먹을 몸 앞에 모아 다음 공격을 준비하는 자세"
+        ],
+        [
+          "g1__M_Move6__n04_f1047_mirror",
+          0.4283,
+          "두 손을 들어 상대를 경계하는 준비 자세"
+        ],
+        [
+          "combat_accad_E7_UppercutLeft_f00029",
+          0.414,
+          "팔꿈치를 굽힌 주먹을 아래에서 위로 올리는 어퍼컷 자세"
+        ],
+        [
+          "webtoon_combat_29",
+          0.4132,
+          "양주먹을 얼굴 앞에 올려 가드하는 자세"
+        ],
+        [
+          "combat_ual2_Melee_Hook_Rec_f00000",
+          0.4092,
+          "훅을 날린 뒤 몸을 낮추며 주먹을 회수하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "combat_ual1_Punch_Cross_f01800",
+          0.4465,
+          "두 주먹을 몸 앞에 모아 다음 공격을 준비하는 자세"
+        ],
+        [
+          "g1__M_Move6__n04_f1047_mirror",
+          0.4283,
+          "두 손을 들어 상대를 경계하는 준비 자세"
+        ],
+        [
+          "combat_accad_E7_UppercutLeft_f00029",
+          0.414,
+          "팔꿈치를 굽힌 주먹을 아래에서 위로 올리는 어퍼컷 자세"
+        ],
+        [
+          "webtoon_combat_29",
+          0.4132,
+          "양주먹을 얼굴 앞에 올려 가드하는 자세"
+        ],
+        [
+          "combat_ual2_Melee_Hook_Rec_f00000",
+          0.4092,
+          "훅을 날린 뒤 몸을 낮추며 주먹을 회수하는 자세"
+        ]
+      ],
+      "baseline_verdict": "partial",
+      "final_verdict": "partial",
+      "visual_note": "전투 준비지만 두 주먹의 얼굴 앞 높이가 덜 맞음."
+    },
+    {
+      "id": "Q018",
+      "category": "맨손 전투",
+      "text": "달려들어서 상대를 밀쳐내는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "rokoko_BurstThroughDoor_mixamo_00081",
+          0.5806,
+          "한 손으로 문을 밀며 앞으로 들어가는 자세"
+        ],
+        [
+          "combat_ual2_Shield_Dash_RM_f00200",
+          0.5706,
+          "몸을 낮추고 방패로 밀며 돌진하는 자세"
+        ],
+        [
+          "combat_pair_airborne_press_attacker",
+          0.5297,
+          "공중에서 몸을 낮추고 두 팔로 상대를 덮치는 자세"
+        ],
+        [
+          "webtoon_combat_10",
+          0.529,
+          "방패를 앞세워 돌진을 준비하는 자세"
+        ],
+        [
+          "combat_authored_horizontal_dash_mirror",
+          0.4356,
+          "두 손을 앞으로 뻗고 전신을 날려 상대에게 돌진하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "rokoko_BurstThroughDoor_mixamo_00081",
+          0.5806,
+          "한 손으로 문을 밀며 앞으로 들어가는 자세"
+        ],
+        [
+          "combat_ual2_Shield_Dash_RM_f00200",
+          0.5706,
+          "몸을 낮추고 방패로 밀며 돌진하는 자세"
+        ],
+        [
+          "combat_pair_airborne_press_attacker",
+          0.5297,
+          "공중에서 몸을 낮추고 두 팔로 상대를 덮치는 자세"
+        ],
+        [
+          "webtoon_combat_10",
+          0.529,
+          "방패를 앞세워 돌진을 준비하는 자세"
+        ],
+        [
+          "combat_authored_horizontal_dash_mirror",
+          0.4356,
+          "두 손을 앞으로 뻗고 전신을 날려 상대에게 돌진하는 자세"
+        ]
+      ],
+      "baseline_verdict": "partial",
+      "final_verdict": "partial",
+      "visual_note": "문 밀기가 1위. 사람 밀기와 대상 구분 부족."
+    },
+    {
+      "id": "Q019",
+      "category": "맨손 전투",
+      "text": "상대 멱살을 잡으려고 손을 뻗는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "webtoon_romance_16",
+          0.5525,
+          "상대의 뺨을 만지려 얼굴 높이로 손을 뻗는 자세"
+        ],
+        [
+          "webtoon_romance_45",
+          0.5461,
+          "상대의 짐을 대신 들어주려고 두 손을 뻗는 자세"
+        ],
+        [
+          "cmu_21_06_00289_mirror",
+          0.4916,
+          "손을 뻗어 방향을 잡으며 앞으로 걷는 자세"
+        ],
+        [
+          "webtoon_romance_19",
+          0.4892,
+          "양손을 뻗어 상대의 옷깃을 고쳐주는 자세"
+        ],
+        [
+          "cmu_13_27_01871_mirror",
+          0.468,
+          "앞쪽 위를 향해 손을 뻗어 안내하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "webtoon_romance_16",
+          0.5525,
+          "상대의 뺨을 만지려 얼굴 높이로 손을 뻗는 자세"
+        ],
+        [
+          "webtoon_romance_45",
+          0.5461,
+          "상대의 짐을 대신 들어주려고 두 손을 뻗는 자세"
+        ],
+        [
+          "cmu_21_06_00289_mirror",
+          0.4916,
+          "손을 뻗어 방향을 잡으며 앞으로 걷는 자세"
+        ],
+        [
+          "webtoon_romance_19",
+          0.4892,
+          "양손을 뻗어 상대의 옷깃을 고쳐주는 자세"
+        ],
+        [
+          "cmu_13_27_01871_mirror",
+          0.468,
+          "앞쪽 위를 향해 손을 뻗어 안내하는 자세"
+        ]
+      ],
+      "baseline_verdict": "wrong",
+      "final_verdict": "wrong",
+      "visual_note": "뺨 만지기 포즈가 1위. 멱살 대상·손 관계 미해결."
+    },
+    {
+      "id": "Q020",
+      "category": "맨손 전투",
+      "text": "넘어진 상대를 향해 주먹을 내려치는 장면",
+      "status": "no_result",
+      "top": [],
+      "baseline_top": [],
+      "baseline_verdict": "no_result",
+      "final_verdict": "no_result",
+      "visual_note": "넘어진 상대와 공격자를 분리하지 못하고 결과 없음."
+    },
+    {
+      "id": "Q021",
+      "category": "무기를 쓰는 장면",
+      "text": "칼을 두 손으로 들고 적을 내려치는 장면",
+      "status": "ok",
+      "top": [
+        [
+          "dynamic_fantasy_twohand_cleave",
+          0.4333,
+          "한 무릎을 들고 양손 검을 머리 위로 들어 내리치려는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "dynamic_fantasy_twohand_cleave",
+          0.4333,
+          "한 무릎을 들고 양손 검을 머리 위로 들어 내리치려는 자세"
+        ]
+      ],
+      "baseline_verdict": "partial",
+      "final_verdict": "partial",
+      "visual_note": "양손 검 내려치기 준비 단계. 베는 순간은 미반영."
+    },
+    {
+      "id": "Q022",
+      "category": "무기를 쓰는 장면",
+      "text": "한 손으로 검을 옆으로 휘두르는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "rokoko_Sword_Generic_mixamo_00314",
+          0.7097,
+          "상체를 틀며 한 손 검을 옆으로 휘두르는 자세"
+        ],
+        [
+          "rokoko_Sword_Generic_mixamo_00162",
+          0.7,
+          "한 손 검을 옆으로 휘두르며 전진하는 자세"
+        ],
+        [
+          "combat_ual2_Sword_Regular_C_f00800",
+          0.4883,
+          "한 무릎을 들고 몸을 비틀어 검을 휘두르는 자세"
+        ],
+        [
+          "UAL2__Sword_Regular_C__p03_f0033_mirror",
+          0.484,
+          "검을 휘두르는 듯 몸을 비틀며 다리를 펼치는 자세"
+        ],
+        [
+          "combat_ual2_Sword_Dash_RM_f01200",
+          0.4768,
+          "몸을 앞으로 던지며 검을 휘두르는 돌진 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "rokoko_Sword_Generic_mixamo_00314",
+          0.7097,
+          "상체를 틀며 한 손 검을 옆으로 휘두르는 자세"
+        ],
+        [
+          "rokoko_Sword_Generic_mixamo_00162",
+          0.7,
+          "한 손 검을 옆으로 휘두르며 전진하는 자세"
+        ],
+        [
+          "combat_ual2_Sword_Regular_C_f00800",
+          0.4883,
+          "한 무릎을 들고 몸을 비틀어 검을 휘두르는 자세"
+        ],
+        [
+          "UAL2__Sword_Regular_C__p03_f0033_mirror",
+          0.484,
+          "검을 휘두르는 듯 몸을 비틀며 다리를 펼치는 자세"
+        ],
+        [
+          "combat_ual2_Sword_Dash_RM_f01200",
+          0.4768,
+          "몸을 앞으로 던지며 검을 휘두르는 돌진 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q023",
+      "category": "무기를 쓰는 장면",
+      "text": "칼끝을 상대에게 겨누고 거리를 재는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "webtoon_combat_09",
+          0.4615,
+          "무릎을 굽혀 낮은 자세로 검을 겨누는 자세"
+        ]
+      ],
+      "baseline_top": [],
+      "baseline_verdict": "no_result",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q024",
+      "category": "무기를 쓰는 장면",
+      "text": "검을 뒤로 빼고 찌를 준비를 하는 사람",
+      "status": "no_result",
+      "top": [],
+      "baseline_top": [
+        [
+          "rokoko_Sword_Generic_mixamo_00436",
+          0.4079,
+          "앞으로 걸으며 한 손 검을 내미는 자세"
+        ],
+        [
+          "webtoon_combat_05",
+          0.4072,
+          "몸을 옆으로 돌려 검을 정면으로 찌르는 자세"
+        ],
+        [
+          "rokoko_Sword_Samurai_mixamo_00119",
+          0.4012,
+          "다리를 넓게 벌리고 검을 옆 앞으로 찌르는 자세"
+        ]
+      ],
+      "baseline_verdict": "wrong",
+      "final_verdict": "no_result",
+      "visual_note": "준비 조건 강화 후 결과 없음. 정확한 찌르기 준비 후보 재검토 필요."
+    },
+    {
+      "id": "Q025",
+      "category": "무기를 쓰는 장면",
+      "text": "방패를 앞에 세워 공격을 막는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "webtoon_fantasy_34",
+          0.6478,
+          "방패 뒤로 몸을 낮춰 공격을 막는 자세"
+        ],
+        [
+          "webtoon_combat_12",
+          0.6454,
+          "방패로 몸을 가리며 옆으로 짧은 검을 내미는 자세"
+        ],
+        [
+          "UAL2__Shield_OneShot__p01_f0009",
+          0.6082,
+          "팔을 몸 앞에 가로질러 방패로 막는 자세"
+        ],
+        [
+          "webtoon_combat_11",
+          0.5355,
+          "방패를 높이 들어 머리를 보호하는 자세"
+        ],
+        [
+          "webtoon_fantasy_04",
+          0.5315,
+          "검과 방패를 들고 통로를 지키는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "webtoon_fantasy_34",
+          0.6478,
+          "방패 뒤로 몸을 낮춰 공격을 막는 자세"
+        ],
+        [
+          "webtoon_combat_12",
+          0.6454,
+          "방패로 몸을 가리며 옆으로 짧은 검을 내미는 자세"
+        ],
+        [
+          "webtoon_combat_33",
+          0.6258,
+          "팔꿈치를 앞으로 세워 공격을 막는 자세"
+        ],
+        [
+          "combat_ual2_Idle_Shield_Loop_f04800",
+          0.6253,
+          "방패를 몸 앞에 두고 대기하는 자세"
+        ],
+        [
+          "combat_ual2_Sword_Block_f00800",
+          0.6129,
+          "무릎을 굽히고 검을 앞세워 공격을 막는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q026",
+      "category": "무기를 쓰는 장면",
+      "text": "창을 길게 뻗어 적을 찌르는 장면",
+      "status": "ok",
+      "top": [
+        [
+          "webtoon_combat_13",
+          0.5089,
+          "두 손 장창으로 정면을 길게 찌르는 자세"
+        ],
+        [
+          "dynamic_aerial_spear_dive",
+          0.4732,
+          "몸을 길게 펴고 창끝부터 수직으로 낙하하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "rokoko_Sword_Generic_mixamo_00375",
+          0.5936,
+          "한 팔을 길게 뻗어 검으로 찌르는 자세"
+        ],
+        [
+          "g1__B_Fence2__n02_f0311",
+          0.5638,
+          "한 팔을 길게 뻗어 찌르듯 공격하는 자세"
+        ],
+        [
+          "g1__M_Move2__p04_f1361",
+          0.5305,
+          "한 손을 허리에 두고 다른 팔을 길게 내미는 자세"
+        ],
+        [
+          "webtoon_combat_13",
+          0.5089,
+          "두 손 장창으로 정면을 길게 찌르는 자세"
+        ],
+        [
+          "dynamic_aerial_spear_dive",
+          0.4732,
+          "몸을 길게 펴고 창끝부터 수직으로 낙하하는 자세"
+        ]
+      ],
+      "baseline_verdict": "wrong",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q027",
+      "category": "무기를 쓰는 장면",
+      "text": "활시위를 당겨 목표를 조준하는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "webtoon_fantasy_23",
+          0.75,
+          "활시위를 당겨 정면을 조준하는 자세"
+        ],
+        [
+          "webtoon_combat_24",
+          0.6982,
+          "활시위를 끝까지 당겨 정면을 조준하는 자세"
+        ],
+        [
+          "webtoon_combat_25",
+          0.4829,
+          "한 무릎을 꿇고 활을 당겨 조준하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "webtoon_fantasy_23",
+          0.75,
+          "활시위를 당겨 정면을 조준하는 자세"
+        ],
+        [
+          "webtoon_combat_24",
+          0.6982,
+          "활시위를 끝까지 당겨 정면을 조준하는 자세"
+        ],
+        [
+          "webtoon_combat_25",
+          0.4829,
+          "한 무릎을 꿇고 활을 당겨 조준하는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q028",
+      "category": "무기를 쓰는 장면",
+      "text": "권총을 두 손으로 잡고 앞을 겨누는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "combat_ual1_Pistol_Aim_Neutral_f00000",
+          0.6084,
+          "두 손으로 권총을 전방에 겨누는 자세"
+        ],
+        [
+          "rokoko_Pistol_BehindCover_mixamo_00410_mirror",
+          0.5368,
+          "낮게 선 채 두 손으로 권총을 다루는 자세"
+        ],
+        [
+          "rokoko_Pistol_01_mixamo_00236_mirror",
+          0.5143,
+          "몸 앞에서 양손으로 권총을 받치는 자세"
+        ],
+        [
+          "combat_ual1_Pistol_Reload_f02400",
+          0.5109,
+          "가슴 앞에서 양손으로 권총을 다루는 자세"
+        ],
+        [
+          "rokoko_Pistol_02_mixamo_00182",
+          0.5106,
+          "가슴 앞에서 양손으로 권총을 점검하는 듯한 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "combat_ual1_Pistol_Aim_Neutral_f00000",
+          0.6084,
+          "두 손으로 권총을 전방에 겨누는 자세"
+        ],
+        [
+          "rokoko_Pistol_BehindCover_mixamo_00410_mirror",
+          0.5368,
+          "낮게 선 채 두 손으로 권총을 다루는 자세"
+        ],
+        [
+          "rokoko_Pistol_01_mixamo_00236_mirror",
+          0.5143,
+          "몸 앞에서 양손으로 권총을 받치는 자세"
+        ],
+        [
+          "combat_ual1_Pistol_Reload_f02400",
+          0.5109,
+          "가슴 앞에서 양손으로 권총을 다루는 자세"
+        ],
+        [
+          "rokoko_Pistol_02_mixamo_00182",
+          0.5106,
+          "가슴 앞에서 양손으로 권총을 점검하는 듯한 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q029",
+      "category": "무기를 쓰는 장면",
+      "text": "무릎을 꿇고 소총으로 멀리 있는 적을 조준하는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "dynamic_shoot_kneel_rifle",
+          0.7203,
+          "한 무릎을 꿇고 소총을 전방에 겨누는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "dynamic_shoot_kneel_rifle",
+          0.7203,
+          "한 무릎을 꿇고 소총을 전방에 겨누는 자세"
+        ],
+        [
+          "webtoon_combat_27",
+          0.5785,
+          "한 무릎을 꿇고 양손 권총을 조준하는 자세"
+        ],
+        [
+          "webtoon_combat_25",
+          0.5573,
+          "한 무릎을 꿇고 활을 당겨 조준하는 자세"
+        ],
+        [
+          "rokoko_Pistol_BehindCover_mixamo_00312",
+          0.5535,
+          "한 무릎을 꿇고 한 손 권총을 앞으로 겨누는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q030",
+      "category": "무기를 쓰는 장면",
+      "text": "커다란 망치를 머리 위로 들어 내려치려는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "webtoon_fantasy_27",
+          0.6862,
+          "망치를 두 손으로 머리 위에 들어 내려칠 자세"
+        ],
+        [
+          "dynamic_aerial_hammer_drop",
+          0.4484,
+          "거꾸로 떨어지며 양손 망치를 내려찍는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "webtoon_fantasy_27",
+          0.6862,
+          "망치를 두 손으로 머리 위에 들어 내려칠 자세"
+        ],
+        [
+          "rokoko_Sword_Generic_mixamo_00320",
+          0.6558,
+          "검을 머리 위로 들어 내려치려는 자세"
+        ],
+        [
+          "webtoon_combat_18",
+          0.5975,
+          "양손 도끼를 머리 위로 들어 내려칠 준비를 하는 자세"
+        ],
+        [
+          "dynamic_fantasy_twohand_cleave",
+          0.5931,
+          "한 무릎을 들고 양손 검을 머리 위로 들어 내리치려는 자세"
+        ],
+        [
+          "dynamic_aerial_hammer_drop",
+          0.4484,
+          "거꾸로 떨어지며 양손 망치를 내려찍는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q031",
+      "category": "방어·피격·회피",
+      "text": "상대가 주먹을 날리니까 얼굴을 가리고 버티는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "webtoon_combat_37",
+          0.7776,
+          "한 손으로 배를 감싸고 다른 손으로 가드하며 버티는 자세"
+        ],
+        [
+          "combat_authored_knee_strike_mirror",
+          0.7458,
+          "한 발로 버티며 무릎으로 앞쪽을 올려치는 자세"
+        ],
+        [
+          "g1__M_Move9__n05_f0810_mirror",
+          0.7409,
+          "한 다리로 버티며 양팔을 벌린 경계 자세"
+        ],
+        [
+          "g1__M_Move10__n03_f1065",
+          0.7138,
+          "한 손으로 얼굴을 가리고 발을 옮기는 자세"
+        ],
+        [
+          "cmu_144_06_03287",
+          0.706,
+          "두 손으로 얼굴을 가리고 무릎을 높여 방어하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "webtoon_combat_37",
+          0.7776,
+          "한 손으로 배를 감싸고 다른 손으로 가드하며 버티는 자세"
+        ],
+        [
+          "combat_authored_knee_strike_mirror",
+          0.7458,
+          "한 발로 버티며 무릎으로 앞쪽을 올려치는 자세"
+        ],
+        [
+          "g1__M_Move9__n05_f0810_mirror",
+          0.7409,
+          "한 다리로 버티며 양팔을 벌린 경계 자세"
+        ],
+        [
+          "g1__M_Move10__n03_f1065",
+          0.7138,
+          "한 손으로 얼굴을 가리고 발을 옮기는 자세"
+        ],
+        [
+          "cmu_144_06_03287",
+          0.706,
+          "두 손으로 얼굴을 가리고 무릎을 높여 방어하는 자세"
+        ]
+      ],
+      "baseline_verdict": "partial",
+      "final_verdict": "partial",
+      "visual_note": "버티는 가드가 1위지만 얼굴 가리기가 덜 맞음."
+    },
+    {
+      "id": "Q032",
+      "category": "방어·피격·회피",
+      "text": "날아오는 발차기를 피하려고 상체를 뒤로 젖히는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "webtoon_combat_31",
+          0.8529,
+          "가드를 유지하고 상체를 뒤로 빼 공격을 피하는 자세"
+        ],
+        [
+          "combat_authored_wide_evade",
+          0.5023,
+          "다리를 넓게 벌리고 상체를 옆으로 기울여 공격을 피하는 자세"
+        ],
+        [
+          "combat_accad_E21_DuckLeft_f00035",
+          0.4557,
+          "무릎을 굽히고 상체를 숙여 공격 아래로 피하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "mass_accad_G5_BackKick_f00028",
+          0.4159,
+          "상체를 숙이고 다리를 뒤로 길게 차는 자세"
+        ],
+        [
+          "cmu_21_13_01353_mirror",
+          0.4124,
+          "몸을 뒤로 젖히고 높은 발차기를 하는 자세"
+        ]
+      ],
+      "baseline_verdict": "wrong",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q033",
+      "category": "방어·피격·회피",
+      "text": "머리를 숙여 상대 주먹을 피하는 장면",
+      "status": "ok",
+      "top": [
+        [
+          "combat_accad_E21_DuckLeft_f00035",
+          0.5542,
+          "무릎을 굽히고 상체를 숙여 공격 아래로 피하는 자세"
+        ],
+        [
+          "combat_authored_wide_evade",
+          0.439,
+          "다리를 넓게 벌리고 상체를 옆으로 기울여 공격을 피하는 자세"
+        ],
+        [
+          "g1__M_Move10__n05_f1205_mirror",
+          0.4353,
+          "두 손을 들어 머리를 지키며 옆으로 피하는 자세"
+        ]
+      ],
+      "baseline_top": [],
+      "baseline_verdict": "no_result",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q034",
+      "category": "방어·피격·회피",
+      "text": "칼이 날아오자 몸을 옆으로 빼는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "combat_authored_wide_evade_mirror",
+          0.7096,
+          "한 손으로 얼굴을 가리고 몸을 비스듬히 빼는 회피 자세"
+        ],
+        [
+          "mass_hero_side_air_evasion",
+          0.6947,
+          "몸을 옆으로 눕히며 공중에서 피하는 자세"
+        ],
+        [
+          "combat_accad_E19_DodgeLeft_f00034",
+          0.6794,
+          "가드를 유지하며 몸을 옆으로 틀어 공격을 피하는 자세"
+        ],
+        [
+          "g1__M_Move10__n05_f1205",
+          0.6496,
+          "머리 옆으로 손을 들고 한 발을 빼며 피하는 자세"
+        ],
+        [
+          "webtoon_combat_31",
+          0.5654,
+          "가드를 유지하고 상체를 뒤로 빼 공격을 피하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "webtoon_combat_05",
+          0.4521,
+          "몸을 옆으로 돌려 검을 정면으로 찌르는 자세"
+        ]
+      ],
+      "baseline_verdict": "wrong",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q035",
+      "category": "방어·피격·회피",
+      "text": "배를 맞고 몸을 접으며 아파하는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "cmu_22_17_00560_mirror",
+          0.4233,
+          "몸을 접어 앉아 양손으로 얼굴을 지키는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "cmu_22_17_00560_mirror",
+          0.4233,
+          "몸을 접어 앉아 양손으로 얼굴을 지키는 자세"
+        ]
+      ],
+      "baseline_verdict": "wrong",
+      "final_verdict": "wrong",
+      "visual_note": "얼굴 보호가 1위. 복부 피격 위치를 못 맞춤."
+    },
+    {
+      "id": "Q036",
+      "category": "방어·피격·회피",
+      "text": "얼굴을 맞아 고개가 옆으로 돌아가는 순간",
+      "status": "ok",
+      "top": [
+        [
+          "g1__M_Move20__n02_f0560",
+          0.445,
+          "얼굴 옆으로 손을 가져가며 몸을 돌리는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "g1__M_Move20__n02_f0560",
+          0.445,
+          "얼굴 옆으로 손을 가져가며 몸을 돌리는 자세"
+        ]
+      ],
+      "baseline_verdict": "partial",
+      "final_verdict": "partial",
+      "visual_note": "가드/몸 돌리기. 얼굴 피격 반응은 부분 일치."
+    },
+    {
+      "id": "Q037",
+      "category": "방어·피격·회피",
+      "text": "공격을 받고 뒤로 밀려나는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "webtoon_combat_36",
+          0.5463,
+          "공격을 맞아 상체가 뒤로 젖혀지는 자세"
+        ],
+        [
+          "Big Side Hit_00009",
+          0.5349,
+          "옆에서 맞은 듯 몸이 들리고 뒤로 밀려나는 자세"
+        ],
+        [
+          "cmu_54_06_04876",
+          0.4804,
+          "몸이 뒤로 밀려 앉으며 두 손으로 얼굴 앞을 가리는 자세"
+        ],
+        [
+          "cmu_28_15_00772_mirror",
+          0.4752,
+          "팔을 펼쳐 균형을 잡으며 뒤로 밀려나는 앉은 자세"
+        ],
+        [
+          "Receiving An Uppercut_00021",
+          0.466,
+          "상체가 뒤로 밀리며 손을 얼굴 앞에 올리는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "webtoon_combat_36",
+          0.5463,
+          "공격을 맞아 상체가 뒤로 젖혀지는 자세"
+        ],
+        [
+          "Big Side Hit_00009",
+          0.5349,
+          "옆에서 맞은 듯 몸이 들리고 뒤로 밀려나는 자세"
+        ],
+        [
+          "cmu_54_06_04876",
+          0.4804,
+          "몸이 뒤로 밀려 앉으며 두 손으로 얼굴 앞을 가리는 자세"
+        ],
+        [
+          "cmu_28_15_00772_mirror",
+          0.4752,
+          "팔을 펼쳐 균형을 잡으며 뒤로 밀려나는 앉은 자세"
+        ],
+        [
+          "Receiving An Uppercut_00021",
+          0.466,
+          "상체가 뒤로 밀리며 손을 얼굴 앞에 올리는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q038",
+      "category": "방어·피격·회피",
+      "text": "한쪽 무릎을 바닥에 대고 간신히 버티는 전사",
+      "status": "ok",
+      "top": [
+        [
+          "mass_accad_A8_CrouchToLie_f00047",
+          0.491,
+          "한 무릎을 바닥에 대고 몸을 낮추는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "mass_accad_A8_CrouchToLie_f00047",
+          0.491,
+          "한 무릎을 바닥에 대고 몸을 낮추는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q039",
+      "category": "방어·피격·회피",
+      "text": "더는 싸우지 않겠다는 듯 두 손을 들고 물러나는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "cmu_88_05_00056",
+          0.5756,
+          "무릎을 조금 낮추고 두 손을 높게 들어 반응하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "cmu_55_17_00882",
+          0.5504,
+          "손을 얼굴 양옆에 들고 놀라서 뒤로 물러나는 자세"
+        ],
+        [
+          "rokoko_Sword_Samurai_mixamo_00784",
+          0.4619,
+          "한 손을 가슴 앞으로 올리고 물러나는 검술 자세"
+        ],
+        [
+          "cmu_14_34_00993",
+          0.422,
+          "놀라서 한 손으로 얼굴을 가리고 무릎을 들어 피하는 자세"
+        ]
+      ],
+      "baseline_verdict": "partial",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q040",
+      "category": "방어·피격·회피",
+      "text": "넘어진 채 팔로 얼굴을 보호하는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "g1__M_Move4__p04_f1346_mirror",
+          0.5297,
+          "무릎을 굽혀 양팔로 얼굴을 보호하는 자세"
+        ],
+        [
+          "cmu_54_06_04876_mirror",
+          0.5172,
+          "앉은 채 고개를 젖히고 손으로 얼굴을 보호하는 자세"
+        ],
+        [
+          "g1__M_Move3__p03_f1151_mirror",
+          0.4718,
+          "양팔로 얼굴을 가리며 뒤로 몸을 낮추는 자세"
+        ],
+        [
+          "combat_authored_crouch_head_guard",
+          0.4689,
+          "무릎을 낮추고 두 팔로 머리를 보호하는 자세"
+        ],
+        [
+          "cmu_55_17_00882_mirror",
+          0.4546,
+          "한 발을 들고 얼굴 앞을 보호하며 움찔하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "g1__M_Move4__p04_f1346_mirror",
+          0.5297,
+          "무릎을 굽혀 양팔로 얼굴을 보호하는 자세"
+        ],
+        [
+          "cmu_54_06_04876_mirror",
+          0.5172,
+          "앉은 채 고개를 젖히고 손으로 얼굴을 보호하는 자세"
+        ],
+        [
+          "g1__M_Move3__p03_f1151_mirror",
+          0.4718,
+          "양팔로 얼굴을 가리며 뒤로 몸을 낮추는 자세"
+        ],
+        [
+          "combat_authored_crouch_head_guard",
+          0.4689,
+          "무릎을 낮추고 두 팔로 머리를 보호하는 자세"
+        ],
+        [
+          "cmu_55_17_00882_mirror",
+          0.4546,
+          "한 발을 들고 얼굴 앞을 보호하며 움찔하는 자세"
+        ]
+      ],
+      "baseline_verdict": "wrong",
+      "final_verdict": "wrong",
+      "visual_note": "서서 얼굴 보호가 1위. 넘어진 상태를 못 맞춤."
+    },
+    {
+      "id": "Q041",
+      "category": "공을 사용하는 스포츠",
+      "text": "투수가 야구공을 던지기 직전에 다리를 드는 모습",
+      "status": "ok",
+      "top": [
+        [
+          "UAL2__OverhandThrow__p02_f0021_mirror",
+          0.6679,
+          "앞다리를 들고 몸을 돌려 야구공 투구를 준비하는 미러 자세."
+        ],
+        [
+          "sd_cmu_124_01_f00374",
+          0.6618,
+          "한 다리를 높이 들어 야구 투구를 준비하는 자세"
+        ],
+        [
+          "sd_cmu_124_02_f00344",
+          0.6529,
+          "앞다리를 들어 팔을 옆으로 펼친 야구 투구 자세"
+        ],
+        [
+          "g1__M_Move17__p04_f0829",
+          0.575,
+          "한 무릎을 높이 들고 몸을 틀어 야구공 투구를 준비하는 자세. 큰 걸음 동작에도 활용 가능."
+        ],
+        [
+          "mass_baseball_pitch_windup",
+          0.5203,
+          "한 무릎을 높이 들고 양손을 가슴 앞에 모아 야구 투구를 준비하는 자세."
+        ]
+      ],
+      "baseline_top": [
+        [
+          "UAL2__OverhandThrow__p02_f0021_mirror",
+          0.6679,
+          "앞다리를 들고 몸을 돌려 야구공 투구를 준비하는 미러 자세."
+        ],
+        [
+          "sd_cmu_124_01_f00374",
+          0.6618,
+          "한 다리를 높이 들어 야구 투구를 준비하는 자세"
+        ],
+        [
+          "sd_cmu_124_02_f00344",
+          0.6529,
+          "앞다리를 들어 팔을 옆으로 펼친 야구 투구 자세"
+        ],
+        [
+          "sd_cmu_124_01_f00424",
+          0.5834,
+          "팔을 머리 위로 휘둘러 야구공을 던지는 자세"
+        ],
+        [
+          "g1__M_Move17__p04_f0829",
+          0.575,
+          "한 무릎을 높이 들고 몸을 틀어 야구공 투구를 준비하는 자세. 큰 걸음 동작에도 활용 가능."
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q042",
+      "category": "공을 사용하는 스포츠",
+      "text": "야구공을 힘껏 던지고 몸이 앞으로 따라가는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "sd_cmu_124_13_f00594",
+          0.4886,
+          "아래로 휘두른 팔을 앞으로 뻗어 투구하는 자세"
+        ],
+        [
+          "sd_cmu_124_01_f00424",
+          0.4337,
+          "팔을 머리 위로 휘둘러 야구공을 던지는 자세"
+        ],
+        [
+          "UAL2__OverhandThrow__p02_f0021_mirror",
+          0.4181,
+          "앞다리를 들고 몸을 돌려 야구공 투구를 준비하는 미러 자세."
+        ],
+        [
+          "g1__M_Move17__p04_f0829",
+          0.4136,
+          "한 무릎을 높이 들고 몸을 틀어 야구공 투구를 준비하는 자세. 큰 걸음 동작에도 활용 가능."
+        ],
+        [
+          "sd_cmu_124_02_f00344",
+          0.4133,
+          "앞다리를 들어 팔을 옆으로 펼친 야구 투구 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "sd_cmu_124_13_f00594",
+          0.4886,
+          "아래로 휘두른 팔을 앞으로 뻗어 투구하는 자세"
+        ],
+        [
+          "sd_cmu_124_01_f00424",
+          0.4337,
+          "팔을 머리 위로 휘둘러 야구공을 던지는 자세"
+        ],
+        [
+          "UAL2__OverhandThrow__p02_f0021_mirror",
+          0.4181,
+          "앞다리를 들고 몸을 돌려 야구공 투구를 준비하는 미러 자세."
+        ],
+        [
+          "g1__M_Move17__p04_f0829",
+          0.4136,
+          "한 무릎을 높이 들고 몸을 틀어 야구공 투구를 준비하는 자세. 큰 걸음 동작에도 활용 가능."
+        ],
+        [
+          "sd_cmu_124_02_f00344",
+          0.4133,
+          "앞다리를 들어 팔을 옆으로 펼친 야구 투구 자세"
+        ]
+      ],
+      "baseline_verdict": "partial",
+      "final_verdict": "partial",
+      "visual_note": "투구는 찾지만 오버핸드 후속 동작 대신 낮은 투구 계열."
+    },
+    {
+      "id": "Q043",
+      "category": "공을 사용하는 스포츠",
+      "text": "타자가 배트를 휘둘러 공을 치는 순간",
+      "status": "ok",
+      "top": [
+        [
+          "Baseball Hit_00033",
+          0.6009,
+          "앞다리를 들고 배트를 어깨 뒤로 준비하는 타격 자세"
+        ],
+        [
+          "Baseball Hit_00054",
+          0.5734,
+          "몸을 돌리며 팔을 옆으로 뻗는 야구 타격 후 자세"
+        ],
+        [
+          "mass_baseball_batter",
+          0.5525,
+          "양손을 어깨 옆에 모아 야구 타격을 준비하는 자세"
+        ],
+        [
+          "sd_cmu_124_08_f00244",
+          0.458,
+          "배트를 가슴 앞에 가로로 잡고 번트를 준비하는 자세"
+        ],
+        [
+          "sd_cmu_124_08_f00514",
+          0.4552,
+          "몸을 틀어 가슴 앞 배트를 유지하는 번트 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "Baseball Hit_00033",
+          0.6009,
+          "앞다리를 들고 배트를 어깨 뒤로 준비하는 타격 자세"
+        ],
+        [
+          "Baseball Hit_00054",
+          0.5734,
+          "몸을 돌리며 팔을 옆으로 뻗는 야구 타격 후 자세"
+        ],
+        [
+          "mass_baseball_batter",
+          0.5525,
+          "양손을 어깨 옆에 모아 야구 타격을 준비하는 자세"
+        ],
+        [
+          "sd_cmu_124_08_f00244",
+          0.458,
+          "배트를 가슴 앞에 가로로 잡고 번트를 준비하는 자세"
+        ],
+        [
+          "sd_cmu_124_08_f00514",
+          0.4552,
+          "몸을 틀어 가슴 앞 배트를 유지하는 번트 자세"
+        ]
+      ],
+      "baseline_verdict": "partial",
+      "final_verdict": "partial",
+      "visual_note": "배트 스윙 준비가 1위. 공을 치는 순간은 2위 설명에 있음."
+    },
+    {
+      "id": "Q044",
+      "category": "공을 사용하는 스포츠",
+      "text": "낮게 날아오는 야구공을 잡으려고 몸을 숙이는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "mass_baseball_grounder",
+          0.4637,
+          "몸을 낮춰 두 손으로 땅볼을 받는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "sd_cmu_124_13_f00264",
+          0.4155,
+          "상체를 낮추고 팔을 아래에서 휘둘러 던지는 자세"
+        ]
+      ],
+      "baseline_verdict": "wrong",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q045",
+      "category": "공을 사용하는 스포츠",
+      "text": "농구공을 양손으로 가슴 앞에서 패스하는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "mass_basketball_chest_pass",
+          0.6439,
+          "서서 양팔을 앞으로 뻗어 농구공을 가슴 패스로 보내는 자세."
+        ]
+      ],
+      "baseline_top": [
+        [
+          "mass_basketball_chest_pass",
+          0.6439,
+          "서서 양팔을 앞으로 뻗어 농구공을 가슴 패스로 보내는 자세."
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q046",
+      "category": "공을 사용하는 스포츠",
+      "text": "달리면서 농구공을 바닥에 튀기는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "sd_cmu_06_13_f01584",
+          0.6348,
+          "몸을 낮춰 다리 사이로 농구공을 드리블하는 자세"
+        ],
+        [
+          "sd_cmu_102_13_f00034",
+          0.6287,
+          "농구공을 낮게 유지하며 옆으로 돌파하는 자세"
+        ],
+        [
+          "mass_basketball_low_dribble_r3",
+          0.5499,
+          "몸을 숙이고 한 손으로 낮게 드리블하는 자세"
+        ],
+        [
+          "sd_cmu_06_13_f02844",
+          0.5458,
+          "상체를 숙여 무릎 사이에서 낮게 드리블하는 자세"
+        ],
+        [
+          "mass_basketball_cross_dribble",
+          0.5152,
+          "앞으로 내딛으며 낮게 크로스오버 드리블하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "sd_cmu_102_13_f00054",
+          0.5092,
+          "상체를 숙이고 한 발로 밀어 농구 돌파를 하는 자세"
+        ],
+        [
+          "sd_cmu_124_06_f00284",
+          0.4864,
+          "레이업을 위해 몸을 낮추고 앞으로 달려드는 자세"
+        ],
+        [
+          "sd_cmu_102_22_f00174",
+          0.4759,
+          "팔을 벌리고 전진하며 공격자를 따라가는 수비 자세"
+        ]
+      ],
+      "baseline_verdict": "partial",
+      "final_verdict": "partial",
+      "visual_note": "드리블은 찾지만 달리는 상태 대신 몸을 낮춘 정지 드리블."
+    },
+    {
+      "id": "Q047",
+      "category": "공을 사용하는 스포츠",
+      "text": "점프해서 농구 골대에 슛을 던지는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "sd_cmu_124_05_f00434",
+          0.5772,
+          "뛰어올라 양팔을 높이며 농구 점프슛을 하는 자세"
+        ],
+        [
+          "sd_cmu_124_06_f00384",
+          0.5512,
+          "양손을 머리 위로 올리며 레이업을 시도하는 자세"
+        ],
+        [
+          "sd_cmu_124_06_f00424",
+          0.4871,
+          "한 팔을 골대 쪽으로 길게 뻗는 레이업 자세"
+        ],
+        [
+          "sd_cmu_124_05_f00454",
+          0.4366,
+          "슛을 던진 팔을 유지하며 착지를 준비하는 자세"
+        ],
+        [
+          "sd_other_ball_05",
+          0.4185,
+          "한 무릎을 높여 뛰며 핸드볼 점프슛 하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "sd_cmu_124_05_f00434",
+          0.5772,
+          "뛰어올라 양팔을 높이며 농구 점프슛을 하는 자세"
+        ],
+        [
+          "sd_cmu_124_06_f00384",
+          0.5512,
+          "양손을 머리 위로 올리며 레이업을 시도하는 자세"
+        ],
+        [
+          "sd_cmu_124_06_f00424",
+          0.4871,
+          "한 팔을 골대 쪽으로 길게 뻗는 레이업 자세"
+        ],
+        [
+          "sd_cmu_124_05_f00454",
+          0.4366,
+          "슛을 던진 팔을 유지하며 착지를 준비하는 자세"
+        ],
+        [
+          "sd_other_ball_05",
+          0.4185,
+          "한 무릎을 높여 뛰며 핸드볼 점프슛 하는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q048",
+      "category": "공을 사용하는 스포츠",
+      "text": "축구공을 세게 차려고 발을 뒤로 빼는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "cmu_11_01_00389",
+          0.7001,
+          "뒷다리를 접어 뒤로 빼고 축구공을 차려고 준비하는 자세. 달리는 장면에도 활용 가능."
+        ],
+        [
+          "sd_cmu_10_01_f00594",
+          0.5821,
+          "한쪽 발을 앞으로 내밀어 축구공을 차는 자세"
+        ],
+        [
+          "sd_cmu_10_01_f00574",
+          0.5449,
+          "공을 차기 위해 다리를 뒤로 접고 달려드는 자세"
+        ],
+        [
+          "cmu_14_06_02733",
+          0.482,
+          "몸을 옆으로 기울이고 팔로 균형 잡는 자세. 축구공을 차는 장면으로도 해석 가능."
+        ],
+        [
+          "sd_cmu_10_05_f00284",
+          0.445,
+          "긴 보폭으로 달려가 축구 킥을 준비하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "cmu_11_01_00389",
+          0.7001,
+          "뒷다리를 접어 뒤로 빼고 축구공을 차려고 준비하는 자세. 달리는 장면에도 활용 가능."
+        ],
+        [
+          "sd_cmu_10_01_f00594",
+          0.5821,
+          "한쪽 발을 앞으로 내밀어 축구공을 차는 자세"
+        ],
+        [
+          "sd_cmu_10_01_f00574",
+          0.5449,
+          "공을 차기 위해 다리를 뒤로 접고 달려드는 자세"
+        ],
+        [
+          "cmu_14_06_02733",
+          0.482,
+          "몸을 옆으로 기울이고 팔로 균형 잡는 자세. 축구공을 차는 장면으로도 해석 가능."
+        ],
+        [
+          "sd_cmu_10_05_f00284",
+          0.445,
+          "긴 보폭으로 달려가 축구 킥을 준비하는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q049",
+      "category": "공을 사용하는 스포츠",
+      "text": "골키퍼가 날아오는 공을 막으려고 준비하는 모습",
+      "status": "ok",
+      "top": [
+        [
+          "g1__M_Move4__p05_f1535",
+          0.597,
+          "다리를 넓게 벌려 몸을 낮추고 페널티킥을 막을 준비를 하는 골키퍼로 활용 가능한 자세."
+        ]
+      ],
+      "baseline_top": [
+        [
+          "g1__M_Move4__p05_f1535",
+          0.597,
+          "다리를 넓게 벌려 몸을 낮추고 페널티킥을 막을 준비를 하는 골키퍼로 활용 가능한 자세."
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q050",
+      "category": "공을 사용하는 스포츠",
+      "text": "배구 네트 앞에서 뛰어올라 두 손으로 공을 막는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "sd_volleyball_09",
+          0.5603,
+          "옆으로 이동해 양손을 높여 블로킹하는 자세"
+        ],
+        [
+          "mass_volleyball_block",
+          0.5535,
+          "양손을 높이 올려 배구 블로킹하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "sd_volleyball_02",
+          0.571,
+          "뛰어올라 높은 손으로 배구 점프서브를 하는 자세"
+        ],
+        [
+          "sd_volleyball_09",
+          0.5603,
+          "옆으로 이동해 양손을 높여 블로킹하는 자세"
+        ],
+        [
+          "mass_volleyball_block",
+          0.5535,
+          "양손을 높이 올려 배구 블로킹하는 자세"
+        ],
+        [
+          "sd_volleyball_06_r2",
+          0.4375,
+          "한 무릎을 낮추고 팔을 내밀어 배구공을 수비하는 자세"
+        ],
+        [
+          "sd_volleyball_03",
+          0.4342,
+          "양팔을 높이며 배구 스파이크를 위해 도약하는 자세"
+        ]
+      ],
+      "baseline_verdict": "wrong",
+      "final_verdict": "partial",
+      "visual_note": "두 손 블로킹은 찾지만 점프 단계가 덜 맞음."
+    },
+    {
+      "id": "Q051",
+      "category": "이동·착지·운동",
+      "text": "전력으로 달리다가 방향을 바꾸는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "mass_accad_C15_RunTurnRight45_f00032",
+          0.7233,
+          "무릎을 굽혀 달리며 방향을 바꾸는 자세"
+        ],
+        [
+          "mass_accad_C15_RunTurnRight45_f00041",
+          0.7195,
+          "상체를 틀며 달리는 방향을 바꾸는 자세"
+        ],
+        [
+          "style100_Rushed_FR_f000728_49438f60",
+          0.6872,
+          "몸을 낮춰 급하게 방향을 바꾸며 달리는 자세"
+        ],
+        [
+          "combat_ual1_Sprint_Loop_f00600",
+          0.5125,
+          "큰 보폭으로 앞으로 전력 질주하는 자세"
+        ],
+        [
+          "UAL1__Sprint_Loop__p01_f0007_mirror",
+          0.504,
+          "한쪽 무릎을 가슴 쪽으로 들어 전력 질주하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "mass_accad_C15_RunTurnRight45_f00032",
+          0.7233,
+          "무릎을 굽혀 달리며 방향을 바꾸는 자세"
+        ],
+        [
+          "mass_accad_C15_RunTurnRight45_f00041",
+          0.7195,
+          "상체를 틀며 달리는 방향을 바꾸는 자세"
+        ],
+        [
+          "style100_Rushed_FR_f000728_49438f60",
+          0.6872,
+          "몸을 낮춰 급하게 방향을 바꾸며 달리는 자세"
+        ],
+        [
+          "combat_ual1_Sprint_Loop_f00600",
+          0.5125,
+          "큰 보폭으로 앞으로 전력 질주하는 자세"
+        ],
+        [
+          "UAL1__Sprint_Loop__p01_f0007_mirror",
+          0.504,
+          "한쪽 무릎을 가슴 쪽으로 들어 전력 질주하는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q052",
+      "category": "이동·착지·운동",
+      "text": "천천히 걷다가 뒤를 돌아보는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "webtoon_romance_40",
+          0.6337,
+          "뒤를 돌아보며 한 손을 흔들어 인사하는 자세"
+        ],
+        [
+          "mass_daily_seated_over_shoulder",
+          0.539,
+          "앉아서 몸을 돌려 뒤를 바라보는 자세"
+        ],
+        [
+          "rokoko_DoubleTakes_mixamo_00092_mirror",
+          0.4843,
+          "한 발을 옮겨 돌아보며 반응하는 자세"
+        ],
+        [
+          "style100_Rushed_FW_f001297_49438f60",
+          0.4251,
+          "몸을 옆으로 기울여 급하게 방향을 바꾸는 걸음 자세"
+        ],
+        [
+          "g1__M_Move6__n02_f0597",
+          0.4088,
+          "두 손을 가슴 앞에 두고 몸을 비트는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "webtoon_romance_40",
+          0.6337,
+          "뒤를 돌아보며 한 손을 흔들어 인사하는 자세"
+        ],
+        [
+          "mass_daily_seated_over_shoulder",
+          0.539,
+          "앉아서 몸을 돌려 뒤를 바라보는 자세"
+        ],
+        [
+          "rokoko_DoubleTakes_mixamo_00092_mirror",
+          0.4843,
+          "한 발을 옮겨 돌아보며 반응하는 자세"
+        ],
+        [
+          "style100_Rushed_FW_f001297_49438f60",
+          0.4251,
+          "몸을 옆으로 기울여 급하게 방향을 바꾸는 걸음 자세"
+        ],
+        [
+          "g1__M_Move6__n02_f0597",
+          0.4088,
+          "두 손을 가슴 앞에 두고 몸을 비트는 자세"
+        ]
+      ],
+      "baseline_verdict": "partial",
+      "final_verdict": "partial",
+      "visual_note": "돌아보기는 맞지만 걷기보다 인사 해석이 섞임."
+    },
+    {
+      "id": "Q053",
+      "category": "이동·착지·운동",
+      "text": "높은 데서 뛰어내려 바닥에 착지하는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "sd_cmu_01_08_f01784",
+          0.6484,
+          "높은 곳에서 뛰어내리며 다리를 앞으로 뻗는 자세"
+        ],
+        [
+          "sd_athletics_07_r2",
+          0.4579,
+          "멀리뛰기 중 두 다리를 앞으로 모아 착지를 준비하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "sd_cmu_01_08_f01784",
+          0.6484,
+          "높은 곳에서 뛰어내리며 다리를 앞으로 뻗는 자세"
+        ],
+        [
+          "sd_athletics_07_r2",
+          0.4579,
+          "멀리뛰기 중 두 다리를 앞으로 모아 착지를 준비하는 자세"
+        ]
+      ],
+      "baseline_verdict": "partial",
+      "final_verdict": "partial",
+      "visual_note": "공중에서 내려오는 단계. 실제 지면 접촉 착지를 우선하지 못함."
+    },
+    {
+      "id": "Q054",
+      "category": "이동·착지·운동",
+      "text": "뛰어내린 뒤 무릎을 굽혀 충격을 받아내는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "combat_ual2_NinjaJump_Land_f01200",
+          0.5757,
+          "무릎을 굽혀 점프 착지를 받아내는 자세"
+        ],
+        [
+          "style100_TwoFootJump_FW_f000791_49438f60",
+          0.5637,
+          "두 발 점프 후 무릎을 굽혀 균형 잡는 자세"
+        ],
+        [
+          "sd_volleyball_10",
+          0.5635,
+          "착지하며 무릎을 굽혀 다음 배구 수비를 준비하는 자세"
+        ],
+        [
+          "combat_ual1_Jump_Land_f01400",
+          0.5524,
+          "점프 후 무릎과 허리를 굽혀 착지 충격을 받아내는 자세"
+        ],
+        [
+          "sd_cmu_01_08_f01784",
+          0.5211,
+          "높은 곳에서 뛰어내리며 다리를 앞으로 뻗는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "mass_basketball_rebound",
+          0.476,
+          "한 무릎을 들고 높이 손을 뻗어 리바운드를 잡는 자세"
+        ],
+        [
+          "combat_ual1_Jump_Land_f01400",
+          0.4479,
+          "점프 후 무릎과 허리를 굽혀 착지 충격을 받아내는 자세"
+        ],
+        [
+          "UAL2__NinjaJump_Start__p01_f0002_mirror",
+          0.4317,
+          "양 무릎을 굽혀 힘을 모으는 도약 준비 자세"
+        ],
+        [
+          "style100_TwoFootJump_FW_f000711_49438f60",
+          0.428,
+          "양무릎을 굽혀 두 발 점프를 준비하는 자세"
+        ]
+      ],
+      "baseline_verdict": "wrong",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q055",
+      "category": "이동·착지·운동",
+      "text": "발을 헛디뎌 앞으로 넘어지는 장면",
+      "status": "ok",
+      "top": [
+        [
+          "Big Side Hit_00009_mirror",
+          0.4315,
+          "충격에 밀려 다리가 앞으로 뜨는 피격 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "Big Side Hit_00009_mirror",
+          0.4315,
+          "충격에 밀려 다리가 앞으로 뜨는 피격 자세"
+        ]
+      ],
+      "baseline_verdict": "wrong",
+      "final_verdict": "wrong",
+      "visual_note": "뒤로 밀리는 피격이 1위. 앞으로 넘어짐 방향 오류."
+    },
+    {
+      "id": "Q056",
+      "category": "이동·착지·운동",
+      "text": "바닥에 엎드려 팔굽혀펴기를 하는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "mass_accad_A11_Crawl_f00048",
+          0.5473,
+          "몸을 바닥 가까이 낮춰 포복하는 자세"
+        ],
+        [
+          "combat_ual1_Swim_Fwd_Loop_f00200",
+          0.4189,
+          "엎드린 채 팔을 굽혀 물을 젓는 수영 자세"
+        ],
+        [
+          "sd_cmu_111_21_f01304",
+          0.4075,
+          "엎드린 채 한 팔을 앞으로 길게 뻗고 다른 팔을 머리 가까이 접은 자세."
+        ]
+      ],
+      "baseline_top": [
+        [
+          "mass_accad_A11_Crawl_f00048",
+          0.5473,
+          "몸을 바닥 가까이 낮춰 포복하는 자세"
+        ],
+        [
+          "combat_ual1_Swim_Fwd_Loop_f00200",
+          0.4189,
+          "엎드린 채 팔을 굽혀 물을 젓는 수영 자세"
+        ],
+        [
+          "sd_cmu_111_21_f01304",
+          0.4075,
+          "엎드린 채 한 팔을 앞으로 길게 뻗고 다른 팔을 머리 가까이 접은 자세."
+        ]
+      ],
+      "baseline_verdict": "wrong",
+      "final_verdict": "wrong",
+      "visual_note": "팔굽혀펴기가 아니라 포복이 1위. 해당 태그·설명은 목록에서 미발견."
+    },
+    {
+      "id": "Q057",
+      "category": "이동·착지·운동",
+      "text": "운동 전에 한 팔을 가슴 앞으로 당겨 몸을 푸는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "Arm Stretching_00054_mirror",
+          0.6109,
+          "한 팔을 가슴 앞으로 당겨 어깨를 푸는 자세"
+        ],
+        [
+          "style100_SwingArmsRound_FR_f000741_26c31151",
+          0.434,
+          "팔로 큰 원을 그리며 몸을 푸는 자세"
+        ],
+        [
+          "cmu_143_16_00087",
+          0.4314,
+          "고개를 숙이고 한 무릎을 높게 들어 몸을 푸는 자세"
+        ],
+        [
+          "sd_cmu_01_02_f00694",
+          0.4206,
+          "한 발을 높이 올리고 몸을 당겨 등반하는 자세"
+        ],
+        [
+          "expansion_accad_D9_WarmUpToReadyToWarmUp_f00150",
+          0.4198,
+          "두 팔을 앞으로 들어 몸을 풀고 준비하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "Arm Stretching_00054_mirror",
+          0.6109,
+          "한 팔을 가슴 앞으로 당겨 어깨를 푸는 자세"
+        ],
+        [
+          "style100_SwingArmsRound_FR_f000741_26c31151",
+          0.434,
+          "팔로 큰 원을 그리며 몸을 푸는 자세"
+        ],
+        [
+          "cmu_143_16_00087",
+          0.4314,
+          "고개를 숙이고 한 무릎을 높게 들어 몸을 푸는 자세"
+        ],
+        [
+          "sd_cmu_01_02_f00694",
+          0.4206,
+          "한 발을 높이 올리고 몸을 당겨 등반하는 자세"
+        ],
+        [
+          "expansion_accad_D9_WarmUpToReadyToWarmUp_f00150",
+          0.4198,
+          "두 팔을 앞으로 들어 몸을 풀고 준비하는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q058",
+      "category": "이동·착지·운동",
+      "text": "한쪽 발로 서서 다른 발목을 잡고 허벅지를 늘리는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "Male Standing Pose (1)_01_mirror",
+          0.482,
+          "서서 한쪽 무릎을 양손으로 끌어안아 올리는 자세"
+        ],
+        [
+          "sd_dressing_09",
+          0.447,
+          "한 발로 서서 다른 다리를 들어 신발을 터는 자세"
+        ],
+        [
+          "sd_cmu_13_10_f01674",
+          0.4413,
+          "높은 곳을 잡고 무릎을 굽혀 중심을 잡는 자세"
+        ],
+        [
+          "sd_cmu_79_42_f00367",
+          0.4371,
+          "한 손으로 그릇을 들고 다른 손으로 수프를 떠먹는 자세"
+        ],
+        [
+          "webtoon_daily_49",
+          0.4272,
+          "한 팔에 책을 끼고 다른 손으로 인사하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "Male Standing Pose (1)_01_mirror",
+          0.482,
+          "서서 한쪽 무릎을 양손으로 끌어안아 올리는 자세"
+        ],
+        [
+          "sd_dressing_09",
+          0.447,
+          "한 발로 서서 다른 다리를 들어 신발을 터는 자세"
+        ],
+        [
+          "sd_cmu_13_10_f01674",
+          0.4413,
+          "높은 곳을 잡고 무릎을 굽혀 중심을 잡는 자세"
+        ],
+        [
+          "sd_cmu_79_42_f00367",
+          0.4371,
+          "한 손으로 그릇을 들고 다른 손으로 수프를 떠먹는 자세"
+        ],
+        [
+          "webtoon_daily_49",
+          0.4272,
+          "한 팔에 책을 끼고 다른 손으로 인사하는 자세"
+        ]
+      ],
+      "baseline_verdict": "wrong",
+      "final_verdict": "wrong",
+      "visual_note": "무릎 끌어안기가 1위. 뒤로 발목 잡고 허벅지 늘리기와 다름."
+    },
+    {
+      "id": "Q059",
+      "category": "이동·착지·운동",
+      "text": "스케이트를 타며 한쪽 다리를 뒤로 뻗는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "cmu_05_13_00670",
+          0.5968,
+          "두 팔을 수평으로 벌리고 한 다리를 옆뒤로 뻗는 자세"
+        ],
+        [
+          "cmu_05_13_00603_mirror",
+          0.4944,
+          "양팔을 펼치고 한 다리를 뒤로 들어 우아하게 서 있는 자세"
+        ],
+        [
+          "sports_skate_side_leg_reach",
+          0.4285,
+          "한 발로 균형 잡고 옆으로 든 다리에 손을 뻗는 스케이팅 자세"
+        ],
+        [
+          "cmu_105_07_00948",
+          0.4216,
+          "양손을 앞으로 내밀고 한 다리를 뒤로 들어 균형 잡는 자세"
+        ],
+        [
+          "cmu_05_10_00183",
+          0.4155,
+          "두 손을 머리 위로 모으고 다리를 교차해 스케이팅 회전하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "cmu_05_13_00670",
+          0.5968,
+          "두 팔을 수평으로 벌리고 한 다리를 옆뒤로 뻗는 자세"
+        ],
+        [
+          "cmu_05_13_00603_mirror",
+          0.4944,
+          "양팔을 펼치고 한 다리를 뒤로 들어 우아하게 서 있는 자세"
+        ],
+        [
+          "sports_skate_side_leg_reach",
+          0.4285,
+          "한 발로 균형 잡고 옆으로 든 다리에 손을 뻗는 스케이팅 자세"
+        ],
+        [
+          "cmu_105_07_00948",
+          0.4216,
+          "양손을 앞으로 내밀고 한 다리를 뒤로 들어 균형 잡는 자세"
+        ],
+        [
+          "cmu_05_10_00183",
+          0.4155,
+          "두 손을 머리 위로 모으고 다리를 교차해 스케이팅 회전하는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q060",
+      "category": "이동·착지·운동",
+      "text": "물속에서 팔을 번갈아 저으며 앞으로 헤엄치는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "sd_cmu_125_06_f02614",
+          0.7446,
+          "팔을 번갈아 젓으며 몸을 틀어 수영하는 자세"
+        ],
+        [
+          "combat_ual1_Swim_Fwd_Loop_f02000",
+          0.591,
+          "팔을 양옆으로 벌리고 발을 접어 헤엄치는 자세"
+        ],
+        [
+          "combat_ual1_Swim_Fwd_Loop_f03000",
+          0.5752,
+          "팔을 앞으로 모으고 다리를 접은 수영 자세"
+        ],
+        [
+          "sd_cmu_126_10_f00424",
+          0.5702,
+          "한 팔을 앞으로 보내며 자유형으로 나아가는 자세"
+        ],
+        [
+          "sd_cmu_126_10_f01074",
+          0.5692,
+          "자유형으로 한 팔을 앞으로 뻗고 반대 팔을 당기는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "sd_cmu_125_06_f02614",
+          0.7446,
+          "팔을 번갈아 젓으며 몸을 틀어 수영하는 자세"
+        ],
+        [
+          "combat_ual1_Swim_Fwd_Loop_f02000",
+          0.591,
+          "팔을 양옆으로 벌리고 발을 접어 헤엄치는 자세"
+        ],
+        [
+          "combat_ual1_Swim_Fwd_Loop_f03000",
+          0.5752,
+          "팔을 앞으로 모으고 다리를 접은 수영 자세"
+        ],
+        [
+          "sd_cmu_126_10_f00424",
+          0.5702,
+          "한 팔을 앞으로 보내며 자유형으로 나아가는 자세"
+        ],
+        [
+          "sd_cmu_126_10_f01074",
+          0.5692,
+          "자유형으로 한 팔을 앞으로 뻗고 반대 팔을 당기는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q061",
+      "category": "일상·생활",
+      "text": "의자에 앉아 등을 기대고 쉬는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "sd_cmu_13_04_f02064",
+          0.7255,
+          "한 무릎에 팔을 기대고 생각하는 좌식 자세"
+        ],
+        [
+          "story_seated_ledge_recline",
+          0.5623,
+          "턱에 기대 한 다리를 길게 뻗고 앉아 쉬는 자세"
+        ],
+        [
+          "rokoko_Typing_UsingMouse_mixamo_00882_mirror",
+          0.5589,
+          "앉아 양손을 뒤로 두고 쉬는 미러 자세"
+        ],
+        [
+          "sd_rest_01",
+          0.5436,
+          "의자에서 팔을 내려놓고 가슴을 펴 쉬는 자세"
+        ],
+        [
+          "MH__wolgade_sit_on_ground_01",
+          0.5251,
+          "바닥에 비스듬히 앉아 한 손을 짚고 다리를 옆으로 뻗은 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "sd_cmu_13_04_f02064",
+          0.7255,
+          "한 무릎에 팔을 기대고 생각하는 좌식 자세"
+        ],
+        [
+          "story_seated_ledge_recline",
+          0.5623,
+          "턱에 기대 한 다리를 길게 뻗고 앉아 쉬는 자세"
+        ],
+        [
+          "rokoko_Typing_UsingMouse_mixamo_00882_mirror",
+          0.5589,
+          "앉아 양손을 뒤로 두고 쉬는 미러 자세"
+        ],
+        [
+          "sd_rest_01",
+          0.5436,
+          "의자에서 팔을 내려놓고 가슴을 펴 쉬는 자세"
+        ],
+        [
+          "MH__wolgade_sit_on_ground_01",
+          0.5251,
+          "바닥에 비스듬히 앉아 한 손을 짚고 다리를 옆으로 뻗은 자세"
+        ]
+      ],
+      "baseline_verdict": "partial",
+      "final_verdict": "partial",
+      "visual_note": "앉기·쉬기는 맞지만 등 기대기 대신 무릎에 팔 기대기."
+    },
+    {
+      "id": "Q062",
+      "category": "일상·생활",
+      "text": "침대에 누워 한쪽 팔로 머리를 받친 자세",
+      "status": "ok",
+      "top": [
+        [
+          "combat_composition_rough_293_p0",
+          0.4721,
+          "뒤로 누워 한 다리를 들어 차며 팔로 몸을 받치는 자세"
+        ],
+        [
+          "sd_cmu_111_06_f00014",
+          0.4029,
+          "누워 한쪽 무릎을 접어 다리를 교차시키는 자세"
+        ],
+        [
+          "sd_cmu_111_21_f00504",
+          0.4009,
+          "옆으로 누워 한 팔을 머리 옆에 둔 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "combat_composition_rough_293_p0",
+          0.4721,
+          "뒤로 누워 한 다리를 들어 차며 팔로 몸을 받치는 자세"
+        ],
+        [
+          "sd_cmu_111_06_f00014",
+          0.4029,
+          "누워 한쪽 무릎을 접어 다리를 교차시키는 자세"
+        ],
+        [
+          "sd_cmu_111_21_f00504",
+          0.4009,
+          "옆으로 누워 한 팔을 머리 옆에 둔 자세"
+        ]
+      ],
+      "baseline_verdict": "wrong",
+      "final_verdict": "wrong",
+      "visual_note": "뒤로 누워 발차기. 머리를 팔로 받치는 휴식과 다름."
+    },
+    {
+      "id": "Q063",
+      "category": "일상·생활",
+      "text": "책을 읽다가 고개를 들어 앞을 보는 사람",
+      "status": "no_result",
+      "top": [],
+      "baseline_top": [],
+      "baseline_verdict": "no_result",
+      "final_verdict": "no_result",
+      "visual_note": "독서 후 앞 보기라는 전환을 못 찾아 결과 없음."
+    },
+    {
+      "id": "Q064",
+      "category": "일상·생활",
+      "text": "휴대폰을 귀에 대고 통화하는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "Talking On A Cell Phone (1)_03",
+          1,
+          "한 손으로 휴대폰을 귀에 대고 서서 통화하는 자세"
+        ],
+        [
+          "webtoon_daily_20",
+          1,
+          "휴대폰을 귀에 대고 통화하는 자세"
+        ],
+        [
+          "Talking On A Cell Phone (1)_02",
+          0.9548,
+          "한 손을 귀에 대고 다른 손으로 설명하며 통화하는 자세"
+        ],
+        [
+          "combat_ual2_Idle_TalkingPhone_Loop_f06000",
+          0.9158,
+          "전화기를 귀에 대고 다른 손으로 설명하는 자세"
+        ],
+        [
+          "Talking On Phone_02",
+          0.8985,
+          "한 손을 허리에 얹고 다른 손을 귀에 대어 통화하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "Talking On A Cell Phone (1)_03",
+          1,
+          "한 손으로 휴대폰을 귀에 대고 서서 통화하는 자세"
+        ],
+        [
+          "webtoon_daily_20",
+          1,
+          "휴대폰을 귀에 대고 통화하는 자세"
+        ],
+        [
+          "Talking On A Cell Phone (1)_02",
+          0.9548,
+          "한 손을 귀에 대고 다른 손으로 설명하며 통화하는 자세"
+        ],
+        [
+          "combat_ual2_Idle_TalkingPhone_Loop_f06000",
+          0.9158,
+          "전화기를 귀에 대고 다른 손으로 설명하는 자세"
+        ],
+        [
+          "Talking On Phone_02",
+          0.8985,
+          "한 손을 허리에 얹고 다른 손을 귀에 대어 통화하는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q065",
+      "category": "일상·생활",
+      "text": "앉아서 컴퓨터 키보드를 두드리는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "rokoko_Typing_UsingMouse_mixamo_00668",
+          0.7303,
+          "앉아서 두 손으로 키보드를 입력하는 자세"
+        ],
+        [
+          "webtoon_daily_22",
+          0.7302,
+          "앉아서 양손으로 키보드를 입력하는 자세"
+        ],
+        [
+          "rokoko_Typing_UsingMouse_mixamo_01272_mirror",
+          0.5464,
+          "한 손으로 컴퓨터를 조작하는 미러 좌식 자세"
+        ],
+        [
+          "rokoko_Typing_UsingMouse_mixamo_00390",
+          0.5399,
+          "앉아서 한 손으로 마우스를 조작하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "rokoko_Typing_UsingMouse_mixamo_00668",
+          0.7303,
+          "앉아서 두 손으로 키보드를 입력하는 자세"
+        ],
+        [
+          "webtoon_daily_22",
+          0.7302,
+          "앉아서 양손으로 키보드를 입력하는 자세"
+        ],
+        [
+          "rokoko_Typing_UsingMouse_mixamo_01272_mirror",
+          0.5464,
+          "한 손으로 컴퓨터를 조작하는 미러 좌식 자세"
+        ],
+        [
+          "rokoko_Typing_UsingMouse_mixamo_00390",
+          0.5399,
+          "앉아서 한 손으로 마우스를 조작하는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q066",
+      "category": "일상·생활",
+      "text": "컵을 입 가까이 가져가 마시려는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "webtoon_daily_08",
+          0.8283,
+          "한 손으로 컵을 입 가까이 들어 물을 마시는 자세"
+        ],
+        [
+          "webtoon_romance_02",
+          0.5623,
+          "앉아서 찻잔을 들고 상대의 이야기를 듣는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "webtoon_daily_08",
+          0.8283,
+          "한 손으로 컵을 입 가까이 들어 물을 마시는 자세"
+        ],
+        [
+          "webtoon_romance_02",
+          0.5623,
+          "앉아서 찻잔을 들고 상대의 이야기를 듣는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q067",
+      "category": "일상·생활",
+      "text": "무거운 상자를 두 팔로 안고 옮기는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "webtoon_daily_12",
+          0.5804,
+          "무거운 상자를 허리 높이에서 두 손으로 드는 자세"
+        ],
+        [
+          "expansion_accad_B20_WalkWithBox_f00093",
+          0.5271,
+          "상자를 배 앞에 안고 걷는 자세"
+        ],
+        [
+          "webtoon_romance_46",
+          0.404,
+          "큰 곰인형을 품에 안고 걸어가는 자세"
+        ],
+        [
+          "webtoon_romance_06",
+          0.4004,
+          "받은 선물 상자를 가슴에 안고 기뻐하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "webtoon_daily_12",
+          0.5804,
+          "무거운 상자를 허리 높이에서 두 손으로 드는 자세"
+        ],
+        [
+          "expansion_accad_B20_WalkWithBox_f00093",
+          0.5271,
+          "상자를 배 앞에 안고 걷는 자세"
+        ],
+        [
+          "webtoon_romance_46",
+          0.404,
+          "큰 곰인형을 품에 안고 걸어가는 자세"
+        ],
+        [
+          "webtoon_romance_06",
+          0.4004,
+          "받은 선물 상자를 가슴에 안고 기뻐하는 자세"
+        ]
+      ],
+      "baseline_verdict": "partial",
+      "final_verdict": "partial",
+      "visual_note": "상자를 들지만 품에 안고 이동하는 상태는 2위에 더 가까움."
+    },
+    {
+      "id": "Q068",
+      "category": "일상·생활",
+      "text": "잘 안 열리는 문을 온몸으로 밀고 있는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "webtoon_daily_32",
+          0.4109,
+          "양손을 앞으로 내밀어 무거운 문을 밀어 여는 자세"
+        ],
+        [
+          "rokoko_BurstThroughDoor_mixamo_00081_mirror",
+          0.4076,
+          "문을 밀어젖히며 한 발을 내딛는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "webtoon_daily_32",
+          0.4109,
+          "양손을 앞으로 내밀어 무거운 문을 밀어 여는 자세"
+        ],
+        [
+          "rokoko_BurstThroughDoor_mixamo_00081_mirror",
+          0.4076,
+          "문을 밀어젖히며 한 발을 내딛는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q069",
+      "category": "일상·생활",
+      "text": "몸을 숙여 신발 끈을 묶는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "sd_cmu_143_13_f00114",
+          0.511,
+          "몸을 숙여 세탁 바구니 손잡이에 손을 뻗는 자세"
+        ],
+        [
+          "g1__M_Move9__p05_f1433_mirror",
+          0.4976,
+          "앉은 채 양다리 사이로 몸을 숙여 늘리는 자세"
+        ],
+        [
+          "combat_ual1_Fixing_Kneeling_f04000",
+          0.4967,
+          "한 무릎을 꿇고 몸을 숙여 바닥 쪽 물건을 수리하는 자세"
+        ],
+        [
+          "combat_ual2_ClimbUp_1m_RM_f00400",
+          0.495,
+          "무릎을 높이고 몸을 숙여 턱을 올라가는 자세"
+        ],
+        [
+          "sd_cmu_79_26_f00787",
+          0.491,
+          "몸을 숙여 나무를 심을 자리를 정리하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "sd_cmu_143_13_f00114",
+          0.511,
+          "몸을 숙여 세탁 바구니 손잡이에 손을 뻗는 자세"
+        ],
+        [
+          "g1__M_Move9__p05_f1433_mirror",
+          0.4976,
+          "앉은 채 양다리 사이로 몸을 숙여 늘리는 자세"
+        ],
+        [
+          "combat_ual1_Fixing_Kneeling_f04000",
+          0.4967,
+          "한 무릎을 꿇고 몸을 숙여 바닥 쪽 물건을 수리하는 자세"
+        ],
+        [
+          "combat_ual2_ClimbUp_1m_RM_f00400",
+          0.495,
+          "무릎을 높이고 몸을 숙여 턱을 올라가는 자세"
+        ],
+        [
+          "sd_cmu_79_26_f00787",
+          0.491,
+          "몸을 숙여 나무를 심을 자리를 정리하는 자세"
+        ]
+      ],
+      "baseline_verdict": "wrong",
+      "final_verdict": "wrong",
+      "visual_note": "바구니 잡기가 1위. 신발 끈 묶기 설명은 목록에서 미발견."
+    },
+    {
+      "id": "Q070",
+      "category": "일상·생활",
+      "text": "바닥에 떨어진 물건을 주우려고 손을 뻗는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "sd_sport_between_03_r2",
+          0.5612,
+          "바닥에 앉아 발목 쪽으로 양손을 뻗는 스트레칭 자세"
+        ],
+        [
+          "webtoon_daily_30",
+          0.528,
+          "선반 위 물건을 향해 한 손을 높이 뻗는 자세"
+        ],
+        [
+          "combat_authored_ground_reach",
+          0.5034,
+          "다리를 넓게 벌려 낮추고 한 손을 바닥 쪽으로 뻗는 자세"
+        ],
+        [
+          "UAL2__Consume__p01_f0016",
+          0.495,
+          "한 손을 앞에 내밀어 물건을 집거나 사용하는 자세"
+        ],
+        [
+          "webtoon_daily_31",
+          0.4778,
+          "쪼그려 앉아 바닥의 작은 물건을 줍는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "sd_sport_between_03_r2",
+          0.5612,
+          "바닥에 앉아 발목 쪽으로 양손을 뻗는 스트레칭 자세"
+        ],
+        [
+          "combat_authored_ground_reach",
+          0.5034,
+          "다리를 넓게 벌려 낮추고 한 손을 바닥 쪽으로 뻗는 자세"
+        ]
+      ],
+      "baseline_verdict": "wrong",
+      "final_verdict": "wrong",
+      "visual_note": "앉아 발목 쪽으로 손을 뻗는 스트레칭이 여전히 1위. 물건 줍기의 행동·신체 관계 미해결."
+    },
+    {
+      "id": "Q071",
+      "category": "감정·몸짓",
+      "text": "갑자기 뭔가 튀어나와서 놀라 뒤로 물러나는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "Surprised_02",
+          0.575,
+          "두 손을 앞으로 벌리며 놀라 뒤로 물러나는 자세"
+        ],
+        [
+          "cmu_14_16_03756",
+          0.5537,
+          "손을 가슴 앞으로 들어 놀라며 뒤로 물러나는 자세"
+        ],
+        [
+          "cmu_55_17_00882",
+          0.5465,
+          "손을 얼굴 양옆에 들고 놀라서 뒤로 물러나는 자세"
+        ],
+        [
+          "Reacting_02_mirror",
+          0.4311,
+          "손을 앞으로 벌려 들고 조심스럽게 물러나는 자세"
+        ],
+        [
+          "cmu_127_20_00102",
+          0.423,
+          "한 손을 얼굴 옆에 들고 몸을 낮추며 물러나는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "Surprised_02",
+          0.575,
+          "두 손을 앞으로 벌리며 놀라 뒤로 물러나는 자세"
+        ],
+        [
+          "cmu_14_16_03756",
+          0.5537,
+          "손을 가슴 앞으로 들어 놀라며 뒤로 물러나는 자세"
+        ],
+        [
+          "cmu_55_17_00882",
+          0.5465,
+          "손을 얼굴 양옆에 들고 놀라서 뒤로 물러나는 자세"
+        ],
+        [
+          "Reacting_02_mirror",
+          0.4311,
+          "손을 앞으로 벌려 들고 조심스럽게 물러나는 자세"
+        ],
+        [
+          "cmu_127_20_00102",
+          0.423,
+          "한 손을 얼굴 옆에 들고 몸을 낮추며 물러나는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q072",
+      "category": "감정·몸짓",
+      "text": "아 망했다 싶어서 두 손으로 머리를 감싸는 사람",
+      "status": "no_result",
+      "top": [],
+      "baseline_top": [],
+      "baseline_verdict": "no_result",
+      "final_verdict": "no_result",
+      "visual_note": "망했다·싶어서 등 구어체 감정과 머리 감싸기 연결 실패."
+    },
+    {
+      "id": "Q073",
+      "category": "감정·몸짓",
+      "text": "화가 나서 상대를 손가락으로 가리키는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "webtoon_romance_48",
+          0.5115,
+          "앉아서 사진을 들고 손가락으로 한 부분을 가리키는 자세"
+        ],
+        [
+          "cmu_14_26_01830",
+          0.4296,
+          "한 팔을 옆 앞으로 뻗어 방향을 가리키는 자세"
+        ],
+        [
+          "cmu_13_27_01871",
+          0.424,
+          "한 팔을 대각선 앞으로 뻗어 방향을 가리키는 자세"
+        ],
+        [
+          "rokoko_Witness_mixamo_01169",
+          0.4076,
+          "앉아서 한 손으로 앞을 가리키며 이야기하는 자세"
+        ],
+        [
+          "rokoko_Interogation_BadCop_mixamo_00338_mirror",
+          0.4053,
+          "몸을 기울이며 손으로 상대를 지적하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "webtoon_romance_48",
+          0.5115,
+          "앉아서 사진을 들고 손가락으로 한 부분을 가리키는 자세"
+        ],
+        [
+          "cmu_14_26_01830",
+          0.4296,
+          "한 팔을 옆 앞으로 뻗어 방향을 가리키는 자세"
+        ],
+        [
+          "cmu_13_27_01871",
+          0.424,
+          "한 팔을 대각선 앞으로 뻗어 방향을 가리키는 자세"
+        ],
+        [
+          "rokoko_Witness_mixamo_01169",
+          0.4076,
+          "앉아서 한 손으로 앞을 가리키며 이야기하는 자세"
+        ],
+        [
+          "rokoko_Interogation_BadCop_mixamo_00338_mirror",
+          0.4053,
+          "몸을 기울이며 손으로 상대를 지적하는 자세"
+        ]
+      ],
+      "baseline_verdict": "wrong",
+      "final_verdict": "wrong",
+      "visual_note": "사진의 한 부분을 가리키는 자세. 분노/상대 대상 미반영."
+    },
+    {
+      "id": "Q074",
+      "category": "감정·몸짓",
+      "text": "부끄러워서 얼굴을 손으로 가리는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "webtoon_romance_27",
+          0.9131,
+          "양손으로 얼굴을 가리며 부끄러워하는 자세"
+        ],
+        [
+          "webtoon_romance_25",
+          0.6522,
+          "한 손으로 입을 가리고 웃는 자세"
+        ],
+        [
+          "Kiss_02_mirror",
+          0.5048,
+          "얼굴 옆에 손을 올리고 상대 쪽으로 손짓하는 자세"
+        ],
+        [
+          "webtoon_romance_07",
+          0.4961,
+          "편지를 두 손으로 내밀며 고백하는 자세"
+        ],
+        [
+          "rokoko_Flirty_mixamo_01258_mirror",
+          0.4881,
+          "한 손으로 머리를 만지며 몸을 기울이는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "webtoon_romance_27",
+          0.9131,
+          "양손으로 얼굴을 가리며 부끄러워하는 자세"
+        ],
+        [
+          "webtoon_romance_25",
+          0.6522,
+          "한 손으로 입을 가리고 웃는 자세"
+        ],
+        [
+          "Kiss_02_mirror",
+          0.5048,
+          "얼굴 옆에 손을 올리고 상대 쪽으로 손짓하는 자세"
+        ],
+        [
+          "webtoon_romance_07",
+          0.4961,
+          "편지를 두 손으로 내밀며 고백하는 자세"
+        ],
+        [
+          "rokoko_Flirty_mixamo_01258_mirror",
+          0.4881,
+          "한 손으로 머리를 만지며 몸을 기울이는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q075",
+      "category": "감정·몸짓",
+      "text": "기뻐서 양팔을 들고 뛰는 모습",
+      "status": "ok",
+      "top": [
+        [
+          "cmu_104_16_00006_mirror",
+          0.5732,
+          "팔을 들어 반응하며 한 다리를 뒤로 접어 뛰는 자세"
+        ],
+        [
+          "cmu_49_21_01499_mirror",
+          0.5418,
+          "한 발을 뒤로 접어 들고 두 팔을 펼쳐 뛰는 자세"
+        ],
+        [
+          "combat_ual1_Jog_Fwd_Loop_f00400",
+          0.5265,
+          "팔을 굽히고 앞무릎을 들어 조깅하는 자세"
+        ],
+        [
+          "style100_WildArms_FR_f002394_eed5ec3a",
+          0.5194,
+          "팔을 높이 들어 크게 손짓하며 뛰는 자세"
+        ],
+        [
+          "style100_HighKnees_FR_f000317_49438f60",
+          0.4761,
+          "팔을 내린 채 한 무릎을 높이 들어 달리는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "cmu_104_16_00006_mirror",
+          0.5732,
+          "팔을 들어 반응하며 한 다리를 뒤로 접어 뛰는 자세"
+        ],
+        [
+          "cmu_49_21_01499_mirror",
+          0.5418,
+          "한 발을 뒤로 접어 들고 두 팔을 펼쳐 뛰는 자세"
+        ],
+        [
+          "combat_ual1_Jog_Fwd_Loop_f00400",
+          0.5265,
+          "팔을 굽히고 앞무릎을 들어 조깅하는 자세"
+        ],
+        [
+          "style100_WildArms_FR_f002394_eed5ec3a",
+          0.5194,
+          "팔을 높이 들어 크게 손짓하며 뛰는 자세"
+        ],
+        [
+          "style100_HighKnees_FR_f000317_49438f60",
+          0.4761,
+          "팔을 내린 채 한 무릎을 높이 들어 달리는 자세"
+        ]
+      ],
+      "baseline_verdict": "partial",
+      "final_verdict": "partial",
+      "visual_note": "뛰기는 맞지만 한 팔 들기. 양팔과 기쁨이 덜 맞음."
+    },
+    {
+      "id": "Q076",
+      "category": "감정·몸짓",
+      "text": "기운이 없어 어깨를 축 늘어뜨린 사람",
+      "status": "ok",
+      "top": [
+        [
+          "cmu_13_06_03242_mirror",
+          0.476,
+          "발을 벌려 서서 아래를 보고 어깨를 늘어뜨린 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "cmu_13_06_03242_mirror",
+          0.476,
+          "발을 벌려 서서 아래를 보고 어깨를 늘어뜨린 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q077",
+      "category": "감정·몸짓",
+      "text": "잘못을 빌며 두 손을 모으는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "rokoko_SitcomCameraLooks_mixamo_00484_mirror",
+          0.4013,
+          "가슴에 두 손을 모으는 미러 대화 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "rokoko_SitcomCameraLooks_mixamo_00484_mirror",
+          0.4013,
+          "가슴에 두 손을 모으는 미러 대화 자세"
+        ]
+      ],
+      "baseline_verdict": "partial",
+      "final_verdict": "partial",
+      "visual_note": "가슴에 두 손 모으기. 사죄 의도와 손 모양은 부분 일치."
+    },
+    {
+      "id": "Q078",
+      "category": "감정·몸짓",
+      "text": "믿을 수 없다는 듯 몸을 뒤로 빼는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "cmu_12_04_07264_mirror",
+          0.4381,
+          "몸을 뒤로 빼며 양손으로 앞을 밀거나 막는 자세"
+        ],
+        [
+          "rokoko_Sword_Samurai_mixamo_00784_mirror",
+          0.431,
+          "몸을 뒤로 빼며 검술 가드를 잡는 미러 자세"
+        ],
+        [
+          "cmu_14_17_00561_mirror",
+          0.4301,
+          "양팔을 높게 펼치고 몸을 뒤로 빼며 반응하는 자세"
+        ],
+        [
+          "cmu_55_03_00431",
+          0.4202,
+          "손바닥을 높이 펼치고 몸을 뒤로 빼며 놀라는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "cmu_12_04_07264_mirror",
+          0.4381,
+          "몸을 뒤로 빼며 양손으로 앞을 밀거나 막는 자세"
+        ],
+        [
+          "rokoko_Sword_Samurai_mixamo_00784_mirror",
+          0.431,
+          "몸을 뒤로 빼며 검술 가드를 잡는 미러 자세"
+        ],
+        [
+          "cmu_14_17_00561_mirror",
+          0.4301,
+          "양팔을 높게 펼치고 몸을 뒤로 빼며 반응하는 자세"
+        ],
+        [
+          "cmu_55_03_00431",
+          0.4202,
+          "손바닥을 높이 펼치고 몸을 뒤로 빼며 놀라는 자세"
+        ]
+      ],
+      "baseline_verdict": "partial",
+      "final_verdict": "partial",
+      "visual_note": "뒤로 몸 빼기는 맞지만 불신보다 방어 해석."
+    },
+    {
+      "id": "Q079",
+      "category": "감정·몸짓",
+      "text": "이리 오라고 한 손으로 부르는 자세",
+      "status": "no_result",
+      "top": [],
+      "baseline_top": [],
+      "baseline_verdict": "no_result",
+      "final_verdict": "no_result",
+      "visual_note": "초대 손짓/부르는 의도 연결 실패."
+    },
+    {
+      "id": "Q080",
+      "category": "감정·몸짓",
+      "text": "자신만만하게 가슴을 펴고 허리에 손을 얹은 사람",
+      "status": "ok",
+      "top": [
+        [
+          "cmu_124_11_00760_mirror",
+          0.8913,
+          "허리에 손을 얹고 가슴을 펴며 서 있는 자세"
+        ],
+        [
+          "Female Standing Pose_01_mirror",
+          0.7092,
+          "몸을 가볍게 기울이고 허리에 손을 얹은 대기 자세"
+        ],
+        [
+          "rokoko_Interogation_BadCop_mixamo_00555_mirror",
+          0.6115,
+          "허리에 손을 얹고 몸을 옆으로 기울이는 자세"
+        ],
+        [
+          "rokoko_FootTapping_mixamo_00114_mirror",
+          0.5368,
+          "허리에 손을 얹고 가만히 대기하는 자세"
+        ],
+        [
+          "cmu_13_30_00301_mirror",
+          0.5344,
+          "가슴에 손을 얹어 자신을 가리키며 이야기하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "cmu_124_11_00760_mirror",
+          0.8913,
+          "허리에 손을 얹고 가슴을 펴며 서 있는 자세"
+        ],
+        [
+          "Female Standing Pose_01_mirror",
+          0.7092,
+          "몸을 가볍게 기울이고 허리에 손을 얹은 대기 자세"
+        ],
+        [
+          "rokoko_Interogation_BadCop_mixamo_00555_mirror",
+          0.6115,
+          "허리에 손을 얹고 몸을 옆으로 기울이는 자세"
+        ],
+        [
+          "rokoko_FootTapping_mixamo_00114_mirror",
+          0.5368,
+          "허리에 손을 얹고 가만히 대기하는 자세"
+        ],
+        [
+          "cmu_13_30_00301_mirror",
+          0.5344,
+          "가슴에 손을 얹어 자신을 가리키며 이야기하는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q081",
+      "category": "사람 사이의 상호작용",
+      "text": "오랜만에 만난 사람을 꼭 끌어안는 장면",
+      "status": "ok",
+      "top": [
+        [
+          "webtoon_romance_13",
+          0.6934,
+          "포옹하려고 두 팔을 앞으로 벌리는 자세"
+        ],
+        [
+          "webtoon_romance_14",
+          0.6839,
+          "상대를 감싸 안듯 두 팔을 둥글게 모으는 자세"
+        ],
+        [
+          "Kiss_01",
+          0.6808,
+          "두 손을 얼굴 높이로 내밀어 상대에게 다가가는 자세"
+        ],
+        [
+          "webtoon_daily_45",
+          0.654,
+          "베개를 배 앞에 안고 편하게 앉아 있는 자세"
+        ]
+      ],
+      "baseline_top": [],
+      "baseline_verdict": "no_result",
+      "final_verdict": "partial",
+      "visual_note": "포옹 준비로 팔 벌리기는 찾지만 실제 꼭 끌어안은 장면은 아님."
+    },
+    {
+      "id": "Q082",
+      "category": "사람 사이의 상호작용",
+      "text": "상대와 악수하려고 손을 내미는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "webtoon_romance_15",
+          0.4278,
+          "앉아 있는 상대를 향해 몸을 숙이고 손을 내미는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "webtoon_romance_15",
+          0.4278,
+          "앉아 있는 상대를 향해 몸을 숙이고 손을 내미는 자세"
+        ]
+      ],
+      "baseline_verdict": "partial",
+      "final_verdict": "partial",
+      "visual_note": "손 내밀기는 맞지만 악수 관계는 미확정."
+    },
+    {
+      "id": "Q083",
+      "category": "사람 사이의 상호작용",
+      "text": "쓰러진 사람을 일으켜 세우려는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "combat_ual1_Death01_f02200",
+          0.4671,
+          "몸에 힘이 빠져 뒤로 넘어지며 쓰러지는 자세"
+        ],
+        [
+          "Big Side Hit_00009",
+          0.4436,
+          "옆에서 맞은 듯 몸이 들리고 뒤로 밀려나는 자세"
+        ],
+        [
+          "combat_composition_rough_291_p0",
+          0.423,
+          "몸이 옆으로 크게 기울어 충격에 날아가는 듯한 자세"
+        ],
+        [
+          "rokoko_Tightrope_Falloff_mixamo_00595_mirror",
+          0.4159,
+          "한쪽 다리가 들리며 휘청이는 미러 자세"
+        ],
+        [
+          "rokoko_Tightrope_Falloff_mixamo_00575_mirror",
+          0.4076,
+          "균형을 잃어 몸이 옆으로 쏠리는 미러 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "combat_ual1_Death01_f02200",
+          0.4671,
+          "몸에 힘이 빠져 뒤로 넘어지며 쓰러지는 자세"
+        ],
+        [
+          "Big Side Hit_00009",
+          0.4436,
+          "옆에서 맞은 듯 몸이 들리고 뒤로 밀려나는 자세"
+        ],
+        [
+          "combat_composition_rough_291_p0",
+          0.423,
+          "몸이 옆으로 크게 기울어 충격에 날아가는 듯한 자세"
+        ],
+        [
+          "rokoko_Tightrope_Falloff_mixamo_00595_mirror",
+          0.4159,
+          "한쪽 다리가 들리며 휘청이는 미러 자세"
+        ],
+        [
+          "rokoko_Tightrope_Falloff_mixamo_00575_mirror",
+          0.4076,
+          "균형을 잃어 몸이 옆으로 쏠리는 미러 자세"
+        ]
+      ],
+      "baseline_verdict": "wrong",
+      "final_verdict": "wrong",
+      "visual_note": "일으켜 주는 사람 대신 쓰러지는 사람 반환. 주체·대상 역할 오류."
+    },
+    {
+      "id": "Q084",
+      "category": "사람 사이의 상호작용",
+      "text": "다친 친구를 어깨로 부축하며 걷는 모습",
+      "status": "no_result",
+      "top": [],
+      "baseline_top": [],
+      "baseline_verdict": "no_result",
+      "final_verdict": "no_result",
+      "visual_note": "부축하기 태그의 검색 가능 문서는 0개. 원본 포즈 부족/태깅 누락 여부는 미확정."
+    },
+    {
+      "id": "Q085",
+      "category": "사람 사이의 상호작용",
+      "text": "아이를 품에 안고 달래는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "webtoon_romance_46",
+          0.5273,
+          "큰 곰인형을 품에 안고 걸어가는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "webtoon_romance_46",
+          0.5273,
+          "큰 곰인형을 품에 안고 걸어가는 자세"
+        ]
+      ],
+      "baseline_verdict": "wrong",
+      "final_verdict": "wrong",
+      "visual_note": "곰인형 안기가 1위. 아이·달래기 대상 역할 오류."
+    },
+    {
+      "id": "Q086",
+      "category": "사람 사이의 상호작용",
+      "text": "누군가에게 선물을 건네는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "webtoon_romance_05",
+          0.581,
+          "작은 선물 상자를 두 손으로 건네는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "webtoon_romance_05",
+          0.5159,
+          "작은 선물 상자를 두 손으로 건네는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q087",
+      "category": "사람 사이의 상호작용",
+      "text": "앞에 있는 사람을 붙잡아 못 가게 막는 장면",
+      "status": "ok",
+      "top": [
+        [
+          "g1__M_Move20__n03_f1067",
+          0.6939,
+          "두 팔을 가슴 앞에 교차해 막는 자세"
+        ],
+        [
+          "g1__M_Move3__n03_f1088",
+          0.6811,
+          "두 손을 가슴 앞에 모아 비스듬히 막는 자세"
+        ],
+        [
+          "UAL2__Shield_OneShot__p01_f0009",
+          0.677,
+          "팔을 몸 앞에 가로질러 방패로 막는 자세"
+        ],
+        [
+          "combat_authored_compact_guard",
+          0.633,
+          "다리를 넓게 벌려 몸을 낮추고 양팔을 가슴 앞에 교차해 공격을 막는 자세."
+        ],
+        [
+          "webtoon_combat_29",
+          0.6306,
+          "양주먹을 얼굴 앞에 올려 가드하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "g1__M_Move20__n03_f1067",
+          0.6939,
+          "두 팔을 가슴 앞에 교차해 막는 자세"
+        ],
+        [
+          "g1__M_Move3__n03_f1088",
+          0.6811,
+          "두 손을 가슴 앞에 모아 비스듬히 막는 자세"
+        ],
+        [
+          "UAL2__Shield_OneShot__p01_f0009",
+          0.677,
+          "팔을 몸 앞에 가로질러 방패로 막는 자세"
+        ],
+        [
+          "g1__M_Move10__n01_f0194_mirror",
+          0.6486,
+          "팔을 가슴 앞에 교차하고 한 다리를 든 방어 자세"
+        ],
+        [
+          "g1__M_Move9__n04_f0730_mirror",
+          0.6353,
+          "다리를 벌리고 가슴 앞에 손을 두는 준비 자세"
+        ]
+      ],
+      "baseline_verdict": "partial",
+      "final_verdict": "partial",
+      "visual_note": "앞을 막는 자세지만 상대를 손으로 붙잡는 관계는 미반영."
+    },
+    {
+      "id": "Q088",
+      "category": "사람 사이의 상호작용",
+      "text": "상대 뒤에 숨어 조심스럽게 내다보는 사람",
+      "status": "no_result",
+      "top": [],
+      "baseline_top": [],
+      "baseline_verdict": "no_result",
+      "final_verdict": "no_result",
+      "visual_note": "상대 뒤 숨기기 관계를 못 찾아 결과 없음."
+    },
+    {
+      "id": "Q089",
+      "category": "사람 사이의 상호작용",
+      "text": "둘이 서로 주먹을 겨누고 대치하는 장면",
+      "status": "no_result",
+      "top": [],
+      "baseline_top": [],
+      "baseline_verdict": "no_result",
+      "final_verdict": "no_result",
+      "visual_note": "개별 포즈 검색에서 두 사람 대치 장면을 못 찾음. 세트/역할 검색 개선 필요."
+    },
+    {
+      "id": "Q090",
+      "category": "사람 사이의 상호작용",
+      "text": "넘어진 사람에게 손을 내밀어 도와주는 자세",
+      "status": "no_result",
+      "top": [],
+      "baseline_top": [],
+      "baseline_verdict": "no_result",
+      "final_verdict": "no_result",
+      "visual_note": "넘어진 사람을 돕는 역할을 못 찾아 결과 없음."
+    },
+    {
+      "id": "Q091",
+      "category": "배경·순서·목적이 섞인 입력",
+      "text": "오래 앉아 있다가 일어나 몸을 쭉 펴는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "g1__M_Move17__p06_f1478",
+          0.506,
+          "두 손을 머리 위로 모아 몸을 길게 펴는 자세"
+        ],
+        [
+          "cmu_80_21_01132_mirror",
+          0.5029,
+          "팔꿈치를 벌려 두 손을 위로 모으고 몸을 길게 펴는 자세"
+        ],
+        [
+          "webtoon_daily_06",
+          0.4724,
+          "양손을 등 뒤로 모아 가슴을 펴는 자세"
+        ],
+        [
+          "g1__M_Move7__p02_f0480_mirror",
+          0.4545,
+          "몸을 길게 펴고 양손을 높이는 자세"
+        ],
+        [
+          "expansion_accad_D9_WarmUpToReadyToWarmUp_f00150",
+          0.4541,
+          "두 팔을 앞으로 들어 몸을 풀고 준비하는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "g1__M_Move17__p06_f1478",
+          0.506,
+          "두 손을 머리 위로 모아 몸을 길게 펴는 자세"
+        ],
+        [
+          "cmu_80_21_01132_mirror",
+          0.5029,
+          "팔꿈치를 벌려 두 손을 위로 모으고 몸을 길게 펴는 자세"
+        ],
+        [
+          "webtoon_daily_06",
+          0.4724,
+          "양손을 등 뒤로 모아 가슴을 펴는 자세"
+        ],
+        [
+          "g1__M_Move7__p02_f0480_mirror",
+          0.4545,
+          "몸을 길게 펴고 양손을 높이는 자세"
+        ],
+        [
+          "expansion_accad_D9_WarmUpToReadyToWarmUp_f00150",
+          0.4541,
+          "두 팔을 앞으로 들어 몸을 풀고 준비하는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q092",
+      "category": "배경·순서·목적이 섞인 입력",
+      "text": "넘어진 뒤 손으로 바닥을 짚고 일어나려는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "sd_cmu_111_06_f00404",
+          0.5068,
+          "바닥에서 다리를 접고 손을 짚어 일어나려는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "sd_cmu_111_06_f00404",
+          0.5068,
+          "바닥에서 다리를 접고 손을 짚어 일어나려는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q093",
+      "category": "배경·순서·목적이 섞인 입력",
+      "text": "상대가 칼을 휘두르자 방패를 들어 몸을 가리는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "webtoon_combat_12",
+          0.742,
+          "방패로 몸을 가리며 옆으로 짧은 검을 내미는 자세"
+        ],
+        [
+          "webtoon_fantasy_34",
+          0.5467,
+          "방패 뒤로 몸을 낮춰 공격을 막는 자세"
+        ],
+        [
+          "UAL2__Idle_Shield_Break__p01_f0007_mirror",
+          0.5427,
+          "방패 방어가 무너지며 몸을 옆으로 돌려 물러나는 자세"
+        ],
+        [
+          "combat_ual2_Shield_Dash_RM_f00200",
+          0.5379,
+          "몸을 낮추고 방패로 밀며 돌진하는 자세"
+        ],
+        [
+          "webtoon_fantasy_04",
+          0.5368,
+          "검과 방패를 들고 통로를 지키는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "webtoon_combat_12",
+          0.5222,
+          "방패로 몸을 가리며 옆으로 짧은 검을 내미는 자세"
+        ],
+        [
+          "combat_ual2_Sword_Regular_C_f00800",
+          0.405,
+          "한 무릎을 들고 몸을 비틀어 검을 휘두르는 자세"
+        ],
+        [
+          "webtoon_fantasy_34",
+          0.4005,
+          "방패 뒤로 몸을 낮춰 공격을 막는 자세"
+        ]
+      ],
+      "baseline_verdict": "match",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q094",
+      "category": "배경·순서·목적이 섞인 입력",
+      "text": "공이 머리 위로 날아오자 뛰어올라 잡으려는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "mass_basketball_rebound",
+          0.7352,
+          "한 무릎을 들고 높이 손을 뻗어 리바운드를 잡는 자세"
+        ],
+        [
+          "mass_baseball_grounder",
+          0.5054,
+          "몸을 낮춰 두 손으로 땅볼을 받는 자세"
+        ],
+        [
+          "sd_other_ball_04",
+          0.4715,
+          "옆으로 손을 뻗어 탁구공을 받는 자세"
+        ],
+        [
+          "sd_cmu_143_22_f00184",
+          0.4662,
+          "양손으로 미식축구공을 받으며 몸을 낮추는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "sd_cmu_124_06_f00384",
+          0.5092,
+          "양손을 머리 위로 올리며 레이업을 시도하는 자세"
+        ],
+        [
+          "sd_cmu_124_05_f00434",
+          0.4134,
+          "뛰어올라 양팔을 높이며 농구 점프슛을 하는 자세"
+        ],
+        [
+          "sd_volleyball_02",
+          0.4082,
+          "뛰어올라 높은 손으로 배구 점프서브를 하는 자세"
+        ]
+      ],
+      "baseline_verdict": "wrong",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q095",
+      "category": "배경·순서·목적이 섞인 입력",
+      "text": "뒤에서 누가 부르니까 걷다가 돌아보는 모습",
+      "status": "ok",
+      "top": [
+        [
+          "rokoko_DoubleTakes_mixamo_00092_mirror",
+          0.6292,
+          "한 발을 옮겨 돌아보며 반응하는 자세"
+        ],
+        [
+          "webtoon_romance_40",
+          0.5868,
+          "뒤를 돌아보며 한 손을 흔들어 인사하는 자세"
+        ],
+        [
+          "style100_Rushed_FW_f001297_49438f60",
+          0.5149,
+          "몸을 옆으로 기울여 급하게 방향을 바꾸는 걸음 자세"
+        ],
+        [
+          "mass_daily_seated_over_shoulder",
+          0.5132,
+          "앉아서 몸을 돌려 뒤를 바라보는 자세"
+        ],
+        [
+          "g1__M_Move6__n02_f0597",
+          0.4871,
+          "두 손을 가슴 앞에 두고 몸을 비트는 자세"
+        ]
+      ],
+      "baseline_top": [],
+      "baseline_verdict": "no_result",
+      "final_verdict": "match",
+      "visual_note": "정면·측면에서 입력의 핵심 자세·행동과 일치하는 1위 후보 확인."
+    },
+    {
+      "id": "Q096",
+      "category": "배경·순서·목적이 섞인 입력",
+      "text": "달려오다가 앞에 장애물이 보여 급하게 멈추는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "style100_Rushed_FR_f000643_49438f60",
+          0.5478,
+          "상체를 앞으로 기울여 급하게 달려가는 자세"
+        ],
+        [
+          "style100_Rushed_FR_f000728_49438f60",
+          0.5032,
+          "몸을 낮춰 급하게 방향을 바꾸며 달리는 자세"
+        ],
+        [
+          "style100_KarateChop_FR_f002152_49438f60",
+          0.4878,
+          "가슴 앞에 손을 세우고 달려가는 무술 자세"
+        ],
+        [
+          "rokoko_BurstThroughDoor_mixamo_00349",
+          0.4775,
+          "양손을 가슴 앞에 두고 앞으로 뛰는 자세"
+        ],
+        [
+          "cmu_102_12_00003",
+          0.4723,
+          "큰 보폭으로 몸을 옆으로 틀어 달리는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "style100_Rushed_FR_f000643_49438f60",
+          0.486,
+          "상체를 앞으로 기울여 급하게 달려가는 자세"
+        ],
+        [
+          "style100_Rushed_FR_f000728_49438f60",
+          0.4414,
+          "몸을 낮춰 급하게 방향을 바꾸며 달리는 자세"
+        ],
+        [
+          "style100_KarateChop_FR_f002152_49438f60",
+          0.426,
+          "가슴 앞에 손을 세우고 달려가는 무술 자세"
+        ],
+        [
+          "rokoko_BurstThroughDoor_mixamo_00349",
+          0.4157,
+          "양손을 가슴 앞에 두고 앞으로 뛰는 자세"
+        ],
+        [
+          "cmu_102_12_00003",
+          0.4105,
+          "큰 보폭으로 몸을 옆으로 틀어 달리는 자세"
+        ]
+      ],
+      "baseline_verdict": "wrong",
+      "final_verdict": "wrong",
+      "visual_note": "멈추는 대신 계속 달리는 포즈. 최종 행동·급정지 구분 실패."
+    },
+    {
+      "id": "Q097",
+      "category": "배경·순서·목적이 섞인 입력",
+      "text": "물에 빠진 사람이 헤엄쳐서 빠져나오려는 모습",
+      "status": "ok",
+      "top": [
+        [
+          "combat_ual1_Swim_Fwd_Loop_f02000",
+          0.5612,
+          "팔을 양옆으로 벌리고 발을 접어 헤엄치는 자세"
+        ],
+        [
+          "UAL1__Swim_Idle_Loop__p01_f0092",
+          0.5326,
+          "물에 떠서 두 팔을 벌리고 다리로 균형 잡는 자세"
+        ],
+        [
+          "combat_ual1_Swim_Fwd_Loop_f00200",
+          0.5232,
+          "엎드린 채 팔을 굽혀 물을 젓는 수영 자세"
+        ],
+        [
+          "sd_cmu_126_07_f00894",
+          0.5188,
+          "양팔을 날개처럼 벌려 물 밖으로 돌리는 접영 자세"
+        ],
+        [
+          "combat_ual1_Swim_Fwd_Loop_f02400",
+          0.5177,
+          "양 무릎을 벌려 접고 팔로 물을 젓는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "combat_ual1_Swim_Fwd_Loop_f02000",
+          0.5612,
+          "팔을 양옆으로 벌리고 발을 접어 헤엄치는 자세"
+        ],
+        [
+          "UAL1__Swim_Idle_Loop__p01_f0092",
+          0.5326,
+          "물에 떠서 두 팔을 벌리고 다리로 균형 잡는 자세"
+        ],
+        [
+          "combat_ual1_Swim_Fwd_Loop_f00200",
+          0.5232,
+          "엎드린 채 팔을 굽혀 물을 젓는 수영 자세"
+        ],
+        [
+          "sd_cmu_126_07_f00894",
+          0.5188,
+          "양팔을 날개처럼 벌려 물 밖으로 돌리는 접영 자세"
+        ],
+        [
+          "combat_ual1_Swim_Fwd_Loop_f02400",
+          0.5177,
+          "양 무릎을 벌려 접고 팔로 물을 젓는 자세"
+        ]
+      ],
+      "baseline_verdict": "partial",
+      "final_verdict": "partial",
+      "visual_note": "수영은 찾지만 탈출 목적·긴박한 감정은 미반영."
+    },
+    {
+      "id": "Q098",
+      "category": "배경·순서·목적이 섞인 입력",
+      "text": "무거운 짐을 내려놓고 허리를 펴며 한숨 쉬는 사람",
+      "status": "ok",
+      "top": [
+        [
+          "sd_cmu_111_12_f01594",
+          0.4728,
+          "두 다리를 펴고 양팔을 내려 편하게 누운 자세"
+        ],
+        [
+          "sd_rest_01",
+          0.4539,
+          "의자에서 팔을 내려놓고 가슴을 펴 쉬는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "sd_cmu_111_12_f01594",
+          0.4728,
+          "두 다리를 펴고 양팔을 내려 편하게 누운 자세"
+        ],
+        [
+          "sd_rest_01",
+          0.4539,
+          "의자에서 팔을 내려놓고 가슴을 펴 쉬는 자세"
+        ]
+      ],
+      "baseline_verdict": "wrong",
+      "final_verdict": "wrong",
+      "visual_note": "허리 펴며 서서 쉬기가 아니라 누운 자세. 전환/최종 자세 오류."
+    },
+    {
+      "id": "Q099",
+      "category": "배경·순서·목적이 섞인 입력",
+      "text": "공을 던지는 게 아니라 잡으려고 두 손을 내미는 자세",
+      "status": "ok",
+      "top": [
+        [
+          "mass_basketball_rebound",
+          0.5749,
+          "한 무릎을 들고 높이 손을 뻗어 리바운드를 잡는 자세"
+        ],
+        [
+          "sd_other_ball_04",
+          0.5707,
+          "옆으로 손을 뻗어 탁구공을 받는 자세"
+        ],
+        [
+          "mass_baseball_grounder",
+          0.5098,
+          "몸을 낮춰 두 손으로 땅볼을 받는 자세"
+        ],
+        [
+          "sd_cmu_143_22_f00184",
+          0.4689,
+          "양손으로 미식축구공을 받으며 몸을 낮추는 자세"
+        ],
+        [
+          "mass_hero_overhead_catch",
+          0.4617,
+          "두 손을 위로 뻗어 내려오는 물체를 받는 자세"
+        ]
+      ],
+      "baseline_top": [
+        [
+          "mass_baseball_pitch_windup",
+          0.4532,
+          "한 무릎을 높이 들고 양손을 가슴 앞에 모아 야구 투구를 준비하는 자세."
+        ],
+        [
+          "sd_cmu_124_01_f00424",
+          0.4218,
+          "팔을 머리 위로 휘둘러 야구공을 던지는 자세"
+        ],
+        [
+          "combat_ual2_OverhandThrow_f02400",
+          0.4023,
+          "공을 던진 뒤 몸을 낮추고 균형을 잡는 자세"
+        ]
+      ],
+      "baseline_verdict": "wrong",
+      "final_verdict": "partial",
+      "visual_note": "던지기 부정은 반영. 위로 받는 리바운드가 1위라 두 손 앞으로 내밀기는 부분 일치."
+    },
+    {
+      "id": "Q100",
+      "category": "배경·순서·목적이 섞인 입력",
+      "text": "한 손은 바닥에 짚고 다른 손은 얼굴을 가리면서 버티는 사람",
+      "status": "no_result",
+      "top": [],
+      "baseline_top": [
+        [
+          "webtoon_combat_38",
+          0.4535,
+          "한 무릎으로 바닥을 짚고 가드를 유지하는 자세"
+        ]
+      ],
+      "baseline_verdict": "wrong",
+      "final_verdict": "no_result",
+      "visual_note": "무릎 지지를 손 지지로 오인하던 후보는 제거. 복합 손 관계에 맞는 결과 없음."
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "version": "semantic-holdout-v5",
+  "frozen_before": "surrender tag enrichment and torso twist lexicon",
+  "note": "임시 태그 기준 평가. 조정 후 한 번만 실행하며 사람 판정과 구분.",
+  "queries": [
+    {"id":"H501","kind":"action","source":"user","text":"공을 뒤로 빼서 멀리 던지려는 사람","expected_status":"ok","relevant":{"tags_all":[["action:throw"],["object:ball"]]}},
+    {"id":"H502","kind":"action","source":"user","text":"투수가 한 다리를 올린 채 투구를 준비하는 모습","expected_status":"ok","relevant":{"tags_all":[["activity:baseball"],["action:throw","action:prepare"]]}},
+    {"id":"H503","kind":"action","source":"user","text":"농구 드리블을 하면서 앞으로 가는 포즈","expected_status":"ok","relevant":{"tags_all":[["activity:basketball"],["action:dribble"]]}},
+    {"id":"H504","kind":"action","source":"user","text":"상대에게 맞지 않도록 가드를 올리고 있는 사람","expected_status":"ok","relevant":{"tags_all":[["action:guard","action:block","intent:defense"]]}},
+    {"id":"H505","kind":"action","source":"user","text":"축구 골키퍼가 공을 막으려고 낮게 준비하는 모습","expected_status":"ok","relevant":{"tags_all":[["activity:goalkeeping"]]}},
+    {"id":"H506","kind":"action","source":"user","text":"팔 근육을 풀기 위해 스트레칭하는 사람","expected_status":"ok","relevant":{"tags_all":[["action:stretch"]]}},
+    {"id":"H507","kind":"action","source":"user","text":"손에 휴대전화를 들고 대화하는 모습","expected_status":"ok","relevant":{"tags_all":[["object:phone"]]}},
+    {"id":"H508","kind":"action","source":"user","text":"물 안에서 두 팔로 헤엄치는 포즈","expected_status":"ok","relevant":{"tags_all":[["action:swim","activity:swimming"],["object:water"]]}},
+    {"id":"H509","kind":"body","source":"user","text":"한 손을 앞에 뻗고 한 다리를 뒤로 드는 자세","expected_status":"ok","relevant":{"desc_all":[["(손|팔).*(앞|뻗)"],["(다리|발).*(뒤|들)"]]}},
+    {"id":"H510","kind":"body","source":"user","text":"앉아서 고개를 숙이고 두 손을 무릎 근처에 두는 사람","expected_status":"ok","relevant":{"tags_all":[["posture:sitting","action:sit"]]}},
+    {"id":"H511","kind":"action","source":"user","text":"패배를 인정하고 두 손을 위로 올린 사람","expected_status":"ok","relevant":{"tags_all":[["action:surrender","action:raise_hand"]]}},
+    {"id":"H512","kind":"action","source":"user","text":"회전하며 몸통을 비튼 사람","expected_status":"ok","relevant":{"tags_all":[["action:turn"]]}},
+    {"id":"H513","kind":"action","source":"user","text":"양손에 검을 잡고 적을 향해 준비하는 사람","expected_status":"ok","relevant":{"tags_all":[["object:sword"]]}},
+    {"id":"H514","kind":"action","source":"user","text":"전투 중 한 발로 상대를 차는 사람","expected_status":"ok","relevant":{"tags_all":[["action:kick"]]}},
+    {"id":"H515","kind":"vlm","source":"vlm","text":"인물이 발을 넓게 벌리고 무릎을 구부려 몸을 낮추고 두 손으로 앞을 막을 준비를 한다","expected_status":"ok","relevant":{"tags_all":[["action:block","action:defend","action:guard","intent:defense"]]}},
+    {"id":"H516","kind":"action","source":"user","text":"레인에 볼링공을 굴려 스트라이크를 노리는 자세","expected_status":"no_result"},
+    {"id":"H517","kind":"action","source":"user","text":"자동차 운전대 양쪽을 잡고 운전하는 자세","expected_status":"no_result"},
+    {"id":"H518","kind":"action","source":"user","text":"우주선 조종석에서 레버를 조작하는 자세","expected_status":"no_result"}
+  ]
+}
