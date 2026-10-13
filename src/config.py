@@ -42,6 +42,13 @@ class Config:
     # 태그 호출 한 번의 상한. 분석 호출(기본 45초)보다 짧게 둔다 — 늦게 오는 기록용
     # 값 때문에 사용자가 기다리지 않게 한다.
     vlm_person_tags_timeout_ms: int = int(os.getenv("VLM_PERSON_TAGS_TIMEOUT_MS", "15000"))
+    # --- 러프함 기반 검색 경로 분기(04J-286, docs/SEARCH_ROUTING.md) ---
+    # 끄면(기본) 기존 기하 검색만 쓰던 동작과 결과가 같다. 판정 기준값은
+    # src/search_routing.py::RoutingConfig.from_env의 ROUTING_* env로 바꾼다.
+    search_routing_enabled: bool = _env_bool("SEARCH_ROUTING", False)
+    # 관절 근거가 부족한 인물이 있을 때만 나가는 자세 설명 호출 1회의 상한.
+    routing_describe_timeout_ms: int = int(os.getenv("ROUTING_DESCRIBE_TIMEOUT_MS", "15000"))
+    semantic_top_k: int = int(os.getenv("SEMANTIC_TOP_K", "5"))
     gemini_model: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
     # Gemini HTTP 호출 1회의 상한. google-genai HttpOptions.timeout 단위는 밀리초다.
     #

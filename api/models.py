@@ -95,6 +95,18 @@ class VlmTagsOut(BaseModel):
     relationship: Optional[Relationship] = None
 
 
+class SemanticCandidateOut(BaseModel):
+    """시맨틱 경로 후보(04J-286). 기하 candidates와 의미가 달라 별도 칸에 싣는다.
+
+    score는 태그·문장 겹침 점수(클수록 가까움)이며 기하 distance와 비교할 수 없다.
+    관절 근거가 부족한 인물의 참고 후보이므로 refine 대상이 아니다.
+    """
+    pose_id: str
+    score: float
+    matched: dict = Field(default_factory=dict)
+    pose: dict = Field(default_factory=dict, description="해당 포즈 JSON(태그·설명·bvh_url)")
+
+
 class PersonOut(BaseModel):
     index: int
     box: Optional[List[float]] = Field(None, description="[x1,y1,x2,y2] 픽셀")
@@ -136,6 +148,14 @@ class PersonOut(BaseModel):
     quality_reasons: List[str] = Field(default_factory=list)
     output_scope: ScopeDetectionOut = Field(default_factory=ScopeDetectionOut)
     person_tags: PersonTagsOut = Field(default_factory=PersonTagsOut)
+    # ---- 04J-286 러프함 기반 경로(SEARCH_ROUTING=1일 때만 채워진다) ----
+    semantic_candidates: List[SemanticCandidateOut] = Field(
+        default_factory=list,
+        description="route=semantic일 때 시맨틱 검색 후보. 기존 candidates와 별개")
+    search_routing: Optional[dict] = Field(
+        None,
+        description=("인물별 선택 경로(geometric|semantic|undetermined|error), 분기 사유와 "
+                     "판정 수치·기준값, 검색 상태(ok|no_result|error|not_run), 처리 시간"))
 
 
 class CutResultOut(BaseModel):
@@ -149,6 +169,8 @@ class CutResultOut(BaseModel):
     image: ImageInfoOut
     inference_metadata: InferenceMetadataOut
     vlm_tags: Optional[VlmTagsOut] = None
+    search_routing: Optional[dict] = Field(
+        None, description="컷 단위 라우팅 요약(자세 설명 호출 상태·시간). 끄면 null")
 
 
 # ==== 포즈 미세조정 (docs/REFINE_DESIGN.md) ================================

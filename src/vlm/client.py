@@ -139,6 +139,17 @@ class BaseVLMClient:
         """
         return None
 
+    def describe_people(self, image, boxes: list):
+        """관절 근거가 부족한 인물의 자세 설명(04J-286). ``DescribeOutcome``을 돌려준다.
+
+        지원하지 않는 provider는 '의미 근거 없음'이 아니라 오류로 답한다 — 판단 불가와
+        섞이면 provider 미지원이 러프 품질 문제로 집계되기 때문이다.
+        """
+        from ..search_routing import DescribeOutcome
+
+        return DescribeOutcome("error", error_reason="describe_not_supported",
+                               retryable=False, provider=type(self).__name__)
+
     def rerank(self, image, candidates: list, query_tags: dict) -> list:
         """
         Top-N 후보를 의미 기준으로 재정렬(선택). 기본은 no-op(순서 유지).
@@ -216,6 +227,95 @@ class MockVLMClient(BaseVLMClient):
         )
 
 
+def _mock_describe(self, image, boxes: list):
+    """hint 문자열로 설명을 흉내 낸다. 'describe_fail'이면 VLM 오류, 'vague'면 일반 설명."""
+    from ..search_routing import DescribeOutcome, PoseDescription
+
+    hint = str(getattr(image, "hint", "") or image if isinstance(image, str) else "").lower()
+    if "describe_fail" in hint:
+        return DescribeOutcome("error", error_reason="rate_limited", retryable=True,
+                               retry_after_seconds=30.0, provider="mock")
+    descriptions = {}
+    for index, _box in enumerate(boxes):
+        if "unreadable" in hint:
+            descriptions[index] = PoseDescription(visible=False, certainty="low")
+        elif "vague" in hint:
+            descriptions[index] = PoseDescription(
+                postures=["standing"], body_details="", search_text="서 있는 사람",
+                certainty="low")
+        else:
+            descriptions[index] = PoseDescription(
+                postures=["standing"], actions=["run"], domains=["sports"],
+                activities=["athletics"], intents=["prepare_action"],
+                body_details="팔과 다리를 앞뒤로 크게 엇갈려 뻗음",
+                search_text="큰 보폭으로 팔다리를 엇갈려 달리는 자세", certainty="medium")
+    return DescribeOutcome("ok", descriptions=descriptions, provider="mock")
+
+
+MockVLMClient.describe_people = _mock_describe
+
+
+def parse_pose_descriptions(payload, count: int) -> dict:
+    """설명 응답 → {인덱스: PoseDescription}. 길이가 다르면 통째로 버린다(한 칸 밀림 방지)."""
+    from ..search_routing import PoseDescription
+    from ..semantic_vocab import VOCABULARY
+
+    people = payload.get("people") if isinstance(payload, dict) else None
+    if not isinstance(people, list) or len(people) != count:
+        raise ValueError("describe_people: people length mismatch")
+    groups = {
+        "postures": "posture", "actions": "action", "domains": "domain",
+        "activities": "activity", "objects": "object", "intents": "intent",
+        "emotions": "emotion",
+    }
+    out = {}
+    for index, item in enumerate(people):
+        if not isinstance(item, dict):
+            out[index] = None
+            continue
+        kept, dropped = {}, {}
+        for field_name, group in groups.items():
+            values = item.get(field_name)
+            values = values if isinstance(values, list) else []
+            allowed = VOCABULARY[group]
+            kept[field_name] = list(dict.fromkeys(
+                value for value in values if isinstance(value, str) and value in allowed))
+            bad = [value for value in values if not (isinstance(value, str) and value in allowed)]
+            if bad:
+                dropped[field_name] = [str(value)[:40] for value in bad][:10]
+        certainty = item.get("certainty")
+        out[index] = PoseDescription(
+            visible=item.get("visible") is not False,
+            body_details=str(item.get("body_details") or "")[:300],
+            search_text=str(item.get("search_text") or "")[:200],
+            certainty=certainty if certainty in ("high", "medium", "low") else None,
+            dropped=dropped, **kept,
+        )
+    return out
+
+
+def describe_failure_reason(error: Exception) -> tuple[str, bool, Optional[float]]:
+    """설명 호출 실패 → (reason, retryable, retry_after). 04J-294 분류가 있으면 그대로 쓴다."""
+    status = _http_status(error)
+    timed_out = _is_timeout(error)
+    upstream = timed_out or status == 429 or (status is not None and 500 <= status < 600)
+    if not upstream:
+        # 우리 쪽(파싱·스키마·SDK) 문제. 상류 혼잡으로 분류하지 않는다.
+        return ("invalid_response" if isinstance(error, (ValueError, KeyError))
+                else "provider_error"), False, None
+    try:
+        from .failures import classify_failure  # 04J-294(PR #86) 병합 후 존재
+    except ImportError:
+        classify_failure = None
+    if classify_failure is not None:
+        reason, delay = classify_failure(error, status, timed_out=timed_out)
+    else:
+        reason = ("timeout" if timed_out else "rate_limited" if status == 429
+                  else "upstream_unavailable" if status == 503 else "upstream_error")
+        delay = None
+    return reason, reason != "daily_quota_exhausted", delay
+
+
 class GeminiVLMClient(BaseVLMClient):
     """Gemini Flash 어댑터 (현행 google-genai SDK). `pip install google-genai pillow`, env GEMINI_API_KEY.
     모델은 GEMINI_MODEL env로 지정(기본 gemini-2.5-flash). 최신 Flash로 올리려면 그 값을 바꾼다."""
@@ -274,6 +374,40 @@ class GeminiVLMClient(BaseVLMClient):
                      errorType=type(error).__name__,
                      elapsedMs=round((self._clock() - started) * 1000))
             return None
+
+    def describe_people(self, image, boxes: list):
+        """인물별 자세 설명 1회 호출(재시도 없음). 실패는 reason과 함께 오류로 돌려준다."""
+        from google.genai import types
+        from ..search_routing import DescribeOutcome
+
+        started = self._clock()
+        try:
+            resp = self._client.models.generate_content(
+                model=self._model,
+                contents=[prompts.pose_describe_prompt(boxes), self._to_part(image)],
+                config=types.GenerateContentConfig(
+                    system_instruction=prompts.POSE_DESCRIBE_SYSTEM,
+                    response_mime_type="application/json",
+                    temperature=0,
+                    http_options=types.HttpOptions(timeout=CFG.routing_describe_timeout_ms),
+                ),
+            )
+            descriptions = parse_pose_descriptions(_extract_json(resp.text), len(boxes))
+        except Exception as error:  # noqa: BLE001 - 상태로 돌려준다
+            reason, retryable, delay = describe_failure_reason(error)
+            elapsed = (self._clock() - started) * 1000
+            log_warn("gemini_pose_describe", model=self._model, status="failed",
+                     failureReason=reason, errorType=type(error).__name__,
+                     upstreamStatus=_http_status(error), elapsedMs=round(elapsed))
+            return DescribeOutcome("error", error_reason=reason, retryable=retryable,
+                                   retry_after_seconds=delay, elapsed_ms=elapsed,
+                                   provider="gemini")
+        elapsed = (self._clock() - started) * 1000
+        log_info("gemini_pose_describe", model=self._model, status="ok",
+                 people=len(boxes), promptVersion=prompts.POSE_DESCRIBE_VERSION,
+                 elapsedMs=round(elapsed))
+        return DescribeOutcome("ok", descriptions=descriptions, elapsed_ms=elapsed,
+                               provider="gemini")
 
     def analyze(self, image, img_w: int, img_h: int) -> VLMAnalysis:
         from google.genai import types

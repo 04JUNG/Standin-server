@@ -130,3 +130,80 @@ def user_template(version: str) -> str:
         raise ValueError(
             f"unknown VLM_PROMPT_VERSION {version!r}; expected one of {sorted(USER_TEMPLATES)}"
         ) from None
+
+
+# ── 인물별 자세 설명 호출(04J-286 시맨틱 라우팅) ──────────────────────────
+#
+# 관절 근거가 부족한 인물에 한해서만 부른다(정상 러프는 호출 0회). 분석 프롬프트와 분리돼
+# 있어 route·인원수·박스가 이 호출 때문에 달라질 수 없다. 태그 어휘는 라이브러리 태깅과
+# 같은 search-taxonomy-v2 키만 허용한다(src/semantic_vocab.py). 판단 원칙은
+# pose-library-viewer/tagging/ROUGH_TO_LANGUAGE.md를 따른다 — 관찰과 해석을 나누고,
+# 형태에서 행동으로 넘어가되 근거 없는 감정·종목을 붙이지 않는다.
+POSE_DESCRIBE_VERSION = "d1-taxonomy-v2"
+
+POSE_DESCRIBE_SYSTEM = (
+    "너는 웹툰 러프 콘티에서 지정된 인물의 자세를 검색용 태그와 짧은 문장으로 설명하는 도우미다. "
+    "관절 좌표나 픽셀 위치는 추정하지 마라. 사람 수를 다시 세거나 새 인물을 찾지 마라. "
+    "러프가 거칠어도 팔·다리·몸통의 배치와 장면 단서로 읽을 수 있는 만큼만 말하고, "
+    "읽을 수 없으면 솔직히 visible=false 또는 certainty=low로 답한다."
+)
+
+POSE_DESCRIBE_TEMPLATE = """이 컷에서 아래 {count}명의 자세를 설명하라(0~1 정규화 박스, 순서 고정).
+
+{boxes}
+
+허용 태그(영문 키만 사용, 목록 밖 값 금지):
+- postures: {postures}
+- actions: {actions}
+- domains: {domains}
+- activities: {activities}
+- objects: {objects}
+- intents: {intents}
+- emotions: {emotions}
+
+아래 JSON으로만 답하라. 설명 문장 금지.
+
+{{
+  "people": [
+    {{
+      "visible": <이 인물의 몸 자세를 러프에서 읽을 수 있으면 true>,
+      "postures": [...], "actions": [...], "domains": [...], "activities": [...],
+      "objects": [...], "intents": [...], "emotions": [...],
+      "body_details": "<실제로 보이는 팔·다리·몸통 배치 관찰 한 문장(한국어)>",
+      "search_text": "<[상황/대상] + [핵심 행동] + [몸의 특징] 형태의 검색 문장(한국어)>",
+      "certainty": "high" | "medium" | "low"
+    }}
+  ]
+}}
+
+규칙:
+- people 배열 길이는 반드시 {count}이고 순서는 위 목록과 같다.
+- 형태 나열에서 끝내지 말고 검색 가능한 행동으로 넘어가라. 단, 근거 없는 종목·감정은 붙이지 마라.
+- 주된 해석 하나를 중심으로 쓰고, 여러 해석을 이상한 한 문장으로 합치지 마라.
+- 공·검 같은 대상이 그림에 없으면 행동 맥락으로 연결한 경우에만 objects에 넣는다.
+- 서 있기만 하고 다른 단서가 없으면 postures=["standing"]만 두고 certainty를 low로 둔다.
+- 선이 너무 거칠어 팔다리 배치를 읽을 수 없으면 visible=false.
+"""
+
+
+def pose_describe_prompt(boxes) -> str:
+    """boxes는 0~1 정규화된 (x1, y1, x2, y2) 목록이다(None이면 위치 불명)."""
+    from ..semantic_vocab import VOCABULARY
+
+    lines = []
+    for index, box in enumerate(boxes):
+        if box is None:
+            lines.append(f"- {index}번: 위치 불명")
+            continue
+        x1, y1, x2, y2 = (round(float(value), 3) for value in box)
+        lines.append(f"- {index}번: x {x1}~{x2}, y {y1}~{y2}")
+
+    def keys(group):
+        return ", ".join(VOCABULARY[group])
+
+    return POSE_DESCRIBE_TEMPLATE.format(
+        count=len(boxes), boxes="\n".join(lines),
+        postures=keys("posture"), actions=keys("action"), domains=keys("domain"),
+        activities=keys("activity"), objects=keys("object"), intents=keys("intent"),
+        emotions=keys("emotion"),
+    )

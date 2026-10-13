@@ -185,6 +185,10 @@ class CutResult:
     vlm_tags: Optional[dict] = None
 
     body_matching: dict = field(default_factory=dict)
+    # 04J-286 라우팅. SEARCH_ROUTING=0이면 비어 있고 응답에 아무 값도 더하지 않는다.
+    person_routing: list = field(default_factory=list)              # 인물별 경로·사유·상태·시간
+    person_semantic_candidates: list = field(default_factory=list)  # 인물별 시맨틱 후보(포즈 JSON 포함)
+    routing_summary: Optional[dict] = None                          # 컷 단위(설명 호출 상태 등)
 
 
 @dataclass

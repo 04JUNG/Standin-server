@@ -576,3 +576,17 @@ Converter `/healthz`의 `preview_model_revision`과 `character_hashes`로 지원
 캐시 세대를 확인한다. exact V3.2.4 모드에서는 모델 capability가 꺼진다.
 모델 export용 모듈은 기존 `posed-mesh-v1` exporter와 분리하여 기존 사전 생성
 라이브러리의 키를 무효화하지 않는다. 배포 순서는 Converter/추론 → BFF → 앱이다.
+
+## 러프함 기반 검색 경로 필드 (04J-286, 2026-10-13)
+
+`SEARCH_ROUTING=1`일 때만 채워지는 **추가 필드**다. 기존 필드의 의미·값은 바뀌지 않는다.
+끈 상태(기본)에서는 `people[i].search_routing=null`, `people[i].semantic_candidates=[]`, 최상위 `search_routing=null`.
+
+| 필드 | 위치 | 내용 |
+|---|---|---|
+| `search_routing` | `people[i]` | `route`(geometric·semantic·undetermined·error), `reason`, 관절/의미 판정 수치와 기준값, `search.status`(ok·no_result·error·not_run), `elapsed_ms` |
+| `semantic_candidates` | `people[i]` | route=semantic일 때 `[{pose_id, score, matched, pose}]`. `score`는 의미 점수라 `candidates[].distance`와 비교 불가. refine 대상 아님 |
+| `search_routing` | 최상위 | 자세 설명 호출 상태(`describe.status`, `error_reason`, `retryable`, `retry_after_seconds`, `elapsed_ms`) |
+
+route가 geometric이 아닌 인물은 `candidates=[]`, `confidence=low`, `refine_allowed=false`다(기존에도 관절 근거가
+부족한 인물은 후보 0개였다). 상세: `docs/SEARCH_ROUTING.md`.
