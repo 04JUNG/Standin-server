@@ -219,3 +219,83 @@ T008·T009의 몸 관찰 4개가 일치했고, 종목·판타지·전투 태그�
 남은 한계: 정성 속성은 거친 구분이다. 라이브러리 문장에 없는 속성은 비교할 수 없으며
 한국어 규칙이 모든 문장·관점을 해석하지 못한다. 다른 동작의 홀드아웃 평가, 작가의 동작 의도,
 카메라·세밀한 팔 방향과 검색 지연을 별도로 검증해야 한다.
+
+## 10. 실제 BVH 몸 배치 색인(선택적 v3 실험)
+
+라이브러리 설명에 없는 관절 배치를 실제 BVH의 기존 COCO17 매핑에서 추출한다.
+러프의 스켈레톤을 복원하거나 기하 검색을 수정하지 않는다. `bvh-body-v1` 색인은
+무릎 내각, 골반 축 기준 무릎/발 간격, 몸통 길이 대비 손·팔꿈치 높이, 몸통 기울기를 저장한다.
+대표 프레임은 기존 라이브러리와 같은 0이다. 요청 단계에서는 메모리 속성만 비교한다.
+
+- 무릎: 양쪽 140° 이하=bent, 160° 이상=straight, 한쪽씩 다르면 mixed.
+  중간값·결측·퇴화한 뼈는 unknown이며 감점하지 않는다.
+- 다리: 골반의 수평 좌우 축으로 무릎·발 간격을 측정한다. 골반 폭의 2배 이상=apart,
+  1.35배 이하=together. 앞뒤 발 간격이 몸통 길이의 0.7배 이상이면 staggered를 우선한다
+  (단 넓은 좌우 벌림이 있으면 apart). 관점별 실루엣과 같다는 보장은 없다.
+- 팔: 손·팔꿈치 높이와 좌우 벌림으로 lowered/raised/spread/mixed를 구분한다.
+  모호한 팔은 unknown이다. torso는 12° 이하 upright만 판정한다.
+  소스별 몸 정면 방향이 불확실하므로 forward/backward는 추정하지 않는다.
+- 임계값은 임시 규칙이며 작가 라벨로 보정한 값이 아니다. BVH 매핑 presence 점수는
+  RTMPose score와 다르며 러프의 raw score 기준값을 추가하지 않았다.
+
+### 활성화·재현
+
+```bash
+python scripts/build_semantic_body_index.py --db <bundle>/poses.db \
+  --tags <viewer>/dist/data/search-v2.json --bvh-root <bundle>/bvh \
+  --out tmp/semantic-body-v1.json
+
+# 실험 환경에서만 지정. 비우면 v2, SEARCH_ROUTING은 계속 기본 0.
+SEMANTIC_BODY_INDEX_PATH=tmp/semantic-body-v1.json
+
+# Gemini 설명을 고정한 검색기 대조. 추가 VLM 호출 0회.
+python scripts/compare_semantic_body_index.py --results <saved>/results.json \
+  --tags <viewer>/dist/data/search-v2.json --db <bundle>/poses.db \
+  --body-index tmp/semantic-body-v1.json --out tmp/body-ablation \
+  --images <testset> --thumbs <bundle>/thumbs
+```
+
+색인은 알고리즘 버전·임계값·프레임·태그 코퍼스 SHA256·BVH별 SHA256을 보관한다.
+로더는 버전·임계값·프레임·코퍼스·관찰 허용값·유한 수치를 검사한다.
+BVH의 현재 내용은 요청 중 다시 읽지 않으므로, **BVH/대표 프레임/매핑/태그 변경 시 오프라인
+색인을 재생성해야 한다**. 소스 해시는 재현·감사용이며 변경을 실시간 감지하는 기능은 아니다.
+빌더는 poses.db를 read-only로 연다. 파일이 실패한 개별 포즈는 오류 목록에 남고,
+유효한 부분 색인의 누락 포즈는 기존 문장 속성을 쓴다. 손상·불일치한 색인 전체는 v2 폴백한다.
+
+### 검증에서 발견한 실패와 보완
+
+단서 하나만으로 BVH를 적용하면 ‘한쪽 무릎 굽힘’에 맞는 투구가 착지보다 높아졌다.
+또한 문장 어댑터의 mixed는 ‘위로+옆으로’라는 동시 속성일 수도 있어 실제 좌우 비대칭과 같지 않다.
+따라서 knees/legs/arms 중 구별되는 intrinsic 관찰이 기본 2개 이상일 때만 v3 몸 근거를 적용한다.
+문장에서 추론한 mixed는 이 게이트에서 제외하고 명시적인 mixed만 허용한다.
+그 외 쿼리는 v2와 같은 점수/순위를 유지한다(backend 기록만 v3).
+
+실 Gemini T008에는 fall 해석의 3점이 추가 팔 관찰(2점)보다 커서 형태가 덜 맞는 후보가 올라왔다.
+행동 태그를 비운 통제 대조에서 더 많은 몸 관찰을 만족한 후보가 1위로 바뀌었다.
+이를 보완해 intrinsic 관찰이 충분한 v3 쿼리의 행동 가중치는 1점으로 제한한다.
+약한 쿼리/v2의 기존 3점 정책은 유지한다. 이 정책 역시 미보정이며 점수는 확률이 아니다.
+
+### 2026-10-13 최종 결과
+
+- 실제 라이브러리 1,981/1,981개 색인 생성, 파일 처리 실패 0개(약 1.35초).
+  이는 모든 관절 속성이 알려졌다는 뜻이 아니다: 무릎 unknown 877개, 팔 unknown 1,141개다.
+- d2 실 Gemini T008/T009/T044 설명을 그대로 재사용해 v2/v3 검색을 비교했다.
+  T008/T009의 새 1위는 `g1__M_Move5__n03_f1076`이다.
+  기존 1위는 각각 `combat_ual1_Jump_Start_f00000`, `cmu_18_14_00277`이었다.
+  전면 썸네일에서 넓게 벌린 굽힌 다리·낮은 팔의 부분적 개선을 확인했지만,
+  몸통·팔 방향까지 일치하지 않으며 작가의 정답 라벨이 없다. 정확도 상승 수치는 주장하지 않는다.
+- T008/T009는 같은 구도의 크기 다른 러프이므로 서로 다른 동작 두 개로 계산하면 안 된다.
+  T044 기하 Top-5는 ID·view·distance 동일하고 추가 설명 호출도 없다.
+- 실제 current-X·실제 라이브러리의 50장 전체 재생: geometric 39, semantic 8,
+  undetermined 6. 기하 39명은 이전 v2 결과와도 Top-5 동일, 사례 오류 0개.
+  시맨틱 8명 모두 후보 반환. Claude fixture 대조에서 T008/T009만 v3 적용,
+  나머지 6명은 안전 게이트로 기존 검색을 유지한다. 따라서 50장은 새 Gemini 품질 평가가 아니다.
+- 새 테스트 29개, 전체 842 passed·8 skipped·22 subtests passed. 스모크 54/54,
+  compileall·git diff --check 통과. 합성 자세 테스트는 통제된 구현 검증이지 실제 정확도가 아니다.
+- 원본 실호출과 초기 실패 결과는 보존했다. 이번 추가 VLM 호출 0회, PR·push·배포 없음.
+  새 옵션과 SEARCH_ROUTING 운영 기본값 모두 비활성이다.
+
+증거: `tmp/semantic-body-v1.json`, `tmp/routing-eval-bvh-body-v3-final/{ablation.json,REPORT.md}`,
+`tmp/routing-eval-bvh-fixture-ablation-final/ablation.json`,
+`tmp/routing-eval-replay-bvh-v3-release/results.json`.
+후속: 관점별 몸 배치, 좌우 팔·다리 구분, 작가 판정이 있는 다른 동작 홀드아웃이 필요하다.

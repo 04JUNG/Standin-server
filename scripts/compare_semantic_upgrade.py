@@ -124,11 +124,13 @@ def _write_reranked(args, data, rows, backend):
                 "semantic_status": semantic.get("status"),
                 "same_top5": person["baseline_top5"] == person["routed_top5"],
             })
-    data.update({"semantic_backend": backend, "evaluation_kind": "cached-live-description-ranking",
+    is_live = data.get("vlm_mode") == "live"
+    data.update({"semantic_backend": backend,
+                 "evaluation_kind": "cached-live-description-ranking" if is_live else "cached-fixture-description-ranking",
                  "ranking_source": str(args.after), "extra_vlm_calls": 0})
     args.rerank_out.mkdir(parents=True, exist_ok=True)
     (args.rerank_out / "results.json").write_text(json.dumps(data, ensure_ascii=False, indent=2))
-    report_args = SimpleNamespace(out=args.rerank_out, vlm="cached-live",
+    report_args = SimpleNamespace(out=args.rerank_out, vlm="cached-live" if is_live else "replay",
                                   vlm_provider=data.get("vlm_provider"), vlm_model=data.get("vlm_model"),
                                   images=args.images, thumbs=args.thumbs)
     _write_report(report_args, data["cases"], table)

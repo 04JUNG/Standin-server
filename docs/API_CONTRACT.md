@@ -597,3 +597,11 @@ context_evidence를 추가했다. body_observations는 knees·legs·arms·torso�
 score_components를 추가로 포함할 수 있다. 미관측 속성은 중립이며 semantic은 계속 refine 금지다.
 점수 정책 버전은 search.backend에 기록된다. 서로 다른 backend 버전의 score나 기하 distance를
 직접 비교하지 않는다. `valid`는 검색 근거 조건 통과이며 정확도 보증이 아니다.
+
+선택적 BVH 몸 색인(v3): `SEMANTIC_BODY_INDEX_PATH`를 지정하면 backend는
+`tag-v3-bvh-body-interim`이다. `matched.body_source`는 `bvh` 또는 `library_text`,
+`body_index_usage`는 쿼리 사용 조건·폴백 이유·행동 가중치를 기록한다.
+`body_metrics`가 있으면 **후보 라이브러리**에서 미리 계산한 무릎 각도·정규화 손 높이 등이다.
+러프에서 좌표·각도를 생성한 값이 아니며 기하 피처/distance/refine에는 입력하지 않는다.
+불충분한 intrinsic 관찰은 기존 문장 검색을 유지하고, 색인 누락·버전/코퍼스 불일치·손상은
+경고 로그와 함께 v2로 폴백한다. 새 색인은 기본 비활성이고 외부 응답 형태는 그대로다.

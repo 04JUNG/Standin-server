@@ -18,6 +18,10 @@
 형태 충돌은 감점한다. 장면 태그 합계는 최대 0.5점이다. 임베딩/LLM 검색은 아니다.
 종목 이름만 같고 자세가 다른 결과가 올라오지 않게 하기 위한 임시 개선이다
 (tagging/ROUGH_TO_LANGUAGE.md §추출과 검색을 잇는 흐름 6).
+
+선택적 SEMANTIC_BODY_INDEX_PATH는 실제 라이브러리 BVH에서 미리 계산한 몸 속성을
+불러온다. 구별되는 intrinsic 관찰이 충분할 때만 사용하며 약한 쿼리는 기존 문장
+방식을 유지한다. 이 모드의 행동 해석 가점은 1점이다. 요청 중 BVH/VLM 호출은 없다.
 """
 from __future__ import annotations
 
@@ -30,6 +34,7 @@ from typing import Iterable, Optional, Protocol
 from .logging_setup import log_warn
 from .body_language import (
     observations_from_text, query_observations, compare_observations, specific_observation_count,
+    validated_observations,
 )
 
 TAG_FIELDS = ("postures", "actions", "domains", "activities", "objects", "intents", "emotions")
@@ -46,6 +51,9 @@ _WEIGHTS = {
 }
 _TEXT_WEIGHT = 2.0
 _CONTEXT_MAX_SCORE = 0.5
+# With enough intrinsic observations, interpreted action must weigh less than
+# even the weakest measured limb cue (arms=2). Experimental, not calibrated.
+_GROUNDED_ACTION_WEIGHT = 1.0
 
 
 @dataclass
@@ -124,13 +132,16 @@ def _mirror_base(pose_id: str) -> str:
 
 
 class TagSemanticSearcher:
-    """Observed body layout + specific tags; context is only a small tie-breaker."""
+    """Observed body layout + specific tags; optional offline BVH grounding."""
 
     backend = "tag-v2-body-grounded-interim"
 
     def __init__(self, records: Iterable[dict], *, library_pose_ids: Optional[set] = None,
-                 min_score: float = 3.0):
+                 min_score: float = 3.0, body_metadata: Optional[dict] = None):
         self.min_score = float(min_score)
+        self.body_metadata = body_metadata or {}
+        if self.body_metadata:
+            self.backend = "tag-v3-bvh-body-interim"
         self._poses = []
         for record in records:
             pose_id = record.get("pose_id")
@@ -153,12 +164,16 @@ class TagSemanticSearcher:
             self._poses.append((pose_id, tags, _bigrams(text), record, text, body))
 
     @classmethod
-    def from_file(cls, path: str, **kwargs) -> "TagSemanticSearcher":
+    def from_file(cls, path: str, *, body_index_path: Optional[str] = None,
+                  **kwargs) -> "TagSemanticSearcher":
         with open(path, encoding="utf-8") as handle:
             data = json.load(handle)
         records = data.get("poses") if isinstance(data, dict) else data
         if not isinstance(records, list):
             raise ValueError("search-v2.json: 'poses' list missing")
+        if body_index_path:
+            from .semantic_body_index import load_body_index
+            kwargs["body_metadata"] = load_body_index(body_index_path, records)
         return cls(records, **kwargs)
 
     def __len__(self) -> int:
@@ -185,8 +200,20 @@ class TagSemanticSearcher:
         shape_actions = wanted["actions"] - set(query.generic_actions)
         query_grams = _bigrams(query.body_details + " " + query.text)
         observed = query_observations(query.body_details, query.body_observations)
+        explicit = validated_observations(query.body_observations)
+        # Body measurements cannot disambiguate a weak query. Require distinctive
+        # cues in attributes actually measured by v1 (no forward/backward torso).
+        # Text adapter's 'mixed' may mean raised+spread, NOT left/right asymmetry.
+        reliable_intrinsic = {k: v for k, v in observed.items()
+                              if k in ("knees", "legs", "arms")
+                              and (v != "mixed" or explicit.get(k) == "mixed")}
+        use_measured = specific_observation_count(reliable_intrinsic) >= max(1, query.min_body_matches)
         scored = []
         for pose_id, tags, grams, record, text, body in self._poses:
+            measured = self.body_metadata.get(pose_id) if use_measured else None
+            if measured is not None:
+                # Measurement's unknown is neutral; never fill it with a text guess.
+                body = dict(measured["observations"])
             matched = {name: sorted(wanted[name] & tags[name])
                        for name in TAG_FIELDS if wanted[name] & tags[name]}
             # Body-only retrieval is possible, but a scene label alone is insufficient.
@@ -197,7 +224,9 @@ class TagSemanticSearcher:
                     or (tags["actions"] & shape_actions) or body_supported):
                 continue
             # Multiple speculative actions and generic standing cannot pile up score.
-            shape_score = (_WEIGHTS["actions"] * bool(tags["actions"] & shape_actions)
+            action_weight = (_GROUNDED_ACTION_WEIGHT if self.body_metadata and use_measured
+                             else _WEIGHTS["actions"])
+            shape_score = (action_weight * bool(tags["actions"] & shape_actions)
                            + _WEIGHTS["postures"] * bool(tags["postures"] & shape_postures))
             context_score = min(_CONTEXT_MAX_SCORE, sum(
                 _WEIGHTS[name] * len(values) for name, values in matched.items()
@@ -213,12 +242,23 @@ class TagSemanticSearcher:
                 **matched, "text_overlap": round(float(text_overlap), 4),
                 "body_matches": detail["matched"], "body_conflicts": detail["conflicts"],
                 "query_body": observed, "candidate_body": body,
+                "body_source": "bvh" if measured is not None else "library_text",
                 "score_components": {
                     "shape_tags": shape_score, "context": round(context_score, 4),
                     "body_reward": detail["reward"], "body_penalty": detail["penalty"],
                     "text": round(_TEXT_WEIGHT * text_overlap, 4),
                 },
             }
+            if self.body_metadata:
+                explanation["body_index_usage"] = {
+                    "query_eligible": use_measured,
+                    "reason": ("measured" if measured is not None else
+                               "pose_metadata_missing" if use_measured else
+                               "insufficient_intrinsic_query_observations"),
+                    "action_weight": action_weight,
+                }
+            if measured is not None:
+                explanation["body_metrics"] = measured["metrics"]
             scored.append((score, pose_id, explanation, record, text))
         scored.sort(key=lambda item: (-item[0], item[1]))
         hits: list[SemanticHit] = []
@@ -258,11 +298,22 @@ class UnavailableSemanticSearcher:
 
 
 def build_semantic_searcher(path: Optional[str] = None, *,
-                            library_pose_ids: Optional[set] = None):
+                            library_pose_ids: Optional[set] = None,
+                            body_index_path: Optional[str] = None):
     """env SEMANTIC_TAGS_PATH(기본 data/search-v2.json)에서 임시 검색기를 만든다."""
     path = path or os.getenv("SEMANTIC_TAGS_PATH", "data/search-v2.json")
+    body_index_path = body_index_path or os.getenv("SEMANTIC_BODY_INDEX_PATH")
     try:
-        searcher = TagSemanticSearcher.from_file(path, library_pose_ids=library_pose_ids)
+        if body_index_path:
+            try:
+                searcher = TagSemanticSearcher.from_file(
+                    path, library_pose_ids=library_pose_ids, body_index_path=body_index_path)
+            except Exception as error:
+                log_warn("semantic_body_index_init", status="fallback_library_text",
+                         errorType=type(error).__name__)
+                searcher = TagSemanticSearcher.from_file(path, library_pose_ids=library_pose_ids)
+        else:
+            searcher = TagSemanticSearcher.from_file(path, library_pose_ids=library_pose_ids)
     except FileNotFoundError:
         log_warn("semantic_search_init", status="index_missing", path=path)
         return UnavailableSemanticSearcher("semantic_index_missing")
