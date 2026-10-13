@@ -600,6 +600,7 @@ class Pipeline:
                 description,
                 generic_postures=self.routing_config.semantic_generic_postures,
                 generic_actions=self.routing_config.semantic_generic_actions,
+                min_body_matches=self.routing_config.semantic_min_body_observations,
             )
             with span("semantic_search"):
                 search_started = perf_counter()

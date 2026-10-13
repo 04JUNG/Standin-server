@@ -590,3 +590,10 @@ Converter `/healthz`의 `preview_model_revision`과 `character_hashes`로 지원
 
 route가 geometric이 아닌 인물은 `candidates=[]`, `confidence=low`, `refine_allowed=false`다(기존에도 관절 근거가
 부족한 인물은 후보 0개였다). 상세: `docs/SEARCH_ROUTING.md`.
+
+몸 관찰 개선(d2): semantic_evidence.description에 기본값이 있는 body_observations와
+context_evidence를 추가했다. body_observations는 knees·legs·arms·torso의 정성 분류이며
+관절 좌표·각도가 아니다. semantic_candidates[].matched는 body_matches·body_conflicts·
+score_components를 추가로 포함할 수 있다. 미관측 속성은 중립이며 semantic은 계속 refine 금지다.
+점수 정책 버전은 search.backend에 기록된다. 서로 다른 backend 버전의 score나 기하 distance를
+직접 비교하지 않는다. `valid`는 검색 근거 조건 통과이며 정확도 보증이 아니다.

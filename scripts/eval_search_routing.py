@@ -328,7 +328,12 @@ def run(args) -> int:
 def _write_results(args, pipeline, searcher, results):
     """Persist every case so interrupted live calls leave reviewable evidence."""
     (args.out / "results.json").write_text(
-        json.dumps({"vlm_mode": args.vlm, "pose_variant": CFG.pose_model_variant,
+        json.dumps({"vlm_mode": args.vlm,
+                    "vlm_provider": CFG.vlm_provider if args.vlm == "live" else "replay",
+                    "vlm_model": (CFG.gemini_model if args.vlm == "live"
+                                  and CFG.vlm_provider == "gemini" else None),
+                    "vlm_prompt_version": CFG.vlm_prompt_version,
+                    "pose_variant": CFG.pose_model_variant,
                     "routing_config": asdict(pipeline.routing_config),
                     "semantic_backend": getattr(searcher, "backend", None),
                     "cases": results}, ensure_ascii=False, indent=1, default=str),
@@ -337,6 +342,8 @@ def _write_results(args, pipeline, searcher, results):
 
 def _write_report(args, results, table):
     from collections import Counter
+    provider = getattr(args, "vlm_provider", CFG.vlm_provider)
+    model = getattr(args, "vlm_model", CFG.gemini_model)
 
     people = [row for row in table if isinstance(row.get("person"), int)]
     routes = Counter(row["route"] for row in people)
@@ -354,6 +361,8 @@ def _write_report(args, results, table):
         "# 04J-286 라우팅 재현 결과",
         "",
         f"- VLM 모드: `{args.vlm}`  포즈: `{CFG.pose_model_variant}`",
+        f"- VLM 설정: provider=`{provider}`, model=`{model}` "
+        f"(실호출 Gemini일 때 적용)",
         f"- 사례 {len(results)}장, 인물 {len(people)}명, VLM 인물 0명 컷 "
         f"{sum(1 for r in results if r.get('vlm_count') == 0)}장",
         f"- 경로 분포: " + ", ".join(f"{k}={v}" for k, v in sorted(routes.items())),
@@ -371,7 +380,10 @@ def _write_report(args, results, table):
     if args.vlm == "replay":
         lines += ["", "주의: VLM 분석은 운영 기록 재생이며, 자세 설명은 fixture 또는 오류 대역이다.",
                   "이 결과는 분기·검색 연결 검증용이다. Gemini 설명 품질과 실제 호출 지연은 미측정이다."]
-    elif requested:
+    if args.vlm == "cached-live":
+        lines += ["", "주의: 실제 Gemini 설명을 고정하여 검색만 재생한 결과다.",
+                  "아래 설명 호출 수·지연은 원본 실호출 기록이며 이번 재생에서 추가 VLM 호출은 0회다."]
+    if args.vlm != "replay" and requested:
         import numpy as np
         times = [d["elapsed_ms"] for d in requested]
         p50, p95 = np.percentile(times, [50, 95])

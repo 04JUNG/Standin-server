@@ -1,7 +1,8 @@
 # 러프함 기반 인물별 검색 경로 분기 (04J-286)
 
 상태: 최신 develop(PR #84·#86 포함)에 구현 반영·오프라인 검증 완료.
-실 Gemini 재현은 러프 이미지 외부 전송 승인 대기 · 기본값 **꺼짐**(`SEARCH_ROUTING=0`)
+사용자 승인 후 실제 Gemini 3장 파일럿 완료. 전체 50장 실호출 품질 평가는 미진행.
+기본값 **꺼짐**(`SEARCH_ROUTING=0`)
 
 ## 1. 무엇을 하나
 
@@ -68,7 +69,11 @@ Gemini 분석(기존) → RTMPose·슬롯 배정·crop·Human-Art rescue(기존)
 
 유효(`valid`) 조건 — 모두 만족:
 - `visible=true`, `certainty`가 low가 아님
-- 구체 태그 ≥ 1: 자세(서기 제외)·행동(기다리기·바라보기·쉬기·듣기·말하기·발 내딛기·손짓 제외)·활동 중 하나
+- 구체 태그 ≥ 1, 또는 구별되는 몸 관찰 ≥ 2
+  (`ROUTING_SEMANTIC_MIN_BODY_OBSERVATIONS`, 기본 2).
+  구체 태그는 자세(서기 제외)·행동(일반 행동 제외)·활동 중 하나다.
+  무릎 굽힘·다리 벌림·팔 올림·몸 기울임은 구별되는 관찰이며,
+  무릎 펴짐·다리 모음·팔 내림·상체 곧음만으로 일반 서기를 유효로 승격하지 않는다.
 - 검색 문장 ≥ 8자, 몸 배치 관찰 문장 ≥ 6자
 
 그 외 상태: `too_generic`(예: "서 있는 사람"), `low_certainty`, `not_visible`, `empty`, `vlm_error`.
@@ -110,7 +115,7 @@ quality_trace·notes·후보·confidence·refine 정책 불변(`tests/test_searc
 ## 7. 04J-285와의 경계
 
 04J-285(자연어 → 기존 포즈 JSON 검색)는 아직 들어오지 않았다. 지금 semantic 경로 뒤에는 **임시 태그 검색기**
-(`TagSemanticSearcher`, 태그 겹침 + 설명 문장 bigram, 임베딩/LLM 아님)가 붙어 있다. 285가 완성되면
+(`TagSemanticSearcher`, 구체 태그 + 관찰 몸 배치 + 문장 bigram, 임베딩/LLM 아님)가 붙어 있다. 285가 완성되면
 `SemanticSearcher` 계약(`search(query, top_k) -> SemanticSearchResult(status, hits)`)을 구현해
 `build_semantic_searcher`만 바꾼다. 라우터·응답 형식은 그대로다.
 
@@ -152,3 +157,65 @@ geometric의 Top-5(포즈 ID·view·거리)가 바뀌거나 사례 처리 오류
 - 기능 브랜치: `san400b/04j-286-dynamic-routing`. GitHub 업로드·PR 생성은
   자동 승인 검토에서 외부 게시 승인이 필요하다고 차단되어 사용자 승인 대기다. CI는 미실행이다.
 - 운영 활성화·클라이언트 표시 연결은 진행하지 않았다.
+
+### 실제 Gemini 3장 파일럿(사용자 승인 후)
+
+사용자 승인 범위인 T008·T009·T044를 실제 Gemini로 실행했다.
+기본 gemini-2.5-flash는 현재 키에서 404를 반환해 실험 env에서만 gemini-3.8-flash로 변경했다.
+
+- T008·T009: 기존 후보 0개 → semantic 후보 각 5개. 설명 추가 호출 각각 8.699초·7.870초.
+- T044: geometric Top-5의 ID·view·거리 동일, 설명 추가 호출 0회.
+- 후보 프런트 썸네일 확인: T008의 3위·T009의 2위는 일부 형태가 유사하나,
+  두 사례의 1위는 팔다리 배치가 달라 후보 반환만으로 품질 성공을 선언할 수 없다.
+- 두 실패 러프는 같은 구도의 크기 다른 이미지이며 Gemini가 서로 다른 종목·장면 태그를 붙였다.
+  크기와 응답 변동의 영향을 구분하려면 추가 대조가 필요하다.
+- 전체 50장 실호출·PR·배포는 미진행. 검색 기준·설명 프롬프트·운영 기본 모델은 변경하지 않았다.
+- 로컬 증거: `tmp/routing-eval-live-pilot-g38/{REPORT.md,results.json,side_by_side.csv,index.html}`.
+
+## 9. 몸 관찰을 연결한 검색 업그레이드(d2-observed-body)
+
+원인은 분기 이후의 설명·순위에 있었다. d1의 body_details는 쿼리에서 누락됐고,
+장면·활동 태그와 일반 standing이 몸 배치보다 순위를 크게 좌우했다.
+행동 태그가 없는 구체적인 설명은 구형 검색기에서 검색할 수 없었다.
+
+- 설명: 몸 관찰과 해석을 분리하고 knees·legs·arms·torso를 정성 값으로 받는다.
+  좌표·각도는 생성하지 않는다. 주된 행동은 하나이며 불확실하면 비울 수 있다.
+- 파서: body_observations를 허용값으로 검증한다. 근거(context_evidence)가 없는 장면·대상·의도는
+  주 쿼리에서 제외하고 dropped에 남긴다. 이것은 사실성 검증이 아닌 최소한의 근거 기록 검사다.
+- 검색: body_details와 관찰 값을 전달한다. 라이브러리의 설명·검토 메모에서 정성 속성을 읽고,
+  일치에는 무릎 3·다리 간격 3·팔 2·몸통 1.5점을 주며 충돌에는 같은 크기로 감점한다.
+  모르는 속성은 중립이다. 단순 standing은 가점하지 않고 여러 행동 추측도 중복 가점하지 않는다.
+- 장면 태그는 합계 최대 0.5점이다. 이 가중치는 임시 규칙이며 학습·보정된 정답 확률이 아니다.
+- 구체적인 몸 관찰 2개 이상이면 행동 태그가 비어도 후보를 찾을 수 있다.
+  일반 서기 단서만 있는 설명, 두상·얽힘 정책, low certainty 차단은 유지한다.
+- SemanticQuery에 기본값이 있는 body_details·body_observations를 추가했다.
+  SemanticSearcher의 search(query, top_k)와 SemanticHit 응답은 유지한다.
+- 후보 matched에 body_matches·body_conflicts·score_components를 기록한다.
+  backend는 `tag-v2-body-grounded-interim`이다. v1/v2 점수는 직접 비교하지 않는다.
+
+### 전후 검증
+
+실제 Gemini 3.8 Flash로 승인된 동일 3장을 d2 프롬프트로 재실행했다.
+T008·T009의 몸 관찰 4개가 일치했고, 종목·판타지·전투 태그는 비어 있었다.
+행동 해석은 T008=fall, T009=없음으로 여전히 불확실하므로 관찰 일치와 행동 정확도를 구분한다.
+
+기존 Gemini 설명을 고정한 검색기 대조에서도 두 사례의 1위가 모두
+`combat_ual1_Jump_Start_f00000`(무릎을 굽히고 다리를 벌려 팔을 내린 형태)로 바뀌었다.
+새 설명에서는 T008의 1위가 같은 포즈, T009의 1위가 `cmu_18_14_00277`
+(다리를 벌려 앉고 손을 내린 형태)였다. 사람이 확인한 부분적 형태 개선이며 작가의 정답 판정은 아니다.
+
+- 설명 추가 호출: T008 7.208초, T009 8.606초, T044 0회. 지연 개선은 입증되지 않았다.
+- T044의 같은 분석을 공유한 off/on Top-5는 ID·view·거리 모두 동일.
+- 전체 테스트 813 passed·8 skipped, 22 subtests passed. compileall·diff check 통과.
+- 50장 실제 current-X 재생: geometric 39명 전원 기존 Top-5 동일.
+  이 50장의 설명은 Claude fixture이며 실 Gemini 품질 근거가 아니다.
+- 원본 실호출: `tmp/routing-eval-live-body-v2/results.json`.
+  문장 해석기 보완 후 같은 설명으로 검색만 재생한 최종 결과:
+  `tmp/routing-eval-live-body-v2-final/results.json`. 추가 VLM 호출 0회.
+- 통제 대조: `scripts/compare_semantic_upgrade.py`,
+  `tmp/routing-eval-live-body-v2/ablation.json`(기존/새 설명 × 기존/새 검색기).
+- 원본 이미지·라이브러리·키는 커밋하지 않았다. SEARCH_ROUTING 기본 OFF, PR·배포 미진행.
+
+남은 한계: 정성 속성은 거친 구분이다. 라이브러리 문장에 없는 속성은 비교할 수 없으며
+한국어 규칙이 모든 문장·관점을 해석하지 못한다. 다른 동작의 홀드아웃 평가, 작가의 동작 의도,
+카메라·세밀한 팔 방향과 검색 지연을 별도로 검증해야 한다.

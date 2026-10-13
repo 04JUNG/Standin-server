@@ -259,6 +259,7 @@ def parse_pose_descriptions(payload, count: int) -> dict:
     """설명 응답 → {인덱스: PoseDescription}. 길이가 다르면 통째로 버린다(한 칸 밀림 방지)."""
     from ..search_routing import PoseDescription
     from ..semantic_vocab import VOCABULARY
+    from ..body_language import validated_observations
 
     people = payload.get("people") if isinstance(payload, dict) else None
     if not isinstance(people, list) or len(people) != count:
@@ -284,11 +285,27 @@ def parse_pose_descriptions(payload, count: int) -> dict:
             if bad:
                 dropped[field_name] = [str(value)[:40] for value in bad][:10]
         certainty = item.get("certainty")
+        observations = validated_observations(item.get("body_observations"))
+        raw_observations = item.get("body_observations")
+        if isinstance(raw_observations, dict):
+            invalid = {str(k)[:40]: str(v)[:40] for k, v in raw_observations.items()
+                       if k not in observations}
+            if invalid:
+                dropped["body_observations"] = invalid
+        context = item.get("context_evidence")
+        context = context.strip()[:200] if isinstance(context, str) else ""
+        if not context:
+            # Interpretations without evidence cannot dominate the main query.
+            for name in ("domains", "activities", "objects", "intents", "emotions"):
+                if kept[name]:
+                    dropped[f"ungrounded_{name}"] = kept[name]
+                    kept[name] = []
         out[index] = PoseDescription(
             visible=item.get("visible") is not False,
             body_details=str(item.get("body_details") or "")[:300],
             search_text=str(item.get("search_text") or "")[:200],
             certainty=certainty if certainty in ("high", "medium", "low") else None,
+            body_observations=observations, context_evidence=context,
             dropped=dropped, **kept,
         )
     return out

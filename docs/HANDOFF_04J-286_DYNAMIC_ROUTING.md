@@ -11,6 +11,17 @@
 > 필요하다는 자동 승인 검토에 의해 차단됐다. PR·CI는 아직 미실행이다.
 > 최신 구현 설명은 `docs/SEARCH_ROUTING.md`를 따른다.
 
+> 후속: 사용자 승인 후 실제 Gemini 3장(T008·T009·T044) 파일럿을 완료했다.
+> 두 실패 사례는 각각 semantic 후보 5개, 정상 사례는 기존 Top-5 동일이었다.
+> Gemini 설명 호출은 약 7.9~8.7초이며 후보 1위의 형태 적합성과 장면 태그 일관성에 문제가 관찰됐다.
+> 전체 50장 실호출·PR·배포는 미진행이다. 자세한 관찰은 SEARCH_ROUTING.md의 파일럿 절과
+> 로컬 `tmp/routing-eval-live-pilot-g38/REPORT.md`를 따른다.
+
+> 개선 후: d2-observed-body에서 누락된 몸 관찰을 검색에 연결하고 일반 서기 가점·과한 장면 가점을
+> 줄였다. 같은 설명을 고정한 대조와 동일 3장의 재실호출에서 형태 순위가 개선됐다.
+> 전체 테스트 813개 통과, 50장 재생의 geometric 39명 Top-5 동일. 지연은 여전히 약 7~9초다.
+> 최종 기록은 SEARCH_ROUTING.md §9와 `tmp/routing-eval-live-body-v2-final/REPORT.md`다.
+
 이 문서 하나만 읽고 이어서 작업할 수 있게 썼다. 설계 상세는 `docs/SEARCH_ROUTING.md`, 응답 계약은
 `docs/API_CONTRACT.md` 마지막 절, 저장소 불변식은 `CLAUDE.md`에 있다. **작업 전에 CLAUDE.md의 핵심 설계
 불변식 7개를 먼저 읽을 것.**

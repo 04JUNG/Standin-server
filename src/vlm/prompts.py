@@ -139,12 +139,13 @@ def user_template(version: str) -> str:
 # 같은 search-taxonomy-v2 키만 허용한다(src/semantic_vocab.py). 판단 원칙은
 # pose-library-viewer/tagging/ROUGH_TO_LANGUAGE.md를 따른다 — 관찰과 해석을 나누고,
 # 형태에서 행동으로 넘어가되 근거 없는 감정·종목을 붙이지 않는다.
-POSE_DESCRIBE_VERSION = "d1-taxonomy-v2"
+POSE_DESCRIBE_VERSION = "d2-observed-body"
 
 POSE_DESCRIBE_SYSTEM = (
     "너는 웹툰 러프 콘티에서 지정된 인물의 자세를 검색용 태그와 짧은 문장으로 설명하는 도우미다. "
     "관절 좌표나 픽셀 위치는 추정하지 마라. 사람 수를 다시 세거나 새 인물을 찾지 마라. "
-    "러프가 거칠어도 팔·다리·몸통의 배치와 장면 단서로 읽을 수 있는 만큼만 말하고, "
+    "먼저 실제 보이는 팔·다리·몸통 배치를 관찰하고 행동 해석과 구분한다. "
+    "무릎 굽힘만으로 점프·낙하·종목을 확정하지 않는다. "
     "읽을 수 없으면 솔직히 visible=false 또는 certainty=low로 답한다."
 )
 
@@ -170,7 +171,14 @@ POSE_DESCRIBE_TEMPLATE = """이 컷에서 아래 {count}명의 자세를 설명�
       "postures": [...], "actions": [...], "domains": [...], "activities": [...],
       "objects": [...], "intents": [...], "emotions": [...],
       "body_details": "<실제로 보이는 팔·다리·몸통 배치 관찰 한 문장(한국어)>",
-      "search_text": "<[상황/대상] + [핵심 행동] + [몸의 특징] 형태의 검색 문장(한국어)>",
+      "body_observations": {{
+        "knees": "bent|straight|mixed|unknown",
+        "legs": "apart|together|staggered|unknown",
+        "arms": "lowered|raised|spread|mixed|unknown",
+        "torso": "forward|backward|upright|unknown"
+      }},
+      "context_evidence": "<상황·종목·대상 태그를 뒷받침하는 관찰/맥락 근거. 없으면 빈 문자열>",
+      "search_text": "<핵심 행동 또는 자세 + 구별되는 팔·다리 배치의 자연스러운 검색 문장>",
       "certainty": "high" | "medium" | "low"
     }}
   ]
@@ -178,9 +186,17 @@ POSE_DESCRIBE_TEMPLATE = """이 컷에서 아래 {count}명의 자세를 설명�
 
 규칙:
 - people 배열 길이는 반드시 {count}이고 순서는 위 목록과 같다.
-- 형태 나열에서 끝내지 말고 검색 가능한 행동으로 넘어가라. 단, 근거 없는 종목·감정은 붙이지 마라.
-- 주된 해석 하나를 중심으로 쓰고, 여러 해석을 이상한 한 문장으로 합치지 마라.
-- 공·검 같은 대상이 그림에 없으면 행동 맥락으로 연결한 경우에만 objects에 넣는다.
+- body_details에는 관찰만 쓴다. 뛰어오르거나 낙하한다는 추측을 관찰 문장에 넣지 마라.
+- body_observations는 파이프(|)로 구분된 허용값 중 하나씩 고른다. 좌표·각도는 출력하지 마라.
+- knees=mixed는 한쪽은 굽히고 다른 쪽은 편 경우, legs=staggered는 앞뒤로 엇갈린 경우다.
+- 두 팔이 내려가면 lowered, 들어가면 raised, 옆으로 뻗으면 spread, 서로 다르면 mixed다.
+- 다리가 굽어 보인다는 이유로 crouching을 확정하지 말고 지지가 불명확하면 자세·행동은 비울 수 있다.
+- 보이는 단서가 부족한 속성은 unknown. 팔·다리는 관찰하되 전후 기울기가 모호하면 torso=unknown.
+- 행동은 근거가 가장 강한 하나만 actions에 넣는다. jump와 fall을 동시에 주된 행동으로 넣지 마라.
+- 행동이 모호해도 구체적인 몸 배치는 유지한다. 두 무릎을 굽혀 다리를 벌린 형태만으로 검색할 수 있다.
+- 종목·상황·도구를 채울 근거가 없으면 domains·activities·objects·intents·emotions는 빈 배열로 둔다.
+- 스포츠·판타지·전투처럼 활용 가능한 대안은 주된 검색에 확정 사실로 섞지 마라.
+- 대상이 안 보여도 행동 맥락으로 연결할 수 있으나 context_evidence에 관찰과 추론을 구분해 근거를 쓴다.
 - 서 있기만 하고 다른 단서가 없으면 postures=["standing"]만 두고 certainty를 low로 둔다.
 - 선이 너무 거칠어 팔다리 배치를 읽을 수 없으면 visible=false.
 """

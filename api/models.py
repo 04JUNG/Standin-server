@@ -98,7 +98,7 @@ class VlmTagsOut(BaseModel):
 class SemanticCandidateOut(BaseModel):
     """시맨틱 경로 후보(04J-286). 기하 candidates와 의미가 달라 별도 칸에 싣는다.
 
-    score는 태그·문장 겹침 점수(클수록 가까움)이며 기하 distance와 비교할 수 없다.
+    score는 태그·관찰 몸 배치·문장 점수(클수록 가까움)이며 기하 distance와 비교할 수 없다.
     관절 근거가 부족한 인물의 참고 후보이므로 refine 대상이 아니다.
     """
     pose_id: str

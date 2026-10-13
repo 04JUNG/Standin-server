@@ -25,6 +25,7 @@ from dataclasses import dataclass, field, asdict
 from typing import Optional
 
 import numpy as np
+from .body_language import query_observations, specific_observation_count
 
 ROUTES = ("geometric", "semantic", "undetermined", "error")
 
@@ -74,6 +75,8 @@ class RoutingConfig:
     semantic_min_specific_tags: int = 1
     semantic_min_text_chars: int = 8
     semantic_min_body_detail_chars: int = 6
+    # Two distinctive body observations can ground a query when action is unknown.
+    semantic_min_body_observations: int = 2
     # VLM이 스스로 low라고 답하면 유효로 보지 않는다.
     semantic_reject_certainty: tuple[str, ...] = ("low",)
 
@@ -103,6 +106,8 @@ class RoutingConfig:
             semantic_min_body_detail_chars=_env_int(
                 "ROUTING_SEMANTIC_MIN_BODY_DETAIL_CHARS",
                 base.semantic_min_body_detail_chars),
+            semantic_min_body_observations=_env_int(
+                "ROUTING_SEMANTIC_MIN_BODY_OBSERVATIONS", base.semantic_min_body_observations),
             semantic_reject_certainty=_env_csv(
                 "ROUTING_SEMANTIC_REJECT_CERTAINTY", base.semantic_reject_certainty),
         )
@@ -122,6 +127,7 @@ class RoutingConfig:
             "min_specific_tags": self.semantic_min_specific_tags,
             "min_text_chars": self.semantic_min_text_chars,
             "min_body_detail_chars": self.semantic_min_body_detail_chars,
+            "min_body_observations": self.semantic_min_body_observations,
             "generic_postures": list(self.semantic_generic_postures),
             "generic_actions": list(self.semantic_generic_actions),
             "reject_certainty": list(self.semantic_reject_certainty),
@@ -242,6 +248,9 @@ class PoseDescription:
     certainty: Optional[str] = None
     # 어휘 밖이라 버린 값(기록용).
     dropped: dict = field(default_factory=dict)
+    # Qualitative observations, not VLM-generated joint coordinates.
+    body_observations: dict = field(default_factory=dict)
+    context_evidence: str = ""
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -303,6 +312,8 @@ def assess_semantic_evidence(description: Optional[PoseDescription], rcfg: Routi
     )
     text = (description.search_text or "").strip()
     body = (description.body_details or "").strip()
+    observations = query_observations(body, description.body_observations)
+    specific_body = specific_observation_count(observations)
     metrics = {
         "specific_tag_count": len(specific),
         "specific_tags": specific,
@@ -314,6 +325,8 @@ def assess_semantic_evidence(description: Optional[PoseDescription], rcfg: Routi
         "body_detail_chars": len(body),
         "certainty": description.certainty,
         "visible": description.visible,
+        "body_observations": observations,
+        "specific_body_observations": specific_body,
     }
     reasons: list[str] = []
     status = "valid"
@@ -324,7 +337,8 @@ def assess_semantic_evidence(description: Optional[PoseDescription], rcfg: Routi
     else:
         if description.certainty in rcfg.semantic_reject_certainty:
             reasons.append("certainty_low")
-        if len(specific) < rcfg.semantic_min_specific_tags:
+        if (len(specific) < rcfg.semantic_min_specific_tags
+                and specific_body < rcfg.semantic_min_body_observations):
             reasons.append("only_generic_tags")
         if len(text) < rcfg.semantic_min_text_chars:
             reasons.append("search_text_too_short")

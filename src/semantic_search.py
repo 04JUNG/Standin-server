@@ -13,9 +13,10 @@
           hits    [SemanticHit(pose_id, score, matched, pose)] — pose는 해당 포즈 JSON
 
 임시 구현 ``TagSemanticSearcher``는 pose-library-viewer의 ``search-v2.json``(1,981 포즈,
-04J-284 태깅)을 읽어 태그 겹침 + 설명 문장 글자 bigram 겹침으로 점수를 낸다. 임베딩/LLM
-검색이 아니다. 자세·행동(posture/action) 중 구체 태그가 하나도 맞지 않으면 후보로 내지
-않는다 — 종목 이름만 같고 자세가 다른 결과가 올라오지 않게 하기 위해서다
+04J-284 태깅)을 읽어 구체 자세·행동, 관찰된 몸 배치, 문장 겹침으로 점수를 낸다.
+태그가 모호해도 구별되는 몸 배치 2개 이상이 맞으면 후보로 낸다. 미관측 속성은 중립이며
+형태 충돌은 감점한다. 장면 태그 합계는 최대 0.5점이다. 임베딩/LLM 검색은 아니다.
+종목 이름만 같고 자세가 다른 결과가 올라오지 않게 하기 위한 임시 개선이다
 (tagging/ROUGH_TO_LANGUAGE.md §추출과 검색을 잇는 흐름 6).
 """
 from __future__ import annotations
@@ -27,6 +28,9 @@ from time import perf_counter
 from typing import Iterable, Optional, Protocol
 
 from .logging_setup import log_warn
+from .body_language import (
+    observations_from_text, query_observations, compare_observations, specific_observation_count,
+)
 
 TAG_FIELDS = ("postures", "actions", "domains", "activities", "objects", "intents", "emotions")
 # search-v2.json의 groups[*].field 값 → SemanticQuery 필드.
@@ -37,10 +41,11 @@ _FIELD_MAP = {
 }
 # 태그 그룹별 가중치. 자세·행동이 포즈 모양을 가장 직접 좁힌다.
 _WEIGHTS = {
-    "actions": 3.0, "postures": 2.0, "activities": 2.0, "objects": 1.0,
-    "intents": 1.0, "domains": 0.5, "emotions": 0.5,
+    "actions": 3.0, "postures": 2.0, "activities": 0.2, "objects": 0.2,
+    "intents": 0.1, "domains": 0.1, "emotions": 0.1,
 }
 _TEXT_WEIGHT = 2.0
+_CONTEXT_MAX_SCORE = 0.5
 
 
 @dataclass
@@ -56,22 +61,29 @@ class SemanticQuery:
     # 그 자체로는 포즈를 좁히지 못하는 태그(라우터 기준과 같은 값을 넘긴다).
     generic_postures: tuple[str, ...] = ("standing",)
     generic_actions: tuple[str, ...] = ()
+    body_details: str = ""
+    body_observations: dict = field(default_factory=dict)
+    min_body_matches: int = 2
 
     @classmethod
     def from_description(cls, description, generic_postures=("standing",),
-                         generic_actions=()) -> "SemanticQuery":
+                         generic_actions=(), *, min_body_matches=2) -> "SemanticQuery":
         return cls(
             postures=list(description.postures), actions=list(description.actions),
             domains=list(description.domains), activities=list(description.activities),
             objects=list(description.objects), intents=list(description.intents),
             emotions=list(description.emotions), text=description.search_text or "",
             generic_postures=tuple(generic_postures), generic_actions=tuple(generic_actions),
+            body_details=description.body_details or "",
+            body_observations=dict(getattr(description, "body_observations", {}) or {}),
+            min_body_matches=int(min_body_matches),
         )
 
     def to_dict(self) -> dict:
         data = asdict(self)
         data.pop("generic_postures", None)
         data.pop("generic_actions", None)
+        data.pop("min_body_matches", None)
         return data
 
 
@@ -112,9 +124,9 @@ def _mirror_base(pose_id: str) -> str:
 
 
 class TagSemanticSearcher:
-    """search-v2.json 태그 기반 임시 시맨틱 검색기(04J-285 대체 전까지)."""
+    """Observed body layout + specific tags; context is only a small tie-breaker."""
 
-    backend = "tag-v2-interim"
+    backend = "tag-v2-body-grounded-interim"
 
     def __init__(self, records: Iterable[dict], *, library_pose_ids: Optional[set] = None,
                  min_score: float = 3.0):
@@ -134,7 +146,11 @@ class TagSemanticSearcher:
                     if name and isinstance(value, str):
                         tags[name].add(value)
             text = ((record.get("description") or {}).get("text") or "")
-            self._poses.append((pose_id, tags, _bigrams(text), record, text))
+            # The review note often retains limb observations omitted by the short
+            # search sentence. No BVH filename or scene label is used as body evidence.
+            note = (record.get("review") or {}).get("note") or ""
+            body = observations_from_text(text + ". " + note)
+            self._poses.append((pose_id, tags, _bigrams(text), record, text, body))
 
     @classmethod
     def from_file(cls, path: str, **kwargs) -> "TagSemanticSearcher":
@@ -162,33 +178,52 @@ class TagSemanticSearcher:
             backend=self.backend, elapsed_ms=(perf_counter() - started) * 1000.0)
 
     def _rank(self, query: SemanticQuery, top_k: int) -> list[SemanticHit]:
-        if not self._poses:
+        if not self._poses or top_k <= 0:
             return []
         wanted = {name: set(getattr(query, name)) for name in TAG_FIELDS}
-        specific_shape = (
-            (wanted["postures"] - set(query.generic_postures))
-            | (wanted["actions"] - set(query.generic_actions))
-        )
-        query_grams = _bigrams(query.text)
+        shape_postures = wanted["postures"] - set(query.generic_postures)
+        shape_actions = wanted["actions"] - set(query.generic_actions)
+        query_grams = _bigrams(query.body_details + " " + query.text)
+        observed = query_observations(query.body_details, query.body_observations)
         scored = []
-        for pose_id, tags, grams, record, text in self._poses:
+        for pose_id, tags, grams, record, text, body in self._poses:
             matched = {name: sorted(wanted[name] & tags[name])
                        for name in TAG_FIELDS if wanted[name] & tags[name]}
-            # 모양을 좁히는 자세·행동 태그가 하나도 안 맞으면 종목만 같아도 버린다.
-            if not ((tags["postures"] | tags["actions"]) & specific_shape):
+            # Body-only retrieval is possible, but a scene label alone is insufficient.
+            detail = compare_observations(observed, body)
+            body_supported = (specific_observation_count(observed) >= query.min_body_matches
+                              and len(detail["matched"]) >= query.min_body_matches)
+            if not ((tags["postures"] & shape_postures)
+                    or (tags["actions"] & shape_actions) or body_supported):
                 continue
-            score = sum(_WEIGHTS[name] * len(values) for name, values in matched.items())
+            # Multiple speculative actions and generic standing cannot pile up score.
+            shape_score = (_WEIGHTS["actions"] * bool(tags["actions"] & shape_actions)
+                           + _WEIGHTS["postures"] * bool(tags["postures"] & shape_postures))
+            context_score = min(_CONTEXT_MAX_SCORE, sum(
+                _WEIGHTS[name] * len(values) for name, values in matched.items()
+                if name not in ("postures", "actions")))
+            score = shape_score + context_score + detail["reward"] - detail["penalty"]
             text_overlap = 0.0
             if query_grams and grams:
                 text_overlap = len(query_grams & grams) / float(len(query_grams | grams))
                 score += _TEXT_WEIGHT * text_overlap
             if score < self.min_score:
                 continue
-            scored.append((score, pose_id, matched, record, text, text_overlap))
+            explanation = {
+                **matched, "text_overlap": round(float(text_overlap), 4),
+                "body_matches": detail["matched"], "body_conflicts": detail["conflicts"],
+                "query_body": observed, "candidate_body": body,
+                "score_components": {
+                    "shape_tags": shape_score, "context": round(context_score, 4),
+                    "body_reward": detail["reward"], "body_penalty": detail["penalty"],
+                    "text": round(_TEXT_WEIGHT * text_overlap, 4),
+                },
+            }
+            scored.append((score, pose_id, explanation, record, text))
         scored.sort(key=lambda item: (-item[0], item[1]))
         hits: list[SemanticHit] = []
         seen_bases = set()
-        for score, pose_id, matched, record, text, overlap in scored:
+        for score, pose_id, matched, record, text in scored:
             base = _mirror_base(pose_id)
             # 원본·미러는 태그가 같아 점수가 같다. Top-K 다양성을 위해 하나만 남긴다.
             if base in seen_bases:
@@ -196,7 +231,7 @@ class TagSemanticSearcher:
             seen_bases.add(base)
             hits.append(SemanticHit(
                 pose_id=pose_id, score=round(float(score), 4),
-                matched={**matched, "text_overlap": round(float(overlap), 4)},
+                matched=matched,
                 pose={
                     "pose_id": pose_id,
                     "description": text,
