@@ -602,7 +602,15 @@ class Pipeline:
                 generic_actions=self.routing_config.semantic_generic_actions,
             )
             with span("semantic_search"):
-                result = self.semantic_searcher.search(query, top_k=CFG.semantic_top_k)
+                search_started = perf_counter()
+                try:
+                    result = self.semantic_searcher.search(query, top_k=CFG.semantic_top_k)
+                except Exception as error:
+                    from .semantic_search import SemanticSearchResult
+                    result = SemanticSearchResult(
+                        "error", reason=f"search_exception:{type(error).__name__}",
+                        backend=getattr(self.semantic_searcher, "backend", "unknown"),
+                        elapsed_ms=(perf_counter() - search_started) * 1000.0)
             search_status, backend, search_reason = result.status, result.backend, result.reason
             elapsed["semantic_search_ms"] = round(result.elapsed_ms, 3)
             semantic_candidates = [hit.to_dict() for hit in result.hits]

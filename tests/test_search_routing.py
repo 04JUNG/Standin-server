@@ -230,6 +230,27 @@ def test_semantic_search_error_is_status_not_crash():
     assert record["search"]["reason"] == "semantic_index_missing"
 
 
+def test_all_rough_people_share_one_describe_call():
+    vlm = _CountingVLM()
+    _, res = _run("full_half standing front 2p rough", on=True, vlm=vlm, all_rough=True)
+    assert [r["route"] for r in res.person_routing] == ["semantic", "semantic"]
+    assert vlm.describe_calls == 1
+    assert len(vlm.describe_boxes[0]) == 2
+
+
+def test_searcher_exception_preserves_other_people():
+    class _RaisingSearcher(_StubSearcher):
+        def search(self, query, top_k=5):
+            raise RuntimeError("backend unavailable")
+
+    _, res = _run("full_half standing front 2p rough", on=True, searcher=_RaisingSearcher())
+    assert res.person_routing[0]["route"] == "geometric"
+    assert res.person_candidates[0]
+    assert res.person_routing[1]["search"]["status"] == "error"
+    assert res.person_routing[1]["search"]["reason"] == "search_exception:RuntimeError"
+    assert not res.descriptors[1].refine_allowed
+
+
 # ---------------------------------------------------------------- undetermined / error
 
 
@@ -379,6 +400,85 @@ def test_api_models_carry_routing_without_touching_candidates():
     legacy = json.loads(PersonOut(index=0, tags={}, candidates=[]).model_dump_json())
     assert legacy["search_routing"] is None and legacy["semantic_candidates"] == []
     json.dumps(res.routing_summary)          # 컷 요약도 JSON 직렬화 가능
+
+
+def test_analyze_maps_mixed_routes_and_off_defaults():
+    import io
+    from PIL import Image
+    from fastapi import UploadFile
+    import api.app as api_app
+
+    previous_state = dict(api_app.STATE)
+    previous_routing, previous_provider = CFG.search_routing_enabled, CFG.vlm_provider
+    api_app.STATE.clear()
+    api_app.STATE.update({"pipeline": _pipe(), "provider": "mock", "pose_backend": "mock"})
+    CFG.vlm_provider = "mock"
+    try:
+        for enabled in (False, True):
+            CFG.search_routing_enabled = enabled
+            data = io.BytesIO()
+            Image.new("RGB", (512, 512), "white").save(data, format="PNG")
+            data.seek(0)
+            response = api_app.analyze(
+                UploadFile(filename="cut.png", file=data),
+                hint="full_half standing front 2p rough").model_dump()
+            left, right = response["people"]
+            assert left["candidates"]
+            assert right["candidates"] == []
+            if enabled:
+                assert left["search_routing"]["route"] == "geometric"
+                assert right["search_routing"]["route"] == "semantic"
+                assert right["semantic_candidates"][0]["pose"]["pose_id"] == "pose_0"
+                assert right["refine_allowed"] is False
+                assert response["search_routing"]["describe"]["requested_people"] == 1
+            else:
+                assert response["search_routing"] is None
+                assert all(p["search_routing"] is None and p["semantic_candidates"] == []
+                           for p in response["people"])
+    finally:
+        CFG.search_routing_enabled, CFG.vlm_provider = previous_routing, previous_provider
+        api_app.STATE.clear()
+        api_app.STATE.update(previous_state)
+
+
+def test_gemini_describe_uses_timeout_and_never_retries():
+    import json
+    from types import SimpleNamespace
+    from PIL import Image
+    from src.vlm.client import GeminiVLMClient
+
+    calls = []
+
+    def generate(**kwargs):
+        calls.append(kwargs)
+        return SimpleNamespace(text=json.dumps({"people": [{
+            "visible": True, "actions": ["kick"], "body_details": "한 다리를 앞으로 뻗음",
+            "search_text": "한 다리를 앞으로 뻗어 발차기 하는 자세", "certainty": "medium"
+        }]}))
+
+    image = Image.new("RGB", (32, 32), "white")
+    client = GeminiVLMClient(client=SimpleNamespace(models=SimpleNamespace(generate_content=generate)))
+    result = client.describe_people(image, [(0, 0, 1, 1)])
+    assert result.status == "ok" and result.descriptions[0].actions == ["kick"]
+    assert len(calls) == 1
+    assert calls[0]["config"].http_options.timeout == CFG.routing_describe_timeout_ms
+
+    class _QuotaError(Exception):
+        code = 429
+        details = {"error": {"details": [{
+            "@type": "type.googleapis.com/google.rpc.QuotaFailure",
+            "violations": [{"quotaId": "GenerateRequestsPerDayPerProject"}]
+        }]}}
+
+    def fail(**kwargs):
+        calls.append(kwargs)
+        raise _QuotaError("daily quota exhausted")
+
+    client._client.models.generate_content = fail
+    result = client.describe_people(image, [(0, 0, 1, 1)])
+    assert len(calls) == 2
+    assert result.status == "error" and result.error_reason == "daily_quota_exhausted"
+    assert result.retryable is False
 
 
 # ---------------------------------------------------------------- 임시 태그 검색기

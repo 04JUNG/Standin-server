@@ -1,6 +1,7 @@
 # 러프함 기반 인물별 검색 경로 분기 (04J-286)
 
-상태: 구현·오프라인 검증 완료, 실 Gemini 재현은 맥에서 실행 필요 · 기본값 **꺼짐**(`SEARCH_ROUTING=0`)
+상태: 최신 develop(PR #84·#86 포함)에 구현 반영·오프라인 검증 완료.
+실 Gemini 재현은 러프 이미지 외부 전송 승인 대기 · 기본값 **꺼짐**(`SEARCH_ROUTING=0`)
 
 ## 1. 무엇을 하나
 
@@ -131,3 +132,19 @@ python scripts/eval_search_routing.py --vlm live \
 
 출력 `side_by_side.csv`·`index.html`이 04J-291 제품팀 공동 실험(Top-5 활용 가능 여부, 성공→실패 회귀,
 처리 시간, 실패 원인)의 입력이다.
+
+`--test-ids T008,T009,T044`로 사례를 선택할 수 있다. 실호출 모드에서 VLM이나 RTMPose가
+mock으로 폴백하면 평가를 중단한다. 완료한 사례는 매번 `results.json`에 저장한다.
+geometric의 Top-5(포즈 ID·view·거리)가 바뀌거나 사례 처리 오류가 있으면 종료 코드 1을 낸다.
+실호출 보고서는 설명 호출 지연 p50/p95를 집계한다. replay에서는 fixture 지연을 Gemini 지연으로 보고하지 않는다.
+
+### 2026-10-13 로컬 재검증
+
+- 기준: develop `c838051`, Python 3.12, 실제 current-X·실제 라이브러리.
+- 50장·53명: geometric 39명, semantic 8명, undetermined 6명, 사례 오류 0장.
+- geometric 39명 모두 기존 Top-5의 포즈 ID·view·거리 동일.
+- semantic 8명 모두 라이브러리 후보 반환. 설명은 인수인계의 Claude fixture를 사용했으므로
+  Gemini 품질을 입증하는 결과가 아니다.
+- API의 혼합 인물 응답·OFF 기본값, 복수 인물 설명 1회, 시맨틱 검색 예외 격리,
+  Gemini 설명 호출 timeout·일일 쿼터 분류·재시도 금지를 추가 검증했다.
+- 운영 활성화·클라이언트 표시 연결은 진행하지 않았다.

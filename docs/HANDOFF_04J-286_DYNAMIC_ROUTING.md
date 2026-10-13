@@ -2,6 +2,13 @@
 
 작성 2026-10-13 · Linear 04J-286 (기한 10/14 중간 점검) · 다음 작업자: Codex
 
+> 아래 본문은 최초 인수인계 시점의 기록이다. Codex는 같은 날 최신 develop `c838051`
+> (PR #84·#86 포함)에 패치를 반영하고 API·오류 분리 테스트와 실제 current-X 50장 재생 검증을
+> 완료했다. geometric 39명 모두 Top-5 동일, semantic 8명 모두 후보 반환.
+> 자세 설명은 Claude fixture이므로 Gemini 품질·지연은 여전히 미측정이다.
+> 실 Gemini 검증은 자동 승인 검토가 러프 이미지 외부 전송을 차단해 사용자 승인 대기 중이다.
+> 최신 구현 설명은 `docs/SEARCH_ROUTING.md`를 따른다.
+
 이 문서 하나만 읽고 이어서 작업할 수 있게 썼다. 설계 상세는 `docs/SEARCH_ROUTING.md`, 응답 계약은
 `docs/API_CONTRACT.md` 마지막 절, 저장소 불변식은 `CLAUDE.md`에 있다. **작업 전에 CLAUDE.md의 핵심 설계
 불변식 7개를 먼저 읽을 것.**

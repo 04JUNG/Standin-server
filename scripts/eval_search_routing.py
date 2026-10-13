@@ -35,13 +35,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from src.config import CFG  # noqa: E402
 from src.pipeline import Pipeline  # noqa: E402
-from src.pose import build_pose_model  # noqa: E402
+from src.pose import MockPoseModel, build_pose_model  # noqa: E402
 from src.repo import load_entries  # noqa: E402
 from src.schema import (Action, BBox, Relationship, Shot, View,  # noqa: E402
                         VLMAnalysis)
 from src.search_routing import DescribeOutcome, PoseDescription  # noqa: E402
 from src.semantic_search import build_semantic_searcher  # noqa: E402
-from src.vlm.client import BaseVLMClient, build_vlm_client  # noqa: E402
+from src.vlm.client import BaseVLMClient, MockVLMClient, build_vlm_client  # noqa: E402
 
 
 # ---------------------------------------------------------------- VLM 래퍼
@@ -202,16 +202,25 @@ def run(args) -> int:
     from PIL import Image
 
     rows = list(csv.DictReader(args.manifest.open(encoding="utf-8-sig")))
+    if args.test_ids:
+        wanted = set(args.test_ids.split(","))
+        rows = [row for row in rows if (row.get("test_id") or row.get("id")) in wanted]
+    if not rows:
+        raise ValueError("No matching evaluation cases")
     if args.limit:
         rows = rows[:args.limit]
     entries = load_entries(str(args.db))
     fixtures = json.loads(args.describe_fixtures.read_text(encoding="utf-8")) \
         if args.describe_fixtures else None
     inner = (ReplayVLM(args.jobs, fixtures) if args.vlm == "replay" else build_vlm_client())
+    if args.vlm == "live" and isinstance(inner, MockVLMClient):
+        raise RuntimeError("Live evaluation requires a real VLM; mock fallback rejected")
     vlm = CachedVLM(inner)
     searcher = build_semantic_searcher(
         str(args.tags), library_pose_ids={entry.pose_id for entry in entries})
     pose = build_pose_model()
+    if CFG.pose_backend == "rtmlib" and isinstance(pose, MockPoseModel):
+        raise RuntimeError("RTMPose evaluation cannot use a mock fallback")
     pipeline = Pipeline(entries, vlm_client=vlm, pose_model=pose,
                         semantic_searcher=searcher)
     args.out.mkdir(parents=True, exist_ok=True)
@@ -239,6 +248,8 @@ def run(args) -> int:
             record["error"] = f"{type(error).__name__}: {error}"
             results.append(record)
             table.append({"test_id": test_id, "person": "", "error": record["error"]})
+            _write_results(args, pipeline, searcher, results)
+            print(f"{test_id}: {record['error']}", flush=True)
             continue
         finally:
             CFG.search_routing_enabled = False
@@ -281,8 +292,10 @@ def run(args) -> int:
                 "search_status": (routing or {}).get("search", {}).get("status"),
                 "baseline_top5": " ".join(c["pose_id"] for c in person["baseline_top5"]),
                 "routed_top5": " ".join(c["pose_id"] for c in person["routed_top5"]),
-                "same_top5": [c["pose_id"] for c in person["baseline_top5"]]
-                == [c["pose_id"] for c in person["routed_top5"]],
+                "same_top5": (person["baseline_top5"] == person["routed_top5"]
+                              if (routing or {}).get("route") == "geometric" else
+                              [c["pose_id"] for c in person["baseline_top5"]]
+                              == [c["pose_id"] for c in person["routed_top5"]]),
                 "baseline_ms": round(baseline_ms, 1), "routed_ms": round(routed_ms, 1),
                 "describe_ms": (routed.routing_summary or {}).get("describe", {})
                 .get("elapsed_ms"),
@@ -293,16 +306,12 @@ def run(args) -> int:
                           "route": "(no person from VLM)", "baseline_ms": round(baseline_ms, 1),
                           "routed_ms": round(routed_ms, 1)})
         results.append(record)
+        _write_results(args, pipeline, searcher, results)
         print(f"{test_id}: people={len(routed.descriptors)} routes="
               f"{[p['routing']['route'] if p['routing'] else None for p in record['people']]}",
               flush=True)
 
-    (args.out / "results.json").write_text(
-        json.dumps({"vlm_mode": args.vlm, "pose_variant": CFG.pose_model_variant,
-                    "routing_config": asdict(pipeline.routing_config),
-                    "semantic_backend": getattr(searcher, "backend", None),
-                    "cases": results}, ensure_ascii=False, indent=1, default=str),
-        encoding="utf-8")
+    _write_results(args, pipeline, searcher, results)
     fields = sorted({key for row in table for key in row},
                     key=lambda k: list(table[0].keys()).index(k) if k in table[0] else 99)
     with (args.out / "side_by_side.csv").open("w", encoding="utf-8-sig", newline="") as handle:
@@ -312,7 +321,18 @@ def run(args) -> int:
     _write_report(args, results, table)
     if args.thumbs:
         _write_html(args, results)
-    return 0
+    return int(any(r.get("error") for r in results) or any(
+        row.get("route") == "geometric" and not row.get("same_top5") for row in table))
+
+
+def _write_results(args, pipeline, searcher, results):
+    """Persist every case so interrupted live calls leave reviewable evidence."""
+    (args.out / "results.json").write_text(
+        json.dumps({"vlm_mode": args.vlm, "pose_variant": CFG.pose_model_variant,
+                    "routing_config": asdict(pipeline.routing_config),
+                    "semantic_backend": getattr(searcher, "backend", None),
+                    "cases": results}, ensure_ascii=False, indent=1, default=str),
+        encoding="utf-8")
 
 
 def _write_report(args, results, table):
@@ -323,6 +343,13 @@ def _write_report(args, results, table):
     by_outcome = Counter((row.get("outcome"), row["route"]) for row in people)
     status = Counter((row["route"], row.get("search_status")) for row in people)
     changed = sum(1 for row in people if not row.get("same_top5"))
+    geometric = [row for row in people if row.get("route") == "geometric"]
+    regressions = sum(not row.get("same_top5") for row in geometric)
+    descriptions = [(r.get("routing_summary") or {}).get("describe") or {} for r in results]
+    requested = [d for d in descriptions if d.get("requested_people", 0)]
+    semantic_people = [row for row in people if (row.get("semantic_status") or "")
+                       not in ("", "not_requested")]
+    valid = sum(row.get("semantic_status") == "valid" for row in semantic_people)
     lines = [
         "# 04J-286 라우팅 재현 결과",
         "",
@@ -331,12 +358,25 @@ def _write_report(args, results, table):
         f"{sum(1 for r in results if r.get('vlm_count') == 0)}장",
         f"- 경로 분포: " + ", ".join(f"{k}={v}" for k, v in sorted(routes.items())),
         f"- 기존 대비 Top-5가 달라진 인물: {changed}명",
+        f"- geometric Top-5 회귀: {regressions}/{len(geometric)}명",
+        f"- 설명을 요청한 인물의 valid 비율: {valid}/{len(semantic_people)}명",
+        f"- 설명 호출: {len(requested)}회, 상태 " + str(Counter(d["status"] for d in requested)),
+        f"- 사례 처리 오류: {sum(bool(r.get('error')) for r in results)}장",
         "",
         "| 결과 유형 | 경로 | 인원 |", "|---|---|---:|",
     ]
     lines += [f"| {o} | {r} | {n} |" for (o, r), n in sorted(by_outcome.items())]
     lines += ["", "| 경로 | 검색 상태 | 인원 |", "|---|---|---:|"]
     lines += [f"| {r} | {s} | {n} |" for (r, s), n in sorted(status.items(), key=str)]
+    if args.vlm == "replay":
+        lines += ["", "주의: VLM 분석은 운영 기록 재생이며, 자세 설명은 fixture 또는 오류 대역이다.",
+                  "이 결과는 분기·검색 연결 검증용이다. Gemini 설명 품질과 실제 호출 지연은 미측정이다."]
+    elif requested:
+        import numpy as np
+        times = [d["elapsed_ms"] for d in requested]
+        p50, p95 = np.percentile(times, [50, 95])
+        lines += ["", f"설명 호출 지연: p50={p50:.1f}ms, p95={p95:.1f}ms "
+                  f"(호출 {len(times)}회, 실패 포함)."]
     (args.out / "REPORT.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print("\n".join(lines))
 
@@ -433,6 +473,7 @@ def main(argv=None) -> int:
     parser.add_argument("--jobs", type=Path, help="replay용 jobs.json")
     parser.add_argument("--describe-fixtures", type=Path)
     parser.add_argument("--limit", type=int, default=0)
+    parser.add_argument("--test-ids", default="", help="Comma-separated case IDs")
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args(argv)
     if args.vlm == "replay" and not args.jobs:
