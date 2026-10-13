@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ko">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Standin · 100문장 포즈 검수</title><link rel="stylesheet" href="/lab-static/review.css"></head>
+<body>
+<header><a class="brand" href="/review">STANDIN <span>POSE REVIEW</span></a><nav><a href="/">직접 검색</a><button id="export" disabled>검수 결과 받기</button></nav></header>
+<main>
+  <section class="progress-area" aria-label="검수 진행 상황"><div><strong id="progressText">검수 준비 중</strong><span id="deferredCount"></span><span class="local">로컬에 저장 · 외부 전송 없음</span></div><progress id="progress" max="100" value="0"></progress></section>
+  <section class="toolbar"><div class="filters"><label>보기<select id="filter"><option value="all">전체 문장</option><option value="pending">아직 검수 안 한 문장</option><option value="done">검수 완료 문장</option><option value="weak">AI가 부족하다고 본 문장</option></select></label><label>분류<select id="category"><option value="all">모든 분류</option></select></label></div><button id="nextPending">미검수로 이동</button></section>
+  <section class="question"><div class="eyebrow"><span id="queryId"></span><span id="queryCategory"></span><span id="queryPosition"></span></div><h1 id="question">문장을 불러오는 중…</h1><div class="question-nav"><button id="prev" aria-label="이전 문장">← 이전</button><label class="jump-label">문장 이동<select id="jump"></select></label><button id="next" aria-label="다음 문장">다음 →</button></div></section>
+  <div id="message" role="status" aria-live="polite"></div>
+  <div class="workspace" id="workspace" hidden>
+    <section class="pose-area" aria-label="검색된 포즈 확인">
+      <div class="pose-toolbar"><div class="segmented"><button id="singleMode" class="active" aria-pressed="true">개선 후 크게 보기</button><button id="compareMode" aria-pressed="false">개선 전·후 비교</button></div><label class="view-label">시점<select id="view"><option value="pair">정면 + 측면</option><option value="front">정면</option><option value="side">측면</option><option value="three_quarter">¾ 시점</option><option value="back">후면</option></select></label></div>
+      <div id="stage"></div>
+      <div class="candidate-header"><h2>개선 후 후보</h2><span>눌러서 포즈를 바꿔보세요</span></div><div id="candidates" class="candidates"></div>
+      <details class="ai-details"><summary>AI의 기존 판정·이유 보기</summary><p id="aiJudgment"></p><p id="aiNote"></p><p class="muted">AI 판정은 참고용입니다. 위에서 선택한 후보를 기준으로 직접 평가해주세요.</p></details>
+    </section>
+    <aside class="decision" aria-label="검수 평가">
+      <span class="eyebrow">YOUR REVIEW</span><h2>이 문장에 맞는 포즈인가요?</h2><p id="selectedLabel" class="selected-label"></p>
+      <details id="noteBlock" class="note-block"><summary>수정 의견·메모 <span class="optional">선택</span></summary><label for="note">수정 의견</label><textarea id="note" maxlength="2000" placeholder="예: 팔이 더 높아야 함 / 공격이 아니라 방어 / 2번 후보가 더 맞음"></textarea><p class="note-help">메모는 자동 저장됩니다. 평가 버튼을 누르면 메모와 선택한 후보가 함께 저장돼요.</p></details>
+      <div class="verdicts"><button data-verdict="match" class="match"><span>1</span>맞음 <small>찾던 자세예요</small></button><button data-verdict="partial" class="partial"><span>2</span>부분 일치 <small>비슷하지만 수정이 필요해요</small></button><button data-verdict="wrong" class="wrong"><span>3</span>다름 <small>찾던 자세가 아니에요</small></button><button data-verdict="deferred" class="deferred">판단 보류</button><button id="editNote" class="edit-note">메모 추가</button></div>
+      <label class="auto-next"><input id="autoNext" type="checkbox" checked>평가 후 다음 문장으로 이동</label>
+      <div id="saveState" role="status" aria-live="polite">아직 평가하지 않았어요</div>
+      <p class="shortcuts">← → 문장 이동 · 1 / 2 / 3 평가<br>메모 입력 중에는 단축키가 작동하지 않습니다.</p>
+    </aside>
+  </div>
+  <section id="empty" hidden><h2>이 조건에 해당하는 문장이 없어요</h2><button id="resetFilters">전체 문장 보기</button></section>
+</main>
+<dialog id="zoom"><button id="closeZoom" aria-label="포즈 확대 닫기">닫기 ✕</button><img id="zoomImage" alt="확대한 포즈"><p id="zoomLabel"></p></dialog>
+<script src="/lab-static/review.js"></script>
+</body></html>

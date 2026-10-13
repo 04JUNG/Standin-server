@@ -1,7 +1,13 @@
 {
   "schema_version": 1,
-  "policy_id": "refine-pose-quarantine-2026-08-18-v1",
+  "policy_id": "refine-pose-quarantine-2026-10-13-v3",
   "entries": [
+    {
+      "pose_id": "MH__anrico_sitting07",
+      "reason": "visible_hand_body_mesh_penetration",
+      "fixture": "user-screenshot-20261013-213025; Q006_rank5",
+      "disposition": "exclude_and_promote_next_top_k"
+    },
     {
       "pose_id": "rokoko_Flirty_mixamo_00321_mirror",
       "reason": "bad_hand_asset_and_visible_mesh_penetration",
@@ -12,6 +18,30 @@
       "pose_id": "Dig And Plant Seeds_00165_mirror",
       "reason": "visible_mesh_penetration_and_structural_search_mismatch",
       "fixture": "171734:p0",
+      "disposition": "exclude_and_promote_next_top_k"
+    },
+    {
+      "pose_id": "Jumping Down_00011",
+      "reason": "visible_hand_leg_mesh_penetration",
+      "fixture": "user-screenshot-20261013-193414; original_front_side_review",
+      "disposition": "exclude_and_promote_next_top_k"
+    },
+    {
+      "pose_id": "Jumping Down_00011_mirror",
+      "reason": "visible_hand_leg_mesh_penetration",
+      "fixture": "user-screenshot-20261013-193414; mirror_front_side_review",
+      "disposition": "exclude_and_promote_next_top_k"
+    },
+    {
+      "pose_id": "combat_authored_deep_landing",
+      "reason": "visible_hand_thigh_mesh_penetration",
+      "fixture": "user-screenshot-20261013-193414; original_front_side_review",
+      "disposition": "exclude_and_promote_next_top_k"
+    },
+    {
+      "pose_id": "combat_authored_deep_landing_mirror",
+      "reason": "visible_hand_thigh_mesh_penetration",
+      "fixture": "user-screenshot-20261013-193414; mirror_front_side_review",
       "disposition": "exclude_and_promote_next_top_k"
     }
   ]

@@ -327,3 +327,62 @@ class ExportOrder(BaseModel):
     created_at: str
     items: List[ExportItem]
     notes: List[str] = []
+
+# Direct semantic text search (04J-285); no /analyze or routing schema changes.
+class SemanticSearchRequest(BaseModel):
+    query: str = Field("", description="한국어 자연어 문장. 사용자 입력 또는 VLM이 러프에서 만든 설명")
+    source: Literal["user", "vlm"] = Field("user", description="쿼리 출처. 임계값 선택에 쓴다")
+    top_k: Optional[int] = Field(None, ge=1, le=20, description="반환 후보 수. 비우면 SEMANTIC_TOP_K")
+    tags: List[str] = Field(default_factory=list, max_length=30,
+                            description="선택. 태그 사전 값 'field:value'(예: VLM이 고른 'action:throw'). "
+                                        "있으면 query는 비어도 된다")
+
+
+class SemanticErrorOut(BaseModel):
+    code: str = Field(..., description="index_not_loaded | index_load_failed | index_version_mismatch | "
+                                       "index_inconsistent | encoder_failed | pose_json_missing | "
+                                       "pose_id_mismatch | invalid_query | invalid_source | invalid_tags | internal_error")
+    message: str
+    detail: dict = Field(default_factory=dict)
+
+
+class SemanticPoseOut(BaseModel):
+    """포즈 JSON(standin-pose-record-v1). ``pose_id``는 후보의 ``pose_id``와 항상 같다."""
+    schema_: str = Field("standin-pose-record-v1", alias="schema")
+    pose_id: str
+    source: Optional[str] = None
+    license: Optional[str] = None
+    set_id: Optional[str] = None
+    set_role: Optional[str] = None
+    meta: dict = Field(default_factory=dict)
+    tags: dict = Field(..., description="pose_action·scene·objects·meaning → [{field,value,label}]")
+    description: str
+    bvh_url: str
+    thumbnail_urls: dict = Field(default_factory=dict, description="view → 썸네일 경로(파일이 있을 때만)")
+    library: dict = Field(default_factory=dict)
+
+    model_config = {"populate_by_name": True}
+
+
+class SemanticCandidateOut(BaseModel):
+    rank: int
+    pose_id: str
+    score: float = Field(..., description="0~1. 임계값 이상만 candidates에 들어온다")
+    score_components: dict = Field(..., description="concept·body·text·coverage 성분")
+    evidence: dict = Field(..., description="matched_tags·missing_concepts·uncovered_words·body·text_cosine·description")
+    mirror_alternates: List[dict] = Field(default_factory=list, description="묶인 원본/미러 포즈")
+    refine_allowed: bool = Field(False, description="2D 관절 근거가 없어 항상 false")
+    pose: SemanticPoseOut
+
+
+class SemanticSearchResponse(BaseModel):
+    status: Literal["ok", "no_result", "error"]
+    error: Optional[SemanticErrorOut] = None
+    query: Optional[dict] = None
+    candidates: List[SemanticCandidateOut] = Field(default_factory=list)
+    near_misses: List[dict] = Field(default_factory=list,
+                                    description="no_result일 때 임계값 아래 최상위 몇 개(pose_id·score만)")
+    threshold: Optional[float] = None
+    top_k: Optional[int] = None
+    index: Optional[dict] = None
+    elapsed_ms: float = 0.0

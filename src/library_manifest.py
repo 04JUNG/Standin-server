@@ -12,6 +12,11 @@ S3 key는 고정(`pose-library/v1.tar.gz`)이고 `POSE_LIBRARY_VERSION`은 인�
 
 내용 해시의 대상은 서버가 실제로 쓰는 파일뿐이다: `poses.db`, `bvh/**`, `thumbs/**`,
 `ATTRIBUTION.md`. manifest 자신과 `index.pkl`(서버가 읽지 않는 레거시)은 넣지 않는다.
+
+`semantic/`(04J-285 자연어 검색 태그)은 **내용 해시에서 뺀다.** 태그만 고쳐도
+`library_version`이 바뀌면 기하 검색 재생 게이트를 다시 돌려야 하는데, 태그는 기하 검색에
+영향이 없다. 대신 manifest의 `semantic` 절에 파일 해시와 기준 `db_sha256`을 따로 남기고
+배포 검증기가 같은 방식으로 다시 잰다.
 """
 from __future__ import annotations
 
@@ -39,6 +44,11 @@ LEGACY_VERSION = "v1"
 # replay_gate.status 중 배포를 막지 않는 값. not_required는 부모와 내용이 같은 번들
 # (예: manifest만 새로 붙인 기준 번들)에만 쓴다.
 GATE_OK = frozenset({"passed", "not_required"})
+
+SEMANTIC_DIR = "semantic"
+SEMANTIC_TAGS = "search-v2.json"
+SEMANTIC_TAXONOMY = "search-taxonomy-v2.json"
+SEMANTIC_FILES = (SEMANTIC_TAGS, SEMANTIC_TAXONOMY)
 
 
 class LibraryManifestError(RuntimeError):
@@ -168,7 +178,7 @@ def read_manifest(bundle_dir: Path) -> dict | None:
 
 
 def verify_manifest(bundle_dir: Path, manifest: dict | None = None, *,
-                    check_content: bool = True) -> dict:
+                    check_content: bool = True, check_semantic: bool = True) -> dict:
     """manifest 형식과 번들 내용의 일치를 확인한다. 문제가 있으면 전부 모아 한 번에 알린다."""
     root = Path(bundle_dir)
     payload = manifest if manifest is not None else read_manifest(root)
@@ -193,6 +203,8 @@ def verify_manifest(bundle_dir: Path, manifest: dict | None = None, *,
         problems.append(f"{db} 가 없습니다")
     elif payload.get("db_sha256") != sha256_file(db):
         problems.append("db_sha256이 poses.db와 다릅니다(manifest를 만든 뒤 DB가 바뀌었습니다)")
+    if check_semantic:
+        problems.extend(verify_semantic_section(root, payload))
     if check_content and not problems:
         actual = content_sha256(root)
         if actual != content:
@@ -200,6 +212,41 @@ def verify_manifest(bundle_dir: Path, manifest: dict | None = None, *,
     if problems:
         raise LibraryManifestError("library manifest 검증 실패:\n  - " + "\n  - ".join(problems))
     return payload
+
+
+def semantic_files_sha256(bundle_dir: Path) -> dict[str, str] | None:
+    """`semantic/` 파일 해시. 폴더가 없으면 None, 일부만 있으면 오류."""
+    root = Path(bundle_dir) / SEMANTIC_DIR
+    if not root.exists():
+        return None
+    missing = [name for name in SEMANTIC_FILES if not (root / name).is_file()]
+    if missing:
+        raise LibraryManifestError(f"{root} 에 {', '.join(missing)} 가 없습니다")
+    return {name: sha256_file(root / name) for name in SEMANTIC_FILES}
+
+
+def verify_semantic_section(bundle_dir: Path, manifest: dict) -> list[str]:
+    """manifest.semantic과 실제 semantic/ 파일·poses.db가 맞는지. 문제 목록을 돌려준다."""
+    root = Path(bundle_dir)
+    section = manifest.get("semantic")
+    try:
+        actual = semantic_files_sha256(root)
+    except LibraryManifestError as exc:
+        return [str(exc)]
+    if actual is None:
+        return ["manifest에 semantic 절이 있는데 semantic/ 폴더가 없습니다"] if section else []
+    if not section:
+        return ["semantic/ 폴더가 있는데 manifest에 기록되지 않았습니다"
+                "(build_pose_bundle.py attach-semantic으로 붙이세요)"]
+    problems = []
+    if section.get("files") != actual:
+        problems.append("semantic/ 파일 해시가 manifest와 다릅니다")
+    db = root / BUNDLE_DB
+    if db.is_file() and section.get("source_db_sha256") != sha256_file(db):
+        problems.append("semantic 태그가 다른 poses.db 기준으로 만들어졌습니다")
+    if section.get("status") != "passed":
+        problems.append(f"semantic.status={section.get('status')!r} (passed여야 함)")
+    return problems
 
 
 @dataclass(frozen=True)
@@ -228,7 +275,9 @@ def resolve_library_identity(data_dir: Path, *, fallback_version: str,
         payload = read_manifest(root)
         if payload is None:
             return LibraryIdentity(fallback_version, "env")
-        verify_manifest(root, payload, check_content=check_content)
+        # 시맨틱 태그 불일치로 기하 검색 기동을 막지 않는다. 서버의 시맨틱 로더가 따로
+        # db_sha256을 확인하고, 틀리면 /semantic-search만 503이 된다.
+        verify_manifest(root, payload, check_content=check_content, check_semantic=False)
     except LibraryManifestError:
         if strict:
             raise

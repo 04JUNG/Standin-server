@@ -24,10 +24,27 @@ python scripts/build_pose_bundle.py curated \
 # 3) 재생 게이트 보고서(JSON, status=passed|failed)를 manifest에 기록한다.
 python scripts/build_pose_bundle.py record-gate --bundle data/bundles/next --report <report.json>
 
-# 4) 검증만 → 배포
+# 3-1) 자연어 검색 태그(04J-284 태깅 v2)를 붙인다. library_version·게이트는 그대로다.
+python scripts/build_pose_bundle.py attach-semantic --bundle data/bundles/next \
+  --tags <pose-library-viewer>/dist/data/search-v2.json \
+  --taxonomy <pose-library-viewer>/dist/data/search-taxonomy-v2.json
+
+# 4) 검증만 → 배포 (SEMANTIC_REQUIRED=1로 운영할 때는 --require-semantic)
 python scripts/deploy_pose_library.py data/bundles/next --dry-run
 python scripts/deploy_pose_library.py data/bundles/next
 ```
+
+### 자연어 검색 태그(`semantic/`)
+
+- 번들의 `semantic/search-v2.json`·`semantic/search-taxonomy-v2.json`. 서버는 기동 시
+  `DATA_DIR/semantic/`에서 읽는다(`docs/SEMANTIC_SEARCH.md`).
+- **내용 해시(`content_sha256`)·`library_version`에는 들어가지 않는다.** 태그만 바꿔도 기하 검색
+  재생 게이트를 다시 돌리지 않게 하려는 것이다. 대신 manifest `semantic` 절에 파일 해시,
+  기준 `source_db_sha256`, 검증 결과(`status=passed`)를 남기고 배포 검증기가 다시 잰다.
+- 태그는 특정 `poses.db`에 묶인다. `curated`로 DB가 바뀌면 태그를 다시 만들고 `attach-semantic`을
+  다시 해야 한다(다른 DB 기준 태그는 거부). `baseline`은 바이트가 같으므로 기록을 이어받는다.
+- 서버 기동은 시맨틱 불일치로 실패하지 않는다. 틀리면 `/semantic-search`만 503이고 `/healthz`의
+  `semantic.error_code`에 원인이 남는다.
 
 `curated`가 하는 일:
 

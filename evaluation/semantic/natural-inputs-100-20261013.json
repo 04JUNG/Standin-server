@@ -1,0 +1,609 @@
+{
+  "version": "natural-inputs-100-20261013",
+  "purpose": "실제 사용자의 자연어 포즈 검색 입력집. 아직 실행하지 않은 신규 입력도 포함한다.",
+  "evaluation_status": "input_collection_only",
+  "note": "category는 입력집을 정리하는 용도이며 검색에 넘기는 정답 태그가 아니다. 성공/실패 기대값이나 정답 포즈는 아직 정의하지 않았다. 2인·목적·동작 순서·부정 표현은 도전 사례다. 실제 검색 요청에는 text만 전달한다.",
+  "count": 100,
+  "queries": [
+    {
+      "id": "Q001",
+      "category": "짧고 모호한 입력",
+      "text": "싸우는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q002",
+      "category": "짧고 모호한 입력",
+      "text": "착지하는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q003",
+      "category": "짧고 모호한 입력",
+      "text": "야구공을 던지는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q004",
+      "category": "짧고 모호한 입력",
+      "text": "도망치는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q005",
+      "category": "짧고 모호한 입력",
+      "text": "넘어지는 순간",
+      "source": "user"
+    },
+    {
+      "id": "Q006",
+      "category": "짧고 모호한 입력",
+      "text": "앉아서 쉬는 모습",
+      "source": "user"
+    },
+    {
+      "id": "Q007",
+      "category": "짧고 모호한 입력",
+      "text": "놀라는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q008",
+      "category": "짧고 모호한 입력",
+      "text": "누군가를 기다리는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q009",
+      "category": "짧고 모호한 입력",
+      "text": "춤추는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q010",
+      "category": "짧고 모호한 입력",
+      "text": "몸 푸는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q011",
+      "category": "맨손 전투",
+      "text": "상대 얼굴을 향해 주먹을 날리는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q012",
+      "category": "맨손 전투",
+      "text": "한 대 때리려고 주먹을 뒤로 당긴 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q013",
+      "category": "맨손 전투",
+      "text": "주먹을 연달아 날리는 복서",
+      "source": "user"
+    },
+    {
+      "id": "Q014",
+      "category": "맨손 전투",
+      "text": "상대 배를 무릎으로 올려치는 장면",
+      "source": "user"
+    },
+    {
+      "id": "Q015",
+      "category": "맨손 전투",
+      "text": "몸을 돌리면서 옆으로 발차기하는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q016",
+      "category": "맨손 전투",
+      "text": "한쪽 다리로 버티고 높게 발을 차는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q017",
+      "category": "맨손 전투",
+      "text": "싸우기 전에 두 주먹을 올리고 상대를 노려보는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q018",
+      "category": "맨손 전투",
+      "text": "달려들어서 상대를 밀쳐내는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q019",
+      "category": "맨손 전투",
+      "text": "상대 멱살을 잡으려고 손을 뻗는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q020",
+      "category": "맨손 전투",
+      "text": "넘어진 상대를 향해 주먹을 내려치는 장면",
+      "source": "user"
+    },
+    {
+      "id": "Q021",
+      "category": "무기를 쓰는 장면",
+      "text": "칼을 두 손으로 들고 적을 내려치는 장면",
+      "source": "user"
+    },
+    {
+      "id": "Q022",
+      "category": "무기를 쓰는 장면",
+      "text": "한 손으로 검을 옆으로 휘두르는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q023",
+      "category": "무기를 쓰는 장면",
+      "text": "칼끝을 상대에게 겨누고 거리를 재는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q024",
+      "category": "무기를 쓰는 장면",
+      "text": "검을 뒤로 빼고 찌를 준비를 하는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q025",
+      "category": "무기를 쓰는 장면",
+      "text": "방패를 앞에 세워 공격을 막는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q026",
+      "category": "무기를 쓰는 장면",
+      "text": "창을 길게 뻗어 적을 찌르는 장면",
+      "source": "user"
+    },
+    {
+      "id": "Q027",
+      "category": "무기를 쓰는 장면",
+      "text": "활시위를 당겨 목표를 조준하는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q028",
+      "category": "무기를 쓰는 장면",
+      "text": "권총을 두 손으로 잡고 앞을 겨누는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q029",
+      "category": "무기를 쓰는 장면",
+      "text": "무릎을 꿇고 소총으로 멀리 있는 적을 조준하는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q030",
+      "category": "무기를 쓰는 장면",
+      "text": "커다란 망치를 머리 위로 들어 내려치려는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q031",
+      "category": "방어·피격·회피",
+      "text": "상대가 주먹을 날리니까 얼굴을 가리고 버티는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q032",
+      "category": "방어·피격·회피",
+      "text": "날아오는 발차기를 피하려고 상체를 뒤로 젖히는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q033",
+      "category": "방어·피격·회피",
+      "text": "머리를 숙여 상대 주먹을 피하는 장면",
+      "source": "user"
+    },
+    {
+      "id": "Q034",
+      "category": "방어·피격·회피",
+      "text": "칼이 날아오자 몸을 옆으로 빼는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q035",
+      "category": "방어·피격·회피",
+      "text": "배를 맞고 몸을 접으며 아파하는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q036",
+      "category": "방어·피격·회피",
+      "text": "얼굴을 맞아 고개가 옆으로 돌아가는 순간",
+      "source": "user"
+    },
+    {
+      "id": "Q037",
+      "category": "방어·피격·회피",
+      "text": "공격을 받고 뒤로 밀려나는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q038",
+      "category": "방어·피격·회피",
+      "text": "한쪽 무릎을 바닥에 대고 간신히 버티는 전사",
+      "source": "user"
+    },
+    {
+      "id": "Q039",
+      "category": "방어·피격·회피",
+      "text": "더는 싸우지 않겠다는 듯 두 손을 들고 물러나는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q040",
+      "category": "방어·피격·회피",
+      "text": "넘어진 채 팔로 얼굴을 보호하는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q041",
+      "category": "공을 사용하는 스포츠",
+      "text": "투수가 야구공을 던지기 직전에 다리를 드는 모습",
+      "source": "user"
+    },
+    {
+      "id": "Q042",
+      "category": "공을 사용하는 스포츠",
+      "text": "야구공을 힘껏 던지고 몸이 앞으로 따라가는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q043",
+      "category": "공을 사용하는 스포츠",
+      "text": "타자가 배트를 휘둘러 공을 치는 순간",
+      "source": "user"
+    },
+    {
+      "id": "Q044",
+      "category": "공을 사용하는 스포츠",
+      "text": "낮게 날아오는 야구공을 잡으려고 몸을 숙이는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q045",
+      "category": "공을 사용하는 스포츠",
+      "text": "농구공을 양손으로 가슴 앞에서 패스하는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q046",
+      "category": "공을 사용하는 스포츠",
+      "text": "달리면서 농구공을 바닥에 튀기는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q047",
+      "category": "공을 사용하는 스포츠",
+      "text": "점프해서 농구 골대에 슛을 던지는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q048",
+      "category": "공을 사용하는 스포츠",
+      "text": "축구공을 세게 차려고 발을 뒤로 빼는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q049",
+      "category": "공을 사용하는 스포츠",
+      "text": "골키퍼가 날아오는 공을 막으려고 준비하는 모습",
+      "source": "user"
+    },
+    {
+      "id": "Q050",
+      "category": "공을 사용하는 스포츠",
+      "text": "배구 네트 앞에서 뛰어올라 두 손으로 공을 막는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q051",
+      "category": "이동·착지·운동",
+      "text": "전력으로 달리다가 방향을 바꾸는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q052",
+      "category": "이동·착지·운동",
+      "text": "천천히 걷다가 뒤를 돌아보는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q053",
+      "category": "이동·착지·운동",
+      "text": "높은 데서 뛰어내려 바닥에 착지하는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q054",
+      "category": "이동·착지·운동",
+      "text": "뛰어내린 뒤 무릎을 굽혀 충격을 받아내는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q055",
+      "category": "이동·착지·운동",
+      "text": "발을 헛디뎌 앞으로 넘어지는 장면",
+      "source": "user"
+    },
+    {
+      "id": "Q056",
+      "category": "이동·착지·운동",
+      "text": "바닥에 엎드려 팔굽혀펴기를 하는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q057",
+      "category": "이동·착지·운동",
+      "text": "운동 전에 한 팔을 가슴 앞으로 당겨 몸을 푸는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q058",
+      "category": "이동·착지·운동",
+      "text": "한쪽 발로 서서 다른 발목을 잡고 허벅지를 늘리는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q059",
+      "category": "이동·착지·운동",
+      "text": "스케이트를 타며 한쪽 다리를 뒤로 뻗는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q060",
+      "category": "이동·착지·운동",
+      "text": "물속에서 팔을 번갈아 저으며 앞으로 헤엄치는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q061",
+      "category": "일상·생활",
+      "text": "의자에 앉아 등을 기대고 쉬는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q062",
+      "category": "일상·생활",
+      "text": "침대에 누워 한쪽 팔로 머리를 받친 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q063",
+      "category": "일상·생활",
+      "text": "책을 읽다가 고개를 들어 앞을 보는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q064",
+      "category": "일상·생활",
+      "text": "휴대폰을 귀에 대고 통화하는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q065",
+      "category": "일상·생활",
+      "text": "앉아서 컴퓨터 키보드를 두드리는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q066",
+      "category": "일상·생활",
+      "text": "컵을 입 가까이 가져가 마시려는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q067",
+      "category": "일상·생활",
+      "text": "무거운 상자를 두 팔로 안고 옮기는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q068",
+      "category": "일상·생활",
+      "text": "잘 안 열리는 문을 온몸으로 밀고 있는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q069",
+      "category": "일상·생활",
+      "text": "몸을 숙여 신발 끈을 묶는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q070",
+      "category": "일상·생활",
+      "text": "바닥에 떨어진 물건을 주우려고 손을 뻗는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q071",
+      "category": "감정·몸짓",
+      "text": "갑자기 뭔가 튀어나와서 놀라 뒤로 물러나는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q072",
+      "category": "감정·몸짓",
+      "text": "아 망했다 싶어서 두 손으로 머리를 감싸는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q073",
+      "category": "감정·몸짓",
+      "text": "화가 나서 상대를 손가락으로 가리키는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q074",
+      "category": "감정·몸짓",
+      "text": "부끄러워서 얼굴을 손으로 가리는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q075",
+      "category": "감정·몸짓",
+      "text": "기뻐서 양팔을 들고 뛰는 모습",
+      "source": "user"
+    },
+    {
+      "id": "Q076",
+      "category": "감정·몸짓",
+      "text": "기운이 없어 어깨를 축 늘어뜨린 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q077",
+      "category": "감정·몸짓",
+      "text": "잘못을 빌며 두 손을 모으는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q078",
+      "category": "감정·몸짓",
+      "text": "믿을 수 없다는 듯 몸을 뒤로 빼는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q079",
+      "category": "감정·몸짓",
+      "text": "이리 오라고 한 손으로 부르는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q080",
+      "category": "감정·몸짓",
+      "text": "자신만만하게 가슴을 펴고 허리에 손을 얹은 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q081",
+      "category": "사람 사이의 상호작용",
+      "text": "오랜만에 만난 사람을 꼭 끌어안는 장면",
+      "source": "user"
+    },
+    {
+      "id": "Q082",
+      "category": "사람 사이의 상호작용",
+      "text": "상대와 악수하려고 손을 내미는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q083",
+      "category": "사람 사이의 상호작용",
+      "text": "쓰러진 사람을 일으켜 세우려는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q084",
+      "category": "사람 사이의 상호작용",
+      "text": "다친 친구를 어깨로 부축하며 걷는 모습",
+      "source": "user"
+    },
+    {
+      "id": "Q085",
+      "category": "사람 사이의 상호작용",
+      "text": "아이를 품에 안고 달래는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q086",
+      "category": "사람 사이의 상호작용",
+      "text": "누군가에게 선물을 건네는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q087",
+      "category": "사람 사이의 상호작용",
+      "text": "앞에 있는 사람을 붙잡아 못 가게 막는 장면",
+      "source": "user"
+    },
+    {
+      "id": "Q088",
+      "category": "사람 사이의 상호작용",
+      "text": "상대 뒤에 숨어 조심스럽게 내다보는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q089",
+      "category": "사람 사이의 상호작용",
+      "text": "둘이 서로 주먹을 겨누고 대치하는 장면",
+      "source": "user"
+    },
+    {
+      "id": "Q090",
+      "category": "사람 사이의 상호작용",
+      "text": "넘어진 사람에게 손을 내밀어 도와주는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q091",
+      "category": "배경·순서·목적이 섞인 입력",
+      "text": "오래 앉아 있다가 일어나 몸을 쭉 펴는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q092",
+      "category": "배경·순서·목적이 섞인 입력",
+      "text": "넘어진 뒤 손으로 바닥을 짚고 일어나려는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q093",
+      "category": "배경·순서·목적이 섞인 입력",
+      "text": "상대가 칼을 휘두르자 방패를 들어 몸을 가리는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q094",
+      "category": "배경·순서·목적이 섞인 입력",
+      "text": "공이 머리 위로 날아오자 뛰어올라 잡으려는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q095",
+      "category": "배경·순서·목적이 섞인 입력",
+      "text": "뒤에서 누가 부르니까 걷다가 돌아보는 모습",
+      "source": "user"
+    },
+    {
+      "id": "Q096",
+      "category": "배경·순서·목적이 섞인 입력",
+      "text": "달려오다가 앞에 장애물이 보여 급하게 멈추는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q097",
+      "category": "배경·순서·목적이 섞인 입력",
+      "text": "물에 빠진 사람이 헤엄쳐서 빠져나오려는 모습",
+      "source": "user"
+    },
+    {
+      "id": "Q098",
+      "category": "배경·순서·목적이 섞인 입력",
+      "text": "무거운 짐을 내려놓고 허리를 펴며 한숨 쉬는 사람",
+      "source": "user"
+    },
+    {
+      "id": "Q099",
+      "category": "배경·순서·목적이 섞인 입력",
+      "text": "공을 던지는 게 아니라 잡으려고 두 손을 내미는 자세",
+      "source": "user"
+    },
+    {
+      "id": "Q100",
+      "category": "배경·순서·목적이 섞인 입력",
+      "text": "한 손은 바닥에 짚고 다른 손은 얼굴을 가리면서 버티는 사람",
+      "source": "user"
+    }
+  ]
+}

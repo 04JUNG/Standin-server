@@ -50,8 +50,12 @@ def test_quarantine_loader_and_geometry_search_promote_next_candidate():
 
 def test_release_policy_contains_both_failed_visual_fixtures():
     records = load_pose_quarantine(CFG)
+    assert records["MH__anrico_sitting07"]["reason"] == "visible_hand_body_mesh_penetration"
     assert records["rokoko_Flirty_mixamo_00321_mirror"]["fixture"] == "131056:p2"
     assert records["Dig And Plant Seeds_00165_mirror"]["fixture"] == "171734:p0"
+    for base in ("Jumping Down_00011", "combat_authored_deep_landing"):
+        for suffix in ("", "_mirror"):
+            assert records[base + suffix]["disposition"] == "exclude_and_promote_next_top_k"
 
 
 def test_refine_rejects_stale_quarantined_selection_before_db_lookup():

@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Standin 자연어 검색 실험실</title><link rel="stylesheet" href="/lab-static/style.css"></head>
+<body><header><div><span class="brand">STANDIN</span><h1>자연어 검색 실험실</h1></div><div><a href="/review" style="color:#c4eb64;margin-right:24px">100문장 하나씩 검수 →</a><span id="libraryInfo">라이브러리 준비 중</span></div></header>
+<main><aside>
+<form id="textForm"><label for="query">찾고 싶은 자세</label><textarea id="query" maxlength="500" placeholder="예: 공을 던지는 자세" required>공을 던지는 자세</textarea><button class="primary" type="submit">포즈 검색</button></form>
+<div class="examples"><span>바로 시험하기</span><button>싸우는 자세</button><button>패널티킥 막는 골키퍼</button><button>물에서 수영하는 자세</button><button>양손을 들어 항복하는 자세</button><button>팔을 가슴 앞으로 당겨 스트레칭하는 자세</button></div>
+<p class="hint">후보의 ‘맞음·다름’을 기록하면 검색어와 포즈 ID가 로컬 개선 목록에 저장됩니다.</p><button id="download" disabled>실험 결과 JSON 받기</button>
+</aside><section class="results"><div id="status" role="status">검색 문장을 입력하거나 예시를 골라 시작하세요.</div><div id="readings"></div><div id="cards"></div></section></main>
+<dialog id="detail"><button id="closeDetail" aria-label="닫기">닫기</button><h2 id="detailTitle"></h2><div id="detailImages"></div><pre id="detailEvidence"></pre></dialog>
+<script src="/lab-static/app.js"></script></body></html>

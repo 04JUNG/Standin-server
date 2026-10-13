@@ -1,0 +1,1204 @@
+{
+  "version": "semantic-dev-20261013.v3",
+  "note": "dev v2 + 확인에 이미 쓴 holdout v2·v3을 합친 조정용 세트. 반복 개선용 dev 세트. 여기서만 조정한다. relevant는 판정 규칙(태그는 04J-284 사람 검수 태그, desc는 한 줄 설명 정규식): tags_all의 각 묶음 중 하나 이상 + desc_all의 각 묶음 중 하나 이상을 모두 만족하면 관련 후보로 센다. 사람 판정을 대신하는 근사치다. vlm_tags는 VLM 구조화 출력을 사람이 문장만 보고 흉내 낸 값(실제 Gemini 출력 아님).",
+  "queries": [
+    {
+      "id": "D01",
+      "kind": "action",
+      "source": "user",
+      "text": "야구공을 던지는 투수",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:throw"
+          ],
+          [
+            "activity:baseball",
+            "object:ball"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D02",
+      "kind": "action",
+      "source": "user",
+      "text": "공 던지기 직전 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:throw",
+            "action:prepare"
+          ],
+          [
+            "object:ball",
+            "activity:baseball"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D03",
+      "kind": "action",
+      "source": "user",
+      "text": "농구공 드리블하는 선수",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "activity:basketball"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D04",
+      "kind": "action",
+      "source": "user",
+      "text": "축구공을 세게 차는 장면",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:kick",
+            "action:shoot_ball"
+          ],
+          [
+            "activity:soccer",
+            "object:ball"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D05",
+      "kind": "action",
+      "source": "user",
+      "text": "페널티킥 막는 골키퍼",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "activity:goalkeeping",
+            "activity:handball",
+            "activity:soccer"
+          ],
+          [
+            "action:block",
+            "action:defend",
+            "intent:defense"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D06",
+      "kind": "action",
+      "source": "user",
+      "text": "칼을 양손으로 들고 대치하는 검사",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "object:sword",
+            "activity:swordsmanship"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D07",
+      "kind": "action",
+      "source": "user",
+      "text": "검을 위에서 아래로 내려베는 공격",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "object:sword",
+            "activity:swordsmanship"
+          ],
+          [
+            "action:slash",
+            "action:strike"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D08",
+      "kind": "action",
+      "source": "user",
+      "text": "권총을 겨누는 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "object:pistol",
+            "object:rifle",
+            "activity:shooting"
+          ],
+          [
+            "action:aim",
+            "action:fire"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D09",
+      "kind": "action",
+      "source": "user",
+      "text": "복싱 가드를 올리고 경계하는 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:guard",
+            "activity:boxing",
+            "activity:unarmed_combat"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D10",
+      "kind": "action",
+      "source": "user",
+      "text": "주먹으로 상대를 때리는 펀치",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:punch"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D11",
+      "kind": "action",
+      "source": "user",
+      "text": "높이 점프하는 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:jump"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D12",
+      "kind": "action",
+      "source": "user",
+      "text": "전력으로 달리는 사람",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:run",
+            "action:dash"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D13",
+      "kind": "action",
+      "source": "user",
+      "text": "손을 흔들며 인사하는 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:wave",
+            "intent:greeting",
+            "action:bow"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D14",
+      "kind": "action",
+      "source": "user",
+      "text": "허리 숙여 인사하는 모습",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:bow",
+            "intent:greeting",
+            "intent:respect"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D15",
+      "kind": "action",
+      "source": "user",
+      "text": "휴대폰으로 통화하는 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "object:phone"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D16",
+      "kind": "action",
+      "source": "user",
+      "text": "의자에 앉아서 쉬는 사람",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "posture:sitting",
+            "action:sit"
+          ]
+        ],
+        "desc_all": [
+          [
+            "의자|앉"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D17",
+      "kind": "action",
+      "source": "user",
+      "text": "기타를 치는 연주자",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "object:guitar"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D18",
+      "kind": "action",
+      "source": "user",
+      "text": "마법을 쓰는 마법사",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:cast_spell",
+            "activity:magic"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D19",
+      "kind": "action",
+      "source": "user",
+      "text": "물속에서 헤엄치는 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:swim",
+            "activity:swimming"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D20",
+      "kind": "action",
+      "source": "user",
+      "text": "깜짝 놀라 뒤로 젖히는 반응",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "emotion:surprised"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D21",
+      "kind": "action",
+      "source": "user",
+      "text": "춤추는 댄서",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:dance",
+            "activity:dance",
+            "activity:ballet"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D22",
+      "kind": "action",
+      "source": "user",
+      "text": "벽을 타고 기어오르는 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:climb",
+            "activity:climbing"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D23",
+      "kind": "action",
+      "source": "user",
+      "text": "방패로 공격을 막는 기사",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "object:shield"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D24",
+      "kind": "action",
+      "source": "user",
+      "text": "무거운 상자를 들어 옮기는 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "object:box",
+            "action:carry",
+            "action:lift"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D25",
+      "kind": "body",
+      "source": "user",
+      "text": "쪼그려 앉아 바닥을 보는 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "posture:crouching",
+            "action:crouch"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D26",
+      "kind": "body",
+      "source": "user",
+      "text": "한쪽 무릎을 꿇고 앉은 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "posture:kneeling",
+            "action:kneel"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D27",
+      "kind": "body",
+      "source": "user",
+      "text": "바닥에 등을 대고 누운 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "posture:lying"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D28",
+      "kind": "body",
+      "source": "user",
+      "text": "한 다리를 높이 들고 균형을 잡는 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:raise_leg",
+            "action:balance",
+            "intent:maintain_balance"
+          ]
+        ],
+        "desc_all": [
+          [
+            "다리|무릎|발"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D29",
+      "kind": "body",
+      "source": "user",
+      "text": "양팔을 머리 위로 쭉 뻗은 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "desc_all": [
+          [
+            "(양팔|두 팔|두팔|양손|두 손|팔).{0,12}(머리 위|위로|높이)"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D30",
+      "kind": "body",
+      "source": "user",
+      "text": "상체를 앞으로 숙이고 팔을 아래로 늘어뜨린 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "desc_all": [
+          [
+            "숙|굽혀|접"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D31",
+      "kind": "body",
+      "source": "user",
+      "text": "팔짱을 끼고 서 있는 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:fold_arms"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "D32",
+      "kind": "body",
+      "source": "user",
+      "text": "다리를 꼬고 앉은 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "posture:sitting"
+          ]
+        ],
+        "desc_all": [
+          [
+            "꼬|교차|겹"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "V01",
+      "kind": "vlm",
+      "source": "vlm",
+      "text": "오른팔을 머리 위로 들어 검을 내려치려 하고 다리는 앞뒤로 벌려 앞발에 체중을 싣고 있다. 전투 장면의 공격 동작.",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "object:sword",
+            "activity:swordsmanship"
+          ]
+        ]
+      },
+      "vlm_tags": [
+        "object:sword",
+        "action:slash",
+        "action:strike",
+        "domain:combat",
+        "intent:attack"
+      ]
+    },
+    {
+      "id": "V02",
+      "kind": "vlm",
+      "source": "vlm",
+      "text": "바닥에 앉아 무릎을 세우고 고개를 숙이고 있다. 지치거나 슬픈 분위기.",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "posture:sitting",
+            "posture:crouching"
+          ]
+        ],
+        "desc_all": [
+          [
+            "숙|무릎"
+          ]
+        ]
+      },
+      "vlm_tags": [
+        "posture:sitting",
+        "action:bend",
+        "emotion:sad",
+        "emotion:tired"
+      ]
+    },
+    {
+      "id": "V03",
+      "kind": "vlm",
+      "source": "vlm",
+      "text": "인물이 한 손에 휴대폰을 귀에 대고 서서 통화하고 있다. 일상 장면.",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "object:phone",
+            "action:talk"
+          ]
+        ]
+      },
+      "vlm_tags": [
+        "object:phone",
+        "action:talk",
+        "posture:standing",
+        "domain:daily"
+      ]
+    },
+    {
+      "id": "V04",
+      "kind": "vlm",
+      "source": "vlm",
+      "text": "두 팔을 앞으로 내밀어 상대를 강하게 밀치는 동작. 몸은 앞으로 기울어 있다.",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:push"
+          ]
+        ]
+      },
+      "vlm_tags": [
+        "action:push",
+        "intent:attack",
+        "action:lean"
+      ]
+    },
+    {
+      "id": "N01",
+      "kind": "negative",
+      "source": "user",
+      "text": "자전거를 타는 자세",
+      "expected_status": "no_result"
+    },
+    {
+      "id": "N02",
+      "kind": "negative",
+      "source": "user",
+      "text": "말을 타고 달리는 기수",
+      "expected_status": "no_result"
+    },
+    {
+      "id": "N03",
+      "kind": "negative",
+      "source": "user",
+      "text": "우주선 조종석에서 레버를 당기는 조종사",
+      "expected_status": "no_result"
+    },
+    {
+      "id": "N04",
+      "kind": "negative",
+      "source": "user",
+      "text": "강아지를 산책시키는 사람",
+      "expected_status": "no_result"
+    },
+    {
+      "id": "N05",
+      "kind": "negative",
+      "source": "user",
+      "text": "아기를 욕조에서 목욕시키는 부모",
+      "expected_status": "no_result"
+    },
+    {
+      "id": "N06",
+      "kind": "negative",
+      "source": "user",
+      "text": "트럭 운전석에서 핸들을 돌리는 기사",
+      "expected_status": "no_result"
+    },
+    {
+      "id": "N07",
+      "kind": "negative",
+      "source": "vlm",
+      "text": "인물이 자전거 핸들을 잡고 페달을 밟으며 앞으로 나아가고 있다. 거리 장면.",
+      "expected_status": "no_result",
+      "vlm_tags": [
+        "action:hold",
+        "posture:sitting"
+      ]
+    },
+    {
+      "id": "N08",
+      "kind": "negative",
+      "source": "vlm",
+      "text": "말 위에 올라타 고삐를 두 손으로 쥐고 몸을 앞으로 숙이고 있다. 질주하는 분위기.",
+      "expected_status": "no_result",
+      "vlm_tags": [
+        "posture:sitting",
+        "action:hold",
+        "action:bend"
+      ]
+    },
+    {
+      "id": "N09",
+      "kind": "negative",
+      "source": "vlm",
+      "text": "카메라를 눈앞에 들고 한쪽 눈을 감은 채 셔터를 누르고 있다.",
+      "expected_status": "no_result",
+      "vlm_tags": [
+        "action:hold",
+        "action:look"
+      ]
+    },
+    {
+      "id": "G01",
+      "kind": "action",
+      "source": "user",
+      "text": "배트를 휘두르는 타자",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "object:bat",
+            "action:swing",
+            "activity:baseball"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "G02",
+      "kind": "action",
+      "source": "user",
+      "text": "테니스 라켓으로 공을 치는 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "object:racket",
+            "activity:tennis",
+            "activity:badminton"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "G03",
+      "kind": "action",
+      "source": "user",
+      "text": "발차기로 상대를 공격하는 무술가",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:kick"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "G04",
+      "kind": "action",
+      "source": "user",
+      "text": "창을 앞으로 찌르는 병사",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "object:spear",
+            "activity:spear_fighting",
+            "action:thrust"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "G05",
+      "kind": "action",
+      "source": "user",
+      "text": "드럼을 연주하는 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "object:drum"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "G06",
+      "kind": "action",
+      "source": "user",
+      "text": "책을 읽는 학생",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "object:book",
+            "action:read",
+            "activity:study"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "G07",
+      "kind": "action",
+      "source": "user",
+      "text": "요리하는 셰프",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:cook",
+            "activity:cooking"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "G08",
+      "kind": "action",
+      "source": "user",
+      "text": "스트레칭으로 몸을 푸는 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:stretch",
+            "intent:warm_up"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "G09",
+      "kind": "action",
+      "source": "user",
+      "text": "공중에 떠서 날아가는 히어로",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:fly",
+            "activity:flying",
+            "activity:hero_action"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "G10",
+      "kind": "action",
+      "source": "user",
+      "text": "손가락으로 무언가를 가리키는 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:point"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "G11",
+      "kind": "body",
+      "source": "user",
+      "text": "무릎을 끌어안고 웅크려 앉은 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "posture:sitting",
+            "posture:crouching"
+          ]
+        ],
+        "desc_all": [
+          [
+            "무릎|웅크"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "G12",
+      "kind": "body",
+      "source": "user",
+      "text": "양손을 허리에 올리고 당당하게 선 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "desc_all": [
+          [
+            "허리"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "G13",
+      "kind": "body",
+      "source": "user",
+      "text": "몸을 뒤로 크게 젖힌 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:lean_back"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "V11",
+      "kind": "vlm",
+      "source": "vlm",
+      "text": "인물이 양손으로 활시위를 당겨 정면을 조준하고 있다. 전투 또는 사냥 장면.",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "object:bow"
+          ]
+        ]
+      },
+      "vlm_tags": [
+        "object:bow",
+        "action:aim",
+        "action:pull",
+        "domain:combat"
+      ]
+    },
+    {
+      "id": "V12",
+      "kind": "vlm",
+      "source": "vlm",
+      "text": "한 무릎을 꿇고 두 손을 모아 기도하는 듯한 자세. 간절한 분위기.",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:pray"
+          ]
+        ]
+      },
+      "vlm_tags": [
+        "posture:kneeling",
+        "action:pray"
+      ]
+    },
+    {
+      "id": "M01",
+      "kind": "negative",
+      "source": "user",
+      "text": "휠체어를 밀며 복도를 걷는 간호사",
+      "expected_status": "no_result"
+    },
+    {
+      "id": "M02",
+      "kind": "negative",
+      "source": "user",
+      "text": "카메라로 사진을 찍는 사진작가",
+      "expected_status": "no_result"
+    },
+    {
+      "id": "M03",
+      "kind": "negative",
+      "source": "user",
+      "text": "뜨개질하는 할머니",
+      "expected_status": "no_result"
+    },
+    {
+      "id": "K01",
+      "kind": "action",
+      "source": "user",
+      "text": "도끼를 휘둘러 내려찍는 전사",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "object:axe",
+            "action:swing",
+            "action:strike",
+            "action:slash"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "K02",
+      "kind": "action",
+      "source": "user",
+      "text": "두 손으로 박수 치는 관객",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:clap"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "K03",
+      "kind": "action",
+      "source": "user",
+      "text": "넘어져 바닥에 쓰러진 사람",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:fall",
+            "posture:lying"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "K04",
+      "kind": "action",
+      "source": "user",
+      "text": "슬라이딩하며 미끄러지는 야구 선수",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:slide"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "K05",
+      "kind": "action",
+      "source": "user",
+      "text": "빗자루로 바닥을 쓰는 청소부",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:clean",
+            "object:broom",
+            "object:mop"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "K06",
+      "kind": "action",
+      "source": "user",
+      "text": "물건을 상대에게 건네주는 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:give"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "K07",
+      "kind": "action",
+      "source": "user",
+      "text": "낚싯대를 던져 낚시하는 사람",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:fish",
+            "object:fishing_rod"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "K08",
+      "kind": "action",
+      "source": "user",
+      "text": "두 팔을 벌려 상대를 꼭 안아주는 포옹",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:hug",
+            "intent:affection"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "K09",
+      "kind": "body",
+      "source": "user",
+      "text": "몸을 옆으로 기울이고 한 손을 허리에 짚은 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "desc_all": [
+          [
+            "기울|비스듬"
+          ],
+          [
+            "허리|옆구리"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "K10",
+      "kind": "body",
+      "source": "user",
+      "text": "무릎을 꿇은 채 양손을 바닥에 짚은 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "posture:kneeling",
+            "posture:all_fours",
+            "action:kneel"
+          ]
+        ],
+        "desc_all": [
+          [
+            "바닥|짚|손"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "K11",
+      "kind": "body",
+      "source": "user",
+      "text": "고개를 젖히고 하늘을 올려다보는 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "desc_all": [
+          [
+            "올려|위를|하늘|젖혀|젖히"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "K12",
+      "kind": "body",
+      "source": "user",
+      "text": "다리를 앞뒤로 크게 벌린 런지 자세",
+      "expected_status": "ok",
+      "relevant": {
+        "desc_all": [
+          [
+            "런지|앞뒤로|크게 벌|넓게 벌|길게 벌|내딛"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "V21",
+      "kind": "vlm",
+      "source": "vlm",
+      "text": "인물이 한 손을 높이 들어 손바닥을 펴고 좌우로 흔들고 있다. 멀리 있는 사람을 부르는 듯한 장면.",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "action:wave",
+            "intent:request_attention",
+            "intent:greeting"
+          ]
+        ]
+      },
+      "vlm_tags": [
+        "action:wave",
+        "action:raise_hand",
+        "intent:request_attention",
+        "intent:greeting"
+      ]
+    },
+    {
+      "id": "V22",
+      "kind": "vlm",
+      "source": "vlm",
+      "text": "몸을 웅크리고 두 팔로 머리를 감싸 보호하고 있다. 위협을 받아 두려워하는 분위기.",
+      "expected_status": "ok",
+      "relevant": {
+        "tags_all": [
+          [
+            "emotion:afraid",
+            "intent:protect",
+            "intent:avoid_danger",
+            "action:defend",
+            "action:block",
+            "action:crouch",
+            "posture:crouching"
+          ]
+        ],
+        "desc_all": [
+          [
+            "머리|감싸|막"
+          ]
+        ]
+      },
+      "vlm_tags": [
+        "posture:crouching",
+        "action:defend",
+        "intent:protect",
+        "emotion:afraid"
+      ]
+    },
+    {
+      "id": "P01",
+      "kind": "negative",
+      "source": "user",
+      "text": "스케이트보드 대신 서핑보드 위에서 파도를 타는 서퍼",
+      "expected_status": "no_result"
+    },
+    {
+      "id": "P02",
+      "kind": "negative",
+      "source": "user",
+      "text": "망원경으로 별을 관측하는 천문학자",
+      "expected_status": "no_result"
+    },
+    {
+      "id": "P03",
+      "kind": "negative",
+      "source": "vlm",
+      "text": "인물이 재봉틀 앞에 앉아 천을 밀어 넣으며 바느질을 하고 있다.",
+      "expected_status": "no_result"
+    }
+  ]
+}

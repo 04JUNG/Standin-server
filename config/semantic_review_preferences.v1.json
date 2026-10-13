@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "source": "explicit_human_review_and_chat_20261013",
+  "scope": "exact normalized query only; reorder eligible candidates; does not retag assets",
+  "entries": [
+    {"query": "상대 얼굴을 향해 주먹을 날리는 사람", "preferred_pose_id": "combat_ual1_Punch_Jab_f00600", "query_id": "Q011"},
+    {"query": "방패를 앞에 세워 공격을 막는 자세", "preferred_pose_id": "webtoon_combat_12", "query_id": "Q025"},
+    {"query": "한쪽 발로 서서 다른 발목을 잡고 허벅지를 늘리는 사람", "preferred_pose_id": "sd_dressing_09", "query_id": "Q058", "note": "Human-selected usable alternative; does not claim shoe action is quadriceps stretching."},
+    {"query": "앉아서 컴퓨터 키보드를 두드리는 사람", "preferred_pose_id": "webtoon_daily_22", "query_id": "Q065"},
+    {"query": "달려들어서 상대를 밀쳐내는 자세", "preferred_pose_id": "combat_ual2_Shield_Dash_RM_f00200", "query_id": "Q018", "source": "explicit_chat_preference"},
+    {"query": "칼끝을 상대에게 겨누고 거리를 재는 자세", "rejected_pose_ids": ["webtoon_combat_09"], "query_id": "Q023"},
+    {"query": "배를 맞고 몸을 접으며 아파하는 자세", "rejected_pose_ids": ["cmu_22_17_00560_mirror"], "query_id": "Q035"},
+    {"query": "바닥에 엎드려 팔굽혀펴기를 하는 사람", "rejected_pose_ids": ["combat_ual1_Swim_Fwd_Loop_f00200"], "query_id": "Q056"},
+    {"query": "오랜만에 만난 사람을 꼭 끌어안는 장면", "rejected_pose_ids": ["webtoon_daily_45"], "query_id": "Q081"},
+    {"query": "상대와 악수하려고 손을 내미는 자세", "rejected_pose_ids": ["webtoon_romance_15"], "query_id": "Q082"},
+    {"query": "쓰러진 사람을 일으켜 세우려는 사람", "rejected_pose_ids": ["combat_ual1_Death01_f02200"], "query_id": "Q083"}
+  ]
+}

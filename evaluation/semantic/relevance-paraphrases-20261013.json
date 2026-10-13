@@ -1,0 +1,13 @@
+{
+  "purpose": "Unseen wording diagnostic for relevance guards; not a held-out accuracy benchmark",
+  "queries": [
+    {"id": "P001", "category": "악수", "text": "상대에게 한 손을 내밀어 악수를 청하는 모습"},
+    {"id": "P002", "category": "악수", "text": "누군가와 악수하는 사람"},
+    {"id": "P003", "category": "팔굽혀펴기", "text": "손바닥과 발끝을 바닥에 대고 팔굽혀펴기를 하는 자세"},
+    {"id": "P004", "category": "팔굽혀펴기", "text": "팔굽혀펴기를 하려고 엎드린 모습"},
+    {"id": "P005", "category": "돕는 역할", "text": "다친 동료를 어깨로 부축해 걷는 자세"},
+    {"id": "P006", "category": "돕는 역할", "text": "넘어진 친구의 팔을 잡아 일으켜 세우는 사람"},
+    {"id": "P007", "category": "검 방향", "text": "검끝을 앞으로 겨누는 자세"},
+    {"id": "P008", "category": "검 방향", "text": "칼을 세워 들고 경계하는 자세"}
+  ]
+}
