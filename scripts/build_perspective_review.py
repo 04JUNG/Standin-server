@@ -32,10 +32,13 @@ def build(study,output,standalone=None):
     if standalone:
         document='<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>러프 검색 비포 애프터 검수</title><style>'+STANDALONE_STYLE+'</style></head><body>'+fragment+'</body></html>'
         standalone.write_text(document,encoding='utf-8')
-    save_json(study/'presentation.json',{'template_at_run_sha256':json.loads((study/'protocol.json').read_text())['files']['scripts/templates/perspective_rough_review.html'],
+    policy=json.loads((study/'protocol.json').read_text())
+    if 'scripts/templates/perspective_rough_review.html' not in policy.get('files',{}):
+        policy=json.loads((study/'presentation-policy.json').read_text())
+    save_json(study/'presentation.json',{'template_at_run_sha256':policy['files']['scripts/templates/perspective_rough_review.html'],
         'template_now_sha256':sha256(template),'rankings_sha256':summary['rankings_sha256'],
         'data_sha256':sha256(study/'review-data-private.json'),'fragment_sha256':sha256(output),
-        'changes':'clear raw-template error; default first searchable case; search settings and results unchanged'})
+        'changes':'presentation-only refresh; search settings and results unchanged'})
 
 
 if __name__=='__main__':

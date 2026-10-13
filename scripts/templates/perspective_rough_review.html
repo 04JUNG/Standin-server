@@ -8,8 +8,8 @@
   <p data-status aria-live="polite"></p>
   <div class="comparison-grid">
     <section><div>입력 러프</div><img data-input alt="입력 러프"></section>
-    <section><div>Before · 기존 4시점</div><div class="viz-row" data-ranks="before"></div><img data-image="before" alt="기존 검색 3D 후보"><div class="text-small" data-label="before"></div></section>
-    <section><div>After · 개선 검색</div><div class="viz-row" data-ranks="after"></div><img data-image="after" alt="개선 검색 3D 후보"><div class="text-small" data-label="after"></div></section>
+    <section><div data-title="before">Before · 기존 4시점</div><div class="viz-row" data-ranks="before"></div><img data-image="before" alt="기존 검색 3D 후보"><div class="text-small" data-label="before"></div></section>
+    <section><div data-title="after">After · 개선 검색</div><div class="viz-row" data-ranks="after"></div><img data-image="after" alt="개선 검색 3D 후보"><div class="text-small" data-label="after"></div></section>
   </div>
   <div class="viz-controls" data-rating-controls>
     <label class="form-label">기존 Top-5 안에 쓸 만한 포즈 <select class="form-select" data-useful="before"><option value="">미검수</option><option value="yes">있음</option><option value="no">없음</option><option value="uncertain">판단 어려움</option></select></label>
@@ -18,7 +18,7 @@
   </div>
   <label class="form-label">검수 메모 <textarea class="form-control" data-note rows="2" maxlength="500"></textarea></label>
   <div class="viz-row"><button class="btn btn-primary" type="button" data-send>검수 결과 전달</button><button class="btn" type="button" data-export>검수 JSON 저장</button><span data-progress aria-live="polite"></span></div>
-  <p class="text-small">동일 Human-Art 관절로 비교 · 개선은 좌우 두 해석·원근·카메라 미세 조정·윤곽 재정렬 · 얼굴과 손가락 방향은 근사</p>
+  <p class="text-small" data-summary>동일 Human-Art 관절로 비교 · 개선은 좌우 두 해석·원근·카메라 미세 조정·윤곽 재정렬 · 얼굴과 손가락 방향은 근사</p>
   <pre data-export-text hidden></pre>
 </div>
 <style>
@@ -37,6 +37,9 @@ const root=document.getElementById('rough-perspective-review');
 const $=s=>root.querySelector(s);
 let data;
 try{data=JSON.parse($('[data-study]').textContent);}catch(e){$('[data-status]').textContent='비교 데이터가 아직 생성되지 않았습니다. 생성된 review.html을 열어주세요.';return;}
+if(data.before_label)$('[data-title="before"]').textContent=data.before_label;
+if(data.after_label)$('[data-title="after"]').textContent=data.after_label;
+if(data.summary_label)$('[data-summary]').textContent=data.summary_label;
 const fields={query:$('[data-query]'),view:$('[data-view]'),overlay:$('[data-overlay]'),preference:$('[data-preference]'),note:$('[data-note]')};
 let state={study_id:data.study_id,query:(data.queries.find(q=>!q.error)||data.queries[0]).id,view:'matched',overlay:false,ranks:{before:0,after:0},ratings:{}};
 function adopt(snapshot){const s=snapshot?.modelContent;if(s?.study_id===data.study_id&&data.queries.some(q=>q.id===s.query))state={...state,...s,ratings:s.ratings||{},ranks:s.ranks||{before:0,after:0}};}
@@ -46,11 +49,13 @@ function save(){const snapshot={modelContent:state,privateContent:null};if(windo
 function render(){
 const q=data.queries.find(q=>q.id===state.query)||data.queries[0];fields.query.value=q.id;fields.view.value=state.view;fields.overlay.checked=state.overlay;
 $('[data-input]').src=state.overlay?q.overlay:q.input;
-$('[data-status]').textContent=q.error?'관절 추출 기준 미달 · 두 방법 모두 검색 실패':q.id+(q.contour_fallback?' · 윤곽 처리 실패로 카메라 검색 결과 유지':' · 후보 1~5위를 눌러 비교');
+$('[data-status]').textContent=q.status_text||(q.error?'관절 추출 기준 미달 · 두 방법 모두 검색 실패':q.id+(q.contour_fallback?' · 윤곽 처리 실패로 카메라 검색 결과 유지':' · 후보 1~5위를 눌러 비교'));
 for(const arm of ['before','after']){const ranks=$('[data-ranks="'+arm+'"]');ranks.replaceChildren();
 q[arm].forEach((c,i)=>{const b=document.createElement('button');b.type='button';b.className='btn';b.textContent=(i+1)+'위';b.setAttribute('aria-pressed',String(state.ranks[arm]===i));b.addEventListener('click',()=>{state.ranks[arm]=i;render();save();});ranks.append(b);});
 const c=q[arm][state.ranks[arm]];const image=$('[data-image="'+arm+'"]');image.hidden=!c;
-if(c){image.src=c[state.view];$('[data-label="'+arm+'"]') .textContent=c.pose_id+' · '+(state.view==='canonical'?c.canonical_kind:c.kind);}else $('[data-label="'+arm+'"]') .textContent='검색 실패';
+if(c){image.src=c[state.view];let detail=c.pose_id+' · '+(state.view==='canonical'?c.canonical_kind:c.kind);
+if(c.features){const f=c.features;detail+=' · 실제 팔꿈치 좌/우 '+f.elbows_3d_degrees.map(v=>v==null?'?':Math.round(v)+'°').join('/')+(f.folded_arm_contact?' · 반대쪽 팔 근접 조건':f.folded_arms?' · 팔 교차 기하 조건':'');}
+$('[data-label="'+arm+'"]') .textContent=detail;}else $('[data-label="'+arm+'"]') .textContent='검색 실패';
 const r=state.ratings[q.id]||{};$('[data-useful="'+arm+'"]') .value=r[arm]||'';
 }
 const rating=state.ratings[q.id]||{};fields.preference.value=rating.preference||'';fields.note.value=rating.note||'';
