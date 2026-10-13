@@ -368,4 +368,13 @@ Blender 전용 tests/converter는 bpy/mathutils 런타임이 없어 제외했다
 필터하면 일치 포즈를 놓칠 수 있으므로 전체 후보 풀 또는 검색기의 필수 조건 인터페이스가 필요하다.
 기하 후보와 의미 score는 계속 분리하고 refine_allowed=false를 유지한다.
 현재 v4는 임시 검색기 실험이며 285의 worktree/태그/BVH를 수정하거나 별도의 운영 검색기로 배포하지 않는다.
+
+## 사용자 승인 상·하체 합성 probe(오프라인 전용)
+
+T013의 기존 실제 설명으로 팔짱 팔 체인과 앉기 베이스를 따로 검색·합성했다.
+단순 회전값 복사는 0/12 팔짱 통과, target 리그 방향 retarget는 구조 검사 11/12 통과였다.
+이는 단일 러프의 구조 probe이며 정확도/실사용 성공률이 아니다. 새 BVH는 별도 identity이고
+동적 라우팅/API/라이브러리에 연결하지 않는다. 원본·기하·refine 정책은 그대로다.
+실제 FBX mesh/관절 제한/손목 twist/피부 접촉은 미검증이고 release_allowed=false다.
+범위·재현·실패 사례: [PART_COMPOSITION_T013_PROBE.md](PART_COMPOSITION_T013_PROBE.md).
 후속: 관점별 몸 배치, 좌우 팔·다리 구분, 작가 판정이 있는 다른 동작 홀드아웃이 필요하다.
