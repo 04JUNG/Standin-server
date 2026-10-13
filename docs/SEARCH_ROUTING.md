@@ -147,4 +147,8 @@ geometric의 Top-5(포즈 ID·view·거리)가 바뀌거나 사례 처리 오류
   Gemini 품질을 입증하는 결과가 아니다.
 - API의 혼합 인물 응답·OFF 기본값, 복수 인물 설명 1회, 시맨틱 검색 예외 격리,
   Gemini 설명 호출 timeout·일일 쿼터 분류·재시도 금지를 추가 검증했다.
+- 최종 로컬 전체 테스트: 801 passed, 8 skipped, 22 subtests passed.
+  스모크 54/54, compileall·git diff --check 통과.
+- 기능 브랜치: `san400b/04j-286-dynamic-routing`. GitHub 업로드·PR 생성은
+  자동 승인 검토에서 외부 게시 승인이 필요하다고 차단되어 사용자 승인 대기다. CI는 미실행이다.
 - 운영 활성화·클라이언트 표시 연결은 진행하지 않았다.

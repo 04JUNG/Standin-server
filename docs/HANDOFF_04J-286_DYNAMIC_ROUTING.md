@@ -7,6 +7,8 @@
 > 완료했다. geometric 39명 모두 Top-5 동일, semantic 8명 모두 후보 반환.
 > 자세 설명은 Claude fixture이므로 Gemini 품질·지연은 여전히 미측정이다.
 > 실 Gemini 검증은 자동 승인 검토가 러프 이미지 외부 전송을 차단해 사용자 승인 대기 중이다.
+> 로컬 전체 테스트는 801 passed·8 skipped이며, GitHub 업로드도 외부 코드 게시 승인이
+> 필요하다는 자동 승인 검토에 의해 차단됐다. PR·CI는 아직 미실행이다.
 > 최신 구현 설명은 `docs/SEARCH_ROUTING.md`를 따른다.
 
 이 문서 하나만 읽고 이어서 작업할 수 있게 썼다. 설계 상세는 `docs/SEARCH_ROUTING.md`, 응답 계약은
