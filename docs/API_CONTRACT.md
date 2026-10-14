@@ -620,3 +620,48 @@ backend=`tag-v4-critical-shapes-interim`이다. 명확한 `fold_arms` 또는 양
 기존 `pose.view`는 yaw 라벨만 나타내므로 기존 4방향 JPG만으로 pitch 적용 결과를 표시하면 안 된다.
 BVH·기하 후보·distance·refine은 바뀌지 않는다. 몸 기준 V 관계와 화면에서 보이는 V 관계는
 구별한다. 위/아래에서 보는 단서가 문장에 명시되지 않으면 러프와 같은 시점이라고 보장하지 않는다.
+
+### 실험적 자연어 생성 hook (2026-10-14, 기본 비활성)
+
+`Pipeline(..., pose_generator=<explicit research adapter>)`에 직접 주입한 경우만,
+유효한 semantic 설명의 검색이 정상 수행되어 `no_result`이고 hits가 0개일 때 실행한다.
+API 앱의 기본 Pipeline factory에는 주입하지 않는다. 별도 운영 env/endpoint/자동 export 없음.
+provider/색인 오류, 모호한 설명, geometric 정상 경로, head/얽힘 기존 차단 및 명시적 half/bust에는 실행하지 않는다.
+
+선택적으로 `people[i].search_routing.generation`에 다음을 기록한다:
+
+- `status`: preview_ready / unsupported / rejected / timeout / error / not_requested.
+- `backend`, `reason`, `elapsed_ms`, `diagnostics`, `candidates`(별도 합성 미리보기).
+- 모든 상태에 `release_allowed=false`, `refine_allowed=false`, `actual_mesh_validated=false`.
+- 미리보기는 `pose_id=generated_<hash>`, `source=text_constraints_analytic_ik`,
+  `kind=synthetic_research_preview`, `bvh`(1프레임 본문), `keypoints_3d`, `constraints`,
+  기본 리그 출처 hash 및 기구학 검사 결과를 포함한다. VLM 관절 좌표가 아니다.
+
+`route=semantic`, `search.status=no_result`, 기존 `candidates=[]`, `semantic_candidates=[]`,
+`confidence=low`, refine 금지를 유지한다. 생성 미리보기 3개를 검색 성공 3개로 세지 않는다.
+생성 ID는 라이브러리 ID가 아니며 `/pose/{id}/bvh`, `/refine`, 자동 export 대상으로 보내면 안 된다.
+기본 앱 응답은 기존과 동일하고 generation 필드가 없다.
+기본 뼈대→자연어 조건→별도 IK 생성은 기존 refine과 다르다.
+실제 피부 메시, 손목 twist/손가락/관절 해부학 축/의자 접촉/3D GT는 미검증이다.
+세부 지원 범위·검증은 `docs/TEXT_POSE_GENERATION_PROBE.md`를 따른다.
+
+### 04J-285 시맨틱 검색 연결 (2026-10-14, opt-in)
+
+`SEMANTIC_BACKEND=semantic285`를 명시하면 285의 직접 문장 검색 서비스가
+286의 기존 SemanticQuery/SemanticSearchResult 계약 뒤에서 실행된다. 기본값 tag와
+`SEARCH_ROUTING=0`은 유지한다. `/semantic-search` HTTP endpoint는 이 연결 작업에서 추가하지 않았다.
+`route`, `search.status`, `candidates`, `semantic_candidates`의 응답 구조는 동일하다.
+
+- backend는 `semantic-285-text+bvh-validation-v1`. score는 285의 0..1 정책으로,
+  기존 tag-v4 의미 점수나 geometric distance와 직접 비교하지 않는다.
+- `semantic_candidates[].pose`는 285가 검증한 `standin-pose-record-v1` 포즈 JSON이며 ID·DB·태그 정합성 검사를 유지한다.
+- `matched.semantic285`에 원래 점수 성분·문장/태그 근거·색인 정체성을 기록한다.
+- 전체 기준 통과 후보군에 BVH 팔짱/V·요청 자세·미리보기 카메라 및 알려진 몸 관찰 충돌 검사를 적용한 뒤 family Top-K를 선택한다.
+  상위 5개 또는 20개만 필터링해 적합 후보를 놓치지 않는다. 미관측 값은 중립이다.
+- 문장별 선호/거절 기록은 기본 비활성. 수동 검수 결과는 일반화 성능으로 집계하지 않는다.
+- 기존 격리 목록과 가져온 시맨틱 격리 목록의 합집합을 시맨틱 색인에 적용한다.
+  이 작업은 기존 global 기하/refine 정책 파일을 변경하지 않는다.
+- 명시한 DB/색인/encoder 실패는 error. 팔 관계 색인이 없는 핵심 요청도 error이며 이전 태그 검색기로 조용히 폴백하지 않는다.
+- 기하 후보/추출/쿼리 좌표/refine solver 불변. 모든 시맨틱 후보는 계속 refine 금지다.
+
+코드·30개 저장 실험·검수 인수인계는 `docs/SEMANTIC_285_INTEGRATION.md`를 따른다.

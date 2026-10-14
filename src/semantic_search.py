@@ -360,6 +360,15 @@ def build_semantic_searcher(path: Optional[str] = None, *,
     path = path or os.getenv("SEMANTIC_TAGS_PATH", "data/search-v2.json")
     body_index_path = body_index_path or os.getenv("SEMANTIC_BODY_INDEX_PATH")
     shape_index_path = shape_index_path or os.getenv("SEMANTIC_SHAPE_INDEX_PATH")
+    backend=os.getenv("SEMANTIC_BACKEND","tag")
+    if backend=="semantic285":
+        from .semantic_adapter_285 import build_from_env
+        try:
+            return build_from_env(path,library_pose_ids=library_pose_ids,
+                                  body_index_path=body_index_path,shape_index_path=shape_index_path)
+        except Exception as error:
+            return UnavailableSemanticSearcher(f"semantic285_init:{type(error).__name__}")
+    if backend!="tag":return UnavailableSemanticSearcher("semantic_backend_unknown")
     try:
         if shape_index_path:
             # Fail closed for an explicitly requested critical index; no silent
