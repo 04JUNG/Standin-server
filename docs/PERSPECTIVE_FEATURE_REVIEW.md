@@ -84,3 +84,45 @@ python scripts/build_perspective_review.py \
 ```
 
 다음에는 특징 조건을 만족하는 후보가 전체 자세도 유지하는지 사람이 확인해야 한다. 조건을 추가하면서 다리나 몸통 자세가 나빠진 후보를 성공으로 집계하지 않는다. 178의 가려진 몸통, 315의 쪼그려 앉기와 팔짱의 동시 일치, 288의 실제 앞굽힘, 291의 벤치 접촉은 남은 문제다.
+
+## 2026-10-14 추가 코드와 검수 상태
+
+이번 PR에는 이전 Z·시점·깊이 신뢰도·윤곽 실험과 실패 진단의 코드/테스트도 보관한다. 전체 진행 기록은 [PERSPECTIVE_RESEARCH.md](PERSPECTIVE_RESEARCH.md)에 있으며, 아래 도구들은 운영 API에서 호출하지 않는다. 개발 기준에 실패한 정책을 기본 검색에 적용하지 않았고, 과거 40장과 반복 개발 120 family를 새로운 holdout으로 취급하지 않는다. 현재까지 소비한 family는 1120개다.
+
+- `body_part_evidence`와 `joint_part_guard`: 중요 특징을 맞추면서 팔·다리·몸통 오차가 증가하는 문제와 부위 보호 정책을 진단한다. 강한 원근 Top1은 개발에서77→78/120으로, 사전3장 증가 기준을 통과하지 못했다.
+- `partial_similarity`: 가려진178의 관측 상체/팔만 맞추는 별도 마스크 실험이다. 후보 생성은 가능하지만 미관측 하체와 실제 포즈 정확도는 미확정이다.
+- `pose_requirement_coverage`, `cue_shortlist_guard`: 팔짱과 낮은 앉음을 함께 가진 기하 후보 범위 및 전체XY Top20 안의 수동조건 교집합을 확인한다. 의미상 정답이나 실제 접촉 판정은 아니다.
+- `bvh_orientation_diagnostic`, `pelvis_lean_diagnostic`: 원본BVH 회전 정보와 골반 기준 몸통 기울기를 진단한다. rest 앞축은 실제 캐릭터 얼굴/몸 앞축으로 보정되지 않았으며 화면 표시나 검색에 자동 적용하지 않는다.
+- `experiment_folded_arms_lowerbody_fit`:315의 팔 조건은 수동으로 유지하고 하체/몸통8관절로 카메라를 맞추는 별도 입력 마스크 실험이다.9개 팔조건 후보 안에서 기존 전체XY control과 새 방법의 첫 후보가 같았고, 새로운 개선을 입증하지 못했다.
+- `build_basic_mannequin_review`: 라이브러리의 기존 JPEG 인형으로 표시만 교체한다. 정면·사선·옆면·뒷면은 **고정 라이브러리 시점이지 검색 맞춤 원근 카메라가 아니다.** 원본BVH 팔꿈치 각도와 리타기팅된 인형 이미지의 관절 모양을 동일 측정으로 간주하지 않는다.
+
+사용자는315의 Before1에서 쪼그린 자세, After1에서 팔짱을 각각 선호했다. 이 부분별 검수는 한쪽 전체가 더 좋다는 평가나 원본3D 정답이 아니다. 따라서 팔짱만 맞추면서 서 있는 후보를 전체 개선으로 보고하지 않는다.
+
+### 로컬 지연 측정
+
+기존 실제러프9장의 고정XY/마스크와1981개 갤러리로 각각3회 측정했다. warmup은 제외하고 쿼리/반복별 실행 순서를 교대로 바꿨다. 관절추론·이미지로딩·네트워크·DB·인덱스 초기화·수동조건 gate·인형 표시를 제외한 알고리즘 시간이다.
+
+| 구성 | 중앙값 | 반복측정 p95 |
+| --- | ---: | ---: |
+| 4시점 단일 라벨 | 0.958ms | 1.375ms |
+| 117시점 단일 라벨 | 33.770ms | 44.115ms |
+| 117시점 좌우 두 해석 | 68.360ms | 77.841ms |
+| 좌우·195시작 카메라 미세조정·혼합·Top20 윤곽 | 487.652ms | 571.387ms |
+
+짝지은 전체 구성−4시점 차이의 중앙값은486.719ms다. 작은 반복 로컬 시험이며 운영 p95/서비스 응답시간이나 부하 시험이 아니다. 전체27회 중 윤곽fallback3회도 포함했다. 개별 구간 중앙값을 더해 전체 중앙값을 만들지 않는다.
+
+```sh
+python scripts/benchmark_perspective_latency.py \
+  --source out/rough-test-perspective-review-20261013 \
+  --gallery out/first-rank-confirm-20261013/historical-gallery-1981.npz \
+  --out out/perspective-latency-new-run --repetitions 3
+
+python scripts/build_basic_mannequin_review.py \
+  --source out/manual-ordinal-camera-cues-20261014 \
+  --gallery out/first-rank-confirm-20261013/historical-gallery-1981.npz \
+  --database /path/to/historical-backup/poses.db \
+  --library /path/to/source_bundle --thumbs /path/to/source_bundle/thumbs \
+  --out out/basic-mannequin-new-run --inline /path/to/new-inline-review.html
+```
+
+신규 코드의 부분관측·마스크 불변·회전/투영·갤러리 대응을 포함한 수치/표시계약80테스트가 통과했고, 기본인형 전체10장 화면의380개 이미지와 inline4장 화면의160개 이미지 로딩·상태저장·모바일폭을 격리브라우저에서 확인했다. 이는 소프트웨어 검증이지 사람의 포즈 품질 검수를 대신하지 않는다. 원본 러프·JPEG·생성HTML·모델·DB·BVH·NPZ는 공개 대상에 포함하지 않는다.

@@ -1,0 +1,80 @@
+<div id="basic-mannequin-review">
+  <script type="application/json" data-study>__REVIEW_DATA__</script>
+  <div class="viz-controls">
+    <label class="form-label">러프 <select class="form-select" data-query></select></label>
+    <label class="form-label">기본 인형 시점 <select class="form-select" data-view><option value="front">정면</option><option value="three_quarter">사선</option><option value="side">옆면</option><option value="back">뒷면</option></select></label>
+    <label class="form-check"><input class="form-check-input" type="checkbox" data-overlay><span class="form-check-label">추출 관절 표시</span></label>
+  </div>
+  <div class="text-small" data-view-label aria-live="polite"></div>
+  <p data-status aria-live="polite"></p>
+  <div class="comparison-grid">
+    <section><div>입력 러프</div><img data-input alt="입력 러프"></section>
+    <section><div data-title="before"></div><div class="viz-row" data-ranks="before"></div><img data-image="before" alt="이전 검색 후보 기본 인형"><div class="text-small" data-label="before"></div></section>
+    <section><div data-title="after"></div><div class="viz-row" data-ranks="after"></div><img data-image="after" alt="검수 조건 검색 후보 기본 인형"><div class="text-small" data-label="after"></div></section>
+  </div>
+  <div class="viz-controls" data-rating-controls>
+    <label class="form-label">이전 Top-5 쓸 만한 포즈 <select class="form-select" data-useful="before"><option value="">미검수</option><option value="yes">있음</option><option value="no">없음</option><option value="uncertain">판단 어려움</option></select></label>
+    <label class="form-label">조건 추가 Top-5 쓸 만한 포즈 <select class="form-select" data-useful="after"><option value="">미검수</option><option value="yes">있음</option><option value="no">없음</option><option value="uncertain">판단 어려움</option></select></label>
+    <label class="form-label">전체 비교 <select class="form-select" data-preference><option value="">미검수</option><option value="after">조건 추가가 더 좋음</option><option value="before">이전이 더 좋음</option><option value="tie">비슷함</option><option value="neither">둘 다 부적절</option><option value="uncertain">판단 어려움</option></select></label>
+  </div>
+  <label class="form-label">검수 메모 <textarea class="form-control" data-note rows="2" maxlength="500"></textarea></label>
+  <div class="viz-row"><button class="btn btn-primary" type="button" data-send>검수 결과 전달</button><button class="btn" type="button" data-export>검수 JSON 저장</button><span data-progress aria-live="polite"></span></div>
+</div>
+<style>
+#basic-mannequin-review .comparison-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:16px 0}
+#basic-mannequin-review section{min-width:0}
+#basic-mannequin-review img{display:block;width:100%;height:300px;object-fit:contain}
+#basic-mannequin-review [data-label]{overflow-wrap:anywhere}
+#basic-mannequin-review [data-ranks]{margin:8px 0}
+#basic-mannequin-review [hidden]{display:none!important}
+@media(max-width:600px){#basic-mannequin-review .comparison-grid{grid-template-columns:1fr}#basic-mannequin-review img{height:260px}}
+</style>
+<script>
+(()=>{
+const root=document.getElementById('basic-mannequin-review');
+const $=s=>root.querySelector(s);
+const data=JSON.parse($('[data-study]').textContent);
+const viewNames={front:'정면',three_quarter:'사선',side:'옆면',back:'뒷면'};
+const fields={query:$('[data-query]'),view:$('[data-view]'),overlay:$('[data-overlay]'),note:$('[data-note]'),preference:$('[data-preference]')};
+fields.overlay.closest('label').hidden=!!data.disable_overlay;
+let state={study_id:data.study_id,query:data.default_query,view:'front',overlay:false,ranks:{before:0,after:0},ratings:{}};
+function adopt(s){if(s?.study_id!==data.study_id)return;if(!data.queries.some(q=>q.id===s.query)||!viewNames[s.view])return;state={...state,...s,ranks:s.ranks||{before:0,after:0},ratings:s.ratings||{}};}
+try{adopt(window.openai?.widgetState?.modelContent);if(!window.openai)adopt(JSON.parse(localStorage.getItem(data.study_id)||'null'));}catch(e){}
+for(const q of data.queries){const o=document.createElement('option');o.value=q.id;o.textContent=q.id+' · '+q.set;fields.query.append(o);}
+$('[data-title="before"]').textContent=data.before_label;$('[data-title="after"]').textContent=data.after_label;
+function save(){const s={modelContent:state,privateContent:null};if(window.openai?.setWidgetState)window.openai.setWidgetState(s).catch(()=>{});else try{localStorage.setItem(data.study_id,JSON.stringify(state));}catch(e){}}
+function progress(){$('[data-progress]').textContent=Object.values(state.ratings).filter(r=>r.before&&r.after&&r.preference).length+'장 검수 완료';}
+function render(){
+const q=data.queries.find(q=>q.id===state.query);if(data.disable_overlay)state.overlay=false;fields.query.value=q.id;fields.view.value=state.view;fields.overlay.checked=state.overlay;
+$('[data-input]').src=state.overlay?q.overlay:q.input;
+$('[data-view-label]').textContent='라이브러리 고정 '+viewNames[state.view]+' · 검색 맞춤 시점 아님 · 순위 변경 없음';
+$('[data-status]').textContent=q.status_text||q.id;
+for(const arm of ['before','after']){
+const ranks=$('[data-ranks="'+arm+'"]');ranks.replaceChildren();
+if(!Number.isInteger(state.ranks[arm])||state.ranks[arm]<0||state.ranks[arm]>=q[arm].length)state.ranks[arm]=0;
+q[arm].forEach((c,i)=>{const b=document.createElement('button');b.className='btn';b.type='button';b.textContent=(i+1)+'위';b.setAttribute('aria-pressed',String(i===state.ranks[arm]));b.addEventListener('click',()=>{state.ranks[arm]=i;render();save();});ranks.append(b);});
+const candidate=q[arm][state.ranks[arm]];const image=$('[data-image="'+arm+'"]');image.hidden=!candidate;
+if(candidate){
+const asset=data.assets[candidate.pose_id]?.[state.view];image.src=asset||'';
+let label=candidate.pose_id+' · 기본 인형 · '+viewNames[state.view];
+if(candidate.features?.elbows_3d_degrees)label+=' · 원본 BVH 팔꿈치 좌/우 '+candidate.features.elbows_3d_degrees.map(x=>x==null?'?':Math.round(x)+'°').join('/');
+$('[data-label="'+arm+'"]') .textContent=asset?label:'해당 기본 인형 이미지 없음';
+}else{$('[data-label="'+arm+'"]') .textContent='검색 실패';image.removeAttribute('src');}
+$('[data-useful="'+arm+'"]') .value=state.ratings[q.id]?.[arm]||'';
+}
+fields.note.value=state.ratings[q.id]?.note||'';fields.preference.value=state.ratings[q.id]?.preference||'';
+$('[data-rating-controls]').hidden=!!q.error;progress();
+}
+fields.query.addEventListener('change',()=>{state.query=fields.query.value;state.ranks={before:0,after:0};render();save();});
+fields.view.addEventListener('change',()=>{state.view=fields.view.value;render();save();});
+fields.overlay.addEventListener('change',()=>{state.overlay=fields.overlay.checked;render();save();});
+function rate(){state.ratings[state.query]={before:$('[data-useful="before"]').value,after:$('[data-useful="after"]').value,preference:fields.preference.value,note:fields.note.value};progress();save();}
+for(const element of [$('[data-useful="before"]'),$('[data-useful="after"]'),fields.preference])element.addEventListener('change',rate);fields.note.addEventListener('input',rate);
+function result(){return {study_id:data.study_id,source_study_id:data.source_study_id,presentation:'library fixed-view basic mannequin; not matched search camera',ratings:state.ratings};}
+$('[data-send]').addEventListener('click',async()=>{if(window.openai?.sendFollowUpMessage)await window.openai.sendFollowUpMessage({prompt:'기본 인형으로 다시 검수한 러프 비교 결과입니다. 평가를 집계해주세요.\n'+JSON.stringify(result()),title:'검수 결과 전달'});else download();});
+function download(){const url=URL.createObjectURL(new Blob([JSON.stringify(result(),null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=data.study_id+'-ratings.json';a.click();URL.revokeObjectURL(url);}
+$('[data-export]').addEventListener('click',download);
+window.addEventListener('openai:set_globals',e=>{adopt(e.detail?.globals?.widgetState?.modelContent);render();});
+render();
+})();
+</script>
