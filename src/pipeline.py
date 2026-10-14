@@ -79,7 +79,8 @@ class _SlotOutcome:
 class Pipeline:
     def __init__(self, entries, vlm_client: BaseVLMClient | None = None,
                  detector=None, pose_model=None, body_matcher=None,
-                 semantic_searcher=None, routing_config: RoutingConfig | None = None):
+                 semantic_searcher=None, routing_config: RoutingConfig | None = None,
+                 pose_generator=None):
         # 검색 행렬과 메타데이터가 실행 중 서로 어긋나지 않도록 같은 immutable
         # snapshot을 공유한다. 라이브러리 갱신은 새 Pipeline 생성 시 자동 반영된다.
         self.entries = tuple(entries)
@@ -94,6 +95,9 @@ class Pipeline:
         # 04J-286 라우팅. 꺼져 있으면 아래 두 값은 읽지 않는다(기존 경로 그대로).
         self.routing_config = routing_config or RoutingConfig.from_env()
         self._semantic_searcher = semantic_searcher
+        # Explicit injection only. API factory/default config never enables it.
+        # Generated research previews are NOT library candidates or refine bases.
+        self._pose_generator = pose_generator
 
     @property
     def semantic_searcher(self):
@@ -590,6 +594,7 @@ class Pipeline:
         self._apply_refine_policy(desc, slot, "low", has_candidates=False)
         desc.refinable_limbs = ()
         semantic_candidates: list = []
+        generation = None
         search_status, backend, search_reason = "not_run", None, None
         elapsed: dict = {}
         if route_name == "semantic":
@@ -620,6 +625,19 @@ class Pipeline:
                 "no_result": "관절 근거 부족 → 시맨틱 경로였지만 검색 결과 없음",
                 "error": f"관절 근거 부족 → 시맨틱 검색 실패({result.reason})",
             }.get(result.status, "시맨틱 경로")
+            if self._pose_generator is not None and result.status == "no_result" and not result.hits:
+                from .experimental.text_pose_generation import after_no_result
+                # No full-body invention for explicitly cropped/head scopes or
+                # existing entangled blocks; never repair a failed provider call.
+                blocked = (decision.joint.policy_block is not None or
+                           desc.output_scope.detected in (BodyScope.HEAD, BodyScope.HALF, BodyScope.BUST))
+                with span("pose_generation_preview"):
+                    generated = after_no_result(
+                        self._pose_generator, description, search_status=result.status,
+                        hit_count=len(result.hits), policy_block=blocked)
+                generation = generated.to_dict()
+                elapsed["pose_generation_ms"] = round(generated.elapsed_ms, 3)
+                reason += f" → 생성 실험 {generated.status}(미리보기 전용, 자동 적용 금지)"
         elif route_name == "error":
             reason = (f"관절 근거 부족 + 자세 설명 VLM 호출 실패"
                       f"({decision.semantic.error_reason}) → 오류")
@@ -639,6 +657,8 @@ class Pipeline:
                         for hit in semantic_candidates],
             search_reason=search_reason,
         )
+        if generation is not None:
+            outcome.routing["generation"] = generation
         return outcome
 
     def _routing_record(self, decision, routing, *, search_status: str,
