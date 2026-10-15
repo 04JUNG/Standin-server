@@ -518,6 +518,21 @@ Retry-After: 30
 
 OpenAPI 자동 문서: 서버 기동 후 **`http://127.0.0.1:8000/docs`**. 이 문서와 `/docs`가 어긋나면 **코드가 정본**이고, 이 문서를 갱신한다(`05` 문서 도입 시 "API 변경은 문서 동시 수정" 규칙 적용).
 
+## 원근 검색 런타임 연결 (2026-10-15)
+
+`POSE_SEARCH_MODE=perspective`(새 코드 기본값)는 단일 인물·정상 full coverage·
+full_image·전신 pos 검색에서 117개 조합/195개 시작점 조정/Top20 윤곽 재정렬을
+실행한다. Z 모델은 사용하지 않는다. `legacy` 설정과 재시작으로 기존 검색으로
+복귀하며, 부분·다인물·복구·비-pos·원본 BVH 미확보는 기존 경로를 유지한다.
+운영 배포 설정은 이 코드 변경에 포함하지 않는다.
+
+응답 스키마는 그대로다. 새 경로는 점수 미보정 때문에 `confidence=low`,
+`confidence_threshold=null`, `refine_allowed=false`, 출력 `scores=0`을 유지한다.
+`quality_trace.perspective_search`에는 applied/reason/contour 복귀/비용/검색 카메라
+진단값을 남긴다. 후보 `distance`는 카메라 혼합+윤곽 점수이며 legacy 거리와 직접
+비교하면 안 된다. 표시 `view`/`camera v1`은 검색 맞춤 원근 카메라와 다르다.
+세부 적용 범위와 제한: [PERSPECTIVE_RUNTIME.md](PERSPECTIVE_RUNTIME.md).
+
 ## 관측 상체 검색 추가 (2026-10-02)
 
 - 흉상도 추출·검색을 수행하며 응답 `route=core`. 골반을 관측하지 못했으나

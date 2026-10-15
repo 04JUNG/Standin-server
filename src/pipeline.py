@@ -38,6 +38,7 @@ from .logging_setup import log_warn
 from .body_scope import BodyScope, detect_scope
 from .refine_policy import structural_refine_allowed
 from .search import PositionSearchIndex, candidate_stability, knn_geometric, knn_upper_body
+from .pose_quarantine import load_pose_quarantine
 from .tracing import span
 from .skeleton_extraction import (
     apply_crop_result,
@@ -75,6 +76,18 @@ class Pipeline:
             PositionSearchIndex.build(self.entries)
             if CFG.position_search_vectorized else None
         )
+        self.perspective_index = None
+        self.perspective_index_status = "disabled"
+        if CFG.pose_search_mode == "perspective":
+            try:
+                from .perspective_search import PerspectiveSearchIndex
+                self.perspective_index = PerspectiveSearchIndex.build(self.entries)
+                self.perspective_index_status = "ready"
+            except (OSError, ValueError, ImportError, AssertionError, IndexError, KeyError):
+                # No partial gallery: a missing/stale original BVH keeps the
+                # whole original index usable. Never serve fabricated geometry.
+                self.perspective_index_status = "library_unavailable"
+                log_warn("perspective_search_index", status="legacy_fallback")
         self.body_matcher = body_matcher
         self.vlm = vlm_client or build_vlm_client()
         self.detector = detector or MockDetector()
@@ -351,7 +364,8 @@ class Pipeline:
         for slot in slots:
             with span("descriptor_search"):
                 outcome = self._evaluate_slot(
-                    vlm, slot, threshold_scale, (img_w, img_h))
+                    vlm, slot, threshold_scale, (img_w, img_h),
+                    search_image=image if len(slots) == 1 and vlm.num_people == 1 else None)
             if (outcome.stability is not None
                     and outcome.stability["status"] == "unstable"
                     and slot.retry_count == 0
@@ -362,7 +376,8 @@ class Pipeline:
                         finalize_slot(slot, CFG)
                     with span("descriptor_search"):
                         outcome = self._evaluate_slot(
-                            vlm, slot, threshold_scale, (img_w, img_h))
+                            vlm, slot, threshold_scale, (img_w, img_h),
+                            search_image=image if len(slots) == 1 and vlm.num_people == 1 else None)
 
             # crop 후에도 검색이 불안정하고 거리까지 coverage 임계 밖이면 자동 Top-5를
             # 책임질 수 없다. 거리가 임계 안이면 라이브러리 prior를 살려 soft fallback.
@@ -506,6 +521,11 @@ class Pipeline:
                 )
             )
         )
+        # Expanded-camera scores and label ambiguity are not calibrated for
+        # existing refine/orthographic confidence gates, even with v2 enabled.
+        if desc.quality_trace.get("perspective_search", {}).get("applied"):
+            allowed = False
+            desc.quality_trace["refine_policy_block"] = "perspective_camera_unverified"
         desc.refine_allowed = allowed
         desc.refinable_limbs = refinable_limbs
         desc.quality_trace["lower_body_observed"] = bool(
@@ -525,7 +545,8 @@ class Pipeline:
             )
 
     def _evaluate_slot(self, vlm: VLMAnalysis, slot, threshold_scale: float,
-                       image_size: tuple[int, int] | None = None) -> _SlotOutcome:
+                       image_size: tuple[int, int] | None = None,
+                       search_image=None) -> _SlotOutcome:
         """한 슬롯의 masked 검색·A/B 안정성·refine 정책을 한 번에 계산한다."""
         # 태그 호출이 아직 안 끝났으면 여기서 합친다. 두 번째 슬롯부터는 바로 지나간다.
         self._join_person_tags(vlm)
@@ -645,12 +666,15 @@ class Pipeline:
             desc, slot.skeleton, threshold_scale=threshold_scale,
             query_valid_mask=search_mask, distance_metric=search_metric,
             top_k=search_top_k,
+            search_image=search_image if search_scope == "full_body" else None,
         )
         threshold = CFG.fallback_threshold(
             search_metric, desc.coverage_class
         )
         if threshold is not None:
             threshold *= threshold_scale
+        if desc.quality_trace.get("perspective_search", {}).get("applied"):
+            threshold = None
         slot.confidence_threshold = threshold
         slot.rank_distance = candidates[0].distance if candidates else None
         desc.confidence_threshold = threshold
@@ -783,7 +807,7 @@ class Pipeline:
     def _search_one(self, desc, skel, fallback_distance=None,
                     threshold_scale: float = 1.0,
                     query_valid_mask=None,
-                    distance_metric=None, top_k=None):
+                    distance_metric=None, top_k=None, search_image=None):
         # 슬롯 품질 검사를 거친 경로에서는 전체 평균 score를 신뢰도 대용으로 쓰지 않는다.
         if skel is None or desc.feature is None or desc.coverage_class == "insufficient":
             return [], "low", "스켈레톤 추출 실패 → 폴백(작가)"
@@ -793,6 +817,38 @@ class Pipeline:
 
         if query_valid_mask is None:
             query_valid_mask = desc.valid_joint_mask
+        desc.quality_trace["perspective_search"] = {
+            "applied": False, "reason": self.perspective_index_status,
+        }
+        if (CFG.pose_search_mode == "perspective"
+                and self.perspective_index is not None
+                and search_image is not None
+                and (distance_metric or CFG.distance_metric).lower() == "pos"
+                and desc.coverage_class == "full"
+                and desc.skeleton_state == "valid"
+                and desc.skeleton_source == "full_image"
+                and desc.slot_origin != "rtm_provisional"
+                and query_valid_mask is not None):
+            try:
+                cands, trace = self.perspective_index.search(
+                    skel.keypoints, query_valid_mask, search_image,
+                    top_k=top_k or CFG.top_k_final,
+                    quarantined_pose_ids=load_pose_quarantine(CFG),
+                )
+                desc.quality_trace["perspective_search"] = trace
+                # Do not reinterpret a smaller optimized distance as stronger
+                # detection/ownership evidence. Refine stays explicitly off.
+                return cands, "low", (
+                    "원근 카메라 검색 후보; 신뢰도 미보정·자동 refine 금지"
+                    if cands else "후보 없음 → 폴백"
+                )
+            except (ValueError, OSError, ImportError, RuntimeError, AssertionError, IndexError):
+                desc.quality_trace["perspective_search"] = {
+                    "applied": False, "reason": "camera_search_failed",
+                }
+                log_warn("perspective_search", status="legacy_fallback")
+        elif self.perspective_index is not None:
+            desc.quality_trace["perspective_search"]["reason"] = "unsupported_context"
         cands = knn_geometric(
             self.entries, desc.feature,
             top_k=top_k,
