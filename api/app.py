@@ -277,6 +277,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Standin Pose Pipeline", version="0.2.1", lifespan=lifespan)
+from .natural_search import router as natural_search_router
+app.include_router(natural_search_router)
 
 
 def _refine_capability() -> dict:

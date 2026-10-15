@@ -1,0 +1,877 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Standin Natural Part Search Preview",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/natural-search/parts": {
+      "post": {
+        "tags": [
+          "natural-language-preview"
+        ],
+        "summary": "Parts Search",
+        "operationId": "parts_search_natural_search_parts_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PartsSearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NaturalSearchResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/natural-search/text": {
+      "post": {
+        "tags": [
+          "natural-language-preview"
+        ],
+        "summary": "Text Search",
+        "operationId": "text_search_natural_search_text_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TextSearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NaturalSearchResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/natural-search/health": {
+      "get": {
+        "tags": [
+          "natural-language-preview"
+        ],
+        "summary": "Health",
+        "operationId": "health_natural_search_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/natural-search/library/{pose_id}/bvh": {
+      "get": {
+        "tags": [
+          "natural-language-preview"
+        ],
+        "summary": "Source Bvh",
+        "operationId": "source_bvh_natural_search_library__pose_id__bvh_get",
+        "parameters": [
+          {
+            "name": "pose_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Pose Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ErrorDetail": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "retryable": {
+            "type": "boolean",
+            "title": "Retryable"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "retryable"
+        ],
+        "title": "ErrorDetail"
+      },
+      "ErrorResponse": {
+        "properties": {
+          "detail": {
+            "$ref": "#/components/schemas/ErrorDetail"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "detail"
+        ],
+        "title": "ErrorResponse"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "LibraryIdentity": {
+        "properties": {
+          "library_version": {
+            "type": "string",
+            "title": "Library Version"
+          },
+          "db_sha256": {
+            "type": "string",
+            "title": "Db Sha256"
+          },
+          "tags_sha256": {
+            "type": "string",
+            "title": "Tags Sha256"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "eligible": {
+            "type": "integer",
+            "title": "Eligible"
+          },
+          "tag_status": {
+            "type": "string",
+            "const": "draft_unreviewed",
+            "title": "Tag Status",
+            "default": "draft_unreviewed"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "library_version",
+          "db_sha256",
+          "tags_sha256",
+          "total",
+          "eligible"
+        ],
+        "title": "LibraryIdentity"
+      },
+      "LowerPartQuery": {
+        "properties": {
+          "description": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 1,
+            "title": "Description"
+          },
+          "observations": {
+            "items": {
+              "type": "string",
+              "maxLength": 240,
+              "minLength": 1
+            },
+            "type": "array",
+            "maxItems": 8,
+            "title": "Observations"
+          },
+          "group": {
+            "type": "string",
+            "enum": [
+              "standing",
+              "locomotion",
+              "chair_sitting",
+              "floor_sitting",
+              "kneeling_crouching",
+              "lying",
+              "off_ground",
+              "other",
+              "unknown"
+            ],
+            "title": "Group",
+            "default": "unknown"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "description"
+        ],
+        "title": "LowerPartQuery"
+      },
+      "NaturalSearchResponse": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "const": "natural-part-search-api-v1",
+            "title": "Schema Version",
+            "default": "natural-part-search-api-v1"
+          },
+          "request_id": {
+            "type": "string",
+            "title": "Request Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "preview_ready",
+              "no_result",
+              "not_run"
+            ],
+            "title": "Status"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "route": {
+            "type": "string",
+            "const": "natural_language",
+            "title": "Route",
+            "default": "natural_language"
+          },
+          "input_source": {
+            "type": "string",
+            "enum": [
+              "text",
+              "parts"
+            ],
+            "title": "Input Source"
+          },
+          "parsed_parts": {
+            "$ref": "#/components/schemas/ParsedParts"
+          },
+          "parser": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Parser"
+          },
+          "library": {
+            "$ref": "#/components/schemas/LibraryIdentity"
+          },
+          "upper": {
+            "$ref": "#/components/schemas/PartResult"
+          },
+          "lower": {
+            "$ref": "#/components/schemas/PartResult"
+          },
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/PreviewCandidate"
+            },
+            "type": "array",
+            "maxItems": 5,
+            "title": "Candidates"
+          },
+          "export_intent": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Export Intent"
+          },
+          "elapsed_ms": {
+            "type": "number",
+            "title": "Elapsed Ms"
+          },
+          "budget_exhausted": {
+            "type": "boolean",
+            "title": "Budget Exhausted",
+            "default": false
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Warnings"
+          },
+          "skeleton_used_for_ranking": {
+            "type": "boolean",
+            "const": false,
+            "title": "Skeleton Used For Ranking",
+            "default": false
+          },
+          "generation_executed": {
+            "type": "boolean",
+            "const": false,
+            "title": "Generation Executed",
+            "default": false
+          },
+          "release_allowed": {
+            "type": "boolean",
+            "const": false,
+            "title": "Release Allowed",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "request_id",
+          "status",
+          "input_source",
+          "parsed_parts",
+          "parser",
+          "library",
+          "upper",
+          "lower",
+          "candidates",
+          "export_intent",
+          "elapsed_ms",
+          "warnings"
+        ],
+        "title": "NaturalSearchResponse"
+      },
+      "ParsedParts": {
+        "properties": {
+          "upper": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UpperPartQuery"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lower": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LowerPartQuery"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ParsedParts"
+      },
+      "PartHit": {
+        "properties": {
+          "pose_id": {
+            "type": "string",
+            "title": "Pose Id"
+          },
+          "family": {
+            "type": "string",
+            "title": "Family"
+          },
+          "score": {
+            "type": "number",
+            "title": "Score"
+          },
+          "score_kind": {
+            "type": "string",
+            "const": "family_semantic_similarity_not_probability",
+            "title": "Score Kind",
+            "default": "family_semantic_similarity_not_probability"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "bvh_url": {
+            "type": "string",
+            "title": "Bvh Url"
+          },
+          "thumbnail_url": {
+            "type": "null",
+            "title": "Thumbnail Url"
+          },
+          "lateral": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lateral"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "pose_id",
+          "family",
+          "score",
+          "description",
+          "bvh_url"
+        ],
+        "title": "PartHit"
+      },
+      "PartResult": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "inferred_default": {
+            "type": "boolean",
+            "title": "Inferred Default",
+            "default": false
+          },
+          "hits": {
+            "items": {
+              "$ref": "#/components/schemas/PartHit"
+            },
+            "type": "array",
+            "title": "Hits"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "status",
+          "hits"
+        ],
+        "title": "PartResult"
+      },
+      "PartsSearchRequest": {
+        "properties": {
+          "upper": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UpperPartQuery"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lower": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LowerPartQuery"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "top_k": {
+            "type": "integer",
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Top K",
+            "default": 5
+          },
+          "output_scope": {
+            "type": "string",
+            "enum": [
+              "full",
+              "upper_only"
+            ],
+            "title": "Output Scope",
+            "default": "full"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "PartsSearchRequest"
+      },
+      "PreviewCandidate": {
+        "properties": {
+          "pose_id": {
+            "type": "string",
+            "title": "Pose Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "composed_preview",
+              "library_reference"
+            ],
+            "title": "Kind"
+          },
+          "upper_id": {
+            "type": "string",
+            "title": "Upper Id"
+          },
+          "lower_id": {
+            "type": "string",
+            "title": "Lower Id"
+          },
+          "score": {
+            "type": "number",
+            "title": "Score"
+          },
+          "bvh": {
+            "type": "string",
+            "title": "Bvh"
+          },
+          "bvh_sha256": {
+            "type": "string",
+            "title": "Bvh Sha256"
+          },
+          "bvh_url": {
+            "type": "null",
+            "title": "Bvh Url"
+          },
+          "thumbnail_url": {
+            "type": "null",
+            "title": "Thumbnail Url"
+          },
+          "inferred_parts": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "upper",
+                "lower"
+              ]
+            },
+            "type": "array",
+            "title": "Inferred Parts"
+          },
+          "lateral": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Lateral"
+          },
+          "diagnostics": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Diagnostics"
+          },
+          "refine_allowed": {
+            "type": "boolean",
+            "const": false,
+            "title": "Refine Allowed",
+            "default": false
+          },
+          "release_allowed": {
+            "type": "boolean",
+            "const": false,
+            "title": "Release Allowed",
+            "default": false
+          },
+          "actual_mesh_validated": {
+            "type": "boolean",
+            "const": false,
+            "title": "Actual Mesh Validated",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "pose_id",
+          "kind",
+          "upper_id",
+          "lower_id",
+          "score",
+          "bvh",
+          "bvh_sha256",
+          "inferred_parts",
+          "lateral",
+          "diagnostics"
+        ],
+        "title": "PreviewCandidate"
+      },
+      "TextSearchRequest": {
+        "properties": {
+          "top_k": {
+            "type": "integer",
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Top K",
+            "default": 5
+          },
+          "output_scope": {
+            "type": "string",
+            "enum": [
+              "full",
+              "upper_only"
+            ],
+            "title": "Output Scope",
+            "default": "full"
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Text"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "TextSearchRequest"
+      },
+      "UpperPartQuery": {
+        "properties": {
+          "description": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 1,
+            "title": "Description"
+          },
+          "observations": {
+            "items": {
+              "type": "string",
+              "maxLength": 240,
+              "minLength": 1
+            },
+            "type": "array",
+            "maxItems": 8,
+            "title": "Observations"
+          },
+          "group": {
+            "type": "string",
+            "enum": [
+              "arms_down",
+              "arms_front_bent",
+              "arms_forward",
+              "arms_sideways",
+              "arms_raised",
+              "hands_near_face_head",
+              "hands_waist_back",
+              "arms_supporting_body",
+              "other",
+              "unknown"
+            ],
+            "title": "Group",
+            "default": "unknown"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "description"
+        ],
+        "title": "UpperPartQuery"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

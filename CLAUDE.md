@@ -1,5 +1,13 @@
 # CLAUDE.md
 
+2026-10-15: opt-in `/natural-search/text` and `/natural-search/parts` provide
+preview-only semantic-first upper/lower retrieval and existing mirror selection.
+This separate API does NOT change `/analyze`, legacy VLM tags, geometric search,
+refine or export invariants below. Standalone app `api.natural_search_app:app`.
+Default `NATURAL_SEARCH_ENABLED=0`; exact DB/BVH/tag-bound local assets required.
+No asset upload, deployment, generation fallback, actual mesh crop or skin safety
+certification. UI/BFF contract: docs/NATURAL_SEARCH_API.md and exported OpenAPI.
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## 무엇을 하는 코드인가

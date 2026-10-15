@@ -1,5 +1,12 @@
 # API 계약 — 도원 추론 서버 (FastAPI)
 
+2026-10-15 preview 추가: `POST /natural-search/text`, `POST /natural-search/parts`,
+`GET /natural-search/health`, `GET /natural-search/library/{pose_id}/bvh`.
+별도 UI/BFF 앱 `api.natural_search_app:app` 및 상세 계약은
+[NATURAL_SEARCH_API.md](NATURAL_SEARCH_API.md), 정적 스키마는
+[natural-search-v1.json](openapi/natural-search-v1.json).
+기본 비활성·preview 전용이며 기존 러프 분석·refine·export 계약은 변경하지 않는다.
+
 > 상태: 현재 계약 · 갱신일: 2026-10-02 · 기준 코드: `api/app.py`, `api/models.py`
 >
 > 이 문서는 **실제 구현된** HTTP 계약(`api/app.py`·`api/models.py`)을 문서화한다.
