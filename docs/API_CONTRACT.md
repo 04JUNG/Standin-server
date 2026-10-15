@@ -579,6 +579,8 @@ Converter `/healthz`의 `preview_model_revision`과 `character_hashes`로 지원
 
 ## 손 모양·손 후보 (04J-290, 2026-10-14)
 
+> refine 화면·BFF 저장/중계·오류 규칙까지 포함한 전체 설계: [`HAND_SELECTION_DESIGN.md`](HAND_SELECTION_DESIGN.md)
+
 `POST /analyze`의 `people[].hands`에 인물별 좌/우 손 자동 선택과 후보가 실린다
 (`VLM_HAND_SHAPES=1`일 때 VLM 별도 호출로 채움, 꺼져 있으면 `status=not_requested`와 기본값).
 `left`/`right`는 그 인물 자신의 손이다. 각 손: `preset`(자동으로 구울 값), `source`(`vlm`|`default`),

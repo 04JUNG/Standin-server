@@ -6,6 +6,8 @@
 러프에서 손 모양을 읽어 FBX 손가락에 굽고, 자동 선택이 틀릴 때 사용자가 고를 수 있게 손 후보를
 함께 준다. 몸 포즈(V3.2.5)는 바꾸지 않는다.
 
+화면(refine)·BFF·API 설계: [`HAND_SELECTION_DESIGN.md`](HAND_SELECTION_DESIGN.md)
+
 ```
 /analyze ──(VLM 별도 호출, VLM_HAND_SHAPES=1)──▶ people[].hands.{left,right}
                                                    preset      ← 자동으로 구울 값
