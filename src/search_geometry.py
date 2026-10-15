@@ -161,9 +161,10 @@ def optimize_one(points,index,cameras,xy,mask,*,starts=3,steps=DEFAULT_STEPS,swe
     result=np.minimum(result,costs.min(axis=0))
     return result,params[best,cols]
 
-def refine_costs(points,index,cameras,xy,mask,**kwargs):
+def refine_costs(points,index,cameras,xy,mask,*,return_labels=False,**kwargs):
     alt,altmask=alternate_labels(xy,mask)
     direct,dp=optimize_one(points,index,cameras,xy,mask,**kwargs)
     swapped,sp=optimize_one(points,index,cameras,alt,altmask,**kwargs)
     use_swap=swapped<direct
-    return np.minimum(direct,swapped),np.where(use_swap[:,None],sp,dp)
+    result = (np.minimum(direct,swapped),np.where(use_swap[:,None],sp,dp))
+    return result+(use_swap,) if return_labels else result

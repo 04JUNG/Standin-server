@@ -9,11 +9,12 @@ Pipeline이 생성되면 아래 지원 범위에서 `/analyze`의 후보 검색�
 `POSE_SEARCH_MODE=legacy`로 설정하고 프로세스를 다시 시작하면 기존 4시점
 검색만 사용하며 새 BVH/카메라 색인을 로드하지 않는다. 배포 설정은 수정하지 않았다.
 
-지원 범위는 **한 명인 컷의 정상 full coverage·full_image·전신 pos 검색**이다.
+지원 범위는 **refine v2에서 한 명인 컷의 정상 full coverage·full_image·전신 pos 검색**이다.
 다인물(슬롯 1개만 남았어도 VLM 인원수가 2 이상이면 포함), upper_only,
 부분/의심/복구 슬롯, Human-Art rescue의 보수적 검색, angle/hybrid 검색은
 기존 검색과 안전 정책을 유지한다. 인물별 윤곽 분리 없이 다인 컷 전체를
 각 인물에게 매칭시키지 않는다. RTMPose/Human-Art 모델이나 XY 추론은 바꾸지 않는다.
+`REFINE_V2_ENABLED=0`의 v1은 기존 검색·거리 confidence·보정 경로를 함께 유지한다.
 
 ## 실제 호출 경로
 
@@ -42,17 +43,36 @@ family 정책(원본/mirror 묶음)을 적용하고 뒤 후보로 채운다. 입
 
 ## 신뢰도·refine·표시 경계
 
-새 최적화/윤곽 합산 점수에 기존 `FALLBACK_DISTANCE=0.45`를 적용하지 않는다.
-**새 경로 후보는 confidence=low, confidence_threshold=null, refine_allowed=false**다.
-v2 구조 게이트도 이 차단을 우회하지 않으며 구 클라이언트용 출력 scores는 0이다.
-잘못된 좌우/카메라로 자동 관절 보정을 실행하지 않도록 한 안전 경계다.
-자동 refine까지 승격하려면 새 점수 보정과 검색-표시-보정 카메라 계약 검증이 필요하다.
+최초 연결 커밋의 일괄 refine 차단은 제거했다. 새 최적화/윤곽 합산 점수에 기존
+`FALLBACK_DISTANCE=0.45`를 적용하지 않아 confidence=low, confidence_threshold=null은
+유지하지만, **refine_allowed는 기존 v2 구조/소유권/관측 게이트로 결정**한다. 새 점수가
+작아졌다는 이유로 high를 주지 않는다. 정상 입력의 유효 scores도 일괄 0으로 만들지 않는다.
+원래 refine 금지 입력이나 카메라 바인딩 미완성 입력은 계속 차단한다.
 
-API 스키마와 BVH 원본은 유지한다. 기존 `view`는 근처의 라이브러리 썸네일 시점이고,
-`CandidateCamera v1`은 별도의 기존 표시 피팅이다. **정확한 검색 원근 카메라를 화면에
-동일하게 재현했다는 뜻이 아니다.** 검색 fit의 yaw/pitch/몸통 기준 거리는
-`quality_trace.perspective_search.cameras`의 진단값이다. 카메라 비용과 최종 순위 점수를
-구분하며, blend 전체가 하나의 물리 카메라를 뜻하지 않는다.
+`CandidateCamera v2`는 선택한 fit 카메라의 회전·원근/직교·몸통 길이 기준 거리·
+전체 몸의 labels_swapped·원본 BVH SHA·pose_id·query SHA·측정 mask를 전달한다.
+검색은 두 해석 중 실제 선택한 값을 저장하며, API는 다른 표시 카메라를 다시 맞추지 않는다.
+리파인은 회전 정렬된 BVH에서 **원래 골반 중심과 3D 몸통 길이로 고정한 카메라**를
+쓴다. 좌우가 바뀌면 타깃 XY·scores·allowed_limbs·선택 bone_weights도 함께 대응시킨다.
+물리적인 BVH 미러는 하지 않는다. 결과는 기존과 같이 원래 BVH 좌표계로 복원한다.
+
+`src/refine_projection.py`의 요청별 ContextVar 범위에서 library.pose_to_feature가
+고정 원근 투영을 사용한다. v1/v2 전방계산·v2.5 최종 selector의 공통 오차가 같은
+카메라를 사용하며, 다른 요청/예외/중첩 호출 이후에는 원래 투영으로 복원된다.
+거리와 골반 원점은 solver 반복이나 몸통 변화에 맞춰 재피팅하지 않는다. near-plane을
+넘는 제안은 depth clamp로 숨기지 않고 camera_projection_invalid로 원본을 유지한다.
+기존 충돌·이동량·관절 제한·비회귀·selector·시간 제한 게이트를 완화하지 않는다.
+
+camera=null/v1 요청은 기존 방식 그대로다. v2는 필수 projection/좌우/바인딩 필드
+누락, 다른 포즈/쿼리, stale BVH, 측정되지 않은 관절 추가를 거부한다. 클라이언트는
+camera 전체와 distance_metric=perspective_pos를 그대로 /refine에 재전송해야 한다.
+카메라가 탈락한 새 검색 요청을 가까운 4방향으로 조용히 대체하지 않는다. 이 검사는
+계약/좌표 대응 검사이지 클라이언트 입력의 암호학적 인증은 아니다.
+
+기존 view/썸네일은 가까운 라이브러리 시점이다. 표시/썸네일 파이프라인은 회전을
+받아도 아직 직교이므로 **최종 화면의 원근까지 동일하게 재현했다는 뜻은 아니다.**
+이 PR은 서버 API 연결이며 외부 BFF/앱의 v2 전체 필드 전달·화면·운영 부하/배포는
+별도 통합 확인이 필요하다. 검색 fit은 혼합 점수의 한 성분이지 전체 blend의 단일 카메라가 아니다.
 
 Z 추정·팔꿈치/교차 특징 보조점수·수동 러프별 조건·새 roll/이웃 점수는 연결하지 않았다.
 실험 모듈을 런타임에서 import하지 않는다. 동결 실험 파일/해시를 보존하기 위해 검증된
@@ -60,14 +80,17 @@ Z 추정·팔꿈치/교차 특징 보조점수·수동 러프별 조건·새 rol
 
 ## 로컬 확인
 
-- 커밋 대상 기존 테스트와 새18개 계약 테스트: 983개 통과·8개 조건부 skip.
+- 커밋 대상 기존 테스트와 새26개 camera/refine 계약 테스트: 1009개 통과·8개 조건부 skip.
   로컬 모의 HTTP 서버 권한이 필요한 기존4개는 별도 실행해 모두 통과했다
-  (총987개 통과, converter/Blender 테스트 제외). src/api/scripts 컴파일과 diff 검사 통과.
+  (총1013개 통과, converter/Blender 테스트 제외). src/api/scripts 컴파일과 diff 검사 통과.
   외부 유료 API·모델 추론은 호출하지 않았다.
 - 추가 계약 테스트: 기하/카메라·내부 렌더·윤곽의 동결 코드 동등성, 첫 후보 이동,
   전체 윤곽 복귀, quarantine/family backfill, BVH/투영 불일치 거부, 입력 불변,
-  두 요청 동시 실행, legacy 롤백, 예외 복귀, 전신 컷 연결 및 v2 refine 차단,
-  다인물 컷 윤곽 차단 등을 확인했다.
+  두 요청 동시 실행, legacy 롤백, 예외 복귀, 전신 컷 연결 및 v2 구조 게이트 유지,
+  다인물 컷 윤곽 차단 등을 확인했다. 추가로 실제 v2 솔버의 직교/원근 두 구도 ×
+  직접/좌우 교환 × conservative/aggressive 12조건에서 알려진 팔 각도 차이가 줄어드는지,
+  원점·뼈 길이 보존/원본 복원, 같은 투영의 최종 selector, HTTP analyze→refine 바인딩과
+  near-plane 원본 복귀, stale/누락/다른 query 거부, 스레드/예외 격리를 검사했다.
 - 기존 검수 러프10장의 **저장된 측정 XY만** 사용한 구성요소 재실행:
   동일한 1995 포즈 번들, 검색가능9장 모두 런타임과 동결 정책의 Top5 ID·점수 일치.
   rough_178의 기존 관절 기준 미달은 분모에 남겼다. 원본3D 정답이 없어 정확도는 null이다.
@@ -76,11 +99,14 @@ Z 추정·팔꿈치/교차 특징 보조점수·수동 러프별 조건·새 rol
   모델 추론·API·표시 카메라 fitting·네트워크를 포함한 운영 응답시간이 아니다.
 - 원본 DB는 `mode=ro`로만 읽고 DB/BVH/그림/측정 XY의 실행 전후 해시를 확인했다.
   출력은 ignored `out/perspective-runtime-replay-20261015/results.json`에만 보관한다.
+  리파인 연결 후에도 `out/search-refine-runtime-replay-20261015/results.json`에서 9장 모두
+  검색 순위/점수 동등성을 재확인했다. 새 카메라 메타데이터 추가로 검색 순위를 바꾸지 않았다.
 
 재현:
 
 ```sh
 python -m pytest -q tests/test_perspective_runtime.py
+python -m pytest -q tests/test_search_camera_refine.py tests/test_candidate_camera.py
 python scripts/check_perspective_runtime.py \
   --library-root /path/to/frozen-bundle \
   --review-root /path/to/rough-test-perspective-review-20261013 \

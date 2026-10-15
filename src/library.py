@@ -19,6 +19,7 @@ import numpy as np
 from .schema import LibraryEntry, View, Shot, Action, Relationship, COCO17
 from .features import normalize_skeleton, _BODY
 from .bvh import load_coco17
+from .refine_projection import active_projection
 
 
 # ---- 3D → 2D 투영 --------------------------------------------------------
@@ -63,9 +64,15 @@ def pose_to_feature(joints3d: np.ndarray, view, scores: np.ndarray | None = None
     """
     if scores is None:
         scores = np.ones(17, dtype=np.float32)
-    kp2d = project_3d_to_2d(joints3d, view_angle(view)).copy()
-    # 투영 좌표는 y가 위로 +이므로 이미지 좌표(y 아래로 +)와 맞추려 부호 반전
-    kp2d[:, 1] *= -1
+    projection = active_projection()
+    if projection is None:
+        kp2d = project_3d_to_2d(joints3d, view_angle(view)).copy()
+        # 투영 좌표는 y가 위로 +이므로 이미지 좌표(y 아래로 +)와 맞추려 부호 반전
+        kp2d[:, 1] *= -1
+    else:
+        if view not in (View.FRONT, 'front'):
+            raise ValueError('search camera refine requires aligned front frame')
+        kp2d = projection.project(joints3d)
     return normalize_skeleton(kp2d, scores)
 
 

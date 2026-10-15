@@ -3,7 +3,9 @@
 No models, answers, experiment outputs, DB writes or network calls are used.
 An index belongs to one Pipeline/library snapshot; requests never mutate it.
 """
+from __future__ import annotations
 from dataclasses import dataclass
+import hashlib
 from pathlib import Path
 from time import perf_counter
 
@@ -13,6 +15,7 @@ from .bvh import load_coco17
 from .library import pose_to_feature
 from .schema import PoseCandidate
 from .search import pose_family_id
+from .refine_projection import search_camera
 from .search_geometry import (
     Camera, alternate_labels, build_camera_index, camera_grid,
     normalize_batch, normalized_joints, refine_costs, score_camera_index,
@@ -24,6 +27,7 @@ class _Pose:
     entry: object
     joints: np.ndarray
     entries: tuple
+    source_sha256: str | None = None
 
 
 def _readonly(array):
@@ -61,7 +65,10 @@ class PerspectiveSearchIndex:
                    pose_family_id(v.pose_id, v.meta) != pose_family_id(pid, entry.meta)
                    for v in variants):
                 raise ValueError("inconsistent pose metadata across projections")
+            source_sha256 = hashlib.sha256(Path(entry.bvh_path).read_bytes()).hexdigest()
             joints, scores = load_coco17(entry.bvh_path)
+            if hashlib.sha256(Path(entry.bvh_path).read_bytes()).hexdigest() != source_sha256:
+                raise ValueError('BVH changed during index construction')
             if (joints.shape != (17, 3) or not np.isfinite(joints).all()
                     or not np.isfinite(scores).all() or np.any(scores[5:] < .3)):
                 raise ValueError("incomplete BVH body mapping")
@@ -71,7 +78,7 @@ class PerspectiveSearchIndex:
                 expected = pose_to_feature(joints, variant.view, scores)
                 if not np.allclose(expected, variant.feature, atol=3e-4, rtol=1e-5):
                     raise ValueError("BVH and stored library projection disagree")
-            poses.append(_Pose(entry, _readonly(joints.copy()), tuple(variants)))
+            poses.append(_Pose(entry, _readonly(joints.copy()), tuple(variants), source_sha256))
         return cls(poses)
 
     def search(self, keypoints, mask, image, *, top_k=5, quarantined_pose_ids=()):
@@ -98,7 +105,8 @@ class PerspectiveSearchIndex:
         coarse = tuple(a[:117] for a in index)
         base = np.minimum(score_camera_index(coarse, q, mask),
                           score_camera_index(coarse, alternate, am))
-        fit, parameters = refine_costs(self.points[eligible], index, self.cameras, q, mask)
+        fit, parameters, swapped = refine_costs(
+            self.points[eligible], index, self.cameras, q, mask, return_labels=True)
         scores = .25 * base.astype(float) + .75 * fit.astype(float)
         if not np.isfinite(scores).all():
             raise ValueError("nonfinite camera costs")
@@ -152,6 +160,10 @@ class PerspectiveSearchIndex:
                 'yaw': yaw, 'pitch': pitch,
                 'distance_torso': None if inverse == 0 else 1/inverse,
                 'camera_cost': float(scores[i]), 'ranking_score': float(total[i]),
+                'refine_camera': search_camera(
+                    p.entry.pose_id, p.source_sha256, xy, mask, parameters[i],
+                    swapped[i], nearest.view.value, fit[i],
+                ) if p.source_sha256 else None,
             }
             if len(candidates) >= top_k:
                 break
@@ -162,5 +174,6 @@ class PerspectiveSearchIndex:
             'gallery_poses': len(poses), 'cameras': cameras,
             'elapsed_ms': round((perf_counter()-started)*1000, 3),
             'confidence_calibrated': False,
-            'display_camera': 'legacy presentation; not the fitted perspective camera',
+            'refine_context_ready': bool(candidates) and all(c['refine_camera'] for c in cameras.values()),
+            'display_camera': 'search rotation; legacy thumbnails remain orthographic',
         }

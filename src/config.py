@@ -106,7 +106,7 @@ class Config:
 
     # --- 검색 ---
     # 새 코드 배포 후 전신·단일 인물 검색에 적용. legacy는 즉시 롤백 스위치.
-    # 부분 관측/다인물/비-pos/원본 BVH 미확보는 기존 검색을 유지한다.
+    # 부분 관측/다인물/비-pos/원본 BVH 미확보/refine v1은 기존 검색을 유지한다.
     pose_search_mode: str = os.getenv("POSE_SEARCH_MODE", "perspective")
     top_n_search: int = 20     # kNN 1차 후보 수(→ rerank 입력)
     top_k_final: int = 5       # 작가에게 보여줄 최종 후보 수

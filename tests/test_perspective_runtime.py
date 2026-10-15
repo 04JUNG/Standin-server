@@ -19,7 +19,7 @@ def gallery(names=('a', 'b', 'c')):
     for i, name in enumerate(names):
         points = _synthetic_pose(('standing', 'sitting', 'reaching')[i % 3])
         entries = build_entries_from_pose(name, points, {}, name+'.bvh')
-        poses.append(_Pose(entries[0], points, tuple(entries)))
+        poses.append(_Pose(entries[0], points, tuple(entries), 'a'*64))
     return PerspectiveSearchIndex(poses)
 
 
@@ -87,7 +87,7 @@ def controlled_search(index, penalties, failure=None, quarantine=()):
             raise ValueError('surface intersects camera')
         return value, None, None
     with patch('src.perspective_search.score_camera_index', return_value=values), \
-         patch('src.perspective_search.refine_costs', return_value=(values, np.zeros((n,3)))), \
+         patch('src.perspective_search.refine_costs', return_value=(values, np.zeros((n,3)), np.zeros(n,bool))), \
          patch('src.search_contour.prepare_letterboxed_query', return_value=({}, {})), \
          patch('src.search_contour.candidate_evidence', side_effect=evidence):
         return index.search(xy, mask, image, top_k=3, quarantined_pose_ids=quarantine)
@@ -134,6 +134,7 @@ def test_bvh_snapshot_validation_is_all_or_nothing():
     points = _synthetic_pose('standing')
     entries = build_entries_from_pose('a', points, {}, 'a.bvh')
     with patch('pathlib.Path.is_file', return_value=True), \
+         patch('pathlib.Path.read_bytes', return_value=b'fixture'), \
          patch('src.perspective_search.load_coco17', return_value=(points, np.ones(17))):
         assert len(PerspectiveSearchIndex.build(entries).poses) == 1
         entries[1].feature = entries[1].feature + 1
@@ -162,6 +163,7 @@ def test_unavailable_index_preserves_original_candidates():
 def test_new_search_routes_through_pipeline_and_remains_low_confidence():
     index = gallery()
     with patch.object(CFG, 'pose_search_mode', 'perspective'), \
+         patch.object(CFG, 'refine_v2_enabled', True), \
          patch.object(PerspectiveSearchIndex, 'build', return_value=index):
         pipe = Pipeline(build_synthetic_index())
         desc = descriptor()
@@ -173,6 +175,7 @@ def test_new_search_routes_through_pipeline_and_remains_low_confidence():
 def test_nonpos_partial_and_no_image_keep_legacy_path():
     index = gallery()
     with patch.object(CFG, 'pose_search_mode', 'perspective'), \
+         patch.object(CFG, 'refine_v2_enabled', True), \
          patch.object(PerspectiveSearchIndex, 'build', return_value=index):
         pipe = Pipeline(build_synthetic_index())
         for coverage, metric, image in (('reduced','pos',observations()[2]),
@@ -186,6 +189,7 @@ def test_nonpos_partial_and_no_image_keep_legacy_path():
 def test_camera_failure_falls_back_to_complete_legacy_search():
     index = gallery()
     with patch.object(CFG, 'pose_search_mode', 'perspective'), \
+         patch.object(CFG, 'refine_v2_enabled', True), \
          patch.object(PerspectiveSearchIndex, 'build', return_value=index), \
          patch.object(index, 'search', side_effect=ValueError('invalid camera')):
         pipe = Pipeline(build_synthetic_index()); desc = descriptor()
@@ -194,7 +198,7 @@ def test_camera_failure_falls_back_to_complete_legacy_search():
             'applied': False, 'reason': 'camera_search_failed'}
 
 
-def test_full_cut_reaches_camera_search_but_refine_is_blocked_even_v2():
+def test_full_cut_reaches_camera_search_and_preserves_v2_structural_refine():
     xy, _, image = observations()
     class VLM:
         def analyze(self, *args):
@@ -212,9 +216,9 @@ def test_full_cut_reaches_camera_search_but_refine_is_blocked_even_v2():
     assert result.candidates and result.person_confidence == ['low']
     desc = result.descriptors[0]
     assert desc.quality_trace['perspective_search']['applied']
-    assert desc.confidence_threshold is None and not desc.refine_allowed
-    assert desc.quality_trace['refine_policy_block'] == 'perspective_camera_unverified'
-    assert not desc.skeleton.scores.any()
+    assert desc.confidence_threshold is None and desc.refine_allowed
+    assert 'refine_policy_block' not in desc.quality_trace
+    assert desc.skeleton.scores.any() and desc.distance_metric=='perspective_pos'
 
 
 def test_search_mode_rejects_typo():

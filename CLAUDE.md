@@ -155,9 +155,12 @@ VLM.analyze  ── 1회 호출로 개수·shot·action·view·relationship·대
 일치하는 라이브러리에서 정상 full coverage·단일 인물·pos 전신 검색은
 117개 카메라 → 195개 시작점 미세 조정 → .25/.75 혼합 → Top20 공정 윤곽
 재정렬을 사용한다. Z 추정은 하지 않는다. 부분 관측/다인물/복구/비-pos 및
-BVH 미확보는 기존 경로를 유지한다. 새 점수는 기존 confidence 임계값을 쓰지
-않고 low/refine_allowed=false를 유지한다. `POSE_SEARCH_MODE=legacy`와
-프로세스 재시작으로 롤백한다. 표시 카메라와 검색 원근은 아직 별개다.
+BVH 미확보·refine v1 설정은 기존 경로를 유지한다. 새 점수는 기존 confidence
+임계값을 쓰지 않아 low지만, refine v2는 기존 구조 안전 정책에 따라 계속 허용한다.
+candidate-camera-v2의 전체 회전/원근 거리/좌우 해석을 /refine에 그대로 전달한다.
+리파인 전방계산과 최종 selector가 요청 범위 내에서 같은 고정 원근을 사용한다.
+기존 보정/충돌/비회귀 게이트는 유지하며 결과는 원본 BVH 좌표로 복구한다.
+POSE_SEARCH_MODE=legacy와 프로세스 재시작으로 롤백한다. 썸네일은 아직 직교다.
 세부 계약·테스트: [PERSPECTIVE_RUNTIME.md](docs/PERSPECTIVE_RUNTIME.md).
 
 아래는 legacy 검색 경로의 설명이다.

@@ -521,9 +521,10 @@ class Pipeline:
                 )
             )
         )
-        # Expanded-camera scores and label ambiguity are not calibrated for
-        # existing refine/orthographic confidence gates, even with v2 enabled.
-        if desc.quality_trace.get("perspective_search", {}).get("applied"):
+        search_trace = desc.quality_trace.get("perspective_search", {})
+        # Keep existing v2 structural gates. Only an incomplete camera binding
+        # blocks refine; low search confidence is already not a v2 gate.
+        if search_trace.get("applied") and not search_trace.get("refine_context_ready"):
             allowed = False
             desc.quality_trace["refine_policy_block"] = "perspective_camera_unverified"
         desc.refine_allowed = allowed
@@ -821,6 +822,7 @@ class Pipeline:
             "applied": False, "reason": self.perspective_index_status,
         }
         if (CFG.pose_search_mode == "perspective"
+                and CFG.refine_v2_enabled  # v1 keeps its original search/confidence gates
                 and self.perspective_index is not None
                 and search_image is not None
                 and (distance_metric or CFG.distance_metric).lower() == "pos"
@@ -836,10 +838,11 @@ class Pipeline:
                     quarantined_pose_ids=load_pose_quarantine(CFG),
                 )
                 desc.quality_trace["perspective_search"] = trace
+                desc.distance_metric = 'perspective_pos'
                 # Do not reinterpret a smaller optimized distance as stronger
-                # detection/ownership evidence. Refine stays explicitly off.
+                # detection/ownership evidence. Refine uses its v2 structural gates.
                 return cands, "low", (
-                    "원근 카메라 검색 후보; 신뢰도 미보정·자동 refine 금지"
+                    "원근 카메라 검색 후보; 신뢰도 미보정·refine은 관절/소유권 검사 적용"
                     if cands else "후보 없음 → 폴백"
                 )
             except (ValueError, OSError, ImportError, RuntimeError, AssertionError, IndexError):
