@@ -139,6 +139,10 @@ class BaseVLMClient:
         """
         return None
 
+    def read_hands(self, image, boxes: list) -> Optional[dict]:
+        """인물별 손 모양(04J-290). 지원하지 않는 provider는 None → 손은 기본값."""
+        return None
+
     def rerank(self, image, candidates: list, query_tags: dict) -> list:
         """
         Top-N 후보를 의미 기준으로 재정렬(선택). 기본은 no-op(순서 유지).
@@ -271,6 +275,38 @@ class GeminiVLMClient(BaseVLMClient):
         except Exception as error:
             # 실패를 올려 보내지 않는다. 분석은 이미 끝났고 태그는 없어도 되는 값이다.
             log_warn("gemini_person_tags", model=self._model, status="failed",
+                     errorType=type(error).__name__,
+                     elapsedMs=round((self._clock() - started) * 1000))
+            return None
+
+    def read_hands(self, image, boxes: list) -> Optional[dict]:
+        """손 모양 전용 호출. 재시도하지 않는다 — 실패하면 손은 기본값(relaxed)으로 간다."""
+        from google.genai import types
+
+        from converter.hand_library import load_library
+
+        library = load_library()
+        presets = [(p.preset_id, p.label_ko, p.vlm_hint, library.categories[p.category])
+                   for p in library.presets.values()]
+        started = self._clock()
+        try:
+            resp = self._client.models.generate_content(
+                model=self._model,
+                contents=[prompts.hand_shapes_prompt(boxes, presets), self._to_part(image)],
+                config=types.GenerateContentConfig(
+                    system_instruction=prompts.HAND_SHAPES_SYSTEM,
+                    response_mime_type="application/json",
+                    temperature=0,
+                    http_options=types.HttpOptions(timeout=CFG.vlm_hand_shapes_timeout_ms),
+                ),
+            )
+            payload = _extract_json(resp.text)
+            log_info("gemini_hand_shapes", model=self._model, status="ok",
+                     people=len(boxes),
+                     elapsedMs=round((self._clock() - started) * 1000))
+            return payload if isinstance(payload, dict) else None
+        except Exception as error:
+            log_warn("gemini_hand_shapes", model=self._model, status="failed",
                      errorType=type(error).__name__,
                      elapsedMs=round((self._clock() - started) * 1000))
             return None
