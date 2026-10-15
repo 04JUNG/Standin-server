@@ -397,7 +397,16 @@ class BlenderRunner:
         preview_view: str | None = None,
         camera_rotation: list | None = None,
         preview_model: bool = False,
+        shape_recipe: dict | None = None,
     ) -> ConversionResult:
+        if shape_recipe is not None and report.get("ok"):
+            shape = report.get("shape_bake", {})
+            if (shape.get("shape_sha256") != shape_recipe["shape_sha256"] or
+                shape.get("rules") != shape_recipe["rules"] or
+                shape.get("controls") != shape_recipe["values"] or
+                shape.get("blend_sha256") != shape_recipe["blend_sha256"] or
+                shape.get("controller_sha256") != shape_recipe["controller_sha256"]):
+                raise WorkerIntegrityError("shape bake lineage mismatch", report=report)
         if not report.get("ok"):
             raise self._report_error(report)
         if returncode != 0:
@@ -582,7 +591,10 @@ class BlenderRunner:
         preview_view: str | None = None,
         camera_rotation: list | None = None,
         preview_model: bool = False,
+        shape_recipe: dict | None = None,
     ) -> ConversionResult:
+        if shape_recipe is not None and self.settings.force_exact_v324:
+            raise ConversionRejectedError("exact V3.2.4 mode does not permit shape baking")
         if not bvh_bytes:
             raise ConversionRejectedError("BVH upload is empty")
         if type(mirror) is not bool:
@@ -626,6 +638,7 @@ class BlenderRunner:
                 preview_view=preview_view,
                 camera_rotation=camera_rotation,
                 preview_model=preview_model,
+                shape_recipe=shape_recipe,
             )
         finally:
             execution_ms = (time.monotonic() - execution_started) * 1000.0
@@ -653,6 +666,7 @@ class BlenderRunner:
         preview_view: str | None = None,
         camera_rotation: list | None = None,
         preview_model: bool = False,
+        shape_recipe: dict | None = None,
     ) -> ConversionResult:
         if not character_path.is_file() or character_path.suffix.lower() != ".fbx":
             raise WorkerIntegrityError("character artifact is not a regular FBX file")
@@ -702,6 +716,7 @@ class BlenderRunner:
                 "preview_view": preview_view,
                 "camera_rotation": camera_rotation,
                 "preview_model": preview_model,
+                **({"shape_recipe": shape_recipe} if shape_recipe is not None else {}),
             }
             job_path.write_text(
                 json.dumps(job, sort_keys=True, separators=(",", ":")) + "\n",
@@ -750,6 +765,7 @@ class BlenderRunner:
                 preview_view=preview_view,
                 camera_rotation=camera_rotation,
                 preview_model=preview_model,
+                shape_recipe=shape_recipe,
             )
 
 

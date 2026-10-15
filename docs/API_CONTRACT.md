@@ -555,3 +555,27 @@ Converter `/healthz`의 `preview_model_revision`과 `character_hashes`로 지원
 캐시 세대를 확인한다. exact V3.2.4 모드에서는 모델 capability가 꺼진다.
 모델 export용 모듈은 기존 `posed-mesh-v1` exporter와 분리하여 기존 사전 생성
 라이브러리의 키를 무효화하지 않는다. 배포 순서는 Converter/추론 → BFF → 앱이다.
+
+
+## Internal converter: numeric body baking (2026-10-15)
+
+`POST /convert-framed` accepts an optional multipart `shape` JSON string:
+`{schemaVersion:"body-shape.v1", controls:{...}, shapeSha256:"..."}`.
+The BFF validates/normalizes controls first; the converter independently checks
+keys, finite values, ranges, step and the same digest. Request-selected source
+paths or Python code are never accepted. Only `CONVERTER_SHAPE_REGISTRY` recipes
+using the SHA-pinned confirmed male 0.6.7/female 0.2.2 sources can run.
+
+The approved controller bakes neutral mesh and bone proportions, the existing
+V3.2.5 solver transfers the BVH, and approved pose/contact correction is baked
+before framing. PNG and final review GLB are made from that exact final FBX.
+Response adds `shape_sha256` and `shape_bake` lineage/roundtrip metrics.
+`CONVERTER_FORCE_EXACT_V324` rejects shape baking rather than claiming exact-parent
+compatibility. New shape FBXs preserve all 52 real terminal bones; only synthetic
+unweighted `_end` markers are removed during the isolated shape job.
+
+BFF `BODY_SHAPE_BAKE_ENABLED` defaults off. Enable with `BODY_SHAPE_EDIT_ENABLED`
+only after deploying matching converter/BFF code and immutable source/catalog data.
+Modified-body Top-K uses PNG fallback instead of an unrelated precomputed GLB;
+final review GLB is generated from the shaped FBX. New catalogs remain draft for
+inference matching; supported BVHs are explicit and do not imply full-library QA.

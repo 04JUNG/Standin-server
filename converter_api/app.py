@@ -306,6 +306,7 @@ def create_app(
     max_bvh_bytes: int | None = None,
 ) -> FastAPI:
     character_registry = registry or CharacterRegistry.from_env()
+    default_character_id = getattr(character_registry, "default_character_id", "standin-master-v2")
     blender_runner = runner or BlenderRunner()
     size_limit = (
         max_bvh_bytes
@@ -354,7 +355,7 @@ def create_app(
         return preview_contract()
 
     @app.get("/pose-preview/{source_sha}")
-    def pose_preview(source_sha: str, character_id: str = "standin-master-v2",
+    def pose_preview(source_sha: str, character_id: str = default_character_id,
                      expected_character_sha256: str | None = None,
                      expected_preview_revision: str | None = None):
         if not SHA256_RE.fullmatch(source_sha):
@@ -450,6 +451,21 @@ def create_app(
                 "ok": False,
                 "code": type(exc).__name__,
             }
+        if os.getenv("CONVERTER_SHAPE_REGISTRY"):
+            try:
+                from pathlib import Path
+                from converter.shape_spec import validate_recipe
+                registry_data=json.loads(Path(os.environ["CONVERTER_SHAPE_REGISTRY"]).read_text())
+                if registry_data.get("schema") != "shape-bake.v1" or not registry_data.get("characters"):
+                    raise ValueError("invalid shape registry")
+                seen=set()
+                for recipe in registry_data["characters"].values():
+                    identity=(recipe.get("blend"),recipe.get("controller"),recipe.get("rules"))
+                    validate_recipe(recipe, verify_files=False)
+                    if identity not in seen:validate_recipe(recipe);seen.add(identity)
+                checks["shape_sources"]={"ok":True,"schema":"shape-bake.v1","models":len(registry_data["characters"])}
+            except (ValueError,KeyError,OSError,TypeError):
+                ok=False;checks["shape_sources"]={"ok":False,"code":"SHAPE_SOURCE_UNAVAILABLE"}
         payload = {
             "ok": ok,
             "solver_version": SOLVER_VERSION,
@@ -488,6 +504,7 @@ def create_app(
         preview_view: str | None = None,
         camera_rotation: list | None = None,
         preview_model: bool = False,
+        shape: str | None = None,
     ) -> CompletedConversion:
         conversion_id = str(uuid.uuid4())
         request_started = time.monotonic()
@@ -544,6 +561,14 @@ def create_app(
                 verify_character_sha(expected_character_sha256, character_registry.metadata(character_id).sha256)
             resolved = character_registry.resolve(character_id)
             verify_character_sha(expected_character_sha256, resolved.metadata.sha256)
+            from converter.shape_spec import resolve_shape, ShapeError
+            if shape is not None and len(shape) > 16384:
+                raise ApiProblem(413, "INVALID_SHAPE", "shape payload is too large", conversion_id=conversion_id)
+            try:
+                shape_recipe = resolve_shape(character_id, resolved.metadata.sha256,
+                                             json.loads(shape) if shape is not None else None)
+            except (ShapeError, ValueError, KeyError, OSError) as exc:
+                raise ApiProblem(400, "INVALID_SHAPE", str(exc), conversion_id=conversion_id) from exc
             result = blender_runner.convert(
                 bvh_bytes=bvh_bytes,
                 character_path=resolved.path,
@@ -554,6 +579,7 @@ def create_app(
                 thumbnail=thumbnail,
                 output_scope=output_scope,
                 preview_view=preview_view,
+                **({"shape_recipe": shape_recipe} if shape_recipe is not None else {}),
                 **({"camera_rotation": camera_rotation} if camera_rotation is not None else {}),
                 **({"preview_model": True} if preview_model else {}),
             )
@@ -697,7 +723,7 @@ def create_app(
     )
     def convert(
         bvh: UploadFile = File(...),
-        character_id: str = Form(default="standin-master-v2"),
+        character_id: str = Form(default=default_character_id),
         frame: int = Form(default=FRAME),
         mirror: bool = Form(default=False),
         output_mode: str = Form(default=OUTPUT_MODE),
@@ -752,7 +778,7 @@ def create_app(
         bvh: UploadFile = File(...),
         artifact_kind: str = Form(...),
         expected_bvh_sha256: str = Form(...),
-        character_id: str = Form(default="standin-master-v2"),
+        character_id: str = Form(default=default_character_id),
         frame: int = Form(default=FRAME),
         mirror: bool = Form(default=False),
         output_mode: str = Form(default=OUTPUT_MODE),
@@ -816,7 +842,7 @@ def create_app(
     )
     def render_thumbnail(
         bvh: UploadFile = File(...),
-        character_id: str = Form(default="standin-master-v2"),
+        character_id: str = Form(default=default_character_id),
         view: str = Form(default="front"),
         size: int = Form(default=THUMBNAIL_DEFAULT_SIZE),
         format: str = Form(default="png"),
@@ -924,7 +950,7 @@ def create_app(
     @app.post("/convert-framed")
     def convert_framed(
         bvh: UploadFile = File(...),
-        character_id: str = Form(default="standin-master-v2"),
+        character_id: str = Form(default=default_character_id),
         output_scope: str = Form(default="full"),
         preview_view: str = Form(default="front"),
         expected_bvh_sha256: str = Form(...),
@@ -932,6 +958,7 @@ def create_app(
         expected_preview_revision: str | None = Form(default=None),
         camera_rotation: str | None = Form(default=None),
         preview_format: str = Form(default="png"),
+        shape: str | None = Form(default=None),
     ):
         """One verified FBX plus its own reimported preview, in a single response."""
         contract = verify_preview_revision(expected_preview_revision)
@@ -950,7 +977,7 @@ def create_app(
             response_format="framed", expected_bvh_sha256=expected_bvh_sha256,
             expected_character_sha256=expected_character_sha256,
             output_scope=output_scope, preview_view=preview_view if preview_format == "png" else None,
-            camera_rotation=rotation, preview_model=preview_format == "model",
+            camera_rotation=rotation, preview_model=preview_format == "model", shape=shape,
         )
         result = completed.result
         if preview_format == "model":
@@ -977,6 +1004,8 @@ def create_app(
                 "character_id": completed.character.metadata.character_id,
                 "character_sha256": completed.character.metadata.sha256,
                 "source_bvh_sha256": result.source_bvh_sha256,
+                "shape_sha256": result.report.get("shape_bake", {}).get("shape_sha256"),
+                "shape_bake": result.report.get("shape_bake"),
                 "fbx_sha256": result.artifact_sha256,
                 "preview_sha256": hashlib.sha256(result.preview_model).hexdigest(),
                 "fbx_base64": base64.b64encode(result.artifact).decode("ascii"),
@@ -999,7 +1028,9 @@ def create_app(
             "character_id": completed.character.metadata.character_id,
             "character_sha256": completed.character.metadata.sha256,
             "source_bvh_sha256": result.source_bvh_sha256,
-            "fbx_sha256": result.artifact_sha256,
+            "shape_sha256": result.report.get("shape_bake", {}).get("shape_sha256"),
+                "shape_bake": result.report.get("shape_bake"),
+                "fbx_sha256": result.artifact_sha256,
             "preview_sha256": result.report["preview_sha256"],
             "camera_rotation": rotation,
             "fbx_base64": base64.b64encode(result.artifact).decode("ascii"),

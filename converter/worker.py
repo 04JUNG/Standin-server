@@ -101,7 +101,7 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
         "apply_root_translation", "embed_textures",
         "force_exact_v324", "thumbnail",
     }
-    unknown = set(raw) - required - {"output_scope", "preview_view", "camera_rotation", "preview_model"}
+    unknown = set(raw) - required - {"output_scope", "preview_view", "camera_rotation", "preview_model", "shape_recipe"}
     missing = required - set(raw)
     if missing or unknown:
         raise JobValidationError(
@@ -311,6 +311,15 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
     if _sha256(Path(job["character_fbx"])) != job["character_sha256"]:
         raise ArtifactValidationError("character artifact SHA256 changed before conversion")
 
+    recipe = job.get("shape_recipe")
+    if recipe is not None:
+        from converter.shape_bake import convert_shaped, import_full_character
+        from converter import retarget as rt
+        # This fresh one-job process uses the shape FBX terminal-bone policy
+        # through retarget, framing and final GLB/PNG reimports.
+        rt.import_character = import_full_character
+        from functools import partial
+        convert = partial(convert_shaped, recipe=recipe)
     report = convert(
         bvh_path=job["bvh_path"],
         character_fbx=job["character_fbx"],
@@ -323,6 +332,8 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
         force_exact_v324=job["force_exact_v324"],
     )
     payload = report.as_dict()
+    if recipe is not None and report.ok:
+        payload["shape_bake"] = json.loads(Path(job["output_path"]).with_suffix(".shape.json").read_text())
     if report.ok:
         from converter.framing import process_output
         scope = job.get("output_scope", "full")
@@ -367,6 +378,7 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
                 "source_bvh_sha256": source_bvh_sha256,
                 "character_id": job["character_id"], "character_sha256": job["character_sha256"],
                 "scope": job.get("output_scope", "full"),
+                **({"shape_sha256": recipe["shape_sha256"], "shape_rules": recipe["rules"]} if recipe else {}),
                 "camera_rotation": job.get("camera_rotation"),
             })
         if job["thumbnail"] is not None:

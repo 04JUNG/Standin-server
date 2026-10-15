@@ -85,6 +85,8 @@ COPY converter/retarget.py /app/converter/retarget.py
 COPY converter/thumbnail_render.py /app/converter/thumbnail_render.py
 COPY converter/preview_style.py /app/converter/preview_style.py
 COPY converter/preview_studio.sl /app/converter/preview_studio.sl
+COPY converter/shape_spec.py /app/converter/shape_spec.py
+COPY converter/shape_bake.py /app/converter/shape_bake.py
 COPY converter/worker.py /app/converter/worker.py
 COPY converter/framing.py /app/converter/framing.py
 COPY converter/camera.py /app/converter/camera.py
