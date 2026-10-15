@@ -86,6 +86,19 @@ class Semantic285Adapter:
         return result('no_result',reason=reason)
 
 
+def excluded_pose_ids():
+    """Shared exclusions for both sides of whole-body hybrid retrieval."""
+    excluded = set(load_pose_quarantine(CFG))
+    policy = json.loads((ROOT/'config/semantic_quarantine_285.v1.json').read_text())
+    if policy.get('schema_version') != 1 or not isinstance(policy.get('entries'), list):
+        raise ValueError('invalid imported quarantine')
+    for entry in policy['entries']:
+        if not isinstance(entry.get('pose_id'), str) or not entry.get('reason'):
+            raise ValueError('invalid imported quarantine entry')
+        excluded.add(entry['pose_id'])
+    return excluded
+
+
 def build_semantic285_searcher(*,tags_path,taxonomy_path,db_path,library_pose_ids=None,
         lexicon_path=None,shape_index_path=None,body_index_path=None,dense_model_dir=None,
         dense_cache_dir=None,settings=None,review_preferences_path=None):
@@ -96,12 +109,7 @@ def build_semantic285_searcher(*,tags_path,taxonomy_path,db_path,library_pose_id
         if dense_model_dir:
             from .semantic_embedding import E5OnnxEncoder
             dense=E5OnnxEncoder(str(dense_model_dir),cache_dir=str(dense_cache_dir or ROOT/'tmp/semantic285-dense-cache'),threads=1)
-        excluded=set(load_pose_quarantine(CFG))
-        policy=json.loads((ROOT/'config/semantic_quarantine_285.v1.json').read_text())
-        if policy.get('schema_version')!=1 or not isinstance(policy.get('entries'),list):raise ValueError('invalid imported quarantine')
-        for entry in policy['entries']:
-            if not isinstance(entry.get('pose_id'),str) or not entry.get('reason'):raise ValueError('invalid imported quarantine entry')
-            excluded.add(entry['pose_id'])
+        excluded=excluded_pose_ids()
         index=SemanticIndex.load(tags_path=str(tags_path),taxonomy_path=str(taxonomy_path),db_path=str(db_path),
             lexicon_path=str(lexicon_path or ROOT/'config/semantic_lexicon.v1.json'),
             allowed_pose_ids=library_pose_ids,excluded_pose_ids=excluded,dense_encoder=dense,

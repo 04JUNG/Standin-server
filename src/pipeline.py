@@ -80,7 +80,7 @@ class Pipeline:
     def __init__(self, entries, vlm_client: BaseVLMClient | None = None,
                  detector=None, pose_model=None, body_matcher=None,
                  semantic_searcher=None, routing_config: RoutingConfig | None = None,
-                 pose_generator=None):
+                 pose_generator=None, fullbody_search=None):
         # 검색 행렬과 메타데이터가 실행 중 서로 어긋나지 않도록 같은 immutable
         # snapshot을 공유한다. 라이브러리 갱신은 새 Pipeline 생성 시 자동 반영된다.
         self.entries = tuple(entries)
@@ -95,9 +95,10 @@ class Pipeline:
         # 04J-286 라우팅. 꺼져 있으면 아래 두 값은 읽지 않는다(기존 경로 그대로).
         self.routing_config = routing_config or RoutingConfig.from_env()
         self._semantic_searcher = semantic_searcher
-        # Explicit injection only. API factory/default config never enables it.
+        # Legacy generator injection. The fullbody API factory owns its own generator.
         # Generated research previews are NOT library candidates or refine bases.
         self._pose_generator = pose_generator
+        self._fullbody_search = fullbody_search
 
     @property
     def semantic_searcher(self):
@@ -375,12 +376,36 @@ class Pipeline:
             )
         threshold_scale = 0.7 if count_confidence == "low" else 1.0
         routing = None
-        if CFG.search_routing_enabled:
+        if CFG.search_routing_enabled or self._fullbody_search is not None:
             with span("search_routing"):
                 routing = self._route_slots(image, img_w, img_h, vlm, slots)
         processed: list[tuple[object, _SlotOutcome]] = []
         for slot in slots:
             decision = routing["decisions"].get(id(slot)) if routing else None
+            if self._fullbody_search is not None and decision is not None:
+                desc = build_slot_descriptors(vlm, [slot], image_size=(img_w, img_h))[0]
+                evidence = {
+                    "keypoints": slot.skeleton.keypoints.tolist() if slot.skeleton is not None else [],
+                    "joint_mask": slot.evidence.valid_joint_mask.tolist() if slot.evidence is not None else [],
+                    "coverage_class": desc.coverage_class,
+                }
+                with span("fullbody_search"):
+                    report = self._fullbody_search.search(decision, evidence,
+                        generation_block=desc.output_scope.detected in (
+                            BodyScope.HEAD, BodyScope.HALF, BodyScope.BUST))
+                self._apply_refine_policy(desc, slot, "low", has_candidates=False)
+                desc.refinable_limbs = ()
+                desc.quality_trace["search_scope"] = "whole_library_pose"
+                record = self._routing_record(decision, routing,
+                    search_status=report["status"], search_backend=report["version"],
+                    elapsed={"fullbody_search_ms": report["elapsed_ms"]},
+                    candidates=report["selected"], search_reason=report["reason"])
+                record["route"] = report["route"]
+                record["fullbody_search"] = report
+                desc.quality_reasons = list(dict.fromkeys(slot.reasons))
+                processed.append((slot, _SlotOutcome(desc, [], "low", report["reason"],
+                    hard_fallback=not bool(report["selected"]), routing=record)))
+                continue
             if decision is not None and decision.route in ("semantic", "undetermined", "error") \
                     and decision.joint.policy_block is None:
                 with span("routed_non_geometric"):
@@ -504,7 +529,7 @@ class Pipeline:
             result.notes.append(
                 "검색 경로: " + ", ".join(
                     f"{name}={routes.count(name)}"
-                    for name in ("geometric", "semantic", "undetermined", "error")
+                    for name in ("hybrid", "geometric", "semantic", "undetermined", "error")
                     if routes.count(name)))
         low_count = result.person_confidence.count("low")
         result.notes.append(
@@ -515,7 +540,7 @@ class Pipeline:
     # ---- 04J-286: 러프함 기반 인물별 검색 경로 ----
     def _route_slots(self, image, img_w: int, img_h: int, vlm: VLMAnalysis,
                      slots) -> dict:
-        """모든 슬롯의 관절 근거를 보고, 부족한 인물에 한해 자세 설명을 1회 묻는다."""
+        """전신 hybrid에서는 관절이 충분한 인물도 설명을 추출한다. 레거시는 부족할 때만."""
         rcfg = self.routing_config
         started = perf_counter()
         self._join_person_tags(vlm)
@@ -530,7 +555,8 @@ class Pipeline:
             joints[id(slot)] = assess_joint_evidence(slot, desc, img_h, rcfg,
                                                      policy_block=block)
         need = [slot for slot in slots
-                if not joints[id(slot)].sufficient and joints[id(slot)].policy_block is None]
+                if (self._fullbody_search is not None or not joints[id(slot)].sufficient)
+                and joints[id(slot)].policy_block is None]
         semantics = {}
         describe = None
         describe_ms = 0.0

@@ -219,7 +219,8 @@ async def lifespan(app: FastAPI):
         entries = _ensure_db()                      # 1회 로드
         library_identity = _resolve_library_identity()  # 응답에 실을 번들 버전
         model_bundle = _ensure_pose_model_bundle()  # S3 bundle → local manifest
-        pipeline = Pipeline(entries)                # VLM/검출/포즈 팩토리도 1회 초기화
+        from src.fullbody_routing import build_api_pipeline
+        pipeline = build_api_pipeline(entries, db_path=DB_PATH)
         _check_backends(pipeline)                   # 팩토리 폴백 후 실제 인스턴스 검사
         # production에서 converter 주소가 없으면 여기서 기동이 실패한다(옛 마네킹을
         # 조용히 서빙하지 않는다). 개발은 경고 후 마네킹으로 폴백한다.
@@ -526,6 +527,7 @@ def _routing_fields(res, index: int) -> dict:
     hits = semantic[index] if index < len(semantic) and semantic[index] else []
     return {
         "search_routing": routes[index],
+        "dynamic_search": routes[index].get("fullbody_search"),
         "semantic_candidates": [SemanticCandidateOut(**hit) for hit in hits],
     }
 

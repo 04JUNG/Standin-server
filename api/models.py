@@ -107,12 +107,45 @@ class SemanticCandidateOut(BaseModel):
     pose: dict = Field(default_factory=dict, description="해당 포즈 JSON(태그·설명·bvh_url)")
 
 
+class WholePoseCandidateOut(BaseModel):
+    pose_id: str
+    kind: Literal["library_original"] = "library_original"
+    rank_score: float
+    evidence: dict = Field(default_factory=dict)
+    camera: Optional[dict] = None
+    semantic_preview_camera: Optional[dict] = None
+    family: str
+    lookup_allowed: Literal[True] = True
+    refine_allowed: Literal[False] = False
+    release_allowed: Literal[False] = False
+    actual_mesh_validated: Literal[False] = False
+
+
+class DynamicSearchOut(BaseModel):
+    version: Literal["fullbody-dynamic-v1"]
+    route: Literal["hybrid", "geometric", "semantic", "undetermined", "error"]
+    status: Literal["ok", "no_result", "error", "partial_error", "undetermined", "blocked", "not_run"]
+    selected: List[WholePoseCandidateOut] = Field(default_factory=list, max_length=5)
+    branches: dict = Field(default_factory=dict)
+    generation: Optional[dict] = None
+    geometry_evidence: dict = Field(default_factory=dict)
+    description_evidence: dict = Field(default_factory=dict)
+    composition_enabled: Literal[False] = False
+    split_search_enabled: Literal[False] = False
+    ranking: str
+    rank_score_is_accuracy: Literal[False] = False
+    reason: Optional[str] = None
+    elapsed_ms: float
+
+
 class PersonOut(BaseModel):
     index: int
     box: Optional[List[float]] = Field(None, description="[x1,y1,x2,y2] 픽셀")
     tags: dict
     skeleton: Optional[SkeletonOut] = None
     candidates: List[CandidateOut]
+    dynamic_search: Optional[DynamicSearchOut] = Field(
+        None, description="전신 동적 라우팅의 단일 Top5. 원본 selected와 검수용 generation은 분리")
     # /refine을 '순수 함수'로 만들기 위한 필드(docs/REFINE_DESIGN.md).
     # /analyze가 이미 추출한 값을 실어 보낼 뿐이라 연산 추가는 0이다.
     # 클라이언트는 이 두 값을 그대로 POST /refine에 되돌려주면 된다
