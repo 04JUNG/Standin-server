@@ -8,7 +8,7 @@
 
 - 기존 `muscle`(0–2): 근육량·선명도 동작 유지.
 - 추가 `muscle_bulk`(0–1, 기본 0): 어깨·등·팔·하체의 근육 두께와 덩치를 조절.
-- 기존 `MUSCLE_MAX` 유지. `NEW_MUSCLE_HALF`, `NEW_MUSCLE_MAX` 추가.
+- 기존 `MUSCLE_MAX` 유지. `NEW_MUSCULAR`(new_근육형, 볼륨0.5), `NEW_MUSCLE_MAX`(new_근육 MAX, 볼륨1.0) 추가. 기존8개와 신규2개, 총10개를 별도로 선택한다.
 - 키·머리·등신·팔다리 길이·골격·웨이트는 변경하지 않는다. 가슴은 기존의 완만한 전방 돌출 기준을 따른다.
 - 높은 지방과 볼륨을 함께 적용하면 추가 근육 변형을 연속적으로 완화한다.
 - 기본 비교 이미지는 T 포즈다.
@@ -40,9 +40,11 @@
 
 비교 폴더: `/Users/dowon/.codex/worktrees/shape-converter-staging/Standin-server/artifacts/male-muscle-volume-v0.6.8/`
 
-- `REPORT.html`: 정면·측면·후면·사선·상체 확대, 자세와 치수 비교
+- `REPORT.html`: 기존8개 + 신규2개 프리셋 선택, T 포즈3면 및 자세·치수 비교
 - `model/standin-body-0.6.8.blend`: START_HERE 실행 후 N → Standin → 근육 볼륨
 - `model/standin_body.py`: 새 컨트롤러
 - `model/bulk_max.fbx`, `model/old_max.fbx`: T 포즈 FBX
 - `neutral-validation.json`, `pose-validation.json`, `fbx-validation.json`: 원시 검증
 - `build.py`, `render.py`, `pose_audit.py`: 재현 스크립트
+
+2026-10-15 추가 요청 반영: 여성처럼 `new_근육형`, `new_근육 MAX`로 별도 표기. 이전 비교안은 `backups/before-new-preset-labels/`에 보존했다. 원본 8개 프리셋과의 좌표 차이 0mm를 재확인하고 프리셋 JSON·Blender 내장 컨트롤러·FBX6개를 함께 갱신했다.
