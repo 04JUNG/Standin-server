@@ -327,6 +327,9 @@ def create_app(
     app.state.runner = blender_runner
     app.state.max_bvh_bytes = size_limit
 
+    from converter_api.scene_routes import register_scene_routes
+    register_scene_routes(app, blender_runner)
+
     from converter_api.preview_models import PreviewModelStore
     from converter.preview_model import MODEL_VERSION
     from converter_api.body_preview import preview_contract
