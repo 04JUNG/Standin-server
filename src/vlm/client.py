@@ -22,6 +22,7 @@ from ..config import CFG
 from ..body_scope import BodyScope, parse_person_scopes
 from ..person_tags import parse_person_values, stated_value
 from ..logging_setup import log_info, log_warn
+from ..pose_query import validated_object_hands
 from . import prompts
 from .failures import classify_failure, failure_reason
 
@@ -260,6 +261,7 @@ def parse_pose_descriptions(payload, count: int) -> dict:
     from ..search_routing import PoseDescription
     from ..semantic_vocab import VOCABULARY
     from ..body_language import validated_observations
+    from ..pose_relations import validate_relations
 
     people = payload.get("people") if isinstance(payload, dict) else None
     if not isinstance(people, list) or len(people) != count:
@@ -300,12 +302,23 @@ def parse_pose_descriptions(payload, count: int) -> dict:
                 if kept[name]:
                     dropped[f"ungrounded_{name}"] = kept[name]
                     kept[name] = []
+        from ..pose_requirements import clean_arm_states,hand_counts
+        counts=hand_counts(item.get('held_object_hand_counts'))
+        for obj,side in validated_object_hands(item.get('held_object_hands'),kept['objects']).items():
+            if side in ('left','right','both'):counts.setdefault(obj,'two' if side=='both' else 'one')
         out[index] = PoseDescription(
             visible=item.get("visible") is not False,
             body_details=str(item.get("body_details") or "")[:300],
             search_text=str(item.get("search_text") or "")[:200],
             certainty=certainty if certainty in ("high", "medium", "low") else None,
             body_observations=observations, context_evidence=context,
+            held_object_hands=validated_object_hands(
+                item.get('held_object_hands'),kept['objects']),
+            held_object_hand_counts={k:v for k,v in counts.items() if k in kept['objects']},
+            arm_states=clean_arm_states(item.get('arm_states')),
+            pose_relations=validate_relations(item.get('pose_relations')),
+            visible_scope=item.get('visible_scope') if item.get('visible_scope') in ('full','half','shoulder_head','head') else None,
+            head_view=item.get('head_view') if item.get('head_view') in ('front','profile_left','profile_right','back','three_quarter_left','three_quarter_right') else None,
             dropped=dropped, **kept,
         )
     return out
@@ -393,7 +406,58 @@ class GeminiVLMClient(BaseVLMClient):
             return None
 
     def describe_people(self, image, boxes: list):
-        """인물별 자세 설명 1회 호출(재시도 없음). 실패는 reason과 함께 오류로 돌려준다."""
+        """One bounded retry for transient errors, then independent side review."""
+        result = self._describe_people_once(image, boxes)
+        delay = result.retry_after_seconds or 0
+        if result.status == 'error' and result.retryable and delay <= 2:
+            if delay > 0:
+                self._sleep(delay)
+            first_ms=result.elapsed_ms
+            result=self._describe_people_once(image, boxes)
+            result.attempts=2
+            result.elapsed_ms+=first_ms
+        if result.status == 'ok' and any(d and (d.held_object_hands or d.pose_relations) for d in result.descriptions.values()):
+            self._review_pose_sides(image, boxes, result.descriptions)
+        return result
+
+    def _review_pose_sides(self, image, boxes, descriptions):
+        from google.genai import types
+        from ..pose_relations import validate_relations
+        requested=[{'objects':list(d.held_object_hands), 'actions':[r['kind'] for r in d.pose_relations]} if d else {} for d in descriptions.values()]
+        prompt=('러프의 각 인물 팔 연결만 독립 검수한다. 인물 기준 좌우다. 화면 위치만으로 판정 금지. '
+            '손목-팔꿈치-어깨 연결이 가려지거나 모호하면 unknown. 물건을 쥔 손과 만진 손을 구분. '
+            '박스 순서대로 people 배열. 각 항목은 held_object_hands(물건: left/right/both/unknown), '
+            'chain_visible(boolean), evidence(팔 연결 근거), pose_relations 배열(kind,side,chain_visible,side_confidence:high/unknown,evidence). '
+            '확인할 물건/동작만 답하고 새 사람/좌표는 만들지 않는다. JSON만 반환. '
+            +json.dumps({'boxes':boxes,'requested':requested},ensure_ascii=False))
+        try:
+            resp=self._client.models.generate_content(model=self._model,contents=[prompt,self._to_part(image)],
+                config=types.GenerateContentConfig(response_mime_type='application/json',temperature=0,
+                    http_options=types.HttpOptions(timeout=20000)))
+            rows=_extract_json(resp.text)['people']
+            if not isinstance(rows,list) or len(rows)!=len(boxes):raise ValueError('side_review_length')
+        except Exception:
+            rows=[{} for _ in boxes]
+        for i,d in descriptions.items():
+            if not d:continue
+            row=rows[i] if isinstance(rows[i],dict) else {}
+            second=validated_object_hands(row.get('held_object_hands'),d.objects)
+            changes=[]
+            for obj,side in d.held_object_hands.items():
+                if row.get('chain_visible') is not True or not row.get('evidence') or second.get(obj)!=side:
+                    changes.append({'object':obj,'initial':side,'review':second.get(obj),'status':'abstain'})
+                    d.held_object_hands[obj]='unknown'
+            reviewed=validate_relations(row.get('pose_relations'))
+            for relation in d.pose_relations:
+                other=next((r for r in reviewed if r['kind']==relation['kind']),{})
+                if relation['side']!='unknown' and other.get('side')!=relation['side']:
+                    changes.append({'action':relation['kind'],'initial':relation['side'],'review':other.get('side'),'status':'abstain'})
+                    relation['side']='unknown';relation['side_confidence']='unknown'
+            d.laterality_review=dict(status='reviewed' if row else 'unavailable_abstain',changes=changes,
+                evidence=str(row.get('evidence') or '')[:300],independent=True,not_ground_truth=True)
+
+    def _describe_people_once(self, image, boxes: list):
+        """Single request; caller controls the bounded retry."""
         from google.genai import types
         from ..search_routing import DescribeOutcome
 

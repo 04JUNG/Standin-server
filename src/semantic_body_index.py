@@ -14,7 +14,7 @@ import numpy as np
 
 from .body_language import validated_observations
 
-BODY_INDEX_VERSION = "bvh-body-v1"
+BODY_INDEX_VERSION = "bvh-body-v2-torso-relative-arms"
 THRESHOLDS = {
     "knee_bent_max_deg": 140.0, "knee_straight_min_deg": 160.0,
     "legs_apart_min_hip_widths": 2.0, "legs_together_max_hip_widths": 1.35,
@@ -85,13 +85,25 @@ def describe_library_body(joints, scores) -> dict:
                     observations["legs"] = "staggered"
                 elif separation <= THRESHOLDS["legs_together_max_hip_widths"]:
                     observations["legs"] = "together"
+        # Arms use the body's own hip-to-shoulder axis, not world gravity.
+        # A prone person's hands below world-Y shoulders are not necessarily
+        # lowered along the torso. Dead-band positions remain unknown.
+        if length > 1e-8:
+            up = torso / length
+            arm_lateral = p[6] - p[5]
+            arm_lateral -= np.dot(arm_lateral, up) * up
+            arm_width = float(np.linalg.norm(arm_lateral))
+            if arm_width <= 1e-8:
+                return {"observations": observations,
+                        "metrics": {k: None if v is None else round(v, 6) for k, v in metrics.items()}}
+            arm_lateral /= arm_width
             arm_states = []
             for label, sh, elbow, hand in (("left", 5, 7, 9), ("right", 6, 8, 10)):
                 state = "unknown"
                 if valid(sh, elbow, hand):
-                    height = float((p[hand, 1] - p[sh, 1]) / length)
-                    eh = float((p[elbow, 1] - p[sh, 1]) / length)
-                    spread = abs(float(np.dot(p[hand] - p[sh], lateral))) / length
+                    height = float(np.dot(p[hand] - p[sh], up) / length)
+                    eh = float(np.dot(p[elbow] - p[sh], up) / length)
+                    spread = abs(float(np.dot(p[hand] - p[sh], arm_lateral))) / length
                     metrics.update({label + "_hand_height": height,
                                     label + "_elbow_height": eh,
                                     label + "_hand_lateral": spread})

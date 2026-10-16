@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import math
 from typing import Annotated, List, Literal, Optional
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, computed_field
 
 from src.body_scope import BodyScope
 from src.schema import Action, Relationship, Shot, View
@@ -77,7 +77,13 @@ class InferenceMetadataOut(BaseModel):
 class ScopeDetectionOut(BaseModel):
     detected: Optional[BodyScope] = None
     # observed_legs: VLM은 half/bust였지만 화면 안 무릎이 관측돼 full로 올린 값.
-    source: Literal["vlm_person", "legacy_shot", "observed_legs", "unknown"] = "unknown"
+    source: Literal["vlm_person", "vlm_description", "legacy_shot", "observed_legs", "unknown"] = "unknown"
+
+    @computed_field
+    @property
+    def mesh_scope(self) -> Optional[str]:
+        from src.body_scope import mesh_scope
+        return mesh_scope(self.detected)
 
 
 class PersonTagsOut(BaseModel):
@@ -110,8 +116,10 @@ class SemanticCandidateOut(BaseModel):
 class WholePoseCandidateOut(BaseModel):
     pose_id: str
     kind: Literal["library_original"] = "library_original"
+    library_source: Optional[str] = Field(None, description="저장 포즈 출처. generated_composition도 전신 검색 후보이며 이번 요청에서 합성하지 않음")
     rank_score: float
     evidence: dict = Field(default_factory=dict)
+    core_conditions: Optional[dict] = None
     camera: Optional[dict] = None
     semantic_preview_camera: Optional[dict] = None
     family: str
@@ -119,20 +127,30 @@ class WholePoseCandidateOut(BaseModel):
     refine_allowed: Literal[False] = False
     release_allowed: Literal[False] = False
     actual_mesh_validated: Literal[False] = False
+    pose_detail_fit: Optional[dict] = None
+    match_level: Optional[str] = None
 
 
 class DynamicSearchOut(BaseModel):
     version: Literal["fullbody-dynamic-v1"]
-    route: Literal["hybrid", "geometric", "semantic", "undetermined", "error"]
+    route: Literal["hybrid", "geometric", "semantic", "undetermined", "error", "basic_model"]
     status: Literal["ok", "no_result", "error", "partial_error", "undetermined", "blocked", "not_run"]
     selected: List[WholePoseCandidateOut] = Field(default_factory=list, max_length=5)
+    near_candidates: List[dict] = Field(default_factory=list, max_length=5,
+        description="핵심 동작은 맞지만 무릎·다리 세부가 다르거나 미확인인 검수 참고. selected와 분리")
+    framing_references: List[dict] = Field(default_factory=list, max_length=5,
+        description="중립 머리·어깨 구도 참고. 검색 정답·생성 성공이 아니며 selected와 분리")
     branches: dict = Field(default_factory=dict)
     generation: Optional[dict] = None
+    basic_model: Optional[dict] = Field(None,description="명시적 머리·어깨 컷의 기본 인체 출력 계획. 검색·생성 후보와 구분")
     geometry_evidence: dict = Field(default_factory=dict)
     description_evidence: dict = Field(default_factory=dict)
     composition_enabled: Literal[False] = False
+    stored_compositions_included: bool = True
     split_search_enabled: Literal[False] = False
     ranking: str
+    condition_ranking: Optional[str] = None
+    candidate_validation: Optional[dict] = None
     rank_score_is_accuracy: Literal[False] = False
     reason: Optional[str] = None
     elapsed_ms: float

@@ -114,10 +114,20 @@ def person_tags_prompt(boxes) -> str:
     return PERSON_TAGS_TEMPLATE.format(count=len(boxes), boxes="\n".join(lines))
 
 
-DEFAULT_PROMPT_VERSION = "p1-scope"
+USER_TEMPLATE_SCOPE_OUTPUT = USER_TEMPLATE.replace(
+    '"full" | "half" | "bust" | "head" | null',
+    '"full" | "half" | "bust" | "shoulder_head" | "head" | null',
+).replace(
+    'bust=가슴 위와 어깨가 보이는 흉상, head=머리·얼굴 중심(목 일부 포함)의 두상.',
+    'bust=가슴 위와 어깨가 보이는 흉상, '
+    'shoulder_head=머리·목·어깨선만 보이고 가슴·배·팔이 화면 밖인 어깨 위 클로즈업, '
+    'head=머리·얼굴 중심(목 일부 포함)의 두상. shoulder_head와 가슴이 보이는 bust를 구분하라.',
+)
+DEFAULT_PROMPT_VERSION = "p3-output-scope"
 USER_TEMPLATES = {
     "p1-scope": USER_TEMPLATE,
     "p2-person-tags": USER_TEMPLATE_P2,
+    "p3-output-scope": USER_TEMPLATE_SCOPE_OUTPUT,
 }
 # 인물별 action·view를 묻는 버전. mock VLM이 같은 모양의 응답을 흉내 낼 때 쓴다.
 PERSON_TAG_VERSIONS = frozenset({"p2-person-tags"})
@@ -139,7 +149,7 @@ def user_template(version: str) -> str:
 # 같은 search-taxonomy-v2 키만 허용한다(src/semantic_vocab.py). 판단 원칙은
 # pose-library-viewer/tagging/ROUGH_TO_LANGUAGE.md를 따른다 — 관찰과 해석을 나누고,
 # 형태에서 행동으로 넘어가되 근거 없는 감정·종목을 붙이지 않는다.
-POSE_DESCRIBE_VERSION = "d2-observed-body"
+POSE_DESCRIBE_VERSION = "d4-visible-action-relations"
 
 POSE_DESCRIBE_SYSTEM = (
     "너는 웹툰 러프 콘티에서 지정된 인물의 자세를 검색용 태그와 짧은 문장으로 설명하는 도우미다. "
@@ -170,6 +180,12 @@ POSE_DESCRIBE_TEMPLATE = """이 컷에서 아래 {count}명의 자세를 설명�
       "visible": <이 인물의 몸 자세를 러프에서 읽을 수 있으면 true>,
       "postures": [...], "actions": [...], "domains": [...], "activities": [...],
       "objects": [...], "intents": [...], "emotions": [...],
+      "held_object_hands": {{"<실제로 쥔 objects 태그>": "left|right|both|unknown"}},
+      "held_object_hand_counts": {{"<실제로 쥔 objects 태그>": "one|two|unknown"}},
+      "arm_states": {{"left":"lowered|waist|forward|raised|spread|unknown", "right":"lowered|waist|forward|raised|spread|unknown"}},
+      "visible_scope": "full|half|shoulder_head|head",
+      "head_view": "front|profile_left|profile_right|back|three_quarter_left|three_quarter_right|unknown",
+      "pose_relations": [{{"kind":"touch_head|touch_face|check_wrist|hand_chest|arm_raised", "side":"left|right|both|unknown", "chain_visible":true, "side_confidence":"high|unknown", "evidence":"손목에서 어깨로 연결되는 근거. 안 보이면 명시"}}],
       "body_details": "<실제로 보이는 팔·다리·몸통 배치 관찰 한 문장(한국어)>",
       "body_observations": {{
         "knees": "bent|straight|mixed|unknown",
@@ -185,8 +201,14 @@ POSE_DESCRIBE_TEMPLATE = """이 컷에서 아래 {count}명의 자세를 설명�
 }}
 
 규칙:
+- 팔·다리가 없어도 머리·목·어깨 방향을 읽을 수 있으면 visible=true. 보이는 부위의 자세에 대해서만 certainty를 매겨라. 없는 부위를 추정하지 마라.
+- visible_scope: 팔이 보이면 shoulder_head 금지, half로. head_view의 좌우는 화면에서 코가 향하는 방향이다(손의 인물 기준 좌우와 다름).
+- pose_relations는 물건 유무와 무관하게 핵심 동작을 기록한다. 손목시계/기기 확인은 check_wrist로, 머리를 짚는 것은 touch_head로. 옆에 컵을 들었다고 핵심 동작을 hold로 대체하지 마라. 해당 동작이 없으면 빈 배열.
+- side는 인물 본인 기준이며 화면 위치만으로 고르지 마라. 손-팔꿈치-어깨 연결이 가려지거나 불확실하면 chain_visible=false, side=unknown. search_text에도 동작과 확인된 좌우를 보존하라.
 - people 배열 길이는 반드시 {count}이고 순서는 위 목록과 같다.
 - body_details에는 관찰만 쓴다. 뛰어오르거나 낙하한다는 추측을 관찰 문장에 넣지 마라.
+- held_object_hands는 물건별로 실제로 쥔 손을 적는다. 화면 좌우가 아니라 인물 본인 기준이다. 정면 인물의 왼손은 화면 오른쪽이다. 뒤돌아선 인물은 반대다. 물건에서 손목·팔꿈치·어깨 연결을 따라 확인하고 가림·옆모습으로 모호하면 unknown. 물건을 다른 손으로 만지는 것과 쥐는 것을 구분한다. 물건이 없으면 빈 객체다.
+- held_object_hand_counts는 좌우와 독립이다. 좌우가 모호해도 양손이 같은 물건을 잡는 것이 보이면 two다. arm_states는 각 팔을 별도로 관찰한다. 허리 손은 waist, 앞으로 뻗음은 forward, 내린 팔은 lowered. 팔 연결이 모호하거나 안 보이면 해당 팔만 unknown. 옆에 놓인 물건과 실제로 쥔 물건을 구분하라.
 - body_observations는 파이프(|)로 구분된 허용값 중 하나씩 고른다. 좌표·각도는 출력하지 마라.
 - knees=mixed는 한쪽은 굽히고 다른 쪽은 편 경우, legs=staggered는 앞뒤로 엇갈린 경우다.
 - 두 팔이 내려가면 lowered, 들어가면 raised, 옆으로 뻗으면 spread, 서로 다르면 mixed다.

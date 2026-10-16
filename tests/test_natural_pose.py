@@ -137,6 +137,6 @@ def test_real_description_contract_to_text(tmp_path, monkeypatch):
     from src.experimental.text_pose_generation import GenerationResult
     generator=NaturalLanguagePoseGenerator(tmp_path/'rig',tmp_path/'tax')
     calls=[]
-    monkeypatch.setattr(generator,'generate_text',lambda text:(calls.append(text) or GenerationResult('rejected')))
+    monkeypatch.setattr(generator,'generate_text',lambda text,**kwargs:(calls.append(text) or GenerationResult('rejected')))
     result=generator.generate(PoseDescription(visible=True,certainty='high',search_text='의자에 앉기',body_details='양팔로 팔짱'))
     assert calls==['의자에 앉기. 양팔로 팔짱'] and result.status=='rejected'

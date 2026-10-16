@@ -73,6 +73,28 @@ def test_insufficient_joints_only_search_text():
     assert e.camera.calls==0 and e.semantic.calls==1
 
 
+@pytest.mark.parametrize('weight', [0, 1, -1, float('nan'), float('inf')])
+def test_invalid_semantic_weight_rejected(weight):
+    with pytest.raises(ValueError, match='semantic_weight'):
+        FullBodySearch([], None, None, semantic_weight=weight)
+
+
+def test_higher_semantic_weight_changes_fusion_only():
+    entries=[SimpleNamespace(pose_id=p,meta={}) for p in ('a','b','c')]
+    a=FullBodySearch(entries, Semantic(('c',)), Camera(('a',)))
+    b=FullBodySearch(entries, Semantic(('c',)), Camera(('a',)), semantic_weight=.6)
+    before=a.search(decision(), evidence()); after=b.search(decision(), evidence())
+    assert before['selected'][0]['pose_id']=='a'
+    assert after['selected'][0]['pose_id']=='c'
+    assert after['selected'][0]['rank_score']==pytest.approx(.6/61)
+    assert after['ranking']=='weighted_rrf_k60_geometry_0.4_semantic_0.6'
+    assert not after['composition_enabled'] and not after['split_search_enabled']
+    for name in ('geometry','semantic'):
+        assert before['branches'][name]['hits']==after['branches'][name]['hits']
+    text_only=b.search(decision(False), evidence())
+    assert text_only['selected'][0]['rank_score']==pytest.approx(1/61)
+
+
 @pytest.mark.parametrize('sufficient', [True,False])
 def test_semantic_error_never_becomes_empty_generation(sufficient):
     e=engine(semantic=Semantic((), 'raise'))
@@ -134,9 +156,30 @@ def test_cutoff_and_original_safety_filters(monkeypatch):
     e=engine(Camera(distance=2))
     assert e.geometry_search(evidence())['status']=='no_result'
     e.camera=Camera(); e.meta['b']['source']='generated_composition'
+    e.include_stored_compositions=False  # Reproduce the previous restricted corpus.
     monkeypatch.setattr(mod,'excluded_pose_ids', lambda:{'a'})
     out=e.search(decision(),evidence())
     assert [r['pose_id'] for r in out['selected']]==['c']
+
+
+@pytest.mark.parametrize('branch', ['geometry', 'semantic'])
+def test_stored_compositions_are_searchable_but_quarantine_still_wins(monkeypatch, branch):
+    import src.fullbody_routing as mod
+    e=engine(); e.meta['b']['source']='generated_composition'
+    hits=[dict(pose_id='b',distance=.1,score=.5)]
+    assert e._clean(hits,branch)==hits
+    monkeypatch.setattr(mod,'excluded_pose_ids',lambda:{'b'})
+    assert e._clean(hits,branch)==[]
+
+
+def test_inclusion_preserves_weights_and_never_enables_runtime_composition():
+    e=engine(); e.meta['b']['source']='generated_composition'
+    out=e.search(decision(),evidence())
+    assert out['stored_compositions_included']
+    assert not out['composition_enabled'] and not out['split_search_enabled']
+    assert out['selected'][0]['library_source']=='generated_composition'
+    assert out['selected'][0]['rank_score']==pytest.approx(.65/62+.35/61)
+    assert not out['selected'][0]['release_allowed']
 
 
 def test_unknown_pose_is_error():
@@ -222,3 +265,34 @@ def test_factory_disabled_keeps_legacy(monkeypatch):
     monkeypatch.setenv('ROUTING_FULLBODY_ENABLED','0')
     monkeypatch.setattr(module,'Pipeline',lambda entries:sentinel)
     assert build_api_pipeline([],db_path='not-needed.db') is sentinel
+
+
+@pytest.mark.parametrize('review_status', ['ok', 'error', 'skipped'])
+def test_fullbody_review_precedes_search_and_preserves_diagnostics(monkeypatch, review_status):
+    from src.pipeline import Pipeline
+    from src.library import build_synthetic_index
+    from tests.test_search_routing import _Img, _RoughPose, _CountingVLM
+    from src.search_routing import DescribeOutcome
+    entries = build_synthetic_index(); pid = entries[0].pose_id
+    vlm = _CountingVLM(); order = []
+    vlm.describe_people = lambda image, boxes: DescribeOutcome('ok', descriptions={
+        i: PoseDescription(**decision().semantic.description) for i in range(len(boxes))})
+    class Review:
+        def repair(self, image, slots, *args):
+            order.append('review')
+            return dict(status=review_status, called=review_status!='skipped', targets=[0],
+                        elapsed_ms=1.0, repaired_slots=[])
+    engine = FullBodySearch(entries, Semantic((pid,)), Camera((pid,)))
+    original = engine.search
+    def search(*args, **kwargs):
+        assert order == ['review']
+        order.append('search')
+        return original(*args, **kwargs)
+    engine.search = search
+    monkeypatch.setattr(CFG, 'search_routing_enabled', False)
+    pipe = Pipeline(entries, vlm_client=vlm, pose_model=_RoughPose(),
+                    fullbody_search=engine, skeleton_repairer=Review())
+    result = pipe.process_cut(_Img('full_half standing front'))
+    assert order == ['review', 'search']
+    assert result.routing_summary['skeleton_repair']['status'] == review_status
+    assert not result.descriptors[0].refine_allowed

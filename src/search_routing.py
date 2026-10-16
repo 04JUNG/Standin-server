@@ -253,6 +253,13 @@ class PoseDescription:
     # Qualitative observations, not VLM-generated joint coordinates.
     body_observations: dict = field(default_factory=dict)
     context_evidence: str = ""
+    held_object_hands: dict = field(default_factory=dict)
+    held_object_hand_counts: dict = field(default_factory=dict)
+    arm_states: dict = field(default_factory=dict)
+    pose_relations: list = field(default_factory=list)
+    visible_scope: Optional[str] = None
+    head_view: Optional[str] = None
+    laterality_review: dict = field(default_factory=dict)
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -269,6 +276,7 @@ class DescribeOutcome:
     retry_after_seconds: Optional[float] = None
     elapsed_ms: float = 0.0
     provider: Optional[str] = None
+    attempts: int = 1
 
 
 @dataclass
@@ -316,6 +324,10 @@ def assess_semantic_evidence(description: Optional[PoseDescription], rcfg: Routi
     body = (description.body_details or "").strip()
     observations = query_observations(body, description.body_observations)
     specific_body = specific_observation_count(observations)
+    from .pose_relations import validate_relations
+    relations = validate_relations(description.pose_relations)
+    closeup = (description.visible_scope in ('head','shoulder_head')
+               and description.head_view in ('front','profile_left','profile_right','back','three_quarter_left','three_quarter_right'))
     metrics = {
         "specific_tag_count": len(specific),
         "specific_tags": specific,
@@ -340,7 +352,7 @@ def assess_semantic_evidence(description: Optional[PoseDescription], rcfg: Routi
         if description.certainty in rcfg.semantic_reject_certainty:
             reasons.append("certainty_low")
         if (len(specific) < rcfg.semantic_min_specific_tags
-                and specific_body < rcfg.semantic_min_body_observations):
+                and specific_body < rcfg.semantic_min_body_observations and not relations and not closeup):
             reasons.append("only_generic_tags")
         if len(text) < rcfg.semantic_min_text_chars:
             reasons.append("search_text_too_short")

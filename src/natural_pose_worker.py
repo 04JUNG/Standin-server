@@ -80,13 +80,15 @@ def independent_reasons(metrics, overlaps):
         if any(not math.isfinite(v) for v in m.values()):
             reasons.append(f'{side} 독립 검사 비유한 값')
     for pair, depth in overlaps.items():
-        tolerance = 1.5 if 'hand' in pair else 1.
+        # 1.5 cm was almost a whole finger diameter and admitted interlocked
+        # phone hands. A bilateral finger/palm contact gets a stricter gate.
+        tolerance = .2 if pair=='Lhand~Rhand' else 1.5 if 'hand' in pair else 1.
         if not math.isfinite(depth) or depth > tolerance:
             reasons.append(f'독립 관통 {pair}: {depth:.2f}cm (한계 {tolerance}cm)')
     return reasons
 
 
-def solve_proposal(proposal, text):
+def solve_proposal(proposal, text, *, leg_spacing_delta=0., arm_spacing_delta=0.):
     import numpy as np
     from .bvh import parse_bvh
     from .experimental.pose_authoring.author import Author
@@ -94,6 +96,22 @@ def solve_proposal(proposal, text):
     from .experimental.pose_authoring.audit import measure_file
     try:
         spec = compile_spec(proposal)
+        if leg_spacing_delta:
+            # Bounded server-owned IK TARGET correction, never copied motion or
+            # upper/lower assembly. Only intrinsic pelvis-frame foot spacing.
+            if abs(leg_spacing_delta)>8:raise ValueError('leg_spacing_repair_out_of_bounds')
+            for side,sign in (('L',1),('R',-1)):
+                leg=spec.get('legs',{}).get(side)
+                if not leg or leg.get('frame')!='p':raise ValueError('unsupported_spacing_repair_frame')
+                leg['to'][0]+=sign*leg_spacing_delta
+        if arm_spacing_delta:
+            if not 0<arm_spacing_delta<=8 or any(spec.get('hands',{}).get(s)!='phone' for s in ('L','R')):
+                raise ValueError('unsupported_bilateral_phone_target_repair')
+            for side,sign in (('L',1),('R',-1)):
+                arm=spec.get('arms',{}).get(side)
+                if not arm or arm.get('frame')!='c':raise ValueError('unsupported_phone_repair_frame')
+                arm['to'][0]+=sign*arm_spacing_delta
+                if 'palm' in arm:raise ValueError('explicit_palm_target_requires_replanning')
     except ValueError as exc:
         return dict(passed=False, reasons=[str(exc)], validation={})
     try:
@@ -102,6 +120,8 @@ def solve_proposal(proposal, text):
     except (ValueError, FloatingPointError, np.linalg.LinAlgError) as exc:
         return dict(passed=False, reasons=['IK 계산 불가: 목표점이 관절과 겹치거나 퇴화함 ('+type(exc).__name__+')'], validation={})
     validation = dict(ik_and_geometry=bool(report['passed']), saved_file=False, independent=False)
+    if leg_spacing_delta:validation['detail_target_repair']=dict(kind='pelvis_frame_leg_spacing',delta_cm=leg_spacing_delta)
+    if arm_spacing_delta:validation['detail_target_repair']=dict(kind='bilateral_phone_chest_target_spacing',delta_cm=arm_spacing_delta)
     reasons = report_reasons(report)
     if not report['passed']:
         return dict(passed=False, reasons=reasons[:20], validation=validation)
@@ -129,7 +149,9 @@ def solve_proposal(proposal, text):
         metrics, _, overlaps = measure_file(path)
         audit_reasons = independent_reasons(metrics, overlaps)
         reasons += audit_reasons
-        validation.update(independent=not audit_reasons, independent_metrics=metrics)
+        validation.update(independent=not audit_reasons, independent_metrics=metrics,
+            bilateral_hand_proxy=dict(overlap_cm=overlaps.get('Lhand~Rhand'),max_overlap_cm=.2,
+                                      actual_skin_mesh_checked=False))
         bvh = path.read_text(encoding='utf-8')
     if reasons:
         return dict(passed=False, reasons=reasons[:20], validation=validation)
@@ -189,7 +211,9 @@ class GeminiSpecPlanner:
             'frames: w=골반x/z아래 바닥(루트yaw만),p=골반,c=가슴,h=머리,tL/tR=허벅지,kL/kR=정강이. '
             '턱/볼 접촉은 h프레임 palm,pframe 지정. 팔꿈치 방향 pole, 손목 pron/flex/dev 선택. '
             '한손 동작의 반대손도 자연스럽게 놓고 body_parts.hands는 실제 spec/프리셋 손모양과 일치시킨다. '
-            'root높이 서기91.2 의자53.4 바닥9 무릎40, base의 다리/소품을 우선 유지. '
+            'root높이 서기91.2 의자53.4 바닥9 무릎40. base는 시작점이며 원문 다리 간격/무릎에 맞게 spec.legs 목표도 고친다. '
+            '누워 양다리 벌림은 pelvis(p) 프레임 발목 좌우 간격을 넓힌다. '
+            '양손 휴대폰은 하나의 물체를 양옆에서 잡고 손가락이 서로 끼어들지 않게 손목 위치/손바닥 방향을 둔다. '
             '발지지/균형/관통 검사를 끄는 옵션은 금지. 공중/밀착2인은 현재 지원하지 않는다. '
             'tags는 제공된 search-v2 vocabulary 키만 사용하고 읽을 수 없는 동작은 꾸미지 않는다. '
             '검증 실패시 사유를 고치되 원문 핵심 동작은 유지. 통과 판정은 서버만 한다.')
@@ -217,8 +241,36 @@ def main():
         if file_hash(job['taxonomy']) != job['taxonomy_sha256']:
             raise ValueError('taxonomy_changed')
         taxonomy = json.loads(Path(job['taxonomy']).read_text())
+        def checked_solver(proposal):
+            result=solve_proposal(proposal,job['text'])
+            if result['passed'] and job.get('requirements'):
+                from .pose_requirements import audit_generated
+                checked=audit_generated(job['requirements'],result['candidate'])
+                repair_attempts=[]
+                # First repair small, explicit geometric differences locally;
+                # repeated prose must not leave an unchanged default base.
+                if checked['status']=='near_match' and checked.get('detail_conflicts')==['body:legs']:
+                    wanted=job['requirements'].get('body_states',{}).get('legs')
+                    direction=1 if wanted=='apart' else -1 if wanted=='together' else 0
+                    for delta in (2.,4.,6.,8.) if direction else ():
+                        trial=solve_proposal(proposal,job['text'],leg_spacing_delta=direction*delta)
+                        note=dict(delta_cm=direction*delta,safety_passed=trial['passed'],reasons=trial.get('reasons',[]))
+                        repair_attempts.append(note)
+                        if not trial['passed']:continue
+                        audit=audit_generated(job['requirements'],trial['candidate']);note['conditions']=audit
+                        if audit['status']=='passed':result=trial;checked=audit;break
+                result['validation']['whole_pose_conditions']=checked
+                result['validation']['bounded_detail_repairs']=repair_attempts
+                if checked['status'] not in ('passed','not_required'):
+                    result['passed']=False
+                    result['reasons']=['관찰 조건 '+k+': 요구='+str(v['requested'])+', 생성='+str(v['candidate'])
+                        for k,v in checked['checks'].items() if v['status']!='match' and not v.get('missing_is_optional')]
+                    result['reasons']+=['몸 세부 조건 '+k+': '+str(checked['checks'][k])
+                        for k in checked.get('detail_conflicts',[])+checked.get('detail_unknown',[])]
+                    if checked['status']=='near_match':result['near_candidate']=result['candidate']
+            return result
         result = generate_loop(job['text'], GeminiSpecPlanner(taxonomy, job['model']),
-            lambda proposal: solve_proposal(proposal, job['text']), taxonomy,
+            checked_solver, taxonomy,
             budget_s=job['budget_s'], max_retries=job['max_retries'])
         if file_hash(os.environ['POSE_GENERATION_RIG']) != RIG_SHA256 or file_hash(job['taxonomy']) != job['taxonomy_sha256']:
             raise ValueError('source_changed_during_generation')

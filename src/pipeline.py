@@ -36,7 +36,7 @@ from .descriptor import build_slot_descriptors
 from .person_tags import apply_person_tags
 from .logging_setup import log_info, log_warn
 from .vlm import prompts
-from .body_scope import BodyScope, detect_scope
+from .body_scope import BodyScope, detect_scope, refine_scope_from_description
 from .refine_policy import structural_refine_allowed
 from .search import PositionSearchIndex, candidate_stability, knn_geometric, knn_upper_body
 from .tracing import span
@@ -80,7 +80,7 @@ class Pipeline:
     def __init__(self, entries, vlm_client: BaseVLMClient | None = None,
                  detector=None, pose_model=None, body_matcher=None,
                  semantic_searcher=None, routing_config: RoutingConfig | None = None,
-                 pose_generator=None, fullbody_search=None):
+                 pose_generator=None, fullbody_search=None, skeleton_repairer=None):
         # 검색 행렬과 메타데이터가 실행 중 서로 어긋나지 않도록 같은 immutable
         # snapshot을 공유한다. 라이브러리 갱신은 새 Pipeline 생성 시 자동 반영된다.
         self.entries = tuple(entries)
@@ -99,6 +99,12 @@ class Pipeline:
         # Generated research previews are NOT library candidates or refine bases.
         self._pose_generator = pose_generator
         self._fullbody_search = fullbody_search
+        # Review extracted joints before choosing geometry vs semantic routing.
+        # Auto-enable only on the new fullbody path; preserve legacy defaults.
+        if skeleton_repairer is None and fullbody_search is not None:
+            from .skeleton_repair import build_repairer
+            skeleton_repairer = build_repairer(self.vlm)
+        self.skeleton_repairer = skeleton_repairer or None
 
     @property
     def semantic_searcher(self):
@@ -170,7 +176,7 @@ class Pipeline:
             detect_scope(vlm, i).detected in (None, BodyScope.HEAD)
             for i in range(vlm.num_people)
         )
-        if all_head:
+        if all_head and self._fullbody_search is None:
             # Keep people/framing metadata even when search is not supported.
             # No pose inference, invented joints, or candidate generation here.
             assignment = assign_candidates(
@@ -374,25 +380,38 @@ class Pipeline:
                 "Human-Art 폴백 요청 거부: "
                 + ",".join(dict.fromkeys(rescue.rejected_reasons))
             )
+        repair_trace = None
+        if self.skeleton_repairer is not None:
+            with span("skeleton_repair"):
+                repair_trace = self.skeleton_repairer.repair(image, slots, img_w, img_h, CFG)
+            if repair_trace.get("called"):
+                notes.append(
+                    f"Gemini 스켈레톤 보완 {repair_trace['status']}: "
+                    f"수정 {len(repair_trace.get('repaired_slots') or [])}명, "
+                    f"{repair_trace['elapsed_ms']:.0f}ms")
         threshold_scale = 0.7 if count_confidence == "low" else 1.0
         routing = None
         if CFG.search_routing_enabled or self._fullbody_search is not None:
             with span("search_routing"):
                 routing = self._route_slots(image, img_w, img_h, vlm, slots)
+            if repair_trace is not None:
+                routing["summary"]["skeleton_repair"] = repair_trace
         processed: list[tuple[object, _SlotOutcome]] = []
         for slot in slots:
             decision = routing["decisions"].get(id(slot)) if routing else None
             if self._fullbody_search is not None and decision is not None:
                 desc = build_slot_descriptors(vlm, [slot], image_size=(img_w, img_h))[0]
+                desc.output_scope = refine_scope_from_description(
+                    desc.output_scope, decision.semantic.description)
                 evidence = {
                     "keypoints": slot.skeleton.keypoints.tolist() if slot.skeleton is not None else [],
                     "joint_mask": slot.evidence.valid_joint_mask.tolist() if slot.evidence is not None else [],
                     "coverage_class": desc.coverage_class,
+                    "output_scope": desc.output_scope.detected.value if desc.output_scope.detected else None,
+                    "output_scope_source": desc.output_scope.source,
                 }
                 with span("fullbody_search"):
-                    report = self._fullbody_search.search(decision, evidence,
-                        generation_block=desc.output_scope.detected in (
-                            BodyScope.HEAD, BodyScope.HALF, BodyScope.BUST))
+                    report = self._fullbody_search.search(decision, evidence)
                 self._apply_refine_policy(desc, slot, "low", has_candidates=False)
                 desc.refinable_limbs = ()
                 desc.quality_trace["search_scope"] = "whole_library_pose"
@@ -404,7 +423,7 @@ class Pipeline:
                 record["fullbody_search"] = report
                 desc.quality_reasons = list(dict.fromkeys(slot.reasons))
                 processed.append((slot, _SlotOutcome(desc, [], "low", report["reason"],
-                    hard_fallback=not bool(report["selected"]), routing=record)))
+                    hard_fallback=not bool(report["selected"] or report.get('basic_model')), routing=record)))
                 continue
             if decision is not None and decision.route in ("semantic", "undetermined", "error") \
                     and decision.joint.policy_block is None:
@@ -548,7 +567,7 @@ class Pipeline:
         for slot in slots:
             desc = build_slot_descriptors(vlm, [slot], image_size=(img_w, img_h))[0]
             block = None
-            if desc.output_scope.detected == BodyScope.HEAD:
+            if desc.output_scope.detected == BodyScope.HEAD and self._fullbody_search is None:
                 block = "head_search_unsupported"
             elif vlm.relationship.is_entangled:
                 block = "entangled_set_search_unavailable"
@@ -583,8 +602,13 @@ class Pipeline:
                     semantics[id(slot)] = assess_semantic_evidence(
                         None, rcfg, vlm_error=describe.error_reason or "unknown")
                 else:
+                    from .pose_relations import reconcile_sides
+                    description=describe.descriptions.get(index)
+                    if description and slot.skeleton is not None and slot.evidence is not None:
+                        checks=reconcile_sides(description,slot.skeleton.keypoints,slot.evidence.valid_joint_mask)
+                        if checks:description.laterality_review['joint_conflicts']=checks
                     semantics[id(slot)] = assess_semantic_evidence(
-                        describe.descriptions.get(index), rcfg)
+                        description, rcfg)
         decisions = {}
         for slot in slots:
             joint = joints[id(slot)]
@@ -603,6 +627,7 @@ class Pipeline:
                 "error_reason": getattr(describe, "error_reason", None),
                 "retryable": getattr(describe, "retryable", None),
                 "retry_after_seconds": getattr(describe, "retry_after_seconds", None),
+                "attempts": getattr(describe,"attempts",0),
                 "elapsed_ms": round(describe_ms, 3),
             },
             "routing_elapsed_ms": round((perf_counter() - started) * 1000.0, 3),
@@ -656,7 +681,7 @@ class Pipeline:
                 # No full-body invention for explicitly cropped/head scopes or
                 # existing entangled blocks; never repair a failed provider call.
                 blocked = (decision.joint.policy_block is not None or
-                           desc.output_scope.detected in (BodyScope.HEAD, BodyScope.HALF, BodyScope.BUST))
+                           desc.output_scope.detected in (BodyScope.HEAD, BodyScope.HALF, BodyScope.BUST, BodyScope.SHOULDER_HEAD))
                 with span("pose_generation_preview"):
                     generated = after_no_result(
                         self._pose_generator, description, search_status=result.status,
@@ -990,7 +1015,7 @@ class Pipeline:
 
         # provisional·모호한 소유권·crop 복구는 거리와 무관하게 high가 될 수 없다.
         if (slot.slot_origin == "rtm_provisional" or slot.state == "suspect"
-                or slot.skeleton_source in {"crop_retry", "fallback_full_image"}
+                or slot.skeleton_source in {"crop_retry", "fallback_full_image", "vlm_repair"}
                 ) and confidence == "high":
             confidence = "low"
             reason = "복구/provisional/소유권 의심 → 베이스 Top-5만 제공"

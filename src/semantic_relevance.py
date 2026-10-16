@@ -63,7 +63,14 @@ def relevance_constraints(query, description, tags):
         if not (re.search(r'입|입가', description) and re.search(r'손|팔', description)):
             failures.append('hand_at_mouth_required')
     if re.search(r'양손|두 손', query) and re.search(r'휴대폰|스마트폰', query):
-        if not re.search(r'양손|두 손', description):
+        # Missing hand count is unknown, not evidence of a one-handed pose.
+        # Reject only an explicit one-hand phone relationship; an unrelated
+        # "one hand" elsewhere in the description is not sufficient either.
+        onehand_phone = re.search(
+            r'(?:한\s*손|한쪽\s*손|오른손|왼손)(?:으로|에|만으로)?\s*'
+            r'(?:휴대폰|스마트폰)|(?:휴대폰|스마트폰)(?:을|를)?\s*'
+            r'(?:한\s*손|한쪽\s*손|오른손|왼손)', description)
+        if onehand_phone and not re.search(r'양손|두\s*손', description):
             failures.append('twohand_phone_not_onehand')
         if re.search(r'앉', query) and not (
                 ('posture', 'sitting') in tags or re.search(r'앉|좌식', description)):

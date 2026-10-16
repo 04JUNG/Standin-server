@@ -27,7 +27,7 @@ def generate_loop(text, planner, solver, taxonomy, *, budget_s=60., max_retries=
     """Injectable orchestration; the production caller also enforces a hard deadline."""
     from .natural_pose_schema import validate_proposal
     started = clock(); deadline = started + budget_s
-    attempts = []; previous = None; feedback = []
+    attempts = []; previous = None; feedback = []; near_candidates=[]
     for _ in range(max_retries + 1):
         remaining = deadline - clock()
         if remaining <= 0:
@@ -50,6 +50,11 @@ def generate_loop(text, planner, solver, taxonomy, *, budget_s=60., max_retries=
         feedback = result.get('reasons', [])
         row.update(status='passed' if result['passed'] else 'rejected', reasons=feedback,
                    validation=result.get('validation', {}), proposal=proposal.model_dump(exclude_none=True))
+        if result.get('near_candidate'):
+            near=dict(result['near_candidate'],kind='generated_near_match',refine_allowed=False,
+                      release_allowed=False,lookup_allowed=False,actual_mesh_validated=False,
+                      review_required=True,not_exact_match=True)
+            if all(c.get('bvh_sha256')!=near.get('bvh_sha256') for c in near_candidates):near_candidates.append(near)
         if clock() >= deadline:
             break
         if result['passed']:
@@ -63,7 +68,7 @@ def generate_loop(text, planner, solver, taxonomy, *, budget_s=60., max_retries=
     timed_out = clock() >= deadline
     return GenerationResult('timeout' if timed_out else 'rejected',
         'generation_deadline_exhausted' if timed_out else 'validation_failed_after_retries',
-        diagnostics={'attempts': attempts, 'review_required': True}, backend=VERSION,
+        diagnostics={'attempts': attempts, 'review_required': True,'near_candidates':near_candidates[:3]}, backend=VERSION,
         elapsed_ms=(clock()-started)*1000)
 
 
@@ -82,9 +87,18 @@ class NaturalLanguagePoseGenerator:
             return GenerationResult('unsupported', 'description_not_trusted', backend=VERSION)
         text = '. '.join(dict.fromkeys(part.strip() for part in (
             description.search_text, description.body_details) if part and part.strip()))
-        return self.generate_text(text)
+        scope=getattr(description,'visible_scope',None)
+        if scope in ('head','shoulder_head','half'):
+            text += (' . 출력은 '+scope+' 범위만 사용한다. 화면 밖 하체는 중립 서기 지지 자세로 둔다. '
+                     '보이지 않는 부위는 관측 정답이 아닌 기본값이다. 보이는 머리/어깨/팔 자세를 우선한다.')
+        relations=getattr(description,'pose_relations',[])
+        if relations:text+=' . 관찰 동작 관계: '+json.dumps(relations,ensure_ascii=False)
+        from .pose_requirements import requirements
+        from .semantic_search import SemanticQuery
+        required=requirements(SemanticQuery.from_description(description),dict(objects=description.objects,hand_count=None))
+        return self.generate_text(text,requirements=required)
 
-    def generate_text(self, text):
+    def generate_text(self, text, *, requirements=None):
         started = perf_counter()
         if not isinstance(text, str) or not text.strip() or len(text) > 2000:
             return GenerationResult('unsupported', 'invalid_text', backend=VERSION)
@@ -93,7 +107,8 @@ class NaturalLanguagePoseGenerator:
                 raise ValueError('rig_hash_mismatch')
             taxonomy_hash = file_hash(self.taxonomy)
             payload = dict(text=text.strip(), taxonomy=str(self.taxonomy), taxonomy_sha256=taxonomy_hash,
-                           budget_s=self.budget_s, max_retries=self.max_retries, model=self.model)
+                           budget_s=self.budget_s, max_retries=self.max_retries, model=self.model,
+                           requirements=requirements)
             env = {**os.environ, 'POSE_GENERATION_RIG': str(self.rig),
                    'OPENBLAS_NUM_THREADS': '1', 'OMP_NUM_THREADS': '1'}
             remaining = self.budget_s - (perf_counter()-started)

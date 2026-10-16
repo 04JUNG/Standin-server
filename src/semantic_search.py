@@ -74,6 +74,12 @@ class SemanticQuery:
     min_body_matches: int = 2
     # View wording is used only for semantic preview, never geometry/refine.
     context_evidence: str = ""
+    held_object_hands: dict = field(default_factory=dict)
+    held_object_hand_counts: dict = field(default_factory=dict)
+    arm_states: dict = field(default_factory=dict)
+    pose_relations: list = field(default_factory=list)
+    visible_scope: Optional[str] = None
+    head_view: Optional[str] = None
 
     @classmethod
     def from_description(cls, description, generic_postures=("standing",),
@@ -88,6 +94,12 @@ class SemanticQuery:
             body_observations=dict(getattr(description, "body_observations", {}) or {}),
             min_body_matches=int(min_body_matches),
             context_evidence=getattr(description, "context_evidence", "") or "",
+            held_object_hands=dict(getattr(description, "held_object_hands", {}) or {}),
+            held_object_hand_counts=dict(getattr(description, "held_object_hand_counts", {}) or {}),
+            arm_states=dict(getattr(description, "arm_states", {}) or {}),
+            pose_relations=list(getattr(description,'pose_relations',[]) or []),
+            visible_scope=getattr(description,'visible_scope',None),
+            head_view=getattr(description,'head_view',None),
         )
 
     def to_dict(self) -> dict:
@@ -116,6 +128,7 @@ class SemanticSearchResult:
     reason: Optional[str] = None
     backend: str = "unknown"
     elapsed_ms: float = 0.0
+    query_evidence: Optional[dict] = None
 
 
 class SemanticSearcher(Protocol):

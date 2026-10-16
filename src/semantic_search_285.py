@@ -660,7 +660,7 @@ def _read_json(path: str, what: str) -> dict:
 
 
 _META_KEEP = ("category", "category_label", "style", "pose_family_id",
-              "curation_group", "review_status")
+              "curation_group", "review_status", "body_parts", "is_mirror", "bvh_sha256")
 
 
 def _load_db_records(db_path: str) -> dict[str, dict]:
@@ -1143,6 +1143,10 @@ def _search(index, text, norm, source, top_k, min_score, settings, started, quer
     words = query_words(norm, lex)
     word_concepts = [
         [c for c in concepts if c.surface in w or (len(w) >= 2 and w in c.surface)]
+        # Explicit tags replace free-text concepts above. Preserve each word's
+        # lexical aliases for coverage: 스마트폰 must still match object:phone
+        # when the library description says 휴대폰 rather than 스마트폰.
+        + (lex.extract(w) if tag_list else [])
         for w, _ in words
     ]
     # 라이브러리 어디에도 없는 단어(태그 개념도 아님)는 '라이브러리 공백' 신호라 무겁게,

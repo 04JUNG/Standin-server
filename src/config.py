@@ -35,7 +35,7 @@ class Config:
     # --- VLM ---  provider: "mock"(오프라인 기본) | "gemini" | "openai"
     vlm_provider: str = os.getenv("VLM_PROVIDER", "mock")
     # src/vlm/prompts.py의 USER_TEMPLATES 키. 모르는 값이면 VLM 클라이언트를 만들 때 기동이 멈춘다.
-    vlm_prompt_version: str = os.getenv("VLM_PROMPT_VERSION", "p1-scope")
+    vlm_prompt_version: str = os.getenv("VLM_PROMPT_VERSION", "p3-output-scope")
     # 인물별 태그를 받을지. 분석 호출과 분리된 두 번째 VLM 호출이라 켜면 비용이 는다.
     # 실패해도 분석은 그대로 나간다 — 태그만 비고(unknown), 라우팅·검색은 영향이 없다.
     vlm_person_tags: bool = os.getenv("VLM_PERSON_TAGS", "0") == "1"

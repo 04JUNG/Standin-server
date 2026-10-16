@@ -135,6 +135,6 @@ def test_body_only_minimum_is_configurable_and_shared_with_query():
 
 def test_describe_prompt_is_versioned_and_requests_observation_not_coordinates():
     prompt = prompts.pose_describe_prompt([(0, 0, 1, 1)])
-    assert prompts.POSE_DESCRIBE_VERSION == "d2-observed-body"
+    assert prompts.POSE_DESCRIBE_VERSION == "d4-visible-action-relations"
     assert '"body_observations"' in prompt and '"context_evidence"' in prompt
     assert "jump와 fall을 동시에" in prompt and "좌표·각도는 출력하지 마라" in prompt
