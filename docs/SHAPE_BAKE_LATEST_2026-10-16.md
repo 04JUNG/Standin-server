@@ -3,6 +3,7 @@
 목표: 체형 더보기에서 슬라이더로 조절한 값이 **최종 FBX와 저장 결과 포즈에 그대로 들어간다.**
 대상 모델: 남성 **0.7.1**, 여성 **0.3.3** (`artifacts/body-production-release-2026-10-16-v0.7.1-v0.3.3`).
 여성은 작업 도중 0.3.2 → 0.3.3(골반 보정)으로 올라가 다시 등록·검증했다. 코드 변경 없이 릴리스 데이터만 다시 만들었다.
+이후 확정 모델 **남성 0.7.2 · 여성 0.3.4**(S3 스테이징 `confirmed-20261016-m072-f034`)도 코드 변경 없이 등록·검증했다(아래 절).
 
 ## 결론
 
@@ -67,6 +68,30 @@ converter HTTP 124/124 전달은 통과했지만 실제 포즈 표면 관통 55/
 관찰: 여성 풍만형 + 지방 볼륨 1.5 + 앉은 자세에서 배-허벅지 접촉부에 어두운 면이 보였다(모델 접촉 보정 영역,
 이번 연동과 무관한 기존 조형 한계로 보이며 모델 QA 확인 필요).
 
+## 남성 0.7.2 · 여성 0.3.4 (확정 모델, 2026-10-16)
+
+원본: `artifacts/body-surface-upgrade-2026-10-16/{male,female}/model` — S3 스테이징
+`body-models/releases/confirmed-20261016-m072-f034-04778b9f9479`의 blend와 SHA-256이 같다
+(남성 blend `9ff276f6…5998`·컨트롤러 `51baa18d…45b9`, 여성 blend `a3622a9d…ae32`·컨트롤러 `df981aed…eb1f`).
+바뀐 것은 컨트롤러 `correct_pose`(표면 보존 보정, 관통 검사 끔)뿐이고 중립 체형 계산은 0.7.1/0.3.3과 같다
+(40개 조합 0.0 mm, 같은 asset identity).
+
+- 코드 변경 없음: `build_shape_release.py --source <male> --source <female>`로 레지스트리(`shape-bake.v2`)와 프리셋 FBX 20개를 만들었다.
+- 실제 굽기 4회(2쌍, 무릎 꿇기) 모두 성공, 굽기 계보가 요청 값과 일치. **0.7.1/0.3.3보다 빠르다**(관통 검사가 빠짐).
+- 독립 검사 2/2 통과.
+
+| 체형 | BVH | 슬라이더 값 | 굽기(초) 프리셋/수치 | 관절 거리 오차 | 정점 이동 상관 | 체적 변화 중립→포즈 | 판정 |
+|---|---|---|---|---|---|---|---|
+| male-bulk-v0-7-2 | Kneel_02 | 근육 1.2 · 키 186 · 어깨 0.3 | 32 / 27 | 0.001 mm (변화 최대 20.09 mm) | 0.9264 | +8.0% → +8.4% | 통과 |
+| female-base-v0-3-4 | Kneel_02 | 가슴 0.6 · 지방 0.6(physique) · 지방 볼륨 1.0 · 키 165 | 14 / 20 | 0.001 mm (변화 최대 25.98 mm) | 0.8488 | +18.0% → +15.9% | 통과 |
+
+앱 실시간 자산(SSR1 정밀 이식, 클라이언트 `MALE_072`·`FEMALE_034` 별칭): 남성 7,091,028 B sha256 `f6d7be53…a129`,
+여성 4,984,080 B sha256 `c21d170b…6f2f`. 머리말 `source`가 위 원본과 같다. 패키징 예시는 아래 "실행" 4)번.
+
+남은 것: 확정본 S3 스테이징에는 blend·T 포즈 FBX·프리셋만 있다. 수치 굽기를 켜려면 컨트롤러 `.py`,
+`shape-bakes.json`(이 converter가 쓰는 레지스트리), 실시간 자산, BFF manifest의 `shapeSource`/`shapeRuntime`이 담긴
+shape-bake 릴리스를 Blender 5.2.0에서 `package_shape_staging.py`로 만들어 따로 게시해야 한다.
+
 ## 지연 시간
 
 수치 굽기 1회 30–110초(2 vCPU). 대부분 컨트롤러 `correct_pose`(21–70초)다. 남성 BULK가 가장 느리다.
@@ -87,7 +112,7 @@ CONVERTER_SHAPE_REGISTRY=<out>/shape-bakes.local.json blender --background --pyt
 # 3) 앱 실시간 자산 (클라이언트 저장소 scripts/shape-runtime/build_sampled_runtime.py)
 # 4) 패키지(업로드는 --upload일 때만)
 python scripts/package_shape_staging.py --release <out> --bake-qa <out>/bake-qa \
-  --runtime standin-body-0.7.1=<male.ssr> --runtime standin-female-body-0.3.3=<female.ssr> --version shape-<date>-v1
+  --runtime standin-body-0.7.2=<male.ssr> --runtime standin-female-body-0.3.4=<female.ssr> --version shape-<date>-v1
 ```
 
 배포 순서: converter → BFF → 앱 → 인프라에서 새 manifest 선택 → `BODY_SHAPE_EDIT_ENABLED`,
