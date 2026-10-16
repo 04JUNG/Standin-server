@@ -1,0 +1,13 @@
+{
+  "workspace": "/absolute/path/to/private-experiment-workspace",
+  "repo": "/absolute/path/to/Standin-server",
+  "routing_repo": "/absolute/path/to/fullbody-routing-checkout",
+  "python": "/absolute/path/to/refine-venv/bin/python",
+  "layout_python": "/absolute/path/to/humanart-venv/bin/python",
+  "blender": "/absolute/path/to/Blender",
+  "node": "/absolute/path/to/node",
+  "three_dir": "/absolute/path/to/node_modules/three",
+  "humanart_manifest": "/absolute/path/to/humanart-local-bundle/manifest.json",
+  "font": "/absolute/path/to/Korean-font.ttf",
+  "label_font": "/absolute/path/to/label-font.ttf"
+}

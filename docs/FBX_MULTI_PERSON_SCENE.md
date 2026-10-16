@@ -152,3 +152,13 @@ Three.js는 원본/합성본 모두에서 정점당 가중치 4개 초과 경고
 특성이며 두 결과의 실제 정점 좌표는 위 오차 이내다. Blender가 기존 terminal bone을 스킨
 cluster 배열에 포함해 배열 길이가 달라질 수 있어, Three.js 검증은 실제 본 계층과 스킨 정점
 좌표를 비교한다.
+
+## 러프 자동 맞춤 로컬 실험
+
+자동 방향·범위·배치·접촉 보정과 set3 비교 코드는
+[`experiments/multi_person_fbx`](../experiments/multi_person_fbx/README.md)에 기록했다.
+원본 실행 소스 28개와 체크섬, v3/v4 검증 수치, 개인 작업 공간용 경로 설정 도구를 포함한다.
+이 실험은 서비스의 3D 선택 버튼이나 `/analyze`에 연결되지 않았으며, 위 통합 변환 API는
+이미 포즈와 위치가 결정된 FBX를 받는다. 실험 v4의 Three.js 허용오차(1mm/0.1px)는
+위 합성 API의 Blender worker 검증(0.1mm)과 구분한다. 러프·라이브러리·생성 FBX와
+이미지 내장 HTML은 저장소에 포함하지 않는다.
