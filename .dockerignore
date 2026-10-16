@@ -26,3 +26,5 @@ data/
 tags.csv
 .env
 .env.*
+# 손 카탈로그 썸네일은 추론 서버가 /hands/{id}/thumbnail 로 직접 내보낸다(04J-290)
+!converter/hand_thumbs/*.png

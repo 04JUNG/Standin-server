@@ -76,6 +76,14 @@ report = {
     "artifact_sha256": hashlib.sha256(artifact).hexdigest(),
     "artifact_size": len(artifact),
 }
+if job.get("hands") is not None and mode != "hands_not_reported":
+    report["hands"] = {
+        "left": job["hands"]["left"], "right": job["hands"]["right"],
+        "library_sha256": os.environ.get("FAKE_HAND_LIBRARY_SHA256", ""),
+        "body_bones_preserved": True,
+    }
+    if mode == "hands_wrong_preset":
+        report["hands"]["left"] = "open"
 if mode == "wrong_source_hash":
     report["source_bvh_sha256"] = "0" * 64
 if mode == "rejected":
@@ -125,7 +133,10 @@ def _runner(
     jobs = tmp_path / "jobs"
     jobs.mkdir()
     worker = Path(__file__).resolve().parents[2] / "converter/worker.py"
-    env = {"FAKE_MODE": mode, "FAKE_VERSION": version}
+    from converter.hand_library import load_library
+
+    env = {"FAKE_MODE": mode, "FAKE_VERSION": version,
+           "FAKE_HAND_LIBRARY_SHA256": load_library().sha256}
     if engine is not None:
         env["FAKE_ENGINE"] = engine
     settings = RunnerSettings(
@@ -139,7 +150,8 @@ def _runner(
     return BlenderRunner(settings), jobs
 
 
-def _convert(runner: BlenderRunner, tmp_path: Path, thumbnail: ThumbnailRequest | None = None):
+def _convert(runner: BlenderRunner, tmp_path: Path, thumbnail: ThumbnailRequest | None = None,
+             **extra):
     character = tmp_path / "character.fbx"
     character.write_bytes(b"character")
     digest = hashlib.sha256(character.read_bytes()).hexdigest()
@@ -151,6 +163,7 @@ def _convert(runner: BlenderRunner, tmp_path: Path, thumbnail: ThumbnailRequest 
         conversion_id="conversion-test",
         mirror=False,
         thumbnail=thumbnail,
+        **extra,
     )
 
 
@@ -297,3 +310,33 @@ def test_thumbnail_settings_come_from_env(monkeypatch, tmp_path):
 def test_thumbnail_request_validates_its_fields(kwargs):
     with pytest.raises(ValueError):
         ThumbnailRequest(**kwargs)
+
+
+# ---- 손 굽기(04J-290) ---------------------------------------------------------
+
+def test_runner_passes_hands_to_the_job_and_checks_the_report(tmp_path):
+    runner, jobs = _runner(tmp_path)
+    result = _convert(runner, tmp_path, hands={"left": "grip", "right": None})
+    assert result.report["hands"]["left"] == "grip"
+    assert result.report["hands"]["right"] is None
+    assert list(jobs.iterdir()) == []
+
+
+def test_runner_without_hands_sends_no_hand_field(tmp_path):
+    runner, _ = _runner(tmp_path)
+    assert "hands" not in _convert(runner, tmp_path).report
+
+
+@pytest.mark.parametrize("mode", ["hands_not_reported", "hands_wrong_preset"])
+def test_runner_fails_closed_when_baked_hands_do_not_match(tmp_path, mode):
+    runner, _ = _runner(tmp_path, mode)
+    with pytest.raises(WorkerIntegrityError, match="hands"):
+        _convert(runner, tmp_path, hands={"left": "grip", "right": "fist"})
+
+
+@pytest.mark.parametrize("hands", [{"left": "tentacle"}, {"middle": "fist"}])
+def test_runner_rejects_unknown_hand_presets_before_starting_blender(tmp_path, hands):
+    runner, jobs = _runner(tmp_path)
+    with pytest.raises(ConversionRejectedError, match="hands"):
+        _convert(runner, tmp_path, hands=hands)
+    assert list(jobs.iterdir()) == []
