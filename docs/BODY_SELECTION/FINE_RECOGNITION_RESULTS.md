@@ -1,5 +1,9 @@
 # 세부 체형 판독 구현·평가 — 2026-10-17
 
+후속 실제 러프의 윤곽·가림·동일 포즈 비교 결과는
+[ROUGH_PROJECTION_RESULTS.md](ROUGH_PROJECTION_RESULTS.md)를 참고한다.
+아래 제어 렌더 정확도와 실제 러프 성능은 구분해야 한다.
+
 확정 자산 남성 0.7.2 9종·여성 0.3.4 11종의 실제 메시 측정 17축을
 `config/body_morphology.v1.json`에 기록했다. 20개 서명은 모두 다르다.
 기존 `body_presets.v2.json`의 0.6.12/0.2.3 draft는 과거 릴리스 명세로 보존한다.
