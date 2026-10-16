@@ -51,6 +51,7 @@ from src.pose_model_source import PoseModelFetchError, ensure_pose_model
 from src.refine import (REFINE_CODE_VERSION, REFINE_V2_CODE_VERSION,
                         refine_bvh)
 from src.refine_policy import structural_refine_allowed
+from src.pose_catalog import build_catalog, folders as pose_catalog_folders, page as pose_catalog_page
 from src.pose_quarantine import (load_pose_quarantine, pose_quarantine_sha256,
                                  quarantine_record)
 from src.repo import (FEATURE_VERSION, build_db, load_entries,
@@ -463,6 +464,14 @@ class _HintImg(str):
 # 우리가 더 두드리게 되고, 너무 길면 이미 풀린 뒤에도 사용자를 기다리게 한다.
 VLM_RETRY_AFTER_SECONDS = 30
 
+_VLM_FAILURE_MESSAGES = {
+    "rate_limited": "AI 분석 요청 한도에 일시적으로 도달했습니다. 잠시 후 다시 시도해 주세요.",
+    "daily_quota_exhausted": "AI 분석의 일일 사용 한도가 소진됐습니다. 한도 초기화 또는 운영자 확인이 필요합니다.",
+    "upstream_unavailable": "AI 분석 서비스가 일시적으로 혼잡하거나 이용 불가 상태입니다. 잠시 후 다시 시도해 주세요.",
+    "timeout": "AI 분석 응답 시간이 초과됐습니다. 잠시 후 다시 시도해 주세요.",
+    "upstream_error": "AI 분석 서비스에 일시적인 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+}
+
 
 def _vlm_unavailable_response(exc: VLMUnavailable) -> HTTPException:
     """상류 VLM 혼잡 → 503.
@@ -474,15 +483,23 @@ def _vlm_unavailable_response(exc: VLMUnavailable) -> HTTPException:
 
     오류 본문은 앱 서버(BFF)가 자기 오류 봉투로 옮겨 담는다(docs/API_CONTRACT.md §7).
     """
+    from math import ceil
+
+    reason = exc.reason if exc.reason in _VLM_FAILURE_MESSAGES else "upstream_error"
+    retryable = reason != "daily_quota_exhausted"
+    retry_after = max(VLM_RETRY_AFTER_SECONDS, ceil(exc.retry_after_seconds or 0)) if retryable else None
+    message = _VLM_FAILURE_MESSAGES[reason]
     log_warn("vlm_unavailable", "상류 VLM이 응답하지 못해 분석을 중단했다",
              route="/analyze", errorCode="VLM_UNAVAILABLE",
+             failureReason=reason, retryable=retryable, retryAfterSeconds=retry_after,
              upstreamStatus=exc.status, attempts=exc.attempts,
              elapsedMs=round(exc.elapsed_seconds * 1000))
     alerts.notify(
         "P2", "VLM_UNAVAILABLE",
-        "VLM 상류 혼잡으로 분석 요청이 실패했습니다. 사용자에게는 재시도 안내가 나갑니다.",
-        key="P2:vlm_unavailable",
+        message,
+        key=f"P2:vlm_unavailable:{reason}",
         context={"상류 상태": exc.status or "timeout", "시도": exc.attempts,
+                 "원인": reason, "재시도 가능": retryable,
                  "소요(초)": round(exc.elapsed_seconds, 1),
                  "모델": CFG.gemini_model},
     )
@@ -490,10 +507,12 @@ def _vlm_unavailable_response(exc: VLMUnavailable) -> HTTPException:
         status_code=503,
         detail={
             "code": "VLM_UNAVAILABLE",
-            "message": "분석 서버가 일시적으로 혼잡합니다. 잠시 후 다시 시도해 주세요.",
-            "retry_after_seconds": VLM_RETRY_AFTER_SECONDS,
+            "message": message,
+            "reason": reason,
+            "retryable": retryable,
+            "retry_after_seconds": retry_after,
         },
-        headers={"Retry-After": str(VLM_RETRY_AFTER_SECONDS)},
+        headers={"Retry-After": str(retry_after)} if retry_after is not None else {},
     )
 
 
@@ -625,6 +644,33 @@ def get_pose_bvh(pose_id: str):
                  f"실 라이브러리 빌드 전 단계.")
     return FileResponse(path, media_type="application/octet-stream",
                         filename=f"{pose_id}.bvh")
+
+
+def _pose_catalog():
+    """라이브러리 목록. Pipeline이 바뀌면(번들 교체·재기동) 다시 만든다."""
+    pipeline = STATE.get("pipeline")
+    if pipeline is None:
+        raise HTTPException(503, "library is not loaded")
+    cached = STATE.get("pose_catalog")
+    if cached is None or cached[0] is not pipeline:
+        cached = (pipeline, build_catalog(pipeline.entries))
+        STATE["pose_catalog"] = cached
+    return cached[1]
+
+
+@app.get("/poses/folders")
+def get_pose_folders():
+    """포즈 라이브러리의 출처별·분류별 폴더와 포즈 수(관리자 모아 보기)."""
+    return pose_catalog_folders(_pose_catalog())
+
+
+@app.get("/poses")
+def list_poses(source: str = "", category: str = "", q: str = "", cursor: str = "", limit: int = 48):
+    """포즈 라이브러리 한 페이지. 검색이 쓰는 목록 그대로라 격리된 포즈는 나오지 않는다."""
+    if limit < 1 or limit > 96:
+        raise HTTPException(400, "limit must be between 1 and 96")
+    return pose_catalog_page(_pose_catalog(), source=source or None, category=category or None,
+                             query=q or None, cursor=cursor or None, limit=limit)
 
 
 @app.get("/pose/{pose_id}/thumbnail")

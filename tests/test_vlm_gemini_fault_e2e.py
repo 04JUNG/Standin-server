@@ -70,6 +70,9 @@ def fault_server(outcomes):
                     {"error": {"code": 503, "message": "high demand", "status": "UNAVAILABLE"}},
                 )
                 return
+            if isinstance(outcome, dict):
+                self._json(429, {"error": {"code": 429, "status": "RESOURCE_EXHAUSTED", "details": [outcome]}})
+                return
             self._json(200, gemini_response())
 
         def _json(self, status: int, payload: dict):
@@ -131,6 +134,30 @@ def test_never_responding_transport_hits_real_sdk_timeout(monkeypatch):
         # timeout은 재시도하지 않지만, 원인은 상류 지연이므로 503으로 번역될 수 있게
         # VLMUnavailable로 감싼다. 실제 SDK 예외는 원인 사슬에 남는다.
         assert "timeout" in type(raised.value.__cause__).__name__.lower()
+
+
+def test_real_sdk_daily_quota_is_not_retried(monkeypatch):
+    monkeypatch.setattr(CFG, "gemini_max_attempts", 3)
+    quota = {"@type": "type.googleapis.com/google.rpc.QuotaFailure",
+             "violations": [{"quotaId": "GenerateRequestsPerDayPerProjectPerModel"}]}
+    with fault_server([quota]) as (base_url, state):
+        client = client_for(base_url, 3000, monkeypatch)
+        with pytest.raises(VLMUnavailable) as raised:
+            client.analyze("ignored", 100, 100)
+        assert state["requests"] == 1
+        assert raised.value.reason == "daily_quota_exhausted"
+
+
+def test_real_sdk_retry_info_over_budget_stops_without_extra_requests(monkeypatch):
+    monkeypatch.setattr(CFG, "gemini_total_budget_seconds", 75)
+    hint = {"@type": "type.googleapis.com/google.rpc.RetryInfo", "retryDelay": "120s"}
+    with fault_server([hint]) as (base_url, state):
+        client = client_for(base_url, 3000, monkeypatch)
+        with pytest.raises(VLMUnavailable) as raised:
+            client.analyze("ignored", 100, 100)
+        assert state["requests"] == 1
+        assert raised.value.reason == "rate_limited"
+        assert raised.value.retry_after_seconds == 120
 
 
 def test_real_sdk_503_is_retried_then_succeeds(monkeypatch):

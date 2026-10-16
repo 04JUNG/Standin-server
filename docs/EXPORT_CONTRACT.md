@@ -18,6 +18,9 @@
 - `/convert-bundle` = 최종 BVH 원문과 그 바이트로 만든 V3.2 FBX를 무결성 manifest와 함께 반환.
 - `/convert` = 하위 호환용 FBX 단일 응답.
 
+`/analyze`의 VLM 실패 원인·재시도 필드는 `API_CONTRACT.md` §7-1을 따른다.
+이는 분석 실패 안내만 확장하며, 정상 스켈레톤·선택·BVH/FBX export 계약은 바꾸지 않는다.
+
 FastAPI inference가 DB에서 legacy 주문서의 `bvh_url·set_id·tags`를 채운다. 최종 base/refined
 선택과 artifact 영속화는 BFF가 소유한다.
 
