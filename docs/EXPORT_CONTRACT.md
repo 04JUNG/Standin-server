@@ -24,6 +24,17 @@
 FastAPI inference가 DB에서 legacy 주문서의 `bvh_url·set_id·tags`를 채운다. 최종 base/refined
 선택과 artifact 영속화는 BFF가 소유한다.
 
+### 전신 동적 라우팅 검수 후보의 경계 (2026-10-16)
+
+`/analyze.people[].dynamic_search`의 원본 후보·`near_candidates`·`generation`·`basic_model`은
+기존 자동 export 흐름으로 직접 연결하지 않는다. 새 경로는 `refine_allowed=false`,
+`release_allowed=false`이며, 실제 인체 변환 후 검수와 사용자 선택이 필요하다.
+생성 BVH는 `generation.candidates[].bvh` 본문으로만 제공되고 `/pose/{id}/bvh`에 등록되지 않는다.
+로컬 손 피부 교차 검사 통과도 손-몸통/소품/동일 손 내부 전체의 충돌 인증은 아니다.
+출력 범위는 `output_scope.mesh_scope`를 변환기의 `output_scope`에 전달한다
+(`full`, 팔·손을 보존하는 `half`, 목·어깨선·머리만 남기는 `shoulder_head`).
+이 PR은 기존 `/export-order` 요청 스키마나 운영 export 승인 정책을 확장하지 않는다.
+
 ---
 
 ## 1. Legacy 요청 — Tauri/BFF → inference (`POST /export-order`)

@@ -1,10 +1,38 @@
 # API 계약 — 도원 추론 서버 (FastAPI)
 
-> 상태: 현재 계약 · 갱신일: 2026-10-02 · 기준 코드: `api/app.py`, `api/models.py`
+> 상태: 현재 계약 · 갱신일: 2026-10-16 · 기준 코드: `api/app.py`, `api/models.py`
 >
 > 이 문서는 **실제 구현된** HTTP 계약(`api/app.py`·`api/models.py`)을 문서화한다.
 > `/export-order`의 상세는 별도 문서(`docs/EXPORT_CONTRACT.md`)에 있고, 여기서는 전체 엔드포인트와
 > **앱 서버 팀 문서와의 경계·불일치**를 확정한다. 스키마의 단일 소스는 코드다 → FastAPI `/docs`(OpenAPI).
+
+---
+
+## 전신 동적 라우팅 연결 시 주의 (2026-10-16)
+
+`ROUTING_FULLBODY_ENABLED=1`에서는 요청 `POST /analyze`의 multipart 형식은 유지하고,
+인물별 새 응답 `people[].dynamic_search`를 읽는다. 세부 파이프라인·기동 조건은
+[`FULLBODY_DYNAMIC_ROUTING.md`](FULLBODY_DYNAMIC_ROUTING.md)가 기준이다.
+이 기능 브랜치의 API 팩토리는 변수가 없을 때도 1이므로, 기존 mock/레거시 개발 환경은
+명시적으로 0을 설정해야 한다. `.env.example`은 0으로 유지한다. PR 생성은 배포가 아니다.
+
+- `selected`: 핵심 동작 및 확인된 세부 조건을 통과한 전신 라이브러리 후보, 최대 5개.
+- `near_candidates`: 핵심 동작은 맞지만 다리/무릎 세부가 다르거나 미확인인 별도 검수 참고.
+  정답·확률·성공 5개 채우기용 후보가 아니며, 빈 `selected`의 생성 시도를 막지 않는다.
+- `pose_detail_fit`: 관측된 2D 몸통 기울기·골반 이동·다리 간격·무릎 각도의 동일 카메라 비교.
+- `generation`: 정상 검색이 비었을 때만 실행되는 검수용 자세 JSON→IK→BVH 생성. 검색/설명 오류는
+  생성으로 덮지 않는다. 생성/근접 참고는 원본 라이브러리 ID나 자동 export 대상이 아니다.
+- `basic_model`: 명시적 어깨~머리 컷의 기본 인체 출력 계획. 검색·생성 성공과 별도다.
+- `candidate_validation`, `branches`, `description_evidence`, `geometry_evidence`: 조건·실제 검색문·
+  관절 근거·분기별 실패/시간 기록. 기존 `candidates`/`semantic_candidates`와 임의 결합하지 않는다.
+
+이 경로는 Human-Art 관절의 조건부 VLM 검수·보완과 인물별 자세 설명을 사용한다.
+아래 레거시 경로의 “VLM은 좌표를 생성하지 않음” 규칙과 달리, 보완 관절은 `vlm_repair` 출처를
+명시하고 구조 검사 악화 시 되돌린다. 자동 high 신뢰도·refine 권한으로 승격하지 않는다.
+상하체 분리 검색·런타임 BVH 합성은 하지 않는다. API 기본 RRF 자연어 비중은 0.35이고 로컬
+set4/set5 비교는 0.60을 명시했으며, 실험 비중을 운영 기본값으로 바꾸지 않았다.
+모든 새 후보는 `release_allowed=false`, `refine_allowed=false`, `actual_mesh_validated=false`다.
+실제 반대 손 피부 삼각형 검사는 현재 로컬 변환 후 검수이며 자동 API 안전 인증이 아니다.
 
 ---
 

@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### 이 브랜치의 전신 동적 라우팅
 
-`feat/fullbody-dynamic-routing`은 사용자 요청에 따라 API 기본 경로를
+전신 동적 라우팅 기능 브랜치는 사용자 요청에 따라 API 기본 경로를
 Human-Art 관절 + Gemini 자세 설명 → 전신 원본 검색으로 변경한다.
 관절이 충분해도 자연어 검색을 함께 실행하여 순위를 결합한다. 아래 순수 기하
 불변식 1과 검색 설명은 `ROUTING_FULLBODY_ENABLED=0`인 레거시 경로에 해당한다.
