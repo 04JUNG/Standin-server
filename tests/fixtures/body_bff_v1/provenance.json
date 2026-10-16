@@ -1,0 +1,21 @@
+{
+  "repository": "04JUNG/Standin-app-server",
+  "commit": "ee0ba879cadb4e1bc71cedbb5640d1671ff049c4",
+  "transpiler": "typescript 5.9.3",
+  "target": "ES2022",
+  "scope": "Frozen deployed BFF mapper/resolver code, compiled without logic changes. No BFF deployment or production modification.",
+  "files": [
+    {
+      "source": "src/body-selection/model.ts",
+      "source_sha256": "7f335f781c4ed33b80da16426a0b130edd1cbd476bdd9de95dd421dd3748e6d2",
+      "compiled": "model.js",
+      "compiled_sha256": "9b111ee10544e13297d61999d649428e9825ab0c67ba06c2dfba92b13b41dab8"
+    },
+    {
+      "source": "src/body-selection/recommendation.ts",
+      "source_sha256": "224645d2d5415a8efbd13cfef95ff42e26b95c2505b90af08cca5b2ad0f3a222",
+      "compiled": "recommendation.js",
+      "compiled_sha256": "e06334d43b2b128e27834c3ac95dc9ff1de50fd6d239dd2a0e64aef4a220f315"
+    }
+  ]
+}

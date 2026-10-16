@@ -15,6 +15,7 @@ from .observation import (GeminiBodyAttributeClient, MockBodyAttributeClient, PR
                           geometry_ratios)
 from .schema import GEOMETRY_VERSION, OBSERVATION_VERSION, SCHEMA_VERSION, parse_person, unknown_attributes
 from .selection import choose_body
+from .evidence import mask_geometry
 
 _INIT_LOCK = RLock()
 
@@ -163,6 +164,7 @@ class BodyMatchingService:
             if obs["ownership_ambiguous"]:
                 obs["attributes"] = unknown_attributes()
                 obs["geometry"] = {}
+            obs["geometry"] = mask_geometry(obs)
             poses = []
             for candidate in (result.person_candidates[index] if index < len(result.person_candidates) else []):
                 pose_hash = None
