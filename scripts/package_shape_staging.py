@@ -99,7 +99,7 @@ def main():
         recipe = registry['characters'][cid]
         assert sha(copy(release / 'fbx' / (cid + '.fbx'), f'fbx/{cid}.fbx').read_bytes()) == recipe['asset_sha256'] == body['assetSha256']
         png = release / 'png' / (cid + '.png')
-        if png.exists():
+        if png.exists() and 'neutralPreview' in body:
             copy(png, f'png/{cid}.png')
             body['neutralPreview']['path'] = DEPLOY + f'png/{cid}.png'
         meta = runtime_meta.get(recipe['rules'])

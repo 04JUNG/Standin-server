@@ -1,4 +1,7 @@
-"""Bake current-preset T-pose PNGs using one fixed comparison camera."""
+"""Bake current-preset T-pose PNGs using one fixed comparison camera.
+
+    blender --background --python scripts/render_shape_catalog.py -- <release dir>
+"""
 import sys,json,hashlib
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
@@ -6,9 +9,11 @@ import bpy
 from mathutils import Vector
 from converter.shape_bake import _load
 from converter.preview_style import configure_workbench
-R=ROOT/'artifacts/shape-staging/release';recipes=json.loads((R/'shape-bakes.local.json').read_text())['characters'];bodies=json.loads((R/'body-models.local.json').read_text());(R/'png').mkdir(exist_ok=True)
+argv=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else sys.argv[1:]
+R=Path(argv[0]).resolve() if argv else ROOT/'artifacts/shape-staging/release'
+registry=json.loads((R/'shape-bakes.local.json').read_text());recipes=registry['characters'];sources=registry['sources'];bodies=json.loads((R/'body-models.local.json').read_text());(R/'png').mkdir(exist_ok=True)
 for body in bodies['assets']:
- cid=body['characterId'];recipe=recipes[cid];recipe['values']=recipe['defaults'];sb=_load(recipe);sb.apply_pose('T');m,a=sb.objects();co=sb.evaluated(m);faces=[list(p.vertices) for p in m.data.polygons]
+ cid=body['characterId'];recipe={**recipes[cid],**sources[recipes[cid]['rules']]};recipe['values']=recipe['defaults'];sb=_load(recipe);sb.apply_pose('T');m,a=sb.objects();co=sb.evaluated(m);faces=[list(p.vertices) for p in m.data.polygons]
  # Freeze only this render copy; no source model or controller is written.
  for name,fn in sb.HANDLERS:
   handlers=getattr(bpy.app.handlers,name)
