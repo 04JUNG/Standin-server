@@ -453,19 +453,18 @@ def create_app(
             }
         if os.getenv("CONVERTER_SHAPE_REGISTRY"):
             try:
-                from pathlib import Path
-                from converter.shape_spec import validate_recipe
-                registry_data=json.loads(Path(os.environ["CONVERTER_SHAPE_REGISTRY"]).read_text())
-                if registry_data.get("schema") != "shape-bake.v1" or not registry_data.get("characters"):
-                    raise ValueError("invalid shape registry")
-                seen=set()
-                for recipe in registry_data["characters"].values():
-                    identity=(recipe.get("blend"),recipe.get("controller"),recipe.get("rules"))
-                    validate_recipe(recipe, verify_files=False)
-                    if identity not in seen:validate_recipe(recipe);seen.add(identity)
-                checks["shape_sources"]={"ok":True,"schema":"shape-bake.v1","models":len(registry_data["characters"])}
-            except (ValueError,KeyError,OSError,TypeError):
-                ok=False;checks["shape_sources"]={"ok":False,"code":"SHAPE_SOURCE_UNAVAILABLE"}
+                from converter.shape_spec import load_registry, REGISTRY_SCHEMA
+                # Re-hashes each approved source once and checks its VERSION literal.
+                registry_data = load_registry()
+                checks["shape_sources"] = {
+                    "ok": True,
+                    "schema": REGISTRY_SCHEMA,
+                    "models": len(registry_data["characters"]),
+                    "rules": sorted(registry_data["sources"]),
+                }
+            except (ValueError, KeyError, OSError, TypeError):
+                ok = False
+                checks["shape_sources"] = {"ok": False, "code": "SHAPE_SOURCE_UNAVAILABLE"}
         payload = {
             "ok": ok,
             "solver_version": SOLVER_VERSION,
@@ -505,6 +504,7 @@ def create_app(
         camera_rotation: list | None = None,
         preview_model: bool = False,
         shape: str | None = None,
+        expected_shape_source: str | None = None,
     ) -> CompletedConversion:
         conversion_id = str(uuid.uuid4())
         request_started = time.monotonic()
@@ -564,10 +564,21 @@ def create_app(
             from converter.shape_spec import resolve_shape, ShapeError
             if shape is not None and len(shape) > 16384:
                 raise ApiProblem(413, "INVALID_SHAPE", "shape payload is too large", conversion_id=conversion_id)
+            if expected_shape_source is not None and (shape is None or len(expected_shape_source) > 1024):
+                raise ApiProblem(400, "INVALID_SHAPE", "expected_shape_source needs a shape", conversion_id=conversion_id)
             try:
+                expected_source = json.loads(expected_shape_source) if expected_shape_source is not None else None
                 shape_recipe = resolve_shape(character_id, resolved.metadata.sha256,
-                                             json.loads(shape) if shape is not None else None)
-            except (ShapeError, ValueError, KeyError, OSError) as exc:
+                                             json.loads(shape) if shape is not None else None,
+                                             expected_source)
+            except ShapeError as exc:
+                if str(exc) == "shape source mismatch":
+                    # The catalog promised another authoring version than this converter
+                    # bakes. Refuse before Blender work; the client must not get a body
+                    # that differs from its live preview.
+                    raise ApiProblem(409, "SHAPE_SOURCE_MISMATCH", str(exc), conversion_id=conversion_id) from exc
+                raise ApiProblem(400, "INVALID_SHAPE", str(exc), conversion_id=conversion_id) from exc
+            except (ValueError, KeyError, OSError) as exc:
                 raise ApiProblem(400, "INVALID_SHAPE", str(exc), conversion_id=conversion_id) from exc
             result = blender_runner.convert(
                 bvh_bytes=bvh_bytes,
@@ -959,6 +970,7 @@ def create_app(
         camera_rotation: str | None = Form(default=None),
         preview_format: str = Form(default="png"),
         shape: str | None = Form(default=None),
+        expected_shape_source: str | None = Form(default=None),
     ):
         """One verified FBX plus its own reimported preview, in a single response."""
         contract = verify_preview_revision(expected_preview_revision)
@@ -978,6 +990,7 @@ def create_app(
             expected_character_sha256=expected_character_sha256,
             output_scope=output_scope, preview_view=preview_view if preview_format == "png" else None,
             camera_rotation=rotation, preview_model=preview_format == "model", shape=shape,
+            expected_shape_source=expected_shape_source,
         )
         result = completed.result
         if preview_format == "model":
@@ -1029,8 +1042,8 @@ def create_app(
             "character_sha256": completed.character.metadata.sha256,
             "source_bvh_sha256": result.source_bvh_sha256,
             "shape_sha256": result.report.get("shape_bake", {}).get("shape_sha256"),
-                "shape_bake": result.report.get("shape_bake"),
-                "fbx_sha256": result.artifact_sha256,
+            "shape_bake": result.report.get("shape_bake"),
+            "fbx_sha256": result.artifact_sha256,
             "preview_sha256": result.report["preview_sha256"],
             "camera_rotation": rotation,
             "fbx_base64": base64.b64encode(result.artifact).decode("ascii"),

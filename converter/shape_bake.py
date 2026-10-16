@@ -7,7 +7,7 @@ Only the final, corrected fixed FBX is passed to PNG/GLB generation.
 from __future__ import annotations
 import importlib.util,json,shutil,hashlib
 from pathlib import Path
-from .shape_spec import validate_recipe
+from .shape_spec import validate_source
 
 def import_full_character(path):
     """Approved shape FBXs have no synthetic leaf bones; retain their 52 real bones."""
@@ -36,11 +36,14 @@ def import_full_character(path):
 
 def _load(recipe):
     import bpy
-    validate_recipe(recipe)
+    # Re-hash the approved source inside the job process: the paths came from the
+    # registry, but the bytes on disk are checked again right before Blender opens them.
+    validate_source(recipe['rules'],{k:recipe[k] for k in ('blend','controller','blend_sha256','controller_sha256')})
     bpy.ops.wm.open_mainfile(filepath=recipe['blend'])
     # No embedded file scripts are auto-executed; only the pinned module is loaded.
     spec=importlib.util.spec_from_file_location('_standin_shape_controller',recipe['controller'])
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    if getattr(module,'VERSION',None)!=recipe['rules']:raise ValueError('loaded controller VERSION does not match shape rules')
     module.register();module.set_controls(recipe['values'],correct=False)
     return module
 

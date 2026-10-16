@@ -149,6 +149,10 @@ class RunnerSettings:
     thumbnail_samples: int = THUMBNAIL_RENDER_SAMPLES
     thumbnail_engines: tuple[str, ...] = THUMBNAIL_ENGINES
     camera_timeout_seconds: float = 60.0
+    # A shaped job opens the authoring .blend twice and runs its pose correctives
+    # (contacts/axilla repair). Measured 30-110 s per job on 2 vCPU; keep it separate
+    # from the 30 s budget of plain conversions.
+    shape_timeout_seconds: float = 300.0
 
     @classmethod
     def from_env(cls, repo_root: Path | None = None) -> "RunnerSettings":
@@ -167,6 +171,7 @@ class RunnerSettings:
             ),
             timeout_seconds=float(os.getenv("CONVERTER_TIMEOUT_SECONDS", "30")),
             camera_timeout_seconds=float(os.getenv("CONVERTER_CAMERA_TIMEOUT_SECONDS", "60")),
+            shape_timeout_seconds=float(os.getenv("CONVERTER_SHAPE_TIMEOUT_SECONDS", "300")),
             terminate_grace_seconds=float(
                 os.getenv("CONVERTER_TERMINATE_GRACE_SECONDS", "2")
             ),
@@ -228,6 +233,8 @@ class BlenderRunner:
             raise ValueError("converter timeout_seconds must be positive")
         if self.settings.camera_timeout_seconds <= 0:
             raise ValueError("camera timeout_seconds must be positive")
+        if self.settings.shape_timeout_seconds <= 0:
+            raise ValueError("shape timeout_seconds must be positive")
         if self.settings.terminate_grace_seconds < 0:
             raise ValueError("converter terminate_grace_seconds must be non-negative")
         if self.settings.max_concurrent_processes <= 0:
@@ -739,6 +746,8 @@ class BlenderRunner:
             try:
                 timeout = (max(self.settings.timeout_seconds, self.settings.camera_timeout_seconds)
                            if camera_rotation is not None else self.settings.timeout_seconds)
+                if shape_recipe is not None:
+                    timeout = max(timeout, self.settings.shape_timeout_seconds)
                 stdout, stderr = process.communicate(timeout=timeout)
             except subprocess.TimeoutExpired as exc:
                 self._terminate_process_group(
