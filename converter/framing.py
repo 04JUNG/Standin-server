@@ -8,14 +8,14 @@ from __future__ import annotations
 
 from pathlib import Path
 
-FRAMING_VERSION = "skin-regions-v1"
-OUTPUT_SCOPES = frozenset({"full", "half", "bust", "head"})
+FRAMING_VERSION = "skin-regions-v2-shoulder-head"
+OUTPUT_SCOPES = frozenset({"full", "half", "bust", "shoulder_head", "head"})
 PREVIEW_VIEWS = frozenset({"front", "three_quarter", "side", "back"})
 
 
 def validate_scope(value: str) -> str:
     if not isinstance(value, str) or value not in OUTPUT_SCOPES:
-        raise ValueError("output_scope must be full, half, bust or head")
+        raise ValueError("output_scope must be full, half, bust, shoulder_head or head")
     return value
 
 
@@ -23,7 +23,7 @@ def retained_roles(scope: str) -> set[str]:
     validate_scope(scope)
     if scope == "head":
         return {"head"}
-    if scope == "bust":
+    if scope in ("bust", "shoulder_head"):
         return {"spine2", "neck", "head", "shoulder.L", "shoulder.R"}
     if scope == "half":
         return {"spine", "spine1", "spine2", "neck", "head"} | {
@@ -58,6 +58,23 @@ def crop_meshes(arm, meshes, scope: str) -> dict:
         raise ValueError("character lacks the anatomical anchors for framing")
     inverse = {value: key for key, value in mapping.items()}
     roles = retained_roles(scope)
+    shoulder_plane = None
+    if scope == 'shoulder_head':
+        required = ('upperarm.L', 'upperarm.R')
+        if any(mapping.get(role) not in bones for role in required):
+            raise ValueError('shoulder framing requires both shoulder anchors')
+        # The exported rigged-rest character uses the delivered posed anatomy.
+        # Clip along its own torso axis, never the world's vertical coordinate.
+        left = arm.data.bones[mapping['upperarm.L']].head_local
+        right = arm.data.bones[mapping['upperarm.R']].head_local
+        shoulder = (left + right) * .5
+        hip = arm.data.bones[mapping['hips']].head_local
+        axis = shoulder - hip
+        length = axis.length
+        if length <= 1e-8:
+            raise ValueError('degenerate shoulder framing anchors')
+        axis.normalize()
+        shoulder_plane = (shoulder - axis * (.10 * length), axis, length)
 
     def keep_bone(name):
         bone = arm.data.bones.get(name)
@@ -88,6 +105,10 @@ def crop_meshes(arm, meshes, scope: str) -> dict:
                     raise ValueError("framing cannot classify unweighted vertices")
                 membership = sum(weight for group, weight in weights.items()
                                  if groups.get(group, False)) / total - .5
+                if shoulder_plane is not None:
+                    origin, axis, length = shoulder_plane
+                    anatomical = arm.matrix_world.inverted() @ mesh.matrix_world @ vertex.co
+                    membership = min(membership, (anatomical-origin).dot(axis) / length)
                 vertex[position] = vertex.co.copy()
                 vertex[scalar] = membership
                 vertex.co.z = membership
