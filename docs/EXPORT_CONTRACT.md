@@ -21,6 +21,8 @@
 `/analyze`의 VLM 실패 원인·재시도 필드는 `API_CONTRACT.md` §7-1을 따른다.
 이는 분석 실패 안내만 확장하며, 정상 스켈레톤·선택·BVH/FBX export 계약은 바꾸지 않는다.
 
+체형 P0·P1의 decision/policy/suggestion은 `/analyze` 진단이다. suggestion을 export 체형으로 사용하지 않는다. 최종 체형은 기존 BFF 선택 결과를 사용하며 수동 선택·fixed_default·기본값 우선순위와 export 형식은 유지한다. [체형 계약](BODY_PIPELINE_API_CONTRACT.md).
+
 FastAPI inference가 DB에서 legacy 주문서의 `bvh_url·set_id·tags`를 채운다. 최종 base/refined
 선택과 artifact 영속화는 BFF가 소유한다.
 

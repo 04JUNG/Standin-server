@@ -22,9 +22,12 @@ Python 응답은 `BodyMatchingOut | EmptyBodyMatchingOut`이다. JSON은 object�
 | people[].person_index | 기존 people[].index와 결합 |
 | people[].person_id | input_sha256:p{person_index}. 현재 분석 범위의 ID이며 장기 캐릭터 ID가 아님 |
 | observations | 속성 값·가시성·근거·coverage·소유권·캐릭터 디자인 표현 |
-| auto_body_id / selected_asset | 추천 체형 및 body/rig/measurement 버전·asset hash |
+| auto_body_id / selected_asset | 자동 선택한 체형 및 body/rig/measurement 버전·asset hash. 보류 시 둘 다 null |
+| suggested_body_id / suggested_asset | 적용 정책과 분리된 후보 제안. BFF 자동 선택으로 소비하지 않음 |
+| decision | auto_apply / presentation_default / suggest_only / insufficient_evidence / asset_unavailable |
+| policy_version / application_policy | 자동 적용 허용·명확한 축·독립 근거 그룹·보류 사유. calibrated=false, acceptance_probability=null |
 | applied_body_id | auto에서 추천 ID, shadow에서 null. 외부 적용 대상으로 선택됐다는 뜻이며 메시/썸네일 적용 완료를 뜻하지 않음 |
-| selection_source | auto_best_effort / auto_presentation_default / auto_default. presentation_default는 명확한 인물 디자인 단서에 맞는 체형군 안에서 기본 체격을 선택. auto_default는 시각 근거 없는 기본값 |
+| selection_source | auto_best_effort / auto_presentation_default / auto_default. presentation_default는 명확한 인물 디자인 단서에 맞는 체형군 안에서 기본 체격을 선택. auto_default는 시각 근거 없는 기본값 제안이며 자동 적용하지 않음 |
 | diagnostic / reason_codes | 근거 부족·provider 실패·자산 없음 등 |
 | candidates / tied_body_ids | 상위 체형 최대 3개 및 동점 목록. 포즈 Top-5와 별개 |
 | presentation_selection | 디자인 계열 관측으로 후보 제한/동점/기본값을 결정한 기록 |
@@ -40,7 +43,8 @@ Python 응답은 `BodyMatchingOut | EmptyBodyMatchingOut`이다. JSON은 object�
 - 기존 pose_id/view/후보 순위·개수·검색·refine 정책을 수정하지 않는다.
 - 사람별 body pose_bindings가 기존 후보와 다르거나 인물 ID가 어긋나면 `body_contract_invalid` unavailable로 축소한다. 기존 people/포즈 응답은 유지한다.
 - core 외 route에는 not_applicable. 후보 없는 인물에는 자동 체형을 적용하지 않는다.
-- 관측 timeout/파싱 오류는 provider_error를 기록하고 승인된 기본값이 있으면 auto_default를 쓴다. 실패를 시각 관측 성공으로 바꾸지 않는다.
+- 관측 timeout/파싱 오류·약한 근거·동점은 auto/selected/applied를 null, selection_state를 unavailable, render_required를 false로 반환한다. 추천/기본값은 suggestion으로만 남긴다. 기존 BFF는 수동 선택 → fixed_default → 유효 auto → 사용자 기본값 → catalog 기본값 우선순위를 유지한다. 명시적 auto 요청에 유효 auto가 없으면 BFF의 기존 오류 동작을 유지한다.
+- 새 decision과 policy의 허용 여부·출처·버전, suggestion ID와 자산 참조의 ID가 다르면 body_contract_invalid로 축소한다. 이전 decision 없는 v1 응답도 허용한다.
 - 카탈로그 파일 오류는 unavailable, 빈/부적합 자산 목록은 인물별 unavailable 및 컷 partial.
 - draft/qa_pending/retired 자산, FBX/QA hash 불일치, 지원되지 않은 pose는 선택하지 않는다.
 - off는 체형 VLM·카탈로그 로드를 실행하지 않는다. body 단계 예외는 성공한 포즈 결과를 파괴하지 않는다.
@@ -58,4 +62,14 @@ Python 응답은 `BodyMatchingOut | EmptyBodyMatchingOut`이다. JSON은 object�
 
 ### 디자인 단서만 관측된 경우
 
-`auto_presentation_default`는 소유권이 명확하고 visible 여성형/남성형 디자인 단서로 compatible_candidates를 구성했지만 비교 가능한 체격·투영 점수가 없을 때 사용한다. 체격·근육·등신을 감지했다는 뜻이 아니며 일치율은 계속 null이다. 약한 단서·헤어/의상만의 단서·소유권 불명·호환 체형 부재는 이 출처로 승격하지 않는다. BFF는 이 출처와 presentation 진단을 검증하여 선택을 유지한다. 사용자 manual/fixed_default 우선순위는 유지한다. 기존 BFF는 새 출처를 unavailable로 처리하므로 BFF 지원 후 감지 변경을 활성화한다.
+`auto_presentation_default`는 소유권이 명확하고 visible 여성형/남성형 디자인 단서로 compatible_candidates를 구성했지만 비교 가능한 체격·투영 점수가 없을 때 사용한다. 체격·근육·등신을 감지했다는 뜻이 아니며 일치율은 계속 null이다. 약한 단서·헤어/의상만의 단서·소유권 불명·호환 체형 부재는 이 출처로 승격하지 않는다. BFF는 이 출처와 presentation 진단을 검증하여 선택을 유지한다. 사용자 manual/fixed_default 우선순위는 유지한다. 2026-10-16 확인한 스테이징 BFF(`ee0ba879`)는 이 출처를 지원한다. 이 경로는 `decision=presentation_default`, `application_policy.allowed=false`로 구분하며 체형 판독 성공으로 계산하지 않는다.
+
+### 형태 근거와 적용 정책 (P1)
+
+`body-attributes.v5.regional-evidence` / `body-observation.v5.regional-evidence`는 부위별 `representation`과 `surface_detail`, 축별 `evidence_regions`를 관측한다. 새 provider 스키마는 이 필드를 요구하지만 이전 관측 payload는 읽을 수 있다. coverage/representation 없는 legacy 관측은 형태 자동 적용을 허용하지 않는다.
+
+coverage가 visible이고 representation이 outline/shaded인 **동일 부위**만 명확한 형태 근거다. 스틱 라인·숨은 볼륨·잘리거나 단축된 등신을 제외한다. 팔 윤곽만 없는 전신에서 등신을 버리지는 않는다. 세부 근육선을 생략한 그림의 muscle=0은 미상 처리하며, 보이는 외곽 근육 볼륨은 보존한다.
+
+`body-apply.structural-evidence.v2`는 최소 2개 독립 근거 그룹과 전체/명확한 근거 순위의 동일한 유일한 1위를 요구한다. 같은 윤곽의 여러 라벨은 1그룹이다. 명시적인 torso 프레임과 arms 볼륨처럼 서로 다른 부위의 근거는 2그룹이 될 수 있다. 투영 가설별 동점에 1위가 포함되면 허용하되, 다른 후보를 단독 지지하는 모순은 보류한다. 거리나 점수 차이는 확률·보정된 신뢰도로 표시하지 않는다.
+
+[최신 20종 명세·리뷰 결과·BFF 회귀 검증](BODY_SELECTION/P0_P1_REVIEW.md).

@@ -276,7 +276,7 @@ async def lifespan(app: FastAPI):
     alerts.flush()
 
 
-app = FastAPI(title="Standin Pose Pipeline", version="0.2.1", lifespan=lifespan)
+app = FastAPI(title="Standin Pose Pipeline", version="0.2.2", lifespan=lifespan)
 
 
 def _refine_capability() -> dict:

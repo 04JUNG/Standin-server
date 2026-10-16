@@ -81,6 +81,9 @@ class BodyObservationOut(BodyWireModel):
     coverage: BodyCoverageOut | None = None
     full_body_visible: bool | None = None
     presentation: PresentationOut | None = None
+    representation: dict[Literal['head','torso','arms','legs'], Literal['outline','shaded','skeletal','unknown']] | None = None
+    surface_detail: Literal['drawn','omitted','unknown'] | None = None
+    evidence_regions: dict[str, list[Literal['head','torso','arms','legs']]] | None = None
 
 
 class PresentationSelectionOut(BodyWireModel):
@@ -101,6 +104,16 @@ class BodyCandidateOut(BodyWireModel):
     score_spread: float | None = None
 
 
+class BodyApplicationPolicyOut(BodyWireModel):
+    version: str
+    allowed: bool = Field(strict=True)
+    strong_axes: list[str]
+    evidence_groups: list[str]
+    reason_codes: list[str]
+    calibrated: Literal[False] = False
+    acceptance_probability: None = None
+
+
 class BodyPersonOut(BodyWireModel):
     person_index: int = Field(ge=0)
     person_id: str
@@ -119,9 +132,29 @@ class BodyPersonOut(BodyWireModel):
     manual_change_scope: Literal['current_cut_person']
     presentation_selection: PresentationSelectionOut | None = None
     tied_body_ids: list[str] = Field(default_factory=list)
+    decision: Literal['auto_apply','presentation_default','suggest_only','insufficient_evidence','asset_unavailable'] | None = None
+    policy_version: str | None = None
+    application_policy: BodyApplicationPolicyOut | None = None
+    suggested_body_id: str | None = None
+    suggested_asset: BodyAssetRef | None = None
 
     @model_validator(mode='after')
     def consistent_selection(self):
+        if self.decision == 'auto_apply' and (self.auto_body_id is None
+                or self.application_policy is None or not self.application_policy.allowed
+                or self.selection_source != 'auto_best_effort'):
+            raise ValueError('body_decision_policy_mismatch')
+        if self.decision == 'presentation_default' and (self.auto_body_id is None
+                or self.selection_source != 'auto_presentation_default'
+                or self.application_policy is None or self.application_policy.allowed):
+            raise ValueError('body_presentation_default_policy_mismatch')
+        if self.decision in {'suggest_only','insufficient_evidence','asset_unavailable'} and self.auto_body_id is not None:
+            raise ValueError('held_body_has_selection')
+        if self.application_policy is not None and self.policy_version != self.application_policy.version:
+            raise ValueError('body_policy_version_mismatch')
+        if (self.suggested_asset is None) != (self.suggested_body_id is None) or (
+                self.suggested_asset is not None and self.suggested_asset.body_id != self.suggested_body_id):
+            raise ValueError('body_suggestion_identity_mismatch')
         if self.person_id != self.observations.person_id:
             raise ValueError('body_observation_person_mismatch')
         if self.auto_body_id is None:

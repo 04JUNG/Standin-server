@@ -533,6 +533,8 @@ OpenAPI 자동 문서: 서버 기동 후 **`http://127.0.0.1:8000/docs`**. 이 �
 
 ## 선택적 체형 관측·자동선택 결과
 
+2026-10-16 P0·P1: `body-match.v1`에 decision/policy/suggestion을 선택적 진단으로 추가한다. 약한 체형 근거는 자동 ID를 null로 반환하고, 기존 BFF의 수동 선택·사용자/카탈로그 기본값 처리를 따른다. 명확한 디자인 계열의 `auto_presentation_default`는 유지한다. [리뷰 및 최신 20종 draft 명세](BODY_SELECTION/P0_P1_REVIEW.md).
+
 `BODY_MATCHING_MODE=off`(기본값)에서는 `/analyze.body_matching={}`이다. `shadow|auto`에서는 인물별 관측·자동선택 결과를 추가한다. 기존 people/포즈 순위/검색·refine 정책은 그대로다. 스키마·오류·catalog 승인 조건은 [체형 감지·선택 API 계약](BODY_PIPELINE_API_CONTRACT.md)을 따른다. 이 필드는 기존 클라이언트의 수동 선택을 덮어쓰지 않으며, 렌더·BFF 상태 저장·Export는 실행하지 않는다.
 
 # 후보 표시 카메라 (2026-10-07 추가)
