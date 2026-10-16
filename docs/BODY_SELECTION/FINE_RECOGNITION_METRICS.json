@@ -1,0 +1,99 @@
+{
+  "evaluation_date": "2026-10-17",
+  "status": "experimental_not_deployed",
+  "assets": {
+    "male": "0.7.2",
+    "female": "0.3.4",
+    "count": 20,
+    "unique_measured_signatures": 20
+  },
+  "development": {
+    "baseline": {
+      "top1": 9,
+      "top3": 25,
+      "denominator": 40
+    },
+    "fine": {
+      "top1": 12,
+      "top3": 28,
+      "denominator": 40
+    }
+  },
+  "contour": {
+    "development": {
+      "n": 40,
+      "top1": 38,
+      "top3": 40,
+      "auto_applied": 0,
+      "by_view": {
+        "front": {
+          "n": 20,
+          "top1": 18,
+          "top3": 20
+        },
+        "side": {
+          "n": 20,
+          "top1": 20,
+          "top3": 20
+        }
+      }
+    },
+    "holdout": {
+      "n": 40,
+      "top1": 40,
+      "top3": 40,
+      "auto_applied": 0,
+      "by_view": {
+        "front": {
+          "n": 20,
+          "top1": 20,
+          "top3": 20
+        },
+        "side": {
+          "n": 20,
+          "top1": 20,
+          "top3": 20
+        }
+      }
+    }
+  },
+  "baseline_holdout": {
+    "n": 40,
+    "completed": 40,
+    "top1": 6,
+    "top3": 19
+  },
+  "rough": {
+    "expected": 28,
+    "completed": 28,
+    "recorded": 28,
+    "decisions": {
+      "ambiguous": 14,
+      "insufficient_evidence": 14
+    },
+    "automatic_applied": 0,
+    "accuracy": null,
+    "accuracy_reason": "Artist acceptable-body labels unavailable"
+  },
+  "provider_model": [
+    "gemini-3.5-flash-lite"
+  ],
+  "parse_failures_count": 1,
+  "limitations": [
+    "Render benchmark uses the same 20 meshes under different poses, not unseen artist drawings.",
+    "Contour method requires complete upright isolated silhouettes and a known renderer background; no general rough segmentation.",
+    "Different reference information and extractors mean this is not a controlled single-component ablation.",
+    "No artist accepted-body labels; rough accuracy remains null.",
+    "All new methods are suggestions only, with no runtime/BFF/production activation."
+  ],
+  "provenance": {
+    "protocol.json": "8ef268a9e848fb5efe85e2b0dc035507130c59269e7fd0b8514debf6cd8cde79",
+    "contour-protocol.json": "11093e670826064bdeabe75f93ec124bf5be8a4a6eb9050153b982a2c1fbda44",
+    "measurements.json": "f63aaa447038edda20979646f10917a4a1a3fa0973752783680b099cfc0d58bd",
+    "fbx-verification.json": "e573ab59def715c01041603838ca472497cb45c37900dfd46cbc0799cf22f3d0",
+    "results.json": "23b2529a73b76afd3421bcfa6d4a8743f4d936b580b4fca4993c9e5b5b6bd846",
+    "contour-results.json": "81b5971048a7e64477293442d5c3c9e26c889c37eab7e184b9ef8a5a5ab6512d",
+    "holdout-baseline-results.json": "6216466c7359db41f852f8881fc19b3a9673df4ebd85259f737e7421d6658481",
+    "v1_1-replay.json": "77707c847749c005f2f8876d7d40a97b3a78ef0812170e9765e42d96660292da"
+  }
+}
