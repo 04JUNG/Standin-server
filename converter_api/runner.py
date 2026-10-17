@@ -222,6 +222,10 @@ class BlenderRunner:
     _VERSION_RE = re.compile(r"Blender\s+(\d+\.\d+\.\d+)(?:\s+LTS)?")
     _BUILD_HASH_RE = re.compile(r"(?:build hash:|hash)\s*([0-9a-f]{8,40})", re.I)
 
+    def compose_scene(self, *, manifest, fbx_bytes):
+        from converter_api.scene_runner import compose_scene
+        return compose_scene(self, manifest=manifest, fbx_bytes=fbx_bytes)
+
     def __init__(self, settings: RunnerSettings | None = None):
         self.settings = settings or RunnerSettings.from_env()
         if self.settings.timeout_seconds <= 0:

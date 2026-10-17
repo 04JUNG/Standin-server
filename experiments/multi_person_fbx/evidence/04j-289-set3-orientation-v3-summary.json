@@ -1,0 +1,101 @@
+{
+  "created_at": "2026-10-16T12:22:10.753211+00:00",
+  "cuts": 13,
+  "people": 34,
+  "fresh_local_analysis": true,
+  "manual_angles": false,
+  "manual_coordinates": false,
+  "github_uploaded": false,
+  "scope_changes": [
+    {
+      "cut_id": "S3-p_rough_066",
+      "person_index": 0,
+      "before": "bust",
+      "after": "half"
+    },
+    {
+      "cut_id": "S3-p_rough_066",
+      "person_index": 1,
+      "before": "half",
+      "after": "full"
+    },
+    {
+      "cut_id": "S3-p_rough_220",
+      "person_index": 0,
+      "before": "full",
+      "after": "bust"
+    },
+    {
+      "cut_id": "S3-p_rough_220",
+      "person_index": 1,
+      "before": "full",
+      "after": "half"
+    },
+    {
+      "cut_id": "S3-v3_rough_0718",
+      "person_index": 1,
+      "before": "full",
+      "after": "half"
+    },
+    {
+      "cut_id": "S3-p_rough_219",
+      "person_index": 0,
+      "before": "full",
+      "after": "half"
+    },
+    {
+      "cut_id": "S3-v3_rough_0275",
+      "person_index": 2,
+      "before": "full",
+      "after": "half"
+    },
+    {
+      "cut_id": "S3-p_rough_111",
+      "person_index": 1,
+      "before": "full",
+      "after": "half"
+    }
+  ],
+  "pose_changes": [
+    {
+      "cut_id": "S3-p_rough_066",
+      "person_index": 1,
+      "before": "gen_st_lean_fwd__carry_box__x__h1_m",
+      "after": "rokoko_FistPumps_mixamo_01125"
+    },
+    {
+      "cut_id": "S3-v3_rough_0718",
+      "person_index": 2,
+      "before": "g1__M_Move2__p04_f1361",
+      "after": "rokoko_StandUpComedian_mixamo_00824_mirror"
+    },
+    {
+      "cut_id": "S3-v3_rough_0275",
+      "person_index": 1,
+      "before": "gen_ac_kick_front__cast_up__back__h0_m",
+      "after": "expansion_accad_A6_BoxLift_f00564"
+    }
+  ],
+  "final_zero_overlap_cuts": 13,
+  "mean_anchor_shift_frame": 0.016020773105597366,
+  "max_anchor_shift_frame": 0.13560882082291362,
+  "depth_order_reversals": 0,
+  "max_head_height_change_unchanged_scope": 0.16858248940298493,
+  "three_max_world_error_m": 2.6366050989914657e-05,
+  "camera_max_projection_error_pixels": 0.002607713761936741,
+  "common_body_model": true,
+  "limitations": [
+    "Frozen 34-person census retains pre-existing missing foreground hand/arm actor in p_rough_128.",
+    "Eight-bin camera-relative orientation remains estimated; unknown head follows torso as a flagged reference.",
+    "Full output is extrapolated from library legs when source feet are clipped.",
+    "Metric depth inferred from apparent size; common body proportions and clothing are not reconstructed.",
+    "Synthetic skeleton/image loss is not a human-rated accuracy score."
+  ],
+  "max_screen_size_proxy_change_unchanged_scope": 0.011548358395145009,
+  "cuts_without_additional_anchor_move": 8,
+  "layout_exception": [
+    "S3-p_rough_060",
+    0.13560882082291362
+  ],
+  "remaining_pose_errors": "p_rough_038 right palm still has a visible cheek gap; fine hand contact is not solved. Reclassified output ranges outside p_rough_066 still require visual review."
+}
