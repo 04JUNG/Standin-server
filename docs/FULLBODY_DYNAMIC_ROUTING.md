@@ -179,6 +179,9 @@ shoulder_head로 좁히고 출처를 `vlm_description`으로 기록한다.
 
 ## 실행 설정
 
+스테이징 배포의 모델/환경/파일 사전 검사와 복구 절차는
+[FULLBODY_STAGING_ROLLOUT.md](FULLBODY_STAGING_ROLLOUT.md)를 따른다.
+
 이 feature 브랜치의 API는 `ROUTING_FULLBODY_ENABLED`가 **없으면 1**이다.
 기존 mock 개발을 위한 `.env.example`에는 명시적으로 0을 넣었다.
 0이면 기존 파이프라인 그대로이고, 직접 `Pipeline(...)`을 쓰는 코드도 새 engine을 주입하지 않으면 기존 동작이다.

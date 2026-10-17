@@ -30,6 +30,9 @@ jobs:
       #   거기 두면 staging 배포가 프로덕션 클러스터로 나간다.
       ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
       ECS_SERVICE: ${{ vars.ECS_SERVICE }}
+      # Explicit rollout: develop uses the requested fullbody path. Main stays
+      # legacy unless its own environment explicitly opts in; no production rollout by accident.
+      ROUTING_FULLBODY_ENABLED: ${{ vars.ROUTING_FULLBODY_ENABLED || (github.ref == 'refs/heads/develop' && '1' || '0') }}
     steps:
       - uses: actions/checkout@v4
 
@@ -90,8 +93,17 @@ jobs:
             --task-definition "$TASK_DEFINITION" \
             --query taskDefinition > taskdef.json
 
+      - name: Prepare explicit fullbody deployment contract
+        env:
+          REQUESTED_POSE_VARIANT: ${{ vars.POSE_MODEL_VARIANT }}
+          REQUESTED_CANARY_STAGE: ${{ vars.POSE_CANARY_STAGE }}
+        run: |
+          python scripts/prepare_fullbody_deployment.py taskdef.json \
+            --enabled "$ROUTING_FULLBODY_ENABLED" \
+            --variant "$REQUESTED_POSE_VARIANT" --canary "$REQUESTED_CANARY_STAGE"
+
       - name: Verify Human-Art model source
-        if: ${{ (vars.POSE_MODEL_VARIANT || 'cascade') == 'cascade' }}
+        if: ${{ env.ROUTING_FULLBODY_ENABLED == '1' || (vars.POSE_MODEL_VARIANT || 'cascade') == 'cascade' }}
         # 모델 URI는 환경별 assets 버킷을 소유한 CDK/CloudFormation이 task
         # definition에 넣는다. 앱 workflow는 값을 덮어쓰지 않고 존재만 확인한다.
         run: |
@@ -136,13 +148,31 @@ jobs:
           environment-variables: |
             APP_ENV=production
             POSE_BACKEND=rtmlib
-            POSE_MODEL_VARIANT=${{ vars.POSE_MODEL_VARIANT || 'cascade' }}
-            POSE_CANARY_STAGE=${{ vars.POSE_CANARY_STAGE || 'canary-100' }}
             POSE_STRICT=1
             REFINE_THUMBNAIL_RENDERER=${{ vars.REFINE_THUMBNAIL_RENDERER || 'converter' }}
             VLM_PROMPT_VERSION=${{ vars.VLM_PROMPT_VERSION || 'p1-scope' }}
             VLM_PERSON_TAGS=${{ vars.VLM_PERSON_TAGS || '0' }}
             VLM_PERSON_TAGS_TIMEOUT_MS=${{ vars.VLM_PERSON_TAGS_TIMEOUT_MS || '15000' }}
+
+      - name: Preflight real fullbody model and library in deployment image
+        if: env.ROUTING_FULLBODY_ENABLED == '1'
+        env:
+          RENDERED_TASK: ${{ steps.render.outputs.task-definition }}
+          IMAGE: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+        run: |
+          python scripts/fullbody_preflight_environment.py "$RENDERED_TASK" fullbody-preflight.env
+          docker pull "$IMAGE"
+          docker run --rm --platform linux/amd64 \
+            --env-file fullbody-preflight.env \
+            --env AWS_ACCESS_KEY_ID --env AWS_SECRET_ACCESS_KEY --env AWS_SESSION_TOKEN \
+            --env AWS_DEFAULT_REGION --env AWS_REGION \
+            "$IMAGE" python scripts/check_fullbody_startup.py
+
+      - name: Allow bounded fullbody cold-start grace
+        if: env.ROUTING_FULLBODY_ENABLED == '1'
+        run: |
+          aws ecs update-service --cluster "$ECS_CLUSTER" --service "$ECS_SERVICE" \
+            --health-check-grace-period-seconds 900 > /dev/null
 
       - uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
