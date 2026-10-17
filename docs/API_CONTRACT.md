@@ -553,6 +553,59 @@ Retry-After: 30
 
 OpenAPI 자동 문서: 서버 기동 후 **`http://127.0.0.1:8000/docs`**. 이 문서와 `/docs`가 어긋나면 **코드가 정본**이고, 이 문서를 갱신한다(`05` 문서 도입 시 "API 변경은 문서 동시 수정" 규칙 적용).
 
+## Internal converter: numeric body baking (2026-10-15, registry v2 2026-10-16)
+
+`POST /convert-framed` accepts an optional multipart `shape` JSON string:
+`{schemaVersion:"body-shape.v1", controls:{...}, shapeSha256:"..."}` and, with it,
+`expected_shape_source`: `{rules, blendSha256, controllerSha256}` — the authoring source
+the BFF catalog promises for this body. The BFF validates/normalizes controls first; the
+converter independently checks keys, finite values, ranges, step grid and the same digest.
+Request-selected source paths or Python code are never accepted.
+
+**Approval is data, not code (`shape-bake.v2`).** `CONVERTER_SHAPE_REGISTRY` names a
+registry shipped inside the immutable, manifest-pinned body release:
+
+```json
+{"schema": "shape-bake.v2",
+ "sources": {"standin-body-0.7.1": {"blend": "/app/body-staging/sources/standin-body-0.7.1.blend",
+                                     "controller": "/app/body-staging/sources/standin-body-0.7.1.py",
+                                     "blend_sha256": "…", "controller_sha256": "…"}},
+ "characters": {"male-bulk-v0-7-1": {"rules": "standin-body-0.7.1", "preset": "BULK", "asset": "…",
+                                      "asset_sha256": "<neutral preset FBX>", "defaults": {…},
+                                      "controls": [{"key": "height", "min": 160, "max": 195, "step": 1, "default": 178}, …]}}}
+```
+
+At start-up (`/healthz` → `checks.shape_sources`) and again inside every Blender job the
+converter re-hashes each source, requires the controller's `VERSION` literal to equal its
+`rules`, and requires every preset default to lie on its own slider grid (`(default-min)/step`
+integral — the build shifts `min` up by less than one step when needed). `shape-bake.v1`
+registries (hard-coded 0.6.7/0.2.2 pins) are rejected. A new body version therefore needs a
+new release built by `scripts/build_shape_release.py`, not a code change.
+
+Errors: different `expected_shape_source` → `409 SHAPE_SOURCE_MISMATCH` before any Blender
+work; other shape problems → `400 INVALID_SHAPE`.
+
+The approved controller bakes neutral mesh and bone proportions, the existing
+V3.2.5 solver transfers the BVH, and approved pose/contact correction is baked
+before framing. PNG and final review GLB are made from that exact final FBX.
+Response adds `shape_sha256` and `shape_bake` lineage (`rules`, `blend_sha256`,
+`controller_sha256`, `controls`, roundtrip/contact QA); the BFF requires the lineage to equal
+the promised source. `CONVERTER_FORCE_EXACT_V324` rejects shape baking rather than claiming
+exact-parent compatibility. New shape FBXs preserve all 52 real terminal bones; only synthetic
+unweighted `_end` markers are removed during the isolated shape job.
+
+**Latency.** A shaped job opens the source .blend twice and runs the controller's pose
+correctives. Measured 30–110 s per job (2 vCPU Linux, pip bpy 5.0.1; heaviest: male BULK),
+dominated by `correct_pose` (21–70 s). Shaped jobs use `CONVERTER_SHAPE_TIMEOUT_SECONDS`
+(default 300) instead of the 30 s conversion budget; the BFF uses `CONVERTER_SHAPE_TIMEOUT_MS`
+(default 320000). Load balancer idle timeouts on this path must exceed these.
+
+BFF `BODY_SHAPE_BAKE_ENABLED` defaults off. Enable with `BODY_SHAPE_EDIT_ENABLED`
+only after deploying matching converter/BFF code and immutable source/catalog data.
+Modified-body Top-K uses PNG fallback instead of an unrelated precomputed GLB;
+final review GLB is generated from the shaped FBX. New catalogs remain draft for
+inference matching; supported BVHs are explicit and do not imply full-library QA.
+
 ## 원근 검색 런타임 연결 (2026-10-15)
 
 `POSE_SEARCH_MODE=perspective`(새 코드 기본값)는 단일 인물·정상 full coverage·

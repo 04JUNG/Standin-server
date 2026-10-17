@@ -74,6 +74,8 @@ jobs:
         run: |
           python -m pytest -q \
             tests/converter/test_worker_contract.py \
+            tests/converter/test_shape_bake_contract.py \
+            tests/converter/test_shape_hand_integration.py \
             tests/converter/test_registry.py \
             tests/converter/test_runner_failures.py \
             tests/converter/test_api_contract.py \
