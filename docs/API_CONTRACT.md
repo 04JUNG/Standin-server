@@ -16,7 +16,14 @@
 이 기능 브랜치의 API 팩토리는 변수가 없을 때도 1이므로, 기존 mock/레거시 개발 환경은
 명시적으로 0을 설정해야 한다. `.env.example`은 0으로 유지한다. PR 생성은 배포가 아니다.
 
-- `selected`: 핵심 동작 및 확인된 세부 조건을 통과한 전신 라이브러리 후보, 최대 5개.
+- `selected`: 일반 경로에서는 핵심 동작 및 확인된 세부 조건을 통과한 전신 라이브러리 후보, 최대 5개.
+  통합 체형 opt-in 경로에서 조건 통과 후보가 0개면 기존 생성 시도 이후 기하 참고를 반환할 수 있다.
+  이 경우 `match_level=geometry_fallback`, `review_required=true`, `not_exact_match=true`,
+  `constraints_satisfied=false`를 반드시 함께 읽어 **조건 통과 후보와 구분**한다.
+  인물 소유권·유효 관절·기하 거리 상한과 명확한 자세(서기/앉기/눕기) 조건은 유지한다.
+  팔/물건 양손 수 등 나머지 조건을 만족했다는 뜻이 아니다. 원래 조건 감사 결과는
+  `core_conditions.whole_pose_validation`, 완화 범위는 `geometry_review_fallback`에 보존한다.
+  자동 refine/export 권한은 없다. off/legacy 및 기존 조건 통과 후보 목록은 바뀌지 않는다.
 - `near_candidates`: 핵심 동작은 맞지만 다리/무릎 세부가 다르거나 미확인인 별도 검수 참고.
   정답·확률·성공 5개 채우기용 후보가 아니며, 빈 `selected`의 생성 시도를 막지 않는다.
 - `pose_detail_fit`: 관측된 2D 몸통 기울기·골반 이동·다리 간격·무릎 각도의 동일 카메라 비교.
@@ -741,8 +748,8 @@ FBX에 손을 구우려면 converter `POST /convert`·`/convert-bundle`·`/conve
 
 ### 첫 VLM 체형 통합 (선택적)
 
-`BODY_CLASSIFICATION_STRATEGY=integrated`와 `BODY_MATCHING_MODE=shadow|auto`를 함께 설정하면 최초 `VLM.analyze`가 기존 사람 수·shot·박스·가시성에 `person_bodies`를 추가한다. `coarse_classification`과 `coarse_recommendation`의 외부 형태는 coarse와 같고, `classification_strategy=integrated`, `prompt_version=body-integrated.v3.compact`로 출처를 구분한다. `inference_metadata.vlm_body_prompt_version`은 활성화한 통합 프롬프트 버전 또는 null이다.
+`BODY_CLASSIFICATION_STRATEGY=integrated`와 `BODY_MATCHING_MODE=shadow|auto`를 함께 설정하면 최초 `VLM.analyze`가 기존 사람 수·shot·박스·가시성에 `person_bodies`를 추가한다. `coarse_classification`과 `coarse_recommendation`의 외부 형태는 coarse와 같고, `classification_strategy=integrated`, `prompt_version=body-integrated.v4.uncertain-review`로 출처를 구분한다. `inference_metadata.vlm_body_prompt_version`은 활성화한 통합 프롬프트 버전 또는 null이다.
 
-별도 crop 체형 호출·계열 재검토는 실행하지 않는다. 체형은 원본 VLM 슬롯 인덱스로 전달하여 출력 인물의 좌우 정렬 뒤에도 연결을 보존한다. 누락·잘못된 체형 응답은 해당 체형만 unknown으로 처리하며 기존 제어 필드를 변경하지 않는다. 주 추천은 항상 기록하되 관측 불명 시 기본 추천이라는 근거를 함께 반환한다. 약한 근거로 자동 적용하지 않으며 `auto_body_id/applied_body_id/selected_asset`는 null이다. 손 모양, 인물 태그, 전신 포즈 설명·재검토·생성은 기존 기능의 독립 호출이므로 전체 파이프라인의 VLM 호출이 한 번이라는 뜻은 아니다.
+Gemini 통합 모드의 `BODY_INTEGRATED_REVIEW_ENABLED=1`(기본)에서는 첫 판독의 남녀 계열이 unknown/androgynous이거나 certainty=unknown인 인물만 crop을 독립 재검토한다. 여러 대상은 최대 1회 batch 호출하고, 첫 판독의 결론·정답·파일 ID를 보내지 않는다. 이미 binary 계열을 판독한 인물은 tentative여도 변경하지 않는다. 재검토는 `BODY_TIMEOUT_SECONDS`와 주 VLM의 남은 총 예산 중 작은 값으로 제한하며 재시도하지 않는다. 오류·미확정이면 원래 추천을 유지하고 `family_review`에 기록한다. tentative 추천은 그대로 tentative이며 자동 적용 근거가 아니다. `BODY_INTEGRATED_REVIEW_ENABLED=0`이면 추가 체형 호출이 없다. OpenAI 통합은 첫 호출만 지원한다. 체형은 원본 VLM 슬롯 인덱스로 전달하여 출력 인물의 좌우 정렬 뒤에도 연결을 보존한다. 누락·잘못된 체형 응답은 해당 체형만 unknown으로 처리하며 기존 제어 필드를 변경하지 않는다. 주 추천은 항상 기록하되 관측 불명 시 기본 추천이라는 근거를 함께 반환한다. 약한 근거로 자동 적용하지 않으며 `auto_body_id/applied_body_id/selected_asset`는 null이다. 손 모양, 인물 태그, 전신 포즈 설명·재검토·생성은 기존 기능의 독립 호출이므로 전체 파이프라인의 VLM 호출이 한 번이라는 뜻은 아니다.
 
 기본은 `legacy`/`off`이며 실제 환경 설정을 바꾸지 않았다. 평가 모델·28명 기준·전신 경로의 시간과 회귀 관측은 [통합 평가](BODY_SELECTION/INTEGRATED_FIRST_CALL.md)를 따른다.

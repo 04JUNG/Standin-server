@@ -10,6 +10,7 @@ from pathlib import Path
 from time import perf_counter
 from .coarse import GeminiCoarseClient, VERSION, parse_response, recommend, unknown
 from .coarse_input import prepare_input
+from .integrated import VERSION as INTEGRATED_VERSION
 from .schema import (
     SCHEMA_VERSION,
     OBSERVATION_VERSION,
@@ -75,7 +76,7 @@ class CoarseBodyService:
             model=self.model,
             family_review_model=self.family_review_model or None,
             is_mock=self.provider == "mock" if self.integrated else self.client is None,
-            prompt_version="body-integrated.v3.compact" if self.integrated else VERSION,
+            prompt_version=INTEGRATED_VERSION if self.integrated else VERSION,
             classification_strategy="integrated" if self.integrated else "coarse",
             pose_order_preserved=True,
             rendering_executed=False,
@@ -131,7 +132,7 @@ class CoarseBodyService:
                                 ident
                             ]
                             shared["version"] = candidate.get(
-                                "version", "body-integrated.v3.compact"
+                                "version", INTEGRATED_VERSION
                             )
                         except (TypeError, ValueError, AttributeError):
                             err = "invalid_integrated_body"

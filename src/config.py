@@ -92,6 +92,7 @@ class Config:
     body_matching_mode: str = os.getenv("BODY_MATCHING_MODE", "off")
     vlm_body_thinking_level: str = os.getenv("VLM_BODY_THINKING_LEVEL", "")
     body_classification_strategy: str = os.getenv("BODY_CLASSIFICATION_STRATEGY", "legacy")
+    body_integrated_review_enabled: bool = os.getenv("BODY_INTEGRATED_REVIEW_ENABLED", "1") == "1"
     body_coarse_family_review_model: str = os.getenv("BODY_COARSE_FAMILY_REVIEW_MODEL", "")
     body_coarse_catalog_path: str = os.getenv("BODY_COARSE_CATALOG_PATH", "config/body_morphology.v1.json")
     body_catalog_path: str = os.getenv("BODY_CATALOG_PATH", "config/body_catalog.v1.json")

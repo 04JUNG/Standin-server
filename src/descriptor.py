@@ -195,6 +195,8 @@ def build_slot_descriptors(vlm: VLMAnalysis, slots,
                 vlm, slot.slot_id if slot.slot_origin == "vlm" else None,
             ),
         ))
+        if getattr(slot, "box_recovery", None):
+            out[-1].quality_trace["box_recovery"] = dict(slot.box_recovery)
         if output_scope is not vlm_scope:
             # API에는 승격된 값만 나가므로 VLM 원래 판별은 trace에 남긴다.
             out[-1].quality_trace["output_scope_promotion"] = {

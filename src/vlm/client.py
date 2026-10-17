@@ -585,7 +585,17 @@ class GeminiVLMClient(BaseVLMClient):
                     status="ok",
                     elapsedMs=round((self._clock() - started) * 1000),
                 )
-                return _coerce(_extract_json(resp.text), img_w, img_h)
+                analysis = _coerce(_extract_json(resp.text), img_w, img_h)
+                if body_enabled and getattr(CFG, "body_integrated_review_enabled", True):
+                    # Optional read-only body review must never retry/replace a
+                    # successful control analysis or receive a fresh time budget.
+                    try:
+                        from ..experimental.body_matching.integrated_review import review_uncertain
+                        review_uncertain(self, image, analysis, CFG, deadline)
+                    except Exception as review_error:
+                        log_warn("integrated_body_review", status="failed",
+                                 errorType=type(review_error).__name__)
+                return analysis
             except Exception as error:
                 status = _http_status(error)
                 timed_out = _is_timeout(error)

@@ -298,10 +298,12 @@ class Pipeline:
                        count_record: dict, rescue_request,
                        rescue_context=None) -> CutResult:
         """RTM candidate를 슬롯에 배정하고 필요한 슬롯만 crop 복구한다."""
+        from .experimental.body_matching.integrated import enabled as integrated_enabled
+        repair_options = {"recover_invalid": True} if integrated_enabled(CFG) else {}
         with span("slot_assignment"):
             assignment = assign_candidates(vlm.approx_boxes, list(skeletons),
                                            img_w, img_h, CFG,
-                                           expected_count=vlm.num_people)
+                                           expected_count=vlm.num_people, **repair_options)
         for slot in assignment.slots:
             explicitly_visible = bool(
                 slot.slot_origin == "vlm"
@@ -463,7 +465,8 @@ class Pipeline:
                     "output_scope_source": desc.output_scope.source,
                 }
                 with span("fullbody_search"):
-                    report = self._fullbody_search.search(decision, evidence)
+                    review_options = {"review_geometry": True} if integrated_enabled(CFG) else {}
+                    report = self._fullbody_search.search(decision, evidence, **review_options)
                 self._apply_refine_policy(desc, slot, "low", has_candidates=False)
                 desc.refinable_limbs = ()
                 desc.quality_trace["search_scope"] = "whole_library_pose"

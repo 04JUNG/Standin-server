@@ -363,6 +363,7 @@ def test_approved_body_metadata_is_not_a_search_hand_or_refine_input():
         "src/vlm/client.py",
         "src/descriptor.py",
         "src/experimental/body_matching/integrated.py",
+        "src/experimental/body_matching/integrated_review.py",
         "src/experimental/body_matching/coarse_service.py",
     }
     found = set()
