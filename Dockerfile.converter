@@ -85,6 +85,8 @@ COPY converter/retarget.py /app/converter/retarget.py
 COPY converter/thumbnail_render.py /app/converter/thumbnail_render.py
 COPY converter/preview_style.py /app/converter/preview_style.py
 COPY converter/preview_studio.sl /app/converter/preview_studio.sl
+COPY converter/shape_spec.py /app/converter/shape_spec.py
+COPY converter/shape_bake.py /app/converter/shape_bake.py
 COPY converter/worker.py /app/converter/worker.py
 COPY converter/scene_contract.py /app/converter/scene_contract.py
 COPY converter/scene.py /app/converter/scene.py
@@ -94,6 +96,7 @@ COPY converter/hand_library.py /app/converter/hand_library.py
 COPY converter/hand_library.v1.json /app/converter/hand_library.v1.json
 COPY converter/hand_geometry.py /app/converter/hand_geometry.py
 COPY converter/hand_collision.py /app/converter/hand_collision.py
+COPY converter/hand_contact.py /app/converter/hand_contact.py
 COPY converter/hands.py /app/converter/hands.py
 COPY converter/camera.py /app/converter/camera.py
 COPY converter/preview_model.py /app/converter/preview_model.py

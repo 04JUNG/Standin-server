@@ -26,6 +26,7 @@ def _args() -> argparse.Namespace:
     parser.add_argument("--thumbnail-headers", type=Path)
     parser.add_argument("--thumbnail", type=Path)
     parser.add_argument("--review-model", type=Path)
+    parser.add_argument("--skin-screen", type=Path)
     return parser.parse_args()
 
 
@@ -101,6 +102,23 @@ def main() -> int:
     }
     assert health["checks"]["tempdir"]["ok"] is True
     assert health["checks"]["default_character"]["ok"] is True
+    if args.skin_screen:
+        report = json.loads(args.skin_screen.read_text())
+        assert report['method'] == 'evaluated_skin_opposite_hand_triangle_crossing_v1'
+        assert report['scope'] == 'opposite_hands_only'
+        assert report['complete_collision_certificate'] is False
+        assert report['source_bvh_sha256'] == hashlib.sha256(args.bvh.read_bytes()).hexdigest()
+        assert report['character_sha256'] == health['character_hashes']['standin-master-v2']
+        assert report['solver_version'] == health['solver_version']
+        assert len(report['screened_artifact_sha256']) == 64
+        assert report['status'] in ('clear_screen', 'intersection', 'unavailable')
+        # Synthetic CI rigs may lack hand skin; never upgrade that to clear.
+        if report['status'] == 'unavailable':
+            assert report['reason']
+        else:
+            assert all(report['triangle_counts'][s] > 0 for s in ('left', 'right'))
+            assert (report['intersection_pairs'] == 0) == (report['status'] == 'clear_screen')
+        assert 'fbx_base64' not in report and 'preview_base64' not in report
 
     if args.review_model:
         pair = json.loads(args.review_model.read_text(encoding="utf-8"))

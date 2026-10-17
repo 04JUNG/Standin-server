@@ -103,7 +103,7 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
         "force_exact_v324", "thumbnail",
     }
     unknown = set(raw) - required - {
-        "output_scope", "preview_view", "camera_rotation", "preview_model", "hands"}
+        "output_scope", "preview_view", "camera_rotation", "preview_model", "shape_recipe", "hands", "hand_contact_screen"}
     missing = required - set(raw)
     if missing or unknown:
         raise JobValidationError(
@@ -158,6 +158,11 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
         raise JobValidationError(f"invalid hands: {exc}") from exc
     if hands is not None and raw["force_exact_v324"]:
         raise JobValidationError("exact V3.2.4 mode does not permit hand presets")
+    screening = raw.get("hand_contact_screen", False)
+    if type(screening) is not bool or (screening and (
+            output_scope != 'full' or preview_view or preview_model or camera_rotation is not None
+            or raw['thumbnail'] is not None or raw['mirror'] or raw['force_exact_v324'])):
+        raise JobValidationError('hand screening requires an unframed, non-mirrored full artifact')
 
     unresolved_temp = _absolute_path(raw["temp_dir"], "temp_dir")
     if unresolved_temp.is_symlink():
@@ -320,6 +325,15 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
     if _sha256(Path(job["character_fbx"])) != job["character_sha256"]:
         raise ArtifactValidationError("character artifact SHA256 changed before conversion")
 
+    recipe = job.get("shape_recipe")
+    if recipe is not None:
+        from converter.shape_bake import convert_shaped, import_full_character
+        from converter import retarget as rt
+        # This fresh one-job process uses the shape FBX terminal-bone policy
+        # through retarget, framing and final GLB/PNG reimports.
+        rt.import_character = import_full_character
+        from functools import partial
+        convert = partial(convert_shaped, recipe=recipe)
     report = convert(
         bvh_path=job["bvh_path"],
         character_fbx=job["character_fbx"],
@@ -332,11 +346,18 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
         force_exact_v324=job["force_exact_v324"],
     )
     payload = report.as_dict()
+    if recipe is not None and report.ok:
+        payload["shape_bake"] = json.loads(Path(job["output_path"]).with_suffix(".shape.json").read_text())
     if report.ok and job.get("hands") is not None:
         # 손은 몸 변환 직후, 메시 절단·카메라 회전·미리보기보다 먼저 굽는다.
         # 그래야 이후 단계가 모두 손이 적용된 실제 산출물을 다시 읽는다.
         from converter.hands import bake_hands
         payload["hands"] = bake_hands(job["output_path"], job["hands"])
+    if report.ok and job.get('hand_contact_screen'):
+        from converter.hand_contact import screen_artifact
+        # AFTER hand baking, BEFORE crop/camera/preview. Screening does not
+        # export or change the frozen retarget solver or delivered FBX bytes.
+        payload['hand_contact_screen'] = screen_artifact(job['output_path'])
     if report.ok:
         from converter.framing import process_output
         scope = job.get("output_scope", "full")
@@ -381,6 +402,7 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
                 "source_bvh_sha256": source_bvh_sha256,
                 "character_id": job["character_id"], "character_sha256": job["character_sha256"],
                 "scope": job.get("output_scope", "full"),
+                **({"shape_sha256": recipe["shape_sha256"], "shape_rules": recipe["rules"]} if recipe else {}),
                 "camera_rotation": job.get("camera_rotation"),
             })
         if job["thumbnail"] is not None:

@@ -181,3 +181,13 @@ def test_openapi_and_no_new_ui_or_change_to_analyze_candidate_contract(environme
     monkeypatch.setattr(api, "log_info", lambda *a, **k: logs.append((a, k)))
     client.post("/semantic-search", json={"query": "개인입력 야구공"})
     assert "개인입력" not in repr(logs)
+
+
+def test_health_reports_actual_direct_text_readiness(environment):
+    client, pipeline, _, _ = environment
+    assert client.get('/healthz').json()['semantic_text']['ready'] is True
+    pipeline._fullbody_search.startup_error = 'index_not_ready'
+    assert client.get('/healthz').json()['semantic_text']['ready'] is False
+    pipeline._fullbody_search.startup_error = None
+    pipeline._fullbody_search.validator = None
+    assert client.get('/healthz').json()['semantic_text']['ready'] is False

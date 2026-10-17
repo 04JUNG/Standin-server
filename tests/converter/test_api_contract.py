@@ -160,6 +160,49 @@ def _post_bundle(
     )
 
 
+@pytest.mark.parametrize('status', ['clear_screen', 'intersection', 'unavailable'])
+def test_screen_api_returns_only_bound_diagnostic_not_artifact(tmp_path, status):
+    from converter.hand_contact import SCREEN_VERSION
+    class ScreenRunner(FakeRunner):
+        def convert(self, **kwargs):
+            result = super().convert(**kwargs)
+            assert kwargs['hand_contact_screen'] is True
+            assert kwargs['hands'] == {'left': 'relaxed', 'right': 'fist'}
+            result.report['hand_contact_screen'] = dict(status=status,
+                reason='missing skin weights' if status == 'unavailable' else None,
+                method=SCREEN_VERSION, scope='opposite_hands_only',
+                complete_collision_certificate=False,
+                triangle_counts={'left': 4, 'right': 4},
+                intersection_pairs=int(status == 'intersection'),
+                screened_artifact_sha256=result.artifact_sha256)
+            return result
+    response = _client(tmp_path, runner=ScreenRunner()).post('/screen-hand-contact',
+        files={'bvh': ('pose.bvh', VALID_BVH, 'application/octet-stream')},
+        data={'expected_bvh_sha256': hashlib.sha256(VALID_BVH).hexdigest(),
+              'hand_left': 'relaxed', 'hand_right': 'fist'})
+    assert response.status_code == 200, response.text
+    result = response.json()
+    assert result['status'] == status and result['source_bvh_sha256'] == hashlib.sha256(VALID_BVH).hexdigest()
+    assert result['hands'] == {'left': 'relaxed', 'right': 'fist'}
+    assert 'fbx_base64' not in result and 'preview_base64' not in result
+
+
+def test_screen_api_missing_or_wrong_receipt_is_failure(tmp_path):
+    response = _client(tmp_path, runner=FakeRunner()).post('/screen-hand-contact',
+        files={'bvh': ('pose.bvh', VALID_BVH, 'application/octet-stream')},
+        data={'expected_bvh_sha256': hashlib.sha256(VALID_BVH).hexdigest()})
+    assert response.status_code == 500
+    assert response.json()['error']['code'] == 'WORKER_INTEGRITY_ERROR'
+
+
+def test_screen_api_source_hash_checked_before_conversion(tmp_path):
+    runner = FakeRunner()
+    response = _client(tmp_path, runner=runner).post('/screen-hand-contact',
+        files={'bvh': ('pose.bvh', VALID_BVH, 'application/octet-stream')},
+        data={'expected_bvh_sha256': '0'*64})
+    assert response.status_code == 409 and not runner.calls
+
+
 def test_api_process_does_not_import_bpy():
     assert "bpy" not in sys.modules
 

@@ -165,7 +165,8 @@ class PersonDescriptor:
     output_scope: ScopeDetection = field(default_factory=ScopeDetection)
     # 인물별 action·view. tag_dict()의 컷 단위 값과 별개이며 검색은 읽지 않는다.
     person_tags: PersonTags = field(default_factory=PersonTags)
-    # 인물별 손 모양과 손 후보. 검색·refine은 읽지 않는다.
+    # 인물별 손 모양과 손 후보. 검색 점수·refine은 읽지 않는다.
+    # 전신 반환 전 실제 FBX 피부 검사에는 동일한 프리셋을 전달한다.
     hands: Optional["PersonHands"] = None
     # Metadata only: never used as a pose query or refine input.
     body_classification: Optional[dict] = None

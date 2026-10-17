@@ -74,6 +74,15 @@ def user_query(text, lexicon):
         **{name: sorted(items) for name, items in values.items()})
 
 
+def semantic_text_ready(pipeline):
+    engine = getattr(pipeline, "_fullbody_search", None)
+    semantic = getattr(engine, "semantic", None)
+    service = getattr(semantic, "service", None)
+    return bool(getattr(service, "index", None) is not None
+                and not getattr(engine, "startup_error", None)
+                and getattr(engine, "validator", None) is not None)
+
+
 def search_text(request, pipeline, library=None):
     """Return (HTTP status, validated response); never treat an error as empty."""
     start = perf_counter()
@@ -91,8 +100,7 @@ def search_text(request, pipeline, library=None):
         body["elapsed_ms"] = (perf_counter()-start)*1000
         return status, SemanticTextResponse(**body)
 
-    if (index is None or getattr(engine, "startup_error", None)
-            or getattr(engine, "validator", None) is None):
+    if not semantic_text_ready(pipeline):
         return finish(503, "semantic_unavailable", "Whole-pose semantic engine is not ready")
     try:
         query = user_query(request.query, index.lexicon)

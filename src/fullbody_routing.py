@@ -19,13 +19,14 @@ from .search_routing import PoseDescription
 from .semantic_search import SemanticQuery
 
 VERSION = 'fullbody-dynamic-v1'
+API_SEMANTIC_WEIGHT = .6
 
 
 class FullBodySearch:
     def __init__(self, entries, semantic, camera_index, *, top_k=5, pool_k=40,
                  geometry_max_distance=1.0, geometry_upper_max_distance=1.5,
                  generator=None, startup_error=None, include_stored_compositions=True,
-                 semantic_weight=.35):
+                 semantic_weight=.35, hand_skin_gate=None):
         if not 1 <= top_k <= pool_k <= 200:
             raise ValueError('invalid search limits')
         if any(not math.isfinite(v) or v <= 0 for v in (geometry_max_distance, geometry_upper_max_distance)):
@@ -41,6 +42,7 @@ class FullBodySearch:
         self.top_k, self.pool_k = top_k, pool_k
         self.cutoffs = {'full': geometry_max_distance, 'upper': geometry_upper_max_distance}
         self.generator, self.startup_error = generator, startup_error
+        self.hand_skin_gate = hand_skin_gate
         self.include_stored_compositions = include_stored_compositions
         self.validator=None
         if hasattr(camera_index,'pose_ids') and hasattr(semantic,'core_records'):
@@ -270,14 +272,21 @@ class FullBodySearch:
         out['near_candidates']=[dict(r,review_required=True,not_exact_match=True) for r in ranked
                                 if r.get('match_level')=='near_match'][:self.top_k]
         if fits:out['condition_ranking']='hard_core_then_detail_bands_then_existing_rrf'
-        if self.validator and required and required['active']:
-            for hit in out['selected']:
-                checked=self.validator.check(required,hit['pose_id'])
-                hit.setdefault('core_conditions',{})['whole_pose_validation']=checked
         # Framing references are not successful pose matches and must not
         # suppress the empty-search generation path.
         out['framing_references']=[r for r in out['selected'] if r['kind']=='framing_reference']
         out['selected']=[r for r in out['selected'] if r['kind']!='framing_reference']
+        skin_session = None
+        if self.hand_skin_gate is not None:
+            skin_session = self.hand_skin_gate.session(evidence.get('hand_presets'))
+            eligible = [r for r in ranked if r.get('match_level') != 'near_match'
+                        and r['kind'] != 'framing_reference']
+            out['selected'] = skin_session.filter(eligible, limit=self.top_k)
+            out['hand_skin_screen'] = skin_session.report()
+        if self.validator and required and required['active']:
+            for hit in out['selected']:
+                checked=self.validator.check(required,hit['pose_id'])
+                hit.setdefault('core_conditions',{})['whole_pose_validation']=checked
         for branch in out['branches'].values():
             refs=[h for h in branch.get('hits',[]) if h.get('matched',{}).get('visible_region_reference')]
             if refs:
@@ -288,6 +297,8 @@ class FullBodySearch:
         errors = any(b['status'] == 'error' for b in out['branches'].values())
         if errors:
             return finish('partial_error' if out['selected'] else 'error', 'search_or_description_error_no_generation')
+        if skin_session and skin_session.unverified:
+            return finish('partial_error' if out['selected'] else 'error', 'hand_skin_screen_unavailable_no_generation')
         if out['selected']:
             return finish('ok')
         # A branch may have only near candidates. These are review evidence,
@@ -313,6 +324,15 @@ class FullBodySearch:
                 out['generation']['diagnostics']['whole_pose_conditions']=audits
                 if any(a['status'] not in ('passed','not_required') for a in audits):
                     out['generation'].update(status='rejected',reason='generated_observation_conditions_failed',candidates=[])
+            if skin_session and out['generation']['status'] == 'preview_ready':
+                generated = out['generation']['candidates']
+                passed = skin_session.filter(generated, generated=True, limit=len(generated))
+                out['generation']['candidates'] = passed
+                out['hand_skin_screen'] = skin_session.report()
+                if not passed:
+                    out['generation'].update(status='rejected', reason='generated_hand_skin_screen_not_clear')
+                if skin_session.unverified:
+                    return finish('error', 'generated_hand_skin_screen_unavailable')
         # Keep qualified selection and generation unchanged. When optional
         # integrated recovery is enabled, expose bounded geometry references as
         # review-only choices rather than turning text overconstraints into an
@@ -330,15 +350,23 @@ class FullBodySearch:
                 qualified_count=0, constraints_satisfied=False,
                 original_requirements=required, retained_hard_conditions=retained, cutoff=fallback.get('cutoff'))
             if fallback['status'] == 'ok':
-                rows = self._fuse({'geometry': fallback})
+                rows = self._fuse({'geometry': fallback}, limit=self.pool_k)
                 for row in rows:
                     row.update(match_level='geometry_fallback', review_required=True,
                                not_exact_match=True, constraints_satisfied=False)
                     if self.validator and required and required['active']:
                         row['core_conditions'] = dict(whole_pose_validation=
                             self.validator.check(required, row['pose_id']))
-                out['selected'] = rows
-                return finish('ok', 'geometry_review_fallback_not_qualified')
+                if skin_session:
+                    rows = skin_session.filter(rows, limit=self.top_k)
+                    out['hand_skin_screen'] = skin_session.report()
+                    if skin_session.unverified:
+                        out['selected'] = rows
+                        return finish('partial_error' if rows else 'error',
+                                      'geometry_review_hand_skin_screen_unavailable')
+                out['selected'] = rows[:self.top_k]
+                if rows:
+                    return finish('ok', 'geometry_review_fallback_not_qualified')
         return finish('no_result', 'successful_empty_search_generation_separate')
 
 
@@ -403,7 +431,10 @@ def _build_fullbody_resources(entries, *, db_path):
             model=os.getenv('POSE_GENERATION_MODEL', 'gemini-3.8-flash'),
             review_dir=os.getenv('POSE_GENERATION_REVIEW_DIR', 'tmp/generated-pose-review'))
     engine = FullBodySearch(entries, semantic, camera, generator=generator,
+        semantic_weight=API_SEMANTIC_WEIGHT,
         include_stored_compositions=include_stored,
         geometry_max_distance=float(os.getenv('ROUTING_GEOMETRY_MAX_DISTANCE', '1.0')),
         geometry_upper_max_distance=float(os.getenv('ROUTING_GEOMETRY_UPPER_MAX_DISTANCE', '1.5')))
+    from .hand_skin_screen import build_hand_skin_gate
+    engine.hand_skin_gate = build_hand_skin_gate(camera, paths['bvh'])
     return pose, semantic, engine

@@ -1,6 +1,6 @@
 # API 계약 — 도원 추론 서버 (FastAPI)
 
-> 상태: 현재 계약 · 갱신일: 2026-10-16 · 기준 코드: `api/app.py`, `api/models.py`
+> 상태: 현재 계약 · 갱신일: 2026-10-17 · 기준 코드: `api/app.py`, `api/models.py`
 >
 > 이 문서는 **실제 구현된** HTTP 계약(`api/app.py`·`api/models.py`)을 문서화한다.
 > `/export-order`의 상세는 별도 문서(`docs/EXPORT_CONTRACT.md`)에 있고, 여기서는 전체 엔드포인트와
@@ -36,12 +36,55 @@
 이 경로는 Human-Art 관절의 조건부 VLM 검수·보완과 인물별 자세 설명을 사용한다.
 아래 레거시 경로의 “VLM은 좌표를 생성하지 않음” 규칙과 달리, 보완 관절은 `vlm_repair` 출처를
 명시하고 구조 검사 악화 시 되돌린다. 자동 high 신뢰도·refine 권한으로 승격하지 않는다.
-상하체 분리 검색·런타임 BVH 합성은 하지 않는다. API 기본 RRF 자연어 비중은 0.35이고 로컬
-set4/set5 비교는 0.60을 명시했으며, 실험 비중을 운영 기본값으로 바꾸지 않았다.
+상하체 분리 검색·런타임 BVH 합성은 하지 않는다. 2026-10-17 사용자 요청으로 API 팩토리의
+RRF 자연어 비중은 0.60, 기하 비중은 0.40이다. 로컬 set4/set5 가중치 실험과 같은 비중이며,
+조건 검사·거리 컷오프·단일 검색 경로의 가중치 1은 유지한다. 과거 비교를 재현하는 직접
+`FullBodySearch(...)` 호출의 기본값 0.35는 보존하며, 서버 팩토리가 0.60을 명시한다.
 모든 새 후보는 `release_allowed=false`, `refine_allowed=false`, `actual_mesh_validated=false`다.
-실제 반대 손 피부 삼각형 검사는 현재 로컬 변환 후 검수이며 자동 API 안전 인증이 아니다.
+동적라우팅 API는 실제 FBX 변환 후 반대 손 피부 삼각형 검사를 자동 호출한다.
+전체 메시 안전 인증은 아니며, 검사 오류/미확인은 정상 후보와 분리한다(아래 자동 검사 계약).
 
 ---
+
+## 전신 후보의 손 피부 자동 검사 (2026-10-17)
+
+전신 API 팩토리는 검색 엔진에 `HandSkinGate`를 연결한다. `/analyze`의 기하/자연어
+검색과 조건·순위 계산을 먼저 끝낸 뒤, 원래 순서대로 실제 FBX 검사를 수행한다.
+필요한 내부 주소는 기존 `REFINE_THUMBNAIL_CONVERTER_URL`을 재사용한다.
+
+- converter의 `POST /screen-hand-contact`에 BVH 바이트·원문 SHA256·대상 캐릭터 ID/SHA256·
+  인물별 실제 손 프리셋을 보낸다. 러프 이미지나 Gemini 설명은 보내지 않는다.
+- converter는 기존 동결 solver로 full FBX를 만들고, 요청한 손 프리셋을 굽고, **그 실제 FBX를
+  재임포트**하여 변형된 반대 손 피부 삼각형 교차를 검사한다. crop·카메라·미리보기 이전 단계다.
+- 입력 BVH·캐릭터·solver·손 프리셋·손 라이브러리·검사한 FBX SHA를 검증한 receipt만 사용한다.
+  별도 캐시는 저장하지 않으며 동일 요청 안에서 같은 BVH/손 설정만 재사용한다.
+- `clear_screen`: 반대 손 교차 미검출. 해당 후보에 `hand_skin_screen` 근거를 붙여 유지한다.
+- `intersection`: 정상 `selected`에서 제외하고 예산 안에서 다음 순위 후보를 확인한다.
+- `unavailable`: 누락/변경 BVH, 구버전 converter, HTTP/시간 초과, 스킨 부위 누락,
+  receipt 불일치 등. `hand_skin_screen.unverified`에 분리하고 정상 후보로 반환하지 않는다.
+  안전 후보가 남으면 `partial_error`, 없으면 `error`이며 **오류를 생성으로 덮지 않는다**.
+- 검사 가능한 검색 후보가 모두 교차로 탈락했고 다른 오류가 없다면 기존 빈 검색 생성 분기를
+  실행할 수 있다. 생성 후보도 관절·BVH 검증 후 같은 피부 검사를 통과해야 `preview_ready`에 남는다.
+- 인물별 검색/생성이 **최대 10회·누적 검사 30초(HTTP 1회 최대 15초)**를 공유한다.
+  예산 때문에 확인하지 못한 후보는 미확인이며 통과나 자산 부재로 취급하지 않는다.
+  추가 변환 지연이 있으므로 호출 측 시간 예산에 이 후처리를 포함해야 한다.
+
+`dynamic_search.hand_skin_screen`에는 검사 횟수/예산/제외/미확인 진단이 남는다.
+제외·미확인 생성 진단에 BVH 본문을 새로 넣지 않는다. `near_candidates`는 기존 조건 차이의
+검토 참고로 유지하며 피부 검사 통과 후보라고 표시하지 않는다. 기본 머리·어깨 인체도 검사 대상이 아니다.
+손·몸통·소품·같은 손 내부, 완전 포함, 공면 접촉을 포함하는 완전한 충돌 검사가 아니므로
+`actual_mesh_validated=false`, `refine_allowed=false`, `release_allowed=false`를 유지한다.
+피부 검사 단계 자체는 IK/손목 목표/손 프리셋을 수정하지 않는다.
+
+이 연결은 전신 동적라우팅 `/analyze` 대상이다. 레거시 검색, 기존 `/convert*` export 승인,
+미병합 직접 문장 API #96은 변경하지 않는다. 다른 캐릭터·손 프리셋·BVH로 바꾸면 기존 receipt를
+재사용할 수 없으며 해당 출력의 재검사가 필요하다.
+
+배포는 **converter의 새 검사 endpoint부터 준비한 뒤 inference를 적용**해야 한다.
+두 자동 배포가 병렬로 진행되어 converter가 구버전이면 잠시 `error/partial_error`가 날 수 있다.
+구버전/장애 시 검사를 생략하고 정상 후보를 내보내는 폴백은 없다. S3/IAM 변경이나 실제 배포는
+이 기능 PR 범위 밖이다. `/healthz.dynamic_routing.hand_skin_screen_required`는 연결 여부이며
+converter의 실시간 가용성 인증이 아니다.
 
 ## 0. 경계 — 이 서버는 어디에 있나 (반드시 먼저 읽을 것)
 
@@ -553,6 +596,59 @@ Retry-After: 30
 
 OpenAPI 자동 문서: 서버 기동 후 **`http://127.0.0.1:8000/docs`**. 이 문서와 `/docs`가 어긋나면 **코드가 정본**이고, 이 문서를 갱신한다(`05` 문서 도입 시 "API 변경은 문서 동시 수정" 규칙 적용).
 
+## Internal converter: numeric body baking (2026-10-15, registry v2 2026-10-16)
+
+`POST /convert-framed` accepts an optional multipart `shape` JSON string:
+`{schemaVersion:"body-shape.v1", controls:{...}, shapeSha256:"..."}` and, with it,
+`expected_shape_source`: `{rules, blendSha256, controllerSha256}` — the authoring source
+the BFF catalog promises for this body. The BFF validates/normalizes controls first; the
+converter independently checks keys, finite values, ranges, step grid and the same digest.
+Request-selected source paths or Python code are never accepted.
+
+**Approval is data, not code (`shape-bake.v2`).** `CONVERTER_SHAPE_REGISTRY` names a
+registry shipped inside the immutable, manifest-pinned body release:
+
+```json
+{"schema": "shape-bake.v2",
+ "sources": {"standin-body-0.7.1": {"blend": "/app/body-staging/sources/standin-body-0.7.1.blend",
+                                     "controller": "/app/body-staging/sources/standin-body-0.7.1.py",
+                                     "blend_sha256": "…", "controller_sha256": "…"}},
+ "characters": {"male-bulk-v0-7-1": {"rules": "standin-body-0.7.1", "preset": "BULK", "asset": "…",
+                                      "asset_sha256": "<neutral preset FBX>", "defaults": {…},
+                                      "controls": [{"key": "height", "min": 160, "max": 195, "step": 1, "default": 178}, …]}}}
+```
+
+At start-up (`/healthz` → `checks.shape_sources`) and again inside every Blender job the
+converter re-hashes each source, requires the controller's `VERSION` literal to equal its
+`rules`, and requires every preset default to lie on its own slider grid (`(default-min)/step`
+integral — the build shifts `min` up by less than one step when needed). `shape-bake.v1`
+registries (hard-coded 0.6.7/0.2.2 pins) are rejected. A new body version therefore needs a
+new release built by `scripts/build_shape_release.py`, not a code change.
+
+Errors: different `expected_shape_source` → `409 SHAPE_SOURCE_MISMATCH` before any Blender
+work; other shape problems → `400 INVALID_SHAPE`.
+
+The approved controller bakes neutral mesh and bone proportions, the existing
+V3.2.5 solver transfers the BVH, and approved pose/contact correction is baked
+before framing. PNG and final review GLB are made from that exact final FBX.
+Response adds `shape_sha256` and `shape_bake` lineage (`rules`, `blend_sha256`,
+`controller_sha256`, `controls`, roundtrip/contact QA); the BFF requires the lineage to equal
+the promised source. `CONVERTER_FORCE_EXACT_V324` rejects shape baking rather than claiming
+exact-parent compatibility. New shape FBXs preserve all 52 real terminal bones; only synthetic
+unweighted `_end` markers are removed during the isolated shape job.
+
+**Latency.** A shaped job opens the source .blend twice and runs the controller's pose
+correctives. Measured 30–110 s per job (2 vCPU Linux, pip bpy 5.0.1; heaviest: male BULK),
+dominated by `correct_pose` (21–70 s). Shaped jobs use `CONVERTER_SHAPE_TIMEOUT_SECONDS`
+(default 300) instead of the 30 s conversion budget; the BFF uses `CONVERTER_SHAPE_TIMEOUT_MS`
+(default 320000). Load balancer idle timeouts on this path must exceed these.
+
+BFF `BODY_SHAPE_BAKE_ENABLED` defaults off. Enable with `BODY_SHAPE_EDIT_ENABLED`
+only after deploying matching converter/BFF code and immutable source/catalog data.
+Modified-body Top-K uses PNG fallback instead of an unrelated precomputed GLB;
+final review GLB is generated from the shaped FBX. New catalogs remain draft for
+inference matching; supported BVHs are explicit and do not imply full-library QA.
+
 ## 원근 검색 런타임 연결 (2026-10-15)
 
 `POSE_SEARCH_MODE=perspective`(새 코드 기본값)는 단일 인물·정상 full coverage·
@@ -815,3 +911,112 @@ Gemini 통합 모드의 `BODY_INTEGRATED_REVIEW_ENABLED=1`(기본)에서는 첫 
 재검토를 시작한 응답에만 `body_matching.parallel_review` 진단이 추가된다. `mode=parallel`, `status=completed|error|deadline_exceeded`, `target_count`, `merged_count`, `error`, `review_finished`, `review_elapsed_ms`, `overlap_ms`, `join_wait_ms`, `pose_path_ms`를 제공한다. `review_finished=false`이면 경과 시간은 수집 시점까지의 값이며 완료 시간이 아니다. 이 시간들은 내부 병렬 구간 진단이고 전체 요청 지연이나 제품 SLA가 아니다. [병렬화 검증과 제한](BODY_SELECTION/PARALLEL_REVIEW.md).
 
 기본은 `legacy`/`off`이며 실제 환경 설정을 바꾸지 않았다. 평가 모델·28명 기준·전신 경로의 시간과 회귀 관측은 [통합 평가](BODY_SELECTION/INTEGRATED_FIRST_CALL.md)를 따른다.
+## 동적라우팅 BFF·앱 표시 연결 (dynamic-pose-presentation-v1)
+
+`POST /analyze`에 **추가**된 `people[i].pose_presentation`이 동적라우팅의 표시용 계약이다.
+기존 `dynamic_search` 원문과 legacy `candidates`는 변경하지 않는다. 전신 동적라우팅에서는
+`candidates=[]`가 의도된 값이므로 이것만으로 후보 없음으로 판정하면 안 된다.
+legacy/라우팅 미실행이면 `pose_presentation=null`이며 기존 앱 경로를 그대로 사용한다.
+
+| 필드 | BFF·앱 처리 |
+| --- | --- |
+| `version`, `person_index`, `route` | `dynamic-pose-presentation-v1`; `person_index=people[].index`; 선택된 인물별 라우팅 경로 |
+| `status` | 표시 상태. `ready`, `review_ready`, `basic_reference`, `no_result`, `generation_failed`, `partial_error`, `error`, `blocked`, `undetermined`, `not_run` |
+| `search_status`, `search_reason` | 검색 엔진 원래 상태·사유. HTTP 200이어도 검색 오류일 수 있음 |
+| `generation_status`, `generation_reason` | 생성 원래 상태·사유. 참고 후보가 있어도 생성 실패 배너는 유지 |
+| `ranking` | 실제 RRF 가중치. API 팩토리 `weighted_rrf_k60_geometry_0.4_semantic_0.6`. 배포 후 `/healthz.dynamic_routing`에서도 실제 ranking·두 가중치 확인 가능 |
+| `output_scope` | 변환 출력 범위 `full/half/shoulder_head/head/null`. 미관측을 임의로 full로 확정하지 않음 |
+| `unobserved_body_is_default` | 생성 진단의 명시적 기본값 여부만 전달. true=화면 밖 부위 기본값; null=근거 없음 |
+| `preview_status` | `ready`=표시용 파일 입력 있음, `unavailable`=파일/계약 오류로 없음, `not_requested`=미리보기 입력 없음. BFF 조회 실패 시 별도 오류 표시 필요 |
+| `library_candidates` | qualified 원본 검색 후보(최대 5개). 통과한 검색 조건 범위의 후보이며 완전한 메시 안전 인증 아님 |
+| `review_candidates` | `geometry_review`, `near_match`, `framing_reference` 분리 표시(합계 최대 10개). 정답 검색 성공으로 집계 금지 |
+| `generated_candidates` | `preview_ready` 생성만 `generated_review`로 제공(최대 3개). 실패/근접 생성 진단의 BVH는 포함하지 않음 |
+| `basic_model` | 어깨~머리 기본 모델의 **출력 계획**. 미렌더 상태이며 BVH/FBX 경로를 지어내지 않음 |
+| `issues` | 미리보기 파일 누락·격리·해시 변경 등의 코드. 내부 파일 경로·예외 원문 미노출 |
+
+`ready`는 표시할 파일이 준비되었다는 뜻이지 자동 적용·내보내기 승인이라는 뜻이 아니다.
+모든 항목은 `review_required=true`, `auto_apply_allowed/refine_allowed/export_allowed/
+release_allowed/actual_mesh_validated=false`다. 각 항목의 `validation`은 원래 검사 근거이며
+피부 검사 receipt가 없는데 통과한 것으로 채우지 않는다. 별도 피부 자동 검사 PR의 적용을
+이 계약 변경이 대신하지 않는다. 표시용 투영은 원래 점수·조건 게이트·생성 호출/재시도를
+바꾸지 않는다. 별도 사용자 요청에 따른 서버 RRF 비중 0.6 적용은 위 ranking 항목을 따른다.
+
+### 3D 미리보기 파일 전달
+
+각 항목은 `candidate_id`, `pose_id`, `source`, `library_source`, `kind`, 원래 그룹 내 `rank`, `asset`, `camera`, `camera_kind`, `render_camera`,
+`validation`을 가진다. `rank_score`는 검색 후보의 RRF 점수이며 정확도가 아니다.
+실패한 항목을 건너뛰어도 원래 rank·순서는 유지한다. 그룹 간 임의 통합 재정렬은 하지 않는다.
+`candidate_id=preview_<sha256>`는 버전 v1의 인물 index·종류·라이브러리 ID(생성은 null)·
+BVH SHA-256·정규화된 카메라·출력 범위에 바인딩한다. 점수/순위가 바뀌어도 같은 미리보기는
+같은 ID이며, 바이트/인물/시점/범위가 바뀌면 달라진다. 전역 인증 토큰이 아니므로 BFF의
+job/사용자 소유권 확인을 대체하지 않는다. `lookup_allowed=true`는 미리보기 입력 조회만 뜻한다.
+`score_kind=weighted_rrf` 또는 null이며 `score_is_accuracy=false`다.
+
+* 라이브러리: `asset.transport=library_bvh`, `bvh_url=/pose/{URL-encoded-id}/bvh`,
+  `bvh_sha256`, `library_lookup_supported=true`. 기존 GET과 같은 레지스트리/격리 정책을
+  확인하고, 가능하면 검색 인덱스의 원본 해시도 비교한다. BFF는 이 **내부 상대 경로**를
+  고정된 추론 서버에서 가져오는 인증된 프록시로 바꾸고, 받은 바이트 해시를 재확인한다.
+  임의 외부 URL을 가져오는 프록시를 만들지 않는다. 저장된 과거 결과의 파일이 바뀌면
+  다른 포즈로 조용히 대체하지 말고 재분석/미리보기 불가로 표시한다.
+* 생성: `asset.transport=inline_bvh`, `bvh` 본문, `bvh_sha256`,
+  `library_lookup_supported=false`, `bvh_url=null`, `encoding=utf-8`, `pose_id=null`, `source=generation`.
+  본문을 그대로 미리보기 입력으로 사용하고 `/pose/generated_.../bvh`를 요청하지 않는다.
+  새 공개 파일 저장소·임시 경로·자동 라이브러리 등록은 만들지 않는다.
+* `thumbnail_url`은 실제 번들 파일이 있을 때만 제공한다. 정면 썸네일이므로
+  `thumbnail_view=front`, `thumbnail_is_search_view=false`다. 없으면 null이며 3D 파일은
+  정상일 수 있다. 이 API에서 converter 렌더를 추가 실행하지 않는다.
+* `camera_kind=fixed_117`의 `camera={yaw,pitch,distance}`는 `src/camera_search.py::project`
+  규약(도 단위, 몸통 길이 정규화, hip 중심, Ry 후 Rx 회전, distance null은 직교)을 유지한다.
+  legacy `CandidateCamera` v1/v2와 다른 형식이므로 그 스키마로 캐스팅하지 않는다.
+  `semantic_preview`는 기존 색인의 프리뷰 카메라, `viewer_default`는 시점 미확정이다.
+  서버가 새로운 시점/좌우/관절을 추정하거나 BVH에 회전을 굽지 않는다.
+
+완전한 렌더 규약은 추가된 `render_camera`를 사용한다. `pose-preview-camera-v1`은 Y-up
+오른손 좌표계, hip midpoint 중심, hip→shoulder midpoint 길이 정규화를 사용한다. 회전행렬은
+열벡터 기준 `Rz @ Rx @ Ry`이며 실제 점은 `q=R*(p-hip)/torso_length`다. 정사영은
+`xy=(q.x,-q.y)`, 원근은 `xy=(q.x,-q.y)/(q.z+distance_torso)`이며 깊이>.1이어야 한다.
+각도는 도, 거리는 몸통 길이 단위다. 이는 정규화 투영면 수식이므로 FOV는 제공/추정하지 않는다.
+기성 원근 렌더러를 쓰면 focal length=1인 대칭 투영면을 구현해야 하며, 이미지 채우기용 확대·
+이동은 별도다. `fit_to_rough_pixels=false`: 러프 픽셀 구도까지 복원했다는 뜻이 아니다.
+`projection_matches_search=true`는 117시점 기하의 방향·투영 수식만 같다는 뜻이다.
+`semantic_preview`는 정사영 참고, `viewer_default`는 중립 정사영 표시 기본값(관측 시점 아님).
+`bvh_camera_rotation_applied=false`이므로 BVH 원래 루트/관절 회전은 유지한 채 이 **표시 회전만
+한 번** 적용한다. BVH 단위는 원본 단위이며 미터로 단정하지 말고 위 torso 정규화를 사용한다.
+
+BVH 경로는 만료 시각이 있는 signed URL이 아니며 별도 TTL은 없다. 다만 같은 라이브러리·
+파일·접근 정책이 유지될 때만 재시작 후에도 유효하다. 기본 추론 라우트에 새 공개 인증/토큰을
+추가하지 않았으므로 기존 내부 네트워크/서비스 인증 경계를 유지하고 앱에 직접 노출하지 않는다.
+생성 본문은 반환 후 서버 임시 파일 없이도 사용할 수 있다. BFF는 기존 분석 결과 보관 기간·
+job 소유권·접근제어·사용자 삭제/만료 정책 안에서 미리보기용으로 저장/재사용할 수 있다.
+본문·해시·후보 ID·검사 근거를 함께 보존하고 공개 저장소/무기한 보관/라이브러리 등록/export로
+확장하지 않는다. 보관 기간을 이 계약에서 새로 늘리지 않는다.
+
+우선순위: 지원하는 `pose_presentation.version`이 있으면 표시 목록/상태는 이 필드가 기준이다.
+`dynamic_search`는 근거 확인용이며 두 결과를 합치지 않는다. 미포함/null인 구버전은 팀원의
+기존 dynamic_search 연결을 유지할 수 있고, 그것도 없을 때 legacy candidates를 사용한다.
+알 수 없는 버전은 지원 불가로 표시한다. 오류를 보고 다른 목록을 정상 후보로 승격하지 않는다.
+
+검색 오류·차단이면 주입된 생성/검색 항목을 표시용 목록으로 승격하지 않는다. 정상 빈 검색의
+생성만 허용하며, 이후 별도 기하 참고 목록이 붙더라도 qualified 결과가 없었던 생성은 유지한다.
+파일 접근 실패는 `error/partial_error + issues`이며 `no_result`로 바꾸거나 재생성하지 않는다.
+어떤 표시용 항목도 legacy `candidates`, `/refine`, `/export-order`에 복사하지 않는다.
+
+### 팀원 연결 요청과 완료 기준
+
+추론 서버 소유 변경은 이 필드·파일 무결성·OpenAPI·회귀 테스트까지다. BFF/앱 구현·배포는 별도다.
+
+1. BFF는 새 필드를 인물별로 저장·전달하고 library/inline 전송을 구분한다. body matching의
+   인물/체형 선택·수동 설정·손 프리셋 등 기존 계약은 그대로 보존한다. 검수/변환 조건을
+   바꾸거나 프리셋을 다시 구웠다면 이전 검사 근거를 새 결과의 인증으로 재사용하지 않는다.
+2. 앱은 새 필드가 있으면 그 목록을 읽고 검색/참고/생성 그룹을 구분한다. `search_status`,
+   `generation_status`, `issues`를 보존해 실패를 단순 후보 없음과 구분한다. 구버전 서버만
+   기존 candidates 경로를 사용한다. 두 목록을 임의로 합치거나 export 제한을 해제하지 않는다.
+3. 같은 러프의 인물별 목록 수와 표시 수가 일치하고 실제 BVH 미리보기가 열리는지 E2E로 확인한다.
+   검색 1개/legacy 0개, 정상 빈 검색, 생성 검수 성공, 생성 실패, 부분 오류, 근접 참고,
+   어깨~머리 기본 계획, 파일 누락·변경, 다인물 및 legacy 응답을 각각 검사한다.
+
+로컬 HTTP 회귀 예제: `tests/test_pose_presentation.py`. `pose_presentation` 로그는 그룹별 수와
+오류 코드만 기록한다(러프·설명·BVH 본문은 기록하지 않음). BFF·앱이 새 필드를 읽기 전까지는
+추론 서버만 배포해도 기존 앱의 ‘후보 0개’ 표시는 해결되지 않는다.
+
+`GET /healthz.semantic_text.ready`는 직접 문장 검색에 쓰는 기존 전신 엔진의 실제 index·validator·startup 상태를 나타낸다. BFF는 이 값으로 문장 검색 준비 여부를 확인한다. 환경 플래그만으로 준비됨을 표시하지 않는다. 이 조회는 VLM·검색·생성을 호출하지 않는다.
