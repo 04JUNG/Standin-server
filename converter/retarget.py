@@ -76,7 +76,7 @@ import os
 from dataclasses import dataclass, field, asdict
 
 import bpy
-from mathutils import Matrix, Vector
+from mathutils import Matrix, Quaternion, Vector
 
 from . import bone_map
 from .bone_map import CANONICAL_BONES, REQUIRED_BONES, PROFILES
@@ -122,6 +122,9 @@ class ConvertReport:
     palm_plane_sin: dict[str, float] = field(default_factory=dict)
     palm_frame_status: dict[str, str] = field(default_factory=dict)
     palm_roll_mode: dict[str, str] = field(default_factory=dict)
+    # 손바닥 기준점 부족(fallback)으로 hand가 target rest 관계에 고정될 때, 원본 손목의
+    # 전완 대비 회전(rest 대비 delta)을 world 공간에서 그대로 옮긴 양(도). 0이면 미적용.
+    wrist_transfer: dict[str, float] = field(default_factory=dict)
     palm_fallback_reason: dict[str, str | None] = field(default_factory=dict)
     palm_roll_bones: list[str] = field(default_factory=list)
     palm_roll_fallback_bones: list[str] = field(default_factory=list)
@@ -649,9 +652,58 @@ def _signed_twist_deg(rotation: Matrix, axis: Vector) -> float:
     return math.degrees(theta)
 
 
+_WRIST_TRANSFER = os.environ.get("STANDIN_WRIST_TRANSFER", "1") != "0"
+# fallback 손목 전달 시 전완축 비틀림 중 전완 본이 나눠 갖는 비율. 원본(CMU 등)의 손 채널에는
+# 전완 회내·회외가 함께 실려 있어, 비틀림 bone이 없는 target 손목 한 곳에 몰면 손목 스킨이 꼬인다.
+_WRIST_TWIST_FOREARM_SHARE = float(os.environ.get("STANDIN_WRIST_TWIST_FOREARM_SHARE", "0.5"))
+
+
 def _source_rot(m: Matrix, mirror: bool) -> Matrix:
     r = _rot_only(m)
     return (_MIRROR_X @ r @ _MIRROR_X) if mirror else r
+
+
+def _twist_about(rot: Matrix, axis: Vector) -> tuple[float, Vector] | None:
+    """rot의 axis 둘레 비틀림 성분(swing-twist 분해). (부호 있는 각, 단위축) 또는 None."""
+    if axis.length <= _DIR_EPS:
+        return None
+    a = axis.normalized()
+    q = rot.to_quaternion()
+    v = Vector((q.x, q.y, q.z))
+    p = a * v.dot(a)
+    t = Quaternion((q.w, p.x, p.y, p.z))
+    if t.magnitude <= 1e-9:
+        return None
+    t.normalize()
+    if t.w < 0.0:
+        t = Quaternion((-t.w, -t.x, -t.y, -t.z))
+    angle = 2.0 * math.atan2(Vector((t.x, t.y, t.z)).dot(a), t.w)
+    return angle, a
+
+
+def _wrist_relative_transfer(src_arm, s_hand: str, mirror: bool) -> tuple[Matrix | None, dict]:
+    """palm-roll fallback일 때 원본 손목의 전완 대비 상대회전(굽힘+비틀림)을 world delta로 돌려준다.
+
+    D = (전완 world delta)^-1 · (손 world delta) 는 rest world 프레임에서 손이 전완보다 더 돈 양이다.
+    이를 source 전완의 posed 프레임으로 올린 F·D·F^-1 을 frozen target 손에 곱하면, target 전완이
+    source 전완과 같은 방향일 때 손의 전완 대비 회전이 원본 채널과 같아진다. 손가락 위치로
+    방향만 맞추는 swing은 비틀림을 굽힘으로 바꿔 가짜 손목 꺾임을 만들므로 쓰지 않는다.
+    """
+    s_bone = src_arm.data.bones[s_hand]
+    if s_bone.parent is None:
+        return None, {"applied_deg": 0.0, "reason": "source hand has no forearm"}
+    s_fore = s_bone.parent.name
+    f_delta = _rot_only(_pose_world(src_arm, s_fore)).to_3x3() @ _rot_only(_rest_world(src_arm, s_fore)).to_3x3().inverted()
+    h_delta = _rot_only(_pose_world(src_arm, s_hand)).to_3x3() @ _rot_only(_rest_world(src_arm, s_hand)).to_3x3().inverted()
+    d_rest = f_delta.inverted() @ h_delta
+    rel = f_delta @ d_rest @ f_delta.inverted()
+    if mirror:
+        flip = Matrix.Diagonal((-1.0, 1.0, 1.0))
+        rel = flip @ rel @ flip
+    if not _matrix_is_finite(rel):
+        return None, {"applied_deg": 0.0, "reason": "non-finite"}
+    deg = math.degrees(rel.to_quaternion().angle)
+    return rel.to_4x4(), {"applied_deg": deg, "mode": "forearm_relative_full"}
 
 
 def _vector_is_finite(v: Vector) -> bool:
@@ -1261,9 +1313,27 @@ def retarget(
             _QA_SOLVER_MODE_BY_BONE[canon] = "chain_transport"
         frozen_hand = maps[1] @ _rot_only(_rest_world(dst_arm, d_hand))
         desired_rot[hand] = apply_palm_roll(hand, s_hand, d_hand, frozen_hand)
+        if rep.palm_roll_mode.get(hand) == "fallback" and _WRIST_TRANSFER:
+            # fallback은 손을 target rest 손목 관계에 고정해 원본 손목 회전(굽힘·비틀림)을 버린다.
+            # 원본 전완 대비 손 상대회전을 그대로 옮기고, 전완축 비틀림의 일부는 전완 본에
+            # 나눠 실어 손목 한 점에 비틀림이 몰리지 않게 한다(손의 world 방향은 그대로).
+            rel, info = _wrist_relative_transfer(src_arm, s_hand, mirror)
+            if rel is not None:
+                desired_rot[hand] = _rot_only(rel @ frozen_hand)
+                fore = bones[1]
+                share = max(0.0, min(1.0, _WRIST_TWIST_FOREARM_SHARE))
+                twist = _twist_about(rel, desired_rot[fore].to_3x3() @ Vector((0.0, 1.0, 0.0)))
+                if share > 0.0 and twist is not None and abs(twist[0]) > 1e-6:
+                    angle, axis = twist
+                    desired_rot[fore] = _rot_only(Matrix.Rotation(angle * share, 4, axis) @ desired_rot[fore])
+                    info["forearm_twist_deg"] = math.degrees(angle * share)
+                swing = rel
+                rep.wrist_transfer[hand] = info["applied_deg"]
+                _QA_PALM_DIAGNOSTICS.setdefault(hand, {})["wrist_transfer"] = info
         _QA_SOLVER_MODE_BY_BONE[hand] = (
             "terminal_follow_palm_roll"
             if rep.palm_roll_mode.get(hand) == "corrected"
+            else "terminal_follow_wrist_transfer" if hand in rep.wrist_transfer
             else "terminal_follow"
         )
         _QA_TERMINAL_FOLLOW_BONES.append(hand)
