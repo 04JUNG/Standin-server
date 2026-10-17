@@ -546,6 +546,29 @@ Retry-After: 30
 
 OpenAPI 자동 문서: 서버 기동 후 **`http://127.0.0.1:8000/docs`**. 이 문서와 `/docs`가 어긋나면 **코드가 정본**이고, 이 문서를 갱신한다(`05` 문서 도입 시 "API 변경은 문서 동시 수정" 규칙 적용).
 
+## 원근 검색 런타임 연결 (2026-10-15)
+
+`POSE_SEARCH_MODE=perspective`(새 코드 기본값)는 단일 인물·정상 full coverage·
+full_image·전신 pos 검색에서 117개 조합/195개 시작점 조정/Top20 윤곽 재정렬을
+실행한다. Z 모델은 사용하지 않는다. `legacy` 설정과 재시작으로 기존 검색으로
+복귀하며, 부분·다인물·복구·비-pos·원본 BVH 미확보는 기존 경로를 유지한다.
+운영 배포 설정은 이 코드 변경에 포함하지 않는다.
+
+새 경로는 점수 미보정 때문에 `confidence=low`, `confidence_threshold=null`을 유지하지만,
+refine v2는 기존 구조/소유권/관측 게이트로 허용한다. 일괄 refine 차단과 scores=0은 제거했다.
+refine v1 설정은 기존 검색/보정 경로를 유지한다. 새 후보의 `camera.version`은
+`candidate-camera-v2`이며 rotation 외에 projection, distance_torso, labels_swapped,
+pose_id, query_sha256, observed_joint_mask를 포함한다. 클라이언트는 이 객체 전체와
+`distance_metric=perspective_pos`를 `/refine`에 그대로 재전송해야 한다. 새 metric에
+camera v2가 없거나 필드/포즈/XY/원본 SHA가 맞지 않으면 422(분석 중 원본 교체는 409)다.
+v1/null camera 계약은 유지한다. v2의 원근/좌우가 전방계산과 최종 selector에 적용되고,
+보정 결과는 원래 BVH 좌표로 복원한다. 안전한 보정이 불가능하면 기존 게이트나
+`camera_projection_invalid` 사유로 원본을 유지한다. 표시 썸네일은 아직 직교다.
+`quality_trace.perspective_search`에는 applied/reason/contour 복귀/비용/검색 카메라
+진단값을 남긴다. 후보 `distance`는 카메라 혼합+윤곽 점수이며 legacy 거리와 직접
+비교하면 안 된다. 외부 BFF/앱의 v2 전달/원근 화면 재현은 별도 통합 확인 대상이다.
+세부 적용 범위와 제한: [PERSPECTIVE_RUNTIME.md](PERSPECTIVE_RUNTIME.md).
+
 ## 관측 상체 검색 추가 (2026-10-02)
 
 - 흉상도 추출·검색을 수행하며 응답 `route=core`. 골반을 관측하지 못했으나

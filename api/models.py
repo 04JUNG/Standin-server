@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import math
 from typing import Annotated, List, Literal, Optional
-from pydantic import BaseModel, Field, field_validator, computed_field
+from pydantic import BaseModel, Field, field_validator, computed_field, model_validator
 
 from src.body_scope import BodyScope
 from src.schema import Action, Relationship, Shot, View
@@ -14,16 +14,44 @@ from .body_models import BodyMatchingOut, EmptyBodyMatchingOut
 
 
 class CandidateCamera(BaseModel):
-    version: Literal["candidate-camera-v1"]
+    version: Literal["candidate-camera-v1", "candidate-camera-v2"]
     rotation: List[List[float]]
     source_bvh_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
-    reference: Literal["pelvis-torso-yaw"]
+    reference: Literal["pelvis-torso-yaw", "search-fit"]
     canonical_yaw: float
     display_view: Literal["front", "back", "side", "three_quarter"]
     status: Literal["fitted", "canonical_fallback"]
     fit_error: float
     facing_source: Literal["person_observation", "geometry_only"]
     depth_ambiguous: bool
+    projection: Optional[Literal['orthographic','perspective']] = None
+    distance_torso: Optional[float] = None
+    labels_swapped: Optional[bool] = Field(None, strict=True)
+    pose_id: Optional[str] = None
+    query_sha256: Optional[str] = Field(None, pattern=r'^[a-f0-9]{64}$')
+    observed_joint_mask: Optional[Annotated[List[bool], Field(min_length=17,max_length=17)]] = None
+
+    @model_validator(mode='after')
+    def _projection_contract(self):
+        if self.version == 'candidate-camera-v1':
+            if (self.reference != 'pelvis-torso-yaw' or any(v is not None for v in (
+                    self.projection,self.distance_torso,self.labels_swapped,self.pose_id,
+                    self.query_sha256,self.observed_joint_mask))):
+                raise ValueError('v1 camera cannot carry a search projection')
+        else:
+            if (self.reference!='search-fit' or self.projection is None or self.labels_swapped is None
+                    or not self.pose_id or self.query_sha256 is None or self.observed_joint_mask is None):
+                raise ValueError('v2 search camera requires complete projection/label binding')
+            if self.projection=='perspective':
+                if self.distance_torso is None or not math.isfinite(self.distance_torso) or self.distance_torso<.8:
+                    raise ValueError('finite positive perspective torso distance required')
+            elif self.distance_torso is not None:
+                raise ValueError('orthographic camera must not carry a distance')
+            if (not math.isfinite(self.fit_error) or self.fit_error<0
+                    or not all(self.observed_joint_mask[i] for i in (5,6,11,12))
+                    or sum(self.observed_joint_mask[5:])<6):
+                raise ValueError('invalid search camera observation/fit')
+        return self
 
     @field_validator("rotation", mode="before")
     @classmethod
@@ -301,6 +329,19 @@ class RefineRequest(BaseModel):
         if not all(math.isfinite(float(number)) for point in value for number in point):
             raise ValueError("keypoints must contain only finite values")
         return value
+
+    @model_validator(mode='after')
+    def _search_camera_binding(self):
+        is_search = self.camera is not None and self.camera.version=='candidate-camera-v2'
+        if self.distance_metric=='perspective_pos' and not is_search:
+            raise ValueError('perspective search refine requires its v2 camera')
+        if is_search:
+            from src.refine_projection import query_sha256
+            if self.camera.pose_id!=self.pose_id or self.camera.query_sha256!=query_sha256(self.keypoints):
+                raise ValueError('search camera belongs to another candidate/query')
+            if self.scores is None or any(s>=.3 and not m for s,m in zip(self.scores,self.camera.observed_joint_mask)):
+                raise ValueError('refine must not invent unobserved search joints')
+        return self
 
     @field_validator("scores")
     @classmethod

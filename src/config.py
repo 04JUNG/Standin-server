@@ -116,6 +116,9 @@ class Config:
     pose_strict: bool = _env_bool("POSE_STRICT", False)
 
     # --- 검색 ---
+    # 새 코드 배포 후 전신·단일 인물 검색에 적용. legacy는 즉시 롤백 스위치.
+    # 부분 관측/다인물/비-pos/원본 BVH 미확보/refine v1은 기존 검색을 유지한다.
+    pose_search_mode: str = os.getenv("POSE_SEARCH_MODE", "perspective")
     top_n_search: int = 20     # kNN 1차 후보 수(→ rerank 입력)
     top_k_final: int = 5       # 작가에게 보여줄 최종 후보 수
     use_rerank: bool = os.getenv("USE_RERANK", "1") == "1"
@@ -472,6 +475,8 @@ class Config:
     refine_timeout_seconds: float = float(os.getenv("REFINE_TIMEOUT_SECONDS", "5.0"))
 
     def __post_init__(self) -> None:
+        if self.pose_search_mode not in {"legacy", "perspective"}:
+            raise ValueError("POSE_SEARCH_MODE must be legacy or perspective")
         if self.body_matching_mode not in {"off", "shadow", "auto"}:
             raise ValueError("BODY_MATCHING_MODE must be off, shadow or auto")
         if self.body_vlm_provider not in {"mock", "gemini"}:
