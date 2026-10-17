@@ -26,7 +26,7 @@ class FullBodySearch:
     def __init__(self, entries, semantic, camera_index, *, top_k=5, pool_k=40,
                  geometry_max_distance=1.0, geometry_upper_max_distance=1.5,
                  generator=None, startup_error=None, include_stored_compositions=True,
-                 semantic_weight=.35, hand_skin_gate=None):
+                 semantic_weight=.35, hand_skin_gate=None, hand_spacing_repairer=None):
         if not 1 <= top_k <= pool_k <= 200:
             raise ValueError('invalid search limits')
         if any(not math.isfinite(v) or v <= 0 for v in (geometry_max_distance, geometry_upper_max_distance)):
@@ -43,6 +43,7 @@ class FullBodySearch:
         self.cutoffs = {'full': geometry_max_distance, 'upper': geometry_upper_max_distance}
         self.generator, self.startup_error = generator, startup_error
         self.hand_skin_gate = hand_skin_gate
+        self.hand_spacing_repairer = hand_spacing_repairer
         self.include_stored_compositions = include_stored_compositions
         self.validator=None
         if hasattr(camera_index,'pose_ids') and hasattr(semantic,'core_records'):
@@ -326,7 +327,12 @@ class FullBodySearch:
                     out['generation'].update(status='rejected',reason='generated_observation_conditions_failed',candidates=[])
             if skin_session and out['generation']['status'] == 'preview_ready':
                 generated = out['generation']['candidates']
-                passed = skin_session.filter(generated, generated=True, limit=len(generated))
+                if self.hand_spacing_repairer:
+                    passed, repair_report = self.hand_spacing_repairer.filter(
+                        generated, out['generation'], required, skin_session)
+                    out['generation']['diagnostics']['hand_spacing_repair'] = repair_report
+                else:
+                    passed = skin_session.filter(generated, generated=True, limit=len(generated))
                 out['generation']['candidates'] = passed
                 out['hand_skin_screen'] = skin_session.report()
                 if not passed:
@@ -437,4 +443,7 @@ def _build_fullbody_resources(entries, *, db_path):
         geometry_upper_max_distance=float(os.getenv('ROUTING_GEOMETRY_UPPER_MAX_DISTANCE', '1.5')))
     from .hand_skin_screen import build_hand_skin_gate
     engine.hand_skin_gate = build_hand_skin_gate(camera, paths['bvh'])
+    if generator is not None:
+        from .hand_spacing_repair import GeneratedHandSpacingRepair
+        engine.hand_spacing_repairer = GeneratedHandSpacingRepair(generator.repair_hand_spacing)
     return pose, semantic, engine

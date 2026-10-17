@@ -239,7 +239,7 @@ def build_pose_presentation(report, *, person_index=0, output_scope=None, resolv
                         candidate_id=candidate_id(person_index, 'generated_review', None, asset, normalized, output_scope),
                         source='generation', kind="generated_review", rank=rank, asset=asset,
                         camera_kind="viewer_default", render_camera=normalized, validation={k: deepcopy(row[k]) for k in (
-                            "validation", "diagnostics", "hand_skin_screen") if k in row}))
+                            "validation", "diagnostics", "hand_skin_screen", "hand_spacing_repair") if k in row}))
                 except (ValueError, TypeError):
                     out.issues.append("generated_preview_unavailable")
             if not out.generated_candidates:

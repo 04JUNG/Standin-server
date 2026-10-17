@@ -46,6 +46,9 @@ FastAPI inference가 DB에서 legacy 주문서의 `bvh_url·set_id·tags`를 채
 자동 거친다. 미검출 receipt도 손-몸통/소품/동일 손 내부 전체의 충돌 인증은 아니다.
 다른 BVH·손 프리셋·캐릭터 출력에 receipt를 재사용하지 않는다. 기존 `/convert*`와
 자동 export 승인 정책을 이 검사로 승격하지 않는다.
+제한된 생성 손 간격 보정도 동일하다. 보정 후 BVH 해시와 피부 receipt는 미리보기
+계보일 뿐 내보내기 승인서가 아니다. BFF는 보정 전 BVH·손모양의 receipt를
+보정본에 붙이지 않으며, `hand_spacing_repair`가 있어도 자동 export하지 않는다.
 출력 범위는 `output_scope.mesh_scope`를 변환기의 `output_scope`에 전달한다
 (`full`, 팔·손을 보존하는 `half`, 목·어깨선·머리만 남기는 `shoulder_head`).
 이 PR은 기존 `/export-order` 요청 스키마나 운영 export 승인 정책을 확장하지 않는다.
