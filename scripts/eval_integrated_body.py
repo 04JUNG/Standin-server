@@ -67,6 +67,8 @@ def same_successful_count(before, after):
         and before.get("result") is not None
         and after.get("result") is not None
         and before["result"].get("vlm_count") == after["result"].get("vlm_count")
+        and len(before["result"].get("people", []))
+        == len(after["result"].get("people", []))
     )
 
 
@@ -99,6 +101,11 @@ def main():
     p.add_argument("--person-tags", action="store_true")
     p.add_argument("--manifest", type=Path)
     p.add_argument("--resume", action="store_true")
+    p.add_argument(
+        "--baseline-from",
+        type=Path,
+        help="Frozen evaluation root; uses its integrated-<repeat> records as baseline",
+    )
     a = p.parse_args()
     a.out.mkdir(parents=True, exist_ok=True)
     from dotenv import dotenv_values
@@ -109,6 +116,8 @@ def main():
     os.environ["GEMINI_API_KEY"] = key
     root = a.data_root.resolve()
     a.out = a.out.resolve()
+    if a.baseline_from:
+        a.baseline_from = a.baseline_from.resolve()
     # No .env mutation. All profile overrides are local to this evaluation process.
     env = dict(
         APP_ENV="development",
@@ -166,7 +175,8 @@ def main():
             raise ValueError("input_hash_mismatch")
         cuts.setdefault(c["cut_id"], []).append(c)
     receipt = dict(
-        develop_commit="58c691ea",
+        develop_commit="c8181b0e",
+        baseline_source=str(a.baseline_from.resolve()) if a.baseline_from else None,
         profile=a.profile,
         model=a.model,
         thinking_level=a.thinking_level,
@@ -227,9 +237,38 @@ def main():
         json.dumps(receipt, ensure_ascii=False, indent=2)
     )
     print("STARTUP", json.dumps(receipt, ensure_ascii=False), flush=True)
+    if a.baseline_from:
+        prior = json.loads((a.baseline_from / "receipt.json").read_text())
+        for name in (
+            "profile",
+            "model",
+            "thinking_level",
+            "person_tags",
+            "hand_shapes",
+            "protocol_sha256",
+            "reference_sha256",
+            "library_source_sha256",
+            "pose_identity",
+            "pose_adapter",
+        ):
+            if prior.get(name) != receipt.get(name):
+                raise ValueError("incompatible_baseline_" + name)
     outputs = {}
     for repeat in range(a.repeats):
         for phase in ["baseline", "integrated"]:
+            if phase == "baseline" and a.baseline_from:
+                for cut in cuts:
+                    source = (
+                        a.baseline_from / f"integrated-{repeat}" / cut / "result.json"
+                    )
+                    previous = json.loads(source.read_text())
+                    if previous.get("cut_id") != cut:
+                        raise ValueError("baseline_identity_mismatch")
+                    outputs[(repeat, phase, cut)] = previous
+                    dest = a.out / f"baseline-{repeat}" / cut
+                    dest.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(source, dest / "result.json")
+                continue
             CFG.body_matching_mode = "off" if phase == "baseline" else "shadow"
             CFG.body_coarse_catalog_path = str(
                 Path(__file__).resolve().parents[1] / "config/body_morphology.v1.json"
@@ -249,7 +288,17 @@ def main():
             def generate(model_self, **kw):
                 cfg = kw["config"]
                 system = cfg.system_instruction
-                if system == prompts.PERSON_TAGS_SYSTEM:
+                from src.experimental.body_matching.integrated_review import (
+                    SYSTEM as BODY_REVIEW_SYSTEM,
+                    PROMPT as BODY_REVIEW_PROMPT,
+                )
+
+                if (
+                    system == BODY_REVIEW_SYSTEM
+                    or kw.get("contents", [None])[0] == BODY_REVIEW_PROMPT
+                ):
+                    kind = "body_review"
+                elif system == prompts.PERSON_TAGS_SYSTEM:
                     kind = "person_tags"
                 elif system == prompts.HAND_SHAPES_SYSTEM:
                     kind = "hands"
