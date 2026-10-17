@@ -321,29 +321,51 @@ def build_api_pipeline(entries, *, db_path):
     from .pipeline import Pipeline
     if os.getenv('ROUTING_FULLBODY_ENABLED', '1') != '1':
         return Pipeline(entries)
-    if CFG.pose_backend != 'rtmlib' or CFG.pose_model_variant != 'humanart-m':
-        raise ValueError('fullbody routing requires POSE_BACKEND=rtmlib and POSE_MODEL_VARIANT=humanart-m')
-    from .pose_humanart import HumanArtPoseModel
-    pose = HumanArtPoseModel()  # strict manifest/calibration validation, no mock fallback
+    pose, semantic, engine = _build_fullbody_resources(entries, db_path=db_path)
     from .vlm.client import build_vlm_client, MockVLMClient
     vlm = build_vlm_client()
     if isinstance(vlm, MockVLMClient):
         raise ValueError('fullbody routing requires a configured real VLM')
+    return Pipeline(entries, vlm_client=vlm, pose_model=pose, semantic_searcher=semantic, fullbody_search=engine)
+
+
+def _build_fullbody_resources(entries, *, db_path):
+    """Shared by real startup and deployment file/model preflight (no VLM calls)."""
+    if CFG.pose_backend != 'rtmlib' or CFG.pose_model_variant != 'humanart-m':
+        raise ValueError('fullbody routing requires POSE_BACKEND=rtmlib and POSE_MODEL_VARIANT=humanart-m')
+    from .pose_humanart import HumanArtPoseModel
+    bundle = None
+    if os.getenv('POSE_CALIBRATION_FROM_MANIFEST', '0') == '1':
+        from .pose_contract import load_pose_bundle, apply_bundle_calibration
+        bundle = load_pose_bundle(CFG.pose_model_manifest, expected_model_id='humanart-m')
+        apply_bundle_calibration(bundle, CFG)
+    pose = HumanArtPoseModel(bundle=bundle)  # strict validation remains, no mock fallback
     root = Path(CFG.data_dir)
-    from .semantic_adapter_285 import build_semantic285_searcher
-    semantic = build_semantic285_searcher(
-        tags_path=os.getenv('SEMANTIC_285_TAGS_PATH', str(root/'search-v2.json')),
-        taxonomy_path=os.getenv('SEMANTIC_285_TAXONOMY_PATH', str(root/'search-taxonomy-v2.json')),
-        db_path=db_path, library_pose_ids={e.pose_id for e in entries},
-        body_index_path=os.getenv('SEMANTIC_285_BODY_INDEX_PATH', str(root/'body.json')),
-        shape_index_path=os.getenv('SEMANTIC_285_SHAPE_INDEX_PATH', str(root/'shapes.json')),
-        dense_model_dir=os.getenv('SEMANTIC_EMBEDDING_DIR') or None)
-    if getattr(semantic, 'service', None) is None:
-        raise ValueError('fullbody semantic index unavailable: '+getattr(semantic, 'reason', 'unknown'))
     include_stored = os.getenv('ROUTING_INCLUDE_STORED_COMPOSITIONS', '1') == '1'
     allowed = {e.pose_id for e in entries if include_stored
                or e.meta.get('source') != 'generated_composition'} - excluded_pose_ids()
-    camera = CameraIndex.from_library(allowed, os.getenv('ROUTING_BVH_ROOT', str(root/'bvh')), count=117)
+    paths = dict(tags=Path(os.getenv('SEMANTIC_285_TAGS_PATH', str(root/'search-v2.json'))),
+                 taxonomy=Path(os.getenv('SEMANTIC_285_TAXONOMY_PATH', str(root/'search-taxonomy-v2.json'))),
+                 body=Path(os.getenv('SEMANTIC_285_BODY_INDEX_PATH', str(root/'body.json'))),
+                 shapes=Path(os.getenv('SEMANTIC_285_SHAPE_INDEX_PATH', str(root/'shapes.json'))),
+                 bvh=Path(os.getenv('ROUTING_BVH_ROOT', str(root/'bvh'))))
+    if os.getenv('ROUTING_PREPARE_ASSETS', '0') == '1':
+        from .fullbody_assets import prepare_assets, validate_generation_assets
+        paths = prepare_assets(db_path=db_path, root=root, allowed=allowed)
+        validate_generation_assets(root)
+        from .logging_setup import log_info
+        log_info('fullbody_assets', **paths['receipt'])
+    from .semantic_adapter_285 import build_semantic285_searcher
+    semantic = build_semantic285_searcher(
+        tags_path=paths['tags'],
+        taxonomy_path=paths['taxonomy'],
+        db_path=db_path, library_pose_ids={e.pose_id for e in entries},
+        body_index_path=paths['body'],
+        shape_index_path=paths['shapes'],
+        dense_model_dir=os.getenv('SEMANTIC_EMBEDDING_DIR') or None)
+    if getattr(semantic, 'service', None) is None:
+        raise ValueError('fullbody semantic index unavailable: '+getattr(semantic, 'reason', 'unknown'))
+    camera = CameraIndex.from_library(allowed, paths['bvh'], count=117)
     if camera.errors:
         raise ValueError('fullbody camera index incomplete; invalid BVH assets require curation')
     generator = None
@@ -358,4 +380,4 @@ def build_api_pipeline(entries, *, db_path):
         include_stored_compositions=include_stored,
         geometry_max_distance=float(os.getenv('ROUTING_GEOMETRY_MAX_DISTANCE', '1.0')),
         geometry_upper_max_distance=float(os.getenv('ROUTING_GEOMETRY_UPPER_MAX_DISTANCE', '1.5')))
-    return Pipeline(entries, vlm_client=vlm, pose_model=pose, semantic_searcher=semantic, fullbody_search=engine)
+    return pose, semantic, engine

@@ -418,6 +418,8 @@ def healthz():
     pose_count = STATE.get("pose_count", 0)
     capability = _refine_capability()
     ok = "pipeline" in STATE and pose_count > 0 and capability["config_valid"]
+    engine = getattr(STATE.get('pipeline'), '_fullbody_search', None)
+    camera = getattr(engine, 'camera', None)
     body = {
         "ok": ok,
         "env": CFG.app_env,
@@ -427,6 +429,13 @@ def healthz():
         "quarantined_pose_count": STATE.get("quarantined_pose_count", 0),
         # 어느 번들이 떠 있는지: version·source(manifest|env)·content_sha256·db_sha256
         "pose_library": STATE.get("pose_library"),
+        # Actual initialized engine, not an environment flag. No model API call.
+        "dynamic_routing": {
+            "enabled": engine is not None,
+            "camera_count": len(getattr(camera, 'cameras', [])),
+            "camera_pose_count": len(getattr(camera, 'pose_ids', [])),
+            "semantic_backend": getattr(getattr(engine, 'semantic', None), 'backend', None),
+        },
         "refine": capability,
         "refine_thumbnail": {
             "renderer": getattr(STATE.get("thumbnail_renderer"), "name", None),
