@@ -64,11 +64,12 @@ API `search_routing.skeleton_repair`에 호출 여부·수정·실패 기록이 
 기하 검색과 자연어 검색이 각각 최대 40개 원본 후보를 제안한다. 같은 포즈가 양쪽에서
 선택되면 점수를 합친다. 거리와 문장 점수는 단위가 다르므로 원시값을 더하지 않는다.
 
-`rank_score = 0.65 / (60 + 기하 순위) + 0.35 / (60 + 자연어 순위)`
+`rank_score = 0.40 / (60 + 기하 순위) + 0.60 / (60 + 자연어 순위)`
 
-로컬 가중치 실험은 `FullBodySearch(..., semantic_weight=0.6)`으로 자연어 0.60,
-기하 0.40을 비교할 수 있다. 인자는 0과 1 사이의 유한값만 허용한다.
-API 팩토리 기본값은 여전히 0.35이며, `ranking` 필드는 실제 적용 가중치를 기록한다.
+2026-10-17 사용자 요청으로 API 팩토리는 자연어 0.60·기하 0.40을 명시하며,
+로컬 비교 실험도 `FullBodySearch(..., semantic_weight=0.6)`으로 재현한다.
+인자는 0과 1 사이의 유한값만 허용한다. 과거 비교용 직접 생성자의 기본값 0.35는 유지한다.
+`ranking`과 `/healthz.dynamic_routing`은 초기화된 엔진의 실제 적용 가중치를 기록한다.
 같은 저장 후보 목록으로 순위만 재계산하면 추출·검색 변동 없이 가중치 효과를 분리한다.
 
 구조화된 물건 관찰이 있는 경우 `pose_query.py`가 물건·잡는 동작·손 개수·위치를
@@ -127,6 +128,13 @@ curl -X POST http://127.0.0.1:8000/analyze -F 'file=@rough.png'
 
 새 경로의 단일 결과 목록은 **`people[i].dynamic_search.selected`**다.
 구형 `candidates`와 `semantic_candidates`는 빈 목록으로 두므로 UI가 임의로 합치면 안 된다.
+
+2026-10-17: BFF·앱은 추가된 **`people[i].pose_presentation`**을 표시용으로 사용할 수 있다.
+원문 `dynamic_search`는 유지하며, 표시용 투영은 원본 검색/기하·근접 참고/생성 검수 목록과
+라이브러리 BVH 상대 경로 또는 생성 BVH 본문·SHA-256·카메라·출력 범위를 제공한다.
+단순히 legacy `candidates=[]`라는 이유로 검색 실패를 표시하지 않는다. 파일 오류·검색 오류·
+생성 실패를 구분하며 모든 자동 적용·refine·export 제한은 유지한다. BFF·앱 연결은 별도 작업이다.
+전체 계약과 팀원 완료 기준은 `API_CONTRACT.md`의 `dynamic-pose-presentation-v1`을 따른다.
 
 | 필드 | 의미 |
 | --- | --- |

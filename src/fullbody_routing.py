@@ -19,6 +19,7 @@ from .search_routing import PoseDescription
 from .semantic_search import SemanticQuery
 
 VERSION = 'fullbody-dynamic-v1'
+API_SEMANTIC_WEIGHT = .6
 
 
 class FullBodySearch:
@@ -403,6 +404,7 @@ def _build_fullbody_resources(entries, *, db_path):
             model=os.getenv('POSE_GENERATION_MODEL', 'gemini-3.8-flash'),
             review_dir=os.getenv('POSE_GENERATION_REVIEW_DIR', 'tmp/generated-pose-review'))
     engine = FullBodySearch(entries, semantic, camera, generator=generator,
+        semantic_weight=API_SEMANTIC_WEIGHT,
         include_stored_compositions=include_stored,
         geometry_max_distance=float(os.getenv('ROUTING_GEOMETRY_MAX_DISTANCE', '1.0')),
         geometry_upper_max_distance=float(os.getenv('ROUTING_GEOMETRY_UPPER_MAX_DISTANCE', '1.5')))

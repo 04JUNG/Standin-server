@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field, field_validator, computed_field, model_va
 from src.body_scope import BodyScope
 from src.schema import Action, Relationship, Shot, View
 from .body_models import BodyMatchingOut, EmptyBodyMatchingOut
+from .pose_presentation import PosePresentationOut
 
 
 class CandidateCamera(BaseModel):
@@ -227,6 +228,8 @@ class PersonOut(BaseModel):
     candidates: List[CandidateOut]
     dynamic_search: Optional[DynamicSearchOut] = Field(
         None, description="전신 동적 라우팅의 단일 Top5. 원본 selected와 검수용 generation은 분리")
+    pose_presentation: Optional[PosePresentationOut] = Field(None,
+        description="BFF·앱 표시용 동적라우팅 결과. 검색/근접/생성 검수 분리, 미리보기 BVH와 상태. export 허가 아님")
     # /refine을 '순수 함수'로 만들기 위한 필드(docs/REFINE_DESIGN.md).
     # /analyze가 이미 추출한 값을 실어 보낼 뿐이라 연산 추가는 0이다.
     # 클라이언트는 이 두 값을 그대로 POST /refine에 되돌려주면 된다
