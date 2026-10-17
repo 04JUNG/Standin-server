@@ -348,6 +348,7 @@ def test_integrated_strategy_does_not_reuse_old_network_matcher_or_claim_mock_is
     result = attach_body_matching(pipe, Image.new("RGB", (100, 100)), cut(1), CFG)
     assert result.body_matching["provider_actual"] == "mock"
     assert result.body_matching["is_mock"] is True
+    assert result.body_matching["family_review_model"] is None
     assert pipe.body_matcher.integrated and pipe.body_matcher.client is None
     assert result.body_matching["people"][0]["coarse_recommendation"][
         "recommended_body_id"
@@ -412,6 +413,9 @@ def test_eval_uses_dynamic_pose_contract_and_never_counts_errors_as_equal():
     assert not same_successful_count(failure, failure)
     success = {"error": None, "result": {"vlm_count": 2}}
     assert same_successful_count(success, success)
+    assert not same_successful_count(
+        success, {"error": None, "result": {"vlm_count": 2, "people": [{}]}}
+    )
 
 
 def test_eval_keeps_malformed_primary_as_failure_and_accepts_provider_fences():

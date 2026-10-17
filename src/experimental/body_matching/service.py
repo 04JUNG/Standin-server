@@ -213,8 +213,6 @@ def attach_body_matching(pipe, image, result, cfg):
                     catalog_path = cfg.body_coarse_catalog_path
                     if cfg.body_classification_strategy == "integrated":
                         extra["integrated"] = True
-                        if getattr(cfg, "body_integrated_review_enabled", True) and cfg.vlm_provider == "gemini":
-                            extra["family_review_model"] = getattr(pipe.vlm, "_model", cfg.gemini_model)
                     else:
                         extra["family_review_model"] = getattr(cfg, "body_coarse_family_review_model", "")
                 shared_provider = cfg.vlm_provider
@@ -225,6 +223,8 @@ def attach_body_matching(pipe, image, result, cfg):
                         shared_provider, shared_model = "mock", "mock"
                     else:
                         shared_model = getattr(pipe.vlm, "_model", shared_model)
+                    if shared_provider == "gemini" and getattr(cfg, "body_integrated_review_enabled", True):
+                        extra["family_review_model"] = shared_model
                 pipe.body_matcher = service_class(
                     catalog_path,
                     provider=shared_provider if extra.get("integrated") else cfg.body_vlm_provider,
