@@ -119,9 +119,22 @@ def main():
     p.add_argument(
         "--labels", type=Path, help="Evaluation-only user-confirmed family labels"
     )
+    p.add_argument(
+        "--baseline", type=Path, help="Compare identical frozen inputs per person"
+    )
+    p.add_argument(
+        "--focus-case",
+        action="append",
+        default=[],
+        help="Report other cases separately",
+    )
     p.add_argument("--env-file", type=Path)
     p.add_argument("--model", default="gemini-flash-lite-latest")
+    p.add_argument("--family-review-model", default="")
+    p.add_argument("--timeout-seconds", type=float, default=90)
     a = p.parse_args()
+    if a.focus_case and not a.baseline:
+        p.error("--focus-case requires --baseline")
     if a.env_file:
         from dotenv import dotenv_values
 
@@ -161,10 +174,25 @@ def main():
                     )
                 )
 
+            def record_family_review_response(self, r):
+                (dest / "family-review-response.json").write_text(
+                    json.dumps(
+                        dict(
+                            text=r.text,
+                            model_version=r.model_version,
+                            usage=r.usage_metadata.model_dump(),
+                        ),
+                        ensure_ascii=False,
+                        indent=2,
+                    )
+                )
+
         client = None
         err = None
         try:
-            client = Client(a.model)
+            client = Client(
+                a.model, a.timeout_seconds, family_review_model=a.family_review_model
+            )
             crops = [
                 (f"Q{start+i:03}", inputs[c["case_id"]]) for i, c in enumerate(batch)
             ]
@@ -275,6 +303,12 @@ def main():
             Counter(r["recommendation"]["recommendation_basis"] for r in rows)
         ),
         provider_errors=sum(bool(r["provider_error"]) for r in rows),
+        family_review_counts=dict(
+            Counter(
+                r["observation"].get("family_review", {}).get("status", "not_requested")
+                for r in rows
+            )
+        ),
         auto_applied=0,
         accuracy=None,
         accuracy_note="작가의 정답 라벨 없음. 추천 출력률은 정확도가 아님.",
@@ -292,6 +326,18 @@ def main():
             hashlib.sha256(a.labels.read_bytes()).hexdigest() if a.labels else None
         ),
         model_requested=a.model if a.remote else recorded.get("model_requested"),
+        family_review_model=(
+            a.family_review_model if a.remote else recorded.get("family_review_model")
+        ),
+        family_review_implementation_sha256=hashlib.sha256(
+            (
+                Path(__file__).resolve().parents[1]
+                / "src/experimental/body_matching/family_review.py"
+            ).read_bytes()
+        ).hexdigest(),
+        timeout_seconds=(
+            a.timeout_seconds if a.remote else recorded.get("timeout_seconds")
+        ),
         recorded_from=str(a.recorded.resolve()) if a.recorded else None,
         source_classification_implementation_sha256=(
             (
@@ -318,6 +364,16 @@ def main():
         metrics=metrics,
         rows=rows,
     )
+    if a.baseline:
+        from scripts.body_coarse_comparison import compare_runs
+
+        result["comparison"] = compare_runs(
+            json.loads(a.baseline.read_text()),
+            result,
+            labels=labels,
+            focus_cases=a.focus_case,
+        )
+        result["baseline_sha256"] = hashlib.sha256(a.baseline.read_bytes()).hexdigest()
     (a.out / "results.json").write_text(
         json.dumps(result, ensure_ascii=False, indent=2)
     )

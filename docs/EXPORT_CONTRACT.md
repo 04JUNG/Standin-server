@@ -228,3 +228,5 @@ proper rotation, Y-up). 사용 시 `preview_view=front`만 허용한다. 동결 
 `BODY_CLASSIFICATION_STRATEGY=coarse`의 `coarse_recommendation.recommended_body_id`는 캐릭터 대분류에 따른 프리셋 추천이다. 이를 승인된 `selected_asset` 또는 Export 주문으로 간주하지 않는다. 이 전략은 `applied_body_id=null`, `render_required=false`이며 기존 수동 선택·자산 QA·Export 검증 절차를 유지한다. 추천 출력과 자동 적용을 구분하는 필드는 [대분류 추천 계약](BODY_SELECTION/COARSE_RECOMMENDATION.md)에 기록한다.
 
 coarse의 tentative 계열에 제공하는 반대 계열 BASE도 진단용 대안이다. `crop_box` 확장이나 추천 후보 변경은 Export 자산 권한·주문·자동 적용을 만들지 않는다.
+
+선택적 `family_review`는 이미지 판독 근거와 추천에만 영향을 준다. 재검토로 계열이 교정되어도 `applied_body_id/selected_asset`은 null이며 Export 주문이나 자산 승인을 생성하지 않는다. 기존 수동 선택·기본값 처리와 Export 입력은 유지한다. [이미지 재검토 계약](BODY_SELECTION/FAMILY_REVIEW.md).

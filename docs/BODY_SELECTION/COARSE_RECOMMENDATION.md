@@ -118,3 +118,7 @@ python scripts/eval_body_coarse.py --protocol /path/to/protocol.json \
 입력 회귀는 얼굴 보존·가장자리 대상과 옆 인물 분리·동일 crop 두 장만 전송·서비스/평가 입력 일치·원본 해시 변조 거부·잠정 계열 대안의 개수와 순위를 검증한다.
 
 사용자 확인 라벨 채점은 `--labels docs/BODY_SELECTION/COARSE_CONFIRMED_LABELS.json`으로 재현한다. 라벨은 요청 프롬프트·이미지·추천 규칙에 들어가지 않고 평가 단계에서만 사용한다. `metrics.confirmed_family`는 해당 라벨 사례만의 정확도이며 전체 28명 정확도가 아니다.
+
+## 선택적 이미지 계열 재검토
+
+잠정/미확정 남녀만 의상·얼굴·몸 근거를 먼저 읽는 재검토를 추가했다. 기본 비활성이며 `BODY_COARSE_FAMILY_REVIEW_MODEL`로 선택한다. 기존 체형 시간 예산을 공유하고 실패하면 최초 추천을 유지한다. 동등하게 잠정적인 반대 계열은 기존 추천을 뒤집지 않는다. `coarse_classification.family_review`에 최초 판독·독립 근거·resolved/unresolved/conflict/error를 기록한다. 124702 교정, 다른 27명 비교와 운영 지연 제한은 [FAMILY_REVIEW.md](FAMILY_REVIEW.md)에 있다.
