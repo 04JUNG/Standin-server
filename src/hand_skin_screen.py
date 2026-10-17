@@ -93,11 +93,13 @@ class SkinSession:
         self.cache = {}
         self.rejected, self.unverified = [], []
 
-    def check(self, text):
+    def check(self, text, *, timeout_seconds=None):
         key = hashlib.sha256(text.encode('utf-8')).hexdigest()
         if key in self.cache:
             return self.cache[key]
         remaining = self.gate.budget_seconds-self.spent_seconds
+        if timeout_seconds is not None:
+            remaining = min(remaining, timeout_seconds)
         if self.failed or remaining <= 0 or self.checks >= self.gate.max_checks:
             return unknown('hand_screen_budget_or_upstream_unavailable')
         self.checks += 1
