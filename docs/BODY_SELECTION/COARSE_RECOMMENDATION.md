@@ -10,7 +10,7 @@ VLM은 그림 전체의 얼굴/상체/체격/의상/비율 인상을 읽는다. 
 남성형·여성형은 캐릭터 디자인 계열이며 생물학적 성별·나이 판정이 아니다.
 
 1. `presentation`: masculine / feminine / androgynous / unknown을 가장 먼저 판독한다.
-2. 해당 계열 `BASE`를 기본 추천으로 둔다. 남녀가 명확한 경우 대안도 같은 계열에서만 고른다.
+2. 해당 계열 `BASE`를 기본 추천으로 둔다. 남녀가 명확한 경우 대안도 같은 계열에서만 고른다. 남녀 판독 자체가 tentative이면 주 추천과 같은 계열 BASE를 보존하면서 반대 계열 BASE도 대안으로 제공한다(최대 3개).
 3. 나머지 축은 `muscle`(일반/근육질/매우 근육질), `fullness`(마름/보통/부드러움/통통함), `proportion`(아담/표준/길쭉함)이다.
 4. 특징이 **clear**일 때만 기본형을 변경한다. tentative/unknown은 기록하지만 기본형을 바꾸지 않는다.
 5. 특징이 겹치면 근육 → 부드럽고 큰 체격 → 비율 → 슬림 순으로 대표값을 선택하고, 다른 특징 후보와 BASE를 대안으로 남긴다. 이 우선순위는 제품 규칙이며 학습된 점수가 아니다.
@@ -32,37 +32,37 @@ VLM은 그림 전체의 얼굴/상체/체격/의상/비율 인상을 읽는다. 
 최신 확정 20종의 실제 이름을 사용하며 존재하지 않는 체형 ID를 만들지 않는다.
 TOON64는 아동 판정이 아니고, IDEAL83도 러프에서 정확히 8.3등신을 측정했다는 뜻이 아니다.
 
-## 실제 러프 28명 결과
+## 실제 러프 28명 원본 대조 리뷰 — 최신 결과
 
-Gemini 요청 7배치 성공 / provider 오류 0건. 실제 반환 모델은 `gemini-3.5-flash-lite`.
-원본 crop만 사용했고, 기존 포즈 기반 ownership 10명 제외 조건을 판독 전에 적용하지 않았다.
-모델이 이 crop의 대상 인물을 직접 구분하고, 모호한 대상은 기본형 추천으로 처리한다.
+최신 검수는 [COARSE_REVIEW.md](COARSE_REVIEW.md), 수치는 [COARSE_REVIEW_METRICS.json](COARSE_REVIEW_METRICS.json),
+28명 각각의 전후 추천과 판독 근거는 [COARSE_REVIEW_CASES.json](COARSE_REVIEW_CASES.json)을 따른다.
+
+원본을 전수 확인한 결과 `131112:p4`가 옆 남학생을 읽고 남성 BASE를 추천하는 오류를 확인했다.
+머리까지 확장한 인물 crop + 동일 crop에 대상 박스를 표시한 입력으로 수정하여 **여성 BASE**를 추천한다.
+`124637:p0`, `124702:p0`는 시각 리뷰와 모델 판독이 아직 일치하지 않는다. 작가 설정 미확인 상태이며
+잠정 계열/미확정 계열로 기록하고, 주 추천은 남성 BASE, 여성 BASE도 대안으로 남겼다.
 
 | 추천 프리셋 | 인원 |
 |---|---:|
-| male BASE | 16 |
-| female BASE | 6 |
-| male MUSCULAR | 2 |
+| male BASE | 14 |
+| female BASE | 7 |
+| male MUSCULAR | 3 |
 | male MUSCLE_MAX | 1 |
 | male IDEAL83 | 3 |
 | 합계 | **28** |
 
-남녀 대분류: 남성형 22명 / 여성형 6명. 계열 기본형 22명, 명확한 특징을 보고 변경한 추천 6명.
-추천 기록률 28/28은 정확도가 아니다. 작가 정답이 없으므로 정확도는 null이다.
-이 데이터에 통통형·여성 근육형의 추천이 없으므로 해당 클래스의 실데이터 성능을 검증했다고 주장하지 않는다.
-해당 분기는 회귀 테스트에서 확인했으며 다양한 실제 러프를 추가해 평가해야 한다.
+판독 계열: 남성형 20명 / 여성형 7명 / 중성적 1명(설정 남성 BASE 추천).
+Gemini 7배치 성공, 오류 0건. 실제 모델 `gemini-3.5-flash-lite`를 유지했다.
+다른 모델에서 새 불일치가 생기거나 기존 불일치가 남아 Flash 3.8/Pro 3.1로 교체하지 않았다.
 
-특징 추천 사례:
+재평가 전 고정한 **AI 시각 리뷰 기준** 일치: 23/26(88.5%) → 24/26(92.3%).
+명확한 리뷰 20명에서는 18/20 → 19/20. 매우 거친 2명은 리뷰 계열 미확정으로 분모에서 제외하되 추천은 기록했다.
+이는 작가 정답 정확도가 아니다. 같은 28명을 개선에 사용했으므로 독립 검증 성능도 아니다.
+처음 여성형으로 읽었던 단순 소체 등에서는 리뷰 자체도 작가 확인이 필요하다.
 
-- `131040:p0`, `2.16.04:p1` → 남성 근육형 `male-muscular-v0-7-2`.
-- `2.16.04:p0` → 남성 고근육형 `male-muscle-max-v0-7-2`.
-- `124629:p0`, `131056:p0`, `청룡성:p1` → 남성 8.3등신형 `male-ideal83-v0-7-2`.
-- 여성형으로 판독한 6명은 명확한 특수 체형 근거가 없어 모두 `female-base-v0-3-4`.
-
-로컬 보고서: `artifacts/body-matching/2026-10-17-coarse/REPORT.html`.
-모든 인물의 추천 ID/이름/대안/기본값 여부/근거가 표와 카드에 있다.
-`recommendations.csv`, `family-first/results.json`에도 28명 모두 기록했다.
-요약은 [COARSE_RECOMMENDATION_METRICS.json](COARSE_RECOMMENDATION_METRICS.json).
+로컬 보고서: `artifacts/body-matching/2026-10-17-coarse-review/REPORT.html`.
+원본 전체(로컬 검수 전용), 이전 crop, 새 대상 crop, 전후 추천, 모든 판독 근거를 28명 각각 표시한다.
+이전 결과는 `2026-10-17-coarse/family-first/results.json`에 보존한다.
 
 ## API와 활성화
 
@@ -106,11 +106,13 @@ python scripts/eval_body_coarse.py --protocol /path/to/protocol.json \
   --recorded /path/to/result/results.json
 ```
 
-원본 이미지는 해시 확인, 원격 요청에는 불투명 ID만 사용한다. API 키는 출력·커밋하지 않는다.
+원본 이미지는 해시 확인, 원격 요청에는 불투명 ID와 인물 crop만 사용한다. 원본 전체를 원격으로 보내지 않는다. `camera_real_rough_20260921_v2/protocol.json` 형식의 원본 이미지+대상 box 프로토콜은 서비스와 동일한 `coarse_input.prepare_input`을 사용한다. 예전 crop-only 프로토콜도 비교 재현용으로 지원한다. API 키는 출력·커밋하지 않는다.
 프리셋과 성별을 나타내는 파일 이름을 모델에 주지 않는다.
 
-신규 31개 회귀: 양 계열 기본형, 약한 특징 기본형 유지, 선명한 특징 경로,
+대분류 회귀 45개: 양 계열 기본형, 약한 특징 기본형 유지, 선명한 특징 경로,
 근육질 여성 계열 유지, 잘린 하체와 근육 판독의 독립성, 스틱/얼굴 전용 입력,
 정보 부족·provider 오류에도 모든 추천 기록, typed API 및 BFF 계약, legacy 기본값 유지.
 
-전체 CI 범위 회귀: **903 passed, 8 skipped, 28 subtests passed**. 스모크 **54/54**, compileall 통과.
+전체 CI 범위 회귀: **917 passed, 8 skipped, 28 subtests passed**. 스모크 **54/54**, compileall 통과.
+
+입력 회귀는 얼굴 보존·가장자리 대상과 옆 인물 분리·동일 crop 두 장만 전송·서비스/평가 입력 일치·원본 해시 변조 거부·잠정 계열 대안의 개수와 순위를 검증한다.

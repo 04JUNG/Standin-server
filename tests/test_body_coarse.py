@@ -238,3 +238,227 @@ def test_strategy_opt_in_keeps_legacy_default():
         result.body_matching["people"][0]["coarse_recommendation"]["recommended_preset"]
         == "BASE"
     )
+
+
+def test_head_context_and_edge_target_do_not_recenter_on_neighbor():
+    from src.experimental.body_matching.coarse_input import prepare_input
+
+    im = Image.new("RGB", (440, 550), "white")
+    im.putpixel((410, 10), (0, 0, 255))  # target head above detector box
+    im.putpixel((370, 130), (255, 0, 0))  # adjacent person's face
+    before = im.tobytes()
+    item = prepare_input(im, (401.6, 43.5, 445.5, 394))
+    assert item.target_box == (401, 43, 440, 394)
+    assert item.crop_box[1] == 0
+    assert item.crop_box[0] > 370
+    assert item.crop.getpixel((410 - item.crop_box[0], 10)) == (0, 0, 255)
+    assert item.crop.size == item.context.size != im.size
+    assert im.tobytes() == before
+    assert item.crop.tobytes() != item.context.tobytes()
+
+
+@pytest.mark.parametrize(
+    "box",
+    [
+        (0, 0, 0, 10),
+        (20, 0, 40, 10),
+        (0, float("nan"), 10, 10),
+        (0, 0, float("inf"), 10),
+    ],
+)
+def test_invalid_target_cannot_silently_send_whole_image(box):
+    from src.experimental.body_matching.coarse_input import prepare_input
+
+    with pytest.raises(ValueError, match="invalid_coarse_target_box"):
+        prepare_input(Image.new("RGB", (20, 20)), box)
+
+
+def test_service_sends_shared_prepared_inputs_with_stable_identity():
+    from src.experimental.body_matching.coarse_input import CoarseInput, prepare_input
+
+    im = Image.new("RGB", (200, 200), "white")
+    result = cut(2)
+
+    class InspectClient(Client):
+        def analyze(self, crops):
+            assert len(crops) == 2 and crops[0][0] != crops[1][0]
+            for i, (ident, item) in enumerate(crops):
+                expected = prepare_input(im, result.descriptors[i].box.as_list())
+                assert isinstance(item, CoarseInput)
+                assert item.target_box == expected.target_box
+                assert item.crop.tobytes() == expected.crop.tobytes()
+                assert item.context.tobytes() == expected.context.tobytes()
+            return super().analyze(crops)
+
+    out = CoarseBodyService(CATALOG, client=InspectClient(), provider="gemini").analyze(
+        im, result
+    )
+    assert out["status"] == "ok"
+    for i, person in enumerate(out["people"]):
+        expected = prepare_input(im, result.descriptors[i].box.as_list())
+        assert person["observations"]["crop_box"] == list(expected.crop_box)
+    assert all(
+        p["coarse_recommendation"]["recommended_family"] == "female"
+        for p in out["people"]
+    )
+
+
+def test_gemini_payload_contains_only_same_person_crop_pair():
+    import io
+    from src.experimental.body_matching.coarse_input import prepare_input
+    from src.experimental.body_matching.coarse import GeminiCoarseClient
+
+    pytest.importorskip("google.genai")
+
+    item = prepare_input(Image.new("RGB", (600, 900)), (400, 100, 450, 500))
+    o = observation(person_id="opaque")
+    o.pop("version")
+    captured = {}
+
+    def generate(**kwargs):
+        captured.update(kwargs)
+        return SimpleNamespace(text=json.dumps({"people": [o]}))
+
+    client = GeminiCoarseClient.__new__(GeminiCoarseClient)
+    client.model = "fixture"
+    client.client = SimpleNamespace(models=SimpleNamespace(generate_content=generate))
+    got = client.analyze([("opaque", item)])
+    parts = [p for p in captured["contents"] if not isinstance(p, str)]
+    assert len(parts) == 2 and set(got) == {"opaque"}
+    decoded = [Image.open(io.BytesIO(p.inline_data.data)) for p in parts]
+    assert [x.size for x in decoded] == [item.context.size, item.crop.size]
+    assert decoded[0].tobytes() == item.context.tobytes()
+    assert decoded[1].tobytes() == item.crop.tobytes()
+    assert all(x.size != (600, 900) for x in decoded)
+
+
+def test_eval_input_freezes_source_identity_and_uses_live_preparer(tmp_path):
+    import hashlib
+    from scripts.eval_body_coarse import load_cases
+    from src.experimental.body_matching.coarse_input import prepare_input
+
+    source = tmp_path / "source.png"
+    im = Image.new("RGB", (100, 200), "white")
+    im.save(source)
+    box = (20.5, 50, 70, 180)
+    protocol = tmp_path / "protocol.json"
+    case = dict(
+        id="p0",
+        image=str(source),
+        box=box,
+        image_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),
+    )
+    protocol.write_text(json.dumps({"cases": [case]}))
+    cases, inputs = load_cases(protocol, tmp_path / "out")
+    expected = prepare_input(im, box)
+    assert cases[0]["target_box"] == list(expected.target_box)
+    assert inputs["p0"].context.tobytes() == expected.context.tobytes()
+    assert (
+        hashlib.sha256(Path(cases[0]["context"]).read_bytes()).hexdigest()
+        == cases[0]["context_sha256"]
+    )
+    case["image_sha256"] = "tampered"
+    protocol.write_text(json.dumps({"cases": [case]}))
+    with pytest.raises(ValueError, match="source_hash_mismatch"):
+        load_cases(protocol, tmp_path / "out2")
+
+
+@pytest.mark.parametrize("presentation", ["masculine", "feminine"])
+@pytest.mark.parametrize("muscle", ["ordinary", "very_muscular"])
+def test_tentative_family_records_other_base_without_overriding_recommendation(
+    presentation, muscle
+):
+    o = observation(presentation, muscle=muscle)
+    o["axes"]["presentation"]["certainty"] = "tentative"
+    r = recommend(o, ASSETS)
+    expected = "male" if presentation == "masculine" else "female"
+    assert r["recommended_family"] == expected
+    assert r["candidates"][0]["body_id"] == r["recommended_body_id"]
+    assert r["candidates"][-1]["family"] != expected
+    assert r["candidates"][-1]["preset"] == "BASE"
+    assert any(
+        c["preset"] == "BASE" and c["family"] == expected for c in r["candidates"]
+    )
+    assert len(r["candidates"]) <= 3
+    assert [c["rank"] for c in r["candidates"]] == list(
+        range(1, len(r["candidates"]) + 1)
+    )
+    assert r["auto_apply"] is False and r["applied_body_id"] is None
+
+
+@pytest.mark.parametrize("context_input", [False, True])
+def test_recorded_inputs_keep_legacy_replay_and_reject_context_mismatch(
+    tmp_path, monkeypatch, context_input
+):
+    import hashlib
+    from scripts.eval_body_coarse import load_cases, main
+
+    source = tmp_path / "source.png"
+    Image.new("RGB", (50, 100), "white").save(source)
+    digest = hashlib.sha256(source.read_bytes()).hexdigest()
+    protocol = tmp_path / "protocol.json"
+    c = (
+        dict(id="p0", image=str(source), image_sha256=digest, box=[10, 30, 40, 90])
+        if context_input
+        else dict(
+            case_id="p0",
+            crop=str(source),
+            crop_sha256=digest,
+            image_sha256="old-source-hash",
+        )
+    )
+    protocol.write_text(json.dumps({"cases": [c]}))
+    cases, _ = load_cases(protocol, tmp_path / "initial")
+    obs = observation(person_id="p0")
+    obs["version"] = "body-coarse.v2.family-first"
+    previous = dict(
+        version=obs["version"],
+        implementation_sha256="source-code-hash",
+        rows=[
+            dict(
+                case_id="p0",
+                crop=cases[0]["crop"],
+                crop_sha256=cases[0]["crop_sha256"],
+                observation=obs,
+                recommendation=recommend(obs, ASSETS),
+                provider_error=None,
+            )
+        ],
+    )
+    if context_input:
+        previous["rows"][0]["input_metadata"] = {
+            k: cases[0][k]
+            for k in ("input_version", "context_sha256", "image_sha256", "target_box")
+        }
+        previous["rows"][0]["input_metadata"]["context_sha256"] = "tampered"
+    recorded = tmp_path / "recorded.json"
+    recorded.write_text(json.dumps(previous))
+    out = tmp_path / "out"
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "eval",
+            "--protocol",
+            str(protocol),
+            "--catalog",
+            str(CATALOG),
+            "--out",
+            str(out),
+            "--recorded",
+            str(recorded),
+        ],
+    )
+    if context_input:
+        with pytest.raises(ValueError, match="recorded_context_mismatch"):
+            main()
+    else:
+        main()
+        replay = json.load(open(out / "results.json"))
+        assert replay["classification_versions"] == ["body-coarse.v2.family-first"]
+        assert (
+            replay["source_classification_implementation_sha256"] == "source-code-hash"
+        )
+        assert (
+            replay["rows"][0]["recommendation"]["recommended_body_id"]
+            == "male-base-v0-7-2"
+        )

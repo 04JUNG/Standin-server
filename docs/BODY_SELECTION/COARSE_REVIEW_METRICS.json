@@ -1,0 +1,94 @@
+{
+  "reviewer": "assistant_visual_review",
+  "artist_verified": false,
+  "accuracy": null,
+  "total_reviewed": 28,
+  "baseline": {
+    "review_labeled": 26,
+    "review_observed_agreement": 23,
+    "review_recommended_agreement": 23,
+    "clear_review_labeled": 20,
+    "clear_review_observed_agreement": 18,
+    "clear_review_recommended_agreement": 18
+  },
+  "new_input_lite": {
+    "review_labeled": 26,
+    "review_observed_agreement": 24,
+    "review_recommended_agreement": 24,
+    "clear_review_labeled": 20,
+    "clear_review_observed_agreement": 19,
+    "clear_review_recommended_agreement": 19
+  },
+  "final": {
+    "review_labeled": 26,
+    "review_observed_agreement": 24,
+    "review_recommended_agreement": 24,
+    "clear_review_labeled": 20,
+    "clear_review_observed_agreement": 19,
+    "clear_review_recommended_agreement": 19
+  },
+  "evaluation": {
+    "total": 28,
+    "recommendations": 28,
+    "family_counts": {
+      "male": 20,
+      "unknown": 1,
+      "female": 7
+    },
+    "preset_counts": {
+      "male/IDEAL83": 3,
+      "male/BASE": 14,
+      "female/BASE": 7,
+      "male/MUSCULAR": 3,
+      "male/MUSCLE_MAX": 1
+    },
+    "basis_counts": {
+      "recognized_feature": 7,
+      "presentation_default": 20,
+      "catalog_default": 1
+    },
+    "provider_errors": 0,
+    "auto_applied": 0,
+    "accuracy": null,
+    "accuracy_note": "작가의 정답 라벨 없음. 추천 출력률은 정확도가 아님."
+  },
+  "review_sha256": "a21ec1f7c2efc79dddef43659197db73ac2df98cb68e47f94422ae8777a9cad3",
+  "model_versions": [
+    "gemini-3.5-flash-lite"
+  ],
+  "failed_comparison": {
+    "model": "gemini-2.5-flash",
+    "status": "404 unavailable for new users",
+    "included_in_accuracy": false
+  },
+  "notes": [
+    "판독 대상은 캐릭터 디자인 계열이며 생물학적 성별 판정이 아니다.",
+    "작가 정답이 아닌 AI 시각 리뷰 기준의 일치율이다. 이 28명은 개선에 사용한 개발 세트이며 독립 검증 세트가 아니다.",
+    "원본 전체는 로컬 검수에만 사용했다. 원격 요청은 얼굴을 포함한 인물 crop과 동일 crop의 대상 표시본이다."
+  ],
+  "model_comparisons": {
+    "flash38": {
+      "review_labeled": 26,
+      "review_observed_agreement": 24,
+      "review_recommended_agreement": 24,
+      "clear_review_labeled": 20,
+      "clear_review_observed_agreement": 18,
+      "clear_review_recommended_agreement": 18
+    },
+    "pro-comparison": {
+      "review_labeled": 26,
+      "review_observed_agreement": 23,
+      "review_recommended_agreement": 24,
+      "clear_review_labeled": 20,
+      "clear_review_observed_agreement": 19,
+      "clear_review_recommended_agreement": 19
+    }
+  },
+  "unresolved_review_cases": [
+    "124637:p0",
+    "124702:p0"
+  ],
+  "changed_family": [
+    "131112:p4"
+  ]
+}

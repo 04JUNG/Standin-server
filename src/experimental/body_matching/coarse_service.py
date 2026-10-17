@@ -9,6 +9,7 @@ import hashlib, json, math
 from pathlib import Path
 from time import perf_counter
 from .coarse import GeminiCoarseClient, VERSION, parse_response, recommend, unknown
+from .coarse_input import prepare_input
 from .schema import (
     SCHEMA_VERSION,
     OBSERVATION_VERSION,
@@ -86,6 +87,7 @@ class CoarseBodyService:
         for i, desc in enumerate(result.descriptors):
             ident = key + ":p" + str(i)
             box = _box(desc, *im.size)
+            prepared = None
             err = self.init_error or (
                 "mock_not_visual_classification" if self.client is None else None
             )
@@ -94,13 +96,13 @@ class CoarseBodyService:
             elif i >= self.max_people:
                 err = "coarse_batch_budget_exceeded"
             elif self.client:
-                crop = im.crop(box)
-                crop.thumbnail((768, 768))
-                crops.append((ident, crop))
+                prepared = prepare_input(im, box)
+                crops.append((ident, prepared))
             cases.append(
                 dict(
                     person_id=ident,
                     box=box,
+                    crop_box=prepared.crop_box if prepared else None,
                     error=err,
                     observation=unknown(ident, err or "classification_unavailable"),
                 )
@@ -145,7 +147,7 @@ class CoarseBodyService:
                 clothing_occlusion=False,
                 foreshortening=False,
                 ownership_ambiguous=classified["target"] == "ambiguous",
-                crop_box=list(c["box"]) if c["box"] else None,
+                crop_box=list(c["crop_box"]) if c["crop_box"] else None,
                 provider_error=c["error"],
                 reason_codes=[],
             )
