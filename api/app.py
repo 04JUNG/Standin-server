@@ -3,6 +3,7 @@ FastAPI 레이어 — 도원의 Python 추론 서버.
 
 경계: [앱 서버 팀] --HTTP--> [이 서비스]  (문서화된 OpenAPI 계약 = /docs)
   POST /analyze         멀티파트 PNG 러프 컷 → CutResult(JSON)
+  POST /semantic-search 직접 문장 → 기존 전신 포즈 후보(이미지·VLM 호출 없음)
   POST /refine          선택 포즈 → 조정 BVH + 매칭 시점 preview(JSON 인라인,
                         converter의 V3.2.5 FBX 남성 모델 렌더 = 후보 썸네일과 동일)
   GET  /pose/{id}/bvh   후보 pose_id → 라이브러리 BVH 파일(동원 내보내기 팀이 소비)
@@ -84,6 +85,7 @@ from api.models import (CutResultOut, PersonOut, CandidateOut, SkeletonOut,
                         RefineRequest, RefineResponse, RefineThumbnailOut,
                         ExportOrderRequest, ExportOrder, ExportItem)
 from api.candidate_presentation import candidate_camera, refine_in_camera
+from api.semantic_text import SemanticTextRequest, SemanticTextResponse, search_text, semantic_text_ready
 from api.pose_presentation import PreviewAssetOut, build_pose_presentation
 
 # uvicorn이 자기 로깅을 세운 뒤 이 모듈을 import한다. 여기서 덮어써야 로그가
@@ -413,6 +415,17 @@ async def request_context(request: Request, call_next):
         request_id_var.reset(token)
 
 
+@app.post("/semantic-search", response_model=SemanticTextResponse,
+          responses={503: {"model": SemanticTextResponse}, 500: {"model": SemanticTextResponse}})
+def semantic_search_route(req: SemanticTextRequest):
+    status, result = search_text(req, STATE.get("pipeline"), STATE.get("pose_library"))
+    # Never log the sentence, parsed concepts or full backend exception text.
+    log_info("semantic_search", status=result.status, httpStatus=status,
+             candidateCount=len(result.candidates), backend=result.backend,
+             elapsedMs=round(result.elapsed_ms, 2))
+    return JSONResponse(status_code=status, content=result.model_dump())
+
+
 @app.get("/healthz")
 def healthz():
     # 라이브러리가 비면 후보를 하나도 못 내므로 healthy로 보고하지 않는다.
@@ -431,6 +444,7 @@ def healthz():
         "quarantined_pose_count": STATE.get("quarantined_pose_count", 0),
         # 어느 번들이 떠 있는지: version·source(manifest|env)·content_sha256·db_sha256
         "pose_library": STATE.get("pose_library"),
+        "semantic_text": {"ready": semantic_text_ready(STATE.get("pipeline"))},
         # Actual initialized engine, not an environment flag. No model API call.
         "dynamic_routing": {
             "enabled": engine is not None,
