@@ -31,6 +31,13 @@ FastAPI inference가 DB에서 legacy 주문서의 `bvh_url·set_id·tags`를 채
 
 ### 전신 동적 라우팅 검수 후보의 경계 (2026-10-16)
 
+2026-10-17 표시 연결: `people[].pose_presentation`은 원본/근접/생성 결과의 **미리보기 전용**
+파일 전달 계약이다. `library_bvh` 상대 경로와 `inline_bvh` 본문을 구분하고 바이트 SHA-256을
+보존한다. 모든 항목은 `export_allowed=false`이며 기존 export/refine 승인 정책을 확장하지 않는다.
+생성 ID는 라이브러리 조회 키가 아니다. BFF는 이 목록을 legacy 후보·export 주문서에 자동 복사하지
+않고 별도 검수 UI로 전달한다. 자세한 상태/실패/권한 규약은 `API_CONTRACT.md`의
+`dynamic-pose-presentation-v1`을 따른다. 썸네일/3D 미리보기 가능과 제품 export 허가는 별개다.
+
 `/analyze.people[].dynamic_search`의 원본 후보·`near_candidates`·`generation`·`basic_model`은
 기존 자동 export 흐름으로 직접 연결하지 않는다. 새 경로는 `refine_allowed=false`,
 `release_allowed=false`이며, 실제 인체 변환 후 검수와 사용자 선택이 필요하다.

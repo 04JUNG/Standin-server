@@ -26,6 +26,8 @@ def main():
                           library_version=library['version'],
                           searchable_poses=len(engine.camera.pose_ids), camera_count=len(engine.camera.cameras),
                           semantic_backend=semantic.backend,
+                          ranking=engine.ranking, semantic_weight=engine.semantic_weight,
+                          geometry_weight=engine.geometry_weight,
                           generation_files_checked=engine.generator is not None,
                           vlm_request_tested=False, deployed=False)))
 
