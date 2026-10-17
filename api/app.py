@@ -435,6 +435,7 @@ def healthz():
             "camera_count": len(getattr(camera, 'cameras', [])),
             "camera_pose_count": len(getattr(camera, 'pose_ids', [])),
             "semantic_backend": getattr(getattr(engine, 'semantic', None), 'backend', None),
+            "hand_skin_screen_required": getattr(engine, 'hand_skin_gate', None) is not None,
         },
         "refine": capability,
         "refine_thumbnail": {

@@ -103,7 +103,7 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
         "force_exact_v324", "thumbnail",
     }
     unknown = set(raw) - required - {
-        "output_scope", "preview_view", "camera_rotation", "preview_model", "hands"}
+        "output_scope", "preview_view", "camera_rotation", "preview_model", "hands", "hand_contact_screen"}
     missing = required - set(raw)
     if missing or unknown:
         raise JobValidationError(
@@ -158,6 +158,11 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
         raise JobValidationError(f"invalid hands: {exc}") from exc
     if hands is not None and raw["force_exact_v324"]:
         raise JobValidationError("exact V3.2.4 mode does not permit hand presets")
+    screening = raw.get("hand_contact_screen", False)
+    if type(screening) is not bool or (screening and (
+            output_scope != 'full' or preview_view or preview_model or camera_rotation is not None
+            or raw['thumbnail'] is not None or raw['mirror'] or raw['force_exact_v324'])):
+        raise JobValidationError('hand screening requires an unframed, non-mirrored full artifact')
 
     unresolved_temp = _absolute_path(raw["temp_dir"], "temp_dir")
     if unresolved_temp.is_symlink():
@@ -337,6 +342,11 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
         # 그래야 이후 단계가 모두 손이 적용된 실제 산출물을 다시 읽는다.
         from converter.hands import bake_hands
         payload["hands"] = bake_hands(job["output_path"], job["hands"])
+    if report.ok and job.get('hand_contact_screen'):
+        from converter.hand_contact import screen_artifact
+        # AFTER hand baking, BEFORE crop/camera/preview. Screening does not
+        # export or change the frozen retarget solver or delivered FBX bytes.
+        payload['hand_contact_screen'] = screen_artifact(job['output_path'])
     if report.ok:
         from converter.framing import process_output
         scope = job.get("output_scope", "full")

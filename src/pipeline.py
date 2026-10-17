@@ -461,6 +461,9 @@ class Pipeline:
                     "coverage_class": desc.coverage_class,
                     "output_scope": desc.output_scope.detected.value if desc.output_scope.detected else None,
                     "output_scope_source": desc.output_scope.source,
+                    # Post-retrieval mesh gate only; never feeds pose ranking.
+                    "hand_presets": {side: getattr(desc.hands, side).preset
+                                     for side in ('left', 'right')} if desc.hands else None,
                 }
                 with span("fullbody_search"):
                     report = self._fullbody_search.search(decision, evidence)
