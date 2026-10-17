@@ -97,6 +97,7 @@ class PersonSlot:
     rescue_trace: dict = field(default_factory=dict)
     lower_body_observed: bool = False
     lower_body_visibility_known: bool = False
+    box_recovery: dict = field(default_factory=dict)
 
     @property
     def result_box(self) -> Optional[BBox]:
@@ -611,9 +612,58 @@ def _hungarian(cost: np.ndarray) -> list[int]:
     return assignment
 
 
+def _recover_unique_invalid_slot(slots, candidates, boxes, evidence, used,
+                                 duplicates, expected_count, cfg):
+    """Recover identity by elimination, never by sorting a corrupt VLM rectangle.
+
+    Exactly one invalid VLM box and one unused, structurally valid detector
+    person must remain. Every peer must already have an unambiguous owner.
+    Count confidence remains the original detector/VLM count comparison.
+    """
+    if expected_count is None or len(candidates) != expected_count or len(slots) != expected_count:
+        return
+    missing = [s for s in slots if s.vlm_box is None and s.skeleton is None]
+    unused = [i for i in range(len(candidates)) if i not in used]
+    if len(missing) != 1 or len(unused) != 1:
+        return
+    target, index = missing[0], unused[0]
+    peers = [s for s in slots if s is not target]
+    identity_errors = {"assignment_ambiguous", "assignment_competition", "merge_suspected",
+                       "duplicate_candidate", "torso_cross_slot", "torso_outside_slot"}
+    if any(s.skeleton is None or s.vlm_box is None or identity_errors.intersection(s.reasons)
+           for s in peers):
+        return
+    box, ev = boxes[index], evidence[index]
+    if (index in duplicates or box is None or ev.state not in ("valid", "partial")
+            or ev.coverage_class not in ("full", "reduced")):
+        return
+    occupied = [b for s in peers for b in (s.vlm_box, s.skeleton_box) if b is not None]
+    if max((bbox_iou(box, b) for b in occupied), default=0.) > cfg.slot_provisional_max_iou:
+        return
+    center = np.asarray(candidates[index].keypoints)[ANCHOR_JOINTS].mean(axis=0)
+    if any(_point_in_box(center, s.skeleton_box) for s in peers):
+        return
+    owner = BBox(box.x1, box.y1, box.x2, box.y2, source="unique_detector_recovery", score=box.score)
+    checked = analyze_skeleton(candidates[index], box, cfg.skeleton_kpt_threshold,
+                               cfg.skeleton_torso_min_box_ratio, owner_box=owner,
+                               peer_boxes=[s.vlm_box for s in peers], cfg=cfg)
+    if checked.state not in ("valid", "partial") or checked.coverage_class not in ("full", "reduced"):
+        return
+    target.box_recovery = dict(method="unique_unassigned_detector", detector_index=index,
+                               original_reasons=list(target.reasons), count_match=True)
+    target.vlm_box, target.skeleton_box = owner, box
+    target.skeleton, target.evidence = candidates[index], checked
+    target.state, target.skeleton_source = checked.state, "full_image"
+    target.assigned_rtm_index = index
+    target.reasons = [x for x in target.reasons if x != "unmatched_slot"]
+    target.reasons.extend(["unique_detector_box_recovery", *checked.reasons])
+    used.add(index)
+
+
 def assign_candidates(vlm_boxes: Iterable[Optional[BBox]], candidates: list[Skeleton],
                       img_w: int, img_h: int, cfg=CFG,
-                      expected_count: int | None = None) -> AssignmentResult:
+                      expected_count: int | None = None,
+                      recover_invalid: bool = False) -> AssignmentResult:
     """VLM 슬롯과 RTM candidate를 전역 일대일 배정한다.
 
     ``expected_count``가 주어지면 무효/누락 박스도 placeholder로
@@ -745,6 +795,10 @@ def assign_candidates(vlm_boxes: Iterable[Optional[BBox]], candidates: list[Skel
             if column in duplicate_indices:
                 slot.state = "suspect"
                 slot.reasons.append("duplicate_candidate")
+
+    if recover_invalid:
+        _recover_unique_invalid_slot(slots, candidates, candidate_boxes, evidence,
+                                     used, duplicate_indices, expected_count, cfg)
 
     unmatched = [i for i in range(len(candidates)) if i not in used]
     accepted_boxes = [slot.skeleton_box for slot in slots if slot.skeleton_box is not None]

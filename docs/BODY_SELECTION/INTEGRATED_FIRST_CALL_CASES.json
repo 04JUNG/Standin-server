@@ -1,0 +1,3236 @@
+{
+  "reference_sha256": "c5de2791e6ba60103a660e2a99a8f8856f2b69e27f4a61db07bbb4dd8d236a92",
+  "thresholds": {
+    "box_match_iou": 0.3,
+    "latency_seconds": 12
+  },
+  "rows": [
+    {
+      "repeat": 0,
+      "case_id": "124629:p0",
+      "expected_family": "male",
+      "expected_body_id": "male-ideal83-v0-7-2",
+      "match": {
+        "index": 0,
+        "iou": 0.8955882411876647
+      },
+      "baseline_match": {
+        "index": 0,
+        "iou": 0.7971630711302063
+      },
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "male-ideal83-v0-7-2",
+        "recommended_preset": "IDEAL83",
+        "recommended_family": "male",
+        "observed_family": "male",
+        "recommendation_basis": "recognized_feature",
+        "candidates": [
+          {
+            "body_id": "male-ideal83-v0-7-2",
+            "display_name": "8.3등신",
+            "preset": "IDEAL83",
+            "family": "male",
+            "version": "0.7.2",
+            "rank": 1,
+            "reason": "주 추천"
+          },
+          {
+            "body_id": "male-base-v0-7-2",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "male",
+            "version": "0.7.2",
+            "rank": 2,
+            "reason": "기본형 대안"
+          },
+          {
+            "body_id": "female-base-v0-3-4",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "female",
+            "version": "0.3.4",
+            "rank": 3,
+            "reason": "남녀 판독이 잠정적이거나 미확정일 때 다른 계열 기본형"
+          }
+        ],
+        "unresolved_axes": [
+          "presentation"
+        ],
+        "recognized_features": [
+          "proportion"
+        ],
+        "reasons": [
+          "웨이브 있는 짧은 머리에 심플한 눈매 / 깃 달린 셔츠와 조끼 착용, 긴 바지 / 매우 길쭉하고 슬림한 실루엣",
+          "proportion: 웨이브 있는 짧은 머리에 심플한 눈매 / 깃 달린 셔츠와 조끼 착용, 긴 바지 / 매우 길쭉하고 슬림한 실루엣",
+          "남녀 판독이 잠정적이므로 다른 계열 기본형도 대안으로 제공"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": true,
+      "observed_correct": true,
+      "preset_correct": true,
+      "baseline_top_k": [
+        [
+          "rokoko_FootTapping_mixamo_00040",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 30, \"yaw\": 30}"
+        ],
+        [
+          "rokoko_PlayingSaxophone_mixamo_00539_mirror",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 30, \"yaw\": 60}"
+        ],
+        [
+          "b8_hold_hands_right",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 30, \"yaw\": 0}"
+        ],
+        [
+          "rokoko_Interogation_GoodCop_mixamo_00088",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 30, \"yaw\": 30}"
+        ],
+        [
+          "b2_hand_on_hip_talk",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 30, \"yaw\": 0}"
+        ]
+      ],
+      "integrated_top_k": [
+        [
+          "rokoko_FootTapping_mixamo_00040",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 0, \"yaw\": 45}"
+        ],
+        [
+          "rokoko_PlayingSaxophone_mixamo_00539_mirror",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 0, \"yaw\": 30}"
+        ],
+        [
+          "b8_hold_hands_right",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 0, \"yaw\": 330}"
+        ],
+        [
+          "rokoko_Interogation_GoodCop_mixamo_00088",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 0, \"yaw\": 0}"
+        ],
+        [
+          "b2_hand_on_hip_talk",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 0, \"yaw\": 30}"
+        ]
+      ],
+      "pose_top_k_equal": false,
+      "pose_top1_equal": false,
+      "baseline_people": 1,
+      "integrated_people": 1
+    },
+    {
+      "repeat": 0,
+      "case_id": "124637:p0",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "match": {
+        "index": 0,
+        "iou": 1.0
+      },
+      "baseline_match": {
+        "index": 0,
+        "iou": 1.0
+      },
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "male-base-v0-7-2",
+        "recommended_preset": "BASE",
+        "recommended_family": "male",
+        "observed_family": null,
+        "recommendation_basis": "catalog_default",
+        "candidates": [
+          {
+            "body_id": "male-base-v0-7-2",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "male",
+            "version": "0.7.2",
+            "rank": 1,
+            "reason": "주 추천"
+          },
+          {
+            "body_id": "female-base-v0-3-4",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "female",
+            "version": "0.3.4",
+            "rank": 2,
+            "reason": "남녀 판독이 잠정적이거나 미확정일 때 다른 계열 기본형"
+          }
+        ],
+        "unresolved_axes": [
+          "presentation"
+        ],
+        "recognized_features": [],
+        "reasons": [
+          "남녀 계열 미확정: 설정된 기본 계열로 추천하며 판독 결과와 구분",
+          "뚜렷한 체형 특징이 없으므로 해당 계열 기본형을 추천"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": true,
+      "observed_correct": false,
+      "preset_correct": true,
+      "baseline_top_k": [
+        [
+          "gen_st_narrow__mg_wrist_hold__x-j0__h3_m",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 30, \"yaw\": 0}"
+        ]
+      ],
+      "integrated_top_k": [
+        [
+          "gen_st_narrow__mg_wrist_hold__x-j0__h3_m",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 30, \"yaw\": 0}"
+        ],
+        [
+          "gen_st_narrow__mg_wrist_hold__x-j0__h3",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 30, \"yaw\": 0}"
+        ]
+      ],
+      "pose_top_k_equal": false,
+      "pose_top1_equal": true,
+      "baseline_people": 1,
+      "integrated_people": 1
+    },
+    {
+      "repeat": 0,
+      "case_id": "124702:p0",
+      "expected_family": "female",
+      "expected_body_id": "female-base-v0-3-4",
+      "match": {
+        "index": 0,
+        "iou": 0.8704528744174294
+      },
+      "baseline_match": {
+        "index": 0,
+        "iou": 0.8704528744174294
+      },
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "male-base-v0-7-2",
+        "recommended_preset": "BASE",
+        "recommended_family": "male",
+        "observed_family": null,
+        "recommendation_basis": "catalog_default",
+        "candidates": [
+          {
+            "body_id": "male-base-v0-7-2",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "male",
+            "version": "0.7.2",
+            "rank": 1,
+            "reason": "주 추천"
+          },
+          {
+            "body_id": "female-base-v0-3-4",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "female",
+            "version": "0.3.4",
+            "rank": 2,
+            "reason": "남녀 판독이 잠정적이거나 미확정일 때 다른 계열 기본형"
+          }
+        ],
+        "unresolved_axes": [
+          "presentation",
+          "fullness"
+        ],
+        "recognized_features": [],
+        "reasons": [
+          "남녀 계열 미확정: 설정된 기본 계열로 추천하며 판독 결과와 구분",
+          "뚜렷한 체형 특징이 없으므로 해당 계열 기본형을 추천"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": false,
+      "observed_correct": false,
+      "preset_correct": false,
+      "baseline_top_k": [
+        [
+          "sd_cmu_114_05_f01284",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 30, \"yaw\": 0}"
+        ],
+        [
+          "sd_cmu_143_18_f00614",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 0, \"yaw\": 0}"
+        ],
+        [
+          "sd_cmu_114_05_f00954",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 30, \"yaw\": 0}"
+        ]
+      ],
+      "integrated_top_k": [
+        [
+          "sd_cmu_114_05_f01284",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 30, \"yaw\": 0}"
+        ],
+        [
+          "sd_cmu_143_18_f00614",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 0, \"yaw\": 0}"
+        ],
+        [
+          "cmu_79_22_00711_ground",
+          "library_original",
+          "null"
+        ],
+        [
+          "sd_cmu_114_05_f00954",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 30, \"yaw\": 0}"
+        ]
+      ],
+      "pose_top_k_equal": false,
+      "pose_top1_equal": true,
+      "baseline_people": 1,
+      "integrated_people": 1
+    },
+    {
+      "repeat": 0,
+      "case_id": "131000:p0",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "match": {
+        "index": 0,
+        "iou": 0.6237750243597701
+      },
+      "baseline_match": {
+        "index": 0,
+        "iou": 0.6749093703449968
+      },
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "male-base-v0-7-2",
+        "recommended_preset": "BASE",
+        "recommended_family": "male",
+        "observed_family": "male",
+        "recommendation_basis": "presentation_default",
+        "candidates": [
+          {
+            "body_id": "male-base-v0-7-2",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "male",
+            "version": "0.7.2",
+            "rank": 1,
+            "reason": "주 추천"
+          }
+        ],
+        "unresolved_axes": [],
+        "recognized_features": [],
+        "reasons": [
+          "날카로운 눈매와 뻗친 단발 머리 / 후드 집업과 바지 차림 / 다부진 소년 체격의 선화 표현",
+          "뚜렷한 체형 특징이 없으므로 해당 계열 기본형을 추천"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": true,
+      "observed_correct": true,
+      "preset_correct": true,
+      "baseline_top_k": [
+        [
+          "cmu_18_14_00277_mirror",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 0, \"yaw\": 300}"
+        ],
+        [
+          "cmu_85_14_01837_mirror",
+          "library_original",
+          "{\"distance\": null, \"pitch\": -30, \"yaw\": 120}"
+        ],
+        [
+          "style100_WildLegs_FW_f000898_eed5ec3a",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 30, \"yaw\": 30}"
+        ],
+        [
+          "style100_HighKnees_FW_f007918_49438f60",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 30, \"yaw\": 30}"
+        ],
+        [
+          "cmu_23_19_00009",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 30, \"yaw\": 180}"
+        ]
+      ],
+      "integrated_top_k": [
+        [
+          "gen_kn_seiza__reach_fwd__hang__h0_r2_m",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 30, \"yaw\": 30}"
+        ],
+        [
+          "gen_ac_run_air__fist_chamber__x-j0__h3",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 30, \"yaw\": 30}"
+        ],
+        [
+          "gen_ac_lunge_deep__fist_chamber__x-j0__h1",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 30, \"yaw\": 30}"
+        ],
+        [
+          "gen_kn_one__guitar__x__h0",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 30, \"yaw\": 30}"
+        ],
+        [
+          "gen_ac_lunge_deep__sword_mid__x-j0__h5",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 30, \"yaw\": 0}"
+        ]
+      ],
+      "pose_top_k_equal": false,
+      "pose_top1_equal": false,
+      "baseline_people": 2,
+      "integrated_people": 2
+    },
+    {
+      "repeat": 0,
+      "case_id": "131000:p1",
+      "expected_family": "female",
+      "expected_body_id": "female-base-v0-3-4",
+      "match": {
+        "index": 1,
+        "iou": 0.6903692256992469
+      },
+      "baseline_match": {
+        "index": 1,
+        "iou": 0.8994605562095537
+      },
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "female-base-v0-3-4",
+        "recommended_preset": "BASE",
+        "recommended_family": "female",
+        "observed_family": "female",
+        "recommendation_basis": "presentation_default",
+        "candidates": [
+          {
+            "body_id": "female-base-v0-3-4",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "female",
+            "version": "0.3.4",
+            "rank": 1,
+            "reason": "주 추천"
+          }
+        ],
+        "unresolved_axes": [
+          "fullness"
+        ],
+        "recognized_features": [],
+        "reasons": [
+          "긴 생머리와 눈물 흘리는 여성적 눈매 / 자켓과 하이넥 티셔츠, 목걸이 착용 / 가녀린 손과 팔 라인",
+          "뚜렷한 체형 특징이 없으므로 해당 계열 기본형을 추천"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": true,
+      "observed_correct": true,
+      "preset_correct": true,
+      "baseline_top_k": [
+        [
+          "mass_basketball_chest_pass",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 30, \"yaw\": 0}"
+        ],
+        [
+          "webtoon_romance_05",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 30, \"yaw\": 0}"
+        ],
+        [
+          "rokoko_Judge_mixamo_00006_mirror",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 30, \"yaw\": 270}"
+        ],
+        [
+          "webtoon_romance_39",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 30, \"yaw\": 0}"
+        ],
+        [
+          "gen_st_wall__give_gift__x__h4",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 30, \"yaw\": 0}"
+        ]
+      ],
+      "integrated_top_k": [],
+      "pose_top_k_equal": false,
+      "pose_top1_equal": false,
+      "baseline_people": 2,
+      "integrated_people": 2
+    },
+    {
+      "repeat": 0,
+      "case_id": "131040:p0",
+      "expected_family": "male",
+      "expected_body_id": "male-muscular-v0-7-2",
+      "match": {
+        "index": 0,
+        "iou": 0.9336607406567689
+      },
+      "baseline_match": {
+        "index": 0,
+        "iou": 0.9039053649837462
+      },
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "male-base-v0-7-2",
+        "recommended_preset": "BASE",
+        "recommended_family": "male",
+        "observed_family": "male",
+        "recommendation_basis": "presentation_default",
+        "candidates": [
+          {
+            "body_id": "male-base-v0-7-2",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "male",
+            "version": "0.7.2",
+            "rank": 1,
+            "reason": "주 추천"
+          }
+        ],
+        "unresolved_axes": [
+          "muscle"
+        ],
+        "recognized_features": [],
+        "reasons": [
+          "외침 표정과 수염 자국 / 민소매 러닝셔츠와 반바지 차림 / 팔다리 털과 단단한 체격",
+          "뚜렷한 체형 특징이 없으므로 해당 계열 기본형을 추천"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": true,
+      "observed_correct": true,
+      "preset_correct": false,
+      "baseline_top_k": [],
+      "integrated_top_k": [],
+      "pose_top_k_equal": true,
+      "pose_top1_equal": false,
+      "baseline_people": 3,
+      "integrated_people": 3
+    },
+    {
+      "repeat": 0,
+      "case_id": "131040:p1",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "match": {
+        "index": 1,
+        "iou": 0.7116960474500758
+      },
+      "baseline_match": {
+        "index": 1,
+        "iou": 0.7116960474500758
+      },
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "male-base-v0-7-2",
+        "recommended_preset": "BASE",
+        "recommended_family": "male",
+        "observed_family": "male",
+        "recommendation_basis": "presentation_default",
+        "candidates": [
+          {
+            "body_id": "male-base-v0-7-2",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "male",
+            "version": "0.7.2",
+            "rank": 1,
+            "reason": "주 추천"
+          },
+          {
+            "body_id": "female-base-v0-3-4",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "female",
+            "version": "0.3.4",
+            "rank": 2,
+            "reason": "남녀 판독이 잠정적이거나 미확정일 때 다른 계열 기본형"
+          }
+        ],
+        "unresolved_axes": [
+          "presentation",
+          "muscle",
+          "fullness",
+          "proportion"
+        ],
+        "recognized_features": [],
+        "reasons": [
+          "고개를 숙여 가린 얼굴 / 어두운 상의와 긴바지 착용 / 웅크려 쓰러져 있는 체형",
+          "뚜렷한 체형 특징이 없으므로 해당 계열 기본형을 추천",
+          "남녀 판독이 잠정적이므로 다른 계열 기본형도 대안으로 제공"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": true,
+      "observed_correct": true,
+      "preset_correct": true,
+      "baseline_top_k": [],
+      "integrated_top_k": [],
+      "pose_top_k_equal": true,
+      "pose_top1_equal": false,
+      "baseline_people": 3,
+      "integrated_people": 3
+    },
+    {
+      "repeat": 0,
+      "case_id": "131056:p0",
+      "expected_family": "male",
+      "expected_body_id": "male-ideal83-v0-7-2",
+      "match": {
+        "index": 0,
+        "iou": 0.8904274020311354
+      },
+      "baseline_match": null,
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "male-base-v0-7-2",
+        "recommended_preset": "BASE",
+        "recommended_family": "male",
+        "observed_family": "male",
+        "recommendation_basis": "presentation_default",
+        "candidates": [
+          {
+            "body_id": "male-base-v0-7-2",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "male",
+            "version": "0.7.2",
+            "rank": 1,
+            "reason": "주 추천"
+          }
+        ],
+        "unresolved_axes": [
+          "fullness",
+          "proportion"
+        ],
+        "recognized_features": [],
+        "reasons": [
+          "짧은 머리와 짙은 눈매의 미소 / 깃 달린 어두운 셔츠와 긴 바지 / 키가 크고 마른 남성형 체형",
+          "뚜렷한 체형 특징이 없으므로 해당 계열 기본형을 추천"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": true,
+      "observed_correct": true,
+      "preset_correct": false,
+      "baseline_top_k": [],
+      "integrated_top_k": [
+        [
+          "a1_phone_stand_one_mirror",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": -30, \"yaw\": 300}"
+        ],
+        [
+          "rokoko_FootTapping_mixamo_00452_mirror",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": -30, \"yaw\": 45}"
+        ],
+        [
+          "gen_st_bent_knees__broom__x__h4",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 0, \"yaw\": 45}"
+        ],
+        [
+          "gen_st_lean_fwd__broom__x__h0",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 0, \"yaw\": 45}"
+        ],
+        [
+          "b2_ok_sign_mirror",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 0, \"yaw\": 300}"
+        ]
+      ],
+      "pose_top_k_equal": false,
+      "pose_top1_equal": false,
+      "baseline_people": 3,
+      "integrated_people": 3
+    },
+    {
+      "repeat": 0,
+      "case_id": "131056:p2",
+      "expected_family": "female",
+      "expected_body_id": "female-base-v0-3-4",
+      "match": {
+        "index": 2,
+        "iou": 0.9213241891995567
+      },
+      "baseline_match": {
+        "index": 1,
+        "iou": 0.9213241891995567
+      },
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "female-base-v0-3-4",
+        "recommended_preset": "BASE",
+        "recommended_family": "female",
+        "observed_family": "female",
+        "recommendation_basis": "presentation_default",
+        "candidates": [
+          {
+            "body_id": "female-base-v0-3-4",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "female",
+            "version": "0.3.4",
+            "rank": 1,
+            "reason": "주 추천"
+          }
+        ],
+        "unresolved_axes": [],
+        "recognized_features": [],
+        "reasons": [
+          "단발머리와 부드러운 눈매 / 목폴라 니트와 긴 치마 차림 / 가방을 메고 서 있는 여성형 실루엣",
+          "뚜렷한 체형 특징이 없으므로 해당 계열 기본형을 추천"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": true,
+      "observed_correct": true,
+      "preset_correct": true,
+      "baseline_top_k": [
+        [
+          "rokoko_FootTapping_mixamo_00114",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 0, \"yaw\": 30}"
+        ]
+      ],
+      "integrated_top_k": [],
+      "pose_top_k_equal": false,
+      "pose_top1_equal": false,
+      "baseline_people": 3,
+      "integrated_people": 3
+    },
+    {
+      "repeat": 0,
+      "case_id": "131112:p0",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "match": {
+        "index": 0,
+        "iou": 0.9786177435956501
+      },
+      "baseline_match": {
+        "index": 0,
+        "iou": 0.8529418900903486
+      },
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "male-base-v0-7-2",
+        "recommended_preset": "BASE",
+        "recommended_family": "male",
+        "observed_family": "male",
+        "recommendation_basis": "presentation_default",
+        "candidates": [
+          {
+            "body_id": "male-base-v0-7-2",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "male",
+            "version": "0.7.2",
+            "rank": 1,
+            "reason": "주 추천"
+          }
+        ],
+        "unresolved_axes": [],
+        "recognized_features": [],
+        "reasons": [
+          "짧은 머리와 짙은 눈썹, 주름진 인상 / 패딩 점퍼에 면바지 착용 / 서서 주머니에 손을 넣은 성인 남성 체격",
+          "뚜렷한 체형 특징이 없으므로 해당 계열 기본형을 추천"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": true,
+      "observed_correct": true,
+      "preset_correct": true,
+      "baseline_top_k": [],
+      "integrated_top_k": [],
+      "pose_top_k_equal": true,
+      "pose_top1_equal": false,
+      "baseline_people": 5,
+      "integrated_people": 5
+    },
+    {
+      "repeat": 0,
+      "case_id": "131112:p3",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "match": {
+        "index": 3,
+        "iou": 0.9062040669409698
+      },
+      "baseline_match": {
+        "index": 1,
+        "iou": 0.8011857338246561
+      },
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "male-base-v0-7-2",
+        "recommended_preset": "BASE",
+        "recommended_family": "male",
+        "observed_family": "male",
+        "recommendation_basis": "presentation_default",
+        "candidates": [
+          {
+            "body_id": "male-base-v0-7-2",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "male",
+            "version": "0.7.2",
+            "rank": 1,
+            "reason": "주 추천"
+          }
+        ],
+        "unresolved_axes": [],
+        "recognized_features": [],
+        "reasons": [
+          "동그란 안경과 앳된 소년 얼굴 / 더플코트와 백팩, 면바지 / 단정한 체격의 학생 체형",
+          "뚜렷한 체형 특징이 없으므로 해당 계열 기본형을 추천"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": true,
+      "observed_correct": true,
+      "preset_correct": true,
+      "baseline_top_k": [],
+      "integrated_top_k": [],
+      "pose_top_k_equal": true,
+      "pose_top1_equal": false,
+      "baseline_people": 5,
+      "integrated_people": 5
+    },
+    {
+      "repeat": 0,
+      "case_id": "131112:p4",
+      "expected_family": "female",
+      "expected_body_id": "female-base-v0-3-4",
+      "match": {
+        "index": 4,
+        "iou": 0.7955443419365233
+      },
+      "baseline_match": null,
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "female-base-v0-3-4",
+        "recommended_preset": "BASE",
+        "recommended_family": "female",
+        "observed_family": "female",
+        "recommendation_basis": "presentation_default",
+        "candidates": [
+          {
+            "body_id": "female-base-v0-3-4",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "female",
+            "version": "0.3.4",
+            "rank": 1,
+            "reason": "주 추천"
+          }
+        ],
+        "unresolved_axes": [],
+        "recognized_features": [],
+        "reasons": [
+          "웨이브 머리와 웃는 표정의 성인 여성 / 퍼 카라 코트와 스커트, 구두 / 어깨에 손을 올린 보통 체격의 여성",
+          "뚜렷한 체형 특징이 없으므로 해당 계열 기본형을 추천"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": true,
+      "observed_correct": true,
+      "preset_correct": true,
+      "baseline_top_k": [],
+      "integrated_top_k": [],
+      "pose_top_k_equal": false,
+      "pose_top1_equal": false,
+      "baseline_people": 5,
+      "integrated_people": 5
+    },
+    {
+      "repeat": 0,
+      "case_id": "131127:p0",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "match": {
+        "index": 0,
+        "iou": 0.39942905693006026
+      },
+      "baseline_match": null,
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "male-base-v0-7-2",
+        "recommended_preset": "BASE",
+        "recommended_family": "male",
+        "observed_family": "male",
+        "recommendation_basis": "presentation_default",
+        "candidates": [
+          {
+            "body_id": "male-base-v0-7-2",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "male",
+            "version": "0.7.2",
+            "rank": 1,
+            "reason": "주 추천"
+          }
+        ],
+        "unresolved_axes": [
+          "muscle",
+          "fullness"
+        ],
+        "recognized_features": [],
+        "reasons": [
+          "모자를 쓰고 입을 벌린 남성형 얼굴 / 주황색 구조대 유니폼 상의 / 건장한 체격의 상체",
+          "뚜렷한 체형 특징이 없으므로 해당 계열 기본형을 추천"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": true,
+      "observed_correct": true,
+      "preset_correct": true,
+      "baseline_top_k": [],
+      "integrated_top_k": [
+        [
+          "sd_cmu_143_11_f00254",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 0, \"yaw\": 330}"
+        ],
+        [
+          "sd_cmu_111_38_f01284",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 0, \"yaw\": 300}"
+        ],
+        [
+          "sd_cmu_14_20_f03124",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 0, \"yaw\": 270}"
+        ],
+        [
+          "ext_pushup_top_straight_arms",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 0, \"yaw\": 300}"
+        ],
+        [
+          "a2_kneel_hands_floor_cry",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 0, \"yaw\": 300}"
+        ]
+      ],
+      "pose_top_k_equal": false,
+      "pose_top1_equal": false,
+      "baseline_people": 0,
+      "integrated_people": 4
+    },
+    {
+      "repeat": 0,
+      "case_id": "131127:p1",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "match": {
+        "index": 3,
+        "iou": 0.9474508013752359
+      },
+      "baseline_match": null,
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "male-base-v0-7-2",
+        "recommended_preset": "BASE",
+        "recommended_family": "male",
+        "observed_family": "male",
+        "recommendation_basis": "presentation_default",
+        "candidates": [
+          {
+            "body_id": "male-base-v0-7-2",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "male",
+            "version": "0.7.2",
+            "rank": 1,
+            "reason": "주 추천"
+          }
+        ],
+        "unresolved_axes": [],
+        "recognized_features": [],
+        "reasons": [
+          "가르마 탄 단정한 남성형 이목구비 / 정장 자켓과 넥타이 차림의 정장 / 서 있는 표준 비율의 체형",
+          "뚜렷한 체형 특징이 없으므로 해당 계열 기본형을 추천"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": true,
+      "observed_correct": true,
+      "preset_correct": true,
+      "baseline_top_k": [],
+      "integrated_top_k": [
+        [
+          "b8_hold_hands_right",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 0, \"yaw\": 0}"
+        ],
+        [
+          "b1_fists_anger",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 30, \"yaw\": 0}"
+        ],
+        [
+          "b8_wall_pin_pinned",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 30, \"yaw\": 180}"
+        ],
+        [
+          "webtoon_daily_16",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 0, \"yaw\": 0}"
+        ],
+        [
+          "gen_st_wall__sword_side__hang__h5",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 30, \"yaw\": 0}"
+        ]
+      ],
+      "pose_top_k_equal": false,
+      "pose_top1_equal": false,
+      "baseline_people": 0,
+      "integrated_people": 4
+    },
+    {
+      "repeat": 0,
+      "case_id": "131145:p0",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "match": {
+        "index": 0,
+        "iou": 0.9659498346057779
+      },
+      "baseline_match": {
+        "index": 0,
+        "iou": 0.9659498346057779
+      },
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "male-base-v0-7-2",
+        "recommended_preset": "BASE",
+        "recommended_family": "male",
+        "observed_family": "male",
+        "recommendation_basis": "presentation_default",
+        "candidates": [
+          {
+            "body_id": "male-base-v0-7-2",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "male",
+            "version": "0.7.2",
+            "rank": 1,
+            "reason": "주 추천"
+          },
+          {
+            "body_id": "female-base-v0-3-4",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "female",
+            "version": "0.3.4",
+            "rank": 2,
+            "reason": "남녀 판독이 잠정적이거나 미확정일 때 다른 계열 기본형"
+          }
+        ],
+        "unresolved_axes": [
+          "presentation"
+        ],
+        "recognized_features": [],
+        "reasons": [
+          "뒷모습 위주로 이목구비 거의 안 보임 / 교복 재킷과 바지, 완장을 찬 긴 소매 / 직사각형 체형에 직선적인 어깨와 긴 다리",
+          "뚜렷한 체형 특징이 없으므로 해당 계열 기본형을 추천",
+          "남녀 판독이 잠정적이므로 다른 계열 기본형도 대안으로 제공"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": true,
+      "observed_correct": true,
+      "preset_correct": true,
+      "baseline_top_k": [
+        [
+          "a5_attention",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": -30, \"yaw\": 180}"
+        ],
+        [
+          "b8_wall_pin_pinned",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": -30, \"yaw\": 0}"
+        ],
+        [
+          "rokoko_Clipboard_Lever_Computer_mixamo_00105",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": -30, \"yaw\": 210}"
+        ],
+        [
+          "rokoko_DoubleTakes_mixamo_00167_mirror",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": -30, \"yaw\": 270}"
+        ],
+        [
+          "b8_wrist_pull_pulled",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": -30, \"yaw\": 180}"
+        ]
+      ],
+      "integrated_top_k": [
+        [
+          "a5_attention",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": -30, \"yaw\": 180}"
+        ],
+        [
+          "b8_wall_pin_pinned",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": -30, \"yaw\": 0}"
+        ],
+        [
+          "rokoko_Clipboard_Lever_Computer_mixamo_00105",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": -30, \"yaw\": 210}"
+        ],
+        [
+          "rokoko_DoubleTakes_mixamo_00167_mirror",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": -30, \"yaw\": 270}"
+        ],
+        [
+          "b8_wrist_pull_pulled",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": -30, \"yaw\": 180}"
+        ]
+      ],
+      "pose_top_k_equal": true,
+      "pose_top1_equal": true,
+      "baseline_people": 1,
+      "integrated_people": 1
+    },
+    {
+      "repeat": 0,
+      "case_id": "131211:p0",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "match": {
+        "index": 0,
+        "iou": 0.8856177916551856
+      },
+      "baseline_match": {
+        "index": 0,
+        "iou": 0.8856177916551856
+      },
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "male-base-v0-7-2",
+        "recommended_preset": "BASE",
+        "recommended_family": "male",
+        "observed_family": "male",
+        "recommendation_basis": "presentation_default",
+        "candidates": [
+          {
+            "body_id": "male-base-v0-7-2",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "male",
+            "version": "0.7.2",
+            "rank": 1,
+            "reason": "주 추천"
+          },
+          {
+            "body_id": "female-base-v0-3-4",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "female",
+            "version": "0.3.4",
+            "rank": 2,
+            "reason": "남녀 판독이 잠정적이거나 미확정일 때 다른 계열 기본형"
+          }
+        ],
+        "unresolved_axes": [
+          "presentation",
+          "muscle",
+          "fullness",
+          "proportion"
+        ],
+        "recognized_features": [],
+        "reasons": [
+          "모자를 쓴 거친 윤곽의 인물 / 재킷과 바지를 착용한 원경 복장 / 작은 크기로 그려진 남성형 체형",
+          "뚜렷한 체형 특징이 없으므로 해당 계열 기본형을 추천",
+          "남녀 판독이 잠정적이므로 다른 계열 기본형도 대안으로 제공"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": true,
+      "observed_correct": true,
+      "preset_correct": true,
+      "baseline_top_k": [],
+      "integrated_top_k": [
+        [
+          "UAL2__Consume__p01_f0016",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": -30, \"yaw\": 45}"
+        ],
+        [
+          "combat_ual1_Spell_Simple_Shoot_f00400",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": -30, \"yaw\": 60}"
+        ],
+        [
+          "g1__M_Move2__n02_f1241_mirror",
+          "library_original",
+          "{\"distance\": null, \"pitch\": -30, \"yaw\": 90}"
+        ],
+        [
+          "g1__B_Fence2__n02_f0311_mirror",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 0, \"yaw\": 330}"
+        ],
+        [
+          "g1__M_Move4__n02_f0844_mirror",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 30, \"yaw\": 60}"
+        ]
+      ],
+      "pose_top_k_equal": false,
+      "pose_top1_equal": false,
+      "baseline_people": 2,
+      "integrated_people": 2
+    },
+    {
+      "repeat": 0,
+      "case_id": "131211:p1",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "match": {
+        "index": 1,
+        "iou": 0.9206195098981831
+      },
+      "baseline_match": {
+        "index": 1,
+        "iou": 0.8381989135400589
+      },
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "male-base-v0-7-2",
+        "recommended_preset": "BASE",
+        "recommended_family": "male",
+        "observed_family": "male",
+        "recommendation_basis": "presentation_default",
+        "candidates": [
+          {
+            "body_id": "male-base-v0-7-2",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "male",
+            "version": "0.7.2",
+            "rank": 1,
+            "reason": "주 추천"
+          },
+          {
+            "body_id": "female-base-v0-3-4",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "female",
+            "version": "0.3.4",
+            "rank": 2,
+            "reason": "남녀 판독이 잠정적이거나 미확정일 때 다른 계열 기본형"
+          }
+        ],
+        "unresolved_axes": [
+          "presentation",
+          "fullness"
+        ],
+        "recognized_features": [],
+        "reasons": [
+          "크게 뜬 눈과 긴장된 입매, 뾰족한 소년풍 머리 / 후드 티셔츠와 바지, 운동화 착용 / 호리호리하고 날씬한 표준 체형 실루엣",
+          "뚜렷한 체형 특징이 없으므로 해당 계열 기본형을 추천",
+          "남녀 판독이 잠정적이므로 다른 계열 기본형도 대안으로 제공"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": true,
+      "observed_correct": true,
+      "preset_correct": true,
+      "baseline_top_k": [],
+      "integrated_top_k": [
+        [
+          "style100_Skip_FR_f000414_49438f60",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 0, \"yaw\": 30}"
+        ],
+        [
+          "rokoko_SitcomIntroShots_mixamo_00522_mirror",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": -30, \"yaw\": 45}"
+        ],
+        [
+          "rokoko_Judge_mixamo_00669_mirror",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 30, \"yaw\": 300}"
+        ],
+        [
+          "rokoko_ShoulderShimmy_mixamo_00659_mirror",
+          "library_original",
+          "{\"distance\": null, \"pitch\": -30, \"yaw\": 0}"
+        ],
+        [
+          "rokoko_AssaultRifle_mixamo_00091",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 0, \"yaw\": 60}"
+        ]
+      ],
+      "pose_top_k_equal": false,
+      "pose_top1_equal": false,
+      "baseline_people": 2,
+      "integrated_people": 2
+    },
+    {
+      "repeat": 0,
+      "case_id": "131224:p0",
+      "expected_family": "female",
+      "expected_body_id": "female-slim-v0-3-4",
+      "match": {
+        "index": 0,
+        "iou": 0.7879277231047997
+      },
+      "baseline_match": {
+        "index": 0,
+        "iou": 0.7591221464040895
+      },
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "female-base-v0-3-4",
+        "recommended_preset": "BASE",
+        "recommended_family": "female",
+        "observed_family": "female",
+        "recommendation_basis": "presentation_default",
+        "candidates": [
+          {
+            "body_id": "female-base-v0-3-4",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "female",
+            "version": "0.3.4",
+            "rank": 1,
+            "reason": "주 추천"
+          }
+        ],
+        "unresolved_axes": [
+          "fullness"
+        ],
+        "recognized_features": [],
+        "reasons": [
+          "긴 생머리와 또렷한 눈매 표현 / 상의와 긴 바지 착용, 차 문에 일부 가림 / 슬림하고 균형 잡힌 여성형 실루엣",
+          "뚜렷한 체형 특징이 없으므로 해당 계열 기본형을 추천"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": true,
+      "observed_correct": true,
+      "preset_correct": false,
+      "baseline_top_k": [],
+      "integrated_top_k": [],
+      "pose_top_k_equal": true,
+      "pose_top1_equal": false,
+      "baseline_people": 1,
+      "integrated_people": 1
+    },
+    {
+      "repeat": 0,
+      "case_id": "171734:p0",
+      "expected_family": "female",
+      "expected_body_id": "female-base-v0-3-4",
+      "match": {
+        "index": 0,
+        "iou": 0.7734475365860787
+      },
+      "baseline_match": {
+        "index": 0,
+        "iou": 0.7734475365860787
+      },
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "female-base-v0-3-4",
+        "recommended_preset": "BASE",
+        "recommended_family": "female",
+        "observed_family": "female",
+        "recommendation_basis": "presentation_default",
+        "candidates": [
+          {
+            "body_id": "female-base-v0-3-4",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "female",
+            "version": "0.3.4",
+            "rank": 1,
+            "reason": "주 추천"
+          }
+        ],
+        "unresolved_axes": [
+          "fullness"
+        ],
+        "recognized_features": [],
+        "reasons": [
+          "큰 눈망울과 불안한 표정, 갸름한 턱선 / 목을 감싸는 이너와 자켓, 스커트 착용 / 슬림하고 가녀린 체형의 상반신",
+          "뚜렷한 체형 특징이 없으므로 해당 계열 기본형을 추천"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": true,
+      "observed_correct": true,
+      "preset_correct": true,
+      "baseline_top_k": [
+        [
+          "g1__M_Move5__n01_f0515",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 0, \"yaw\": 240}"
+        ],
+        [
+          "g1__M_Move5__n02_f0534",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 30, \"yaw\": 270}"
+        ],
+        [
+          "cmu_106_14_00353",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 0, \"yaw\": 90}"
+        ],
+        [
+          "sd_cmu_102_26_f00404",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 0, \"yaw\": 30}"
+        ],
+        [
+          "cmu_78_35_00115_mirror",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 0, \"yaw\": 120}"
+        ]
+      ],
+      "integrated_top_k": [
+        [
+          "g1__M_Move5__n01_f0515",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 0, \"yaw\": 240}"
+        ],
+        [
+          "g1__M_Move5__n02_f0534",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 30, \"yaw\": 270}"
+        ],
+        [
+          "cmu_106_14_00353",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 0, \"yaw\": 90}"
+        ],
+        [
+          "sd_cmu_102_26_f00404",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 0, \"yaw\": 30}"
+        ],
+        [
+          "cmu_78_35_00115_mirror",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 0, \"yaw\": 120}"
+        ]
+      ],
+      "pose_top_k_equal": true,
+      "pose_top1_equal": true,
+      "baseline_people": 1,
+      "integrated_people": 1
+    },
+    {
+      "repeat": 0,
+      "case_id": "2.16.04:p0",
+      "expected_family": "male",
+      "expected_body_id": "male-muscle-max-v0-7-2",
+      "match": {
+        "index": 0,
+        "iou": 0.7990135667687416
+      },
+      "baseline_match": {
+        "index": 0,
+        "iou": 0.9349538357317836
+      },
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "male-muscle-max-v0-7-2",
+        "recommended_preset": "MUSCLE_MAX",
+        "recommended_family": "male",
+        "observed_family": "male",
+        "recommendation_basis": "recognized_feature",
+        "candidates": [
+          {
+            "body_id": "male-muscle-max-v0-7-2",
+            "display_name": "고근육형",
+            "preset": "MUSCLE_MAX",
+            "family": "male",
+            "version": "0.7.2",
+            "rank": 1,
+            "reason": "주 추천"
+          },
+          {
+            "body_id": "male-muscular-v0-7-2",
+            "display_name": "근육형",
+            "preset": "MUSCULAR",
+            "family": "male",
+            "version": "0.7.2",
+            "rank": 2,
+            "reason": "같은 계열의 대안"
+          },
+          {
+            "body_id": "male-base-v0-7-2",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "male",
+            "version": "0.7.2",
+            "rank": 3,
+            "reason": "기본형 대안"
+          }
+        ],
+        "unresolved_axes": [
+          "fullness"
+        ],
+        "recognized_features": [
+          "muscle"
+        ],
+        "reasons": [
+          "각진 턱과 흉터, 강인한 이목구비 / 몸에 밀착된 상의 및 흉갑 벨트 / 극도로 과장된 어깨근육과 복근 묘사",
+          "muscle: 각진 턱과 흉터, 강인한 이목구비 / 몸에 밀착된 상의 및 흉갑 벨트 / 극도로 과장된 어깨근육과 복근 묘사"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": true,
+      "observed_correct": true,
+      "preset_correct": true,
+      "baseline_top_k": [
+        [
+          "webtoon_fantasy_19",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 30, \"yaw\": 0}"
+        ],
+        [
+          "gen_kn_upright__sw_slash_follow__x-j0__h2_m",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 0, \"yaw\": 0}"
+        ],
+        [
+          "gen_ac_jump_split__sw_slash_follow__x__h2",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 30, \"yaw\": 0}"
+        ],
+        [
+          "webtoon_combat_02",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 30, \"yaw\": 0}"
+        ],
+        [
+          "rokoko_RescuingDeadFriend_mixamo_00684_mirror",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": -30, \"yaw\": 300}"
+        ]
+      ],
+      "integrated_top_k": [
+        [
+          "webtoon_fantasy_19",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 30, \"yaw\": 0}"
+        ],
+        [
+          "style100_HighKnees_FR_f000317_49438f60",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 0, \"yaw\": 30}"
+        ],
+        [
+          "rokoko_Lawyer_02_mixamo_00008_mirror",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 30, \"yaw\": 0}"
+        ],
+        [
+          "b3_door_knob",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 30, \"yaw\": 0}"
+        ],
+        [
+          "style100_TwoFootJump_FR_f000659_49438f60",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 0, \"yaw\": 30}"
+        ]
+      ],
+      "pose_top_k_equal": false,
+      "pose_top1_equal": false,
+      "baseline_people": 2,
+      "integrated_people": 2
+    },
+    {
+      "repeat": 0,
+      "case_id": "2.16.04:p1",
+      "expected_family": "male",
+      "expected_body_id": "male-muscular-v0-7-2",
+      "match": {
+        "index": 1,
+        "iou": 0.7239008819533232
+      },
+      "baseline_match": {
+        "index": 1,
+        "iou": 0.7239008819533232
+      },
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "male-base-v0-7-2",
+        "recommended_preset": "BASE",
+        "recommended_family": "male",
+        "observed_family": "male",
+        "recommendation_basis": "presentation_default",
+        "candidates": [
+          {
+            "body_id": "male-base-v0-7-2",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "male",
+            "version": "0.7.2",
+            "rank": 1,
+            "reason": "주 추천"
+          },
+          {
+            "body_id": "female-base-v0-3-4",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "female",
+            "version": "0.3.4",
+            "rank": 2,
+            "reason": "남녀 판독이 잠정적이거나 미확정일 때 다른 계열 기본형"
+          }
+        ],
+        "unresolved_axes": [
+          "presentation",
+          "fullness"
+        ],
+        "recognized_features": [],
+        "reasons": [
+          "마스크로 하관을 가린 날카로운 눈매 / 팔토시와 붕대 형태의 상의 디자인 / 팔짱 낀 포즈의 탄탄하고 날렵한 체형",
+          "뚜렷한 체형 특징이 없으므로 해당 계열 기본형을 추천",
+          "남녀 판독이 잠정적이므로 다른 계열 기본형도 대안으로 제공"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": true,
+      "observed_correct": true,
+      "preset_correct": false,
+      "baseline_top_k": [
+        [
+          "rokoko_PlayingSaxophone_mixamo_00524_mirror",
+          "library_original",
+          "{\"distance\": null, \"pitch\": -30, \"yaw\": 30}"
+        ],
+        [
+          "rokoko_FistPumps_mixamo_00951",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": -30, \"yaw\": 0}"
+        ],
+        [
+          "rokoko_DoubleTakes_mixamo_00619_mirror",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": -30, \"yaw\": 30}"
+        ],
+        [
+          "rokoko_MiddleFingers_mixamo_00604_mirror",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": -30, \"yaw\": 330}"
+        ],
+        [
+          "sd_cmu_14_30_f01454",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 0, \"yaw\": 45}"
+        ]
+      ],
+      "integrated_top_k": [
+        [
+          "rokoko_PlayingSaxophone_mixamo_00524_mirror",
+          "library_original",
+          "{\"distance\": null, \"pitch\": -30, \"yaw\": 30}"
+        ],
+        [
+          "rokoko_FistPumps_mixamo_00951",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": -30, \"yaw\": 0}"
+        ],
+        [
+          "rokoko_DoubleTakes_mixamo_00619_mirror",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": -30, \"yaw\": 30}"
+        ],
+        [
+          "rokoko_MiddleFingers_mixamo_00604_mirror",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": -30, \"yaw\": 330}"
+        ],
+        [
+          "rokoko_PlayingGuitar_mixamo_00584_mirror",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": -30, \"yaw\": 60}"
+        ]
+      ],
+      "pose_top_k_equal": false,
+      "pose_top1_equal": true,
+      "baseline_people": 2,
+      "integrated_people": 2
+    },
+    {
+      "repeat": 0,
+      "case_id": "2.16.52:p0",
+      "expected_family": "female",
+      "expected_body_id": "female-base-v0-3-4",
+      "match": {
+        "index": 0,
+        "iou": 0.7447537270581372
+      },
+      "baseline_match": {
+        "index": 0,
+        "iou": 0.66922228609743
+      },
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "female-base-v0-3-4",
+        "recommended_preset": "BASE",
+        "recommended_family": "female",
+        "observed_family": "female",
+        "recommendation_basis": "presentation_default",
+        "candidates": [
+          {
+            "body_id": "female-base-v0-3-4",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "female",
+            "version": "0.3.4",
+            "rank": 1,
+            "reason": "주 추천"
+          },
+          {
+            "body_id": "male-base-v0-7-2",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "male",
+            "version": "0.7.2",
+            "rank": 2,
+            "reason": "남녀 판독이 잠정적이거나 미확정일 때 다른 계열 기본형"
+          }
+        ],
+        "unresolved_axes": [
+          "presentation",
+          "fullness"
+        ],
+        "recognized_features": [],
+        "reasons": [
+          "안경 쓴 옆얼굴과 정돈된 단발머리 / 셔츠 깃과 넥타이가 보이는 교복 조끼 / 슬림한 상체 라인",
+          "뚜렷한 체형 특징이 없으므로 해당 계열 기본형을 추천",
+          "남녀 판독이 잠정적이므로 다른 계열 기본형도 대안으로 제공"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": true,
+      "observed_correct": true,
+      "preset_correct": true,
+      "baseline_top_k": [
+        [
+          "rokoko_SitcomCameraLooks_mixamo_00706",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": -30, \"yaw\": 30}"
+        ],
+        [
+          "Looking_01_mirror",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": -30, \"yaw\": 330}"
+        ],
+        [
+          "rokoko_DoubleTakes_mixamo_00092_mirror",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": -30, \"yaw\": 0}"
+        ],
+        [
+          "Shaking Hands 2_02_mirror",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": -30, \"yaw\": 0}"
+        ],
+        [
+          "Female Standing Pose_01_legfix_mirror",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": -30, \"yaw\": 45}"
+        ]
+      ],
+      "integrated_top_k": [
+        [
+          "b6_look_back_walk",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 0, \"yaw\": 30}"
+        ],
+        [
+          "rokoko_TakingAGroupPhoto_mixamo_01203_mirror",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 0, \"yaw\": 210}"
+        ],
+        [
+          "rokoko_SitcomCameraLooks_mixamo_00706",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": -30, \"yaw\": 30}"
+        ],
+        [
+          "rokoko_DoubleTakes_mixamo_00167",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 0, \"yaw\": 330}"
+        ],
+        [
+          "rokoko_Judges_mixamo_00061_mirror",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 0, \"yaw\": 300}"
+        ]
+      ],
+      "pose_top_k_equal": false,
+      "pose_top1_equal": false,
+      "baseline_people": 3,
+      "integrated_people": 3
+    },
+    {
+      "repeat": 0,
+      "case_id": "2.16.52:p2",
+      "expected_family": "female",
+      "expected_body_id": "female-base-v0-3-4",
+      "match": {
+        "index": 1,
+        "iou": 0.8763631394323522
+      },
+      "baseline_match": {
+        "index": 2,
+        "iou": 0.8763631394323522
+      },
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "female-base-v0-3-4",
+        "recommended_preset": "BASE",
+        "recommended_family": "female",
+        "observed_family": "female",
+        "recommendation_basis": "presentation_default",
+        "candidates": [
+          {
+            "body_id": "female-base-v0-3-4",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "female",
+            "version": "0.3.4",
+            "rank": 1,
+            "reason": "주 추천"
+          }
+        ],
+        "unresolved_axes": [],
+        "recognized_features": [],
+        "reasons": [
+          "큰 눈과 긴 생머리의 여성형 얼굴 / 긴소매 셔츠와 치마 라인 / 적당한 체형의 직립 상체",
+          "뚜렷한 체형 특징이 없으므로 해당 계열 기본형을 추천"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": true,
+      "observed_correct": true,
+      "preset_correct": true,
+      "baseline_top_k": [
+        [
+          "gen_st_wall__phone_both__x__h3",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 0, \"yaw\": 0}"
+        ],
+        [
+          "gen_ch_feet_tuck__phone_both__x__h5",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 0, \"yaw\": 0}"
+        ],
+        [
+          "gen_st_narrow__phone_both__x__h4_m",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": -30, \"yaw\": 330}"
+        ],
+        [
+          "gen_ch_slouch__phone_both__x__h0_m",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 30, \"yaw\": 0}"
+        ],
+        [
+          "gen_ch_feet_out__phone_both__x__h0_m",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 0, \"yaw\": 0}"
+        ]
+      ],
+      "integrated_top_k": [
+        [
+          "gen_st_wall__phone_both__x__h3",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 0, \"yaw\": 0}"
+        ],
+        [
+          "gen_ch_feet_tuck__phone_both__x__h5",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 0, \"yaw\": 0}"
+        ],
+        [
+          "gen_st_narrow__phone_both__x__h4_m",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": -30, \"yaw\": 330}"
+        ],
+        [
+          "gen_ch_feet_out__phone_both__x__h0",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 0, \"yaw\": 0}"
+        ],
+        [
+          "gen_ch_slouch__phone_both__x__h0_m",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 30, \"yaw\": 0}"
+        ]
+      ],
+      "pose_top_k_equal": false,
+      "pose_top1_equal": true,
+      "baseline_people": 3,
+      "integrated_people": 3
+    },
+    {
+      "repeat": 0,
+      "case_id": "3.08.13:p0",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "match": {
+        "index": 0,
+        "iou": 0.7032825380882974
+      },
+      "baseline_match": {
+        "index": 0,
+        "iou": 0.7032825380882974
+      },
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "male-base-v0-7-2",
+        "recommended_preset": "BASE",
+        "recommended_family": "male",
+        "observed_family": "male",
+        "recommendation_basis": "presentation_default",
+        "candidates": [
+          {
+            "body_id": "male-base-v0-7-2",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "male",
+            "version": "0.7.2",
+            "rank": 1,
+            "reason": "주 추천"
+          }
+        ],
+        "unresolved_axes": [
+          "muscle"
+        ],
+        "recognized_features": [],
+        "reasons": [
+          "두건과 흉터, 긴장한 눈과 벌린 입 / 민소매 스타일 상의와 붕대 감은 팔 / 보통 체격의 남성형 상체 윤곽",
+          "뚜렷한 체형 특징이 없으므로 해당 계열 기본형을 추천"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": true,
+      "observed_correct": true,
+      "preset_correct": true,
+      "baseline_top_k": [
+        [
+          "rokoko_SitDown_UseLaptop_mixamo_00857",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 0, \"yaw\": 0}"
+        ],
+        [
+          "rokoko_Lawyer_01_mixamo_00878",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 0, \"yaw\": 90}"
+        ],
+        [
+          "Shaking Hands 1_01",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 0, \"yaw\": 330}"
+        ],
+        [
+          "gen_ac_low_ready__mg_beam__x-j0__h2",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 0, \"yaw\": 0}"
+        ],
+        [
+          "Great Sword Strafe_00034",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 0, \"yaw\": 30}"
+        ]
+      ],
+      "integrated_top_k": [
+        [
+          "gen_ac_low_ready__mg_beam__x-j0__h2",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 0, \"yaw\": 0}"
+        ],
+        [
+          "rokoko_FistPumps_mixamo_00838_mirror",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 0, \"yaw\": 0}"
+        ],
+        [
+          "gen_ac_brace__mg_beam__x-j0__h0",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 0, \"yaw\": 0}"
+        ],
+        [
+          "webtoon_daily_18",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 30, \"yaw\": 0}"
+        ],
+        [
+          "Great Sword Strafe_00034",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 0, \"yaw\": 30}"
+        ]
+      ],
+      "pose_top_k_equal": false,
+      "pose_top1_equal": false,
+      "baseline_people": 2,
+      "integrated_people": 2
+    },
+    {
+      "repeat": 0,
+      "case_id": "4.56.21:p0",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "match": {
+        "index": 0,
+        "iou": 0.9391737147685455
+      },
+      "baseline_match": {
+        "index": 0,
+        "iou": 0.931154792866708
+      },
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "male-base-v0-7-2",
+        "recommended_preset": "BASE",
+        "recommended_family": "male",
+        "observed_family": "male",
+        "recommendation_basis": "presentation_default",
+        "candidates": [
+          {
+            "body_id": "male-base-v0-7-2",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "male",
+            "version": "0.7.2",
+            "rank": 1,
+            "reason": "주 추천"
+          },
+          {
+            "body_id": "female-base-v0-3-4",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "female",
+            "version": "0.3.4",
+            "rank": 2,
+            "reason": "남녀 판독이 잠정적이거나 미확정일 때 다른 계열 기본형"
+          }
+        ],
+        "unresolved_axes": [
+          "presentation",
+          "muscle",
+          "fullness"
+        ],
+        "recognized_features": [],
+        "reasons": [
+          "모자를 눌러쓴 또렷하고 날카로운 눈매 / 헐렁한 운동 유니폼 바지와 반팔 상의 / 몸을 깊게 숙인 투구/수비 동작의 체형",
+          "뚜렷한 체형 특징이 없으므로 해당 계열 기본형을 추천",
+          "남녀 판독이 잠정적이므로 다른 계열 기본형도 대안으로 제공"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": true,
+      "observed_correct": true,
+      "preset_correct": true,
+      "baseline_top_k": [
+        [
+          "cmu_143_16_00087_mirror",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 30, \"yaw\": 240}"
+        ]
+      ],
+      "integrated_top_k": [],
+      "pose_top_k_equal": false,
+      "pose_top1_equal": false,
+      "baseline_people": 1,
+      "integrated_people": 1
+    },
+    {
+      "repeat": 0,
+      "case_id": "청룡성:p0",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "match": null,
+      "baseline_match": {
+        "index": 0,
+        "iou": 1.0
+      },
+      "recommendation": null,
+      "family_correct": false,
+      "observed_correct": false,
+      "preset_correct": false,
+      "baseline_top_k": [
+        [
+          "rokoko_StandUpComedian_mixamo_00824",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 30, \"yaw\": 330}"
+        ],
+        [
+          "rokoko_Flirty_mixamo_00964_mirror",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 0, \"yaw\": 0}"
+        ],
+        [
+          "rokoko_Lawyer_01_mixamo_00669_mirror",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 0, \"yaw\": 330}"
+        ],
+        [
+          "rokoko_FootTapping_mixamo_00452_mirror",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 0, \"yaw\": 300}"
+        ],
+        [
+          "a4_tray_both_hands",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 0, \"yaw\": 45}"
+        ]
+      ],
+      "integrated_top_k": [],
+      "pose_top_k_equal": false,
+      "pose_top1_equal": false,
+      "baseline_people": 3,
+      "integrated_people": 3
+    },
+    {
+      "repeat": 0,
+      "case_id": "청룡성:p1",
+      "expected_family": "male",
+      "expected_body_id": "male-ideal83-v0-7-2",
+      "match": {
+        "index": 0,
+        "iou": 0.6903389361252467
+      },
+      "baseline_match": {
+        "index": 1,
+        "iou": 0.8965316154328892
+      },
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "male-base-v0-7-2",
+        "recommended_preset": "BASE",
+        "recommended_family": "male",
+        "observed_family": "male",
+        "recommendation_basis": "presentation_default",
+        "candidates": [
+          {
+            "body_id": "male-base-v0-7-2",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "male",
+            "version": "0.7.2",
+            "rank": 1,
+            "reason": "주 추천"
+          },
+          {
+            "body_id": "female-base-v0-3-4",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "female",
+            "version": "0.3.4",
+            "rank": 2,
+            "reason": "남녀 판독이 잠정적이거나 미확정일 때 다른 계열 기본형"
+          }
+        ],
+        "unresolved_axes": [
+          "presentation",
+          "fullness",
+          "proportion"
+        ],
+        "recognized_features": [],
+        "reasons": [
+          "단정한 이목구비와 짧은 머리 형태 / 긴 코트와 바지 착용 / 키가 크고 슬림한 체형 선화",
+          "뚜렷한 체형 특징이 없으므로 해당 계열 기본형을 추천",
+          "남녀 판독이 잠정적이므로 다른 계열 기본형도 대안으로 제공"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": true,
+      "observed_correct": true,
+      "preset_correct": false,
+      "baseline_top_k": [],
+      "integrated_top_k": [
+        [
+          "rokoko_Flirty_mixamo_00964_mirror",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 30, \"yaw\": 0}"
+        ],
+        [
+          "rokoko_Host_mixamo_00564",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 30, \"yaw\": 60}"
+        ],
+        [
+          "rokoko_TakingAGroupPhoto_mixamo_01203",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 30, \"yaw\": 120}"
+        ],
+        [
+          "rokoko_BurstThroughDoor_mixamo_00611_mirror",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 30, \"yaw\": 60}"
+        ],
+        [
+          "rokoko_Flirty_mixamo_00321",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 30, \"yaw\": 330}"
+        ]
+      ],
+      "pose_top_k_equal": false,
+      "pose_top1_equal": false,
+      "baseline_people": 3,
+      "integrated_people": 3
+    },
+    {
+      "repeat": 0,
+      "case_id": "청룡성:p2",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "match": {
+        "index": 1,
+        "iou": 1.0
+      },
+      "baseline_match": {
+        "index": 2,
+        "iou": 1.0
+      },
+      "recommendation": {
+        "version": "body-coarse.v3.target-context",
+        "recommended_body_id": "male-base-v0-7-2",
+        "recommended_preset": "BASE",
+        "recommended_family": "male",
+        "observed_family": "male",
+        "recommendation_basis": "presentation_default",
+        "candidates": [
+          {
+            "body_id": "male-base-v0-7-2",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "male",
+            "version": "0.7.2",
+            "rank": 1,
+            "reason": "주 추천"
+          },
+          {
+            "body_id": "female-base-v0-3-4",
+            "display_name": "기본형",
+            "preset": "BASE",
+            "family": "female",
+            "version": "0.3.4",
+            "rank": 2,
+            "reason": "남녀 판독이 잠정적이거나 미확정일 때 다른 계열 기본형"
+          }
+        ],
+        "unresolved_axes": [
+          "presentation",
+          "fullness",
+          "proportion"
+        ],
+        "recognized_features": [],
+        "reasons": [
+          "놀란 표정의 간략한 선화 이목구비 / 간략한 반팔 형태의 의복 실루엣 / 다소 마른 보통 체격 실루엣",
+          "뚜렷한 체형 특징이 없으므로 해당 계열 기본형을 추천",
+          "남녀 판독이 잠정적이므로 다른 계열 기본형도 대안으로 제공"
+        ],
+        "auto_apply": false,
+        "applied_body_id": null,
+        "application_reason": "recommendation_only_no_runtime_asset_grant"
+      },
+      "family_correct": true,
+      "observed_correct": true,
+      "preset_correct": true,
+      "baseline_top_k": [
+        [
+          "rokoko_MiddleFingers_mixamo_00519_mirror",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 30, \"yaw\": 30}"
+        ],
+        [
+          "g1__M_Move8__n08_f0692",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 0, \"yaw\": 0}"
+        ],
+        [
+          "sd_cmu_102_18_f00034",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 30, \"yaw\": 0}"
+        ],
+        [
+          "g1__M_Move9__n03_f0298_mirror",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 30, \"yaw\": 330}"
+        ],
+        [
+          "gen_ac_dodge_lean__uppercut__x__h0",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 30, \"yaw\": 0}"
+        ]
+      ],
+      "integrated_top_k": [
+        [
+          "cmu_55_03_00431",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 30, \"yaw\": 30}"
+        ],
+        [
+          "rokoko_MiddleFingers_mixamo_00519",
+          "library_original",
+          "{\"distance\": null, \"pitch\": 30, \"yaw\": 0}"
+        ],
+        [
+          "g1__M_Move9__n03_f0298_mirror",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 30, \"yaw\": 300}"
+        ],
+        [
+          "rokoko_Singer_mixamo_01301_mirror",
+          "library_original",
+          "{\"distance\": 8.0, \"pitch\": 30, \"yaw\": 330}"
+        ],
+        [
+          "gen_st_contra__uppercut__x-j0__h3",
+          "library_original",
+          "{\"distance\": 4.0, \"pitch\": 30, \"yaw\": 0}"
+        ]
+      ],
+      "pose_top_k_equal": false,
+      "pose_top1_equal": false,
+      "baseline_people": 3,
+      "integrated_people": 3
+    }
+  ],
+  "live_comparison": {
+    "scope": "Paired live VLM runs, not a fixed-response replay; no independent pose-quality ground truth.",
+    "baseline_matched": 24,
+    "integrated_matched": 27,
+    "lost_match": [
+      "청룡성:p0"
+    ],
+    "gained_match": [
+      "131056:p0",
+      "131112:p4",
+      "131127:p0",
+      "131127:p1"
+    ],
+    "baseline_served": 16,
+    "integrated_served": 18,
+    "lost_pose": [
+      "131000:p1",
+      "131056:p2",
+      "4.56.21:p0",
+      "청룡성:p0"
+    ],
+    "gained_pose": [
+      "131056:p0",
+      "131127:p0",
+      "131127:p1",
+      "131211:p0",
+      "131211:p1",
+      "청룡성:p1"
+    ],
+    "keypoints_scores_equal": 7,
+    "both_matched": 23,
+    "cuts": [
+      {
+        "cut_id": "124629",
+        "baseline_vlm_count": 1,
+        "integrated_vlm_count": 1,
+        "baseline_people": 1,
+        "integrated_people": 1,
+        "baseline_invalid_raw_boxes": 1,
+        "integrated_invalid_raw_boxes": 0,
+        "both_successful": true
+      },
+      {
+        "cut_id": "124637",
+        "baseline_vlm_count": 1,
+        "integrated_vlm_count": 1,
+        "baseline_people": 1,
+        "integrated_people": 1,
+        "baseline_invalid_raw_boxes": 0,
+        "integrated_invalid_raw_boxes": 0,
+        "both_successful": true
+      },
+      {
+        "cut_id": "124702",
+        "baseline_vlm_count": 1,
+        "integrated_vlm_count": 1,
+        "baseline_people": 1,
+        "integrated_people": 1,
+        "baseline_invalid_raw_boxes": 0,
+        "integrated_invalid_raw_boxes": 0,
+        "both_successful": true
+      },
+      {
+        "cut_id": "131000",
+        "baseline_vlm_count": 2,
+        "integrated_vlm_count": 2,
+        "baseline_people": 2,
+        "integrated_people": 2,
+        "baseline_invalid_raw_boxes": 2,
+        "integrated_invalid_raw_boxes": 0,
+        "both_successful": true
+      },
+      {
+        "cut_id": "131040",
+        "baseline_vlm_count": 3,
+        "integrated_vlm_count": 3,
+        "baseline_people": 3,
+        "integrated_people": 3,
+        "baseline_invalid_raw_boxes": 1,
+        "integrated_invalid_raw_boxes": 0,
+        "both_successful": true
+      },
+      {
+        "cut_id": "131056",
+        "baseline_vlm_count": 3,
+        "integrated_vlm_count": 3,
+        "baseline_people": 3,
+        "integrated_people": 3,
+        "baseline_invalid_raw_boxes": 2,
+        "integrated_invalid_raw_boxes": 0,
+        "both_successful": true
+      },
+      {
+        "cut_id": "131112",
+        "baseline_vlm_count": 5,
+        "integrated_vlm_count": 5,
+        "baseline_people": 5,
+        "integrated_people": 5,
+        "baseline_invalid_raw_boxes": 5,
+        "integrated_invalid_raw_boxes": 0,
+        "both_successful": true
+      },
+      {
+        "cut_id": "131127",
+        "baseline_vlm_count": null,
+        "integrated_vlm_count": 4,
+        "baseline_people": 0,
+        "integrated_people": 4,
+        "baseline_invalid_raw_boxes": 0,
+        "integrated_invalid_raw_boxes": 0,
+        "both_successful": false
+      },
+      {
+        "cut_id": "131145",
+        "baseline_vlm_count": 1,
+        "integrated_vlm_count": 1,
+        "baseline_people": 1,
+        "integrated_people": 1,
+        "baseline_invalid_raw_boxes": 0,
+        "integrated_invalid_raw_boxes": 0,
+        "both_successful": true
+      },
+      {
+        "cut_id": "131211",
+        "baseline_vlm_count": 2,
+        "integrated_vlm_count": 2,
+        "baseline_people": 2,
+        "integrated_people": 2,
+        "baseline_invalid_raw_boxes": 0,
+        "integrated_invalid_raw_boxes": 0,
+        "both_successful": true
+      },
+      {
+        "cut_id": "131224",
+        "baseline_vlm_count": 1,
+        "integrated_vlm_count": 1,
+        "baseline_people": 1,
+        "integrated_people": 1,
+        "baseline_invalid_raw_boxes": 0,
+        "integrated_invalid_raw_boxes": 0,
+        "both_successful": true
+      },
+      {
+        "cut_id": "171734",
+        "baseline_vlm_count": 1,
+        "integrated_vlm_count": 1,
+        "baseline_people": 1,
+        "integrated_people": 1,
+        "baseline_invalid_raw_boxes": 0,
+        "integrated_invalid_raw_boxes": 0,
+        "both_successful": true
+      },
+      {
+        "cut_id": "2.16.04",
+        "baseline_vlm_count": 2,
+        "integrated_vlm_count": 2,
+        "baseline_people": 2,
+        "integrated_people": 2,
+        "baseline_invalid_raw_boxes": 0,
+        "integrated_invalid_raw_boxes": 0,
+        "both_successful": true
+      },
+      {
+        "cut_id": "2.16.52",
+        "baseline_vlm_count": 3,
+        "integrated_vlm_count": 3,
+        "baseline_people": 3,
+        "integrated_people": 3,
+        "baseline_invalid_raw_boxes": 2,
+        "integrated_invalid_raw_boxes": 0,
+        "both_successful": true
+      },
+      {
+        "cut_id": "3.08.13",
+        "baseline_vlm_count": 2,
+        "integrated_vlm_count": 2,
+        "baseline_people": 2,
+        "integrated_people": 2,
+        "baseline_invalid_raw_boxes": 0,
+        "integrated_invalid_raw_boxes": 0,
+        "both_successful": true
+      },
+      {
+        "cut_id": "4.56.21",
+        "baseline_vlm_count": 1,
+        "integrated_vlm_count": 1,
+        "baseline_people": 1,
+        "integrated_people": 1,
+        "baseline_invalid_raw_boxes": 0,
+        "integrated_invalid_raw_boxes": 0,
+        "both_successful": true
+      },
+      {
+        "cut_id": "청룡성",
+        "baseline_vlm_count": 3,
+        "integrated_vlm_count": 3,
+        "baseline_people": 3,
+        "integrated_people": 3,
+        "baseline_invalid_raw_boxes": 0,
+        "integrated_invalid_raw_boxes": 1,
+        "both_successful": true
+      }
+    ],
+    "people": [
+      {
+        "case_id": "124629:p0",
+        "baseline_matched": true,
+        "integrated_matched": true,
+        "baseline_iou": 0.7971630711302063,
+        "integrated_iou": 0.8955882411876647,
+        "baseline_pose_ids": [
+          "rokoko_FootTapping_mixamo_00040",
+          "rokoko_PlayingSaxophone_mixamo_00539_mirror",
+          "b8_hold_hands_right",
+          "rokoko_Interogation_GoodCop_mixamo_00088",
+          "b2_hand_on_hip_talk"
+        ],
+        "integrated_pose_ids": [
+          "rokoko_FootTapping_mixamo_00040",
+          "rokoko_PlayingSaxophone_mixamo_00539_mirror",
+          "b8_hold_hands_right",
+          "rokoko_Interogation_GoodCop_mixamo_00088",
+          "b2_hand_on_hip_talk"
+        ],
+        "baseline_served": true,
+        "integrated_served": true,
+        "keypoints_scores_equal": false,
+        "baseline_refine_allowed": false,
+        "integrated_refine_allowed": false,
+        "baseline_scope": "full",
+        "integrated_scope": "full"
+      },
+      {
+        "case_id": "124637:p0",
+        "baseline_matched": true,
+        "integrated_matched": true,
+        "baseline_iou": 1.0,
+        "integrated_iou": 1.0,
+        "baseline_pose_ids": [
+          "gen_st_narrow__mg_wrist_hold__x-j0__h3_m"
+        ],
+        "integrated_pose_ids": [
+          "gen_st_narrow__mg_wrist_hold__x-j0__h3_m",
+          "gen_st_narrow__mg_wrist_hold__x-j0__h3"
+        ],
+        "baseline_served": true,
+        "integrated_served": true,
+        "keypoints_scores_equal": true,
+        "baseline_refine_allowed": false,
+        "integrated_refine_allowed": false,
+        "baseline_scope": "full",
+        "integrated_scope": "full"
+      },
+      {
+        "case_id": "124702:p0",
+        "baseline_matched": true,
+        "integrated_matched": true,
+        "baseline_iou": 0.8704528744174294,
+        "integrated_iou": 0.8704528744174294,
+        "baseline_pose_ids": [
+          "sd_cmu_114_05_f01284",
+          "sd_cmu_143_18_f00614",
+          "sd_cmu_114_05_f00954"
+        ],
+        "integrated_pose_ids": [
+          "sd_cmu_114_05_f01284",
+          "sd_cmu_143_18_f00614",
+          "cmu_79_22_00711_ground",
+          "sd_cmu_114_05_f00954"
+        ],
+        "baseline_served": true,
+        "integrated_served": true,
+        "keypoints_scores_equal": true,
+        "baseline_refine_allowed": false,
+        "integrated_refine_allowed": false,
+        "baseline_scope": "full",
+        "integrated_scope": "full"
+      },
+      {
+        "case_id": "131000:p0",
+        "baseline_matched": true,
+        "integrated_matched": true,
+        "baseline_iou": 0.6749093703449968,
+        "integrated_iou": 0.6237750243597701,
+        "baseline_pose_ids": [
+          "cmu_18_14_00277_mirror",
+          "cmu_85_14_01837_mirror",
+          "style100_WildLegs_FW_f000898_eed5ec3a",
+          "style100_HighKnees_FW_f007918_49438f60",
+          "cmu_23_19_00009"
+        ],
+        "integrated_pose_ids": [
+          "gen_kn_seiza__reach_fwd__hang__h0_r2_m",
+          "gen_ac_run_air__fist_chamber__x-j0__h3",
+          "gen_ac_lunge_deep__fist_chamber__x-j0__h1",
+          "gen_kn_one__guitar__x__h0",
+          "gen_ac_lunge_deep__sword_mid__x-j0__h5"
+        ],
+        "baseline_served": true,
+        "integrated_served": true,
+        "keypoints_scores_equal": false,
+        "baseline_refine_allowed": false,
+        "integrated_refine_allowed": false,
+        "baseline_scope": "full",
+        "integrated_scope": "full"
+      },
+      {
+        "case_id": "131000:p1",
+        "baseline_matched": true,
+        "integrated_matched": true,
+        "baseline_iou": 0.8994605562095537,
+        "integrated_iou": 0.6903692256992469,
+        "baseline_pose_ids": [
+          "mass_basketball_chest_pass",
+          "webtoon_romance_05",
+          "rokoko_Judge_mixamo_00006_mirror",
+          "webtoon_romance_39",
+          "gen_st_wall__give_gift__x__h4"
+        ],
+        "integrated_pose_ids": [],
+        "baseline_served": true,
+        "integrated_served": false,
+        "keypoints_scores_equal": false,
+        "baseline_refine_allowed": false,
+        "integrated_refine_allowed": false,
+        "baseline_scope": "half",
+        "integrated_scope": "half"
+      },
+      {
+        "case_id": "131040:p0",
+        "baseline_matched": true,
+        "integrated_matched": true,
+        "baseline_iou": 0.9039053649837462,
+        "integrated_iou": 0.9336607406567689,
+        "baseline_pose_ids": [],
+        "integrated_pose_ids": [],
+        "baseline_served": false,
+        "integrated_served": false,
+        "keypoints_scores_equal": false,
+        "baseline_refine_allowed": false,
+        "integrated_refine_allowed": false,
+        "baseline_scope": "full",
+        "integrated_scope": "full"
+      },
+      {
+        "case_id": "131040:p1",
+        "baseline_matched": true,
+        "integrated_matched": true,
+        "baseline_iou": 0.7116960474500758,
+        "integrated_iou": 0.7116960474500758,
+        "baseline_pose_ids": [],
+        "integrated_pose_ids": [],
+        "baseline_served": false,
+        "integrated_served": false,
+        "keypoints_scores_equal": true,
+        "baseline_refine_allowed": false,
+        "integrated_refine_allowed": false,
+        "baseline_scope": "full",
+        "integrated_scope": "full"
+      },
+      {
+        "case_id": "131056:p0",
+        "baseline_matched": false,
+        "integrated_matched": true,
+        "baseline_iou": null,
+        "integrated_iou": 0.8904274020311354,
+        "baseline_pose_ids": [],
+        "integrated_pose_ids": [
+          "a1_phone_stand_one_mirror",
+          "rokoko_FootTapping_mixamo_00452_mirror",
+          "gen_st_bent_knees__broom__x__h4",
+          "gen_st_lean_fwd__broom__x__h0",
+          "b2_ok_sign_mirror"
+        ],
+        "baseline_served": false,
+        "integrated_served": true,
+        "keypoints_scores_equal": false,
+        "baseline_refine_allowed": null,
+        "integrated_refine_allowed": false,
+        "baseline_scope": null,
+        "integrated_scope": "full"
+      },
+      {
+        "case_id": "131056:p2",
+        "baseline_matched": true,
+        "integrated_matched": true,
+        "baseline_iou": 0.9213241891995567,
+        "integrated_iou": 0.9213241891995567,
+        "baseline_pose_ids": [
+          "rokoko_FootTapping_mixamo_00114"
+        ],
+        "integrated_pose_ids": [],
+        "baseline_served": true,
+        "integrated_served": false,
+        "keypoints_scores_equal": false,
+        "baseline_refine_allowed": false,
+        "integrated_refine_allowed": false,
+        "baseline_scope": "full",
+        "integrated_scope": "full"
+      },
+      {
+        "case_id": "131112:p0",
+        "baseline_matched": true,
+        "integrated_matched": true,
+        "baseline_iou": 0.8529418900903486,
+        "integrated_iou": 0.9786177435956501,
+        "baseline_pose_ids": [],
+        "integrated_pose_ids": [],
+        "baseline_served": false,
+        "integrated_served": false,
+        "keypoints_scores_equal": false,
+        "baseline_refine_allowed": false,
+        "integrated_refine_allowed": false,
+        "baseline_scope": "full",
+        "integrated_scope": "full"
+      },
+      {
+        "case_id": "131112:p3",
+        "baseline_matched": true,
+        "integrated_matched": true,
+        "baseline_iou": 0.8011857338246561,
+        "integrated_iou": 0.9062040669409698,
+        "baseline_pose_ids": [],
+        "integrated_pose_ids": [],
+        "baseline_served": false,
+        "integrated_served": false,
+        "keypoints_scores_equal": false,
+        "baseline_refine_allowed": false,
+        "integrated_refine_allowed": false,
+        "baseline_scope": "full",
+        "integrated_scope": "full"
+      },
+      {
+        "case_id": "131112:p4",
+        "baseline_matched": false,
+        "integrated_matched": true,
+        "baseline_iou": null,
+        "integrated_iou": 0.7955443419365233,
+        "baseline_pose_ids": [],
+        "integrated_pose_ids": [],
+        "baseline_served": false,
+        "integrated_served": false,
+        "keypoints_scores_equal": false,
+        "baseline_refine_allowed": null,
+        "integrated_refine_allowed": false,
+        "baseline_scope": null,
+        "integrated_scope": "full"
+      },
+      {
+        "case_id": "131127:p0",
+        "baseline_matched": false,
+        "integrated_matched": true,
+        "baseline_iou": null,
+        "integrated_iou": 0.39942905693006026,
+        "baseline_pose_ids": [],
+        "integrated_pose_ids": [
+          "sd_cmu_143_11_f00254",
+          "sd_cmu_111_38_f01284",
+          "sd_cmu_14_20_f03124",
+          "ext_pushup_top_straight_arms",
+          "a2_kneel_hands_floor_cry"
+        ],
+        "baseline_served": false,
+        "integrated_served": true,
+        "keypoints_scores_equal": false,
+        "baseline_refine_allowed": null,
+        "integrated_refine_allowed": false,
+        "baseline_scope": null,
+        "integrated_scope": "half"
+      },
+      {
+        "case_id": "131127:p1",
+        "baseline_matched": false,
+        "integrated_matched": true,
+        "baseline_iou": null,
+        "integrated_iou": 0.9474508013752359,
+        "baseline_pose_ids": [],
+        "integrated_pose_ids": [
+          "b8_hold_hands_right",
+          "b1_fists_anger",
+          "b8_wall_pin_pinned",
+          "webtoon_daily_16",
+          "gen_st_wall__sword_side__hang__h5"
+        ],
+        "baseline_served": false,
+        "integrated_served": true,
+        "keypoints_scores_equal": false,
+        "baseline_refine_allowed": null,
+        "integrated_refine_allowed": false,
+        "baseline_scope": null,
+        "integrated_scope": "full"
+      },
+      {
+        "case_id": "131145:p0",
+        "baseline_matched": true,
+        "integrated_matched": true,
+        "baseline_iou": 0.9659498346057779,
+        "integrated_iou": 0.9659498346057779,
+        "baseline_pose_ids": [
+          "a5_attention",
+          "b8_wall_pin_pinned",
+          "rokoko_Clipboard_Lever_Computer_mixamo_00105",
+          "rokoko_DoubleTakes_mixamo_00167_mirror",
+          "b8_wrist_pull_pulled"
+        ],
+        "integrated_pose_ids": [
+          "a5_attention",
+          "b8_wall_pin_pinned",
+          "rokoko_Clipboard_Lever_Computer_mixamo_00105",
+          "rokoko_DoubleTakes_mixamo_00167_mirror",
+          "b8_wrist_pull_pulled"
+        ],
+        "baseline_served": true,
+        "integrated_served": true,
+        "keypoints_scores_equal": true,
+        "baseline_refine_allowed": false,
+        "integrated_refine_allowed": false,
+        "baseline_scope": "full",
+        "integrated_scope": "full"
+      },
+      {
+        "case_id": "131211:p0",
+        "baseline_matched": true,
+        "integrated_matched": true,
+        "baseline_iou": 0.8856177916551856,
+        "integrated_iou": 0.8856177916551856,
+        "baseline_pose_ids": [],
+        "integrated_pose_ids": [
+          "UAL2__Consume__p01_f0016",
+          "combat_ual1_Spell_Simple_Shoot_f00400",
+          "g1__M_Move2__n02_f1241_mirror",
+          "g1__B_Fence2__n02_f0311_mirror",
+          "g1__M_Move4__n02_f0844_mirror"
+        ],
+        "baseline_served": false,
+        "integrated_served": true,
+        "keypoints_scores_equal": true,
+        "baseline_refine_allowed": false,
+        "integrated_refine_allowed": false,
+        "baseline_scope": "full",
+        "integrated_scope": "full"
+      },
+      {
+        "case_id": "131211:p1",
+        "baseline_matched": true,
+        "integrated_matched": true,
+        "baseline_iou": 0.8381989135400589,
+        "integrated_iou": 0.9206195098981831,
+        "baseline_pose_ids": [],
+        "integrated_pose_ids": [
+          "style100_Skip_FR_f000414_49438f60",
+          "rokoko_SitcomIntroShots_mixamo_00522_mirror",
+          "rokoko_Judge_mixamo_00669_mirror",
+          "rokoko_ShoulderShimmy_mixamo_00659_mirror",
+          "rokoko_AssaultRifle_mixamo_00091"
+        ],
+        "baseline_served": false,
+        "integrated_served": true,
+        "keypoints_scores_equal": false,
+        "baseline_refine_allowed": false,
+        "integrated_refine_allowed": false,
+        "baseline_scope": "full",
+        "integrated_scope": "full"
+      },
+      {
+        "case_id": "131224:p0",
+        "baseline_matched": true,
+        "integrated_matched": true,
+        "baseline_iou": 0.7591221464040895,
+        "integrated_iou": 0.7879277231047997,
+        "baseline_pose_ids": [],
+        "integrated_pose_ids": [],
+        "baseline_served": false,
+        "integrated_served": false,
+        "keypoints_scores_equal": false,
+        "baseline_refine_allowed": false,
+        "integrated_refine_allowed": false,
+        "baseline_scope": "full",
+        "integrated_scope": "full"
+      },
+      {
+        "case_id": "171734:p0",
+        "baseline_matched": true,
+        "integrated_matched": true,
+        "baseline_iou": 0.7734475365860787,
+        "integrated_iou": 0.7734475365860787,
+        "baseline_pose_ids": [
+          "g1__M_Move5__n01_f0515",
+          "g1__M_Move5__n02_f0534",
+          "cmu_106_14_00353",
+          "sd_cmu_102_26_f00404",
+          "cmu_78_35_00115_mirror"
+        ],
+        "integrated_pose_ids": [
+          "g1__M_Move5__n01_f0515",
+          "g1__M_Move5__n02_f0534",
+          "cmu_106_14_00353",
+          "sd_cmu_102_26_f00404",
+          "cmu_78_35_00115_mirror"
+        ],
+        "baseline_served": true,
+        "integrated_served": true,
+        "keypoints_scores_equal": true,
+        "baseline_refine_allowed": false,
+        "integrated_refine_allowed": false,
+        "baseline_scope": "half",
+        "integrated_scope": "half"
+      },
+      {
+        "case_id": "2.16.04:p0",
+        "baseline_matched": true,
+        "integrated_matched": true,
+        "baseline_iou": 0.9349538357317836,
+        "integrated_iou": 0.7990135667687416,
+        "baseline_pose_ids": [
+          "webtoon_fantasy_19",
+          "gen_kn_upright__sw_slash_follow__x-j0__h2_m",
+          "gen_ac_jump_split__sw_slash_follow__x__h2",
+          "webtoon_combat_02",
+          "rokoko_RescuingDeadFriend_mixamo_00684_mirror"
+        ],
+        "integrated_pose_ids": [
+          "webtoon_fantasy_19",
+          "style100_HighKnees_FR_f000317_49438f60",
+          "rokoko_Lawyer_02_mixamo_00008_mirror",
+          "b3_door_knob",
+          "style100_TwoFootJump_FR_f000659_49438f60"
+        ],
+        "baseline_served": true,
+        "integrated_served": true,
+        "keypoints_scores_equal": true,
+        "baseline_refine_allowed": false,
+        "integrated_refine_allowed": false,
+        "baseline_scope": "full",
+        "integrated_scope": "half"
+      },
+      {
+        "case_id": "2.16.04:p1",
+        "baseline_matched": true,
+        "integrated_matched": true,
+        "baseline_iou": 0.7239008819533232,
+        "integrated_iou": 0.7239008819533232,
+        "baseline_pose_ids": [
+          "rokoko_PlayingSaxophone_mixamo_00524_mirror",
+          "rokoko_FistPumps_mixamo_00951",
+          "rokoko_DoubleTakes_mixamo_00619_mirror",
+          "rokoko_MiddleFingers_mixamo_00604_mirror",
+          "sd_cmu_14_30_f01454"
+        ],
+        "integrated_pose_ids": [
+          "rokoko_PlayingSaxophone_mixamo_00524_mirror",
+          "rokoko_FistPumps_mixamo_00951",
+          "rokoko_DoubleTakes_mixamo_00619_mirror",
+          "rokoko_MiddleFingers_mixamo_00604_mirror",
+          "rokoko_PlayingGuitar_mixamo_00584_mirror"
+        ],
+        "baseline_served": true,
+        "integrated_served": true,
+        "keypoints_scores_equal": false,
+        "baseline_refine_allowed": false,
+        "integrated_refine_allowed": false,
+        "baseline_scope": "half",
+        "integrated_scope": "half"
+      },
+      {
+        "case_id": "2.16.52:p0",
+        "baseline_matched": true,
+        "integrated_matched": true,
+        "baseline_iou": 0.66922228609743,
+        "integrated_iou": 0.7447537270581372,
+        "baseline_pose_ids": [
+          "rokoko_SitcomCameraLooks_mixamo_00706",
+          "Looking_01_mirror",
+          "rokoko_DoubleTakes_mixamo_00092_mirror",
+          "Shaking Hands 2_02_mirror",
+          "Female Standing Pose_01_legfix_mirror"
+        ],
+        "integrated_pose_ids": [
+          "b6_look_back_walk",
+          "rokoko_TakingAGroupPhoto_mixamo_01203_mirror",
+          "rokoko_SitcomCameraLooks_mixamo_00706",
+          "rokoko_DoubleTakes_mixamo_00167",
+          "rokoko_Judges_mixamo_00061_mirror"
+        ],
+        "baseline_served": true,
+        "integrated_served": true,
+        "keypoints_scores_equal": false,
+        "baseline_refine_allowed": false,
+        "integrated_refine_allowed": false,
+        "baseline_scope": "full",
+        "integrated_scope": "half"
+      },
+      {
+        "case_id": "2.16.52:p2",
+        "baseline_matched": true,
+        "integrated_matched": true,
+        "baseline_iou": 0.8763631394323522,
+        "integrated_iou": 0.8763631394323522,
+        "baseline_pose_ids": [
+          "gen_st_wall__phone_both__x__h3",
+          "gen_ch_feet_tuck__phone_both__x__h5",
+          "gen_st_narrow__phone_both__x__h4_m",
+          "gen_ch_slouch__phone_both__x__h0_m",
+          "gen_ch_feet_out__phone_both__x__h0_m"
+        ],
+        "integrated_pose_ids": [
+          "gen_st_wall__phone_both__x__h3",
+          "gen_ch_feet_tuck__phone_both__x__h5",
+          "gen_st_narrow__phone_both__x__h4_m",
+          "gen_ch_feet_out__phone_both__x__h0",
+          "gen_ch_slouch__phone_both__x__h0_m"
+        ],
+        "baseline_served": true,
+        "integrated_served": true,
+        "keypoints_scores_equal": false,
+        "baseline_refine_allowed": false,
+        "integrated_refine_allowed": false,
+        "baseline_scope": "full",
+        "integrated_scope": "full"
+      },
+      {
+        "case_id": "3.08.13:p0",
+        "baseline_matched": true,
+        "integrated_matched": true,
+        "baseline_iou": 0.7032825380882974,
+        "integrated_iou": 0.7032825380882974,
+        "baseline_pose_ids": [
+          "rokoko_SitDown_UseLaptop_mixamo_00857",
+          "rokoko_Lawyer_01_mixamo_00878",
+          "Shaking Hands 1_01",
+          "gen_ac_low_ready__mg_beam__x-j0__h2",
+          "Great Sword Strafe_00034"
+        ],
+        "integrated_pose_ids": [
+          "gen_ac_low_ready__mg_beam__x-j0__h2",
+          "rokoko_FistPumps_mixamo_00838_mirror",
+          "gen_ac_brace__mg_beam__x-j0__h0",
+          "webtoon_daily_18",
+          "Great Sword Strafe_00034"
+        ],
+        "baseline_served": true,
+        "integrated_served": true,
+        "keypoints_scores_equal": false,
+        "baseline_refine_allowed": false,
+        "integrated_refine_allowed": false,
+        "baseline_scope": "full",
+        "integrated_scope": "full"
+      },
+      {
+        "case_id": "4.56.21:p0",
+        "baseline_matched": true,
+        "integrated_matched": true,
+        "baseline_iou": 0.931154792866708,
+        "integrated_iou": 0.9391737147685455,
+        "baseline_pose_ids": [
+          "cmu_143_16_00087_mirror"
+        ],
+        "integrated_pose_ids": [],
+        "baseline_served": true,
+        "integrated_served": false,
+        "keypoints_scores_equal": false,
+        "baseline_refine_allowed": false,
+        "integrated_refine_allowed": false,
+        "baseline_scope": "full",
+        "integrated_scope": "full"
+      },
+      {
+        "case_id": "청룡성:p0",
+        "baseline_matched": true,
+        "integrated_matched": false,
+        "baseline_iou": 1.0,
+        "integrated_iou": null,
+        "baseline_pose_ids": [
+          "rokoko_StandUpComedian_mixamo_00824",
+          "rokoko_Flirty_mixamo_00964_mirror",
+          "rokoko_Lawyer_01_mixamo_00669_mirror",
+          "rokoko_FootTapping_mixamo_00452_mirror",
+          "a4_tray_both_hands"
+        ],
+        "integrated_pose_ids": [],
+        "baseline_served": true,
+        "integrated_served": false,
+        "keypoints_scores_equal": false,
+        "baseline_refine_allowed": false,
+        "integrated_refine_allowed": null,
+        "baseline_scope": "full",
+        "integrated_scope": null
+      },
+      {
+        "case_id": "청룡성:p1",
+        "baseline_matched": true,
+        "integrated_matched": true,
+        "baseline_iou": 0.8965316154328892,
+        "integrated_iou": 0.6903389361252467,
+        "baseline_pose_ids": [],
+        "integrated_pose_ids": [
+          "rokoko_Flirty_mixamo_00964_mirror",
+          "rokoko_Host_mixamo_00564",
+          "rokoko_TakingAGroupPhoto_mixamo_01203",
+          "rokoko_BurstThroughDoor_mixamo_00611_mirror",
+          "rokoko_Flirty_mixamo_00321"
+        ],
+        "baseline_served": false,
+        "integrated_served": true,
+        "keypoints_scores_equal": false,
+        "baseline_refine_allowed": false,
+        "integrated_refine_allowed": false,
+        "baseline_scope": "full",
+        "integrated_scope": "full"
+      },
+      {
+        "case_id": "청룡성:p2",
+        "baseline_matched": true,
+        "integrated_matched": true,
+        "baseline_iou": 1.0,
+        "integrated_iou": 1.0,
+        "baseline_pose_ids": [
+          "rokoko_MiddleFingers_mixamo_00519_mirror",
+          "g1__M_Move8__n08_f0692",
+          "sd_cmu_102_18_f00034",
+          "g1__M_Move9__n03_f0298_mirror",
+          "gen_ac_dodge_lean__uppercut__x__h0"
+        ],
+        "integrated_pose_ids": [
+          "cmu_55_03_00431",
+          "rokoko_MiddleFingers_mixamo_00519",
+          "g1__M_Move9__n03_f0298_mirror",
+          "rokoko_Singer_mixamo_01301_mirror",
+          "gen_st_contra__uppercut__x-j0__h3"
+        ],
+        "baseline_served": true,
+        "integrated_served": true,
+        "keypoints_scores_equal": false,
+        "baseline_refine_allowed": false,
+        "integrated_refine_allowed": false,
+        "baseline_scope": "full",
+        "integrated_scope": "full"
+      }
+    ]
+  }
+}
