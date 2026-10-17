@@ -42,6 +42,7 @@ from converter.thumbnail_render import (  # noqa: E402 - bpy는 함수 안에서
     render_artifact_view,
 )
 from converter.framing import FRAMING_VERSION, PREVIEW_VIEWS, validate_scope
+from converter.hand_library import HandLibraryError, normalize_request as normalize_hands
 
 
 class JobValidationError(ValueError):
@@ -101,7 +102,8 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
         "apply_root_translation", "embed_textures",
         "force_exact_v324", "thumbnail",
     }
-    unknown = set(raw) - required - {"output_scope", "preview_view", "camera_rotation", "preview_model", "shape_recipe"}
+    unknown = set(raw) - required - {
+        "output_scope", "preview_view", "camera_rotation", "preview_model", "shape_recipe", "hands"}
     missing = required - set(raw)
     if missing or unknown:
         raise JobValidationError(
@@ -150,6 +152,12 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
         raise JobValidationError("invalid preview_view")
     if raw["force_exact_v324"] and output_scope != "full":
         raise JobValidationError("exact V3.2.4 mode permits full framing only")
+    try:
+        hands = normalize_hands(raw.get("hands"))
+    except HandLibraryError as exc:
+        raise JobValidationError(f"invalid hands: {exc}") from exc
+    if hands is not None and raw["force_exact_v324"]:
+        raise JobValidationError("exact V3.2.4 mode does not permit hand presets")
 
     unresolved_temp = _absolute_path(raw["temp_dir"], "temp_dir")
     if unresolved_temp.is_symlink():
@@ -188,6 +196,7 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
         "output_path": str(output),
         "report_path": str(report),
         "thumbnail": thumbnail,
+        "hands": hands,
     })
     return normalized
 
@@ -334,6 +343,11 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
     payload = report.as_dict()
     if recipe is not None and report.ok:
         payload["shape_bake"] = json.loads(Path(job["output_path"]).with_suffix(".shape.json").read_text())
+    if report.ok and job.get("hands") is not None:
+        # 손은 몸 변환 직후, 메시 절단·카메라 회전·미리보기보다 먼저 굽는다.
+        # 그래야 이후 단계가 모두 손이 적용된 실제 산출물을 다시 읽는다.
+        from converter.hands import bake_hands
+        payload["hands"] = bake_hands(job["output_path"], job["hands"])
     if report.ok:
         from converter.framing import process_output
         scope = job.get("output_scope", "full")

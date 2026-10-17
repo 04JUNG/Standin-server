@@ -1,0 +1,649 @@
+{
+  "ok": true,
+  "cases": [
+    {
+      "cut_id": "S3-p_rough_028",
+      "variant": "raw",
+      "person_count": 2,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.0000036296964432862125,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000004091964235627703,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-p_rough_028",
+      "variant": "final",
+      "person_count": 2,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000002233527557653293,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.00000388703179227739,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-p_rough_038",
+      "variant": "raw",
+      "person_count": 2,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000003489426739735564,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000003126194689433943,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-p_rough_038",
+      "variant": "final",
+      "person_count": 2,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000003489426739735564,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000003126194689433943,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-p_rough_139",
+      "variant": "raw",
+      "person_count": 2,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.0000031305457969934752,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000009423732482778158,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-p_rough_139",
+      "variant": "final",
+      "person_count": 2,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.0000031305457969934752,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000009423732482778158,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-p_rough_060",
+      "variant": "raw",
+      "person_count": 2,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.0000036317633277249943,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.0000034486047228804622,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-p_rough_060",
+      "variant": "final",
+      "person_count": 2,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.0000036959195964193076,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000002871520751376713,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-p_rough_066",
+      "variant": "raw",
+      "person_count": 2,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000005833167048159967,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.000003064810402202489,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-p_rough_066",
+      "variant": "final",
+      "person_count": 2,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000005833167048159967,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.000003064810402202489,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-p_rough_128",
+      "variant": "raw",
+      "person_count": 1,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000026366050989914657,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-p_rough_128",
+      "variant": "final",
+      "person_count": 1,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000026366050989914657,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-p_rough_220",
+      "variant": "raw",
+      "person_count": 2,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 28320,
+          "max_world_error_m": 0.000002493646977585641,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000008022365539172686,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-p_rough_220",
+      "variant": "final",
+      "person_count": 2,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 28320,
+          "max_world_error_m": 0.000002493646977585641,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000008022365539172686,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-v3_rough_0270",
+      "variant": "raw",
+      "person_count": 3,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.000003625290001569545,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.000018223832793716435,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 2,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.000010384306298826078,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-v3_rough_0270",
+      "variant": "final",
+      "person_count": 3,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.000003625290001569545,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.000018223832793716435,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 2,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.000010384306298826078,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-v3_rough_0718",
+      "variant": "raw",
+      "person_count": 3,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.000003019568712095098,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.0000026738478450930635,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 2,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.0000034521701183809293,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-v3_rough_0718",
+      "variant": "final",
+      "person_count": 3,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.000002628080083925895,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.0000026904597975771688,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 2,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.0000034521701183809293,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-p_rough_219",
+      "variant": "raw",
+      "person_count": 3,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000004944596589095678,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.000005954447271062484,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 2,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.000010765913186785348,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-p_rough_219",
+      "variant": "final",
+      "person_count": 3,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000004944596589095678,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.000005954447271062484,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 2,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.000010765913186785348,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-v3_rough_0275",
+      "variant": "raw",
+      "person_count": 3,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.000012230285584181354,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.000003505522999428622,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 2,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000006997135712045045,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-v3_rough_0275",
+      "variant": "final",
+      "person_count": 3,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.000012230285584181354,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.000003505522999428622,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 2,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000006997135712045045,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-p_rough_047",
+      "variant": "raw",
+      "person_count": 4,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000006149001920155179,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000004143849841459656,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 2,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000002440455093153402,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 3,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000005044044403960524,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-p_rough_047",
+      "variant": "final",
+      "person_count": 4,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000006149001920155179,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000004143849841459656,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 2,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000002800031163260654,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 3,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.0000043147146094163255,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-p_rough_111",
+      "variant": "raw",
+      "person_count": 5,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.0000028619640927633373,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000003833115979644163,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 2,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.000002541434318061094,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 3,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.0000029708612812491097,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 4,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.000003127165985504958,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-p_rough_111",
+      "variant": "final",
+      "person_count": 5,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.0000028619640927633373,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000005144116226224396,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 2,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.00000296914549301336,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 3,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.0000020231171039328696,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 4,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.0000031271659857462268,
+          "physical_scale": 1
+        }
+      ]
+    }
+  ],
+  "skin_weight_truncation_warnings": 136,
+  "scope": "all source-to-merged skin vertices, bones, person roots; JSON camera required for exact framing"
+}

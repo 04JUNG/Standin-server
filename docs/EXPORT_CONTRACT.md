@@ -9,7 +9,9 @@
 
 > ⚠ **BVH는 1인만 지원한다(위치도 미반영).** 그래서 **export item 1개 = 1인 BVH 1개**다.
 > 다인 컷은 인물 수만큼 item(=1인 BVH)이 나오고, 얽힘(포옹·격투)도 2인 BVH가 아니라
-> **1인 BVH 여러 개를 `set_id`로 묶어** 표현한다. 상대 위치는 BVH가 안 실으므로 작가가 CSP에서 맞춘다.
+> **1인 BVH 여러 개를 `set_id`로 묶어** 표현한다. BVH는 상대 위치를 담지 않는다.
+> 04J-289의 추가 내부 API `/compose-scene`은 최종 인물별 FBX와 명시적 3D 배치를 받아
+> **1컷 다인 FBX**를 만든다. 기존 인물별 BVH·FBX 흐름 뒤에 선택적으로 연결한다.
 
 **세 계약은 별개다:**
 - `/analyze` = "Top5 **보여주기**"(인물별 후보 리스트). → `CutResult`
@@ -17,12 +19,24 @@
 - `/export-order` = base 선택만 표현하는 legacy 주문서. → `ExportOrder`
 - `/convert-bundle` = 최종 BVH 원문과 그 바이트로 만든 V3.2 FBX를 무결성 manifest와 함께 반환.
 - `/convert` = 하위 호환용 FBX 단일 응답.
+- `/compose-scene` = 최종 1인 rigged-rest FBX 여러 개 + Y-up 미터 배치 → `scene.fbx`와 manifest ZIP.
 
 `/analyze`의 VLM 실패 원인·재시도 필드는 `API_CONTRACT.md` §7-1을 따른다.
 이는 분석 실패 안내만 확장하며, 정상 스켈레톤·선택·BVH/FBX export 계약은 바꾸지 않는다.
 
 FastAPI inference가 DB에서 legacy 주문서의 `bvh_url·set_id·tags`를 채운다. 최종 base/refined
 선택과 artifact 영속화는 BFF가 소유한다.
+
+### 전신 동적 라우팅 검수 후보의 경계 (2026-10-16)
+
+`/analyze.people[].dynamic_search`의 원본 후보·`near_candidates`·`generation`·`basic_model`은
+기존 자동 export 흐름으로 직접 연결하지 않는다. 새 경로는 `refine_allowed=false`,
+`release_allowed=false`이며, 실제 인체 변환 후 검수와 사용자 선택이 필요하다.
+생성 BVH는 `generation.candidates[].bvh` 본문으로만 제공되고 `/pose/{id}/bvh`에 등록되지 않는다.
+로컬 손 피부 교차 검사 통과도 손-몸통/소품/동일 손 내부 전체의 충돌 인증은 아니다.
+출력 범위는 `output_scope.mesh_scope`를 변환기의 `output_scope`에 전달한다
+(`full`, 팔·손을 보존하는 `half`, 목·어깨선·머리만 남기는 `shoulder_head`).
+이 PR은 기존 `/export-order` 요청 스키마나 운영 export 승인 정책을 확장하지 않는다.
 
 ---
 
@@ -198,7 +212,10 @@ X-Standin-Solver-Version           == chain-transport-v3.2
 
 mirror는 Converter가 한 번만 적용한다. CSP는 같은 좌우 반전을 다시 하지 않고 소재 등록·배치와
 다인 상대 위치 조정을 담당한다. 다인 컷은 item 수만큼 독립 Converter 요청과 독립
-`BVH + FBX` 쌍이 생긴다. `set_id`는 묶음 메타일 뿐 하나의 다인 BVH/FBX가 아니다.
+`BVH + FBX` 쌍이 생긴다. `set_id` 자체는 묶음 메타다. 이 최종 FBX들을 명시적 3D 배치와
+함께 `/compose-scene`에 넘기면 한 컷 다인 FBX를 만들 수 있다. 스켈레톤/2D bbox만으로
+깊이를 복원하지 않으며 BFF/뷰어가 배치값을 확정한다. 호출 규격과 검증은
+[`FBX_MULTI_PERSON_SCENE.md`](FBX_MULTI_PERSON_SCENE.md)를 따른다.
 
 상세 BFF 구현·lineage·오류 계약은
 [`FBX_CONVERTER_V3_2_PHASE3_BFF_HANDOFF.md`](FBX_CONVERTER_V3_2_PHASE3_BFF_HANDOFF.md)를 따른다.

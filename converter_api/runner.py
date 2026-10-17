@@ -227,6 +227,10 @@ class BlenderRunner:
     _VERSION_RE = re.compile(r"Blender\s+(\d+\.\d+\.\d+)(?:\s+LTS)?")
     _BUILD_HASH_RE = re.compile(r"(?:build hash:|hash)\s*([0-9a-f]{8,40})", re.I)
 
+    def compose_scene(self, *, manifest, fbx_bytes):
+        from converter_api.scene_runner import compose_scene
+        return compose_scene(self, manifest=manifest, fbx_bytes=fbx_bytes)
+
     def __init__(self, settings: RunnerSettings | None = None):
         self.settings = settings or RunnerSettings.from_env()
         if self.settings.timeout_seconds <= 0:
@@ -405,6 +409,7 @@ class BlenderRunner:
         camera_rotation: list | None = None,
         preview_model: bool = False,
         shape_recipe: dict | None = None,
+        hands: dict | None = None,
     ) -> ConversionResult:
         if shape_recipe is not None and report.get("ok"):
             shape = report.get("shape_bake", {})
@@ -445,6 +450,15 @@ class BlenderRunner:
         if output_scope != "full" or preview_view or preview_model:
             if report.get("output_scope") != output_scope or report.get("framing_version") != FRAMING_VERSION:
                 mismatched.append("output_scope/framing_version")
+        if hands is not None:
+            from converter.hand_library import load_library
+            baked = report.get("hands") or {}
+            if (baked.get("left") != hands.get("left") or baked.get("right") != hands.get("right")
+                    or baked.get("library_sha256") != load_library().sha256
+                    or baked.get("body_bones_preserved") is not True):
+                mismatched.append("hands")
+        elif report.get("hands") is not None:
+            mismatched.append("hands")
         if mismatched:
             raise WorkerIntegrityError(
                 f"worker report lineage mismatch: {','.join(sorted(mismatched))}",
@@ -599,6 +613,7 @@ class BlenderRunner:
         camera_rotation: list | None = None,
         preview_model: bool = False,
         shape_recipe: dict | None = None,
+        hands: dict | None = None,
     ) -> ConversionResult:
         if shape_recipe is not None and self.settings.force_exact_v324:
             raise ConversionRejectedError("exact V3.2.4 mode does not permit shape baking")
@@ -626,6 +641,13 @@ class BlenderRunner:
             raise ConversionRejectedError("invalid preview model options")
         if camera_rotation is not None and ((preview_view != "front" and not preview_model) or mirror or thumbnail or self.settings.force_exact_v324):
             raise ConversionRejectedError("invalid aligned camera options")
+        from converter.hand_library import HandLibraryError, normalize_request
+        try:
+            hands = normalize_request(hands)
+        except HandLibraryError as exc:
+            raise ConversionRejectedError(f"invalid hands: {exc}") from exc
+        if hands is not None and self.settings.force_exact_v324:
+            raise ConversionRejectedError("exact V3.2.4 mode does not permit hand presets")
         queue_started = time.monotonic()
         self._process_slots.acquire()
         queue_wait_ms = (time.monotonic() - queue_started) * 1000.0
@@ -646,6 +668,7 @@ class BlenderRunner:
                 camera_rotation=camera_rotation,
                 preview_model=preview_model,
                 shape_recipe=shape_recipe,
+                hands=hands,
             )
         finally:
             execution_ms = (time.monotonic() - execution_started) * 1000.0
@@ -674,6 +697,7 @@ class BlenderRunner:
         camera_rotation: list | None = None,
         preview_model: bool = False,
         shape_recipe: dict | None = None,
+        hands: dict | None = None,
     ) -> ConversionResult:
         if not character_path.is_file() or character_path.suffix.lower() != ".fbx":
             raise WorkerIntegrityError("character artifact is not a regular FBX file")
@@ -725,6 +749,8 @@ class BlenderRunner:
                 "preview_model": preview_model,
                 **({"shape_recipe": shape_recipe} if shape_recipe is not None else {}),
             }
+            if hands is not None:
+                job["hands"] = hands
             job_path.write_text(
                 json.dumps(job, sort_keys=True, separators=(",", ":")) + "\n",
                 encoding="utf-8",
@@ -775,6 +801,7 @@ class BlenderRunner:
                 camera_rotation=camera_rotation,
                 preview_model=preview_model,
                 shape_recipe=shape_recipe,
+                hands=hands,
             )
 
 

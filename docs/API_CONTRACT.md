@@ -1,10 +1,38 @@
 # API 계약 — 도원 추론 서버 (FastAPI)
 
-> 상태: 현재 계약 · 갱신일: 2026-10-02 · 기준 코드: `api/app.py`, `api/models.py`
+> 상태: 현재 계약 · 갱신일: 2026-10-16 · 기준 코드: `api/app.py`, `api/models.py`
 >
 > 이 문서는 **실제 구현된** HTTP 계약(`api/app.py`·`api/models.py`)을 문서화한다.
 > `/export-order`의 상세는 별도 문서(`docs/EXPORT_CONTRACT.md`)에 있고, 여기서는 전체 엔드포인트와
 > **앱 서버 팀 문서와의 경계·불일치**를 확정한다. 스키마의 단일 소스는 코드다 → FastAPI `/docs`(OpenAPI).
+
+---
+
+## 전신 동적 라우팅 연결 시 주의 (2026-10-16)
+
+`ROUTING_FULLBODY_ENABLED=1`에서는 요청 `POST /analyze`의 multipart 형식은 유지하고,
+인물별 새 응답 `people[].dynamic_search`를 읽는다. 세부 파이프라인·기동 조건은
+[`FULLBODY_DYNAMIC_ROUTING.md`](FULLBODY_DYNAMIC_ROUTING.md)가 기준이다.
+이 기능 브랜치의 API 팩토리는 변수가 없을 때도 1이므로, 기존 mock/레거시 개발 환경은
+명시적으로 0을 설정해야 한다. `.env.example`은 0으로 유지한다. PR 생성은 배포가 아니다.
+
+- `selected`: 핵심 동작 및 확인된 세부 조건을 통과한 전신 라이브러리 후보, 최대 5개.
+- `near_candidates`: 핵심 동작은 맞지만 다리/무릎 세부가 다르거나 미확인인 별도 검수 참고.
+  정답·확률·성공 5개 채우기용 후보가 아니며, 빈 `selected`의 생성 시도를 막지 않는다.
+- `pose_detail_fit`: 관측된 2D 몸통 기울기·골반 이동·다리 간격·무릎 각도의 동일 카메라 비교.
+- `generation`: 정상 검색이 비었을 때만 실행되는 검수용 자세 JSON→IK→BVH 생성. 검색/설명 오류는
+  생성으로 덮지 않는다. 생성/근접 참고는 원본 라이브러리 ID나 자동 export 대상이 아니다.
+- `basic_model`: 명시적 어깨~머리 컷의 기본 인체 출력 계획. 검색·생성 성공과 별도다.
+- `candidate_validation`, `branches`, `description_evidence`, `geometry_evidence`: 조건·실제 검색문·
+  관절 근거·분기별 실패/시간 기록. 기존 `candidates`/`semantic_candidates`와 임의 결합하지 않는다.
+
+이 경로는 Human-Art 관절의 조건부 VLM 검수·보완과 인물별 자세 설명을 사용한다.
+아래 레거시 경로의 “VLM은 좌표를 생성하지 않음” 규칙과 달리, 보완 관절은 `vlm_repair` 출처를
+명시하고 구조 검사 악화 시 되돌린다. 자동 high 신뢰도·refine 권한으로 승격하지 않는다.
+상하체 분리 검색·런타임 BVH 합성은 하지 않는다. API 기본 RRF 자연어 비중은 0.35이고 로컬
+set4/set5 비교는 0.60을 명시했으며, 실험 비중을 운영 기본값으로 바꾸지 않았다.
+모든 새 후보는 `release_allowed=false`, `refine_allowed=false`, `actual_mesh_validated=false`다.
+실제 반대 손 피부 삼각형 검사는 현재 로컬 변환 후 검수이며 자동 API 안전 인증이 아니다.
 
 ---
 
@@ -518,6 +546,29 @@ Retry-After: 30
 
 OpenAPI 자동 문서: 서버 기동 후 **`http://127.0.0.1:8000/docs`**. 이 문서와 `/docs`가 어긋나면 **코드가 정본**이고, 이 문서를 갱신한다(`05` 문서 도입 시 "API 변경은 문서 동시 수정" 규칙 적용).
 
+## 원근 검색 런타임 연결 (2026-10-15)
+
+`POSE_SEARCH_MODE=perspective`(새 코드 기본값)는 단일 인물·정상 full coverage·
+full_image·전신 pos 검색에서 117개 조합/195개 시작점 조정/Top20 윤곽 재정렬을
+실행한다. Z 모델은 사용하지 않는다. `legacy` 설정과 재시작으로 기존 검색으로
+복귀하며, 부분·다인물·복구·비-pos·원본 BVH 미확보는 기존 경로를 유지한다.
+운영 배포 설정은 이 코드 변경에 포함하지 않는다.
+
+새 경로는 점수 미보정 때문에 `confidence=low`, `confidence_threshold=null`을 유지하지만,
+refine v2는 기존 구조/소유권/관측 게이트로 허용한다. 일괄 refine 차단과 scores=0은 제거했다.
+refine v1 설정은 기존 검색/보정 경로를 유지한다. 새 후보의 `camera.version`은
+`candidate-camera-v2`이며 rotation 외에 projection, distance_torso, labels_swapped,
+pose_id, query_sha256, observed_joint_mask를 포함한다. 클라이언트는 이 객체 전체와
+`distance_metric=perspective_pos`를 `/refine`에 그대로 재전송해야 한다. 새 metric에
+camera v2가 없거나 필드/포즈/XY/원본 SHA가 맞지 않으면 422(분석 중 원본 교체는 409)다.
+v1/null camera 계약은 유지한다. v2의 원근/좌우가 전방계산과 최종 selector에 적용되고,
+보정 결과는 원래 BVH 좌표로 복원한다. 안전한 보정이 불가능하면 기존 게이트나
+`camera_projection_invalid` 사유로 원본을 유지한다. 표시 썸네일은 아직 직교다.
+`quality_trace.perspective_search`에는 applied/reason/contour 복귀/비용/검색 카메라
+진단값을 남긴다. 후보 `distance`는 카메라 혼합+윤곽 점수이며 legacy 거리와 직접
+비교하면 안 된다. 외부 BFF/앱의 v2 전달/원근 화면 재현은 별도 통합 확인 대상이다.
+세부 적용 범위와 제한: [PERSPECTIVE_RUNTIME.md](PERSPECTIVE_RUNTIME.md).
+
 ## 관측 상체 검색 추가 (2026-10-02)
 
 - 흉상도 추출·검색을 수행하며 응답 `route=core`. 골반을 관측하지 못했으나
@@ -630,3 +681,106 @@ only after deploying matching converter/BFF code and immutable source/catalog da
 Modified-body Top-K uses PNG fallback instead of an unrelated precomputed GLB;
 final review GLB is generated from the shaped FBX. New catalogs remain draft for
 inference matching; supported BVHs are explicit and do not imply full-library QA.
+
+## 러프함 기반 검색 경로 필드 (04J-286, 2026-10-13)
+
+`SEARCH_ROUTING=1`일 때만 채워지는 **추가 필드**다. 기존 필드의 의미·값은 바뀌지 않는다.
+끈 상태(기본)에서는 `people[i].search_routing=null`, `people[i].semantic_candidates=[]`, 최상위 `search_routing=null`.
+
+| 필드 | 위치 | 내용 |
+|---|---|---|
+| `search_routing` | `people[i]` | `route`(geometric·semantic·undetermined·error), `reason`, 관절/의미 판정 수치와 기준값, `search.status`(ok·no_result·error·not_run), `elapsed_ms` |
+| `semantic_candidates` | `people[i]` | route=semantic일 때 `[{pose_id, score, matched, pose}]`. `score`는 의미 점수라 `candidates[].distance`와 비교 불가. refine 대상 아님 |
+| `search_routing` | 최상위 | 자세 설명 호출 상태(`describe.status`, `error_reason`, `retryable`, `retry_after_seconds`, `elapsed_ms`) |
+
+route가 geometric이 아닌 인물은 `candidates=[]`, `confidence=low`, `refine_allowed=false`다(기존에도 관절 근거가
+부족한 인물은 후보 0개였다). 상세: `docs/SEARCH_ROUTING.md`.
+
+몸 관찰 개선(d2): semantic_evidence.description에 기본값이 있는 body_observations와
+context_evidence를 추가했다. body_observations는 knees·legs·arms·torso의 정성 분류이며
+관절 좌표·각도가 아니다. semantic_candidates[].matched는 body_matches·body_conflicts·
+score_components를 추가로 포함할 수 있다. 미관측 속성은 중립이며 semantic은 계속 refine 금지다.
+점수 정책 버전은 search.backend에 기록된다. 서로 다른 backend 버전의 score나 기하 distance를
+직접 비교하지 않는다. `valid`는 검색 근거 조건 통과이며 정확도 보증이 아니다.
+
+선택적 BVH 몸 색인(v3): `SEMANTIC_BODY_INDEX_PATH`를 지정하면 backend는
+`tag-v3-bvh-body-interim`이다. `matched.body_source`는 `bvh` 또는 `library_text`,
+`body_index_usage`는 쿼리 사용 조건·폴백 이유·행동 가중치를 기록한다.
+`body_metrics`가 있으면 **후보 라이브러리**에서 미리 계산한 무릎 각도·정규화 손 높이 등이다.
+러프에서 좌표·각도를 생성한 값이 아니며 기하 피처/distance/refine에는 입력하지 않는다.
+불충분한 intrinsic 관찰은 기존 문장 검색을 유지하고, 색인 누락·버전/코퍼스 불일치·손상은
+경고 로그와 함께 v2로 폴백한다. 새 색인은 기본 비활성이고 외부 응답 형태는 그대로다.
+
+선택적 핵심 관계 색인(v4): `SEMANTIC_SHAPE_INDEX_PATH`를 명시하면
+backend=`tag-v4-critical-shapes-interim`이다. 명확한 `fold_arms` 또는 양팔 V자
+쿼리는 해당 관계가 검증된 후보만 반환한다. 명시한 비일반 자세(예: sitting)도 일치해야 한다.
+검증 후보 없음은 `no_result`, reason=`critical_pose_combination_unverified:<관계+자세>`이며
+라이브러리 전체의 실제 부재를 증명하는 값은 아니다. 색인 손상·누락은 `error`이고
+핵심 조건을 놓친 이전 검색기로 조용히 폴백하지 않는다.
+
+`matched.critical_relations`는 required·verified·근거 source를 담는다.
+`matched.camera_comparison`은 24개 정사영 시점 중 관계의 가시성을 비교한 진단이며
+`kind=qualitative_visibility_not_pixel_fit`이다. `pose.preview_camera`의 yaw_deg·pitch_deg·roll_deg는
+**라이브러리 BVH 미리보기 카메라** 설정이고 러프에서 추정한 관절 각도나 포즈 수정값이 아니다.
+기존 `pose.view`는 yaw 라벨만 나타내므로 기존 4방향 JPG만으로 pitch 적용 결과를 표시하면 안 된다.
+BVH·기하 후보·distance·refine은 바뀌지 않는다. 몸 기준 V 관계와 화면에서 보이는 V 관계는
+구별한다. 위/아래에서 보는 단서가 문장에 명시되지 않으면 러프와 같은 시점이라고 보장하지 않는다.
+
+### 실험적 자연어 생성 hook (2026-10-14, 기본 비활성)
+
+`Pipeline(..., pose_generator=<explicit research adapter>)`에 직접 주입한 경우만,
+유효한 semantic 설명의 검색이 정상 수행되어 `no_result`이고 hits가 0개일 때 실행한다.
+API 앱의 기본 Pipeline factory에는 주입하지 않는다. 별도 운영 env/endpoint/자동 export 없음.
+provider/색인 오류, 모호한 설명, geometric 정상 경로, head/얽힘 기존 차단 및 명시적 half/bust에는 실행하지 않는다.
+
+선택적으로 `people[i].search_routing.generation`에 다음을 기록한다:
+
+- `status`: preview_ready / unsupported / rejected / timeout / error / not_requested.
+- `backend`, `reason`, `elapsed_ms`, `diagnostics`, `candidates`(별도 합성 미리보기).
+- 모든 상태에 `release_allowed=false`, `refine_allowed=false`, `actual_mesh_validated=false`.
+- 미리보기는 `pose_id=generated_<hash>`, `source=text_constraints_analytic_ik`,
+  `kind=synthetic_research_preview`, `bvh`(1프레임 본문), `keypoints_3d`, `constraints`,
+  기본 리그 출처 hash 및 기구학 검사 결과를 포함한다. VLM 관절 좌표가 아니다.
+
+`route=semantic`, `search.status=no_result`, 기존 `candidates=[]`, `semantic_candidates=[]`,
+`confidence=low`, refine 금지를 유지한다. 생성 미리보기 3개를 검색 성공 3개로 세지 않는다.
+생성 ID는 라이브러리 ID가 아니며 `/pose/{id}/bvh`, `/refine`, 자동 export 대상으로 보내면 안 된다.
+기본 앱 응답은 기존과 동일하고 generation 필드가 없다.
+기본 뼈대→자연어 조건→별도 IK 생성은 기존 refine과 다르다.
+실제 피부 메시, 손목 twist/손가락/관절 해부학 축/의자 접촉/3D GT는 미검증이다.
+세부 지원 범위·검증은 `docs/TEXT_POSE_GENERATION_PROBE.md`를 따른다.
+
+### 04J-285 시맨틱 검색 연결 (2026-10-14, opt-in)
+
+`SEMANTIC_BACKEND=semantic285`를 명시하면 285의 직접 문장 검색 서비스가
+286의 기존 SemanticQuery/SemanticSearchResult 계약 뒤에서 실행된다. 기본값 tag와
+`SEARCH_ROUTING=0`은 유지한다. `/semantic-search` HTTP endpoint는 이 연결 작업에서 추가하지 않았다.
+`route`, `search.status`, `candidates`, `semantic_candidates`의 응답 구조는 동일하다.
+
+- backend는 `semantic-285-text+bvh-validation-v1`. score는 285의 0..1 정책으로,
+  기존 tag-v4 의미 점수나 geometric distance와 직접 비교하지 않는다.
+- `semantic_candidates[].pose`는 285가 검증한 `standin-pose-record-v1` 포즈 JSON이며 ID·DB·태그 정합성 검사를 유지한다.
+- `matched.semantic285`에 원래 점수 성분·문장/태그 근거·색인 정체성을 기록한다.
+- 전체 기준 통과 후보군에 BVH 팔짱/V·요청 자세·미리보기 카메라 및 알려진 몸 관찰 충돌 검사를 적용한 뒤 family Top-K를 선택한다.
+  상위 5개 또는 20개만 필터링해 적합 후보를 놓치지 않는다. 미관측 값은 중립이다.
+- 문장별 선호/거절 기록은 기본 비활성. 수동 검수 결과는 일반화 성능으로 집계하지 않는다.
+- 기존 격리 목록과 가져온 시맨틱 격리 목록의 합집합을 시맨틱 색인에 적용한다.
+  이 작업은 기존 global 기하/refine 정책 파일을 변경하지 않는다.
+- 명시한 DB/색인/encoder 실패는 error. 팔 관계 색인이 없는 핵심 요청도 error이며 이전 태그 검색기로 조용히 폴백하지 않는다.
+- 기하 후보/추출/쿼리 좌표/refine solver 불변. 모든 시맨틱 후보는 계속 refine 금지다.
+
+코드·30개 저장 실험·검수 인수인계는 `docs/SEMANTIC_285_INTEGRATION.md`를 따른다.
+
+## 손 모양·손 후보 (04J-290, 2026-10-14)
+
+> refine 화면·BFF 저장/중계·오류 규칙까지 포함한 전체 설계: [`HAND_SELECTION_DESIGN.md`](HAND_SELECTION_DESIGN.md)
+
+`POST /analyze`의 `people[].hands`에 인물별 좌/우 손 자동 선택과 후보가 실린다
+(`VLM_HAND_SHAPES=1`일 때 VLM 별도 호출로 채움, 꺼져 있으면 `status=not_requested`와 기본값).
+`left`/`right`는 그 인물 자신의 손이다. 각 손: `preset`(자동으로 구울 값), `source`(`vlm`|`default`),
+`confidence`(`high`|`low`|null), `visible`, `candidates`(최대 4개, 앞이 유력).
+검색·refine에는 쓰지 않는다.
+
+FBX에 손을 구우려면 converter `POST /convert`·`/convert-bundle`·`/convert-framed`에 form 필드
+`hand_left`, `hand_right`(프리셋 id)를 보낸다. 보내지 않으면 기존과 바이트 단위로 같은 FBX다.
+프리셋 목록·불변식·제약: `docs/HAND_LIBRARY.md`.

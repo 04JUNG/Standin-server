@@ -4,6 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 무엇을 하는 코드인가
 
+### 이 브랜치의 전신 동적 라우팅
+
+전신 동적 라우팅 기능 브랜치는 사용자 요청에 따라 API 기본 경로를
+Human-Art 관절 + Gemini 자세 설명 → 전신 원본 검색으로 변경한다.
+관절이 충분해도 자연어 검색을 함께 실행하여 순위를 결합한다. 아래 순수 기하
+불변식 1과 검색 설명은 `ROUTING_FULLBODY_ENABLED=0`인 레거시 경로에 해당한다.
+새 경로의 계약과 기동 필수 조건은 `docs/FULLBODY_DYNAMIC_ROUTING.md`가 기준이다.
+상하체 분리 검색·합성은 실행하지 않는다. 새 후보는 `people[].dynamic_search`에
+있으며 검수용 생성 결과와 분리한다. refine·자동 export를 허용하지 않는다.
+
 웹툰 러프 콘티 컷 1장(.png) → 포즈 **Top-K 후보**를 반환하는 파이프라인.
 전체 제품(설계문서 v2)의 파이프라인 중 **VLM→검색 구간만** 담당한다(담당: 도원).
 CSP 연동·캡처·BVH 내보내기·Three.js 뷰어 등 앞단/뒷단은 이 저장소 밖(이동원/공통).
@@ -148,6 +158,22 @@ VLM.analyze  ── 1회 호출로 개수·shot·action·view·relationship·대
 7. **refine은 좋아지거나, 그대로.** `refine.py`는 검색된 베이스 포즈의 **팔 회전만** 러프에 맞춰 돌린다(기본 `REFINE_LIMBS=arms`. 루트/힙 위치·척추·손목·**다리** 고정). 다리는 투영 관측 감도가 팔의 1/3.4라 손실이 못 보는 방향으로 크게 움직인다 — 3D 정규화·이동량 게이트 없이 켜지 말 것(`REFINE_DESIGN.md` §6-4). 안전 게이트 중 하나라도 걸리면 조정을 버리고 베이스를 그대로 반환한다 — refine이 결과를 나쁘게 만드는 경로는 존재하면 안 된다. 특히 **검색이 실패한 컷에는 refine을 돌리지 않는다**(틀린 베이스를 러프에 끼워맞추면 더 이상해진다). 게이트를 약화시키는 방향으로 바꾸지 말 것. 상세: `docs/REFINE_DESIGN.md`.
 
 ## 검색이 어떻게 매칭되나 (개념)
+
+### 2026-10-15 런타임 시점 확대 경로
+
+`POSE_SEARCH_MODE=perspective`가 새 기본값이다. 원본 BVH와 저장 투영이 모두
+일치하는 라이브러리에서 정상 full coverage·단일 인물·pos 전신 검색은
+117개 카메라 → 195개 시작점 미세 조정 → .25/.75 혼합 → Top20 공정 윤곽
+재정렬을 사용한다. Z 추정은 하지 않는다. 부분 관측/다인물/복구/비-pos 및
+BVH 미확보·refine v1 설정은 기존 경로를 유지한다. 새 점수는 기존 confidence
+임계값을 쓰지 않아 low지만, refine v2는 기존 구조 안전 정책에 따라 계속 허용한다.
+candidate-camera-v2의 전체 회전/원근 거리/좌우 해석을 /refine에 그대로 전달한다.
+리파인 전방계산과 최종 selector가 요청 범위 내에서 같은 고정 원근을 사용한다.
+기존 보정/충돌/비회귀 게이트는 유지하며 결과는 원본 BVH 좌표로 복구한다.
+POSE_SEARCH_MODE=legacy와 프로세스 재시작으로 롤백한다. 썸네일은 아직 직교다.
+세부 계약·테스트: [PERSPECTIVE_RUNTIME.md](docs/PERSPECTIVE_RUNTIME.md).
+
+아래는 legacy 검색 경로의 설명이다.
 
 그림에서 3D를 복원(리프팅)하지 **않는다**. 이미 3D인 라이브러리 포즈를 여러 가상 카메라로 2D 투영해 색인하고(`library.py::VIRTUAL_CAMERAS`, view별 1개 엔트리), 추출한 2D 스켈레톤과 같은 피처 공간에서 **순수 기하 kNN**(`search.knn_geometric`, 거리=몸통 12관절 L2 `features.pose_distance`)을 돈다. **태그(action/view)로 필터링하지 않는다** — 기하와 중복이라 매칭에서 제외(설계 결정). cosine은 국소 차이를 못 잡아 폐기. `knn`은 같은 `pose_id`의 여러 view 중 최선 1개만 남겨 후보 다양성을 확보한다.
 

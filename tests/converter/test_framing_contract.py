@@ -33,7 +33,7 @@ def post(client, **fields):
                              "expected_bvh_sha256": hashlib.sha256(VALID_BVH).hexdigest(), **fields})
 
 
-@pytest.mark.parametrize('scope', ['full', 'half', 'bust', 'head'])
+@pytest.mark.parametrize('scope', ['full', 'half', 'bust', 'shoulder_head', 'head'])
 def test_framed_pair_hashes_and_requested_scope(tmp_path, scope):
     runner = FramedRunner()
     response = post(_client(tmp_path, runner=runner), output_scope=scope)

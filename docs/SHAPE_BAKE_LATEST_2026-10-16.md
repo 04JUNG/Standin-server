@@ -117,3 +117,22 @@ python scripts/package_shape_staging.py --release <out> --bake-qa <out>/bake-qa 
 
 배포 순서: converter → BFF → 앱 → 인프라에서 새 manifest 선택 → `BODY_SHAPE_EDIT_ENABLED`,
 `BODY_SHAPE_BAKE_ENABLED` 켜기. 이 작업은 ECS·운영 포인터·S3를 바꾸지 않았다.
+
+## 2026-10-17 develop 통합 검증
+
+develop `c8181b0e`의 손 라이브러리·장면 합성·palm-roll 변경을 반영했다.
+`shape`/`expected_shape_source`와 `hand_left`/`hand_right`를 같은 요청 및 worker job에서
+보존한다. 처리 순서는 체형 굽기 → 손 프리셋 굽기 → 프레이밍·카메라·미리보기이며,
+runner는 체형과 손의 계보를 각각 검증한다. 누락·다른 수치·다른 손 프리셋은 결과를 거부한다.
+
+- 추론 회귀 1,481개(로컬 HTTP 오류 복구 4개 포함), Converter Python 291개 통과.
+  추론 9개·Converter 1개는 기존 외부 자산/선택형 환경 조건으로 skip했다.
+- 신규 결합 계약 9개와 기존 shape-bake 계약 28개를 CI에 포함했다.
+- 고정 Blender 5.2.0 `fbe6228777e7`에서 기존 합성 변환 회귀 28/28 통과.
+- 원본 SHA가 일치하는 남성 0.7.2·여성 0.3.4 BASE 자산의 임시 복사본으로,
+  합성 팔 들기 BVH + `muscle=0.5` + 왼손 fist/오른손 relaxed를 실제 worker에서
+  각각 실행했다. 두 건 모두 체형 controls/digest, 손 선택·몸뼈 보존, 최종 FBX 해시 검증을
+  통과했다(각 6.96초/5.46초). 원본 자산·S3·배포 설정은 변경하지 않았다.
+
+이 검사는 두 BASE 조합의 실행 검증이며 모든 체형/포즈/손 조합의 메시 건전성,
+실제 러프 품질, PNG/GLB/CSP 표시 또는 운영 부하 검증을 대체하지 않는다.

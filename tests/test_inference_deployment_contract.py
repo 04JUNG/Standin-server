@@ -6,15 +6,19 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_deploy_defaults_to_full_cascade_with_strict_startup():
+def test_deploy_selects_explicit_routing_model_contract_with_strict_startup():
     workflow = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(
         encoding="utf-8"
     )
 
     assert "APP_ENV=production" in workflow
     assert "POSE_BACKEND=rtmlib" in workflow
-    assert "vars.POSE_MODEL_VARIANT || 'cascade'" in workflow
-    assert "vars.POSE_CANARY_STAGE || 'canary-100'" in workflow
+    assert "prepare_fullbody_deployment.py" in workflow
+    assert "github.ref == 'refs/heads/develop' && '1' || '0'" in workflow
+    assert 'REQUESTED_POSE_VARIANT: ${{ vars.POSE_MODEL_VARIANT }}' in workflow
+    assert 'REQUESTED_CANARY_STAGE: ${{ vars.POSE_CANARY_STAGE }}' in workflow
+    # Never overwrite the prepared humanart-m contract with the old cascade default.
+    assert 'POSE_MODEL_VARIANT=${{' not in workflow
     assert "POSE_STRICT=1" in workflow
 
 

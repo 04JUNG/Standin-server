@@ -74,9 +74,13 @@ jobs:
         run: |
           python -m pytest -q \
             tests/converter/test_worker_contract.py \
+            tests/converter/test_shape_bake_contract.py \
+            tests/converter/test_shape_hand_integration.py \
             tests/converter/test_registry.py \
             tests/converter/test_runner_failures.py \
             tests/converter/test_api_contract.py \
+            tests/converter/test_scene_contract.py \
+            tests/converter/test_scene_runner.py \
             tests/converter/test_preview_models.py \
             tests/converter/test_body_preview_contract.py \
             tests/converter/test_preview_style.py \
@@ -174,6 +178,16 @@ jobs:
             "$CONVERTER_IMAGE" \
             /opt/blender/blender --background --python-exit-code 1 \
             --python /app/tests/converter/test_convert.py
+
+      - name: Verify single-cut multi-person FBX round trip
+        run: |
+          docker run --rm --platform linux/amd64 \
+            --env CONVERTER_TEST_ARTIFACT_ROOT=/artifacts \
+            --mount type=bind,source="$ARTIFACT_ROOT",target=/artifacts \
+            --mount type=bind,source="$GITHUB_WORKSPACE/tests/converter",target=/app/tests/converter,readonly \
+            "$CONVERTER_IMAGE" \
+            /opt/blender/blender --background --python-exit-code 1 \
+            --python /app/tests/converter/verify_scene_roundtrip.py -- --out /artifacts/multi-person-scene
 
       - name: Verify soft preview lighting in headless Blender
         run: |
