@@ -69,7 +69,7 @@
 
 ## 검증·재현 자료
 
-- CI 범위 `pytest tests/ --ignore=tests/converter -q`: **1,695 passed / 9 skipped / 28 subtests**. 통합+BFF 집중 39 passed. smoke 54/54, compileall과 diff check 통과. Blender 전용 converter 실행은 변경 범위 밖이며 실행하지 않았다.
+- CI 범위 `pytest tests/ --ignore=tests/converter -q`: **1,695 passed / 9 skipped / 28 subtests**. 통합+BFF 집중 39 passed. 최신 develop 병합 후에도 CI 1,695 passed 및 변경된 converter runner 계약 28 passed를 확인했다. smoke 54/54, compileall과 diff check 통과. Blender 전용 converter 실행은 변경 범위 밖이며 실행하지 않았다.
 - [수치·실행 식별자](INTEGRATED_FIRST_CALL_METRICS.json), [28명 추천과 live 비교](INTEGRATED_FIRST_CALL_CASES.json). 원문 이미지·모델·라이브러리는 커밋하지 않았다.
 - 로컬 `artifacts/body-matching/2026-10-17-integrated/REPORT.html`: 원본 crop과 모든 추천/대안/근거, 컷별 API 시간. `trace-124702/trace.html`은 기존 tracer 스키마·템플릿을 재사용한 API 기록 기반 **부분 추적**이다. 초기 추출/배정 중간값은 미수집으로 표시했다. 기록 카메라와 BVH를 공유 함수로 투영해 3개 선택 후보의 API 거리를 1e-5 이내로 재현했다. raw provider 대사·private cloud 경로·키는 공유 HTML/trace에 넣지 않았다.
 - 브라우저 렌더 검수는 수행하지 못했다. HTML/JSON/앵커/JavaScript 구문·표시 수치를 정적으로 검증했다.

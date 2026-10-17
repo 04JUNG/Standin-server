@@ -291,7 +291,9 @@
     "focused_passed": 39,
     "smoke_passed": 54,
     "blender_suite": "not run; unchanged converter",
-    "browser_render_qa": "not performed; static HTML/JS/data/anchor validation only"
+    "browser_render_qa": "not performed; static HTML/JS/data/anchor validation only",
+    "upstream_converter_runner_passed": 28,
+    "post_merge_ci_passed": 1695
   },
   "release": {
     "deployed": false,
