@@ -2,7 +2,7 @@
   "schema_version": 1,
   "status": "PROMOTED_RUNTIME",
   "parent_variant": "chain-transport-v3.2.1-palm-roll",
-  "parent_retarget_sha256": "be57c8eaf7144994a9015783e244a418d70f57b18cef01218fe850b028334cbd",
+  "parent_retarget_sha256": "2fca3bd577445989c178aa4ca33e772c595ad2aeb6083f817a3824c93508a579",
   "parent_palm_roll_mu": 0.5,
   "candidate_mu": [0.0, 0.25, 0.5, 0.75, 1.0],
   "activation": {

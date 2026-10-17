@@ -1,0 +1,188 @@
+HIERARCHY
+ROOT Hips
+{
+	OFFSET 0.000000000 0.000000000 0.000000000
+	CHANNELS 6 Xposition Yposition Zposition Zrotation Yrotation Xrotation 
+	JOINT LHipJoint
+	{
+		OFFSET 0.000000000 0.000000000 0.000000000
+		CHANNELS 3 Zrotation Yrotation Xrotation
+		JOINT LeftUpLeg
+		{
+			OFFSET 1.772290000 -1.583460000 0.870840000
+			CHANNELS 3 Zrotation Yrotation Xrotation
+			JOINT LeftLeg
+			{
+				OFFSET 2.507030000 -6.888010000 0.000000000
+				CHANNELS 3 Zrotation Yrotation Xrotation
+				JOINT LeftFoot
+				{
+					OFFSET 2.616200000 -7.187960000 0.000000000
+					CHANNELS 3 Zrotation Yrotation Xrotation
+					JOINT LeftToeBase
+					{
+						OFFSET 0.151900000 -0.417350000 2.159740000
+						CHANNELS 3 Zrotation Yrotation Xrotation
+						End Site
+						{
+							OFFSET 0.000000000 0.000000000 1.109190000
+						}
+					}
+				}
+			}
+		}
+	}
+	JOINT RHipJoint
+	{
+		OFFSET 0.000000000 0.000000000 0.000000000
+		CHANNELS 3 Zrotation Yrotation Xrotation
+		JOINT RightUpLeg
+		{
+			OFFSET -1.822980000 -1.583460000 0.870840000
+			CHANNELS 3 Zrotation Yrotation Xrotation
+			JOINT RightLeg
+			{
+				OFFSET -2.437900000 -6.698090000 0.000000000
+				CHANNELS 3 Zrotation Yrotation Xrotation
+				JOINT RightFoot
+				{
+					OFFSET -2.592880000 -7.123890000 0.000000000
+					CHANNELS 3 Zrotation Yrotation Xrotation
+					JOINT RightToeBase
+					{
+						OFFSET -0.145520000 -0.399810000 2.131600000
+						CHANNELS 3 Zrotation Yrotation Xrotation
+						End Site
+						{
+							OFFSET 0.000000000 0.000000000 1.094270000
+						}
+					}
+				}
+			}
+		}
+	}
+	JOINT LowerBack
+	{
+		OFFSET 0.000000000 0.000000000 0.000000000
+		CHANNELS 3 Zrotation Yrotation Xrotation
+		JOINT Spine
+		{
+			OFFSET 0.036020000 2.124230000 -0.302490000
+			CHANNELS 3 Zrotation Yrotation Xrotation
+			JOINT Spine1
+			{
+				OFFSET -0.027170000 2.100430000 0.129120000
+				CHANNELS 3 Zrotation Yrotation Xrotation
+				JOINT Neck
+				{
+					OFFSET 0.000000000 0.000000000 0.000000000
+					CHANNELS 3 Zrotation Yrotation Xrotation
+					JOINT Neck1
+					{
+						OFFSET 0.063710000 1.886560000 0.116020000
+						CHANNELS 3 Zrotation Yrotation Xrotation
+						JOINT Head
+						{
+							OFFSET -0.082080000 1.877590000 -0.115050000
+							CHANNELS 3 Zrotation Yrotation Xrotation
+							End Site
+							{
+								OFFSET -0.033820000 1.930900000 -0.054830000
+							}
+						}
+					}
+				}
+				JOINT LeftShoulder
+				{
+					OFFSET 0.000000000 0.000000000 0.000000000
+					CHANNELS 3 Zrotation Yrotation Xrotation
+					JOINT LeftArm
+					{
+						OFFSET 3.129470000 1.600370000 -0.004640000
+						CHANNELS 3 Zrotation Yrotation Xrotation
+						JOINT LeftForeArm
+						{
+							OFFSET 5.341940000 0.000000000 0.000000000
+							CHANNELS 3 Zrotation Yrotation Xrotation
+							JOINT LeftHand
+							{
+								OFFSET 3.193510000 0.000000000 0.000000000
+								CHANNELS 3 Zrotation Yrotation Xrotation
+								JOINT LeftFingerBase
+								{
+									OFFSET 0.000000000 0.000000000 0.000000000
+									CHANNELS 3 Zrotation Yrotation Xrotation
+									JOINT LeftHandIndex1
+									{
+										OFFSET 0.743860000 0.000000000 0.000000000
+										CHANNELS 3 Zrotation Yrotation Xrotation
+										End Site
+										{
+											OFFSET 0.599720000 0.000000000 0.000000000
+										}
+									}
+								}
+								JOINT LThumb
+								{
+									OFFSET 0.000000000 0.000000000 0.000000000
+									CHANNELS 3 Zrotation Yrotation Xrotation
+									End Site
+									{
+										OFFSET 0.608880000 0.000000000 0.608880000
+									}
+								}
+							}
+						}
+					}
+				}
+				JOINT RightShoulder
+				{
+					OFFSET 0.000000000 0.000000000 0.000000000
+					CHANNELS 3 Zrotation Yrotation Xrotation
+					JOINT RightArm
+					{
+						OFFSET -3.309030000 1.403570000 0.201560000
+						CHANNELS 3 Zrotation Yrotation Xrotation
+						JOINT RightForeArm
+						{
+							OFFSET -5.433010000 0.000000000 0.000000000
+							CHANNELS 3 Zrotation Yrotation Xrotation
+							JOINT RightHand
+							{
+								OFFSET -3.159360000 0.000000000 0.000000000
+								CHANNELS 3 Zrotation Yrotation Xrotation
+								JOINT RightFingerBase
+								{
+									OFFSET 0.000000000 0.000000000 0.000000000
+									CHANNELS 3 Zrotation Yrotation Xrotation
+									JOINT RightHandIndex1
+									{
+										OFFSET -0.712830000 0.000000000 0.000000000
+										CHANNELS 3 Zrotation Yrotation Xrotation
+										End Site
+										{
+											OFFSET -0.574700000 0.000000000 0.000000000
+										}
+									}
+								}
+								JOINT RThumb
+								{
+									OFFSET 0.000000000 0.000000000 0.000000000
+									CHANNELS 3 Zrotation Yrotation Xrotation
+									End Site
+									{
+										OFFSET -0.583470000 0.000000000 0.583470000
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+MOTION
+Frames: 1
+Frame Time: 0.008333300
+-4.991000000 13.046300000 -14.786000000 159.275000000 -34.600000000 -162.954000000 0.000000000 0.000000000 0.000000000 -10.175800000 13.789500000 -4.465400000 7.420800000 15.676300000 50.448600000 1.669400000 15.213200000 -33.915800000 3.367100000 11.266800000 33.185100000 0.000000000 0.000000000 0.000000000 -18.776000000 -12.727000000 -74.459300000 -16.015000000 -19.614900000 78.276500000 0.159000000 10.838200000 -4.824800000 -0.063300000 1.624000000 -4.467500000 -4.766500000 -2.899900000 16.706600000 1.610500000 -4.701800000 -1.616600000 5.659600000 -1.906700000 -10.649400000 -2.029200000 -10.520300000 -1.703900000 -2.356300000 -14.235900000 9.184200000 -0.897600000 -7.332400000 3.217700000 0.000000000 0.000000000 0.000000000 37.271100000 -45.582200000 -44.218200000 91.363600000 -59.993000000 -61.180900000 0.000000000 0.000000000 -12.039000000 14.265600000 28.453900000 6.907200000 -7.125000000 0.000000000 0.000000000 -18.361600000 58.236100000 -6.078300000 0.000000000 0.000000000 0.000000000 92.806500000 30.539500000 22.510500000 -85.606500000 59.926900000 -56.196000000 0.000000000 0.000000000 -67.699500000 -26.591700000 -19.810800000 9.628800000 7.125000000 0.000000000 0.000000000 1.836600000 -51.916900000 -0.312900000
