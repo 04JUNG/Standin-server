@@ -95,6 +95,14 @@ def test_converter_deploy_is_gated_and_path_filtered():
     assert "container-name: inference" not in workflow
 
 
+def test_converter_ci_exercises_real_skin_screen_endpoint():
+    workflow = (ROOT / '.github/workflows/converter-ci.yml').read_text()
+    assert 'http://127.0.0.1:8001/screen-hand-contact' in workflow
+    assert '--skin-screen "$ARTIFACT_ROOT/http-skin-screen.json"' in workflow
+    dockerfile = (ROOT / 'Dockerfile.converter').read_text()
+    assert 'COPY converter/hand_contact.py /app/converter/hand_contact.py' in dockerfile
+
+
 def test_converter_ci_smokes_dual_artifact_bundle_endpoint():
     workflow = (ROOT / ".github/workflows/converter-ci.yml").read_text()
     assert "http://127.0.0.1:8001/convert-bundle" in workflow

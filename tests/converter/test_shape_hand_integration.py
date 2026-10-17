@@ -68,3 +68,16 @@ def test_worker_accepts_shape_and_hands_together(tmp_path, monkeypatch):
     normalized = load_job(path)
     assert normalized["shape_recipe"] == recipe
     assert normalized["hands"] == job["hands"]
+
+
+def test_worker_preserves_shape_hands_and_skin_screen_together(tmp_path, monkeypatch):
+    path, job = _job(tmp_path)
+    write_registry(tmp_path, monkeypatch, asset_sha=job['character_sha256'])
+    recipe = resolve_shape('standin-master-v2', job['character_sha256'])
+    job.update(shape_recipe=recipe, hands={'left': 'fist', 'right': 'relaxed'},
+               hand_contact_screen=True)
+    path.write_text(json.dumps(job))
+    normalized = load_job(path)
+    assert normalized['shape_recipe'] == recipe
+    assert normalized['hands'] == job['hands']
+    assert normalized['hand_contact_screen'] is True

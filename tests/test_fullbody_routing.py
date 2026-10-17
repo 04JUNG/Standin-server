@@ -99,6 +99,10 @@ def test_api_resource_factory_uses_semantic_point_six(monkeypatch, tmp_path):
     import src.fullbody_routing as module
     import src.pose_humanart as pose_module
     import src.semantic_adapter_285 as semantic_module
+    import src.hand_skin_screen as skin_module
+    from tests.test_hand_skin_gate import gate
+    skin_gate = gate(tmp_path)
+    monkeypatch.setattr(skin_module, 'build_hand_skin_gate', lambda *a: skin_gate)
     camera = Camera(('a',)); camera.errors = {}
     semantic = Semantic(('c',)); semantic.service = object()
     monkeypatch.setattr(CFG, 'pose_backend', 'rtmlib')

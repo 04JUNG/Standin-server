@@ -410,6 +410,7 @@ class BlenderRunner:
         preview_model: bool = False,
         shape_recipe: dict | None = None,
         hands: dict | None = None,
+        hand_contact_screen: bool = False,
     ) -> ConversionResult:
         if shape_recipe is not None and report.get("ok"):
             shape = report.get("shape_bake", {})
@@ -487,6 +488,12 @@ class BlenderRunner:
             raise WorkerIntegrityError(
                 "artifact size does not match worker report", report=report
             )
+        if hand_contact_screen:
+            from converter.hand_contact import validate_screen
+            try:
+                validate_screen(report.get('hand_contact_screen'), artifact_sha256=artifact_sha256)
+            except ValueError as exc:
+                raise WorkerIntegrityError('invalid hand skin screen receipt', report=report) from exc
         artifact = output_path.read_bytes()
         thumbnail_png: bytes | None = None
         thumbnail_report: dict[str, Any] | None = None
@@ -614,6 +621,7 @@ class BlenderRunner:
         preview_model: bool = False,
         shape_recipe: dict | None = None,
         hands: dict | None = None,
+        hand_contact_screen: bool = False,
     ) -> ConversionResult:
         if shape_recipe is not None and self.settings.force_exact_v324:
             raise ConversionRejectedError("exact V3.2.4 mode does not permit shape baking")
@@ -648,6 +656,10 @@ class BlenderRunner:
             raise ConversionRejectedError(f"invalid hands: {exc}") from exc
         if hands is not None and self.settings.force_exact_v324:
             raise ConversionRejectedError("exact V3.2.4 mode does not permit hand presets")
+        if type(hand_contact_screen) is not bool or (hand_contact_screen and (
+                output_scope != 'full' or preview_view or preview_model or camera_rotation is not None
+                or thumbnail or mirror or self.settings.force_exact_v324)):
+            raise ConversionRejectedError('invalid hand screening options')
         queue_started = time.monotonic()
         self._process_slots.acquire()
         queue_wait_ms = (time.monotonic() - queue_started) * 1000.0
@@ -669,6 +681,7 @@ class BlenderRunner:
                 preview_model=preview_model,
                 shape_recipe=shape_recipe,
                 hands=hands,
+                hand_contact_screen=hand_contact_screen,
             )
         finally:
             execution_ms = (time.monotonic() - execution_started) * 1000.0
@@ -698,6 +711,7 @@ class BlenderRunner:
         preview_model: bool = False,
         shape_recipe: dict | None = None,
         hands: dict | None = None,
+        hand_contact_screen: bool = False,
     ) -> ConversionResult:
         if not character_path.is_file() or character_path.suffix.lower() != ".fbx":
             raise WorkerIntegrityError("character artifact is not a regular FBX file")
@@ -751,6 +765,8 @@ class BlenderRunner:
             }
             if hands is not None:
                 job["hands"] = hands
+            if hand_contact_screen:
+                job['hand_contact_screen'] = True
             job_path.write_text(
                 json.dumps(job, sort_keys=True, separators=(",", ":")) + "\n",
                 encoding="utf-8",
@@ -802,6 +818,7 @@ class BlenderRunner:
                 preview_model=preview_model,
                 shape_recipe=shape_recipe,
                 hands=hands,
+                hand_contact_screen=hand_contact_screen,
             )
 
 

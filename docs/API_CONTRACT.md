@@ -41,9 +41,50 @@ RRF 자연어 비중은 0.60, 기하 비중은 0.40이다. 로컬 set4/set5 가�
 조건 검사·거리 컷오프·단일 검색 경로의 가중치 1은 유지한다. 과거 비교를 재현하는 직접
 `FullBodySearch(...)` 호출의 기본값 0.35는 보존하며, 서버 팩토리가 0.60을 명시한다.
 모든 새 후보는 `release_allowed=false`, `refine_allowed=false`, `actual_mesh_validated=false`다.
-실제 반대 손 피부 삼각형 검사는 현재 로컬 변환 후 검수이며 자동 API 안전 인증이 아니다.
+동적라우팅 API는 실제 FBX 변환 후 반대 손 피부 삼각형 검사를 자동 호출한다.
+전체 메시 안전 인증은 아니며, 검사 오류/미확인은 정상 후보와 분리한다(아래 자동 검사 계약).
 
 ---
+
+## 전신 후보의 손 피부 자동 검사 (2026-10-17)
+
+전신 API 팩토리는 검색 엔진에 `HandSkinGate`를 연결한다. `/analyze`의 기하/자연어
+검색과 조건·순위 계산을 먼저 끝낸 뒤, 원래 순서대로 실제 FBX 검사를 수행한다.
+필요한 내부 주소는 기존 `REFINE_THUMBNAIL_CONVERTER_URL`을 재사용한다.
+
+- converter의 `POST /screen-hand-contact`에 BVH 바이트·원문 SHA256·대상 캐릭터 ID/SHA256·
+  인물별 실제 손 프리셋을 보낸다. 러프 이미지나 Gemini 설명은 보내지 않는다.
+- converter는 기존 동결 solver로 full FBX를 만들고, 요청한 손 프리셋을 굽고, **그 실제 FBX를
+  재임포트**하여 변형된 반대 손 피부 삼각형 교차를 검사한다. crop·카메라·미리보기 이전 단계다.
+- 입력 BVH·캐릭터·solver·손 프리셋·손 라이브러리·검사한 FBX SHA를 검증한 receipt만 사용한다.
+  별도 캐시는 저장하지 않으며 동일 요청 안에서 같은 BVH/손 설정만 재사용한다.
+- `clear_screen`: 반대 손 교차 미검출. 해당 후보에 `hand_skin_screen` 근거를 붙여 유지한다.
+- `intersection`: 정상 `selected`에서 제외하고 예산 안에서 다음 순위 후보를 확인한다.
+- `unavailable`: 누락/변경 BVH, 구버전 converter, HTTP/시간 초과, 스킨 부위 누락,
+  receipt 불일치 등. `hand_skin_screen.unverified`에 분리하고 정상 후보로 반환하지 않는다.
+  안전 후보가 남으면 `partial_error`, 없으면 `error`이며 **오류를 생성으로 덮지 않는다**.
+- 검사 가능한 검색 후보가 모두 교차로 탈락했고 다른 오류가 없다면 기존 빈 검색 생성 분기를
+  실행할 수 있다. 생성 후보도 관절·BVH 검증 후 같은 피부 검사를 통과해야 `preview_ready`에 남는다.
+- 인물별 검색/생성이 **최대 10회·누적 검사 30초(HTTP 1회 최대 15초)**를 공유한다.
+  예산 때문에 확인하지 못한 후보는 미확인이며 통과나 자산 부재로 취급하지 않는다.
+  추가 변환 지연이 있으므로 호출 측 시간 예산에 이 후처리를 포함해야 한다.
+
+`dynamic_search.hand_skin_screen`에는 검사 횟수/예산/제외/미확인 진단이 남는다.
+제외·미확인 생성 진단에 BVH 본문을 새로 넣지 않는다. `near_candidates`는 기존 조건 차이의
+검토 참고로 유지하며 피부 검사 통과 후보라고 표시하지 않는다. 기본 머리·어깨 인체도 검사 대상이 아니다.
+손·몸통·소품·같은 손 내부, 완전 포함, 공면 접촉을 포함하는 완전한 충돌 검사가 아니므로
+`actual_mesh_validated=false`, `refine_allowed=false`, `release_allowed=false`를 유지한다.
+피부 검사 단계 자체는 IK/손목 목표/손 프리셋을 수정하지 않는다.
+
+이 연결은 전신 동적라우팅 `/analyze` 대상이다. 레거시 검색, 기존 `/convert*` export 승인,
+미병합 직접 문장 API #96은 변경하지 않는다. 다른 캐릭터·손 프리셋·BVH로 바꾸면 기존 receipt를
+재사용할 수 없으며 해당 출력의 재검사가 필요하다.
+
+배포는 **converter의 새 검사 endpoint부터 준비한 뒤 inference를 적용**해야 한다.
+두 자동 배포가 병렬로 진행되어 converter가 구버전이면 잠시 `error/partial_error`가 날 수 있다.
+구버전/장애 시 검사를 생략하고 정상 후보를 내보내는 폴백은 없다. S3/IAM 변경이나 실제 배포는
+이 기능 PR 범위 밖이다. `/healthz.dynamic_routing.hand_skin_screen_required`는 연결 여부이며
+converter의 실시간 가용성 인증이 아니다.
 
 ## 0. 경계 — 이 서버는 어디에 있나 (반드시 먼저 읽을 것)
 

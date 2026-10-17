@@ -42,10 +42,25 @@ FastAPI inference가 DB에서 legacy 주문서의 `bvh_url·set_id·tags`를 채
 기존 자동 export 흐름으로 직접 연결하지 않는다. 새 경로는 `refine_allowed=false`,
 `release_allowed=false`이며, 실제 인체 변환 후 검수와 사용자 선택이 필요하다.
 생성 BVH는 `generation.candidates[].bvh` 본문으로만 제공되고 `/pose/{id}/bvh`에 등록되지 않는다.
-로컬 손 피부 교차 검사 통과도 손-몸통/소품/동일 손 내부 전체의 충돌 인증은 아니다.
+전신 `/analyze`의 검색·생성 후보는 실제 손 프리셋을 적용한 full FBX의 반대 손 교차 검사를
+자동 거친다. 미검출 receipt도 손-몸통/소품/동일 손 내부 전체의 충돌 인증은 아니다.
+다른 BVH·손 프리셋·캐릭터 출력에 receipt를 재사용하지 않는다. 기존 `/convert*`와
+자동 export 승인 정책을 이 검사로 승격하지 않는다.
 출력 범위는 `output_scope.mesh_scope`를 변환기의 `output_scope`에 전달한다
 (`full`, 팔·손을 보존하는 `half`, 목·어깨선·머리만 남기는 `shoulder_head`).
 이 PR은 기존 `/export-order` 요청 스키마나 운영 export 승인 정책을 확장하지 않는다.
+
+### 내부 진단 POST /screen-hand-contact
+
+multipart 필드: `bvh`, 필수 `expected_bvh_sha256`, 선택 `character_id`(기본 standin-master-v2),
+`expected_character_sha256`, `hand_left`, `hand_right`. full/frame0/non-mirror 변환만 실행한다.
+요청에 없는 손 프리셋을 만들거나 crop·카메라 회전·refine·생성을 실행하지 않는다.
+
+HTTP 200은 **진단 완료**이지 내보내기 허가가 아니다. `status`는 `clear_screen` /
+`intersection` / `unavailable`이며, 반대 손 삼각형 수·교차 수·제한 범위·입력/FBX/손/solver
+계보를 반환한다. FBX/PNG/GLB 바이트는 반환하지 않는다. 입력 해시 불일치는 기존 409,
+변환·worker 무결성 실패는 기존 converter 오류 봉투(4xx/5xx)다. inference는 비정상 응답을
+미확인으로 처리한다. converter Docker의 명시적 allowlist에 검사 모듈을 포함한다.
 
 ---
 

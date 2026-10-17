@@ -520,6 +520,7 @@ def create_app(
         expected_shape_source: str | None = None,
         hand_left: str | None = None,
         hand_right: str | None = None,
+        hand_contact_screen: bool = False,
     ) -> CompletedConversion:
         conversion_id = str(uuid.uuid4())
         request_started = time.monotonic()
@@ -614,6 +615,7 @@ def create_app(
                 **({"camera_rotation": camera_rotation} if camera_rotation is not None else {}),
                 **({"preview_model": True} if preview_model else {}),
                 **({"hands": hands} if hands is not None else {}),
+                **({"hand_contact_screen": True} if hand_contact_screen else {}),
             )
             if camera_rotation is not None and result.report.get("camera_rotation") != camera_rotation:
                 raise WorkerIntegrityError("camera rotation lineage mismatch")
@@ -990,6 +992,37 @@ def create_app(
             media_type=media_type,
             headers=headers,
         )
+
+    @app.post('/screen-hand-contact')
+    def screen_hand_contact(
+        bvh: UploadFile = File(...),
+        character_id: str = Form(default='standin-master-v2'),
+        expected_bvh_sha256: str = Form(...),
+        expected_character_sha256: str | None = Form(default=None),
+        hand_left: str | None = Form(default=None),
+        hand_right: str | None = Form(default=None),
+    ):
+        """Internal diagnostic only; no FBX/preview export, no pose correction."""
+        completed = _execute_conversion(bvh=bvh, character_id=character_id,
+            frame=FRAME, mirror=False, output_mode=OUTPUT_MODE,
+            apply_root_translation=False, response_format='hand_skin_screen',
+            expected_bvh_sha256=expected_bvh_sha256,
+            expected_character_sha256=expected_character_sha256,
+            hand_left=hand_left, hand_right=hand_right, hand_contact_screen=True)
+        from converter.hand_contact import validate_screen
+        from converter.hand_library import load_library
+        result = completed.result
+        try:
+            receipt = validate_screen(result.report.get('hand_contact_screen'),
+                                      artifact_sha256=result.artifact_sha256)
+        except ValueError as exc:
+            raise ApiProblem(500, 'WORKER_INTEGRITY_ERROR', 'invalid skin screen receipt') from exc
+        return {**receipt, 'source_bvh_sha256': result.source_bvh_sha256,
+                'character_id': completed.character.metadata.character_id,
+                'character_sha256': completed.character.metadata.sha256,
+                'solver_version': SOLVER_VERSION,
+                'hands': normalize_hands({'left': hand_left, 'right': hand_right}),
+                'hand_library_sha256': load_library().sha256}
 
     @app.post("/convert-framed")
     def convert_framed(

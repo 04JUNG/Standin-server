@@ -95,6 +95,17 @@ if job.get("shape_recipe") is not None and mode != "shape_not_reported":
         report["shape_bake"]["controls"] = {}
 if mode == "wrong_source_hash":
     report["source_bvh_sha256"] = "0" * 64
+if job.get('hand_contact_screen') and mode != 'skin_missing':
+    report['hand_contact_screen'] = {
+        'status': 'intersection' if mode == 'skin_intersection' else 'clear_screen',
+        'method': 'evaluated_skin_opposite_hand_triangle_crossing_v1',
+        'scope': 'opposite_hands_only', 'complete_collision_certificate': False,
+        'triangle_counts': {'left': 40, 'right': 40},
+        'intersection_pairs': 2 if mode == 'skin_intersection' else 0,
+        'screened_artifact_sha256': hashlib.sha256(artifact).hexdigest(),
+    }
+    if mode == 'skin_wrong_hash':
+        report['hand_contact_screen']['screened_artifact_sha256'] = '0'*64
 if mode == "rejected":
     report["error_code"] = "conversion_rejected"
     report["error_message"] = "bad mapping"
@@ -130,6 +141,21 @@ if mode == "traceback":
     print("Traceback (most recent call last): fake")
 raise SystemExit(1 if mode in {"rejected", "thumbnail_render_failed"} else 0)
 '''
+
+
+@pytest.mark.parametrize('mode', ['skin_missing', 'skin_wrong_hash'])
+def test_skin_receipt_required_and_bound_to_final_fbx(tmp_path, mode):
+    runner, _ = _runner(tmp_path, mode)
+    with pytest.raises(WorkerIntegrityError):
+        _convert(runner, tmp_path, hand_contact_screen=True)
+
+
+@pytest.mark.parametrize('mode,status', [('success', 'clear_screen'), ('skin_intersection', 'intersection')])
+def test_skin_worker_result_is_diagnostic_not_export_authorization(tmp_path, mode, status):
+    runner, _ = _runner(tmp_path, mode)
+    result = _convert(runner, tmp_path, hand_contact_screen=True)
+    assert result.report['hand_contact_screen']['status'] == status
+    assert result.report['hand_contact_screen']['complete_collision_certificate'] is False
 
 
 def _runner(

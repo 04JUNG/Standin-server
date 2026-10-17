@@ -437,6 +437,7 @@ def healthz():
             "camera_count": len(getattr(camera, 'cameras', [])),
             "camera_pose_count": len(getattr(camera, 'pose_ids', [])),
             "semantic_backend": getattr(getattr(engine, 'semantic', None), 'backend', None),
+            "hand_skin_screen_required": getattr(engine, 'hand_skin_gate', None) is not None,
             "ranking": getattr(engine, 'ranking', None),
             "semantic_weight": getattr(engine, 'semantic_weight', None),
             "geometry_weight": getattr(engine, 'geometry_weight', None),
