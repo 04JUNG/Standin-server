@@ -184,3 +184,36 @@ def test_optional_review_exception_never_retries_successful_primary(monkeypatch)
     )
     got = client.analyze(Image.new("RGB", (200, 300)), 200, 300)
     assert len(calls) == 1 and got.raw == raw
+
+
+@pytest.mark.parametrize("presentation", ["androgynous", "unknown"])
+def test_family_resolution_keeps_clear_independent_body_traits(presentation):
+    raw, analysis = setup_scene(presentation)
+    initial = analysis.person_bodies[0]
+    for name, value in [
+        ("muscle", "muscular"),
+        ("fullness", "slim"),
+        ("proportion", "elongated"),
+    ]:
+        initial["axes"][name].update(value=value, certainty="clear")
+    expected = copy.deepcopy(initial["axes"])
+    runner(analysis)
+    for name in ("muscle", "fullness", "proportion"):
+        assert analysis.person_bodies[0]["axes"][name] == expected[name]
+    assert analysis.person_bodies[0]["axes"]["presentation"]["value"] == "feminine"
+
+
+def test_actual_binary_family_reversal_still_downgrades_special_traits():
+    from src.experimental.body_matching.family_review import apply_review
+
+    _, analysis = setup_scene("masculine", "tentative")
+    initial = analysis.person_bodies[0]
+    initial["axes"]["muscle"].update(value="muscular", certainty="clear")
+    got = apply_review(
+        initial, reading("female", "clear"), preserve_unresolved_features=True
+    )
+    assert got["axes"]["muscle"]["certainty"] == "tentative"
+    # Existing standalone coarse policy retains its previous BASE reset.
+    initial["axes"]["presentation"].update(value="androgynous", certainty="unknown")
+    old = apply_review(initial, reading("female", "clear"))
+    assert old["axes"]["muscle"]["certainty"] == "tentative"

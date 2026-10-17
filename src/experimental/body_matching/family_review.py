@@ -91,7 +91,9 @@ def eligible(observation):
     )
 
 
-def apply_review(observation, reading=None, *, error=None):
+def apply_review(
+    observation, reading=None, *, error=None, preserve_unresolved_features=False
+):
     if not eligible(observation):
         return deepcopy(observation)
     if reading is not None:
@@ -128,7 +130,9 @@ def apply_review(observation, reading=None, *, error=None):
         result["axes"]["presentation"] = dict(
             value=value, certainty=reading["certainty"], reason=reading["reason"]
         )
-        if value != initial["value"]:
+        if value != initial["value"] and not (
+            preserve_unresolved_features and initial_family is None
+        ):
             # Keep the original observations visible, but do not transfer an
             # unverified special physique from a conflicting family reading.
             for name, ordinary in (

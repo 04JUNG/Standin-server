@@ -7,7 +7,7 @@ person count, boxes, routing, hand metadata or geometric pose selection.
 from copy import deepcopy
 from .coarse import AXES, parse_response, unknown
 
-VERSION = "body-integrated.v5.compact-review"
+VERSION = "body-integrated.v6.independent-axes"
 PROMPT_EXTENSION = """
 Additional output field: person_bodies, one entry for EACH approx_boxes person, in exactly that order.
 Finish the original person count, shot and box analysis using the original rules. Each approx_box must have 0 <= x1 < x2 <= 1 and 0 <= y1 < y2 <= 1, never 0~1000 coordinates. Check this before returning. Do not add,

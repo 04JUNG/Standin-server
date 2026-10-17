@@ -84,7 +84,10 @@ def review_uncertain(vlm, image, analysis, cfg, deadline):
         # Tentative recommendations remain tentative and cannot authorize auto
         # application. Existing conflict guard and ordinary BASE defaults apply.
         updated = family_review.apply_review(
-            observation, readings.get("V" + str(index)), error=error
+            observation,
+            readings.get("V" + str(index)),
+            error=error,
+            preserve_unresolved_features=True,
         )
         updated["version"] = observation["version"]
         analysis.person_bodies[index] = deepcopy(updated)
