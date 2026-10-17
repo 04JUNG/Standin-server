@@ -247,3 +247,8 @@ proper rotation, Y-up). 사용 시 `preview_view=front`만 허용한다. 동결 
 coarse의 tentative 계열에 제공하는 반대 계열 BASE도 진단용 대안이다. `crop_box` 확장이나 추천 후보 변경은 Export 자산 권한·주문·자동 적용을 만들지 않는다.
 
 선택적 `family_review`는 이미지 판독 근거와 추천에만 영향을 준다. 재검토로 계열이 교정되어도 `applied_body_id/selected_asset`은 null이며 Export 주문이나 자산 승인을 생성하지 않는다. 기존 수동 선택·기본값 처리와 Export 입력은 유지한다. [이미지 재검토 계약](BODY_SELECTION/FAMILY_REVIEW.md).
+
+
+### 첫 VLM 체형 통합의 경계
+
+`BODY_CLASSIFICATION_STRATEGY=integrated`는 `/analyze`의 최초 VLM 관측을 공유하는 추천 전용 경로다. `coarse_recommendation.recommended_body_id`는 실행용 자산 승인이나 Export 선택이 아니며, `auto_body_id/applied_body_id/selected_asset`는 null을 유지한다. BFF 수동 선택·기본값 우선순위, Export 체형 참조, 다중 인물 장면과 손 프리셋 전달 계약은 변경하지 않는다. 추천을 Export 주문으로 자동 승격하지 않는다. [통합 평가 및 제한](BODY_SELECTION/INTEGRATED_FIRST_CALL.md).

@@ -77,3 +77,12 @@ coverage가 visible이고 representation이 outline/shaded인 **동일 부위**�
 ## VLM 대분류 추천 전략 (coarse)
 
 `BODY_CLASSIFICATION_STRATEGY=coarse`는 남녀 계열을 먼저 정하고 해당 계열 BASE를 기본값으로 추천한다. 명확한 근육·체격·비율 특징만 프리셋을 변경한다. `people[].coarse_classification`은 판독 결과, `people[].coarse_recommendation`은 모든 인물의 추천 ID·추천 방식·대안·이유다. 기존 자동 적용용 `candidates=[]`, `selected_asset/suggested_asset/auto_body_id/applied_body_id=null`을 유지하고 렌더를 실행하지 않는다. UI는 추천을 `coarse_recommendation.recommended_body_id`에서 읽어야 한다. 기본 legacy 전략의 계약은 바뀌지 않는다. [규칙·실제 28명 평가·활성화 예시](BODY_SELECTION/COARSE_RECOMMENDATION.md).
+
+
+## 첫 호출 통합 전략
+
+`integrated`는 첫 `VLM.analyze`의 인물별 관측을 재사용하며 추가 체형 API 호출·crop 전송·계열 재검토를 하지 않는다. 추천 정책과 20종 카탈로그는 coarse와 공유한다. `classification_strategy=integrated`, `prompt_version=body-integrated.v3.compact`; provider/model은 별도 BODY_VLM_*가 아닌 주 VLM 출처다. `observations.crop_box=null`은 crop을 생성하지 않았다는 뜻이다. `elapsed_ms`는 체형 후처리만 측정하며 첫 VLM 시간이나 전체 분석 시간이 아니다.
+
+이 전략은 `auto`에서도 추천만 반환한다. 자동 적용·렌더·BFF 기본값 우선순위를 변경하지 않는다. 원본 VLM 슬롯에 체형을 연결하고 출력 인물 순서로 옮긴다. 검출기에서 추가된 슬롯처럼 연결 근거가 없으면 unknown 관측과 명시적 기본 추천을 반환한다. 연결 불명인 관측을 가까운 다른 사람에게 전용하지 않는다. 얼굴/skip 경로에도 descriptor가 있으면 기본 추천을 제공할 수 있다.
+
+`VLM_BODY_THINKING_LEVEL`은 Gemini 통합 첫 호출의 선택적 추론 설정이다. 빈 값은 모델 기본을 유지하며 지원하지 않는 값은 provider 오류가 된다. 별도 BODY_TIMEOUT_SECONDS 대신 기존 주 VLM 요청·총 예산과 재시도 설정을 공유한다. 전신 포즈 설명 등 기존 추가 호출은 유지한다. [실측 및 제한](BODY_SELECTION/INTEGRATED_FIRST_CALL.md).

@@ -145,6 +145,7 @@ def signature(result):
                 scope=d.output_scope.detected,
                 slot=d.quality_trace.get("vlm_person_index"),
                 hands=asdict(d.hands) if d.hands else None,
+                person_tags=asdict(d.person_tags),
             )
             for d in result.descriptors
         ],
@@ -162,10 +163,11 @@ def signature(result):
     )
 
 
+@pytest.mark.parametrize("accessories", [False, True])
 @pytest.mark.parametrize("fullbody", [False, True])
 @pytest.mark.parametrize("invalid", [False, True])
 def test_body_metadata_keeps_count_boxes_pose_rank_hand_and_fullbody_flow(
-    monkeypatch, fullbody, invalid
+    monkeypatch, fullbody, invalid, accessories
 ):
     from tests.test_fullbody_routing import Camera, Semantic
     from src.fullbody_routing import FullBodySearch
@@ -181,6 +183,21 @@ def test_body_metadata_keeps_count_boxes_pose_rank_hand_and_fullbody_flow(
             if invalid:
                 raw["person_bodies"][0]["evidence"] = ""
             return _coerce(raw, 200, 300)
+
+        def tag_people(self, image, boxes):
+            return dict(
+                person_actions=["standing", "sitting"], person_views=["front", "side"]
+            )
+
+        def read_hands(self, image, boxes):
+            from tests.test_hand_shapes import _side
+
+            return {
+                "people": [
+                    {"left": _side("fist"), "right": _side("grip")},
+                    {"left": _side("open"), "right": _side("pinch")},
+                ]
+            }
 
         def describe_people(self, image, boxes):
             return DescribeOutcome(
@@ -198,8 +215,8 @@ def test_body_metadata_keeps_count_boxes_pose_rank_hand_and_fullbody_flow(
                 },
             )
 
-    monkeypatch.setattr(CFG, "vlm_person_tags", False)
-    monkeypatch.setattr(CFG, "vlm_hand_shapes", False)
+    monkeypatch.setattr(CFG, "vlm_person_tags", accessories)
+    monkeypatch.setattr(CFG, "vlm_hand_shapes", accessories)
     monkeypatch.setattr(CFG, "search_routing_enabled", False)
     monkeypatch.setattr(CFG, "body_classification_strategy", "integrated")
     monkeypatch.setattr(CFG, "vlm_provider", "gemini")
@@ -226,6 +243,10 @@ def test_body_metadata_keeps_count_boxes_pose_rank_hand_and_fullbody_flow(
         )
     # Original VLM order is right-to-left; API descriptor order is left-to-right.
     assert after.descriptors[0].quality_trace["vlm_person_index"] == 1
+    if accessories:
+        assert after.descriptors[0].hands.left.preset == "open"
+        assert after.descriptors[1].hands.left.preset == "fist"
+        assert after.descriptors[0].person_tags.action.value == "sitting"
 
 
 def test_integrated_service_never_initializes_or_calls_a_second_model(monkeypatch):
@@ -382,6 +403,9 @@ def test_eval_uses_dynamic_pose_contract_and_never_counts_errors_as_equal():
         "dynamic_search": {"selected": [{"pose_id": "b", "kind": "library_original"}]},
     }
     assert pose_signature(a) != pose_signature(b)
+    c = copy.deepcopy(a)
+    c["dynamic_search"]["selected"][0]["camera"] = {"yaw": 90, "pitch": 0}
+    assert pose_signature(c) != pose_signature(a)
     assert pose_signature({"candidates": []}) == []
     failure = {"error": {"type": "JSONDecodeError"}, "result": None}
     assert not same_successful_count(failure, failure)

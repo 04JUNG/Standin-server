@@ -48,7 +48,10 @@ def pose_signature(person):
                 x["pose_id"],
                 x.get("kind"),
                 json.dumps(
-                    x.get("evidence", {}).get("geometry", {}).get("camera"),
+                    x.get(
+                        "camera",
+                        x.get("evidence", {}).get("geometry", {}).get("camera"),
+                    ),
                     sort_keys=True,
                 ),
             )
@@ -278,7 +281,12 @@ def main():
                     chain = []
                     cause = e
                     while cause is not None and len(chain) < 5:
-                        chain.append(dict(type=type(cause).__name__, message=str(cause).replace(key, "[REDACTED]")[:250]))
+                        chain.append(
+                            dict(
+                                type=type(cause).__name__,
+                                message=str(cause).replace(key, "[REDACTED]")[:250],
+                            )
+                        )
                         cause = cause.__cause__
                     row["error_chain"] = chain
                     raise

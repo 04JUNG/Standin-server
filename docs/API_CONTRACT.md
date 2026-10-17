@@ -737,3 +737,12 @@ provider/색인 오류, 모호한 설명, geometric 정상 경로, head/얽힘 �
 FBX에 손을 구우려면 converter `POST /convert`·`/convert-bundle`·`/convert-framed`에 form 필드
 `hand_left`, `hand_right`(프리셋 id)를 보낸다. 보내지 않으면 기존과 바이트 단위로 같은 FBX다.
 프리셋 목록·불변식·제약: `docs/HAND_LIBRARY.md`.
+
+
+### 첫 VLM 체형 통합 (선택적)
+
+`BODY_CLASSIFICATION_STRATEGY=integrated`와 `BODY_MATCHING_MODE=shadow|auto`를 함께 설정하면 최초 `VLM.analyze`가 기존 사람 수·shot·박스·가시성에 `person_bodies`를 추가한다. `coarse_classification`과 `coarse_recommendation`의 외부 형태는 coarse와 같고, `classification_strategy=integrated`, `prompt_version=body-integrated.v3.compact`로 출처를 구분한다. `inference_metadata.vlm_body_prompt_version`은 활성화한 통합 프롬프트 버전 또는 null이다.
+
+별도 crop 체형 호출·계열 재검토는 실행하지 않는다. 체형은 원본 VLM 슬롯 인덱스로 전달하여 출력 인물의 좌우 정렬 뒤에도 연결을 보존한다. 누락·잘못된 체형 응답은 해당 체형만 unknown으로 처리하며 기존 제어 필드를 변경하지 않는다. 주 추천은 항상 기록하되 관측 불명 시 기본 추천이라는 근거를 함께 반환한다. 약한 근거로 자동 적용하지 않으며 `auto_body_id/applied_body_id/selected_asset`는 null이다. 손 모양, 인물 태그, 전신 포즈 설명·재검토·생성은 기존 기능의 독립 호출이므로 전체 파이프라인의 VLM 호출이 한 번이라는 뜻은 아니다.
+
+기본은 `legacy`/`off`이며 실제 환경 설정을 바꾸지 않았다. 평가 모델·28명 기준·전신 경로의 시간과 회귀 관측은 [통합 평가](BODY_SELECTION/INTEGRATED_FIRST_CALL.md)를 따른다.
