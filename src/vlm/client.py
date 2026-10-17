@@ -22,6 +22,7 @@ from ..config import CFG
 from ..body_scope import BodyScope, parse_person_scopes
 from ..person_tags import parse_person_values, stated_value
 from ..logging_setup import log_info, log_warn
+from ..pose_query import validated_object_hands
 from . import prompts
 from .failures import classify_failure, failure_reason
 
@@ -139,6 +140,21 @@ class BaseVLMClient:
         """
         return None
 
+    def describe_people(self, image, boxes: list):
+        """관절 근거가 부족한 인물의 자세 설명(04J-286). ``DescribeOutcome``을 돌려준다.
+
+        지원하지 않는 provider는 '의미 근거 없음'이 아니라 오류로 답한다 — 판단 불가와
+        섞이면 provider 미지원이 러프 품질 문제로 집계되기 때문이다.
+        """
+        from ..search_routing import DescribeOutcome
+
+        return DescribeOutcome("error", error_reason="describe_not_supported",
+                               retryable=False, provider=type(self).__name__)
+
+    def read_hands(self, image, boxes: list) -> Optional[dict]:
+        """인물별 손 모양(04J-290). 지원하지 않는 provider는 None → 손은 기본값."""
+        return None
+
     def rerank(self, image, candidates: list, query_tags: dict) -> list:
         """
         Top-N 후보를 의미 기준으로 재정렬(선택). 기본은 no-op(순서 유지).
@@ -216,6 +232,124 @@ class MockVLMClient(BaseVLMClient):
         )
 
 
+def _mock_describe(self, image, boxes: list):
+    """hint 문자열로 설명을 흉내 낸다. 'describe_fail'이면 VLM 오류, 'vague'면 일반 설명."""
+    from ..search_routing import DescribeOutcome, PoseDescription
+
+    hint = str(getattr(image, "hint", "") or image if isinstance(image, str) else "").lower()
+    if "describe_fail" in hint:
+        return DescribeOutcome("error", error_reason="rate_limited", retryable=True,
+                               retry_after_seconds=30.0, provider="mock")
+    descriptions = {}
+    for index, _box in enumerate(boxes):
+        if "unreadable" in hint:
+            descriptions[index] = PoseDescription(visible=False, certainty="low")
+        elif "vague" in hint:
+            descriptions[index] = PoseDescription(
+                postures=["standing"], body_details="", search_text="서 있는 사람",
+                certainty="low")
+        else:
+            descriptions[index] = PoseDescription(
+                postures=["standing"], actions=["run"], domains=["sports"],
+                activities=["athletics"], intents=["prepare_action"],
+                body_details="팔과 다리를 앞뒤로 크게 엇갈려 뻗음",
+                search_text="큰 보폭으로 팔다리를 엇갈려 달리는 자세", certainty="medium")
+    return DescribeOutcome("ok", descriptions=descriptions, provider="mock")
+
+
+MockVLMClient.describe_people = _mock_describe
+
+
+def parse_pose_descriptions(payload, count: int) -> dict:
+    """설명 응답 → {인덱스: PoseDescription}. 길이가 다르면 통째로 버린다(한 칸 밀림 방지)."""
+    from ..search_routing import PoseDescription
+    from ..semantic_vocab import VOCABULARY
+    from ..body_language import validated_observations
+    from ..pose_relations import validate_relations
+
+    people = payload.get("people") if isinstance(payload, dict) else None
+    if not isinstance(people, list) or len(people) != count:
+        raise ValueError("describe_people: people length mismatch")
+    groups = {
+        "postures": "posture", "actions": "action", "domains": "domain",
+        "activities": "activity", "objects": "object", "intents": "intent",
+        "emotions": "emotion",
+    }
+    out = {}
+    for index, item in enumerate(people):
+        if not isinstance(item, dict):
+            out[index] = None
+            continue
+        kept, dropped = {}, {}
+        for field_name, group in groups.items():
+            values = item.get(field_name)
+            values = values if isinstance(values, list) else []
+            allowed = VOCABULARY[group]
+            kept[field_name] = list(dict.fromkeys(
+                value for value in values if isinstance(value, str) and value in allowed))
+            bad = [value for value in values if not (isinstance(value, str) and value in allowed)]
+            if bad:
+                dropped[field_name] = [str(value)[:40] for value in bad][:10]
+        certainty = item.get("certainty")
+        observations = validated_observations(item.get("body_observations"))
+        raw_observations = item.get("body_observations")
+        if isinstance(raw_observations, dict):
+            invalid = {str(k)[:40]: str(v)[:40] for k, v in raw_observations.items()
+                       if k not in observations}
+            if invalid:
+                dropped["body_observations"] = invalid
+        context = item.get("context_evidence")
+        context = context.strip()[:200] if isinstance(context, str) else ""
+        if not context:
+            # Interpretations without evidence cannot dominate the main query.
+            for name in ("domains", "activities", "objects", "intents", "emotions"):
+                if kept[name]:
+                    dropped[f"ungrounded_{name}"] = kept[name]
+                    kept[name] = []
+        from ..pose_requirements import clean_arm_states,hand_counts
+        counts=hand_counts(item.get('held_object_hand_counts'))
+        for obj,side in validated_object_hands(item.get('held_object_hands'),kept['objects']).items():
+            if side in ('left','right','both'):counts.setdefault(obj,'two' if side=='both' else 'one')
+        out[index] = PoseDescription(
+            visible=item.get("visible") is not False,
+            body_details=str(item.get("body_details") or "")[:300],
+            search_text=str(item.get("search_text") or "")[:200],
+            certainty=certainty if certainty in ("high", "medium", "low") else None,
+            body_observations=observations, context_evidence=context,
+            held_object_hands=validated_object_hands(
+                item.get('held_object_hands'),kept['objects']),
+            held_object_hand_counts={k:v for k,v in counts.items() if k in kept['objects']},
+            arm_states=clean_arm_states(item.get('arm_states')),
+            pose_relations=validate_relations(item.get('pose_relations')),
+            visible_scope=item.get('visible_scope') if item.get('visible_scope') in ('full','half','shoulder_head','head') else None,
+            head_view=item.get('head_view') if item.get('head_view') in ('front','profile_left','profile_right','back','three_quarter_left','three_quarter_right') else None,
+            dropped=dropped, **kept,
+        )
+    return out
+
+
+def describe_failure_reason(error: Exception) -> tuple[str, bool, Optional[float]]:
+    """설명 호출 실패 → (reason, retryable, retry_after). 04J-294 분류가 있으면 그대로 쓴다."""
+    status = _http_status(error)
+    timed_out = _is_timeout(error)
+    upstream = timed_out or status == 429 or (status is not None and 500 <= status < 600)
+    if not upstream:
+        # 우리 쪽(파싱·스키마·SDK) 문제. 상류 혼잡으로 분류하지 않는다.
+        return ("invalid_response" if isinstance(error, (ValueError, KeyError))
+                else "provider_error"), False, None
+    try:
+        from .failures import classify_failure  # 04J-294(PR #86) 병합 후 존재
+    except ImportError:
+        classify_failure = None
+    if classify_failure is not None:
+        reason, delay = classify_failure(error, status, timed_out=timed_out)
+    else:
+        reason = ("timeout" if timed_out else "rate_limited" if status == 429
+                  else "upstream_unavailable" if status == 503 else "upstream_error")
+        delay = None
+    return reason, reason != "daily_quota_exhausted", delay
+
+
 class GeminiVLMClient(BaseVLMClient):
     """Gemini Flash 어댑터 (현행 google-genai SDK). `pip install google-genai pillow`, env GEMINI_API_KEY.
     모델은 GEMINI_MODEL env로 지정(기본 gemini-2.5-flash). 최신 Flash로 올리려면 그 값을 바꾼다."""
@@ -274,6 +408,122 @@ class GeminiVLMClient(BaseVLMClient):
                      errorType=type(error).__name__,
                      elapsedMs=round((self._clock() - started) * 1000))
             return None
+
+    def read_hands(self, image, boxes: list) -> Optional[dict]:
+        """손 모양 전용 호출. 실패하면 기존 기본 손으로 반환한다."""
+        from google.genai import types
+        from converter.hand_library import load_library
+
+        library = load_library()
+        presets = [(p.preset_id, p.label_ko, p.vlm_hint, library.categories[p.category])
+                   for p in library.presets.values()]
+        started = self._clock()
+        try:
+            resp = self._client.models.generate_content(
+                model=self._model,
+                contents=[prompts.hand_shapes_prompt(boxes, presets), self._to_part(image)],
+                config=types.GenerateContentConfig(
+                    system_instruction=prompts.HAND_SHAPES_SYSTEM,
+                    response_mime_type="application/json",
+                    temperature=0,
+                    http_options=types.HttpOptions(timeout=CFG.vlm_hand_shapes_timeout_ms),
+                ),
+            )
+            payload = _extract_json(resp.text)
+            log_info("gemini_hand_shapes", model=self._model, status="ok",
+                     people=len(boxes),
+                     elapsedMs=round((self._clock() - started) * 1000))
+            return payload if isinstance(payload, dict) else None
+        except Exception as error:
+            log_warn("gemini_hand_shapes", model=self._model, status="failed",
+                     errorType=type(error).__name__,
+                     elapsedMs=round((self._clock() - started) * 1000))
+            return None
+
+    def describe_people(self, image, boxes: list):
+        """One bounded retry for transient errors, then independent side review."""
+        result = self._describe_people_once(image, boxes)
+        delay = result.retry_after_seconds or 0
+        if result.status == 'error' and result.retryable and delay <= 2:
+            if delay > 0:
+                self._sleep(delay)
+            first_ms=result.elapsed_ms
+            result=self._describe_people_once(image, boxes)
+            result.attempts=2
+            result.elapsed_ms+=first_ms
+        if result.status == 'ok' and any(d and (d.held_object_hands or d.pose_relations) for d in result.descriptions.values()):
+            self._review_pose_sides(image, boxes, result.descriptions)
+        return result
+
+    def _review_pose_sides(self, image, boxes, descriptions):
+        from google.genai import types
+        from ..pose_relations import validate_relations
+        requested=[{'objects':list(d.held_object_hands), 'actions':[r['kind'] for r in d.pose_relations]} if d else {} for d in descriptions.values()]
+        prompt=('러프의 각 인물 팔 연결만 독립 검수한다. 인물 기준 좌우다. 화면 위치만으로 판정 금지. '
+            '손목-팔꿈치-어깨 연결이 가려지거나 모호하면 unknown. 물건을 쥔 손과 만진 손을 구분. '
+            '박스 순서대로 people 배열. 각 항목은 held_object_hands(물건: left/right/both/unknown), '
+            'chain_visible(boolean), evidence(팔 연결 근거), pose_relations 배열(kind,side,chain_visible,side_confidence:high/unknown,evidence). '
+            '확인할 물건/동작만 답하고 새 사람/좌표는 만들지 않는다. JSON만 반환. '
+            +json.dumps({'boxes':boxes,'requested':requested},ensure_ascii=False))
+        try:
+            resp=self._client.models.generate_content(model=self._model,contents=[prompt,self._to_part(image)],
+                config=types.GenerateContentConfig(response_mime_type='application/json',temperature=0,
+                    http_options=types.HttpOptions(timeout=20000)))
+            rows=_extract_json(resp.text)['people']
+            if not isinstance(rows,list) or len(rows)!=len(boxes):raise ValueError('side_review_length')
+        except Exception:
+            rows=[{} for _ in boxes]
+        for i,d in descriptions.items():
+            if not d:continue
+            row=rows[i] if isinstance(rows[i],dict) else {}
+            second=validated_object_hands(row.get('held_object_hands'),d.objects)
+            changes=[]
+            for obj,side in d.held_object_hands.items():
+                if row.get('chain_visible') is not True or not row.get('evidence') or second.get(obj)!=side:
+                    changes.append({'object':obj,'initial':side,'review':second.get(obj),'status':'abstain'})
+                    d.held_object_hands[obj]='unknown'
+            reviewed=validate_relations(row.get('pose_relations'))
+            for relation in d.pose_relations:
+                other=next((r for r in reviewed if r['kind']==relation['kind']),{})
+                if relation['side']!='unknown' and other.get('side')!=relation['side']:
+                    changes.append({'action':relation['kind'],'initial':relation['side'],'review':other.get('side'),'status':'abstain'})
+                    relation['side']='unknown';relation['side_confidence']='unknown'
+            d.laterality_review=dict(status='reviewed' if row else 'unavailable_abstain',changes=changes,
+                evidence=str(row.get('evidence') or '')[:300],independent=True,not_ground_truth=True)
+
+    def _describe_people_once(self, image, boxes: list):
+        """Single request; caller controls the bounded retry."""
+        from google.genai import types
+        from ..search_routing import DescribeOutcome
+
+        started = self._clock()
+        try:
+            resp = self._client.models.generate_content(
+                model=self._model,
+                contents=[prompts.pose_describe_prompt(boxes), self._to_part(image)],
+                config=types.GenerateContentConfig(
+                    system_instruction=prompts.POSE_DESCRIBE_SYSTEM,
+                    response_mime_type="application/json",
+                    temperature=0,
+                    http_options=types.HttpOptions(timeout=CFG.routing_describe_timeout_ms),
+                ),
+            )
+            descriptions = parse_pose_descriptions(_extract_json(resp.text), len(boxes))
+        except Exception as error:  # noqa: BLE001 - 상태로 돌려준다
+            reason, retryable, delay = describe_failure_reason(error)
+            elapsed = (self._clock() - started) * 1000
+            log_warn("gemini_pose_describe", model=self._model, status="failed",
+                     failureReason=reason, errorType=type(error).__name__,
+                     upstreamStatus=_http_status(error), elapsedMs=round(elapsed))
+            return DescribeOutcome("error", error_reason=reason, retryable=retryable,
+                                   retry_after_seconds=delay, elapsed_ms=elapsed,
+                                   provider="gemini")
+        elapsed = (self._clock() - started) * 1000
+        log_info("gemini_pose_describe", model=self._model, status="ok",
+                 people=len(boxes), promptVersion=prompts.POSE_DESCRIBE_VERSION,
+                 elapsedMs=round(elapsed))
+        return DescribeOutcome("ok", descriptions=descriptions, elapsed_ms=elapsed,
+                               provider="gemini")
 
     def analyze(self, image, img_w: int, img_h: int) -> VLMAnalysis:
         from google.genai import types

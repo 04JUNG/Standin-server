@@ -86,7 +86,15 @@ COPY converter/thumbnail_render.py /app/converter/thumbnail_render.py
 COPY converter/preview_style.py /app/converter/preview_style.py
 COPY converter/preview_studio.sl /app/converter/preview_studio.sl
 COPY converter/worker.py /app/converter/worker.py
+COPY converter/scene_contract.py /app/converter/scene_contract.py
+COPY converter/scene.py /app/converter/scene.py
+COPY converter/scene_worker.py /app/converter/scene_worker.py
 COPY converter/framing.py /app/converter/framing.py
+COPY converter/hand_library.py /app/converter/hand_library.py
+COPY converter/hand_library.v1.json /app/converter/hand_library.v1.json
+COPY converter/hand_geometry.py /app/converter/hand_geometry.py
+COPY converter/hand_collision.py /app/converter/hand_collision.py
+COPY converter/hands.py /app/converter/hands.py
 COPY converter/camera.py /app/converter/camera.py
 COPY converter/preview_model.py /app/converter/preview_model.py
 COPY converter/framed_model.py /app/converter/framed_model.py
@@ -96,6 +104,8 @@ COPY converter_api/__init__.py /app/converter_api/__init__.py
 COPY converter_api/app.py /app/converter_api/app.py
 COPY converter_api/registry.py /app/converter_api/registry.py
 COPY converter_api/runner.py /app/converter_api/runner.py
+COPY converter_api/scene_runner.py /app/converter_api/scene_runner.py
+COPY converter_api/scene_routes.py /app/converter_api/scene_routes.py
 COPY converter_api/schemas.py /app/converter_api/schemas.py
 COPY config/characters.example.json /app/config/characters.example.json
 

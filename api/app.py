@@ -35,6 +35,12 @@ import numpy as np
 from fastapi import FastAPI, File, Form, Request, UploadFile, HTTPException
 from fastapi.responses import FileResponse, JSONResponse, Response
 
+from src.hand_shapes import default_hands
+from src.hand_catalog import (
+    build_catalog as build_hand_catalog,
+    thumbnail_etag as hand_thumbnail_etag,
+    thumbnail_path as hand_thumbnail_path,
+)
 from src.config import CFG
 from src.bvh import parse_bvh
 from src.logging_setup import (configure_logging, log_error, log_info,
@@ -51,6 +57,7 @@ from src.pose_model_source import PoseModelFetchError, ensure_pose_model
 from src.refine import (REFINE_CODE_VERSION, REFINE_V2_CODE_VERSION,
                         refine_bvh)
 from src.refine_policy import structural_refine_allowed
+from src.refine_projection import ProjectionDomainError, VERSION as REFINE_PROJECTION_VERSION
 from src.pose_catalog import build_catalog, folders as pose_catalog_folders, page as pose_catalog_page
 from src.pose_quarantine import (load_pose_quarantine, pose_quarantine_sha256,
                                  quarantine_record)
@@ -71,6 +78,7 @@ from src.runtime_guard import (
     ensure_production_backends,
 )
 from api.models import (CutResultOut, PersonOut, CandidateOut, SkeletonOut,
+                        SemanticCandidateOut,
                         ImageInfoOut, InferenceMetadataOut,
                         RefineRequest, RefineResponse, RefineThumbnailOut,
                         ExportOrderRequest, ExportOrder, ExportItem)
@@ -218,7 +226,8 @@ async def lifespan(app: FastAPI):
         entries = _ensure_db()                      # 1회 로드
         library_identity = _resolve_library_identity()  # 응답에 실을 번들 버전
         model_bundle = _ensure_pose_model_bundle()  # S3 bundle → local manifest
-        pipeline = Pipeline(entries)                # VLM/검출/포즈 팩토리도 1회 초기화
+        from src.fullbody_routing import build_api_pipeline
+        pipeline = build_api_pipeline(entries, db_path=DB_PATH)
         _check_backends(pipeline)                   # 팩토리 폴백 후 실제 인스턴스 검사
         # production에서 converter 주소가 없으면 여기서 기동이 실패한다(옛 마네킹을
         # 조용히 서빙하지 않는다). 개발은 경고 후 마네킹으로 폴백한다.
@@ -294,6 +303,7 @@ def _refine_capability() -> dict:
         REFINE_V2_CODE_VERSION if CFG.refine_v2_enabled else REFINE_CODE_VERSION
     )
     identity = {
+        'projection_version': REFINE_PROJECTION_VERSION,
         "code_version": code_version,
         "feature_version": FEATURE_VERSION,
         "pose_library_version": CFG.pose_library_version,
@@ -408,6 +418,8 @@ def healthz():
     pose_count = STATE.get("pose_count", 0)
     capability = _refine_capability()
     ok = "pipeline" in STATE and pose_count > 0 and capability["config_valid"]
+    engine = getattr(STATE.get('pipeline'), '_fullbody_search', None)
+    camera = getattr(engine, 'camera', None)
     body = {
         "ok": ok,
         "env": CFG.app_env,
@@ -417,6 +429,13 @@ def healthz():
         "quarantined_pose_count": STATE.get("quarantined_pose_count", 0),
         # 어느 번들이 떠 있는지: version·source(manifest|env)·content_sha256·db_sha256
         "pose_library": STATE.get("pose_library"),
+        # Actual initialized engine, not an environment flag. No model API call.
+        "dynamic_routing": {
+            "enabled": engine is not None,
+            "camera_count": len(getattr(camera, 'cameras', [])),
+            "camera_pose_count": len(getattr(camera, 'pose_ids', [])),
+            "semantic_backend": getattr(getattr(engine, 'semantic', None), 'backend', None),
+        },
         "refine": capability,
         "refine_thumbnail": {
             "renderer": getattr(STATE.get("thumbnail_renderer"), "name", None),
@@ -516,6 +535,20 @@ def _vlm_unavailable_response(exc: VLMUnavailable) -> HTTPException:
     )
 
 
+def _routing_fields(res, index: int) -> dict:
+    """라우팅이 꺼져 있으면 빈 dict → 새 필드는 기본값(빈 목록·null) 그대로."""
+    routes = getattr(res, "person_routing", None) or []
+    if index >= len(routes) or routes[index] is None:
+        return {}
+    semantic = getattr(res, "person_semantic_candidates", None) or []
+    hits = semantic[index] if index < len(semantic) and semantic[index] else []
+    return {
+        "search_routing": routes[index],
+        "dynamic_search": routes[index].get("fullbody_search"),
+        "semantic_candidates": [SemanticCandidateOut(**hit) for hit in hits],
+    }
+
+
 @app.post("/analyze", response_model=CutResultOut)
 def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
             rescue: Annotated[str, Form()] = "",
@@ -598,6 +631,8 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
             quality_reasons=desc.quality_reasons,
             output_scope=asdict(desc.output_scope),
             person_tags=asdict(desc.person_tags),
+            hands=asdict(desc.hands if desc.hands is not None else default_hands()),
+            **_routing_fields(res, i),
         ))
     vlm_model = (CFG.gemini_model if STATE.get("provider") == "gemini"
                  else CFG.openai_model if STATE.get("provider") == "openai"
@@ -608,6 +643,7 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
         detector_count=res.detector_count, vlm_count=res.vlm_count,
         people=people, notes=res.notes,
         vlm_tags=getattr(res, "vlm_tags", None),
+        search_routing=getattr(res, "routing_summary", None),
         image=ImageInfoOut(width=w, height=h),
         inference_metadata=InferenceMetadataOut(
             deployment_version=CFG.deployment_version,
@@ -711,6 +747,36 @@ def get_pose_thumbnail(pose_id: str, view: str, request: Request):
             "Cache-Control": "private, max-age=86400",
         },
     )
+
+
+# ---- 손 라이브러리 (04J-290, docs/HAND_SELECTION_API.md) -------------------
+
+@app.get("/hands/catalog")
+def get_hand_catalog():
+    """refine 화면 손 칩용 목록: 묶음·프리셋 이름·설명·썸네일 URL·라이브러리 버전.
+
+    라이브러리는 배포 단위로만 바뀌므로 길게 캐시해도 된다. 버전이 바뀌면 sha가 바뀐다.
+    """
+    catalog = build_hand_catalog()
+    return JSONResponse(catalog, headers={
+        "Cache-Control": "private, max-age=3600",
+        "ETag": f'"{catalog["library_sha256"][:32]}"',
+    })
+
+
+@app.get("/hands/{preset_id}/thumbnail")
+def get_hand_thumbnail(preset_id: str, side: str, request: Request):
+    """프리셋 하나의 마네킹 손 PNG(투명 배경). side는 그 인물 자신의 left/right."""
+    if side not in ("left", "right"):
+        raise HTTPException(400, f"unsupported side: {side}")
+    path = hand_thumbnail_path(preset_id, side)
+    if path is None:
+        raise HTTPException(404, f"hand thumbnail not found: {preset_id} ({side})")
+    etag = hand_thumbnail_etag(preset_id, side)
+    headers = {"ETag": etag, "Cache-Control": "private, max-age=86400"}
+    if request.headers.get("if-none-match") == etag:
+        return Response(status_code=304, headers=headers)
+    return FileResponse(path, media_type="image/png", headers=headers)
 
 
 # ---- 포즈 미세조정 (docs/REFINE_DESIGN.md) --------------------------------
@@ -852,6 +918,8 @@ def refine(req: RefineRequest):
     if req.camera and req.camera.source_bvh_sha256 != _file_sha256(base):
         # Also validate before policy/base fallbacks, which can render a preview.
         raise HTTPException(422, "candidate camera source changed; analyze again")
+    if req.camera and req.camera.version=='candidate-camera-v2' and not CFG.refine_v2_enabled:
+        raise HTTPException(422, 'search camera requires refine v2; use legacy search with refine v1')
 
     def _base_context() -> dict:
         return {
@@ -863,7 +931,7 @@ def refine(req: RefineRequest):
             "source_revision": SOURCE_REVISION,
         }
 
-    def _base_response(reason: str) -> RefineResponse:
+    def _base_response(reason: str, *, attempted: bool = False) -> RefineResponse:
         return RefineResponse(
             pose_id=req.pose_id, view=req.view, refined=False,
             reason=reason, bvh_url=f"/pose/{req.pose_id}/bvh", bvh=None,
@@ -874,7 +942,7 @@ def refine(req: RefineRequest):
             loss_base=None, loss_final=None, gain=None, backend="none",
             refine_version=(REFINE_V2_CODE_VERSION if CFG.refine_v2_enabled
                             else REFINE_CODE_VERSION),
-            refine_outcome="not_attempted",
+            refine_outcome="reverted" if attempted else "not_attempted",
             diagnostics={
                 "mode_requested": mode_requested,
                 "mode_effective": effective_mode,
@@ -940,6 +1008,8 @@ def refine(req: RefineRequest):
                          allowed_limbs=effective_limbs,
                          lower_body_observed=req.lower_body_observed,
                          refine_mode=effective_mode, deadline=deadline)
+    except ProjectionDomainError:
+        return _base_response('camera_projection_invalid', attempted=True)
     except ValueError as exc:                      # 알 수 없는 view 등
         raise HTTPException(422, str(exc)) from exc
     except (OSError, AssertionError) as exc:

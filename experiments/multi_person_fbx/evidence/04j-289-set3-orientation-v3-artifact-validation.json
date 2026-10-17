@@ -1,0 +1,128 @@
+{
+  "ok": true,
+  "cuts": 13,
+  "people": 34,
+  "independent_image_evidence_receipts": 102,
+  "verified_upright_pose_gates": 31,
+  "head_aim_max_angular_error_degrees": 0.0,
+  "cases": [
+    {
+      "cut_id": "S3-p_rough_028",
+      "people": 2,
+      "source_hash_and_fresh_receipts": true,
+      "fbx_hashes_and_camera": true,
+      "scope_skin_contract": true,
+      "head_and_bone_geometry": true,
+      "clearance_and_depth_order": true
+    },
+    {
+      "cut_id": "S3-p_rough_038",
+      "people": 2,
+      "source_hash_and_fresh_receipts": true,
+      "fbx_hashes_and_camera": true,
+      "scope_skin_contract": true,
+      "head_and_bone_geometry": true,
+      "clearance_and_depth_order": true
+    },
+    {
+      "cut_id": "S3-p_rough_139",
+      "people": 2,
+      "source_hash_and_fresh_receipts": true,
+      "fbx_hashes_and_camera": true,
+      "scope_skin_contract": true,
+      "head_and_bone_geometry": true,
+      "clearance_and_depth_order": true
+    },
+    {
+      "cut_id": "S3-p_rough_060",
+      "people": 2,
+      "source_hash_and_fresh_receipts": true,
+      "fbx_hashes_and_camera": true,
+      "scope_skin_contract": true,
+      "head_and_bone_geometry": true,
+      "clearance_and_depth_order": true
+    },
+    {
+      "cut_id": "S3-p_rough_066",
+      "people": 2,
+      "source_hash_and_fresh_receipts": true,
+      "fbx_hashes_and_camera": true,
+      "scope_skin_contract": true,
+      "head_and_bone_geometry": true,
+      "clearance_and_depth_order": true
+    },
+    {
+      "cut_id": "S3-p_rough_128",
+      "people": 1,
+      "source_hash_and_fresh_receipts": true,
+      "fbx_hashes_and_camera": true,
+      "scope_skin_contract": true,
+      "head_and_bone_geometry": true,
+      "clearance_and_depth_order": true
+    },
+    {
+      "cut_id": "S3-p_rough_220",
+      "people": 2,
+      "source_hash_and_fresh_receipts": true,
+      "fbx_hashes_and_camera": true,
+      "scope_skin_contract": true,
+      "head_and_bone_geometry": true,
+      "clearance_and_depth_order": true
+    },
+    {
+      "cut_id": "S3-v3_rough_0270",
+      "people": 3,
+      "source_hash_and_fresh_receipts": true,
+      "fbx_hashes_and_camera": true,
+      "scope_skin_contract": true,
+      "head_and_bone_geometry": true,
+      "clearance_and_depth_order": true
+    },
+    {
+      "cut_id": "S3-v3_rough_0718",
+      "people": 3,
+      "source_hash_and_fresh_receipts": true,
+      "fbx_hashes_and_camera": true,
+      "scope_skin_contract": true,
+      "head_and_bone_geometry": true,
+      "clearance_and_depth_order": true
+    },
+    {
+      "cut_id": "S3-p_rough_219",
+      "people": 3,
+      "source_hash_and_fresh_receipts": true,
+      "fbx_hashes_and_camera": true,
+      "scope_skin_contract": true,
+      "head_and_bone_geometry": true,
+      "clearance_and_depth_order": true
+    },
+    {
+      "cut_id": "S3-v3_rough_0275",
+      "people": 3,
+      "source_hash_and_fresh_receipts": true,
+      "fbx_hashes_and_camera": true,
+      "scope_skin_contract": true,
+      "head_and_bone_geometry": true,
+      "clearance_and_depth_order": true
+    },
+    {
+      "cut_id": "S3-p_rough_047",
+      "people": 4,
+      "source_hash_and_fresh_receipts": true,
+      "fbx_hashes_and_camera": true,
+      "scope_skin_contract": true,
+      "head_and_bone_geometry": true,
+      "clearance_and_depth_order": true
+    },
+    {
+      "cut_id": "S3-p_rough_111",
+      "people": 5,
+      "source_hash_and_fresh_receipts": true,
+      "fbx_hashes_and_camera": true,
+      "scope_skin_contract": true,
+      "head_and_bone_geometry": true,
+      "clearance_and_depth_order": true
+    }
+  ],
+  "meaning": "Proves reproducible input/output consistency and rig geometry; does not prove original-image fidelity or correct person census."
+}

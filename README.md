@@ -89,6 +89,11 @@ docker run --rm --platform linux/amd64 --publish 8001:8001 \
 [`docs/FBX_CONVERTER_V3_2_INTEGRATION_HANDOFF.md`](docs/FBX_CONVERTER_V3_2_INTEGRATION_HANDOFF.md)를
 따른다.
 
+`POST /compose-scene`은 인물별 최종 FBX와 위치·Y축 회전·균일 스케일을 받아 한 컷 FBX로
+합친다. 결과를 Blender로 다시 읽어 골격·스킨·월드 좌표를 검증한 뒤 `scene.fbx`와
+`manifest.json` ZIP을 반환한다. API·오프라인 CLI·Three.js 단위 변환은
+[`docs/FBX_MULTI_PERSON_SCENE.md`](docs/FBX_MULTI_PERSON_SCENE.md)에 정리했다.
+
 BFF는 `refined=true`면 `/refine` 응답의 inline `bvh`, 아니면 base `bvh_url` 응답 바이트를
 최종 입력으로 선택한다. `/convert-bundle` 성공 응답을 받으면 ZIP·내부 BVH·내부 FBX의 SHA를
 응답 헤더와 `manifest.json`에 각각 대조한 뒤 두 파일을 함께 publish한다. mirror는 Converter에서

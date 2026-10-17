@@ -1,0 +1,780 @@
+{
+  "schema_version": 1,
+  "library_version": "hand-library-v1",
+  "library_sha256": "c031c50f5f43e82c7c25f04e9d402fa40d3ca866bbccf6f541931546a5299a19",
+  "default_preset": "relaxed",
+  "fallback_order": [
+    "relaxed",
+    "fist",
+    "open",
+    "grip"
+  ],
+  "thumbnails_available": true,
+  "categories": [
+    {
+      "id": "basic",
+      "label": "기본",
+      "presets": [
+        {
+          "id": "open",
+          "label": "편 손",
+          "description": "손가락을 곧게 펴고 살짝 벌린 손. 하이파이브·멈춤·손 흔들기·손바닥 보이기.",
+          "thumbnails": {
+            "left": "/hands/open/thumbnail?side=left",
+            "right": "/hands/open/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "relaxed",
+          "label": "힘 뺀 손",
+          "description": "아무것도 쥐지 않고 자연스럽게 살짝 굽은 손. 서 있거나 걷는 기본 상태.",
+          "thumbnails": {
+            "left": "/hands/relaxed/thumbnail?side=left",
+            "right": "/hands/relaxed/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "tense",
+          "label": "힘준 손",
+          "description": "손가락을 크게 벌리고 힘이 들어간 손. 놀람·당황·주문 시전.",
+          "thumbnails": {
+            "left": "/hands/tense/thumbnail?side=left",
+            "right": "/hands/tense/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "blade",
+          "label": "손날",
+          "description": "손가락을 붙여 곧게 편 손. 경례·수도(손날치기)·합장·쉿.",
+          "thumbnails": {
+            "left": "/hands/blade/thumbnail?side=left",
+            "right": "/hands/blade/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "fist",
+          "label": "주먹",
+          "description": "손가락을 끝까지 말아 꽉 쥔 주먹. 펀치·분노·결의.",
+          "thumbnails": {
+            "left": "/hands/fist/thumbnail?side=left",
+            "right": "/hands/fist/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "claw",
+          "label": "갈퀴손",
+          "description": "손가락 둘째·셋째 마디를 세게 굽혀 할퀴듯 벌린 손. 위협·괴물·고통.",
+          "thumbnails": {
+            "left": "/hands/claw/thumbnail?side=left",
+            "right": "/hands/claw/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "soft_open",
+          "label": "살짝 편 손",
+          "description": "힘을 빼고 손가락을 거의 편 손. 무언가를 건네거나 손바닥을 내미는 순간.",
+          "thumbnails": {
+            "left": "/hands/soft_open/thumbnail?side=left",
+            "right": "/hands/soft_open/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "hyper_open",
+          "label": "쫙 젖힌 손",
+          "description": "손가락을 끝까지 펴서 뒤로 살짝 젖힌 손. 강한 멈춤·밀어내기·충격.",
+          "thumbnails": {
+            "left": "/hands/hyper_open/thumbnail?side=left",
+            "right": "/hands/hyper_open/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "limp",
+          "label": "늘어진 손",
+          "description": "힘이 완전히 빠져 축 처진 손. 기절·잠·지친 상태.",
+          "thumbnails": {
+            "left": "/hands/limp/thumbnail?side=left",
+            "right": "/hands/limp/thumbnail?side=right"
+          }
+        }
+      ]
+    },
+    {
+      "id": "hold",
+      "label": "물건 쥐기",
+      "presets": [
+        {
+          "id": "grip",
+          "label": "쥐는 손",
+          "description": "막대·손잡이·가방끈처럼 원통형 물건을 쥔 손. 손가락이 감기지만 가운데가 비어 있다.",
+          "thumbnails": {
+            "left": "/hands/grip/thumbnail?side=left",
+            "right": "/hands/grip/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "cup",
+          "label": "오므린 손",
+          "description": "공·과일을 감싸거나 물을 뜨듯 둥글게 오므린 손. 주먹보다 덜 쥔다.",
+          "thumbnails": {
+            "left": "/hands/cup/thumbnail?side=left",
+            "right": "/hands/cup/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "pinch",
+          "label": "집는 손",
+          "description": "엄지와 검지 끝을 모아 카드·작은 물건을 집은 손. 나머지 손가락은 말려 있다.",
+          "thumbnails": {
+            "left": "/hands/pinch/thumbnail?side=left",
+            "right": "/hands/pinch/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "support",
+          "label": "받치는 손",
+          "description": "손바닥을 펴서 물건을 받치거나 벽·탁자를 짚는 손. 손가락은 거의 펴져 있다.",
+          "thumbnails": {
+            "left": "/hands/support/thumbnail?side=left",
+            "right": "/hands/support/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "hold_phone",
+          "label": "휴대폰 쥐기",
+          "description": "스마트폰·책처럼 납작한 물건을 손바닥에 대고 쥔 손. 엄지가 화면 위에 있다.",
+          "thumbnails": {
+            "left": "/hands/hold_phone/thumbnail?side=left",
+            "right": "/hands/hold_phone/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "hold_cup",
+          "label": "컵 쥐기",
+          "description": "컵·캔·병을 옆에서 감싸 쥔 손. 쥐는 손보다 굵게 벌어져 있다.",
+          "thumbnails": {
+            "left": "/hands/hold_cup/thumbnail?side=left",
+            "right": "/hands/hold_cup/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "pen",
+          "label": "펜 쥐기",
+          "description": "펜·붓·젓가락을 엄지·검지·중지로 잡은 손. 글씨 쓰기·그림 그리기.",
+          "thumbnails": {
+            "left": "/hands/pen/thumbnail?side=left",
+            "right": "/hands/pen/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "hold_bag_handle",
+          "label": "가방 손잡이 들기",
+          "description": "장바구니·서류가방 손잡이를 손가락에 걸어 든 손. 손가락 끝마디가 갈고리처럼 굽는다.",
+          "thumbnails": {
+            "left": "/hands/hold_bag_handle/thumbnail?side=left",
+            "right": "/hands/hold_bag_handle/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "hold_chopsticks",
+          "label": "젓가락 쥐기",
+          "description": "젓가락을 쥔 손. 엄지·검지·중지가 젓가락을 잡고 약지·새끼는 받친다.",
+          "thumbnails": {
+            "left": "/hands/hold_chopsticks/thumbnail?side=left",
+            "right": "/hands/hold_chopsticks/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "hold_spoon",
+          "label": "숟가락 쥐기",
+          "description": "숟가락·포크를 쥔 손. 펜보다 낮게 잡고 손가락이 더 감긴다.",
+          "thumbnails": {
+            "left": "/hands/hold_spoon/thumbnail?side=left",
+            "right": "/hands/hold_spoon/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "hold_book",
+          "label": "책 받쳐 들기",
+          "description": "책·태블릿을 아래에서 받치고 엄지로 위를 누른 손.",
+          "thumbnails": {
+            "left": "/hands/hold_book/thumbnail?side=left",
+            "right": "/hands/hold_book/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "hold_handrail",
+          "label": "손잡이·난간 잡기",
+          "description": "지하철 손잡이·난간·문고리를 잡은 손. 굵은 막대를 느슨하게 감싼다.",
+          "thumbnails": {
+            "left": "/hands/hold_handrail/thumbnail?side=left",
+            "right": "/hands/hold_handrail/thumbnail?side=right"
+          }
+        }
+      ]
+    },
+    {
+      "id": "weapon",
+      "label": "무기",
+      "presets": [
+        {
+          "id": "sword_grip",
+          "label": "검 쥐기",
+          "description": "칼자루·검·몽둥이를 꽉 쥔 손. 쥐는 손보다 더 단단히 감긴다.",
+          "thumbnails": {
+            "left": "/hands/sword_grip/thumbnail?side=left",
+            "right": "/hands/sword_grip/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "gun_trigger",
+          "label": "권총 쥐기",
+          "description": "권총 손잡이를 쥐고 검지를 방아쇠에 건 손.",
+          "thumbnails": {
+            "left": "/hands/gun_trigger/thumbnail?side=left",
+            "right": "/hands/gun_trigger/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "gun_ready",
+          "label": "총 쥐기(검지 펴기)",
+          "description": "총을 쥐되 검지를 방아쇠 밖으로 곧게 편 손. 경계·대기 자세.",
+          "thumbnails": {
+            "left": "/hands/gun_ready/thumbnail?side=left",
+            "right": "/hands/gun_ready/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "bow_draw",
+          "label": "활시위 당기기",
+          "description": "검지·중지·약지를 갈고리처럼 걸어 활시위를 당긴 손.",
+          "thumbnails": {
+            "left": "/hands/bow_draw/thumbnail?side=left",
+            "right": "/hands/bow_draw/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "staff_grip",
+          "label": "창·봉 쥐기",
+          "description": "창·지팡이·빗자루처럼 굵은 장대를 쥔 손. 손가락이 덜 감긴다.",
+          "thumbnails": {
+            "left": "/hands/staff_grip/thumbnail?side=left",
+            "right": "/hands/staff_grip/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "dagger_reverse",
+          "label": "단검 역수 쥐기",
+          "description": "단검을 칼날이 새끼 쪽으로 오게 거꾸로 쥔 손. 엄지가 칼자루 끝을 덮는다.",
+          "thumbnails": {
+            "left": "/hands/dagger_reverse/thumbnail?side=left",
+            "right": "/hands/dagger_reverse/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "rifle_support",
+          "label": "총 받침손",
+          "description": "소총·장총의 몸통을 아래에서 받친 손. 손가락이 가볍게 감싼다.",
+          "thumbnails": {
+            "left": "/hands/rifle_support/thumbnail?side=left",
+            "right": "/hands/rifle_support/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "throw_knife",
+          "label": "던지기용 단검 쥐기",
+          "description": "던지려고 단검이나 수리검을 엄지·검지·중지로 집은 손.",
+          "thumbnails": {
+            "left": "/hands/throw_knife/thumbnail?side=left",
+            "right": "/hands/throw_knife/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "shield_grip",
+          "label": "방패 손잡이 쥐기",
+          "description": "방패 안쪽 손잡이를 쥔 손. 손가락이 짧은 손잡이에 감긴다.",
+          "thumbnails": {
+            "left": "/hands/shield_grip/thumbnail?side=left",
+            "right": "/hands/shield_grip/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "wand_grip",
+          "label": "지팡이·완드 쥐기",
+          "description": "마법봉·지휘봉을 쥐고 검지를 봉을 따라 편 손.",
+          "thumbnails": {
+            "left": "/hands/wand_grip/thumbnail?side=left",
+            "right": "/hands/wand_grip/thumbnail?side=right"
+          }
+        }
+      ]
+    },
+    {
+      "id": "sports",
+      "label": "스포츠·공",
+      "presets": [
+        {
+          "id": "ball_palm",
+          "label": "공 받치기",
+          "description": "농구공·배구공처럼 큰 공을 손가락을 벌려 받치거나 잡은 손.",
+          "thumbnails": {
+            "left": "/hands/ball_palm/thumbnail?side=left",
+            "right": "/hands/ball_palm/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "ball_grip",
+          "label": "공 쥐기(야구공)",
+          "description": "야구공·작은 공을 손끝으로 쥔 손. 검지·중지가 위, 엄지가 아래.",
+          "thumbnails": {
+            "left": "/hands/ball_grip/thumbnail?side=left",
+            "right": "/hands/ball_grip/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "racket_grip",
+          "label": "라켓·배트 쥐기",
+          "description": "라켓·배트·골프채 손잡이를 쥔 손. 검지가 살짝 떨어져 있다.",
+          "thumbnails": {
+            "left": "/hands/racket_grip/thumbnail?side=left",
+            "right": "/hands/racket_grip/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "basketball_shoot",
+          "label": "슛 손",
+          "description": "농구 슛을 쏘는 손. 손가락을 벌려 공을 받친 채 손끝으로 민다.",
+          "thumbnails": {
+            "left": "/hands/basketball_shoot/thumbnail?side=left",
+            "right": "/hands/basketball_shoot/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "volleyball_set",
+          "label": "토스 손",
+          "description": "배구 토스처럼 머리 위에서 공을 받치는 손. 손가락이 둥글게 벌어진다.",
+          "thumbnails": {
+            "left": "/hands/volleyball_set/thumbnail?side=left",
+            "right": "/hands/volleyball_set/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "bowling",
+          "label": "볼링공 쥐기",
+          "description": "중지·약지·엄지를 볼링공 구멍에 넣은 손. 검지·새끼는 공 표면에 편다.",
+          "thumbnails": {
+            "left": "/hands/bowling/thumbnail?side=left",
+            "right": "/hands/bowling/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "climbing_crimp",
+          "label": "클라이밍 크림프",
+          "description": "암벽의 작은 홀드를 손끝으로 거는 손. 둘째 마디가 세게 굽고 끝마디는 젖혀진다.",
+          "thumbnails": {
+            "left": "/hands/climbing_crimp/thumbnail?side=left",
+            "right": "/hands/climbing_crimp/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "swim_stroke",
+          "label": "수영 손",
+          "description": "물을 끌어당기는 수영 손. 손가락을 붙이고 살짝 오목하게 만든다.",
+          "thumbnails": {
+            "left": "/hands/swim_stroke/thumbnail?side=left",
+            "right": "/hands/swim_stroke/thumbnail?side=right"
+          }
+        }
+      ]
+    },
+    {
+      "id": "tool",
+      "label": "도구·악기",
+      "presets": [
+        {
+          "id": "piano",
+          "label": "피아노 치기",
+          "description": "건반 위에서 손가락을 둥글게 세운 손.",
+          "thumbnails": {
+            "left": "/hands/piano/thumbnail?side=left",
+            "right": "/hands/piano/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "guitar_chord",
+          "label": "기타 코드 잡기",
+          "description": "기타 지판에서 코드를 누르는 손. 손가락 끝을 세우고 엄지는 넥 뒤에 있다.",
+          "thumbnails": {
+            "left": "/hands/guitar_chord/thumbnail?side=left",
+            "right": "/hands/guitar_chord/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "hammer_grip",
+          "label": "망치 쥐기",
+          "description": "망치·도끼 자루를 단단히 쥔 손.",
+          "thumbnails": {
+            "left": "/hands/hammer_grip/thumbnail?side=left",
+            "right": "/hands/hammer_grip/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "mic_grip",
+          "label": "마이크 쥐기",
+          "description": "마이크를 쥔 손. 손가락이 감기고 새끼가 살짝 떨어진다.",
+          "thumbnails": {
+            "left": "/hands/mic_grip/thumbnail?side=left",
+            "right": "/hands/mic_grip/thumbnail?side=right"
+          }
+        }
+      ]
+    },
+    {
+      "id": "daily",
+      "label": "일상 동작",
+      "presets": [
+        {
+          "id": "typing",
+          "label": "타이핑",
+          "description": "키보드를 치는 손. 손가락이 고르게 둥글게 굽는다.",
+          "thumbnails": {
+            "left": "/hands/typing/thumbnail?side=left",
+            "right": "/hands/typing/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "press_button",
+          "label": "버튼 누르기",
+          "description": "검지로 버튼·화면·벨을 누르는 손. 나머지 손가락은 가볍게 만다.",
+          "thumbnails": {
+            "left": "/hands/press_button/thumbnail?side=left",
+            "right": "/hands/press_button/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "phone_swipe",
+          "label": "휴대폰 넘기기",
+          "description": "휴대폰을 쥔 채 엄지를 펴서 화면을 넘기는 손.",
+          "thumbnails": {
+            "left": "/hands/phone_swipe/thumbnail?side=left",
+            "right": "/hands/phone_swipe/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "scratch_head",
+          "label": "머리 긁기",
+          "description": "머리·뺨을 긁는 손. 손가락 끝마디가 살짝 굽는다.",
+          "thumbnails": {
+            "left": "/hands/scratch_head/thumbnail?side=left",
+            "right": "/hands/scratch_head/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "rest_chin",
+          "label": "턱 괴기",
+          "description": "턱이나 뺨을 괸 손. 느슨하게 말린 손가락에 얼굴을 기댄다.",
+          "thumbnails": {
+            "left": "/hands/rest_chin/thumbnail?side=left",
+            "right": "/hands/rest_chin/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "tap_table",
+          "label": "탁자 두드리기",
+          "description": "손가락 끝으로 탁자를 톡톡 두드리는 손.",
+          "thumbnails": {
+            "left": "/hands/tap_table/thumbnail?side=left",
+            "right": "/hands/tap_table/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "floor_press",
+          "label": "바닥 짚기",
+          "description": "손바닥을 바닥·땅에 평평하게 대고 몸을 지탱하는 손. 손가락을 넓게 펴서 바닥에 붙인다. 앉아서 뒤로 짚기·기어가기·넘어져 짚기·팔굽혀펴기.",
+          "thumbnails": {
+            "left": "/hands/floor_press/thumbnail?side=left",
+            "right": "/hands/floor_press/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "cough_fist",
+          "label": "기침 주먹",
+          "description": "기침·헛기침할 때 입 앞에 대는 느슨한 주먹. 손가락이 둥글게 말려 입을 가리고 엄지는 검지 옆에 붙는다.",
+          "thumbnails": {
+            "left": "/hands/cough_fist/thumbnail?side=left",
+            "right": "/hands/cough_fist/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "cover_mouth",
+          "label": "입 가리기",
+          "description": "기침·하품·웃음·놀람으로 입을 손바닥으로 가린 손. 손가락을 붙여 오목하게 감싼다.",
+          "thumbnails": {
+            "left": "/hands/cover_mouth/thumbnail?side=left",
+            "right": "/hands/cover_mouth/thumbnail?side=right"
+          }
+        }
+      ]
+    },
+    {
+      "id": "gesture",
+      "label": "제스처",
+      "presets": [
+        {
+          "id": "point",
+          "label": "가리키기",
+          "description": "검지만 곧게 펴고 나머지는 말아 쥔 손. 지목·명령·쉿.",
+          "thumbnails": {
+            "left": "/hands/point/thumbnail?side=left",
+            "right": "/hands/point/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "v_sign",
+          "label": "브이",
+          "description": "검지·중지를 벌려 편 브이 손. 승리·사진 포즈.",
+          "thumbnails": {
+            "left": "/hands/v_sign/thumbnail?side=left",
+            "right": "/hands/v_sign/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "thumbs_up",
+          "label": "엄지척",
+          "description": "주먹을 쥐고 엄지만 위로 세운 손. 칭찬·좋아요.",
+          "thumbnails": {
+            "left": "/hands/thumbs_up/thumbnail?side=left",
+            "right": "/hands/thumbs_up/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "ok_sign",
+          "label": "오케이",
+          "description": "엄지와 검지로 동그라미를 만들고 나머지는 편 손.",
+          "thumbnails": {
+            "left": "/hands/ok_sign/thumbnail?side=left",
+            "right": "/hands/ok_sign/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "finger_heart",
+          "label": "손가락 하트",
+          "description": "엄지와 검지를 엇갈려 작은 하트를 만든 손. 나머지는 말아 쥔다.",
+          "thumbnails": {
+            "left": "/hands/finger_heart/thumbnail?side=left",
+            "right": "/hands/finger_heart/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "call_me",
+          "label": "전화해(샤카)",
+          "description": "엄지와 새끼만 펴고 나머지를 말아 쥔 손. 전화 흉내·인사.",
+          "thumbnails": {
+            "left": "/hands/call_me/thumbnail?side=left",
+            "right": "/hands/call_me/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "rock",
+          "label": "락(뿔)",
+          "description": "검지와 새끼만 펴고 엄지로 중지·약지를 누른 손. 락 공연·장난.",
+          "thumbnails": {
+            "left": "/hands/rock/thumbnail?side=left",
+            "right": "/hands/rock/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "beckon",
+          "label": "이리 와",
+          "description": "검지를 갈고리처럼 굽혀 부르는 손. 나머지는 말아 쥔다.",
+          "thumbnails": {
+            "left": "/hands/beckon/thumbnail?side=left",
+            "right": "/hands/beckon/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "count_three",
+          "label": "숫자 셋",
+          "description": "검지·중지·약지를 펴고 엄지로 새끼를 누른 손.",
+          "thumbnails": {
+            "left": "/hands/count_three/thumbnail?side=left",
+            "right": "/hands/count_three/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "count_four",
+          "label": "숫자 넷",
+          "description": "엄지만 접고 네 손가락을 편 손.",
+          "thumbnails": {
+            "left": "/hands/count_four/thumbnail?side=left",
+            "right": "/hands/count_four/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "cross_fingers",
+          "label": "행운 빌기",
+          "description": "검지 위로 중지를 꼬아 겹친 손.",
+          "thumbnails": {
+            "left": "/hands/cross_fingers/thumbnail?side=left",
+            "right": "/hands/cross_fingers/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "pinky_promise",
+          "label": "새끼손가락 약속",
+          "description": "새끼손가락만 펴서 갈고리처럼 건 손. 나머지는 말아 쥔다.",
+          "thumbnails": {
+            "left": "/hands/pinky_promise/thumbnail?side=left",
+            "right": "/hands/pinky_promise/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "gun_finger",
+          "label": "손가락 총",
+          "description": "엄지를 세우고 검지를 편 손가락 총.",
+          "thumbnails": {
+            "left": "/hands/gun_finger/thumbnail?side=left",
+            "right": "/hands/gun_finger/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "snap",
+          "label": "손가락 튕기기",
+          "description": "엄지와 중지를 맞대고 딱 소리를 내기 직전의 손.",
+          "thumbnails": {
+            "left": "/hands/snap/thumbnail?side=left",
+            "right": "/hands/snap/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "wave",
+          "label": "손 흔들기",
+          "description": "손을 흔들어 인사하는 손. 손가락이 펴지고 살짝 벌어진다.",
+          "thumbnails": {
+            "left": "/hands/wave/thumbnail?side=left",
+            "right": "/hands/wave/thumbnail?side=right"
+          }
+        }
+      ]
+    },
+    {
+      "id": "emotion",
+      "label": "감정 표현",
+      "presets": [
+        {
+          "id": "tremble_fist",
+          "label": "부들부들 주먹",
+          "description": "분노·참음으로 하얗게 질릴 만큼 꽉 쥔 주먹. 엄지가 깊이 감긴다.",
+          "thumbnails": {
+            "left": "/hands/tremble_fist/thumbnail?side=left",
+            "right": "/hands/tremble_fist/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "clutch_chest",
+          "label": "가슴 움켜쥐기",
+          "description": "가슴·옷자락을 움켜쥔 손. 아픔·충격·설렘.",
+          "thumbnails": {
+            "left": "/hands/clutch_chest/thumbnail?side=left",
+            "right": "/hands/clutch_chest/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "cover_face",
+          "label": "얼굴 가리기",
+          "description": "얼굴·눈을 가린 손. 손가락이 붙어 살짝 오목하다.",
+          "thumbnails": {
+            "left": "/hands/cover_face/thumbnail?side=left",
+            "right": "/hands/cover_face/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "pray",
+          "label": "기도하는 손",
+          "description": "두 손을 모아 기도하는 손. 손가락을 붙여 곧게 편다.",
+          "thumbnails": {
+            "left": "/hands/pray/thumbnail?side=left",
+            "right": "/hands/pray/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "reach_out",
+          "label": "손 뻗기",
+          "description": "누군가를 붙잡으려 뻗은 손. 손가락이 벌어지고 살짝 굽는다.",
+          "thumbnails": {
+            "left": "/hands/reach_out/thumbnail?side=left",
+            "right": "/hands/reach_out/thumbnail?side=right"
+          }
+        }
+      ]
+    },
+    {
+      "id": "action",
+      "label": "액션·감정",
+      "presets": [
+        {
+          "id": "loose_fist",
+          "label": "느슨한 주먹",
+          "description": "가볍게 말아 쥔 주먹. 격투 가드·달리기·긴장.",
+          "thumbnails": {
+            "left": "/hands/loose_fist/thumbnail?side=left",
+            "right": "/hands/loose_fist/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "grab",
+          "label": "움켜쥐기",
+          "description": "멱살·팔·옷깃을 움켜잡은 손. 손가락이 굵은 물체를 감싼다.",
+          "thumbnails": {
+            "left": "/hands/grab/thumbnail?side=left",
+            "right": "/hands/grab/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "spell_cast",
+          "label": "마법 시전",
+          "description": "기를 모으거나 마법을 쓰는 손. 손가락을 벌리고 반쯤 굽힌다.",
+          "thumbnails": {
+            "left": "/hands/spell_cast/thumbnail?side=left",
+            "right": "/hands/spell_cast/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "catch_ready",
+          "label": "받을 준비",
+          "description": "날아오는 것을 받으려고 벌린 손.",
+          "thumbnails": {
+            "left": "/hands/catch_ready/thumbnail?side=left",
+            "right": "/hands/catch_ready/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "pull_hook",
+          "label": "끌어당기기",
+          "description": "밧줄·옷깃을 끌어당기는 손. 손가락이 갈고리처럼 걸린다.",
+          "thumbnails": {
+            "left": "/hands/pull_hook/thumbnail?side=left",
+            "right": "/hands/pull_hook/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "push",
+          "label": "밀치기",
+          "description": "상대나 문을 손바닥으로 밀치는 손. 손가락이 펴지고 살짝 벌어진다.",
+          "thumbnails": {
+            "left": "/hands/push/thumbnail?side=left",
+            "right": "/hands/push/thumbnail?side=right"
+          }
+        },
+        {
+          "id": "fingertip_floor",
+          "label": "손끝 짚기",
+          "description": "손바닥을 띄우고 손가락 끝만 바닥에 댄 손. 손가락이 둥글게 서고 엄지는 아래를 향한다. 착지 자세·달리기 출발·웅크려 앉기.",
+          "thumbnails": {
+            "left": "/hands/fingertip_floor/thumbnail?side=left",
+            "right": "/hands/fingertip_floor/thumbnail?side=right"
+          }
+        }
+      ]
+    }
+  ]
+}

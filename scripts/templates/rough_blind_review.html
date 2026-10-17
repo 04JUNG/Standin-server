@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>러프 포즈 후보 검토</title>
+<style>
+:root{color-scheme:light dark;font:16px/1.5 system-ui,sans-serif;background:light-dark(#f5f6f8,#171a20);color:light-dark(#202834,#e7edf4)}
+*{box-sizing:border-box}body{max-width:1320px;margin:0 auto;padding:24px}h1{font-size:24px;margin:0 0 8px}h2{font-size:19px}p{margin:8px 0}
+button,select,input{font:inherit;min-height:42px;border:1px solid light-dark(#bbc4d0,#647080);border-radius:6px;background:light-dark(#fff,#242b35);color:inherit;padding:7px 10px}
+button{cursor:pointer}button:disabled{opacity:.45;cursor:default}button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #398ad0;outline-offset:2px}
+.toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:16px 0}.toolbar label{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#rater{width:170px}.hint{color:light-dark(#4e5b6b,#bac6d4);font-size:14px}.layout{display:grid;grid-template-columns:240px minmax(0,1fr);gap:24px}
+.reference{align-self:start;position:sticky;top:16px}.reference img{width:100%;max-height:430px;object-fit:contain;background:white;border-radius:8px}
+.method{margin:0 0 22px}.method h2{margin:0 0 8px}.candidates{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.candidate{min-width:0;background:light-dark(#fff,#242b35);padding:8px;border-radius:8px}.candidate img{width:100%;aspect-ratio:1;object-fit:contain;background:#f6f6f6;border-radius:4px}
+.candidate label{display:block;font-size:14px}.candidate select{margin-top:5px;width:100%;font-size:14px;padding:6px 3px}.candidate .enlarge{width:100%;margin:5px 0;font-size:13px;min-height:32px}
+.failure{padding:24px;background:light-dark(#fff,#242b35);border-radius:8px}#status{min-height:24px}dialog{border:1px solid #7e8996;border-radius:12px;max-width:min(94vw,720px);background:light-dark(#fff,#242b35);color:inherit}dialog img{display:block;width:100%;max-height:72vh;object-fit:contain}dialog::backdrop{background:#0008}
+@media(max-width:950px){body{padding:16px}.layout{grid-template-columns:190px minmax(0,1fr);gap:14px}.candidates{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:640px){.layout{grid-template-columns:1fr}.reference{position:static}.reference img{max-height:300px}.candidates{grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar{gap:8px}h1{font-size:22px}}
+</style>
+</head>
+<body>
+<h1>러프와 검색 후보 비교</h1>
+<p>러프의 몸통·팔·다리 구도와 좌우·앞뒤 관계가 대체로 맞아, 자세를 크게 바꾸지 않고 참고로 쓸 수 있나요?</p>
+<p class="hint">현재 보이는 시점으로 평가하세요. 얼굴 방향·손가락은 이 미리보기에서 정확하지 않아 평가에서 제외합니다. A·B·C의 방법은 그림마다 섞여 있습니다. 정답 포즈를 찾는 시험이 아니라 사람의 관련성 평가입니다.</p>
+<div class="toolbar">
+<label>평가자 별칭 <input id="rater" placeholder="예: 검토자1" maxlength="40" autocomplete="off"></label>
+<button id="previous" type="button">이전 그림</button>
+<label>그림 <select id="query"></select></label>
+<button id="next" type="button">다음 그림</button>
+<button id="export" type="button">평가 JSON 저장</button>
+</div>
+<p id="progress" aria-live="polite"></p>
+<p id="status" class="hint" role="status">선택 내용은 이 브라우저에 임시 저장됩니다. 완료 후 JSON도 저장해 주세요. 외부로 전송되지 않습니다.</p>
+<div class="layout">
+<aside class="reference"><h2 id="query-title"></h2><img id="input" alt="평가할 원본 러프"><p id="query-note" class="hint"></p></aside>
+<main id="methods"></main>
+</div>
+<dialog id="zoom"><button id="close-zoom" type="button">닫기</button><img id="zoom-image" alt="선택한 후보 확대"></dialog>
+<script id="study-data" type="application/json">__STUDY_DATA__</script>
+<script>
+(() => {
+  const study=JSON.parse(document.getElementById('study-data').textContent);
+  const key='rough-review:'+study.study_id;
+  const $=id=>document.getElementById(id);
+  let state={rater:'',ratings:{},query:0};
+  try{const saved=JSON.parse(localStorage.getItem(key));if(saved&&saved.study_id===study.study_id)state={...state,...saved};}catch(e){}
+  const allowed=new Set(['yes','no','uncertain']);
+  state.ratings=Object.fromEntries(Object.entries(state.ratings||{}).filter(([k,v])=>study.candidate_ids.includes(k)&&allowed.has(v)));
+  state.query=Math.max(0,Math.min(study.queries.length-1,Number(state.query)||0));
+  $('rater').value=state.rater;
+  study.queries.forEach((q,i)=>{const o=document.createElement('option');o.value=i;o.textContent=q.id+(q.failed?' · 추출 실패':'');$('query').append(o);});
+  function save(){try{localStorage.setItem(key,JSON.stringify({...state,study_id:study.study_id}));}catch(e){$('status').textContent='브라우저 임시 저장이 제한됩니다. 평가 JSON 저장을 사용해 주세요.';}}
+  function progress(){$('progress').textContent='평가한 후보 '+Object.keys(state.ratings).length+' / '+study.candidate_ids.length+' · 추출 실패 '+study.failed_queries+'장은 별도로 유지';}
+  function render(){
+    const q=study.queries[state.query];$('query').value=state.query;
+    $('query-title').textContent=q.id+' · 입력 러프';$('input').src=q.input;
+    $('input').alt=q.id+'의 원본 러프';
+    $('query-note').textContent='그림 '+(state.query+1)+' / '+study.queries.length;
+    $('previous').disabled=state.query===0;$('next').disabled=state.query===study.queries.length-1;
+    const main=$('methods');main.replaceChildren();
+    if(q.failed){const p=document.createElement('p');p.className='failure';p.textContent='관절 추출 기준 미달로 세 방법 모두 검색 실패입니다. 평가할 후보가 없으며 이 그림을 결과에서 제외하지 않습니다.';main.append(p);progress();return;}
+    for(const group of q.groups){
+      const section=document.createElement('section');section.className='method';
+      const h=document.createElement('h2');h.textContent='방법 '+group.slot;section.append(h);
+      const grid=document.createElement('div');grid.className='candidates';
+      group.candidates.forEach((c,i)=>{
+        const card=document.createElement('div');card.className='candidate';
+        const im=document.createElement('img');im.src=c.image;im.alt='방법 '+group.slot+'의 '+(i+1)+'위 후보';card.append(im);
+        const zoom=document.createElement('button');zoom.type='button';zoom.className='enlarge';zoom.textContent=(i+1)+'위 · 크게 보기';
+        zoom.addEventListener('click',()=>{$('zoom-image').src=c.image;$('zoom-image').alt=im.alt;$('zoom').showModal();});card.append(zoom);
+        const label=document.createElement('label');label.textContent='참고로 쓸 수 있나요?';
+        const select=document.createElement('select');select.dataset.candidate=c.id;select.setAttribute('aria-label',q.id+' 방법 '+group.slot+' '+(i+1)+'위 평가');
+        [['','미평가'],['yes','쓸 만함'],['no','어려움'],['uncertain','애매함']].forEach(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;select.append(o);});
+        select.value=state.ratings[c.id]||'';
+        select.addEventListener('change',()=>{if(select.value)state.ratings[c.id]=select.value;else delete state.ratings[c.id];save();progress();});
+        label.append(select);card.append(label);grid.append(card);
+      });
+      section.append(grid);main.append(section);
+    }
+    progress();
+  }
+  $('query').addEventListener('change',()=>{state.query=Number($('query').value);save();render();});
+  $('previous').addEventListener('click',()=>{state.query--;save();render();});
+  $('next').addEventListener('click',()=>{state.query++;save();render();});
+  $('rater').addEventListener('input',()=>{state.rater=$('rater').value;save();});
+  $('close-zoom').addEventListener('click',()=>$('zoom').close());
+  $('export').addEventListener('click',()=>{
+    if(!state.rater.trim()){$('status').textContent='평가자 별칭을 입력해 주세요.';$('rater').focus();return;}
+    const complete=Object.keys(state.ratings).length===study.candidate_ids.length;
+    const payload={schema_version:1,study_id:study.study_id,public_data_sha256:study.public_data_sha256,
+      rater:state.rater.trim(),rater_origin:'human-self-report',exported_at:new Date().toISOString(),complete,ratings:state.ratings};
+    const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));
+    const link=document.createElement('a');link.href=url;link.download=study.study_id+'-ratings.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+    $('status').textContent=complete?'평가 파일을 저장했습니다. 파일을 이 대화에 보내면 집계할 수 있어요.':'부분 평가를 저장했습니다. 미평가 항목은 점수로 집계하지 않습니다.';
+  });
+  render();
+})();
+</script>
+</body>
+</html>

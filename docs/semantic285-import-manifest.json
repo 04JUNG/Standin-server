@@ -1,0 +1,116 @@
+{
+  "source_thread_id": "01a12de7-4fcf-7ca1-8e66-23c50864ef87",
+  "source_title": "라이브러리 태깅(sp2) & 시멘틱 검색(sp2)",
+  "source_worktree": "/Users/dw/Desktop/AI소마 17기/.worktrees/standin-semantic-text-search",
+  "source_head": "b2d0a91",
+  "snapshot_date": "2026-10-14",
+  "includes_uncommitted_search_and_review_updates": true,
+  "exact_query_preferences_enabled_by_default": false,
+  "files": [
+    {
+      "source": "src/semantic_search.py",
+      "destination": "src/semantic_search_285.py",
+      "source_sha256": "ca72488b10e7f532fce0e0a825db106d82575f666d7b51627947f7fffb03cf5f",
+      "imported_sha256": "ca72488b10e7f532fce0e0a825db106d82575f666d7b51627947f7fffb03cf5f",
+      "adaptations": "none"
+    },
+    {
+      "source": "src/semantic_relevance.py",
+      "destination": "src/semantic_relevance.py",
+      "source_sha256": "4c9cdbfea3e7a95966c6cfd68a293662c14c0f2a8b416f05f55bd698347a1e6c",
+      "imported_sha256": "4c9cdbfea3e7a95966c6cfd68a293662c14c0f2a8b416f05f55bd698347a1e6c",
+      "adaptations": "none"
+    },
+    {
+      "source": "src/semantic_embedding.py",
+      "destination": "src/semantic_embedding.py",
+      "source_sha256": "a70bf5511c299843afac2f154b6571df1cc3ab8a7bf4e173b0b50347c9916e59",
+      "imported_sha256": "a70bf5511c299843afac2f154b6571df1cc3ab8a7bf4e173b0b50347c9916e59",
+      "adaptations": "none"
+    },
+    {
+      "source": "config/semantic_lexicon.v1.json",
+      "destination": "config/semantic_lexicon.v1.json",
+      "source_sha256": "800af8d09f3eddf5010a2e4b85dea2bfc5b278ff5d5e89ec5bdb90938cafdec6",
+      "imported_sha256": "800af8d09f3eddf5010a2e4b85dea2bfc5b278ff5d5e89ec5bdb90938cafdec6",
+      "adaptations": "none"
+    },
+    {
+      "source": "config/semantic_review_preferences.v1.json",
+      "destination": "config/semantic_review_preferences_285.v1.json",
+      "source_sha256": "87c3ae2b297ecee4dd78ecf0a62f83856818da6ec70fcfe6c01df0ab12818783",
+      "imported_sha256": "87c3ae2b297ecee4dd78ecf0a62f83856818da6ec70fcfe6c01df0ab12818783",
+      "adaptations": "none"
+    },
+    {
+      "source": "config/refine_pose_quarantine.v1.json",
+      "destination": "config/semantic_quarantine_285.v1.json",
+      "source_sha256": "c337dd845f78cd4864e347481b91797c712ffdb98218b578108f3a2809b21065",
+      "imported_sha256": "c337dd845f78cd4864e347481b91797c712ffdb98218b578108f3a2809b21065",
+      "adaptations": "none"
+    },
+    {
+      "source": "tests/test_semantic_search.py",
+      "destination": "tests/test_semantic_search_285.py",
+      "source_sha256": "86a14e631150bfc2f4f0967f48b73e5c1aee46460b806f77b16321a1aba5b246",
+      "imported_sha256": "c13848dc2fcb426531ff9f58edd34ef3a08f104fbf3295bcee0f236c33d23d42",
+      "adaptations": "module alias; direct HTTP test explicit skip; corpus size not hard-coded"
+    },
+    {
+      "source": "tests/test_semantic_relevance.py",
+      "destination": "tests/test_semantic_relevance_285.py",
+      "source_sha256": "182426dddba0395c2d45a3a1ec67a71fe06196f1fbad7335ac4953f753f0177c",
+      "imported_sha256": "4bea5ceae6ea8647429dd3f632cc923f4af79d4a643b3d2ede74223fe80d501e",
+      "adaptations": "module alias; direct HTTP test explicit skip; corpus size not hard-coded"
+    },
+    {
+      "source": "docs/SEMANTIC_SEARCH.md",
+      "destination": "docs/SEMANTIC_285_SOURCE_REFERENCE.md",
+      "source_sha256": "48d7ce63d61e079137e2527dc185be9061a18d714b35d00ecdaebe044343a473",
+      "imported_sha256": "48d7ce63d61e079137e2527dc185be9061a18d714b35d00ecdaebe044343a473",
+      "adaptations": "none"
+    },
+    {
+      "source": "out/semantic-30-20261014/inputs.json",
+      "destination": "tmp/semantic285-handoff/inputs.json",
+      "source_sha256": "7cb8c5dbe5a817175774e62bae8a0a38d7536a18b0c72d46f6158b85c5de43b4",
+      "imported_sha256": "7cb8c5dbe5a817175774e62bae8a0a38d7536a18b0c72d46f6158b85c5de43b4",
+      "adaptations": "none"
+    },
+    {
+      "source": "out/semantic-30-20261014/feedback.jsonl",
+      "destination": "tmp/semantic285-handoff/feedback.jsonl",
+      "source_sha256": "21d982e1d5753376189bd7ceb53bb8abab963c48b8dd238a2a011e317d5ebcec",
+      "imported_sha256": "21d982e1d5753376189bd7ceb53bb8abab963c48b8dd238a2a011e317d5ebcec",
+      "adaptations": "none"
+    },
+    {
+      "source": "out/semantic-30-20261014/runs/feedback-r2/feedback-audit.json",
+      "destination": "tmp/semantic285-handoff/feedback-audit.json",
+      "source_sha256": "f29f55fb304ddf0cf16bb3babeca3f5eae2b7eb912e190fbbdfe0535641530e2",
+      "imported_sha256": "f29f55fb304ddf0cf16bb3babeca3f5eae2b7eb912e190fbbdfe0535641530e2",
+      "adaptations": "none"
+    },
+    {
+      "source": "out/semantic-30-20261014/runs/feedback-r2/results.json",
+      "destination": "tmp/semantic285-handoff/feedback-r2-results.json",
+      "source_sha256": "cbe2067813032b392035718937583b16b7ebc430754dd039aee6a7e43f5ef8b6",
+      "imported_sha256": "cbe2067813032b392035718937583b16b7ebc430754dd039aee6a7e43f5ef8b6",
+      "adaptations": "none"
+    },
+    {
+      "source": "out/semantic-30-20261014/runs/baseline-g38-q027-retry/results.json",
+      "destination": "tmp/semantic285-handoff/baseline-results.json",
+      "source_sha256": "83fdae9db48daef57525c3947d3c72d17d3d56b796cf31cbc39c5da96727f47e",
+      "imported_sha256": "83fdae9db48daef57525c3947d3c72d17d3d56b796cf31cbc39c5da96727f47e",
+      "adaptations": "none"
+    },
+    {
+      "source": "out/semantic-30-20261014/five-without-preferences.json",
+      "destination": "tmp/semantic285-handoff/five-without-preferences.json",
+      "source_sha256": "4d9a832120399a5be323ab9b7bc94850604ae22c56077b6d5c779dc91f0d8605",
+      "imported_sha256": "4d9a832120399a5be323ab9b7bc94850604ae22c56077b6d5c779dc91f0d8605",
+      "adaptations": "none"
+    }
+  ]
+}

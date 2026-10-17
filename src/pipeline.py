@@ -34,11 +34,22 @@ from .pose_rescue import parse_rescue_request, rescue_slots
 from .routing import route
 from .descriptor import build_slot_descriptors
 from .person_tags import apply_person_tags
-from .logging_setup import log_warn
-from .body_scope import BodyScope, detect_scope
+from .hand_shapes import apply_hand_shapes
+from .logging_setup import log_info, log_warn
+from .vlm import prompts
+from .body_scope import BodyScope, detect_scope, refine_scope_from_description
 from .refine_policy import structural_refine_allowed
 from .search import PositionSearchIndex, candidate_stability, knn_geometric, knn_upper_body
+from .pose_quarantine import load_pose_quarantine
 from .tracing import span
+from .search_routing import (
+    RoutingConfig,
+    assess_joint_evidence,
+    assess_semantic_evidence,
+    decide_route,
+    not_requested_semantic,
+)
+from .semantic_search import SemanticQuery, build_semantic_searcher
 from .skeleton_extraction import (
     apply_crop_result,
     assign_candidates,
@@ -63,11 +74,15 @@ class _SlotOutcome:
     stability: dict | None = None
     ab_elapsed_ms: float = 0.0
     hard_fallback: bool = False
+    routing: dict | None = None
+    semantic_candidates: list | None = None
 
 
 class Pipeline:
     def __init__(self, entries, vlm_client: BaseVLMClient | None = None,
-                 detector=None, pose_model=None, body_matcher=None):
+                 detector=None, pose_model=None, body_matcher=None,
+                 semantic_searcher=None, routing_config: RoutingConfig | None = None,
+                 pose_generator=None, fullbody_search=None, skeleton_repairer=None):
         # 검색 행렬과 메타데이터가 실행 중 서로 어긋나지 않도록 같은 immutable
         # snapshot을 공유한다. 라이브러리 갱신은 새 Pipeline 생성 시 자동 반영된다.
         self.entries = tuple(entries)
@@ -75,10 +90,43 @@ class Pipeline:
             PositionSearchIndex.build(self.entries)
             if CFG.position_search_vectorized else None
         )
+        self.perspective_index = None
+        self.perspective_index_status = "disabled"
+        if CFG.pose_search_mode == "perspective":
+            try:
+                from .perspective_search import PerspectiveSearchIndex
+                self.perspective_index = PerspectiveSearchIndex.build(self.entries)
+                self.perspective_index_status = "ready"
+            except (OSError, ValueError, ImportError, AssertionError, IndexError, KeyError):
+                # No partial gallery: a missing/stale original BVH keeps the
+                # whole original index usable. Never serve fabricated geometry.
+                self.perspective_index_status = "library_unavailable"
+                log_warn("perspective_search_index", status="legacy_fallback")
         self.body_matcher = body_matcher
         self.vlm = vlm_client or build_vlm_client()
         self.detector = detector or MockDetector()
         self.pose = pose_model or build_pose_model()
+        # 04J-286 라우팅. 꺼져 있으면 아래 두 값은 읽지 않는다(기존 경로 그대로).
+        self.routing_config = routing_config or RoutingConfig.from_env()
+        self._semantic_searcher = semantic_searcher
+        # Legacy generator injection. The fullbody API factory owns its own generator.
+        # Generated research previews are NOT library candidates or refine bases.
+        self._pose_generator = pose_generator
+        self._fullbody_search = fullbody_search
+        # Review extracted joints before choosing geometry vs semantic routing.
+        # Auto-enable only on the new fullbody path; preserve legacy defaults.
+        if skeleton_repairer is None and fullbody_search is not None:
+            from .skeleton_repair import build_repairer
+            skeleton_repairer = build_repairer(self.vlm)
+        self.skeleton_repairer = skeleton_repairer or None
+
+    @property
+    def semantic_searcher(self):
+        """시맨틱 검색기는 라우팅이 실제로 semantic을 고를 때 처음 만든다."""
+        if self._semantic_searcher is None:
+            self._semantic_searcher = build_semantic_searcher(
+                library_pose_ids={entry.pose_id for entry in self.entries})
+        return self._semantic_searcher
 
     # ---- 인물별 태그(기록용, 별도 호출) ----
     def _start_person_tags(self, image, img_w: int, img_h: int, vlm) -> None:
@@ -113,6 +161,38 @@ class Pipeline:
             return
         apply_person_tags(vlm, payload)
 
+    # ---- 인물별 손 모양(04J-290, 별도 호출) ----
+    def _start_hand_shapes(self, image, img_w: int, img_h: int, vlm) -> None:
+        """손 모양 호출을 백그라운드로 띄운다. 끄면(기본) 손은 기본값으로 나간다."""
+        vlm._hand_shapes_future = None
+        if not CFG.vlm_hand_shapes or vlm.num_people <= 0:
+            return
+        boxes = [
+            None if box is None else (
+                box.x1 / img_w, box.y1 / img_h, box.x2 / img_w, box.y2 / img_h)
+            for box in vlm.approx_boxes[:vlm.num_people]
+        ]
+        if len(boxes) != vlm.num_people:
+            return
+        executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="hand-shapes")
+        vlm._hand_shapes_future = executor.submit(self.vlm.read_hands, image, boxes)
+        executor.shutdown(wait=False)
+
+    def _join_hand_shapes(self, vlm) -> None:
+        """손 모양 결과를 합친다. 늦거나 실패하면 '물어봤지만 없음'으로 기록한다."""
+        future = getattr(vlm, "_hand_shapes_future", None)
+        if future is None:
+            return
+        vlm._hand_shapes_future = None
+        budget = max(0.1, CFG.vlm_hand_shapes_timeout_ms / 1000)
+        try:
+            payload = future.result(timeout=budget)
+        except Exception as error:  # noqa: BLE001 - 분석을 막지 않는다
+            log_warn("hand_shapes_join", status="failed", errorType=type(error).__name__)
+            future.cancel()
+            payload = None
+        apply_hand_shapes(vlm, payload)
+
     # ---- 메인 ----
     def process_cut(self, image, img_w: int = 512, img_h: int = 768,
                     rescue_request=None) -> CutResult:
@@ -133,6 +213,7 @@ class Pipeline:
         #      스켈레톤 추출과 겹쳐 돌려 지연을 숨긴다 — 결과는 descriptor를 만들기
         #      직전에 합친다(`_join_person_tags`).
         self._start_person_tags(image, img_w, img_h, vlm)
+        self._start_hand_shapes(image, img_w, img_h, vlm)
 
         # 2) Shot 분기
         with span("route"):
@@ -142,7 +223,7 @@ class Pipeline:
             detect_scope(vlm, i).detected in (None, BodyScope.HEAD)
             for i in range(vlm.num_people)
         )
-        if all_head:
+        if all_head and self._fullbody_search is None:
             # Keep people/framing metadata even when search is not supported.
             # No pose inference, invented joints, or candidate generation here.
             assignment = assign_candidates(
@@ -154,6 +235,7 @@ class Pipeline:
                 slot.slot_id,
             ))
             self._join_person_tags(vlm)
+            self._join_hand_shapes(vlm)
             descs = build_slot_descriptors(vlm, slots)
             for desc in descs:
                 desc.quality_reasons.append("head_search_unsupported")
@@ -346,12 +428,68 @@ class Pipeline:
                 "Human-Art 폴백 요청 거부: "
                 + ",".join(dict.fromkeys(rescue.rejected_reasons))
             )
+        repair_trace = None
+        if self.skeleton_repairer is not None:
+            with span("skeleton_repair"):
+                repair_trace = self.skeleton_repairer.repair(image, slots, img_w, img_h, CFG)
+            if repair_trace.get("called"):
+                notes.append(
+                    f"Gemini 스켈레톤 보완 {repair_trace['status']}: "
+                    f"수정 {len(repair_trace.get('repaired_slots') or [])}명, "
+                    f"{repair_trace['elapsed_ms']:.0f}ms")
+        # All routes below build descriptors, including hybrid and semantic-only
+        # routes that bypass _evaluate_slot. Preserve develop's hand metadata on
+        # those paths too; hand presets remain independent of pose retrieval.
+        self._join_hand_shapes(vlm)
         threshold_scale = 0.7 if count_confidence == "low" else 1.0
+        routing = None
+        if CFG.search_routing_enabled or self._fullbody_search is not None:
+            with span("search_routing"):
+                routing = self._route_slots(image, img_w, img_h, vlm, slots)
+            if repair_trace is not None:
+                routing["summary"]["skeleton_repair"] = repair_trace
         processed: list[tuple[object, _SlotOutcome]] = []
         for slot in slots:
+            decision = routing["decisions"].get(id(slot)) if routing else None
+            if self._fullbody_search is not None and decision is not None:
+                desc = build_slot_descriptors(vlm, [slot], image_size=(img_w, img_h))[0]
+                desc.output_scope = refine_scope_from_description(
+                    desc.output_scope, decision.semantic.description)
+                evidence = {
+                    "keypoints": slot.skeleton.keypoints.tolist() if slot.skeleton is not None else [],
+                    "joint_mask": slot.evidence.valid_joint_mask.tolist() if slot.evidence is not None else [],
+                    "coverage_class": desc.coverage_class,
+                    "output_scope": desc.output_scope.detected.value if desc.output_scope.detected else None,
+                    "output_scope_source": desc.output_scope.source,
+                }
+                with span("fullbody_search"):
+                    report = self._fullbody_search.search(decision, evidence)
+                self._apply_refine_policy(desc, slot, "low", has_candidates=False)
+                desc.refinable_limbs = ()
+                desc.quality_trace["search_scope"] = "whole_library_pose"
+                record = self._routing_record(decision, routing,
+                    search_status=report["status"], search_backend=report["version"],
+                    elapsed={"fullbody_search_ms": report["elapsed_ms"]},
+                    candidates=report["selected"], search_reason=report["reason"])
+                record["route"] = report["route"]
+                record["fullbody_search"] = report
+                desc.quality_reasons = list(dict.fromkeys(slot.reasons))
+                processed.append((slot, _SlotOutcome(desc, [], "low", report["reason"],
+                    hard_fallback=not bool(report["selected"] or report.get('basic_model')), routing=record)))
+                continue
+            if decision is not None and decision.route in ("semantic", "undetermined", "error") \
+                    and decision.joint.policy_block is None:
+                with span("routed_non_geometric"):
+                    outcome = self._route_non_geometric(
+                        vlm, slot, decision, routing, (img_w, img_h))
+                outcome.descriptor.quality_reasons = list(dict.fromkeys(slot.reasons))
+                processed.append((slot, outcome))
+                continue
+            geometric_started = perf_counter()
             with span("descriptor_search"):
                 outcome = self._evaluate_slot(
-                    vlm, slot, threshold_scale, (img_w, img_h))
+                    vlm, slot, threshold_scale, (img_w, img_h),
+                    search_image=image if len(slots) == 1 and vlm.num_people == 1 else None)
             if (outcome.stability is not None
                     and outcome.stability["status"] == "unstable"
                     and slot.retry_count == 0
@@ -362,7 +500,8 @@ class Pipeline:
                         finalize_slot(slot, CFG)
                     with span("descriptor_search"):
                         outcome = self._evaluate_slot(
-                            vlm, slot, threshold_scale, (img_w, img_h))
+                            vlm, slot, threshold_scale, (img_w, img_h),
+                            search_image=image if len(slots) == 1 and vlm.num_people == 1 else None)
 
             # crop 후에도 검색이 불안정하고 거리까지 coverage 임계 밖이면 자동 Top-5를
             # 책임질 수 없다. 거리가 임계 안이면 라이브러리 prior를 살려 soft fallback.
@@ -394,6 +533,19 @@ class Pipeline:
                     outcome.confidence = "low"
                     outcome.reason = "보수적 mask에서 Top-5 불안정 → soft fallback"
                     self._apply_refine_policy(outcome.descriptor, slot, "low")
+            if decision is not None:
+                outcome.routing = self._routing_record(
+                    decision, routing,
+                    search_status="ok" if outcome.candidates else "no_result",
+                    search_backend="geometric_knn",
+                    elapsed={"geometric_search_ms": round(
+                        (perf_counter() - geometric_started) * 1000.0, 3)},
+                    candidates=[{"pose_id": c.pose_id, "view": c.view.value,
+                                 "distance": round(float(c.distance), 6)}
+                                for c in outcome.candidates],
+                    search_reason=None if outcome.candidates else outcome.reason,
+                    search_ran=decision.joint.policy_block is None,
+                )
             outcome.descriptor.quality_reasons = list(dict.fromkeys(slot.reasons))
             processed.append((slot, outcome))
 
@@ -428,6 +580,9 @@ class Pipeline:
                 )
             result.person_candidates.append(candidates)
             result.person_confidence.append(confidence)
+            if routing is not None:
+                result.person_routing.append(outcome.routing)
+                result.person_semantic_candidates.append(outcome.semantic_candidates or [])
             if (slot.state != "valid" or slot.slot_origin != "vlm"
                     or slot.skeleton_source != "full_image" or slot.reasons):
                 details = ",".join(dict.fromkeys(slot.reasons)) or "none"
@@ -441,11 +596,206 @@ class Pipeline:
                 result.notes.append(f"인물 {index}: {reason}")
 
         result.candidates = result.person_candidates[0] if result.person_candidates else []
+        if routing is not None:
+            result.routing_summary = routing["summary"]
+            routes = [record.get("route") for record in result.person_routing if record]
+            result.notes.append(
+                "검색 경로: " + ", ".join(
+                    f"{name}={routes.count(name)}"
+                    for name in ("hybrid", "geometric", "semantic", "undetermined", "error")
+                    if routes.count(name)))
         low_count = result.person_confidence.count("low")
         result.notes.append(
             f"인물 {len(descs)}명 처리 (high={result.person_confidence.count('high')}, "
             f"low/폴백={low_count}, top_k={CFG.top_k_final})")
         return result
+
+    # ---- 04J-286: 러프함 기반 인물별 검색 경로 ----
+    def _route_slots(self, image, img_w: int, img_h: int, vlm: VLMAnalysis,
+                     slots) -> dict:
+        """전신 hybrid에서는 관절이 충분한 인물도 설명을 추출한다. 레거시는 부족할 때만."""
+        rcfg = self.routing_config
+        started = perf_counter()
+        self._join_person_tags(vlm)
+        joints = {}
+        for slot in slots:
+            desc = build_slot_descriptors(vlm, [slot], image_size=(img_w, img_h))[0]
+            block = None
+            if desc.output_scope.detected == BodyScope.HEAD and self._fullbody_search is None:
+                block = "head_search_unsupported"
+            elif vlm.relationship.is_entangled:
+                block = "entangled_set_search_unavailable"
+            joints[id(slot)] = assess_joint_evidence(slot, desc, img_h, rcfg,
+                                                     policy_block=block)
+        need = [slot for slot in slots
+                if (self._fullbody_search is not None or not joints[id(slot)].sufficient)
+                and joints[id(slot)].policy_block is None]
+        semantics = {}
+        describe = None
+        describe_ms = 0.0
+        if need:
+            boxes = []
+            for slot in need:
+                # 관절이 부족한 슬롯의 스켈레톤 박스는 잡힌 점 몇 개만 감싸 실제 인물보다
+                # 작을 수 있다. 설명 호출에는 VLM이 준 인물 박스를 우선 쓴다.
+                box = slot.vlm_box or slot.result_box
+                boxes.append(None if box is None else (
+                    box.x1 / img_w, box.y1 / img_h, box.x2 / img_w, box.y2 / img_h))
+            describe_started = perf_counter()
+            with span("vlm_describe"):
+                try:
+                    describe = self.vlm.describe_people(image, boxes)
+                except Exception as error:  # noqa: BLE001 - 오류로 기록하고 진행
+                    from .search_routing import DescribeOutcome
+                    describe = DescribeOutcome(
+                        "error", error_reason=f"describe_exception:{type(error).__name__}",
+                        retryable=False)
+            describe_ms = (perf_counter() - describe_started) * 1000.0
+            for index, slot in enumerate(need):
+                if describe.status != "ok":
+                    semantics[id(slot)] = assess_semantic_evidence(
+                        None, rcfg, vlm_error=describe.error_reason or "unknown")
+                else:
+                    from .pose_relations import reconcile_sides
+                    description=describe.descriptions.get(index)
+                    if description and slot.skeleton is not None and slot.evidence is not None:
+                        checks=reconcile_sides(description,slot.skeleton.keypoints,slot.evidence.valid_joint_mask)
+                        if checks:description.laterality_review['joint_conflicts']=checks
+                    semantics[id(slot)] = assess_semantic_evidence(
+                        description, rcfg)
+        decisions = {}
+        for slot in slots:
+            joint = joints[id(slot)]
+            semantic = semantics.get(id(slot)) or not_requested_semantic(
+                rcfg, "joint_sufficient" if joint.sufficient else
+                f"policy_blocked:{joint.policy_block}")
+            decisions[id(slot)] = decide_route(joint, semantic)
+        summary = {
+            "enabled": True,
+            "people": len(slots),
+            "describe": {
+                "requested_people": len(need),
+                "status": describe.status if describe is not None else "not_requested",
+                "provider": getattr(describe, "provider", None),
+                "prompt_version": prompts.POSE_DESCRIBE_VERSION if need else None,
+                "error_reason": getattr(describe, "error_reason", None),
+                "retryable": getattr(describe, "retryable", None),
+                "retry_after_seconds": getattr(describe, "retry_after_seconds", None),
+                "attempts": getattr(describe,"attempts",0),
+                "elapsed_ms": round(describe_ms, 3),
+            },
+            "routing_elapsed_ms": round((perf_counter() - started) * 1000.0, 3),
+        }
+        return {"decisions": decisions, "summary": summary, "describe_ms": describe_ms}
+
+    def _route_non_geometric(self, vlm: VLMAnalysis, slot, decision, routing,
+                             image_size) -> _SlotOutcome:
+        """semantic·undetermined·error 경로. 기하 검색은 돌리지 않는다."""
+        desc = build_slot_descriptors(vlm, [slot], image_size=image_size)[0]
+        route_name = decision.route
+        slot.reasons.append(f"search_route:{route_name}")
+        desc.quality_trace["search_scope"] = f"routed_{route_name}"
+        # 기하 후보가 없으므로 refine 대상도 없다(조정할 베이스가 없음).
+        self._apply_refine_policy(desc, slot, "low", has_candidates=False)
+        desc.refinable_limbs = ()
+        semantic_candidates: list = []
+        generation = None
+        search_status, backend, search_reason = "not_run", None, None
+        elapsed: dict = {}
+        if route_name == "semantic":
+            from .search_routing import PoseDescription
+
+            description = PoseDescription(**decision.semantic.description)
+            query = SemanticQuery.from_description(
+                description,
+                generic_postures=self.routing_config.semantic_generic_postures,
+                generic_actions=self.routing_config.semantic_generic_actions,
+                min_body_matches=self.routing_config.semantic_min_body_observations,
+            )
+            with span("semantic_search"):
+                search_started = perf_counter()
+                try:
+                    result = self.semantic_searcher.search(query, top_k=CFG.semantic_top_k)
+                except Exception as error:
+                    from .semantic_search import SemanticSearchResult
+                    result = SemanticSearchResult(
+                        "error", reason=f"search_exception:{type(error).__name__}",
+                        backend=getattr(self.semantic_searcher, "backend", "unknown"),
+                        elapsed_ms=(perf_counter() - search_started) * 1000.0)
+            search_status, backend, search_reason = result.status, result.backend, result.reason
+            elapsed["semantic_search_ms"] = round(result.elapsed_ms, 3)
+            semantic_candidates = [hit.to_dict() for hit in result.hits]
+            reason = {
+                "ok": f"관절 근거 부족 → 시맨틱 후보 {len(semantic_candidates)}개(참고용, refine 금지)",
+                "no_result": "관절 근거 부족 → 시맨틱 경로였지만 검색 결과 없음",
+                "error": f"관절 근거 부족 → 시맨틱 검색 실패({result.reason})",
+            }.get(result.status, "시맨틱 경로")
+            if self._pose_generator is not None and result.status == "no_result" and not result.hits:
+                from .experimental.text_pose_generation import after_no_result
+                # No full-body invention for explicitly cropped/head scopes or
+                # existing entangled blocks; never repair a failed provider call.
+                blocked = (decision.joint.policy_block is not None or
+                           desc.output_scope.detected in (BodyScope.HEAD, BodyScope.HALF, BodyScope.BUST, BodyScope.SHOULDER_HEAD))
+                with span("pose_generation_preview"):
+                    generated = after_no_result(
+                        self._pose_generator, description, search_status=result.status,
+                        hit_count=len(result.hits), policy_block=blocked)
+                generation = generated.to_dict()
+                elapsed["pose_generation_ms"] = round(generated.elapsed_ms, 3)
+                reason += f" → 생성 실험 {generated.status}(미리보기 전용, 자동 적용 금지)"
+        elif route_name == "error":
+            reason = (f"관절 근거 부족 + 자세 설명 VLM 호출 실패"
+                      f"({decision.semantic.error_reason}) → 오류")
+        else:
+            reason = "관절·의미 근거 모두 부족 → 판단 불가(검색하지 않음)"
+        if decision.semantic.status not in ("not_requested",):
+            elapsed["describe_ms_cut"] = round(routing["describe_ms"], 3)
+        outcome = _SlotOutcome(
+            descriptor=desc, candidates=[], confidence="low", reason=reason,
+            hard_fallback=True,
+        )
+        outcome.semantic_candidates = semantic_candidates
+        outcome.routing = self._routing_record(
+            decision, routing, search_status=search_status, search_backend=backend,
+            elapsed=elapsed,
+            candidates=[{"pose_id": hit["pose_id"], "score": hit["score"]}
+                        for hit in semantic_candidates],
+            search_reason=search_reason,
+        )
+        if generation is not None:
+            outcome.routing["generation"] = generation
+        return outcome
+
+    def _routing_record(self, decision, routing, *, search_status: str,
+                        search_backend, elapsed: dict, candidates: list,
+                        search_reason=None, search_ran: bool = True) -> dict:
+        record = decision.to_dict()
+        if decision.semantic.status not in ("not_requested",) and \
+                "describe_ms_cut" not in elapsed:
+            elapsed = {**elapsed, "describe_ms_cut": round(routing["describe_ms"], 3)}
+        record["search"] = {
+            "status": search_status if search_ran else "not_run",
+            "backend": search_backend if search_ran else None,
+            "reason": search_reason,
+            "top": candidates,
+        }
+        record["elapsed_ms"] = elapsed
+        log_info(
+            "search_routing",
+            route=record["route"], reason=record["reason"],
+            searchStatus=record["search"]["status"],
+            searchBackend=record["search"]["backend"],
+            candidateCount=len(candidates),
+            jointSufficient=decision.joint.sufficient,
+            jointReasons=",".join(decision.joint.reasons) or None,
+            validBones=decision.joint.metrics.get("valid_bone_count"),
+            torsoBones=decision.joint.metrics.get("torso_bone_count"),
+            coverage=decision.joint.metrics.get("coverage_class"),
+            semanticStatus=decision.semantic.status,
+            semanticErrorReason=decision.semantic.error_reason,
+            elapsedMs=elapsed,
+        )
+        return record
 
     def _apply_refine_policy(self, desc, slot, confidence: str,
                              has_candidates: bool = True) -> None:
@@ -506,6 +856,12 @@ class Pipeline:
                 )
             )
         )
+        search_trace = desc.quality_trace.get("perspective_search", {})
+        # Keep existing v2 structural gates. Only an incomplete camera binding
+        # blocks refine; low search confidence is already not a v2 gate.
+        if search_trace.get("applied") and not search_trace.get("refine_context_ready"):
+            allowed = False
+            desc.quality_trace["refine_policy_block"] = "perspective_camera_unverified"
         desc.refine_allowed = allowed
         desc.refinable_limbs = refinable_limbs
         desc.quality_trace["lower_body_observed"] = bool(
@@ -525,10 +881,12 @@ class Pipeline:
             )
 
     def _evaluate_slot(self, vlm: VLMAnalysis, slot, threshold_scale: float,
-                       image_size: tuple[int, int] | None = None) -> _SlotOutcome:
+                       image_size: tuple[int, int] | None = None,
+                       search_image=None) -> _SlotOutcome:
         """한 슬롯의 masked 검색·A/B 안정성·refine 정책을 한 번에 계산한다."""
         # 태그 호출이 아직 안 끝났으면 여기서 합친다. 두 번째 슬롯부터는 바로 지나간다.
         self._join_person_tags(vlm)
+        self._join_hand_shapes(vlm)
         desc = build_slot_descriptors(vlm, [slot], image_size=image_size)[0]
         if desc.output_scope.detected == BodyScope.HEAD:
             slot.reasons.append("head_search_unsupported")
@@ -645,12 +1003,15 @@ class Pipeline:
             desc, slot.skeleton, threshold_scale=threshold_scale,
             query_valid_mask=search_mask, distance_metric=search_metric,
             top_k=search_top_k,
+            search_image=search_image if search_scope == "full_body" else None,
         )
         threshold = CFG.fallback_threshold(
             search_metric, desc.coverage_class
         )
         if threshold is not None:
             threshold *= threshold_scale
+        if desc.quality_trace.get("perspective_search", {}).get("applied"):
+            threshold = None
         slot.confidence_threshold = threshold
         slot.rank_distance = candidates[0].distance if candidates else None
         desc.confidence_threshold = threshold
@@ -719,7 +1080,7 @@ class Pipeline:
 
         # provisional·모호한 소유권·crop 복구는 거리와 무관하게 high가 될 수 없다.
         if (slot.slot_origin == "rtm_provisional" or slot.state == "suspect"
-                or slot.skeleton_source in {"crop_retry", "fallback_full_image"}
+                or slot.skeleton_source in {"crop_retry", "fallback_full_image", "vlm_repair"}
                 ) and confidence == "high":
             confidence = "low"
             reason = "복구/provisional/소유권 의심 → 베이스 Top-5만 제공"
@@ -783,7 +1144,7 @@ class Pipeline:
     def _search_one(self, desc, skel, fallback_distance=None,
                     threshold_scale: float = 1.0,
                     query_valid_mask=None,
-                    distance_metric=None, top_k=None):
+                    distance_metric=None, top_k=None, search_image=None):
         # 슬롯 품질 검사를 거친 경로에서는 전체 평균 score를 신뢰도 대용으로 쓰지 않는다.
         if skel is None or desc.feature is None or desc.coverage_class == "insufficient":
             return [], "low", "스켈레톤 추출 실패 → 폴백(작가)"
@@ -793,6 +1154,40 @@ class Pipeline:
 
         if query_valid_mask is None:
             query_valid_mask = desc.valid_joint_mask
+        desc.quality_trace["perspective_search"] = {
+            "applied": False, "reason": self.perspective_index_status,
+        }
+        if (CFG.pose_search_mode == "perspective"
+                and CFG.refine_v2_enabled  # v1 keeps its original search/confidence gates
+                and self.perspective_index is not None
+                and search_image is not None
+                and (distance_metric or CFG.distance_metric).lower() == "pos"
+                and desc.coverage_class == "full"
+                and desc.skeleton_state == "valid"
+                and desc.skeleton_source == "full_image"
+                and desc.slot_origin != "rtm_provisional"
+                and query_valid_mask is not None):
+            try:
+                cands, trace = self.perspective_index.search(
+                    skel.keypoints, query_valid_mask, search_image,
+                    top_k=top_k or CFG.top_k_final,
+                    quarantined_pose_ids=load_pose_quarantine(CFG),
+                )
+                desc.quality_trace["perspective_search"] = trace
+                desc.distance_metric = 'perspective_pos'
+                # Do not reinterpret a smaller optimized distance as stronger
+                # detection/ownership evidence. Refine uses its v2 structural gates.
+                return cands, "low", (
+                    "원근 카메라 검색 후보; 신뢰도 미보정·refine은 관절/소유권 검사 적용"
+                    if cands else "후보 없음 → 폴백"
+                )
+            except (ValueError, OSError, ImportError, RuntimeError, AssertionError, IndexError):
+                desc.quality_trace["perspective_search"] = {
+                    "applied": False, "reason": "camera_search_failed",
+                }
+                log_warn("perspective_search", status="legacy_fallback")
+        elif self.perspective_index is not None:
+            desc.quality_trace["perspective_search"]["reason"] = "unsupported_context"
         cands = knn_geometric(
             self.entries, desc.feature,
             top_k=top_k,

@@ -110,8 +110,8 @@ def test_api_serializes_per_person_detection_on_mixed_route(monkeypatch):
     people = result.model_dump(mode="json")["people"]
     # The mock pose draws knees for the bust person, so that label cannot crop legs.
     assert [p["output_scope"] for p in people] == [
-        {"detected": "head", "source": "vlm_person"},
-        {"detected": "full", "source": "observed_legs"},
+        {"detected": "head", "source": "vlm_person", "mesh_scope": "head"},
+        {"detected": "full", "source": "observed_legs", "mesh_scope": "full"},
     ]
     assert people[1]["quality_trace"]["output_scope_promotion"]["vlm_detected"] == "bust"
     assert [p["index"] for p in people] == [0, 1]

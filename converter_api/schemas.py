@@ -26,6 +26,7 @@ class HealthResponse(BaseModel):
     output_scopes: list[str] = []
     preview_model_revision: str | None = None
     character_hashes: dict[str, str] = {}
+    hand_library: dict[str, Any] | None = None
 
 
 class ErrorDetail(BaseModel):

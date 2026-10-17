@@ -1,0 +1,145 @@
+{
+  "kind": "exact local experiment code snapshots",
+  "files": [
+    {
+      "source": "outputs/04j-289-set3-orientation-v3/analyze_people.py",
+      "snapshot": "sources/04j-289-set3-orientation-v3/analyze_people.py",
+      "sha256": "060edb939f216f4cd4c211c21e0592e1bcd95de24e1ddb20439fc454827b1da2"
+    },
+    {
+      "source": "outputs/04j-289-set3-orientation-v3/build_people.py",
+      "snapshot": "sources/04j-289-set3-orientation-v3/build_people.py",
+      "sha256": "e99eef8d8e56b6af0e1ae4bd52c8bd3d36502383760c6a4db2d5d7771482ab2d"
+    },
+    {
+      "source": "outputs/04j-289-set3-orientation-v3/build_review.py",
+      "snapshot": "sources/04j-289-set3-orientation-v3/build_review.py",
+      "sha256": "ee418479740b88f2e98ededb52ee53431f8b4210a5a87471435e7e115fb38f72"
+    },
+    {
+      "source": "outputs/04j-289-set3-orientation-v3/build_scenes.py",
+      "snapshot": "sources/04j-289-set3-orientation-v3/build_scenes.py",
+      "sha256": "b996cace0ae01e9af15256edff9c31f404721288b23e0e4f8f16ccf61155ec88"
+    },
+    {
+      "source": "outputs/04j-289-set3-orientation-v3/evidence_policy.py",
+      "snapshot": "sources/04j-289-set3-orientation-v3/evidence_policy.py",
+      "sha256": "0f8a5da122b165c53e8180cd3edb10c8f98951a617a4e7d68053dda51ecc0778"
+    },
+    {
+      "source": "outputs/04j-289-set3-orientation-v3/fit_layout.py",
+      "snapshot": "sources/04j-289-set3-orientation-v3/fit_layout.py",
+      "sha256": "e90ae4193fbd470e09bc51d4cf7f433f7a29e8c1c698c0e9f56b026e523dc704"
+    },
+    {
+      "source": "outputs/04j-289-set3-orientation-v3/inspect_axes.py",
+      "snapshot": "sources/04j-289-set3-orientation-v3/inspect_axes.py",
+      "sha256": "7ea32c06976bf8d7a63ca768cf01170345fbc2bfe7d4cdd63c7e4c8ec6d67001"
+    },
+    {
+      "source": "outputs/04j-289-set3-orientation-v3/review_anatomy.py",
+      "snapshot": "sources/04j-289-set3-orientation-v3/review_anatomy.py",
+      "sha256": "0cda284a132cdff915a1a6ec38e9cfea3536d70de3485bd98f18004aef97312e"
+    },
+    {
+      "source": "outputs/04j-289-set3-orientation-v3/run_pipeline.py",
+      "snapshot": "sources/04j-289-set3-orientation-v3/run_pipeline.py",
+      "sha256": "8b4c63139829c633f57049b7a688de210f163e069468fc1740320a1ef8c4b5bf"
+    },
+    {
+      "source": "outputs/04j-289-set3-orientation-v3/select_refine.py",
+      "snapshot": "sources/04j-289-set3-orientation-v3/select_refine.py",
+      "sha256": "b196562c5fc68337400d73e1837b0baf7f963984609d8add7b796c36692cfa95"
+    },
+    {
+      "source": "outputs/04j-289-set3-orientation-v3/validate_results.py",
+      "snapshot": "sources/04j-289-set3-orientation-v3/validate_results.py",
+      "sha256": "97054a02e5beb05c1e9b39cd08d3adc58b8201cbe54f32f31835da251e99d36d"
+    },
+    {
+      "source": "outputs/04j-289-set3-orientation-v3/verify_fbx.mjs",
+      "snapshot": "sources/04j-289-set3-orientation-v3/verify_fbx.mjs",
+      "sha256": "9c08e7cb00a73b322a18a86c3ffaa32b74d3e914e12c471f86a017a55024eec4"
+    },
+    {
+      "source": "outputs/04j-289-scene-interactions-v4/analyze_scene.py",
+      "snapshot": "sources/04j-289-scene-interactions-v4/analyze_scene.py",
+      "sha256": "ee78d3807f3aec1bfdc20cc8b5e9457744898031640ac6a1e782d6556b59e6c6"
+    },
+    {
+      "source": "outputs/04j-289-scene-interactions-v4/build_people.py",
+      "snapshot": "sources/04j-289-scene-interactions-v4/build_people.py",
+      "sha256": "63afd403f8b563ff0a3e9630ecf6047b2e6b5a64cf30c0008b6a458a210d213d"
+    },
+    {
+      "source": "outputs/04j-289-scene-interactions-v4/build_review.py",
+      "snapshot": "sources/04j-289-scene-interactions-v4/build_review.py",
+      "sha256": "79fa2ac15f69e0e3890a661aca30771b09feed96d2580fccdfa3b43b7a4c13d5"
+    },
+    {
+      "source": "outputs/04j-289-scene-interactions-v4/build_scenes.py",
+      "snapshot": "sources/04j-289-scene-interactions-v4/build_scenes.py",
+      "sha256": "b996cace0ae01e9af15256edff9c31f404721288b23e0e4f8f16ccf61155ec88"
+    },
+    {
+      "source": "outputs/04j-289-scene-interactions-v4/contrastive.py",
+      "snapshot": "sources/04j-289-scene-interactions-v4/contrastive.py",
+      "sha256": "c813a567105fb352716f4a07f3e3f0708d4796b5c059f8eb07502cb7425bfabf"
+    },
+    {
+      "source": "outputs/04j-289-scene-interactions-v4/find_hands.py",
+      "snapshot": "sources/04j-289-scene-interactions-v4/find_hands.py",
+      "sha256": "e78d7eb8e2556e66a4c7748036760cebdc6db0275e08cbf0bb84db26524ca533"
+    },
+    {
+      "source": "outputs/04j-289-scene-interactions-v4/fit_layout.py",
+      "snapshot": "sources/04j-289-scene-interactions-v4/fit_layout.py",
+      "sha256": "229e1d652f2b2e995b658424a9ffcc745c2bc617bf641b41361bbc3cd90b69d6"
+    },
+    {
+      "source": "outputs/04j-289-scene-interactions-v4/fresh_keypoints.py",
+      "snapshot": "sources/04j-289-scene-interactions-v4/fresh_keypoints.py",
+      "sha256": "733055974781891930b879e408d6b5d84df6cd8fab20eac06ef51cae980053f8"
+    },
+    {
+      "source": "outputs/04j-289-scene-interactions-v4/localize_hands.py",
+      "snapshot": "sources/04j-289-scene-interactions-v4/localize_hands.py",
+      "sha256": "65c0ee5b863b6b49c97f0e1abad98a27ce1f3833c7b565d620097e2fac55fea9"
+    },
+    {
+      "source": "outputs/04j-289-scene-interactions-v4/plan.py",
+      "snapshot": "sources/04j-289-scene-interactions-v4/plan.py",
+      "sha256": "b6f14a3141ad3173998ea2354419bed816963d535f99ffb21e971a0801b8c605"
+    },
+    {
+      "source": "outputs/04j-289-scene-interactions-v4/refine_arms.py",
+      "snapshot": "sources/04j-289-scene-interactions-v4/refine_arms.py",
+      "sha256": "5506dfd861fbe4250ced9b0e43a90fcc1b5fa83f8a4e03b8fe06fe52ea273873"
+    },
+    {
+      "source": "outputs/04j-289-scene-interactions-v4/run_experiment.py",
+      "snapshot": "sources/04j-289-scene-interactions-v4/run_experiment.py",
+      "sha256": "b2198cfe6becf217bceb0b8a4d38711e1bd4afe6ec3bec8d080993462ce7e874"
+    },
+    {
+      "source": "outputs/04j-289-scene-interactions-v4/verify_fbx.mjs",
+      "snapshot": "sources/04j-289-scene-interactions-v4/verify_fbx.mjs",
+      "sha256": "6c4396c02f6f6358b3a69cd0cad572920f4e9e73134a0346144dbfe5578fdd9f"
+    },
+    {
+      "source": "outputs/04j-289-scene-interactions-v4/verify_scene.py",
+      "snapshot": "sources/04j-289-scene-interactions-v4/verify_scene.py",
+      "sha256": "9d80950365891c3fd4d74ccf6008082b36f6e9a5e000c3cbbe4ad480f337a391"
+    },
+    {
+      "source": "outputs/04j-289-set3-layout-v2/layout_math.py",
+      "snapshot": "sources/04j-289-set3-layout-v2/layout_math.py",
+      "sha256": "9c965e67d81ecf3625f8ad4e17aa0a66806f8b52569f0b4b9f0743932962386d"
+    },
+    {
+      "source": "outputs/04j-289-set34-refine-scenes/align_refine.py",
+      "snapshot": "sources/04j-289-set34-refine-scenes/align_refine.py",
+      "sha256": "b485088f9d45997da061471f79a41026a1e81b389e5e079127b793f65cafc008"
+    }
+  ]
+}
