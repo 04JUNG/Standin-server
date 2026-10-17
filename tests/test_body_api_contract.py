@@ -74,6 +74,42 @@ class BodyAPIContractTests(BodyMatchingFixture):
             self.assertEqual(data['body_matching']['reason'],'body_contract_invalid')
             self.assertEqual(len(data['people'][0]['candidates']),5)
 
+    def test_http_held_suggestion_and_evidence_policy_survive_serialization(self):
+        from tests.test_body_matching import person_payload
+        from src.experimental.body_matching.schema import unknown_attributes
+        class WeakClient(FixtureClient):
+            def analyze(self, crops):
+                found = {}
+                for key, _ in crops:
+                    raw = person_payload(key)
+                    raw['attributes'] = unknown_attributes()
+                    raw['attributes']['body_build'] = dict(value='slim', visibility='uncertain', evidence='weak outline')
+                    found[key] = raw
+                return found
+        data = self.response(client=WeakClient())
+        person = data['body_matching']['people'][0]
+        self.assertEqual(person['decision'], 'suggest_only')
+        self.assertFalse(person['application_policy']['allowed'])
+        self.assertEqual(person['suggested_body_id'], 'slim')
+        self.assertEqual(person['suggested_asset']['body_id'], 'slim')
+        self.assertIsNone(person['auto_body_id'])
+        self.assertIsNone(person['applied_body_id'])
+        self.assertFalse(person['render_required'])
+        self.assertEqual(person['observations']['representation']['torso'], 'outline')
+        self.assertEqual(len(data['people'][0]['candidates']), 5)
+
+    def test_bad_decision_policy_or_suggestion_only_disables_body(self):
+        for mutate in [lambda p: p.update(decision='suggest_only'),
+                       lambda p: p['application_policy'].update(allowed=False),
+                       lambda p: p.update(policy_version='wrong'),
+                       lambda p: p['suggested_asset'].update(body_id='wrong'),
+                       lambda p: p.update(selection_source='auto_default'),
+                       lambda p: p['application_policy'].update(calibrated=True)]:
+            with self.subTest(mutate=mutate):
+                data = self.response(broken=lambda d: mutate(d['people'][0]))
+                self.assertEqual(data['body_matching']['reason'], 'body_contract_invalid')
+                self.assertEqual(len(data['people'][0]['candidates']), 5)
+
     def test_missing_catalog_is_typed_unavailable(self):
         self.raw.update(assets=[],default_body_id=None);self.write()
         d=self.response()['body_matching'];self.assertEqual(d['status'],'partial')

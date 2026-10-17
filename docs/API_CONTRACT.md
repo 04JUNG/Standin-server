@@ -16,7 +16,14 @@
 이 기능 브랜치의 API 팩토리는 변수가 없을 때도 1이므로, 기존 mock/레거시 개발 환경은
 명시적으로 0을 설정해야 한다. `.env.example`은 0으로 유지한다. PR 생성은 배포가 아니다.
 
-- `selected`: 핵심 동작 및 확인된 세부 조건을 통과한 전신 라이브러리 후보, 최대 5개.
+- `selected`: 일반 경로에서는 핵심 동작 및 확인된 세부 조건을 통과한 전신 라이브러리 후보, 최대 5개.
+  통합 체형 opt-in 경로에서 조건 통과 후보가 0개면 기존 생성 시도 이후 기하 참고를 반환할 수 있다.
+  이 경우 `match_level=geometry_fallback`, `review_required=true`, `not_exact_match=true`,
+  `constraints_satisfied=false`를 반드시 함께 읽어 **조건 통과 후보와 구분**한다.
+  인물 소유권·유효 관절·기하 거리 상한과 명확한 자세(서기/앉기/눕기) 조건은 유지한다.
+  팔/물건 양손 수 등 나머지 조건을 만족했다는 뜻이 아니다. 원래 조건 감사 결과는
+  `core_conditions.whole_pose_validation`, 완화 범위는 `geometry_review_fallback`에 보존한다.
+  자동 refine/export 권한은 없다. off/legacy 및 기존 조건 통과 후보 목록은 바뀌지 않는다.
 - `near_candidates`: 핵심 동작은 맞지만 다리/무릎 세부가 다르거나 미확인인 별도 검수 참고.
   정답·확률·성공 5개 채우기용 후보가 아니며, 빈 `selected`의 생성 시도를 막지 않는다.
 - `pose_detail_fit`: 관측된 2D 몸통 기울기·골반 이동·다리 간격·무릎 각도의 동일 카메라 비교.
@@ -584,6 +591,8 @@ v1/null camera 계약은 유지한다. v2의 원근/좌우가 전방계산과 �
 
 ## 선택적 체형 관측·자동선택 결과
 
+2026-10-16 P0·P1: `body-match.v1`에 decision/policy/suggestion을 선택적 진단으로 추가한다. 약한 체형 근거는 자동 ID를 null로 반환하고, 기존 BFF의 수동 선택·사용자/카탈로그 기본값 처리를 따른다. 명확한 디자인 계열의 `auto_presentation_default`는 유지한다. [리뷰 및 최신 20종 draft 명세](BODY_SELECTION/P0_P1_REVIEW.md).
+
 `BODY_MATCHING_MODE=off`(기본값)에서는 `/analyze.body_matching={}`이다. `shadow|auto`에서는 인물별 관측·자동선택 결과를 추가한다. 기존 people/포즈 순위/검색·refine 정책은 그대로다. 스키마·오류·catalog 승인 조건은 [체형 감지·선택 API 계약](BODY_PIPELINE_API_CONTRACT.md)을 따른다. 이 필드는 기존 클라이언트의 수동 선택을 덮어쓰지 않으며, 렌더·BFF 상태 저장·Export는 실행하지 않는다.
 
 # 후보 표시 카메라 (2026-10-07 추가)
@@ -628,6 +637,11 @@ Converter `/healthz`의 `preview_model_revision`과 `character_hashes`로 지원
 모델 export용 모듈은 기존 `posed-mesh-v1` exporter와 분리하여 기존 사전 생성
 라이브러리의 키를 무효화하지 않는다. 배포 순서는 Converter/추론 → BFF → 앱이다.
 
+### 대분류 체형 추천 (opt-in)
+
+`BODY_CLASSIFICATION_STRATEGY=coarse`는 인물별 `coarse_classification`과 `coarse_recommendation`을 추가한다. 남녀 계열을 먼저 판독하고 해당 계열 BASE를 기본 추천으로 두며 명확한 특징만 근육형·IDEAL83 등으로 변경한다. 모든 인물에 `recommended_body_id`와 추천 근거를 기록한다. 자동 적용과 달리 `recommended_body_id`는 진단용 프리셋 ID이며 자산 QA 권한이 아니다. `auto_body_id/applied_body_id/selected_asset/suggested_asset`는 null, `render_required=false`이다. 기존 기본 전략은 legacy이고 기존 수동 선택·기본값 계약은 유지한다. 상세: [대분류 추천](BODY_SELECTION/COARSE_RECOMMENDATION.md). 판독 입력은 머리 여백을 포함한 인물 crop과 같은 crop의 대상 표시본이다. `observations.crop_box`는 실제 확장 crop 좌표이며 crop을 만들지 못한 경우 null이다. 남녀 판독이 tentative인 경우 주 추천과 같은 계열 BASE를 보존하고 반대 계열 BASE도 대안에 포함한다(최대 3개). clear이면 같은 계열 대안만 제공한다.
+
+선택적 `BODY_COARSE_FAMILY_REVIEW_MODEL`은 coarse의 잠정·미확정 계열만 이미지로 재검토한다. `body_matching.family_review_model`은 설정된 재검토 모델 또는 null이며, `coarse_classification.family_review`는 미실행이면 null/생략, 실행 시 최초 presentation·reading(face/clothing/body_design/family/certainty/reason)·status(resolved/unresolved/conflict/error)·error를 제공한다. 같은 확신도의 반대 계열은 기존 추천을 유지한다. 반대 계열 BASE 대안은 잠정/미확정 계열에서만 HTTP 검증을 통과한다. 실패·시간 소진은 최초 추천을 보존하며 자동 선택은 만들지 않는다. 기본 비활성, 기존 BODY_TIMEOUT_SECONDS 공유. [평가·제한](BODY_SELECTION/FAMILY_REVIEW.md).
 ## 러프함 기반 검색 경로 필드 (04J-286, 2026-10-13)
 
 `SEARCH_ROUTING=1`일 때만 채워지는 **추가 필드**다. 기존 필드의 의미·값은 바뀌지 않는다.
@@ -730,3 +744,16 @@ provider/색인 오류, 모호한 설명, geometric 정상 경로, head/얽힘 �
 FBX에 손을 구우려면 converter `POST /convert`·`/convert-bundle`·`/convert-framed`에 form 필드
 `hand_left`, `hand_right`(프리셋 id)를 보낸다. 보내지 않으면 기존과 바이트 단위로 같은 FBX다.
 프리셋 목록·불변식·제약: `docs/HAND_LIBRARY.md`.
+
+
+### 첫 VLM 체형 통합 (선택적)
+
+`BODY_CLASSIFICATION_STRATEGY=integrated`와 `BODY_MATCHING_MODE=shadow|auto`를 함께 설정하면 최초 `VLM.analyze`가 기존 사람 수·shot·박스·가시성에 `person_bodies`를 추가한다. `coarse_classification`과 `coarse_recommendation`의 외부 형태는 coarse와 같고, `classification_strategy=integrated`, `prompt_version=body-integrated.v7.parallel-review`로 출처를 구분한다. `inference_metadata.vlm_body_prompt_version`은 활성화한 통합 프롬프트 버전 또는 null이다.
+
+Gemini 통합 모드의 `BODY_INTEGRATED_REVIEW_ENABLED=1`(기본)에서는 첫 판독의 남녀 계열이 unknown/androgynous이거나 certainty=unknown인 인물만 crop을 독립 재검토한다. 여러 대상은 최대 1회 batch 호출하고, 첫 판독의 결론·정답·파일 ID를 보내지 않는다. 이미 binary 계열을 판독한 인물은 tentative여도 변경하지 않는다. 재검토는 짧은 얼굴·의상·몸 근거를 출력하고 명시된 `VLM_BODY_THINKING_LEVEL`을 공유한다. 재검토는 `BODY_TIMEOUT_SECONDS`와 주 VLM의 남은 총 예산 중 작은 값으로 제한하며 재시도하지 않는다. 오류·미확정이면 원래 추천을 유지하고 `family_review`에 기록한다. tentative 추천은 그대로 tentative이며 자동 적용 근거가 아니다. 중성/unknown 계열의 해소만으로 기존 명확한 근육·체격·비율 근거를 낮추지 않는다. 실제 기존 binary 계열을 반대로 교정하는 경우의 특징 강등 가드는 유지한다. `BODY_INTEGRATED_REVIEW_ENABLED=0`이면 추가 체형 호출이 없다. OpenAI 통합은 첫 호출만 지원한다. 체형은 원본 VLM 슬롯 인덱스로 전달하여 출력 인물의 좌우 정렬 뒤에도 연결을 보존한다. 누락·잘못된 체형 응답은 해당 체형만 unknown으로 처리하며 기존 제어 필드를 변경하지 않는다. 주 추천은 항상 기록하되 관측 불명 시 기본 추천이라는 근거를 함께 반환한다. 약한 근거로 자동 적용하지 않으며 `auto_body_id/applied_body_id/selected_asset`는 null이다. 손 모양, 인물 태그, 전신 포즈 설명·재검토·생성은 기존 기능의 독립 호출이므로 전체 파이프라인의 VLM 호출이 한 번이라는 뜻은 아니다.
+
+`Pipeline.process_cut`의 Gemini 통합 경로에서는 첫 판독 직후 미확정 체형 재검토를 시작하여 검출·포즈 추출·검색과 병렬로 실행한다. 포즈 경로가 끝난 뒤 최초에 정한 남은 예산만 기다리고, 원본 VLM 슬롯 인덱스로 descriptor에 합친다. 대기 시점에 새 예산을 부여하지 않는다. 기한 내 완료된 응답은 포즈 작업이 더 늦게 끝나도 사용하며, 시간 초과·실패는 최초 추천을 보존한다. 작업은 요청별 이미지·분석 복사본을 사용하므로 늦게 끝난 응답이 반환 결과를 바꾸지 않는다. SDK의 실행 중 HTTP 요청은 강제 취소할 수 없으며 기존 HTTP timeout이 유지된다. 직접 `GeminiVLMClient.analyze()`를 호출하는 경로는 기존 동기 계약을 유지한다.
+
+재검토를 시작한 응답에만 `body_matching.parallel_review` 진단이 추가된다. `mode=parallel`, `status=completed|error|deadline_exceeded`, `target_count`, `merged_count`, `error`, `review_finished`, `review_elapsed_ms`, `overlap_ms`, `join_wait_ms`, `pose_path_ms`를 제공한다. `review_finished=false`이면 경과 시간은 수집 시점까지의 값이며 완료 시간이 아니다. 이 시간들은 내부 병렬 구간 진단이고 전체 요청 지연이나 제품 SLA가 아니다. [병렬화 검증과 제한](BODY_SELECTION/PARALLEL_REVIEW.md).
+
+기본은 `legacy`/`off`이며 실제 환경 설정을 바꾸지 않았다. 평가 모델·28명 기준·전신 경로의 시간과 회귀 관측은 [통합 평가](BODY_SELECTION/INTEGRATED_FIRST_CALL.md)를 따른다.

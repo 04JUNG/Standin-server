@@ -201,7 +201,7 @@ class FullBodySearch:
             out[pid]=fit
         return out
 
-    def search(self, decision, evidence, *, generation_block=False):
+    def search(self, decision, evidence, *, generation_block=False, review_geometry=False):
         start = perf_counter()
         out = dict(version=VERSION, route='undetermined', status='not_run', selected=[],near_candidates=[],
             branches={}, generation=None, composition_enabled=False, split_search_enabled=False,
@@ -313,6 +313,32 @@ class FullBodySearch:
                 out['generation']['diagnostics']['whole_pose_conditions']=audits
                 if any(a['status'] not in ('passed','not_required') for a in audits):
                     out['generation'].update(status='rejected',reason='generated_observation_conditions_failed',candidates=[])
+        # Keep qualified selection and generation unchanged. When optional
+        # integrated recovery is enabled, expose bounded geometry references as
+        # review-only choices rather than turning text overconstraints into an
+        # empty pose gallery. Never relabel them as qualified core matches.
+        if review_geometry and sufficient:
+            retained = dict(active=bool(required and required.get('posture')),
+                            posture=required.get('posture') if required else None,
+                            arms={}, body_states={}, hand_counts={})
+            fallback = self.geometry_search(evidence, retained)
+            for hit in fallback.get('hits', []):
+                if hit.get('whole_pose_validation'):
+                    hit['whole_pose_validation'] = {**hit['whole_pose_validation'], 'condition_scope': 'retained_posture_only'}
+            out['geometry_review_fallback'] = dict(
+                status=fallback['status'], reason=fallback.get('reason'),
+                qualified_count=0, constraints_satisfied=False,
+                original_requirements=required, retained_hard_conditions=retained, cutoff=fallback.get('cutoff'))
+            if fallback['status'] == 'ok':
+                rows = self._fuse({'geometry': fallback})
+                for row in rows:
+                    row.update(match_level='geometry_fallback', review_required=True,
+                               not_exact_match=True, constraints_satisfied=False)
+                    if self.validator and required and required['active']:
+                        row['core_conditions'] = dict(whole_pose_validation=
+                            self.validator.check(required, row['pose_id']))
+                out['selected'] = rows
+                return finish('ok', 'geometry_review_fallback_not_qualified')
         return finish('no_result', 'successful_empty_search_generation_separate')
 
 

@@ -1,0 +1,190 @@
+{
+  "confirmed": {
+    "label_source": "user_confirmed_character_setting",
+    "total": 2,
+    "observed_correct": 2,
+    "recommended_correct": 2,
+    "recommendation_accuracy": 1.0,
+    "scope": "Only confirmed cases; not accuracy across the entire evaluation set",
+    "cases": [
+      {
+        "case_id": "124637:p0",
+        "expected_family": "male",
+        "observed_family": "male",
+        "recommended_family": "male",
+        "recommended_body_id": "male-base-v0-7-2",
+        "observation_correct": true,
+        "recommendation_correct": true,
+        "recommendation_basis": "presentation_default"
+      },
+      {
+        "case_id": "124702:p0",
+        "expected_family": "female",
+        "observed_family": "female",
+        "recommended_family": "female",
+        "recommended_body_id": "female-base-v0-3-4",
+        "observation_correct": true,
+        "recommendation_correct": true,
+        "recommendation_basis": "presentation_default"
+      }
+    ]
+  },
+  "provider_errors": 0,
+  "auto_applied": 0,
+  "label_scope": "User-confirmed labels: 2 only. Other 26 are not author-confirmed; this is a development set.",
+  "excluded_runs": {
+    "integrated": "SyntaxError before review, 28 failed classifications; not a quality evaluation. Fixed and rerun.",
+    "integrated-v1": "Rejected because it changed confirmed male 124637 to female. Preserved and replayed with the general conflict guard."
+  },
+  "comparisons": {
+    "historical_to_final": {
+      "metric": "paired_stability_not_accuracy",
+      "note": "Only user-confirmed family labels measure correctness. Unlabelled or physique changes require review; equal aggregate counts do not establish non-regression.",
+      "all": {
+        "total": 28,
+        "changed": {
+          "observed_family": 1,
+          "recommended_family": 1,
+          "recommended_body_id": 3
+        },
+        "provider_error_pairs": 0,
+        "confirmed_total": 2,
+        "confirmed_improvements": 1,
+        "confirmed_regressions": 0,
+        "unlabelled_recommendation_changes": 2
+      },
+      "other_cases": {
+        "total": 27,
+        "changed": {
+          "observed_family": 0,
+          "recommended_family": 0,
+          "recommended_body_id": 2
+        },
+        "provider_error_pairs": 0,
+        "confirmed_total": 1,
+        "confirmed_improvements": 0,
+        "confirmed_regressions": 0,
+        "unlabelled_recommendation_changes": 2
+      },
+      "focus_cases": [
+        "124702:p0"
+      ]
+    },
+    "fresh_baseline_to_final": {
+      "metric": "paired_stability_not_accuracy",
+      "note": "Only user-confirmed family labels measure correctness. Unlabelled or physique changes require review; equal aggregate counts do not establish non-regression.",
+      "all": {
+        "total": 28,
+        "changed": {
+          "observed_family": 1,
+          "recommended_family": 1,
+          "recommended_body_id": 2
+        },
+        "provider_error_pairs": 0,
+        "confirmed_total": 2,
+        "confirmed_improvements": 1,
+        "confirmed_regressions": 0,
+        "unlabelled_recommendation_changes": 1
+      },
+      "other_cases": {
+        "total": 27,
+        "changed": {
+          "observed_family": 0,
+          "recommended_family": 0,
+          "recommended_body_id": 1
+        },
+        "provider_error_pairs": 0,
+        "confirmed_total": 1,
+        "confirmed_improvements": 0,
+        "confirmed_regressions": 0,
+        "unlabelled_recommendation_changes": 1
+      },
+      "focus_cases": [
+        "124702:p0"
+      ]
+    },
+    "same_primary_to_final": {
+      "metric": "paired_stability_not_accuracy",
+      "note": "Only user-confirmed family labels measure correctness. Unlabelled or physique changes require review; equal aggregate counts do not establish non-regression.",
+      "all": {
+        "total": 28,
+        "changed": {
+          "observed_family": 2,
+          "recommended_family": 1,
+          "recommended_body_id": 1
+        },
+        "provider_error_pairs": 0,
+        "confirmed_total": 2,
+        "confirmed_improvements": 1,
+        "confirmed_regressions": 0,
+        "unlabelled_recommendation_changes": 0
+      },
+      "other_cases": {
+        "total": 27,
+        "changed": {
+          "observed_family": 1,
+          "recommended_family": 0,
+          "recommended_body_id": 0
+        },
+        "provider_error_pairs": 0,
+        "confirmed_total": 1,
+        "confirmed_improvements": 0,
+        "confirmed_regressions": 0,
+        "unlabelled_recommendation_changes": 0
+      },
+      "focus_cases": [
+        "124702:p0"
+      ]
+    },
+    "rejected_run_with_guard": {
+      "metric": "paired_stability_not_accuracy",
+      "note": "Only user-confirmed family labels measure correctness. Unlabelled or physique changes require review; equal aggregate counts do not establish non-regression.",
+      "all": {
+        "total": 28,
+        "changed": {
+          "observed_family": 1,
+          "recommended_family": 1,
+          "recommended_body_id": 1
+        },
+        "provider_error_pairs": 0,
+        "confirmed_total": 2,
+        "confirmed_improvements": 1,
+        "confirmed_regressions": 0,
+        "unlabelled_recommendation_changes": 0
+      },
+      "other_cases": {
+        "total": 27,
+        "changed": {
+          "observed_family": 0,
+          "recommended_family": 0,
+          "recommended_body_id": 0
+        },
+        "provider_error_pairs": 0,
+        "confirmed_total": 1,
+        "confirmed_improvements": 0,
+        "confirmed_regressions": 0,
+        "unlabelled_recommendation_changes": 0
+      },
+      "focus_cases": [
+        "124702:p0"
+      ]
+    }
+  },
+  "tests": {
+    "passed": 961,
+    "skipped": 8,
+    "subtests": 28,
+    "coarse_related": 89,
+    "smoke": "54/54"
+  },
+  "source_hashes": {
+    "confirmed-eval/results.json": "cae56f830c9ec3921ca3fc764af58b7e80ab249249f10554e10feae8f2110c4a",
+    "baseline-repeat/results.json": "1946325af4582543530ed599551b2c3ef7c9f89bf89df6e6b295ff8f14bb7fcf",
+    "final-live/results.json": "fbbfad90c503d4c4c620299fcb171a89d5521573e9a3db95fed2d0af5f1d76a8",
+    "BODY_SELECTION/COARSE_CONFIRMED_LABELS.json": "5bd669def55848d341aba468c542eafd443460d4459af63cb2985c5d28e8caad"
+  },
+  "review_version": "body-family-review.v2.conflict-guard",
+  "default_enabled": false,
+  "evaluation_timeout_seconds": 120,
+  "deployed": false
+}

@@ -42,6 +42,11 @@ jobs:
           python-version: "3.12"
           cache: pip
 
+      - name: Set up Node for frozen BFF contract tests
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
       - name: Install dependencies
         run: pip install -r requirements.txt pytest
 

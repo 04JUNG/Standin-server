@@ -1,0 +1,26 @@
+{
+  "total": 28,
+  "recommendations": 28,
+  "family_counts": {
+    "male": 22,
+    "female": 6
+  },
+  "preset_counts": {
+    "male/IDEAL83": 3,
+    "male/BASE": 16,
+    "female/BASE": 6,
+    "male/MUSCULAR": 2,
+    "male/MUSCLE_MAX": 1
+  },
+  "basis_counts": {
+    "recognized_feature": 6,
+    "presentation_default": 22
+  },
+  "provider_errors": 0,
+  "auto_applied": 0,
+  "accuracy": null,
+  "accuracy_note": "작가의 정답 라벨 없음. 추천 출력률은 정확도가 아님.",
+  "version": "body-coarse.v2.family-first",
+  "implementation_sha256": "13f8190429a8ce6ba0b0aa114aba500d2288118fbfccb6981a619f55000d3096",
+  "catalog_sha256": "efdde36690a64e17cb2a100e6a39319e1b46db00a32cede15530a21c6461a636"
+}

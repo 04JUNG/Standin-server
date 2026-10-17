@@ -1,5 +1,59 @@
 {
   "$defs": {
+    "BodyApplicationPolicyOut": {
+      "additionalProperties": true,
+      "properties": {
+        "version": {
+          "title": "Version",
+          "type": "string"
+        },
+        "allowed": {
+          "title": "Allowed",
+          "type": "boolean"
+        },
+        "strong_axes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Strong Axes",
+          "type": "array"
+        },
+        "evidence_groups": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Groups",
+          "type": "array"
+        },
+        "reason_codes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "calibrated": {
+          "const": false,
+          "default": false,
+          "title": "Calibrated",
+          "type": "boolean"
+        },
+        "acceptance_probability": {
+          "default": null,
+          "title": "Acceptance Probability",
+          "type": "null"
+        }
+      },
+      "required": [
+        "version",
+        "allowed",
+        "strong_axes",
+        "evidence_groups",
+        "reason_codes"
+      ],
+      "title": "BodyApplicationPolicyOut",
+      "type": "object"
+    },
     "BodyAssetRef": {
       "additionalProperties": true,
       "properties": {
@@ -531,6 +585,76 @@
             }
           ],
           "default": null
+        },
+        "representation": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "enum": [
+                  "outline",
+                  "shaded",
+                  "skeletal",
+                  "unknown"
+                ],
+                "type": "string"
+              },
+              "propertyNames": {
+                "enum": [
+                  "head",
+                  "torso",
+                  "arms",
+                  "legs"
+                ]
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Representation"
+        },
+        "surface_detail": {
+          "anyOf": [
+            {
+              "enum": [
+                "drawn",
+                "omitted",
+                "unknown"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Surface Detail"
+        },
+        "evidence_regions": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "items": {
+                  "enum": [
+                    "head",
+                    "torso",
+                    "arms",
+                    "legs"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence Regions"
         }
       },
       "required": [
@@ -676,6 +800,71 @@
           },
           "title": "Tied Body Ids",
           "type": "array"
+        },
+        "decision": {
+          "anyOf": [
+            {
+              "enum": [
+                "auto_apply",
+                "presentation_default",
+                "suggest_only",
+                "insufficient_evidence",
+                "asset_unavailable"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Decision"
+        },
+        "policy_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Policy Version"
+        },
+        "application_policy": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BodyApplicationPolicyOut"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "suggested_body_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Suggested Body Id"
+        },
+        "suggested_asset": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BodyAssetRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [

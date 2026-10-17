@@ -15,6 +15,7 @@ from .config import CFG
 from .body_scope import detect_scope, observed_legs, promote_for_observed_legs
 from .person_tags import detect_person_tags
 from .hand_shapes import detect_person_hands
+from .experimental.body_matching.integrated import detect_body
 from .partial_pose import shoulder_frame
 
 
@@ -187,10 +188,15 @@ def build_slot_descriptors(vlm: VLMAnalysis, slots,
             person_tags=detect_person_tags(
                 vlm, slot.slot_id if slot.slot_origin == "vlm" else None,
             ),
+            body_classification=detect_body(
+                vlm, slot.slot_id if slot.slot_origin == "vlm" else None,
+            ),
             hands=detect_person_hands(
                 vlm, slot.slot_id if slot.slot_origin == "vlm" else None,
             ),
         ))
+        if getattr(slot, "box_recovery", None):
+            out[-1].quality_trace["box_recovery"] = dict(slot.box_recovery)
         if output_scope is not vlm_scope:
             # API에는 승격된 값만 나가므로 VLM 원래 판별은 trace에 남긴다.
             out[-1].quality_trace["output_scope_promotion"] = {
