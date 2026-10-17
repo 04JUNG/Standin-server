@@ -462,3 +462,51 @@ def test_recorded_inputs_keep_legacy_replay_and_reject_context_mismatch(
             replay["rows"][0]["recommendation"]["recommended_body_id"]
             == "male-base-v0-7-2"
         )
+
+
+def test_confirmed_scoring_does_not_count_alternative_or_default_as_observed_success():
+    from scripts.eval_body_coarse import validate_labels, score_labels
+
+    labels = validate_labels(
+        dict(
+            source="user_confirmed_character_setting",
+            rows=[
+                dict(case_id="p0", expected_family="male"),
+                dict(case_id="p1", expected_family="female"),
+            ],
+        ),
+        {"p0", "p1"},
+    )
+    rows = [
+        dict(case_id="p0", recommendation=recommend(observation(), ASSETS)),
+        dict(
+            case_id="p1", recommendation=recommend(unknown("p1", "ambiguous"), ASSETS)
+        ),
+    ]
+    before = copy.deepcopy(rows)
+    scored = score_labels(rows, labels)
+    assert scored["recommended_correct"] == 1 and scored["observed_correct"] == 1
+    assert scored["total"] == 2 and scored["recommendation_accuracy"] == 0.5
+    assert rows == before
+    # A fallback that happens to match a label still is not visual recognition.
+    scored = score_labels(rows, {"p1": "male"})
+    assert scored["recommended_correct"] == 1 and scored["observed_correct"] == 0
+
+
+@pytest.mark.parametrize(
+    "rows",
+    [
+        [dict(case_id="p0", expected_family="male")] * 2,
+        [dict(case_id="wrong", expected_family="female")],
+        [dict(case_id="p0", expected_family="unknown")],
+    ],
+)
+def test_confirmed_labels_reject_wrong_identity_duplicates_and_nonbinary_ground_truth(
+    rows,
+):
+    from scripts.eval_body_coarse import validate_labels
+
+    with pytest.raises(ValueError, match="invalid_confirmed_label"):
+        validate_labels(
+            dict(source="user_confirmed_character_setting", rows=rows), {"p0"}
+        )

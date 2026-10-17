@@ -62,6 +62,50 @@ def load_cases(protocol, out):
     return cases, inputs
 
 
+def validate_labels(document, case_ids):
+    """Evaluation-only ground truth. Never included in the model request."""
+    if document.get("source") != "user_confirmed_character_setting":
+        raise ValueError("labels_not_user_confirmed")
+    labels = {}
+    for row in document["rows"]:
+        ident, family = row["case_id"], row["expected_family"]
+        if ident not in case_ids or ident in labels or family not in ("male", "female"):
+            raise ValueError("invalid_confirmed_label")
+        labels[ident] = family
+    if not labels:
+        raise ValueError("empty_confirmed_labels")
+    return labels
+
+
+def score_labels(rows, labels):
+    by_id = {r["case_id"]: r for r in rows}
+    details = []
+    for ident, expected in labels.items():
+        rec = by_id[ident]["recommendation"]
+        details.append(
+            dict(
+                case_id=ident,
+                expected_family=expected,
+                observed_family=rec["observed_family"],
+                recommended_family=rec["recommended_family"],
+                recommended_body_id=rec["recommended_body_id"],
+                observation_correct=rec["observed_family"] == expected,
+                recommendation_correct=rec["recommended_family"] == expected,
+                recommendation_basis=rec["recommendation_basis"],
+            )
+        )
+    correct = sum(r["recommendation_correct"] for r in details)
+    return dict(
+        label_source="user_confirmed_character_setting",
+        total=len(details),
+        observed_correct=sum(r["observation_correct"] for r in details),
+        recommended_correct=correct,
+        recommendation_accuracy=correct / len(details),
+        scope="Only confirmed cases; not accuracy across the entire evaluation set",
+        cases=details,
+    )
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--protocol", type=Path, required=True)
@@ -72,6 +116,9 @@ def main():
     g = p.add_mutually_exclusive_group(required=True)
     g.add_argument("--remote", action="store_true")
     g.add_argument("--recorded", type=Path)
+    p.add_argument(
+        "--labels", type=Path, help="Evaluation-only user-confirmed family labels"
+    )
     p.add_argument("--env-file", type=Path)
     p.add_argument("--model", default="gemini-flash-lite-latest")
     a = p.parse_args()
@@ -89,6 +136,11 @@ def main():
     ids = [c["case_id"] for c in cases]
     if len(ids) != len(set(ids)):
         raise ValueError("duplicate_eval_case")
+    labels = (
+        validate_labels(json.loads(a.labels.read_text()), set(ids))
+        if a.labels
+        else None
+    )
 
     def evaluate(start):
         batch = cases[start : start + 4]
@@ -227,10 +279,18 @@ def main():
         accuracy=None,
         accuracy_note="작가의 정답 라벨 없음. 추천 출력률은 정확도가 아님.",
     )
+    if labels:
+        metrics["confirmed_family"] = score_labels(rows, labels)
+        metrics["accuracy_note"] = (
+            "전체 세트 정확도 미측정. 사용자 확인 사례만 confirmed_family에서 별도 평가."
+        )
     result = dict(
         version=VERSION,
         classification_versions=sorted({r["observation"]["version"] for r in rows}),
         mode="remote" if a.remote else "recorded",
+        confirmed_labels_sha256=(
+            hashlib.sha256(a.labels.read_bytes()).hexdigest() if a.labels else None
+        ),
         model_requested=a.model if a.remote else recorded.get("model_requested"),
         recorded_from=str(a.recorded.resolve()) if a.recorded else None,
         source_classification_implementation_sha256=(

@@ -1,10 +1,15 @@
 {
-  "reviewer": "assistant_visual_review",
-  "artist_verified": false,
+  "reviewer": "assistant_visual_review_with_user_confirmed_overrides",
+  "label_sources": {
+    "user_confirmed_character_setting": 2,
+    "assistant_visual_review": 26
+  },
   "rows": [
     {
       "case_id": "124629:p0",
       "expected_family": "male",
+      "label_source": "assistant_visual_review",
+      "previous_review_family": null,
       "review_certainty": "clear",
       "before": "남성형 IDEAL83",
       "after": "남성형 IDEAL83",
@@ -18,21 +23,25 @@
     },
     {
       "case_id": "124637:p0",
-      "expected_family": "female",
+      "expected_family": "male",
+      "label_source": "user_confirmed_character_setting",
+      "previous_review_family": "female",
       "review_certainty": "tentative",
       "before": "남성형 BASE",
       "after": "남성형 BASE",
       "observed_family": "male",
       "recommended_body_id": "male-base-v0-7-2",
       "basis": "presentation_default",
-      "status": "리뷰와 불일치",
-      "review_reason": "속눈썹과 얼굴 표현, 묶은 곱슬머리와 허리선의 종합 인상. 단순 선화여서 작가 확인 필요",
+      "status": "일치",
+      "review_reason": "사용자 확인: 124637: 남자 / 이전 AI 시각 리뷰: 속눈썹과 얼굴 표현, 묶은 곱슬머리와 허리선의 종합 인상. 단순 선화여서 작가 확인 필요",
       "model_reason": "짧은 헤어스타일과 각진 턱선",
       "alternatives": "female-base-v0-3-4"
     },
     {
       "case_id": "124702:p0",
       "expected_family": "female",
+      "label_source": "user_confirmed_character_setting",
+      "previous_review_family": "female",
       "review_certainty": "clear",
       "before": "남성형 BASE",
       "after": "남성형 BASE",
@@ -40,13 +49,15 @@
       "recommended_body_id": "male-base-v0-7-2",
       "basis": "catalog_default",
       "status": "리뷰와 불일치",
-      "review_reason": "얼굴·가슴과 허리 표현, 어깨가 드러난 상의와 하의·신발을 함께 보면 여성형",
+      "review_reason": "사용자 확인: 124702: 여자 / 이전 AI 시각 리뷰: 얼굴·가슴과 허리 표현, 어깨가 드러난 상의와 하의·신발을 함께 보면 여성형",
       "model_reason": "중성적인 얼굴 윤곽과 체형",
       "alternatives": "female-base-v0-3-4"
     },
     {
       "case_id": "131000:p0",
       "expected_family": "male",
+      "label_source": "assistant_visual_review",
+      "previous_review_family": null,
       "review_certainty": "clear",
       "before": "남성형 BASE",
       "after": "남성형 BASE",
@@ -61,6 +72,8 @@
     {
       "case_id": "131000:p1",
       "expected_family": "female",
+      "label_source": "assistant_visual_review",
+      "previous_review_family": null,
       "review_certainty": "clear",
       "before": "여성형 BASE",
       "after": "여성형 BASE",
@@ -75,6 +88,8 @@
     {
       "case_id": "131040:p0",
       "expected_family": "male",
+      "label_source": "assistant_visual_review",
+      "previous_review_family": null,
       "review_certainty": "clear",
       "before": "남성형 MUSCULAR",
       "after": "남성형 MUSCULAR",
@@ -89,6 +104,8 @@
     {
       "case_id": "131040:p1",
       "expected_family": "male",
+      "label_source": "assistant_visual_review",
+      "previous_review_family": null,
       "review_certainty": "clear",
       "before": "남성형 BASE",
       "after": "남성형 BASE",
@@ -103,6 +120,8 @@
     {
       "case_id": "131056:p0",
       "expected_family": "male",
+      "label_source": "assistant_visual_review",
+      "previous_review_family": null,
       "review_certainty": "clear",
       "before": "남성형 IDEAL83",
       "after": "남성형 IDEAL83",
@@ -117,6 +136,8 @@
     {
       "case_id": "131056:p2",
       "expected_family": "female",
+      "label_source": "assistant_visual_review",
+      "previous_review_family": null,
       "review_certainty": "clear",
       "before": "여성형 BASE",
       "after": "여성형 BASE",
@@ -131,6 +152,8 @@
     {
       "case_id": "131112:p0",
       "expected_family": "male",
+      "label_source": "assistant_visual_review",
+      "previous_review_family": null,
       "review_certainty": "clear",
       "before": "남성형 BASE",
       "after": "남성형 BASE",
@@ -145,6 +168,8 @@
     {
       "case_id": "131112:p3",
       "expected_family": "male",
+      "label_source": "assistant_visual_review",
+      "previous_review_family": null,
       "review_certainty": "clear",
       "before": "남성형 BASE",
       "after": "남성형 BASE",
@@ -159,6 +184,8 @@
     {
       "case_id": "131112:p4",
       "expected_family": "female",
+      "label_source": "assistant_visual_review",
+      "previous_review_family": null,
       "review_certainty": "clear",
       "before": "남성형 BASE",
       "after": "여성형 BASE",
@@ -173,6 +200,8 @@
     {
       "case_id": "131127:p0",
       "expected_family": "male",
+      "label_source": "assistant_visual_review",
+      "previous_review_family": null,
       "review_certainty": "clear",
       "before": "남성형 BASE",
       "after": "남성형 MUSCULAR",
@@ -187,6 +216,8 @@
     {
       "case_id": "131127:p1",
       "expected_family": "male",
+      "label_source": "assistant_visual_review",
+      "previous_review_family": null,
       "review_certainty": "tentative",
       "before": "남성형 BASE",
       "after": "남성형 BASE",
@@ -201,6 +232,8 @@
     {
       "case_id": "131145:p0",
       "expected_family": "male",
+      "label_source": "assistant_visual_review",
+      "previous_review_family": null,
       "review_certainty": "tentative",
       "before": "남성형 BASE",
       "after": "남성형 BASE",
@@ -215,6 +248,8 @@
     {
       "case_id": "131211:p0",
       "expected_family": "male",
+      "label_source": "assistant_visual_review",
+      "previous_review_family": null,
       "review_certainty": "tentative",
       "before": "남성형 BASE",
       "after": "남성형 BASE",
@@ -229,6 +264,8 @@
     {
       "case_id": "131211:p1",
       "expected_family": "male",
+      "label_source": "assistant_visual_review",
+      "previous_review_family": null,
       "review_certainty": "clear",
       "before": "남성형 BASE",
       "after": "남성형 BASE",
@@ -243,6 +280,8 @@
     {
       "case_id": "131224:p0",
       "expected_family": "female",
+      "label_source": "assistant_visual_review",
+      "previous_review_family": null,
       "review_certainty": "clear",
       "before": "여성형 BASE",
       "after": "여성형 BASE",
@@ -257,6 +296,8 @@
     {
       "case_id": "171734:p0",
       "expected_family": "female",
+      "label_source": "assistant_visual_review",
+      "previous_review_family": null,
       "review_certainty": "clear",
       "before": "여성형 BASE",
       "after": "여성형 BASE",
@@ -271,6 +312,8 @@
     {
       "case_id": "2.16.04:p0",
       "expected_family": "male",
+      "label_source": "assistant_visual_review",
+      "previous_review_family": null,
       "review_certainty": "clear",
       "before": "남성형 MUSCLE_MAX",
       "after": "남성형 MUSCLE_MAX",
@@ -285,6 +328,8 @@
     {
       "case_id": "2.16.04:p1",
       "expected_family": "male",
+      "label_source": "assistant_visual_review",
+      "previous_review_family": null,
       "review_certainty": "clear",
       "before": "남성형 MUSCULAR",
       "after": "남성형 MUSCULAR",
@@ -299,6 +344,8 @@
     {
       "case_id": "2.16.52:p0",
       "expected_family": "female",
+      "label_source": "assistant_visual_review",
+      "previous_review_family": null,
       "review_certainty": "clear",
       "before": "여성형 BASE",
       "after": "여성형 BASE",
@@ -313,6 +360,8 @@
     {
       "case_id": "2.16.52:p2",
       "expected_family": "female",
+      "label_source": "assistant_visual_review",
+      "previous_review_family": null,
       "review_certainty": "clear",
       "before": "여성형 BASE",
       "after": "여성형 BASE",
@@ -327,6 +376,8 @@
     {
       "case_id": "3.08.13:p0",
       "expected_family": "male",
+      "label_source": "assistant_visual_review",
+      "previous_review_family": null,
       "review_certainty": "clear",
       "before": "남성형 BASE",
       "after": "남성형 BASE",
@@ -341,6 +392,8 @@
     {
       "case_id": "4.56.21:p0",
       "expected_family": "male",
+      "label_source": "assistant_visual_review",
+      "previous_review_family": null,
       "review_certainty": "tentative",
       "before": "남성형 BASE",
       "after": "남성형 BASE",
@@ -355,6 +408,8 @@
     {
       "case_id": "청룡성:p0",
       "expected_family": null,
+      "label_source": "assistant_visual_review",
+      "previous_review_family": null,
       "review_certainty": "unknown",
       "before": "남성형 BASE",
       "after": "남성형 BASE",
@@ -369,6 +424,8 @@
     {
       "case_id": "청룡성:p1",
       "expected_family": "male",
+      "label_source": "assistant_visual_review",
+      "previous_review_family": null,
       "review_certainty": "tentative",
       "before": "남성형 IDEAL83",
       "after": "남성형 IDEAL83",
@@ -383,6 +440,8 @@
     {
       "case_id": "청룡성:p2",
       "expected_family": null,
+      "label_source": "assistant_visual_review",
+      "previous_review_family": null,
       "review_certainty": "unknown",
       "before": "남성형 BASE",
       "after": "남성형 BASE",
