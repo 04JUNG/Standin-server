@@ -1,0 +1,40 @@
+{
+  "ok": true,
+  "cases": [
+    {
+      "cut_id": "S3-p_rough_060",
+      "actors": 2,
+      "fresh_source_hashes": true,
+      "rig_bones": 52,
+      "full_scopes_preserve_all_vertices": true,
+      "arm_length_and_head_preserved": true,
+      "zero_silhouette_overlap": true,
+      "no_depth_order_reversals": true
+    },
+    {
+      "cut_id": "S3-p_rough_220",
+      "actors": 2,
+      "fresh_source_hashes": true,
+      "rig_bones": 52,
+      "full_scopes_preserve_all_vertices": true,
+      "arm_length_and_head_preserved": true,
+      "zero_silhouette_overlap": true,
+      "no_depth_order_reversals": true
+    },
+    {
+      "cut_id": "S3-v3_rough_0718",
+      "actors": 3,
+      "fresh_source_hashes": true,
+      "rig_bones": 52,
+      "full_scopes_preserve_all_vertices": true,
+      "arm_length_and_head_preserved": true,
+      "zero_silhouette_overlap": true,
+      "no_depth_order_reversals": true
+    }
+  ],
+  "three_max_raw_world_error_m": 0.00022279526034725485,
+  "three_max_skin_world_error_m": 0.00019226484159444302,
+  "three_max_source_pixel_error": 0.04008667506898313,
+  "no_cut_specific_angles_or_joint_targets_in_inference_code": true,
+  "semantic_quality_requires_user_review": true
+}
