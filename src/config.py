@@ -79,6 +79,8 @@ class Config:
 
     # Body sidecar: observe/choose one FBX without changing existing pose search.
     body_matching_mode: str = os.getenv("BODY_MATCHING_MODE", "off")
+    body_classification_strategy: str = os.getenv("BODY_CLASSIFICATION_STRATEGY", "legacy")
+    body_coarse_catalog_path: str = os.getenv("BODY_COARSE_CATALOG_PATH", "config/body_morphology.v1.json")
     body_catalog_path: str = os.getenv("BODY_CATALOG_PATH", "config/body_catalog.v1.json")
     body_vlm_provider: str = os.getenv("BODY_VLM_PROVIDER", "mock")
     body_vlm_model: str = os.getenv("BODY_VLM_MODEL", "gemini-2.5-flash")
@@ -461,6 +463,8 @@ class Config:
     refine_timeout_seconds: float = float(os.getenv("REFINE_TIMEOUT_SECONDS", "5.0"))
 
     def __post_init__(self) -> None:
+        if self.body_classification_strategy not in {"legacy", "coarse"}:
+            raise ValueError("BODY_CLASSIFICATION_STRATEGY must be legacy or coarse")
         if self.body_matching_mode not in {"off", "shadow", "auto"}:
             raise ValueError("BODY_MATCHING_MODE must be off, shadow or auto")
         if self.body_vlm_provider not in {"mock", "gemini"}:

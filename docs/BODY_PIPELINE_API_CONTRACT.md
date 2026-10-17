@@ -73,3 +73,7 @@ coverage가 visible이고 representation이 outline/shaded인 **동일 부위**�
 `body-apply.structural-evidence.v2`는 최소 2개 독립 근거 그룹과 전체/명확한 근거 순위의 동일한 유일한 1위를 요구한다. 같은 윤곽의 여러 라벨은 1그룹이다. 명시적인 torso 프레임과 arms 볼륨처럼 서로 다른 부위의 근거는 2그룹이 될 수 있다. 투영 가설별 동점에 1위가 포함되면 허용하되, 다른 후보를 단독 지지하는 모순은 보류한다. 거리나 점수 차이는 확률·보정된 신뢰도로 표시하지 않는다.
 
 [최신 20종 명세·리뷰 결과·BFF 회귀 검증](BODY_SELECTION/P0_P1_REVIEW.md).
+
+## VLM 대분류 추천 전략 (coarse)
+
+`BODY_CLASSIFICATION_STRATEGY=coarse`는 남녀 계열을 먼저 정하고 해당 계열 BASE를 기본값으로 추천한다. 명확한 근육·체격·비율 특징만 프리셋을 변경한다. `people[].coarse_classification`은 판독 결과, `people[].coarse_recommendation`은 모든 인물의 추천 ID·추천 방식·대안·이유다. 기존 자동 적용용 `candidates=[]`, `selected_asset/suggested_asset/auto_body_id/applied_body_id=null`을 유지하고 렌더를 실행하지 않는다. UI는 추천을 `coarse_recommendation.recommended_body_id`에서 읽어야 한다. 기본 legacy 전략의 계약은 바뀌지 않는다. [규칙·실제 28명 평가·활성화 예시](BODY_SELECTION/COARSE_RECOMMENDATION.md).

@@ -222,3 +222,7 @@ proper rotation, Y-up). 사용 시 `preview_view=front`만 허용한다. 동결 
 카메라는 FBX와 preview에만 적용한다. BVH는 회전하지 않는다. Mirror와 카메라를
 동시에 요청하는 경로는 지원하지 않으며, exact V3.2.4도 회전을 허용하지 않는다.
 전신·반신·흉상·두상 모두 같은 행렬을 사용한다. 관절·손가락의 상대 회전은 바꾸지 않는다.
+
+### 대분류 추천과 Export 경계
+
+`BODY_CLASSIFICATION_STRATEGY=coarse`의 `coarse_recommendation.recommended_body_id`는 캐릭터 대분류에 따른 프리셋 추천이다. 이를 승인된 `selected_asset` 또는 Export 주문으로 간주하지 않는다. 이 전략은 `applied_body_id=null`, `render_required=false`이며 기존 수동 선택·자산 QA·Export 검증 절차를 유지한다. 추천 출력과 자동 적용을 구분하는 필드는 [대분류 추천 계약](BODY_SELECTION/COARSE_RECOMMENDATION.md)에 기록한다.

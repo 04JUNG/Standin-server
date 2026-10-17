@@ -114,6 +114,61 @@ class BodyApplicationPolicyOut(BodyWireModel):
     acceptance_probability: None = None
 
 
+class CoarseAxisOut(BodyWireModel, Generic[AttributeValue]):
+    value: AttributeValue
+    certainty: Literal['clear','tentative','unknown']
+    reason: str
+
+
+class CoarseAxesOut(BodyWireModel):
+    presentation: CoarseAxisOut[Literal['masculine','feminine','androgynous','unknown']]
+    muscle: CoarseAxisOut[Literal['ordinary','muscular','very_muscular','unknown']]
+    fullness: CoarseAxisOut[Literal['slim','average','soft','heavy','unknown']]
+    proportion: CoarseAxisOut[Literal['compact','standard','elongated','unknown']]
+
+
+class CoarseClassificationOut(BodyWireModel):
+    version: str
+    person_id: str
+    target: Literal['clear','ambiguous']
+    representation: Literal['character','stick','face_only','unreadable']
+    proportion_readable: bool
+    axes: CoarseAxesOut
+
+
+class CoarseCandidateOut(BodyWireModel):
+    body_id: str
+    display_name: str
+    preset: str
+    family: Literal['male','female']
+    version: str
+    rank: int = Field(ge=1)
+    reason: str
+
+
+class CoarseRecommendationOut(BodyWireModel):
+    version: str
+    recommended_body_id: str
+    recommended_preset: str
+    recommended_family: Literal['male','female']
+    observed_family: Literal['male','female'] | None
+    recommendation_basis: Literal['recognized_feature','presentation_default','catalog_default']
+    candidates: list[CoarseCandidateOut] = Field(min_length=1,max_length=3)
+    unresolved_axes: list[str]
+    recognized_features: list[str]
+    reasons: list[str]
+    auto_apply: Literal[False]
+    applied_body_id: None
+    application_reason: str
+
+    @model_validator(mode='after')
+    def recommendation_identity(self):
+        first=self.candidates[0]
+        if (first.body_id,first.family,first.preset)!=(self.recommended_body_id,self.recommended_family,self.recommended_preset):raise ValueError('coarse_recommendation_identity')
+        if self.observed_family is not None and any(c.family!=self.observed_family for c in self.candidates):raise ValueError('coarse_family_mismatch')
+        return self
+
+
 class BodyPersonOut(BodyWireModel):
     person_index: int = Field(ge=0)
     person_id: str
@@ -127,6 +182,8 @@ class BodyPersonOut(BodyWireModel):
     acceptance_probability: None = None
     candidates: list[BodyCandidateOut]
     observations: BodyObservationOut
+    coarse_classification: CoarseClassificationOut | None = None
+    coarse_recommendation: CoarseRecommendationOut | None = None
     pose_bindings: list[BodyPoseBindingOut]
     render_required: bool
     manual_change_scope: Literal['current_cut_person']
@@ -155,6 +212,8 @@ class BodyPersonOut(BodyWireModel):
         if (self.suggested_asset is None) != (self.suggested_body_id is None) or (
                 self.suggested_asset is not None and self.suggested_asset.body_id != self.suggested_body_id):
             raise ValueError('body_suggestion_identity_mismatch')
+        if self.coarse_classification is not None and self.coarse_classification.person_id != self.person_id:
+            raise ValueError("coarse_person_identity_mismatch")
         if self.person_id != self.observations.person_id:
             raise ValueError('body_observation_person_mismatch')
         if self.auto_body_id is None:

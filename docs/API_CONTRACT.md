@@ -578,3 +578,7 @@ Converter `/healthz`의 `preview_model_revision`과 `character_hashes`로 지원
 캐시 세대를 확인한다. exact V3.2.4 모드에서는 모델 capability가 꺼진다.
 모델 export용 모듈은 기존 `posed-mesh-v1` exporter와 분리하여 기존 사전 생성
 라이브러리의 키를 무효화하지 않는다. 배포 순서는 Converter/추론 → BFF → 앱이다.
+
+### 대분류 체형 추천 (opt-in)
+
+`BODY_CLASSIFICATION_STRATEGY=coarse`는 인물별 `coarse_classification`과 `coarse_recommendation`을 추가한다. 남녀 계열을 먼저 판독하고 해당 계열 BASE를 기본 추천으로 두며 명확한 특징만 근육형·IDEAL83 등으로 변경한다. 모든 인물에 `recommended_body_id`와 추천 근거를 기록한다. 자동 적용과 달리 `recommended_body_id`는 진단용 프리셋 ID이며 자산 QA 권한이 아니다. `auto_body_id/applied_body_id/selected_asset/suggested_asset`는 null, `render_required=false`이다. 기존 기본 전략은 legacy이고 기존 수동 선택·기본값 계약은 유지한다. 상세: [대분류 추천](BODY_SELECTION/COARSE_RECOMMENDATION.md).
