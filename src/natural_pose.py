@@ -82,6 +82,38 @@ class NaturalLanguagePoseGenerator:
         self.budget_s, self.max_retries, self.model = budget_s, max_retries, model
         self.review_dir = Path(review_dir).resolve() if review_dir else None
 
+    def repair_hand_spacing(self, candidate, generation, delta_cm, timeout_s):
+        """Bounded offline child; source identity must reproduce before any IK edit."""
+        try:
+            if type(delta_cm) not in (int, float) or delta_cm not in (2., 4., 6., 8.):
+                raise ValueError('repair_delta_out_of_bounds')
+            if not 0 < timeout_s <= 30:
+                raise ValueError('repair_deadline_invalid')
+            digest = hashlib.sha256(candidate['bvh'].encode('utf-8')).hexdigest()
+            if digest != candidate['bvh_sha256'] or file_hash(self.rig) != RIG_SHA256:
+                raise ValueError('repair_source_invalid')
+            attempts = generation['diagnostics']['attempts']
+            if not attempts or attempts[-1]['status'] != 'passed':
+                raise ValueError('repair_no_passed_proposal')
+            payload = dict(proposal=attempts[-1]['proposal'],
+                text=candidate['search_v2']['description']['text'], delta_cm=delta_cm,
+                source_bvh_sha256=digest, taxonomy=str(self.taxonomy),
+                taxonomy_sha256=file_hash(self.taxonomy))
+            run = subprocess.run([sys.executable, '-m', 'src.hand_spacing_worker'],
+                input=json.dumps(payload), text=True, capture_output=True, timeout=timeout_s,
+                cwd=Path(__file__).resolve().parents[1], env={**os.environ,
+                    'POSE_GENERATION_RIG': str(self.rig), 'OPENBLAS_NUM_THREADS': '1', 'OMP_NUM_THREADS': '1'})
+            if run.returncode:
+                raise ValueError('repair_worker_failed')
+            result = json.loads(run.stdout)
+            if result.get('passed') is not True:
+                return dict(passed=False, reasons=['hand_repair_ik_or_source_rejected'])
+            return result
+        except subprocess.TimeoutExpired:
+            return dict(passed=False, reasons=['hand_repair_deadline_exhausted'])
+        except Exception:
+            return dict(passed=False, reasons=['hand_repair_source_or_worker_unavailable'])
+
     def generate(self, description):
         if description.visible is not True or description.certainty not in ('high', 'medium'):
             return GenerationResult('unsupported', 'description_not_trusted', backend=VERSION)
