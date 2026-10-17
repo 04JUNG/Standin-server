@@ -57,6 +57,7 @@ from src.pose_model_source import PoseModelFetchError, ensure_pose_model
 from src.refine import (REFINE_CODE_VERSION, REFINE_V2_CODE_VERSION,
                         refine_bvh)
 from src.refine_policy import structural_refine_allowed
+from src.refine_projection import ProjectionDomainError, VERSION as REFINE_PROJECTION_VERSION
 from src.pose_catalog import build_catalog, folders as pose_catalog_folders, page as pose_catalog_page
 from src.pose_quarantine import (load_pose_quarantine, pose_quarantine_sha256,
                                  quarantine_record)
@@ -300,6 +301,7 @@ def _refine_capability() -> dict:
         REFINE_V2_CODE_VERSION if CFG.refine_v2_enabled else REFINE_CODE_VERSION
     )
     identity = {
+        'projection_version': REFINE_PROJECTION_VERSION,
         "code_version": code_version,
         "feature_version": FEATURE_VERSION,
         "pose_library_version": CFG.pose_library_version,
@@ -889,6 +891,8 @@ def refine(req: RefineRequest):
     if req.camera and req.camera.source_bvh_sha256 != _file_sha256(base):
         # Also validate before policy/base fallbacks, which can render a preview.
         raise HTTPException(422, "candidate camera source changed; analyze again")
+    if req.camera and req.camera.version=='candidate-camera-v2' and not CFG.refine_v2_enabled:
+        raise HTTPException(422, 'search camera requires refine v2; use legacy search with refine v1')
 
     def _base_context() -> dict:
         return {
@@ -900,7 +904,7 @@ def refine(req: RefineRequest):
             "source_revision": SOURCE_REVISION,
         }
 
-    def _base_response(reason: str) -> RefineResponse:
+    def _base_response(reason: str, *, attempted: bool = False) -> RefineResponse:
         return RefineResponse(
             pose_id=req.pose_id, view=req.view, refined=False,
             reason=reason, bvh_url=f"/pose/{req.pose_id}/bvh", bvh=None,
@@ -911,7 +915,7 @@ def refine(req: RefineRequest):
             loss_base=None, loss_final=None, gain=None, backend="none",
             refine_version=(REFINE_V2_CODE_VERSION if CFG.refine_v2_enabled
                             else REFINE_CODE_VERSION),
-            refine_outcome="not_attempted",
+            refine_outcome="reverted" if attempted else "not_attempted",
             diagnostics={
                 "mode_requested": mode_requested,
                 "mode_effective": effective_mode,
@@ -977,6 +981,8 @@ def refine(req: RefineRequest):
                          allowed_limbs=effective_limbs,
                          lower_body_observed=req.lower_body_observed,
                          refine_mode=effective_mode, deadline=deadline)
+    except ProjectionDomainError:
+        return _base_response('camera_projection_invalid', attempted=True)
     except ValueError as exc:                      # 알 수 없는 view 등
         raise HTTPException(422, str(exc)) from exc
     except (OSError, AssertionError) as exc:
