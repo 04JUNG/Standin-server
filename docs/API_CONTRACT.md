@@ -1,6 +1,6 @@
 # API 계약 — 도원 추론 서버 (FastAPI)
 
-> 상태: 현재 계약 · 갱신일: 2026-10-16 · 기준 코드: `api/app.py`, `api/models.py`
+> 상태: 현재 계약 · 갱신일: 2026-10-17 · 기준 코드: `api/app.py`, `api/models.py`
 >
 > 이 문서는 **실제 구현된** HTTP 계약(`api/app.py`·`api/models.py`)을 문서화한다.
 > `/export-order`의 상세는 별도 문서(`docs/EXPORT_CONTRACT.md`)에 있고, 여기서는 전체 엔드포인트와
@@ -36,8 +36,10 @@
 이 경로는 Human-Art 관절의 조건부 VLM 검수·보완과 인물별 자세 설명을 사용한다.
 아래 레거시 경로의 “VLM은 좌표를 생성하지 않음” 규칙과 달리, 보완 관절은 `vlm_repair` 출처를
 명시하고 구조 검사 악화 시 되돌린다. 자동 high 신뢰도·refine 권한으로 승격하지 않는다.
-상하체 분리 검색·런타임 BVH 합성은 하지 않는다. API 기본 RRF 자연어 비중은 0.35이고 로컬
-set4/set5 비교는 0.60을 명시했으며, 실험 비중을 운영 기본값으로 바꾸지 않았다.
+상하체 분리 검색·런타임 BVH 합성은 하지 않는다. 2026-10-17 사용자 요청으로 API 팩토리의
+RRF 자연어 비중은 0.60, 기하 비중은 0.40이다. 로컬 set4/set5 가중치 실험과 같은 비중이며,
+조건 검사·거리 컷오프·단일 검색 경로의 가중치 1은 유지한다. 과거 비교를 재현하는 직접
+`FullBodySearch(...)` 호출의 기본값 0.35는 보존하며, 서버 팩토리가 0.60을 명시한다.
 모든 새 후보는 `release_allowed=false`, `refine_allowed=false`, `actual_mesh_validated=false`다.
 실제 반대 손 피부 삼각형 검사는 현재 로컬 변환 후 검수이며 자동 API 안전 인증이 아니다.
 
@@ -810,3 +812,110 @@ Gemini 통합 모드의 `BODY_INTEGRATED_REVIEW_ENABLED=1`(기본)에서는 첫 
 재검토를 시작한 응답에만 `body_matching.parallel_review` 진단이 추가된다. `mode=parallel`, `status=completed|error|deadline_exceeded`, `target_count`, `merged_count`, `error`, `review_finished`, `review_elapsed_ms`, `overlap_ms`, `join_wait_ms`, `pose_path_ms`를 제공한다. `review_finished=false`이면 경과 시간은 수집 시점까지의 값이며 완료 시간이 아니다. 이 시간들은 내부 병렬 구간 진단이고 전체 요청 지연이나 제품 SLA가 아니다. [병렬화 검증과 제한](BODY_SELECTION/PARALLEL_REVIEW.md).
 
 기본은 `legacy`/`off`이며 실제 환경 설정을 바꾸지 않았다. 평가 모델·28명 기준·전신 경로의 시간과 회귀 관측은 [통합 평가](BODY_SELECTION/INTEGRATED_FIRST_CALL.md)를 따른다.
+## 동적라우팅 BFF·앱 표시 연결 (dynamic-pose-presentation-v1)
+
+`POST /analyze`에 **추가**된 `people[i].pose_presentation`이 동적라우팅의 표시용 계약이다.
+기존 `dynamic_search` 원문과 legacy `candidates`는 변경하지 않는다. 전신 동적라우팅에서는
+`candidates=[]`가 의도된 값이므로 이것만으로 후보 없음으로 판정하면 안 된다.
+legacy/라우팅 미실행이면 `pose_presentation=null`이며 기존 앱 경로를 그대로 사용한다.
+
+| 필드 | BFF·앱 처리 |
+| --- | --- |
+| `version`, `person_index`, `route` | `dynamic-pose-presentation-v1`; `person_index=people[].index`; 선택된 인물별 라우팅 경로 |
+| `status` | 표시 상태. `ready`, `review_ready`, `basic_reference`, `no_result`, `generation_failed`, `partial_error`, `error`, `blocked`, `undetermined`, `not_run` |
+| `search_status`, `search_reason` | 검색 엔진 원래 상태·사유. HTTP 200이어도 검색 오류일 수 있음 |
+| `generation_status`, `generation_reason` | 생성 원래 상태·사유. 참고 후보가 있어도 생성 실패 배너는 유지 |
+| `ranking` | 실제 RRF 가중치. API 팩토리 `weighted_rrf_k60_geometry_0.4_semantic_0.6`. 배포 후 `/healthz.dynamic_routing`에서도 실제 ranking·두 가중치 확인 가능 |
+| `output_scope` | 변환 출력 범위 `full/half/shoulder_head/head/null`. 미관측을 임의로 full로 확정하지 않음 |
+| `unobserved_body_is_default` | 생성 진단의 명시적 기본값 여부만 전달. true=화면 밖 부위 기본값; null=근거 없음 |
+| `preview_status` | `ready`=표시용 파일 입력 있음, `unavailable`=파일/계약 오류로 없음, `not_requested`=미리보기 입력 없음. BFF 조회 실패 시 별도 오류 표시 필요 |
+| `library_candidates` | qualified 원본 검색 후보(최대 5개). 통과한 검색 조건 범위의 후보이며 완전한 메시 안전 인증 아님 |
+| `review_candidates` | `geometry_review`, `near_match`, `framing_reference` 분리 표시(합계 최대 10개). 정답 검색 성공으로 집계 금지 |
+| `generated_candidates` | `preview_ready` 생성만 `generated_review`로 제공(최대 3개). 실패/근접 생성 진단의 BVH는 포함하지 않음 |
+| `basic_model` | 어깨~머리 기본 모델의 **출력 계획**. 미렌더 상태이며 BVH/FBX 경로를 지어내지 않음 |
+| `issues` | 미리보기 파일 누락·격리·해시 변경 등의 코드. 내부 파일 경로·예외 원문 미노출 |
+
+`ready`는 표시할 파일이 준비되었다는 뜻이지 자동 적용·내보내기 승인이라는 뜻이 아니다.
+모든 항목은 `review_required=true`, `auto_apply_allowed/refine_allowed/export_allowed/
+release_allowed/actual_mesh_validated=false`다. 각 항목의 `validation`은 원래 검사 근거이며
+피부 검사 receipt가 없는데 통과한 것으로 채우지 않는다. 별도 피부 자동 검사 PR의 적용을
+이 계약 변경이 대신하지 않는다. 표시용 투영은 원래 점수·조건 게이트·생성 호출/재시도를
+바꾸지 않는다. 별도 사용자 요청에 따른 서버 RRF 비중 0.6 적용은 위 ranking 항목을 따른다.
+
+### 3D 미리보기 파일 전달
+
+각 항목은 `candidate_id`, `pose_id`, `source`, `library_source`, `kind`, 원래 그룹 내 `rank`, `asset`, `camera`, `camera_kind`, `render_camera`,
+`validation`을 가진다. `rank_score`는 검색 후보의 RRF 점수이며 정확도가 아니다.
+실패한 항목을 건너뛰어도 원래 rank·순서는 유지한다. 그룹 간 임의 통합 재정렬은 하지 않는다.
+`candidate_id=preview_<sha256>`는 버전 v1의 인물 index·종류·라이브러리 ID(생성은 null)·
+BVH SHA-256·정규화된 카메라·출력 범위에 바인딩한다. 점수/순위가 바뀌어도 같은 미리보기는
+같은 ID이며, 바이트/인물/시점/범위가 바뀌면 달라진다. 전역 인증 토큰이 아니므로 BFF의
+job/사용자 소유권 확인을 대체하지 않는다. `lookup_allowed=true`는 미리보기 입력 조회만 뜻한다.
+`score_kind=weighted_rrf` 또는 null이며 `score_is_accuracy=false`다.
+
+* 라이브러리: `asset.transport=library_bvh`, `bvh_url=/pose/{URL-encoded-id}/bvh`,
+  `bvh_sha256`, `library_lookup_supported=true`. 기존 GET과 같은 레지스트리/격리 정책을
+  확인하고, 가능하면 검색 인덱스의 원본 해시도 비교한다. BFF는 이 **내부 상대 경로**를
+  고정된 추론 서버에서 가져오는 인증된 프록시로 바꾸고, 받은 바이트 해시를 재확인한다.
+  임의 외부 URL을 가져오는 프록시를 만들지 않는다. 저장된 과거 결과의 파일이 바뀌면
+  다른 포즈로 조용히 대체하지 말고 재분석/미리보기 불가로 표시한다.
+* 생성: `asset.transport=inline_bvh`, `bvh` 본문, `bvh_sha256`,
+  `library_lookup_supported=false`, `bvh_url=null`, `encoding=utf-8`, `pose_id=null`, `source=generation`.
+  본문을 그대로 미리보기 입력으로 사용하고 `/pose/generated_.../bvh`를 요청하지 않는다.
+  새 공개 파일 저장소·임시 경로·자동 라이브러리 등록은 만들지 않는다.
+* `thumbnail_url`은 실제 번들 파일이 있을 때만 제공한다. 정면 썸네일이므로
+  `thumbnail_view=front`, `thumbnail_is_search_view=false`다. 없으면 null이며 3D 파일은
+  정상일 수 있다. 이 API에서 converter 렌더를 추가 실행하지 않는다.
+* `camera_kind=fixed_117`의 `camera={yaw,pitch,distance}`는 `src/camera_search.py::project`
+  규약(도 단위, 몸통 길이 정규화, hip 중심, Ry 후 Rx 회전, distance null은 직교)을 유지한다.
+  legacy `CandidateCamera` v1/v2와 다른 형식이므로 그 스키마로 캐스팅하지 않는다.
+  `semantic_preview`는 기존 색인의 프리뷰 카메라, `viewer_default`는 시점 미확정이다.
+  서버가 새로운 시점/좌우/관절을 추정하거나 BVH에 회전을 굽지 않는다.
+
+완전한 렌더 규약은 추가된 `render_camera`를 사용한다. `pose-preview-camera-v1`은 Y-up
+오른손 좌표계, hip midpoint 중심, hip→shoulder midpoint 길이 정규화를 사용한다. 회전행렬은
+열벡터 기준 `Rz @ Rx @ Ry`이며 실제 점은 `q=R*(p-hip)/torso_length`다. 정사영은
+`xy=(q.x,-q.y)`, 원근은 `xy=(q.x,-q.y)/(q.z+distance_torso)`이며 깊이>.1이어야 한다.
+각도는 도, 거리는 몸통 길이 단위다. 이는 정규화 투영면 수식이므로 FOV는 제공/추정하지 않는다.
+기성 원근 렌더러를 쓰면 focal length=1인 대칭 투영면을 구현해야 하며, 이미지 채우기용 확대·
+이동은 별도다. `fit_to_rough_pixels=false`: 러프 픽셀 구도까지 복원했다는 뜻이 아니다.
+`projection_matches_search=true`는 117시점 기하의 방향·투영 수식만 같다는 뜻이다.
+`semantic_preview`는 정사영 참고, `viewer_default`는 중립 정사영 표시 기본값(관측 시점 아님).
+`bvh_camera_rotation_applied=false`이므로 BVH 원래 루트/관절 회전은 유지한 채 이 **표시 회전만
+한 번** 적용한다. BVH 단위는 원본 단위이며 미터로 단정하지 말고 위 torso 정규화를 사용한다.
+
+BVH 경로는 만료 시각이 있는 signed URL이 아니며 별도 TTL은 없다. 다만 같은 라이브러리·
+파일·접근 정책이 유지될 때만 재시작 후에도 유효하다. 기본 추론 라우트에 새 공개 인증/토큰을
+추가하지 않았으므로 기존 내부 네트워크/서비스 인증 경계를 유지하고 앱에 직접 노출하지 않는다.
+생성 본문은 반환 후 서버 임시 파일 없이도 사용할 수 있다. BFF는 기존 분석 결과 보관 기간·
+job 소유권·접근제어·사용자 삭제/만료 정책 안에서 미리보기용으로 저장/재사용할 수 있다.
+본문·해시·후보 ID·검사 근거를 함께 보존하고 공개 저장소/무기한 보관/라이브러리 등록/export로
+확장하지 않는다. 보관 기간을 이 계약에서 새로 늘리지 않는다.
+
+우선순위: 지원하는 `pose_presentation.version`이 있으면 표시 목록/상태는 이 필드가 기준이다.
+`dynamic_search`는 근거 확인용이며 두 결과를 합치지 않는다. 미포함/null인 구버전은 팀원의
+기존 dynamic_search 연결을 유지할 수 있고, 그것도 없을 때 legacy candidates를 사용한다.
+알 수 없는 버전은 지원 불가로 표시한다. 오류를 보고 다른 목록을 정상 후보로 승격하지 않는다.
+
+검색 오류·차단이면 주입된 생성/검색 항목을 표시용 목록으로 승격하지 않는다. 정상 빈 검색의
+생성만 허용하며, 이후 별도 기하 참고 목록이 붙더라도 qualified 결과가 없었던 생성은 유지한다.
+파일 접근 실패는 `error/partial_error + issues`이며 `no_result`로 바꾸거나 재생성하지 않는다.
+어떤 표시용 항목도 legacy `candidates`, `/refine`, `/export-order`에 복사하지 않는다.
+
+### 팀원 연결 요청과 완료 기준
+
+추론 서버 소유 변경은 이 필드·파일 무결성·OpenAPI·회귀 테스트까지다. BFF/앱 구현·배포는 별도다.
+
+1. BFF는 새 필드를 인물별로 저장·전달하고 library/inline 전송을 구분한다. body matching의
+   인물/체형 선택·수동 설정·손 프리셋 등 기존 계약은 그대로 보존한다. 검수/변환 조건을
+   바꾸거나 프리셋을 다시 구웠다면 이전 검사 근거를 새 결과의 인증으로 재사용하지 않는다.
+2. 앱은 새 필드가 있으면 그 목록을 읽고 검색/참고/생성 그룹을 구분한다. `search_status`,
+   `generation_status`, `issues`를 보존해 실패를 단순 후보 없음과 구분한다. 구버전 서버만
+   기존 candidates 경로를 사용한다. 두 목록을 임의로 합치거나 export 제한을 해제하지 않는다.
+3. 같은 러프의 인물별 목록 수와 표시 수가 일치하고 실제 BVH 미리보기가 열리는지 E2E로 확인한다.
+   검색 1개/legacy 0개, 정상 빈 검색, 생성 검수 성공, 생성 실패, 부분 오류, 근접 참고,
+   어깨~머리 기본 계획, 파일 누락·변경, 다인물 및 legacy 응답을 각각 검사한다.
+
+로컬 HTTP 회귀 예제: `tests/test_pose_presentation.py`. `pose_presentation` 로그는 그룹별 수와
+오류 코드만 기록한다(러프·설명·BVH 본문은 기록하지 않음). BFF·앱이 새 필드를 읽기 전까지는
+추론 서버만 배포해도 기존 앱의 ‘후보 0개’ 표시는 해결되지 않는다.
