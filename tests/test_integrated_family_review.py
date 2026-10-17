@@ -49,7 +49,9 @@ def runner(analysis, response=None, error=None, deadline=30):
         _model="offline",
         _client=SimpleNamespace(models=SimpleNamespace(generate_content=generate)),
     )
-    cfg = SimpleNamespace(body_max_people=8, body_timeout_seconds=12)
+    cfg = SimpleNamespace(
+        body_max_people=8, body_timeout_seconds=12, vlm_body_thinking_level="low"
+    )
     review.review_uncertain(vlm, Image.new("RGB", (200, 300)), analysis, cfg, deadline)
     return calls
 
@@ -60,7 +62,9 @@ def test_unresolved_family_review_is_one_batched_call_and_only_changes_body():
     original = copy.deepcopy(raw)
     calls = runner(analysis)
     assert len(calls) == 1 and calls[0]["config"].http_options.timeout == 12000
-    assert calls[0]["config"].thinking_config is None
+    assert calls[0]["config"].thinking_config.thinking_level.value.lower() == "low"
+    assert calls[0]["config"].system_instruction is None
+    assert calls[0]["contents"][0] == review.PROMPT
     assert calls[0]["config"].http_options.retry_options.attempts == 1
     assert analysis.raw == original
     after = asdict(analysis)
