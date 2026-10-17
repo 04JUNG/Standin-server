@@ -35,13 +35,20 @@ class Config:
     # --- VLM ---  provider: "mock"(오프라인 기본) | "gemini" | "openai"
     vlm_provider: str = os.getenv("VLM_PROVIDER", "mock")
     # src/vlm/prompts.py의 USER_TEMPLATES 키. 모르는 값이면 VLM 클라이언트를 만들 때 기동이 멈춘다.
-    vlm_prompt_version: str = os.getenv("VLM_PROMPT_VERSION", "p1-scope")
+    vlm_prompt_version: str = os.getenv("VLM_PROMPT_VERSION", "p3-output-scope")
     # 인물별 태그를 받을지. 분석 호출과 분리된 두 번째 VLM 호출이라 켜면 비용이 는다.
     # 실패해도 분석은 그대로 나간다 — 태그만 비고(unknown), 라우팅·검색은 영향이 없다.
     vlm_person_tags: bool = os.getenv("VLM_PERSON_TAGS", "0") == "1"
     # 태그 호출 한 번의 상한. 분석 호출(기본 45초)보다 짧게 둔다 — 늦게 오는 기록용
     # 값 때문에 사용자가 기다리지 않게 한다.
     vlm_person_tags_timeout_ms: int = int(os.getenv("VLM_PERSON_TAGS_TIMEOUT_MS", "15000"))
+    # --- 러프함 기반 검색 경로 분기(04J-286, docs/SEARCH_ROUTING.md) ---
+    # 끄면(기본) 기존 기하 검색만 쓰던 동작과 결과가 같다. 판정 기준값은
+    # src/search_routing.py::RoutingConfig.from_env의 ROUTING_* env로 바꾼다.
+    search_routing_enabled: bool = _env_bool("SEARCH_ROUTING", False)
+    # 관절 근거가 부족한 인물이 있을 때만 나가는 자세 설명 호출 1회의 상한.
+    routing_describe_timeout_ms: int = int(os.getenv("ROUTING_DESCRIBE_TIMEOUT_MS", "15000"))
+    semantic_top_k: int = int(os.getenv("SEMANTIC_TOP_K", "5"))
     # 인물별 손 모양(04J-290). 분석과 분리된 VLM 호출이라 켜면 비용이 는다. 끄거나
     # 실패하면 손은 라이브러리 기본값(relaxed)과 기본 후보 목록으로 나간다.
     vlm_hand_shapes: bool = os.getenv("VLM_HAND_SHAPES", "0") == "1"

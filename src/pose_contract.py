@@ -246,6 +246,27 @@ def validate_calibration_against_config(bundle: PoseBundle, cfg) -> None:
         )
 
 
+def apply_bundle_calibration(bundle: PoseBundle, cfg) -> None:
+    """Explicit direct-model rollout: adopt the validated model's WHOLE profile.
+
+    Caller must opt in. Never used by cascade or by default. The ordinary exact
+    config validation still runs in HumanArtPoseModel after this atomic update.
+    """
+    fields = ('skeleton_kpt_threshold', 'min_skeleton_score', 'distance_metric',
+              'fallback_pos_full', 'fallback_pos_reduced', 'fallback_angle_full',
+              'fallback_angle_reduced', 'fallback_hybrid_full', 'fallback_hybrid_reduced')
+    values = {name: bundle.calibration[name] for name in fields}
+    if values['distance_metric'] not in ('pos', 'angle', 'hybrid'):
+        raise PoseContractError('invalid manifest calibration distance metric')
+    for name, value in values.items():
+        if name == 'distance_metric' or (name.startswith('fallback_') and value is None):
+            continue
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
+            raise PoseContractError('invalid manifest calibration field: ' + name)
+    for name, value in values.items():
+        setattr(cfg, name, value)
+
+
 def validate_rescue_calibration(bundle: PoseBundle) -> None:
     """Validate the manifest-owned subset used by the cascade fallback.
 

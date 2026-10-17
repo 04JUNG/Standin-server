@@ -159,3 +159,33 @@ def test_default_hands_are_serializable_for_the_api():
     out = PersonHandsOut(**asdict(default_hands()))
     assert out.left.preset == DEFAULT_PRESET and out.status == "not_requested"
     assert out.left.candidates[:2] == ["relaxed", "fist"]
+
+
+def test_gemini_hand_call_and_pose_description_keep_separate_contracts():
+    """Merging adjacent VLM methods must not replace either request/timeout."""
+    import json
+    from types import SimpleNamespace
+    from PIL import Image
+    from src.vlm.client import GeminiVLMClient
+
+    calls = []
+    def generate(**kwargs):
+        calls.append(kwargs)
+        if len(calls) == 1:
+            payload = {"people": [{"left": _side("hold_phone"), "right": _side("open")}]}
+        else:
+            payload = {"people": [{"visible": True, "certainty": "high", "actions": ["kick"],
+                "body_details": "한 다리를 앞으로 뻗음", "search_text": "한 다리를 앞으로 뻗어 발차기"}]}
+        return SimpleNamespace(text=json.dumps(payload))
+
+    client = GeminiVLMClient(client=SimpleNamespace(models=SimpleNamespace(generate_content=generate)))
+    image = Image.new("RGB", (32, 32), "white")
+    hands = client.read_hands(image, [(0, 0, 1, 1)])
+    description = client.describe_people(image, [(0, 0, 1, 1)])
+    assert hands["people"][0]["left"]["shape"] == "hold_phone"
+    assert description.status == "ok" and description.descriptions[0].actions == ["kick"]
+    assert len(calls) == 2
+    assert calls[0]["config"].system_instruction == prompts.HAND_SHAPES_SYSTEM
+    assert calls[0]["config"].http_options.timeout == CFG.vlm_hand_shapes_timeout_ms
+    assert calls[1]["config"].system_instruction == prompts.POSE_DESCRIBE_SYSTEM
+    assert calls[1]["config"].http_options.timeout == CFG.routing_describe_timeout_ms

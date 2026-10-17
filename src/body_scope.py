@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
+import re
 from typing import TYPE_CHECKING, Iterable, Literal
 
 import numpy as np
@@ -23,20 +24,49 @@ class BodyScope(str, Enum):
     FULL = "full"
     HALF = "half"
     BUST = "bust"
+    SHOULDER_HEAD = "shoulder_head"
     HEAD = "head"
 
 
 @dataclass(frozen=True)
 class ScopeDetection:
     detected: BodyScope | None = None
-    source: Literal["vlm_person", "legacy_shot", "observed_legs", "unknown"] = "unknown"
+    source: Literal["vlm_person", "vlm_description", "legacy_shot", "observed_legs", "unknown"] = "unknown"
 
 
 # COCO17 hip→knee per leg. A visible knee is below every half-body cut line.
 _THIGHS = {"left_leg": (11, 13), "right_leg": (12, 14)}
 # Scopes whose output mesh drops the legs. Head keeps its own unsupported-search
 # path, so it is deliberately not promoted here.
-_LEG_CUTTING_SCOPES = frozenset({BodyScope.HALF, BodyScope.BUST})
+_LEG_CUTTING_SCOPES = frozenset({BodyScope.HALF, BodyScope.BUST, BodyScope.SHOULDER_HEAD})
+
+
+def refine_scope_from_description(detection: ScopeDetection, description: dict | None) -> ScopeDetection:
+    """An explicit head/shoulder close-up can narrow a prior half/bust label.
+
+    Pose confidence and missing joints are not framing evidence. A trusted full
+    framing (including observed legs) always wins over this prose refinement.
+    """
+    if description and description.get('visible_scope') in ('head','shoulder_head','half'):
+        if detection.source != 'observed_legs':
+            return ScopeDetection(BodyScope(description['visible_scope']),'vlm_description')
+    if detection.detected not in (BodyScope.HALF, BodyScope.BUST) or not description:
+        return detection
+    text = re.sub(r'\s+', '', ' '.join(str(description.get(k) or '')
+        for k in ('body_details', 'search_text', 'context_evidence')))
+    head = bool(re.search(r'머리|얼굴|두상', text))
+    shoulders = '어깨' in text
+    close = bool(re.search(r'클로즈업|어깨(?:선)?(?:일부)?만|어깨(?:위|까지)|머리와목', text))
+    if head and shoulders and close:
+        return ScopeDetection(BodyScope.SHOULDER_HEAD, 'vlm_description')
+    return detection
+
+
+def mesh_scope(detected: BodyScope | None) -> str | None:
+    """Normal upper-body shots retain their arms; tight shoulders are explicit."""
+    if detected == BodyScope.BUST:
+        return BodyScope.HALF.value
+    return detected.value if detected is not None else None
 
 
 def parse_person_scopes(raw: object, count: int) -> list[BodyScope | None]:

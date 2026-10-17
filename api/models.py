@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import math
 from typing import Annotated, List, Literal, Optional
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, Field, field_validator, computed_field, model_validator
 
 from src.body_scope import BodyScope
 from src.schema import Action, Relationship, Shot, View
@@ -105,7 +105,13 @@ class InferenceMetadataOut(BaseModel):
 class ScopeDetectionOut(BaseModel):
     detected: Optional[BodyScope] = None
     # observed_legs: VLM은 half/bust였지만 화면 안 무릎이 관측돼 full로 올린 값.
-    source: Literal["vlm_person", "legacy_shot", "observed_legs", "unknown"] = "unknown"
+    source: Literal["vlm_person", "vlm_description", "legacy_shot", "observed_legs", "unknown"] = "unknown"
+
+    @computed_field
+    @property
+    def mesh_scope(self) -> Optional[str]:
+        from src.body_scope import mesh_scope
+        return mesh_scope(self.detected)
 
 
 class PersonTagsOut(BaseModel):
@@ -144,12 +150,69 @@ class VlmTagsOut(BaseModel):
     relationship: Optional[Relationship] = None
 
 
+class SemanticCandidateOut(BaseModel):
+    """시맨틱 경로 후보(04J-286). 기하 candidates와 의미가 달라 별도 칸에 싣는다.
+
+    score는 태그·관찰 몸 배치·문장 점수(클수록 가까움)이며 기하 distance와 비교할 수 없다.
+    관절 근거가 부족한 인물의 참고 후보이므로 refine 대상이 아니다.
+    """
+    pose_id: str
+    score: float
+    matched: dict = Field(default_factory=dict)
+    pose: dict = Field(default_factory=dict, description="해당 포즈 JSON(태그·설명·bvh_url)")
+
+
+class WholePoseCandidateOut(BaseModel):
+    pose_id: str
+    kind: Literal["library_original"] = "library_original"
+    library_source: Optional[str] = Field(None, description="저장 포즈 출처. generated_composition도 전신 검색 후보이며 이번 요청에서 합성하지 않음")
+    rank_score: float
+    evidence: dict = Field(default_factory=dict)
+    core_conditions: Optional[dict] = None
+    camera: Optional[dict] = None
+    semantic_preview_camera: Optional[dict] = None
+    family: str
+    lookup_allowed: Literal[True] = True
+    refine_allowed: Literal[False] = False
+    release_allowed: Literal[False] = False
+    actual_mesh_validated: Literal[False] = False
+    pose_detail_fit: Optional[dict] = None
+    match_level: Optional[str] = None
+
+
+class DynamicSearchOut(BaseModel):
+    version: Literal["fullbody-dynamic-v1"]
+    route: Literal["hybrid", "geometric", "semantic", "undetermined", "error", "basic_model"]
+    status: Literal["ok", "no_result", "error", "partial_error", "undetermined", "blocked", "not_run"]
+    selected: List[WholePoseCandidateOut] = Field(default_factory=list, max_length=5)
+    near_candidates: List[dict] = Field(default_factory=list, max_length=5,
+        description="핵심 동작은 맞지만 무릎·다리 세부가 다르거나 미확인인 검수 참고. selected와 분리")
+    framing_references: List[dict] = Field(default_factory=list, max_length=5,
+        description="중립 머리·어깨 구도 참고. 검색 정답·생성 성공이 아니며 selected와 분리")
+    branches: dict = Field(default_factory=dict)
+    generation: Optional[dict] = None
+    basic_model: Optional[dict] = Field(None,description="명시적 머리·어깨 컷의 기본 인체 출력 계획. 검색·생성 후보와 구분")
+    geometry_evidence: dict = Field(default_factory=dict)
+    description_evidence: dict = Field(default_factory=dict)
+    composition_enabled: Literal[False] = False
+    stored_compositions_included: bool = True
+    split_search_enabled: Literal[False] = False
+    ranking: str
+    condition_ranking: Optional[str] = None
+    candidate_validation: Optional[dict] = None
+    rank_score_is_accuracy: Literal[False] = False
+    reason: Optional[str] = None
+    elapsed_ms: float
+
+
 class PersonOut(BaseModel):
     index: int
     box: Optional[List[float]] = Field(None, description="[x1,y1,x2,y2] 픽셀")
     tags: dict
     skeleton: Optional[SkeletonOut] = None
     candidates: List[CandidateOut]
+    dynamic_search: Optional[DynamicSearchOut] = Field(
+        None, description="전신 동적 라우팅의 단일 Top5. 원본 selected와 검수용 generation은 분리")
     # /refine을 '순수 함수'로 만들기 위한 필드(docs/REFINE_DESIGN.md).
     # /analyze가 이미 추출한 값을 실어 보낼 뿐이라 연산 추가는 0이다.
     # 클라이언트는 이 두 값을 그대로 POST /refine에 되돌려주면 된다
@@ -186,6 +249,14 @@ class PersonOut(BaseModel):
     output_scope: ScopeDetectionOut = Field(default_factory=ScopeDetectionOut)
     person_tags: PersonTagsOut = Field(default_factory=PersonTagsOut)
     hands: PersonHandsOut = Field(default_factory=PersonHandsOut)
+    # ---- 04J-286 러프함 기반 경로(SEARCH_ROUTING=1일 때만 채워진다) ----
+    semantic_candidates: List[SemanticCandidateOut] = Field(
+        default_factory=list,
+        description="route=semantic일 때 시맨틱 검색 후보. 기존 candidates와 별개")
+    search_routing: Optional[dict] = Field(
+        None,
+        description=("인물별 선택 경로(geometric|semantic|undetermined|error), 분기 사유와 "
+                     "판정 수치·기준값, 검색 상태(ok|no_result|error|not_run), 처리 시간"))
 
 
 class CutResultOut(BaseModel):
@@ -199,6 +270,8 @@ class CutResultOut(BaseModel):
     image: ImageInfoOut
     inference_metadata: InferenceMetadataOut
     vlm_tags: Optional[VlmTagsOut] = None
+    search_routing: Optional[dict] = Field(
+        None, description="컷 단위 라우팅 요약(자세 설명 호출 상태·시간). 끄면 null")
 
 
 # ==== 포즈 미세조정 (docs/REFINE_DESIGN.md) ================================
