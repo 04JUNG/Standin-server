@@ -16,6 +16,7 @@ import numpy as np
 
 from .body_scope import BodyScope, ScopeDetection
 from .person_tags import PersonTags
+from .hand_shapes import PersonHands
 
 
 # ---- 열거형(Controlled Vocabulary) ---------------------------------------
@@ -123,6 +124,9 @@ class VLMAnalysis:
     # refine의 입력이 아니다(src/person_tags.py). 프롬프트가 인물별로 묻지 않으면 비어 있다.
     person_actions: list[Optional[Action]] = field(default_factory=list)
     person_views: list[Optional[View]] = field(default_factory=list)
+    # 인물별 손 모양(src/hand_shapes.py). FBX 손 굽기·손 후보에만 쓰고 검색은 읽지 않는다.
+    # 비어 있으면 손 호출을 하지 않은 분석이다.
+    person_hands: list = field(default_factory=list)
     # 위 shot·action·view·relationship은 잘못된 값을 기본값(full_half·other·front 등)으로
     # 바꾼다. 이 칸은 provider가 실제로 말한 값만 담고, 어휘 밖이거나 없으면 None이다.
     # 칸 전체가 None이면 추적하지 않은 분석이다(테스트가 직접 만든 VLMAnalysis 등).
@@ -159,6 +163,8 @@ class PersonDescriptor:
     output_scope: ScopeDetection = field(default_factory=ScopeDetection)
     # 인물별 action·view. tag_dict()의 컷 단위 값과 별개이며 검색은 읽지 않는다.
     person_tags: PersonTags = field(default_factory=PersonTags)
+    # 인물별 손 모양과 손 후보. 검색·refine은 읽지 않는다.
+    hands: Optional["PersonHands"] = None
 
     def tag_dict(self) -> dict:
         return {

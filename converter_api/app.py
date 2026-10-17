@@ -53,6 +53,7 @@ from converter_api.runner import (
 )
 from converter_api.schemas import CharactersResponse, HealthResponse
 from converter.framing import FRAMING_VERSION, OUTPUT_SCOPES, PREVIEW_VIEWS
+from converter.hand_library import HandLibraryError, normalize_request as normalize_hands
 
 
 LOGGER = logging.getLogger("standin.converter")
@@ -266,6 +267,8 @@ def _build_artifact_bundle(
             "apply_root_translation": APPLY_ROOT_TRANSLATION,
             "output_scope": result.report.get("output_scope", "full"),
             "framing_version": result.report.get("framing_version"),
+            # 손 프리셋(04J-290). 손을 요청하지 않았으면 null — 다시 내보낼 때 같은 손을 쓰기 위한 기록.
+            "hands": result_hands(result.report),
         },
         "artifacts": {
             "bvh": {
@@ -466,6 +469,13 @@ def create_app(
         from converter.framed_model import revision
         payload["preview_model_revision"] = (revision() if not getattr(
             getattr(blender_runner, "settings", None), "force_exact_v324", False) else None)
+        # 손 굽기 지원 여부(04J-290). exact V3.2.4 모드에서는 손 요청을 거부하므로 null.
+        from converter.hand_library import load_library
+        hand_library = load_library()
+        payload["hand_library"] = (None if getattr(
+            getattr(blender_runner, "settings", None), "force_exact_v324", False) else {
+            "version": hand_library.library_version, "sha256": hand_library.sha256,
+            "presets": len(hand_library.presets)})
         payload["character_hashes"] = {
             c["character_id"]: character_registry.metadata(c["character_id"]).sha256
             for c in character_registry.list_public(available_only=True)
@@ -491,6 +501,8 @@ def create_app(
         preview_view: str | None = None,
         camera_rotation: list | None = None,
         preview_model: bool = False,
+        hand_left: str | None = None,
+        hand_right: str | None = None,
     ) -> CompletedConversion:
         conversion_id = str(uuid.uuid4())
         request_started = time.monotonic()
@@ -529,6 +541,11 @@ def create_app(
                     400, "INVALID_OPTION", "apply_root_translation must be false",
                     conversion_id=conversion_id,
                 )
+            try:
+                hands = normalize_hands({"left": hand_left or None, "right": hand_right or None})
+            except HandLibraryError as exc:
+                raise ApiProblem(400, "INVALID_HAND_PRESET", str(exc),
+                                 conversion_id=conversion_id) from exc
             bvh_bytes = _read_bvh(bvh, size_limit, conversion_id)
             actual_bvh_sha256 = hashlib.sha256(bvh_bytes).hexdigest()
             if expected_bvh_sha256 is not None and not hmac.compare_digest(
@@ -559,6 +576,7 @@ def create_app(
                 preview_view=preview_view,
                 **({"camera_rotation": camera_rotation} if camera_rotation is not None else {}),
                 **({"preview_model": True} if preview_model else {}),
+                **({"hands": hands} if hands is not None else {}),
             )
             if camera_rotation is not None and result.report.get("camera_rotation") != camera_rotation:
                 raise WorkerIntegrityError("camera rotation lineage mismatch")
@@ -674,6 +692,10 @@ def create_app(
             "X-Standin-Mapped-Bones": str(int(report.get("mapped_bones", 0))),
             "X-Standin-Warning-Count": str(len(report.get("warnings") or [])),
             "X-Standin-Task-Cold-Start": str(result.task_cold_start).lower(),
+            "X-Standin-Hands": (
+                "none" if hands is None
+                else f"left={hands['left'] or 'rest'};right={hands['right'] or 'rest'}"
+            ),
             "Server-Timing": (
                 f"queue;dur={queue_wait_ms}, "
                 f"blender;dur={execution_ms}, total;dur={request_total_ms}"
@@ -706,6 +728,8 @@ def create_app(
         output_mode: str = Form(default=OUTPUT_MODE),
         apply_root_translation: bool = Form(default=APPLY_ROOT_TRANSLATION),
         output_scope: str = Form(default="full"),
+        hand_left: str | None = Form(default=None),
+        hand_right: str | None = Form(default=None),
     ):
         completed = _execute_conversion(
             bvh=bvh,
@@ -716,6 +740,8 @@ def create_app(
             apply_root_translation=apply_root_translation,
             response_format="fbx",
             output_scope=output_scope,
+            hand_left=hand_left,
+            hand_right=hand_right,
         )
         result = completed.result
         filename = (
@@ -761,6 +787,8 @@ def create_app(
         output_mode: str = Form(default=OUTPUT_MODE),
         apply_root_translation: bool = Form(default=APPLY_ROOT_TRANSLATION),
         output_scope: str = Form(default="full"),
+        hand_left: str | None = Form(default=None),
+        hand_right: str | None = Form(default=None),
     ):
         completed = _execute_conversion(
             bvh=bvh,
@@ -773,6 +801,8 @@ def create_app(
             output_scope=output_scope,
             artifact_kind=artifact_kind,
             expected_bvh_sha256=expected_bvh_sha256,
+            hand_left=hand_left,
+            hand_right=hand_right,
         )
         bundle, manifest = _build_artifact_bundle(
             completed,
@@ -935,6 +965,8 @@ def create_app(
         expected_preview_revision: str | None = Form(default=None),
         camera_rotation: str | None = Form(default=None),
         preview_format: str = Form(default="png"),
+        hand_left: str | None = Form(default=None),
+        hand_right: str | None = Form(default=None),
     ):
         """One verified FBX plus its own reimported preview, in a single response."""
         contract = verify_preview_revision(expected_preview_revision)
@@ -954,7 +986,9 @@ def create_app(
             expected_character_sha256=expected_character_sha256,
             output_scope=output_scope, preview_view=preview_view if preview_format == "png" else None,
             camera_rotation=rotation, preview_model=preview_format == "model",
+            hand_left=hand_left, hand_right=hand_right,
         )
+        baked = result_hands(completed.result.report)
         result = completed.result
         if preview_format == "model":
             from converter.framed_model import MODEL_VERSION, metadata, revision
@@ -981,6 +1015,7 @@ def create_app(
                 "character_sha256": completed.character.metadata.sha256,
                 "source_bvh_sha256": result.source_bvh_sha256,
                 "fbx_sha256": result.artifact_sha256,
+                "hands": baked,
                 "preview_sha256": hashlib.sha256(result.preview_model).hexdigest(),
                 "fbx_base64": base64.b64encode(result.artifact).decode("ascii"),
                 "preview_base64": base64.b64encode(result.preview_model).decode("ascii"),
@@ -1005,11 +1040,20 @@ def create_app(
             "fbx_sha256": result.artifact_sha256,
             "preview_sha256": result.report["preview_sha256"],
             "camera_rotation": rotation,
+            "hands": baked,
             "fbx_base64": base64.b64encode(result.artifact).decode("ascii"),
             "preview_base64": base64.b64encode(result.preview).decode("ascii"),
         }
 
     return app
+
+
+def result_hands(report: dict[str, Any]) -> dict[str, Any] | None:
+    """응답에 싣는 손 굽기 요약. 손을 요청하지 않았으면 None."""
+    baked = report.get("hands")
+    if not baked:
+        return None
+    return {key: baked.get(key) for key in ("left", "right", "library_version", "version")}
 
 
 def _encode_thumbnail(

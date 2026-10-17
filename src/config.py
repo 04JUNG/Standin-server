@@ -42,6 +42,10 @@ class Config:
     # 태그 호출 한 번의 상한. 분석 호출(기본 45초)보다 짧게 둔다 — 늦게 오는 기록용
     # 값 때문에 사용자가 기다리지 않게 한다.
     vlm_person_tags_timeout_ms: int = int(os.getenv("VLM_PERSON_TAGS_TIMEOUT_MS", "15000"))
+    # 인물별 손 모양(04J-290). 분석과 분리된 VLM 호출이라 켜면 비용이 는다. 끄거나
+    # 실패하면 손은 라이브러리 기본값(relaxed)과 기본 후보 목록으로 나간다.
+    vlm_hand_shapes: bool = os.getenv("VLM_HAND_SHAPES", "0") == "1"
+    vlm_hand_shapes_timeout_ms: int = int(os.getenv("VLM_HAND_SHAPES_TIMEOUT_MS", "15000"))
     gemini_model: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
     # Gemini HTTP 호출 1회의 상한. google-genai HttpOptions.timeout 단위는 밀리초다.
     #

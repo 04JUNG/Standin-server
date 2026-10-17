@@ -1,0 +1,98 @@
+{
+  "_note": "POST /analyze 응답 중 people[].hands만 남긴 실제 예시(러프 p_rough_155, 3명, VLM_HAND_SHAPES=1, gemini-3.8-flash). 다른 필드는 생략.",
+  "people": [
+    {
+      "person_index": 0,
+      "hands": {
+        "left": {
+          "preset": "limp",
+          "source": "vlm",
+          "confidence": "high",
+          "visible": true,
+          "candidates": [
+            "limp",
+            "relaxed",
+            "open",
+            "tense"
+          ]
+        },
+        "right": {
+          "preset": "limp",
+          "source": "vlm",
+          "confidence": "high",
+          "visible": true,
+          "candidates": [
+            "limp",
+            "relaxed",
+            "open",
+            "tense"
+          ]
+        },
+        "library_version": "hand-library-v1",
+        "status": "vlm"
+      }
+    },
+    {
+      "person_index": 1,
+      "hands": {
+        "left": {
+          "preset": "hold_phone",
+          "source": "vlm",
+          "confidence": "high",
+          "visible": true,
+          "candidates": [
+            "hold_phone",
+            "grip",
+            "cup",
+            "pinch"
+          ]
+        },
+        "right": {
+          "preset": "relaxed",
+          "source": "default",
+          "confidence": null,
+          "visible": false,
+          "candidates": [
+            "relaxed",
+            "fist",
+            "open",
+            "grip"
+          ]
+        },
+        "library_version": "hand-library-v1",
+        "status": "vlm"
+      }
+    },
+    {
+      "person_index": 2,
+      "hands": {
+        "left": {
+          "preset": "grip",
+          "source": "vlm",
+          "confidence": "high",
+          "visible": true,
+          "candidates": [
+            "grip",
+            "loose_fist",
+            "cup",
+            "pinch"
+          ]
+        },
+        "right": {
+          "preset": "open",
+          "source": "vlm",
+          "confidence": "high",
+          "visible": true,
+          "candidates": [
+            "open",
+            "soft_open",
+            "relaxed",
+            "tense"
+          ]
+        },
+        "library_version": "hand-library-v1",
+        "status": "vlm"
+      }
+    }
+  ]
+}

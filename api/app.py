@@ -35,6 +35,12 @@ import numpy as np
 from fastapi import FastAPI, File, Form, Request, UploadFile, HTTPException
 from fastapi.responses import FileResponse, JSONResponse, Response
 
+from src.hand_shapes import default_hands
+from src.hand_catalog import (
+    build_catalog as build_hand_catalog,
+    thumbnail_etag as hand_thumbnail_etag,
+    thumbnail_path as hand_thumbnail_path,
+)
 from src.config import CFG
 from src.bvh import parse_bvh
 from src.logging_setup import (configure_logging, log_error, log_info,
@@ -598,6 +604,7 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
             quality_reasons=desc.quality_reasons,
             output_scope=asdict(desc.output_scope),
             person_tags=asdict(desc.person_tags),
+            hands=asdict(desc.hands if desc.hands is not None else default_hands()),
         ))
     vlm_model = (CFG.gemini_model if STATE.get("provider") == "gemini"
                  else CFG.openai_model if STATE.get("provider") == "openai"
@@ -711,6 +718,36 @@ def get_pose_thumbnail(pose_id: str, view: str, request: Request):
             "Cache-Control": "private, max-age=86400",
         },
     )
+
+
+# ---- 손 라이브러리 (04J-290, docs/HAND_SELECTION_API.md) -------------------
+
+@app.get("/hands/catalog")
+def get_hand_catalog():
+    """refine 화면 손 칩용 목록: 묶음·프리셋 이름·설명·썸네일 URL·라이브러리 버전.
+
+    라이브러리는 배포 단위로만 바뀌므로 길게 캐시해도 된다. 버전이 바뀌면 sha가 바뀐다.
+    """
+    catalog = build_hand_catalog()
+    return JSONResponse(catalog, headers={
+        "Cache-Control": "private, max-age=3600",
+        "ETag": f'"{catalog["library_sha256"][:32]}"',
+    })
+
+
+@app.get("/hands/{preset_id}/thumbnail")
+def get_hand_thumbnail(preset_id: str, side: str, request: Request):
+    """프리셋 하나의 마네킹 손 PNG(투명 배경). side는 그 인물 자신의 left/right."""
+    if side not in ("left", "right"):
+        raise HTTPException(400, f"unsupported side: {side}")
+    path = hand_thumbnail_path(preset_id, side)
+    if path is None:
+        raise HTTPException(404, f"hand thumbnail not found: {preset_id} ({side})")
+    etag = hand_thumbnail_etag(preset_id, side)
+    headers = {"ETag": etag, "Cache-Control": "private, max-age=86400"}
+    if request.headers.get("if-none-match") == etag:
+        return Response(status_code=304, headers=headers)
+    return FileResponse(path, media_type="image/png", headers=headers)
 
 
 # ---- 포즈 미세조정 (docs/REFINE_DESIGN.md) --------------------------------
