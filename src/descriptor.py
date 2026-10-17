@@ -15,6 +15,7 @@ from .config import CFG
 from .body_scope import detect_scope, observed_legs, promote_for_observed_legs
 from .person_tags import detect_person_tags
 from .hand_shapes import detect_person_hands
+from .experimental.body_matching.integrated import detect_body
 from .partial_pose import shoulder_frame
 
 
@@ -185,6 +186,9 @@ def build_slot_descriptors(vlm: VLMAnalysis, slots,
             quality_reasons=list(dict.fromkeys(slot.reasons)),
             output_scope=output_scope,
             person_tags=detect_person_tags(
+                vlm, slot.slot_id if slot.slot_origin == "vlm" else None,
+            ),
+            body_classification=detect_body(
                 vlm, slot.slot_id if slot.slot_origin == "vlm" else None,
             ),
             hands=detect_person_hands(

@@ -93,6 +93,7 @@ class InferenceMetadataOut(BaseModel):
     vlm_model: str
     # 어느 VLM 프롬프트가 답했는지(src/vlm/prompts.py의 USER_TEMPLATES 키).
     vlm_prompt_version: Optional[str] = None
+    vlm_body_prompt_version: Optional[str] = None
     pose_backend: str
     pose_model_version: str
     # 번들 library_manifest.json의 버전(lib-YYYYMMDD-<hash8>). manifest 없는 번들이면 env 값.

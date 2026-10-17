@@ -66,6 +66,10 @@ def _coerce(analysis: dict, img_w: int, img_h: int) -> VLMAnalysis:
 
     lower_body_visible, lower_body_visibility_known = parse_lower_body(
         analysis.get("lower_body_visible"), num)
+    person_bodies = []
+    if "person_bodies" in analysis:
+        from ..experimental.body_matching.integrated import parse_bodies
+        person_bodies = parse_bodies(analysis["person_bodies"], num)
     return VLMAnalysis(
         num_people=num,
         shot=pick(Shot, analysis.get("shot"), Shot.FULL_HALF),
@@ -76,6 +80,7 @@ def _coerce(analysis: dict, img_w: int, img_h: int) -> VLMAnalysis:
         approx_boxes=boxes,
         dialogue=analysis.get("dialogue"),
         raw=analysis,
+        person_bodies=person_bodies,
         lower_body_visible=lower_body_visible,
         lower_body_visibility_known=lower_body_visibility_known,
         body_scopes=parse_person_scopes(analysis.get("body_scopes"), num),
@@ -528,6 +533,20 @@ class GeminiVLMClient(BaseVLMClient):
     def analyze(self, image, img_w: int, img_h: int) -> VLMAnalysis:
         from google.genai import types
         part = self._to_part(image)
+        from ..experimental.body_matching.integrated import enabled, analysis_prompt
+        prompt = prompts.user_template(CFG.vlm_prompt_version)
+        body_enabled = enabled(CFG)
+        system = prompts.SYSTEM
+        if body_enabled:
+            prompt = analysis_prompt(prompt)
+            from ..experimental.body_matching.integrated import SYSTEM_EXTENSION
+            system += SYSTEM_EXTENSION
+        body_options = {}
+        if body_enabled and CFG.vlm_prompt_version == "p3-output-scope":
+            from ..experimental.body_matching.integrated import response_schema
+            body_options["response_json_schema"] = response_schema()
+        if body_enabled and CFG.vlm_body_thinking_level:
+            body_options["thinking_config"] = types.ThinkingConfig(thinking_level=CFG.vlm_body_thinking_level)
         attempts = max(1, CFG.gemini_max_attempts)
         # 재시도가 BFF의 분석 상한(기본 120초)을 먹어 치우지 않게 VLM 단계 전체에 예산을 둔다.
         # 예산이 없으면 timeout을 올릴 때마다 최악 지연이 attempts배로 늘어난다.
@@ -549,13 +568,14 @@ class GeminiVLMClient(BaseVLMClient):
             try:
                 resp = self._client.models.generate_content(
                     model=self._model,
-                    contents=[prompts.user_template(CFG.vlm_prompt_version), part],
+                    contents=[prompt, part],
                     config=types.GenerateContentConfig(
-                        system_instruction=prompts.SYSTEM,
+                        system_instruction=system,
                         response_mime_type="application/json",
                         temperature=0,
                         # 요청 단위 상한. 클라이언트 생성 시의 값(전체 timeout)을 덮어쓴다.
                         http_options=_gemini_attempt_options(types, int(timeout_seconds * 1000)),
+                        **body_options,
                     ),
                 )
                 log_info(
@@ -666,13 +686,20 @@ class OpenAIVLMClient(BaseVLMClient):
         self._model = model or CFG.openai_model
 
     def analyze(self, image_data_url: str, img_w: int, img_h: int) -> VLMAnalysis:
+        from ..experimental.body_matching.integrated import enabled, analysis_prompt
+        prompt = prompts.user_template(CFG.vlm_prompt_version)
+        system = prompts.SYSTEM
+        if enabled(CFG):
+            from ..experimental.body_matching.integrated import SYSTEM_EXTENSION
+            prompt = analysis_prompt(prompt)
+            system += SYSTEM_EXTENSION
         resp = self._client.chat.completions.create(
             model=self._model,
             response_format={"type": "json_object"},
             messages=[
-                {"role": "system", "content": prompts.SYSTEM},
+                {"role": "system", "content": system},
                 {"role": "user", "content": [
-                    {"type": "text", "text": prompts.user_template(CFG.vlm_prompt_version)},
+                    {"type": "text", "text": prompt},
                     {"type": "image_url", "image_url": {"url": image_data_url}},
                 ]},
             ],

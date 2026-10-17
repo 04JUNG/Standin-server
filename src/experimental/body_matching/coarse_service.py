@@ -29,14 +29,17 @@ class CoarseBodyService:
         timeout_seconds=12,
         max_people=8,
         family_review_model="",
+        integrated=False,
     ):
         if (
-            provider not in ("mock", "gemini")
+            provider
+            not in (("mock", "gemini", "openai") if integrated else ("mock", "gemini"))
             or not math.isfinite(timeout_seconds)
             or timeout_seconds <= 0
             or not 1 <= max_people <= 20
         ):
             raise ValueError("invalid_coarse_config")
+        self.integrated = integrated
         self.catalog_path = str(catalog_path)
         self.provider = provider
         self.model = model
@@ -44,7 +47,7 @@ class CoarseBodyService:
         self.max_people = max_people
         self.init_error = None
         self.client = client
-        if client is None and provider == "gemini":
+        if not integrated and client is None and provider == "gemini":
             try:
                 self.client = GeminiCoarseClient(
                     model, timeout_seconds, family_review_model=family_review_model
@@ -64,16 +67,22 @@ class CoarseBodyService:
             status="ok",
             people=[],
             provider_requested=self.provider,
-            provider_actual="gemini" if self.client else "mock",
+            provider_actual=(
+                self.provider
+                if self.integrated
+                else "gemini" if self.client else "mock"
+            ),
             model=self.model,
             family_review_model=self.family_review_model or None,
-            is_mock=self.client is None,
-            prompt_version=VERSION,
-            classification_strategy="coarse",
+            is_mock=self.provider == "mock" if self.integrated else self.client is None,
+            prompt_version="body-integrated.v3.compact" if self.integrated else VERSION,
+            classification_strategy="integrated" if self.integrated else "coarse",
             pose_order_preserved=True,
             rendering_executed=False,
         )
-        if result.route not in ("core", "bust") or not result.descriptors:
+        if (
+            result.route not in ("core", "bust") and not self.integrated
+        ) or not result.descriptors:
             return {
                 **out,
                 "status": "not_applicable",
@@ -100,16 +109,40 @@ class CoarseBodyService:
                 err = "coarse_crop_unavailable"
             elif i >= self.max_people:
                 err = "coarse_batch_budget_exceeded"
-            elif self.client:
+            elif self.client and not self.integrated:
                 prepared = prepare_input(im, box)
                 crops.append((ident, prepared))
+            shared = None
+            if self.integrated:
+                err = None
+                if i >= self.max_people:
+                    err = "coarse_batch_budget_exceeded"
+                else:
+                    candidate = getattr(desc, "body_classification", None)
+                    if candidate is None:
+                        err = "integrated_body_unavailable"
+                    else:
+                        try:
+                            payload = {
+                                k: v for k, v in candidate.items() if k != "version"
+                            }
+                            payload["person_id"] = ident
+                            shared = parse_response({"people": [payload]}, [ident])[
+                                ident
+                            ]
+                            shared["version"] = candidate.get(
+                                "version", "body-integrated.v3.compact"
+                            )
+                        except (TypeError, ValueError, AttributeError):
+                            err = "invalid_integrated_body"
             cases.append(
                 dict(
                     person_id=ident,
                     box=box,
                     crop_box=prepared.crop_box if prepared else None,
                     error=err,
-                    observation=unknown(ident, err or "classification_unavailable"),
+                    observation=shared
+                    or unknown(ident, err or "classification_unavailable"),
                 )
             )
         if crops:
