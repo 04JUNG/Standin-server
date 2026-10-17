@@ -60,9 +60,9 @@ report = {
     "source_bvh_sha256": hashlib.sha256(
         pathlib.Path(job["bvh_path"]).read_bytes()
     ).hexdigest(),
-    "retarget_sha256": "be57c8eaf7144994a9015783e244a418d70f57b18cef01218fe850b028334cbd",
+    "retarget_sha256": "2fca3bd577445989c178aa4ca33e772c595ad2aeb6083f817a3824c93508a579",
     "ankle_policy_sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
-    "solver_manifest_sha256": "aa06111117a64ba0b1b8bd8a88baa3bce2287c07e3ad17ee9a67f56a68127581",
+    "solver_manifest_sha256": "52eae0b0eb6a7023540fdf023ad4321f24c11d439f3ecf9f390b5b72358b24e3",
     "force_exact_v324": job["force_exact_v324"],
     "output_mode": "rigged_rest",
     "frame": 0,
