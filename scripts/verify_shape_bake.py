@@ -13,8 +13,9 @@ checks on the two final FBX files:
 * ``lineage_controls_match``: the bake used exactly the requested controller values;
 * ``bone_lengths``: final-FBX bone lengths equal the controller's warped rest skeleton
   for those values (pose is rigid per bone, proportions are not);
-* ``shape_effect``: per-vertex |Δ| between preset and slider bakes against the same
-  |Δ| in the neutral meshes — the slider change survives posing and correction.
+* ``shape_effect``: same-pose pinned-controller surface and displacement checks
+  performed separately by inspect_shape_bake.py; native pose channels are recorded
+  here and cross-checked against actual FBX bones there.
 """
 import argparse, hashlib, json, os, sys, time
 from dataclasses import replace
@@ -84,6 +85,7 @@ def main():
                            'pose_transfer_max_joint_error_mm': lineage.get('pose_transfer_max_joint_error_mm'),
                            'roundtrip_max_error_mm': lineage.get('roundtrip_max_error_mm'),
                            'contact_qa': lineage.get('contact_qa'), 'pose_qa': lineage.get('pose_qa'),
+                           'authoring_pose': lineage.get('authoring_pose'),
                            'fbx_sha256': result.artifact_sha256}
                 except Exception as exc:  # noqa: BLE001 - evidence file records every failure
                     row = {'id': stem, 'case': cid, 'bvh': bvh_path.name, 'label': label, 'ok': False,

@@ -15,6 +15,10 @@ on:
       - "tests/converter/**"
       - "deploy/ecs/**"
       - "scripts/measure_converter_latency.py"
+      - "scripts/verify_shape_bake.py"
+      - "scripts/inspect_shape_bake.py"
+      - "scripts/shape_inspection_metrics.py"
+      - "scripts/package_shape_staging.py"
       - "qa/retarget/CHAIN_TRANSPORT_V3_1_ANKLE/**"
       - "qa/retarget/CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY/**"
   push:
@@ -31,6 +35,10 @@ on:
       - "tests/converter/**"
       - "deploy/ecs/**"
       - "scripts/measure_converter_latency.py"
+      - "scripts/verify_shape_bake.py"
+      - "scripts/inspect_shape_bake.py"
+      - "scripts/shape_inspection_metrics.py"
+      - "scripts/package_shape_staging.py"
       - "qa/retarget/CHAIN_TRANSPORT_V3_1_ANKLE/**"
       - "qa/retarget/CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY/**"
   workflow_dispatch:
@@ -75,6 +83,7 @@ jobs:
           python -m pytest -q \
             tests/converter/test_worker_contract.py \
             tests/converter/test_shape_bake_contract.py \
+            tests/converter/test_shape_inspection.py \
             tests/converter/test_shape_hand_integration.py \
             tests/converter/test_registry.py \
             tests/converter/test_runner_failures.py \
