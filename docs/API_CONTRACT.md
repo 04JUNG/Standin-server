@@ -717,6 +717,64 @@ provider/색인 오류, 모호한 설명, geometric 정상 경로, head/얽힘 �
 
 코드·30개 저장 실험·검수 인수인계는 `docs/SEMANTIC_285_INTEGRATION.md`를 따른다.
 
+## 직접 문장 검색 — POST /semantic-search
+
+이미지 없이 작가가 입력한 문장으로 **현재 로드된 전신 라이브러리**를 검색한다.
+#87의 개발용 검수 UI·피드백 저장·별도 검색 엔진은 가져오지 않았다.
+기존 `/analyze`의 관절 추출·VLM 검수·동적 라우팅·RRF 비중·응답 계약은 변경하지 않는다.
+
+```http
+POST /semantic-search
+Content-Type: application/json
+
+{"query":"의자에 앉아 양손으로 휴대폰을 보는 자세","topK":5}
+```
+
+- `query`: 문자열 1~500자, 공백/기호만 있는 입력 금지. 앞뒤 공백 제거.
+- `topK` 또는 `top_k`: 정수 1~20, 기본 5. 숫자 문자열·bool은 거절한다.
+- 다른 필드(`source`, `tags`, 임계값 등)는 422. 출처는 항상 `user`이며 운영 엔진의
+  사용자 임계값(현재 기본 0.40)을 사용한다. 이미지/VLM 경로의 임계값은 바꾸지 않는다.
+- 기동 시 로드한 `FullBodySearch.semantic` 어댑터·색인·BVH 조건 검증기를 재사용한다.
+  전신 경로가 꺼져 있거나 색인/검증기가 준비되지 않았으면 503이며, 다른 엔진·mock로 폴백하지 않는다.
+- 기존 어휘에서 명확한 자세/행동/도구 개념과 문장 속 몸 상태를 구조화한다.
+  기존 핵심 관계·양손 조건·자세 검사와 격리 정책, 저장 합성 포즈 포함 설정을 적용한다.
+  어휘 기반 해석이지 새 VLM 판독은 아니며, 임의 문장의 완전한 이해나 좌우·접촉 정답을 보장하지 않는다.
+- 전체 기준 통과 후보군에 조건 검사·제외 정책을 적용하고 `near_match`를 분리한 **뒤** TopK를 자른다.
+  동작 중 상하체 분리 검색·합성, 117시점 기하 검색, 이미지 분석, 포즈 생성은 호출하지 않는다.
+
+응답(필드명은 snake_case):
+
+| 필드 | 의미 |
+|---|---|
+| `status` | `ok` / `no_result` / `error` |
+| `error` | 정상은 null, 오류는 `{code,message}` |
+| `query` | 입력 `text`, 고정 `source:user`, 구조화한 `parsed`, 적용한 `conditions` |
+| `candidates` | 정식 후보 `[{rank,pose_id,score,matched,pose,...}]` |
+| `near_candidates` | 일부 조건만 만족한 검토 참고 후보. 정식 결과로 세지 않음 |
+| `backend`, `threshold`, `top_k` | 실제 엔진, 사용자 의미 점수 기준, 요청 개수 |
+| `pose_library`, `elapsed_ms` | 현재 번들 정체성, 처리 시간 |
+| `score_is_accuracy`, `generation_requested` | 항상 false |
+
+후보 `pose`는 기존 `standin-pose-record-v1` JSON이며 `pose_id`가 바깥 ID와 같아야 한다.
+BVH는 기존 `pose.bvh_url`(`/pose/{id}/bvh`)로 받는다. `matched`에 점수 성분·검색 근거·
+BVH 조건 판정을 보존한다. 의미 점수는 정확도가 아니며 기하 거리와 비교/합산하지 않는다.
+모든 후보의 `refine_allowed`, `release_allowed`, `actual_mesh_validated`는 false다.
+`near_candidates`의 rank는 정식 후보와 별도다.
+
+| HTTP | 의미 |
+|---|---|
+| 200 + `ok` | 정식 후보 있음 |
+| 200 + `no_result` | 검색 정상 완료, 정식 후보 없음. near 후보가 있을 수 있음 |
+| 422 | 입력 형식/범위 오류(FastAPI validation 응답) |
+| 503 + `error` | 엔진 미준비 또는 색인/encoder 등 검색 실패 |
+| 500 + `error` | 후보 ID/점수/조건 판정 불일치 또는 예외 |
+
+후보 없음은 라이브러리 자산 부재의 증명이 아니며 **이 API는 자동 생성하지 않는다**.
+오류를 후보 없음으로 바꾸지 않는다. 사용자 문장·전체 검색 근거·백엔드 예외 원문은
+요청 로그에 남기지 않는다. 응답에는 호출자 자신의 문장과 검색 근거를 반환한다.
+기존 추론 서버와 동일한 내부 전용 경계이며, 앱/BFF 입력창·인증·중계 연결은 별도 작업이다.
+새 환경변수·모델·라이브러리 업로드는 필요 없다.
+
 ## 손 모양·손 후보 (04J-290, 2026-10-14)
 
 > refine 화면·BFF 저장/중계·오류 규칙까지 포함한 전체 설계: [`HAND_SELECTION_DESIGN.md`](HAND_SELECTION_DESIGN.md)
