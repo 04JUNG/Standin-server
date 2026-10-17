@@ -7,7 +7,7 @@
 Upload is opt-in. This command never updates ECS, production, or existing keys.
 
 Checks before anything is written:
-* every bake run in --bake-qa passed (and inspect_shape_bake.py evidence if present);
+* every bake run in --bake-qa passed (and complete pose-matched inspect_shape_bake.py evidence required);
 * each runtime is SSR1/SSR2; an SSR2 header must name the same rules and source SHA-256
   as the registry (the app refuses a mismatch anyway — this catches it before release);
 * every asset's FBX hash equals its registry asset_sha256.
@@ -18,6 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from converter.shape_spec import load_registry  # noqa: E402
+from scripts.shape_inspection_metrics import require_inspection
 
 BUCKET = 'standinstagingapp-assetsbucket5cb76180-fiwlikrhl1sk'
 DEPLOY = '/app/body-staging/'
@@ -70,8 +71,9 @@ def main():
     if not runs or not all(r.get('ok') for r in runs) or not all(r.get('lineage_controls_match') for r in runs if r['label'] == 'slider'):
         raise SystemExit('every bake run must pass before packaging')
     inspection = Path(args.bake_qa) / 'inspection.json'
-    if inspection.exists() and not all(r['passed'] for r in json.loads(inspection.read_text())):
-        raise SystemExit('independent bake inspection failed')
+    if not inspection.is_file():
+        raise SystemExit('pose-matched independent inspection is required')
+    require_inspection(runs, json.loads(inspection.read_text()))
     runtimes = dict(item.split('=', 1) for item in args.runtime)
     package.mkdir()
 

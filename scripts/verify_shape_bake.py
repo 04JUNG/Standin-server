@@ -84,6 +84,7 @@ def main():
                            'pose_transfer_max_joint_error_mm': lineage.get('pose_transfer_max_joint_error_mm'),
                            'roundtrip_max_error_mm': lineage.get('roundtrip_max_error_mm'),
                            'contact_qa': lineage.get('contact_qa'), 'pose_qa': lineage.get('pose_qa'),
+                           'authoring_pose': lineage.get('authoring_pose'),
                            'fbx_sha256': result.artifact_sha256}
                 except Exception as exc:  # noqa: BLE001 - evidence file records every failure
                     row = {'id': stem, 'case': cid, 'bvh': bvh_path.name, 'label': label, 'ok': False,

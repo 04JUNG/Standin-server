@@ -79,6 +79,11 @@ def convert_shaped(*, recipe, bvh_path, character_fbx, out_path, **options):
     finally:module.BUSY=False
     shutil.copyfile(posed_bundle/'model.fbx',out_path)
     final=json.loads((posed_bundle/'manifest.json').read_text())
+    channels = {b.name: {'rotation_mode': b.rotation_mode,
+                         'location': list(b.location), 'scale': list(b.scale),
+                         'rotation_quaternion': list(b.rotation_quaternion),
+                         'rotation_euler': list(b.rotation_euler),
+                         'rotation_axis_angle': list(b.rotation_axis_angle)} for b in rig.pose.bones}
     lineage={
       'schema':'shape-bake.v1','import_policy':'preserve-real-terminal-bones-v1','rules':recipe['rules'],'asset':recipe['asset'],
       'blend_sha256':recipe['blend_sha256'],'controller_sha256':recipe['controller_sha256'],
@@ -89,6 +94,11 @@ def convert_shaped(*, recipe, bvh_path, character_fbx, out_path, **options):
       'roundtrip_joint_error_mm':final['roundtrip_joint_error_mm'],
       'roundtrip_weight_error':final['roundtrip_weight_error'],
       'pose_qa':final['pose_qa'],'contact_qa':final['contact_qa'],
+      # Native authoring frames avoid amplifying FBX axis/float round-trip noise
+      # when an independent verifier reconstructs the requested source surface.
+      # This records pose only: expected geometry is recomputed by that verifier.
+      'authoring_pose': {'schema': 'shape-authoring-pose.v1', 'space': 'armature-local',
+                         'bones': final['pose'], 'channels': channels},
     }
     Path(out_path).with_suffix('.shape.json').write_text(json.dumps(lineage,ensure_ascii=False,indent=2))
     return report
