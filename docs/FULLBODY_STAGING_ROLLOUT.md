@@ -54,8 +54,8 @@ role이 ECS 읽기·등록·UpdateService·PassRole·ECR 권한으로 배포한�
 막히며 IAM을 자동 수정하거나 다른 자격 증명으로 우회하지 않는다. 실제 Fargate task role의
 S3 읽기/secret 주입 권한은 별도다. workflow는 VLM secret 값을 조회할 권한이 필요 없다.
 
-현재 task definition의 VLM/URI 참조는 로컬 `ecs:DescribeTaskDefinition` 권한이 없어
-확인하지 못했다. workflow가 환경별 실제 task를 읽어 검사하며, 참조 부재/잘못된 값은
+현재 task definition의 VLM/URI 참조는 로컬에서 직접 확인하지 못했다.
+workflow가 환경별 실제 task를 읽어 검사하며, 참조 부재/잘못된 값은
 운영 담당자가 해당 GitHub environment/infra에서 수정해야 한다. 코드 통과만으로 이를 보증하지 않는다.
 
 배포 뒤 `/healthz.dynamic_routing.enabled=true`, `camera_count=117`, 실제 포즈 수와
@@ -65,11 +65,11 @@ S3 읽기/secret 주입 권한은 별도다. workflow는 VLM secret 값을 조�
 
 ## 로컬 실파일 확인 (2026-10-17)
 
-- staging S3 `pose-library/v1.tar.gz`의 고정 VersionId
-  `y0HHT3EUqwKK5tgNZnoX6jWTSjmREcpN` 사본을 임시 폴더로만 내려받았다.
-- library version `lib-20261016-ca99615b`, DB 5,795개, 기존 격리 11개를 제외한
+- 승인된 스테이징 자산의 고정 버전 사본을 임시 폴더로만 내려받았다.
+  구체적인 운영 객체 식별자와 버전은 공개 문서에 넣지 않는다.
+- DB 5,795개, 기존 격리 11개를 제외한
   5,784개 cache 준비, semantic285 로딩 및 117시점 camera 자산 검사를 통과했다.
-- promoted/approved Human-Art build `20260828.codex1-fp32-cpu-raw-simcc`의 실제 모델을
+- 승인된 Human-Art 실제 모델을
   S3에서 읽어 SHA 검증·rtmlib 0.0.15/onnxruntime 1.28.0·CPU startup probe를 통과했다.
 - 생성 rig SHA와 taxonomy 파일도 통과했다. paid VLM 호출·S3 업로드·ECS 변경은 0회다.
 - 로컬은 macOS arm64이므로 실제 Linux amd64/Fargate·VLM secret·서버 가동 성공을
