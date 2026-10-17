@@ -34,6 +34,7 @@ from .pose_rescue import parse_rescue_request, rescue_slots
 from .routing import route
 from .descriptor import build_slot_descriptors
 from .person_tags import apply_person_tags
+from .hand_shapes import apply_hand_shapes
 from .logging_setup import log_warn
 from .body_scope import BodyScope, detect_scope
 from .refine_policy import structural_refine_allowed
@@ -126,6 +127,38 @@ class Pipeline:
             return
         apply_person_tags(vlm, payload)
 
+    # ---- 인물별 손 모양(04J-290, 별도 호출) ----
+    def _start_hand_shapes(self, image, img_w: int, img_h: int, vlm) -> None:
+        """손 모양 호출을 백그라운드로 띄운다. 끄면(기본) 손은 기본값으로 나간다."""
+        vlm._hand_shapes_future = None
+        if not CFG.vlm_hand_shapes or vlm.num_people <= 0:
+            return
+        boxes = [
+            None if box is None else (
+                box.x1 / img_w, box.y1 / img_h, box.x2 / img_w, box.y2 / img_h)
+            for box in vlm.approx_boxes[:vlm.num_people]
+        ]
+        if len(boxes) != vlm.num_people:
+            return
+        executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="hand-shapes")
+        vlm._hand_shapes_future = executor.submit(self.vlm.read_hands, image, boxes)
+        executor.shutdown(wait=False)
+
+    def _join_hand_shapes(self, vlm) -> None:
+        """손 모양 결과를 합친다. 늦거나 실패하면 '물어봤지만 없음'으로 기록한다."""
+        future = getattr(vlm, "_hand_shapes_future", None)
+        if future is None:
+            return
+        vlm._hand_shapes_future = None
+        budget = max(0.1, CFG.vlm_hand_shapes_timeout_ms / 1000)
+        try:
+            payload = future.result(timeout=budget)
+        except Exception as error:  # noqa: BLE001 - 분석을 막지 않는다
+            log_warn("hand_shapes_join", status="failed", errorType=type(error).__name__)
+            future.cancel()
+            payload = None
+        apply_hand_shapes(vlm, payload)
+
     # ---- 메인 ----
     def process_cut(self, image, img_w: int = 512, img_h: int = 768,
                     rescue_request=None) -> CutResult:
@@ -146,6 +179,7 @@ class Pipeline:
         #      스켈레톤 추출과 겹쳐 돌려 지연을 숨긴다 — 결과는 descriptor를 만들기
         #      직전에 합친다(`_join_person_tags`).
         self._start_person_tags(image, img_w, img_h, vlm)
+        self._start_hand_shapes(image, img_w, img_h, vlm)
 
         # 2) Shot 분기
         with span("route"):
@@ -167,6 +201,7 @@ class Pipeline:
                 slot.slot_id,
             ))
             self._join_person_tags(vlm)
+            self._join_hand_shapes(vlm)
             descs = build_slot_descriptors(vlm, slots)
             for desc in descs:
                 desc.quality_reasons.append("head_search_unsupported")
@@ -551,6 +586,7 @@ class Pipeline:
         """한 슬롯의 masked 검색·A/B 안정성·refine 정책을 한 번에 계산한다."""
         # 태그 호출이 아직 안 끝났으면 여기서 합친다. 두 번째 슬롯부터는 바로 지나간다.
         self._join_person_tags(vlm)
+        self._join_hand_shapes(vlm)
         desc = build_slot_descriptors(vlm, [slot], image_size=image_size)[0]
         if desc.output_scope.detected == BodyScope.HEAD:
             slot.reasons.append("head_search_unsupported")

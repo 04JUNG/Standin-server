@@ -1,0 +1,693 @@
+<title>Standin 손 라이브러리</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: drafting-table workbench — preset tray on the left, one large specimen + angle sheet on the right. */
+:root {
+  --paper: #eef1f4;
+  --sheet: #ffffff;
+  --ink: #1b2230;
+  --ink-soft: #5a6577;
+  --rule: #d5dbe3;
+  --accent: #2a52be;
+  --accent-wash: #e4ebfb;
+  --ghost: #9aa5b5;
+  --ok: #1f7a4d;
+  --warn: #b5551d;
+  --f-thumb: #d1435b;
+  --f-index: #d98e04;
+  --f-middle: #0f8a7e;
+  --f-ring: #2f6fd0;
+  --f-pinky: #8a4fc8;
+  --palm: rgba(27, 34, 48, 0.07);
+  --doll: #d8c4a8;
+  --doll-ink: rgba(43, 36, 30, 0.55);
+  --ghost-doll: #6d8fd8;
+  --hit: #e0303f;
+  --stage: #f7f8fa;
+  --font-ui: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #141922; --sheet: #1b2230; --ink: #e6ebf2; --ink-soft: #9aa6b8; --rule: #2c3647;
+    --accent: #7d9bff; --accent-wash: #22305a; --ghost: #5d6a7e; --ok: #4cc58a; --warn: #f0905a;
+    --f-thumb: #ff6b84; --f-index: #ffbe3b; --f-middle: #3fd1c0; --f-ring: #6ea5ff; --f-pinky: #c08cff;
+    --palm: rgba(230, 235, 242, 0.08); --doll: #d3bfa3; --doll-ink: rgba(0, 0, 0, 0.6); --ghost-doll: #7d9bff; --hit: #ff4d5b; --stage: #222a39; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #141922; --sheet: #1b2230; --ink: #e6ebf2; --ink-soft: #9aa6b8; --rule: #2c3647;
+  --accent: #7d9bff; --accent-wash: #22305a; --ghost: #5d6a7e; --ok: #4cc58a; --warn: #f0905a;
+  --f-thumb: #ff6b84; --f-index: #ffbe3b; --f-middle: #3fd1c0; --f-ring: #6ea5ff; --f-pinky: #c08cff;
+  --palm: rgba(230, 235, 242, 0.08); --doll: #d3bfa3; --doll-ink: rgba(0, 0, 0, 0.6); --ghost-doll: #7d9bff; --hit: #ff4d5b; --stage: #222a39; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--paper); color: var(--ink); font-family: var(--font-ui); font-size: 14px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 40px;
+}
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+.mono { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+header.top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 20px; max-width: 1360px; margin: 0 auto 18px; }
+header.top h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
+header.top .meta { color: var(--ink-soft); font-size: 12.5px; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.note { max-width: 1360px; margin: 0 auto 18px; color: var(--ink-soft); font-size: 13px; }
+.note b { color: var(--ink); font-weight: 600; }
+.bench { display: grid; grid-template-columns: minmax(0, 380px) minmax(0, 1fr); gap: 20px; max-width: 1360px; margin: 0 auto; align-items: start; }
+@media (max-width: 920px) { .bench { grid-template-columns: minmax(0, 1fr); } .stage { order: -1; } }
+@media (min-width: 921px) {
+  .tray { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); max-height: calc(100vh - 24px); overflow-y: auto; }
+}
+
+/* tray */
+.tray { background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; padding: 14px; min-width: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.chip { font: inherit; font-size: 12.5px; border: 1px solid var(--rule); background: transparent; color: var(--ink-soft); border-radius: 999px; padding: 3px 10px; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--sheet); }
+.chip:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.cat-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); margin: 12px 2px 6px; font-weight: 600; }
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.card { font: inherit; text-align: left; background: transparent; border: 1px solid var(--rule); border-radius: 8px; padding: 6px 6px 7px; cursor: pointer; color: var(--ink); display: flex; flex-direction: column; gap: 2px; position: relative; }
+.card:hover { border-color: var(--ink-soft); }
+.card[aria-current="true"] { border-color: var(--accent); background: var(--accent-wash); }
+.card canvas { width: 100%; aspect-ratio: 1; display: block; background: var(--stage); border-radius: 5px; }
+.card .name { font-size: 12.5px; font-weight: 600; line-height: 1.3; }
+.card .pid { font-family: var(--font-data); font-size: 10.5px; color: var(--ink-soft); overflow-wrap: anywhere; }
+.card .edited { position: absolute; top: 6px; right: 6px; font-size: 10px; background: var(--warn); color: var(--sheet); border-radius: 4px; padding: 0 5px; }
+
+/* specimen */
+.stage { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.specimen { background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; padding: 16px; min-width: 0; }
+.spec-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin-bottom: 4px; }
+.spec-head h2 { font-size: 24px; font-weight: 700; }
+.spec-head .pid { font-family: var(--font-data); color: var(--ink-soft); font-size: 13px; }
+.spec-head .cat { font-size: 12px; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 0 8px; }
+.hint { color: var(--ink-soft); font-size: 13.5px; max-width: 70ch; margin: 2px 0 12px; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin-bottom: 10px; font-size: 13px; }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 7px; overflow: hidden; }
+.seg button { font: inherit; font-size: 12.5px; border: 0; background: transparent; color: var(--ink-soft); padding: 4px 10px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--rule); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--sheet); }
+select { font: inherit; font-size: 12.5px; padding: 3px 6px; border: 1px solid var(--rule); border-radius: 6px; background: var(--sheet); color: var(--ink); max-width: 100%; }
+.hands { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 560px) { .hands { grid-template-columns: minmax(0, 1fr); } }
+.hand { border: 1px solid var(--rule); background: var(--stage); border-radius: 8px; position: relative; min-width: 0; }
+.check { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.check input { accent-color: var(--accent); }
+.hand canvas { width: 100%; aspect-ratio: 1; display: block; cursor: grab; touch-action: none; }
+.hand canvas:active { cursor: grabbing; }
+.hand .side { position: absolute; left: 10px; top: 8px; font-size: 12px; font-weight: 600; color: var(--ink-soft); }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--ink-soft); margin-top: 10px; }
+.legend i { display: inline-block; width: 18px; height: 4px; border-radius: 2px; vertical-align: middle; margin-right: 5px; }
+.legend .ghost i { background: var(--ghost-doll); }
+
+.cols { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 1500px) { .cols { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; padding: 14px 16px; min-width: 0; }
+.panel h3 { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+.panel .sub { color: var(--ink-soft); font-size: 12.5px; margin: 0 0 10px; }
+.sheet-wrap { overflow-x: auto; }
+table.angles { border-collapse: collapse; width: 100%; min-width: 520px; font-size: 12.5px; }
+table.angles th { text-align: left; font-weight: 600; color: var(--ink-soft); font-size: 11.5px; padding: 4px 6px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+table.angles td { padding: 5px 6px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+table.angles td.f { font-weight: 600; white-space: nowrap; }
+table.angles td.f i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+.knob { display: flex; align-items: center; gap: 6px; }
+.knob input[type="range"] { width: 100%; min-width: 60px; accent-color: var(--accent); }
+.knob output { font-family: var(--font-data); font-variant-numeric: tabular-nums; font-size: 12px; width: 3.2ch; text-align: right; }
+.knob output.changed { color: var(--warn); font-weight: 600; }
+.row-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; align-items: center; }
+.btn { font: inherit; font-size: 12.5px; border: 1px solid var(--ink); background: var(--ink); color: var(--sheet); border-radius: 6px; padding: 5px 12px; cursor: pointer; }
+.btn.quiet { background: transparent; color: var(--ink); border-color: var(--rule); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.toast { font-size: 12.5px; color: var(--ok); }
+textarea.export { width: 100%; min-height: 140px; margin-top: 10px; font-family: var(--font-data); font-size: 11.5px; background: var(--paper); color: var(--ink); border: 1px solid var(--rule); border-radius: 6px; padding: 8px; }
+
+dl.stats { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 14px; margin: 0; font-size: 13px; }
+dl.stats dt { color: var(--ink-soft); }
+dl.stats dd { margin: 0; font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+.pill { display: inline-block; font-size: 11.5px; border-radius: 999px; padding: 0 8px; font-family: var(--font-ui); font-weight: 600; }
+.pill.ok { background: color-mix(in srgb, var(--ok) 16%, transparent); color: var(--ok); }
+.pill.warn { background: color-mix(in srgb, var(--warn) 16%, transparent); color: var(--warn); }
+.cand { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.cand button { font: inherit; font-size: 12px; border: 1px solid var(--rule); background: transparent; color: var(--ink); border-radius: 6px; padding: 2px 8px; cursor: pointer; }
+.cand button:first-child { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.bar { height: 6px; background: var(--paper); border-radius: 3px; overflow: hidden; }
+.bar span { display: block; height: 100%; border-radius: 3px; }
+table.reach { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+table.reach td { padding: 3px 4px; }
+table.reach td:first-child { width: 4.5em; color: var(--ink-soft); }
+table.reach td.num { width: 5.5em; text-align: right; font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<header class="top">
+  <h1>손 라이브러리</h1>
+  <div class="meta mono" id="meta"></div>
+</header>
+<p class="note">
+  <b>마네킹 손 미리보기</b>입니다. 변환기와 같은 계산(<span class="mono">converter/hand_geometry.py</span>)으로 만든 관절 위치에 인형 손 볼륨을 입혀 그립니다.
+  Standin 캐릭터 메시 자체는 아니며, 남·여 캐릭터 검증은 Blender 스크립트로 따로 합니다. 손을 끌어서 돌려 보세요.
+</p>
+
+<div class="bench">
+  <aside class="tray" aria-label="손 프리셋 목록">
+    <div class="chips" id="chips" role="group" aria-label="카테고리"></div>
+    <div id="tray"></div>
+  </aside>
+
+  <main class="stage">
+    <section class="specimen" aria-labelledby="spec-name">
+      <div class="spec-head">
+        <h2 id="spec-name"></h2>
+        <span class="pid" id="spec-id"></span>
+        <span class="cat" id="spec-cat"></span>
+      </div>
+      <p class="hint" id="spec-hint"></p>
+      <div class="controls">
+        <div class="seg" role="group" aria-label="시점" id="views"></div>
+        <label>비교 손 <select id="ghost"></select></label>
+        <label class="check"><input type="checkbox" id="bones"> 뼈대 겹쳐 보기</label>
+      </div>
+      <div class="hands">
+        <div class="hand"><span class="side">왼손</span><canvas id="cv-left" aria-label="왼손 3D 미리보기"></canvas></div>
+        <div class="hand"><span class="side">오른손</span><canvas id="cv-right" aria-label="오른손 3D 미리보기"></canvas></div>
+      </div>
+      <div class="legend" id="legend"></div>
+    </section>
+
+    <div class="cols">
+      <section class="panel" aria-labelledby="sheet-title">
+        <h3 id="sheet-title">각도 실험</h3>
+        <p class="sub">마디별 굽힘(+는 손바닥 쪽)과 첫 마디 벌림(+는 중지에서 멀어짐). 바꾸면 바로 다시 계산합니다. 값은 이 브라우저에만 남습니다.</p>
+        <div class="sheet-wrap"><table class="angles" id="angles"></table></div>
+        <div class="row-actions">
+          <button class="btn" id="copy" type="button">이 손 JSON 복사</button>
+          <button class="btn quiet" id="copy-all" type="button">바꾼 손 전체 복사</button>
+          <button class="btn quiet" id="reset" type="button">이 손 되돌리기</button>
+          <span class="toast" id="toast" role="status"></span>
+        </div>
+        <textarea class="export" id="export" hidden readonly aria-label="복사할 JSON"></textarea>
+      </section>
+
+      <section class="panel" aria-labelledby="check-title">
+        <h3 id="check-title">측정</h3>
+        <p class="sub">표준 손(손 길이 <span class="mono" id="hand-len"></span>) 기준. 오른손 값.</p>
+        <dl class="stats" id="stats"></dl>
+        <div class="cat-label" style="margin-top:14px">손목 → 손끝 거리 (편 손 대비)</div>
+        <table class="reach" id="reach"></table>
+        <div class="cat-label" style="margin-top:14px">VLM이 이 손을 1순위로 고르면 후보</div>
+        <div class="cand" id="cands"></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script id="hand-data" type="application/json">__DATA__</script>
+<script>
+(() => {
+  const DATA = JSON.parse(document.getElementById("hand-data").textContent);
+  const FINGERS = ["thumb", "index", "middle", "ring", "pinky"];
+  const FINGER_KO = { thumb: "엄지", index: "검지", middle: "중지", ring: "약지", pinky: "새끼" };
+  const SIDES = ["left", "right"];
+  const STORE_KEY = "standin-hand-edits:" + DATA.library_sha256;
+
+  // ---- vector math (mirrors converter/hand_geometry.py) ----
+  const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+  const add = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+  const mul = (a, s) => [a[0] * s, a[1] * s, a[2] * s];
+  const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const norm = (a) => Math.hypot(a[0], a[1], a[2]);
+  const unit = (a) => mul(a, 1 / norm(a));
+  const matMul = (A, B) => A.map((row) => [0, 1, 2].map((j) => row[0] * B[0][j] + row[1] * B[1][j] + row[2] * B[2][j]));
+  const matVec = (A, v) => A.map((row) => row[0] * v[0] + row[1] * v[1] + row[2] * v[2]);
+  const I3 = () => [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
+  function axisAngle(axis, deg) {
+    const [x, y, z] = unit(axis), t = (deg * Math.PI) / 180, s = Math.sin(t), c = 1 - Math.cos(t);
+    const K = [[0, -z, y], [z, 0, -x], [-y, x, 0]], K2 = matMul(K, K);
+    return [0, 1, 2].map((i) => [0, 1, 2].map((j) => (i === j ? 1 : 0) + s * K[i][j] + c * K2[i][j]));
+  }
+
+  const FRAME = {};
+  for (const side of SIDES) {
+    const r = DATA.rest[side], base = (f) => r.fingers[f][0].head;
+    const length = unit(base("middle"));
+    const ip = sub(base("index"), base("pinky"));
+    const across = sub(ip, mul(length, dot(ip, length)));
+    FRAME[side] = { normal: r.palm_normal, length, pinkySide: unit(mul(across, -1)) };
+  }
+
+  function pose(side, fingers) {
+    const rest = DATA.rest[side], fr = FRAME[side], out = {};
+    const base = (f) => rest.fingers[f][0].head;
+    for (const f of FINGERS) {
+      const spec = fingers[f];
+      let D = I3(), p = base(f);
+      const chain = [p];
+      for (let j = 0; j < 3; j++) {
+        const seg = rest.fingers[f][j], dir = unit(seg.dir);
+        const target = f === "thumb" ? add(fr.normal, mul(fr.pinkySide, DATA.thumb_across_weight)) : fr.normal;
+        let R = axisAngle(cross(dir, target), spec.curl[j]);
+        if (j === 0 && spec.spread) {
+          const lateral = f === "middle" ? sub(base("index"), base("middle"))
+            : f === "thumb" ? sub(base("thumb"), base("index")) : sub(base(f), base("middle"));
+          let axis = fr.normal;
+          if (dot(cross(axis, dir), lateral) < 0) axis = mul(axis, -1);
+          R = matMul(R, axisAngle(axis, spec.spread));
+        }
+        D = matMul(D, R);
+        p = add(p, mul(matVec(D, dir), seg.length));
+        chain.push(p);
+      }
+      out[f] = chain;
+    }
+    return out;
+  }
+
+  // ---- state ----
+  const ORIGINAL = {};
+  for (const [id, p] of Object.entries(DATA.presets)) ORIGINAL[id] = JSON.parse(JSON.stringify(p.fingers));
+  let edits = {};
+  try { edits = JSON.parse(localStorage.getItem(STORE_KEY) || "{}") || {}; } catch (e) { edits = {}; }
+  const saveEdits = () => { try { localStorage.setItem(STORE_KEY, JSON.stringify(edits)); } catch (e) { /* storage unavailable */ } };
+  const fingersOf = (id) => edits[id] || ORIGINAL[id];
+  const isEdited = (id) => !!edits[id] && JSON.stringify(edits[id]) !== JSON.stringify(ORIGINAL[id]);
+
+  // JS 재계산이 Python 결과와 같은지(편집 전 원본 기준) — 화면의 그림이 변환기 계산과 같다는 근거.
+  let maxErr = 0;
+  for (const [id, p] of Object.entries(DATA.presets)) for (const side of SIDES) {
+    const js = pose(side, ORIGINAL[id]);
+    for (const f of FINGERS) js[f].forEach((pt, k) => { maxErr = Math.max(maxErr, norm(sub(pt, p.sides[side].points[f][k]))); });
+  }
+
+  let current = Object.keys(DATA.presets)[0];
+  let ghost = "";
+  let category = "all";
+  let showBones = false;
+  const VIEWS = { palm: ["손바닥", 0, 0], oblique: ["비스듬히", 35, 25], side: ["옆(엄지 쪽)", 90, 0], back: ["손등", 180, 0] };
+  const cam = { yaw: 35, pitch: 25 };
+
+  // ---- drawing ----
+  const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  function screenBasis(side) {
+    // 화면 위 = 손가락 방향, 화면 앞 = 손바닥(손바닥 시점), 그 위에 yaw/pitch.
+    const fr = FRAME[side], up0 = fr.length, toward0 = fr.normal;
+    const right0 = cross(up0, toward0);
+    const Ry = axisAngle(up0, cam.yaw);
+    let toward = matVec(Ry, toward0), right = matVec(Ry, right0);
+    const Rp = axisAngle(right, -cam.pitch);
+    toward = matVec(Rp, toward); const up = matVec(Rp, up0);
+    return { right, up, toward };
+  }
+  // ---- doll renderer: 라이브러리 없이 Canvas 2D로 그리는 마네킹 손 ----
+  // 같은 관절 위치(pose) 위에 볼륨(마디 원기둥·관절 구슬·손바닥 덩어리)을 입히고,
+  // 깊이 순서로 그린다. 조명은 화면 왼쪽 위 앞에서 오는 하나의 빛.
+  // 두께는 관통 검사(converter/hand_collision.py)와 같은 값이다. 화면에서 안 겹치면 검사도 통과한다.
+  const COL = DATA.collision;
+  const capsuleR = (f, j) => 0.5 * (COL.radii[f][j] + COL.radii[f][j + 1]);
+  const PALM_HALF_THICK = COL.palm_half_thickness, WRIST_HALF_WIDTH = COL.wrist_half_width, FOREARM = 0.055;
+
+  // ---- 관통 검사 (converter/hand_collision.py와 같은 계산) ----
+  function segDist(p1, q1, p2, q2) {
+    const d1 = sub(q1, p1), d2 = sub(q2, p2), r = sub(p1, p2);
+    const a = dot(d1, d1), e = dot(d2, d2), f = dot(d2, r);
+    let s, t;
+    if (a <= 1e-12 && e <= 1e-12) return norm(r);
+    if (a <= 1e-12) { s = 0; t = Math.min(Math.max(f / e, 0), 1); }
+    else {
+      const c = dot(d1, r);
+      if (e <= 1e-12) { t = 0; s = Math.min(Math.max(-c / a, 0), 1); }
+      else {
+        const b = dot(d1, d2), den = a * e - b * b;
+        s = den > 1e-12 ? Math.min(Math.max((b * f - c * e) / den, 0), 1) : 0;
+        t = (b * s + f) / e;
+        if (t < 0) { t = 0; s = Math.min(Math.max(-c / a, 0), 1); }
+        else if (t > 1) { t = 1; s = Math.min(Math.max((b - c) / a, 0), 1); }
+      }
+    }
+    return norm(sub(add(p1, mul(d1, s)), add(p2, mul(d2, t))));
+  }
+  function inPoly(pt, poly) {
+    let inside = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const [x1, y1] = poly[i], [x2, y2] = poly[j];
+      if ((y1 > pt[1]) !== (y2 > pt[1]) && pt[0] < x1 + ((pt[1] - y1) * (x2 - x1)) / (y2 - y1)) inside = !inside;
+    }
+    return inside;
+  }
+  function collisions(side, posed) {
+    const fr = FRAME[side], tol = COL.tolerance, found = new Map();
+    const rec = (a, b, depth) => { if (depth > tol) { const key = [a, b].sort().join("|"); found.set(key, Math.max(found.get(key) || 0, depth)); } };
+    const segs = [];
+    for (const f of FINGERS) for (let j = 0; j < 3; j++) segs.push([f, j, posed[f][j], posed[f][j + 1], capsuleR(f, j)]);
+    for (let i = 0; i < segs.length; i++) for (let j = i + 1; j < segs.length; j++) {
+      const [fi, ji, pi, qi, ri] = segs[i], [fj, jj, pj, qj, rj] = segs[j];
+      if (fi === fj && Math.abs(ji - jj) < 2) continue;
+      let dist;
+      if (fi !== fj && ji === 0 && jj === 0) {
+        dist = segDist(add(pi, mul(sub(qi, pi), COL.root_fraction)), qi, add(pj, mul(sub(qj, pj), COL.root_fraction)), qj);
+      } else dist = segDist(pi, qi, pj, qj);
+      rec(fi + (ji + 1), fj + (jj + 1), ri + rj - dist);
+    }
+    const u = fr.pinkySide, v = fr.length, n = fr.normal, w = WRIST_HALF_WIDTH;
+    const outline = [mul(u, -w), posed.thumb[1], posed.index[0], posed.middle[0], posed.ring[0], posed.pinky[0], mul(u, w)];
+    const poly = outline.map((p) => [dot(p, u), dot(p, v)]);
+    for (const [f, j, p, q, r] of segs) {
+      if (j === 0) continue;
+      const start = f === "thumb" && j === 1 ? 0.35 : 0;
+      for (let k = 0; k < 9; k++) {
+        const t = start + ((1 - start) * k) / 8, pt = add(p, mul(sub(q, p), t));
+        if (!inPoly([dot(pt, u), dot(pt, v)], poly)) continue;
+        rec(f + (j + 1), "palm", r + PALM_HALF_THICK - Math.abs(dot(pt, n)));
+      }
+    }
+    return [...found.entries()].map(([key, depth]) => { const [a, b] = key.split("|"); return { a, b, depth }; }).sort((x, y) => y.depth - x.depth);
+  }
+  const hexRgb = (hex) => { const h = hex.replace("#", ""); const n = parseInt(h.length === 3 ? h.split("").map((c) => c + c).join("") : h, 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
+  const shade = (rgb, k, a = 1) => `rgba(${rgb.map((c) => Math.round(Math.max(0, Math.min(255, c * k)))).join(",")},${a})`;
+
+  function drawDoll(canvas, side, fingers, ghostFingers, opts = {}) {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = canvas.clientWidth || 200, h = canvas.clientHeight || 200;
+    if (canvas.width !== Math.round(w * dpr)) { canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr); }
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    const B = screenBasis(side), fr = FRAME[side];
+    const L = DATA.hand_length_m, k = L / 0.18;
+    const scale = (Math.min(w, h) * 0.80) / (L * 1.2);
+    const center = mul(fr.length, L * 0.36);
+    const proj = (p) => { const q = sub(p, center); return [w / 2 + dot(q, B.right) * scale, h / 2 - dot(q, B.up) * scale, dot(q, B.toward)]; };
+    const light = unit(add(add(mul(B.toward, 0.85), mul(B.up, 0.55)), mul(B.right, -0.45)));
+    const lit = (n) => 0.42 + 0.68 * Math.max(0, dot(n, light));
+    const outline = opts.thin ? 0.8 : 1.4;
+
+    const prims = [];
+    function body(fingerSet, material, hits = new Set()) {
+      const posed = pose(side, fingerSet);
+      const hitMat = { ...material, rgb: hexRgb(css("--hit")) };
+      const { rgb, alpha, ink } = material;
+      // 손바닥 덩어리: 손목 양끝·엄지 뿌리·네 손가락 뿌리를 손바닥 두께만큼 밀어낸 각기둥
+      const across = fr.pinkySide;
+      const ring = [add([0, 0, 0], mul(across, -WRIST_HALF_WIDTH * k)), posed.thumb[1], posed.index[0], posed.middle[0],
+        posed.ring[0], posed.pinky[0], add([0, 0, 0], mul(across, WRIST_HALF_WIDTH * k))];
+      const top = ring.map((p) => add(p, mul(fr.normal, PALM_HALF_THICK * k)));
+      const bot = ring.map((p) => add(p, mul(fr.normal, -PALM_HALF_THICK * k)));
+      const face = (pts, n) => {
+        if (dot(n, B.toward) <= 0) return;
+        const sp = pts.map(proj);
+        prims.push({ z: sp.reduce((s, p) => s + p[2], 0) / sp.length, draw: () => {
+          ctx.beginPath(); sp.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.closePath();
+          ctx.fillStyle = shade(rgb, lit(n), alpha); ctx.fill();
+          ctx.strokeStyle = ink; ctx.lineWidth = outline * 0.7; ctx.lineJoin = "round"; ctx.stroke();
+        } });
+      };
+      face(top, fr.normal); face(bot, mul(fr.normal, -1));
+      const centroid = mul(ring.reduce((s, p) => add(s, p), [0, 0, 0]), 1 / ring.length);
+      for (let i = 0; i < ring.length; i++) {
+        const j = (i + 1) % ring.length;
+        const mid = mul(add(ring[i], ring[j]), 0.5);
+        let n = cross(sub(ring[j], ring[i]), fr.normal);
+        if (dot(n, sub(mid, centroid)) < 0) n = mul(n, -1);
+        face([top[i], top[j], bot[j], bot[i]], unit(n));
+      }
+      // 팔뚝 토막과 손목 구슬(방향 감각용)
+      const elbowSide = mul(fr.length, -FOREARM * k);
+      cylinder([0, 0, 0], elbowSide, 0.021 * k, 0.023 * k, material, 0.6);
+      sphere([0, 0, 0], 0.021 * k, material);
+      for (const f of FINGERS) {
+        const chain = posed[f];
+        for (let j = 0; j < 3; j++) {
+          // 캡슐 = 원기둥 + 양끝 구슬, 반지름 하나. 관통 검사의 모양과 같다.
+          const r = capsuleR(f, j) * k, m = hits.has(f + (j + 1)) ? hitMat : material;
+          cylinder(chain[j], chain[j + 1], r, r, m);
+          sphere(chain[j], r, m);
+          sphere(chain[j + 1], r, m);
+        }
+      }
+    }
+    function sphere(c, r, { rgb, alpha, ink }) {
+      const [x, y, z] = proj(c), R = r * scale;
+      const lx = dot(light, B.right), ly = -dot(light, B.up);
+      prims.push({ z: z + r * 0.2, draw: () => {
+        const g = ctx.createRadialGradient(x + lx * R * 0.45, y + ly * R * 0.45, R * 0.1, x, y, R);
+        g.addColorStop(0, shade(rgb, 1.12, alpha)); g.addColorStop(0.65, shade(rgb, 0.86, alpha)); g.addColorStop(1, shade(rgb, 0.58, alpha));
+        ctx.beginPath(); ctx.arc(x, y, R, 0, Math.PI * 2); ctx.fillStyle = g; ctx.fill();
+        ctx.strokeStyle = ink; ctx.lineWidth = outline * 0.6; ctx.stroke();
+      } });
+    }
+    function cylinder(a3, b3, ra, rb, { rgb, alpha, ink }, fade = 1) {
+      const a = proj(a3), b = proj(b3);
+      const dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy) || 1e-6;
+      const px = -dy / len, py = dx / len;            // 화면 수직 방향
+      const side3 = unit(add(mul(B.right, px), mul(B.up, -py)));
+      const axis = unit(sub(b3, a3));
+      const view = unit(sub(B.toward, mul(axis, dot(B.toward, axis))));
+      const Ra = ra * scale, Rb = rb * scale;
+      prims.push({ z: (a[2] + b[2]) / 2, draw: () => {
+        const g = ctx.createLinearGradient(a[0] - px * Ra, a[1] - py * Ra, a[0] + px * Ra, a[1] + py * Ra);
+        for (const s of [-1, -0.6, -0.2, 0.2, 0.6, 1]) {
+          const n = unit(add(mul(side3, s), mul(view, Math.sqrt(Math.max(0, 1 - s * s)) + 1e-3)));
+          g.addColorStop((s + 1) / 2, shade(rgb, lit(n), alpha * fade));
+        }
+        ctx.beginPath();
+        ctx.moveTo(a[0] + px * Ra, a[1] + py * Ra); ctx.lineTo(b[0] + px * Rb, b[1] + py * Rb);
+        ctx.lineTo(b[0] - px * Rb, b[1] - py * Rb); ctx.lineTo(a[0] - px * Ra, a[1] - py * Ra); ctx.closePath();
+        ctx.fillStyle = g; ctx.fill();
+        ctx.strokeStyle = ink; ctx.lineWidth = outline * 0.6;
+        ctx.beginPath(); ctx.moveTo(a[0] + px * Ra, a[1] + py * Ra); ctx.lineTo(b[0] + px * Rb, b[1] + py * Rb);
+        ctx.moveTo(a[0] - px * Ra, a[1] - py * Ra); ctx.lineTo(b[0] - px * Rb, b[1] - py * Rb); ctx.stroke();
+      } });
+    }
+
+    const ink = css("--doll-ink");
+    if (ghostFingers) {
+      body(ghostFingers, { rgb: hexRgb(css("--ghost-doll")), alpha: 0.34, ink: "rgba(0,0,0,0)" });
+      prims.forEach((p) => p.draw()); prims.length = 0;
+    }
+    const hits = new Set();
+    for (const c of collisions(side, pose(side, fingers))) { hits.add(c.a); hits.add(c.b); }
+    body(fingers, { rgb: hexRgb(css("--doll")), alpha: 1, ink }, hits);
+    prims.sort((p1, p2) => p1.z - p2.z).forEach((p) => p.draw());
+
+    if (opts.bones) {
+      const posed = pose(side, fingers);
+      ctx.lineCap = "round"; ctx.lineWidth = opts.thin ? 1.5 : 2.4;
+      for (const f of FINGERS) {
+        ctx.strokeStyle = css("--f-" + f); ctx.beginPath();
+        posed[f].forEach((p, i) => { const [x, y] = proj(p); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+        ctx.stroke();
+      }
+    }
+  }
+
+  // ---- tray ----
+  const chips = document.getElementById("chips");
+  const tray = document.getElementById("tray");
+  const cats = [["all", "전체"], ...Object.entries(DATA.categories)];
+  for (const [id, label] of cats) {
+    const b = document.createElement("button");
+    b.className = "chip"; b.type = "button"; b.id = "chip-" + id;
+    const n = id === "all" ? Object.keys(DATA.presets).length : Object.values(DATA.presets).filter((p) => p.category === id).length;
+    b.textContent = `${label} ${n}`;
+    b.setAttribute("aria-pressed", String(id === category));
+    b.addEventListener("click", () => { category = id; renderTray(); });
+    chips.appendChild(b);
+  }
+  const thumbs = {};
+  function renderTray() {
+    chips.querySelectorAll(".chip").forEach((c) => c.setAttribute("aria-pressed", String(c.id === "chip-" + category)));
+    tray.innerHTML = "";
+    for (const [cid, clabel] of Object.entries(DATA.categories)) {
+      if (category !== "all" && category !== cid) continue;
+      const lab = document.createElement("div"); lab.className = "cat-label"; lab.textContent = clabel; tray.appendChild(lab);
+      const grid = document.createElement("div"); grid.className = "grid"; tray.appendChild(grid);
+      for (const [id, p] of Object.entries(DATA.presets)) {
+        if (p.category !== cid) continue;
+        const card = document.createElement("button");
+        card.type = "button"; card.className = "card"; card.id = "card-" + id;
+        card.setAttribute("aria-current", String(id === current));
+        card.innerHTML = `<canvas></canvas><span class="name"></span><span class="pid"></span>`;
+        card.querySelector(".name").textContent = p.label_ko;
+        card.querySelector(".pid").textContent = id;
+        if (isEdited(id)) { const e = document.createElement("span"); e.className = "edited"; e.textContent = "수정"; card.appendChild(e); }
+        card.addEventListener("click", () => select(id));
+        grid.appendChild(card);
+        thumbs[id] = card.querySelector("canvas");
+      }
+    }
+    requestAnimationFrame(drawThumbs);
+  }
+  function drawThumbs() {
+    const saved = { ...cam }; cam.yaw = 35; cam.pitch = 25;
+    for (const [id, c] of Object.entries(thumbs)) if (c.isConnected) drawDoll(c, "right", fingersOf(id), null, { thin: true });
+    Object.assign(cam, saved);
+  }
+
+  // ---- specimen ----
+  const viewsEl = document.getElementById("views");
+  for (const [key, [label, yaw, pitch]] of Object.entries(VIEWS)) {
+    const b = document.createElement("button"); b.type = "button"; b.textContent = label; b.dataset.view = key;
+    b.addEventListener("click", () => { cam.yaw = yaw; cam.pitch = pitch; markView(); drawSpecimen(); });
+    viewsEl.appendChild(b);
+  }
+  const markView = () => viewsEl.querySelectorAll("button").forEach((b) => {
+    const [, yaw, pitch] = VIEWS[b.dataset.view]; b.setAttribute("aria-pressed", String(yaw === cam.yaw && pitch === cam.pitch));
+  });
+  const ghostSel = document.getElementById("ghost");
+  ghostSel.innerHTML = `<option value="">없음</option>` + Object.entries(DATA.categories).map(([cid, cl]) =>
+    `<optgroup label="${cl}">` + Object.entries(DATA.presets).filter(([, p]) => p.category === cid)
+      .map(([id, p]) => `<option value="${id}">${p.label_ko} (${id})</option>`).join("") + `</optgroup>`).join("");
+  document.getElementById("bones").addEventListener("change", (e) => { showBones = e.target.checked; drawSpecimen(); renderLegend(); });
+  ghostSel.addEventListener("change", () => { ghost = ghostSel.value; drawSpecimen(); renderLegend(); });
+
+  const legend = document.getElementById("legend");
+  function renderLegend() {
+    legend.innerHTML = (showBones ? FINGERS.map((f) => `<span><i style="background:var(--f-${f})"></i>${FINGER_KO[f]}</span>`).join("") : `<span>마네킹 손 · 손 길이 ${(DATA.hand_length_m * 100).toFixed(0)}cm</span>`) +
+      (ghost ? `<span class="ghost"><i></i>비교: ${DATA.presets[ghost].label_ko}</span>` : "");
+  }
+  function drawSpecimen() {
+    for (const side of SIDES) drawDoll(document.getElementById("cv-" + side), side, fingersOf(current), ghost ? fingersOf(ghost) : null, { bones: showBones });
+  }
+  for (const side of SIDES) {
+    const cv = document.getElementById("cv-" + side);
+    let drag = null;
+    cv.addEventListener("pointerdown", (e) => { drag = { x: e.clientX, y: e.clientY, yaw: cam.yaw, pitch: cam.pitch }; cv.setPointerCapture(e.pointerId); });
+    cv.addEventListener("pointermove", (e) => {
+      if (!drag) return;
+      cam.yaw = Math.round(drag.yaw + (e.clientX - drag.x) * 0.6);
+      cam.pitch = Math.max(-89, Math.min(89, Math.round(drag.pitch + (e.clientY - drag.y) * 0.6)));
+      markView(); drawSpecimen();
+    });
+    const end = () => { drag = null; };
+    cv.addEventListener("pointerup", end); cv.addEventListener("pointercancel", end);
+  }
+
+  // ---- angle sheet ----
+  const anglesEl = document.getElementById("angles");
+  function renderAngles() {
+    const fingers = fingersOf(current), orig = ORIGINAL[current];
+    const head = `<tr><th>손가락</th><th>첫째 마디</th><th>둘째 마디</th><th>셋째 마디</th><th>벌림</th></tr>`;
+    const knob = (f, key, k, value, origValue, min, max) => {
+      const id = `k-${f}-${key}${k ?? ""}`;
+      const changed = value !== origValue ? " changed" : "";
+      return `<td><div class="knob"><input type="range" id="${id}" min="${min}" max="${max}" step="1" value="${value}"
+        data-f="${f}" data-key="${key}" data-k="${k ?? ""}" aria-label="${FINGER_KO[f]} ${key === "spread" ? "벌림" : (k + 1) + "번째 마디 굽힘"}">
+        <output for="${id}" class="${changed}">${value}</output></div></td>`;
+    };
+    anglesEl.innerHTML = head + FINGERS.map((f) => `<tr><td class="f"><i style="background:var(--f-${f})"></i>${FINGER_KO[f]}</td>` +
+      [0, 1, 2].map((k) => knob(f, "curl", k, fingers[f].curl[k], orig[f].curl[k], -10, 110)).join("") +
+      knob(f, "spread", null, fingers[f].spread, orig[f].spread, -30, 30) + `</tr>`).join("");
+  }
+  anglesEl.addEventListener("input", (e) => {
+    const t = e.target; if (t.type !== "range") return;
+    const next = JSON.parse(JSON.stringify(fingersOf(current)));
+    const v = Number(t.value);
+    if (t.dataset.key === "curl") next[t.dataset.f].curl[Number(t.dataset.k)] = v; else next[t.dataset.f].spread = v;
+    edits[current] = next; saveEdits();
+    const out = t.parentElement.querySelector("output"); out.textContent = v;
+    const orig = t.dataset.key === "curl" ? ORIGINAL[current][t.dataset.f].curl[Number(t.dataset.k)] : ORIGINAL[current][t.dataset.f].spread;
+    out.classList.toggle("changed", v !== orig);
+    drawSpecimen(); renderStats(); syncCard();
+  });
+  function syncCard() {
+    const c = thumbs[current]; if (c && c.isConnected) drawDoll(c, "right", fingersOf(current), null, { thin: true });
+    const card = document.getElementById("card-" + current); if (!card) return;
+    const badge = card.querySelector(".edited");
+    if (isEdited(current) && !badge) { const e = document.createElement("span"); e.className = "edited"; e.textContent = "수정"; card.appendChild(e); }
+    if (!isEdited(current) && badge) badge.remove();
+    document.getElementById("reset").disabled = !isEdited(current);
+  }
+  const toast = document.getElementById("toast");
+  const exportEl = document.getElementById("export");
+  const presetJSON = (id) => JSON.stringify({ [id]: { ...DATA.library_json.presets[id], fingers: fingersOf(id) } }, null, 2);
+  async function copyText(text, label) {
+    exportEl.value = text;
+    try { await navigator.clipboard.writeText(text); exportEl.hidden = true; toast.textContent = label + " 복사했습니다."; }
+    catch (e) { exportEl.hidden = false; exportEl.focus(); exportEl.select(); toast.textContent = "자동 복사가 막혀 아래 칸을 선택해 두었습니다. 직접 복사하세요."; }
+  }
+  document.getElementById("copy").addEventListener("click", () => copyText(presetJSON(current), DATA.presets[current].label_ko));
+  document.getElementById("copy-all").addEventListener("click", () => {
+    const ids = Object.keys(DATA.presets).filter(isEdited);
+    if (!ids.length) { toast.textContent = "아직 바꾼 손이 없습니다."; return; }
+    const obj = {}; ids.forEach((id) => { obj[id] = { ...DATA.library_json.presets[id], fingers: fingersOf(id) }; });
+    copyText(JSON.stringify(obj, null, 2), `바꾼 손 ${ids.length}개를`);
+  });
+  document.getElementById("reset").addEventListener("click", () => {
+    delete edits[current]; saveEdits(); renderAngles(); drawSpecimen(); renderStats(); syncCard(); toast.textContent = "원래 값으로 되돌렸습니다.";
+  });
+
+  // ---- stats ----
+  const LEN = DATA.hand_length_m;
+  document.getElementById("hand-len").textContent = (LEN * 100).toFixed(0) + "cm";
+  function candidates(primary, limit = 4) {
+    const cat = DATA.presets[primary].category;
+    const siblings = Object.keys(DATA.presets).filter((id) => DATA.presets[id].category === cat);
+    const out = [];
+    for (const id of [primary, ...siblings, ...DATA.fallback_order]) { if (!out.includes(id)) out.push(id); if (out.length >= limit) break; }
+    return out;
+  }
+  function renderStats() {
+    const cols = SIDES.flatMap((sd) => collisions(sd, pose(sd, fingersOf(current))).map((c) => ({ ...c, sd })));
+    const nameOf = (key) => key === "palm" ? "손바닥" : FINGER_KO[key.slice(0, -1)] + " " + key.slice(-1) + "마디";
+    const worst = cols.slice(0, 3).map((c) => `${nameOf(c.a)}↔${nameOf(c.b)} ${(c.depth * 1000).toFixed(1)}mm`).join(", ");
+    const hitText = cols.length ? `<span class="pill warn">관통 ${cols.length}곳</span> ${worst}` : '<span class="pill ok">없음</span>';
+    const p = pose("right", fingersOf(current)), open = pose("right", ORIGINAL.open);
+    const cm = (v) => (v * 100).toFixed(1) + "cm";
+    const tip = (f) => p[f][3];
+    const gapTI = norm(sub(tip("thumb"), tip("index")));
+    const backBend = FINGERS.filter((f) => f !== "thumb" && dot(sub(tip(f), open[f][3]), FRAME.right.normal) < -1e-3);
+    const mmErr = (maxErr * 1000).toFixed(4);
+    document.getElementById("stats").innerHTML = `
+      <dt>엄지 끝 ↔ 검지 끝</dt><dd>${cm(gapTI)} ${gapTI < 0.012 ? '<span class="pill ok">맞닿음</span>' : ""}</dd>
+      <dt>손가락 관통</dt><dd>${hitText}</dd>
+      <dt>손등 쪽 꺾임</dt><dd>${backBend.length ? '<span class="pill warn">' + backBend.map((f) => FINGER_KO[f]).join("·") + "</span>" : '<span class="pill ok">없음</span>'}</dd>
+      <dt>변환기 계산과 일치</dt><dd>${maxErr < 1e-5 ? '<span class="pill ok">일치</span>' : '<span class="pill warn">불일치</span>'} 최대 오차 ${mmErr}mm (${Object.keys(DATA.presets).length}종×양손, 편집 전 값)</dd>
+      <dt>상태</dt><dd>${isEdited(current) ? '<span class="pill warn">실험 중 · 라이브러리와 다름</span>' : '<span class="pill ok">라이브러리 값</span>'}</dd>`;
+    const maxReach = Math.max(...FINGERS.map((f) => norm(open[f][3])));
+    document.getElementById("reach").innerHTML = FINGERS.map((f) => {
+      const r = norm(tip(f)), o = norm(open[f][3]);
+      return `<tr><td>${FINGER_KO[f]}</td><td><div class="bar"><span style="width:${(100 * r / maxReach).toFixed(1)}%;background:var(--f-${f})"></span></div></td><td class="num">${cm(r)}</td><td class="num">${Math.round(100 * r / o)}%</td></tr>`;
+    }).join("");
+    document.getElementById("cands").innerHTML = candidates(current).map((id) => `<button type="button" data-id="${id}">${DATA.presets[id].label_ko}</button>`).join("");
+  }
+  document.getElementById("cands").addEventListener("click", (e) => { const id = e.target.dataset && e.target.dataset.id; if (id) select(id); });
+
+  function select(id) {
+    current = id;
+    const p = DATA.presets[id];
+    document.getElementById("spec-name").textContent = p.label_ko;
+    document.getElementById("spec-id").textContent = id;
+    document.getElementById("spec-cat").textContent = DATA.categories[p.category];
+    document.getElementById("spec-hint").textContent = p.vlm_hint;
+    document.querySelectorAll(".card").forEach((c) => c.setAttribute("aria-current", String(c.id === "card-" + id)));
+    renderAngles(); drawSpecimen(); renderStats(); syncCard();
+    try { history.replaceState(null, "", "#" + id); } catch (e) { /* ignore */ }
+  }
+
+  // 썸네일 생성용(scripts/render_hand_thumbnails.mjs). 화면 동작에는 쓰지 않는다.
+  window.__standinRenderHand = (id, side, size) => {
+    const c = document.createElement("canvas");
+    c.style.width = c.style.height = size + "px";
+    document.body.appendChild(c);
+    const saved = { ...cam }; cam.yaw = 35; cam.pitch = 25;
+    drawDoll(c, side, ORIGINAL[id], null, { thin: true });
+    Object.assign(cam, saved);
+    const url = c.toDataURL("image/png"); c.remove(); return url;
+  };
+
+  document.getElementById("meta").innerHTML =
+    `<span>${DATA.library_version}</span><span>sha ${DATA.library_sha256.slice(0, 12)}</span><span>${Object.keys(DATA.presets).length}종 · ${Object.keys(DATA.categories).length}묶음</span>`;
+  const fromHash = location.hash.slice(1);
+  if (DATA.presets[fromHash]) current = fromHash;
+  renderTray(); renderLegend(); markView(); select(current);
+  let resizeTimer; window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { drawSpecimen(); drawThumbs(); }, 120); });
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  (mq.addEventListener ? mq.addEventListener("change", () => { drawSpecimen(); drawThumbs(); }) : null);
+  new MutationObserver(() => { drawSpecimen(); drawThumbs(); }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+})();
+</script>

@@ -1,0 +1,972 @@
+{
+  "schema_version": 1,
+  "library_version": "hand-library-v1",
+  "angle_convention": {
+    "unit": "degree",
+    "curl": "각 손가락의 [첫째, 둘째, 셋째] 마디 굽힘. +는 손바닥 쪽으로 접힌다. 엄지는 [CMC, MCP, IP].",
+    "spread": "첫째 마디의 벌림. +는 중지에서 멀어지는 방향(엄지는 검지에서 멀어지는 방향), -는 붙이는 방향. 중지는 검지 쪽이 +.",
+    "frame": "캐릭터 리그의 rest 기하(손목·손가락 뿌리 위치)에서 매번 계산한다. 리그의 본 roll·좌우 이름에 의존하지 않는다."
+  },
+  "categories": {
+    "basic": "기본",
+    "hold": "물건 쥐기",
+    "weapon": "무기",
+    "sports": "스포츠·공",
+    "tool": "도구·악기",
+    "daily": "일상 동작",
+    "gesture": "제스처",
+    "emotion": "감정 표현",
+    "action": "액션·감정"
+  },
+  "fallback_order": ["relaxed", "fist", "open", "grip"],
+  "presets": {
+    "open": {
+      "category": "basic",
+      "label_ko": "편 손",
+      "vlm_hint": "손가락을 곧게 펴고 살짝 벌린 손. 하이파이브·멈춤·손 흔들기·손바닥 보이기.",
+      "fingers": {
+        "thumb": {"curl": [0, 0, 0], "spread": 10},
+        "index": {"curl": [0, 0, 0], "spread": 5},
+        "middle": {"curl": [0, 0, 0], "spread": 0},
+        "ring": {"curl": [0, 0, 0], "spread": 4},
+        "pinky": {"curl": [0, 0, 0], "spread": 9}
+      }
+    },
+    "relaxed": {
+      "category": "basic",
+      "label_ko": "힘 뺀 손",
+      "vlm_hint": "아무것도 쥐지 않고 자연스럽게 살짝 굽은 손. 서 있거나 걷는 기본 상태.",
+      "fingers": {
+        "thumb": {"curl": [8, 10, 8], "spread": 0},
+        "index": {"curl": [14, 20, 10], "spread": 2},
+        "middle": {"curl": [17, 24, 12], "spread": 0},
+        "ring": {"curl": [21, 27, 14], "spread": 2},
+        "pinky": {"curl": [25, 30, 16], "spread": 5}
+      }
+    },
+    "tense": {
+      "category": "basic",
+      "label_ko": "힘준 손",
+      "vlm_hint": "손가락을 크게 벌리고 힘이 들어간 손. 놀람·당황·주문 시전.",
+      "fingers": {
+        "thumb": {"curl": [0, 5, 0], "spread": 22},
+        "index": {"curl": [8, 6, 0], "spread": 12},
+        "middle": {"curl": [8, 6, 0], "spread": 0},
+        "ring": {"curl": [10, 8, 0], "spread": 10},
+        "pinky": {"curl": [12, 10, 0], "spread": 20}
+      }
+    },
+    "blade": {
+      "category": "basic",
+      "label_ko": "손날",
+      "vlm_hint": "손가락을 붙여 곧게 편 손. 경례·수도(손날치기)·합장·쉿.",
+      "fingers": {
+        "thumb": {"curl": [12, 10, 0], "spread": -10},
+        "index": {"curl": [2, 2, 0], "spread": -3},
+        "middle": {"curl": [2, 2, 0], "spread": 0},
+        "ring": {"curl": [3, 3, 0], "spread": -3},
+        "pinky": {"curl": [4, 4, 0], "spread": -6}
+      }
+    },
+    "fist": {
+      "category": "basic",
+      "label_ko": "주먹",
+      "vlm_hint": "손가락을 끝까지 말아 꽉 쥔 주먹. 펀치·분노·결의.",
+      "fingers": {
+        "thumb": {"curl": [18, 49, 48], "spread": 4},
+        "index": {"curl": [82, 95, 49], "spread": 0},
+        "middle": {"curl": [86, 95, 49], "spread": 0},
+        "ring": {"curl": [88, 95, 49], "spread": 0},
+        "pinky": {"curl": [90, 95, 49], "spread": 0}
+      }
+    },
+    "claw": {
+      "category": "basic",
+      "label_ko": "갈퀴손",
+      "vlm_hint": "손가락 둘째·셋째 마디를 세게 굽혀 할퀴듯 벌린 손. 위협·괴물·고통.",
+      "fingers": {
+        "thumb": {"curl": [20, 30, 30], "spread": 12},
+        "index": {"curl": [10, 70, 50], "spread": 10},
+        "middle": {"curl": [10, 72, 52], "spread": 0},
+        "ring": {"curl": [10, 72, 52], "spread": 8},
+        "pinky": {"curl": [12, 70, 50], "spread": 16}
+      }
+    },
+    "grip": {
+      "category": "hold",
+      "label_ko": "쥐는 손",
+      "vlm_hint": "막대·손잡이·가방끈처럼 원통형 물건을 쥔 손. 손가락이 감기지만 가운데가 비어 있다.",
+      "fingers": {
+        "thumb": {"curl": [31, 20, 16], "spread": 1},
+        "index": {"curl": [61, 72, 37], "spread": -1},
+        "middle": {"curl": [66, 72, 42], "spread": 0},
+        "ring": {"curl": [70, 74, 44], "spread": 0},
+        "pinky": {"curl": [74, 76, 46], "spread": 2}
+      }
+    },
+    "cup": {
+      "category": "hold",
+      "label_ko": "오므린 손",
+      "vlm_hint": "공·과일을 감싸거나 물을 뜨듯 둥글게 오므린 손. 주먹보다 덜 쥔다.",
+      "fingers": {
+        "thumb": {"curl": [18, 15, 10], "spread": -6},
+        "index": {"curl": [30, 35, 20], "spread": 1},
+        "middle": {"curl": [33, 38, 22], "spread": 0},
+        "ring": {"curl": [36, 40, 24], "spread": 1},
+        "pinky": {"curl": [40, 42, 26], "spread": 3}
+      }
+    },
+    "pinch": {
+      "category": "hold",
+      "label_ko": "집는 손",
+      "vlm_hint": "엄지와 검지 끝을 모아 카드·작은 물건을 집은 손. 나머지 손가락은 말려 있다.",
+      "fingers": {
+        "thumb": {"curl": [46, 22, 18], "spread": 1},
+        "index": {"curl": [46, 54, 34], "spread": 0},
+        "middle": {"curl": [46, 55, 34], "spread": 0},
+        "ring": {"curl": [54, 62, 38], "spread": 1},
+        "pinky": {"curl": [60, 68, 42], "spread": 3}
+      }
+    },
+    "support": {
+      "category": "hold",
+      "label_ko": "받치는 손",
+      "vlm_hint": "손바닥을 펴서 물건을 받치거나 벽·탁자를 짚는 손. 손가락은 거의 펴져 있다.",
+      "fingers": {
+        "thumb": {"curl": [4, 6, 4], "spread": 8},
+        "index": {"curl": [6, 8, 4], "spread": 3},
+        "middle": {"curl": [7, 9, 5], "spread": 0},
+        "ring": {"curl": [8, 10, 5], "spread": 3},
+        "pinky": {"curl": [10, 12, 6], "spread": 6}
+      }
+    },
+    "hold_phone": {
+      "category": "hold",
+      "label_ko": "휴대폰 쥐기",
+      "vlm_hint": "스마트폰·책처럼 납작한 물건을 손바닥에 대고 쥔 손. 엄지가 화면 위에 있다.",
+      "fingers": {
+        "thumb": {"curl": [20, 10, 5], "spread": -4},
+        "index": {"curl": [50, 35, 15], "spread": 0},
+        "middle": {"curl": [55, 38, 16], "spread": 0},
+        "ring": {"curl": [60, 40, 18], "spread": 0},
+        "pinky": {"curl": [65, 42, 20], "spread": 2}
+      }
+    },
+    "hold_cup": {
+      "category": "hold",
+      "label_ko": "컵 쥐기",
+      "vlm_hint": "컵·캔·병을 옆에서 감싸 쥔 손. 쥐는 손보다 굵게 벌어져 있다.",
+      "fingers": {
+        "thumb": {"curl": [41, 19, 11], "spread": -4},
+        "index": {"curl": [42, 48, 28], "spread": 1},
+        "middle": {"curl": [45, 50, 30], "spread": 0},
+        "ring": {"curl": [48, 52, 32], "spread": 1},
+        "pinky": {"curl": [52, 55, 34], "spread": 3}
+      }
+    },
+    "pen": {
+      "category": "hold",
+      "label_ko": "펜 쥐기",
+      "vlm_hint": "펜·붓·젓가락을 엄지·검지·중지로 잡은 손. 글씨 쓰기·그림 그리기.",
+      "fingers": {
+        "thumb": {"curl": [30, 20, 10], "spread": -15},
+        "index": {"curl": [30, 30, 20], "spread": 0},
+        "middle": {"curl": [40, 50, 30], "spread": 0},
+        "ring": {"curl": [60, 70, 45], "spread": 0},
+        "pinky": {"curl": [65, 75, 50], "spread": 2}
+      }
+    },
+    "sword_grip": {
+      "category": "weapon",
+      "label_ko": "검 쥐기",
+      "vlm_hint": "칼자루·검·몽둥이를 꽉 쥔 손. 쥐는 손보다 더 단단히 감긴다.",
+      "fingers": {
+        "thumb": {"curl": [36, 28, 48], "spread": 8},
+        "index": {"curl": [70, 85, 50], "spread": 0},
+        "middle": {"curl": [74, 86, 52], "spread": 0},
+        "ring": {"curl": [77, 87, 54], "spread": 0},
+        "pinky": {"curl": [80, 88, 56], "spread": 0}
+      }
+    },
+    "gun_trigger": {
+      "category": "weapon",
+      "label_ko": "권총 쥐기",
+      "vlm_hint": "권총 손잡이를 쥐고 검지를 방아쇠에 건 손.",
+      "fingers": {
+        "thumb": {"curl": [25, 15, 10], "spread": -10},
+        "index": {"curl": [20, 40, 20], "spread": 4},
+        "middle": {"curl": [75, 85, 50], "spread": 0},
+        "ring": {"curl": [78, 86, 52], "spread": 0},
+        "pinky": {"curl": [80, 88, 54], "spread": 0}
+      }
+    },
+    "gun_ready": {
+      "category": "weapon",
+      "label_ko": "총 쥐기(검지 펴기)",
+      "vlm_hint": "총을 쥐되 검지를 방아쇠 밖으로 곧게 편 손. 경계·대기 자세.",
+      "fingers": {
+        "thumb": {"curl": [25, 15, 10], "spread": -10},
+        "index": {"curl": [5, 0, 0], "spread": 0},
+        "middle": {"curl": [75, 85, 50], "spread": 0},
+        "ring": {"curl": [78, 86, 52], "spread": 0},
+        "pinky": {"curl": [80, 88, 54], "spread": 0}
+      }
+    },
+    "bow_draw": {
+      "category": "weapon",
+      "label_ko": "활시위 당기기",
+      "vlm_hint": "검지·중지·약지를 갈고리처럼 걸어 활시위를 당긴 손.",
+      "fingers": {
+        "thumb": {"curl": [25, 30, 20], "spread": -8},
+        "index": {"curl": [15, 75, 45], "spread": 0},
+        "middle": {"curl": [15, 78, 45], "spread": 0},
+        "ring": {"curl": [18, 75, 45], "spread": 0},
+        "pinky": {"curl": [60, 70, 40], "spread": 2}
+      }
+    },
+    "staff_grip": {
+      "category": "weapon",
+      "label_ko": "창·봉 쥐기",
+      "vlm_hint": "창·지팡이·빗자루처럼 굵은 장대를 쥔 손. 손가락이 덜 감긴다.",
+      "fingers": {
+        "thumb": {"curl": [26, 23, 15], "spread": 0},
+        "index": {"curl": [55, 63, 37], "spread": -1},
+        "middle": {"curl": [58, 64, 40], "spread": 0},
+        "ring": {"curl": [61, 66, 42], "spread": 0},
+        "pinky": {"curl": [65, 68, 44], "spread": 2}
+      }
+    },
+    "ball_palm": {
+      "category": "sports",
+      "label_ko": "공 받치기",
+      "vlm_hint": "농구공·배구공처럼 큰 공을 손가락을 벌려 받치거나 잡은 손.",
+      "fingers": {
+        "thumb": {"curl": [12, 8, 5], "spread": 20},
+        "index": {"curl": [18, 15, 10], "spread": 10},
+        "middle": {"curl": [18, 15, 10], "spread": 0},
+        "ring": {"curl": [20, 16, 10], "spread": 9},
+        "pinky": {"curl": [22, 18, 12], "spread": 18}
+      }
+    },
+    "ball_grip": {
+      "category": "sports",
+      "label_ko": "공 쥐기(야구공)",
+      "vlm_hint": "야구공·작은 공을 손끝으로 쥔 손. 검지·중지가 위, 엄지가 아래.",
+      "fingers": {
+        "thumb": {"curl": [30, 15, 10], "spread": -14},
+        "index": {"curl": [28, 32, 18], "spread": 2},
+        "middle": {"curl": [30, 34, 20], "spread": 0},
+        "ring": {"curl": [50, 55, 35], "spread": 2},
+        "pinky": {"curl": [55, 60, 38], "spread": 4}
+      }
+    },
+    "racket_grip": {
+      "category": "sports",
+      "label_ko": "라켓·배트 쥐기",
+      "vlm_hint": "라켓·배트·골프채 손잡이를 쥔 손. 검지가 살짝 떨어져 있다.",
+      "fingers": {
+        "thumb": {"curl": [26, 17, 14], "spread": 1},
+        "index": {"curl": [51, 64, 35], "spread": 5},
+        "middle": {"curl": [64, 70, 42], "spread": 0},
+        "ring": {"curl": [68, 72, 44], "spread": 0},
+        "pinky": {"curl": [72, 74, 46], "spread": 2}
+      }
+    },
+    "point": {
+      "category": "gesture",
+      "label_ko": "가리키기",
+      "vlm_hint": "검지만 곧게 펴고 나머지는 말아 쥔 손. 지목·명령·쉿.",
+      "fingers": {
+        "thumb": {"curl": [42, 14, 56], "spread": -8},
+        "index": {"curl": [2, 0, 0], "spread": 0},
+        "middle": {"curl": [86, 95, 49], "spread": 0},
+        "ring": {"curl": [88, 95, 49], "spread": 0},
+        "pinky": {"curl": [90, 95, 49], "spread": 0}
+      }
+    },
+    "v_sign": {
+      "category": "gesture",
+      "label_ko": "브이",
+      "vlm_hint": "검지·중지를 벌려 편 브이 손. 승리·사진 포즈.",
+      "fingers": {
+        "thumb": {"curl": [38, 42, 32], "spread": -22},
+        "index": {"curl": [0, 0, 0], "spread": 10},
+        "middle": {"curl": [0, 0, 0], "spread": -6},
+        "ring": {"curl": [88, 95, 60], "spread": 0},
+        "pinky": {"curl": [90, 95, 60], "spread": 0}
+      }
+    },
+    "thumbs_up": {
+      "category": "gesture",
+      "label_ko": "엄지척",
+      "vlm_hint": "주먹을 쥐고 엄지만 위로 세운 손. 칭찬·좋아요.",
+      "fingers": {
+        "thumb": {"curl": [0, 0, 0], "spread": 18},
+        "index": {"curl": [82, 95, 60], "spread": 0},
+        "middle": {"curl": [86, 95, 60], "spread": 0},
+        "ring": {"curl": [88, 95, 60], "spread": 0},
+        "pinky": {"curl": [90, 95, 60], "spread": 0}
+      }
+    },
+    "ok_sign": {
+      "category": "gesture",
+      "label_ko": "오케이",
+      "vlm_hint": "엄지와 검지로 동그라미를 만들고 나머지는 편 손.",
+      "fingers": {
+        "thumb": {"curl": [25, 24, 57], "spread": 0},
+        "index": {"curl": [45, 50, 40], "spread": 0},
+        "middle": {"curl": [5, 5, 0], "spread": 0},
+        "ring": {"curl": [6, 6, 0], "spread": 4},
+        "pinky": {"curl": [8, 8, 0], "spread": 9}
+      }
+    },
+    "finger_heart": {
+      "category": "gesture",
+      "label_ko": "손가락 하트",
+      "vlm_hint": "엄지와 검지를 엇갈려 작은 하트를 만든 손. 나머지는 말아 쥔다.",
+      "fingers": {
+        "thumb": {"curl": [33, 41, 10], "spread": 3},
+        "index": {"curl": [39, 61, 40], "spread": 0},
+        "middle": {"curl": [86, 95, 60], "spread": 0},
+        "ring": {"curl": [88, 95, 61], "spread": 0},
+        "pinky": {"curl": [90, 95, 60], "spread": 0}
+      }
+    },
+    "call_me": {
+      "category": "gesture",
+      "label_ko": "전화해(샤카)",
+      "vlm_hint": "엄지와 새끼만 펴고 나머지를 말아 쥔 손. 전화 흉내·인사.",
+      "fingers": {
+        "thumb": {"curl": [0, 0, 0], "spread": 22},
+        "index": {"curl": [82, 95, 60], "spread": 0},
+        "middle": {"curl": [86, 95, 60], "spread": 0},
+        "ring": {"curl": [88, 95, 60], "spread": 0},
+        "pinky": {"curl": [0, 0, 0], "spread": 18}
+      }
+    },
+    "rock": {
+      "category": "gesture",
+      "label_ko": "락(뿔)",
+      "vlm_hint": "검지와 새끼만 펴고 엄지로 중지·약지를 누른 손. 락 공연·장난.",
+      "fingers": {
+        "thumb": {"curl": [42, 14, 56], "spread": -8},
+        "index": {"curl": [0, 0, 0], "spread": 6},
+        "middle": {"curl": [86, 95, 49], "spread": 0},
+        "ring": {"curl": [88, 95, 49], "spread": 0},
+        "pinky": {"curl": [0, 0, 0], "spread": 12}
+      }
+    },
+    "beckon": {
+      "category": "gesture",
+      "label_ko": "이리 와",
+      "vlm_hint": "검지를 갈고리처럼 굽혀 부르는 손. 나머지는 말아 쥔다.",
+      "fingers": {
+        "thumb": {"curl": [42, 14, 56], "spread": -8},
+        "index": {"curl": [25, 70, 55], "spread": 0},
+        "middle": {"curl": [86, 95, 49], "spread": 0},
+        "ring": {"curl": [88, 95, 49], "spread": 0},
+        "pinky": {"curl": [90, 95, 49], "spread": 0}
+      }
+    },
+    "loose_fist": {
+      "category": "action",
+      "label_ko": "느슨한 주먹",
+      "vlm_hint": "가볍게 말아 쥔 주먹. 격투 가드·달리기·긴장.",
+      "fingers": {
+        "thumb": {"curl": [42, 0, 40], "spread": 4},
+        "index": {"curl": [60, 75, 45], "spread": 0},
+        "middle": {"curl": [64, 76, 46], "spread": 0},
+        "ring": {"curl": [68, 78, 48], "spread": 0},
+        "pinky": {"curl": [72, 80, 50], "spread": 0}
+      }
+    },
+    "grab": {
+      "category": "action",
+      "label_ko": "움켜쥐기",
+      "vlm_hint": "멱살·팔·옷깃을 움켜잡은 손. 손가락이 굵은 물체를 감싼다.",
+      "fingers": {
+        "thumb": {"curl": [33, 13, 8], "spread": -1},
+        "index": {"curl": [53, 64, 36], "spread": -1},
+        "middle": {"curl": [58, 62, 42], "spread": 0},
+        "ring": {"curl": [60, 64, 44], "spread": 0},
+        "pinky": {"curl": [64, 66, 46], "spread": 2}
+      }
+    },
+    "soft_open": {
+      "category": "basic",
+      "label_ko": "살짝 편 손",
+      "vlm_hint": "힘을 빼고 손가락을 거의 편 손. 무언가를 건네거나 손바닥을 내미는 순간.",
+      "fingers": {
+        "thumb": {"curl": [4, 6, 4], "spread": 6},
+        "index": {"curl": [6, 8, 4], "spread": 3},
+        "middle": {"curl": [8, 10, 5], "spread": 0},
+        "ring": {"curl": [10, 12, 6], "spread": 3},
+        "pinky": {"curl": [12, 14, 8], "spread": 6}
+      }
+    },
+    "hyper_open": {
+      "category": "basic",
+      "label_ko": "쫙 젖힌 손",
+      "vlm_hint": "손가락을 끝까지 펴서 뒤로 살짝 젖힌 손. 강한 멈춤·밀어내기·충격.",
+      "fingers": {
+        "thumb": {"curl": [-5, 0, 0], "spread": 24},
+        "index": {"curl": [-8, 0, 0], "spread": 12},
+        "middle": {"curl": [-8, 0, 0], "spread": 0},
+        "ring": {"curl": [-8, 0, 0], "spread": 11},
+        "pinky": {"curl": [-6, 0, 0], "spread": 22}
+      }
+    },
+    "limp": {
+      "category": "basic",
+      "label_ko": "늘어진 손",
+      "vlm_hint": "힘이 완전히 빠져 축 처진 손. 기절·잠·지친 상태.",
+      "fingers": {
+        "thumb": {"curl": [12, 15, 10], "spread": -4},
+        "index": {"curl": [25, 35, 20], "spread": -2},
+        "middle": {"curl": [28, 38, 22], "spread": 0},
+        "ring": {"curl": [32, 40, 24], "spread": -2},
+        "pinky": {"curl": [36, 42, 26], "spread": -3}
+      }
+    },
+    "hold_bag_handle": {
+      "category": "hold",
+      "label_ko": "가방 손잡이 들기",
+      "vlm_hint": "장바구니·서류가방 손잡이를 손가락에 걸어 든 손. 손가락 끝마디가 갈고리처럼 굽는다.",
+      "fingers": {
+        "thumb": {"curl": [15, 15, 10], "spread": -6},
+        "index": {"curl": [20, 80, 50], "spread": 0},
+        "middle": {"curl": [20, 82, 52], "spread": 0},
+        "ring": {"curl": [22, 82, 52], "spread": 0},
+        "pinky": {"curl": [25, 80, 50], "spread": 2}
+      }
+    },
+    "hold_chopsticks": {
+      "category": "hold",
+      "label_ko": "젓가락 쥐기",
+      "vlm_hint": "젓가락을 쥔 손. 엄지·검지·중지가 젓가락을 잡고 약지·새끼는 받친다.",
+      "fingers": {
+        "thumb": {"curl": [28, 18, 8], "spread": -14},
+        "index": {"curl": [28, 32, 22], "spread": 0},
+        "middle": {"curl": [38, 45, 25], "spread": -3},
+        "ring": {"curl": [50, 55, 32], "spread": 0},
+        "pinky": {"curl": [58, 62, 38], "spread": 2}
+      }
+    },
+    "hold_spoon": {
+      "category": "hold",
+      "label_ko": "숟가락 쥐기",
+      "vlm_hint": "숟가락·포크를 쥔 손. 펜보다 낮게 잡고 손가락이 더 감긴다.",
+      "fingers": {
+        "thumb": {"curl": [25, 15, 10], "spread": -12},
+        "index": {"curl": [35, 30, 15], "spread": 0},
+        "middle": {"curl": [45, 45, 25], "spread": 0},
+        "ring": {"curl": [55, 60, 35], "spread": 0},
+        "pinky": {"curl": [60, 65, 40], "spread": 2}
+      }
+    },
+    "hold_book": {
+      "category": "hold",
+      "label_ko": "책 받쳐 들기",
+      "vlm_hint": "책·태블릿을 아래에서 받치고 엄지로 위를 누른 손.",
+      "fingers": {
+        "thumb": {"curl": [10, 5, 0], "spread": 16},
+        "index": {"curl": [25, 12, 6], "spread": 2},
+        "middle": {"curl": [27, 14, 6], "spread": 0},
+        "ring": {"curl": [30, 15, 8], "spread": 2},
+        "pinky": {"curl": [32, 16, 8], "spread": 5}
+      }
+    },
+    "hold_handrail": {
+      "category": "hold",
+      "label_ko": "손잡이·난간 잡기",
+      "vlm_hint": "지하철 손잡이·난간·문고리를 잡은 손. 굵은 막대를 느슨하게 감싼다.",
+      "fingers": {
+        "thumb": {"curl": [27, 20, 12], "spread": 0},
+        "index": {"curl": [48, 55, 35], "spread": 0},
+        "middle": {"curl": [50, 57, 36], "spread": 0},
+        "ring": {"curl": [53, 58, 38], "spread": 0},
+        "pinky": {"curl": [56, 60, 40], "spread": 2}
+      }
+    },
+    "dagger_reverse": {
+      "category": "weapon",
+      "label_ko": "단검 역수 쥐기",
+      "vlm_hint": "단검을 칼날이 새끼 쪽으로 오게 거꾸로 쥔 손. 엄지가 칼자루 끝을 덮는다.",
+      "fingers": {
+        "thumb": {"curl": [11, 23, 27], "spread": -9},
+        "index": {"curl": [75, 85, 55], "spread": 1},
+        "middle": {"curl": [75, 87, 54], "spread": 0},
+        "ring": {"curl": [78, 88, 55], "spread": -1},
+        "pinky": {"curl": [80, 88, 56], "spread": 0}
+      }
+    },
+    "rifle_support": {
+      "category": "weapon",
+      "label_ko": "총 받침손",
+      "vlm_hint": "소총·장총의 몸통을 아래에서 받친 손. 손가락이 가볍게 감싼다.",
+      "fingers": {
+        "thumb": {"curl": [20, 10, 5], "spread": 10},
+        "index": {"curl": [35, 30, 15], "spread": 2},
+        "middle": {"curl": [37, 32, 16], "spread": 0},
+        "ring": {"curl": [40, 34, 18], "spread": 2},
+        "pinky": {"curl": [42, 36, 20], "spread": 4}
+      }
+    },
+    "throw_knife": {
+      "category": "weapon",
+      "label_ko": "던지기용 단검 쥐기",
+      "vlm_hint": "던지려고 단검이나 수리검을 엄지·검지·중지로 집은 손.",
+      "fingers": {
+        "thumb": {"curl": [30, 20, 10], "spread": -10},
+        "index": {"curl": [30, 25, 10], "spread": 0},
+        "middle": {"curl": [35, 30, 15], "spread": 0},
+        "ring": {"curl": [60, 70, 40], "spread": 0},
+        "pinky": {"curl": [65, 75, 45], "spread": 2}
+      }
+    },
+    "shield_grip": {
+      "category": "weapon",
+      "label_ko": "방패 손잡이 쥐기",
+      "vlm_hint": "방패 안쪽 손잡이를 쥔 손. 손가락이 짧은 손잡이에 감긴다.",
+      "fingers": {
+        "thumb": {"curl": [25, 23, 17], "spread": -1},
+        "index": {"curl": [58, 67, 38], "spread": -2},
+        "middle": {"curl": [60, 68, 42], "spread": 0},
+        "ring": {"curl": [62, 70, 44], "spread": 0},
+        "pinky": {"curl": [66, 72, 46], "spread": 2}
+      }
+    },
+    "wand_grip": {
+      "category": "weapon",
+      "label_ko": "지팡이·완드 쥐기",
+      "vlm_hint": "마법봉·지휘봉을 쥐고 검지를 봉을 따라 편 손.",
+      "fingers": {
+        "thumb": {"curl": [25, 20, 10], "spread": -12},
+        "index": {"curl": [10, 15, 10], "spread": 0},
+        "middle": {"curl": [60, 70, 40], "spread": 0},
+        "ring": {"curl": [64, 72, 42], "spread": 0},
+        "pinky": {"curl": [68, 74, 44], "spread": 2}
+      }
+    },
+    "basketball_shoot": {
+      "category": "sports",
+      "label_ko": "슛 손",
+      "vlm_hint": "농구 슛을 쏘는 손. 손가락을 벌려 공을 받친 채 손끝으로 민다.",
+      "fingers": {
+        "thumb": {"curl": [15, 10, 5], "spread": 18},
+        "index": {"curl": [20, 20, 10], "spread": 8},
+        "middle": {"curl": [22, 22, 10], "spread": 0},
+        "ring": {"curl": [24, 24, 12], "spread": 8},
+        "pinky": {"curl": [26, 24, 12], "spread": 16}
+      }
+    },
+    "volleyball_set": {
+      "category": "sports",
+      "label_ko": "토스 손",
+      "vlm_hint": "배구 토스처럼 머리 위에서 공을 받치는 손. 손가락이 둥글게 벌어진다.",
+      "fingers": {
+        "thumb": {"curl": [15, 12, 6], "spread": 16},
+        "index": {"curl": [28, 25, 15], "spread": 8},
+        "middle": {"curl": [30, 26, 15], "spread": 0},
+        "ring": {"curl": [32, 28, 16], "spread": 8},
+        "pinky": {"curl": [34, 30, 18], "spread": 14}
+      }
+    },
+    "bowling": {
+      "category": "sports",
+      "label_ko": "볼링공 쥐기",
+      "vlm_hint": "중지·약지·엄지를 볼링공 구멍에 넣은 손. 검지·새끼는 공 표면에 편다.",
+      "fingers": {
+        "thumb": {"curl": [8, 0, 0], "spread": -4},
+        "index": {"curl": [22, 20, 10], "spread": 8},
+        "middle": {"curl": [40, 50, 20], "spread": 0},
+        "ring": {"curl": [40, 50, 20], "spread": 0},
+        "pinky": {"curl": [20, 15, 5], "spread": 16}
+      }
+    },
+    "climbing_crimp": {
+      "category": "sports",
+      "label_ko": "클라이밍 크림프",
+      "vlm_hint": "암벽의 작은 홀드를 손끝으로 거는 손. 둘째 마디가 세게 굽고 끝마디는 젖혀진다.",
+      "fingers": {
+        "thumb": {"curl": [30, 30, 20], "spread": -14},
+        "index": {"curl": [10, 95, -10], "spread": 0},
+        "middle": {"curl": [10, 95, -10], "spread": 0},
+        "ring": {"curl": [12, 95, -10], "spread": 0},
+        "pinky": {"curl": [15, 90, -8], "spread": 0}
+      }
+    },
+    "swim_stroke": {
+      "category": "sports",
+      "label_ko": "수영 손",
+      "vlm_hint": "물을 끌어당기는 수영 손. 손가락을 붙이고 살짝 오목하게 만든다.",
+      "fingers": {
+        "thumb": {"curl": [12, 10, 5], "spread": -8},
+        "index": {"curl": [12, 15, 10], "spread": -3},
+        "middle": {"curl": [12, 15, 10], "spread": 0},
+        "ring": {"curl": [14, 16, 10], "spread": -3},
+        "pinky": {"curl": [16, 18, 12], "spread": -5}
+      }
+    },
+    "piano": {
+      "category": "tool",
+      "label_ko": "피아노 치기",
+      "vlm_hint": "건반 위에서 손가락을 둥글게 세운 손.",
+      "fingers": {
+        "thumb": {"curl": [10, 10, 5], "spread": 12},
+        "index": {"curl": [35, 40, 25], "spread": 3},
+        "middle": {"curl": [38, 42, 26], "spread": 0},
+        "ring": {"curl": [38, 42, 26], "spread": 3},
+        "pinky": {"curl": [35, 40, 24], "spread": 6}
+      }
+    },
+    "guitar_chord": {
+      "category": "tool",
+      "label_ko": "기타 코드 잡기",
+      "vlm_hint": "기타 지판에서 코드를 누르는 손. 손가락 끝을 세우고 엄지는 넥 뒤에 있다.",
+      "fingers": {
+        "thumb": {"curl": [20, 10, 0], "spread": -6},
+        "index": {"curl": [40, 55, 40], "spread": 6},
+        "middle": {"curl": [42, 58, 42], "spread": 2},
+        "ring": {"curl": [40, 60, 42], "spread": 4},
+        "pinky": {"curl": [38, 58, 40], "spread": 10}
+      }
+    },
+    "hammer_grip": {
+      "category": "tool",
+      "label_ko": "망치 쥐기",
+      "vlm_hint": "망치·도끼 자루를 단단히 쥔 손.",
+      "fingers": {
+        "thumb": {"curl": [36, 28, 48], "spread": 8},
+        "index": {"curl": [68, 80, 48], "spread": 0},
+        "middle": {"curl": [72, 82, 50], "spread": 0},
+        "ring": {"curl": [75, 84, 52], "spread": 0},
+        "pinky": {"curl": [78, 85, 54], "spread": 0}
+      }
+    },
+    "mic_grip": {
+      "category": "tool",
+      "label_ko": "마이크 쥐기",
+      "vlm_hint": "마이크를 쥔 손. 손가락이 감기고 새끼가 살짝 떨어진다.",
+      "fingers": {
+        "thumb": {"curl": [25, 24, 15], "spread": 0},
+        "index": {"curl": [54, 63, 36], "spread": -1},
+        "middle": {"curl": [58, 64, 40], "spread": 0},
+        "ring": {"curl": [60, 66, 42], "spread": 0},
+        "pinky": {"curl": [40, 45, 28], "spread": 6}
+      }
+    },
+    "typing": {
+      "category": "daily",
+      "label_ko": "타이핑",
+      "vlm_hint": "키보드를 치는 손. 손가락이 고르게 둥글게 굽는다.",
+      "fingers": {
+        "thumb": {"curl": [12, 10, 5], "spread": 8},
+        "index": {"curl": [30, 35, 20], "spread": 3},
+        "middle": {"curl": [32, 36, 20], "spread": 0},
+        "ring": {"curl": [32, 36, 20], "spread": 3},
+        "pinky": {"curl": [30, 34, 18], "spread": 6}
+      }
+    },
+    "press_button": {
+      "category": "daily",
+      "label_ko": "버튼 누르기",
+      "vlm_hint": "검지로 버튼·화면·벨을 누르는 손. 나머지 손가락은 가볍게 만다.",
+      "fingers": {
+        "thumb": {"curl": [25, 25, 15], "spread": -10},
+        "index": {"curl": [10, 15, 10], "spread": 0},
+        "middle": {"curl": [50, 60, 40], "spread": 0},
+        "ring": {"curl": [55, 65, 42], "spread": 0},
+        "pinky": {"curl": [58, 68, 44], "spread": 2}
+      }
+    },
+    "phone_swipe": {
+      "category": "daily",
+      "label_ko": "휴대폰 넘기기",
+      "vlm_hint": "휴대폰을 쥔 채 엄지를 펴서 화면을 넘기는 손.",
+      "fingers": {
+        "thumb": {"curl": [5, 5, 0], "spread": 2},
+        "index": {"curl": [50, 35, 15], "spread": 0},
+        "middle": {"curl": [55, 38, 16], "spread": 0},
+        "ring": {"curl": [60, 40, 18], "spread": 0},
+        "pinky": {"curl": [65, 42, 20], "spread": 2}
+      }
+    },
+    "scratch_head": {
+      "category": "daily",
+      "label_ko": "머리 긁기",
+      "vlm_hint": "머리·뺨을 긁는 손. 손가락 끝마디가 살짝 굽는다.",
+      "fingers": {
+        "thumb": {"curl": [10, 10, 8], "spread": 6},
+        "index": {"curl": [20, 45, 35], "spread": 3},
+        "middle": {"curl": [22, 46, 36], "spread": 0},
+        "ring": {"curl": [24, 46, 36], "spread": 3},
+        "pinky": {"curl": [26, 44, 34], "spread": 6}
+      }
+    },
+    "rest_chin": {
+      "category": "daily",
+      "label_ko": "턱 괴기",
+      "vlm_hint": "턱이나 뺨을 괸 손. 느슨하게 말린 손가락에 얼굴을 기댄다.",
+      "fingers": {
+        "thumb": {"curl": [15, 15, 10], "spread": 4},
+        "index": {"curl": [40, 50, 30], "spread": 0},
+        "middle": {"curl": [44, 52, 32], "spread": 0},
+        "ring": {"curl": [48, 54, 34], "spread": 0},
+        "pinky": {"curl": [52, 56, 36], "spread": 2}
+      }
+    },
+    "tap_table": {
+      "category": "daily",
+      "label_ko": "탁자 두드리기",
+      "vlm_hint": "손가락 끝으로 탁자를 톡톡 두드리는 손.",
+      "fingers": {
+        "thumb": {"curl": [10, 10, 5], "spread": 8},
+        "index": {"curl": [22, 28, 18], "spread": 4},
+        "middle": {"curl": [24, 30, 18], "spread": 0},
+        "ring": {"curl": [26, 30, 18], "spread": 4},
+        "pinky": {"curl": [28, 30, 18], "spread": 8}
+      }
+    },
+    "floor_press": {
+      "category": "daily",
+      "label_ko": "바닥 짚기",
+      "vlm_hint": "손바닥을 바닥·땅에 평평하게 대고 몸을 지탱하는 손. 손가락을 넓게 펴서 바닥에 붙인다. 앉아서 뒤로 짚기·기어가기·넘어져 짚기·팔굽혀펴기.",
+      "fingers": {
+        "thumb": {"curl": [0, 4, 0], "spread": 22},
+        "index": {"curl": [-4, 0, 0], "spread": 10},
+        "middle": {"curl": [-4, 0, 0], "spread": 0},
+        "ring": {"curl": [-3, 0, 0], "spread": 9},
+        "pinky": {"curl": [-2, 2, 0], "spread": 18}
+      }
+    },
+    "count_three": {
+      "category": "gesture",
+      "label_ko": "숫자 셋",
+      "vlm_hint": "검지·중지·약지를 펴고 엄지로 새끼를 누른 손.",
+      "fingers": {
+        "thumb": {"curl": [40, 45, 35], "spread": -22},
+        "index": {"curl": [0, 0, 0], "spread": 8},
+        "middle": {"curl": [0, 0, 0], "spread": 0},
+        "ring": {"curl": [0, 0, 0], "spread": 6},
+        "pinky": {"curl": [90, 95, 60], "spread": 0}
+      }
+    },
+    "count_four": {
+      "category": "gesture",
+      "label_ko": "숫자 넷",
+      "vlm_hint": "엄지만 접고 네 손가락을 편 손.",
+      "fingers": {
+        "thumb": {"curl": [45, 50, 40], "spread": -26},
+        "index": {"curl": [0, 0, 0], "spread": 6},
+        "middle": {"curl": [0, 0, 0], "spread": 0},
+        "ring": {"curl": [0, 0, 0], "spread": 5},
+        "pinky": {"curl": [0, 0, 0], "spread": 10}
+      }
+    },
+    "cross_fingers": {
+      "category": "gesture",
+      "label_ko": "행운 빌기",
+      "vlm_hint": "검지 위로 중지를 꼬아 겹친 손.",
+      "fingers": {
+        "thumb": {"curl": [42, 35, 32], "spread": -20},
+        "index": {"curl": [25, 8, 0], "spread": 5},
+        "middle": {"curl": [-10, 0, 0], "spread": 22},
+        "ring": {"curl": [88, 95, 44], "spread": 0},
+        "pinky": {"curl": [90, 95, 44], "spread": 0}
+      }
+    },
+    "pinky_promise": {
+      "category": "gesture",
+      "label_ko": "새끼손가락 약속",
+      "vlm_hint": "새끼손가락만 펴서 갈고리처럼 건 손. 나머지는 말아 쥔다.",
+      "fingers": {
+        "thumb": {"curl": [18, 49, 48], "spread": 4},
+        "index": {"curl": [82, 95, 49], "spread": 0},
+        "middle": {"curl": [86, 95, 49], "spread": 0},
+        "ring": {"curl": [88, 95, 49], "spread": 0},
+        "pinky": {"curl": [5, 30, 20], "spread": 8}
+      }
+    },
+    "gun_finger": {
+      "category": "gesture",
+      "label_ko": "손가락 총",
+      "vlm_hint": "엄지를 세우고 검지를 편 손가락 총.",
+      "fingers": {
+        "thumb": {"curl": [0, 0, 0], "spread": 20},
+        "index": {"curl": [0, 0, 0], "spread": 0},
+        "middle": {"curl": [86, 95, 60], "spread": 0},
+        "ring": {"curl": [88, 95, 60], "spread": 0},
+        "pinky": {"curl": [90, 95, 60], "spread": 0}
+      }
+    },
+    "snap": {
+      "category": "gesture",
+      "label_ko": "손가락 튕기기",
+      "vlm_hint": "엄지와 중지를 맞대고 딱 소리를 내기 직전의 손.",
+      "fingers": {
+        "thumb": {"curl": [48, 11, 6], "spread": -9},
+        "index": {"curl": [25, 30, 20], "spread": 4},
+        "middle": {"curl": [44, 51, 40], "spread": 0},
+        "ring": {"curl": [60, 70, 40], "spread": 0},
+        "pinky": {"curl": [64, 74, 44], "spread": 2}
+      }
+    },
+    "wave": {
+      "category": "gesture",
+      "label_ko": "손 흔들기",
+      "vlm_hint": "손을 흔들어 인사하는 손. 손가락이 펴지고 살짝 벌어진다.",
+      "fingers": {
+        "thumb": {"curl": [5, 5, 0], "spread": 12},
+        "index": {"curl": [5, 6, 0], "spread": 6},
+        "middle": {"curl": [5, 6, 0], "spread": 0},
+        "ring": {"curl": [6, 8, 0], "spread": 5},
+        "pinky": {"curl": [8, 10, 0], "spread": 10}
+      }
+    },
+    "tremble_fist": {
+      "category": "emotion",
+      "label_ko": "부들부들 주먹",
+      "vlm_hint": "분노·참음으로 하얗게 질릴 만큼 꽉 쥔 주먹. 엄지가 깊이 감긴다.",
+      "fingers": {
+        "thumb": {"curl": [12, 63, 24], "spread": 4},
+        "index": {"curl": [84, 95, 49], "spread": 0},
+        "middle": {"curl": [88, 95, 49], "spread": 0},
+        "ring": {"curl": [89, 95, 49], "spread": 0},
+        "pinky": {"curl": [90, 95, 49], "spread": 0}
+      }
+    },
+    "clutch_chest": {
+      "category": "emotion",
+      "label_ko": "가슴 움켜쥐기",
+      "vlm_hint": "가슴·옷자락을 움켜쥔 손. 아픔·충격·설렘.",
+      "fingers": {
+        "thumb": {"curl": [45, 15, 10], "spread": 3},
+        "index": {"curl": [40, 50, 35], "spread": 2},
+        "middle": {"curl": [42, 52, 36], "spread": 0},
+        "ring": {"curl": [44, 54, 38], "spread": 2},
+        "pinky": {"curl": [46, 56, 40], "spread": 4}
+      }
+    },
+    "cover_face": {
+      "category": "emotion",
+      "label_ko": "얼굴 가리기",
+      "vlm_hint": "얼굴·눈을 가린 손. 손가락이 붙어 살짝 오목하다.",
+      "fingers": {
+        "thumb": {"curl": [10, 10, 5], "spread": -4},
+        "index": {"curl": [10, 15, 10], "spread": -2},
+        "middle": {"curl": [10, 15, 10], "spread": 0},
+        "ring": {"curl": [12, 16, 10], "spread": -2},
+        "pinky": {"curl": [14, 18, 12], "spread": -4}
+      }
+    },
+    "pray": {
+      "category": "emotion",
+      "label_ko": "기도하는 손",
+      "vlm_hint": "두 손을 모아 기도하는 손. 손가락을 붙여 곧게 편다.",
+      "fingers": {
+        "thumb": {"curl": [15, 10, 0], "spread": -12},
+        "index": {"curl": [3, 3, 0], "spread": -1},
+        "middle": {"curl": [3, 3, 0], "spread": 0},
+        "ring": {"curl": [4, 4, 0], "spread": -1},
+        "pinky": {"curl": [5, 5, 0], "spread": -3}
+      }
+    },
+    "reach_out": {
+      "category": "emotion",
+      "label_ko": "손 뻗기",
+      "vlm_hint": "누군가를 붙잡으려 뻗은 손. 손가락이 벌어지고 살짝 굽는다.",
+      "fingers": {
+        "thumb": {"curl": [10, 10, 5], "spread": 16},
+        "index": {"curl": [12, 15, 10], "spread": 8},
+        "middle": {"curl": [14, 16, 10], "spread": 0},
+        "ring": {"curl": [16, 18, 12], "spread": 7},
+        "pinky": {"curl": [18, 20, 12], "spread": 14}
+      }
+    },
+    "spell_cast": {
+      "category": "action",
+      "label_ko": "마법 시전",
+      "vlm_hint": "기를 모으거나 마법을 쓰는 손. 손가락을 벌리고 반쯤 굽힌다.",
+      "fingers": {
+        "thumb": {"curl": [15, 20, 15], "spread": 18},
+        "index": {"curl": [15, 40, 30], "spread": 14},
+        "middle": {"curl": [15, 40, 30], "spread": 0},
+        "ring": {"curl": [18, 42, 30], "spread": 12},
+        "pinky": {"curl": [20, 40, 28], "spread": 20}
+      }
+    },
+    "catch_ready": {
+      "category": "action",
+      "label_ko": "받을 준비",
+      "vlm_hint": "날아오는 것을 받으려고 벌린 손.",
+      "fingers": {
+        "thumb": {"curl": [12, 15, 10], "spread": 16},
+        "index": {"curl": [15, 20, 15], "spread": 10},
+        "middle": {"curl": [16, 22, 15], "spread": 0},
+        "ring": {"curl": [18, 24, 16], "spread": 9},
+        "pinky": {"curl": [20, 24, 16], "spread": 16}
+      }
+    },
+    "pull_hook": {
+      "category": "action",
+      "label_ko": "끌어당기기",
+      "vlm_hint": "밧줄·옷깃을 끌어당기는 손. 손가락이 갈고리처럼 걸린다.",
+      "fingers": {
+        "thumb": {"curl": [35, 23, 54], "spread": 3},
+        "index": {"curl": [35, 80, 50], "spread": 0},
+        "middle": {"curl": [36, 82, 52], "spread": 0},
+        "ring": {"curl": [38, 82, 52], "spread": 0},
+        "pinky": {"curl": [40, 80, 50], "spread": 2}
+      }
+    },
+    "push": {
+      "category": "action",
+      "label_ko": "밀치기",
+      "vlm_hint": "상대나 문을 손바닥으로 밀치는 손. 손가락이 펴지고 살짝 벌어진다.",
+      "fingers": {
+        "thumb": {"curl": [0, 5, 0], "spread": 16},
+        "index": {"curl": [-4, 4, 0], "spread": 6},
+        "middle": {"curl": [-4, 4, 0], "spread": 0},
+        "ring": {"curl": [-3, 5, 0], "spread": 6},
+        "pinky": {"curl": [-2, 6, 0], "spread": 12}
+      }
+    },
+    "fingertip_floor": {
+      "category": "action",
+      "label_ko": "손끝 짚기",
+      "vlm_hint": "손바닥을 띄우고 손가락 끝만 바닥에 댄 손. 손가락이 둥글게 서고 엄지는 아래를 향한다. 착지 자세·달리기 출발·웅크려 앉기.",
+      "fingers": {
+        "thumb": {"curl": [18, 10, 0], "spread": 16},
+        "index": {"curl": [32, 22, 0], "spread": 6},
+        "middle": {"curl": [34, 22, 0], "spread": 0},
+        "ring": {"curl": [34, 24, 0], "spread": 6},
+        "pinky": {"curl": [32, 24, 0], "spread": 12}
+      }
+    },
+    "cough_fist": {
+      "category": "daily",
+      "label_ko": "기침 주먹",
+      "vlm_hint": "기침·헛기침할 때 입 앞에 대는 느슨한 주먹. 손가락이 둥글게 말려 입을 가리고 엄지는 검지 옆에 붙는다.",
+      "fingers": {
+        "thumb": {"curl": [20, 15, 10], "spread": -6},
+        "index": {"curl": [55, 70, 45], "spread": 0},
+        "middle": {"curl": [58, 72, 46], "spread": 0},
+        "ring": {"curl": [60, 72, 46], "spread": 0},
+        "pinky": {"curl": [62, 70, 44], "spread": 2}
+      }
+    },
+    "cover_mouth": {
+      "category": "daily",
+      "label_ko": "입 가리기",
+      "vlm_hint": "기침·하품·웃음·놀람으로 입을 손바닥으로 가린 손. 손가락을 붙여 오목하게 감싼다.",
+      "fingers": {
+        "thumb": {"curl": [10, 8, 5], "spread": -6},
+        "index": {"curl": [18, 22, 14], "spread": -2},
+        "middle": {"curl": [20, 24, 15], "spread": 0},
+        "ring": {"curl": [22, 25, 15], "spread": -2},
+        "pinky": {"curl": [24, 26, 16], "spread": -4}
+      }
+    }
+  }
+}

@@ -599,3 +599,17 @@ Converter `/healthz`의 `preview_model_revision`과 `character_hashes`로 지원
 캐시 세대를 확인한다. exact V3.2.4 모드에서는 모델 capability가 꺼진다.
 모델 export용 모듈은 기존 `posed-mesh-v1` exporter와 분리하여 기존 사전 생성
 라이브러리의 키를 무효화하지 않는다. 배포 순서는 Converter/추론 → BFF → 앱이다.
+
+## 손 모양·손 후보 (04J-290, 2026-10-14)
+
+> refine 화면·BFF 저장/중계·오류 규칙까지 포함한 전체 설계: [`HAND_SELECTION_DESIGN.md`](HAND_SELECTION_DESIGN.md)
+
+`POST /analyze`의 `people[].hands`에 인물별 좌/우 손 자동 선택과 후보가 실린다
+(`VLM_HAND_SHAPES=1`일 때 VLM 별도 호출로 채움, 꺼져 있으면 `status=not_requested`와 기본값).
+`left`/`right`는 그 인물 자신의 손이다. 각 손: `preset`(자동으로 구울 값), `source`(`vlm`|`default`),
+`confidence`(`high`|`low`|null), `visible`, `candidates`(최대 4개, 앞이 유력).
+검색·refine에는 쓰지 않는다.
+
+FBX에 손을 구우려면 converter `POST /convert`·`/convert-bundle`·`/convert-framed`에 form 필드
+`hand_left`, `hand_right`(프리셋 id)를 보낸다. 보내지 않으면 기존과 바이트 단위로 같은 FBX다.
+프리셋 목록·불변식·제약: `docs/HAND_LIBRARY.md`.
