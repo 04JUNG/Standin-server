@@ -31,7 +31,9 @@ def attributes(build='regular'):
 def person_payload(person_id, build='regular'):
     return dict(person_id=person_id, attributes={k: dict(value=v, visibility='visible', evidence='fixture')
                 for k, v in attributes(build).items()}, clothing_occlusion=False,
-                foreshortening=False, ownership_ambiguous=False)
+                foreshortening=False, ownership_ambiguous=False,
+                coverage={r:'visible' for r in ('head','torso','arms','legs')}, full_body_visible=True,
+                representation={r:'outline' for r in ('head','torso','arms','legs')}, surface_detail='drawn')
 
 
 class FixtureClient:
@@ -83,7 +85,6 @@ class BodyMatchingFixture(unittest.TestCase):
         return BodyMatchingService(self.path,client=client or FixtureClient()).analyze(self.image,result or cut(),**kwargs)
 
 
-
 class BodyMatchingTests(BodyMatchingFixture):
     def test_visual_selection_and_pose_preservation(self):
         result=cut();before=dumps(result)
@@ -101,7 +102,8 @@ class BodyMatchingTests(BodyMatchingFixture):
         p=out['people'][0]
         self.assertTrue(out['is_mock'])
         self.assertEqual(p['selection_source'],'auto_default')
-        self.assertEqual(p['applied_body_id'],'regular')
+        self.assertIsNone(p['applied_body_id'])
+        self.assertEqual(p['suggested_body_id'],'regular')
         self.assertEqual(p['candidates'],[])
 
     def test_unknown_zero_and_occlusion(self):
@@ -109,9 +111,11 @@ class BodyMatchingTests(BodyMatchingFixture):
         p=parse_response({'people':[raw]},['p'])['p']
         self.assertEqual(p['attributes']['soft_volume']['value'],0)
         raw['clothing_occlusion']=True
+        raw['coverage']={r:'unknown' for r in ('head','torso','arms','legs')}
+        raw['coverage']['head']='visible'
         p=parse_response({'people':[raw]},['p'])['p']
         self.assertIsNone(p['attributes']['soft_volume']['value'])
-        self.assertEqual(p['attributes']['head_ratio_class']['value'],'h7')
+        self.assertIsNone(p['attributes']['head_ratio_class']['value'])
 
     def test_invalid_vlm_values_ids_missing_duplicate(self):
         raw=person_payload('p')
@@ -138,7 +142,7 @@ class BodyMatchingTests(BodyMatchingFixture):
             client=FixtureClient()
             with patch.object(client,'analyze',side_effect=error):
                 p=self.run_service(client)['people'][0]
-                self.assertEqual(p['applied_body_id'],'regular')
+                self.assertIsNone(p['applied_body_id'])
                 self.assertEqual(p['diagnostic'],'provider_error')
                 self.assertEqual(len(p['pose_bindings']),5)
         client=FixtureClient()
@@ -167,7 +171,7 @@ class BodyMatchingTests(BodyMatchingFixture):
         service=BodyMatchingService(self.path,client=client,max_people=1)
         out=service.analyze(self.image,cut(2))
         self.assertEqual(out['people'][0]['applied_body_id'],'muscular')
-        self.assertEqual(out['people'][1]['applied_body_id'],'regular')
+        self.assertIsNone(out['people'][1]['applied_body_id'])
 
     def test_qa_hash_pose_support_and_drafts(self):
         (self.root/'muscular.fbx').write_bytes(b'changed')
@@ -199,13 +203,19 @@ class BodyMatchingTests(BodyMatchingFixture):
                 target_asset_sha256=asset['asset_sha256'],rig_version=asset['rig_version'],
                 geometry_version=GEOMETRY_VERSION,ratios={k:v*(1 if asset['body_id']=='slim' else 2) for k,v in ratios.items()})]
         self.write()
-        service=BodyMatchingService(self.path)
+        client=FixtureClient()
+        def geometry_only(crops):
+            people={key:person_payload(key) for key,_ in crops}
+            for person in people.values(): person['attributes']=unknown_attributes()
+            return people
+        client.analyze=geometry_only
+        service=BodyMatchingService(self.path,client=client)
         out=service.analyze(self.image,result)
         self.assertEqual(out['people'][0]['applied_body_id'],'slim')
         self.assertEqual(len(out['people'][0]['geometry_hypotheses']),1)
         posefile.write_text('new pose version')
         p=service.analyze(self.image,result)['people'][0]
-        self.assertEqual(p['applied_body_id'],'regular')
+        self.assertIsNone(p['applied_body_id'])
         self.assertIn('target_projection_missing_geometry_not_scored',p['reason_codes'])
 
     def test_missing_projection_cannot_advantage_candidate(self):
@@ -280,8 +290,8 @@ class BodyMatchingTests(BodyMatchingFixture):
         from types import SimpleNamespace
         with patch.dict(app.STATE,{'pipeline':SimpleNamespace(process_cut=lambda *a,**k: fixture)}):
             out=app.analyze(UploadFile(filename='rough.png',file=stream),hint='',rescue='')
-        # HTTP compatibility is the serialized JSON; the response model is now typed.
-        self.assertEqual(out.model_dump(mode='json')['body_matching']['people'][0]['applied_body_id'],'muscular')
+        body=out.body_matching.model_dump() if hasattr(out.body_matching,'model_dump') else out.body_matching
+        self.assertEqual(body['people'][0]['applied_body_id'],'muscular')
         self.assertEqual([c.pose_id for c in out.people[0].candidates],['pose-'+str(i) for i in range(5)])
 
     def test_catalog_cli_and_projection_import(self):

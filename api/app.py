@@ -56,6 +56,7 @@ from src.library_source import ensure_library
 from src.pose_model_source import PoseModelFetchError, ensure_pose_model
 from src.refine import (REFINE_CODE_VERSION, REFINE_V2_CODE_VERSION,
                         refine_bvh)
+from src.experimental.body_matching.integrated import VERSION as INTEGRATED_BODY_VERSION
 from src.refine_policy import structural_refine_allowed
 from src.refine_projection import ProjectionDomainError, VERSION as REFINE_PROJECTION_VERSION
 from src.pose_catalog import build_catalog, folders as pose_catalog_folders, page as pose_catalog_page
@@ -83,6 +84,7 @@ from api.models import (CutResultOut, PersonOut, CandidateOut, SkeletonOut,
                         RefineRequest, RefineResponse, RefineThumbnailOut,
                         ExportOrderRequest, ExportOrder, ExportItem)
 from api.candidate_presentation import candidate_camera, refine_in_camera
+from api.pose_presentation import PreviewAssetOut, build_pose_presentation
 
 # uvicorn이 자기 로깅을 세운 뒤 이 모듈을 import한다. 여기서 덮어써야 로그가
 # JSON 한 종류로 남는다(그대로 두면 uvicorn 형식과 우리 형식이 섞인다).
@@ -285,7 +287,7 @@ async def lifespan(app: FastAPI):
     alerts.flush()
 
 
-app = FastAPI(title="Standin Pose Pipeline", version="0.2.1", lifespan=lifespan)
+app = FastAPI(title="Standin Pose Pipeline", version="0.2.2", lifespan=lifespan)
 
 
 def _refine_capability() -> dict:
@@ -436,6 +438,9 @@ def healthz():
             "camera_pose_count": len(getattr(camera, 'pose_ids', [])),
             "semantic_backend": getattr(getattr(engine, 'semantic', None), 'backend', None),
             "hand_skin_screen_required": getattr(engine, 'hand_skin_gate', None) is not None,
+            "ranking": getattr(engine, 'ranking', None),
+            "semantic_weight": getattr(engine, 'semantic_weight', None),
+            "geometry_weight": getattr(engine, 'geometry_weight', None),
         },
         "refine": capability,
         "refine_thumbnail": {
@@ -543,11 +548,53 @@ def _routing_fields(res, index: int) -> dict:
         return {}
     semantic = getattr(res, "person_semantic_candidates", None) or []
     hits = semantic[index] if index < len(semantic) and semantic[index] else []
+    report = routes[index].get("fullbody_search")
+    presentation = None
+    if report is not None:
+        from src.body_scope import mesh_scope
+        descriptor = res.descriptors[index]
+        presentation = build_pose_presentation(report,
+            person_index=index,
+            output_scope=mesh_scope(descriptor.output_scope.detected),
+            resolve_library=_library_preview_asset)
+        log_info("pose_presentation", status=presentation.status,
+            searchStatus=presentation.search_status,
+            libraryCount=len(presentation.library_candidates),
+            reviewCount=len(presentation.review_candidates),
+            generatedCount=len(presentation.generated_candidates),
+            issues=",".join(presentation.issues) or None)
     return {
         "search_routing": routes[index],
-        "dynamic_search": routes[index].get("fullbody_search"),
+        "dynamic_search": report,
+        "pose_presentation": presentation,
         "semantic_candidates": [SemanticCandidateOut(**hit) for hit in hits],
     }
+
+
+def _library_preview_asset(pose_id: str):
+    """Same lookup/quarantine policy as download; bind viewer bytes, not export."""
+    from pathlib import Path
+    from urllib.parse import quote
+    import sqlite3
+    try:
+        response = get_pose_bvh(pose_id)
+        with Path(response.path).open("rb") as stream:
+            data = stream.read(8_000_001)
+        if not data or len(data) > 8_000_000:
+            raise ValueError("preview_asset_size")
+        # The search index and registry must refer to the same BVH bytes.
+        engine = getattr(STATE.get("pipeline"), "_fullbody_search", None)
+        expected = getattr(getattr(engine, "camera", None), "hashes", {}).get(pose_id)
+        digest = hashlib.sha256(data).hexdigest()
+        if expected is not None and expected != digest:
+            raise ValueError("preview_asset_changed")
+        thumb = thumbnail_url(CFG.data_dir, pose_id, "front")
+        return PreviewAssetOut(transport="library_bvh",
+            bvh_url=f"/pose/{quote(pose_id, safe='')}/bvh", bvh_sha256=digest,
+            library_lookup_supported=True, thumbnail_url=thumb,
+            thumbnail_view="front" if thumb else None)
+    except (HTTPException, KeyError, sqlite3.Error) as exc:
+        raise ValueError("preview_asset_unavailable") from exc
 
 
 @app.post("/analyze", response_model=CutResultOut)
@@ -651,6 +698,7 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
             vlm_provider=STATE.get("provider", CFG.vlm_provider),
             vlm_model=vlm_model,
             vlm_prompt_version=CFG.vlm_prompt_version,
+            vlm_body_prompt_version=(INTEGRATED_BODY_VERSION if CFG.body_matching_mode != "off" and CFG.body_classification_strategy == "integrated" else None),
             pose_backend=STATE.get("pose_backend", CFG.pose_backend),
             pose_model_version=_pose_model_version(),
             pose_library_version=CFG.pose_library_version,

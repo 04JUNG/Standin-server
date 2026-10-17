@@ -52,7 +52,7 @@
         }
       ],
       "observations": {
-        "schema_version": "body-observation.v3.presentation",
+        "schema_version": "body-observation.v5.regional-evidence",
         "person_id": "869d654dd4b086e6ef4b1c3b079a7e4d1c118c33016a66007b7e57b5b4b98807:p0",
         "attributes": {
           "head_ratio_class": {
@@ -111,9 +111,22 @@
         ],
         "provider_error": null,
         "reason_codes": [],
-        "coverage": null,
-        "full_body_visible": null,
-        "presentation": null
+        "coverage": {
+          "head": "visible",
+          "torso": "visible",
+          "arms": "visible",
+          "legs": "visible"
+        },
+        "full_body_visible": true,
+        "presentation": null,
+        "representation": {
+          "head": "outline",
+          "torso": "outline",
+          "arms": "outline",
+          "legs": "outline"
+        },
+        "surface_detail": "drawn",
+        "evidence_regions": null
       },
       "pose_bindings": [
         {
@@ -157,7 +170,38 @@
       "tied_body_ids": [
         "muscular"
       ],
-      "scorer_version": "body-score.v2.presentation-gate.uncalibrated",
+      "decision": "auto_apply",
+      "policy_version": "body-apply.structural-evidence.v2",
+      "application_policy": {
+        "version": "body-apply.structural-evidence.v2",
+        "allowed": true,
+        "strong_axes": [
+          "head_ratio_class",
+          "body_build",
+          "frame_width",
+          "limb_proportion",
+          "muscularity_visual",
+          "soft_volume",
+          "volume_distribution"
+        ],
+        "evidence_groups": [
+          "body_contour",
+          "head_proportion",
+          "limb_proportion"
+        ],
+        "reason_codes": [],
+        "calibrated": false,
+        "acceptance_probability": null
+      },
+      "suggested_body_id": "muscular",
+      "suggested_asset": {
+        "body_id": "muscular",
+        "body_version": "v1",
+        "asset_sha256": "2c7fcfa711c033e852bad2a4253e5546fdf16ded6ae8411dc514951809902ded",
+        "rig_version": "fixture",
+        "measurement_version": "fixture.v1"
+      },
+      "scorer_version": "body-score.v4.regional-gate.uncalibrated",
       "calibrator_version": null,
       "geometry_hypotheses": [],
       "evidence_axes": [
@@ -175,7 +219,7 @@
   "input_sha256": "869d654dd4b086e6ef4b1c3b079a7e4d1c118c33016a66007b7e57b5b4b98807",
   "catalog_version": "test.v1",
   "catalog_sha256": "f8b65d3df7bd2e9c5d16b898675b13b5be836f1fc6b7632e8ef03cb02d23509b",
-  "prompt_version": "body-attributes.v3.presentation",
+  "prompt_version": "body-attributes.v5.regional-evidence",
   "provider_requested": "mock",
   "provider_actual": "recorded_test",
   "model": "fixture.v1",

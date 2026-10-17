@@ -72,11 +72,12 @@ API `search_routing.skeleton_repair`에 호출 여부·수정·실패 기록이 
 기하 검색과 자연어 검색이 각각 최대 40개 원본 후보를 제안한다. 같은 포즈가 양쪽에서
 선택되면 점수를 합친다. 거리와 문장 점수는 단위가 다르므로 원시값을 더하지 않는다.
 
-`rank_score = 0.65 / (60 + 기하 순위) + 0.35 / (60 + 자연어 순위)`
+`rank_score = 0.40 / (60 + 기하 순위) + 0.60 / (60 + 자연어 순위)`
 
-로컬 가중치 실험은 `FullBodySearch(..., semantic_weight=0.6)`으로 자연어 0.60,
-기하 0.40을 비교할 수 있다. 인자는 0과 1 사이의 유한값만 허용한다.
-API 팩토리 기본값은 여전히 0.35이며, `ranking` 필드는 실제 적용 가중치를 기록한다.
+2026-10-17 사용자 요청으로 API 팩토리는 자연어 0.60·기하 0.40을 명시하며,
+로컬 비교 실험도 `FullBodySearch(..., semantic_weight=0.6)`으로 재현한다.
+인자는 0과 1 사이의 유한값만 허용한다. 과거 비교용 직접 생성자의 기본값 0.35는 유지한다.
+`ranking`과 `/healthz.dynamic_routing`은 초기화된 엔진의 실제 적용 가중치를 기록한다.
 같은 저장 후보 목록으로 순위만 재계산하면 추출·검색 변동 없이 가중치 효과를 분리한다.
 
 구조화된 물건 관찰이 있는 경우 `pose_query.py`가 물건·잡는 동작·손 개수·위치를
@@ -135,6 +136,13 @@ curl -X POST http://127.0.0.1:8000/analyze -F 'file=@rough.png'
 
 새 경로의 단일 결과 목록은 **`people[i].dynamic_search.selected`**다.
 구형 `candidates`와 `semantic_candidates`는 빈 목록으로 두므로 UI가 임의로 합치면 안 된다.
+
+2026-10-17: BFF·앱은 추가된 **`people[i].pose_presentation`**을 표시용으로 사용할 수 있다.
+원문 `dynamic_search`는 유지하며, 표시용 투영은 원본 검색/기하·근접 참고/생성 검수 목록과
+라이브러리 BVH 상대 경로 또는 생성 BVH 본문·SHA-256·카메라·출력 범위를 제공한다.
+단순히 legacy `candidates=[]`라는 이유로 검색 실패를 표시하지 않는다. 파일 오류·검색 오류·
+생성 실패를 구분하며 모든 자동 적용·refine·export 제한은 유지한다. BFF·앱 연결은 별도 작업이다.
+전체 계약과 팀원 완료 기준은 `API_CONTRACT.md`의 `dynamic-pose-presentation-v1`을 따른다.
 
 | 필드 | 의미 |
 | --- | --- |
@@ -252,6 +260,23 @@ Human-Art manifest의 모델·런타임·라이선스·calibration 검증을 그
 라이브러리·S3·서비스에 자동 등록하지 않는다.
 
 ## 검증과 남은 작업
+
+### 2026-10-18 손 피부 검사 브랜치 통합
+
+최신 develop의 자연어 0.6/기하 0.4, `pose_presentation` 표시 계약,
+체형 굽기와 손모양 굽기를 보존하면서 #97의 실제 반대 손 피부 검사를 합친다.
+체형 변환 → 손모양 굽기 → 최종 FBX 피부 검사 순서이며, 새 기하 참고 후보도
+검사를 우회하지 않는다. 참고 후보의 `constraints_satisfied=false`와 자동 적용·
+refine·export 금지는 그대로다. 검사 불가를 정상 빈 검색이나 생성 성공으로 바꾸지 않는다.
+설정은 기존 `thumbnail_converter_url`/`thumbnail_character_id`를 읽는다.
+
+이 단계는 검사·제외 연결이다. 손 간격 자동 보정은 별도 변경이며 아직 포함하지 않는다.
+병합·배포 전에는 변환기의 `/screen-hand-contact`를 먼저 제공해야 한다.
+로컬 통합 검증: 서버 1,812 passed/9 skipped(28 subtests), 변환기 계약
+338 passed/1 skipped. 실제 Blender HTTP 검사에서 기존 양손 휴대폰 포즈는
+교차 87건, 과거 2cm 보정본은 0건, 같은 보정본에 relaxed 양손을 적용하면
+50건이었다. 따라서 BVH·인체·손모양이 바뀌면 기존 검사 결과를 재사용할 수 없다.
+이는 Linux 배포 성공이나 전체 러프 품질 동등성을 입증하는 결과가 아니다.
 
 ### develop 손 모양·다인 장면 기능과의 통합 (2026-10-17)
 

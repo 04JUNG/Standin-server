@@ -144,3 +144,48 @@ def test_new_fields_survive_public_api_serialization(tmp_path):
     result = DynamicSearchOut(**e.search(decision(), evidence())).model_dump()
     assert result['hand_skin_screen']['checks'] > 0
     assert result['selected'][0]['hand_skin_screen']['status'] == 'clear_screen'
+
+
+@pytest.mark.parametrize('status', ['clear_screen', 'intersection', 'unavailable'])
+def test_geometry_review_fallback_cannot_bypass_skin_gate(tmp_path, status):
+    from tests.test_integrated_recovery import constrained_scene
+    from api.models import DynamicSearchOut
+    e, d, ev, _ = constrained_scene()
+    e.generator = None
+    e.hand_skin_gate = gate(tmp_path, [status], ids=('a',))
+    result = e.search(d, ev, review_geometry=True)
+    assert len(e.hand_skin_gate.client.calls) == 1
+    wire = DynamicSearchOut.model_validate(result).model_dump()
+    if status == 'clear_screen':
+        [row] = wire['selected']
+        assert row['hand_skin_screen']['status'] == 'clear_screen'
+        assert row['match_level'] == 'geometry_fallback'
+        assert row['review_required'] and row['not_exact_match']
+        assert row['constraints_satisfied'] is False
+        assert not row['release_allowed'] and not row['refine_allowed']
+    else:
+        assert not wire['selected']
+        assert wire['status'] == ('error' if status == 'unavailable' else 'no_result')
+
+
+def test_generated_screen_error_is_not_hidden_by_geometry_fallback(tmp_path, monkeypatch):
+    from tests.test_integrated_recovery import constrained_scene
+    import src.pose_requirements as conditions
+    monkeypatch.setattr(conditions, 'audit_generated', lambda *a: {'status': 'passed'})
+    e, d, ev, _ = constrained_scene()
+    e.hand_skin_gate = gate(tmp_path, ['unavailable'], ids=('a',))
+    result = e.search(d, ev, review_geometry=True)
+    assert result['status'] == 'error' and not result['selected']
+    assert 'geometry_review_fallback' not in result
+
+
+def test_factory_reads_real_config_attribute_names(monkeypatch, tmp_path):
+    from types import SimpleNamespace
+    from src.config import CFG
+    from src.hand_skin_screen import build_hand_skin_gate
+    monkeypatch.setattr(CFG, 'thumbnail_character_id', 'standin-master-v2')
+    monkeypatch.setattr(CFG, 'thumbnail_converter_url', 'http://converter')
+    result = build_hand_skin_gate(SimpleNamespace(hashes={}), tmp_path)
+    assert result.client.character_id == 'standin-master-v2'
+    assert result.client.base_url == 'http://converter'
+    assert len(result.client.character_sha256) == 64

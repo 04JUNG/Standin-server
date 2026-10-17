@@ -19,6 +19,7 @@ from .search_routing import PoseDescription
 from .semantic_search import SemanticQuery
 
 VERSION = 'fullbody-dynamic-v1'
+API_SEMANTIC_WEIGHT = .6
 
 
 class FullBodySearch:
@@ -202,7 +203,7 @@ class FullBodySearch:
             out[pid]=fit
         return out
 
-    def search(self, decision, evidence, *, generation_block=False):
+    def search(self, decision, evidence, *, generation_block=False, review_geometry=False):
         start = perf_counter()
         out = dict(version=VERSION, route='undetermined', status='not_run', selected=[],near_candidates=[],
             branches={}, generation=None, composition_enabled=False, split_search_enabled=False,
@@ -332,6 +333,40 @@ class FullBodySearch:
                     out['generation'].update(status='rejected', reason='generated_hand_skin_screen_not_clear')
                 if skin_session.unverified:
                     return finish('error', 'generated_hand_skin_screen_unavailable')
+        # Keep qualified selection and generation unchanged. When optional
+        # integrated recovery is enabled, expose bounded geometry references as
+        # review-only choices rather than turning text overconstraints into an
+        # empty pose gallery. Never relabel them as qualified core matches.
+        if review_geometry and sufficient:
+            retained = dict(active=bool(required and required.get('posture')),
+                            posture=required.get('posture') if required else None,
+                            arms={}, body_states={}, hand_counts={})
+            fallback = self.geometry_search(evidence, retained)
+            for hit in fallback.get('hits', []):
+                if hit.get('whole_pose_validation'):
+                    hit['whole_pose_validation'] = {**hit['whole_pose_validation'], 'condition_scope': 'retained_posture_only'}
+            out['geometry_review_fallback'] = dict(
+                status=fallback['status'], reason=fallback.get('reason'),
+                qualified_count=0, constraints_satisfied=False,
+                original_requirements=required, retained_hard_conditions=retained, cutoff=fallback.get('cutoff'))
+            if fallback['status'] == 'ok':
+                rows = self._fuse({'geometry': fallback}, limit=self.pool_k)
+                for row in rows:
+                    row.update(match_level='geometry_fallback', review_required=True,
+                               not_exact_match=True, constraints_satisfied=False)
+                    if self.validator and required and required['active']:
+                        row['core_conditions'] = dict(whole_pose_validation=
+                            self.validator.check(required, row['pose_id']))
+                if skin_session:
+                    rows = skin_session.filter(rows, limit=self.top_k)
+                    out['hand_skin_screen'] = skin_session.report()
+                    if skin_session.unverified:
+                        out['selected'] = rows
+                        return finish('partial_error' if rows else 'error',
+                                      'geometry_review_hand_skin_screen_unavailable')
+                out['selected'] = rows[:self.top_k]
+                if rows:
+                    return finish('ok', 'geometry_review_fallback_not_qualified')
         return finish('no_result', 'successful_empty_search_generation_separate')
 
 
@@ -396,6 +431,7 @@ def _build_fullbody_resources(entries, *, db_path):
             model=os.getenv('POSE_GENERATION_MODEL', 'gemini-3.8-flash'),
             review_dir=os.getenv('POSE_GENERATION_REVIEW_DIR', 'tmp/generated-pose-review'))
     engine = FullBodySearch(entries, semantic, camera, generator=generator,
+        semantic_weight=API_SEMANTIC_WEIGHT,
         include_stored_compositions=include_stored,
         geometry_max_distance=float(os.getenv('ROUTING_GEOMETRY_MAX_DISTANCE', '1.0')),
         geometry_upper_max_distance=float(os.getenv('ROUTING_GEOMETRY_UPPER_MAX_DISTANCE', '1.5')))

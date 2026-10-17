@@ -95,6 +95,36 @@ def test_higher_semantic_weight_changes_fusion_only():
     assert text_only['selected'][0]['rank_score']==pytest.approx(1/61)
 
 
+def test_api_resource_factory_uses_semantic_point_six(monkeypatch, tmp_path):
+    import src.fullbody_routing as module
+    import src.pose_humanart as pose_module
+    import src.semantic_adapter_285 as semantic_module
+    import src.hand_skin_screen as skin_module
+    from tests.test_hand_skin_gate import gate
+    skin_gate = gate(tmp_path)
+    monkeypatch.setattr(skin_module, 'build_hand_skin_gate', lambda *a: skin_gate)
+    camera = Camera(('a',)); camera.errors = {}
+    semantic = Semantic(('c',)); semantic.service = object()
+    monkeypatch.setattr(CFG, 'pose_backend', 'rtmlib')
+    monkeypatch.setattr(CFG, 'pose_model_variant', 'humanart-m')
+    monkeypatch.setattr(CFG, 'data_dir', str(tmp_path))
+    for name in ('POSE_CALIBRATION_FROM_MANIFEST', 'ROUTING_PREPARE_ASSETS', 'POSE_GENERATION_ENABLED'):
+        monkeypatch.setenv(name, '0')
+    monkeypatch.setattr(pose_module, 'HumanArtPoseModel', lambda **kwargs: object())
+    monkeypatch.setattr(semantic_module, 'build_semantic285_searcher', lambda **kwargs: semantic)
+    monkeypatch.setattr(module.CameraIndex, 'from_library', lambda *args, **kwargs: camera)
+    entries = [SimpleNamespace(pose_id=p, meta={}) for p in ('a','b','c')]
+    _, _, actual = module._build_fullbody_resources(entries, db_path=str(tmp_path/'poses.db'))
+    assert actual.semantic_weight == .6 and actual.geometry_weight == .4
+    out = actual.search(decision(), evidence())
+    assert out['ranking'] == 'weighted_rrf_k60_geometry_0.4_semantic_0.6'
+    assert out['selected'][0]['pose_id'] == 'c'
+    assert out['selected'][0]['rank_score'] == pytest.approx(.6/61)
+    assert not out['selected'][0]['release_allowed']
+    assert not out['composition_enabled'] and not out['split_search_enabled']
+    assert actual.search(decision(False), evidence())['selected'][0]['rank_score'] == pytest.approx(1/61)
+
+
 @pytest.mark.parametrize('sufficient', [True,False])
 def test_semantic_error_never_becomes_empty_generation(sufficient):
     e=engine(semantic=Semantic((), 'raise'))

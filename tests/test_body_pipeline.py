@@ -64,9 +64,13 @@ class BodyPipelineTests(BodyMatchingFixture):
                     assets.append(asset)
                 self.raw.update(assets=assets,default_body_id=assets[-1]['body_id']);self.write()
                 service=BodyMatchingService(self.path)
-                self.assertEqual(service.analyze(self.image,cut())['people'][0]['auto_body_id'],assets[-1]['body_id'])
+                first=service.analyze(self.image,cut())['people'][0]
+                self.assertIsNone(first['auto_body_id'])
+                self.assertEqual(first['suggested_body_id'],assets[-1]['body_id'])
                 self.raw['default_body_id']=assets[0]['body_id'];self.write()
-                self.assertEqual(service.analyze(self.image,cut())['people'][0]['auto_body_id'],assets[0]['body_id'])
+                second=service.analyze(self.image,cut())['people'][0]
+                self.assertIsNone(second['auto_body_id'])
+                self.assertEqual(second['suggested_body_id'],assets[0]['body_id'])
 
     def test_new_named_body_is_selected_without_runtime_code_change(self):
         service=BodyMatchingService(self.path,client=FixtureClient())

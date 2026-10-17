@@ -90,6 +90,11 @@ class Config:
 
     # Body sidecar: observe/choose one FBX without changing existing pose search.
     body_matching_mode: str = os.getenv("BODY_MATCHING_MODE", "off")
+    vlm_body_thinking_level: str = os.getenv("VLM_BODY_THINKING_LEVEL", "")
+    body_classification_strategy: str = os.getenv("BODY_CLASSIFICATION_STRATEGY", "legacy")
+    body_integrated_review_enabled: bool = os.getenv("BODY_INTEGRATED_REVIEW_ENABLED", "1") == "1"
+    body_coarse_family_review_model: str = os.getenv("BODY_COARSE_FAMILY_REVIEW_MODEL", "")
+    body_coarse_catalog_path: str = os.getenv("BODY_COARSE_CATALOG_PATH", "config/body_morphology.v1.json")
     body_catalog_path: str = os.getenv("BODY_CATALOG_PATH", "config/body_catalog.v1.json")
     body_vlm_provider: str = os.getenv("BODY_VLM_PROVIDER", "mock")
     body_vlm_model: str = os.getenv("BODY_VLM_MODEL", "gemini-2.5-flash")
@@ -475,6 +480,10 @@ class Config:
     refine_timeout_seconds: float = float(os.getenv("REFINE_TIMEOUT_SECONDS", "5.0"))
 
     def __post_init__(self) -> None:
+        if self.vlm_body_thinking_level not in {"", "minimal", "low", "medium", "high"}:
+            raise ValueError("invalid VLM_BODY_THINKING_LEVEL")
+        if self.body_classification_strategy not in {"legacy", "coarse", "integrated"}:
+            raise ValueError("BODY_CLASSIFICATION_STRATEGY must be legacy, coarse or integrated")
         if self.pose_search_mode not in {"legacy", "perspective"}:
             raise ValueError("POSE_SEARCH_MODE must be legacy or perspective")
         if self.body_matching_mode not in {"off", "shadow", "auto"}:

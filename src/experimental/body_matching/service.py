@@ -15,6 +15,7 @@ from .observation import (GeminiBodyAttributeClient, MockBodyAttributeClient, PR
                           geometry_ratios)
 from .schema import GEOMETRY_VERSION, OBSERVATION_VERSION, SCHEMA_VERSION, parse_person, unknown_attributes
 from .selection import choose_body
+from .evidence import mask_geometry
 
 _INIT_LOCK = RLock()
 
@@ -163,6 +164,7 @@ class BodyMatchingService:
             if obs["ownership_ambiguous"]:
                 obs["attributes"] = unknown_attributes()
                 obs["geometry"] = {}
+            obs["geometry"] = mask_geometry(obs)
             poses = []
             for candidate in (result.person_candidates[index] if index < len(result.person_candidates) else []):
                 pose_hash = None
@@ -198,10 +200,36 @@ def attach_body_matching(pipe, image, result, cfg):
     from ...pose import MockPoseModel
     try:
         with _INIT_LOCK:
-            if getattr(pipe, "body_matcher", None) is None:
-                pipe.body_matcher = BodyMatchingService(
-                    cfg.body_catalog_path, provider=cfg.body_vlm_provider, model=cfg.body_vlm_model,
-                    timeout_seconds=cfg.body_timeout_seconds, max_people=cfg.body_max_people)
+            cached = getattr(pipe, "body_matcher", None)
+            requested = getattr(cfg, "body_classification_strategy", "legacy")
+            incompatible = requested == "integrated" and not getattr(cached, "integrated", False)
+            if cached is None or incompatible:
+                service_class = BodyMatchingService
+                catalog_path = cfg.body_catalog_path
+                extra = {}
+                if getattr(cfg, "body_classification_strategy", "legacy") in {"coarse", "integrated"}:
+                    from .coarse_service import CoarseBodyService
+                    service_class = CoarseBodyService
+                    catalog_path = cfg.body_coarse_catalog_path
+                    if cfg.body_classification_strategy == "integrated":
+                        extra["integrated"] = True
+                    else:
+                        extra["family_review_model"] = getattr(cfg, "body_coarse_family_review_model", "")
+                shared_provider = cfg.vlm_provider
+                shared_model = cfg.openai_model if shared_provider == "openai" else cfg.gemini_model
+                if extra.get("integrated"):
+                    from ...vlm.client import MockVLMClient
+                    if isinstance(pipe.vlm, MockVLMClient):
+                        shared_provider, shared_model = "mock", "mock"
+                    else:
+                        shared_model = getattr(pipe.vlm, "_model", shared_model)
+                    if shared_provider == "gemini" and getattr(cfg, "body_integrated_review_enabled", True):
+                        extra["family_review_model"] = shared_model
+                pipe.body_matcher = service_class(
+                    catalog_path,
+                    provider=shared_provider if extra.get("integrated") else cfg.body_vlm_provider,
+                    model=shared_model if extra.get("integrated") else cfg.body_vlm_model,
+                    timeout_seconds=cfg.body_timeout_seconds, max_people=cfg.body_max_people, **extra)
             service = pipe.body_matcher
         result.body_matching = service.analyze(image, result, mode=cfg.body_matching_mode,
                                                pose_is_mock=isinstance(pipe.pose, MockPoseModel))

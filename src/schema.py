@@ -127,6 +127,8 @@ class VLMAnalysis:
     # 인물별 손 모양(src/hand_shapes.py). FBX 손 굽기·손 후보에만 쓰고 검색은 읽지 않는다.
     # 비어 있으면 손 호출을 하지 않은 분석이다.
     person_hands: list = field(default_factory=list)
+    # Independently validated first-call body observations, in original VLM slot order.
+    person_bodies: list = field(default_factory=list)
     # 위 shot·action·view·relationship은 잘못된 값을 기본값(full_half·other·front 등)으로
     # 바꾼다. 이 칸은 provider가 실제로 말한 값만 담고, 어휘 밖이거나 없으면 None이다.
     # 칸 전체가 None이면 추적하지 않은 분석이다(테스트가 직접 만든 VLMAnalysis 등).
@@ -166,6 +168,8 @@ class PersonDescriptor:
     # 인물별 손 모양과 손 후보. 검색 점수·refine은 읽지 않는다.
     # 전신 반환 전 실제 FBX 피부 검사에는 동일한 프리셋을 전달한다.
     hands: Optional["PersonHands"] = None
+    # Metadata only: never used as a pose query or refine input.
+    body_classification: Optional[dict] = None
 
     def tag_dict(self) -> dict:
         return {

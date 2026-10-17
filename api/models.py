@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field, field_validator, computed_field, model_va
 from src.body_scope import BodyScope
 from src.schema import Action, Relationship, Shot, View
 from .body_models import BodyMatchingOut, EmptyBodyMatchingOut
+from .pose_presentation import PosePresentationOut
 
 
 class CandidateCamera(BaseModel):
@@ -93,6 +94,7 @@ class InferenceMetadataOut(BaseModel):
     vlm_model: str
     # 어느 VLM 프롬프트가 답했는지(src/vlm/prompts.py의 USER_TEMPLATES 키).
     vlm_prompt_version: Optional[str] = None
+    vlm_body_prompt_version: Optional[str] = None
     pose_backend: str
     pose_model_version: str
     # 번들 library_manifest.json의 버전(lib-YYYYMMDD-<hash8>). manifest 없는 번들이면 env 값.
@@ -180,6 +182,18 @@ class WholePoseCandidateOut(BaseModel):
     match_level: Optional[str] = None
     hand_skin_screen: Optional[dict] = Field(None,
         description="실제 FBX 반대 손 피부 삼각형 검사. 전신·소품 충돌 인증은 아님")
+    review_required: bool = False
+    not_exact_match: bool = False
+    constraints_satisfied: Optional[bool] = None
+
+    @model_validator(mode="after")
+    def review_geometry_is_never_a_qualified_match(self):
+        if self.match_level == "geometry_fallback":
+            if not self.review_required or not self.not_exact_match or self.constraints_satisfied is not False:
+                raise ValueError("geometry_fallback_requires_explicit_review_flags")
+            if not self.evidence.get("geometry"):
+                raise ValueError("geometry_fallback_requires_geometry_evidence")
+        return self
 
 
 class DynamicSearchOut(BaseModel):
@@ -191,6 +205,7 @@ class DynamicSearchOut(BaseModel):
         description="핵심 동작은 맞지만 무릎·다리 세부가 다르거나 미확인인 검수 참고. selected와 분리")
     framing_references: List[dict] = Field(default_factory=list, max_length=5,
         description="중립 머리·어깨 구도 참고. 검색 정답·생성 성공이 아니며 selected와 분리")
+    geometry_review_fallback: Optional[dict] = None
     branches: dict = Field(default_factory=dict)
     generation: Optional[dict] = None
     basic_model: Optional[dict] = Field(None,description="명시적 머리·어깨 컷의 기본 인체 출력 계획. 검색·생성 후보와 구분")
@@ -217,6 +232,8 @@ class PersonOut(BaseModel):
     candidates: List[CandidateOut]
     dynamic_search: Optional[DynamicSearchOut] = Field(
         None, description="전신 동적 라우팅의 단일 Top5. 원본 selected와 검수용 generation은 분리")
+    pose_presentation: Optional[PosePresentationOut] = Field(None,
+        description="BFF·앱 표시용 동적라우팅 결과. 검색/근접/생성 검수 분리, 미리보기 BVH와 상태. export 허가 아님")
     # /refine을 '순수 함수'로 만들기 위한 필드(docs/REFINE_DESIGN.md).
     # /analyze가 이미 추출한 값을 실어 보낼 뿐이라 연산 추가는 0이다.
     # 클라이언트는 이 두 값을 그대로 POST /refine에 되돌려주면 된다

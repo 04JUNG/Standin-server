@@ -1,0 +1,34 @@
+{
+  "total": 28,
+  "owned": 18,
+  "contour_supported": 1,
+  "numerically_compared": 1,
+  "review_candidates": 0,
+  "auto_applied": 0,
+  "held": 28,
+  "body_top1_accuracy": null,
+  "body_top3_accuracy": null,
+  "segmentation_iou": null,
+  "ground_truth_status": "artist labels and segmentation masks unavailable",
+  "comparison_coverage_percent": 3.57,
+  "ownership_held": 10,
+  "contour_held": 17,
+  "comparison_held": 1,
+  "semantically_visible_cases": 3,
+  "final_projection_images": 40,
+  "regression": {
+    "passed": 872,
+    "skipped": 8,
+    "subtests_passed": 28,
+    "new_tests": 29
+  },
+  "evaluation_type": "development set, not blind held-out accuracy",
+  "source_protocol_sha256": "d5f4cf8ba9402b0d58e69314cd4da7841f25e193e1de79a9a89d994dcfa2c8e0",
+  "sam_source_commit": "2b90b9f5ceec907a1c18123530e92e794ad901a4",
+  "sam_checkpoint_sha256": "7402e0d864fa82708a20fbd15bc84245c2f26dff0eb43a4b5b93452deb34be69",
+  "latest_assets": {
+    "male": "0.7.2 (9)",
+    "female": "0.3.4 (11)"
+  },
+  "result_sha256": "3fcf1332a797c8f915bb90e989217a4eea47fd2bd91002511bef0f44f0b4db70"
+}

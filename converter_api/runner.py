@@ -149,6 +149,10 @@ class RunnerSettings:
     thumbnail_samples: int = THUMBNAIL_RENDER_SAMPLES
     thumbnail_engines: tuple[str, ...] = THUMBNAIL_ENGINES
     camera_timeout_seconds: float = 60.0
+    # A shaped job opens the authoring .blend twice and runs its pose correctives
+    # (contacts/axilla repair). Measured 30-110 s per job on 2 vCPU; keep it separate
+    # from the 30 s budget of plain conversions.
+    shape_timeout_seconds: float = 300.0
 
     @classmethod
     def from_env(cls, repo_root: Path | None = None) -> "RunnerSettings":
@@ -167,6 +171,7 @@ class RunnerSettings:
             ),
             timeout_seconds=float(os.getenv("CONVERTER_TIMEOUT_SECONDS", "30")),
             camera_timeout_seconds=float(os.getenv("CONVERTER_CAMERA_TIMEOUT_SECONDS", "60")),
+            shape_timeout_seconds=float(os.getenv("CONVERTER_SHAPE_TIMEOUT_SECONDS", "300")),
             terminate_grace_seconds=float(
                 os.getenv("CONVERTER_TERMINATE_GRACE_SECONDS", "2")
             ),
@@ -232,6 +237,8 @@ class BlenderRunner:
             raise ValueError("converter timeout_seconds must be positive")
         if self.settings.camera_timeout_seconds <= 0:
             raise ValueError("camera timeout_seconds must be positive")
+        if self.settings.shape_timeout_seconds <= 0:
+            raise ValueError("shape timeout_seconds must be positive")
         if self.settings.terminate_grace_seconds < 0:
             raise ValueError("converter terminate_grace_seconds must be non-negative")
         if self.settings.max_concurrent_processes <= 0:
@@ -401,9 +408,18 @@ class BlenderRunner:
         preview_view: str | None = None,
         camera_rotation: list | None = None,
         preview_model: bool = False,
+        shape_recipe: dict | None = None,
         hands: dict | None = None,
         hand_contact_screen: bool = False,
     ) -> ConversionResult:
+        if shape_recipe is not None and report.get("ok"):
+            shape = report.get("shape_bake", {})
+            if (shape.get("shape_sha256") != shape_recipe["shape_sha256"] or
+                shape.get("rules") != shape_recipe["rules"] or
+                shape.get("controls") != shape_recipe["values"] or
+                shape.get("blend_sha256") != shape_recipe["blend_sha256"] or
+                shape.get("controller_sha256") != shape_recipe["controller_sha256"]):
+                raise WorkerIntegrityError("shape bake lineage mismatch", report=report)
         if not report.get("ok"):
             raise self._report_error(report)
         if returncode != 0:
@@ -603,9 +619,12 @@ class BlenderRunner:
         preview_view: str | None = None,
         camera_rotation: list | None = None,
         preview_model: bool = False,
+        shape_recipe: dict | None = None,
         hands: dict | None = None,
         hand_contact_screen: bool = False,
     ) -> ConversionResult:
+        if shape_recipe is not None and self.settings.force_exact_v324:
+            raise ConversionRejectedError("exact V3.2.4 mode does not permit shape baking")
         if not bvh_bytes:
             raise ConversionRejectedError("BVH upload is empty")
         if type(mirror) is not bool:
@@ -660,6 +679,7 @@ class BlenderRunner:
                 preview_view=preview_view,
                 camera_rotation=camera_rotation,
                 preview_model=preview_model,
+                shape_recipe=shape_recipe,
                 hands=hands,
                 hand_contact_screen=hand_contact_screen,
             )
@@ -689,6 +709,7 @@ class BlenderRunner:
         preview_view: str | None = None,
         camera_rotation: list | None = None,
         preview_model: bool = False,
+        shape_recipe: dict | None = None,
         hands: dict | None = None,
         hand_contact_screen: bool = False,
     ) -> ConversionResult:
@@ -740,6 +761,7 @@ class BlenderRunner:
                 "preview_view": preview_view,
                 "camera_rotation": camera_rotation,
                 "preview_model": preview_model,
+                **({"shape_recipe": shape_recipe} if shape_recipe is not None else {}),
             }
             if hands is not None:
                 job["hands"] = hands
@@ -766,6 +788,8 @@ class BlenderRunner:
             try:
                 timeout = (max(self.settings.timeout_seconds, self.settings.camera_timeout_seconds)
                            if camera_rotation is not None else self.settings.timeout_seconds)
+                if shape_recipe is not None:
+                    timeout = max(timeout, self.settings.shape_timeout_seconds)
                 stdout, stderr = process.communicate(timeout=timeout)
             except subprocess.TimeoutExpired as exc:
                 self._terminate_process_group(
@@ -792,6 +816,7 @@ class BlenderRunner:
                 preview_view=preview_view,
                 camera_rotation=camera_rotation,
                 preview_model=preview_model,
+                shape_recipe=shape_recipe,
                 hands=hands,
                 hand_contact_screen=hand_contact_screen,
             )

@@ -149,7 +149,7 @@ class SkinSession:
 def build_hand_skin_gate(camera, bvh_root):
     from .config import CFG
     characters = json.loads((Path(__file__).resolve().parents[1]/'config/characters.example.json').read_text())
-    character_id = CFG.refine_thumbnail_character_id
+    character_id = CFG.thumbnail_character_id
     digest = characters['characters'].get(character_id, {}).get('sha256')
-    client = HandSkinClient(CFG.refine_thumbnail_converter_url, character_id, digest)
+    client = HandSkinClient(CFG.thumbnail_converter_url, character_id, digest)
     return HandSkinGate(client, bvh_root, camera.hashes)
