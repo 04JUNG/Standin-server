@@ -78,6 +78,7 @@ from src.runtime_guard import (
     ensure_production_backends,
 )
 from api.models import (CutResultOut, PersonOut, CandidateOut, SkeletonOut,
+                        SemanticCandidateOut,
                         ImageInfoOut, InferenceMetadataOut,
                         RefineRequest, RefineResponse, RefineThumbnailOut,
                         ExportOrderRequest, ExportOrder, ExportItem)
@@ -225,7 +226,8 @@ async def lifespan(app: FastAPI):
         entries = _ensure_db()                      # 1회 로드
         library_identity = _resolve_library_identity()  # 응답에 실을 번들 버전
         model_bundle = _ensure_pose_model_bundle()  # S3 bundle → local manifest
-        pipeline = Pipeline(entries)                # VLM/검출/포즈 팩토리도 1회 초기화
+        from src.fullbody_routing import build_api_pipeline
+        pipeline = build_api_pipeline(entries, db_path=DB_PATH)
         _check_backends(pipeline)                   # 팩토리 폴백 후 실제 인스턴스 검사
         # production에서 converter 주소가 없으면 여기서 기동이 실패한다(옛 마네킹을
         # 조용히 서빙하지 않는다). 개발은 경고 후 마네킹으로 폴백한다.
@@ -524,6 +526,20 @@ def _vlm_unavailable_response(exc: VLMUnavailable) -> HTTPException:
     )
 
 
+def _routing_fields(res, index: int) -> dict:
+    """라우팅이 꺼져 있으면 빈 dict → 새 필드는 기본값(빈 목록·null) 그대로."""
+    routes = getattr(res, "person_routing", None) or []
+    if index >= len(routes) or routes[index] is None:
+        return {}
+    semantic = getattr(res, "person_semantic_candidates", None) or []
+    hits = semantic[index] if index < len(semantic) and semantic[index] else []
+    return {
+        "search_routing": routes[index],
+        "dynamic_search": routes[index].get("fullbody_search"),
+        "semantic_candidates": [SemanticCandidateOut(**hit) for hit in hits],
+    }
+
+
 @app.post("/analyze", response_model=CutResultOut)
 def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
             rescue: Annotated[str, Form()] = "",
@@ -607,6 +623,7 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
             output_scope=asdict(desc.output_scope),
             person_tags=asdict(desc.person_tags),
             hands=asdict(desc.hands if desc.hands is not None else default_hands()),
+            **_routing_fields(res, i),
         ))
     vlm_model = (CFG.gemini_model if STATE.get("provider") == "gemini"
                  else CFG.openai_model if STATE.get("provider") == "openai"
@@ -617,6 +634,7 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
         detector_count=res.detector_count, vlm_count=res.vlm_count,
         people=people, notes=res.notes,
         vlm_tags=getattr(res, "vlm_tags", None),
+        search_routing=getattr(res, "routing_summary", None),
         image=ImageInfoOut(width=w, height=h),
         inference_metadata=InferenceMetadataOut(
             deployment_version=CFG.deployment_version,
