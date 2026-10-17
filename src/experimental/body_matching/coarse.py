@@ -119,7 +119,7 @@ def parse_response(raw, ids):
         raise ValueError("invalid_coarse_batch")
     out = {}
     for p in raw["people"]:
-        if not isinstance(p, dict) or set(p) != {
+        if not isinstance(p, dict) or set(p) - {"family_review"} != {
             "person_id",
             "target",
             "representation",
@@ -173,6 +173,10 @@ def parse_response(raw, ids):
                     reason="이 항목은 입력에서 판독하기 어려움",
                 )
             axes[name] = x
+        if p.get("family_review") is not None:
+            from .family_review import validate_metadata
+
+            validate_metadata(p["family_review"])
         out[key] = {**p, "axes": axes, "version": VERSION}
     if set(out) != set(ids):
         raise ValueError("coarse_missing_person")
@@ -388,11 +392,23 @@ def recommend(observation, assets, *, default_body_id=None):
 
 
 class GeminiCoarseClient:
-    def __init__(self, model="gemini-flash-lite-latest", timeout_seconds=90):
+    def __init__(
+        self,
+        model="gemini-flash-lite-latest",
+        timeout_seconds=90,
+        *,
+        family_review_model="",
+    ):
         from google import genai
         from google.genai import types
 
+        import math
+
+        if not math.isfinite(timeout_seconds) or timeout_seconds <= 0:
+            raise ValueError("invalid_coarse_timeout")
         self.model = model
+        self.timeout_seconds = timeout_seconds
+        self.family_review_model = family_review_model
         self.client = genai.Client(
             api_key=os.environ["GEMINI_API_KEY"],
             http_options=types.HttpOptions(
@@ -401,10 +417,11 @@ class GeminiCoarseClient:
             ),
         )
 
-    def analyze(self, crops):
+    @staticmethod
+    def _contents(crops, prompt):
         from google.genai import types
 
-        contents = [PROMPT]
+        contents = [prompt]
         from .coarse_input import CoarseInput
 
         for ident, item in crops:
@@ -425,9 +442,16 @@ class GeminiCoarseClient:
                         ),
                     ]
                 )
+        return contents
+
+    def analyze(self, crops):
+        from google.genai import types
+        from time import perf_counter
+
+        started = perf_counter()
         r = self.client.models.generate_content(
             model=self.model,
-            contents=contents,
+            contents=self._contents(crops, PROMPT),
             config=types.GenerateContentConfig(
                 temperature=0,
                 response_mime_type="application/json",
@@ -435,9 +459,54 @@ class GeminiCoarseClient:
             ),
         )
         self.record_response(r)
-        return parse_response(json.loads(r.text), [x[0] for x in crops])
+        observed = parse_response(json.loads(r.text), [x[0] for x in crops])
+        if not getattr(self, "family_review_model", ""):
+            return observed
+        from . import family_review
+
+        pending = [
+            (ident, item)
+            for ident, item in crops
+            if family_review.eligible(observed[ident])
+        ]
+        if not pending:
+            return observed
+        readings, error = {}, None
+        try:
+            remaining = self.timeout_seconds - (perf_counter() - started)
+            if remaining <= 1:
+                raise TimeoutError("family_review_budget_exhausted")
+            review = self.client.models.generate_content(
+                model=self.family_review_model,
+                contents=self._contents(pending, family_review.PROMPT),
+                config=types.GenerateContentConfig(
+                    temperature=0,
+                    response_mime_type="application/json",
+                    response_json_schema=family_review.response_schema(
+                        [x[0] for x in pending]
+                    ),
+                    http_options=types.HttpOptions(
+                        timeout=int(remaining * 1000),
+                        retry_options=types.HttpRetryOptions(attempts=1),
+                    ),
+                ),
+            )
+            self.record_family_review_response(review)
+            readings = family_review.parse_response(
+                json.loads(review.text), [x[0] for x in pending]
+            )
+        except Exception as exc:
+            error = type(exc).__name__
+        for ident, _ in pending:
+            observed[ident] = family_review.apply_review(
+                observed[ident], readings.get(ident), error=error
+            )
+        return observed
 
     def record_response(self, response):
+        pass
+
+    def record_family_review_response(self, response):
         pass
 
     def close(self):

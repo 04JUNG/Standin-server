@@ -510,3 +510,36 @@ def test_confirmed_labels_reject_wrong_identity_duplicates_and_nonbinary_ground_
         validate_labels(
             dict(source="user_confirmed_character_setting", rows=rows), {"p0"}
         )
+
+
+@pytest.mark.parametrize("family", ["masculine", "feminine"])
+def test_tentative_family_alternative_survives_http_response_validation(family):
+    from api.body_models import CoarseRecommendationOut
+
+    o = observation(family)
+    o["axes"]["presentation"]["certainty"] = "tentative"
+    rec = recommend(o, ASSETS)
+    wire = CoarseRecommendationOut.model_validate(rec)
+    assert wire.model_dump()["candidates"] == rec["candidates"]
+    assert wire.auto_apply is False and wire.applied_body_id is None
+    bad = copy.deepcopy(rec)
+    bad["unresolved_axes"] = []
+    with pytest.raises(ValueError, match="coarse_family_mismatch"):
+        CoarseRecommendationOut.model_validate(bad)
+    bad = copy.deepcopy(rec)
+    bad["candidates"][-1]["preset"] = "MUSCULAR"
+    with pytest.raises(ValueError, match="coarse_family_mismatch"):
+        CoarseRecommendationOut.model_validate(bad)
+    bad = copy.deepcopy(rec)
+    bad["observed_family"] = "female" if rec["observed_family"] == "male" else "male"
+    with pytest.raises(ValueError, match="coarse_family_mismatch"):
+        CoarseRecommendationOut.model_validate(bad)
+
+
+def test_clear_androgynous_reading_still_allows_both_base_alternatives():
+    from api.body_models import CoarseRecommendationOut
+
+    rec = recommend(observation("androgynous"), ASSETS)
+    assert rec["observed_family"] is None
+    wire = CoarseRecommendationOut.model_validate(rec)
+    assert {c.family for c in wire.candidates} == {"male", "female"}

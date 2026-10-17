@@ -127,6 +127,23 @@ class CoarseAxesOut(BodyWireModel):
     proportion: CoarseAxisOut[Literal['compact','standard','elongated','unknown']]
 
 
+class CoarseFamilyReadingOut(BodyWireModel):
+    face: str
+    clothing: str
+    body_design: str
+    family: Literal['male','female','unresolved']
+    certainty: Literal['clear','tentative','unknown']
+    reason: str
+
+
+class CoarseFamilyReviewOut(BodyWireModel):
+    version: str
+    status: Literal['resolved','unresolved','conflict','error']
+    initial_presentation: CoarseAxisOut[Literal['masculine','feminine','androgynous','unknown']]
+    reading: CoarseFamilyReadingOut | None
+    error: str | None
+
+
 class CoarseClassificationOut(BodyWireModel):
     version: str
     person_id: str
@@ -134,6 +151,7 @@ class CoarseClassificationOut(BodyWireModel):
     representation: Literal['character','stick','face_only','unreadable']
     proportion_readable: bool
     axes: CoarseAxesOut
+    family_review: CoarseFamilyReviewOut | None = None
 
 
 class CoarseCandidateOut(BodyWireModel):
@@ -165,7 +183,15 @@ class CoarseRecommendationOut(BodyWireModel):
     def recommendation_identity(self):
         first=self.candidates[0]
         if (first.body_id,first.family,first.preset)!=(self.recommended_body_id,self.recommended_family,self.recommended_preset):raise ValueError('coarse_recommendation_identity')
-        if self.observed_family is not None and any(c.family!=self.observed_family for c in self.candidates):raise ValueError('coarse_family_mismatch')
+        if self.observed_family is not None and first.family != self.observed_family:
+            raise ValueError('coarse_family_mismatch')
+        cross_family = [c for c in self.candidates[1:] if c.family != first.family]
+        if cross_family and (
+            (self.observed_family is not None and 'presentation' not in self.unresolved_axes)
+            or len(cross_family) != 1
+            or cross_family[0].preset != 'BASE'
+        ):
+            raise ValueError('coarse_family_mismatch')
         return self
 
 

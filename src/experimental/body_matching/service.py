@@ -203,13 +203,15 @@ def attach_body_matching(pipe, image, result, cfg):
             if getattr(pipe, "body_matcher", None) is None:
                 service_class = BodyMatchingService
                 catalog_path = cfg.body_catalog_path
+                extra = {}
                 if getattr(cfg, "body_classification_strategy", "legacy") == "coarse":
                     from .coarse_service import CoarseBodyService
                     service_class = CoarseBodyService
                     catalog_path = cfg.body_coarse_catalog_path
+                    extra["family_review_model"] = getattr(cfg, "body_coarse_family_review_model", "")
                 pipe.body_matcher = service_class(
                     catalog_path, provider=cfg.body_vlm_provider, model=cfg.body_vlm_model,
-                    timeout_seconds=cfg.body_timeout_seconds, max_people=cfg.body_max_people)
+                    timeout_seconds=cfg.body_timeout_seconds, max_people=cfg.body_max_people, **extra)
             service = pipe.body_matcher
         result.body_matching = service.analyze(image, result, mode=cfg.body_matching_mode,
                                                pose_is_mock=isinstance(pipe.pose, MockPoseModel))

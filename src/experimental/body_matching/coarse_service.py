@@ -28,6 +28,7 @@ class CoarseBodyService:
         model="gemini-flash-lite-latest",
         timeout_seconds=12,
         max_people=8,
+        family_review_model="",
     ):
         if (
             provider not in ("mock", "gemini")
@@ -39,12 +40,15 @@ class CoarseBodyService:
         self.catalog_path = str(catalog_path)
         self.provider = provider
         self.model = model
+        self.family_review_model = family_review_model
         self.max_people = max_people
         self.init_error = None
         self.client = client
         if client is None and provider == "gemini":
             try:
-                self.client = GeminiCoarseClient(model, timeout_seconds)
+                self.client = GeminiCoarseClient(
+                    model, timeout_seconds, family_review_model=family_review_model
+                )
             except Exception as e:
                 self.init_error = "coarse_provider_init_" + type(e).__name__
 
@@ -62,6 +66,7 @@ class CoarseBodyService:
             provider_requested=self.provider,
             provider_actual="gemini" if self.client else "mock",
             model=self.model,
+            family_review_model=self.family_review_model or None,
             is_mock=self.client is None,
             prompt_version=VERSION,
             classification_strategy="coarse",
