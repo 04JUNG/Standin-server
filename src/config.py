@@ -49,6 +49,10 @@ class Config:
     # 관절 근거가 부족한 인물이 있을 때만 나가는 자세 설명 호출 1회의 상한.
     routing_describe_timeout_ms: int = int(os.getenv("ROUTING_DESCRIBE_TIMEOUT_MS", "15000"))
     semantic_top_k: int = int(os.getenv("SEMANTIC_TOP_K", "5"))
+    # 인물별 손 모양(04J-290). 분석과 분리된 VLM 호출이라 켜면 비용이 는다. 끄거나
+    # 실패하면 손은 라이브러리 기본값(relaxed)과 기본 후보 목록으로 나간다.
+    vlm_hand_shapes: bool = os.getenv("VLM_HAND_SHAPES", "0") == "1"
+    vlm_hand_shapes_timeout_ms: int = int(os.getenv("VLM_HAND_SHAPES_TIMEOUT_MS", "15000"))
     gemini_model: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
     # Gemini HTTP 호출 1회의 상한. google-genai HttpOptions.timeout 단위는 밀리초다.
     #

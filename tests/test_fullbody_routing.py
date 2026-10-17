@@ -230,7 +230,10 @@ def test_real_camera_117_exact_projection():
     assert len(idx.cameras)==117 and hits[0]['distance']==pytest.approx(0.,abs=1e-6)
 
 
-def test_http_analyze_exposes_only_whole_pose_rank_list(monkeypatch):
+@pytest.mark.parametrize('rough', [False, True])
+@pytest.mark.parametrize('hand_status', ['disabled', 'ok', 'failed'])
+@pytest.mark.parametrize('people', [1, 2])
+def test_http_analyze_exposes_only_whole_pose_rank_list(monkeypatch, rough, hand_status, people):
     import io
     from PIL import Image
     from fastapi.testclient import TestClient
@@ -241,22 +244,43 @@ def test_http_analyze_exposes_only_whole_pose_rank_list(monkeypatch):
     from src.search_routing import DescribeOutcome
     entries=build_synthetic_index(); pid=entries[0].pose_id
     vlm=_CountingVLM()
+    hand_calls=[]
+    def read_hands(image, boxes):
+        hand_calls.append(boxes)
+        if hand_status == 'failed':
+            raise RuntimeError('offline hand provider failure')
+        return {'people': [
+            {'left': {'visible': True, 'shape': 'hold_phone' if i == 0 else 'fist', 'confidence': 'high'},
+             'right': {'visible': True, 'shape': 'open', 'confidence': 'high'}}
+            for i, _ in enumerate(boxes)]}
+    vlm.read_hands=read_hands
+    monkeypatch.setattr(CFG, 'vlm_hand_shapes', hand_status != 'disabled')
     vlm.describe_people=lambda image,boxes:DescribeOutcome('ok',descriptions={
         i:PoseDescription(**decision().semantic.description) for i in range(len(boxes))})
-    pipe=Pipeline(entries,vlm_client=vlm,pose_model=_RoughPose(),
+    pipe=Pipeline(entries,vlm_client=vlm,pose_model=_RoughPose(all_rough=rough),
         fullbody_search=FullBodySearch(entries,Semantic((pid,)),Camera((pid,))))
-    result=pipe.process_cut(_Img('full_half standing front'))
+    result=pipe.process_cut(_Img(f'full_half standing front {people}p'+(' rough' if rough else '')))
     monkeypatch.setitem(api.STATE,'pipeline',SimpleNamespace(process_cut=lambda *a,**k:result))
     monkeypatch.setitem(api.STATE,'provider','mock')
     monkeypatch.setitem(api.STATE,'pose_backend','mock')
     data=io.BytesIO(); Image.new('RGB',(128,128),'white').save(data,format='PNG')
     response=TestClient(api.app).post('/analyze',files={'file':('rough.png',data.getvalue(),'image/png')})
     assert response.status_code==200,response.text
+    assert len(response.json()['people']) == people
     person=response.json()['people'][0]
     assert person['candidates']==person['semantic_candidates']==[]
-    assert person['dynamic_search']['route']=='hybrid'
+    assert person['dynamic_search']['route']==('semantic' if rough else 'hybrid')
     assert person['dynamic_search']['selected'][0]['pose_id']==pid
     assert not person['refine_allowed']
+    assert len(hand_calls) == (0 if hand_status == 'disabled' else 1)
+    hands=person['hands']
+    assert hands['status'] == {'disabled': 'not_requested', 'ok': 'vlm',
+                               'failed': 'unavailable'}[hand_status]
+    assert hands['left']['preset'] == ('hold_phone' if hand_status == 'ok' else 'relaxed')
+    assert hands['right']['preset'] == ('open' if hand_status == 'ok' else 'relaxed')
+    if people == 2:
+        other=response.json()['people'][1]['hands']
+        assert other['left']['preset'] == ('fist' if hand_status == 'ok' else 'relaxed')
 
 
 def test_factory_disabled_keeps_legacy(monkeypatch):

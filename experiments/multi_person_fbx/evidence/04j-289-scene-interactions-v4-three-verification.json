@@ -1,0 +1,173 @@
+{
+  "ok": true,
+  "cases": [
+    {
+      "cut_id": "S3-p_rough_060",
+      "variant": "raw",
+      "person_count": 2,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.00000602547232088484,
+          "max_raw_geometry_world_error_m": 0.0000016314182736587914,
+          "max_source_image_error_pixels": 0.004822012694384023,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000016302053522291675,
+          "max_raw_geometry_world_error_m": 0.00001156052688968758,
+          "max_source_image_error_pixels": 0.04008667506898313,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-p_rough_060",
+      "variant": "final",
+      "person_count": 2,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.00000602547232088484,
+          "max_raw_geometry_world_error_m": 0.0000016314182736587914,
+          "max_source_image_error_pixels": 0.004822012694384023,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.000016302053522291675,
+          "max_raw_geometry_world_error_m": 0.00001156052688968758,
+          "max_source_image_error_pixels": 0.04008667506898313,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-p_rough_220",
+      "variant": "raw",
+      "person_count": 2,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.0000069036469801148196,
+          "max_raw_geometry_world_error_m": 0.000018320381114038427,
+          "max_source_image_error_pixels": 0.003172418837933723,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.000004764987115663693,
+          "max_raw_geometry_world_error_m": 4.0178036607117347e-7,
+          "max_source_image_error_pixels": 0.0009459483236393251,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-p_rough_220",
+      "variant": "final",
+      "person_count": 2,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 84018,
+          "max_world_error_m": 0.0000069036469801148196,
+          "max_raw_geometry_world_error_m": 0.000018320381114038427,
+          "max_source_image_error_pixels": 0.003172418837933723,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.000004764987115663693,
+          "max_raw_geometry_world_error_m": 4.0178036607117347e-7,
+          "max_source_image_error_pixels": 0.0009459483236393251,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-v3_rough_0718",
+      "variant": "raw",
+      "person_count": 3,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.00019226484159444302,
+          "max_raw_geometry_world_error_m": 0.00022279526034725485,
+          "max_source_image_error_pixels": 0.003570051305945159,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.0000016940171708224351,
+          "max_raw_geometry_world_error_m": 5.839499896889886e-7,
+          "max_source_image_error_pixels": 0.0001123621711261814,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 2,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.000003539642723399408,
+          "max_raw_geometry_world_error_m": 0.0000015757480689543148,
+          "max_source_image_error_pixels": 0.00015705552548443713,
+          "physical_scale": 1
+        }
+      ]
+    },
+    {
+      "cut_id": "S3-v3_rough_0718",
+      "variant": "final",
+      "person_count": 3,
+      "embedded_camera_count": 1,
+      "camera_json_supported": true,
+      "people": [
+        {
+          "person_index": 0,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.00019226484159444302,
+          "max_raw_geometry_world_error_m": 0.00022279526034725485,
+          "max_source_image_error_pixels": 0.003570051305945159,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 1,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.0000016940171708224351,
+          "max_raw_geometry_world_error_m": 5.839499896889886e-7,
+          "max_source_image_error_pixels": 0.0001123621711261814,
+          "physical_scale": 1
+        },
+        {
+          "person_index": 2,
+          "vertices_checked": 150000,
+          "max_world_error_m": 0.000003539642723399408,
+          "max_raw_geometry_world_error_m": 0.0000015757480689543148,
+          "max_source_image_error_pixels": 0.00015705552548443713,
+          "physical_scale": 1
+        }
+      ]
+    }
+  ],
+  "skin_weight_truncation_warnings": 28,
+  "scope": "all source-to-merged skin vertices, bones and person roots; 1mm world + 0.1 source pixel tolerance; raw geometry independently checked; JSON camera required for exact framing"
+}

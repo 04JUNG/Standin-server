@@ -693,3 +693,17 @@ provider/색인 오류, 모호한 설명, geometric 정상 경로, head/얽힘 �
 - 기하 후보/추출/쿼리 좌표/refine solver 불변. 모든 시맨틱 후보는 계속 refine 금지다.
 
 코드·30개 저장 실험·검수 인수인계는 `docs/SEMANTIC_285_INTEGRATION.md`를 따른다.
+
+## 손 모양·손 후보 (04J-290, 2026-10-14)
+
+> refine 화면·BFF 저장/중계·오류 규칙까지 포함한 전체 설계: [`HAND_SELECTION_DESIGN.md`](HAND_SELECTION_DESIGN.md)
+
+`POST /analyze`의 `people[].hands`에 인물별 좌/우 손 자동 선택과 후보가 실린다
+(`VLM_HAND_SHAPES=1`일 때 VLM 별도 호출로 채움, 꺼져 있으면 `status=not_requested`와 기본값).
+`left`/`right`는 그 인물 자신의 손이다. 각 손: `preset`(자동으로 구울 값), `source`(`vlm`|`default`),
+`confidence`(`high`|`low`|null), `visible`, `candidates`(최대 4개, 앞이 유력).
+검색·refine에는 쓰지 않는다.
+
+FBX에 손을 구우려면 converter `POST /convert`·`/convert-bundle`·`/convert-framed`에 form 필드
+`hand_left`, `hand_right`(프리셋 id)를 보낸다. 보내지 않으면 기존과 바이트 단위로 같은 FBX다.
+프리셋 목록·불변식·제약: `docs/HAND_LIBRARY.md`.

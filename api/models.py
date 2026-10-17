@@ -93,6 +93,27 @@ class PersonTagsOut(BaseModel):
     source: Literal["vlm_person", "legacy_cut", "unknown"] = "unknown"
 
 
+class HandChoiceOut(BaseModel):
+    """한 손의 자동 선택과 후보(04J-290). preset을 converter의 hand_left/hand_right로 넘기면
+    그 손 모양이 FBX에 구워진다."""
+    preset: str = Field("relaxed", description="FBX에 구울 손 프리셋 id")
+    source: Literal["vlm", "default"] = Field(
+        "default", description="vlm=러프에서 읽음 · default=안 보이거나 못 읽어 기본값")
+    confidence: Optional[Literal["high", "low"]] = Field(
+        None, description="VLM 확신도. low면 후보를 먼저 보여 주는 것을 권장")
+    visible: Optional[bool] = Field(None, description="러프에 그 손이 그려져 있는지. null=모름")
+    candidates: List[str] = Field(
+        default_factory=list, description="사용자가 고를 손 후보(앞일수록 유력, 최대 4)")
+
+
+class PersonHandsOut(BaseModel):
+    """인물 자신의 왼손/오른손(화면 좌우 아님). 검색·refine에는 쓰지 않는다."""
+    left: HandChoiceOut = Field(default_factory=HandChoiceOut)
+    right: HandChoiceOut = Field(default_factory=HandChoiceOut)
+    library_version: str = ""
+    status: Literal["vlm", "not_requested", "unavailable"] = "not_requested"
+
+
 class VlmTagsOut(BaseModel):
     """VLM이 컷에 대해 실제로 말한 태그. people[].tags와 달리 잘못된 값을 기본값으로 채우지 않는다."""
     shot: Optional[Shot] = None
@@ -199,6 +220,7 @@ class PersonOut(BaseModel):
     quality_reasons: List[str] = Field(default_factory=list)
     output_scope: ScopeDetectionOut = Field(default_factory=ScopeDetectionOut)
     person_tags: PersonTagsOut = Field(default_factory=PersonTagsOut)
+    hands: PersonHandsOut = Field(default_factory=PersonHandsOut)
     # ---- 04J-286 러프함 기반 경로(SEARCH_ROUTING=1일 때만 채워진다) ----
     semantic_candidates: List[SemanticCandidateOut] = Field(
         default_factory=list,

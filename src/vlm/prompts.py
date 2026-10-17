@@ -124,6 +124,71 @@ USER_TEMPLATE_SCOPE_OUTPUT = USER_TEMPLATE.replace(
     'head=머리·얼굴 중심(목 일부 포함)의 두상. shoulder_head와 가슴이 보이는 bust를 구분하라.',
 )
 DEFAULT_PROMPT_VERSION = "p3-output-scope"
+
+# ── 인물별 손 모양 전용 호출(04J-290) ─────────────────────────────────
+#
+# person tags와 같은 이유로 분석 프롬프트와 분리한다. 손 모양은 FBX 손가락 굽기와
+# 손 후보에만 쓰이고 검색·라우팅의 입력이 아니다(src/hand_shapes.py).
+HAND_SHAPES_SYSTEM = (
+    "너는 이미 분석이 끝난 웹툰 러프 컷에서 인물별 손 모양만 고르는 도우미다. "
+    "사람 수와 위치는 이미 정해져 있다. 그 수를 바꾸거나 사람을 새로 찾지 마라. "
+    "관절 좌표나 픽셀 위치는 추정하지 마라. 정해진 손 모양 이름 중에서만 고른다."
+)
+
+HAND_SHAPES_TEMPLATE = """이 컷에는 사람이 {count}명 있고, 위치는 아래와 같다(0~1 정규화, 좌→우 순서).
+
+{boxes}
+
+각 인물의 왼손과 오른손이 어떤 모양인지 아래 목록에서 골라라.
+
+{shapes}
+
+아래 JSON으로만 답하라. 설명 문장 금지.
+
+{{
+  "people": [
+    {{
+      "left":  {{"visible": true | false, "shape": <모양 이름 | null>, "alternative": <모양 이름 | null>, "confidence": "high" | "low"}},
+      "right": {{"visible": true | false, "shape": <모양 이름 | null>, "alternative": <모양 이름 | null>, "confidence": "high" | "low"}}
+    }}
+  ]
+}}
+
+규칙:
+- people 배열의 길이는 반드시 {count}이고, 순서는 위 목록과 같다.
+- left/right는 **그 인물 자신의** 왼손/오른손이다. 화면의 왼쪽/오른쪽이 아니다.
+  정면을 보는 인물은 화면 오른쪽에 있는 손이 그 인물의 왼손이다. 뒷모습이면 화면과 같다.
+- visible: 그 손이 러프에 실제로 그려져 있으면 true. 화면 밖·몸이나 물건에 가림·흉상 구도면 false.
+- shape: 보이는 손이 위 목록 중 가장 가까운 모양. 안 보이면 null.
+- alternative: shape 다음으로 그럴듯한 모양. 없으면 null. shape와 같은 값을 쓰지 마라.
+- confidence: 손가락 모양이 그림에서 분명하면 high, 선이 러프해 추측했으면 low.
+- 물건을 들고 있으면 그 물건 전용 손을 먼저 고른다(칼=sword_grip, 총=gun_trigger, 활=bow_draw,
+  큰 공=ball_palm, 야구공=ball_grip, 컵=hold_cup, 휴대폰=hold_phone, 펜=pen). 전용 손이 없으면
+  grip·cup·pinch 같은 일반 쥐기 손을 고른다. 제스처(브이·엄지척 등)는 손가락 모양이 보일 때만 고른다.
+- 기침·헛기침으로 입 앞에 주먹을 대면 cough_fist, 손바닥으로 입을 덮으면 cover_mouth를 고른다.
+- 한 인물의 값을 다른 인물에 복사하지 마라. 사람 수를 다시 세지 마라.
+"""
+
+
+def hand_shapes_prompt(boxes, presets) -> str:
+    """손 모양 전용 프롬프트. presets는 (id, label_ko, vlm_hint[, 묶음 이름]) 목록이다."""
+    lines = []
+    for index, box in enumerate(boxes):
+        if box is None:
+            lines.append(f"- {index}번: 위치 불명")
+            continue
+        x1, y1, x2, y2 = (round(float(value), 3) for value in box)
+        lines.append(f"- {index}번: x {x1}~{x2}, y {y1}~{y2}")
+    groups: dict[str, list[str]] = {}
+    for entry in presets:
+        preset_id, label, hint = entry[:3]
+        group = entry[3] if len(entry) > 3 else ""
+        groups.setdefault(group, []).append(f"- {preset_id} ({label}): {hint}")
+    shapes = "\n".join(
+        (f"[{group}]\n" if group else "") + "\n".join(lines) for group, lines in groups.items())
+    return HAND_SHAPES_TEMPLATE.format(count=len(boxes), boxes="\n".join(lines), shapes=shapes)
+
+
 USER_TEMPLATES = {
     "p1-scope": USER_TEMPLATE,
     "p2-person-tags": USER_TEMPLATE_P2,
