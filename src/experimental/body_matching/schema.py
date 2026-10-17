@@ -4,7 +4,7 @@ from __future__ import annotations
 import math
 
 SCHEMA_VERSION = "body-match.v1"
-OBSERVATION_VERSION = "body-observation.v3.presentation"
+OBSERVATION_VERSION = "body-observation.v5.regional-evidence"
 REGIONS = ("head", "torso", "arms", "legs")
 # Head classes are visual proportion buckets, not measured head counts or age.
 AXES = {
@@ -42,6 +42,7 @@ def parse_person(raw, expected_id):
     allowed = {"person_id", "attributes", "clothing_occlusion", "foreshortening", "ownership_ambiguous"}
     if "presentation" in raw:
         allowed.add("presentation")
+    allowed.update(k for k in ("representation", "surface_detail", "evidence_regions") if k in raw)
     extra = {"coverage", "full_body_visible"}
     extended = extra.issubset(raw)
     if set(raw) != allowed | (extra if extended else set()) or not isinstance(raw["attributes"], dict):
@@ -49,7 +50,7 @@ def parse_person(raw, expected_id):
     if set(raw["attributes"]) != set(AXES):
         raise ValueError("invalid_body_attribute_fields")
     result = {"person_id": expected_id, "attributes": unknown_attributes()}
-    for flag in allowed - {"person_id", "attributes", "presentation"}:
+    for flag in allowed - {"person_id", "attributes", "presentation", "representation", "surface_detail", "evidence_regions"}:
         if type(raw[flag]) is not bool:
             raise ValueError("invalid_body_observation_flag")
         result[flag] = raw[flag]
@@ -60,6 +61,27 @@ def parse_person(raw, expected_id):
                 or type(raw["full_body_visible"]) is not bool):
             raise ValueError("invalid_body_coverage")
         result.update(coverage=dict(coverage), full_body_visible=raw["full_body_visible"])
+    from .evidence import REPRESENTATIONS, SURFACE_DETAIL, mask_shape_attributes
+    if "representation" in raw:
+        representation = raw["representation"]
+        if (not isinstance(representation, dict) or set(representation) != set(REGIONS)
+                or any(v not in REPRESENTATIONS for v in representation.values())):
+            raise ValueError("invalid_body_representation")
+        result["representation"] = dict(representation)
+    if "surface_detail" in raw:
+        if raw["surface_detail"] not in SURFACE_DETAIL:
+            raise ValueError("invalid_body_surface_detail")
+        result["surface_detail"] = raw["surface_detail"]
+    if "evidence_regions" in raw:
+        from .evidence import SHAPE_REGIONS
+        regions = raw["evidence_regions"]
+        if not isinstance(regions, dict) or set(regions) != set(AXES):
+            raise ValueError("invalid_body_evidence_regions")
+        for axis, values in regions.items():
+            if (not isinstance(values, list) or any(not isinstance(r, str) or r not in SHAPE_REGIONS[axis] for r in values)
+                    or len(set(values)) != len(values)):
+                raise ValueError("invalid_body_evidence_regions")
+        result["evidence_regions"] = {a: list(v) for a, v in regions.items()}
     for axis, item in raw["attributes"].items():
         if not isinstance(item, dict) or set(item) != {"value", "visibility", "evidence"}:
             raise ValueError("invalid_body_attribute")
@@ -71,7 +93,7 @@ def parse_person(raw, expected_id):
         # Providers can emit null+uncertain or a value+unknown. Both carry no
         # usable evidence; mask this axis without discarding other people/axes.
         result["attributes"][axis] = (dict(value=None, visibility="unknown", evidence=evidence)
-                                      if visibility == "unknown" or value is None else dict(item))
+                                      if visibility == "unknown" or value is None or not evidence.strip() else dict(item))
     if "presentation" in raw:
         from .presentation import parse_presentation
         result["presentation"] = parse_presentation(raw["presentation"], ambiguous=result["ownership_ambiguous"])
@@ -98,7 +120,7 @@ def parse_person(raw, expected_id):
     elif result["clothing_occlusion"]:
         for axis in ("body_build", "frame_width", "muscularity_visual", "soft_volume", "volume_distribution"):
             result["attributes"][axis] = {"value": None, "visibility": "unknown", "evidence": "clothing_occlusion"}
-    return result
+    return mask_shape_attributes(result)
 
 
 def response_schema():
@@ -118,6 +140,15 @@ def response_schema():
         "required": list(REGIONS), "additionalProperties": False})
     from .presentation import presentation_schema
     properties["presentation"] = presentation_schema()
+    from .evidence import REPRESENTATIONS, SURFACE_DETAIL
+    properties["representation"] = {"type": "object", "properties": {
+        r: {"type": "string", "enum": list(REPRESENTATIONS)} for r in REGIONS},
+        "required": list(REGIONS), "additionalProperties": False}
+    properties["surface_detail"] = {"type": "string", "enum": list(SURFACE_DETAIL)}
+    from .evidence import SHAPE_REGIONS
+    properties["evidence_regions"] = {"type": "object", "additionalProperties": False,
+        "required": list(AXES), "properties": {axis: {"type": "array",
+            "items": {"type": "string", "enum": list(regions)}} for axis, regions in SHAPE_REGIONS.items()}}
     return {"type": "object", "additionalProperties": False, "required": ["people"],
             "properties": {"people": {"type": "array", "items": {
                 "type": "object", "properties": properties, "required": list(properties), "additionalProperties": False}}}}

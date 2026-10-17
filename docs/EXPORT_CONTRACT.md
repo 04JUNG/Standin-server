@@ -24,6 +24,8 @@
 `/analyze`의 VLM 실패 원인·재시도 필드는 `API_CONTRACT.md` §7-1을 따른다.
 이는 분석 실패 안내만 확장하며, 정상 스켈레톤·선택·BVH/FBX export 계약은 바꾸지 않는다.
 
+체형 P0·P1의 decision/policy/suggestion은 `/analyze` 진단이다. suggestion을 export 체형으로 사용하지 않는다. 최종 체형은 기존 BFF 선택 결과를 사용하며 수동 선택·fixed_default·기본값 우선순위와 export 형식은 유지한다. [체형 계약](BODY_PIPELINE_API_CONTRACT.md).
+
 FastAPI inference가 DB에서 legacy 주문서의 `bvh_url·set_id·tags`를 채운다. 최종 base/refined
 선택과 artifact 영속화는 BFF가 소유한다.
 
@@ -237,3 +239,22 @@ proper rotation, Y-up). 사용 시 `preview_view=front`만 허용한다. 동결 
 카메라는 FBX와 preview에만 적용한다. BVH는 회전하지 않는다. Mirror와 카메라를
 동시에 요청하는 경로는 지원하지 않으며, exact V3.2.4도 회전을 허용하지 않는다.
 전신·반신·흉상·두상 모두 같은 행렬을 사용한다. 관절·손가락의 상대 회전은 바꾸지 않는다.
+
+### 대분류 추천과 Export 경계
+
+`BODY_CLASSIFICATION_STRATEGY=coarse`의 `coarse_recommendation.recommended_body_id`는 캐릭터 대분류에 따른 프리셋 추천이다. 이를 승인된 `selected_asset` 또는 Export 주문으로 간주하지 않는다. 이 전략은 `applied_body_id=null`, `render_required=false`이며 기존 수동 선택·자산 QA·Export 검증 절차를 유지한다. 추천 출력과 자동 적용을 구분하는 필드는 [대분류 추천 계약](BODY_SELECTION/COARSE_RECOMMENDATION.md)에 기록한다.
+
+coarse의 tentative 계열에 제공하는 반대 계열 BASE도 진단용 대안이다. `crop_box` 확장이나 추천 후보 변경은 Export 자산 권한·주문·자동 적용을 만들지 않는다.
+
+선택적 `family_review`는 이미지 판독 근거와 추천에만 영향을 준다. 재검토로 계열이 교정되어도 `applied_body_id/selected_asset`은 null이며 Export 주문이나 자산 승인을 생성하지 않는다. 기존 수동 선택·기본값 처리와 Export 입력은 유지한다. [이미지 재검토 계약](BODY_SELECTION/FAMILY_REVIEW.md).
+
+
+### 첫 VLM 체형 통합의 경계
+
+`BODY_CLASSIFICATION_STRATEGY=integrated`는 `/analyze`의 최초 VLM 관측을 공유하는 추천 전용 경로다. `coarse_recommendation.recommended_body_id`는 실행용 자산 승인이나 Export 선택이 아니며, `auto_body_id/applied_body_id/selected_asset`는 null을 유지한다. BFF 수동 선택·기본값 우선순위, Export 체형 참조, 다중 인물 장면과 손 프리셋 전달 계약은 변경하지 않는다. 추천을 Export 주문으로 자동 승격하지 않는다. [통합 평가 및 제한](BODY_SELECTION/INTEGRATED_FIRST_CALL.md).
+
+### 통합 경로의 기하 참고 복구
+
+통합 체형 opt-in 모드의 `dynamic_search.selected`가 `match_level=geometry_fallback`을 반환하면 의미 조건 통과 후보가 아닌 검수 참고다. `review_required=true`, `not_exact_match=true`, `constraints_satisfied=false`와 원래 조건 감사 결과를 함께 표시한다. `release_allowed=false`, `refine_allowed=false`이며 자동 Export나 정답 인증에 사용하지 않는다. 미확정 체형의 독립 재검토도 추천에만 영향을 주며 수동 선택·기본값·Export 주문 계약을 변경하지 않는다. [복구 평가와 범위](BODY_SELECTION/INTEGRATED_REPAIR.md).
+
+통합 체형의 조건부 재검토는 포즈 추출·검색과 병렬 실행하고, 포즈 경로 종료 후 남은 기존 예산 안에서 추천에만 합친다. 시간 초과는 최초 추천을 보존하며 늦은 응답으로 Export 입력을 바꾸지 않는다. 기존 수동 선택·기본값·자동 적용 금지 계약은 유지한다. [병렬화 검증](BODY_SELECTION/PARALLEL_REVIEW.md).

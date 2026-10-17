@@ -1,0 +1,17 @@
+{
+  "version": "body-family-labels.v1",
+  "source": "user_confirmed_character_setting",
+  "confirmed_on": "2026-10-17",
+  "rows": [
+    {
+      "case_id": "124637:p0",
+      "expected_family": "male",
+      "user_answer": "124637: 남자"
+    },
+    {
+      "case_id": "124702:p0",
+      "expected_family": "female",
+      "user_answer": "124702: 여자"
+    }
+  ]
+}

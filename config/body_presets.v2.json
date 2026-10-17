@@ -1,0 +1,956 @@
+{
+  "schema_version": "body-preset-manifest.v1",
+  "builder_version": "body-assets-builder.v1",
+  "path_base": "repository_root",
+  "status": "draft_not_publishable",
+  "delivery": {
+    "path": "artifacts/body-contact-upgrade-2026-10-16/DELIVERY.json",
+    "sha256": "14bbd39cb9c9eaf6f7330353cc3af6d2cba85713adbd5c9ad9ff7360a899c448"
+  },
+  "neutral_fbx_index": {
+    "path": "artifacts/body-contact-upgrade-2026-10-16/delivery/FBX_INDEX.json",
+    "sha256": "d8b6ebb233e2f34329a9af9cb2e0ecc4a6955508791f55c06716d4995a622ff8"
+  },
+  "sources": {
+    "male": {
+      "version": "0.6.12",
+      "model": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/male/model/standin-body-0.6.12.blend",
+        "sha256": "d0a22147acc5764642abf5e722d1fd7aa9d219a5d518997d3b709bb14124c1a7"
+      },
+      "controller": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/male/model/standin_body.py",
+        "sha256": "8cba9955a13f1764de0c3fb31413964c6623038f23b695a2e1c0ba9e59c8be43"
+      },
+      "rules": "standin-body-0.6.12",
+      "rig_version": "rest-warp-4-jaw-preserving"
+    },
+    "female": {
+      "version": "0.2.3",
+      "model": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/female/model/standin-female-body-0.2.3.blend",
+        "sha256": "c41db7f6ee1de27a638081d467cfdb0e2ec1359ae5d29c92c97e67acb96fda75"
+      },
+      "controller": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/female/model/standin_body.py",
+        "sha256": "5ef6586fa6ec20fd2ed4b1f3df30d06b2da9bdb37dd551aee5de84f4ddc2f2bf"
+      },
+      "rules": "standin-female-body-0.2.3",
+      "rig_version": "female-landmark-warp-1"
+    }
+  },
+  "assets": [
+    {
+      "body_id": "male-base-v0-6-12",
+      "character_id": "male-base-v0-6-12",
+      "source_family": "male",
+      "body_version": "0.6.12",
+      "preset": "BASE",
+      "display_name": "기본 체형",
+      "neutral_fbx": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/delivery/fbx/male/BASE-T.fbx",
+        "sha256": "86f36aabf0f200329080ee07e954ee7e231647d98ae0f3d5eb84841e8428f101"
+      },
+      "authoring": {
+        "overrides": {},
+        "resolved_parameters": null,
+        "resolution_status": "requires_blender_mesh_defaults"
+      },
+      "metadata": {
+        "presentation_style": "masculine",
+        "rendering_style": "stylized",
+        "age_design": null
+      },
+      "measurements": null,
+      "projections": [],
+      "readiness": {
+        "source_identity": "verified",
+        "authoring_neutral_qa": "passed",
+        "measurement": "pending",
+        "recommendation": "pending",
+        "rendering": "pending",
+        "converter_pin": "pending",
+        "runtime": "pending"
+      },
+      "authoring_qa": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/male/BASE--T.json",
+        "sha256": "4b6daf9af6feb71620dbb4918f165f6a995ab7a800e9ee9de408982d32519ba5"
+      },
+      "supported_pose_ids": [],
+      "availability": "draft"
+    },
+    {
+      "body_id": "male-ideal83-v0-6-12",
+      "character_id": "male-ideal83-v0-6-12",
+      "source_family": "male",
+      "body_version": "0.6.12",
+      "preset": "IDEAL83",
+      "display_name": "8.3등신 · 장신 미형",
+      "neutral_fbx": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/delivery/fbx/male/IDEAL83-T.fbx",
+        "sha256": "f783f477f898898afd6c7d33d73dcc5f6564d4a735b7715123db8381ec9d03c6"
+      },
+      "authoring": {
+        "overrides": {
+          "heads": 8.3,
+          "physique": -0.25,
+          "muscle": 0.65,
+          "leg_length": 0.65,
+          "arm_length": 0.2,
+          "shoulders": 0.65,
+          "waist": -0.25,
+          "detail_calf": -0.2
+        },
+        "resolved_parameters": null,
+        "resolution_status": "requires_blender_mesh_defaults"
+      },
+      "metadata": {
+        "presentation_style": "masculine",
+        "rendering_style": "stylized",
+        "age_design": null
+      },
+      "measurements": null,
+      "projections": [],
+      "readiness": {
+        "source_identity": "verified",
+        "authoring_neutral_qa": "passed",
+        "measurement": "pending",
+        "recommendation": "pending",
+        "rendering": "pending",
+        "converter_pin": "pending",
+        "runtime": "pending"
+      },
+      "authoring_qa": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/male/IDEAL83--T.json",
+        "sha256": "0d96b29204b59be4041e790270783b39f8409d1ac5613b71c9419519d89b4f95"
+      },
+      "supported_pose_ids": [],
+      "availability": "draft"
+    },
+    {
+      "body_id": "male-ideal70-v0-6-12",
+      "character_id": "male-ideal70-v0-6-12",
+      "source_family": "male",
+      "body_version": "0.6.12",
+      "preset": "IDEAL70",
+      "display_name": "7등신 · 균형 미형",
+      "neutral_fbx": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/delivery/fbx/male/IDEAL70-T.fbx",
+        "sha256": "7e442f50134e1258bc960d759da5485baddc975d5bcb5727f2a4b5662e15ae0e"
+      },
+      "authoring": {
+        "overrides": {
+          "heads": 7.0,
+          "physique": -0.2,
+          "muscle": 0.45,
+          "leg_length": 0.18,
+          "torso_length": -0.08,
+          "arm_length": -0.12,
+          "shoulders": 0.15,
+          "waist": -0.2,
+          "pelvis": 0.08
+        },
+        "resolved_parameters": null,
+        "resolution_status": "requires_blender_mesh_defaults"
+      },
+      "metadata": {
+        "presentation_style": "masculine",
+        "rendering_style": "stylized",
+        "age_design": null
+      },
+      "measurements": null,
+      "projections": [],
+      "readiness": {
+        "source_identity": "verified",
+        "authoring_neutral_qa": "passed",
+        "measurement": "pending",
+        "recommendation": "pending",
+        "rendering": "pending",
+        "converter_pin": "pending",
+        "runtime": "pending"
+      },
+      "authoring_qa": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/male/IDEAL70--T.json",
+        "sha256": "ebe54aaa3ecc1456fc7239df48dc0e3f3998c129b9df77a4eabb4212cd720d32"
+      },
+      "supported_pose_ids": [],
+      "availability": "draft"
+    },
+    {
+      "body_id": "male-toon64-v0-6-12",
+      "character_id": "male-toon64-v0-6-12",
+      "source_family": "male",
+      "body_version": "0.6.12",
+      "preset": "TOON64",
+      "display_name": "6.4등신 · 가녀린 만화체",
+      "neutral_fbx": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/delivery/fbx/male/TOON64-T.fbx",
+        "sha256": "7ecbe28af760915336004717770f1c8944f7eada091cbe5251f8ab938277566b"
+      },
+      "authoring": {
+        "overrides": {
+          "head_scale": 0.9,
+          "height_cm": 165.0,
+          "heads": 6.4,
+          "head_depth": -0.1,
+          "neck_width": 0.1,
+          "neck_length": -0.3,
+          "physique": -0.85,
+          "muscle": 0.1,
+          "shoulders": -0.7,
+          "chest_width": -0.35,
+          "chest_depth": -0.2,
+          "waist": -0.35,
+          "pelvis": -0.25,
+          "leg_length": -0.15,
+          "torso_length": -0.08,
+          "arm_length": -0.35,
+          "thigh": -0.25,
+          "calf": -0.2
+        },
+        "resolved_parameters": null,
+        "resolution_status": "requires_blender_mesh_defaults"
+      },
+      "metadata": {
+        "presentation_style": "masculine",
+        "rendering_style": "stylized",
+        "age_design": null
+      },
+      "measurements": null,
+      "projections": [],
+      "readiness": {
+        "source_identity": "verified",
+        "authoring_neutral_qa": "passed",
+        "measurement": "pending",
+        "recommendation": "pending",
+        "rendering": "pending",
+        "converter_pin": "pending",
+        "runtime": "pending"
+      },
+      "authoring_qa": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/male/TOON64--T.json",
+        "sha256": "a0b0512d86f6148129745ef958055a92da7f981b118226b3d6a1c3b7b9cf5653"
+      },
+      "supported_pose_ids": [],
+      "availability": "draft"
+    },
+    {
+      "body_id": "male-muscular-v0-6-12",
+      "character_id": "male-muscular-v0-6-12",
+      "source_family": "male",
+      "body_version": "0.6.12",
+      "preset": "MUSCULAR",
+      "display_name": "근육형 · 완만한 가슴",
+      "neutral_fbx": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/delivery/fbx/male/MUSCULAR-T.fbx",
+        "sha256": "9102d4bab996cbf206fa91c269b5186c08429e730f8618ff35dad60ce1463272"
+      },
+      "authoring": {
+        "overrides": {
+          "heads": 7.1,
+          "muscle": 1.4,
+          "definition": 0.65,
+          "shoulders": 0.65,
+          "chest_width": 0.15,
+          "detail_chest": 0.0,
+          "thigh": 0.25
+        },
+        "resolved_parameters": null,
+        "resolution_status": "requires_blender_mesh_defaults"
+      },
+      "metadata": {
+        "presentation_style": "masculine",
+        "rendering_style": "stylized",
+        "age_design": null
+      },
+      "measurements": null,
+      "projections": [],
+      "readiness": {
+        "source_identity": "verified",
+        "authoring_neutral_qa": "passed",
+        "measurement": "pending",
+        "recommendation": "pending",
+        "rendering": "pending",
+        "converter_pin": "pending",
+        "runtime": "pending"
+      },
+      "authoring_qa": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/male/MUSCULAR--T.json",
+        "sha256": "5a998f0e1913fcbc15bb9079a94726f4e18e618d44de5a3f0a6c81d6268f3136"
+      },
+      "supported_pose_ids": [],
+      "availability": "draft"
+    },
+    {
+      "body_id": "male-muscle-max-v0-6-12",
+      "character_id": "male-muscle-max-v0-6-12",
+      "source_family": "male",
+      "body_version": "0.6.12",
+      "preset": "MUSCLE_MAX",
+      "display_name": "근육 MAX 2.0",
+      "neutral_fbx": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/delivery/fbx/male/MUSCLE_MAX-T.fbx",
+        "sha256": "09db3fefd3fa8bdcdc3d223ba437eb5d0b81fd309b8cf0d1bfdfec42faa8bb8c"
+      },
+      "authoring": {
+        "overrides": {
+          "heads": 7.0,
+          "muscle": 2.0,
+          "definition": 0.65,
+          "shoulders": 0.75,
+          "chest_width": 0.2,
+          "detail_chest": 0.0
+        },
+        "resolved_parameters": null,
+        "resolution_status": "requires_blender_mesh_defaults"
+      },
+      "metadata": {
+        "presentation_style": "masculine",
+        "rendering_style": "stylized",
+        "age_design": null
+      },
+      "measurements": null,
+      "projections": [],
+      "readiness": {
+        "source_identity": "verified",
+        "authoring_neutral_qa": "passed",
+        "measurement": "pending",
+        "recommendation": "pending",
+        "rendering": "pending",
+        "converter_pin": "pending",
+        "runtime": "pending"
+      },
+      "authoring_qa": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/male/MUSCLE_MAX--T.json",
+        "sha256": "bd0a11f5ec414cd6ed65cb46137c63a214107622dd43ab5ccbeb52053874c78f"
+      },
+      "supported_pose_ids": [],
+      "availability": "draft"
+    },
+    {
+      "body_id": "male-bulk-v0-6-12",
+      "character_id": "male-bulk-v0-6-12",
+      "source_family": "male",
+      "body_version": "0.6.12",
+      "preset": "BULK",
+      "display_name": "벌크형",
+      "neutral_fbx": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/delivery/fbx/male/BULK-T.fbx",
+        "sha256": "cdc5edf7c11cb88eee7e7c54a820a030c15cb4602d500fd6761d6af4b800ebac"
+      },
+      "authoring": {
+        "overrides": {
+          "heads": 7.0,
+          "muscle": 2.0,
+          "definition": 0.65,
+          "shoulders": 0.75,
+          "chest_width": 0.2,
+          "detail_chest": 0.0,
+          "muscle_bulk": 1.0
+        },
+        "resolved_parameters": null,
+        "resolution_status": "requires_blender_mesh_defaults"
+      },
+      "metadata": {
+        "presentation_style": "masculine",
+        "rendering_style": "stylized",
+        "age_design": null
+      },
+      "measurements": null,
+      "projections": [],
+      "readiness": {
+        "source_identity": "verified",
+        "authoring_neutral_qa": "passed",
+        "measurement": "pending",
+        "recommendation": "pending",
+        "rendering": "pending",
+        "converter_pin": "pending",
+        "runtime": "pending"
+      },
+      "authoring_qa": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/male/BULK--T.json",
+        "sha256": "0c0218f7f9e725493ca4875ee2cbe2cdbe90c4ad94786d3e6deb001423a261d7"
+      },
+      "supported_pose_ids": [],
+      "availability": "draft"
+    },
+    {
+      "body_id": "male-soft-v0-6-12",
+      "character_id": "male-soft-v0-6-12",
+      "source_family": "male",
+      "body_version": "0.6.12",
+      "preset": "SOFT",
+      "display_name": "소프트 · 부드러운 연결",
+      "neutral_fbx": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/delivery/fbx/male/SOFT-T.fbx",
+        "sha256": "85cc1dcdf827c8b6f2e7022a211224d3b1a8b93379376c5fe60033bae7e72275"
+      },
+      "authoring": {
+        "overrides": {
+          "head_scale": 0.9,
+          "heads": 6.95,
+          "neck_width": 0.2,
+          "neck_length": -0.1,
+          "physique": 1.0,
+          "waist": 0.1,
+          "glute": 0.0,
+          "pelvis": 0.1
+        },
+        "resolved_parameters": null,
+        "resolution_status": "requires_blender_mesh_defaults"
+      },
+      "metadata": {
+        "presentation_style": "masculine",
+        "rendering_style": "stylized",
+        "age_design": null
+      },
+      "measurements": null,
+      "projections": [],
+      "readiness": {
+        "source_identity": "verified",
+        "authoring_neutral_qa": "passed",
+        "measurement": "pending",
+        "recommendation": "pending",
+        "rendering": "pending",
+        "converter_pin": "pending",
+        "runtime": "pending"
+      },
+      "authoring_qa": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/male/SOFT--T.json",
+        "sha256": "7b88b4a94fa91b32ccdeae4ff25595aee4f9cbc219611da55edefe566dd8d166"
+      },
+      "supported_pose_ids": [],
+      "availability": "draft"
+    },
+    {
+      "body_id": "male-fat-max-v0-6-12",
+      "character_id": "male-fat-max-v0-6-12",
+      "source_family": "male",
+      "body_version": "0.6.12",
+      "preset": "FAT_MAX",
+      "display_name": "FAT MAX 1.7",
+      "neutral_fbx": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/delivery/fbx/male/FAT_MAX-T.fbx",
+        "sha256": "8552c23fad50324ceb968f60d55dff99b780a7f8e90f044a257964140bb9468f"
+      },
+      "authoring": {
+        "overrides": {
+          "head_scale": 0.9,
+          "heads": 6.7,
+          "neck_width": 0.4,
+          "neck_length": -0.2,
+          "physique": 1.7,
+          "waist": 0.1,
+          "pelvis": 0.2,
+          "glute": 0.0
+        },
+        "resolved_parameters": null,
+        "resolution_status": "requires_blender_mesh_defaults"
+      },
+      "metadata": {
+        "presentation_style": "masculine",
+        "rendering_style": "stylized",
+        "age_design": null
+      },
+      "measurements": null,
+      "projections": [],
+      "readiness": {
+        "source_identity": "verified",
+        "authoring_neutral_qa": "passed",
+        "measurement": "pending",
+        "recommendation": "pending",
+        "rendering": "pending",
+        "converter_pin": "pending",
+        "runtime": "pending"
+      },
+      "authoring_qa": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/male/FAT_MAX--T.json",
+        "sha256": "67590abe8048454e340d98aa97ea6da922ceffc967cf153c2f3d990352ea7f22"
+      },
+      "supported_pose_ids": [],
+      "availability": "draft"
+    },
+    {
+      "body_id": "female-base-v0-2-3",
+      "character_id": "female-base-v0-2-3",
+      "source_family": "female",
+      "body_version": "0.2.3",
+      "preset": "BASE",
+      "display_name": "여성 · 기본",
+      "neutral_fbx": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/delivery/fbx/female/BASE-T.fbx",
+        "sha256": "5060cc6eec9841ca91529064f515a1a71d988b5c672c2811679733b3d9c90097"
+      },
+      "authoring": {
+        "overrides": {},
+        "resolved_parameters": null,
+        "resolution_status": "requires_blender_mesh_defaults"
+      },
+      "metadata": {
+        "presentation_style": "feminine",
+        "rendering_style": "stylized",
+        "age_design": null
+      },
+      "measurements": null,
+      "projections": [],
+      "readiness": {
+        "source_identity": "verified",
+        "authoring_neutral_qa": "passed",
+        "measurement": "pending",
+        "recommendation": "pending",
+        "rendering": "pending",
+        "converter_pin": "pending",
+        "runtime": "pending"
+      },
+      "authoring_qa": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/female/BASE--T.json",
+        "sha256": "b43f3be12829409b3d713cee678a046c1ee2f8203304f1867fb8b1c251ce18fc"
+      },
+      "supported_pose_ids": [],
+      "availability": "draft"
+    },
+    {
+      "body_id": "female-slim-v0-2-3",
+      "character_id": "female-slim-v0-2-3",
+      "source_family": "female",
+      "body_version": "0.2.3",
+      "preset": "SLIM",
+      "display_name": "여성 · 마른형",
+      "neutral_fbx": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/delivery/fbx/female/SLIM-T.fbx",
+        "sha256": "4bb9f6af3f76be82a7297084c2be819bb1c6d49c69144b0822e0c006d471d0e3"
+      },
+      "authoring": {
+        "overrides": {
+          "physique": -0.8,
+          "muscle": 0.12
+        },
+        "resolved_parameters": null,
+        "resolution_status": "requires_blender_mesh_defaults"
+      },
+      "metadata": {
+        "presentation_style": "feminine",
+        "rendering_style": "stylized",
+        "age_design": null
+      },
+      "measurements": null,
+      "projections": [],
+      "readiness": {
+        "source_identity": "verified",
+        "authoring_neutral_qa": "passed",
+        "measurement": "pending",
+        "recommendation": "pending",
+        "rendering": "pending",
+        "converter_pin": "pending",
+        "runtime": "pending"
+      },
+      "authoring_qa": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/female/SLIM--T.json",
+        "sha256": "ae6df2ee0df978b317dd6548525b026f72526f78a3152dfe89826b3754756b91"
+      },
+      "supported_pose_ids": [],
+      "availability": "draft"
+    },
+    {
+      "body_id": "female-ideal83-v0-2-3",
+      "character_id": "female-ideal83-v0-2-3",
+      "source_family": "female",
+      "body_version": "0.2.3",
+      "preset": "IDEAL83",
+      "display_name": "8.3등신 · 장신 미형",
+      "neutral_fbx": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/delivery/fbx/female/IDEAL83-T.fbx",
+        "sha256": "514c1718e91a9f6a4b0c7756088c6c82562558799765f578fd9d0562f1e4b074"
+      },
+      "authoring": {
+        "overrides": {
+          "heads": 8.3,
+          "physique": -0.2,
+          "muscle": 0.35,
+          "leg_length": 0.35,
+          "shoulders": 0.12,
+          "waist": -0.12
+        },
+        "resolved_parameters": null,
+        "resolution_status": "requires_blender_mesh_defaults"
+      },
+      "metadata": {
+        "presentation_style": "feminine",
+        "rendering_style": "stylized",
+        "age_design": null
+      },
+      "measurements": null,
+      "projections": [],
+      "readiness": {
+        "source_identity": "verified",
+        "authoring_neutral_qa": "passed",
+        "measurement": "pending",
+        "recommendation": "pending",
+        "rendering": "pending",
+        "converter_pin": "pending",
+        "runtime": "pending"
+      },
+      "authoring_qa": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/female/IDEAL83--T.json",
+        "sha256": "68b4fa63ace2ed6fbde55ed8254d220434747aef7ce789ba83d82af1f601c1d2"
+      },
+      "supported_pose_ids": [],
+      "availability": "draft"
+    },
+    {
+      "body_id": "female-ideal70-v0-2-3",
+      "character_id": "female-ideal70-v0-2-3",
+      "source_family": "female",
+      "body_version": "0.2.3",
+      "preset": "IDEAL70",
+      "display_name": "7등신 · 균형 미형",
+      "neutral_fbx": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/delivery/fbx/female/IDEAL70-T.fbx",
+        "sha256": "fbcc81bebc1ac33b066a1f6dc0e9336bb5022e713de3939152211434a640d3fe"
+      },
+      "authoring": {
+        "overrides": {
+          "height_cm": 168.0,
+          "heads": 7.0,
+          "muscle": 0.2,
+          "leg_length": 0.1
+        },
+        "resolved_parameters": null,
+        "resolution_status": "requires_blender_mesh_defaults"
+      },
+      "metadata": {
+        "presentation_style": "feminine",
+        "rendering_style": "stylized",
+        "age_design": null
+      },
+      "measurements": null,
+      "projections": [],
+      "readiness": {
+        "source_identity": "verified",
+        "authoring_neutral_qa": "passed",
+        "measurement": "pending",
+        "recommendation": "pending",
+        "rendering": "pending",
+        "converter_pin": "pending",
+        "runtime": "pending"
+      },
+      "authoring_qa": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/female/IDEAL70--T.json",
+        "sha256": "0ff2d6f0ac4fa35e51c60bc362ed16617427b594da271fd28d3d6a0105c7f6d6"
+      },
+      "supported_pose_ids": [],
+      "availability": "draft"
+    },
+    {
+      "body_id": "female-toon64-v0-2-3",
+      "character_id": "female-toon64-v0-2-3",
+      "source_family": "female",
+      "body_version": "0.2.3",
+      "preset": "TOON64",
+      "display_name": "6.4등신 · 성인 만화체",
+      "neutral_fbx": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/delivery/fbx/female/TOON64-T.fbx",
+        "sha256": "2c3287ed5bd08f4e9edd51a2fca98c42b11311efb040b1eda3a2c91a2ba20bdb"
+      },
+      "authoring": {
+        "overrides": {
+          "height_cm": 162.0,
+          "heads": 6.4,
+          "head_scale": 0.96,
+          "physique": -0.2,
+          "shoulders": -0.1,
+          "breast_size": -0.2
+        },
+        "resolved_parameters": null,
+        "resolution_status": "requires_blender_mesh_defaults"
+      },
+      "metadata": {
+        "presentation_style": "feminine",
+        "rendering_style": "stylized",
+        "age_design": null
+      },
+      "measurements": null,
+      "projections": [],
+      "readiness": {
+        "source_identity": "verified",
+        "authoring_neutral_qa": "passed",
+        "measurement": "pending",
+        "recommendation": "pending",
+        "rendering": "pending",
+        "converter_pin": "pending",
+        "runtime": "pending"
+      },
+      "authoring_qa": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/female/TOON64--T.json",
+        "sha256": "4029152048679018497df444a3ef9a45af26fc7aa516dc9406d2966fcce1dc21"
+      },
+      "supported_pose_ids": [],
+      "availability": "draft"
+    },
+    {
+      "body_id": "female-muscular-v0-2-3",
+      "character_id": "female-muscular-v0-2-3",
+      "source_family": "female",
+      "body_version": "0.2.3",
+      "preset": "MUSCULAR",
+      "display_name": "여성 · 운동형",
+      "neutral_fbx": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/delivery/fbx/female/MUSCULAR-T.fbx",
+        "sha256": "6b0ce9fc600f02136513ed1cdc1dbead99933633eff2b130ae2d38059fddd11a"
+      },
+      "authoring": {
+        "overrides": {
+          "muscle": 1.25,
+          "definition": 0.45,
+          "shoulders": 0.25,
+          "thigh": 0.12
+        },
+        "resolved_parameters": null,
+        "resolution_status": "requires_blender_mesh_defaults"
+      },
+      "metadata": {
+        "presentation_style": "feminine",
+        "rendering_style": "stylized",
+        "age_design": null
+      },
+      "measurements": null,
+      "projections": [],
+      "readiness": {
+        "source_identity": "verified",
+        "authoring_neutral_qa": "passed",
+        "measurement": "pending",
+        "recommendation": "pending",
+        "rendering": "pending",
+        "converter_pin": "pending",
+        "runtime": "pending"
+      },
+      "authoring_qa": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/female/MUSCULAR--T.json",
+        "sha256": "441cf197b696b2a81d2dd40f85d3c09e8764c9c31c02e5f77afebc752533d5c3"
+      },
+      "supported_pose_ids": [],
+      "availability": "draft"
+    },
+    {
+      "body_id": "female-muscle-max-v0-2-3",
+      "character_id": "female-muscle-max-v0-2-3",
+      "source_family": "female",
+      "body_version": "0.2.3",
+      "preset": "MUSCLE_MAX",
+      "display_name": "여성 · 근육 MAX",
+      "neutral_fbx": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/delivery/fbx/female/MUSCLE_MAX-T.fbx",
+        "sha256": "ebde1d6f8779b3ac25ffb274b32311f8cf09d9bbabec89ee3a795a59de5adaf3"
+      },
+      "authoring": {
+        "overrides": {
+          "muscle": 2.0,
+          "definition": 0.7,
+          "shoulders": 0.4,
+          "thigh": 0.2
+        },
+        "resolved_parameters": null,
+        "resolution_status": "requires_blender_mesh_defaults"
+      },
+      "metadata": {
+        "presentation_style": "feminine",
+        "rendering_style": "stylized",
+        "age_design": null
+      },
+      "measurements": null,
+      "projections": [],
+      "readiness": {
+        "source_identity": "verified",
+        "authoring_neutral_qa": "passed",
+        "measurement": "pending",
+        "recommendation": "pending",
+        "rendering": "pending",
+        "converter_pin": "pending",
+        "runtime": "pending"
+      },
+      "authoring_qa": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/female/MUSCLE_MAX--T.json",
+        "sha256": "9907d69aab1f93ec47b37f1fec0028239e7a2ec0fe805a4524f56efa5d1130f2"
+      },
+      "supported_pose_ids": [],
+      "availability": "draft"
+    },
+    {
+      "body_id": "female-soft-v0-2-3",
+      "character_id": "female-soft-v0-2-3",
+      "source_family": "female",
+      "body_version": "0.2.3",
+      "preset": "SOFT",
+      "display_name": "여성 · 소프트",
+      "neutral_fbx": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/delivery/fbx/female/SOFT-T.fbx",
+        "sha256": "048c30b62a66080ec8869010ff061dfc863021bdf68a0a6f97b253f27c1e4d6a"
+      },
+      "authoring": {
+        "overrides": {
+          "physique": 0.8,
+          "fat_distribution": 0.15
+        },
+        "resolved_parameters": null,
+        "resolution_status": "requires_blender_mesh_defaults"
+      },
+      "metadata": {
+        "presentation_style": "feminine",
+        "rendering_style": "stylized",
+        "age_design": null
+      },
+      "measurements": null,
+      "projections": [],
+      "readiness": {
+        "source_identity": "verified",
+        "authoring_neutral_qa": "passed",
+        "measurement": "pending",
+        "recommendation": "pending",
+        "rendering": "pending",
+        "converter_pin": "pending",
+        "runtime": "pending"
+      },
+      "authoring_qa": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/female/SOFT--T.json",
+        "sha256": "2390c37f38a485118490f9c910c131f73150c188fc26af0044b951f7580a3feb"
+      },
+      "supported_pose_ids": [],
+      "availability": "draft"
+    },
+    {
+      "body_id": "female-fat-max-v0-2-3",
+      "character_id": "female-fat-max-v0-2-3",
+      "source_family": "female",
+      "body_version": "0.2.3",
+      "preset": "FAT_MAX",
+      "display_name": "여성 · FAT MAX 1.4",
+      "neutral_fbx": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/delivery/fbx/female/FAT_MAX-T.fbx",
+        "sha256": "6c9d0e1f11a1693c9e3dcb0cce26e55adafd1983bccaa1d1b5664570558c38ad"
+      },
+      "authoring": {
+        "overrides": {
+          "physique": 1.4,
+          "fat_distribution": 0.2
+        },
+        "resolved_parameters": null,
+        "resolution_status": "requires_blender_mesh_defaults"
+      },
+      "metadata": {
+        "presentation_style": "feminine",
+        "rendering_style": "stylized",
+        "age_design": null
+      },
+      "measurements": null,
+      "projections": [],
+      "readiness": {
+        "source_identity": "verified",
+        "authoring_neutral_qa": "passed",
+        "measurement": "pending",
+        "recommendation": "pending",
+        "rendering": "pending",
+        "converter_pin": "pending",
+        "runtime": "pending"
+      },
+      "authoring_qa": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/female/FAT_MAX--T.json",
+        "sha256": "48bdf9af7713d2b1c364817ac2f0270a2145798494e26cc9378fb844a10f47ff"
+      },
+      "supported_pose_ids": [],
+      "availability": "draft"
+    },
+    {
+      "body_id": "female-new-fat-v0-2-3",
+      "character_id": "female-new-fat-v0-2-3",
+      "source_family": "female",
+      "body_version": "0.2.3",
+      "preset": "NEW_FAT",
+      "display_name": "new_fat",
+      "neutral_fbx": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/delivery/fbx/female/NEW_FAT-T.fbx",
+        "sha256": "18bc341a00ced4c8c2f8f4e41c22162c13e11de72ad9d50eef691b906a33df1e"
+      },
+      "authoring": {
+        "overrides": {
+          "physique": 1.4,
+          "fat_distribution": 0.2,
+          "fat_gain": 2.0
+        },
+        "resolved_parameters": null,
+        "resolution_status": "requires_blender_mesh_defaults"
+      },
+      "metadata": {
+        "presentation_style": "feminine",
+        "rendering_style": "stylized",
+        "age_design": null
+      },
+      "measurements": null,
+      "projections": [],
+      "readiness": {
+        "source_identity": "verified",
+        "authoring_neutral_qa": "passed",
+        "measurement": "pending",
+        "recommendation": "pending",
+        "rendering": "pending",
+        "converter_pin": "pending",
+        "runtime": "pending"
+      },
+      "authoring_qa": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/female/NEW_FAT--T.json",
+        "sha256": "99f80cad23cb80db51a34510a7b03ee93613a0dc4aa49dfe3562fd9f906d4f8f"
+      },
+      "supported_pose_ids": [],
+      "availability": "draft"
+    },
+    {
+      "body_id": "female-new-muscular-v0-2-3",
+      "character_id": "female-new-muscular-v0-2-3",
+      "source_family": "female",
+      "body_version": "0.2.3",
+      "preset": "NEW_MUSCULAR",
+      "display_name": "new_근육형",
+      "neutral_fbx": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/delivery/fbx/female/NEW_MUSCULAR-T.fbx",
+        "sha256": "6ac422b952c6bfa26e61ba856ea0f93f880a502084e8a1f7d9abe24132312259"
+      },
+      "authoring": {
+        "overrides": {
+          "muscle": 4.0,
+          "definition": 0.7,
+          "shoulders": 0.4,
+          "thigh": 0.2
+        },
+        "resolved_parameters": null,
+        "resolution_status": "requires_blender_mesh_defaults"
+      },
+      "metadata": {
+        "presentation_style": "feminine",
+        "rendering_style": "stylized",
+        "age_design": null
+      },
+      "measurements": null,
+      "projections": [],
+      "readiness": {
+        "source_identity": "verified",
+        "authoring_neutral_qa": "passed",
+        "measurement": "pending",
+        "recommendation": "pending",
+        "rendering": "pending",
+        "converter_pin": "pending",
+        "runtime": "pending"
+      },
+      "authoring_qa": {
+        "path": "artifacts/body-contact-upgrade-2026-10-16/female/NEW_MUSCULAR--T.json",
+        "sha256": "220614cc9edb6bcd324f3be6b24fd5212a498382b092740cd8f3fd5377d98c8f"
+      },
+      "supported_pose_ids": [],
+      "availability": "draft"
+    }
+  ],
+  "retired_for_new_analysis": [
+    "teen-male",
+    "teen-female",
+    "child"
+  ],
+  "legacy_job_policy": "preserve_exact_asset_identity_no_automatic_replacement"
+}

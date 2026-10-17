@@ -1,0 +1,21 @@
+{
+  "total": 28,
+  "family_match": 26,
+  "observed_family_match": 24,
+  "preset_match": 23,
+  "provider_errors": 0,
+  "batches_over_12_seconds": 3,
+  "batches": 7,
+  "max_seconds": 12.071145457914099,
+  "median_seconds": 5.611701666843146,
+  "scope": "body-stage 4-person evaluation batches, 2 workers; excludes pose pipeline and BFF",
+  "budget_seconds": 12,
+  "reference_source": "user_approved_report_recommendations",
+  "reference_results_sha256": "fbbfad90c503d4c4c620299fcb171a89d5521573e9a3db95fed2d0af5f1d76a8",
+  "reference_report_sha256": "834b4802102587f01b2c3cc59ab3fc999ac0a631725e37ad60b8a44f00219f48",
+  "review_calls": 3,
+  "review_timeouts": 3,
+  "review_affected_people": 7,
+  "independent_validation": false,
+  "repeats": 1
+}

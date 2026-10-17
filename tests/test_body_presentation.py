@@ -70,11 +70,13 @@ class PresentationTests(unittest.TestCase):
         o=observe();o['presentation']=presentation(visibility='uncertain')
         self.assertEqual(select(o,a)['auto_body_id'],'masculine-regular')
         o['attributes']=unknown_attributes()
-        self.assertEqual(select(o,a)['auto_body_id'],'feminine-muscular')
+        self.assertIsNone(select(o,a)['auto_body_id'])
+        self.assertEqual(select(o,a)['suggested_body_id'],'feminine-muscular')
 
     def test_unknown_does_not_fabricate_female_or_male_detection(self):
         o=observe();o['presentation']=presentation(value=None,visibility='unknown');o['attributes']=unknown_attributes()
-        d=select(o);self.assertEqual(d['auto_body_id'],'masculine-regular')
+        d=select(o);self.assertIsNone(d['auto_body_id'])
+        self.assertEqual(d['suggested_body_id'],'masculine-regular')
         self.assertEqual(d['presentation_selection']['mode'],'unresolved')
 
     def test_ownership_ambiguous_masks_presentation(self):
@@ -91,9 +93,13 @@ class PresentationTests(unittest.TestCase):
         self.assertEqual(d['presentation_selection']['mode'],'matching_style_unavailable')
         self.assertIn('presentation_matching_asset_unavailable',d['reason_codes'])
 
-    def test_legacy_observation_has_identical_choice(self):
-        old=dict(person_payload('p'),geometry={});d=select(old)
-        self.assertEqual(d['auto_body_id'],'masculine-regular')
+    def test_legacy_observation_is_readable_without_automatic_application(self):
+        old=dict(person_payload('p'),geometry={})
+        for key in ('coverage','representation','full_body_visible','surface_detail'):
+            old.pop(key,None)
+        d=select(old)
+        self.assertIsNone(d['auto_body_id'])
+        self.assertEqual(d['suggested_body_id'],'masculine-regular')
 
 
 class Fixture(BodyMatchingFixture):

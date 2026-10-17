@@ -57,6 +57,7 @@ from src.library_source import ensure_library
 from src.pose_model_source import PoseModelFetchError, ensure_pose_model
 from src.refine import (REFINE_CODE_VERSION, REFINE_V2_CODE_VERSION,
                         refine_bvh)
+from src.experimental.body_matching.integrated import VERSION as INTEGRATED_BODY_VERSION
 from src.refine_policy import structural_refine_allowed
 from src.refine_projection import ProjectionDomainError, VERSION as REFINE_PROJECTION_VERSION
 from src.pose_catalog import build_catalog, folders as pose_catalog_folders, page as pose_catalog_page
@@ -287,7 +288,7 @@ async def lifespan(app: FastAPI):
     alerts.flush()
 
 
-app = FastAPI(title="Standin Pose Pipeline", version="0.2.1", lifespan=lifespan)
+app = FastAPI(title="Standin Pose Pipeline", version="0.2.2", lifespan=lifespan)
 
 
 def _refine_capability() -> dict:
@@ -663,6 +664,7 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
             vlm_provider=STATE.get("provider", CFG.vlm_provider),
             vlm_model=vlm_model,
             vlm_prompt_version=CFG.vlm_prompt_version,
+            vlm_body_prompt_version=(INTEGRATED_BODY_VERSION if CFG.body_matching_mode != "off" and CFG.body_classification_strategy == "integrated" else None),
             pose_backend=STATE.get("pose_backend", CFG.pose_backend),
             pose_model_version=_pose_model_version(),
             pose_library_version=CFG.pose_library_version,
