@@ -6,6 +6,10 @@ failure preserves the first analysis; the original provider payload is immutable
 """
 
 from copy import deepcopy
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeout
+from dataclasses import dataclass
+from time import perf_counter
+from types import SimpleNamespace
 import math
 from . import family_review
 from .coarse import GeminiCoarseClient
@@ -28,10 +32,13 @@ def unresolved(observation):
 
 
 def review_uncertain(vlm, image, analysis, cfg, deadline):
-    from google.genai import types
-    from .service import _image
-    from ...vlm.client import _extract_json, _gemini_attempt_options
+    pending = _pending(analysis, cfg)
+    if not pending:
+        return
+    _read_pending(vlm, image, analysis, cfg, deadline, pending)
 
+
+def _pending(analysis, cfg):
     pending = []
     for index, observation in enumerate(analysis.person_bodies[: cfg.body_max_people]):
         if not unresolved(observation) or index >= len(analysis.approx_boxes):
@@ -47,8 +54,14 @@ def review_uncertain(vlm, image, analysis, cfg, deadline):
         ):
             continue
         pending.append((index, observation, coordinates))
-    if not pending:
-        return
+    return pending
+
+
+def _read_pending(vlm, image, analysis, cfg, deadline, pending):
+    from google.genai import types
+    from .service import _image
+    from ...vlm.client import _extract_json, _gemini_attempt_options
+
     readings = {}
     error = None
     try:
@@ -91,3 +104,126 @@ def review_uncertain(vlm, image, analysis, cfg, deadline):
         )
         updated["version"] = observation["version"]
         analysis.person_bodies[index] = deepcopy(updated)
+
+
+@dataclass
+class _ReviewJob:
+    future: object
+    clock: object
+    deadline: float
+    started: float
+    targets: tuple
+
+
+def start_pipeline_review(vlm, image, analysis, cfg, deadline):
+    """Schedule a request-local snapshot. Workers never mutate live analysis."""
+    from .service import _image
+
+    targets = tuple(index for index, _, _ in _pending(analysis, cfg))
+    if not targets:
+        return
+    review_deadline = min(deadline, vlm._clock() + cfg.body_timeout_seconds)
+    started = perf_counter()
+    snapshot = deepcopy(analysis)
+    frozen_image = _image(image)
+    frozen_cfg = SimpleNamespace(
+        body_max_people=cfg.body_max_people,
+        body_timeout_seconds=cfg.body_timeout_seconds,
+        vlm_body_thinking_level=getattr(cfg, "vlm_body_thinking_level", ""),
+    )
+
+    def run():
+        review_uncertain(vlm, frozen_image, snapshot, frozen_cfg, review_deadline)
+        return snapshot, vlm._clock(), perf_counter()
+
+    pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix="body-review")
+    try:
+        future = pool.submit(run)
+    finally:
+        # No context-manager shutdown: it would wait and serialize pose work.
+        pool.shutdown(wait=False)
+    analysis._body_review_job = _ReviewJob(
+        future, vlm._clock, review_deadline, started, targets
+    )
+
+
+def finish_pipeline_review(analysis, result, pose_started):
+    """Join only the remaining original budget, then merge by original slots."""
+    job = getattr(analysis, "_body_review_job", None)
+    if job is None:
+        return
+    pose_finished = perf_counter()
+    joined = pose_finished
+    error = None
+    snapshot = None
+    finished = None
+    try:
+        snapshot, completed_at, finished = job.future.result(
+            timeout=max(0.0, job.deadline - job.clock())
+        )
+        if completed_at > job.deadline:
+            raise FutureTimeout()
+        if len(snapshot.person_bodies) != len(analysis.person_bodies) or [
+            o["person_id"] for o in snapshot.person_bodies
+        ] != [o["person_id"] for o in analysis.person_bodies]:
+            raise ValueError("review_snapshot_identity_changed")
+    except FutureTimeout:
+        error = "integrated_review_deadline_exceeded"
+    except Exception as exc:
+        error = "integrated_review_worker_" + type(exc).__name__
+    waited = perf_counter() - joined
+    if error:
+        snapshot = SimpleNamespace(person_bodies=deepcopy(analysis.person_bodies))
+        for index in job.targets:
+            snapshot.person_bodies[index] = family_review.apply_review(
+                analysis.person_bodies[index], error=error
+            )
+    if not error:
+        errors = [
+            snapshot.person_bodies[i].get("family_review", {}).get("error")
+            for i in job.targets
+        ]
+        error = next((value for value in errors if value), None)
+    # Copy-on-merge only here, after every pose path has finished. Keep the
+    # live analysis untouched: tags/hand tasks may still hold references to it.
+    updated = 0
+    for desc in result.descriptors:
+        index = desc.quality_trace.get("vlm_person_index")
+        if type(index) is int and index in job.targets:
+            from .integrated import detect_body
+
+            body = detect_body(snapshot, index)
+            if body is not None:
+                desc.body_classification = body
+                updated += 1
+    end = perf_counter()
+    overlap_end = min(
+        finished if finished is not None else pose_finished, pose_finished
+    )
+    result._body_review_execution = dict(
+        mode="parallel",
+        status=(
+            "deadline_exceeded"
+            if error == "integrated_review_deadline_exceeded"
+            else "error" if error else "completed"
+        ),
+        target_count=len(job.targets),
+        merged_count=updated,
+        error=error,
+        review_finished=finished is not None,
+        review_elapsed_ms=round(max(0.0, (finished or end) - job.started) * 1000, 3),
+        overlap_ms=round(
+            max(0.0, overlap_end - max(job.started, pose_started)) * 1000, 3
+        ),
+        join_wait_ms=round(max(0.0, waited) * 1000, 3),
+        pose_path_ms=round(max(0.0, pose_finished - pose_started) * 1000, 3),
+    )
+
+
+def abandon_pipeline_review(analysis):
+    job = getattr(analysis, "_body_review_job", None)
+    if job is not None:
+        del analysis._body_review_job
+        # Running SDK requests cannot be forcibly cancelled; their original
+        # HTTP timeout remains bounded. Private snapshots prevent late writes.
+        job.future.cancel()

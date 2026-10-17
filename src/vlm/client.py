@@ -530,7 +530,10 @@ class GeminiVLMClient(BaseVLMClient):
         return DescribeOutcome("ok", descriptions=descriptions, elapsed_ms=elapsed,
                                provider="gemini")
 
-    def analyze(self, image, img_w: int, img_h: int) -> VLMAnalysis:
+    def analyze_for_pipeline(self, image, img_w: int, img_h: int) -> VLMAnalysis:
+        return self.analyze(image, img_w, img_h, _defer_body_review=True)
+
+    def analyze(self, image, img_w: int, img_h: int, *, _defer_body_review=False) -> VLMAnalysis:
         from google.genai import types
         part = self._to_part(image)
         from ..experimental.body_matching.integrated import enabled, analysis_prompt
@@ -590,8 +593,12 @@ class GeminiVLMClient(BaseVLMClient):
                     # Optional read-only body review must never retry/replace a
                     # successful control analysis or receive a fresh time budget.
                     try:
-                        from ..experimental.body_matching.integrated_review import review_uncertain
-                        review_uncertain(self, image, analysis, CFG, deadline)
+                        from ..experimental.body_matching.integrated_review import review_uncertain, start_pipeline_review
+                        if _defer_body_review:
+                            start_pipeline_review(self, image, analysis, CFG, deadline)
+                        else:
+                            # Standalone callers retain their synchronous contract.
+                            review_uncertain(self, image, analysis, CFG, deadline)
                     except Exception as review_error:
                         log_warn("integrated_body_review", status="failed",
                                  errorType=type(review_error).__name__)

@@ -200,14 +200,31 @@ class Pipeline:
         if CFG.body_matching_mode != "off":
             from .experimental.body_matching.service import attach_body_matching
             attach_body_matching(self, image, result, CFG)
+            execution = getattr(result, "_body_review_execution", None)
+            if execution and result.body_matching:
+                result.body_matching["parallel_review"] = execution
         return result
 
     def _process_cut(self, image, img_w, img_h, rescue_request):
         rescue_request = parse_rescue_request(rescue_request)
         # 1) VLM: 러프 → 제어 신호(shot·사람수·대략박스)
         with span("vlm"):
-            vlm: VLMAnalysis = self.vlm.analyze(image, img_w, img_h)
+            analyze = getattr(self.vlm, "analyze_for_pipeline", self.vlm.analyze)
+            vlm: VLMAnalysis = analyze(image, img_w, img_h)
+        from .experimental.body_matching.integrated_review import finish_pipeline_review, abandon_pipeline_review
+        pose_started = perf_counter()
+        try:
+            result = self._process_analyzed_cut(image, img_w, img_h, rescue_request, vlm)
+            try:
+                finish_pipeline_review(vlm, result, pose_started)
+            except Exception as error:
+                log_warn("body_review_join", status="failed", errorType=type(error).__name__)
+            return result
+        finally:
+            # A failed pose path never waits for body review or accepts late writes.
+            abandon_pipeline_review(vlm)
 
+    def _process_analyzed_cut(self, image, img_w, img_h, rescue_request, vlm):
         # 1-b) 인물별 태그는 **별도 호출**로 받는다(기록용). 분석 프롬프트를 건드리지
         #      않으므로 route·인원수·박스가 이 호출 때문에 달라질 수 없다.
         #      스켈레톤 추출과 겹쳐 돌려 지연을 숨긴다 — 결과는 descriptor를 만들기
