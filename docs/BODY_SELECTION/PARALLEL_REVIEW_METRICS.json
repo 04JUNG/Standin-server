@@ -1,0 +1,37 @@
+{
+  "scope": "Recorded V5 responses, current serial vs parallel body-policy scheduling; no network, no new pose execution or production latency measurement.",
+  "cuts": 17,
+  "people": 36,
+  "approved_people": 28,
+  "identical_recommendations": 36,
+  "identical_controls_and_pose_cuts": 17,
+  "matched": 28,
+  "family_correct": 28,
+  "preset_correct": 24,
+  "synthetic_latency": {
+    "scope": "Synthetic injected VLM/pose delays in actual Pipeline; 3 repeats per mode. NOT live Gemini, RTMPose or production API latency.",
+    "summary": [
+      {
+        "review_delay_ms": 120.0,
+        "pose_delay_ms": 200.0,
+        "serial_median_ms": 333.6732918396592,
+        "parallel_median_ms": 208.78625009208918,
+        "saved_ms": 124.88704174757004
+      },
+      {
+        "review_delay_ms": 200.0,
+        "pose_delay_ms": 120.0,
+        "serial_median_ms": 331.85020787641406,
+        "parallel_median_ms": 206.28637494519353,
+        "saved_ms": 125.56383293122053
+      }
+    ]
+  },
+  "tests": {
+    "passed": 1740,
+    "skipped": 9,
+    "subtests_passed": 28,
+    "smoke_passed": 54,
+    "concurrency_tests_passed": 11
+  }
+}

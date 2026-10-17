@@ -22,13 +22,23 @@ def main():
     parser.add_argument("--source-run", type=Path, required=True)
     parser.add_argument("--protocol", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument(
+        "--parallel",
+        action="store_true",
+        help="Exercise deferred review and slot-based join",
+    )
     args = parser.parse_args()
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     from PIL import Image
     from src.vlm.client import _coerce
     from src.schema import BBox
     from src.experimental.body_matching.integrated import VERSION, detect_body
-    from src.experimental.body_matching.integrated_review import review_uncertain
+    from src.experimental.body_matching.integrated_review import (
+        review_uncertain,
+        start_pipeline_review,
+        finish_pipeline_review,
+        abandon_pipeline_review,
+    )
     from src.experimental.body_matching.coarse_service import CoarseBodyService
     from api.models import CutResultOut
     from api.body_models import validated_body_sidecar
@@ -40,6 +50,7 @@ def main():
     receipt.update(
         integrated_version=VERSION,
         source_run=str(args.source_run.resolve()),
+        body_review_mode="parallel" if args.parallel else "serial",
         execution_scope="Recorded response body-policy replay only; no network or pose execution",
         timing_scope="Copied source VLM/API measurements; NOT newly measured end-to-end latency",
     )
@@ -79,7 +90,8 @@ def main():
             _client=SimpleNamespace(models=SimpleNamespace(generate_content=generate)),
         )
         started = time.perf_counter()
-        review_uncertain(
+        run_review = start_pipeline_review if args.parallel else review_uncertain
+        run_review(
             client,
             image,
             analysis,
@@ -90,7 +102,6 @@ def main():
             ),
             started + 30,
         )
-        assert len(calls) == len(recorded), "review_eligibility_changed"
         now = asdict(analysis)
         now.pop("person_bodies")
         assert controls == now
@@ -100,7 +111,9 @@ def main():
             box = BBox(*person["box"], source="recorded") if person.get("box") else None
             descriptors.append(
                 SimpleNamespace(
-                    box=box, body_classification=detect_body(analysis, slot)
+                    box=box,
+                    body_classification=detect_body(analysis, slot),
+                    quality_trace=copy.deepcopy(person["quality_trace"]),
                 )
             )
         service = CoarseBodyService(
@@ -110,15 +123,22 @@ def main():
             model=receipt["model"],
             family_review_model=receipt["model"],
         )
-        sidecar = service.analyze(
-            image,
-            SimpleNamespace(
-                route=old["result"]["route"],
-                descriptors=descriptors,
-                person_candidates=[[] for _ in descriptors],
-            ),
-            mode=old["result"]["body_matching"]["mode"],
+        replay_result = SimpleNamespace(
+            route=old["result"]["route"],
+            descriptors=descriptors,
+            person_candidates=[[] for _ in descriptors],
         )
+        if args.parallel:
+            try:
+                finish_pipeline_review(analysis, replay_result, started)
+            finally:
+                abandon_pipeline_review(analysis)
+        assert len(calls) == len(recorded), "review_eligibility_changed"
+        sidecar = service.analyze(
+            image, replay_result, mode=old["result"]["body_matching"]["mode"]
+        )
+        if hasattr(replay_result, "_body_review_execution"):
+            sidecar["parallel_review"] = replay_result._body_review_execution
         typed = CutResultOut.model_validate(old["result"])
         wire = validated_body_sidecar(sidecar, typed.people)
         assert wire is not None and wire.status != "unavailable"

@@ -748,8 +748,12 @@ FBX에 손을 구우려면 converter `POST /convert`·`/convert-bundle`·`/conve
 
 ### 첫 VLM 체형 통합 (선택적)
 
-`BODY_CLASSIFICATION_STRATEGY=integrated`와 `BODY_MATCHING_MODE=shadow|auto`를 함께 설정하면 최초 `VLM.analyze`가 기존 사람 수·shot·박스·가시성에 `person_bodies`를 추가한다. `coarse_classification`과 `coarse_recommendation`의 외부 형태는 coarse와 같고, `classification_strategy=integrated`, `prompt_version=body-integrated.v6.independent-axes`로 출처를 구분한다. `inference_metadata.vlm_body_prompt_version`은 활성화한 통합 프롬프트 버전 또는 null이다.
+`BODY_CLASSIFICATION_STRATEGY=integrated`와 `BODY_MATCHING_MODE=shadow|auto`를 함께 설정하면 최초 `VLM.analyze`가 기존 사람 수·shot·박스·가시성에 `person_bodies`를 추가한다. `coarse_classification`과 `coarse_recommendation`의 외부 형태는 coarse와 같고, `classification_strategy=integrated`, `prompt_version=body-integrated.v7.parallel-review`로 출처를 구분한다. `inference_metadata.vlm_body_prompt_version`은 활성화한 통합 프롬프트 버전 또는 null이다.
 
 Gemini 통합 모드의 `BODY_INTEGRATED_REVIEW_ENABLED=1`(기본)에서는 첫 판독의 남녀 계열이 unknown/androgynous이거나 certainty=unknown인 인물만 crop을 독립 재검토한다. 여러 대상은 최대 1회 batch 호출하고, 첫 판독의 결론·정답·파일 ID를 보내지 않는다. 이미 binary 계열을 판독한 인물은 tentative여도 변경하지 않는다. 재검토는 짧은 얼굴·의상·몸 근거를 출력하고 명시된 `VLM_BODY_THINKING_LEVEL`을 공유한다. 재검토는 `BODY_TIMEOUT_SECONDS`와 주 VLM의 남은 총 예산 중 작은 값으로 제한하며 재시도하지 않는다. 오류·미확정이면 원래 추천을 유지하고 `family_review`에 기록한다. tentative 추천은 그대로 tentative이며 자동 적용 근거가 아니다. 중성/unknown 계열의 해소만으로 기존 명확한 근육·체격·비율 근거를 낮추지 않는다. 실제 기존 binary 계열을 반대로 교정하는 경우의 특징 강등 가드는 유지한다. `BODY_INTEGRATED_REVIEW_ENABLED=0`이면 추가 체형 호출이 없다. OpenAI 통합은 첫 호출만 지원한다. 체형은 원본 VLM 슬롯 인덱스로 전달하여 출력 인물의 좌우 정렬 뒤에도 연결을 보존한다. 누락·잘못된 체형 응답은 해당 체형만 unknown으로 처리하며 기존 제어 필드를 변경하지 않는다. 주 추천은 항상 기록하되 관측 불명 시 기본 추천이라는 근거를 함께 반환한다. 약한 근거로 자동 적용하지 않으며 `auto_body_id/applied_body_id/selected_asset`는 null이다. 손 모양, 인물 태그, 전신 포즈 설명·재검토·생성은 기존 기능의 독립 호출이므로 전체 파이프라인의 VLM 호출이 한 번이라는 뜻은 아니다.
+
+`Pipeline.process_cut`의 Gemini 통합 경로에서는 첫 판독 직후 미확정 체형 재검토를 시작하여 검출·포즈 추출·검색과 병렬로 실행한다. 포즈 경로가 끝난 뒤 최초에 정한 남은 예산만 기다리고, 원본 VLM 슬롯 인덱스로 descriptor에 합친다. 대기 시점에 새 예산을 부여하지 않는다. 기한 내 완료된 응답은 포즈 작업이 더 늦게 끝나도 사용하며, 시간 초과·실패는 최초 추천을 보존한다. 작업은 요청별 이미지·분석 복사본을 사용하므로 늦게 끝난 응답이 반환 결과를 바꾸지 않는다. SDK의 실행 중 HTTP 요청은 강제 취소할 수 없으며 기존 HTTP timeout이 유지된다. 직접 `GeminiVLMClient.analyze()`를 호출하는 경로는 기존 동기 계약을 유지한다.
+
+재검토를 시작한 응답에만 `body_matching.parallel_review` 진단이 추가된다. `mode=parallel`, `status=completed|error|deadline_exceeded`, `target_count`, `merged_count`, `error`, `review_finished`, `review_elapsed_ms`, `overlap_ms`, `join_wait_ms`, `pose_path_ms`를 제공한다. `review_finished=false`이면 경과 시간은 수집 시점까지의 값이며 완료 시간이 아니다. 이 시간들은 내부 병렬 구간 진단이고 전체 요청 지연이나 제품 SLA가 아니다. [병렬화 검증과 제한](BODY_SELECTION/PARALLEL_REVIEW.md).
 
 기본은 `legacy`/`off`이며 실제 환경 설정을 바꾸지 않았다. 평가 모델·28명 기준·전신 경로의 시간과 회귀 관측은 [통합 평가](BODY_SELECTION/INTEGRATED_FIRST_CALL.md)를 따른다.
