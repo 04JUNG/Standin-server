@@ -762,8 +762,13 @@ BVH SHA·범위·FBX SHA 필드도 유지된다. GLB의 `asset.extras`에는
 
 Converter `/healthz`의 `preview_model_revision`과 `character_hashes`로 지원 여부와
 캐시 세대를 확인한다. exact V3.2.4 모드에서는 모델 capability가 꺼진다.
-모델 export용 모듈은 기존 `posed-mesh-v1` exporter와 분리하여 기존 사전 생성
-라이브러리의 키를 무효화하지 않는다. 배포 순서는 Converter/추론 → BFF → 앱이다.
+정적 GLB는 단일 mesh·내부 buffer를 유지하며 최대 8개의 triangle primitive를 허용한다.
+큰 아동 메시처럼 UInt32 인덱스 표가 8MiB 한도/50만 accessor 항목을 넘으면,
+원본 정점·split normal·삼각형과 winding을 보존해 최대 65,535정점의 UInt16 파트로 나눈다.
+LOD·decimation·양자화는 적용하지 않으며 원본 FBX/BVH와 뼈대는 유지한다.
+8MiB 파일·50만 accessor 항목 제한은 그대로이고 각 bufferView는 4바이트 정렬을 유지한다.
+Exporter revision과 사전 생성 GLB 캐시 키는 새 소스로 갱신되므로 재생성되지 않은 캐시는
+기존 missing-model 경로로 처리한다. **다중 primitive를 허용하는 앱을 먼저 배포한 뒤 Converter를 배포한다.**
 
 ### 대분류 체형 추천 (opt-in)
 
