@@ -4,6 +4,7 @@ Distances and semantic scores retain their own units. Reciprocal rank fusion
 combines ranked original-pose lists; the resulting score is not confidence.
 """
 from concurrent.futures import ThreadPoolExecutor
+from copy import deepcopy
 import math
 import os
 from pathlib import Path
@@ -283,7 +284,7 @@ class FullBodySearch:
             eligible = [r for r in ranked if r.get('match_level') != 'near_match'
                         and r['kind'] != 'framing_reference']
             out['selected'] = skin_session.filter(eligible, limit=self.top_k)
-            out['hand_skin_screen'] = skin_session.report()
+            out['hand_skin_screen'] = deepcopy(skin_session.report())
         if self.validator and required and required['active']:
             for hit in out['selected']:
                 checked=self.validator.check(required,hit['pose_id'])
@@ -301,6 +302,22 @@ class FullBodySearch:
         if skin_session and skin_session.unverified:
             return finish('partial_error' if out['selected'] else 'error', 'hand_skin_screen_unavailable_no_generation')
         if out['selected']:
+            from .mirror_reference import mirror_reference
+            try:
+                reference, comparison = mirror_reference(self, out['selected'], description, required, skin_session)
+            except (ValueError, KeyError, TypeError, OSError, AttributeError):
+                reference, comparison = None, dict(status='unavailable', reason='mirror_validation_failed')
+            out['mirror_comparison'] = comparison
+            if reference:
+                # The reference occupies one existing display slot, never a sixth.
+                budget = min(self.top_k, 5)
+                out['selected'] = [r for r in out['selected'] if r['pose_id'] != reference['pose_id']][:budget - 1]
+                out['mirror_references'] = [reference]
+                out['near_candidates'] = out['near_candidates'][:max(0, budget - len(out['selected']) - 1)]
+                out['framing_references'] = []
+            if skin_session:
+                # Optional, rejected references cannot invalidate already screened matches.
+                out['mirror_hand_skin_screen'] = skin_session.report()
             return finish('ok')
         # A branch may have only near candidates. These are review evidence,
         # not qualified matches, and must not suppress empty-search generation.
