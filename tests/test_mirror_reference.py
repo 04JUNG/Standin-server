@@ -107,7 +107,7 @@ def test_known_second_hand_prevents_one_hand_claim():
 def test_source_change_between_search_and_asset_projection_drops_reference():
     e, _, d, required, skin = fixture()
     row, comparison = mirror_reference(e, [hit('left')], d, required, skin)
-    data = report(); data.update(selected=[hit('left')],mirror_references=[row],mirror_comparison=comparison)
+    data = report(); data.update(selected=[hit('left', hand_skin_screen={'status': 'clear_screen'})],mirror_references=[row],mirror_comparison=comparison)
     p = present(data)  # resolver now returns different bytes than the checked library hashes
     assert not p.review_candidates
     assert p.mirror_comparison['status']=='unavailable'
