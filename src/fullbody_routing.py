@@ -301,6 +301,22 @@ class FullBodySearch:
         if skin_session and skin_session.unverified:
             return finish('partial_error' if out['selected'] else 'error', 'hand_skin_screen_unavailable_no_generation')
         if out['selected']:
+            from .mirror_reference import mirror_reference
+            try:
+                reference, comparison = mirror_reference(self, out['selected'], description, required, skin_session)
+            except (ValueError, KeyError, TypeError, OSError, AttributeError):
+                reference, comparison = None, dict(status='unavailable', reason='mirror_validation_failed')
+            out['mirror_comparison'] = comparison
+            if reference:
+                # The reference occupies one existing display slot, never a sixth.
+                out['selected'] = [r for r in out['selected'] if r['pose_id'] != reference['pose_id']][:self.top_k - 1]
+                out['mirror_references'] = [reference]
+                out['near_candidates'] = out['near_candidates'][:max(0, self.top_k - len(out['selected']) - 1)]
+                out['framing_references'] = []
+            if skin_session:
+                out['hand_skin_screen'] = skin_session.report()
+                if skin_session.unverified:
+                    return finish('partial_error', 'optional_mirror_screen_unavailable')
             return finish('ok')
         # A branch may have only near candidates. These are review evidence,
         # not qualified matches, and must not suppress empty-search generation.
