@@ -65,11 +65,17 @@ RRF 자연어 비중은 0.60, 기하 비중은 0.40이다. 로컬 set4/set5 가�
   안전 후보가 남으면 `partial_error`, 없으면 `error`이며 **오류를 생성으로 덮지 않는다**.
 - 검사 가능한 검색 후보가 모두 교차로 탈락했고 다른 오류가 없다면 기존 빈 검색 생성 분기를
   실행할 수 있다. 생성 후보도 관절·BVH 검증 후 같은 피부 검사를 통과해야 `preview_ready`에 남는다.
-- 인물별 검색/생성이 **최대 10회·누적 검사 30초(HTTP 1회 최대 15초)**를 공유한다.
+- 인물별 검색/생성이 **최대 10회·누적 검사 기본 45초(HTTP 1회 최대 15초)**를 공유한다.
   예산 때문에 확인하지 못한 후보는 미확인이며 통과나 자산 부재로 취급하지 않는다.
-  추가 변환 지연이 있으므로 호출 측 시간 예산에 이 후처리를 포함해야 한다.
+  `HAND_SKIN_SCREEN_BUDGET_SECONDS`로 누적 예산을 설정한다(유한한 `(0,60]`초,
+  이전 30초 예산으로 복귀 가능). 추가 변환 지연이 있으므로 호출 측 시간 예산에 이 후처리를 포함해야 한다.
 
 `dynamic_search.hand_skin_screen`에는 검사 횟수/예산/제외/미확인 진단이 남는다.
+HTTP 실패(`hand_screen_http_error`, 상태 코드만), 요청 시간 초과(`hand_screen_request_timeout`),
+네트워크 오류(`hand_screen_network_error`), receipt 형식 오류(`hand_screen_invalid_receipt`),
+입력 계보 불일치(`hand_screen_receipt_lineage_mismatch`, 불일치 필드명만),
+공통 예산/횟수 소진(`hand_screen_budget_exhausted`/`hand_screen_check_limit_exhausted`)을 구분한다.
+내부 URL·예외 원문·receipt의 불일치 값은 진단에 포함하지 않는다.
 제외·미확인 생성 진단에 BVH 본문을 새로 넣지 않는다. `near_candidates`는 기존 조건 차이의
 검토 참고로 유지하며 피부 검사 통과 후보라고 표시하지 않는다. 기본 머리·어깨 인체도 검사 대상이 아니다.
 손·몸통·소품·같은 손 내부, 완전 포함, 공면 접촉을 포함하는 완전한 충돌 검사가 아니므로
@@ -97,7 +103,7 @@ converter의 실시간 가용성 인증이 아니다.
 - 양손 `phone`·가슴 프레임 목표만 지원한다. 원래 제안에서 좌우 각 2/4/6/8cm를
   독립적으로 시도한다. 이전 수정에 누적해서 20cm 이동시키지 않는다.
 - 모델 재호출 없이 별도 종료 가능한 IK 프로세스를 사용한다. 전체 요청 최대 4회·
-  보정 벽시계 30초, #97의 누적 메시 검사 30초/10회 한도도 함께 지킨다.
+  보정 벽시계 30초, #97의 누적 메시 검사 설정 예산(기본 45초)/10회 한도도 함께 지킨다.
   기존 자연어 생성 60초와 별도 후처리 예산이므로 전체 응답은 60초 상한이 아니다.
 - 뼈 길이/관절/저장 왕복/독립 안전 검사, 원래 관찰 조건, 실제 손모양을 적용한
   변환 후 피부 검사를 모두 다시 통과한 최소 시도안을 검수용으로 남긴다.
@@ -1100,3 +1106,12 @@ worker·손 피부 HTTP 계약·현재 API registry/download 검증을 사용한
 추론 서버만 배포해도 기존 앱의 ‘후보 0개’ 표시는 해결되지 않는다.
 
 `GET /healthz.semantic_text.ready`는 직접 문장 검색에 쓰는 기존 전신 엔진의 실제 index·validator·startup 상태를 나타낸다. BFF는 이 값으로 문장 검색 준비 여부를 확인한다. 환경 플래그만으로 준비됨을 표시하지 않는다. 이 조회는 VLM·검색·생성을 호출하지 않는다.
+
+### 자세 설명 응답 형식과 오류 진단
+Gemini describe 호출은 `d5-structured-description`부터 response_json_schema를 함께 보낸다. people 배열의 minItems/maxItems는 요청 슬롯 수와 같고, 두상·가림으로 읽을 수 없어도 슬롯을 생략하는 대신 visible=false/certainty=low/빈 관찰로 기권한다. 좌표·숨은 팔다리·정상 검색 결과를 만들어 채우지 않는다. 기존의 관찰 및 의미 근거 게이트가 계속 최종 유효성을 판단한다.
+
+로컬 검증은 missing_text/missing_json/invalid_json/people_count_mismatch/invalid_person을 구분한다. gemini_pose_describe 로그의 validationCode/validationField에는 고정 코드와 필드 이름만 기록한다. VLM 응답 원문·프롬프트·이미지·인증값은 기록하지 않는다. 형식 실패는 기존 invalid_response/nonretryable을 유지하며 후보 없음이나 생성 성공으로 바꾸지 않는다. transient 오류의 기존 제한 재시도 정책도 유지한다.
+
+`tests/test_description_contract.py`는 실제 google-genai SDK와 localhost HTTP 서버로 요청의 schema 직렬화 및 HTTP 200 뒤 잘못된 응답 처리를 검증한다. 합성 이미지·가짜 키를 쓰며 외부 Gemini는 호출하지 않는다. 올바른 기권 응답은 빈 관찰을 유지하고, 형식 실패는 고정 code/field만 남긴 채 1회 호출로 종료한다. 이 회귀 통과와 실제 Gemini/스테이징 입력 재현은 별도 검증이다.
+
+스테이징 제보의 과거 로그는 ValueError만 남아 실패 필드를 복원할 수 없다. 이 변경은 응답 구조 예방과 다음 실패의 진단을 보강하며, 원본 입력의 스테이징 재실행 성공을 의미하지 않는다. 표시 scope의 불일치는 별도 BFF 범위 resolver 변경에서 처리한다.
