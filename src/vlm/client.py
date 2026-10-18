@@ -271,10 +271,11 @@ def parse_pose_descriptions(payload, count: int) -> dict:
     from ..semantic_vocab import VOCABULARY
     from ..body_language import validated_observations
     from ..pose_relations import validate_relations
+    from .description_contract import DescriptionResponseError
 
     people = payload.get("people") if isinstance(payload, dict) else None
     if not isinstance(people, list) or len(people) != count:
-        raise ValueError("describe_people: people length mismatch")
+        raise DescriptionResponseError("people_count_mismatch", "people")
     groups = {
         "postures": "posture", "actions": "action", "domains": "domain",
         "activities": "activity", "objects": "object", "intents": "intent",
@@ -283,8 +284,7 @@ def parse_pose_descriptions(payload, count: int) -> dict:
     out = {}
     for index, item in enumerate(people):
         if not isinstance(item, dict):
-            out[index] = None
-            continue
+            raise DescriptionResponseError("invalid_person", "people.item")
         kept, dropped = {}, {}
         for field_name, group in groups.items():
             values = item.get(field_name)
@@ -326,7 +326,7 @@ def parse_pose_descriptions(payload, count: int) -> dict:
             held_object_hand_counts={k:v for k,v in counts.items() if k in kept['objects']},
             arm_states=clean_arm_states(item.get('arm_states')),
             pose_relations=validate_relations(item.get('pose_relations')),
-            visible_scope=item.get('visible_scope') if item.get('visible_scope') in ('full','half','shoulder_head','head') else None,
+            visible_scope=item.get('visible_scope') if item.get('visible_scope') in ('full','half','bust','shoulder_head','head') else None,
             head_view=item.get('head_view') if item.get('head_view') in ('front','profile_left','profile_right','back','three_quarter_left','three_quarter_right') else None,
             dropped=dropped, **kept,
         )
@@ -500,6 +500,7 @@ class GeminiVLMClient(BaseVLMClient):
         """Single request; caller controls the bounded retry."""
         from google.genai import types
         from ..search_routing import DescribeOutcome
+        from .description_contract import description_schema, description_payload, DescriptionResponseError
 
         started = self._clock()
         try:
@@ -508,17 +509,20 @@ class GeminiVLMClient(BaseVLMClient):
                 contents=[prompts.pose_describe_prompt(boxes), self._to_part(image)],
                 config=types.GenerateContentConfig(
                     system_instruction=prompts.POSE_DESCRIBE_SYSTEM,
+                    response_json_schema=description_schema(len(boxes)),
                     response_mime_type="application/json",
                     temperature=0,
                     http_options=types.HttpOptions(timeout=CFG.routing_describe_timeout_ms),
                 ),
             )
-            descriptions = parse_pose_descriptions(_extract_json(resp.text), len(boxes))
+            descriptions = parse_pose_descriptions(description_payload(resp.text), len(boxes))
         except Exception as error:  # noqa: BLE001 - 상태로 돌려준다
             reason, retryable, delay = describe_failure_reason(error)
             elapsed = (self._clock() - started) * 1000
             log_warn("gemini_pose_describe", model=self._model, status="failed",
                      failureReason=reason, errorType=type(error).__name__,
+                     validationCode=error.code if isinstance(error, DescriptionResponseError) else None,
+                     validationField=error.field if isinstance(error, DescriptionResponseError) else None,
                      upstreamStatus=_http_status(error), elapsedMs=round(elapsed))
             return DescribeOutcome("error", error_reason=reason, retryable=retryable,
                                    retry_after_seconds=delay, elapsed_ms=elapsed,
