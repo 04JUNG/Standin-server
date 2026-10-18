@@ -1,6 +1,7 @@
 """Post-retrieval mesh gating without model/cloud/Blender calls."""
 import hashlib
 import json
+from urllib.error import HTTPError, URLError
 
 import pytest
 
@@ -33,7 +34,7 @@ def gate(tmp_path, statuses=(), ids=('a', 'b', 'c')):
         data = 'BVH '+pid
         (tmp_path/(pid+'.bvh')).write_text(data)
         hashes[pid] = hashlib.sha256(data.encode()).hexdigest()
-    return HandSkinGate(Checker(statuses), tmp_path, hashes)
+    return HandSkinGate(Checker(statuses), tmp_path, hashes, budget_seconds=30.)
 
 
 def test_crossing_removed_and_next_clear_pose_used(tmp_path):
@@ -189,3 +190,97 @@ def test_factory_reads_real_config_attribute_names(monkeypatch, tmp_path):
     assert result.client.character_id == 'standin-master-v2'
     assert result.client.base_url == 'http://converter'
     assert len(result.client.character_sha256) == 64
+    assert result.budget_seconds == CFG.hand_skin_screen_budget_seconds
+
+
+def test_staging_seventh_screen_trace_preserves_gate_and_fits_bounded_budget(monkeypatch, tmp_path):
+    import src.hand_skin_screen as module
+    # Actual Converter durations: two intersections before the fifth safe candidate.
+    durations = [4.271759, 4.052420, 4.024773, 7.226617, 4.030341, 4.011594, 7.467987]
+    statuses = ['intersection', 'clear_screen', 'clear_screen', 'clear_screen',
+                'intersection', 'clear_screen', 'clear_screen']
+
+    def run(budget):
+        now = [0.]
+        monkeypatch.setattr(module, 'monotonic', lambda: now[0])
+        class TimedChecker:
+            def __init__(self): self.calls = 0
+            def check(self, text, hands, timeout):
+                index = self.calls
+                self.calls += 1
+                now[0] += min(durations[index], timeout)
+                if durations[index] > timeout:
+                    return unknown('hand_screen_request_timeout')
+                return receipt(statuses[index])
+        client = TimedChecker()
+        g = HandSkinGate(client, tmp_path, {}, budget_seconds=budget)
+        session = g.session()
+        selected = []
+        for i in range(7):
+            result = session.check('actual-candidate-' + str(i))
+            if result['status'] == 'clear_screen': selected.append(i)
+        return selected, session, client
+
+    selected, old, _ = run(30.)
+    assert selected == [1, 2, 3, 5] and old.failed
+    selected, new, client = run(45.)
+    assert selected == [1, 2, 3, 5, 6] and not new.failed
+    assert client.calls == 7 and new.spent_seconds < 45.
+    assert 0 not in selected and 4 not in selected  # Both true intersections still rejected.
+
+
+@pytest.mark.parametrize('budget', [0., -1., float('inf'), float('nan'), 60.01])
+def test_invalid_skin_budget_fails_before_network(tmp_path, budget):
+    with pytest.raises(ValueError):
+        HandSkinGate(Checker(), tmp_path, {}, budget_seconds=budget)
+
+
+@pytest.mark.parametrize('failure,reason', [
+    (TimeoutError('private URL'), 'hand_screen_request_timeout'),
+    (URLError(TimeoutError('private URL')),
+     'hand_screen_request_timeout'),
+    (URLError('private hostname'),
+     'hand_screen_network_error'),
+])
+def test_client_diagnostics_distinguish_timeout_without_private_values(failure, reason):
+    def opener(*args, **kwargs): raise failure
+    client = HandSkinClient('http://private-host', 'character', '1'*64, opener=opener)
+    result = client.check('private BVH', None, 3.)
+    assert result['status'] == 'unavailable' and result['reason'] == reason
+    assert 'private' not in json.dumps(result)
+
+
+def test_client_lineage_diagnostic_names_fields_without_values():
+    text = 'BVH input'
+    payload = receipt(source_bvh_sha256=hashlib.sha256(text.encode()).hexdigest(),
+        character_id='wrong-private-character', character_sha256='1'*64,
+        solver_version=SOLVER_VERSION, hands=None,
+        hand_library_sha256=load_library().sha256, screened_artifact_sha256='2'*64)
+    client = HandSkinClient('http://private-host', 'expected', '1'*64,
+                           opener=lambda *a, **k: Response(payload))
+    result = client.check(text, None, 3.)
+    assert result['reason'] == 'hand_screen_receipt_lineage_mismatch'
+    assert result['mismatched_fields'] == ['character_id']
+    assert 'wrong-private-character' not in json.dumps(result)
+
+
+def test_http_error_reports_only_status_code():
+    from io import BytesIO
+    error = HTTPError('http://private-host', 503, 'private detail', {}, BytesIO(b'private body'))
+    def opener(*args, **kwargs): raise error
+    client = HandSkinClient('http://private-host', 'character', '1'*64, opener=opener)
+    result = client.check('private BVH', None, 3.)
+    assert result['reason'] == 'hand_screen_http_error'
+    assert result['upstream_status'] == 503 and error.closed
+    assert 'private' not in json.dumps(result)
+
+
+def test_budget_and_check_limit_have_distinct_diagnostics(tmp_path):
+    g = gate(tmp_path)
+    session = g.session()
+    session.spent_seconds = 30.
+    assert session.check('candidate')['reason'] == 'hand_screen_budget_exhausted'
+    session = g.session()
+    session.checks = 10
+    assert session.check('candidate')['reason'] == 'hand_screen_check_limit_exhausted'
+    assert not g.client.calls

@@ -159,6 +159,10 @@ class Config:
     thumbnail_character_id: str = os.getenv(
         "REFINE_THUMBNAIL_CHARACTER_ID", "standin-master-v2"
     )
+    # Shared post-retrieval budget; 15s per request, up to 10 checks per session.
+    hand_skin_screen_budget_seconds: float = float(os.getenv(
+        "HAND_SKIN_SCREEN_BUDGET_SECONDS", "45"
+    ))
     # 변환(~3s)+렌더 한 번의 상한. 초과하면 그림 없이 응답한다(조정 결과는 유지).
     thumbnail_timeout_seconds: float = float(
         os.getenv("REFINE_THUMBNAIL_TIMEOUT_SECONDS", "20")
@@ -507,6 +511,9 @@ class Config:
             raise ValueError("REFINE_THUMBNAIL_TIMEOUT_SECONDS must be positive")
         if not self.thumbnail_character_id.strip():
             raise ValueError("REFINE_THUMBNAIL_CHARACTER_ID must not be empty")
+        if (not math.isfinite(self.hand_skin_screen_budget_seconds)
+                or not 0 < self.hand_skin_screen_budget_seconds <= 60):
+            raise ValueError("HAND_SKIN_SCREEN_BUDGET_SECONDS must be in (0,60]")
         self.pose_model_uri = self.pose_model_uri.strip()
         self.pose_models_root = self.pose_models_root.strip()
         self.pose_model_manifest = self.pose_model_manifest.strip()

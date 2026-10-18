@@ -5,9 +5,11 @@ Unknown/errors are review evidence, never eligible library/generated results.
 """
 import hashlib
 import json
+import math
 import re
 from pathlib import Path
 from time import monotonic
+from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from converter.hand_contact import SCREEN_VERSION, validate_screen
@@ -16,9 +18,10 @@ from converter.protocol import SOLVER_VERSION
 from .refine_thumbnail import _multipart
 
 
-def unknown(reason):
+def unknown(reason, **diagnostics):
     return dict(status='unavailable', reason=reason, method=SCREEN_VERSION,
-                scope='opposite_hands_only', complete_collision_certificate=False)
+                scope='opposite_hands_only', complete_collision_certificate=False,
+                **diagnostics)
 
 
 class HandSkinClient:
@@ -52,19 +55,34 @@ class HandSkinClient:
             expected = dict(source_bvh_sha256=digest, character_id=self.character_id,
                 character_sha256=self.character_sha256, solver_version=SOLVER_VERSION,
                 hands=hands, hand_library_sha256=load_library().sha256)
-            if any(receipt.get(k) != v for k, v in expected.items()):
-                raise ValueError('skin receipt input lineage mismatch')
+            mismatched = [k for k, v in expected.items() if receipt.get(k) != v]
+            if mismatched:
+                # Fixed field names only; no private values, URLs, body or exception text.
+                return unknown('hand_screen_receipt_lineage_mismatch',
+                               mismatched_fields=mismatched)
             if not re.fullmatch(r'[0-9a-f]{64}', receipt.get('screened_artifact_sha256', '')):
                 raise ValueError('missing artifact hash')
             return receipt
+        except HTTPError as exc:
+            status = exc.code
+            exc.close()
+            return unknown('hand_screen_http_error', upstream_status=status)
+        except TimeoutError:
+            return unknown('hand_screen_request_timeout')
+        except URLError as exc:
+            return unknown('hand_screen_request_timeout' if isinstance(exc.reason, TimeoutError)
+                           else 'hand_screen_network_error')
+        except (ValueError, TypeError, KeyError, UnicodeError):
+            return unknown('hand_screen_invalid_receipt')
         except Exception:
-            # Timeout, old converter (404), invalid receipt, or network error:
-            # do not expose private URLs/paths and never silently pass a pose.
+            # Unexpected errors still fail closed and never expose exception text.
             return unknown('hand_screen_request_or_integrity_failed')
 
 
 class HandSkinGate:
-    def __init__(self, client, bvh_root, hashes, *, budget_seconds=30., max_checks=10):
+    def __init__(self, client, bvh_root, hashes, *, budget_seconds=45., max_checks=10):
+        if not math.isfinite(budget_seconds) or not 0 < budget_seconds <= 60:
+            raise ValueError('hand screen budget must be finite and in (0,60]')
         self.client, self.root, self.hashes = client, Path(bvh_root), dict(hashes)
         self.budget_seconds, self.max_checks = budget_seconds, max_checks
 
@@ -100,8 +118,12 @@ class SkinSession:
         remaining = self.gate.budget_seconds-self.spent_seconds
         if timeout_seconds is not None:
             remaining = min(remaining, timeout_seconds)
-        if self.failed or remaining <= 0 or self.checks >= self.gate.max_checks:
-            return unknown('hand_screen_budget_or_upstream_unavailable')
+        if self.failed:
+            return unknown('hand_screen_upstream_unavailable')
+        if remaining <= 0:
+            return unknown('hand_screen_budget_exhausted')
+        if self.checks >= self.gate.max_checks:
+            return unknown('hand_screen_check_limit_exhausted')
         self.checks += 1
         started = monotonic()
         try:
@@ -154,4 +176,5 @@ def build_hand_skin_gate(camera, bvh_root):
     character_id = CFG.thumbnail_character_id
     digest = characters['characters'].get(character_id, {}).get('sha256')
     client = HandSkinClient(CFG.thumbnail_converter_url, character_id, digest)
-    return HandSkinGate(client, bvh_root, camera.hashes)
+    return HandSkinGate(client, bvh_root, camera.hashes,
+                        budget_seconds=CFG.hand_skin_screen_budget_seconds)
