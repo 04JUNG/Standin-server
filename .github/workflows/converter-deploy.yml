@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
     inputs:
       deploy_staging:
-        description: "Deploy this ref to staging even when automatic deploys are disabled (never main/beta)"
+        description: "Deploy develop to staging even when automatic deploys are disabled (never main/beta)"
         type: boolean
         required: false
         default: false
@@ -36,7 +36,7 @@ jobs:
     name: Deploy isolated converter
     if: >-
       vars.CONVERTER_AUTO_DEPLOY_ENABLED == 'true' ||
-      (github.event_name == 'workflow_dispatch' && inputs.deploy_staging && github.ref != 'refs/heads/main')
+      (github.event_name == 'workflow_dispatch' && inputs.deploy_staging && github.ref == 'refs/heads/develop')
     runs-on: ubuntu-latest
     environment: ${{ github.ref == 'refs/heads/main' && 'beta' || 'staging' }}
     env:
