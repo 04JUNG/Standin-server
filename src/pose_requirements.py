@@ -21,6 +21,25 @@ def hand_counts(value):
             if isinstance(o,str) and isinstance(v,str) and v in ('one','two','unknown')}
 
 
+def object_hand_sides(parts, obj):
+    """Bound authored intent only. Do not infer objects from generic hand shapes.
+
+    Historical library records (and stored generated proposals) used object
+    names directly in hands. Preserve that exact-label compatibility only when
+    the new field is absent/None. An explicit empty/malformed binding cannot
+    fall back to a finger preset. Neither representation certifies mesh contact.
+    """
+    bindings = parts.get('held_object_hands')
+    if bindings is not None:
+        side = bindings.get(obj) if isinstance(bindings, dict) else None
+        return {'left': ['left'], 'right': ['right'], 'both': ['left', 'right']}.get(side, []) if isinstance(side, str) else []
+    hands = parts.get('hands') or {}
+    # Generic shapes like grip/fist/open can never be held-object identities.
+    if obj in ('grip', 'fist', 'open', 'flat', 'relaxed', 'soft', 'pinch', 'point', 'v', 'thumb', 'ok', 'shh'):
+        return []
+    return [side for side in ('left', 'right') if isinstance(hands, dict) and hands.get(side) == obj]
+
+
 def arms_from_text(text):
     """Qualitative legacy description compatibility; never infers screen sides."""
     text=re.sub(r'\s+','',text or '');out={}
@@ -63,7 +82,9 @@ def requirements(query,prepared):
     if count and len(prepared.get('objects',[]))==1:counts.setdefault(prepared['objects'][0],count)
     body={k:obs[k] for k in ('knees','legs') if obs.get(k) in ('bent','straight','mixed','apart','together','staggered')}
     if query.visible_scope in ('head','shoulder_head','half','bust'):body={}
+    object_hands={o:s for o,s in query.held_object_hands.items() if s in ('left','right','both')}
     return dict(posture=posture,arms=arms,body_states=body,hand_counts={k:v for k,v in counts.items() if v!='unknown'},
+                object_hands=object_hands,
                 active=bool(posture or arms or body or any(v!='unknown' for v in counts.values())))
 
 
@@ -150,12 +171,16 @@ class WholePoseValidator:
         for field,value in required.get('body_states',{}).items():
             add('body:'+field,value,observed['body'].get(field),'BVH_intrinsic_body')
             checks['body:'+field]['missing_is_optional']=True
-        parts=meta.get('body_parts') or {};hands=parts.get('hands') or {}
+        parts=meta.get('body_parts') or {}
         for obj,count in required['hand_counts'].items():
-            sides=[side for side in ('left','right') if hands.get(side)==obj]
+            sides=object_hand_sides(parts,obj)
             actual='two' if len(sides)==2 else 'one' if sides else None
             if not bound:actual=None
             add('hand_count:'+obj,count,actual,'BVH_bound_object_specific_hands')
+            wanted_side=required.get('object_hands',{}).get(obj)
+            if wanted_side in ('left','right','both'):
+                actual_side='both' if len(sides)==2 else sides[0] if sides else None
+                add('held_hand:'+obj,wanted_side,actual_side if bound else None,'BVH_bound_object_hand_intent')
             if count=='two':
                 separation=observed.get('hands_separation')
                 # Close wrists alone cannot prove a shared grip. Widely separated
