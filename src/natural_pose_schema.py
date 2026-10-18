@@ -14,6 +14,8 @@ Degree = Annotated[float, Field(ge=-180, le=180)]
 Vec = Annotated[list[Cm], Field(min_length=3, max_length=3)]
 Frame = Literal['w', 'p', 'c', 'h', 'tL', 'tR', 'kL', 'kR']
 Hand = Literal['open', 'flat', 'relaxed', 'soft', 'cup', 'grip', 'fist', 'pinch', 'point', 'v', 'thumb', 'ok', 'phone', 'shh']
+ObjectSide = Literal['left', 'right', 'both', 'unknown']
+ObjectName = Annotated[str, Field(min_length=1, max_length=80)]
 
 
 class Orientation(Strict):
@@ -114,6 +116,9 @@ class BodyParts(Strict):
     upper_action: Annotated[str, Field(min_length=1, max_length=160)]
     active_hand: Literal['L', 'R', 'both', 'none']
     hands: Hands
+    # Authored object-use intent, not a finger preset or a physical-contact receipt.
+    # None keeps old stored proposals readable; an explicit {} means no bindings.
+    held_object_hands: Annotated[dict[ObjectName, ObjectSide], Field(max_length=5)] | None = None
     head_direction: Annotated[str, Field(min_length=1, max_length=160)]
 
 
@@ -131,4 +136,14 @@ def validate_proposal(raw, taxonomy):
     for field, values in proposal.tags.model_dump().items():
         if field not in vocabulary or any(v not in vocabulary[field] for v in values):
             raise ValueError('unknown search-v2 tag: ' + field)
+    for obj, side in (proposal.body_parts.held_object_hands or {}).items():
+        if obj not in proposal.tags.object:
+            raise ValueError('held_object_not_in_object_tags')
+        # An explicit known empty/pointing hand contradicts a declared grasp.
+        # A grasp-compatible shape is necessary here, never sufficient evidence:
+        # no binding is ever inferred from the shape or active_hand field.
+        sides = ('L', 'R') if side == 'both' else (('L',) if side == 'left' else ('R',) if side == 'right' else ())
+        for hand in sides:
+            if getattr(proposal.body_parts.hands, hand) not in ('grip', 'fist', 'pinch', 'phone', 'cup'):
+                raise ValueError('held_object_hand_shape_incompatible')
     return proposal
