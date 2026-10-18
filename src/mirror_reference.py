@@ -13,8 +13,9 @@ def one_observed_side(description):
              if s in ('left', 'right') and state != 'unknown'}
     relations = {r.get('side') for r in description.pose_relations
                  if r.get('chain_visible') is True and r.get('side_confidence') == 'high'}
-    known |= relations & {'left', 'right'}
-    if 'both' in relations or len(known) != 1:
+    held = set(description.held_object_hands.values())
+    known |= (relations | held) & {'left', 'right'}
+    if 'both' in relations | held or len(known) != 1:
         return None
     return next(iter(known))
 
@@ -86,13 +87,13 @@ def mirror_reference(engine, selected, description, required, skin_session):
                          or (mirrored.get('objects') and core['object_state'] != 'match')):
                 reason = 'mirror_condition_check_failed'
                 continue
-            row = dict(pose_id=other, family=family, kind='mirror_reference',
+            row = dict(pose_id=other, source_bvh_sha256=hashes[other], family=family, kind='mirror_reference',
                 library_source=engine.meta[other].get('source'), camera=deepcopy(original.get('camera')),
                 semantic_preview_camera=deepcopy(original.get('semantic_preview_camera')),
                 rank_score=None, evidence={}, review_required=True, not_exact_match=True,
                 constraints_satisfied=False, match_level='opposite_hand_reference', lookup_allowed=True,
                 refine_allowed=False, release_allowed=False, actual_mesh_validated=False,
-                mirror_comparison=dict(family_id=family, original_pose_id=pid,
+                mirror_comparison=dict(family_id=family, original_pose_id=pid, original_bvh_sha256=hashes[pid],
                     is_mirror=other_meta['is_mirror'], observed_side=side, reference_side=_opposite(side),
                     reason='opposite_hand_reference', matches_observed_side=False),
                 core_conditions=dict(whole_pose_validation=engine.validator.check(required, other),

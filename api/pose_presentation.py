@@ -93,6 +93,7 @@ def candidate_id(person_index, kind, pose_id, asset, camera, scope):
 class MirrorComparisonOut(BaseModel):
     family_id: str = Field(min_length=1, max_length=512)
     original_pose_id: str = Field(min_length=1, max_length=512)
+    original_bvh_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
     original_candidate_id: str = Field(pattern=r'^preview_[a-f0-9]{64}$')
     is_mirror: bool
     observed_side: Literal['left', 'right']
@@ -198,7 +199,9 @@ def build_pose_presentation(report, *, person_index=0, output_scope=None, resolv
                 raw_comparison = row.get('mirror_comparison') or {}
                 original = next((c for c in out.library_candidates
                                  if c.pose_id == raw_comparison.get('original_pose_id')), None)
-                if original is None or raw_comparison.get('observed_side') == raw_comparison.get('reference_side'):
+                if (original is None or raw_comparison.get('original_bvh_sha256') != original.asset.bvh_sha256
+                        or row.get('source_bvh_sha256') != asset.bvh_sha256
+                        or raw_comparison.get('observed_side') == raw_comparison.get('reference_side')):
                     raise ValueError('unbound_mirror_reference')
                 comparison = MirrorComparisonOut(**raw_comparison, original_candidate_id=original.candidate_id)
                 normalized.projection_matches_search = False

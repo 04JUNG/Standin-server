@@ -314,9 +314,8 @@ class FullBodySearch:
                 out['near_candidates'] = out['near_candidates'][:max(0, self.top_k - len(out['selected']) - 1)]
                 out['framing_references'] = []
             if skin_session:
-                out['hand_skin_screen'] = skin_session.report()
-                if skin_session.unverified:
-                    return finish('partial_error', 'optional_mirror_screen_unavailable')
+                # Optional, rejected references cannot invalidate already screened matches.
+                out['mirror_hand_skin_screen'] = skin_session.report()
             return finish('ok')
         # A branch may have only near candidates. These are review evidence,
         # not qualified matches, and must not suppress empty-search generation.

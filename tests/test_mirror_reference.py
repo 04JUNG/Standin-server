@@ -1,5 +1,6 @@
 """Real-library reference selection is bounded and never ignores safety checks."""
 from copy import deepcopy
+import hashlib
 from types import SimpleNamespace
 
 import pytest
@@ -7,11 +8,12 @@ import pytest
 from src.mirror_reference import mirror_reference, one_observed_side
 from src.search_routing import PoseDescription
 from tests.test_pose_presentation import hit, report, present
+from api.pose_presentation import PreviewAssetOut, build_pose_presentation
 
 
 def fixture():
     ids = ['left', 'right', 'other']
-    meta = {pid: {'bvh_sha256': pid * 10, 'pose_family_id': 'pair' if pid != 'other' else 'other',
+    meta = {pid: {'bvh_sha256': hashlib.sha256(pid.encode()).hexdigest(), 'pose_family_id': 'pair' if pid != 'other' else 'other',
                   'is_mirror': pid == 'right'} for pid in ids}
     state = SimpleNamespace(unsafe=False, bad_conditions=False, calls=[])
     class Validator:
@@ -79,7 +81,7 @@ def test_presentation_pair_uses_real_assets_and_five_total_without_export():
     data['mirror_references'] = [row]
     data['mirror_comparison'] = comparison
     data['near_candidates'] = [hit('ignored')]
-    p = present(data)
+    p = build_pose_presentation(data, output_scope='half', resolve_library=lambda pid: PreviewAssetOut(transport='library_bvh', bvh_url='/pose/'+pid+'/bvh', bvh_sha256=hashlib.sha256(pid.encode()).hexdigest(), library_lookup_supported=True))
     assert len(p.library_candidates) + len(p.review_candidates) == 5
     reference = p.review_candidates[0]
     assert reference.kind == 'mirror_reference' and reference.pose_id == 'right'
@@ -96,3 +98,30 @@ def test_presentation_drops_orphaned_reference():
     p = present(report(mirror_references=[row]))
     assert not p.review_candidates
     assert 'mirror_reference_preview_unavailable' in p.issues
+
+
+def test_known_second_hand_prevents_one_hand_claim():
+    assert one_observed_side(PoseDescription(arm_states={'left':'raised'},held_object_hands={'cup':'right'})) is None
+
+
+def test_source_change_between_search_and_asset_projection_drops_reference():
+    e, _, d, required, skin = fixture()
+    row, comparison = mirror_reference(e, [hit('left')], d, required, skin)
+    data = report(); data.update(selected=[hit('left')],mirror_references=[row],mirror_comparison=comparison)
+    p = present(data)  # resolver now returns different bytes than the checked library hashes
+    assert not p.review_candidates
+    assert p.mirror_comparison['status']=='unavailable'
+
+
+def test_engine_pair_occupies_one_of_five_slots_and_keeps_main_rank(monkeypatch):
+    from tests.test_fullbody_routing import Camera, Semantic, decision, evidence
+    from src.fullbody_routing import FullBodySearch
+    from types import SimpleNamespace
+    rows = ['a','b','c','d','e']
+    engine=FullBodySearch([SimpleNamespace(pose_id=p,meta={}) for p in rows], Semantic(rows), Camera(rows))
+    reference=hit('actual_mirror',review_required=True,not_exact_match=True)
+    monkeypatch.setattr('src.mirror_reference.mirror_reference',lambda *a:(reference,{'status':'ready','reason':'opposite_hand_reference'}))
+    out=engine.search(decision(False),evidence())
+    assert len(out['selected'])==4 and len(out['mirror_references'])==1
+    assert [r['pose_id'] for r in out['selected']]==rows[:4]
+    assert out['selected'][0]['pose_id']=='a' and out['generation'] is None
