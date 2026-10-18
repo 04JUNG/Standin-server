@@ -1032,26 +1032,6 @@ job 소유권·접근제어·사용자 삭제/만료 정책 안에서 미리보�
 파일 접근 실패는 `error/partial_error + issues`이며 `no_result`로 바꾸거나 재생성하지 않는다.
 어떤 표시용 항목도 legacy `candidates`, `/refine`, `/export-order`에 복사하지 않는다.
 
-### 팀원 연결 요청과 완료 기준
-
-추론 서버 소유 변경은 이 필드·파일 무결성·OpenAPI·회귀 테스트까지다. BFF/앱 구현·배포는 별도다.
-
-1. BFF는 새 필드를 인물별로 저장·전달하고 library/inline 전송을 구분한다. body matching의
-   인물/체형 선택·수동 설정·손 프리셋 등 기존 계약은 그대로 보존한다. 검수/변환 조건을
-   바꾸거나 프리셋을 다시 구웠다면 이전 검사 근거를 새 결과의 인증으로 재사용하지 않는다.
-2. 앱은 새 필드가 있으면 그 목록을 읽고 검색/참고/생성 그룹을 구분한다. `search_status`,
-   `generation_status`, `issues`를 보존해 실패를 단순 후보 없음과 구분한다. 구버전 서버만
-   기존 candidates 경로를 사용한다. 두 목록을 임의로 합치거나 export 제한을 해제하지 않는다.
-3. 같은 러프의 인물별 목록 수와 표시 수가 일치하고 실제 BVH 미리보기가 열리는지 E2E로 확인한다.
-   검색 1개/legacy 0개, 정상 빈 검색, 생성 검수 성공, 생성 실패, 부분 오류, 근접 참고,
-   어깨~머리 기본 계획, 파일 누락·변경, 다인물 및 legacy 응답을 각각 검사한다.
-
-로컬 HTTP 회귀 예제: `tests/test_pose_presentation.py`. `pose_presentation` 로그는 그룹별 수와
-오류 코드만 기록한다(러프·설명·BVH 본문은 기록하지 않음). BFF·앱이 새 필드를 읽기 전까지는
-추론 서버만 배포해도 기존 앱의 ‘후보 0개’ 표시는 해결되지 않는다.
-
-`GET /healthz.semantic_text.ready`는 직접 문장 검색에 쓰는 기존 전신 엔진의 실제 index·validator·startup 상태를 나타낸다. BFF는 이 값으로 문장 검색 준비 여부를 확인한다. 환경 플래그만으로 준비됨을 표시하지 않는다. 이 조회는 VLM·검색·생성을 호출하지 않는다.
-
 ### 한손 반대손 참고 (`mirror_reference`)
 
 한쪽 **캐릭터 해부학적 손**만 관측되고 일반 원본 후보가 기존 전신 조건·손 피부 검사를
@@ -1095,8 +1075,28 @@ job 소유권·접근제어·사용자 삭제/만료 정책 안에서 미리보�
 
 재현 가능한 실제 에셋 검사는 `tests/test_mirror_reference_assets.py`의 opt-in 테스트다.
 `MIRROR_ASSET_ROOT`에 기존 릴리스 data 디렉터리, `MIRROR_CHARACTER_FBX`에 등록된
-`standin-master-v2` 파일을 지정하고 실행한다. 기본 30초/10회 손 검사 예산과 실제 Blender
+`standin-master-v2` 파일을 지정하고 실행한다. 실행 시 구성된 누적 예산·최대 10회 손 검사와 실제 Blender
 worker·손 피부 HTTP 계약·현재 API registry/download 검증을 사용한다. 원본 라이브러리는
 읽기만 하고 API용 경로는 임시 DB 복사본에서 재배치한다. `MIRROR_EVIDENCE_DIR`을 지정하면
 로컬 presentation/receipt 증거를 남긴다. 입력은 라이브러리 포즈의 결정적 2D 투영과 명시적
 한팔 관측이므로, 이 테스트 통과를 실제 러프/VLM/스테이징 통합 검증으로 보고하지 않는다.
+
+### 팀원 연결 요청과 완료 기준
+
+추론 서버 소유 변경은 이 필드·파일 무결성·OpenAPI·회귀 테스트까지다. BFF/앱 구현·배포는 별도다.
+
+1. BFF는 새 필드를 인물별로 저장·전달하고 library/inline 전송을 구분한다. body matching의
+   인물/체형 선택·수동 설정·손 프리셋 등 기존 계약은 그대로 보존한다. 검수/변환 조건을
+   바꾸거나 프리셋을 다시 구웠다면 이전 검사 근거를 새 결과의 인증으로 재사용하지 않는다.
+2. 앱은 새 필드가 있으면 그 목록을 읽고 검색/참고/생성 그룹을 구분한다. `search_status`,
+   `generation_status`, `issues`를 보존해 실패를 단순 후보 없음과 구분한다. 구버전 서버만
+   기존 candidates 경로를 사용한다. 두 목록을 임의로 합치거나 export 제한을 해제하지 않는다.
+3. 같은 러프의 인물별 목록 수와 표시 수가 일치하고 실제 BVH 미리보기가 열리는지 E2E로 확인한다.
+   검색 1개/legacy 0개, 정상 빈 검색, 생성 검수 성공, 생성 실패, 부분 오류, 근접 참고,
+   어깨~머리 기본 계획, 파일 누락·변경, 다인물 및 legacy 응답을 각각 검사한다.
+
+로컬 HTTP 회귀 예제: `tests/test_pose_presentation.py`. `pose_presentation` 로그는 그룹별 수와
+오류 코드만 기록한다(러프·설명·BVH 본문은 기록하지 않음). BFF·앱이 새 필드를 읽기 전까지는
+추론 서버만 배포해도 기존 앱의 ‘후보 0개’ 표시는 해결되지 않는다.
+
+`GET /healthz.semantic_text.ready`는 직접 문장 검색에 쓰는 기존 전신 엔진의 실제 index·validator·startup 상태를 나타낸다. BFF는 이 값으로 문장 검색 준비 여부를 확인한다. 환경 플래그만으로 준비됨을 표시하지 않는다. 이 조회는 VLM·검색·생성을 호출하지 않는다.
