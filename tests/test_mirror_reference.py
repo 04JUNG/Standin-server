@@ -77,7 +77,7 @@ def test_presentation_pair_uses_real_assets_and_five_total_without_export():
     e, _, d, required, skin = fixture()
     row, comparison = mirror_reference(e, [hit('left')], d, required, skin)
     data = report()
-    data['selected'] = [hit(pid) for pid in ('left', 'a', 'b', 'c')]
+    data['selected'] = [hit(pid, hand_skin_screen={'status': 'clear_screen'}) for pid in ('left', 'a', 'b', 'c')]
     data['mirror_references'] = [row]
     data['mirror_comparison'] = comparison
     data['near_candidates'] = [hit('ignored')]
@@ -125,3 +125,121 @@ def test_engine_pair_occupies_one_of_five_slots_and_keeps_main_rank(monkeypatch)
     assert len(out['selected'])==4 and len(out['mirror_references'])==1
     assert [r['pose_id'] for r in out['selected']]==rows[:4]
     assert out['selected'][0]['pose_id']=='a' and out['generation'] is None
+
+
+@pytest.mark.parametrize('extra', [
+    {'arms': {'left': 'raised', 'right': 'lowered'}},
+    {'object_hands': {'cup': 'right'}},
+    {'object_hands': {'cup': 'both'}},
+    {'hand_counts': {'cup': 'two'}},
+])
+def test_required_conditions_cannot_hide_second_observed_hand(extra):
+    e, _, d, required, skin = fixture()
+    required.update(extra)
+    row, comparison = mirror_reference(e, [hit('left')], d, required, skin)
+    assert row is None and comparison['status'] == 'not_requested'
+
+
+@pytest.mark.parametrize('flag,value', [
+    ('review_required', True), ('not_exact_match', True), ('constraints_satisfied', False),
+])
+def test_review_or_unsatisfied_original_never_becomes_reference_source(flag, value):
+    e, _, d, required, skin = fixture()
+    row, comparison = mirror_reference(e, [hit('left', **{flag: value})], d, required, skin)
+    assert row is None and comparison['status'] == 'unavailable'
+
+
+def pair_report():
+    e, _, d, required, skin = fixture()
+    row, comparison = mirror_reference(e, [hit('left')], d, required, skin)
+    data = report(mirror_references=[row], mirror_comparison=comparison)
+    data['selected'] = [hit('left', hand_skin_screen={'status': 'clear_screen'})]
+    return data
+
+
+def pair_presentation(data):
+    return build_pose_presentation(data, output_scope='half', resolve_library=lambda pid:
+        PreviewAssetOut(transport='library_bvh', bvh_url='/pose/'+pid+'/bvh',
+            bvh_sha256=hashlib.sha256(pid.encode()).hexdigest(), library_lookup_supported=True))
+
+
+@pytest.mark.parametrize('change', ['same_pose', 'bool_string', 'rank_score', 'score', 'score_kind',
+    'exact', 'satisfied', 'review_missing', 'camera', 'source_not_exact', 'source_fifth', 'mirror_skin', 'main_skin'])
+def test_api_rejects_malformed_reference_without_failing_verified_main(change):
+    data = pair_report()
+    row = data['mirror_references'][0]
+    if change == 'same_pose':
+        row['pose_id'] = 'left'
+        row['source_bvh_sha256'] = hashlib.sha256(b'left').hexdigest()
+    elif change == 'bool_string': row['mirror_comparison']['is_mirror'] = 'true'
+    elif change in ('rank_score', 'score'): row[change] = 0.9
+    elif change == 'score_kind': row['score_kind'] = 'weighted_rrf'
+    elif change == 'exact': row['not_exact_match'] = False
+    elif change == 'satisfied': row['constraints_satisfied'] = True
+    elif change == 'review_missing': row.pop('review_required')
+    elif change == 'camera': row['camera'] = {'yaw': 45.}
+    elif change == 'mirror_skin': row['hand_skin_screen']['status'] = 'unavailable'
+    elif change == 'main_skin': data['selected'][0]['hand_skin_screen']['status'] = 'unavailable'
+    elif change == 'source_not_exact': data['selected'][0]['not_exact_match'] = True
+    elif change == 'source_fifth': data['selected'] = [hit(p) for p in ('a', 'b', 'c', 'd', 'left')]
+    out = pair_presentation(data)
+    assert not out.review_candidates and out.library_candidates
+    assert out.status == 'ready' and out.mirror_comparison['status'] == 'unavailable'
+    assert 'mirror_reference_preview_unavailable' in out.issues
+
+
+def test_api_reserves_one_slot_even_with_extra_review_near_and_framing_rows():
+    data = pair_report()
+    data['selected'] += [hit('a'), hit('b'), hit('c', review_required=True), hit('d')]
+    data['near_candidates'] = [hit('near'+str(i)) for i in range(5)]
+    data['framing_references'] = [hit('framing'+str(i)) for i in range(5)]
+    out = pair_presentation(data)
+    assert len(out.library_candidates) + len(out.review_candidates) == 5
+    assert [c.pose_id for c in out.library_candidates] == ['left', 'a', 'b']
+    assert [c.kind for c in out.review_candidates] == ['geometry_review', 'mirror_reference']
+
+
+def test_optional_skin_unavailable_preserves_main_receipt_and_mandatory_failure(tmp_path, monkeypatch):
+    from tests.test_fullbody_routing import engine, decision, evidence
+    from tests.test_hand_skin_gate import gate
+    e = engine()
+    e.hand_skin_gate = gate(tmp_path)
+    def unavailable(engine, selected, description, required, session):
+        session.unverified.append({'pose_id': 'optional', 'hand_skin_screen': {'status': 'unavailable'}})
+        return None, {'status': 'unavailable', 'reason': 'mirror_hand_skin_not_clear'}
+    monkeypatch.setattr('src.mirror_reference.mirror_reference', unavailable)
+    out = e.search(decision(), evidence())
+    assert out['status'] == 'ok' and len(out['selected']) == 3
+    assert not out['hand_skin_screen']['unverified']
+    assert out['mirror_hand_skin_screen']['unverified'][0]['pose_id'] == 'optional'
+    e.hand_skin_gate = gate(tmp_path, ['unavailable'])
+    out = e.search(decision(), evidence())
+    assert out['status'] == 'error' and not out['selected']
+    assert out['reason'] == 'hand_skin_screen_unavailable_no_generation'
+    assert 'mirror_hand_skin_screen' not in out
+
+
+def test_already_selected_opposite_asset_is_not_demoted_from_main_results():
+    e, _, d, required, skin = fixture()
+    row, comparison = mirror_reference(e, [hit('left'), hit('right')], d, required, skin)
+    assert row is None and comparison['status'] == 'unavailable'
+
+
+def test_large_internal_top_k_still_uses_first_four_sources_only():
+    e, _, d, required, skin = fixture()
+    e.top_k = 20
+    row, comparison = mirror_reference(e, [hit('other')]*4 + [hit('left')], d, required, skin)
+    assert row is None and comparison['status'] == 'unavailable'
+
+
+@pytest.mark.parametrize('core', [None,
+    {'conflicts': [], 'relations': {'held_hand:cup': {'status': 'unknown'}}, 'object_state': 'match'},
+    {'conflicts': [], 'relations': {}, 'object_state': 'unknown'}])
+def test_missing_semantic_condition_evidence_never_passes_reference(core):
+    e, _, d, required, skin = fixture()
+    d.objects = ['cup']
+    d.held_object_hands = {'cup': 'left'}
+    e.semantic.service.index.lexicon.labels[('object', 'cup')] = '컵'
+    e.semantic.conditions = lambda *args: core
+    row, comparison = mirror_reference(e, [hit('left')], d, required, skin)
+    assert row is None and comparison['status'] == 'unavailable'

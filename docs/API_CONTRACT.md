@@ -955,7 +955,7 @@ legacy/라우팅 미실행이면 `pose_presentation=null`이며 기존 앱 경�
 | `unobserved_body_is_default` | 생성 진단의 명시적 기본값 여부만 전달. true=화면 밖 부위 기본값; null=근거 없음 |
 | `preview_status` | `ready`=표시용 파일 입력 있음, `unavailable`=파일/계약 오류로 없음, `not_requested`=미리보기 입력 없음. BFF 조회 실패 시 별도 오류 표시 필요 |
 | `library_candidates` | qualified 원본 검색 후보(최대 5개). 통과한 검색 조건 범위의 후보이며 완전한 메시 안전 인증 아님 |
-| `review_candidates` | `geometry_review`, `near_match`, `framing_reference` 분리 표시(합계 최대 10개). 정답 검색 성공으로 집계 금지 |
+| `review_candidates` | `geometry_review`, `near_match`, `framing_reference`, `mirror_reference` 분리 표시(기존 합계 최대 10개; 미러 참고 요청 시 일반 후보 포함 총 5개). 정답 검색 성공으로 집계 금지 |
 | `generated_candidates` | `preview_ready` 생성만 `generated_review`로 제공(최대 3개). 실패/근접 생성 진단의 BVH는 포함하지 않음 |
 | `basic_model` | 어깨~머리 기본 모델의 **출력 계획**. 미렌더 상태이며 BVH/FBX 경로를 지어내지 않음 |
 | `issues` | 미리보기 파일 누락·격리·해시 변경 등의 코드. 내부 파일 경로·예외 원문 미노출 |
@@ -1046,3 +1046,52 @@ job 소유권·접근제어·사용자 삭제/만료 정책 안에서 미리보�
 추론 서버만 배포해도 기존 앱의 ‘후보 0개’ 표시는 해결되지 않는다.
 
 `GET /healthz.semantic_text.ready`는 직접 문장 검색에 쓰는 기존 전신 엔진의 실제 index·validator·startup 상태를 나타낸다. BFF는 이 값으로 문장 검색 준비 여부를 확인한다. 환경 플래그만으로 준비됨을 표시하지 않는다. 이 조회는 VLM·검색·생성을 호출하지 않는다.
+
+### 한손 반대손 참고 (`mirror_reference`)
+
+한쪽 **캐릭터 해부학적 손**만 관측되고 일반 원본 후보가 기존 전신 조건·손 피부 검사를
+통과한 경우, 같은 명시적 `pose_family_id`의 반대 `is_mirror` 실제 라이브러리 에셋을
+최대 1개 추가로 검토할 수 있다. 필수 팔 상태·고신뢰도 visible-chain 관계·소지품 손
+중 양손 또는 상충하는 측면 근거가 있으면 요청하지 않는다. 보이지 않는 팔은 채우지 않는다.
+파일명으로 가족/측면을 추정하거나 BVH 생성·수정·CSS 반전을 하지 않는다.
+
+* 원본과 참고 모두 태그 메타데이터 `bvh_sha256`, 카메라 인덱스 해시,
+  body 인덱스 `source_sha256`가 같아야 한다. 참고는 현재 allowed/nonquarantine
+  라이브러리의 같은 family, 반대 **boolean** `is_mirror`여야 한다.
+* 관측 조건의 좌우 필드만 교환하여 `WholePoseValidator`·기존 의미 조건·실제 손 피부
+  검사를 다시 통과해야 한다. 그 밖의 자세/소지품/손 개수 조건은 유지하며 unknown이나
+  conflict를 성공으로 승격하지 않는다. 원본 검색 순서·점수는 유지한다.
+* `review_candidates[].kind=mirror_reference`, `rank_score=null`, `score_kind=null`.
+  `validation.not_exact_match=true`, `validation.constraints_satisfied=false`이며
+  `review_required=true`. 모든 표시 후보와 같이 내보내기·refine·release·자동 적용·
+  실제 메시 승인 권한은 false다. `lookup_allowed=true`는 검토용 파일 조회만 뜻한다.
+* `mirror_comparison`에는 `family_id`, `original_pose_id`, `original_bvh_sha256`,
+  `original_candidate_id`, 참고의 boolean `is_mirror`, `observed_side`, `reference_side`,
+  `reason=opposite_hand_reference`, `matches_observed_side=false`를 담는다. 두 side는
+  `left/right` 중 서로 반대이며 화면 좌우가 아니다. API가 현재 표시 원본의 candidate ID와
+  BVH 해시를 연결하고 참고의 `source_bvh_sha256`를 실제 registry 에셋 해시와 재검증한다.
+  원본이 사라졌거나 바이트/카메라가 바뀌면 참고를 버린다.
+* 카메라는 원본과 동일한 수치·회전 행렬을 한 번만 적용한다. 참고의
+  `render_camera.projection_matches_search=false`는 참고가 원래 관측의 검색 일치가
+  아님을 표시한다. 메타데이터 측면이나 카메라를 다시 반전하지 않는다.
+* 참고가 준비되면 일반 원본 최대 4개 + 참고 1개, 전체 최대 5개다. near/framing/geometry
+  review도 이 예산을 공유하며, 연결된 원본은 유지된 첫 4개 안에 있어야 한다.
+  선택적 참고 검증 실패는 이미 검증된 일반 후보와 그 순위·권한을 바꾸지 않는다.
+* 상위 `presentation.mirror_comparison.status`는 `ready/unavailable/not_requested`다.
+  `ready`에는 유효 참고가 정확히 하나 있어야 한다. API 재투영에서 참고가 탈락하면
+  `unavailable`, `reason=mirror_preview_unavailable`로 낮추고
+  `issues=mirror_reference_preview_unavailable`를 남긴다. 이것만으로 일반 후보의
+  `ready`를 오류로 바꾸지 않는다. 필수 일반 후보 손 검사 실패 정책은 그대로다.
+
+엔진의 `mirror_hand_skin_screen`은 선택적 검사 진단이다. 일반 후보에 이미 확정된
+`hand_skin_screen` 스냅샷과 분리하며, 참고 검사 timeout/미확인을 일반 후보 성공이나
+생성 허용으로 바꾸는 근거로 쓰지 않는다. BFF·앱은 `반대손 참고`와 원본 연결, 관측 손과
+참고 손을 표시하고 참고에 export/refine 동작을 제공하지 않는다.
+
+재현 가능한 실제 에셋 검사는 `tests/test_mirror_reference_assets.py`의 opt-in 테스트다.
+`MIRROR_ASSET_ROOT`에 기존 릴리스 data 디렉터리, `MIRROR_CHARACTER_FBX`에 등록된
+`standin-master-v2` 파일을 지정하고 실행한다. 기본 30초/10회 손 검사 예산과 실제 Blender
+worker·손 피부 HTTP 계약·현재 API registry/download 검증을 사용한다. 원본 라이브러리는
+읽기만 하고 API용 경로는 임시 DB 복사본에서 재배치한다. `MIRROR_EVIDENCE_DIR`을 지정하면
+로컬 presentation/receipt 증거를 남긴다. 입력은 라이브러리 포즈의 결정적 2D 투영과 명시적
+한팔 관측이므로, 이 테스트 통과를 실제 러프/VLM/스테이징 통합 검증으로 보고하지 않는다.

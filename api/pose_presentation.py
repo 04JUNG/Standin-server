@@ -95,11 +95,17 @@ class MirrorComparisonOut(BaseModel):
     original_pose_id: str = Field(min_length=1, max_length=512)
     original_bvh_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
     original_candidate_id: str = Field(pattern=r'^preview_[a-f0-9]{64}$')
-    is_mirror: bool
+    is_mirror: bool = Field(strict=True)
     observed_side: Literal['left', 'right']
     reference_side: Literal['left', 'right']
     reason: Literal['opposite_hand_reference']
     matches_observed_side: Literal[False] = False
+
+    @model_validator(mode='after')
+    def opposite_sides(self):
+        if self.observed_side == self.reference_side:
+            raise ValueError('mirror_requires_opposite_sides')
+        return self
 
 
 class PosePreviewOut(BaseModel):
@@ -133,6 +139,15 @@ class PosePreviewOut(BaseModel):
             raise ValueError('preview_source_mismatch')
         if (generated and self.pose_id is not None) or (not generated and not self.pose_id):
             raise ValueError('preview_pose_identity_mismatch')
+        if self.kind == 'mirror_reference':
+            if (self.mirror_comparison is None or self.pose_id == self.mirror_comparison.original_pose_id
+                    or self.rank_score is not None or self.score_kind is not None
+                    or self.render_camera.projection_matches_search
+                    or self.validation.get('not_exact_match') is not True
+                    or self.validation.get('constraints_satisfied') is not False):
+                raise ValueError('invalid_mirror_reference')
+        elif self.mirror_comparison is not None:
+            raise ValueError('unexpected_mirror_comparison')
         return self
 
 
@@ -199,11 +214,22 @@ def build_pose_presentation(report, *, person_index=0, output_scope=None, resolv
                 raw_comparison = row.get('mirror_comparison') or {}
                 original = next((c for c in out.library_candidates
                                  if c.pose_id == raw_comparison.get('original_pose_id')), None)
-                if (original is None or raw_comparison.get('original_bvh_sha256') != original.asset.bvh_sha256
+                if (original is None or original.rank > 4 or pid == original.pose_id
+                        or original.validation.get('not_exact_match') is True
+                        or original.validation.get('constraints_satisfied') is False
+                        or (original.validation.get('hand_skin_screen') or {}).get('status') != 'clear_screen'
+                        or (row.get('hand_skin_screen') or {}).get('status') != 'clear_screen'
+                        or row.get('review_required') is not True
+                        or row.get('not_exact_match') is not True
+                        or row.get('constraints_satisfied') is not False
+                        or any(row.get(k) is not None for k in ('score', 'score_kind', 'rank_score'))
+                        or raw_comparison.get('original_bvh_sha256') != original.asset.bvh_sha256
                         or row.get('source_bvh_sha256') != asset.bvh_sha256
                         or raw_comparison.get('observed_side') == raw_comparison.get('reference_side')):
                     raise ValueError('unbound_mirror_reference')
                 comparison = MirrorComparisonOut(**raw_comparison, original_candidate_id=original.candidate_id)
+                if normalized != original.render_camera or camera_kind != original.camera_kind:
+                    raise ValueError('mirror_camera_changed')
                 normalized.projection_matches_search = False
             item = PosePreviewOut(candidate_id=candidate_id(person_index, kind, pid, asset, normalized, output_scope),
                 pose_id=pid, source='library', library_source=row.get('library_source'), kind=kind, rank=rank,
@@ -224,8 +250,11 @@ def build_pose_presentation(report, *, person_index=0, output_scope=None, resolv
             review = row.get("match_level") == "geometry_fallback" or row.get("review_required") is True
             add_library(row, "geometry_review" if review else "library_match", rank)
         for rank, row in enumerate(report.get('mirror_references', [])[:1], 1):
-            if len(out.library_candidates) < 5:
-                add_library(row, 'mirror_reference', rank)
+            add_library(row, 'mirror_reference', rank)
+        if any(c.kind == 'mirror_reference' for c in out.review_candidates):
+            out.library_candidates = [c for c in out.library_candidates if c.rank <= 4]
+            out.review_candidates = [c for c in out.review_candidates
+                                     if c.kind == 'mirror_reference' or c.rank <= 4]
         for key, kind in (("near_candidates", "near_match"), ("framing_references", "framing_reference")):
             for rank, row in enumerate(report.get(key, [])[:5], 1):
                 if (len(out.review_candidates) < 10 and (not report.get("mirror_references")
@@ -283,7 +312,7 @@ def build_pose_presentation(report, *, person_index=0, output_scope=None, resolv
 
     if failed_search:
         out.status = out.search_status
-    elif out.search_status == "partial_error" or out.issues:
+    elif out.search_status == "partial_error" or any(i != 'mirror_reference_preview_unavailable' for i in out.issues):
         out.status = "partial_error" if (out.library_candidates or out.review_candidates or out.generated_candidates) else "error"
     elif out.library_candidates:
         out.status = "ready"

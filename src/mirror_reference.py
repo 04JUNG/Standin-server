@@ -6,7 +6,7 @@ def _opposite(side):
     return {'left': 'right', 'right': 'left'}.get(side, side)
 
 
-def one_observed_side(description):
+def one_observed_side(description, required=None):
     if not description:
         return None
     known = {s for s, state in description.arm_states.items()
@@ -15,7 +15,13 @@ def one_observed_side(description):
                  if r.get('chain_visible') is True and r.get('side_confidence') == 'high'}
     held = set(description.held_object_hands.values())
     known |= (relations | held) & {'left', 'right'}
-    if 'both' in relations | held or len(known) != 1:
+    required = required or {}
+    known |= {s for s, state in required.get('arms', {}).items()
+              if s in ('left', 'right') and state != 'unknown'}
+    required_hands = set(required.get('object_hands', {}).values())
+    known |= required_hands & {'left', 'right'}
+    if ('both' in relations | held | required_hands
+            or 'two' in required.get('hand_counts', {}).values() or len(known) != 1):
         return None
     return next(iter(known))
 
@@ -26,13 +32,14 @@ def mirror_reference(engine, selected, description, required, skin_session):
     All other conditions are kept. The original observation is not rewritten,
     hidden limbs are not filled, and the returned row has no retrieval score.
     """
-    side = one_observed_side(description)
+    side = one_observed_side(description, required)
     def result(reason, row=None):
         return row, dict(status='ready' if row else 'unavailable', reason=reason,
                          observed_side=side, reference_side=_opposite(side))
     if not side:
         return None, dict(status='not_requested', reason='one_known_arm_required')
-    if engine.top_k < 2:
+    budget = min(engine.top_k, 5)
+    if budget < 2:
         return result('display_budget_too_small')
     if not engine.validator or skin_session is None or required is None:
         return result('validation_unavailable')
@@ -62,17 +69,20 @@ def mirror_reference(engine, selected, description, required, skin_session):
     for relation in mirrored.get('action_relations', []):
         relation['side'] = _opposite(relation.get('side'))
     excluded = excluded_pose_ids()
+    selected_ids = {row['pose_id'] for row in selected}
     reason = 'bound_mirror_not_available'
-    for original in selected[:engine.top_k - 1]:
+    for original in selected[:budget - 1]:
         pid = original['pose_id']
         meta = bound(pid)
-        if not meta or original.get('review_required') or original.get('not_exact_match'):
+        if (not meta or pid not in engine.allowed or pid in excluded
+                or original.get('review_required') or original.get('not_exact_match')
+                or original.get('constraints_satisfied') is False):
             continue
         original_check = engine.validator.check(required, pid)
         if original_check['status'] not in ('passed', 'not_required'):
             continue
         family = meta['pose_family_id']
-        for other in sorted(engine.allowed - excluded - {pid}):
+        for other in sorted(engine.allowed - excluded - selected_ids):
             other_meta = bound(other)
             if (not other_meta or other_meta['pose_family_id'] != family
                     or other_meta['is_mirror'] == meta['is_mirror']
@@ -83,14 +93,15 @@ def mirror_reference(engine, selected, description, required, skin_session):
                 reason = 'mirror_condition_check_failed'
                 continue
             core = engine.semantic.conditions(mirrored, records[other], other)
-            if core and (core['conflicts'] or any(r['status'] != 'match' for r in core['relations'].values())
-                         or (mirrored.get('objects') and core['object_state'] != 'match')):
+            if ((mirrored.get('enabled') and not core) or core and
+                        (core['conflicts'] or any(r['status'] != 'match' for r in core['relations'].values())
+                         or (mirrored.get('objects') and core['object_state'] != 'match'))):
                 reason = 'mirror_condition_check_failed'
                 continue
             row = dict(pose_id=other, source_bvh_sha256=hashes[other], family=family, kind='mirror_reference',
                 library_source=engine.meta[other].get('source'), camera=deepcopy(original.get('camera')),
                 semantic_preview_camera=deepcopy(original.get('semantic_preview_camera')),
-                rank_score=None, evidence={}, review_required=True, not_exact_match=True,
+                rank_score=None, score=None, score_kind=None, evidence={}, review_required=True, not_exact_match=True,
                 constraints_satisfied=False, match_level='opposite_hand_reference', lookup_allowed=True,
                 refine_allowed=False, release_allowed=False, actual_mesh_validated=False,
                 mirror_comparison=dict(family_id=family, original_pose_id=pid, original_bvh_sha256=hashes[pid],
