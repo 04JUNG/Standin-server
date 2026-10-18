@@ -1,8 +1,12 @@
 """Malformed close-up descriptions remain failures; schema never invents evidence."""
 import json
+import threading
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from types import SimpleNamespace
 
 import pytest
+from google import genai
+from google.genai import types
 from PIL import Image
 
 from src.vlm.client import GeminiVLMClient, parse_pose_descriptions
@@ -56,3 +60,66 @@ def test_valid_head_description_preserves_unknown_hidden_limbs():
         'search_text': '왼쪽으로 향한 머리', 'certainty': 'medium'}]}, 1)[0]
     assert d.visible_scope == 'head' and d.head_view == 'profile_left'
     assert d.arm_states == {} and d.body_observations == {} and d.held_object_hands == {}
+
+
+@pytest.mark.parametrize('text,code,field', [
+    (None, 'missing_text', 'response'),
+    ('private response', 'missing_json', 'response'),
+    ('{"people":oops}', 'invalid_json', 'response'),
+    ('{"people":[]}', 'people_count_mismatch', 'people'),
+    ('{"people":[null]}', 'invalid_person', 'people.item'),
+    (json.dumps({'people': [{'visible': False, 'body_details': '',
+        'search_text': '', 'certainty': 'low'}]}), None, None),
+])
+def test_real_sdk_http200_description_contract(monkeypatch, text, code, field):
+    """Exercise SDK serialization and HTTP200 parsing without sending a rough."""
+    requests, logs = [], []
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_POST(self):
+            requests.append(json.loads(self.rfile.read(int(self.headers['Content-Length']))))
+            body = json.dumps({'candidates': [{'content': {'role': 'model',
+                'parts': [{'text': text}]}, 'finishReason': 'STOP'}]}).encode()
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def log_message(self, *_args):
+            pass
+
+    server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    sdk = genai.Client(api_key='local-description-test', http_options=types.HttpOptions(
+        base_url=f'http://127.0.0.1:{server.server_port}', timeout=3000))
+    monkeypatch.setattr('src.vlm.client.log_warn', lambda *args, **kw: logs.append(kw))
+    try:
+        client = GeminiVLMClient(client=sdk, model='local-description-test')
+        result = client.describe_people(Image.new('RGB', (16, 16)), [(0, 0, 1, 1)])
+    finally:
+        sdk.close()
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=1)
+
+    assert len(requests) == 1 and result.attempts == 1
+    schema = requests[0]['generationConfig']['responseJsonSchema']
+    assert schema['properties']['people']['minItems'] == 1
+    assert schema['properties']['people']['maxItems'] == 1
+    if code:
+        assert result.status == 'error' and result.error_reason == 'invalid_response'
+        assert not result.retryable and not result.descriptions
+        assert logs[0]['validationCode'] == code and logs[0]['validationField'] == field
+        assert set(logs[0]) == {'model', 'status', 'failureReason', 'errorType',
+            'validationCode', 'validationField', 'upstreamStatus', 'elapsedMs'}
+        if text is not None:
+            assert text not in json.dumps(logs)
+    else:
+        assert result.status == 'ok' and len(result.descriptions) == 1
+        description = result.descriptions[0]
+        assert not description.visible and description.certainty == 'low'
+        assert not description.arm_states and not description.body_observations
+        assert not description.search_text and not description.pose_relations
+        assert not logs

@@ -1052,4 +1052,6 @@ Gemini describe 호출은 `d5-structured-description`부터 response_json_schema
 
 로컬 검증은 missing_text/missing_json/invalid_json/people_count_mismatch/invalid_person을 구분한다. gemini_pose_describe 로그의 validationCode/validationField에는 고정 코드와 필드 이름만 기록한다. VLM 응답 원문·프롬프트·이미지·인증값은 기록하지 않는다. 형식 실패는 기존 invalid_response/nonretryable을 유지하며 후보 없음이나 생성 성공으로 바꾸지 않는다. transient 오류의 기존 제한 재시도 정책도 유지한다.
 
+`tests/test_description_contract.py`는 실제 google-genai SDK와 localhost HTTP 서버로 요청의 schema 직렬화 및 HTTP 200 뒤 잘못된 응답 처리를 검증한다. 합성 이미지·가짜 키를 쓰며 외부 Gemini는 호출하지 않는다. 올바른 기권 응답은 빈 관찰을 유지하고, 형식 실패는 고정 code/field만 남긴 채 1회 호출로 종료한다. 이 회귀 통과와 실제 Gemini/스테이징 입력 재현은 별도 검증이다.
+
 스테이징 제보의 과거 로그는 ValueError만 남아 실패 필드를 복원할 수 없다. 이 변경은 응답 구조 예방과 다음 실패의 진단을 보강하며, 원본 입력의 스테이징 재실행 성공을 의미하지 않는다. 표시 scope의 불일치는 별도 BFF 범위 resolver 변경에서 처리한다.
