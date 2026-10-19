@@ -73,6 +73,18 @@ def test_insufficient_joints_only_search_text():
     assert e.camera.calls==0 and e.semantic.calls==1
 
 
+@pytest.mark.parametrize('sufficient', [True, False])
+def test_rough_output_remains_five_when_semantic_pool_has_more(sufficient):
+    ids = tuple(f'pose_{i:02}' for i in range(30))
+    entries = [SimpleNamespace(pose_id=pid, meta={}) for pid in ids]
+    e = FullBodySearch(entries, Semantic(ids), Camera(ids))
+    out = e.search(decision(sufficient), evidence())
+    assert out['status'] == 'ok'
+    assert len(out['selected']) == 5
+    assert len({candidate['pose_id'] for candidate in out['selected']}) == 5
+    assert e.top_k == 5
+
+
 @pytest.mark.parametrize('weight', [0, 1, -1, float('nan'), float('inf')])
 def test_invalid_semantic_weight_rejected(weight):
     with pytest.raises(ValueError, match='semantic_weight'):
