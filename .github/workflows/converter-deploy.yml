@@ -130,6 +130,9 @@ jobs:
           task-definition: taskdef.json
           container-name: converter
           image: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          # An inherited ECS value overrides Docker's baked version in logs.
+          environment-variables: |
+            DEPLOYMENT_VERSION=${{ github.sha }}
 
       - uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         if: env.ECS_SERVICE != ''
