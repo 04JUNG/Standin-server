@@ -109,7 +109,9 @@ Inference의 `hand_skin_screen_check`/`hand_skin_screen_summary` 로그는 검�
 fixture가 검증하며 실제 child 실행은 CPU 부하/종료/대기 절감의 근거다.
 샌드박스 안에서는 입력 없는 Blender 기동도139로 종료되어, 실제 Blender 검증은
 설치된 로컬 바이너리를 제한 밖에서 실행했다. 코드 변경 없이 배포 환경이 수정된 것이 아니다.
-수정 코드는 아직 스테이징에 배포하지 않았으므로 동일 원본3종/native205의 최신 E2E는 남는다.
+위 수치는 최초 PR 작성 시점의 로컬 검증이다. 실제 스테이징 후속 검증에서는
+큐 대기가 줄어도 실행 자체가 기존 예산을 소진했다. 동일 원본3종과 native205의
+결과·배포 리비전·남은 검증은 [후속 실측](HAND_SCREEN_STAGING_2026-10-19.md)을 따른다.
 
 실제 자산 검증 도구는 `python -m tests.converter.verify_hand_skin_screen` 및
 `python -m tests.converter.verify_screen_contention --help`를 따른다. 공유 로컬
