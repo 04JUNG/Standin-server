@@ -1,3 +1,5 @@
+Current full-library/reference-skinning follow-up: [HUMAN_REFERENCE_POSTERS.md](HUMAN_REFERENCE_POSTERS.md). The initial frozen-bake smoke results below cover the earlier implementation only.
+
 # Default-body pose posters
 
 Search cards can display a verified, canonical front orthographic image without starting Blender. This reference uses the pinned `standin-master-v2` default mesh, not the selected body, shape, hands, or search camera. The source BVH is exact, including actual mirrored library entries. No image reflection is used.

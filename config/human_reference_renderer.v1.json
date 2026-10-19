@@ -1,0 +1,11 @@
+{
+  "version": "reference-skinning-v1",
+  "algorithm_sha256": "eb28fef84614baed85b34f28a7c0030cc4439626a11314034a4c6879f84f9e01",
+  "client_source_sha256": {
+    "preview/humanReference/template.ts": "6a406affebb2fdda246ea3edc4f2688eb2551a920640b792eaed1e1b7a9b58c7",
+    "preview/humanReference/pose.ts": "04a48ad6813bc378f4221ebbea37407fc246731562bce8bc1bda9b6175121b93",
+    "preview/humanReference/render.ts": "8a3a60b0248d455da74c6e6850e55d276eb8bb893ef8fa3018cb431ec5fbc15c",
+    "preview/previewStyle.ts": "efc03a8890817e9aa11c1b06bb51108c81b0f00c8b7344661d2056a6636976a9",
+    "preview/previewStyleContract.ts": "07b7002452a4d13e4945cfd1c97587f4f8086357d7693c9c46ca43d5aaf37167"
+  }
+}
