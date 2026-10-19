@@ -10,8 +10,8 @@ from api.semantic_text import user_query
 from src.fullbody_routing import FullBodySearch
 from src.semantic_adapter_285 import Semantic285Adapter
 from src.semantic_search import SemanticHit, SemanticSearchResult
-from src.semantic_search_285 import SemanticSearchService, SemanticSettings
-from tests.test_semantic_search_285 import _index
+from src.semantic_search_285 import SemanticIndex, SemanticSearchService, SemanticSettings
+from tests.test_semantic_search_285 import _index, _write_library, POSES
 
 
 class Validator:
@@ -65,7 +65,8 @@ def test_real_index_uses_existing_adapter_and_user_threshold(environment):
 @pytest.mark.parametrize("payload", [
     {}, {"query": ""}, {"query": " \n "}, {"query": "!!!"}, {"query": "😄"},
     {"query": "가"*501}, {"query": None}, {"query": 123},
-    {"query": "야구", "topK": 0}, {"query": "야구", "topK": 21},
+    {"query": "야구", "topK": 0}, {"query": "야구", "topK": -1},
+    {"query": "야구", "topK": 1.5}, {"query": "야구", "topK": "all"},
     {"query": "야구", "topK": True}, {"query": "야구", "topK": "5"},
     {"query": "야구", "source": "vlm"}, {"query": "야구", "min_score": 0},
     {"query": "야구", "tags": ["action:throw"]},
@@ -191,3 +192,119 @@ def test_health_reports_actual_direct_text_readiness(environment):
     pipeline._fullbody_search.startup_error = None
     pipeline._fullbody_search.validator = None
     assert client.get('/healthz').json()['semantic_text']['ready'] is False
+
+
+@pytest.fixture
+def large_environment(tmp_path, monkeypatch):
+    # Real SQLite/tag index and real adapter, with more than 20 distinct families.
+    # This catches an accidental hidden Top20 cap in the shared retrieval pool.
+    tags, description = POSES[0][1:]
+    poses = [(f"pitch_variant_{i:03}", tags, description) for i in range(45)] + [POSES[-1]]
+    index = SemanticIndex.load(**_write_library(str(tmp_path), poses=poses),
+        excluded_pose_ids={"quarantined_pose"})
+    semantic = Semantic285Adapter(SemanticSearchService(index, SemanticSettings()))
+    engine = FullBodySearch([SimpleNamespace(pose_id=d.pose_id, meta={}) for d in index.docs],
+                           semantic, SimpleNamespace())
+    validator = Validator()
+    engine.validator = semantic.whole_pose_validator = validator
+    monkeypatch.setitem(api.STATE, "pipeline", SimpleNamespace(_fullbody_search=engine))
+    monkeypatch.setitem(api.STATE, "pose_library", {"version": "large-test"})
+    return TestClient(api.app), engine, semantic, validator
+
+
+@pytest.mark.parametrize("name", ["topK", "top_k"])
+def test_all_matches_exceed_twenty_without_changing_shared_settings(large_environment, name):
+    client, engine, semantic, _ = large_environment
+    shared_settings = semantic.service.settings
+    response = client.post('/semantic-search', json={"query": "야구공을 던지는 투수", name: None})
+    assert response.status_code == 200, response.text
+    result = response.json()
+    assert result['status'] == 'ok' and result['top_k'] is None
+    assert result['total_candidates'] == len(result['candidates']) == 45
+    assert result['total_near_candidates'] == len(result['near_candidates']) == 0
+    assert [c['rank'] for c in result['candidates']] == list(range(1, 46))
+    assert len({c['pose_id'] for c in result['candidates']}) == 45
+    assert all(c['pose_id'] != 'quarantined_pose' for c in result['candidates'])
+    assert all(c['pose_id'] == c['pose']['pose_id'] and c['score'] >= result['threshold']
+               and not c['refine_allowed'] for c in result['candidates'])
+    assert engine.top_k == 5 and semantic.service.settings is shared_settings
+    assert semantic.service.settings.max_top_k == 20
+    # An all-results request must not change later requests' legacy default.
+    default = client.post('/semantic-search', json={"query": "야구공을 던지는 투수"}).json()
+    assert default['top_k'] == 5 and len(default['candidates']) == 5
+    assert default['total_candidates'] == 45
+
+
+@pytest.mark.parametrize("limit,expected", [(21, 21), (30, 30), (10000, 45)])
+def test_positive_limit_above_twenty_is_allowed_without_padding(large_environment, limit, expected):
+    client, _, _, _ = large_environment
+    result = client.post('/semantic-search', json={"query": "야구공을 던지는 투수", "topK": limit})
+    assert result.status_code == 200
+    assert len(result.json()['candidates']) == expected
+    assert result.json()['total_candidates'] == 45
+
+
+def test_all_results_separate_near_matches_and_respect_rollout_exclusions(large_environment):
+    client, engine, semantic, validator = large_environment
+    ids = sorted(d.pose_id for d in semantic.service.index.docs)
+    for pid in ids[:12]:
+        validator.statuses[pid] = 'near_match'
+    for pid in ids[12:16]:
+        validator.statuses[pid] = 'conflict'
+    excluded = ids[-1]
+    engine.include_stored_compositions = False
+    engine.meta[excluded]['source'] = 'generated_composition'
+    body = {"query": "서서 야구공을 던지는 투수", "topK": None}
+    full = client.post('/semantic-search', json=body).json()
+    assert full['status'] == 'ok'
+    assert full['total_candidates'] == len(full['candidates']) == 28
+    assert full['total_near_candidates'] == len(full['near_candidates']) == 12
+    actual = {c['pose_id'] for c in full['candidates']}
+    near = {c['pose_id'] for c in full['near_candidates']}
+    assert not actual & near
+    assert excluded not in actual | near
+    assert not set(ids[12:16]) & (actual | near)
+    assert all(c['matched']['whole_pose_validation']['status'] == 'passed' for c in full['candidates'])
+    assert all(c['matched']['whole_pose_validation']['status'] == 'near_match' for c in full['near_candidates'])
+    limited = client.post('/semantic-search', json={**body, 'topK': 7}).json()
+    assert len(limited['candidates']) == len(limited['near_candidates']) == 7
+    assert limited['total_candidates'] == 28 and limited['total_near_candidates'] == 12
+    assert limited['candidates'] == full['candidates'][:7]
+    assert limited['near_candidates'] == full['near_candidates'][:7]
+
+
+def test_all_results_empty_and_unavailable_preserve_status_contract(environment, monkeypatch):
+    client, _, semantic, _ = environment
+    result = client.post('/semantic-search', json={"query": "우주엘리베이터 요리", "topK": None})
+    assert result.status_code == 200
+    assert result.json()['status'] == 'no_result' and result.json()['error'] is None
+    assert result.json()['top_k'] is None and result.json()['total_candidates'] == 0
+    monkeypatch.setattr(semantic, 'search', lambda *a, **k: SemanticSearchResult('error'))
+    result = client.post('/semantic-search', json={"query": "야구공", "topK": None})
+    assert result.status_code == 503 and result.json()['status'] == 'error'
+    assert result.json()['total_candidates'] == result.json()['total_near_candidates'] == 0
+
+
+def test_all_results_only_near_matches_are_not_exact_success(large_environment):
+    client, _, semantic, validator = large_environment
+    validator.statuses = {doc.pose_id: 'near_match' for doc in semantic.service.index.docs}
+    response = client.post('/semantic-search', json={"query": "서서 야구공을 던지는 투수", "topK": None})
+    assert response.status_code == 200
+    result = response.json()
+    assert result['status'] == 'no_result' and result['candidates'] == []
+    assert result['total_candidates'] == 0
+    assert result['total_near_candidates'] == len(result['near_candidates']) == 45
+    assert [c['rank'] for c in result['near_candidates']] == list(range(1, 46))
+
+
+def test_all_results_openapi_is_nullable_and_has_no_twenty_cap(environment):
+    client, _, _, _ = environment
+    models = client.get('/openapi.json').json()['components']['schemas']
+    request = models['SemanticTextRequest']['properties']['topK']
+    assert request['default'] == 5
+    assert {'type': 'null'} in request['anyOf']
+    integer = next(option for option in request['anyOf'] if option['type'] == 'integer')
+    assert integer['minimum'] == 1 and 'maximum' not in integer
+    response = models['SemanticTextResponse']['properties']
+    assert {'type': 'null'} in response['top_k']['anyOf']
+    assert {'total_candidates', 'total_near_candidates'} <= response.keys()

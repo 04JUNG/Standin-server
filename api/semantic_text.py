@@ -16,7 +16,8 @@ from src.semantic_search_285 import normalize_text
 class SemanticTextRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
     query: str = Field(strict=True, min_length=1, max_length=500)
-    top_k: int = Field(5, alias="topK", strict=True, ge=1, le=20)
+    top_k: int | None = Field(5, alias="topK", strict=True, ge=1,
+        description="Maximum candidates per group; null returns all eligible matches. Omitted defaults to 5.")
 
     @field_validator("query")
     @classmethod
@@ -45,7 +46,11 @@ class SemanticTextResponse(BaseModel):
     near_candidates: list[SemanticTextCandidate] = Field(default_factory=list)
     backend: str | None = None
     threshold: float | None = None
-    top_k: int
+    top_k: int | None
+    total_candidates: int = Field(0, ge=0,
+        description="Eligible exact candidates before the optional TopK limit; not library size.")
+    total_near_candidates: int = Field(0, ge=0,
+        description="Eligible near matches before the optional TopK limit; separate from exact candidates.")
     pose_library: dict | None = None
     elapsed_ms: float
     score_is_accuracy: Literal[False] = False
@@ -132,7 +137,11 @@ def search_text(request, pipeline, library=None):
                 raise ValueError("candidate_not_validated")
             target = near if checked == "near_match" else candidates
             target.append(SemanticTextCandidate(rank=len(target)+1, **hit))
+        # None is an explicit opt-in to all validated matches. Keep the legacy
+        # default and /analyze's independent Top5 policy unchanged. Slicing by
+        # None returns the whole list, with no padding or threshold relaxation.
         body.update(status="ok" if candidates else "no_result",
+                    total_candidates=len(candidates), total_near_candidates=len(near),
                     candidates=candidates[:request.top_k], near_candidates=near[:request.top_k])
         return finish(200)
     except Exception:
