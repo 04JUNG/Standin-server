@@ -88,6 +88,7 @@ from api.models import (CutResultOut, PersonOut, CandidateOut, SkeletonOut,
 from api.candidate_presentation import candidate_camera, refine_in_camera
 from api.semantic_text import SemanticTextRequest, SemanticTextResponse, search_text, semantic_text_ready
 from api.pose_presentation import PreviewAssetOut, build_pose_presentation
+from api.hand_skin_middleware import HandSkinMiddleware
 
 # uvicorn이 자기 로깅을 세운 뒤 이 모듈을 import한다. 여기서 덮어써야 로그가
 # JSON 한 종류로 남는다(그대로 두면 uvicorn 형식과 우리 형식이 섞인다).
@@ -291,6 +292,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Standin Pose Pipeline", version="0.2.2", lifespan=lifespan)
+if CFG.hand_skin_screen_concurrency == 2:
+    app.add_middleware(HandSkinMiddleware)
 
 
 def _refine_capability() -> dict:
