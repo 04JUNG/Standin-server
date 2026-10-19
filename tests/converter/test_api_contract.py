@@ -444,7 +444,8 @@ def test_convert_is_503_on_character_hash_mismatch(tmp_path):
 
 def test_openapi_declares_multipart_convert_contract(tmp_path):
     payload = _client(tmp_path).get("/openapi.json").json()
-    assert payload["info"]["version"] == "1.2.0"
+    assert payload["info"]["version"] == "1.3.0"
+    assert "/convert-framed-export" in payload["paths"]
     request_body = payload["paths"]["/convert"]["post"]["requestBody"]
     assert "multipart/form-data" in request_body["content"]
     bundle_body = payload["paths"]["/convert-bundle"]["post"]["requestBody"]
@@ -582,3 +583,62 @@ def test_convert_endpoints_do_not_request_a_thumbnail(tmp_path):
     assert _post(client).status_code == 200
     assert _post_bundle(client).status_code == 200
     assert all(call["thumbnail"] is None for call in runner.calls)
+
+
+@pytest.mark.parametrize('cause,status', [('preempt',503),('cancel',499),('deadline',504)])
+def test_work_failures_have_safe_phase_timing_and_retry_headers(tmp_path,cause,status):
+    from converter_api.work_queue import current_work
+    class StoppedRunner(FakeRunner):
+        def convert(self, **kwargs):
+            control=current_work.get()
+            assert control.kind=='screen'
+            control.queue_wait_ms=12.5
+            if cause=='preempt': control.preempted.set()
+            if cause=='cancel': control.cancelled.set()
+            if cause=='deadline': control.started-=100
+            control.check('queue')
+    response=_client(tmp_path,runner=StoppedRunner()).post('/screen-hand-contact',
+        files={'bvh':('pose.bvh',VALID_BVH,'application/octet-stream')},
+        data={'expected_bvh_sha256':hashlib.sha256(VALID_BVH).hexdigest()},
+        headers={'X-Standin-Work-Budget-Ms':'12000','X-Request-Id':'req_00000000-0000-0000-0000-000000000000'})
+    assert response.status_code==status
+    assert response.json()['error']['diagnostics']['phase']=='queue'
+    assert response.json()['error']['diagnostics']['budget_ms']==12000
+    assert response.json()['error']['diagnostics']['request_id']=='req_00000000-0000-0000-0000-000000000000'
+    assert response.headers['X-Standin-Queue-Wait-Ms']=='12.5'
+    assert response.headers['X-Standin-Conversion-Id']==response.json()['error']['diagnostics']['conversion_id']
+    assert ('retry-after' in response.headers)==(cause=='preempt')
+    assert VALID_BVH.decode() not in response.text
+
+
+@pytest.mark.parametrize('path,kind',[('/convert-framed','preview'),('/convert-framed-export','normal')])
+@pytest.mark.parametrize('preview_format',['png','model'])
+def test_scoped_export_path_keeps_identical_artifact_lineage_without_header_upgrade(tmp_path,path,kind,preview_format):
+    import base64
+    from converter_api.work_queue import current_work
+    from tests.converter.test_framing_contract import FramedRunner
+    from tests.converter.test_review_model import ModelRunner
+    base=ModelRunner if preview_format=='model' else FramedRunner
+    class Observe(base):
+        def convert(self,**kwargs):
+            assert current_work.get().kind==kind
+            return super().convert(**kwargs)
+    runner=Observe()
+    client=_client(tmp_path,runner=runner)
+    fields={'output_scope':'half','preview_view':'front','preview_format':preview_format,
+            'expected_bvh_sha256':hashlib.sha256(VALID_BVH).hexdigest()}
+    response=client.post(path,files={'bvh':('pose.bvh',VALID_BVH,'application/octet-stream')},
+                         data=fields,headers={'X-Standin-Work-Class':'screen'})
+    assert response.status_code==200,response.text
+    assert response.headers['X-Standin-Work-Class']==kind
+    value=response.json()
+    assert value['output_scope']=='half'
+    for field in ('fbx','preview'):
+        assert hashlib.sha256(base64.b64decode(value[field+'_base64'])).hexdigest()==value[field+'_sha256']
+    response=client.post(path,files={'bvh':('pose.bvh',VALID_BVH,'application/octet-stream')},
+                         data={**fields,'expected_bvh_sha256':'0'*64})
+    assert response.status_code==409 and len(runner.calls)==1
+    if preview_format=='model': runner.bad_field='base_fbx_sha256'
+    else: runner.corrupt='preview_sha256'
+    response=client.post(path,files={'bvh':('pose.bvh',VALID_BVH,'application/octet-stream')},data=fields)
+    assert response.status_code==500 and 'fbx_base64' not in response.json()

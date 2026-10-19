@@ -94,7 +94,7 @@ def test_runtime_contract_imports_from_exact_docker_copy_allowlist(tmp_path):
             dst.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(src, dst)
     process = subprocess.run([sys.executable, '-c',
-        'import json; from converter_api.body_preview import preview_contract; print(json.dumps(preview_contract()))'],
+        'import json; import converter_api.app; from converter_api.body_preview import preview_contract; print(json.dumps(preview_contract()))'],
         cwd=tmp_path, capture_output=True, text=True)
     assert process.returncode == 0, process.stderr
     assert json.loads(process.stdout) == preview_contract()

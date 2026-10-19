@@ -55,7 +55,7 @@ def compose_scene(runner, *, manifest, fbx_bytes):
         except OSError as exc:
             raise BlenderUnavailableError("scene Blender could not start") from exc
         try:
-            process.communicate(timeout=runner.settings.timeout_seconds)
+            runner._communicate(process, runner.settings.timeout_seconds)
         except subprocess.TimeoutExpired as exc:
             runner._terminate_process_group(process, runner.settings.terminate_grace_seconds)
             raise ConversionTimeoutError("scene composition timed out") from exc
