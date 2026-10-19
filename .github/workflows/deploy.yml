@@ -146,6 +146,7 @@ jobs:
           # ⚠ 아래 블록(|) 안에는 주석을 쓰지 않는다. YAML 블록 안의 #은 주석이 아니라 값이라
           #   렌더 액션이 그 줄을 환경 변수로 읽다가 배포가 실패한다.
           environment-variables: |
+            DEPLOYMENT_VERSION=${{ github.sha }}
             APP_ENV=production
             POSE_BACKEND=rtmlib
             POSE_STRICT=1
