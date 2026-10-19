@@ -213,6 +213,15 @@ class FullBodySearch:
             ranking=self.ranking, rank_score_is_accuracy=False,
             geometry_evidence=decision.joint.to_dict(), description_evidence=decision.semantic.to_dict())
         def finish(status, reason=None):
+            screen = out.get('hand_skin_screen')
+            if screen:
+                from .logging_setup import log_info
+                log_info('hand_skin_screen_summary', status=status, reason=reason,
+                         checks=screen['checks'], elapsed_ms=screen['elapsed_ms'],
+                         budget_seconds=screen['budget_seconds'],
+                         rejected_count=len(screen['rejected']), unverified_count=len(screen['unverified']),
+                         unavailable_reasons=[item['hand_skin_screen'].get('reason')
+                                              for item in screen['unverified']])
             out.update(status=status, reason=reason, elapsed_ms=(perf_counter()-start)*1000)
             return out
         if decision.joint.policy_block:
@@ -304,7 +313,10 @@ class FullBodySearch:
         if out['selected']:
             from .mirror_reference import mirror_reference
             try:
-                reference, comparison = mirror_reference(self, out['selected'], description, required, skin_session)
+                from contextlib import nullcontext
+                context = skin_session.optional_phase() if skin_session else nullcontext()
+                with context:
+                    reference, comparison = mirror_reference(self, out['selected'], description, required, skin_session)
             except (ValueError, KeyError, TypeError, OSError, AttributeError):
                 reference, comparison = None, dict(status='unavailable', reason='mirror_validation_failed')
             out['mirror_comparison'] = comparison

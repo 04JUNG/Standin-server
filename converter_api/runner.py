@@ -42,6 +42,7 @@ from converter.protocol import (
     THUMBNAIL_VIEWS,
 )
 from converter.framing import FRAMING_VERSION, PREVIEW_VIEWS, validate_scope
+from converter_api.work_queue import PrioritySlots, WorkControl, WorkStopped, current_work
 
 
 class RunnerError(RuntimeError):
@@ -249,9 +250,7 @@ class BlenderRunner:
             raise ValueError("expected Blender build hash is invalid")
         self._blender_info: BlenderInfo | None = None
         self._blender_lock = threading.Lock()
-        self._process_slots = threading.BoundedSemaphore(
-            self.settings.max_concurrent_processes
-        )
+        self._process_slots = PrioritySlots(self.settings.max_concurrent_processes)
         self._lifecycle_lock = threading.Lock()
         self._completed_conversions = 0
 
@@ -358,6 +357,32 @@ class BlenderRunner:
                 process.wait(timeout=1)
             except subprocess.TimeoutExpired:
                 pass
+
+    def _communicate(self, process, timeout):
+        """Poll the same bounded child for cancellation; never start extra work."""
+        control = current_work.get()
+        if control is None:
+            return process.communicate(timeout=timeout)
+        execution_started = time.monotonic()
+        execution_deadline = execution_started+timeout
+        try:
+            while True:
+                control.check('execution')
+                remaining = execution_deadline-time.monotonic()
+                if remaining <= 0:
+                    raise subprocess.TimeoutExpired(process.args, timeout)
+                try:
+                    result = process.communicate(
+                        timeout=min(.05, remaining, max(.001, control.remaining)))
+                    control.check('execution')
+                    return result
+                except subprocess.TimeoutExpired:
+                    continue
+        except WorkStopped:
+            self._terminate_process_group(process, self.settings.terminate_grace_seconds)
+            raise
+        finally:
+            control.execution_ms = (time.monotonic()-execution_started)*1000
 
     @staticmethod
     def _parse_report(report_path: Path) -> dict[str, Any]:
@@ -660,8 +685,19 @@ class BlenderRunner:
                 output_scope != 'full' or preview_view or preview_model or camera_rotation is not None
                 or thumbnail or mirror or self.settings.force_exact_v324)):
             raise ConversionRejectedError('invalid hand screening options')
+        control = current_work.get() or WorkControl(
+            kind='screen' if hand_contact_screen else 'preview'
+            if preview_view or preview_model or thumbnail else 'normal',
+            budget_seconds=max(self.settings.timeout_seconds,
+                               self.settings.camera_timeout_seconds,
+                               self.settings.shape_timeout_seconds))
+        token = current_work.set(control)
         queue_started = time.monotonic()
-        self._process_slots.acquire()
+        try:
+            self._process_slots.acquire()
+        except BaseException:
+            current_work.reset(token)
+            raise
         queue_wait_ms = (time.monotonic() - queue_started) * 1000.0
         with self._lifecycle_lock:
             task_cold_start = self._completed_conversions == 0
@@ -683,9 +719,12 @@ class BlenderRunner:
                 hands=hands,
                 hand_contact_screen=hand_contact_screen,
             )
+            control.check("execution")
         finally:
             execution_ms = (time.monotonic() - execution_started) * 1000.0
+            control.execution_ms = execution_ms
             self._process_slots.release()
+            current_work.reset(token)
         with self._lifecycle_lock:
             self._completed_conversions += 1
         return replace(
@@ -713,6 +752,9 @@ class BlenderRunner:
         hands: dict | None = None,
         hand_contact_screen: bool = False,
     ) -> ConversionResult:
+        control = current_work.get()
+        if control is not None:
+            control.check("execution")
         if not character_path.is_file() or character_path.suffix.lower() != ".fbx":
             raise WorkerIntegrityError("character artifact is not a regular FBX file")
         if sha256_file(character_path) != character_sha256:
@@ -772,6 +814,8 @@ class BlenderRunner:
                 encoding="utf-8",
             )
 
+            if control is not None:
+                control.check("execution")
             try:
                 process = subprocess.Popen(
                     self._command(job_path),
@@ -790,7 +834,7 @@ class BlenderRunner:
                            if camera_rotation is not None else self.settings.timeout_seconds)
                 if shape_recipe is not None:
                     timeout = max(timeout, self.settings.shape_timeout_seconds)
-                stdout, stderr = process.communicate(timeout=timeout)
+                stdout, stderr = self._communicate(process, timeout)
             except subprocess.TimeoutExpired as exc:
                 self._terminate_process_group(
                     process, self.settings.terminate_grace_seconds

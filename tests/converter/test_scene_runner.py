@@ -79,3 +79,27 @@ def test_timeout_terminates_process_and_releases_budget(tmp_path, monkeypatch):
     assert not list(tmp_path.iterdir())
     assert value._process_slots.acquire(blocking=False)
     value._process_slots.release()
+
+
+@pytest.mark.parametrize('cause',['cancel','deadline'])
+def test_scene_execution_observes_disconnect_or_budget_and_cleans_up(tmp_path,monkeypatch,cause):
+    from converter_api.work_queue import WorkControl,WorkStopped,current_work
+    import time
+    value=runner(tmp_path,monkeypatch)
+    control=WorkControl('normal',budget_seconds=.03 if cause=='deadline' else 1.)
+    calls=[]
+    def communicate(self,**kwargs):
+        if cause=='cancel':control.cancelled.set()
+        time.sleep(.002)
+        raise subprocess.TimeoutExpired('fixture',1)
+    monkeypatch.setattr(subprocess.Popen,'communicate',communicate)
+    monkeypatch.setattr(value,'_terminate_process_group',lambda *args:calls.append('stopped'))
+    token=current_work.set(control)
+    try:
+        with pytest.raises(WorkStopped) as error:value.compose_scene(**inputs())
+    finally:current_work.reset(token)
+    assert error.value.code==('REQUEST_CANCELLED' if cause=='cancel' else 'WORK_BUDGET_EXHAUSTED')
+    assert error.value.phase=='execution' and calls==['stopped']
+    assert control.execution_ms>0
+    assert not list(tmp_path.iterdir())
+    assert value._process_slots.snapshot()['active']==0
