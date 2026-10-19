@@ -71,6 +71,16 @@ RRF 자연어 비중은 0.60, 기하 비중은 0.40이다. 로컬 set4/set5 가�
   이전 30초 예산으로 복귀 가능). 추가 변환 지연이 있으므로 호출 측 시간 예산에 이 후처리를 포함해야 한다.
 
 `dynamic_search.hand_skin_screen`에는 검사 횟수/예산/제외/미확인 진단이 남는다.
+2026-10-19: 단일 Blender 용량을 유지한 필수 검사 우선순위·선택 미리보기 선점,
+HTTP disconnect 취소·큐/실행 기한과 안전 timing 진단을 추가한다.
+`checks_diagnostics`는 검사 번호·phase/cause·대기/실행·남은 예산의 안전 근거다.
+선택적 mirror 검사는 낮은 우선순위이며 이미 통과한 본후보의 검사 스냅샷은 유지한다.
+`/convert-framed-export`는 동일 계보 검증의 일반 출력 경로이며 기존 `preview_format=png|model`의
+PNG+FBX 또는 GLB+FBX pair를 그대로 지원한다.
+기존 `/convert-framed`는 구형 scoped FBX 호출도 포함해 선점 가능하므로 BFF 최종 FBX
+호출만 새 경로로 전환해야 한다. Converter→BFF 적용 순서와 오류/재시도/호환 한계는
+[HAND_SCREEN_AVAILABILITY.md](HAND_SCREEN_AVAILABILITY.md)를 따른다.
+
 HTTP 실패(`hand_screen_http_error`, 상태 코드만), 요청 시간 초과(`hand_screen_request_timeout`),
 네트워크 오류(`hand_screen_network_error`), receipt 형식 오류(`hand_screen_invalid_receipt`),
 입력 계보 불일치(`hand_screen_receipt_lineage_mismatch`, 불일치 필드명만),

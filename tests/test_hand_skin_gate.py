@@ -284,3 +284,79 @@ def test_budget_and_check_limit_have_distinct_diagnostics(tmp_path):
     session.checks = 10
     assert session.check('candidate')['reason'] == 'hand_screen_check_limit_exhausted'
     assert not g.client.calls
+
+
+def test_client_sends_bounded_work_budget_and_optional_priority_is_session_local(tmp_path):
+    requests = []
+    def opener(request, timeout):
+        requests.append((dict(request.header_items()), timeout))
+        raise TimeoutError('private data')
+    client = HandSkinClient('http://private-host', 'character', '1'*64, opener=opener)
+    session = HandSkinGate(client, tmp_path, {}).session()
+    with session.optional_phase():
+        session.client.check('BVH', None, 3.)
+    session.client.check('BVH', None, .05)
+    client.check('BVH', None, 15.)
+    assert requests[0][0]['X-standin-work-budget-ms'] == '2850'
+    assert requests[0][0]['X-standin-screen-optional'] == '1'
+    assert requests[1][0]['X-standin-work-budget-ms'] == '1'
+    assert 'X-standin-screen-optional' not in requests[1][0]
+    assert requests[2][0]['X-standin-work-budget-ms'] == '14850'
+    assert not hasattr(client, '_screen_optional')
+
+
+def test_http_queue_deadline_reports_safe_timing_and_cause_without_body_values():
+    from io import BytesIO
+    error = HTTPError('http://private-host', 504, 'private detail', {
+        'X-Standin-Queue-Wait-Ms':'1234.5', 'X-Standin-Execution-Ms':'nan',
+        'X-Standin-Work-Phase':'queue', 'X-Standin-Work-Reason':'WORK_BUDGET_EXHAUSTED'},
+        BytesIO(b'{"error":{"code":"WORK_BUDGET_EXHAUSTED","message":"private raw text"}}'))
+    def opener(*args, **kwargs): raise error
+    result = HandSkinClient('http://private-host', 'character', '1'*64, opener=opener).check('BVH', None, 3.)
+    assert result['reason'] == 'hand_screen_work_budget_exhausted'
+    assert result['availability'] == {'status':'unavailable', 'queue_wait_ms':1234.5,
+        'phase':'queue', 'cause':'WORK_BUDGET_EXHAUSTED'}
+    assert 'private' not in json.dumps(result)
+
+
+def test_per_check_and_summary_logs_explain_fail_closed_failure_without_payload(tmp_path, monkeypatch):
+    events=[]
+    monkeypatch.setattr('src.logging_setup.log_info',lambda name,**fields:events.append((name,fields)))
+    class QueueFailure:
+        def check(self,text,hands,timeout):
+            return unknown('hand_screen_work_budget_exhausted',availability={
+                'status':'unavailable','phase':'queue','queue_wait_ms':100.,
+                'execution_ms':0.,'cause':'WORK_BUDGET_EXHAUSTED'})
+    e=engine(); e.hand_skin_gate=gate(tmp_path); e.hand_skin_gate.client=QueueFailure()
+    result=e.search(decision(),evidence())
+    assert result['status']=='error' and not result['selected']
+    check=[fields for name,fields in events if name=='hand_skin_screen_check'][0]
+    summary=[fields for name,fields in events if name=='hand_skin_screen_summary'][0]
+    assert check['check']==1 and check['status']=='unavailable' and check['phase']=='queue'
+    assert check['call_budget_ms']==15000 and check['optional'] is False
+    assert check['queue_wait_ms']==100 and check['cause']=='WORK_BUDGET_EXHAUSTED'
+    assert summary['unverified_count']>=1 and summary['status']=='error'
+    assert all('bvh' not in key.lower() and 'url' not in key.lower() for key in check)
+
+
+def test_unavailable_receipt_does_not_log_arbitrary_upstream_reason():
+    text='BVH input'
+    payload=receipt('unavailable',reason='private raw upstream failure',
+        source_bvh_sha256=hashlib.sha256(text.encode()).hexdigest(),
+        character_id='expected',character_sha256='1'*64,solver_version=SOLVER_VERSION,
+        hands=None,hand_library_sha256=load_library().sha256,screened_artifact_sha256='2'*64)
+    client=HandSkinClient('http://private-host','expected','1'*64,
+                          opener=lambda *a,**k:Response(payload))
+    result=client.check(text,None,3.)
+    assert result['status']=='unavailable' and result['reason']=='hand_screen_mesh_unavailable'
+    assert 'private' not in json.dumps(result)
+
+
+def test_malformed_http_failure_code_is_not_reflected_or_raised():
+    from io import BytesIO
+    error=HTTPError('http://private-host',503,'private message',{},
+        BytesIO(b'{"error":{"code":["private response"]}}'))
+    def opener(*args,**kwargs):raise error
+    result=HandSkinClient('http://private-host','character','1'*64,opener=opener).check('BVH',None,3.)
+    assert result['status']=='unavailable' and result['reason']=='hand_screen_http_error'
+    assert 'private' not in json.dumps(result)

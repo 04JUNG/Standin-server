@@ -52,6 +52,8 @@ from converter_api.runner import (
     WorkerIntegrityError,
 )
 from converter_api.schemas import CharactersResponse, HealthResponse
+from converter_api.work_queue import WorkStopped, current_work
+from converter_api.work_middleware import WorkMiddleware
 from converter.framing import FRAMING_VERSION, OUTPUT_SCOPES, PREVIEW_VIEWS
 from converter.hand_library import HandLibraryError, normalize_request as normalize_hands
 
@@ -146,10 +148,12 @@ def _error_response(problem: ApiProblem) -> JSONResponse:
 
 
 def _structured_log(level: int, event: str, **fields: Any) -> None:
+    control = current_work.get()
     payload = {
         "event": event,
         "service": "converter",
         "version": os.getenv("DEPLOYMENT_VERSION", "development"),
+        **({"request_id": control.request_id} if control and control.request_id else {}),
         **fields,
     }
     LOGGER.log(level, json.dumps(payload, ensure_ascii=False, sort_keys=True))
@@ -321,12 +325,13 @@ def create_app(
 
     app = FastAPI(
         title="Standin Internal Converter",
-        version="1.2.0",
+        version="1.3.0",
         description=(
             "Internal BVH to FBX conversion service "
             "(BFF export bundles, inference refine thumbnails)"
         ),
     )
+    app.add_middleware(WorkMiddleware)
     app.state.registry = character_registry
     app.state.runner = blender_runner
     app.state.max_bvh_bytes = size_limit
@@ -400,6 +405,16 @@ def create_app(
         )
         return _error_response(exc)
 
+    @app.exception_handler(WorkStopped)
+    async def work_stopped_handler(request: Request, exc: WorkStopped):
+        control = current_work.get()
+        diagnostics = control.diagnostics() if control else {'phase': exc.phase}
+        _structured_log(logging.WARNING, 'converter_work_stopped',
+                        route=request.url.path, error_code=exc.code, **diagnostics)
+        return JSONResponse(status_code=exc.status, content={
+            'error': {'code': exc.code, 'message': 'converter work stopped',
+                      'diagnostics': diagnostics}})
+
     @app.exception_handler(RequestValidationError)
     async def validation_handler(_request: Request, _exc: RequestValidationError):
         return _error_response(ApiProblem(400, "INVALID_REQUEST", "invalid request fields"))
@@ -427,6 +442,9 @@ def create_app(
     @app.get("/healthz", response_model=HealthResponse)
     def healthz():
         checks: dict[str, Any] = {"api": {"ok": True}}
+        slots = getattr(blender_runner, "_process_slots", None)
+        if slots is not None and hasattr(slots, "snapshot"):
+            checks["work_queue"] = {"ok": True, **slots.snapshot()}
         ok = True
         try:
             info = blender_runner.inspect_blender(refresh=True)
@@ -523,6 +541,9 @@ def create_app(
         hand_contact_screen: bool = False,
     ) -> CompletedConversion:
         conversion_id = str(uuid.uuid4())
+        control = current_work.get()
+        if control is not None:
+            control.conversion_id = conversion_id
         request_started = time.monotonic()
         try:
             if output_scope not in OUTPUT_SCOPES or (preview_view is not None and preview_view not in PREVIEW_VIEWS):
@@ -1022,9 +1043,13 @@ def create_app(
                 'character_sha256': completed.character.metadata.sha256,
                 'solver_version': SOLVER_VERSION,
                 'hands': normalize_hands({'left': hand_left, 'right': hand_right}),
-                'hand_library_sha256': load_library().sha256}
+                'hand_library_sha256': load_library().sha256,
+                'availability': {'status': 'available',
+                    'queue_wait_ms': round(result.queue_wait_ms, 3),
+                    'execution_ms': round(result.execution_ms, 3)}}
 
     @app.post("/convert-framed")
+    @app.post("/convert-framed-export")
     def convert_framed(
         bvh: UploadFile = File(...),
         character_id: str = Form(default=default_character_id),

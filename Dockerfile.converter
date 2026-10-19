@@ -107,6 +107,8 @@ COPY converter_api/__init__.py /app/converter_api/__init__.py
 COPY converter_api/app.py /app/converter_api/app.py
 COPY converter_api/registry.py /app/converter_api/registry.py
 COPY converter_api/runner.py /app/converter_api/runner.py
+COPY converter_api/work_queue.py /app/converter_api/work_queue.py
+COPY converter_api/work_middleware.py /app/converter_api/work_middleware.py
 COPY converter_api/scene_runner.py /app/converter_api/scene_runner.py
 COPY converter_api/scene_routes.py /app/converter_api/scene_routes.py
 COPY converter_api/schemas.py /app/converter_api/schemas.py
