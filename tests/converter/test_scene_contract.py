@@ -100,6 +100,42 @@ def test_api_returns_atomic_scene_bundle_with_placements_and_hashes():
     assert runner.calls[0]["fbx_bytes"] == [FBX, FBX]
 
 
+@pytest.mark.parametrize("rough", [False, True])
+def test_raw_fbx_binds_artifact_person_count_and_exact_manifest(rough):
+    value = manifest()
+    if rough:
+        value["rough_layout"] = dict(version="rough-layout-v1", width=640, height=480)
+        for row in value["persons"]:
+            row.pop("position")
+            row["observation"] = dict(box=[10, 20, 100, 400],
+                                      keypoints=[[50, 50]] * 17, scores=[0.8] * 17)
+    serialized = json.dumps(value, indent=2)
+    runner = FakeRunner()
+    response = client(runner).post("/compose-scene",
+        data={"manifest": serialized, "response_format": "fbx"},
+        files=[("fbx", ("person.fbx", FBX))] * 2)
+    assert response.status_code == 200
+    assert response.content == FBX
+    assert response.headers["content-type"] == "application/octet-stream"
+    assert response.headers["content-disposition"].endswith('"cut_01.fbx"')
+    assert response.headers["x-standin-artifact-sha256"] == hashlib.sha256(FBX).hexdigest()
+    assert response.headers["x-standin-fbx-artifact-sha256"] == hashlib.sha256(FBX).hexdigest()
+    assert response.headers["x-standin-scene-input-sha256"] == hashlib.sha256(serialized.encode()).hexdigest()
+    assert response.headers["x-standin-person-count"] == "2"
+    assert response.headers["x-standin-scene-version"] == ("rough-layout-v1" if rough else "cut-scene-v1")
+    assert len(runner.calls) == 1
+
+
+def test_unsupported_response_format_does_not_start_worker():
+    runner = FakeRunner()
+    response = client(runner).post("/compose-scene",
+        data={"manifest": json.dumps(manifest()), "response_format": "unknown"},
+        files=[("fbx", ("person.fbx", FBX))] * 2)
+    assert response.status_code == 400
+    assert response.json()["error"]["code"] == "INVALID_SCENE"
+    assert not runner.calls
+
+
 @pytest.mark.parametrize("case,status,code", [
     ("duplicate", 400, "INVALID_SCENE"),
     ("missing", 400, "INVALID_SCENE"),

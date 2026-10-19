@@ -32,7 +32,7 @@ def register_scene_routes(app, runner):
     from converter_api.app import ApiProblem, SAFE_UPLOAD_NAME
 
     @app.post("/compose-scene", responses={
-        200: {"content": {"application/zip": {}}},
+        200: {"content": {"application/zip": {}, "application/octet-stream": {}}},
         400: {"description": "Invalid scene manifest or file count"},
         409: {"description": "Source FBX checksum mismatch"},
         413: {"description": "Scene input exceeds size limits"},
@@ -40,7 +40,10 @@ def register_scene_routes(app, runner):
         503: {"description": "Blender unavailable"},
         504: {"description": "Composition timeout"},
     })
-    def compose_scene(manifest: str = Form(...), fbx: list[UploadFile] = File(...)):
+    def compose_scene(manifest: str = Form(...), fbx: list[UploadFile] = File(...),
+                      response_format: str = Form("zip")):
+        if response_format not in {"zip", "fbx"}:
+            raise ApiProblem(400, "INVALID_SCENE", "unsupported response format")
         try:
             if len(manifest) > 32768:
                 raise ValueError("scene manifest too large")
@@ -73,11 +76,15 @@ def register_scene_routes(app, runner):
             raise ApiProblem(504, exc.code, "scene composition timed out") from exc
         except RunnerError as exc:
             raise ApiProblem(500, exc.code, "scene composition or round-trip verification failed") from exc
-        data = scene_bundle(scene, result)
-        return StreamingResponse(io.BytesIO(data), media_type="application/zip", headers={
-            "Content-Disposition": f'attachment; filename="{scene["cut_id"]}.zip"',
+        raw = response_format == "fbx"
+        data = result.artifact if raw else scene_bundle(scene, result)
+        extension = "fbx" if raw else "zip"
+        return StreamingResponse(io.BytesIO(data), media_type="application/octet-stream" if raw else "application/zip", headers={
+            "Content-Disposition": f'attachment; filename="{scene["cut_id"]}.{extension}"',
             "Content-Length": str(len(data)), "Cache-Control": "private, no-store",
             "X-Standin-Artifact-SHA256": hashlib.sha256(data).hexdigest(),
             "X-Standin-FBX-Artifact-SHA256": hashlib.sha256(result.artifact).hexdigest(),
             "X-Standin-Person-Count": str(len(scene["persons"])),
+            "X-Standin-Scene-Input-SHA256": hashlib.sha256(manifest.encode()).hexdigest(),
+            "X-Standin-Scene-Version": "rough-layout-v1" if scene.get("rough_layout") else "cut-scene-v1",
         })
