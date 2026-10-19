@@ -773,6 +773,17 @@ def list_poses(source: str = "", category: str = "", q: str = "", cursor: str = 
                              query=q or None, cursor=cursor or None, limit=limit)
 
 
+@app.get("/pose-poster-template/{scope}")
+def get_pose_poster_template(scope: str):
+    """Shared approved human mesh; never starts conversion or grants export."""
+    from src.human_reference import read_template
+    try:
+        data, response_headers = read_template(Path(CFG.data_dir) / "human-templates", scope)
+    except (ValueError, OSError):
+        raise HTTPException(404, "human reference unavailable")
+    return Response(data, headers=response_headers)
+
+
 @app.get("/pose/{pose_id}/poster")
 def get_pose_poster(pose_id: str, source_sha256: str, scope: str = "full"):
     """Read-only canonical reference; never queues a live model conversion."""

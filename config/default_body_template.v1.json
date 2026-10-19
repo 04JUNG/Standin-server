@@ -1,0 +1,52 @@
+{
+  "version": "default-body-template-library-v1",
+  "character_id": "standin-master-v2",
+  "character_sha256": "7c648b97a24a3bb4914b6e5d515708c33727979881d92ef916d5726e22301f3d",
+  "scopes": {
+    "bust": {
+      "file": "bust.json.gz",
+      "sha256": "2c6496df66e24878bd16190a6cf4dac4199295a8866218c40adc27c614a90300",
+      "json_sha256": "cd3a3075d72f0419e7a55c42bc19adf002d2ab2b057bf94e730118c7c8063866",
+      "bytes": 198349,
+      "json_bytes": 687910,
+      "vertices": 4722,
+      "max_discarded_weight": 0.0
+    },
+    "full": {
+      "file": "full.json.gz",
+      "sha256": "54a81c52d3e494662935ab00cd2c9b11ed1f851c32afcd5ef61fd7377bff03b8",
+      "json_sha256": "b0758d095202f9c5e15f132507ec383cbbca7b3dcf9261a06455f1a78975b2bb",
+      "bytes": 1069655,
+      "json_bytes": 3786560,
+      "vertices": 24988,
+      "max_discarded_weight": 0.0
+    },
+    "half": {
+      "file": "half.json.gz",
+      "sha256": "5c3cfd9e2f80f0e1e071b08e3daf372b9f114108ca7a889e3ed10c1a5480dbd3",
+      "json_sha256": "27941a674581c31d2263124315cb7bb722165ea0e821cda0282ed54115646086",
+      "bytes": 584314,
+      "json_bytes": 2068556,
+      "vertices": 14005,
+      "max_discarded_weight": 0.0
+    },
+    "head": {
+      "file": "head.json.gz",
+      "sha256": "72f8bd19ecce1006709a970f5ae72775abfc2a2be570b515bd78d989667c723a",
+      "json_sha256": "7cba85fc6fd93d26262d25da172b59615e583430c8be6c3343ad5477e749d0ca",
+      "bytes": 76876,
+      "json_bytes": 286114,
+      "vertices": 2041,
+      "max_discarded_weight": 0.0
+    },
+    "shoulder_head": {
+      "file": "shoulder_head.json.gz",
+      "sha256": "4f55b56c8058aedcf8618d39214e64d49926a92e23530010c25a881835f0e8f7",
+      "json_sha256": "d254f1c47bc4eba6b6affc1515327cc815cab08b28398a153c41cc1817c02a4f",
+      "bytes": 154567,
+      "json_bytes": 548627,
+      "vertices": 3814,
+      "max_discarded_weight": 0.0
+    }
+  }
+}

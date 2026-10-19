@@ -56,7 +56,11 @@ def read_poster(directory: Path, source: str, scope="full") -> tuple[bytes, dict
     meta = json.loads(manifest.read_text())
     if not isinstance(meta, dict):
         raise ValueError('invalid poster manifest')
-    if any(meta.get(k) != v for k, v in identity(source, scope).items()):
+    from src.human_reference import METHOD, reference_identity
+    if meta.get('render_method') not in (None, METHOD):
+        raise ValueError('unknown human preview method')
+    expected = reference_identity(source, scope) if meta.get('render_method') == METHOD else identity(source, scope)
+    if any(meta.get(k) != v for k, v in expected.items()):
         raise ValueError('poster lineage changed')
     image = root / (stem + '.png')
     if image.is_symlink() or not 8 <= image.stat().st_size <= MAX_IMAGE_BYTES:
@@ -122,6 +126,8 @@ def headers(meta: dict) -> dict[str, str]:
         'Cache-Control': 'private, no-store',
         'X-Standin-Poster-Kind': meta['kind'],
         'X-Standin-Poster-Version': VERSION,
+        'X-Standin-Preview-Method': meta.get('render_method', 'frozen-retarget-v1') if meta['kind'] == 'default-body' else 'pose-only',
+        'X-Standin-Template-SHA256': meta.get('template_sha256', 'none'),
         'X-Standin-Source-BVH-SHA256': meta['source_bvh_sha256'],
         'X-Standin-Character-Id': meta['character_id'],
         'X-Standin-Character-SHA256': meta['character_sha256'],

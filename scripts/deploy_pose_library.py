@@ -86,7 +86,7 @@ PROFILE = os.getenv("AWS_PROFILE", "standin-inference")
 # poses.db와 어긋난 오래된 pickle이 번들에 섞인다.
 BUNDLE_DB = "poses.db"
 BUNDLE_OPTIONAL = [MANIFEST_NAME, "ATTRIBUTION.md"]
-BUNDLE_DIRS = ["bvh", "thumbs", "pose-posters"]
+BUNDLE_DIRS = ["bvh", "thumbs", "pose-posters", "human-templates"]
 _SKIP_NAMES = {"__pycache__", ".DS_Store", "Thumbs.db"}
 DEFAULT_LOG = Path("data") / "deploys.jsonl"
 
@@ -134,9 +134,25 @@ def validate(data_dir: Path, allow_missing_thumbs: bool = False, *,
         summary = _validate_db(con, data_dir, allow_missing_thumbs)
     finally:
         con.close()
+    summary["human_templates"] = _check_human_templates(data_dir)
     summary["posters"] = _check_posters(data_dir)
     summary["manifest"] = _check_manifest(data_dir, allow_no_manifest, skip_gate_reason)
     return summary
+
+
+def _check_human_templates(data_dir: Path) -> dict:
+    from src.human_reference import read_template, template_manifest
+    directory = data_dir / "human-templates"
+    if not directory.exists():
+        return {"status": "absent"}
+    try:
+        if json.loads((directory / "manifest.json").read_text()) != template_manifest():
+            raise ValueError("human template manifest changed")
+        for scope in ("full", "half", "bust", "shoulder_head", "head"):
+            read_template(directory, scope)
+        return {"status": "verified", "scopes": 5}
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        raise DeployError("기본 인체 참고 메시의 해시·범위 검증에 실패했습니다.") from exc
 
 
 def _check_posters(data_dir: Path) -> dict:
@@ -153,13 +169,17 @@ def _check_posters(data_dir: Path) -> dict:
             rows = db.execute("SELECT pose_id,bvh_path FROM poses").fetchall()
         if summary.get("expected") != len(rows) * len(OUTPUT_SCOPES):
             raise ValueError("poster coverage differs from library")
+        reference_used = False
         for _, raw in rows:
             bvh = _bvh_file(data_dir, raw)
             if bvh is None:
                 raise ValueError("poster source missing")
             source = digest(bvh.read_bytes())
             for scope in OUTPUT_SCOPES:
-                read_poster(directory, source, scope)
+                _, meta = read_poster(directory, source, scope)
+                reference_used |= meta.get("render_method") == "reference-skinning-v1"
+        if reference_used and _check_human_templates(data_dir)["status"] != "verified":
+            raise ValueError("reference mesh template missing")
         return {"status": "verified", "images": summary["expected"]}
     except (OSError, ValueError, KeyError, TypeError) as exc:
         raise DeployError("기본 체형 포스터의 범위·버전·원본 해시 검증에 실패했습니다.") from exc
@@ -402,6 +422,7 @@ def make_archive(data_dir: Path, out_path: Path) -> int:
     tar CLI 대신 tarfile을 쓴다 — Git Bash에서 'C:/...' 경로를 원격 호스트로 오인하는
     문제와 한글 경로 인코딩을 피할 수 있다.
     """
+    _check_human_templates(data_dir)
     allowed_posters: set[str] = set()
     if (data_dir / "pose-posters").exists():
         _check_posters(data_dir)
@@ -418,6 +439,8 @@ def make_archive(data_dir: Path, out_path: Path) -> int:
 
     def _add(tar: tarfile.TarFile, src: Path, arc: str) -> None:
         if src.name in _SKIP_NAMES:
+            return
+        if arc.startswith("human-templates/") and src.name not in {"manifest.json", "full.json.gz", "half.json.gz", "bust.json.gz", "shoulder_head.json.gz", "head.json.gz"}:
             return
         if arc.startswith("pose-posters/") and (not src.is_file() or src.name not in allowed_posters):
             return
