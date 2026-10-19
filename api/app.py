@@ -24,6 +24,7 @@ import io
 import json
 import mimetypes
 import os
+from pathlib import Path
 import re
 import time
 import uuid
@@ -770,6 +771,23 @@ def list_poses(source: str = "", category: str = "", q: str = "", cursor: str = 
         raise HTTPException(400, "limit must be between 1 and 96")
     return pose_catalog_page(_pose_catalog(), source=source or None, category=category or None,
                              query=q or None, cursor=cursor or None, limit=limit)
+
+
+@app.get("/pose/{pose_id}/poster")
+def get_pose_poster(pose_id: str, source_sha256: str, scope: str = "full"):
+    """Read-only canonical reference; never queues a live model conversion."""
+    from src.pose_posters import poster, headers as poster_headers, digest
+    response = get_pose_bvh(pose_id)  # Existing registration and quarantine guards.
+    if Path(response.path).stat().st_size > 2_000_000:
+        raise HTTPException(404, "poster unavailable")
+    source = Path(response.path).read_bytes()
+    if digest(source) != source_sha256:
+        raise HTTPException(409, "poster source changed")
+    try:
+        image, meta = poster(Path(CFG.data_dir) / "pose-posters", source, scope)
+    except (ValueError, OSError):
+        raise HTTPException(404, "poster unavailable")
+    return Response(image, media_type="image/png", headers=poster_headers(meta))
 
 
 @app.get("/pose/{pose_id}/thumbnail")
