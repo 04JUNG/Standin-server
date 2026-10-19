@@ -7,6 +7,8 @@ server-created job file has been validated.
 
 from __future__ import annotations
 
+import time
+_LAB_PROCESS_ENTER = time.monotonic()
 import hashlib
 import json
 import os
@@ -103,7 +105,7 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
         "force_exact_v324", "thumbnail",
     }
     unknown = set(raw) - required - {
-        "output_scope", "preview_view", "camera_rotation", "preview_model", "shape_recipe", "hands", "hand_contact_screen"}
+        "output_scope", "preview_view", "camera_rotation", "preview_model", "shape_recipe", "hands", "hand_contact_screen", "retarget_cache", "fast_scene_reset"}
     missing = required - set(raw)
     if missing or unknown:
         raise JobValidationError(
@@ -190,6 +192,28 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
 
     thumbnail = _validate_thumbnail(raw["thumbnail"], temp_dir, output, report)
 
+    fast_reset = raw.get("fast_scene_reset", False)
+    if type(fast_reset) is not bool or (fast_reset and (
+            raw.get("shape_recipe") is not None or hands is None or preview_view != "front"
+            or screening or raw["force_exact_v324"] or preview_model or thumbnail is not None)):
+        raise JobValidationError("invalid fast scene reset options")
+    base = raw.get("retarget_cache")
+    if base is not None:
+        if (not isinstance(base, dict) or set(base) != {"mode","fbx_path","meta_path"}
+                or base["mode"] not in ("capture","reuse") or raw.get("shape_recipe") is not None
+                or screening or raw["force_exact_v324"] or hands is None or preview_view != "front"
+                or preview_model or thumbnail is not None):
+            raise JobValidationError("invalid retarget base options")
+        for key, suffix in [("fbx_path",".fbx"),("meta_path",".json")]:
+            unresolved = _absolute_path(base[key],key)
+            if unresolved.is_symlink(): raise JobValidationError("retarget base cannot be a symlink")
+            resolved = _inside(unresolved,temp_dir,key)
+            if resolved.suffix != suffix or resolved in (output,report,bvh_path,path):
+                raise JobValidationError("invalid retarget base path")
+            if base["mode"] == "reuse" and not resolved.is_file():
+                raise JobValidationError("retarget base missing")
+            if base["mode"] == "capture" and resolved.exists():
+                raise JobValidationError("retarget capture must be new")
     normalized = dict(raw)
     normalized.update({
         "output_scope": output_scope,
@@ -307,23 +331,35 @@ def _frozen_lineage() -> dict[str, str]:
 
 def run_job(job: dict[str, Any]) -> dict[str, Any]:
     """Execute one validated job inside Blender and persist its report."""
-    lineage = _frozen_lineage()
-    source_bvh_sha256 = _sha256(Path(job["bvh_path"]))
-    from converter.convert import convert  # imports bpy only in this child process
-    import bpy
+    from converter.lab_timing import StageTimings
+    lab_timings = StageTimings()
+    with lab_timings.measure("worker_init"):
+        lineage = _frozen_lineage()
+        source_bvh_sha256 = _sha256(Path(job["bvh_path"]))
+        from converter.convert import convert  # imports bpy only in this child process
+        import bpy
 
-    blender_version = bpy.app.version_string
-    raw_build_hash = bpy.app.build_hash
-    blender_build_hash = (
-        raw_build_hash.decode("ascii", errors="replace")
-        if isinstance(raw_build_hash, bytes) else str(raw_build_hash)
-    )
-    if not blender_version.startswith(EXPECTED_BLENDER_VERSION):
-        raise FrozenLineageError("Blender version does not match the frozen runtime")
-    if blender_build_hash != EXPECTED_BLENDER_BUILD_HASH:
-        raise FrozenLineageError("Blender build hash does not match the frozen runtime")
-    if _sha256(Path(job["character_fbx"])) != job["character_sha256"]:
-        raise ArtifactValidationError("character artifact SHA256 changed before conversion")
+        blender_version = bpy.app.version_string
+        raw_build_hash = bpy.app.build_hash
+        blender_build_hash = (
+            raw_build_hash.decode("ascii", errors="replace")
+            if isinstance(raw_build_hash, bytes) else str(raw_build_hash)
+        )
+        if not blender_version.startswith(EXPECTED_BLENDER_VERSION):
+            raise FrozenLineageError("Blender version does not match the frozen runtime")
+        if blender_build_hash != EXPECTED_BLENDER_BUILD_HASH:
+            raise FrozenLineageError("Blender build hash does not match the frozen runtime")
+        if _sha256(Path(job["character_fbx"])) != job["character_sha256"]:
+            raise ArtifactValidationError("character artifact SHA256 changed before conversion")
+
+    fast_reset = job.get('fast_scene_reset') is True
+    if fast_reset:
+        from converter.fast_scene_reset import install as install_fast_reset
+        install_fast_reset()
+    profiling = os.getenv('STANDIN_LAB_FIRST_ENTRY_PROFILE') == '1'
+    if profiling:
+        from converter.first_entry_profile import install, RECORDS
+        install()
 
     recipe = job.get("shape_recipe")
     if recipe is not None:
@@ -334,31 +370,49 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
         rt.import_character = import_full_character
         from functools import partial
         convert = partial(convert_shaped, recipe=recipe)
-    report = convert(
-        bvh_path=job["bvh_path"],
-        character_fbx=job["character_fbx"],
-        out_path=job["output_path"],
-        frame=FRAME,
-        mirror=job["mirror"],
-        output_mode=OUTPUT_MODE,
-        apply_root_translation=APPLY_ROOT_TRANSLATION,
-        embed_textures=EMBED_TEXTURES,
-        force_exact_v324=job["force_exact_v324"],
-    )
-    payload = report.as_dict()
-    if recipe is not None and report.ok:
+    base = job.get("retarget_cache")
+    base_metadata = None
+    if base:
+        from converter.retarget_cache import binding, restore_base, capture_base, cache_key
+        base_identity = binding(source_bvh_sha256, job["character_sha256"], job["character_id"], job["mirror"])
+    if base and base["mode"] == "reuse":
+        with lab_timings.measure("retarget_base_restore_verify"):
+            payload, base_metadata = restore_base(base["fbx_path"],base["meta_path"],job["output_path"],base_identity)
+    else:
+        with lab_timings.measure("retarget_initial_export"):
+            report = convert(
+                bvh_path=job["bvh_path"],
+                character_fbx=job["character_fbx"],
+                out_path=job["output_path"],
+                frame=FRAME,
+                mirror=job["mirror"],
+                output_mode=OUTPUT_MODE,
+                apply_root_translation=APPLY_ROOT_TRANSLATION,
+                embed_textures=EMBED_TEXTURES,
+                force_exact_v324=job["force_exact_v324"],
+            )
+        payload = report.as_dict()
+        if base and report.ok:
+            with lab_timings.measure("retarget_base_capture"):
+                base_metadata = capture_base(job["output_path"],payload,base_identity,base["fbx_path"],base["meta_path"])
+    ok = payload.get("ok") is True
+    if base_metadata:
+        payload["retarget_reuse"] = {"mode":base["mode"],"key":cache_key(base_identity),
+            "base_sha256":base_metadata["artifact_sha256"],"body_report_sha256":base_metadata["body_report_sha256"]}
+    if recipe is not None and ok:
         payload["shape_bake"] = json.loads(Path(job["output_path"]).with_suffix(".shape.json").read_text())
-    if report.ok and job.get("hands") is not None:
+    if ok and job.get("hands") is not None:
         # 손은 몸 변환 직후, 메시 절단·카메라 회전·미리보기보다 먼저 굽는다.
         # 그래야 이후 단계가 모두 손이 적용된 실제 산출물을 다시 읽는다.
         from converter.hands import bake_hands
-        payload["hands"] = bake_hands(job["output_path"], job["hands"])
-    if report.ok and job.get('hand_contact_screen'):
+        with lab_timings.measure("hand_import_apply_export"):
+            payload["hands"] = bake_hands(job["output_path"], job["hands"])
+    if ok and job.get('hand_contact_screen'):
         from converter.hand_contact import screen_artifact
         # AFTER hand baking, BEFORE crop/camera/preview. Screening does not
         # export or change the frozen retarget solver or delivered FBX bytes.
         payload['hand_contact_screen'] = screen_artifact(job['output_path'])
-    if report.ok:
+    if ok:
         from converter.framing import process_output
         scope = job.get("output_scope", "full")
         preview_view = job.get("preview_view")
@@ -367,6 +421,7 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
             job["output_path"], scope, preview_path=preview_path,
             view=preview_view or "front",
             camera_rotation=job.get("camera_rotation"),
+            lab_timings=lab_timings,
         )
         payload["camera_rotation"] = job.get("camera_rotation")
         payload["output_scope"] = scope
@@ -389,7 +444,7 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
         "force_exact_v324": job["force_exact_v324"],
     })
     output = Path(job["output_path"])
-    if report.ok:
+    if ok:
         if not output.is_file() or output.is_symlink() or output.stat().st_size <= 0:
             raise ArtifactValidationError(
                 "converter reported success without a non-empty FBX artifact"
@@ -410,6 +465,14 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
     else:
         payload["error_code"] = "conversion_rejected"
         payload["error_message"] = "converter rejected the BVH/profile mapping"
+    if fast_reset:
+        from converter.fast_scene_reset import receipt
+        payload['scene_reset'] = receipt()
+    if profiling:
+        payload['lab_call_profile'] = RECORDS
+        payload['lab_process_enter_monotonic'] = _LAB_PROCESS_ENTER
+    if lab_timings.enabled:
+        payload["lab_stage_timings"] = lab_timings.records
     return payload
 
 

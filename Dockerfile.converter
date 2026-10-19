@@ -88,6 +88,10 @@ COPY converter/preview_studio.sl /app/converter/preview_studio.sl
 COPY converter/shape_spec.py /app/converter/shape_spec.py
 COPY converter/shape_bake.py /app/converter/shape_bake.py
 COPY converter/worker.py /app/converter/worker.py
+COPY converter/lab_timing.py /app/converter/lab_timing.py
+COPY converter/retarget_cache.py /app/converter/retarget_cache.py
+COPY converter/fast_scene_reset.py /app/converter/fast_scene_reset.py
+COPY converter/first_entry_profile.py /app/converter/first_entry_profile.py
 COPY converter/scene_contract.py /app/converter/scene_contract.py
 COPY converter/scene.py /app/converter/scene.py
 COPY converter/scene_worker.py /app/converter/scene_worker.py

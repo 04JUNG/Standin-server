@@ -143,6 +143,9 @@ class RunnerSettings:
     timeout_seconds: float = 30.0
     terminate_grace_seconds: float = 2.0
     max_concurrent_processes: int = 1
+    retarget_cache_bytes: int = 0
+    fast_scene_reset: bool = False
+    retarget_cache_ttl_seconds: float = 600.
     temp_root: Path | None = None
     process_env: Mapping[str, str] | None = None
     force_exact_v324: bool = False
@@ -171,6 +174,9 @@ class RunnerSettings:
                 "BLENDER_EXPECTED_BUILD_HASH", EXPECTED_BLENDER_BUILD_HASH
             ),
             timeout_seconds=float(os.getenv("CONVERTER_TIMEOUT_SECONDS", "30")),
+            retarget_cache_bytes=int(os.getenv("CONVERTER_RETARGET_CACHE_BYTES", "0")),
+            retarget_cache_ttl_seconds=float(os.getenv("CONVERTER_RETARGET_CACHE_TTL_SECONDS", "600")),
+            fast_scene_reset=_env_bool("CONVERTER_FAST_SCENE_RESET"),
             camera_timeout_seconds=float(os.getenv("CONVERTER_CAMERA_TIMEOUT_SECONDS", "60")),
             shape_timeout_seconds=float(os.getenv("CONVERTER_SHAPE_TIMEOUT_SECONDS", "300")),
             terminate_grace_seconds=float(
@@ -253,6 +259,8 @@ class BlenderRunner:
         self._process_slots = PrioritySlots(self.settings.max_concurrent_processes)
         self._lifecycle_lock = threading.Lock()
         self._completed_conversions = 0
+        from converter.retarget_cache import RetargetBaseCache
+        self.retarget_cache = RetargetBaseCache(self.settings.retarget_cache_bytes, self.settings.retarget_cache_ttl_seconds)
 
     def _environment(self) -> dict[str, str]:
         env = dict(os.environ)
@@ -437,6 +445,14 @@ class BlenderRunner:
         hands: dict | None = None,
         hand_contact_screen: bool = False,
     ) -> ConversionResult:
+        if (self.settings.fast_scene_reset and shape_recipe is None and hands is not None
+                and preview_view == "front" and not preview_model and thumbnail is None
+                and not hand_contact_screen and not self.settings.force_exact_v324 and report.get("ok")):
+            from converter.fast_scene_reset import identity
+            expected_reset = identity()
+            actual_reset = report.get('scene_reset') or {}
+            if any(actual_reset.get(k)!=v for k,v in expected_reset.items()) or type(actual_reset.get('calls')) is not int or actual_reset['calls']<1:
+                raise WorkerIntegrityError('factory-empty scene receipt mismatch', report=report)
         if shape_recipe is not None and report.get("ok"):
             shape = report.get("shape_bake", {})
             if (shape.get("shape_sha256") != shape_recipe["shape_sha256"] or
@@ -809,6 +825,30 @@ class BlenderRunner:
                 job["hands"] = hands
             if hand_contact_screen:
                 job['hand_contact_screen'] = True
+            if (self.settings.fast_scene_reset and shape_recipe is None and hands is not None
+                    and preview_view == "front" and not preview_model and thumbnail is None
+                    and not hand_contact_screen and not self.settings.force_exact_v324):
+                job["fast_scene_reset"] = True
+            # Lookup is inside the acquired runner slot. A successful first request
+            # publishes before release, so the next hand request can reuse its body.
+            base_identity = None
+            base_entry = None
+            base_fbx = temp_dir / "retarget-base.fbx"
+            base_meta = temp_dir / "retarget-base.json"
+            if (self.settings.retarget_cache_bytes and shape_recipe is None and hands is not None
+                    and preview_view == "front" and not preview_model and thumbnail is None
+                    and not hand_contact_screen and not self.settings.force_exact_v324):
+                from converter.retarget_cache import binding
+                base_identity = binding(source_bvh_sha256, character_sha256, character_id, mirror)
+                try:
+                    base_entry = self.retarget_cache.get(base_identity)
+                except (ValueError, KeyError, TypeError) as exc:
+                    raise WorkerIntegrityError("cached retarget base is corrupt") from exc
+                if base_entry is not None:
+                    base_fbx.write_bytes(base_entry.artifact)
+                    base_meta.write_bytes(base_entry.metadata_json)
+                job["retarget_cache"] = {"mode":"reuse" if base_entry else "capture",
+                    "fbx_path":str(base_fbx),"meta_path":str(base_meta)}
             job_path.write_text(
                 json.dumps(job, sort_keys=True, separators=(",", ":")) + "\n",
                 encoding="utf-8",
@@ -843,7 +883,7 @@ class BlenderRunner:
 
             report = self._parse_report(report_path)
             combined_log = f"{stdout}\n{stderr}"
-            return self._validate_success(
+            result = self._validate_success(
                 report=report,
                 output_path=output_path,
                 temp_dir=temp_dir,
@@ -864,6 +904,24 @@ class BlenderRunner:
                 hands=hands,
                 hand_contact_screen=hand_contact_screen,
             )
+            if base_identity is not None:
+                from converter.retarget_cache import validate_base, cache_key
+                metadata = json.loads(base_meta.read_bytes())
+                data = base_fbx.read_bytes()
+                try:
+                    validate_base(data, metadata, base_identity)
+                    receipt = report.get("retarget_reuse") or {}
+                    if (receipt.get("key") != cache_key(base_identity)
+                            or receipt.get("base_sha256") != metadata["artifact_sha256"]
+                            or receipt.get("body_report_sha256") != metadata["body_report_sha256"]
+                            or receipt.get("mode") != ("reuse" if base_entry else "capture")):
+                        raise ValueError("retarget base receipt mismatch")
+                    # Publish only after all final artifact/preview/hand checks succeed.
+                    if base_entry is None:
+                        self.retarget_cache.put(base_identity, data, base_meta.read_bytes())
+                except (ValueError, KeyError, TypeError) as exc:
+                    raise WorkerIntegrityError("retarget base integrity mismatch", report=report) from exc
+            return result
 
 
 __all__ = [
