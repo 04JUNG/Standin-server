@@ -49,7 +49,8 @@ class FullBodySearch:
         self.validator=None
         if hasattr(camera_index,'pose_ids') and hasattr(semantic,'core_records'):
             from .pose_requirements import WholePoseValidator
-            self.validator=WholePoseValidator(camera_index,semantic.core_records,getattr(semantic,'body',{}))
+            self.validator=WholePoseValidator(camera_index,semantic.core_records,getattr(semantic,'body',{}),
+                shapes=getattr(semantic,'shapes',{}))
             semantic.whole_pose_validator=self.validator
 
     def _clean(self, hits, branch):
@@ -111,7 +112,7 @@ class FullBodySearch:
             return dict(status='error', hits=[], backend='geometry_117',
                         reason='geometry_search:'+type(error).__name__, elapsed_ms=(perf_counter()-started)*1000)
 
-    def semantic_search(self, description):
+    def semantic_search(self, description, required=None):
         started = perf_counter()
         try:
             result = self.semantic.search(SemanticQuery.from_description(description), top_k=self.pool_k)
@@ -120,6 +121,15 @@ class FullBodySearch:
             if (result.status == 'ok') != bool(result.hits):
                 raise ValueError('inconsistent_search_status')
             hits = self._clean([h.to_dict() for h in result.hits], 'semantic')
+            # The semantic adapter also validates, but no alternative adapter
+            # may bypass the shared requirements enforced on geometry/generation.
+            if self.validator and required and required['active']:
+                accepted=[]
+                for hit in hits:
+                    checked=self.validator.check(required,hit['pose_id'])
+                    if checked['status'] in ('passed','near_match'):
+                        hit['whole_pose_validation']=checked;accepted.append(hit)
+                hits=accepted
             return dict(status=('ok' if hits else 'no_result') if result.status != 'error' else 'error',
                         hits=hits, reason=result.reason, backend=result.backend,
                         query_evidence=getattr(result,'query_evidence',None),
@@ -248,7 +258,8 @@ class FullBodySearch:
             from .pose_requirements import requirements
             q=SemanticQuery.from_description(description)
             required=requirements(q,prepare_pose_query(q,self.semantic.service.index.lexicon))
-            out['candidate_validation']=dict(version='whole-pose-conditions-v2',requirements=required,
+            from .pose_requirements import CONDITIONS_VERSION
+            out['candidate_validation']=dict(version=CONDITIONS_VERSION,requirements=required,
                 unknown_policy='separate_review_not_selected',split_search=False)
         out['route'] = 'hybrid' if sufficient and semantic_valid else 'geometric' if sufficient else 'semantic' if semantic_valid else 'undetermined'
         if not sufficient and not semantic_valid:
@@ -262,7 +273,7 @@ class FullBodySearch:
             if sufficient:
                 futures['geometry'] = pool.submit(self.geometry_search, evidence, required)
             if semantic_valid:
-                futures['semantic'] = pool.submit(self.semantic_search, description)
+                futures['semantic'] = pool.submit(self.semantic_search, description, required)
             out['branches'] = {k:v.result() for k,v in futures.items()}
         if not semantic_valid:
             failed = decision.semantic.status in ('error', 'vlm_error')
@@ -376,10 +387,15 @@ class FullBodySearch:
             retained = dict(active=bool(required and required.get('posture')),
                             posture=required.get('posture') if required else None,
                             arms={}, body_states={}, hand_counts={})
+            if required and required.get('relations'):
+                retained.update(relations=required['relations'],active=True)
+            if required and required.get('knee_support'):
+                retained['knee_support']=required['knee_support']
             fallback = self.geometry_search(evidence, retained)
             for hit in fallback.get('hits', []):
                 if hit.get('whole_pose_validation'):
-                    hit['whole_pose_validation'] = {**hit['whole_pose_validation'], 'condition_scope': 'retained_posture_only'}
+                    hit['whole_pose_validation'] = {**hit['whole_pose_validation'], 'condition_scope':
+                        'retained_posture_and_critical_relations' if retained.get('relations') else 'retained_posture_only'}
             out['geometry_review_fallback'] = dict(
                 status=fallback['status'], reason=fallback.get('reason'),
                 qualified_count=0, constraints_satisfied=False,

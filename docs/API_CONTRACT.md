@@ -33,6 +33,16 @@
 - `candidate_validation`, `branches`, `description_evidence`, `geometry_evidence`: 조건·실제 검색문·
   관절 근거·분기별 실패/시간 기록. 기존 `candidates`/`semantic_candidates`와 임의 결합하지 않는다.
 
+`candidate_validation.version=whole-pose-conditions-v3-critical`은 `requirements`에
+`relations`(기존 팔짱/V자 관계)와 `knee_support`(`one`/`both`/null)를 추가한다.
+기하·자연어 후보와 생성 BVH 재감사 모두 같은 필수 조건을 적용한다. 팔짱은 BVH 해시가
+일치하는 검수 shape 프로필과 실제 가슴 앞 교차 형상이 모두 필요하며, 거친 팔 높이 분류는
+팔짱/V자 관계를 덮어쓰지 않는다. 전신의 무릎 꿇기는 해시에 연결된 자세 태그와 낮은 굽힌
+무릎의 지지 근사를 함께 확인한다. 한 무릎/양 무릎이 명시되면 해당 개수도 필수다.
+근거 없음·stale 해시·관측 결측은 통과가 아니다. 상반신/클로즈업에서 안 보이는 무릎 조건은
+추가하지 않는다. 이 지지 근사는 실제 바닥·피부 접촉이나 물리 검증을 인증하지 않는다.
+선택적 `geometry_review_fallback`도 이 핵심 관계와 무릎 지지 조건을 완화하지 않는다.
+
 이 경로는 Human-Art 관절의 조건부 VLM 검수·보완과 인물별 자세 설명을 사용한다.
 아래 레거시 경로의 “VLM은 좌표를 생성하지 않음” 규칙과 달리, 보완 관절은 `vlm_repair` 출처를
 명시하고 구조 검사 악화 시 되돌린다. 자동 high 신뢰도·refine 권한으로 승격하지 않는다.

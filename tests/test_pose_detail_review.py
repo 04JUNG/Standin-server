@@ -62,7 +62,8 @@ def test_only_near_library_hits_do_not_suppress_generation():
         core_records={};body={};service=SimpleNamespace(index=SimpleNamespace(lexicon=LEX))
         def search(self,q,top_k):return SemanticSearchResult('no_result')
     generator=Generator();engine=FullBodySearch([SimpleNamespace(pose_id='a',meta={})],Text(),camera,generator=generator)
-    d=decision();d.semantic.description.update(postures=['standing'],body_details='서 있는 자세',body_observations={'knees':'bent'})
+    d=decision();d.semantic.description.update(postures=['standing'],actions=[],
+        search_text='서 있는 자세',body_details='서 있는 자세',body_observations={'knees':'bent'})
     ev=evidence();ev['keypoints']=p[:,:2].copy();ev['keypoints'][:,1]*=-1
     result=engine.search(d,ev)
     assert not result['selected'] and len(result['near_candidates'])==1
