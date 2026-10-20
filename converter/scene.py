@@ -82,6 +82,11 @@ def compose(manifest, fbx_paths, output_path):
     bpy.context.scene.unit_settings.system = "METRIC"
     bpy.context.scene.unit_settings.scale_length = 1.0
     people = []
+    rough = manifest.get("rough_layout")
+    camera = None
+    if rough:
+        from converter.rough_layout import camera_for
+        camera = camera_for(rough["width"], rough["height"])
     for row, path in zip(manifest["persons"], fbx_paths):
         if hashlib.sha256(Path(path).read_bytes()).hexdigest() != row["fbx_sha256"]:
             raise SceneInputError("source FBX checksum mismatch")
@@ -112,16 +117,42 @@ def compose(manifest, fbx_paths, output_path):
                 world = obj.matrix_world.copy()
                 obj.parent = group
                 obj.matrix_world = world
+        fit_report = None
+        if rough:
+            from converter.rough_layout import geometry_for, fit_translation
+            vertices, joints = geometry_for(rigs[0], meshes)
+            try:
+                translation, fit_report = fit_translation(vertices, joints, row["observation"], camera)
+            except ValueError as exc:
+                raise SceneInputError("rough observations could not be fitted") from exc
+            tx, ty, tz = translation
+            row = {**row, "position": [tx, tz, -ty], "scale": 1.0, "rotation_y_degrees": 0.0}
         x, y, z = row["position"]
         group.matrix_world = (Matrix.Translation((x, -z, y))
                               @ Matrix.Rotation(math.radians(row["rotation_y_degrees"]), 4, "Z")
                               @ Matrix.Scale(row["scale"], 4))
         bpy.context.view_layer.update()
         people.append({**row, "root_name": group.name, "armature_name": rigs[0].name,
-                       "bone_count": len(rigs[0].data.bones), "mesh_count": len(meshes)})
+                       "bone_count": len(rigs[0].data.bones), "mesh_count": len(meshes),
+                       **({"layout_fit": fit_report} if fit_report else {})})
+    if camera:
+        from mathutils import Vector
+        data = bpy.data.cameras.new("rough_camera")
+        obj = bpy.data.objects.new("rough_camera", data)
+        bpy.context.collection.objects.link(obj)
+        obj.location = camera["position_blender"]
+        obj.rotation_euler = Vector((0, 1, 0)).to_track_quat("-Z", "Y").to_euler()
+        data.sensor_fit = "HORIZONTAL"
+        data.lens_unit = "FOV"
+        data.angle = math.radians(camera["horizontal_fov_degrees"])
+        scene = bpy.context.scene
+        scene.render.resolution_x = rough["width"]
+        scene.render.resolution_y = rough["height"]
+        scene.render.pixel_aspect_x = scene.render.pixel_aspect_y = 1.0
+        scene.camera = obj
     before = _snapshot()
     bpy.ops.export_scene.fbx(
-        filepath=str(output_path), use_selection=False, object_types={"EMPTY", "ARMATURE", "MESH"},
+        filepath=str(output_path), use_selection=False, object_types={"EMPTY", "ARMATURE", "MESH", "CAMERA"},
         axis_forward="-Z", axis_up="Y", apply_unit_scale=True, global_scale=1.0,
         use_mesh_modifiers=True, add_leaf_bones=False, bake_anim=False,
         primary_bone_axis="Y", secondary_bone_axis="X", mesh_smooth_type="FACE",
@@ -134,4 +165,7 @@ def compose(manifest, fbx_paths, output_path):
     error = _verify(before, _snapshot())
     return dict(ok=True, version=SCENE_VERSION, blender_version=bpy.app.version_string,
                 person_count=len(people), persons=people, roundtrip_verified=True,
-                max_world_error_m=error, tolerance_m=0.0001)
+                max_world_error_m=error, tolerance_m=0.0001,
+                **({"rough_layout": {"version": "rough-layout-v1", "camera": camera,
+                    "depth_is_estimate": True, "manual_adjustment": False,
+                    "csp_camera_preservation": False}} if rough else {}))
