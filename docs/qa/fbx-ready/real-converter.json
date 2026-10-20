@@ -1,0 +1,42 @@
+{
+  "character_sha256": "809a131510434089888429605bf7cd2e3bc75b63109e4ac5c9734b211ee52365",
+  "source_bvh_sha256": "34fb35ec2dd1d6e3797ae9a47c155461ae2c11385f75ca3494e0e42c478e6f9e",
+  "blender": {
+    "version": "5.2.0",
+    "build_hash": "fbe6228777e7"
+  },
+  "cases": [
+    {
+      "case": "first",
+      "scope": "half",
+      "ready_s": 9.544,
+      "preview_s": 0.697,
+      "sha256": "8e44b1a6c868e83ffc93711712907ae9fae61e6e1accf45b3773e5b52f730915",
+      "bytes": 1291388
+    },
+    {
+      "case": "hand-change",
+      "scope": "half",
+      "ready_s": 8.653,
+      "preview_s": 0.66,
+      "sha256": "be83214954ecc7ebf5934f1143cf4ace697e47bb1030094a0fad690b86552f30",
+      "bytes": 1291340
+    },
+    {
+      "case": "head",
+      "scope": "head",
+      "ready_s": 8.639,
+      "preview_s": 0.605,
+      "sha256": "de480e8dd7a193bb8911969812deaa07c9e4579f57e566752bdd17eb1ea03b52",
+      "bytes": 256140
+    },
+    {
+      "case": "shape",
+      "scope": "half",
+      "ready_s": 8.868,
+      "preview_s": 0.688,
+      "sha256": "8afe2fd35fbde3024123e88d0189cd6a62def9723b76056c20969b87cb60364d",
+      "bytes": 1291548
+    }
+  ]
+}

@@ -146,7 +146,7 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
         camera_rotation = validate_rotation(raw.get("camera_rotation"))
     except ValueError as exc:
         raise JobValidationError(str(exc)) from exc
-    if camera_rotation is not None and ((preview_view != "front" and not preview_model) or raw["mirror"] or raw["thumbnail"]):
+    if camera_rotation is not None and ((preview_view not in (None, "front") and not preview_model) or raw["mirror"] or raw["thumbnail"]):
         raise JobValidationError("aligned output requires front preview without mirror/anatomical thumbnail")
     if camera_rotation is not None and raw["force_exact_v324"]:
         raise JobValidationError("exact V3.2.4 mode does not permit camera rotation")
@@ -194,14 +194,14 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
 
     fast_reset = raw.get("fast_scene_reset", False)
     if type(fast_reset) is not bool or (fast_reset and (
-            raw.get("shape_recipe") is not None or hands is None or preview_view != "front"
+            raw.get("shape_recipe") is not None or hands is None or preview_view not in (None, "front")
             or screening or raw["force_exact_v324"] or preview_model or thumbnail is not None)):
         raise JobValidationError("invalid fast scene reset options")
     base = raw.get("retarget_cache")
     if base is not None:
         if (not isinstance(base, dict) or set(base) != {"mode","fbx_path","meta_path"}
                 or base["mode"] not in ("capture","reuse") or raw.get("shape_recipe") is not None
-                or screening or raw["force_exact_v324"] or hands is None or preview_view != "front"
+                or screening or raw["force_exact_v324"] or hands is None or preview_view not in (None, "front")
                 or preview_model or thumbnail is not None):
             raise JobValidationError("invalid retarget base options")
         for key, suffix in [("fbx_path",".fbx"),("meta_path",".json")]:

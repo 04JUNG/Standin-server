@@ -97,6 +97,7 @@ COPY converter/scene.py /app/converter/scene.py
 COPY converter/rough_layout.py /app/converter/rough_layout.py
 COPY converter/scene_worker.py /app/converter/scene_worker.py
 COPY converter/framing.py /app/converter/framing.py
+COPY converter/final_preview_worker.py /app/converter/final_preview_worker.py
 COPY converter/hand_library.py /app/converter/hand_library.py
 COPY converter/hand_library.v1.json /app/converter/hand_library.v1.json
 COPY converter/hand_geometry.py /app/converter/hand_geometry.py
@@ -110,6 +111,7 @@ COPY converter_api/preview_models.py /app/converter_api/preview_models.py
 COPY converter_api/body_preview.py /app/converter_api/body_preview.py
 COPY converter_api/__init__.py /app/converter_api/__init__.py
 COPY converter_api/app.py /app/converter_api/app.py
+COPY converter_api/final_preview.py /app/converter_api/final_preview.py
 COPY converter_api/registry.py /app/converter_api/registry.py
 COPY converter_api/runner.py /app/converter_api/runner.py
 COPY converter_api/work_queue.py /app/converter_api/work_queue.py

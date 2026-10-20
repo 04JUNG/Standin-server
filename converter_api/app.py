@@ -645,7 +645,7 @@ def create_app(
                 conversion_id=conversion_id,
                 bvh_bytes=bvh_bytes,
             )
-            if output_scope != "full" or preview_view or preview_model:
+            if output_scope != "full" or preview_view or preview_model or camera_rotation is not None:
                 if (result.report.get("output_scope") != output_scope
                         or result.report.get("framing_version") != FRAMING_VERSION):
                     raise WorkerIntegrityError("output framing lineage mismatch")
@@ -1067,7 +1067,7 @@ def create_app(
     ):
         """One verified FBX plus its own reimported preview, in a single response."""
         contract = verify_preview_revision(expected_preview_revision)
-        if preview_format not in ("png", "model") or (preview_format == "model" and preview_view != "front"):
+        if preview_format not in ("png", "model", "none") or (preview_format == "model" and preview_view != "front"):
             raise ApiProblem(400, "INVALID_OPTION", "invalid preview_format")
         from converter.camera import validate_rotation
         try:
@@ -1088,6 +1088,28 @@ def create_app(
         )
         baked = result_hands(completed.result.report)
         result = completed.result
+        if preview_format == "none":
+            # _execute_conversion has completed every worker, asset, shape, hand
+            # and artifact integrity check. No image/model work was requested.
+            if (not result.artifact.startswith(b"Kaydara FBX Binary  \x00\x1a\x00")
+                    or result.report.get("output_scope") != output_scope
+                    or result.report.get("framing_version") != FRAMING_VERSION
+                    or len(result.artifact) > 30 * 1024 * 1024
+                    or hashlib.sha256(result.artifact).hexdigest() != result.artifact_sha256):
+                raise ApiProblem(500, "WORKER_INTEGRITY_ERROR", "FBX integrity mismatch")
+            return {
+                "artifact_contract": "verified-fbx-v1", "preview_format": "none",
+                "conversion_id": completed.conversion_id, "solver_version": SOLVER_VERSION,
+                "framing_version": FRAMING_VERSION, "output_scope": output_scope,
+                "preview_view": "front", "preview_revision": contract["preview_revision"],
+                "camera_rotation": rotation, "character_id": completed.character.metadata.character_id,
+                "character_sha256": completed.character.metadata.sha256,
+                "source_bvh_sha256": result.source_bvh_sha256,
+                "shape_sha256": result.report.get("shape_bake", {}).get("shape_sha256"),
+                "shape_bake": result.report.get("shape_bake"), "hands": baked,
+                "fbx_sha256": result.artifact_sha256,
+                "fbx_base64": base64.b64encode(result.artifact).decode("ascii"),
+            }
         if preview_format == "model":
             from converter.framed_model import MODEL_VERSION, metadata, revision
             try:
@@ -1149,6 +1171,8 @@ def create_app(
             "preview_base64": base64.b64encode(result.preview).decode("ascii"),
         }
 
+    from converter_api.final_preview import register_final_preview
+    register_final_preview(app, blender_runner)
     return app
 
 
