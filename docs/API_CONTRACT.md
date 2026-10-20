@@ -1,5 +1,17 @@
 # API 계약 — 도원 추론 서버 (FastAPI)
 
+## 별도 v4 장면 보정 worker
+
+기존 `/analyze` 및 기동 라우팅과 별개인 기본 꺼짐 서비스입니다.
+내부 bearer 인증을 사용하는 `POST /scene/plan`과 `POST /scene/build`를 제공합니다.
+BFF가 소유 원본·확인한 FBX를 plan으로 보내고, 제안된 등록 포즈를 같은 체형·손으로 변환한 full FBX를
+build로 보냅니다. 최종 FBX·PNG와 SHA·인원 수·원본 SHA·plan ID가 반환됩니다.
+공개 클라이언트에는 파일 경로·자유 관절·회전 명령 입력을 제공하지 않습니다.
+
+실행 설정, calibration 제약, 배포 전 검증은
+[v4 worker 계약](../src/scene_refinement/README.md)을 따릅니다.
+현재 inference/Converter 배포 이미지나 ECS 서비스에 이 worker를 추가하는 변경은 포함하지 않습니다.
+
 > 상태: 현재 계약 · 갱신일: 2026-10-17 · 기준 코드: `api/app.py`, `api/models.py`
 >
 > 이 문서는 **실제 구현된** HTTP 계약(`api/app.py`·`api/models.py`)을 문서화한다.
