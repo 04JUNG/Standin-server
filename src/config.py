@@ -163,6 +163,8 @@ class Config:
     hand_skin_screen_budget_seconds: float = float(os.getenv(
         "HAND_SKIN_SCREEN_BUDGET_SECONDS", "45"
     ))
+    # Opt-in; one shared gate admits at most two in-flight checks per process.
+    hand_skin_screen_concurrency: int = int(os.getenv("HAND_SKIN_SCREEN_CONCURRENCY", "1"))
     # 변환(~3s)+렌더 한 번의 상한. 초과하면 그림 없이 응답한다(조정 결과는 유지).
     thumbnail_timeout_seconds: float = float(
         os.getenv("REFINE_THUMBNAIL_TIMEOUT_SECONDS", "20")

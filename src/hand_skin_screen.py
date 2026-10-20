@@ -138,13 +138,24 @@ class HandSkinClient:
 
 
 class HandSkinGate:
-    def __init__(self, client, bvh_root, hashes, *, budget_seconds=45., max_checks=10):
+    def __init__(self, client, bvh_root, hashes, *, budget_seconds=45., max_checks=10,
+                 concurrency=1):
         if not math.isfinite(budget_seconds) or not 0 < budget_seconds <= 60:
             raise ValueError('hand screen budget must be finite and in (0,60]')
         self.client, self.root, self.hashes = client, Path(bvh_root), dict(hashes)
         self.budget_seconds, self.max_checks = budget_seconds, max_checks
+        if type(concurrency) is not int or concurrency not in (1, 2):
+            raise ValueError('hand screen concurrency must be 1 or 2')
+        self.concurrency = concurrency
+        # Bound aggregate checks across people/requests sharing this engine.
+        if concurrency == 2:
+            from .hand_skin_parallel import ScreenSlots
+            self.parallel_slots = ScreenSlots()
 
     def session(self, hands=None):
+        if self.concurrency == 2:
+            from .hand_skin_parallel import ParallelSkinSession
+            return ParallelSkinSession(self, hands)
         return SkinSession(self, hands)
 
     def library_text(self, pose_id):
@@ -259,4 +270,5 @@ def build_hand_skin_gate(camera, bvh_root):
     digest = characters['characters'].get(character_id, {}).get('sha256')
     client = HandSkinClient(CFG.thumbnail_converter_url, character_id, digest)
     return HandSkinGate(client, bvh_root, camera.hashes,
-                        budget_seconds=CFG.hand_skin_screen_budget_seconds)
+                        budget_seconds=CFG.hand_skin_screen_budget_seconds,
+                        concurrency=CFG.hand_skin_screen_concurrency)
