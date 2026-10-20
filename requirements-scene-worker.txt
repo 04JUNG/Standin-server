@@ -1,0 +1,18 @@
+# Dedicated Python 3.12 worker; CPU torch is installed separately by Docker.
+# Direct dependencies pin the locally exercised versions. Full Linux model
+# execution still requires the approved mounted release and staging smoke test.
+fastapi==0.143.3
+pydantic==2.14.0
+uvicorn==0.54.0
+numpy==2.3.5
+scipy==1.18.1
+Pillow==12.3.0
+google-genai==2.31.0
+transformers==5.20.1
+huggingface-hub==2.2.0
+safetensors==0.8.0
+rtmlib==0.0.15
+onnxruntime==1.28.0
+# rtmlib declares both OpenCV distributions; hold their binary versions together.
+opencv-python==5.0.0.93
+opencv-contrib-python==5.0.0.93

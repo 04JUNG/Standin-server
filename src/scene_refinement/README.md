@@ -37,30 +37,19 @@ camera adoption remains separate from scene world transforms and this pipeline
 makes no CSP pixel-match claim.
 
 
-## Runtime configuration
+## Dedicated staging runtime (Draft)
 
-Run from the repository root in a dedicated worker environment. Provision Python
-API/core dependencies, PyTorch, Transformers CLIP, the pinned HumanArt runtime
-and its manifest/weights, and Blender 5.2 matching the Converter calibration.
-The default inference and Converter containers are not wired to launch this worker.
-Use Gemini for the tested configuration; optional MLX requires its own runtime.
+See [the staging deployment and BFF handoff](../../docs/scene-worker-staging.md)
+for the dedicated image, approved release inventory, required ECS settings,
+private URL/auth configuration, error contract and smoke-test sequence.
 
-Required operator environment variables:
+`python -m src.scene_refinement` now loads assets through
+`SCENE_ASSET_MANIFEST` + `SCENE_ASSET_MANIFEST_SHA256`, rather than independently
+supplied model/library paths. `SCENE_REFINEMENT_ENABLED=1` and a private 32+ character
+`SCENE_REFINEMENT_TOKEN` remain required. Only the dedicated Gemini/CPU deployment
+is supported by this entrypoint; research callers can still construct Engine
+explicitly. `/healthz` is liveness; `/readyz` passes only after offline assets,
+Blender and model startup checks. Remote Gemini access requires a separate smoke.
 
-- `SCENE_REFINEMENT_ENABLED=1`, `SCENE_REFINEMENT_TOKEN` (32+ characters).
-- `SCENE_REFINEMENT_ROOT`: private scratch directory, retained briefly for diagnostics;
-  restrict access because raw images and derived artifacts are stored there.
-- `SCENE_BLENDER_BINARY`: trusted Blender executable.
-- `SCENE_POSE_CATALOG`, `SCENE_POSE_LIBRARY`: matching catalog and registered BVH directory.
-- `SCENE_CHARACTER_FBX`, `SCENE_CHARACTER_SHA256`, `SCENE_HEAD_AXES`: matching calibrated asset and axes.
-- `SCENE_VLM_PROVIDER`, `SCENE_VLM_MODEL`: explicit real provider/model, plus its secret credential.
-- `SCENE_POSE_MODEL_MANIFEST`: pinned HumanArt model bundle.
-- Optional `SCENE_CLIP_MODEL` (model ID or local snapshot), `SCENE_REFINEMENT_HOST`
-  (default `127.0.0.1`), `SCENE_REFINEMENT_PORT` (default `8002`).
-
-Catalog, axes, character and weights are external operator assets, not bundled by
-this PR. Production packaging, Linux/container model execution, capacity/load
-behavior, multi-replica BFF receipt affinity, installed desktop native saving,
-and CSP camera/framing require validation before enabling for users. BFF receipts
-are process-local: requests reaching another replica must be routed consistently
-or a shared receipt store added. Expired/missing receipts fail closed and require review.
+The worker remains default-off. Deployment resources and approved assets still
+need provisioning; this code does not activate the BFF or change `/analyze`.
