@@ -10,10 +10,16 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-from .contracts import EVALUATION_SCHEMA, REPAIR_SCHEMA
+from .contracts import EVALUATION_SCHEMA, REPAIR_SCHEMA, SINGLE_SCHEMA
 
 PROMPTS = Path(__file__).with_name("prompts")
 ROLES = {"evaluation": "평가용_VLM_v3.2.md", "repair": "수정용_VLM_v3.2.md"}
+SINGLE_PROMPTS = [
+    "공통_규칙_single.md",
+    "검토_single.md",
+    "수정_single.md",
+    "응답_계약_single.md",
+]
 
 
 class GeminiStageError(RuntimeError):
@@ -44,26 +50,33 @@ def provider_schema(schema):
 
 
 class GeminiReviewer:
-    def __init__(self, api_key, model, timeout=180):
+    def __init__(self, api_key, model, timeout=180, thinking_level="low"):
         if not api_key:
             raise ValueError("GEMINI_API_KEY is required")
         if not isinstance(model, str) or not re.fullmatch(r"[A-Za-z0-9._-]+", model):
             raise ValueError("Explicit Gemini model ID is required")
         if not math.isfinite(timeout) or timeout <= 0:
             raise ValueError("Timeout must be positive and finite")
+        if thinking_level not in {"low", "default"}:
+            raise ValueError("Thinking level must be low or default")
         self.api_key = api_key
         self.model = model
         self.timeout = timeout
+        self.thinking_level = thinking_level
         # Snapshot all prompt text at construction; never reload between stages.
         common = (PROMPTS / "공통_규칙_v3.2.md").read_text(encoding="utf-8")
         self.prompts = {
             stage: common + "\n\n" + (PROMPTS / name).read_text(encoding="utf-8")
             for stage, name in ROLES.items()
         }
+        self.prompts["single_review_repair"] = "\n\n".join(
+            (PROMPTS / name).read_text(encoding="utf-8") for name in SINGLE_PROMPTS
+        )
         self.metadata = {
             "provider": "gemini",
             "model": model,
             "timeout_seconds": timeout,
+            "thinking_level": thinking_level,
             "prompt_sha256": {
                 stage: hashlib.sha256(text.encode()).hexdigest()
                 for stage, text in self.prompts.items()
@@ -72,7 +85,7 @@ class GeminiReviewer:
         }
 
     def request(self, stage, original_png, overlay_png, context, evaluation=None):
-        if stage not in ROLES or (stage == "repair") != (evaluation is not None):
+        if stage not in self.prompts or (stage == "repair") != (evaluation is not None):
             raise ValueError("Invalid stage/evaluation combination")
         parts = [{"text": self.prompts[stage]}]
         for label, data in (
@@ -103,7 +116,11 @@ class GeminiReviewer:
                     + json.dumps(evaluation, ensure_ascii=False, allow_nan=False)
                 }
             )
-        schema = EVALUATION_SCHEMA if stage == "evaluation" else REPAIR_SCHEMA
+        schema = {
+            "evaluation": EVALUATION_SCHEMA,
+            "repair": REPAIR_SCHEMA,
+            "single_review_repair": SINGLE_SCHEMA,
+        }[stage]
         payload = {
             "contents": [{"role": "user", "parts": parts}],
             "generationConfig": {
@@ -112,6 +129,10 @@ class GeminiReviewer:
                 "responseJsonSchema": provider_schema(schema),
             },
         }
+        if self.thinking_level != "default":
+            payload["generationConfig"]["thinkingConfig"] = {
+                "thinkingLevel": self.thinking_level
+            }
         request = urllib.request.Request(
             f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent",
             data=json.dumps(payload, ensure_ascii=False, allow_nan=False).encode(),

@@ -7,6 +7,8 @@ server-created job file has been validated.
 
 from __future__ import annotations
 
+import time
+_LAB_PROCESS_ENTER = time.monotonic()
 import hashlib
 import json
 import os
@@ -41,6 +43,8 @@ from converter.thumbnail_render import (  # noqa: E402 - bpy는 함수 안에서
     ThumbnailRenderError,
     render_artifact_view,
 )
+from converter.framing import FRAMING_VERSION, PREVIEW_VIEWS, validate_scope
+from converter.hand_library import HandLibraryError, normalize_request as normalize_hands
 
 
 class JobValidationError(ValueError):
@@ -100,7 +104,8 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
         "apply_root_translation", "embed_textures",
         "force_exact_v324", "thumbnail",
     }
-    unknown = set(raw) - required
+    unknown = set(raw) - required - {
+        "output_scope", "preview_view", "camera_rotation", "preview_model", "shape_recipe", "hands", "hand_contact_screen", "retarget_cache", "fast_scene_reset"}
     missing = required - set(raw)
     if missing or unknown:
         raise JobValidationError(
@@ -127,6 +132,39 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
         raise JobValidationError("embed_textures must be false")
     if type(raw["force_exact_v324"]) is not bool:
         raise JobValidationError("force_exact_v324 must be boolean")
+    try:
+        output_scope = validate_scope(raw.get("output_scope", "full"))
+    except (TypeError, ValueError) as exc:
+        raise JobValidationError("invalid output_scope") from exc
+    preview_view = raw.get("preview_view")
+    preview_model = raw.get("preview_model", False)
+    if type(preview_model) is not bool or (preview_model and (
+            preview_view is not None or raw["thumbnail"] or raw["mirror"] or raw["force_exact_v324"])):
+        raise JobValidationError("invalid preview_model options")
+    from converter.camera import validate_rotation
+    try:
+        camera_rotation = validate_rotation(raw.get("camera_rotation"))
+    except ValueError as exc:
+        raise JobValidationError(str(exc)) from exc
+    if camera_rotation is not None and ((preview_view != "front" and not preview_model) or raw["mirror"] or raw["thumbnail"]):
+        raise JobValidationError("aligned output requires front preview without mirror/anatomical thumbnail")
+    if camera_rotation is not None and raw["force_exact_v324"]:
+        raise JobValidationError("exact V3.2.4 mode does not permit camera rotation")
+    if preview_view is not None and preview_view not in PREVIEW_VIEWS:
+        raise JobValidationError("invalid preview_view")
+    if raw["force_exact_v324"] and output_scope != "full":
+        raise JobValidationError("exact V3.2.4 mode permits full framing only")
+    try:
+        hands = normalize_hands(raw.get("hands"))
+    except HandLibraryError as exc:
+        raise JobValidationError(f"invalid hands: {exc}") from exc
+    if hands is not None and raw["force_exact_v324"]:
+        raise JobValidationError("exact V3.2.4 mode does not permit hand presets")
+    screening = raw.get("hand_contact_screen", False)
+    if type(screening) is not bool or (screening and (
+            output_scope != 'full' or preview_view or preview_model or camera_rotation is not None
+            or raw['thumbnail'] is not None or raw['mirror'] or raw['force_exact_v324'])):
+        raise JobValidationError('hand screening requires an unframed, non-mirrored full artifact')
 
     unresolved_temp = _absolute_path(raw["temp_dir"], "temp_dir")
     if unresolved_temp.is_symlink():
@@ -154,14 +192,40 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
 
     thumbnail = _validate_thumbnail(raw["thumbnail"], temp_dir, output, report)
 
+    fast_reset = raw.get("fast_scene_reset", False)
+    if type(fast_reset) is not bool or (fast_reset and (
+            raw.get("shape_recipe") is not None or hands is None or preview_view != "front"
+            or screening or raw["force_exact_v324"] or preview_model or thumbnail is not None)):
+        raise JobValidationError("invalid fast scene reset options")
+    base = raw.get("retarget_cache")
+    if base is not None:
+        if (not isinstance(base, dict) or set(base) != {"mode","fbx_path","meta_path"}
+                or base["mode"] not in ("capture","reuse") or raw.get("shape_recipe") is not None
+                or screening or raw["force_exact_v324"] or hands is None or preview_view != "front"
+                or preview_model or thumbnail is not None):
+            raise JobValidationError("invalid retarget base options")
+        for key, suffix in [("fbx_path",".fbx"),("meta_path",".json")]:
+            unresolved = _absolute_path(base[key],key)
+            if unresolved.is_symlink(): raise JobValidationError("retarget base cannot be a symlink")
+            resolved = _inside(unresolved,temp_dir,key)
+            if resolved.suffix != suffix or resolved in (output,report,bvh_path,path):
+                raise JobValidationError("invalid retarget base path")
+            if base["mode"] == "reuse" and not resolved.is_file():
+                raise JobValidationError("retarget base missing")
+            if base["mode"] == "capture" and resolved.exists():
+                raise JobValidationError("retarget capture must be new")
     normalized = dict(raw)
     normalized.update({
+        "output_scope": output_scope,
+        "preview_view": preview_view,
+        "camera_rotation": camera_rotation,
         "temp_dir": str(temp_dir),
         "bvh_path": str(bvh_path),
         "character_fbx": str(character),
         "output_path": str(output),
         "report_path": str(report),
         "thumbnail": thumbnail,
+        "hands": hands,
     })
     return normalized
 
@@ -267,36 +331,107 @@ def _frozen_lineage() -> dict[str, str]:
 
 def run_job(job: dict[str, Any]) -> dict[str, Any]:
     """Execute one validated job inside Blender and persist its report."""
-    lineage = _frozen_lineage()
-    source_bvh_sha256 = _sha256(Path(job["bvh_path"]))
-    from converter.convert import convert  # imports bpy only in this child process
-    import bpy
+    from converter.lab_timing import StageTimings
+    lab_timings = StageTimings()
+    with lab_timings.measure("worker_init"):
+        lineage = _frozen_lineage()
+        source_bvh_sha256 = _sha256(Path(job["bvh_path"]))
+        from converter.convert import convert  # imports bpy only in this child process
+        import bpy
 
-    blender_version = bpy.app.version_string
-    raw_build_hash = bpy.app.build_hash
-    blender_build_hash = (
-        raw_build_hash.decode("ascii", errors="replace")
-        if isinstance(raw_build_hash, bytes) else str(raw_build_hash)
-    )
-    if not blender_version.startswith(EXPECTED_BLENDER_VERSION):
-        raise FrozenLineageError("Blender version does not match the frozen runtime")
-    if blender_build_hash != EXPECTED_BLENDER_BUILD_HASH:
-        raise FrozenLineageError("Blender build hash does not match the frozen runtime")
-    if _sha256(Path(job["character_fbx"])) != job["character_sha256"]:
-        raise ArtifactValidationError("character artifact SHA256 changed before conversion")
+        blender_version = bpy.app.version_string
+        raw_build_hash = bpy.app.build_hash
+        blender_build_hash = (
+            raw_build_hash.decode("ascii", errors="replace")
+            if isinstance(raw_build_hash, bytes) else str(raw_build_hash)
+        )
+        if not blender_version.startswith(EXPECTED_BLENDER_VERSION):
+            raise FrozenLineageError("Blender version does not match the frozen runtime")
+        if blender_build_hash != EXPECTED_BLENDER_BUILD_HASH:
+            raise FrozenLineageError("Blender build hash does not match the frozen runtime")
+        if _sha256(Path(job["character_fbx"])) != job["character_sha256"]:
+            raise ArtifactValidationError("character artifact SHA256 changed before conversion")
 
-    report = convert(
-        bvh_path=job["bvh_path"],
-        character_fbx=job["character_fbx"],
-        out_path=job["output_path"],
-        frame=FRAME,
-        mirror=job["mirror"],
-        output_mode=OUTPUT_MODE,
-        apply_root_translation=APPLY_ROOT_TRANSLATION,
-        embed_textures=EMBED_TEXTURES,
-        force_exact_v324=job["force_exact_v324"],
-    )
-    payload = report.as_dict()
+    fast_reset = job.get('fast_scene_reset') is True
+    if fast_reset:
+        from converter.fast_scene_reset import install as install_fast_reset
+        install_fast_reset()
+    profiling = os.getenv('STANDIN_LAB_FIRST_ENTRY_PROFILE') == '1'
+    if profiling:
+        from converter.first_entry_profile import install, RECORDS
+        install()
+
+    recipe = job.get("shape_recipe")
+    if recipe is not None:
+        from converter.shape_bake import convert_shaped, import_full_character
+        from converter import retarget as rt
+        # This fresh one-job process uses the shape FBX terminal-bone policy
+        # through retarget, framing and final GLB/PNG reimports.
+        rt.import_character = import_full_character
+        from functools import partial
+        convert = partial(convert_shaped, recipe=recipe)
+    base = job.get("retarget_cache")
+    base_metadata = None
+    if base:
+        from converter.retarget_cache import binding, restore_base, capture_base, cache_key
+        base_identity = binding(source_bvh_sha256, job["character_sha256"], job["character_id"], job["mirror"])
+    if base and base["mode"] == "reuse":
+        with lab_timings.measure("retarget_base_restore_verify"):
+            payload, base_metadata = restore_base(base["fbx_path"],base["meta_path"],job["output_path"],base_identity)
+    else:
+        with lab_timings.measure("retarget_initial_export"):
+            report = convert(
+                bvh_path=job["bvh_path"],
+                character_fbx=job["character_fbx"],
+                out_path=job["output_path"],
+                frame=FRAME,
+                mirror=job["mirror"],
+                output_mode=OUTPUT_MODE,
+                apply_root_translation=APPLY_ROOT_TRANSLATION,
+                embed_textures=EMBED_TEXTURES,
+                force_exact_v324=job["force_exact_v324"],
+            )
+        payload = report.as_dict()
+        if base and report.ok:
+            with lab_timings.measure("retarget_base_capture"):
+                base_metadata = capture_base(job["output_path"],payload,base_identity,base["fbx_path"],base["meta_path"])
+    ok = payload.get("ok") is True
+    if base_metadata:
+        payload["retarget_reuse"] = {"mode":base["mode"],"key":cache_key(base_identity),
+            "base_sha256":base_metadata["artifact_sha256"],"body_report_sha256":base_metadata["body_report_sha256"]}
+    if recipe is not None and ok:
+        payload["shape_bake"] = json.loads(Path(job["output_path"]).with_suffix(".shape.json").read_text())
+    if ok and job.get("hands") is not None:
+        # 손은 몸 변환 직후, 메시 절단·카메라 회전·미리보기보다 먼저 굽는다.
+        # 그래야 이후 단계가 모두 손이 적용된 실제 산출물을 다시 읽는다.
+        from converter.hands import bake_hands
+        with lab_timings.measure("hand_import_apply_export"):
+            payload["hands"] = bake_hands(job["output_path"], job["hands"])
+    if ok and job.get('hand_contact_screen'):
+        from converter.hand_contact import screen_artifact
+        # AFTER hand baking, BEFORE crop/camera/preview. Screening does not
+        # export or change the frozen retarget solver or delivered FBX bytes.
+        payload['hand_contact_screen'] = screen_artifact(job['output_path'])
+    if ok:
+        from converter.framing import process_output
+        scope = job.get("output_scope", "full")
+        preview_view = job.get("preview_view")
+        preview_path = Path(job["temp_dir"]) / "preview.png" if preview_view else None
+        payload["framing"] = process_output(
+            job["output_path"], scope, preview_path=preview_path,
+            view=preview_view or "front",
+            camera_rotation=job.get("camera_rotation"),
+            lab_timings=lab_timings,
+        )
+        payload["camera_rotation"] = job.get("camera_rotation")
+        payload["output_scope"] = scope
+        payload["framing_version"] = FRAMING_VERSION
+        if preview_path:
+            from converter.preview_style import PREVIEW_STYLE_VERSION
+            payload["preview_style_version"] = PREVIEW_STYLE_VERSION
+            payload["preview_view"] = preview_view
+            payload["preview_sha256"] = _sha256(preview_path)
+            payload["preview_size"] = preview_path.stat().st_size
     payload.update({
         "conversion_id": job["conversion_id"],
         "solver_version": SOLVER_VERSION,
@@ -309,18 +444,35 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
         "force_exact_v324": job["force_exact_v324"],
     })
     output = Path(job["output_path"])
-    if report.ok:
+    if ok:
         if not output.is_file() or output.is_symlink() or output.stat().st_size <= 0:
             raise ArtifactValidationError(
                 "converter reported success without a non-empty FBX artifact"
             )
         payload["artifact_sha256"] = _sha256(output)
         payload["artifact_size"] = output.stat().st_size
+        if job.get("preview_model"):
+            from converter.framed_model import bake_final
+            payload["preview_model"] = bake_final(output, Path(job["temp_dir"]) / "preview.glb", {
+                "source_bvh_sha256": source_bvh_sha256,
+                "character_id": job["character_id"], "character_sha256": job["character_sha256"],
+                "scope": job.get("output_scope", "full"),
+                **({"shape_sha256": recipe["shape_sha256"], "shape_rules": recipe["rules"]} if recipe else {}),
+                "camera_rotation": job.get("camera_rotation"),
+            })
         if job["thumbnail"] is not None:
             payload["thumbnail"] = _render_thumbnail(job["thumbnail"], output)
     else:
         payload["error_code"] = "conversion_rejected"
         payload["error_message"] = "converter rejected the BVH/profile mapping"
+    if fast_reset:
+        from converter.fast_scene_reset import receipt
+        payload['scene_reset'] = receipt()
+    if profiling:
+        payload['lab_call_profile'] = RECORDS
+        payload['lab_process_enter_monotonic'] = _LAB_PROCESS_ENTER
+    if lab_timings.enabled:
+        payload["lab_stage_timings"] = lab_timings.records
     return payload
 
 

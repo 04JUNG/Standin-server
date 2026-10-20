@@ -1,0 +1,50 @@
+{
+  "rig_source": "data/curation/sources/quaternius/export-1/pool/combat_ual1_Punch_Cross_f00000.bvh",
+  "rig_sha256": "fd3d02eb9cb307eb0700f48ef4cc6d0a90fdf595c1f6c8b66bd40dd93844544b",
+  "scenes": [
+    {
+      "id": "sports_recovery_hands_on_knees",
+      "label": "경기 중 숨을 고르며 양손을 무릎에 짚기",
+      "category": "sports",
+      "category_label": "경기 후 휴식·균형",
+      "stance": "wide",
+      "gesture": "hands_knees",
+      "props": "",
+      "hands": ["support", "support"],
+      "root_xyz": [52, 0, 0],
+      "lean": 25,
+      "nod": 12,
+      "left_wrist": [0.25, -0.26, 0.25],
+      "right_wrist": [-0.25, -0.26, 0.25],
+      "left_pole": [0.48, 0.18, 0.31],
+      "right_pole": [-0.48, 0.18, 0.31],
+      "overrides": {
+        "left_leg": [[0.34, 0.105, 0.24], [0.35, 0.58, 0.57]],
+        "right_leg": [[-0.34, 0.105, 0.24], [-0.35, 0.58, 0.57]]
+      }
+    },
+    {
+      "id": "sports_skate_side_leg_reach",
+      "label": "한 발 균형을 잡고 옆으로 든 다리에 손 뻗기",
+      "category": "sports",
+      "category_label": "경기 후 휴식·균형",
+      "stance": "stand",
+      "gesture": "reach_low",
+      "props": "",
+      "hands": ["open", "relaxed"],
+      "root_xyz": [12, 0, -8],
+      "lean": 14,
+      "look": -8,
+      "nod": 11,
+      "left_wrist": [0.42, 0.01, 0.36],
+      "right_wrist": [-0.34, 0.04, -0.1],
+      "left_pole": [0.58, 0.36, 0.18],
+      "right_pole": [-0.54, 0.29, -0.2],
+      "overrides": {
+        "left_leg": [[0.66, 0.47, 0.34], [0.36, 0.78, 0.57]],
+        "right_leg": [[-0.14, 0.105, -0.04], [-0.28, 0.48, 0.38]],
+        "left_foot": {"mode": "follow_shin", "pitch_degrees": 8}
+      }
+    }
+  ]
+}

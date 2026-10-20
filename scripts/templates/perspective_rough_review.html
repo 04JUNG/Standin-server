@@ -1,0 +1,76 @@
+<div id="rough-perspective-review">
+  <script type="application/json" data-study>__REVIEW_DATA__</script>
+  <div class="viz-controls">
+    <label class="form-label">러프 <select class="form-select" data-query></select></label>
+    <label class="form-label">후보 보기 <select class="form-select" data-view><option value="matched">검색에서 맞춘 시점</option><option value="canonical">두 방법 모두 45° 시점</option></select></label>
+    <label class="form-check"><input class="form-check-input" type="checkbox" data-overlay><span class="form-check-label">추출 관절 표시</span></label>
+  </div>
+  <p data-status aria-live="polite"></p>
+  <div class="comparison-grid">
+    <section><div>입력 러프</div><img data-input alt="입력 러프"></section>
+    <section><div data-title="before">Before · 기존 4시점</div><div class="viz-row" data-ranks="before"></div><img data-image="before" alt="기존 검색 3D 후보"><div class="text-small" data-label="before"></div></section>
+    <section><div data-title="after">After · 개선 검색</div><div class="viz-row" data-ranks="after"></div><img data-image="after" alt="개선 검색 3D 후보"><div class="text-small" data-label="after"></div></section>
+  </div>
+  <div class="viz-controls" data-rating-controls>
+    <label class="form-label">기존 Top-5 안에 쓸 만한 포즈 <select class="form-select" data-useful="before"><option value="">미검수</option><option value="yes">있음</option><option value="no">없음</option><option value="uncertain">판단 어려움</option></select></label>
+    <label class="form-label">개선 Top-5 안에 쓸 만한 포즈 <select class="form-select" data-useful="after"><option value="">미검수</option><option value="yes">있음</option><option value="no">없음</option><option value="uncertain">판단 어려움</option></select></label>
+    <label class="form-label">전체 비교 <select class="form-select" data-preference><option value="">미검수</option><option value="after">개선이 더 좋음</option><option value="before">기존이 더 좋음</option><option value="tie">비슷함</option><option value="neither">둘 다 부적절</option><option value="uncertain">판단 어려움</option></select></label>
+  </div>
+  <label class="form-label">검수 메모 <textarea class="form-control" data-note rows="2" maxlength="500"></textarea></label>
+  <div class="viz-row"><button class="btn btn-primary" type="button" data-send>검수 결과 전달</button><button class="btn" type="button" data-export>검수 JSON 저장</button><span data-progress aria-live="polite"></span></div>
+  <p class="text-small" data-summary>동일 Human-Art 관절로 비교 · 개선은 좌우 두 해석·원근·카메라 미세 조정·윤곽 재정렬 · 얼굴과 손가락 방향은 근사</p>
+  <pre data-export-text hidden></pre>
+</div>
+<style>
+#rough-perspective-review .comparison-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:16px 0}
+#rough-perspective-review section{min-width:0}
+#rough-perspective-review img{width:100%;height:310px;object-fit:contain;display:block}
+#rough-perspective-review [data-label]{overflow-wrap:anywhere}
+#rough-perspective-review [data-ranks]{margin:8px 0}
+#rough-perspective-review [data-status]{color:var(--foreground)}
+#rough-perspective-review [hidden]{display:none!important}
+@media(max-width:600px){#rough-perspective-review .comparison-grid{grid-template-columns:1fr}#rough-perspective-review img{height:260px}}
+</style>
+<script>
+(()=>{
+const root=document.getElementById('rough-perspective-review');
+const $=s=>root.querySelector(s);
+let data;
+try{data=JSON.parse($('[data-study]').textContent);}catch(e){$('[data-status]').textContent='비교 데이터가 아직 생성되지 않았습니다. 생성된 review.html을 열어주세요.';return;}
+if(data.before_label)$('[data-title="before"]').textContent=data.before_label;
+if(data.after_label)$('[data-title="after"]').textContent=data.after_label;
+if(data.summary_label)$('[data-summary]').textContent=data.summary_label;
+const fields={query:$('[data-query]'),view:$('[data-view]'),overlay:$('[data-overlay]'),preference:$('[data-preference]'),note:$('[data-note]')};
+let state={study_id:data.study_id,query:(data.queries.find(q=>!q.error)||data.queries[0]).id,view:'matched',overlay:false,ranks:{before:0,after:0},ratings:{}};
+function adopt(snapshot){const s=snapshot?.modelContent;if(s?.study_id===data.study_id&&data.queries.some(q=>q.id===s.query))state={...state,...s,ratings:s.ratings||{},ranks:s.ranks||{before:0,after:0}};}
+try{adopt(window.openai?.widgetState);if(!window.openai)adopt(JSON.parse(localStorage.getItem(data.study_id)||'null'));}catch(e){}
+for(const q of data.queries){const option=document.createElement('option');option.value=q.id;option.textContent=q.id+' · '+q.set;fields.query.append(option);}
+function save(){const snapshot={modelContent:state,privateContent:null};if(window.openai?.setWidgetState)window.openai.setWidgetState(snapshot).catch(()=>{});else try{localStorage.setItem(data.study_id,JSON.stringify(snapshot));}catch(e){}}
+function render(){
+const q=data.queries.find(q=>q.id===state.query)||data.queries[0];fields.query.value=q.id;fields.view.value=state.view;fields.overlay.checked=state.overlay;
+$('[data-input]').src=state.overlay?q.overlay:q.input;
+$('[data-status]').textContent=q.status_text||(q.error?'관절 추출 기준 미달 · 두 방법 모두 검색 실패':q.id+(q.contour_fallback?' · 윤곽 처리 실패로 카메라 검색 결과 유지':' · 후보 1~5위를 눌러 비교'));
+for(const arm of ['before','after']){const ranks=$('[data-ranks="'+arm+'"]');ranks.replaceChildren();
+q[arm].forEach((c,i)=>{const b=document.createElement('button');b.type='button';b.className='btn';b.textContent=(i+1)+'위';b.setAttribute('aria-pressed',String(state.ranks[arm]===i));b.addEventListener('click',()=>{state.ranks[arm]=i;render();save();});ranks.append(b);});
+const c=q[arm][state.ranks[arm]];const image=$('[data-image="'+arm+'"]');image.hidden=!c;
+if(c){image.src=c[state.view];let detail=c.pose_id+' · '+(state.view==='canonical'?c.canonical_kind:c.kind);
+if(c.features){const f=c.features;detail+=' · 실제 팔꿈치 좌/우 '+f.elbows_3d_degrees.map(v=>v==null?'?':Math.round(v)+'°').join('/')+(f.folded_arm_contact?' · 반대쪽 팔 근접 조건':f.folded_arms?' · 팔 교차 기하 조건':'');}
+$('[data-label="'+arm+'"]') .textContent=detail;}else $('[data-label="'+arm+'"]') .textContent='검색 실패';
+const r=state.ratings[q.id]||{};$('[data-useful="'+arm+'"]') .value=r[arm]||'';
+}
+const rating=state.ratings[q.id]||{};fields.preference.value=rating.preference||'';fields.note.value=rating.note||'';
+$('[data-rating-controls]').hidden=!!q.error;
+$('[data-progress]').textContent=Object.values(state.ratings).filter(r=>r.before&&r.after&&r.preference).length+'장 검수 완료 / '+data.queries.filter(q=>!q.error).length+'장 검색 가능';
+}
+fields.query.addEventListener('change',()=>{state.query=fields.query.value;state.ranks={before:0,after:0};render();save();});
+fields.view.addEventListener('change',()=>{state.view=fields.view.value;render();save();});
+fields.overlay.addEventListener('change',()=>{state.overlay=fields.overlay.checked;render();save();});
+function rate(){state.ratings[state.query]={before:$('[data-useful="before"]').value,after:$('[data-useful="after"]').value,preference:fields.preference.value,note:fields.note.value};save();$('[data-progress]').textContent=Object.values(state.ratings).filter(r=>r.before&&r.after&&r.preference).length+'장 검수 완료';}
+for(const element of [$('[data-useful="before"]'),$('[data-useful="after"]'),fields.preference])element.addEventListener('change',rate);fields.note.addEventListener('input',rate);
+function exported(){return {study_id:data.study_id,ratings:state.ratings,failed_queries:data.queries.filter(q=>q.error).map(q=>q.id)};}
+$('[data-send]').addEventListener('click',async()=>{const result=exported();if(window.openai?.sendFollowUpMessage){await window.openai.sendFollowUpMessage({prompt:'러프 비포/애프터 검수 결과입니다. 이 평가를 집계하고 개선 여부를 분석해주세요.\n'+JSON.stringify(result),title:'검수 결과 전달'});}else{$('[data-export-text]').hidden=false;$('[data-export-text]').textContent=JSON.stringify(result,null,2);}});
+$('[data-export]').addEventListener('click',()=>{const a=document.createElement('a');const url=URL.createObjectURL(new Blob([JSON.stringify(exported(),null,2)],{type:'application/json'}));a.href=url;a.download=data.study_id+'-ratings.json';a.click();URL.revokeObjectURL(url);});
+window.addEventListener('openai:set_globals',event=>{if(event.detail?.globals?.widgetState){adopt(event.detail.globals.widgetState);render();}});
+render();
+})();
+</script>

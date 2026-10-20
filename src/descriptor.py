@@ -12,6 +12,11 @@ from .schema import VLMAnalysis, Skeleton, PersonDescriptor, BBox
 from .features import normalize_skeleton
 from .refine_policy import structural_refine_allowed
 from .config import CFG
+from .body_scope import detect_scope, observed_legs, promote_for_observed_legs
+from .person_tags import detect_person_tags
+from .hand_shapes import detect_person_hands
+from .experimental.body_matching.integrated import detect_body
+from .partial_pose import shoulder_frame
 
 
 def order_left_to_right(skeletons: List[Optional[Skeleton]],
@@ -63,11 +68,15 @@ def build_descriptors(vlm: VLMAnalysis,
     return out
 
 
-def build_slot_descriptors(vlm: VLMAnalysis, slots) -> List[PersonDescriptor]:
+def build_slot_descriptors(vlm: VLMAnalysis, slots,
+                           image_size: Optional[Tuple[int, int]] = None,
+                           ) -> List[PersonDescriptor]:
     """복구가 끝난 PersonSlot을 검색 descriptor로 변환한다.
 
     invalid/missing 슬롯도 descriptor 자리를 유지해 뒤 인물의 person_index가 당겨지지
     않게 한다. 명시적 mask는 순위 거리에 전달하고 raw score는 평가를 위해 보존한다.
+    image_size(w, h)가 있으면 화면 안에서 관측된 무릎을 근거로 VLM의 반신/흉상
+    출력 범위를 전신으로 올린다(body_scope.promote_for_observed_legs).
     """
     out: List[PersonDescriptor] = []
     for slot in slots:
@@ -77,7 +86,10 @@ def build_slot_descriptors(vlm: VLMAnalysis, slots) -> List[PersonDescriptor]:
                           and evidence.searchable and slot.state not in ("missing", "invalid"))
         valid_mask = evidence.valid_joint_mask.copy() if evidence is not None else None
         feature = None
-        if searchable:
+        if searchable and evidence.coverage_class == "upper_only":
+            feature = shoulder_frame(skeleton.keypoints)[0].reshape(-1)
+            feature.reshape(17, 2)[~valid_mask] = 0.0
+        elif searchable:
             feature = normalize_skeleton(
                 skeleton.keypoints, skeleton.scores,
                 kpt_thr=CFG.skeleton_kpt_threshold,
@@ -103,6 +115,18 @@ def build_slot_descriptors(vlm: VLMAnalysis, slots) -> List[PersonDescriptor]:
                 np.asarray(output_skeleton.keypoints, dtype=np.float32).copy(),
                 output_scores,
             )
+        vlm_scope = detect_scope(
+            vlm, slot.slot_id if slot.slot_origin == "vlm" else None,
+        )
+        # 소유권이 의심(suspect)인 슬롯의 다리는 이 인물의 다리라고 보장할 수 없다.
+        legs = (
+            observed_legs(skeleton.keypoints, evidence.valid_joint_mask,
+                          evidence.suspect_limbs, image_size)
+            if (image_size is not None and skeleton is not None
+                and evidence is not None and slot.state in ("valid", "partial"))
+            else ()
+        )
+        output_scope = promote_for_observed_legs(vlm_scope, legs)
         out.append(PersonDescriptor(
             shot=vlm.shot,
             action=vlm.action,
@@ -160,5 +184,24 @@ def build_slot_descriptors(vlm: VLMAnalysis, slots) -> List[PersonDescriptor]:
                 "pose_rescue": dict(slot.rescue_trace),
             },
             quality_reasons=list(dict.fromkeys(slot.reasons)),
+            output_scope=output_scope,
+            person_tags=detect_person_tags(
+                vlm, slot.slot_id if slot.slot_origin == "vlm" else None,
+            ),
+            body_classification=detect_body(
+                vlm, slot.slot_id if slot.slot_origin == "vlm" else None,
+            ),
+            hands=detect_person_hands(
+                vlm, slot.slot_id if slot.slot_origin == "vlm" else None,
+            ),
         ))
+        if getattr(slot, "box_recovery", None):
+            out[-1].quality_trace["box_recovery"] = dict(slot.box_recovery)
+        if output_scope is not vlm_scope:
+            # API에는 승격된 값만 나가므로 VLM 원래 판별은 trace에 남긴다.
+            out[-1].quality_trace["output_scope_promotion"] = {
+                "vlm_detected": vlm_scope.detected.value,
+                "vlm_source": vlm_scope.source,
+                "observed_legs": list(legs),
+            }
     return out

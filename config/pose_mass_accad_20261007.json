@@ -1,0 +1,1305 @@
+{
+  "id_prefix": "mass_accad",
+  "clips": {
+    "A2_Sway": {
+      "style": "서서 몸 흔들기",
+      "movement": "daily",
+      "category": "daily",
+      "category_label": "일상",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "A3_SwingArms": {
+      "style": "양팔 흔들어 몸풀기",
+      "movement": "daily",
+      "category": "daily",
+      "category_label": "일상",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "A4_LookAround": {
+      "style": "고개 돌려 주변 살피기",
+      "movement": "daily",
+      "category": "daily",
+      "category_label": "일상",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "A5_PickUpBox": {
+      "style": "상자 집기",
+      "movement": "daily",
+      "category": "daily",
+      "category_label": "일상",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "A6_BoxLift": {
+      "style": "상자 들어 올리기",
+      "movement": "daily",
+      "category": "daily",
+      "category_label": "일상",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "A7_Crouch": {
+      "style": "몸 낮춰 쪼그리기",
+      "movement": "daily",
+      "category": "daily",
+      "category_label": "일상",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "A8_CrouchToLie": {
+      "style": "쪼그린 자세에서 눕기",
+      "movement": "daily",
+      "category": "daily",
+      "category_label": "일상",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "A9_Lie": {
+      "style": "바닥에 눕기",
+      "movement": "daily",
+      "category": "daily",
+      "category_label": "일상",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "A10_LieToCrouch": {
+      "style": "누운 자세에서 일어나기",
+      "movement": "daily",
+      "category": "daily",
+      "category_label": "일상",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "A11_Crawl": {
+      "style": "손과 무릎으로 기어가기",
+      "movement": "daily",
+      "category": "daily",
+      "category_label": "일상",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "A12_CrawlBackwards": {
+      "style": "뒤로 기어가기",
+      "movement": "daily",
+      "category": "daily",
+      "category_label": "일상",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "B19_WalkToPickUpBox": {
+      "style": "걷다가 상자 집기",
+      "movement": "daily",
+      "category": "daily",
+      "category_label": "일상",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "B20_WalkWithBox": {
+      "style": "상자 안고 걷기",
+      "movement": "daily",
+      "category": "daily",
+      "category_label": "일상",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "B21_PutDownBoxToWalk": {
+      "style": "상자를 내려놓고 이동",
+      "movement": "daily",
+      "category": "daily",
+      "category_label": "일상",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "B24_WalkToCrouch": {
+      "style": "걷다가 몸 낮추기",
+      "movement": "daily",
+      "category": "daily",
+      "category_label": "일상",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "B25_CrouchToWalk": {
+      "style": "낮은 자세에서 일어서기",
+      "movement": "daily",
+      "category": "daily",
+      "category_label": "일상",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "C20_RunToPickupBox": {
+      "style": "달려와 물건 집기",
+      "movement": "daily",
+      "category": "daily",
+      "category_label": "일상",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "C22_RunWithBox": {
+      "style": "짐을 안고 달리기",
+      "movement": "daily",
+      "category": "daily",
+      "category_label": "일상",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "C23_PutDownBoxToRun": {
+      "style": "짐 내려놓고 달리기",
+      "movement": "daily",
+      "category": "daily",
+      "category_label": "일상",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "D7_WalkToBow": {
+      "style": "걸어와 인사",
+      "movement": "daily",
+      "category": "daily",
+      "category_label": "일상",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "D8_BowToReady": {
+      "style": "숙여 인사한 뒤 준비",
+      "movement": "daily",
+      "category": "daily",
+      "category_label": "일상",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "A13_Skip": {
+      "style": "스킵 점프",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "A14_StandToSkip": {
+      "style": "제자리에서 스킵 시작",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "A15_SkipToStand": {
+      "style": "스킵 후 멈추기",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "B17_WalkToHopToWalk": {
+      "style": "한 발 도약",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "B18_WalkToLeapToWalk": {
+      "style": "앞으로 크게 도약",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "B22_SideStepLeft": {
+      "style": "왼쪽 사이드스텝",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "B23_SideStepRight": {
+      "style": "오른쪽 사이드스텝",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "B26_WalkToSkip": {
+      "style": "걷다가 스킵하기",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "B27_SkipToWalk": {
+      "style": "스킵에서 걷기로 전환",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "C1_StandToRun": {
+      "style": "달리기 출발",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "C2_RunToStand": {
+      "style": "달리다 멈추기",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "C4_RunToWalk": {
+      "style": "달리다 속도 낮추기",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "C5_WalkToRun": {
+      "style": "달리기 가속",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "C6_StandToRunBackwards": {
+      "style": "뒤로 달리기 출발",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "C7_RunBackwards": {
+      "style": "뒤로 달리기",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "C8_RunBackwardsToStand": {
+      "style": "뒤로 달리다 멈추기",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "C9_RunBackwardsTurnRunForward": {
+      "style": "뒤로 달리다 전방 전환",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "C10_RunBackwardsStopRunForward": {
+      "style": "뒤로 달리다 제동 후 돌진",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "C11_RunTurnLeft90": {
+      "style": "달리며 왼쪽 직각 전환",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "C12_RunTurnLeft45": {
+      "style": "달리며 왼쪽 대각 전환",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "C13_RunTurnLeft135": {
+      "style": "달리며 왼쪽 급회전",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "C14_RunTurnRight90": {
+      "style": "달리며 오른쪽 직각 전환",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "C15_RunTurnRight45": {
+      "style": "달리며 오른쪽 대각 전환",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "C16_RunTurnRight135": {
+      "style": "달리며 오른쪽 급회전",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "C16_RunTurnAround": {
+      "style": "달리며 뒤돌기",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "C17_RunChangeDirection": {
+      "style": "달리기 방향 전환",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "C18_RunToHopToWalk": {
+      "style": "달려와 한 발 도약",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "C24_QuickSidestepLeft": {
+      "style": "왼쪽 빠른 회피 스텝",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "C25_QuickSidestepRight": {
+      "style": "오른쪽 빠른 회피 스텝",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "C26_RunToCrouch": {
+      "style": "달리다 낮게 앉기",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "C27_CrouchToRun": {
+      "style": "낮은 자세에서 달리기",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "D9_WarmUpToReadyToWarmUp": {
+      "style": "준비 운동과 몸풀기",
+      "movement": "sports",
+      "category": "sports",
+      "category_label": "스포츠",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "D1_StandToReady": {
+      "style": "서서 전투 준비",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "D2_WalkToReady": {
+      "style": "걸어와 가드",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "D3_RunToReady": {
+      "style": "달려와 가드",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "D4_ReadyToRelax": {
+      "style": "가드 풀기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "D5_ReadyToWalkAway": {
+      "style": "가드 후 물러나기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "D6_ReadyToRun": {
+      "style": "가드에서 돌진",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "D11_ReadyToTaunt1ToReady": {
+      "style": "한손으로 상대 도발",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "D12_ReadyToTaunt1ToReady": {
+      "style": "상대를 부르는 도발",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "D13_CrouchToReady": {
+      "style": "낮은 자세에서 가드",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "D14_ReadyToCrouch": {
+      "style": "가드하며 몸 낮추기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "D15_SwitchStance": {
+      "style": "전투 스탠스 전환",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "D16_SwitchStanceMore": {
+      "style": "빠른 스탠스 전환",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E1_JabLeft": {
+      "style": "왼손 잽",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E2_JabRight": {
+      "style": "오른손 잽",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E3_CrossLeft": {
+      "style": "왼손 스트레이트",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E4_CrossRight": {
+      "style": "오른손 스트레이트",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E5_HookLeft": {
+      "style": "왼손 훅",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E6_HookRight": {
+      "style": "오른손 훅",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E7_UppercutLeft": {
+      "style": "왼손 어퍼컷",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E8_UppercutRight": {
+      "style": "오른손 어퍼컷",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E9_BodyHookLeft": {
+      "style": "왼손 몸통 훅",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E10_BodyHookRight": {
+      "style": "오른손 몸통 훅",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E11_BackfistLeft": {
+      "style": "왼손 등주먹",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E12_BackfistRight": {
+      "style": "오른손 등주먹",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E13_BodyCrossLeft": {
+      "style": "왼손 몸통 스트레이트",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E14_BodyCrossRight": {
+      "style": "오른손 몸통 스트레이트",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E15_BodyJabRight": {
+      "style": "오른손 몸통 잽",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E16_BodyJabLeft": {
+      "style": "왼손 몸통 잽",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E11_BlockLeftHigh": {
+      "style": "왼팔 상단 막기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E12_BlockLeftLow": {
+      "style": "왼팔 하단 막기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E13_BlockRightHigh": {
+      "style": "오른팔 상단 막기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E14_BlockRightLow": {
+      "style": "오른팔 하단 막기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E15_BlockLeftMiddle": {
+      "style": "왼팔 중단 막기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E16_BlockRightMiddle": {
+      "style": "오른팔 중단 막기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E17_BlockMiddleHigh": {
+      "style": "양팔 상단 막기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E18_BlockMiddleLow": {
+      "style": "양팔 하단 막기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E19_DodgeLeft": {
+      "style": "왼쪽 회피",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E20_DodgeRight": {
+      "style": "오른쪽 회피",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E21_DuckLeft": {
+      "style": "왼쪽으로 숙여 피하기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E22_DuckRight": {
+      "style": "오른쪽으로 숙여 피하기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E1_TurnAroundRight": {
+      "style": "가드하며 오른쪽 뒤돌기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E2_TurnAroundLeft": {
+      "style": "가드하며 왼쪽 뒤돌기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E3_Advance": {
+      "style": "가드하며 전진",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E4_QuickAdvance": {
+      "style": "가드하며 빠른 전진",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E5_Retreat": {
+      "style": "가드하며 후퇴",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E6_QuickRetreat": {
+      "style": "가드하며 빠른 후퇴",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E7_SuperFastAdvance": {
+      "style": "순간 돌진 스텝",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E8_Bounce": {
+      "style": "가벼운 바운스 스텝",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E9_SideStepLeft": {
+      "style": "가드 왼쪽 스텝",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "E10_SideStepRight": {
+      "style": "가드 오른쪽 스텝",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "G1_SidekickLeadingLeft": {
+      "style": "왼발 선행 옆차기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "G2_FrontKick": {
+      "style": "앞차기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "G3_SidekickLeadingRight": {
+      "style": "오른발 선행 옆차기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "G4_SpinningBackKick": {
+      "style": "회전 뒤차기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "G5_BackKick": {
+      "style": "뒤차기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "G6_AxeKick": {
+      "style": "내려차기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "G7_Capoeira": {
+      "style": "카포에라 회전차기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "G8_RoundhouseLeft": {
+      "style": "왼발 돌려차기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "G9_RoundhouseRight": {
+      "style": "오른발 돌려차기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "G9_RoundhouseRightT2": {
+      "style": "오른발 돌려차기 두 번째 테이크",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "G10_RoundhouseLeadingLeft": {
+      "style": "왼발 선행 돌려차기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "G11_RoundhouseLeadingRight": {
+      "style": "오른발 선행 돌려차기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "G12_CrescentLeft": {
+      "style": "왼발 반달차기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "G13_CrescentRight": {
+      "style": "오른발 반달차기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "G14_RoundhouseBodyLeft": {
+      "style": "왼발 몸통 돌려차기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "G15_RoundhouseBodyRight": {
+      "style": "오른발 몸통 돌려차기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "G16_DoubleKick": {
+      "style": "연속 발차기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "G17_PushKickLeft": {
+      "style": "왼발 밀어차기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "G18_PushKickRight": {
+      "style": "오른발 밀어차기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "G19_ReverseSpinCrescentLeft": {
+      "style": "왼발 역회전 반달차기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "G20_ReverseSpinCrescentRight": {
+      "style": "오른발 역회전 반달차기",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "Extended_1": {
+      "style": "연속 무술 동작 1",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "Extended_2": {
+      "style": "연속 무술 동작 2",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "Extended_3": {
+      "style": "연속 무술 동작 3",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "Form_1": {
+      "style": "무술 품새",
+      "movement": "combat",
+      "category": "combat",
+      "category_label": "전투",
+      "hands": [
+        "fist",
+        "fist"
+      ]
+    },
+    "D9_Victory1": {
+      "style": "승리 세리머니",
+      "movement": "hero",
+      "category": "hero",
+      "category_label": "히어로",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    },
+    "D10_Victory2": {
+      "style": "양팔 벌린 승리 동작",
+      "movement": "hero",
+      "category": "hero",
+      "category_label": "히어로",
+      "hands": [
+        "relaxed",
+        "relaxed"
+      ]
+    }
+  }
+}

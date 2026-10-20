@@ -34,6 +34,25 @@ class Config:
 
     # --- VLM ---  provider: "mock"(오프라인 기본) | "gemini" | "openai"
     vlm_provider: str = os.getenv("VLM_PROVIDER", "mock")
+    # src/vlm/prompts.py의 USER_TEMPLATES 키. 모르는 값이면 VLM 클라이언트를 만들 때 기동이 멈춘다.
+    vlm_prompt_version: str = os.getenv("VLM_PROMPT_VERSION", "p3-output-scope")
+    # 인물별 태그를 받을지. 분석 호출과 분리된 두 번째 VLM 호출이라 켜면 비용이 는다.
+    # 실패해도 분석은 그대로 나간다 — 태그만 비고(unknown), 라우팅·검색은 영향이 없다.
+    vlm_person_tags: bool = os.getenv("VLM_PERSON_TAGS", "0") == "1"
+    # 태그 호출 한 번의 상한. 분석 호출(기본 45초)보다 짧게 둔다 — 늦게 오는 기록용
+    # 값 때문에 사용자가 기다리지 않게 한다.
+    vlm_person_tags_timeout_ms: int = int(os.getenv("VLM_PERSON_TAGS_TIMEOUT_MS", "15000"))
+    # --- 러프함 기반 검색 경로 분기(04J-286, docs/SEARCH_ROUTING.md) ---
+    # 끄면(기본) 기존 기하 검색만 쓰던 동작과 결과가 같다. 판정 기준값은
+    # src/search_routing.py::RoutingConfig.from_env의 ROUTING_* env로 바꾼다.
+    search_routing_enabled: bool = _env_bool("SEARCH_ROUTING", False)
+    # 관절 근거가 부족한 인물이 있을 때만 나가는 자세 설명 호출 1회의 상한.
+    routing_describe_timeout_ms: int = int(os.getenv("ROUTING_DESCRIBE_TIMEOUT_MS", "15000"))
+    semantic_top_k: int = int(os.getenv("SEMANTIC_TOP_K", "5"))
+    # 인물별 손 모양(04J-290). 분석과 분리된 VLM 호출이라 켜면 비용이 는다. 끄거나
+    # 실패하면 손은 라이브러리 기본값(relaxed)과 기본 후보 목록으로 나간다.
+    vlm_hand_shapes: bool = os.getenv("VLM_HAND_SHAPES", "0") == "1"
+    vlm_hand_shapes_timeout_ms: int = int(os.getenv("VLM_HAND_SHAPES_TIMEOUT_MS", "15000"))
     gemini_model: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
     # Gemini HTTP 호출 1회의 상한. google-genai HttpOptions.timeout 단위는 밀리초다.
     #
@@ -69,6 +88,19 @@ class Config:
     gemini_retry_max_seconds: float = float(os.getenv("GEMINI_RETRY_MAX_SECONDS", "2.0"))
     openai_model: str = os.getenv("OPENAI_MODEL", "gpt-5-mini")
 
+    # Body sidecar: observe/choose one FBX without changing existing pose search.
+    body_matching_mode: str = os.getenv("BODY_MATCHING_MODE", "off")
+    vlm_body_thinking_level: str = os.getenv("VLM_BODY_THINKING_LEVEL", "")
+    body_classification_strategy: str = os.getenv("BODY_CLASSIFICATION_STRATEGY", "legacy")
+    body_integrated_review_enabled: bool = os.getenv("BODY_INTEGRATED_REVIEW_ENABLED", "1") == "1"
+    body_coarse_family_review_model: str = os.getenv("BODY_COARSE_FAMILY_REVIEW_MODEL", "")
+    body_coarse_catalog_path: str = os.getenv("BODY_COARSE_CATALOG_PATH", "config/body_morphology.v1.json")
+    body_catalog_path: str = os.getenv("BODY_CATALOG_PATH", "config/body_catalog.v1.json")
+    body_vlm_provider: str = os.getenv("BODY_VLM_PROVIDER", "mock")
+    body_vlm_model: str = os.getenv("BODY_VLM_MODEL", "gemini-2.5-flash")
+    body_timeout_seconds: float = float(os.getenv("BODY_TIMEOUT_SECONDS", "12"))
+    body_max_people: int = int(os.getenv("BODY_MAX_PEOPLE", "8"))
+
     # --- 검출/포즈 ---  "mock" | "rtmlib"
     pose_backend: str = os.getenv("POSE_BACKEND", "mock")
     # 배포 단위 variant. 미설정=current-X 현행 경로이며 Human-Art는 manifest와
@@ -89,6 +121,9 @@ class Config:
     pose_strict: bool = _env_bool("POSE_STRICT", False)
 
     # --- 검색 ---
+    # 새 코드 배포 후 전신·단일 인물 검색에 적용. legacy는 즉시 롤백 스위치.
+    # 부분 관측/다인물/비-pos/원본 BVH 미확보/refine v1은 기존 검색을 유지한다.
+    pose_search_mode: str = os.getenv("POSE_SEARCH_MODE", "perspective")
     top_n_search: int = 20     # kNN 1차 후보 수(→ rerank 입력)
     top_k_final: int = 5       # 작가에게 보여줄 최종 후보 수
     use_rerank: bool = os.getenv("USE_RERANK", "1") == "1"
@@ -124,6 +159,12 @@ class Config:
     thumbnail_character_id: str = os.getenv(
         "REFINE_THUMBNAIL_CHARACTER_ID", "standin-master-v2"
     )
+    # Shared post-retrieval budget; 15s per request, up to 10 checks per session.
+    hand_skin_screen_budget_seconds: float = float(os.getenv(
+        "HAND_SKIN_SCREEN_BUDGET_SECONDS", "45"
+    ))
+    # Opt-in; one shared gate admits at most two in-flight checks per process.
+    hand_skin_screen_concurrency: int = int(os.getenv("HAND_SKIN_SCREEN_CONCURRENCY", "1"))
     # 변환(~3s)+렌더 한 번의 상한. 초과하면 그림 없이 응답한다(조정 결과는 유지).
     thumbnail_timeout_seconds: float = float(
         os.getenv("REFINE_THUMBNAIL_TIMEOUT_SECONDS", "20")
@@ -445,6 +486,20 @@ class Config:
     refine_timeout_seconds: float = float(os.getenv("REFINE_TIMEOUT_SECONDS", "5.0"))
 
     def __post_init__(self) -> None:
+        if self.vlm_body_thinking_level not in {"", "minimal", "low", "medium", "high"}:
+            raise ValueError("invalid VLM_BODY_THINKING_LEVEL")
+        if self.body_classification_strategy not in {"legacy", "coarse", "integrated"}:
+            raise ValueError("BODY_CLASSIFICATION_STRATEGY must be legacy, coarse or integrated")
+        if self.pose_search_mode not in {"legacy", "perspective"}:
+            raise ValueError("POSE_SEARCH_MODE must be legacy or perspective")
+        if self.body_matching_mode not in {"off", "shadow", "auto"}:
+            raise ValueError("BODY_MATCHING_MODE must be off, shadow or auto")
+        if self.body_vlm_provider not in {"mock", "gemini"}:
+            raise ValueError("BODY_VLM_PROVIDER must be mock or gemini")
+        if not math.isfinite(self.body_timeout_seconds) or self.body_timeout_seconds <= 0:
+            raise ValueError("BODY_TIMEOUT_SECONDS must be positive and finite")
+        if not 1 <= self.body_max_people <= 20:
+            raise ValueError("BODY_MAX_PEOPLE must be in [1,20]")
         self.thumbnail_renderer = self.thumbnail_renderer.strip().lower()
         if self.thumbnail_renderer not in ("converter", "mannequin"):
             raise ValueError(
@@ -458,6 +513,9 @@ class Config:
             raise ValueError("REFINE_THUMBNAIL_TIMEOUT_SECONDS must be positive")
         if not self.thumbnail_character_id.strip():
             raise ValueError("REFINE_THUMBNAIL_CHARACTER_ID must not be empty")
+        if (not math.isfinite(self.hand_skin_screen_budget_seconds)
+                or not 0 < self.hand_skin_screen_budget_seconds <= 60):
+            raise ValueError("HAND_SKIN_SCREEN_BUDGET_SECONDS must be in (0,60]")
         self.pose_model_uri = self.pose_model_uri.strip()
         self.pose_models_root = self.pose_models_root.strip()
         self.pose_model_manifest = self.pose_model_manifest.strip()

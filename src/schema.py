@@ -14,6 +14,10 @@ import json
 
 import numpy as np
 
+from .body_scope import BodyScope, ScopeDetection
+from .person_tags import PersonTags
+from .hand_shapes import PersonHands
+
 
 # ---- 열거형(Controlled Vocabulary) ---------------------------------------
 # ⚠ 라이브러리 태깅 전에 반드시 고정해야 하는 어휘(설계문서 v2 §12-3단계).
@@ -114,6 +118,21 @@ class VLMAnalysis:
     # lower_body_visible 값이 실제 provider 응답에서 왔는지 나타낸다. 누락을 false와
     # 구분해야 검색이 전신을 반신으로 조용히 오분류하지 않는다.
     lower_body_visibility_known: list[bool] = field(default_factory=list)
+    # Composition, in provider approx_boxes order. None means uncertain/omitted.
+    body_scopes: list[Optional[BodyScope]] = field(default_factory=list)
+    # 인물별 의미 태그(approx_boxes 순서, None=모름). 기록용 메타데이터일 뿐 매칭·라우팅·
+    # refine의 입력이 아니다(src/person_tags.py). 프롬프트가 인물별로 묻지 않으면 비어 있다.
+    person_actions: list[Optional[Action]] = field(default_factory=list)
+    person_views: list[Optional[View]] = field(default_factory=list)
+    # 인물별 손 모양(src/hand_shapes.py). FBX 손 굽기·손 후보에만 쓰고 검색은 읽지 않는다.
+    # 비어 있으면 손 호출을 하지 않은 분석이다.
+    person_hands: list = field(default_factory=list)
+    # Independently validated first-call body observations, in original VLM slot order.
+    person_bodies: list = field(default_factory=list)
+    # 위 shot·action·view·relationship은 잘못된 값을 기본값(full_half·other·front 등)으로
+    # 바꾼다. 이 칸은 provider가 실제로 말한 값만 담고, 어휘 밖이거나 없으면 None이다.
+    # 칸 전체가 None이면 추적하지 않은 분석이다(테스트가 직접 만든 VLMAnalysis 등).
+    stated_tags: Optional[dict] = None
 
 
 @dataclass
@@ -143,6 +162,14 @@ class PersonDescriptor:
     confidence_threshold: Optional[float] = None
     quality_trace: dict = field(default_factory=dict)
     quality_reasons: list[str] = field(default_factory=list)
+    output_scope: ScopeDetection = field(default_factory=ScopeDetection)
+    # 인물별 action·view. tag_dict()의 컷 단위 값과 별개이며 검색은 읽지 않는다.
+    person_tags: PersonTags = field(default_factory=PersonTags)
+    # 인물별 손 모양과 손 후보. 검색 점수·refine은 읽지 않는다.
+    # 전신 반환 전 실제 FBX 피부 검사에는 동일한 프리셋을 전달한다.
+    hands: Optional["PersonHands"] = None
+    # Metadata only: never used as a pose query or refine input.
+    body_classification: Optional[dict] = None
 
     def tag_dict(self) -> dict:
         return {
@@ -165,6 +192,14 @@ class CutResult:
     person_candidates: list = field(default_factory=list)  # 인물별 Top-K
     person_confidence: list = field(default_factory=list)  # 인물별 'high'|'low(폴백)'
     notes: list = field(default_factory=list)
+    # VLM이 이 컷에 대해 실제로 말한 shot·action·view·relationship(VLMAnalysis.stated_tags).
+    vlm_tags: Optional[dict] = None
+
+    body_matching: dict = field(default_factory=dict)
+    # 04J-286 라우팅. SEARCH_ROUTING=0이면 비어 있고 응답에 아무 값도 더하지 않는다.
+    person_routing: list = field(default_factory=list)              # 인물별 경로·사유·상태·시간
+    person_semantic_candidates: list = field(default_factory=list)  # 인물별 시맨틱 후보(포즈 JSON 포함)
+    routing_summary: Optional[dict] = None                          # 컷 단위(설명 호출 상태 등)
 
 
 @dataclass

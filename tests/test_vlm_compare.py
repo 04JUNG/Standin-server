@@ -1,0 +1,261 @@
+"""VLM 프롬프트 A/B 비교 게이트(standin_eval/vlm_compare.py)."""
+from __future__ import annotations
+
+import json
+import os
+import sys
+from pathlib import Path
+
+import pytest
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from src.config import CFG
+from src.vlm.client import _coerce
+from standin_eval.dataset import EvalDataset
+from standin_eval.vlm_compare import evaluate, matched_box_iou, run_vlm_compare, write_vlm_compare
+
+
+class _Image:
+    size = (100, 200)
+
+
+def _payload(num=1, shot="full_half", relationship=None, actions=None, views=None, x=0.1):
+    payload = {
+        "num_people": num, "shot": shot, "action": "standing", "view": "front",
+        "relationship": relationship or ("solo" if num == 1 else "talking"),
+        "approx_boxes": [{"x1": x + 0.4 * i, "y1": 0.1, "x2": x + 0.4 * i + 0.3, "y2": 0.9}
+                         for i in range(num)],
+    }
+    if actions is not None:
+        payload["person_actions"] = actions
+    if views is not None:
+        payload["person_views"] = views
+    return payload
+
+
+class _ScriptedVLM:
+    """프롬프트 버전과 그 버전의 호출 횟수로 응답을 고른다."""
+
+    def __init__(self, script, clock=None, latency=None):
+        self.script, self.calls, self.seen = script, {}, []
+        self.clock, self.latency = clock, latency or {}
+
+    def analyze(self, image, width, height):
+        version = CFG.vlm_prompt_version
+        count = self.calls.get(version, 0)
+        self.calls[version] = count + 1
+        self.seen.append(version)
+        if self.clock is not None:
+            self.clock.now += self.latency.get(version, 1.0)
+        payload = self.script(version, count)
+        if isinstance(payload, Exception):
+            raise payload
+        return _coerce(payload, width, height)
+
+
+class _Clock:
+    now = 0.0
+
+    def __call__(self):
+        return self.now
+
+
+def _run(script, repeats=3, cuts=("c1", "c2"), **kwargs):
+    client = _ScriptedVLM(script, **kwargs)
+    samples = run_vlm_compare([{"cut_id": cut} for cut in cuts], prompt_a="p1-scope",
+                              prompt_b="p2-person-tags", repeats=repeats, client=client,
+                              load_image=lambda cut: _Image(),
+                              clock=kwargs.get("clock") or _Clock())
+    return client, evaluate(samples)
+
+
+def _same(version, count):
+    if version == "p2-person-tags":
+        return _payload(actions=["standing"], views=["front"])
+    return _payload()
+
+
+def test_the_same_answers_pass_and_record_person_tag_coverage():
+    _, report = _run(_same)
+    assert report["passed"], report["checks"]
+    assert report["metrics"]["route_change_excess"] == 0
+    assert report["metrics"]["alignment_rate"] == 1.0
+    assert report["metrics"]["person_tag_fill_rate"] == 1.0
+
+
+def test_arms_alternate_and_the_prompt_setting_is_restored(monkeypatch):
+    monkeypatch.setattr(CFG, "vlm_prompt_version", "p1-scope")
+    client, _ = _run(_same, repeats=2, cuts=("c1",))
+    assert client.seen == ["p1-scope", "p2-person-tags", "p2-person-tags", "p1-scope"]
+    assert CFG.vlm_prompt_version == "p1-scope"
+
+    def boom(version, count):
+        raise KeyboardInterrupt
+
+    with pytest.raises(KeyboardInterrupt):
+        _run(boom, repeats=2, cuts=("c1",))
+    assert CFG.vlm_prompt_version == "p1-scope"
+
+
+def test_jitter_shared_by_both_prompts_is_noise_not_regression():
+    def jitter(version, count):
+        num = 1 if count % 2 == 0 else 2
+        tags = {"actions": ["standing"] * num, "views": ["front"] * num}
+        return _payload(num=num, **tags) if version == "p2-person-tags" else _payload(num=num)
+
+    _, report = _run(jitter, repeats=4)
+    assert report["noise_floor"]["count_agreement"] < 1
+    assert report["checks"]["count_agreement"], report["metrics"]
+
+
+def test_a_route_flip_fails_the_gate():
+    def flip(version, count):
+        return _payload(shot="bust", actions=["standing"], views=["front"]) \
+            if version == "p2-person-tags" else _payload()
+
+    _, report = _run(flip)
+    assert not report["passed"]
+    assert not report["checks"]["route_change"]
+    assert report["metrics"]["route_change_excess"] == 1.0
+
+
+def test_misaligned_person_arrays_fail_alignment():
+    def misaligned(version, count):
+        return _payload(actions=["standing", "sitting"], views=["front"]) \
+            if version == "p2-person-tags" else _payload()
+
+    _, report = _run(misaligned)
+    assert report["metrics"]["alignment_rate"] == 0.0
+    assert not report["checks"]["alignment"]
+
+
+def test_a_single_parse_failure_in_b_fails():
+    def flaky(version, count):
+        if version == "p2-person-tags" and count == 0:
+            return ValueError("bad json")
+        return _same(version, count)
+
+    _, report = _run(flaky)
+    assert report["metrics"]["parse_failures"] == {"A": 0, "B": 1}
+    assert not report["checks"]["parse_failures_b"]
+
+
+def test_slower_answers_fail_the_latency_check():
+    clock = _Clock()
+    _, report = _run(_same, clock=clock, latency={"p1-scope": 1.0, "p2-person-tags": 1.5})
+    assert report["metrics"]["latency_p95_increase"] == pytest.approx(0.5)
+    assert not report["checks"]["latency"]
+
+
+def test_boxes_shifted_by_b_lower_the_iou():
+    def shifted(version, count):
+        return _payload(x=0.3, actions=["standing"], views=["front"]) \
+            if version == "p2-person-tags" else _payload()
+
+    _, report = _run(shifted)
+    assert report["metrics"]["box_iou_median_drop"] > 0.03
+    assert not report["checks"]["box_iou"]
+
+
+def test_bad_arguments_stop_before_any_call():
+    client = _ScriptedVLM(_same)
+    with pytest.raises(ValueError):
+        run_vlm_compare([{"cut_id": "c1"}], prompt_a="p1-scope", prompt_b="p9", repeats=3,
+                        client=client, load_image=lambda cut: _Image())
+    with pytest.raises(ValueError):
+        run_vlm_compare([{"cut_id": "c1"}], prompt_a="p1-scope", prompt_b="p2-person-tags",
+                        repeats=1, client=client, load_image=lambda cut: _Image())
+    assert client.seen == []
+
+
+def test_matched_box_iou_pairs_each_box_once():
+    box = (0.1, 0.1, 0.4, 0.9)
+    assert matched_box_iou([box], [box]) == 1.0
+    assert matched_box_iou([box, None], [box, box]) == 1.0
+    assert matched_box_iou([], [box]) is None
+
+
+def test_report_from_a_dataset_keeps_only_ids_and_numbers(tmp_path, monkeypatch):
+    from PIL import Image
+    import standin_eval.vlm_compare as compare
+
+    # This tests serialized report contents; scheduler jitter in a near-zero
+    # mock call must not decide the production latency gate outcome here.
+    original_run = compare.run_vlm_compare
+    def deterministic_run(*args, **kwargs):
+        return original_run(*args, **kwargs, clock=_Clock())
+    monkeypatch.setattr(compare, "run_vlm_compare", deterministic_run)
+
+    image_path = tmp_path / "secret-rough-name.png"
+    Image.new("RGB", (32, 48), "white").save(image_path)
+    dataset = EvalDataset(root=tmp_path, manifest={"dataset_id": "tiny"},
+                          cuts=[{"cut_id": "c1", "image_path": str(image_path)}], persons=[])
+
+    report = write_vlm_compare(dataset, provider="mock", prompt_a="p1-scope",
+                               prompt_b="p2-person-tags", repeats=2,
+                               output_root=str(tmp_path / "out"))
+
+    assert report["passed"], report["checks"]
+    stored = Path(report["report_path"]).read_text(encoding="utf-8")
+    assert "secret-rough-name" not in stored
+    assert json.loads(stored)["prompts"] == {"A": "p1-scope", "B": "p2-person-tags"}
+
+
+# ── 컷별 불일치 집계 ──────────────────────────────────────────────────
+
+
+def _sample(cut_id, arm, *, route="core", num_people=2, ok=True):
+    from standin_eval.vlm_compare import Sample
+
+    return Sample(cut_id=cut_id, arm=arm, ok=ok, latency_ms=100.0,
+                  route=route, num_people=num_people, entangled=False, boxes=[])
+
+
+def test_per_cut_rows_only_cover_cuts_that_disagree():
+    # 전체 비율만 보면 "몇몇 컷이 끄는지"를 알 수 없다. 그걸 보려고 넣은 집계다.
+    samples = [
+        _sample("agree", "A"), _sample("agree", "B"),
+        _sample("route-differs", "A", route="core"),
+        _sample("route-differs", "B", route="bust"),
+    ]
+    rows = evaluate(samples)["per_cut_disagreement"]
+    assert [row["cut_id"] for row in rows] == ["route-differs"]
+    assert rows[0]["route_mismatch_pairs"] == 1
+    assert rows[0]["count_mismatch_pairs"] == 0
+
+
+def test_rows_say_what_each_arm_saw():
+    samples = [
+        _sample("c", "A", num_people=3), _sample("c", "A", num_people=3),
+        _sample("c", "B", num_people=5), _sample("c", "B", num_people=8),
+    ]
+    row = evaluate(samples)["per_cut_disagreement"][0]
+    # 한쪽만 흔들리는지 둘 다 흔들리는지 구분돼야 원인을 좁힐 수 있다.
+    assert row["a_counts"] == [3]
+    assert row["b_counts"] == [5, 8]
+    assert row["count_mismatch_pairs"] == row["cross_pairs"] == 4
+
+
+def test_worst_cuts_come_first():
+    samples = [
+        _sample("mild", "A", route="core"), _sample("mild", "A", route="core"),
+        _sample("mild", "B", route="core"), _sample("mild", "B", route="bust"),
+        _sample("bad", "A", route="core"), _sample("bad", "A", route="core"),
+        _sample("bad", "B", route="bust"), _sample("bad", "B", route="bust"),
+    ]
+    rows = evaluate(samples)["per_cut_disagreement"]
+    assert [row["cut_id"] for row in rows] == ["bad", "mild"]
+
+
+def test_failed_samples_do_not_make_a_row():
+    samples = [_sample("c", "A"), _sample("c", "B", ok=False)]
+    assert evaluate(samples)["per_cut_disagreement"] == []
+
+
+def test_rows_carry_no_image_or_response_text():
+    # 보고서에 남기는 것은 컷 ID와 숫자뿐이다.
+    samples = [_sample("c", "A", route="core"), _sample("c", "B", route="bust")]
+    row = evaluate(samples)["per_cut_disagreement"][0]
+    assert set(row) == {"cut_id", "cross_pairs", "count_mismatch_pairs",
+                        "route_mismatch_pairs", "a_counts", "b_counts"}

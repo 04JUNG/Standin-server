@@ -10,6 +10,10 @@
 
 ## 빠른 시작
 
+포즈 자료 수집, 1프레임 BVH 생성, 서비스 캐릭터 미리보기 및 기존/신규 검수 화면은
+[`docs/POSE_CURATION.md`](docs/POSE_CURATION.md)를 참고한다. 로컬 검수 서버는
+`python -m pose_curation serve --port 8765`로 실행한다.
+
 ```bash
 pip install numpy                 # 코어 실행에 필요한 유일한 의존성
 python scripts/run_demo.py        # mock으로 6개 케이스 end-to-end 데모
@@ -84,6 +88,11 @@ docker run --rm --platform linux/amd64 --publish 8001:8001 \
 `POST /convert`도 유지한다. 두 API 모두 사용자 URL이나 서버 파일 경로는 받지 않는다. 동결 solver와 통합 정본은
 [`docs/FBX_CONVERTER_V3_2_INTEGRATION_HANDOFF.md`](docs/FBX_CONVERTER_V3_2_INTEGRATION_HANDOFF.md)를
 따른다.
+
+`POST /compose-scene`은 인물별 최종 FBX와 위치·Y축 회전·균일 스케일을 받아 한 컷 FBX로
+합친다. 결과를 Blender로 다시 읽어 골격·스킨·월드 좌표를 검증한 뒤 `scene.fbx`와
+`manifest.json` ZIP을 반환한다. API·오프라인 CLI·Three.js 단위 변환은
+[`docs/FBX_MULTI_PERSON_SCENE.md`](docs/FBX_MULTI_PERSON_SCENE.md)에 정리했다.
 
 BFF는 `refined=true`면 `/refine` 응답의 inline `bvh`, 아니면 base `bvh_url` 응답 바이트를
 최종 입력으로 선택한다. `/convert-bundle` 성공 응답을 받으면 ZIP·내부 BVH·내부 FBX의 SHA를
@@ -208,6 +217,14 @@ POSE_LIBRARY_URI=s3://<bucket>/pose-library/v1.tar.gz
 
 ## 문서 맵
 
+포즈 라이브러리 검수: [기준·자동 실행 명령](docs/POSE_REVIEW_STANDARD.md).
+`python -m pose_curation qa --prepare`로 검사·미리보기 준비·시각 검수 대기 목록을 생성한다.
+
+웹툰 상황별 일상·판타지·전투·로맨스 50개씩의 제작 설정과 절차는
+[포즈 큐레이션 문서](docs/POSE_CURATION.md#웹툰-상황별-포즈-200개-2026-10-02)에 있다.
+로컬 검수 서버의 `/scenarios`에서 상황 목록을, `/?category=daily` 등에서
+카테고리별 미리보기를 볼 수 있다. 소품은 배치 가이드이고 BVH에는 인물만 포함된다.
+
 읽는 순서:
 
 1. [`CLAUDE.md`](CLAUDE.md) — 파이프라인 단계·설계 불변식·모듈 트리 (개발 전 필독)
@@ -231,8 +248,10 @@ POSE_LIBRARY_URI=s3://<bucket>/pose-library/v1.tar.gz
 
 기존 HTTP API를 변경하지 않는 v3.2 추출 모듈과 CLI는
 [`docs/HYBRID_POSE_V32.md`](docs/HYBRID_POSE_V32.md)를 참고하세요.
-흐름은 RTM → 평가 1회 → 필요 시 부분 수정 1회 → 코드 검사이며,
-수정 후 VLM 재평가는 없습니다. 20초 목표는 아직 미달성입니다.
+기본 흐름은 Human-Art RTM → Gemini 검토·부분 수정 단일 호출(Low) → 코드 검사이며,
+수정 후 VLM 재평가는 없습니다. 기존 2단계/기본 추론은 명시적 옵션으로 유지합니다.
+Low 실험 공통 성공 24컷 평균은 14.82초지만 전체 27컷 중 3컷은 검증 오류였으며,
+운영 환경의 20초 보장이나 품질 승인으로 해석하지 않습니다.
 
 ```bash
 python tests/test_smoke.py                    # 전체 스모크(자체 러너 내장, pytest 불필요)

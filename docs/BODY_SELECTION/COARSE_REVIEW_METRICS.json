@@ -1,0 +1,160 @@
+{
+  "reviewer": "assistant_visual_review_with_user_confirmed_overrides",
+  "artist_verified": false,
+  "accuracy": null,
+  "total_reviewed": 28,
+  "baseline": {
+    "user_confirmed_total": 2,
+    "user_confirmed_observed_correct": 1,
+    "user_confirmed_recommended_correct": 1,
+    "ai_only_total": 24,
+    "ai_only_observed_agreement": 23,
+    "review_labeled": 26,
+    "review_observed_agreement": 24,
+    "review_recommended_agreement": 24,
+    "clear_review_labeled": 20,
+    "clear_review_observed_agreement": 18,
+    "clear_review_recommended_agreement": 18
+  },
+  "new_input_lite": {
+    "user_confirmed_total": 2,
+    "user_confirmed_observed_correct": 1,
+    "user_confirmed_recommended_correct": 1,
+    "ai_only_total": 24,
+    "ai_only_observed_agreement": 24,
+    "review_labeled": 26,
+    "review_observed_agreement": 25,
+    "review_recommended_agreement": 25,
+    "clear_review_labeled": 20,
+    "clear_review_observed_agreement": 19,
+    "clear_review_recommended_agreement": 19
+  },
+  "final": {
+    "user_confirmed_total": 2,
+    "user_confirmed_observed_correct": 1,
+    "user_confirmed_recommended_correct": 1,
+    "ai_only_total": 24,
+    "ai_only_observed_agreement": 24,
+    "review_labeled": 26,
+    "review_observed_agreement": 25,
+    "review_recommended_agreement": 25,
+    "clear_review_labeled": 20,
+    "clear_review_observed_agreement": 19,
+    "clear_review_recommended_agreement": 19
+  },
+  "evaluation": {
+    "total": 28,
+    "recommendations": 28,
+    "family_counts": {
+      "male": 20,
+      "unknown": 1,
+      "female": 7
+    },
+    "preset_counts": {
+      "male/IDEAL83": 3,
+      "male/BASE": 14,
+      "female/BASE": 7,
+      "male/MUSCULAR": 3,
+      "male/MUSCLE_MAX": 1
+    },
+    "basis_counts": {
+      "recognized_feature": 7,
+      "presentation_default": 20,
+      "catalog_default": 1
+    },
+    "provider_errors": 0,
+    "auto_applied": 0,
+    "accuracy": null,
+    "accuracy_note": "전체 세트 정확도 미측정. 사용자 확인 사례만 confirmed_family에서 별도 평가.",
+    "confirmed_family": {
+      "label_source": "user_confirmed_character_setting",
+      "total": 2,
+      "observed_correct": 1,
+      "recommended_correct": 1,
+      "recommendation_accuracy": 0.5,
+      "scope": "Only confirmed cases; not accuracy across the entire evaluation set",
+      "cases": [
+        {
+          "case_id": "124637:p0",
+          "expected_family": "male",
+          "observed_family": "male",
+          "recommended_family": "male",
+          "recommended_body_id": "male-base-v0-7-2",
+          "observation_correct": true,
+          "recommendation_correct": true,
+          "recommendation_basis": "presentation_default"
+        },
+        {
+          "case_id": "124702:p0",
+          "expected_family": "female",
+          "observed_family": null,
+          "recommended_family": "male",
+          "recommended_body_id": "male-base-v0-7-2",
+          "observation_correct": false,
+          "recommendation_correct": false,
+          "recommendation_basis": "catalog_default"
+        }
+      ]
+    }
+  },
+  "review_sha256": "a21ec1f7c2efc79dddef43659197db73ac2df98cb68e47f94422ae8777a9cad3",
+  "model_versions": [
+    "gemini-3.5-flash-lite"
+  ],
+  "failed_comparison": {
+    "model": "gemini-2.5-flash",
+    "status": "404 unavailable for new users",
+    "included_in_accuracy": false
+  },
+  "notes": [
+    "판독 대상은 캐릭터 디자인 계열이며 생물학적 성별 판정이 아니다.",
+    "사용자 확인 2건과 AI 리뷰 24건의 혼합 기준 일치율이다. 확인 정답 2건 정확도는 별도로 표시한다. 이 28명은 개발 세트이며 독립 검증 세트가 아니다.",
+    "원본 전체는 로컬 검수에만 사용했다. 원격 요청은 얼굴을 포함한 인물 crop과 동일 crop의 대상 표시본이다."
+  ],
+  "confirmed_labels_sha256": "5bd669def55848d341aba468c542eafd443460d4459af63cb2985c5d28e8caad",
+  "confirmed_accuracy": {
+    "correct": 1,
+    "total": 2,
+    "value": 0.5,
+    "note": "사용자 확인 2건만의 추천 계열 정확도; 전체 28명 정확도가 아님"
+  },
+  "model_comparisons": {
+    "flash38": {
+      "user_confirmed_total": 2,
+      "user_confirmed_observed_correct": 0,
+      "user_confirmed_recommended_correct": 0,
+      "ai_only_total": 24,
+      "ai_only_observed_agreement": 23,
+      "review_labeled": 26,
+      "review_observed_agreement": 23,
+      "review_recommended_agreement": 23,
+      "clear_review_labeled": 20,
+      "clear_review_observed_agreement": 18,
+      "clear_review_recommended_agreement": 18
+    },
+    "pro-comparison": {
+      "user_confirmed_total": 2,
+      "user_confirmed_observed_correct": 1,
+      "user_confirmed_recommended_correct": 1,
+      "ai_only_total": 24,
+      "ai_only_observed_agreement": 23,
+      "review_labeled": 26,
+      "review_observed_agreement": 24,
+      "review_recommended_agreement": 25,
+      "clear_review_labeled": 20,
+      "clear_review_observed_agreement": 19,
+      "clear_review_recommended_agreement": 19
+    }
+  },
+  "unresolved_review_cases": [
+    "124702:p0"
+  ],
+  "additional_probe": {
+    "cases": 4,
+    "promoted": false,
+    "reason": "추가 단순 소체 지침에서도 124702는 중성형. 124637의 남성 판독도 중성형으로 약해져 미채택."
+  },
+  "changed_family": [
+    "131112:p4"
+  ]
+}

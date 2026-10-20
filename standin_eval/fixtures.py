@@ -34,8 +34,9 @@ def serialize_vlm(analysis) -> dict:
         "action": _value(analysis.action),
         "view": _value(analysis.view),
         "relationship": _value(analysis.relationship),
+        # 형식이 잘못된 박스는 None 자리로 남는다. 인물별 배열이 같은 순서를 쓰기 때문이다.
         "approx_boxes": [
-            {
+            None if box is None else {
                 "x1": float(box.x1), "y1": float(box.y1),
                 "x2": float(box.x2), "y2": float(box.y2),
                 "source": str(getattr(box, "source", "vlm")),
@@ -45,20 +46,50 @@ def serialize_vlm(analysis) -> dict:
         ],
         "dialogue": analysis.dialogue,
         "raw": analysis.raw,
+        # 인물별 값. 빠지면 재생한 분석이 refine 허용·출력 범위·인물 태그를 잃는다.
+        "lower_body_visible": [bool(value) for value in analysis.lower_body_visible],
+        "lower_body_visibility_known": [
+            bool(value) for value in analysis.lower_body_visibility_known
+        ],
+        "body_scopes": [_value(value) for value in analysis.body_scopes],
+        "person_actions": [_value(value) for value in analysis.person_actions],
+        "person_views": [_value(value) for value in analysis.person_views],
+        "stated_tags": analysis.stated_tags,
     }
 
 
 def deserialize_vlm(payload: dict):
+    from src.body_scope import parse_person_scopes
+    from src.person_tags import parse_person_values
     from src.schema import Action, BBox, Relationship, Shot, VLMAnalysis, View
+    from src.vlm.client import parse_lower_body
 
-    boxes = [BBox(
+    boxes = [None if row is None else BBox(
         float(row["x1"]), float(row["y1"]), float(row["x2"]), float(row["y2"]),
         str(row.get("source", "vlm")), float(row.get("score", 0.5)),
     ) for row in payload.get("approx_boxes", [])]
+    num = int(payload["num_people"])
+    raw = payload.get("raw", {})
+
+    # 이 칸들이 생기기 전에 만든 픽스처는 provider 원문(raw)에서 다시 읽는다.
+    def stored(key):
+        return payload[key] if key in payload else raw.get(key)
+
+    if "lower_body_visible" in payload:
+        lower = [bool(value) for value in payload["lower_body_visible"]]
+        known = [bool(value) for value in payload.get("lower_body_visibility_known", lower)]
+    else:
+        lower, known = parse_lower_body(raw.get("lower_body_visible"), num)
     return VLMAnalysis(
-        int(payload["num_people"]), Shot(payload["shot"]), Action(payload["action"]),
+        num, Shot(payload["shot"]), Action(payload["action"]),
         View(payload["view"]), Relationship(payload["relationship"]), boxes,
-        dialogue=payload.get("dialogue"), raw=payload.get("raw", {}),
+        dialogue=payload.get("dialogue"), raw=raw,
+        lower_body_visible=lower,
+        lower_body_visibility_known=known,
+        body_scopes=parse_person_scopes(stored("body_scopes"), num),
+        person_actions=parse_person_values(stored("person_actions"), num, Action),
+        person_views=parse_person_values(stored("person_views"), num, View),
+        stated_tags=payload.get("stated_tags"),
     )
 
 
@@ -412,7 +443,10 @@ def capture_vlm_fixture(
     for cut in dataset.cuts:
         key = vlm_cache_key(
             image_sha256=cut["image_sha256"], provider=actual, model=model,
-            prompt_sha256=hash_json({"system": prompts.SYSTEM, "user": prompts.USER_TEMPLATE}),
+            prompt_sha256=hash_json({
+                "system": prompts.SYSTEM,
+                "user": prompts.user_template(CFG.vlm_prompt_version),
+            }),
             decoding={"use_rerank": bool(CFG.use_rerank)},
             response_schema_version=str(FIXTURE_SCHEMA_VERSION),
             preprocessing_version="pil-rgb-v1", sdk_version=_package_version(sdk_package),
@@ -460,7 +494,7 @@ def capture_vlm_fixture(
         },
         "vlm": {
             "requested": requested_provider, "actual": actual,
-            "model": model, "cache": cache_counts,
+            "model": model, "prompt_version": CFG.vlm_prompt_version, "cache": cache_counts,
             "model_cache_root": str(resolve_path(model_cache_root)),
         },
         "pose": None,

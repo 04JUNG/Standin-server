@@ -4,6 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 무엇을 하는 코드인가
 
+### 이 브랜치의 전신 동적 라우팅
+
+전신 동적 라우팅 기능 브랜치는 사용자 요청에 따라 API 기본 경로를
+Human-Art 관절 + Gemini 자세 설명 → 전신 원본 검색으로 변경한다.
+관절이 충분해도 자연어 검색을 함께 실행하여 순위를 결합한다. 아래 순수 기하
+불변식 1과 검색 설명은 `ROUTING_FULLBODY_ENABLED=0`인 레거시 경로에 해당한다.
+새 경로의 계약과 기동 필수 조건은 `docs/FULLBODY_DYNAMIC_ROUTING.md`가 기준이다.
+상하체 분리 검색·합성은 실행하지 않는다. 새 후보는 `people[].dynamic_search`에
+있으며 검수용 생성 결과와 분리한다. refine·자동 export를 허용하지 않는다.
+
 웹툰 러프 콘티 컷 1장(.png) → 포즈 **Top-K 후보**를 반환하는 파이프라인.
 전체 제품(설계문서 v2)의 파이프라인 중 **VLM→검색 구간만** 담당한다(담당: 도원).
 CSP 연동·캡처·BVH 내보내기·Three.js 뷰어 등 앞단/뒷단은 이 저장소 밖(이동원/공통).
@@ -130,7 +140,7 @@ webtoon-pose-mvp/
 ```
 VLM.analyze  ── 1회 호출로 개수·shot·action·view·relationship·대략박스 확보
   │            (검출 보정[§7]과 의미 태그[§5]가 같은 결과를 공유 — 중복 호출 안 함)
-  ├─ route      face→"skip"(조기 종료) / bust→"bust"(검색 스킵) / full_half→"core"
+  ├─ route      두상만 있는 face→"skip" / bust·full_half·혼합 구도→"core" (관측 관절 검색)
   ├─ detect + reconcile   검출기 개수 vs VLM 개수
   ├─ pose.estimate        각 박스에서 17kp 스켈레톤
   ├─ build_descriptors    태그 + 정규화 피처 결합
@@ -139,15 +149,31 @@ VLM.analyze  ── 1회 호출로 개수·shot·action·view·relationship·대
 
 핵심 설계 불변식(수정 시 반드시 지킬 것):
 
-1. **VLM 태그 = shot + 사람 수(제어 신호)만.** action/view/relationship는 매칭에 안 쓴다(기하와 중복). shot→라우팅(skip/bust/core), 사람 수→분기(N명→N BVH). 관절 좌표는 VLM이 생성 안 함(검출기·포즈 모델 몫).
+1. **VLM 태그 = shot + 사람 수(제어 신호)만.** action/view/relationship는 매칭에 안 쓴다(기하와 중복). shot→라우팅(skip/bust/core), 사람 수→분기(N명→N BVH). 관절 좌표는 VLM이 생성 안 함(검출기·포즈 모델 몫). 인물별 action·view(`person_tags.py`, `PersonOut.person_tags`)는 매칭·라우팅·refine solver의 입력이 아니다(`tests/test_person_tags.py`가 검색 결과 불변과 사용처를 검사한다). 표시 단계 예외: `api/candidate_presentation.py`만 `vlm_person` 출처의 view를 앞/뒤 카메라 모호성 제한에 사용한다. 후보 순위·관절·안전 게이트는 바꾸지 않는다. 조정은 확정된 카메라 좌표로 실행하고 BVH는 원래 좌표로 복구한다(`docs/CANDIDATE_CAMERA_ALIGNMENT.md`).
 2. **개수 일치 = 스케일 무관 신뢰도 신호.** rtmlib score는 모델마다 스케일이 달라(Body 0.1~0.2 vs Wholebody 1.4~7.5) 신뢰도로 못 쓴다. 대신 `detect.py::reconcile`이 "검출기 개수 vs VLM 개수" 이진 일치로 `high`/`low`를 낸다. 불일치=폴백 후보. 이 신호를 다른 것으로 바꾸지 말 것.
 3. **얽힘·공백 = 폴백(신뢰도 분기).** 매칭은 순수 기하라 별도 얽힘 태그가 없다. 대신 `pipeline._search_one`이 스켈레톤 score 낮음(추출 실패) 또는 Top-1 거리 > `CFG.fallback_distance`(라이브러리 공백·얽힘)면 `person_confidence='low'`로 폴백(작가). 임계값은 실데이터로 보정.
-4. **피처 공간의 대칭성.** 쿼리(추출 스켈레톤)와 라이브러리(3D→2D 투영)가 **반드시 같은** `features.normalize_skeleton`을 통과해야 kNN이 성립한다. 정규화는 힙 중심 이동 + 몸통 길이 스케일 + 결측 관절 마스킹(카메라·인물 크기 불변). 한쪽만 바꾸면 검색이 조용히 망가진다. 3D 포즈→피처는 `library.pose_to_feature`가 단일 소스이고 **색인과 refine이 이 함수를 공유**한다(`test_feature_space_symmetry_shared_function`이 감시).
+4. **피처 공간의 대칭성.** 전신 쿼리와 라이브러리는 같은 `features.normalize_skeleton`을 통과한다(힙 중심·몸통 길이·결측 마스킹). 3D 포즈→피처는 `library.pose_to_feature`를 색인과 refine이 공유한다. `upper_only` 검색은 별도로 쿼리와 저장 투영 양쪽에 `partial_pose.shoulder_frame`을 적용해 힙 기준을 상쇄한다. 한쪽만 정규화를 바꾸면 안 된다. 상체 거리에는 전신 임계값을 쓰지 않으며 refine은 금지한다. 상세: `docs/BODY_SCOPE.md`.
 5. **Descriptor 결합에 LLM 불필요.** VLM 태그 + 스켈레톤 피처는 `descriptor.py`에서 JSON 구조화로만 합친다.
 6. **얽힘 관계는 세트로.** `Relationship.HUGGING`/`FIGHTING`은 `is_entangled` → 2인 상호작용 포즈를 한 덩어리로 검색(개별 인물 분해가 실패하는 케이스).
 7. **refine은 좋아지거나, 그대로.** `refine.py`는 검색된 베이스 포즈의 **팔 회전만** 러프에 맞춰 돌린다(기본 `REFINE_LIMBS=arms`. 루트/힙 위치·척추·손목·**다리** 고정). 다리는 투영 관측 감도가 팔의 1/3.4라 손실이 못 보는 방향으로 크게 움직인다 — 3D 정규화·이동량 게이트 없이 켜지 말 것(`REFINE_DESIGN.md` §6-4). 안전 게이트 중 하나라도 걸리면 조정을 버리고 베이스를 그대로 반환한다 — refine이 결과를 나쁘게 만드는 경로는 존재하면 안 된다. 특히 **검색이 실패한 컷에는 refine을 돌리지 않는다**(틀린 베이스를 러프에 끼워맞추면 더 이상해진다). 게이트를 약화시키는 방향으로 바꾸지 말 것. 상세: `docs/REFINE_DESIGN.md`.
 
 ## 검색이 어떻게 매칭되나 (개념)
+
+### 2026-10-15 런타임 시점 확대 경로
+
+`POSE_SEARCH_MODE=perspective`가 새 기본값이다. 원본 BVH와 저장 투영이 모두
+일치하는 라이브러리에서 정상 full coverage·단일 인물·pos 전신 검색은
+117개 카메라 → 195개 시작점 미세 조정 → .25/.75 혼합 → Top20 공정 윤곽
+재정렬을 사용한다. Z 추정은 하지 않는다. 부분 관측/다인물/복구/비-pos 및
+BVH 미확보·refine v1 설정은 기존 경로를 유지한다. 새 점수는 기존 confidence
+임계값을 쓰지 않아 low지만, refine v2는 기존 구조 안전 정책에 따라 계속 허용한다.
+candidate-camera-v2의 전체 회전/원근 거리/좌우 해석을 /refine에 그대로 전달한다.
+리파인 전방계산과 최종 selector가 요청 범위 내에서 같은 고정 원근을 사용한다.
+기존 보정/충돌/비회귀 게이트는 유지하며 결과는 원본 BVH 좌표로 복구한다.
+POSE_SEARCH_MODE=legacy와 프로세스 재시작으로 롤백한다. 썸네일은 아직 직교다.
+세부 계약·테스트: [PERSPECTIVE_RUNTIME.md](docs/PERSPECTIVE_RUNTIME.md).
+
+아래는 legacy 검색 경로의 설명이다.
 
 그림에서 3D를 복원(리프팅)하지 **않는다**. 이미 3D인 라이브러리 포즈를 여러 가상 카메라로 2D 투영해 색인하고(`library.py::VIRTUAL_CAMERAS`, view별 1개 엔트리), 추출한 2D 스켈레톤과 같은 피처 공간에서 **순수 기하 kNN**(`search.knn_geometric`, 거리=몸통 12관절 L2 `features.pose_distance`)을 돈다. **태그(action/view)로 필터링하지 않는다** — 기하와 중복이라 매칭에서 제외(설계 결정). cosine은 국소 차이를 못 잡아 폐기. `knn`은 같은 `pose_id`의 여러 view 중 최선 1개만 남겨 후보 다양성을 확보한다.
 

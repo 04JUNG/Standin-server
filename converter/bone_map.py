@@ -126,6 +126,37 @@ CMU_BVH: dict[str, str] = {
     "toe.R": "RightToeBase",
 }
 
+# 100STYLE (Mason et al., CC BY 4.0) 원본 BVH.
+# 이름 체계가 CMU·Mixamo와 다르다 — `LeftShoulder`가 **상완**, `LeftElbow`가 전완,
+# `LeftCollar`가 쇄골, `LeftHip`이 대퇴다(CMU의 `LeftShoulder`는 쇄골).
+# Chest3는 계층에 남아 Chest4에 변환이 누적되므로 상부 척추는 Chest4에 매핑한다.
+# 오프라인 정리 렌더러가 같은 표로 4방향 미리보기를 만들어 시각 검수했다
+# (pose_curation/rendering/profiles.py, 2026-10).
+STYLE100: dict[str, str] = {
+    "hips": "Hips",
+    "spine": "Chest",
+    "spine1": "Chest2",
+    "spine2": "Chest4",
+    "neck": "Neck",
+    "head": "Head",
+    "shoulder.L": "LeftCollar",
+    "upperarm.L": "LeftShoulder",
+    "forearm.L": "LeftElbow",
+    "hand.L": "LeftWrist",
+    "shoulder.R": "RightCollar",
+    "upperarm.R": "RightShoulder",
+    "forearm.R": "RightElbow",
+    "hand.R": "RightWrist",
+    "upleg.L": "LeftHip",
+    "leg.L": "LeftKnee",
+    "foot.L": "LeftAnkle",
+    "toe.L": "LeftToe",
+    "upleg.R": "RightHip",
+    "leg.R": "RightKnee",
+    "foot.R": "RightAnkle",
+    "toe.R": "RightToe",
+}
+
 # CSP 표준 본 — ⚠️ 실험(EXP-FBX-04) 전까지 확정 불가. 자리표시자.
 # 정적 메시 베이크 경로에서는 이 매핑이 필요 없다(본이 산출물에 없음).
 CSP: dict[str, str] = {}
@@ -135,6 +166,7 @@ PROFILES: dict[str, dict[str, str]] = {
     "mixamo": MIXAMO,
     "mixamo_noprefix": MIXAMO_NOPREFIX,
     "cmu_bvh": CMU_BVH,
+    "100style": STYLE100,
     "csp": CSP,
 }
 

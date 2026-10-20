@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "rig_source": "data/curation/sources/quaternius/export-1/pool/combat_ual1_Punch_Cross_f00000.bvh",
+  "rig_sha256": "fd3d02eb9cb307eb0700f48ef4cc6d0a90fdf595c1f6c8b66bd40dd93844544b",
+  "scenes": [
+    {
+      "id": "daily_seated_put_on_shoe_r4_20261007",
+      "category": "daily",
+      "category_label": "일상",
+      "label": "앉아서 오른발 신발 신기",
+      "stance": "sit",
+      "gesture": "reach_low",
+      "props": "",
+      "support": "seat",
+      "hands": ["pinch", "pinch"],
+      "root_xyz": [65, 0, 0],
+      "lean": 8,
+      "nod": 10,
+      "look": -8,
+      "left_wrist": [0.05, -0.14, 0.54],
+      "right_wrist": [-0.23, -0.27, 0.55],
+      "left_pole": [0.45, -0.05, 0.65],
+      "right_pole": [-0.48, 0.30, 0.23],
+      "overrides": {
+        "right_leg": [[-0.19, 0.25, 0.55], [-0.28, 0.45, 0.39]],
+        "right_foot": {"mode": "follow_shin", "pitch_degrees": 0}
+      }
+    }
+  ]
+}

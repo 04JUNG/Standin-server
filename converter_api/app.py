@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import hashlib
+import base64
 import hmac
 import io
 import json
@@ -51,6 +52,10 @@ from converter_api.runner import (
     WorkerIntegrityError,
 )
 from converter_api.schemas import CharactersResponse, HealthResponse
+from converter_api.work_queue import WorkStopped, current_work
+from converter_api.work_middleware import WorkMiddleware
+from converter.framing import FRAMING_VERSION, OUTPUT_SCOPES, PREVIEW_VIEWS
+from converter.hand_library import HandLibraryError, normalize_request as normalize_hands
 
 
 LOGGER = logging.getLogger("standin.converter")
@@ -143,10 +148,12 @@ def _error_response(problem: ApiProblem) -> JSONResponse:
 
 
 def _structured_log(level: int, event: str, **fields: Any) -> None:
+    control = current_work.get()
     payload = {
         "event": event,
         "service": "converter",
         "version": os.getenv("DEPLOYMENT_VERSION", "development"),
+        **({"request_id": control.request_id} if control and control.request_id else {}),
         **fields,
     }
     LOGGER.log(level, json.dumps(payload, ensure_ascii=False, sort_keys=True))
@@ -262,6 +269,10 @@ def _build_artifact_bundle(
             "mirror": mirror,
             "output_mode": OUTPUT_MODE,
             "apply_root_translation": APPLY_ROOT_TRANSLATION,
+            "output_scope": result.report.get("output_scope", "full"),
+            "framing_version": result.report.get("framing_version"),
+            # 손 프리셋(04J-290). 손을 요청하지 않았으면 null — 다시 내보낼 때 같은 손을 쓰기 위한 기록.
+            "hands": result_hands(result.report),
         },
         "artifacts": {
             "bvh": {
@@ -302,6 +313,7 @@ def create_app(
     max_bvh_bytes: int | None = None,
 ) -> FastAPI:
     character_registry = registry or CharacterRegistry.from_env()
+    default_character_id = getattr(character_registry, "default_character_id", "standin-master-v2")
     blender_runner = runner or BlenderRunner()
     size_limit = (
         max_bvh_bytes
@@ -313,15 +325,73 @@ def create_app(
 
     app = FastAPI(
         title="Standin Internal Converter",
-        version="1.2.0",
+        version="1.3.0",
         description=(
             "Internal BVH to FBX conversion service "
             "(BFF export bundles, inference refine thumbnails)"
         ),
     )
+    app.add_middleware(WorkMiddleware)
     app.state.registry = character_registry
     app.state.runner = blender_runner
     app.state.max_bvh_bytes = size_limit
+
+    from converter_api.scene_routes import register_scene_routes
+    register_scene_routes(app, blender_runner)
+
+    from converter_api.preview_models import PreviewModelStore
+    from converter.preview_model import MODEL_VERSION
+    from converter_api.body_preview import preview_contract
+    preview_models = PreviewModelStore()
+    app.state.preview_models = preview_models
+
+    def verify_preview_revision(expected: str | None):
+        contract = preview_contract()
+        if expected is not None:
+            if not SHA256_RE.fullmatch(expected):
+                raise ApiProblem(400, "INVALID_PREVIEW_REVISION", "invalid preview revision")
+            if not hmac.compare_digest(expected, contract["preview_revision"]):
+                raise ApiProblem(409, "PREVIEW_REVISION_MISMATCH", "preview runtime changed")
+        return contract
+
+    def verify_character_sha(expected: str | None, actual: str | None = None):
+        if expected is not None:
+            if not SHA256_RE.fullmatch(expected):
+                raise ApiProblem(400, "INVALID_CHARACTER_SHA256", "invalid character digest")
+            if actual is not None and not hmac.compare_digest(expected, actual):
+                raise ApiProblem(409, "CHARACTER_SHA256_MISMATCH", "character asset changed")
+
+    @app.get("/preview-contract")
+    def read_preview_contract():
+        return preview_contract()
+
+    @app.get("/pose-preview/{source_sha}")
+    def pose_preview(source_sha: str, character_id: str = default_character_id,
+                     expected_character_sha256: str | None = None,
+                     expected_preview_revision: str | None = None):
+        if not SHA256_RE.fullmatch(source_sha):
+            raise ApiProblem(400, "INVALID_INPUT", "invalid source digest")
+        contract = verify_preview_revision(expected_preview_revision)
+        verify_character_sha(expected_character_sha256)
+        try:
+            metadata = character_registry.metadata(character_id)
+            verify_character_sha(expected_character_sha256, metadata.sha256)
+            data, manifest = preview_models.get(source_sha, metadata.sha256)
+        except ApiProblem:
+            raise
+        except (FileNotFoundError, UnknownCharacterError):
+            raise ApiProblem(404, "PREVIEW_NOT_READY", "precomputed model unavailable")
+        except Exception:
+            raise ApiProblem(503, "PREVIEW_UNAVAILABLE", "preview model unavailable")
+        return StreamingResponse(io.BytesIO(data), media_type="model/gltf-binary", headers={
+            "Content-Length": str(len(data)), "Cache-Control": "private, no-store",
+            "X-Standin-Model-Version": MODEL_VERSION,
+            "X-Standin-Model-Revision": contract["model_revision"],
+            "X-Standin-Preview-Revision": contract["preview_revision"],
+            "X-Standin-Artifact-SHA256": manifest["sha256"],
+            "X-Standin-Character-SHA256": metadata.sha256,
+            "X-Standin-Source-BVH-SHA256": source_sha,
+        })
 
     @app.exception_handler(ApiProblem)
     async def api_problem_handler(request: Request, exc: ApiProblem):
@@ -334,6 +404,16 @@ def create_app(
             conversion_id=exc.conversion_id,
         )
         return _error_response(exc)
+
+    @app.exception_handler(WorkStopped)
+    async def work_stopped_handler(request: Request, exc: WorkStopped):
+        control = current_work.get()
+        diagnostics = control.diagnostics() if control else {'phase': exc.phase}
+        _structured_log(logging.WARNING, 'converter_work_stopped',
+                        route=request.url.path, error_code=exc.code, **diagnostics)
+        return JSONResponse(status_code=exc.status, content={
+            'error': {'code': exc.code, 'message': 'converter work stopped',
+                      'diagnostics': diagnostics}})
 
     @app.exception_handler(RequestValidationError)
     async def validation_handler(_request: Request, _exc: RequestValidationError):
@@ -362,6 +442,9 @@ def create_app(
     @app.get("/healthz", response_model=HealthResponse)
     def healthz():
         checks: dict[str, Any] = {"api": {"ok": True}}
+        slots = getattr(blender_runner, "_process_slots", None)
+        if slots is not None and hasattr(slots, "snapshot"):
+            checks["work_queue"] = {"ok": True, **slots.snapshot()}
         ok = True
         try:
             info = blender_runner.inspect_blender(refresh=True)
@@ -392,10 +475,43 @@ def create_app(
                 "ok": False,
                 "code": type(exc).__name__,
             }
+        if os.getenv("CONVERTER_SHAPE_REGISTRY"):
+            try:
+                from converter.shape_spec import load_registry, REGISTRY_SCHEMA
+                # Re-hashes each approved source once and checks its VERSION literal.
+                registry_data = load_registry()
+                checks["shape_sources"] = {
+                    "ok": True,
+                    "schema": REGISTRY_SCHEMA,
+                    "models": len(registry_data["characters"]),
+                    "rules": sorted(registry_data["sources"]),
+                }
+            except (ValueError, KeyError, OSError, TypeError):
+                ok = False
+                checks["shape_sources"] = {"ok": False, "code": "SHAPE_SOURCE_UNAVAILABLE"}
         payload = {
             "ok": ok,
             "solver_version": SOLVER_VERSION,
+            "camera_version": "candidate-camera-v1",
+            "framing_version": FRAMING_VERSION,
+            "output_scopes": (sorted(OUTPUT_SCOPES) if not getattr(
+                getattr(blender_runner, "settings", None), "force_exact_v324", False
+            ) else ["full"]),
             "checks": checks,
+        }
+        from converter.framed_model import revision
+        payload["preview_model_revision"] = (revision() if not getattr(
+            getattr(blender_runner, "settings", None), "force_exact_v324", False) else None)
+        # 손 굽기 지원 여부(04J-290). exact V3.2.4 모드에서는 손 요청을 거부하므로 null.
+        from converter.hand_library import load_library
+        hand_library = load_library()
+        payload["hand_library"] = (None if getattr(
+            getattr(blender_runner, "settings", None), "force_exact_v324", False) else {
+            "version": hand_library.library_version, "sha256": hand_library.sha256,
+            "presets": len(hand_library.presets)})
+        payload["character_hashes"] = {
+            c["character_id"]: character_registry.metadata(c["character_id"]).sha256
+            for c in character_registry.list_public(available_only=True)
         }
         if ok:
             return payload
@@ -412,11 +528,27 @@ def create_app(
         response_format: str,
         artifact_kind: str | None = None,
         expected_bvh_sha256: str | None = None,
+        expected_character_sha256: str | None = None,
         thumbnail: ThumbnailRequest | None = None,
+        output_scope: str = "full",
+        preview_view: str | None = None,
+        camera_rotation: list | None = None,
+        preview_model: bool = False,
+        shape: str | None = None,
+        expected_shape_source: str | None = None,
+        hand_left: str | None = None,
+        hand_right: str | None = None,
+        hand_contact_screen: bool = False,
     ) -> CompletedConversion:
         conversion_id = str(uuid.uuid4())
+        control = current_work.get()
+        if control is not None:
+            control.conversion_id = conversion_id
         request_started = time.monotonic()
         try:
+            if output_scope not in OUTPUT_SCOPES or (preview_view is not None and preview_view not in PREVIEW_VIEWS):
+                raise ApiProblem(400, "INVALID_OPTION", "invalid output scope or preview view",
+                                 conversion_id=conversion_id)
             if artifact_kind is not None and artifact_kind not in ARTIFACT_KINDS:
                 raise ApiProblem(
                     400,
@@ -448,6 +580,11 @@ def create_app(
                     400, "INVALID_OPTION", "apply_root_translation must be false",
                     conversion_id=conversion_id,
                 )
+            try:
+                hands = normalize_hands({"left": hand_left or None, "right": hand_right or None})
+            except HandLibraryError as exc:
+                raise ApiProblem(400, "INVALID_HAND_PRESET", str(exc),
+                                 conversion_id=conversion_id) from exc
             bvh_bytes = _read_bvh(bvh, size_limit, conversion_id)
             actual_bvh_sha256 = hashlib.sha256(bvh_bytes).hexdigest()
             if expected_bvh_sha256 is not None and not hmac.compare_digest(
@@ -460,7 +597,31 @@ def create_app(
                     "uploaded BVH does not match expected_bvh_sha256",
                     conversion_id=conversion_id,
                 )
+            # Check immutable registry metadata before fetching the FBX or starting Blender.
+            if expected_character_sha256 is not None:
+                verify_character_sha(expected_character_sha256)
+                verify_character_sha(expected_character_sha256, character_registry.metadata(character_id).sha256)
             resolved = character_registry.resolve(character_id)
+            verify_character_sha(expected_character_sha256, resolved.metadata.sha256)
+            from converter.shape_spec import resolve_shape, ShapeError
+            if shape is not None and len(shape) > 16384:
+                raise ApiProblem(413, "INVALID_SHAPE", "shape payload is too large", conversion_id=conversion_id)
+            if expected_shape_source is not None and (shape is None or len(expected_shape_source) > 1024):
+                raise ApiProblem(400, "INVALID_SHAPE", "expected_shape_source needs a shape", conversion_id=conversion_id)
+            try:
+                expected_source = json.loads(expected_shape_source) if expected_shape_source is not None else None
+                shape_recipe = resolve_shape(character_id, resolved.metadata.sha256,
+                                             json.loads(shape) if shape is not None else None,
+                                             expected_source)
+            except ShapeError as exc:
+                if str(exc) == "shape source mismatch":
+                    # The catalog promised another authoring version than this converter
+                    # bakes. Refuse before Blender work; the client must not get a body
+                    # that differs from its live preview.
+                    raise ApiProblem(409, "SHAPE_SOURCE_MISMATCH", str(exc), conversion_id=conversion_id) from exc
+                raise ApiProblem(400, "INVALID_SHAPE", str(exc), conversion_id=conversion_id) from exc
+            except (ValueError, KeyError, OSError) as exc:
+                raise ApiProblem(400, "INVALID_SHAPE", str(exc), conversion_id=conversion_id) from exc
             result = blender_runner.convert(
                 bvh_bytes=bvh_bytes,
                 character_path=resolved.path,
@@ -469,12 +630,25 @@ def create_app(
                 conversion_id=conversion_id,
                 mirror=mirror,
                 thumbnail=thumbnail,
+                output_scope=output_scope,
+                preview_view=preview_view,
+                **({"shape_recipe": shape_recipe} if shape_recipe is not None else {}),
+                **({"camera_rotation": camera_rotation} if camera_rotation is not None else {}),
+                **({"preview_model": True} if preview_model else {}),
+                **({"hands": hands} if hands is not None else {}),
+                **({"hand_contact_screen": True} if hand_contact_screen else {}),
             )
+            if camera_rotation is not None and result.report.get("camera_rotation") != camera_rotation:
+                raise WorkerIntegrityError("camera rotation lineage mismatch")
             _verify_result_integrity(
                 result,
                 conversion_id=conversion_id,
                 bvh_bytes=bvh_bytes,
             )
+            if output_scope != "full" or preview_view or preview_model:
+                if (result.report.get("output_scope") != output_scope
+                        or result.report.get("framing_version") != FRAMING_VERSION):
+                    raise WorkerIntegrityError("output framing lineage mismatch")
         except ApiProblem:
             raise
         except UnknownCharacterError as exc:
@@ -569,6 +743,8 @@ def create_app(
         common_headers = {
             "X-Standin-Conversion-Id": conversion_id,
             "X-Standin-Solver-Version": SOLVER_VERSION,
+            "X-Standin-Output-Scope": output_scope,
+            "X-Standin-Framing-Version": FRAMING_VERSION,
             "X-Standin-Source-BVH-SHA256": result.source_bvh_sha256,
             "X-Standin-FBX-Artifact-SHA256": result.artifact_sha256,
             "X-Standin-Source-Profile": _safe_header(report.get("src_profile")),
@@ -576,6 +752,10 @@ def create_app(
             "X-Standin-Mapped-Bones": str(int(report.get("mapped_bones", 0))),
             "X-Standin-Warning-Count": str(len(report.get("warnings") or [])),
             "X-Standin-Task-Cold-Start": str(result.task_cold_start).lower(),
+            "X-Standin-Hands": (
+                "none" if hands is None
+                else f"left={hands['left'] or 'rest'};right={hands['right'] or 'rest'}"
+            ),
             "Server-Timing": (
                 f"queue;dur={queue_wait_ms}, "
                 f"blender;dur={execution_ms}, total;dur={request_total_ms}"
@@ -602,11 +782,14 @@ def create_app(
     )
     def convert(
         bvh: UploadFile = File(...),
-        character_id: str = Form(default="standin-master-v2"),
+        character_id: str = Form(default=default_character_id),
         frame: int = Form(default=FRAME),
         mirror: bool = Form(default=False),
         output_mode: str = Form(default=OUTPUT_MODE),
         apply_root_translation: bool = Form(default=APPLY_ROOT_TRANSLATION),
+        output_scope: str = Form(default="full"),
+        hand_left: str | None = Form(default=None),
+        hand_right: str | None = Form(default=None),
     ):
         completed = _execute_conversion(
             bvh=bvh,
@@ -616,6 +799,9 @@ def create_app(
             output_mode=output_mode,
             apply_root_translation=apply_root_translation,
             response_format="fbx",
+            output_scope=output_scope,
+            hand_left=hand_left,
+            hand_right=hand_right,
         )
         result = completed.result
         filename = (
@@ -655,11 +841,14 @@ def create_app(
         bvh: UploadFile = File(...),
         artifact_kind: str = Form(...),
         expected_bvh_sha256: str = Form(...),
-        character_id: str = Form(default="standin-master-v2"),
+        character_id: str = Form(default=default_character_id),
         frame: int = Form(default=FRAME),
         mirror: bool = Form(default=False),
         output_mode: str = Form(default=OUTPUT_MODE),
         apply_root_translation: bool = Form(default=APPLY_ROOT_TRANSLATION),
+        output_scope: str = Form(default="full"),
+        hand_left: str | None = Form(default=None),
+        hand_right: str | None = Form(default=None),
     ):
         completed = _execute_conversion(
             bvh=bvh,
@@ -669,8 +858,11 @@ def create_app(
             output_mode=output_mode,
             apply_root_translation=apply_root_translation,
             response_format="bundle",
+            output_scope=output_scope,
             artifact_kind=artifact_kind,
             expected_bvh_sha256=expected_bvh_sha256,
+            hand_left=hand_left,
+            hand_right=hand_right,
         )
         bundle, manifest = _build_artifact_bundle(
             completed,
@@ -717,7 +909,7 @@ def create_app(
     )
     def render_thumbnail(
         bvh: UploadFile = File(...),
-        character_id: str = Form(default="standin-master-v2"),
+        character_id: str = Form(default=default_character_id),
         view: str = Form(default="front"),
         size: int = Form(default=THUMBNAIL_DEFAULT_SIZE),
         format: str = Form(default="png"),
@@ -822,7 +1014,150 @@ def create_app(
             headers=headers,
         )
 
+    @app.post('/screen-hand-contact')
+    def screen_hand_contact(
+        bvh: UploadFile = File(...),
+        character_id: str = Form(default='standin-master-v2'),
+        expected_bvh_sha256: str = Form(...),
+        expected_character_sha256: str | None = Form(default=None),
+        hand_left: str | None = Form(default=None),
+        hand_right: str | None = Form(default=None),
+    ):
+        """Internal diagnostic only; no FBX/preview export, no pose correction."""
+        completed = _execute_conversion(bvh=bvh, character_id=character_id,
+            frame=FRAME, mirror=False, output_mode=OUTPUT_MODE,
+            apply_root_translation=False, response_format='hand_skin_screen',
+            expected_bvh_sha256=expected_bvh_sha256,
+            expected_character_sha256=expected_character_sha256,
+            hand_left=hand_left, hand_right=hand_right, hand_contact_screen=True)
+        from converter.hand_contact import validate_screen
+        from converter.hand_library import load_library
+        result = completed.result
+        try:
+            receipt = validate_screen(result.report.get('hand_contact_screen'),
+                                      artifact_sha256=result.artifact_sha256)
+        except ValueError as exc:
+            raise ApiProblem(500, 'WORKER_INTEGRITY_ERROR', 'invalid skin screen receipt') from exc
+        return {**receipt, 'source_bvh_sha256': result.source_bvh_sha256,
+                'character_id': completed.character.metadata.character_id,
+                'character_sha256': completed.character.metadata.sha256,
+                'solver_version': SOLVER_VERSION,
+                'hands': normalize_hands({'left': hand_left, 'right': hand_right}),
+                'hand_library_sha256': load_library().sha256,
+                'availability': {'status': 'available',
+                    'queue_wait_ms': round(result.queue_wait_ms, 3),
+                    'execution_ms': round(result.execution_ms, 3)}}
+
+    @app.post("/convert-framed")
+    @app.post("/convert-framed-export")
+    def convert_framed(
+        bvh: UploadFile = File(...),
+        character_id: str = Form(default=default_character_id),
+        output_scope: str = Form(default="full"),
+        preview_view: str = Form(default="front"),
+        expected_bvh_sha256: str = Form(...),
+        expected_character_sha256: str | None = Form(default=None),
+        expected_preview_revision: str | None = Form(default=None),
+        camera_rotation: str | None = Form(default=None),
+        preview_format: str = Form(default="png"),
+        shape: str | None = Form(default=None),
+        expected_shape_source: str | None = Form(default=None),
+        hand_left: str | None = Form(default=None),
+        hand_right: str | None = Form(default=None),
+    ):
+        """One verified FBX plus its own reimported preview, in a single response."""
+        contract = verify_preview_revision(expected_preview_revision)
+        if preview_format not in ("png", "model") or (preview_format == "model" and preview_view != "front"):
+            raise ApiProblem(400, "INVALID_OPTION", "invalid preview_format")
+        from converter.camera import validate_rotation
+        try:
+            rotation = validate_rotation(json.loads(camera_rotation)) if camera_rotation is not None else None
+            if camera_rotation is not None and (rotation is None or preview_view != "front"):
+                raise ValueError("aligned output requires front preview and a matrix")
+        except (ValueError, TypeError) as exc:
+            raise ApiProblem(400, "INVALID_OPTION", "invalid camera_rotation") from exc
+        completed = _execute_conversion(
+            bvh=bvh, character_id=character_id, frame=FRAME, mirror=False,
+            output_mode=OUTPUT_MODE, apply_root_translation=APPLY_ROOT_TRANSLATION,
+            response_format="framed", expected_bvh_sha256=expected_bvh_sha256,
+            expected_character_sha256=expected_character_sha256,
+            output_scope=output_scope, preview_view=preview_view if preview_format == "png" else None,
+            camera_rotation=rotation, preview_model=preview_format == "model", shape=shape,
+            expected_shape_source=expected_shape_source,
+            hand_left=hand_left, hand_right=hand_right,
+        )
+        baked = result_hands(completed.result.report)
+        result = completed.result
+        if preview_format == "model":
+            from converter.framed_model import MODEL_VERSION, metadata, revision
+            try:
+                meta = metadata(result.preview_model)
+                expected = {
+                    "version": MODEL_VERSION, "revision": revision(), "scope": output_scope,
+                    "camera_rotation": rotation, "base_fbx_sha256": result.artifact_sha256,
+                    "source_bvh_sha256": result.source_bvh_sha256,
+                    "character_id": completed.character.metadata.character_id,
+                    "character_sha256": completed.character.metadata.sha256,
+                }
+                if any(meta.get(k) != v for k, v in expected.items()) or len(result.artifact) > 30 * 1024 * 1024:
+                    raise ValueError("model lineage")
+            except (ValueError, KeyError, TypeError) as exc:
+                raise ApiProblem(500, "WORKER_INTEGRITY_ERROR", "model integrity mismatch") from exc
+            return {
+                "conversion_id": completed.conversion_id, "solver_version": SOLVER_VERSION,
+                "framing_version": FRAMING_VERSION, "output_scope": output_scope,
+                "preview_view": "front", "preview_format": "model",
+                "preview_revision": contract["preview_revision"],
+                "preview_model_revision": revision(), "camera_rotation": rotation,
+                "character_id": completed.character.metadata.character_id,
+                "character_sha256": completed.character.metadata.sha256,
+                "source_bvh_sha256": result.source_bvh_sha256,
+                "shape_sha256": result.report.get("shape_bake", {}).get("shape_sha256"),
+                "shape_bake": result.report.get("shape_bake"),
+                "fbx_sha256": result.artifact_sha256,
+                "hands": baked,
+                **({"lab_stage_timings": result.report["lab_stage_timings"]} if "lab_stage_timings" in result.report else {}),
+                "preview_sha256": hashlib.sha256(result.preview_model).hexdigest(),
+                "fbx_base64": base64.b64encode(result.artifact).decode("ascii"),
+                "preview_base64": base64.b64encode(result.preview_model).decode("ascii"),
+            }
+        if (not result.preview.startswith(b"\x89PNG\r\n\x1a\n")
+                or len(result.preview) > 4 * 1024 * 1024
+                or len(result.artifact) > 30 * 1024 * 1024
+                or result.report.get("preview_view") != preview_view
+                or result.report.get("preview_size") != len(result.preview)
+                or hashlib.sha256(result.preview).hexdigest() != result.report.get("preview_sha256")):
+            raise ApiProblem(500, "WORKER_INTEGRITY_ERROR", "preview integrity mismatch")
+        return {
+            "conversion_id": completed.conversion_id,
+            "solver_version": SOLVER_VERSION,
+            "framing_version": FRAMING_VERSION,
+            "preview_revision": contract["preview_revision"],
+            "output_scope": output_scope,
+            "preview_view": preview_view,
+            "character_id": completed.character.metadata.character_id,
+            "character_sha256": completed.character.metadata.sha256,
+            "source_bvh_sha256": result.source_bvh_sha256,
+            "shape_sha256": result.report.get("shape_bake", {}).get("shape_sha256"),
+            "shape_bake": result.report.get("shape_bake"),
+            "fbx_sha256": result.artifact_sha256,
+            "preview_sha256": result.report["preview_sha256"],
+            "camera_rotation": rotation,
+            "hands": baked,
+            **({"lab_stage_timings": result.report["lab_stage_timings"]} if "lab_stage_timings" in result.report else {}),
+            "fbx_base64": base64.b64encode(result.artifact).decode("ascii"),
+            "preview_base64": base64.b64encode(result.preview).decode("ascii"),
+        }
+
     return app
+
+
+def result_hands(report: dict[str, Any]) -> dict[str, Any] | None:
+    """응답에 싣는 손 굽기 요약. 손을 요청하지 않았으면 None."""
+    baked = report.get("hands")
+    if not baked:
+        return None
+    return {key: baked.get(key) for key in ("left", "right", "library_version", "version")}
 
 
 def _encode_thumbnail(

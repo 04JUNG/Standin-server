@@ -1,0 +1,35 @@
+{
+  "schema_version": "body-catalog.v1",
+  "catalog_version": "my-body-catalog.v1",
+  "default_body_id": "regular-h7",
+  "assets": [
+    {
+      "body_id": "regular-h7",
+      "body_version": "v1",
+      "availability": "draft",
+      "fbx_path": "../data/bodies/regular-h7.fbx",
+      "asset_sha256": null,
+      "rig_version": "mixamo-v1",
+      "measurement_version": "artist-reviewed.v1",
+      "qa_report": "../data/bodies/regular-h7.qa.json",
+      "qa_sha256": null,
+      "quality_priority": 0,
+      "supported_pose_ids": [],
+      "metadata": {
+        "age_design": "young_adult",
+        "presentation_style": "unspecified"
+      },
+      "attributes": {
+        "head_ratio_class": "h7",
+        "body_build": "regular",
+        "frame_width": "regular",
+        "limb_proportion": "regular",
+        "muscularity_visual": 1,
+        "soft_volume": 1,
+        "volume_distribution": "even"
+      },
+      "projections": []
+    }
+  ],
+  "presentation_defaults": {}
+}

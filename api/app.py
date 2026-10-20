@@ -3,6 +3,7 @@ FastAPI 레이어 — 도원의 Python 추론 서버.
 
 경계: [앱 서버 팀] --HTTP--> [이 서비스]  (문서화된 OpenAPI 계약 = /docs)
   POST /analyze         멀티파트 PNG 러프 컷 → CutResult(JSON)
+  POST /semantic-search 직접 문장 → 기존 전신 포즈 후보(이미지·VLM 호출 없음)
   POST /refine          선택 포즈 → 조정 BVH + 매칭 시점 preview(JSON 인라인,
                         converter의 V3.2.5 FBX 남성 모델 렌더 = 후보 썸네일과 동일)
   GET  /pose/{id}/bvh   후보 pose_id → 라이브러리 BVH 파일(동원 내보내기 팀이 소비)
@@ -15,12 +16,15 @@ FastAPI 레이어 — 도원의 Python 추론 서버.
 """
 from __future__ import annotations
 
+from .body_models import validated_body_sidecar
+
 import base64
 import hashlib
 import io
 import json
 import mimetypes
 import os
+from pathlib import Path
 import re
 import time
 import uuid
@@ -33,6 +37,12 @@ import numpy as np
 from fastapi import FastAPI, File, Form, Request, UploadFile, HTTPException
 from fastapi.responses import FileResponse, JSONResponse, Response
 
+from src.hand_shapes import default_hands
+from src.hand_catalog import (
+    build_catalog as build_hand_catalog,
+    thumbnail_etag as hand_thumbnail_etag,
+    thumbnail_path as hand_thumbnail_path,
+)
 from src.config import CFG
 from src.bvh import parse_bvh
 from src.logging_setup import (configure_logging, log_error, log_info,
@@ -42,11 +52,16 @@ from src.ops_metrics import COLLECTOR, TASK_ID
 from src.pipeline import Pipeline
 from src.pose_rescue import parse_rescue_request
 from src.library import build_synthetic_index
+from src.library_manifest import (MANIFEST_NAME, LibraryManifestError,
+                                  resolve_library_identity)
 from src.library_source import ensure_library
 from src.pose_model_source import PoseModelFetchError, ensure_pose_model
 from src.refine import (REFINE_CODE_VERSION, REFINE_V2_CODE_VERSION,
                         refine_bvh)
+from src.experimental.body_matching.integrated import VERSION as INTEGRATED_BODY_VERSION
 from src.refine_policy import structural_refine_allowed
+from src.refine_projection import ProjectionDomainError, VERSION as REFINE_PROJECTION_VERSION
+from src.pose_catalog import build_catalog, folders as pose_catalog_folders, page as pose_catalog_page
 from src.pose_quarantine import (load_pose_quarantine, pose_quarantine_sha256,
                                  quarantine_record)
 from src.repo import (FEATURE_VERSION, build_db, load_entries,
@@ -66,9 +81,14 @@ from src.runtime_guard import (
     ensure_production_backends,
 )
 from api.models import (CutResultOut, PersonOut, CandidateOut, SkeletonOut,
+                        SemanticCandidateOut,
                         ImageInfoOut, InferenceMetadataOut,
                         RefineRequest, RefineResponse, RefineThumbnailOut,
                         ExportOrderRequest, ExportOrder, ExportItem)
+from api.candidate_presentation import candidate_camera, refine_in_camera
+from api.semantic_text import SemanticTextRequest, SemanticTextResponse, search_text, semantic_text_ready
+from api.pose_presentation import PreviewAssetOut, build_pose_presentation
+from api.hand_skin_middleware import HandSkinMiddleware
 
 # uvicorn이 자기 로깅을 세운 뒤 이 모듈을 import한다. 여기서 덮어써야 로그가
 # JSON 한 종류로 남는다(그대로 두면 uvicorn 형식과 우리 형식이 섞인다).
@@ -114,6 +134,54 @@ def _ensure_db():
         build_db(build_synthetic_index(), DB_PATH)
 
     return load_entries(DB_PATH)
+
+
+def _resolve_library_identity() -> dict:
+    """번들의 library_manifest.json으로 응답에 실을 라이브러리 버전을 정한다.
+
+    S3 key와 POSE_LIBRARY_VERSION env가 고정("v1")이라, 이것 없이는 어느 번들이 답했는지
+    BFF가 알 수 없다. manifest는 poses.db와 같은 번들 루트에 있다.
+      · 있고 poses.db와 맞으면 그 버전(lib-YYYYMMDD-<hash8>)을 쓴다.
+      · 없으면 env를 쓴다 — manifest 없는 옛 번들로 롤백해도 기동은 된다.
+      · 있는데 맞지 않으면 프로덕션은 기동을 막는다. 틀린 버전을 내보내면 전후 측정이
+        엉뚱한 번들에 귀속된다. 개발은 경고 후 env로 폴백한다.
+    내용 전체 해시는 배포 검증기가 업로드 전에 이미 확인하므로 여기서는 DB 해시만 본다.
+    """
+    root = os.path.dirname(os.path.abspath(DB_PATH))
+    try:
+        identity = resolve_library_identity(
+            root, fallback_version=CFG.pose_library_version,
+            strict=CFG.is_production, check_content=False,
+        )
+    except LibraryManifestError as exc:
+        raise StartupError(f"{MANIFEST_NAME}이 번들과 맞지 않습니다: {exc}") from exc
+    if identity.source == "env" and os.path.exists(os.path.join(root, MANIFEST_NAME)):
+        log_warn("pose_library", "library manifest가 번들과 맞지 않아 env 버전을 씁니다",
+                 errorCode="LIBRARY_MANIFEST_MISMATCH", libraryVersion=identity.version)
+    CFG.pose_library_version = identity.version
+    return identity.to_dict()
+
+
+def _pose_model_version() -> str:
+    """어느 추출 모델이 답했는지. 라이브러리 버전과 같은 역할을 모델 쪽에서 한다.
+
+    예전에는 `POSE_MODEL_VERSION` env가 없으면 `runtime-default`라는 상수가 나갔다. 그
+    값으로는 "모델을 바꿨더니 추출이 나아졌나"를 되짚을 수 없다 — 실제로 staging에서
+    cascade가 도는 동안에도 기록에는 `runtime-default`만 남았다(2026-10-08).
+
+    번들을 받아 왔으면 그 정체(`model_id@build_id`)를 쓴다. 없으면 적어도 어떤 변이로
+    설정됐는지는 남긴다. env는 명시적 덮어쓰기로 그대로 존중한다.
+    """
+    override = os.getenv("POSE_MODEL_VERSION")
+    if override:
+        return override
+    bundle = STATE.get("pose_model_bundle") or {}
+    model_id, build_id = bundle.get("model_id"), bundle.get("build_id")
+    if model_id and build_id:
+        return f"{model_id}@{build_id}"
+    if model_id:
+        return str(model_id)
+    return CFG.pose_model_variant
 
 
 def _ensure_pose_model_bundle():
@@ -162,8 +230,10 @@ def _check_backends(pipeline: Pipeline) -> None:
 async def lifespan(app: FastAPI):
     try:
         entries = _ensure_db()                      # 1회 로드
+        library_identity = _resolve_library_identity()  # 응답에 실을 번들 버전
         model_bundle = _ensure_pose_model_bundle()  # S3 bundle → local manifest
-        pipeline = Pipeline(entries)                # VLM/검출/포즈 팩토리도 1회 초기화
+        from src.fullbody_routing import build_api_pipeline
+        pipeline = build_api_pipeline(entries, db_path=DB_PATH)
         _check_backends(pipeline)                   # 팩토리 폴백 후 실제 인스턴스 검사
         # production에서 converter 주소가 없으면 여기서 기동이 실패한다(옛 마네킹을
         # 조용히 서빙하지 않는다). 개발은 경고 후 마네킹으로 폴백한다.
@@ -195,6 +265,7 @@ async def lifespan(app: FastAPI):
     STATE["quarantined_pose_count"] = len(quarantine)
     STATE["pipeline"] = pipeline
     STATE["db_path"] = DB_PATH
+    STATE["pose_library"] = library_identity
     STATE["pose_count"] = len(entries)
     STATE["quarantined_pose_count"] = len(quarantine)
     STATE["provider"] = actual_vlm
@@ -220,7 +291,9 @@ async def lifespan(app: FastAPI):
     alerts.flush()
 
 
-app = FastAPI(title="Standin Pose Pipeline", version="0.2.1", lifespan=lifespan)
+app = FastAPI(title="Standin Pose Pipeline", version="0.2.2", lifespan=lifespan)
+if CFG.hand_skin_screen_concurrency == 2:
+    app.add_middleware(HandSkinMiddleware)
 
 
 def _refine_capability() -> dict:
@@ -238,6 +311,7 @@ def _refine_capability() -> dict:
         REFINE_V2_CODE_VERSION if CFG.refine_v2_enabled else REFINE_CODE_VERSION
     )
     identity = {
+        'projection_version': REFINE_PROJECTION_VERSION,
         "code_version": code_version,
         "feature_version": FEATURE_VERSION,
         "pose_library_version": CFG.pose_library_version,
@@ -345,6 +419,17 @@ async def request_context(request: Request, call_next):
         request_id_var.reset(token)
 
 
+@app.post("/semantic-search", response_model=SemanticTextResponse,
+          responses={503: {"model": SemanticTextResponse}, 500: {"model": SemanticTextResponse}})
+def semantic_search_route(req: SemanticTextRequest):
+    status, result = search_text(req, STATE.get("pipeline"), STATE.get("pose_library"))
+    # Never log the sentence, parsed concepts or full backend exception text.
+    log_info("semantic_search", status=result.status, httpStatus=status,
+             candidateCount=len(result.candidates), backend=result.backend,
+             elapsedMs=round(result.elapsed_ms, 2))
+    return JSONResponse(status_code=status, content=result.model_dump())
+
+
 @app.get("/healthz")
 def healthz():
     # 라이브러리가 비면 후보를 하나도 못 내므로 healthy로 보고하지 않는다.
@@ -352,6 +437,8 @@ def healthz():
     pose_count = STATE.get("pose_count", 0)
     capability = _refine_capability()
     ok = "pipeline" in STATE and pose_count > 0 and capability["config_valid"]
+    engine = getattr(STATE.get('pipeline'), '_fullbody_search', None)
+    camera = getattr(engine, 'camera', None)
     body = {
         "ok": ok,
         "env": CFG.app_env,
@@ -359,6 +446,20 @@ def healthz():
         "pose_backend": STATE.get("pose_backend", CFG.pose_backend),
         "pose_count": pose_count,
         "quarantined_pose_count": STATE.get("quarantined_pose_count", 0),
+        # 어느 번들이 떠 있는지: version·source(manifest|env)·content_sha256·db_sha256
+        "pose_library": STATE.get("pose_library"),
+        "semantic_text": {"ready": semantic_text_ready(STATE.get("pipeline"))},
+        # Actual initialized engine, not an environment flag. No model API call.
+        "dynamic_routing": {
+            "enabled": engine is not None,
+            "camera_count": len(getattr(camera, 'cameras', [])),
+            "camera_pose_count": len(getattr(camera, 'pose_ids', [])),
+            "semantic_backend": getattr(getattr(engine, 'semantic', None), 'backend', None),
+            "hand_skin_screen_required": getattr(engine, 'hand_skin_gate', None) is not None,
+            "ranking": getattr(engine, 'ranking', None),
+            "semantic_weight": getattr(engine, 'semantic_weight', None),
+            "geometry_weight": getattr(engine, 'geometry_weight', None),
+        },
         "refine": capability,
         "refine_thumbnail": {
             "renderer": getattr(STATE.get("thumbnail_renderer"), "name", None),
@@ -406,6 +507,14 @@ class _HintImg(str):
 # 우리가 더 두드리게 되고, 너무 길면 이미 풀린 뒤에도 사용자를 기다리게 한다.
 VLM_RETRY_AFTER_SECONDS = 30
 
+_VLM_FAILURE_MESSAGES = {
+    "rate_limited": "AI 분석 요청 한도에 일시적으로 도달했습니다. 잠시 후 다시 시도해 주세요.",
+    "daily_quota_exhausted": "AI 분석의 일일 사용 한도가 소진됐습니다. 한도 초기화 또는 운영자 확인이 필요합니다.",
+    "upstream_unavailable": "AI 분석 서비스가 일시적으로 혼잡하거나 이용 불가 상태입니다. 잠시 후 다시 시도해 주세요.",
+    "timeout": "AI 분석 응답 시간이 초과됐습니다. 잠시 후 다시 시도해 주세요.",
+    "upstream_error": "AI 분석 서비스에 일시적인 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+}
+
 
 def _vlm_unavailable_response(exc: VLMUnavailable) -> HTTPException:
     """상류 VLM 혼잡 → 503.
@@ -417,15 +526,23 @@ def _vlm_unavailable_response(exc: VLMUnavailable) -> HTTPException:
 
     오류 본문은 앱 서버(BFF)가 자기 오류 봉투로 옮겨 담는다(docs/API_CONTRACT.md §7).
     """
+    from math import ceil
+
+    reason = exc.reason if exc.reason in _VLM_FAILURE_MESSAGES else "upstream_error"
+    retryable = reason != "daily_quota_exhausted"
+    retry_after = max(VLM_RETRY_AFTER_SECONDS, ceil(exc.retry_after_seconds or 0)) if retryable else None
+    message = _VLM_FAILURE_MESSAGES[reason]
     log_warn("vlm_unavailable", "상류 VLM이 응답하지 못해 분석을 중단했다",
              route="/analyze", errorCode="VLM_UNAVAILABLE",
+             failureReason=reason, retryable=retryable, retryAfterSeconds=retry_after,
              upstreamStatus=exc.status, attempts=exc.attempts,
              elapsedMs=round(exc.elapsed_seconds * 1000))
     alerts.notify(
         "P2", "VLM_UNAVAILABLE",
-        "VLM 상류 혼잡으로 분석 요청이 실패했습니다. 사용자에게는 재시도 안내가 나갑니다.",
-        key="P2:vlm_unavailable",
+        message,
+        key=f"P2:vlm_unavailable:{reason}",
         context={"상류 상태": exc.status or "timeout", "시도": exc.attempts,
+                 "원인": reason, "재시도 가능": retryable,
                  "소요(초)": round(exc.elapsed_seconds, 1),
                  "모델": CFG.gemini_model},
     )
@@ -433,11 +550,69 @@ def _vlm_unavailable_response(exc: VLMUnavailable) -> HTTPException:
         status_code=503,
         detail={
             "code": "VLM_UNAVAILABLE",
-            "message": "분석 서버가 일시적으로 혼잡합니다. 잠시 후 다시 시도해 주세요.",
-            "retry_after_seconds": VLM_RETRY_AFTER_SECONDS,
+            "message": message,
+            "reason": reason,
+            "retryable": retryable,
+            "retry_after_seconds": retry_after,
         },
-        headers={"Retry-After": str(VLM_RETRY_AFTER_SECONDS)},
+        headers={"Retry-After": str(retry_after)} if retry_after is not None else {},
     )
+
+
+def _routing_fields(res, index: int) -> dict:
+    """라우팅이 꺼져 있으면 빈 dict → 새 필드는 기본값(빈 목록·null) 그대로."""
+    routes = getattr(res, "person_routing", None) or []
+    if index >= len(routes) or routes[index] is None:
+        return {}
+    semantic = getattr(res, "person_semantic_candidates", None) or []
+    hits = semantic[index] if index < len(semantic) and semantic[index] else []
+    report = routes[index].get("fullbody_search")
+    presentation = None
+    if report is not None:
+        from src.body_scope import mesh_scope
+        descriptor = res.descriptors[index]
+        presentation = build_pose_presentation(report,
+            person_index=index,
+            output_scope=mesh_scope(descriptor.output_scope.detected),
+            resolve_library=_library_preview_asset)
+        log_info("pose_presentation", status=presentation.status,
+            searchStatus=presentation.search_status,
+            libraryCount=len(presentation.library_candidates),
+            reviewCount=len(presentation.review_candidates),
+            generatedCount=len(presentation.generated_candidates),
+            issues=",".join(presentation.issues) or None)
+    return {
+        "search_routing": routes[index],
+        "dynamic_search": report,
+        "pose_presentation": presentation,
+        "semantic_candidates": [SemanticCandidateOut(**hit) for hit in hits],
+    }
+
+
+def _library_preview_asset(pose_id: str):
+    """Same lookup/quarantine policy as download; bind viewer bytes, not export."""
+    from pathlib import Path
+    from urllib.parse import quote
+    import sqlite3
+    try:
+        response = get_pose_bvh(pose_id)
+        with Path(response.path).open("rb") as stream:
+            data = stream.read(8_000_001)
+        if not data or len(data) > 8_000_000:
+            raise ValueError("preview_asset_size")
+        # The search index and registry must refer to the same BVH bytes.
+        engine = getattr(STATE.get("pipeline"), "_fullbody_search", None)
+        expected = getattr(getattr(engine, "camera", None), "hashes", {}).get(pose_id)
+        digest = hashlib.sha256(data).hexdigest()
+        if expected is not None and expected != digest:
+            raise ValueError("preview_asset_changed")
+        thumb = thumbnail_url(CFG.data_dir, pose_id, "front")
+        return PreviewAssetOut(transport="library_bvh",
+            bvh_url=f"/pose/{quote(pose_id, safe='')}/bvh", bvh_sha256=digest,
+            library_lookup_supported=True, thumbnail_url=thumb,
+            thumbnail_view="front" if thumb else None)
+    except (HTTPException, KeyError, sqlite3.Error) as exc:
+        raise ValueError("preview_asset_unavailable") from exc
 
 
 @app.post("/analyze", response_model=CutResultOut)
@@ -496,6 +671,7 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
                 tags=c.tags, rerank_score=c.rerank_score,
                 bvh_url=f"/pose/{c.pose_id}/bvh",
                 thumbnail_url=thumbnail_url(CFG.data_dir, c.pose_id, c.view.value),
+                camera=candidate_camera(STATE.get("db_path"), c, desc),
             ) for c in cands],
             # 이미 추출한 스켈레톤을 실어 보낸다(연산 추가 0) → /refine이 순수 함수가 된다.
             keypoints=np.asarray(skel.keypoints, dtype=float).reshape(-1, 2).tolist()
@@ -519,22 +695,32 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
             refine_allowed=desc.refine_allowed,
             quality_trace=desc.quality_trace,
             quality_reasons=desc.quality_reasons,
+            output_scope=asdict(desc.output_scope),
+            person_tags=asdict(desc.person_tags),
+            hands=asdict(desc.hands if desc.hands is not None else default_hands()),
+            **_routing_fields(res, i),
         ))
     vlm_model = (CFG.gemini_model if STATE.get("provider") == "gemini"
                  else CFG.openai_model if STATE.get("provider") == "openai"
                  else "mock")
     return CutResultOut(
+        body_matching=validated_body_sidecar(res.body_matching, people),
         route=res.route, count_confidence=res.count_confidence,
         detector_count=res.detector_count, vlm_count=res.vlm_count,
         people=people, notes=res.notes,
+        vlm_tags=getattr(res, "vlm_tags", None),
+        search_routing=getattr(res, "routing_summary", None),
         image=ImageInfoOut(width=w, height=h),
         inference_metadata=InferenceMetadataOut(
             deployment_version=CFG.deployment_version,
             vlm_provider=STATE.get("provider", CFG.vlm_provider),
             vlm_model=vlm_model,
+            vlm_prompt_version=CFG.vlm_prompt_version,
+            vlm_body_prompt_version=(INTEGRATED_BODY_VERSION if CFG.body_matching_mode != "off" and CFG.body_classification_strategy == "integrated" else None),
             pose_backend=STATE.get("pose_backend", CFG.pose_backend),
-            pose_model_version=os.getenv("POSE_MODEL_VERSION", "runtime-default"),
+            pose_model_version=_pose_model_version(),
             pose_library_version=CFG.pose_library_version,
+            pose_library_sha256=(STATE.get("pose_library") or {}).get("content_sha256"),
             feature_version=FEATURE_VERSION,
         ),
     )
@@ -561,6 +747,61 @@ def get_pose_bvh(pose_id: str):
                  f"실 라이브러리 빌드 전 단계.")
     return FileResponse(path, media_type="application/octet-stream",
                         filename=f"{pose_id}.bvh")
+
+
+def _pose_catalog():
+    """라이브러리 목록. Pipeline이 바뀌면(번들 교체·재기동) 다시 만든다."""
+    pipeline = STATE.get("pipeline")
+    if pipeline is None:
+        raise HTTPException(503, "library is not loaded")
+    cached = STATE.get("pose_catalog")
+    if cached is None or cached[0] is not pipeline:
+        cached = (pipeline, build_catalog(pipeline.entries))
+        STATE["pose_catalog"] = cached
+    return cached[1]
+
+
+@app.get("/poses/folders")
+def get_pose_folders():
+    """포즈 라이브러리의 출처별·분류별 폴더와 포즈 수(관리자 모아 보기)."""
+    return pose_catalog_folders(_pose_catalog())
+
+
+@app.get("/poses")
+def list_poses(source: str = "", category: str = "", q: str = "", cursor: str = "", limit: int = 48):
+    """포즈 라이브러리 한 페이지. 검색이 쓰는 목록 그대로라 격리된 포즈는 나오지 않는다."""
+    if limit < 1 or limit > 96:
+        raise HTTPException(400, "limit must be between 1 and 96")
+    return pose_catalog_page(_pose_catalog(), source=source or None, category=category or None,
+                             query=q or None, cursor=cursor or None, limit=limit)
+
+
+@app.get("/pose-poster-template/{scope}")
+def get_pose_poster_template(scope: str):
+    """Shared approved human mesh; never starts conversion or grants export."""
+    from src.human_reference import read_template
+    try:
+        data, response_headers = read_template(Path(CFG.data_dir) / "human-templates", scope)
+    except (ValueError, OSError):
+        raise HTTPException(404, "human reference unavailable")
+    return Response(data, headers=response_headers)
+
+
+@app.get("/pose/{pose_id}/poster")
+def get_pose_poster(pose_id: str, source_sha256: str, scope: str = "full"):
+    """Read-only canonical reference; never queues a live model conversion."""
+    from src.pose_posters import poster, headers as poster_headers, digest
+    response = get_pose_bvh(pose_id)  # Existing registration and quarantine guards.
+    if Path(response.path).stat().st_size > 2_000_000:
+        raise HTTPException(404, "poster unavailable")
+    source = Path(response.path).read_bytes()
+    if digest(source) != source_sha256:
+        raise HTTPException(409, "poster source changed")
+    try:
+        image, meta = poster(Path(CFG.data_dir) / "pose-posters", source, scope)
+    except (ValueError, OSError):
+        raise HTTPException(404, "poster unavailable")
+    return Response(image, media_type="image/png", headers=poster_headers(meta))
 
 
 @app.get("/pose/{pose_id}/thumbnail")
@@ -601,6 +842,36 @@ def get_pose_thumbnail(pose_id: str, view: str, request: Request):
             "Cache-Control": "private, max-age=86400",
         },
     )
+
+
+# ---- 손 라이브러리 (04J-290, docs/HAND_SELECTION_API.md) -------------------
+
+@app.get("/hands/catalog")
+def get_hand_catalog():
+    """refine 화면 손 칩용 목록: 묶음·프리셋 이름·설명·썸네일 URL·라이브러리 버전.
+
+    라이브러리는 배포 단위로만 바뀌므로 길게 캐시해도 된다. 버전이 바뀌면 sha가 바뀐다.
+    """
+    catalog = build_hand_catalog()
+    return JSONResponse(catalog, headers={
+        "Cache-Control": "private, max-age=3600",
+        "ETag": f'"{catalog["library_sha256"][:32]}"',
+    })
+
+
+@app.get("/hands/{preset_id}/thumbnail")
+def get_hand_thumbnail(preset_id: str, side: str, request: Request):
+    """프리셋 하나의 마네킹 손 PNG(투명 배경). side는 그 인물 자신의 left/right."""
+    if side not in ("left", "right"):
+        raise HTTPException(400, f"unsupported side: {side}")
+    path = hand_thumbnail_path(preset_id, side)
+    if path is None:
+        raise HTTPException(404, f"hand thumbnail not found: {preset_id} ({side})")
+    etag = hand_thumbnail_etag(preset_id, side)
+    headers = {"ETag": etag, "Cache-Control": "private, max-age=86400"}
+    if request.headers.get("if-none-match") == etag:
+        return Response(status_code=304, headers=headers)
+    return FileResponse(path, media_type="image/png", headers=headers)
 
 
 # ---- 포즈 미세조정 (docs/REFINE_DESIGN.md) --------------------------------
@@ -645,6 +916,7 @@ def _refine_thumbnail(
     bvh_text: Optional[str] = None,
     pose_id: Optional[str] = None,
     refined: Optional[bool] = None,
+    camera_rotation: Optional[list] = None,
 ) -> Optional[RefineThumbnailOut]:
     """Render the selected candidate view without persisting a refined artifact.
 
@@ -660,6 +932,7 @@ def _refine_thumbnail(
     source = ThumbnailSource(
         view=view, bvh_path=bvh_path, bvh_text=bvh_text, pose_id=pose_id,
         refined=(bvh_text is not None) if refined is None else bool(refined),
+        camera_rotation=camera_rotation,
     )
     started = time.monotonic()
     try:
@@ -737,6 +1010,11 @@ def refine(req: RefineRequest):
         raise HTTPException(
             409, f"pose '{req.pose_id}'의 BVH를 파싱할 수 없습니다: {exc}"
         ) from exc
+    if req.camera and req.camera.source_bvh_sha256 != _file_sha256(base):
+        # Also validate before policy/base fallbacks, which can render a preview.
+        raise HTTPException(422, "candidate camera source changed; analyze again")
+    if req.camera and req.camera.version=='candidate-camera-v2' and not CFG.refine_v2_enabled:
+        raise HTTPException(422, 'search camera requires refine v2; use legacy search with refine v1')
 
     def _base_context() -> dict:
         return {
@@ -748,17 +1026,18 @@ def refine(req: RefineRequest):
             "source_revision": SOURCE_REVISION,
         }
 
-    def _base_response(reason: str) -> RefineResponse:
+    def _base_response(reason: str, *, attempted: bool = False) -> RefineResponse:
         return RefineResponse(
             pose_id=req.pose_id, view=req.view, refined=False,
             reason=reason, bvh_url=f"/pose/{req.pose_id}/bvh", bvh=None,
             thumbnail=_refine_thumbnail(
                 view=req.view, bvh_path=base, pose_id=req.pose_id, refined=False,
-            ),
+                camera_rotation=req.camera.rotation if req.camera else None,
+            ) if req.render_thumbnail else None,
             loss_base=None, loss_final=None, gain=None, backend="none",
             refine_version=(REFINE_V2_CODE_VERSION if CFG.refine_v2_enabled
                             else REFINE_CODE_VERSION),
-            refine_outcome="not_attempted",
+            refine_outcome="reverted" if attempted else "not_attempted",
             diagnostics={
                 "mode_requested": mode_requested,
                 "mode_effective": effective_mode,
@@ -815,7 +1094,8 @@ def refine(req: RefineRequest):
     try:
         # out_path=None → 로컬 파일을 쓰지 않는다. selector는 내부 임시파일로 최종
         # 후보를 재검증하고, 채택본의 본문만 응답으로 나간다.
-        res = refine_bvh(base, req.keypoints, req.scores, req.view,
+        res = refine_in_camera(refine_bvh, base, req.keypoints, req.scores, req.view,
+                         camera=req.camera,
                          out_path=None, search_distance=req.search_distance,
                          # 하체 비관측이면 정책 단계에서 이미 걸러낸 목록을 넘긴다.
                          # v2는 내부에서 한 번 더 막지만, REFINE_V2_ENABLED=0으로
@@ -823,6 +1103,8 @@ def refine(req: RefineRequest):
                          allowed_limbs=effective_limbs,
                          lower_body_observed=req.lower_body_observed,
                          refine_mode=effective_mode, deadline=deadline)
+    except ProjectionDomainError:
+        return _base_response('camera_projection_invalid', attempted=True)
     except ValueError as exc:                      # 알 수 없는 view 등
         raise HTTPException(422, str(exc)) from exc
     except (OSError, AssertionError) as exc:
@@ -853,13 +1135,15 @@ def refine(req: RefineRequest):
         refined=res.refined, reason=res.reason,
         bvh_url=f"/pose/{req.pose_id}/bvh",
         bvh=res.bvh_text if res.refined else None,
-        thumbnail=(
+        thumbnail=None if not req.render_thumbnail else (
             _refine_thumbnail(
                 view=req.view, bvh_text=res.bvh_text, pose_id=req.pose_id, refined=True,
+                camera_rotation=req.camera.rotation if req.camera else None,
             )
             if res.refined
             else _refine_thumbnail(
                 view=req.view, bvh_path=base, pose_id=req.pose_id, refined=False,
+                camera_rotation=req.camera.rotation if req.camera else None,
             )
         ),
         loss_base=None if np.isnan(res.loss_base) else res.loss_base,

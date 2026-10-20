@@ -6,7 +6,59 @@ from __future__ import annotations
 
 import math
 from typing import Annotated, List, Literal, Optional
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, computed_field, model_validator
+
+from src.body_scope import BodyScope
+from src.schema import Action, Relationship, Shot, View
+from .body_models import BodyMatchingOut, EmptyBodyMatchingOut
+from .pose_presentation import PosePresentationOut
+
+
+class CandidateCamera(BaseModel):
+    version: Literal["candidate-camera-v1", "candidate-camera-v2"]
+    rotation: List[List[float]]
+    source_bvh_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    reference: Literal["pelvis-torso-yaw", "search-fit"]
+    canonical_yaw: float
+    display_view: Literal["front", "back", "side", "three_quarter"]
+    status: Literal["fitted", "canonical_fallback"]
+    fit_error: float
+    facing_source: Literal["person_observation", "geometry_only"]
+    depth_ambiguous: bool
+    projection: Optional[Literal['orthographic','perspective']] = None
+    distance_torso: Optional[float] = None
+    labels_swapped: Optional[bool] = Field(None, strict=True)
+    pose_id: Optional[str] = None
+    query_sha256: Optional[str] = Field(None, pattern=r'^[a-f0-9]{64}$')
+    observed_joint_mask: Optional[Annotated[List[bool], Field(min_length=17,max_length=17)]] = None
+
+    @model_validator(mode='after')
+    def _projection_contract(self):
+        if self.version == 'candidate-camera-v1':
+            if (self.reference != 'pelvis-torso-yaw' or any(v is not None for v in (
+                    self.projection,self.distance_torso,self.labels_swapped,self.pose_id,
+                    self.query_sha256,self.observed_joint_mask))):
+                raise ValueError('v1 camera cannot carry a search projection')
+        else:
+            if (self.reference!='search-fit' or self.projection is None or self.labels_swapped is None
+                    or not self.pose_id or self.query_sha256 is None or self.observed_joint_mask is None):
+                raise ValueError('v2 search camera requires complete projection/label binding')
+            if self.projection=='perspective':
+                if self.distance_torso is None or not math.isfinite(self.distance_torso) or self.distance_torso<.8:
+                    raise ValueError('finite positive perspective torso distance required')
+            elif self.distance_torso is not None:
+                raise ValueError('orthographic camera must not carry a distance')
+            if (not math.isfinite(self.fit_error) or self.fit_error<0
+                    or not all(self.observed_joint_mask[i] for i in (5,6,11,12))
+                    or sum(self.observed_joint_mask[5:])<6):
+                raise ValueError('invalid search camera observation/fit')
+        return self
+
+    @field_validator("rotation", mode="before")
+    @classmethod
+    def _rotation(cls, value):
+        from converter.camera import validate_rotation
+        return validate_rotation(value)
 
 
 class CandidateOut(BaseModel):
@@ -17,6 +69,7 @@ class CandidateOut(BaseModel):
     rerank_score: Optional[float] = None
     bvh_url: str = Field(..., description="동원 내보내기 팀이 받는 라이브러리 BVH 다운로드 경로")
     thumbnail_url: Optional[str] = Field(None, description="후보 시점 PNG 썸네일의 내부 다운로드 경로")
+    camera: Optional[CandidateCamera] = None
 
 
 Point2D = Annotated[List[float], Field(min_length=2, max_length=2)]
@@ -39,10 +92,136 @@ class InferenceMetadataOut(BaseModel):
     deployment_version: str
     vlm_provider: str
     vlm_model: str
+    # 어느 VLM 프롬프트가 답했는지(src/vlm/prompts.py의 USER_TEMPLATES 키).
+    vlm_prompt_version: Optional[str] = None
+    vlm_body_prompt_version: Optional[str] = None
     pose_backend: str
     pose_model_version: str
+    # 번들 library_manifest.json의 버전(lib-YYYYMMDD-<hash8>). manifest 없는 번들이면 env 값.
     pose_library_version: str
     feature_version: int
+    # 번들 내용 해시. manifest 없는 번들이면 null.
+    pose_library_sha256: Optional[str] = None
+
+
+class ScopeDetectionOut(BaseModel):
+    detected: Optional[BodyScope] = None
+    # observed_legs: VLM은 half/bust였지만 화면 안 무릎이 관측돼 full로 올린 값.
+    source: Literal["vlm_person", "vlm_description", "legacy_shot", "observed_legs", "unknown"] = "unknown"
+
+    @computed_field
+    @property
+    def mesh_scope(self) -> Optional[str]:
+        from src.body_scope import mesh_scope
+        return mesh_scope(self.detected)
+
+
+class PersonTagsOut(BaseModel):
+    """인물별 관측 태그. 검색에는 미사용; view는 API의 표시 카메라 제약에만 사용."""
+    action: Optional[Action] = None
+    view: Optional[View] = None
+    source: Literal["vlm_person", "legacy_cut", "unknown"] = "unknown"
+
+
+class HandChoiceOut(BaseModel):
+    """한 손의 자동 선택과 후보(04J-290). preset을 converter의 hand_left/hand_right로 넘기면
+    그 손 모양이 FBX에 구워진다."""
+    preset: str = Field("relaxed", description="FBX에 구울 손 프리셋 id")
+    source: Literal["vlm", "default"] = Field(
+        "default", description="vlm=러프에서 읽음 · default=안 보이거나 못 읽어 기본값")
+    confidence: Optional[Literal["high", "low"]] = Field(
+        None, description="VLM 확신도. low면 후보를 먼저 보여 주는 것을 권장")
+    visible: Optional[bool] = Field(None, description="러프에 그 손이 그려져 있는지. null=모름")
+    candidates: List[str] = Field(
+        default_factory=list, description="사용자가 고를 손 후보(앞일수록 유력, 최대 4)")
+
+
+class PersonHandsOut(BaseModel):
+    """인물 자신의 왼손/오른손(화면 좌우 아님). 검색·refine에는 쓰지 않는다."""
+    left: HandChoiceOut = Field(default_factory=HandChoiceOut)
+    right: HandChoiceOut = Field(default_factory=HandChoiceOut)
+    library_version: str = ""
+    status: Literal["vlm", "not_requested", "unavailable"] = "not_requested"
+
+
+class VlmTagsOut(BaseModel):
+    """VLM이 컷에 대해 실제로 말한 태그. people[].tags와 달리 잘못된 값을 기본값으로 채우지 않는다."""
+    shot: Optional[Shot] = None
+    action: Optional[Action] = None
+    view: Optional[View] = None
+    relationship: Optional[Relationship] = None
+
+
+class SemanticCandidateOut(BaseModel):
+    """시맨틱 경로 후보(04J-286). 기하 candidates와 의미가 달라 별도 칸에 싣는다.
+
+    score는 태그·관찰 몸 배치·문장 점수(클수록 가까움)이며 기하 distance와 비교할 수 없다.
+    관절 근거가 부족한 인물의 참고 후보이므로 refine 대상이 아니다.
+    """
+    pose_id: str
+    score: float
+    matched: dict = Field(default_factory=dict)
+    pose: dict = Field(default_factory=dict, description="해당 포즈 JSON(태그·설명·bvh_url)")
+
+
+class WholePoseCandidateOut(BaseModel):
+    pose_id: str
+    kind: Literal["library_original"] = "library_original"
+    library_source: Optional[str] = Field(None, description="저장 포즈 출처. generated_composition도 전신 검색 후보이며 이번 요청에서 합성하지 않음")
+    rank_score: float
+    evidence: dict = Field(default_factory=dict)
+    core_conditions: Optional[dict] = None
+    camera: Optional[dict] = None
+    semantic_preview_camera: Optional[dict] = None
+    family: str
+    lookup_allowed: Literal[True] = True
+    refine_allowed: Literal[False] = False
+    release_allowed: Literal[False] = False
+    actual_mesh_validated: Literal[False] = False
+    pose_detail_fit: Optional[dict] = None
+    match_level: Optional[str] = None
+    hand_skin_screen: Optional[dict] = Field(None,
+        description="실제 FBX 손 피부 검사 또는 확실한 head의 not_applicable 생략 기록. 메시 안전 인증은 아님")
+    review_required: bool = False
+    not_exact_match: bool = False
+    constraints_satisfied: Optional[bool] = None
+
+    @model_validator(mode="after")
+    def review_geometry_is_never_a_qualified_match(self):
+        if self.match_level == "geometry_fallback":
+            if not self.review_required or not self.not_exact_match or self.constraints_satisfied is not False:
+                raise ValueError("geometry_fallback_requires_explicit_review_flags")
+            if not self.evidence.get("geometry"):
+                raise ValueError("geometry_fallback_requires_geometry_evidence")
+        return self
+
+
+class DynamicSearchOut(BaseModel):
+    version: Literal["fullbody-dynamic-v1"]
+    route: Literal["hybrid", "geometric", "semantic", "undetermined", "error", "basic_model"]
+    status: Literal["ok", "no_result", "error", "partial_error", "undetermined", "blocked", "not_run"]
+    selected: List[WholePoseCandidateOut] = Field(default_factory=list, max_length=5)
+    near_candidates: List[dict] = Field(default_factory=list, max_length=5,
+        description="핵심 동작은 맞지만 무릎·다리 세부가 다르거나 미확인인 검수 참고. selected와 분리")
+    framing_references: List[dict] = Field(default_factory=list, max_length=5,
+        description="중립 머리·어깨 구도 참고. 검색 정답·생성 성공이 아니며 selected와 분리")
+    geometry_review_fallback: Optional[dict] = None
+    branches: dict = Field(default_factory=dict)
+    generation: Optional[dict] = None
+    basic_model: Optional[dict] = Field(None,description="명시적 머리·어깨 컷의 기본 인체 출력 계획. 검색·생성 후보와 구분")
+    geometry_evidence: dict = Field(default_factory=dict)
+    description_evidence: dict = Field(default_factory=dict)
+    composition_enabled: Literal[False] = False
+    stored_compositions_included: bool = True
+    split_search_enabled: Literal[False] = False
+    ranking: str
+    condition_ranking: Optional[str] = None
+    candidate_validation: Optional[dict] = None
+    hand_skin_screen: Optional[dict] = Field(None,
+        description="실제 FBX 손 검사·탈락·미확인 또는 head 생략(checks=0, not_applicable). 안전 인증은 아님")
+    rank_score_is_accuracy: Literal[False] = False
+    reason: Optional[str] = None
+    elapsed_ms: float
 
 
 class PersonOut(BaseModel):
@@ -51,6 +230,10 @@ class PersonOut(BaseModel):
     tags: dict
     skeleton: Optional[SkeletonOut] = None
     candidates: List[CandidateOut]
+    dynamic_search: Optional[DynamicSearchOut] = Field(
+        None, description="전신 동적 라우팅의 단일 Top5. 원본 selected와 검수용 generation은 분리")
+    pose_presentation: Optional[PosePresentationOut] = Field(None,
+        description="BFF·앱 표시용 동적라우팅 결과. 검색/근접/생성 검수 분리, 미리보기 BVH와 상태. export 허가 아님")
     # /refine을 '순수 함수'로 만들기 위한 필드(docs/REFINE_DESIGN.md).
     # /analyze가 이미 추출한 값을 실어 보낼 뿐이라 연산 추가는 0이다.
     # 클라이언트는 이 두 값을 그대로 POST /refine에 되돌려주면 된다
@@ -67,7 +250,7 @@ class PersonOut(BaseModel):
     skeleton_source: str = Field(
         "full_image", description="none | full_image | crop_retry")
     coverage_class: str = Field(
-        "full", description="full | reduced | sparse | insufficient")
+        "full", description="full | reduced | sparse | upper_only | insufficient")
     slot_origin: str = Field("vlm", description="vlm | rtm_provisional")
     search_stability: Optional[str] = Field(
         None, description="stable | ambiguous | unstable | not_required | not_available")
@@ -84,9 +267,21 @@ class PersonOut(BaseModel):
     refine_allowed: bool = False
     quality_trace: dict = Field(default_factory=dict)
     quality_reasons: List[str] = Field(default_factory=list)
+    output_scope: ScopeDetectionOut = Field(default_factory=ScopeDetectionOut)
+    person_tags: PersonTagsOut = Field(default_factory=PersonTagsOut)
+    hands: PersonHandsOut = Field(default_factory=PersonHandsOut)
+    # ---- 04J-286 러프함 기반 경로(SEARCH_ROUTING=1일 때만 채워진다) ----
+    semantic_candidates: List[SemanticCandidateOut] = Field(
+        default_factory=list,
+        description="route=semantic일 때 시맨틱 검색 후보. 기존 candidates와 별개")
+    search_routing: Optional[dict] = Field(
+        None,
+        description=("인물별 선택 경로(geometric|semantic|undetermined|error), 분기 사유와 "
+                     "판정 수치·기준값, 검색 상태(ok|no_result|error|not_run), 처리 시간"))
 
 
 class CutResultOut(BaseModel):
+    body_matching: BodyMatchingOut | EmptyBodyMatchingOut = Field(default_factory=EmptyBodyMatchingOut)
     route: str = Field(..., description="core | bust | skip")
     count_confidence: str = Field(..., description="high(개수 일치) | low(불일치→폴백) | n/a")
     detector_count: int
@@ -95,12 +290,17 @@ class CutResultOut(BaseModel):
     notes: List[str] = []
     image: ImageInfoOut
     inference_metadata: InferenceMetadataOut
+    vlm_tags: Optional[VlmTagsOut] = None
+    search_routing: Optional[dict] = Field(
+        None, description="컷 단위 라우팅 요약(자세 설명 호출 상태·시간). 끄면 null")
 
 
 # ==== 포즈 미세조정 (docs/REFINE_DESIGN.md) ================================
 # 작가가 Top-K 중 '고른 1개'만 러프에 맞춰 조정한다. 계산은 커밋된 포즈에만 든다.
 
 class RefineRequest(BaseModel):
+    render_thumbnail: bool = True
+    camera: Optional[CandidateCamera] = None
     pose_id: str = Field(..., description="작가가 고른 후보의 pose_id")
     view: Literal["front", "three_quarter", "side", "back"] = Field(
         ..., description="그 후보의 view(=매칭된 투영 각도)")
@@ -150,6 +350,19 @@ class RefineRequest(BaseModel):
         if not all(math.isfinite(float(number)) for point in value for number in point):
             raise ValueError("keypoints must contain only finite values")
         return value
+
+    @model_validator(mode='after')
+    def _search_camera_binding(self):
+        is_search = self.camera is not None and self.camera.version=='candidate-camera-v2'
+        if self.distance_metric=='perspective_pos' and not is_search:
+            raise ValueError('perspective search refine requires its v2 camera')
+        if is_search:
+            from src.refine_projection import query_sha256
+            if self.camera.pose_id!=self.pose_id or self.camera.query_sha256!=query_sha256(self.keypoints):
+                raise ValueError('search camera belongs to another candidate/query')
+            if self.scores is None or any(s>=.3 and not m for s,m in zip(self.scores,self.camera.observed_joint_mask)):
+                raise ValueError('refine must not invent unobserved search joints')
+        return self
 
     @field_validator("scores")
     @classmethod

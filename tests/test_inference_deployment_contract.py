@@ -6,15 +6,19 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_deploy_defaults_to_full_cascade_with_strict_startup():
+def test_deploy_selects_explicit_routing_model_contract_with_strict_startup():
     workflow = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(
         encoding="utf-8"
     )
 
     assert "APP_ENV=production" in workflow
     assert "POSE_BACKEND=rtmlib" in workflow
-    assert "vars.POSE_MODEL_VARIANT || 'cascade'" in workflow
-    assert "vars.POSE_CANARY_STAGE || 'canary-100'" in workflow
+    assert "prepare_fullbody_deployment.py" in workflow
+    assert "github.ref == 'refs/heads/develop' && '1' || '0'" in workflow
+    assert 'REQUESTED_POSE_VARIANT: ${{ vars.POSE_MODEL_VARIANT }}' in workflow
+    assert 'REQUESTED_CANARY_STAGE: ${{ vars.POSE_CANARY_STAGE }}' in workflow
+    # Never overwrite the prepared humanart-m contract with the old cascade default.
+    assert 'POSE_MODEL_VARIANT=${{' not in workflow
     assert "POSE_STRICT=1" in workflow
 
 
@@ -53,3 +57,31 @@ def test_pose_bundle_runtime_stays_exactly_pinned():
             f"{package}는 번들 manifest의 runtime과 완전일치해야 한다. "
             f"범위 핀은 재빌드만으로 cascade 기동을 깬다: {line!r}"
         )
+
+
+def test_render_step_environment_block_holds_only_assignments():
+    """`environment-variables: |` 블록의 줄은 모두 KEY=VALUE여야 한다.
+
+    YAML 블록(|) 안의 #은 주석이 아니라 값이다. 2026-10-06에 VLM_PROMPT_VERSION 설명을
+    블록 안에 주석으로 적었다가, 렌더 액션이 그 줄을 환경 변수로 읽지 못해 staging 배포가
+    실패했다(c84dd34).
+    """
+    import re
+
+    lines = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(
+        encoding="utf-8"
+    ).splitlines()
+    start = next(i for i, line in enumerate(lines)
+                 if line.strip() == "environment-variables: |")
+    indent = len(lines[start]) - len(lines[start].lstrip())
+    block = []
+    for line in lines[start + 1:]:
+        if line.strip() and len(line) - len(line.lstrip()) <= indent:
+            break
+        if line.strip():
+            block.append(line.strip())
+
+    assert block
+    assert [line for line in block
+            if not re.match(r"^[A-Z_][A-Z0-9_]*=", line)] == []
+    assert "VLM_PROMPT_VERSION=${{ vars.VLM_PROMPT_VERSION || 'p1-scope' }}" in block

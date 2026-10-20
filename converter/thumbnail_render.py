@@ -3,10 +3,8 @@
 Blender 자식 프로세스 안에서만 실행된다. ``bpy``/``mathutils``는 함수 안에서
 import하므로 HTTP 프로세스가 이 모듈을 import해도 Blender에 의존하지 않는다.
 
-카메라·조명·재질·배경은 ``qa/retarget/CHAIN_TRANSPORT_V3_2_RELATIVE_MESH_QA/tools/
-render_manifest_fronts.py::_render_view``와 같다 — 2026-09-03 라이브러리 번들이 그
-코드로 만들어졌으므로, 여기서 값을 바꾸면 refine preview와 후보 썸네일의 그림이
-달라진다. 바꿔야 한다면 라이브러리 썸네일도 함께 다시 굽는다.
+카메라는 anatomical 기준을 유지한다. 조명·재질·배경은 preview_style의
+밝고 부드러운 라이브러리 스타일을 사용하며 리그·출력 FBX는 변경하지 않는다.
 """
 
 from __future__ import annotations
@@ -203,48 +201,8 @@ def _stage_scene(view: str, resolution: int) -> dict[str, Any]:
     )
     bpy.context.scene.camera = camera
 
-    material = bpy.data.materials.get("QA_NEUTRAL_MATERIAL")
-    if material is None:
-        material = bpy.data.materials.new("QA_NEUTRAL_MATERIAL")
-    material.use_nodes = True
-    principled = material.node_tree.nodes.get("Principled BSDF")
-    if principled is None:
-        raise ThumbnailRenderError("Principled BSDF node is unavailable")
-    principled.inputs["Base Color"].default_value = (0.20, 0.22, 0.26, 1.0)
-    principled.inputs["Roughness"].default_value = 0.78
-    for mesh in meshes:
-        mesh.data.materials.clear()
-        mesh.data.materials.append(material)
-
-    radius = max(size.length, 1.0)
-    bpy.ops.object.light_add(
-        type="AREA",
-        location=center + (screen_right * 0.8 + up * 1.0 + view_axis * 1.2) * radius,
-    )
-    key = bpy.context.object
-    key.name = "QA_VIEW_KEY"
-    key.data.energy = 500.0
-    key.data.shape = "DISK"
-    key.data.size = radius * 0.8
-    _point_at(key, center, up)
-    bpy.ops.object.light_add(
-        type="AREA",
-        location=center + (-screen_right * 0.9 + up * 0.35 + view_axis * 0.5) * radius,
-    )
-    fill = bpy.context.object
-    fill.name = "QA_VIEW_FILL"
-    fill.data.energy = 110.0
-    fill.data.size = radius
-    _point_at(fill, center, up)
-
-    world = bpy.context.scene.world or bpy.data.worlds.new("QA_FRONT_WORLD")
-    bpy.context.scene.world = world
-    world.use_nodes = True
-    background = world.node_tree.nodes.get("Background")
-    if background is None:
-        raise ThumbnailRenderError("world Background node is unavailable")
-    background.inputs["Color"].default_value = (0.62, 0.62, 0.62, 1.0)
-    background.inputs["Strength"].default_value = 0.55
+    from converter.preview_style import configure_surface
+    configure_surface(bpy.context.scene, meshes)
 
     scene = bpy.context.scene
     scene.render.resolution_x = resolution

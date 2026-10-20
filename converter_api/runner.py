@@ -41,6 +41,8 @@ from converter.protocol import (
     THUMBNAIL_RENDER_SAMPLES,
     THUMBNAIL_VIEWS,
 )
+from converter.framing import FRAMING_VERSION, PREVIEW_VIEWS, validate_scope
+from converter_api.work_queue import PrioritySlots, WorkControl, WorkStopped, current_work
 
 
 class RunnerError(RuntimeError):
@@ -141,12 +143,20 @@ class RunnerSettings:
     timeout_seconds: float = 30.0
     terminate_grace_seconds: float = 2.0
     max_concurrent_processes: int = 1
+    retarget_cache_bytes: int = 0
+    fast_scene_reset: bool = False
+    retarget_cache_ttl_seconds: float = 600.
     temp_root: Path | None = None
     process_env: Mapping[str, str] | None = None
     force_exact_v324: bool = False
     thumbnail_resolution: int = THUMBNAIL_RENDER_RESOLUTION
     thumbnail_samples: int = THUMBNAIL_RENDER_SAMPLES
     thumbnail_engines: tuple[str, ...] = THUMBNAIL_ENGINES
+    camera_timeout_seconds: float = 60.0
+    # A shaped job opens the authoring .blend twice and runs its pose correctives
+    # (contacts/axilla repair). Measured 30-110 s per job on 2 vCPU; keep it separate
+    # from the 30 s budget of plain conversions.
+    shape_timeout_seconds: float = 300.0
 
     @classmethod
     def from_env(cls, repo_root: Path | None = None) -> "RunnerSettings":
@@ -164,6 +174,11 @@ class RunnerSettings:
                 "BLENDER_EXPECTED_BUILD_HASH", EXPECTED_BLENDER_BUILD_HASH
             ),
             timeout_seconds=float(os.getenv("CONVERTER_TIMEOUT_SECONDS", "30")),
+            retarget_cache_bytes=int(os.getenv("CONVERTER_RETARGET_CACHE_BYTES", "0")),
+            retarget_cache_ttl_seconds=float(os.getenv("CONVERTER_RETARGET_CACHE_TTL_SECONDS", "600")),
+            fast_scene_reset=_env_bool("CONVERTER_FAST_SCENE_RESET"),
+            camera_timeout_seconds=float(os.getenv("CONVERTER_CAMERA_TIMEOUT_SECONDS", "60")),
+            shape_timeout_seconds=float(os.getenv("CONVERTER_SHAPE_TIMEOUT_SECONDS", "300")),
             terminate_grace_seconds=float(
                 os.getenv("CONVERTER_TERMINATE_GRACE_SECONDS", "2")
             ),
@@ -203,6 +218,8 @@ class ConversionResult:
     # 썸네일을 요청한 변환에서만 채운다. 원본 렌더 해상도의 PNG 바이트다.
     thumbnail_png: bytes | None = None
     thumbnail_report: dict[str, Any] | None = None
+    preview: bytes = b""
+    preview_model: bytes = b""
 
 
 def sha256_file(path: Path) -> str:
@@ -217,10 +234,18 @@ class BlenderRunner:
     _VERSION_RE = re.compile(r"Blender\s+(\d+\.\d+\.\d+)(?:\s+LTS)?")
     _BUILD_HASH_RE = re.compile(r"(?:build hash:|hash)\s*([0-9a-f]{8,40})", re.I)
 
+    def compose_scene(self, *, manifest, fbx_bytes):
+        from converter_api.scene_runner import compose_scene
+        return compose_scene(self, manifest=manifest, fbx_bytes=fbx_bytes)
+
     def __init__(self, settings: RunnerSettings | None = None):
         self.settings = settings or RunnerSettings.from_env()
         if self.settings.timeout_seconds <= 0:
             raise ValueError("converter timeout_seconds must be positive")
+        if self.settings.camera_timeout_seconds <= 0:
+            raise ValueError("camera timeout_seconds must be positive")
+        if self.settings.shape_timeout_seconds <= 0:
+            raise ValueError("shape timeout_seconds must be positive")
         if self.settings.terminate_grace_seconds < 0:
             raise ValueError("converter terminate_grace_seconds must be non-negative")
         if self.settings.max_concurrent_processes <= 0:
@@ -231,11 +256,11 @@ class BlenderRunner:
             raise ValueError("expected Blender build hash is invalid")
         self._blender_info: BlenderInfo | None = None
         self._blender_lock = threading.Lock()
-        self._process_slots = threading.BoundedSemaphore(
-            self.settings.max_concurrent_processes
-        )
+        self._process_slots = PrioritySlots(self.settings.max_concurrent_processes)
         self._lifecycle_lock = threading.Lock()
         self._completed_conversions = 0
+        from converter.retarget_cache import RetargetBaseCache
+        self.retarget_cache = RetargetBaseCache(self.settings.retarget_cache_bytes, self.settings.retarget_cache_ttl_seconds)
 
     def _environment(self) -> dict[str, str]:
         env = dict(os.environ)
@@ -341,6 +366,32 @@ class BlenderRunner:
             except subprocess.TimeoutExpired:
                 pass
 
+    def _communicate(self, process, timeout):
+        """Poll the same bounded child for cancellation; never start extra work."""
+        control = current_work.get()
+        if control is None:
+            return process.communicate(timeout=timeout)
+        execution_started = time.monotonic()
+        execution_deadline = execution_started+timeout
+        try:
+            while True:
+                control.check('execution')
+                remaining = execution_deadline-time.monotonic()
+                if remaining <= 0:
+                    raise subprocess.TimeoutExpired(process.args, timeout)
+                try:
+                    result = process.communicate(
+                        timeout=min(.05, remaining, max(.001, control.remaining)))
+                    control.check('execution')
+                    return result
+                except subprocess.TimeoutExpired:
+                    continue
+        except WorkStopped:
+            self._terminate_process_group(process, self.settings.terminate_grace_seconds)
+            raise
+        finally:
+            control.execution_ms = (time.monotonic()-execution_started)*1000
+
     @staticmethod
     def _parse_report(report_path: Path) -> dict[str, Any]:
         if not report_path.is_file() or report_path.is_symlink():
@@ -386,7 +437,30 @@ class BlenderRunner:
         combined_log: str,
         thumbnail: ThumbnailRequest | None = None,
         thumbnail_path: Path | None = None,
+        output_scope: str = "full",
+        preview_view: str | None = None,
+        camera_rotation: list | None = None,
+        preview_model: bool = False,
+        shape_recipe: dict | None = None,
+        hands: dict | None = None,
+        hand_contact_screen: bool = False,
     ) -> ConversionResult:
+        if (self.settings.fast_scene_reset and shape_recipe is None and hands is not None
+                and preview_view == "front" and not preview_model and thumbnail is None
+                and not hand_contact_screen and not self.settings.force_exact_v324 and report.get("ok")):
+            from converter.fast_scene_reset import identity
+            expected_reset = identity()
+            actual_reset = report.get('scene_reset') or {}
+            if any(actual_reset.get(k)!=v for k,v in expected_reset.items()) or type(actual_reset.get('calls')) is not int or actual_reset['calls']<1:
+                raise WorkerIntegrityError('factory-empty scene receipt mismatch', report=report)
+        if shape_recipe is not None and report.get("ok"):
+            shape = report.get("shape_bake", {})
+            if (shape.get("shape_sha256") != shape_recipe["shape_sha256"] or
+                shape.get("rules") != shape_recipe["rules"] or
+                shape.get("controls") != shape_recipe["values"] or
+                shape.get("blend_sha256") != shape_recipe["blend_sha256"] or
+                shape.get("controller_sha256") != shape_recipe["controller_sha256"]):
+                raise WorkerIntegrityError("shape bake lineage mismatch", report=report)
         if not report.get("ok"):
             raise self._report_error(report)
         if returncode != 0:
@@ -413,6 +487,20 @@ class BlenderRunner:
             "blender_build_hash": self.settings.expected_blender_build_hash,
         }
         mismatched = [key for key, value in expected.items() if report.get(key) != value]
+        if camera_rotation is not None and report.get("camera_rotation") != camera_rotation:
+            mismatched.append("camera_rotation")
+        if output_scope != "full" or preview_view or preview_model:
+            if report.get("output_scope") != output_scope or report.get("framing_version") != FRAMING_VERSION:
+                mismatched.append("output_scope/framing_version")
+        if hands is not None:
+            from converter.hand_library import load_library
+            baked = report.get("hands") or {}
+            if (baked.get("left") != hands.get("left") or baked.get("right") != hands.get("right")
+                    or baked.get("library_sha256") != load_library().sha256
+                    or baked.get("body_bones_preserved") is not True):
+                mismatched.append("hands")
+        elif report.get("hands") is not None:
+            mismatched.append("hands")
         if mismatched:
             raise WorkerIntegrityError(
                 f"worker report lineage mismatch: {','.join(sorted(mismatched))}",
@@ -441,6 +529,12 @@ class BlenderRunner:
             raise WorkerIntegrityError(
                 "artifact size does not match worker report", report=report
             )
+        if hand_contact_screen:
+            from converter.hand_contact import validate_screen
+            try:
+                validate_screen(report.get('hand_contact_screen'), artifact_sha256=artifact_sha256)
+            except ValueError as exc:
+                raise WorkerIntegrityError('invalid hand skin screen receipt', report=report) from exc
         artifact = output_path.read_bytes()
         thumbnail_png: bytes | None = None
         thumbnail_report: dict[str, Any] | None = None
@@ -452,6 +546,41 @@ class BlenderRunner:
                 png_path=thumbnail_path,
                 temp_dir=temp_dir,
             )
+        preview = b""
+        if preview_view:
+            preview_path = temp_dir / "preview.png"
+            if (report.get("preview_view") != preview_view or not preview_path.is_file()
+                    or preview_path.is_symlink()):
+                raise WorkerIntegrityError("preview output missing or mismatched")
+            preview = preview_path.read_bytes()
+            if (not preview.startswith(b"\x89PNG\r\n\x1a\n")
+                    or hashlib.sha256(preview).hexdigest() != report.get("preview_sha256")
+                    or len(preview) != report.get("preview_size")):
+                raise WorkerIntegrityError("preview integrity check failed")
+        model = b""
+        if preview_model:
+            from converter.framed_model import MODEL_VERSION, metadata, revision
+            model_path = temp_dir / "preview.glb"
+            try:
+                if model_path.is_symlink():
+                    raise ValueError("symlink model")
+                model = model_path.read_bytes()
+                meta = metadata(model)
+                expected_meta = {
+                    "version": MODEL_VERSION, "revision": revision(), "scope": output_scope,
+                    "camera_rotation": camera_rotation, "character_id": character_id,
+                    "character_sha256": character_sha256, "source_bvh_sha256": source_bvh_sha256,
+                    "base_fbx_sha256": artifact_sha256,
+                    "solver_manifest_sha256": SOLVER_MANIFEST_SHA256,
+                    "coordinates": "Y-up-hips-origin",
+                }
+                if any(meta.get(k) != v for k, v in expected_meta.items()):
+                    raise ValueError("model lineage")
+                if report.get("preview_model") != {
+                        **meta, "sha256": hashlib.sha256(model).hexdigest(), "size": len(model)}:
+                    raise ValueError("model hash")
+            except (OSError, ValueError, KeyError, TypeError) as exc:
+                raise WorkerIntegrityError("preview model integrity mismatch") from exc
         return ConversionResult(
             conversion_id=conversion_id,
             artifact=artifact,
@@ -460,6 +589,8 @@ class BlenderRunner:
             report=report,
             thumbnail_png=thumbnail_png,
             thumbnail_report=thumbnail_report,
+            preview=preview,
+            preview_model=model,
         )
 
     def _validate_thumbnail(
@@ -525,15 +656,64 @@ class BlenderRunner:
         conversion_id: str,
         mirror: bool = False,
         thumbnail: ThumbnailRequest | None = None,
+        output_scope: str = "full",
+        preview_view: str | None = None,
+        camera_rotation: list | None = None,
+        preview_model: bool = False,
+        shape_recipe: dict | None = None,
+        hands: dict | None = None,
+        hand_contact_screen: bool = False,
     ) -> ConversionResult:
+        if shape_recipe is not None and self.settings.force_exact_v324:
+            raise ConversionRejectedError("exact V3.2.4 mode does not permit shape baking")
         if not bvh_bytes:
             raise ConversionRejectedError("BVH upload is empty")
         if type(mirror) is not bool:
             raise ConversionRejectedError("mirror must be boolean")
         if thumbnail is not None and not isinstance(thumbnail, ThumbnailRequest):
             raise ValueError("thumbnail must be a ThumbnailRequest")
+        try:
+            validate_scope(output_scope)
+        except (TypeError, ValueError) as exc:
+            raise ConversionRejectedError("invalid output_scope") from exc
+        if preview_view is not None and preview_view not in PREVIEW_VIEWS:
+            raise ConversionRejectedError("invalid preview_view")
+        if self.settings.force_exact_v324 and output_scope != "full":
+            raise ConversionRejectedError("exact V3.2.4 mode permits full framing only")
+        from converter.camera import validate_rotation
+        try:
+            validate_rotation(camera_rotation)
+        except ValueError as exc:
+            raise ConversionRejectedError(str(exc)) from exc
+        if type(preview_model) is not bool or (preview_model and (
+                preview_view is not None or mirror or thumbnail or self.settings.force_exact_v324)):
+            raise ConversionRejectedError("invalid preview model options")
+        if camera_rotation is not None and ((preview_view != "front" and not preview_model) or mirror or thumbnail or self.settings.force_exact_v324):
+            raise ConversionRejectedError("invalid aligned camera options")
+        from converter.hand_library import HandLibraryError, normalize_request
+        try:
+            hands = normalize_request(hands)
+        except HandLibraryError as exc:
+            raise ConversionRejectedError(f"invalid hands: {exc}") from exc
+        if hands is not None and self.settings.force_exact_v324:
+            raise ConversionRejectedError("exact V3.2.4 mode does not permit hand presets")
+        if type(hand_contact_screen) is not bool or (hand_contact_screen and (
+                output_scope != 'full' or preview_view or preview_model or camera_rotation is not None
+                or thumbnail or mirror or self.settings.force_exact_v324)):
+            raise ConversionRejectedError('invalid hand screening options')
+        control = current_work.get() or WorkControl(
+            kind='screen' if hand_contact_screen else 'preview'
+            if preview_view or preview_model or thumbnail else 'normal',
+            budget_seconds=max(self.settings.timeout_seconds,
+                               self.settings.camera_timeout_seconds,
+                               self.settings.shape_timeout_seconds))
+        token = current_work.set(control)
         queue_started = time.monotonic()
-        self._process_slots.acquire()
+        try:
+            self._process_slots.acquire()
+        except BaseException:
+            current_work.reset(token)
+            raise
         queue_wait_ms = (time.monotonic() - queue_started) * 1000.0
         with self._lifecycle_lock:
             task_cold_start = self._completed_conversions == 0
@@ -547,10 +727,20 @@ class BlenderRunner:
                 conversion_id=conversion_id,
                 mirror=mirror,
                 thumbnail=thumbnail,
+                output_scope=output_scope,
+                preview_view=preview_view,
+                camera_rotation=camera_rotation,
+                preview_model=preview_model,
+                shape_recipe=shape_recipe,
+                hands=hands,
+                hand_contact_screen=hand_contact_screen,
             )
+            control.check("execution")
         finally:
             execution_ms = (time.monotonic() - execution_started) * 1000.0
+            control.execution_ms = execution_ms
             self._process_slots.release()
+            current_work.reset(token)
         with self._lifecycle_lock:
             self._completed_conversions += 1
         return replace(
@@ -570,7 +760,17 @@ class BlenderRunner:
         conversion_id: str,
         mirror: bool,
         thumbnail: ThumbnailRequest | None = None,
+        output_scope: str = "full",
+        preview_view: str | None = None,
+        camera_rotation: list | None = None,
+        preview_model: bool = False,
+        shape_recipe: dict | None = None,
+        hands: dict | None = None,
+        hand_contact_screen: bool = False,
     ) -> ConversionResult:
+        control = current_work.get()
+        if control is not None:
+            control.check("execution")
         if not character_path.is_file() or character_path.suffix.lower() != ".fbx":
             raise WorkerIntegrityError("character artifact is not a regular FBX file")
         if sha256_file(character_path) != character_sha256:
@@ -615,12 +815,47 @@ class BlenderRunner:
                     "engines": list(thumbnail.engines),
                     "output_path": str(thumbnail_path),
                 },
+                "output_scope": output_scope,
+                "preview_view": preview_view,
+                "camera_rotation": camera_rotation,
+                "preview_model": preview_model,
+                **({"shape_recipe": shape_recipe} if shape_recipe is not None else {}),
             }
+            if hands is not None:
+                job["hands"] = hands
+            if hand_contact_screen:
+                job['hand_contact_screen'] = True
+            if (self.settings.fast_scene_reset and shape_recipe is None and hands is not None
+                    and preview_view == "front" and not preview_model and thumbnail is None
+                    and not hand_contact_screen and not self.settings.force_exact_v324):
+                job["fast_scene_reset"] = True
+            # Lookup is inside the acquired runner slot. A successful first request
+            # publishes before release, so the next hand request can reuse its body.
+            base_identity = None
+            base_entry = None
+            base_fbx = temp_dir / "retarget-base.fbx"
+            base_meta = temp_dir / "retarget-base.json"
+            if (self.settings.retarget_cache_bytes and shape_recipe is None and hands is not None
+                    and preview_view == "front" and not preview_model and thumbnail is None
+                    and not hand_contact_screen and not self.settings.force_exact_v324):
+                from converter.retarget_cache import binding
+                base_identity = binding(source_bvh_sha256, character_sha256, character_id, mirror)
+                try:
+                    base_entry = self.retarget_cache.get(base_identity)
+                except (ValueError, KeyError, TypeError) as exc:
+                    raise WorkerIntegrityError("cached retarget base is corrupt") from exc
+                if base_entry is not None:
+                    base_fbx.write_bytes(base_entry.artifact)
+                    base_meta.write_bytes(base_entry.metadata_json)
+                job["retarget_cache"] = {"mode":"reuse" if base_entry else "capture",
+                    "fbx_path":str(base_fbx),"meta_path":str(base_meta)}
             job_path.write_text(
                 json.dumps(job, sort_keys=True, separators=(",", ":")) + "\n",
                 encoding="utf-8",
             )
 
+            if control is not None:
+                control.check("execution")
             try:
                 process = subprocess.Popen(
                     self._command(job_path),
@@ -635,7 +870,11 @@ class BlenderRunner:
             except OSError as exc:
                 raise BlenderUnavailableError("Blender process could not start") from exc
             try:
-                stdout, stderr = process.communicate(timeout=self.settings.timeout_seconds)
+                timeout = (max(self.settings.timeout_seconds, self.settings.camera_timeout_seconds)
+                           if camera_rotation is not None else self.settings.timeout_seconds)
+                if shape_recipe is not None:
+                    timeout = max(timeout, self.settings.shape_timeout_seconds)
+                stdout, stderr = self._communicate(process, timeout)
             except subprocess.TimeoutExpired as exc:
                 self._terminate_process_group(
                     process, self.settings.terminate_grace_seconds
@@ -644,7 +883,7 @@ class BlenderRunner:
 
             report = self._parse_report(report_path)
             combined_log = f"{stdout}\n{stderr}"
-            return self._validate_success(
+            result = self._validate_success(
                 report=report,
                 output_path=output_path,
                 temp_dir=temp_dir,
@@ -657,7 +896,32 @@ class BlenderRunner:
                 combined_log=combined_log,
                 thumbnail=thumbnail,
                 thumbnail_path=thumbnail_path,
+                output_scope=output_scope,
+                preview_view=preview_view,
+                camera_rotation=camera_rotation,
+                preview_model=preview_model,
+                shape_recipe=shape_recipe,
+                hands=hands,
+                hand_contact_screen=hand_contact_screen,
             )
+            if base_identity is not None:
+                from converter.retarget_cache import validate_base, cache_key
+                metadata = json.loads(base_meta.read_bytes())
+                data = base_fbx.read_bytes()
+                try:
+                    validate_base(data, metadata, base_identity)
+                    receipt = report.get("retarget_reuse") or {}
+                    if (receipt.get("key") != cache_key(base_identity)
+                            or receipt.get("base_sha256") != metadata["artifact_sha256"]
+                            or receipt.get("body_report_sha256") != metadata["body_report_sha256"]
+                            or receipt.get("mode") != ("reuse" if base_entry else "capture")):
+                        raise ValueError("retarget base receipt mismatch")
+                    # Publish only after all final artifact/preview/hand checks succeed.
+                    if base_entry is None:
+                        self.retarget_cache.put(base_identity, data, base_meta.read_bytes())
+                except (ValueError, KeyError, TypeError) as exc:
+                    raise WorkerIntegrityError("retarget base integrity mismatch", report=report) from exc
+            return result
 
 
 __all__ = [

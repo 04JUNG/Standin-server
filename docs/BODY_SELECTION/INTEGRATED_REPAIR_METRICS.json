@@ -1,0 +1,286 @@
+{
+  "body_review_calls": [
+    {
+      "cut_id": "124629",
+      "elapsed_seconds": 4.255953749874607,
+      "error": null
+    },
+    {
+      "cut_id": "124637",
+      "elapsed_seconds": 2.7651622090488672,
+      "error": null
+    },
+    {
+      "cut_id": "131056",
+      "elapsed_seconds": 4.15762195806019,
+      "error": null
+    },
+    {
+      "cut_id": "131112",
+      "elapsed_seconds": 5.332930166972801,
+      "error": null
+    },
+    {
+      "cut_id": "131127",
+      "elapsed_seconds": 3.4497212499845773,
+      "error": null
+    },
+    {
+      "cut_id": "2.16.52",
+      "elapsed_seconds": 3.8859937079250813,
+      "error": null
+    }
+  ],
+  "frozen_family": {
+    "scope": "Frozen v3 original first analyses; actual v5 runtime independent-review helper, one batch RPC per eligible cut, all original controls immutable. Previously missing person remains unmapped here; real box recovery is measured separately. Not E2E latency.",
+    "people": 28,
+    "mapped": 27,
+    "changes": [
+      "124702:p0"
+    ],
+    "family_correct": 27,
+    "review_calls": 5,
+    "review_errors": 0,
+    "all_vlm_slots": 36,
+    "changed_slots": [
+      {
+        "cut_id": "124702",
+        "slot": 0
+      },
+      {
+        "cut_id": "131112",
+        "slot": 2
+      }
+    ],
+    "other_slot_recommendations_preserved": 34
+  },
+  "implementation_commit": "77a7be5b",
+  "scope": "Final v6 body-policy replay of recorded v5 API responses; 28 approved development references, not blind truth. People/pose/control preserved; timing belongs to source v5 API runs.",
+  "version": "body-integrated.v6.independent-axes",
+  "receipt": {
+    "develop_commit": "c8181b0e",
+    "baseline_source": "artifacts/body-matching/2026-10-17-integrated/fullbody-eval-v3-completion",
+    "profile": "fullbody",
+    "model": "gemini-3.8-flash",
+    "thinking_level": "low",
+    "integrated_version": "body-integrated.v6.independent-axes",
+    "scope": "local inference API handler + JSON serialization; excludes BFF/network upload/startup",
+    "hardware": "darwin",
+    "hand_shapes": false,
+    "person_tags": true,
+    "fullbody_enabled": true,
+    "library_source_sha256": "1f666f5481cb2ae81678cbf350382330bbaaeeb3d969b8df58bac439f9f3cc70",
+    "protocol_sha256": "49afeade477ed7aa5ee1fc2a08e7b36dfd7283c7d7df03a05cb79982737a80f0",
+    "reference_sha256": "c5de2791e6ba60103a660e2a99a8f8856f2b69e27f4a61db07bbb4dd8d236a92",
+    "thresholds": {
+      "match_iou": 0.3,
+      "latency_seconds": 12
+    },
+    "repeats": 1,
+    "resumed": true,
+    "startup_seconds": 8.961878333007917,
+    "pose_identity": {
+      "model_id": "humanart-m",
+      "build_id": "20260828.codex1-fp32-cpu-raw-simcc",
+      "status": "promoted",
+      "license_review": "approved",
+      "manifest_sha256": "9491a3a256a6e1f0d50e9f99e72cf83a1cf8b0cd1e3df4e7be244a3b5bf647b7",
+      "pose_sha256": "e43171f2917cce6188425f3519d7d663f3e5c3e29ff07ae9f68b84770e012e52",
+      "detector_model_id": "yolox-x-humanart-a39d44ed",
+      "detector_sha256": "8e9ea96a176bd48501eaaa77216e49ee30794d2f8ba80c7b9862beca4ea972da",
+      "calibration_profile_id": "humanart-m-rtmlib-average-r1-v1",
+      "calibration_profile_sha256": "1c17c428f8da4b8de0de7743aab72f47ae117de1533d9b38fd341ee17c40394f",
+      "input_size_wh": [
+        192,
+        256
+      ],
+      "detector_input_size_wh": [
+        640,
+        640
+      ],
+      "score_decoder": "rtmlib-average-v1",
+      "color_order_to_pose": "RGB",
+      "flip_test": false,
+      "backend": "rtmlib",
+      "adapter": "HumanArtPoseModel",
+      "canary_stage": "canary-100",
+      "calibration_owner": "runtime",
+      "skeleton_kpt_threshold": 0.35,
+      "initialized": true,
+      "detector_session_owner": "humanart-m"
+    },
+    "pose_adapter": "HumanArtPoseModel",
+    "library_poses": 5795,
+    "source_run": "artifacts/body-matching/2026-10-17-integrated-repair/fullbody-eval-v5-completion",
+    "execution_scope": "Recorded response body-policy replay only; no network or pose execution",
+    "timing_scope": "Copied source VLM/API measurements; NOT newly measured end-to-end latency"
+  },
+  "completed": {
+    "family": 28,
+    "observed": 26,
+    "preset": 24,
+    "matched": 28,
+    "served": 23,
+    "normal_selection": 22,
+    "condition_validated": 14,
+    "review_only": 1
+  },
+  "initial_run": {
+    "reference_scope": "28 report recommendations accepted as development-set reference; not independent or blinded ground truth",
+    "phases": {
+      "baseline": {
+        "cuts": 17,
+        "unmeasured_failures": 0,
+        "successful": 17,
+        "within_12_seconds": 0,
+        "median_seconds": 34.66160566592589,
+        "max_seconds": 83.99279100005515,
+        "median_successful_seconds": 34.66160566592589,
+        "p95_successful_seconds": 76.1017537663225,
+        "p95_seconds": 76.1017537663225,
+        "call_counts": [
+          4,
+          4,
+          3,
+          3,
+          2,
+          3,
+          2,
+          3,
+          3,
+          4,
+          4,
+          3,
+          3,
+          4,
+          5,
+          3,
+          3
+        ]
+      },
+      "integrated": {
+        "cuts": 17,
+        "unmeasured_failures": 0,
+        "successful": 16,
+        "within_12_seconds": 0,
+        "median_seconds": 24.459250833839178,
+        "max_seconds": 68.17612258298323,
+        "median_successful_seconds": 24.222742625395767,
+        "p95_successful_seconds": 57.11329880193807,
+        "p95_seconds": 56.37577721653505,
+        "call_counts": [
+          4,
+          5,
+          3,
+          3,
+          2,
+          5,
+          3,
+          4,
+          3,
+          4,
+          4,
+          3,
+          3,
+          6,
+          3,
+          3,
+          1
+        ]
+      }
+    },
+    "total_cases": 28,
+    "family_correct": 25,
+    "observed_correct": 24,
+    "preset_correct": 20,
+    "matched": 25,
+    "count_equal_cuts": 16,
+    "pose_top_k_equal": 10
+  },
+  "baseline": {
+    "family": 26,
+    "preset": 21,
+    "matched": 27,
+    "served": 18
+  },
+  "regression": {
+    "lost_match": [],
+    "lost_pose": [],
+    "original_pose_loss_remaining": [],
+    "new_family_errors": [],
+    "new_preset_errors": [],
+    "keypoints_equal": 15,
+    "count_equal_cuts": 17
+  },
+  "phases": {
+    "baseline": {
+      "cuts": 17,
+      "unmeasured_failures": 0,
+      "successful": 17,
+      "within_12_seconds": 0,
+      "median_seconds": 34.66160566592589,
+      "max_seconds": 83.99279100005515,
+      "median_successful_seconds": 34.66160566592589,
+      "p95_successful_seconds": 76.1017537663225,
+      "p95_seconds": 76.1017537663225,
+      "call_counts": [
+        4,
+        4,
+        3,
+        3,
+        2,
+        3,
+        2,
+        3,
+        3,
+        4,
+        4,
+        3,
+        3,
+        4,
+        5,
+        3,
+        3
+      ]
+    },
+    "integrated": {
+      "cuts": 17,
+      "unmeasured_failures": 0,
+      "successful": 17,
+      "within_12_seconds": 0,
+      "median_seconds": 24.459250833839178,
+      "max_seconds": 68.17612258298323,
+      "median_successful_seconds": 24.459250833839178,
+      "p95_successful_seconds": 56.37577721653505,
+      "p95_seconds": 56.37577721653505,
+      "call_counts": [
+        4,
+        5,
+        3,
+        3,
+        2,
+        5,
+        3,
+        4,
+        3,
+        4,
+        4,
+        3,
+        3,
+        6,
+        3,
+        3,
+        4
+      ]
+    }
+  },
+  "frozen_replay": {
+    "scope": "Frozen post-repair query joints/masks and final pose descriptions, real pinned fullbody library/camera/semantic search. Generator disabled, no network, not a latency run. Box recovery is independently measured using real detector and in the new remote full-pipeline run.",
+    "people": 36,
+    "original_reproduced": 35,
+    "selected_before": 24,
+    "existing_selected_preserved": 24,
+    "restored": 4
+  },
+  "timing_scope": "V5 source API measurements, including one previously unavailable cut completed separately; V6 is policy replay only."
+}

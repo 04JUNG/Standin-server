@@ -1,0 +1,235 @@
+{
+  "source": "user_approved_report_recommendations",
+  "user_statement": "이거 정답으로 쓸 수 있겠고 12초 안에도 가능해?",
+  "approved_on": "2026-10-17",
+  "reference_report": "artifacts/body-matching/2026-10-17-family-resolve/REPORT.html",
+  "reference_report_sha256": "834b4802102587f01b2c3cc59ab3fc999ac0a631725e37ad60b8a44f00219f48",
+  "reference_results_sha256": "fbbfad90c503d4c4c620299fcb171a89d5521573e9a3db95fed2d0af5f1d76a8",
+  "scope": "28 report recommendations accepted as development-set reference; not independent or blinded ground truth",
+  "rows": [
+    {
+      "case_id": "124629:p0",
+      "expected_family": "male",
+      "expected_body_id": "male-ideal83-v0-7-2",
+      "expected_preset": "IDEAL83",
+      "crop_sha256": "4274bb0a47f3fb8d2b07821c81b1e5f3996d6ffcf7a2be640fa8b8f432065393",
+      "image_sha256": "ba92e47ea1600905a81b5973813f5c711087e479898dec0b230ae5716de3ccc6"
+    },
+    {
+      "case_id": "124637:p0",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "expected_preset": "BASE",
+      "crop_sha256": "9159cb3f62d880481c244b5eab62ff601995d164e3b1631f676367c7a7eb9445",
+      "image_sha256": "871b0c80ce8b2124c7e39a57682225c3bff0b280fd2aca3d6577063bb49175aa"
+    },
+    {
+      "case_id": "124702:p0",
+      "expected_family": "female",
+      "expected_body_id": "female-base-v0-3-4",
+      "expected_preset": "BASE",
+      "crop_sha256": "52e3743042ab4cccb4075d2a5ac3a2fe0d899811f6a0292b35b59302917cf89f",
+      "image_sha256": "35809b3f095c0394172858b8bd645369b2ab936c0ff9b22ff9ff3452f4c2acc0"
+    },
+    {
+      "case_id": "131000:p0",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "expected_preset": "BASE",
+      "crop_sha256": "cc296ab46687c9453c70fc59d0867870a909eea55bea1c8eefcc0ff4bc129295",
+      "image_sha256": "3ebf5e62a5776e1e1e53ed1ca3570dbb3a596861d98b7244d6021052158efbba"
+    },
+    {
+      "case_id": "131000:p1",
+      "expected_family": "female",
+      "expected_body_id": "female-base-v0-3-4",
+      "expected_preset": "BASE",
+      "crop_sha256": "90474b15d75fdc4d5970044d997052ce0118a4e318b52b42b22d14aa23679387",
+      "image_sha256": "3ebf5e62a5776e1e1e53ed1ca3570dbb3a596861d98b7244d6021052158efbba"
+    },
+    {
+      "case_id": "131040:p0",
+      "expected_family": "male",
+      "expected_body_id": "male-muscular-v0-7-2",
+      "expected_preset": "MUSCULAR",
+      "crop_sha256": "7c2ff12a9d13c56e03d0cd9a54afcd0f657d8948dfc775bb03a60a474ee9cc36",
+      "image_sha256": "9749eeaee78c4f1f57309458295c06685a217305620400ca315620c7e0094bc7"
+    },
+    {
+      "case_id": "131040:p1",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "expected_preset": "BASE",
+      "crop_sha256": "cf33fabda2271a04b845b2bf98c47eba720cbb78bff1b554ecccd33146c8c177",
+      "image_sha256": "9749eeaee78c4f1f57309458295c06685a217305620400ca315620c7e0094bc7"
+    },
+    {
+      "case_id": "131056:p0",
+      "expected_family": "male",
+      "expected_body_id": "male-ideal83-v0-7-2",
+      "expected_preset": "IDEAL83",
+      "crop_sha256": "bf2463f421bf20e131e97f68f81fd034de9bafb38c18fb027bf347f22ac856e9",
+      "image_sha256": "faebb6403f276a1165aceed50d56cb7ae92fe6e4a143290849646e2016e66942"
+    },
+    {
+      "case_id": "131056:p2",
+      "expected_family": "female",
+      "expected_body_id": "female-base-v0-3-4",
+      "expected_preset": "BASE",
+      "crop_sha256": "00045ffa11ab06b94df5fc511d9f103d1eb763e66ad1a4f8b5a1deeae95a01e8",
+      "image_sha256": "faebb6403f276a1165aceed50d56cb7ae92fe6e4a143290849646e2016e66942"
+    },
+    {
+      "case_id": "131112:p0",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "expected_preset": "BASE",
+      "crop_sha256": "84fadae7a984063d7ccf33d4b2da46d98fffabe4aca008391eb5c38944dda99f",
+      "image_sha256": "d8878b388ae50e44b0130438bebd2807e99ab6cfd4ad8cc31913945fe12535da"
+    },
+    {
+      "case_id": "131112:p3",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "expected_preset": "BASE",
+      "crop_sha256": "518f9089b2e78288b54d5e80d68ab3c78b23f6837cfd139a35ca4648ba50812b",
+      "image_sha256": "d8878b388ae50e44b0130438bebd2807e99ab6cfd4ad8cc31913945fe12535da"
+    },
+    {
+      "case_id": "131112:p4",
+      "expected_family": "female",
+      "expected_body_id": "female-base-v0-3-4",
+      "expected_preset": "BASE",
+      "crop_sha256": "548f0611976a9c7f6b7e4277ab1237ab69218289eaf91991778867634a3de9b2",
+      "image_sha256": "d8878b388ae50e44b0130438bebd2807e99ab6cfd4ad8cc31913945fe12535da"
+    },
+    {
+      "case_id": "131127:p0",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "expected_preset": "BASE",
+      "crop_sha256": "da01068228ab9230641c8ef1531da4c3f6552c7cbbcd89ff8e64c4eeb7fb4db9",
+      "image_sha256": "154378c5e225bacf09e8cad0fcc9b58c83320c2c15a29e7ae0fd9b9933ff27bd"
+    },
+    {
+      "case_id": "131127:p1",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "expected_preset": "BASE",
+      "crop_sha256": "7dbc6f9a8f2b6ad5424e6b35dad5477f7af403ea941931b1dc9c2a85eb77d6c4",
+      "image_sha256": "154378c5e225bacf09e8cad0fcc9b58c83320c2c15a29e7ae0fd9b9933ff27bd"
+    },
+    {
+      "case_id": "131145:p0",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "expected_preset": "BASE",
+      "crop_sha256": "e38a480056f0fdf9fd02293076fec3d016ea98eb31f244e475c685aba1b3de4d",
+      "image_sha256": "f007240984144a882279f80ec34b42095bb6519b817bc556fffd6d7b480b6f63"
+    },
+    {
+      "case_id": "131211:p0",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "expected_preset": "BASE",
+      "crop_sha256": "c0380a5b7c09361ccfd0b56cc580cf34fb8d27f46172034bf57fb151fd8531b3",
+      "image_sha256": "3cb409bb7bc5155699409b07cb0700f14dfd9055a53bf317af96b6e0c2fe53e7"
+    },
+    {
+      "case_id": "131211:p1",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "expected_preset": "BASE",
+      "crop_sha256": "20495f4b73a6de8d59d77ac50adcf3435c1a69e6c2369c08318cb5c2c866de4b",
+      "image_sha256": "3cb409bb7bc5155699409b07cb0700f14dfd9055a53bf317af96b6e0c2fe53e7"
+    },
+    {
+      "case_id": "131224:p0",
+      "expected_family": "female",
+      "expected_body_id": "female-slim-v0-3-4",
+      "expected_preset": "SLIM",
+      "crop_sha256": "299196f52d3f74cd8aea2499c232188d38c6fb9436c77602ec25e6a16dd808c0",
+      "image_sha256": "3902eff178ce61b204f080a95c14c8588025913275a53de85a73701068106898"
+    },
+    {
+      "case_id": "171734:p0",
+      "expected_family": "female",
+      "expected_body_id": "female-base-v0-3-4",
+      "expected_preset": "BASE",
+      "crop_sha256": "9ea56978885230c48eebd6cf0babe381fca6df0e7642aeca41801fc22d8fb788",
+      "image_sha256": "f666fe40140e3520e83d66e0117a17b5090d8a895dc4ba2a05152179a4c3b50e"
+    },
+    {
+      "case_id": "2.16.04:p0",
+      "expected_family": "male",
+      "expected_body_id": "male-muscle-max-v0-7-2",
+      "expected_preset": "MUSCLE_MAX",
+      "crop_sha256": "c3d9d62b92c8ac16fc01f0f492030dfd0e2f6f8fcec69b1f1f2734070c811da8",
+      "image_sha256": "eb17ed7a162a11bc88c8d124b94e9070df1be00c0effb4592d5bc1dd3fb8c7d6"
+    },
+    {
+      "case_id": "2.16.04:p1",
+      "expected_family": "male",
+      "expected_body_id": "male-muscular-v0-7-2",
+      "expected_preset": "MUSCULAR",
+      "crop_sha256": "772753d32bc4ea369586aa610639d69089a8fe4c16aa335d9043038e8abba63a",
+      "image_sha256": "eb17ed7a162a11bc88c8d124b94e9070df1be00c0effb4592d5bc1dd3fb8c7d6"
+    },
+    {
+      "case_id": "2.16.52:p0",
+      "expected_family": "female",
+      "expected_body_id": "female-base-v0-3-4",
+      "expected_preset": "BASE",
+      "crop_sha256": "a948879e8ea20c0fe39a0705f86e03a1d4bc855fa64d32c0305c932d4c773e75",
+      "image_sha256": "d9cf496e1793b7e7089b0e52d533d6edb9cfc3a63c4631e73b6b888a7a5c4bbd"
+    },
+    {
+      "case_id": "2.16.52:p2",
+      "expected_family": "female",
+      "expected_body_id": "female-base-v0-3-4",
+      "expected_preset": "BASE",
+      "crop_sha256": "4f4afcde358637cd6be3b16a70378930d135028e3556c525ab9fb95460992ed8",
+      "image_sha256": "d9cf496e1793b7e7089b0e52d533d6edb9cfc3a63c4631e73b6b888a7a5c4bbd"
+    },
+    {
+      "case_id": "3.08.13:p0",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "expected_preset": "BASE",
+      "crop_sha256": "f9d33cf4911226fa54cedf369074c857f7fa47a7dd1548cea8165c3e58b66543",
+      "image_sha256": "e5a8f7ec1124e2d9a9941d6c6d2699416b3a2ec064924025813dd4639fde7847"
+    },
+    {
+      "case_id": "4.56.21:p0",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "expected_preset": "BASE",
+      "crop_sha256": "843457d128862508675544658cb5c1f0fb091e86f542d65caa4c622b8a6f4939",
+      "image_sha256": "32cde1dd1fba80a6a6f188bbff8ebc832875c3d60fc628b18522914809b39e2a"
+    },
+    {
+      "case_id": "청룡성:p0",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "expected_preset": "BASE",
+      "crop_sha256": "c9fa4b7df0cdd8961c7d9c689e1afe62d6b8dd3d0aae3e5214b4564b379b3f8a",
+      "image_sha256": "c797a0f5abda4316bd5d59addfc37a8b63fa939c14c6fb19aff92e84782e2a78"
+    },
+    {
+      "case_id": "청룡성:p1",
+      "expected_family": "male",
+      "expected_body_id": "male-ideal83-v0-7-2",
+      "expected_preset": "IDEAL83",
+      "crop_sha256": "f0ef59140f206eb8e206dede85d92272677b0495afb6f69d5bcdbc53a3a3ba41",
+      "image_sha256": "c797a0f5abda4316bd5d59addfc37a8b63fa939c14c6fb19aff92e84782e2a78"
+    },
+    {
+      "case_id": "청룡성:p2",
+      "expected_family": "male",
+      "expected_body_id": "male-base-v0-7-2",
+      "expected_preset": "BASE",
+      "crop_sha256": "5872a94347980571d167c21542f953bde1401a69b729f0b4e66d58cd4ff000ea",
+      "image_sha256": "c797a0f5abda4316bd5d59addfc37a8b63fa939c14c6fb19aff92e84782e2a78"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "source": "100style",
+  "styles": ["WildArms", "WildLegs", "Superman", "Star"],
+  "movements": ["FW", "FR"],
+  "poses_per_clip": 5,
+  "sample_hz": 12,
+  "minimum_separation_seconds": 0.3,
+  "minimum_pose_distance": 0.25,
+  "near_duplicate_distance": 0.16
+}

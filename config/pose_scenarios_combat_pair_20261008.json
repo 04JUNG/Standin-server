@@ -1,0 +1,61 @@
+{
+  "rig_source": "data/curation/sources/quaternius/export-1/pool/combat_ual1_Punch_Cross_f00000.bvh",
+  "rig_sha256": "fd3d02eb9cb307eb0700f48ef4cc6d0a90fdf595c1f6c8b66bd40dd93844544b",
+  "scenes": [
+    {
+      "id": "combat_pair_airborne_press_attacker",
+      "label": "공중에서 몸을 낮춰 상대를 덮치는 공격자",
+      "category": "combat",
+      "category_label": "공중 덮치기와 바닥 방어",
+      "stance": "wide",
+      "gesture": "grapple",
+      "props": "",
+      "hands": ["open", "open"],
+      "relationship": "fighting",
+      "set_id": "combat_pair_airborne_press",
+      "set_role": "A",
+      "overrides": {
+        "left_leg": [[0.33, 0.31, -0.18], [0.37, 0.61, 0.38]],
+        "right_leg": [[-0.27, 0.42, 0.11], [-0.36, 0.61, 0.39]],
+        "left_foot": {"mode": "follow_shin", "pitch_degrees": 5},
+        "right_foot": {"mode": "follow_shin", "pitch_degrees": 8}
+      },
+      "left_wrist": [0.32, 0.44, 0.48],
+      "right_wrist": [-0.27, 0.45, 0.48],
+      "left_pole": [0.55, 0.47, 0.22],
+      "right_pole": [-0.51, 0.51, 0.22],
+      "lean": 6,
+      "nod": 11,
+      "world_xyz": [105, 0, 0],
+      "air_clearance": 0.5
+    },
+    {
+      "id": "combat_pair_airborne_press_defender",
+      "label": "등을 대고 미끄러지며 두 팔로 막는 방어자",
+      "category": "combat",
+      "category_label": "공중 덮치기와 바닥 방어",
+      "stance": "sit_open",
+      "gesture": "guard",
+      "props": "",
+      "support": "",
+      "hands": ["fist", "fist"],
+      "relationship": "fighting",
+      "set_id": "combat_pair_airborne_press",
+      "set_role": "B",
+      "overrides": {
+        "left_leg": [[0.33, 0.12, 0.55], [0.35, 0.55, 0.55]],
+        "right_leg": [[-0.27, 0.15, 0.42], [-0.29, 0.54, 0.54]],
+        "left_foot": {"mode": "follow_shin", "pitch_degrees": 8},
+        "right_foot": {"mode": "follow_shin", "pitch_degrees": 7}
+      },
+      "left_wrist": [0.19, 0.72, 0.26],
+      "right_wrist": [-0.19, 0.70, 0.27],
+      "left_pole": [0.47, 0.64, 0.05],
+      "right_pole": [-0.46, 0.63, 0.05],
+      "lean": -7,
+      "nod": -7,
+      "world_xyz": [-78, 0, 0],
+      "air_clearance": 0.06
+    }
+  ]
+}

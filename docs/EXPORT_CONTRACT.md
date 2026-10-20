@@ -9,7 +9,9 @@
 
 > ⚠ **BVH는 1인만 지원한다(위치도 미반영).** 그래서 **export item 1개 = 1인 BVH 1개**다.
 > 다인 컷은 인물 수만큼 item(=1인 BVH)이 나오고, 얽힘(포옹·격투)도 2인 BVH가 아니라
-> **1인 BVH 여러 개를 `set_id`로 묶어** 표현한다. 상대 위치는 BVH가 안 실으므로 작가가 CSP에서 맞춘다.
+> **1인 BVH 여러 개를 `set_id`로 묶어** 표현한다. BVH는 상대 위치를 담지 않는다.
+> 04J-289의 추가 내부 API `/compose-scene`은 최종 인물별 FBX와 명시적 3D 배치를 받아
+> **1컷 다인 FBX**를 만든다. 기존 인물별 BVH·FBX 흐름 뒤에 선택적으로 연결한다.
 
 **세 계약은 별개다:**
 - `/analyze` = "Top5 **보여주기**"(인물별 후보 리스트). → `CutResult`
@@ -17,9 +19,51 @@
 - `/export-order` = base 선택만 표현하는 legacy 주문서. → `ExportOrder`
 - `/convert-bundle` = 최종 BVH 원문과 그 바이트로 만든 V3.2 FBX를 무결성 manifest와 함께 반환.
 - `/convert` = 하위 호환용 FBX 단일 응답.
+- `/compose-scene` = 최종 1인 rigged-rest FBX 여러 개 + Y-up 미터 배치 → `scene.fbx`와 manifest ZIP.
+
+`/analyze`의 VLM 실패 원인·재시도 필드는 `API_CONTRACT.md` §7-1을 따른다.
+이는 분석 실패 안내만 확장하며, 정상 스켈레톤·선택·BVH/FBX export 계약은 바꾸지 않는다.
+
+체형 P0·P1의 decision/policy/suggestion은 `/analyze` 진단이다. suggestion을 export 체형으로 사용하지 않는다. 최종 체형은 기존 BFF 선택 결과를 사용하며 수동 선택·fixed_default·기본값 우선순위와 export 형식은 유지한다. [체형 계약](BODY_PIPELINE_API_CONTRACT.md).
 
 FastAPI inference가 DB에서 legacy 주문서의 `bvh_url·set_id·tags`를 채운다. 최종 base/refined
 선택과 artifact 영속화는 BFF가 소유한다.
+
+### 전신 동적 라우팅 검수 후보의 경계 (2026-10-16)
+
+2026-10-17 표시 연결: `people[].pose_presentation`은 원본/근접/생성 결과의 **미리보기 전용**
+파일 전달 계약이다. `library_bvh` 상대 경로와 `inline_bvh` 본문을 구분하고 바이트 SHA-256을
+보존한다. 모든 항목은 `export_allowed=false`이며 기존 export/refine 승인 정책을 확장하지 않는다.
+생성 ID는 라이브러리 조회 키가 아니다. BFF는 이 목록을 legacy 후보·export 주문서에 자동 복사하지
+않고 별도 검수 UI로 전달한다. 자세한 상태/실패/권한 규약은 `API_CONTRACT.md`의
+`dynamic-pose-presentation-v1`을 따른다. 썸네일/3D 미리보기 가능과 제품 export 허가는 별개다.
+
+`/analyze.people[].dynamic_search`의 원본 후보·`near_candidates`·`generation`·`basic_model`은
+기존 자동 export 흐름으로 직접 연결하지 않는다. 새 경로는 `refine_allowed=false`,
+`release_allowed=false`이며, 실제 인체 변환 후 검수와 사용자 선택이 필요하다.
+생성 BVH는 `generation.candidates[].bvh` 본문으로만 제공되고 `/pose/{id}/bvh`에 등록되지 않는다.
+전신 `/analyze`의 검색·생성 후보는 실제 손 프리셋을 적용한 full FBX의 반대 손 교차 검사를
+자동 거친다. 미검출 receipt도 손-몸통/소품/동일 손 내부 전체의 충돌 인증은 아니다.
+다른 BVH·손 프리셋·캐릭터 출력에 receipt를 재사용하지 않는다. 기존 `/convert*`와
+자동 export 승인 정책을 이 검사로 승격하지 않는다.
+제한된 생성 손 간격 보정도 동일하다. 보정 후 BVH 해시와 피부 receipt는 미리보기
+계보일 뿐 내보내기 승인서가 아니다. BFF는 보정 전 BVH·손모양의 receipt를
+보정본에 붙이지 않으며, `hand_spacing_repair`가 있어도 자동 export하지 않는다.
+출력 범위는 `output_scope.mesh_scope`를 변환기의 `output_scope`에 전달한다
+(`full`, 팔·손을 보존하는 `half`, 목·어깨선·머리만 남기는 `shoulder_head`).
+이 PR은 기존 `/export-order` 요청 스키마나 운영 export 승인 정책을 확장하지 않는다.
+
+### 내부 진단 POST /screen-hand-contact
+
+multipart 필드: `bvh`, 필수 `expected_bvh_sha256`, 선택 `character_id`(기본 standin-master-v2),
+`expected_character_sha256`, `hand_left`, `hand_right`. full/frame0/non-mirror 변환만 실행한다.
+요청에 없는 손 프리셋을 만들거나 crop·카메라 회전·refine·생성을 실행하지 않는다.
+
+HTTP 200은 **진단 완료**이지 내보내기 허가가 아니다. `status`는 `clear_screen` /
+`intersection` / `unavailable`이며, 반대 손 삼각형 수·교차 수·제한 범위·입력/FBX/손/solver
+계보를 반환한다. FBX/PNG/GLB 바이트는 반환하지 않는다. 입력 해시 불일치는 기존 409,
+변환·worker 무결성 실패는 기존 converter 오류 봉투(4xx/5xx)다. inference는 비정상 응답을
+미확인으로 처리한다. converter Docker의 명시적 allowlist에 검사 모듈을 포함한다.
 
 ---
 
@@ -195,7 +239,10 @@ X-Standin-Solver-Version           == chain-transport-v3.2
 
 mirror는 Converter가 한 번만 적용한다. CSP는 같은 좌우 반전을 다시 하지 않고 소재 등록·배치와
 다인 상대 위치 조정을 담당한다. 다인 컷은 item 수만큼 독립 Converter 요청과 독립
-`BVH + FBX` 쌍이 생긴다. `set_id`는 묶음 메타일 뿐 하나의 다인 BVH/FBX가 아니다.
+`BVH + FBX` 쌍이 생긴다. `set_id` 자체는 묶음 메타다. 이 최종 FBX들을 명시적 3D 배치와
+함께 `/compose-scene`에 넘기면 한 컷 다인 FBX를 만들 수 있다. 스켈레톤/2D bbox만으로
+깊이를 복원하지 않으며 BFF/뷰어가 배치값을 확정한다. 호출 규격과 검증은
+[`FBX_MULTI_PERSON_SCENE.md`](FBX_MULTI_PERSON_SCENE.md)를 따른다.
 
 상세 BFF 구현·lineage·오류 계약은
 [`FBX_CONVERTER_V3_2_PHASE3_BFF_HANDOFF.md`](FBX_CONVERTER_V3_2_PHASE3_BFF_HANDOFF.md)를 따른다.
@@ -207,3 +254,34 @@ mirror는 Converter가 한 번만 적용한다. CSP는 같은 좌우 반전을 �
 - legacy `/export-order`: `api/models.py`의 `ExportOrderRequest` / `ExportOrder` / `ExportItem`
 - inference/refine → converter Phase 3: `FBX_CONVERTER_V3_2_PHASE3_BFF_HANDOFF.md`
 - 내부 `/convert-bundle` 및 호환 `/convert`: `converter_api/app.py`와 converter OpenAPI `/docs`
+# 후보 카메라와 FBX (2026-10-07 추가)
+
+`POST /convert-framed`는 선택적 multipart `camera_rotation`을 받는다(JSON 3×3
+proper rotation, Y-up). 사용 시 `preview_view=front`만 허용한다. 동결 solver 후
+완성 모델 전체를 회전하고 저장한 FBX를 다시 읽어 preview를 만든다. 응답은 실제 적용한
+`camera_rotation`을 그대로 되돌려준다. BFF는 요청과 다르거나 누락되면 실패 처리한다.
+
+카메라는 FBX와 preview에만 적용한다. BVH는 회전하지 않는다. Mirror와 카메라를
+동시에 요청하는 경로는 지원하지 않으며, exact V3.2.4도 회전을 허용하지 않는다.
+전신·반신·흉상·두상 모두 같은 행렬을 사용한다. 관절·손가락의 상대 회전은 바꾸지 않는다.
+
+### 대분류 추천과 Export 경계
+
+`BODY_CLASSIFICATION_STRATEGY=coarse`의 `coarse_recommendation.recommended_body_id`는 캐릭터 대분류에 따른 프리셋 추천이다. 이를 승인된 `selected_asset` 또는 Export 주문으로 간주하지 않는다. 이 전략은 `applied_body_id=null`, `render_required=false`이며 기존 수동 선택·자산 QA·Export 검증 절차를 유지한다. 추천 출력과 자동 적용을 구분하는 필드는 [대분류 추천 계약](BODY_SELECTION/COARSE_RECOMMENDATION.md)에 기록한다.
+
+coarse의 tentative 계열에 제공하는 반대 계열 BASE도 진단용 대안이다. `crop_box` 확장이나 추천 후보 변경은 Export 자산 권한·주문·자동 적용을 만들지 않는다.
+
+선택적 `family_review`는 이미지 판독 근거와 추천에만 영향을 준다. 재검토로 계열이 교정되어도 `applied_body_id/selected_asset`은 null이며 Export 주문이나 자산 승인을 생성하지 않는다. 기존 수동 선택·기본값 처리와 Export 입력은 유지한다. [이미지 재검토 계약](BODY_SELECTION/FAMILY_REVIEW.md).
+
+
+### 첫 VLM 체형 통합의 경계
+
+`BODY_CLASSIFICATION_STRATEGY=integrated`는 `/analyze`의 최초 VLM 관측을 공유하는 추천 전용 경로다. `coarse_recommendation.recommended_body_id`는 실행용 자산 승인이나 Export 선택이 아니며, `auto_body_id/applied_body_id/selected_asset`는 null을 유지한다. BFF 수동 선택·기본값 우선순위, Export 체형 참조, 다중 인물 장면과 손 프리셋 전달 계약은 변경하지 않는다. 추천을 Export 주문으로 자동 승격하지 않는다. [통합 평가 및 제한](BODY_SELECTION/INTEGRATED_FIRST_CALL.md).
+
+### 통합 경로의 기하 참고 복구
+
+통합 체형 opt-in 모드의 `dynamic_search.selected`가 `match_level=geometry_fallback`을 반환하면 의미 조건 통과 후보가 아닌 검수 참고다. `review_required=true`, `not_exact_match=true`, `constraints_satisfied=false`와 원래 조건 감사 결과를 함께 표시한다. `release_allowed=false`, `refine_allowed=false`이며 자동 Export나 정답 인증에 사용하지 않는다. 미확정 체형의 독립 재검토도 추천에만 영향을 주며 수동 선택·기본값·Export 주문 계약을 변경하지 않는다. [복구 평가와 범위](BODY_SELECTION/INTEGRATED_REPAIR.md).
+
+통합 체형의 조건부 재검토는 포즈 추출·검색과 병렬 실행하고, 포즈 경로 종료 후 남은 기존 예산 안에서 추천에만 합친다. 시간 초과는 최초 추천을 보존하며 늦은 응답으로 Export 입력을 바꾸지 않는다. 기존 수동 선택·기본값·자동 적용 금지 계약은 유지한다. [병렬화 검증](BODY_SELECTION/PARALLEL_REVIEW.md).
+
+아동 자산은 이미지 자동 추천으로 Export 권한을 만들지 않는다. BFF는 과거 자동 아동 추천/선택도 재검증하며, 사용자 수동·사용자 기본값·last-used 아동은 기존 적격성/Export 계약을 따른다. 아동 모델 자체를 삭제하거나 성인으로 강제 치환하지 않는다. [정책](BODY_SELECTION/CHILD_RECOMMENDATION_POLICY.md).

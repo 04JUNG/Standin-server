@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>두상·흉상 시점 작업실</title><link rel="stylesheet" href="/static/style.css?v=head-1"><link rel="stylesheet" href="/static/scoped.css?v=1"><link rel="stylesheet" href="/static/head.css?v=bust-3"></head>
+<body class="scoped-page head-page"><main>
+<header class="page-header"><div><a class="text-link" href="/scoped">← 상체 포즈·러프 시점</a><h1>두상·흉상 시점 작업실</h1><p>얼굴 후보를 선택해 각도를 맞추고, 기본 캐릭터로 확인한 뒤 FBX를 내려받으세요.</p></div></header>
+<p class="head-notice">자동 검출한 얼굴 후보에서 원하는 그림 얼굴을 선택하세요. 후보가 없거나 가려진 얼굴은 얼굴 영역을 지정하고 각도로 직접 맞출 수 있습니다. 흉상은 머리·몸통 방향을 따로 조절합니다. 표정과 어깨 들썩임은 기본 형태입니다.</p>
+<section class="toolbar"><label for="head-list-mode">목록</label><select id="head-list-mode"><option value="detected">자동 각도 후보 있는 러프</option><option value="active">전체 검수 대상</option><option value="excluded">제외한 이미지</option></select><label for="head-query">비교할 러프</label><select id="head-query" disabled></select><label for="head-scope">출력 범위</label><select id="head-scope"><option value="head">두상</option><option value="bust">흉상 · 머리·몸통 조절</option></select></section>
+<div class="head-actions"><button id="head-exclude" class="quiet-button" disabled>두상 없는 이미지 제외</button><button id="head-restore" class="quiet-button" hidden>검수 대상으로 복구</button><span id="head-list-status" class="preview-caption"></span></div>
+<div class="rough-workspace">
+<section><h2>1. 대상 얼굴 선택</h2><p id="face-candidates-status" class="preview-caption" role="status"></p><div id="face-candidates" class="face-candidates"></div><details class="manual-landmarks"><summary>기준점 직접 지정</summary><p class="preview-caption">자동 후보 대신 직접 지정할 때 사용하세요. 한 인물의 같은 얼굴에 표시하세요. 두 눈·코·턱이 안 보이는 옆얼굴이나 뒤통수는 각도로 직접 맞추세요.</p>
+<div class="head-guide"><svg viewBox="0 0 160 180" aria-label="얼굴 기준점 위치 예시" role="img"><ellipse cx="80" cy="88" rx="51" ry="73" fill="#f5f4ee" stroke="#72897d"/><path d="M44 68 Q53 59 64 68 M96 68 Q107 59 116 68 M80 69 L72 100 L85 100 M64 122 Q80 130 96 122" fill="none" stroke="#72897d" stroke-width="2"/><g fill="#28634f" font-size="15" font-family="sans-serif"><text x="31" y="65">1</text><text x="116" y="65">2</text><text x="75" y="59">3</text><text x="82" y="103">4</text><text x="76" y="159">5</text><text x="76" y="28">6</text></g></svg><div id="head-anchors" aria-label="기준점 선택"></div></div>
+</details>
+<div class="head-actions"><button id="head-region" class="quiet-button" disabled>측면·뒤통수 영역 지정</button></div><p class="preview-caption">눈·코가 안 보이면 머리를 감싸는 영역의 두 모서리를 지정하고 각도를 직접 맞출 수 있습니다.</p>
+<div class="head-image-stage"><img id="head-image" alt="선택한 익명 러프"><svg id="head-overlay" aria-label="얼굴 기준점 입력 영역"></svg></div>
+<div class="head-actions"><button id="head-reset" class="quiet-button">기준점 초기화</button><button id="head-fit" class="primary-button" disabled>6개 기준점으로 각도 추천</button></div>
+<p id="head-status" role="status">러프를 불러오는 중…</p><a id="head-fit-download" class="text-link" hidden>기준점·추천 기록 JSON ↓</a>
+<p class="preview-caption">초록은 입력·검출 기준점, 주황은 기준 얼굴의 투영입니다. 참고 각도이며 얼굴 비율·원근은 재현하지 않습니다.</p>
+</section>
+<section><h2>2. 기본 모델 확인·내보내기</h2><p class="preview-caption">두상은 전체 방향을 맞춥니다. 흉상은 머리와 몸통을 따로 맞출 수 있습니다. 목 회전은 두 관절에 나누어 적용하고 과도한 꺾임은 제한합니다.</p>
+<div id="preview-style" hidden><button data-style="oriented">자유 각도</button></div><div id="standard-preview" hidden></div>
+<section id="orientation-panel" aria-label="기본 두상 각도 출력">
+<div class="angle-controls">
+<label for="yaw-angle">좌우 시점 <output id="yaw-value">0°</output></label><input id="yaw-angle" type="range" min="-180" max="180" value="0" step="0.01"><input id="yaw-number" aria-label="좌우 시점 각도" type="number" min="-180" max="180" step="0.01" value="0" required>
+<label for="pitch-angle">높낮이 <output id="pitch-value">0°</output></label><input id="pitch-angle" type="range" min="-90" max="90" value="0" step="0.01"><input id="pitch-number" aria-label="높낮이 각도" type="number" min="-90" max="90" step="0.01" value="0" required>
+<label for="roll-angle">화면 기울기 <output id="roll-value">0°</output></label><input id="roll-angle" type="range" min="-180" max="180" value="0" step="0.01"><input id="roll-number" aria-label="화면 기울기 각도" type="number" min="-180" max="180" step="0.01" value="0" required>
+</div>
+<div id="angle-presets" class="segmented"><button data-yaw="0">정면·초기화</button><button data-yaw="45">45°</button><button data-yaw="90">측면</button><button data-yaw="180">후면</button></div>
+<p class="preview-caption">높낮이 +는 위에서, −는 아래에서 봅니다. 기울기 +는 시계 방향입니다.</p>
+<section id="bust-controls" hidden>
+<label><input id="bust-separate" type="checkbox"> 머리와 몸통 방향 따로 맞추기</label>
+<div id="body-fields" hidden>
+<div class="body-angle-fields"><label>몸통 좌우 <input id="body-yaw" type="number" min="-180" max="180" step="0.01" value="0" required></label><label>몸통 높낮이 <input id="body-pitch" type="number" min="-90" max="90" step="0.01" value="0" required></label><label>몸통 기울기 <input id="body-roll" type="number" min="-180" max="180" step="0.01" value="0" required></label></div>
+<div class="head-actions"><button id="body-reset" class="quiet-button">몸통을 머리 방향에 맞추기</button><button id="body-shoulders" class="quiet-button" disabled>양쪽 어깨로 기울기 맞추기</button></div>
+<p id="body-status" class="preview-caption" role="status">어깨 두 점으로는 화면 기울기만 맞춥니다. 몸통 좌우·높낮이는 직접 정해 주세요. 어깨 들썩임·팔 자세는 재현하지 않습니다. 머리와 몸통의 상대 회전은 55°까지 허용합니다.</p>
+</div></section>
+<button id="angle-generate" class="primary-button" disabled>이 각도로 미리보기·파일 생성</button><p id="angle-status" class="preview-caption" role="status"></p>
+<div class="hero-image angle-image-box"><img id="angle-image" alt="실제 출력 FBX의 기본 두상 미리보기" hidden><img id="angle-rough" alt="얼굴 러프 비교 레이어" hidden></div>
+<div id="angle-downloads" class="angle-downloads" hidden><a id="angle-fbx" class="quiet-button">이 각도 FBX ↓</a><a id="angle-settings" class="text-link">각도 설정 JSON ↓</a></div>
+<details class="rough-comparison"><summary>얼굴 러프 겹쳐 보기</summary><button id="head-overlay-crop" class="quiet-button" disabled>지정한 얼굴 영역 겹치기</button><button id="head-overlay-clear" class="quiet-button">겹침 숨기기</button><label>다른 비교 이미지 <input id="rough-file" type="file" accept="image/png,image/jpeg,image/webp"></label><label for="rough-opacity">러프 불투명도</label><input id="rough-opacity" type="range" min="0" max="100" value="45"><label for="head-overlay-scale">비교 이미지 크기</label><input id="head-overlay-scale" type="range" min="50" max="200" value="100"><label for="head-overlay-x">비교 이미지 좌우 위치</label><input id="head-overlay-x" type="range" min="-50" max="50" value="0"><label for="head-overlay-y">비교 이미지 위아래 위치</label><input id="head-overlay-y" type="range" min="-50" max="50" value="0"><p class="preview-caption">겹침 위치·크기는 비교 화면에만 적용됩니다.</p></details>
+<p class="preview-caption">출력은 FBX만 제공합니다. CSP에서는 정면·평행 투영 카메라로 확인해 주세요. 기존 레이어의 카메라는 파일로 변경되지 않습니다.</p>
+</section>
+<section class="head-review-panel" aria-label="얼굴 각도 검수 기록">
+<h2>3. 각도·검수 저장</h2>
+<p class="preview-caption">대상 얼굴별로 저장합니다. 채택할 때는 현재 각도의 출력 미리보기를 확인해 주세요. 검수 기록은 이 PC에 보관됩니다.</p>
+<label for="head-review-decision">검수 판정</label><select id="head-review-decision"><option value="hold">보류</option><option value="accepted">채택</option><option value="rejected">제외</option></select>
+<label for="head-review-note">각도 검수 메모</label><textarea id="head-review-note" rows="3" maxlength="2000" placeholder="시선·기울기·가림 등 확인한 내용"></textarea>
+<label class="head-review-confirm"><input id="head-review-confirm" type="checkbox">현재 각도의 FBX 미리보기를 확인했습니다</label>
+<div class="head-actions"><button id="head-review-save" class="primary-button" disabled>각도·검수 저장</button><button id="head-review-reload" class="quiet-button">저장 목록 새로고침</button></div>
+<p id="head-review-status" class="preview-caption" role="status"></p>
+<label for="head-review-records">저장한 얼굴·각도</label><select id="head-review-records"></select>
+<button id="head-review-restore" class="quiet-button" disabled>저장한 각도 불러오기</button>
+</section></section></div>
+</main><script type="module" src="/static/head.js?v=6"></script></body></html>

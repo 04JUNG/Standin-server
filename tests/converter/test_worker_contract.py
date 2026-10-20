@@ -49,6 +49,25 @@ def _job(tmp_path: Path) -> tuple[Path, dict]:
     return path, payload
 
 
+@pytest.mark.parametrize('field,value', [('output_scope', 'shoulder_head'),
+    ('preview_view', 'front'), ('preview_model', True), ('mirror', True),
+    ('force_exact_v324', True), ('hand_contact_screen', 'true')])
+def test_screening_rejects_wrong_artifact_stage(tmp_path, field, value):
+    path, payload = _job(tmp_path)
+    payload['hand_contact_screen'] = True
+    payload[field] = value
+    path.write_text(json.dumps(payload))
+    with pytest.raises(JobValidationError): load_job(path)
+
+
+def test_screening_job_is_explicit_and_does_not_change_legacy_defaults(tmp_path):
+    path, payload = _job(tmp_path)
+    assert not load_job(path).get('hand_contact_screen')
+    payload['hand_contact_screen'] = True
+    path.write_text(json.dumps(payload))
+    assert load_job(path)['hand_contact_screen'] is True
+
+
 def test_worker_module_does_not_import_bpy():
     assert "bpy" not in sys.modules
 

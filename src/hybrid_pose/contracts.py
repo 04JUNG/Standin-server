@@ -87,6 +87,33 @@ REPAIR_SCHEMA = obj(
 )
 
 
+SINGLE_SCHEMA = obj(
+    {
+        "evaluation": copy.deepcopy(EVALUATION_SCHEMA),
+        "patch": copy.deepcopy(REPAIR_SCHEMA),
+    }
+)
+
+
+def merge_single_response(base, response):
+    """One response, same strict/atomic patch rules as the two-stage protocol."""
+    keys(response, SINGLE_SCHEMA["properties"])
+    evaluation, patch = response["evaluation"], response["patch"]
+    validate_evaluation(evaluation, base)
+    if evaluation["decision"] == "repair":
+        return merge_repair(base, evaluation, patch)
+    keys(patch, REPAIR_SCHEMA["properties"])
+    if any(not isinstance(value, list) or value for value in patch.values()):
+        raise ValueError("No-change decision must have empty patch arrays")
+    return copy.deepcopy(base), {
+        "changes": [],
+        "unresolved": [],
+        "uncertainties": evaluation["uncertainties"],
+        "visual_reassessment": False,
+        "unchanged_joint_count": sum(len(p["keypoints"]) for p in base["people"]),
+    }
+
+
 def keys(x, expected):
     if not isinstance(x, dict) or set(x) != set(expected):
         raise ValueError("Invalid object fields")

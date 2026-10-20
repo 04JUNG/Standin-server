@@ -79,7 +79,7 @@ class PipelineTest(unittest.TestCase):
         self.pose.estimate.return_value = [skeleton()]
         self.reviewer = Mock(metadata={"model": "offline-test"})
         self.artifacts = {}
-        self.pipeline = HybridPosePipeline(self.pose, self.reviewer)
+        self.pipeline = HybridPosePipeline(self.pose, self.reviewer, mode="two-stage")
 
     def run_pipeline(self, responses):
         self.reviewer.request.side_effect = responses
@@ -214,6 +214,136 @@ class PipelineTest(unittest.TestCase):
         self.assertEqual(result["status"], "error")
         self.pose.estimate.assert_not_called()
         self.reviewer.request.assert_not_called()
+
+
+class SingleCallTest(unittest.TestCase):
+    def setUp(self):
+        PipelineTest.setUp(self)
+        self.pipeline = HybridPosePipeline(self.pose, self.reviewer)
+
+    def run_single(self, e=None, p=None):
+        response = {
+            "evaluation": e if e is not None else evaluation(),
+            "patch": (
+                p
+                if p is not None
+                else {
+                    "edits": [],
+                    "added_people": [],
+                    "removed_people": [],
+                    "unresolved": [],
+                }
+            ),
+        }
+        self.reviewer.request.return_value = (response, {"saved_raw": True})
+        return self.pipeline.extract(self.image, self.artifacts.__setitem__)
+
+    def test_default_single_pass_preserves_all_coordinates(self):
+        r = self.run_single()
+        self.assertEqual(r["status"], "ok")
+        self.assertEqual(r["final"], r["rtm"])
+        self.assertEqual(r["api_calls_started"], 1)
+        self.assertEqual(
+            self.reviewer.request.call_args.args[0], "single_review_repair"
+        )
+        self.assertIn("single_review_repair.response.json", self.artifacts)
+        self.assertNotIn("evaluation.response.json", self.artifacts)
+        self.assertNotIn("repair.response.json", self.artifacts)
+
+    def test_single_repair_preserves_unedited_no_reevaluation(self):
+        r = self.run_single(repair_evaluation(), patch_data())
+        self.assertEqual(r["status"], "ok")
+        self.assertEqual(r["api_calls_started"], 1)
+        self.reviewer.request.assert_called_once()
+        self.assertEqual(r["audit"]["unchanged_joint_count"], 16)
+        self.assertFalse(r["visual_reassessment"])
+        self.assertEqual(r["delivery_status"], "repair_unverified")
+        self.assertEqual(r["rtm"], proposal())
+        for a, b in zip(
+            r["rtm"]["people"][0]["keypoints"], r["final"]["people"][0]["keypoints"]
+        ):
+            if a["name"] != "left_elbow":
+                self.assertEqual(a, b)
+        self.assertGreaterEqual(
+            r["timings_ms"]["total"],
+            sum(v for k, v in r["timings_ms"].items() if k != "total"),
+        )
+
+    def test_invalid_single_patch_atomic_and_raw_preserved(self):
+        for kind in ["wrong_type", "absent_coords", "duplicate", "pass_with_patch"]:
+            with self.subTest(kind=kind):
+                self.artifacts.clear()
+                self.reviewer.request.reset_mock()
+                e, p = repair_evaluation(), patch_data()
+                if kind == "wrong_type":
+                    e["issues"][0].update(
+                        type="false_or_duplicate_person", joint_names=[]
+                    )
+                elif kind == "absent_coords":
+                    p["edits"][0]["state"] = "not_present"
+                elif kind == "duplicate":
+                    p["edits"].append(copy.deepcopy(p["edits"][0]))
+                else:
+                    e = evaluation()
+                r = self.run_single(e, p)
+                self.assertEqual(r["status"], "error")
+                self.assertIsNone(r["final"])
+                self.assertEqual(r["rtm"], proposal())
+                self.assertNotIn("final.json", self.artifacts)
+                self.assertIn("single_review_repair.response.json", self.artifacts)
+                self.reviewer.request.assert_called_once()
+
+    def test_single_timeout_does_not_retry(self):
+        self.reviewer.request.side_effect = TimeoutError("private")
+        r = self.pipeline.extract(self.image)
+        self.assertIsNone(r["final"])
+        self.assertEqual(r["api_calls_started"], 1)
+        self.reviewer.request.assert_called_once()
+        self.assertNotIn("private", json.dumps(r))
+
+    def test_single_uncertainty_keeps_base(self):
+        e = evaluation()
+        e.update(
+            decision="review_needed",
+            uncertainties=[
+                {
+                    "person_index": 0,
+                    "joint_names": ["left_wrist"],
+                    "region_description": "Behind table",
+                    "reason": "Ambiguous",
+                }
+            ],
+        )
+        r = self.run_single(e)
+        self.assertEqual(r["delivery_status"], "review_needed")
+        self.assertEqual(r["final"], r["rtm"])
+
+    def test_low_vs_default_payload_only_thinking_config_differs(self):
+        payloads = []
+        for level in ["default", "low"]:
+            client = GeminiReviewer("secret", "test-model", thinking_level=level)
+            with patch(
+                "urllib.request.urlopen", return_value=GeminiTest().response({})
+            ) as call:
+                client.request("single_review_repair", b"a", b"b", {"people": []})
+            payloads.append(json.loads(call.call_args.args[0].data))
+            self.assertEqual(call.call_count, 1)
+            self.assertEqual(client.metadata["thinking_level"], level)
+        self.assertEqual(
+            payloads[1]["generationConfig"].pop("thinkingConfig"),
+            {"thinkingLevel": "low"},
+        )
+        self.assertEqual(payloads[0], payloads[1])
+        self.assertEqual(
+            set(payloads[0]["generationConfig"]["responseJsonSchema"]["properties"]),
+            {"evaluation", "patch"},
+        )
+
+    def test_invalid_modes_fail_before_api(self):
+        with self.assertRaises(ValueError):
+            HybridPosePipeline(self.pose, self.reviewer, mode="typo")
+        with self.assertRaises(ValueError):
+            GeminiReviewer("secret", "test-model", thinking_level="typo")
 
 
 class ValidationTest(unittest.TestCase):

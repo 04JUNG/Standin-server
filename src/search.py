@@ -270,6 +270,49 @@ def knn_geometric(entries, feature, top_k=None, query_valid_mask=None,
     return _best_per_pose_family(scored, top_k)
 
 
+def knn_upper_body(entries, feature, query_valid_mask, *, search_index=None,
+                   top_k=None):
+    """Shoulder-frame position search, with the same family/quarantine policy.
+
+    Stored full-body projections are re-centered/re-scaled symmetrically at query
+    time. No action, view or framing tags filter the library. This distance has no
+    calibrated high-confidence threshold and must never reuse torso thresholds.
+    """
+    from .partial_pose import UPPER_JOINTS, shoulder_frame
+
+    entries = search_index.entries if search_index is not None else tuple(entries)
+    if not entries:
+        return []
+    mask = _as_joint_mask(query_valid_mask)
+    selected = UPPER_JOINTS[mask[UPPER_JOINTS]]
+    if not mask[5:7].all() or len(selected) < 4:
+        return []
+    query, query_ok = shoulder_frame(np.asarray(feature).reshape(17, 2))
+    if not query_ok:
+        return []
+    projections = (search_index.features if search_index is not None else
+                   np.stack([entry.feature.reshape(17, 2) for entry in entries]))
+    library, valid = shoulder_frame(projections)
+    distances = np.linalg.norm(library[:, selected] - query[selected], axis=2).mean(axis=1)
+    quarantined = load_pose_quarantine(CFG)
+    candidates = []
+    seen = set()
+    for index in np.argsort(distances, kind="stable"):
+        entry = entries[index]
+        family = pose_family_id(entry.pose_id, entry.meta)
+        if (not valid[index] or not np.isfinite(distances[index])
+                or entry.pose_id in quarantined or family in seen):
+            continue
+        seen.add(family)
+        candidates.append(PoseCandidate(
+            pose_id=entry.pose_id, view=entry.view, distance=float(distances[index]),
+            tags=entry.tags, bvh_path=entry.bvh_path, pose_family_id=family,
+        ))
+        if len(candidates) >= (top_k or CFG.top_k_final):
+            break
+    return candidates
+
+
 def candidate_stability(candidates_a, candidates_b, entries,
                         top1_angle_max: float = -1.0) -> dict:
     """두 mask의 Top-5를 pose family와 Top-1 angle로 비교한다."""

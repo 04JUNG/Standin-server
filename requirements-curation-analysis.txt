@@ -1,0 +1,5 @@
+# Optional local rough analysis. Images never leave this workstation.
+-r requirements-curation.txt
+scipy>=1.11,<2
+rtmlib==0.0.16
+onnxruntime>=1.18,<2

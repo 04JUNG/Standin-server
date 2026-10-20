@@ -14,6 +14,9 @@
 from __future__ import annotations
 
 import io
+import base64
+import hashlib
+import json
 import os
 import tempfile
 import uuid
@@ -42,6 +45,7 @@ class ThumbnailSource:
     bvh_text: Optional[str] = None
     pose_id: Optional[str] = None
     refined: bool = False
+    camera_rotation: Optional[list] = None
 
     def __post_init__(self) -> None:
         if (self.bvh_path is None) == (self.bvh_text is None):
@@ -50,7 +54,7 @@ class ThumbnailSource:
     def read_text(self) -> str:
         if self.bvh_text is not None:
             return self.bvh_text
-        with open(self.bvh_path, "r", encoding="utf-8") as handle:  # type: ignore[arg-type]
+        with open(self.bvh_path, "r", encoding="utf-8", newline="") as handle:  # type: ignore[arg-type]
             return handle.read()
 
 
@@ -94,6 +98,8 @@ class MannequinThumbnailRenderer:
         self._format = image_format
 
     def render(self, source: ThumbnailSource) -> RenderedThumbnail:
+        if source.camera_rotation is not None:
+            raise ThumbnailRenderFailed("aligned previews require the FBX converter")
         if source.bvh_text is None:
             image = self._render(str(source.bvh_path), source.view)
         else:
@@ -183,6 +189,8 @@ class ConverterThumbnailRenderer:
 
     # -- converter 호출 ----------------------------------------------------
     def render(self, source: ThumbnailSource) -> RenderedThumbnail:
+        if source.camera_rotation is not None:
+            return self._aligned(source)
         reused = self._library_thumbnail(source)
         if reused is not None:
             return reused
@@ -247,6 +255,33 @@ class ConverterThumbnailRenderer:
             renderer_version=f"{renderer}/{self.character_id}",
             origin="converter",
         )
+
+    def _aligned(self, source: ThumbnailSource) -> RenderedThumbnail:
+        raw = source.read_text().encode('utf-8')
+        digest = hashlib.sha256(raw).hexdigest()
+        body, content_type = _multipart(
+            fields={'character_id': self.character_id, 'output_scope': 'full',
+                    'preview_view': 'front', 'expected_bvh_sha256': digest,
+                    'camera_rotation': json.dumps(source.camera_rotation)},
+            file_field='bvh', filename='pose.bvh', file_bytes=raw)
+        request = urllib_request.Request(self.base_url + '/convert-framed', data=body,
+                                         headers={'Content-Type': content_type}, method='POST')
+        with self._open(request, timeout=self.timeout_seconds) as response:
+            payload = response.read(48 * 1024 * 1024 + 1)
+        if len(payload) > 48 * 1024 * 1024:
+            raise ThumbnailRenderFailed('aligned response too large')
+        result = json.loads(payload)
+        preview = base64.b64decode(result['preview_base64'], validate=True)
+        if (result.get('source_bvh_sha256') != digest
+                or result.get('camera_rotation') != source.camera_rotation
+                or result.get('preview_view') != 'front'
+                or result.get('output_scope') != 'full'
+                or result.get('preview_sha256') != hashlib.sha256(preview).hexdigest()):
+            raise ThumbnailRenderFailed('aligned preview lineage mismatch')
+        with Image.open(io.BytesIO(preview)) as image:
+            data = _encode(image.resize((self.size, self.size), Image.Resampling.LANCZOS), self.image_format)
+        return RenderedThumbnail(data=data, media_type=MEDIA_TYPES[self.image_format],
+                                 renderer_version='candidate-camera-v1', origin='converter')
 
 
 LIBRARY_RENDERER_VERSION = "fbx-anatomical-v1/library"

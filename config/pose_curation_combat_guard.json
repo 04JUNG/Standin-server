@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "rig_source": "data/curation/sources/quaternius/export-1/pool/combat_ual1_Punch_Cross_f00000.bvh",
+  "rig_sha256": "fd3d02eb9cb307eb0700f48ef4cc6d0a90fdf595c1f6c8b66bd40dd93844544b",
+  "coordinate_system": "metres; X left, Y up, Z forward; authored 3D targets and bend poles, not detected query coordinates",
+  "poses": [
+    {
+      "hip_height": 0.7,
+      "root_xyz": [
+        25,
+        0,
+        0
+      ],
+      "spine_pitch": 0,
+      "left_arm": [
+        [
+          0.22,
+          1.42,
+          0.67
+        ],
+        [
+          0.45,
+          1.19,
+          0.72
+        ]
+      ],
+      "right_arm": [
+        [
+          -0.22,
+          1.14,
+          0.68
+        ],
+        [
+          -0.4,
+          0.9,
+          0.62
+        ]
+      ],
+      "left_leg": [
+        [
+          0.12,
+          0.1,
+          0.3
+        ],
+        [
+          0.2,
+          0.4,
+          0.65
+        ]
+      ],
+      "right_leg": [
+        [
+          -0.12,
+          0.1,
+          0.3
+        ],
+        [
+          -0.2,
+          0.4,
+          0.65
+        ]
+      ],
+      "id": "crouch_head_guard",
+      "label": "웅크려 머리를 보호하는 자세",
+      "reference_roughs": [
+        "rough_287"
+      ],
+      "left_foot": {
+        "mode": "planted",
+        "pitch_degrees": 0
+      },
+      "right_foot": {
+        "mode": "planted",
+        "pitch_degrees": 0
+      }
+    }
+  ]
+}

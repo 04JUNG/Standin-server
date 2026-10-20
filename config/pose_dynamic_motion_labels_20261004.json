@@ -1,0 +1,44 @@
+{
+  "Pistol_Aim_Down": {
+    "style": "권총 하향 조준",
+    "category": "shooting",
+    "category_label": "사격",
+    "prop_guides": "pistol:R:aim"
+  },
+  "Pistol_Aim_Neutral": {
+    "style": "권총 전방 조준",
+    "category": "shooting",
+    "category_label": "사격",
+    "prop_guides": "pistol:R:aim"
+  },
+  "Pistol_Aim_Up": {
+    "style": "권총 상향 조준",
+    "category": "shooting",
+    "category_label": "사격",
+    "prop_guides": "pistol:R:aim"
+  },
+  "Pistol_Shoot": {
+    "style": "권총 발사 동작",
+    "category": "shooting",
+    "category_label": "사격",
+    "prop_guides": "pistol:R:aim"
+  },
+  "Pistol_Reload": {
+    "style": "권총 재장전 동작",
+    "category": "shooting",
+    "category_label": "사격",
+    "prop_guides": ""
+  },
+  "Jump_Loop": {
+    "style": "점프 공중 자세",
+    "category": "fantasy",
+    "category_label": "판타지",
+    "prop_guides": ""
+  },
+  "Spell_Simple_Enter": {
+    "style": "마법 시전 준비",
+    "category": "fantasy",
+    "category_label": "판타지",
+    "prop_guides": ""
+  }
+}

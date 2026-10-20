@@ -130,10 +130,10 @@ def test_face_skips():
     assert res.candidates == []
 
 
-def test_bust_route_skips_search():
+def test_bust_route_uses_observed_pose_search():
     res = _pipe().process_cut(_Img("bust front 1p"))
-    assert res.route == "bust"
-    assert res.candidates == []
+    assert res.route == "core"
+    assert res.candidates  # Mock supplies a complete skeleton; geometry wins.
 
 
 def test_count_mismatch_is_low_conf():

@@ -7,9 +7,9 @@ SOLVER_VERSION = "chain-transport-v3.2.5"
 EXPECTED_BLENDER_VERSION = "5.2.0"
 EXPECTED_BLENDER_BUILD_HASH = "fbe6228777e7"
 
-RETARGET_SHA256 = "be57c8eaf7144994a9015783e244a418d70f57b18cef01218fe850b028334cbd"
+RETARGET_SHA256 = "2fca3bd577445989c178aa4ca33e772c595ad2aeb6083f817a3824c93508a579"
 ANKLE_POLICY_SHA256 = "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f"
-SOLVER_MANIFEST_SHA256 = "3693d91cc1607e787bdb7997201cd8a78b90e79740d60003c30d2a42536466ae"
+SOLVER_MANIFEST_SHA256 = "52eae0b0eb6a7023540fdf023ad4321f24c11d439f3ecf9f390b5b72358b24e3"
 
 OUTPUT_MODE = "rigged_rest"
 FRAME = 0
@@ -17,11 +17,10 @@ APPLY_ROOT_TRANSLATION = False
 EMBED_TEXTURES = False
 
 # ── 썸네일 렌더(선택 단계) ──
-# 라이브러리 썸네일(2026-09-03 번들)은 같은 캐릭터를 V3.2.5로 변환한 FBX를
-# 어깨·골반에서 유도한 anatomical 카메라로 EEVEE 렌더한 뒤 256px JPEG로 줄인 것이다.
-# /refine 조정본 preview도 같은 경로를 타야 후보 썸네일과 같은 그림이 된다.
+# anatomical 카메라는 유지하고, preview_style의 부드러운 라이브러리 조명을 쓴다.
+# /refine 조정본에도 같은 스타일을 적용하며 렌더 버전으로 예전 결과와 구분한다.
 # 렌더는 변환 report와 함께 검증되지만 solver 동결 범위(SHA256SUMS.v325) 밖이다.
-THUMBNAIL_RENDERER_VERSION = "fbx-anatomical-v1"
+THUMBNAIL_RENDERER_VERSION = "fbx-anatomical-soft-v2"
 THUMBNAIL_VIEWS = ("front", "three_quarter", "side", "back")
 THUMBNAIL_CAMERA_CONVENTION = "anatomical_{view}_from_shoulders_hips"
 THUMBNAIL_RENDER_RESOLUTION = 256      # live preview 최종 크기(CPU Cycles 지연 상한)

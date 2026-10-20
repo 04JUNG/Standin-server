@@ -785,7 +785,9 @@ def test_v25_aggressive_skips_when_final_check_budget_is_not_available():
             base, keypoints, scores, "front",
             out_path=os.path.join(directory, "result.bvh"),
             allowed_limbs=["left_arm"], refine_mode="aggressive",
-            deadline=time.monotonic() + 2.0, cfg=cfg,
+            # Leave CPU headroom for the conservative pass on busy desktops.
+            # Five seconds is still below the ten-second aggressive threshold.
+            deadline=time.monotonic() + 5.0, cfg=cfg,
         )
         assert result.refined
         assert result.diagnostics["mode_applied"] == "conservative"

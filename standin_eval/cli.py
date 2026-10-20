@@ -100,6 +100,18 @@ def _run(parser: argparse.ArgumentParser) -> None:
     replay.add_argument("--min-iou", type=float, default=0.10)
     replay.add_argument("--max-center-distance", type=float, default=0.75)
 
+    vlm_compare = sub.add_parser(
+        "vlm-compare",
+        help="Alternate two VLM prompt versions on the same cuts and gate the change",
+    )
+    vlm_compare.add_argument("--dataset", required=True)
+    vlm_compare.add_argument("--eval-root", default="evaluation")
+    vlm_compare.add_argument("--provider", required=True)
+    vlm_compare.add_argument("--a", dest="prompt_a", default="p1-scope")
+    vlm_compare.add_argument("--b", dest="prompt_b", required=True)
+    vlm_compare.add_argument("--repeats", type=int, default=5)
+    vlm_compare.add_argument("--output-root", default="out/eval/vlm-compare")
+
     refine = sub.add_parser("refine-pairs")
     refine.add_argument("--target", required=True)
     refine.add_argument("--from-run", required=True)
@@ -252,6 +264,16 @@ def main(argv: list[str] | None = None) -> int:
                 timeout_seconds=args.timeout, seed=args.seed,
             ))
             return 0
+        if args.run_command == "vlm-compare":
+            from .vlm_compare import write_vlm_compare
+
+            report = write_vlm_compare(
+                load_dataset(args.dataset, args.eval_root), provider=args.provider,
+                prompt_a=args.prompt_a, prompt_b=args.prompt_b, repeats=args.repeats,
+                output_root=args.output_root,
+            )
+            _print(report)
+            return 0 if report["passed"] else 2
         if args.run_command == "refine-eval":
             from .refine_three_arm import run_refine_evaluation
 

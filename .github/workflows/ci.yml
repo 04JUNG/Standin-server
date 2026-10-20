@@ -10,6 +10,12 @@ on:
       - ".dockerignore"
       - "Dockerfile"
       - "requirements.txt"
+      - "requirements-curation*.txt"
+      - "requirements-head-direction.txt"
+      - "requirements-anime-head.txt"
+      - "pose_curation/**"
+      - "config/pose_curation*.json"
+      - "config/pose_scenarios*.json"
       - "api/**"
       - "src/**"
       - "scripts/**"
@@ -36,13 +42,16 @@ jobs:
           python-version: "3.12"
           cache: pip
 
+      - name: Set up Node for frozen BFF contract tests
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
       - name: Install dependencies
-        # mirror BVH contract tests import scipy, while production keeps scipy
-        # optional because runtime refine has a NumPy fallback.
-        run: pip install -r requirements.txt pytest "scipy>=1.11"
+        run: pip install -r requirements.txt pytest
 
       - name: Compile Python sources
-        run: python -m compileall src api scripts
+        run: python -m compileall src api scripts pose_curation
 
       - name: Run pose cascade contract
         run: python -m pytest -q tests/test_pose_cascade.py

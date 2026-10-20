@@ -19,8 +19,12 @@ from typing import Optional
 
 from ..schema import VLMAnalysis, BBox, Shot, Action, View, Relationship
 from ..config import CFG
+from ..body_scope import BodyScope, parse_person_scopes
+from ..person_tags import parse_person_values, stated_value
 from ..logging_setup import log_info, log_warn
+from ..pose_query import validated_object_hands
 from . import prompts
+from .failures import classify_failure, failure_reason
 
 
 _MAX_VLM_PEOPLE = 20
@@ -60,16 +64,12 @@ def _coerce(analysis: dict, img_w: int, img_h: int) -> VLMAnalysis:
         except (KeyError, TypeError, ValueError, OverflowError):
             boxes.append(None)
 
-    raw_lower = analysis.get("lower_body_visible")
-    if isinstance(raw_lower, list) and len(raw_lower) == num:
-        lower_body_visible = [value is True for value in raw_lower]
-        lower_body_visibility_known = [
-            isinstance(value, bool) for value in raw_lower
-        ]
-    else:
-        # refine은 fail-closed로 동결하되, 검색은 누락을 '반신'으로 해석하지 않는다.
-        lower_body_visible = [False] * max(num, 0)
-        lower_body_visibility_known = [False] * max(num, 0)
+    lower_body_visible, lower_body_visibility_known = parse_lower_body(
+        analysis.get("lower_body_visible"), num)
+    person_bodies = []
+    if "person_bodies" in analysis:
+        from ..experimental.body_matching.integrated import parse_bodies
+        person_bodies = parse_bodies(analysis["person_bodies"], num)
     return VLMAnalysis(
         num_people=num,
         shot=pick(Shot, analysis.get("shot"), Shot.FULL_HALF),
@@ -80,9 +80,27 @@ def _coerce(analysis: dict, img_w: int, img_h: int) -> VLMAnalysis:
         approx_boxes=boxes,
         dialogue=analysis.get("dialogue"),
         raw=analysis,
+        person_bodies=person_bodies,
         lower_body_visible=lower_body_visible,
         lower_body_visibility_known=lower_body_visibility_known,
+        body_scopes=parse_person_scopes(analysis.get("body_scopes"), num),
+        person_actions=parse_person_values(analysis.get("person_actions"), num, Action),
+        person_views=parse_person_values(analysis.get("person_views"), num, View),
+        stated_tags={
+            "shot": stated_value(analysis.get("shot"), Shot),
+            "action": stated_value(analysis.get("action"), Action),
+            "view": stated_value(analysis.get("view"), View),
+            "relationship": stated_value(analysis.get("relationship"), Relationship),
+        },
     )
+
+
+def parse_lower_body(raw: object, count: int) -> tuple[list[bool], list[bool]]:
+    """approx_boxes 순서의 하체 가시성과, 그 값이 실제 provider 응답에서 왔는지."""
+    if isinstance(raw, list) and len(raw) == count:
+        return [value is True for value in raw], [isinstance(value, bool) for value in raw]
+    # refine은 fail-closed로 동결하되, 검색은 누락을 '반신'으로 해석하지 않는다.
+    return [False] * max(count, 0), [False] * max(count, 0)
 
 
 def _extract_json(text: str) -> dict:
@@ -94,27 +112,53 @@ def _extract_json(text: str) -> dict:
 
 
 class VLMUnavailable(RuntimeError):
-    """상류 VLM이 **일시적으로** 요청을 처리하지 못했다(429·5xx 소진, 데드라인).
+    """상류 VLM이 요청을 처리하지 못했다(요청 제한·일일 한도·5xx·데드라인).
 
     파이프라인 버그와 구분하기 위한 타입이다. 이 구분이 없으면 Gemini 과부하가
     `/analyze`에서 처리되지 않은 예외로 올라가 500 + P2 UNHANDLED_ERROR 알림이 되고,
     사용자는 "다른 이미지로 다시 시도해 주세요"라는 잘못된 안내를 받는다. 다른 이미지를
     넣어도 상류가 붐비는 동안에는 똑같이 실패한다.
 
-    호출자(api/app.py)가 503 + Retry-After로 번역한다.
+    호출자(api/app.py)가 503과 원인별 재시도 안내로 번역한다.
     """
 
     def __init__(self, message: str, *, status: int | None = None,
-                 attempts: int = 0, elapsed_seconds: float = 0.0):
+                 attempts: int = 0, elapsed_seconds: float = 0.0,
+                 reason: str | None = None, retry_after_seconds: float | None = None):
         super().__init__(message)
         self.status = status
         self.attempts = attempts
         self.elapsed_seconds = elapsed_seconds
+        self.reason = reason or failure_reason(status, timed_out=status is None)
+        self.retryable = self.reason != "daily_quota_exhausted"
+        self.retry_after_seconds = retry_after_seconds
 
 
 class BaseVLMClient:
     def analyze(self, image, img_w: int, img_h: int) -> VLMAnalysis:  # noqa
         raise NotImplementedError
+
+    def tag_people(self, image, boxes: list) -> Optional[dict]:
+        """인물별 태그만 받는 두 번째 호출. 지원하지 않거나 실패하면 None.
+
+        분석 호출과 분리돼 있어 이 호출이 어떻게 되든 route·인원수·박스는 바뀌지 않는다.
+        """
+        return None
+
+    def describe_people(self, image, boxes: list):
+        """관절 근거가 부족한 인물의 자세 설명(04J-286). ``DescribeOutcome``을 돌려준다.
+
+        지원하지 않는 provider는 '의미 근거 없음'이 아니라 오류로 답한다 — 판단 불가와
+        섞이면 provider 미지원이 러프 품질 문제로 집계되기 때문이다.
+        """
+        from ..search_routing import DescribeOutcome
+
+        return DescribeOutcome("error", error_reason="describe_not_supported",
+                               retryable=False, provider=type(self).__name__)
+
+    def read_hands(self, image, boxes: list) -> Optional[dict]:
+        """인물별 손 모양(04J-290). 지원하지 않는 provider는 None → 손은 기본값."""
+        return None
 
     def rerank(self, image, candidates: list, query_tags: dict) -> list:
         """
@@ -137,7 +181,7 @@ class MockVLMClient(BaseVLMClient):
         shot = Shot.FULL_HALF
         if "bust" in hint or "흉상" in hint:
             shot = Shot.BUST
-        elif "face" in hint or "얼굴" in hint:
+        elif "face" in hint or "head" in hint or "얼굴" in hint or "두상" in hint:
             shot = Shot.FACE
 
         action = Action.STANDING
@@ -165,17 +209,150 @@ class MockVLMClient(BaseVLMClient):
         lower_hidden = any(token in hint for token in (
             "half_body", "half-body", "lower_hidden", "반신", "하체 비관측",
         ))
+        # 인물별 태그를 묻는 프롬프트일 때만 실제 provider처럼 인물별 배열을 돌려준다.
+        person_tags = CFG.vlm_prompt_version in prompts.PERSON_TAG_VERSIONS
+        raw = {
+            "mock": True,
+            "hint": hint,
+            "lower_body_visible": [not lower_hidden] * num,
+        }
+        if person_tags:
+            raw["person_actions"] = [action.value] * num
+            raw["person_views"] = [view.value] * num
         return VLMAnalysis(
             num, shot, action, view, rel, boxes,
             dialogue=None,
-            raw={
-                "mock": True,
-                "hint": hint,
-                "lower_body_visible": [not lower_hidden] * num,
-            },
+            raw=raw,
             lower_body_visible=[not lower_hidden] * num,
             lower_body_visibility_known=[True] * num,
+            body_scopes=[
+                BodyScope.HEAD if shot == Shot.FACE else
+                BodyScope.BUST if shot == Shot.BUST else
+                BodyScope.HALF if lower_hidden else BodyScope.FULL
+            ] * num,
+            person_actions=[action] * num if person_tags else [],
+            person_views=[view] * num if person_tags else [],
+            stated_tags={"shot": shot.value, "action": action.value,
+                         "view": view.value, "relationship": rel.value},
         )
+
+
+def _mock_describe(self, image, boxes: list):
+    """hint 문자열로 설명을 흉내 낸다. 'describe_fail'이면 VLM 오류, 'vague'면 일반 설명."""
+    from ..search_routing import DescribeOutcome, PoseDescription
+
+    hint = str(getattr(image, "hint", "") or image if isinstance(image, str) else "").lower()
+    if "describe_fail" in hint:
+        return DescribeOutcome("error", error_reason="rate_limited", retryable=True,
+                               retry_after_seconds=30.0, provider="mock")
+    descriptions = {}
+    for index, _box in enumerate(boxes):
+        if "unreadable" in hint:
+            descriptions[index] = PoseDescription(visible=False, certainty="low")
+        elif "vague" in hint:
+            descriptions[index] = PoseDescription(
+                postures=["standing"], body_details="", search_text="서 있는 사람",
+                certainty="low")
+        else:
+            descriptions[index] = PoseDescription(
+                postures=["standing"], actions=["run"], domains=["sports"],
+                activities=["athletics"], intents=["prepare_action"],
+                body_details="팔과 다리를 앞뒤로 크게 엇갈려 뻗음",
+                search_text="큰 보폭으로 팔다리를 엇갈려 달리는 자세", certainty="medium")
+    return DescribeOutcome("ok", descriptions=descriptions, provider="mock")
+
+
+MockVLMClient.describe_people = _mock_describe
+
+
+def parse_pose_descriptions(payload, count: int) -> dict:
+    """설명 응답 → {인덱스: PoseDescription}. 길이가 다르면 통째로 버린다(한 칸 밀림 방지)."""
+    from ..search_routing import PoseDescription
+    from ..semantic_vocab import VOCABULARY
+    from ..body_language import validated_observations
+    from ..pose_relations import validate_relations
+    from .description_contract import DescriptionResponseError
+
+    people = payload.get("people") if isinstance(payload, dict) else None
+    if not isinstance(people, list) or len(people) != count:
+        raise DescriptionResponseError("people_count_mismatch", "people")
+    groups = {
+        "postures": "posture", "actions": "action", "domains": "domain",
+        "activities": "activity", "objects": "object", "intents": "intent",
+        "emotions": "emotion",
+    }
+    out = {}
+    for index, item in enumerate(people):
+        if not isinstance(item, dict):
+            raise DescriptionResponseError("invalid_person", "people.item")
+        kept, dropped = {}, {}
+        for field_name, group in groups.items():
+            values = item.get(field_name)
+            values = values if isinstance(values, list) else []
+            allowed = VOCABULARY[group]
+            kept[field_name] = list(dict.fromkeys(
+                value for value in values if isinstance(value, str) and value in allowed))
+            bad = [value for value in values if not (isinstance(value, str) and value in allowed)]
+            if bad:
+                dropped[field_name] = [str(value)[:40] for value in bad][:10]
+        certainty = item.get("certainty")
+        observations = validated_observations(item.get("body_observations"))
+        raw_observations = item.get("body_observations")
+        if isinstance(raw_observations, dict):
+            invalid = {str(k)[:40]: str(v)[:40] for k, v in raw_observations.items()
+                       if k not in observations}
+            if invalid:
+                dropped["body_observations"] = invalid
+        context = item.get("context_evidence")
+        context = context.strip()[:200] if isinstance(context, str) else ""
+        if not context:
+            # Interpretations without evidence cannot dominate the main query.
+            for name in ("domains", "activities", "objects", "intents", "emotions"):
+                if kept[name]:
+                    dropped[f"ungrounded_{name}"] = kept[name]
+                    kept[name] = []
+        from ..pose_requirements import clean_arm_states,hand_counts
+        counts=hand_counts(item.get('held_object_hand_counts'))
+        for obj,side in validated_object_hands(item.get('held_object_hands'),kept['objects']).items():
+            if side in ('left','right','both'):counts.setdefault(obj,'two' if side=='both' else 'one')
+        out[index] = PoseDescription(
+            visible=item.get("visible") is not False,
+            body_details=str(item.get("body_details") or "")[:300],
+            search_text=str(item.get("search_text") or "")[:200],
+            certainty=certainty if certainty in ("high", "medium", "low") else None,
+            body_observations=observations, context_evidence=context,
+            held_object_hands=validated_object_hands(
+                item.get('held_object_hands'),kept['objects']),
+            held_object_hand_counts={k:v for k,v in counts.items() if k in kept['objects']},
+            arm_states=clean_arm_states(item.get('arm_states')),
+            pose_relations=validate_relations(item.get('pose_relations')),
+            visible_scope=item.get('visible_scope') if item.get('visible_scope') in ('full','half','bust','shoulder_head','head') else None,
+            head_view=item.get('head_view') if item.get('head_view') in ('front','profile_left','profile_right','back','three_quarter_left','three_quarter_right') else None,
+            dropped=dropped, **kept,
+        )
+    return out
+
+
+def describe_failure_reason(error: Exception) -> tuple[str, bool, Optional[float]]:
+    """설명 호출 실패 → (reason, retryable, retry_after). 04J-294 분류가 있으면 그대로 쓴다."""
+    status = _http_status(error)
+    timed_out = _is_timeout(error)
+    upstream = timed_out or status == 429 or (status is not None and 500 <= status < 600)
+    if not upstream:
+        # 우리 쪽(파싱·스키마·SDK) 문제. 상류 혼잡으로 분류하지 않는다.
+        return ("invalid_response" if isinstance(error, (ValueError, KeyError))
+                else "provider_error"), False, None
+    try:
+        from .failures import classify_failure  # 04J-294(PR #86) 병합 후 존재
+    except ImportError:
+        classify_failure = None
+    if classify_failure is not None:
+        reason, delay = classify_failure(error, status, timed_out=timed_out)
+    else:
+        reason = ("timeout" if timed_out else "rate_limited" if status == 429
+                  else "upstream_unavailable" if status == 503 else "upstream_error")
+        delay = None
+    return reason, reason != "daily_quota_exhausted", delay
 
 
 class GeminiVLMClient(BaseVLMClient):
@@ -208,9 +385,175 @@ class GeminiVLMClient(BaseVLMClient):
         buf = io.BytesIO(); img.convert("RGB").save(buf, format="PNG")
         return types.Part.from_bytes(data=buf.getvalue(), mime_type="image/png")
 
-    def analyze(self, image, img_w: int, img_h: int) -> VLMAnalysis:
+    def tag_people(self, image, boxes: list) -> Optional[dict]:
+        """태그 전용 호출. 재시도하지 않는다 — 기록용 값이라 사용자를 기다리게 하지 않는다."""
+        from google.genai import types
+
+        started = self._clock()
+        try:
+            resp = self._client.models.generate_content(
+                model=self._model,
+                contents=[prompts.person_tags_prompt(boxes), self._to_part(image)],
+                config=types.GenerateContentConfig(
+                    system_instruction=prompts.PERSON_TAGS_SYSTEM,
+                    response_mime_type="application/json",
+                    temperature=0,
+                    http_options=types.HttpOptions(
+                        timeout=CFG.vlm_person_tags_timeout_ms),
+                ),
+            )
+            payload = _extract_json(resp.text)
+            log_info("gemini_person_tags", model=self._model, status="ok",
+                     people=len(boxes),
+                     elapsedMs=round((self._clock() - started) * 1000))
+            return payload if isinstance(payload, dict) else None
+        except Exception as error:
+            # 실패를 올려 보내지 않는다. 분석은 이미 끝났고 태그는 없어도 되는 값이다.
+            log_warn("gemini_person_tags", model=self._model, status="failed",
+                     errorType=type(error).__name__,
+                     elapsedMs=round((self._clock() - started) * 1000))
+            return None
+
+    def read_hands(self, image, boxes: list) -> Optional[dict]:
+        """손 모양 전용 호출. 실패하면 기존 기본 손으로 반환한다."""
+        from google.genai import types
+        from converter.hand_library import load_library
+
+        library = load_library()
+        presets = [(p.preset_id, p.label_ko, p.vlm_hint, library.categories[p.category])
+                   for p in library.presets.values()]
+        started = self._clock()
+        try:
+            resp = self._client.models.generate_content(
+                model=self._model,
+                contents=[prompts.hand_shapes_prompt(boxes, presets), self._to_part(image)],
+                config=types.GenerateContentConfig(
+                    system_instruction=prompts.HAND_SHAPES_SYSTEM,
+                    response_mime_type="application/json",
+                    temperature=0,
+                    http_options=types.HttpOptions(timeout=CFG.vlm_hand_shapes_timeout_ms),
+                ),
+            )
+            payload = _extract_json(resp.text)
+            log_info("gemini_hand_shapes", model=self._model, status="ok",
+                     people=len(boxes),
+                     elapsedMs=round((self._clock() - started) * 1000))
+            return payload if isinstance(payload, dict) else None
+        except Exception as error:
+            log_warn("gemini_hand_shapes", model=self._model, status="failed",
+                     errorType=type(error).__name__,
+                     elapsedMs=round((self._clock() - started) * 1000))
+            return None
+
+    def describe_people(self, image, boxes: list):
+        """One bounded retry for transient errors, then independent side review."""
+        result = self._describe_people_once(image, boxes)
+        delay = result.retry_after_seconds or 0
+        if result.status == 'error' and result.retryable and delay <= 2:
+            if delay > 0:
+                self._sleep(delay)
+            first_ms=result.elapsed_ms
+            result=self._describe_people_once(image, boxes)
+            result.attempts=2
+            result.elapsed_ms+=first_ms
+        if result.status == 'ok' and any(d and (d.held_object_hands or d.pose_relations) for d in result.descriptions.values()):
+            self._review_pose_sides(image, boxes, result.descriptions)
+        return result
+
+    def _review_pose_sides(self, image, boxes, descriptions):
+        from google.genai import types
+        from ..pose_relations import validate_relations
+        requested=[{'objects':list(d.held_object_hands), 'actions':[r['kind'] for r in d.pose_relations]} if d else {} for d in descriptions.values()]
+        prompt=('러프의 각 인물 팔 연결만 독립 검수한다. 인물 기준 좌우다. 화면 위치만으로 판정 금지. '
+            '손목-팔꿈치-어깨 연결이 가려지거나 모호하면 unknown. 물건을 쥔 손과 만진 손을 구분. '
+            '박스 순서대로 people 배열. 각 항목은 held_object_hands(물건: left/right/both/unknown), '
+            'chain_visible(boolean), evidence(팔 연결 근거), pose_relations 배열(kind,side,chain_visible,side_confidence:high/unknown,evidence). '
+            '확인할 물건/동작만 답하고 새 사람/좌표는 만들지 않는다. JSON만 반환. '
+            +json.dumps({'boxes':boxes,'requested':requested},ensure_ascii=False))
+        try:
+            resp=self._client.models.generate_content(model=self._model,contents=[prompt,self._to_part(image)],
+                config=types.GenerateContentConfig(response_mime_type='application/json',temperature=0,
+                    http_options=types.HttpOptions(timeout=20000)))
+            rows=_extract_json(resp.text)['people']
+            if not isinstance(rows,list) or len(rows)!=len(boxes):raise ValueError('side_review_length')
+        except Exception:
+            rows=[{} for _ in boxes]
+        for i,d in descriptions.items():
+            if not d:continue
+            row=rows[i] if isinstance(rows[i],dict) else {}
+            second=validated_object_hands(row.get('held_object_hands'),d.objects)
+            changes=[]
+            for obj,side in d.held_object_hands.items():
+                if row.get('chain_visible') is not True or not row.get('evidence') or second.get(obj)!=side:
+                    changes.append({'object':obj,'initial':side,'review':second.get(obj),'status':'abstain'})
+                    d.held_object_hands[obj]='unknown'
+            reviewed=validate_relations(row.get('pose_relations'))
+            for relation in d.pose_relations:
+                other=next((r for r in reviewed if r['kind']==relation['kind']),{})
+                if relation['side']!='unknown' and other.get('side')!=relation['side']:
+                    changes.append({'action':relation['kind'],'initial':relation['side'],'review':other.get('side'),'status':'abstain'})
+                    relation['side']='unknown';relation['side_confidence']='unknown'
+            d.laterality_review=dict(status='reviewed' if row else 'unavailable_abstain',changes=changes,
+                evidence=str(row.get('evidence') or '')[:300],independent=True,not_ground_truth=True)
+
+    def _describe_people_once(self, image, boxes: list):
+        """Single request; caller controls the bounded retry."""
+        from google.genai import types
+        from ..search_routing import DescribeOutcome
+        from .description_contract import description_schema, description_payload, DescriptionResponseError
+
+        started = self._clock()
+        try:
+            resp = self._client.models.generate_content(
+                model=self._model,
+                contents=[prompts.pose_describe_prompt(boxes), self._to_part(image)],
+                config=types.GenerateContentConfig(
+                    system_instruction=prompts.POSE_DESCRIBE_SYSTEM,
+                    response_json_schema=description_schema(len(boxes)),
+                    response_mime_type="application/json",
+                    temperature=0,
+                    http_options=types.HttpOptions(timeout=CFG.routing_describe_timeout_ms),
+                ),
+            )
+            descriptions = parse_pose_descriptions(description_payload(resp.text), len(boxes))
+        except Exception as error:  # noqa: BLE001 - 상태로 돌려준다
+            reason, retryable, delay = describe_failure_reason(error)
+            elapsed = (self._clock() - started) * 1000
+            log_warn("gemini_pose_describe", model=self._model, status="failed",
+                     failureReason=reason, errorType=type(error).__name__,
+                     validationCode=error.code if isinstance(error, DescriptionResponseError) else None,
+                     validationField=error.field if isinstance(error, DescriptionResponseError) else None,
+                     upstreamStatus=_http_status(error), elapsedMs=round(elapsed))
+            return DescribeOutcome("error", error_reason=reason, retryable=retryable,
+                                   retry_after_seconds=delay, elapsed_ms=elapsed,
+                                   provider="gemini")
+        elapsed = (self._clock() - started) * 1000
+        log_info("gemini_pose_describe", model=self._model, status="ok",
+                 people=len(boxes), promptVersion=prompts.POSE_DESCRIBE_VERSION,
+                 elapsedMs=round(elapsed))
+        return DescribeOutcome("ok", descriptions=descriptions, elapsed_ms=elapsed,
+                               provider="gemini")
+
+    def analyze_for_pipeline(self, image, img_w: int, img_h: int) -> VLMAnalysis:
+        return self.analyze(image, img_w, img_h, _defer_body_review=True)
+
+    def analyze(self, image, img_w: int, img_h: int, *, _defer_body_review=False) -> VLMAnalysis:
         from google.genai import types
         part = self._to_part(image)
+        from ..experimental.body_matching.integrated import enabled, analysis_prompt
+        prompt = prompts.user_template(CFG.vlm_prompt_version)
+        body_enabled = enabled(CFG)
+        system = prompts.SYSTEM
+        if body_enabled:
+            prompt = analysis_prompt(prompt)
+            from ..experimental.body_matching.integrated import SYSTEM_EXTENSION
+            system += SYSTEM_EXTENSION
+        body_options = {}
+        if body_enabled and CFG.vlm_prompt_version == "p3-output-scope":
+            from ..experimental.body_matching.integrated import response_schema
+            body_options["response_json_schema"] = response_schema()
+        if body_enabled and CFG.vlm_body_thinking_level:
+            body_options["thinking_config"] = types.ThinkingConfig(thinking_level=CFG.vlm_body_thinking_level)
         attempts = max(1, CFG.gemini_max_attempts)
         # 재시도가 BFF의 분석 상한(기본 120초)을 먹어 치우지 않게 VLM 단계 전체에 예산을 둔다.
         # 예산이 없으면 timeout을 올릴 때마다 최악 지연이 attempts배로 늘어난다.
@@ -232,14 +575,14 @@ class GeminiVLMClient(BaseVLMClient):
             try:
                 resp = self._client.models.generate_content(
                     model=self._model,
-                    contents=[prompts.USER_TEMPLATE, part],
+                    contents=[prompt, part],
                     config=types.GenerateContentConfig(
-                        system_instruction=prompts.SYSTEM,
+                        system_instruction=system,
                         response_mime_type="application/json",
                         temperature=0,
                         # 요청 단위 상한. 클라이언트 생성 시의 값(전체 timeout)을 덮어쓴다.
-                        http_options=types.HttpOptions(
-                            timeout=int(timeout_seconds * 1000)),
+                        http_options=_gemini_attempt_options(types, int(timeout_seconds * 1000)),
+                        **body_options,
                     ),
                 )
                 log_info(
@@ -249,24 +592,41 @@ class GeminiVLMClient(BaseVLMClient):
                     status="ok",
                     elapsedMs=round((self._clock() - started) * 1000),
                 )
-                return _coerce(_extract_json(resp.text), img_w, img_h)
+                analysis = _coerce(_extract_json(resp.text), img_w, img_h)
+                if body_enabled and getattr(CFG, "body_integrated_review_enabled", True):
+                    # Optional read-only body review must never retry/replace a
+                    # successful control analysis or receive a fresh time budget.
+                    try:
+                        from ..experimental.body_matching.integrated_review import review_uncertain, start_pipeline_review
+                        if _defer_body_review:
+                            start_pipeline_review(self, image, analysis, CFG, deadline)
+                        else:
+                            # Standalone callers retain their synchronous contract.
+                            review_uncertain(self, image, analysis, CFG, deadline)
+                    except Exception as review_error:
+                        log_warn("integrated_body_review", status="failed",
+                                 errorType=type(review_error).__name__)
+                return analysis
             except Exception as error:
                 status = _http_status(error)
-                # 429와 5xx는 상류 혼잡이다. timeout도 같은 부류로 본다 — 원인은 달라도
-                # 사용자가 할 수 있는 일("잠시 후 다시")이 같고, 둘 다 우리 버그가 아니다.
-                # 반면 4xx와 파싱 오류는 우리 잘못이므로 그대로 올려 보내 알림을 받는다.
                 timed_out = _is_timeout(error)
-                transient = status == 429 or (status is not None and 500 <= status < 600)
-                upstream = transient or timed_out
+                failure, retry_after = classify_failure(error, status, timed_out=timed_out)
+                upstream = status == 429 or (status is not None and 500 <= status < 600) or timed_out
+                transient = upstream and not timed_out and failure != "daily_quota_exhausted"
                 left = deadline - self._clock()
+                base_delay = min(CFG.gemini_retry_base_seconds * (2 ** (attempt - 1)),
+                                 CFG.gemini_retry_max_seconds)
+                delay = max(0.0, self._jitter(base_delay * 0.8, base_delay * 1.2),
+                            retry_after or 0.0)
                 # 남은 예산으로 의미 있는 시도를 한 번 더 할 수 있을 때만 재시도한다.
-                budget_left = left >= min_attempt
+                budget_left = left >= delay + min_attempt
                 # timeout은 재시도하지 않는다 — 끊긴 호출도 Gemini 쪽에서는 계속 생성
                 # 중일 수 있어 재시도가 비용만 두 배로 쓴다. 대신 데드라인을 넉넉히 잡는다.
                 retryable = transient and attempt < attempts and budget_left
                 reason = (
                     "retrying" if retryable
                     else "timed_out" if timed_out
+                    else "daily_quota_exhausted" if failure == "daily_quota_exhausted"
                     else "not_transient" if not transient
                     else "attempts_exhausted" if attempt >= attempts
                     else "budget_exhausted"
@@ -278,6 +638,8 @@ class GeminiVLMClient(BaseVLMClient):
                     status=status or "error",
                     retry=retryable,
                     retryDecision=reason,
+                    failureReason=failure if upstream else None,
+                    retryAfterSeconds=retry_after,
                     timeoutSeconds=round(timeout_seconds, 1),
                     budgetLeftSeconds=round(max(0.0, left), 1),
                     elapsedMs=round((self._clock() - started) * 1000),
@@ -291,17 +653,22 @@ class GeminiVLMClient(BaseVLMClient):
                             status=status,
                             attempts=attempt,
                             elapsed_seconds=self._clock() - started_all,
+                            reason=failure,
+                            retry_after_seconds=retry_after,
                         ) from error
                     raise
-                delay = min(
-                    CFG.gemini_retry_base_seconds * (2 ** (attempt - 1)),
-                    CFG.gemini_retry_max_seconds,
-                )
-                # 대기도 예산을 먹는다. 다음 시도 몫을 남기지 못할 만큼은 쉬지 않는다.
-                delay = max(0.0, min(delay, left - min_attempt))
                 if delay:
-                    self._sleep(self._jitter(delay * 0.8, delay * 1.2))
+                    self._sleep(delay)
         raise RuntimeError("unreachable")
+
+
+def _gemini_attempt_options(types, timeout_ms):
+    # SDK 1.10 has no retry layer/options; newer SDKs must not nest retries
+    # under our quota classification and total request budget.
+    options = {"timeout": timeout_ms}
+    if "retry_options" in types.HttpOptions.model_fields:
+        options["retry_options"] = types.HttpRetryOptions(attempts=1)
+    return types.HttpOptions(**options)
 
 
 def _http_status(error: Exception) -> int | None:
@@ -340,13 +707,20 @@ class OpenAIVLMClient(BaseVLMClient):
         self._model = model or CFG.openai_model
 
     def analyze(self, image_data_url: str, img_w: int, img_h: int) -> VLMAnalysis:
+        from ..experimental.body_matching.integrated import enabled, analysis_prompt
+        prompt = prompts.user_template(CFG.vlm_prompt_version)
+        system = prompts.SYSTEM
+        if enabled(CFG):
+            from ..experimental.body_matching.integrated import SYSTEM_EXTENSION
+            prompt = analysis_prompt(prompt)
+            system += SYSTEM_EXTENSION
         resp = self._client.chat.completions.create(
             model=self._model,
             response_format={"type": "json_object"},
             messages=[
-                {"role": "system", "content": prompts.SYSTEM},
+                {"role": "system", "content": system},
                 {"role": "user", "content": [
-                    {"type": "text", "text": prompts.USER_TEMPLATE},
+                    {"type": "text", "text": prompt},
                     {"type": "image_url", "image_url": {"url": image_data_url}},
                 ]},
             ],
@@ -356,6 +730,8 @@ class OpenAIVLMClient(BaseVLMClient):
 
 def build_vlm_client() -> BaseVLMClient:
     """CFG.vlm_provider에 따라 어댑터 생성. 실패 시 mock 폴백."""
+    # 프롬프트 버전 오타는 폴백할 일이 아니다. 아래 try 밖에서 확인해 기동을 멈춘다.
+    prompts.user_template(CFG.vlm_prompt_version)
     p = CFG.vlm_provider.lower()
     try:
         if p == "gemini":

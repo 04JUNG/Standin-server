@@ -13,6 +13,12 @@ on:
       - "config/characters.example.json"
       - "deploy/ecs/**"
   workflow_dispatch:
+    inputs:
+      deploy_staging:
+        description: "Deploy develop to staging even when automatic deploys are disabled (never main/beta)"
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   id-token: write
@@ -28,7 +34,9 @@ env:
 jobs:
   deploy:
     name: Deploy isolated converter
-    if: vars.CONVERTER_AUTO_DEPLOY_ENABLED == 'true'
+    if: >-
+      vars.CONVERTER_AUTO_DEPLOY_ENABLED == 'true' ||
+      (github.event_name == 'workflow_dispatch' && inputs.deploy_staging && github.ref == 'refs/heads/develop')
     runs-on: ubuntu-latest
     environment: ${{ github.ref == 'refs/heads/main' && 'beta' || 'staging' }}
     env:
@@ -55,6 +63,7 @@ jobs:
             tests/converter/test_registry.py \
             tests/converter/test_runner_failures.py \
             tests/converter/test_api_contract.py \
+            tests/converter/test_review_model.py \
             tests/converter/test_deployment_contract.py \
             tests/converter/test_latency_probe.py
 
@@ -121,6 +130,9 @@ jobs:
           task-definition: taskdef.json
           container-name: converter
           image: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          # An inherited ECS value overrides Docker's baked version in logs.
+          environment-variables: |
+            DEPLOYMENT_VERSION=${{ github.sha }}
 
       - uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         if: env.ECS_SERVICE != ''

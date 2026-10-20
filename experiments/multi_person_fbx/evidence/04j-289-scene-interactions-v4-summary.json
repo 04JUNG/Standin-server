@@ -1,0 +1,91 @@
+{
+  "created_at": "2026-10-16T13:22:12.378699+00:00",
+  "cuts": 3,
+  "people": 7,
+  "manual_angles": false,
+  "manual_joint_coordinates": false,
+  "manual_pose_ids": false,
+  "github_uploaded": false,
+  "layout_reference": "v2 original-fit final anchors; v3 excess shifts are reverted",
+  "max_head_center_shift_from_good_v2_frame": 7.26136088021404e-15,
+  "mean_head_center_shift_from_good_v2_frame": 2.1623896600583805e-15,
+  "zero_overlap_cuts": 3,
+  "overlap_raster_max_edge": 1200,
+  "depth_order_reversals": 0,
+  "scope_changes": [
+    {
+      "cut_id": "S3-p_rough_220",
+      "person_index": 0,
+      "before": "bust",
+      "after": "half"
+    },
+    {
+      "cut_id": "S3-p_rough_220",
+      "person_index": 1,
+      "before": "half",
+      "after": "full"
+    },
+    {
+      "cut_id": "S3-v3_rough_0718",
+      "person_index": 1,
+      "before": "half",
+      "after": "full"
+    }
+  ],
+  "body_changes": [
+    {
+      "cut_id": "S3-p_rough_060",
+      "person_index": 1,
+      "before": 0.0,
+      "after": -90.0
+    },
+    {
+      "cut_id": "S3-p_rough_220",
+      "person_index": 0,
+      "before": 135.0,
+      "after": 90.0
+    },
+    {
+      "cut_id": "S3-v3_rough_0718",
+      "person_index": 0,
+      "before": 180.0,
+      "after": 90.0
+    },
+    {
+      "cut_id": "S3-v3_rough_0718",
+      "person_index": 2,
+      "before": -135.0,
+      "after": -45.0
+    }
+  ],
+  "pose_changes": [
+    {
+      "cut_id": "S3-p_rough_220",
+      "person_index": 0,
+      "before": "webtoon_daily_18",
+      "after": "gen_ch_slouch__stop_palm__thigh__h3"
+    },
+    {
+      "cut_id": "S3-v3_rough_0718",
+      "person_index": 1,
+      "before": "cmu_104_16_00006_mirror",
+      "after": "b1_wave_hands_no_mirror"
+    }
+  ],
+  "head_scale_changes": [],
+  "three_max_skin_world_error_m": 0.00019226484159444302,
+  "three_max_raw_world_error_m": 0.00022279526034725485,
+  "three_max_source_pixel_error": 0.04008667506898313,
+  "three_validation_tolerance": {
+    "world_m": 0.001,
+    "source_pixels": 0.1
+  },
+  "tolerance_note": "Prior 0.1mm-only check failed for the rotated p0718 P0 (skin 0.192mm, raw 0.223mm). Final check independently bounds raw/skin world errors below 1mm and reprojection below 0.1 original pixel. Measured maximum reprojection is 0.0401px. These are file-consistency checks, not image-fidelity scores.",
+  "limitations": [
+    "Hand/finger and elbow shapes are approximate. IK fitting does not prove narrative perception.",
+    "p220 background walking step and carried object are not reconstructed.",
+    "p060 left two-handed phone pose and the phone prop remain approximate.",
+    "CSP direct import untested; camera.json needed for exact framing in importers.",
+    "3D depth is inferred from apparent size; p220 foreground head-size proxy was corrected, changing its estimated depth but not head center or front/back order."
+  ]
+}

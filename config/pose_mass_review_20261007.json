@@ -1,0 +1,2143 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-10-06T17:02:43.279077+00:00",
+  "baseline_count": 1584,
+  "minimum_body_distance": 0.17,
+  "policy_fingerprint": "63e6c97ce9479518fe1a3bd9c5684b4287451664f15a233d7f4924f0ddaf5fec",
+  "source": "Explicit four-view review, not automatic anatomy approval",
+  "counts": {
+    "hero": 11,
+    "superpower": 8,
+    "daily": 23,
+    "sports": 40,
+    "fantasy": 3,
+    "combat": 40
+  },
+  "accepted": [
+    {
+      "pose_id": "mass_hero_side_air_evasion",
+      "batch": "mass-scenarios-20261007",
+      "key": "f88a68afe42c75a4337a6a87",
+      "bvh_sha256": "dbac2064a55d0c412ab4ef9c8d156b09c066a42f070b3de3bcdcc588db5ea664",
+      "thumbnail_sha256": {
+        "front": "3569b58ee59e78c44f21826b132246d97bcb5d8d15f8441622b4a5539d403216",
+        "three_quarter": "e72bb7343db490fe9bfae64970acf1bb0a86259651edbfd117b1f77a5a25b785",
+        "side": "2b20711238f36425904d3bb760340a4626ca4b510e90d28ac1167ac52b6f9ea5",
+        "back": "84034b8bf8fd1af9b7574e4d98f7a1781d14e323a94e108f80c503c7692b5ec9"
+      },
+      "category": "hero",
+      "label": "몸을 옆으로 눕혀 공중 회피",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 18,
+      "novelty_distance": 0.8084485671874144
+    },
+    {
+      "pose_id": "mass_hero_diagonal_dive",
+      "batch": "mass-scenarios-20261007",
+      "key": "f2d5f4f94d114bb8715d88f1",
+      "bvh_sha256": "1a648fb716a4106027f2dac34079fdb482326b496f26914a424d35161d155129",
+      "thumbnail_sha256": {
+        "front": "0a2182b93fa8c1cfb2033a4ae1b47ae3e29f52ea57a0ce34afcea4b23e3477ef",
+        "three_quarter": "5d2237609336443687bafda1b647db714f0baf2f4333b1e4fa2c9873737da91d",
+        "side": "360ef78183227647e810afe4ae0ddcac7f003bfa0e2c2a3f45868753e8d57b40",
+        "back": "2dea8f44b921f2a6dbbc1679f6fb99fd01e4b0187f4d9a93042dc40beed0c899"
+      },
+      "category": "hero",
+      "label": "한 팔을 접고 대각 급강하",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 13,
+      "novelty_distance": 0.6164566306828763
+    },
+    {
+      "pose_id": "mass_hero_air_rescue_reach",
+      "batch": "mass-scenarios-20261007",
+      "key": "bf62238f8ab3f798b5bc2161",
+      "bvh_sha256": "7f1d0e1bdc0f6f8595f5d7d951760a449e48a08f06c6903884de2019bdd1a214",
+      "thumbnail_sha256": {
+        "front": "ffab7cf3daac5532d4cbecf505e40c84a9ff5e4404aa054dec99bb2aa40f229c",
+        "three_quarter": "cb678fab10bd369188af0b523bc98bba40755374badf4a2a64752c08b9658c07",
+        "side": "1c27d5fe65ced8ea13c0e6916b8ae938b244760b7c8be4f59a2436b72aa681f6",
+        "back": "4d88f3d33e43fec3c60d9e5f55ca8f47b2e2521d0f34f725f46ee44765bc76c3"
+      },
+      "category": "hero",
+      "label": "공중에서 구조 대상에게 손 뻗기",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 12,
+      "novelty_distance": 0.6085732911341206
+    },
+    {
+      "pose_id": "mass_power_inverted_blast",
+      "batch": "mass-scenarios-20261007",
+      "key": "da843379ac82aa7d28b6aae8",
+      "bvh_sha256": "05d6f5ca284303f6e6670c2eacdd25da31babda5a4bcab67d125cdc61931e9d2",
+      "thumbnail_sha256": {
+        "front": "e75c4b46526494782d457446c5428e482f77b1ca805cf2ba68f183ddf634a87c",
+        "three_quarter": "7c200a459be8c967d744af7ccff64a142f7a9b32c66269a4212a815466781bc9",
+        "side": "7ab771cd0572756b3e95fdd186d135025fae96941b8ae763c8c232e61857617c",
+        "back": "d3e9a9d85e4e4663a58c74a04fb896c09e7dca2c4e55a082d1b10c11689bb203"
+      },
+      "category": "superpower",
+      "label": "역위 상태에서 아래로 양손 방출",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 22,
+      "novelty_distance": 0.4808791765077876
+    },
+    {
+      "pose_id": "mass_hero_inverted_guard",
+      "batch": "mass-scenarios-20261007",
+      "key": "cca0b070544d97c138ddb978",
+      "bvh_sha256": "fc5634fce7caf899583d17f9043a2bf16d251656aa22c5b074965588ddfc06fa",
+      "thumbnail_sha256": {
+        "front": "4dcf887cc170f58cc24d9b121e3410a2ea3ae3123130f7a8c17c24f454c2a9b7",
+        "three_quarter": "8ef439fa80a9bebd8f01e0a17060c6f91cfc928ae8d5fd80b2080757b971e957",
+        "side": "ca60e5ed0aceda38c61da70f9424e7622a4024f29a4e63f8fca1830d534c9e36",
+        "back": "6ac574efba247626235335528ca275354f15bf0607ee57bf96e40716ca1b3e12"
+      },
+      "category": "hero",
+      "label": "머리를 아래로 한 공중 전투 가드",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 16,
+      "novelty_distance": 0.41749930446458594
+    },
+    {
+      "pose_id": "mass_hero_low_landing",
+      "batch": "mass-scenarios-r2-20261007",
+      "key": "c56b48bd32d75472faacb5bb",
+      "bvh_sha256": "c1d738899d171be820d8253074756c056478d29b0210bb642a35c701ef643104",
+      "thumbnail_sha256": {
+        "front": "638e3743b920965060349b9ce43859c7d2131d0aac0f78ad1cc084b3ef8be2e3",
+        "three_quarter": "d939aac3c331ebccc77c8d12eef9fff82ec6109ccad361b2be75f335e67b7343",
+        "side": "dd4bbdf4e73431d78a8107eca30f4c436d903c4e1c390779d186179d421e998f",
+        "back": "bcdbae6ae75b49c576c82e136c62700569f6c3d2b752c708af030f1385f4b87c"
+      },
+      "category": "hero",
+      "label": "낮게 착지하며 한손 짚기",
+      "visual_set": "review-scenarios-r2",
+      "visual_index": 5,
+      "novelty_distance": 0.4576672639208325
+    },
+    {
+      "pose_id": "mass_hero_flying_fist",
+      "batch": "mass-scenarios-20261007",
+      "key": "c84fd7675a2978bf16e33d5e",
+      "bvh_sha256": "d3e34ba80f8cb816e7015ecdceacf83748e52192c619f4bae95ee7117718fce5",
+      "thumbnail_sha256": {
+        "front": "8536039450fbbd4044bda41930b91361d665ea6238c0967d034db467e799aabc",
+        "three_quarter": "130e769e9881da26a39af01f1ced2df5a3cbb7ad790cfdce7f69bde7f030c2e4",
+        "side": "e7955012bfc6a4a36f60327c0bd468118f85812d751b4200f1e5d8d955c6507e",
+        "back": "b9912a4063e40f8fc32c71ace462d4e124bc509953f615b38eb0df18db2f2099"
+      },
+      "category": "hero",
+      "label": "주먹 쥐고 앞으로 날아가기",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 14,
+      "novelty_distance": 0.40905656716410077
+    },
+    {
+      "pose_id": "mass_power_air_palm_strike",
+      "batch": "mass-scenarios-20261007",
+      "key": "393b6ecaf46c235a210d5cc8",
+      "bvh_sha256": "430399b93954720c68c795fd4c959a8fa714c70e147a379415808b5ce9b11abf",
+      "thumbnail_sha256": {
+        "front": "c772542761719d5594a45cd9334f272a7416c890d61b01600c45280e5f7ae3df",
+        "three_quarter": "756d0a24cfa81b54e5ef2eeb10cd3a4f6bbd00ea3fce7bb0570f6921a9fc2516",
+        "side": "dd7715b1afa630d5dc1885cee0039819bd7c6546adf1e4a57a8ff279017c556f",
+        "back": "83a86e8445629c37229bc5d9dcc1d19a57618eaf1ccda1861c69cc6b4399b9c6"
+      },
+      "category": "superpower",
+      "label": "공중에서 손바닥 내려치기",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 19,
+      "novelty_distance": 0.4065016051147629
+    },
+    {
+      "pose_id": "mass_hero_overhead_catch",
+      "batch": "mass-scenarios-20261007",
+      "key": "d9cb01d14579206516b048fb",
+      "bvh_sha256": "bbe00f79c25c12c341896afa05e888405343a0799d1f93f4690320c418fb9286",
+      "thumbnail_sha256": {
+        "front": "19f5b6504791d34cbc208cb13ad4113ea7a944df2967a0fe31c79b669138ab5c",
+        "three_quarter": "1712224794819550d958ca93eb784180cf9a7acf8e23c5260d152f227bc1fc03",
+        "side": "33583446fc6c4868958f8dea31de7c70fe26d4050303edad156f221077e74d80",
+        "back": "44c80abc1e38dd7c4a2ebd129b8af586213debd259fd34f384cbfa66af2dceac"
+      },
+      "category": "hero",
+      "label": "양손으로 위에서 내려오는 물체 받기",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 17,
+      "novelty_distance": 0.3179975762851754
+    },
+    {
+      "pose_id": "mass_power_hover_channel",
+      "batch": "mass-scenarios-20261007",
+      "key": "7e616b2b30915a7f6abec175",
+      "bvh_sha256": "506f8076689f120a79ce98c6e24b978401275bd72910be23d7d82576b42f2882",
+      "thumbnail_sha256": {
+        "front": "b2506b1caaa90e59c05b7dd13a9f54ab0eca11c52edd1815a34926be442d1c6b",
+        "three_quarter": "af72ce1aa23d3613333882a32e5f55bea09f3ee9f71bebebde1291b78ef8275c",
+        "side": "be531a25ba9a97ed19f2830335ee9e65f4e0a9f12f70fc7faaec2fd65b9a5df2",
+        "back": "8e0478a8edca9c6b14d78ec9f8f51fc651d9f7043a62f4ab672224d074eec5c7"
+      },
+      "category": "superpower",
+      "label": "공중 부양하며 양팔 펼치기",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 21,
+      "novelty_distance": 0.27898466262484384
+    },
+    {
+      "pose_id": "mass_hero_hover_guard",
+      "batch": "mass-scenarios-20261007",
+      "key": "5c34aaacd3c233a84555adc7",
+      "bvh_sha256": "b65fb05fac8349e3ac8f1a8f036415f773a80751820d36b9d32645f5801dc460",
+      "thumbnail_sha256": {
+        "front": "f544fa758e8a269e99c6b9b08facb7e0373fb1078a072f56c1777749fbffbafa",
+        "three_quarter": "0aff4c497e91dc5e1cd039a0437f662056b52275174f0b992f6afbf6973a366e",
+        "side": "5aeeca9b1392a821aa02f3aded937ad1656a80a52c6589b0fe04bf566ec00189",
+        "back": "01bfde09c80275efb314a9094a78eee7aa0b18d279bd53617bc1f7ad28564c39"
+      },
+      "category": "hero",
+      "label": "공중 가드하며 한 무릎 들기",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 15,
+      "novelty_distance": 0.25474165554992395
+    },
+    {
+      "pose_id": "mass_hero_shoulder_ram",
+      "batch": "mass-scenarios-20261007",
+      "key": "8acd301f00575acaf4169e70",
+      "bvh_sha256": "c79dad2ee290937084a7c3df488dddac39d0319af61f3844a327511ae33262a5",
+      "thumbnail_sha256": {
+        "front": "22fb700fd4687b2f66f3c916cedfef71d2746998fe37d4d29f59097a7ca5e31d",
+        "three_quarter": "61c276759ff4628e7d7a66a80a94acacc45d73558718d14f8e664adc9f7d7e93",
+        "side": "fada53d1d747cf87d4b2e4045628d9a3c532d369d5a6793a6249f8d13e3edd0c",
+        "back": "06b8f396d5595ff71cb415ff429874b3c95a79601ae174e59db240a112094716"
+      },
+      "category": "hero",
+      "label": "어깨를 앞세워 돌진 준비",
+      "visual_set": "review-scenarios-rest",
+      "visual_index": 8,
+      "novelty_distance": 0.23973048427717616
+    },
+    {
+      "pose_id": "mass_power_mental_focus",
+      "batch": "mass-scenarios-20261007",
+      "key": "6f4cf3b9320218349351f7cd",
+      "bvh_sha256": "642c9c4c0a69662e3fefa6d48f72715a4aa6c8268dadf816fd17e4bdf246481b",
+      "thumbnail_sha256": {
+        "front": "071b574e7695b753269a30228372ff424f10ca4c81525fa0de778019569886d9",
+        "three_quarter": "1b0472a18fa4ca68fba1bf450dce7e1a59f51114e23a8bb1b1e2e21b71ed0adb",
+        "side": "d13e4658ce83392e7262de6baf715806fed2fc5c2ea16c84b1707243afe448ee",
+        "back": "f7bb6d3bf5b6ffbb3ac2d7432671fde0ddd699615b0132c9af55f5fd82635f3b"
+      },
+      "category": "superpower",
+      "label": "관자놀이를 짚고 정신 집중",
+      "visual_set": "review-scenarios-rest",
+      "visual_index": 10,
+      "novelty_distance": 0.18707571961486127
+    },
+    {
+      "pose_id": "mass_power_overhead_sphere",
+      "batch": "mass-scenarios-20261007",
+      "key": "657d8e2f9e2e88b5e9d09bc6",
+      "bvh_sha256": "47a4656ec20e3c443a5b8e329bcad9b73193f0daebdbbeaa0a50dc2e4b090515",
+      "thumbnail_sha256": {
+        "front": "f778ffeea4511918821ba464b5e3f0ee967b378cd802bcef7cbd65480d1116a1",
+        "three_quarter": "317cbc551c57def3246c7092baab86f3a495ad44132583620afab8c62a55d1b8",
+        "side": "ca4f56d312c1e9eec7829061acd4520f4d1600b491d4c6aa3d0b8617966518e9",
+        "back": "ceba8f501b54d138e8a81c5357769a368f2a5360e6adda8181cbf35b45f128f3"
+      },
+      "category": "superpower",
+      "label": "머리 위 거대한 구체 받치기",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 23,
+      "novelty_distance": 0.18113560290317127
+    },
+    {
+      "pose_id": "mass_power_orb_charge",
+      "batch": "mass-scenarios-r2-20261007",
+      "key": "d679a81bb05c8ba9807a2dde",
+      "bvh_sha256": "a5b61d4150a216cadba8cae5ca63df0c0b1efbfb77987bdde10d4716103d806b",
+      "thumbnail_sha256": {
+        "front": "8f9f2525cdcbb832d227ba5311f4018ec4f869a58d21d90c890686407e49f9a3",
+        "three_quarter": "5c8404b39e48bbb2970cbb959f2328e6951e8686d0af611343d4315f7d5219ae",
+        "side": "c2838c8c08327a71929e9328811d43887f616ee7e5a712c49e64aeee1ff8ffc3",
+        "back": "8c6e95101dcbfb2d96c9619da28b9ae765c4878b15b308342a18a80c0592c204"
+      },
+      "category": "superpower",
+      "label": "골반 옆에서 양손 기 모으기",
+      "visual_set": "review-scenarios-r2",
+      "visual_index": 7,
+      "novelty_distance": 0.17407457583300254
+    },
+    {
+      "pose_id": "mass_power_low_barrier",
+      "batch": "mass-scenarios-20261007",
+      "key": "999f2865e3a6ce536b86a916",
+      "bvh_sha256": "e20f8ceb05d4e1f022aad5383734422e85546208d06d4f84b2cf436a44d29e80",
+      "thumbnail_sha256": {
+        "front": "ce853e004979253895c6563b22eb643928ce116caa39f6a397ea3d94cef05e3a",
+        "three_quarter": "33240789fb1d67eb4877cff650b6a40e28b11ef9b5f0a3d2bd3eea09680bfc36",
+        "side": "8524244ccf651e5088eab1c660808715e01b9cc9b151eeeea7454636f70a6b63",
+        "back": "8e3ea0012432926e7f4413c2c0b1aad9b37c01a959879ae16c077d30e52d8b1a"
+      },
+      "category": "superpower",
+      "label": "무릎 꿇고 낮은 방어막",
+      "visual_set": "review-scenarios-rest",
+      "visual_index": 9,
+      "novelty_distance": 0.17223579837022843
+    },
+    {
+      "pose_id": "combat_ual2_Shield_Dash_RM_f00200",
+      "batch": "mass-quaternius-20261007",
+      "key": "f8747a9c7c018a3ba0370e54",
+      "bvh_sha256": "61608540978d74a865b3e36d8d6b3bf73a1a0346f04a32ca12237e28fbdb2824",
+      "thumbnail_sha256": {
+        "front": "de7e24e2b983453ebc5f699385d58c03b52350654688b29aaab70d22da7c1200",
+        "three_quarter": "d4d77e1a00092874d507eb6b51313636eb239ffe2c284d41dfda0e84849e423c",
+        "side": "eac6c4f6efc1fcaaee1f29f82062cf5a08ff60a1c61a5ab2ecc523bfd4a4d612",
+        "back": "f61cca9ccbd19e78bd378a8468e2cae245d0f22abf0a6c0a8cfb5f3d0aaf0dfc"
+      },
+      "category": "hero",
+      "label": "방패 앞세워 돌진",
+      "visual_set": "review-quat-early",
+      "visual_index": 17,
+      "novelty_distance": 0.4660956762433319
+    },
+    {
+      "pose_id": "combat_ual2_NinjaJump_Start_f00400",
+      "batch": "mass-quaternius-20261007",
+      "key": "471dc73cd05a36cf560adc13",
+      "bvh_sha256": "358da8cea222fc963122a00803c4d995f2d8136c4d5202c841b9cb2477c0ea6b",
+      "thumbnail_sha256": {
+        "front": "b183d9287ff5deaec23d92a57bc9d21081484cb346ffc0ff7f1d9b30e4dc45be",
+        "three_quarter": "75e6a501c727923224174712a72053472a35a250a7622c54a850454bc5bc01e5",
+        "side": "c9b68266e1dbe99f6ef47875a2eb24ca3b58d84563e6d2b0bf281fa36e6c1079",
+        "back": "69b0cae5e58fdb23620103d4a6700f696f2d4a7b8faac3e3ea970075aef75e92"
+      },
+      "category": "hero",
+      "label": "닌자 도약",
+      "visual_set": "review-quat-rest",
+      "visual_index": 37,
+      "novelty_distance": 0.27635743021931936
+    },
+    {
+      "pose_id": "combat_ual2_Chest_Open_f02200",
+      "batch": "mass-quaternius-20261007",
+      "key": "f139900a26ce9d1c24187250",
+      "bvh_sha256": "971c0a3c6e6e36d5f4fb2ee9bf8d781ff6a9283c5c1b67943a890e4d0133d4c4",
+      "thumbnail_sha256": {
+        "front": "25cddf50c151b08c4765e82baf78bbc372c89e0579100bc9dce18f2f14412844",
+        "three_quarter": "fe29197685375cea890e36288bb899ffc1f3c00c1be576e7729aaadc0e406b28",
+        "side": "7fb573d374f327861749faa84b7de1ff54bfc556bf3367ddfb72e415798ed177",
+        "back": "6a683085a9173c1f33b386450150ade6b28d11db69532a58c7546c832a0b821d"
+      },
+      "category": "superpower",
+      "label": "힘을 모으며 상체 숙이기",
+      "visual_set": "review-quat-rest",
+      "visual_index": 28,
+      "novelty_distance": 0.23614878848856588
+    },
+    {
+      "pose_id": "mass_accad_A11_Crawl_f00195",
+      "batch": "mass-accad-20261007",
+      "key": "b9110bb90adfb39d7fa86105",
+      "bvh_sha256": "7c0bc1235e88c0bd2ef5d6cb5c432140f4df5c26a43b86dc6ff8fee181199e0e",
+      "thumbnail_sha256": {
+        "front": "42ac9e51d17435453256f8a0aed401cda1a4fa0deec630e71674a72bbeba8518",
+        "three_quarter": "6667d99f9e7c36e1994f46d8c03da646c77b8fc28cbd89f64334df7deab2f5bc",
+        "side": "fa253c6d7b019f0602763a8fe1c9d9b3fea128470be26a501e54070d4cc3ed2f",
+        "back": "936c604c3d3654d23ef398a5f79bf03e37c72be1eaa665945ae5d38665cbd6b0"
+      },
+      "category": "daily",
+      "label": "손과 무릎으로 기어가기",
+      "visual_set": "review-accad-early",
+      "visual_index": 6,
+      "novelty_distance": 0.559341438472002
+    },
+    {
+      "pose_id": "mass_accad_A11_Crawl_f00048",
+      "batch": "mass-accad-20261007",
+      "key": "b87985effd18f1aee425b2ef",
+      "bvh_sha256": "315c84b9c99508f81796fd18e0c77c89b6599f75316d64dc5e30dfbd531846fc",
+      "thumbnail_sha256": {
+        "front": "99a3cbd2a097264bac395e3b4f554d8dd6ece4bc3ccda6d2fac01186abc746cc",
+        "three_quarter": "927c6a70f9c1bfb158be0602c94b1f4ffd34a88024e223f5b74f168db0418880",
+        "side": "b4d4fbfcfab149f98eb2ed86ea466cc21094e8a523b3f739714ba3026724201b",
+        "back": "f0efd2bccf5de4b95791a70343dad5005b601b51f66fefbb68e7473548b46626"
+      },
+      "category": "daily",
+      "label": "손과 무릎으로 기어가기",
+      "visual_set": "review-accad-early",
+      "visual_index": 5,
+      "novelty_distance": 0.6513297407806569
+    },
+    {
+      "pose_id": "mass_accad_A10_LieToCrouch_f00078",
+      "batch": "mass-accad-20261007",
+      "key": "9559e6a0f305ebf23743249c",
+      "bvh_sha256": "8a8573938591edfb7e7d64d8190f8dbf91e6ebc19f7fc053237911517c529c85",
+      "thumbnail_sha256": {
+        "front": "513d0b198f1d491876e74e480fae6a904a31ed11f5491191309826c7b33d1dc8",
+        "three_quarter": "328703993dff58a6b53adf3e8ccb8d4c06e32c7e181ef6c980c0d97b05e8bf25",
+        "side": "7276c36a79778539e7d0bc3b96a53f10ac0b45c1db277d219de9d77c0de45cca",
+        "back": "abad2803c04e9362fba77f00a532bdaee48b1e8e89df30abf64c692526c16853"
+      },
+      "category": "daily",
+      "label": "누운 자세에서 일어나기",
+      "visual_set": "review-accad-early",
+      "visual_index": 2,
+      "novelty_distance": 0.5794250660279333
+    },
+    {
+      "pose_id": "mass_accad_A12_CrawlBackwards_f00414",
+      "batch": "mass-accad-20261007",
+      "key": "a6c834ab2da78fc06911cce1",
+      "bvh_sha256": "c20917a4506ff25a03010c34d5552228593a2db2bfba0ae0ea0debdab7825bc5",
+      "thumbnail_sha256": {
+        "front": "f4d654d25af0aadf7a5149b7e1366242345c3ffa2cf8fe6add06b2bc28be3869",
+        "three_quarter": "02f7211577916f1504375872ec705d3e322956934a8120abcaf569678bc397df",
+        "side": "3489ed7a5f39d4ddaa54902d927ebf31b02646afdfb35472b0ea0590058bd8f8",
+        "back": "37d0b40fa18aa27a643868a97c753730f1dad409df2f160f8e54f7c3ad5c9c1c"
+      },
+      "category": "daily",
+      "label": "뒤로 기어가기",
+      "visual_set": "review-accad-early",
+      "visual_index": 9,
+      "novelty_distance": 0.44665819058919415
+    },
+    {
+      "pose_id": "mass_accad_A8_CrouchToLie_f00057",
+      "batch": "mass-accad-20261007",
+      "key": "337b40439941b6bcc56ad24f",
+      "bvh_sha256": "871cb583afc04dd746f8eaafadc9c48ec44bef9a4e1e8ebde975949531d3a4e9",
+      "thumbnail_sha256": {
+        "front": "0eb880b9042c1becf584e664389c807056193d96a971730f384850322133eeb1",
+        "three_quarter": "380d6ebae990c00bc61ea5df49b4bf1c658529555f39bf28ba9d53af5b4d54bc",
+        "side": "d1e67b59ee3453581763ab8570d456231f83e6e79d60073aba3fe34794c52592",
+        "back": "bfdaeaee5044c928fbfcdf7460943791a4e7621cdd55ce81654a4f6d0ae0111d"
+      },
+      "category": "daily",
+      "label": "쪼그린 자세에서 눕기",
+      "visual_set": "review-accad-early",
+      "visual_index": 12,
+      "novelty_distance": 0.5146630313062549
+    },
+    {
+      "pose_id": "mass_accad_C23_PutDownBoxToRun_f00022",
+      "batch": "mass-accad-20261007",
+      "key": "f63faf1c2dedf8025585cdcc",
+      "bvh_sha256": "404f8efa12d9afa26a69b25c2ff58b3402ffacfc6cbcc70df7948cd4715fc75c",
+      "thumbnail_sha256": {
+        "front": "5a9a2959a83bf0b07cf7c91ae5ba0a23a98470178df6cd8593ea79723a16c10c",
+        "three_quarter": "a17ed4545b07d4f0e765ac09864684bcb96ec8fc74cf14e1cf2d7548a1f08b6a",
+        "side": "61e3aeeec6c79da3cb277e697cecd77d831345071c811c3c47e7efd3ddcdc456",
+        "back": "19f79b94ea2de8914e7d88d671aa1f14e6139d7c92315111582bae114000f79e"
+      },
+      "category": "daily",
+      "label": "짐 내려놓고 달리기",
+      "visual_set": "review-accad-early",
+      "visual_index": 17,
+      "novelty_distance": 0.5005637276422735
+    },
+    {
+      "pose_id": "mass_accad_A8_CrouchToLie_f00047",
+      "batch": "mass-accad-20261007",
+      "key": "7a128514aa85d793db79602a",
+      "bvh_sha256": "06071ecfd6a1a8a2dbacbd41a8cf89ea199b61987a2fdd2eed01644cf28e166f",
+      "thumbnail_sha256": {
+        "front": "88f561cc3ee809b5152a1635a67ce0a48848d6d20f60dfbef3113ced59b50b8d",
+        "three_quarter": "23c1c4690af1ea83a0c88f9aa72c06c228c178a8cd2b0e6c1ede4dcb89972527",
+        "side": "26e99b06857427844e4d30f3babe26d053995c9639a9d487385469efbec9ba5e",
+        "back": "d8c6c4fa3703aad4e4d70b45cc15624881a41f125eec9bba7ef964cab1bcf9cd"
+      },
+      "category": "daily",
+      "label": "쪼그린 자세에서 눕기",
+      "visual_set": "review-accad-early",
+      "visual_index": 11,
+      "novelty_distance": 0.4947855831557748
+    },
+    {
+      "pose_id": "mass_accad_A12_CrawlBackwards_f00210",
+      "batch": "mass-accad-20261007",
+      "key": "4fa61205b62161817b5af458",
+      "bvh_sha256": "6a1dcedb20d8cfe6dfd423d46715b7cb344448edef25b01dbdf1bb925760e428",
+      "thumbnail_sha256": {
+        "front": "a62092345cdd49c83183b8bb830672f8a07a485d322d9b7ab6fa454a807dc7cb",
+        "three_quarter": "b0d578d379425dedf3fd49a691ff6df7ddf219e89d575f63397bcc7eb1b0f6f6",
+        "side": "38467394c4f9d98830f19a1b65a354648a6b30718af815c26ca0384545c8fb1e",
+        "back": "1e31946cec18c8f1cc068ce698eb870b74a59f15442ef7f32147757b6527ad18"
+      },
+      "category": "daily",
+      "label": "뒤로 기어가기",
+      "visual_set": "review-accad-early",
+      "visual_index": 7,
+      "novelty_distance": 0.33531815123202097
+    },
+    {
+      "pose_id": "mass_accad_C26_RunToCrouch_f00059",
+      "batch": "mass-accad-20261007",
+      "key": "834a0dc172af515e078709c0",
+      "bvh_sha256": "7b448d136b6542dacfcfe22dda6fb121014122450e2082a992eba1b762ca65d2",
+      "thumbnail_sha256": {
+        "front": "2de30f59786ce9f286379d823131586c2e06f6d0448e9c5f6178c6fbc3b3840c",
+        "three_quarter": "f5e0827c36d107f1c209a93eb10427d8b93ebf6320bdc57046fe9cf0ca892f4e",
+        "side": "516fc4ce6ffccb7924b2cab53021b3cbd13af5bc797b89e284dba4dd049ff120",
+        "back": "c252b4edff3ec93cbd804923684bb933eed1391e6445c9f1a1417aca34dff139"
+      },
+      "category": "sports",
+      "label": "달리다 낮게 앉기",
+      "visual_set": "review-accad-early",
+      "visual_index": 18,
+      "novelty_distance": 0.4714992988821855
+    },
+    {
+      "pose_id": "mass_accad_A10_LieToCrouch_f00091",
+      "batch": "mass-accad-20261007",
+      "key": "e6e927527fee76dab0241474",
+      "bvh_sha256": "5f9337906d22160312ee5d10a6b42ae8cedadcced394abe6c747af4c32b108c8",
+      "thumbnail_sha256": {
+        "front": "00028f5f5a88011594bab97de0ed3844ecddeb6809dcce9a73737ce394714707",
+        "three_quarter": "029f7576b686509984a9ab5123754732152ae5ff4d0f63ae7139e68d65f306d0",
+        "side": "1b5d3c18945a2ceafd527c9130835ddf5ab502d13d0d9615eff8186c68228b9c",
+        "back": "bc42aea076562a1e00623ebd924dfaf90a70e9ccd5b4182258aace79de4b6ada"
+      },
+      "category": "daily",
+      "label": "누운 자세에서 일어나기",
+      "visual_set": "review-accad-early",
+      "visual_index": 3,
+      "novelty_distance": 0.46857365354545516
+    },
+    {
+      "pose_id": "mass_basketball_rebound",
+      "batch": "mass-scenarios-20261007",
+      "key": "e814a0802ad4d4dabe123f43",
+      "bvh_sha256": "b667c5c0fc5d8245c967a3152a50b4d9b50cf5335c09582130a0ecedf9c69801",
+      "thumbnail_sha256": {
+        "front": "96e5102ff4a581926cec7f07f589b8d9e1db9cbae8d6f8924f72d5ad6d82fb60",
+        "three_quarter": "12f17b7ecaa5584054c661d28bd4557efb5a2750403734d4e150143b69e9b518",
+        "side": "e007030c0c8dde1e803b53b050f0b9edf79da564f7e1179f09a694584afa6672",
+        "back": "6615381e1905ea5ba08f74123e71970e9679e0b608c87fb420e9e148556641d1"
+      },
+      "category": "sports",
+      "label": "농구 한손 리바운드",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 5,
+      "novelty_distance": 0.3170198881905535
+    },
+    {
+      "pose_id": "mass_accad_C15_RunTurnRight45_f00041",
+      "batch": "mass-accad-20261007",
+      "key": "3b102fb9ce8663f850596053",
+      "bvh_sha256": "adba75e4039f2a13a061f62624ff7f4c386ced741b8b9f7a06ca52add241d1f4",
+      "thumbnail_sha256": {
+        "front": "a7fd454f6222042bc68b12e522a4ff6ab04fc0718c5598c514c0392935c3abb1",
+        "three_quarter": "685f7e6361f144e6ea753e7147dfb77619e8ffa0a313e2bd6579f8ac1dc97995",
+        "side": "8e75bfe55f942507ce5c65e03b97bb4c03535fd50ec4248332a8069e8e0c5ed3",
+        "back": "e079d1787031fbdd26eebc9a36d33f5b2118bc17f9edcf31578fa89bfbdce409"
+      },
+      "category": "sports",
+      "label": "달리며 오른쪽 대각 전환",
+      "visual_set": "review-accad-early",
+      "visual_index": 16,
+      "novelty_distance": 0.355916566256789
+    },
+    {
+      "pose_id": "mass_volleyball_spike_ready",
+      "batch": "mass-scenarios-20261007",
+      "key": "3ee1ce2860ddfef52d139f53",
+      "bvh_sha256": "9a5ad98059f43954a3be4107338b1e8786e1cf091fcfc28ed68dcfd54fc844d7",
+      "thumbnail_sha256": {
+        "front": "9e8a8878e2bdf92ebc863de55eeccd00fa77057096b062e822f0085b65e8269e",
+        "three_quarter": "06bbaa935205d09fd436f3ebcd76843e0300f6138156622e4d25c2a07e932b26",
+        "side": "cc6cea29a7187c6d2e655d433766d4706f025faecba6f06bc537d003c0e8743c",
+        "back": "420a3d19ca73d35a3323709c57a7668e9ab373f83c1b8be98a36c651a91d2d46"
+      },
+      "category": "sports",
+      "label": "배구 스파이크 준비",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 30,
+      "novelty_distance": 0.3488691747064208
+    },
+    {
+      "pose_id": "mass_accad_C15_RunTurnRight45_f00032",
+      "batch": "mass-accad-20261007",
+      "key": "f85c9e420d288eb1d933a72d",
+      "bvh_sha256": "a186f6e37c5493dec27232fa5182c17ef8fb4f1c0b87a3b28f428c1ec1d2a74f",
+      "thumbnail_sha256": {
+        "front": "8f0bfd128db1992c52a83d729b9ff7ce5b3bcd6c451810ddcb6be5f64aee96d9",
+        "three_quarter": "23f5528d742b47afa561ee03a48cd200cdee11757c861c65d7451ad71e0df453",
+        "side": "5728ee9d7872ce1d4d04d17ae273902567bd53eb85a12552d4a1d21579069a02",
+        "back": "8459b766db854b224c3f5124292ae07179c85fcd9e1db6bb6ca980f86d53f78b"
+      },
+      "category": "sports",
+      "label": "달리며 오른쪽 대각 전환",
+      "visual_set": "review-accad-early",
+      "visual_index": 15,
+      "novelty_distance": 0.34237670659687325
+    },
+    {
+      "pose_id": "mass_daily_sofa_relax",
+      "batch": "mass-scenarios-20261007",
+      "key": "07d1a3fede10b1603377c1a2",
+      "bvh_sha256": "668f36becc42fa38699976b74c6edb7370dee4e65cd9818250236a6a369a1a4e",
+      "thumbnail_sha256": {
+        "front": "2dafb099b60d077f0557eade5d6030d8d54198a4260ddfc0f9f26e1f39ea3419",
+        "three_quarter": "dbf86b45592329db4d97a98f0e5b91ce2132c909c6105f863cbaec898513fc8a",
+        "side": "0db117c7313879f6e4fa6d3e47e65859c479d4de69b514572523e66874f6951b",
+        "back": "1fb8181d32bccc7f8fa40e6a154d0e0a551a1dab7c8b7ce89888d84225777264"
+      },
+      "category": "daily",
+      "label": "소파에서 팔을 벌리고 기대기",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 11,
+      "novelty_distance": 0.3254710569573161
+    },
+    {
+      "pose_id": "mass_yoga_tree",
+      "batch": "mass-scenarios-20261007",
+      "key": "723b20d21d38eec1180919cd",
+      "bvh_sha256": "4857bbbae391b9ceb30e476f4f2d6f042a8e33b7cbba3ab7fc247d6b43375097",
+      "thumbnail_sha256": {
+        "front": "7b72d680784ccfa972cddcc005521096c3905a27e4042bcb5fdd7326e1d2435b",
+        "three_quarter": "4820876b51c618567d7af5d5eea7f5fd6b507c20fb0449a7f61c6067e14998c9",
+        "side": "6830f81fa6c85030d61279bb5aec376a9263fbc2612384c973c45c400cf3cc24",
+        "back": "d9d5641ba1e214f048e3ccf4483c2deb46c315800ce4bcf7eadd6197fc2de997"
+      },
+      "category": "sports",
+      "label": "무릎을 옆으로 열고 한 발 균형 잡기",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 32,
+      "novelty_distance": 0.3113427903654821
+    },
+    {
+      "pose_id": "mass_daily_kneeling_high_reach",
+      "batch": "mass-scenarios-20261007",
+      "key": "21d6eda6195f03e485da2870",
+      "bvh_sha256": "fb5c182ef5f6a87c657896c74ddbd1eb81276b4fe4bf680c6b785831b23c2627",
+      "thumbnail_sha256": {
+        "front": "1a3fa09124d03f3c184944f26c9ef980ec22da2669c3d1a60a010045afb64eaa",
+        "three_quarter": "c7ceb65f0836ac28111340aec13f8d1916aab9148d0cc0e2fc13710c5776e6d4",
+        "side": "367527c476dccb12679278a0f265f167072db9c6768677ab3eb8b53077736fb0",
+        "back": "b9170e673931e02bda57710c1a9447402d3a2d78056c7084ef8461a44b3ca897"
+      },
+      "category": "daily",
+      "label": "무릎 꿇고 높은 선반에 손 뻗기",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 7,
+      "novelty_distance": 0.287681914541507
+    },
+    {
+      "pose_id": "mass_yoga_warrior",
+      "batch": "mass-scenarios-20261007",
+      "key": "eca8a08373d635271057de6b",
+      "bvh_sha256": "5762261fe350c47b8be37438acf8c477b3fc47a83cbe5decb06966c99b9ba005",
+      "thumbnail_sha256": {
+        "front": "72b29edad415137f419247ed7cd9819de3df6aafcc46e88a18989637c5d83008",
+        "three_quarter": "d09a940fce3ae6510223fdd929f4197f6460e45fa09055bd3b941decf188ca84",
+        "side": "962a40602f17a71be013e1e84da28886f8a4fb33bfc170965313c1b309594a94",
+        "back": "9e08920c3a6b524b3dd7a9969dbae2c0437d3c97d5fb5122b18f0bb96be580e6"
+      },
+      "category": "sports",
+      "label": "다리 벌리고 양팔 펼쳐 가슴 스트레칭",
+      "visual_set": "review-scenarios-rest",
+      "visual_index": 14,
+      "novelty_distance": 0.2759031895690391
+    },
+    {
+      "pose_id": "mass_daily_seated_forward_reach",
+      "batch": "mass-scenarios-r2-20261007",
+      "key": "fdecf3c0906cc76a0b109e01",
+      "bvh_sha256": "1dc96524b0ffc83d468a67eb6bed76063ed42bfb3deeb9507fe8178dada27c4c",
+      "thumbnail_sha256": {
+        "front": "d942498c051e36c63b7d7c7cdd1e9ffb7a3dfb7fcd1de9ee0b5040d3727359cf",
+        "three_quarter": "06999e6e25d191dc540a57af5e76ba0215e4b62496e88af36203fa4169dea652",
+        "side": "eec9a3ecd79f21338c6a82d3066574a596e21754208dd0b7d99938ab43b70dc6",
+        "back": "bda849f032d54b23f623b0f660d4c43c3840f6ddd2307c742e0d3c1491dbb75e"
+      },
+      "category": "daily",
+      "label": "앉아서 바닥 물건 집기",
+      "visual_set": "review-scenarios-r2",
+      "visual_index": 4,
+      "novelty_distance": 0.2743086087022338
+    },
+    {
+      "pose_id": "mass_basketball_low_dribble_r3",
+      "batch": "mass-scenarios-r3-20261007",
+      "key": "acce300d32cbfdcbceac24c3",
+      "bvh_sha256": "7d6bf5a1671e4cfcb896f707ae2baa5bf5c0788755f59c4c2102b18c6cf7862e",
+      "thumbnail_sha256": {
+        "front": "72b578661bd3ff0e26d627524fc6434769b2f044ad760b06b18fef6da7afba6d",
+        "three_quarter": "08100ea628ced1c1325e3a07deb4d91485a2a3ddffa27de02d8d6d56b2f89fc8",
+        "side": "c08e10db38d203496f84e17d54916e31c0b977c57259caaf7646730d36c56c32",
+        "back": "af945542e0d4acfe424c672b5985f760aa214b1bf7612cea8fe365780c92ee27"
+      },
+      "category": "sports",
+      "label": "농구 낮은 드리블",
+      "visual_set": "review-scenarios-r3",
+      "visual_index": 0,
+      "novelty_distance": 0.27396539335220804
+    },
+    {
+      "pose_id": "mass_daily_laundry_hang",
+      "batch": "mass-scenarios-20261007",
+      "key": "192eaf9c58f57b592a957ed7",
+      "bvh_sha256": "a8e739c891566385d0a2c93160398ef5751f82a78bb409b684c3158de3a13109",
+      "thumbnail_sha256": {
+        "front": "3c74b02f58aeed405ef4806c6917e3a636d7d7fe970e5f64be7797ae62fb8499",
+        "three_quarter": "0570774142dce0b4bc38fe58d37e8192f60f1b0f892492f8b4714d55a9b3534e",
+        "side": "2772eeef92239ed7cf2c1ee594fe3c3527c084c9484f31c5fcbd4bcbde4608f9",
+        "back": "4c1d45c345c3616daa1feb337a6863e1fccf73aa7a33af429c6c259bf2a1bb16"
+      },
+      "category": "daily",
+      "label": "한쪽 팔 높이 빨래 널기",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 8,
+      "novelty_distance": 0.2630238016018304
+    },
+    {
+      "pose_id": "mass_ski_pole_push",
+      "batch": "mass-scenarios-20261007",
+      "key": "8b240cbb5e48cf186ea60d04",
+      "bvh_sha256": "83529931fbd96c186d7de506b9a85984e5ee6981c3b699132d3be0df1bf64169",
+      "thumbnail_sha256": {
+        "front": "1e1ebb93d0a22afe0a6e4ad746f19e7908db00b23959fa316d3a5803399c8732",
+        "three_quarter": "47dc10654eb6b468689eb366bdc5a909e2af9f2ec65e4399f12ad89a727e10e8",
+        "side": "929c1085b1ac6f70f5756eeccf1b03fb4768f1d83ac863c65d5da949d3504714",
+        "back": "a032e62f4a781ee997d490e13e0780239f716a2fe1543261fe6e3e09abc7ecad"
+      },
+      "category": "sports",
+      "label": "스키 폴로 밀기",
+      "visual_set": "review-scenarios-rest",
+      "visual_index": 11,
+      "novelty_distance": 0.2582272842529632
+    },
+    {
+      "pose_id": "mass_basketball_defense",
+      "batch": "mass-scenarios-20261007",
+      "key": "a9253325b467900d0cdcdd0e",
+      "bvh_sha256": "cae7fbbc3ee2d9019f39b6e4b086c67252ff2a715746292eb870a15a5a9226b9",
+      "thumbnail_sha256": {
+        "front": "697c4befc5153e5dc3c8a793a7113199bb7d6064e313d2e9adea2c85cca7a383",
+        "three_quarter": "4693da6e208c270f3bb11635c04d607735d48279b76800ed60ec533ae61a1cea",
+        "side": "3350a1b9907c0c0c3e821257a26df82ed0a7b42cd37248569e158729af9079a4",
+        "back": "06a7a4248ecb1b9a07d0ceca335ac4ba9348fa765cb17ffde102ab818634e047"
+      },
+      "category": "sports",
+      "label": "농구 양팔 벌린 수비",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 3,
+      "novelty_distance": 0.20156542867625107
+    },
+    {
+      "pose_id": "mass_snowboard_balance",
+      "batch": "mass-scenarios-20261007",
+      "key": "51e74d534f94790673e249ab",
+      "bvh_sha256": "8dd5b748e212c18c5fc25128a3983dad7a5d363f1dbdede67798af394d763a5c",
+      "thumbnail_sha256": {
+        "front": "881921340ab3f58fea26a8a62a6f53864900e66c6c64b846d932658d2c2abd02",
+        "three_quarter": "7d71cdf0abf1779223c69f26f7cf75359bcbc96c51110abee0ba825f03e2f0c3",
+        "side": "edc81ce0551d3b41bae484c4b79eb5854f0204d0022eea95543fcdff3ed38fac",
+        "back": "069e528ca8964559d15fee8c9f80545292e8ea3cb121a506190ace984b8bb061"
+      },
+      "category": "sports",
+      "label": "스노보드 양팔 균형",
+      "visual_set": "review-scenarios-rest",
+      "visual_index": 12,
+      "novelty_distance": 0.2553213874186631
+    },
+    {
+      "pose_id": "mass_tennis_serve_toss",
+      "batch": "mass-scenarios-20261007",
+      "key": "107e90e73a29ac19510b379c",
+      "bvh_sha256": "9760be7cc7f1056d663277a2be0ac2051fc8e10b40bf03f48a149a8c667437b8",
+      "thumbnail_sha256": {
+        "front": "efe13f01c1ccfaeef88f2f688c9f43220e4b2a277763aedfa744b579ab0815c4",
+        "three_quarter": "497eae99266eae5e14b7c51a9511716ec1b30cebcf928a0f5436eada66f3132e",
+        "side": "c2b29bf78cd897e831a378bdfc005788d59303e84bccb12f0a0199c054f964f2",
+        "back": "0418445becdeb429438150589a2a5bf6b389696d5120d1736863c867abe20591"
+      },
+      "category": "sports",
+      "label": "테니스 서브 토스",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 28,
+      "novelty_distance": 0.25057263300584365
+    },
+    {
+      "pose_id": "mass_baseball_pitch_windup",
+      "batch": "mass-scenarios-20261007",
+      "key": "6491ee31b6e770da02349f5d",
+      "bvh_sha256": "4e20d10aaa8b8e0176013c8e7e1311e252b39fb0a78b7512da351ae155df3cd3",
+      "thumbnail_sha256": {
+        "front": "9e95c3faf7834d8a1684e2ec6292f275ed1be13585e87e57b9f077969f7376ad",
+        "three_quarter": "ec874ca05f12396e4dd81a148b7113f205491deea561116eeb0bdfa79a30af7c",
+        "side": "e157b04c98dc8b76bbf8ea73f84ac427eb7aca3aab4c221d88551828aa6e85c4",
+        "back": "79eec674bcfea06210f1d60b36e4be255a54db73e904accf4a0e7e6254e96dc9"
+      },
+      "category": "sports",
+      "label": "야구 투구 와인드업",
+      "visual_set": "review-scenarios-rest",
+      "visual_index": 1,
+      "novelty_distance": 0.2444564387877644
+    },
+    {
+      "pose_id": "mass_baseball_batter",
+      "batch": "mass-scenarios-20261007",
+      "key": "f4a873b400282dbebb57c519",
+      "bvh_sha256": "120d11f447ffece21a65a667ca628f0abb95201bcd022bc4ed8573a07706ce6c",
+      "thumbnail_sha256": {
+        "front": "df180cbab70ae274dea1e13ee34be39fa888a25a84703032834af31e98cd3d72",
+        "three_quarter": "84912e9d9bbdc5659daf9c9d6353761ac0cbee220a6844d19fec78e74f44a420",
+        "side": "d2a58be9c93bc9f1024f049bb763d0113fe82200dcb58adf7222ae549d3f54b2",
+        "back": "f64207434f7eb0fc15351e409225379f6cb05ef91cb83896c9713b6215716d29"
+      },
+      "category": "sports",
+      "label": "야구 배트 타격 준비",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 0,
+      "novelty_distance": 0.2428258069934498
+    },
+    {
+      "pose_id": "mass_volleyball_toss",
+      "batch": "mass-scenarios-20261007",
+      "key": "c0e038781ffc5bcdf04f98ab",
+      "bvh_sha256": "50ce65356f6cfa0551071b92d9d073a8b0cc4aad3078c0761e55fb15f8b8ab94",
+      "thumbnail_sha256": {
+        "front": "7b127068751216a0e6ab27d67c1b459fe957ba9d8d4da6afa8b8dd42abd933af",
+        "three_quarter": "49112228cd34780597b8172c16f2ffd505991974508c5a2ad6ea59235d72aec2",
+        "side": "18ffdaa28b6d6d65be93105e1b57d33eee8e411268b0fdee69ec5a17248a5462",
+        "back": "26b030a257b3a978b8188daee3926eefd5318ef8ed63412731994d3cb00957f1"
+      },
+      "category": "sports",
+      "label": "배구 머리 위 토스",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 31,
+      "novelty_distance": 0.20298268525371171
+    },
+    {
+      "pose_id": "mass_tennis_forehand_set",
+      "batch": "mass-scenarios-20261007",
+      "key": "9e6b22508059175bc5c76488",
+      "bvh_sha256": "70f0492a1a08efbb916559d1c4a43f9e3fa6f208f4eaa283b4e7f69301334ad0",
+      "thumbnail_sha256": {
+        "front": "96acaabe813af542b7cbfea584121fef79f8730169843233654dcfe1bd343368",
+        "three_quarter": "f272039c98aadd036b02bf586c1ed06c2191067e9688601b52527ebbad16eeb8",
+        "side": "0079fdcdc10e054a11bec325c094673c68392d22e752a90d4e0863b029c732dd",
+        "back": "071acb3990834042ba855cf45e4dd957fbe5e933616f597e4538edec60a68a44"
+      },
+      "category": "sports",
+      "label": "테니스 포핸드 준비",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 27,
+      "novelty_distance": 0.21665689491439077
+    },
+    {
+      "pose_id": "mass_tennis_forehand_follow",
+      "batch": "mass-scenarios-20261007",
+      "key": "db75d66174f293b5a627eb5a",
+      "bvh_sha256": "17d58c189dd99f25305bb7494a12fc141b4cf79f546918fec1ead4dc595b5c61",
+      "thumbnail_sha256": {
+        "front": "f9b7091ebdc06ae3a200c05201cc651a99c852fb40d2e4f724733ec0cb1614a8",
+        "three_quarter": "f7ece7418554e65a36465f7270e6257f22ac5bf8b61b98e0e7b816ac6cb0d520",
+        "side": "4ba1cfa75131d6f5a74d510fa394bc66e1de61ca807e8a0cf9355bb740f2848c",
+        "back": "2a16d26a022b3d4a70ab97ba1b4ae8c91111d9519d72aaf5d80dcc2f68c8d4b3"
+      },
+      "category": "sports",
+      "label": "테니스 포핸드 후속 동작",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 26,
+      "novelty_distance": 0.21459288637904916
+    },
+    {
+      "pose_id": "mass_speed_skating_push",
+      "batch": "mass-scenarios-20261007",
+      "key": "f48f04f2ff556b551a715733",
+      "bvh_sha256": "ce5ce67337dddc50f536a91d891d52f7b218eb8f7f3bc4aab98b572738ce942f",
+      "thumbnail_sha256": {
+        "front": "f606389cca24c4d73ac0e82e0d8a819f25dcc6dc014cc6fdb92162b3fe33ba4c",
+        "three_quarter": "deca5150428481c8247351a4c8112887ec9a0b2c0ff86357c99aa1128726c8c6",
+        "side": "0f732664ddf2aa6957ae2e775960cd3404e63918c8dc189efe5136ee13f2ad53",
+        "back": "f611f09a20ed059a3141a0f2e75cacbfaa8f5788604b1b8295bc9be5952dc512"
+      },
+      "category": "sports",
+      "label": "스피드스케이팅 측면 밀기",
+      "visual_set": "review-scenarios-rest",
+      "visual_index": 13,
+      "novelty_distance": 0.2143419554331742
+    },
+    {
+      "pose_id": "mass_baseball_pitch_stride",
+      "batch": "mass-scenarios-20261007",
+      "key": "9f2e32d5d68897c1d347791b",
+      "bvh_sha256": "0f2fdc2052b056e6cb501f399c2485c6c1e4a31b6a1e470923a5503ffc989e33",
+      "thumbnail_sha256": {
+        "front": "2373117d2238576abf37d2dcf0bc8152fc50d6a145bb07bbaa8120ad60f4a32a",
+        "three_quarter": "85c396b77c7c4a9f13d8c031475ed8413b4261a45cfdf6a95fd05934fefcf3e4",
+        "side": "a60482e49d1220bd643661b90a2c28725fe1b9ded1d717884041c9da6fc88d2f",
+        "back": "de0698ac54c7240b753b53e6e2fb539764ab7925ce5201bdb0c4b96ce205038f"
+      },
+      "category": "sports",
+      "label": "야구 투구 전방 스트라이드",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 1,
+      "novelty_distance": 0.2129630401573376
+    },
+    {
+      "pose_id": "mass_daily_seated_yawn",
+      "batch": "mass-scenarios-20261007",
+      "key": "aa548bbafc1d0d94c5ae9d64",
+      "bvh_sha256": "5d31efb3c52a7eb1ec38998313789d55b41bc439618cda33f74a4f7d4ec25348",
+      "thumbnail_sha256": {
+        "front": "c4b6b2021735091d6f34d730e0a0f95dabc3d520eb9e71c0d24f975381223830",
+        "three_quarter": "60548ed7f3ba8a23199460cfde4d18aba9f429a47d35ef505d7400aea382c2b1",
+        "side": "1f86d38989fc956fe9f16515ec22880050387434554342ed8b00228f28f87e13",
+        "back": "28524318b6fa835860431fbf756fd872549a54e4f9d4b0ad9d4fd4a5f5a1947e"
+      },
+      "category": "daily",
+      "label": "앉아서 한손으로 입 가리고 기지개",
+      "visual_set": "review-scenarios-rest",
+      "visual_index": 5,
+      "novelty_distance": 0.20815862420263762
+    },
+    {
+      "pose_id": "mass_baseball_grounder",
+      "batch": "mass-scenarios-r2-20261007",
+      "key": "0ee52535fdf4f89cc6d98ed7",
+      "bvh_sha256": "82f43d6c24df27e033c785801467cd3c9616fe01be24e48944398633a5160897",
+      "thumbnail_sha256": {
+        "front": "b46ac1b8d4541287f6ed3b7f1ece2d1994d52942f569285fb5a17df6ade053fb",
+        "three_quarter": "dcc68562fd206b1969c31e02d656798d79a8e0f9ffadb391b50136fa715c7517",
+        "side": "d69b0c023ac182585944d6990c218775d5c93c6d5986cb236007132229ec58ff",
+        "back": "498424ce512eef90987dea9d7b702d639c50c1e6b5064b1d861b292857aa96c9"
+      },
+      "category": "sports",
+      "label": "야구 땅볼 받기",
+      "visual_set": "review-scenarios-r2",
+      "visual_index": 1,
+      "novelty_distance": 0.20703666405079768
+    },
+    {
+      "pose_id": "mass_basketball_cross_dribble",
+      "batch": "mass-scenarios-r2-20261007",
+      "key": "2ed394a5639b3b5456b71b31",
+      "bvh_sha256": "0d71afd0b110d21e3af72c629ff307b71b823f9d9596016db0f1a1710f807ecc",
+      "thumbnail_sha256": {
+        "front": "05cb314c8378649ef948be7a6f8d4d1c3cc9bddf0e03c25513cc4647ad56b2f9",
+        "three_quarter": "794a9b2d880b22e4b8c1f848f0f3eb4f949d02a9402f3e4919ee641b48e73108",
+        "side": "0b0a25840caedbd634970c89a789de235dd5a4b91585b8b9c0f30daedb6a5af3",
+        "back": "0abbd0734baf4babacecb6ec607d21485aba998fcc3161151611430ef3d9d5db"
+      },
+      "category": "sports",
+      "label": "농구 크로스오버 드리블",
+      "visual_set": "review-scenarios-r2",
+      "visual_index": 2,
+      "novelty_distance": 0.20663962486357948
+    },
+    {
+      "pose_id": "mass_basketball_jump_release",
+      "batch": "mass-scenarios-20261007",
+      "key": "54a0f1125f99492632c79172",
+      "bvh_sha256": "48f3c6365e67d16782972a3184233376354a5771af2b08b783660436195e7549",
+      "thumbnail_sha256": {
+        "front": "eb663c0977c93482c462f9e2d215b09d03086c1e029fa81c0bc62963f814312a",
+        "three_quarter": "afd45ae41683b1492e6759869f6f9569278a34222f12995a788ec52270402d86",
+        "side": "49a1d8c3dc7389c8e05df9a91dbd384bfd68181172be15346d699177ba136593",
+        "back": "fba2aca9b995040bec02dc95a794999af67ff5fc1fde15db1353937a34528eae"
+      },
+      "category": "sports",
+      "label": "농구 점프슛 릴리스",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 4,
+      "novelty_distance": 0.20060619830105259
+    },
+    {
+      "pose_id": "mass_daily_seated_stretch",
+      "batch": "mass-scenarios-20261007",
+      "key": "44c88e7f2aab0c8c0d60bc1b",
+      "bvh_sha256": "0e9a414ffee9770eac898fbf640a4fd31b7525e44131055a858d7f94df0312f0",
+      "thumbnail_sha256": {
+        "front": "813a1de32a721938509e330c8a93305f4f21f78bacdece984b45463a3e0b5619",
+        "three_quarter": "51e8369afc7c0634c72c49dc3355e12f32119749c48756db3cc512943c965f11",
+        "side": "3a4c223fb195531d59a3c6f6dd27635b39fdedbb4728f6cbf905d2073d30b5b6",
+        "back": "7efcb5f8285956948af501b804a3a36a9759c11bf81b1d262d48e9318cbd7968"
+      },
+      "category": "daily",
+      "label": "앉아서 양팔 위로 기지개",
+      "visual_set": "review-scenarios-rest",
+      "visual_index": 4,
+      "novelty_distance": 0.19803897929251382
+    },
+    {
+      "pose_id": "mass_volleyball_block",
+      "batch": "mass-scenarios-20261007",
+      "key": "6526027029b0f522102f3952",
+      "bvh_sha256": "aa9e97958937fd1188ecf792790515e266693193e6cdd051cc50e752e2988e40",
+      "thumbnail_sha256": {
+        "front": "ac51a802f023d5411ba5a41a7af88b50e484e36e0a939ad4684209f1a315d11b",
+        "three_quarter": "174a9ff4d9cc35185420aeaf37ea6fd72fd2e09797020f52ac0a9b84bd8660a8",
+        "side": "0d24ce5b0ffec7cba446715668ce8699be0429d3b101f35381e6bb792def13b0",
+        "back": "23c04f11dce90c47cc4aa62c9f253c13cfbb04aa40c03df09f132ddc56a7ee94"
+      },
+      "category": "sports",
+      "label": "배구 점프 블로킹",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 29,
+      "novelty_distance": 0.19157921100516112
+    },
+    {
+      "pose_id": "mass_basketball_chest_pass",
+      "batch": "mass-scenarios-20261007",
+      "key": "ba5b5b07d63d6fcc6c1a87a0",
+      "bvh_sha256": "298a6a235668496bd5443ccd6789f8aac7e52159919fc2db2ef93f071107ee30",
+      "thumbnail_sha256": {
+        "front": "fd1caade5b472d57c0a65cd2badd2171962a06c81e8c19065385b1cdd66da60a",
+        "three_quarter": "a6be10aee190490d00dd29762ad13cb964e0e7c250c407ff38a243617d171dbd",
+        "side": "8855aa4cfa7543d242084d60d1602a7fc77e8437b3350f0a86a869b892657024",
+        "back": "238d809ffb554206c8a029e4e3b6eb5b4fd89306a5739a3a167809bdf0e36dcd"
+      },
+      "category": "sports",
+      "label": "농구 양손 가슴 패스",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 2,
+      "novelty_distance": 0.18575425922889696
+    },
+    {
+      "pose_id": "mass_daily_heavy_bag_lift",
+      "batch": "mass-scenarios-r2-20261007",
+      "key": "416e4f7929d3f43fd794bdf2",
+      "bvh_sha256": "c5b454dc1cff7076810dca37e79798b95953a39f008eee4ad1022ca28b2c1f6f",
+      "thumbnail_sha256": {
+        "front": "e6f0682265b890380b7bee270f43a42314f5db5a25fbf60bdbc9ebd59d95b19f",
+        "three_quarter": "e9b6a2fc3a22b0e1cb97964a16c28822782c626145667715b63e9bbdef60b590",
+        "side": "e42636780786d8354464611a8140c7dbeac18e6a04b7258b5cc4a72836df6e5b",
+        "back": "ef3a784311e3bf20d9e4b7a159053ddf1cb919a37568394b1312c2ce5013b35e"
+      },
+      "category": "daily",
+      "label": "몸 옆의 무거운 가방 들어올리기",
+      "visual_set": "review-scenarios-r2",
+      "visual_index": 3,
+      "novelty_distance": 0.18178622147714477
+    },
+    {
+      "pose_id": "mass_daily_seated_over_shoulder",
+      "batch": "mass-scenarios-20261007",
+      "key": "658ff2ed5c5a0401f3f31d98",
+      "bvh_sha256": "4e353c7ff8f855f8305ca194a1ff4e013d931375ec4a0e378d93f74c4a1f49b2",
+      "thumbnail_sha256": {
+        "front": "1f502c69fc4121840bd3f1568d108cd1f14da99fb75a8b931f48fff5fc7d4ad9",
+        "three_quarter": "ea1c364f5ab8d6589c8597ac40501fb5af11844ca793dc480cfd0d5c54f6c035",
+        "side": "c3c74c537d0ef568750c2d7dfe1a0128b61dec8d3f7c5d8e46ddb06c513093a2",
+        "back": "d7021cf6b722cd195b52f89dbe55b1c33d71c5eb6c69679bd74d4eb69ea325ff"
+      },
+      "category": "daily",
+      "label": "앉아서 뒤를 돌아보기",
+      "visual_set": "review-scenarios-rest",
+      "visual_index": 3,
+      "novelty_distance": 0.1795512069443226
+    },
+    {
+      "pose_id": "mass_tennis_backhand_set",
+      "batch": "mass-scenarios-20261007",
+      "key": "56502292b4e5c9d176990487",
+      "bvh_sha256": "e0dfeac87224be6bac37743a4976db1819fd5bd278bf624739412e1a59618cbb",
+      "thumbnail_sha256": {
+        "front": "1934762e0abdcfa025b66b2ec78fb3385a4de401a30edb4b801738bd8a69a65f",
+        "three_quarter": "adfab60c5760902e68e35c03963657df23b6b97bf8ea5df2719f9f75528ef8e7",
+        "side": "eb28201f052e4b055f6779408fb5e5ad29bbe2cac7ce2d947700f674df5396f2",
+        "back": "652ff56871f050f57f48d75180ab3edc80f3af65e4426c83bbeba874b9e151de"
+      },
+      "category": "sports",
+      "label": "테니스 양손 백핸드 준비",
+      "visual_set": "review-scenarios-early",
+      "visual_index": 25,
+      "novelty_distance": 0.17029828857979168
+    },
+    {
+      "pose_id": "combat_ual1_Swim_Fwd_Loop_f02000",
+      "batch": "mass-quaternius-20261007",
+      "key": "2a2425788c1a21903328430c",
+      "bvh_sha256": "f105fbfc734344729b198da8cd20ad58041f31a7e257d9ecf71d7e196b0d8373",
+      "thumbnail_sha256": {
+        "front": "d3750774c1676d19d7df13ec908b155df4ef3064339eced616568c62ef1d9a35",
+        "three_quarter": "444e5a41b04b678cc46d2b11c7045e0d6ac4275e43b33fc4181b78d7ba10d1ba",
+        "side": "01d812c7155ac2138779e401793873512bbce03d58ac32e05797d081b2ca8e0a",
+        "back": "78bf29afe880e07511db83899fc4fbd34154b52af6c6a63f73f7f054cc9edac2"
+      },
+      "category": "sports",
+      "label": "수영 전진",
+      "visual_set": "review-quat-early",
+      "visual_index": 5,
+      "novelty_distance": 0.570561537898288
+    },
+    {
+      "pose_id": "combat_ual2_Slide_Start_f00600",
+      "batch": "mass-quaternius-20261007",
+      "key": "c7a3a6cd1554ea889efa6f79",
+      "bvh_sha256": "e1be033cef4746ff78d8959e679062b7ed26aeb8dae7b1c62f1073ad542a2fc9",
+      "thumbnail_sha256": {
+        "front": "19522f234fef9e08975cd1bdea81d37675234c666dff03edb95a35007a2da684",
+        "three_quarter": "7e6ebde6b537ca0dbc27862e9dcdcca0c74a99dd4d4426120bb1289935932f69",
+        "side": "8621fd2a7bcbc0678411c78d2f6fdab51b98e2f0377e0833cbafdf70d81a8be6",
+        "back": "492e10e13c2d495a2a47d41a04a320359e56858a06fad17912643164838047be"
+      },
+      "category": "sports",
+      "label": "슬라이딩 진입",
+      "visual_set": "review-quat-early",
+      "visual_index": 23,
+      "novelty_distance": 0.45628038510865176
+    },
+    {
+      "pose_id": "combat_ual2_ClimbUp_1m_RM_f01000",
+      "batch": "mass-quaternius-20261007",
+      "key": "65f6dd1ff59391826ccad487",
+      "bvh_sha256": "e2d62fe324a6bfbb72c2b70bc6be9392803cb34bdf55e91a4335dd5d3343a633",
+      "thumbnail_sha256": {
+        "front": "35a70a65c2cab28f8ade1625158bd49d595605eb6507753f9aa4402c57d887ec",
+        "three_quarter": "635674f50ebd30c05c0142dfac263c541efb01c834f3afe49aaf60e6310dd14b",
+        "side": "38fdd8bc97eacf27428ebc97a48b44ad5a22c5a4cf7821fa34e8bafd1bbc3d78",
+        "back": "a5f240cb1489a337666348efa97ae1644624bc8ee57dff9f6f0843d437ac456d"
+      },
+      "category": "sports",
+      "label": "턱 올라가기",
+      "visual_set": "review-quat-early",
+      "visual_index": 8,
+      "novelty_distance": 0.43272693825914454
+    },
+    {
+      "pose_id": "combat_ual2_Slide_Exit_f00600",
+      "batch": "mass-quaternius-20261007",
+      "key": "00bc12cba5d3f466e7fd3ee1",
+      "bvh_sha256": "2f4a7defab32ed3ed2d505abc0fbcc2ff6df10bcae2abd6f08d2d689344cc056",
+      "thumbnail_sha256": {
+        "front": "a162812bbf3f24fb09fc03a69bdcbb75d3592d9d3b5f321b01618a80bde7caa1",
+        "three_quarter": "5efe1dc566ece01d243b33aa9b0d03b6f3cf82f58517ce6ba22b3b2766c06a89",
+        "side": "1f89bcb3ecf46bb040c386591f52e8071edc254e136dbb6dfda99f0cbefbdc94",
+        "back": "4dd3006271a4ab92fe2958892f50d22a43fbaaf619183a89f8c7a4f883606b49"
+      },
+      "category": "sports",
+      "label": "슬라이딩 후 회복",
+      "visual_set": "review-quat-early",
+      "visual_index": 20,
+      "novelty_distance": 0.41684715147822415
+    },
+    {
+      "pose_id": "combat_ual1_Swim_Fwd_Loop_f03000",
+      "batch": "mass-quaternius-20261007",
+      "key": "8155a06c5e4068d0ca479ade",
+      "bvh_sha256": "b52013ae74d3006cfd2a566eaff5127090e9a5fde1a8e7504b6b297142e500f1",
+      "thumbnail_sha256": {
+        "front": "87ff6cffb6ad2cee0a498c65f15ad28804c6af548a2db21fbb85898e265f4ce8",
+        "three_quarter": "3adf228dee398b229eb42b29f56f63cea3240e14a633267bb978df57e0f319db",
+        "side": "76994994dcf5ba67dc7676c07ad38e0a58cd7bd54b18774cd6bd6c0e8d98e13a",
+        "back": "455d13f7fbb3eda7485587bb852a6d42871ca264e6220222e9c9aa2e83f6b8e5"
+      },
+      "category": "sports",
+      "label": "수영 전진",
+      "visual_set": "review-quat-early",
+      "visual_index": 6,
+      "novelty_distance": 0.41608028871409214
+    },
+    {
+      "pose_id": "combat_ual1_Swim_Fwd_Loop_f00200",
+      "batch": "mass-quaternius-20261007",
+      "key": "4703c6132f2921f2319b45d4",
+      "bvh_sha256": "ee619aa07fb54eb33b33c5c68660560a030c63443b81441bd94b862a146cf57a",
+      "thumbnail_sha256": {
+        "front": "7adf689ad44be536aeb970842691c2a22c151d0e5ccb41485953cffbef88a439",
+        "three_quarter": "4790a493298fdbe4dc3078d5cf745aef512465bad613875bb2794677be90ff3c",
+        "side": "173e91ef1034b8608de59e63d17cee51cbf6a3b970ac9d1b426e547da7447135",
+        "back": "de4c7e291c5bcff9c27dbedb0cab086398236364628857bd4992e56022a27a56"
+      },
+      "category": "sports",
+      "label": "수영 전진",
+      "visual_set": "review-quat-early",
+      "visual_index": 4,
+      "novelty_distance": 0.4135969114108473
+    },
+    {
+      "pose_id": "combat_ual2_Slide_Exit_f00400",
+      "batch": "mass-quaternius-20261007",
+      "key": "1939e1b755d686930b401090",
+      "bvh_sha256": "e17d1e35759a5edef07501f8c58cc332e388e38e073d7cc63fabaed216e25f54",
+      "thumbnail_sha256": {
+        "front": "373b0a09ab28724bc780393cc610010667850bb052cf7eb8e9d736f5ae020a6e",
+        "three_quarter": "5f254a15fd13367b321ba9355c0806bf3831e01fa290ec71c9199562a9114a5d",
+        "side": "019d3b3548dca5441f8b07b10ff571b838320a71e4243e34404e2f0ab9aa6ab7",
+        "back": "db9a3ae72c332b7a63a816298a41d045f718ba5dc1bd5b77e4fb843b75c8941f"
+      },
+      "category": "sports",
+      "label": "슬라이딩 후 회복",
+      "visual_set": "review-quat-early",
+      "visual_index": 19,
+      "novelty_distance": 0.2775979054312862
+    },
+    {
+      "pose_id": "combat_ual2_OverhandThrow_f02400",
+      "batch": "mass-quaternius-20261007",
+      "key": "4505a981718ded09c4626511",
+      "bvh_sha256": "97fa90b3ca3482e144e6e23d16b8432b4d04f7d2a696bb65b56d3f71a5f577b7",
+      "thumbnail_sha256": {
+        "front": "687fe29fd42f3511992c1c7fddedce49b4fea8f573a6ec44ed49dffca296448f",
+        "three_quarter": "e2a5d1f31fc66c0f464d7fbfd8d2eaabb8488b36265abda5da8ff13540419547",
+        "side": "4d8f145798cf40a8103ea7c9dd53459204888412ffb509b20ebb341b4d2951fe",
+        "back": "bb5f355bb6198abdde8f0b726bf371770d6b864b6986c232de46e859446cf800"
+      },
+      "category": "sports",
+      "label": "머리 위로 공 던지기",
+      "visual_set": "review-quat-early",
+      "visual_index": 16,
+      "novelty_distance": 0.36318559509524795
+    },
+    {
+      "pose_id": "combat_ual2_ClimbUp_1m_RM_f00600",
+      "batch": "mass-quaternius-20261007",
+      "key": "d8eb6f341a138abf00d5f2d9",
+      "bvh_sha256": "efbe91aded2826c2681310996d20ac927d58a714bd767ffbcb1f238f5cd396e4",
+      "thumbnail_sha256": {
+        "front": "42dec7f8e95fbc70677200ba870b92421446e11c2a209364578e5454b680e17e",
+        "three_quarter": "c2a55f9fb8880fe5f843de1d1494d495901e7266ba6ad09af801eb1b9b215b94",
+        "side": "3bb70b4cc56c121a3cadffe810af72ebd3609b862a291a70a58a44b27885ce51",
+        "back": "bda23b12b204afb59a4bca1578f4d51a712f0139da3575060917573a2c204443"
+      },
+      "category": "sports",
+      "label": "턱 올라가기",
+      "visual_set": "review-quat-early",
+      "visual_index": 7,
+      "novelty_distance": 0.34282550250998794
+    },
+    {
+      "pose_id": "combat_ual1_Jump_Start_f00600",
+      "batch": "mass-quaternius-20261007",
+      "key": "a951e3f8a24132d609f30384",
+      "bvh_sha256": "131c064924be9342b34b8e6f1468ed24353c37b8b6bb0a61895da152b6553644",
+      "thumbnail_sha256": {
+        "front": "136d028dda561af69b5a5fc43c09e4d3b4b57d0c9eb8d4e31bed09e6e23ae3a4",
+        "three_quarter": "92e5094926358bbfb0c34d674e6c90b6408e5e9c4fb17334fab8c8809d80c1bc",
+        "side": "601bffcf9695b892f5a7eaa8e8db1bd245f68b9a3e96a8bc157329746eed99c0",
+        "back": "b862d3a1b1409cc02ac513741aba141fe1b1787a6691311340404d9fca299722"
+      },
+      "category": "sports",
+      "label": "점프 도약",
+      "visual_set": "review-quat-early",
+      "visual_index": 1,
+      "novelty_distance": 0.2921713919288848
+    },
+    {
+      "pose_id": "combat_ual1_Jog_Fwd_Loop_f00400",
+      "batch": "mass-quaternius-20261007",
+      "key": "e81c08e67a9d578d20f2704b",
+      "bvh_sha256": "b9839d62b24503edfd1b1c44ed6eff45ee605dc5463809b3d941c6ebb21e5e52",
+      "thumbnail_sha256": {
+        "front": "b17566262e5719210281f5ea55ebbd1c296b377e3495e0e596b54380567b3343",
+        "three_quarter": "1e9027b635072ae9ce4a307926ac1a70eb6b9a8ea222fda84b5d72ae5fa30702",
+        "side": "9281353c297cdf4bf72bec38e44eab42fd99eb60b76e42eeaea7bbb9cbffe8fa",
+        "back": "402fb6e6aff186a0e2635645fa0a28b9eefa0efa89fe1d52a1a7f13cd5cd660d"
+      },
+      "category": "sports",
+      "label": "조깅",
+      "visual_set": "review-quat-early",
+      "visual_index": 0,
+      "novelty_distance": 0.3187148220159129
+    },
+    {
+      "pose_id": "combat_ual2_Farm_Harvest_f03600",
+      "batch": "mass-quaternius-20261007",
+      "key": "cd77f4869a14576545d54bea",
+      "bvh_sha256": "5055d36544df62ea20f2e4fa638f3f9e87d8cb4ff20683ec8658e7c879474a66",
+      "thumbnail_sha256": {
+        "front": "bb9e4edec4c0047f5ed5ba366bf6231dd7668c704c58db77c18158efa953f00d",
+        "three_quarter": "1a53f80bb9c137ccd4ee5047bb64cf51f80ec98133253e9f204347340655af39",
+        "side": "a60179c155da83283df948ee76ecc7c5f5f6fce4a17e06970720ff94f714de50",
+        "back": "f657cc46ad2ebb961eb1b6a0fe249e4f3a20a433383021f3b754c316c810915e"
+      },
+      "category": "daily",
+      "label": "작물 거두기",
+      "visual_set": "review-quat-early",
+      "visual_index": 10,
+      "novelty_distance": 0.316227739432696
+    },
+    {
+      "pose_id": "combat_ual1_Fixing_Kneeling_f10400",
+      "batch": "mass-quaternius-20261007",
+      "key": "262ced2a8e9f0108f54285c8",
+      "bvh_sha256": "4c71a2fee4a84f2e774f7ac306fe6cc660e5853318d2dbd0a4f2a5951b59ea73",
+      "thumbnail_sha256": {
+        "front": "98bd84cf5858f0a3c879c84742c533cb514c0296790a1bb335b18e82d65f5767",
+        "three_quarter": "aaf18b68c33799fe9b4941cb1cc10cfd285c1104071aa7964e219b0852fc709c",
+        "side": "8e7dadbc429773a25d5a84112fbcd2057ff64b1548621d95c0598ae67d4b866c",
+        "back": "9ea185374161313329e7ac086c7d428f7b98e945152b6ba510999162eed22289"
+      },
+      "category": "daily",
+      "label": "무릎 꿇고 수리하기",
+      "visual_set": "review-quat-rest",
+      "visual_index": 4,
+      "novelty_distance": 0.2997496871473373
+    },
+    {
+      "pose_id": "combat_ual2_ClimbUp_1m_RM_f00200",
+      "batch": "mass-quaternius-20261007",
+      "key": "cdbc58ad456a2efb97f8b3bc",
+      "bvh_sha256": "f4f35437f7d11a5c5b15e195e390d0eb369773afc059ac8730a0be454dfb0b0e",
+      "thumbnail_sha256": {
+        "front": "a54fadfd33937bbe76aee474548ec8ddca4720b424e6fef4b5e34589008a8cea",
+        "three_quarter": "cbd5465d4c7ac9c03dc14e86693e9178deadcf0dc9472f5e3d6e20e0e147f0f7",
+        "side": "7eb207bdf4f65941123d9f51fb55563f11d1a3b1a060bed4a771abb3f7c7b9a2",
+        "back": "d12dee7d981b0f04ca88588c5cab475674bb41db4802e95b778a79ee7067c32d"
+      },
+      "category": "sports",
+      "label": "턱 올라가기",
+      "visual_set": "review-quat-rest",
+      "visual_index": 29,
+      "novelty_distance": 0.2911963790693832
+    },
+    {
+      "pose_id": "combat_ual1_Sprint_Loop_f01000",
+      "batch": "mass-quaternius-20261007",
+      "key": "2874aa0a79f3a5280cf38b49",
+      "bvh_sha256": "2c767b4ee04694eb783481baa6e708b14ec6d7b877e3815d025db21102bb7276",
+      "thumbnail_sha256": {
+        "front": "058ae128c07a3b206ac79fc631de24373ada8df19fcc1631f036b0b967652cf4",
+        "three_quarter": "9191dac5fe8ac5e2ddb255806e8823c4b587d24fe57c01aacf8d44b8f47d0733",
+        "side": "8ee11dd35c49bec36098de45ca20cbc9bcea4e8d714a7b17b7d2acbfa6160205",
+        "back": "c6b70da2319177ceae8a98cf032737433d49fe43e5be21abae67b2d56964e420"
+      },
+      "category": "sports",
+      "label": "전력 질주",
+      "visual_set": "review-quat-rest",
+      "visual_index": 17,
+      "novelty_distance": 0.2813687442412791
+    },
+    {
+      "pose_id": "combat_ual1_Fixing_Kneeling_f04000",
+      "batch": "mass-quaternius-20261007",
+      "key": "e30b8c7cd63fce8e86e07fc8",
+      "bvh_sha256": "ecf169219aefe74e321d75b1071c524f61a5bdcd64cc4b57721e1e8cd280740f",
+      "thumbnail_sha256": {
+        "front": "c545e243a557f74458c813cf094a17a7f60c41bfbfe81d64b399d3cfe7e12a7b",
+        "three_quarter": "ecc9ba0f838799d71d4f89e314b36459bf4cdf6c68fa6a0e999d83c6c547d8a9",
+        "side": "32ebda75ca7bac5af547bbda4b89e4bd54ded54f5344aa3975e640715c508b15",
+        "back": "f0164231db67bef38fb764fd766cf77dda1058f7f9f749c43942c3e9ad88f2eb"
+      },
+      "category": "daily",
+      "label": "무릎 꿇고 수리하기",
+      "visual_set": "review-quat-rest",
+      "visual_index": 3,
+      "novelty_distance": 0.2765847932875716
+    },
+    {
+      "pose_id": "combat_ual2_Walk_Carry_Loop_f01200",
+      "batch": "mass-quaternius-20261007",
+      "key": "b6faf52ee12cbb20969a6557",
+      "bvh_sha256": "1419fdef1a5c126329994752ea942f6b6a9a16133b8ab8e0d71847e8a0541e1e",
+      "thumbnail_sha256": {
+        "front": "c0c39977755e4ddede6a75dca25b35c1601cbb03d5776207ec83812c84078cbb",
+        "three_quarter": "577f0a502a101d3b2e11a5f7ea724bb8276e045d58ed75c1827e37a4ff165b7f",
+        "side": "0eba4b56e6ea58f4e9c3902cf01663e1979125a145c6d33f32785cdce856849c",
+        "back": "ca6df23ce54c331cd79a2de2c313fbf949d1e41c60fa15bed400acb6c5aec508"
+      },
+      "category": "daily",
+      "label": "물건 들고 걷기",
+      "visual_set": "review-quat-rest",
+      "visual_index": 46,
+      "novelty_distance": 0.27353291658575635
+    },
+    {
+      "pose_id": "combat_ual1_Crouch_Fwd_Loop_f02000",
+      "batch": "mass-quaternius-20261007",
+      "key": "3ac927187f9cf9e426ec10d3",
+      "bvh_sha256": "e0d432e4a2f110657f2b51aa48519902d0ebbe590ac9484321c2112035acc896",
+      "thumbnail_sha256": {
+        "front": "fef33326f163ea95466c94137d17c984b69ee586e5b2bf5afaf20ad7cfbe73b8",
+        "three_quarter": "736c07564bb06465b642c7b786ddf68d103714e7a9962bbc824f51a451504448",
+        "side": "cdb16919c32abd96be7fc1289675b22e172c7a4b0378f24f6b9e765e705a6831",
+        "back": "956d46be37a1f8d36533ff0679ebb89daece5d2c01fbff17ea8d1b1b502436de"
+      },
+      "category": "daily",
+      "label": "몸 낮춰 이동",
+      "visual_set": "review-quat-rest",
+      "visual_index": 0,
+      "novelty_distance": 0.2513550184502192
+    },
+    {
+      "pose_id": "combat_ual2_Farm_PlantSeed_f02000",
+      "batch": "mass-quaternius-20261007",
+      "key": "7198dd47c3bd49e34bf28e83",
+      "bvh_sha256": "c7fa116150e9549a3a9e57b8eb1a6d1070ea97706c2e69c17bab8d09f0811509",
+      "thumbnail_sha256": {
+        "front": "929a0e0c9b45f39227dcc07c6d76802cf4b97f00337924bf04236bbc0b814f88",
+        "three_quarter": "987922a789e28c5fc8cfbddc6e6a9606e250617f4da3aaf5610a27c013429bef",
+        "side": "6bbdfb6964909904c522f473a2646881163f7d76e95bcacbbe0b87496ab01008",
+        "back": "281f5f9927dd0e20f86581695ddac43372da90e728d4bf00c5794f77a41d5af1"
+      },
+      "category": "daily",
+      "label": "씨앗 심기",
+      "visual_set": "review-quat-rest",
+      "visual_index": 32,
+      "novelty_distance": 0.23840549220267776
+    },
+    {
+      "pose_id": "combat_ual1_Swim_Idle_Loop_f05200",
+      "batch": "mass-quaternius-20261007",
+      "key": "32bf36bb1134b061ee551f94",
+      "bvh_sha256": "188f9d856e5e1d2c10e9b623f85e11046cd101c383d2c56a45667133f545bd36",
+      "thumbnail_sha256": {
+        "front": "94fd0135c5bd9c64e6f0d71325406e08ba3aa9bd1f0bc79090fe399af94fef8b",
+        "three_quarter": "9f8dd1b5f09abbc152f0c34766762156e9f3177d66954ba5cd871ac1f28cc53e",
+        "side": "4ce9097832745b1f726f66a1baaf91e36a7c12861cc93307ef3fa036952998d8",
+        "back": "6623b619fb091756e6a9f3db4cce6eaca98fd4fb70a1be780727f99d9666900d"
+      },
+      "category": "sports",
+      "label": "물속에서 균형 잡기",
+      "visual_set": "review-quat-rest",
+      "visual_index": 20,
+      "novelty_distance": 0.23498724169403137
+    },
+    {
+      "pose_id": "combat_ual1_Jog_Fwd_Loop_f01000",
+      "batch": "mass-quaternius-20261007",
+      "key": "06a51396641f5da8116fd501",
+      "bvh_sha256": "284c2e33eaf510fe7702fe17f5c7484f9f93cdcdec4fcbd290a2f224b67b1a6d",
+      "thumbnail_sha256": {
+        "front": "b695afdb4dc5d3b1464e5b91112b029f3eb3ea5c7e5b2e6f088fc76f10e29a81",
+        "three_quarter": "8c4e129c3e29dde676f1e49ed2c36a04f14db5c467839b110ebf33c6dd496965",
+        "side": "456863e8e35613e5f37ef33115a026e5ce36319633c2aae89a18caa7a9b5562a",
+        "back": "cb442f417052caae44762a3c617b5f714525bc69dced910b0e8f2c91f7c2ab6b"
+      },
+      "category": "sports",
+      "label": "조깅",
+      "visual_set": "review-quat-rest",
+      "visual_index": 8,
+      "novelty_distance": 0.21321310213130776
+    },
+    {
+      "pose_id": "combat_ual2_Zombie_Scratch_f02200",
+      "batch": "mass-quaternius-20261007",
+      "key": "e3f718f22c811b15592f605b",
+      "bvh_sha256": "1325c2c82a139dcf33d10bff9c5240160025a4205699453a7d6e13e46b7ed16e",
+      "thumbnail_sha256": {
+        "front": "7ba5df6352d242f1a5d537be92b9a89732dc7ea1f02b2387a0ffad17527d13e5",
+        "three_quarter": "447b4d731cd56ac5f3a56f90e85ca901d2c09732604e58634bc41308b7426dd3",
+        "side": "5fa011df7814577a18586b9c98afe003107216c2a5bcf0f6728ee944059d6ba6",
+        "back": "39f4c5f33b11762a5dcfcda147f767e50062da47afa1b780debf4c6a7f2c531f"
+      },
+      "category": "fantasy",
+      "label": "좀비 할퀴기",
+      "visual_set": "review-quat-early",
+      "visual_index": 31,
+      "novelty_distance": 0.5297958856564247
+    },
+    {
+      "pose_id": "combat_ual2_Zombie_Scratch_f01400",
+      "batch": "mass-quaternius-20261007",
+      "key": "c8970a6df2e8dd35d47228c4",
+      "bvh_sha256": "2ad9a9cf4de2a58208de4920f39bbdc7f3c1861241b6256af2730708230b1ff7",
+      "thumbnail_sha256": {
+        "front": "98669486f27e1103431415a5cd94447a976ff1698bc05c4ac9f74e229a1d3394",
+        "three_quarter": "fb2855bd68eed3d7eb28f029a6332c7e888f3300445dd608e5c18570f671c0a3",
+        "side": "4d0f975b3b7ab9e93c1362d4b0987c52e70c1248706ab8c4b90c255a04f386e1",
+        "back": "85c44254cea272dce7d928a59a9513004db6005434f98081fb727ecad4a82891"
+      },
+      "category": "fantasy",
+      "label": "좀비 할퀴기",
+      "visual_set": "review-quat-early",
+      "visual_index": 30,
+      "novelty_distance": 0.3962131215777777
+    },
+    {
+      "pose_id": "combat_ual2_Zombie_Walk_Fwd_Loop_f01600",
+      "batch": "mass-quaternius-20261007",
+      "key": "bbcfea59ac78cd05a236a505",
+      "bvh_sha256": "97ec072a9278a7b04059b45776b92ddd921884d9cff63b4dae469efaee6362ce",
+      "thumbnail_sha256": {
+        "front": "d39d6dda200ed273952d8bfd3c386c5fe30556017834479fdfb4f54766803a5b",
+        "three_quarter": "f91893008c0930b5c24d19d6ac0000006703436e7151c43ca8afa28953231eef",
+        "side": "dd2fd4794e94df327ccc97c8450da9ded47272c2c16b0dcfc35205b36afc578c",
+        "back": "6d6dc2110c4efff73acce0d52afcb9caf352d2c9d1b3c0c89a6834ea34693bef"
+      },
+      "category": "fantasy",
+      "label": "좀비 비틀거리며 걷기",
+      "visual_set": "review-quat-rest",
+      "visual_index": 49,
+      "novelty_distance": 0.22532057104464756
+    },
+    {
+      "pose_id": "mass_accad_G7_Capoeira_f00016",
+      "batch": "mass-accad-20261007",
+      "key": "2e064cbbb593d27781b76e42",
+      "bvh_sha256": "ed4cf1cfecd4f285ea65ad79cad0c94f23ee262686daa1721f0fce1f5bded24e",
+      "thumbnail_sha256": {
+        "front": "94be2ae336d97b656ce2705c8303b27e947559eead47b5544fe5a3d7403d80aa",
+        "three_quarter": "b939fd549acf1aff74ae7181469370f520cc4d09162888c0c72e6b4096fa3bb8",
+        "side": "411f68d7c94664b686ee63e1dd2587b355df2fb9b11571393fadffa58350dbd0",
+        "back": "395f1a461ea966f536c6b93947fbc84214be2fce57faa18fce10c57cdf707d10"
+      },
+      "category": "combat",
+      "label": "카포에라 회전차기",
+      "visual_set": "review-accad-early",
+      "visual_index": 61,
+      "novelty_distance": 0.7565031643407417
+    },
+    {
+      "pose_id": "mass_accad_Extended_3_f00711",
+      "batch": "mass-accad-20261007",
+      "key": "43bfc679b45f830e9cd5e2e5",
+      "bvh_sha256": "9c9dd051bf0bb9566519cb1b7d40873705a648672389e21b9e4c2951b3353303",
+      "thumbnail_sha256": {
+        "front": "c90c6fc956cf4516f528d85c9336250c1e7e59d84dc98a8ceb992d815dd00ecd",
+        "three_quarter": "e5f4166ec6379c8a3df58ffefee6c16c6ac781b1e9fb2747f96aaa8a04390921",
+        "side": "922e25a35d25170651703fa767df6d44b0f781d29d2893ba8f8baf3c6b550497",
+        "back": "e0740ffa803437bbaaa123ef4f66aadcdb7aa7cfa23a83817327435d542af43d"
+      },
+      "category": "combat",
+      "label": "연속 무술 동작 3",
+      "visual_set": "review-accad-early",
+      "visual_index": 27,
+      "novelty_distance": 0.7551079303953214
+    },
+    {
+      "pose_id": "mass_accad_G5_BackKick_f00028",
+      "batch": "mass-accad-20261007",
+      "key": "00320645964a8e9c06de3b85",
+      "bvh_sha256": "b741cfc7fc3f6f48c6036161a1ec6ba707032ce2feb07afa14322da782d3d6ad",
+      "thumbnail_sha256": {
+        "front": "bc7e7aa56e1e3e7483503891380bc2568d839afcfa89f7ec1ea6a66092973009",
+        "three_quarter": "1b40153f1d8f8bb02d7085c2589bdf93beede7f40872695e512260554ee9ac25",
+        "side": "8d30c6eee28ffb0df1bf243787487559022fc7289d7ec3bba9c9319f5d7b18a4",
+        "back": "f5f9d26c82813f54c659c68c07fd29da07a3973b948192496bd52413997ee0c3"
+      },
+      "category": "combat",
+      "label": "뒤차기",
+      "visual_set": "review-accad-early",
+      "visual_index": 57,
+      "novelty_distance": 0.6718286572167244
+    },
+    {
+      "pose_id": "mass_accad_Extended_3_f00181",
+      "batch": "mass-accad-20261007",
+      "key": "485343385f9a6322daee3756",
+      "bvh_sha256": "82213713cebab1909e679acd8f2740b731bc48f34efeb0160c2d5e2e8f19b98a",
+      "thumbnail_sha256": {
+        "front": "e624e6b1a2e5ae248e9bb50df8fde881f2e3be98ac54f1efbc3980ae9e12cb5b",
+        "three_quarter": "259460136a6eab3141b98d80c14527f8c42131ea83cae311edf9569da9619de8",
+        "side": "169bdd8707ec8d3c48157138afb4df86269bf7ceee5f40433735d569b1d673bd",
+        "back": "2282733018601f316c0440df8b2691a8700ba69dfd22324b31032f4b55eb7bba"
+      },
+      "category": "combat",
+      "label": "연속 무술 동작 3",
+      "visual_set": "review-accad-early",
+      "visual_index": 26,
+      "novelty_distance": 0.6442498499423535
+    },
+    {
+      "pose_id": "mass_accad_G19_ReverseSpinCrescentLeft_f00044",
+      "batch": "mass-accad-20261007",
+      "key": "c64dc5b05fc7339c411cadc8",
+      "bvh_sha256": "c892eed0d1a31e2bb30d53ce796d12903dc2b4430d3e07ed628bb09876f097bc",
+      "thumbnail_sha256": {
+        "front": "5a79f7c48a2ef1eca80851a1f12da6f7a3b99342fd459fb55c618fc23d1d7ece",
+        "three_quarter": "98af5a916a7b112928c3f0989df7e1a7a78d8fb5fb46eb53e045f8fc38a43f49",
+        "side": "0a1cd47a940e7da3c84c11d072c525d485f314f2561a3c62079661a12ffc3c0f",
+        "back": "f32e8d544f843755bbcd48ae14b008f64440151a17a401ad8b48f1668c7f2c3c"
+      },
+      "category": "combat",
+      "label": "왼발 역회전 반달차기",
+      "visual_set": "review-accad-early",
+      "visual_index": 46,
+      "novelty_distance": 0.6267643479312228
+    },
+    {
+      "pose_id": "mass_accad_Extended_3_f00831",
+      "batch": "mass-accad-20261007",
+      "key": "90833ba329b7f20bb3fcf0b8",
+      "bvh_sha256": "2e29cc09d0847319353a1052c59c00bc9b877b93152bbb7be304164bcd1ac139",
+      "thumbnail_sha256": {
+        "front": "ccea7fb1c3fa7f5ab703dc6001ff795a724594583f34be6e5741f43d9c939ffa",
+        "three_quarter": "e843653e83c32866da1b1d587032c728b45ca0121c691b2e1a081e4323c4ca4d",
+        "side": "ee40973ea20e0d1febad3061bcbd0cb8f4982c6f039024ebb9d23ccfb4bf1f7c",
+        "back": "4142d2c0eaa3cc1814dbb5f9118f893d9a074d4f2a6828a41f1b57b1436a07cc"
+      },
+      "category": "combat",
+      "label": "연속 무술 동작 3",
+      "visual_set": "review-accad-early",
+      "visual_index": 28,
+      "novelty_distance": 0.6043682454390337
+    },
+    {
+      "pose_id": "mass_accad_G13_CrescentRight_f00027",
+      "batch": "mass-accad-20261007",
+      "key": "ff677fc6297faf82f98fc9dc",
+      "bvh_sha256": "e6cb4f50e0601906e586466acc0b5715a97ed6637fe72802521e21a92cb4f399",
+      "thumbnail_sha256": {
+        "front": "4a5fd1602e0f1cf072e0af8d6e47362b08c7f88b4902fe19c0bd6fe465558bea",
+        "three_quarter": "0eeb18ef052556ff8a89e24a0c4a50bfd303b537e529c69ec614ed792d221f03",
+        "side": "c8508074f7d2f310b6a315f4d9fb7a1559bcc056b44061f59814c8680b31ed77",
+        "back": "c68766203acee9937feb167a1e2cc496873d9d7debd8d3902fdf96cba7e12895"
+      },
+      "category": "combat",
+      "label": "오른발 반달차기",
+      "visual_set": "review-accad-early",
+      "visual_index": 37,
+      "novelty_distance": 0.5387696368017059
+    },
+    {
+      "pose_id": "mass_accad_G12_CrescentLeft_f00036",
+      "batch": "mass-accad-20261007",
+      "key": "6a03850cbd8c05d1c98eec9e",
+      "bvh_sha256": "a118a9e46ef43306d544368e71a408086c07a7b4907f1b8c45b3bb5cf6cd9284",
+      "thumbnail_sha256": {
+        "front": "cf59f68a44192d26e8beeb448d2f98bacc7699016ea3e53a4feafcea0840560e",
+        "three_quarter": "a9747420c0b4708e676e9017bfdf168de6905fef67eefcad906a34a0481abb98",
+        "side": "c64f025be14fddf177da1f9a33583cbf9bb2686121792b6aa911993e42f8311d",
+        "back": "3a787e8c98b4892976266c495c7b77a0ca650a253951161b52f478b8674c277d"
+      },
+      "category": "combat",
+      "label": "왼발 반달차기",
+      "visual_set": "review-accad-early",
+      "visual_index": 34,
+      "novelty_distance": 0.4027632918185781
+    },
+    {
+      "pose_id": "mass_accad_G11_RoundhouseLeadingRight_f00048",
+      "batch": "mass-accad-20261007",
+      "key": "1cd219492625280fd0810f91",
+      "bvh_sha256": "d966da8c865fef6e4b0f8d0bea546c54bb4f16be7a4df0797e83f989aad00cbf",
+      "thumbnail_sha256": {
+        "front": "5551256704b7130644c4218a4941d5095b155823e09eaa00df44c8cecd7d00f5",
+        "three_quarter": "1c4971bdc440c9712eb344fd0afc135eb72750a26d49f6cf5e983202c7ea2cb1",
+        "side": "907c09af6896f51efcc710dc7b463e2386967b27e2cf3c4a6d5dc878237410e7",
+        "back": "7d66a7d3242dcc9b641c3c45c6633c4f0c6dbc95772ed91505e3311b57416dfd"
+      },
+      "category": "combat",
+      "label": "오른발 선행 돌려차기",
+      "visual_set": "review-accad-early",
+      "visual_index": 32,
+      "novelty_distance": 0.5521167248412145
+    },
+    {
+      "pose_id": "mass_accad_G11_RoundhouseLeadingRight_f00040",
+      "batch": "mass-accad-20261007",
+      "key": "1cbe872941b12fd5c124fd3d",
+      "bvh_sha256": "dd2f17c4b54b32b709e4a3ed4d2b2d0ffdae696e0b1979d98cb37b3bbededa30",
+      "thumbnail_sha256": {
+        "front": "167cfc0e23031848dd9e844e020777fb9d0798c15b7534c6cffbf74f33194b41",
+        "three_quarter": "edff8f240c6148b6567986ff2b8ba6b7d8da6f039022b9aea47ceb49cca07a35",
+        "side": "abca1b3a87ed3a87cc9c251751e1a7bda087689af64e569c24fbdf8977c65598",
+        "back": "e3f73698a419340b347a77a733fdcb686d4d58795134667673d9d9e83acb6649"
+      },
+      "category": "combat",
+      "label": "오른발 선행 돌려차기",
+      "visual_set": "review-accad-early",
+      "visual_index": 31,
+      "novelty_distance": 0.545871341759539
+    },
+    {
+      "pose_id": "mass_accad_G14_RoundhouseBodyLeft_f00016",
+      "batch": "mass-accad-20261007",
+      "key": "d9cdd76ca606b32c71862879",
+      "bvh_sha256": "0dd569e80fe7c6bcecde361eea8beedf56864ba83202219975f7bb3ec904d11a",
+      "thumbnail_sha256": {
+        "front": "9c51b857e50bb7088288e298e5acc1863878ee9de5470d79548d33dc209b1289",
+        "three_quarter": "8dea6410272401a4a46e01af1ba452df825446963bc79630aa6bfd5d6296d493",
+        "side": "3f629faece7040301bcd7fd4f8b40a48ed01c4464586ee16d249ed2807622b42",
+        "back": "fdf87305d63664198c85ffc4542b0072a7cec850746b2ed05511d857940094e3"
+      },
+      "category": "combat",
+      "label": "왼발 몸통 돌려차기",
+      "visual_set": "review-accad-early",
+      "visual_index": 39,
+      "novelty_distance": 0.5412463220656121
+    },
+    {
+      "pose_id": "mass_accad_G5_BackKick_f00021",
+      "batch": "mass-accad-20261007",
+      "key": "4af894e9cf789dcf909fdc9b",
+      "bvh_sha256": "f512b63a1aa8dd0586acfd93d04c4072eff8118fbad9f250e714a8c0698c6a45",
+      "thumbnail_sha256": {
+        "front": "f23992a61fc98af2924ff0f13f6f3fb86d174c2c93c5842ab73060bfc873fc5a",
+        "three_quarter": "7f8e245d68d9321f0ad57c445aaae324830b899a06b037e9c110b8ec026a57d0",
+        "side": "30756d3069e2ebb0b9626b25ec0f0ab1d16056bfb353d1d3d373951dde3d7895",
+        "back": "5e3f5c45f2357c4dd200641e32c33065fdf80969eb18fec95a435639483abb7c"
+      },
+      "category": "combat",
+      "label": "뒤차기",
+      "visual_set": "review-accad-early",
+      "visual_index": 56,
+      "novelty_distance": 0.531816045398246
+    },
+    {
+      "pose_id": "mass_accad_G4_SpinningBackKick_f00030",
+      "batch": "mass-accad-20261007",
+      "key": "1c59fb0feb04137855e17d97",
+      "bvh_sha256": "cf1a9e788c07e7b4d6ec24044e31281b33606573f5124371684833fcc2419d88",
+      "thumbnail_sha256": {
+        "front": "d4010db4d36bae88dc0b2336e2f420fb2d49911e208a8bcb95f51ebab1bd4f0e",
+        "three_quarter": "93f17fb65bcbdd8e9c72378d6ca49c0568d7440cc1e1935c2d7aa5b6b82a670b",
+        "side": "fddc49f5901dee3c90764f4e1d817e4b4a9210125937588079ae3505be24a48b",
+        "back": "1b28f4e0445adfdac9767660c36561a57769cfe7ae6c100284080b8a84c97f53"
+      },
+      "category": "combat",
+      "label": "회전 뒤차기",
+      "visual_set": "review-accad-early",
+      "visual_index": 55,
+      "novelty_distance": 0.5217323861360291
+    },
+    {
+      "pose_id": "mass_accad_G16_DoubleKick_f00047",
+      "batch": "mass-accad-20261007",
+      "key": "a1a8b0bac45de44bcd1021fc",
+      "bvh_sha256": "d9fc23235e9ec2c78a5cba24a3e437a0e04ddb7b97309f0f912fd2964534209c",
+      "thumbnail_sha256": {
+        "front": "aea06e6e77484cd6378fdc1383b453e35aa69d2cd1d5df18593e22cc8c39380a",
+        "three_quarter": "ce20ec66eccba12d95f9b0bbe74cef7eee533fe13a289a1c5c4d095337bf4616",
+        "side": "ecb8aa3e1241dbf180a0565d4d736bb0920ab4ca55057138a3507841a8e5866e",
+        "back": "10d06423bcc57ed9a3434199d29f5aecaf6740a3def9e8a739a141eeb1dc4448"
+      },
+      "category": "combat",
+      "label": "연속 발차기",
+      "visual_set": "review-accad-early",
+      "visual_index": 42,
+      "novelty_distance": 0.4957158263215885
+    },
+    {
+      "pose_id": "mass_accad_G20_ReverseSpinCrescentRight_f00021",
+      "batch": "mass-accad-20261007",
+      "key": "f0b959d76305f1ce3553eda2",
+      "bvh_sha256": "9949bd7be06f9ff4c58810527ecaa6ca3411aa0fc9e7b41f58bf3315cf77c04b",
+      "thumbnail_sha256": {
+        "front": "683b282d6771534a493f45847cccc6e24bd35d1e930b7ee891b9180ae671fd78",
+        "three_quarter": "54acdea8e6e41d057422430f4bd21e3ab8bba5aae57e7c50b3ba20df68033dfc",
+        "side": "27b2a648b0bbf163116280d7266b093e7d4b381ec35754efb147b5642851560a",
+        "back": "300770b471a463318126a294856564e19c6ab2b3e1b7029dfe4150e67747e7be"
+      },
+      "category": "combat",
+      "label": "오른발 역회전 반달차기",
+      "visual_set": "review-accad-early",
+      "visual_index": 48,
+      "novelty_distance": 0.4941937575899763
+    },
+    {
+      "pose_id": "mass_accad_Extended_3_f01095",
+      "batch": "mass-accad-20261007",
+      "key": "d6d6f7b2a1bb78cdc739b6a0",
+      "bvh_sha256": "3bfc6dfa8c18398602244e7a6d91575514f0daeefefe2b15f1771026a785b6d8",
+      "thumbnail_sha256": {
+        "front": "222b6a202af10e787127946f688377942ba778724aaf7f1beba7e49ee129e451",
+        "three_quarter": "70c670ff1915187ebf4be9bd8872da0ec4bda3ee116a51edbe7cd6224f10c6b0",
+        "side": "bc23340512c938b1bb668fa972345bc31d8f065c05d346e3298f364254369262",
+        "back": "4ad742d780645819d19354fa0c81bcac1cd1a3399401b9ef3ceba71210adc5db"
+      },
+      "category": "combat",
+      "label": "연속 무술 동작 3",
+      "visual_set": "review-accad-early",
+      "visual_index": 29,
+      "novelty_distance": 0.49094167127985433
+    },
+    {
+      "pose_id": "mass_accad_G10_RoundhouseLeadingLeft_f00019",
+      "batch": "mass-accad-20261007",
+      "key": "a9355d087779ebf7895d7a3a",
+      "bvh_sha256": "c642116ebd2517e13aa08ce465380d2753677fcdf1eac84074cd6dea6685b67f",
+      "thumbnail_sha256": {
+        "front": "e9e05bdfa20a7638e8ae5ebc22abe43501d424a07799e6dea3e2f09b7c0917ea",
+        "three_quarter": "51544be25f5d4e8c16182ef27ab3d835c2c306e63459913f47c9c047f753460a",
+        "side": "5b2e2306f523ea91730745da8f266daa704df837cf4fb69fd278a803c64c6caa",
+        "back": "6b7413d78024005e5f259fffb3c96c42b4adefc24d68c6bf1f9fa68eba9ad3ce"
+      },
+      "category": "combat",
+      "label": "왼발 선행 돌려차기",
+      "visual_set": "review-accad-early",
+      "visual_index": 30,
+      "novelty_distance": 0.4788529285291658
+    },
+    {
+      "pose_id": "mass_accad_G3_SidekickLeadingRight_f00024",
+      "batch": "mass-accad-20261007",
+      "key": "823bf3cd97f2e5533b53fb8a",
+      "bvh_sha256": "a474ba91d7cf9c6bb8a514722d299b4c8aaa5f5e5647b470959a8da286629a07",
+      "thumbnail_sha256": {
+        "front": "463fe6f67ea04417f804d891b653ccfde903e2b9dd36b7f9ac96a81290b0ef28",
+        "three_quarter": "8f0f1966a73f1b7845c150eb8e55a09be6fdeff49f114dfd8db32fa2a75e9a4c",
+        "side": "cac079c8d978a17954a5450d399fce92644b87ff3ddbb9512e00b68084a1f4f0",
+        "back": "3ff77793b33b8caf632498712f901ccba4ca7c5f79b40a0f774d0ca8f2e02071"
+      },
+      "category": "combat",
+      "label": "오른발 선행 옆차기",
+      "visual_set": "review-accad-early",
+      "visual_index": 53,
+      "novelty_distance": 0.4734616120480594
+    },
+    {
+      "pose_id": "mass_accad_G9_RoundhouseRightT2_f00029",
+      "batch": "mass-accad-20261007",
+      "key": "703016a8aea5aefb687b16f3",
+      "bvh_sha256": "87d1f75ee72d9aafe876c69315b6db74c0c1710fa4b09164bb60c89ca2e4db28",
+      "thumbnail_sha256": {
+        "front": "8eaea139c3edb9061c923137a2bc4f62b97cd0e16f9063c5e3ceed81c7afd8d2",
+        "three_quarter": "89a74142560aa37c6866016039ad7d0ba54aafdbf7b783d19c813b2a8fab5464",
+        "side": "a4b8cc319a93d7d540e329056beb33328dc47047b4881d43d97a10931b988fa5",
+        "back": "49d213bb97facfba81140c4a71792629f66c69650bace7ca90d86b3384fd7f05"
+      },
+      "category": "combat",
+      "label": "오른발 돌려차기 두 번째 테이크",
+      "visual_set": "review-accad-early",
+      "visual_index": 64,
+      "novelty_distance": 0.47290083012013695
+    },
+    {
+      "pose_id": "mass_accad_G12_CrescentLeft_f00030",
+      "batch": "mass-accad-20261007",
+      "key": "d4e16f301c31f8b0ea45c5fc",
+      "bvh_sha256": "e20702819c31433ab9f090ddf1f8e3e0d728cb40e51082eb639cd7be1e34422a",
+      "thumbnail_sha256": {
+        "front": "3c190cbd1041b9c270e9361c21f11bdf2fa2050dd3636095808c42e97ae4158a",
+        "three_quarter": "842d414e6251d2a08f411c7cdcec100861a60fa7d2ab5f7ff8ea51ce7dda453b",
+        "side": "adb08ac9a3332bf01fc48cb38c63af959f0d99c03c9129991e1dc149b8da1993",
+        "back": "b7364da0cc393f70f7e40156d4f7cb2f1802f84e91ae7ac103d0009b9914190c"
+      },
+      "category": "combat",
+      "label": "왼발 반달차기",
+      "visual_set": "review-accad-early",
+      "visual_index": 33,
+      "novelty_distance": 0.47048225378541625
+    },
+    {
+      "pose_id": "mass_accad_G19_ReverseSpinCrescentLeft_f00036",
+      "batch": "mass-accad-20261007",
+      "key": "f4cdbd756ea43db61af85ef6",
+      "bvh_sha256": "be656b4b149dbd890902332692ce0eba8c4df2464beb485133f71ac42bf6790f",
+      "thumbnail_sha256": {
+        "front": "9d344ab47430d660bd729877c29437859988c26357081661a44105bc02340de6",
+        "three_quarter": "69996a58b5e001cdded2955e03e2219bb7ad582c4110816c20df5180affd4960",
+        "side": "3cc824798362676b71c3746d7180a763318c6e347496573919685e85a719bc40",
+        "back": "bb69a45d0f4fb79de1075a14d99475fe013b1efa720c0abb42ff7c9972c4388e"
+      },
+      "category": "combat",
+      "label": "왼발 역회전 반달차기",
+      "visual_set": "review-accad-early",
+      "visual_index": 45,
+      "novelty_distance": 0.4156085078987125
+    },
+    {
+      "pose_id": "mass_accad_G13_CrescentRight_f00032",
+      "batch": "mass-accad-20261007",
+      "key": "ecd99bd1753c298b0e27eff7",
+      "bvh_sha256": "f2aa0e46f176a8313b1f8f1444717802e90783036821ecb75977697beb6209d2",
+      "thumbnail_sha256": {
+        "front": "1f57ef4389e54242f150e323d362ea781be823c11ea7f1f390a3dea53f212137",
+        "three_quarter": "7ead1f55da2b2f7befd43b50799e1578515422d32452ec69e5452f790ca7aa38",
+        "side": "86602a0254f3f0e5db1f0821c35d28266abf2b57e27f2a464459400fb594b1aa",
+        "back": "5e6a0364e30e88d9393eaa82d0188bb0380a5acc88f90553f796658f902ef41b"
+      },
+      "category": "combat",
+      "label": "오른발 반달차기",
+      "visual_set": "review-accad-early",
+      "visual_index": 38,
+      "novelty_distance": 0.4615076558027571
+    },
+    {
+      "pose_id": "mass_accad_G17_PushKickLeft_f00079",
+      "batch": "mass-accad-20261007",
+      "key": "1e9bb11d19b446a6518d02e9",
+      "bvh_sha256": "ec7f0bd7607d7e75ae94728608ac7cdf13e5845593e8250d2dd3ca748efa6de3",
+      "thumbnail_sha256": {
+        "front": "25ff837d4df6657e7286ff1e33378f44b025ddbe228b671615f1b329477d8895",
+        "three_quarter": "874d137e33dedcf4b7bfd0731eb3bc1869da5278ff1db28955ccec4da307a574",
+        "side": "fc7b57b5c04005a5e38b91f942dcd0e49900746fb4884ca4213358bbd408f4fb",
+        "back": "68a1e5bfb909aa0ab55f789c10fa8cfcba9e87c020a5462bf303af0cb3950b32"
+      },
+      "category": "combat",
+      "label": "왼발 밀어차기",
+      "visual_set": "review-accad-early",
+      "visual_index": 43,
+      "novelty_distance": 0.4418377277185626
+    },
+    {
+      "pose_id": "mass_accad_G20_ReverseSpinCrescentRight_f00027",
+      "batch": "mass-accad-20261007",
+      "key": "f39ce5c5851316caf627d5c3",
+      "bvh_sha256": "63c6ad6f14fb35b9dd68723fbadacd90fc1082eb9c1853e57a368af6996134d0",
+      "thumbnail_sha256": {
+        "front": "71d22c31b573fd85d08c6c4048b1059607caeb725e90f047dbb27f6962a4c3fa",
+        "three_quarter": "38f0dd3d961536b7044cc21be8118092d5055ba505c7b2ecc3771b5d307815d3",
+        "side": "63f4a34d9b4dc71714d11a2440ad2bd3ec8dac44c6641fc57a157f2ed550382d",
+        "back": "e54cd97791a1c26a54867e7684ba66a204a3635d7faf682583ed3b811a53e070"
+      },
+      "category": "combat",
+      "label": "오른발 역회전 반달차기",
+      "visual_set": "review-accad-early",
+      "visual_index": 49,
+      "novelty_distance": 0.4343374827117036
+    },
+    {
+      "pose_id": "mass_accad_G15_RoundhouseBodyRight_f00021",
+      "batch": "mass-accad-20261007",
+      "key": "62e8ff12dc913d5b2cab841a",
+      "bvh_sha256": "1747a05c0d647932bf7c676f7a81f322235bd0636351d3db88c839238c3134c8",
+      "thumbnail_sha256": {
+        "front": "e333bc16c3d87a1a5dc26d76e1eaa77273e28faa4a3f2e039d643bf6623cc8c4",
+        "three_quarter": "7380bc2f76258657c541292b7ad051a62ef3cb457df5e777e3e60c47b061d5eb",
+        "side": "2cfd62b5d8cb7a2c3d87038c9fc6fb1cd41424aaba46e9fa4a5bbb582e4e8432",
+        "back": "6c0605b2186cb9cb619eb956ee3bb1e3a66d86a895a757c591df7178f2d2dd42"
+      },
+      "category": "combat",
+      "label": "오른발 몸통 돌려차기",
+      "visual_set": "review-accad-early",
+      "visual_index": 41,
+      "novelty_distance": 0.28249758916438433
+    },
+    {
+      "pose_id": "mass_accad_G7_Capoeira_f00012",
+      "batch": "mass-accad-20261007",
+      "key": "f8b2614d22a193582cdd426e",
+      "bvh_sha256": "e559e3988c490ddb8b409dc6a06cd3f6227a894ea593af6ac4000e028eab94c8",
+      "thumbnail_sha256": {
+        "front": "45e9f3de8827b81420a109a83d06d47511215a344101794e61f3e1e950570fbf",
+        "three_quarter": "a63903f0e47f6d35fc26f894bd435114c74639314b3619d4b5d3e96a6589ef90",
+        "side": "327095f3e8fa729139a983a0ce8756ee09876c5f39a315a748966ab3353a4211",
+        "back": "dbd263edef7d6aafd733ff1b18628935cb8eefda0af1c8533d71fb1dea501abb"
+      },
+      "category": "combat",
+      "label": "카포에라 회전차기",
+      "visual_set": "review-accad-early",
+      "visual_index": 60,
+      "novelty_distance": 0.4297148124826336
+    },
+    {
+      "pose_id": "mass_accad_G13_CrescentRight_f00021",
+      "batch": "mass-accad-20261007",
+      "key": "e0f86a40874bdf94757d4812",
+      "bvh_sha256": "d432a6335a70aec87d22567b92afbb74e67943ad34f65a80c8eb3fea35bbb1ac",
+      "thumbnail_sha256": {
+        "front": "30095e1f815c4b2ba28134d4a32791569d09e1567c847bb62a0d2ef272821c1c",
+        "three_quarter": "592e558ac336364df66a44fd749ea6856e2a7438fd1b144f9b34916c367e35ee",
+        "side": "10ac3889f5075ad996f1430de74b020422a1caab8bbc2980bacf70ddafa4eadc",
+        "back": "1952e8403e4498db473fc54a72c6208ca22f2f161c20f8ca2328f1bcb065fcb4"
+      },
+      "category": "combat",
+      "label": "오른발 반달차기",
+      "visual_set": "review-accad-early",
+      "visual_index": 36,
+      "novelty_distance": 0.4194944557098161
+    },
+    {
+      "pose_id": "mass_accad_G12_CrescentLeft_f00041",
+      "batch": "mass-accad-20261007",
+      "key": "69fc6c234789fe9943d1f1ce",
+      "bvh_sha256": "235cca1a6f54d2172a5c740acbb898d182335adce0e9d717132cdf0cd2d46efb",
+      "thumbnail_sha256": {
+        "front": "47dc17e9732db8b5fc585ac83b0632f20757e7f20901b7edfecbf5bf09fc9019",
+        "three_quarter": "4b9fd7249a9e11112cc6cce60e08e71809af45dea7ef961728ca4881e81e24e5",
+        "side": "d4a887ddec951613a7849fb5ba8b86788da138e7b6caf4ac786d5766eedd29f9",
+        "back": "336742914d79c050d87836f1131f183c509b9db51f931cd12f86f0cc27850a49"
+      },
+      "category": "combat",
+      "label": "왼발 반달차기",
+      "visual_set": "review-accad-early",
+      "visual_index": 35,
+      "novelty_distance": 0.4184175304984903
+    },
+    {
+      "pose_id": "mass_accad_G7_Capoeira_f00031",
+      "batch": "mass-accad-20261007",
+      "key": "f5d78c57d23eb08a6548e2d5",
+      "bvh_sha256": "975b44231e121fa12a98d5279335edc7968af4edc3b8a35eb8b252ac102bf3a2",
+      "thumbnail_sha256": {
+        "front": "aa066bb4b5b26cfff60dda96416ea06c4d2d43eb7f68d654b2d8fe0809425bd4",
+        "three_quarter": "5e0c3ef9b09edf5faec37cb45761a9a1f7a5970178a651319e22bbdcc15dcfdb",
+        "side": "1209f31c064197cb34cce2d30a5628782c7ab5aec122ba155da7bc207ffd39fa",
+        "back": "5a6ac4fd1a99fb81858bd0db0f6093638dce4e0645c05164fc6b3f821d360132"
+      },
+      "category": "combat",
+      "label": "카포에라 회전차기",
+      "visual_set": "review-accad-early",
+      "visual_index": 62,
+      "novelty_distance": 0.41577145644613334
+    },
+    {
+      "pose_id": "mass_accad_E7_SuperFastAdvance_f00065",
+      "batch": "mass-accad-20261007",
+      "key": "bb657eca2fd6ce0afd2141b0",
+      "bvh_sha256": "221f9933febfee7d0c0d37e139554e62389bd68a16e1cf0fbda1a18ed2f88151",
+      "thumbnail_sha256": {
+        "front": "29fca98e6e13ae111e7b0bd7fe6408a26e11e69365d62dcb2f8311f77d7417c5",
+        "three_quarter": "9317a17b26b0e4d9b29065d54c296cafde661d5ef52f75c5e2103046d1ff36bb",
+        "side": "9a098a09b7936f7191c3b3e6d0ae3c8c1103c91a6583cdca73190edbf893f663",
+        "back": "10b3be1ebb0a63cfcf044b74e1aeb615c9f42559d54c448fda16b2e4e043ecaa"
+      },
+      "category": "combat",
+      "label": "순간 돌진 스텝",
+      "visual_set": "review-accad-early",
+      "visual_index": 24,
+      "novelty_distance": 0.3998410274955262
+    },
+    {
+      "pose_id": "mass_accad_Extended_1_f00428",
+      "batch": "mass-accad-20261007",
+      "key": "c6ccd2f5df4f9d8a5a130e7f",
+      "bvh_sha256": "34c0988b375bff2be33f57d1522f096632fa9af65937e5828c4e6c6d01b7acd8",
+      "thumbnail_sha256": {
+        "front": "af3e27736d117064d2356358746e0ef1608903e5433f4fa9581264ec83f72923",
+        "three_quarter": "6e40a4fa8092d6646e48acbbe93c6c71595594b0ad89861c87d63a071fc6153d",
+        "side": "b54bea5eccad530f5ba7b9e985a4a1c0df711a9227303b039ce74c4456e70aff",
+        "back": "a4cb3f5225a37ac3e1d37a1c3d4d2fcf1968b361d8f83148ae89eab1d1cfd960"
+      },
+      "category": "combat",
+      "label": "연속 무술 동작 1",
+      "visual_set": "review-accad-early",
+      "visual_index": 25,
+      "novelty_distance": 0.38653347627079165
+    },
+    {
+      "pose_id": "mass_accad_G1_SidekickLeadingLeft_f00042",
+      "batch": "mass-accad-20261007",
+      "key": "6fdb4f09753c92f0bcabc6f5",
+      "bvh_sha256": "f2040ece7b57a4673f739bc2d81b7f4519fd635598e5b5a536b9ca3337355cef",
+      "thumbnail_sha256": {
+        "front": "2cc268d29c72ac4aaeb485ec87dd8c844ea84a02ef67800ada9597ae2f528c79",
+        "three_quarter": "e8476b2d0aaaaf889c2a5f675666d6fcdd251d255aaed3371e81815737a9c225",
+        "side": "1b66a7213f67ed358939f2b8cc34efc11d6d7294b0b03d1bc558d9c15f06b469",
+        "back": "ff92ca2b1de998279a861b94dfdad8510170941e7406cc99d58318788ae9ae1d"
+      },
+      "category": "combat",
+      "label": "왼발 선행 옆차기",
+      "visual_set": "review-accad-early",
+      "visual_index": 47,
+      "novelty_distance": 0.35372463055331815
+    },
+    {
+      "pose_id": "mass_accad_E7_SuperFastAdvance_f00037",
+      "batch": "mass-accad-20261007",
+      "key": "0ad594a19095f6ec1359f9ee",
+      "bvh_sha256": "82dbca8e0886ae74a86b54772559da0b45eae992d9e34394890ead727a989066",
+      "thumbnail_sha256": {
+        "front": "588adc59dd323fdfb4f090598fa9a0a2f485b4ab7c1a905fd6a84fa73953b9fc",
+        "three_quarter": "e92fdcaf122a4ddb7301d5449c5712acbb63f155d5a6e36a3b0b6899178ea312",
+        "side": "b846ba324ed08e249eb30bfaad617b90dbacd4c9eab62418ae622a0ef8f1b7d1",
+        "back": "194b0b2053996f374faa4481d6fbefb1f3e370e02a5ea1d5b8b6078f139d2e79"
+      },
+      "category": "combat",
+      "label": "순간 돌진 스텝",
+      "visual_set": "review-accad-early",
+      "visual_index": 23,
+      "novelty_distance": 0.33250426905670655
+    },
+    {
+      "pose_id": "mass_accad_E12_BackfistRight_f00028",
+      "batch": "mass-accad-20261007",
+      "key": "ecf14af30f32c60c1a22ddfe",
+      "bvh_sha256": "7478bea1631f436668a86028573f37ca89903f969e3d4cf4705e5d269c89c5db",
+      "thumbnail_sha256": {
+        "front": "15e7f2bf43d8649fce4b837a29db8fc919b0ed1efdd61d8fe3c51e1ea1cf2e11",
+        "three_quarter": "5815c01a8ea6ab6cf3bfd6565e3e3225318c3a02f0d1cf558fbdb13bf1d56da0",
+        "side": "69495f1362f540a9bcda26fd727fdc0a1a8954e75e0e5bb4071ca6f157451198",
+        "back": "4618f62e8fa0ba3f833f3e1b88abcc1f9378aa2011146d5e8d7918d020193757"
+      },
+      "category": "combat",
+      "label": "오른손 등주먹",
+      "visual_set": "review-accad-early",
+      "visual_index": 22,
+      "novelty_distance": 0.32820187091284186
+    },
+    {
+      "pose_id": "combat_ual2_Melee_Hook_f00600",
+      "batch": "mass-quaternius-20261007",
+      "key": "437816cccdd5e451e88d68c4",
+      "bvh_sha256": "e5ffa01c0c5447e09c1b791277dbcb93e1ff03a4044319b7ff98f7acc5d8749a",
+      "thumbnail_sha256": {
+        "front": "09d1316feb110fba4cd968192627c5e28aca2aa31d66b8b4b541970a9118dfb9",
+        "three_quarter": "d092da7693949d904aa7d05e3c81f688ad8cbb6b396e274669823d45013eb4ab",
+        "side": "046bb32341d393c09c5e424d938e705de9a018bd4f6a9bff07a069d2e3dffdd8",
+        "back": "a9f022cbcf37831986a9c2ec89e860653ed4ee223aaaf8c764cf6060666c67e4"
+      },
+      "category": "combat",
+      "label": "훅 공격",
+      "visual_set": "review-quat-early",
+      "visual_index": 15,
+      "novelty_distance": 0.5011909871990545
+    },
+    {
+      "pose_id": "combat_ual2_Sword_Regular_B_f00400",
+      "batch": "mass-quaternius-20261007",
+      "key": "5b3fdd7659d4b980531c2932",
+      "bvh_sha256": "7452cd2fc33c2009dfabee5a0168444ea8bbcef3e06a6b3cb14129c35179a54a",
+      "thumbnail_sha256": {
+        "front": "c46685441cd554d9f20a54f2099048788fb9c324767a86a23033f591e7238f1e",
+        "three_quarter": "12e5886bcbb4ea3afdb8f57a1a376cf16be010d9f27cc0ecf46c759e3228bfb3",
+        "side": "5ff700dfefcc629063f0505f3404f196ed9e4338bba7e6a2977ea448e779126c",
+        "back": "9c0b579281baed5b9b2907f22df55538881324f0c6cff8446d0802ae4ec8b6b1"
+      },
+      "category": "combat",
+      "label": "검 반대 방향 베기",
+      "visual_set": "review-quat-early",
+      "visual_index": 26,
+      "novelty_distance": 0.3587191084127969
+    },
+    {
+      "pose_id": "combat_ual2_Melee_Hook_Rec_f00000",
+      "batch": "mass-quaternius-20261007",
+      "key": "550e7edbe6e77fdac5b654a1",
+      "bvh_sha256": "73474398189642141f783337b1d0d244468be4ac9872d56f6745af20a4bc5f8e",
+      "thumbnail_sha256": {
+        "front": "be1adf568f46c99c6672b88d71fb9aa5d11de65d760df255e50aae78bc55c5de",
+        "three_quarter": "560f1c1c7b137ecc9b7786feb43e4ee05005244c1e70b23ba138ca5ea6d0b2da",
+        "side": "4f4c86cfebcfffcdcc53e5f3e12e9bab7d78827b51d5b7e241cecdc1a002b80b",
+        "back": "3c5f383dd5142fbe59f047334dfd76b5bcd0c541f66cfa7a789c9dc9e5e6b526"
+      },
+      "category": "combat",
+      "label": "훅 공격 후 회복",
+      "visual_set": "review-quat-early",
+      "visual_index": 12,
+      "novelty_distance": 0.3379089626925767
+    },
+    {
+      "pose_id": "combat_ual2_Sword_Regular_B_Rec_f01000",
+      "batch": "mass-quaternius-20261007",
+      "key": "0ad9a88943e3880e87d1b064",
+      "bvh_sha256": "7f20ccfd7689760f5eba7c86af2af32e71c17b44d68470183b562a23da07a793",
+      "thumbnail_sha256": {
+        "front": "7bff54cf8643ff9b8f34a5c92cabf43ff6b81b4457d8a21afd53f286a28fa2a1",
+        "three_quarter": "1c63c70e207bb611e2e4a5b1f02f2d8b727ad439ce63b9c7d73277de55f7468d",
+        "side": "6fc48de74b7bf1989d311b9c8aaf490740321f77223f460afefd401c653b74d2",
+        "back": "c1cc42bd787b19f03b6a20d53de22d888a0e556391aec59a7e22a76f27a2e607"
+      },
+      "category": "combat",
+      "label": "검 베기 후 자세 회복",
+      "visual_set": "review-quat-early",
+      "visual_index": 24,
+      "novelty_distance": 0.32738794458636594
+    },
+    {
+      "pose_id": "combat_ual2_Sword_Regular_A_Rec_f00800",
+      "batch": "mass-quaternius-20261007",
+      "key": "df2285f0104875f249a9dc4c",
+      "bvh_sha256": "a021395eaebb9753681b3d9153eafaf0d9fcdc071f81476aa73556a2ebc47e02",
+      "thumbnail_sha256": {
+        "front": "2dc9fa534fdb9ae6e72152e0f6d9435a074a917248bdc2ed5f6bc3189d31be2d",
+        "three_quarter": "f2d9fba2a80160050e1a7cf76cf12f3df36f5544f3abf252fafa3646c9fa627d",
+        "side": "f8e9a2ce947f6cbb7f0766860c1d075b5fc2b0d2f0bca59b8d5fdd9f66602dac",
+        "back": "48df14e3af3cf92a9ab8ffd03b4888e79dcf6a595fb99a9df9f20c76ff15dcdd"
+      },
+      "category": "combat",
+      "label": "검 가로 베기 후 회복",
+      "visual_set": "review-quat-rest",
+      "visual_index": 40,
+      "novelty_distance": 0.26591946054156823
+    },
+    {
+      "pose_id": "combat_ual2_Idle_Shield_Break_f01000",
+      "batch": "mass-quaternius-20261007",
+      "key": "2fceccb115245121710eb9dc",
+      "bvh_sha256": "e6249159341e40d589853d41986d3d95aaa213aaaf5b9837dda9a50391bfd6af",
+      "thumbnail_sha256": {
+        "front": "9f4eecbf3b753f29fafed5715104b08d5e9aa643b8a3b8d3a611fdc08c6c283a",
+        "three_quarter": "0069f88d6d40f03ba1985bd15c793ecb441dcb0a097a031971efb9f22b773e2d",
+        "side": "026959585d2417ad0951d3b55d3daf66a99ed30818b3f0a2f521ace0e3c96aa0",
+        "back": "1d956bad8ab4c80a9565aa105cdce1eaa19f834f102450c05293c7f8d0db08a4"
+      },
+      "category": "combat",
+      "label": "방패 방어가 무너짐",
+      "visual_set": "review-quat-rest",
+      "visual_index": 33,
+      "novelty_distance": 0.22839338886849261
+    }
+  ]
+}

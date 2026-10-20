@@ -9,9 +9,15 @@
 from __future__ import annotations
 
 from fastapi import HTTPException
+import pytest
 
 from api.app import VLM_RETRY_AFTER_SECONDS, _vlm_unavailable_response
 from src.vlm.client import VLMUnavailable
+
+
+@pytest.fixture(autouse=True)
+def no_external_alerts(monkeypatch):
+    monkeypatch.setattr("api.app.alerts.notify", lambda *args, **kwargs: None)
 
 
 def test_upstream_congestion_becomes_503_with_retry_after():
@@ -23,6 +29,7 @@ def test_upstream_congestion_becomes_503_with_retry_after():
     # 500이 아니라 503이어야 BFF·클라이언트가 "일시적, 다시 시도"로 다룰 수 있다.
     assert exc.status_code == 503
     assert exc.detail["code"] == "VLM_UNAVAILABLE"
+    assert exc.detail["reason"] == "upstream_unavailable"
     assert exc.headers["Retry-After"] == str(VLM_RETRY_AFTER_SECONDS)
     # 사용자에게 보이는 문구는 원인과 다음 행동을 담는다(이미지 탓으로 돌리지 않는다).
     assert "잠시 후" in exc.detail["message"]
@@ -36,3 +43,25 @@ def test_timeout_without_status_is_still_translated():
 
     assert exc.status_code == 503
     assert exc.detail["code"] == "VLM_UNAVAILABLE"
+    assert exc.detail["reason"] == "timeout"
+
+
+def test_daily_quota_has_no_misleading_retry_header():
+    exc = _vlm_unavailable_response(VLMUnavailable("secret", status=429,
+        reason="daily_quota_exhausted", retry_after_seconds=20))
+    assert exc.detail["reason"] == "daily_quota_exhausted"
+    assert exc.detail["retryable"] is False
+    assert exc.detail["retry_after_seconds"] is None
+    assert "Retry-After" not in exc.headers
+    assert "일일" in exc.detail["message"]
+    assert "secret" not in str(exc.detail)
+
+
+def test_rate_limit_keeps_upstream_cooldown_and_legacy_code():
+    exc = _vlm_unavailable_response(VLMUnavailable("secret", status=429, retry_after_seconds=120.2))
+    assert exc.status_code == 503
+    assert exc.detail["code"] == "VLM_UNAVAILABLE"
+    assert exc.detail["reason"] == "rate_limited"
+    assert exc.detail["retryable"] is True
+    assert exc.detail["retry_after_seconds"] == 121
+    assert exc.headers["Retry-After"] == "121"
