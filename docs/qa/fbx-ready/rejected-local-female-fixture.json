@@ -1,0 +1,7 @@
+{
+  "character_sha256": "e6947d8e2aeb1014e9505a61d2f42e6bd9d34965cc7bb3a6c2fcd2722d4f280a",
+  "source_bvh_sha256": "34fb35ec2dd1d6e3797ae9a47c155461ae2c11385f75ca3494e0e42c478e6f9e",
+  "legacy_png_status": 422,
+  "artifact_only_status": 422,
+  "reason": "existing converter rejects target rig: missing_required head; no candidate promotion or fallback"
+}

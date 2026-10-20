@@ -229,3 +229,23 @@ def test_broken_transport_does_not_strand_body_consumer():
         await asyncio.wait_for(WorkMiddleware(app)({'type':'http','path':'/convert-framed','headers':[]},receive,send),1)
         assert replies[0]['status']==499
     asyncio.run(scenario())
+
+
+def test_final_fbx_preparation_preempts_optional_image_without_preempting_exports():
+    slots = PrioritySlots(continuation_seconds=0)
+    entered = threading.Event()
+    image = WorkControl('preview')
+    def render(control):
+        entered.set()
+        while True:
+            control.check('execution')
+            control.cancelled.wait(.002)
+    with ThreadPoolExecutor(2) as pool:
+        preview = pool.submit(run, slots, image, render)
+        assert entered.wait(1)
+        ready = pool.submit(run, slots, WorkControl('normal'), lambda _: 'verified-fbx')
+        assert ready.result(1) == 'verified-fbx'
+        with pytest.raises(WorkStopped) as error:
+            preview.result(1)
+        assert error.value.code == 'PREVIEW_PREEMPTED'
+    assert slots.snapshot()['active'] == 0

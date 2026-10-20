@@ -241,6 +241,9 @@ class Engine:
                 self.retire(pending[1])
 
     def _build(self, request):
+        artifact_only = request.get("artifact_only", False)
+        if type(artifact_only) is not bool:
+            raise ValueError("invalid artifact_only option")
         key = request["plan_id"]
         pending = self.pending.get(key)
         if not pending or time.monotonic() - pending[0] > self.settings.ttl:
@@ -272,6 +275,8 @@ class Engine:
         fit(ctx)
         self.stage(ctx, "arms")
         fit(ctx)
+        if artifact_only:
+            (folder / "artifact-only").touch()
         self.stage(ctx, "scenes")
         layout = json.loads((folder / "layout.json").read_text())
         result = json.loads((folder / "scene-result.json").read_text())
@@ -279,11 +284,12 @@ class Engine:
 
         validate_layout(layout)
         data = (folder / "scene.fbx").read_bytes()
-        preview = (folder / "final.png").read_bytes()
+        preview = b"" if artifact_only else (folder / "final.png").read_bytes()
         return dict(
             version=VERSION,
             plan_id=key,
             artifact_sha256=digest(data),
+            **({"artifact_contract": "verified-scene-fbx-v1"} if artifact_only else {}),
             preview_sha256=digest(preview),
             fbx_base64=base64.b64encode(data).decode(),
             preview_base64=base64.b64encode(preview).decode(),

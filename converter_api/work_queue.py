@@ -92,7 +92,7 @@ class PrioritySlots:
                 # those bounded waiting places.
                 victim = next((row for row in reversed(self._pending)
                                if row[1].kind == 'preview'), None)
-                if control.kind == 'screen' and victim is not None:
+                if control.kind in ('screen', 'normal') and victim is not None:
                     victim[1].preempted.set()
                     self._pending.remove(victim)
                 else:
@@ -105,8 +105,8 @@ class PrioritySlots:
                 while True:
                     control.check('queue')
                     # Preempt only as many optional processes as capacity needs.
-                    if control.kind == 'screen':
-                        screens = sum(w.kind == 'screen' for _, w in self._pending)
+                    if control.kind in ('screen', 'normal'):
+                        screens = sum(w.kind in ('screen', 'normal') for _, w in self._pending)
                         preempting = sum(w.preempted.is_set() for w in self._active.values())
                         needed = max(0, screens - (self.capacity-len(self._active)) - preempting)
                         for active in self._active.values():

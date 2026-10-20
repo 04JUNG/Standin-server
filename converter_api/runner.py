@@ -446,7 +446,7 @@ class BlenderRunner:
         hand_contact_screen: bool = False,
     ) -> ConversionResult:
         if (self.settings.fast_scene_reset and shape_recipe is None and hands is not None
-                and preview_view == "front" and not preview_model and thumbnail is None
+                and preview_view in (None, "front") and not preview_model and thumbnail is None
                 and not hand_contact_screen and not self.settings.force_exact_v324 and report.get("ok")):
             from converter.fast_scene_reset import identity
             expected_reset = identity()
@@ -489,7 +489,7 @@ class BlenderRunner:
         mismatched = [key for key, value in expected.items() if report.get(key) != value]
         if camera_rotation is not None and report.get("camera_rotation") != camera_rotation:
             mismatched.append("camera_rotation")
-        if output_scope != "full" or preview_view or preview_model:
+        if output_scope != "full" or preview_view or preview_model or camera_rotation is not None:
             if report.get("output_scope") != output_scope or report.get("framing_version") != FRAMING_VERSION:
                 mismatched.append("output_scope/framing_version")
         if hands is not None:
@@ -688,7 +688,7 @@ class BlenderRunner:
         if type(preview_model) is not bool or (preview_model and (
                 preview_view is not None or mirror or thumbnail or self.settings.force_exact_v324)):
             raise ConversionRejectedError("invalid preview model options")
-        if camera_rotation is not None and ((preview_view != "front" and not preview_model) or mirror or thumbnail or self.settings.force_exact_v324):
+        if camera_rotation is not None and ((preview_view not in (None, "front") and not preview_model) or mirror or thumbnail or self.settings.force_exact_v324):
             raise ConversionRejectedError("invalid aligned camera options")
         from converter.hand_library import HandLibraryError, normalize_request
         try:
@@ -826,7 +826,7 @@ class BlenderRunner:
             if hand_contact_screen:
                 job['hand_contact_screen'] = True
             if (self.settings.fast_scene_reset and shape_recipe is None and hands is not None
-                    and preview_view == "front" and not preview_model and thumbnail is None
+                    and preview_view in (None, "front") and not preview_model and thumbnail is None
                     and not hand_contact_screen and not self.settings.force_exact_v324):
                 job["fast_scene_reset"] = True
             # Lookup is inside the acquired runner slot. A successful first request
@@ -836,7 +836,7 @@ class BlenderRunner:
             base_fbx = temp_dir / "retarget-base.fbx"
             base_meta = temp_dir / "retarget-base.json"
             if (self.settings.retarget_cache_bytes and shape_recipe is None and hands is not None
-                    and preview_view == "front" and not preview_model and thumbnail is None
+                    and preview_view in (None, "front") and not preview_model and thumbnail is None
                     and not hand_contact_screen and not self.settings.force_exact_v324):
                 from converter.retarget_cache import binding
                 base_identity = binding(source_bvh_sha256, character_sha256, character_id, mirror)
