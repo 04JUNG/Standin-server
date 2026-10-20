@@ -152,6 +152,9 @@ class PersonDescriptor:
     slot_origin: str = "detector"
     skeleton_source: str = "full_image"
     refine_allowed: bool = True
+    # Qualified dynamic library hits, each bound to the original BVH/query/camera.
+    # Separate from viewer/reference groups and the legacy ranked candidates.
+    refine_candidates: list = field(default_factory=list)
     valid_limbs: tuple[str, ...] = ()
     refinable_limbs: tuple[str, ...] = ()
     lower_body_observed: bool = False

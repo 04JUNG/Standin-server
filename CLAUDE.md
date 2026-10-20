@@ -12,7 +12,8 @@ Human-Art 관절 + Gemini 자세 설명 → 전신 원본 검색으로 변경한
 불변식 1과 검색 설명은 `ROUTING_FULLBODY_ENABLED=0`인 레거시 경로에 해당한다.
 새 경로의 계약과 기동 필수 조건은 `docs/FULLBODY_DYNAMIC_ROUTING.md`가 기준이다.
 상하체 분리 검색·합성은 실행하지 않는다. 새 후보는 `people[].dynamic_search`에
-있으며 검수용 생성 결과와 분리한다. refine·자동 export를 허용하지 않는다.
+있으며 검수용 생성 결과와 분리한다. 관절 정책을 통과한 라이브러리 검색 후보는
+`refine_candidates`의 고정 검색 카메라로 refine할 수 있다. 참고·생성 후보와 자동 export 제한은 유지한다.
 
 웹툰 러프 콘티 컷 1장(.png) → 포즈 **Top-K 후보**를 반환하는 파이프라인.
 전체 제품(설계문서 v2)의 파이프라인 중 **VLM→검색 구간만** 담당한다(담당: 도원).

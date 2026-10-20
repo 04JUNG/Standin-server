@@ -225,6 +225,9 @@ class DynamicSearchOut(BaseModel):
 
 
 class PersonOut(BaseModel):
+    # Optional additive contract: qualified dynamic library refine bindings.
+    # Old BFF/clients ignore this and keep dynamic refinement disabled.
+    refine_candidates: List[CandidateOut] = Field(default_factory=list)
     index: int
     box: Optional[List[float]] = Field(None, description="[x1,y1,x2,y2] 픽셀")
     tags: dict

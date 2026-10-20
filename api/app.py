@@ -660,6 +660,7 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
                 raw_scores = raw.tolist()
         people.append(PersonOut(
             index=i,
+            refine_candidates=[CandidateOut(**c) for c in desc.refine_candidates],
             box=desc.box.as_list() if desc.box else None,
             tags=desc.tag_dict(),
             skeleton=(SkeletonOut(
