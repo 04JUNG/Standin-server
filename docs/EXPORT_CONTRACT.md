@@ -283,3 +283,5 @@ coarse의 tentative 계열에 제공하는 반대 계열 BASE도 진단용 대�
 통합 체형 opt-in 모드의 `dynamic_search.selected`가 `match_level=geometry_fallback`을 반환하면 의미 조건 통과 후보가 아닌 검수 참고다. `review_required=true`, `not_exact_match=true`, `constraints_satisfied=false`와 원래 조건 감사 결과를 함께 표시한다. `release_allowed=false`, `refine_allowed=false`이며 자동 Export나 정답 인증에 사용하지 않는다. 미확정 체형의 독립 재검토도 추천에만 영향을 주며 수동 선택·기본값·Export 주문 계약을 변경하지 않는다. [복구 평가와 범위](BODY_SELECTION/INTEGRATED_REPAIR.md).
 
 통합 체형의 조건부 재검토는 포즈 추출·검색과 병렬 실행하고, 포즈 경로 종료 후 남은 기존 예산 안에서 추천에만 합친다. 시간 초과는 최초 추천을 보존하며 늦은 응답으로 Export 입력을 바꾸지 않는다. 기존 수동 선택·기본값·자동 적용 금지 계약은 유지한다. [병렬화 검증](BODY_SELECTION/PARALLEL_REVIEW.md).
+
+아동 자산은 이미지 자동 추천으로 Export 권한을 만들지 않는다. BFF는 과거 자동 아동 추천/선택도 재검증하며, 사용자 수동·사용자 기본값·last-used 아동은 기존 적격성/Export 계약을 따른다. 아동 모델 자체를 삭제하거나 성인으로 강제 치환하지 않는다. [정책](BODY_SELECTION/CHILD_RECOMMENDATION_POLICY.md).

@@ -86,3 +86,7 @@ coverage가 visible이고 representation이 outline/shaded인 **동일 부위**�
 이 전략은 `auto`에서도 추천만 반환한다. 자동 적용·렌더·BFF 기본값 우선순위를 변경하지 않는다. 원본 VLM 슬롯에 체형을 연결하고 출력 인물 순서로 옮긴다. 검출기에서 추가된 슬롯처럼 연결 근거가 없으면 unknown 관측과 명시적 기본 추천을 반환한다. 연결 불명인 관측을 가까운 다른 사람에게 전용하지 않는다. 얼굴/skip 경로에도 descriptor가 있으면 기본 추천을 제공할 수 있다.
 
 `VLM_BODY_THINKING_LEVEL`은 Gemini 통합 첫 호출의 선택적 추론 설정이다. 빈 값은 모델 기본을 유지하며 지원하지 않는 값은 provider 오류가 된다. 별도 BODY_TIMEOUT_SECONDS 대신 기존 주 VLM 요청·총 예산과 재시도 설정을 공유한다. 전신 포즈 설명 등 기존 추가 호출은 유지한다. [실측 및 제한](BODY_SELECTION/INTEGRATED_FIRST_CALL.md).
+
+### 아동 자산 추천 제한 (2026-10-20)
+
+이미지의 비율·얼굴·스타일·가림·웅크림 또는 VLM clear 표시로 아동 자산을 자동 추천하지 않는다. 레거시 랭커도 순위·제안·자동 선택에서 child 자산을 제외한다. 해당 경우 `child_recommendation_policy`와 `child_requires_explicit_user_selection`을 반환하며, 다른 기존 기본 후보가 없으면 선택을 요구한다. 실제 나이 필드/나이 확률을 생성하지 않는다. 사용자 수동 선택·저장한 기본값·last-used 아동은 유지한다. [기준·경로·검증 한계](BODY_SELECTION/CHILD_RECOMMENDATION_POLICY.md).

@@ -1,0 +1,40 @@
+{
+  "scope": "Recorded V5 responses through latest develop body policy, compared with previous V7 policy replay. No new VLM/pose execution or latency measurement.",
+  "cuts": 17,
+  "people": 36,
+  "identical_recommendations": 36,
+  "identical_controls_and_pose_cuts": 17,
+  "approved_people": 28,
+  "family_correct": 28,
+  "preset_correct": 24,
+  "attached_policy_replay": {
+    "scope": "Actual attached image inspected locally. Policy replay with manually constructed VLM-confound observation, NOT a new VLM inference or accuracy measurement.",
+    "image_dimensions": [
+      764,
+      1056
+    ],
+    "observed_confounds": [
+      "cap partly hides head",
+      "stylized face",
+      "crouched and foreshortened limbs",
+      "loose clothing hides volume"
+    ],
+    "base_sha": "d934238fb21c4798e242ae61a5c46b19b0905aac",
+    "prior_suggestion": "body-child",
+    "current_suggestion": "adult-base",
+    "current_automatic": null,
+    "reason_codes": [
+      "child_requires_explicit_user_selection",
+      "presentation_unresolved_default_is_not_gender_detection",
+      "uncalibrated_rank_score",
+      "library_coverage_unvalidated",
+      "insufficient_independent_shape_evidence"
+    ]
+  },
+  "server_tests": {
+    "passed": 2194,
+    "skipped": 10,
+    "subtests": 28,
+    "smoke": 54
+  }
+}
