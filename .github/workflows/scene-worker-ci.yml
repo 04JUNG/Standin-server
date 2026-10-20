@@ -51,7 +51,7 @@ jobs:
             if python -c 'import json; assert json.load(open("/tmp/ready.json"))["phase"] == "failed"'; then break; fi
             sleep 1
           done
-          python -c 'import json; assert json.load(open("/tmp/ready.json"))["phase"] == "failed"' 
+          python -c 'import json; assert json.load(open("/tmp/ready.json"))["phase"] == "failed"'
           test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://127.0.0.1:8002/scene/plan)" = 401
       - name: Remove smoke container
         if: always()
