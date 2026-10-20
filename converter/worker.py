@@ -451,6 +451,11 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
             )
         payload["artifact_sha256"] = _sha256(output)
         payload["artifact_size"] = output.stat().st_size
+        if not job.get("preview_view") and not job.get("preview_model") and job["thumbnail"] is None:
+            # PNG/model reimports used to provide this structural check. Retain
+            # it when no visual is requested, without rendering or re-exporting.
+            from converter.final_artifact import validate
+            payload["artifact_validation"] = validate(output, scope, payload.get("framing", {}).get("bones_preserved"))
         if job.get("preview_model"):
             from converter.framed_model import bake_final
             payload["preview_model"] = bake_final(output, Path(job["temp_dir"]) / "preview.glb", {

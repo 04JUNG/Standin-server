@@ -1089,9 +1089,11 @@ def create_app(
         baked = result_hands(completed.result.report)
         result = completed.result
         if preview_format == "none":
+            from converter.final_artifact import valid_receipt
             # _execute_conversion has completed every worker, asset, shape, hand
             # and artifact integrity check. No image/model work was requested.
-            if (not result.artifact.startswith(b"Kaydara FBX Binary  \x00\x1a\x00")
+            if (not valid_receipt(result.report.get("artifact_validation"), result.artifact_sha256, output_scope)
+                    or not result.artifact.startswith(b"Kaydara FBX Binary  \x00\x1a\x00")
                     or result.report.get("output_scope") != output_scope
                     or result.report.get("framing_version") != FRAMING_VERSION
                     or len(result.artifact) > 30 * 1024 * 1024
@@ -1099,6 +1101,7 @@ def create_app(
                 raise ApiProblem(500, "WORKER_INTEGRITY_ERROR", "FBX integrity mismatch")
             return {
                 "artifact_contract": "verified-fbx-v1", "preview_format": "none",
+                "artifact_validation": result.report["artifact_validation"],
                 "conversion_id": completed.conversion_id, "solver_version": SOLVER_VERSION,
                 "framing_version": FRAMING_VERSION, "output_scope": output_scope,
                 "preview_view": "front", "preview_revision": contract["preview_revision"],

@@ -9,33 +9,33 @@
     {
       "case": "first",
       "scope": "half",
-      "ready_s": 9.544,
-      "preview_s": 0.697,
-      "sha256": "8e44b1a6c868e83ffc93711712907ae9fae61e6e1accf45b3773e5b52f730915",
+      "ready_s": 9.032,
+      "preview_s": 0.68,
+      "sha256": "bca0aa38f698f833e151777260f74059014d804b5c20a93db15ff103bfb9d76b",
       "bytes": 1291388
     },
     {
       "case": "hand-change",
       "scope": "half",
-      "ready_s": 8.653,
-      "preview_s": 0.66,
-      "sha256": "be83214954ecc7ebf5934f1143cf4ace697e47bb1030094a0fad690b86552f30",
+      "ready_s": 8.608,
+      "preview_s": 0.643,
+      "sha256": "e8a2021a78581fca1538f240d0d2f981277e7f76761281f369c127d8e38e9b55",
       "bytes": 1291340
     },
     {
       "case": "head",
       "scope": "head",
-      "ready_s": 8.639,
-      "preview_s": 0.605,
-      "sha256": "de480e8dd7a193bb8911969812deaa07c9e4579f57e566752bdd17eb1ea03b52",
+      "ready_s": 8.389,
+      "preview_s": 0.596,
+      "sha256": "e78e15ebd03854d3c3e3de4d609c32d65e858a9d0e00844f6e3eaa10c7cfe311",
       "bytes": 256140
     },
     {
       "case": "shape",
       "scope": "half",
-      "ready_s": 8.868,
-      "preview_s": 0.688,
-      "sha256": "8afe2fd35fbde3024123e88d0189cd6a62def9723b76056c20969b87cb60364d",
+      "ready_s": 8.832,
+      "preview_s": 0.65,
+      "sha256": "dfba5b8ec4fc167f4a23f8fe0a6e59907bf4af8f91e6c0a8538e274a3be9c4f0",
       "bytes": 1291548
     }
   ]

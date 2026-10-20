@@ -15,7 +15,10 @@ class ReadyRunner(FramedRunner):
     def convert(self, **kwargs):
         result = super().convert(**kwargs)
         data = FBX_MAGIC + b'final-fixture'
-        return replace(result, artifact=data, artifact_sha256=hashlib.sha256(data).hexdigest())
+        digest = hashlib.sha256(data).hexdigest()
+        return replace(result, artifact=data, artifact_sha256=digest, report={**result.report,
+            'artifact_validation': {'version':'final-fbx-v1', 'artifact_sha256':digest, 'scope':kwargs['output_scope'],
+                'bones':22, 'meshes':1, 'vertices':8, 'polygons':6, 'skin_verified':True}})
 
 
 @pytest.mark.parametrize('scope', ['full', 'half', 'bust', 'shoulder_head', 'head'])
@@ -69,3 +72,21 @@ def test_final_preview_uses_exact_persisted_bytes_and_hash(tmp_path, monkeypatch
     assert calls == [(data, digest, True)]
     assert response.headers['X-Standin-Artifact-SHA256'] == digest
     assert response.content == png
+
+
+def test_artifact_ready_requires_structural_import_receipt(tmp_path):
+    class MissingValidation(ReadyRunner):
+        def convert(self, **kwargs):
+            result = super().convert(**kwargs)
+            report = dict(result.report); report.pop('artifact_validation')
+            return replace(result, report=report)
+    assert post(_client(tmp_path, runner=MissingValidation()), preview_format='none').status_code == 500
+
+
+@pytest.mark.parametrize('change', [{'skin_verified':False}, {'bones':0}, {'artifact_sha256':'a'*64}, {'scope':'head'}])
+def test_structural_receipt_fails_closed(change):
+    from converter.final_artifact import valid_receipt
+    value = {'version':'final-fbx-v1', 'artifact_sha256':'b'*64, 'scope':'half',
+             'bones':22, 'meshes':1, 'vertices':8, 'polygons':6, 'skin_verified':True}
+    assert valid_receipt(value, 'b'*64, 'half')
+    assert not valid_receipt({**value, **change}, 'b'*64, 'half')

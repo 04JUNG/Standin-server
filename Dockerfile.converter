@@ -98,6 +98,7 @@ COPY converter/rough_layout.py /app/converter/rough_layout.py
 COPY converter/scene_worker.py /app/converter/scene_worker.py
 COPY converter/framing.py /app/converter/framing.py
 COPY converter/final_preview_worker.py /app/converter/final_preview_worker.py
+COPY converter/final_artifact.py /app/converter/final_artifact.py
 COPY converter/hand_library.py /app/converter/hand_library.py
 COPY converter/hand_library.v1.json /app/converter/hand_library.v1.json
 COPY converter/hand_geometry.py /app/converter/hand_geometry.py
