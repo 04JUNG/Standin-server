@@ -1181,3 +1181,29 @@ Gemini describe 호출은 `d5-structured-description`부터 response_json_schema
 ### 아동 자산 추천 제한 (2026-10-20)
 
 이미지의 비율·얼굴·스타일·가림·웅크림 또는 VLM clear 표시로 아동 자산을 자동 추천하지 않는다. 레거시 랭커도 순위·제안·자동 선택에서 child 자산을 제외한다. 해당 경우 `child_recommendation_policy`와 `child_requires_explicit_user_selection`을 반환하며, 다른 기존 기본 후보가 없으면 선택을 요구한다. 실제 나이 필드/나이 확률을 생성하지 않는다. 사용자 수동 선택·저장한 기본값·last-used 아동은 유지한다. [기준·경로·검증 한계](BODY_SELECTION/CHILD_RECOMMENDATION_POLICY.md).
+
+### 확실한 두상 출력의 손 단계 생략
+
+추론의 최종 인물 범위가 `head`이고 출처가 `vlm_person`, `vlm_description` 또는 단일
+인물의 `legacy_shot`일 때만 손 작업을 생략한다. 누락 관절·일반 설명·출처 불명은
+근거가 아니며 `bust`, `shoulder_head`, `half`, `full`은 기존 추론 손 정책을 유지한다.
+사용자가 이후 바꾸는 수동 범위는 BFF의 최종 범위 resolver와 손 선택 계약이 우선한다.
+
+- 전신 동적 경로는 인물 설명과 범위 보정을 끝낸 뒤 손 VLM을 시작한다. 남은 인물만
+  요청하며 원 VLM 슬롯 인덱스로 응답을 복원한다. 생략 인물은 `hands.status=not_requested`,
+  요청 실패는 요청한 인물만 `unavailable`이다. 전원이 head이면 손 호출·Future 대기가 없다.
+- head의 검색 후 손 피부 검사·생성 손 검사·미러 손 검사 세션을 만들지 않는다.
+  `dynamic_search.hand_skin_screen`은 `method=head-output-hand-omission-v1`,
+  `status=not_applicable`, `reason=head_only_output`, `scope=head`, `checks=0`을 기록한다.
+  후보에도 같은 N/A marker를 붙인다. `clear_screen`이 아니고 실제 메시 검증 성공도 아니다.
+- 모든 기존 `release_allowed`, `refine_allowed`, `actual_mesh_validated`와 최종 검수 정책은
+  그대로다. 두상 생성/geometry fallback도 기존 참고 자격만 유지한다. 다른 범위에서의
+  검사 오류는 기존대로 fail-closed이며 head 요청이 공유 gate 상태를 바꾸지 않는다.
+- 두상 미러도 원본/참고 해시·family·원문 조건·카메라·첫 4개 안의 원본 연결을 검증한다.
+  손 검사를 대체하는 N/A는 API 투영의 범위가 head이고 엔진 summary와 양쪽 marker가
+  정확히 일치할 때만 인정한다. 다른 범위의 N/A, 손 검사 성공으로 바꾼 marker,
+  원본 연결 오류 또는 권한 승격은 거부한다.
+
+전신 동적 경로의 손 VLM 시작이 설명/범위 판정 뒤로 이동하므로 손이 있는 인물은 이전의
+초기 포즈 추출과 손 호출 중첩을 사용하지 않는다. 실제 지연 변화는 배포 후 별도 측정한다.
+실제 모델 호출·피부 렌더 없이 회귀 계약은 `tests/test_head_only_hands.py`에서 검증한다.

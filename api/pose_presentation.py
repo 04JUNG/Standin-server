@@ -211,14 +211,16 @@ def build_pose_presentation(report, *, person_index=0, output_scope=None, resolv
             normalized = render_camera(camera, camera_kind)
             comparison = None
             if kind == 'mirror_reference':
+                from src.hand_scope import mirror_hand_evidence_allowed
                 raw_comparison = row.get('mirror_comparison') or {}
                 original = next((c for c in out.library_candidates
                                  if c.pose_id == raw_comparison.get('original_pose_id')), None)
+                screens_valid = original is not None and mirror_hand_evidence_allowed(
+                    report, output_scope, original.validation.get('hand_skin_screen'), row.get('hand_skin_screen'))
                 if (original is None or original.rank > 4 or pid == original.pose_id
                         or original.validation.get('not_exact_match') is True
                         or original.validation.get('constraints_satisfied') is False
-                        or (original.validation.get('hand_skin_screen') or {}).get('status') != 'clear_screen'
-                        or (row.get('hand_skin_screen') or {}).get('status') != 'clear_screen'
+                        or not screens_valid
                         or row.get('review_required') is not True
                         or row.get('not_exact_match') is not True
                         or row.get('constraints_satisfied') is not False

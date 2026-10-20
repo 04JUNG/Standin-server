@@ -26,7 +26,7 @@ def one_observed_side(description, required=None):
     return next(iter(known))
 
 
-def mirror_reference(engine, selected, description, required, skin_session):
+def mirror_reference(engine, selected, description, required, skin_session, *, head_only=False):
     """Recheck a bound family member against explicitly swapped side conditions.
 
     All other conditions are kept. The original observation is not rewritten,
@@ -41,7 +41,7 @@ def mirror_reference(engine, selected, description, required, skin_session):
     budget = min(engine.top_k, 5)
     if budget < 2:
         return result('display_budget_too_small')
-    if not engine.validator or skin_session is None or required is None:
+    if not engine.validator or (skin_session is None and head_only is not True) or required is None:
         return result('validation_unavailable')
     from .pose_query import prepare_pose_query
     from .semantic_search import SemanticQuery
@@ -109,6 +109,9 @@ def mirror_reference(engine, selected, description, required, skin_session):
                     reason='opposite_hand_reference', matches_observed_side=False),
                 core_conditions=dict(whole_pose_validation=engine.validator.check(required, other),
                                      reference_conditions=checked, reference_relations=core))
+            if head_only is True:
+                from .hand_scope import head_hand_omission
+                return result('opposite_hand_reference', {**row, 'hand_skin_screen': head_hand_omission()})
             accepted = skin_session.filter([row], limit=1)
             if accepted:
                 return result('opposite_hand_reference', accepted[0])

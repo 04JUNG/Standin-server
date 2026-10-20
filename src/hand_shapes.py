@@ -95,10 +95,18 @@ def parse_hand_shapes(payload: object, count: int,
     return out
 
 
-def apply_hand_shapes(vlm: "VLMAnalysis", payload: Optional[dict]) -> None:
+def apply_hand_shapes(vlm: "VLMAnalysis", payload: Optional[dict], *, person_indices=None) -> None:
     """별도 호출의 응답을 VLMAnalysis에 싣는다. 실패(None)도 '물어봤다'로 기록한다."""
+    if person_indices is None:
+        person_indices = tuple(range(vlm.num_people))
+    indices = tuple(person_indices)
+    if (len(set(indices)) != len(indices)
+            or any(type(i) is not int or not 0 <= i < vlm.num_people for i in indices)):
+        raise ValueError("invalid hand request slot mapping")
     vlm.raw[HAND_SHAPES_KEY] = payload
-    vlm.person_hands = parse_hand_shapes(payload, vlm.num_people)
+    vlm.person_hands = [default_hands() for _ in range(vlm.num_people)]
+    for index, hands in zip(indices, parse_hand_shapes(payload, len(indices))):
+        vlm.person_hands[index] = hands
 
 
 def detect_person_hands(vlm: "VLMAnalysis", person_index: Optional[int]) -> PersonHands:

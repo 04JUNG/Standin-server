@@ -181,7 +181,7 @@ class WholePoseCandidateOut(BaseModel):
     pose_detail_fit: Optional[dict] = None
     match_level: Optional[str] = None
     hand_skin_screen: Optional[dict] = Field(None,
-        description="실제 FBX 반대 손 피부 삼각형 검사. 전신·소품 충돌 인증은 아님")
+        description="실제 FBX 손 피부 검사 또는 확실한 head의 not_applicable 생략 기록. 메시 안전 인증은 아님")
     review_required: bool = False
     not_exact_match: bool = False
     constraints_satisfied: Optional[bool] = None
@@ -218,7 +218,7 @@ class DynamicSearchOut(BaseModel):
     condition_ranking: Optional[str] = None
     candidate_validation: Optional[dict] = None
     hand_skin_screen: Optional[dict] = Field(None,
-        description="실제 FBX 반대 손 피부 검사·탈락·미확인 기록. 전체 메시 안전 인증은 아님")
+        description="실제 FBX 손 검사·탈락·미확인 또는 head 생략(checks=0, not_applicable). 안전 인증은 아님")
     rank_score_is_accuracy: Literal[False] = False
     reason: Optional[str] = None
     elapsed_ms: float

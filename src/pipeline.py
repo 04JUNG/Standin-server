@@ -35,6 +35,7 @@ from .routing import route
 from .descriptor import build_slot_descriptors
 from .person_tags import apply_person_tags
 from .hand_shapes import apply_hand_shapes
+from .hand_scope import is_head_only_output
 from .logging_setup import log_info, log_warn
 from .vlm import prompts
 from .body_scope import BodyScope, detect_scope, refine_scope_from_description
@@ -162,9 +163,10 @@ class Pipeline:
         apply_person_tags(vlm, payload)
 
     # ---- 인물별 손 모양(04J-290, 별도 호출) ----
-    def _start_hand_shapes(self, image, img_w: int, img_h: int, vlm) -> None:
+    def _start_hand_shapes(self, image, img_w: int, img_h: int, vlm, *, scopes=None) -> None:
         """손 모양 호출을 백그라운드로 띄운다. 끄면(기본) 손은 기본값으로 나간다."""
         vlm._hand_shapes_future = None
+        vlm._hand_shapes_person_indices = ()
         if not CFG.vlm_hand_shapes or vlm.num_people <= 0:
             return
         boxes = [
@@ -174,8 +176,17 @@ class Pipeline:
         ]
         if len(boxes) != vlm.num_people:
             return
+        scopes = scopes or {}
+        indices = []
+        for index in range(vlm.num_people):
+            scope = scopes.get(index, detect_scope(vlm, index))
+            if not is_head_only_output(scope.detected, scope.source):
+                indices.append(index)
+        if not indices:
+            return
+        vlm._hand_shapes_person_indices = tuple(indices)
         executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="hand-shapes")
-        vlm._hand_shapes_future = executor.submit(self.vlm.read_hands, image, boxes)
+        vlm._hand_shapes_future = executor.submit(self.vlm.read_hands, image, [boxes[i] for i in indices])
         executor.shutdown(wait=False)
 
     def _join_hand_shapes(self, vlm) -> None:
@@ -191,7 +202,7 @@ class Pipeline:
             log_warn("hand_shapes_join", status="failed", errorType=type(error).__name__)
             future.cancel()
             payload = None
-        apply_hand_shapes(vlm, payload)
+        apply_hand_shapes(vlm, payload, person_indices=vlm._hand_shapes_person_indices)
 
     # ---- 메인 ----
     def process_cut(self, image, img_w: int = 512, img_h: int = 768,
@@ -230,7 +241,10 @@ class Pipeline:
         #      스켈레톤 추출과 겹쳐 돌려 지연을 숨긴다 — 결과는 descriptor를 만들기
         #      직전에 합친다(`_join_person_tags`).
         self._start_person_tags(image, img_w, img_h, vlm)
-        self._start_hand_shapes(image, img_w, img_h, vlm)
+        # Fullbody descriptions can narrow an initial scope to head. Resolve
+        # those first so a later head result never starts or joins hand work.
+        if self._fullbody_search is None:
+            self._start_hand_shapes(image, img_w, img_h, vlm)
 
         # 2) Shot 분기
         with span("route"):
@@ -456,10 +470,6 @@ class Pipeline:
                     f"Gemini 스켈레톤 보완 {repair_trace['status']}: "
                     f"수정 {len(repair_trace.get('repaired_slots') or [])}명, "
                     f"{repair_trace['elapsed_ms']:.0f}ms")
-        # All routes below build descriptors, including hybrid and semantic-only
-        # routes that bypass _evaluate_slot. Preserve develop's hand metadata on
-        # those paths too; hand presets remain independent of pose retrieval.
-        self._join_hand_shapes(vlm)
         threshold_scale = 0.7 if count_confidence == "low" else 1.0
         routing = None
         if CFG.search_routing_enabled or self._fullbody_search is not None:
@@ -467,6 +477,19 @@ class Pipeline:
                 routing = self._route_slots(image, img_w, img_h, vlm, slots)
             if repair_trace is not None:
                 routing["summary"]["skeleton_repair"] = repair_trace
+        if self._fullbody_search is not None:
+            scopes = {}
+            for slot in slots:
+                if slot.slot_origin != 'vlm':
+                    continue
+                desc = build_slot_descriptors(vlm, [slot], image_size=(img_w, img_h))[0]
+                decision = routing['decisions'].get(id(slot)) if routing else None
+                scopes[slot.slot_id] = refine_scope_from_description(
+                    desc.output_scope, decision.semantic.description if decision else None)
+            self._start_hand_shapes(image, img_w, img_h, vlm, scopes=scopes)
+        # Hybrid/semantic paths bypass _evaluate_slot; retain the same per-slot
+        # hands there, with omitted head slots explicitly left not_requested.
+        self._join_hand_shapes(vlm)
         processed: list[tuple[object, _SlotOutcome]] = []
         for slot in slots:
             decision = routing["decisions"].get(id(slot)) if routing else None

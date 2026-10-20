@@ -216,6 +216,8 @@ class FullBodySearch:
         return out
 
     def search(self, decision, evidence, *, generation_block=False, review_geometry=False):
+        from .hand_scope import is_head_only_output, head_hand_omission, head_hand_summary
+        head_only = is_head_only_output(evidence.get('output_scope'), evidence.get('output_scope_source'))
         start = perf_counter()
         out = dict(version=VERSION, route='undetermined', status='not_run', selected=[],near_candidates=[],
             branches={}, generation=None, composition_enabled=False, split_search_enabled=False,
@@ -223,10 +225,19 @@ class FullBodySearch:
             ranking=self.ranking, rank_score_is_accuracy=False,
             geometry_evidence=decision.joint.to_dict(), description_evidence=decision.semantic.to_dict())
         def finish(status, reason=None):
+            if head_only:
+                out['hand_skin_screen'] = head_hand_summary()
+                groups = [out.get(k, []) for k in ('selected', 'near_candidates',
+                          'framing_references', 'mirror_references')]
+                groups.append((out.get('generation') or {}).get('candidates', []))
+                for group in groups:
+                    for row in group:
+                        row['hand_skin_screen'] = head_hand_omission()
             screen = out.get('hand_skin_screen')
             if screen:
                 from .logging_setup import log_info
                 log_info('hand_skin_screen_summary', status=status, reason=reason,
+                         hand_processing_status=screen.get('status', 'screened'),
                          checks=screen['checks'], elapsed_ms=screen['elapsed_ms'],
                          budget_seconds=screen['budget_seconds'],
                          rejected_count=len(screen['rejected']), unverified_count=len(screen['unverified']),
@@ -299,7 +310,7 @@ class FullBodySearch:
         out['framing_references']=[r for r in out['selected'] if r['kind']=='framing_reference']
         out['selected']=[r for r in out['selected'] if r['kind']!='framing_reference']
         skin_session = None
-        if self.hand_skin_gate is not None:
+        if self.hand_skin_gate is not None and not head_only:
             skin_session = self.hand_skin_gate.session(evidence.get('hand_presets'))
             eligible = [r for r in ranked if r.get('match_level') != 'near_match'
                         and r['kind'] != 'framing_reference']
@@ -327,7 +338,8 @@ class FullBodySearch:
                 from contextlib import nullcontext
                 context = skin_session.optional_phase() if skin_session else nullcontext()
                 with context:
-                    reference, comparison = mirror_reference(self, out['selected'], description, required, skin_session)
+                    reference, comparison = mirror_reference(self, out['selected'], description, required, skin_session,
+                        **({'head_only': True} if head_only else {}))
             except (ValueError, KeyError, TypeError, OSError, AttributeError):
                 reference, comparison = None, dict(status='unavailable', reason='mirror_validation_failed')
             out['mirror_comparison'] = comparison
