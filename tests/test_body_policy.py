@@ -224,8 +224,9 @@ class BodyPolicyTests(unittest.TestCase):
             observation = {**parse_person(raw, 'p'), 'geometry': {}}
             decision = compare_body_shapes(assets, observation, default_body_id='regular')
             self.assertIsNone(decision['auto_body_id'])
-            self.assertEqual(decision['suggested_body_id'], 'child')
-            self.assertEqual(decision['decision'], 'suggest_only')
+            self.assertNotEqual(decision['suggested_body_id'], 'child')
+            self.assertNotIn('child', [r['body_id'] for r in decision['candidates']])
+            self.assertIn('child_requires_explicit_user_selection', decision['reason_codes'])
 
     def test_projection_hypotheses_cannot_disagree_on_applied_body(self):
         from src.experimental.body_matching.selection import choose_body
