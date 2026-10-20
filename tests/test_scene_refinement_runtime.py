@@ -152,3 +152,32 @@ def test_incomplete_separation_or_reversed_depth_cannot_be_released():
     for value in (report(pixels=1), report(reversed=True), report(scale=0.5)):
         with pytest.raises(ValueError):
             validate_layout(value)
+
+
+def test_scene_artifact_only_build_does_not_read_final_png(tmp_path, monkeypatch):
+    from src.scene_refinement.engine import Engine, VERSION, digest
+    from src.scene_refinement import layout, validation
+    import time
+    work = tmp_path / 'work'
+    folder = work / 'scene'
+    folder.mkdir(parents=True)
+    (work / 'inputs.json').write_text(json.dumps([{'cut_id': 'scene'}]))
+    (folder / 'layout.json').write_text('{}')
+    (folder / 'scene-result.json').write_text('{"verified":true}')
+    data = MAGIC + b'verified-scene'
+    (folder / 'scene.fbx').write_bytes(data)
+    ctx = SimpleNamespace(work=work)
+    engine = object.__new__(Engine)
+    engine.settings = SimpleNamespace(ttl=60, character_sha256='c'*64)
+    engine.pending = {'plan': (time.monotonic(), ctx, {'people': [{'person_index': 0, 'pose_id': 'pose'}]}, {'image_sha256':'i'*64})}
+    stages = []
+    engine.stage = lambda ctx, name: stages.append(name)
+    monkeypatch.setattr(layout, 'run', lambda ctx: None)
+    monkeypatch.setattr(validation, 'validate_layout', lambda report: None)
+    result = engine._build({'plan_id':'plan', 'artifact_only':True, 'persons':[{'person_index':0, 'pose_id':'pose',
+        'character_sha256':'c'*64, 'fbx_sha256':digest(data), 'fbx_base64':base64.b64encode(data).decode()}]})
+    assert result['version'] == VERSION and result['artifact_contract'] == 'verified-scene-fbx-v1'
+    assert result['preview_base64'] == ''
+    assert (folder / 'artifact-only').exists()
+    assert stages == ['people', 'arms', 'scenes']
+    assert result['artifact_sha256'] == digest(data)

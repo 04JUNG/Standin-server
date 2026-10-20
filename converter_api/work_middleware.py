@@ -16,7 +16,7 @@ class WorkMiddleware:
         screening = path == '/screen-hand-contact'
         optional = headers.get(b'x-standin-screen-optional') == b'1'
         kind = ('screen' if screening and not optional else 'preview'
-                if screening or path in ('/convert-framed', '/render-thumbnail') else 'normal')
+                if screening or path in ('/convert-framed', '/render-thumbnail', '/render-final-preview') else 'normal')
         maximum = 15_000 if screening else 300_000
         value = headers.get(b'x-standin-work-budget-ms', str(maximum).encode())
         if not value.isdigit() or len(value) > 9 or not 1 <= int(value) <= maximum:
