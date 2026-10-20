@@ -1028,10 +1028,16 @@ legacy/라우팅 미실행이면 `pose_presentation=null`이며 기존 앱 경�
 | `unobserved_body_is_default` | 생성 진단의 명시적 기본값 여부만 전달. true=화면 밖 부위 기본값; null=근거 없음 |
 | `preview_status` | `ready`=표시용 파일 입력 있음, `unavailable`=파일/계약 오류로 없음, `not_requested`=미리보기 입력 없음. BFF 조회 실패 시 별도 오류 표시 필요 |
 | `library_candidates` | qualified 원본 검색 후보(최대 5개). 통과한 검색 조건 범위의 후보이며 완전한 메시 안전 인증 아님 |
-| `review_candidates` | `geometry_review`, `near_match`, `framing_reference`, `mirror_reference` 분리 표시(기존 합계 최대 10개; 미러 참고 요청 시 일반 후보 포함 총 5개). 정답 검색 성공으로 집계 금지 |
-| `generated_candidates` | `preview_ready` 생성만 `generated_review`로 제공(최대 3개). 실패/근접 생성 진단의 BVH는 포함하지 않음 |
+| `review_candidates` | `geometry_review`, `near_match`, `framing_reference`, `mirror_reference` 분리 표시(최대 5개; 검색·생성 후보와 합산하여 총 5개). 정답 검색 성공으로 집계 금지 |
+| `generated_candidates` | `preview_ready` 생성만 `generated_review`로 제공(최대 3개, 전체 5개 중 남은 자리만 사용). 실패/근접 생성 진단의 BVH는 포함하지 않음 |
 | `basic_model` | 어깨~머리 기본 모델의 **출력 계획**. 미렌더 상태이며 BVH/FBX 경로를 지어내지 않음 |
 | `issues` | 미리보기 파일 누락·격리·해시 변경 등의 코드. 내부 파일 경로·예외 원문 미노출 |
+
+러프 검색의 `library_candidates`·`review_candidates`·`generated_candidates` 합계는 인물별 최대 5개다.
+원래 selected 후보를 우선 유지하고, 검증된 미러 참고는 기존처럼 한 자리를 사용한다.
+이후 남은 자리에 근접 참고 → 구도 참고 → 생성 검수 순서로 채운다. 미리보기 파일 검증 실패는
+자리를 차지하지 않으며, 후보의 원래 rank·ID와 검색 보고서는 유지한다. 이 제한은
+`dynamic-pose-presentation-v1`에 적용하며 자연어 검색의 전체 결과 계약은 변경하지 않는다.
 
 `ready`는 표시할 파일이 준비되었다는 뜻이지 자동 적용·내보내기 승인이라는 뜻이 아니다.
 모든 항목은 `review_required=true`, `auto_apply_allowed/refine_allowed/export_allowed/

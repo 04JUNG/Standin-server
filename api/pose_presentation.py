@@ -16,6 +16,9 @@ from urllib.parse import quote
 from pydantic import BaseModel, Field, model_validator
 
 
+MAX_PRESENTATION_CANDIDATES = 5
+
+
 class PreviewAssetOut(BaseModel):
     transport: Literal["library_bvh", "inline_bvh"]
     bvh_url: str | None = None
@@ -165,8 +168,8 @@ class PosePresentationOut(BaseModel):
     generation_reason: str | None = None
     output_scope: str | None = None
     unobserved_body_is_default: bool | None = None
-    library_candidates: list[PosePreviewOut] = Field(default_factory=list, max_length=5)
-    review_candidates: list[PosePreviewOut] = Field(default_factory=list, max_length=10)
+    library_candidates: list[PosePreviewOut] = Field(default_factory=list, max_length=MAX_PRESENTATION_CANDIDATES)
+    review_candidates: list[PosePreviewOut] = Field(default_factory=list, max_length=MAX_PRESENTATION_CANDIDATES)
     generated_candidates: list[PosePreviewOut] = Field(default_factory=list, max_length=3)
     mirror_comparison: dict | None = None
     basic_model: dict | None = None
@@ -176,6 +179,13 @@ class PosePresentationOut(BaseModel):
     auto_apply_allowed: Literal[False] = False
     refine_allowed: Literal[False] = False
     export_allowed: Literal[False] = False
+
+    @model_validator(mode='after')
+    def candidate_budget(self):
+        if (len(self.library_candidates) + len(self.review_candidates)
+                + len(self.generated_candidates) > MAX_PRESENTATION_CANDIDATES):
+            raise ValueError('presentation_candidate_budget_exceeded')
+        return self
 
 
 def _pose_id(value):
@@ -248,7 +258,7 @@ def build_pose_presentation(report, *, person_index=0, output_scope=None, resolv
             out.issues.append(f"{kind}_preview_unavailable")
 
     if not failed_search:
-        for rank, row in enumerate(report.get("selected", [])[:5], 1):
+        for rank, row in enumerate(report.get("selected", [])[:MAX_PRESENTATION_CANDIDATES], 1):
             review = row.get("match_level") == "geometry_fallback" or row.get("review_required") is True
             add_library(row, "geometry_review" if review else "library_match", rank)
         for rank, row in enumerate(report.get('mirror_references', [])[:1], 1):
@@ -258,10 +268,10 @@ def build_pose_presentation(report, *, person_index=0, output_scope=None, resolv
             out.review_candidates = [c for c in out.review_candidates
                                      if c.kind == 'mirror_reference' or c.rank <= 4]
         for key, kind in (("near_candidates", "near_match"), ("framing_references", "framing_reference")):
-            for rank, row in enumerate(report.get(key, [])[:5], 1):
-                if (len(out.review_candidates) < 10 and (not report.get("mirror_references")
-                        or len(out.library_candidates) + len(out.review_candidates) < 5)):
-                    add_library(row, kind, rank)
+            for rank, row in enumerate(report.get(key, [])[:MAX_PRESENTATION_CANDIDATES], 1):
+                if len(out.library_candidates) + len(out.review_candidates) >= MAX_PRESENTATION_CANDIDATES:
+                    break
+                add_library(row, kind, rank)
 
     generation = report.get("generation") or {}
     default_body = generation.get('diagnostics', {}).get('unobserved_body_is_default')
@@ -284,7 +294,10 @@ def build_pose_presentation(report, *, person_index=0, output_scope=None, resolv
                 "refine_allowed", "release_allowed", "actual_mesh_validated")):
             out.issues.append("generated_preview_policy_invalid")
         else:
+            remaining = MAX_PRESENTATION_CANDIDATES - len(out.library_candidates) - len(out.review_candidates)
             for rank, row in enumerate(generation.get("candidates", [])[:3], 1):
+                if len(out.generated_candidates) >= remaining:
+                    break
                 try:
                     if any(row.get(k) is not False for k in (
                             "refine_allowed", "release_allowed", "actual_mesh_validated")):
@@ -305,7 +318,7 @@ def build_pose_presentation(report, *, person_index=0, output_scope=None, resolv
                             "validation", "diagnostics", "hand_skin_screen", "hand_spacing_repair") if k in row}))
                 except (ValueError, TypeError):
                     out.issues.append("generated_preview_unavailable")
-            if not out.generated_candidates:
+            if remaining > 0 and not out.generated_candidates:
                 out.issues.append("generation_preview_missing")
 
     if report.get("basic_model") and out.search_status == "ok" and report.get("route") == "basic_model":
