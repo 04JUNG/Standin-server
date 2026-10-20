@@ -12,7 +12,7 @@ from pydantic import ValidationError
 
 import api.app as api
 from api.models import CutResultOut
-from api.pose_presentation import PreviewAssetOut, PosePreviewOut, build_pose_presentation
+from api.pose_presentation import PosePresentationOut, PreviewAssetOut, PosePreviewOut, build_pose_presentation
 from src.body_scope import BodyScope, ScopeDetection
 from src.config import CFG
 from tests.test_body_matching import cut
@@ -108,6 +108,75 @@ def test_near_and_geometry_fallback_never_masquerade_as_qualified():
     assert [c.kind for c in out.review_candidates] == ['geometry_review', 'near_match']
 
 
+@pytest.mark.parametrize('selected_count', range(6))
+@pytest.mark.parametrize('geometry_review', [False, True])
+def test_rough_candidates_share_five_slots_without_mirror(selected_count, geometry_review):
+    data = report(
+        near_candidates=[hit(f'near_{i}') for i in range(2)],
+        framing_references=[hit(f'framing_{i}') for i in range(5)],
+    )
+    data['selected'] = [hit(f'selected_{i}', review_required=geometry_review)
+                        for i in range(selected_count)]
+    out = present(data)
+    candidates = out.library_candidates + out.review_candidates + out.generated_candidates
+    expected = ([f'selected_{i}' for i in range(selected_count)]
+                + [f'near_{i}' for i in range(2)]
+                + [f'framing_{i}' for i in range(5)])[:5]
+    assert [c.pose_id for c in candidates] == expected
+    assert not out.issues
+
+
+def test_five_search_candidates_do_not_append_five_near_candidates():
+    data = report(near_candidates=[hit(f'near_{i}') for i in range(5)])
+    data['selected'] = [hit(f'selected_{i}') for i in range(5)]
+    out = present(data)
+    assert [c.pose_id for c in out.library_candidates] == [f'selected_{i}' for i in range(5)]
+    assert not out.review_candidates
+
+
+def test_unavailable_search_preview_leaves_room_for_reference():
+    data = report(near_candidates=[hit('near_0'), hit('near_1')])
+    data['selected'] = [hit(f'selected_{i}') for i in range(5)]
+
+    def resolve(pid):
+        if pid == 'selected_1':
+            raise OSError('unavailable')
+        return resolver(pid)
+
+    out = build_pose_presentation(data, output_scope='half', resolve_library=resolve)
+    assert [c.rank for c in out.library_candidates] == [1, 3, 4, 5]
+    assert [c.pose_id for c in out.review_candidates] == ['near_0']
+    assert out.status == 'partial_error'
+
+
+@pytest.mark.parametrize('selected_count', range(6))
+def test_generated_previews_only_fill_remaining_five_slots(selected_count):
+    generation = generated()
+    generation['candidates'] = [
+        dict(generation['candidates'][0], bvh=BVH + '\n' * i,
+             bvh_sha256=hashlib.sha256((BVH + '\n' * i).encode()).hexdigest())
+        for i in range(3)
+    ]
+    data = report('ok' if selected_count else 'no_result',
+                  reason='geometry_review_fallback_not_qualified', generation=generation)
+    data['selected'] = [hit(f'geometry_{i}', match_level='geometry_fallback',
+                           review_required=True, constraints_satisfied=False)
+                        for i in range(selected_count)]
+    out = present(data)
+    assert len(out.review_candidates) == selected_count
+    assert len(out.generated_candidates) == min(3, 5 - selected_count)
+    assert out.status == 'review_ready'
+    assert not out.issues
+
+
+def test_presentation_contract_rejects_more_than_five_across_groups():
+    data = report(); data['selected'] = [hit(f'selected_{i}') for i in range(5)]
+    raw = present(data).model_dump()
+    raw['review_candidates'] = present(report(near_candidates=[hit('near')])).model_dump()['review_candidates']
+    with pytest.raises(ValidationError, match='presentation_candidate_budget_exceeded'):
+        PosePresentationOut.model_validate(raw)
+
+
 def test_valid_generation_survives_later_geometry_review_fallback():
     data = report(reason='geometry_review_fallback_not_qualified', generation=generated())
     data['selected'] = [hit(match_level='geometry_fallback', review_required=True,
@@ -163,11 +232,13 @@ def http_result(monkeypatch, tmp_path, data, *, legacy=False, count=1, quarantin
         result.person_candidates = [[] for _ in range(count)]
         result.person_routing = [{'fullbody_search':deepcopy(data)} for _ in range(count)]
     for d in result.descriptors: d.output_scope = ScopeDetection(BodyScope.HALF, 'vlm_person')
+    pose_ids = {'a'} | {row['pose_id'] for key in ('selected', 'near_candidates', 'framing_references')
+                        for row in data.get(key, [])}
     class Pipe:
-        _fullbody_search = SimpleNamespace(camera=SimpleNamespace(hashes={'a':DIGEST}))
+        _fullbody_search = SimpleNamespace(camera=SimpleNamespace(hashes={pid:DIGEST for pid in pose_ids}))
         def process_cut(self, *args, **kwargs): return result
     bvh_path = tmp_path/'pose.bvh'; bvh_path.write_text(BVH+'\n' if changed else BVH)
-    monkeypatch.setattr(api, 'get_bvh_path', lambda db,pid: str(bvh_path) if pid=='a' else None)
+    monkeypatch.setattr(api, 'get_bvh_path', lambda db,pid: str(bvh_path) if pid in pose_ids else None)
     monkeypatch.setattr(api, 'quarantine_record', lambda *a: {'reason':'test'} if quarantine else None)
     monkeypatch.setattr(CFG, 'data_dir', str(tmp_path))
     monkeypatch.setitem(api.STATE, 'pipeline', Pipe())
@@ -190,6 +261,21 @@ def test_http_regression_empty_legacy_but_one_dynamic_candidate_can_download(mon
     assert download.status_code == 200 and download.content == BVH.encode()
     assert hashlib.sha256(download.content).hexdigest() == asset.bvh_sha256
     assert asset.thumbnail_url is None  # Never invent a thumbnail or rerender.
+
+
+def test_http_five_search_plus_five_near_returns_only_five_display_candidates(monkeypatch, tmp_path):
+    data = report(near_candidates=[hit(f'near_{i}') for i in range(5)])
+    data['selected'] = [hit(f'selected_{i}') for i in range(5)]
+    person = http_result(monkeypatch, tmp_path, data)['people'][0]
+    presentation = person['pose_presentation']
+    assert len(person['dynamic_search']['selected']) == 5
+    assert len(person['dynamic_search']['near_candidates']) == 5
+    assert [c['pose_id'] for c in presentation['library_candidates']] == [f'selected_{i}' for i in range(5)]
+    assert not presentation['review_candidates'] and not presentation['generated_candidates']
+    asset = presentation['library_candidates'][0]['asset']
+    download = TestClient(api.app).get(asset['bvh_url'])
+    assert download.status_code == 200 and download.content == BVH.encode()
+    assert hashlib.sha256(download.content).hexdigest() == asset['bvh_sha256']
 
 
 def test_http_generated_preview_is_typed_and_keeps_no_legacy_candidate(monkeypatch,tmp_path):
