@@ -40,6 +40,7 @@ from .logging_setup import log_info, log_warn
 from .vlm import prompts
 from .body_scope import BodyScope, detect_scope, refine_scope_from_description
 from .refine_policy import structural_refine_allowed
+from .dynamic_refine import dynamic_refine_candidates
 from .search import PositionSearchIndex, candidate_stability, knn_geometric, knn_upper_body
 from .pose_quarantine import load_pose_quarantine
 from .tracing import span
@@ -510,8 +511,11 @@ class Pipeline:
                 with span("fullbody_search"):
                     review_options = {"review_geometry": True} if integrated_enabled(CFG) else {}
                     report = self._fullbody_search.search(decision, evidence, **review_options)
-                self._apply_refine_policy(desc, slot, "low", has_candidates=False)
-                desc.refinable_limbs = ()
+                bindings = dynamic_refine_candidates(
+                    desc, slot, report, getattr(self._fullbody_search, 'camera', None))
+                self._apply_refine_policy(desc, slot, "low", has_candidates=bool(bindings))
+                desc.refine_candidates = bindings if desc.refine_allowed else []
+                desc.quality_trace['dynamic_refine_candidate_count'] = len(desc.refine_candidates)
                 desc.quality_trace["search_scope"] = "whole_library_pose"
                 record = self._routing_record(decision, routing,
                     search_status=report["status"], search_backend=report["version"],
