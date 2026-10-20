@@ -245,13 +245,12 @@ def run(ctx):
             path = folder / name
             composition = compose(manifest, sources, path)
             camera, verification = export_with_camera(path, cfg)
-            render(
-                camera, cfg, folder / ("raw.png" if variant == "raw" else "final.png")
-            )
+            if not (folder / "artifact-only").exists():
+                render(camera, cfg, folder / ("raw.png" if variant == "raw" else "final.png"))
             results[variant] = dict(
                 composition=composition, verification=verification, fbx_sha256=sha(path)
             )
-            if variant == "final":
+            if variant == "final" and not (folder / "artifact-only").exists():
                 render_angle(folder / "angle.png")
         if (BASE / cut / "final.png").exists():
             shutil.copy2(BASE / cut / "final.png", folder / "old.png")
