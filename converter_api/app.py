@@ -1116,6 +1116,7 @@ def create_app(
                 "shape_bake": result.report.get("shape_bake"),
                 "fbx_sha256": result.artifact_sha256,
                 "hands": baked,
+                **({"lab_stage_timings": result.report["lab_stage_timings"]} if "lab_stage_timings" in result.report else {}),
                 "preview_sha256": hashlib.sha256(result.preview_model).hexdigest(),
                 "fbx_base64": base64.b64encode(result.artifact).decode("ascii"),
                 "preview_base64": base64.b64encode(result.preview_model).decode("ascii"),
@@ -1143,6 +1144,7 @@ def create_app(
             "preview_sha256": result.report["preview_sha256"],
             "camera_rotation": rotation,
             "hands": baked,
+            **({"lab_stage_timings": result.report["lab_stage_timings"]} if "lab_stage_timings" in result.report else {}),
             "fbx_base64": base64.b64encode(result.artifact).decode("ascii"),
             "preview_base64": base64.b64encode(result.preview).decode("ascii"),
         }

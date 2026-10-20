@@ -7,6 +7,7 @@ intact. Full output is a byte-preserving no-op. Blender imports are child-only.
 from __future__ import annotations
 
 from pathlib import Path
+from converter.lab_timing import StageTimings
 
 FRAMING_VERSION = "skin-regions-v2-shoulder-head"
 OUTPUT_SCOPES = frozenset({"full", "half", "bust", "shoulder_head", "head"})
@@ -190,7 +191,7 @@ def render_preview(meshes, output: Path, view="front", *, aligned=False) -> None
     bpy.ops.render.render(write_still=True)
 
 
-def process_output(path, scope="full", *, preview_path=None, view="front", camera_rotation=None) -> dict:
+def process_output(path, scope="full", *, preview_path=None, view="front", camera_rotation=None, lab_timings=None) -> dict:
     from converter import retarget as rt
     from converter.camera import validate_rotation, rotate_scene
 
@@ -200,16 +201,23 @@ def process_output(path, scope="full", *, preview_path=None, view="front", camer
         raise ValueError("aligned output requires a fixed front camera")
     if scope == "full" and preview_path is None and camera_rotation is None:
         return {"version": FRAMING_VERSION, "scope": scope}
-    rt.reset_scene()
-    arm, meshes = rt.import_character(str(path))
-    report = crop_meshes(arm, meshes, scope)
+    timings = lab_timings if lab_timings is not None else StageTimings()
+    with timings.measure("framing_import"):
+        rt.reset_scene()
+        arm, meshes = rt.import_character(str(path))
+    with timings.measure("crop"):
+        report = crop_meshes(arm, meshes, scope)
     if camera_rotation is not None:
-        rotate_scene(arm, camera_rotation)
+        with timings.measure("camera_rotate"):
+            rotate_scene(arm, camera_rotation)
     if scope != "full" or camera_rotation is not None:
-        rt.export_fbx(str(path), embed_textures=False)
+        with timings.measure("framing_export"):
+            rt.export_fbx(str(path), embed_textures=False)
     if preview_path:
         # Reimport the actual delivered FBX; preview/export cannot silently diverge.
-        rt.reset_scene()
-        _, meshes = rt.import_character(str(path))
-        render_preview(meshes, Path(preview_path), view, aligned=camera_rotation is not None)
+        with timings.measure("final_fbx_reimport"):
+            rt.reset_scene()
+            _, meshes = rt.import_character(str(path))
+        with timings.measure("png_render_write"):
+            render_preview(meshes, Path(preview_path), view, aligned=camera_rotation is not None)
     return report

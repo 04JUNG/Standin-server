@@ -17,6 +17,7 @@ def preview_contract() -> dict:
                  "converter/shape_spec.py", "converter/shape_bake.py"):
         digest.update(name.encode())
         digest.update((root / name).read_bytes().replace(b"\r\n", b"\n"))
+    digest.update((root / 'converter/fast_scene_reset.py').read_bytes())
     return {
         "schema_version": "body-preview-runtime.v1",
         "preview_revision": digest.hexdigest(),
