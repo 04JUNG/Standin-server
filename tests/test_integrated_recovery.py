@@ -114,6 +114,7 @@ def constrained_scene(posture="standing", distance_limit=1.0):
     d = decision()
     d.semantic.description.update(
         postures=[posture],
+        actions=["hold"],  # phone fixture must not inherit decision()'s fold_arms
         body_details="서서 양손으로 휴대폰을 쥔다",
         search_text="휴대폰을 양손으로 쥐고 서기",
         objects=["phone"],

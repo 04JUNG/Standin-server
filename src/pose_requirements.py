@@ -9,6 +9,11 @@ import numpy as np
 from .semantic_body_index import describe_library_body
 
 ARM_STATES={'lowered','waist','forward','raised','spread','unknown'}
+CONDITIONS_VERSION = 'whole-pose-conditions-v3-critical'
+# Conservative joint proxies, not proof of skin/floor contact. The declared
+# kneeling posture must also be bound to the very BVH being measured.
+KNEE_SUPPORT_THRESHOLDS = dict(max_knee_above_ankle_torso=.2,
+    max_support_knee_angle=120., min_pelvis_above_knee_torso=.25, min_torso_up_y=.35)
 
 
 def clean_arm_states(value):
@@ -58,16 +63,27 @@ def arms_from_text(text):
 
 
 def requirements(query,prepared):
+    from .semantic_shapes import critical_relations
+    relations=sorted(critical_relations(query))
     arms=arms_from_text(query.body_details or query.text)
     arms.update({k:v for k,v in clean_arm_states(getattr(query,'arm_states',{})).items() if v!='unknown'})
     # A bilateral coarse observation is useful; mixed is never a per-arm label.
     obs=query.body_observations or {}
     if not arms and obs.get('arms') in ('lowered','spread'):
         arms=dict.fromkeys(('left','right'),obs['arms'])
+    # A chest-fold/V relation is more specific than a coarse wrist-height bin.
+    # In particular, VLM's "waist" bins cannot veto a verified chest fold.
+    if relations:arms={}
     posture=None
+    knee_support=None
     if query.visible_scope not in ('head','shoulder_head','half','bust'):
         tags=set(query.postures)
         if 'lying' in tags or re.search(r'누워|누운|누우|엎드',query.body_details or query.text):posture='lying'
+        elif 'kneeling' in tags:
+            posture='kneeling'
+            text=re.sub(r'\s+','',query.body_details or query.text or '')
+            if re.search(r'(?:양|두|양쪽)무릎',text):knee_support='both'
+            elif re.search(r'(?:한쪽|한|하나의)무릎',text):knee_support='one'
         elif 'sitting' in tags:posture='sitting'
         elif 'standing' in tags:posture='standing'
     counts=hand_counts(getattr(query,'held_object_hand_counts',{}))
@@ -83,9 +99,44 @@ def requirements(query,prepared):
     body={k:obs[k] for k in ('knees','legs') if obs.get(k) in ('bent','straight','mixed','apart','together','staggered')}
     if query.visible_scope in ('head','shoulder_head','half','bust'):body={}
     object_hands={o:s for o,s in query.held_object_hands.items() if s in ('left','right','both')}
-    return dict(posture=posture,arms=arms,body_states=body,hand_counts={k:v for k,v in counts.items() if v!='unknown'},
+    return dict(posture=posture,knee_support=knee_support,relations=relations,
+                arms=arms,body_states=body,hand_counts={k:v for k,v in counts.items() if v!='unknown'},
                 object_hands=object_hands,
-                active=bool(posture or arms or body or any(v!='unknown' for v in counts.values())))
+                active=bool(posture or relations or arms or body or any(v!='unknown' for v in counts.values())))
+
+
+def knee_support_evidence(points, scores):
+    """Measure low bent knees relative to ankles, never from pose names/text.
+
+    Translation/scale/yaw invariant, gravity sensitive. Ankles are a support
+    proxy, not a known world ground plane. Authored, hash-bound posture evidence
+    is separately required before calling this a kneeling pose.
+    """
+    p=np.asarray(points,float);s=np.asarray(scores,float)
+    anchors=[5,6,11,12,13,14,15,16]
+    if (p.shape!=(17,3) or s.shape!=(17,) or not np.isfinite(p[anchors]).all()
+            or not np.isfinite(s[anchors]).all() or not (s[anchors]>=.3).all()):
+        return dict(support=None,metrics={})
+    up=(p[5]+p[6]-p[11]-p[12])*.5
+    length=float(np.linalg.norm(up))
+    if length<1e-6:return dict(support=None,metrics={})
+    if up[1]/length<KNEE_SUPPORT_THRESHOLDS['min_torso_up_y']:
+        return dict(support=None,metrics={'torso_up_y':float(up[1]/length)})
+    floor=min(p[15,1],p[16,1]);hips=float((p[11,1]+p[12,1])*.5)
+    supported=[];metrics={}
+    for side,hip,knee,ankle in (('left',11,13,15),('right',12,14,16)):
+        a=p[hip]-p[knee];b=p[ankle]-p[knee]
+        denominator=float(np.linalg.norm(a)*np.linalg.norm(b))
+        if denominator<1e-8:return dict(support=None,metrics={})
+        angle=float(np.degrees(np.arccos(np.clip(np.dot(a,b)/denominator,-1,1))))
+        height=float((p[knee,1]-floor)/length)
+        pelvis=float((hips-p[knee,1])/length)
+        supported.append(height<=KNEE_SUPPORT_THRESHOLDS['max_knee_above_ankle_torso']
+            and angle<=KNEE_SUPPORT_THRESHOLDS['max_support_knee_angle']
+            and pelvis>=KNEE_SUPPORT_THRESHOLDS['min_pelvis_above_knee_torso'])
+        metrics[side]=dict(knee_above_ankles_torso=height,pelvis_above_knee_torso=pelvis,knee_angle=angle)
+    return dict(support={0:'none',1:'one',2:'both'}[sum(supported)],metrics=metrics,
+                thresholds=dict(KNEE_SUPPORT_THRESHOLDS),floor_contact_certified=False)
 
 
 def measure(points,scores):
@@ -137,8 +188,9 @@ def measure(points,scores):
 
 
 class WholePoseValidator:
-    def __init__(self,camera,records,body):
+    def __init__(self,camera,records,body,*,shapes=None):
         self.camera=camera;self.records=records;self.body=body;self.cache={}
+        self.shapes=shapes or {}
         self.positions={pid:i for i,pid in enumerate(camera.pose_ids)}
 
     def check(self,required,pid):
@@ -155,15 +207,36 @@ class WholePoseValidator:
         wanted=required['posture']
         if wanted:
             actual=observed['posture']
-            if actual is None and bound:
-                labels=postures&{'standing','sitting','lying'}
-                if len(labels)==1:
-                    label=next(iter(labels))
-                    if not (label=='lying' and observed['orientation']=='upright'):
-                        actual=label
-            if wanted=='lying' and observed['orientation']=='upright':actual='upright'
-            if wanted in ('standing','sitting') and observed['orientation']=='horizontal' and observed['posture']=='lying':actual='lying'
-            add('posture',wanted,actual,'BVH_gravity_and_bound_posture')
+            if wanted=='kneeling':
+                support=knee_support_evidence(self.camera.points[self.positions[pid]],
+                    self.camera.scores[self.positions[pid]])
+                # Bent legs alone do not prove kneeling: require a matching
+                # BVH-bound declaration AND a measured low-knee support proxy.
+                actual=None
+                if bound:
+                    if 'kneeling' in postures and support['support'] in ('one','both'):actual='kneeling'
+                    elif support['support']=='none':actual='not_kneeling'
+                add('posture',wanted,actual,'bound_kneeling_label+BVH_knee_support_proxy')
+                checks['posture']['support_evidence']=support
+                if required.get('knee_support'):
+                    add('knee_support',required['knee_support'],
+                        support['support'] if actual=='kneeling' else None,
+                        'BVH_knee_support_proxy')
+            else:
+                self._check_posture(add,wanted,actual,observed,postures,bound)
+        for relation in required.get('relations',[]):
+            profile=self.shapes.get(pid,{})
+            source_sha=self.camera.hashes.get(pid)
+            actual=None
+            if source_sha and profile.get('source_sha256')==source_sha:
+                from .semantic_shapes import relational_geometry
+                geometry=relational_geometry(self.camera.points[self.positions[pid]],
+                    self.camera.scores[self.positions[pid]])
+                measured=geometry.get('fold_geometry' if relation=='fold_arms' else relation)
+                declared=profile.get('relations',{}).get(relation)
+                if measured is False or declared is False:actual='absent'
+                elif measured is True and declared is True:actual='present'
+            add('relation:'+relation,'present',actual,'hash_bound_shape_profile+BVH_relation')
         for side,state in required['arms'].items():
             actual=observed['arms'].get(side)
             if state=='spread' and observed.get('arm_features',{}).get(side,{}).get('spread'):actual='spread'
@@ -195,6 +268,17 @@ class WholePoseValidator:
                     checks=checks,conflicts=conflicts,unknown=unknown,
                     detail_conflicts=detail_conflicts,detail_unknown=detail_unknown,body_metrics=observed.get('metrics',{}),
                     actual_mesh_contact_validated=False)
+
+    @staticmethod
+    def _check_posture(add,wanted,actual,observed,postures,bound):
+        if actual is None and bound:
+            labels=postures&{'standing','sitting','lying'}
+            if len(labels)==1:
+                label=next(iter(labels))
+                if not (label=='lying' and observed['orientation']=='upright'):actual=label
+        if wanted=='lying' and observed['orientation']=='upright':actual='upright'
+        if wanted in ('standing','sitting') and observed['orientation']=='horizontal' and observed['posture']=='lying':actual='lying'
+        add('posture',wanted,actual,'BVH_gravity_and_bound_posture')
 
 
 def projected_pose_details(points,mask):
@@ -250,6 +334,13 @@ def audit_generated(required,candidate):
     hands=parts.get('hands') or {};parts['hands']={s:hands.get(k) for s,k in (('left','L'),('right','R'))}
     record=dict(groups=groups,meta=dict(bvh_sha256=digest,body_parts=parts))
     cam=SimpleNamespace(pose_ids=['generated'],points=[points],scores=[scores],hashes={'generated':digest})
-    result=WholePoseValidator(cam,{'generated':record},{}).check(required,'generated')
+    from .semantic_shapes import relational_geometry
+    geometry=relational_geometry(points,scores)
+    actions={t['value'] for group in groups.values() for t in group if t.get('field')=='action'}
+    # A generated declaration alone never certifies its emitted body shape.
+    shapes={'generated':dict(source_sha256=digest,relations=dict(
+        fold_arms=geometry['fold_geometry'] if 'fold_arms' in actions else False,
+        v_arms=geometry['v_arms']))}
+    result=WholePoseValidator(cam,{'generated':record},{},shapes=shapes).check(required,'generated')
     result['source']='generated_spec_and_reloaded_BVH'
     return result
