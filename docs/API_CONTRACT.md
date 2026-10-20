@@ -1165,3 +1165,7 @@ Gemini describe 호출은 `d5-structured-description`부터 response_json_schema
 `tests/test_description_contract.py`는 실제 google-genai SDK와 localhost HTTP 서버로 요청의 schema 직렬화 및 HTTP 200 뒤 잘못된 응답 처리를 검증한다. 합성 이미지·가짜 키를 쓰며 외부 Gemini는 호출하지 않는다. 올바른 기권 응답은 빈 관찰을 유지하고, 형식 실패는 고정 code/field만 남긴 채 1회 호출로 종료한다. 이 회귀 통과와 실제 Gemini/스테이징 입력 재현은 별도 검증이다.
 
 스테이징 제보의 과거 로그는 ValueError만 남아 실패 필드를 복원할 수 없다. 이 변경은 응답 구조 예방과 다음 실패의 진단을 보강하며, 원본 입력의 스테이징 재실행 성공을 의미하지 않는다. 표시 scope의 불일치는 별도 BFF 범위 resolver 변경에서 처리한다.
+
+### 아동 자산 추천 제한 (2026-10-20)
+
+이미지의 비율·얼굴·스타일·가림·웅크림 또는 VLM clear 표시로 아동 자산을 자동 추천하지 않는다. 레거시 랭커도 순위·제안·자동 선택에서 child 자산을 제외한다. 해당 경우 `child_recommendation_policy`와 `child_requires_explicit_user_selection`을 반환하며, 다른 기존 기본 후보가 없으면 선택을 요구한다. 실제 나이 필드/나이 확률을 생성하지 않는다. 사용자 수동 선택·저장한 기본값·last-used 아동은 유지한다. [기준·경로·검증 한계](BODY_SELECTION/CHILD_RECOMMENDATION_POLICY.md).

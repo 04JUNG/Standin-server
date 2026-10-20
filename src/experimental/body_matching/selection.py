@@ -6,7 +6,7 @@ from .schema import AXES, NOMINAL_AXES, VISIBILITY
 from .evidence import mask_geometry
 from .policy import POLICY_VERSION, application_policy
 
-SCORER_VERSION = "body-score.v4.regional-gate.uncalibrated"
+SCORER_VERSION = "body-score.v5.child-manual-only.uncalibrated"
 
 
 def choose_body(catalog, observation, poses):
@@ -32,6 +32,21 @@ def _select(candidates, observation, poses, default_body_id, *, unavailable_reas
             "calibrator_version": None, "geometry_hypotheses": [], "evidence_axes": [],
             "decision": "asset_unavailable", "policy_version": POLICY_VERSION,
             "suggested_body_id": None, "suggested_asset": None}
+    from .child_policy import automatic_candidates, REASON, VERSION
+    filtered = automatic_candidates(candidates)
+    excluded = [a["body_id"] for a in candidates if a not in filtered]
+    if excluded:
+        base["child_recommendation_policy"] = dict(
+            version=VERSION, mode="manual_only", excluded_body_ids=excluded)
+        base["reason_codes"].append(REASON)
+        candidates = filtered
+        if not candidates:
+            return {**base, "diagnostic": REASON}
+        if default_body_id in excluded:
+            # Prefer an existing ordinary catalog body over an arbitrary lexical
+            # winner when an old automatic default points at the child asset.
+            default_body_id = next((a["body_id"] for a in candidates
+                                    if a.get("attributes", {}).get("body_build") == "regular"), None)
     if not candidates or (require_poses and not poses):
         return {**base, "diagnostic": unavailable_reason}
     from .presentation import presentation_candidates, presentation_tie_rank
@@ -43,7 +58,7 @@ def _select(candidates, observation, poses, default_body_id, *, unavailable_reas
     axes = [axis for axis in AXES if attrs[axis]["value"] is not None
             and attrs[axis]["visibility"] != "unknown"
             and all(a["attributes"][axis] is not None for a in candidates)]
-    reasons = list(presentation_trace["reason_codes"])
+    reasons = base["reason_codes"] + list(presentation_trace["reason_codes"])
     if any(attrs[k]["value"] is not None and k not in axes for k in AXES):
         reasons.append("incomplete_catalog_attributes_excluded")
     geometry = mask_geometry(observation)
