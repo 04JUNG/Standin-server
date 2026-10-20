@@ -1165,3 +1165,29 @@ Gemini describe 호출은 `d5-structured-description`부터 response_json_schema
 `tests/test_description_contract.py`는 실제 google-genai SDK와 localhost HTTP 서버로 요청의 schema 직렬화 및 HTTP 200 뒤 잘못된 응답 처리를 검증한다. 합성 이미지·가짜 키를 쓰며 외부 Gemini는 호출하지 않는다. 올바른 기권 응답은 빈 관찰을 유지하고, 형식 실패는 고정 code/field만 남긴 채 1회 호출로 종료한다. 이 회귀 통과와 실제 Gemini/스테이징 입력 재현은 별도 검증이다.
 
 스테이징 제보의 과거 로그는 ValueError만 남아 실패 필드를 복원할 수 없다. 이 변경은 응답 구조 예방과 다음 실패의 진단을 보강하며, 원본 입력의 스테이징 재실행 성공을 의미하지 않는다. 표시 scope의 불일치는 별도 BFF 범위 resolver 변경에서 처리한다.
+
+### 확실한 두상 출력의 손 단계 생략
+
+추론의 최종 인물 범위가 `head`이고 출처가 `vlm_person`, `vlm_description` 또는 단일
+인물의 `legacy_shot`일 때만 손 작업을 생략한다. 누락 관절·일반 설명·출처 불명은
+근거가 아니며 `bust`, `shoulder_head`, `half`, `full`은 기존 추론 손 정책을 유지한다.
+사용자가 이후 바꾸는 수동 범위는 BFF의 최종 범위 resolver와 손 선택 계약이 우선한다.
+
+- 전신 동적 경로는 인물 설명과 범위 보정을 끝낸 뒤 손 VLM을 시작한다. 남은 인물만
+  요청하며 원 VLM 슬롯 인덱스로 응답을 복원한다. 생략 인물은 `hands.status=not_requested`,
+  요청 실패는 요청한 인물만 `unavailable`이다. 전원이 head이면 손 호출·Future 대기가 없다.
+- head의 검색 후 손 피부 검사·생성 손 검사·미러 손 검사 세션을 만들지 않는다.
+  `dynamic_search.hand_skin_screen`은 `method=head-output-hand-omission-v1`,
+  `status=not_applicable`, `reason=head_only_output`, `scope=head`, `checks=0`을 기록한다.
+  후보에도 같은 N/A marker를 붙인다. `clear_screen`이 아니고 실제 메시 검증 성공도 아니다.
+- 모든 기존 `release_allowed`, `refine_allowed`, `actual_mesh_validated`와 최종 검수 정책은
+  그대로다. 두상 생성/geometry fallback도 기존 참고 자격만 유지한다. 다른 범위에서의
+  검사 오류는 기존대로 fail-closed이며 head 요청이 공유 gate 상태를 바꾸지 않는다.
+- 두상 미러도 원본/참고 해시·family·원문 조건·카메라·첫 4개 안의 원본 연결을 검증한다.
+  손 검사를 대체하는 N/A는 API 투영의 범위가 head이고 엔진 summary와 양쪽 marker가
+  정확히 일치할 때만 인정한다. 다른 범위의 N/A, 손 검사 성공으로 바꾼 marker,
+  원본 연결 오류 또는 권한 승격은 거부한다.
+
+전신 동적 경로의 손 VLM 시작이 설명/범위 판정 뒤로 이동하므로 손이 있는 인물은 이전의
+초기 포즈 추출과 손 호출 중첩을 사용하지 않는다. 실제 지연 변화는 배포 후 별도 측정한다.
+실제 모델 호출·피부 렌더 없이 회귀 계약은 `tests/test_head_only_hands.py`에서 검증한다.
