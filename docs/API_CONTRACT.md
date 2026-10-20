@@ -1213,3 +1213,25 @@ Gemini describe 호출은 `d5-structured-description`부터 response_json_schema
 전신 동적 경로의 손 VLM 시작이 설명/범위 판정 뒤로 이동하므로 손이 있는 인물은 이전의
 초기 포즈 추출과 손 호출 중첩을 사용하지 않는다. 실제 지연 변화는 배포 후 별도 측정한다.
 실제 모델 호출·피부 렌더 없이 회귀 계약은 `tests/test_head_only_hands.py`에서 검증한다.
+
+## 동적 라이브러리 후보의 선택 후 refine 복구 (2026-10-21)
+
+`people[].refine_candidates`는 선택적 후보 바인딩 목록이다. 기존 `CandidateOut` 형식으로
+pose_id, view, distance, camera를 제공한다. `camera`는 원본 BVH SHA-256·입력 관절 SHA-256·
+관측 마스크·원래 117시점 검색 회전/원근을 담은 `candidate-camera-v2`다. 새 카메라 fitting이나
+검색 순위 변경은 없다. 기존 legacy `candidates`와 `pose_presentation` 목록은 그대로 유지한다.
+
+full_image / VLM 소유 슬롯의 valid 또는 partial 스켈레톤이 full/reduced 범위와 보정할 사지를
+갖고, 실제 기하 검색 카메라에 연결된 정식 라이브러리 후보가 있을 때 기존 구조 정책으로
+`refine_allowed=true`와 마스킹된 scores/refinable_limbs를 보존한다. 동적 후보가 있다는 이유로
+`has_candidates=False`를 넣어 scores를 0으로 만들던 처리를 제거한다. low 검색 신뢰도는
+v2 refine 금지 사유가 아니며, 하체 미관측 동결·충돌·해부학·selector·5초 제한은 그대로다.
+
+semantic-only, geometry fallback, near/framing/mirror 참고, 생성 후보 및 기존 구조 정책에서
+차단된 인물은 이 목록에 포함하지 않는다. `REFINE_ENABLED=0` 또는 `REFINE_V2_ENABLED=0`도
+목록을 비운다. `pose_presentation`은 계속 미리보기/수동 확인 계약이며 그 내부의 자동 권한은
+승격하지 않는다. BFF는 명시적 바인딩을 같은 library_match 후보의 자산·카메라와 대조해서
+선택 후보의 refine 권한만 연결해야 한다. 바인딩이 없는 구 응답은 기존 차단을 유지한다.
+
+배포 순서: 추론 서버 → BFF → 클라이언트. BFF의 `REFINE_FEATURE_ENABLED`도 true여야 한다.
+과거 저장 Job의 0점 관절을 사후 복원하지 않는다. 새 분석부터 적용한다.
