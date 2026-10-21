@@ -1266,3 +1266,10 @@ semantic-only, geometry fallback, near/framing/mirror 참고, 생성 후보 및 
 
 배포 순서: 추론 서버 → BFF → 클라이언트. BFF의 `REFINE_FEATURE_ENABLED`도 true여야 한다.
 과거 저장 Job의 0점 관절을 사후 복원하지 않는다. 새 분석부터 적용한다.
+
+
+## Top5 수평 8방향 미리보기 2026-10-21
+
+기존 `GET /pose/{pose_id}/poster`에 선택적으로 `variant=rough-yaw8-v1&view=yaw_045`를 전달하면 검색 좌표계 기준 45도 간격의 검증된 정적 참고 이미지를 제공합니다. BFF가 후보별 카메라로 view를 결정합니다. `source_sha256`·scope·등록/격리 검증은 유지하며 variant 없는 호출은 기존 native PNG 호환 경로를 유지합니다.
+
+실제 served yaw·폴백·투영 불일치는 버전 있는 헤더로 전달합니다. 없는 방향이나 머리 단독 자산을 임의로 채우거나 원본 포즈·정밀 카메라·내보내기 권한을 바꾸지 않습니다. 자산 좌표 변환, JPEG 형식, 누락/손상 구분 및 헤더는 [ROUGH_YAW8_PREVIEWS.md](ROUGH_YAW8_PREVIEWS.md)를 참조합니다.
