@@ -770,6 +770,27 @@ BFF가 저장한 값을 Converter로 전달한다. `rotation`은 원본 BVH Y-up
 
 ## Precomputed candidate previews
 
+### Existing PNG poster compatibility for native references
+
+`GET /pose/{pose_id}/poster?source_sha256=...&scope=...` keeps the existing URL,
+`image/png` response, source/quarantine checks and `default-body-poster-v1` protocol.
+For a complete native bundle, full/half/bust/shoulder_head use the verified
+`thumbs/scope8/{source}__{scope}__yaw_000.jpg` (fixed front, not the search camera).
+The server verifies source, character, frame 0, solver, crop, camera, approved
+native renderer revision and JPEG hash, then losslessly encodes the decoded RGB
+pixels as PNG. No Blender, pose generation or source/bundle writes occur.
+
+The existing HTTP `frozen-retarget-v1` method describes this frozen native-retarget
+family, **not** reference skinning. `X-Standin-Preview-Revision` remains the real
+native renderer revision; `X-Standin-Native-Render-Method` preserves
+`frozen-native-scope8-v1`, and `X-Standin-Native-Artifact-SHA256` identifies the
+original JPEG. `X-Standin-Artifact-SHA256` identifies the returned PNG. Native
+metadata is never relabelled. Missing/corrupt advertised native assets fail closed
+with 404. Old bundles and excluded head-only scope keep the existing poster path.
+App/BFF code, candidate ordering, templates, selected body/hands and export grants
+are unchanged. Browser in-memory caches may retain an older successful poster
+until the app is restarted or its existing cache expires.
+
 The internal converter additionally serves read-only
 `GET /pose-preview/{source_sha}?character_id=...` (`model/gltf-binary`).
 It never runs inference or Blender. Configuration, identity, failure behavior
