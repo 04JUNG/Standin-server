@@ -789,7 +789,8 @@ def get_pose_poster_template(scope: str):
 
 
 @app.get("/pose/{pose_id}/poster")
-def get_pose_poster(pose_id: str, source_sha256: str, scope: str = "full"):
+def get_pose_poster(pose_id: str, source_sha256: str, scope: str = "full",
+                    variant: str | None = None, view: str = "yaw_000"):
     """Read-only canonical reference; never queues a live model conversion."""
     from src.pose_posters import poster, headers as poster_headers, digest
     response = get_pose_bvh(pose_id)  # Existing registration and quarantine guards.
@@ -798,6 +799,19 @@ def get_pose_poster(pose_id: str, source_sha256: str, scope: str = "full"):
     source = Path(response.path).read_bytes()
     if digest(source) != source_sha256:
         raise HTTPException(409, "poster source changed")
+    if variant is not None:
+        from src.rough_posters import VARIANT, rough_poster
+        from src.directional_posters import VIEWS
+        if variant != VARIANT or view not in VIEWS:
+            raise HTTPException(400, "unsupported directional poster")
+        try:
+            image, response_headers = rough_poster(Path(CFG.data_dir), source_sha256, scope, view)
+        except (OSError, ValueError, KeyError, TypeError):
+            raise HTTPException(404, "directional poster unavailable")
+        media = "image/jpeg" if image.startswith(b'\xff\xd8\xff') else "image/png"
+        return Response(image, media_type=media, headers=response_headers)
+    if view != "yaw_000":
+        raise HTTPException(400, "directional variant required")
     from src.native_png_posters import read_native_png
     try:
         native = read_native_png(Path(CFG.data_dir), source_sha256, scope)
