@@ -798,6 +798,14 @@ def get_pose_poster(pose_id: str, source_sha256: str, scope: str = "full"):
     source = Path(response.path).read_bytes()
     if digest(source) != source_sha256:
         raise HTTPException(409, "poster source changed")
+    from src.native_png_posters import read_native_png
+    try:
+        native = read_native_png(Path(CFG.data_dir), source_sha256, scope)
+    except (ValueError, OSError, KeyError, TypeError):
+        raise HTTPException(404, "poster unavailable")
+    if native is not None:
+        image, response_headers = native
+        return Response(image, media_type="image/png", headers=response_headers)
     try:
         image, meta = poster(Path(CFG.data_dir) / "pose-posters", source, scope)
     except (ValueError, OSError):
