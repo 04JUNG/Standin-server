@@ -7,8 +7,13 @@ import math
 
 VIEWS={'front','profile_left','profile_right','three_quarter_left','three_quarter_right','back'}
 
+# Temporarily paused pending further experiments. Do not enable via deployment env.
+BASIC_CLOSEUP_ENABLED = False
+
 
 def basic_closeup_plan(evidence, description):
+    if not BASIC_CLOSEUP_ENABLED:
+        return None
     desc=description or {}
     scope=evidence.get('output_scope')
     if scope not in ('head','shoulder_head'):
