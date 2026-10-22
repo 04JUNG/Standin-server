@@ -87,6 +87,9 @@ def main():
     p.add_argument("--shape-registry", required=True)
     p.add_argument("--source-bvh", required=True)
     p.add_argument("--neutral-source", action="store_true")
+    p.add_argument("--skin-plan", help="Offline bounded derived skin plan; never registers the asset")
+    p.add_argument("--pose-plan", help="Bounded target pose with independently checked depth/angle guards")
+    p.add_argument("--pose-rig", help="Exact Blender-realized rig; its mesh vertices are never adopted")
     p.add_argument("--hand-left", default="open")
     p.add_argument("--hand-right", default="open")
     p.add_argument("--output-dir", required=True)
@@ -125,19 +128,42 @@ def main():
                           expected_normals=directors, reference_double_areas=areas)
     baseline_audit = mesh_check(neutral["vertices"])
     repaired, repair = repair_neutral(neutral["vertices"], original_faces, baseline_audit, mesh_check)
+    skin_plan = None
+    skin_weights = neutral["weights"]
+    clearance_degrees = 0.
+    if a.skin_plan:
+        if a.neutral_source:
+            raise ValueError("derived_skin_requires_actual_source")
+        from converter.skin_profile_repair import validate_plan, VERSION as SKIN_VERSION
+        with np.load(a.skin_plan, allow_pickle=False) as plan:
+            skin_weights, repaired, clearance_degrees = validate_plan(plan,
+                neutral=neutral["vertices"], repaired_rest=repaired, faces=original_faces,
+                original_weights=neutral["weights"], source_sha256=sha(a.source_bvh),
+                asset_sha256=original_asset_sha)
+        skin_plan = dict(version=SKIN_VERSION, sha256=sha(a.skin_plan),
+            right_arm_clearance_degrees=clearance_degrees,
+            max_weight_delta=float(abs(skin_weights-neutral["weights"]).max()),
+            original_weights_sha256=hashlib.sha256(neutral["weights"].tobytes()).hexdigest(),
+            planned_weights_sha256=hashlib.sha256(skin_weights.tobytes()).hexdigest())
     # Never modify the source/release asset. Only this newly identified asset changes.
     rt.reset_scene()
     _, meshes = rt.import_character(str(native_neutral))
     mesh = meshes[0]
-    for index in repair["changed_vertices"]:
+    for index in np.flatnonzero(np.any(repaired != neutral["vertices"], axis=1)):
         mesh.data.vertices[index].co = mesh.matrix_world.inverted() @ Vector(repaired[index])
+    if skin_plan:
+        mesh.vertex_groups.clear()
+        for column, name in enumerate(neutral["names"]):
+            group = mesh.vertex_groups.new(name=name)
+            for index in np.flatnonzero(skin_weights[:, column] > 0):
+                group.add([int(index)], float(skin_weights[index, column]), "REPLACE")
     mesh.data.update()
     bpy.context.view_layer.update()
     derived = output/"derived-neutral.fbx"
     rt.export_fbx(str(derived), embed_textures=False)
     derived_sha = sha(derived)
     rest = snapshot(derived)
-    same_rig(neutral, rest, require_rest=True)
+    same_rig({**neutral, "weights": skin_weights}, rest, require_rest=True)
     source = output/"source.bvh"
     if a.neutral_source:
         from src.bvh import parse_bvh, single_frame_bvh_text
@@ -147,15 +173,40 @@ def main():
         shutil.copyfile(a.source_bvh, source)
     source_sha = sha(source)
     hands = {"left": a.hand_left, "right": a.hand_right}
-    target = TargetProfile(a.character_id+".offline-neutral-repair-v1", original_asset_sha,
-        _digest({"native_shape": shape_spec, "derived_neutral_sha256": derived_sha, "repair": repair}),
+    pose_plan = None
+    pose_checks = None
+    if a.pose_plan:
+        from converter.pose_safety import VERSION as POSE_VERSION, audit_pose
+        if not a.skin_plan or a.neutral_source:
+            raise ValueError("pose_plan_requires_bound_actual_skin_plan")
+        with np.load(a.pose_plan, allow_pickle=False) as packed:
+            pose_plan = {k: packed[k] for k in packed.files}
+        if (str(pose_plan["version"]) != POSE_VERSION
+                or str(pose_plan["source_sha256"]) != source_sha
+                or str(pose_plan["asset_sha256"]) != original_asset_sha
+                or str(pose_plan["skin_plan_sha256"]) != sha(a.skin_plan)
+                or list(pose_plan["names"]) != rest["names"]
+                or json.loads(str(pose_plan["parents"])) != rest["parents"]):
+            raise ValueError("target_pose_plan_identity_mismatch")
+        pose_camera = json.loads(str(pose_plan["camera_json"]))
+        if a.pose_rig and (str(pose_plan.get("realized_body_sha256", "")) != sha(a.pose_rig)
+                or str(pose_plan.get("hand_left", "")) != a.hand_left
+                or str(pose_plan.get("hand_right", "")) != a.hand_right):
+            raise ValueError("realized_rig_or_hands_mismatch")
+        pose_checks = {"plan_sha256": sha(a.pose_plan), "version": POSE_VERSION}
+    elif a.pose_rig:
+        raise ValueError("realized_rig_requires_pose_plan")
+    target = TargetProfile(a.character_id+(".offline-skin-repair-v1" if skin_plan else ".offline-neutral-repair-v1"), original_asset_sha,
+        _digest({"native_shape": shape_spec, "derived_neutral_sha256": derived_sha,
+                 "repair": repair, **({"skin_plan": skin_plan} if skin_plan else {}),
+                 **({"pose_plan": pose_checks} if pose_checks else {})}),
         _digest(rest["parents"]), _digest(rest["bones"].tolist()), sha(ROOT/"converter/bone_map.py"),
         _digest({"hands": hands, "library_sha256": load_library().sha256}), lineage["retarget_sha256"],
         lineage["solver_manifest_sha256"], recipe["controller_sha256"], "finite-snapshot-1", "hands-1",
         "finite-normalized-lbs-shell-witness-v1", SOLVER_VERSION, bpy.app.build_hash.decode())
     identity = dict(source_asset_sha256=original_asset_sha, profile_sha256=target.digest, source_sha256=source_sha)
     witness = build_lbs_witness(neutral_vertices=neutral["vertices"], corrected_rest_vertices=repaired,
-        faces=original_faces, vertex_weights=neutral["weights"],
+        faces=original_faces, vertex_weights=rest["weights"],
         bone_world_transforms=np.repeat(np.eye(4)[None], len(rest["names"]), axis=0),
         mesh_world_transform=np.eye(4), stage="neutral-repair", stage_input_sha256=sha(native_neutral), **identity)
     stages = []
@@ -180,8 +231,86 @@ def main():
     (output/"body-report.json").write_text(json.dumps(converted.as_dict(), indent=2))
     if not converted.ok:
         raise ValueError("existing_converter_gate_rejected_source")
+    if clearance_degrees or pose_plan is not None:
+        from mathutils import Matrix
+        # A bounded target-space clearance correction, recorded in the new
+        # profile. Source BVH, root, legs and the opposite arm stay unchanged.
+        shutil.copyfile(body_path, output/"solver-body.fbx")
+        rt.reset_scene()
+        arm, meshes = rt.import_character(str(body_path))
+        original_world = {b.name: arm.matrix_world @ arm.pose.bones[b.name].matrix.copy()
+                          for b in arm.data.bones}
+        if pose_plan is not None:
+            actual_base = np.array([original_world[n] for n in rest["names"]])
+            if np.max(abs(actual_base-pose_plan["base_bones"])) > 1e-5:
+                raise ValueError("target_pose_plan_baseline_mismatch")
+            from converter.pose_safety import descendants, rotate_subtree
+            root_index = next(i for i,n in enumerate(rest["names"]) if n.split(":")[-1] == "RightArm")
+            prior = rotate_subtree(actual_base,
+                descendants(rest["names"], rest["parents"], rest["names"][root_index]), root_index,
+                np.asarray(Matrix.Rotation(np.deg2rad(clearance_degrees), 3, "Y")))
+            if np.max(abs(prior-pose_plan["depth_reference"])) > 1e-5:
+                raise ValueError("target_pose_depth_reference_mismatch")
+            pose_checks["planned"] = audit_pose(actual_base, pose_plan["body_bones"],
+                rest["names"], rest["parents"], pose_camera, depth_reference=pose_plan["depth_reference"])
+            if pose_checks["planned"]["status"] != "pose_validated":
+                raise ValueError("target_pose_angle_or_depth_rejected")
+            desired_world = {n: Matrix(pose_plan["body_bones"][i]) for i,n in enumerate(rest["names"])}
+            active = set(original_world)
+        else:
+            root_name = next(n for n in original_world if n.split(":")[-1] == "RightArm")
+            root_bone = arm.data.bones[root_name]
+            active = {root_name, *(b.name for b in root_bone.children_recursive)}
+            pivot = original_world[root_name].translation
+            delta = (Matrix.Translation(pivot) @ Matrix.Rotation(np.deg2rad(clearance_degrees), 4, "Y")
+                     @ Matrix.Translation(-pivot))
+            desired_world = {name: delta @ world if name in active else world
+                             for name, world in original_world.items()}
+        # Skin the derived REST once with the complete target pose. Applying a
+        # second armature pass to already baked LBS vertices is not equivalent
+        # to the composed bone maps and would violate independent replay.
+        rt.reset_scene()
+        arm, meshes = rt.import_character(str(derived))
+        for bone in arm.data.bones:
+            arm.pose.bones[bone.name].matrix = arm.matrix_world.inverted() @ desired_world[bone.name]
+            bpy.context.view_layer.update()
+        for name in set(original_world)-active:
+            actual_world = arm.matrix_world @ arm.pose.bones[name].matrix
+            if np.max(abs(np.asarray(actual_world)-np.asarray(original_world[name]))) > 1e-5:
+                raise ValueError("clearance_changed_inactive_bone")
+        if a.pose_rig:
+            # Evaluate Blender LBS from the newly corrected REST, once. Reuse
+            # only the independently bound realized rig, avoiding a second
+            # pose-to-rest conversion and its unstable near-pi roll rounding.
+            # Existing final 1e-5 matrix equality and 1e-5 m vertex replay remain.
+            from converter.mesh_validation import extract_evaluated_skin
+            fresh_vertices, fresh_faces = extract_evaluated_skin(meshes)
+            template = snapshot(a.pose_rig)
+            same_rig(rest, template)
+            if (np.max(abs(template["bones"]-pose_plan["body_bones"])) > 1e-5
+                    or not np.array_equal(fresh_faces, template["faces"])):
+                raise ValueError("realized_rig_frame_or_topology_mismatch")
+            rt.reset_scene()
+            arm, meshes = rt.import_character(str(a.pose_rig))
+            mesh = meshes[0]
+            inverse = mesh.matrix_world.inverted()
+            for index, point in enumerate(fresh_vertices):
+                mesh.data.vertices[index].co = inverse @ Vector(point)
+            mesh.data.update()
+            bpy.context.view_layer.update()
+        else:
+            rt.apply_output_mode(arm, meshes, "rigged_rest")
+        rt.export_fbx(str(body_path), embed_textures=False)
     body = snapshot(body_path)
     same_rig(rest, body)
+    if pose_plan is not None:
+        pose_checks["exported_body"] = audit_pose(pose_plan["base_bones"], body["bones"],
+            rest["names"], rest["parents"], pose_camera, depth_reference=pose_plan["depth_reference"])
+        pose_checks["body_frame_max_error"] = float(np.max(abs(body["bones"]-pose_plan["body_bones"])))
+        (output/"pose-safety.json").write_text(json.dumps(pose_checks, indent=2))
+        if (pose_checks["exported_body"]["status"] != "pose_validated"
+                or np.max(abs(body["bones"]-pose_plan["body_bones"])) > 1e-5):
+            raise ValueError("exported_body_pose_mismatch")
     witness = compose_lbs_witness(witness, faces=original_faces, vertex_weights=rest["weights"],
         bone_world_transforms=body["bones"] @ np.linalg.inv(rest["bones"]),
         stage="body", stage_input_sha256=derived_sha)
@@ -191,6 +320,22 @@ def main():
     hand_report = bake_hands(final, hands)
     actual = snapshot(final)
     same_rig(body, actual)
+    if pose_plan is not None:
+        pose_checks["final_rig_error"] = float(np.max(abs(actual["bones"]-pose_plan["hand_bones"])))
+        if pose_checks["final_rig_error"] > 1e-5:
+            raise ValueError("final_hand_pose_mismatch")
+        # Hand library already bounds finger curl/splay and preserves body.
+        # Verify the actual final body a second time, keeping fingers at the
+        # pre-hand reference so library articulation is not counted as body IK.
+        body_only = actual["bones"].copy()
+        for i,n in enumerate(rest["names"]):
+            if "Hand" in n and n.split(":")[-1] not in {"LeftHand", "RightHand"}:
+                body_only[i] = body["bones"][i]
+        pose_checks["final_body"] = audit_pose(pose_plan["base_bones"], body_only,
+            rest["names"], rest["parents"], pose_camera, depth_reference=pose_plan["depth_reference"])
+        (output/"pose-safety.json").write_text(json.dumps(pose_checks, indent=2))
+        if pose_checks["final_body"]["status"] != "pose_validated":
+            raise ValueError("final_pose_angle_or_depth_rejected")
     witness = compose_lbs_witness(witness, faces=original_faces, vertex_weights=body["weights"],
         bone_world_transforms=actual["bones"] @ np.linalg.inv(body["bones"]),
         stage="hands", stage_input_sha256=sha(body_path))
@@ -208,7 +353,7 @@ def main():
         "original_asset_sha256": original_asset_sha, "native_neutral_sha256": sha(native_neutral),
         "derived_neutral_sha256": derived_sha, "source_sha256": source_sha,
         "neutral_qa_source": a.neutral_source, "source_template_sha256": sha(a.source_bvh),
-        "original_neutral_audit": baseline_audit, "repair": repair,
+        "original_neutral_audit": baseline_audit, "repair": repair, "skin_plan": skin_plan, "pose_safety": pose_checks,
         "stages": stages, "hands": hand_report, "mesh_audit": audit, "artifact_integrity": integrity,
         "receipt": asdict(receipt), "receipt_sha256": receipt.digest, "artifact_sha256": sha(final),
         "artifact_size": final.stat().st_size, "safe_final_snapshot_count": 1,

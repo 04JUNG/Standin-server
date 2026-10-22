@@ -4,6 +4,16 @@ Status: implemented internal contracts and default-off diagnostic. No production
 profile/mesh policy is certified or activated. Existing Converter endpoints,
 automatic flow, five output scopes and independent preview remain unchanged.
 
+2026-10-23: one actual non-neutral rough + derived female BASE + support/relaxed
+hands now passes full-body final-FBX validation. The offline application command
+also reproduced the result. See [actual application, measurements and scope](../docs/REFINE_ACTUAL_ROUGH_APPLIED_2026-10-23.md).
+This does not activate a production profile or promote regional observation authority.
+
+The offline `--depth-safe` path now fits the actual target rig under fixed-camera
+depth-order, hinge, relative angle/twist and whole-mesh guards. An actual final
+FBX passes all gates; visual depth improvement remains unconfirmed by Gemini.
+See [depth and joint safety evidence](../docs/REFINE_DEPTH_SAFETY_2026-10-23.md).
+
 Follow-up: one exact offline derived female BASE + both open hands + neutral QA
 source passes actual full-body final-FBX v2 validation and immutable receipt.
 See [root causes, fixes, exact evidence and limits](../docs/REFINE_V3_MESH_SAFETY_FIX_2026-10-22.md).
