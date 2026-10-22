@@ -2,7 +2,7 @@ from dataclasses import FrozenInstanceError, replace
 import hashlib
 import pytest
 from src.target_profile import (TargetProfile, EquivalenceReceipt, TargetEvaluation,
-    CertifiedTargetRegistry, TARGET_REGISTRY, certified_adapter)
+    CertifiedTargetRegistry, TARGET_REGISTRY, certified_adapter, evaluate_certified_adapter)
 
 SHA = "a"*64
 SOURCE = hashlib.sha256(b"pose").hexdigest()
@@ -82,3 +82,45 @@ def test_snapshot_adapter_exact_cache_content_and_unknown_rotations_abstain():
         SnapshotTargetAdapter(adapter.profile, adapter.receipt, (wrong,))
     with pytest.raises(ValueError, match="immutable"):
         replace(evaluation, patches=[])
+
+
+def test_direct_solver_evaluation_checks_exact_serialized_source_before_call():
+    adapter = Adapter()
+    expected = adapter.evaluate("pose")
+    calls = []
+    adapter.evaluate = lambda text: calls.append(text) or expected
+    assert evaluate_certified_adapter(adapter, adapter.profile.digest, "pose") == expected
+    for probe in ("pose\n", "pose with finite-difference rotation", "pose with changed translation"):
+        with pytest.raises(ValueError, match="unsupported"):
+            evaluate_certified_adapter(adapter, adapter.profile.digest, probe)
+    assert calls == ["pose"]
+    with pytest.raises(ValueError, match="unsupported"):
+        evaluate_certified_adapter(adapter, SHA, "pose")
+    with pytest.raises(ValueError, match="unsupported"):
+        evaluate_certified_adapter(None, adapter.profile.digest, "pose")
+
+
+@pytest.mark.parametrize("change", [
+    {"profile_sha256": SHA},
+    {"source_sha256": SHA},
+    {"coco17": tuple((1., 2., 3.) for _ in range(17))},
+    {"patches": (("palm", (0., 0., 0.), (0., 0., 1.)),)},
+])
+def test_direct_solver_evaluation_rejects_identity_or_content_mismatch(change):
+    adapter = Adapter()
+    expected = adapter.evaluate("pose")
+    returned = replace(expected, **change)
+    adapter.evaluate = lambda text: returned
+    with pytest.raises(ValueError, match="identity"):
+        evaluate_certified_adapter(adapter, adapter.profile.digest, "pose")
+
+
+def test_direct_solver_evaluation_rejects_certificate_swapped_during_call():
+    adapter = Adapter()
+    expected = adapter.evaluate("pose")
+    def swap(text):
+        adapter.receipt = replace(adapter.receipt, evidence_sha256="b"*64)
+        return expected
+    adapter.evaluate = swap
+    with pytest.raises(ValueError, match="identity"):
+        evaluate_certified_adapter(adapter, adapter.profile.digest, "pose")

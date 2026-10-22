@@ -153,6 +153,32 @@ def certified_adapter(adapter: TargetAdapter | None, profile_sha256: str,
         return False
 
 
+def evaluate_certified_adapter(adapter: TargetAdapter | None, profile_sha256: str,
+                               source_text: str) -> TargetEvaluation:
+    """Validate direct solver evaluations against the exact serialized BVH.
+
+    Certification of a baseline never authorizes an unseen finite-difference
+    probe or solver candidate. Identity and coordinate/patch content are checked
+    after evaluation as well, so bypassing the registry grants no authority.
+    """
+    if not isinstance(source_text, str):
+        raise ValueError("target_profile_unsupported")
+    source_sha256 = hashlib.sha256(source_text.encode("utf-8")).hexdigest()
+    if not certified_adapter(adapter, profile_sha256, source_sha256):
+        raise ValueError("target_profile_unsupported")
+    receipt = adapter.receipt
+    result = adapter.evaluate(source_text)
+    if (not certified_adapter(adapter, profile_sha256, source_sha256)
+            or adapter.receipt != receipt
+            or not isinstance(result, TargetEvaluation)
+            or result.profile_sha256 != profile_sha256
+            or result.source_sha256 != source_sha256
+            or result.digest != dict(receipt.evaluation_sha256s).get(source_sha256)
+            or (result.patches and not receipt.patch_verified)):
+        raise ValueError("target_evaluation_identity_mismatch")
+    return result
+
+
 class CertifiedTargetRegistry:
     """Server-owned adapters only; no client supplied certification flags."""
     def __init__(self):
@@ -175,17 +201,8 @@ class CertifiedTargetRegistry:
         return adapter if certified_adapter(adapter, profile_sha256, source_sha256) else None
 
     def evaluate(self, profile_sha256: str, source_text: str) -> TargetEvaluation:
-        source_sha256 = hashlib.sha256(source_text.encode()).hexdigest()
-        adapter = self.resolve(profile_sha256, source_sha256)
-        if adapter is None:
-            raise ValueError("target_profile_unsupported")
-        result = adapter.evaluate(source_text)
-        if (not isinstance(result, TargetEvaluation) or result.profile_sha256 != profile_sha256
-                or result.source_sha256 != source_sha256
-                or result.digest != dict(adapter.receipt.evaluation_sha256s).get(source_sha256)
-                or (result.patches and not adapter.receipt.patch_verified)):
-            raise ValueError("target_evaluation_identity_mismatch")
-        return result
+        return evaluate_certified_adapter(self._adapters.get(profile_sha256),
+                                          profile_sha256, source_text)
 
 
 TARGET_REGISTRY = CertifiedTargetRegistry()
