@@ -314,3 +314,17 @@ def test_target_meters_and_source_centimeters_use_independent_perspective(tmp_pa
         target_adapter=MeterAdapter(), target_profile_sha256="test")
     assert result.refined and result.reason == "target_geometry_improved", result.to_dict()
     assert result.mesh_status == "mesh_unverified"
+
+
+def test_output_hardlink_cannot_mutate_selected_source(tmp_path):
+    import os
+    source, kwargs = _inputs(tmp_path, missing=(8,10,11,12,13,14,15,16))
+    binding = build_regional_binding(**kwargs, enabled=True).binding
+    original = Path(source).read_bytes()
+    output = tmp_path / "linked-output.bvh"
+    os.link(source, output)
+    result = refine_regional_bvh(source, kwargs["keypoints"], binding,
+        kwargs["provenance"], kwargs["ownership"], enabled=True, out_path=output)
+    assert result.refined, result.to_dict()
+    assert Path(source).read_bytes() == original
+    assert output.read_bytes() != original

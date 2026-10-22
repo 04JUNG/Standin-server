@@ -151,8 +151,21 @@ def refine_regional_bvh(source_path, keypoints, binding, provenance, ownership, 
         result.result_bvh_sha256 = hashlib.sha256(payload).hexdigest()
         result.diagnostics["elapsed_ms"] = (time.monotonic() - started) * 1000
         if out_path is not None:
-            Path(out_path).parent.mkdir(parents=True, exist_ok=True)
-            Path(out_path).write_bytes(payload)
+            destination = Path(out_path)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            # Atomic replacement also breaks a pre-existing hard link to B0;
+            # opening that link for writes would mutate the selected source.
+            temporary = None
+            try:
+                with tempfile.NamedTemporaryFile(dir=destination.parent,
+                        prefix=".refine-v3-", delete=False) as handle:
+                    temporary = handle.name
+                    handle.write(payload)
+                os.replace(temporary, destination)
+                temporary = None
+            finally:
+                if temporary is not None:
+                    os.unlink(temporary)
             result.bvh_path = str(out_path)
         else:
             result.bvh_path = str(source_path) if not refined else None
