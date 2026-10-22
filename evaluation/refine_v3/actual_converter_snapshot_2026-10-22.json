@@ -1,0 +1,251 @@
+{
+  "schema": "refine-v3-target-qa-v1",
+  "target_profile": {
+    "profile_id": "male-base-v0-7-2",
+    "character_sha256": "3f4ad797317595ca5a6901e3a89937cc7dd2f6d457faf390000b1b30dc4f08b5",
+    "shape_sha256": "685652b658d31ddd39a3f9ecb72d953bf60c1b740353c9bb867dbfd9925e157e",
+    "rig_sha256": "6f7a8ef06b07c2584206c4be72fb1c726a4a430521809e28fb8b9d4f99514924",
+    "rest_sha256": "3ee1c86ed3888984eac6a617e12d4c43ec0d4bf8fa55601ccd3c8519f357323b",
+    "bone_map_sha256": "50fafaafe4350da4b8916a8cdace028ab5fd91f45dd49fa7afb6b2337e642af7",
+    "hand_sha256": "29e22526dab64bf43e026d52abec1cc12982a5a9bddded6a5f01553d78d9a5e3",
+    "retarget_sha256": "2fca3bd577445989c178aa4ca33e772c595ad2aeb6083f817a3824c93508a579",
+    "converter_manifest_sha256": "52eae0b0eb6a7023540fdf023ad4321f24c11d439f3ecf9f390b5b72358b24e3",
+    "controller_sha256": "51baa18d05bb1cf4a4268886486f62d6ad16e538dfe234ab75feab4e32d745b9",
+    "revision": "offline-snapshot-1",
+    "hand_revision": "offline-hands-1",
+    "adapter_version": "converter-reference-only-v1",
+    "converter_version": "chain-transport-v3.2.5",
+    "blender_build_hash": "fbe6228777e7",
+    "units": "meters",
+    "coordinates": "right-handed-z-up",
+    "output_mode": "rigged_rest"
+  },
+  "profile_sha256": "0a8fffd0b5855020570b4c42469c3329d05e36b33c24a01b156c678444714575",
+  "source_sha256": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+  "artifact_sha256": "16b386e5a7c831c2c7a6f31f48b6a8b0bf2b2b65899fe269681476747860e6b9",
+  "blender_build_hash": "fbe6228777e7",
+  "joints_world_m": {
+    "hips": [
+      8.940696716308594e-08,
+      0.009948235005140305,
+      1.0130765438079834
+    ],
+    "spine": [
+      -0.021627608686685562,
+      0.025618616491556168,
+      1.100784420967102
+    ],
+    "spine1": [
+      -0.021663472056388855,
+      0.06347601115703583,
+      1.2008261680603027
+    ],
+    "spine2": [
+      -0.02551473304629326,
+      0.10535770654678345,
+      1.3156089782714844
+    ],
+    "neck": [
+      -0.05293310433626175,
+      0.1364014595746994,
+      1.4467504024505615
+    ],
+    "head": [
+      -0.059306755661964417,
+      0.18063780665397644,
+      1.5304396152496338
+    ],
+    "shoulder.L": [
+      -0.09813189506530762,
+      0.15313276648521423,
+      1.4147733449935913
+    ],
+    "upperarm.L": [
+      -0.18834713101387024,
+      0.18660518527030945,
+      1.3512858152389526
+    ],
+    "forearm.L": [
+      -0.07023092359304428,
+      0.2331441342830658,
+      1.0917575359344482
+    ],
+    "hand.L": [
+      -0.021537115797400475,
+      0.4699227511882782,
+      1.145792841911316
+    ],
+    "shoulder.R": [
+      -0.0020745424553751945,
+      0.10889194905757904,
+      1.445317029953003
+    ],
+    "upperarm.R": [
+      0.09932839870452881,
+      0.054112400859594345,
+      1.442759394645691
+    ],
+    "forearm.R": [
+      0.3156566321849823,
+      0.20460470020771027,
+      1.5611850023269653
+    ],
+    "hand.R": [
+      0.15044791996479034,
+      0.3660251796245575,
+      1.6506513357162476
+    ],
+    "upleg.L": [
+      -0.04678952321410179,
+      0.04108181968331337,
+      0.9429711699485779
+    ],
+    "leg.L": [
+      -0.021995909512043,
+      0.46876347064971924,
+      0.8079733848571777
+    ],
+    "foot.L": [
+      -0.09294020384550095,
+      0.42801880836486816,
+      0.4023597836494446
+    ],
+    "toe.L": [
+      -0.06191138178110123,
+      0.559884250164032,
+      0.3212321102619171
+    ],
+    "upleg.R": [
+      0.06594084948301315,
+      -0.04489796608686447,
+      0.9863420128822327
+    ],
+    "leg.R": [
+      0.20550060272216797,
+      -0.2007390409708023,
+      0.5890077948570251
+    ],
+    "foot.R": [
+      0.030566692352294922,
+      -0.49458548426628113,
+      0.35616162419319153
+    ],
+    "toe.R": [
+      0.1816091686487198,
+      -0.49411046504974365,
+      0.31768926978111267
+    ]
+  },
+  "coordinate_frame": "right-handed-z-up",
+  "roundtrip_joint_error_m": 4.0676093186504025e-07,
+  "roundtrip_vertex_error_m": 7.028863677424643e-07,
+  "roundtrip_topology_match": true,
+  "artifact_integrity": {
+    "version": "final-fbx-v1",
+    "artifact_sha256": "16b386e5a7c831c2c7a6f31f48b6a8b0bf2b2b65899fe269681476747860e6b9",
+    "scope": "full",
+    "bones": 52,
+    "meshes": 1,
+    "vertices": 24988,
+    "polygons": 50000,
+    "skin_verified": true
+  },
+  "mesh_audit": {
+    "version": "full-body-posed-skin-v1",
+    "status": "validation_blocked",
+    "full_body": true,
+    "hard_violations": [
+      "skin_triangle_intersection"
+    ],
+    "unverified_reasons": [
+      "mesh_policy_unsupported",
+      "fold_reference_unavailable",
+      "validation_deadline"
+    ],
+    "triangle_pairs_checked": 14075,
+    "triangle_intersections": [
+      [
+        40991,
+        42722
+      ],
+      [
+        40991,
+        42723
+      ],
+      [
+        40991,
+        42773
+      ],
+      [
+        40991,
+        42721
+      ],
+      [
+        40991,
+        42771
+      ],
+      [
+        40991,
+        42772
+      ],
+      [
+        40992,
+        42722
+      ],
+      [
+        40992,
+        42723
+      ],
+      [
+        42748,
+        42773
+      ],
+      [
+        42749,
+        42773
+      ],
+      [
+        42749,
+        42947
+      ],
+      [
+        42722,
+        40994
+      ],
+      [
+        42723,
+        40994
+      ],
+      [
+        40994,
+        42773
+      ],
+      [
+        40994,
+        42771
+      ],
+      [
+        28550,
+        42774
+      ]
+    ],
+    "contained_components": [],
+    "folded_faces": [],
+    "complete_collision_certificate": false,
+    "topology_sha256": "c538e0c65c2bda575ee073c8e728bac892b6909d5b85bdd44b4c4a1889ab303a",
+    "vertices": 24988,
+    "triangles": 50000,
+    "profile_sha256": null,
+    "mesh_policy_version": null,
+    "mesh_policy_sha256": null,
+    "closed_manifold": true,
+    "consistently_oriented": true,
+    "components": 1,
+    "elapsed_sec": 3.0001312498934567,
+    "full_body_artifact_sha256": "16b386e5a7c831c2c7a6f31f48b6a8b0bf2b2b65899fe269681476747860e6b9"
+  },
+  "shape_applied": true,
+  "hand_applied_bones": 30,
+  "fast_fk_equivalence_certified": false,
+  "production_supported": false
+}
