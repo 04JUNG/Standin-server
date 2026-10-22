@@ -17,6 +17,7 @@ import sys
 sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+_RUN_OUTPUT = None
 
 
 def sha(path):
@@ -63,6 +64,7 @@ def same_rig(before, after, *, require_rest=False):
 
 
 def main():
+    global _RUN_OUTPUT
     import bpy
     import numpy as np
     from mathutils import Vector
@@ -94,6 +96,7 @@ def main():
     lineage = _frozen_lineage()
     output = Path(a.output_dir).resolve()
     output.mkdir(parents=True, exist_ok=False)
+    _RUN_OUTPUT = output
     character = Path(a.character).resolve()
     original_asset_sha = sha(character)
     import os
@@ -216,4 +219,26 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as error:
+        # Failed actual rough poses need reviewable evidence too. Never issue a
+        # receipt, turn an exception into success, or overwrite a prior run.
+        if _RUN_OUTPUT is not None:
+            stage_file = _RUN_OUTPUT/"stages.json"
+            stages = json.loads(stage_file.read_text()) if stage_file.exists() else []
+            hard = str(error) in {"discrete_shell_orientation_reversed",
+                                  "discrete_shell_area_collapse", "nonpositive_skin_determinant"}
+            status = "validation_blocked" if hard else "mesh_unverified"
+            if stages and stages[-1]["mesh_audit"]["status"] != "mesh_validated":
+                status = stages[-1]["mesh_audit"]["status"]
+            failure = {"schema": "finite-actual-fbx-safety-failure-v1", "status": status,
+                "reason": str(error), "error_type": type(error).__name__,
+                "last_validated_stage": next((row["stage"] for row in reversed(stages)
+                    if row["mesh_audit"]["status"] == "mesh_validated"), None),
+                "artifacts": {name: sha(_RUN_OUTPUT/name) for name in
+                    ("source.bvh", "native-neutral/model.fbx", "derived-neutral.fbx", "body.fbx", "final.fbx")
+                    if (_RUN_OUTPUT/name).is_file()},
+                "final_receipt_issued": False, "production_registered": False, "deployed": False}
+            (_RUN_OUTPUT/"qa-failure.json").write_text(json.dumps(failure, indent=2))
+        raise

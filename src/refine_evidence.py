@@ -12,7 +12,7 @@ import json
 import os
 
 VERSION = "refine-evidence-v1"
-SCHEMA_VERSION = "refine-evidence-schema-v1"
+SCHEMA_VERSION = "refine-evidence-schema-v2"
 MAX_PEOPLE = 20
 MAX_BYTES = 96_000
 LIMITS = {"visibility": 16, "relations": 8, "contacts": 6, "preserve": 8}
@@ -24,6 +24,8 @@ CONFIDENCE = {"high", "low", "unknown"}
 EVIDENCE = {"direct_visible", "inferred", "unknown"}
 SIDES = {"certain", "ambiguous", "unknown"}
 SCOPES = {"full", "half", "bust", "shoulder_head", "head", "unknown"}
+CONTACT_EFFECTORS = {"left_palm", "right_palm", "left_hand_back", "right_hand_back",
+                     "left_sole", "right_sole", "left_knee", "right_knee", "pelvis"}
 
 
 def enabled():
@@ -126,8 +128,7 @@ def _entry(item, group, scope, ids):
     if group == "contacts":
         if type(item["chain_visible"]) is not bool:
             return None
-        if item["effector_region"] not in {"left_palm", "right_palm", "left_hand_back", "right_hand_back",
-                                           "left_sole", "right_sole", "left_knee", "right_knee", "pelvis"}:
+        if item["effector_region"] not in CONTACT_EFFECTORS:
             return None
         target, ref = item["target"], item["target_ref"]
         if target == "self_region" and (not isinstance(ref, str) or not _valid_region(ref, scope)):
@@ -282,7 +283,7 @@ def evidence_schema(kind="observations"):
                                          "frame": enum({"image", "camera_depth", "anatomical"}), "side_certainty": enum(SIDES), **common}), 8),
                       preserve=arr({"type": "string", "maxLength": 4}, 8))
     else:
-        person["contacts"] = arr(obj({"effector_region": enum(REGIONS), "target": enum({"self_region", "ground", "external_object", "other_person", "unknown"}),
+        person["contacts"] = arr(obj({"effector_region": enum(CONTACT_EFFECTORS), "target": enum({"self_region", "ground", "external_object", "other_person", "unknown"}),
                                        "target_ref": {"type": ["string", "integer", "null"], "maxLength": 32},
                                        "kind": enum({"touching", "grasping", "supporting", "unknown"}), "side_certainty": enum(SIDES),
                                        "chain_visible": {"type": "boolean"}, **common}), 6)
@@ -292,8 +293,24 @@ def evidence_schema(kind="observations"):
 def extend_analysis_schema(schema):
     from copy import deepcopy
     schema = deepcopy(schema)
-    schema["properties"]["refine_observations"] = evidence_schema()
+    schema["properties"]["refine_observations"] = provider_evidence_schema(evidence_schema())
     return schema
+
+
+def provider_evidence_schema(value):
+    """Keep Gemini's decoding grammar small; admission stays in the strict parser.
+
+    The combined bounded evidence grammar rejected actual Gemini requests with
+    400 INVALID_ARGUMENT. Only the optional evidence transport grammar omits
+    decoding bounds. MAX_BYTES/MAX_PEOPLE/LIMITS, exact IDs/scopes,
+    enum/field validation and diagnostic-only authority are unchanged.
+    """
+    if isinstance(value, dict):
+        return {key: provider_evidence_schema(item) for key, item in value.items()
+                if key not in {"minItems", "maxItems", "minimum", "maximum", "minLength", "maxLength"}}
+    if isinstance(value, list):
+        return [provider_evidence_schema(item) for item in value]
+    return value
 
 
 def hand_response_schema():
@@ -305,7 +322,8 @@ def hand_response_schema():
         "people": {"type": "array", "maxItems": MAX_PEOPLE, "items": {
             "type": "object", "properties": {"left": hand, "right": hand},
             "required": ["left", "right"], "additionalProperties": False}},
-        "refine_contacts": evidence_schema("contacts")}, "required": ["people"], "additionalProperties": False}
+        "refine_contacts": provider_evidence_schema(evidence_schema("contacts"))},
+        "required": ["people"], "additionalProperties": False}
 
 
 def evidence_bundle_from_serializable(payload):

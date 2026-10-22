@@ -225,6 +225,49 @@ def test_provider_schema_is_optional_bounded_and_does_not_mutate_core():
     assert hand_response_schema()["required"] == ["people"]
 
 
+def test_gemini_transport_avoids_nested_bounds_without_changing_core_contract():
+    from src.experimental.body_matching.integrated import response_schema
+    core = response_schema()
+    before = deepcopy(core)
+    wire = extend_analysis_schema(core)
+    assert core == before
+    assert {k:v for k,v in wire["properties"].items() if k != "refine_observations"} == core["properties"]
+    assert wire["required"] == core["required"]
+    def keys(value):
+        if isinstance(value, dict):
+            return set(value).union(*(keys(v) for v in value.values()))
+        if isinstance(value, list):
+            return set().union(*(keys(v) for v in value))
+        return set()
+    unsupported = {"maxItems", "minItems", "minimum", "maximum", "maxLength", "minLength"}
+    for field in (wire["properties"]["refine_observations"], hand_response_schema()["properties"]["refine_contacts"]):
+        assert not keys(field) & unsupported
+        assert {"enum", "required", "additionalProperties"} <= keys(field)
+
+
+def test_compact_provider_grammar_does_not_expand_runtime_admission():
+    from src.refine_evidence import MAX_BYTES, MAX_PEOPLE, LIMITS
+    too_many = observations(tuple(range(MAX_PEOPLE+1)))
+    assert parse_refine_evidence(too_many, expected_person_ids=tuple(range(MAX_PEOPLE+1))).status == "unavailable"
+    oversized = observations(visibility=[visibility()]*(LIMITS["visibility"]+1))
+    parsed = parse_refine_evidence(oversized, expected_person_ids=(0,))
+    assert parsed.status == "partial" and not parsed.people[0].visibility
+    assert parsed.people[0].disposition == "diagnostic_only"
+    oversized = observations(untrusted="x"*MAX_BYTES)
+    assert parse_refine_evidence(oversized, expected_person_ids=(0,)).reasons == ("evidence_size_limit",)
+
+
+def test_contact_schema_only_offers_effectors_the_strict_parser_admits():
+    schema = evidence_schema("contacts")
+    offered = schema["properties"]["people"]["items"]["properties"]["contacts"]["items"]["properties"]["effector_region"]["enum"]
+    for effector in offered:
+        raw = {"people": [{"person_id": 0, "body_scope": "full", "contacts": [contact(effector_region=effector)]}]}
+        assert parse_refine_evidence(raw, expected_person_ids=(0,), kind="contacts").status == "valid"
+    assert "right_hand" not in offered and "left_foot" not in offered
+    raw = {"people": [{"person_id": 0, "body_scope": "full", "contacts": [contact(effector_region="right_hand")]}]}
+    assert parse_refine_evidence(raw, expected_person_ids=(0,), kind="contacts").status == "partial"
+
+
 def test_stored_evidence_checksum_and_binding_revalidation():
     stored = parse_refine_evidence(observations(), expected_person_ids=(0,)).to_serializable()
     bound = bind_evidence_to_slots(stored, {0: 7}, provenance={"image_digest": "sha", "crop_transform": "full", "slot_map_version": "v1"})

@@ -1,5 +1,11 @@
 # Refine v3 implementation and verification — 2026-10-22
 
+Actual rough follow-up: [live Gemini + Human-Art + strict FBX pilot](REFINE_V3_LIVE_GEMINI_ROUGH_2026-10-22.md)
+records 3 real roughs, 6 corrected-pilot runs, 28 provider requests (49 including
+diagnosis/rechecks), two provider-schema fixes, and **zero newly certified actual
+rough FBXs**. Both selected B0 and F25 from the qualified rough fail the same
+strict shell-direction test. V3 regional authority remains unverified.
+
 Current follow-up: **one exact offline female BASE derived asset, both open hands,
 and neutral QA source** passes actual final-FBX mesh v2 safety and strict receipt.
 Production profiles remain zero. [Root causes, fixes, positive/negative evidence
