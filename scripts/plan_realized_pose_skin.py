@@ -24,7 +24,11 @@ def main():
     bm,bc,_=_skin_maps(w,pose['body_bones']@np.linalg.inv(x['bones']),len(n),'lbs')
     hm,hc,_=_skin_maps(w,pose['hand_bones']@np.linalg.inv(pose['body_bones']),len(n),'lbs')
     bd=np.einsum('fvij,fj->fvi',bc[f],normal);hd=np.einsum('fvij,fvj->fvi',hc[f],bd)
-    rest,report=correct_rest_surface(n,x['rest'],f,[('body',bm,bd),('hands',hm@bm,hd)])
+    try:
+        rest,report=correct_rest_surface(n,x['rest'],f,[('body',bm,bd),('hands',hm@bm,hd)])
+    except ValueError as error:
+        (a.output_dir/'rejected-plan.json').write_text(json.dumps(dict(reason=str(error),details=getattr(error,'report',None)),indent=2))
+        raise
     skin['corrected_rest']=rest;np.savez(a.output_dir/'skin-plan.npz',**skin)
     pose['skin_plan_sha256']=hashlib.sha256((a.output_dir/'skin-plan.npz').read_bytes()).hexdigest()
     np.savez(a.output_dir/'pose-plan.npz',**pose)
