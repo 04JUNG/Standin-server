@@ -90,12 +90,17 @@ class Skeleton:
     """한 인물의 2D 스켈레톤. keypoints: (17,2), scores: (17,)."""
     keypoints: np.ndarray
     scores: np.ndarray
+    # Immutable snapshots, separate from mutable model coordinates.
+    joint_provenance: Optional[tuple] = None
 
     def to_serializable(self) -> dict:
-        return {
+        result = {
             "keypoints": np.asarray(self.keypoints).tolist(),
             "scores": np.asarray(self.scores).tolist(),
         }
+        if self.joint_provenance is not None:
+            result["joint_provenance"] = [item.to_serializable() for item in self.joint_provenance]
+        return result
 
 
 @dataclass
@@ -133,6 +138,8 @@ class VLMAnalysis:
     # 바꾼다. 이 칸은 provider가 실제로 말한 값만 담고, 어휘 밖이거나 없으면 None이다.
     # 칸 전체가 None이면 추적하지 않은 분석이다(테스트가 직접 만든 VLMAnalysis 등).
     stated_tags: Optional[dict] = None
+    # Optional semantic sidecar. Never modifies core control fields or coordinates.
+    refine_evidence: Optional[dict] = None
 
 
 @dataclass
@@ -173,6 +180,7 @@ class PersonDescriptor:
     hands: Optional["PersonHands"] = None
     # Metadata only: never used as a pose query or refine input.
     body_classification: Optional[dict] = None
+    refine_evidence: Optional[dict] = None
 
     def tag_dict(self) -> dict:
         return {

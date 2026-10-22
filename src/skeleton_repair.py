@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import copy
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from time import perf_counter
 from typing import Optional
 
@@ -24,6 +24,7 @@ import numpy as np
 
 from .config import CFG
 from .schema import COCO17, Skeleton
+from .joint_provenance import initialize_joint_provenance, record_joint_update
 from .skeleton_extraction import finalize_slot
 
 REPAIR_SOURCE = "vlm_repair"
@@ -134,6 +135,8 @@ def _skeleton_from(person, old: Optional[Skeleton], img_w, img_h, repaired_score
            else np.zeros((17, 2)))
     scores = (np.asarray(old.scores, float).reshape(17).copy() if old is not None
               else np.zeros(17))
+    before = old if old is not None else Skeleton(pts.copy(), scores.copy())
+    lineage = initialize_joint_provenance(before, source="unknown")
     changed = []
     for j, joint in enumerate(person["keypoints"]):
         if "score" in joint and old is not None:
@@ -146,7 +149,17 @@ def _skeleton_from(person, old: Optional[Skeleton], img_w, img_h, repaired_score
         pts[j] = (joint["x"] / 1000.0 * img_w, joint["y"] / 1000.0 * img_h)
         scores[j] = repaired_score
         changed.append(COCO17[j])
-    return Skeleton(keypoints=pts.astype(np.float32), scores=scores.astype(np.float32)), changed
+    result = Skeleton(keypoints=pts.astype(np.float32), scores=scores.astype(np.float32))
+    for j, joint in enumerate(person["keypoints"]):
+        if COCO17[j] not in changed:
+            continue
+        state = joint["state"]
+        source = "missing" if state == "not_present" else ("vlm_visible" if state == "visible" else "vlm_estimated")
+        visibility = "absent" if state == "not_present" else ("model_inferred" if state == "visible" else "occluded_estimated")
+        lineage = record_joint_update(lineage, result, source=source, visibility=visibility,
+                                      reason="existing_skeleton_repair:" + state, changed_indices=(j,))
+    result.joint_provenance = lineage
+    return result, changed
 
 
 class SkeletonRepairer:
@@ -258,7 +271,13 @@ class SkeletonRepairer:
     @staticmethod
     def _apply(slot, person, img_w, img_h, repaired_score, cfg, trace, kind):
         before = slot.state
+        if slot.skeleton is not None and slot.skeleton.joint_provenance is None:
+            slot.skeleton.joint_provenance = initialize_joint_provenance(
+                slot.skeleton, source=slot.skeleton_source, person_id=slot.slot_id)
         skeleton, changed = _skeleton_from(person, slot.skeleton, img_w, img_h, repaired_score)
+        if slot.skeleton is None:
+            skeleton.joint_provenance = tuple(replace(record, person_id=slot.slot_id)
+                                              for record in skeleton.joint_provenance)
         if not changed:
             return
         saved = {name: getattr(slot, name) for name in _SLOT_FIELDS}

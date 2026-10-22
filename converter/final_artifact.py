@@ -1,4 +1,9 @@
-"""Final FBX import/skin integrity, independent of any display render."""
+"""Final FBX import/skin integrity, independent of any display render.
+
+``skin_verified`` confirms skin binding and finite geometry only. It never
+certifies absence of penetration, containment, folding or safe joint limits.
+The separate mesh_validation gate is required for refine-v3 certification.
+"""
 import hashlib
 import math
 from pathlib import Path

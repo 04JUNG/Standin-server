@@ -412,6 +412,18 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
         # AFTER hand baking, BEFORE crop/camera/preview. Screening does not
         # export or change the frozen retarget solver or delivered FBX bytes.
         payload['hand_contact_screen'] = screen_artifact(job['output_path'])
+    # Additive diagnostic only. Default off; no production safety authority is
+    # granted to an unsupported profile or to the existing skin-binding receipt.
+    mesh_shadow = os.getenv("CONVERTER_REFINE_V3_MESH_SHADOW", "0") == "1"
+    if ok and mesh_shadow:
+        from converter.mesh_validation import audit_artifact
+        try:
+            payload["refine_v3_mesh_shadow"] = audit_artifact(job["output_path"], seconds=3.0)
+        except Exception as exc:
+            payload["refine_v3_mesh_shadow"] = {
+                "status": "mesh_unverified", "complete_collision_certificate": False,
+                "unverified_reasons": ["skin_evaluation:" + type(exc).__name__],
+            }
     if ok:
         from converter.framing import process_output
         scope = job.get("output_scope", "full")
@@ -451,7 +463,7 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
             )
         payload["artifact_sha256"] = _sha256(output)
         payload["artifact_size"] = output.stat().st_size
-        if not job.get("preview_view") and not job.get("preview_model") and job["thumbnail"] is None:
+        if mesh_shadow or (not job.get("preview_view") and not job.get("preview_model") and job["thumbnail"] is None):
             # PNG/model reimports used to provide this structural check. Retain
             # it when no visual is requested, without rendering or re-exporting.
             from converter.final_artifact import validate

@@ -1,0 +1,2105 @@
+{
+  "schema": "refine-v3-actual-gemini-rough-summary-v1",
+  "independent_quality_labels": false,
+  "accuracy": null,
+  "actual_rough_final_safe_count": 0,
+  "prior_neutral_safe_count": 1,
+  "production_registered": false,
+  "deployed": false,
+  "total_actual_gemini_requests": 49,
+  "initial_diagnostic": {
+    "receipt": {
+      "schema": "refine-v3-live-rough-pilot-v1",
+      "model_requested": "gemini-3.8-flash",
+      "phases": [
+        "off",
+        "evidence_shadow"
+      ],
+      "generation_enabled": false,
+      "scope": "local analyze/refine handlers and serialization; excludes BFF, upload, preview and startup latency",
+      "independent_quality_labels": false,
+      "selected_source_policy": "first selected library pose per detected slot",
+      "images": [
+        {
+          "name": "124629.png",
+          "sha256": "ba92e47ea1600905a81b5973813f5c711087e479898dec0b230ae5716de3ccc6"
+        },
+        {
+          "name": "131040.png",
+          "sha256": "9749eeaee78c4f1f57309458295c06685a217305620400ca315620c7e0094bc7"
+        },
+        {
+          "name": "131224.png",
+          "sha256": "3902eff178ce61b204f080a95c14c8588025913275a53de85a73701068106898"
+        }
+      ],
+      "source_db_sha256": "1f666f5481cb2ae81678cbf350382330bbaaeeb3d969b8df58bac439f9f3cc70",
+      "model_manifest_sha256": "9491a3a256a6e1f0d50e9f99e72cf83a1cf8b0cd1e3df4e7be244a3b5bf647b7",
+      "script_sha256": "2ef29fb004f3535f2197e254f2dc4da0d65c4ff2170765ea7bf23af2842ec8b2",
+      "deployed": false,
+      "production_registered": false,
+      "startup_seconds": 17.42527566710487,
+      "pose_identity": {
+        "model_id": "humanart-m",
+        "build_id": "20260828.codex1-fp32-cpu-raw-simcc",
+        "status": "promoted",
+        "license_review": "approved",
+        "manifest_sha256": "9491a3a256a6e1f0d50e9f99e72cf83a1cf8b0cd1e3df4e7be244a3b5bf647b7",
+        "pose_sha256": "e43171f2917cce6188425f3519d7d663f3e5c3e29ff07ae9f68b84770e012e52",
+        "detector_model_id": "yolox-x-humanart-a39d44ed",
+        "detector_sha256": "8e9ea96a176bd48501eaaa77216e49ee30794d2f8ba80c7b9862beca4ea972da",
+        "calibration_profile_id": "humanart-m-rtmlib-average-r1-v1",
+        "calibration_profile_sha256": "1c17c428f8da4b8de0de7743aab72f47ae117de1533d9b38fd341ee17c40394f",
+        "input_size_wh": [
+          192,
+          256
+        ],
+        "detector_input_size_wh": [
+          640,
+          640
+        ],
+        "score_decoder": "rtmlib-average-v1",
+        "color_order_to_pose": "RGB",
+        "flip_test": false,
+        "backend": "rtmlib",
+        "adapter": "HumanArtPoseModel",
+        "canary_stage": "canary-100",
+        "calibration_owner": "runtime",
+        "skeleton_kpt_threshold": 0.35,
+        "initialized": true,
+        "detector_session_owner": "humanart-m"
+      },
+      "library_poses": 5795,
+      "startup_ok": true,
+      "completed": true,
+      "cuts": 6,
+      "provider_requests": 18,
+      "original_db_unchanged": true
+    },
+    "request_count": 18,
+    "request_kinds": {
+      "analysis": 6,
+      "person_tags": 3,
+      "describe": 3,
+      "hands": 3,
+      "skeleton_review_repair": 2,
+      "other": 1
+    },
+    "failed_requests": 5,
+    "usage": {
+      "successful_response_prompt_tokens": 44994,
+      "successful_response_candidate_tokens": 3136,
+      "successful_response_total_tokens": 53330,
+      "requests_without_usage": 5,
+      "failed_request_usage": "unknown",
+      "cost_usd": null
+    },
+    "rows": [
+      {
+        "phase": "off",
+        "image": "124629.png",
+        "image_sha256": "ba92e47ea1600905a81b5973813f5c711087e479898dec0b230ae5716de3ccc6",
+        "analyze_seconds": 25.721346167149022,
+        "analyze_error": null,
+        "people": [
+          {
+            "index": 0,
+            "skeleton_source": "full_image",
+            "skeleton_state": "valid",
+            "coverage": "full",
+            "lower_body_observed": true,
+            "structural_refine_allowed": false,
+            "dynamic_status": "error",
+            "dynamic_reason": "hand_skin_screen_unavailable_no_generation",
+            "selected_pose_ids": [],
+            "hand_status": "vlm",
+            "hands": {
+              "left": {
+                "preset": "relaxed",
+                "source": "vlm",
+                "visible": true,
+                "confidence": "low"
+              },
+              "right": {
+                "preset": "relaxed",
+                "source": "vlm",
+                "visible": true,
+                "confidence": "low"
+              }
+            },
+            "evidence_status": null,
+            "observations_status": null,
+            "contacts_status": null,
+            "shadow": null,
+            "hand_screen": {
+              "checks": 1,
+              "elapsed_ms": 0.03,
+              "unverified_count": 6,
+              "rejected_count": 0,
+              "events": [
+                {
+                  "check": 1,
+                  "status": "unavailable",
+                  "reason": "hand_screen_converter_not_configured",
+                  "elapsed_ms": 0.033,
+                  "remaining_before_ms": 45000.0,
+                  "call_budget_ms": 15000.0,
+                  "optional": false
+                }
+              ]
+            }
+          }
+        ],
+        "selected_sources": [],
+        "provider_calls": [
+          {
+            "kind": "analysis",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 6.812232250114903,
+            "error": null
+          },
+          {
+            "kind": "person_tags",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 5.462536082835868,
+            "error": null
+          },
+          {
+            "kind": "describe",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 7.442302209092304,
+            "error": null
+          },
+          {
+            "kind": "hands",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 5.323345792014152,
+            "error": null
+          }
+        ],
+        "usage": {
+          "successful_response_prompt_tokens": 11164,
+          "successful_response_candidate_tokens": 627,
+          "successful_response_total_tokens": 13016,
+          "requests_without_usage": 0,
+          "failed_request_usage": "unknown",
+          "cost_usd": null
+        },
+        "raw_record_sha256": "d2dd859d37ded95a181010ad5beeccd057500cb87804c99f2f4ada773fe8142a"
+      },
+      {
+        "phase": "off",
+        "image": "131040.png",
+        "image_sha256": "9749eeaee78c4f1f57309458295c06685a217305620400ca315620c7e0094bc7",
+        "analyze_seconds": 34.14920812495984,
+        "analyze_error": null,
+        "people": [
+          {
+            "index": 0,
+            "skeleton_source": "full_image",
+            "skeleton_state": "valid",
+            "coverage": "full",
+            "lower_body_observed": true,
+            "structural_refine_allowed": false,
+            "dynamic_status": "blocked",
+            "dynamic_reason": "entangled_set_search_unavailable",
+            "selected_pose_ids": [],
+            "hand_status": "unavailable",
+            "hands": {
+              "left": {
+                "preset": "relaxed",
+                "source": "default",
+                "visible": null,
+                "confidence": null
+              },
+              "right": {
+                "preset": "relaxed",
+                "source": "default",
+                "visible": null,
+                "confidence": null
+              }
+            },
+            "evidence_status": null,
+            "observations_status": null,
+            "contacts_status": null,
+            "shadow": null,
+            "hand_screen": {
+              "checks": 0,
+              "elapsed_ms": null,
+              "unverified_count": 0,
+              "rejected_count": 0,
+              "events": []
+            }
+          },
+          {
+            "index": 1,
+            "skeleton_source": "full_image",
+            "skeleton_state": "valid",
+            "coverage": "full",
+            "lower_body_observed": true,
+            "structural_refine_allowed": false,
+            "dynamic_status": "blocked",
+            "dynamic_reason": "entangled_set_search_unavailable",
+            "selected_pose_ids": [],
+            "hand_status": "unavailable",
+            "hands": {
+              "left": {
+                "preset": "relaxed",
+                "source": "default",
+                "visible": null,
+                "confidence": null
+              },
+              "right": {
+                "preset": "relaxed",
+                "source": "default",
+                "visible": null,
+                "confidence": null
+              }
+            },
+            "evidence_status": null,
+            "observations_status": null,
+            "contacts_status": null,
+            "shadow": null,
+            "hand_screen": {
+              "checks": 0,
+              "elapsed_ms": null,
+              "unverified_count": 0,
+              "rejected_count": 0,
+              "events": []
+            }
+          },
+          {
+            "index": 2,
+            "skeleton_source": "vlm_repair",
+            "skeleton_state": "partial",
+            "coverage": "sparse",
+            "lower_body_observed": false,
+            "structural_refine_allowed": false,
+            "dynamic_status": "blocked",
+            "dynamic_reason": "entangled_set_search_unavailable",
+            "selected_pose_ids": [],
+            "hand_status": "unavailable",
+            "hands": {
+              "left": {
+                "preset": "relaxed",
+                "source": "default",
+                "visible": null,
+                "confidence": null
+              },
+              "right": {
+                "preset": "relaxed",
+                "source": "default",
+                "visible": null,
+                "confidence": null
+              }
+            },
+            "evidence_status": null,
+            "observations_status": null,
+            "contacts_status": null,
+            "shadow": null,
+            "hand_screen": {
+              "checks": 0,
+              "elapsed_ms": null,
+              "unverified_count": 0,
+              "rejected_count": 0,
+              "events": []
+            }
+          }
+        ],
+        "selected_sources": [],
+        "provider_calls": [
+          {
+            "kind": "analysis",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 11.80916670896113,
+            "error": null
+          },
+          {
+            "kind": "person_tags",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 8.072158500086516,
+            "error": null
+          },
+          {
+            "kind": "skeleton_review_repair",
+            "transport": "urllib",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 7.9644442088902,
+            "error": null
+          },
+          {
+            "kind": "hands",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": null,
+            "elapsed_seconds": 14.030623666010797,
+            "error": "ServerError"
+          }
+        ],
+        "usage": {
+          "successful_response_prompt_tokens": 13549,
+          "successful_response_candidate_tokens": 939,
+          "successful_response_total_tokens": 15638,
+          "requests_without_usage": 1,
+          "failed_request_usage": "unknown",
+          "cost_usd": null
+        },
+        "raw_record_sha256": "a7afe6cd3e720297f8ea0c6daca447d8338d84c848c103b6d302a509e823f579"
+      },
+      {
+        "phase": "off",
+        "image": "131224.png",
+        "image_sha256": "3902eff178ce61b204f080a95c14c8588025913275a53de85a73701068106898",
+        "analyze_seconds": 58.22712974995375,
+        "analyze_error": null,
+        "people": [
+          {
+            "index": 0,
+            "skeleton_source": "vlm_repair",
+            "skeleton_state": "valid",
+            "coverage": "full",
+            "lower_body_observed": false,
+            "structural_refine_allowed": false,
+            "dynamic_status": "no_result",
+            "dynamic_reason": "successful_empty_search_generation_separate",
+            "selected_pose_ids": [],
+            "hand_status": "vlm",
+            "hands": {
+              "left": {
+                "preset": "grip",
+                "source": "vlm",
+                "visible": true,
+                "confidence": "high"
+              },
+              "right": {
+                "preset": "cover_mouth",
+                "source": "vlm",
+                "visible": true,
+                "confidence": "high"
+              }
+            },
+            "evidence_status": null,
+            "observations_status": null,
+            "contacts_status": null,
+            "shadow": null,
+            "hand_screen": {
+              "checks": 0,
+              "elapsed_ms": 0.0,
+              "unverified_count": 0,
+              "rejected_count": 0,
+              "events": []
+            }
+          }
+        ],
+        "selected_sources": [],
+        "provider_calls": [
+          {
+            "kind": "analysis",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 5.193030166905373,
+            "error": null
+          },
+          {
+            "kind": "person_tags",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 3.6895156248938292,
+            "error": null
+          },
+          {
+            "kind": "skeleton_review_repair",
+            "transport": "urllib",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 7.402430291986093,
+            "error": null
+          },
+          {
+            "kind": "describe",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": null,
+            "elapsed_seconds": 11.788007917115465,
+            "error": "ServerError"
+          },
+          {
+            "kind": "describe",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 12.644891125150025,
+            "error": null
+          },
+          {
+            "kind": "other",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 13.094413832994178,
+            "error": null
+          },
+          {
+            "kind": "hands",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 7.246517125051469,
+            "error": null
+          }
+        ],
+        "usage": {
+          "successful_response_prompt_tokens": 20281,
+          "successful_response_candidate_tokens": 1570,
+          "successful_response_total_tokens": 24676,
+          "requests_without_usage": 1,
+          "failed_request_usage": "unknown",
+          "cost_usd": null
+        },
+        "raw_record_sha256": "fa9196bca66c5a07b9b1bc6194e345022d725d3ffc209b65e7d3bbc30fc148ba"
+      },
+      {
+        "phase": "evidence_shadow",
+        "image": "124629.png",
+        "image_sha256": "ba92e47ea1600905a81b5973813f5c711087e479898dec0b230ae5716de3ccc6",
+        "analyze_seconds": 2.6620370000600815,
+        "analyze_error": {
+          "type": "ClientError",
+          "status": null,
+          "message": "400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Request contains an invalid argument.', 'status': 'INVALID_ARGUMENT'}}"
+        },
+        "people": [],
+        "selected_sources": [],
+        "provider_calls": [
+          {
+            "kind": "analysis",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": null,
+            "elapsed_seconds": 2.654590249992907,
+            "error": "ClientError"
+          }
+        ],
+        "usage": {
+          "successful_response_prompt_tokens": 0,
+          "successful_response_candidate_tokens": 0,
+          "successful_response_total_tokens": 0,
+          "requests_without_usage": 1,
+          "failed_request_usage": "unknown",
+          "cost_usd": null
+        },
+        "raw_record_sha256": "de7d42ea949021e493b59e53981e9c7045823a062856e1d61ce9da09837380a4"
+      },
+      {
+        "phase": "evidence_shadow",
+        "image": "131040.png",
+        "image_sha256": "9749eeaee78c4f1f57309458295c06685a217305620400ca315620c7e0094bc7",
+        "analyze_seconds": 1.9340959580149502,
+        "analyze_error": {
+          "type": "ClientError",
+          "status": null,
+          "message": "400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Request contains an invalid argument.', 'status': 'INVALID_ARGUMENT'}}"
+        },
+        "people": [],
+        "selected_sources": [],
+        "provider_calls": [
+          {
+            "kind": "analysis",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": null,
+            "elapsed_seconds": 1.9236202498432249,
+            "error": "ClientError"
+          }
+        ],
+        "usage": {
+          "successful_response_prompt_tokens": 0,
+          "successful_response_candidate_tokens": 0,
+          "successful_response_total_tokens": 0,
+          "requests_without_usage": 1,
+          "failed_request_usage": "unknown",
+          "cost_usd": null
+        },
+        "raw_record_sha256": "330d639f43b4e9f1cb249e1f05cb5ff4fe2204e309ba0d4bd57a866ee3f27a24"
+      },
+      {
+        "phase": "evidence_shadow",
+        "image": "131224.png",
+        "image_sha256": "3902eff178ce61b204f080a95c14c8588025913275a53de85a73701068106898",
+        "analyze_seconds": 2.469650333048776,
+        "analyze_error": {
+          "type": "ClientError",
+          "status": null,
+          "message": "400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'Request contains an invalid argument.', 'status': 'INVALID_ARGUMENT'}}"
+        },
+        "people": [],
+        "selected_sources": [],
+        "provider_calls": [
+          {
+            "kind": "analysis",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": null,
+            "elapsed_seconds": 2.4544738749973476,
+            "error": "ClientError"
+          }
+        ],
+        "usage": {
+          "successful_response_prompt_tokens": 0,
+          "successful_response_candidate_tokens": 0,
+          "successful_response_total_tokens": 0,
+          "requests_without_usage": 1,
+          "failed_request_usage": "unknown",
+          "cost_usd": null
+        },
+        "raw_record_sha256": "5893faac503fb496bf464ea343a75d2c13ca0060cfa1e10eeab5679f0135edeb"
+      }
+    ]
+  },
+  "corrected_grammar_pilot": {
+    "receipt": {
+      "schema": "refine-v3-live-rough-pilot-v1",
+      "model_requested": "gemini-3.8-flash",
+      "phases": [
+        "evidence_shadow",
+        "off"
+      ],
+      "generation_enabled": false,
+      "hand_screen_local_converter": true,
+      "hand_screen_character": "female-base-v0-3-4",
+      "scope": "local analyze/refine handlers and serialization; excludes BFF, upload, preview and startup latency",
+      "independent_quality_labels": false,
+      "selected_source_policy": "first selected library pose per detected slot",
+      "images": [
+        {
+          "name": "124629.png",
+          "sha256": "ba92e47ea1600905a81b5973813f5c711087e479898dec0b230ae5716de3ccc6"
+        },
+        {
+          "name": "131040.png",
+          "sha256": "9749eeaee78c4f1f57309458295c06685a217305620400ca315620c7e0094bc7"
+        },
+        {
+          "name": "131224.png",
+          "sha256": "3902eff178ce61b204f080a95c14c8588025913275a53de85a73701068106898"
+        }
+      ],
+      "source_db_sha256": "1f666f5481cb2ae81678cbf350382330bbaaeeb3d969b8df58bac439f9f3cc70",
+      "model_manifest_sha256": "9491a3a256a6e1f0d50e9f99e72cf83a1cf8b0cd1e3df4e7be244a3b5bf647b7",
+      "script_sha256": "1cfac9cfa6e57a9e8d72eda8ea06bec820293248fd476ae56326b91a2c49b72f",
+      "deployed": false,
+      "production_registered": false,
+      "startup_seconds": 18.255037292139605,
+      "pose_identity": {
+        "model_id": "humanart-m",
+        "build_id": "20260828.codex1-fp32-cpu-raw-simcc",
+        "status": "promoted",
+        "license_review": "approved",
+        "manifest_sha256": "9491a3a256a6e1f0d50e9f99e72cf83a1cf8b0cd1e3df4e7be244a3b5bf647b7",
+        "pose_sha256": "e43171f2917cce6188425f3519d7d663f3e5c3e29ff07ae9f68b84770e012e52",
+        "detector_model_id": "yolox-x-humanart-a39d44ed",
+        "detector_sha256": "8e9ea96a176bd48501eaaa77216e49ee30794d2f8ba80c7b9862beca4ea972da",
+        "calibration_profile_id": "humanart-m-rtmlib-average-r1-v1",
+        "calibration_profile_sha256": "1c17c428f8da4b8de0de7743aab72f47ae117de1533d9b38fd341ee17c40394f",
+        "input_size_wh": [
+          192,
+          256
+        ],
+        "detector_input_size_wh": [
+          640,
+          640
+        ],
+        "score_decoder": "rtmlib-average-v1",
+        "color_order_to_pose": "RGB",
+        "flip_test": false,
+        "backend": "rtmlib",
+        "adapter": "HumanArtPoseModel",
+        "canary_stage": "canary-100",
+        "calibration_owner": "runtime",
+        "skeleton_kpt_threshold": 0.35,
+        "initialized": true,
+        "detector_session_owner": "humanart-m"
+      },
+      "library_poses": 5795,
+      "startup_ok": true,
+      "completed": true,
+      "cuts": 6,
+      "provider_requests": 28,
+      "original_db_unchanged": true
+    },
+    "request_count": 28,
+    "request_kinds": {
+      "analysis": 6,
+      "person_tags": 6,
+      "describe": 4,
+      "hands": 6,
+      "skeleton_review_repair": 4,
+      "other": 2
+    },
+    "failed_requests": 3,
+    "usage": {
+      "successful_response_prompt_tokens": 89334,
+      "successful_response_candidate_tokens": 6488,
+      "successful_response_total_tokens": 106102,
+      "requests_without_usage": 3,
+      "failed_request_usage": "unknown",
+      "cost_usd": null
+    },
+    "rows": [
+      {
+        "phase": "evidence_shadow",
+        "image": "124629.png",
+        "image_sha256": "ba92e47ea1600905a81b5973813f5c711087e479898dec0b230ae5716de3ccc6",
+        "analyze_seconds": 76.0627450000029,
+        "analyze_error": null,
+        "people": [
+          {
+            "index": 0,
+            "skeleton_source": "full_image",
+            "skeleton_state": "valid",
+            "coverage": "full",
+            "lower_body_observed": true,
+            "structural_refine_allowed": true,
+            "dynamic_status": "ok",
+            "dynamic_reason": null,
+            "selected_pose_ids": [
+              "rokoko_Interogation_GoodCop_mixamo_00088",
+              "rokoko_FootTapping_mixamo_00040",
+              "rokoko_PlayingSaxophone_mixamo_00539_mirror",
+              "b8_hold_hands_right",
+              "b2_hand_on_hip_talk"
+            ],
+            "hand_status": "vlm",
+            "hands": {
+              "left": {
+                "preset": "relaxed",
+                "source": "vlm",
+                "visible": true,
+                "confidence": "low"
+              },
+              "right": {
+                "preset": "grip",
+                "source": "vlm",
+                "visible": true,
+                "confidence": "low"
+              }
+            },
+            "evidence_status": "partial",
+            "observations_status": null,
+            "contacts_status": "partial",
+            "shadow": {
+              "version": "refine-shadow-v1",
+              "mode": "shadow",
+              "applied": false,
+              "mesh_status": "mesh_unverified",
+              "reason": "shadow_only",
+              "candidate_count": 5,
+              "eligible_count": 0
+            },
+            "hand_screen": {
+              "checks": 5,
+              "elapsed_ms": 40785.23,
+              "unverified_count": 0,
+              "rejected_count": 0,
+              "events": [
+                {
+                  "check": 1,
+                  "status": "clear_screen",
+                  "reason": null,
+                  "elapsed_ms": 8960.08,
+                  "remaining_before_ms": 45000.0,
+                  "call_budget_ms": 15000.0,
+                  "optional": false,
+                  "queue_wait_ms": 0.007,
+                  "execution_ms": 8941.47,
+                  "phase": "execution",
+                  "conversion_id": "aaced5b6-29ca-4d36-9d48-c722cf5bdcdd"
+                },
+                {
+                  "check": 2,
+                  "status": "clear_screen",
+                  "reason": null,
+                  "elapsed_ms": 9743.931,
+                  "remaining_before_ms": 36039.922,
+                  "call_budget_ms": 15000.0,
+                  "optional": false,
+                  "queue_wait_ms": 0.006,
+                  "execution_ms": 9733.874,
+                  "phase": "execution",
+                  "conversion_id": "82e0aef8-8cba-4245-8a6b-b67e3433b068"
+                },
+                {
+                  "check": 3,
+                  "status": "clear_screen",
+                  "reason": null,
+                  "elapsed_ms": 8973.945,
+                  "remaining_before_ms": 26295.992,
+                  "call_budget_ms": 15000.0,
+                  "optional": false,
+                  "queue_wait_ms": 0.006,
+                  "execution_ms": 8963.472,
+                  "phase": "execution",
+                  "conversion_id": "9e22725f-3379-4902-9cff-a48683ef746f"
+                },
+                {
+                  "check": 4,
+                  "status": "clear_screen",
+                  "reason": null,
+                  "elapsed_ms": 5958.998,
+                  "remaining_before_ms": 17322.048,
+                  "call_budget_ms": 15000.0,
+                  "optional": false,
+                  "queue_wait_ms": 0.006,
+                  "execution_ms": 5948.016,
+                  "phase": "execution",
+                  "conversion_id": "efe2b3c9-b56f-471f-9558-2b6589888d90"
+                },
+                {
+                  "check": 5,
+                  "status": "clear_screen",
+                  "reason": null,
+                  "elapsed_ms": 7148.285,
+                  "remaining_before_ms": 11363.051,
+                  "call_budget_ms": 11363.051,
+                  "optional": false,
+                  "queue_wait_ms": 0.006,
+                  "execution_ms": 7138.561,
+                  "phase": "execution",
+                  "conversion_id": "3f9e6bfd-9d00-40ac-8332-d0fd8e264e13"
+                }
+              ]
+            }
+          }
+        ],
+        "selected_sources": [
+          {
+            "person_index": 0,
+            "pose_id": "rokoko_Interogation_GoodCop_mixamo_00088",
+            "source_kind": "f25_refined",
+            "source_bvh_sha256": "c2234a5dc55b0eb595e4ba6aa1b5d817202cfe89e0f8d3e9a77ea83d9b62b763",
+            "delivered_bvh_sha256": "eee645226f1f17adcad7dbe4c198c7896ba111408860a8f6d09cc5132e144169",
+            "refine_called": true,
+            "refined": true,
+            "refine_reason": "ok",
+            "v3_diagnostic": {
+              "version": "refine-shadow-v1",
+              "mode": "shadow",
+              "applied": false,
+              "mesh_status": "mesh_unverified",
+              "reason": "unverified_ownership"
+            }
+          }
+        ],
+        "provider_calls": [
+          {
+            "kind": "analysis",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 10.40577495796606,
+            "error": null
+          },
+          {
+            "kind": "person_tags",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 6.7917724589351565,
+            "error": null
+          },
+          {
+            "kind": "describe",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 5.903596250107512,
+            "error": null
+          },
+          {
+            "kind": "hands",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 11.461753707844764,
+            "error": null
+          }
+        ],
+        "usage": {
+          "successful_response_prompt_tokens": 12978,
+          "successful_response_candidate_tokens": 708,
+          "successful_response_total_tokens": 15918,
+          "requests_without_usage": 0,
+          "failed_request_usage": "unknown",
+          "cost_usd": null
+        },
+        "raw_record_sha256": "0e13dc14a207bbb5d75162acd24dac8778c899fc845db45e6e78c6465a5f605d"
+      },
+      {
+        "phase": "evidence_shadow",
+        "image": "131040.png",
+        "image_sha256": "9749eeaee78c4f1f57309458295c06685a217305620400ca315620c7e0094bc7",
+        "analyze_seconds": 36.613400208065286,
+        "analyze_error": null,
+        "people": [
+          {
+            "index": 0,
+            "skeleton_source": "vlm_repair",
+            "skeleton_state": "valid",
+            "coverage": "full",
+            "lower_body_observed": true,
+            "structural_refine_allowed": false,
+            "dynamic_status": "blocked",
+            "dynamic_reason": "entangled_set_search_unavailable",
+            "selected_pose_ids": [],
+            "hand_status": "unavailable",
+            "hands": {
+              "left": {
+                "preset": "relaxed",
+                "source": "default",
+                "visible": null,
+                "confidence": null
+              },
+              "right": {
+                "preset": "relaxed",
+                "source": "default",
+                "visible": null,
+                "confidence": null
+              }
+            },
+            "evidence_status": "valid",
+            "observations_status": "valid",
+            "contacts_status": null,
+            "shadow": {
+              "version": "refine-shadow-v1",
+              "mode": "shadow",
+              "applied": false,
+              "mesh_status": "mesh_unverified",
+              "reason": "shadow_only",
+              "candidate_count": 0,
+              "eligible_count": 0
+            },
+            "hand_screen": {
+              "checks": 0,
+              "elapsed_ms": null,
+              "unverified_count": 0,
+              "rejected_count": 0,
+              "events": []
+            }
+          },
+          {
+            "index": 1,
+            "skeleton_source": "full_image",
+            "skeleton_state": "valid",
+            "coverage": "full",
+            "lower_body_observed": false,
+            "structural_refine_allowed": false,
+            "dynamic_status": "blocked",
+            "dynamic_reason": "entangled_set_search_unavailable",
+            "selected_pose_ids": [],
+            "hand_status": "unavailable",
+            "hands": {
+              "left": {
+                "preset": "relaxed",
+                "source": "default",
+                "visible": null,
+                "confidence": null
+              },
+              "right": {
+                "preset": "relaxed",
+                "source": "default",
+                "visible": null,
+                "confidence": null
+              }
+            },
+            "evidence_status": "valid",
+            "observations_status": "valid",
+            "contacts_status": null,
+            "shadow": {
+              "version": "refine-shadow-v1",
+              "mode": "shadow",
+              "applied": false,
+              "mesh_status": "mesh_unverified",
+              "reason": "shadow_only",
+              "candidate_count": 0,
+              "eligible_count": 0
+            },
+            "hand_screen": {
+              "checks": 0,
+              "elapsed_ms": null,
+              "unverified_count": 0,
+              "rejected_count": 0,
+              "events": []
+            }
+          },
+          {
+            "index": 2,
+            "skeleton_source": "vlm_repair",
+            "skeleton_state": "partial",
+            "coverage": "sparse",
+            "lower_body_observed": false,
+            "structural_refine_allowed": false,
+            "dynamic_status": "blocked",
+            "dynamic_reason": "entangled_set_search_unavailable",
+            "selected_pose_ids": [],
+            "hand_status": "unavailable",
+            "hands": {
+              "left": {
+                "preset": "relaxed",
+                "source": "default",
+                "visible": null,
+                "confidence": null
+              },
+              "right": {
+                "preset": "relaxed",
+                "source": "default",
+                "visible": null,
+                "confidence": null
+              }
+            },
+            "evidence_status": "valid",
+            "observations_status": "valid",
+            "contacts_status": null,
+            "shadow": {
+              "version": "refine-shadow-v1",
+              "mode": "shadow",
+              "applied": false,
+              "mesh_status": "mesh_unverified",
+              "reason": "shadow_only",
+              "candidate_count": 0,
+              "eligible_count": 0
+            },
+            "hand_screen": {
+              "checks": 0,
+              "elapsed_ms": null,
+              "unverified_count": 0,
+              "rejected_count": 0,
+              "events": []
+            }
+          }
+        ],
+        "selected_sources": [],
+        "provider_calls": [
+          {
+            "kind": "analysis",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 12.392181457951665,
+            "error": null
+          },
+          {
+            "kind": "person_tags",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 7.168628292158246,
+            "error": null
+          },
+          {
+            "kind": "skeleton_review_repair",
+            "transport": "urllib",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 9.581659541931003,
+            "error": null
+          },
+          {
+            "kind": "hands",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": null,
+            "elapsed_seconds": 14.264935499988496,
+            "error": "ServerError"
+          }
+        ],
+        "usage": {
+          "successful_response_prompt_tokens": 14662,
+          "successful_response_candidate_tokens": 1469,
+          "successful_response_total_tokens": 17275,
+          "requests_without_usage": 1,
+          "failed_request_usage": "unknown",
+          "cost_usd": null
+        },
+        "raw_record_sha256": "6c0c1665c3ade1298e37b4d9db90bd8a15019933343166ba134731e7be1baaaf"
+      },
+      {
+        "phase": "evidence_shadow",
+        "image": "131224.png",
+        "image_sha256": "3902eff178ce61b204f080a95c14c8588025913275a53de85a73701068106898",
+        "analyze_seconds": 47.929150958079845,
+        "analyze_error": null,
+        "people": [
+          {
+            "index": 0,
+            "skeleton_source": "vlm_repair",
+            "skeleton_state": "valid",
+            "coverage": "full",
+            "lower_body_observed": false,
+            "structural_refine_allowed": false,
+            "dynamic_status": "no_result",
+            "dynamic_reason": "successful_empty_search_generation_separate",
+            "selected_pose_ids": [],
+            "hand_status": "unavailable",
+            "hands": {
+              "left": {
+                "preset": "relaxed",
+                "source": "default",
+                "visible": null,
+                "confidence": null
+              },
+              "right": {
+                "preset": "relaxed",
+                "source": "default",
+                "visible": null,
+                "confidence": null
+              }
+            },
+            "evidence_status": "valid",
+            "observations_status": "valid",
+            "contacts_status": null,
+            "shadow": {
+              "version": "refine-shadow-v1",
+              "mode": "shadow",
+              "applied": false,
+              "mesh_status": "mesh_unverified",
+              "reason": "shadow_only",
+              "candidate_count": 0,
+              "eligible_count": 0
+            },
+            "hand_screen": {
+              "checks": 0,
+              "elapsed_ms": 0.0,
+              "unverified_count": 0,
+              "rejected_count": 0,
+              "events": []
+            }
+          }
+        ],
+        "selected_sources": [],
+        "provider_calls": [
+          {
+            "kind": "analysis",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 8.31433420907706,
+            "error": null
+          },
+          {
+            "kind": "person_tags",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 5.315458209021017,
+            "error": null
+          },
+          {
+            "kind": "skeleton_review_repair",
+            "transport": "urllib",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 5.333931624889374,
+            "error": null
+          },
+          {
+            "kind": "describe",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 9.515079334145412,
+            "error": null
+          },
+          {
+            "kind": "other",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 9.9338372501079,
+            "error": null
+          },
+          {
+            "kind": "hands",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": null,
+            "elapsed_seconds": 13.988525582943112,
+            "error": "ServerError"
+          }
+        ],
+        "usage": {
+          "successful_response_prompt_tokens": 16698,
+          "successful_response_candidate_tokens": 1455,
+          "successful_response_total_tokens": 19886,
+          "requests_without_usage": 1,
+          "failed_request_usage": "unknown",
+          "cost_usd": null
+        },
+        "raw_record_sha256": "61a203d881ece4e4791ae216efdf5ff2b9dd33e2ecd805f42cbe3ba05928c2ab"
+      },
+      {
+        "phase": "off",
+        "image": "124629.png",
+        "image_sha256": "ba92e47ea1600905a81b5973813f5c711087e479898dec0b230ae5716de3ccc6",
+        "analyze_seconds": 67.40341700008139,
+        "analyze_error": null,
+        "people": [
+          {
+            "index": 0,
+            "skeleton_source": "full_image",
+            "skeleton_state": "valid",
+            "coverage": "full",
+            "lower_body_observed": true,
+            "structural_refine_allowed": true,
+            "dynamic_status": "ok",
+            "dynamic_reason": null,
+            "selected_pose_ids": [
+              "Female Standing Pose_01_legfix_mirror",
+              "rokoko_FootTapping_mixamo_00040",
+              "rokoko_PlayingSaxophone_mixamo_00539_mirror",
+              "b8_hold_hands_right",
+              "rokoko_Interogation_GoodCop_mixamo_00088"
+            ],
+            "hand_status": "vlm",
+            "hands": {
+              "left": {
+                "preset": "support",
+                "source": "vlm",
+                "visible": true,
+                "confidence": "low"
+              },
+              "right": {
+                "preset": "relaxed",
+                "source": "vlm",
+                "visible": true,
+                "confidence": "low"
+              }
+            },
+            "evidence_status": null,
+            "observations_status": null,
+            "contacts_status": null,
+            "shadow": null,
+            "hand_screen": {
+              "checks": 5,
+              "elapsed_ms": 41685.49,
+              "unverified_count": 0,
+              "rejected_count": 0,
+              "events": [
+                {
+                  "check": 1,
+                  "status": "clear_screen",
+                  "reason": null,
+                  "elapsed_ms": 7142.711,
+                  "remaining_before_ms": 45000.0,
+                  "call_budget_ms": 15000.0,
+                  "optional": false,
+                  "queue_wait_ms": 0.015,
+                  "execution_ms": 7121.454,
+                  "phase": "execution",
+                  "conversion_id": "8a30fd31-7f3e-45ef-a955-56f40adc5b3b"
+                },
+                {
+                  "check": 2,
+                  "status": "clear_screen",
+                  "reason": null,
+                  "elapsed_ms": 9814.519,
+                  "remaining_before_ms": 37857.29,
+                  "call_budget_ms": 15000.0,
+                  "optional": false,
+                  "queue_wait_ms": 0.006,
+                  "execution_ms": 9804.43,
+                  "phase": "execution",
+                  "conversion_id": "20eb5d0e-a329-46d2-8a7c-42c1f315c5e3"
+                },
+                {
+                  "check": 3,
+                  "status": "clear_screen",
+                  "reason": null,
+                  "elapsed_ms": 9602.401,
+                  "remaining_before_ms": 28042.772,
+                  "call_budget_ms": 15000.0,
+                  "optional": false,
+                  "queue_wait_ms": 0.006,
+                  "execution_ms": 9592.246,
+                  "phase": "execution",
+                  "conversion_id": "dc87a66e-1557-4abe-b1aa-cb79b6df7ea3"
+                },
+                {
+                  "check": 4,
+                  "status": "clear_screen",
+                  "reason": null,
+                  "elapsed_ms": 6094.443,
+                  "remaining_before_ms": 18440.371,
+                  "call_budget_ms": 15000.0,
+                  "optional": false,
+                  "queue_wait_ms": 0.006,
+                  "execution_ms": 6084.752,
+                  "phase": "execution",
+                  "conversion_id": "de115eaf-6587-44b3-a360-c0346204c136"
+                },
+                {
+                  "check": 5,
+                  "status": "clear_screen",
+                  "reason": null,
+                  "elapsed_ms": 9031.417,
+                  "remaining_before_ms": 12345.929,
+                  "call_budget_ms": 12345.929,
+                  "optional": false,
+                  "queue_wait_ms": 0.006,
+                  "execution_ms": 9021.465,
+                  "phase": "execution",
+                  "conversion_id": "09179ba1-9713-488e-b5b8-5da73cc34ed3"
+                }
+              ]
+            }
+          }
+        ],
+        "selected_sources": [
+          {
+            "person_index": 0,
+            "pose_id": "Female Standing Pose_01_legfix_mirror",
+            "source_kind": "selected_base",
+            "source_bvh_sha256": "6aad5aa33fd7c2e20f3ad2ffbfc52b5b45fd0ef369e4e34d44e1b41ed8544d98",
+            "delivered_bvh_sha256": "6aad5aa33fd7c2e20f3ad2ffbfc52b5b45fd0ef369e4e34d44e1b41ed8544d98",
+            "refine_called": false,
+            "refined": null,
+            "refine_reason": null,
+            "v3_diagnostic": null
+          }
+        ],
+        "provider_calls": [
+          {
+            "kind": "analysis",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 4.887476500123739,
+            "error": null
+          },
+          {
+            "kind": "person_tags",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 7.068821540800855,
+            "error": null
+          },
+          {
+            "kind": "describe",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 6.975223541958258,
+            "error": null
+          },
+          {
+            "kind": "hands",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 6.5448646252043545,
+            "error": null
+          }
+        ],
+        "usage": {
+          "successful_response_prompt_tokens": 11164,
+          "successful_response_candidate_tokens": 494,
+          "successful_response_total_tokens": 13103,
+          "requests_without_usage": 0,
+          "failed_request_usage": "unknown",
+          "cost_usd": null
+        },
+        "raw_record_sha256": "0d0a5157086a978866d371498e10bfdb2e8885fa6a1df6db3b8bff3bbf0ffe78"
+      },
+      {
+        "phase": "off",
+        "image": "131040.png",
+        "image_sha256": "9749eeaee78c4f1f57309458295c06685a217305620400ca315620c7e0094bc7",
+        "analyze_seconds": 31.769913790980354,
+        "analyze_error": null,
+        "people": [
+          {
+            "index": 0,
+            "skeleton_source": "full_image",
+            "skeleton_state": "valid",
+            "coverage": "full",
+            "lower_body_observed": true,
+            "structural_refine_allowed": false,
+            "dynamic_status": "blocked",
+            "dynamic_reason": "entangled_set_search_unavailable",
+            "selected_pose_ids": [],
+            "hand_status": "unavailable",
+            "hands": {
+              "left": {
+                "preset": "relaxed",
+                "source": "default",
+                "visible": null,
+                "confidence": null
+              },
+              "right": {
+                "preset": "relaxed",
+                "source": "default",
+                "visible": null,
+                "confidence": null
+              }
+            },
+            "evidence_status": null,
+            "observations_status": null,
+            "contacts_status": null,
+            "shadow": null,
+            "hand_screen": {
+              "checks": 0,
+              "elapsed_ms": null,
+              "unverified_count": 0,
+              "rejected_count": 0,
+              "events": []
+            }
+          },
+          {
+            "index": 1,
+            "skeleton_source": "full_image",
+            "skeleton_state": "valid",
+            "coverage": "full",
+            "lower_body_observed": false,
+            "structural_refine_allowed": false,
+            "dynamic_status": "blocked",
+            "dynamic_reason": "entangled_set_search_unavailable",
+            "selected_pose_ids": [],
+            "hand_status": "unavailable",
+            "hands": {
+              "left": {
+                "preset": "relaxed",
+                "source": "default",
+                "visible": null,
+                "confidence": null
+              },
+              "right": {
+                "preset": "relaxed",
+                "source": "default",
+                "visible": null,
+                "confidence": null
+              }
+            },
+            "evidence_status": null,
+            "observations_status": null,
+            "contacts_status": null,
+            "shadow": null,
+            "hand_screen": {
+              "checks": 0,
+              "elapsed_ms": null,
+              "unverified_count": 0,
+              "rejected_count": 0,
+              "events": []
+            }
+          },
+          {
+            "index": 2,
+            "skeleton_source": "vlm_repair",
+            "skeleton_state": "partial",
+            "coverage": "sparse",
+            "lower_body_observed": false,
+            "structural_refine_allowed": false,
+            "dynamic_status": "blocked",
+            "dynamic_reason": "entangled_set_search_unavailable",
+            "selected_pose_ids": [],
+            "hand_status": "unavailable",
+            "hands": {
+              "left": {
+                "preset": "relaxed",
+                "source": "default",
+                "visible": null,
+                "confidence": null
+              },
+              "right": {
+                "preset": "relaxed",
+                "source": "default",
+                "visible": null,
+                "confidence": null
+              }
+            },
+            "evidence_status": null,
+            "observations_status": null,
+            "contacts_status": null,
+            "shadow": null,
+            "hand_screen": {
+              "checks": 0,
+              "elapsed_ms": null,
+              "unverified_count": 0,
+              "rejected_count": 0,
+              "events": []
+            }
+          }
+        ],
+        "selected_sources": [],
+        "provider_calls": [
+          {
+            "kind": "analysis",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 9.45121508394368,
+            "error": null
+          },
+          {
+            "kind": "person_tags",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 8.180916791083291,
+            "error": null
+          },
+          {
+            "kind": "skeleton_review_repair",
+            "transport": "urllib",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 6.938486832892522,
+            "error": null
+          },
+          {
+            "kind": "hands",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": null,
+            "elapsed_seconds": 14.105893957894295,
+            "error": "ServerError"
+          }
+        ],
+        "usage": {
+          "successful_response_prompt_tokens": 13551,
+          "successful_response_candidate_tokens": 873,
+          "successful_response_total_tokens": 15504,
+          "requests_without_usage": 1,
+          "failed_request_usage": "unknown",
+          "cost_usd": null
+        },
+        "raw_record_sha256": "ca5c4e9c8695f34e2bd0178ce7aba10092b9a835f9afbe7696390b1b0c24aa65"
+      },
+      {
+        "phase": "off",
+        "image": "131224.png",
+        "image_sha256": "3902eff178ce61b204f080a95c14c8588025913275a53de85a73701068106898",
+        "analyze_seconds": 45.25315554183908,
+        "analyze_error": null,
+        "people": [
+          {
+            "index": 0,
+            "skeleton_source": "vlm_repair",
+            "skeleton_state": "valid",
+            "coverage": "full",
+            "lower_body_observed": false,
+            "structural_refine_allowed": false,
+            "dynamic_status": "no_result",
+            "dynamic_reason": "successful_empty_search_generation_separate",
+            "selected_pose_ids": [],
+            "hand_status": "vlm",
+            "hands": {
+              "left": {
+                "preset": "grip",
+                "source": "vlm",
+                "visible": true,
+                "confidence": "low"
+              },
+              "right": {
+                "preset": "cover_mouth",
+                "source": "vlm",
+                "visible": true,
+                "confidence": "low"
+              }
+            },
+            "evidence_status": null,
+            "observations_status": null,
+            "contacts_status": null,
+            "shadow": null,
+            "hand_screen": {
+              "checks": 0,
+              "elapsed_ms": 0.0,
+              "unverified_count": 0,
+              "rejected_count": 0,
+              "events": []
+            }
+          }
+        ],
+        "selected_sources": [],
+        "provider_calls": [
+          {
+            "kind": "analysis",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 6.792450166074559,
+            "error": null
+          },
+          {
+            "kind": "person_tags",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 5.3403105000033975,
+            "error": null
+          },
+          {
+            "kind": "skeleton_review_repair",
+            "transport": "urllib",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 7.225795125123113,
+            "error": null
+          },
+          {
+            "kind": "describe",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 11.288583958055824,
+            "error": null
+          },
+          {
+            "kind": "other",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 12.32268137508072,
+            "error": null
+          },
+          {
+            "kind": "hands",
+            "transport": "google-genai",
+            "model_requested": "gemini-3.8-flash",
+            "model_actual": "gemini-3.8-flash",
+            "elapsed_seconds": 6.841051333816722,
+            "error": null
+          }
+        ],
+        "usage": {
+          "successful_response_prompt_tokens": 20281,
+          "successful_response_candidate_tokens": 1489,
+          "successful_response_total_tokens": 24416,
+          "requests_without_usage": 0,
+          "failed_request_usage": "unknown",
+          "cost_usd": null
+        },
+        "raw_record_sha256": "5e5495ac9de5001e11a62aeb0593de2b22da3afc1b4835c49be2fcb4b9f59fbf"
+      }
+    ],
+    "usage_by_phase_kind": {
+      "evidence_shadow": {
+        "analysis": {
+          "requests": 3,
+          "responses_with_usage": 3,
+          "prompt_tokens": 8924,
+          "total_tokens": 12182,
+          "request_seconds": [
+            10.40577495796606,
+            12.392181457951665,
+            8.31433420907706
+          ]
+        },
+        "person_tags": {
+          "requests": 3,
+          "responses_with_usage": 3,
+          "prompt_tokens": 4258,
+          "total_tokens": 5590,
+          "request_seconds": [
+            6.7917724589351565,
+            7.168628292158246,
+            5.315458209021017
+          ]
+        },
+        "describe": {
+          "requests": 2,
+          "responses_with_usage": 2,
+          "prompt_tokens": 6569,
+          "total_tokens": 7968,
+          "request_seconds": [
+            5.903596250107512,
+            9.515079334145412
+          ]
+        },
+        "hands": {
+          "requests": 3,
+          "responses_with_usage": 1,
+          "prompt_tokens": 5368,
+          "total_tokens": 6415,
+          "request_seconds": [
+            11.461753707844764,
+            14.264935499988496,
+            13.988525582943112
+          ]
+        },
+        "skeleton_review_repair": {
+          "requests": 2,
+          "responses_with_usage": 2,
+          "prompt_tokens": 17903,
+          "total_tokens": 18814,
+          "request_seconds": [
+            9.581659541931003,
+            5.333931624889374
+          ]
+        },
+        "other": {
+          "requests": 1,
+          "responses_with_usage": 1,
+          "prompt_tokens": 1316,
+          "total_tokens": 2110,
+          "request_seconds": [
+            9.9338372501079
+          ]
+        }
+      },
+      "off": {
+        "analysis": {
+          "requests": 3,
+          "responses_with_usage": 3,
+          "prompt_tokens": 5591,
+          "total_tokens": 7303,
+          "request_seconds": [
+            4.887476500123739,
+            9.45121508394368,
+            6.792450166074559
+          ]
+        },
+        "person_tags": {
+          "requests": 3,
+          "responses_with_usage": 3,
+          "prompt_tokens": 4258,
+          "total_tokens": 5573,
+          "request_seconds": [
+            7.068821540800855,
+            8.180916791083291,
+            5.3403105000033975
+          ]
+        },
+        "describe": {
+          "requests": 2,
+          "responses_with_usage": 2,
+          "prompt_tokens": 6569,
+          "total_tokens": 8056,
+          "request_seconds": [
+            6.975223541958258,
+            11.288583958055824
+          ]
+        },
+        "hands": {
+          "requests": 3,
+          "responses_with_usage": 2,
+          "prompt_tokens": 9359,
+          "total_tokens": 10440,
+          "request_seconds": [
+            6.5448646252043545,
+            14.105893957894295,
+            6.841051333816722
+          ]
+        },
+        "skeleton_review_repair": {
+          "requests": 2,
+          "responses_with_usage": 2,
+          "prompt_tokens": 17903,
+          "total_tokens": 19071,
+          "request_seconds": [
+            6.938486832892522,
+            7.225795125123113
+          ]
+        },
+        "other": {
+          "requests": 1,
+          "responses_with_usage": 1,
+          "prompt_tokens": 1316,
+          "total_tokens": 2580,
+          "request_seconds": [
+            12.32268137508072
+          ]
+        }
+      }
+    }
+  },
+  "provider_grammar_probes": [
+    {
+      "kind": "analysis",
+      "variant": "provider-without-length-number-bounds",
+      "schema_sha256": "5ac356e135f2307c78db8e38048fc68e97555fc0e60fbd76dffcc8fc3148ea76",
+      "status": "accepted",
+      "text": "{\"num_people\":0,\"shot\":\"full_half\",\"action\":\"other\",\"view\":\"front\",\"relationship\":\"solo\",\"approx_boxes\":[],\"lower_body_visible",
+      "model": "gemini-3.8-flash",
+      "usage": {
+        "cache_tokens_details": null,
+        "cached_content_token_count": null,
+        "candidates_token_count": 35,
+        "candidates_tokens_details": null,
+        "prompt_token_count": 30,
+        "prompt_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 30
+          }
+        ],
+        "thoughts_token_count": 462,
+        "tool_use_prompt_token_count": null,
+        "tool_use_prompt_tokens_details": null,
+        "total_token_count": 527,
+        "traffic_type": null
+      },
+      "seconds": 6.08754604193382
+    },
+    {
+      "kind": "hands",
+      "variant": "provider-without-length-number-bounds",
+      "schema_sha256": "67e8a36d7f87a425e51cf41e52c913a28e6c0af1147f958637a73643a8fa0a4f",
+      "status": "accepted",
+      "text": "{\n  \"people\": [\n    {\n",
+      "model": "gemini-3.8-flash",
+      "usage": {
+        "cache_tokens_details": null,
+        "cached_content_token_count": null,
+        "candidates_token_count": 11,
+        "candidates_tokens_details": null,
+        "prompt_token_count": 14,
+        "prompt_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 14
+          }
+        ],
+        "thoughts_token_count": 487,
+        "tool_use_prompt_token_count": null,
+        "tool_use_prompt_tokens_details": null,
+        "total_token_count": 512,
+        "traffic_type": null
+      },
+      "seconds": 5.352723584044725
+    }
+  ],
+  "contact_effector_fix_verification": {
+    "schema": "live-contact-effector-fix-check-v1",
+    "image_sha256": "ba92e47ea1600905a81b5973813f5c711087e479898dec0b230ae5716de3ccc6",
+    "model_requested": "gemini-3.8-flash",
+    "schema_sha256": "caadaff752a51fa9a0899b35512e85190d21160a330b561ef0b6a2df4c46649b",
+    "additional_requests_for_this_fix_verification": 1,
+    "elapsed_seconds": 10.485271624987945,
+    "response": {
+      "people": [
+        {
+          "left": {
+            "visible": true,
+            "shape": "support",
+            "alternative": "relaxed",
+            "confidence": "low"
+          },
+          "right": {
+            "visible": true,
+            "shape": "relaxed",
+            "alternative": "soft_open",
+            "confidence": "low"
+          }
+        }
+      ],
+      "refine_contacts": {
+        "people": [
+          {
+            "person_id": 0,
+            "body_scope": "full",
+            "contacts": [
+              {
+                "effector_region": "left_palm",
+                "target": "self_region",
+                "target_ref": "pelvis",
+                "kind": "touching",
+                "side_certainty": "certain",
+                "chain_visible": true,
+                "evidence": "direct_visible",
+                "confidence": "high"
+              },
+              {
+                "effector_region": "left_sole",
+                "target": "ground",
+                "target_ref": null,
+                "kind": "supporting",
+                "side_certainty": "ambiguous",
+                "chain_visible": true,
+                "evidence": "direct_visible",
+                "confidence": "high"
+              },
+              {
+                "effector_region": "right_sole",
+                "target": "ground",
+                "target_ref": null,
+                "kind": "supporting",
+                "side_certainty": "ambiguous",
+                "chain_visible": true,
+                "evidence": "direct_visible",
+                "confidence": "high"
+              }
+            ]
+          }
+        ]
+      },
+      "refine_evidence": {
+        "version": "refine-evidence-v1",
+        "status": "valid",
+        "people": [
+          {
+            "person_id": 0,
+            "body_scope": "full",
+            "disposition": "diagnostic_only",
+            "visibility": [],
+            "relations": [],
+            "contacts": [
+              {
+                "chain_visible": true,
+                "confidence": "high",
+                "effector_region": "left_palm",
+                "evidence": "direct_visible",
+                "kind": "touching",
+                "side_certainty": "certain",
+                "target": "self_region",
+                "target_ref": "pelvis"
+              },
+              {
+                "chain_visible": true,
+                "confidence": "unknown",
+                "effector_region": "left_sole",
+                "evidence": "unknown",
+                "kind": "supporting",
+                "side_certainty": "ambiguous",
+                "target": "ground",
+                "target_ref": null
+              },
+              {
+                "chain_visible": true,
+                "confidence": "unknown",
+                "effector_region": "right_sole",
+                "evidence": "unknown",
+                "kind": "supporting",
+                "side_certainty": "ambiguous",
+                "target": "ground",
+                "target_ref": null
+              }
+            ],
+            "preserve": []
+          }
+        ],
+        "reasons": [],
+        "provenance": {
+          "additional_logical_calls": 0,
+          "image_attempts": 1,
+          "image_inputs_per_attempt": 1,
+          "logical_call_id": "read_hands",
+          "logical_calls": 1,
+          "model": "gemini-3.8-flash",
+          "prompt_tokens": 5265,
+          "prompt_version": "refine-evidence-v1",
+          "provider": "gemini",
+          "provider_attempts": 1,
+          "provider_response_id": "K_XZavLDFcParfcP9bWD2A0",
+          "response_tokens": 406,
+          "schema_version": "refine-evidence-schema-v2",
+          "solver_logical_calls": 0,
+          "source_sha": "57dbf483fdcb81559bf304ff13b35b2eafa01a038d4cef1433b6d03176c0b26e",
+          "token_usage_scope": "successful_response_only",
+          "total_tokens": 6178
+        },
+        "evidence_sha": "10a05b48df638f72182fff523366837da964849a3d64f9a35784c21651f5420e"
+      }
+    },
+    "transport": "actual_google_genai",
+    "deployed": false
+  },
+  "paired_actual_fbx": [
+    {
+      "variant": "selected_b0",
+      "profile": "female-base-v0-3-4.offline-neutral-repair-v1",
+      "hands": {
+        "left": "relaxed",
+        "right": "grip"
+      },
+      "source_unmodified": true,
+      "failure": {
+        "schema": "finite-actual-fbx-safety-failure-v1",
+        "status": "validation_blocked",
+        "reason": "discrete_shell_orientation_reversed",
+        "error_type": "WitnessValidationError",
+        "last_validated_stage": "neutral-repair",
+        "artifacts": {
+          "source.bvh": "c2234a5dc55b0eb595e4ba6aa1b5d817202cfe89e0f8d3e9a77ea83d9b62b763",
+          "derived-neutral.fbx": "d3f40c4f6d40443044bfe9c8a3ef9cd53929b7cbc5b5de2d191dfa0891faf1d7",
+          "body.fbx": "ae6f9031a07672d172cae7ab603f012738865d269d4933adc7f445938ceca011"
+        },
+        "final_receipt_issued": false,
+        "production_registered": false,
+        "deployed": false
+      },
+      "completed_stages": [
+        {
+          "stage": "neutral-repair",
+          "artifact_sha256": "d3f40c4f6d40443044bfe9c8a3ef9cd53929b7cbc5b5de2d191dfa0891faf1d7",
+          "witness": {
+            "version": "finite-normalized-lbs-shell-witness-v1",
+            "source_asset_sha256": "98338c58635a4d741c646ca15398da767595a965218cb38bf4a69eb78b33b7f0",
+            "profile_sha256": "bec4efd09741fa850a1e8f72bd8afc4fed9e0945b0b48610ed31a0cece13d349",
+            "source_sha256": "c2234a5dc55b0eb595e4ba6aa1b5d817202cfe89e0f8d3e9a77ea83d9b62b763",
+            "topology_sha256": "2d2eeb3183bad7dfd007059733e58d37bc25d9b37411b61d2651ee92344cc559",
+            "stage": "neutral-repair",
+            "stage_input_sha256": "56aff8dcc8c9b0ba9e6a3472afde4c806c498a56018266891d264db9aceabeb4",
+            "input_sha256": "f5b9a99a12f58ecfd02d29edb9dd80d4ca06d39def2198a85a578088d2e1d97c",
+            "previous_witness_sha256": "",
+            "vertex_count": 24994,
+            "face_count": 50000,
+            "determinant_min": 0.9999999999999993,
+            "vertex_tolerance_m": 1e-05,
+            "area_ratio_min": 0.001,
+            "expected_vertices_sha256": "cb2f01cb3a42d11fd9c106ce65f28b5a7c3dd6b696819f8f8ce25c0cd33aa179",
+            "faces_sha256": "7b6ebc73743c2801ab0373755b14276973af987102419410e0ee0141cf28ecaa",
+            "directors_sha256": "b91f8cf839d7faef68e99bc8c0f3d30b9235d11ae61f728fbbb53c3879e03859",
+            "reference_areas_sha256": "aaf18df0f03c256a51d2eb6ee31e0f8e48b8011629c8196da2d0133f04d38aff"
+          },
+          "witness_sha256": "6e34da67bab2833a4c1175186c1292536243297f2565c4484fde73967d96fb64",
+          "replay": {
+            "version": "finite-normalized-lbs-shell-witness-v1",
+            "witness_sha256": "6e34da67bab2833a4c1175186c1292536243297f2565c4484fde73967d96fb64",
+            "max_vertex_error_m": 4.43287044505574e-07,
+            "vertex_tolerance_m": 1e-05,
+            "area_ratio_min": 0.001,
+            "discrete_shell_orientation_verified": true,
+            "continuous_volume_certificate": false
+          },
+          "mesh_audit": {
+            "version": "full-body-posed-skin-v2",
+            "status": "mesh_validated",
+            "full_body": true,
+            "hard_violations": [],
+            "unverified_reasons": [],
+            "triangle_pairs_checked": 12812,
+            "triangle_intersections": [],
+            "contained_components": [],
+            "folded_faces": [],
+            "complete_collision_certificate": true,
+            "topology_sha256": "2d2eeb3183bad7dfd007059733e58d37bc25d9b37411b61d2651ee92344cc559",
+            "vertices": 24994,
+            "triangles": 50000,
+            "profile_sha256": "bec4efd09741fa850a1e8f72bd8afc4fed9e0945b0b48610ed31a0cece13d349",
+            "mesh_policy_version": "finite-original-rest-directors-v2",
+            "mesh_policy_sha256": "f9eacdf6cc9dfb4adbe2ea93b59ad3750670742b94ef3d9c7e7b99a07e8dac79",
+            "closed_manifold": true,
+            "consistently_oriented": true,
+            "components": 1,
+            "broadphase_pairs_examined": 325846,
+            "shared_boundary_certified_pairs": 313034,
+            "elapsed_sec": 2.136610999936238,
+            "full_body_artifact_sha256": "d3f40c4f6d40443044bfe9c8a3ef9cd53929b7cbc5b5de2d191dfa0891faf1d7",
+            "deformation_witness_sha256": "6e34da67bab2833a4c1175186c1292536243297f2565c4484fde73967d96fb64",
+            "fold_reference_kind": "independent-original-rest-lbs-three-directors"
+          }
+        }
+      ]
+    },
+    {
+      "variant": "f25_refined",
+      "profile": "female-base-v0-3-4.offline-neutral-repair-v1",
+      "hands": {
+        "left": "relaxed",
+        "right": "grip"
+      },
+      "source_unmodified": true,
+      "failure": {
+        "schema": "finite-actual-fbx-safety-failure-v1",
+        "status": "validation_blocked",
+        "reason": "discrete_shell_orientation_reversed",
+        "error_type": "WitnessValidationError",
+        "last_validated_stage": "neutral-repair",
+        "artifacts": {
+          "source.bvh": "eee645226f1f17adcad7dbe4c198c7896ba111408860a8f6d09cc5132e144169",
+          "derived-neutral.fbx": "f300cffa2386c85002801d662c3e0826c5548d43eb1aec85395319820dab87d3",
+          "body.fbx": "b6452160c7f857650c6708cef18a83bda19eef882a1525664888b988b3305c04"
+        },
+        "final_receipt_issued": false,
+        "production_registered": false,
+        "deployed": false
+      },
+      "completed_stages": [
+        {
+          "stage": "neutral-repair",
+          "artifact_sha256": "f300cffa2386c85002801d662c3e0826c5548d43eb1aec85395319820dab87d3",
+          "witness": {
+            "version": "finite-normalized-lbs-shell-witness-v1",
+            "source_asset_sha256": "98338c58635a4d741c646ca15398da767595a965218cb38bf4a69eb78b33b7f0",
+            "profile_sha256": "4dd6a227c6e70d16afb94e69104cec7f563e7fcbda8ba15a2b5772dcf3fac89a",
+            "source_sha256": "eee645226f1f17adcad7dbe4c198c7896ba111408860a8f6d09cc5132e144169",
+            "topology_sha256": "2d2eeb3183bad7dfd007059733e58d37bc25d9b37411b61d2651ee92344cc559",
+            "stage": "neutral-repair",
+            "stage_input_sha256": "15f8fbd88f51f216277dbd9b4b2e871edefbf2363a97e026d314e1195a7977fa",
+            "input_sha256": "f5b9a99a12f58ecfd02d29edb9dd80d4ca06d39def2198a85a578088d2e1d97c",
+            "previous_witness_sha256": "",
+            "vertex_count": 24994,
+            "face_count": 50000,
+            "determinant_min": 0.9999999999999993,
+            "vertex_tolerance_m": 1e-05,
+            "area_ratio_min": 0.001,
+            "expected_vertices_sha256": "cb2f01cb3a42d11fd9c106ce65f28b5a7c3dd6b696819f8f8ce25c0cd33aa179",
+            "faces_sha256": "7b6ebc73743c2801ab0373755b14276973af987102419410e0ee0141cf28ecaa",
+            "directors_sha256": "b91f8cf839d7faef68e99bc8c0f3d30b9235d11ae61f728fbbb53c3879e03859",
+            "reference_areas_sha256": "aaf18df0f03c256a51d2eb6ee31e0f8e48b8011629c8196da2d0133f04d38aff"
+          },
+          "witness_sha256": "d6ffa04e924cc9d01c297d149cde1f897f7ae2bfb9933d072f5ef16b5e0ae5ad",
+          "replay": {
+            "version": "finite-normalized-lbs-shell-witness-v1",
+            "witness_sha256": "d6ffa04e924cc9d01c297d149cde1f897f7ae2bfb9933d072f5ef16b5e0ae5ad",
+            "max_vertex_error_m": 4.43287044505574e-07,
+            "vertex_tolerance_m": 1e-05,
+            "area_ratio_min": 0.001,
+            "discrete_shell_orientation_verified": true,
+            "continuous_volume_certificate": false
+          },
+          "mesh_audit": {
+            "version": "full-body-posed-skin-v2",
+            "status": "mesh_validated",
+            "full_body": true,
+            "hard_violations": [],
+            "unverified_reasons": [],
+            "triangle_pairs_checked": 12812,
+            "triangle_intersections": [],
+            "contained_components": [],
+            "folded_faces": [],
+            "complete_collision_certificate": true,
+            "topology_sha256": "2d2eeb3183bad7dfd007059733e58d37bc25d9b37411b61d2651ee92344cc559",
+            "vertices": 24994,
+            "triangles": 50000,
+            "profile_sha256": "4dd6a227c6e70d16afb94e69104cec7f563e7fcbda8ba15a2b5772dcf3fac89a",
+            "mesh_policy_version": "finite-original-rest-directors-v2",
+            "mesh_policy_sha256": "339b7b85c51bff6484269ccd0c472b25cdfc4304c4d9422c1eaae7e5c0e52f32",
+            "closed_manifold": true,
+            "consistently_oriented": true,
+            "components": 1,
+            "broadphase_pairs_examined": 325846,
+            "shared_boundary_certified_pairs": 313034,
+            "elapsed_sec": 2.1019847500137985,
+            "full_body_artifact_sha256": "f300cffa2386c85002801d662c3e0826c5548d43eb1aec85395319820dab87d3",
+            "deformation_witness_sha256": "d6ffa04e924cc9d01c297d149cde1f897f7ae2bfb9933d072f5ef16b5e0ae5ad",
+            "fold_reference_kind": "independent-original-rest-lbs-three-directors"
+          }
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Three previously examined convenience roughs, no independent pose/hand/3D quality labels",
+    "Fresh off/shadow responses can vary; not a causal accuracy or latency comparison",
+    "Generation fallback, body classifier, BFF, network upload, preview and product deployment excluded",
+    "Local hand screen uses released female BASE; strict full-body QA uses separately identified repaired pure-LBS asset",
+    "Provider text/coords stay in local raw run directories, not committed",
+    "All unknown/partial evidence remains diagnostic only; no visibility/side authority promotion"
+  ]
+}

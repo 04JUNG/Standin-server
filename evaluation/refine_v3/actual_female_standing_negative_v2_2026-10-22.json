@@ -1,0 +1,14 @@
+{
+  "schema": "actual-source-negative-control-v1",
+  "source_sha256": "13be4288d936cbd9efcbff20a89186cfa51cae6784a9891dbc80d5b974dbaa27",
+  "source_modified": false,
+  "character": "female-base-v0-3-4.offline-neutral-repair-v1",
+  "body_artifact_sha256": "f3129a3ba08ba10fb5bbc90234439f30d229d49888680c6fbc53e5fdd24e66bb",
+  "last_validated_stage": "neutral-repair",
+  "blocked_stage": "body",
+  "status": "validation_blocked",
+  "reason": "discrete_shell_orientation_reversed",
+  "final_receipt_issued": false,
+  "production_registered": false,
+  "deployed": false
+}

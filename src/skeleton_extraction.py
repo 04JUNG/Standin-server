@@ -1029,6 +1029,12 @@ def select_crop_candidate(slot: PersonSlot, candidates: list[Skeleton], cfg=CFG,
 
 
 def apply_crop_result(slot: PersonSlot, selected: CropSelection) -> None:
+    from .joint_provenance import initialize_joint_provenance, transfer_joint_provenance
+    old = slot.skeleton
+    if old is not None and old.joint_provenance is None:
+        old.joint_provenance = initialize_joint_provenance(old, source=slot.skeleton_source, person_id=slot.slot_id)
+    selected.skeleton.joint_provenance = transfer_joint_provenance(
+        old, selected.skeleton, source="crop_retry", person_id=slot.slot_id)
     slot.skeleton = selected.skeleton
     slot.skeleton_box = selected.box
     slot.evidence = selected.evidence
@@ -1048,6 +1054,10 @@ def finalize_slot(slot: PersonSlot, cfg=CFG) -> PersonSlot:
         if "missing_skeleton" not in slot.reasons:
             slot.reasons.append("missing_skeleton")
         return slot
+    from .joint_provenance import initialize_joint_provenance
+    if slot.skeleton.joint_provenance is None:
+        slot.skeleton.joint_provenance = initialize_joint_provenance(
+            slot.skeleton, source=slot.skeleton_source, person_id=slot.slot_id)
     if slot.evidence is None:
         slot.skeleton_box = skeleton_bbox(slot.skeleton, cfg.skeleton_kpt_threshold)
         slot.evidence = analyze_skeleton(
