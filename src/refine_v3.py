@@ -323,8 +323,10 @@ def refine_regional_bvh(source_path, keypoints, binding, provenance, ownership, 
             return finish("insufficient_gain")
         if target_mode:
             # Source nonregression is independent of the target objective.
-            source_base_xy = projection.project(base_source @ rotation.T)
-            source_new_xy = projection.project(source_candidate @ rotation.T)
+            source_projection = FixedProjection.from_aligned_base(
+                base_source @ rotation.T, binding["camera"].get("distance_torso"))
+            source_base_xy = source_projection.project(base_source @ rotation.T)
+            source_new_xy = source_projection.project(source_candidate @ rotation.T)
             source_center = source_base_xy[[5, 6]].mean(axis=0)
             source_width = np.linalg.norm(source_base_xy[5] - source_base_xy[6])
             if source_width < 1e-7:

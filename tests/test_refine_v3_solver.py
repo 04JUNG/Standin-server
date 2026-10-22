@@ -276,3 +276,41 @@ def test_no_gain_restores_every_byte(tmp_path):
         kwargs["ownership"], enabled=True, out_path=output)
     assert result.reason == "insufficient_gain" and not result.refined
     assert output.read_bytes() == Path(source).read_bytes()
+
+
+def test_target_meters_and_source_centimeters_use_independent_perspective(tmp_path, monkeypatch):
+    """A target-meter camera must never project source-centimeter geometry."""
+    import sys
+    import types
+    from src.refine_projection import FixedProjection, search_rotation
+    module = types.ModuleType("src.target_profile")
+    module.certified_adapter = lambda *_: True  # Explicit synthetic QA receipt.
+    monkeypatch.setitem(sys.modules, "src.target_profile", module)
+    source, kwargs = _inputs(tmp_path)
+    rotation = search_rotation(30, 0)
+    joints, frames = parse_bvh(source)
+    source_base, _ = coco17_from_fk(joints, fk(joints, frames[0]))
+    target_path = tmp_path / "target.bvh"
+    target_joints, target_frames = parse_bvh(str(target_path))
+    target_points, _ = coco17_from_fk(target_joints, fk(target_joints, target_frames[0]))
+    source_projection = FixedProjection.from_aligned_base(source_base @ rotation.T, 3.)
+    kwargs["keypoints"] = source_projection.project(target_points @ rotation.T)
+    for i, row in enumerate(kwargs["provenance"]):
+        row["original"] = row["current"] = kwargs["keypoints"][i].tolist()
+    kwargs["camera"] = regional_search_camera(pose_id=kwargs["pose_id"],
+        source_bvh_sha256=kwargs["source_bvh_sha256"], keypoints=kwargs["keypoints"],
+        rotation=rotation, camera_index=0, projection="perspective", distance_torso=3.)
+    class MeterAdapter:
+        coordinate_frame = "source-canonical-m"
+        def evaluate(self, text):
+            adapter_path = tmp_path / "adapter.bvh"
+            adapter_path.write_text(text)
+            joints, frames = parse_bvh(str(adapter_path))
+            points, _ = coco17_from_fk(joints, fk(joints, frames[0]))
+            return types.SimpleNamespace(coco17=points * .01)
+    binding = build_regional_binding(**kwargs, enabled=True).binding
+    result = refine_regional_bvh(source, kwargs["keypoints"], binding,
+        kwargs["provenance"], kwargs["ownership"], enabled=True,
+        target_adapter=MeterAdapter(), target_profile_sha256="test")
+    assert result.refined and result.reason == "target_geometry_improved", result.to_dict()
+    assert result.mesh_status == "mesh_unverified"
