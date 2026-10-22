@@ -1,0 +1,95 @@
+{
+  "version": "full-body-posed-skin-v2",
+  "status": "validation_blocked",
+  "full_body": true,
+  "hard_violations": [
+    "skin_triangle_intersection"
+  ],
+  "unverified_reasons": [
+    "mesh_policy_unsupported",
+    "fold_reference_unavailable"
+  ],
+  "triangle_pairs_checked": 27841,
+  "triangle_intersections": [
+    [
+      40991,
+      42722
+    ],
+    [
+      40991,
+      42723
+    ],
+    [
+      40991,
+      42773
+    ],
+    [
+      40991,
+      42721
+    ],
+    [
+      40991,
+      42771
+    ],
+    [
+      40991,
+      42772
+    ],
+    [
+      40992,
+      42722
+    ],
+    [
+      40992,
+      42723
+    ],
+    [
+      42748,
+      42773
+    ],
+    [
+      42749,
+      42773
+    ],
+    [
+      42749,
+      42947
+    ],
+    [
+      42722,
+      40994
+    ],
+    [
+      42723,
+      40994
+    ],
+    [
+      40994,
+      42773
+    ],
+    [
+      40994,
+      42771
+    ],
+    [
+      28550,
+      42774
+    ]
+  ],
+  "contained_components": [],
+  "folded_faces": [],
+  "complete_collision_certificate": false,
+  "topology_sha256": "c538e0c65c2bda575ee073c8e728bac892b6909d5b85bdd44b4c4a1889ab303a",
+  "vertices": 24988,
+  "triangles": 50000,
+  "profile_sha256": null,
+  "mesh_policy_version": null,
+  "mesh_policy_sha256": null,
+  "closed_manifold": true,
+  "consistently_oriented": true,
+  "components": 1,
+  "broadphase_pairs_examined": 340939,
+  "shared_boundary_certified_pairs": 313098,
+  "elapsed_sec": 2.4033799581229687,
+  "full_body_artifact_sha256": "16b386e5a7c831c2c7a6f31f48b6a8b0bf2b2b65899fe269681476747860e6b9"
+}

@@ -1,5 +1,11 @@
 # Refine v3 implementation and verification — 2026-10-22
 
+Current follow-up: **one exact offline female BASE derived asset, both open hands,
+and neutral QA source** passes actual final-FBX mesh v2 safety and strict receipt.
+Production profiles remain zero. [Root causes, fixes, positive/negative evidence
+and final regression](REFINE_V3_MESH_SAFETY_FIX_2026-10-22.md). The initial blocked
+male result below remains historical evidence and remains blocked under v2.
+
 Base: clean `origin/develop` `7a3713f7cbd1e78925f6e78704f5ff706b96bfa2`, re-fetched before implementation. The original `/Users/dowon/dev/Standin-server` working tree was never reset, cleaned, switched, pulled or edited. Three independent managed worktrees implemented observation evidence, regional solver and target/Converter safety; integration owns the shared API/lifecycle contracts. Historical revision-3 design and occlusion audit are preserved alongside this report; their statements about no implementation describe their original design stage.
 
 ## Implemented behavior
@@ -28,7 +34,7 @@ Isolated Python 3.12 venv under `/private/tmp/standin-refine-v3-venv`; no origin
 - Independent review found a shadow camera-context mismatch and source/target unit mixing; both were fixed with regressions. Target evaluation content is independently checked against its exact receipt; no finite sample is promoted to a continuous envelope.
 - Synthetic seven-mask source-only benchmark: 70 cache-off solves, per-mask warm p95 approximately **3.6–13.8 ms** on this local runtime. One missing-elbow side retained the base (`insufficient_gain`). These runs use explicit synthetic direct-visibility fixtures. Cold process, shared F25+target/Converter end-to-end SLO, multi-person resource load, real rough quality and hidden-joint recovery were **not** established. Raw report: [synthetic source timing](../evaluation/refine_v3/synthetic_source_cache_off_2026-10-22.json); rerun with `PYTHONPATH=. python scripts/eval_refine_v3_synthetic.py --output <new-report.json>`.
 
-Actual Converter QA used read-only local `male-base-v0-7-2`, native shape corrections, both relaxed hands (30 finger bones), the repository CMU BVH fixture, and pinned Blender 5.2.0 LTS build `fbe6228777e7`. The final FBX had 52 bones, 24,988 vertices and 50,000 polygons; skin reimport and additional topology roundtrip passed. Maximum roundtrip joint error was `4.0676e-7 m`, vertex error `7.0289e-7 m` (both under 0.001 mm). **This verifies that snapshot's transport/integrity, not continuous TargetFK equivalence or pose improvement.** The full mesh shadow recorded intersections and exceeded its 3-second budget, with uncertified policy/fold reference: `validation_blocked`, `complete_collision_certificate=false`. Near-touch positives have not been independently classified. **No actual output was approved as safe or improved.** [Exact QA report](../evaluation/refine_v3/actual_converter_snapshot_2026-10-22.json), [reproduction and limits](../converter/REFINE_V3_SUPPORT.md).
+Actual Converter QA used read-only local `male-base-v0-7-2`, native shape corrections, both relaxed hands (30 finger bones), the repository CMU BVH fixture, and pinned Blender 5.2.0 LTS build `fbe6228777e7`. The final FBX had 52 bones, 24,988 vertices and 50,000 polygons; skin reimport and additional topology roundtrip passed. Maximum roundtrip joint error was `4.0676e-7 m`, vertex error `7.0289e-7 m` (both under 0.001 mm). **This verifies that snapshot's transport/integrity, not continuous TargetFK equivalence or pose improvement.** The full mesh shadow recorded intersections and exceeded its 3-second budget, with uncertified policy/fold reference: `validation_blocked`, `complete_collision_certificate=false`. Near-touch positives have not been independently classified. **At this initial stage, no actual output was approved as safe or improved.** [Exact QA report](../evaluation/refine_v3/actual_converter_snapshot_2026-10-22.json), [reproduction and limits](../converter/REFINE_V3_SUPPORT.md).
 
 ## Product support that remains unavailable
 
@@ -38,7 +44,7 @@ Current model observations are `model_inferred`, and independent side/visibility
 
 BFF/client ownership remains user-side; inference is server-team-owned; Converter/profile/mesh certification is shared. BFF companion is a separate develop-based PR with a private default-off signed sidecar relay only. It does not change public eligibility/cache keys or need a client UI change. Target-result caching, body/hand revision adoption and strict blocked-save UI must be integrated only after a real supported profile/policy and negotiated product capability exist.
 
-## Final integrated validation
+## Initial integrated validation (before mesh safety follow-up)
 
 - Inference: `python -m pytest tests/ --ignore=tests/converter -q` — **2,495 passed, 10 skipped**, 28 subtests passed (27.92 s).
 - Converter unit/contracts: **415 passed, 1 skipped** (5.38 s). Three Blender-only executable modules (`test_convert.py`, `test_v325_runtime.py`, `test_v32_parent_coherent_math.py`) were excluded from CPython collection because they require `bpy`/`mathutils` and separate CLI/asset parameters. The actual Blender shape/hand/reimport QA above ran separately; these three full executable suites were not claimed as run.

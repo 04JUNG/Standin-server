@@ -1,0 +1,485 @@
+{
+  "schema": "finite-actual-fbx-safety-qa-v1",
+  "profile": {
+    "profile_id": "female-base-v0-3-4.offline-neutral-repair-v1",
+    "character_sha256": "98338c58635a4d741c646ca15398da767595a965218cb38bf4a69eb78b33b7f0",
+    "shape_sha256": "e39a8ecee531ddfaaccba027fc7a574cd091915ea7dac62e67557797e4baf0b5",
+    "rig_sha256": "6f7a8ef06b07c2584206c4be72fb1c726a4a430521809e28fb8b9d4f99514924",
+    "rest_sha256": "801a925d3618031389875ca46753ad0cf20be826a2a1f00eb3513ca10916c54a",
+    "bone_map_sha256": "50fafaafe4350da4b8916a8cdace028ab5fd91f45dd49fa7afb6b2337e642af7",
+    "hand_sha256": "75870f220aadd1eb7060611c112178698736f9c59a9f870b6d5dca98898e93f5",
+    "retarget_sha256": "2fca3bd577445989c178aa4ca33e772c595ad2aeb6083f817a3824c93508a579",
+    "converter_manifest_sha256": "52eae0b0eb6a7023540fdf023ad4321f24c11d439f3ecf9f390b5b72358b24e3",
+    "controller_sha256": "df981aedc3784d38e008f6ddb7c7108ce26d8a528ef31539facdabfe2937eb1f",
+    "revision": "finite-snapshot-1",
+    "hand_revision": "hands-1",
+    "adapter_version": "finite-normalized-lbs-shell-witness-v1",
+    "converter_version": "chain-transport-v3.2.5",
+    "blender_build_hash": "fbe6228777e7",
+    "units": "meters",
+    "coordinates": "right-handed-z-up",
+    "output_mode": "rigged_rest"
+  },
+  "profile_sha256": "638a78d790f087c98de10ee893b809caa1ef86671ec9c7b3d1a260167f124e0b",
+  "original_asset_sha256": "98338c58635a4d741c646ca15398da767595a965218cb38bf4a69eb78b33b7f0",
+  "native_neutral_sha256": "bfacfcfc9374309cdc0c536757a6bacf56deac301e423a5edd2ebefd4bb9afc5",
+  "derived_neutral_sha256": "6542fc162c78b89fa0c1497c7dc5d35e5635973bf4b511417a2cc2bc0d3563a0",
+  "source_sha256": "70a555107541a886c2c3faedd6664e97e15feb31d2a29bf2ab7d822d0cc831d0",
+  "neutral_qa_source": true,
+  "source_template_sha256": "13be4288d936cbd9efcbff20a89186cfa51cae6784a9891dbc80d5b974dbaa27",
+  "original_neutral_audit": {
+    "version": "full-body-posed-skin-v2",
+    "status": "validation_blocked",
+    "full_body": true,
+    "hard_violations": [
+      "skin_triangle_intersection"
+    ],
+    "unverified_reasons": [],
+    "triangle_pairs_checked": 12822,
+    "triangle_intersections": [
+      [
+        11646,
+        12566
+      ],
+      [
+        12563,
+        12566
+      ],
+      [
+        12566,
+        11651
+      ]
+    ],
+    "contained_components": [],
+    "folded_faces": [],
+    "complete_collision_certificate": false,
+    "topology_sha256": "2d2eeb3183bad7dfd007059733e58d37bc25d9b37411b61d2651ee92344cc559",
+    "vertices": 24994,
+    "triangles": 50000,
+    "profile_sha256": "bea025948f100d72e45cc23b625b461a9f07ea74ade165046d286f90ec3dc809",
+    "mesh_policy_version": "finite-original-rest-directors-v2",
+    "mesh_policy_sha256": "9eb4fd0920b665bfc14eef1ded1345be94a83322c769b56ab1ff0074a5802e39",
+    "closed_manifold": true,
+    "consistently_oriented": true,
+    "components": 1,
+    "broadphase_pairs_examined": 325854,
+    "shared_boundary_certified_pairs": 313032,
+    "elapsed_sec": 2.0562487500719726
+  },
+  "repair": {
+    "version": "bounded-neutral-collision-repair-v1",
+    "alpha": 0.1,
+    "max_shift_m": 0.00027859343361133043,
+    "max_allowed_shift_m": 0.0005,
+    "changed_vertices": [
+      5756,
+      6027,
+      6190,
+      6207,
+      6276,
+      6380
+    ],
+    "deltas_m": [
+      [
+        1.8892933924992417e-05,
+        -0.00027292014824019525,
+        -5.264932082758994e-05
+      ],
+      [
+        6.363562175205756e-05,
+        4.69362097127099e-05,
+        -0.00014637483816061712
+      ],
+      [
+        -3.0886914048876284e-05,
+        -3.1574176890510065e-05,
+        9.430722732629103e-05
+      ],
+      [
+        -2.5647506117820742e-05,
+        0.00014886651188135148,
+        -7.524120155721903e-05
+      ],
+      [
+        -2.2453708308083078e-05,
+        2.068738852228497e-05,
+        5.644320377281732e-05
+      ],
+      [
+        6.587815781434331e-05,
+        2.15284526348114e-05,
+        -0.00014811495008567964
+      ]
+    ],
+    "attempts": [
+      {
+        "alpha": 0.05,
+        "status": "validation_blocked",
+        "hard_violations": [
+          "skin_triangle_intersection"
+        ],
+        "unverified_reasons": []
+      },
+      {
+        "alpha": 0.1,
+        "status": "mesh_validated",
+        "hard_violations": [],
+        "unverified_reasons": []
+      }
+    ],
+    "original_geometry_sha256": "06df7956347be3dcdddc5810fff260c98bcacc5aaec01ca6c745a70becdac92b",
+    "repaired_geometry_sha256": "97c608e6f2340abaac5058b1c18857ebc6eb6cf687589fb1c72e013f68c3581c"
+  },
+  "stages": [
+    {
+      "stage": "neutral-repair",
+      "artifact_sha256": "6542fc162c78b89fa0c1497c7dc5d35e5635973bf4b511417a2cc2bc0d3563a0",
+      "witness": {
+        "version": "finite-normalized-lbs-shell-witness-v1",
+        "source_asset_sha256": "98338c58635a4d741c646ca15398da767595a965218cb38bf4a69eb78b33b7f0",
+        "profile_sha256": "638a78d790f087c98de10ee893b809caa1ef86671ec9c7b3d1a260167f124e0b",
+        "source_sha256": "70a555107541a886c2c3faedd6664e97e15feb31d2a29bf2ab7d822d0cc831d0",
+        "topology_sha256": "2d2eeb3183bad7dfd007059733e58d37bc25d9b37411b61d2651ee92344cc559",
+        "stage": "neutral-repair",
+        "stage_input_sha256": "bfacfcfc9374309cdc0c536757a6bacf56deac301e423a5edd2ebefd4bb9afc5",
+        "input_sha256": "f5b9a99a12f58ecfd02d29edb9dd80d4ca06d39def2198a85a578088d2e1d97c",
+        "previous_witness_sha256": "",
+        "vertex_count": 24994,
+        "face_count": 50000,
+        "determinant_min": 0.9999999999999993,
+        "vertex_tolerance_m": 1e-05,
+        "area_ratio_min": 0.001,
+        "expected_vertices_sha256": "cb2f01cb3a42d11fd9c106ce65f28b5a7c3dd6b696819f8f8ce25c0cd33aa179",
+        "faces_sha256": "7b6ebc73743c2801ab0373755b14276973af987102419410e0ee0141cf28ecaa",
+        "directors_sha256": "b91f8cf839d7faef68e99bc8c0f3d30b9235d11ae61f728fbbb53c3879e03859",
+        "reference_areas_sha256": "aaf18df0f03c256a51d2eb6ee31e0f8e48b8011629c8196da2d0133f04d38aff"
+      },
+      "witness_sha256": "07b17b8a54d2556eedfd018d83046157579a8fd7a136bd05b42d14447c375559",
+      "replay": {
+        "version": "finite-normalized-lbs-shell-witness-v1",
+        "witness_sha256": "07b17b8a54d2556eedfd018d83046157579a8fd7a136bd05b42d14447c375559",
+        "max_vertex_error_m": 4.43287044505574e-07,
+        "vertex_tolerance_m": 1e-05,
+        "area_ratio_min": 0.001,
+        "discrete_shell_orientation_verified": true,
+        "continuous_volume_certificate": false
+      },
+      "mesh_audit": {
+        "version": "full-body-posed-skin-v2",
+        "status": "mesh_validated",
+        "full_body": true,
+        "hard_violations": [],
+        "unverified_reasons": [],
+        "triangle_pairs_checked": 12812,
+        "triangle_intersections": [],
+        "contained_components": [],
+        "folded_faces": [],
+        "complete_collision_certificate": true,
+        "topology_sha256": "2d2eeb3183bad7dfd007059733e58d37bc25d9b37411b61d2651ee92344cc559",
+        "vertices": 24994,
+        "triangles": 50000,
+        "profile_sha256": "638a78d790f087c98de10ee893b809caa1ef86671ec9c7b3d1a260167f124e0b",
+        "mesh_policy_version": "finite-original-rest-directors-v2",
+        "mesh_policy_sha256": "667a6ed1b23d28c3387a3d527de4850dc7a2cb8634fa590f69dfdf8a8b9992c2",
+        "closed_manifold": true,
+        "consistently_oriented": true,
+        "components": 1,
+        "broadphase_pairs_examined": 325846,
+        "shared_boundary_certified_pairs": 313034,
+        "elapsed_sec": 2.0744165000505745,
+        "full_body_artifact_sha256": "6542fc162c78b89fa0c1497c7dc5d35e5635973bf4b511417a2cc2bc0d3563a0",
+        "deformation_witness_sha256": "07b17b8a54d2556eedfd018d83046157579a8fd7a136bd05b42d14447c375559",
+        "fold_reference_kind": "independent-original-rest-lbs-three-directors"
+      }
+    },
+    {
+      "stage": "body",
+      "artifact_sha256": "36f2de808777140a38c9ae62f1a3276ac7059d6ca29463b6b6c007bb6f0081b3",
+      "witness": {
+        "version": "finite-normalized-lbs-shell-witness-v1",
+        "source_asset_sha256": "98338c58635a4d741c646ca15398da767595a965218cb38bf4a69eb78b33b7f0",
+        "profile_sha256": "638a78d790f087c98de10ee893b809caa1ef86671ec9c7b3d1a260167f124e0b",
+        "source_sha256": "70a555107541a886c2c3faedd6664e97e15feb31d2a29bf2ab7d822d0cc831d0",
+        "topology_sha256": "2d2eeb3183bad7dfd007059733e58d37bc25d9b37411b61d2651ee92344cc559",
+        "stage": "body",
+        "stage_input_sha256": "6542fc162c78b89fa0c1497c7dc5d35e5635973bf4b511417a2cc2bc0d3563a0",
+        "input_sha256": "f5fcb01e017977a13d4af666fb33350c860f99aeae6c591030ffc61eb3eefa53",
+        "previous_witness_sha256": "07b17b8a54d2556eedfd018d83046157579a8fd7a136bd05b42d14447c375559",
+        "vertex_count": 24994,
+        "face_count": 50000,
+        "determinant_min": 0.998847648932781,
+        "vertex_tolerance_m": 1e-05,
+        "area_ratio_min": 0.001,
+        "expected_vertices_sha256": "3c4d27df061b66d64501fa037443aff120fc0a265285ea92da925405d7e5d6d7",
+        "faces_sha256": "7b6ebc73743c2801ab0373755b14276973af987102419410e0ee0141cf28ecaa",
+        "directors_sha256": "b7f071231f41a1709a58b42a84b15eee7af57edbbb278c6df177a495f9b070c5",
+        "reference_areas_sha256": "aaf18df0f03c256a51d2eb6ee31e0f8e48b8011629c8196da2d0133f04d38aff"
+      },
+      "witness_sha256": "4ebd86364c62f2cb89999ce52fb993cff85b328701001dd849c1e8bb6ef8631b",
+      "replay": {
+        "version": "finite-normalized-lbs-shell-witness-v1",
+        "witness_sha256": "4ebd86364c62f2cb89999ce52fb993cff85b328701001dd849c1e8bb6ef8631b",
+        "max_vertex_error_m": 9.138068819428286e-07,
+        "vertex_tolerance_m": 1e-05,
+        "area_ratio_min": 0.001,
+        "discrete_shell_orientation_verified": true,
+        "continuous_volume_certificate": false
+      },
+      "mesh_audit": {
+        "version": "full-body-posed-skin-v2",
+        "status": "mesh_validated",
+        "full_body": true,
+        "hard_violations": [],
+        "unverified_reasons": [],
+        "triangle_pairs_checked": 12831,
+        "triangle_intersections": [],
+        "contained_components": [],
+        "folded_faces": [],
+        "complete_collision_certificate": true,
+        "topology_sha256": "2d2eeb3183bad7dfd007059733e58d37bc25d9b37411b61d2651ee92344cc559",
+        "vertices": 24994,
+        "triangles": 50000,
+        "profile_sha256": "638a78d790f087c98de10ee893b809caa1ef86671ec9c7b3d1a260167f124e0b",
+        "mesh_policy_version": "finite-original-rest-directors-v2",
+        "mesh_policy_sha256": "667a6ed1b23d28c3387a3d527de4850dc7a2cb8634fa590f69dfdf8a8b9992c2",
+        "closed_manifold": true,
+        "consistently_oriented": true,
+        "components": 1,
+        "broadphase_pairs_examined": 325865,
+        "shared_boundary_certified_pairs": 313034,
+        "elapsed_sec": 2.0602690000087023,
+        "full_body_artifact_sha256": "36f2de808777140a38c9ae62f1a3276ac7059d6ca29463b6b6c007bb6f0081b3",
+        "deformation_witness_sha256": "4ebd86364c62f2cb89999ce52fb993cff85b328701001dd849c1e8bb6ef8631b",
+        "fold_reference_kind": "independent-original-rest-lbs-three-directors"
+      }
+    },
+    {
+      "stage": "hands",
+      "artifact_sha256": "e503416f66201fc22b6d5959797b00954da13ec480b0fcf5be9bc518a7114b4e",
+      "witness": {
+        "version": "finite-normalized-lbs-shell-witness-v1",
+        "source_asset_sha256": "98338c58635a4d741c646ca15398da767595a965218cb38bf4a69eb78b33b7f0",
+        "profile_sha256": "638a78d790f087c98de10ee893b809caa1ef86671ec9c7b3d1a260167f124e0b",
+        "source_sha256": "70a555107541a886c2c3faedd6664e97e15feb31d2a29bf2ab7d822d0cc831d0",
+        "topology_sha256": "2d2eeb3183bad7dfd007059733e58d37bc25d9b37411b61d2651ee92344cc559",
+        "stage": "hands",
+        "stage_input_sha256": "36f2de808777140a38c9ae62f1a3276ac7059d6ca29463b6b6c007bb6f0081b3",
+        "input_sha256": "498f925e321ff7d602498655fe4df41e209094f322d662b916f6689b133cd5e8",
+        "previous_witness_sha256": "4ebd86364c62f2cb89999ce52fb993cff85b328701001dd849c1e8bb6ef8631b",
+        "vertex_count": 24994,
+        "face_count": 50000,
+        "determinant_min": 0.9924038549140862,
+        "vertex_tolerance_m": 1e-05,
+        "area_ratio_min": 0.001,
+        "expected_vertices_sha256": "a837c97de96c9d98f81ab3f8a28be59cf98641148361185507cb96d21342f8d5",
+        "faces_sha256": "7b6ebc73743c2801ab0373755b14276973af987102419410e0ee0141cf28ecaa",
+        "directors_sha256": "f1e5482bfde7e2957b9610c9d224f100a91d50b599a3b5b6dbc7ff59781ecb21",
+        "reference_areas_sha256": "aaf18df0f03c256a51d2eb6ee31e0f8e48b8011629c8196da2d0133f04d38aff"
+      },
+      "witness_sha256": "190936139689241e88001298cb64f5ff8fdab8d274c9f58b22b8a43722704108",
+      "replay": {
+        "version": "finite-normalized-lbs-shell-witness-v1",
+        "witness_sha256": "190936139689241e88001298cb64f5ff8fdab8d274c9f58b22b8a43722704108",
+        "max_vertex_error_m": 1.3380247054982499e-06,
+        "vertex_tolerance_m": 1e-05,
+        "area_ratio_min": 0.001,
+        "discrete_shell_orientation_verified": true,
+        "continuous_volume_certificate": false
+      },
+      "mesh_audit": {
+        "version": "full-body-posed-skin-v2",
+        "status": "mesh_validated",
+        "full_body": true,
+        "hard_violations": [],
+        "unverified_reasons": [],
+        "triangle_pairs_checked": 13205,
+        "triangle_intersections": [],
+        "contained_components": [],
+        "folded_faces": [],
+        "complete_collision_certificate": true,
+        "topology_sha256": "2d2eeb3183bad7dfd007059733e58d37bc25d9b37411b61d2651ee92344cc559",
+        "vertices": 24994,
+        "triangles": 50000,
+        "profile_sha256": "638a78d790f087c98de10ee893b809caa1ef86671ec9c7b3d1a260167f124e0b",
+        "mesh_policy_version": "finite-original-rest-directors-v2",
+        "mesh_policy_sha256": "667a6ed1b23d28c3387a3d527de4850dc7a2cb8634fa590f69dfdf8a8b9992c2",
+        "closed_manifold": true,
+        "consistently_oriented": true,
+        "components": 1,
+        "broadphase_pairs_examined": 326239,
+        "shared_boundary_certified_pairs": 313034,
+        "elapsed_sec": 2.069421458989382,
+        "full_body_artifact_sha256": "e503416f66201fc22b6d5959797b00954da13ec480b0fcf5be9bc518a7114b4e",
+        "deformation_witness_sha256": "190936139689241e88001298cb64f5ff8fdab8d274c9f58b22b8a43722704108",
+        "fold_reference_kind": "independent-original-rest-lbs-three-directors"
+      }
+    }
+  ],
+  "hands": {
+    "version": "hand-bake-v1",
+    "library_version": "hand-library-v1",
+    "library_sha256": "c031c50f5f43e82c7c25f04e9d402fa40d3ca866bbccf6f541931546a5299a19",
+    "left": "open",
+    "right": "open",
+    "applied_bones": 30,
+    "body_bones_preserved": true,
+    "sides": {
+      "left": {
+        "preset": "open",
+        "before": {
+          "thumb": {
+            "tip_to_wrist": 0.141724,
+            "tip_palm_offset": 0.050373
+          },
+          "index": {
+            "tip_to_wrist": 0.192763,
+            "tip_palm_offset": 0.002555
+          },
+          "middle": {
+            "tip_to_wrist": 0.205127,
+            "tip_palm_offset": -0.003818
+          },
+          "ring": {
+            "tip_to_wrist": 0.194087,
+            "tip_palm_offset": 0.003525
+          },
+          "pinky": {
+            "tip_to_wrist": 0.168571,
+            "tip_palm_offset": 0.012332
+          }
+        },
+        "after": {
+          "thumb": {
+            "tip_to_wrist": 0.141524,
+            "tip_palm_offset": 0.050373
+          },
+          "index": {
+            "tip_to_wrist": 0.193025,
+            "tip_palm_offset": 0.002555
+          },
+          "middle": {
+            "tip_to_wrist": 0.205127,
+            "tip_palm_offset": -0.003818
+          },
+          "ring": {
+            "tip_to_wrist": 0.193869,
+            "tip_palm_offset": 0.003525
+          },
+          "pinky": {
+            "tip_to_wrist": 0.16891,
+            "tip_palm_offset": 0.012332
+          }
+        },
+        "self_collisions": []
+      },
+      "right": {
+        "preset": "open",
+        "before": {
+          "thumb": {
+            "tip_to_wrist": 0.142503,
+            "tip_palm_offset": 0.042241
+          },
+          "index": {
+            "tip_to_wrist": 0.193072,
+            "tip_palm_offset": 0.005749
+          },
+          "middle": {
+            "tip_to_wrist": 0.207079,
+            "tip_palm_offset": -0.006846
+          },
+          "ring": {
+            "tip_to_wrist": 0.194143,
+            "tip_palm_offset": 0.001235
+          },
+          "pinky": {
+            "tip_to_wrist": 0.17066,
+            "tip_palm_offset": 0.01005
+          }
+        },
+        "after": {
+          "thumb": {
+            "tip_to_wrist": 0.142355,
+            "tip_palm_offset": 0.042241
+          },
+          "index": {
+            "tip_to_wrist": 0.19329,
+            "tip_palm_offset": 0.005749
+          },
+          "middle": {
+            "tip_to_wrist": 0.207079,
+            "tip_palm_offset": -0.006846
+          },
+          "ring": {
+            "tip_to_wrist": 0.194106,
+            "tip_palm_offset": 0.001235
+          },
+          "pinky": {
+            "tip_to_wrist": 0.171257,
+            "tip_palm_offset": 0.01005
+          }
+        },
+        "self_collisions": []
+      }
+    },
+    "self_collision_free": true
+  },
+  "mesh_audit": {
+    "version": "full-body-posed-skin-v2",
+    "status": "mesh_validated",
+    "full_body": true,
+    "hard_violations": [],
+    "unverified_reasons": [],
+    "triangle_pairs_checked": 13205,
+    "triangle_intersections": [],
+    "contained_components": [],
+    "folded_faces": [],
+    "complete_collision_certificate": true,
+    "topology_sha256": "2d2eeb3183bad7dfd007059733e58d37bc25d9b37411b61d2651ee92344cc559",
+    "vertices": 24994,
+    "triangles": 50000,
+    "profile_sha256": "638a78d790f087c98de10ee893b809caa1ef86671ec9c7b3d1a260167f124e0b",
+    "mesh_policy_version": "finite-original-rest-directors-v2",
+    "mesh_policy_sha256": "667a6ed1b23d28c3387a3d527de4850dc7a2cb8634fa590f69dfdf8a8b9992c2",
+    "closed_manifold": true,
+    "consistently_oriented": true,
+    "components": 1,
+    "broadphase_pairs_examined": 326239,
+    "shared_boundary_certified_pairs": 313034,
+    "elapsed_sec": 2.069421458989382,
+    "full_body_artifact_sha256": "e503416f66201fc22b6d5959797b00954da13ec480b0fcf5be9bc518a7114b4e",
+    "deformation_witness_sha256": "190936139689241e88001298cb64f5ff8fdab8d274c9f58b22b8a43722704108",
+    "fold_reference_kind": "independent-original-rest-lbs-three-directors"
+  },
+  "artifact_integrity": {
+    "version": "final-fbx-v1",
+    "artifact_sha256": "e503416f66201fc22b6d5959797b00954da13ec480b0fcf5be9bc518a7114b4e",
+    "scope": "full",
+    "bones": 52,
+    "meshes": 1,
+    "vertices": 24994,
+    "polygons": 50000,
+    "skin_verified": true
+  },
+  "receipt": {
+    "version": "refine-v3-final-artifact-v1",
+    "artifact_sha256": "e503416f66201fc22b6d5959797b00954da13ec480b0fcf5be9bc518a7114b4e",
+    "artifact_size": 1816796,
+    "source_sha256": "70a555107541a886c2c3faedd6664e97e15feb31d2a29bf2ab7d822d0cc831d0",
+    "context_sha256": "4fad8dbe2442a7bf511155c4ecefe98cdc6ad50ab12dfe2bb37978739d089462",
+    "profile_sha256": "638a78d790f087c98de10ee893b809caa1ef86671ec9c7b3d1a260167f124e0b",
+    "revision": "1",
+    "scope": "full",
+    "full_body_artifact_sha256": "e503416f66201fc22b6d5959797b00954da13ec480b0fcf5be9bc518a7114b4e",
+    "mesh_policy_version": "finite-original-rest-directors-v2",
+    "mesh_policy_sha256": "667a6ed1b23d28c3387a3d527de4850dc7a2cb8634fa590f69dfdf8a8b9992c2",
+    "mesh_audit_sha256": "fa3688f8a0f5c09967a972a019a44fc4d918d704bcbb6acf91440a078ac46c28",
+    "integrity_audit_sha256": "4dacfed57146e19c20796ee68276969c3e2d9d4d68295a95710f776265bd806d"
+  },
+  "receipt_sha256": "832025c6caecc8b451dc4040ac9fe5f15a702fe081d6928856fad4d14ab524e0",
+  "artifact_sha256": "e503416f66201fc22b6d5959797b00954da13ec480b0fcf5be9bc518a7114b4e",
+  "artifact_size": 1816796,
+  "safe_final_snapshot_count": 1,
+  "production_registered": false,
+  "continuous_fk_certified": false,
+  "deployed": false
+}

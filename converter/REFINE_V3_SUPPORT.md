@@ -4,6 +4,11 @@ Status: implemented internal contracts and default-off diagnostic. No production
 profile/mesh policy is certified or activated. Existing Converter endpoints,
 automatic flow, five output scopes and independent preview remain unchanged.
 
+Follow-up: one exact offline derived female BASE + both open hands + neutral QA
+source passes actual full-body final-FBX v2 validation and immutable receipt.
+See [root causes, fixes, exact evidence and limits](../docs/REFINE_V3_MESH_SAFETY_FIX_2026-10-22.md).
+Original male CMU and unmodified female Standing poses still fail closed.
+
 ## Implemented
 
 - `src/target_profile.py`: immutable exact asset, shape, neutral rig/rest, map,
@@ -16,8 +21,9 @@ automatic flow, five output scopes and independent preview remain unchanged.
 - `mesh_validation.py`: evaluated world-space full-body triangles after actual
   shape/hand baking, before framing. Bounded broad phase, conservative triangle
   SAT including coplanar overlap, closed/oriented-component winding containment,
-  collapse/transported-normal fold checks. Shared triangle boundaries are inset;
-  an entire neighboring pair/region is never exempted. Contact never waives a
+  collapse/transported-normal fold checks. Shared boundaries require a geometric
+  separating-plane proof; unproved triangles remain unshrunk. An entire
+  neighboring pair/region is never exempted. Contact never waives a
   crossing. Unknown policy, open surfaces, absent independent fold reference,
   triangle/pair limits and timeout cannot produce a certificate.
 - `artifact_receipt.py`: immutable revision/context/profile/final-byte receipt.
@@ -37,7 +43,7 @@ must abstain there. Production `TARGET_REGISTRY` is empty. Trusted server code i
 responsible for registering independently reviewed certificates; hashes are identity,
 not evidence that arbitrary geometry is safe.
 
-## Actual local QA, 2026-10-22
+## Initial actual local QA, 2026-10-22 (historical v1)
 
 Executed `refine_v3_target_qa.py` against Blender 5.2.0 LTS build `fbe6228777e7`,
 read-only local release `male-base-v0-7-2`, its native shape controller, both relaxed
@@ -75,8 +81,8 @@ HTTP/ready, final-integrity, shape and hand contract tests passed in an isolated
 Synthetic closed tetrahedra demonstrate the policy code, not a certified body asset.
 
 Continuous fast retarget/FK, source-canonical transform, certified surface patches,
-anatomical joint-limit envelope, production mesh region/seam policy, real fold-normal
-transport, five-scope strict derivation certification, and real asset/rough holdout
+anatomical joint-limit envelope, production mesh region/seam policy, generic
+fold-normal transport, five-scope strict derivation certification, and real asset/rough holdout
 quality/latency certification remain unsupported. Solver and strict final approval
 must abstain on those missing capabilities. Existing F25/proxy or skin integrity
 passes cannot fill them in.

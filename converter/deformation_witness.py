@@ -1,7 +1,9 @@
 """Immutable finite LBS witnesses for a discrete shell orientation test.
 
-Inputs come from the original neutral mesh, weights and BEFORE-rest-rewrite pose
-matrices. No delivered mesh normals are used as a reference. This is an exact
+Inputs come from the original neutral mesh, weights and world deformation maps
+from pose matrices or preserved before/after rig frames. No delivered mesh
+normals are used as a reference. Every delivered vertex must match replay.
+This is an exact
 finite vertex-replay and conservative transported-director test, not a continuous
 volume-Jacobian, anatomical, collision or arbitrary-pose certification. DQS and
 unrepresented modifier/envelope/vertex-group attenuation are unsupported.

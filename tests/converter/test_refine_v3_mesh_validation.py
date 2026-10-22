@@ -2,7 +2,7 @@ from dataclasses import replace
 import hashlib
 import numpy as np
 import pytest
-from converter.mesh_validation import MeshPolicy, audit_mesh, topology_sha256, triangle_intersection
+from converter.mesh_validation import MeshPolicy, audit_mesh, topology_sha256, triangle_intersection, triangle_relations
 from converter.artifact_receipt import issue_receipt, verify_receipt
 from converter.final_artifact import VERSION as INTEGRITY_VERSION
 
@@ -102,3 +102,64 @@ def test_safe_mesh_receipt_cannot_authorize_unrelated_or_cropped_final_bytes():
             issue_receipt(data, source_sha256=SHA, context_sha256=SHA, profile_sha256=SHA,
                           revision="r1", scope=scope, mesh_audit=mesh,
                           integrity_audit=integrity(data, scope))
+
+
+def test_batched_sat_matches_scalar_for_unrelated_triangles():
+    random = np.random.default_rng(714)
+    first = random.normal(size=(300,3,3))
+    second = random.normal(size=(300,3,3))
+    ids = np.arange(900).reshape(300,3)
+    intersects, boundary, _ = triangle_relations(first, second, ids, ids+900)
+    assert not boundary.any()
+    assert intersects.tolist() == [triangle_intersection(a,b) for a,b in zip(first,second)]
+
+
+def test_sharp_shared_edge_has_only_its_exact_topological_boundary():
+    first = np.array([[[0.,0.,0.], [1.,0.,0.], [0.,1.,0.]]])
+    # Distinct planes intersect exactly on the common edge, even at a sharp crease.
+    second = np.array([[[1.,0.,0.], [0.,0.,0.], [0.,1.,.01]]])
+    intersects, boundary, _ = triangle_relations(first,second,[[0,1,2]],[[1,0,3]])
+    assert boundary[0] and not intersects[0]
+
+
+def test_shared_vertex_does_not_exempt_a_real_crossing_or_duplicate_face():
+    first = np.array([[[0.,0.,0.], [1.,0.,0.], [0.,1.,0.]]])
+    second = np.array([[[0.,0.,0.], [.25,.25,-1.], [.25,.25,1.]]])
+    intersects,boundary,_ = triangle_relations(first,second,[[0,1,2]],[[0,3,4]])
+    assert intersects[0] and not boundary[0]
+    intersects,boundary,_ = triangle_relations(first,first,[[0,1,2]],[[0,1,2]])
+    assert intersects[0] and not boundary[0]
+
+
+def test_all_three_independent_vertex_directors_must_agree():
+    normals = np.cross(V[F][:,1]-V[F][:,0], V[F][:,2]-V[F][:,0])
+    directors = np.repeat(normals[:,None,:],3,axis=1)
+    directors[0,1] *= -1
+    assert "skin_folding" in audit(expected_normals=directors)["hard_violations"]
+
+
+def test_reference_direction_scaling_does_not_change_fold_or_area_threshold():
+    normals = np.cross(V[F][:,1]-V[F][:,0], V[F][:,2]-V[F][:,0])
+    for factor in (1e-9, 1., 1e9):
+        assert audit(expected_normals=normals*factor)["status"] == "mesh_validated"
+        assert "skin_folding" in audit(expected_normals=-normals*factor)["hard_violations"]
+
+
+@pytest.mark.parametrize("width", [2e-7, 5e-7, 1e-6])
+def test_thin_coplanar_overlap_cannot_be_erased_by_shared_boundary_inset(width):
+    first = np.array([[[0.,0.,0.], [1.,0.,0.], [0.,1.,0.]]])
+    second = np.array([[[0.,0.,0.], [1.,width,0.], [1.,-1.,0.]]])
+    crossing,boundary,_ = triangle_relations(first,second,[[0,1,2]],[[0,3,4]])
+    assert crossing[0] and not boundary[0]
+
+
+@pytest.mark.parametrize("shift", [0.,1e8])
+def test_shared_edge_proof_is_translation_invariant_for_thin_overlap(shift):
+    first = np.array([[[0.,0.,0.], [1.,0.,0.], [0.,1.,0.]]])+[0,shift,0]
+    second = np.array([[[1.,0.,0.], [0.,0.,0.], [.5,1e-6,0.]]])+[0,shift,0]
+    crossing,boundary,_ = triangle_relations(first,second,[[0,1,2]],[[1,0,3]])
+    assert crossing[0] and not boundary[0]
+
+
+def test_world_coordinates_without_clearance_precision_abstain():
+    assert "coordinate_precision_unsupported" in audit(vertices=V+1e10)["unverified_reasons"]

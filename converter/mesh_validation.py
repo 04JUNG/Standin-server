@@ -13,7 +13,7 @@ import math
 import time
 import numpy as np
 
-VERSION = "full-body-posed-skin-v1"
+VERSION = "full-body-posed-skin-v2"
 
 
 def topology_sha256(faces, vertex_count):
@@ -44,7 +44,7 @@ class MeshPolicy:
 
     @property
     def digest(self):
-        return hashlib.sha256(json.dumps(asdict(self), sort_keys=True,
+        return hashlib.sha256(json.dumps({"validator_version": VERSION, **asdict(self)}, sort_keys=True,
             separators=(",", ":"), allow_nan=False).encode()).hexdigest()
 
 
@@ -70,6 +70,78 @@ def triangle_intersection(a, b, epsilon=1e-7):
         if ap.max() < bp.min()-epsilon or bp.max() < ap.min()-epsilon:
             return False
     return True
+
+
+def _sat_projections(first, second):
+    first, second = np.asarray(first, float), np.asarray(second, float)
+    # A pair-local frame keeps the shared-boundary proof invariant under world
+    # translation. World-coordinate magnitude must never swallow a thin overlap.
+    origin = first[:, :1].copy()
+    first, second = first-origin, second-origin
+    edge_a = np.roll(first, -1, axis=1)-first
+    edge_b = np.roll(second, -1, axis=1)-second
+    normal_a = np.cross(edge_a[:, 0], edge_a[:, 1])
+    normal_b = np.cross(edge_b[:, 0], edge_b[:, 1])
+    axes = np.concatenate((normal_a[:, None], normal_b[:, None],
+        np.cross(edge_a[:, :, None], edge_b[:, None]).reshape(-1, 9, 3),
+        np.cross(normal_a[:, None], np.concatenate((edge_a, edge_b), axis=1))), axis=1)
+    lengths = np.linalg.norm(axes, axis=2)
+    axes = np.divide(axes, lengths[:, :, None], out=np.zeros_like(axes),
+                     where=lengths[:, :, None] >= 1e-14)
+    a = np.einsum('pvc,pac->pav', first, axes)
+    b = np.einsum('pvc,pac->pav', second, axes)
+    valid = lengths >= 1e-14
+    return a, b, valid
+
+
+def triangle_relations(first, second, first_ids, second_ids, epsilon=1e-7):
+    """Batched original SAT plus a separating-plane shared-simplex proof.
+
+    A shared vertex/edge is legal only when a plane through that exact simplex
+    strictly separates the nonshared vertices from the other triangle. This
+    proves the intersection cannot extend outside that simplex; adjacency alone
+    never exempts a pair. Unproved pairs retain unshrunk conservative SAT.
+    """
+    first, second = np.asarray(first, float), np.asarray(second, float)
+    a, b, valid = _sat_projections(first, second)
+    separated = np.any(valid & ((a.max(2) < b.min(2)-epsilon)
+                               | (b.max(2) < a.min(2)-epsilon)), axis=1)
+    matches = np.asarray(first_ids)[:, :, None] == np.asarray(second_ids)[:, None, :]
+    shared_a, shared_b = matches.any(2), matches.any(1)
+    count = shared_a.sum(1)
+    shared_min = np.min(np.where(shared_a[:, None], a, np.inf), axis=2)
+    shared_max = np.max(np.where(shared_a[:, None], a, -np.inf), axis=2)
+    shared_min[count == 0] = 0
+    shared_max[count == 0] = 0
+    # Only floating point roundoff is tolerated for the plane containing a
+    # shared edge, never the skin clearance epsilon or a percentage of a face.
+    roundoff = 64*np.finfo(float).eps*np.maximum(1., np.maximum(abs(shared_min), abs(shared_max)))
+    planar = np.zeros_like(valid)
+    np.less_equal(shared_max-shared_min, roundoff, out=planar, where=(count > 0)[:, None] )
+    amin = np.min(np.where(~shared_a[:, None], a, np.inf), axis=2)
+    amax = np.max(np.where(~shared_a[:, None], a, -np.inf), axis=2)
+    bmin = np.min(np.where(~shared_b[:, None], b, np.inf), axis=2)
+    bmax = np.max(np.where(~shared_b[:, None], b, -np.inf), axis=2)
+    # One triangle may lie IN the separating plane (a sharp legal crease).
+    # Strict separation of the other's nonshared vertices still proves that
+    # the intersection is confined to the shared simplex. Requiring both to
+    # have nonzero projections wrongly calls such sharp edges penetrations.
+    boundary = ((count == 1) | (count == 2)) & np.any(valid & planar & (
+        ((amin > shared_max+roundoff) & (b.max(2) <= shared_min+roundoff))
+        | ((amax < shared_min-roundoff) & (b.min(2) >= shared_max-roundoff))
+        | ((bmin > shared_max+roundoff) & (a.max(2) <= shared_min+roundoff))
+        | ((bmax < shared_min-roundoff) & (a.min(2) >= shared_max-roundoff))), axis=1)
+    unresolved = ~separated & ~boundary
+    intersects = np.zeros(len(first), dtype=bool)
+    if unresolved.any():
+        indices = np.flatnonzero(unresolved)
+        aa, bb = first[indices].copy(), second[indices].copy()
+        # Never shrink faces to remove their seam: that can erase a genuine
+        # thin overlap. An unproved pair stays conservatively intersecting.
+        pa, pb, usable = _sat_projections(aa, bb)
+        intersects[indices] = ~np.any(usable & ((pa.max(2) < pb.min(2)-epsilon)
+                                              | (pb.max(2) < pa.min(2)-epsilon)), axis=1)
+    return intersects, boundary, unresolved
 
 
 def _inside(point, triangles, epsilon):
@@ -116,7 +188,7 @@ def audit_mesh(vertices, faces, *, policy=None, profile_sha256=None,
                expected_normals=None, reference_double_areas=None,
                full_body=True, seconds=3.0, max_triangles=50000,
                max_pairs=200000):
-    """Inspect all nonadjacent full-skin triangles and closed components.
+    """Inspect all full-skin triangle pairs and closed components.
 
     expected_normals MUST be computed by a separately verified deformation
     adapter. Reusing current normals would conceal a fold and cannot certify.
@@ -172,6 +244,9 @@ def audit_mesh(vertices, faces, *, policy=None, profile_sha256=None,
         unknown("mesh_triangle_budget")
         return finish()
     eps = policy.epsilon_m if isinstance(policy, MeshPolicy) else 1e-7
+    if np.max(abs(vertices))*64*np.finfo(float).eps > eps:
+        unknown("coordinate_precision_unsupported")
+        return finish()
     tris = vertices[faces]
     normals = np.cross(tris[:, 1]-tris[:, 0], tris[:, 2]-tris[:, 0])
     areas = np.linalg.norm(normals, axis=1)
@@ -182,13 +257,15 @@ def audit_mesh(vertices, faces, *, policy=None, profile_sha256=None,
     else:
         expected = np.asarray(expected_normals, float)
         reference = np.asarray(reference_double_areas, float)
-        if (expected.shape != normals.shape or reference.shape != areas.shape
+        if expected.shape == normals.shape:
+            expected = expected[:, None, :]
+        if (expected.shape not in ((len(faces), 1, 3), (len(faces), 3, 3)) or reference.shape != areas.shape
                 or not np.isfinite(expected).all() or not np.isfinite(reference).all()
-                or np.any(np.linalg.norm(expected, axis=1) < eps) or np.any(reference <= 0)):
+                or np.any(np.linalg.norm(expected, axis=2) <= 0) or np.any(reference <= 0)):
             unknown("fold_reference_invalid")
         else:
             threshold = policy.area_ratio_min if isinstance(policy, MeshPolicy) else .001
-            folded = np.flatnonzero((np.einsum("ij,ij->i", normals, expected) <= 0)
+            folded = np.flatnonzero(np.any(np.einsum("fi,fvi->fv", normals, expected) <= 0, axis=1)
                                     | (areas/reference < threshold))
             result["folded_faces"] = folded[:16].tolist()
             if len(folded):
@@ -198,35 +275,55 @@ def audit_mesh(vertices, faces, *, policy=None, profile_sha256=None,
     if not closed or not oriented:
         unknown("containment_requires_closed_oriented_skin")
     lo, hi = tris.min(axis=1), tris.max(axis=1)
-    # Sweep along x. Every AABB overlap is considered; no semantic contact mask.
+    # Complete AABB sweep, with batched SAT. No body region or contact mask.
+    # Shared-simplex separating-plane proofs are cheap broadphase certificates,
+    # not adjacency exclusions. The original exact-pair/time limits are retained.
+    if type(max_pairs) is not int or max_pairs <= 0:
+        unknown("validation_pair_budget")
+        return finish()
     order = np.argsort(lo[:, 0], kind="stable")
-    for position, i in enumerate(order):
+    ends = np.searchsorted(lo[order, 0], hi[order, 0]+eps, side="right")
+    result["broadphase_pairs_examined"] = 0
+    result["shared_boundary_certified_pairs"] = 0
+    pending_a, pending_b, size = [], [], 0
+    def inspect_batch():
+        nonlocal pending_a, pending_b, size
+        if not size:
+            return True
+        aa, bb = np.concatenate(pending_a), np.concatenate(pending_b)
+        pending_a, pending_b, size = [], [], 0
+        crossing, boundary, _ = triangle_relations(tris[aa], tris[bb], faces[aa], faces[bb], eps)
+        result["broadphase_pairs_examined"] += len(aa)
+        result["shared_boundary_certified_pairs"] += int(boundary.sum())
+        result["triangle_pairs_checked"] += int((~boundary).sum())
+        if result["triangle_pairs_checked"] > max_pairs:
+            unknown("validation_pair_budget")
+            return False
+        if crossing.any():
+            blocked("skin_triangle_intersection")
+            for index in np.flatnonzero(crossing):
+                if len(result["triangle_intersections"]) >= 16:
+                    break
+                result["triangle_intersections"].append([int(aa[index]), int(bb[index])])
         if time.monotonic() >= deadline:
             unknown("validation_deadline")
+            return False
+        return True
+    for position, i in enumerate(order):
+        if position % 256 == 0 and time.monotonic() >= deadline:
+            unknown("validation_deadline")
             return finish()
-        remaining = order[position+1:]
-        remaining = remaining[lo[remaining, 0] <= hi[i, 0]+eps]
-        candidates = remaining[np.all((lo[remaining] <= hi[i]+eps) & (hi[remaining] >= lo[i]-eps), axis=1)]
-        for j in candidates:
-            # Only directly incident triangles share a skin seam. Their folding
-            # is checked above; regions, contact labels and whole limbs cannot exempt pairs.
-            first, second = tris[i], tris[j]
-            if np.intersect1d(faces[i], faces[j]).size:
-                # Remove only the shared boundary, not the entire incident pair:
-                # adjacent triangles may fold and overlap beyond their seam.
-                def inset(triangle):
-                    center = triangle.mean(axis=0)
-                    scale = max(float(np.max(np.linalg.norm(triangle-center, axis=1))), eps)
-                    return center + (triangle-center)*(1-min(0.01, 16*eps/scale))
-                first, second = inset(first), inset(second)
-            result["triangle_pairs_checked"] += 1
-            if result["triangle_pairs_checked"] > max_pairs or time.monotonic() >= deadline:
-                unknown("validation_pair_budget" if time.monotonic() < deadline else "validation_deadline")
+        candidates = order[position+1:ends[position]]
+        candidates = candidates[np.all((lo[candidates] <= hi[i]+eps)
+                                      & (hi[candidates] >= lo[i]-eps), axis=1)]
+        if len(candidates):
+            pending_a.append(np.full(len(candidates), i, dtype=int))
+            pending_b.append(candidates)
+            size += len(candidates)
+            if size >= 4096 and not inspect_batch():
                 return finish()
-            if triangle_intersection(first, second, eps):
-                blocked("skin_triangle_intersection")
-                if len(result["triangle_intersections"]) < 16:
-                    result["triangle_intersections"].append([int(i), int(j)])
+    if not inspect_batch():
+        return finish()
     if closed and oriented:
         # Independent closed components can be fully enclosed without a crossing.
         # Both directions and every component pair are required.
