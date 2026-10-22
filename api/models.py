@@ -225,6 +225,10 @@ class DynamicSearchOut(BaseModel):
 
 
 class PersonOut(BaseModel):
+    # Private BFF sidecar. A signed shadow envelope grants no product permission.
+    refine_v3: Optional[dict] = None
+    refine_evidence: Optional[dict] = None
+    joint_provenance: Optional[List[dict]] = None
     # Optional additive contract: qualified dynamic library refine bindings.
     # Old BFF/clients ignore this and keep dynamic refinement disabled.
     refine_candidates: List[CandidateOut] = Field(default_factory=list)
@@ -302,6 +306,7 @@ class CutResultOut(BaseModel):
 # 작가가 Top-K 중 '고른 1개'만 러프에 맞춰 조정한다. 계산은 커밋된 포즈에만 든다.
 
 class RefineRequest(BaseModel):
+    refine_v3: Optional[dict] = None
     render_thumbnail: bool = True
     camera: Optional[CandidateCamera] = None
     pose_id: str = Field(..., description="작가가 고른 후보의 pose_id")
@@ -352,6 +357,18 @@ class RefineRequest(BaseModel):
     def _finite_keypoints(cls, value):
         if not all(math.isfinite(float(number)) for point in value for number in point):
             raise ValueError("keypoints must contain only finite values")
+        return value
+
+    @field_validator("refine_v3")
+    @classmethod
+    def _bounded_v3(cls, value):
+        if value is not None:
+            from src.refine_v3_contracts import canonical_bytes
+            try:
+                if len(canonical_bytes(value)) > 65536:
+                    raise ValueError("refine_v3 exceeds size limit")
+            except (TypeError, OverflowError, RecursionError) as exc:
+                raise ValueError("invalid refine_v3 envelope") from exc
         return value
 
     @model_validator(mode='after')

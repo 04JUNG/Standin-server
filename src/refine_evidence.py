@@ -256,6 +256,9 @@ def response_trace(response, *, provider, model, logical_call_id, attempts=1):
             "provider_response_id": getattr(response, "response_id", None),
             "logical_calls": 1, "provider_attempts": attempts, "additional_logical_calls": 0,
             "solver_logical_calls": 0,
+            "image_inputs_per_attempt": 1,
+            "image_attempts": attempts if type(attempts) is int else None,
+            "token_usage_scope": "successful_response_only",
             "prompt_tokens": getattr(usage, "prompt_token_count", getattr(usage, "prompt_tokens", None)),
             "response_tokens": getattr(usage, "candidates_token_count", getattr(usage, "completion_tokens", None)),
             "total_tokens": getattr(usage, "total_token_count", getattr(usage, "total_tokens", None))}

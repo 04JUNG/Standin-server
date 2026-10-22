@@ -200,7 +200,7 @@ def refine_regional_bvh(source_path, keypoints, binding, provenance, ownership, 
         rotation = np.asarray(binding["camera"]["rotation"], float)
         target_mode = target_adapter is not None
         if target_mode:
-            from .target_profile import certified_adapter
+            from .target_profile import certified_adapter, evaluate_certified_adapter
             if not certified_adapter(target_adapter, target_profile_sha256, digest):
                 return finish("target_adapter_uncertified")
             if getattr(target_adapter, "coordinate_frame", None) != "source-canonical-m":
@@ -210,8 +210,9 @@ def refine_regional_bvh(source_path, keypoints, binding, provenance, ownership, 
         def points_for(values):
             check_time()
             if target_mode:
-                data = doc.render(values, indices)
-                evaluated = target_adapter.evaluate(data.decode("utf-8-sig"))
+                data = raw if np.array_equal(values, base) else doc.render(values, indices)
+                evaluated = evaluate_certified_adapter(target_adapter, target_profile_sha256,
+                                                       data.decode("utf-8-sig"))
                 points = np.asarray(evaluated.coco17, float)
                 if points.shape != (17, 3) or not np.isfinite(points).all():
                     raise ValueError("invalid target FK")

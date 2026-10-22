@@ -201,6 +201,8 @@ def test_uncertified_adapter_never_falls_through_to_source_success(tmp_path, mon
     import types
     module = types.ModuleType("src.target_profile")
     module.certified_adapter = lambda *_: False
+    # Explicit mechanical QA adapter only; real receipt validation is tested separately.
+    module.evaluate_certified_adapter = lambda adapter, profile, text: adapter.evaluate(text)
     monkeypatch.setitem(sys.modules, "src.target_profile", module)
     source, kwargs = _inputs(tmp_path)
     binding = build_regional_binding(**kwargs, enabled=True).binding
@@ -218,6 +220,8 @@ def test_target_qa_geometry_still_requires_exact_candidate_certificate(tmp_path,
     source, kwargs = _inputs(tmp_path)
     baseline_hash = kwargs["source_bvh_sha256"]
     module.certified_adapter = lambda adapter, profile, digest: digest == baseline_hash
+    # Explicit mechanical QA adapter only; real receipt validation is tested separately.
+    module.evaluate_certified_adapter = lambda adapter, profile, text: adapter.evaluate(text)
     monkeypatch.setitem(sys.modules, "src.target_profile", module)
     class Adapter:
         coordinate_frame = "source-canonical-m"
@@ -240,6 +244,8 @@ def test_target_geometry_path_is_not_mesh_certification(tmp_path, monkeypatch):
     import types
     module = types.ModuleType("src.target_profile")
     module.certified_adapter = lambda *_: True  # Explicit synthetic adapter.
+    # Explicit mechanical QA adapter only; real receipt validation is tested separately.
+    module.evaluate_certified_adapter = lambda adapter, profile, text: adapter.evaluate(text)
     monkeypatch.setitem(sys.modules, "src.target_profile", module)
     source, kwargs = _inputs(tmp_path)
     class Adapter:
@@ -257,6 +263,39 @@ def test_target_geometry_path_is_not_mesh_certification(tmp_path, monkeypatch):
     assert result.refined and result.reason == "target_geometry_improved", result.to_dict()
     assert result.mesh_status == "mesh_unverified"
     assert result.target_status == "certified_candidate_geometry"
+
+
+def test_real_finite_receipt_cannot_authorize_unseen_solver_probe(tmp_path):
+    """Exercise the genuine content checker, without the mechanical QA bypass."""
+    from src.target_profile import TargetEvaluation, EquivalenceReceipt
+    from tests.test_refine_v3_target_profile import profile
+    source, kwargs = _inputs(tmp_path)
+    joints, frames = parse_bvh(source)
+    points, _ = coco17_from_fk(joints, fk(joints, frames[0]))
+    target = profile()
+    digest = kwargs["source_bvh_sha256"]
+    evaluation = TargetEvaluation(target.digest, digest,
+        tuple(tuple(float(v) for v in point) for point in points))
+    calls = []
+    class FiniteAdapter:
+        # Explicit synthetic coordinate fixture; this is not a deployed rig.
+        coordinate_frame = "source-canonical-m"
+        profile = target
+        receipt = EquivalenceReceipt(target.digest, target.adapter_version, (digest,),
+            target.converter_version, target.blender_build_hash, 0., 0., 1e-5, "a" * 64,
+            evaluation_sha256s=((digest, evaluation.digest),))
+        def evaluate(self, text):
+            calls.append(hashlib.sha256(text.encode()).hexdigest())
+            return evaluation
+    binding = build_regional_binding(**kwargs, enabled=True).binding
+    output = tmp_path / "finite-rollback.bvh"
+    result = refine_regional_bvh(source, kwargs["keypoints"], binding,
+        kwargs["provenance"], kwargs["ownership"], enabled=True, out_path=output,
+        target_adapter=FiniteAdapter(), target_profile_sha256=target.digest)
+    assert not result.refined and result.reason == "solver_validation_failed"
+    assert result.diagnostics["failure_reason"] == "target_profile_unsupported"
+    assert calls and set(calls) == {digest}
+    assert output.read_bytes() == Path(source).read_bytes()
 
 
 def test_no_gain_restores_every_byte(tmp_path):
@@ -285,6 +324,8 @@ def test_target_meters_and_source_centimeters_use_independent_perspective(tmp_pa
     from src.refine_projection import FixedProjection, search_rotation
     module = types.ModuleType("src.target_profile")
     module.certified_adapter = lambda *_: True  # Explicit synthetic QA receipt.
+    # Explicit mechanical QA adapter only; real receipt validation is tested separately.
+    module.evaluate_certified_adapter = lambda adapter, profile, text: adapter.evaluate(text)
     monkeypatch.setitem(sys.modules, "src.target_profile", module)
     source, kwargs = _inputs(tmp_path)
     rotation = search_rotation(30, 0)
