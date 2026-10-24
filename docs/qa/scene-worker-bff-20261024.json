@@ -1,0 +1,22 @@
+[
+  {
+    "worker": "fixed-server",
+    "case": "artifact_only",
+    "accepted": true,
+    "contract": "verified-scene-fbx-v1"
+  },
+  {
+    "worker": "fixed-server",
+    "case": "busy",
+    "upstreamStatus": 503,
+    "bffCode": "SCENE_BUSY",
+    "operationMayContinue": false
+  },
+  {
+    "worker": "fixed-server",
+    "case": "timeout",
+    "upstreamStatus": 504,
+    "bffCode": "SCENE_TIMEOUT",
+    "operationMayContinue": true
+  }
+]

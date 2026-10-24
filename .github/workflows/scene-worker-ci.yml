@@ -1,0 +1,65 @@
+name: Scene worker CI
+on:
+  pull_request:
+    branches: [develop]
+    paths:
+      - 'src/**'
+      - 'converter/**'
+      - 'converter_api/**'
+      - 'config/**'
+      - 'Dockerfile.converter'
+      - 'Dockerfile.scene-worker'
+      - 'requirements*'
+      - '.dockerignore'
+      - '.github/workflows/scene-worker-*.yml'
+      - 'scripts/*scene*'
+      - 'tests/test_scene*'
+      - 'tests/converter/verify_scene_preview_camera.py'
+      - 'deploy/ecs/scene-worker*'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: scene-worker-ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  worker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Runtime contracts (no paid model calls)
+        run: |
+          pip install -r requirements-converter.txt numpy scipy httpx pytest google-genai
+          python -m pytest -q tests/test_scene_refinement_runtime.py tests/test_scene_worker_deployment.py tests/test_scene_worker_artifact_contract.py
+      - name: Build calibrated base and CPU worker at the same commit
+        run: |
+          docker build --platform linux/amd64 -f Dockerfile.converter -t standin-converter:scene-base .
+          docker build --platform linux/amd64 -f Dockerfile.scene-worker -t standin-scene:ci .
+          docker run --rm standin-scene:ci python -c 'import torch,transformers,rtmlib,onnxruntime,cv2; from src.scene_refinement import runtime,plan; from src.semantic_adapter_285 import excluded_pose_ids; excluded_pose_ids(); assert not torch.cuda.is_available()'
+      - name: Verify scene camera projection through real Blender FBX roundtrip
+        run: |
+          docker run --rm --platform linux/amd64 \
+            --mount type=bind,source="$GITHUB_WORKSPACE/tests",target=/app/tests,readonly \
+            standin-scene:ci /opt/blender/blender --background --factory-startup \
+            --python-exit-code 1 --python /app/tests/converter/verify_scene_preview_camera.py
+      - name: Missing assets cannot pass readiness
+        run: |
+          docker run -d --name scene-smoke -p 127.0.0.1:8002:8002 \
+            -e SCENE_REFINEMENT_ENABLED=1 \
+            -e SCENE_REFINEMENT_TOKEN=ci-only-not-a-secret-32-characters-long standin-scene:ci
+          curl --fail --retry 15 --retry-delay 1 --retry-all-errors http://127.0.0.1:8002/healthz
+          test "$(curl -s -o /tmp/ready.json -w '%{http_code}' http://127.0.0.1:8002/readyz)" = 503
+          for ATTEMPT in $(seq 1 20); do
+            curl -s http://127.0.0.1:8002/readyz > /tmp/ready.json
+            if python -c 'import json; assert json.load(open("/tmp/ready.json"))["phase"] == "failed"'; then break; fi
+            sleep 1
+          done
+          python -c 'import json; assert json.load(open("/tmp/ready.json"))["phase"] == "failed"'
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://127.0.0.1:8002/scene/plan)" = 401
+      - name: Remove smoke container
+        if: always()
+        run: docker rm -f scene-smoke || true

@@ -1,0 +1,116 @@
+{
+  "family": "standin-scene-worker-staging",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  },
+  "cpu": "4096",
+  "memory": "8192",
+  "executionRoleArn": "arn:aws:iam::<account-id>:role/<staging-ecs-execution-with-worker-secrets>",
+  "taskRoleArn": "arn:aws:iam::<account-id>:role/<staging-scene-efs-read-only>",
+  "ephemeralStorage": {
+    "sizeInGiB": 30
+  },
+  "volumes": [
+    {
+      "name": "scene-assets",
+      "efsVolumeConfiguration": {
+        "fileSystemId": "<staging-efs-id>",
+        "transitEncryption": "ENABLED",
+        "authorizationConfig": {
+          "accessPointId": "<staging-read-only-release-access-point>",
+          "iam": "ENABLED"
+        }
+      }
+    }
+  ],
+  "containerDefinitions": [
+    {
+      "name": "scene-worker",
+      "image": "<account-id>.dkr.ecr.<region>.amazonaws.com/standin/scene-worker:<git-sha>",
+      "essential": true,
+      "user": "10001:10001",
+      "readonlyRootFilesystem": false,
+      "portMappings": [
+        {
+          "name": "scene-worker-http",
+          "containerPort": 8002,
+          "hostPort": 8002,
+          "protocol": "tcp",
+          "appProtocol": "http"
+        }
+      ],
+      "environment": [
+        {
+          "name": "APP_ENV",
+          "value": "staging"
+        },
+        {
+          "name": "SCENE_REFINEMENT_ENABLED",
+          "value": "1"
+        },
+        {
+          "name": "SCENE_VLM_PROVIDER",
+          "value": "gemini"
+        },
+        {
+          "name": "SCENE_VLM_MODEL",
+          "value": "<approved-gemini-model>"
+        },
+        {
+          "name": "SCENE_ASSET_MANIFEST",
+          "value": "/scene-assets/<immutable-release-id>/release.json"
+        },
+        {
+          "name": "SCENE_ASSET_MANIFEST_SHA256",
+          "value": "<approved-release-json-sha256>"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "SCENE_REFINEMENT_TOKEN",
+          "valueFrom": "arn:aws:secretsmanager:<region>:<account-id>:secret:<private-worker-token>"
+        },
+        {
+          "name": "GEMINI_API_KEY",
+          "valueFrom": "arn:aws:secretsmanager:<region>:<account-id>:secret:<gemini-api-key>"
+        }
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "scene-assets",
+          "containerPath": "/scene-assets",
+          "readOnly": true
+        }
+      ],
+      "linuxParameters": {
+        "initProcessEnabled": true
+      },
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8002/readyz',timeout=3)\""
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 300
+      },
+      "stopTimeout": 120,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/standin/scene-worker-staging",
+          "awslogs-region": "<region>",
+          "awslogs-stream-prefix": "scene-worker",
+          "mode": "non-blocking",
+          "max-buffer-size": "25m"
+        }
+      }
+    }
+  ]
+}

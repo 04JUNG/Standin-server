@@ -1,0 +1,31 @@
+{
+  "serviceName": "standin-scene-worker-staging",
+  "launchType": "FARGATE",
+  "desiredCount": 1,
+  "platformVersion": "1.4.0",
+  "healthCheckGracePeriodSeconds": 300,
+  "networkConfiguration": {
+    "awsvpcConfiguration": {
+      "subnets": [
+        "<private-subnet>"
+      ],
+      "securityGroups": [
+        "<scene-sg-ingress-8002-from-bff-only>"
+      ],
+      "assignPublicIp": "DISABLED"
+    }
+  },
+  "deploymentConfiguration": {
+    "maximumPercent": 100,
+    "minimumHealthyPercent": 0,
+    "deploymentCircuitBreaker": {
+      "enable": true,
+      "rollback": true
+    }
+  },
+  "serviceRegistries": [
+    {
+      "registryArn": "<private-cloud-map-service-arn>"
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+[
+  {
+    "cut": "S3-p_rough_060",
+    "people": 2,
+    "input_sha256": "5f77c597f5987f87e79a378d137ffce7e33559f63b474edfb0d279191bba8937",
+    "variants": {
+      "before": {
+        "artifact_sha256": "5f77c597f5987f87e79a378d137ffce7e33559f63b474edfb0d279191bba8937",
+        "preview_sha256": "de27a03f51cd04935d679bc1cfd76b78dd93d1ddfc18678744b43ef2666f210b",
+        "size": [
+          302,
+          512
+        ]
+      },
+      "after": {
+        "artifact_sha256": "5f77c597f5987f87e79a378d137ffce7e33559f63b474edfb0d279191bba8937",
+        "preview_sha256": "a6992e0d374c1cd3a051c5c60471495e1a27293f40f45b5566b6c1db4b198a6e",
+        "size": [
+          302,
+          512
+        ]
+      }
+    },
+    "pixel_difference_bbox": [
+      0,
+      74,
+      302,
+      512
+    ]
+  },
+  {
+    "cut": "S3-p_rough_220",
+    "people": 2,
+    "input_sha256": "a44053543e3b943dcb3df11a43eb2ad9f96b702482a9625432ae2ef3129453e9",
+    "variants": {
+      "before": {
+        "artifact_sha256": "a44053543e3b943dcb3df11a43eb2ad9f96b702482a9625432ae2ef3129453e9",
+        "preview_sha256": "28092c0c479ed0af40cbc974db0d7a920338a5948a0722ab62ad2e1008a6daff",
+        "size": [
+          183,
+          512
+        ]
+      },
+      "after": {
+        "artifact_sha256": "a44053543e3b943dcb3df11a43eb2ad9f96b702482a9625432ae2ef3129453e9",
+        "preview_sha256": "083e4d6f7b6b6fdd82c0eaacc10c519920e586d793fbbde13c39fe1944224e1d",
+        "size": [
+          183,
+          512
+        ]
+      }
+    },
+    "pixel_difference_bbox": [
+      0,
+      0,
+      183,
+      512
+    ]
+  },
+  {
+    "cut": "S3-v3_rough_0718",
+    "people": 3,
+    "input_sha256": "362dec210084b2449aed96a8385c2389974716aa1832fc4803998586f4d6df57",
+    "variants": {
+      "before": {
+        "artifact_sha256": "362dec210084b2449aed96a8385c2389974716aa1832fc4803998586f4d6df57",
+        "preview_sha256": "7c5734c2b0bc264b3e45a12ae01c0e2dcc4ec98e199bc9704b7fff33de29a3a6",
+        "size": [
+          512,
+          295
+        ]
+      },
+      "after": {
+        "artifact_sha256": "362dec210084b2449aed96a8385c2389974716aa1832fc4803998586f4d6df57",
+        "preview_sha256": "9c02873e5bc5833f9a0c71cf35b958b61e9f36c9444762250b16aa326df1cc25",
+        "size": [
+          512,
+          295
+        ]
+      }
+    },
+    "pixel_difference_bbox": null
+  }
+]
