@@ -86,10 +86,9 @@ def create_app(engine=None, token="", *, factory=None):
         if state["phase"] != "ready":
             raise HTTPException(503, {"code": "SCENE_WORKER_NOT_READY"})
         # No await between admission check and reservation, including body reads.
+        # The BFF transport identifies this exact legacy detail as SCENE_BUSY.
         if busy:
-            raise HTTPException(
-                503, {"code": "SCENE_WORKER_BUSY"}, headers={"Retry-After": "5"}
-            )
+            raise HTTPException(503, "scene worker busy", headers={"Retry-After": "5"})
         busy = True
         try:
             data = bytearray()

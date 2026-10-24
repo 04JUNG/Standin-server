@@ -202,7 +202,8 @@ and reviewed-FBX route (not public worker access):
 5. Import the actual downloaded files into CSP without manually changing transforms;
    compare position/size/camera adoption separately. No CSP pixel-match claim yet.
 
-Worker failures now use `{"detail":{"code":"..."}}`:
+Worker failures use `{"detail":{"code":"..."}}`, except the busy detail
+string retained for the existing BFF transport:
 
 | HTTP | Code | Meaning |
 | --- | --- | --- |
@@ -210,7 +211,7 @@ Worker failures now use `{"detail":{"code":"..."}}`:
 | 413 | `SCENE_INPUT_TOO_LARGE` | streamed body exceeds160MiB |
 | 422 | `SCENE_EVIDENCE_REJECTED` | invalid JSON/artifacts/evidence/plan binding |
 | 503 | `SCENE_WORKER_NOT_READY` | startup not complete or failed |
-| 503 | `SCENE_WORKER_BUSY` | slot occupied, Retry-After5 |
+| 503 | `detail="scene worker busy"` | legacy BFF-compatible busy, Retry-After5 |
 | 504 | `SCENE_WORKER_TIMEOUT` | upload/model/Blender timeout |
 | 502 | `SCENE_WORKER_FAILED` | upstream/worker failure, details withheld |
 
@@ -233,3 +234,10 @@ receipt affinity, load/restart/retention policy and CSP framing verification.
 Raw inputs/artifacts remain on task-private ephemeral scratch until engine cleanup
 or task deletion; existing cleanup is request-driven, not a strict idle TTL janitor.
 Do not scale or declare user readiness based on health alone.
+
+
+## 2026-10-24 compatibility follow-up
+
+The paused runtime changes are now based on develop7a3713f and preserve its
+artifact-first engine/final-preview contract. Busy retains the legacy detail
+string required by BFF PR130. See [the pinned comparison and test evidence](scene-worker-compatibility-2026-10-24.md).

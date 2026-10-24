@@ -112,7 +112,7 @@ def test_stream_admission_and_disconnect_do_not_overlap_threads():
                 await asyncio.sleep(0)
                 blocked = await client.post("/scene/plan", headers=HEADERS, json={})
                 assert blocked.status_code == 503
-                assert blocked.json()["detail"]["code"] == "SCENE_WORKER_BUSY"
+                assert blocked.json()["detail"] == "scene worker busy"
                 assert (await client.get("/readyz")).status_code == 200
             finally:
                 release.set()
