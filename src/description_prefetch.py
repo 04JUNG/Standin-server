@@ -1,4 +1,4 @@
-"""Opt-in, request-local description prefetch. Never publishes from a worker.
+"""Default-on, request-local description prefetch. Never publishes from a worker.
 
 Only a byte-identical image and the entire original ordered slot/box request may
 reuse a result. Mismatches use the existing foreground describe path instead.
@@ -127,7 +127,7 @@ class DescriptionPrefetch:
 
 
 def start_description_prefetch(client, image, analysis, img_w, img_h, *, fullbody):
-    if not fullbody or os.getenv("PARALLEL_POSE_DESCRIPTION", "0") != "1":
+    if not fullbody or os.getenv("PARALLEL_POSE_DESCRIPTION", "1") != "1":
         return None
     # An optional optimization must not break the existing pose path if request
     # preparation is unsupported. Actual provider failures are NOT swallowed here.

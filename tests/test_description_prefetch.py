@@ -86,6 +86,15 @@ def test_disabled_or_legacy_does_not_submit(monkeypatch, image, setting, fullbod
     assert not client.calls
 
 
+def test_unset_flag_enables_prefetch_by_default(monkeypatch, image):
+    monkeypatch.delenv("PARALLEL_POSE_DESCRIPTION", raising=False)
+    client = Client()
+    job = start(client, image)
+    assert consume(job, client, image).status == "ok"
+    assert job.status == "used" and len(client.calls) == 1
+    job.close()
+
+
 @pytest.mark.parametrize("case", ["missing", "invalid", "count", "empty", "entangled", "non_pil"])
 def test_unsupported_batches_use_existing_foreground_path(image, case):
     client = Client()
@@ -274,8 +283,11 @@ def pipeline(client, *, rough=False, pose=None, repairer=False, empty=False):
 def test_pipeline_results_ranks_errors_and_generation_match_sequential(
         monkeypatch, image, rough, people, reply, empty):
     runs = []
-    for enabled in ("0", "1"):
-        monkeypatch.setenv("PARALLEL_POSE_DESCRIPTION", enabled)
+    for enabled in (None, "0", "1"):
+        if enabled is None:
+            monkeypatch.delenv("PARALLEL_POSE_DESCRIPTION", raising=False)
+        else:
+            monkeypatch.setenv("PARALLEL_POSE_DESCRIPTION", enabled)
         client = Client(people=people, error=RuntimeError("offline") if reply == "raise" else None)
         # Reverse original VLM order; output is later sorted left-to-right.
         client.analysis.approx_boxes.reverse()
@@ -284,11 +296,11 @@ def test_pipeline_results_ranks_errors_and_generation_match_sequential(
         pipe = pipeline(client, rough=rough, empty=empty)
         result = pipe.process_cut(image, 100, 200)
         assert len(client.calls) == 1
-        if enabled == "1":
+        if enabled != "0":
             expected = "used_error" if reply == "raise" else "used"
             assert result.routing_summary["describe"]["prefetch"]["status"] == expected
         runs.append((clean(asdict(result)), pipe._fullbody_search.generator.calls))
-    assert runs[0] == runs[1]
+    assert runs[0] == runs[1] == runs[2]
 
 
 def test_description_starts_before_pose_but_final_joint_checks_and_search_stay_after_repair(monkeypatch, image):
