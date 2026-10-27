@@ -23,7 +23,7 @@ import uuid
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from converter.local.contract import (PROTOCOL, LIMITS, LocalError, absolute_file,
-                                      digest, sha256, snapshot, validate_request, versions)
+                                      digest, identifier, sha256, snapshot, validate_request, versions)
 
 
 def resident_bytes(pid):
@@ -139,6 +139,10 @@ class Host:
     def submit(self, raw):
         request_id = raw.get("requestId") if isinstance(raw, dict) else None
         try:
+            identifier(request_id)
+        except LocalError:
+            request_id = None
+        try:
             req = validate_request(raw)
             with self.lock:
                 if request_id in self.seen:
@@ -208,10 +212,13 @@ class Host:
         # Isolate config, scripts, extensions and auto-exec from a user's Blender installation.
         env = {k: v for k, v in os.environ.items() if not k.startswith(("PYTHON", "BLENDER"))}
         env.update({"BLENDER_USER_RESOURCES": str(work / "blender-user"),
-                    "PYTHONNOUSERSITE": "1", "PYTHONDONTWRITEBYTECODE": "1"})
+                    "PYTHONNOUSERSITE": "1", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONSAFEPATH": "1"})
         script = Path(__file__).with_name("blender_job.py")
         try:
             proc = subprocess.Popen([self.blender, "--background", "--factory-startup", "--disable-autoexec",
+                                     # Blender otherwise ignores Python environment controls during startup.
+                                     # Only our three sanitized PYTHON* settings above are inherited.
+                                     "--python-use-system-env",
                                      "--threads", "2", "--python", str(script), "--", str(job_path)],
                                     stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                                     env=env, start_new_session=os.name != "nt",
@@ -392,7 +399,7 @@ def main():
                 break
             try:
                 raw = json.loads(line)
-            except (ValueError, UnicodeError):
+            except (ValueError, UnicodeError, RecursionError):
                 host.event(None, "error", error=LocalError("INVALID_REQUEST", "Malformed JSON request").payload())
                 continue
             host.submit(raw)

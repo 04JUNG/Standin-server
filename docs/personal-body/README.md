@@ -43,6 +43,8 @@ Original and BVH snapshots are copied with incremental hashes and cancellation c
 
 The builder copies a complete vetted Blender 5.2.0 distribution, its Python 3.13, native libraries and existing license files, plus converter source/policies. End users do not install Python, Blender or Modeler. The launcher uses the **bundled** Python with isolated imports and bytecode writes disabled. The entry verifies every manifest file before running the host. It fixes the Blender executable; clients cannot pass a different runtime via IPC.
 
+Relocating resources may change `.py` timestamps and invalidate shipped `.pyc` files. The host explicitly uses `-B -I`; the child uses `--python-use-system-env` with all inherited `PYTHON*` variables removed, then only application-set `PYTHONDONTWRITEBYTECODE=1`, `PYTHONNOUSERSITE=1`, `PYTHONSAFEPATH=1`. Without that Blender flag, its startup ignores the bytecode environment setting and can rewrite signed/hashed resources. The child verifies these controls before doing work. Source, executable and shipped bytecode integrity checks remain enabled; the fix is not a manifest exclusion.
+
 ```sh
 python scripts/local_converter/package_runtime.py \
   --distribution /path/to/Blender.app \
@@ -82,7 +84,8 @@ python scripts/local_converter/verify_runtime.py \
   --launcher /path/to/local-converter/standin-local-converter \
   --source /local/permitted-character.fbx \
   --pose /local/final-pose-1.bvh --pose /local/final-pose-2.bvh \
-  --cs3c /local/sample.cs3c --report /local/report.json
+  --cs3c /local/sample.cs3c --report /local/report.json \
+  --relocate-to /local/new-relocated-resource-directory
 ```
 
 See [verification-macos-arm64.json](verification-macos-arm64.json) for actual public IPC evidence. Validation covers import, optional preview, restart reuse, CMU/Mixamo library BVH apply/export, cache reuse, changed-pose rejection, unsupported hands, stale snapshots, destination preservation, active cancellation, EOF cleanup, deletion and export preservation. Library BVH use is converter QA; it is not authenticated live BFF end-to-end QA.

@@ -123,6 +123,17 @@ class LocalConverterTests(unittest.TestCase):
             finally:
                 host.close()
 
+    def test_malformed_request_id_is_not_echoed_as_an_invalid_event(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            events = []
+            host = Host(tmp, Path(tmp) / "runtime", events.append)
+            try:
+                host.submit({"protocolVersion": PROTOCOL, "requestId": "../private/path", "action": "hello"})
+                self.assertIsNone(events[-1]["requestId"])
+                self.assertEqual(events[-1]["error"]["code"], "INVALID_REQUEST")
+            finally:
+                host.close()
+
 
 if __name__ == "__main__":
     unittest.main()

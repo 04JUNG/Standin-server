@@ -18,6 +18,8 @@ def run(job):
 
     if bpy.app.version[:3] != (5, 2, 0):
         raise LocalError("RUNTIME_MISMATCH", "This local converter requires Blender 5.2.0")
+    if not (sys.dont_write_bytecode and sys.flags.no_user_site and sys.flags.safe_path):
+        raise LocalError("RUNTIME_MISMATCH", "The local child must disable bytecode writes and unsafe Python paths")
     bpy.ops.wm.read_factory_settings(use_empty=True)
     work = Path(job["workDir"])
     if job["action"] == "import":

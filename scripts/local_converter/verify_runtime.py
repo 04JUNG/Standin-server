@@ -10,6 +10,7 @@ import hashlib
 import json
 from pathlib import Path
 import queue
+import shutil
 import subprocess
 import tempfile
 import threading
@@ -20,7 +21,8 @@ PROTOCOL = "standin.local-converter/1"
 
 
 def sha(path):
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+    with Path(path).open("rb") as f:
+        return hashlib.file_digest(f, "sha256").hexdigest()
 
 
 class Session:
@@ -66,7 +68,7 @@ class Session:
         assert self.process.returncode == 0
 
 
-def verify(launcher, source, poses, cs3c, report_path):
+def verify(launcher, source, poses, cs3c, report_path, relocated=False):
     root = Path(tempfile.mkdtemp(prefix="standin-packaged-qa-", dir=report_path.parent))
     storage = root / "store"
     transcript = []
@@ -152,13 +154,21 @@ def verify(launcher, source, poses, cs3c, report_path):
     session.close()
     transcript += session.transcript
     assert all((root / f"export-{i}.fbx").exists() for i in range(len(poses)))
+    package = launcher.parent
+    manifest = json.loads((package / "runtime-manifest.json").read_text())
+    assert all(sha(package / rel) == expected for rel, expected in manifest["files"].items()), "Runtime mutated"
+    extras = [p for p in package.rglob("*") if p.is_file() and not p.is_symlink()
+              and p.relative_to(package).as_posix() not in manifest["files"] and p.name != "runtime-manifest.json"]
+    assert not extras, "Runtime created untracked files"
     report = {"protocolVersion": PROTOCOL, "scope": "Packaged macOS public IPC with real FBX and library BVH; no BFF/CSP/Windows qualification",
               "startupSeconds": startup, "versions": hello["versions"], "sourceHash": source_hash,
               "registration": {k: model[k] for k in ("validation", "capabilities", "metrics")}, "outputs": outputs,
               "restartReusePassed": True, "staleSnapshotRejected": True, "changedPoseRejected": True,
               "noOverwritePassed": True, "activeCancellationPassed": True,
               "eofCancellationPassed": True, "deletePreservesExportsPassed": True,
-              "cs3cFailClosedPassed": bool(cs3c), "allPassed": True}
+              "cs3cFailClosedPassed": bool(cs3c), "allPassed": True,
+              "packageIntegrityAfterRepeatedStarts": {"manifestFiles": len(manifest["files"]), "changed": 0, "extra": 0},
+              "copiedWithoutPreservingTimestamps": relocated}
     report_path.write_text(json.dumps(report, indent=2))
     (root / "transcript.json").write_text(json.dumps(transcript, indent=2))
     print(json.dumps({"report": str(report_path), "localArtifacts": str(root), "allPassed": True}))
@@ -171,6 +181,13 @@ if __name__ == "__main__":
     parser.add_argument("--pose", type=Path, action="append", required=True)
     parser.add_argument("--cs3c", type=Path)
     parser.add_argument("--report", type=Path, required=True)
+    parser.add_argument("--relocate-to", type=Path,
+                        help="Copy package without preserving timestamps, then test the copy (must be a new directory)")
     args = parser.parse_args()
-    verify(args.launcher.resolve(), args.source.resolve(), [p.resolve() for p in args.pose],
-           args.cs3c.resolve() if args.cs3c else None, args.report.resolve())
+    launcher = args.launcher.resolve()
+    if args.relocate_to:
+        relocated = args.relocate_to.resolve()
+        shutil.copytree(launcher.parent, relocated, symlinks=True, copy_function=shutil.copy)
+        launcher = relocated / launcher.name
+    verify(launcher, args.source.resolve(), [p.resolve() for p in args.pose],
+           args.cs3c.resolve() if args.cs3c else None, args.report.resolve(), bool(args.relocate_to))
