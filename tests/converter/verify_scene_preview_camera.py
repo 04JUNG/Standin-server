@@ -14,6 +14,8 @@ import bpy
 from mathutils import Vector
 from bpy_extras.object_utils import world_to_camera_view
 from converter.final_preview_worker import configure_scene_camera
+from converter.rough_layout import camera_for
+from converter.scene_camera import configure_camera, verify_camera_recipe
 
 rows = []
 with tempfile.TemporaryDirectory() as folder:
@@ -25,12 +27,9 @@ with tempfile.TemporaryDirectory() as folder:
         scene.collection.objects.link(camera)
         camera.location = (0, -5, 1)
         camera.rotation_euler = Vector((0, 1, 0)).to_track_quat("-Z", "Y").to_euler()
-        data.sensor_fit = "HORIZONTAL"
-        data.sensor_width = 36
-        data.sensor_height = 36 * height / width
-        data.lens = 40
-        camera["source_image_width"] = width
-        camera["source_image_height"] = height
+        cfg = camera_for(width, height)
+        cfg["position_blender"] = list(camera.location)
+        recipe = configure_camera(camera, cfg)
         configure_scene_camera(scene, camera)
         bpy.context.view_layer.update()
         points = [Vector(p) for p in ((-1, 0, 1), (1, 0, 1), (0, 0, 2), (0, 2, 0))]
@@ -49,6 +48,7 @@ with tempfile.TemporaryDirectory() as folder:
         )
         scene = bpy.context.scene
         camera = next(o for o in scene.objects if o.type == "CAMERA")
+        verify_camera_recipe(camera, recipe)
         configure_scene_camera(scene, camera)
         bpy.context.view_layer.update()
         actual = [world_to_camera_view(scene, camera, p) for p in points]

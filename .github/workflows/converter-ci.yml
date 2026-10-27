@@ -90,6 +90,7 @@ jobs:
             tests/converter/test_work_queue.py \
             tests/converter/test_api_contract.py \
             tests/converter/test_scene_contract.py \
+            tests/converter/test_scene_camera.py \
             tests/converter/test_scene_runner.py \
             tests/converter/test_preview_models.py \
             tests/converter/test_body_preview_contract.py \
