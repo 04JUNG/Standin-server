@@ -1,4 +1,5 @@
-// 손 프리셋 칩용 마네킹 손 썸네일을 만든다(04J-290). 개발자 도구 — 라이브러리를 바꾼 뒤 한 번 돌린다.
+// 관절 인형 진단 이미지 전용. 배포용 손 썸네일은 render_hand_mesh_thumbnails.py로 만든다.
+// 손 프리셋 칩용 마네킹 손 썸네일을 만든다(04J-290). 개발자 진단 도구.
 //
 //   python scripts/hand_library_preview.py out/hand-library.html
 //   node scripts/render_hand_thumbnails.mjs out/hand-library.html converter/hand_thumbs
