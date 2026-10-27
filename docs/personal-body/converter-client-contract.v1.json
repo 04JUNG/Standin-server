@@ -1,0 +1,1134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:standin:local-converter:1",
+  "protocolVersion": "standin.local-converter/1",
+  "versions": {
+    "importerVersion": "personal-import/1",
+    "normalizationVersion": "personal-normalize/1",
+    "rigMappingVersion": "personal-rig/1",
+    "converterVersion": "personal-converter/1",
+    "converterFingerprint": "runtime-computed SHA256 of all shipped converter Python and JSON files"
+  },
+  "transport": {
+    "type": "stdio-ndjson",
+    "encoding": "UTF-8",
+    "stdout": "events only, one JSON object per line",
+    "stderr": "diagnostics; never model names or paths",
+    "oneActiveJob": true,
+    "requestIds": "unique for host lifetime; echoed in every event",
+    "eof": "cancel active work and clean staging"
+  },
+  "runtime": {
+    "discovery": [
+      "STANDIN_LOCAL_CONVERTER: optional debug-only override to packaged launcher",
+      "macOS: <app resources>/local-converter/standin-local-converter",
+      "Windows: <app resources>/local-converter/standin-local-converter.cmd"
+    ],
+    "arguments": [
+      "--storage",
+      "<absolute app-owned directory>"
+    ],
+    "manualInstallRequired": false,
+    "network": false,
+    "CS3C": "recognized but fail-closed CS3C_DECODER_UNAVAILABLE until redistributable decoder and materials are validated",
+    "manifest": "runtime-manifest.json beside launcher: schemaVersion, protocolVersion, target, launcher, blender, python, files (SHA256), uncompressedBytes, requiresUserInstalledRuntime=false, releaseReady=false",
+    "launch": "spawn launcher with --storage <absolute app-owned storage>; keep stdin open, parse stdout NDJSON; kill host only after cancel/terminal, EOF cancels child and cleans staging",
+    "signing": "Current test candidate is unsigned/unqualified; client must not advertise released support.",
+    "resourceMapping": "Builder produces a target-specific resource directory; client copies that directory to resources/local-converter at app build time. Manifest.target records the chosen platform."
+  },
+  "limits": {
+    "sourceBytes": 134217728,
+    "poseBytes": 8388608,
+    "vertices": 1000000,
+    "bones": 512,
+    "meshes": 128,
+    "workerSeconds": 120,
+    "workerMemoryBytes": 2147483648,
+    "expandedBytes": 67108864,
+    "requestBytes": 65536
+  },
+  "actions": {
+    "hello": {
+      "type": "object",
+      "properties": {
+        "protocolVersion": {
+          "const": "standin.local-converter/1"
+        },
+        "requestId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "action": {
+          "const": "hello"
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "requestId",
+        "action"
+      ],
+      "additionalProperties": false
+    },
+    "import": {
+      "type": "object",
+      "properties": {
+        "protocolVersion": {
+          "const": "standin.local-converter/1"
+        },
+        "requestId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "action": {
+          "const": "import"
+        },
+        "localModelId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "sourcePath": {
+          "type": "string",
+          "description": "absolute local path"
+        },
+        "sourceHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "requestId",
+        "action",
+        "localModelId",
+        "sourcePath",
+        "sourceHash"
+      ],
+      "additionalProperties": false
+    },
+    "inspect": {
+      "type": "object",
+      "properties": {
+        "protocolVersion": {
+          "const": "standin.local-converter/1"
+        },
+        "requestId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "action": {
+          "const": "inspect"
+        },
+        "localModelId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "requestId",
+        "action",
+        "localModelId"
+      ],
+      "additionalProperties": false
+    },
+    "apply": {
+      "type": "object",
+      "properties": {
+        "protocolVersion": {
+          "const": "standin.local-converter/1"
+        },
+        "requestId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "action": {
+          "const": "apply"
+        },
+        "localModelId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "sourceHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "posePath": {
+          "type": "string",
+          "description": "absolute local path"
+        },
+        "poseHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "selectionId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "hands": {
+          "type": "object",
+          "properties": {
+            "left": {
+              "type": "null"
+            },
+            "right": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "left",
+            "right"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "requestId",
+        "action",
+        "localModelId",
+        "sourceHash",
+        "posePath",
+        "poseHash",
+        "selectionId",
+        "hands"
+      ],
+      "additionalProperties": false
+    },
+    "export": {
+      "type": "object",
+      "properties": {
+        "protocolVersion": {
+          "const": "standin.local-converter/1"
+        },
+        "requestId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "action": {
+          "const": "export"
+        },
+        "localModelId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "snapshotHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "destinationPath": {
+          "type": "string",
+          "description": "absolute local path"
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "requestId",
+        "action",
+        "localModelId",
+        "snapshotHash",
+        "destinationPath"
+      ],
+      "additionalProperties": false
+    },
+    "cancel": {
+      "type": "object",
+      "properties": {
+        "protocolVersion": {
+          "const": "standin.local-converter/1"
+        },
+        "requestId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "action": {
+          "const": "cancel"
+        },
+        "targetRequestId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "requestId",
+        "action",
+        "targetRequestId"
+      ],
+      "additionalProperties": false
+    },
+    "delete": {
+      "type": "object",
+      "properties": {
+        "protocolVersion": {
+          "const": "standin.local-converter/1"
+        },
+        "requestId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "action": {
+          "const": "delete"
+        },
+        "localModelId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "requestId",
+        "action",
+        "localModelId"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "events": {
+    "progress": {
+      "protocolVersion": "standin.local-converter/1",
+      "requestId": "same as request",
+      "event": "progress",
+      "stage": "copying | inspecting | retargeting | validating | committing",
+      "progress": "number from 0 to 1"
+    },
+    "result": {
+      "protocolVersion": "standin.local-converter/1",
+      "requestId": "same as request",
+      "event": "result",
+      "result": "action-specific payload"
+    },
+    "error": {
+      "protocolVersion": "standin.local-converter/1",
+      "requestId": "same as request, null for malformed envelope",
+      "event": "error",
+      "error": {
+        "code": "one of errors",
+        "message": "safe developer diagnostic; map to user copy",
+        "details": "object without input paths/names",
+        "retryable": "boolean"
+      }
+    }
+  },
+  "errors": [
+    "PROTOCOL_MISMATCH",
+    "INVALID_REQUEST",
+    "BUSY",
+    "MODEL_EXISTS",
+    "MODEL_NOT_FOUND",
+    "SOURCE_CHANGED",
+    "SOURCE_TOO_LARGE",
+    "UNSUPPORTED_FORMAT",
+    "CS3C_DECODER_UNAVAILABLE",
+    "UNSUPPORTED_CS3C_VERSION",
+    "UNSUPPORTED_RIG",
+    "INVALID_HIERARCHY",
+    "UNSUPPORTED_REST_POSE",
+    "INVALID_SKIN",
+    "UNSUPPORTED_TRANSFORM",
+    "UNSUPPORTED_MATERIAL",
+    "UNSUPPORTED_FEATURE",
+    "HAND_UNSUPPORTED",
+    "LIMIT_EXCEEDED",
+    "CANCELLED",
+    "TIMEOUT",
+    "MEMORY_LIMIT",
+    "RUNTIME_UNAVAILABLE",
+    "RUNTIME_MISMATCH",
+    "CONVERSION_FAILED",
+    "ROUNDTRIP_FAILED",
+    "SNAPSHOT_MISMATCH",
+    "DESTINATION_EXISTS",
+    "IO_ERROR"
+  ],
+  "capability": {
+    "supportLevel": "body_only or rejected",
+    "bodyPose": "boolean",
+    "hands": {
+      "left": {
+        "supported": false,
+        "reason": "NO_FINGER_RIG or UNVALIDATED_FINGER_RIG",
+        "fingerBones": "integer"
+      },
+      "right": {
+        "supported": false,
+        "reason": "NO_FINGER_RIG or UNVALIDATED_FINGER_RIG",
+        "fingerBones": "integer"
+      }
+    },
+    "handChanges": "disabled on both sides until personal finger deformation is validated; preserve original hand shape"
+  },
+  "trustBoundary": "Client obtains final BVH through authenticated existing candidate validation. selectionId is correlation only, not an authorization token. Worker does not fetch poses, bypass BFF, or upload personal assets.",
+  "cacheIdentity": [
+    "importerVersion",
+    "normalizationVersion",
+    "rigMappingVersion",
+    "converterVersion",
+    "localModelId",
+    "sourceHash",
+    "poseHash",
+    "hands.left",
+    "hands.right",
+    "orientation",
+    "outputMode",
+    "converterFingerprint"
+  ],
+  "commit": "A model appears only after import inspection, FK deformation probe, FBX roundtrip and atomic rename. Errors/cancel never replace an existing model. Export requires immutable snapshotHash and never overwrites a destination.",
+  "resultPaths": "absolute device-only paths; never send to telemetry or server",
+  "scope": "Draft implementation: FBX known T-pose solid-material skinned humanoids; CS3C and hand changes are blocked, no collision prevention/shape sliders/auto-rigging.",
+  "results": {
+    "hello": {
+      "protocolVersion": "standin.local-converter/1",
+      "versions": {
+        "importerVersion": "personal-import/1",
+        "normalizationVersion": "personal-normalize/1",
+        "rigMappingVersion": "personal-rig/1",
+        "converterVersion": "personal-converter/1",
+        "converterFingerprint": "runtime-computed SHA256 of all shipped converter Python and JSON files"
+      },
+      "limits": {
+        "sourceBytes": 134217728,
+        "poseBytes": 8388608,
+        "vertices": 1000000,
+        "bones": 512,
+        "meshes": 128,
+        "workerSeconds": 120,
+        "workerMemoryBytes": 2147483648,
+        "expandedBytes": 67108864,
+        "requestBytes": 65536
+      },
+      "formats": {
+        "fbx": true,
+        "cs3c": false
+      },
+      "hands": false
+    },
+    "import": "model manifest (see modelManifest)",
+    "inspect": "same model manifest, version and file hash checked",
+    "apply": {
+      "localModelId": "id",
+      "snapshotHash": "sha256 canonical snapshot JSON",
+      "snapshot": "cacheIdentity object",
+      "artifactPath": "verified FBX",
+      "artifactHash": "sha256",
+      "validation": "roundtrip report",
+      "cacheHit": "boolean; cache retains identical immutable snapshot"
+    },
+    "export": {
+      "localModelId": "id",
+      "snapshotHash": "sha256",
+      "artifactHash": "sha256",
+      "destinationPath": "selected destination"
+    },
+    "delete": {
+      "deleted": true
+    },
+    "cancel": {
+      "targetRequestId": "id",
+      "accepted": "boolean; target receives CANCELLED if true before commit"
+    }
+  },
+  "modelManifest": {
+    "schemaVersion": 1,
+    "localModelId": "id",
+    "sourceHash": "sha256",
+    "versions": {
+      "importerVersion": "personal-import/1",
+      "normalizationVersion": "personal-normalize/1",
+      "rigMappingVersion": "personal-rig/1",
+      "converterVersion": "personal-converter/1",
+      "converterFingerprint": "runtime-computed SHA256 of all shipped converter Python and JSON files"
+    },
+    "sourceFormat": "fbx",
+    "capabilities": "capability",
+    "character": "hierarchy, local/world and inverse bind matrices, original mesh transforms, weights hash, counts, solid material descriptors, units and mapping",
+    "normalizedPath": "immutable .blend local path",
+    "previewPath": "optional immutable registration GLB path; null on preview failure",
+    "validation": "import FK probe and roundtrip evidence",
+    "previewHash": "SHA256 of optional GLB, null when absent"
+  },
+  "$defs": {
+    "versions": {
+      "type": "object",
+      "properties": {
+        "importerVersion": {
+          "type": "string"
+        },
+        "normalizationVersion": {
+          "type": "string"
+        },
+        "rigMappingVersion": {
+          "type": "string"
+        },
+        "converterVersion": {
+          "type": "string"
+        },
+        "converterFingerprint": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "importerVersion",
+        "normalizationVersion",
+        "rigMappingVersion",
+        "converterVersion",
+        "converterFingerprint"
+      ],
+      "additionalProperties": false
+    },
+    "capabilities": {
+      "type": "object",
+      "properties": {
+        "supportLevel": {
+          "const": "body_only"
+        },
+        "bodyPose": {
+          "const": true
+        },
+        "hands": {
+          "type": "object",
+          "properties": {
+            "left": {
+              "type": "object",
+              "properties": {
+                "supported": {
+                  "const": false
+                },
+                "reason": {
+                  "enum": [
+                    "NO_FINGER_RIG",
+                    "UNVALIDATED_FINGER_RIG"
+                  ]
+                },
+                "fingerBones": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "supported",
+                "reason",
+                "fingerBones"
+              ],
+              "additionalProperties": false
+            },
+            "right": {
+              "type": "object",
+              "properties": {
+                "supported": {
+                  "const": false
+                },
+                "reason": {
+                  "enum": [
+                    "NO_FINGER_RIG",
+                    "UNVALIDATED_FINGER_RIG"
+                  ]
+                },
+                "fingerBones": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "supported",
+                "reason",
+                "fingerBones"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "left",
+            "right"
+          ],
+          "additionalProperties": false
+        },
+        "collisionPrevention": {
+          "const": false
+        },
+        "shapeSliders": {
+          "const": false
+        }
+      },
+      "required": [
+        "supportLevel",
+        "bodyPose",
+        "hands",
+        "collisionPrevention",
+        "shapeSliders"
+      ],
+      "additionalProperties": false
+    },
+    "validation": {
+      "type": "object",
+      "properties": {
+        "passed": {
+          "const": true
+        },
+        "meshCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "originalBoneCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "vertexCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxSurfaceError": {
+          "type": "number",
+          "minimum": 0
+        },
+        "maxSkinProbeError": {
+          "type": "number",
+          "minimum": 0
+        },
+        "tolerance": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "fkProbes": {
+          "type": "object"
+        },
+        "blenderVersion": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "passed",
+        "meshCount",
+        "originalBoneCount",
+        "vertexCount",
+        "maxSurfaceError",
+        "maxSkinProbeError",
+        "tolerance",
+        "fkProbes",
+        "blenderVersion"
+      ],
+      "additionalProperties": false
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "elapsedSeconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "peakResidentBytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "elapsedSeconds",
+        "peakResidentBytes"
+      ],
+      "additionalProperties": false
+    },
+    "modelManifest": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "localModelId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "sourceHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sourceFormat": {
+          "const": "fbx"
+        },
+        "versions": {
+          "$ref": "#/$defs/versions"
+        },
+        "character": {
+          "type": "object"
+        },
+        "capabilities": {
+          "$ref": "#/$defs/capabilities"
+        },
+        "normalizedHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "normalizedPath": {
+          "type": "string"
+        },
+        "sourcePath": {
+          "type": "string"
+        },
+        "previewPath": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "previewHash": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "validation": {
+          "$ref": "#/$defs/validation"
+        },
+        "metrics": {
+          "$ref": "#/$defs/metrics"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "localModelId",
+        "sourceHash",
+        "sourceFormat",
+        "versions",
+        "character",
+        "capabilities",
+        "normalizedHash",
+        "normalizedPath",
+        "sourcePath",
+        "previewPath",
+        "previewHash",
+        "validation",
+        "metrics"
+      ],
+      "additionalProperties": false
+    },
+    "snapshot": {
+      "type": "object",
+      "properties": {
+        "localModelId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "sourceHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "importerVersion": {
+          "type": "string"
+        },
+        "normalizationVersion": {
+          "type": "string"
+        },
+        "rigMappingVersion": {
+          "type": "string"
+        },
+        "converterVersion": {
+          "type": "string"
+        },
+        "converterFingerprint": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "poseHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "hands": {
+          "type": "object",
+          "properties": {
+            "left": {
+              "type": "null"
+            },
+            "right": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "left",
+            "right"
+          ],
+          "additionalProperties": false
+        },
+        "orientation": {
+          "const": "source"
+        },
+        "outputMode": {
+          "const": "rigged_rest"
+        }
+      },
+      "required": [
+        "localModelId",
+        "sourceHash",
+        "importerVersion",
+        "normalizationVersion",
+        "rigMappingVersion",
+        "converterVersion",
+        "converterFingerprint",
+        "poseHash",
+        "hands",
+        "orientation",
+        "outputMode"
+      ],
+      "additionalProperties": false
+    },
+    "applyResult": {
+      "type": "object",
+      "properties": {
+        "localModelId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "snapshot": {
+          "$ref": "#/$defs/snapshot"
+        },
+        "snapshotHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "artifactPath": {
+          "type": "string"
+        },
+        "artifactHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "validation": {
+          "$ref": "#/$defs/validation"
+        },
+        "retarget": {
+          "type": "object"
+        },
+        "selectionId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "metrics": {
+          "$ref": "#/$defs/metrics"
+        },
+        "cacheHit": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "localModelId",
+        "snapshot",
+        "snapshotHash",
+        "artifactPath",
+        "artifactHash",
+        "validation",
+        "retarget",
+        "selectionId",
+        "metrics",
+        "cacheHit"
+      ],
+      "additionalProperties": false
+    },
+    "exportResult": {
+      "type": "object",
+      "properties": {
+        "localModelId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "snapshotHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "artifactHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "destinationPath": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "localModelId",
+        "snapshotHash",
+        "artifactHash",
+        "destinationPath"
+      ],
+      "additionalProperties": false
+    },
+    "helloResult": {
+      "type": "object",
+      "properties": {
+        "protocolVersion": {
+          "const": "standin.local-converter/1"
+        },
+        "versions": {
+          "$ref": "#/$defs/versions"
+        },
+        "limits": {
+          "type": "object"
+        },
+        "formats": {
+          "type": "object",
+          "properties": {
+            "fbx": {
+              "const": true
+            },
+            "cs3c": {
+              "const": false
+            }
+          },
+          "required": [
+            "fbx",
+            "cs3c"
+          ],
+          "additionalProperties": false
+        },
+        "hands": {
+          "const": false
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "versions",
+        "limits",
+        "formats",
+        "hands"
+      ],
+      "additionalProperties": false
+    },
+    "errorPayload": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "enum": [
+            "PROTOCOL_MISMATCH",
+            "INVALID_REQUEST",
+            "BUSY",
+            "MODEL_EXISTS",
+            "MODEL_NOT_FOUND",
+            "SOURCE_CHANGED",
+            "SOURCE_TOO_LARGE",
+            "UNSUPPORTED_FORMAT",
+            "CS3C_DECODER_UNAVAILABLE",
+            "UNSUPPORTED_CS3C_VERSION",
+            "UNSUPPORTED_RIG",
+            "INVALID_HIERARCHY",
+            "UNSUPPORTED_REST_POSE",
+            "INVALID_SKIN",
+            "UNSUPPORTED_TRANSFORM",
+            "UNSUPPORTED_MATERIAL",
+            "UNSUPPORTED_FEATURE",
+            "HAND_UNSUPPORTED",
+            "LIMIT_EXCEEDED",
+            "CANCELLED",
+            "TIMEOUT",
+            "MEMORY_LIMIT",
+            "RUNTIME_UNAVAILABLE",
+            "RUNTIME_MISMATCH",
+            "CONVERSION_FAILED",
+            "ROUNDTRIP_FAILED",
+            "SNAPSHOT_MISMATCH",
+            "DESTINATION_EXISTS",
+            "IO_ERROR"
+          ]
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "object"
+        },
+        "retryable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "details",
+        "retryable"
+      ],
+      "additionalProperties": false
+    },
+    "progressEvent": {
+      "type": "object",
+      "properties": {
+        "protocolVersion": {
+          "const": "standin.local-converter/1"
+        },
+        "requestId": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "event": {
+          "const": "progress"
+        },
+        "stage": {
+          "enum": [
+            "copying",
+            "inspecting",
+            "retargeting",
+            "validating",
+            "committing"
+          ]
+        },
+        "progress": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "requestId",
+        "event",
+        "stage",
+        "progress"
+      ],
+      "additionalProperties": false
+    },
+    "errorEvent": {
+      "type": "object",
+      "properties": {
+        "protocolVersion": {
+          "const": "standin.local-converter/1"
+        },
+        "requestId": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "event": {
+          "const": "error"
+        },
+        "error": {
+          "$ref": "#/$defs/errorPayload"
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "requestId",
+        "event",
+        "error"
+      ],
+      "additionalProperties": false
+    },
+    "resultEvent": {
+      "type": "object",
+      "properties": {
+        "protocolVersion": {
+          "const": "standin.local-converter/1"
+        },
+        "requestId": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "event": {
+          "const": "result"
+        },
+        "result": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/modelManifest"
+            },
+            {
+              "$ref": "#/$defs/applyResult"
+            },
+            {
+              "$ref": "#/$defs/exportResult"
+            },
+            {
+              "$ref": "#/$defs/helloResult"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "deleted": {
+                  "const": true
+                }
+              },
+              "required": [
+                "deleted"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "targetRequestId": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{1,64}$"
+                },
+                "accepted": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "targetRequestId",
+                "accepted"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "requestId",
+        "event",
+        "result"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/actions/hello"
+    },
+    {
+      "$ref": "#/actions/import"
+    },
+    {
+      "$ref": "#/actions/inspect"
+    },
+    {
+      "$ref": "#/actions/apply"
+    },
+    {
+      "$ref": "#/actions/export"
+    },
+    {
+      "$ref": "#/actions/cancel"
+    },
+    {
+      "$ref": "#/actions/delete"
+    },
+    {
+      "$ref": "#/$defs/progressEvent"
+    },
+    {
+      "$ref": "#/$defs/errorEvent"
+    },
+    {
+      "$ref": "#/$defs/resultEvent"
+    }
+  ]
+}
