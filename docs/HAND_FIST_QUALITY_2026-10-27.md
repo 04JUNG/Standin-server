@@ -4,7 +4,8 @@
 male/female meshes. Their optional `closed_fist_v2` articulation profile now uses
 coherent cumulative bending, explicit thumb opposition, volume-preserving skin
 deformation and eight local smoothing iterations. Smoothing retains topology and
-skin groups. The female rig also needs guarded middle/ring root correction: it
+skin groups. Thumb opposition is tightened so the distal thumb lies alongside
+the curled index rather than projecting away from the fist. The female rig also needs guarded middle/ring root correction: it
 only runs when a root is more than 1.18 times the outer fingers' wrist distance.
 Reconstructed chains retain their tips; local skin weights retain total mass.
 
@@ -28,7 +29,7 @@ the other 154 thumbnails retain their original bytes.
   (both fists, both tremble fists, right fist with left unselected).
 - Eight saved-FBX hand configurations: no capsule contacts and no noncoplanar
   nonadjacent triangle crossings detected within the same hand.
-- Maximum non-hand vertex movement: 0.0156 mm. Maximum unselected-hand movement:
+- Maximum non-hand vertex movement: 0.0066 mm. Maximum unselected-hand movement:
   0.00045 mm. Body-bone matrix error stays below 1e-5. Mesh vertex/face counts,
   skin-group names, total skin weights and input file bytes are preserved.
 - Fist and tremble-fist exported meshes match to a micrometre on each character.
