@@ -14,6 +14,14 @@ on:
       - "deploy/ecs/**"
   workflow_dispatch:
     inputs:
+      target:
+        description: "Manual target (scene-worker runs only on develop/staging)"
+        type: choice
+        options:
+          - converter
+          - scene-worker
+        required: true
+        default: converter
       deploy_staging:
         description: "Deploy develop to staging even when automatic deploys are disabled (never main/beta)"
         type: boolean
@@ -35,8 +43,9 @@ jobs:
   deploy:
     name: Deploy isolated converter
     if: >-
-      vars.CONVERTER_AUTO_DEPLOY_ENABLED == 'true' ||
-      (github.event_name == 'workflow_dispatch' && inputs.deploy_staging && github.ref == 'refs/heads/develop')
+      inputs.target != 'scene-worker' &&
+      (vars.CONVERTER_AUTO_DEPLOY_ENABLED == 'true' ||
+       (github.event_name == 'workflow_dispatch' && inputs.deploy_staging && github.ref == 'refs/heads/develop'))
     runs-on: ubuntu-latest
     environment: ${{ github.ref == 'refs/heads/main' && 'beta' || 'staging' }}
     env:
@@ -141,3 +150,10 @@ jobs:
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
+
+  scene_worker:
+    name: Build or deploy v4 scene worker (staging)
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/develop' && inputs.target == 'scene-worker'
+    uses: ./.github/workflows/scene-worker-deploy.yml
+    with:
+      deploy_staging: ${{ inputs.deploy_staging }}

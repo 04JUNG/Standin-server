@@ -1,7 +1,9 @@
 # v4 scene worker: staging handoff (Draft)
 
 This service runs `src.scene_refinement` separately from inference `/analyze`
-and Converter. It is NOT deployed by the existing inference/Converter workflows.
+and Converter. Inference deployments do not deploy it. The registered **Deploy
+converter** workflow can explicitly delegate a manual `develop` run to the worker
+workflow; its default target and automatic Converter deployments are unchanged.
 This change prepares a dedicated image and an explicit staging workflow. It does
 not provision AWS resources or enable the BFF feature.
 
@@ -155,8 +157,26 @@ private DNS and ECS service first. Keep infrastructure configuration in its owni
 repo. The workflow checks the existing task/service and refuses an inference or
 Converter task, missing required settings or non-singleton deployment.
 
-After this Draft is reviewed and merged, manually run **Build or deploy scene
-worker (staging only)** on `develop`. `deploy_staging=false` uploads only the
+After the deployment changes are reviewed and merged into `develop`, open the
+registered **Deploy converter** workflow, choose **Run workflow**, and select:
+
+- Branch: `develop`
+- `target`: `scene-worker`
+- `deploy_staging`: `true` to update the existing staging service
+
+The entry point is `.github/workflows/converter-deploy.yml`. It calls
+`scene-worker-deploy.yml` from the **same commit**, using `workflow_call`.
+This avoids registering a new manual workflow on the default branch; no `main`
+change is required. Worker selection skips the Converter job even if automatic
+Converter deployment is enabled. A push or a manual run on `main`/another branch
+cannot select the worker deployment. The callee also checks `develop` and binds
+its own `staging` environment and dedicated `SCENE_*` variables/OIDC role.
+
+The direct **Build or deploy scene worker (staging only)** entry point remains
+available only if it has been registered on the default branch. Both entry points
+use the same worker concurrency group and preflight checks.
+
+`deploy_staging=false` uploads only the
 commit-tagged image. `true` requires the ECS target and updates only that service,
 then waits for ECS health/stability. It preserves task environment/secrets/mounts.
 There is no automatic production deployment. Rollback uses the previously approved

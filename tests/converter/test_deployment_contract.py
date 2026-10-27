@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import re
 import shlex
 import shutil
 import subprocess
 import sys
+from types import SimpleNamespace
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -122,6 +124,83 @@ def test_converter_deploy_is_gated_and_path_filtered():
     assert '"converter_api/**"' in workflow
     assert '"deploy/ecs/**"' in workflow
     assert "container-name: inference" not in workflow
+
+
+def _job_condition(filename: str, job: str) -> str:
+    workflow = (ROOT / ".github/workflows" / filename).read_text()
+    block = re.search(
+        rf"(?ms)^  {re.escape(job)}:\n(.*?)(?=^  [\w-]+:|\Z)",
+        workflow.split("\njobs:\n", 1)[1],
+    ).group(1)
+    condition = re.search(r"(?m)^    if: (.+)$", block).group(1)
+    if condition == ">-":
+        condition = " ".join(
+            re.search(r"(?m)^    if: >-\n((?:      .+\n)+)", block)
+            .group(1).splitlines()
+        )
+    return condition
+
+
+def _enabled(condition, event, branch, target, deploy_staging, auto):
+    # Evaluate the actual simple job guards, including short-circuit operators,
+    # so a missing branch/event/target guard fails the routing matrix below.
+    expression = condition.replace("&&", " and ").replace("||", " or ")
+    expression = expression.replace("vars.", "variables.")
+    return bool(eval(expression, {"__builtins__": {}}, {
+        "github": SimpleNamespace(event_name=event, ref="refs/heads/" + branch),
+        "inputs": SimpleNamespace(target=target, deploy_staging=deploy_staging),
+        "variables": SimpleNamespace(CONVERTER_AUTO_DEPLOY_ENABLED=str(auto).lower()),
+    }))
+
+
+def test_manual_target_routing_never_deploys_worker_outside_develop():
+    converter = _job_condition("converter-deploy.yml", "deploy")
+    worker = _job_condition("converter-deploy.yml", "scene_worker")
+    callee = _job_condition("scene-worker-deploy.yml", "staging")
+    # Expected caller jobs. The worker's second guard must independently deny
+    # main/feature refs even if a caller is accidentally broadened later.
+    cases = [
+        ("push", "develop", "", False, False, set()),
+        ("push", "develop", "", False, True, {"converter"}),
+        ("push", "main", "", False, True, {"converter"}),
+        ("workflow_dispatch", "develop", "converter", True, False, {"converter"}),
+        ("workflow_dispatch", "develop", "converter", False, False, set()),
+        ("workflow_dispatch", "develop", "scene-worker", True, False, {"worker"}),
+        ("workflow_dispatch", "develop", "scene-worker", True, True, {"worker"}),
+        ("workflow_dispatch", "develop", "scene-worker", False, True, {"worker"}),
+        ("workflow_dispatch", "main", "scene-worker", True, True, set()),
+        ("workflow_dispatch", "feature", "scene-worker", True, True, set()),
+        ("pull_request", "develop", "scene-worker", True, False, set()),
+    ]
+    for event, branch, target, deploy_staging, auto, expected in cases:
+        args = event, branch, target, deploy_staging, auto
+        actual = {
+            name for name, condition in (("converter", converter), ("worker", worker))
+            if _enabled(condition, *args)
+        }
+        assert actual == expected, args
+        assert _enabled(callee, *args) == (branch == "develop"), args
+
+
+def test_worker_delegation_uses_same_commit_and_explicit_staging_opt_in():
+    caller = (ROOT / ".github/workflows/converter-deploy.yml").read_text()
+    worker = (ROOT / ".github/workflows/scene-worker-deploy.yml").read_text()
+    delegation = caller.split("  scene_worker:\n", 1)[1]
+    assert "default: converter" in caller
+    assert "uses: ./.github/workflows/scene-worker-deploy.yml" in delegation
+    assert "deploy_staging: ${{ inputs.deploy_staging }}" in delegation
+    assert "secrets: inherit" not in delegation
+    assert "  workflow_call:\n    inputs:\n      deploy_staging:\n        type: boolean" in worker
+    assert "    environment: staging" in worker
+    assert "group: scene-worker-staging" in worker
+    assert "SCENE_AWS_DEPLOY_ROLE" in worker
+    assert "CONVERTER_AWS_DEPLOY_ROLE" not in worker
+    assert worker.count("if: inputs.deploy_staging") == 2
+    assert "wait-for-service-stability: true" in worker
+    assert "python scripts/validate_scene_task.py /tmp/scene-task.json" in worker
+    triggers = worker.split("\npermissions:", 1)[0]
+    assert "\n  push:" not in triggers
+    assert "\n  pull_request:" not in triggers
 
 
 def test_converter_ci_exercises_real_skin_screen_endpoint():
