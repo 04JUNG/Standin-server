@@ -4,6 +4,8 @@ from __future__ import annotations
 from collections import Counter
 import math
 
+from converter.scene_contract import MAX_PERSONS
+
 from .artifact_lineage import BINDINGS, SCHEMA, is_sha, resolved_identity, validate_lineage
 from .util import canonical_json, hash_json
 
@@ -71,8 +73,14 @@ def evaluate_export_tasks(sealed, observations):
                 dims["mesh"] = "pass"
             elif mesh.get("state") in STATES:
                 dims["mesh"] = mesh["state"] if mesh["state"] != "pass" else "unknown"
+        declared_count = task.get("person_count")
+        count_valid = type(declared_count) is int and 1 <= declared_count <= MAX_PERSONS
+        observed_count = len(obs["selections"]) if obs.get("selections") is not None else None
+        scene_required = ((count_valid and declared_count > 1)
+                          or (observed_count is not None and observed_count > 1)
+                          or task.get("props_present") is True or obs.get("props_present") is True)
         scene = obs.get("scene_interaction", {})
-        if task.get("person_count", 1) == 1 and not task.get("props_present", False):
+        if not scene_required and count_valid:
             # Explicit policy may exclude this dimension, never manufacture a pass.
             reasons.append("scene_interaction_not_applicable")
         elif scene.get("independent_checker") and scene.get("checks_complete") is True:
@@ -112,7 +120,12 @@ def evaluate_export_tasks(sealed, observations):
         # Apply immutable identity checks AFTER all dimension calculations;
         # later good labels/readbacks may never erase a stale-file failure.
         identity_fields = ("artifact_sha256", "profile_sha256", "scope", "selection_revision")
-        binding_missing = any(not task.get(k) for k in identity_fields)
+        binding_missing = not count_valid or any(not task.get(k) for k in identity_fields)
+        if not count_valid:
+            reasons.append("frozen_person_count_missing_or_invalid")
+        elif observed_count is not None and observed_count != declared_count:
+            dims["integrity"] = "fail"
+            reasons.append("observed_person_count_mismatch")
         binding_missing |= any(not is_sha(task.get(k)) for k in ("artifact_sha256", "profile_sha256"))
         if not task.get("selection_sha256s"):
             binding_missing = True
@@ -161,7 +174,7 @@ def evaluate_export_tasks(sealed, observations):
             if dims[name] not in STATES:
                 dims[name] = "unknown"
         required_names = set(policy["required_dimensions"]) | set(FINAL_REQUIRED)
-        if task.get("person_count", 1) > 1 or task.get("props_present", False):
+        if scene_required:
             required_names.add("scene_interaction")
         required = [dims[k] for k in required_names]
         fixture = obs.get("execution_kind") != "product_observation" or any(

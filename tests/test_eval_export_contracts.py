@@ -253,7 +253,7 @@ class ExportReportTests(unittest.TestCase):
             self.assertEqual(evaluate_export_tasks(seal_export_policy([task], policy), [obs])["decision"], "INCONCLUSIVE")
             obs["execution_kind"] = "product_observation"
             policy["required_dimensions"].append("scene_interaction")
-            task["person_count"] = 2
+            task["props_present"] = True
             self.assertEqual(evaluate_export_tasks(seal_export_policy([task], policy), [obs])["decision"], "INCONCLUSIVE")
 
     def test_policy_and_denominator_cannot_change_after_execution(self):
@@ -281,8 +281,50 @@ class ExportReportTests(unittest.TestCase):
             policy["required_dimensions"] = ["integrity"]
             self.assertEqual(evaluate_export_tasks(seal_export_policy([task], policy), [obs])["decision"], "INCONCLUSIVE")
             task, policy, obs = report_case(directory)
-            task["person_count"] = 2
+            task["props_present"] = True
             self.assertEqual(evaluate_export_tasks(seal_export_policy([task], policy), [obs])["decision"], "INCONCLUSIVE")
+
+    def test_observed_multi_person_cannot_hide_behind_missing_or_single_count(self):
+        with tempfile.TemporaryDirectory() as directory:
+            task, policy, obs = report_case(directory)
+            first = obs["selections"][0]
+            second = {**first, "gt_person_id": "permanent-person-8", "person_index": 7,
+                      "unit_id": "unit-2", "candidate_id": "candidate-5"}
+            first_sha, second_sha = hash_json(first), hash_json(second)
+            original = obs["artifacts"]
+            second_nodes = copy.deepcopy(original[:4])
+            for node in second_nodes:
+                node["artifact_id"] = "p2-" + node["artifact_id"]
+                node["parents"] = ["p2-" + parent for parent in node["parents"]]
+                node["selection_sha256s"] = [second_sha]
+            scene = {**copy.deepcopy(original[3]), "artifact_id": "scene", "stage": "scene_fbx",
+                     "parents": [original[3]["artifact_id"], second_nodes[-1]["artifact_id"]],
+                     "selection_sha256s": [first_sha, second_sha]}
+            delivery = copy.deepcopy(original[4:])
+            delivery[0]["parents"] = ["scene"]
+            for node in delivery:
+                node["selection_sha256s"] = [first_sha, second_sha]
+            obs["selections"] = [first, second]
+            obs["artifacts"] = original[:4] + second_nodes + [scene] + delivery
+            task["selection_sha256s"] = [first_sha, second_sha]
+            self.assertEqual(validate_lineage(obs["selections"], obs["artifacts"])["state"], "pass")
+            task.pop("person_count")
+            missing = evaluate_export_tasks(seal_export_policy([task], policy), [obs])
+            self.assertEqual(missing["decision"], "INCONCLUSIVE")
+            self.assertEqual(missing["tasks"][0]["dimensions"]["scene_interaction"], "unknown")
+            self.assertIn("frozen_person_count_missing_or_invalid", missing["tasks"][0]["reasons"])
+            task["person_count"] = 1
+            wrong = evaluate_export_tasks(seal_export_policy([task], policy), [obs])
+            self.assertEqual(wrong["decision"], "FAIL")
+            self.assertIn("observed_person_count_mismatch", wrong["tasks"][0]["reasons"])
+            task["person_count"] = 2
+            correct = evaluate_export_tasks(seal_export_policy([task], policy), [obs])
+            self.assertEqual(correct["decision"], "INCONCLUSIVE")
+            self.assertEqual(correct["tasks"][0]["dimensions"]["scene_interaction"], "unknown")
+            for invalid_count in (None, False, 0, 9, "2"):
+                task["person_count"] = invalid_count
+                result = evaluate_export_tasks(seal_export_policy([task], policy), [obs])
+                self.assertEqual(result["decision"], "INCONCLUSIVE")
 
     def test_missing_preregistered_final_hash_unknown_not_conflict(self):
         with tempfile.TemporaryDirectory() as directory:
