@@ -74,7 +74,7 @@ sequenceDiagram
             "candidates": ["hold_phone", "grip", "cup", "pinch"]},
   "right": {"preset": "relaxed", "source": "default", "confidence": null, "visible": false,
             "candidates": ["relaxed", "fist", "open", "grip"]},
-  "library_version": "hand-library-v1",
+  "library_version": "hand-library-v2",
   "status": "vlm"
 }
 ```
@@ -90,7 +90,7 @@ sequenceDiagram
 ```json
 {
   "schema_version": 1,
-  "library_version": "hand-library-v1",
+  "library_version": "hand-library-v2",
   "library_sha256": "c031c50f…",
   "default_preset": "relaxed",
   "fallback_order": ["relaxed", "fist", "open", "grip"],
@@ -110,7 +110,9 @@ sequenceDiagram
 
 ## 3. Converter API (구현 완료)
 
-손은 FBX를 만들 때 굽는다. 몸 포즈는 그대로 두고 손가락 30개 뼈만 바꾼 뒤 `rigged_rest`로 다시 내보낸다.
+손은 FBX를 만들 때 굽는다. 몸 포즈는 그대로 두고 손가락 회전을 적용한 뒤 `rigged_rest`로 다시 내보낸다.
+`hand-library-v2`의 `fist`·`tremble_fist`는 손가락 뿌리 이상치와 국소 피부 접힘도 보정한다.
+나머지 77종은 기존 회전 경로를 사용한다. [주먹 보정 검증](HAND_FIST_QUALITY_2026-10-27.md)을 참고한다.
 몸 뼈가 바뀌지 않았는지(1e-5)와 손가락 관통이 없는지를 함께 검사해 결과에 남긴다.
 
 | 항목 | 내용 |
@@ -123,7 +125,7 @@ sequenceDiagram
 ```json
 {
   "version": "hand-bake-v1",
-  "library_version": "hand-library-v1",
+  "library_version": "hand-library-v2",
   "library_sha256": "c031c50f…",
   "left": "hold_phone", "right": "relaxed",
   "applied_bones": 30,

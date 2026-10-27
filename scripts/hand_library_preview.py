@@ -113,6 +113,8 @@ def build() -> dict:
                     for f in FINGERS},
             }
         presets[preset.preset_id] = {
+            "fist_profile": None if preset.articulation is None else {
+                "thumb_directions": preset.articulation.thumb_directions, "fan": dict(preset.articulation.fan)},
             "label_ko": preset.label_ko, "category": preset.category, "vlm_hint": preset.vlm_hint,
             "fingers": {f: {"curl": list(p.curl), "spread": p.spread} for f, p in preset.fingers.items()},
             "sides": sides,
