@@ -1,0 +1,3400 @@
+{
+  "schema": "palm-elbow-review-v1",
+  "full_request_passed": false,
+  "safe_pose_candidate": true,
+  "audit": {
+    "version": "actual-palm-elbow-audit-v1",
+    "baseline_sha256": "d0476ba2306700b5e66865682a05aefba0720781d28ccfbf7b935882ee810099",
+    "artifact_sha256": "01350422f07796422d8d40082d0ccba94c3e300cf260ee7194f85129133e6fb4",
+    "receipt_sha256": "1c8ffda30c9a3095abd53c9b723c2090a9faff75492e145c8b8bb3b3e08cf025",
+    "contract_sha256": "251c338c9553b77fe91f9d8a15f8b0b9394943b0ac51dbff70da63b385ecd526",
+    "analysis_sha256": "0e13dc14a207bbb5d75162acd24dac8778c899fc845db45e6e78c6465a5f605d",
+    "before": {
+      "version": "full-palm-side-waist-v1",
+      "status": "palm_contact_blocked",
+      "reasons": [
+        "broad_palm_contact_missing"
+      ],
+      "palm_area_mm2": 5398.28918631394,
+      "contact_area_fraction": 0.0,
+      "minimum_sample_gap_mm": 91.03449032972084,
+      "median_gap_mm": 141.03002872538377,
+      "maximum_sample_gap_mm": 188.26170837256365,
+      "mean_opposing_normal_cosine": 0.72757980979335,
+      "zones": [
+        {
+          "zone": 0,
+          "area_mm2": 1362.1654801454026,
+          "contact_fraction": 0.0,
+          "median_gap_mm": 112.2594319838979
+        },
+        {
+          "zone": 1,
+          "area_mm2": 1862.910740869411,
+          "contact_fraction": 0.0,
+          "median_gap_mm": 122.58710233367766
+        },
+        {
+          "zone": 2,
+          "area_mm2": 1367.1739644496674,
+          "contact_fraction": 0.0,
+          "median_gap_mm": 158.15471601961195
+        },
+        {
+          "zone": 3,
+          "area_mm2": 806.0390008494595,
+          "contact_fraction": 0.0,
+          "median_gap_mm": 159.2599462665556
+        }
+      ],
+      "full_mesh_validated": true
+    },
+    "after": {
+      "version": "full-palm-side-waist-v1",
+      "status": "palm_contact_blocked",
+      "reasons": [
+        "broad_palm_contact_missing"
+      ],
+      "palm_area_mm2": 5414.2224668390345,
+      "contact_area_fraction": 0.0,
+      "minimum_sample_gap_mm": 47.549837476231865,
+      "median_gap_mm": 104.03743380984805,
+      "maximum_sample_gap_mm": 154.1626150662024,
+      "mean_opposing_normal_cosine": 0.7687036241763388,
+      "zones": [
+        {
+          "zone": 0,
+          "area_mm2": 1365.9517362269364,
+          "contact_fraction": 0.0,
+          "median_gap_mm": 75.42555191949629
+        },
+        {
+          "zone": 1,
+          "area_mm2": 1874.7837998442124,
+          "contact_fraction": 0.0,
+          "median_gap_mm": 84.56600305371869
+        },
+        {
+          "zone": 2,
+          "area_mm2": 1367.1808977264022,
+          "contact_fraction": 0.0,
+          "median_gap_mm": 122.87185856529611
+        },
+        {
+          "zone": 3,
+          "area_mm2": 806.3060330414842,
+          "contact_fraction": 0.0,
+          "median_gap_mm": 122.71461839025183
+        }
+      ],
+      "full_mesh_validated": true
+    },
+    "quality": {
+      "status": "pose_nonregression_validated",
+      "reasons": [],
+      "metrics": {
+        "body": {
+          "before": 0.10723047435560451,
+          "after": 0.10722072349161754
+        },
+        "selected_arm": {
+          "before": 0.0911489896229586,
+          "after": 0.09109020373038229
+        },
+        "selected_elbow": {
+          "before": 0.028964816262021405,
+          "after": 0.028955553741239128
+        },
+        "selected_wrist": {
+          "before": 0.1533331629838958,
+          "after": 0.15322485371952546
+        }
+      },
+      "elbow_rearward_mm": 31.61006645107193,
+      "normalization": "same baseline-FBX camera/torso/hip for both; no refitting",
+      "observed_3d_ground_truth": false
+    },
+    "mesh_validated": true,
+    "pose_safety_validated": true,
+    "deployed": false,
+    "full_request_passed": false,
+    "safe_pose_candidate": true
+  },
+  "qa_mesh": {
+    "version": "full-body-posed-skin-v2",
+    "status": "mesh_validated",
+    "full_body": true,
+    "hard_violations": [],
+    "unverified_reasons": [],
+    "triangle_pairs_checked": 17684,
+    "triangle_intersections": [],
+    "contained_components": [],
+    "folded_faces": [],
+    "complete_collision_certificate": true,
+    "topology_sha256": "2d2eeb3183bad7dfd007059733e58d37bc25d9b37411b61d2651ee92344cc559",
+    "vertices": 24994,
+    "triangles": 50000,
+    "profile_sha256": "48a88610aa3210de9b130f2ea9273f2b039485de05eb90d699f9f5cc17877715",
+    "mesh_policy_version": "finite-original-rest-directors-v2",
+    "mesh_policy_sha256": "f612b1a742805118b66a045fcff272bf8081277d75a71c15b602feedf20a2484",
+    "closed_manifold": true,
+    "consistently_oriented": true,
+    "components": 1,
+    "broadphase_pairs_examined": 330718,
+    "shared_boundary_certified_pairs": 313034,
+    "elapsed_sec": 2.3662389582023025,
+    "full_body_artifact_sha256": "01350422f07796422d8d40082d0ccba94c3e300cf260ee7194f85129133e6fb4",
+    "deformation_witness_sha256": "ac8d6a3472325d80ba5cd5804372dfececf302f1d36ed4e457714c27308b87ee",
+    "fold_reference_kind": "independent-original-rest-lbs-three-directors"
+  },
+  "pose_safety": {
+    "plan_sha256": "59eb75f5bc4b07b799446e1d558dab0e65c4a7761776231ce2e490f341b63b02",
+    "version": "target-pose-depth-safety-v1",
+    "planned": {
+      "version": "target-pose-depth-safety-v1",
+      "status": "pose_validated",
+      "violations": [],
+      "joints": [
+        {
+          "joint": "Head",
+          "delta_degrees": 4.8717494326925376e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 7.139685753206489e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "Hips",
+          "delta_degrees": 8.566715585446431e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 8.400529623031616e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftArm",
+          "delta_degrees": 6.572856052567198,
+          "limit_degrees": 12.0,
+          "offset_error_m": 2.0394789469380113e-06,
+          "axial_twist_degrees": 3.8285433378994123,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "LeftFoot",
+          "delta_degrees": 0.4835756784370419,
+          "limit_degrees": 12.0,
+          "offset_error_m": 2.8456211344491575e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftForeArm",
+          "delta_degrees": 11.990011427079406,
+          "limit_degrees": 12.0,
+          "offset_error_m": 1.1265954310242268e-06,
+          "axial_twist_degrees": 0.11396043724838895,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "LeftHand",
+          "delta_degrees": 7.258582496146605e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 9.745551057747747e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandIndex1",
+          "delta_degrees": 0.00027564330419654594,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.597217723366579e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandIndex2",
+          "delta_degrees": 0.00034108657872728576,
+          "limit_degrees": 0.0,
+          "offset_error_m": 4.1833029542973986e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandIndex3",
+          "delta_degrees": 0.00014114920980182747,
+          "limit_degrees": 0.0,
+          "offset_error_m": 6.614790998563878e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandMiddle1",
+          "delta_degrees": 0.00013253031261928295,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.442043628291346e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandMiddle2",
+          "delta_degrees": 0.00020511900745926134,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.3884251831874714e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandMiddle3",
+          "delta_degrees": 0.0003389449117020153,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.6900331729804013e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandPinky1",
+          "delta_degrees": 5.466818727595207e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.577986039786809e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandPinky2",
+          "delta_degrees": 6.299437963898121e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.69504889694863e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandPinky3",
+          "delta_degrees": 0.0002936559389775022,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.1576007639264343e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandRing1",
+          "delta_degrees": 0.00010808248327068641,
+          "limit_degrees": 0.0,
+          "offset_error_m": 4.604908754022996e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandRing2",
+          "delta_degrees": 0.000574378401745468,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.672957986049486e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandRing3",
+          "delta_degrees": 0.00037509726781568984,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.599643772864177e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandThumb1",
+          "delta_degrees": 0.00018685748614852757,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.6747165337603653e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandThumb2",
+          "delta_degrees": 5.045217142111914e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.3796742615535557e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandThumb3",
+          "delta_degrees": 2.634275661277943e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.0121332172460904e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftLeg",
+          "delta_degrees": 1.4996766724083677,
+          "limit_degrees": 8.0,
+          "offset_error_m": 4.1953804954420504e-07,
+          "axial_twist_degrees": 5.576489144856184e-05,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "LeftShoulder",
+          "delta_degrees": 4.577054956828774e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.4173883306581715e-06,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftToeBase",
+          "delta_degrees": 0.0013351043555728049,
+          "limit_degrees": 0.0,
+          "offset_error_m": 4.743055215240199e-06,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftUpLeg",
+          "delta_degrees": 1.790967426944644,
+          "limit_degrees": 8.0,
+          "offset_error_m": 6.436904585427542e-07,
+          "axial_twist_degrees": 0.001238298241143159,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "Neck",
+          "delta_degrees": 1.6108968939569464e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.200372203757114e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightArm",
+          "delta_degrees": 4.449193324393323,
+          "limit_degrees": 12.0,
+          "offset_error_m": 2.629255754696866e-07,
+          "axial_twist_degrees": 0.06081412438464284,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "RightFoot",
+          "delta_degrees": 0.30911017303959376,
+          "limit_degrees": 12.0,
+          "offset_error_m": 4.380095532047571e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightForeArm",
+          "delta_degrees": 1.5624001991583607,
+          "limit_degrees": 12.0,
+          "offset_error_m": 1.1612723190997412e-07,
+          "axial_twist_degrees": 4.541506536516527e-05,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "RightHand",
+          "delta_degrees": 0.0001753793220693129,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.8095356409982643e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandIndex1",
+          "delta_degrees": 0.00010949626209707174,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.819868445789821e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandIndex2",
+          "delta_degrees": 6.189711731221187e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.9710128992474965e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandIndex3",
+          "delta_degrees": 8.846347527351503e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.3699216422180426e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandMiddle1",
+          "delta_degrees": 0.0001331503729479818,
+          "limit_degrees": 0.0,
+          "offset_error_m": 4.986000750684241e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandMiddle2",
+          "delta_degrees": 7.368219908447397e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.3278322872588066e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandMiddle3",
+          "delta_degrees": 5.8941307301714305e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.119526630763946e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandPinky1",
+          "delta_degrees": 0.00014212190104144872,
+          "limit_degrees": 0.0,
+          "offset_error_m": 4.441775116668055e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandPinky2",
+          "delta_degrees": 0.0001270259109884968,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.5150282940413773e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandPinky3",
+          "delta_degrees": 0.0001910241024532321,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.076800086557673e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandRing1",
+          "delta_degrees": 0.00010026661868815529,
+          "limit_degrees": 0.0,
+          "offset_error_m": 5.762365532236238e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandRing2",
+          "delta_degrees": 0.00017388919169983189,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.4549304034314e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandRing3",
+          "delta_degrees": 5.890419450090898e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 5.385651181961377e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandThumb1",
+          "delta_degrees": 0.00013320510652736753,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.6813590309883014e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandThumb2",
+          "delta_degrees": 0.00010565427312402412,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.3516377803159326e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandThumb3",
+          "delta_degrees": 0.00010911614663825302,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.5562062744903133e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightLeg",
+          "delta_degrees": 1.4996952609249083,
+          "limit_degrees": 8.0,
+          "offset_error_m": 4.1455374231546497e-07,
+          "axial_twist_degrees": 6.257307962422464e-05,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "RightShoulder",
+          "delta_degrees": 4.7166647622351805e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 7.893823298165602e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightToeBase",
+          "delta_degrees": 0.0006795737895178355,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.0526207060732376e-06,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightUpLeg",
+          "delta_degrees": 1.7874528346033114,
+          "limit_degrees": 8.0,
+          "offset_error_m": 4.4528270721617234e-07,
+          "axial_twist_degrees": 0.0004264987015591936,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "Spine",
+          "delta_degrees": 7.373164691171895e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.6584159066293483e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "Spine1",
+          "delta_degrees": 1.4589290462454084e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.7570229896395873e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "Spine2",
+          "delta_degrees": 4.353408482428142e-06,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.1894508170183904e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        }
+      ],
+      "chains": [
+        {
+          "chain": "LeftArm",
+          "base_interior_degrees": 125.31172797803077,
+          "interior_degrees": 113.32233303613715,
+          "pole_turn_degrees": 6.112743235469157
+        },
+        {
+          "chain": "LeftLeg",
+          "base_interior_degrees": 170.42744772218245,
+          "interior_degrees": 168.92772278339686,
+          "pole_turn_degrees": 0.4221808683803112
+        },
+        {
+          "chain": "RightArm",
+          "base_interior_degrees": 168.02715604965599,
+          "interior_degrees": 166.4647214463944,
+          "pole_turn_degrees": 0.7896151615848808
+        },
+        {
+          "chain": "RightLeg",
+          "base_interior_degrees": 165.78622846605626,
+          "interior_degrees": 164.28682985865262,
+          "pole_turn_degrees": 0.12168247327136941
+        }
+      ],
+      "depth_pairs": [
+        {
+          "joints": [
+            5,
+            7
+          ],
+          "base_depth_torso": 0.11044741550532723,
+          "depth_torso": 0.056425899935864714,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            7,
+            9
+          ],
+          "base_depth_torso": 0.360947711744188,
+          "depth_torso": 0.3874970251163716,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            6,
+            8
+          ],
+          "base_depth_torso": 0.037450738012688674,
+          "depth_torso": 0.03710932188665943,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            8,
+            10
+          ],
+          "base_depth_torso": 0.17041656357520824,
+          "depth_torso": 0.1866751759715655,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            11,
+            13
+          ],
+          "base_depth_torso": -0.0023551917606534647,
+          "depth_torso": 0.03125358078447862,
+          "prior_constrained": false,
+          "preserved": true
+        },
+        {
+          "joints": [
+            13,
+            15
+          ],
+          "base_depth_torso": -0.17314166156488622,
+          "depth_torso": -0.16802638723143037,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            12,
+            14
+          ],
+          "base_depth_torso": 0.13956933763860385,
+          "depth_torso": 0.17274149284100937,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            14,
+            16
+          ],
+          "base_depth_torso": -0.12227359045209382,
+          "depth_torso": -0.11731379024705704,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            7,
+            8
+          ],
+          "base_depth_torso": 0.1865947689569544,
+          "depth_torso": 0.24027497201003722,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            9,
+            10
+          ],
+          "base_depth_torso": -0.003936379212025404,
+          "depth_torso": 0.03945312286523117,
+          "prior_constrained": false,
+          "preserved": true
+        },
+        {
+          "joints": [
+            13,
+            14
+          ],
+          "base_depth_torso": 0.2979643162701263,
+          "depth_torso": 0.29752771776551784,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            15,
+            16
+          ],
+          "base_depth_torso": 0.3488323873829187,
+          "depth_torso": 0.3482403147498912,
+          "prior_constrained": true,
+          "preserved": true
+        }
+      ],
+      "max_depth_drift_torso": 0.05402352810841353,
+      "depth_authority": "selected-3d-pose-prior",
+      "observed_depth_ground_truth": false,
+      "anatomical_certificate": false
+    },
+    "exported_body": {
+      "version": "target-pose-depth-safety-v1",
+      "status": "pose_validated",
+      "violations": [],
+      "joints": [
+        {
+          "joint": "Head",
+          "delta_degrees": 4.8717494326925376e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 7.139685753206489e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "Hips",
+          "delta_degrees": 8.566715585446431e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 8.400529623031616e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftArm",
+          "delta_degrees": 6.572856052567198,
+          "limit_degrees": 12.0,
+          "offset_error_m": 2.0394789469380113e-06,
+          "axial_twist_degrees": 3.8285433378994123,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "LeftFoot",
+          "delta_degrees": 0.4835756784370419,
+          "limit_degrees": 12.0,
+          "offset_error_m": 2.8456211344491575e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftForeArm",
+          "delta_degrees": 11.990011427079406,
+          "limit_degrees": 12.0,
+          "offset_error_m": 1.1265954310242268e-06,
+          "axial_twist_degrees": 0.11396043724838895,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "LeftHand",
+          "delta_degrees": 7.258582496146605e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 9.745551057747747e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandIndex1",
+          "delta_degrees": 0.00027564330419654594,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.597217723366579e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandIndex2",
+          "delta_degrees": 0.00034108657872728576,
+          "limit_degrees": 0.0,
+          "offset_error_m": 4.1833029542973986e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandIndex3",
+          "delta_degrees": 0.00014114920980182747,
+          "limit_degrees": 0.0,
+          "offset_error_m": 6.614790998563878e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandMiddle1",
+          "delta_degrees": 0.00013253031261928295,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.442043628291346e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandMiddle2",
+          "delta_degrees": 0.00020511900745926134,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.3884251831874714e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandMiddle3",
+          "delta_degrees": 0.0003389449117020153,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.6900331729804013e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandPinky1",
+          "delta_degrees": 5.466818727595207e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.577986039786809e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandPinky2",
+          "delta_degrees": 6.299437963898121e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.69504889694863e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandPinky3",
+          "delta_degrees": 0.0002936559389775022,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.1576007639264343e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandRing1",
+          "delta_degrees": 0.00010808248327068641,
+          "limit_degrees": 0.0,
+          "offset_error_m": 4.604908754022996e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandRing2",
+          "delta_degrees": 0.000574378401745468,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.672957986049486e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandRing3",
+          "delta_degrees": 0.00037509726781568984,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.599643772864177e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandThumb1",
+          "delta_degrees": 0.00018685748614852757,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.6747165337603653e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandThumb2",
+          "delta_degrees": 5.045217142111914e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.3796742615535557e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandThumb3",
+          "delta_degrees": 2.634275661277943e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.0121332172460904e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftLeg",
+          "delta_degrees": 1.4996766724083677,
+          "limit_degrees": 8.0,
+          "offset_error_m": 4.1953804954420504e-07,
+          "axial_twist_degrees": 5.576489144856184e-05,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "LeftShoulder",
+          "delta_degrees": 4.577054956828774e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.4173883306581715e-06,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftToeBase",
+          "delta_degrees": 0.0013351043555728049,
+          "limit_degrees": 0.0,
+          "offset_error_m": 4.743055215240199e-06,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftUpLeg",
+          "delta_degrees": 1.790967426944644,
+          "limit_degrees": 8.0,
+          "offset_error_m": 6.436904585427542e-07,
+          "axial_twist_degrees": 0.001238298241143159,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "Neck",
+          "delta_degrees": 1.6108968939569464e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.200372203757114e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightArm",
+          "delta_degrees": 4.449193324393323,
+          "limit_degrees": 12.0,
+          "offset_error_m": 2.629255754696866e-07,
+          "axial_twist_degrees": 0.06081412438464284,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "RightFoot",
+          "delta_degrees": 0.30911017303959376,
+          "limit_degrees": 12.0,
+          "offset_error_m": 4.380095532047571e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightForeArm",
+          "delta_degrees": 1.5624001991583607,
+          "limit_degrees": 12.0,
+          "offset_error_m": 1.1612723190997412e-07,
+          "axial_twist_degrees": 4.541506536516527e-05,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "RightHand",
+          "delta_degrees": 0.0001753793220693129,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.8095356409982643e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandIndex1",
+          "delta_degrees": 0.00010949626209707174,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.819868445789821e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandIndex2",
+          "delta_degrees": 6.189711731221187e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.9710128992474965e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandIndex3",
+          "delta_degrees": 8.846347527351503e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.3699216422180426e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandMiddle1",
+          "delta_degrees": 0.0001331503729479818,
+          "limit_degrees": 0.0,
+          "offset_error_m": 4.986000750684241e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandMiddle2",
+          "delta_degrees": 7.368219908447397e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.3278322872588066e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandMiddle3",
+          "delta_degrees": 5.8941307301714305e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.119526630763946e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandPinky1",
+          "delta_degrees": 0.00014212190104144872,
+          "limit_degrees": 0.0,
+          "offset_error_m": 4.441775116668055e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandPinky2",
+          "delta_degrees": 0.0001270259109884968,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.5150282940413773e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandPinky3",
+          "delta_degrees": 0.0001910241024532321,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.076800086557673e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandRing1",
+          "delta_degrees": 0.00010026661868815529,
+          "limit_degrees": 0.0,
+          "offset_error_m": 5.762365532236238e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandRing2",
+          "delta_degrees": 0.00017388919169983189,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.4549304034314e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandRing3",
+          "delta_degrees": 5.890419450090898e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 5.385651181961377e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandThumb1",
+          "delta_degrees": 0.00013320510652736753,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.6813590309883014e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandThumb2",
+          "delta_degrees": 0.00010565427312402412,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.3516377803159326e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandThumb3",
+          "delta_degrees": 0.00010911614663825302,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.5562062744903133e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightLeg",
+          "delta_degrees": 1.4996952609249083,
+          "limit_degrees": 8.0,
+          "offset_error_m": 4.1455374231546497e-07,
+          "axial_twist_degrees": 6.257307962422464e-05,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "RightShoulder",
+          "delta_degrees": 4.7166647622351805e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 7.893823298165602e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightToeBase",
+          "delta_degrees": 0.0006795737895178355,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.0526207060732376e-06,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightUpLeg",
+          "delta_degrees": 1.7874528346033114,
+          "limit_degrees": 8.0,
+          "offset_error_m": 4.4528270721617234e-07,
+          "axial_twist_degrees": 0.0004264987015591936,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "Spine",
+          "delta_degrees": 7.373164691171895e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.6584159066293483e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "Spine1",
+          "delta_degrees": 1.4589290462454084e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.7570229896395873e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "Spine2",
+          "delta_degrees": 4.353408482428142e-06,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.1894508170183904e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        }
+      ],
+      "chains": [
+        {
+          "chain": "LeftArm",
+          "base_interior_degrees": 125.31172797803077,
+          "interior_degrees": 113.32233303613715,
+          "pole_turn_degrees": 6.112743235469157
+        },
+        {
+          "chain": "LeftLeg",
+          "base_interior_degrees": 170.42744772218245,
+          "interior_degrees": 168.92772278339686,
+          "pole_turn_degrees": 0.4221808683803112
+        },
+        {
+          "chain": "RightArm",
+          "base_interior_degrees": 168.02715604965599,
+          "interior_degrees": 166.4647214463944,
+          "pole_turn_degrees": 0.7896151615848808
+        },
+        {
+          "chain": "RightLeg",
+          "base_interior_degrees": 165.78622846605626,
+          "interior_degrees": 164.28682985865262,
+          "pole_turn_degrees": 0.12168247327136941
+        }
+      ],
+      "depth_pairs": [
+        {
+          "joints": [
+            5,
+            7
+          ],
+          "base_depth_torso": 0.11044741550532723,
+          "depth_torso": 0.056425899935864714,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            7,
+            9
+          ],
+          "base_depth_torso": 0.360947711744188,
+          "depth_torso": 0.3874970251163716,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            6,
+            8
+          ],
+          "base_depth_torso": 0.037450738012688674,
+          "depth_torso": 0.03710932188665943,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            8,
+            10
+          ],
+          "base_depth_torso": 0.17041656357520824,
+          "depth_torso": 0.1866751759715655,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            11,
+            13
+          ],
+          "base_depth_torso": -0.0023551917606534647,
+          "depth_torso": 0.03125358078447862,
+          "prior_constrained": false,
+          "preserved": true
+        },
+        {
+          "joints": [
+            13,
+            15
+          ],
+          "base_depth_torso": -0.17314166156488622,
+          "depth_torso": -0.16802638723143037,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            12,
+            14
+          ],
+          "base_depth_torso": 0.13956933763860385,
+          "depth_torso": 0.17274149284100937,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            14,
+            16
+          ],
+          "base_depth_torso": -0.12227359045209382,
+          "depth_torso": -0.11731379024705704,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            7,
+            8
+          ],
+          "base_depth_torso": 0.1865947689569544,
+          "depth_torso": 0.24027497201003722,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            9,
+            10
+          ],
+          "base_depth_torso": -0.003936379212025404,
+          "depth_torso": 0.03945312286523117,
+          "prior_constrained": false,
+          "preserved": true
+        },
+        {
+          "joints": [
+            13,
+            14
+          ],
+          "base_depth_torso": 0.2979643162701263,
+          "depth_torso": 0.29752771776551784,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            15,
+            16
+          ],
+          "base_depth_torso": 0.3488323873829187,
+          "depth_torso": 0.3482403147498912,
+          "prior_constrained": true,
+          "preserved": true
+        }
+      ],
+      "max_depth_drift_torso": 0.05402352810841353,
+      "depth_authority": "selected-3d-pose-prior",
+      "observed_depth_ground_truth": false,
+      "anatomical_certificate": false
+    },
+    "body_frame_max_error": 0.0,
+    "final_rig_error": 0.0,
+    "final_body": {
+      "version": "target-pose-depth-safety-v1",
+      "status": "pose_validated",
+      "violations": [],
+      "joints": [
+        {
+          "joint": "Head",
+          "delta_degrees": 5.789315642351374e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 8.167141788326977e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "Hips",
+          "delta_degrees": 0.00011329161293983906,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.0086223483085632e-06,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftArm",
+          "delta_degrees": 6.572874449920969,
+          "limit_degrees": 12.0,
+          "offset_error_m": 2.01040584402428e-06,
+          "axial_twist_degrees": 3.828563553682302,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "LeftFoot",
+          "delta_degrees": 0.4828332938948815,
+          "limit_degrees": 12.0,
+          "offset_error_m": 5.398260283614054e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftForeArm",
+          "delta_degrees": 11.990016298390161,
+          "limit_degrees": 12.0,
+          "offset_error_m": 1.3893203706358746e-06,
+          "axial_twist_degrees": 0.11396941913131654,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "LeftHand",
+          "delta_degrees": 9.672166469080886e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.1862178410099558e-06,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandIndex1",
+          "delta_degrees": 0.00032928667132977853,
+          "limit_degrees": 0.0,
+          "offset_error_m": 5.960436349646854e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandIndex2",
+          "delta_degrees": 0.00034108657872728576,
+          "limit_degrees": 0.0,
+          "offset_error_m": 4.1833029542973986e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandIndex3",
+          "delta_degrees": 0.00014114920980182747,
+          "limit_degrees": 0.0,
+          "offset_error_m": 6.614790998563878e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandMiddle1",
+          "delta_degrees": 8.289961852271285e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 7.256704493551465e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandMiddle2",
+          "delta_degrees": 0.00020511900745926134,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.3884251831874714e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandMiddle3",
+          "delta_degrees": 0.0003389449117020153,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.6900331729804013e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandPinky1",
+          "delta_degrees": 7.465517055671882e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 5.106513184129421e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandPinky2",
+          "delta_degrees": 6.299437963898121e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.69504889694863e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandPinky3",
+          "delta_degrees": 0.0002936559389775022,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.1576007639264343e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandRing1",
+          "delta_degrees": 0.0001500019797339568,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.605946225588886e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandRing2",
+          "delta_degrees": 0.000574378401745468,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.672957986049486e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandRing3",
+          "delta_degrees": 0.00037509726781568984,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.599643772864177e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandThumb1",
+          "delta_degrees": 0.00015141910901659888,
+          "limit_degrees": 0.0,
+          "offset_error_m": 4.529943301146392e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandThumb2",
+          "delta_degrees": 5.045217142111914e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.3796742615535557e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandThumb3",
+          "delta_degrees": 2.634275661277943e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.0121332172460904e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftLeg",
+          "delta_degrees": 1.499632624897666,
+          "limit_degrees": 8.0,
+          "offset_error_m": 6.595482612541387e-07,
+          "axial_twist_degrees": 9.19060234892538e-05,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "LeftShoulder",
+          "delta_degrees": 5.9372575884557096e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.43635031944939e-06,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftToeBase",
+          "delta_degrees": 0.0017013555993709837,
+          "limit_degrees": 0.0,
+          "offset_error_m": 5.5062062758190714e-06,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftUpLeg",
+          "delta_degrees": 1.7909720221330694,
+          "limit_degrees": 8.0,
+          "offset_error_m": 7.612048049128606e-07,
+          "axial_twist_degrees": 0.0012509768195445362,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "Neck",
+          "delta_degrees": 2.784925354712252e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.1586241150151967e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightArm",
+          "delta_degrees": 4.449199346810946,
+          "limit_degrees": 12.0,
+          "offset_error_m": 1.828002540229104e-07,
+          "axial_twist_degrees": 0.06081433608326054,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "RightFoot",
+          "delta_degrees": 0.30940503470549857,
+          "limit_degrees": 12.0,
+          "offset_error_m": 1.4787959085736902e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightForeArm",
+          "delta_degrees": 1.5623898831755734,
+          "limit_degrees": 12.0,
+          "offset_error_m": 3.253020521050044e-07,
+          "axial_twist_degrees": 3.387515030287865e-05,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "RightHand",
+          "delta_degrees": 0.00017334759068054535,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.0329420172154862e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandIndex1",
+          "delta_degrees": 0.0001074127327695811,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.091628714968669e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandIndex2",
+          "delta_degrees": 6.189711731221187e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.9710128992474965e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandIndex3",
+          "delta_degrees": 8.846347527351503e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.3699216422180426e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandMiddle1",
+          "delta_degrees": 0.00013411042084314983,
+          "limit_degrees": 0.0,
+          "offset_error_m": 4.1781409651075403e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandMiddle2",
+          "delta_degrees": 7.368219908447397e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.3278322872588066e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandMiddle3",
+          "delta_degrees": 5.8941307301714305e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.119526630763946e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandPinky1",
+          "delta_degrees": 0.0001451314751193905,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.367685864408447e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandPinky2",
+          "delta_degrees": 0.0001270259109884968,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.5150282940413773e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandPinky3",
+          "delta_degrees": 0.0001910241024532321,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.076800086557673e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandRing1",
+          "delta_degrees": 9.160477990890116e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 4.7421954099866375e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandRing2",
+          "delta_degrees": 0.00017388919169983189,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.4549304034314e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandRing3",
+          "delta_degrees": 5.890419450090898e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 5.385651181961377e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandThumb1",
+          "delta_degrees": 0.0001327391517237152,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.7966302476048653e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandThumb2",
+          "delta_degrees": 0.00010565427312402412,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.3516377803159326e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandThumb3",
+          "delta_degrees": 0.00010911614663825302,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.5562062744903133e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightLeg",
+          "delta_degrees": 1.4996493315059334,
+          "limit_degrees": 8.0,
+          "offset_error_m": 5.617717111313288e-07,
+          "axial_twist_degrees": 5.13381833662297e-05,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "RightShoulder",
+          "delta_degrees": 8.016384430977918e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 8.012221786778677e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightToeBase",
+          "delta_degrees": 0.0007512926724575137,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.4423299054971677e-06,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightUpLeg",
+          "delta_degrees": 1.787492099297455,
+          "limit_degrees": 8.0,
+          "offset_error_m": 4.008626470474852e-07,
+          "axial_twist_degrees": 0.0002746287451337667,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "Spine",
+          "delta_degrees": 9.494177922860575e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.74049113215862e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "Spine1",
+          "delta_degrees": 1.574280817616329e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.5060343152721584e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "Spine2",
+          "delta_degrees": 2.9575586669421963e-06,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.253358239727618e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        }
+      ],
+      "chains": [
+        {
+          "chain": "LeftArm",
+          "base_interior_degrees": 125.31172797803077,
+          "interior_degrees": 113.32233753837532,
+          "pole_turn_degrees": 6.112753576840337
+        },
+        {
+          "chain": "LeftLeg",
+          "base_interior_degrees": 170.42744772218245,
+          "interior_degrees": 168.92776704984107,
+          "pole_turn_degrees": 0.422180453822547
+        },
+        {
+          "chain": "RightArm",
+          "base_interior_degrees": 168.02715604965599,
+          "interior_degrees": 166.4647214447097,
+          "pole_turn_degrees": 0.7896124089832468
+        },
+        {
+          "chain": "RightLeg",
+          "base_interior_degrees": 165.78622846605626,
+          "interior_degrees": 164.28674683205173,
+          "pole_turn_degrees": 0.12168669441252328
+        }
+      ],
+      "depth_pairs": [
+        {
+          "joints": [
+            5,
+            7
+          ],
+          "base_depth_torso": 0.11044741550532723,
+          "depth_torso": 0.05642591249461017,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            7,
+            9
+          ],
+          "base_depth_torso": 0.360947711744188,
+          "depth_torso": 0.3874973767612428,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            6,
+            8
+          ],
+          "base_depth_torso": 0.037450738012688674,
+          "depth_torso": 0.037109522826585896,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            8,
+            10
+          ],
+          "base_depth_torso": 0.17041656357520824,
+          "depth_torso": 0.1866751634128201,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            11,
+            13
+          ],
+          "base_depth_torso": -0.0023551917606534647,
+          "depth_torso": 0.031253762886286986,
+          "prior_constrained": false,
+          "preserved": true
+        },
+        {
+          "joints": [
+            13,
+            15
+          ],
+          "base_depth_torso": -0.17314166156488622,
+          "depth_torso": -0.16802543904615233,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            12,
+            14
+          ],
+          "base_depth_torso": 0.13956933763860385,
+          "depth_torso": 0.17274170633968122,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            14,
+            16
+          ],
+          "base_depth_torso": -0.12227359045209382,
+          "depth_torso": -0.1173151465915607,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            7,
+            8
+          ],
+          "base_depth_torso": 0.1865947689569544,
+          "depth_torso": 0.2402752859786723,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            9,
+            10
+          ],
+          "base_depth_torso": -0.003936379212025404,
+          "depth_torso": 0.03945307263024955,
+          "prior_constrained": false,
+          "preserved": true
+        },
+        {
+          "joints": [
+            13,
+            14
+          ],
+          "base_depth_torso": 0.2979643162701263,
+          "depth_torso": 0.2975277240448906,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            15,
+            16
+          ],
+          "base_depth_torso": 0.3488323873829187,
+          "depth_torso": 0.34823801649948216,
+          "prior_constrained": true,
+          "preserved": true
+        }
+      ],
+      "max_depth_drift_torso": 0.05402398022324806,
+      "depth_authority": "selected-3d-pose-prior",
+      "observed_depth_ground_truth": false,
+      "anatomical_certificate": false
+    }
+  },
+  "planning": {
+    "version": "palm-elbow-planner-v1",
+    "objective": "palm",
+    "trials": [
+      {
+        "parameters": [
+          4.5121097417373,
+          -5.983598211454752,
+          10.588640366977133,
+          -3.8,
+          0.11384704553759253
+        ],
+        "objective": 4.308332806025174,
+        "minimum_constraint": -1.0585895902264289e-15,
+        "feasible": true,
+        "solver_message": "Optimization terminated successfully"
+      },
+      {
+        "parameters": [
+          4.51210974176241,
+          -5.983598211491395,
+          10.588640367163629,
+          -3.7999999999999403,
+          0.11384702593858859
+        ],
+        "objective": 4.308332806021711,
+        "minimum_constraint": -3.419486915845482e-14,
+        "feasible": true,
+        "solver_message": "Optimization terminated successfully"
+      },
+      {
+        "parameters": [
+          4.512109691888807,
+          -5.983598145317079,
+          10.588639885364259,
+          -3.799999999999999,
+          0.11389790900508641
+        ],
+        "objective": 4.308332805992214,
+        "minimum_constraint": -5.959509856358781e-14,
+        "feasible": true,
+        "solver_message": "Optimization terminated successfully"
+      }
+    ],
+    "baseline_joint_nme": 0.10722975771436744,
+    "planned_joint_nme": 0.10721975771442703,
+    "baseline_elbow_nme": 0.02896437424666031,
+    "planned_elbow_nme": 0.028954374246573884,
+    "baseline_wrist_nme": 0.15333316269095987,
+    "planned_wrist_nme": 0.15322316269176145,
+    "elbow_rearward_mm": 31.609592988619,
+    "before": {
+      "version": "full-palm-side-waist-v1",
+      "status": "palm_contact_blocked",
+      "reasons": [
+        "full_mesh_not_verified",
+        "broad_palm_contact_missing"
+      ],
+      "palm_area_mm2": 5398.2992109892,
+      "contact_area_fraction": 0.0,
+      "minimum_sample_gap_mm": 91.03466333391252,
+      "median_gap_mm": 141.0302426162039,
+      "maximum_sample_gap_mm": 188.26177410744833,
+      "mean_opposing_normal_cosine": 0.7275783602052144,
+      "zones": [
+        {
+          "zone": 0,
+          "area_mm2": 1362.1733341256725,
+          "contact_fraction": 0.0,
+          "median_gap_mm": 112.2596319196213
+        },
+        {
+          "zone": 1,
+          "area_mm2": 1862.9164166883604,
+          "contact_fraction": 0.0,
+          "median_gap_mm": 122.58746786787349
+        },
+        {
+          "zone": 2,
+          "area_mm2": 1367.1769896776375,
+          "contact_fraction": 0.0,
+          "median_gap_mm": 158.15487865781427
+        },
+        {
+          "zone": 3,
+          "area_mm2": 806.0324704975294,
+          "contact_fraction": 0.0,
+          "median_gap_mm": 159.2601563361871
+        }
+      ],
+      "full_mesh_validated": false
+    },
+    "planned": {
+      "version": "full-palm-side-waist-v1",
+      "status": "palm_contact_blocked",
+      "reasons": [
+        "full_mesh_not_verified",
+        "broad_palm_contact_missing"
+      ],
+      "palm_area_mm2": 5414.219676116416,
+      "contact_area_fraction": 0.0,
+      "minimum_sample_gap_mm": 47.55019109048976,
+      "median_gap_mm": 104.03794031313393,
+      "maximum_sample_gap_mm": 154.16270876429687,
+      "mean_opposing_normal_cosine": 0.7687039670122944,
+      "zones": [
+        {
+          "zone": 0,
+          "area_mm2": 1365.959887842587,
+          "contact_fraction": 0.0,
+          "median_gap_mm": 75.42592062604989
+        },
+        {
+          "zone": 1,
+          "area_mm2": 1874.7898824861397,
+          "contact_fraction": 0.0,
+          "median_gap_mm": 84.56642294032203
+        },
+        {
+          "zone": 2,
+          "area_mm2": 1367.1772007806217,
+          "contact_fraction": 0.0,
+          "median_gap_mm": 122.8722428077878
+        },
+        {
+          "zone": 3,
+          "area_mm2": 806.292705007068,
+          "contact_fraction": 0.0,
+          "median_gap_mm": 122.71490598871395
+        }
+      ],
+      "full_mesh_validated": false
+    },
+    "pose_audit": {
+      "version": "target-pose-depth-safety-v1",
+      "status": "pose_validated",
+      "violations": [],
+      "joints": [
+        {
+          "joint": "Head",
+          "delta_degrees": 3.242092304495175e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.2760105144498013e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "Hips",
+          "delta_degrees": 4.59771179305311e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 5.038455128669739e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftArm",
+          "delta_degrees": 6.572837843647178,
+          "limit_degrees": 12.0,
+          "offset_error_m": 1.6196463312908078e-06,
+          "axial_twist_degrees": 3.8284753179544038,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "LeftFoot",
+          "delta_degrees": 0.48458318033124104,
+          "limit_degrees": 12.0,
+          "offset_error_m": 1.4721634084528597e-06,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftForeArm",
+          "delta_degrees": 11.989999999896913,
+          "limit_degrees": 12.0,
+          "offset_error_m": 7.099135914470887e-07,
+          "axial_twist_degrees": 0.11393830669681976,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "LeftHand",
+          "delta_degrees": 8.387864415663222e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.1544353490354368e-06,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandIndex1",
+          "delta_degrees": 0.00013433850919079623,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.9410038195049905e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandIndex2",
+          "delta_degrees": 0.0001451364975779984,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.856291992784599e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandIndex3",
+          "delta_degrees": 5.7767109776210485e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 4.7294754148642835e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandMiddle1",
+          "delta_degrees": 6.967546242376378e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 5.223298290409466e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandMiddle2",
+          "delta_degrees": 4.673192270113879e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.1048300560353425e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandMiddle3",
+          "delta_degrees": 0.00011691400617875289,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.0045381038046764e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandPinky1",
+          "delta_degrees": 5.76787132289745e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 4.446805420488522e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandPinky2",
+          "delta_degrees": 3.9936169227980436e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.614274175098986e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandPinky3",
+          "delta_degrees": 5.274082611557155e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 9.263140495633739e-08,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandRing1",
+          "delta_degrees": 0.00011004741569028466,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.728045300538975e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandRing2",
+          "delta_degrees": 0.00021101167231692993,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.2694653633084115e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandRing3",
+          "delta_degrees": 0.00018264371559943804,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.9047808043290797e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandThumb1",
+          "delta_degrees": 0.0002289228103312589,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.9457290195240777e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandThumb2",
+          "delta_degrees": 0.00013318868881527865,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.5863444199410394e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftHandThumb3",
+          "delta_degrees": 6.427730595197406e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.403215265986997e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftLeg",
+          "delta_degrees": 1.4997638185015918,
+          "limit_degrees": 8.0,
+          "offset_error_m": 4.884246188886683e-07,
+          "axial_twist_degrees": 2.163297005799784e-05,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "LeftShoulder",
+          "delta_degrees": 4.7290120733147285e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.646792063099904e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftToeBase",
+          "delta_degrees": 0.0007246250103999989,
+          "limit_degrees": 0.0,
+          "offset_error_m": 4.474054924806378e-06,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "LeftUpLeg",
+          "delta_degrees": 1.7909592662538327,
+          "limit_degrees": 8.0,
+          "offset_error_m": 4.705868030461423e-07,
+          "axial_twist_degrees": 0.0007987729096716826,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "Neck",
+          "delta_degrees": 2.2845425764212974e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.4604960424856595e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightArm",
+          "delta_degrees": 4.449174829229875,
+          "limit_degrees": 12.0,
+          "offset_error_m": 1.653000954328974e-07,
+          "axial_twist_degrees": 0.060792426586173516,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "RightFoot",
+          "delta_degrees": 0.3095679810607083,
+          "limit_degrees": 12.0,
+          "offset_error_m": 8.943852109847459e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightForeArm",
+          "delta_degrees": 1.5624152564547131,
+          "limit_degrees": 12.0,
+          "offset_error_m": 1.8642440788030472e-07,
+          "axial_twist_degrees": 8.59331711798576e-05,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "RightHand",
+          "delta_degrees": 0.0001957284230710874,
+          "limit_degrees": 0.0,
+          "offset_error_m": 5.41983685187973e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandIndex1",
+          "delta_degrees": 0.0001244168218824393,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.2182033025601965e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandIndex2",
+          "delta_degrees": 2.2940947124789083e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.6103332362544663e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandIndex3",
+          "delta_degrees": 4.28080437503387e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.8428555393747932e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandMiddle1",
+          "delta_degrees": 0.0001482225802382661,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.6161084130025122e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandMiddle2",
+          "delta_degrees": 5.8344669681881546e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.0416221182387427e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandMiddle3",
+          "delta_degrees": 4.248328248908772e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.8052708462656493e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandPinky1",
+          "delta_degrees": 0.00015533519334300807,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.64581457351055e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandPinky2",
+          "delta_degrees": 7.937799487898816e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.6972821932586175e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandPinky3",
+          "delta_degrees": 0.00013908913441374566,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.5659902233292583e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandRing1",
+          "delta_degrees": 6.478561344894969e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.1391720322059916e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandRing2",
+          "delta_degrees": 0.00014380954782028965,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.3355047041811556e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandRing3",
+          "delta_degrees": 4.551502461532898e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 2.767757980380864e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandThumb1",
+          "delta_degrees": 7.124790953727437e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.2153478052831635e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandThumb2",
+          "delta_degrees": 2.2230927998283902e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 6.822253748760934e-08,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightHandThumb3",
+          "delta_degrees": 0.00011021288568975054,
+          "limit_degrees": 0.0,
+          "offset_error_m": 4.0489874898749726e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightLeg",
+          "delta_degrees": 1.4996044912502169,
+          "limit_degrees": 8.0,
+          "offset_error_m": 5.19826882981861e-07,
+          "axial_twist_degrees": 4.654905517245962e-05,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "RightShoulder",
+          "delta_degrees": 6.255312325322784e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 5.51068795554056e-08,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightToeBase",
+          "delta_degrees": 0.0008962801716887384,
+          "limit_degrees": 0.0,
+          "offset_error_m": 3.5041727521146994e-06,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "RightUpLeg",
+          "delta_degrees": 1.7874861939593583,
+          "limit_degrees": 8.0,
+          "offset_error_m": 2.557735297500846e-07,
+          "axial_twist_degrees": 0.00016237526508623395,
+          "axial_twist_limit_degrees": 4.0
+        },
+        {
+          "joint": "Spine",
+          "delta_degrees": 3.3613102066044606e-05,
+          "limit_degrees": 0.0,
+          "offset_error_m": 4.775660611348177e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "Spine1",
+          "delta_degrees": 6.830189170012755e-06,
+          "limit_degrees": 0.0,
+          "offset_error_m": 1.2177930932069494e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        },
+        {
+          "joint": "Spine2",
+          "delta_degrees": 9.035490975690211e-06,
+          "limit_degrees": 0.0,
+          "offset_error_m": 5.915490819558247e-07,
+          "axial_twist_degrees": 0.0,
+          "axial_twist_limit_degrees": 0.0
+        }
+      ],
+      "chains": [
+        {
+          "chain": "LeftArm",
+          "base_interior_degrees": 125.31172797803077,
+          "interior_degrees": 113.32239236168647,
+          "pole_turn_degrees": 6.1127485738407366
+        },
+        {
+          "chain": "LeftLeg",
+          "base_interior_degrees": 170.42744772218245,
+          "interior_degrees": 168.92763681229548,
+          "pole_turn_degrees": 0.4221840668710573
+        },
+        {
+          "chain": "RightArm",
+          "base_interior_degrees": 168.02715604965599,
+          "interior_degrees": 166.46473275387822,
+          "pole_turn_degrees": 0.7896013340277501
+        },
+        {
+          "chain": "RightLeg",
+          "base_interior_degrees": 165.78622846605626,
+          "interior_degrees": 164.2868040990845,
+          "pole_turn_degrees": 0.12167678566220895
+        }
+      ],
+      "depth_pairs": [
+        {
+          "joints": [
+            5,
+            7
+          ],
+          "base_depth_torso": 0.11044741550532723,
+          "depth_torso": 0.05642580695675796,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            7,
+            9
+          ],
+          "base_depth_torso": 0.360947711744188,
+          "depth_torso": 0.38749722483983684,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            6,
+            8
+          ],
+          "base_depth_torso": 0.037450738012688674,
+          "depth_torso": 0.03710913350547836,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            8,
+            10
+          ],
+          "base_depth_torso": 0.17041656357520824,
+          "depth_torso": 0.18667503782536604,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            11,
+            13
+          ],
+          "base_depth_torso": -0.0023551917606534647,
+          "depth_torso": 0.03125327309521624,
+          "prior_constrained": false,
+          "preserved": true
+        },
+        {
+          "joints": [
+            13,
+            15
+          ],
+          "base_depth_torso": -0.17314166156488622,
+          "depth_torso": -0.16802835267508617,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            12,
+            14
+          ],
+          "base_depth_torso": 0.13956933763860385,
+          "depth_torso": 0.17274133585669182,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            14,
+            16
+          ],
+          "base_depth_torso": -0.12227359045209382,
+          "depth_torso": -0.11731439934620916,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            7,
+            8
+          ],
+          "base_depth_torso": 0.1865947689569544,
+          "depth_torso": 0.24027490800482648,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            9,
+            10
+          ],
+          "base_depth_torso": -0.003936379212025404,
+          "depth_torso": 0.03945272099035571,
+          "prior_constrained": false,
+          "preserved": true
+        },
+        {
+          "joints": [
+            13,
+            14
+          ],
+          "base_depth_torso": 0.2979643162701263,
+          "depth_torso": 0.2975278810292081,
+          "prior_constrained": true,
+          "preserved": true
+        },
+        {
+          "joints": [
+            15,
+            16
+          ],
+          "base_depth_torso": 0.3488323873829187,
+          "depth_torso": 0.3482418343580851,
+          "prior_constrained": true,
+          "preserved": true
+        }
+      ],
+      "max_depth_drift_torso": 0.05402286128342336,
+      "depth_authority": "selected-3d-pose-prior",
+      "observed_depth_ground_truth": false,
+      "anatomical_certificate": false
+    },
+    "parameters_degrees": [
+      4.512109691888807,
+      -5.983598145317079,
+      10.588639885364259,
+      -3.799999999999999,
+      0.11389790900508641
+    ],
+    "final_fbx_verified": false,
+    "shoulder_plane_bound": {
+      "original_forward_elbow_mm": 58.85965899045318,
+      "minimum_turn_to_plane_degrees": 13.670364958122107,
+      "allowed_degrees": 12.0,
+      "maximum_elbow_back_coordinate_mm": -7.259652142509543,
+      "plane_interpretation": "anatomical shoulder plane; not observed image depth"
+    }
+  },
+  "metrics": {
+    "schema": "fixed-camera-actual-fbx-comparison-v1",
+    "camera": {
+      "canonical_yaw": 0.0,
+      "depth_ambiguous": true,
+      "display_view": "front",
+      "distance_torso": 8.0,
+      "facing_source": "geometry_only",
+      "fit_error": 0.1257515698671341,
+      "labels_swapped": false,
+      "observed_joint_mask": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "pose_id": "rokoko_FootTapping_mixamo_00040",
+      "projection": "perspective",
+      "query_sha256": "2106942e376aa4459cefe3452d61d647f8378b1eb79883bbaa143e0c7671ef5a",
+      "reference": "search-fit",
+      "rotation": [
+        [
+          0.7071067811865476,
+          0.0,
+          0.7071067811865475
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          -0.7071067811865475,
+          0.0,
+          0.7071067811865476
+        ]
+      ],
+      "source_bvh_sha256": "b804647df4336c54ad9cdd7f5e41ad6564ffe87fab24fc9fad3773f90b84ead3",
+      "status": "fitted",
+      "version": "candidate-camera-v2"
+    },
+    "normalization": "same previous-FBX projected torso and hip center for both files",
+    "depth_ground_truth": false,
+    "observations": "saved actual Human-Art/Gemini 124629 analysis",
+    "rows": [
+      {
+        "label": "before",
+        "artifact_sha256": "d0476ba2306700b5e66865682a05aefba0720781d28ccfbf7b935882ee810099",
+        "joint_nme": 0.10723047435560451,
+        "wrist_nme": 0.15249299602797506,
+        "ankle_nme": 0.17363473677391056,
+        "limb_nme": {
+          "left_arm": 0.0911489896229586,
+          "right_arm": 0.15518130744013703,
+          "left_leg": 0.15139871331488045,
+          "right_leg": 0.07879288218138779
+        },
+        "camera_joints_m": [
+          [
+            -0.007117438077527635,
+            1.5418933629989624,
+            0.0058388192560850215
+          ],
+          [
+            -0.007117438077527635,
+            1.5418933629989624,
+            0.0058388192560850215
+          ],
+          [
+            -0.007117438077527635,
+            1.5418933629989624,
+            0.0058388192560850215
+          ],
+          [
+            -0.007117438077527635,
+            1.5418933629989624,
+            0.0058388192560850215
+          ],
+          [
+            -0.007117438077527635,
+            1.5418933629989624,
+            0.0058388192560850215
+          ],
+          [
+            0.12790556603565373,
+            1.4039106369018555,
+            -0.1058781557666967
+          ],
+          [
+            -0.17309583189207434,
+            1.4009928703308105,
+            0.003019832232517674
+          ],
+          [
+            0.2512890570831379,
+            1.1946264505386353,
+            -0.05107483650438094
+          ],
+          [
+            -0.1791053508237123,
+            1.1525139808654785,
+            0.018587055221243827
+          ],
+          [
+            0.15377664376534775,
+            1.0000311136245728,
+            0.10624646258785425
+          ],
+          [
+            -0.19494848815621502,
+            0.8961187601089478,
+            0.09689669000789453
+          ],
+          [
+            0.06359762140359318,
+            0.9854031205177307,
+            -0.040141314432105425
+          ],
+          [
+            -0.08081242792088296,
+            0.9856067895889282,
+            0.025316919111671637
+          ],
+          [
+            0.1115000435471349,
+            0.53355872631073,
+            -0.027030609972124583
+          ],
+          [
+            -0.06270889188246821,
+            0.5373256206512451,
+            0.0977814603594375
+          ],
+          [
+            0.1471884802137916,
+            0.10680779814720154,
+            -0.09751759738015701
+          ],
+          [
+            -0.052345070078603444,
+            0.10621204972267151,
+            0.04856786688087908
+          ]
+        ],
+        "projected_pixels": [
+          [
+            100.3624787975682,
+            115.57325802446587
+          ],
+          [
+            100.3624787975682,
+            115.57325802446587
+          ],
+          [
+            100.3624787975682,
+            115.57325802446587
+          ],
+          [
+            100.3624787975682,
+            115.57325802446587
+          ],
+          [
+            100.3624787975682,
+            115.57325802446587
+          ],
+          [
+            148.17649144468828,
+            157.88684993433853
+          ],
+          [
+            43.509154520129144,
+            163.67744365988634
+          ],
+          [
+            190.33059240366632,
+            233.19573800499933
+          ],
+          [
+            41.71949491018756,
+            249.05398751620407
+          ],
+          [
+            153.82024077610276,
+            301.1697343054807
+          ],
+          [
+            37.755473791269495,
+            335.7848663428872
+          ],
+          [
+            124.90665517566936,
+            306.0327813365118
+          ],
+          [
+            75.28237833263142,
+            305.9627936146601
+          ],
+          [
+            141.36434460423132,
+            462.20012050619084
+          ],
+          [
+            81.82814418418711,
+            455.31238643313475
+          ],
+          [
+            154.8612276623394,
+            616.2494092352479
+          ],
+          [
+            85.07076601312221,
+            603.1670961159714
+          ]
+        ],
+        "joints_world": [
+          [
+            -0.009161457419395447,
+            0.0009041200391948223,
+            1.5418933629989624
+          ],
+          [
+            -0.009161457419395447,
+            0.0009041200391948223,
+            1.5418933629989624
+          ],
+          [
+            -0.009161457419395447,
+            0.0009041200391948223,
+            1.5418933629989624
+          ],
+          [
+            -0.009161457419395447,
+            0.0009041200391948223,
+            1.5418933629989624
+          ],
+          [
+            -0.009161457419395447,
+            0.0009041200391948223,
+            1.5418933629989624
+          ],
+          [
+            0.1653100550174713,
+            -0.015575731173157692,
+            1.4039106369018555
+          ],
+          [
+            -0.12453258037567139,
+            0.12026189267635345,
+            1.4009928703308105
+          ],
+          [
+            0.21380355954170227,
+            -0.14157283306121826,
+            1.1946264505386353
+          ],
+          [
+            -0.1397896409034729,
+            0.11350357532501221,
+            1.1525139808654785
+          ],
+          [
+            0.03360891342163086,
+            -0.18386410176753998,
+            1.0000311136245728
+          ],
+          [
+            -0.206365704536438,
+            0.06933309137821198,
+            0.8961187601089478
+          ],
+          [
+            0.07335450500249863,
+            -0.01658611372113228,
+            0.9854031205177307
+          ],
+          [
+            -0.07504478096961975,
+            0.0392412506043911,
+            0.9856067895889282
+          ],
+          [
+            0.09795596450567245,
+            -0.05972890928387642,
+            0.53355872631073
+          ],
+          [
+            -0.11348381638526917,
+            -0.024800051003694534,
+            0.5373256206512451
+          ],
+          [
+            0.17303332686424255,
+            -0.035122618079185486,
+            0.10680779814720154
+          ],
+          [
+            -0.07135622203350067,
+            0.002670885995030403,
+            0.10621204972267151
+          ]
+        ]
+      },
+      {
+        "label": "after",
+        "artifact_sha256": "01350422f07796422d8d40082d0ccba94c3e300cf260ee7194f85129133e6fb4",
+        "joint_nme": 0.10722072349161754,
+        "wrist_nme": 0.15243899188810117,
+        "ankle_nme": 0.1736342509443159,
+        "limb_nme": {
+          "left_arm": 0.09109020373038229,
+          "right_arm": 0.1551819446338752,
+          "left_leg": 0.15139876870659047,
+          "right_leg": 0.07879234359105254
+        },
+        "camera_joints_m": [
+          [
+            -0.007117779862127278,
+            1.5418939590454102,
+            0.005838478788574394
+          ],
+          [
+            -0.007117779862127278,
+            1.5418939590454102,
+            0.005838478788574394
+          ],
+          [
+            -0.007117779862127278,
+            1.5418939590454102,
+            0.005838478788574394
+          ],
+          [
+            -0.007117779862127278,
+            1.5418939590454102,
+            0.005838478788574394
+          ],
+          [
+            -0.007117779862127278,
+            1.5418939590454102,
+            0.005838478788574394
+          ],
+          [
+            0.12790528681278235,
+            1.403910517692566,
+            -0.10587843498956809
+          ],
+          [
+            -0.17309625336055945,
+            1.400992512702942,
+            0.0030194950577295872
+          ],
+          [
+            0.24669911776633177,
+            1.1862988471984863,
+            -0.0822079337826809
+          ],
+          [
+            -0.17910576702384132,
+            1.1525136232376099,
+            0.018586828681933083
+          ],
+          [
+            0.12076633639108468,
+            1.0135470628738403,
+            0.08034605460286369
+          ],
+          [
+            -0.19494871996388183,
+            0.8961189389228821,
+            0.09689650034707623
+          ],
+          [
+            0.06359738959592637,
+            0.9854032397270203,
+            -0.04014154623977223
+          ],
+          [
+            -0.08081263075259142,
+            0.9856067895889282,
+            0.02531667413311467
+          ],
+          [
+            0.1114999355458356,
+            0.5335586071014404,
+            -0.027030686363287516
+          ],
+          [
+            -0.06270902885972587,
+            0.5373257398605347,
+            0.09778130230875558
+          ],
+          [
+            0.1471879164996928,
+            0.10680752992630005,
+            -0.097516854541952
+          ],
+          [
+            -0.05234502924884395,
+            0.10621237754821777,
+            0.04856794985748709
+          ]
+        ],
+        "projected_pixels": [
+          [
+            100.36236187383626,
+            115.57303464778391
+          ],
+          [
+            100.36236187383626,
+            115.57303464778391
+          ],
+          [
+            100.36236187383626,
+            115.57303464778391
+          ],
+          [
+            100.36236187383626,
+            115.57303464778391
+          ],
+          [
+            100.36236187383626,
+            115.57303464778391
+          ],
+          [
+            148.176396939169,
+            157.8868842999819
+          ],
+          [
+            43.50900417043939,
+            163.67754675681644
+          ],
+          [
+            189.57601738071205,
+            235.43157535426485
+          ],
+          [
+            41.719348856203226,
+            249.05410779595587
+          ],
+          [
+            143.17277215116007,
+            296.60766776257793
+          ],
+          [
+            37.755392172866486,
+            335.784808350864
+          ],
+          [
+            124.90657785297176,
+            306.032739973567
+          ],
+          [
+            75.28230960134468,
+            305.96279361256256
+          ],
+          [
+            141.36431023858796,
+            462.2001720546559
+          ],
+          [
+            81.82809907928018,
+            455.3123520674914
+          ],
+          [
+            154.86101717277376,
+            616.2494436008913
+          ],
+          [
+            85.07077997416484,
+            603.1669586533978
+          ]
+        ],
+        "joints_world": [
+          [
+            -0.009161458350718021,
+            0.0009046024642884731,
+            1.5418939590454102
+          ],
+          [
+            -0.009161458350718021,
+            0.0009046024642884731,
+            1.5418939590454102
+          ],
+          [
+            -0.009161458350718021,
+            0.0009046024642884731,
+            1.5418939590454102
+          ],
+          [
+            -0.009161458350718021,
+            0.0009046024642884731,
+            1.5418939590454102
+          ],
+          [
+            -0.009161458350718021,
+            0.0009046024642884731,
+            1.5418939590454102
+          ],
+          [
+            0.1653100550174713,
+            -0.015575336292386055,
+            1.403910517692566
+          ],
+          [
+            -0.12453263998031616,
+            0.12026242911815643,
+            1.400992512702942
+          ],
+          [
+            0.23257240653038025,
+            -0.11631283164024353,
+            1.1862988471984863
+          ],
+          [
+            -0.13978977501392365,
+            0.11350402981042862,
+            1.1525136232376099
+          ],
+          [
+            0.02858145534992218,
+            -0.14220793545246124,
+            1.0135470628738403
+          ],
+          [
+            -0.20636573433876038,
+            0.06933338940143585,
+            0.8961189389228821
+          ],
+          [
+            0.07335450500249863,
+            -0.016585785895586014,
+            0.9854032397270203
+          ],
+          [
+            -0.07504475116729736,
+            0.03924156725406647,
+            0.9856067895889282
+          ],
+          [
+            0.09795594215393066,
+            -0.05972877889871597,
+            0.5335586071014404
+          ],
+          [
+            -0.11348380148410797,
+            -0.02479984238743782,
+            0.5373257398605347
+          ],
+          [
+            0.17303240299224854,
+            -0.035122744739055634,
+            0.10680752992630005
+          ],
+          [
+            -0.07135625183582306,
+            0.0026707984507083893,
+            0.10621237754821777
+          ]
+        ]
+      }
+    ],
+    "relative_error_reduction": 9.09337018749623e-05
+  },
+  "vlm": {
+    "model_requested": "gemini-3.8-flash",
+    "model_actual": "gemini-3.8-flash",
+    "provider_requests": 1,
+    "elapsed_seconds": 14.426915958989412,
+    "prompt_sha256": "fa656516eb46172b8aa5dbe483fc231226a554755fbf87b0ae32d50feefa4608",
+    "images": [
+      {
+        "name": "codex-clipboard-e4cba0f0-633e-488e-86a1-729055a72367.png",
+        "sha256": "5790f134817faff0aa7c0c604f9e97e6825d146c1622d733f2883df735cc8e36"
+      },
+      {
+        "name": "before-front.png",
+        "sha256": "fbf968fd40ae4f9657ea94df6008614626ac00ef5b34de8defcdbb07fa6c6d1d"
+      },
+      {
+        "name": "after-front.png",
+        "sha256": "d62987fa9c9a99c8c798cb9a6d97c38548d8612be047cb1f6b042185df725969"
+      },
+      {
+        "name": "before-side.png",
+        "sha256": "c3ca7954c126a3790733973ab40fd442d90b3e8ed20301d2a0a55f00fbcd2e40"
+      },
+      {
+        "name": "after-side.png",
+        "sha256": "32d15446238cbb246e9a2e96caf8266048ed943fecbed87321a084b15cbb5525"
+      },
+      {
+        "name": "before-contact-three_quarter.png",
+        "sha256": "c5b6d97b285cbedfc01b5ef058fa5ba791fdd07596321e6790e2fe9ddf0455db"
+      },
+      {
+        "name": "after-contact-three_quarter.png",
+        "sha256": "92aec2430ea7ba463f94958b457003bf886306a2161735c092e6d6627c9f46c9"
+      }
+    ],
+    "response": {
+      "preferred": "uncertain",
+      "elbow_rearward_change": "same",
+      "elbow_rough_match_change": "same",
+      "full_palm_side_waist_contact": "not_achieved",
+      "rough_pose_match_change": "same",
+      "reasons": [
+        "러프에서는 팔꿈치가 몸통 뒤쪽으로 뻗어 있고 손이 옆구리/허리 부근에 위치하지만, 기존과 후보 렌더 모두 손이 하복부 앞쪽에 위치해 있습니다.",
+        "측면 렌더(4, 5) 비교 시 팔꿈치가 몸통 뒤편으로 유의미하게 이동하지 않았으며 거의 동일한 위치에 머물러 있습니다.",
+        "확대 사선 렌더(6, 7)에서 손바닥 전체가 옆허리에 자연스럽게 밀착되지 않고 복부 앞쪽 공간에 위치해 있어 밀착 조건을 충족하지 못합니다."
+      ],
+      "remaining_mismatches": [
+        "팔꿈치가 러프처럼 몸통 뒤쪽으로 충분히 빠지지 않음",
+        "손의 위치가 옆허리가 아닌 하복부/치골 전면에 머물러 있음",
+        "손바닥 전체의 옆허리 밀착 미달성"
+      ],
+      "confidence": "high",
+      "camera_limitations": "단일 각도 렌더링만으로는 정확한 관통 여부나 깊이를 완벽히 측정하기 어려우나, 제공된 정면, 측면, 확대 사선 뷰를 통해 팔꿈치 후방 배치 및 손바닥의 옆허리 밀착 실패는 명확히 확인 가능함."
+    },
+    "usage": {
+      "cache_tokens_details": [
+        {
+          "modality": "TEXT",
+          "token_count": 224
+        },
+        {
+          "modality": "IMAGE",
+          "token_count": 5539
+        }
+      ],
+      "cached_content_token_count": 5763,
+      "candidates_token_count": 384,
+      "candidates_tokens_details": null,
+      "prompt_token_count": 7920,
+      "prompt_tokens_details": [
+        {
+          "modality": "TEXT",
+          "token_count": 308
+        },
+        {
+          "modality": "IMAGE",
+          "token_count": 7612
+        }
+      ],
+      "thoughts_token_count": 805,
+      "tool_use_prompt_token_count": null,
+      "tool_use_prompt_tokens_details": null,
+      "total_token_count": 9109,
+      "traffic_type": null
+    },
+    "safety_authority": false,
+    "depth_ground_truth": false
+  },
+  "vlm_attempts": [
+    {
+      "outcome": "read_timeout",
+      "timeout_seconds": 45
+    },
+    {
+      "outcome": "response",
+      "timeout_seconds": 90
+    }
+  ],
+  "alternatives": [
+    {
+      "diagnostic": {
+        "candidate": "b2_hand_on_hip_talk",
+        "source_sha256": "ebdf632ab10b413f28dbf43f0ae3ce8edf134a57c1cb5d007606b18acbf1a163",
+        "body_sha256": "94189379ca31121609a94af1309e4d880f22d833b4a0d5384b6d3a58c11b7ab4",
+        "diagnostic_only": true,
+        "full_mesh_validated": false,
+        "quality": {
+          "status": "pose_nonregression_blocked",
+          "reasons": [
+            "body_regressed",
+            "selected_arm_regressed",
+            "selected_elbow_regressed",
+            "selected_wrist_regressed"
+          ],
+          "metrics": {
+            "body": {
+              "before": 0.10723047435560451,
+              "after": 0.14505440979905995
+            },
+            "selected_arm": {
+              "before": 0.0911489896229586,
+              "after": 0.24119681377907504
+            },
+            "selected_elbow": {
+              "before": 0.028964816262021405,
+              "after": 0.25327396274975317
+            },
+            "selected_wrist": {
+              "before": 0.1533331629838958,
+              "after": 0.2291196648083969
+            }
+          },
+          "elbow_rearward_mm": 302.5826174334692,
+          "normalization": "same baseline-FBX camera/torso/hip for both; no refitting",
+          "observed_3d_ground_truth": false
+        }
+      },
+      "failure": {
+        "schema": "finite-actual-fbx-safety-failure-v1",
+        "status": "validation_blocked",
+        "reason": "discrete_shell_orientation_reversed",
+        "error_type": "WitnessValidationError",
+        "last_validated_stage": "neutral-repair",
+        "artifacts": {
+          "source.bvh": "ebdf632ab10b413f28dbf43f0ae3ce8edf134a57c1cb5d007606b18acbf1a163",
+          "derived-neutral.fbx": "98853be81d41b85b297d815481c610f5bd10cc7abe73dbf948f1f63916cf0c14",
+          "body.fbx": "94189379ca31121609a94af1309e4d880f22d833b4a0d5384b6d3a58c11b7ab4"
+        },
+        "final_receipt_issued": false,
+        "production_registered": false,
+        "deployed": false
+      }
+    },
+    {
+      "diagnostic": {
+        "candidate": "rokoko_PlayingSaxophone_mixamo_00539_mirror",
+        "source_sha256": "2405827db17af891f264f3d561baed37a258d24ab7f7e6c3140bcf9985df9f95",
+        "body_sha256": "9581897e3d8a18eae2c5ee4793814ab57fb186d5df5000ea391c6a49deccf0f2",
+        "diagnostic_only": true,
+        "full_mesh_validated": false,
+        "quality": {
+          "status": "pose_nonregression_blocked",
+          "reasons": [
+            "body_regressed",
+            "selected_arm_regressed",
+            "selected_elbow_regressed",
+            "selected_wrist_regressed"
+          ],
+          "metrics": {
+            "body": {
+              "before": 0.10723047435560451,
+              "after": 0.12702013231199621
+            },
+            "selected_arm": {
+              "before": 0.0911489896229586,
+              "after": 0.14784262259246583
+            },
+            "selected_elbow": {
+              "before": 0.028964816262021405,
+              "after": 0.09293343787808733
+            },
+            "selected_wrist": {
+              "before": 0.1533331629838958,
+              "after": 0.20275180730684436
+            }
+          },
+          "elbow_rearward_mm": 35.76374813901374,
+          "normalization": "same baseline-FBX camera/torso/hip for both; no refitting",
+          "observed_3d_ground_truth": false
+        }
+      },
+      "failure": {
+        "schema": "finite-actual-fbx-safety-failure-v1",
+        "status": "validation_blocked",
+        "reason": "discrete_shell_orientation_reversed",
+        "error_type": "WitnessValidationError",
+        "last_validated_stage": "neutral-repair",
+        "artifacts": {
+          "source.bvh": "2405827db17af891f264f3d561baed37a258d24ab7f7e6c3140bcf9985df9f95",
+          "derived-neutral.fbx": "97571eea60179cf168580ba70d468678a4dab4cac9ae83c844c8ccbbb17a3998",
+          "body.fbx": "9581897e3d8a18eae2c5ee4793814ab57fb186d5df5000ea391c6a49deccf0f2"
+        },
+        "final_receipt_issued": false,
+        "production_registered": false,
+        "deployed": false
+      }
+    }
+  ],
+  "anatomical_elbow_coordinate_mm": {
+    "before": -68.12412663496912,
+    "after": -36.51405918898
+  },
+  "source_image_sha256": "5790f134817faff0aa7c0c604f9e97e6825d146c1622d733f2883df735cc8e36",
+  "analysis_sha256": "0e13dc14a207bbb5d75162acd24dac8778c899fc845db45e6e78c6465a5f605d",
+  "attached_rough_pixels_identical_to_analysis_image": true,
+  "branch": "codex/refine-palm-elbow-20261024",
+  "baseline_code": "814ea9730",
+  "previous_experiment_code": "64d18960b",
+  "deployed": false
+}

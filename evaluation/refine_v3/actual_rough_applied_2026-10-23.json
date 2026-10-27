@@ -1,0 +1,1135 @@
+{
+  "schema": "actual-rough-application-review-v1",
+  "input": "124629.png",
+  "input_sha256": "ba92e47ea1600905a81b5973813f5c711087e479898dec0b230ae5716de3ccc6",
+  "analysis_run": "2026-10-22 corrected live Gemini pilot",
+  "application_run": "2026-10-23 validated-v4",
+  "source_pose": "rokoko_FootTapping_mixamo_00040",
+  "original_search_rank": 2,
+  "source_sha256": "835b3eb6ab103385ce8b9ee1627014df950ec36671e20108f80e63008f3c0d17",
+  "artifact_sha256": "310e8eaf166b21d824a5fc070e2d8dd222d82f55fdafa34ad8111af9319c0fa8",
+  "receipt_sha256": "f9616e4ee718fb431e5ee15956f52435e91a29c82f2d7002da1269bf98852ec3",
+  "profile_sha256": "d20d4ea4ac093c26ce50c6402891bce43631d9dc57e85c7800827db55fd422c9",
+  "actual_rough_safe_combination_count": 1,
+  "neutral_qa_source": false,
+  "metrics": {
+    "schema": "actual-fbx-pose-fit-v1",
+    "metric": "mean COCO body joint error / projected torso length",
+    "joint_indices": [
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+    ],
+    "independent_ground_truth": false,
+    "observation_source": "saved actual Human-Art/Gemini pipeline 124629",
+    "rows": [
+      {
+        "label": "previous",
+        "fbx_sha256": "b6452160c7f857650c6708cef18a83bda19eef882a1525664888b988b3305c04",
+        "joints_world": [
+          [
+            0.004733240697532892,
+            -0.01032097078859806,
+            1.5410093069076538
+          ],
+          [
+            0.004733240697532892,
+            -0.01032097078859806,
+            1.5410093069076538
+          ],
+          [
+            0.004733240697532892,
+            -0.01032097078859806,
+            1.5410093069076538
+          ],
+          [
+            0.004733240697532892,
+            -0.01032097078859806,
+            1.5410093069076538
+          ],
+          [
+            0.004733240697532892,
+            -0.01032097078859806,
+            1.5410093069076538
+          ],
+          [
+            0.16219577193260193,
+            -0.03984196484088898,
+            1.4209221601486206
+          ],
+          [
+            -0.11685009300708771,
+            0.13388341665267944,
+            1.4213286638259888
+          ],
+          [
+            0.3356558680534363,
+            0.017547618597745895,
+            1.2516752481460571
+          ],
+          [
+            -0.13697879016399384,
+            0.2836633026599884,
+            1.2233871221542358
+          ],
+          [
+            0.19082759320735931,
+            -0.04750845953822136,
+            1.0350698232650757
+          ],
+          [
+            -0.14593137800693512,
+            0.05675296485424042,
+            1.0800228118896484
+          ],
+          [
+            0.06920699030160904,
+            -0.02769634500145912,
+            0.9875829219818115
+          ],
+          [
+            -0.06820003688335419,
+            0.05130176618695259,
+            0.9833777546882629
+          ],
+          [
+            0.0776059478521347,
+            -0.017283380031585693,
+            0.5332150459289551
+          ],
+          [
+            -0.10682082176208496,
+            0.048546407371759415,
+            0.5305699706077576
+          ],
+          [
+            0.09452986717224121,
+            0.023024722933769226,
+            0.10142046213150024
+          ],
+          [
+            -0.08398455381393433,
+            0.0956735610961914,
+            0.09970307350158691
+          ]
+        ],
+        "camera": {
+          "version": "candidate-camera-v2",
+          "rotation": [
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "source_bvh_sha256": "c2234a5dc55b0eb595e4ba6aa1b5d817202cfe89e0f8d3e9a77ea83d9b62b763",
+          "reference": "search-fit",
+          "canonical_yaw": 0.0,
+          "display_view": "front",
+          "status": "fitted",
+          "fit_error": 0.1765579730272293,
+          "facing_source": "geometry_only",
+          "depth_ambiguous": true,
+          "projection": "orthographic",
+          "distance_torso": null,
+          "labels_swapped": false,
+          "pose_id": "rokoko_Interogation_GoodCop_mixamo_00088",
+          "query_sha256": "2106942e376aa4459cefe3452d61d647f8378b1eb79883bbaa143e0c7671ef5a",
+          "observed_joint_mask": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "joint_nme": 0.13100053493915295,
+        "wrist_nme": 0.2177821334701934,
+        "projected_pixels": [
+          [
+            101.50322540192035,
+            120.98072594616119
+          ],
+          [
+            101.50322540192035,
+            120.98072594616119
+          ],
+          [
+            101.50322540192035,
+            120.98072594616119
+          ],
+          [
+            101.50322540192035,
+            120.98072594616119
+          ],
+          [
+            101.50322540192035,
+            120.98072594616119
+          ],
+          [
+            153.94558975387588,
+            160.97535556899086
+          ],
+          [
+            61.01030444185147,
+            160.8399708886095
+          ],
+          [
+            211.71589044163227,
+            217.3424694788739
+          ],
+          [
+            54.30650966015595,
+            226.7637345478281
+          ],
+          [
+            163.48132137902493,
+            289.4821765689505
+          ],
+          [
+            51.32488043714441,
+            274.5107351381456
+          ],
+          [
+            122.97599175915265,
+            305.29752907488324
+          ],
+          [
+            77.21304174914813,
+            306.69804587628863
+          ],
+          [
+            125.77323379686767,
+            456.6232195907319
+          ],
+          [
+            64.35051944495666,
+            457.5041530161399
+          ],
+          [
+            131.40968811577227,
+            600.4309610878644
+          ],
+          [
+            71.95606155783445,
+            601.0029117346601
+          ]
+        ]
+      },
+      {
+        "label": "current",
+        "fbx_sha256": "310e8eaf166b21d824a5fc070e2d8dd222d82f55fdafa34ad8111af9319c0fa8",
+        "joints_world": [
+          [
+            -0.009161451831459999,
+            0.000903603620827198,
+            1.5418931245803833
+          ],
+          [
+            -0.009161451831459999,
+            0.000903603620827198,
+            1.5418931245803833
+          ],
+          [
+            -0.009161451831459999,
+            0.000903603620827198,
+            1.5418931245803833
+          ],
+          [
+            -0.009161451831459999,
+            0.000903603620827198,
+            1.5418931245803833
+          ],
+          [
+            -0.009161451831459999,
+            0.000903603620827198,
+            1.5418931245803833
+          ],
+          [
+            0.16530996561050415,
+            -0.015576198697090149,
+            1.403910517692566
+          ],
+          [
+            -0.12453269213438034,
+            0.12026152014732361,
+            1.4009935855865479
+          ],
+          [
+            0.21785034239292145,
+            -0.13364052772521973,
+            1.1910094022750854
+          ],
+          [
+            -0.1484619379043579,
+            0.12197259068489075,
+            1.1531133651733398
+          ],
+          [
+            0.045000866055488586,
+            -0.1749265491962433,
+            0.9896535873413086
+          ],
+          [
+            -0.21850226819515228,
+            0.0909116268157959,
+            0.8957191705703735
+          ],
+          [
+            0.07335450500249863,
+            -0.016586434096097946,
+            0.9854027628898621
+          ],
+          [
+            -0.07504473626613617,
+            0.03924092650413513,
+            0.9856066703796387
+          ],
+          [
+            0.10917150229215622,
+            -0.05100676044821739,
+            0.5335599184036255
+          ],
+          [
+            -0.10486534237861633,
+            -0.013739876449108124,
+            0.5352312326431274
+          ],
+          [
+            0.18779636919498444,
+            -0.02691539190709591,
+            0.1074194610118866
+          ],
+          [
+            -0.061992399394512177,
+            0.015920450910925865,
+            0.10433584451675415
+          ]
+        ],
+        "camera": {
+          "version": "candidate-camera-v2",
+          "rotation": [
+            [
+              0.7071067811865476,
+              0.0,
+              0.7071067811865475
+            ],
+            [
+              0.0,
+              1.0,
+              0.0
+            ],
+            [
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          ],
+          "source_bvh_sha256": "b804647df4336c54ad9cdd7f5e41ad6564ffe87fab24fc9fad3773f90b84ead3",
+          "reference": "search-fit",
+          "canonical_yaw": 0.0,
+          "display_view": "front",
+          "status": "fitted",
+          "fit_error": 0.1257515698671341,
+          "facing_source": "geometry_only",
+          "depth_ambiguous": true,
+          "projection": "perspective",
+          "distance_torso": 8.0,
+          "labels_swapped": false,
+          "pose_id": "rokoko_FootTapping_mixamo_00040",
+          "query_sha256": "2106942e376aa4459cefe3452d61d647f8378b1eb79883bbaa143e0c7671ef5a",
+          "observed_joint_mask": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "joint_nme": 0.11909342555395169,
+        "wrist_nme": 0.18946434476676136,
+        "projected_pixels": [
+          [
+            100.36252109049268,
+            115.57349316111072
+          ],
+          [
+            100.36252109049268,
+            115.57349316111072
+          ],
+          [
+            100.36252109049268,
+            115.57349316111072
+          ],
+          [
+            100.36252109049268,
+            115.57349316111072
+          ],
+          [
+            100.36252109049268,
+            115.57349316111072
+          ],
+          [
+            148.17643686968543,
+            157.8870002737799
+          ],
+          [
+            43.509204574971506,
+            163.67729345278843
+          ],
+          [
+            189.60343493538528,
+            234.27152211114435
+          ],
+          [
+            37.58943883113722,
+            248.85203590807612
+          ],
+          [
+            154.62381835015404,
+            304.61284983177734
+          ],
+          [
+            29.675469115365686,
+            335.9757571474282
+          ],
+          [
+            124.90661931711213,
+            306.03282225780623
+          ],
+          [
+            75.28241419118865,
+            305.96275269336564
+          ],
+          [
+            142.15231984699426,
+            462.8622986496826
+          ],
+          [
+            81.17779321470059,
+            456.61543211217804
+          ],
+          [
+            156.7809713201515,
+            617.5826321980538
+          ],
+          [
+            84.06812539222646,
+            605.2029930620552
+          ]
+        ]
+      }
+    ],
+    "relative_error_reduction": 0.09089359360808613
+  },
+  "visual_review": {
+    "model_requested": "gemini-3.8-flash",
+    "model_actual": "gemini-3.8-flash",
+    "elapsed_seconds": 19.020818291930482,
+    "provider_requests": 1,
+    "images": [
+      {
+        "name": "124629.png",
+        "sha256": "ba92e47ea1600905a81b5973813f5c711087e479898dec0b230ae5716de3ccc6"
+      },
+      {
+        "name": "rough-f25-blocked.png",
+        "sha256": "5131c2c961276d4c77a8e9bbe67def76eb67fad3152edf0353fd6402ed230edc"
+      },
+      {
+        "name": "actual-safe-front.png",
+        "sha256": "6f1fbf5662b9c7f7f4dd4d2c926716c716bcc1499061a499a6866bf11027619c"
+      },
+      {
+        "name": "actual-safe-three_quarter.png",
+        "sha256": "0e8b18a8662805b1dea4e3a175485264a00641b1f78f94c130229533e3119f8a"
+      }
+    ],
+    "response": {
+      "preferred": "current",
+      "reasons": [
+        "러프처럼 한쪽 팔을 아래로 곧게 펴고 반대쪽 팔만 굽힌 기본 배치가 반영됨",
+        "양팔이 모두 굽혀져 있던 이전 결과보다 러프의 팔 구성에 근접함"
+      ],
+      "remaining_mismatches": [
+        "러프의 굽힌 손은 골반/허리 측면에 걸쳐 있으나 결과물은 손이 하복부 앞쪽에 위치함",
+        "러프의 시선과 몸통은 좌측을 향한 반측면이나 렌더 모델은 정면을 향함",
+        "발과 다리의 체중 지지 축 및 각도가 러프와 완전히 일치하지 않음"
+      ],
+      "hand_shape_confidence": "low",
+      "camera_limitations": "러프가 좌측면을 바라보는 각도인 반면 렌더는 정면 위주라 회전축과 깊이감 비교에 제약이 있음"
+    },
+    "usage": {
+      "cache_tokens_details": null,
+      "cached_content_token_count": null,
+      "candidates_token_count": 240,
+      "candidates_tokens_details": null,
+      "prompt_token_count": 4561,
+      "prompt_tokens_details": [
+        {
+          "modality": "TEXT",
+          "token_count": 216
+        },
+        {
+          "modality": "IMAGE",
+          "token_count": 4345
+        }
+      ],
+      "thoughts_token_count": 815,
+      "tool_use_prompt_token_count": null,
+      "tool_use_prompt_tokens_details": null,
+      "total_token_count": 5616,
+      "traffic_type": null
+    },
+    "safety_authority": false,
+    "independent_ground_truth": false
+  },
+  "stages": [
+    {
+      "stage": "neutral-repair",
+      "mesh_status": "mesh_validated",
+      "replay_error_m": 4.43287044505574e-07,
+      "mesh_audit_seconds": 2.200195834040642,
+      "hard_violations": [],
+      "unverified_reasons": []
+    },
+    {
+      "stage": "body",
+      "mesh_status": "mesh_validated",
+      "replay_error_m": 3.6675128334466992e-06,
+      "mesh_audit_seconds": 2.3298109169118106,
+      "hard_violations": [],
+      "unverified_reasons": []
+    },
+    {
+      "stage": "hands",
+      "mesh_status": "mesh_validated",
+      "replay_error_m": 7.3284586361612985e-06,
+      "mesh_audit_seconds": 2.336253375047818,
+      "hard_violations": [],
+      "unverified_reasons": []
+    }
+  ],
+  "skin_plan": {
+    "version": "derived-arm-skin-profile-v1",
+    "sha256": "dd2ffe489dd331594352de70aa31ff5c372879c256ad4bf4f5d1a16a22fa4e08",
+    "right_arm_clearance_degrees": 6.0,
+    "max_weight_delta": 0.42233841546879347,
+    "original_weights_sha256": "bd421fc2fbffd76b1f348eedb372cc41fe78b421ec7b9c8fe9cb0b3b1c2a5c0e",
+    "planned_weights_sha256": "d1e9ed96b855f210c55ee27f3a5a6416fd7fa9e574111540fa378a202a010f4f"
+  },
+  "one_command_reproduction": {
+    "schema": "actual-rough-apply-v1",
+    "applied": true,
+    "selected": {
+      "pose_id": "rokoko_FootTapping_mixamo_00040",
+      "original_rank": 2,
+      "source_sha256": "835b3eb6ab103385ce8b9ee1627014df950ec36671e20108f80e63008f3c0d17",
+      "source_joint_nme": 0.07428035266522719,
+      "camera": {
+        "version": "candidate-camera-v2",
+        "rotation": [
+          [
+            0.7071067811865476,
+            0.0,
+            0.7071067811865475
+          ],
+          [
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            -0.7071067811865475,
+            0.0,
+            0.7071067811865476
+          ]
+        ],
+        "source_bvh_sha256": "b804647df4336c54ad9cdd7f5e41ad6564ffe87fab24fc9fad3773f90b84ead3",
+        "reference": "search-fit",
+        "canonical_yaw": 0.0,
+        "display_view": "front",
+        "status": "fitted",
+        "fit_error": 0.1257515698671341,
+        "facing_source": "geometry_only",
+        "depth_ambiguous": true,
+        "projection": "perspective",
+        "distance_torso": 8.0,
+        "labels_swapped": false,
+        "pose_id": "rokoko_FootTapping_mixamo_00040",
+        "query_sha256": "2106942e376aa4459cefe3452d61d647f8378b1eb79883bbaa143e0c7671ef5a",
+        "observed_joint_mask": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      "refined": true,
+      "reason": "ok"
+    },
+    "artifact_sha256": "90aa53dbff4e8f39178ff15650c786ea9a08619e46ea580d8f08b4b8191ca894",
+    "receipt_sha256": "316e71a279fb8e212dd5a72732c4ddf45042e756f5dbf00c68c119978eb4a9e1",
+    "profile_sha256": "4996a3d3acc80d8f9c8d2b6c85800810660fa0a98fc0789eea0c24fe4172f049",
+    "mesh_status": "mesh_validated",
+    "analysis_sha256": "0e13dc14a207bbb5d75162acd24dac8778c899fc845db45e6e78c6465a5f605d",
+    "image_sha256": "ba92e47ea1600905a81b5973813f5c711087e479898dec0b230ae5716de3ccc6",
+    "authority": "existing-full-body-refine-contract",
+    "regional_observation_authority_promoted": false,
+    "provider_requests": 0,
+    "production_registered": false,
+    "deployed": false
+  },
+  "production_registered": false,
+  "deployed": false,
+  "regional_visibility_promoted": false,
+  "strict_final_qa": {
+    "schema": "finite-actual-fbx-safety-qa-v1",
+    "profile": {
+      "profile_id": "female-base-v0-3-4.offline-skin-repair-v1",
+      "character_sha256": "98338c58635a4d741c646ca15398da767595a965218cb38bf4a69eb78b33b7f0",
+      "shape_sha256": "8dabd7370df79bd630b3cac50b6289edfe3bc3dc1f9bc296ccea363180178171",
+      "rig_sha256": "6f7a8ef06b07c2584206c4be72fb1c726a4a430521809e28fb8b9d4f99514924",
+      "rest_sha256": "801a925d3618031389875ca46753ad0cf20be826a2a1f00eb3513ca10916c54a",
+      "bone_map_sha256": "50fafaafe4350da4b8916a8cdace028ab5fd91f45dd49fa7afb6b2337e642af7",
+      "hand_sha256": "18a4c4ebb9af77e5be2cad02c3ddab601f2e5c1f4cd04c03e59d999c0fac92c4",
+      "retarget_sha256": "2fca3bd577445989c178aa4ca33e772c595ad2aeb6083f817a3824c93508a579",
+      "converter_manifest_sha256": "52eae0b0eb6a7023540fdf023ad4321f24c11d439f3ecf9f390b5b72358b24e3",
+      "controller_sha256": "df981aedc3784d38e008f6ddb7c7108ce26d8a528ef31539facdabfe2937eb1f",
+      "revision": "finite-snapshot-1",
+      "hand_revision": "hands-1",
+      "adapter_version": "finite-normalized-lbs-shell-witness-v1",
+      "converter_version": "chain-transport-v3.2.5",
+      "blender_build_hash": "fbe6228777e7",
+      "units": "meters",
+      "coordinates": "right-handed-z-up",
+      "output_mode": "rigged_rest"
+    },
+    "profile_sha256": "d20d4ea4ac093c26ce50c6402891bce43631d9dc57e85c7800827db55fd422c9",
+    "original_asset_sha256": "98338c58635a4d741c646ca15398da767595a965218cb38bf4a69eb78b33b7f0",
+    "native_neutral_sha256": "ee8f188e63778cd0b1624b59c932cc264d283657cfbcb6411b01c0385d860f9b",
+    "derived_neutral_sha256": "8047757062a88d970814e936a475bc7de34c76495450bdee2fa4b25dede9ceed",
+    "source_sha256": "835b3eb6ab103385ce8b9ee1627014df950ec36671e20108f80e63008f3c0d17",
+    "neutral_qa_source": false,
+    "source_template_sha256": "835b3eb6ab103385ce8b9ee1627014df950ec36671e20108f80e63008f3c0d17",
+    "original_neutral_audit": {
+      "version": "full-body-posed-skin-v2",
+      "status": "validation_blocked",
+      "full_body": true,
+      "hard_violations": [
+        "skin_triangle_intersection"
+      ],
+      "unverified_reasons": [],
+      "triangle_pairs_checked": 12822,
+      "triangle_intersections": [
+        [
+          11646,
+          12566
+        ],
+        [
+          12563,
+          12566
+        ],
+        [
+          12566,
+          11651
+        ]
+      ],
+      "contained_components": [],
+      "folded_faces": [],
+      "complete_collision_certificate": false,
+      "topology_sha256": "2d2eeb3183bad7dfd007059733e58d37bc25d9b37411b61d2651ee92344cc559",
+      "vertices": 24994,
+      "triangles": 50000,
+      "profile_sha256": "bea025948f100d72e45cc23b625b461a9f07ea74ade165046d286f90ec3dc809",
+      "mesh_policy_version": "finite-original-rest-directors-v2",
+      "mesh_policy_sha256": "9eb4fd0920b665bfc14eef1ded1345be94a83322c769b56ab1ff0074a5802e39",
+      "closed_manifold": true,
+      "consistently_oriented": true,
+      "components": 1,
+      "broadphase_pairs_examined": 325854,
+      "shared_boundary_certified_pairs": 313032,
+      "elapsed_sec": 2.2035037910100073
+    },
+    "repair": {
+      "version": "bounded-neutral-collision-repair-v1",
+      "alpha": 0.1,
+      "max_shift_m": 0.00027859343361133043,
+      "max_allowed_shift_m": 0.0005,
+      "changed_vertices": [
+        5756,
+        6027,
+        6190,
+        6207,
+        6276,
+        6380
+      ],
+      "deltas_m": [
+        [
+          1.8892933924992417e-05,
+          -0.00027292014824019525,
+          -5.264932082758994e-05
+        ],
+        [
+          6.363562175205756e-05,
+          4.69362097127099e-05,
+          -0.00014637483816061712
+        ],
+        [
+          -3.0886914048876284e-05,
+          -3.1574176890510065e-05,
+          9.430722732629103e-05
+        ],
+        [
+          -2.5647506117820742e-05,
+          0.00014886651188135148,
+          -7.524120155721903e-05
+        ],
+        [
+          -2.2453708308083078e-05,
+          2.068738852228497e-05,
+          5.644320377281732e-05
+        ],
+        [
+          6.587815781434331e-05,
+          2.15284526348114e-05,
+          -0.00014811495008567964
+        ]
+      ],
+      "attempts": [
+        {
+          "alpha": 0.05,
+          "status": "validation_blocked",
+          "hard_violations": [
+            "skin_triangle_intersection"
+          ],
+          "unverified_reasons": []
+        },
+        {
+          "alpha": 0.1,
+          "status": "mesh_validated",
+          "hard_violations": [],
+          "unverified_reasons": []
+        }
+      ],
+      "original_geometry_sha256": "06df7956347be3dcdddc5810fff260c98bcacc5aaec01ca6c745a70becdac92b",
+      "repaired_geometry_sha256": "97c608e6f2340abaac5058b1c18857ebc6eb6cf687589fb1c72e013f68c3581c"
+    },
+    "skin_plan": {
+      "version": "derived-arm-skin-profile-v1",
+      "sha256": "dd2ffe489dd331594352de70aa31ff5c372879c256ad4bf4f5d1a16a22fa4e08",
+      "right_arm_clearance_degrees": 6.0,
+      "max_weight_delta": 0.42233841546879347,
+      "original_weights_sha256": "bd421fc2fbffd76b1f348eedb372cc41fe78b421ec7b9c8fe9cb0b3b1c2a5c0e",
+      "planned_weights_sha256": "d1e9ed96b855f210c55ee27f3a5a6416fd7fa9e574111540fa378a202a010f4f"
+    },
+    "stages": [
+      {
+        "stage": "neutral-repair",
+        "artifact_sha256": "8047757062a88d970814e936a475bc7de34c76495450bdee2fa4b25dede9ceed",
+        "witness": {
+          "version": "finite-normalized-lbs-shell-witness-v1",
+          "source_asset_sha256": "98338c58635a4d741c646ca15398da767595a965218cb38bf4a69eb78b33b7f0",
+          "profile_sha256": "d20d4ea4ac093c26ce50c6402891bce43631d9dc57e85c7800827db55fd422c9",
+          "source_sha256": "835b3eb6ab103385ce8b9ee1627014df950ec36671e20108f80e63008f3c0d17",
+          "topology_sha256": "2d2eeb3183bad7dfd007059733e58d37bc25d9b37411b61d2651ee92344cc559",
+          "stage": "neutral-repair",
+          "stage_input_sha256": "ee8f188e63778cd0b1624b59c932cc264d283657cfbcb6411b01c0385d860f9b",
+          "input_sha256": "388a155061ae907141da0803ec4bab67e8c2219e529ec22091b505ea75f8ce85",
+          "previous_witness_sha256": "",
+          "vertex_count": 24994,
+          "face_count": 50000,
+          "determinant_min": 0.9999999999999983,
+          "vertex_tolerance_m": 1e-05,
+          "area_ratio_min": 0.001,
+          "expected_vertices_sha256": "727677e0e246640f03e0638bfe7a85528f600156db2caba947b6283089bf6e5c",
+          "faces_sha256": "7b6ebc73743c2801ab0373755b14276973af987102419410e0ee0141cf28ecaa",
+          "directors_sha256": "5a897fa9b73eafdd70a45e5ac473a4985926bc992dc863e50a5e2b57656d4121",
+          "reference_areas_sha256": "aaf18df0f03c256a51d2eb6ee31e0f8e48b8011629c8196da2d0133f04d38aff"
+        },
+        "witness_sha256": "9aee7bc21133abc130c4bb25f69927cc7e4ed30516b110aa473574b41ba40a06",
+        "replay": {
+          "version": "finite-normalized-lbs-shell-witness-v1",
+          "witness_sha256": "9aee7bc21133abc130c4bb25f69927cc7e4ed30516b110aa473574b41ba40a06",
+          "max_vertex_error_m": 4.43287044505574e-07,
+          "vertex_tolerance_m": 1e-05,
+          "area_ratio_min": 0.001,
+          "discrete_shell_orientation_verified": true,
+          "continuous_volume_certificate": false
+        },
+        "mesh_audit": {
+          "version": "full-body-posed-skin-v2",
+          "status": "mesh_validated",
+          "full_body": true,
+          "hard_violations": [],
+          "unverified_reasons": [],
+          "triangle_pairs_checked": 12809,
+          "triangle_intersections": [],
+          "contained_components": [],
+          "folded_faces": [],
+          "complete_collision_certificate": true,
+          "topology_sha256": "2d2eeb3183bad7dfd007059733e58d37bc25d9b37411b61d2651ee92344cc559",
+          "vertices": 24994,
+          "triangles": 50000,
+          "profile_sha256": "d20d4ea4ac093c26ce50c6402891bce43631d9dc57e85c7800827db55fd422c9",
+          "mesh_policy_version": "finite-original-rest-directors-v2",
+          "mesh_policy_sha256": "a0f7906f8a075ed42a1063c976f852fa025321b2cea3420e5eb43c51b38501b4",
+          "closed_manifold": true,
+          "consistently_oriented": true,
+          "components": 1,
+          "broadphase_pairs_examined": 325843,
+          "shared_boundary_certified_pairs": 313034,
+          "elapsed_sec": 2.200195834040642,
+          "full_body_artifact_sha256": "8047757062a88d970814e936a475bc7de34c76495450bdee2fa4b25dede9ceed",
+          "deformation_witness_sha256": "9aee7bc21133abc130c4bb25f69927cc7e4ed30516b110aa473574b41ba40a06",
+          "fold_reference_kind": "independent-original-rest-lbs-three-directors"
+        }
+      },
+      {
+        "stage": "body",
+        "artifact_sha256": "f40bc08150b5b5d6f94397ccc323aef1e3fc46517366d4acb3faf118d23fd666",
+        "witness": {
+          "version": "finite-normalized-lbs-shell-witness-v1",
+          "source_asset_sha256": "98338c58635a4d741c646ca15398da767595a965218cb38bf4a69eb78b33b7f0",
+          "profile_sha256": "d20d4ea4ac093c26ce50c6402891bce43631d9dc57e85c7800827db55fd422c9",
+          "source_sha256": "835b3eb6ab103385ce8b9ee1627014df950ec36671e20108f80e63008f3c0d17",
+          "topology_sha256": "2d2eeb3183bad7dfd007059733e58d37bc25d9b37411b61d2651ee92344cc559",
+          "stage": "body",
+          "stage_input_sha256": "8047757062a88d970814e936a475bc7de34c76495450bdee2fa4b25dede9ceed",
+          "input_sha256": "9e1c59771037f546e30a195939e6feb7d0b369fd6546a7188e01b0d572b6dbb6",
+          "previous_witness_sha256": "9aee7bc21133abc130c4bb25f69927cc7e4ed30516b110aa473574b41ba40a06",
+          "vertex_count": 24994,
+          "face_count": 50000,
+          "determinant_min": 0.5594227580996772,
+          "vertex_tolerance_m": 1e-05,
+          "area_ratio_min": 0.001,
+          "expected_vertices_sha256": "d432cbb8bd1423cdbca687ef6339af6e434d237982ad382406eb54aac7d68eba",
+          "faces_sha256": "7b6ebc73743c2801ab0373755b14276973af987102419410e0ee0141cf28ecaa",
+          "directors_sha256": "43532e0330bf7e89d0912b6487b66435a0138397a2dc9fc6fc9a06bfdd100034",
+          "reference_areas_sha256": "aaf18df0f03c256a51d2eb6ee31e0f8e48b8011629c8196da2d0133f04d38aff"
+        },
+        "witness_sha256": "79a956d04f002ae17d2b3c2f7fa5ffb9be12ab488a86eaed95800e5f906de982",
+        "replay": {
+          "version": "finite-normalized-lbs-shell-witness-v1",
+          "witness_sha256": "79a956d04f002ae17d2b3c2f7fa5ffb9be12ab488a86eaed95800e5f906de982",
+          "max_vertex_error_m": 3.6675128334466992e-06,
+          "vertex_tolerance_m": 1e-05,
+          "area_ratio_min": 0.001,
+          "discrete_shell_orientation_verified": true,
+          "continuous_volume_certificate": false
+        },
+        "mesh_audit": {
+          "version": "full-body-posed-skin-v2",
+          "status": "mesh_validated",
+          "full_body": true,
+          "hard_violations": [],
+          "unverified_reasons": [],
+          "triangle_pairs_checked": 18298,
+          "triangle_intersections": [],
+          "contained_components": [],
+          "folded_faces": [],
+          "complete_collision_certificate": true,
+          "topology_sha256": "2d2eeb3183bad7dfd007059733e58d37bc25d9b37411b61d2651ee92344cc559",
+          "vertices": 24994,
+          "triangles": 50000,
+          "profile_sha256": "d20d4ea4ac093c26ce50c6402891bce43631d9dc57e85c7800827db55fd422c9",
+          "mesh_policy_version": "finite-original-rest-directors-v2",
+          "mesh_policy_sha256": "a0f7906f8a075ed42a1063c976f852fa025321b2cea3420e5eb43c51b38501b4",
+          "closed_manifold": true,
+          "consistently_oriented": true,
+          "components": 1,
+          "broadphase_pairs_examined": 331332,
+          "shared_boundary_certified_pairs": 313034,
+          "elapsed_sec": 2.3298109169118106,
+          "full_body_artifact_sha256": "f40bc08150b5b5d6f94397ccc323aef1e3fc46517366d4acb3faf118d23fd666",
+          "deformation_witness_sha256": "79a956d04f002ae17d2b3c2f7fa5ffb9be12ab488a86eaed95800e5f906de982",
+          "fold_reference_kind": "independent-original-rest-lbs-three-directors"
+        }
+      },
+      {
+        "stage": "hands",
+        "artifact_sha256": "310e8eaf166b21d824a5fc070e2d8dd222d82f55fdafa34ad8111af9319c0fa8",
+        "witness": {
+          "version": "finite-normalized-lbs-shell-witness-v1",
+          "source_asset_sha256": "98338c58635a4d741c646ca15398da767595a965218cb38bf4a69eb78b33b7f0",
+          "profile_sha256": "d20d4ea4ac093c26ce50c6402891bce43631d9dc57e85c7800827db55fd422c9",
+          "source_sha256": "835b3eb6ab103385ce8b9ee1627014df950ec36671e20108f80e63008f3c0d17",
+          "topology_sha256": "2d2eeb3183bad7dfd007059733e58d37bc25d9b37411b61d2651ee92344cc559",
+          "stage": "hands",
+          "stage_input_sha256": "f40bc08150b5b5d6f94397ccc323aef1e3fc46517366d4acb3faf118d23fd666",
+          "input_sha256": "dc5a5b8ef4bc2fd4431e2bf859bf65eba0cf26337cca7ac9a36f89e9e9065e8d",
+          "previous_witness_sha256": "79a956d04f002ae17d2b3c2f7fa5ffb9be12ab488a86eaed95800e5f906de982",
+          "vertex_count": 24994,
+          "face_count": 50000,
+          "determinant_min": 0.5594227580996772,
+          "vertex_tolerance_m": 1e-05,
+          "area_ratio_min": 0.001,
+          "expected_vertices_sha256": "a8eae2165982f9b1ac6004c7fdf93db749c4c3645ae1871cfdb7cd1cc62a0cea",
+          "faces_sha256": "7b6ebc73743c2801ab0373755b14276973af987102419410e0ee0141cf28ecaa",
+          "directors_sha256": "29b1a9c5cd0323023dfdc295fe2e1bd15b143488074b566d25541593d54a5a9b",
+          "reference_areas_sha256": "aaf18df0f03c256a51d2eb6ee31e0f8e48b8011629c8196da2d0133f04d38aff"
+        },
+        "witness_sha256": "0d0a3819a2f44d82a1b5eef3498a2279a9ceb6fc965ce953888b85b4fe85c9c1",
+        "replay": {
+          "version": "finite-normalized-lbs-shell-witness-v1",
+          "witness_sha256": "0d0a3819a2f44d82a1b5eef3498a2279a9ceb6fc965ce953888b85b4fe85c9c1",
+          "max_vertex_error_m": 7.3284586361612985e-06,
+          "vertex_tolerance_m": 1e-05,
+          "area_ratio_min": 0.001,
+          "discrete_shell_orientation_verified": true,
+          "continuous_volume_certificate": false
+        },
+        "mesh_audit": {
+          "version": "full-body-posed-skin-v2",
+          "status": "mesh_validated",
+          "full_body": true,
+          "hard_violations": [],
+          "unverified_reasons": [],
+          "triangle_pairs_checked": 17762,
+          "triangle_intersections": [],
+          "contained_components": [],
+          "folded_faces": [],
+          "complete_collision_certificate": true,
+          "topology_sha256": "2d2eeb3183bad7dfd007059733e58d37bc25d9b37411b61d2651ee92344cc559",
+          "vertices": 24994,
+          "triangles": 50000,
+          "profile_sha256": "d20d4ea4ac093c26ce50c6402891bce43631d9dc57e85c7800827db55fd422c9",
+          "mesh_policy_version": "finite-original-rest-directors-v2",
+          "mesh_policy_sha256": "a0f7906f8a075ed42a1063c976f852fa025321b2cea3420e5eb43c51b38501b4",
+          "closed_manifold": true,
+          "consistently_oriented": true,
+          "components": 1,
+          "broadphase_pairs_examined": 330796,
+          "shared_boundary_certified_pairs": 313034,
+          "elapsed_sec": 2.336253375047818,
+          "full_body_artifact_sha256": "310e8eaf166b21d824a5fc070e2d8dd222d82f55fdafa34ad8111af9319c0fa8",
+          "deformation_witness_sha256": "0d0a3819a2f44d82a1b5eef3498a2279a9ceb6fc965ce953888b85b4fe85c9c1",
+          "fold_reference_kind": "independent-original-rest-lbs-three-directors"
+        }
+      }
+    ],
+    "hands": {
+      "version": "hand-bake-v1",
+      "library_version": "hand-library-v1",
+      "library_sha256": "c031c50f5f43e82c7c25f04e9d402fa40d3ca866bbccf6f541931546a5299a19",
+      "left": "support",
+      "right": "relaxed",
+      "applied_bones": 30,
+      "body_bones_preserved": true,
+      "sides": {
+        "left": {
+          "preset": "support",
+          "before": {
+            "thumb": {
+              "tip_to_wrist": 0.141724,
+              "tip_palm_offset": 0.050373
+            },
+            "index": {
+              "tip_to_wrist": 0.192763,
+              "tip_palm_offset": 0.002556
+            },
+            "middle": {
+              "tip_to_wrist": 0.205127,
+              "tip_palm_offset": -0.003818
+            },
+            "ring": {
+              "tip_to_wrist": 0.194087,
+              "tip_palm_offset": 0.003525
+            },
+            "pinky": {
+              "tip_to_wrist": 0.168571,
+              "tip_palm_offset": 0.012332
+            }
+          },
+          "after": {
+            "thumb": {
+              "tip_to_wrist": 0.140927,
+              "tip_palm_offset": 0.062317
+            },
+            "index": {
+              "tip_to_wrist": 0.191579,
+              "tip_palm_offset": 0.021626
+            },
+            "middle": {
+              "tip_to_wrist": 0.203238,
+              "tip_palm_offset": 0.012573
+            },
+            "ring": {
+              "tip_to_wrist": 0.190832,
+              "tip_palm_offset": 0.018043
+            },
+            "pinky": {
+              "tip_to_wrist": 0.16385,
+              "tip_palm_offset": 0.030486
+            }
+          },
+          "self_collisions": []
+        },
+        "right": {
+          "preset": "relaxed",
+          "before": {
+            "thumb": {
+              "tip_to_wrist": 0.142503,
+              "tip_palm_offset": 0.042241
+            },
+            "index": {
+              "tip_to_wrist": 0.193072,
+              "tip_palm_offset": 0.005749
+            },
+            "middle": {
+              "tip_to_wrist": 0.207079,
+              "tip_palm_offset": -0.006846
+            },
+            "ring": {
+              "tip_to_wrist": 0.194143,
+              "tip_palm_offset": 0.001235
+            },
+            "pinky": {
+              "tip_to_wrist": 0.17066,
+              "tip_palm_offset": 0.010051
+            }
+          },
+          "after": {
+            "thumb": {
+              "tip_to_wrist": 0.140121,
+              "tip_palm_offset": 0.064325
+            },
+            "index": {
+              "tip_to_wrist": 0.182368,
+              "tip_palm_offset": 0.044744
+            },
+            "middle": {
+              "tip_to_wrist": 0.195561,
+              "tip_palm_offset": 0.037452
+            },
+            "ring": {
+              "tip_to_wrist": 0.17993,
+              "tip_palm_offset": 0.037424
+            },
+            "pinky": {
+              "tip_to_wrist": 0.151716,
+              "tip_palm_offset": 0.051697
+            }
+          },
+          "self_collisions": []
+        }
+      },
+      "self_collision_free": true
+    },
+    "mesh_audit": {
+      "version": "full-body-posed-skin-v2",
+      "status": "mesh_validated",
+      "full_body": true,
+      "hard_violations": [],
+      "unverified_reasons": [],
+      "triangle_pairs_checked": 17762,
+      "triangle_intersections": [],
+      "contained_components": [],
+      "folded_faces": [],
+      "complete_collision_certificate": true,
+      "topology_sha256": "2d2eeb3183bad7dfd007059733e58d37bc25d9b37411b61d2651ee92344cc559",
+      "vertices": 24994,
+      "triangles": 50000,
+      "profile_sha256": "d20d4ea4ac093c26ce50c6402891bce43631d9dc57e85c7800827db55fd422c9",
+      "mesh_policy_version": "finite-original-rest-directors-v2",
+      "mesh_policy_sha256": "a0f7906f8a075ed42a1063c976f852fa025321b2cea3420e5eb43c51b38501b4",
+      "closed_manifold": true,
+      "consistently_oriented": true,
+      "components": 1,
+      "broadphase_pairs_examined": 330796,
+      "shared_boundary_certified_pairs": 313034,
+      "elapsed_sec": 2.336253375047818,
+      "full_body_artifact_sha256": "310e8eaf166b21d824a5fc070e2d8dd222d82f55fdafa34ad8111af9319c0fa8",
+      "deformation_witness_sha256": "0d0a3819a2f44d82a1b5eef3498a2279a9ceb6fc965ce953888b85b4fe85c9c1",
+      "fold_reference_kind": "independent-original-rest-lbs-three-directors"
+    },
+    "artifact_integrity": {
+      "version": "final-fbx-v1",
+      "artifact_sha256": "310e8eaf166b21d824a5fc070e2d8dd222d82f55fdafa34ad8111af9319c0fa8",
+      "scope": "full",
+      "bones": 52,
+      "meshes": 1,
+      "vertices": 24994,
+      "polygons": 50000,
+      "skin_verified": true
+    },
+    "receipt": {
+      "version": "refine-v3-final-artifact-v1",
+      "artifact_sha256": "310e8eaf166b21d824a5fc070e2d8dd222d82f55fdafa34ad8111af9319c0fa8",
+      "artifact_size": 2514636,
+      "source_sha256": "835b3eb6ab103385ce8b9ee1627014df950ec36671e20108f80e63008f3c0d17",
+      "context_sha256": "298a0252545828020464b450b75bfbbeb9146f00dc65ac322ac0b551981282f8",
+      "profile_sha256": "d20d4ea4ac093c26ce50c6402891bce43631d9dc57e85c7800827db55fd422c9",
+      "revision": "1",
+      "scope": "full",
+      "full_body_artifact_sha256": "310e8eaf166b21d824a5fc070e2d8dd222d82f55fdafa34ad8111af9319c0fa8",
+      "mesh_policy_version": "finite-original-rest-directors-v2",
+      "mesh_policy_sha256": "a0f7906f8a075ed42a1063c976f852fa025321b2cea3420e5eb43c51b38501b4",
+      "mesh_audit_sha256": "ff703b1b7026c471a748d734f6e37d12dc19fc14c106c996bd57db3f44ab2476",
+      "integrity_audit_sha256": "1f57dc35f26e826962cd7380f893a624858dcfe5c8248dca1c8ba08759a9df1e"
+    },
+    "receipt_sha256": "f9616e4ee718fb431e5ee15956f52435e91a29c82f2d7002da1269bf98852ec3",
+    "artifact_sha256": "310e8eaf166b21d824a5fc070e2d8dd222d82f55fdafa34ad8111af9319c0fa8",
+    "artifact_size": 2514636,
+    "safe_final_snapshot_count": 1,
+    "production_registered": false,
+    "continuous_fk_certified": false,
+    "deployed": false
+  }
+}

@@ -36,8 +36,8 @@ from .collision import (ARM_JOINTS, arm_torso_penetration, collision_dict,
                         collision_status, hand_tip_offset)
 
 
-REFINE_CODE_VERSION = "v1.3"
-REFINE_V2_CODE_VERSION = "v2.5.3"
+REFINE_CODE_VERSION = "v1.4"
+REFINE_V2_CODE_VERSION = "v2.5.4"
 
 
 # ---- 축소판 파라미터 (설계문서 §4-1) --------------------------------------
@@ -96,43 +96,52 @@ _PROBE_DEG = 5.0
 
 
 def limb_observability(joints, frame, view, limb, tgt_dirs, tgt_ok, w) -> float:
-    """
-    이 컷에서 그 사지가 **2D 투영으로 얼마나 보이는지** = 손실변화 / 3D이동량.
+    """Measure projected motion, independently of the requested target direction.
 
-    낮다 = 크게 움직여도 손실이 별로 안 변한다 = 최적화가 '공짜로' 그 사지를
-    깊이 방향으로 휘저을 수 있다 → 매칭 view에선 맞는데 옆에서 보면 이상해진다.
-
-    다리는 이 값이 컷마다 8배 범위로 흩어진다(전신 컷에서 또렷한 다리는 팔과 비슷,
-    허벅지에서 잘린 컷은 팔의 1/10). 그래서 전역 on/off가 아니라 이 측정으로
-    사지별·컷별 판단을 한다. docs/REFINE_DESIGN.md.
+    Loss differences vanish at both a match and an antiparallel mismatch, even
+    for an observable joint. They can also cancel between bones. Measure the
+    fraction of physical joint motion visible through the fixed camera. Target
+    validity/weights still limit the observed bones; target directions cannot
+    grant or revoke geometric observability. Existing thresholds, axis/SVD
+    regularization and downstream safety gates remain in force.
     """
     sufs, _ = LIMBS[limb]
-    mask = _mask_for([limb])
+    mask = _mask_for([limb]) & np.asarray(tgt_ok, dtype=bool)
     fwd = _Forward(joints, frame, view, sufs)
-    if fwd.param_idx.size == 0:
+    if fwd.param_idx.size == 0 or not mask.any():
         return 0.0
     p0 = fwd.base_frame[fwd.param_idx].copy()
+    from .library import project_3d_to_2d, view_angle
+    from .refine_projection import active_projection
+    projection = active_projection()
     kp0, sc0 = fwd.joints3d(p0)
-    L0 = _angle_loss(*bone_dirs(pose_to_feature(kp0, view, sc0)),
-                     tgt_dirs, tgt_ok, w, mask)
-    if not np.isfinite(L0):
+    weights = np.maximum(np.asarray(w, dtype=float), 0)
+    endpoints = np.array([_BONES[i][1] for i in np.flatnonzero(mask)], dtype=int)
+    weights = weights[mask]
+    if not np.isfinite(weights).all() or weights.sum() <= 0:
         return 0.0
-    scale = float(np.linalg.norm(kp0[5] - kp0[11])) or 1.0
-    # 그 사지에서 '가장 잘 보이는 축'을 대표값으로 쓴다. 한 축이라도 관측되면
-    # 최적화가 그 방향으로는 근거 있게 움직일 수 있다.
+    # Perspective image motion is converted to world units at each baseline
+    # joint's depth. The camera and this conversion are fixed across probes.
+    depth = np.ones(len(endpoints))
+    if projection is not None and projection.distance_world is not None:
+        depth = kp0[endpoints, 2] - projection.origin[2] + projection.distance_world
+    def project(points):
+        return (projection.project(points) if projection is not None else
+                project_3d_to_2d(points, view_angle(view)))[endpoints] * depth[:, None]
     best = 0.0
     for k in range(len(p0)):
-        p = p0.copy()
-        p[k] += _PROBE_DEG
-        kpn, scn = fwd.joints3d(p)
-        L = _angle_loss(*bone_dirs(pose_to_feature(kpn, view, scn)),
-                        tgt_dirs, tgt_ok, w, mask)
-        if not np.isfinite(L):
-            continue
-        move = float(np.abs(kpn - kp0).max()) / scale
-        if move > 1e-4:
-            best = max(best, abs(L - L0) / move)
-    return best
+        pp, pm = p0.copy(), p0.copy()
+        pp[k] += _PROBE_DEG
+        pm[k] -= _PROBE_DEG
+        plus, sp = fwd.joints3d(pp)
+        minus, sm = fwd.joints3d(pm)
+        valid = (sc0[endpoints] > 0) & (sp[endpoints] > 0) & (sm[endpoints] > 0)
+        ww = weights * valid
+        spatial = float(np.sum(ww[:, None] * (plus[endpoints]-minus[endpoints])**2))
+        if spatial > 1e-12:
+            measured = float(np.sum(ww[:, None] * (project(plus)-project(minus))**2))
+            best = max(best, math.sqrt(measured/spatial))
+    return best if math.isfinite(best) else 0.0
 
 
 def _torso_length(kp3d) -> float:

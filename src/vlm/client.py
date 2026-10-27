@@ -25,6 +25,7 @@ from ..logging_setup import log_info, log_warn
 from ..pose_query import validated_object_hands
 from . import prompts
 from .failures import classify_failure, failure_reason
+from ..refine_evidence import enabled as refine_evidence_enabled, parse_refine_evidence, response_trace
 
 
 _MAX_VLM_PEOPLE = 20
@@ -70,6 +71,13 @@ def _coerce(analysis: dict, img_w: int, img_h: int) -> VLMAnalysis:
     if "person_bodies" in analysis:
         from ..experimental.body_matching.integrated import parse_bodies
         person_bodies = parse_bodies(analysis["person_bodies"], num)
+    evidence = None
+    if refine_evidence_enabled():
+        evidence = parse_refine_evidence(
+            analysis.get("refine_observations"), expected_person_ids=range(num),
+            body_scopes={i: scope for i, scope in enumerate(
+                parse_person_scopes(analysis.get("body_scopes"), num)) if scope is not None},
+        ).to_serializable()
     return VLMAnalysis(
         num_people=num,
         shot=pick(Shot, analysis.get("shot"), Shot.FULL_HALF),
@@ -81,6 +89,7 @@ def _coerce(analysis: dict, img_w: int, img_h: int) -> VLMAnalysis:
         dialogue=analysis.get("dialogue"),
         raw=analysis,
         person_bodies=person_bodies,
+        refine_evidence=evidence,
         lower_body_visible=lower_body_visible,
         lower_body_visibility_known=lower_body_visibility_known,
         body_scopes=parse_person_scopes(analysis.get("body_scopes"), num),
@@ -422,19 +431,32 @@ class GeminiVLMClient(BaseVLMClient):
         library = load_library()
         presets = [(p.preset_id, p.label_ko, p.vlm_hint, library.categories[p.category])
                    for p in library.presets.values()]
+        hand_prompt = prompts.hand_shapes_prompt(boxes, presets)
+        evidence_options = {}
+        if refine_evidence_enabled():
+            hand_prompt = prompts.refine_evidence_prompt(hand_prompt, kind="contacts")
+            from ..refine_evidence import hand_response_schema
+            evidence_options["response_json_schema"] = hand_response_schema()
         started = self._clock()
         try:
             resp = self._client.models.generate_content(
                 model=self._model,
-                contents=[prompts.hand_shapes_prompt(boxes, presets), self._to_part(image)],
+                contents=[hand_prompt, self._to_part(image)],
                 config=types.GenerateContentConfig(
                     system_instruction=prompts.HAND_SHAPES_SYSTEM,
                     response_mime_type="application/json",
                     temperature=0,
-                    http_options=types.HttpOptions(timeout=CFG.vlm_hand_shapes_timeout_ms),
+                    http_options=(_gemini_attempt_options(types, CFG.vlm_hand_shapes_timeout_ms)
+                                  if refine_evidence_enabled() else types.HttpOptions(timeout=CFG.vlm_hand_shapes_timeout_ms)),
+                    **evidence_options,
                 ),
             )
             payload = _extract_json(resp.text)
+            if refine_evidence_enabled() and isinstance(payload, dict):
+                payload["refine_evidence"] = parse_refine_evidence(
+                    payload.get("refine_contacts"), expected_person_ids=range(len(boxes)), kind="contacts",
+                    provenance=response_trace(resp, provider="gemini", model=self._model, logical_call_id="read_hands"),
+                ).to_serializable()
             log_info("gemini_hand_shapes", model=self._model, status="ok",
                      people=len(boxes),
                      elapsedMs=round((self._clock() - started) * 1000))
@@ -552,6 +574,15 @@ class GeminiVLMClient(BaseVLMClient):
         if body_enabled and CFG.vlm_prompt_version == "p3-output-scope":
             from ..experimental.body_matching.integrated import response_schema
             body_options["response_json_schema"] = response_schema()
+        if refine_evidence_enabled():
+            from ..refine_evidence import extend_analysis_schema
+            from ..experimental.body_matching.integrated import response_schema
+            prompt = prompts.refine_evidence_prompt(prompt)
+            schema = body_options.get("response_json_schema") or response_schema()
+            if not body_enabled:
+                schema["properties"].pop("person_bodies", None)
+                schema["required"] = [key for key in schema["required"] if key != "person_bodies"]
+            body_options["response_json_schema"] = extend_analysis_schema(schema)
         if body_enabled and CFG.vlm_body_thinking_level:
             body_options["thinking_config"] = types.ThinkingConfig(thinking_level=CFG.vlm_body_thinking_level)
         attempts = max(1, CFG.gemini_max_attempts)
@@ -593,6 +624,9 @@ class GeminiVLMClient(BaseVLMClient):
                     elapsedMs=round((self._clock() - started) * 1000),
                 )
                 analysis = _coerce(_extract_json(resp.text), img_w, img_h)
+                if analysis.refine_evidence is not None:
+                    analysis.refine_evidence["call_trace"] = response_trace(
+                        resp, provider="gemini", model=self._model, logical_call_id="analyze", attempts=attempt)
                 if body_enabled and getattr(CFG, "body_integrated_review_enabled", True):
                     # Optional read-only body review must never retry/replace a
                     # successful control analysis or receive a fresh time budget.
@@ -714,6 +748,8 @@ class OpenAIVLMClient(BaseVLMClient):
             from ..experimental.body_matching.integrated import SYSTEM_EXTENSION
             prompt = analysis_prompt(prompt)
             system += SYSTEM_EXTENSION
+        if refine_evidence_enabled():
+            prompt = prompts.refine_evidence_prompt(prompt)
         resp = self._client.chat.completions.create(
             model=self._model,
             response_format={"type": "json_object"},
@@ -725,7 +761,11 @@ class OpenAIVLMClient(BaseVLMClient):
                 ]},
             ],
         )
-        return _coerce(_extract_json(resp.choices[0].message.content), img_w, img_h)
+        analysis = _coerce(_extract_json(resp.choices[0].message.content), img_w, img_h)
+        if analysis.refine_evidence is not None:
+            analysis.refine_evidence["call_trace"] = response_trace(
+                resp, provider="openai", model=self._model, logical_call_id="analyze", attempts=None)
+        return analysis
 
 
 def build_vlm_client() -> BaseVLMClient:
