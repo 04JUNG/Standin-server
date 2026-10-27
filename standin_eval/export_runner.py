@@ -12,7 +12,7 @@ import time
 from pathlib import Path
 
 from .artifact_lineage import is_sha
-from .mesh_evidence_adapter import adapt_actual_snapshot, adapt_roundtrip, adapt_scene_roundtrip
+from .mesh_evidence_adapter import adapt_actual_snapshot, adapt_roundtrip, adapt_scene_roundtrip, SCENE_CASES
 from .util import REPO_ROOT, hash_json, read_json, sha256_file
 
 SCRIPTS = {"single": "scripts/verify_generated_fbx_roundtrip.py",
@@ -87,6 +87,8 @@ def execute_blender(plan, *, expected, timeout_seconds, allow_blender=False):
     output = Path(plan["output_dir"])
     if output.exists():
         raise ValueError("Blender evaluation output must be fresh")
+    if kind == "scene" and expected.get("scene_case") not in (None, *SCENE_CASES):
+        return {"state": "unsupported", "reason": "scene_case_not_implemented"}
     started = time.monotonic()
     common = {"execution_kind": "local_blender", "checker_sha256": plan["script_sha256"],
               "unit_id": expected.get("unit_id"), "artifact_id": expected.get("artifact_id")}
@@ -108,7 +110,15 @@ def execute_blender(plan, *, expected, timeout_seconds, allow_blender=False):
         return {**common, "state": "error", "reason": "converter_tool_failed"}
     try:
         if kind == "scene":
-            return {**common, **adapt_scene_roundtrip(read_json(output / "verification.json"))}
+            report = read_json(output / "verification.json")
+            case = expected.get("scene_case")
+            if case is None:
+                return {**common, **adapt_scene_roundtrip(report)}
+            artifact = output / (case + ".fbx")
+            digest = sha256_file(artifact)
+            if expected.get("artifact_sha256") and digest != expected["artifact_sha256"]:
+                return {**common, "state": "fail", "reason": "output_artifact_hash_mismatch"}
+            return {**common, **adapt_scene_roundtrip(report, case=case, artifact_sha256=digest, expected=expected)}
         artifact = output / ("final.fbx" if kind == "snapshot" else "model.fbx")
         digest = sha256_file(artifact)
         if expected.get("artifact_sha256") and digest != expected["artifact_sha256"]:

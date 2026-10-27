@@ -46,10 +46,12 @@ def report_case(directory):
     selected, nodes = lineage(directory)
     identity = dict(artifact_sha256=nodes[-1]["sha256"], profile_sha256=SHA, scope="full", selection_revision="r1")
     task = dict(task_id="task-1", unit_id="unit-1", person_count=1, **identity,
+                independent_group_id="synthetic-group", grouping_confirmed=True,
                 required_mesh_checks=["collision", "folding", "degeneration"],
                 selection_sha256s=[hash_json(selected)], bindings=selected["bindings"])
     policy = dict(policy_id="offline-test-policy", required_dimensions=["integrity", "structure", "mesh", "human_usability", "native_save", "time"],
-                  minimum_tasks=1, task_budget_seconds=17)
+                  minimum_tasks=1, minimum_reviewers=2, minimum_independent_groups=1,
+                  sample_size_rationale="Finite synthetic contract assertion only", task_budget_seconds=17)
     obs = dict(task_id="task-1", execution_kind="product_observation", selections=[selected], artifacts=nodes,
                bindings=selected["bindings"], elapsed_seconds=12,
                structure=dict(**identity, evidence_kind="structural_roundtrip", state="pass"),
@@ -57,6 +59,7 @@ def report_case(directory):
                human_review=dict(**identity, assignment_id="assignment", labeler_id="reviewer", completed=True,
                                  tool_version="CSP-fixture-version", os="fixture-os", opened=True, usability="immediate"),
                native_save=dict(**identity, state="saved", readback_verified=True, saved_sha256=nodes[-1]["sha256"], bytes=nodes[-1]["bytes"]))
+    obs["human_reviews"] = [{**obs["human_review"], "labeler_id": "reviewer-2", "assignment_id": "assignment-2"}]
     return task, policy, obs
 
 
@@ -195,6 +198,20 @@ class SnapshotAdapterTests(unittest.TestCase):
         self.assertEqual(scene["scene_interaction"], "unknown")
         self.assertEqual(scene["covered_cases"], ["two_people"])
 
+    def test_scene_exact_case_binding_and_unsupported_eight_people(self):
+        report = {"ok": True, "cases": [dict(case="two_people", ok=True, person_count=2,
+            roundtrip_verified=True, independent_world_error_m=0.00001, max_world_error_m=0.00001, tolerance_m=0.0001)]}
+        bound = adapt_scene_roundtrip(report, case="two_people", artifact_sha256=SHA,
+                                      expected=dict(profile_sha256=SHA, scope="full", selection_revision="r1"))
+        self.assertEqual(bound["state"], "pass")
+        self.assertEqual(bound["artifact_sha256"], SHA)
+        self.assertEqual(bound["evidence_kind"], "structural_roundtrip")
+        self.assertEqual(bound["mesh_safety"], "unknown")
+        self.assertEqual(adapt_scene_roundtrip(report, case="eight_people", artifact_sha256=SHA)["state"], "unsupported")
+        report["cases"][0]["independent_world_error_m"] = 0.1
+        self.assertEqual(adapt_scene_roundtrip(report, case="two_people", artifact_sha256=SHA)["state"], "fail")
+        self.assertEqual(adapt_scene_roundtrip({"ok": False})["state"], "fail")
+
     def test_legacy_mesh_contract_unmodified(self):
         from standin_eval.refine_mesh import build_mesh_evidence_template_row, validate_mesh_evidence_row
         row = build_mesh_evidence_template_row(unit_id="unit", arm="B0_no_refine", artifact_id="a", geometry_sha256=SHA)
@@ -210,6 +227,7 @@ class ExportReportTests(unittest.TestCase):
             seal = seal_export_policy([task], policy)
             self.assertEqual(evaluate_export_tasks(seal, [obs])["decision"], "PASS")
             obs.pop("human_review")
+            obs.pop("human_reviews")
             result = evaluate_export_tasks(seal, [obs])
             self.assertEqual(result["decision"], "INCONCLUSIVE")
             self.assertEqual(result["totals"], {"denominator": 1, "pass": 0, "fail": 0, "unknown": 1})
@@ -259,6 +277,7 @@ class ExportReportTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             task, policy, obs = report_case(directory)
             obs.pop("human_review")
+            obs.pop("human_reviews")
             policy["required_dimensions"] = ["integrity"]
             self.assertEqual(evaluate_export_tasks(seal_export_policy([task], policy), [obs])["decision"], "INCONCLUSIVE")
             task, policy, obs = report_case(directory)
@@ -272,6 +291,36 @@ class ExportReportTests(unittest.TestCase):
             obs["bindings"].pop("db_sha256")
             result = evaluate_export_tasks(seal_export_policy([task], policy), [obs])
             self.assertEqual(result["decision"], "FAIL")
+
+    def test_global_worker_group_and_sample_requirements_stay_inconclusive(self):
+        with tempfile.TemporaryDirectory() as directory:
+            task, policy, obs = report_case(directory)
+            obs.pop("human_reviews")
+            result = evaluate_export_tasks(seal_export_policy([task], policy), [obs])
+            self.assertEqual(result["tasks"][0]["dimensions"]["human_usability"], "pass")
+            self.assertEqual(result["decision"], "INCONCLUSIVE")
+            self.assertEqual(result["distinct_reviewers"], 1)
+            self.assertIn("insufficient_distinct_reviewers", result["coverage_gaps"])
+            task, policy, obs = report_case(directory)
+            task["grouping_confirmed"] = False
+            self.assertEqual(evaluate_export_tasks(seal_export_policy([task], policy), [obs])["decision"], "INCONCLUSIVE")
+            task, policy, obs = report_case(directory)
+            policy.pop("sample_size_rationale")
+            self.assertEqual(evaluate_export_tasks(seal_export_policy([task], policy), [obs])["decision"], "INCONCLUSIVE")
+
+    def test_explicit_mock_and_placeholder_binding_cannot_product_pass(self):
+        with tempfile.TemporaryDirectory() as directory:
+            task, policy, obs = report_case(directory)
+            obs["selections"][0]["backend"] = {"requested": "mock", "actual": "mock"}
+            digest = hash_json(obs["selections"][0])
+            task["selection_sha256s"] = [digest]
+            for node in obs["artifacts"]:
+                node["selection_sha256s"] = [digest]
+            self.assertEqual(evaluate_export_tasks(seal_export_policy([task], policy), [obs])["decision"], "INCONCLUSIVE")
+            for placeholder in ("unknown", "REQUIRED", "unresolved:blender"):
+                selected = selection()
+                selected["bindings"]["blender_build"] = placeholder
+                self.assertIn("missing_binding:blender_build", validate_lineage([selected], [])["unknown_reasons"])
 
     def test_duplicate_or_unregistered_observation_rejected(self):
         sealed = seal_export_policy([{"task_id": "task"}], dict(policy_id="p", required_dimensions=["mesh"], minimum_tasks=1))

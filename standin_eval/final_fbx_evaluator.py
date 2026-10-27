@@ -4,7 +4,7 @@ from __future__ import annotations
 from collections import Counter
 import math
 
-from .artifact_lineage import BINDINGS, SCHEMA, is_sha, validate_lineage
+from .artifact_lineage import BINDINGS, SCHEMA, is_sha, resolved_identity, validate_lineage
 from .util import canonical_json, hash_json
 
 DIMENSIONS = ("integrity", "structure", "mesh", "scene_interaction", "human_usability", "native_save", "time")
@@ -50,6 +50,7 @@ def evaluate_export_tasks(sealed, observations):
             raise ValueError("unregistered export observation")
         by_id[ident] = row
     results = []
+    human_labelers, independent_groups = set(), set()
     for task in tasks:
         obs = by_id.get(task["task_id"], {})
         dims = {name: "unknown" for name in DIMENSIONS}
@@ -78,13 +79,25 @@ def evaluate_export_tasks(sealed, observations):
             dims["scene_interaction"] = scene.get("state", "unknown")
         else:
             reasons.append("scene_interaction_unverified")
-        human = obs.get("human_review", {})
-        if (human.get("assignment_id") and human.get("labeler_id") and human.get("completed") is True
-                and human.get("tool_version") and human.get("os") and human.get("opened") is True):
-            if human.get("usability") in ("immediate", "after_edit"):
-                dims["human_usability"] = "pass"
-            elif human.get("usability") == "unusable":
-                dims["human_usability"] = "fail"
+        humans = list(obs.get("human_reviews", []))
+        if obs.get("human_review"):
+            humans.append(obs["human_review"])
+        human_states = []
+        for human in humans:
+            if (human.get("assignment_id") and human.get("labeler_id") and human.get("completed") is True
+                    and human.get("tool_version") and human.get("os") and human.get("opened") is True):
+                if human.get("usability") in ("immediate", "after_edit"):
+                    human_states.append("pass")
+                elif human.get("usability") == "unusable":
+                    human_states.append("fail")
+                identity_bound = all(human.get(k) == task.get(k) and task.get(k) for k in
+                                     ("artifact_sha256", "profile_sha256", "scope", "selection_revision"))
+                if identity_bound and human.get("usability") in ("immediate", "after_edit", "unusable"):
+                    human_labelers.add(human["labeler_id"])
+        if "fail" in human_states:
+            dims["human_usability"] = "fail"
+        elif human_states and all(state == "pass" for state in human_states):
+            dims["human_usability"] = "pass"
         native = obs.get("native_save", {})
         if native.get("state") in ("cancelled", "write_failed"):
             dims["native_save"] = "abstained" if native["state"] == "cancelled" else "fail"
@@ -109,7 +122,7 @@ def evaluate_export_tasks(sealed, observations):
                 dims["mesh"] = "unknown"
         for key in BINDINGS:
             expected_binding = task.get("bindings", {}).get(key)
-            if not expected_binding:
+            if not resolved_identity(expected_binding):
                 binding_missing = True
             elif obs.get("bindings", {}).get(key) != expected_binding:
                 if dims["integrity"] != "fail":
@@ -136,6 +149,14 @@ def evaluate_export_tasks(sealed, observations):
                     if dims[target] != "fail":
                         dims[target] = "fail" if evidence.get(field) else "unknown"
                     reasons.append(evidence_name + "_binding_mismatch_or_missing:" + field)
+        for human in humans:
+            for field in identity_fields:
+                if task.get(field) and human.get(field) != task[field]:
+                    if dims["human_usability"] != "fail":
+                        dims["human_usability"] = "fail" if human.get(field) else "unknown"
+                    reasons.append("human_review_binding_mismatch_or_missing:" + field)
+        if resolved_identity(task.get("independent_group_id")) and task.get("grouping_confirmed") is True:
+            independent_groups.add(task["independent_group_id"])
         for name in dims:
             if dims[name] not in STATES:
                 dims[name] = "unknown"
@@ -153,7 +174,25 @@ def evaluate_export_tasks(sealed, observations):
                         "execution_kind": obs.get("execution_kind", "not_executed")})
     totals = {"denominator": len(tasks), **{s: sum(r["state"] == s for r in results) for s in ("pass", "fail", "unknown")}}
     dimensions = {name: {"denominator": len(tasks), **dict(Counter(r["dimensions"][name] for r in results))} for name in DIMENSIONS}
-    decision = "FAIL" if totals["fail"] else "PASS" if totals["pass"] == len(tasks) and len(tasks) >= policy["minimum_tasks"] else "INCONCLUSIVE"
+    policy_gaps = []
+    reviewers = policy.get("minimum_reviewers")
+    groups = policy.get("minimum_independent_groups")
+    if type(reviewers) is not int or reviewers < 2:
+        policy_gaps.append("minimum_two_distinct_reviewers_not_preregistered")
+    elif len(human_labelers) < reviewers:
+        policy_gaps.append("insufficient_distinct_reviewers")
+    if type(groups) is not int or groups < 1:
+        policy_gaps.append("independent_group_requirement_not_preregistered")
+    elif len(independent_groups) < groups or any(t.get("grouping_confirmed") is not True for t in tasks):
+        policy_gaps.append("independent_groups_unconfirmed_or_insufficient")
+    if not resolved_identity(policy.get("sample_size_rationale")):
+        policy_gaps.append("sample_size_rationale_missing")
+    decision = ("FAIL" if totals["fail"] else "PASS"
+                if totals["pass"] == len(tasks) and len(tasks) >= policy["minimum_tasks"] and not policy_gaps
+                else "INCONCLUSIVE")
     return {"schema": SCHEMA, "evaluation_kind": "final_fbx", "decision": decision,
             "seal_sha256": sealed["seal_sha256"], "mandatory_dimensions": list(FINAL_REQUIRED), "totals": totals, "dimensions": dimensions,
-            "tasks": results, "operational_deployment": False}
+            "tasks": results, "coverage_gaps": policy_gaps, "distinct_reviewers": len(human_labelers),
+            "confirmed_independent_groups": len(independent_groups),
+            "certification_scope": "preregistered_finite_tasks_only", "release_certification": False,
+            "operational_deployment": False}

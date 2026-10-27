@@ -150,10 +150,38 @@ def adapt_roundtrip(report, *, artifact_sha256, scope, execution_kind="imported_
             "mesh_safety": "unknown", "report_sha256": hash_json(report)}
 
 
-def adapt_scene_roundtrip(report):
-    """Only explicit case counts are covered by the existing 1/2/3-person tool."""
+SCENE_CASES = {"single": 1, "two_people": 2, "three_repeated": 3}
+
+
+def adapt_scene_roundtrip(report, *, case=None, artifact_sha256=None, expected=None):
+    """The existing tool certifies placement for 1/2/3 cases, not eight people.
+
+    An aggregate report has no single artifact identity. Only an explicitly
+    selected case with local output readback can feed a final-file task.
+    """
     cases = report.get("cases", [])
-    return {"evidence_kind": "scene_placement_roundtrip", "report_sha256": hash_json(report),
-            "state": "pass" if report.get("ok") is True and cases else "unknown",
-            "covered_cases": [c.get("case") for c in cases],
-            "scene_interaction": "unknown", "unknown_reasons": ["scene_interaction_unverified"]}
+    failure = report.get("ok") is False or any(c.get("ok") is False for c in cases)
+    result = {"evidence_kind": "scene_placement_roundtrip", "report_sha256": hash_json(report),
+              "state": "fail" if failure else "pass" if report.get("ok") is True and cases else "unknown",
+              "covered_cases": [c.get("case") for c in cases],
+              "scene_interaction": "unknown", "unknown_reasons": ["scene_interaction_unverified"]}
+    if case is None:
+        return result
+    if case not in SCENE_CASES:
+        return {**result, "state": "unsupported", "reason": "scene_case_not_implemented"}
+    selected = [row for row in cases if row.get("case") == case]
+    if len(selected) != 1 or not is_sha(artifact_sha256):
+        return {**result, "state": "unknown", "reason": "selected_scene_case_or_bytes_missing"}
+    row = selected[0]
+    errors = [row.get("independent_world_error_m"), row.get("max_world_error_m")]
+    tolerance = row.get("tolerance_m")
+    finite = (type(tolerance) in (int, float) and math.isfinite(tolerance) and tolerance > 0
+              and all(type(value) in (int, float) and math.isfinite(value) and 0 <= value <= tolerance for value in errors))
+    complete = (report.get("ok") is True and row.get("ok") is True and row.get("roundtrip_verified") is True
+                and row.get("person_count") == SCENE_CASES[case] and finite)
+    bad = failure or row.get("roundtrip_verified") is False or row.get("person_count") != SCENE_CASES[case]
+    if finite is False and all(type(value) in (int, float) for value in errors) and type(tolerance) in (int, float):
+        bad = True
+    return {**result, "evidence_kind": "structural_roundtrip", "state": "fail" if bad else "pass" if complete else "unknown",
+            "artifact_sha256": artifact_sha256, "scene_case": case, "person_count": SCENE_CASES[case],
+            "mesh_safety": "unknown", **{k: (expected or {}).get(k) for k in ("profile_sha256", "scope", "selection_revision")}}

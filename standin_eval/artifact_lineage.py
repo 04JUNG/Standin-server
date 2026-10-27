@@ -19,6 +19,12 @@ def is_sha(value):
     return isinstance(value, str) and len(value) == 64 and all(c in "0123456789abcdef" for c in value)
 
 
+def resolved_identity(value):
+    return (isinstance(value, str) and bool(value.strip())
+            and value.strip().lower() not in {"unknown", "required", "unresolved", "pending", "none", "null"}
+            and not value.strip().lower().startswith("unresolved:"))
+
+
 def selection_errors(selection):
     errors = ["missing_selection:" + key for key in SELECTION_FIELDS if not selection.get(key)]
     for key in ("camera_sha256", "source_sha256", "profile_sha256"):
@@ -28,7 +34,7 @@ def selection_errors(selection):
         errors.append("explicit_person_index_required")
     for key in BINDINGS:
         value = selection.get("bindings", {}).get(key)
-        if not value or (key.endswith("sha256") and not is_sha(value)):
+        if not resolved_identity(value) or (key.endswith("sha256") and not is_sha(value)):
             errors.append("missing_binding:" + key)
     backend = selection.get("backend", {})
     if not backend.get("requested") or not backend.get("actual"):
