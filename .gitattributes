@@ -2,4 +2,4 @@
 
 
 # Preserve original BOM/line endings of the supplied empty evaluation forms.
-/docs/evaluation-harness-20261027/*.csv -text
+/docs/evaluation-harness-20261027/*.csv -text whitespace=cr-at-eol
