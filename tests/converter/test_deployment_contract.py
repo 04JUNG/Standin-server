@@ -2,9 +2,38 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import shlex
+import shutil
+import subprocess
+import sys
 
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def test_scene_camera_imports_from_the_converter_image_allowlist(tmp_path):
+    """Catch imports that pass in the checkout but are absent from the image."""
+    for line in (ROOT / "Dockerfile.converter").read_text().splitlines():
+        if not line.lstrip().startswith("COPY "):
+            continue
+        parts = shlex.split(line, comments=True)
+        if len(parts) != 3 or parts[0] != "COPY":
+            continue
+        source, destination = parts[1:]
+        if not source.startswith("converter/") or not destination.startswith("/app/converter/"):
+            continue
+        target = tmp_path / destination.removeprefix("/app/")
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / source, target)
+    subprocess.run(
+        [sys.executable, "-I", "-c",
+         "import sys; sys.path.insert(0, sys.argv[1]); "
+         "from converter.scene import compose; "
+         "from converter.scene_camera import framing_recipe, configure_camera, verify_camera_recipe; "
+         "assert callable(compose) and callable(framing_recipe) and callable(configure_camera) and callable(verify_camera_recipe)",
+         str(tmp_path)],
+        check=True, cwd=tmp_path, capture_output=True, text=True,
+    )
 
 
 def _environment(container: dict) -> dict[str, str]:

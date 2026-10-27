@@ -98,6 +98,21 @@ def main():
         (args.out / f"{name}.json").write_text(json.dumps(manifest, indent=2))
         if args.preview and name == "two_people":
             render_preview(args.out / "two_people.png")
+    # Exercise the real rough-layout composition path, including the exported
+    # camera receipt, with synthetic image observations and existing fixtures.
+    rough_manifest = dict(
+        schema_version=1, cut_id="rough", coordinate_system="threejs-y-up-m",
+        rough_layout=dict(version="rough-layout-v1", width=690, height=1168),
+        persons=[dict(person_index=i, fbx_sha256=hashlib.sha256(p.read_bytes()).hexdigest(),
+                      observation=dict(box=box, keypoints=[[0, 0]] * 17, scores=[0] * 17))
+                 for i, (p, box) in enumerate(zip(sources, [[60, 300, 280, 1000], [390, 180, 650, 850]]))],
+    )
+    rough_report = compose(rough_manifest, sources, args.out / "rough.fbx")
+    assert rough_report["framing"]["source_dimensions"] == [690, 1168]
+    assert rough_report["framing"]["requires_camera_application"] is True
+    assert rough_report["framing"]["automatic_import_framing_verified"] is False
+    assert rough_report["rough_layout"]["csp_camera_preservation"] is False
+    checks.append(dict(case="rough_camera_receipt", **rough_report))
     rejected = []
     invalid_sources = [args.out / "two_people.fbx"]
     if not args.source:
