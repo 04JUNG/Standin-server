@@ -1,11 +1,12 @@
 {
   "schema_version": 1,
-  "library_version": "hand-library-v1",
+  "library_version": "hand-library-v2",
   "angle_convention": {
     "unit": "degree",
     "curl": "각 손가락의 [첫째, 둘째, 셋째] 마디 굽힘. +는 손바닥 쪽으로 접힌다. 엄지는 [CMC, MCP, IP].",
     "spread": "첫째 마디의 벌림. +는 중지에서 멀어지는 방향(엄지는 검지에서 멀어지는 방향), -는 붙이는 방향. 중지는 검지 쪽이 +.",
-    "frame": "캐릭터 리그의 rest 기하(손목·손가락 뿌리 위치)에서 매번 계산한다. 리그의 본 roll·좌우 이름에 의존하지 않는다."
+    "frame": "캐릭터 리그의 rest 기하(손목·손가락 뿌리 위치)에서 매번 계산한다. 리그의 본 roll·좌우 이름에 의존하지 않는다.",
+    "closed_fist": "주먹·떨리는 주먹은 중립 굽힘을 제거한 공통 손가락 평면과 엄지 대립 프레임을 쓴다. 실제 모델의 관절 위치를 점검하고 부피를 유지해 굽는다."
   },
   "categories": {
     "basic": "기본",
@@ -74,10 +75,37 @@
       "vlm_hint": "손가락을 끝까지 말아 꽉 쥔 주먹. 펀치·분노·결의.",
       "fingers": {
         "thumb": {"curl": [18, 49, 48], "spread": 4},
-        "index": {"curl": [82, 95, 49], "spread": 0},
-        "middle": {"curl": [86, 95, 49], "spread": 0},
-        "ring": {"curl": [88, 95, 49], "spread": 0},
-        "pinky": {"curl": [90, 95, 49], "spread": 0}
+        "index": {"curl": [60, 90, 60], "spread": 0},
+        "middle": {"curl": [65, 90, 60], "spread": 0},
+        "ring": {"curl": [65, 90, 60], "spread": 0},
+        "pinky": {"curl": [65, 90, 60], "spread": 0}
+      },
+      "articulation": {
+        "type": "closed_fist_v2",
+        "smoothing_iterations": 8,
+        "thumb_directions": [
+          [
+            0.4,
+            -0.8232,
+            1.0258
+          ],
+          [
+            0.5,
+            -0.1536,
+            1.066
+          ],
+          [
+            0.3,
+            0.3928,
+            0.9196
+          ]
+        ],
+        "fan": {
+          "index": 0.025,
+          "middle": 0.04,
+          "ring": 0.12,
+          "pinky": 0.18
+        }
       }
     },
     "claw": {
@@ -830,10 +858,37 @@
       "vlm_hint": "분노·참음으로 하얗게 질릴 만큼 꽉 쥔 주먹. 엄지가 깊이 감긴다.",
       "fingers": {
         "thumb": {"curl": [12, 63, 24], "spread": 4},
-        "index": {"curl": [84, 95, 49], "spread": 0},
-        "middle": {"curl": [88, 95, 49], "spread": 0},
-        "ring": {"curl": [89, 95, 49], "spread": 0},
-        "pinky": {"curl": [90, 95, 49], "spread": 0}
+        "index": {"curl": [60, 90, 60], "spread": 0},
+        "middle": {"curl": [65, 90, 60], "spread": 0},
+        "ring": {"curl": [65, 90, 60], "spread": 0},
+        "pinky": {"curl": [65, 90, 60], "spread": 0}
+      },
+      "articulation": {
+        "type": "closed_fist_v2",
+        "smoothing_iterations": 8,
+        "thumb_directions": [
+          [
+            0.4,
+            -0.8232,
+            1.0258
+          ],
+          [
+            0.5,
+            -0.1536,
+            1.066
+          ],
+          [
+            0.3,
+            0.3928,
+            0.9196
+          ]
+        ],
+        "fan": {
+          "index": 0.025,
+          "middle": 0.04,
+          "ring": 0.12,
+          "pinky": 0.18
+        }
       }
     },
     "clutch_chest": {
