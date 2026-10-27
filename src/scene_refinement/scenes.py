@@ -5,6 +5,7 @@ import json, sys, math, hashlib, time, shutil
 import bpy, numpy as np
 from mathutils import Vector
 from converter.scene import compose, _snapshot, _verify
+from converter.scene_camera import configure_camera, framing_recipe, verify_camera_recipe
 from converter import retarget as rt
 
 COLORS = [
@@ -34,16 +35,9 @@ def add_camera(cfg):
         Vector(cfg["look_direction_blender"]).to_track_quat("-Z", "Y").to_euler()
     )
     camera.data.type = "PERSP"
-    camera.data.sensor_fit = "HORIZONTAL"
-    camera.data.sensor_width = 36
-    camera.data.sensor_height = 36 * cfg["height"] / cfg["width"]
-    camera.data.lens = 36 / (
-        2 * math.tan(math.radians(cfg["horizontal_fov_degrees"] / 2))
-    )
+    configure_camera(camera, cfg)
     camera.data.clip_start = 0.05
     camera.data.clip_end = 1000
-    camera["source_image_width"] = cfg["width"]
-    camera["source_image_height"] = cfg["height"]
     camera["physical_distance_is_estimate"] = True
     scene.camera = camera
     bpy.context.view_layer.update()
@@ -110,6 +104,7 @@ def export_with_camera(path, cfg):
     cameras = [o for o in bpy.context.scene.objects if o.type == "CAMERA"]
     assert len(cameras) == 1
     actual = cameras[0]
+    verify_camera_recipe(actual, framing_recipe(cfg))
     actual.data.sensor_fit = "HORIZONTAL"
     factor = max(1, math.ceil(1000 / max(cfg["width"], cfg["height"])))
     bpy.context.scene.render.resolution_x = round(cfg["width"] * factor)
@@ -175,6 +170,7 @@ def export_with_camera(path, cfg):
         camera_matrix_max_error=matrix_error,
         horizontal_fov_degrees=math.degrees(angle),
         embedded_camera=True,
+        framing=framing_recipe(cfg),
     )
 
 

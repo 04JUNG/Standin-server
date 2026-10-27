@@ -132,6 +132,64 @@ def finger_rotations(
                 rotation = rotation @ axis_angle_matrix(spread_axis, pose.spread)
             basis = np.asarray(rest.basis, dtype=float)
             rotations[(finger, joint)] = basis.T @ rotation @ basis
+    if preset.articulation is not None:
+        return _closed_fist_rotations(preset, frame, rests, rotations)
+    return rotations
+
+
+def _between(a, b):
+    a, b = _unit(a, "rest direction"), _unit(b, "posed direction")
+    axis = np.cross(a, b)
+    if np.linalg.norm(axis) < 1e-8:
+        if a @ b > 0:
+            return np.eye(3)
+        helper = np.eye(3)[int(np.argmin(abs(a)))]
+        axis = np.cross(a, helper)
+    return axis_angle_matrix(
+        axis, math.degrees(math.acos(float(np.clip(a @ b, -1, 1))))
+    )
+
+
+def _closed_fist_rotations(preset, frame, rests, rotations):
+    """Use coherent hinges and a thumb opposed across the curled fingers.
+
+    The source rig's pre-bend must not accumulate on top of fist flexion.
+    Each child transports its parent's frame before aligning its direction,
+    preventing an axial skin twist at the PIP/DIP boundary.
+    """
+    for finger in ("index", "middle", "ring", "pinky"):
+        previous = np.eye(3)
+        first = frame.length_axis
+        straight = _unit(
+            first - frame.palm_normal * float(first @ frame.palm_normal),
+            "finger plane direction",
+        )
+        hinge = _unit(np.cross(straight, frame.palm_normal), "finger hinge")
+        flexion = 0.0
+        for joint in range(3):
+            rest = rests[finger, joint]
+            flexion += preset.fingers[finger].curl[joint]
+            fan = preset.articulation.fan[finger]
+            desired = _unit(
+                axis_angle_matrix(hinge, flexion) @ straight + frame.pinky_side * fan,
+                "posed finger direction",
+            )
+            delta = _between(previous @ rest.direction, desired) @ previous
+            rotations[finger, joint] = rest.basis.T @ previous.T @ delta @ rest.basis
+            previous = delta
+    # CMC opposition lifts the metacarpal in front of the curled digits; the
+    # next two phalanges then turn across them, instead of curling into a hook.
+    previous = np.eye(3)
+    for joint, (along, across, palm) in enumerate(preset.articulation.thumb_directions):
+        rest = rests["thumb", joint]
+        desired = (
+            frame.length_axis * along
+            + frame.pinky_side * across
+            + frame.palm_normal * palm
+        )
+        delta = _between(previous @ rest.direction, desired) @ previous
+        rotations["thumb", joint] = rest.basis.T @ previous.T @ delta @ rest.basis
+        previous = delta
     return rotations
 
 

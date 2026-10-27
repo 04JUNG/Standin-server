@@ -112,8 +112,28 @@ def main():
             points = []
             depsgraph = bpy.context.evaluated_depsgraph_get()
             for source in meshes:
-                evaluated = source.evaluated_get(depsgraph)
-                data = bpy.data.meshes.new_from_object(evaluated)
+                volume = []
+                smoothing = None
+                if preset.articulation is not None:
+                    from converter.hand_rig import add_finger_smoothing
+                    for modifier in source.modifiers:
+                        if modifier.type == "ARMATURE":
+                            volume.append((modifier, modifier.use_deform_preserve_volume))
+                            modifier.use_deform_preserve_volume = True
+                    if preset.articulation.smoothing_iterations:
+                        smoothing = add_finger_smoothing(source, [side], prefix,
+                            preset.articulation.smoothing_iterations)
+                    bpy.context.view_layer.update()
+                try:
+                    evaluated = source.evaluated_get(depsgraph)
+                    data = bpy.data.meshes.new_from_object(evaluated)
+                finally:
+                    if smoothing:
+                        modifier_name, group_name = smoothing
+                        source.modifiers.remove(source.modifiers[modifier_name])
+                        source.vertex_groups.remove(source.vertex_groups[group_name])
+                    for modifier, before in volume:
+                        modifier.use_deform_preserve_volume = before
                 data.transform(source.matrix_world)
                 bm = bmesh.new()
                 bm.from_mesh(data)
