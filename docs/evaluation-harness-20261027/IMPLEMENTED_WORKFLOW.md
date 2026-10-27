@@ -26,7 +26,7 @@ python -m standin_eval report out/eval/runs/reviewed-experiment --independent-la
 
 정책은 timeout_seconds를 명시해야 한다. search_budget_ms/refine_budget_ms, required_bindings, 표본/독립 묶음·사람 평가·품질 개선 정책이 없으면 해당 판정은 INCONCLUSIVE다. 테스트 fixture의 짧은 deadline은 제품 SLO가 아니다. 시간은 search와 refine(adapter health/refine/artifact fetch)를 나누며 replay/fixture 시간을 end-to-end 사용자 대기로 주장하지 않는다.
 
-선택 JSONL은 `cut_id`, 영구 `gt_person_id`, `selection_revision`, `body_revision`, `hand_revision`, `output_scope`, `selected_base_sha256`, `base_artifact_path`, `bindings`를 사용한다. camera/관측/가림/귀속·관절 출처를 같은 평가 단위로 봉인한다. 모든 arm이 같은 BVH 바이트와 카메라를 사용한다. 선택이 없는 대상 인물도 분모에 남는다. off/shadow의 F25 보존은 v3가 실제 적용됐다는 뜻이 아니며 현재 HTTP v3 적용 arm은 unsupported로 표시한다.
+선택 JSONL은 `cut_id`, 영구 `gt_person_id`, `selection_revision`, `body_revision`, `hand_revision`, `output_scope`, `selected_base_sha256`, `base_artifact_path`, `bindings`를 사용한다. camera/관측/가림/귀속·관절 출처를 같은 평가 단위로 봉인한다. 검색 source·dataset·초기 라벨의 해시를 실행 전에 고정하고, 실행 중 원본 변경은 모든 행을 유지하며 source_snapshot_changed 실패로 봉인한다. 모든 arm이 같은 BVH 바이트와 카메라를 사용한다. 선택이 없는 대상 인물도 분모에 남는다. off/shadow의 F25 보존은 v3가 실제 적용됐다는 뜻이 아니며 현재 HTTP v3 적용 arm은 unsupported로 표시한다.
 
 `experiment.frozen.json`과 private unit/assignment에는 실행 전 정책과 분모를 보존한다. `experiment_arms.jsonl`, `search_evidence.json`, 라벨 queue/template, `experiment_report.json`을 만든다. 초기 report는 라벨 없이 품질 PASS를 내지 않는다. 사람 라벨을 다시 집계한 보고서는 봉인 원본을 덮지 않고 `experiment_report.reviewed.json`에 저장한다. 레거시 승격 프로토콜의 paired 통계 분석·실제 메시/도구 증거를 이 공통 engineering report로 대신하지 않는다.
 
@@ -39,7 +39,7 @@ python -m standin_eval run export-report --sealed out/eval/export-plan-new-versi
 python -m standin_eval run pipeline-report --experiment out/eval/runs/reviewed-experiment --sealed out/eval/export-plan-new-version.json --observations /path/to/export-observations.jsonl --output out/eval/pipeline-report-new-version.json
 ```
 
-먼저 `seal-exports`로 고정 과제와 정책을 봉인한 후 관측을 수집한다. `required_dimensions`, `minimum_tasks`, 시간 검사 때 `task_budget_seconds`를 명시한다. 태스크에는 정확한 artifact/profile/scope/selection revision 및 runtime bindings를 고정한다. 이름만 붙인 PASS, 미실행, 지원 불가, 미완료 검사를 성공으로 세지 않는다. 라벨/검사 누락과 오류도 태스크 행을 유지한다.
+먼저 `seal-exports`로 고정 과제와 정책을 봉인한 후 관측을 수집한다. `required_dimensions`, `minimum_tasks`, 시간 검사 때 `task_budget_seconds`를 명시한다. 태스크에는 정확한 artifact/profile/scope/selection revision 및 runtime bindings를 고정한다. 최종 PASS의 무결성·구조·메시·사람 활용성·native 저장·시간 차원은 정책에서 빼도 생략되지 않는다. minimum_reviewers(2 이상), minimum_independent_groups, sample_size_rationale를 사전 명시하고, 사람이 grouping_confirmed=true로 확정한 independent_group_id와 실제 완료한 서로 다른 작업자 수를 충족해야 한다. 누락은 INCONCLUSIVE다. PASS도 preregistered_finite_tasks_only이며 release_certification=false다. 이름만 붙인 PASS, 미실행, 지원 불가, 미완료 검사를 성공으로 세지 않는다. 라벨/검사 누락과 오류도 태스크 행을 유지한다.
 
 `artifact_lineage`는 선택 BVH→체형→손→인물 FBX→scene→download→native save의 바이트/부모/인물·revision 연결을 검사한다. `pipeline-report` 과제의 `selection_keys=[{"unit_id":"...","arm":"F25"}]`는 실험 단위와 arm을 사전 고정한다. export selection의 `source_sha256`은 실제 Converter에 넣은 실험 결과 BVH 해시이며, `camera_sha256=hash_json({"camera": frozen_camera, "view": frozen_view})`다. 다른 arm·이전 체형/손·다른 BVH가 섞이면 실패한다. 실제 export 관측이 없으면 분모를 유지하고 unknown이다.
 
@@ -54,3 +54,11 @@ python -m standin_eval run pipeline-report --experiment out/eval/runs/reviewed-e
 원본 설계와 BOM CSV 5개, source-audit를 포함했다. PR에는 소형 aggregate와 합성 fixture 기반 실패/unknown 예시만 포함한다. 원본 이름/경로·행별 inventory·BVH/FBX·라벨러 정보는 Git에서 무시되는 `out/`에 둔다. 입력 이미지의 글자나 동봉 문서는 평가 데이터이며 하네스 명령으로 실행하지 않는다.
 
 품질 활용성, 실제 메시 안전, 전달 무결성, 작가의 실제 도구 활용성은 독립 차원이다. 결과가 모두 채워지지 않은 engineering run은 출시 인증이 아니다. 지원 체형 5종과 손/범위 조합, 사람 2명 이상 평가, 실제 모델·Blender·앱·CSP 실행은 [대기 항목](USER_PREPARATION_AND_HUMAN_REVIEW.md)에 구분했다.
+
+## 재현 가능한 실패/unknown 예시
+
+```bash
+python scripts/demo_evaluation_extension.py --output out/eval/extension-demo-new-version --public-reports out/eval/public-example-reports
+```
+
+이 명령은 저장소의 합성 회귀 fixture만 사용한다. [실험 unknown](examples/experiment-unknown.json), [exact recovery 실패](examples/experiment-failure.json), [최종 파일 unknown](examples/export-unknown.json), [전달 해시 실패](examples/export-failure.json), [통합 unknown](examples/pipeline-unknown.json), [저장 계약](examples/save-contracts.json)은 이 명령으로 생성했다. 실제 사람 라벨은 생성하지 않는다. 저장 계약 50/50 통과도 제품 안전/활용성 판정은 INCONCLUSIVE다. 전체 검증 기록은 [검증 결과](VALIDATION.md)를 따른다.

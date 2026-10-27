@@ -54,6 +54,11 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(r['lineage_links']['denominator'],1)
         self.assertEqual(r['lineage_links']['unknown'],1)
 
+    def test_missing_selection_plan_is_unknown_not_contradiction(self):
+        self.sealed = seal_export_policy([{'task_id':'save-A'}],
+            {'policy_id':'offline', 'required_dimensions':['native_save'], 'minimum_tasks':1})
+        self.assertEqual(self.report()['lineage_links']['unknown'],1)
+
     def test_tampered_report_or_units_rejected(self):
         write_json(self.root / 'experiment_report.json', {'decision':'PASS'})
         with self.assertRaisesRegex(ValueError,'seal'):

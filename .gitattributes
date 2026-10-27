@@ -1,2 +1,5 @@
 * text=auto eol=lf
 
+
+# Preserve original BOM/line endings of the supplied empty evaluation forms.
+/docs/evaluation-harness-20261027/*.csv -text

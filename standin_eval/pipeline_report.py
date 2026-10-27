@@ -45,7 +45,7 @@ def build_pipeline_report(experiment, sealed_exports, observations):
         actual_keys = {(s.get('unit_id'), s.get('arm')) for s in selections}
         if not selections:
             unknown.append('export_selection_not_measured')
-        elif actual_keys != expected_keys or len(actual_keys) != len(selections):
+        elif expected_keys and (actual_keys != expected_keys or len(actual_keys) != len(selections)):
             failures.append('export_selection_set_changed')
         for selection in selections:
             key = (selection.get('unit_id'), selection.get('arm'))
