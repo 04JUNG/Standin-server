@@ -1,7 +1,8 @@
 """손 굽기 단계(04J-290). V3.2.5 몸 변환이 끝난 산출 FBX에 손 프리셋을 적용한다.
 
-framing과 같은 후처리 위치에서 돈다: 산출 FBX를 다시 불러 → 손가락 30본의 로컬 회전만
-정하고 → rigged_rest 규약대로 메시에 굽고 포즈를 rest로 승격 → 같은 설정으로 내보낸다.
+framing과 같은 후처리 위치에서 돈다: 산출 FBX를 다시 불러 → 손가락 회전을 정하고 →
+rigged_rest 규약대로 메시에 굽고 포즈를 rest로 승격 → 같은 설정으로 내보낸다.
+닫힌 주먹 프로필은 비정상적으로 먼 손가락 뿌리와 국소 피부 접힘도 보정한다.
 요청에 손이 없으면 이 모듈은 호출되지 않으며 산출 FBX는 바이트 단위로 기존과 같다.
 
 동결 solver(retarget.py 등, SHA256SUMS.v325)는 수정하지 않는다. 여기서 쓰는
@@ -112,6 +113,18 @@ def bake_hands(path, hands: Mapping[str, Optional[str]], *, library_path: Option
                     for side in SIDES for finger in FINGERS for joint in range(JOINTS_PER_FINGER)}
     body_before = {pb.name: pb.matrix.copy() for pb in arm.pose.bones if pb.name not in finger_names}
 
+    rig_repairs = {}
+    closed_sides = [side for side, preset in presets.items()
+                    if preset.articulation is not None]
+    if closed_sides:
+        from converter.hand_rig import repair_digit_roots
+        for side in closed_sides:
+            rig_repairs[side] = repair_digit_roots(arm, meshes, side, prefix)
+        for mesh in meshes:
+            for modifier in mesh.modifiers:
+                if modifier.type == "ARMATURE":
+                    modifier.use_deform_preserve_volume = True
+
     report_sides: dict[str, dict] = {}
     applied = 0
     for side, preset in presets.items():
@@ -146,6 +159,12 @@ def bake_hands(path, hands: Mapping[str, Optional[str]], *, library_path: Option
 
     # convert.py와 같은 규약: 포즈를 메시에 굽고 rest로 승격한 뒤 같은 설정으로 내보낸다.
     rt.apply_output_mode(arm, meshes, "rigged_rest")
+    if closed_sides:
+        from converter.hand_rig import smooth_baked_fingers
+        for iterations in sorted({presets[side].articulation.smoothing_iterations for side in closed_sides}):
+            sides = [side for side in closed_sides
+                     if presets[side].articulation.smoothing_iterations == iterations]
+            smooth_baked_fingers(meshes, sides, prefix, iterations)
     rt.export_fbx(str(path), embed_textures=False)
 
     return {
@@ -156,6 +175,7 @@ def bake_hands(path, hands: Mapping[str, Optional[str]], *, library_path: Option
         "right": hands.get("right"),
         "applied_bones": applied,
         "body_bones_preserved": True,
+        "rig_repairs": rig_repairs,
         "sides": report_sides,
         "self_collision_free": all(not s["self_collisions"] for s in report_sides.values()),
     }
