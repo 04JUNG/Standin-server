@@ -35,8 +35,19 @@ build로 보냅니다. 최종 FBX·PNG와 SHA·인원 수·원본 SHA·plan ID�
 `ROUTING_FULLBODY_ENABLED=1`에서는 요청 `POST /analyze`의 multipart 형식은 유지하고,
 인물별 새 응답 `people[].dynamic_search`를 읽는다. 세부 파이프라인·기동 조건은
 [`FULLBODY_DYNAMIC_ROUTING.md`](FULLBODY_DYNAMIC_ROUTING.md)가 기준이다.
-이 기능 브랜치의 API 팩토리는 변수가 없을 때도 1이므로, 기존 mock/레거시 개발 환경은
-명시적으로 0을 설정해야 한다. `.env.example`은 0으로 유지한다. PR 생성은 배포가 아니다.
+
+로컬 opt-in `PARALLEL_POSE_DESCRIPTION=1`(기본값 `0`)은 기존 인물별 자세 설명 호출을
+관절 처리와 겹쳐 실행한다. 입력·전체 인물 순서가 정확히 일치할 때만 채택하며, 검색/검증 정책은
+유지한다. 활성화한 HTTP 응답의 `search_routing.describe.prefetch`
+(내부 `CutResult.routing_summary.describe.prefetch`)에는 `status`,
+`call_elapsed_ms`(실제 설명 시간 또는 null), `join_wait_ms`(합류 대기 시간)가 추가된다.
+`status=used|used_error`는 같은 요청 결과 채택(오류 포함), `discarded_request_changed`는
+입력 변경으로 기존 경로 실행, `skipped_*`는 선행 실행 미사용, `join_failed|cancelled`는
+합류 실패/취소다. 기존 `describe.status/error_reason/retryable` 실패 구분은 유지한다.
+기본값에서는 응답 필드도 기존과 같으며, 활성화해도 요청 형식·후보/내보내기 권한은 바꾸지 않는다.
+`ROUTING_FULLBODY_ENABLED`는 이 기능 브랜치의 API 팩토리에서 변수가 없을 때도 1이므로,
+기존 mock/레거시 개발 환경은 명시적으로 0을 설정해야 한다. `.env.example`은 0으로 유지한다.
+이는 기본값 0인 위 병렬 옵션과 별개다. PR 생성은 배포가 아니다.
 
 - `selected`: 일반 경로에서는 핵심 동작 및 확인된 세부 조건을 통과한 전신 라이브러리 후보, 최대 5개.
   통합 체형 opt-in 경로에서 조건 통과 후보가 0개면 기존 생성 시도 이후 기하 참고를 반환할 수 있다.
