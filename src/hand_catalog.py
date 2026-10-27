@@ -1,7 +1,7 @@
 """손 카탈로그(04J-290): refine 화면의 손 칩이 쓰는 목록과 썸네일.
 
-라이브러리 정의(converter/hand_library.v1.json)와 미리 그린 마네킹 손 썸네일
-(converter/hand_thumbs/, scripts/render_hand_thumbnails.mjs)을 한 응답으로 묶는다.
+라이브러리 정의(converter/hand_library.v1.json)와 기본 인체 메시로 렌더한 손 썸네일
+(converter/hand_thumbs/, scripts/render_hand_mesh_thumbnails.py)을 한 응답으로 묶는다.
 썸네일 manifest의 library_sha256이 현재 라이브러리와 다르면 썸네일은 '없음'으로 다룬다 —
 각도를 고친 뒤 옛 그림이 나가는 것을 막는다.
 """
