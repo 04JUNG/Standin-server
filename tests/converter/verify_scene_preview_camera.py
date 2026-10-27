@@ -5,13 +5,14 @@ No customer assets, external models, rendering or paid API calls required.
 """
 
 import json
+import math
 from pathlib import Path
 import sys
 import tempfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 import bpy
-from mathutils import Vector
+from mathutils import Matrix, Vector
 from bpy_extras.object_utils import world_to_camera_view
 from converter.final_preview_worker import configure_scene_camera
 from converter.rough_layout import camera_for
@@ -57,5 +58,50 @@ with tempfile.TemporaryDirectory() as folder:
         )
         assert error < 1e-5, (width, height, error)
         assert camera.data.sensor_fit == "HORIZONTAL"
-        rows.append({"width": width, "height": height, "normalized_max_error": error})
+        # Metadata must not conceal a different serialized camera projection.
+        matrix = camera.matrix_world.copy()
+        mutations = {
+            "position": Matrix.Translation((1, 0, 0)) @ matrix,
+            **{f"rotation_{axis}": matrix @ Matrix.Rotation(math.radians(10), 4, axis)
+               for axis in ("X", "Y", "Z")},
+        }
+        rejected = []
+        for name, changed in mutations.items():
+            camera.matrix_world = changed
+            bpy.context.view_layer.update()
+            try:
+                verify_camera_recipe(camera, recipe)
+            except ValueError:
+                rejected.append(name)
+            else:
+                raise AssertionError(f"changed camera {name} passed verification")
+        camera.matrix_world = matrix
+        bpy.context.view_layer.update()
+        # A parent may move the world camera without changing local location.
+        parent = bpy.data.objects.new("changed-camera-parent", None)
+        scene.collection.objects.link(parent)
+        camera.parent = parent
+        camera.matrix_world = matrix
+        parent.location.x = 1
+        bpy.context.view_layer.update()
+        try:
+            verify_camera_recipe(camera, recipe)
+        except ValueError:
+            rejected.append("parent_transform")
+        else:
+            raise AssertionError("changed camera parent passed verification")
+        camera.parent = None
+        camera.matrix_world = matrix
+        camera.data.shift_x = .1
+        bpy.context.view_layer.update()
+        try:
+            verify_camera_recipe(camera, recipe)
+        except ValueError:
+            rejected.append("principal_shift")
+        else:
+            raise AssertionError("off-center camera passed verification")
+        camera.data.shift_x = 0
+        verify_camera_recipe(camera, recipe)
+        rows.append({"width": width, "height": height, "normalized_max_error": error,
+                     "rejected_projection_changes": rejected})
 print("SCENE_PREVIEW_PROJECTION_OK " + json.dumps(rows))

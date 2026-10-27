@@ -23,7 +23,9 @@ CSP camera recipe. The recipe follows CELSYS's documented formula for the newer
   contracts and existing response fields are unchanged.
 - Embedded FBX camera object: JSON custom property `standin_framing_recipe` and
   `source_image_width` / `source_image_height`. The export path checks that these
-  survive FBX reimport and agree with serialized horizontal optics.
+  survive FBX reimport and agree with serialized horizontal optics, projection
+  type, principal shift, and camera world position/orientation (including roll
+  and parent transforms).
 - Raw FBX responses have no JSON sidecar. A consumer needing the recipe without
   parsing FBX should retain the ZIP manifest or v4 build response. Adding metadata
   does not cause CSP to select the embedded camera.
@@ -115,7 +117,10 @@ blender --background --python-exit-code 1 \
 ```
 
 The projection check covers portrait, tall portrait, landscape and square
-canvases. The scene roundtrip check covers one, two and three people plus rough
+canvases and rejects changed position, pitch/yaw/roll, parent transforms and
+principal shifts. The deployment contract also checks imports from the exact
+Converter Docker COPY allowlist, so checkout-only modules cannot pass silently.
+The scene roundtrip check covers one, two and three people plus rough
 layout with camera metadata. These tests establish serialization and mathematical
 projection, not CSP UI behavior. Keep this work in Draft until the CSP application
 path and end-to-end import validation are agreed and completed.
