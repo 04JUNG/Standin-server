@@ -210,7 +210,8 @@ class Host:
         job_path = work / "job.json"
         job_path.write_text(json.dumps(job))
         # Isolate config, scripts, extensions and auto-exec from a user's Blender installation.
-        env = {k: v for k, v in os.environ.items() if not k.startswith(("PYTHON", "BLENDER"))}
+        env = {k: v for k, v in os.environ.items()
+               if not k.startswith(("PYTHON", "BLENDER", "STANDIN_", "CONVERTER_"))}
         env.update({"BLENDER_USER_RESOURCES": str(work / "blender-user"),
                     "PYTHONNOUSERSITE": "1", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONSAFEPATH": "1"})
         script = Path(__file__).with_name("blender_job.py")

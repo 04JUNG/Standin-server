@@ -1,6 +1,7 @@
 """IPC safety and real child-process failure/cancellation tests; no success mock."""
 import json
 import os
+import subprocess
 from pathlib import Path
 import tempfile
 import threading
@@ -90,10 +91,25 @@ class LocalConverterTests(unittest.TestCase):
                     pids.append(pid)
                     observed.set()
                     return resident_bytes(pid)
+                popen = subprocess.Popen
+                def start(command, *args, **kwargs):
+                    if command[0] == str(executable):
+                        child_env = kwargs["env"]
+                        self.assertNotIn("STANDIN_WRIST_TRANSFER", child_env)
+                        self.assertNotIn("STANDIN_WRIST_TWIST_FOREARM_SHARE", child_env)
+                        self.assertNotIn("PYTHONPATH", child_env)
+                        self.assertIn("--python-use-system-env", command)
+                        self.assertEqual(child_env["PYTHONDONTWRITEBYTECODE"], "1")
+                        self.assertEqual(child_env["PYTHONNOUSERSITE"], "1")
+                        self.assertEqual(child_env["PYTHONSAFEPATH"], "1")
+                    return popen(command, *args, **kwargs)
                 limits = {**LIMITS, "workerSeconds": .2 if reason == "TIMEOUT" else 10,
                           "workerMemoryBytes": 1 if reason == "MEMORY_LIMIT" else LIMITS["workerMemoryBytes"]}
                 try:
-                    with patch.dict(LIMITS, limits), patch("converter.local.host.resident_bytes", observe):
+                    with (patch.dict(LIMITS, limits), patch("converter.local.host.resident_bytes", observe),
+                          patch.dict(os.environ, {"STANDIN_WRIST_TRANSFER": "0", "PYTHONPATH": "/untrusted",
+                                                  "STANDIN_WRIST_TWIST_FOREARM_SHARE": "not-a-number"}),
+                          patch("converter.local.host.subprocess.Popen", start)):
                         host.submit({"protocolVersion": PROTOCOL, "requestId": "import", "action": "import",
                                      "localModelId": "m", "sourcePath": str(source), "sourceHash": sha256(source)})
                         self.assertTrue(observed.wait(3))

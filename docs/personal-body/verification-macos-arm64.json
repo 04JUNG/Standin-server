@@ -1,13 +1,13 @@
 {
   "protocolVersion": "standin.local-converter/1",
   "scope": "Packaged macOS public IPC with real FBX and library BVH; no BFF/CSP/Windows qualification",
-  "startupSeconds": 8.89728575013578,
+  "startupSeconds": 9.523976124823093,
   "versions": {
     "importerVersion": "personal-import/1",
     "normalizationVersion": "personal-normalize/1",
     "rigMappingVersion": "personal-rig/1",
     "converterVersion": "personal-converter/1",
-    "converterFingerprint": "d39c53ed6449f617a85750cdecc7aa22452d20866d385ba345bf3bb587f23410"
+    "converterFingerprint": "01b4037b1584c814862737b8c9d6666fd10298761d91bb564c394bc7cca74bf5"
   },
   "sourceHash": "0673f79c0c118f5db009323a54ac223dafd7f6dc79ec35e016fd21e110f82b68",
   "registration": {
@@ -67,14 +67,14 @@
       "shapeSliders": false
     },
     "metrics": {
-      "elapsedSeconds": 2.268467083806172,
-      "peakResidentBytes": 388464640
+      "elapsedSeconds": 2.244340708013624,
+      "peakResidentBytes": 387776512
     }
   },
   "outputs": [
     {
-      "snapshotHash": "a6fde0930b3f25b992de4a84b39df455b7e2e0794dd0dddef5a46a1599575aa2",
-      "artifactHash": "aeedb029687e1a8a4b1e9c756978d5e5582805c07b7c0dbdc66ef3cc1860a6d8",
+      "snapshotHash": "ff1f05bda99110abd55ee62365ca8a69e7fa11ee13f1d98ee5165c4e13292e6c",
+      "artifactHash": "dc3381111256c629a3992ea7ddd0c586a0c9157e05e2b1764897b7e08ba49f57",
       "validation": {
         "passed": true,
         "meshCount": 1,
@@ -113,16 +113,16 @@
         "blenderVersion": "5.2.0 LTS"
       },
       "metrics": {
-        "elapsedSeconds": 1.8477487911004573,
-        "peakResidentBytes": 371802112
+        "elapsedSeconds": 1.8363903330173343,
+        "peakResidentBytes": 369770496
       },
       "poseHash": "7f667dd3d7c1bf4ccdcffcb65da843269a9cc0e449d0ae7ab82bc03e1f25640b",
       "cacheReusePassed": true,
       "exportPassed": true
     },
     {
-      "snapshotHash": "2c59659c26be80eee661d1c5200b0c6986b1fdcdd325c240824c660009249ea5",
-      "artifactHash": "ad85904c8b07ae20c322e5c12e8f62fdb78e10f20bdd3b5717badd88f8422f3b",
+      "snapshotHash": "74661d8333308605e5a431f891c7b56ff6b57330b78d58b88f1c37b515ec1426",
+      "artifactHash": "114b24c4584d24febcd0fdd962a91a40a85974a08b0d3041bfbd5a0641bcd33f",
       "validation": {
         "passed": true,
         "meshCount": 1,
@@ -161,8 +161,8 @@
         "blenderVersion": "5.2.0 LTS"
       },
       "metrics": {
-        "elapsedSeconds": 1.8354503749869764,
-        "peakResidentBytes": 371097600
+        "elapsedSeconds": 1.839113041991368,
+        "peakResidentBytes": 371310592
       },
       "poseHash": "d22cabce87b52e3b86cf07c74b29b30a2bb76bd536167baec981ff4e88565216",
       "cacheReusePassed": true,
@@ -202,5 +202,6 @@
     "pytestPassed": 87,
     "pytestSubtestsPassed": 8
   },
-  "workingDirectoryOutsideRepository": true
+  "workingDirectoryOutsideRepository": true,
+  "hostileInheritedSolverSettingsRejected": true
 }
