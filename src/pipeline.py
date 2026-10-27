@@ -224,8 +224,13 @@ class Pipeline:
             analyze = getattr(self.vlm, "analyze_for_pipeline", self.vlm.analyze)
             vlm: VLMAnalysis = analyze(image, img_w, img_h)
         from .experimental.body_matching.integrated_review import finish_pipeline_review, abandon_pipeline_review
+        from .description_prefetch import start_description_prefetch
+        description_job = None
         pose_started = perf_counter()
         try:
+            description_job = start_description_prefetch(
+                self.vlm, image, vlm, img_w, img_h, fullbody=self._fullbody_search is not None)
+            vlm._description_prefetch = description_job
             result = self._process_analyzed_cut(image, img_w, img_h, rescue_request, vlm)
             try:
                 finish_pipeline_review(vlm, result, pose_started)
@@ -233,6 +238,8 @@ class Pipeline:
                 log_warn("body_review_join", status="failed", errorType=type(error).__name__)
             return result
         finally:
+            if description_job is not None:
+                description_job.close()
             # A failed pose path never waits for body review or accepts late writes.
             abandon_pipeline_review(vlm)
 
@@ -694,13 +701,21 @@ class Pipeline:
             describe_started = perf_counter()
             with span("vlm_describe"):
                 try:
-                    describe = self.vlm.describe_people(image, boxes)
+                    from .description_prefetch import NOT_PREFETCHED
+                    prefetch = getattr(vlm, "_description_prefetch", None)
+                    describe = prefetch.consume(self.vlm, image, boxes,
+                        [(slot.slot_origin, slot.slot_id) for slot in need]) if prefetch else NOT_PREFETCHED
+                    if describe is NOT_PREFETCHED:
+                        describe = self.vlm.describe_people(image, boxes)
                 except Exception as error:  # noqa: BLE001 - 오류로 기록하고 진행
                     from .search_routing import DescribeOutcome
                     describe = DescribeOutcome(
                         "error", error_reason=f"describe_exception:{type(error).__name__}",
                         retryable=False)
             describe_ms = (perf_counter() - describe_started) * 1000.0
+            prefetch = getattr(vlm, "_description_prefetch", None)
+            if prefetch is not None and prefetch.status in ("used", "used_error"):
+                describe_ms = prefetch.elapsed_ms
             for index, slot in enumerate(need):
                 if describe.status != "ok":
                     semantics[id(slot)] = assess_semantic_evidence(
@@ -736,6 +751,9 @@ class Pipeline:
             },
             "routing_elapsed_ms": round((perf_counter() - started) * 1000.0, 3),
         }
+        prefetch = getattr(vlm, "_description_prefetch", None)
+        if prefetch is not None:
+            summary["describe"]["prefetch"] = prefetch.report()
         return {"decisions": decisions, "summary": summary, "describe_ms": describe_ms}
 
     def _route_non_geometric(self, vlm: VLMAnalysis, slot, decision, routing,
