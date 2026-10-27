@@ -36,6 +36,16 @@ def _dataset(parser: argparse.ArgumentParser) -> None:
         command.add_argument("--eval-root", default="evaluation")
     sub.choices["validate"].add_argument("--strict", action="store_true", help="Treat warnings as failures")
 
+    inventory = sub.add_parser("prepare-roughs", help="Read-only inventory and blank human worksheets; never GT")
+    inventory.add_argument("--source", required=True)
+    inventory.add_argument("--output", required=True)
+    intake = sub.add_parser("import-intake", help="Validate completed worksheets into the existing dataset schema")
+    intake.add_argument("--inventory", required=True)
+    intake.add_argument("--intake", required=True)
+    intake.add_argument("--persons", required=True)
+    intake.add_argument("--output", required=True)
+    intake.add_argument("--name", required=True)
+
 
 def _fixture(parser: argparse.ArgumentParser) -> None:
     sub = parser.add_subparsers(dest="fixture_command", required=True)
@@ -62,6 +72,30 @@ def _fixture(parser: argparse.ArgumentParser) -> None:
 
 def _run(parser: argparse.ArgumentParser) -> None:
     sub = parser.add_subparsers(dest="run_command", required=True)
+    pipeline = sub.add_parser("pipeline-report", help="Join sealed experiment artifacts to preregistered final-file tasks")
+    pipeline.add_argument("--experiment", required=True)
+    pipeline.add_argument("--sealed", required=True)
+    pipeline.add_argument("--observations", required=True)
+    pipeline.add_argument("--output", required=True)
+    saves = sub.add_parser("save-scenarios", help="Execute offline scene-save-v1 contract scenarios")
+    saves.add_argument("--output", required=True)
+    seal = sub.add_parser("seal-exports", help="Freeze export tasks and policy before collecting evidence")
+    seal.add_argument("--tasks", required=True, help="JSONL expected tasks")
+    seal.add_argument("--policy", required=True)
+    seal.add_argument("--output", required=True)
+    exports = sub.add_parser("export-report", help="Evaluate exact artifact evidence against sealed export tasks")
+    exports.add_argument("--sealed", required=True)
+    exports.add_argument("--observations", required=True, help="JSONL measured observations")
+    exports.add_argument("--output", required=True)
+    experiment = sub.add_parser("experiment", help="Explicit arm comparison over an existing sealed run (offline by default)")
+    experiment.add_argument("--from-run", required=True)
+    experiment.add_argument("--policy", required=True)
+    experiment.add_argument("--registry")
+    experiment.add_argument("--selections")
+    experiment.add_argument("--fixture-outcomes", help="Local fixture JSON keyed by arm; never product quality evidence")
+    experiment.add_argument("--labels")
+    experiment.add_argument("--output-root", default="out/eval/runs")
+    experiment.add_argument("--run-id")
     http = sub.add_parser("http")
     http.add_argument("--target", required=True)
     http.add_argument("--dataset", required=True)
@@ -217,6 +251,15 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command == "dataset":
+        if args.dataset_command == "prepare-roughs":
+            from .inventory import prepare_inventory
+            _print(prepare_inventory(args.source, args.output))
+            return 0
+        if args.dataset_command == "import-intake":
+            from .intake import import_intake
+            result = import_intake(args.inventory, args.intake, args.persons, args.output, dataset_id=args.name)
+            _print(result)
+            return 0 if result["exported"] else 2
         if args.dataset_command == "init":
             _print(init_dataset(args.name, args.root, args.eval_root, args.purpose))
             return 0
@@ -255,6 +298,52 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "run":
+        if args.run_command == "pipeline-report":
+            from .pipeline_report import build_pipeline_report
+            from .util import read_json, read_jsonl, write_json
+            result = build_pipeline_report(args.experiment, read_json(args.sealed), read_jsonl(args.observations))
+            write_json(args.output, result)
+            _print({"decision": result["decision"], "lineage_links": result["lineage_links"]})
+            return 0 if result["decision"] == "PASS" else 2
+        if args.run_command == "save-scenarios":
+            from .save_scenarios import run_save_scenarios
+            from .util import write_json
+            output = Path(args.output)
+            output.mkdir(parents=True, exist_ok=True)
+            result = run_save_scenarios(output_dir=output)
+            write_json(output / "scenario_report.json", result)
+            _print(result)
+            return 0 if result["contract_tests"]["fail"] == 0 else 2
+        if args.run_command == "seal-exports":
+            from .final_fbx_evaluator import seal_export_policy
+            from .util import read_json, read_jsonl, write_json
+            if Path(args.output).exists():
+                raise FileExistsError("sealed export plan already exists; create a new plan")
+            result = seal_export_policy(read_jsonl(args.tasks), read_json(args.policy))
+            write_json(args.output, result)
+            _print({"seal_sha256": result["seal_sha256"]})
+            return 0
+        if args.run_command == "export-report":
+            from .final_fbx_evaluator import evaluate_export_tasks
+            from .util import read_json, read_jsonl, write_json
+            result = evaluate_export_tasks(read_json(args.sealed), read_jsonl(args.observations))
+            write_json(args.output, result)
+            _print(result)
+            return 0 if result["decision"] == "PASS" else 2
+        if args.run_command == "experiment":
+            from .arms import ArmRegistry, DEFAULT_REGISTRY
+            from .experiment_runner import FixtureAdapter, run_experiment
+            from .util import read_json
+            registry = ArmRegistry.from_dict(read_json(args.registry)) if args.registry else None
+            adapters = None
+            if args.fixture_outcomes:
+                outcomes = read_json(args.fixture_outcomes)
+                selected = registry or DEFAULT_REGISTRY
+                adapters = {arm.arm_id: FixtureAdapter(outcomes) for arm in selected.arms}
+            _print(str(run_experiment(from_run=args.from_run, policy=args.policy,
+                output_root=args.output_root, run_id=args.run_id, registry=registry,
+                selections=args.selections, labels_path=args.labels, adapters=adapters)))
+            return 0
         if args.run_command == "refine-pairs":
             from .refine_runner import run_refine_pairs
 
@@ -346,6 +435,11 @@ def main(argv: list[str] | None = None) -> int:
         from .labels import resolve_run
         run_dir = resolve_run(args.run)
         manifest = json.loads((run_dir / "manifest.json").read_text())
+        if manifest.get("mode") == "experiment":
+            from .experiment_report import write_experiment_report
+            report = write_experiment_report(run_dir, human_labels_path=args.independent_labels or args.labels)
+            _print({"status": report["decision"], "run_id": manifest["run_id"]})
+            return 0 if report["decision"] == "PASS" else 2
         if manifest.get("mode") == "refine_three_arm":
             from .refine_report import write_refine_report
 

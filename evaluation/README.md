@@ -111,3 +111,8 @@ Mesh evidence는 `mesh-checks-v2` 계약을 따른다. 필수 검사는 `parse_f
 다음 수작업은 이미지 결과를 보지 않은 상태에서 `cuts.jsonl`과 `persons.jsonl`을 채우고
 검토 후 `dataset seal`로 hash를 갱신하는 것이다. D1/D2에는 라이선스·외부 VLM 전송 동의와
 작가/프로젝트/scene group 분리도 반드시 기록한다.
+
+
+## 검색·리파인·최종 파일 확장 (2026-10-27)
+
+명시적 F25/v3 arm, 같은 선택 BVH·카메라, 실제 FBX evidence와 저장 lineage, 제공 러프의 읽기 전용 준비는 [구현 워크플로](../docs/evaluation-harness-20261027/IMPLEMENTED_WORKFLOW.md)를 따른다. 기존 명령과 레거시 B0/B1/B2 계약은 유지한다. 오프라인 fixture 통과는 제품 품질/메시 안전/실제 저장 인증이 아니다.
