@@ -96,7 +96,7 @@ def test_shipped_library_covers_basic_and_situational_hands():
     library = load_library()
     assert BASIC_SEVEN | SITUATIONAL <= set(library.preset_ids)
     assert len(library.presets) >= 70
-    assert library.library_version == "hand-library-v1"
+    assert library.library_version == "hand-library-v2"
     assert set(library.categories) == {"basic", "hold", "weapon", "sports", "tool", "daily",
                                        "gesture", "emotion", "action"}
     for category in library.categories:

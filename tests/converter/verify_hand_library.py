@@ -1,4 +1,4 @@
-"""Blender 검증: 손 라이브러리 7종을 실제 캐릭터에 구워 좌우 손을 렌더하고 불변식을 확인한다.
+"""Blender 검증: 손 라이브러리 전종을 실제 캐릭터에 구워 좌우 손을 렌더하고 불변식을 확인한다.
 
     blender -b --factory-startup --python-exit-code 1 --python \\
         tests/converter/verify_hand_library.py -- \\
@@ -8,7 +8,7 @@
 
 확인하는 것
 - V3.2.5로 몸을 변환한 기준 FBX에 프리셋마다 양손을 굽는다(converter.hands.bake_hands).
-- 손가락이 아닌 정점(손가락 본 가중치 합 < 0.01)은 기준 FBX와 1e-4 이내로 같다 = 몸 불변.
+- 손 영역 밖 정점(손·손가락 본 가중치 합 < 0.01)은 기준 FBX와 1e-4 이내로 같다 = 몸 불변.
 - 굽힘 프리셋은 손가락 끝이 open보다 손바닥 쪽으로 이동한다(손등으로 꺾이면 실패).
 - 이 리그의 손 길이에 맞춘 두께로 손가락·손바닥 관통이 없다(converter/hand_collision.py).
 - 프리셋 × 좌/우 × (손바닥 시점, 옆 시점) PNG와 summary.json을 남긴다. 사람 눈 검수용.
@@ -114,8 +114,9 @@ def main() -> int:
     arm, meshes = _import(base)
     prefix = _prefix(arm)
     finger_groups = {bone_name(s, f, j, prefix) for s in SIDES for f in FINGERS for j in range(3)}
+    hand_groups = finger_groups | {hand_bone_name(s, prefix) for s in SIDES}
     base_vertices = _vertices(meshes)
-    weights = {m.name: _finger_weight(m, finger_groups) for m in meshes}
+    weights = {m.name: _finger_weight(m, hand_groups) for m in meshes}
 
     library = load_library()
     summary = {"label": args.label, "character": args.character.name, "bvh": args.bvh.name if args.bvh else None,

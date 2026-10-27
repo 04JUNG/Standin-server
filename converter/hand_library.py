@@ -46,12 +46,20 @@ class FingerPose:
 
 
 @dataclass(frozen=True)
+class FistArticulation:
+    thumb_directions: tuple[tuple[float, float, float], ...]
+    fan: Mapping[str, float]
+    smoothing_iterations: int
+
+
+@dataclass(frozen=True)
 class HandPreset:
     preset_id: str
     label_ko: str
     vlm_hint: str
     fingers: Mapping[str, FingerPose]
     category: str = "basic"
+    articulation: Optional[FistArticulation] = None
 
 
 @dataclass(frozen=True)
@@ -127,18 +135,77 @@ def parse_library(raw: bytes) -> HandLibrary:
             raise HandLibraryError(f"{preset_id} needs label_ko and vlm_hint")
         category = body.get("category")
         if category not in categories:
-            raise HandLibraryError(f"{preset_id}.category must be one of {sorted(categories)}")
-        presets[preset_id] = HandPreset(preset_id, label, hint, fingers, category)
+            raise HandLibraryError(
+                f"{preset_id}.category must be one of {sorted(categories)}"
+            )
+        articulation = body.get("articulation")
+        if articulation is not None:
+            if (
+                not isinstance(articulation, dict)
+                or set(articulation)
+                != {"type", "thumb_directions", "fan", "smoothing_iterations"}
+                or articulation["type"] != "closed_fist_v2"
+            ):
+                raise HandLibraryError(f"{preset_id}.articulation is invalid")
+            directions = articulation["thumb_directions"]
+            if not isinstance(directions, list) or len(directions) != 3:
+                raise HandLibraryError(
+                    f"{preset_id}.thumb_directions must contain three vectors"
+                )
+            parsed = []
+            for vector in directions:
+                if not isinstance(vector, list) or len(vector) != 3:
+                    raise HandLibraryError(
+                        f"{preset_id}.thumb direction must be a 3-vector"
+                    )
+                values = tuple(
+                    _number(v, "thumb direction", (-2.0, 2.0)) for v in vector
+                )
+                if sum(v * v for v in values) < 1e-8:
+                    raise HandLibraryError(f"{preset_id}.thumb direction is zero")
+                parsed.append(values)
+            fan = articulation["fan"]
+            if not isinstance(fan, dict) or set(fan) != set(FINGERS) - {"thumb"}:
+                raise HandLibraryError(f"{preset_id}.fan must define the four fingers")
+            iterations = articulation["smoothing_iterations"]
+            if type(iterations) is not int or not 0 <= iterations <= 12:
+                raise HandLibraryError(
+                    f"{preset_id}.smoothing_iterations must be an integer in [0,12]"
+                )
+            articulation = FistArticulation(
+                tuple(parsed),
+                {
+                    f: _number(v, f"{preset_id}.fan.{f}", (-0.3, 0.3))
+                    for f, v in fan.items()
+                },
+                iterations,
+            )
+        presets[preset_id] = HandPreset(
+            preset_id, label, hint, fingers, category, articulation
+        )
     order = payload.get("fallback_order")
     # 후보를 채우는 범용 기본값 몇 개. 모든 프리셋을 나열할 필요는 없다.
-    if (not isinstance(order, list) or not order or len(set(order)) != len(order)
-            or any(preset_id not in presets for preset_id in order)):
-        raise HandLibraryError("fallback_order must be a non-empty list of unique known presets")
-    empty = [c for c in categories if not any(p.category == c for p in presets.values())]
+    if (
+        not isinstance(order, list)
+        or not order
+        or len(set(order)) != len(order)
+        or any(preset_id not in presets for preset_id in order)
+    ):
+        raise HandLibraryError(
+            "fallback_order must be a non-empty list of unique known presets"
+        )
+    empty = [
+        c for c in categories if not any(p.category == c for p in presets.values())
+    ]
     if empty:
         raise HandLibraryError(f"categories without presets: {empty}")
-    return HandLibrary(version, hashlib.sha256(raw).hexdigest(), presets, tuple(order),
-                       dict(categories))
+    return HandLibrary(
+        version,
+        hashlib.sha256(raw).hexdigest(),
+        presets,
+        tuple(order),
+        dict(categories),
+    )
 
 
 @lru_cache(maxsize=1)

@@ -248,8 +248,27 @@ table.reach td.num { width: 5.5em; text-align: right; font-family: var(--font-da
       const spec = fingers[f];
       let D = I3(), p = base(f);
       const chain = [p];
+      let flexion = 0;
       for (let j = 0; j < 3; j++) {
         const seg = rest.fingers[f][j], dir = unit(seg.dir);
+        if (fingers._fistProfile) {
+          let desired;
+          if (f === "thumb") {
+            const [along, across, palm] = fingers._fistProfile.thumb_directions[j];
+            desired = add(add(mul(fr.length, along), mul(fr.pinkySide, across)), mul(fr.normal, palm));
+          } else {
+            const fan = fingers._fistProfile.fan[f];
+            const first = fr.length;
+            const straight = unit(sub(first, mul(fr.normal, dot(first, fr.normal))));
+            flexion += spec.curl[j];
+            desired = unit(add(matVec(axisAngle(cross(straight, fr.normal), flexion), straight), mul(fr.pinkySide, fan)));
+          }
+          const a = unit(matVec(D, dir)), b = unit(desired), axis = cross(a, b);
+          if (norm(axis) > 1e-8) D = matMul(axisAngle(axis, Math.acos(Math.max(-1, Math.min(1, dot(a, b)))) * 180 / Math.PI), D);
+          p = add(p, mul(matVec(D, dir), seg.length));
+          chain.push(p);
+          continue;
+        }
         const target = f === "thumb" ? add(fr.normal, mul(fr.pinkySide, DATA.thumb_across_weight)) : fr.normal;
         let R = axisAngle(cross(dir, target), spec.curl[j]);
         if (j === 0 && spec.spread) {
@@ -270,11 +289,15 @@ table.reach td.num { width: 5.5em; text-align: right; font-family: var(--font-da
 
   // ---- state ----
   const ORIGINAL = {};
-  for (const [id, p] of Object.entries(DATA.presets)) ORIGINAL[id] = JSON.parse(JSON.stringify(p.fingers));
+  function markFingers(id, fingers) {
+    Object.defineProperty(fingers, "_fistProfile", { value: DATA.presets[id].fist_profile, configurable: true });
+    return fingers;
+  }
+  for (const [id, p] of Object.entries(DATA.presets)) ORIGINAL[id] = markFingers(id, JSON.parse(JSON.stringify(p.fingers)));
   let edits = {};
   try { edits = JSON.parse(localStorage.getItem(STORE_KEY) || "{}") || {}; } catch (e) { edits = {}; }
   const saveEdits = () => { try { localStorage.setItem(STORE_KEY, JSON.stringify(edits)); } catch (e) { /* storage unavailable */ } };
-  const fingersOf = (id) => edits[id] || ORIGINAL[id];
+  const fingersOf = (id) => markFingers(id, edits[id] || ORIGINAL[id]);
   const isEdited = (id) => !!edits[id] && JSON.stringify(edits[id]) !== JSON.stringify(ORIGINAL[id]);
 
   // JS 재계산이 Python 결과와 같은지(편집 전 원본 기준) — 화면의 그림이 변환기 계산과 같다는 근거.
@@ -575,7 +598,9 @@ table.reach td.num { width: 5.5em; text-align: right; font-family: var(--font-da
     const knob = (f, key, k, value, origValue, min, max) => {
       const id = `k-${f}-${key}${k ?? ""}`;
       const changed = value !== origValue ? " changed" : "";
+      const locked = fingers._fistProfile && (f === "thumb" || key === "spread");
       return `<td><div class="knob"><input type="range" id="${id}" min="${min}" max="${max}" step="1" value="${value}"
+        ${locked ? 'disabled title="주먹의 엄지 대립과 손가락 벌림은 articulation 프로필에서 조정합니다."' : ''}
         data-f="${f}" data-key="${key}" data-k="${k ?? ""}" aria-label="${FINGER_KO[f]} ${key === "spread" ? "벌림" : (k + 1) + "번째 마디 굽힘"}">
         <output for="${id}" class="${changed}">${value}</output></div></td>`;
     };
