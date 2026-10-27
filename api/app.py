@@ -892,7 +892,7 @@ def get_hand_catalog():
 
 @app.get("/hands/{preset_id}/thumbnail")
 def get_hand_thumbnail(preset_id: str, side: str, request: Request):
-    """프리셋 하나의 마네킹 손 PNG(투명 배경). side는 그 인물 자신의 left/right."""
+    """기본 인체 메시의 손 PNG. side는 그 인물 자신의 left/right."""
     if side not in ("left", "right"):
         raise HTTPException(400, f"unsupported side: {side}")
     path = hand_thumbnail_path(preset_id, side)

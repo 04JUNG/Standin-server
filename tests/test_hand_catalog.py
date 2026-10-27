@@ -27,11 +27,27 @@ def test_catalog_lists_every_preset_once_in_library_order():
 def test_shipped_thumbnails_match_the_current_library():
     """라이브러리 각도를 바꾸고 썸네일을 다시 안 만들면 이 테스트가 실패한다."""
     catalog = build_catalog()
-    assert catalog["thumbnails_available"], "run scripts/render_hand_thumbnails.mjs"
+    assert catalog["thumbnails_available"], "run scripts/render_hand_mesh_thumbnails.py in Blender"
     for preset_id in load_library().preset_ids:
         for side in ("left", "right"):
             path = thumbnail_path(preset_id, side)
             assert path is not None and path.read_bytes()[:8] == b"\x89PNG\r\n\x1a\n", (preset_id, side)
+
+
+def test_shipped_hand_mesh_previews_are_complete_and_identify_the_approved_character():
+    import struct
+    manifest = json.loads((THUMBS_DIR / "manifest.json").read_text())
+    assert manifest["renderer"] == "default-human-hand-mesh-v1"
+    assert manifest["style"] == "approved-reference-anatomy-detail-dark-v1"
+    assert manifest["character_sha256"] == "7c648b97a24a3bb4914b6e5d515708c33727979881d92ef916d5726e22301f3d"
+    expected = {f"{preset}__{side}.png" for preset in load_library().preset_ids
+                for side in ("left", "right")}
+    assert set(manifest["files"]) == expected
+    pixels = manifest["size_css_px"] * manifest["scale"]
+    for name in expected:
+        assert struct.unpack(">II", (THUMBS_DIR / name).read_bytes()[16:24]) == (pixels, pixels)
+    for preset in load_library().preset_ids:
+        assert manifest["files"][f"{preset}__left.png"] != manifest["files"][f"{preset}__right.png"]
 
 
 def test_stale_or_tampered_thumbnails_are_not_served(tmp_path):
