@@ -17,7 +17,8 @@ def state_counts(values: list[str], denominator: int) -> dict:
 
 
 def build_experiment_report(records: list[dict], *, frozen: dict,
-                            search: dict | None = None, human_labels: list[dict] | None = None) -> dict:
+                            search: dict | None = None, human_labels: list[dict] | None = None,
+                            source_integrity: dict | None = None) -> dict:
     """No row dropping and no conversion of missing labels or measurements to pass.
 
     Human labels follow existing independent-refine label fields and are bound
@@ -32,6 +33,13 @@ def build_experiment_report(records: list[dict], *, frozen: dict,
     expected_keys = {(unit, arm) for unit in expected_units for arm in arms}
     keys = [(r["unit_id"], r["arm"]) for r in records]
     integrity_errors = []
+    if source_integrity and source_integrity.get("source_snapshot_changed"):
+        integrity_errors.append("source_snapshot_changed")
+    if frozen.get("source_snapshot_sha256") and (not source_integrity or
+            source_integrity.get("expected_snapshot_sha256") != frozen["source_snapshot_sha256"]):
+        integrity_errors.append("source_integrity_unbound")
+    if frozen.get("search_evidence_sha256") and hash_json(search) != frozen["search_evidence_sha256"]:
+        integrity_errors.append("frozen_search_evidence_changed")
     if len(keys) != len(set(keys)) or len(records) != expected or set(keys) != expected_keys:
         integrity_errors.append("preregistered_row_set_changed")
     contexts = {}
@@ -152,6 +160,9 @@ def write_experiment_report(run, *, human_labels_path=None) -> dict:
         raise ValueError("experiment preregistration seal mismatch")
     required = {"experiment_arms.jsonl", "search_evidence.json", "refine_label_assignments.private.jsonl",
                 "refine_label_queue.jsonl", "frozen_units.private.jsonl"}
+    frozen = read_json(root / "experiment.frozen.json")
+    if frozen.get("source_snapshot_sha256"):
+        required.add("source_integrity.json")
     if not required <= set(manifest.get("result_seal", {})):
         raise ValueError("experiment result seal incomplete")
     for name, expected in manifest["result_seal"].items():
@@ -174,7 +185,8 @@ def write_experiment_report(run, *, human_labels_path=None) -> dict:
         else:
             valid_labels.append(row)
     report = build_experiment_report(read_jsonl(root / "experiment_arms.jsonl"), frozen=frozen,
-        search=read_json(root / "search_evidence.json"), human_labels=valid_labels)
+        search=read_json(root / "search_evidence.json"), human_labels=valid_labels,
+        source_integrity=read_json(root / "source_integrity.json") if frozen.get("source_snapshot_sha256") else None)
     if label_errors:
         report["decision"] = "FAIL"
         report["hard_failures"] += sorted(set(label_errors))

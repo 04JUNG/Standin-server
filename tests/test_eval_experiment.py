@@ -320,6 +320,41 @@ class ExperimentTests(unittest.TestCase):
             self.assertEqual(report["arms"]["B0_no_refine"]["latency"]["count"], 0)
             self.assertEqual(len(frozen["expected_unit_ids"]), 1)
 
+    def test_mutated_source_cannot_mix_evidence_or_clear_failure_on_rereport(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source, selection, base, _ = source_fixture(root, n=1)
+            original = (source / "candidates.jsonl").read_bytes()
+
+            class MutatingAdapter(FixtureAdapter):
+                def execute(self, unit, arm, timeout_seconds):
+                    # Valid JSON mutation must not change the already computed
+                    # search cohort or quietly become a new source snapshot.
+                    write_jsonl(source / "candidates.jsonl", [])
+                    return super().execute(unit, arm, timeout_seconds)
+
+            adapter = MutatingAdapter({"F25": {"state": "abstained", "refined": False,
+                                               "actual_backend": "none", "bvh_bytes": base.read_bytes()}})
+            run = run_experiment(from_run=source, policy={"timeout_seconds": 1}, selections=[selection],
+                adapters={"F25": adapter}, output_root=root / "runs", run_id="source-mutated")
+            report = read_json(run / "experiment_report.json")
+            self.assertEqual(len(read_jsonl(run / "experiment_arms.jsonl")), 3)
+            self.assertEqual(report["decision"], "FAIL")
+            self.assertIn("source_snapshot_changed", report["hard_failures"])
+            # Still uses pre-adapter candidate evidence: label unknown, not the
+            # mutated empty-source interpretation of zero successful candidates.
+            self.assertEqual(report["search"]["candidate_coverage_at_5"]["unknown"], 1)
+            self.assertTrue(read_json(run / "source_integrity.json")["source_snapshot_changed"])
+            self.assertIn("source_integrity.json", read_json(run / "manifest.json")["result_seal"])
+            frozen = read_json(run / "experiment.frozen.json")
+            self.assertIn("responses/cut.json", frozen["source_snapshot"]["source_files"])
+            self.assertNotEqual(frozen["source_snapshot"]["source_files"]["candidates.jsonl"],
+                                sha256_file(source / "candidates.jsonl"))
+            (source / "candidates.jsonl").write_bytes(original)
+            reviewed = write_experiment_report(run)
+            self.assertEqual(reviewed["decision"], "FAIL")
+            self.assertIn("source_snapshot_changed", reviewed["hard_failures"])
+
     def test_report_detects_dropped_rows_and_changed_comparison_context(self):
         frozen = {"registry": DEFAULT_REGISTRY.to_dict(), "policy": {}, "expected_rows": 3,
                   "expected_unit_ids": ["unit-1"]}

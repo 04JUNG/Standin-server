@@ -187,6 +187,26 @@ def _freeze(source: Path, dataset, manifest: dict, selected_rank: int, selection
     return units
 
 
+def _source_snapshot(source: Path, labels_path=None, dataset_root: Path | None = None) -> dict:
+    """Content identities only; changes/additions/deletions invalidate the run."""
+    paths = {source / "manifest.json", *source.glob("*.jsonl"),
+             *(source / "responses").rglob("*.json")}
+
+    def digest(path):
+        try:
+            return sha256_file(path)
+        except OSError:
+            return "unavailable"
+
+    value = {"source_files": {path.relative_to(source).as_posix(): digest(path)
+                               for path in sorted(paths)},
+             "human_labels_sha256": digest(Path(labels_path)) if labels_path else None}
+    if dataset_root is not None:
+        value["dataset_files"] = {name: digest(dataset_root / name)
+                                  for name in ("dataset.json", "cuts.jsonl", "persons.jsonl")}
+    return value
+
+
 def run_experiment(*, from_run, policy, output_root="out/eval/runs", run_id=None,
                    registry: ArmRegistry | dict | None = None, adapters: dict | None = None,
                    dataset=None, selections=None, labels_path=None) -> Path:
@@ -197,8 +217,10 @@ def run_experiment(*, from_run, policy, output_root="out/eval/runs", run_id=None
     paths stay private. Adapters may be injected for offline contract tests.
     """
     source = resolve_run(from_run)
+    source_snapshot = _source_snapshot(source, labels_path)
     source_manifest = read_json(source / "manifest.json")
     dataset = load_dataset(dataset or source_manifest["dataset"]["root"])
+    source_snapshot["dataset_files"] = _source_snapshot(source, labels_path, dataset.root)["dataset_files"]
     problems = [i.message for i in validate_dataset(dataset) if i.level == "error"]
     if problems:
         raise ValueError("dataset is not sealed/valid: " + "; ".join(problems))
@@ -212,6 +234,10 @@ def run_experiment(*, from_run, policy, output_root="out/eval/runs", run_id=None
     adapters = adapters or {}
     selected = read_jsonl(selections) if selections and not isinstance(selections, list) else (selections or [])
     units = _freeze(source, dataset, source_manifest, int(policy.get("selected_rank", 1)), selected)
+    # Consume search/camera/label evidence before any adapter can contact or
+    # mutate the source. Verify the complete snapshot again after those reads.
+    search = summarize_search_run(source, dataset, labels_path=labels_path, budget_ms=policy.get("search_budget_ms"))
+    snapshot_after_reads = _source_snapshot(source, labels_path, dataset.root)
     if int(policy.get("selected_rank", 1)) < 1:
         raise ValueError("selected_rank must be positive")
     requested_source = source_manifest.get("requested_backend") or {}
@@ -230,7 +256,9 @@ def run_experiment(*, from_run, policy, output_root="out/eval/runs", run_id=None
     output = resolve_path(Path(output_root) / run_id)
     output.mkdir(parents=True, exist_ok=False)
     frozen = {"schema_version": EXTENSION_SCHEMA, "registry": registry.to_dict(),
-              "policy": policy, "source_manifest_sha256": sha256_file(source / "manifest.json"),
+              "policy": policy, "source_manifest_sha256": source_snapshot["source_files"]["manifest.json"],
+              "source_snapshot": source_snapshot, "source_snapshot_sha256": hash_json(source_snapshot),
+              "search_evidence_sha256": hash_json(search),
               "units_sha256": hash_json(units), "expected_rows": len(units) * len(registry.arms),
               "expected_unit_ids": [unit["unit_id"] for unit in units],
               "source_execution_kind": source_manifest.get("mode"),
@@ -244,6 +272,7 @@ def run_experiment(*, from_run, policy, output_root="out/eval/runs", run_id=None
     # Freeze before adapter contact, including base fetching.
     write_json(output / "experiment.frozen.json", frozen)
     write_jsonl(output / "frozen_units.private.jsonl", units)
+    write_json(output / "search_evidence.json", search)
     records = []
     for unit in units:
         base_bytes = None
@@ -361,8 +390,14 @@ def run_experiment(*, from_run, policy, output_root="out/eval/runs", run_id=None
                 row["binding_status"] = "unknown"
             records.append(row)
     write_jsonl(output / "experiment_arms.jsonl", records)
-    search = summarize_search_run(source, dataset, labels_path=labels_path, budget_ms=policy.get("search_budget_ms"))
-    write_json(output / "search_evidence.json", search)
+    snapshot_after_execution = _source_snapshot(source, labels_path, dataset.root)
+    source_changed = source_snapshot != snapshot_after_reads or source_snapshot != snapshot_after_execution
+    source_integrity = {"state": "fail" if source_changed else "pass",
+                        "source_snapshot_changed": source_changed,
+                        "expected_snapshot_sha256": hash_json(source_snapshot),
+                        "after_reads_snapshot_sha256": hash_json(snapshot_after_reads),
+                        "after_execution_snapshot_sha256": hash_json(snapshot_after_execution)}
+    write_json(output / "source_integrity.json", source_integrity)
     # Existing human review assignment engine: duplicate and hidden repeats remain
     # unfilled; delivered artifacts do not automatically become quality labels.
     items = [{"item_id": "item:" + secrets.token_hex(12), "unit_id": r["unit_id"],
@@ -395,9 +430,9 @@ def run_experiment(*, from_run, policy, output_root="out/eval/runs", run_id=None
     write_jsonl(output / "refine_label_queue.jsonl", queue)
     write_jsonl(output / "refine_independent_labels_template.jsonl", templates)
     from .experiment_report import build_experiment_report
-    report = build_experiment_report(records, frozen=frozen, search=search)
+    report = build_experiment_report(records, frozen=frozen, search=search, source_integrity=source_integrity)
     write_json(output / "experiment_report.json", report)
-    result_files = ["experiment_arms.jsonl", "search_evidence.json", "refine_label_queue.jsonl",
+    result_files = ["experiment_arms.jsonl", "search_evidence.json", "source_integrity.json", "refine_label_queue.jsonl",
                     "refine_independent_labels_template.jsonl", "experiment_report.json",
                     "frozen_units.private.jsonl", "refine_label_assignments.private.jsonl",
                     "refine_pair_items.jsonl", "refine_pair_provenance.private.jsonl", "refine_pair_labels_template.jsonl"]
