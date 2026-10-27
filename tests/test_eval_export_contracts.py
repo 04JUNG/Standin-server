@@ -284,6 +284,15 @@ class ExportReportTests(unittest.TestCase):
             task["person_count"] = 2
             self.assertEqual(evaluate_export_tasks(seal_export_policy([task], policy), [obs])["decision"], "INCONCLUSIVE")
 
+    def test_missing_preregistered_final_hash_unknown_not_conflict(self):
+        with tempfile.TemporaryDirectory() as directory:
+            task, policy, obs = report_case(directory)
+            task.pop("artifact_sha256")
+            result = evaluate_export_tasks(seal_export_policy([task], policy), [obs])
+            self.assertEqual(result["decision"], "INCONCLUSIVE")
+            self.assertEqual(result["tasks"][0]["state"], "unknown")
+            self.assertNotIn("final_artifact_task_mismatch", result["tasks"][0]["reasons"])
+
     def test_runtime_model_or_hand_asset_changed_hard_failure(self):
         with tempfile.TemporaryDirectory() as directory:
             task, policy, obs = report_case(directory)

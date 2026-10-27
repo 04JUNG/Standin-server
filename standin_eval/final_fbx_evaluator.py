@@ -133,7 +133,7 @@ def evaluate_export_tasks(sealed, observations):
                 dims["integrity"] = "fail"
                 reasons.append("frozen_selection_mismatch")
         delivery = [n for n in obs.get("artifacts", []) if n.get("stage") == "native_save"]
-        if delivery and any(n.get("sha256") != task.get("artifact_sha256") for n in delivery):
+        if task.get("artifact_sha256") and delivery and any(n.get("sha256") != task["artifact_sha256"] for n in delivery):
             dims["integrity"] = "fail"
             reasons.append("final_artifact_task_mismatch")
         if binding_missing:
