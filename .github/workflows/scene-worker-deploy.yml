@@ -1,0 +1,84 @@
+name: Build or deploy scene worker (staging only)
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_staging:
+        type: boolean
+        description: 'Update an already provisioned, dedicated staging worker service'
+        default: false
+        required: true
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: scene-worker-staging
+  cancel-in-progress: false
+jobs:
+  staging:
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      ECR_REPOSITORY: standin/scene-worker
+      ECS_CLUSTER: ${{ vars.SCENE_ECS_CLUSTER }}
+      ECS_SERVICE: ${{ vars.SCENE_ECS_SERVICE }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Runtime contract tests
+        run: |
+          pip install -r requirements-converter.txt numpy scipy httpx pytest google-genai opencv-python-headless==5.0.0.93
+          python -m pytest -q tests/test_scene_refinement_runtime.py tests/test_scene_worker_deployment.py tests/test_scene_worker_artifact_contract.py
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.SCENE_AWS_DEPLOY_ROLE }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - name: Check dedicated targets before building
+        env:
+          DEPLOY_STAGING: ${{ inputs.deploy_staging }}
+        run: |
+          aws ecr describe-repositories --repository-names "$ECR_REPOSITORY" > /dev/null
+          if [ "$DEPLOY_STAGING" = true ]; then
+            test -n "$ECS_CLUSTER"
+            test -n "$ECS_SERVICE"
+            aws ecs describe-services --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE" > /tmp/scene-service.json
+            jq -e '.services | length == 1' /tmp/scene-service.json > /dev/null
+            jq -e '.services[0] | .status == "ACTIVE" and .desiredCount == 1 and .deploymentConfiguration.maximumPercent == 100 and .deploymentConfiguration.minimumHealthyPercent == 0' /tmp/scene-service.json > /dev/null
+            TASK_DEFINITION=$(jq -r '.services[0].taskDefinition' /tmp/scene-service.json)
+            aws ecs describe-task-definition --task-definition "$TASK_DEFINITION" --query taskDefinition > /tmp/scene-task.json
+            python scripts/validate_scene_task.py /tmp/scene-task.json
+          fi
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Build images from the same commit
+        run: |
+          docker build --platform linux/amd64 -f Dockerfile.converter -t standin-converter:scene-base .
+          docker build --platform linux/amd64 -f Dockerfile.scene-worker -t standin-scene:release .
+          docker run --rm standin-scene:release python -c 'import torch,transformers,rtmlib,onnxruntime,cv2; from src.scene_refinement import runtime,plan; from src.semantic_adapter_285 import excluded_pose_ids; excluded_pose_ids()'
+      - name: Push immutable commit tag
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+        run: |
+          docker tag standin-scene:release "$REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA"
+          docker push "$REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA"
+      - name: Render dedicated task image
+        if: inputs.deploy_staging
+        id: render
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: /tmp/scene-task.json
+          container-name: scene-worker
+          image: ${{ steps.ecr.outputs.registry }}/standin/scene-worker:${{ github.sha }}
+          environment-variables: |
+            DEPLOYMENT_VERSION=${{ github.sha }}
+      - name: Update dedicated staging service
+        if: inputs.deploy_staging
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.render.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true

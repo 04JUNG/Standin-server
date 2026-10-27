@@ -1,0 +1,31 @@
+# syntax=docker/dockerfile:1.7
+# Build the base from Dockerfile.converter at the SAME git commit. This reuses
+# its checksum-verified Blender and frozen solver without editing their image.
+ARG SCENE_CONVERTER_BASE=standin-converter:scene-base
+FROM ${SCENE_CONVERTER_BASE}
+USER root
+COPY requirements-scene-worker.txt /app/requirements-scene-worker.txt
+RUN python -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.14.1 \
+    && python -m pip install --requirement /app/requirements-scene-worker.txt \
+    && python -m pip check
+COPY src /app/src
+COPY config/refine_pose_quarantine.v1.json /app/config/refine_pose_quarantine.v1.json
+COPY config/semantic_quarantine_285.v1.json /app/config/semantic_quarantine_285.v1.json
+RUN mkdir -p /scene-assets /tmp/standin-scene \
+    && chown standin:standin /tmp/standin-scene \
+    && chmod 700 /tmp/standin-scene
+USER 10001:10001
+ENV SCENE_REFINEMENT_ENABLED=0 \
+    SCENE_REFINEMENT_HOST=0.0.0.0 \
+    SCENE_REFINEMENT_PORT=8002 \
+    SCENE_REFINEMENT_ROOT=/tmp/standin-scene \
+    SCENE_BLENDER_BINARY=/opt/blender/blender \
+    HF_HUB_OFFLINE=1 \
+    TRANSFORMERS_OFFLINE=1 \
+    HF_HUB_DISABLE_TELEMETRY=1 \
+    OMP_NUM_THREADS=2 \
+    OPENBLAS_NUM_THREADS=2
+EXPOSE 8002
+HEALTHCHECK --interval=30s --timeout=5s --start-period=300s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8002/readyz',timeout=3)"
+CMD ["python", "-m", "src.scene_refinement"]
