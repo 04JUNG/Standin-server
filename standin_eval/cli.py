@@ -24,6 +24,12 @@ def _print(value) -> None:
 
 def _dataset(parser: argparse.ArgumentParser) -> None:
     sub = parser.add_subparsers(dest="dataset_command", required=True)
+    pose = sub.add_parser("import-pose-suite", help="Pin one authored COCO17 suite set, preserving draft GT")
+    pose.add_argument("--source", required=True)
+    pose.add_argument("--output", required=True)
+    pose.add_argument("--source-commit", required=True)
+    pose.add_argument("--set", dest="set_number", type=int, default=1)
+    pose.add_argument("--usage-authorized", action="store_true")
     init = sub.add_parser("init", help="Create a content-deduplicated dataset inventory")
     init.add_argument("--name", required=True)
     init.add_argument("--root", action="append", required=True)
@@ -72,6 +78,17 @@ def _fixture(parser: argparse.ArgumentParser) -> None:
 
 def _run(parser: argparse.ArgumentParser) -> None:
     sub = parser.add_subparsers(dest="run_command", required=True)
+    pose = sub.add_parser("pose-benchmark", help="Fixed-person COCO17 scoring; no provider call by default")
+    pose.add_argument("--dataset", required=True)
+    pose.add_argument("--output", required=True)
+    source = pose.add_mutually_exclusive_group()
+    source.add_argument("--predictions", help="Recorded cut-level prediction JSONL")
+    source.add_argument("--target", help="Explicit /analyze endpoint base; requires --allow-http")
+    pose.add_argument("--allow-http", action="store_true")
+    pose.add_argument("--timeout", type=float)
+    pose.add_argument("--requested-vlm")
+    pose.add_argument("--requested-pose")
+    pose.add_argument("--policy")
     pipeline = sub.add_parser("pipeline-report", help="Join sealed experiment artifacts to preregistered final-file tasks")
     pipeline.add_argument("--experiment", required=True)
     pipeline.add_argument("--sealed", required=True)
@@ -251,6 +268,12 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command == "dataset":
+        if args.dataset_command == "import-pose-suite":
+            from .pose_dataset import import_pose_suite
+            frozen, _, _ = import_pose_suite(args.source, args.output, source_commit=args.source_commit,
+                usage_authorized=args.usage_authorized, set_number=args.set_number)
+            _print({"dataset_id":frozen["dataset_id"], "counts":frozen["counts"], "seal_sha256":frozen["seal_sha256"]})
+            return 0
         if args.dataset_command == "prepare-roughs":
             from .inventory import prepare_inventory
             _print(prepare_inventory(args.source, args.output))
@@ -298,6 +321,13 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "run":
+        if args.run_command == "pose-benchmark":
+            from .pose_benchmark import run_pose_benchmark
+            requested = {"vlm":args.requested_vlm,"pose":args.requested_pose} if args.requested_vlm or args.requested_pose else None
+            report = run_pose_benchmark(args.dataset,args.output,predictions=args.predictions,policy=args.policy,
+                target=args.target,allow_http=args.allow_http,timeout_seconds=args.timeout,requested_backend=requested)
+            _print({k:report[k] for k in ("decision","score_status","denominator","cut_statuses","actual_model_cuts")})
+            return 2 if report["decision"] == "FAIL" else 0
         if args.run_command == "pipeline-report":
             from .pipeline_report import build_pipeline_report
             from .util import read_json, read_jsonl, write_json

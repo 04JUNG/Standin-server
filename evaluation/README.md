@@ -115,4 +115,6 @@ Mesh evidence는 `mesh-checks-v2` 계약을 따른다. 필수 검사는 `parse_f
 
 ## 검색·리파인·최종 파일 확장 (2026-10-27)
 
+2026-10-28: 사용자 지정 **set-01 (27컷·48명)**의 [자동 COCO17 관절 인식 평가](../docs/evaluation-harness-20261027/SET01_AUTOMATIC_POSE_BENCHMARK.md)를 추가했다. 기존 GT 초안을 이용해 저장된 예측을 자동 채점하며, 사용 허용을 다시 묻거나 323장 작업표를 먼저 요구하지 않는다. 기본 실행은 오프라인이다.
+
 명시적 F25/v3 arm, 같은 선택 BVH·카메라, 실제 FBX evidence와 저장 lineage, 제공 러프의 읽기 전용 준비는 [구현 워크플로](../docs/evaluation-harness-20261027/IMPLEMENTED_WORKFLOW.md)를 따른다. 기존 명령과 레거시 B0/B1/B2 계약은 유지한다. 오프라인 fixture 통과는 제품 품질/메시 안전/실제 저장 인증이 아니다.
