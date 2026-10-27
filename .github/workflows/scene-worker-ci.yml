@@ -33,7 +33,7 @@ jobs:
           python-version: '3.12'
       - name: Runtime contracts (no paid model calls)
         run: |
-          pip install -r requirements-converter.txt numpy scipy httpx pytest google-genai
+          pip install -r requirements-converter.txt numpy scipy httpx pytest google-genai opencv-python-headless==5.0.0.93
           python -m pytest -q tests/test_scene_refinement_runtime.py tests/test_scene_worker_deployment.py tests/test_scene_worker_artifact_contract.py
       - name: Build calibrated base and CPU worker at the same commit
         run: |
