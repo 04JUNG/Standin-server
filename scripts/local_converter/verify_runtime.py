@@ -110,15 +110,26 @@ def verify(launcher, source, poses, cs3c, report_path, relocated=False):
         assert sha(destination) == exported["artifactHash"]
         session.request("apply", error="HAND_UNSUPPORTED", **{**fields, "hands": {"left": "fist", "right": None}})
         outputs.append({k: applied[k] for k in ("snapshotHash", "artifactHash", "validation", "metrics")}
-                                | {"poseHash": sha(pose), "cacheReusePassed": True, "exportPassed": True})
+                                | {"poseHash": sha(pose), "cacheReusePassed": True, "exportPassed": True,
+                                   "targetNormalizationSurfaceError": applied["retarget"]["local_normalization_surface_error"],
+                                   "maxJointEdgeLengthError": applied["retarget"]["max_joint_edge_length_error"]})
     assert len({r["snapshotHash"] for r in outputs}) == len(outputs)
     session.request("export", error="SNAPSHOT_MISMATCH", localModelId="regression", snapshotHash="0"*64,
                     destinationPath=str(root / "stale.fbx"))
     session.request("import", error="MODEL_EXISTS", localModelId="regression", sourcePath=str(source), sourceHash=source_hash)
     if cs3c:
-        session.request("import", error="CS3C_DECODER_UNAVAILABLE", localModelId="cs3c",
-                        sourcePath=str(cs3c), sourceHash=sha(cs3c))
-        session.request("inspect", error="MODEL_NOT_FOUND", localModelId="cs3c")
+        if hello["formats"]["cs3c"]:
+            imported = session.request("import", localModelId="cs3c", sourcePath=str(cs3c), sourceHash=sha(cs3c))
+            assert imported["sourceFormat"] == "cs3c" and imported["validation"]["passed"]
+            applied = session.request("apply", localModelId="cs3c", sourceHash=sha(cs3c), posePath=str(poses[0]),
+                                       poseHash=sha(poses[0]), selectionId="cs3c-regression", hands={"left":None,"right":None})
+            session.request("export", localModelId="cs3c", snapshotHash=applied["snapshotHash"],
+                            destinationPath=str(root / "additional-cs3c.fbx"))
+            session.request("delete", localModelId="cs3c")
+        else:
+            session.request("import", error="CS3C_DECODER_UNAVAILABLE", localModelId="cs3c",
+                            sourcePath=str(cs3c), sourceHash=sha(cs3c))
+            session.request("inspect", error="MODEL_NOT_FOUND", localModelId="cs3c")
     import_id = session.send("import", localModelId="cancelled", sourcePath=str(source), sourceHash=source_hash)
     while True:
         event = session.events.get(timeout=10)
@@ -166,9 +177,13 @@ def verify(launcher, source, poses, cs3c, report_path, relocated=False):
               "restartReusePassed": True, "staleSnapshotRejected": True, "changedPoseRejected": True,
               "noOverwritePassed": True, "activeCancellationPassed": True,
               "eofCancellationPassed": True, "deletePreservesExportsPassed": True,
-              "cs3cFailClosedPassed": bool(cs3c), "allPassed": True,
+              "sourceFormat": model["sourceFormat"],
+              "cs3cConversionPassed": model["sourceFormat"] == "cs3c" or bool(cs3c and hello["formats"]["cs3c"]),
+              "cs3cFailClosedPassed": bool(cs3c and not hello["formats"]["cs3c"]), "allPassed": True,
               "packageIntegrityAfterRepeatedStarts": {"manifestFiles": len(manifest["files"]), "changed": 0, "extra": 0},
               "copiedWithoutPreservingTimestamps": relocated}
+    if "sourceFormatDetails" in model["character"]:
+        report["sourceFormatDetails"] = model["character"]["sourceFormatDetails"]
     report_path.write_text(json.dumps(report, indent=2))
     (root / "transcript.json").write_text(json.dumps(transcript, indent=2))
     print(json.dumps({"report": str(report_path), "localArtifacts": str(root), "allPassed": True}))

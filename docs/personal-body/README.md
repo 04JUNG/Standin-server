@@ -7,13 +7,14 @@ Implements the local-compute direction in `PERSONAL_BODY_LOCAL_REGISTRATION_STRA
 
 A separate stdlib IPC host launches one Blender child per heavy operation. It never uploads assets, opens an HTTP listener, fetches poses, or falls back to the server. The app owns registration cards/names; the worker owns immutable original copies, normalized characters and verified conversion caches.
 
+- CS3C catalog-v2 files in the reviewed schema family are decrypted/decompressed locally, then original nodes, inverse binds, sparse skin weights, vertices/normals/UV, source matte materials (39 per supplied sample) and per-face assignments enter the same Blender representation and retarget/export core. Source FK with source inverse binds/weights is independently compared to Blender at five joints before admission. No diagnostic-color GLB or preconverted FBX stands in for the source.
 - Binary FBX adapters retain terminal/helper bones, mesh/object transforms, original weights, rest transforms and solid Principled material values. Multiple meshes bound to one armature are accepted.
 - The common character representation is a private, hash-checked `.blend` plus a JSON inspection manifest. It records hierarchy, rest/inverse bind matrices, mapping, mesh transforms/counts/weight hashes, material descriptors and units. `.blend` retains the actual vertices, normals, weights and Blender's imported bind state. GLB is an optional registration preview; it is not the source of truth.
 - Known canonical/Mixamo/CMU/100STYLE mappings must pass complete required joints, ancestry, nondegenerate joints, upright T-pose geometry, finite transforms and normalized original skin checks. Unknown rigs, A-pose, multiple armatures, reflections/nonuniform object scaling, shape keys, constraints and unsupported modifiers are rejected explicitly. A supported profile name alone never approves a model.
-- Texture/Video records are rejected **before** Blender resolves image paths or extracts embedded images. External textures and procedural/layered materials are not certified. There is no silent material substitution.
+- FBX Texture/Video records are rejected **before** Blender resolves image paths or extracts embedded images. External textures and procedural/layered materials are not certified. There is no silent material substitution.
 - Body pose application reuses the unchanged current `converter.retarget` solver, `import_bvh`, `apply_output_mode('rigged_rest')` and `export_fbx`. Personal import/inspection is separate because the server importer intentionally drops leaf bones and applies object transforms.
 - Both hands are currently unchanged. Each side reports `NO_FINGER_RIG` or `UNVALIDATED_FINGER_RIG` and its own detected finger count. A left-only finger fixture is tested. Finger presence does not imply validated hand-library support. Non-null hand requests fail `HAND_UNSUPPORTED`.
-- Every registration and final FBX is exported and reimported. Gates compare mesh identities/counts/topology, original bone hierarchy and world positions, solid material values, bidirectional world-space vertex error, and deformation under five FK probes (both forearms, both shins, spine). This is stronger than count-only validation; it still does not prove CSP appearance or arbitrary skinning equivalence.
+- Every registration and final FBX is exported and reimported. Gates compare mesh identities/counts/topology, original bone hierarchy and world positions, solid material values, bidirectional world-space vertex error, per-material face-region geometry, and deformation under five FK probes (both forearms, both shins, spine). This is stronger than count-only validation; it still does not prove CSP appearance or arbitrary skinning equivalence.
 - Physical units are recorded as unconfirmed. The worker preserves imported scale; a user height-calibration flow is not implemented here. Output is full-body `rigged_rest` in the source orientation, with root translation disabled. Other output modes/orientations are not silently approximated.
 - No automatic rigging, personal shape sliders, collision prevention, or guaranteed preservation of CSP expressions/clothing physics is offered.
 
@@ -28,6 +29,8 @@ A separate stdlib IPC host launches one Blender child per heavy operation. It ne
 The immutable snapshot includes local ID, original SHA, importer/normalization/mapping/converter versions, a content fingerprint of all shipped converter Python/JSON, final pose SHA, left/right hand state, output mode and orientation. A changed runtime requires reimport rather than reusing stale normalized data. `export` requires the exact `snapshotHash`; it never uses a mutable “latest output.” Previously saved files remain unchanged after later requests or model deletion. Existing destination files are never overwritten. Cached BVH lookup still verifies the selected file hash.
 
 The child strips inherited `STANDIN_*` and `CONVERTER_*` settings as well as `PYTHON*`/`BLENDER*` settings. Server/QA wrist-transfer overrides must not change a local result without changing its snapshot. The local solver uses shipped defaults; future configurable solver options must become explicit versioned snapshot fields.
+
+Before solving, the armature object's unit/axis transform is baked into its rest data using the existing core helper, with a before/after surface check. The normalized cache still retains the original imported representation. This avoids a 0.01 source-object scale turning into a 100× pose under a solver that writes unit-scale world frames. Every solved joint edge must keep its rest length; normalized surface and edge errors are recorded. `normalizationVersion` is `personal-normalize/2`.
 
 The client native implementation was read without editing its checkout. Its actual resource lookup is `resource_dir/local-converter/`; the contract matches this location. Supply the chosen target-specific builder output at that location. A debug-only `STANDIN_LOCAL_CONVERTER` override points to the packaged launcher. Launch it with only `--storage <absolute app-owned directory>`. Keep stdin open until work finishes.
 
@@ -50,12 +53,14 @@ Relocating resources may change `.py` timestamps and invalidate shipped `.pyc` f
 ```sh
 python scripts/local_converter/package_runtime.py \
   --distribution /path/to/Blender.app \
-  --target darwin-arm64 --output /path/to/new/local-converter
+  --target darwin-arm64 --output /path/to/new/local-converter \
+  --cs3c-modeler-exe /build/reviewed/CLIPStudioModeler.exe
 
 # Windows builder input is the unpacked official portable distribution.
 python scripts/local_converter/package_runtime.py \
   --distribution C:/build/blender-5.2.0-windows-x64 \
-  --target windows-x64 --output C:/build/local-converter
+  --target windows-x64 --output C:/build/local-converter \
+  --cs3c-modeler-exe C:/build/reviewed/CLIPStudioModeler.exe
 ```
 
 Supported package layouts: `darwin-arm64`, `darwin-x64`, `windows-x64`. Only **macOS arm64** was assembled/executed here. Windows and macOS x64 are layout implementations, not tested packages. `runtime-manifest.json` identifies `target`, `launcher`, `blender`, `python`, per-file SHA256 and total size. Current candidates deliberately set `releaseReady:false`.
@@ -64,18 +69,27 @@ The measured macOS resource is about 935 MB / 892 MiB uncompressed. Full-byte ma
 
 Release still requires a pristine approved runtime input, macOS signing/notarization, Windows signing/native QA, and delivery of corresponding Blender source and all dependency notices. The existing local Blender input fails `codesign --verify --deep --strict`; copying it does not make a signed release. The builder does not sign, notarize, publish, or claim licensing clearance. Blender's [license](https://www.blender.org/about/license/), [redistribution FAQ](https://www.blender.org/support/faq/) and [source license inventory](https://github.com/blender/blender/blob/main/release/license/license.md) are the upstream review sources. The background/auto-execution switches follow the [official command-line manual](https://docs.blender.org/manual/en/5.0/advanced/command_line/arguments.html).
 
-## CS3C status and fixture policy
+## CS3C conversion and decoder build dependency
 
-The adapter recognizes a bounded, read-only SQLite character catalog and the observed `CLIP_STUDIO_3D_DATA2` catalog version 2. Both supplied samples are recognized, but production import returns `CS3C_DECODER_UNAVAILABLE`; neither becomes a successful card. Unknown containers/versions return `UNSUPPORTED_CS3C_VERSION`. This is **format detection and an explicit missing-adapter boundary**, not CS3C conversion support.
+The first draft only detected CS3C and returned `CS3C_DECODER_UNAVAILABLE`; that omitted a required input path. It now converts the supplied **original CS3C files directly** into the common normalized character, applies the current Standin CMU/Mixamo pose retarget core, and exports/reimports a verified posed FBX. The two supplied originals each retain 11 meshes, 8,517 vertices and 21 original hierarchy nodes. This is new Standin-core validation, beyond the old experimental GLB test rotations.
 
-The supplied experiment and independent revalidation demonstrate original hierarchy/weights, test FK, GLB→FBX→reimport for two 11-mesh/8,517-vertex/21-node bone-shaped samples. Those facts are experimental evidence, not proof of our search retarget or general character appearance. The experimental decoder reads parameters from a hash-pinned Modeler EXE (`2ebe2d90f8609496cb2e81a7c9defae4e851479b8e5db76eb9dd8ec05d943150`) and its GLB uses diagnostic colors. This PR does not distribute that EXE, extracted key/table parameters, third-party sample originals or generated sample binaries. It does not ask end users to supply Modeler. A reviewed redistributable decoder, schema/version coverage and original appearance preservation are still needed to complete CS3C.
+The adapter supports the observed SQLite catalog version 2 with exact reviewed required-table schema identities, bounded zlib expansion, exact required-row consumption and explicit references/counts/finite-value checks. Unknown catalog versions/schemas fail `UNSUPPORTED_CS3C_VERSION`; unsupported textures, nonidentity mesh transforms, nonunit joint scale, nontriangular faces, opaque-color incompatibilities or unknown humanoid rigs fail their structured support checks. Parser framing still uses the observed table markers: collisions cause rejection rather than guessing a different schema. This is a limited schema adapter, not a complete CS3C specification.
 
-The real regression FBX/BVH files remain local. Portable evidence identifies them by SHA256. `make_fixture.py` creates authored geometry instead of checking third-party assets into Git. It covers two meshes, a transformed skinned accessory, a helper joint and left-only fingers. It does not count as an independent artist model.
+Build with `--cs3c-modeler-exe` pointing to the already reviewed Modeler 1.10.13 binary, SHA256 `2ebe2d90f8609496cb2e81a7c9defae4e851479b8e5db76eb9dd8ec05d943150`. The builder reads it strictly as data and extracts a 4,216-byte parameter payload into `converter/local/cs3c_decoder_data.json`. The payload itself is independently hash pinned; Modeler is **neither executed nor copied into the runtime**. The application bundle already contains the decoder data, Blender and Python; the end user installs none of them separately. Public redistribution suitability of the extracted resource remains a release review gate, distinct from functional conversion. `releaseReady:false` is retained.
+
+The generated decoder data is excluded from Git. Only parser/cipher code, schema/resource hashes, synthetic tests and hash-identified validation evidence are committed. The EXE, extracted parameter bytes and original third-party models remain outside Git. The resource is covered by the runtime file manifest and converter fingerprint; tampering or a missing resource fails closed. If the build omits this option, `hello.formats.cs3c=false` and CS3C import explicitly reports the missing decoder. A configured build reports true. No runtime IPC option accepts an executable, script or alternative parameter source.
+
+Unlike the experimental exporter, the adapter reads the original 39 matte source diffuse colors and assigns the original per-face material indices. It preserves source normals and UV and records original ambient/specular/emission/opacity/shininess values. The supported samples have no textures/emission/specular. Source shininess maps to Blender's FBX shininess/roughness convention. Exact diffuse values and face regions are verified through FBX roundtrip. Original CSP lighting/color-space/shading appearance is still unqualified, as are general human CS3C, textures, other versions and more complex material/transform features. No inspection-color replacement is used to claim appearance preservation.
+
+Registration independently evaluates five source FK probes using the original matrices and weights and compares their posed vertices to Blender. This detects incorrect bind/axis/weight reconstruction even when export/reimport would be self-consistent. Source weights are not silently renormalized. The display normalization maps source Y-up to Z-up at scale 0.01; physical units remain unconfirmed and source values/normalization are retained in provenance.
+
+Real regression FBX/BVH/CS3C files remain local. Portable evidence identifies source and pose hashes. `make_fixture.py` creates authored geometry rather than checking third-party assets into Git. It covers two meshes, a transformed skinned accessory, a helper joint and left-only fingers and does not count as an independent artist model.
 
 ## Reproduce checks
 
 ```sh
 python -m unittest discover -s tests/converter -p test_local_converter.py -v
+python -m unittest discover -s tests/converter -p test_cs3c_decoder.py -v
 python tests/test_smoke.py
 python -m compileall src api scripts converter
 
@@ -90,6 +104,6 @@ python scripts/local_converter/verify_runtime.py \
   --relocate-to /local/new-relocated-resource-directory
 ```
 
-See [verification-macos-arm64.json](verification-macos-arm64.json) for actual public IPC evidence. Validation covers import, optional preview, restart reuse, CMU/Mixamo library BVH apply/export, cache reuse, changed-pose rejection, unsupported hands, stale snapshots, destination preservation, active cancellation, EOF cleanup, deletion and export preservation. Library BVH use is converter QA; it is not authenticated live BFF end-to-end QA.
+See [verification-cs3c-macos-arm64.json](verification-cs3c-macos-arm64.json) for the original-CS3C conversion evidence, and [verification-macos-arm64.json](verification-macos-arm64.json) for actual public IPC evidence. Validation covers import, optional preview, restart reuse, CMU/Mixamo library BVH apply/export, cache reuse, changed-pose rejection, unsupported hands, stale snapshots, destination preservation, active cancellation, EOF cleanup, deletion and export preservation. Library BVH use is converter QA; it is not authenticated live BFF end-to-end QA.
 
-Remaining product gates: redistributable CS3C conversion, general human CS3C and at least three independent permitted models per format, textured appearance, validated personal finger mapping/deformation, physical scale confirmation, broader rest poses/transforms, signed native OS packages, real client registration/preview/reuse, authenticated BFF final-pose integration and supported CSP import. No deployment, merge, release tag or production configuration was performed.
+Remaining product gates: public redistribution review of decoder data, general human CS3C and at least three independent permitted models per format, textured appearance, validated personal finger mapping/deformation, physical scale confirmation, broader rest poses/transforms, signed native OS packages, real client registration/preview/reuse, authenticated BFF final-pose integration and supported CSP import. No deployment, merge, release tag or production configuration was performed.

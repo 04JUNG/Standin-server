@@ -26,8 +26,9 @@ def run(job):
         source = Path(job["sourcePath"])
         if source.suffix.lower() == ".cs3c":
             from converter.local.cs3c import import_character
-            import_character(source)
-        arm, meshes = inspection.import_fbx(source)
+            arm, meshes = import_character(source)
+        else:
+            arm, meshes = inspection.import_fbx(source)
         character, capabilities = inspection.inspect(arm, meshes)
         # .blend is the common representation, not a lossy preview GLB. It keeps
         # original hierarchy, bind/rest transforms, mesh transforms and weights.
@@ -51,16 +52,30 @@ def run(job):
     inspection.require(len(arms) == 1, "UNSUPPORTED_RIG", "Stored character is invalid")
     arm = arms[0]
     character, _ = inspection.inspect(arm, meshes)
+    # The shared solver writes world rotation frames of unit scale. Preserve the
+    # source representation in the cache, but bake the armature object's unit/
+    # axis transform into its rest data before solving, just as the server core
+    # importer does. Otherwise a 0.01 CS3C object scale becomes 100x pose scale.
+    before_normalization = inspection.surface(meshes)
+    rt._apply_object_transform(arm)
+    normalization_error = inspection.surface_error(before_normalization, inspection.surface(meshes))
+    inspection.require(normalization_error < 2e-5, "INVALID_SKIN", "Target normalization changed the original surface")
+    rest_edges = {b.name: (b.head_local-b.parent.head_local).length
+                  for b in arm.data.bones if b.parent}
     src = rt.import_bvh(job["posePath"], frame=0)
     inspection.require(len(src.data.bones) <= 512, "LIMIT_EXCEEDED", "Pose skeleton exceeds the local limit")
     report = rt.retarget(src, arm, dst_profile=character["profile"], apply_root_translation=False)
     inspection.require(report.ok, "CONVERSION_FAILED", "Retarget rejected the selected pose")
+    edge_error = max(abs((arm.pose.bones[name].head-arm.pose.bones[name].parent.head).length-length)
+                     for name,length in rest_edges.items())
+    inspection.require(edge_error < 2e-5, "CONVERSION_FAILED", "Retarget changed the character's joint lengths")
     bpy.data.objects.remove(src, do_unlink=True)
     rt.apply_output_mode(arm, meshes, "rigged_rest")
     validation = inspection.roundtrip(arm, meshes, work / "result.fbx", character["mapping"])
     return {"snapshot": job["snapshot"], "snapshotHash": job["snapshotHash"],
             "artifactHash": sha256(work / "result.fbx"), "validation": validation,
-            "retarget": report.as_dict(), "selectionId": job["selectionId"]}
+            "retarget": {**report.as_dict(), "local_normalization_surface_error": normalization_error,
+                         "max_joint_edge_length_error": edge_error}, "selectionId": job["selectionId"]}
 
 
 def main():

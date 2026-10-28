@@ -3,10 +3,10 @@
   "$id": "urn:standin:local-converter:1",
   "protocolVersion": "standin.local-converter/1",
   "versions": {
-    "importerVersion": "personal-import/1",
-    "normalizationVersion": "personal-normalize/1",
-    "rigMappingVersion": "personal-rig/1",
-    "converterVersion": "personal-converter/1",
+    "importerVersion": "personal-import/2",
+    "normalizationVersion": "personal-normalize/2",
+    "rigMappingVersion": "personal-rig/2",
+    "converterVersion": "personal-converter/2",
     "converterFingerprint": "runtime-computed SHA256 of all shipped converter Python and JSON files"
   },
   "transport": {
@@ -30,8 +30,8 @@
     ],
     "manualInstallRequired": false,
     "network": false,
-    "CS3C": "recognized but fail-closed CS3C_DECODER_UNAVAILABLE until redistributable decoder and materials are validated",
-    "manifest": "runtime-manifest.json beside launcher: schemaVersion, protocolVersion, target, launcher, blender, python, files (SHA256), uncompressedBytes, requiresUserInstalledRuntime=false, releaseReady=false",
+    "CS3C": "Catalog version 2 / reviewed schema family: original skinned geometry, matte source diffuse colors, per-face assignments and UV/normals. Requires separately bundled hash-pinned decoder data. No Modeler/Python/Blender user installation. Missing resource fails explicitly.",
+    "manifest": "runtime-manifest.json beside launcher: schemaVersion, protocolVersion, target, launcher, blender, python, files (SHA256), uncompressedBytes, requiresUserInstalledRuntime=false, releaseReady=false; cs3c.enabled and build-only source/hash provenance",
     "launch": "spawn launcher with --storage <absolute app-owned storage>; keep stdin open, parse stdout NDJSON; kill host only after cancel/terminal, EOF cancels child and cleans staging",
     "signing": "Current test candidate is unsigned/unqualified; client must not advertise released support.",
     "resourceMapping": "Builder produces a target-specific resource directory; client copies that directory to resources/local-converter at app build time. Manifest.target records the chosen platform."
@@ -374,15 +374,15 @@
   ],
   "commit": "A model appears only after import inspection, FK deformation probe, FBX roundtrip and atomic rename. Errors/cancel never replace an existing model. Export requires immutable snapshotHash and never overwrites a destination.",
   "resultPaths": "absolute device-only paths; never send to telemetry or server",
-  "scope": "Draft implementation: FBX known T-pose solid-material skinned humanoids; CS3C and hand changes are blocked, no collision prevention/shape sliders/auto-rigging.",
+  "scope": "FBX and CS3C known upright T-pose skinned humanoids with supported solid materials; body-only hands. Textures, nonidentity CS3C mesh transforms, source shading match and general-human CS3C remain unqualified.",
   "results": {
     "hello": {
       "protocolVersion": "standin.local-converter/1",
       "versions": {
-        "importerVersion": "personal-import/1",
-        "normalizationVersion": "personal-normalize/1",
-        "rigMappingVersion": "personal-rig/1",
-        "converterVersion": "personal-converter/1",
+        "importerVersion": "personal-import/2",
+        "normalizationVersion": "personal-normalize/2",
+        "rigMappingVersion": "personal-rig/2",
+        "converterVersion": "personal-converter/2",
         "converterFingerprint": "runtime-computed SHA256 of all shipped converter Python and JSON files"
       },
       "limits": {
@@ -398,7 +398,7 @@
       },
       "formats": {
         "fbx": true,
-        "cs3c": false
+        "cs3c": "boolean: validated decoder resource is bundled"
       },
       "hands": false
     },
@@ -432,13 +432,13 @@
     "localModelId": "id",
     "sourceHash": "sha256",
     "versions": {
-      "importerVersion": "personal-import/1",
-      "normalizationVersion": "personal-normalize/1",
-      "rigMappingVersion": "personal-rig/1",
-      "converterVersion": "personal-converter/1",
+      "importerVersion": "personal-import/2",
+      "normalizationVersion": "personal-normalize/2",
+      "rigMappingVersion": "personal-rig/2",
+      "converterVersion": "personal-converter/2",
       "converterFingerprint": "runtime-computed SHA256 of all shipped converter Python and JSON files"
     },
-    "sourceFormat": "fbx",
+    "sourceFormat": "fbx | cs3c",
     "capabilities": "capability",
     "character": "hierarchy, local/world and inverse bind matrices, original mesh transforms, weights hash, counts, solid material descriptors, units and mapping",
     "normalizedPath": "immutable .blend local path",
@@ -594,6 +594,14 @@
         },
         "blenderVersion": {
           "type": "string"
+        },
+        "maxMaterialRegionError": {
+          "type": "number",
+          "minimum": 0
+        },
+        "materialCount": {
+          "type": "integer",
+          "minimum": 0
         }
       },
       "required": [
@@ -605,7 +613,9 @@
         "maxSkinProbeError",
         "tolerance",
         "fkProbes",
-        "blenderVersion"
+        "blenderVersion",
+        "maxMaterialRegionError",
+        "materialCount"
       ],
       "additionalProperties": false
     },
@@ -642,7 +652,10 @@
           "pattern": "^[0-9a-f]{64}$"
         },
         "sourceFormat": {
-          "const": "fbx"
+          "enum": [
+            "fbx",
+            "cs3c"
+          ]
         },
         "versions": {
           "$ref": "#/$defs/versions"
@@ -872,7 +885,7 @@
               "const": true
             },
             "cs3c": {
-              "const": false
+              "type": "boolean"
             }
           },
           "required": [
@@ -1130,5 +1143,6 @@
     {
       "$ref": "#/$defs/resultEvent"
     }
-  ]
+  ],
+  "contractRevision": 2
 }

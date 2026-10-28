@@ -152,9 +152,10 @@ class Host:
                 self.seen.add(request_id)
                 action = req["action"]
                 if action == "hello":
+                    from converter.local.cs3c import decoder_available
                     self.event(request_id, "result", result={"protocolVersion": PROTOCOL,
                                "versions": versions(), "limits": LIMITS,
-                               "formats": {"fbx": True, "cs3c": False}, "hands": False})
+                               "formats": {"fbx": True, "cs3c": decoder_available()}, "hands": False})
                     return
                 if action == "cancel":
                     accepted = self.active == req["targetRequestId"] and not self.committed

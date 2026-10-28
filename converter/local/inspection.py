@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import math
 import struct
 import zlib
@@ -138,6 +139,8 @@ def solid_materials(meshes):
 
 
 def inspect(arm, meshes):
+    from converter.local.rig_profiles import register
+    register()
     bones = arm.data.bones
     require(len(meshes) <= LIMITS["meshes"] and len(bones) <= LIMITS["bones"]
             and sum(len(m.data.vertices) for m in meshes) <= LIMITS["vertices"],
@@ -219,6 +222,8 @@ def inspect(arm, meshes):
                             "inverseBindMatrix": matrix((arm.matrix_world @ b.matrix_local).inverted())}
                            for b in bones],
                  "meshes": mesh_info, "materials": solid_materials(meshes)}
+    if "standin_cs3c_provenance" in arm:
+        character["sourceFormatDetails"] = json.loads(arm["standin_cs3c_provenance"])
     return character, {"supportLevel": "body_only", "bodyPose": True, "hands": hands,
                        "collisionPrevention": False, "shapeSliders": False}
 
@@ -263,12 +268,27 @@ def deformation_probe(arm, meshes, table, joint="forearm.L"):
             "surface": posed}
 
 
+def material_regions(meshes, points):
+    """Per-material face centers: independent of FBX face/slot reordering."""
+    regions = {}
+    for mesh in meshes:
+        for polygon in mesh.data.polygons:
+            material = (mesh.material_slots[polygon.material_index].material
+                        if polygon.material_index < len(mesh.material_slots) else None)
+            key = (mesh.name, material.name if material else None)
+            center = tuple(sum(points[mesh.name][v][axis] for v in polygon.vertices) / len(polygon.vertices)
+                           for axis in range(3))
+            regions.setdefault(str(key), []).append(center)
+    return regions
+
+
 def roundtrip(arm, meshes, path, table):
     from converter import retarget as rt
     before = surface(meshes)
     original_bones = {b.name: (b.parent.name if b.parent else None,
                               tuple(arm.matrix_world @ b.head_local)) for b in arm.data.bones}
     material_before = solid_materials(meshes)
+    regions_before = material_regions(meshes, before)
     polygons_before = {m.name: len(m.data.polygons) for m in meshes}
     # Probe the *output* rest pose too: this checks that exported skin still follows bones.
     probe_before = {joint: deformation_probe(arm, meshes, table, joint)
@@ -276,10 +296,13 @@ def roundtrip(arm, meshes, path, table):
     rt.export_fbx(str(path), embed_textures=False)
     bpy.ops.wm.read_factory_settings(use_empty=True)
     after_arm, after_meshes = import_fbx(path)
-    error = surface_error(before, surface(after_meshes))
+    after_points = surface(after_meshes)
+    error = surface_error(before, after_points)
     extent = max((math.dist(p, (0, 0, 0)) for points in before.values() for p in points), default=1)
     tolerance = max(1e-5, extent * 1e-5)
     require(error <= tolerance, "ROUNDTRIP_FAILED", "Posed surface changed during FBX roundtrip")
+    material_region_error = surface_error(regions_before, material_regions(after_meshes, after_points))
+    require(material_region_error <= tolerance, "ROUNDTRIP_FAILED", "Face material regions changed during FBX roundtrip")
     for name, (parent, head) in original_bones.items():
         bone = after_arm.data.bones.get(name)
         require(bone is not None and (bone.parent.name if bone.parent else None) == parent,
@@ -302,5 +325,6 @@ def roundtrip(arm, meshes, path, table):
     require(probe_error <= tolerance, "ROUNDTRIP_FAILED", "Skin deformation changed during FBX roundtrip")
     return {"passed": True, "meshCount": len(after_meshes), "originalBoneCount": len(original_bones),
             "vertexCount": sum(len(p) for p in before.values()), "maxSurfaceError": error,
-            "maxSkinProbeError": probe_error, "tolerance": tolerance, "fkProbes": probe_after,
+            "maxSkinProbeError": probe_error, "maxMaterialRegionError": material_region_error,
+            "materialCount": len(material_before), "tolerance": tolerance, "fkProbes": probe_after,
             "blenderVersion": bpy.app.version_string}

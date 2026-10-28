@@ -1,13 +1,13 @@
 {
   "protocolVersion": "standin.local-converter/1",
   "scope": "Packaged macOS public IPC with real FBX and library BVH; no BFF/CSP/Windows qualification",
-  "startupSeconds": 9.523976124823093,
+  "startupSeconds": 7.224090917035937,
   "versions": {
-    "importerVersion": "personal-import/1",
-    "normalizationVersion": "personal-normalize/1",
-    "rigMappingVersion": "personal-rig/1",
-    "converterVersion": "personal-converter/1",
-    "converterFingerprint": "01b4037b1584c814862737b8c9d6666fd10298761d91bb564c394bc7cca74bf5"
+    "importerVersion": "personal-import/2",
+    "normalizationVersion": "personal-normalize/2",
+    "rigMappingVersion": "personal-rig/2",
+    "converterVersion": "personal-converter/2",
+    "converterFingerprint": "664cb8e8313a328db5df5aedb2b908895e265faa70b7510ff6d7fad6e398662f"
   },
   "sourceHash": "0673f79c0c118f5db009323a54ac223dafd7f6dc79ec35e016fd21e110f82b68",
   "registration": {
@@ -18,6 +18,8 @@
       "vertexCount": 24988,
       "maxSurfaceError": 4.917383193969727e-07,
       "maxSkinProbeError": 5.280984964883828e-07,
+      "maxMaterialRegionError": 4.917383193969727e-07,
+      "materialCount": 1,
       "tolerance": 1.750106643381947e-05,
       "fkProbes": {
         "forearm.L": {
@@ -67,106 +69,114 @@
       "shapeSliders": false
     },
     "metrics": {
-      "elapsedSeconds": 2.244340708013624,
-      "peakResidentBytes": 387776512
+      "elapsedSeconds": 2.5972990840673447,
+      "peakResidentBytes": 389431296
     }
   },
   "outputs": [
     {
-      "snapshotHash": "ff1f05bda99110abd55ee62365ca8a69e7fa11ee13f1d98ee5165c4e13292e6c",
-      "artifactHash": "dc3381111256c629a3992ea7ddd0c586a0c9157e05e2b1764897b7e08ba49f57",
+      "snapshotHash": "ed7f9e773eb455d8553fc34061be06dd459500693b5112bbc0c0eb3a20a8c70a",
+      "artifactHash": "b0c256ab34067a06d84e88c60ec693331137c322d3a33a1e020c83edcdd20197",
       "validation": {
         "passed": true,
         "meshCount": 1,
         "originalBoneCount": 57,
         "vertexCount": 24988,
-        "maxSurfaceError": 4.4229096829440095e-07,
-        "maxSkinProbeError": 4.4915631747244333e-07,
-        "tolerance": 1.4539643014029532e-05,
+        "maxSurfaceError": 3.8194673379621236e-07,
+        "maxSkinProbeError": 5.99204554418975e-07,
+        "maxMaterialRegionError": 3.8194673379621236e-07,
+        "materialCount": 1,
+        "tolerance": 1.4539646852072222e-05,
         "fkProbes": {
           "forearm.L": {
             "joint": "forearm.L",
             "rotationRadians": 0.25,
-            "maxVertexDisplacement": 0.10561659635637093
+            "maxVertexDisplacement": 0.10561655600662456
           },
           "forearm.R": {
             "joint": "forearm.R",
             "rotationRadians": 0.25,
-            "maxVertexDisplacement": 0.11422660427093798
+            "maxVertexDisplacement": 0.11422680543166608
           },
           "leg.L": {
             "joint": "leg.L",
             "rotationRadians": 0.25,
-            "maxVertexDisplacement": 0.12812624895405358
+            "maxVertexDisplacement": 0.12812628411225058
           },
           "leg.R": {
             "joint": "leg.R",
             "rotationRadians": 0.25,
-            "maxVertexDisplacement": 0.12454319198775975
+            "maxVertexDisplacement": 0.1245431682453302
           },
           "spine": {
             "joint": "spine",
             "rotationRadians": 0.25,
-            "maxVertexDisplacement": 0.1965578093539697
+            "maxVertexDisplacement": 0.19655827319779048
           }
         },
         "blenderVersion": "5.2.0 LTS"
       },
       "metrics": {
-        "elapsedSeconds": 1.8363903330173343,
-        "peakResidentBytes": 369770496
+        "elapsedSeconds": 1.8758826670236886,
+        "peakResidentBytes": 375865344
       },
       "poseHash": "7f667dd3d7c1bf4ccdcffcb65da843269a9cc0e449d0ae7ab82bc03e1f25640b",
       "cacheReusePassed": true,
-      "exportPassed": true
+      "exportPassed": true,
+      "targetNormalizationSurfaceError": 2.4620757699267415e-07,
+      "maxJointEdgeLengthError": 3.2028486213198093e-07
     },
     {
-      "snapshotHash": "74661d8333308605e5a431f891c7b56ff6b57330b78d58b88f1c37b515ec1426",
-      "artifactHash": "114b24c4584d24febcd0fdd962a91a40a85974a08b0d3041bfbd5a0641bcd33f",
+      "snapshotHash": "74982af648f6a3084fac410dd5f0180d2ac10a9d1bd46e1b862780a9d221f313",
+      "artifactHash": "1d08d57206a958379d5afc6a6b208bd17bfda501fe20a2320b6be2cd0062ecb7",
       "validation": {
         "passed": true,
         "meshCount": 1,
         "originalBoneCount": 57,
         "vertexCount": 24988,
-        "maxSurfaceError": 5.059816317043442e-07,
-        "maxSkinProbeError": 6.824097340540902e-07,
-        "tolerance": 1.6688350514045923e-05,
+        "maxSurfaceError": 5.682713322130439e-07,
+        "maxSkinProbeError": 8.277273195744783e-07,
+        "maxMaterialRegionError": 5.701063514607085e-07,
+        "materialCount": 1,
+        "tolerance": 1.6688350164858518e-05,
         "fkProbes": {
           "forearm.L": {
             "joint": "forearm.L",
             "rotationRadians": 0.25,
-            "maxVertexDisplacement": 0.08521237188078126
+            "maxVertexDisplacement": 0.08521238349200248
           },
           "forearm.R": {
             "joint": "forearm.R",
             "rotationRadians": 0.25,
-            "maxVertexDisplacement": 0.09009051660054941
+            "maxVertexDisplacement": 0.09009035846021939
           },
           "leg.L": {
             "joint": "leg.L",
             "rotationRadians": 0.25,
-            "maxVertexDisplacement": 0.15559886846115287
+            "maxVertexDisplacement": 0.15559881897165465
           },
           "leg.R": {
             "joint": "leg.R",
             "rotationRadians": 0.25,
-            "maxVertexDisplacement": 0.1436194547597406
+            "maxVertexDisplacement": 0.14361911885879122
           },
           "spine": {
             "joint": "spine",
             "rotationRadians": 0.25,
-            "maxVertexDisplacement": 0.19740194259123106
+            "maxVertexDisplacement": 0.1974023175545336
           }
         },
         "blenderVersion": "5.2.0 LTS"
       },
       "metrics": {
-        "elapsedSeconds": 1.839113041991368,
-        "peakResidentBytes": 371310592
+        "elapsedSeconds": 1.9657470411621034,
+        "peakResidentBytes": 374784000
       },
       "poseHash": "d22cabce87b52e3b86cf07c74b29b30a2bb76bd536167baec981ff4e88565216",
       "cacheReusePassed": true,
-      "exportPassed": true
+      "exportPassed": true,
+      "targetNormalizationSurfaceError": 2.4620757699267415e-07,
+      "maxJointEdgeLengthError": 1.7451517553279672e-07
     }
   ],
   "restartReusePassed": true,
@@ -176,32 +186,21 @@
   "activeCancellationPassed": true,
   "eofCancellationPassed": true,
   "deletePreservesExportsPassed": true,
-  "cs3cFailClosedPassed": true,
+  "sourceFormat": "fbx",
+  "cs3cConversionPassed": true,
+  "cs3cFailClosedPassed": false,
   "allPassed": true,
   "packageIntegrityAfterRepeatedStarts": {
-    "manifestFiles": 6572,
+    "manifestFiles": 6574,
     "changed": 0,
     "extra": 0
   },
-  "copiedWithoutPreservingTimestamps": true,
-  "jsonSchemaValidation": {
-    "validRequestsAndEvents": 58,
-    "intentionalUnsupportedHandRequestsRejected": 2,
-    "schema": "converter-client-contract.v1.json"
-  },
-  "nativeBlenderRegressionTests": {
-    "passed": 3,
-    "scope": [
-      "declared expanded array limit",
-      "actual zlib output bound",
-      "authored two-mesh transformed-clothing/helper/left-only-finger FBX roundtrip"
-    ]
-  },
+  "copiedWithoutPreservingTimestamps": false,
   "unitAndRegressionTests": {
     "smokePassed": 54,
-    "pytestPassed": 87,
-    "pytestSubtestsPassed": 8
+    "pytestPassed": 93,
+    "pytestSubtestsPassed": 8,
+    "nativeBlenderPassed": 3
   },
-  "workingDirectoryOutsideRepository": true,
-  "hostileInheritedSolverSettingsRejected": true
+  "formalSchemaRecordsValidated": 65
 }

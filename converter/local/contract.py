@@ -7,8 +7,8 @@ import re
 from pathlib import Path
 
 PROTOCOL = "standin.local-converter/1"
-VERSIONS = {"importerVersion": "personal-import/1", "normalizationVersion": "personal-normalize/1",
-            "rigMappingVersion": "personal-rig/1", "converterVersion": "personal-converter/1"}
+VERSIONS = {"importerVersion": "personal-import/2", "normalizationVersion": "personal-normalize/2",
+            "rigMappingVersion": "personal-rig/2", "converterVersion": "personal-converter/2"}
 LIMITS = {"sourceBytes": 128 * 1024**2, "poseBytes": 8 * 1024**2,
           "vertices": 1_000_000, "bones": 512, "meshes": 128,
           "workerSeconds": 120, "workerMemoryBytes": 2 * 1024**3,
