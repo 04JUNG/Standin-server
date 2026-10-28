@@ -75,6 +75,12 @@ if (!output) throw Error("Usage: node capture_review.cjs URL OUTPUT_DIRECTORY");
       await page.evaluate((s) => skinPreview.setSkin(s), skin);
       await save(`${model}-${skin}-detail`);
     }
+    await page.evaluate(() => skinPreview.setAngle("front"));
+    await page.evaluate(() => skinPreview.setDetail("pelvis"));
+    for (const skin of ["gray-guide", "flesh-guide"]) {
+      await page.evaluate((s) => skinPreview.setSkin(s), skin);
+      await save(`${model}-${skin}-join-detail`);
+    }
     await page.evaluate(() => skinPreview.setDetail(false));
   }
   const comparisonLayouts = [];

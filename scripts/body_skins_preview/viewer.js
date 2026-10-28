@@ -3,6 +3,10 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 const $ = (s) => document.querySelector(s),
   canvas = $("#canvas");
+const skinStyle = await fetch("./skin_style.json?v=0.1.2").then((response) => {
+  if (!response.ok) throw new Error("Skin style load failed");
+  return response.json();
+});
 const skins = [
   { id: "default", name: "기본", en: "Original neutral", base: null, mode: 0 },
   {
@@ -12,12 +16,18 @@ const skins = [
     base: "#dddfe2",
     mode: 1,
   },
-  { id: "flesh", name: "살색", en: "Soft flesh", base: "#ddb7a1", mode: 0 },
+  {
+    id: "flesh",
+    name: "살색",
+    en: "Soft flesh",
+    base: skinStyle.flesh.base_color_srgb,
+    mode: 0,
+  },
   {
     id: "flesh-guide",
     name: "살색 · 가이드선",
     en: "Flesh + construction",
-    base: "#ddb7a1",
+    base: skinStyle.flesh.base_color_srgb,
     mode: 1,
   },
   {
@@ -28,10 +38,14 @@ const skins = [
     mode: 2,
   },
 ];
+const requestedSkin = new URLSearchParams(location.search).get("skin");
+const initialSkin = skins.some((s) => s.id === requestedSkin)
+  ? requestedSkin
+  : "gray-guide";
 $("#skins").innerHTML = skins
   .map(
     (s, i) =>
-      `<button class="skin ${i === 1 ? "active" : ""}" data-skin="${s.id}"><span class="swatch ${s.mode === 1 ? "guide" : s.mode === 2 ? "muscle" : ""}" style="--base:${s.base || "#dddfe2"}"></span><span><strong>${s.name}</strong><small>${s.en}</small></span><em>0${i + 1}</em></button>`,
+      `<button class="skin ${s.id === initialSkin ? "active" : ""}" data-skin="${s.id}"><span class="swatch ${s.mode === 1 ? "guide" : s.mode === 2 ? "muscle" : ""}" style="--base:${s.base || "#dddfe2"}"></span><span><strong>${s.name}</strong><small>${s.en}</small></span><em>0${i + 1}</em></button>`,
   )
   .join("");
 const renderer = new THREE.WebGLRenderer({
@@ -82,7 +96,7 @@ const loader = new GLTFLoader(),
 let models = [],
   model = "male",
   pose = "standing",
-  skin = "gray-guide",
+  skin = initialSkin,
   angle = "front",
   comparing = false,
   detail = false,
@@ -106,28 +120,34 @@ async function load() {
   if (!masks.has(model))
     masks.set(
       model,
-      textureLoader.loadAsync(`assets/${model}-masks.png`).then((t) => {
-        t.flipY = false;
-        t.generateMipmaps = false;
-        t.minFilter = THREE.LinearFilter;
-        t.colorSpace = THREE.NoColorSpace;
-        t.anisotropy = renderer.capabilities.getMaxAnisotropy();
-        return t;
-      }),
+      textureLoader
+        .loadAsync(`assets/${model}-masks.png?v=${skinStyle.version}`)
+        .then((t) => {
+          t.flipY = false;
+          t.generateMipmaps = false;
+          t.minFilter = THREE.LinearFilter;
+          t.colorSpace = THREE.NoColorSpace;
+          t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+          return t;
+        }),
     );
   return Promise.all([cache.get(key), masks.get(model)]);
 }
 function material(s, mask) {
   const mat = new THREE.MeshStandardMaterial({ roughness: 0.8, metalness: 0 });
+  const isFlesh = s.id === "flesh" || s.id === "flesh-guide";
   if (s.id === "default" || s.id === "gray-guide")
     mat.color.setRGB(0.72, 0.74, 0.76);
   else mat.color.set(s.base);
   if (s.id === skin && settings.base && s.id !== "default")
     mat.color.set(settings.base);
+  if (isFlesh) {
+    mat.emissive.copy(mat.color);
+    mat.emissiveIntensity = skinStyle.flesh.preview_emissive_fill;
+  }
   if (!s.mode) return mat;
   mat.map = mask;
-  mat.customProgramCacheKey = () =>
-    `standin-skin-v1-${s.mode}-${s.id === skin}`;
+  mat.customProgramCacheKey = () => `standin-skin-v2-${s.id}-${s.id === skin}`;
   mat.onBeforeCompile = (shader) => {
     const active = s.id === skin;
     shader.uniforms.skinWidth = { value: active ? settings.width : 1 };
@@ -138,10 +158,20 @@ function material(s, mask) {
     shader.fragmentShader =
       "uniform float skinWidth; uniform float skinOpacity; uniform vec3 centerInk, guideInk, muscleInk;\n" +
       shader.fragmentShader;
+    shader.uniforms.fleshFill = {
+      value: skinStyle.flesh.preview_emissive_fill,
+    };
+    shader.fragmentShader =
+      "uniform float fleshFill;\n" + shader.fragmentShader;
     shader.fragmentShader = shader.fragmentShader.replace(
       "#include <map_fragment>",
       `vec3 fields=texture2D(map,vMapUv).rgb;\n${s.mode === 1 ? `float cw=1.0-(.0022*skinWidth/.006);float gw=1.0-(.00135*skinWidth/.006);float ca=smoothstep(cw-max(.018,fwidth(fields.r)*.65),cw+max(.018,fwidth(fields.r)*.65),fields.r);float ga=smoothstep(gw-max(.018,fwidth(fields.g)*.65),gw+max(.018,fwidth(fields.g)*.65),fields.g);diffuseColor.rgb=mix(diffuseColor.rgb,guideInk,ga*.62*skinOpacity/.9);diffuseColor.rgb=mix(diffuseColor.rgb,centerInk,min(1.0,ca*skinOpacity/.9));` : `float mw=1.0-(.00165*skinWidth/.006);float ma=smoothstep(mw-max(.018,fwidth(fields.b)*.65),mw+max(.018,fwidth(fields.b)*.65),fields.b);diffuseColor.rgb=mix(diffuseColor.rgb,muscleInk,ma*skinOpacity);`}`,
     );
+    if (isFlesh)
+      shader.fragmentShader = shader.fragmentShader.replace(
+        "#include <emissivemap_fragment>",
+        "totalEmissiveRadiance = diffuseColor.rgb * fleshFill;",
+      );
   };
   return mat;
 }
@@ -200,7 +230,13 @@ function frame() {
   const { width, height } = canvas.getBoundingClientRect();
   renderer.setSize(width, height, false);
   const ratio = width / height;
-  let half = comparing ? Math.max(1.12, 2.08 / ratio) : detail ? 0.46 : 1.05;
+  let half = comparing
+    ? Math.max(1.12, 2.08 / ratio)
+    : detail === "pelvis"
+      ? 0.34
+      : detail
+        ? 0.46
+        : 1.05;
   camera.left = -half * ratio;
   camera.right = half * ratio;
   camera.top = half;
@@ -209,7 +245,13 @@ function frame() {
   camera.updateProjectionMatrix();
   const target = new THREE.Vector3(
       0,
-      detail && !comparing ? 1.37 : pose === "seated" ? 0.99 : 0.87,
+      detail && !comparing
+        ? detail === "pelvis"
+          ? 1.01
+          : 1.37
+        : pose === "seated"
+          ? 0.99
+          : 0.87,
       0,
     ),
     r = 5;
@@ -352,7 +394,7 @@ $("#save").onclick = () => {
 };
 controls.addEventListener("change", render);
 new ResizeObserver(frame).observe(canvas.parentElement);
-$("#base-color").value = "#dddfe2";
+$("#base-color").value = skins.find((s) => s.id === skin).base || "#dddfe2";
 rebuild().catch((e) => {
   $("#loading").textContent = "모델 로드 실패: " + e.message;
   diagnostics.errors.push(e.stack);

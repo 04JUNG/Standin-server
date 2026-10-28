@@ -8,6 +8,7 @@ import numpy as np
 from PIL import Image
 
 P=argparse.ArgumentParser();P.add_argument('--assets',required=True);P.add_argument('--id',required=True);P.add_argument('--resolution',type=int,default=4096);a=P.parse_args();root=Path(a.assets);N=a.resolution
+style=json.loads((Path(__file__).with_name('skin_style.json')).read_text())
 z=np.load(root/(a.id+'-surface.npz'));pos=z['positions'];tris=z['triangles'];uvs=z['uv'];h=pos[:,2].max()/1.78
 xyz=np.full((N,N,3),np.nan,np.float32);occupied=np.zeros((N,N),bool);overlaps=0;overlap_pixels=[]
 for inds,uv in zip(tris,uvs):
@@ -62,9 +63,9 @@ def smooth(points):
   out.extend(.5*((2*p[i])+(-p[i-1]+p[i+1])*t+(2*p[i-1]-5*p[i]+4*p[i+1]-p[i+2])*t*t+(-p[i-1]+3*p[i]-3*p[i+1]+p[i+2])*t*t*t))
  return np.array(out,dtype=np.float32)
 
-def path(name,points,channel=2,side='front',mirror=True):
- if channel==0 and side=='both':
-  path(name,points,channel,'front',mirror);path(name,points,channel,'back',mirror);return
+def path(name,points,channel=2,side='front',mirror=True,projected=False,z_min=None,z_max=None):
+ if (channel==0 or projected) and side=='both':
+  path(name,points,channel,'front',mirror,projected,z_min,z_max);path(name,points,channel,'back',mirror,projected,z_min,z_max);return
  for sign in ([1,-1] if mirror else [1]):
   pts=np.array(points,dtype=np.float32);pts[:,0]*=sign
   # Match rest bone stations; women have a shorter upper arm, longer forearm.
@@ -73,27 +74,31 @@ def path(name,points,channel=2,side='front',mirror=True):
   s=smooth(pts)
   front=(Y<.025) if side=='front' else (Y>.025) if side=='back' else np.ones_like(Y,dtype=bool)
   select=front&(X>=s[:,0].min()-radius)&(X<=s[:,0].max()+radius)&(Z>=s[:,1].min()-radius)&(Z<=s[:,1].max()+radius)
-  if channel in (0,2):
+  if channel in (0,2) or projected:
    s=project_to_surface(s,side);finite=np.isfinite(s[:,0])
    if finite.sum()<2:continue
    good=s[finite]
    select=(X>=good[:,0].min()-radius)&(X<=good[:,0].max()+radius)&(Z>=good[:,2].min()-radius)&(Z<=good[:,2].max()+radius)&(Y>=good[:,1].min()-radius)&(Y<=good[:,1].max()+radius)
-  idx=np.flatnonzero(select);v=samples[idx] if channel in (0,2) else np.column_stack([X[idx],Z[idx]]);dist=np.full(len(idx),radius,np.float32)
+  if z_min is not None:select&=Z>=z_min
+  if z_max is not None:select&=Z<=z_max
+  idx=np.flatnonzero(select);v=samples[idx] if channel in (0,2) or projected else np.column_stack([X[idx],Z[idx]]);dist=np.full(len(idx),radius,np.float32)
   for p,q in zip(s,s[1:]):
    if not np.isfinite(p).all() or not np.isfinite(q).all() or np.linalg.norm(q-p)>.035:continue
    d=q-p;t=np.clip(((v-p)*d).sum(1)/max(float(d@d),1e-12),0,1);dist=np.minimum(dist,np.linalg.norm(v-(p+t[:,None]*d),axis=1))
   masks[idx,channel]=np.maximum(masks[idx,channel],np.clip(1-dist/radius,0,1))
-  paths.append({'name':name+(' L' if sign==1 else ' R') if mirror else name,'channel':channel,'surface':side,'points':pts.tolist()})
+  paths.append({'name':name+(' L' if sign==1 else ' R') if mirror else name,'channel':channel,'surface':side,'points':pts.tolist(),'projected':projected or channel in (0,2),'z_min':z_min,'z_max':z_max})
 
 # Sparse cross sections at anatomical stations, plus surface meridians.
 path('sagittal center',[(0,.78),(0,.94),(0,1.15),(0,1.44),(0,1.58),(0,1.79)],0,'both',False)
 for zz,name in [(1.657,'eye level'),(1.492,'neck base')]:path(name,[(-.13,zz),(0,zz),(.13,zz)],1,'both',False)
 for zz,name in [(1.365,'chest upper'),(1.270,'chest lower'),(1.135,'waist'),(1.025,'pelvis')]:
  path(name,[(-.18,zz),(-.09,zz-.006),(0,zz-.009),(.09,zz-.006),(.18,zz)],1,'both',False)
-path('torso volume meridian',[(.08,1.46),(.115,1.36),(.113,1.27),(.093,1.14),(.108,1.03),(.112,.95),(.108,.82),(.101,.67),(.093,.514),(.107,.39),(.093,.26),(.084,.105),(.073,.03)],1,'both')
+join=style['guide_join'];join_z=join['height_m_in_1_78m_rest_model'];overlap=join['overlap_m'];meridian=join['shared_curve']
+path('shared torso-to-leg meridian gray',meridian,1,'both',projected=True,z_min=join_z-overlap)
+path('shared torso-to-leg meridian orange',meridian,0,'both',projected=True,z_max=join_z+overlap)
+path('thigh-root section',[(.015,.895),(.05,.91),(.112,.94),(.17,.965)],1,'both')
 path('arm axis',[(.10,1.466),(.16,1.457),(.205,1.431),(.32,1.410),(.453,1.401),(.58,1.396),(.70,1.394),(.775,1.383)],0,'both')
 for xx,name in [(.30,'upper arm section'),(.453,'elbow'),(.58,'forearm section'),(.70,'wrist')]:path(name,[(xx,1.31),(xx,1.50)],1,'both')
-path('leg axis',[(.078,.93),(.075,.78),(.072,.514),(.073,.31),(.073,.105)],0,'both')
 for zz,name in [(.78,'thigh section'),(.514,'knee'),(.31,'calf section'),(.105,'ankle')]:path(name,[(.015,zz),(.17,zz)],1,'both')
 
 # Front: neck tendons, pectoral arc, deltoid cap, rectus and oblique borders.
@@ -149,7 +154,7 @@ Image.fromarray(mask).save(root/(a.id+'-masks.png'))
 (root/(a.id+'-uv-report.json')).write_text(json.dumps({'resolution':N,'covered_pixels':int(core.sum()),'uv_overlap_pixels':overlaps,'uv_overlap_fraction':overlaps/max(1,int(core.sum())),'gutter_px':5,'distance_range_m':radius,'authored_paths':len(paths),'overlap_pixels_near_ink':int((mask.reshape(-1,3)[overlap_pixels].max(axis=1)>127).sum()) if overlap_pixels else 0},indent=2))
 # Portable ordinary color textures; the preview can recompose these from masks.
 linear=np.array([.72,.74,.76]);gray=np.where(linear<=.0031308,linear*12.92,1.055*linear**(1/2.4)-.055)*255
-for name,base,guide,muscle in [('gray-guide',gray,True,False),('flesh',[221,183,161],False,False),('flesh-guide',[221,183,161],True,False),('muscle',[211,195,177],False,True)]:
+for name,base,guide,muscle in [('gray-guide',gray,True,False),('flesh',style['flesh']['reference_sample_rgb'],False,False),('flesh-guide',style['flesh']['reference_sample_rgb'],True,False),('muscle',[211,195,177],False,True)]:
  color=np.empty((N,N,3),np.float32);color[:]=base
  def ink(ch,col,width,opacity):
   v=mask[:,:,ch].astype(np.float32)/255;coverage=np.clip((v-(1-width/radius))/.13+.5,0,1)*opacity
