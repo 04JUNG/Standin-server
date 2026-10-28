@@ -61,13 +61,23 @@ def _prediction_person(person, threshold):
     skeleton = person.get('skeleton') or {}
     points = person.get('keypoints', skeleton.get('keypoints'))
     scores = person.get('scores', skeleton.get('scores'))
+    trace = person.get('quality_trace') or {}
+    if not isinstance(trace, dict):
+        raise ValueError('prediction quality trace must be an object')
+    observed_mask = person.get('observed_joint_mask', trace.get('observed_joint_mask'))
+    if observed_mask is not None and (not isinstance(observed_mask, list)
+            or len(observed_mask) != 17 or any(type(v) is not bool for v in observed_mask)):
+        raise ValueError('observation mask must contain 17 explicit booleans')
+    if observed_mask is not None and 'observed_joint_scores' in trace:
+        scores = trace['observed_joint_scores']
     if not isinstance(points, list) or len(points) != 17 or any(
             not isinstance(p, list) or len(p) != 2 or any(v is not None and not _number(v) for v in p) for p in points):
         raise ValueError('prediction requires 17 finite/null pixel points')
     if scores is not None and (not isinstance(scores, list) or len(scores) != 17
                                or any(v is not None and not _number(v) for v in scores)):
         raise ValueError('prediction score vector must have 17 finite/null values')
-    return [p if _point(p) and (threshold is None or scores is not None and _number(scores[i]) and scores[i] >= threshold)
+    return [p if _point(p) and (observed_mask is None or observed_mask[i])
+            and (threshold is None or scores is not None and _number(scores[i]) and scores[i] >= threshold)
             else None for i, p in enumerate(points)]
 
 
