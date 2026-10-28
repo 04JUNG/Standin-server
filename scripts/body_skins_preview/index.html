@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ko">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>Standin — Skin Lab</title>
+  <link rel="stylesheet" href="style.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./vendor/three.module.js",
+        "three/addons/": "./vendor/addons/"
+      }
+    }
+  </script>
+  <header>
+    <div class="brand">standin<span> / </span><b>skin lab</b></div>
+    <div class="status"><i></i> 실제 3D 표면 · 검수 초안 v0.1</div>
+    <span class="edition">MATERIAL STUDIES / 2026.10</span>
+  </header>
+  <main>
+    <section class="studio">
+      <div class="stage-top">
+        <div>
+          <small>BODY SKIN COLLECTION</small>
+          <h1>선으로 읽는 인체.</h1>
+          <p>같은 모델, 같은 자세. 스킨만 바꿔서 비교하세요.</p>
+        </div>
+        <div class="segments" id="models">
+          <button data-model="male" class="active">남성 기본형</button
+          ><button data-model="female">여성 기본형</button>
+        </div>
+      </div>
+      <div class="viewport">
+        <canvas id="canvas"></canvas>
+        <div id="loading">모델 표면을 불러오는 중…</div>
+        <div class="view-tools" id="angles">
+          <button data-angle="front" class="active">정면</button
+          ><button data-angle="quarter">45°</button
+          ><button data-angle="side">측면</button
+          ><button data-angle="back">후면</button
+          ><button id="detail">상체 확대</button>
+        </div>
+        <div id="compare-labels"></div>
+        <div class="canvas-foot">
+          <span>드래그 회전 · 스크롤 확대</span
+          ><button id="compare">5종 나란히 비교 ↗</button
+          ><button id="save">이미지 저장 ↓</button>
+        </div>
+      </div>
+      <div class="pose-bar">
+        <span>검수 자세</span>
+        <div id="poses">
+          <button data-pose="standing" class="active">기본</button
+          ><button data-pose="bent">팔 굽힘</button
+          ><button data-pose="seated">앉은 자세</button
+          ><button data-pose="broader">상체 폭 변형</button>
+        </div>
+        <small id="source-label">남성 0.7.2 · 기본형</small>
+      </div>
+    </section>
+    <aside>
+      <div class="section-label">01 / SELECT A SKIN</div>
+      <h2>피부 위의 구조</h2>
+      <p class="intro">
+        다섯 가지 재질을 인체 표면에 적용했습니다. 가이드선과 근육선은 UV에 붙어
+        자세를 따라갑니다.
+      </p>
+      <div id="skins"></div>
+      <div class="tuning">
+        <div class="section-label">02 / FINE TUNE</div>
+        <label
+          >바탕색 <input id="base-color" type="color" value="#d3c3b1" /></label
+        ><label>선 굵기 <output id="width-label">1.0×</output></label
+        ><input
+          id="width"
+          type="range"
+          min="0.5"
+          max="2"
+          step="0.1"
+          value="1"
+        /><label>선 농도 <output id="opacity-label">90%</output></label
+        ><input
+          id="opacity"
+          type="range"
+          min="0.2"
+          max="1"
+          step="0.05"
+          value="0.9"
+        /><button id="reset">재질 기본값으로</button>
+      </div>
+      <p class="note">
+        근육선 초안은 밝은 점토색 위에 짙은 갈색을 사용했습니다. 근육의 흐름을
+        읽기 쉽도록 주요 경계만 정리했습니다.
+      </p>
+      <a href="manifest.json" target="_blank">자산·파라미터 manifest ↗</a>
+      <p class="limit">
+        독립 검수 화면입니다. 앱 전역 선택·운영 배포 및 CSP 적용 검증은 포함하지
+        않습니다.
+      </p>
+    </aside>
+  </main>
+  <script type="module" src="viewer.js"></script>
+</html>
