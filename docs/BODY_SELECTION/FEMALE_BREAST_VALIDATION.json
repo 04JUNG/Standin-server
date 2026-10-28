@@ -1,0 +1,164 @@
+{
+  "status": "draft_artist_review_required",
+  "completed_kst_date": "2026-10-29",
+  "rules": "standin-female-body-0.3.4.breast6",
+  "rig_rules": "female-hip-profile-1",
+  "asset": "standin-female-breast6-72f3e75c9d1215efb43d",
+  "server_base_commit": "612be944d387c3dd2543ee2eed6ae95183c101bb",
+  "client_base_commit": "711f18eb57447d66bd008a91f923ba409fb80ecf",
+  "bff_read_only_commit": "ba2626c9f276dd9dacfd5b67f78427554533c8b9",
+  "parent": {
+    "rules": "standin-female-body-0.3.4",
+    "asset": "standin-female-pelvis-refine-bc1669308a36324a270d",
+    "blend_sha256": "a3622a9d4ae7fa2e88aa3903db102a3f9c4660b3fb34ce376950e8cd2f2bae32",
+    "controller_sha256": "df981aedc3784d38e008f6ddb7c7108ce26d8a528ef31539facdabfe2937eb1f"
+  },
+  "source": {
+    "blend_sha256": "e6a569241e2a0c43d1eea7e771c5616387ab52c2d1cfe60c1a620d6af1359b33",
+    "controller_sha256": "8e4fe42e164581b2cddb1740de92ef845474bda14b6ce0f003de329b21982730"
+  },
+  "runtime": {
+    "sha256": "0bc3822200a4f87cfbeef5d4e2e2d8a6a7970af8a8ca27f1fc0b20d3fbb6d181",
+    "bytes": 5002784,
+    "format": "standin-shape-runtime.v1"
+  },
+  "controls": {
+    "breast_size": {
+      "min": -1,
+      "max": 2,
+      "step": 0.01,
+      "default": 0,
+      "legacy_max": 1
+    }
+  },
+  "keys": [
+    "BODY_BreastSmall",
+    "BODY_BreastExtended",
+    "BODY_BreastSmallReference"
+  ],
+  "mapping": {
+    "BODY_BreastSmall": "max(0,-size)",
+    "BODY_BreastLarge": "min(1,max(0,size))",
+    "BODY_BreastExtended": "max(0,size-1)"
+  },
+  "reference_key": "BODY_BreastSmallReference is zero in normal mapping; used for legacy-reference neutral and pose evaluation only",
+  "composition": "legacy fat/muscle computation, then warped local breast residual and fold guard; pose residual uses legacy shape reference",
+  "qa": {
+    "passed": true,
+    "grid_samples": 301,
+    "representative_neutral_cases": 150,
+    "base_pose_cases": 52,
+    "coupled_extreme_pose_cases": 18,
+    "new_triangle_overlaps": 0,
+    "invariants_equal": true,
+    "unowned_body_keys_exact": true,
+    "zero_to_old_max_exact": true,
+    "pose_bone_matrices_exact": true,
+    "monotonic_signed_volume_proxy": true,
+    "runtime_full_mesh_cases": 129,
+    "runtime_max_component_error_mm": 0.0056,
+    "fixed_fbx_roundtrip_max_vertex_error_mm": 0.00037894758975198783,
+    "converter_roundtrip_max_vertex_error_mm": 0.00027577215178098413,
+    "roundtrip_weight_error": 0.0,
+    "blender_text_editor_startup": {
+      "passed": true,
+      "rows": [
+        {
+          "size": -1.0,
+          "controls_preserved": true,
+          "max_vertex_error_mm": 0.0003867192402697514
+        },
+        {
+          "size": 1.5,
+          "controls_preserved": true,
+          "max_vertex_error_mm": 0.0003867192402697514
+        },
+        {
+          "size": 2.0,
+          "controls_preserved": true,
+          "max_vertex_error_mm": 0.0003867192402697514
+        }
+      ]
+    }
+  },
+  "repo_checks": {
+    "server_smoke": "54/54",
+    "server_shape_contracts": "76 passed",
+    "server_ci": "2564 passed; 10 skipped; 28 subtests passed",
+    "compileall": "passed",
+    "client_Node24": "1241 passed; 1 optional full-mesh test skipped in general suite; separate 129-case full-mesh check passed",
+    "client_typecheck": "passed",
+    "client_lint": "0 errors; 1 existing BodyCandidates warning",
+    "client_build": "passed; existing chunk-size warning",
+    "host_Node26": "141 failures also reproduced on unchanged develop; localStorage test environment; no unrelated fixes included"
+  },
+  "invariant_sha256": {
+    "basis": "fd786e88b3b0ef356b2354f5524eca48c349e5e6d2b2ad12159c02001c72e007",
+    "topology": "d62c2c2e8bd05b63b76b12da6a4dd4b33b716ae9890279f46c12890a3116f831",
+    "weights": "08b553c1b2d96391e219a1d2648fa50d91c8e4eddec3e65a6e3e7c6996b1a491",
+    "uv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "rest": "7837aad5e1779ed4edfd14829728d36493861046c8a62a2c66a721cebf9e7c39",
+    "bones": "b74fad7fa28870060e24fd435a85b6fbb26065b360ef6473ff76cabffb9438de",
+    "materials": "87db6252bf614ac7c93df0f949ee636ff38147a08ccf8f00406db54817a588b2"
+  },
+  "manifests": {
+    "shape-bakes.local.json": "af52848103d43c2e69af9645407d7f645642e962940769afef13c2b4ab7f8cfe",
+    "body-models.local.json": "0fefd1e99762530b95406e2a66859e2b4e6bde4a77d9ea64210683c13ca2df17",
+    "characters.local.json": "26ced66254d44632b62cd71c0ed99ceaf7f8466d9a7bbe5298e14535b0e21883",
+    "source-hashes.json": "a64bb937e1e48d73ec1f680f12d2cfec42e89febc37c8c66705563451437aa81"
+  },
+  "activation_draft_catalog_sha256": "59119c22c2c734547c0168ec8082d0f2f65fa1a50803e23929b8a256ca33ab53",
+  "exports": [
+    {
+      "name": "small",
+      "sha256": "94498a79d4478680520c8ae8de12dd70e3daff5985642f4653a1a1d61a754b14"
+    },
+    {
+      "name": "extended",
+      "sha256": "4428124768be91a2b0ab35da9bafb23983ebc6374caaea9e677c1d56949d58e6"
+    }
+  ],
+  "apex_comparison_mm": [
+    {
+      "size": 0.0,
+      "apex_vertex": 7887,
+      "apex_mm": [
+        79.05361801385881,
+        -110.2181747555733,
+        1272.4599838256834
+      ]
+    },
+    {
+      "size": 1.0,
+      "apex_vertex": 7887,
+      "apex_mm": [
+        79.96860891580583,
+        -138.42207193374637,
+        1272.533297538757
+      ]
+    },
+    {
+      "size": 2.0,
+      "apex_vertex": 7726,
+      "apex_mm": [
+        80.87716251611711,
+        -151.62417292594913,
+        1266.8658494949339
+      ]
+    }
+  ],
+  "remaining": [
+    "Artist visual approval of shrink, rounded cap, upper-pole and dependent lower-pole fullness",
+    "Actual CSP import",
+    "Reviewed combined source/catalog/runtime activation",
+    "Future combination with hand-limit and skin sessions using new combined version"
+  ],
+  "deployment_performed": false,
+  "s3_upload_performed": false,
+  "main_merge_performed": false,
+  "notes": [
+    "Official authoring/publication source verified; current live ECS/BFF activation not asserted.",
+    "Inherited whole-body overlaps remain; no new overlaps in the checked cases is not a claim of globally collision-free anatomy.",
+    "Closed-mesh signed volume is a monotonicity proxy, not a medical breast-volume measurement."
+  ]
+}

@@ -62,6 +62,25 @@ def test_any_approved_version_is_data_not_code(tmp_path, monkeypatch):
     assert recipe['shape_sha256'] == envelope({'muscle': 1.5})['shapeSha256']
 
 
+def test_breast_extension_uses_registered_range_without_changing_legacy(tmp_path, monkeypatch):
+    controls = [{'key': 'breast_size', 'min': -1, 'max': 2, 'step': .01, 'default': 0}]
+    write_registry(tmp_path, monkeypatch, rules='standin-female-body-0.3.4.breast6',
+                   controls=controls, defaults={'breast_size': 0})
+    def request(value):
+        values = {'breast_size': value}
+        return {'schemaVersion': 'body-shape.v1', 'controls': values,
+                'shapeSha256': digest_shape(CHARACTER, 'a' * 64, values)}
+    for value in [-1, 0, 1, 1.5, 2]:
+        assert resolve_shape(CHARACTER, 'a' * 64, request(value))['values']['breast_size'] == value
+    for value in [-1.01, 2.01, 1.005]:
+        with pytest.raises(ShapeError):
+            resolve_shape(CHARACTER, 'a' * 64, request(value))
+    write_registry(tmp_path, monkeypatch, rules='standin-female-body-0.3.4',
+                   controls=[{**controls[0], 'max': 1}], defaults={'breast_size': 0})
+    with pytest.raises(ShapeError, match='out of range'):
+        resolve_shape(CHARACTER, 'a' * 64, request(2))
+
+
 def test_default_shape_without_request_has_no_digest(tmp_path, monkeypatch):
     write_registry(tmp_path, monkeypatch)
     recipe = resolve_shape(CHARACTER, 'a' * 64)

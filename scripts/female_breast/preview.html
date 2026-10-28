@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>여성 가슴 형태 · 전후 검수</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#171d27;color:#eef2f8;font:15px system-ui,sans-serif}main{max-width:1600px;margin:auto;padding:24px}h1{margin:0 0 8px;font-size:24px;font-weight:600}p{color:#bec8d5;margin:6px 0 20px}.toolbar{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin:20px 0}label{display:flex;gap:10px;align-items:center}select,button{color:inherit;background:#303a4a;border:1px solid #5b687c;border-radius:6px;padding:9px;font:inherit}button{cursor:pointer}.size{flex:1;min-width:270px}.size input{flex:1;accent-color:#9cd9ed;min-width:150px}output{min-width:55px;font-variant-numeric:tabular-nums}.views{display:grid;grid-template-columns:1fr 1fr;gap:16px}.view{position:relative;background:#3b4350;border-radius:10px;overflow:hidden}.label{position:absolute;top:12px;left:14px;background:#18202de6;padding:8px 12px;border-radius:6px;pointer-events:none}canvas{display:block;width:100%;height:65vh;min-height:390px;touch-action:none}footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;color:#b6c2d3;margin:14px 0}details{color:#b6c2d3;margin-top:20px;overflow-wrap:anywhere}pre{white-space:pre-wrap;font:12px monospace}@media(max-width:700px){main{padding:14px}.views{grid-template-columns:1fr}canvas{height:60vh}.toolbar{gap:10px}}
+</style>
+<main>
+<h1>가슴 형태 · 전후 검수</h1>
+<p>둥근 끝 · 윗가슴과 아래 볼륨 · 조형 초안 검수</p>
+<div class="toolbar">
+  <label class="size" for="size">가슴 크기 <input id="size" type="range" min="0" max="12" step="1" value="12"><output id="value">+2.00</output></label>
+  <label>자세 <select id="pose"><option value="T">T 포즈</option><option value="ARMS_DOWN">팔 내림</option><option value="RAISE">팔 올림</option><option value="BEND">몸 숙임</option></select></label>
+  <label>확대 <select id="zoom"><option value="torso">상체</option><option value="detail">연결부</option><option value="full">전신</option></select></label>
+  <div><button data-angle="0">정면</button> <button data-angle="45">45도</button> <button data-angle="90">측면</button></div>
+</div>
+<div class="views">
+  <div class="view"><span class="label">기존 0.3.4 · <span id="old-value">기존 최대 +1.00</span></span><canvas aria-label="기존 실제 모델"></canvas></div>
+  <div class="view"><span class="label">가슴 개선 · 둥근 윤곽</span><canvas aria-label="개선된 실제 모델"></canvas></div>
+</div>
+<footer><span id="status">실제 모델을 여는 중…</span><span>0 = 기존 기본 · +1 = 기존 최대 · +2 = 확장 최대 초안</span></footer>
+<p>슬라이더는 실제 컨트롤러로 계산한 0.25 간격 표본입니다. 두 모델은 같은 카메라·자세로 비교됩니다.</p>
+<details><summary>검수 출처</summary><pre id="provenance"></pre></details>
+</main>
+<script>window.BREAST_REVIEW=__DATA__;document.getElementById('provenance').textContent=JSON.stringify(window.BREAST_REVIEW.source,null,2);</script>
+<script>__JS__</script>
+</html>
