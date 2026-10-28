@@ -9,7 +9,7 @@ are outside this change. Artist review and actual CSP import remain pending.
 Server work starts at develop `612be944d387c3dd2543ee2eed6ae95183c101bb`.
 The parent working checkout and the parallel hand-limit 0.3.5 candidate were not
 used as authoring inputs or modified. The candidate rules are
-`standin-female-body-0.3.4.breast6`, independent of that hand-limit version.
+`standin-female-body-0.3.4.breast7`, independent of that hand-limit version.
 
 Pinned official inputs:
 
@@ -53,7 +53,10 @@ The Extended target inflates the existing +1 envelope around its attachment
 and rotates the added mass down by 16 degrees for lower-pole fullness. A broad
 upper-pole fill gives a rounded transition from the chest, while a localized
 cap reduction softens the anterior tip. The upper attachment and lateral root
-are tapered. This is an authored target, not extrapolation of the old Large key.
+are tapered. Lateral shoulder fullness widens the outer mound slightly. Bounded
+local Taubin fairing (at most 1.5 mm) reduces curvature ripples in the baked
+Extended key while pinning the edge of its support. This is an authored target,
+not extrapolation of the old Large key.
 
 | Key | Normal mapping |
 | --- | --- |

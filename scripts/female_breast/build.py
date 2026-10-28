@@ -17,7 +17,7 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from sculpt import targets
 
-VERSION = 'standin-female-body-0.3.4.breast6'
+VERSION = 'standin-female-body-0.3.4.breast7'
 PARENT_BLEND = 'a3622a9d4ae7fa2e88aa3903db102a3f9c4660b3fb34ce376950e8cd2f2bae32'
 PARENT_CONTROLLER = 'df981aedc3784d38e008f6ddb7c7108ce26d8a528ef31539facdabfe2937eb1f'
 
@@ -37,7 +37,7 @@ def load(path, name):
 def controller_text(text, asset):
     replacements = {
         "VERSION='standin-female-body-0.3.4'": f"VERSION='{VERSION}'",
-        "'version':(0,3,4)": "'version':(0,3,4,6)",
+        "'version':(0,3,4)": "'version':(0,3,4,7)",
         "'breast_size':(-1.,1.,0.,'가슴 크기')": "'breast_size':(-1.,2.,0.,'가슴 크기')",
         "out['BODY_BreastLarge']=max(0.,c['breast_size'])":
         "out['BODY_BreastLarge']=min(1.,max(0.,c['breast_size']))\n"
@@ -56,7 +56,7 @@ def controller_text(text, asset):
     # Exact source identity is required; a stored preset is never re-labelled in place.
     text += f'''
 
-BREAST_RULES='local-mound-rounded-upper-and-lower-pole-2'
+BREAST_RULES='local-mound-rounded-full-lateral-pole-3'
 BREAST_PARENT_RULES='standin-female-body-0.3.4'
 BREAST_PARENT_ASSET='{asset}'
 BREAST_REFERENCE=False
@@ -158,7 +158,7 @@ def main(args):
     source = parent.source()
     lock = json.loads(m['asset_lock'])
     old_asset = m['asset_identity']
-    changed = targets(source['co'], source['deltas'])
+    changed = targets(source['co'], source['deltas'], source['faces'])
     original = {k:v.copy() for k,v in source['deltas'].items()}
     parent.BUSY = True
     for name, delta in changed.items():

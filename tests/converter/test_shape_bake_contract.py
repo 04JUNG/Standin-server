@@ -64,7 +64,7 @@ def test_any_approved_version_is_data_not_code(tmp_path, monkeypatch):
 
 def test_breast_extension_uses_registered_range_without_changing_legacy(tmp_path, monkeypatch):
     controls = [{'key': 'breast_size', 'min': -1, 'max': 2, 'step': .01, 'default': 0}]
-    write_registry(tmp_path, monkeypatch, rules='standin-female-body-0.3.4.breast6',
+    write_registry(tmp_path, monkeypatch, rules='standin-female-body-0.3.4.breast7',
                    controls=controls, defaults={'breast_size': 0})
     def request(value):
         values = {'breast_size': value}
