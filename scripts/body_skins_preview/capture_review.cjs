@@ -41,6 +41,7 @@ if (!output) throw Error("Usage: node capture_review.cjs URL OUTPUT_DIRECTORY");
   }
   for (const model of ["male", "female"]) {
     await page.evaluate((m) => skinPreview.setModel(m), model);
+    await page.evaluate(() => skinPreview.setAngle("front"));
     await page.setViewportSize({ width: 2400, height: 1200 });
     await page.evaluate(() => skinPreview.setCompare(true));
     await save(`${model}-comparison`);
@@ -76,6 +77,16 @@ if (!output) throw Error("Usage: node capture_review.cjs URL OUTPUT_DIRECTORY");
     }
     await page.evaluate(() => skinPreview.setDetail(false));
   }
+  const comparisonLayouts = [];
+  await page.evaluate(() => skinPreview.setCompare(true));
+  for (const angle of ["front", "quarter", "side", "back"]) {
+    await page.evaluate((v) => skinPreview.setAngle(v), angle);
+    const centers = await page.evaluate(() => skinPreview.comparisonCenters());
+    if (centers.some((v, i) => i && v[0] - centers[i - 1][0] < 0.1))
+      throw Error("Comparison models overlap at " + angle);
+    comparisonLayouts.push({ angle, projectedCenters: centers });
+  }
+  await page.evaluate(() => skinPreview.setCompare(false));
   // Mouse orbit/zoom, skin swap and material controls must retain the inspection camera.
   await page.evaluate(() => skinPreview.setModel("male"));
   await page.evaluate(() => skinPreview.setSkin("gray-guide"));
@@ -99,6 +110,7 @@ if (!output) throw Error("Usage: node capture_review.cjs URL OUTPUT_DIRECTORY");
     JSON.stringify(
       {
         errors,
+        comparisonLayouts,
         loads: await page.evaluate(() => skinPreview.diagnostics.loads),
         cameraPreservedOnSkinSwap:
           JSON.stringify(before) === JSON.stringify(after),

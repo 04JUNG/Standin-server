@@ -182,6 +182,18 @@ async function rebuild({ fit = true } = {}) {
   render();
 }
 function render() {
+  camera.updateMatrixWorld();
+  if (comparing) {
+    const right = new THREE.Vector3().setFromMatrixColumn(
+      camera.matrixWorld,
+      0,
+    );
+    right.y = 0;
+    right.normalize();
+    models.forEach((object, index) =>
+      object.position.copy(right).multiplyScalar((index - 2) * 0.78),
+    );
+  }
   renderer.render(scene, camera);
 }
 function frame() {
@@ -266,6 +278,10 @@ window.skinPreview = {
   setCompare,
   setDetail,
   diagnostics,
+  comparisonCenters: () =>
+    models.map((object) =>
+      object.getWorldPosition(new THREE.Vector3()).project(camera).toArray(),
+    ),
   capture: () => {
     render();
     return canvas.toDataURL("image/png");
