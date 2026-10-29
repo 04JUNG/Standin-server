@@ -66,7 +66,7 @@ def test_workflow_reuses_images_and_deploys_the_resolved_digest():
     from pathlib import Path
 
     workflow = (Path(__file__).resolve().parents[1] / ".github/workflows/scene-worker-deploy.yml").read_text()
-    assert workflow.count("if: steps.lookup.outputs.found != 'true'") == 2
+    assert workflow.count("if: steps.existing.outputs.exists != 'true'") == 2
     assert "--require" in workflow
     assert "@${{ steps.image.outputs.digest }}" in workflow
     assert "if: github.ref == 'refs/heads/develop'" in workflow
