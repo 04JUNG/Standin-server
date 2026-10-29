@@ -35,6 +35,13 @@ converter POST /convert · /convert-bundle · /convert-framed
 결과를 새 버전으로 재명명하지 않는다. 변경된 렌더의 설명·태그는 출력된
 `semantic-rereview.jsonl`을 기준으로 재검수해야 한다. 기존 입력 DB·BVH는 수정하지 않는다.
 
+배포할 때는 새 `model_revision`에 해당하는 GLB 객체를 먼저 준비하고(이전 키도 유지),
+새 converter·추론 서버 코드, 새 라이브러리 번들 순으로 반영한다. 새 번들을 옛 서버에
+먼저 연결하면 새 렌더 방식을 검증할 수 없어 poster API가 거절한다. 태그를 갱신한
+번들은 최종 `search-v2.json`·DB 해시에 맞춰 `fullbody-cache`도 다시 생성해야 한다.
+썸네일의 `hands_applied=False`는 별도 선택 프리셋을 합성하지 않았다는 기존 계약이며,
+원본 손가락의 적용 여부는 `source_fingers_version`과 `source_fingers` 진단으로 구분한다.
+
 | 묶음 | 프리셋 |
 |---|---|
 | 기본 | `open` 편 손, `relaxed` 힘 뺀 손, `tense` 힘준 손, `blade` 손날, `fist` 주먹, `claw` 갈퀴손, `soft_open` 살짝 편 손, `hyper_open` 쫙 젖힌 손, `limp` 늘어진 손 |
