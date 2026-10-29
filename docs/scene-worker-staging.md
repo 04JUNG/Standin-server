@@ -27,6 +27,11 @@ contract is unchanged; see `src/scene_refinement/README.md`.
 
 ## Release assets and actual remaining blocker
 
+**Status update 2026-10-29:** the candidate-only inventory below is historical.
+PR #146 records `scene-v4-20261029-staging-002` full-release upload and Linux
+startup verification. See [the current transport/status boundary](scene-camera-transport-v1.md).
+Do not interpret that record as proof of a running AWS service or CSP acceptance.
+
 The locally tested HumanArt bundle is `candidate`, its `license_review` is
 `pending`, and its calibration profile hash is not pinned. It remains experimental.
 **It cannot pass this staging preflight.** Do not relabel it to make startup pass.
