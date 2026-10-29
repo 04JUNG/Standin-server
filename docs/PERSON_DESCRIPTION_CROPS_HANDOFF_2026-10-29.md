@@ -39,7 +39,7 @@
 - `.env.example` 충돌은 develop의 prefetch 기본 OFF를 유지하고 새 예산 설정을 추가했다. API 문서 충돌은 양쪽 설명을 모두 보존했다.
 - feature → develop → main 순서로 검토한다. 실험 브랜치 전체를 develop에 merge하면 main 전용 기본값 등 불필요한 변경이 섞일 수 있으므로 이 통합 브랜치 또는 첨부 patch를 사용한다.
 
-이 브랜치는 로컬에만 있다. 원격 push, PR 생성, merge, 스테이징/운영 배포는 이번 작업에서 실행하지 않았다. 통합 후 develop이 더 진행됐다면 담당자가 최신 develop에 rebase/충돌 해결하고 CI를 다시 확인한다.
+이 브랜치는 서버 반영 PR로 제출하는 변경이다. merge와 스테이징/운영 배포는 수행하지 않았다. 통합 후 develop이 더 진행됐다면 담당자가 최신 develop에 rebase/충돌 해결하고 CI를 다시 확인한다.
 
 ### 변경 파일
 
@@ -53,6 +53,7 @@
 | `src/description_prefetch.py` | 동일 요청 검증에 크롭 옵션 포함, 원래 기한 내 join |
 | `api/hand_skin_middleware.py`, `api/app.py` | 모든 `/analyze`에 전체 기한/cancel 적용 |
 | `src/config.py`, `.env.example` | 예산·크롭 옵션 |
+| `.github/workflows/deploy.yml`, `scripts/prepare_description_deployment.py` | 환경별 명시적 rollout 값 연결, 미지정 값/기존 task 보존 |
 | `tests/test_person_crops.py`, `tests/test_description_recovery.py`, `tests/test_analysis_budget.py` 등 | 실제 SDK를 로컬 장애 서버에 연결하는 테스트와 좌표/부분 오류/기한 회귀 |
 | `CLAUDE.md`, `docs/API_CONTRACT.md` | 동작·설정·한계 문서 |
 
@@ -73,7 +74,7 @@ PARALLEL_POSE_DESCRIPTION=1
 
 `PARALLEL_POSE_DESCRIPTION=1`은 실험과 같이 포즈 추출과 설명을 겹치는 opt-in이다. 인물 크롭 분리 자체는 이 값이 0이어도 Gemini 설명 대상이 2명 이상이면 실행된다. develop 코드의 기본값은 0을 유지했다. `VLM_PROVIDER=gemini` 및 기존 전신 동적 검색 설정이 필요하며, mock/다른 provider에는 이 Gemini 크롭 구현을 적용했다고 주장하지 않는다.
 
-**배포 환경변수 연결 주의:** 현재 `.github/workflows/deploy.yml`의 render 단계는 위 6개를 GitHub Variables에서 읽지 않는다. GitHub staging Variables에 등록만 해서는 전달되지 않는다. 현재 task definition의 환경변수는 계승하므로, 배포 담당자가 staging inference task definition에 값을 반영하거나 render 단계의 `environment-variables`에 명시적 연결을 추가해야 한다. 이번 브랜치는 배포 workflow를 수정하지 않았다. 모델·라이브러리 URI나 secret을 문서 값으로 덮어쓰지 않는다.
+**배포 환경변수 연결:** 이 PR은 `.github/workflows/deploy.yml`에 `Prepare optional description rollout overrides` 단계를 추가한다. GitHub staging 환경의 위 6개 Variables를 `scripts/prepare_description_deployment.py`로 전달해 다운로드한 task definition의 inference 환경변수에 적용한 뒤 새 이미지를 render한다. 비어 있는 변수는 기존 task 설정을 유지하고, 명시적 `0`은 롤백 값으로 적용한다. production 플래그를 workflow 기본값으로 켜지 않는다. 이미지·role·health check·다른 컨테이너·model/library URI·secret은 보존한다. 키 이름 충돌·중복 환경변수·잘못된 숫자/플래그는 AWS task 등록 전에 실패한다. 실제 GitHub Variables나 ECS 설정은 이번 작업에서 변경하지 않았다.
 
 workflow는 main/develop push 외에 수동 실행도 지원하고 환경별 `AUTO_DEPLOY_ENABLED` 조건을 사용한다. develop merge가 조건에 따라 스테이징 배포를 유발할 수 있으므로 reviewer가 실제 환경/이미지 SHA를 확인한다. BFF/ALB/클라이언트가 더 먼저 끊으면 추론 서버의 120초 응답 전에 실패할 수 있다. 전체 120초는 inference `/analyze` 수신 시점 기준이므로 BFF 큐·통신 시간은 별도로 관측한다.
 
@@ -88,11 +89,11 @@ workflow는 main/develop push 외에 수동 실행도 지원하고 환경별 `AU
 
 ## 검증 결과와 롤백
 
-최신 develop 통합본: 관련 pytest **360 passed + 6 subtests**, 스모크 **54/54**, compileall 및 diff check 통과. 기존 Starlette/httpx deprecation 경고 1건. 테스트는 로컬 장애 서버/모의 응답을 포함하며 실제 Gemini 유료 호출은 위 3컷 별도 실험이다. 전체 저장소 CI 및 실제 ECS 환경 검증은 아직 실행하지 않았다.
+최신 develop 통합본: 관련 pytest **360 passed + 6 subtests**, 배포 설정 회귀 **33 passed**, 스모크 **54/54**, compileall 및 diff check 통과. 기존 Starlette/httpx deprecation 경고 1건. 테스트는 로컬 장애 서버/모의 응답을 포함하며 실제 Gemini 유료 호출은 위 3컷 별도 실험이다. 전체 저장소 CI 및 실제 ECS 환경 검증은 아직 실행하지 않았다.
 
 - 크롭만 끄기: `ROUTING_DESCRIBE_PERSON_CROPS=0` → 기존 전체 이미지/다인 batch 입력으로 복귀, 새 재시도/120초 기한은 유지.
 - 포즈 추출 겹침만 끄기: `PARALLEL_POSE_DESCRIPTION=0` → 크롭 기능 자체는 유지.
 - 수정 전체 롤백: 반영 전 승인된 이미지/task revision으로 되돌린다. 환경변수만으로 새 미들웨어의 전체 기한을 제거하는 옵션은 없다.
 - 이 변경은 모델·라이브러리 재빌드나 데이터 마이그레이션이 필요하지 않다. 과거 실패 Job/저장 결과는 재작성하지 않는다.
 
-공유 패키지의 `develop-integration.patch`는 `029a50c` 기준 두 기능 커밋과 이 인계서를 포함한다. 해당 기준의 깨끗한 작업 브랜치에서 `git am develop-integration.patch`로 적용하고 CI를 실행할 수 있다. 다른 기준이면 충돌을 수동 검토한다. patch에 API 키·원본 러프·모델·DB는 포함하지 않는다.
+갱신된 공유 패키지의 `develop-integration.patch`는 `029a50c` 기준 두 기능 커밋, 인계서, 배포 설정 연결을 포함한다. 해당 기준의 깨끗한 작업 브랜치에서 `git am develop-integration.patch`로 적용하고 CI를 실행할 수 있다. 다른 기준이면 충돌을 수동 검토한다. patch에 API 키·원본 러프·모델·DB는 포함하지 않는다.
