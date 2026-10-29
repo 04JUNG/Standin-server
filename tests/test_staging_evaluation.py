@@ -86,7 +86,8 @@ def test_workflow_is_develop_only_after_deploy():
     assert text.index('wait-for-service-stability: true') < text.index('- name: Evaluate fixed 50 cuts')
 
 
-def test_live_fifty_cut_pipeline_with_injected_services(tmp_path, monkeypatch):
+@pytest.mark.parametrize('shards', [1, 3])
+def test_live_fifty_cut_pipeline_with_injected_services(tmp_path, monkeypatch, shards):
     import types
     from standin_eval import staging_live as live
     from standin_eval.util import write_json, read_json, sha256_file
@@ -116,8 +117,18 @@ def test_live_fifty_cut_pipeline_with_injected_services(tmp_path, monkeypatch):
     monkeypatch.setattr(thumbnails,'ConverterThumbnailRenderer',lambda *a,**k:types.SimpleNamespace(render=lambda s:types.SimpleNamespace(data=b'png')))
     monkeypatch.setenv('EVAL_DATA_SHA256','dataset')
     monkeypatch.setenv('EVAL_CONTRACT_VERSION','v1')
-    output=tmp_path/'report'; output.mkdir()
-    assert live.execute(package,output,'abc','fake')
+    output=tmp_path/'report'
+    if shards == 1:
+        output.mkdir()
+        assert live.execute(package,output,'abc','fake')
+    else:
+        from standin_eval.staging_merge import merge_fragments
+        fragments=[]
+        for index in range(shards):
+            fragment=tmp_path/f'shard-{index}'; fragment.mkdir()
+            assert live.execute(package,fragment,'abc','fake',shard_index=index,shard_count=shards)
+            fragments.append(fragment)
+        merge_fragments(fragments,output)
     assert calls=={'source':50,'compare':100,'refine':50}
     current=read_json(output/'result.json')
     assert len(current['arms']['search'])==50
@@ -149,3 +160,45 @@ def test_bootstrap_prefers_uploaded_harness_over_image_package(tmp_path):
     completed=subprocess.run([sys.executable,'-c',command],env=env,capture_output=True,text=True,timeout=10)
     assert completed.returncode==0,completed.stderr
     assert completed.stdout.strip()=='uploaded-harness-selected'
+
+
+def test_product_changes_do_not_reset_evaluation_series(tmp_path):
+    from scripts.run_staging_evaluation_ci import evaluator_fingerprint, EVALUATOR_FILES
+    root=tmp_path; (root/'standin_eval').mkdir(); (root/'evaluation/rubrics').mkdir(parents=True)
+    for name in EVALUATOR_FILES:
+        (root/'standin_eval'/name).write_text('fixed evaluator')
+    (root/'standin_eval/perspective_search.py').write_text('search-v1')
+    before=evaluator_fingerprint(root)
+    (root/'standin_eval/perspective_search.py').write_text('search-v2')
+    assert evaluator_fingerprint(root)==before
+    (root/'standin_eval/rubric_judge.py').write_text('changed evaluator')
+    assert evaluator_fingerprint(root)!=before
+
+
+def test_merge_rejects_missing_or_duplicate_cuts(tmp_path):
+    from standin_eval.staging_merge import merge_fragments
+    from standin_eval.util import write_json
+    folder=tmp_path/'fragment'; folder.mkdir()
+    value=result(); write_json(folder/'result.json',value)
+    with pytest.raises(ValueError,match='50 disjoint'):
+        merge_fragments([folder],tmp_path/'output')
+    value['arms']['search']*=50
+    write_json(folder/'result.json',value)
+    with pytest.raises(ValueError,match='50 disjoint'):
+        merge_fragments([folder],tmp_path/'output')
+
+
+def test_deploy_initializer_preserves_inline_logic_and_pins_sha():
+    from scripts.prepare_staging_asset_initializer import prepare
+    source={'containerDefinitions':[{'name':'body-assets-init','image':'old',
+        'command':['python','-c','pinned code'],'environment':[{'name':'MANIFEST','value':'fixed'}]}]}
+    with pytest.raises(ValueError,match='immutable'):
+        prepare(copy.deepcopy(source),'mutable:latest')
+    image='136889124221.dkr.ecr.ap-northeast-2.amazonaws.com/standin/inference:'+('a'*40)
+    updated=prepare(copy.deepcopy(source),image)['containerDefinitions'][0]
+    assert updated['image']==image
+    assert updated['command']==source['containerDefinitions'][0]['command']
+    assert updated['environment']==source['containerDefinitions'][0]['environment']
+    workflow=(Path(__file__).resolve().parents[1]/'.github/workflows/deploy.yml').read_text()
+    step=workflow.split('- name: Keep staging inline')[1].split('- name: Prepare explicit')[0]
+    assert "if: github.ref == 'refs/heads/develop'" in step

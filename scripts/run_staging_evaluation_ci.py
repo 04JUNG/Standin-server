@@ -21,6 +21,17 @@ BUCKET = 'standinstagingapp-assetsbucket5cb76180-fiwlikrhl1sk'
 DATA_SHA = 'be85f93b2e3f4bc276d221ce8dd5c716b3360f546802c5dcf65a703d7bcf00b3'
 DATA_KEY = 'evaluation/fixed50/v3.2/' + DATA_SHA + '.zip'
 PREFIX = 'evaluation/staging/fixed50-v32'
+EVALUATOR_FILES = ('staging_live.py', 'staging_compare.py', 'rubric_judge.py', 'rubric_score.py',
+                   'rubric_v32.py', 'rubric_v32_io.py', 'rubric_package.py', 'matching.py',
+                   'schemas.py', 'http_runner.py', 'util.py', 'staging_merge.py')
+
+
+def evaluator_fingerprint(root=ROOT):
+    """Product search/refine modules shipped in the archive must not reset baseline."""
+    paths = [root/'standin_eval'/name for name in EVALUATOR_FILES]
+    paths += sorted((root/'evaluation/rubrics').rglob('*.json'))
+    content = [(p.relative_to(root).as_posix(), hashlib.sha256(p.read_bytes()).hexdigest()) for p in paths]
+    return hashlib.sha256(json.dumps(content, sort_keys=True).encode()).hexdigest()
 
 
 def bootstrap():
@@ -86,7 +97,7 @@ def main():
                     z.writestr(info, source.read_bytes())
         code_hash = hashlib.sha256(archive.read_bytes()).hexdigest()
         # Different evaluator code/model creates a separate series, never a misleading delta.
-        contract = hashlib.sha256((code_hash+args.judge_model+DATA_SHA).encode()).hexdigest()
+        contract = hashlib.sha256((evaluator_fingerprint()+args.judge_model+DATA_SHA).encode()).hexdigest()
         series = PREFIX+'/'+contract
         run_key = series+'/runs/'+args.run_id
         s3.upload_file(str(archive), BUCKET, run_key+'/code.zip')
@@ -94,52 +105,75 @@ def main():
             return s3.generate_presigned_url(method, Params={'Bucket':BUCKET,'Key':key}, ExpiresIn=3300)
         previous_key = series+'/baseline.json'
         previous_url = ''
+        previous_value = None
         existing = s3.list_objects_v2(Bucket=BUCKET, Prefix=previous_key, MaxKeys=1).get('Contents', [])
         if any(item['Key'] == previous_key for item in existing):
             previous = s3.get_object(Bucket=BUCKET, Key=previous_key)['Body'].read()
             # Snapshot previous baseline: never depend on a mutable URL during execution.
             s3.put_object(Bucket=BUCKET, Key=run_key+'/previous.json', Body=previous)
             previous_url = signed('get_object', run_key+'/previous.json')
+            previous_value = json.loads(previous)
         values = {'EVAL_CODE_URL':signed('get_object',run_key+'/code.zip'), 'EVAL_CODE_SHA256':code_hash,
             'EVAL_DATA_URL':signed('get_object',DATA_KEY), 'EVAL_DATA_SHA256':DATA_SHA,
             'EVAL_RESULT_URL':signed('put_object',run_key+'/report.zip'), 'EVAL_PREVIOUS_URL':previous_url,
             'EVAL_REVISION':args.revision,'EVAL_JUDGE_MODEL':args.judge_model,'EVAL_CONTRACT_VERSION':contract}
         registered = ecs.register_task_definition(**evaluation_definition(definition))['taskDefinition']['taskDefinitionArn']
-        task_arn = None
+        task_arns = []
         try:
-            response = ecs.run_task(cluster=STAGING_CLUSTER, taskDefinition=registered, launchType='FARGATE',
-                networkConfiguration=service['networkConfiguration'], count=1, startedBy='fixed50-staging-eval',
-                tags=[{'key':'StandinEvaluation','value':'fixed50'}],
-                overrides={'containerOverrides':[{'name':'inference','environment':[{'name':k,'value':v} for k,v in values.items()]}]})
-            if response.get('failures') or not response.get('tasks'):
-                raise RuntimeError('evaluation task launch failed')
-            task_arn = response['tasks'][0]['taskArn']
-            write_json(output/'task.json', {'task':task_arn,'revision':args.revision,'dataset':DATA_SHA,'contract':contract})
+            for shard in range(3):
+                shard_values = {**values, 'EVAL_SHARD_INDEX':str(shard), 'EVAL_SHARD_COUNT':'3',
+                    'EVAL_RESULT_URL':signed('put_object',run_key+f'/shard-{shard}.zip')}
+                response = ecs.run_task(cluster=STAGING_CLUSTER, taskDefinition=registered, launchType='FARGATE',
+                    networkConfiguration=service['networkConfiguration'], count=1, startedBy='fixed50-staging-eval',
+                    tags=[{'key':'StandinEvaluation','value':'fixed50'}],
+                    overrides={'containerOverrides':[{'name':'inference','environment':[{'name':k,'value':v} for k,v in shard_values.items()]}]})
+                task_arns.extend(t['taskArn'] for t in response.get('tasks', []))
+                if response.get('failures') or not response.get('tasks'):
+                    raise RuntimeError('evaluation task launch failed')
+            write_json(output/'tasks.json', {'tasks':task_arns,'revision':args.revision,'dataset':DATA_SHA,'contract':contract})
             deadline = time.monotonic()+args.timeout_seconds
             while time.monotonic() < deadline:
-                task = ecs.describe_tasks(cluster=STAGING_CLUSTER,tasks=[task_arn])['tasks'][0]
-                if task['lastStatus'] == 'STOPPED':
+                tasks = ecs.describe_tasks(cluster=STAGING_CLUSTER,tasks=task_arns)['tasks']
+                if len(tasks)==3 and all(t['lastStatus']=='STOPPED' for t in tasks):
                     break
-                print(json.dumps({'status':task['lastStatus'],'elapsed_seconds':int(args.timeout_seconds-(deadline-time.monotonic()))}),flush=True)
+                print(json.dumps({'statuses':[t['lastStatus'] for t in tasks],
+                    'elapsed_seconds':int(args.timeout_seconds-(deadline-time.monotonic()))}),flush=True)
                 time.sleep(20)
             else:
                 raise TimeoutError('staging evaluation deadline exceeded')
-            write_json(output/'task-stop.json', {'reason':task.get('stoppedReason'),
-                'containers':[{k:c.get(k) for k in ('name','exitCode','reason')} for c in task['containers']]})
-            s3.download_file(BUCKET,run_key+'/report.zip',str(output/'report.zip'))
-            _extract(output/'report.zip',output/'report')
-            completed = read_json(output/'report/completion.json') if (output/'report/completion.json').exists() else {}
-            inference_exit = next(c.get('exitCode') for c in task['containers'] if c['name']=='inference')
-            if inference_exit != 0 or not completed.get('complete'):
-                raise RuntimeError('evaluation incomplete; previous baseline preserved; inspect report')
-            # Workflow shares deployment concurrency, so no other staging evaluation races this pointer.
+            stopped = {t['taskArn']:t for t in tasks}
+            fragments = []; failures = []
+            for shard, arn in enumerate(task_arns):
+                task = stopped[arn]
+                folder = output/'shards'/str(shard); folder.mkdir(parents=True)
+                write_json(folder/'task-stop.json', {'reason':task.get('stoppedReason'),
+                    'containers':[{k:c.get(k) for k in ('name','exitCode','reason')} for c in task['containers']]})
+                try:
+                    s3.download_file(BUCKET,run_key+f'/shard-{shard}.zip',str(folder/'report.zip'))
+                    _extract(folder/'report.zip',folder/'report')
+                    completed = read_json(folder/'report/completion.json')
+                    inference_exit = next(c.get('exitCode') for c in task['containers'] if c['name']=='inference')
+                    if inference_exit != 0 or not completed.get('complete'):
+                        raise RuntimeError('incomplete shard')
+                    fragments.append(folder/'report')
+                except Exception as exc:
+                    failures.append({'shard':shard,'error_type':type(exc).__name__})
+            if failures:
+                write_json(output/'failures.json',failures)
+                raise RuntimeError('evaluation incomplete; previous baseline preserved; inspect shards')
+            from standin_eval.staging_merge import merge_fragments
+            import shutil
+            merge_fragments(fragments,output/'report',previous_value)
+            archive = shutil.make_archive(str(output/'report'),'zip',output/'report')
+            s3.upload_file(archive,BUCKET,run_key+'/report.zip')
+            # Deployment concurrency protects this last-successful pointer.
             s3.put_object(Bucket=BUCKET,Key=previous_key,Body=(output/'report/result.json').read_bytes())
             write_json(output/'published.json', {'report_key':run_key+'/report.zip','baseline_key':previous_key})
         finally:
-            if task_arn:
-                task = ecs.describe_tasks(cluster=STAGING_CLUSTER,tasks=[task_arn])['tasks'][0]
-                if task['lastStatus'] != 'STOPPED':
-                    ecs.stop_task(cluster=STAGING_CLUSTER,task=task_arn,reason='bounded staging evaluation cleanup')
+            if task_arns:
+                for task in ecs.describe_tasks(cluster=STAGING_CLUSTER,tasks=task_arns)['tasks']:
+                    if task['lastStatus'] != 'STOPPED':
+                        ecs.stop_task(cluster=STAGING_CLUSTER,task=task['taskArn'],reason='bounded staging evaluation cleanup')
             ecs.deregister_task_definition(taskDefinition=registered)
 
 

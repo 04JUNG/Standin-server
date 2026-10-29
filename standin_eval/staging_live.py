@@ -59,17 +59,24 @@ def refine_payload(person, chosen):
             'search_distance': chosen.get('distance'), 'render_thumbnail': False}
 
 
-def execute(package, output, revision, model, previous=None):
+def execute(package, output, revision, model, previous=None, shard_index=0, shard_count=1):
     from src.config import CFG
     from src.refine_thumbnail import ConverterThumbnailRenderer, ThumbnailSource
     native = read_json(package/'dataset-manifest.json')
     if len(native['cases']) != 50:
         raise ValueError('fixed 50 cuts required')
+    if not 0 <= shard_index < shard_count <= 3:
+        raise ValueError('invalid shard')
+    cases = native['cases'][shard_index::shard_count]
+    ids = {c['case_id'] for c in cases}
+    if previous:
+        previous = {**previous, 'arms': {a:[r for r in rows if r['case_id'] in ids]
+                    for a,rows in previous['arms'].items()}}
     renderer = ConverterThumbnailRenderer(CFG.thumbnail_converter_url, character_id=CFG.thumbnail_character_id,
         timeout_seconds=60, image_format='png', reuse_library=False)
     arms = {a: {'cases': []} for a in ('search', 'refine')}
     operations = []
-    for case in native['cases']:
+    for case in cases:
         cid = case['case_id']
         source = package/case['input']['path']
         if sha256_file(source) != case['input']['sha256']:
@@ -159,7 +166,7 @@ def execute(package, output, revision, model, previous=None):
             arms[a]['cases'].append(row)
         operations.append(op)
         write_json(output/'operations.json', operations)
-        print(json.dumps({'case': cid, 'completed': len(operations), 'total': 50}), flush=True)
+        print(json.dumps({'case': cid, 'completed': len(operations), 'total': len(cases), 'shard': shard_index}), flush=True)
     config = {'run_id': revision, 'rubric_version': '3.2', 'rubric_id': RUBRIC['rubric_id'],
               'mode': 'live_e2e', 'review_status': 'ai_assisted_unreviewed'}
     write_json(output/'config.json', config)
@@ -227,7 +234,8 @@ def main():
             time.sleep(5)
         else:
             raise RuntimeError('staging startup timeout')
-        success = execute(manifest[0].parent, output, os.environ['EVAL_REVISION'], os.environ['EVAL_JUDGE_MODEL'], previous)
+        success = execute(manifest[0].parent, output, os.environ['EVAL_REVISION'], os.environ['EVAL_JUDGE_MODEL'], previous,
+                          int(os.environ.get('EVAL_SHARD_INDEX', '0')), int(os.environ.get('EVAL_SHARD_COUNT', '1')))
     except Exception as exc:
         write_json(output/'failure.json', {'error_type': type(exc).__name__})
     finally:

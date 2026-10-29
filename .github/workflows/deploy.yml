@@ -93,6 +93,12 @@ jobs:
             --task-definition "$TASK_DEFINITION" \
             --query taskDefinition > taskdef.json
 
+      - name: Keep staging inline asset initializer on the deployed image
+        if: github.ref == 'refs/heads/develop'
+        env:
+          STAGING_IMAGE: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+        run: python scripts/prepare_staging_asset_initializer.py taskdef.json --image "$STAGING_IMAGE"
+
       - name: Prepare explicit fullbody deployment contract
         env:
           REQUESTED_POSE_VARIANT: ${{ vars.POSE_MODEL_VARIANT }}

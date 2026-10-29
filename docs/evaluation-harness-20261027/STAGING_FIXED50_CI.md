@@ -4,15 +4,15 @@
 
 `.github/workflows/deploy.yml`의 develop 배포가 안정화된 뒤 staging 환경 변수 `STAGING_EVAL_ENABLED=true`이면 자동 실행한다. 모든 develop 배포를 평가하므로 검색·리파인 변경 배포도 포함한다. main/beta에서는 실행하지 않는다. 기존 배포 concurrency를 공유하며 배포가 바뀌는 동안 평가가 겹치지 않는다. 평가 실패는 배포를 되돌리지 않으며 CI 실패와 보고서로 알린다.
 
-GitHub runner는 모델을 실행하지 않는다. `scripts/run_staging_evaluation_ci.py`가 스테이징 서비스의 현재 task definition을 읽고 **동일 이미지·라이브러리·모델 설정**의 별도 Fargate task를 실행한다. inference 서비스 자체는 수정하지 않는다. task 안의 API는 127.0.0.1에만 열며 Discord 알림 설정은 제거한다. converter는 스테이징 내부 서비스를 사용한다. 이는 BFF 인증·사용자 클릭·최종 FBX 저장까지의 제품 E2E 검증이 아니다.
+GitHub runner는 모델을 실행하지 않는다. `scripts/run_staging_evaluation_ci.py`가 스테이징 서비스의 현재 task definition을 읽고 **동일 이미지·라이브러리·모델 설정**의 고정 50컷을 17·17·16컷으로 나눈 최대 3개의 별도 Fargate task를 실행한다. inference 서비스 자체는 수정하지 않는다. task 안의 API는 127.0.0.1에만 열며 Discord 알림 설정은 제거한다. converter는 스테이징 내부 서비스를 사용한다. 이는 BFF 인증·사용자 클릭·최종 FBX 저장까지의 제품 E2E 검증이 아니다.
 
-최대 task 실행 시간은 3,000초이고 CI step은 60분이다. 원본 50회 분석, 반환 인물별 Top-1의 허용된 리파인 최대 60회, 두 arm의 AI 판정(각 arm 최대 120회 예산)이 상한이다. comparison arm은 첫 arm에서 동결된 목표 자세를 재사용하고, 다음 버전에서도 이전 목표 추정을 재사용한다. 실제 비교 모델은 staging 환경 변수 `STAGING_EVAL_JUDGE_MODEL`로 고정한다. 별도 평가 태스크/렌더/AI 비용이 발생한다.
+최대 task 실행 시간은 3,000초이고 CI step은 60분이다. 3개 묶음은 같은 배포 이미지로 병렬 실행하며 50개 고유 컷이 모두 정상 완료된 경우에만 합산 보고서와 기준선을 발행한다. 어느 묶음이 실패해도 기존 기준선은 유지하고 묶음별 진단 파일을 보존한다. 원본 50회 분석, 반환 인물별 Top-1의 허용된 리파인 최대 60회, 두 arm의 AI 판정(각 arm 최대 120회 예산)이 상한이다. comparison arm은 첫 arm에서 동결된 목표 자세를 재사용하고, 다음 버전에서도 이전 목표 추정을 재사용한다. 실제 비교 모델은 staging 환경 변수 `STAGING_EVAL_JUDGE_MODEL`로 고정한다. 최대 3개 평가 태스크/렌더/AI 비용이 발생한다. converter를 공유하는 고정 3-way 부하 조건이므로 시간은 이 CI 조건의 관측값이다.
 
 ## 고정 데이터·기준선
 
 사용자가 확정한 `standin-rescore-v3.2.zip`, SHA-256 `be85f93b2e3f4bc276d221ce8dd5c716b3360f546802c5dcf65a703d7bcf00b3`를 스테이징 비공개 assets bucket의 `evaluation/fixed50/v3.2/<sha>.zip`에 보관한다. 매 실행 실제 ZIP 바이트와 입력 이미지 해시를 검증한다. 기존 최종 출력과 점수를 새 버전 결과로 재사용하지 않는다. 원본 50컷, 기대 인원·원본 박스, framing만 사용하며 박스/인원은 기존 AI 기준이라는 한계를 유지한다.
 
-평가 코드·루브릭·모델 이름·데이터 해시가 같은 실행끼리만 같은 비교 series다. 첫 완료 실행이 baseline이며 이후 마지막 완료 실행과 비교한다. 인프라·렌더·AI 판정 실패는 이전 baseline을 갱신하지 않는다. 성능이 나빠졌지만 정상 실행된 결과는 그대로 다음 비교 기준이 되며, 이전 모든 보고서를 버전별 보존한다. 평가 코드/모델 변경 시 새 series를 생성하고 잘못된 전후 차이를 제시하지 않는다.
+평가 전용 코드·루브릭·모델 이름·데이터 해시가 같은 실행끼리만 같은 비교 series다. 패키지에 함께 들어간 제품 검색·리파인 알고리즘 파일의 변경은 series를 바꾸지 않는다. 첫 완료 실행이 baseline이며 이후 마지막 완료 실행과 비교한다. 인프라·렌더·AI 판정 실패는 이전 baseline을 갱신하지 않는다. 성능이 나빠졌지만 정상 실행된 결과는 그대로 다음 비교 기준이 되며, 이전 모든 보고서를 버전별 보존한다. 평가 코드/모델 변경 시 새 series를 생성하고 잘못된 전후 차이를 제시하지 않는다.
 
 프로덕션 버킷을 쓰지 않는다. 평가 task는 제한 시간의 서명 URL로 필요한 ZIP만 읽고 자기 보고서 경로에만 업로드한다. URL/키는 보고서에 넣지 않는다. GitHub CI 역할의 필요한 추가 권한은 `evaluation/ci/staging-evaluation-policy.json`에 명시되어 있다. 평가 task role 자체에는 새 권한을 부여하지 않는다. 현재 배포 역할은 RegisterTaskDefinition/Describe/PassRole 권한을 이미 가지고 있다.
 
@@ -48,3 +48,7 @@ python scripts/run_staging_evaluation_ci.py \
 2026-10-29 로컬 검증: 전체 **2778 passed, 8 skipped, 31 subtests passed**, 변경 관련 **117 passed**, compile 및 diff 검증 통과. 스테이징 리비전 `612be944d387c3dd2543ee2eed6ae95183c101bb`과 업로드된 데이터의 preflight 통과. IAM 추가 정책은 별도 승인 대상이며, 승인 전 `STAGING_EVAL_ENABLED=false`로 설정한다. 실제 Fargate/평가 AI 50컷 실행 완료를 의미하지 않는다.
 
 사용자 명시 승인 후 `standin-github-deploy`의 `standin-staging-fixed50-evaluation` 정책을 적용했고, staging `STAGING_EVAL_ENABLED=true`를 확인했다. IAM 시뮬레이션에서 해당 평가 task definition의 RunTask 권한이 allowed다. 초기 실제 실행에서 삭제된 과거 body-assets-init 이미지와 컨테이너의 기존 standin_eval 패키지 우선 로딩을 발견했다. 평가 task에서만 인라인 초기화 코드를 현재 staging 이미지로 실행하고, 업로드한 하네스를 명시적으로 먼저 로드하도록 수정했다. 이 두 회귀를 포함해 최종 전체 **2780 passed, 8 skipped, 31 subtests passed**다. 서비스 task definition은 변경하지 않았다.
+
+초기화 컨테이너의 과거 digest가 ECR에 없어 새 태스크를 만들 수 없는 문제는 develop 배포 단계에도 한정하여 보완한다. `prepare_staging_asset_initializer.py`는 인라인 Python 코드와 manifest 환경을 유지하고 이미지 참조만 이번 immutable inference SHA로 맞춘다. main 배포에는 적용하지 않는다.
+
+최종 분할 실행 검증: **2784 passed, 8 skipped, 31 subtests passed**. staging 전용 회귀 21개에는 3개 묶음의 50컷 실제 집계 코드 통합, 누락·중복 거부, 제품 검색 코드 변경 시 기준선 유지, 평가 기준 변경 시 새 series, staging 초기화 이미지 고정이 포함된다. 처리 시간 `total_seconds`는 50컷 작업 시간의 합이며 병렬 실행의 벽시계 경과 시간과 다르다.
