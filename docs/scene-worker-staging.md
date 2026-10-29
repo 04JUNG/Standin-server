@@ -179,6 +179,11 @@ use the same worker concurrency group and preflight checks.
 `deploy_staging=false` uploads only the
 commit-tagged image. `true` requires the ECS target and updates only that service,
 then waits for ECS health/stability. It preserves task environment/secrets/mounts.
+The repository must use fully immutable tags. A retry of the same commit reuses
+its existing ECR image instead of overwriting the tag; only ImageNotFound allows
+a first build. Permission/network/repository errors stop the workflow. Both new
+and reused images are pulled by their resolved digest and dependency-checked,
+and ECS receives that digest rather than a movable tag.
 There is no automatic production deployment. Rollback uses the previously approved
 task/image and matching immutable release; outstanding plans must be recreated.
 Do not run deploy before the asset/infra checklist above is complete.
