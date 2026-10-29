@@ -34,12 +34,15 @@
 - 기준: `origin/develop`의 `029a50c` (2026-10-29 확인 시점)
 - 통합 커밋 1: `6d5999b` — 요청 기한 공유·설명 재시도
 - 통합 커밋 2: `2dc8310` — 인물별 크롭·개별 실패 격리
+- 배포 설정 연결 커밋: `120c4e8`
 - 원본 실험 커밋: `67155fc`, `3f5c278`
 - 최신 develop의 refine v3 evidence/shadow와 scene-camera 변경을 보존했다.
 - `.env.example` 충돌은 develop의 prefetch 기본 OFF를 유지하고 새 예산 설정을 추가했다. API 문서 충돌은 양쪽 설명을 모두 보존했다.
 - feature → develop → main 순서로 검토한다. 실험 브랜치 전체를 develop에 merge하면 main 전용 기본값 등 불필요한 변경이 섞일 수 있으므로 이 통합 브랜치 또는 첨부 patch를 사용한다.
 
-이 브랜치는 서버 반영 PR로 제출하는 변경이다. merge와 스테이징/운영 배포는 수행하지 않았다. 통합 후 develop이 더 진행됐다면 담당자가 최신 develop에 rebase/충돌 해결하고 CI를 다시 확인한다.
+원격 브랜치 `origin/fix/person-description-crops-develop`에 푸시했다. PR 생성은 연결 도구 권한 부족으로 미완료이며 merge와 스테이징/운영 배포는 수행하지 않았다.
+
+[develop 대상 PR 작성 화면](https://github.com/04JUNG/Standin-server/compare/develop...fix/person-description-crops-develop?expand=1)에서 변경 내용을 검토할 수 있다. reviewer 최소 1명의 확인 후 develop에 반영한다. 통합 후 develop이 더 진행됐다면 담당자가 최신 develop에 rebase/충돌 해결하고 CI를 다시 확인한다.
 
 ### 변경 파일
 
