@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Launch one bounded evaluation task using the current staging service definition."""
+"""Launch bounded evaluation shards using the current staging service definition."""
 import argparse
 import hashlib
 import json
@@ -106,9 +106,12 @@ def main():
         previous_key = series+'/baseline.json'
         previous_url = ''
         previous_value = None
+        previous_etag = None
         existing = s3.list_objects_v2(Bucket=BUCKET, Prefix=previous_key, MaxKeys=1).get('Contents', [])
         if any(item['Key'] == previous_key for item in existing):
-            previous = s3.get_object(Bucket=BUCKET, Key=previous_key)['Body'].read()
+            previous_object = s3.get_object(Bucket=BUCKET, Key=previous_key)
+            previous = previous_object['Body'].read()
+            previous_etag = previous_object['ETag']
             # Snapshot previous baseline: never depend on a mutable URL during execution.
             s3.put_object(Bucket=BUCKET, Key=run_key+'/previous.json', Body=previous)
             previous_url = signed('get_object', run_key+'/previous.json')
@@ -166,8 +169,9 @@ def main():
             merge_fragments(fragments,output/'report',previous_value)
             archive = shutil.make_archive(str(output/'report'),'zip',output/'report')
             s3.upload_file(archive,BUCKET,run_key+'/report.zip')
-            # Deployment concurrency protects this last-successful pointer.
-            s3.put_object(Bucket=BUCKET,Key=previous_key,Body=(output/'report/result.json').read_bytes())
+            # Also protect against a separately launched manual run finishing out of order.
+            condition = {'IfMatch':previous_etag} if previous_etag else {'IfNoneMatch':'*'}
+            s3.put_object(Bucket=BUCKET,Key=previous_key,Body=(output/'report/result.json').read_bytes(),**condition)
             write_json(output/'published.json', {'report_key':run_key+'/report.zip','baseline_key':previous_key})
         finally:
             if task_arns:

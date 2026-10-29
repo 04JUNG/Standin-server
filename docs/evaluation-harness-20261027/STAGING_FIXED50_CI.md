@@ -45,10 +45,8 @@ python scripts/run_staging_evaluation_ci.py \
 
 비교 범위·분모·상반신 분리, 다인 박스 대응, dynamic 무결과의 legacy 대체 차단, 리파인 권한·원본 후보 전달, 알림 제거와 task 정의 불변성, develop 전용 workflow, 서비스/AI를 주입한 실제 50컷 수집→양 arm 채점→보고서 생성 통합 테스트를 포함한다. 실제 스테이징 태스크 실행과 CI 권한 활성화 여부는 배포 기록에서 별도로 확인한다.
 
-2026-10-29 로컬 검증: 전체 **2778 passed, 8 skipped, 31 subtests passed**, 변경 관련 **117 passed**, compile 및 diff 검증 통과. 스테이징 리비전 `612be944d387c3dd2543ee2eed6ae95183c101bb`과 업로드된 데이터의 preflight 통과. IAM 추가 정책은 별도 승인 대상이며, 승인 전 `STAGING_EVAL_ENABLED=false`로 설정한다. 실제 Fargate/평가 AI 50컷 실행 완료를 의미하지 않는다.
+2026-10-29 전체 검증: **2784 passed, 8 skipped, 31 subtests passed**. 스테이징 전용 회귀 21개에는 3개 묶음의 50컷 집계 코드 통합, 누락·중복 거부, 제품 검색 코드 변경 시 기준선 유지, 평가 기준 변경 시 새 series, 스테이징 초기화 이미지 고정이 포함된다. compile 및 diff 검사와 PR checks/worker를 통과했다. 처리 시간 `total_seconds`는 50컷 작업 시간의 합이며 병렬 실행의 벽시계 경과 시간과 다르다.
 
-사용자 명시 승인 후 `standin-github-deploy`의 `standin-staging-fixed50-evaluation` 정책을 적용했고, staging `STAGING_EVAL_ENABLED=true`를 확인했다. IAM 시뮬레이션에서 해당 평가 task definition의 RunTask 권한이 allowed다. 초기 실제 실행에서 삭제된 과거 body-assets-init 이미지와 컨테이너의 기존 standin_eval 패키지 우선 로딩을 발견했다. 평가 task에서만 인라인 초기화 코드를 현재 staging 이미지로 실행하고, 업로드한 하네스를 명시적으로 먼저 로드하도록 수정했다. 이 두 회귀를 포함해 최종 전체 **2780 passed, 8 skipped, 31 subtests passed**다. 서비스 task definition은 변경하지 않았다.
+사용자 명시 승인 후 `standin-github-deploy`의 `standin-staging-fixed50-evaluation` 정책을 적용했고, staging `STAGING_EVAL_ENABLED=true`를 확인했다. IAM 시뮬레이션에서 해당 평가 task definition의 RunTask 권한이 allowed다. 고정 ZIP과 스테이징 리비전 `612be944d387c3dd2543ee2eed6ae95183c101bb`의 preflight를 통과했다. CI 코드의 develop 반영은 PR 머지 후 이뤄진다.
 
-초기화 컨테이너의 과거 digest가 ECR에 없어 새 태스크를 만들 수 없는 문제는 develop 배포 단계에도 한정하여 보완한다. `prepare_staging_asset_initializer.py`는 인라인 Python 코드와 manifest 환경을 유지하고 이미지 참조만 이번 immutable inference SHA로 맞춘다. main 배포에는 적용하지 않는다.
-
-최종 분할 실행 검증: **2784 passed, 8 skipped, 31 subtests passed**. staging 전용 회귀 21개에는 3개 묶음의 50컷 실제 집계 코드 통합, 누락·중복 거부, 제품 검색 코드 변경 시 기준선 유지, 평가 기준 변경 시 새 series, staging 초기화 이미지 고정이 포함된다. 처리 시간 `total_seconds`는 50컷 작업 시간의 합이며 병렬 실행의 벽시계 경과 시간과 다르다.
+실제 기동 검증에서 초기화 컨테이너의 과거 digest가 ECR에 없어 새 태스크를 만들 수 없는 문제를 확인했다. `prepare_staging_asset_initializer.py`는 인라인 Python 코드와 manifest 환경을 유지하고 이미지 참조만 이번 immutable inference SHA로 맞춘다. develop 배포 단계와 평가 태스크에 적용하며 main 배포에는 적용하지 않는다. 평가 태스크는 컨테이너에 들어 있던 이전 하네스 대신 업로드한 평가 코드를 명시적으로 먼저 로드한다. 현재 서비스 task definition 자체는 수정하지 않았다.
