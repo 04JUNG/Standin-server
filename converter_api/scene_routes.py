@@ -76,10 +76,15 @@ def register_scene_routes(app, runner):
             raise ApiProblem(504, exc.code, "scene composition timed out") from exc
         except RunnerError as exc:
             raise ApiProblem(500, exc.code, "scene composition or round-trip verification failed") from exc
+        from converter.scene_camera_transport import HEADER, camera_header
+        camera_headers = {}
+        if result.report.get("framing"):
+            camera_headers[HEADER] = camera_header(result.report["framing"], hashlib.sha256(result.artifact).hexdigest())
         raw = response_format == "fbx"
         data = result.artifact if raw else scene_bundle(scene, result)
         extension = "fbx" if raw else "zip"
         return StreamingResponse(io.BytesIO(data), media_type="application/octet-stream" if raw else "application/zip", headers={
+            **camera_headers,
             "Content-Disposition": f'attachment; filename="{scene["cut_id"]}.{extension}"',
             "Content-Length": str(len(data)), "Cache-Control": "private, no-store",
             "X-Standin-Artifact-SHA256": hashlib.sha256(data).hexdigest(),
