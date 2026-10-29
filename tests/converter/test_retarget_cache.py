@@ -49,7 +49,7 @@ class CacheTests(unittest.TestCase):
   cache._entries[key]=Entry(DATA+b'corrupt',encode(packet()),float('inf'))
   with self.assertRaises(CacheIntegrityError):cache.get(IDENTITY)
  def test_postprocessed_result_or_wrong_identity_is_rejected(self):
-  for field in ['hands','framing','camera_rotation','preview_sha256','shape_bake']:
+  for field in ['hands','source_fingers','framing','camera_rotation','preview_sha256','shape_bake']:
    m=packet();m['body_report']={**BODY,field:{}};m['body_report_sha256']=hashlib.sha256(encode(m['body_report'])).hexdigest()
    with self.assertRaises(CacheIntegrityError):RetargetBaseCache(100000).put(IDENTITY,DATA,encode(m))
   m=packet();m['binding']={**IDENTITY,'source_sha':'changed'}

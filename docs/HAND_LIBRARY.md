@@ -15,10 +15,25 @@
         사용자가 후보를 바꾸면 그 값으로 ↓
 converter POST /convert · /convert-bundle · /convert-framed
         hand_left=<preset> hand_right=<preset>
-        ──▶ V3.2.5 몸 변환 → 손 굽기(converter/hands.py) → framing·미리보기
+        ──▶ V3.2.5 몸 변환 → 원본 손가락 전달 → 선택한 손 프리셋 → framing·미리보기
 ```
 
 ## 손 프리셋 (hand-library-v1, 79종 · 9묶음)
+
+원본 포즈의 손가락은 `converter/source_fingers.py`의 `source-fingers-v1` 단계에서
+먼저 보존한다. 기본 몸 변환의 22본 매핑에 손가락이 없어서 모든 포즈가 편 손으로
+보이던 문제를 고친 것이다. 손목 움직임을 제거한 원본 손가락 회전을 해부학적
+손바닥 좌표로 전달하며 몸·손목·본 길이·위치는 바꾸지 않는다. 좌우 반전도 지원한다.
+프리셋을 지정한 쪽은 원본 전달을 건너뛰므로 선택한 손 모양을 중복해서 접지 않는다.
+원본 체인이 불완전한 손은 `missing_finger_chain` 진단과 함께 대상 기본 손을 유지한다.
+이 진단은 손이 정확히 복원됐거나 관통이 없다는 인증이 아니다.
+
+기존 저장 썸네일은 코드 수정만으로 바뀌지 않는다.
+`scripts/rebuild_library_source_hands.py`가 별도 출력 폴더에 4범위×8방향 이미지를
+생성하고 같은 최종 FBX로 `pose-previews/`의 GLB 캐시도 다시 만든다.
+새 렌더 방식은 `frozen-native-source-fingers-v1`이며 기존 이미지·검수
+결과를 새 버전으로 재명명하지 않는다. 변경된 렌더의 설명·태그는 출력된
+`semantic-rereview.jsonl`을 기준으로 재검수해야 한다. 기존 입력 DB·BVH는 수정하지 않는다.
 
 | 묶음 | 프리셋 |
 |---|---|

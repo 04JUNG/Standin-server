@@ -24,7 +24,8 @@ MAX_MODEL_BYTES = 8 * 1024 * 1024
 def model_revision() -> str:
     # Source edits and frozen runtime changes invalidate precomputed assets.
     source = Path(__file__).read_bytes().replace(b"\r\n", b"\n")
-    return hashlib.sha256(source + SOLVER_MANIFEST_SHA256.encode()
+    fingers = Path(__file__).with_name("source_fingers.py").read_bytes().replace(b"\r\n", b"\n")
+    return hashlib.sha256(source + fingers + SOLVER_MANIFEST_SHA256.encode()
                           + EXPECTED_BLENDER_BUILD_HASH.encode()).hexdigest()
 
 

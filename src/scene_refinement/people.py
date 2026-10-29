@@ -4,7 +4,7 @@ from pathlib import Path
 import json, math, hashlib
 import bpy, numpy as np
 from mathutils import Matrix, Vector
-from converter.convert import convert
+from converter.source_fingers import convert_source_pose as convert
 from converter import retarget as rt
 from converter.framing import crop_meshes
 from .rig import validate_rig
