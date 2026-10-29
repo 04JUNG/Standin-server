@@ -1,5 +1,10 @@
 # Standin evaluation harness
 
+최신 v3.2(전신100·상반신45·보류 점수 범위)의 ZIP 검증, 자동 AI 초안 판정,
+집계와 마지막 사람 검수는 [Rubric 3.2 자동화](../docs/evaluation-harness-20261027/RUBRIC_3_2_AUTOMATION.md)를 따른다.
+[v3.1 문서](../docs/evaluation-harness-20261027/RUBRIC_3_1_AUTOMATION.md)는 이전 계약 참고용이다.
+기존 PCK/검색 relevance와 별도 지표이며, AI 결과는 사람 검수 전 추정으로 표시한다.
+
 실행 진입점은 `python -m standin_eval`이다. 저장소의 `.venv`를 쓰는 예시는 다음과 같다.
 
 ```bash

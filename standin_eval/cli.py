@@ -24,6 +24,9 @@ def _print(value) -> None:
 
 def _dataset(parser: argparse.ArgumentParser) -> None:
     sub = parser.add_subparsers(dest="dataset_command", required=True)
+    rubric = sub.add_parser("prepare-rubric-review", help="Prepare seven-part review worklist from sealed pose dataset")
+    rubric.add_argument("--dataset", required=True)
+    rubric.add_argument("--output", required=True)
     pose = sub.add_parser("import-pose-suite", help="Pin one authored COCO17 suite set, preserving draft GT")
     pose.add_argument("--source", required=True)
     pose.add_argument("--output", required=True)
@@ -78,6 +81,39 @@ def _fixture(parser: argparse.ArgumentParser) -> None:
 
 def _run(parser: argparse.ArgumentParser) -> None:
     sub = parser.add_subparsers(dest="run_command", required=True)
+    intake = sub.add_parser("rubric-import-zip", help="Validate and recompute a 50-case rescore ZIP")
+    intake.add_argument("--zip", required=True)
+    intake.add_argument("--output", required=True)
+    intake.add_argument("--expected-count", type=int, default=50)
+    final = sub.add_parser("rubric-finalize", help="Apply explicit final human decisions without re-running models")
+    final.add_argument("--scored", required=True)
+    final.add_argument("--decisions", required=True)
+    final.add_argument("--artifacts-root", required=True)
+    final.add_argument("--output", required=True)
+    queue = sub.add_parser("rubric-review-queue", help="Create final human-review rows for all cases")
+    queue.add_argument("--scored", required=True)
+    queue.add_argument("--output", required=True)
+    audit = sub.add_parser("rubric-audit-judge", help="Compare AI and human judgements of the same frozen outputs")
+    audit.add_argument("--reference", required=True)
+    audit.add_argument("--automatic", required=True)
+    audit.add_argument("--output", required=True)
+    rubric = sub.add_parser("rubric-score", help="Offline rubric 3.1 scoring of frozen seven-part reviews")
+    rubric.add_argument("--manifest", required=True)
+    rubric.add_argument("--reviews", required=True)
+    rubric.add_argument("--config", required=True)
+    rubric.add_argument("--artifacts-root", required=True)
+    rubric.add_argument("--output", required=True)
+    check = sub.add_parser("rubric-contract-check", help="Verify the 12 supplied synthetic examples; not model quality")
+    check.add_argument("--output", required=True)
+    judge = sub.add_parser("rubric-judge", help="Opt-in AI-assisted visual judgements of frozen selected outputs")
+    judge.add_argument("--manifest", required=True)
+    judge.add_argument("--config", required=True)
+    judge.add_argument("--artifacts-root", required=True)
+    judge.add_argument("--output", required=True)
+    judge.add_argument("--model", required=True)
+    judge.add_argument("--max-calls", required=True, type=int)
+    judge.add_argument("--judge-timeout", required=True, type=float)
+    judge.add_argument("--allow-provider", action="store_true")
     pose = sub.add_parser("pose-benchmark", help="Fixed-person COCO17 scoring; no provider call by default")
     pose.add_argument("--dataset", required=True)
     pose.add_argument("--output", required=True)
@@ -268,6 +304,10 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command == "dataset":
+        if args.dataset_command == "prepare-rubric-review":
+            from .rubric_score import prepare_pose_review
+            _print(prepare_pose_review(args.dataset, args.output))
+            return 0
         if args.dataset_command == "import-pose-suite":
             from .pose_dataset import import_pose_suite
             frozen, _, _ = import_pose_suite(args.source, args.output, source_commit=args.source_commit,
@@ -321,6 +361,44 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "run":
+        if args.run_command == "rubric-audit-judge":
+            from .rubric_package import audit_judge
+            result = audit_judge(args.reference, args.automatic, args.output)
+            _print({"cases": result["cases"], "agreement": result["agreement"]})
+            return 0
+        if args.run_command == "rubric-import-zip":
+            from .rubric_package import import_package
+            result = import_package(args.zip, args.output, expected_count=args.expected_count)
+            _print(result)
+            return 0 if result["status"] == "valid" else 2
+        if args.run_command == "rubric-review-queue":
+            from .rubric_package import review_queue
+            _print(review_queue(args.scored, args.output))
+            return 0
+        if args.run_command == "rubric-finalize":
+            from .rubric_package import finalize_review
+            result = finalize_review(args.scored, args.decisions, args.artifacts_root, args.output)
+            _print({"review_origin": result["review_origin"], "total_cases": result["total_cases"]})
+            return 0
+        if args.run_command == "rubric-judge":
+            from .rubric_judge import GeminiRubricJudge, judge_bundle
+            if not args.allow_provider:
+                raise ValueError("rubric-judge sends paired images to Gemini; explicit --allow-provider required")
+            judge = GeminiRubricJudge(args.model, args.judge_timeout)
+            result = judge_bundle(args.manifest, args.config, args.output, args.artifacts_root,
+                                  judge=judge, model=args.model, max_calls=args.max_calls)
+            _print({"review_origin": result["review_origin"], "eligible_cases": result.get("eligible_cases"), "scopes": result.get("scopes"), "output": args.output})
+            return 0
+        if args.run_command == "rubric-score":
+            from .rubric_score import score_bundle
+            result = score_bundle(args.manifest, args.reviews, args.config, args.output, args.artifacts_root)
+            _print({k: result[k] for k in ("run_id", "total_cases", "eligible_cases", "full_body_mean", "review_origin", "comparison_ready", "scopes") if k in result})
+            return 0
+        if args.run_command == "rubric-contract-check":
+            from .rubric_score import contract_check
+            result = contract_check(args.output)
+            _print({"synthetic": True, "acceptance_cases_passed": result["acceptance_cases_passed"], "output": args.output})
+            return 0
         if args.run_command == "pose-benchmark":
             from .pose_benchmark import run_pose_benchmark
             requested = {"vlm":args.requested_vlm,"pose":args.requested_pose} if args.requested_vlm or args.requested_pose else None

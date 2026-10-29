@@ -1,0 +1,32 @@
+{
+  "created_date": "2026-10-28",
+  "spec_version": "draft-1.0",
+  "rubric_version": "3.1",
+  "new_evaluation_run": false,
+  "files": [
+    {
+      "path": "standin-evaluation-harness-handoff.html",
+      "sha256": "64123d3084cd827756076abd5ae10ba08b730ed828b10a4b775323dfc89579d3"
+    },
+    {
+      "path": "standin-scoring-guide.html",
+      "sha256": "ede41b7c38da92e5e9977ee1840318f8a532586645a85c572412e43ed8d7939f"
+    },
+    {
+      "path": "rubric.json",
+      "sha256": "b0f369a053d7971c6a0170754197eae7c5368a655b9079bbc2c39c00465d0d23"
+    },
+    {
+      "path": "review-record.schema.json",
+      "sha256": "8085a4bd62a006f24ca1963d60c5f797437178cf8a4b9d73968b898f0b5cf449"
+    },
+    {
+      "path": "contract-examples.json",
+      "sha256": "373c6ed15a7b7bc03871c118999b84cfb2778640f4df98968d458f573d5be490"
+    },
+    {
+      "path": "README.txt",
+      "sha256": "9e899886c4b86903f42d55605b62b9d0b69ecfb452c49f09e8d38cb09c23bb1f"
+    }
+  ]
+}

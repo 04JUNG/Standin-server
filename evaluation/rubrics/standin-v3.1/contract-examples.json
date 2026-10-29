@@ -1,0 +1,711 @@
+{
+  "notice": "모두 가상 데이터: 계산 규칙 검증용이며 실제 50장 채점 결과가 아님.",
+  "cases": [
+    {
+      "input": {
+        "case_id": "F01-full-100",
+        "rubric_id": "standin-deduction-head5-action35",
+        "run_id": "synthetic-contract-v1",
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1,
+        "people": [
+          {
+            "reference_person_id": "P1",
+            "chosen_rank": 1,
+            "candidate_id": "synthetic-F01-full-100",
+            "final_image": "fixture-only-not-an-image.png",
+            "final_image_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "refine_status": "returned",
+            "reviewer": "synthetic-fixture",
+            "criteria": {
+              "right_arm": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "left_arm": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "right_leg": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "left_leg": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "torso": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "head": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "action": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              }
+            }
+          }
+        ],
+        "execution_error": null
+      },
+      "expected": {
+        "diagnostic_score": 100,
+        "case_score": 100,
+        "full_body_eligible": true,
+        "full_body_100": true,
+        "classification": "full_body"
+      }
+    },
+    {
+      "input": {
+        "case_id": "F02-head-95",
+        "rubric_id": "standin-deduction-head5-action35",
+        "run_id": "synthetic-contract-v1",
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1,
+        "people": [
+          {
+            "reference_person_id": "P1",
+            "chosen_rank": 1,
+            "candidate_id": "synthetic-F02-head-95",
+            "final_image": "fixture-only-not-an-image.png",
+            "final_image_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "refine_status": "returned",
+            "reviewer": "synthetic-fixture",
+            "criteria": {
+              "right_arm": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "left_arm": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "right_leg": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "left_leg": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "torso": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "head": {
+                "status": "mismatch",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "action": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              }
+            }
+          }
+        ],
+        "execution_error": null
+      },
+      "expected": {
+        "diagnostic_score": 95,
+        "case_score": 95,
+        "full_body_eligible": true,
+        "full_body_100": false,
+        "classification": "full_body"
+      }
+    },
+    {
+      "input": {
+        "case_id": "F03-arms-leg-head-65",
+        "rubric_id": "standin-deduction-head5-action35",
+        "run_id": "synthetic-contract-v1",
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1,
+        "people": [
+          {
+            "reference_person_id": "P1",
+            "chosen_rank": 1,
+            "candidate_id": "synthetic-F03-arms-leg-head-65",
+            "final_image": "fixture-only-not-an-image.png",
+            "final_image_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "refine_status": "returned",
+            "reviewer": "synthetic-fixture",
+            "criteria": {
+              "right_arm": {
+                "status": "mismatch",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "left_arm": {
+                "status": "mismatch",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "right_leg": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "left_leg": {
+                "status": "mismatch",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "torso": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "head": {
+                "status": "mismatch",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "action": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              }
+            }
+          }
+        ],
+        "execution_error": null
+      },
+      "expected": {
+        "diagnostic_score": 65,
+        "case_score": 65,
+        "full_body_eligible": true,
+        "full_body_100": false,
+        "classification": "full_body"
+      }
+    },
+    {
+      "input": {
+        "case_id": "F04-returned-wrong-0",
+        "rubric_id": "standin-deduction-head5-action35",
+        "run_id": "synthetic-contract-v1",
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1,
+        "people": [
+          {
+            "reference_person_id": "P1",
+            "chosen_rank": 1,
+            "candidate_id": "synthetic-F04-returned-wrong-0",
+            "final_image": "fixture-only-not-an-image.png",
+            "final_image_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "refine_status": "returned",
+            "reviewer": "synthetic-fixture",
+            "criteria": {
+              "right_arm": {
+                "status": "mismatch",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "left_arm": {
+                "status": "mismatch",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "right_leg": {
+                "status": "mismatch",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "left_leg": {
+                "status": "mismatch",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "torso": {
+                "status": "mismatch",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "head": {
+                "status": "mismatch",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "action": {
+                "status": "mismatch",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              }
+            }
+          }
+        ],
+        "execution_error": null
+      },
+      "expected": {
+        "diagnostic_score": 0,
+        "case_score": 0,
+        "full_body_eligible": true,
+        "full_body_100": false,
+        "classification": "full_body"
+      }
+    },
+    {
+      "input": {
+        "case_id": "F05-no-result",
+        "rubric_id": "standin-deduction-head5-action35",
+        "run_id": "synthetic-contract-v1",
+        "result_status": "returned_none",
+        "expected_people": 1,
+        "returned_people": 0,
+        "people": [],
+        "execution_error": null
+      },
+      "expected": {
+        "diagnostic_score": null,
+        "case_score": 0,
+        "full_body_eligible": false,
+        "full_body_100": false,
+        "classification": "no_result"
+      }
+    },
+    {
+      "input": {
+        "case_id": "F06-upper-body-excluded",
+        "rubric_id": "standin-deduction-head5-action35",
+        "run_id": "synthetic-contract-v1",
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1,
+        "people": [
+          {
+            "reference_person_id": "P1",
+            "chosen_rank": 1,
+            "candidate_id": "synthetic-F06-upper-body-excluded",
+            "final_image": "fixture-only-not-an-image.png",
+            "final_image_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "refine_status": "returned",
+            "reviewer": "synthetic-fixture",
+            "criteria": {
+              "right_arm": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "left_arm": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "right_leg": {
+                "status": "unobservable",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "left_leg": {
+                "status": "unobservable",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "torso": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "head": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "action": {
+                "status": "unobservable",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              }
+            }
+          }
+        ],
+        "execution_error": null
+      },
+      "expected": {
+        "diagnostic_score": 100,
+        "case_score": null,
+        "full_body_eligible": false,
+        "full_body_100": false,
+        "classification": "needs_review_or_out_of_scope"
+      }
+    },
+    {
+      "input": {
+        "case_id": "F07-camera-held",
+        "rubric_id": "standin-deduction-head5-action35",
+        "run_id": "synthetic-contract-v1",
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1,
+        "people": [
+          {
+            "reference_person_id": "P1",
+            "chosen_rank": 1,
+            "candidate_id": "synthetic-F07-camera-held",
+            "final_image": "fixture-only-not-an-image.png",
+            "final_image_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "refine_status": "returned",
+            "reviewer": "synthetic-fixture",
+            "criteria": {
+              "right_arm": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "left_arm": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "right_leg": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "left_leg": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "torso": {
+                "status": "uncertain",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "head": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "action": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              }
+            }
+          }
+        ],
+        "execution_error": null
+      },
+      "expected": {
+        "diagnostic_score": 100,
+        "case_score": null,
+        "full_body_eligible": false,
+        "full_body_100": false,
+        "classification": "needs_review_or_out_of_scope"
+      }
+    },
+    {
+      "input": {
+        "case_id": "F08-missing-person-cap-50",
+        "rubric_id": "standin-deduction-head5-action35",
+        "run_id": "synthetic-contract-v1",
+        "result_status": "returned_partial",
+        "expected_people": 2,
+        "returned_people": 1,
+        "people": [
+          {
+            "reference_person_id": "P1",
+            "chosen_rank": 1,
+            "candidate_id": "synthetic-F08-missing-person-cap-50",
+            "final_image": "fixture-only-not-an-image.png",
+            "final_image_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "refine_status": "returned",
+            "reviewer": "synthetic-fixture",
+            "criteria": {
+              "right_arm": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "left_arm": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "right_leg": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "left_leg": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "torso": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "head": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "action": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              }
+            }
+          }
+        ],
+        "execution_error": null
+      },
+      "expected": {
+        "diagnostic_score": 100,
+        "case_score": 50,
+        "full_body_eligible": false,
+        "full_body_100": false,
+        "classification": "missing_people"
+      }
+    },
+    {
+      "input": {
+        "case_id": "F09-missing-person-stays-25",
+        "rubric_id": "standin-deduction-head5-action35",
+        "run_id": "synthetic-contract-v1",
+        "result_status": "returned_partial",
+        "expected_people": 2,
+        "returned_people": 1,
+        "people": [
+          {
+            "reference_person_id": "P1",
+            "chosen_rank": 1,
+            "candidate_id": "synthetic-F09-missing-person-stays-25",
+            "final_image": "fixture-only-not-an-image.png",
+            "final_image_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "refine_status": "returned",
+            "reviewer": "synthetic-fixture",
+            "criteria": {
+              "right_arm": {
+                "status": "mismatch",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "left_arm": {
+                "status": "mismatch",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "right_leg": {
+                "status": "mismatch",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "left_leg": {
+                "status": "mismatch",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "torso": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "head": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "action": {
+                "status": "mismatch",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              }
+            }
+          }
+        ],
+        "execution_error": null
+      },
+      "expected": {
+        "diagnostic_score": 25,
+        "case_score": 25,
+        "full_body_eligible": false,
+        "full_body_100": false,
+        "classification": "missing_people"
+      }
+    },
+    {
+      "input": {
+        "case_id": "F10-execution-error",
+        "rubric_id": "standin-deduction-head5-action35",
+        "run_id": "synthetic-contract-v1",
+        "result_status": "execution_error",
+        "expected_people": 1,
+        "returned_people": 0,
+        "people": [],
+        "execution_error": "synthetic timeout"
+      },
+      "expected": {
+        "diagnostic_score": null,
+        "case_score": null,
+        "full_body_eligible": false,
+        "full_body_100": false,
+        "classification": "execution_error"
+      }
+    },
+    {
+      "input": {
+        "case_id": "F11-two-people-one-part",
+        "rubric_id": "standin-deduction-head5-action35",
+        "run_id": "synthetic-contract-v1",
+        "result_status": "returned_all",
+        "expected_people": 2,
+        "returned_people": 2,
+        "people": [
+          {
+            "reference_person_id": "P1",
+            "chosen_rank": 1,
+            "candidate_id": "synthetic-F11-two-people-one-part",
+            "final_image": "fixture-only-not-an-image.png",
+            "final_image_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "refine_status": "returned",
+            "reviewer": "synthetic-fixture",
+            "criteria": {
+              "right_arm": {
+                "status": "mismatch",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "left_arm": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "right_leg": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "left_leg": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "torso": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "head": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "action": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              }
+            }
+          },
+          {
+            "reference_person_id": "P2",
+            "chosen_rank": 1,
+            "candidate_id": "synthetic-F11-two-people-one-part",
+            "final_image": "fixture-only-not-an-image.png",
+            "final_image_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "refine_status": "returned",
+            "reviewer": "synthetic-fixture",
+            "criteria": {
+              "right_arm": {
+                "status": "mismatch",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "left_arm": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "right_leg": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "left_leg": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "torso": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "head": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "action": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              }
+            }
+          }
+        ],
+        "execution_error": null
+      },
+      "expected": {
+        "diagnostic_score": 90,
+        "case_score": 90,
+        "full_body_eligible": true,
+        "full_body_100": false,
+        "classification": "full_body"
+      }
+    },
+    {
+      "input": {
+        "case_id": "F12-mismatch-and-unknown",
+        "rubric_id": "standin-deduction-head5-action35",
+        "run_id": "synthetic-contract-v1",
+        "result_status": "returned_all",
+        "expected_people": 2,
+        "returned_people": 2,
+        "people": [
+          {
+            "reference_person_id": "P1",
+            "chosen_rank": 1,
+            "candidate_id": "synthetic-F11-two-people-one-part",
+            "final_image": "fixture-only-not-an-image.png",
+            "final_image_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "refine_status": "returned",
+            "reviewer": "synthetic-fixture",
+            "criteria": {
+              "right_arm": {
+                "status": "mismatch",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "left_arm": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "right_leg": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "left_leg": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "torso": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "head": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "action": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              }
+            }
+          },
+          {
+            "reference_person_id": "P2",
+            "chosen_rank": 1,
+            "candidate_id": "synthetic-F11-two-people-one-part",
+            "final_image": "fixture-only-not-an-image.png",
+            "final_image_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "refine_status": "returned",
+            "reviewer": "synthetic-fixture",
+            "criteria": {
+              "right_arm": {
+                "status": "uncertain",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "left_arm": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "right_leg": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "left_leg": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "torso": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "head": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              },
+              "action": {
+                "status": "match",
+                "reason": "규칙 계산 검증을 위한 가상 판정; 실제 이미지 판정 아님."
+              }
+            }
+          }
+        ],
+        "execution_error": null
+      },
+      "expected": {
+        "diagnostic_score": 90,
+        "case_score": null,
+        "full_body_eligible": false,
+        "full_body_100": false,
+        "classification": "needs_review_or_out_of_scope"
+      }
+    }
+  ]
+}
