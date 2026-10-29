@@ -1,0 +1,770 @@
+{
+  "cases_executed": 11,
+  "native_saved_edits": 4,
+  "selected_group_means": {
+    "legs_selected": {
+      "N": 9,
+      "scale": 100,
+      "before": [
+        62.77777777777778,
+        73.88888888888889
+      ],
+      "after": [
+        65.0,
+        76.11111111111111
+      ],
+      "paired_gain": [
+        1.1111111111111112,
+        3.3333333333333335
+      ]
+    },
+    "full_body_selected": {
+      "N": 10,
+      "scale": 100,
+      "before": [
+        62.0,
+        74.0
+      ],
+      "after": [
+        65.0,
+        78.0
+      ],
+      "paired_gain": [
+        2.0,
+        5.0
+      ]
+    },
+    "upper_body_selected": {
+      "N": 1,
+      "scale": 45,
+      "before": [
+        0.0,
+        20.0
+      ],
+      "after": [
+        20.0,
+        40.0
+      ],
+      "paired_gain": [
+        20.0,
+        20.0
+      ]
+    }
+  },
+  "fresh_fifty_case_execution": false,
+  "source_sha256": "8f16c45338138878e586fcc572df358734f8269cecaae97d5edab9413f5a97b9",
+  "rows": [
+    {
+      "test_id": "T002",
+      "case_id": "CB002",
+      "status": "applied",
+      "before": {
+        "case_id": "CB002",
+        "evaluation_scope": "upper_body",
+        "score_max": 45,
+        "score_low": 0,
+        "score_high": 20,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 25,
+        "uncertain_loss": 20,
+        "mismatch_keys": [
+          "right_arm",
+          "left_arm",
+          "head"
+        ],
+        "uncertain_keys": [
+          "torso"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [
+          "right_leg",
+          "left_leg",
+          "action"
+        ],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "after": {
+        "case_id": "CB002",
+        "evaluation_scope": "upper_body",
+        "score_max": 45,
+        "score_low": 20,
+        "score_high": 40,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 5,
+        "uncertain_loss": 20,
+        "mismatch_keys": [
+          "head"
+        ],
+        "uncertain_keys": [
+          "torso"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [
+          "right_leg",
+          "left_leg",
+          "action"
+        ],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "paired_gain_low": 20,
+      "paired_gain_high": 20
+    },
+    {
+      "test_id": "T018",
+      "case_id": "CB020",
+      "status": "applied",
+      "before": {
+        "case_id": "CB020",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 55,
+        "score_high": 75,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 25,
+        "uncertain_loss": 20,
+        "mismatch_keys": [
+          "right_arm",
+          "left_arm",
+          "head"
+        ],
+        "uncertain_keys": [
+          "torso"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "after": {
+        "case_id": "CB020",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 65,
+        "score_high": 95,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 5,
+        "uncertain_loss": 30,
+        "mismatch_keys": [
+          "head"
+        ],
+        "uncertain_keys": [
+          "left_arm",
+          "torso"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "paired_gain_low": 10,
+      "paired_gain_high": 20
+    },
+    {
+      "test_id": "T019",
+      "case_id": "CB021",
+      "status": "applied",
+      "before": {
+        "case_id": "CB021",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 55,
+        "score_high": 80,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 20,
+        "uncertain_loss": 25,
+        "mismatch_keys": [
+          "right_arm",
+          "left_leg"
+        ],
+        "uncertain_keys": [
+          "torso",
+          "head"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "after": {
+        "case_id": "CB021",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 65,
+        "score_high": 90,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 10,
+        "uncertain_loss": 25,
+        "mismatch_keys": [
+          "right_arm"
+        ],
+        "uncertain_keys": [
+          "torso",
+          "head"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "paired_gain_low": 10,
+      "paired_gain_high": 10
+    },
+    {
+      "test_id": "T022",
+      "case_id": "CB029",
+      "status": "not_applied",
+      "before": {
+        "case_id": "CB029",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 35,
+        "score_high": 60,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 40,
+        "uncertain_loss": 25,
+        "mismatch_keys": [
+          "right_arm",
+          "left_arm",
+          "right_leg",
+          "left_leg"
+        ],
+        "uncertain_keys": [
+          "torso",
+          "head"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "after": {
+        "case_id": "CB029",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 35,
+        "score_high": 60,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 40,
+        "uncertain_loss": 25,
+        "mismatch_keys": [
+          "right_arm",
+          "left_arm",
+          "right_leg",
+          "left_leg"
+        ],
+        "uncertain_keys": [
+          "torso",
+          "head"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "paired_gain_low": 0,
+      "paired_gain_high": 0
+    },
+    {
+      "test_id": "T024",
+      "case_id": "CB034",
+      "status": "not_applied",
+      "before": {
+        "case_id": "CB034",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 65,
+        "score_high": 65,
+        "exact_score": 65,
+        "score_kind": "exact",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": true,
+        "confirmed_loss": 35,
+        "uncertain_loss": 0,
+        "mismatch_keys": [
+          "left_arm",
+          "right_leg",
+          "left_leg",
+          "head"
+        ],
+        "uncertain_keys": [],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "after": {
+        "case_id": "CB034",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 65,
+        "score_high": 65,
+        "exact_score": 65,
+        "score_kind": "exact",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": true,
+        "confirmed_loss": 35,
+        "uncertain_loss": 0,
+        "mismatch_keys": [
+          "left_arm",
+          "right_leg",
+          "left_leg",
+          "head"
+        ],
+        "uncertain_keys": [],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "paired_gain_low": 0,
+      "paired_gain_high": 0
+    },
+    {
+      "test_id": "T041",
+      "case_id": "CB026",
+      "status": "not_applied",
+      "before": {
+        "case_id": "CB026",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 75,
+        "score_high": 80,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 20,
+        "uncertain_loss": 5,
+        "mismatch_keys": [
+          "right_arm",
+          "right_leg"
+        ],
+        "uncertain_keys": [
+          "head"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "after": {
+        "case_id": "CB026",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 75,
+        "score_high": 80,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 20,
+        "uncertain_loss": 5,
+        "mismatch_keys": [
+          "right_arm",
+          "right_leg"
+        ],
+        "uncertain_keys": [
+          "head"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "paired_gain_low": 0,
+      "paired_gain_high": 0
+    },
+    {
+      "test_id": "T042",
+      "case_id": "CB027",
+      "status": "applied",
+      "before": {
+        "case_id": "CB027",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 55,
+        "score_high": 65,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 35,
+        "uncertain_loss": 10,
+        "mismatch_keys": [
+          "right_arm",
+          "left_arm",
+          "left_leg",
+          "head"
+        ],
+        "uncertain_keys": [
+          "right_leg"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "after": {
+        "case_id": "CB027",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 65,
+        "score_high": 75,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 25,
+        "uncertain_loss": 10,
+        "mismatch_keys": [
+          "right_arm",
+          "left_arm",
+          "head"
+        ],
+        "uncertain_keys": [
+          "right_leg"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "paired_gain_low": 0,
+      "paired_gain_high": 20
+    },
+    {
+      "test_id": "T043",
+      "case_id": "CB028",
+      "status": "not_applied",
+      "before": {
+        "case_id": "CB028",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 55,
+        "score_high": 80,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 20,
+        "uncertain_loss": 25,
+        "mismatch_keys": [
+          "right_arm",
+          "left_leg"
+        ],
+        "uncertain_keys": [
+          "torso",
+          "head"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "after": {
+        "case_id": "CB028",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 55,
+        "score_high": 80,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 20,
+        "uncertain_loss": 25,
+        "mismatch_keys": [
+          "right_arm",
+          "left_leg"
+        ],
+        "uncertain_keys": [
+          "torso",
+          "head"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "paired_gain_low": 0,
+      "paired_gain_high": 0
+    },
+    {
+      "test_id": "T047",
+      "case_id": "CB064",
+      "status": "not_applied",
+      "before": {
+        "case_id": "CB064",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 85,
+        "score_high": 85,
+        "exact_score": 85,
+        "score_kind": "exact",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": true,
+        "confirmed_loss": 15,
+        "uncertain_loss": 0,
+        "mismatch_keys": [
+          "left_leg",
+          "head"
+        ],
+        "uncertain_keys": [],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "after": {
+        "case_id": "CB064",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 85,
+        "score_high": 85,
+        "exact_score": 85,
+        "score_kind": "exact",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": true,
+        "confirmed_loss": 15,
+        "uncertain_loss": 0,
+        "mismatch_keys": [
+          "left_leg",
+          "head"
+        ],
+        "uncertain_keys": [],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "paired_gain_low": 0,
+      "paired_gain_high": 0
+    },
+    {
+      "test_id": "T049",
+      "case_id": "CB067",
+      "status": "not_applied",
+      "before": {
+        "case_id": "CB067",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 75,
+        "score_high": 80,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 20,
+        "uncertain_loss": 5,
+        "mismatch_keys": [
+          "right_leg",
+          "left_leg"
+        ],
+        "uncertain_keys": [
+          "head"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "after": {
+        "case_id": "CB067",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 75,
+        "score_high": 80,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 20,
+        "uncertain_loss": 5,
+        "mismatch_keys": [
+          "right_leg",
+          "left_leg"
+        ],
+        "uncertain_keys": [
+          "head"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "paired_gain_low": 0,
+      "paired_gain_high": 0
+    },
+    {
+      "test_id": "T050",
+      "case_id": "CB074",
+      "status": "not_applied",
+      "before": {
+        "case_id": "CB074",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 65,
+        "score_high": 70,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 30,
+        "uncertain_loss": 5,
+        "mismatch_keys": [
+          "right_arm",
+          "left_arm",
+          "left_leg"
+        ],
+        "uncertain_keys": [
+          "head"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "after": {
+        "case_id": "CB074",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 65,
+        "score_high": 70,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 30,
+        "uncertain_loss": 5,
+        "mismatch_keys": [
+          "right_arm",
+          "left_arm",
+          "left_leg"
+        ],
+        "uncertain_keys": [
+          "head"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "paired_gain_low": 0,
+      "paired_gain_high": 0
+    }
+  ]
+}
