@@ -32,6 +32,12 @@ def tags(r, field):
     }
 
 
+def proposal_pool(library):
+    """Baseline rows remain addressable; only reviewed rows may replace them."""
+    return [r for r in library if r.get("proposal_eligible") is True
+            and r.get("source_review_status") == "ai_visual_reviewed"]
+
+
 def predict(row, yaw, anchor, camera):
     p = np.asarray(row["points"], float)
     p = p @ alignment(p, yaw).T
@@ -376,7 +382,7 @@ def run(ctx):
             ):
                 pool = [
                     r
-                    for r in library
+                    for r in proposal_pool(library)
                     if posture in tags(r, "posture")
                     and posture_cost(metrics[r["pose_id"]], posture, "both_grounded")
                     < 10
@@ -449,7 +455,10 @@ def run(ctx):
                     )
 
                 ranked = sorted(pool, key=lambda r: (cost(r), r["pose_id"]))
-                pose_id = ranked[0]["pose_id"]
+                if ranked:
+                    pose_id = ranked[0]["pose_id"]
+                else:
+                    notes.append("no_reviewed_replacement_preserves_selected_pose")
                 candidates = [
                     dict(
                         pose_id=r["pose_id"], cost=cost(r), description=r["description"]

@@ -36,7 +36,7 @@ jobs:
       - name: Runtime contract tests
         run: |
           pip install -r requirements-converter.txt numpy scipy httpx pytest google-genai opencv-python-headless==5.0.0.93
-          python -m pytest -q tests/test_scene_refinement_runtime.py tests/test_scene_worker_deployment.py tests/test_scene_worker_artifact_contract.py tests/test_scene_worker_image_reuse.py tests/converter/test_deployment_contract.py
+          python -m pytest -q tests/test_scene_refinement_runtime.py tests/test_scene_worker_deployment.py tests/test_scene_worker_artifact_contract.py tests/test_scene_worker_image_reuse.py tests/test_scene_worker_image.py tests/converter/test_deployment_contract.py
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ vars.SCENE_AWS_DEPLOY_ROLE }}
@@ -92,6 +92,9 @@ jobs:
         run: |
           docker tag standin-scene:release "$REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA"
           docker push "$REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA"
+      - name: Resolve published commit digest
+        id: image
+        run: python scripts/scene_worker_image.py --commit "$GITHUB_SHA" --require
       - name: Render dedicated task image
         if: inputs.deploy_staging
         id: render
@@ -99,7 +102,7 @@ jobs:
         with:
           task-definition: /tmp/scene-task.json
           container-name: scene-worker
-          image: ${{ steps.ecr.outputs.registry }}/standin/scene-worker:${{ github.sha }}
+          image: ${{ steps.ecr.outputs.registry }}/standin/scene-worker@${{ steps.image.outputs.digest }}
           environment-variables: |
             DEPLOYMENT_VERSION=${{ github.sha }}
       - name: Update dedicated staging service
