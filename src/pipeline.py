@@ -214,6 +214,11 @@ class Pipeline:
     # ---- 메인 ----
     def process_cut(self, image, img_w: int = 512, img_h: int = 768,
                     rescue_request=None) -> CutResult:
+        from .analysis_budget import analysis_budget
+        with analysis_budget():
+            return self._process_cut_with_budget(image, img_w, img_h, rescue_request)
+
+    def _process_cut_with_budget(self, image, img_w, img_h, rescue_request):
         result = self._process_cut(image, img_w, img_h, rescue_request)
         if CFG.body_matching_mode != "off":
             from .experimental.body_matching.service import attach_body_matching

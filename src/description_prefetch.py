@@ -11,7 +11,7 @@ import hashlib
 import io
 import os
 from threading import BoundedSemaphore, Event
-from time import perf_counter
+from time import perf_counter, monotonic
 
 from .config import CFG
 from .hand_skin_parallel import request_cancelled
@@ -34,6 +34,7 @@ def _image_key(image):
 def _options(client):
     return (id(client), id(getattr(client, "_client", None)),
             getattr(client, "_model", None), CFG.routing_describe_timeout_ms,
+            CFG.routing_describe_budget_ms, CFG.routing_describe_reserve_ms,
             prompts.POSE_DESCRIBE_VERSION, prompts.POSE_DESCRIBE_SYSTEM,
             id(prompts.pose_describe_prompt))
 
@@ -86,14 +87,16 @@ class DescriptionPrefetch:
         if self.future.cancelled():
             self.status = "cancelled_before_start"
             return NOT_PREFETCHED
-        # A full foreground-sized allowance from join, not a shortened remainder
-        # from launch. The SDK's retry and independent-side-review limits are intact.
+        # A bounded join allowance; the original request deadline always wins.
+        # Copied worker contexts share that same deadline, never a fresh 120s.
         joined = perf_counter()
         try:
-            deadline = joined + self.wait_seconds
+            from .analysis_budget import bounded_deadline
+            deadline = bounded_deadline(monotonic() + self.wait_seconds,
+                reserve=max(0, CFG.routing_describe_reserve_ms) / 1000)
             while True:
                 self._check_cancelled()
-                remaining = deadline - perf_counter()
+                remaining = deadline - monotonic()
                 if remaining <= 0:
                     raise TimeoutError()
                 try:
@@ -201,6 +204,6 @@ def _start(client, image, analysis, img_w, img_h):
     return DescriptionPrefetch(
         "pending", future=future, image_key=image_key, boxes_key=_boxes_key(boxes),
         slot_keys=tuple(("vlm", i) for i in range(analysis.num_people)), options=options,
-        wait_seconds=2 * max(0.1, CFG.routing_describe_timeout_ms / 1000) + 27,
+        wait_seconds=max(.1, CFG.routing_describe_budget_ms / 1000) + 2,
         cancelled=cancelled,
     )

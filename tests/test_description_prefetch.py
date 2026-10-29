@@ -354,3 +354,37 @@ def test_hands_wait_for_description_scope_and_preserve_slot_ownership(monkeypatc
         assert result.descriptors[1].hands.left.preset == "fist"
         runs.append(clean(asdict(result)))
     assert runs[0] == runs[1]
+
+
+def test_prefetch_worker_inherits_original_request_deadline(monkeypatch, image):
+    from src.analysis_budget import analysis_budget, analysis_deadline
+    client = Client()
+    captured = []
+    original = client.describe_people
+    def describe(*args):
+        captured.append(analysis_deadline.get())
+        return original(*args)
+    monkeypatch.setattr(client, 'describe_people', describe)
+    with analysis_budget() as deadline:
+        job = start(client, image)
+        assert consume(job, client, image).status == 'ok'
+        job.close()
+    assert captured == [deadline]
+
+
+def test_prefetch_join_cannot_spend_reserved_matching_time(image):
+    from src.analysis_budget import analysis_deadline
+    from time import monotonic
+    client = Client()
+    client.release.clear()
+    job = start(client, image)
+    assert client.started.wait(1)
+    token = analysis_deadline.set(monotonic() + CFG.routing_describe_reserve_ms / 1000 - .01)
+    try:
+        with pytest.raises(TimeoutError):
+            consume(job, client, image)
+        assert job.join_wait_ms < 100
+    finally:
+        analysis_deadline.reset(token)
+        client.release.set()
+        job.close()

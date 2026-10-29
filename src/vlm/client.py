@@ -468,21 +468,65 @@ class GeminiVLMClient(BaseVLMClient):
             return None
 
     def describe_people(self, image, boxes: list):
-        """One bounded retry for transient errors, then independent side review."""
-        result = self._describe_people_once(image, boxes)
-        delay = result.retry_after_seconds or 0
-        if result.status == 'error' and result.retryable and delay <= 2:
-            if delay > 0:
+        """At most two attempts; retry gets more time, never unbounded waiting.
+
+        Description, backoff and independent review share at most 45 seconds,
+        shortened by the request deadline with 15 seconds reserved for matching.
+        Prompt/schema/model and quality/abstention rules remain unchanged.
+        """
+        started = self._clock()
+        from ..analysis_budget import bounded_deadline
+        from ..hand_skin_parallel import request_cancelled
+        deadline = bounded_deadline(started + max(1, CFG.routing_describe_budget_ms) / 1000,
+            reserve=max(0, CFG.routing_describe_reserve_ms) / 1000)
+        cancelled = request_cancelled.get()
+        first_timeout = max(1, CFG.routing_describe_timeout_ms)
+        attempts = 0
+        result = None
+        for attempt in (1, 2):
+            if cancelled is not None and cancelled.is_set():
+                break
+            if attempt == 2:
+                if result.status != 'error' or not result.retryable:
+                    break
+                hint = result.retry_after_seconds or 0
+                # Do not shorten a long provider cooldown to force a retry.
+                if hint > 2:
+                    break
+                delay = max(hint, self._jitter(.5, 1.))
+                if self._clock() + delay + 1. >= deadline:
+                    break
                 self._sleep(delay)
-            first_ms=result.elapsed_ms
-            result=self._describe_people_once(image, boxes)
-            result.attempts=2
-            result.elapsed_ms+=first_ms
+            if cancelled is not None and cancelled.is_set():
+                break
+            remaining_ms = int((deadline - self._clock()) * 1000)
+            if remaining_ms < 1:
+                break
+            timeout_ms = min(first_timeout * attempt, remaining_ms)
+            log_info('gemini_pose_describe_attempt', model=self._model,
+                     attempt=attempt, timeoutMs=timeout_ms,
+                     remainingBudgetMs=remaining_ms)
+            result = self._describe_people_once(image, boxes, timeout_ms)
+            attempts += 1
+        if result is None:
+            from ..search_routing import DescribeOutcome
+            result = DescribeOutcome('error', error_reason='timeout',
+                                     retryable=True, provider='gemini')
+        result.attempts = attempts
+        result.elapsed_ms = (self._clock() - started) * 1000
+        log_info('gemini_pose_describe_summary', model=self._model,
+                 status=result.status, attempts=attempts,
+                 failureReason=result.error_reason,
+                 elapsedMs=round(result.elapsed_ms))
         if result.status == 'ok' and any(d and (d.held_object_hands or d.pose_relations) for d in result.descriptions.values()):
-            self._review_pose_sides(image, boxes, result.descriptions)
+            remaining_ms = max(0, int((deadline - self._clock()) * 1000))
+            if cancelled is not None and cancelled.is_set():
+                remaining_ms = 0
+            self._review_pose_sides(image, boxes, result.descriptions, min(20000, remaining_ms))
+        result.elapsed_ms = (self._clock() - started) * 1000
         return result
 
-    def _review_pose_sides(self, image, boxes, descriptions):
+    def _review_pose_sides(self, image, boxes, descriptions, timeout_ms=20000):
         from google.genai import types
         from ..pose_relations import validate_relations
         requested=[{'objects':list(d.held_object_hands), 'actions':[r['kind'] for r in d.pose_relations]} if d else {} for d in descriptions.values()]
@@ -493,9 +537,11 @@ class GeminiVLMClient(BaseVLMClient):
             '확인할 물건/동작만 답하고 새 사람/좌표는 만들지 않는다. JSON만 반환. '
             +json.dumps({'boxes':boxes,'requested':requested},ensure_ascii=False))
         try:
+            if timeout_ms < 1:
+                raise TimeoutError("side_review_budget_exhausted")
             resp=self._client.models.generate_content(model=self._model,contents=[prompt,self._to_part(image)],
                 config=types.GenerateContentConfig(response_mime_type='application/json',temperature=0,
-                    http_options=types.HttpOptions(timeout=20000)))
+                    http_options=_gemini_attempt_options(types, timeout_ms)))
             rows=_extract_json(resp.text)['people']
             if not isinstance(rows,list) or len(rows)!=len(boxes):raise ValueError('side_review_length')
         except Exception:
@@ -518,7 +564,7 @@ class GeminiVLMClient(BaseVLMClient):
             d.laterality_review=dict(status='reviewed' if row else 'unavailable_abstain',changes=changes,
                 evidence=str(row.get('evidence') or '')[:300],independent=True,not_ground_truth=True)
 
-    def _describe_people_once(self, image, boxes: list):
+    def _describe_people_once(self, image, boxes: list, timeout_ms=None):
         """Single request; caller controls the bounded retry."""
         from google.genai import types
         from ..search_routing import DescribeOutcome
@@ -534,7 +580,7 @@ class GeminiVLMClient(BaseVLMClient):
                     response_json_schema=description_schema(len(boxes)),
                     response_mime_type="application/json",
                     temperature=0,
-                    http_options=types.HttpOptions(timeout=CFG.routing_describe_timeout_ms),
+                    http_options=_gemini_attempt_options(types, timeout_ms if timeout_ms is not None else CFG.routing_describe_timeout_ms),
                 ),
             )
             descriptions = parse_pose_descriptions(description_payload(resp.text), len(boxes))
