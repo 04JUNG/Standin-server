@@ -61,6 +61,30 @@ def evaluation_definition(definition):
     return value
 
 
+def failure_report(output, failures):
+    """Keep incomplete live runs reviewable without publishing a score baseline."""
+    rows = []
+    for folder in sorted((output/'shards').glob('*/report')):
+        for path in sorted((folder/'errors').glob('*.json')):
+            rows.append((folder.parent.name, path.stem, 'artifact/refine', read_json(path).get('error_type')))
+        for arm in ('search', 'refine'):
+            path = folder/arm/'judge-traces.jsonl'
+            if path.exists():
+                for line in path.read_text().splitlines():
+                    item = json.loads(line)
+                    if item.get('status') == 'judge_error':
+                        rows.append((folder.parent.name, item['case_id'], arm+' judge', item.get('error_type')))
+    report = output/'report'; report.mkdir(exist_ok=True)
+    write_json(report/'completion.json', {'complete':False, 'failed_shards':failures})
+    text = ['# 스테이징 고정 50컷 평가 실패', '',
+            '기준선은 갱신하지 않았습니다. 아래 오류와 shards/의 개별 보고서를 확인하세요.', '',
+            '| 묶음 | 컷 | 단계 | 오류 |', '|---|---|---|---|']
+    text += ['| '+' | '.join(map(str, row))+' |' for row in rows]
+    if not rows:
+        text.append('기동 또는 보고서 수집 실패: failures.json과 task-stop.json을 확인하세요.')
+    (report/'report.md').write_text('\n'.join(text)+'\n')
+
+
 def main():
     import boto3
     p = argparse.ArgumentParser()
@@ -163,6 +187,7 @@ def main():
                     failures.append({'shard':shard,'error_type':type(exc).__name__})
             if failures:
                 write_json(output/'failures.json',failures)
+                failure_report(output, failures)
                 raise RuntimeError('evaluation incomplete; previous baseline preserved; inspect shards')
             from standin_eval.staging_merge import merge_fragments
             import shutil

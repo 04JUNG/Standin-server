@@ -59,6 +59,18 @@ def refine_payload(person, chosen):
             'search_distance': chosen.get('distance'), 'render_thumbnail': False}
 
 
+def preview_rotation(chosen):
+    """Preserve search orientation in the converter's orthographic evaluation view."""
+    camera = chosen.get('camera') or chosen.get('semantic_preview_camera')
+    if not camera:
+        return None
+    if 'rotation' in camera:
+        return camera['rotation']
+    from api.pose_presentation import render_camera
+    kind = 'fixed_117' if 'yaw' in camera else 'semantic_preview'
+    return render_camera(camera, kind).rotation
+
+
 def execute(package, output, revision, model, previous=None, shard_index=0, shard_count=1):
     from src.config import CFG
     from src.refine_thumbnail import ConverterThumbnailRenderer, ThumbnailSource
@@ -115,7 +127,7 @@ def execute(package, output, revision, model, previous=None, shard_index=0, shar
                     if status != 200:
                         raise ValueError('missing BVH')
                     bvh = raw.decode('utf-8')
-                    rotation = (chosen.get('camera') or {}).get('rotation')
+                    rotation = preview_rotation(chosen)
                     rendered = renderer.render(ThumbnailSource(view=chosen['view'], bvh_text=bvh,
                                                pose_id=pose_id, camera_rotation=rotation))
                     search_image = output/'images'/f'{cid}-{pid}-search.png'

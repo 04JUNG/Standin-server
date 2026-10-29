@@ -21,7 +21,7 @@ GitHub runner는 모델을 실행하지 않는다. `scripts/run_staging_evaluati
 GitHub Actions Summary에 점수·개선/악화·제외 변화 표가 나오며, `staging-fixed50-<sha>-<attempt>` artifact는 30일 보관한다. ZIP을 내려받아 `report/report.html`을 열면 search/refine 각각의 원본·최종 이미지·부위별 이유를 볼 수 있다. 원본/실행 산출물이 포함되므로 저장소 접근 권한이 있는 검수자용이다. S3에는 run별 report.zip과 마지막 완료 baseline.json을 보관한다.
 
 - search: 동결된 Top-1 후보를 converter로 렌더링해 v3.2로 평가.
-- refine: 해당 실행의 **같은 후보·같은 카메라**에 리파인을 적용해 평가. 허용되지 않은 후보는 베이스 유지.
+- refine: 해당 실행의 **같은 후보·같은 카메라 회전**에 리파인을 적용해 평가. 허용되지 않은 후보는 베이스 유지. converter의 평가 렌더는 직교 투영이며 검색의 원근 거리까지 재현하는 UI E2E가 아니다.
 - 전신100/상반신45 평균과 평가 가능 수, 동일 평가 가능 컷의 변화 범위, 확실한 개선/악화·동일·불확실 범위 중첩·제외 변화.
 - 동일 실행 내 search → refine 전후 비교, 분석/렌더/리파인 오류, 시도 횟수와 총 소요 시간.
 
@@ -45,8 +45,14 @@ python scripts/run_staging_evaluation_ci.py \
 
 비교 범위·분모·상반신 분리, 다인 박스 대응, dynamic 무결과의 legacy 대체 차단, 리파인 권한·원본 후보 전달, 알림 제거와 task 정의 불변성, develop 전용 workflow, 서비스/AI를 주입한 실제 50컷 수집→양 arm 채점→보고서 생성 통합 테스트를 포함한다. 실제 스테이징 태스크 실행과 CI 권한 활성화 여부는 배포 기록에서 별도로 확인한다.
 
-2026-10-29 전체 검증: **2784 passed, 8 skipped, 31 subtests passed**. 스테이징 전용 회귀 21개에는 3개 묶음의 50컷 집계 코드 통합, 누락·중복 거부, 제품 검색 코드 변경 시 기준선 유지, 평가 기준 변경 시 새 series, 스테이징 초기화 이미지 고정이 포함된다. compile 및 diff 검사와 PR checks/worker를 통과했다. 처리 시간 `total_seconds`는 50컷 작업 시간의 합이며 병렬 실행의 벽시계 경과 시간과 다르다.
+2026-10-29 전체 검증: **2787 passed, 8 skipped, 31 subtests passed**. 스테이징 전용 회귀 24개에는 3개 묶음의 50컷 집계 코드 통합, 누락·중복 거부, 제품 검색 코드 변경 시 기준선 유지, 평가 기준 변경 시 새 series, 스테이징 초기화 이미지 고정이 포함된다. compile 및 diff 검사와 PR checks/worker를 통과했다. 처리 시간 `total_seconds`는 50컷 작업 시간의 합이며 병렬 실행의 벽시계 경과 시간과 다르다.
 
 사용자 명시 승인 후 `standin-github-deploy`의 `standin-staging-fixed50-evaluation` 정책을 적용했고, staging `STAGING_EVAL_ENABLED=true`를 확인했다. IAM 시뮬레이션에서 해당 평가 task definition의 RunTask 권한이 allowed다. 고정 ZIP과 스테이징 리비전 `612be944d387c3dd2543ee2eed6ae95183c101bb`의 preflight를 통과했다. CI 코드의 develop 반영은 PR 머지 후 이뤄진다.
 
 실제 기동 검증에서 초기화 컨테이너의 과거 digest가 ECR에 없어 새 태스크를 만들 수 없는 문제를 확인했다. `prepare_staging_asset_initializer.py`는 인라인 Python 코드와 manifest 환경을 유지하고 이미지 참조만 이번 immutable inference SHA로 맞춘다. develop 배포 단계와 평가 태스크에 적용하며 main 배포에는 적용하지 않는다. 평가 태스크는 컨테이너에 들어 있던 이전 하네스 대신 업로드한 평가 코드를 명시적으로 먼저 로드한다. 현재 서비스 task definition 자체는 수정하지 않았다.
+
+## 첫 실제 실행 결과 (2026-10-29)
+
+`bootstrap-20261029-shards-v1`은 스테이징 리비전 `612be944d387c3dd2543ee2eed6ae95183c101bb`으로 50컷 분석을 마쳤다. 분석 오류 0건, 산출물 오류 4건(CB019/CB020/CB042/CB058), 리파인 오류 1건(CB027), 두 arm의 AI 판정 실패 23건을 기록했다. 모든 태스크 종료 및 파생 정의 정리를 수행했고, 기준선은 발행하지 않았다. 이 실행의 점수를 개선 수치로 사용하면 안 된다.
+
+실측 후 AI 호출에 고정 JSON 스키마를 전달하고, 리파인 바인딩이 없는 숫자형 검색 카메라의 회전도 평가 렌더에 적용하도록 보완했다. 실패 실행의 컷별 오류 표도 Actions Summary에 남긴다. 이 변경은 회귀 테스트 대상이며, 수정 후 외부 모델 50컷 재실측을 통과한 것으로 간주하지 않는다. 첫 정상 기준선 확보는 아직 남아 있다.

@@ -202,3 +202,50 @@ def test_deploy_initializer_preserves_inline_logic_and_pins_sha():
     workflow=(Path(__file__).resolve().parents[1]/'.github/workflows/deploy.yml').read_text()
     step=workflow.split('- name: Keep staging inline')[1].split('- name: Prepare explicit')[0]
     assert "if: github.ref == 'refs/heads/develop'" in step
+
+
+def test_numeric_search_camera_keeps_orientation_without_refine_binding():
+    import numpy as np
+    from standin_eval.staging_live import preview_rotation
+    from src.refine_projection import search_rotation
+    chosen=candidate({'dynamic_search':{'selected':[{'pose_id':'p',
+        'camera':{'yaw':330,'pitch':-30,'distance':4.0}}]},'refine_candidates':[]})
+    assert not chosen['_refine_bound']
+    assert np.allclose(preview_rotation(chosen),search_rotation(330,-30))
+    assert not np.allclose(preview_rotation(chosen),np.eye(3))
+
+
+def test_failed_run_report_preserves_baseline_and_identifies_cut(tmp_path):
+    from scripts.run_staging_evaluation_ci import failure_report
+    from standin_eval.util import write_json, write_jsonl
+    baseline=tmp_path/'baseline.json'; baseline.write_bytes(b'previous-complete-run')
+    folder=tmp_path/'shards/1/report'
+    write_json(folder/'errors/CB019-P1.json',{'error_type':'ThumbnailRenderFailed'})
+    write_jsonl(folder/'search/judge-traces.jsonl',[{'case_id':'CB036','status':'judge_error','error_type':'ValueError'}])
+    failure_report(tmp_path,[{'shard':1,'error_type':'RuntimeError'}])
+    assert baseline.read_bytes()==b'previous-complete-run'
+    text=(tmp_path/'report/report.md').read_text()
+    assert 'CB019-P1' in text and 'CB036' in text and '기준선은 갱신하지 않았습니다' in text
+    assert not (tmp_path/'report/result.json').exists()
+
+
+def test_real_judge_requests_pinned_schema_for_both_phases(monkeypatch,tmp_path):
+    import json,types
+    from standin_eval.rubric_judge import GeminiRubricJudge,TARGET_SCHEMA,REVIEW_SCHEMA
+    from src.vlm.client import GeminiVLMClient
+    configs=[]
+    def generate(**kwargs):
+        configs.append(kwargs['config'])
+        return types.SimpleNamespace(text=json.dumps({}),model_version='fake',response_id='id')
+    judge=object.__new__(GeminiRubricJudge); judge.model='fake'
+    judge.client=types.SimpleNamespace(models=types.SimpleNamespace(generate_content=generate))
+    monkeypatch.setattr(GeminiVLMClient,'_to_part',lambda x:'image')
+    judge('target',tmp_path/'original.png',None)
+    judge('compare',tmp_path/'original.png',tmp_path/'final.png')
+    for config, field, allowed in [(configs[0],'visibility',['observable','unobservable','uncertain']),
+                                   (configs[1],'status',['match','mismatch','unobservable','uncertain','not_run'])]:
+        schema=config.response_json_schema
+        assert schema['required']==list(TARGET_SCHEMA['properties'])
+        assert schema['additionalProperties'] is False
+        for criterion in schema['properties'].values():
+            assert criterion['properties'][field]=={'type':'string','enum':allowed}

@@ -74,9 +74,23 @@ class GeminiRubricJudge:
         contents = [prompt, GeminiVLMClient._to_part(str(original))]
         if final is not None:
             contents.append(GeminiVLMClient._to_part(str(final)))
+        schema = copy.deepcopy(TARGET_SCHEMA if final is None else
+            REVIEW_SCHEMA['properties']['people']['items']['properties']['criteria'])
+        # The local validator permits enum-only schemas; the provider needs a type.
+        def typed_enums(node):
+            if isinstance(node, dict):
+                if 'enum' in node:
+                    node.setdefault('type', 'string')
+                for value in node.values():
+                    typed_enums(value)
+            elif isinstance(node, list):
+                for value in node:
+                    typed_enums(value)
+        typed_enums(schema)
         response = self.client.models.generate_content(model=self.model,
             contents=contents,
             config=types.GenerateContentConfig(temperature=0, response_mime_type='application/json',
+                                               response_json_schema=schema,
                                                max_output_tokens=4096))
         return {'criteria': json.loads(response.text),
                 'actual_model': getattr(response, 'model_version', None),
