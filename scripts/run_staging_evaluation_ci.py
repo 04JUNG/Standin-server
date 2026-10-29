@@ -25,7 +25,7 @@ PREFIX = 'evaluation/staging/fixed50-v32'
 
 def bootstrap():
     # Only our generated, hashed code archive is extracted here (not the dataset).
-    return "import os,urllib.request,hashlib,zipfile,sys; p='/tmp/eval-code.zip'; urllib.request.urlretrieve(os.environ['EVAL_CODE_URL'],p); assert hashlib.sha256(open(p,'rb').read()).hexdigest()==os.environ['EVAL_CODE_SHA256']; zipfile.ZipFile(p).extractall('/tmp/eval-code'); os.environ['PYTHONPATH']='/tmp/eval-code:/app'; os.execv(sys.executable,[sys.executable,'-m','standin_eval.staging_live'])"
+    return "import os,urllib.request,hashlib,zipfile,sys; p='/tmp/eval-code.zip'; urllib.request.urlretrieve(os.environ['EVAL_CODE_URL'],p); assert hashlib.sha256(open(p,'rb').read()).hexdigest()==os.environ['EVAL_CODE_SHA256']; zipfile.ZipFile(p).extractall('/tmp/eval-code'); os.environ['PYTHONPATH']='/tmp/eval-code:/app'; os.execv(sys.executable,[sys.executable,'-c',\"import sys,runpy; sys.path.insert(0,'/tmp/eval-code'); runpy.run_module('standin_eval.staging_live',run_name='__main__')\"])"
 
 
 def evaluation_definition(definition):
@@ -34,7 +34,14 @@ def evaluation_definition(definition):
     value = {k:definition[k] for k in allowed if k in definition}
     value = json.loads(json.dumps(value))
     value['family'] = 'standin-staging-fixed50-evaluation'
+    current_image = next(c['image'] for c in value['containerDefinitions'] if c['name'] == 'inference')
     for container in value['containerDefinitions']:
+        if container['name'] == 'body-assets-init':
+            if container.get('command', [])[:2] != ['python', '-c']:
+                raise ValueError('unknown asset initializer contract')
+            # Initializer is inline stdlib+boto3 code, not code inside its old image.
+            # Avoid a deleted historical digest while preserving its pinned manifest.
+            container['image'] = current_image
         if container['name'] == 'inference':
             container['command'] = ['python', '-c', bootstrap()]
             container.pop('healthCheck', None)
@@ -117,6 +124,8 @@ def main():
                 time.sleep(20)
             else:
                 raise TimeoutError('staging evaluation deadline exceeded')
+            write_json(output/'task-stop.json', {'reason':task.get('stoppedReason'),
+                'containers':[{k:c.get(k) for k in ('name','exitCode','reason')} for c in task['containers']]})
             s3.download_file(BUCKET,run_key+'/report.zip',str(output/'report.zip'))
             _extract(output/'report.zip',output/'report')
             completed = read_json(output/'report/completion.json') if (output/'report/completion.json').exists() else {}

@@ -123,3 +123,29 @@ def test_live_fifty_cut_pipeline_with_injected_services(tmp_path, monkeypatch):
     assert len(current['arms']['search'])==50
     assert current['summaries']['refine']['scopes']['full_body']['mean_low']==100
     assert read_json(output/'completion.json')['complete']
+
+
+def test_inline_asset_initializer_uses_available_staging_image():
+    from scripts.run_staging_evaluation_ci import evaluation_definition
+    value=evaluation_definition({'containerDefinitions':[
+        {'name':'inference','image':'current:sha'},
+        {'name':'body-assets-init','image':'deleted@digest','command':['python','-c','inline initializer'],
+         'environment':[{'name':'BODY_ASSETS_MANIFEST_SHA256','value':'pinned'}]}]})
+    init=value['containerDefinitions'][1]
+    assert init['image']=='current:sha'
+    assert init['command']==['python','-c','inline initializer']
+    assert init['environment'][0]['value']=='pinned'
+
+
+def test_bootstrap_prefers_uploaded_harness_over_image_package(tmp_path):
+    import hashlib, os, subprocess, sys, zipfile
+    from scripts.run_staging_evaluation_ci import bootstrap
+    archive=tmp_path/'source.zip'
+    with zipfile.ZipFile(archive,'w') as z:
+        z.writestr('standin_eval/__init__.py','')
+        z.writestr('standin_eval/staging_live.py','print("uploaded-harness-selected")')
+    command=bootstrap().replace('/tmp/eval-code',str(tmp_path/'unpacked'))
+    env={**os.environ,'EVAL_CODE_URL':archive.as_uri(),'EVAL_CODE_SHA256':hashlib.sha256(archive.read_bytes()).hexdigest()}
+    completed=subprocess.run([sys.executable,'-c',command],env=env,capture_output=True,text=True,timeout=10)
+    assert completed.returncode==0,completed.stderr
+    assert completed.stdout.strip()=='uploaded-harness-selected'

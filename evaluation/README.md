@@ -5,6 +5,9 @@
 [v3.1 문서](../docs/evaluation-harness-20261027/RUBRIC_3_1_AUTOMATION.md)는 이전 계약 참고용이다.
 기존 PCK/검색 relevance와 별도 지표이며, AI 결과는 사람 검수 전 추정으로 표시한다.
 
+develop 배포 후 고정 50컷 검색·리파인 비교와 Actions 보고서는
+[스테이징 고정셋 CI](../docs/evaluation-harness-20261027/STAGING_FIXED50_CI.md)를 따른다.
+
 실행 진입점은 `python -m standin_eval`이다. 저장소의 `.venv`를 쓰는 예시는 다음과 같다.
 
 ```bash
