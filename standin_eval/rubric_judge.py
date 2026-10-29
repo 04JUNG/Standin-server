@@ -83,7 +83,7 @@ class GeminiRubricJudge:
                 'response_id': getattr(response, 'response_id', None)}
 
 
-def judge_bundle(manifest_path, config_path, output, artifacts_root, *, judge, model, max_calls):
+def judge_bundle(manifest_path, config_path, output, artifacts_root, *, judge, model, max_calls, frozen_targets=None):
     """Manifest selections freeze final candidate identity before judging.
 
     Injectable judge is used for contract tests. CLI requires explicit provider opt-in.
@@ -109,6 +109,7 @@ def judge_bundle(manifest_path, config_path, output, artifacts_root, *, judge, m
               'judge_max_calls': max_calls,
               'judge_retries': 0, 'judge_concurrency': 1}
     records, jobs = [], []
+    target_cache = {(t['case_id'], t['reference_person_id']): t for t in (frozen_targets or [])}
     for case in manifest['cases']:
         inactive = active_rubric['scopes'][case['evaluation_scope']]['inactive_keys'] if v32 else []
         people = []
@@ -168,8 +169,14 @@ def judge_bundle(manifest_path, config_path, output, artifacts_root, *, judge, m
             target_prompt = TARGET_PROMPT + json.dumps(selected['target_description'], ensure_ascii=False)
             target = None
             try:
-                calls += 1
-                response = judge(target_prompt, root / case['input_image'], None)
+                cached = target_cache.get((case['case_id'], person['reference_person_id']))
+                if cached is not None:
+                    if cached['input_sha256'] != case['input_sha256'] or cached['target_sha256'] != hash_json(cached['target']):
+                        raise ValueError('frozen target identity mismatch')
+                    response = {'criteria': cached['target'], 'actual_model': cached.get('actual_model')}
+                else:
+                    calls += 1
+                    response = judge(target_prompt, root / case['input_image'], None)
                 _schema(response['criteria'], TARGET_SCHEMA)
                 target = copy.deepcopy(response['criteria'])
                 targets.append({'case_id': case['case_id'], 'reference_person_id': person['reference_person_id'],
