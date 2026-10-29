@@ -35,6 +35,7 @@ def _options(client):
     return (id(client), id(getattr(client, "_client", None)),
             getattr(client, "_model", None), CFG.routing_describe_timeout_ms,
             CFG.routing_describe_budget_ms, CFG.routing_describe_reserve_ms,
+            CFG.routing_describe_person_crops, CFG.routing_describe_person_workers,
             prompts.POSE_DESCRIBE_VERSION, prompts.POSE_DESCRIBE_SYSTEM,
             id(prompts.pose_describe_prompt))
 

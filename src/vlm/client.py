@@ -468,6 +468,15 @@ class GeminiVLMClient(BaseVLMClient):
             return None
 
     def describe_people(self, image, boxes: list):
+        from ..analysis_budget import bounded_deadline
+        deadline = bounded_deadline(self._clock() + max(1, CFG.routing_describe_budget_ms) / 1000,
+            reserve=max(0, CFG.routing_describe_reserve_ms) / 1000)
+        if len(boxes) > 1 and CFG.routing_describe_person_crops:
+            from .person_crops import describe_cropped_people
+            return describe_cropped_people(self, image, boxes, deadline)
+        return self._describe_people_bounded(image, boxes, deadline=deadline)
+
+    def _describe_people_bounded(self, image, boxes, *, deadline, stop=None):
         """At most two attempts; retry gets more time, never unbounded waiting.
 
         Description, backoff and independent review share at most 45 seconds,
@@ -477,9 +486,9 @@ class GeminiVLMClient(BaseVLMClient):
         started = self._clock()
         from ..analysis_budget import bounded_deadline
         from ..hand_skin_parallel import request_cancelled
-        deadline = bounded_deadline(started + max(1, CFG.routing_describe_budget_ms) / 1000,
+        deadline = bounded_deadline(deadline,
             reserve=max(0, CFG.routing_describe_reserve_ms) / 1000)
-        cancelled = request_cancelled.get()
+        cancelled = stop or request_cancelled.get()
         first_timeout = max(1, CFG.routing_describe_timeout_ms)
         attempts = 0
         result = None
@@ -571,10 +580,16 @@ class GeminiVLMClient(BaseVLMClient):
         from .description_contract import description_schema, description_payload, DescriptionResponseError
 
         started = self._clock()
+        from .person_crops import active_person_crop
+        prompt = prompts.pose_describe_prompt(boxes)
+        if active_person_crop.get():
+            prompt = ("원본에서 한 인물 주변만 자른 이미지다. 아래 박스로 지정한 대상 한 명만 설명하라. "
+                "주변 인물이나 화면·그림 속의 다른 인물 자세를 대상에게 섞지 마라. "
+                "잘린 몸을 복원하지 말고 실제 보이는 부위와 방향만 설명하라.\n" + prompt)
         try:
             resp = self._client.models.generate_content(
                 model=self._model,
-                contents=[prompts.pose_describe_prompt(boxes), self._to_part(image)],
+                contents=[prompt, self._to_part(image)],
                 config=types.GenerateContentConfig(
                     system_instruction=prompts.POSE_DESCRIBE_SYSTEM,
                     response_json_schema=description_schema(len(boxes)),

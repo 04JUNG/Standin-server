@@ -388,3 +388,15 @@ def test_prefetch_join_cannot_spend_reserved_matching_time(image):
         analysis_deadline.reset(token)
         client.release.set()
         job.close()
+
+
+def test_partial_person_failure_preserves_other_person_search_evidence(image):
+    client = Client(people=2)
+    client.value.status = 'partial_error'
+    del client.value.descriptions[0]
+    client.value.person_errors = {0: dict(error_reason='upstream_error',retryable=True,attempts=2)}
+    result = pipeline(client,rough=True).process_cut(image,100,200)
+    assert result.person_routing[0]['semantic_evidence']['status'] == 'vlm_error'
+    assert result.person_routing[1]['semantic_evidence']['status'] == 'valid'
+    assert result.routing_summary['describe']['status'] == 'partial_error'
+    assert result.routing_summary['describe']['person_errors'][0]['attempts'] == 2
