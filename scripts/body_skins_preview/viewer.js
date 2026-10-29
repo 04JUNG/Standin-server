@@ -3,7 +3,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 const $ = (s) => document.querySelector(s),
   canvas = $("#canvas");
-const skinStyle = await fetch("./skin_style.json?v=0.1.2").then((response) => {
+const skinStyle = await fetch("./skin_style.json?v=0.1.3").then((response) => {
   if (!response.ok) throw new Error("Skin style load failed");
   return response.json();
 });
@@ -42,6 +42,12 @@ const requestedSkin = new URLSearchParams(location.search).get("skin");
 const initialSkin = skins.some((s) => s.id === requestedSkin)
   ? requestedSkin
   : "gray-guide";
+const requestedPose = new URLSearchParams(location.search).get("pose");
+const initialPose = ["tpose", "standing", "bent", "seated", "broader"].includes(
+  requestedPose,
+)
+  ? requestedPose
+  : "standing";
 $("#skins").innerHTML = skins
   .map(
     (s, i) =>
@@ -95,7 +101,7 @@ const loader = new GLTFLoader(),
   masks = new Map();
 let models = [],
   model = "male",
-  pose = "standing",
+  pose = initialPose,
   skin = initialSkin,
   angle = "front",
   comparing = false,
@@ -152,8 +158,12 @@ function material(s, mask) {
     const active = s.id === skin;
     shader.uniforms.skinWidth = { value: active ? settings.width : 1 };
     shader.uniforms.skinOpacity = { value: active ? settings.opacity : 0.9 };
-    shader.uniforms.centerInk = { value: new THREE.Color("#ff8a35") };
-    shader.uniforms.guideInk = { value: new THREE.Color("#5b646e") };
+    shader.uniforms.centerInk = {
+      value: new THREE.Color(skinStyle.lines.orange.color_srgb),
+    };
+    shader.uniforms.guideInk = {
+      value: new THREE.Color(skinStyle.lines.gray.color_srgb),
+    };
     shader.uniforms.muscleInk = { value: new THREE.Color("#42332e") };
     shader.fragmentShader =
       "uniform float skinWidth; uniform float skinOpacity; uniform vec3 centerInk, guideInk, muscleInk;\n" +
@@ -165,7 +175,7 @@ function material(s, mask) {
       "uniform float fleshFill;\n" + shader.fragmentShader;
     shader.fragmentShader = shader.fragmentShader.replace(
       "#include <map_fragment>",
-      `vec3 fields=texture2D(map,vMapUv).rgb;\n${s.mode === 1 ? `float cw=1.0-(.0022*skinWidth/.006);float gw=1.0-(.00135*skinWidth/.006);float ca=smoothstep(cw-max(.018,fwidth(fields.r)*.65),cw+max(.018,fwidth(fields.r)*.65),fields.r);float ga=smoothstep(gw-max(.018,fwidth(fields.g)*.65),gw+max(.018,fwidth(fields.g)*.65),fields.g);diffuseColor.rgb=mix(diffuseColor.rgb,guideInk,ga*.62*skinOpacity/.9);diffuseColor.rgb=mix(diffuseColor.rgb,centerInk,min(1.0,ca*skinOpacity/.9));` : `float mw=1.0-(.00165*skinWidth/.006);float ma=smoothstep(mw-max(.018,fwidth(fields.b)*.65),mw+max(.018,fwidth(fields.b)*.65),fields.b);diffuseColor.rgb=mix(diffuseColor.rgb,muscleInk,ma*skinOpacity);`}`,
+      `vec3 fields=texture2D(map,vMapUv).rgb;\n${s.mode === 1 ? `float cw=1.0-(${skinStyle.lines.orange.half_width_m}*skinWidth/.006);float gw=1.0-(${skinStyle.lines.gray.half_width_m}*skinWidth/.006);float ca=smoothstep(cw-max(.018,fwidth(fields.r)*.65),cw+max(.018,fwidth(fields.r)*.65),fields.r);float ga=smoothstep(gw-max(.018,fwidth(fields.g)*.65),gw+max(.018,fwidth(fields.g)*.65),fields.g);diffuseColor.rgb=mix(diffuseColor.rgb,guideInk,ga*.62*skinOpacity/.9);diffuseColor.rgb=mix(diffuseColor.rgb,centerInk,min(1.0,ca*skinOpacity/.9));` : `float mw=1.0-(.00165*skinWidth/.006);float ma=smoothstep(mw-max(.018,fwidth(fields.b)*.65),mw+max(.018,fwidth(fields.b)*.65),fields.b);diffuseColor.rgb=mix(diffuseColor.rgb,muscleInk,ma*skinOpacity);`}`,
     );
     if (isFlesh)
       shader.fragmentShader = shader.fragmentShader.replace(
@@ -236,7 +246,9 @@ function frame() {
       ? 0.34
       : detail
         ? 0.46
-        : 1.05;
+        : pose === "tpose"
+          ? Math.max(1.05, 1.0 / ratio)
+          : 1.05;
   camera.left = -half * ratio;
   camera.right = half * ratio;
   camera.top = half;
@@ -395,6 +407,7 @@ $("#save").onclick = () => {
 controls.addEventListener("change", render);
 new ResizeObserver(frame).observe(canvas.parentElement);
 $("#base-color").value = skins.find((s) => s.id === skin).base || "#dddfe2";
+select("[data-pose]", "pose", pose);
 rebuild().catch((e) => {
   $("#loading").textContent = "모델 로드 실패: " + e.message;
   diagnostics.errors.push(e.stack);

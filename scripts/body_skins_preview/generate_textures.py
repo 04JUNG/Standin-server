@@ -81,6 +81,7 @@ def path(name,points,channel=2,side='front',mirror=True,projected=False,z_min=No
    select=(X>=good[:,0].min()-radius)&(X<=good[:,0].max()+radius)&(Z>=good[:,2].min()-radius)&(Z<=good[:,2].max()+radius)&(Y>=good[:,1].min()-radius)&(Y<=good[:,1].max()+radius)
   if z_min is not None:select&=Z>=z_min
   if z_max is not None:select&=Z<=z_max
+  if name.startswith('shared torso-to-leg meridian'):select&=GZ<=collar_z+.0005
   idx=np.flatnonzero(select);v=samples[idx] if channel in (0,2) or projected else np.column_stack([X[idx],Z[idx]]);dist=np.full(len(idx),radius,np.float32)
   for p,q in zip(s,s[1:]):
    if not np.isfinite(p).all() or not np.isfinite(q).all() or np.linalg.norm(q-p)>.035:continue
@@ -88,18 +89,54 @@ def path(name,points,channel=2,side='front',mirror=True,projected=False,z_min=No
   masks[idx,channel]=np.maximum(masks[idx,channel],np.clip(1-dist/radius,0,1))
   paths.append({'name':name+(' L' if sign==1 else ' R') if mirror else name,'channel':channel,'surface':side,'points':pts.tolist(),'projected':projected or channel in (0,2),'z_min':z_min,'z_max':z_max})
 
-# Sparse cross sections at anatomical stations, plus surface meridians.
-path('sagittal center',[(0,.78),(0,.94),(0,1.15),(0,1.44),(0,1.58),(0,1.79)],0,'both',False)
-for zz,name in [(1.657,'eye level'),(1.492,'neck base')]:path(name,[(-.13,zz),(0,zz),(.13,zz)],1,'both',False)
-for zz,name in [(1.365,'chest upper'),(1.270,'chest lower'),(1.135,'waist'),(1.025,'pelvis')]:
- path(name,[(-.18,zz),(-.09,zz-.006),(0,zz-.009),(.09,zz-.006),(.18,zz)],1,'both',False)
+# CSP Ver.2 line inventory: observed front + user-supplied profile/back.
+# Cross sections are complete 3D surface intersections, including side faces.
+spec=json.loads(Path(__file__).with_name('guide_spec.json').read_text())
+source=json.loads((root/(a.id+'-source.json')).read_text())
+bones={k.split(':')[-1]:np.array(v)/h for k,v in source['bone_heads'].items()}
+# The same named stations follow each source rig's proportions, without changing it.
+stations=np.array([0,.10036,.51381,.96232,1.10440,1.21095,1.33272,1.46971,1.56210,1.78])
+actual=np.array([0,*[bones[n][2] for n in ['LeftFoot','LeftLeg','LeftUpLeg','Spine','Spine1','Spine2','Neck','Head']],1.78])
+GZ=np.interp(Z,actual,stations)
+def section(name,distance,select,channel=1):
+ idx=np.flatnonzero(select&(np.abs(distance)<radius))
+ masks[idx,channel]=np.maximum(masks[idx,channel],1-np.abs(distance[idx])/radius)
+ paths.append({'name':name,'channel':channel,'surface':'closed surface section','projected':False,'construction':'implicit plane/surface intersection'})
+
+section('sagittal center',X,GZ>=.88,0)
+section('eye level',GZ-spec['head']['eye_z'],GZ>1.56)
+head_y=np.interp(GZ,[1.46,1.56,1.78],[.050,.030,.030])
+# Collar rises over the shoulder and nape, as seen in the profile reference.
+collar_z=np.interp(Y,[-.10,.035,.13],[1.442,1.475,1.486])
+section('head side meridian',Y-head_y,(GZ>=collar_z)&(np.abs(X)<.13))
+section('neck base', (GZ-collar_z)/1.03,(np.abs(X)<.145)&(GZ>1.40)&(GZ<1.52))
+for name,zz in spec['torso']['cross_sections'].items():
+ section(name,GZ-zz,(np.abs(X)<.205)&(GZ>.95)&(GZ<1.37))
 join=style['guide_join'];join_z=join['height_m_in_1_78m_rest_model'];overlap=join['overlap_m'];meridian=join['shared_curve']
-path('shared torso-to-leg meridian gray',meridian,1,'both',projected=True,z_min=join_z-overlap)
-path('shared torso-to-leg meridian orange',meridian,0,'both',projected=True,z_max=join_z+overlap)
-path('thigh-root section',[(.015,.895),(.05,.91),(.112,.94),(.17,.965)],1,'both')
-path('arm axis',[(.10,1.466),(.16,1.457),(.205,1.431),(.32,1.410),(.453,1.401),(.58,1.396),(.70,1.394),(.775,1.383)],0,'both')
-for xx,name in [(.30,'upper arm section'),(.453,'elbow'),(.58,'forearm section'),(.70,'wrist')]:path(name,[(xx,1.31),(xx,1.50)],1,'both')
-for zz,name in [(.78,'thigh section'),(.514,'knee'),(.31,'calf section'),(.105,'ankle')]:path(name,[(.015,zz),(.17,zz)],1,'both')
+for side in ['front','back']:
+ # Female stations are remapped before surface projection; muscle authoring stays unchanged.
+ pts=np.array(meridian);pts[:,1]=np.interp(pts[:,1],stations,actual)
+ path('shared torso-to-leg meridian gray',pts,1,side,projected=True,z_min=np.interp(join_z-overlap,stations,actual))
+ path('shared torso-to-leg meridian orange',pts,0,side,projected=True,z_max=np.interp(join_z+overlap,stations,actual))
+for name,zz in spec['leg']['cross_sections'].items():
+ section(name,GZ-zz,(np.abs(X)<.22)&(GZ<.95))
+leg_y=np.interp(GZ,[.10,.514,.96],[bones['LeftFoot'][1],bones['LeftLeg'][1],bones['LeftUpLeg'][1]])
+section('leg side meridians',Y-leg_y,(GZ<join_z)&(GZ>0)&(np.abs(X)<.22))
+for sign,side in [(1,'Left'),(-1,'Right')]:
+ arm,elbow,hand=[bones[side+n] for n in ['Arm','ForeArm','Hand']]
+ ax=sign*X
+ arm_y=np.interp(ax,[.09,sign*arm[0],sign*elbow[0],sign*hand[0],.79],[.045,arm[1],elbow[1],hand[1],.045])
+ arm_z=np.interp(ax,[sign*arm[0],sign*elbow[0],sign*hand[0]],[arm[2],elbow[2],hand[2]])
+ region=(ax>.09)&(ax<.79)&(Z>arm_z-.09)&(Z<arm_z+.12)&((ax>.19)|(GZ>1.438))
+ # Top/bottom arm meridians are orange; front/back meridians are gray.
+ section('arm superior/inferior orange '+side,Y-arm_y-.012,region,0)
+ section('arm anterior/posterior gray '+side,Z-arm_z,region&(ax>sign*arm[0]))
+ for name,t in spec['arm']['cross_section_fractions'].items():
+  xx=np.interp(t,[0,1,2],[sign*arm[0],sign*elbow[0],sign*hand[0]])
+  section(name+' '+side,ax-xx,region)
+ # A gray side meridian reaches the heel; two transverse foot sections divide instep/toes.
+ for name,yy in spec['foot']['cross_sections_y'].items():
+  section(name+' '+side,Y-yy,(ax>.015)&(ax<.18)&(GZ<.16))
 
 # Front: neck tendons, pectoral arc, deltoid cap, rectus and oblique borders.
 for name,pts in [
@@ -159,7 +196,9 @@ for name,base,guide,muscle in [('gray-guide',gray,True,False),('flesh',style['fl
  def ink(ch,col,width,opacity):
   v=mask[:,:,ch].astype(np.float32)/255;coverage=np.clip((v-(1-width/radius))/.13+.5,0,1)*opacity
   color[:]=color*(1-coverage[:,:,None])+np.array(col)*coverage[:,:,None]
- if guide:ink(1,[91,100,110],.00135,.62);ink(0,[255,138,53],.0022,1.0)
+ if guide:
+  for ch,key in [(1,'gray'),(0,'orange')]:
+   line=style['lines'][key];ink(ch,line['rgb'],line['half_width_m'],line['opacity'])
  if muscle:ink(2,[66,51,46],.00165,.9)
  Image.fromarray(np.clip(color,0,255).astype(np.uint8)).save(root/(a.id+'-'+name+'.png'))
 print('TEXTURES READY',a.id,flush=True)

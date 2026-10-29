@@ -54,11 +54,11 @@ def rotate(name,axis,degrees):
  b.rotation_mode='QUATERNION';b.rotation_quaternion=Quaternion(local,math.radians(degrees))
 
 reports=[]
-for pose in ['standing','bent','seated','broader']:
+for pose in ['tpose','standing','bent','seated','broader']:
  for b in arm.pose.bones:
   b.rotation_mode='QUATERNION';b.rotation_quaternion=(1,0,0,0);b.scale=(1,1,1)
  for side,sign in [('Left',1),('Right',-1)]:
-  rotate(side+'Arm',(0,1,0),sign*(55 if pose=='bent' else 68))
+  if pose!='tpose':rotate(side+'Arm',(0,1,0),sign*(55 if pose=='bent' else 68))
   if pose in ('bent','seated'):rotate(side+'ForeArm',(0,0,1),-sign*(100 if pose=='bent' else 55))
   if pose=='seated':
    rotate(side+'UpLeg',(1,0,0),-82);rotate(side+'Leg',(1,0,0),88)

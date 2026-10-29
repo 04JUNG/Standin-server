@@ -7,10 +7,16 @@ for asset in manifest['assets']:
  f=out/asset['path'];assert f.stat().st_size==asset['bytes'];assert hashlib.sha256(f.read_bytes()).hexdigest()==asset['sha256'],asset['path']
 checks.append('all artifact bytes match manifest hashes')
 style=json.loads((out/'skin_style.json').read_text())
+assert style['version']==manifest['version']=='0.1.3'
+spec=json.loads((out/'guide_spec.json').read_text())
+for ref in spec['evidence']:
+ file=out/ref['file']
+ if file.exists():assert hashlib.sha256(file.read_bytes()).hexdigest()==ref['sha256']
+checks.append('version and CSP source-reference hashes match the finalized line specification')
 for model in manifest['models']:
  name=model['id'];assert model['protected_before']==model['protected_after'];assert model['bones']==52
  src=json.loads((out/f'assets/{name}-source.json').read_text());assert src['vertices']==model['vertices'] and src['source_sha256']==model['sha256']
- poses=json.loads((out/f'assets/{name}-poses.json').read_text());assert len({r['surface_sha256'] for r in poses})==4
+ poses=json.loads((out/f'assets/{name}-poses.json').read_text());assert len({r['surface_sha256'] for r in poses})==5
  for pose in poses:
   assert pose['vertices']==model['vertices']
   data=(out/f"assets/{name}-{pose['pose']}.glb").read_bytes();magic,version,size=struct.unpack_from('<III',data);assert magic==0x46546c67 and version==2 and size==len(data)
@@ -24,6 +30,15 @@ for model in manifest['models']:
  for upper,lower in zip(gray,orange):
   assert upper['surface']==lower['surface'] and upper['points']==lower['points']
   assert upper['projected'] and lower['projected'] and upper['z_min']<lower['z_max']
+ spec=json.loads((out/'guide_spec.json').read_text())
+ assert len(spec['torso']['cross_sections'])==3 and len(spec['leg']['cross_sections'])==6
+ assert len(spec['arm']['cross_section_fractions'])==5
+ names={p['name'] for p in paths}
+ assert all(name in names for name in spec['torso']['cross_sections'])
+ assert all(name in names for name in spec['leg']['cross_sections'])
+ assert 'head side meridian' in names and 'leg side meridians' in names
+ assert not any(p['name'] in ['chest upper','knee'] for p in paths)
+ assert all('arm superior/inferior orange '+side in names and 'arm anterior/posterior gray '+side in names for side in ['Left','Right'])
  with Image.open(out/f'assets/{name}-flesh.png') as flesh:
   assert flesh.getpixel((0,0))==tuple(style['flesh']['reference_sample_rgb'])
  checks.append(name+': shared gray-to-orange surface curve with overlapping color join; exact reference flesh PNG')
@@ -32,9 +47,9 @@ for model in manifest['models']:
  for fbx in model['fbx_roundtrip']:
   assert fbx['max_weight_error']==0 and fbx['max_point_error_m']<1e-5 and fbx['max_bone_matrix_error']<1e-4
   if fbx['skin']!='default':assert fbx['image_nodes']==1
- checks.append(name+': unchanged source topology/rig/weights, four distinct exact pose surfaces, UVs, four portable PNGs, five FBX roundtrips')
+ checks.append(name+': unchanged source topology/rig/weights, five distinct exact pose surfaces, CSP reference line inventory, UVs, four portable PNGs, five FBX roundtrips')
 qa_path=out/'browser-qa.json'
 if qa_path.exists():
- qa=json.loads(qa_path.read_text());assert not qa['errors'];assert qa['cameraPreservedOnSkinSwap'];assert len(qa['loads'])==8;checks.append('browser: eight exact surfaces, five skins, four views, orbit/zoom and camera preservation')
+ qa=json.loads(qa_path.read_text());assert not qa['errors'];assert qa['cameraPreservedOnSkinSwap'];assert len(qa['loads'])==10;checks.append('browser: ten exact surfaces, five skins, four views, orbit/zoom and camera preservation')
 (out/'validation.json').write_text(json.dumps({'status':'passed','checks':checks,'csp_tested':False,'all_body_templates_tested':False},indent=2)+'\n')
 print('\n'.join(checks))

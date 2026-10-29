@@ -82,6 +82,14 @@ if (!output) throw Error("Usage: node capture_review.cjs URL OUTPUT_DIRECTORY");
       await save(`${model}-${skin}-join-detail`);
     }
     await page.evaluate(() => skinPreview.setDetail(false));
+    await page.evaluate(() => skinPreview.setPose("tpose"));
+    await page.evaluate(() => skinPreview.setSkin("gray-guide"));
+    await page.setViewportSize({ width: 1400, height: 1300 });
+    for (const angle of ["front", "quarter", "side", "back"]) {
+      await page.evaluate((v) => skinPreview.setAngle(v), angle);
+      await save(`${model}-tpose-gray-guide-${angle}`);
+    }
+    await page.evaluate(() => skinPreview.setPose("standing"));
   }
   const comparisonLayouts = [];
   await page.evaluate(() => skinPreview.setCompare(true));
@@ -109,6 +117,7 @@ if (!output) throw Error("Usage: node capture_review.cjs URL OUTPUT_DIRECTORY");
     throw Error("Skin swap moved the inspection camera");
   await page.evaluate(() => document.body.classList.remove("capture"));
   await page.setViewportSize({ width: 1600, height: 1060 });
+  await page.evaluate(() => skinPreview.setPose("tpose"));
   await page.evaluate(() => skinPreview.setAngle("front"));
   await page.screenshot({ path: path.join(output, "final-screen.png") });
   fs.writeFileSync(

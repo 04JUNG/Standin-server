@@ -9,7 +9,7 @@ for row in sources['models']:
  subprocess.run([sys.executable,str(HERE/'generate_textures.py'),'--assets',str(assets),'--id',row['id'],'--resolution',str(a.resolution)],check=True)
  subprocess.run([a.blender,'-b','--python',str(HERE/'export_fbx.py'),'--','--assets',str(assets),'--id',row['id']],check=True)
 for intermediate in assets.glob('*.npz'):intermediate.unlink()
-for name in ['index.html','style.css','viewer.js','skin_style.json']:shutil.copy2(HERE/name,out/name)
+for name in ['index.html','style.css','viewer.js','skin_style.json','guide_spec.json']:shutil.copy2(HERE/name,out/name)
 vendor=out/'vendor';vendor.mkdir(exist_ok=True)
 for name in ['three.module.js','three.core.js']:shutil.copy2(a.three_root/'build'/name,vendor/name)
 for name in ['loaders/GLTFLoader.js','controls/OrbitControls.js','utils/BufferGeometryUtils.js','utils/SkeletonUtils.js']:
