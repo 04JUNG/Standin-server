@@ -154,7 +154,8 @@ class Engine:
             i = p["person_index"]
             pose = p["pose_id"]
             obs = p["observation"]
-            if not re.fullmatch(r"[A-Za-z0-9_\-]+", pose) or p["output_scope"] not in (
+            from .assets import valid_pose_id
+            if not valid_pose_id(pose) or p["output_scope"] not in (
                 "full",
                 "half",
                 "bust",
