@@ -21,6 +21,22 @@ def required(name):
     return value
 
 
+def load_parts_service(settings):
+    enabled = os.environ.get("SCENE_PARTS_ENABLED", "0")
+    if enabled not in ("0", "1"):
+        raise ValueError("SCENE_PARTS_ENABLED must be 0 or 1")
+    if enabled == "0":
+        return None
+    from src.refine_v4.service import Catalog, PartsService
+    catalog_path = os.environ.get("SCENE_PARTS_CATALOG")
+    catalog_sha = os.environ.get("SCENE_PARTS_CATALOG_SHA256")
+    if bool(catalog_path) != bool(catalog_sha):
+        raise ValueError("parts catalog and hash must be configured together")
+    catalog = Catalog(catalog_path, catalog_sha) if catalog_path else None
+    return PartsService(root=settings.root / "parts", blender=settings.blender,
+                        catalog=catalog, timeout=settings.timeout)
+
+
 def _load_engine(progress):
     progress[0] = "SCENE_ASSET_INVALID"
     paths, character_sha = verify_release(
@@ -86,7 +102,8 @@ def _load_engine(progress):
         if not bool(visual.torch.isfinite(features).all()):
             raise ValueError("CLIP warmup returned nonfinite features")
     progress[0] = "SCENE_ENGINE_NOT_READY"
-    engine = Engine(settings, Reader("gemini", model), visual)
+    parts_service = load_parts_service(settings)
+    engine = Engine(settings, Reader("gemini", model), visual, parts_service=parts_service)
     with tempfile.TemporaryDirectory(
         prefix="preflight-", dir=settings.root
     ) as directory:

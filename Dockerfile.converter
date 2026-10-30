@@ -95,6 +95,7 @@ COPY converter/first_entry_profile.py /app/converter/first_entry_profile.py
 COPY converter/scene_contract.py /app/converter/scene_contract.py
 COPY converter/scene.py /app/converter/scene.py
 COPY converter/scene_camera.py /app/converter/scene_camera.py
+COPY converter/scene_camera_transport.py /app/converter/scene_camera_transport.py
 COPY converter/rough_layout.py /app/converter/rough_layout.py
 COPY converter/scene_worker.py /app/converter/scene_worker.py
 COPY converter/framing.py /app/converter/framing.py

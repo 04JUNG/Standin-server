@@ -1,0 +1,190 @@
+{
+  "scope": "local ASGI HTTP + real Blender, not staging app / not score",
+  "cases": [
+    {
+      "contract_version": "refine-v4-parts-http-v1",
+      "engine_version": "refine-v4-parts.1",
+      "request_id": "T043",
+      "request_sha256": "06dd79f52f0bed6fff32fbd4ffd10163a57a60fab9f178838a63ab6173cfa991",
+      "catalog_sha256": "cbbc33b2d7f6b56fad2ace55ee5846c61c4f2b48c7907d3ec35179c8ef20881a",
+      "engine_executed": true,
+      "status": "applied",
+      "applied": true,
+      "reason": null,
+      "input_sha256": "a19ccccdfe6ef3fa6c936c2f0de490dd0dc753da9ed9a02b2df3286720fbad2e",
+      "artifact_sha256": "d2cba3eb3c229b5cb9136396b4dfc26949d05a5a0a0152daa6228c2d7789b1a4",
+      "intent": {
+        "source": "user_confirmed",
+        "reference": "accepted experiments PR151; regression only",
+        "description": "오른다리로 지지하고 왼다리는 옆으로 길게 뻗는다"
+      },
+      "operation": {
+        "type": "recipe",
+        "recipe_id": "T043"
+      },
+      "adjusted_limbs": [
+        "left_leg",
+        "right_leg"
+      ],
+      "saved_verification": {
+        "matrix_error": 6.16908073425293e-06,
+        "surface_error_m": 8.19428389362545e-07
+      },
+      "artifact_contract": "verified-parts-fbx-v1",
+      "requires_artifact_review": true,
+      "release_allowed": false,
+      "score_status": "not_scored",
+      "elapsed_seconds": 3.169,
+      "fixture_id": "T043"
+    },
+    {
+      "contract_version": "refine-v4-parts-http-v1",
+      "engine_version": "refine-v4-parts.1",
+      "request_id": "T050",
+      "request_sha256": "c746b7efaebb15c17d115b9387d3525d6797a3bb5e52354c9d27e66253486ba1",
+      "catalog_sha256": "cbbc33b2d7f6b56fad2ace55ee5846c61c4f2b48c7907d3ec35179c8ef20881a",
+      "engine_executed": true,
+      "status": "applied",
+      "applied": true,
+      "reason": null,
+      "input_sha256": "3ae78db4b995998f8a0d3e840be3fdb26a96d423d28439efe9a310a42536bdc6",
+      "artifact_sha256": "7f7e2ed700a7c0853c4e422288ae318c5436ba86574ca5acf66b05772fbe3675",
+      "intent": {
+        "source": "user_confirmed",
+        "reference": "accepted experiments PR151; regression only",
+        "description": "왼발을 인물 앞쪽으로 5cm 더 내민다"
+      },
+      "operation": {
+        "type": "advance_foot",
+        "side": "left",
+        "distance_m": 0.05
+      },
+      "adjusted_limbs": [
+        "left_leg"
+      ],
+      "saved_verification": {
+        "matrix_error": 1.0281801223754883e-05,
+        "surface_error_m": 6.882013820860081e-07
+      },
+      "artifact_contract": "verified-parts-fbx-v1",
+      "requires_artifact_review": true,
+      "release_allowed": false,
+      "score_status": "not_scored",
+      "elapsed_seconds": 1.327,
+      "fixture_id": "T050"
+    },
+    {
+      "contract_version": "refine-v4-parts-http-v1",
+      "engine_version": "refine-v4-parts.1",
+      "request_id": "T002",
+      "request_sha256": "f64d60c10489763bb0bf74f25b1cfe6e6ef96a49f30fb75f5fab9de666bd080d",
+      "catalog_sha256": "cbbc33b2d7f6b56fad2ace55ee5846c61c4f2b48c7907d3ec35179c8ef20881a",
+      "engine_executed": true,
+      "status": "applied",
+      "applied": true,
+      "reason": null,
+      "input_sha256": "4e5687b4a6ad812c5c19b503f7c0b3b173ac7768f1469553227876510f0c319a",
+      "artifact_sha256": "3fd693b5e786d37d29e872d5a98591b6de63278832078e0f5e52255277d7cebb",
+      "intent": {
+        "source": "user_confirmed",
+        "reference": "accepted experiments PR151; regression only",
+        "description": "어깨 옆에서 엄지가 위로 가게 우산대를 잡는다 / 허리 앞에서 휴대폰을 든다"
+      },
+      "operation": {
+        "type": "recipe",
+        "recipe_id": "T002"
+      },
+      "adjusted_limbs": [
+        "left_arm",
+        "right_arm"
+      ],
+      "saved_verification": {
+        "matrix_error": 5.900859832763672e-06,
+        "surface_error_m": 5.82862115371464e-07
+      },
+      "artifact_contract": "verified-parts-fbx-v1",
+      "requires_artifact_review": true,
+      "release_allowed": false,
+      "score_status": "not_scored",
+      "elapsed_seconds": 2.292,
+      "fixture_id": "T002"
+    },
+    {
+      "contract_version": "refine-v4-parts-http-v1",
+      "engine_version": "refine-v4-parts.1",
+      "request_id": "T018",
+      "request_sha256": "7c396cc816c0aa128083068889aadb0541acd9fc3ed0b420b5110b3640419d23",
+      "catalog_sha256": "cbbc33b2d7f6b56fad2ace55ee5846c61c4f2b48c7907d3ec35179c8ef20881a",
+      "engine_executed": true,
+      "status": "applied",
+      "applied": true,
+      "reason": null,
+      "input_sha256": "ae5503d52d94dc1a94295244511f6c72cd28077892757c0fcc97cf5716234b60",
+      "artifact_sha256": "59ceba3080bd0fa5f6e856542f5de2644da9af24ed9ba61e92a571e682be04b4",
+      "intent": {
+        "source": "user_confirmed",
+        "reference": "accepted experiments PR151; regression only",
+        "description": "세운 무릎 위에 손을 올린다 / 손등이 위로 가게 주먹을 쥐고 손을 무릎 쪽 가까이 아래로 내린다"
+      },
+      "operation": {
+        "type": "recipe",
+        "recipe_id": "T018"
+      },
+      "adjusted_limbs": [
+        "left_arm",
+        "right_arm"
+      ],
+      "saved_verification": {
+        "matrix_error": 1.4506280422210693e-05,
+        "surface_error_m": 4.405303448168779e-07
+      },
+      "artifact_contract": "verified-parts-fbx-v1",
+      "requires_artifact_review": true,
+      "release_allowed": false,
+      "score_status": "not_scored",
+      "elapsed_seconds": 4.247,
+      "fixture_id": "T018"
+    },
+    {
+      "contract_version": "refine-v4-parts-http-v1",
+      "engine_version": "refine-v4-parts.1",
+      "request_id": "T041rollback",
+      "request_sha256": "204a0c256b029ee8e16d2580becb960b43d2569a04e8258b3f4493fda48a1cba",
+      "catalog_sha256": "cbbc33b2d7f6b56fad2ace55ee5846c61c4f2b48c7907d3ec35179c8ef20881a",
+      "engine_executed": true,
+      "status": "retained",
+      "applied": false,
+      "reason": "PARTS_REJECTED",
+      "input_sha256": "57b968cf88dfd46612a17ec640b4fc922bc73b89913f9ed5dfd3b05d8bef396b",
+      "artifact_sha256": "57b968cf88dfd46612a17ec640b4fc922bc73b89913f9ed5dfd3b05d8bef396b",
+      "intent": {
+        "source": "user_confirmed",
+        "reference": "accepted experiments PR151; regression only",
+        "description": "오른발목을 왼발목 위로 교차"
+      },
+      "operation": {
+        "type": "recipe",
+        "recipe_id": "T041negative"
+      },
+      "adjusted_limbs": [],
+      "saved_verification": {},
+      "artifact_contract": "retained-current-fbx-v1",
+      "requires_artifact_review": true,
+      "release_allowed": false,
+      "score_status": "not_scored",
+      "elapsed_seconds": 0.794,
+      "fixture_id": "T041rollback"
+    }
+  ],
+  "verification_scope": "Authenticated local ASGI HTTP handler -> actual Blender subprocess -> existing native engine -> saved FBX reimport verification; not staging app and not automatic VLM accuracy.",
+  "blender_version": "5.2.0 macOS",
+  "quality_score": null,
+  "score_delta": null,
+  "deployment_status": "not_deployed",
+  "limitations": [
+    "BFF must call the new private parts API explicitly.",
+    "Production catalog assets and activation are operator configuration, not bundled models.",
+    "T041rollback is a deliberately unsupported-family negative fixture.",
+    "Native arm implementation is the PR151 boundary d09da4a; follow-up752fe0a is not automatically included."
+  ]
+}
