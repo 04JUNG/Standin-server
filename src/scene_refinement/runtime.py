@@ -1,4 +1,4 @@
-"""Dedicated CPU/Gemini staging runtime; never imports the /analyze app."""
+"""Dedicated CPU/VLM runtime; never imports the /analyze app."""
 
 import os
 from pathlib import Path
@@ -43,9 +43,10 @@ def _load_engine(progress):
         required("SCENE_ASSET_MANIFEST"), required("SCENE_ASSET_MANIFEST_SHA256")
     )
     progress[0] = "SCENE_CONFIG_INVALID"
-    if required("SCENE_VLM_PROVIDER") != "gemini":
-        raise ValueError("container runtime supports gemini only")
-    required("GEMINI_API_KEY")
+    provider = required("SCENE_VLM_PROVIDER")
+    if provider not in {"gemini", "openai"}:
+        raise ValueError("container runtime requires gemini or openai")
+    required("OPENAI_API_KEY" if provider == "openai" else "GEMINI_API_KEY")
     model = required("SCENE_VLM_MODEL")
     # Separate opt-in worker uses manifest-owned calibration, independent of
     # /analyze routing. Set before importing its immutable CFG singleton.
@@ -103,7 +104,7 @@ def _load_engine(progress):
             raise ValueError("CLIP warmup returned nonfinite features")
     progress[0] = "SCENE_ENGINE_NOT_READY"
     parts_service = load_parts_service(settings)
-    engine = Engine(settings, Reader("gemini", model), visual, parts_service=parts_service)
+    engine = Engine(settings, Reader(provider, model), visual, parts_service=parts_service)
     with tempfile.TemporaryDirectory(
         prefix="preflight-", dir=settings.root
     ) as directory:

@@ -392,6 +392,8 @@ def recommend(observation, assets, *, default_body_id=None):
 
 
 class GeminiCoarseClient:
+    provider = "gemini"
+
     def __init__(
         self,
         model="gemini-flash-lite-latest",
@@ -399,9 +401,6 @@ class GeminiCoarseClient:
         *,
         family_review_model="",
     ):
-        from google import genai
-        from google.genai import types
-
         import math
 
         if not math.isfinite(timeout_seconds) or timeout_seconds <= 0:
@@ -409,13 +408,8 @@ class GeminiCoarseClient:
         self.model = model
         self.timeout_seconds = timeout_seconds
         self.family_review_model = family_review_model
-        self.client = genai.Client(
-            api_key=os.environ["GEMINI_API_KEY"],
-            http_options=types.HttpOptions(
-                timeout=int(timeout_seconds * 1000),
-                retry_options=types.HttpRetryOptions(attempts=1),
-            ),
-        )
+        from ...vlm.openai_transport import content_client
+        self.client = content_client(self.provider, timeout_ms=int(timeout_seconds * 1000))
 
     @staticmethod
     def _contents(crops, prompt):
@@ -511,3 +505,7 @@ class GeminiCoarseClient:
 
     def close(self):
         self.client.close()
+
+
+class OpenAICoarseClient(GeminiCoarseClient):
+    provider = "openai"

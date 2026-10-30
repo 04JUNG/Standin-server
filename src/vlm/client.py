@@ -24,7 +24,7 @@ from ..person_tags import parse_person_values, stated_value
 from ..logging_setup import log_info, log_warn
 from ..pose_query import validated_object_hands
 from . import prompts
-from .failures import classify_failure, failure_reason
+from .failures import classify_failure, failure_reason, NONRETRYABLE_REASONS
 from ..refine_evidence import enabled as refine_evidence_enabled, parse_refine_evidence, response_trace
 
 
@@ -139,7 +139,7 @@ class VLMUnavailable(RuntimeError):
         self.attempts = attempts
         self.elapsed_seconds = elapsed_seconds
         self.reason = reason or failure_reason(status, timed_out=status is None)
-        self.retryable = self.reason != "daily_quota_exhausted"
+        self.retryable = self.reason not in NONRETRYABLE_REASONS
         self.retry_after_seconds = retry_after_seconds
 
 
@@ -346,7 +346,7 @@ def describe_failure_reason(error: Exception) -> tuple[str, bool, Optional[float
     """설명 호출 실패 → (reason, retryable, retry_after). 04J-294 분류가 있으면 그대로 쓴다."""
     status = _http_status(error)
     timed_out = _is_timeout(error)
-    upstream = timed_out or status == 429 or (status is not None and 500 <= status < 600)
+    upstream = timed_out or status in {401, 402, 403, 429} or (status is not None and 500 <= status < 600)
     if not upstream:
         # 우리 쪽(파싱·스키마·SDK) 문제. 상류 혼잡으로 분류하지 않는다.
         return ("invalid_response" if isinstance(error, (ValueError, KeyError))
@@ -361,12 +361,14 @@ def describe_failure_reason(error: Exception) -> tuple[str, bool, Optional[float
         reason = ("timeout" if timed_out else "rate_limited" if status == 429
                   else "upstream_unavailable" if status == 503 else "upstream_error")
         delay = None
-    return reason, reason != "daily_quota_exhausted", delay
+    return reason, reason not in NONRETRYABLE_REASONS, delay
 
 
 class GeminiVLMClient(BaseVLMClient):
     """Gemini Flash 어댑터 (현행 google-genai SDK). `pip install google-genai pillow`, env GEMINI_API_KEY.
     모델은 GEMINI_MODEL env로 지정(기본 gemini-2.5-flash). 최신 Flash로 올리려면 그 값을 바꾼다."""
+    provider = "gemini"
+
     def __init__(self, model: Optional[str] = None, *, client=None, sleep=time.sleep,
                  jitter=random.uniform, clock=time.monotonic):
         if client is None:
@@ -375,7 +377,7 @@ class GeminiVLMClient(BaseVLMClient):
             import os
             client = genai.Client(
                 api_key=os.environ["GEMINI_API_KEY"],
-                http_options=types.HttpOptions(timeout=CFG.gemini_request_timeout_ms),
+                http_options=types.HttpOptions(timeout=getattr(CFG, self.provider + "_request_timeout_ms")),
             )
         self._client = client
         self._model = model or CFG.gemini_model
@@ -412,13 +414,13 @@ class GeminiVLMClient(BaseVLMClient):
                 ),
             )
             payload = _extract_json(resp.text)
-            log_info("gemini_person_tags", model=self._model, status="ok",
+            log_info(f"{self.provider}_person_tags", model=self._model, status="ok",
                      people=len(boxes),
                      elapsedMs=round((self._clock() - started) * 1000))
             return payload if isinstance(payload, dict) else None
         except Exception as error:
             # 실패를 올려 보내지 않는다. 분석은 이미 끝났고 태그는 없어도 되는 값이다.
-            log_warn("gemini_person_tags", model=self._model, status="failed",
+            log_warn(f"{self.provider}_person_tags", model=self._model, status="failed",
                      errorType=type(error).__name__,
                      elapsedMs=round((self._clock() - started) * 1000))
             return None
@@ -455,14 +457,14 @@ class GeminiVLMClient(BaseVLMClient):
             if refine_evidence_enabled() and isinstance(payload, dict):
                 payload["refine_evidence"] = parse_refine_evidence(
                     payload.get("refine_contacts"), expected_person_ids=range(len(boxes)), kind="contacts",
-                    provenance=response_trace(resp, provider="gemini", model=self._model, logical_call_id="read_hands"),
+                    provenance=response_trace(resp, provider=self.provider, model=self._model, logical_call_id="read_hands"),
                 ).to_serializable()
-            log_info("gemini_hand_shapes", model=self._model, status="ok",
+            log_info(f"{self.provider}_hand_shapes", model=self._model, status="ok",
                      people=len(boxes),
                      elapsedMs=round((self._clock() - started) * 1000))
             return payload if isinstance(payload, dict) else None
         except Exception as error:
-            log_warn("gemini_hand_shapes", model=self._model, status="failed",
+            log_warn(f"{self.provider}_hand_shapes", model=self._model, status="failed",
                      errorType=type(error).__name__,
                      elapsedMs=round((self._clock() - started) * 1000))
             return None
@@ -512,7 +514,7 @@ class GeminiVLMClient(BaseVLMClient):
             if remaining_ms < 1:
                 break
             timeout_ms = min(first_timeout * attempt, remaining_ms)
-            log_info('gemini_pose_describe_attempt', model=self._model,
+            log_info(f'{self.provider}_pose_describe_attempt', model=self._model,
                      attempt=attempt, timeoutMs=timeout_ms,
                      remainingBudgetMs=remaining_ms)
             result = self._describe_people_once(image, boxes, timeout_ms)
@@ -520,10 +522,10 @@ class GeminiVLMClient(BaseVLMClient):
         if result is None:
             from ..search_routing import DescribeOutcome
             result = DescribeOutcome('error', error_reason='timeout',
-                                     retryable=True, provider='gemini')
+                                     retryable=True, provider=self.provider)
         result.attempts = attempts
         result.elapsed_ms = (self._clock() - started) * 1000
-        log_info('gemini_pose_describe_summary', model=self._model,
+        log_info(f'{self.provider}_pose_describe_summary', model=self._model,
                  status=result.status, attempts=attempts,
                  failureReason=result.error_reason,
                  elapsedMs=round(result.elapsed_ms))
@@ -602,20 +604,20 @@ class GeminiVLMClient(BaseVLMClient):
         except Exception as error:  # noqa: BLE001 - 상태로 돌려준다
             reason, retryable, delay = describe_failure_reason(error)
             elapsed = (self._clock() - started) * 1000
-            log_warn("gemini_pose_describe", model=self._model, status="failed",
+            log_warn(f"{self.provider}_pose_describe", model=self._model, status="failed",
                      failureReason=reason, errorType=type(error).__name__,
                      validationCode=error.code if isinstance(error, DescriptionResponseError) else None,
                      validationField=error.field if isinstance(error, DescriptionResponseError) else None,
                      upstreamStatus=_http_status(error), elapsedMs=round(elapsed))
             return DescribeOutcome("error", error_reason=reason, retryable=retryable,
                                    retry_after_seconds=delay, elapsed_ms=elapsed,
-                                   provider="gemini")
+                                   provider=self.provider)
         elapsed = (self._clock() - started) * 1000
-        log_info("gemini_pose_describe", model=self._model, status="ok",
+        log_info(f"{self.provider}_pose_describe", model=self._model, status="ok",
                  people=len(boxes), promptVersion=prompts.POSE_DESCRIBE_VERSION,
                  elapsedMs=round(elapsed))
         return DescribeOutcome("ok", descriptions=descriptions, elapsed_ms=elapsed,
-                               provider="gemini")
+                               provider=self.provider)
 
     def analyze_for_pipeline(self, image, img_w: int, img_h: int) -> VLMAnalysis:
         return self.analyze(image, img_w, img_h, _defer_body_review=True)
@@ -646,13 +648,13 @@ class GeminiVLMClient(BaseVLMClient):
             body_options["response_json_schema"] = extend_analysis_schema(schema)
         if body_enabled and CFG.vlm_body_thinking_level:
             body_options["thinking_config"] = types.ThinkingConfig(thinking_level=CFG.vlm_body_thinking_level)
-        attempts = max(1, CFG.gemini_max_attempts)
+        attempts = max(1, getattr(CFG, self.provider + "_max_attempts"))
         # 재시도가 BFF의 분석 상한(기본 120초)을 먹어 치우지 않게 VLM 단계 전체에 예산을 둔다.
         # 예산이 없으면 timeout을 올릴 때마다 최악 지연이 attempts배로 늘어난다.
-        full_timeout = CFG.gemini_request_timeout_ms / 1000
-        min_attempt = max(1.0, CFG.gemini_min_attempt_seconds)
+        full_timeout = getattr(CFG, self.provider + "_request_timeout_ms") / 1000
+        min_attempt = max(1.0, getattr(CFG, self.provider + "_min_attempt_seconds"))
         started_all = self._clock()
-        deadline = started_all + CFG.gemini_total_budget_seconds
+        deadline = started_all + getattr(CFG, self.provider + "_total_budget_seconds")
         for attempt in range(1, attempts + 1):
             # ⚠ 이번 시도의 상한은 **남은 예산**이다. 전체 timeout을 그대로 쓰면 예산을
             #   넘겨 BFF가 먼저 끊는다. 반대로 "남은 예산이 전체 timeout보다 작으면
@@ -678,7 +680,7 @@ class GeminiVLMClient(BaseVLMClient):
                     ),
                 )
                 log_info(
-                    "gemini_request",
+                    f"{self.provider}_request",
                     model=self._model,
                     attempt=attempt,
                     status="ok",
@@ -687,7 +689,7 @@ class GeminiVLMClient(BaseVLMClient):
                 analysis = _coerce(_extract_json(resp.text), img_w, img_h)
                 if analysis.refine_evidence is not None:
                     analysis.refine_evidence["call_trace"] = response_trace(
-                        resp, provider="gemini", model=self._model, logical_call_id="analyze", attempts=attempt)
+                        resp, provider=self.provider, model=self._model, logical_call_id="analyze", attempts=attempt)
                 if body_enabled and getattr(CFG, "body_integrated_review_enabled", True):
                     # Optional read-only body review must never retry/replace a
                     # successful control analysis or receive a fresh time budget.
@@ -706,11 +708,11 @@ class GeminiVLMClient(BaseVLMClient):
                 status = _http_status(error)
                 timed_out = _is_timeout(error)
                 failure, retry_after = classify_failure(error, status, timed_out=timed_out)
-                upstream = status == 429 or (status is not None and 500 <= status < 600) or timed_out
-                transient = upstream and not timed_out and failure != "daily_quota_exhausted"
+                upstream = status in {401, 402, 403, 429} or (status is not None and 500 <= status < 600) or timed_out
+                transient = upstream and not timed_out and failure not in NONRETRYABLE_REASONS
                 left = deadline - self._clock()
-                base_delay = min(CFG.gemini_retry_base_seconds * (2 ** (attempt - 1)),
-                                 CFG.gemini_retry_max_seconds)
+                base_delay = min(getattr(CFG, self.provider + "_retry_base_seconds") * (2 ** (attempt - 1)),
+                                 getattr(CFG, self.provider + "_retry_max_seconds"))
                 delay = max(0.0, self._jitter(base_delay * 0.8, base_delay * 1.2),
                             retry_after or 0.0)
                 # 남은 예산으로 의미 있는 시도를 한 번 더 할 수 있을 때만 재시도한다.
@@ -727,7 +729,7 @@ class GeminiVLMClient(BaseVLMClient):
                     else "budget_exhausted"
                 )
                 log_warn(
-                    "gemini_request",
+                    f"{self.provider}_request",
                     model=self._model,
                     attempt=attempt,
                     status=status or "error",
@@ -738,7 +740,7 @@ class GeminiVLMClient(BaseVLMClient):
                     timeoutSeconds=round(timeout_seconds, 1),
                     budgetLeftSeconds=round(max(0.0, left), 1),
                     elapsedMs=round((self._clock() - started) * 1000),
-                    errorCode=f"GEMINI_{status}" if status else "GEMINI_ERROR",
+                    errorCode=f"{self.provider.upper()}_{status}" if status else f"{self.provider.upper()}_ERROR",
                 )
                 if not retryable:
                     if upstream:
@@ -778,7 +780,7 @@ def _http_status(error: Exception) -> int | None:
 # httpx의 timeout 계열. 이름으로 보는 이유는 아래 주석 참고.
 _TIMEOUT_CLASS_NAMES = frozenset({
     "TimeoutError", "TimeoutException",
-    "ReadTimeout", "ConnectTimeout", "WriteTimeout", "PoolTimeout",
+    "ReadTimeout", "ConnectTimeout", "WriteTimeout", "PoolTimeout", "APITimeoutError",
 })
 
 
@@ -794,39 +796,36 @@ def _is_timeout(error: Exception) -> bool:
     return any(cls.__name__ in _TIMEOUT_CLASS_NAMES for cls in type(error).__mro__)
 
 
-class OpenAIVLMClient(BaseVLMClient):
-    """gpt-5-mini 등 OpenAI 비전 어댑터. `pip install openai`, env OPENAI_API_KEY 필요."""
-    def __init__(self, model: Optional[str] = None):
-        from openai import OpenAI  # 지연 import
-        self._client = OpenAI()
-        self._model = model or CFG.openai_model
+class OpenAIVLMClient(GeminiVLMClient):
+    """Share prompts, validation, crop/side reviews and bounded retry policy.
 
-    def analyze(self, image_data_url: str, img_w: int, img_h: int) -> VLMAnalysis:
-        from ..experimental.body_matching.integrated import enabled, analysis_prompt
-        prompt = prompts.user_template(CFG.vlm_prompt_version)
-        system = prompts.SYSTEM
-        if enabled(CFG):
-            from ..experimental.body_matching.integrated import SYSTEM_EXTENSION
-            prompt = analysis_prompt(prompt)
-            system += SYSTEM_EXTENSION
-        if refine_evidence_enabled():
-            prompt = prompts.refine_evidence_prompt(prompt)
-        resp = self._client.chat.completions.create(
-            model=self._model,
-            response_format={"type": "json_object"},
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user", "content": [
-                    {"type": "text", "text": prompt},
-                    {"type": "image_url", "image_url": {"url": image_data_url}},
-                ]},
-            ],
-        )
-        analysis = _coerce(_extract_json(resp.choices[0].message.content), img_w, img_h)
-        if analysis.refine_evidence is not None:
-            analysis.refine_evidence["call_trace"] = response_trace(
-                resp, provider="openai", model=self._model, logical_call_id="analyze", attempts=None)
-        return analysis
+    Only the transport, model and provider identity change. No Gemini network
+    client is created, including for auxiliary analysis calls.
+    """
+    provider = "openai"
+
+    @staticmethod
+    def _to_part(image):
+        # Keep the previous OpenAI adapter's data-URL input contract alongside
+        # the PIL/file inputs used by the real serving pipeline.
+        if isinstance(image, str) and image.startswith("data:image/"):
+            import base64
+            from google.genai import types
+            header, encoded = image.split(",", 1)
+            if not header.endswith(";base64"):
+                raise ValueError("base64 image data URL required")
+            return types.Part.from_bytes(data=base64.b64decode(encoded, validate=True),
+                                         mime_type=header[5:-7])
+        return GeminiVLMClient._to_part(image)
+
+    def __init__(self, model: Optional[str] = None, *, client=None, **kwargs):
+        from .openai_transport import OpenAIContentClient
+        selected = model or CFG.openai_model
+        if not selected or selected.startswith("gemini"):
+            raise ValueError("OPENAI_MODEL must explicitly name an OpenAI model")
+        transport = client if client is not None else OpenAIContentClient(
+            timeout_ms=CFG.openai_request_timeout_ms)
+        super().__init__(selected, client=transport, **kwargs)
 
 
 def build_vlm_client() -> BaseVLMClient:

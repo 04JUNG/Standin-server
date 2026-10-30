@@ -74,12 +74,9 @@ class GeminiBodyAttributeClient:
     is_mock = False
 
     def __init__(self, model, timeout_seconds):
-        from google import genai
-        from google.genai import types
+        from ...vlm.openai_transport import content_client
         self.model = model
-        self.client = genai.Client(api_key=os.environ["GEMINI_API_KEY"],
-                                  http_options=types.HttpOptions(timeout=int(timeout_seconds * 1000),
-                                      retry_options=types.HttpRetryOptions(attempts=1)))
+        self.client = content_client(self.provider, timeout_ms=int(timeout_seconds * 1000))
 
     def analyze(self, crops):
         from google.genai import types
@@ -138,3 +135,7 @@ def geometry_ratios(keypoints, mask):
             if 0 <= value <= 20:
                 ratios[name] = value
     return ratios
+
+
+class OpenAIBodyAttributeClient(GeminiBodyAttributeClient):
+    provider = "openai"
