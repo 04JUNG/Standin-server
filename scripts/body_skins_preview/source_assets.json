@@ -1,0 +1,33 @@
+{
+  "schema": "body-skin-sources.v1",
+  "base_commit": "612be944d387c3dd2543ee2eed6ae95183c101bb",
+  "evidence": [
+    "docs/BODY_SELECTION/FINE_RECOGNITION_CRITERIA.md",
+    "docs/BODY_SELECTION/ROUGH_PROJECTION_RESULTS.md",
+    "local release/characters.local.json with matching SHA256"
+  ],
+  "production_registry_queried": false,
+  "models": [
+    {
+      "id": "male",
+      "character_id": "male-base-v0-7-2",
+      "relative_source": "artifacts/converter-registration-check-2026-10-16/release/fbx/male-base-v0-7-2.fbx",
+      "sha256": "3f4ad797317595ca5a6901e3a89937cc7dd2f6d457faf390000b1b30dc4f08b5",
+      "vertices": 24988,
+      "bones": 52
+    },
+    {
+      "id": "female",
+      "character_id": "female-base-v0-3-4",
+      "relative_source": "artifacts/converter-registration-check-2026-10-16/release/fbx/female-base-v0-3-4.fbx",
+      "sha256": "98338c58635a4d741c646ca15398da767595a965218cb38bf4a69eb78b33b7f0",
+      "vertices": 24994,
+      "bones": 52
+    }
+  ],
+  "legacy": {
+    "character_id": "standin-master-v2",
+    "sha256": "7c648b97a24a3bb4914b6e5d515708c33727979881d92ef916d5726e22301f3d",
+    "finding": "The local v3.3.1 male is byte-identical to standin-master-v2. Not selected by filename."
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "standin-body-skins-review",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}
