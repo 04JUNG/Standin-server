@@ -15,6 +15,9 @@ on:
       - "tests/converter/**"
       - "deploy/ecs/**"
       - "scripts/measure_converter_latency.py"
+      - "scripts/prepare_hand_screen_deployment.py"
+      - "src/hand_skin_capacity.py"
+      - "tests/test_hand_screen_deployment.py"
       - "scripts/verify_shape_bake.py"
       - "scripts/inspect_shape_bake.py"
       - "scripts/shape_inspection_metrics.py"
@@ -35,6 +38,9 @@ on:
       - "tests/converter/**"
       - "deploy/ecs/**"
       - "scripts/measure_converter_latency.py"
+      - "scripts/prepare_hand_screen_deployment.py"
+      - "src/hand_skin_capacity.py"
+      - "tests/test_hand_screen_deployment.py"
       - "scripts/verify_shape_bake.py"
       - "scripts/inspect_shape_bake.py"
       - "scripts/shape_inspection_metrics.py"
@@ -81,6 +87,7 @@ jobs:
       - name: Run worker, API, failure, and handoff contracts
         run: |
           python -m pytest -q \
+            tests/test_hand_screen_deployment.py \
             tests/converter/test_worker_contract.py \
             tests/converter/test_shape_bake_contract.py \
             tests/converter/test_shape_inspection.py \

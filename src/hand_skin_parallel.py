@@ -14,6 +14,7 @@ from time import monotonic
 
 from converter.hand_contact import validate_screen
 from .hand_skin_screen import SkinSession, unknown
+from .hand_skin_capacity import validate_concurrency
 
 
 # Cancellation is bound by ASGI lifetime, never by a client-provided request ID.
@@ -29,8 +30,9 @@ class Outcome:
 
 
 class ScreenSlots:
-    """Two calls per gate; optional work always leaves one safety slot free."""
-    def __init__(self):
+    """Bound all sessions of one gate; optional work only starts on an idle gate."""
+    def __init__(self, capacity=2):
+        self.capacity = validate_concurrency(capacity)
         self.condition = threading.Condition()
         self.active = 0
         self.waiting = 0
@@ -44,7 +46,7 @@ class ScreenSlots:
             else:
                 self.waiting += 1
                 try:
-                    while self.active >= 2:
+                    while self.active >= self.capacity:
                         remaining = deadline-monotonic()
                         if remaining <= 0:
                             return False
@@ -184,14 +186,14 @@ class ParallelSkinSession(SkinSession):
         accepted = []
         pending = iter(candidates)
         finished = False
-        with ThreadPoolExecutor(max_workers=2, thread_name_prefix='hand-skin') as pool:
+        with ThreadPoolExecutor(max_workers=self.gate.concurrency, thread_name_prefix='hand-skin') as pool:
             while not finished and len(accepted) < limit:
                 remaining = self.remaining()
-                width = min(2, limit-len(accepted))
-                # Preserve a full timeout for both speculative reservations;
-                # near the session limit, fall back to one check at a time.
-                if remaining < width*CALL_SECONDS:
-                    width = 1
+                # Never buy more concurrency by shortening a mandatory call or
+                # increasing the session's aggregate work allowance. With the
+                # default 45s budget, at most three full 15s reservations fit.
+                width = min(self.gate.concurrency, limit-len(accepted),
+                            max(1, int(remaining // CALL_SECONDS)))
                 wave, futures = [], {}
                 wall_started = monotonic()
                 for _ in range(width):

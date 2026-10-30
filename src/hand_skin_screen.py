@@ -18,6 +18,7 @@ from converter.hand_contact import SCREEN_VERSION, validate_screen
 from converter.hand_library import load_library, normalize_request
 from converter.protocol import SOLVER_VERSION
 from .refine_thumbnail import _multipart
+from .hand_skin_capacity import validate_concurrency
 
 
 def unknown(reason, **diagnostics):
@@ -144,16 +145,14 @@ class HandSkinGate:
             raise ValueError('hand screen budget must be finite and in (0,60]')
         self.client, self.root, self.hashes = client, Path(bvh_root), dict(hashes)
         self.budget_seconds, self.max_checks = budget_seconds, max_checks
-        if type(concurrency) is not int or concurrency not in (1, 2):
-            raise ValueError('hand screen concurrency must be 1 or 2')
-        self.concurrency = concurrency
+        self.concurrency = validate_concurrency(concurrency)
         # Bound aggregate checks across people/requests sharing this engine.
-        if concurrency == 2:
+        if concurrency > 1:
             from .hand_skin_parallel import ScreenSlots
-            self.parallel_slots = ScreenSlots()
+            self.parallel_slots = ScreenSlots(concurrency)
 
     def session(self, hands=None):
-        if self.concurrency == 2:
+        if self.concurrency > 1:
             from .hand_skin_parallel import ParallelSkinSession
             return ParallelSkinSession(self, hands)
         return SkinSession(self, hands)

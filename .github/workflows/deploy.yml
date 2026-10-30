@@ -102,6 +102,11 @@ jobs:
             --enabled "$ROUTING_FULLBODY_ENABLED" \
             --variant "$REQUESTED_POSE_VARIANT" --canary "$REQUESTED_CANARY_STAGE"
 
+      - name: Prepare explicit hand screen capacity
+        env:
+          HAND_SKIN_SCREEN_CONCURRENCY: ${{ vars.HAND_SKIN_SCREEN_CONCURRENCY }}
+        run: python scripts/prepare_hand_screen_deployment.py taskdef.json --container inference
+
       - name: Verify Human-Art model source
         if: ${{ env.ROUTING_FULLBODY_ENABLED == '1' || (vars.POSE_MODEL_VARIANT || 'cascade') == 'cascade' }}
         # 모델 URI는 환경별 assets 버킷을 소유한 CDK/CloudFormation이 task
