@@ -1,0 +1,308 @@
+{
+  "schemaVersion": 1,
+  "checkedAtDateKST": "2026-10-27",
+  "purpose": "Read-only source audit for evaluation harness design; no evaluation run or deployment performed",
+  "bases": {
+    "serverDevelop": "6836b8f706f3873634fb916ba109485c3e1f7cee",
+    "bffDevelop": "81ff3dec1c8062cfbf8855e25a390f7796b308ff",
+    "clientDevelop": "c26572fb4690f132146041321f94c5ead12e86d8",
+    "serverPr133OpenHead": "b7db8d193cb656336e5bf44af0a47d70469279e8"
+  },
+  "files": [
+    {
+      "repository": "Standin-server",
+      "commit": "6836b8f706f3873634fb916ba109485c3e1f7cee",
+      "path": "docs/EVAL_HARNESS.md",
+      "bytes": 44569,
+      "gitBlob": "a2e2722bab8fb92cf0f3389855452a9159e3f412",
+      "sha256": "43b17afe78fa4b32d06d38ed96b614f4224e2928c53f979d298573a45f99b8ce",
+      "url": "https://github.com/04JUNG/Standin-server/blob/6836b8f706f3873634fb916ba109485c3e1f7cee/docs/EVAL_HARNESS.md"
+    },
+    {
+      "repository": "Standin-server",
+      "commit": "6836b8f706f3873634fb916ba109485c3e1f7cee",
+      "path": "evaluation/README.md",
+      "bytes": 6827,
+      "gitBlob": "b9622e7eb264edab9c1b6b0150e21f5dc4ffca3b",
+      "sha256": "12682e073ac697701e0e68d4a283ee9a6831ff5c19f243e0116921561d8ba643",
+      "url": "https://github.com/04JUNG/Standin-server/blob/6836b8f706f3873634fb916ba109485c3e1f7cee/evaluation/README.md"
+    },
+    {
+      "repository": "Standin-server",
+      "commit": "6836b8f706f3873634fb916ba109485c3e1f7cee",
+      "path": "evaluation/datasets/selected12-v1/dataset.json",
+      "bytes": 601,
+      "gitBlob": "aad991a581c24f7ac5763e7eba3f9b92d9efb963",
+      "sha256": "78828f2c14e2f7d4485b4242234f74ca2eb5a69825679d88033ec2eaff9df391",
+      "url": "https://github.com/04JUNG/Standin-server/blob/6836b8f706f3873634fb916ba109485c3e1f7cee/evaluation/datasets/selected12-v1/dataset.json"
+    },
+    {
+      "repository": "Standin-server",
+      "commit": "6836b8f706f3873634fb916ba109485c3e1f7cee",
+      "path": "evaluation/datasets/selected12-v1/cuts.jsonl",
+      "bytes": 6726,
+      "gitBlob": "7d157881eec254319068788a88c16700926972c5",
+      "sha256": "578c4bc40baa2a3990c89a0313a4da03ae62311fca82333dc2a6aec1b2db3403",
+      "url": "https://github.com/04JUNG/Standin-server/blob/6836b8f706f3873634fb916ba109485c3e1f7cee/evaluation/datasets/selected12-v1/cuts.jsonl"
+    },
+    {
+      "repository": "Standin-server",
+      "commit": "6836b8f706f3873634fb916ba109485c3e1f7cee",
+      "path": "evaluation/datasets/selected12-v1/persons.jsonl",
+      "bytes": 0,
+      "gitBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "url": "https://github.com/04JUNG/Standin-server/blob/6836b8f706f3873634fb916ba109485c3e1f7cee/evaluation/datasets/selected12-v1/persons.jsonl"
+    },
+    {
+      "repository": "Standin-server",
+      "commit": "6836b8f706f3873634fb916ba109485c3e1f7cee",
+      "path": "evaluation/refine_promotion_criteria.example.json",
+      "bytes": 895,
+      "gitBlob": "6be3a07b4da862118b9476b53ac01d74fe05baf1",
+      "sha256": "3442d8f23465e44c98b42dcaca3ef0dc99bbf6e4998ced66c16b975ad35391c2",
+      "url": "https://github.com/04JUNG/Standin-server/blob/6836b8f706f3873634fb916ba109485c3e1f7cee/evaluation/refine_promotion_criteria.example.json"
+    },
+    {
+      "repository": "Standin-server",
+      "commit": "6836b8f706f3873634fb916ba109485c3e1f7cee",
+      "path": "standin_eval/cli.py",
+      "bytes": 16695,
+      "gitBlob": "c74708f301af38ef909bfd5ed8f68e90d4b4e01a",
+      "sha256": "b3572c387c3ae69d85b2256e544219b9fa03f00004a631980a823a1517501913",
+      "url": "https://github.com/04JUNG/Standin-server/blob/6836b8f706f3873634fb916ba109485c3e1f7cee/standin_eval/cli.py"
+    },
+    {
+      "repository": "Standin-server",
+      "commit": "6836b8f706f3873634fb916ba109485c3e1f7cee",
+      "path": "standin_eval/metrics.py",
+      "bytes": 13320,
+      "gitBlob": "fcd9b052d42c417aed6a54896ecf7c70d66a9d7b",
+      "sha256": "80bdc4b321aeddad12568a05f5e8b66ed9deec2a593f895d6bb76f01f0c5b12f",
+      "url": "https://github.com/04JUNG/Standin-server/blob/6836b8f706f3873634fb916ba109485c3e1f7cee/standin_eval/metrics.py"
+    },
+    {
+      "repository": "Standin-server",
+      "commit": "6836b8f706f3873634fb916ba109485c3e1f7cee",
+      "path": "standin_eval/refine_three_arm.py",
+      "bytes": 68257,
+      "gitBlob": "06c17436804247b6ccf5ae36c1c8da8c3e7ba288",
+      "sha256": "0de1852e9c1f9287190adc03dcda3345957bce0bd2966684a7809d918ef652a0",
+      "url": "https://github.com/04JUNG/Standin-server/blob/6836b8f706f3873634fb916ba109485c3e1f7cee/standin_eval/refine_three_arm.py"
+    },
+    {
+      "repository": "Standin-server",
+      "commit": "6836b8f706f3873634fb916ba109485c3e1f7cee",
+      "path": "standin_eval/refine_mesh.py",
+      "bytes": 13707,
+      "gitBlob": "651cdc4a979483a8d5918b77c07067f403382bde",
+      "sha256": "9579530b5b820849d4da61f453723f9139f98533ca7a6a734da619a2d69a5f38",
+      "url": "https://github.com/04JUNG/Standin-server/blob/6836b8f706f3873634fb916ba109485c3e1f7cee/standin_eval/refine_mesh.py"
+    },
+    {
+      "repository": "Standin-server",
+      "commit": "6836b8f706f3873634fb916ba109485c3e1f7cee",
+      "path": "standin_eval/refine_report.py",
+      "bytes": 124357,
+      "gitBlob": "036633c17522a2afb2f71ea2b4f0c2abe61d4bca",
+      "sha256": "a642f4df1eb471ec47af2aaadc525d65a3dbfb4e4e78197e2d42129e02597c2f",
+      "url": "https://github.com/04JUNG/Standin-server/blob/6836b8f706f3873634fb916ba109485c3e1f7cee/standin_eval/refine_report.py"
+    },
+    {
+      "repository": "Standin-server",
+      "commit": "6836b8f706f3873634fb916ba109485c3e1f7cee",
+      "path": "converter/scene_contract.py",
+      "bytes": 5185,
+      "gitBlob": "823c97fa93c70defdca6888e00194bfb99649bd8",
+      "sha256": "3fe670684e83ef57967c48fb29ccd288461f888c28959e4cbf03b1aa6b71b65d",
+      "url": "https://github.com/04JUNG/Standin-server/blob/6836b8f706f3873634fb916ba109485c3e1f7cee/converter/scene_contract.py"
+    },
+    {
+      "repository": "Standin-server",
+      "commit": "6836b8f706f3873634fb916ba109485c3e1f7cee",
+      "path": "scripts/verify_generated_fbx_roundtrip.py",
+      "bytes": 4952,
+      "gitBlob": "a7ab3de65b4298c3aa688d3b1383082dc4e776dc",
+      "sha256": "3a68270c4e6297bc80f679d4ef97108230d8edcb2429fdada95e88d2007e83d6",
+      "url": "https://github.com/04JUNG/Standin-server/blob/6836b8f706f3873634fb916ba109485c3e1f7cee/scripts/verify_generated_fbx_roundtrip.py"
+    },
+    {
+      "repository": "Standin-server",
+      "commit": "6836b8f706f3873634fb916ba109485c3e1f7cee",
+      "path": "tests/converter/verify_scene_roundtrip.py",
+      "bytes": 5903,
+      "gitBlob": "6c052280881a8d2cb04c461c89e570a41b957ba6",
+      "sha256": "8bca459575b5cb944b5f2c232d001421ce0bd753a2176966c6b47255e99a1151",
+      "url": "https://github.com/04JUNG/Standin-server/blob/6836b8f706f3873634fb916ba109485c3e1f7cee/tests/converter/verify_scene_roundtrip.py"
+    },
+    {
+      "repository": "Standin-server",
+      "commit": "6836b8f706f3873634fb916ba109485c3e1f7cee",
+      "path": "docs/FBX_MULTI_PERSON_SCENE.md",
+      "bytes": 8541,
+      "gitBlob": "141f44014d77c143413d20868dbc171322b9676a",
+      "sha256": "bfc11cbe7439901944148312d186a9a3962aaefc46e3ac5ebcab81dece9ca122",
+      "url": "https://github.com/04JUNG/Standin-server/blob/6836b8f706f3873634fb916ba109485c3e1f7cee/docs/FBX_MULTI_PERSON_SCENE.md"
+    },
+    {
+      "repository": "Standin-server",
+      "commit": "6836b8f706f3873634fb916ba109485c3e1f7cee",
+      "path": "docs/scene-worker-compatibility-2026-10-24.md",
+      "bytes": 4487,
+      "gitBlob": "13e7ea723f207d29fa8b51453efda1e045015a60",
+      "sha256": "99dd50d45b687e7ea0b4c3a0dfab3f8d7c23e82bf6a2ee07a7b703dcd2155003",
+      "url": "https://github.com/04JUNG/Standin-server/blob/6836b8f706f3873634fb916ba109485c3e1f7cee/docs/scene-worker-compatibility-2026-10-24.md"
+    },
+    {
+      "repository": "Standin-server",
+      "commit": "b7db8d193cb656336e5bf44af0a47d70469279e8",
+      "path": "docs/REFINE_V3_IMPLEMENTATION_2026-10-22.md",
+      "bytes": 9851,
+      "gitBlob": "2024a4d8ab7ed45eaae2653b5f2a84b2e51cafa3",
+      "sha256": "8626b63af128b48c7ad1c8832b8701a1c7a110dff2b5bf840c7bb1f9c04707ef",
+      "url": "https://github.com/04JUNG/Standin-server/blob/b7db8d193cb656336e5bf44af0a47d70469279e8/docs/REFINE_V3_IMPLEMENTATION_2026-10-22.md"
+    },
+    {
+      "repository": "Standin-server",
+      "commit": "b7db8d193cb656336e5bf44af0a47d70469279e8",
+      "path": "docs/REFINE_V3_OCCLUSION_AUDIT_2026-10-22.md",
+      "bytes": 11611,
+      "gitBlob": "46b3204fda80777865d7149d2110f232ddc1904d",
+      "sha256": "3b079bed31530fc6e9807c86cf44ca08dcc69ea89efcd339ea6c8933d9bd191f",
+      "url": "https://github.com/04JUNG/Standin-server/blob/b7db8d193cb656336e5bf44af0a47d70469279e8/docs/REFINE_V3_OCCLUSION_AUDIT_2026-10-22.md"
+    },
+    {
+      "repository": "Standin-server",
+      "commit": "b7db8d193cb656336e5bf44af0a47d70469279e8",
+      "path": "docs/REFINE_V3_LIVE_GEMINI_ROUGH_2026-10-22.md",
+      "bytes": 9676,
+      "gitBlob": "1f218ebf6df3f6238287bb95d9a57d33804a0bb2",
+      "sha256": "54d06d5c4314ebed6426b989ac2c6b4b17bd77be51bf097a769129f33e15abd9",
+      "url": "https://github.com/04JUNG/Standin-server/blob/b7db8d193cb656336e5bf44af0a47d70469279e8/docs/REFINE_V3_LIVE_GEMINI_ROUGH_2026-10-22.md"
+    },
+    {
+      "repository": "Standin-server",
+      "commit": "b7db8d193cb656336e5bf44af0a47d70469279e8",
+      "path": "docs/REFINE_V3_MESH_SAFETY_FIX_2026-10-22.md",
+      "bytes": 7905,
+      "gitBlob": "5fe4c5db497afe549970181e4ec57d9b0d8bd9cb",
+      "sha256": "5dd480520c602cefcdf9290b0ee6e84696f314425d930a369a4ce6eb37259934",
+      "url": "https://github.com/04JUNG/Standin-server/blob/b7db8d193cb656336e5bf44af0a47d70469279e8/docs/REFINE_V3_MESH_SAFETY_FIX_2026-10-22.md"
+    },
+    {
+      "repository": "Standin-server",
+      "commit": "b7db8d193cb656336e5bf44af0a47d70469279e8",
+      "path": "converter/refine_v3_target_qa.py",
+      "bytes": 7288,
+      "gitBlob": "060f981502028e039edf33242b9da66077560103",
+      "sha256": "be2deb95d42144dddc7ab6ef605cb487a380fd58b33f065496782a5548367ed4",
+      "url": "https://github.com/04JUNG/Standin-server/blob/b7db8d193cb656336e5bf44af0a47d70469279e8/converter/refine_v3_target_qa.py"
+    },
+    {
+      "repository": "Standin-server",
+      "commit": "b7db8d193cb656336e5bf44af0a47d70469279e8",
+      "path": "scripts/eval_refine_v3_live_rough.py",
+      "bytes": 13078,
+      "gitBlob": "718e8a9e0bf34cd4e70c3bbcbe07bf072122694a",
+      "sha256": "1cfac9cfa6e57a9e8d72eda8ea06bec820293248fd476ae56326b91a2c49b72f",
+      "url": "https://github.com/04JUNG/Standin-server/blob/b7db8d193cb656336e5bf44af0a47d70469279e8/scripts/eval_refine_v3_live_rough.py"
+    },
+    {
+      "repository": "Standin-server",
+      "commit": "b7db8d193cb656336e5bf44af0a47d70469279e8",
+      "path": "evaluation/refine_v3/actual_gemini_rough_pilot_2026-10-22.json",
+      "bytes": 74958,
+      "gitBlob": "b08c749c304b9c96140f083aa9f9b4bdd95741b0",
+      "sha256": "475a8d8d92bb106d67a24a72775498ee8c0f39126e3ba9eaf22371e48598c703",
+      "url": "https://github.com/04JUNG/Standin-server/blob/b7db8d193cb656336e5bf44af0a47d70469279e8/evaluation/refine_v3/actual_gemini_rough_pilot_2026-10-22.json"
+    },
+    {
+      "repository": "Standin-server",
+      "commit": "b7db8d193cb656336e5bf44af0a47d70469279e8",
+      "path": "evaluation/refine_v3/palm_elbow_revalidation_2026-10-24.json",
+      "bytes": 105801,
+      "gitBlob": "78c6295106fa815dfba04f33113fd2977a87dbbc",
+      "sha256": "25b72f02ad550739b28a1386d1b3748724b117c13b55277a631b9a70bf5c9cbd",
+      "url": "https://github.com/04JUNG/Standin-server/blob/b7db8d193cb656336e5bf44af0a47d70469279e8/evaluation/refine_v3/palm_elbow_revalidation_2026-10-24.json"
+    },
+    {
+      "repository": "Standin-app-server",
+      "commit": "81ff3dec1c8062cfbf8855e25a390f7796b308ff",
+      "path": "src/pose/sceneRoutes.ts",
+      "bytes": 18335,
+      "gitBlob": "7c7f3c85b7607489ee92d14ff27f1c5e1a8cbe2f",
+      "sha256": "064e6540b7f30df7df2849200455abee62c24f581901937bfddace4f00a1a30e",
+      "url": "https://github.com/04JUNG/Standin-app-server/blob/81ff3dec1c8062cfbf8855e25a390f7796b308ff/src/pose/sceneRoutes.ts"
+    },
+    {
+      "repository": "Standin-app-server",
+      "commit": "81ff3dec1c8062cfbf8855e25a390f7796b308ff",
+      "path": "src/pose/sceneIntegration.test.ts",
+      "bytes": 5612,
+      "gitBlob": "e26346ef6b896e9b9f74c63d084099e8bb55d04c",
+      "sha256": "6025675789e4d0b3aa4fd7ccd17a38314ba6f1c989ccf88bb927d762c269a0c3",
+      "url": "https://github.com/04JUNG/Standin-app-server/blob/81ff3dec1c8062cfbf8855e25a390f7796b308ff/src/pose/sceneIntegration.test.ts"
+    },
+    {
+      "repository": "Standin-app-server",
+      "commit": "81ff3dec1c8062cfbf8855e25a390f7796b308ff",
+      "path": "src/converter/scene.ts",
+      "bytes": 3672,
+      "gitBlob": "d72b40a744050f847e5df4ef38ee21a1a3bba040",
+      "sha256": "fd92ac3fe95c4e315b8acf7a49acb869ccdd573e136bfc5841dc5e3df4f34259",
+      "url": "https://github.com/04JUNG/Standin-app-server/blob/81ff3dec1c8062cfbf8855e25a390f7796b308ff/src/converter/scene.ts"
+    },
+    {
+      "repository": "Standin-app-server",
+      "commit": "81ff3dec1c8062cfbf8855e25a390f7796b308ff",
+      "path": "src/converter/scene.test.ts",
+      "bytes": 1911,
+      "gitBlob": "f0fd76b34d590334b5485b92f1d705ca2cbd2978",
+      "sha256": "4118b6c29827394494112941a53cf744ee754eeb730d1166709fc20892a061ea",
+      "url": "https://github.com/04JUNG/Standin-app-server/blob/81ff3dec1c8062cfbf8855e25a390f7796b308ff/src/converter/scene.test.ts"
+    },
+    {
+      "repository": "Standin-client",
+      "commit": "c26572fb4690f132146041321f94c5ead12e86d8",
+      "path": "src/features/export/api/scene.ts",
+      "bytes": 8332,
+      "gitBlob": "bf1c86953741e0faa76fbc87146b8d59c00d6c55",
+      "sha256": "38205cc52ced6f4edd4d5c66ee91bd26763499edfffc462f2465551d81617060",
+      "url": "https://github.com/04JUNG/Standin-client/blob/c26572fb4690f132146041321f94c5ead12e86d8/src/features/export/api/scene.ts"
+    },
+    {
+      "repository": "Standin-client",
+      "commit": "c26572fb4690f132146041321f94c5ead12e86d8",
+      "path": "src/features/export/api/export.service.ts",
+      "bytes": 406,
+      "gitBlob": "960ec1a73d445762a7719794ea2dc05e17405ad9",
+      "sha256": "05aa5710f9f50b55f075ffd10cb1f5c3abdcbc2006d7c4dac0d22399cd54687a",
+      "url": "https://github.com/04JUNG/Standin-client/blob/c26572fb4690f132146041321f94c5ead12e86d8/src/features/export/api/export.service.ts"
+    },
+    {
+      "repository": "Standin-client",
+      "commit": "c26572fb4690f132146041321f94c5ead12e86d8",
+      "path": "src/features/export/api/export.contract.ts",
+      "bytes": 1670,
+      "gitBlob": "107a0d4dda7531140e82e56194e90bbe7440dc87",
+      "sha256": "b7203d00c059e7d7bcc4b5963c2f9c8477f495ada11ed1f94a9bce7e3491ca00",
+      "url": "https://github.com/04JUNG/Standin-client/blob/c26572fb4690f132146041321f94c5ead12e86d8/src/features/export/api/export.contract.ts"
+    },
+    {
+      "repository": "Standin-client",
+      "commit": "c26572fb4690f132146041321f94c5ead12e86d8",
+      "path": "src-tauri/src/commands/export.rs",
+      "bytes": 6298,
+      "gitBlob": "c978d815996a477497e7e01567864984ff194e55",
+      "sha256": "bfb61f808ed5a343290e1fdd028b369f270ab3e9f4b54403b7be1f36fe5c20d0",
+      "url": "https://github.com/04JUNG/Standin-client/blob/c26572fb4690f132146041321f94c5ead12e86d8/src-tauri/src/commands/export.rs"
+    }
+  ],
+  "unresolvedLookups": [
+    {
+      "repository": "Standin-app-server",
+      "path": "src/pose/sceneTransport.ts",
+      "status": "not present at pinned snapshot; not used as implementation evidence"
+    }
+  ]
+}
