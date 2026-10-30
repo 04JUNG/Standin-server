@@ -119,7 +119,7 @@ jobs:
           POSE_GENERATION_PROVIDER: ${{ vars.POSE_GENERATION_PROVIDER }}
           POSE_GENERATION_MODEL: ${{ vars.POSE_GENERATION_MODEL }}
           SKELETON_REPAIR_MODEL: ${{ vars.SKELETON_REPAIR_MODEL }}
-        run: python scripts/prepare_vlm_deployment.py taskdef.json
+        run: python scripts/prepare_vlm_deployment.py taskdef.json --serving
 
       - name: Prepare explicit fullbody deployment contract
         env:
