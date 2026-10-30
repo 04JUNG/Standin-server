@@ -93,6 +93,12 @@ jobs:
             --task-definition "$TASK_DEFINITION" \
             --query taskDefinition > taskdef.json
 
+      - name: Refresh staging body initializer image
+        if: github.ref == 'refs/heads/develop'
+        env:
+          STAGING_IMAGE_URI: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+        run: python scripts/refresh_staging_body_initializer.py taskdef.json --image "$STAGING_IMAGE_URI"
+
       - name: Prepare explicit fullbody deployment contract
         env:
           REQUESTED_POSE_VARIANT: ${{ vars.POSE_MODEL_VARIANT }}
