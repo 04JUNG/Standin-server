@@ -2,7 +2,9 @@
 
 ## 실행과 범위
 
-`.github/workflows/deploy.yml`의 develop 배포가 안정화된 뒤 staging 환경 변수 `STAGING_EVAL_ENABLED=true`이면 자동 실행한다. 모든 develop 배포를 평가하므로 검색·리파인 변경 배포도 포함한다. main/beta에서는 실행하지 않는다. 기존 배포 concurrency를 공유하며 배포가 바뀌는 동안 평가가 겹치지 않는다. 평가 실패는 배포를 되돌리지 않으며 CI 실패와 보고서로 알린다.
+**2026-10-31 사용자 요청으로 유료 자동 평가를 계속 꺼둔다.** 저장소·staging·운영(beta)의 `STAGING_EVAL_ENABLED=false`를 적용했다. 배포 workflow의 평가·평가 자격증명 갱신·평가 Summary·평가 artifact 단계를 제거한다. develop 배포나 향후 main 머지로 모델 평가가 자동 실행되지 않는다. 환경 변수를 실수로 true로 바꿔도 workflow에는 평가 호출 자체가 없다.
+
+`scripts/run_staging_evaluation_ci.py`도 `PAID_EVALUATION_ENABLED=False`로 고정하며, 환경 변수로 풀 수 없다. `--preflight-only` 외의 실행은 AWS 접근·태스크 실행 전에 거부한다. 재활성화는 사용자의 새로운 명시적 요청과 코드 변경이 필요하다. 아래 실행 구조·보고서·2026-10-29~30 기록은 중단 전 이력이다.
 
 GitHub runner는 모델을 실행하지 않는다. `scripts/run_staging_evaluation_ci.py`가 스테이징 서비스의 현재 task definition을 읽고 **동일 이미지·라이브러리·모델 설정**의 고정 50컷을 17·17·16컷으로 나눈 최대 3개의 별도 Fargate task를 실행한다. inference 서비스 자체는 수정하지 않는다. task 안의 API는 127.0.0.1에만 열며 Discord 알림 설정은 제거한다. converter는 스테이징 내부 서비스를 사용한다. 이는 BFF 인증·사용자 클릭·최종 FBX 저장까지의 제품 E2E 검증이 아니다.
 
@@ -27,19 +29,17 @@ GitHub Actions Summary에 점수·개선/악화·제외 변화 표가 나오며,
 
 두 버전의 점수 범위가 겹치면 개선이나 악화를 확정하지 않는다. 평균의 분모가 달라지면 그대로 비교하지 않고 대응 가능한 컷 평균과 제외 변화를 함께 제시한다. Top-5 정답률, 인간 검수 완료 점수, 메시/FBX 안전성, 검색/리파인 변경의 인과적 기여로 해석하지 않는다. 후보가 버전 사이 달라지면 refine arm의 버전 비교는 전체 파이프라인 비교다. 실제 평가 AI의 정확도 검증과 사람 최종 검수는 별도다.
 
-## 설정·실행
+## 현재 허용된 실행: 읽기 전용 사전 확인
 
-staging 환경에 `STAGING_EVAL_ENABLED=true`, `STAGING_EVAL_JUDGE_MODEL=gemini-3.5-flash`를 설정한다(모델은 현재 스테이징 설정에서 확인한 값). IAM 정책 승인·적용 후 활성화해야 한다. CI 코드가 develop에 반영된 다음 배포부터 자동 실행된다. 정책 변경이나 PR 머지는 자동 승인됐다고 가정하지 않는다.
-
-직접 실행 시 현재 스테이징 SHA를 반드시 지정한다:
+유료 50컷 실행은 차단되어 있다. 이전 실행 명령을 그대로 사용하면 오류로 종료하며 환경 플래그로 우회할 수 없다. AWS의 현재 배포 SHA와 고정 ZIP 메타데이터만 확인하는 명령은 다음과 같다. 모델 API와 평가 태스크를 실행하지 않는다.
 
 ```bash
 python scripts/run_staging_evaluation_ci.py \
-  --revision DEPLOYED_STAGING_SHA --run-id UNIQUE_RUN_ID \
-  --judge-model gemini-3.5-flash --output out/staging-evaluation
+  --revision DEPLOYED_STAGING_SHA --run-id preflight-only \
+  --judge-model gemini-3.5-flash --preflight-only
 ```
 
-`--preflight-only`는 모델/태스크를 실행하지 않고 배포 SHA·데이터 존재를 검증한다. `STAGING_EVAL_ENABLED=false`로 자동 평가만 중지할 수 있다. task의 healthCheck와 외부 알림만 평가 실행용으로 제거하고, 종료 시 task를 중지하고 파생 task definition을 비활성화한다.
+배포 workflow에는 평가를 켜는 옵션을 두지 않는다. 기존 파일 검증·집계와 저장된 보고서 열람은 사용할 수 있다.
 
 ## 검증
 
@@ -95,24 +95,11 @@ CB020·CB027의 현재 해결 여부를 확정할 수 없고, 오류 클래스�
   같은 series에서 비교한다. 첫 정상 실행 및 이후 마지막 정상 실행만 baseline이 된다. 실패/부분 실행은
   진단 artifact만 남기고 조건부 baseline 쓰기에 도달하지 않는다.
 
-### 자동 실행·알림·비용 경계
+### 자동 실행·알림·비용 경계 (2026-10-31 갱신)
 
-기능 브랜치 push/PR 검사는 배포·유료 평가를 실행하지 않는다. 이 PR을 develop에 병합한 뒤
-`AUTO_DEPLOY_ENABLED=true`인 배포가 안정화되고 `STAGING_EVAL_ENABLED=true`이면 평가가 자동 실행된다.
-과거 true/IAM 적용/ZIP 업로드 기록은 위와 같으며 이번 검토에서 계정 설정을 변경하거나 실제 자동 실행을
-새로 확인하지 않았다. 설정 이력만으로 이 PR의 hook이 이미 develop에서 실행 중이라고 표현하지 않는다.
+기능 브랜치 push, PR 검사, develop·main 배포에는 유료 평가 호출이 없다. 저장소와 staging/beta의 평가 플래그는 false이며 CLI도 고정 차단한다. 과거 true 설정·IAM 부여·자동 실행 설명은 중단 전 이력으로만 읽는다. 기존 S3 데이터와 평가 코드는 기록·오프라인 검수용으로 보존한다. 일반 서비스 분석 요청의 모델 사용과 별개로 고정50컷 일괄 평가를 중지한 것이다.
 
-필요 준비는 staging 환경의 judge model·API secret·고정 ZIP·모델/라이브러리 manifest·내부 Converter,
-배포 OIDC 역할의 RunTask/TagResource/StopTask/DeregisterTaskDefinition 및 S3 evaluation prefix 권한,
-기존 Describe/RegisterTaskDefinition/PassRole 권한이다. 정책은 `evaluation/ci/staging-evaluation-policy.json`을 따른다.
-평가 태스크의 Discord 설정은 제거된다. 실패는 Deploy workflow를 실패로 표시하지만 이미 안정화된 서비스를
-되돌리거나 사용자 서비스 장애로 판정하지 않는다. Summary/artifact의 평가 실패를 서비스 상태와 구분해 읽어야 한다.
-
-추가 실측은 명시적으로 승인된 다음 staging 배포 또는 별도 승인된 실행에서만 한다. 상한은 Fargate 3개 ×
-3,000초(총 2.5 task-hours), 원본 분석50회·허용 refine 최대60회, AI 예산은 **각 shard/arm 120회**이므로
-전체 최대720회다(목표 재사용으로 실제 호출은 줄 수 있다). 내부 Converter/모델/S3 비용도 발생한다.
-금액은 task CPU/메모리·리전 단가·실제 토큰/렌더량에 따라 달라 여기서 확정하지 않는다.
-이번 작업에서는 운영 접근·배포·새 유료50컷 실행을 하지 않는다.
+평가 태스크의 Discord 환경 설정을 제거해도 ECS 실패 종료에 대한 인프라 알림은 별도 경로로 올 수 있었다. 실행이 실패하더라도 이미 수행된 모델 API 사용은 비용을 소비할 수 있으므로, 사용자의 새로운 요청 없이 유료 검증을 재개하지 않는다.
 
 ### 이번 로컬 검증
 

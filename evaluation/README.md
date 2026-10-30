@@ -5,8 +5,9 @@
 [v3.1 문서](../docs/evaluation-harness-20261027/RUBRIC_3_1_AUTOMATION.md)는 이전 계약 참고용이다.
 기존 PCK/검색 relevance와 별도 지표이며, AI 결과는 사람 검수 전 추정으로 표시한다.
 
-develop 배포 후 고정 50컷 검색·리파인 비교와 Actions 보고서는
-[스테이징 고정셋 CI](../docs/evaluation-harness-20261027/STAGING_FIXED50_CI.md)를 따른다.
+유료 고정 50컷 자동 평가는 사용자 요청으로 계속 꺼둔다. 배포 workflow의 평가 호출을 제거했고,
+실행 스크립트도 기본 차단한다. 운영 머지나 환경 변수 변경으로 다시 실행되지 않는다.
+이전 평가 구조와 중단 기록은 [스테이징 고정셋 CI](../docs/evaluation-harness-20261027/STAGING_FIXED50_CI.md)를 따른다.
 
 실행 진입점은 `python -m standin_eval`이다. 저장소의 `.venv`를 쓰는 예시는 다음과 같다.
 

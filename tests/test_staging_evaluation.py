@@ -78,12 +78,49 @@ def test_task_definition_is_isolated_and_disables_notifications():
     assert container['image']=='immutable'
 
 
-def test_workflow_is_develop_only_after_deploy():
-    text=(Path(__file__).resolve().parents[1]/'.github/workflows/deploy.yml').read_text()
-    step=text.split('- name: Evaluate fixed 50 cuts')[1].split('- name: Publish')[0]
-    assert "github.ref == 'refs/heads/develop'" in step
-    assert 'STAGING_EVAL_ENABLED' in step
-    assert text.index('wait-for-service-stability: true') < text.index('- name: Evaluate fixed 50 cuts')
+def test_workflows_cannot_launch_paid_fixed50_evaluation():
+    workflows=Path(__file__).resolve().parents[1]/'.github/workflows'
+    for path in [*workflows.glob('*.yml'), *workflows.glob('*.yaml')]:
+        text=path.read_text()
+        for entrypoint in ('run_staging_evaluation_ci.py', 'standin_eval.staging_live',
+                           'standin-staging-fixed50-evaluation', 'STAGING_EVAL_ENABLED'):
+            assert entrypoint not in text, (path.name, entrypoint)
+
+
+@pytest.mark.parametrize('legacy_flag', ['false', 'true'])
+def test_paid_runner_stays_disabled_before_aws_access(monkeypatch,tmp_path,capsys,legacy_flag):
+    import sys, types
+    from scripts import run_staging_evaluation_ci as runner
+    def unexpected_client(*args,**kwargs):
+        pytest.fail('disabled evaluation must not access AWS or launch tasks')
+    monkeypatch.setitem(sys.modules,'boto3',types.SimpleNamespace(client=unexpected_client))
+    monkeypatch.setenv('STAGING_EVAL_ENABLED',legacy_flag)
+    output=tmp_path/'paid-output'
+    monkeypatch.setattr(sys,'argv',['runner','--revision','a'*40,'--run-id','disabled',
+        '--judge-model','gemini-3.5-flash','--output',str(output)])
+    with pytest.raises(SystemExit) as exc:
+        runner.main()
+    assert exc.value.code==2
+    assert 'disabled by owner request' in capsys.readouterr().err
+    assert not output.exists()
+
+
+def test_disabled_runner_allows_only_read_only_preflight(monkeypatch,capsys):
+    import sys,types
+    from scripts import run_staging_evaluation_ci as runner
+    revision='a'*40
+    ecs=types.SimpleNamespace(
+        describe_services=lambda **kw:{'services':[{'taskDefinition':'current'}]},
+        describe_task_definition=lambda **kw:{'taskDefinition':{'containerDefinitions':[
+            {'name':'inference','image':'registry/image:'+revision,
+             'environment':[{'name':'DEPLOYMENT_VERSION','value':revision}]}]}})
+    s3=types.SimpleNamespace(head_object=lambda **kw:{'Metadata':{'sha256':runner.DATA_SHA}})
+    monkeypatch.setitem(sys.modules,'boto3',types.SimpleNamespace(
+        client=lambda service,**kw:{'ecs':ecs,'s3':s3}[service]))
+    monkeypatch.setattr(sys,'argv',['runner','--revision',revision,'--run-id','read-only',
+        '--judge-model','gemini-3.5-flash','--preflight-only'])
+    runner.main()
+    assert '"status": "ready"' in capsys.readouterr().out
 
 
 @pytest.mark.parametrize('shards', [1, 3])
