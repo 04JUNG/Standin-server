@@ -1,0 +1,340 @@
+{
+  "date": "2026-10-30",
+  "scope": "Local macOS arm64, real loopback Converter HTTP API and Blender; fixed BVHs, relaxed hands, one existing character. No fresh image/model inference.",
+  "base_commit": "121684a1a0b5fa699f8f9d946ae5a3abdd45277e",
+  "source_sha256": {
+    "src/hand_skin_capacity.py": "96dd25a9f1b6730c1776abb42f112471c00188a184d1bbd52e2b74724061c764",
+    "src/hand_skin_parallel.py": "261214d5f368d02b056eb925715ce15d18d29b27d72a94af3b4083ee9780cc54",
+    "src/hand_skin_screen.py": "1c1da297f795ed8881a6958c206f58c136a51d84273e2c7ef8df89c8ba77c591",
+    "src/config.py": "aac6c6d8a61427b8842cb6c046edef5022e72ba876af36b6f054cad06c03e79e",
+    "scripts/benchmark_hand_screen_capacity.py": "150327d4d4379fa526be3c7c8012cc51cae94b6d97b4e39e963dafc7ebeda1dc",
+    "tests/converter/verify_hand_screen_capacity.py": "ae6342664ed0270ba9f137cdddda660c47dfdcd3a3474eb7b6d1040d08488eb5"
+  },
+  "blender": {
+    "version": "5.2.0",
+    "build_hash": "fbe6228777e7"
+  },
+  "rounds_per_capacity_per_mode": 2,
+  "order": [
+    "1,2,3,4,5",
+    "5,4,3,2,1"
+  ],
+  "session_work_budget_seconds": 45,
+  "individual_call_budget_seconds": 15,
+  "resource_limits": "No CPU/memory cgroup limit on this local Mac; not comparable to the 2 vCPU / 4 GB ECS target. Peak memory was not measured.",
+  "fixture_count": 6,
+  "character_sha256": "7c648b97a24a3bb4914b6e5d515708c33727979881d92ef916d5726e22301f3d",
+  "fixtures": {
+    "library_mirror": "976f0c3a95e95ebd9aab70f29f6099254c041e5fb61c018691fb1ca101f2b2a3",
+    "library_original": "75f66c8e3ad0c155f4a6b714892dc7199980837dd275c5c810103e2f3fee9edc",
+    "phone_intersection": "f59129a350ed71521b4b7964adc34ca671c7097ae623d35c4f659ebb58c4ade1",
+    "phone_repaired": "5278c26b261972e0a58329d0cc24a414555a64664591e0c18fb52a013edf3f36",
+    "relaxed_repaired": "2bae8eee7df1322d72e18d174b2cd4de58d211f290aac1218d67419787561cb1",
+    "staff_clear": "80c5a322406d8b7145aaf0e1e9e1e4dab2468cb2503022995a989caaf0c43a85"
+  },
+  "measurements": [
+    {
+      "preset": "relaxed",
+      "mode": "service",
+      "capacity": 1,
+      "median_seconds": 10.019266374998551,
+      "peak_active_blender": 1,
+      "business_results_equal": true
+    },
+    {
+      "preset": "relaxed",
+      "mode": "service",
+      "capacity": 2,
+      "median_seconds": 5.088089917000616,
+      "peak_active_blender": 2,
+      "business_results_equal": true
+    },
+    {
+      "preset": "relaxed",
+      "mode": "service",
+      "capacity": 3,
+      "median_seconds": 5.232533145499474,
+      "peak_active_blender": 3,
+      "business_results_equal": true
+    },
+    {
+      "preset": "relaxed",
+      "mode": "service",
+      "capacity": 4,
+      "median_seconds": 5.211352979495132,
+      "peak_active_blender": 3,
+      "business_results_equal": true
+    },
+    {
+      "preset": "relaxed",
+      "mode": "service",
+      "capacity": 5,
+      "median_seconds": 5.278634875503485,
+      "peak_active_blender": 3,
+      "business_results_equal": true
+    },
+    {
+      "preset": "relaxed",
+      "mode": "converter",
+      "capacity": 1,
+      "median_seconds": 9.877649562498846,
+      "peak_active_blender": 1,
+      "business_results_equal": true
+    },
+    {
+      "preset": "relaxed",
+      "mode": "converter",
+      "capacity": 2,
+      "median_seconds": 5.229721208495903,
+      "peak_active_blender": 2,
+      "business_results_equal": true
+    },
+    {
+      "preset": "relaxed",
+      "mode": "converter",
+      "capacity": 3,
+      "median_seconds": 3.921394250006415,
+      "peak_active_blender": 3,
+      "business_results_equal": true
+    },
+    {
+      "preset": "relaxed",
+      "mode": "converter",
+      "capacity": 4,
+      "median_seconds": 3.88372795801115,
+      "peak_active_blender": 4,
+      "business_results_equal": true
+    },
+    {
+      "preset": "relaxed",
+      "mode": "converter",
+      "capacity": 5,
+      "median_seconds": 3.783562479002285,
+      "peak_active_blender": 5,
+      "business_results_equal": true
+    }
+  ],
+  "raw_seconds": [
+    {
+      "preset": "relaxed",
+      "round": 1,
+      "mode": "service",
+      "capacity": 1,
+      "seconds": 10.416920499992557,
+      "peak_active_blender": 1
+    },
+    {
+      "preset": "relaxed",
+      "round": 1,
+      "mode": "service",
+      "capacity": 2,
+      "seconds": 5.107022916999995,
+      "peak_active_blender": 2
+    },
+    {
+      "preset": "relaxed",
+      "round": 1,
+      "mode": "service",
+      "capacity": 3,
+      "seconds": 5.299163290997967,
+      "peak_active_blender": 3
+    },
+    {
+      "preset": "relaxed",
+      "round": 1,
+      "mode": "service",
+      "capacity": 4,
+      "seconds": 5.2083761249959935,
+      "peak_active_blender": 3
+    },
+    {
+      "preset": "relaxed",
+      "round": 1,
+      "mode": "service",
+      "capacity": 5,
+      "seconds": 5.432572834004532,
+      "peak_active_blender": 3
+    },
+    {
+      "preset": "relaxed",
+      "round": 1,
+      "mode": "converter",
+      "capacity": 1,
+      "seconds": 9.998577874997864,
+      "peak_active_blender": 1
+    },
+    {
+      "preset": "relaxed",
+      "round": 1,
+      "mode": "converter",
+      "capacity": 2,
+      "seconds": 5.0978308339981595,
+      "peak_active_blender": 2
+    },
+    {
+      "preset": "relaxed",
+      "round": 1,
+      "mode": "converter",
+      "capacity": 3,
+      "seconds": 3.7359532920090714,
+      "peak_active_blender": 3
+    },
+    {
+      "preset": "relaxed",
+      "round": 1,
+      "mode": "converter",
+      "capacity": 4,
+      "seconds": 3.6144170830084477,
+      "peak_active_blender": 4
+    },
+    {
+      "preset": "relaxed",
+      "round": 1,
+      "mode": "converter",
+      "capacity": 5,
+      "seconds": 3.7713715830032015,
+      "peak_active_blender": 5
+    },
+    {
+      "preset": "relaxed",
+      "round": 2,
+      "mode": "service",
+      "capacity": 5,
+      "seconds": 5.124696917002439,
+      "peak_active_blender": 3
+    },
+    {
+      "preset": "relaxed",
+      "round": 2,
+      "mode": "service",
+      "capacity": 4,
+      "seconds": 5.21432983399427,
+      "peak_active_blender": 3
+    },
+    {
+      "preset": "relaxed",
+      "round": 2,
+      "mode": "service",
+      "capacity": 3,
+      "seconds": 5.165903000000981,
+      "peak_active_blender": 3
+    },
+    {
+      "preset": "relaxed",
+      "round": 2,
+      "mode": "service",
+      "capacity": 2,
+      "seconds": 5.069156917001237,
+      "peak_active_blender": 2
+    },
+    {
+      "preset": "relaxed",
+      "round": 2,
+      "mode": "service",
+      "capacity": 1,
+      "seconds": 9.621612250004546,
+      "peak_active_blender": 1
+    },
+    {
+      "preset": "relaxed",
+      "round": 2,
+      "mode": "converter",
+      "capacity": 5,
+      "seconds": 3.795753375001368,
+      "peak_active_blender": 5
+    },
+    {
+      "preset": "relaxed",
+      "round": 2,
+      "mode": "converter",
+      "capacity": 4,
+      "seconds": 4.153038833013852,
+      "peak_active_blender": 4
+    },
+    {
+      "preset": "relaxed",
+      "round": 2,
+      "mode": "converter",
+      "capacity": 3,
+      "seconds": 4.1068352080037585,
+      "peak_active_blender": 3
+    },
+    {
+      "preset": "relaxed",
+      "round": 2,
+      "mode": "converter",
+      "capacity": 2,
+      "seconds": 5.361611582993646,
+      "peak_active_blender": 2
+    },
+    {
+      "preset": "relaxed",
+      "round": 2,
+      "mode": "converter",
+      "capacity": 1,
+      "seconds": 9.756721249999828,
+      "peak_active_blender": 1
+    }
+  ],
+  "geometry": {
+    "all_equal": true,
+    "artifact_count": 120,
+    "case_count": 6,
+    "comparison": "Reloaded mesh vertices, evaluated skin, topology, bind and posed bone matrices and vertex weights; exporter metadata excluded.",
+    "exact_float_geometry": true,
+    "fingerprints": {
+      "relaxed__976f0c3a95e95ebd9aab70f29f6099254c041e5fb61c018691fb1ca101f2b2a3": {
+        "artifact_count": 20,
+        "geometry_sha256": "fe540230327d34c1bbba0c8c07dd65039e73105ff51e40b9b4c1946e02e23fe4",
+        "vertices": 24988,
+        "triangles": 50000,
+        "bones": 52
+      },
+      "relaxed__75f66c8e3ad0c155f4a6b714892dc7199980837dd275c5c810103e2f3fee9edc": {
+        "artifact_count": 20,
+        "geometry_sha256": "35847fa8f7badf27fd5e7fbaff56bb5c6b06a3310727791d9031ee31c6679b92",
+        "vertices": 24988,
+        "triangles": 50000,
+        "bones": 52
+      },
+      "relaxed__f59129a350ed71521b4b7964adc34ca671c7097ae623d35c4f659ebb58c4ade1": {
+        "artifact_count": 20,
+        "geometry_sha256": "6b703d383c46af8d5253728bf256f0e853af6a1bfc6e5342179313172fbe7526",
+        "vertices": 24988,
+        "triangles": 50000,
+        "bones": 52
+      },
+      "relaxed__5278c26b261972e0a58329d0cc24a414555a64664591e0c18fb52a013edf3f36": {
+        "artifact_count": 20,
+        "geometry_sha256": "468bbd95357cbcfb5572f557223eea1c91008325125f6b15d5451504829db012",
+        "vertices": 24988,
+        "triangles": 50000,
+        "bones": 52
+      },
+      "relaxed__2bae8eee7df1322d72e18d174b2cd4de58d211f290aac1218d67419787561cb1": {
+        "artifact_count": 20,
+        "geometry_sha256": "5eafdf728fc8f338d27a78a5def6aed9f3ed52fb5693e41f36591c19d0b26856",
+        "vertices": 24988,
+        "triangles": 50000,
+        "bones": 52
+      },
+      "relaxed__80c5a322406d8b7145aaf0e1e9e1e4dab2468cb2503022995a989caaf0c43a85": {
+        "artifact_count": 20,
+        "geometry_sha256": "e4b3bade0f13111ca37ba231fd07e61106026706a0e1042bffcd3466e2517211",
+        "vertices": 24988,
+        "triangles": 50000,
+        "bones": 52
+      }
+    }
+  },
+  "recommendation": "Start with inference capacity 2 plus Converter process capacity 2 after target-environment validation. Keep defaults unchanged in this PR.",
+  "limits": [
+    "Two local rounds are descriptive, not a statistical performance or SLA guarantee.",
+    "Service mode uses the actual 45-second aggregate session policy; capacities 4 and 5 reached only three simultaneous Blender processes.",
+    "Converter mode isolates process capacity and does not impose the aggregate per-session policy.",
+    "Results concern the hand screening stage, not end-to-end generation latency.",
+    "Exact geometry and business equality are verified for these fixtures, not every input, timeout or resource contention case.",
+    "Raw FBX hashes differ because exporter metadata is excluded from geometry comparison.",
+    "AWS capacity, memory safety and concurrent-user queueing remain unmeasured. No deployment or AWS asset upload was performed."
+  ]
+}

@@ -22,6 +22,27 @@ def test_empty_github_variables_preserve_existing_task_exactly():
     assert prepare(original, {k: "" for k in NAMES}) == original
 
 
+def test_description_rollout_preserves_prepared_hand_screen_capacity():
+    from scripts.prepare_hand_screen_deployment import prepare as prepare_hand_screen
+
+    original = task()
+    before = copy.deepcopy(original)
+    result = prepare(prepare_hand_screen(original, "inference", "2"), {
+        "ROUTING_DESCRIBE_BUDGET_MS": "45000",
+        "PARALLEL_POSE_DESCRIPTION": "0",
+    })
+    assert original == before
+    env = result["containerDefinitions"][0].pop("environment")
+    assert {r["name"]: r["value"] for r in env} == {
+        "PARALLEL_POSE_DESCRIPTION": "0",
+        "POSE_LIBRARY_URI": "existing-library",
+        "HAND_SKIN_SCREEN_CONCURRENCY": "2",
+        "ROUTING_DESCRIBE_BUDGET_MS": "45000",
+    }
+    before["containerDefinitions"][0].pop("environment")
+    assert result == before
+
+
 def test_explicit_zero_rolls_back_without_replacing_image_roles_secrets_or_other_settings():
     original = task()
     before = copy.deepcopy(original)

@@ -234,6 +234,30 @@ def test_health_is_503_on_character_hash_mismatch(tmp_path):
     assert response.json()["ok"] is False
 
 
+def test_hand_screen_profile_is_read_only_and_binds_verified_character(tmp_path,monkeypatch):
+    from converter.hand_library import load_library
+    from converter.hand_screen_catalog import PROFILE_VERSION
+    monkeypatch.setattr('converter.hand_screen_catalog.runtime_profile',lambda runner:'c'*64)
+    runner=FakeRunner();client=_client(tmp_path,runner=runner)
+    response=client.get('/hand-screen-profile',params={'character_id':'standin-master-v2'})
+    assert response.status_code==200
+    body=response.json()
+    assert body['version']==PROFILE_VERSION and body['profile_sha256']=='c'*64
+    assert body['character_id']=='standin-master-v2'
+    assert body['hand_library_sha256']==load_library().sha256
+    assert len(body['character_sha256'])==64 and not runner.calls
+    assert body['shape_sha256'] is None
+    assert set(body)=={'version','profile_sha256','character_id','character_sha256','shape_sha256','hand_library_sha256'}
+
+
+def test_hand_screen_profile_fails_closed_on_asset_hash_mismatch(tmp_path,monkeypatch):
+    monkeypatch.setattr('converter.hand_screen_catalog.runtime_profile',lambda runner:'c'*64)
+    runner=FakeRunner();client=_client(tmp_path,runner=runner,expected_sha='0'*64)
+    response=client.get('/hand-screen-profile')
+    assert response.status_code==503 and not runner.calls
+    assert response.json()['error']['code']=='SCREEN_PROFILE_UNAVAILABLE'
+
+
 def test_convert_success_streams_fbx_and_required_headers(tmp_path):
     runner = FakeRunner()
     response = _post(_client(tmp_path, runner=runner), fields={"mirror": "true"})

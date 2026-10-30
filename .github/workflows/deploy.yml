@@ -130,6 +130,11 @@ jobs:
             --enabled "$ROUTING_FULLBODY_ENABLED" \
             --variant "$REQUESTED_POSE_VARIANT" --canary "$REQUESTED_CANARY_STAGE"
 
+      - name: Prepare explicit hand screen capacity
+        env:
+          HAND_SKIN_SCREEN_CONCURRENCY: ${{ vars.HAND_SKIN_SCREEN_CONCURRENCY }}
+        run: python scripts/prepare_hand_screen_deployment.py taskdef.json --container inference
+
       - name: Prepare optional description rollout overrides
         # Read environment-scoped vars only here. Empty preserves the current
         # task setting; explicit '0' supports rollback without changing secrets.
