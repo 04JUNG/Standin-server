@@ -3,6 +3,10 @@ from concurrent.futures import ThreadPoolExecutor
 from itertools import product
 import threading
 from types import SimpleNamespace
+import os
+from pathlib import Path
+import subprocess
+import sys
 
 import pytest
 
@@ -37,6 +41,20 @@ def test_runtime_selects_requested_capacity(tmp_path, capacity):
 @pytest.mark.parametrize('capacity', [0, 6, True, 2.5, '2'])
 def test_config_rejects_invalid_capacity_at_startup(capacity):
     with pytest.raises(ValueError): Config(hand_skin_screen_concurrency=capacity)
+
+
+@pytest.mark.parametrize('capacity', range(1, 6))
+def test_app_installs_request_cancellation_for_every_parallel_capacity(capacity):
+    script = '''
+from api.app import app
+from api.hand_skin_middleware import HandSkinMiddleware
+from src.config import CFG
+installed = any(item.cls is HandSkinMiddleware for item in app.user_middleware)
+assert installed == (CFG.hand_skin_screen_concurrency > 1)
+'''
+    subprocess.run([sys.executable, '-c', script], check=True,
+        cwd=Path(__file__).resolve().parents[1], capture_output=True, text=True,
+        env={**os.environ, 'HAND_SKIN_SCREEN_CONCURRENCY': str(capacity)})
 
 
 class BlockingChecker:

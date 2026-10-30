@@ -130,7 +130,7 @@ skin, topology, bind and posed bone matrices and vertex weights in all six cases
 Raw FBX bytes contain changing exporter metadata and are not expected to match.
 Contract tests additionally compare all 27 clear/intersection/unavailable outcome
 combinations at capacities 2 through 5 against serial presentation results.
-The full inference suite passed 2,822 tests (10 skipped, 28 subtests); the
+The full inference suite passed 2,827 tests (10 skipped, 28 subtests); the
 Converter CI contract set plus deployment helper passed 393 tests (one skipped).
 
 These measurements cover hand screening only. They exclude fresh image/model

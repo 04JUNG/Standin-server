@@ -293,7 +293,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Standin Pose Pipeline", version="0.2.2", lifespan=lifespan)
-if CFG.hand_skin_screen_concurrency == 2:
+if CFG.hand_skin_screen_concurrency > 1:
     app.add_middleware(HandSkinMiddleware)
 
 
