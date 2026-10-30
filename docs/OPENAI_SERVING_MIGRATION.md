@@ -75,3 +75,11 @@ Gemini로 되돌릴 때에는 `VLM_PROVIDER`, `BODY_VLM_PROVIDER`,
 공식 API 참고: [Responses 사용](https://developers.openai.com/api/docs/quickstart),
 [구조화 출력](https://developers.openai.com/api/docs/guides/structured-outputs),
 [이미지 입력](https://developers.openai.com/api/docs/guides/images-vision).
+
+## 초기화 컨테이너 이미지
+
+메인 배포도 `body-assets-init`을 inference와 같은 커밋 이미지로 갱신한다.
+현재 태스크를 복사하면서 예전 digest를 보존하면, ECR에서 그 이미지가 없어진 뒤
+`CannotPullContainerError`로 서버 기동 자체가 막힌다. 기존 initializer가 있는 경우에만
+이미지를 바꾸며 command·볼륨·역할·시크릿은 그대로 둔다. 알 수 없는 initializer
+계약이나 중복 컨테이너는 ECS 등록 전에 차단한다.
