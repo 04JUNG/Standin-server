@@ -24,6 +24,15 @@ def _print(value) -> None:
 
 def _dataset(parser: argparse.ArgumentParser) -> None:
     sub = parser.add_subparsers(dest="dataset_command", required=True)
+    rubric = sub.add_parser("prepare-rubric-review", help="Prepare seven-part review worklist from sealed pose dataset")
+    rubric.add_argument("--dataset", required=True)
+    rubric.add_argument("--output", required=True)
+    pose = sub.add_parser("import-pose-suite", help="Pin one authored COCO17 suite set, preserving draft GT")
+    pose.add_argument("--source", required=True)
+    pose.add_argument("--output", required=True)
+    pose.add_argument("--source-commit", required=True)
+    pose.add_argument("--set", dest="set_number", type=int, default=1)
+    pose.add_argument("--usage-authorized", action="store_true")
     init = sub.add_parser("init", help="Create a content-deduplicated dataset inventory")
     init.add_argument("--name", required=True)
     init.add_argument("--root", action="append", required=True)
@@ -35,6 +44,16 @@ def _dataset(parser: argparse.ArgumentParser) -> None:
         command.add_argument("dataset")
         command.add_argument("--eval-root", default="evaluation")
     sub.choices["validate"].add_argument("--strict", action="store_true", help="Treat warnings as failures")
+
+    inventory = sub.add_parser("prepare-roughs", help="Read-only inventory and blank human worksheets; never GT")
+    inventory.add_argument("--source", required=True)
+    inventory.add_argument("--output", required=True)
+    intake = sub.add_parser("import-intake", help="Validate completed worksheets into the existing dataset schema")
+    intake.add_argument("--inventory", required=True)
+    intake.add_argument("--intake", required=True)
+    intake.add_argument("--persons", required=True)
+    intake.add_argument("--output", required=True)
+    intake.add_argument("--name", required=True)
 
 
 def _fixture(parser: argparse.ArgumentParser) -> None:
@@ -62,6 +81,74 @@ def _fixture(parser: argparse.ArgumentParser) -> None:
 
 def _run(parser: argparse.ArgumentParser) -> None:
     sub = parser.add_subparsers(dest="run_command", required=True)
+    intake = sub.add_parser("rubric-import-zip", help="Validate and recompute a 50-case rescore ZIP")
+    intake.add_argument("--zip", required=True)
+    intake.add_argument("--output", required=True)
+    intake.add_argument("--expected-count", type=int, default=50)
+    final = sub.add_parser("rubric-finalize", help="Apply explicit final human decisions without re-running models")
+    final.add_argument("--scored", required=True)
+    final.add_argument("--decisions", required=True)
+    final.add_argument("--artifacts-root", required=True)
+    final.add_argument("--output", required=True)
+    queue = sub.add_parser("rubric-review-queue", help="Create final human-review rows for all cases")
+    queue.add_argument("--scored", required=True)
+    queue.add_argument("--output", required=True)
+    audit = sub.add_parser("rubric-audit-judge", help="Compare AI and human judgements of the same frozen outputs")
+    audit.add_argument("--reference", required=True)
+    audit.add_argument("--automatic", required=True)
+    audit.add_argument("--output", required=True)
+    rubric = sub.add_parser("rubric-score", help="Offline rubric 3.1 scoring of frozen seven-part reviews")
+    rubric.add_argument("--manifest", required=True)
+    rubric.add_argument("--reviews", required=True)
+    rubric.add_argument("--config", required=True)
+    rubric.add_argument("--artifacts-root", required=True)
+    rubric.add_argument("--output", required=True)
+    check = sub.add_parser("rubric-contract-check", help="Verify the 12 supplied synthetic examples; not model quality")
+    check.add_argument("--output", required=True)
+    judge = sub.add_parser("rubric-judge", help="Opt-in AI-assisted visual judgements of frozen selected outputs")
+    judge.add_argument("--manifest", required=True)
+    judge.add_argument("--config", required=True)
+    judge.add_argument("--artifacts-root", required=True)
+    judge.add_argument("--output", required=True)
+    judge.add_argument("--model", required=True)
+    judge.add_argument("--max-calls", required=True, type=int)
+    judge.add_argument("--judge-timeout", required=True, type=float)
+    judge.add_argument("--allow-provider", action="store_true")
+    pose = sub.add_parser("pose-benchmark", help="Fixed-person COCO17 scoring; no provider call by default")
+    pose.add_argument("--dataset", required=True)
+    pose.add_argument("--output", required=True)
+    source = pose.add_mutually_exclusive_group()
+    source.add_argument("--predictions", help="Recorded cut-level prediction JSONL")
+    source.add_argument("--target", help="Explicit /analyze endpoint base; requires --allow-http")
+    pose.add_argument("--allow-http", action="store_true")
+    pose.add_argument("--timeout", type=float)
+    pose.add_argument("--requested-vlm")
+    pose.add_argument("--requested-pose")
+    pose.add_argument("--policy")
+    pipeline = sub.add_parser("pipeline-report", help="Join sealed experiment artifacts to preregistered final-file tasks")
+    pipeline.add_argument("--experiment", required=True)
+    pipeline.add_argument("--sealed", required=True)
+    pipeline.add_argument("--observations", required=True)
+    pipeline.add_argument("--output", required=True)
+    saves = sub.add_parser("save-scenarios", help="Execute offline scene-save-v1 contract scenarios")
+    saves.add_argument("--output", required=True)
+    seal = sub.add_parser("seal-exports", help="Freeze export tasks and policy before collecting evidence")
+    seal.add_argument("--tasks", required=True, help="JSONL expected tasks")
+    seal.add_argument("--policy", required=True)
+    seal.add_argument("--output", required=True)
+    exports = sub.add_parser("export-report", help="Evaluate exact artifact evidence against sealed export tasks")
+    exports.add_argument("--sealed", required=True)
+    exports.add_argument("--observations", required=True, help="JSONL measured observations")
+    exports.add_argument("--output", required=True)
+    experiment = sub.add_parser("experiment", help="Explicit arm comparison over an existing sealed run (offline by default)")
+    experiment.add_argument("--from-run", required=True)
+    experiment.add_argument("--policy", required=True)
+    experiment.add_argument("--registry")
+    experiment.add_argument("--selections")
+    experiment.add_argument("--fixture-outcomes", help="Local fixture JSON keyed by arm; never product quality evidence")
+    experiment.add_argument("--labels")
+    experiment.add_argument("--output-root", default="out/eval/runs")
+    experiment.add_argument("--run-id")
     http = sub.add_parser("http")
     http.add_argument("--target", required=True)
     http.add_argument("--dataset", required=True)
@@ -217,6 +304,25 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command == "dataset":
+        if args.dataset_command == "prepare-rubric-review":
+            from .rubric_score import prepare_pose_review
+            _print(prepare_pose_review(args.dataset, args.output))
+            return 0
+        if args.dataset_command == "import-pose-suite":
+            from .pose_dataset import import_pose_suite
+            frozen, _, _ = import_pose_suite(args.source, args.output, source_commit=args.source_commit,
+                usage_authorized=args.usage_authorized, set_number=args.set_number)
+            _print({"dataset_id":frozen["dataset_id"], "counts":frozen["counts"], "seal_sha256":frozen["seal_sha256"]})
+            return 0
+        if args.dataset_command == "prepare-roughs":
+            from .inventory import prepare_inventory
+            _print(prepare_inventory(args.source, args.output))
+            return 0
+        if args.dataset_command == "import-intake":
+            from .intake import import_intake
+            result = import_intake(args.inventory, args.intake, args.persons, args.output, dataset_id=args.name)
+            _print(result)
+            return 0 if result["exported"] else 2
         if args.dataset_command == "init":
             _print(init_dataset(args.name, args.root, args.eval_root, args.purpose))
             return 0
@@ -255,6 +361,97 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "run":
+        if args.run_command == "rubric-audit-judge":
+            from .rubric_package import audit_judge
+            result = audit_judge(args.reference, args.automatic, args.output)
+            _print({"cases": result["cases"], "agreement": result["agreement"]})
+            return 0
+        if args.run_command == "rubric-import-zip":
+            from .rubric_package import import_package
+            result = import_package(args.zip, args.output, expected_count=args.expected_count)
+            _print(result)
+            return 0 if result["status"] == "valid" else 2
+        if args.run_command == "rubric-review-queue":
+            from .rubric_package import review_queue
+            _print(review_queue(args.scored, args.output))
+            return 0
+        if args.run_command == "rubric-finalize":
+            from .rubric_package import finalize_review
+            result = finalize_review(args.scored, args.decisions, args.artifacts_root, args.output)
+            _print({"review_origin": result["review_origin"], "total_cases": result["total_cases"]})
+            return 0
+        if args.run_command == "rubric-judge":
+            from .rubric_judge import GeminiRubricJudge, judge_bundle
+            if not args.allow_provider:
+                raise ValueError("rubric-judge sends paired images to Gemini; explicit --allow-provider required")
+            judge = GeminiRubricJudge(args.model, args.judge_timeout)
+            result = judge_bundle(args.manifest, args.config, args.output, args.artifacts_root,
+                                  judge=judge, model=args.model, max_calls=args.max_calls)
+            _print({"review_origin": result["review_origin"], "eligible_cases": result.get("eligible_cases"), "scopes": result.get("scopes"), "output": args.output})
+            return 0
+        if args.run_command == "rubric-score":
+            from .rubric_score import score_bundle
+            result = score_bundle(args.manifest, args.reviews, args.config, args.output, args.artifacts_root)
+            _print({k: result[k] for k in ("run_id", "total_cases", "eligible_cases", "full_body_mean", "review_origin", "comparison_ready", "scopes") if k in result})
+            return 0
+        if args.run_command == "rubric-contract-check":
+            from .rubric_score import contract_check
+            result = contract_check(args.output)
+            _print({"synthetic": True, "acceptance_cases_passed": result["acceptance_cases_passed"], "output": args.output})
+            return 0
+        if args.run_command == "pose-benchmark":
+            from .pose_benchmark import run_pose_benchmark
+            requested = {"vlm":args.requested_vlm,"pose":args.requested_pose} if args.requested_vlm or args.requested_pose else None
+            report = run_pose_benchmark(args.dataset,args.output,predictions=args.predictions,policy=args.policy,
+                target=args.target,allow_http=args.allow_http,timeout_seconds=args.timeout,requested_backend=requested)
+            _print({k:report[k] for k in ("decision","score_status","denominator","cut_statuses","actual_model_cuts")})
+            return 2 if report["decision"] == "FAIL" else 0
+        if args.run_command == "pipeline-report":
+            from .pipeline_report import build_pipeline_report
+            from .util import read_json, read_jsonl, write_json
+            result = build_pipeline_report(args.experiment, read_json(args.sealed), read_jsonl(args.observations))
+            write_json(args.output, result)
+            _print({"decision": result["decision"], "lineage_links": result["lineage_links"]})
+            return 0 if result["decision"] == "PASS" else 2
+        if args.run_command == "save-scenarios":
+            from .save_scenarios import run_save_scenarios
+            from .util import write_json
+            output = Path(args.output)
+            output.mkdir(parents=True, exist_ok=True)
+            result = run_save_scenarios(output_dir=output)
+            write_json(output / "scenario_report.json", result)
+            _print(result)
+            return 0 if result["contract_tests"]["fail"] == 0 else 2
+        if args.run_command == "seal-exports":
+            from .final_fbx_evaluator import seal_export_policy
+            from .util import read_json, read_jsonl, write_json
+            if Path(args.output).exists():
+                raise FileExistsError("sealed export plan already exists; create a new plan")
+            result = seal_export_policy(read_jsonl(args.tasks), read_json(args.policy))
+            write_json(args.output, result)
+            _print({"seal_sha256": result["seal_sha256"]})
+            return 0
+        if args.run_command == "export-report":
+            from .final_fbx_evaluator import evaluate_export_tasks
+            from .util import read_json, read_jsonl, write_json
+            result = evaluate_export_tasks(read_json(args.sealed), read_jsonl(args.observations))
+            write_json(args.output, result)
+            _print(result)
+            return 0 if result["decision"] == "PASS" else 2
+        if args.run_command == "experiment":
+            from .arms import ArmRegistry, DEFAULT_REGISTRY
+            from .experiment_runner import FixtureAdapter, run_experiment
+            from .util import read_json
+            registry = ArmRegistry.from_dict(read_json(args.registry)) if args.registry else None
+            adapters = None
+            if args.fixture_outcomes:
+                outcomes = read_json(args.fixture_outcomes)
+                selected = registry or DEFAULT_REGISTRY
+                adapters = {arm.arm_id: FixtureAdapter(outcomes) for arm in selected.arms}
+            _print(str(run_experiment(from_run=args.from_run, policy=args.policy,
+                output_root=args.output_root, run_id=args.run_id, registry=registry,
+                selections=args.selections, labels_path=args.labels, adapters=adapters)))
+            return 0
         if args.run_command == "refine-pairs":
             from .refine_runner import run_refine_pairs
 
@@ -346,6 +543,11 @@ def main(argv: list[str] | None = None) -> int:
         from .labels import resolve_run
         run_dir = resolve_run(args.run)
         manifest = json.loads((run_dir / "manifest.json").read_text())
+        if manifest.get("mode") == "experiment":
+            from .experiment_report import write_experiment_report
+            report = write_experiment_report(run_dir, human_labels_path=args.independent_labels or args.labels)
+            _print({"status": report["decision"], "run_id": manifest["run_id"]})
+            return 0 if report["decision"] == "PASS" else 2
         if manifest.get("mode") == "refine_three_arm":
             from .refine_report import write_refine_report
 

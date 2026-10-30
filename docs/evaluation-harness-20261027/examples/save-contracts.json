@@ -1,0 +1,17 @@
+{
+  "schema": "evaluation-extension-v1",
+  "contract": "scene-save-v1",
+  "source_bindings": {
+    "bff": "96475c9e394976668f9f6ba9ea00268e97775813",
+    "client": "c26572fb4690f132146041321f94c5ead12e86d8"
+  },
+  "execution_kind": "fixture",
+  "decision": "INCONCLUSIVE",
+  "contract_tests": {
+    "denominator": 50,
+    "pass": 50,
+    "fail": 0
+  },
+  "product_quality": "unknown",
+  "operational_deployment": false
+}
