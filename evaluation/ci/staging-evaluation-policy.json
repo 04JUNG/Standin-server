@@ -1,0 +1,59 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "ecs:RunTask",
+      "Resource": "arn:aws:ecs:ap-northeast-2:136889124221:task-definition/standin-staging-fixed50-evaluation:*",
+      "Condition": {
+        "ArnEquals": {
+          "ecs:cluster": "arn:aws:ecs:ap-northeast-2:136889124221:cluster/StandinStagingApp-ClusterEB0386A7-fTa8F6KCe561"
+        }
+      }
+    },
+    {
+      "Effect": "Allow",
+      "Action": "ecs:StopTask",
+      "Resource": "arn:aws:ecs:ap-northeast-2:136889124221:task/StandinStagingApp-ClusterEB0386A7-fTa8F6KCe561/*",
+      "Condition": {
+        "StringEquals": {
+          "aws:ResourceTag/StandinEvaluation": "fixed50"
+        }
+      }
+    },
+    {
+      "Effect": "Allow",
+      "Action": "ecs:DeregisterTaskDefinition",
+      "Resource": "arn:aws:ecs:ap-northeast-2:136889124221:task-definition/standin-staging-fixed50-evaluation:*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject"
+      ],
+      "Resource": "arn:aws:s3:::standinstagingapp-assetsbucket5cb76180-fiwlikrhl1sk/evaluation/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "s3:ListBucket",
+      "Resource": "arn:aws:s3:::standinstagingapp-assetsbucket5cb76180-fiwlikrhl1sk",
+      "Condition": {
+        "StringLike": {
+          "s3:prefix": "evaluation/*"
+        }
+      }
+    },
+    {
+      "Effect": "Allow",
+      "Action": "ecs:TagResource",
+      "Resource": "arn:aws:ecs:ap-northeast-2:136889124221:task/StandinStagingApp-ClusterEB0386A7-fTa8F6KCe561/*",
+      "Condition": {
+        "StringEquals": {
+          "ecs:CreateAction": "RunTask",
+          "aws:RequestTag/StandinEvaluation": "fixed50"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "rubric_id": "standin-deduction-head5-action35-scope-interval",
+  "rubric_version": "3.2",
+  "supersedes_contract_version": "3.1",
+  "mode": "replay_review",
+  "weights": {
+    "right_arm": 10,
+    "left_arm": 10,
+    "right_leg": 10,
+    "left_leg": 10,
+    "torso": 20,
+    "head": 5,
+    "action": 35
+  },
+  "scopes": {
+    "full_body": {
+      "score_max": 100,
+      "active_keys": [
+        "right_arm",
+        "left_arm",
+        "right_leg",
+        "left_leg",
+        "torso",
+        "head",
+        "action"
+      ],
+      "inactive_keys": []
+    },
+    "upper_body": {
+      "score_max": 45,
+      "active_keys": [
+        "right_arm",
+        "left_arm",
+        "torso",
+        "head"
+      ],
+      "inactive_keys": [
+        "right_leg",
+        "left_leg",
+        "action"
+      ]
+    }
+  },
+  "scope_assignment": {
+    "source": "dataset-manifest.json framing",
+    "upper_body_framing": "01_상반신",
+    "otherwise": "full_body",
+    "manual_reclassification_in_this_migration": false
+  },
+  "deductions": {
+    "per_key": "zero_or_full_weight",
+    "laterality": "subject_own_left_right",
+    "multiple_people": "OR mismatch per active key, charged once per cut; retain all person reasons",
+    "action": "independent whole-action mismatch evidence required; limb mismatch alone never adds action loss",
+    "torso": "clear posture/bend/layout error only; camera azimuth alone is not mismatch",
+    "head": "clear head/neck look direction difference; small tilt/eyes-only difference excluded"
+  },
+  "statuses": {
+    "match": "관찰 가능하고 일치로 판정됨. 감점 없음.",
+    "mismatch": "판정 가능한 명확한 오류. 해당 배점 전액 차감.",
+    "uncertain": "관찰 자료는 있으나 확정 판정 보류. 0 또는 전액 감점 가능성을 범위에 반영.",
+    "unobservable": "가림/크롭 등으로 비교 불가. 활성 항목이면 해당 컷 범위 집계 제외.",
+    "not_run": "해당 항목 미판정/미실행. 활성 항목이면 해당 컷 범위 집계 제외.",
+    "not_applicable": "상반신 범위에서 양다리·전체 동작만 비활성. 일치가 아니며 배점 재분배 없음."
+  },
+  "interval_rule": {
+    "confirmed_loss_D": "sum(weight[key] for any person mismatch, once per active key)",
+    "uncertain_loss_U": "sum(weight[key] for any person uncertain AND no person mismatch on that key)",
+    "low": "score_max - D - U",
+    "high": "score_max - D",
+    "unknown_and_mismatch_same_key": "confirmed mismatch takes precedence for cut loss; person-level uncertain remains recorded",
+    "do_not_impute_midpoint": true,
+    "eligible": "returned_all AND every expected person mapped AND all active judgments match/mismatch/uncertain AND no core artifact missing",
+    "strict_definitive_E": "eligible cases with every active judgment match/mismatch",
+    "confirmed_perfect": "eligible AND every person active key match; low=high=score_max; no unresolved active judgment",
+    "upper_endpoint_is_not_confirmed_perfect": true
+  },
+  "partial_people_cap": 50,
+  "partial_people_rule": "Only if all returned persons active keys are definitive: min(score_max-D,50). Diagnostic only, excluded from scoped averages. Otherwise score null.",
+  "normal_no_result": {
+    "score": 0,
+    "scope_metric_eligible": false,
+    "requires": "completed successful run with no returned people, evidenced by source receipt"
+  },
+  "execution_error": {
+    "score": null,
+    "scope_metric_eligible": false
+  },
+  "missing_artifacts": {
+    "score": null,
+    "scope_metric_eligible": false,
+    "must_not_infer_returned_none": true
+  },
+  "threshold": {
+    "value": 90,
+    "scope": "full_body",
+    "official_pass_threshold": false,
+    "description": "90점은 설정값이며 공식 확정 합격선이 아님. 상반신45에 자동 환산하지 않음.",
+    "confirmed": "score_low >= 90",
+    "possible_inclusive": "score_high >= 90; includes confirmed"
+  },
+  "metric_rules": {
+    "N": "all input cases including failures/missing",
+    "separate_scales": true,
+    "E": "range-eligible cases within each scope",
+    "mean": "[mean(low), mean(high)] over E",
+    "H": "full_body confirmed 100 only",
+    "P_over_E": "confirmed/possible full_body threshold counts / full_body E",
+    "P_over_N": "same full_body counts / all N",
+    "zero_denominator": null,
+    "rates_are_fractions": true
+  },
+  "selection": {
+    "policy": "preserve original frozen best-of-returned-Top5 choice plus allowed refine",
+    "max_rank": 5,
+    "new_search_calls": 0,
+    "new_refine_calls": 0,
+    "candidate_reselection": false,
+    "manual_pose_edits": false
+  },
+  "review_status": "ai_assisted_unreviewed",
+  "human_reviewed": false
+}

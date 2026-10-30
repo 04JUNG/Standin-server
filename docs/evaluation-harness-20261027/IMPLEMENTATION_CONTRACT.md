@@ -1,0 +1,15 @@
+# Harness extension contract v1
+
+Integration base: origin/develop f02b3aeb0a8656949aae9e0b9408bc38c0d0049c. PR #133 merged 2026-10-27T12:26:58Z; design snapshot 6836b8f is historical. No product configuration or deployment change.
+
+Ownership: A owns standin_eval/arms.py, experiment_runner.py, experiment_report.py, search_evidence.py and tests/test_eval_experiment*. B owns artifact_lineage.py, export_runner.py, final_fbx_evaluator.py, mesh_evidence_adapter.py, save_scenarios.py and tests/test_eval_export*. Root owns inventory.py, intake.py, cli.py integration, docs, generated metadata and cross-module verification. Legacy modules may be extended by A only with backward compatible defaults; coordinate before editing cli.py.
+
+Use existing util canonical hashes/read/write JSONL, dataset load/validate/seal, HTTP/replay, matching, labels/compare/report rather than duplicate these engines. New schema: evaluation-extension-v1. Records retain unit_id, cut_id, gt_person_id, arm, selection_revision, artifact_id where applicable. Stable person IDs never equal request personIndex by inference.
+
+Evaluation states: pass, fail, unknown, unsupported, missing_dependency, timeout, error, abstained. Every preregistered unit/arm/task retains a row. Report decision: PASS / FAIL / INCONCLUSIVE, independent dimensions and fixed success/failure/unknown denominator. Missing labels, measurements, policy, bindings or inspection cannot PASS. Mock/fixture execution is explicitly identified and cannot certify real product quality. Seal policy and expected units before execution. No inherited 5s/2s/350 defaults.
+
+Arm registry explicitly names baseline and F25/v3 separately; legacy B0/B1/B2 preserved. All refine arms consume the same selected BVH hash, camera, observations, body/hand revision and scope. Record requested/actual backend and immutable model/DB/asset/controller/Converter/Blender bindings; fallback cannot count as actual provider success. V3 optional dependency and unsupported profile explicit. Occlusion/ownership/provenance and exact recovery remain evidence.
+
+Additional JSONL: selections, exports, mesh_evidence, native_saves, review_sessions. Lineage cut → permanent person → candidate → selection/body/hand revision → BVH → individual FBX → scene → download → saved file. Mesh evaluator binds exact artifact hash, profile/scope, checker version, completed checks. Proxy/open-file is never full mesh safety; inter-person/prop checks unknown when absent. Save scenarios reuse scene-save-v1/original-selection/auto-correct-v4 contracts and distinguish preview, bytes ready, native saved, cancelled, stale and preserved artifact.
+
+Public report includes hashes and IDs only. Do not commit PNG/BVH/FBX assets or personal paths/names from rough inventory. Raw inventory/annotation worksheet stays in ignored out/; commit aggregate summary plus synthetic fixtures only. Do not execute external providers or transmit roughs. Existing supplied roughs need human grouping, consent, labels, holdout and tool review, not recollection.
