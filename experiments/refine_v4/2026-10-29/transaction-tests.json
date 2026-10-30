@@ -1,0 +1,3477 @@
+{
+  "tests": [
+    {
+      "test": "test_protected_leg_rejected_during_arms",
+      "passed": true,
+      "receipt": {
+        "version": "refine-v4-local.1",
+        "accepted": false,
+        "status": "not_applied",
+        "order": [
+          "arms"
+        ],
+        "stages": [
+          {
+            "kind": "arms",
+            "sides": [
+              "left"
+            ],
+            "receipt": {
+              "accepted": true
+            },
+            "protected_matrix_delta": 0.04901137948036194,
+            "changed_joints": [
+              "mixamorig:LeftLeg",
+              "mixamorig:LeftFoot",
+              "mixamorig:LeftToeBase"
+            ]
+          }
+        ],
+        "reasons": [
+          "arms:protected_joint_changed"
+        ],
+        "score_status": "not_scored",
+        "release_allowed": false,
+        "rollback_matrix_delta": 0.0
+      }
+    },
+    {
+      "test": "test_second_stage_failure_restores_leg_and_fingers",
+      "passed": true,
+      "receipt": {
+        "version": "refine-v4-local.1",
+        "accepted": false,
+        "status": "not_applied",
+        "order": [
+          "legs",
+          "arms"
+        ],
+        "stages": [
+          {
+            "kind": "legs",
+            "sides": [
+              "left"
+            ],
+            "receipt": {
+              "accepted": true
+            },
+            "protected_matrix_delta": 0.0,
+            "changed_joints": [
+              "mixamorig:LeftLeg",
+              "mixamorig:LeftFoot",
+              "mixamorig:LeftToeBase"
+            ]
+          },
+          {
+            "kind": "arms",
+            "sides": [
+              "left"
+            ],
+            "receipt": {
+              "accepted": false,
+              "reasons": [
+                "contact_failed"
+              ]
+            }
+          }
+        ],
+        "reasons": [
+          "arms:stage_rejected"
+        ],
+        "score_status": "not_scored",
+        "release_allowed": false,
+        "rollback_matrix_delta": 0.0
+      }
+    },
+    {
+      "test": "test_current_knee_read_after_leg_stage_and_final_rejection",
+      "passed": true,
+      "receipt": {
+        "version": "refine-v4-local.1",
+        "accepted": false,
+        "status": "not_applied",
+        "order": [
+          "legs",
+          "arms"
+        ],
+        "stages": [
+          {
+            "kind": "legs",
+            "sides": [
+              "left"
+            ],
+            "receipt": {
+              "accepted": true
+            },
+            "protected_matrix_delta": 0.0,
+            "changed_joints": [
+              "mixamorig:LeftUpLeg",
+              "mixamorig:LeftLeg",
+              "mixamorig:LeftFoot",
+              "mixamorig:LeftToeBase"
+            ]
+          },
+          {
+            "kind": "arms",
+            "sides": [
+              "left"
+            ],
+            "receipt": {
+              "accepted": true
+            },
+            "protected_matrix_delta": 0.0,
+            "changed_joints": [
+              "mixamorig:LeftArm",
+              "mixamorig:LeftForeArm",
+              "mixamorig:LeftHand",
+              "mixamorig:LeftHandThumb1",
+              "mixamorig:LeftHandThumb2",
+              "mixamorig:LeftHandThumb3",
+              "mixamorig:LeftHandIndex1",
+              "mixamorig:LeftHandIndex2",
+              "mixamorig:LeftHandIndex3",
+              "mixamorig:LeftHandMiddle1",
+              "mixamorig:LeftHandMiddle2",
+              "mixamorig:LeftHandMiddle3",
+              "mixamorig:LeftHandRing1",
+              "mixamorig:LeftHandRing2",
+              "mixamorig:LeftHandRing3",
+              "mixamorig:LeftHandPinky1",
+              "mixamorig:LeftHandPinky2",
+              "mixamorig:LeftHandPinky3"
+            ]
+          }
+        ],
+        "reasons": [
+          "final_geometry_or_contact_rejected"
+        ],
+        "score_status": "not_scored",
+        "release_allowed": false,
+        "bone_length_error_m": 6.124652984773604e-08,
+        "final_check": {
+          "accepted": false,
+          "reasons": [
+            "contact_drift"
+          ]
+        },
+        "rollback_matrix_delta": 0.0
+      }
+    },
+    {
+      "test": "test_native_leg_recipe_recovers_perturbed_knee_with_real_skin",
+      "passed": true,
+      "receipt": {
+        "version": "refine-v4-local.1",
+        "accepted": true,
+        "status": "applied",
+        "order": [
+          "legs"
+        ],
+        "stages": [
+          {
+            "kind": "legs",
+            "sides": [
+              "left"
+            ],
+            "receipt": {
+              "accepted": true,
+              "reasons": [],
+              "selected_parts": [
+                "499a627248e0b34a2ba190b0b439b3ee0f4d5b10e86d3d4bff913f9f293a7957"
+              ],
+              "plan": {
+                "schema": "standin.refine-v4.leg-plan.v1",
+                "sentence": "한쪽 무릎을 굽혀 앉기",
+                "selection": "left",
+                "sides": [
+                  "left"
+                ],
+                "intent": {
+                  "crossing": null,
+                  "cross_region": "unspecified",
+                  "posture": "seated",
+                  "forward_extended": false,
+                  "elevated": false,
+                  "top_side": null,
+                  "bottom_side": null,
+                  "side_reference": "subject_anatomical",
+                  "cross_style": "unspecified",
+                  "side_evidence": "unspecified_not_guessed"
+                },
+                "evidence": {
+                  "source": "user_confirmed",
+                  "reference": "regression_fixture"
+                },
+                "automatic_image_extraction": false
+              },
+              "method": "native_pelvis_direction_transport",
+              "skin_asset_transferred": false,
+              "measurements": {
+                "knee_flex_deg": {
+                  "left": 100.69616643187581,
+                  "right": 114.33805455001067
+                },
+                "knee_order_lateral_m": 0.27258684972987274,
+                "right_knee_above_left_m": -0.41801511526365537,
+                "top_side": null,
+                "basis": "anatomical_hip_axis_reversal_and_body_up_knee_order",
+                "shin_body_up": {
+                  "left": -0.9717392722159837,
+                  "right": 0.25484739287847663
+                },
+                "scope": "knee_over_knee_joint_relation_not_skin_or_photo_score"
+              },
+              "skin_check": {
+                "accepted": true,
+                "reasons": [],
+                "new_collisions": [],
+                "scope": "measured_skin_nonregression_not_pose_similarity"
+              }
+            },
+            "protected_matrix_delta": 0.0,
+            "changed_joints": [
+              "mixamorig:LeftLeg",
+              "mixamorig:LeftFoot",
+              "mixamorig:LeftToeBase"
+            ]
+          }
+        ],
+        "reasons": [],
+        "score_status": "not_scored",
+        "release_allowed": false,
+        "bone_length_error_m": 3.736607795401525e-08,
+        "final_check": {
+          "accepted": true,
+          "reasons": [],
+          "new_collisions": [],
+          "scope": "measured_skin_nonregression_not_pose_similarity"
+        }
+      }
+    },
+    {
+      "test": "test_missing_final_check_does_not_run_callback",
+      "passed": true,
+      "receipt": {
+        "version": "refine-v4-local.1",
+        "accepted": false,
+        "status": "not_applied",
+        "order": [
+          "legs"
+        ],
+        "stages": [],
+        "reasons": [
+          "final_geometry_and_contact_check_required"
+        ],
+        "score_status": "not_scored",
+        "release_allowed": false
+      }
+    },
+    {
+      "test": "test_actual_arm_adapter_after_actual_leg_recovery",
+      "passed": true,
+      "receipt": {
+        "version": "refine-v4-local.1",
+        "accepted": true,
+        "status": "applied",
+        "order": [
+          "legs",
+          "arms"
+        ],
+        "stages": [
+          {
+            "kind": "legs",
+            "sides": [
+              "left"
+            ],
+            "receipt": {
+              "accepted": true,
+              "reasons": [],
+              "selected_parts": [
+                "bc95df3ee76ce86348c034ce7422c6d233d50625eac7d999ca272cff399711f4"
+              ],
+              "plan": {
+                "schema": "standin.refine-v4.leg-plan.v1",
+                "sentence": "한쪽 무릎을 굽혀 앉기",
+                "selection": "left",
+                "sides": [
+                  "left"
+                ],
+                "intent": {
+                  "crossing": null,
+                  "cross_region": "unspecified",
+                  "posture": "seated",
+                  "forward_extended": false,
+                  "elevated": false,
+                  "top_side": null,
+                  "bottom_side": null,
+                  "side_reference": "subject_anatomical",
+                  "cross_style": "unspecified",
+                  "side_evidence": "unspecified_not_guessed"
+                },
+                "evidence": {
+                  "source": "user_confirmed",
+                  "reference": "artificial_5_degree_regression_fixture"
+                },
+                "automatic_image_extraction": false
+              },
+              "method": "native_pelvis_direction_transport",
+              "skin_asset_transferred": false,
+              "measurements": {
+                "knee_flex_deg": {
+                  "left": 100.69616643187581,
+                  "right": 114.33805455001067
+                },
+                "knee_order_lateral_m": 0.27258684972987274,
+                "right_knee_above_left_m": -0.41801511526365537,
+                "top_side": null,
+                "basis": "anatomical_hip_axis_reversal_and_body_up_knee_order",
+                "shin_body_up": {
+                  "left": -0.9717392722159837,
+                  "right": 0.25484739287847663
+                },
+                "scope": "knee_over_knee_joint_relation_not_skin_or_photo_score"
+              },
+              "skin_check": {
+                "accepted": true,
+                "reasons": [],
+                "new_collisions": [],
+                "scope": "measured_skin_nonregression_not_pose_similarity"
+              }
+            },
+            "protected_matrix_delta": 0.0,
+            "changed_joints": [
+              "mixamorig:LeftLeg",
+              "mixamorig:LeftFoot",
+              "mixamorig:LeftToeBase"
+            ]
+          },
+          {
+            "kind": "arms",
+            "sides": [
+              "left",
+              "right"
+            ],
+            "receipt": {
+              "method": "skeleton_relative_relational_fit_v1",
+              "plan": {
+                "method": "explicit_per_arm_language_rules_v1",
+                "source": "user_confirmed_natural_language",
+                "members": [
+                  {
+                    "side": "left",
+                    "description": "세운 무릎 위에 손을 올린다",
+                    "part": {
+                      "id": "raised_knee_rest",
+                      "label": "세운 무릎 위에 손 얹기",
+                      "hand_preset": "fist",
+                      "target": "raised_knee_skin",
+                      "orientation_rule": "role_default"
+                    },
+                    "change": [
+                      "upper_arm",
+                      "forearm",
+                      "wrist",
+                      "fingers"
+                    ]
+                  },
+                  {
+                    "side": "right",
+                    "description": "반대 손을 아래로 내린다",
+                    "part": {
+                      "id": "lowered_hand",
+                      "label": "손등을 위로 두고 무릎 쪽으로 주먹 내리기",
+                      "hand_preset": "fist",
+                      "target": "free_space_below_hip",
+                      "orientation_rule": "hand_back_up_and_nearer_knee"
+                    },
+                    "change": [
+                      "upper_arm",
+                      "forearm",
+                      "wrist",
+                      "fingers"
+                    ]
+                  }
+                ],
+                "image_skeleton_reliable": false,
+                "image_skeleton_used_for_targets": false,
+                "geometry_source": "destination_3d_skeleton_and_actual_skin",
+                "automatic_image_recognition": false,
+                "relation": "raised_knee_and_lowered_hand",
+                "release_allowed": false
+              },
+              "accepted": true,
+              "members": [
+                {
+                  "side": "left",
+                  "part": {
+                    "id": "raised_knee_rest",
+                    "label": "세운 무릎 위에 손 얹기",
+                    "hand_preset": "fist",
+                    "target": "raised_knee_skin",
+                    "orientation_rule": "role_default"
+                  },
+                  "accepted": true,
+                  "metrics": {
+                    "wrist_swing_deg": 9.840158768362636,
+                    "wrist_twist_deg": 0.4698049037449539,
+                    "elbow_flexion_deg": 32.889956325496,
+                    "bone_length_error_m": 1.9385119259807126e-08,
+                    "wrist_goal_error_m": 1.1920928955078125e-07,
+                    "patch_median_m": 0.004966056905686855,
+                    "patch_p90_m": 0.006947852671146393,
+                    "patch_samples": 21,
+                    "normal_error_deg": 0.0
+                  },
+                  "wrist_goal_world": [
+                    0.14824771881103516,
+                    -0.3646275997161865,
+                    1.0967046022415161
+                  ],
+                  "contact": {
+                    "anchor": [
+                      0.12730661034584045,
+                      -0.38741111755371094,
+                      1.0061012506484985
+                    ],
+                    "normal": [
+                      -0.31062811613082886,
+                      -0.39803341031074524,
+                      0.8631799221038818
+                    ],
+                    "region": "LeftKnee",
+                    "patch": "ulnar_edge"
+                  },
+                  "lengths": [
+                    0.2889164994084091,
+                    0.24769912571671612
+                  ],
+                  "forearm_roll_deg": 62,
+                  "new_skin": [],
+                  "trials": [
+                    {
+                      "goal": [
+                        0.149179607629776,
+                        -0.36343348026275635,
+                        1.094115138053894
+                      ],
+                      "metrics": {
+                        "wrist_swing_deg": 9.50393331495865,
+                        "wrist_twist_deg": 0.6367340867298308,
+                        "elbow_flexion_deg": 32.38907464799687,
+                        "bone_length_error_m": 8.260222050804344e-08,
+                        "wrist_goal_error_m": 1.7120130796843852e-07,
+                        "patch_median_m": 0.00198474433273077,
+                        "patch_p90_m": 0.003954055719077587,
+                        "patch_samples": 21,
+                        "normal_error_deg": 0.0
+                      },
+                      "reasons": [
+                        "new_skin"
+                      ]
+                    },
+                    {
+                      "goal": [
+                        0.14824771881103516,
+                        -0.3646275997161865,
+                        1.0967046022415161
+                      ],
+                      "metrics": {
+                        "wrist_swing_deg": 9.840158768362636,
+                        "wrist_twist_deg": 0.4698049037449539,
+                        "elbow_flexion_deg": 32.889956325496,
+                        "bone_length_error_m": 1.9385119259807126e-08,
+                        "wrist_goal_error_m": 1.1920928955078125e-07,
+                        "patch_median_m": 0.004966056905686855,
+                        "patch_p90_m": 0.006947852671146393,
+                        "patch_samples": 21,
+                        "normal_error_deg": 0.0
+                      },
+                      "reasons": []
+                    }
+                  ]
+                },
+                {
+                  "side": "right",
+                  "part": {
+                    "id": "lowered_hand",
+                    "label": "손등을 위로 두고 무릎 쪽으로 주먹 내리기",
+                    "hand_preset": "fist",
+                    "target": "free_space_below_hip",
+                    "orientation_rule": "hand_back_up_and_nearer_knee"
+                  },
+                  "accepted": true,
+                  "metrics": {
+                    "wrist_swing_deg": 35.00929572305926,
+                    "wrist_twist_deg": 0.4829488557507029,
+                    "elbow_flexion_deg": 25.03543856301456,
+                    "bone_length_error_m": 3.8064367263723753e-07,
+                    "wrist_goal_error_m": 5.3726900748371916e-08,
+                    "hand_back_up_dot": 0.8728731870651245
+                  },
+                  "wrist_goal_world": [
+                    -0.21840882301330566,
+                    -0.1425275206565857,
+                    0.9284508228302002
+                  ],
+                  "contact": null,
+                  "lengths": [
+                    0.28891202380727365,
+                    0.24769921324990804
+                  ],
+                  "forearm_roll_deg": 10,
+                  "new_skin": [],
+                  "trials": [
+                    {
+                      "goal": [
+                        -0.21840882301330566,
+                        -0.1425275206565857,
+                        0.9284508228302002
+                      ],
+                      "metrics": {
+                        "wrist_swing_deg": 35.00929572305926,
+                        "wrist_twist_deg": 0.4829488557507029,
+                        "elbow_flexion_deg": 25.03543856301456,
+                        "bone_length_error_m": 3.8064367263723753e-07,
+                        "wrist_goal_error_m": 5.3726900748371916e-08,
+                        "hand_back_up_dot": 0.8728731870651245
+                      },
+                      "reasons": []
+                    }
+                  ]
+                }
+              ],
+              "initial_skin": {
+                "version": "full-weighted-skin-v2-whole-hands-20261015",
+                "method": "deformed weighted triangle regions + capped-region ray-parity containment; local connected-joint seam exemptions",
+                "depth_tolerance_mm": 2.0,
+                "regions": 14,
+                "finger_skin_included": true,
+                "tested_overlapping_region_pairs": 16,
+                "raw_surface_crossings": 404,
+                "collisions": [
+                  {
+                    "regions": [
+                      "RightShin",
+                      "RightThigh"
+                    ],
+                    "penetrating_vertices": 16,
+                    "max_depth_mm": 11.179,
+                    "surface_crossing_triangle_pairs": 102,
+                    "witness_world": [
+                      -0.09541534632444382,
+                      -0.014264636673033237,
+                      0.6072701811790466
+                    ]
+                  }
+                ],
+                "flags": [
+                  "RightShin / RightThigh: 11.2 mm skin penetration"
+                ],
+                "region_closure_failures": {},
+                "limitations": [
+                  "Automated triage, not human visual approval.",
+                  "Within one anatomical region is not tested against itself, including finger-to-finger/palm collisions within the same hand.",
+                  "Connected-joint seams have small local exemptions.",
+                  "Cut capping can overapproximate concave regions; flagged contacts require inspection."
+                ]
+              },
+              "release_allowed": false,
+              "reasons": [],
+              "protected_matrix_delta": 0.0,
+              "final_skin": {
+                "version": "full-weighted-skin-v2-whole-hands-20261015",
+                "method": "deformed weighted triangle regions + capped-region ray-parity containment; local connected-joint seam exemptions",
+                "depth_tolerance_mm": 2.0,
+                "regions": 14,
+                "finger_skin_included": true,
+                "tested_overlapping_region_pairs": 17,
+                "raw_surface_crossings": 408,
+                "collisions": [
+                  {
+                    "regions": [
+                      "RightShin",
+                      "RightThigh"
+                    ],
+                    "penetrating_vertices": 16,
+                    "max_depth_mm": 11.179,
+                    "surface_crossing_triangle_pairs": 102,
+                    "witness_world": [
+                      -0.09541534632444382,
+                      -0.014264636673033237,
+                      0.6072701811790466
+                    ]
+                  }
+                ],
+                "flags": [
+                  "RightShin / RightThigh: 11.2 mm skin penetration"
+                ],
+                "region_closure_failures": {},
+                "limitations": [
+                  "Automated triage, not human visual approval.",
+                  "Within one anatomical region is not tested against itself, including finger-to-finger/palm collisions within the same hand.",
+                  "Connected-joint seams have small local exemptions.",
+                  "Cut capping can overapproximate concave regions; flagged contacts require inspection."
+                ]
+              },
+              "new_skin": [],
+              "selected_parts": [
+                {
+                  "side": "left",
+                  "id": "raised_knee_rest",
+                  "label": "세운 무릎 위에 손 얹기",
+                  "hand_preset": "fist",
+                  "target": "raised_knee_skin",
+                  "orientation_rule": "role_default"
+                },
+                {
+                  "side": "right",
+                  "id": "lowered_hand",
+                  "label": "손등을 위로 두고 무릎 쪽으로 주먹 내리기",
+                  "hand_preset": "fist",
+                  "target": "free_space_below_hip",
+                  "orientation_rule": "hand_back_up_and_nearer_knee"
+                }
+              ],
+              "changed_joints": [
+                "mixamorig:LeftArm",
+                "mixamorig:LeftForeArm",
+                "mixamorig:LeftHand",
+                "mixamorig:LeftHandThumb1",
+                "mixamorig:LeftHandThumb2",
+                "mixamorig:LeftHandThumb3",
+                "mixamorig:LeftHandIndex1",
+                "mixamorig:LeftHandIndex2",
+                "mixamorig:LeftHandIndex3",
+                "mixamorig:LeftHandMiddle1",
+                "mixamorig:LeftHandMiddle2",
+                "mixamorig:LeftHandMiddle3",
+                "mixamorig:LeftHandRing1",
+                "mixamorig:LeftHandRing2",
+                "mixamorig:LeftHandRing3",
+                "mixamorig:LeftHandPinky1",
+                "mixamorig:LeftHandPinky2",
+                "mixamorig:LeftHandPinky3",
+                "mixamorig:RightArm",
+                "mixamorig:RightForeArm",
+                "mixamorig:RightHand",
+                "mixamorig:RightHandThumb1",
+                "mixamorig:RightHandThumb2",
+                "mixamorig:RightHandThumb3",
+                "mixamorig:RightHandIndex1",
+                "mixamorig:RightHandIndex2",
+                "mixamorig:RightHandIndex3",
+                "mixamorig:RightHandMiddle1",
+                "mixamorig:RightHandMiddle2",
+                "mixamorig:RightHandMiddle3",
+                "mixamorig:RightHandRing1",
+                "mixamorig:RightHandRing2",
+                "mixamorig:RightHandRing3",
+                "mixamorig:RightHandPinky1",
+                "mixamorig:RightHandPinky2",
+                "mixamorig:RightHandPinky3"
+              ],
+              "joint_matrices_before": {
+                "mixamorig:Hips": [
+                  [
+                    1.0,
+                    -1.8594941396127967e-14,
+                    1.6946925995853235e-07,
+                    -1.3737265041864968e-16
+                  ],
+                  [
+                    1.6946925995853235e-07,
+                    6.692142733299988e-07,
+                    -1.0,
+                    0.009947587735950947
+                  ],
+                  [
+                    -9.481631246203298e-14,
+                    1.0,
+                    7.152557373046875e-07,
+                    1.0130765438079834
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:Spine": [
+                  [
+                    1.0,
+                    5.329070518200751e-15,
+                    1.7678465269455046e-07,
+                    7.771561172376096e-16
+                  ],
+                  [
+                    1.76095184656333e-07,
+                    0.08823179453611374,
+                    -0.9960999488830566,
+                    0.018037069588899612
+                  ],
+                  [
+                    -1.5598033087371732e-08,
+                    0.9960999488830566,
+                    0.08823184669017792,
+                    1.1044032573699951
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:Spine1": [
+                  [
+                    1.0,
+                    1.1244131981839184e-14,
+                    1.6203948405291158e-07,
+                    -5.161110237507328e-15
+                  ],
+                  [
+                    1.6140752734372654e-07,
+                    0.08823196589946747,
+                    -0.9960999488830566,
+                    0.02747480571269989
+                  ],
+                  [
+                    -1.4297073747115974e-08,
+                    0.9960999488830566,
+                    0.08823201805353165,
+                    1.210951328277588
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:Spine2": [
+                  [
+                    1.0,
+                    7.566934952978402e-16,
+                    1.7152517273189005e-07,
+                    3.604685079345183e-15
+                  ],
+                  [
+                    1.7085622516788135e-07,
+                    0.08823207765817642,
+                    -0.9960999488830566,
+                    0.03826076537370682
+                  ],
+                  [
+                    -1.5134023811924635e-08,
+                    0.9960999488830566,
+                    0.0882321298122406,
+                    1.3327199220657349
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:Neck": [
+                  [
+                    0.9952273964881897,
+                    0.010877413675189018,
+                    0.09697496145963669,
+                    9.313227522511625e-09
+                  ],
+                  [
+                    0.0975831001996994,
+                    -0.11093634366989136,
+                    -0.9890251159667969,
+                    0.05039506405591965
+                  ],
+                  [
+                    1.0244548320770264e-08,
+                    0.9937678575515747,
+                    -0.11146826297044754,
+                    1.4697105884552002
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:Head": [
+                  [
+                    0.9703845381736755,
+                    0.05096971616148949,
+                    0.23612700402736664,
+                    0.00309677142649889
+                  ],
+                  [
+                    0.2410159707069397,
+                    -0.2701745331287384,
+                    -0.9321572184562683,
+                    0.018811944872140884
+                  ],
+                  [
+                    0.016283703967928886,
+                    0.9614611864089966,
+                    -0.2744576036930084,
+                    1.5591211318969727
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftShoulder": [
+                  [
+                    0.08263001590967178,
+                    0.9464856386184692,
+                    -0.3119899034500122,
+                    0.05503895506262779
+                  ],
+                  [
+                    0.9926614761352539,
+                    -0.10590474307537079,
+                    -0.058378323912620544,
+                    0.05045909062027931
+                  ],
+                  [
+                    -0.08829544484615326,
+                    -0.304876446723938,
+                    -0.9482902884483337,
+                    1.4519317150115967
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftArm": [
+                  [
+                    -0.08689937740564346,
+                    0.47954726219177246,
+                    -0.8732030391693115,
+                    0.16415157914161682
+                  ],
+                  [
+                    0.9500606060028076,
+                    -0.22381819784641266,
+                    -0.21746471524238586,
+                    0.0382501557469368
+                  ],
+                  [
+                    -0.29972320795059204,
+                    -0.8484928607940674,
+                    -0.43614912033081055,
+                    1.4167851209640503
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftForeArm": [
+                  [
+                    -0.6014683246612549,
+                    0.009859979152679443,
+                    -0.7988361716270447,
+                    0.3027009069919586
+                  ],
+                  [
+                    -0.19722919166088104,
+                    -0.9708061814308167,
+                    0.13651752471923828,
+                    -0.026414182037115097
+                  ],
+                  [
+                    -0.7741686105728149,
+                    0.23966459929943085,
+                    0.5858533382415771,
+                    1.1716415882110596
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHand": [
+                  [
+                    -0.5559591054916382,
+                    -0.13826553523540497,
+                    -0.8196296095848083,
+                    0.30514320731163025
+                  ],
+                  [
+                    -0.09972375631332397,
+                    -0.967850923538208,
+                    0.23091274499893188,
+                    -0.26688191294670105
+                  ],
+                  [
+                    -0.8252061009407043,
+                    0.21011441946029663,
+                    0.524296760559082,
+                    1.2310062646865845
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandThumb1": [
+                  [
+                    -0.5054787397384644,
+                    -0.1305057406425476,
+                    -0.8529127240180969,
+                    0.3028535842895508
+                  ],
+                  [
+                    -0.7221879363059998,
+                    -0.4769313931465149,
+                    0.5009810328483582,
+                    -0.280435174703598
+                  ],
+                  [
+                    -0.47216150164604187,
+                    0.8691978454589844,
+                    0.14682891964912415,
+                    1.2639570236206055
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandThumb2": [
+                  [
+                    -0.5054850578308105,
+                    -0.16677649319171906,
+                    -0.8465642929077148,
+                    0.30102306604385376
+                  ],
+                  [
+                    -0.7221858501434326,
+                    -0.4551194906234741,
+                    0.5208789706230164,
+                    -0.2912776470184326
+                  ],
+                  [
+                    -0.4721580147743225,
+                    0.874672532081604,
+                    0.10961243510246277,
+                    1.2903170585632324
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandThumb3": [
+                  [
+                    -0.5054848790168762,
+                    -0.051750242710113525,
+                    -0.8612825274467468,
+                    0.2963646352291107
+                  ],
+                  [
+                    -0.7221869826316833,
+                    -0.5208544135093689,
+                    0.45514580607414246,
+                    -0.3044511377811432
+                  ],
+                  [
+                    -0.47215643525123596,
+                    0.8520756363868713,
+                    0.2259105145931244,
+                    1.3169397115707397
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandIndex1": [
+                  [
+                    -0.5728616118431091,
+                    -0.1148427203297615,
+                    -0.8115671277046204,
+                    0.3124166429042816
+                  ],
+                  [
+                    -0.32098644971847534,
+                    -0.8796214461326599,
+                    0.3510481119155884,
+                    -0.33762115240097046
+                  ],
+                  [
+                    -0.754186749458313,
+                    0.4616037607192993,
+                    0.46703800559043884,
+                    1.277510166168213
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandIndex2": [
+                  [
+                    -0.5728639960289001,
+                    -0.17722070217132568,
+                    -0.8002625703811646,
+                    0.30872106552124023
+                  ],
+                  [
+                    -0.3209874927997589,
+                    -0.8498585820198059,
+                    0.41798141598701477,
+                    -0.3663787841796875
+                  ],
+                  [
+                    -0.7541845440864563,
+                    0.4963204860687256,
+                    0.42996734380722046,
+                    1.2927035093307495
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandIndex3": [
+                  [
+                    -0.5728633403778076,
+                    -0.15038393437862396,
+                    -0.8057373762130737,
+                    0.3033308982849121
+                  ],
+                  [
+                    -0.3209850788116455,
+                    -0.8633511066436768,
+                    0.38935133814811707,
+                    -0.3920072317123413
+                  ],
+                  [
+                    -0.7541860342025757,
+                    0.481674462556839,
+                    0.44631078839302063,
+                    1.3075857162475586
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandMiddle1": [
+                  [
+                    -0.5696751475334167,
+                    0.06983568519353867,
+                    -0.8188979029655457,
+                    0.29991254210472107
+                  ],
+                  [
+                    -0.23165974020957947,
+                    -0.9696275591850281,
+                    0.07846684753894806,
+                    -0.3448687791824341
+                  ],
+                  [
+                    -0.7885458469390869,
+                    0.23440611362457275,
+                    0.5685504078865051,
+                    1.25604248046875
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandMiddle2": [
+                  [
+                    -0.5696768164634705,
+                    -0.13529564440250397,
+                    -0.8106564879417419,
+                    0.3028588891029358
+                  ],
+                  [
+                    -0.23165708780288696,
+                    -0.9199310541152954,
+                    0.31632691621780396,
+                    -0.3824557065963745
+                  ],
+                  [
+                    -0.7885454297065735,
+                    0.3679981827735901,
+                    0.4927207827568054,
+                    1.2654742002487183
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandMiddle3": [
+                  [
+                    -0.5696749091148376,
+                    -0.10397893935441971,
+                    -0.815266489982605,
+                    0.2977006733417511
+                  ],
+                  [
+                    -0.23165786266326904,
+                    -0.9314296841621399,
+                    0.28066757321357727,
+                    -0.41656166315078735
+                  ],
+                  [
+                    -0.788546621799469,
+                    0.3487519323825836,
+                    0.5065241456031799,
+                    1.2788832187652588
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandRing1": [
+                  [
+                    -0.5660490393638611,
+                    0.008155480027198792,
+                    -0.8243316411972046,
+                    0.2874561548233032
+                  ],
+                  [
+                    -0.18537770211696625,
+                    -0.9756004810333252,
+                    0.11764266341924667,
+                    -0.35253968834877014
+                  ],
+                  [
+                    -0.8032584190368652,
+                    0.21940405666828156,
+                    0.5537490844726562,
+                    1.237682580947876
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandRing2": [
+                  [
+                    -0.5660456418991089,
+                    -0.1509407013654709,
+                    -0.8104380965232849,
+                    0.28785383701324463
+                  ],
+                  [
+                    -0.18537537753582,
+                    -0.9346117973327637,
+                    0.3035421073436737,
+                    -0.3846466541290283
+                  ],
+                  [
+                    -0.8032613396644592,
+                    0.3220537304878235,
+                    0.5010518431663513,
+                    1.2450963258743286
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandRing3": [
+                  [
+                    -0.5660466551780701,
+                    -0.07584280520677567,
+                    -0.8208774328231812,
+                    0.28300201892852783
+                  ],
+                  [
+                    -0.1853761225938797,
+                    -0.9585466384887695,
+                    0.2163911610841751,
+                    -0.41396743059158325
+                  ],
+                  [
+                    -0.8032604455947876,
+                    0.27465835213661194,
+                    0.528522253036499,
+                    1.2550102472305298
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandPinky1": [
+                  [
+                    -0.5346624851226807,
+                    -0.20120495557785034,
+                    -0.8207637667655945,
+                    0.27212953567504883
+                  ],
+                  [
+                    0.02046710066497326,
+                    -0.9740407466888428,
+                    0.2254473716020584,
+                    -0.3499058485031128
+                  ],
+                  [
+                    -0.8448180556297302,
+                    0.10373948514461517,
+                    0.5249008536338806,
+                    1.223928689956665
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandPinky2": [
+                  [
+                    -0.5346518158912659,
+                    -0.34886664152145386,
+                    -0.7697012424468994,
+                    0.2664882242679596
+                  ],
+                  [
+                    0.020465781912207603,
+                    -0.9158892035484314,
+                    0.4009104371070862,
+                    -0.3776796758174896
+                  ],
+                  [
+                    -0.8448248505592346,
+                    0.1985948085784912,
+                    0.4968213140964508,
+                    1.227036952972412
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandPinky3": [
+                  [
+                    -0.5346484184265137,
+                    -0.29217398166656494,
+                    -0.7929602265357971,
+                    0.25852805376052856
+                  ],
+                  [
+                    0.020459819585084915,
+                    -0.9425320029258728,
+                    0.33349043130874634,
+                    -0.39834755659103394
+                  ],
+                  [
+                    -0.8448271155357361,
+                    0.1620762050151825,
+                    0.5099007487297058,
+                    1.2313815355300903
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightShoulder": [
+                  [
+                    0.07081856578588486,
+                    -0.9476778507232666,
+                    0.31127363443374634,
+                    -0.055038902908563614
+                  ],
+                  [
+                    -0.9935728907585144,
+                    -0.09464293718338013,
+                    -0.06209232285618782,
+                    0.05033104866743088
+                  ],
+                  [
+                    0.08830346167087555,
+                    -0.3048757314682007,
+                    -0.9482896327972412,
+                    1.4519317150115967
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightArm": [
+                  [
+                    0.5522817969322205,
+                    -0.2923479378223419,
+                    0.780715823173523,
+                    -0.1642891764640808
+                  ],
+                  [
+                    -0.8190200328826904,
+                    -0.015553895384073257,
+                    0.5735539793968201,
+                    0.039420414716005325
+                  ],
+                  [
+                    -0.15553411841392517,
+                    -0.9561854004859924,
+                    -0.2480292022228241,
+                    1.4167850017547607
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightForeArm": [
+                  [
+                    0.7896214127540588,
+                    0.5974733829498291,
+                    0.13972634077072144,
+                    -0.24875211715698242
+                  ],
+                  [
+                    0.49960261583328247,
+                    -0.7582386136054993,
+                    0.41889339685440063,
+                    0.03492679446935654
+                  ],
+                  [
+                    0.3562234044075012,
+                    -0.26095953583717346,
+                    -0.8972206711769104,
+                    1.1405315399169922
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHand": [
+                  [
+                    0.8477563858032227,
+                    0.5287122130393982,
+                    0.042098551988601685,
+                    -0.1007583886384964
+                  ],
+                  [
+                    0.44953978061676025,
+                    -0.7583893537521362,
+                    0.4719744324684143,
+                    -0.1528879702091217
+                  ],
+                  [
+                    0.2814655900001526,
+                    -0.3811943829059601,
+                    -0.8806065320968628,
+                    1.0758912563323975
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandThumb1": [
+                  [
+                    0.2865946888923645,
+                    0.8820368051528931,
+                    -0.3739977180957794,
+                    -0.06813890486955643
+                  ],
+                  [
+                    0.8386457562446594,
+                    -0.04223950207233429,
+                    0.5430372953414917,
+                    -0.15100553631782532
+                  ],
+                  [
+                    0.4631812870502472,
+                    -0.4692832827568054,
+                    -0.7518219947814941,
+                    1.0610240697860718
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandThumb2": [
+                  [
+                    0.28659674525260925,
+                    0.844779372215271,
+                    -0.45189598202705383,
+                    -0.04204324632883072
+                  ],
+                  [
+                    0.8386421799659729,
+                    0.006828460842370987,
+                    0.5446402430534363,
+                    -0.14949931204319
+                  ],
+                  [
+                    0.46318647265434265,
+                    -0.5350713133811951,
+                    -0.7065104842185974,
+                    1.0491300821304321
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandThumb3": [
+                  [
+                    0.28659722208976746,
+                    0.914164125919342,
+                    -0.2866460084915161,
+                    -0.01593025214970112
+                  ],
+                  [
+                    0.8386433720588684,
+                    -0.0947333574295044,
+                    0.5363796949386597,
+                    -0.14877958595752716
+                  ],
+                  [
+                    0.46318402886390686,
+                    -0.39411890506744385,
+                    -0.793807864189148,
+                    1.032983422279358
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandIndex1": [
+                  [
+                    0.7322302460670471,
+                    0.679348886013031,
+                    -0.04820438474416733,
+                    -0.02779167890548706
+                  ],
+                  [
+                    0.5850847363471985,
+                    -0.5912421345710754,
+                    0.5550755262374878,
+                    -0.19724565744400024
+                  ],
+                  [
+                    0.34858933091163635,
+                    -0.43464675545692444,
+                    -0.8304020762443542,
+                    1.053105354309082
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandIndex2": [
+                  [
+                    0.7322307229042053,
+                    0.6708670258522034,
+                    -0.11736811697483063,
+                    -0.005891632288694382
+                  ],
+                  [
+                    0.5850846171379089,
+                    -0.5314306020736694,
+                    0.6125827431678772,
+                    -0.21609768271446228
+                  ],
+                  [
+                    0.3485884368419647,
+                    -0.5172222852706909,
+                    -0.7816438674926758,
+                    1.0392324924468994
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandIndex3": [
+                  [
+                    0.732231855392456,
+                    0.6760995388031006,
+                    -0.08200977742671967,
+                    0.013957290910184383
+                  ],
+                  [
+                    0.5850856900215149,
+                    -0.5628411769866943,
+                    0.5838533043861389,
+                    -0.23191335797309875
+                  ],
+                  [
+                    0.3485843539237976,
+                    -0.47549882531166077,
+                    -0.8077064752578735,
+                    1.0238568782806396
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandMiddle1": [
+                  [
+                    0.7871478796005249,
+                    0.6069978475570679,
+                    0.10932335257530212,
+                    -0.048753250390291214
+                  ],
+                  [
+                    0.5271568894386292,
+                    -0.7541447281837463,
+                    0.39162677526474,
+                    -0.2124633938074112
+                  ],
+                  [
+                    0.32016220688819885,
+                    -0.25063765048980713,
+                    -0.9136064648628235,
+                    1.0485817193984985
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandMiddle2": [
+                  [
+                    0.7871450185775757,
+                    0.6167668700218201,
+                    -0.0010610446333885193,
+                    -0.024517497047781944
+                  ],
+                  [
+                    0.5271557569503784,
+                    -0.6718841195106506,
+                    0.5202679634094238,
+                    -0.24208417534828186
+                  ],
+                  [
+                    0.3201711177825928,
+                    -0.41008567810058594,
+                    -0.8540023565292358,
+                    1.0387846231460571
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandMiddle3": [
+                  [
+                    0.7871472835540771,
+                    0.6136474013328552,
+                    -0.06193305924534798,
+                    -0.001972723752260208
+                  ],
+                  [
+                    0.5271563529968262,
+                    -0.6172572374343872,
+                    0.5840376019477844,
+                    -0.2667493224143982
+                  ],
+                  [
+                    0.3201645314693451,
+                    -0.49237197637557983,
+                    -0.8093603849411011,
+                    1.0237294435501099
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandRing1": [
+                  [
+                    0.8211577534675598,
+                    0.5587658882141113,
+                    0.11610528826713562,
+                    -0.0638064444065094
+                  ],
+                  [
+                    0.48574188351631165,
+                    -0.7910950779914856,
+                    0.3717844486236572,
+                    -0.22632893919944763
+                  ],
+                  [
+                    0.2995906472206116,
+                    -0.24889659881591797,
+                    -0.9210297465324402,
+                    1.0388816595077515
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandRing2": [
+                  [
+                    0.8211580514907837,
+                    0.570609986782074,
+                    0.010171517729759216,
+                    -0.045034654438495636
+                  ],
+                  [
+                    0.4857368469238281,
+                    -0.7081526517868042,
+                    0.5124254822731018,
+                    -0.2525818645954132
+                  ],
+                  [
+                    0.29959791898727417,
+                    -0.4158416986465454,
+                    -0.8586714267730713,
+                    1.0306509733200073
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandRing3": [
+                  [
+                    0.8211581110954285,
+                    0.5689446330070496,
+                    0.044733740389347076,
+                    -0.027379291132092476
+                  ],
+                  [
+                    0.48574069142341614,
+                    -0.7379107475280762,
+                    0.46855539083480835,
+                    -0.27473121881484985
+                  ],
+                  [
+                    0.2995913624763489,
+                    -0.3630291819572449,
+                    -0.8823007941246033,
+                    1.0176423788070679
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandPinky1": [
+                  [
+                    0.8999364376068115,
+                    0.4354031980037689,
+                    0.02319730445742607,
+                    -0.08476670831441879
+                  ],
+                  [
+                    0.3649304211139679,
+                    -0.7812569737434387,
+                    0.5064223408699036,
+                    -0.2292250692844391
+                  ],
+                  [
+                    0.23862086236476898,
+                    -0.44728249311447144,
+                    -0.8619734644889832,
+                    1.0323363542556763
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandPinky2": [
+                  [
+                    0.8999366164207458,
+                    0.4330463111400604,
+                    -0.050839245319366455,
+                    -0.07196715474128723
+                  ],
+                  [
+                    0.3649342656135559,
+                    -0.6842698454856873,
+                    0.6313462257385254,
+                    -0.2521403133869171
+                  ],
+                  [
+                    0.2386142909526825,
+                    -0.5867245197296143,
+                    -0.7738328576087952,
+                    1.0192170143127441
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandPinky3": [
+                  [
+                    0.8999360203742981,
+                    0.42777734994888306,
+                    0.08438852429389954,
+                    -0.061710234731435776
+                  ],
+                  [
+                    0.36493462324142456,
+                    -0.8448899984359741,
+                    0.3911314606666565,
+                    -0.26875513792037964
+                  ],
+                  [
+                    0.23861609399318695,
+                    -0.321196973323822,
+                    -0.9164576530456543,
+                    1.0049878358840942
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftUpLeg": [
+                  [
+                    -0.9806208610534668,
+                    0.19558437168598175,
+                    0.011379851959645748,
+                    0.07412219792604446
+                  ],
+                  [
+                    -0.19591081142425537,
+                    -0.9793287515640259,
+                    -0.05034226179122925,
+                    0.008306141942739487
+                  ],
+                  [
+                    0.0012984618078917265,
+                    -0.05159614235162735,
+                    0.9986673593521118,
+                    0.9623174071311951
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftLeg": [
+                  [
+                    -0.9806236028671265,
+                    -0.04730108752846718,
+                    0.19010525941848755,
+                    0.16197241842746735
+                  ],
+                  [
+                    -0.19589827954769135,
+                    0.23126846551895142,
+                    -0.9529634118080139,
+                    -0.4315759539604187
+                  ],
+                  [
+                    0.0011108622420579195,
+                    -0.9717395305633545,
+                    -0.23605352640151978,
+                    0.9391419887542725
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftFoot": [
+                  [
+                    -0.9955474138259888,
+                    -0.07759465277194977,
+                    -0.05352035537362099,
+                    0.1424000859260559
+                  ],
+                  [
+                    0.09418998658657074,
+                    -0.7966408729553223,
+                    -0.5970696210861206,
+                    -0.33588123321533203
+                  ],
+                  [
+                    0.003692936385050416,
+                    -0.5994521975517273,
+                    0.8004022836685181,
+                    0.5370537042617798
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftToeBase": [
+                  [
+                    -0.9967482089996338,
+                    -0.07614907622337341,
+                    0.02635081112384796,
+                    0.13014772534370422
+                  ],
+                  [
+                    0.07511933147907257,
+                    -0.9964471459388733,
+                    -0.03808736801147461,
+                    -0.46167242527008057
+                  ],
+                  [
+                    0.029157539829611778,
+                    -0.035984188318252563,
+                    0.998927116394043,
+                    0.4423989951610565
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightUpLeg": [
+                  [
+                    -0.9958926439285278,
+                    -0.08126629143953323,
+                    0.03998534753918648,
+                    -0.07412222027778625
+                  ],
+                  [
+                    -0.02589189074933529,
+                    -0.16751106083393097,
+                    -0.9855380058288574,
+                    0.010593622922897339
+                  ],
+                  [
+                    0.0867861807346344,
+                    -0.9825154542922974,
+                    0.16472093760967255,
+                    0.962317168712616
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightLeg": [
+                  [
+                    -0.9958865642547607,
+                    -0.0030708424746990204,
+                    -0.09058544784784317,
+                    -0.11061448603868484
+                  ],
+                  [
+                    -0.026034990325570107,
+                    0.9669827222824097,
+                    0.2535395622253418,
+                    -0.06462552398443222
+                  ],
+                  [
+                    0.08681313693523407,
+                    0.25484898686408997,
+                    -0.9630768895149231,
+                    0.5211266279220581
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightFoot": [
+                  [
+                    -0.9999807476997375,
+                    0.0030032843351364136,
+                    0.005885496735572815,
+                    -0.1118856742978096
+                  ],
+                  [
+                    -0.0014630164951086044,
+                    0.7671405673027039,
+                    -0.6414896249771118,
+                    0.335432231426239
+                  ],
+                  [
+                    -0.006443627178668976,
+                    -0.6414825320243835,
+                    -0.7671116590499878,
+                    0.6265618801116943
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightToeBase": [
+                  [
+                    -0.9980496764183044,
+                    0.03394990414381027,
+                    0.05243460834026337,
+                    -0.11141795665025711
+                  ],
+                  [
+                    -0.06106971949338913,
+                    -0.7063530087471008,
+                    -0.7052316069602966,
+                    0.4550023674964905
+                  ],
+                  [
+                    0.01309279166162014,
+                    -0.7070488333702087,
+                    0.707044780254364,
+                    0.5265777111053467
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ]
+              },
+              "joint_matrices_after": {
+                "mixamorig:Hips": [
+                  [
+                    1.0,
+                    -1.8594941396127967e-14,
+                    1.6946925995853235e-07,
+                    -1.3737265041864968e-16
+                  ],
+                  [
+                    1.6946925995853235e-07,
+                    6.692142733299988e-07,
+                    -1.0,
+                    0.009947587735950947
+                  ],
+                  [
+                    -9.481631246203298e-14,
+                    1.0,
+                    7.152557373046875e-07,
+                    1.0130765438079834
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:Spine": [
+                  [
+                    1.0,
+                    5.329070518200751e-15,
+                    1.7678465269455046e-07,
+                    7.771561172376096e-16
+                  ],
+                  [
+                    1.76095184656333e-07,
+                    0.08823179453611374,
+                    -0.9960999488830566,
+                    0.018037069588899612
+                  ],
+                  [
+                    -1.5598033087371732e-08,
+                    0.9960999488830566,
+                    0.08823184669017792,
+                    1.1044032573699951
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:Spine1": [
+                  [
+                    1.0,
+                    1.1244131981839184e-14,
+                    1.6203948405291158e-07,
+                    -5.161110237507328e-15
+                  ],
+                  [
+                    1.6140752734372654e-07,
+                    0.08823196589946747,
+                    -0.9960999488830566,
+                    0.02747480571269989
+                  ],
+                  [
+                    -1.4297073747115974e-08,
+                    0.9960999488830566,
+                    0.08823201805353165,
+                    1.210951328277588
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:Spine2": [
+                  [
+                    1.0,
+                    7.566934952978402e-16,
+                    1.7152517273189005e-07,
+                    3.604685079345183e-15
+                  ],
+                  [
+                    1.7085622516788135e-07,
+                    0.08823207765817642,
+                    -0.9960999488830566,
+                    0.03826076537370682
+                  ],
+                  [
+                    -1.5134023811924635e-08,
+                    0.9960999488830566,
+                    0.0882321298122406,
+                    1.3327199220657349
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:Neck": [
+                  [
+                    0.9952273964881897,
+                    0.010877413675189018,
+                    0.09697496145963669,
+                    9.313227522511625e-09
+                  ],
+                  [
+                    0.0975831001996994,
+                    -0.11093634366989136,
+                    -0.9890251159667969,
+                    0.05039506405591965
+                  ],
+                  [
+                    1.0244548320770264e-08,
+                    0.9937678575515747,
+                    -0.11146826297044754,
+                    1.4697105884552002
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:Head": [
+                  [
+                    0.9703845381736755,
+                    0.05096971616148949,
+                    0.23612700402736664,
+                    0.00309677142649889
+                  ],
+                  [
+                    0.2410159707069397,
+                    -0.2701745331287384,
+                    -0.9321572184562683,
+                    0.018811944872140884
+                  ],
+                  [
+                    0.016283703967928886,
+                    0.9614611864089966,
+                    -0.2744576036930084,
+                    1.5591211318969727
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftShoulder": [
+                  [
+                    0.08263001590967178,
+                    0.9464856386184692,
+                    -0.3119899034500122,
+                    0.05503895506262779
+                  ],
+                  [
+                    0.9926614761352539,
+                    -0.10590474307537079,
+                    -0.058378323912620544,
+                    0.05045909062027931
+                  ],
+                  [
+                    -0.08829544484615326,
+                    -0.304876446723938,
+                    -0.9482902884483337,
+                    1.4519317150115967
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftArm": [
+                  [
+                    0.041867561638355255,
+                    0.13731473684310913,
+                    -0.9896424412727356,
+                    0.16415157914161682
+                  ],
+                  [
+                    0.7708767652511597,
+                    -0.6345681548118591,
+                    -0.05543476343154907,
+                    0.0382501557469368
+                  ],
+                  [
+                    -0.6356074213981628,
+                    -0.7605710625648499,
+                    -0.13242048025131226,
+                    1.4167851209640503
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftForeArm": [
+                  [
+                    0.28373852372169495,
+                    -0.22437134385108948,
+                    -0.932282030582428,
+                    0.20382443070411682
+                  ],
+                  [
+                    0.3382554054260254,
+                    -0.8863213658332825,
+                    0.3162572979927063,
+                    -0.1450866460800171
+                  ],
+                  [
+                    -0.897260308265686,
+                    -0.40508371591567993,
+                    -0.17558854818344116,
+                    1.1970434188842773
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHand": [
+                  [
+                    0.35752251744270325,
+                    -0.11993761360645294,
+                    -0.9261708855628967,
+                    0.1482478678226471
+                  ],
+                  [
+                    0.49216121435165405,
+                    -0.8186354637145996,
+                    0.29599693417549133,
+                    -0.36462756991386414
+                  ],
+                  [
+                    -0.7936972975730896,
+                    -0.561650812625885,
+                    -0.23365187644958496,
+                    1.0967046022415161
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandThumb1": [
+                  [
+                    0.14060717821121216,
+                    -0.8685881495475769,
+                    -0.47516730427742004,
+                    0.12218306958675385
+                  ],
+                  [
+                    -0.21648000180721283,
+                    -0.49529409408569336,
+                    0.8413209915161133,
+                    -0.3886409401893616
+                  ],
+                  [
+                    -0.9661086797714233,
+                    -0.01543157547712326,
+                    -0.2576739192008972,
+                    1.1010254621505737
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandThumb2": [
+                  [
+                    0.5837557911872864,
+                    -0.7537398934364319,
+                    -0.30183613300323486,
+                    0.09706400334835052
+                  ],
+                  [
+                    0.006559722125530243,
+                    -0.36736124753952026,
+                    0.9300559163093567,
+                    -0.40186989307403564
+                  ],
+                  [
+                    -0.8119025230407715,
+                    -0.5449051856994629,
+                    -0.2095050811767578,
+                    1.1041539907455444
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandThumb3": [
+                  [
+                    0.9623399972915649,
+                    -0.266858845949173,
+                    -0.05184274911880493,
+                    0.0739980936050415
+                  ],
+                  [
+                    0.11235193908214569,
+                    0.21677136421203613,
+                    0.9697364568710327,
+                    -0.41291680932044983
+                  ],
+                  [
+                    -0.2475443035364151,
+                    -0.9390401840209961,
+                    0.23858952522277832,
+                    1.0883445739746094
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandIndex1": [
+                  [
+                    0.35781899094581604,
+                    -0.8954508304595947,
+                    -0.26482659578323364,
+                    0.12440960109233856
+                  ],
+                  [
+                    0.32075250148773193,
+                    -0.14848536252975464,
+                    0.9354523420333862,
+                    -0.4446388781070709
+                  ],
+                  [
+                    -0.8769742250442505,
+                    -0.4196661114692688,
+                    0.23408722877502441,
+                    1.0809094905853271
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandIndex2": [
+                  [
+                    0.2874874472618103,
+                    -0.2874063551425934,
+                    0.9136457443237305,
+                    0.09505877643823624
+                  ],
+                  [
+                    0.36981233954429626,
+                    0.9132510423660278,
+                    0.17091722786426544,
+                    -0.449535071849823
+                  ],
+                  [
+                    -0.8835102319717407,
+                    0.288740873336792,
+                    0.36883437633514404,
+                    1.0672694444656372
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandIndex3": [
+                  [
+                    0.29112881422042847,
+                    0.6423957943916321,
+                    0.7089231014251709,
+                    0.08642764389514923
+                  ],
+                  [
+                    0.3866969347000122,
+                    0.5987716913223267,
+                    -0.7013840079307556,
+                    -0.42199257016181946
+                  ],
+                  [
+                    -0.8750485181808472,
+                    0.47833114862442017,
+                    -0.07409287989139557,
+                    1.0758872032165527
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandMiddle1": [
+                  [
+                    0.3502967655658722,
+                    -0.9126392602920532,
+                    -0.2106703370809555,
+                    0.1354617476463318
+                  ],
+                  [
+                    0.3883472979068756,
+                    -0.06316015124320984,
+                    0.919346809387207,
+                    -0.43640151619911194
+                  ],
+                  [
+                    -0.8523374795913696,
+                    -0.40385720133781433,
+                    0.3322961628437042,
+                    1.0590065717697144
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandMiddle2": [
+                  [
+                    0.37426209449768066,
+                    -0.2027869075536728,
+                    0.904879093170166,
+                    0.09985171258449554
+                  ],
+                  [
+                    0.36529824137687683,
+                    0.9291365146636963,
+                    0.05713418126106262,
+                    -0.43901434540748596
+                  ],
+                  [
+                    -0.8523414731025696,
+                    0.3091675043106079,
+                    0.42181795835494995,
+                    1.0436601638793945
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandMiddle3": [
+                  [
+                    0.35122865438461304,
+                    0.7059437036514282,
+                    0.6150469183921814,
+                    0.09244639426469803
+                  ],
+                  [
+                    0.2931655943393707,
+                    0.5409477949142456,
+                    -0.7883092164993286,
+                    -0.40453222393989563
+                  ],
+                  [
+                    -0.8892090916633606,
+                    0.45718711614608765,
+                    -0.0169622004032135,
+                    1.0548752546310425
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandRing1": [
+                  [
+                    0.4011673033237457,
+                    -0.8821742534637451,
+                    -0.24664391577243805,
+                    0.1440935730934143
+                  ],
+                  [
+                    0.4728478193283081,
+                    -0.031175151467323303,
+                    0.8805930018424988,
+                    -0.4298413395881653
+                  ],
+                  [
+                    -0.784525454044342,
+                    -0.46988993883132935,
+                    0.40462762117385864,
+                    1.0381847620010376
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandRing2": [
+                  [
+                    0.5763694643974304,
+                    -0.17673766613006592,
+                    0.7978483438491821,
+                    0.11493124067783356
+                  ],
+                  [
+                    0.2969757914543152,
+                    0.9548806548118591,
+                    -0.0030134469270706177,
+                    -0.4309762716293335
+                  ],
+                  [
+                    -0.761317253112793,
+                    0.23867839574813843,
+                    0.6028507351875305,
+                    1.0228796005249023
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandRing3": [
+                  [
+                    0.4783908724784851,
+                    0.7262008190155029,
+                    0.49373549222946167,
+                    0.1095196008682251
+                  ],
+                  [
+                    -0.015342465601861477,
+                    0.5690733790397644,
+                    -0.8221442699432373,
+                    -0.4009963274002075
+                  ],
+                  [
+                    -0.8780131340026855,
+                    0.38573092222213745,
+                    0.2833811938762665,
+                    1.0301905870437622
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandPinky1": [
+                  [
+                    0.40286311507225037,
+                    -0.8560897707939148,
+                    -0.32374605536460876,
+                    0.14598295092582703
+                  ],
+                  [
+                    0.6167704463005066,
+                    -0.007416754961013794,
+                    0.7871089577674866,
+                    -0.4157092571258545
+                  ],
+                  [
+                    -0.6762368083000183,
+                    -0.5167737603187561,
+                    0.5250228643417358,
+                    1.0230941772460938
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandPinky2": [
+                  [
+                    0.7644063234329224,
+                    -0.15677659213542938,
+                    0.6253836154937744,
+                    0.12150371074676514
+                  ],
+                  [
+                    0.23819784820079803,
+                    0.9700320959091187,
+                    -0.047973185777664185,
+                    -0.4160304665565491
+                  ],
+                  [
+                    -0.5991201996803284,
+                    0.1856359839439392,
+                    0.7788420915603638,
+                    1.0084813833236694
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftHandPinky3": [
+                  [
+                    0.5790954232215881,
+                    0.7382241487503052,
+                    0.3459395170211792,
+                    0.11808927357196808
+                  ],
+                  [
+                    -0.30006229877471924,
+                    0.5875439643859863,
+                    -0.7515029907226562,
+                    -0.39409875869750977
+                  ],
+                  [
+                    -0.7580314874649048,
+                    0.3313887119293213,
+                    0.5617567896842957,
+                    1.0125733613967896
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightShoulder": [
+                  [
+                    0.07081856578588486,
+                    -0.9476778507232666,
+                    0.31127363443374634,
+                    -0.055038902908563614
+                  ],
+                  [
+                    -0.9935728907585144,
+                    -0.09464293718338013,
+                    -0.06209232285618782,
+                    0.05033104866743088
+                  ],
+                  [
+                    0.08830346167087555,
+                    -0.3048757314682007,
+                    -0.9482896327972412,
+                    1.4519317150115967
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightArm": [
+                  [
+                    0.5995240807533264,
+                    -0.23040470480918884,
+                    0.7664750814437866,
+                    -0.1642891764640808
+                  ],
+                  [
+                    -0.800174355506897,
+                    -0.19297848641872406,
+                    0.5678732395172119,
+                    0.039420414716005325
+                  ],
+                  [
+                    0.017072604969143867,
+                    -0.9537675976753235,
+                    -0.3000594973564148,
+                    1.4167850017547607
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightForeArm": [
+                  [
+                    0.9982743263244629,
+                    0.050251275300979614,
+                    0.030393555760383606,
+                    -0.23085598647594452
+                  ],
+                  [
+                    -0.0005528107285499573,
+                    -0.5094681978225708,
+                    0.8604897856712341,
+                    -0.01633344031870365
+                  ],
+                  [
+                    0.05872514098882675,
+                    -0.8590212464332581,
+                    -0.5085611939430237,
+                    1.1412304639816284
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHand": [
+                  [
+                    0.9929206967353821,
+                    -0.1181543692946434,
+                    -0.012165749445557594,
+                    -0.21840879321098328
+                  ],
+                  [
+                    -0.09568694233894348,
+                    -0.8563624620437622,
+                    0.5074326992034912,
+                    -0.1425274759531021
+                  ],
+                  [
+                    -0.07037373632192612,
+                    -0.5026763081550598,
+                    -0.8616058230400085,
+                    0.9284508228302002
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandThumb1": [
+                  [
+                    0.7997198104858398,
+                    0.45476654171943665,
+                    -0.39196401834487915,
+                    -0.19699136912822723
+                  ],
+                  [
+                    0.508539080619812,
+                    -0.16608572006225586,
+                    0.8448695540428162,
+                    -0.1554628610610962
+                  ],
+                  [
+                    0.3191186487674713,
+                    -0.8749878406524658,
+                    -0.36408862471580505,
+                    0.9027102589607239
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandThumb2": [
+                  [
+                    0.8886812925338745,
+                    -0.09097882360219955,
+                    -0.44940924644470215,
+                    -0.18142910301685333
+                  ],
+                  [
+                    0.4173237085342407,
+                    -0.2455754578113556,
+                    0.8749483227729797,
+                    -0.15855775773525238
+                  ],
+                  [
+                    -0.18996569514274597,
+                    -0.9650993347167969,
+                    -0.18027068674564362,
+                    0.8787737488746643
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandThumb3": [
+                  [
+                    0.5596923232078552,
+                    -0.8160393238067627,
+                    -0.1443067342042923,
+                    -0.1836814433336258
+                  ],
+                  [
+                    0.25789541006088257,
+                    0.006028354167938232,
+                    0.9661545157432556,
+                    -0.16584450006484985
+                  ],
+                  [
+                    -0.7875502109527588,
+                    -0.5779653191566467,
+                    0.21382689476013184,
+                    0.8490256071090698
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandIndex1": [
+                  [
+                    0.9986941814422607,
+                    -0.02447640895843506,
+                    -0.04483848437666893,
+                    -0.19274213910102844
+                  ],
+                  [
+                    0.04577329754829407,
+                    0.039065927267074585,
+                    0.9981882572174072,
+                    -0.21409133076667786
+                  ],
+                  [
+                    -0.022680440917611122,
+                    -0.9989371299743652,
+                    0.04013523459434509,
+                    0.8833865523338318
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandIndex2": [
+                  [
+                    0.9997634291648865,
+                    -0.021472986787557602,
+                    0.003355591092258692,
+                    -0.19335700571537018
+                  ],
+                  [
+                    0.021587848663330078,
+                    0.9990043640136719,
+                    -0.039059117436409,
+                    -0.2128312736749649
+                  ],
+                  [
+                    -0.002513567451387644,
+                    0.03912227600812912,
+                    0.9992316961288452,
+                    0.8513630628585815
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandIndex3": [
+                  [
+                    0.9992697834968567,
+                    -0.023678869009017944,
+                    0.029968904331326485,
+                    -0.19407343864440918
+                  ],
+                  [
+                    0.03755134344100952,
+                    0.4656640291213989,
+                    -0.884165346622467,
+                    -0.1831890046596527
+                  ],
+                  [
+                    0.006980558857321739,
+                    0.8846454620361328,
+                    0.4662133455276489,
+                    0.8525243997573853
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandMiddle1": [
+                  [
+                    0.9989504814147949,
+                    -0.03915172442793846,
+                    0.02377566136419773,
+                    -0.218651682138443
+                  ],
+                  [
+                    -0.018670298159122467,
+                    0.12595424056053162,
+                    0.9918607473373413,
+                    -0.21555468440055847
+                  ],
+                  [
+                    -0.04182776063680649,
+                    -0.9912632703781128,
+                    0.1250910758972168,
+                    0.8876274824142456
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandMiddle2": [
+                  [
+                    0.9953359365463257,
+                    -0.03651025891304016,
+                    0.08929325640201569,
+                    -0.21987304091453552
+                  ],
+                  [
+                    0.04734303429722786,
+                    0.9913544654846191,
+                    -0.12237800657749176,
+                    -0.21058501303195953
+                  ],
+                  [
+                    -0.08405320346355438,
+                    0.1260347217321396,
+                    0.9884589910507202,
+                    0.8484540581703186
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandMiddle3": [
+                  [
+                    0.9912261366844177,
+                    -0.03894547373056412,
+                    0.12630870938301086,
+                    -0.221287339925766
+                  ],
+                  [
+                    0.13150767982006073,
+                    0.3866109251976013,
+                    -0.9128193855285645,
+                    -0.17425468564033508
+                  ],
+                  [
+                    -0.01328214630484581,
+                    0.9214207530021667,
+                    0.38834038376808167,
+                    0.8530805110931396
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandRing1": [
+                  [
+                    0.9858627319335938,
+                    -0.11838610470294952,
+                    0.11857137829065323,
+                    -0.24097824096679688
+                  ],
+                  [
+                    -0.10362409800291061,
+                    0.1253032237291336,
+                    0.986692488193512,
+                    -0.2181396782398224
+                  ],
+                  [
+                    -0.1316680908203125,
+                    -0.9850300550460815,
+                    0.11126431822776794,
+                    0.8848371505737305
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandRing2": [
+                  [
+                    0.9449323415756226,
+                    -0.11572952568531036,
+                    0.3061196506023407,
+                    -0.24472741782665253
+                  ],
+                  [
+                    0.14816522598266602,
+                    0.9853159785270691,
+                    -0.08485506474971771,
+                    -0.21398688852787018
+                  ],
+                  [
+                    -0.29180434346199036,
+                    0.12553879618644714,
+                    0.9482039213180542,
+                    0.8520036935806274
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandRing3": [
+                  [
+                    0.8892592787742615,
+                    -0.11809378862380981,
+                    0.44189536571502686,
+                    -0.24848419427871704
+                  ],
+                  [
+                    0.4512708783149719,
+                    0.3841845989227295,
+                    -0.8054549694061279,
+                    -0.18329904973506927
+                  ],
+                  [
+                    -0.07465015351772308,
+                    0.9156727194786072,
+                    0.39493176341056824,
+                    0.8559626340866089
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandPinky1": [
+                  [
+                    0.9539275169372559,
+                    -0.1764712929725647,
+                    0.24265316128730774,
+                    -0.26103127002716064
+                  ],
+                  [
+                    -0.22294841706752777,
+                    0.12431356310844421,
+                    0.9668717384338379,
+                    -0.20888254046440125
+                  ],
+                  [
+                    -0.20079025626182556,
+                    -0.9764243364334106,
+                    0.07924211025238037,
+                    0.8864930868148804
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandPinky2": [
+                  [
+                    0.8481337428092957,
+                    -0.1737954467535019,
+                    0.500464677810669,
+                    -0.26618486642837524
+                  ],
+                  [
+                    0.21280816197395325,
+                    0.9768596291542053,
+                    -0.021411895751953125,
+                    -0.20523983240127563
+                  ],
+                  [
+                    -0.48516249656677246,
+                    0.12466306239366531,
+                    0.865492582321167,
+                    0.8578360676765442
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightHandPinky3": [
+                  [
+                    0.6513792872428894,
+                    -0.17606326937675476,
+                    0.7380430102348328,
+                    -0.2705771327018738
+                  ],
+                  [
+                    0.7364441752433777,
+                    0.38083896040916443,
+                    -0.5591174364089966,
+                    -0.1816880702972412
+                  ],
+                  [
+                    -0.1826355755329132,
+                    0.9077247977256775,
+                    0.37773141264915466,
+                    0.8609583377838135
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftUpLeg": [
+                  [
+                    -0.9806208610534668,
+                    0.19558437168598175,
+                    0.011379851959645748,
+                    0.07412219792604446
+                  ],
+                  [
+                    -0.19591081142425537,
+                    -0.9793287515640259,
+                    -0.05034226179122925,
+                    0.008306141942739487
+                  ],
+                  [
+                    0.0012984618078917265,
+                    -0.05159614235162735,
+                    0.9986673593521118,
+                    0.9623174071311951
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftLeg": [
+                  [
+                    -0.9806236028671265,
+                    -0.04730108752846718,
+                    0.19010525941848755,
+                    0.16197241842746735
+                  ],
+                  [
+                    -0.19589827954769135,
+                    0.23126846551895142,
+                    -0.9529634118080139,
+                    -0.4315759539604187
+                  ],
+                  [
+                    0.0011108622420579195,
+                    -0.9717395305633545,
+                    -0.23605352640151978,
+                    0.9391419887542725
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftFoot": [
+                  [
+                    -0.9955474138259888,
+                    -0.07759465277194977,
+                    -0.05352035537362099,
+                    0.1424000859260559
+                  ],
+                  [
+                    0.09418998658657074,
+                    -0.7966408729553223,
+                    -0.5970696210861206,
+                    -0.33588123321533203
+                  ],
+                  [
+                    0.003692936385050416,
+                    -0.5994521975517273,
+                    0.8004022836685181,
+                    0.5370537042617798
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:LeftToeBase": [
+                  [
+                    -0.9967482089996338,
+                    -0.07614907622337341,
+                    0.02635081112384796,
+                    0.13014772534370422
+                  ],
+                  [
+                    0.07511933147907257,
+                    -0.9964471459388733,
+                    -0.03808736801147461,
+                    -0.46167242527008057
+                  ],
+                  [
+                    0.029157539829611778,
+                    -0.035984188318252563,
+                    0.998927116394043,
+                    0.4423989951610565
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightUpLeg": [
+                  [
+                    -0.9958926439285278,
+                    -0.08126629143953323,
+                    0.03998534753918648,
+                    -0.07412222027778625
+                  ],
+                  [
+                    -0.02589189074933529,
+                    -0.16751106083393097,
+                    -0.9855380058288574,
+                    0.010593622922897339
+                  ],
+                  [
+                    0.0867861807346344,
+                    -0.9825154542922974,
+                    0.16472093760967255,
+                    0.962317168712616
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightLeg": [
+                  [
+                    -0.9958865642547607,
+                    -0.0030708424746990204,
+                    -0.09058544784784317,
+                    -0.11061448603868484
+                  ],
+                  [
+                    -0.026034990325570107,
+                    0.9669827222824097,
+                    0.2535395622253418,
+                    -0.06462552398443222
+                  ],
+                  [
+                    0.08681313693523407,
+                    0.25484898686408997,
+                    -0.9630768895149231,
+                    0.5211266279220581
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightFoot": [
+                  [
+                    -0.9999807476997375,
+                    0.0030032843351364136,
+                    0.005885496735572815,
+                    -0.1118856742978096
+                  ],
+                  [
+                    -0.0014630164951086044,
+                    0.7671405673027039,
+                    -0.6414896249771118,
+                    0.335432231426239
+                  ],
+                  [
+                    -0.006443627178668976,
+                    -0.6414825320243835,
+                    -0.7671116590499878,
+                    0.6265618801116943
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ],
+                "mixamorig:RightToeBase": [
+                  [
+                    -0.9980496764183044,
+                    0.03394990414381027,
+                    0.05243460834026337,
+                    -0.11141795665025711
+                  ],
+                  [
+                    -0.06106971949338913,
+                    -0.7063530087471008,
+                    -0.7052316069602966,
+                    0.4550023674964905
+                  ],
+                  [
+                    0.01309279166162014,
+                    -0.7070488333702087,
+                    0.707044780254364,
+                    0.5265777111053467
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                  ]
+                ]
+              },
+              "status": "applied"
+            },
+            "protected_matrix_delta": 0.0,
+            "changed_joints": [
+              "mixamorig:LeftArm",
+              "mixamorig:LeftForeArm",
+              "mixamorig:LeftHand",
+              "mixamorig:LeftHandThumb1",
+              "mixamorig:LeftHandThumb2",
+              "mixamorig:LeftHandThumb3",
+              "mixamorig:LeftHandIndex1",
+              "mixamorig:LeftHandIndex2",
+              "mixamorig:LeftHandIndex3",
+              "mixamorig:LeftHandMiddle1",
+              "mixamorig:LeftHandMiddle2",
+              "mixamorig:LeftHandMiddle3",
+              "mixamorig:LeftHandRing1",
+              "mixamorig:LeftHandRing2",
+              "mixamorig:LeftHandRing3",
+              "mixamorig:LeftHandPinky1",
+              "mixamorig:LeftHandPinky2",
+              "mixamorig:LeftHandPinky3",
+              "mixamorig:RightArm",
+              "mixamorig:RightForeArm",
+              "mixamorig:RightHand",
+              "mixamorig:RightHandThumb1",
+              "mixamorig:RightHandThumb2",
+              "mixamorig:RightHandThumb3",
+              "mixamorig:RightHandIndex1",
+              "mixamorig:RightHandIndex2",
+              "mixamorig:RightHandIndex3",
+              "mixamorig:RightHandMiddle1",
+              "mixamorig:RightHandMiddle2",
+              "mixamorig:RightHandMiddle3",
+              "mixamorig:RightHandRing1",
+              "mixamorig:RightHandRing2",
+              "mixamorig:RightHandRing3",
+              "mixamorig:RightHandPinky1",
+              "mixamorig:RightHandPinky2",
+              "mixamorig:RightHandPinky3"
+            ]
+          }
+        ],
+        "reasons": [],
+        "score_status": "not_scored",
+        "release_allowed": false,
+        "bone_length_error_m": 5.357580257214778e-08,
+        "final_check": {
+          "accepted": true,
+          "skin": {
+            "accepted": true,
+            "reasons": [],
+            "new_collisions": [],
+            "scope": "measured_skin_nonregression_not_pose_similarity"
+          },
+          "contact": {
+            "accepted": true,
+            "reasons": [],
+            "protected_matrix_delta": 0.0,
+            "members": [
+              {
+                "side": "left",
+                "metrics": {
+                  "wrist_swing_deg": 9.840158768362636,
+                  "wrist_twist_deg": 0.47146794808614617,
+                  "elbow_flexion_deg": 32.88994949530683,
+                  "bone_length_error_m": 1.9341005630391095e-08,
+                  "wrist_goal_error_m": 1.519626234052415e-07,
+                  "patch_median_m": 0.004965958651155233,
+                  "patch_p90_m": 0.006947706453502178,
+                  "patch_samples": 21,
+                  "normal_error_deg": 0.0
+                },
+                "reasons": []
+              },
+              {
+                "side": "right",
+                "metrics": {
+                  "wrist_swing_deg": 35.00929572305926,
+                  "wrist_twist_deg": 0.4829488557507029,
+                  "elbow_flexion_deg": 25.03543856301456,
+                  "bone_length_error_m": 3.8064367263723753e-07,
+                  "wrist_goal_error_m": 5.3726900748371916e-08,
+                  "hand_back_up_dot": 0.8728731870651245
+                },
+                "reasons": []
+              }
+            ],
+            "new_skin": []
+          }
+        }
+      }
+    }
+  ],
+  "artificial_perturbations": true,
+  "benchmark_score_evidence": false
+}

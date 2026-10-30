@@ -1298,3 +1298,7 @@ This additive phase preserves the existing candidate selection, automatic `/refi
 The Converter's existing `final-fbx-v1`/`skin_verified` receipt checks finite geometry, skeleton and skin binding. It does **not** certify absence of penetration or folding. `CONVERTER_REFINE_V3_MESH_SHADOW=1` optionally records a separate full-body audit before framing, default off. Strict `refine-v3-final-artifact-v1` issuance requires a supported complete mesh audit, exact full-body bytes, reimport integrity, profile/context/revision match; current production profiles are unsupported. Cropped/rotated strict derivations remain unsupported. Existing five-scope artifact-ready and separate preview continue unchanged.
 
 [Implementation, verification and unsupported scope](REFINE_V3_IMPLEMENTATION_2026-10-22.md), [Converter support boundary](../converter/REFINE_V3_SUPPORT.md).
+
+## Scene camera transport extension
+
+Converter `/compose-scene` may return an artifact-bound `X-Standin-Scene-Camera` header; v4 `/scene/build` returns the matching `camera` object. See [scene-camera-transport-v1.md](scene-camera-transport-v1.md). Binary bodies and existing version/hash fields remain unchanged. This does not claim automatic CSP camera application.

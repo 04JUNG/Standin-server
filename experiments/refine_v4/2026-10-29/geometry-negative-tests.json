@@ -1,0 +1,103 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "mode": "fingerprint",
+      "accepted": false,
+      "reasons": [
+        "native part fingerprint mismatch"
+      ],
+      "unmodified": true
+    },
+    {
+      "mode": "topology",
+      "accepted": false,
+      "reasons": [
+        "canonical topology mismatch"
+      ],
+      "unmodified": true
+    },
+    {
+      "mode": "weights",
+      "accepted": false,
+      "reasons": [
+        "canonical named weights mismatch"
+      ],
+      "unmodified": true
+    },
+    {
+      "mode": "wrong_relation",
+      "accepted": false,
+      "status": "not_applied",
+      "method": "native_rest_geometry_part",
+      "part_id": "b0e359fb7c20f4476c95ca1541dc2dfa2a8c908f32a38e5900de61f09875f271",
+      "reasons": [
+        "native anatomical crossing order does not match declared intent"
+      ],
+      "release_allowed": false,
+      "rollback_matrix_delta": 0.0
+    },
+    {
+      "mode": "missing_skin",
+      "accepted": false,
+      "status": "not_applied",
+      "method": "native_rest_geometry_part",
+      "part_id": "a6fbcba188feafcc14877cdaa49b9e5d22e06633cf7268aeede4b1d32e9c316e",
+      "reasons": [
+        "complete baseline skin measurement required"
+      ],
+      "release_allowed": false,
+      "rollback_matrix_delta": 0.0
+    },
+    {
+      "mode": "new_skin",
+      "accepted": false,
+      "status": "not_applied",
+      "method": "native_rest_geometry_part",
+      "part_id": "a6fbcba188feafcc14877cdaa49b9e5d22e06633cf7268aeede4b1d32e9c316e",
+      "reasons": [
+        "native part skin rejected"
+      ],
+      "release_allowed": false,
+      "measured_relation": null,
+      "skin_check": {
+        "accepted": false,
+        "reasons": [
+          "new_skin_penetration"
+        ],
+        "new_collisions": [
+          {
+            "regions": [
+              "LeftThigh",
+              "RightThigh"
+            ],
+            "max_depth_mm": 500
+          }
+        ],
+        "scope": "measured_skin_nonregression_not_pose_similarity"
+      },
+      "rollback_matrix_delta": 0.0
+    },
+    {
+      "mode": "real_skin",
+      "accepted": true,
+      "status": "applied",
+      "method": "native_rest_geometry_part",
+      "part_id": "a6fbcba188feafcc14877cdaa49b9e5d22e06633cf7268aeede4b1d32e9c316e",
+      "reasons": [],
+      "release_allowed": false,
+      "measured_relation": null,
+      "skin_check": {
+        "accepted": true,
+        "reasons": [],
+        "new_collisions": [],
+        "scope": "measured_skin_nonregression_not_pose_similarity"
+      },
+      "protected_matrix_delta": 1.1771917343139648e-06,
+      "template_matrix_delta": 1.1599757350211348e-06,
+      "exact_lower_vertices": 9669
+    }
+  ],
+  "source_sha256": "a19ccccdfe6ef3fa6c936c2f0de490dd0dc753da9ed9a02b2df3286720fbad2e",
+  "donor_sha256": "ef47ec6aa43f343f6ac52c01687a908db8e586226c6701ee48a668d01220a373"
+}

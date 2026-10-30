@@ -154,7 +154,8 @@ class Engine:
             i = p["person_index"]
             pose = p["pose_id"]
             obs = p["observation"]
-            if not re.fullmatch(r"[A-Za-z0-9_\-]+", pose) or p["output_scope"] not in (
+            from .assets import valid_pose_id
+            if not valid_pose_id(pose) or p["output_scope"] not in (
                 "full",
                 "half",
                 "bust",
@@ -285,7 +286,10 @@ class Engine:
         validate_layout(layout)
         data = (folder / "scene.fbx").read_bytes()
         preview = b"" if artifact_only else (folder / "final.png").read_bytes()
+        from converter.scene_camera_transport import camera_binding
+        framing = result["results"]["final"]["verification"]["framing"]
         return dict(
+            camera=camera_binding(framing, digest(data)),
             version=VERSION,
             plan_id=key,
             artifact_sha256=digest(data),

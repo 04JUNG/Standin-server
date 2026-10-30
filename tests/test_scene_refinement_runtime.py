@@ -163,7 +163,9 @@ def test_scene_artifact_only_build_does_not_read_final_png(tmp_path, monkeypatch
     folder.mkdir(parents=True)
     (work / 'inputs.json').write_text(json.dumps([{'cut_id': 'scene'}]))
     (folder / 'layout.json').write_text('{}')
-    (folder / 'scene-result.json').write_text('{"verified":true}')
+    from converter.rough_layout import camera_for
+    from converter.scene_camera import framing_recipe
+    (folder / 'scene-result.json').write_text(json.dumps({"results": {"final": {"verification": {"framing": framing_recipe(camera_for(1000, 768))}}}}))
     data = MAGIC + b'verified-scene'
     (folder / 'scene.fbx').write_bytes(data)
     ctx = SimpleNamespace(work=work)
