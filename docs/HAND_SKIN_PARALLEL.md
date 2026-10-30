@@ -31,10 +31,13 @@ hand presets, solver, search weights and permission schemas are unchanged.
 
 Receipts, BVHs, hand presets, diagnostics, failures and cancellation events belong
 to a session/request. Presets are copied at session creation. The only gate-wide
-state is capacity accounting and the existing library hash registry. A repeated
-search, including the same input from another user, must run its own checks.
-There is no shared receipt cache, persistent artifact cache, user-ID cache key,
-or client-provided identity/cancellation token.
+state is capacity accounting, the existing library hash registry and an optional
+read-only operator release catalog. A repeated
+search, including the same input from another user, runs its own checks by default.
+There is no runtime-learned shared receipt cache, persistent artifact cache,
+user-ID cache key or client-provided identity/cancellation token. The separate
+opt-in [operator-prevalidated library catalog](HAND_SCREEN_PREVALIDATION.md)
+contains only explicit immutable release assets; it never learns from user requests.
 
 `library_text()` still checks the registered pose ID, path containment, symlinks
 and current BVH bytes before session-local reuse. `HandSkinClient` still binds

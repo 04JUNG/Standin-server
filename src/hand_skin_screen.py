@@ -4,7 +4,7 @@ Only the opposite-hand skin triangle test is certified by a clear receipt.
 Unknown/errors are review evidence, never eligible library/generated results.
 """
 from contextlib import contextmanager
-from copy import copy
+from copy import copy, deepcopy
 import hashlib
 import json
 import math
@@ -13,6 +13,7 @@ from pathlib import Path
 from time import monotonic
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
+from urllib.parse import urlencode
 
 from converter.hand_contact import SCREEN_VERSION, validate_screen
 from converter.hand_library import load_library, normalize_request
@@ -56,12 +57,31 @@ def availability(headers):
 
 
 class HandSkinClient:
-    def __init__(self, base_url, character_id, character_sha256, *, opener=None):
+    def __init__(self, base_url, character_id, character_sha256, *, opener=None, shape_sha256=None):
         self.base_url = base_url.rstrip('/')
         self.character_id, self.character_sha256 = character_id, character_sha256
         self.opener = opener or urlopen
+        # This endpoint certifies base FBXs only. Never reuse its result as a
+        # certificate for a shape recipe applied to the same source file.
+        self.shape_sha256 = shape_sha256
+
+    def screening_profile(self, timeout=1.):
+        """Read the current Converter identity once per requesting session."""
+        if self.shape_sha256 is not None:
+            return None
+        request = Request(self.base_url + '/hand-screen-profile?' + urlencode(
+            {'character_id': self.character_id}), headers={'Accept': 'application/json'})
+        with self.opener(request, timeout=timeout) as response:
+            if response.status != 200:
+                return None
+            data = response.read(4097)
+        if len(data) > 4096:
+            return None
+        return json.loads(data)
 
     def check(self, text, hands, timeout):
+        if self.shape_sha256 is not None:
+            return unknown('hand_screen_body_shape_unsupported')
         if not self.base_url or not self.character_sha256:
             return unknown('hand_screen_converter_not_configured')
         try:
@@ -140,12 +160,13 @@ class HandSkinClient:
 
 class HandSkinGate:
     def __init__(self, client, bvh_root, hashes, *, budget_seconds=45., max_checks=10,
-                 concurrency=1):
+                 concurrency=1, catalog=None):
         if not math.isfinite(budget_seconds) or not 0 < budget_seconds <= 60:
             raise ValueError('hand screen budget must be finite and in (0,60]')
         self.client, self.root, self.hashes = client, Path(bvh_root), dict(hashes)
         self.budget_seconds, self.max_checks = budget_seconds, max_checks
         self.concurrency = validate_concurrency(concurrency)
+        self.catalog = catalog
         # Bound aggregate checks across people/requests sharing this engine.
         if concurrency > 1:
             from .hand_skin_parallel import ScreenSlots
@@ -174,13 +195,67 @@ class SkinSession:
         self.gate = gate
         # Optional mirror priority is request/session-local, never shared between analyses.
         self.client = copy(gate.client) if isinstance(gate.client, HandSkinClient) else gate.client
-        self.hands = hands
+        self.hands = deepcopy(hands)
         self.spent_seconds = 0.
         self.checks = 0
         self.failed = False
         self.cache = {}
         self.rejected, self.unverified = [], []
         self.events = []
+        self._profile_checked = False
+        self._screening_profile = None
+        self._library_cache = {}
+
+    def library_check(self, pose_id, text):
+        """Use only a pinned operator certificate for a verified library asset.
+
+        Generated/custom BVHs never call this path. A miss, stale profile or
+        unreachable profile endpoint delegates to the unchanged live checker.
+        """
+        if (self.gate.catalog is None or self.failed
+                or self.spent_seconds >= self.gate.budget_seconds
+                or (getattr(self, 'cancelled', None) is not None and self.cancelled.is_set())):
+            return None
+        key = hashlib.sha256(text.encode()).hexdigest()
+        if key in self.cache:
+            return None
+        library_key = (pose_id, key)
+        if library_key in self._library_cache:
+            return deepcopy(self._library_cache[library_key])
+        if self.checks >= self.gate.max_checks:
+            return None
+        started = monotonic()
+        receipt = None
+        try:
+            if not self.gate.catalog.can_lookup(pose_id, text, self.hands, self.client):
+                return None
+            if not self._profile_checked:
+                self._profile_checked = True
+                self._screening_profile = self.client.screening_profile(
+                    timeout=min(1., self.gate.budget_seconds-self.spent_seconds))
+            receipt = self.gate.catalog.lookup(pose_id, text, self.hands, self.client, self._screening_profile)
+        except Exception:
+            # An optimization can never manufacture a pass or disable live checks.
+            receipt = None
+        finally:
+            elapsed = monotonic()-started
+            self.spent_seconds += elapsed
+            if hasattr(self, 'wall_seconds'):
+                self.wall_seconds += elapsed
+        if (receipt is None or self.spent_seconds >= self.gate.budget_seconds
+                or (getattr(self, 'cancelled', None) is not None and self.cancelled.is_set())):
+            return None
+        self.checks += 1
+        # Keep certificates separate: a later generated BVH must use live checks
+        # even when its bytes happen to equal a certified library asset.
+        self._library_cache[library_key] = deepcopy(receipt)
+        event = dict(check=self.checks, status=receipt['status'],
+            elapsed_ms=round(elapsed*1000, 3), optional=getattr(self, 'optional',
+                getattr(self.client, '_screen_optional', False)), source='prevalidated_library')
+        self.events.append(event)
+        from .logging_setup import log_info
+        log_info('hand_skin_screen_check', **event)
+        return deepcopy(receipt)
 
     @contextmanager
     def optional_phase(self):
@@ -236,7 +311,9 @@ class SkinSession:
                 text = candidate['bvh'] if generated else self.gate.library_text(candidate['pose_id'])
                 if not isinstance(text, str) or not text:
                     raise ValueError('missing BVH')
-                receipt = self.check(text)
+                receipt = None if generated else self.library_check(candidate['pose_id'], text)
+                if receipt is None:
+                    receipt = self.check(text)
             except Exception:
                 receipt = unknown('hand_screen_bvh_unavailable_or_changed')
             result = {**candidate, 'hand_skin_screen': receipt}
@@ -268,6 +345,10 @@ def build_hand_skin_gate(camera, bvh_root):
     character_id = CFG.thumbnail_character_id
     digest = characters['characters'].get(character_id, {}).get('sha256')
     client = HandSkinClient(CFG.thumbnail_converter_url, character_id, digest)
+    catalog = None
+    if CFG.hand_skin_prevalidated_path:
+        from converter.hand_screen_catalog import LibraryScreenCatalog
+        catalog = LibraryScreenCatalog(CFG.hand_skin_prevalidated_path, CFG.hand_skin_prevalidated_sha256)
     return HandSkinGate(client, bvh_root, camera.hashes,
                         budget_seconds=CFG.hand_skin_screen_budget_seconds,
-                        concurrency=CFG.hand_skin_screen_concurrency)
+                        concurrency=CFG.hand_skin_screen_concurrency, catalog=catalog)

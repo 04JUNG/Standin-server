@@ -183,6 +183,13 @@ class ParallelSkinSession(SkinSession):
             target.append(item)
 
     def filter(self, candidates, *, generated=False, limit=5):
+        if self.gate.catalog is not None and not generated:
+            # Static certificates are cheap and commit strictly in order. This
+            # keeps mixed hit/miss/failure semantics identical to serial. A
+            # certificate miss uses live checks in order; generated work still
+            # uses the unchanged bounded parallel path below.
+            result = SkinSession.filter(self, candidates, generated=False, limit=limit)
+            return [] if self.cancelled.is_set() else result
         accepted = []
         pending = iter(candidates)
         finished = False

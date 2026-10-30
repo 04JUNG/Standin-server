@@ -28,6 +28,7 @@ from converter_api.runner import BlenderRunner, RunnerSettings
 from converter_api.work_queue import PrioritySlots
 from src.hand_skin_capacity import validate_concurrency
 from src.hand_skin_screen import HandSkinClient, HandSkinGate
+from converter.hand_screen_catalog import LibraryScreenCatalog, binding, make_catalog
 
 
 def sha(path):
@@ -54,10 +55,11 @@ def main():
     parser.add_argument('--manifest', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--blender', required=True)
+    parser.add_argument('--character-id', default='standin-master-v2')
     parser.add_argument('--port', type=int, default=0)
     parser.add_argument('--rounds', type=int, choices=range(1, 6), default=2)
     parser.add_argument('--capacities', type=int, nargs='+', default=[1, 2, 3, 4, 5])
-    parser.add_argument('--modes', nargs='+', choices=['service', 'converter'], default=['service', 'converter'])
+    parser.add_argument('--modes', nargs='+', choices=['service', 'converter', 'prevalidated'], default=['service', 'converter'])
     args = parser.parse_args()
     capacities = list(dict.fromkeys(validate_concurrency(n) for n in args.capacities))
     if 1 not in capacities: parser.error('capacity 1 is required as the unchanged baseline')
@@ -80,10 +82,10 @@ def main():
         hashes[name] = row['sha256']
         (inputs / (name + '.bvh')).write_bytes(source.read_bytes())
     report = {'status': 'running', 'source': manifest.get('source'),
-        'character_sha256': sha(character), 'fixtures': hashes, 'rounds': args.rounds,
+        'character_id': args.character_id, 'character_sha256': sha(character), 'fixtures': hashes, 'rounds': args.rounds,
         'session_budget_seconds': 45, 'call_budget_seconds': 15,
         'scope': 'fixed BVHs; no fresh image/model inference; local loopback Converter API',
-        'external_model_calls': 0, 'rows': [], 'artifacts': [],
+        'external_model_calls': 0, 'rows': [], 'artifacts': [], 'catalog_preparation': [],
         'limits': {'cpu_max': None, 'memory_max_bytes': read_number('/sys/fs/cgroup/memory.max')}}
     try: report['limits']['cpu_max'] = Path('/sys/fs/cgroup/cpu.max').read_text().strip()
     except OSError: pass
@@ -117,8 +119,10 @@ def main():
         timeout_seconds=30, temp_root=out / 'scratch'))
     runner.settings.temp_root.mkdir()
     report['blender'] = vars(runner.inspect_blender())
-    registry = CharacterRegistry(ROOT / 'config/characters.example.json',
-        environ={'STANDIN_MASTER_V2_URI': str(character)}, artifact_cache_dir=out / 'characters')
+    registry_path = ROOT / 'config/characters.example.json'
+    character_env = json.loads(registry_path.read_text())['characters'][args.character_id]['artifact_uri_env']
+    registry = CharacterRegistry(registry_path, default_character_id=args.character_id,
+        environ={character_env: str(character)}, artifact_cache_dir=out / 'characters')
     app = create_app(registry=registry, runner=runner)
     import uvicorn
     listener = socket.socket()
@@ -131,10 +135,29 @@ def main():
         if not thread.is_alive() or time.monotonic() > deadline: raise RuntimeError('local API failed to start')
         time.sleep(.01)
     client = HandSkinClient(f'http://127.0.0.1:{listener.getsockname()[1]}',
-        'standin-master-v2', report['character_sha256'])
+        args.character_id, report['character_sha256'])
     try:
         for preset in manifest.get('hand_settings', [{'id': 'relaxed', 'hands': {'left': 'relaxed', 'right': 'relaxed'}}]):
+            if not isinstance(preset['id'], str) or not preset['id'].isidentifier():
+                raise ValueError('unsafe hand preset label')
             runner.label = preset['id']
+            catalog = None
+            if 'prevalidated' in args.modes:
+                preparation_started = time.monotonic()
+                profile = client.screening_profile(timeout=5.)
+                entries = []
+                for pid, source_sha in hashes.items():
+                    receipt = client.check((inputs / (pid + '.bvh')).read_bytes().decode(), preset['hands'], 15.)
+                    entries.append((binding(pid, source_sha, client.character_id,
+                        client.character_sha256, preset['hands'], profile['profile_sha256']), receipt))
+                if client.screening_profile(timeout=5.) != profile:
+                    raise ValueError('Converter changed during certificate preparation')
+                catalog_path = out / f'catalog-{preset["id"]}.json'
+                catalog_path.write_text(json.dumps(make_catalog(entries), ensure_ascii=False, indent=2) + '\n')
+                catalog = LibraryScreenCatalog(catalog_path, sha(catalog_path))
+                report['catalog_preparation'].append(dict(preset=preset['id'], entries=len(entries),
+                    seconds=time.monotonic()-preparation_started, sha256=sha(catalog_path)))
+                save()
             for round_index in range(args.rounds):
                 order = capacities if round_index % 2 == 0 else list(reversed(capacities))
                 for mode in args.modes:
@@ -142,7 +165,8 @@ def main():
                         assert runner.active == 0
                         runner._process_slots = PrioritySlots(capacity)
                         runner.peak = 0
-                        gate = HandSkinGate(client, inputs, hashes, concurrency=capacity)
+                        gate = HandSkinGate(client, inputs, hashes, concurrency=capacity,
+                            catalog=catalog if mode == 'prevalidated' else None)
                         session = gate.session(deepcopy(preset['hands']))
                         samples = []
                         stop = threading.Event()
@@ -153,8 +177,9 @@ def main():
                         sampler = threading.Thread(target=sample, daemon=True)
                         sampler.start()
                         started = time.monotonic()
+                        artifacts_before = len(report['artifacts'])
                         try:
-                            if mode == 'service':
+                            if mode in ('service', 'prevalidated'):
                                 selected = session.filter([{'pose_id': pid} for pid in hashes], limit=5)
                                 business = {'selected': semantic(selected),
                                     'rejected': semantic(session.rejected), 'unverified': semantic(session.unverified)}
@@ -171,7 +196,9 @@ def main():
                             stop.set(); sampler.join(1)
                         row = {'preset': preset['id'], 'round': round_index + 1, 'mode': mode,
                             'capacity': capacity, 'seconds': elapsed, 'peak_active_blender': runner.peak,
-                            'memory_peak_bytes': max(samples, default=None), 'business_result': business}
+                            'memory_peak_bytes': max(samples, default=None), 'business_result': business,
+                            'fbx_conversions': len(report['artifacts'])-artifacts_before,
+                            'prevalidated_checks': sum(e.get('source')=='prevalidated_library' for e in session.events)}
                         report['rows'].append(row)
                         save()
                         print('HAND_CAPACITY_RUN ' + json.dumps({k: v for k, v in row.items() if k != 'business_result'}), flush=True)
@@ -186,6 +213,14 @@ def main():
                         'median_seconds': statistics.median(r['seconds'] for r in group),
                         'peak_active_blender': max(r['peak_active_blender'] for r in group),
                         'business_results_equal': all(r['business_result'] == baseline for r in group)})
+                if mode == 'prevalidated' and 'service' in args.modes:
+                    live = next(r['business_result'] for r in report['rows']
+                        if r['preset'] == preset['id'] and r['mode'] == 'service' and r['capacity'] == 1)
+                    for row in rows:
+                        if row['business_result'] != live:
+                            raise AssertionError('prevalidated selection/receipts changed from live serial')
+            if 'prevalidated' in args.modes and 'service' in args.modes:
+                report.setdefault('prevalidation_matches_live', {})[preset['id']] = True
         report['status'] = 'timing_complete'
         save()
     finally:
