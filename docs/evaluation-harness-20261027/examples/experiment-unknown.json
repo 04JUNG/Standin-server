@@ -1,0 +1,517 @@
+{
+  "schema_version": "evaluation-extension-v1",
+  "baseline": "F25",
+  "decision": "INCONCLUSIVE",
+  "expected_rows": 6,
+  "observed_rows": 6,
+  "denominator": {
+    "persons": 2,
+    "arms": 3
+  },
+  "report_scope": "engineering_contract_and_evidence_completeness; use legacy promotion analysis separately",
+  "arms": {
+    "B0_no_refine": {
+      "dimensions": {
+        "execution": {
+          "denominator": 2,
+          "pass": 1,
+          "fail": 0,
+          "unknown": 1,
+          "states": {
+            "abstained": 0,
+            "error": 0,
+            "fail": 0,
+            "missing_dependency": 0,
+            "pass": 1,
+            "timeout": 0,
+            "unknown": 1,
+            "unsupported": 0
+          },
+          "pass_rate": 0.5
+        },
+        "human_usability": {
+          "denominator": 2,
+          "pass": 0,
+          "fail": 0,
+          "unknown": 2,
+          "states": {
+            "abstained": 0,
+            "error": 0,
+            "fail": 0,
+            "missing_dependency": 0,
+            "pass": 0,
+            "timeout": 0,
+            "unknown": 2,
+            "unsupported": 0
+          },
+          "pass_rate": 0.0
+        },
+        "skeleton_capsule_proxy": {
+          "denominator": 2,
+          "pass": 1,
+          "fail": 0,
+          "unknown": 1,
+          "states": {
+            "abstained": 0,
+            "error": 0,
+            "fail": 0,
+            "missing_dependency": 0,
+            "pass": 1,
+            "timeout": 0,
+            "unknown": 1,
+            "unsupported": 0
+          },
+          "pass_rate": 0.5
+        },
+        "exact_recovery": {
+          "denominator": 2,
+          "pass": 1,
+          "fail": 0,
+          "unknown": 1,
+          "states": {
+            "abstained": 0,
+            "error": 0,
+            "fail": 0,
+            "missing_dependency": 0,
+            "pass": 1,
+            "timeout": 0,
+            "unknown": 1,
+            "unsupported": 0
+          },
+          "pass_rate": 0.5
+        },
+        "immutable_bindings": {
+          "denominator": 2,
+          "pass": 0,
+          "fail": 0,
+          "unknown": 2,
+          "states": {
+            "abstained": 0,
+            "error": 0,
+            "fail": 0,
+            "missing_dependency": 0,
+            "pass": 0,
+            "timeout": 0,
+            "unknown": 2,
+            "unsupported": 0
+          },
+          "pass_rate": 0.0
+        },
+        "refine_time": {
+          "denominator": 2,
+          "pass": 0,
+          "fail": 0,
+          "unknown": 2,
+          "states": {
+            "abstained": 0,
+            "error": 0,
+            "fail": 0,
+            "missing_dependency": 0,
+            "pass": 0,
+            "timeout": 0,
+            "unknown": 2,
+            "unsupported": 0
+          },
+          "pass_rate": 0.0
+        },
+        "full_deformed_mesh_safety": {
+          "denominator": 2,
+          "pass": 0,
+          "fail": 0,
+          "unknown": 2,
+          "states": {
+            "abstained": 0,
+            "error": 0,
+            "fail": 0,
+            "missing_dependency": 0,
+            "pass": 0,
+            "timeout": 0,
+            "unknown": 2,
+            "unsupported": 0
+          },
+          "pass_rate": 0.0
+        }
+      },
+      "reasons": {
+        "pass": 1,
+        "selected_candidate_unavailable": 1
+      },
+      "latency": {
+        "count": 0,
+        "p50_ms": null,
+        "p95_ms": null,
+        "max_ms": null,
+        "basis": "adapter_health_refine_and_artifact_fetch; excludes_source_search_and_base_fetch"
+      },
+      "execution_kinds": {
+        "identity": 1,
+        "not_executed": 1
+      },
+      "backend_pairs": [
+        {
+          "requested": "identity",
+          "actual": "identity",
+          "count": 1
+        },
+        {
+          "requested": "identity",
+          "actual": null,
+          "count": 1
+        }
+      ]
+    },
+    "F25": {
+      "dimensions": {
+        "execution": {
+          "denominator": 2,
+          "pass": 0,
+          "fail": 0,
+          "unknown": 2,
+          "states": {
+            "abstained": 1,
+            "error": 0,
+            "fail": 0,
+            "missing_dependency": 0,
+            "pass": 0,
+            "timeout": 0,
+            "unknown": 1,
+            "unsupported": 0
+          },
+          "pass_rate": 0.0
+        },
+        "human_usability": {
+          "denominator": 2,
+          "pass": 0,
+          "fail": 0,
+          "unknown": 2,
+          "states": {
+            "abstained": 0,
+            "error": 0,
+            "fail": 0,
+            "missing_dependency": 0,
+            "pass": 0,
+            "timeout": 0,
+            "unknown": 2,
+            "unsupported": 0
+          },
+          "pass_rate": 0.0
+        },
+        "skeleton_capsule_proxy": {
+          "denominator": 2,
+          "pass": 1,
+          "fail": 0,
+          "unknown": 1,
+          "states": {
+            "abstained": 0,
+            "error": 0,
+            "fail": 0,
+            "missing_dependency": 0,
+            "pass": 1,
+            "timeout": 0,
+            "unknown": 1,
+            "unsupported": 0
+          },
+          "pass_rate": 0.5
+        },
+        "exact_recovery": {
+          "denominator": 2,
+          "pass": 1,
+          "fail": 0,
+          "unknown": 1,
+          "states": {
+            "abstained": 0,
+            "error": 0,
+            "fail": 0,
+            "missing_dependency": 0,
+            "pass": 1,
+            "timeout": 0,
+            "unknown": 1,
+            "unsupported": 0
+          },
+          "pass_rate": 0.5
+        },
+        "immutable_bindings": {
+          "denominator": 2,
+          "pass": 0,
+          "fail": 0,
+          "unknown": 2,
+          "states": {
+            "abstained": 0,
+            "error": 0,
+            "fail": 0,
+            "missing_dependency": 0,
+            "pass": 0,
+            "timeout": 0,
+            "unknown": 2,
+            "unsupported": 0
+          },
+          "pass_rate": 0.0
+        },
+        "refine_time": {
+          "denominator": 2,
+          "pass": 0,
+          "fail": 0,
+          "unknown": 2,
+          "states": {
+            "abstained": 0,
+            "error": 0,
+            "fail": 0,
+            "missing_dependency": 0,
+            "pass": 0,
+            "timeout": 0,
+            "unknown": 2,
+            "unsupported": 0
+          },
+          "pass_rate": 0.0
+        },
+        "full_deformed_mesh_safety": {
+          "denominator": 2,
+          "pass": 0,
+          "fail": 0,
+          "unknown": 2,
+          "states": {
+            "abstained": 0,
+            "error": 0,
+            "fail": 0,
+            "missing_dependency": 0,
+            "pass": 0,
+            "timeout": 0,
+            "unknown": 2,
+            "unsupported": 0
+          },
+          "pass_rate": 0.0
+        }
+      },
+      "reasons": {
+        "abstained": 1,
+        "selected_candidate_unavailable": 1
+      },
+      "latency": {
+        "count": 0,
+        "p50_ms": null,
+        "p95_ms": null,
+        "max_ms": null,
+        "basis": "adapter_health_refine_and_artifact_fetch; excludes_source_search_and_base_fetch"
+      },
+      "execution_kinds": {
+        "fixture": 1,
+        "not_executed": 1
+      },
+      "backend_pairs": [
+        {
+          "requested": "numpy",
+          "actual": "none",
+          "count": 1
+        },
+        {
+          "requested": "numpy",
+          "actual": null,
+          "count": 1
+        }
+      ]
+    },
+    "v3": {
+      "dimensions": {
+        "execution": {
+          "denominator": 2,
+          "pass": 0,
+          "fail": 0,
+          "unknown": 2,
+          "states": {
+            "abstained": 0,
+            "error": 0,
+            "fail": 0,
+            "missing_dependency": 1,
+            "pass": 0,
+            "timeout": 0,
+            "unknown": 1,
+            "unsupported": 0
+          },
+          "pass_rate": 0.0
+        },
+        "human_usability": {
+          "denominator": 2,
+          "pass": 0,
+          "fail": 0,
+          "unknown": 2,
+          "states": {
+            "abstained": 0,
+            "error": 0,
+            "fail": 0,
+            "missing_dependency": 0,
+            "pass": 0,
+            "timeout": 0,
+            "unknown": 2,
+            "unsupported": 0
+          },
+          "pass_rate": 0.0
+        },
+        "skeleton_capsule_proxy": {
+          "denominator": 2,
+          "pass": 0,
+          "fail": 0,
+          "unknown": 2,
+          "states": {
+            "abstained": 0,
+            "error": 0,
+            "fail": 0,
+            "missing_dependency": 0,
+            "pass": 0,
+            "timeout": 0,
+            "unknown": 2,
+            "unsupported": 0
+          },
+          "pass_rate": 0.0
+        },
+        "exact_recovery": {
+          "denominator": 2,
+          "pass": 0,
+          "fail": 0,
+          "unknown": 2,
+          "states": {
+            "abstained": 0,
+            "error": 0,
+            "fail": 0,
+            "missing_dependency": 0,
+            "pass": 0,
+            "timeout": 0,
+            "unknown": 2,
+            "unsupported": 0
+          },
+          "pass_rate": 0.0
+        },
+        "immutable_bindings": {
+          "denominator": 2,
+          "pass": 0,
+          "fail": 0,
+          "unknown": 2,
+          "states": {
+            "abstained": 0,
+            "error": 0,
+            "fail": 0,
+            "missing_dependency": 0,
+            "pass": 0,
+            "timeout": 0,
+            "unknown": 2,
+            "unsupported": 0
+          },
+          "pass_rate": 0.0
+        },
+        "refine_time": {
+          "denominator": 2,
+          "pass": 0,
+          "fail": 0,
+          "unknown": 2,
+          "states": {
+            "abstained": 0,
+            "error": 0,
+            "fail": 0,
+            "missing_dependency": 0,
+            "pass": 0,
+            "timeout": 0,
+            "unknown": 2,
+            "unsupported": 0
+          },
+          "pass_rate": 0.0
+        },
+        "full_deformed_mesh_safety": {
+          "denominator": 2,
+          "pass": 0,
+          "fail": 0,
+          "unknown": 2,
+          "states": {
+            "abstained": 0,
+            "error": 0,
+            "fail": 0,
+            "missing_dependency": 0,
+            "pass": 0,
+            "timeout": 0,
+            "unknown": 2,
+            "unsupported": 0
+          },
+          "pass_rate": 0.0
+        }
+      },
+      "reasons": {
+        "adapter_not_configured": 1,
+        "selected_candidate_unavailable": 1
+      },
+      "latency": {
+        "count": 0,
+        "p50_ms": null,
+        "p95_ms": null,
+        "max_ms": null,
+        "basis": "adapter_health_refine_and_artifact_fetch; excludes_source_search_and_base_fetch"
+      },
+      "execution_kinds": {
+        "not_executed": 2
+      },
+      "backend_pairs": [
+        {
+          "requested": "numpy",
+          "actual": null,
+          "count": 2
+        }
+      ]
+    }
+  },
+  "search": {
+    "candidate_coverage_at_5": {
+      "pass": 0,
+      "fail": 1,
+      "unknown": 1,
+      "denominator": 2
+    },
+    "accepted_at_1": {
+      "pass": 0,
+      "fail": 1,
+      "unknown": 1,
+      "denominator": 2
+    },
+    "assist_success_at_5": {
+      "pass": 0,
+      "fail": 0,
+      "unknown": 2,
+      "denominator": 2
+    }
+  },
+  "hard_failures": [],
+  "incomplete_reasons": [
+    "B0_no_refine:exact_recovery:unknown",
+    "B0_no_refine:execution:unknown",
+    "B0_no_refine:full_deformed_mesh_safety:unknown",
+    "B0_no_refine:human_usability:unknown",
+    "B0_no_refine:immutable_bindings:unknown",
+    "B0_no_refine:refine_time:unknown",
+    "B0_no_refine:skeleton_capsule_proxy:unknown",
+    "F25:exact_recovery:unknown",
+    "F25:execution:unknown",
+    "F25:full_deformed_mesh_safety:unknown",
+    "F25:human_usability:unknown",
+    "F25:immutable_bindings:unknown",
+    "F25:refine_time:unknown",
+    "F25:skeleton_capsule_proxy:unknown",
+    "actual_profile_mesh_evidence_and_native_tool_review_required",
+    "fixture_or_unexecuted_rows_cannot_certify_real_quality",
+    "paired_quality_improvement_analysis_required",
+    "policy_missing:minimum_independent_groups",
+    "policy_missing:minimum_units",
+    "policy_missing:quality_improvement_rule",
+    "policy_missing:refine_budget_ms",
+    "policy_missing:required_bindings",
+    "policy_missing:search_budget_ms",
+    "replay_does_not_measure_provider_or_product_latency",
+    "v3:exact_recovery:unknown",
+    "v3:execution:unknown",
+    "v3:full_deformed_mesh_safety:unknown",
+    "v3:human_usability:unknown",
+    "v3:immutable_bindings:unknown",
+    "v3:refine_time:unknown",
+    "v3:skeleton_capsule_proxy:unknown"
+  ],
+  "limitations": [
+    "static_thumbnail_usability_is_not_fbx_safety",
+    "capsule_and_2d_checks_are_not_deformed_mesh_certification",
+    "no_uninspected_profile_pose_or_scope_is_certified"
+  ]
+}

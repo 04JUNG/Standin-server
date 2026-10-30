@@ -1,0 +1,10 @@
+{
+  "schema_version": "pose-recognition-policy-v1",
+  "pck_image_diagonal_fraction": 0.05,
+  "match_max_image_diagonal_fraction": 0.15,
+  "minimum_common_joints": 1,
+  "prediction_score_threshold": null,
+  "latency_budget_ms": null,
+  "expected_inference_identity": {},
+  "interpretation": "engineering_diagnostic_not_product_acceptance"
+}
