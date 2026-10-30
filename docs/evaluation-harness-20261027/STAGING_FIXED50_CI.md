@@ -6,7 +6,7 @@
 
 GitHub runner는 모델을 실행하지 않는다. `scripts/run_staging_evaluation_ci.py`가 스테이징 서비스의 현재 task definition을 읽고 **동일 이미지·라이브러리·모델 설정**의 고정 50컷을 17·17·16컷으로 나눈 최대 3개의 별도 Fargate task를 실행한다. inference 서비스 자체는 수정하지 않는다. task 안의 API는 127.0.0.1에만 열며 Discord 알림 설정은 제거한다. converter는 스테이징 내부 서비스를 사용한다. 이는 BFF 인증·사용자 클릭·최종 FBX 저장까지의 제품 E2E 검증이 아니다.
 
-최대 task 실행 시간은 3,000초이고 CI step은 60분이다. 3개 묶음은 같은 배포 이미지로 병렬 실행하며 50개 고유 컷이 모두 정상 완료된 경우에만 합산 보고서와 기준선을 발행한다. 어느 묶음이 실패해도 기존 기준선은 유지하고 묶음별 진단 파일을 보존한다. 원본 50회 분석, 반환 인물별 Top-1의 허용된 리파인 최대 60회, 두 arm의 AI 판정(각 arm 최대 120회 예산)이 상한이다. comparison arm은 첫 arm에서 동결된 목표 자세를 재사용하고, 다음 버전에서도 이전 목표 추정을 재사용한다. 실제 비교 모델은 staging 환경 변수 `STAGING_EVAL_JUDGE_MODEL`로 고정한다. 최대 3개 평가 태스크/렌더/AI 비용이 발생한다. converter를 공유하는 고정 3-way 부하 조건이므로 시간은 이 CI 조건의 관측값이다.
+최대 task 실행 시간은 3,000초이고 CI step은 60분이다. 3개 묶음은 같은 배포 이미지로 병렬 실행하며 50개 고유 컷이 모두 정상 완료된 경우에만 합산 보고서와 기준선을 발행한다. 어느 묶음이 실패해도 기존 기준선은 유지하고 묶음별 진단 파일을 보존한다. 원본 50회 분석, 반환 인물별 Top-1의 허용된 리파인 최대 60회, 두 arm의 AI 판정(각 shard/arm 최대 120회, 전체 최대720회 예산)이 상한이다. comparison arm은 첫 arm에서 동결된 목표 자세를 재사용하고, 다음 버전에서도 이전 목표 추정을 재사용한다. 실제 비교 모델은 staging 환경 변수 `STAGING_EVAL_JUDGE_MODEL`로 고정한다. 최대 3개 평가 태스크/렌더/AI 비용이 발생한다. converter를 공유하는 고정 3-way 부하 조건이므로 시간은 이 CI 조건의 관측값이다.
 
 ## 고정 데이터·기준선
 
@@ -56,3 +56,69 @@ python scripts/run_staging_evaluation_ci.py \
 `bootstrap-20261029-shards-v1`은 스테이징 리비전 `612be944d387c3dd2543ee2eed6ae95183c101bb`으로 50컷 분석을 마쳤다. 분석 오류 0건, 산출물 오류 4건(CB019/CB020/CB042/CB058), 리파인 오류 1건(CB027), 두 arm의 AI 판정 실패 23건을 기록했다. 모든 태스크 종료 및 파생 정의 정리를 수행했고, 기준선은 발행하지 않았다. 이 실행의 점수를 개선 수치로 사용하면 안 된다.
 
 실측 후 AI 호출에 고정 JSON 스키마를 전달하고, 리파인 바인딩이 없는 숫자형 검색 카메라의 회전도 평가 렌더에 적용하도록 보완했다. 실패 실행의 컷별 오류 표도 Actions Summary에 남긴다. 이 변경은 회귀 테스트 대상이며, 수정 후 외부 모델 50컷 재실측을 통과한 것으로 간주하지 않는다. 첫 정상 기준선 확보는 아직 남아 있다.
+
+## 2026-10-30 develop 통합 재검토
+
+기준 develop은 `292b9151148e82d75cba6a61cfe11a8f114082a7`, 기존 PR head는
+`2c1f150f2da930ea0b57892a77bdfb2877b9685a`다. 유일한 병합 충돌은 deploy workflow의
+초기화 단계다. develop의 `refresh_staging_body_initializer.py`(staging family·고정 이미지·
+`body_assets_ready` 계약 검사)를 먼저 실행하고 기존 평가용 inline Python 계약 검사를 이어 실행한다.
+두 단계 모두 이미지 참조만 바꾸며 manifest·command·서비스 설정은 유지한다. main에는 적용하지 않는다.
+검색/refine v4·관측 API·Converter 및 배포 설정은 develop 병합 결과를 유지한다.
+
+### 실패 원인과 확인 수준
+
+`60a4fb54b`의 JSON schema 고정, 숫자 카메라 회전 보존, 실패 Summary 보완은 이미 구현되어
+회귀 검사로 확인했다. 이는 외부 모델/Converter의 모든 실패가 해소됐다는 증거가 아니다.
+로컬에 남은 첫 실행 shard ZIP을 외부 호출 없이 재사용했다. 이 shard는 complete=false/failures=6이며
+CB019·CB058의 ThumbnailRenderFailed, CB042의 HTTPError, CB036·CB073(search)·CB063(refine)의
+judge ValueError를 포함한다. 현재 실패 보고서로 여섯 사례가 다시 표시되고 부분 shard의 합산/기준선
+발행은 거부됐다. 실제 CB019의 숫자 카메라와 CB058의 카메라 없는 Top-1 선택도 회귀 사례로 추가했다.
+CB058에서 다른 refinable 후보로 대체하지 않는 것이 의도한 계약이다.
+
+전체 첫 실행의 4개 산출물/1개 refine/23개 judge 실패는 과거 실행 관측이다. 저장된 이 shard만으로
+CB020·CB027의 현재 해결 여부를 확정할 수 없고, 오류 클래스만 남은 렌더/HTTP 실패의 상세 원인도
+확정할 수 없다. 숫자 회전 수정은 렌더 오류 전체의 해결 증거가 아니며 JSON schema 수정도
+23개 실판정 성공의 증거가 아니다. 현재 정상 baseline은 아직 확보하지 않았다.
+
+### 평가 계약과 남은 승인
+
+- 고정 50컷의 완료 여부와 품질 평균의 분모는 별개다. 누락·실패·미실행은 고정 집합에서 사라지지
+  않으며, 활성 unobservable/not_run·인물 누락은 점수 평균에서 제외하고 제외 수를 보고한다.
+  uncertain은 점수 범위다. 전신100/상반신45는 따로 집계한다. 관측 joint mask와 가림 추정은 분리한다.
+- 실시간 CI는 동결 Top-1과 같은 후보의 refine 렌더 비교다. 최종 FBX 저장/receipt 검증과 동일하지 않다.
+  최종 FBX는 별도 artifact lineage/export 하네스에서 후보·인물·선택 revision·출력 SHA·저장 SHA·receipt를
+  대조한다. 증거가 없으면 unknown이며 렌더 점수로 FBX 안전성이나 저장 성공을 대체하지 않는다.
+- AI target/판정은 `ai_assisted_unreviewed`다. 사람 승인·수정 이력과 별도 보관한다. 초안 GT와 AI 점수는
+  검증된 정답 정확도가 아니다. 사람 GT 검수, AI 판정 대조, 별도 holdout/추가 러프 준비는 후속 작업이다.
+- dataset ZIP hash·평가 코드 fingerprint·루브릭 hash·judge model이 series를 정한다. 제품 검색/refine 변경은
+  같은 series에서 비교한다. 첫 정상 실행 및 이후 마지막 정상 실행만 baseline이 된다. 실패/부분 실행은
+  진단 artifact만 남기고 조건부 baseline 쓰기에 도달하지 않는다.
+
+### 자동 실행·알림·비용 경계
+
+기능 브랜치 push/PR 검사는 배포·유료 평가를 실행하지 않는다. 이 PR을 develop에 병합한 뒤
+`AUTO_DEPLOY_ENABLED=true`인 배포가 안정화되고 `STAGING_EVAL_ENABLED=true`이면 평가가 자동 실행된다.
+과거 true/IAM 적용/ZIP 업로드 기록은 위와 같으며 이번 검토에서 계정 설정을 변경하거나 실제 자동 실행을
+새로 확인하지 않았다. 설정 이력만으로 이 PR의 hook이 이미 develop에서 실행 중이라고 표현하지 않는다.
+
+필요 준비는 staging 환경의 judge model·API secret·고정 ZIP·모델/라이브러리 manifest·내부 Converter,
+배포 OIDC 역할의 RunTask/TagResource/StopTask/DeregisterTaskDefinition 및 S3 evaluation prefix 권한,
+기존 Describe/RegisterTaskDefinition/PassRole 권한이다. 정책은 `evaluation/ci/staging-evaluation-policy.json`을 따른다.
+평가 태스크의 Discord 설정은 제거된다. 실패는 Deploy workflow를 실패로 표시하지만 이미 안정화된 서비스를
+되돌리거나 사용자 서비스 장애로 판정하지 않는다. Summary/artifact의 평가 실패를 서비스 상태와 구분해 읽어야 한다.
+
+추가 실측은 명시적으로 승인된 다음 staging 배포 또는 별도 승인된 실행에서만 한다. 상한은 Fargate 3개 ×
+3,000초(총 2.5 task-hours), 원본 분석50회·허용 refine 최대60회, AI 예산은 **각 shard/arm 120회**이므로
+전체 최대720회다(목표 재사용으로 실제 호출은 줄 수 있다). 내부 Converter/모델/S3 비용도 발생한다.
+금액은 task CPU/메모리·리전 단가·실제 토큰/렌더량에 따라 달라 여기서 확정하지 않는다.
+이번 작업에서는 운영 접근·배포·새 유료50컷 실행을 하지 않는다.
+
+### 이번 로컬 검증
+
+- 전체 `tests/`(converter 제외): **2901 passed, 10 skipped, 31 subtests passed**.
+- staging/초기화 집중 회귀: **34 passed**. 스모크 **54/54**.
+- compileall src/api/scripts/standin_eval/pose_curation 및 diff whitespace 검사 통과.
+- 로컬 모의 HTTP 소켓이 필요한 10개 검사는 샌드박스 제한을 해제한 전체 재실행에서 통과했다.
+- 저장된 shard ZIP 실패 보고서 재생: 산출물3/판정3 표시 및 부분 집합 baseline 차단, 외부 모델 호출0회.
+- Converter Blender/FBX 실측·Docker 이미지 빌드·새 staging 실행은 로컬에서 수행하지 않았다.

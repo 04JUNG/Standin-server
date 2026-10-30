@@ -249,3 +249,45 @@ def test_real_judge_requests_pinned_schema_for_both_phases(monkeypatch,tmp_path)
         assert schema['additionalProperties'] is False
         for criterion in schema['properties'].values():
             assert criterion['properties'][field]=={'type':'string','enum':allowed}
+
+
+def test_merged_deploy_initializers_preserve_current_staging_contract():
+    from scripts.refresh_staging_body_initializer import refresh
+    from scripts.prepare_staging_asset_initializer import prepare
+    source = {'family': 'StandinStagingAppInferenceTask76CF0AC4', 'containerDefinitions': [
+        {'name': 'inference', 'image': 'current', 'environment': [{'name': 'MODE', 'value': 'keep'}]},
+        {'name': 'body-assets-init', 'image': 'deleted',
+         'command': ['python', '-c', "print('body_assets_ready')"],
+         'environment': [{'name': 'MANIFEST', 'value': 'pinned'}]}]}
+    image = '136889124221.dkr.ecr.ap-northeast-2.amazonaws.com/standin/inference:' + 'a'*40
+    expected = copy.deepcopy(source)
+    expected['containerDefinitions'][1]['image'] = image
+    assert prepare(refresh(copy.deepcopy(source), image), image) == expected
+
+
+def test_incomplete_saved_run_cannot_be_merged_as_baseline(tmp_path):
+    from standin_eval.staging_merge import merge_fragments
+    from standin_eval.util import write_json
+    fragment = tmp_path/'fragment'
+    value = result()
+    value['arms']['search'] = [{'case_id': f'CB{i:03}'} for i in range(50)]
+    write_json(fragment/'result.json', value)
+    # First real shard's saved completion state (no private inputs or images).
+    write_json(fragment/'completion.json', {'complete': False, 'failures': 6})
+    with pytest.raises(ValueError, match='incomplete shard'):
+        merge_fragments([fragment], tmp_path/'baseline')
+    assert not (tmp_path/'baseline').exists()
+
+
+@pytest.mark.parametrize('pose_id,camera', [
+    ('UAL2__Farm_PlantSeed__p01_f0011_mirror', {'yaw': 330, 'pitch': -30, 'distance': 4.0}),
+    ('gen_st_stairs__reach_fwd__hang__h0_m_r2_m', None),
+])
+def test_saved_failed_cut_selection_does_not_substitute_refinable_candidate(pose_id, camera):
+    from standin_eval.staging_live import preview_rotation
+    chosen = candidate({'dynamic_search': {'selected': [{'pose_id': pose_id, 'camera': camera}]},
+                        'refine_candidates': [{'pose_id': 'different', 'view': 'front'}]})
+    assert chosen['pose_id'] == pose_id
+    assert not chosen['_refine_bound']
+    rotation = preview_rotation(chosen)
+    assert (rotation is None) == (camera is None)
