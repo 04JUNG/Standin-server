@@ -1073,6 +1073,49 @@ def finalize_slot(slot: PersonSlot, cfg=CFG) -> PersonSlot:
     return slot
 
 
+def observed_joints_without_torso(
+    slot: PersonSlot, image_size: Optional[tuple[int, int]], cfg=CFG,
+) -> Optional[np.ndarray]:
+    """Retain bounded observations when only the full-body anchor gate failed.
+
+    This is an output mask, never a search/refine eligibility override. Explicit
+    ownership conflicts, malformed coordinates and degenerate torsos stay closed.
+    Missing points are not inferred; the existing per-joint evidence is reused.
+    """
+    evidence = slot.evidence
+    if (slot.state != "invalid" or slot.skeleton is None or evidence is None
+            or evidence.coverage_class != "insufficient"
+            or "invalid_torso_anchors" not in evidence.reasons
+            or slot.slot_origin != "vlm" or slot.vlm_box is None
+            or image_size is None):
+        return None
+    reasons = set(slot.reasons) | set(evidence.reasons)
+    blocked = {"invalid_shape", "non_finite_keypoints", "torso_degenerate",
+               "torso_width_outlier", "torso_outside_slot", "assignment_ambiguous",
+               "duplicate_candidate", "merge_suspected", "unstable_search_after_retry"}
+    if reasons & blocked or any(reason.endswith("_cross_slot") for reason in reasons):
+        return None
+    points = np.asarray(slot.skeleton.keypoints, dtype=np.float32)
+    scores = np.asarray(evidence.raw_scores, dtype=np.float32)
+    if (points.shape != (17, 2) or scores.shape != (17,)
+            or not np.isfinite(points).all() or not np.isfinite(scores).all()):
+        return None
+    width, height = image_size
+    owner = _expanded_box(slot.vlm_box, cfg.slot_owner_padding)
+    mask = np.asarray(evidence.valid_joint_mask, dtype=bool).copy()
+    mask &= np.asarray([_point_in_box(point, owner) for point in points])
+    mask &= ((points[:, 0] >= 0) & (points[:, 0] < width)
+             & (points[:, 1] >= 0) & (points[:, 1] < height))
+    # Without a torso frame, an isolated high-score wrist/knee is not enough
+    # body evidence. Keep body joints only on an existing valid local segment.
+    connected = np.zeros(17, dtype=bool)
+    for valid, (start, end) in zip(evidence.valid_bone_mask, _BONES):
+        if valid and mask[start] and mask[end]:
+            connected[[start, end]] = True
+    mask[5:] &= connected[5:]
+    return mask if mask.any() else None
+
+
 def sort_slots_left_to_right(slots: list[PersonSlot]) -> list[PersonSlot]:
     """모든 복구가 끝난 뒤 결과 박스 x1로 person_index 순서를 확정한다."""
     return sorted(
