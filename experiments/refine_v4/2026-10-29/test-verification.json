@@ -1,0 +1,25 @@
+{
+  "full_inference_suite": {
+    "passed": 2666,
+    "skipped": 10,
+    "subtests_passed": 28,
+    "warnings": 1,
+    "command": "python -m pytest tests/ --ignore=tests/converter -q"
+  },
+  "additional_artifact_tests_passed": 4,
+  "smoke": "54/54",
+  "compileall": true,
+  "native_geometry_cases_passed": 7,
+  "native_transaction_cases_passed": 6,
+  "runtime_applied": [
+    "T043",
+    "T050",
+    "T002",
+    "T018"
+  ],
+  "runtime_current_asset_fallback": [
+    "T041rollback"
+  ],
+  "frozen_baseline_files_unchanged": 369,
+  "raw_inputs_or_models_committed": false
+}
