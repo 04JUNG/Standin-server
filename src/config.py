@@ -93,7 +93,14 @@ class Config:
     gemini_min_attempt_seconds: float = float(os.getenv("GEMINI_MIN_ATTEMPT_SECONDS", "10"))
     gemini_retry_base_seconds: float = float(os.getenv("GEMINI_RETRY_BASE_SECONDS", "0.5"))
     gemini_retry_max_seconds: float = float(os.getenv("GEMINI_RETRY_MAX_SECONDS", "2.0"))
-    openai_model: str = os.getenv("OPENAI_MODEL", "gpt-5-mini")
+    # Explicit model selection avoids silently changing cost/quality at rollout.
+    openai_model: str = os.getenv("OPENAI_MODEL", "")
+    openai_request_timeout_ms: int = int(os.getenv("OPENAI_REQUEST_TIMEOUT_MS", "45000"))
+    openai_max_attempts: int = int(os.getenv("OPENAI_MAX_ATTEMPTS", "3"))
+    openai_total_budget_seconds: float = float(os.getenv("OPENAI_TOTAL_BUDGET_SECONDS", "75"))
+    openai_min_attempt_seconds: float = float(os.getenv("OPENAI_MIN_ATTEMPT_SECONDS", "10"))
+    openai_retry_base_seconds: float = float(os.getenv("OPENAI_RETRY_BASE_SECONDS", "0.5"))
+    openai_retry_max_seconds: float = float(os.getenv("OPENAI_RETRY_MAX_SECONDS", "2.0"))
 
     # Body sidecar: observe/choose one FBX without changing existing pose search.
     body_matching_mode: str = os.getenv("BODY_MATCHING_MODE", "off")
@@ -501,8 +508,8 @@ class Config:
             raise ValueError("POSE_SEARCH_MODE must be legacy or perspective")
         if self.body_matching_mode not in {"off", "shadow", "auto"}:
             raise ValueError("BODY_MATCHING_MODE must be off, shadow or auto")
-        if self.body_vlm_provider not in {"mock", "gemini"}:
-            raise ValueError("BODY_VLM_PROVIDER must be mock or gemini")
+        if self.body_vlm_provider not in {"mock", "gemini", "openai"}:
+            raise ValueError("BODY_VLM_PROVIDER must be mock, gemini or openai")
         if not math.isfinite(self.body_timeout_seconds) or self.body_timeout_seconds <= 0:
             raise ValueError("BODY_TIMEOUT_SECONDS must be positive and finite")
         if not 1 <= self.body_max_people <= 20:

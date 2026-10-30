@@ -6,10 +6,20 @@ import re
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 
+NONRETRYABLE_REASONS = frozenset({
+    "daily_quota_exhausted", "billing_exhausted", "authentication_failed", "permission_denied",
+})
+
 
 def failure_reason(status: int | None, *, timed_out: bool = False) -> str:
     if timed_out:
         return "timeout"
+    if status == 401:
+        return "authentication_failed"
+    if status == 402:
+        return "billing_exhausted"
+    if status == 403:
+        return "permission_denied"
     if status == 429:
         return "rate_limited"
     if status == 503:
@@ -33,6 +43,13 @@ def classify_failure(error: Exception, status: int | None, *, timed_out=False):
     RESOURCE_EXHAUSTED or free-tier wording alone is not enough evidence.
     """
     reason = failure_reason(status, timed_out=timed_out)
+    # OpenAI SDK exposes a structured body/code. Do not parse error prose,
+    # record account details, or retry an exhausted paid quota as a rate spike.
+    body = getattr(error, "body", None)
+    body = body.get("error", body) if isinstance(body, dict) else {}
+    code = body.get("code") or getattr(error, "code", None)
+    if status == 429 and code in {"insufficient_quota", "billing_hard_limit_reached"}:
+        reason = "billing_exhausted"
     payload = getattr(error, "details", None)
     if isinstance(payload, dict):
         payload = payload.get("error", payload)
