@@ -93,6 +93,11 @@ jobs:
             --task-definition "$TASK_DEFINITION" \
             --query taskDefinition > taskdef.json
 
+      - name: Refresh body initializer to the deployment image
+        env:
+          INFERENCE_IMAGE: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+        run: python scripts/prepare_body_initializer_deployment.py taskdef.json --image "$INFERENCE_IMAGE"
+
       - name: Prepare environment-scoped VLM provider
         env:
           VLM_PROVIDER: ${{ vars.VLM_PROVIDER }}
@@ -107,7 +112,7 @@ jobs:
           POSE_GENERATION_PROVIDER: ${{ vars.POSE_GENERATION_PROVIDER }}
           POSE_GENERATION_MODEL: ${{ vars.POSE_GENERATION_MODEL }}
           SKELETON_REPAIR_MODEL: ${{ vars.SKELETON_REPAIR_MODEL }}
-        run: python scripts/prepare_vlm_deployment.py taskdef.json
+        run: python scripts/prepare_vlm_deployment.py taskdef.json --serving
 
       - name: Prepare explicit fullbody deployment contract
         env:

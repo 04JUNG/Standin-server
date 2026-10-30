@@ -8,12 +8,18 @@
 **50컷 자동평가의 코드·모델·실행 설정은 이번 작업에서 변경하지 않는다.**
 평가에 쓰이는 Gemini 키를 삭제하거나 평가 모델을 OpenAI로 바꾸지 않는다.
 배포 workflow의 기존 평가 단계도 유지되므로, 평가 실행 정책은 해당 담당자가
-별도로 관리해야 한다. 이번 코드 작업에서는 배포·평가·유료 호출을 실행하지 않는다.
+별도로 관리해야 한다. 회귀 테스트에서는 배포·평가·유료 호출을 실행하지 않는다.
+2026-10-31 운영 전환 시에는 각 환경 키로 합성 이미지 1건의 OpenAI 호출을
+확인했고, 기존 이미지의 스테이징 inference 서비스 설정을 전환했다. 50컷은 실행하지 않았다.
 
 ## 환경별 설정
 
 GitHub `staging`과 `beta` environment에 각각 설정한다. `develop`은 staging,
-`main`은 beta 설정을 읽는다. 빈 변수는 현재 ECS 설정을 유지한다.
+`main`은 beta 설정을 읽는다. 서비스 배포는 `--serving` 프로필을 적용하므로
+변수가 비어 있어도 기존 Gemini 설정을 유지하지 않고 **OpenAI / gpt-6-luna / low**로
+전환한다. 분석·체형·family review·자연어 생성·스켈레톤 검수 모델 모두 같은
+프로필을 사용한다. 환경별 명시값은 프로필을 덮어쓸 수 있다. 키/ARN은 기존
+환경의 참조를 그대로 사용한다. 독립 실행 평가 태스크에는 이 프로필을 적용하지 않는다.
 
 | 변수 | 값 |
 |---|---|
@@ -25,9 +31,11 @@ GitHub `staging`과 `beta` environment에 각각 설정한다. `develop`은 stag
 | `POSE_GENERATION_MODEL` | 선택한 자연어 생성 모델 ID |
 | `SKELETON_REPAIR_MODEL` | 필요 시 별도 모델. 미설정이면 분석 모델 사용 |
 | `BODY_COARSE_FAMILY_REVIEW_MODEL` | 별도 family review를 사용 중이라면 OpenAI 모델로 지정 |
-| `OPENAI_REASONING_EFFORT` | 선택 모델이 지원하는 값만 지정. 비우면 모델 기본값 |
+| `OPENAI_REASONING_EFFORT` | 서비스 기본값 `low`. 변경 시 선택 모델이 지원하는 값만 지정 |
 
-모델은 임의의 최신 모델로 대체하지 않는다. `OPENAI_MODEL`을 명시해야 한다.
+기본 모델은 기존 단일 세트 실험에서 JSON 응답 성공과 지연을 확인한
+`gpt-6-luna`, 추론 강도는 `low`다. 해당 실험은 전체 서비스 품질 보증이 아니므로
+배포 후 실제 서비스 요청을 확인한다. 모델 변경은 환경별 변수로 명시한다.
 호출 1회는 기본 45초, 분석 재시도 포함 예산은 75초다. OpenAI SDK 자동 재시도는
 끄고 기존 애플리케이션의 예산 내에서만 재시도한다. 인증·권한·결제 한도 오류와
 timeout은 반복 재시도하지 않는다. 선택 모델의 추론 설정과 지연은 실제 소규모
@@ -60,7 +68,18 @@ SDK 호출은 Responses API이며 이미지 입력, JSON 응답, 응답 ID와 �
 등록 후 순서는 staging의 제한된 실제 분석 요청 → 로그/지연/검색 결과 확인 →
 검증된 변경을 main에 반영하고 beta의 별도 키/모델로 확인하는 것이다.
 rollback은 각 환경의 provider/model 설정과 이전 immutable 이미지를 함께 복구한다.
+Gemini로 되돌릴 때에는 `VLM_PROVIDER`, `BODY_VLM_PROVIDER`,
+`POSE_GENERATION_PROVIDER`와 활성 모델 필드를 모두 명시해야 하며,
+혼합된 provider/model은 배포 전에 검증 오류로 차단한다.
 
 공식 API 참고: [Responses 사용](https://developers.openai.com/api/docs/quickstart),
 [구조화 출력](https://developers.openai.com/api/docs/guides/structured-outputs),
 [이미지 입력](https://developers.openai.com/api/docs/guides/images-vision).
+
+## 초기화 컨테이너 이미지
+
+메인 배포도 `body-assets-init`을 inference와 같은 커밋 이미지로 갱신한다.
+현재 태스크를 복사하면서 예전 digest를 보존하면, ECR에서 그 이미지가 없어진 뒤
+`CannotPullContainerError`로 서버 기동 자체가 막힌다. 기존 initializer가 있는 경우에만
+이미지를 바꾸며 command·볼륨·역할·시크릿은 그대로 둔다. 알 수 없는 initializer
+계약이나 중복 컨테이너는 ECS 등록 전에 차단한다.

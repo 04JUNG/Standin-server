@@ -1,7 +1,8 @@
 """Apply explicit environment-scoped VLM settings without reading any secrets.
 
-Empty overrides preserve the current deployment. This is shared by main and
-develop, each using its own GitHub environment variables and current ECS task.
+Deploy uses the serving profile to replace legacy Gemini settings with OpenAI.
+Explicit environment overrides remain available for rollback. Without the profile,
+empty overrides preserve the current task (including standalone evaluation tasks).
 The helper never copies keys/ARNs from another environment or changes evaluation.
 """
 from __future__ import annotations
@@ -18,6 +19,26 @@ FIELDS = (
     "BODY_VLM_PROVIDER", "BODY_VLM_MODEL", "BODY_COARSE_FAMILY_REVIEW_MODEL",
     "POSE_GENERATION_PROVIDER", "POSE_GENERATION_MODEL", "SKELETON_REPAIR_MODEL",
 )
+
+
+SERVING_DEFAULTS = {
+    "VLM_PROVIDER": "openai",
+    "OPENAI_MODEL": "gpt-6-luna",
+    "OPENAI_REASONING_EFFORT": "low",
+    "BODY_VLM_PROVIDER": "openai",
+    "BODY_VLM_MODEL": "gpt-6-luna",
+    "BODY_COARSE_FAMILY_REVIEW_MODEL": "gpt-6-luna",
+    "POSE_GENERATION_PROVIDER": "openai",
+    "POSE_GENERATION_MODEL": "gpt-6-luna",
+    "SKELETON_REPAIR_MODEL": "gpt-6-luna",
+}
+
+
+def serving_overrides(overrides):
+    """Choose the serving provider even when GitHub variables are unset."""
+    return {**SERVING_DEFAULTS, **{
+        name: overrides[name] for name in FIELDS if overrides.get(name, "").strip()
+    }}
 
 
 def prepare(task, overrides):
@@ -73,8 +94,10 @@ def prepare(task, overrides):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("task", type=Path)
+    parser.add_argument("--serving", action="store_true", help="apply OpenAI serving defaults before explicit overrides")
     args = parser.parse_args()
-    result = prepare(json.loads(args.task.read_text()), os.environ)
+    overrides = serving_overrides(os.environ) if args.serving else os.environ
+    result = prepare(json.loads(args.task.read_text()), overrides)
     args.task.write_text(json.dumps(result), encoding="utf-8")
     print("VLM deployment settings validated; secret values were not read")
 

@@ -79,3 +79,50 @@ def test_scene_worker_accepts_its_own_openai_secret():
         if row["name"] == "GEMINI_API_KEY":
             row["name"] = "OPENAI_API_KEY"
     validate(value)
+
+
+def test_serving_profile_migrates_legacy_task_without_github_variables():
+    from scripts.prepare_vlm_deployment import serving_overrides
+    original = task()
+    original["containerDefinitions"][0]["environment"].extend([
+        {"name": "POSE_GENERATION_PROVIDER", "value": "gemini"},
+        {"name": "POSE_GENERATION_MODEL", "value": "gemini-legacy"},
+        {"name": "BODY_COARSE_FAMILY_REVIEW_MODEL", "value": "gemini-legacy"},
+        {"name": "SKELETON_REPAIR_MODEL", "value": "gemini-legacy"},
+        {"name": "ROUTING_FULLBODY_ENABLED", "value": "1"},
+    ])
+    original["containerDefinitions"].append({"name": "asset-init", "image": "keep-init"})
+    before = copy.deepcopy(original)
+    result = prepare(original, serving_overrides({"VLM_PROVIDER": "", "OPENAI_MODEL": ""}))
+    env = {row["name"]: row["value"] for row in result["containerDefinitions"][0].pop("environment")}
+    for name in ("VLM_PROVIDER", "BODY_VLM_PROVIDER", "POSE_GENERATION_PROVIDER"):
+        assert env[name] == "openai"
+    for name in ("OPENAI_MODEL", "BODY_VLM_MODEL", "BODY_COARSE_FAMILY_REVIEW_MODEL", "POSE_GENERATION_MODEL", "SKELETON_REPAIR_MODEL"):
+        assert env[name] == "gpt-6-luna"
+    assert env["OPENAI_REASONING_EFFORT"] == "low"
+    assert original == before
+    before["containerDefinitions"][0].pop("environment")
+    assert result == before
+
+
+def test_serving_profile_allows_explicit_complete_rollback():
+    from scripts.prepare_vlm_deployment import serving_overrides
+    overrides = {name: "gemini" for name in ("VLM_PROVIDER", "BODY_VLM_PROVIDER", "POSE_GENERATION_PROVIDER")}
+    overrides.update({name: "gemini-rollback" for name in (
+        "BODY_VLM_MODEL", "BODY_COARSE_FAMILY_REVIEW_MODEL", "POSE_GENERATION_MODEL", "SKELETON_REPAIR_MODEL")})
+    result = prepare(task(), serving_overrides(overrides))
+    env = {row["name"]: row["value"] for row in result["containerDefinitions"][0]["environment"]}
+    assert env["VLM_PROVIDER"] == "gemini"
+
+
+def test_deploy_uses_serving_profile_but_evaluation_does_not():
+    from pathlib import Path
+    import yaml
+    root = Path(__file__).resolve().parents[1]
+    workflow = yaml.safe_load((root / ".github/workflows/deploy.yml").read_text())
+    steps = workflow["jobs"]["deploy"]["steps"]
+    provider = next(step for step in steps if step.get("name") == "Prepare environment-scoped VLM provider")
+    assert provider["run"].strip() == "python scripts/prepare_vlm_deployment.py taskdef.json --serving"
+    for step in steps:
+        if "evaluation" in step.get("name", "").lower():
+            assert "--serving" not in step.get("run", "")
