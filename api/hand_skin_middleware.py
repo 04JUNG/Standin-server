@@ -1,4 +1,4 @@
-"""Bind optional parallel screening cancellation to one /analyze lifetime."""
+"""Bind the analysis deadline and screening cancellation to one /analyze lifetime."""
 import asyncio
 import threading
 from time import monotonic

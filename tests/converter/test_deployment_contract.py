@@ -117,7 +117,11 @@ def test_converter_deploy_is_gated_and_path_filtered():
     assert ":develop'" in workflow
     assert "Verify isolated ECR target exists" in workflow
     assert "Verify optional isolated ECS target exists" in workflow
-    assert workflow.count("if: env.ECS_SERVICE != ''") == 4
+    assert workflow.count("if: env.ECS_SERVICE != ''") == 5
+    assert "CONVERTER_MAX_CONCURRENT_PROCESSES: ${{ vars.CONVERTER_MAX_CONCURRENT_PROCESSES }}" in workflow
+    assert 'scripts/prepare_hand_screen_deployment.py taskdef.json --container converter' in workflow
+    assert '"scripts/prepare_hand_screen_deployment.py"' in workflow
+    assert '"src/hand_skin_capacity.py"' in workflow
     assert 'file: Dockerfile.converter' in workflow
     assert 'container-name: converter' in workflow
     assert '"converter/**"' in workflow

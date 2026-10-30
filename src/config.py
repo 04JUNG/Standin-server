@@ -170,8 +170,11 @@ class Config:
     hand_skin_screen_budget_seconds: float = float(os.getenv(
         "HAND_SKIN_SCREEN_BUDGET_SECONDS", "45"
     ))
-    # Opt-in; one shared gate admits at most two in-flight checks per process.
+    # Opt-in; shared per-process capacity 1..5. Session work budgets still apply.
     hand_skin_screen_concurrency: int = int(os.getenv("HAND_SKIN_SCREEN_CONCURRENCY", "1"))
+    # Trusted release asset only. Both values are required; default disabled.
+    hand_skin_prevalidated_path: str = os.getenv("HAND_SKIN_PREVALIDATED_PATH", "")
+    hand_skin_prevalidated_sha256: str = os.getenv("HAND_SKIN_PREVALIDATED_SHA256", "")
     # 변환(~3s)+렌더 한 번의 상한. 초과하면 그림 없이 응답한다(조정 결과는 유지).
     thumbnail_timeout_seconds: float = float(
         os.getenv("REFINE_THUMBNAIL_TIMEOUT_SECONDS", "20")
@@ -523,6 +526,14 @@ class Config:
         if (not math.isfinite(self.hand_skin_screen_budget_seconds)
                 or not 0 < self.hand_skin_screen_budget_seconds <= 60):
             raise ValueError("HAND_SKIN_SCREEN_BUDGET_SECONDS must be in (0,60]")
+        from .hand_skin_capacity import validate_concurrency
+        validate_concurrency(self.hand_skin_screen_concurrency)
+        if bool(self.hand_skin_prevalidated_path) != bool(self.hand_skin_prevalidated_sha256):
+            raise ValueError("hand prevalidation requires both path and SHA256")
+        if self.hand_skin_prevalidated_sha256:
+            import re
+            if not re.fullmatch(r'[0-9a-f]{64}', self.hand_skin_prevalidated_sha256):
+                raise ValueError("invalid hand prevalidation SHA256")
         self.pose_model_uri = self.pose_model_uri.strip()
         self.pose_models_root = self.pose_models_root.strip()
         self.pose_model_manifest = self.pose_model_manifest.strip()
