@@ -85,6 +85,7 @@ webtoon-pose-mvp/
 │  ├─ QA_SECURITY_RELEASE.md  보안(키·라이선스·무인증)·테스트·릴리스
 │  └─ ROADMAP.md          우선순위와 다음 액션(SEARCH_EVAL 기반)
 ├─ scripts/
+│  ├─ female_breast/       pinned female breast candidate builder and independent visual/FBX QA
 │  ├─ run_demo.py         mock로 6개 케이스 end-to-end 데모
 │  ├─ compare_pose_canary.py current-X와 cascade canary 결과 비교
 │  ├─ build_db.py         합성/실 BVH → SQLite 빌드(BVH_DIR env로 실 폴더)
