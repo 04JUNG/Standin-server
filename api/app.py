@@ -508,6 +508,9 @@ class _HintImg(str):
 VLM_RETRY_AFTER_SECONDS = 30
 
 _VLM_FAILURE_MESSAGES = {
+    "billing_exhausted": "AI 분석 서비스의 결제·크레딧 확인이 필요합니다. 운영자에게 문의해 주세요.",
+    "authentication_failed": "AI 분석 서비스의 인증 설정을 확인해야 합니다. 운영자에게 문의해 주세요.",
+    "permission_denied": "AI 분석 서비스의 모델 접근 권한을 확인해야 합니다. 운영자에게 문의해 주세요.",
     "rate_limited": "AI 분석 요청 한도에 일시적으로 도달했습니다. 잠시 후 다시 시도해 주세요.",
     "daily_quota_exhausted": "AI 분석의 일일 사용 한도가 소진됐습니다. 한도 초기화 또는 운영자 확인이 필요합니다.",
     "upstream_unavailable": "AI 분석 서비스가 일시적으로 혼잡하거나 이용 불가 상태입니다. 잠시 후 다시 시도해 주세요.",
@@ -529,7 +532,7 @@ def _vlm_unavailable_response(exc: VLMUnavailable) -> HTTPException:
     from math import ceil
 
     reason = exc.reason if exc.reason in _VLM_FAILURE_MESSAGES else "upstream_error"
-    retryable = reason != "daily_quota_exhausted"
+    retryable = exc.retryable
     retry_after = max(VLM_RETRY_AFTER_SECONDS, ceil(exc.retry_after_seconds or 0)) if retryable else None
     message = _VLM_FAILURE_MESSAGES[reason]
     log_warn("vlm_unavailable", "상류 VLM이 응답하지 못해 분석을 중단했다",
@@ -544,7 +547,7 @@ def _vlm_unavailable_response(exc: VLMUnavailable) -> HTTPException:
         context={"상류 상태": exc.status or "timeout", "시도": exc.attempts,
                  "원인": reason, "재시도 가능": retryable,
                  "소요(초)": round(exc.elapsed_seconds, 1),
-                 "모델": CFG.gemini_model},
+                 "모델": CFG.openai_model if CFG.vlm_provider == "openai" else CFG.gemini_model},
     )
     return HTTPException(
         status_code=503,

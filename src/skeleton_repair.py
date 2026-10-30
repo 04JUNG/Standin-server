@@ -48,7 +48,8 @@ class RepairConfig:
         thinking = os.getenv("SKELETON_REPAIR_THINKING", "low").strip().lower()
         return cls(
             mode=_env_mode(),
-            model=os.getenv("SKELETON_REPAIR_MODEL", "").strip() or CFG.gemini_model,
+            model=os.getenv("SKELETON_REPAIR_MODEL", "").strip() or (
+                CFG.openai_model if CFG.vlm_provider == "openai" else CFG.gemini_model),
             thinking_level=thinking if thinking in {"low", "default"} else "low",
             timeout_s=float(os.getenv("SKELETON_REPAIR_TIMEOUT_S", "30")),
         )
@@ -57,15 +58,21 @@ class RepairConfig:
 def build_repairer(vlm_client=None, config: Optional[RepairConfig] = None):
     """Gemini 분석을 쓰는 운영 구성에서만 켠다. mock VLM이면 None(기존 경로 그대로)."""
     config = config or RepairConfig.from_env()
-    if config.mode == "off" or CFG.vlm_provider.lower() != "gemini":
+    provider = CFG.vlm_provider.lower()
+    if config.mode == "off" or provider not in {"gemini", "openai"}:
         return None
     if vlm_client is not None and "mock" in type(vlm_client).__name__.lower():
         return None
-    key = os.environ.get("GEMINI_API_KEY", "")
+    key = os.environ.get("OPENAI_API_KEY" if provider == "openai" else "GEMINI_API_KEY", "")
     if not key:
         return None
     from .hybrid_pose.gemini import GeminiReviewer
-    reviewer = GeminiReviewer(key, config.model, timeout=config.timeout_s,
+    if provider == "openai":
+        from .hybrid_pose.openai import OpenAIReviewer
+        reviewer_class = OpenAIReviewer
+    else:
+        reviewer_class = GeminiReviewer
+    reviewer = reviewer_class(key, config.model, timeout=config.timeout_s,
                               thinking_level=config.thinking_level)
     return SkeletonRepairer(reviewer, config)
 
