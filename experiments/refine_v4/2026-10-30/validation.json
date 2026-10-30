@@ -1,0 +1,37 @@
+{
+  "scope": "server implementation validation, not deployed app",
+  "server_tests": {
+    "passed": 2708,
+    "skipped": 10,
+    "subtests_passed": 28
+  },
+  "converter_contract_tests": {
+    "passed": 28
+  },
+  "smoke": {
+    "passed": 54,
+    "total": 54
+  },
+  "compileall": "passed",
+  "native_http": {
+    "applied": 4,
+    "retained_exact_current": 1,
+    "real_blender": true,
+    "transport": "FastAPI ASGI TestClient through real HTTP handlers"
+  },
+  "native_atomic": {
+    "passed": 6,
+    "real_blender": true,
+    "fixture_has_artificial_5_degree_perturbations": true
+  },
+  "quality_score": null,
+  "score_delta": null,
+  "full_docker_image_built_locally": false,
+  "staging_app_verified_with_new_endpoint": false,
+  "remaining": [
+    "BFF calls /parts/refine and pins final review/download artifact.",
+    "Deploy converter and dedicated scene worker images from updated commit.",
+    "Configure explicit SCENE_PARTS_ENABLED and approved catalog path/hash.",
+    "Run staging app end to end and then rescore actual saved artifacts."
+  ]
+}
