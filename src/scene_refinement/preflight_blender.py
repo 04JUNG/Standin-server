@@ -12,6 +12,9 @@ from src.scene_refinement.rig import validate_rig
 
 # Import every worker stage before announcing readiness.
 from src.scene_refinement import baseline, people, arms, scenes
+from src.refine_v4 import runner as parts_runner
+from src.arm_refine import v4_adapter as parts_arms
+from converter.scene_camera_transport import camera_binding
 
 assert bpy.app.version[:3] == tuple(map(int, EXPECTED_BLENDER_VERSION.split(".")))
 assert bpy.app.build_hash.decode() == EXPECTED_BLENDER_BUILD_HASH

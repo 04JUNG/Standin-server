@@ -30,9 +30,9 @@ def test_scene_camera_imports_from_the_converter_image_allowlist(tmp_path):
     subprocess.run(
         [sys.executable, "-I", "-c",
          "import sys; sys.path.insert(0, sys.argv[1]); "
-         "from converter.scene import compose; "
+         "from converter.scene import compose; from converter.scene_camera_transport import camera_binding; "
          "from converter.scene_camera import framing_recipe, configure_camera, verify_camera_recipe; "
-         "assert callable(compose) and callable(framing_recipe) and callable(configure_camera) and callable(verify_camera_recipe)",
+         "assert callable(camera_binding) and callable(compose) and callable(framing_recipe) and callable(configure_camera) and callable(verify_camera_recipe)",
          str(tmp_path)],
         check=True, cwd=tmp_path, capture_output=True, text=True,
     )
