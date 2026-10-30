@@ -8,7 +8,7 @@ from __future__ import annotations
 import hashlib, json, math
 from pathlib import Path
 from time import perf_counter
-from .coarse import GeminiCoarseClient, VERSION, parse_response, recommend, unknown
+from .coarse import GeminiCoarseClient, OpenAICoarseClient, VERSION, parse_response, recommend, unknown
 from .coarse_input import prepare_input
 from .integrated import VERSION as INTEGRATED_VERSION
 from .schema import (
@@ -34,7 +34,7 @@ class CoarseBodyService:
     ):
         if (
             provider
-            not in (("mock", "gemini", "openai") if integrated else ("mock", "gemini"))
+            not in ("mock", "gemini", "openai")
             or not math.isfinite(timeout_seconds)
             or timeout_seconds <= 0
             or not 1 <= max_people <= 20
@@ -48,9 +48,10 @@ class CoarseBodyService:
         self.max_people = max_people
         self.init_error = None
         self.client = client
-        if not integrated and client is None and provider == "gemini":
+        if not integrated and client is None and provider in {"gemini", "openai"}:
             try:
-                self.client = GeminiCoarseClient(
+                adapter = OpenAICoarseClient if provider == "openai" else GeminiCoarseClient
+                self.client = adapter(
                     model, timeout_seconds, family_review_model=family_review_model
                 )
             except Exception as e:
@@ -71,7 +72,7 @@ class CoarseBodyService:
             provider_actual=(
                 self.provider
                 if self.integrated
-                else "gemini" if self.client else "mock"
+                else self.provider if self.client else "mock"
             ),
             model=self.model,
             family_review_model=self.family_review_model or None,

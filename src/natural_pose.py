@@ -179,9 +179,23 @@ def build_natural_generator():
     """Local runtime enabled by explicit setting, not by attaching API keys alone."""
     if os.getenv('POSE_GENERATION_ENABLED', '0') != '1':
         return None
+    _, default_model = generation_settings()
     root = Path(os.getenv('DATA_DIR', 'data'))
     return NaturalLanguagePoseGenerator(
         os.getenv('POSE_GENERATION_RIG', str(root/'bvh/webtoon_combat_03.bvh')),
         os.getenv('POSE_GENERATION_TAXONOMY', str(root/'search-taxonomy-v2.json')),
-        model=os.getenv('POSE_GENERATION_MODEL', 'gemini-3.8-flash'),
+        model=os.getenv('POSE_GENERATION_MODEL', default_model),
         review_dir=os.getenv('POSE_GENERATION_REVIEW_DIR', 'tmp/generated-pose-review'))
+
+
+def generation_settings():
+    """Resolve the serving planner explicitly; never send a Gemini model to OpenAI."""
+    from .config import CFG
+    provider = os.getenv('POSE_GENERATION_PROVIDER', 'openai' if CFG.vlm_provider == 'openai' else 'gemini')
+    if provider not in {'gemini', 'openai'}:
+        raise ValueError('POSE_GENERATION_PROVIDER must be gemini or openai')
+    default = CFG.openai_model if provider == 'openai' else 'gemini-3.8-flash'
+    model = os.getenv('POSE_GENERATION_MODEL', default)
+    if not model or (provider == 'openai') == model.startswith('gemini'):
+        raise ValueError('explicit generation model matching its provider required')
+    return provider, model

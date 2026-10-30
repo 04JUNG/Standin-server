@@ -16,13 +16,13 @@ def validate(task):
     secrets = {v["name"]: v["valueFrom"] for v in worker.get("secrets", [])}
     if env.get("APP_ENV") != "staging" or env.get("SCENE_REFINEMENT_ENABLED") != "1":
         raise ValueError("explicit staging worker opt-in is required")
-    if env.get("SCENE_VLM_PROVIDER") != "gemini" or not env.get("SCENE_VLM_MODEL"):
-        raise ValueError("explicit Gemini model is required")
+    if env.get("SCENE_VLM_PROVIDER") not in {"gemini", "openai"} or not env.get("SCENE_VLM_MODEL"):
+        raise ValueError("explicit VLM provider and model are required")
     if not re.fullmatch(r"[0-9a-f]{64}", env.get("SCENE_ASSET_MANIFEST_SHA256", "")):
         raise ValueError("approved asset manifest SHA is required")
     if not env.get("SCENE_ASSET_MANIFEST", "").startswith("/scene-assets/"):
         raise ValueError("mounted release manifest is required")
-    for name in ("SCENE_REFINEMENT_TOKEN", "GEMINI_API_KEY"):
+    for name in ("SCENE_REFINEMENT_TOKEN", "OPENAI_API_KEY" if env["SCENE_VLM_PROVIDER"] == "openai" else "GEMINI_API_KEY"):
         if name in env or not secrets.get(name, "").startswith("arn:aws:"):
             raise ValueError("worker credentials must use ECS secrets")
     if worker.get("command") or worker.get("entryPoint"):

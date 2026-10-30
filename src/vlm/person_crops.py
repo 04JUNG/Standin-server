@@ -56,7 +56,7 @@ def describe_cropped_people(client, image, boxes, deadline):
 
     def failure(reason):
         return DescribeOutcome('error', error_reason=reason, retryable=False,
-                               attempts=0, provider='gemini')
+                               attempts=0, provider=getattr(client, 'provider', 'gemini'))
 
     def run(crop, target, index):
         acquired = False
@@ -70,7 +70,7 @@ def describe_cropped_people(client, image, boxes, deadline):
                     break
             if not acquired or stop.is_set():
                 return failure('request_cancelled' if stop.is_set() else 'timeout')
-            log_info('gemini_person_describe_start', personIndex=index,
+            log_info(f"{getattr(client, 'provider', 'gemini')}_person_describe_start", personIndex=index,
                      cropVersion=VERSION, remainingBudgetMs=max(0,int((deadline-client._clock())*1000)))
             token = active_person_crop.set(True)
             try:
@@ -131,11 +131,11 @@ def describe_cropped_people(client, image, boxes, deadline):
         reports.setdefault(index,{})['result'] = dict(status=result.status,
             attempts=result.attempts,elapsed_ms=result.elapsed_ms,error_reason=result.error_reason)
     status = 'ok' if not errors else 'partial_error' if descriptions else 'error'
-    log_info('gemini_person_describe_summary',status=status,people=len(boxes),
+    log_info(f"{getattr(client, 'provider', 'gemini')}_person_describe_summary",status=status,people=len(boxes),
         successfulPeople=len(descriptions),failedPeople=len(errors),workers=workers,
         elapsedMs=round((client._clock()-started)*1000),cropVersion=VERSION)
     return DescribeOutcome(status,descriptions=descriptions,person_errors=errors,
         person_reports=reports,error_reason='person_description_failed' if errors else None,
         retryable=any(e['retryable'] for e in errors.values()) if errors else None,
         attempts=sum(r.attempts for r in outcomes.values()),
-        elapsed_ms=(client._clock()-started)*1000,provider='gemini')
+        elapsed_ms=(client._clock()-started)*1000,provider=getattr(client, 'provider', 'gemini'))
