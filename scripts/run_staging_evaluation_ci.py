@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Launch bounded evaluation shards using the current staging service definition."""
+"""Archived paid staging runner; only read-only preflight is enabled."""
 import argparse
 import hashlib
 import json
@@ -21,6 +21,9 @@ BUCKET = 'standinstagingapp-assetsbucket5cb76180-fiwlikrhl1sk'
 DATA_SHA = 'be85f93b2e3f4bc276d221ce8dd5c716b3360f546802c5dcf65a703d7bcf00b3'
 DATA_KEY = 'evaluation/fixed50/v3.2/' + DATA_SHA + '.zip'
 PREFIX = 'evaluation/staging/fixed50-v32'
+# Owner disabled paid evaluation after API credit exhaustion (2026-10-31).
+# Environment variables must never re-enable it; restoring it requires a code review.
+PAID_EVALUATION_ENABLED = False
 EVALUATOR_FILES = ('staging_live.py', 'staging_compare.py', 'rubric_judge.py', 'rubric_score.py',
                    'rubric_v32.py', 'rubric_v32_io.py', 'rubric_package.py', 'matching.py',
                    'schemas.py', 'http_runner.py', 'util.py', 'staging_merge.py')
@@ -86,7 +89,6 @@ def failure_report(output, failures):
 
 
 def main():
-    import boto3
     p = argparse.ArgumentParser()
     p.add_argument('--revision', required=True)
     p.add_argument('--run-id', required=True)
@@ -95,10 +97,14 @@ def main():
     p.add_argument('--timeout-seconds', type=int, default=3000)
     p.add_argument('--preflight-only', action='store_true')
     args = p.parse_args()
+    if not args.preflight_only and not PAID_EVALUATION_ENABLED:
+        p.error('Paid fixed-50 evaluation is disabled by owner request. '
+                'Only --preflight-only is available; environment flags cannot enable paid runs.')
     if not args.judge_model.strip() or not 1 <= args.timeout_seconds <= 3000:
         raise ValueError('explicit judge model and deadline <= 3000 seconds required')
     if not args.run_id.replace('-', '').replace('_', '').isalnum():
         raise ValueError('invalid run ID')
+    import boto3
     ecs, s3 = boto3.client('ecs', region_name='ap-northeast-2'), boto3.client('s3', region_name='ap-northeast-2')
     service = ecs.describe_services(cluster=STAGING_CLUSTER, services=[STAGING_SERVICE])['services'][0]
     definition = ecs.describe_task_definition(taskDefinition=service['taskDefinition'])['taskDefinition']

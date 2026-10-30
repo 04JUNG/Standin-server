@@ -227,38 +227,5 @@ jobs:
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
 
-      - name: Refresh credentials for bounded staging evaluation
-        if: github.ref == 'refs/heads/develop' && vars.STAGING_EVAL_ENABLED == 'true'
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE }}
-          aws-region: ${{ vars.AWS_REGION }}
-          role-duration-seconds: 3600
-
-      - name: Evaluate fixed 50 cuts on staging image
-        if: github.ref == 'refs/heads/develop' && vars.STAGING_EVAL_ENABLED == 'true'
-        timeout-minutes: 60
-        env:
-          EVAL_JUDGE_MODEL: ${{ vars.STAGING_EVAL_JUDGE_MODEL }}
-        run: |
-          python -m pip install boto3
-          python scripts/run_staging_evaluation_ci.py \
-            --revision "$GITHUB_SHA" --run-id "${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
-            --judge-model "$EVAL_JUDGE_MODEL" --output out/staging-evaluation
-
-      - name: Publish staging evaluation summary
-        if: always() && github.ref == 'refs/heads/develop' && vars.STAGING_EVAL_ENABLED == 'true'
-        run: |
-          if test -f out/staging-evaluation/report/report.md; then
-            cat out/staging-evaluation/report/report.md >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo 'Fixed-50 evaluation did not produce a report. Inspect task/startup diagnostics; the previous baseline is preserved.' >> "$GITHUB_STEP_SUMMARY"
-          fi
-
-      - uses: actions/upload-artifact@v4
-        if: always() && github.ref == 'refs/heads/develop' && vars.STAGING_EVAL_ENABLED == 'true'
-        with:
-          name: staging-fixed50-${{ github.sha }}-${{ github.run_attempt }}
-          path: out/staging-evaluation/
-          retention-days: 30
-          if-no-files-found: warn
+      # Paid fixed-50 evaluation is disabled by owner request (2026-10-31).
+      # Keep model evaluation outside deployment workflows, including main promotion.
