@@ -12,6 +12,8 @@ on:
       - "converter_api/**"
       - "config/characters.example.json"
       - "deploy/ecs/**"
+      - "scripts/prepare_hand_screen_deployment.py"
+      - "src/hand_skin_capacity.py"
   workflow_dispatch:
     inputs:
       target:
@@ -68,6 +70,7 @@ jobs:
           python -m pip install httpx pytest
           python -m compileall converter converter_api scripts/measure_converter_latency.py
           python -m pytest -q \
+            tests/test_hand_screen_deployment.py \
             tests/converter/test_worker_contract.py \
             tests/converter/test_registry.py \
             tests/converter/test_runner_failures.py \
@@ -131,6 +134,12 @@ jobs:
             --query taskDefinition > taskdef.json
           jq -e '.containerDefinitions | any(.name == "converter")' taskdef.json
           jq -e '.containerDefinitions | all(.name != "inference")' taskdef.json
+
+      - name: Prepare explicit Converter capacity
+        if: env.ECS_SERVICE != ''
+        env:
+          CONVERTER_MAX_CONCURRENT_PROCESSES: ${{ vars.CONVERTER_MAX_CONCURRENT_PROCESSES }}
+        run: python scripts/prepare_hand_screen_deployment.py taskdef.json --container converter
 
       - uses: aws-actions/amazon-ecs-render-task-definition@v1
         id: render

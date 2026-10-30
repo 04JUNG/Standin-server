@@ -95,6 +95,7 @@ COPY converter/first_entry_profile.py /app/converter/first_entry_profile.py
 COPY converter/scene_contract.py /app/converter/scene_contract.py
 COPY converter/scene.py /app/converter/scene.py
 COPY converter/scene_camera.py /app/converter/scene_camera.py
+COPY converter/scene_camera_transport.py /app/converter/scene_camera_transport.py
 COPY converter/rough_layout.py /app/converter/rough_layout.py
 COPY converter/scene_worker.py /app/converter/scene_worker.py
 COPY converter/framing.py /app/converter/framing.py
@@ -106,6 +107,7 @@ COPY converter/hand_geometry.py /app/converter/hand_geometry.py
 COPY converter/hand_rig.py /app/converter/hand_rig.py
 COPY converter/hand_collision.py /app/converter/hand_collision.py
 COPY converter/hand_contact.py /app/converter/hand_contact.py
+COPY converter/hand_screen_catalog.py /app/converter/hand_screen_catalog.py
 COPY converter/hands.py /app/converter/hands.py
 COPY converter/camera.py /app/converter/camera.py
 COPY converter/preview_model.py /app/converter/preview_model.py

@@ -48,6 +48,13 @@ class Config:
     search_routing_enabled: bool = _env_bool("SEARCH_ROUTING", False)
     # 관절 근거가 부족한 인물이 있을 때만 나가는 자세 설명 호출 1회의 상한.
     routing_describe_timeout_ms: int = int(os.getenv("ROUTING_DESCRIBE_TIMEOUT_MS", "15000"))
+    # Includes description attempts, backoff and optional independent side review.
+    routing_describe_budget_ms: int = int(os.getenv("ROUTING_DESCRIBE_BUDGET_MS", "45000"))
+    # Leave time for matching/serialization before the fixed 120s analyze deadline.
+    routing_describe_reserve_ms: int = int(os.getenv("ROUTING_DESCRIBE_RESERVE_MS", "15000"))
+    # Multi-person descriptions: independent crops, at most two active per process.
+    routing_describe_person_crops: bool = _env_bool("ROUTING_DESCRIBE_PERSON_CROPS", True)
+    routing_describe_person_workers: int = int(os.getenv("ROUTING_DESCRIBE_PERSON_WORKERS", "2"))
     semantic_top_k: int = int(os.getenv("SEMANTIC_TOP_K", "5"))
     # 인물별 손 모양(04J-290). 분석과 분리된 VLM 호출이라 켜면 비용이 는다. 끄거나
     # 실패하면 손은 라이브러리 기본값(relaxed)과 기본 후보 목록으로 나간다.
@@ -163,8 +170,11 @@ class Config:
     hand_skin_screen_budget_seconds: float = float(os.getenv(
         "HAND_SKIN_SCREEN_BUDGET_SECONDS", "45"
     ))
-    # Opt-in; one shared gate admits at most two in-flight checks per process.
+    # Opt-in; shared per-process capacity 1..5. Session work budgets still apply.
     hand_skin_screen_concurrency: int = int(os.getenv("HAND_SKIN_SCREEN_CONCURRENCY", "1"))
+    # Trusted release asset only. Both values are required; default disabled.
+    hand_skin_prevalidated_path: str = os.getenv("HAND_SKIN_PREVALIDATED_PATH", "")
+    hand_skin_prevalidated_sha256: str = os.getenv("HAND_SKIN_PREVALIDATED_SHA256", "")
     # 변환(~3s)+렌더 한 번의 상한. 초과하면 그림 없이 응답한다(조정 결과는 유지).
     thumbnail_timeout_seconds: float = float(
         os.getenv("REFINE_THUMBNAIL_TIMEOUT_SECONDS", "20")
@@ -516,6 +526,14 @@ class Config:
         if (not math.isfinite(self.hand_skin_screen_budget_seconds)
                 or not 0 < self.hand_skin_screen_budget_seconds <= 60):
             raise ValueError("HAND_SKIN_SCREEN_BUDGET_SECONDS must be in (0,60]")
+        from .hand_skin_capacity import validate_concurrency
+        validate_concurrency(self.hand_skin_screen_concurrency)
+        if bool(self.hand_skin_prevalidated_path) != bool(self.hand_skin_prevalidated_sha256):
+            raise ValueError("hand prevalidation requires both path and SHA256")
+        if self.hand_skin_prevalidated_sha256:
+            import re
+            if not re.fullmatch(r'[0-9a-f]{64}', self.hand_skin_prevalidated_sha256):
+                raise ValueError("invalid hand prevalidation SHA256")
         self.pose_model_uri = self.pose_model_uri.strip()
         self.pose_models_root = self.pose_models_root.strip()
         self.pose_model_manifest = self.pose_model_manifest.strip()

@@ -30,9 +30,9 @@ def test_scene_camera_imports_from_the_converter_image_allowlist(tmp_path):
     subprocess.run(
         [sys.executable, "-I", "-c",
          "import sys; sys.path.insert(0, sys.argv[1]); "
-         "from converter.scene import compose; "
+         "from converter.scene import compose; from converter.scene_camera_transport import camera_binding; "
          "from converter.scene_camera import framing_recipe, configure_camera, verify_camera_recipe; "
-         "assert callable(compose) and callable(framing_recipe) and callable(configure_camera) and callable(verify_camera_recipe)",
+         "assert callable(camera_binding) and callable(compose) and callable(framing_recipe) and callable(configure_camera) and callable(verify_camera_recipe)",
          str(tmp_path)],
         check=True, cwd=tmp_path, capture_output=True, text=True,
     )
@@ -117,7 +117,11 @@ def test_converter_deploy_is_gated_and_path_filtered():
     assert ":develop'" in workflow
     assert "Verify isolated ECR target exists" in workflow
     assert "Verify optional isolated ECS target exists" in workflow
-    assert workflow.count("if: env.ECS_SERVICE != ''") == 4
+    assert workflow.count("if: env.ECS_SERVICE != ''") == 5
+    assert "CONVERTER_MAX_CONCURRENT_PROCESSES: ${{ vars.CONVERTER_MAX_CONCURRENT_PROCESSES }}" in workflow
+    assert 'scripts/prepare_hand_screen_deployment.py taskdef.json --container converter' in workflow
+    assert '"scripts/prepare_hand_screen_deployment.py"' in workflow
+    assert '"src/hand_skin_capacity.py"' in workflow
     assert 'file: Dockerfile.converter' in workflow
     assert 'container-name: converter' in workflow
     assert '"converter/**"' in workflow

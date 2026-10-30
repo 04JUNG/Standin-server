@@ -66,7 +66,7 @@ def test_provider_error_never_triggers_generation():
 
 def test_transient_describe_failure_retries_once(monkeypatch):
     from src.vlm.client import GeminiVLMClient
-    client=object.__new__(GeminiVLMClient)
+    client=GeminiVLMClient(client=object(), sleep=lambda _:None, jitter=lambda *_:.5)
     results=iter([DescribeOutcome('error',error_reason='upstream_error',retryable=True),DescribeOutcome('ok')])
     monkeypatch.setattr(client,'_describe_people_once',lambda *args:next(results))
     assert client.describe_people(None,[]).attempts==2
@@ -74,7 +74,7 @@ def test_transient_describe_failure_retries_once(monkeypatch):
 
 def test_nonretryable_describe_error_stays_error(monkeypatch):
     from src.vlm.client import GeminiVLMClient
-    client=object.__new__(GeminiVLMClient)
+    client=GeminiVLMClient(client=object(), sleep=lambda _:None, jitter=lambda *_:.5)
     monkeypatch.setattr(client,'_describe_people_once',lambda *args:DescribeOutcome('error',retryable=False))
     assert client.describe_people(None,[]).attempts==1
 

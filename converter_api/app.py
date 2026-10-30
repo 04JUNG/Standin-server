@@ -1014,6 +1014,22 @@ def create_app(
             headers=headers,
         )
 
+    @app.get('/hand-screen-profile')
+    def hand_screen_profile(character_id: str = 'standin-master-v2'):
+        """Read-only identity for operator-prevalidated immutable library poses."""
+        from converter.hand_screen_catalog import PROFILE_VERSION, runtime_profile
+        from converter.hand_library import load_library
+        try:
+            character = character_registry.resolve(character_id)
+            fingerprint = runtime_profile(blender_runner)
+        except (RegistryError, RunnerError, ValueError, OSError):
+            raise ApiProblem(503, 'SCREEN_PROFILE_UNAVAILABLE', 'screening profile unavailable') from None
+        return dict(version=PROFILE_VERSION, profile_sha256=fingerprint,
+            character_id=character.metadata.character_id,
+            character_sha256=character.metadata.sha256,
+            shape_sha256=None,
+            hand_library_sha256=load_library().sha256)
+
     @app.post('/screen-hand-contact')
     def screen_hand_contact(
         bvh: UploadFile = File(...),
