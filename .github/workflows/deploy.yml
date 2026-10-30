@@ -105,6 +105,22 @@ jobs:
           STAGING_IMAGE: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
         run: python scripts/prepare_staging_asset_initializer.py taskdef.json --image "$STAGING_IMAGE"
 
+      - name: Prepare environment-scoped VLM provider
+        env:
+          VLM_PROVIDER: ${{ vars.VLM_PROVIDER }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
+          OPENAI_REASONING_EFFORT: ${{ vars.OPENAI_REASONING_EFFORT }}
+          OPENAI_REQUEST_TIMEOUT_MS: ${{ vars.OPENAI_REQUEST_TIMEOUT_MS }}
+          OPENAI_MAX_ATTEMPTS: ${{ vars.OPENAI_MAX_ATTEMPTS }}
+          OPENAI_TOTAL_BUDGET_SECONDS: ${{ vars.OPENAI_TOTAL_BUDGET_SECONDS }}
+          BODY_VLM_PROVIDER: ${{ vars.BODY_VLM_PROVIDER }}
+          BODY_VLM_MODEL: ${{ vars.BODY_VLM_MODEL }}
+          BODY_COARSE_FAMILY_REVIEW_MODEL: ${{ vars.BODY_COARSE_FAMILY_REVIEW_MODEL }}
+          POSE_GENERATION_PROVIDER: ${{ vars.POSE_GENERATION_PROVIDER }}
+          POSE_GENERATION_MODEL: ${{ vars.POSE_GENERATION_MODEL }}
+          SKELETON_REPAIR_MODEL: ${{ vars.SKELETON_REPAIR_MODEL }}
+        run: python scripts/prepare_vlm_deployment.py taskdef.json
+
       - name: Prepare explicit fullbody deployment contract
         env:
           REQUESTED_POSE_VARIANT: ${{ vars.POSE_MODEL_VARIANT }}

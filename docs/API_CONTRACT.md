@@ -599,7 +599,7 @@ artifact는 알지 못한다. 따라서 Phase 3 제품 export는 BFF가 final ba
 
 ### 7-1. 상류 VLM 오류 원인 — `POST /analyze` → `503 VLM_UNAVAILABLE`
 
-VLM(Gemini)의 429·5xx·시간 초과를 서버 버그와 구분한다. 기존 BFF 호환을 위해
+VLM(Gemini/OpenAI)의 인증·권한·결제 한도·429·5xx·시간 초과를 서버 버그와 구분한다. 기존 BFF 호환을 위해
 HTTP **503**과 `code=VLM_UNAVAILABLE`은 유지하고, `reason`과 `retryable`을 추가한다.
 503 자체만으로 혼잡이나 사용자 사용량 초과를 단정하면 안 된다.
 
@@ -624,6 +624,9 @@ Retry-After: 30
 |---|---|---|
 | `rate_limited` | 429, 명확한 일일 한도 근거 없음 | true / 안내된 시간 후 재시도 |
 | `daily_quota_exhausted` | 429 + QuotaFailure의 quotaId 또는 quotaMetric에 명시된 per-day/daily | false / 한도 초기화 또는 운영자 확인 |
+| `authentication_failed` | 상류 401 | false / 운영자가 API 키 확인 |
+| `permission_denied` | 상류 403 | false / 운영자가 프로젝트·모델 접근 권한 확인 |
+| `billing_exhausted` | 상류 402 또는 OpenAI 429의 명시적 `insufficient_quota`/`billing_hard_limit_reached` 코드 | false / 운영자가 결제·크레딧 확인 |
 | `upstream_unavailable` | 503 | true / 상류 혼잡·일시 이용 불가, 잠시 후 재시도 |
 | `timeout` | 요청 시간 초과 | true / 잠시 후 사용자 재시도; 서버 내부 자동 재시도 없음 |
 | `upstream_error` | 기타 5xx | true / 상류 오류, 잠시 후 재시도 |
