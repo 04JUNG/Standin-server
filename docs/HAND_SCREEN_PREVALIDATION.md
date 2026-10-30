@@ -109,10 +109,13 @@ are not expected to match. The sanitizer preserves timings and fingerprints in
 `experiments/hand_screen_prevalidation/2026-10-30/results.json`; private model,
 BVH and FBX files are excluded from the repository.
 
-The full inference suite passed 3,007 tests (10 skipped, 28 subtests); the
+After integrating the latest `develop`, the full inference suite passed 3,316
+tests (10 skipped, 31 subtests); the
 Converter contract set passed 395 tests (one skipped). Contracts cover mixed
 certificate/live failures, presentation permissions, generated-byte isolation,
 body/hand/runtime changes, pinned-file tampering and request cancellation.
+The analysis deadline remains installed at every screening capacity (1–5),
+and description rollout settings preserve the configured hand screen capacity.
 
 These measurements are not the production 30-second session. Removing a 33.88 s
 screening stage from the earlier 60.275 s example would leave about 26.4 s plus

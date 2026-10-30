@@ -48,6 +48,13 @@ class Config:
     search_routing_enabled: bool = _env_bool("SEARCH_ROUTING", False)
     # 관절 근거가 부족한 인물이 있을 때만 나가는 자세 설명 호출 1회의 상한.
     routing_describe_timeout_ms: int = int(os.getenv("ROUTING_DESCRIBE_TIMEOUT_MS", "15000"))
+    # Includes description attempts, backoff and optional independent side review.
+    routing_describe_budget_ms: int = int(os.getenv("ROUTING_DESCRIBE_BUDGET_MS", "45000"))
+    # Leave time for matching/serialization before the fixed 120s analyze deadline.
+    routing_describe_reserve_ms: int = int(os.getenv("ROUTING_DESCRIBE_RESERVE_MS", "15000"))
+    # Multi-person descriptions: independent crops, at most two active per process.
+    routing_describe_person_crops: bool = _env_bool("ROUTING_DESCRIBE_PERSON_CROPS", True)
+    routing_describe_person_workers: int = int(os.getenv("ROUTING_DESCRIBE_PERSON_WORKERS", "2"))
     semantic_top_k: int = int(os.getenv("SEMANTIC_TOP_K", "5"))
     # 인물별 손 모양(04J-290). 분석과 분리된 VLM 호출이라 켜면 비용이 는다. 끄거나
     # 실패하면 손은 라이브러리 기본값(relaxed)과 기본 후보 목록으로 나간다.

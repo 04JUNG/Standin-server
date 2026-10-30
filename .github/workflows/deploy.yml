@@ -119,6 +119,18 @@ jobs:
           HAND_SKIN_SCREEN_CONCURRENCY: ${{ vars.HAND_SKIN_SCREEN_CONCURRENCY }}
         run: python scripts/prepare_hand_screen_deployment.py taskdef.json --container inference
 
+      - name: Prepare optional description rollout overrides
+        # Read environment-scoped vars only here. Empty preserves the current
+        # task setting; explicit '0' supports rollback without changing secrets.
+        env:
+          ROUTING_DESCRIBE_TIMEOUT_MS: ${{ vars.ROUTING_DESCRIBE_TIMEOUT_MS }}
+          ROUTING_DESCRIBE_BUDGET_MS: ${{ vars.ROUTING_DESCRIBE_BUDGET_MS }}
+          ROUTING_DESCRIBE_RESERVE_MS: ${{ vars.ROUTING_DESCRIBE_RESERVE_MS }}
+          ROUTING_DESCRIBE_PERSON_CROPS: ${{ vars.ROUTING_DESCRIBE_PERSON_CROPS }}
+          ROUTING_DESCRIBE_PERSON_WORKERS: ${{ vars.ROUTING_DESCRIBE_PERSON_WORKERS }}
+          PARALLEL_POSE_DESCRIPTION: ${{ vars.PARALLEL_POSE_DESCRIPTION }}
+        run: python scripts/prepare_description_deployment.py taskdef.json
+
       - name: Verify Human-Art model source
         if: ${{ env.ROUTING_FULLBODY_ENABLED == '1' || (vars.POSE_MODEL_VARIANT || 'cascade') == 'cascade' }}
         # 모델 URI는 환경별 assets 버킷을 소유한 CDK/CloudFormation이 task
