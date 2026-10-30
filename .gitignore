@@ -59,6 +59,9 @@ __pycache__/
 venv/
 .pytest_cache/
 
+# Generated decoder build data: never commit extracted third-party parameters.
+converter/local/cs3c_decoder_data.json
+
 # OS
 .DS_Store
 Thumbs.db

@@ -104,6 +104,11 @@ jobs:
             tests/converter/test_fast_scene_reset.py \
             tests/converter/test_preview_instrumentation.py
 
+      - name: Run local IPC and child cancellation contracts
+        run: |
+          python -m unittest discover -s tests/converter -p test_local_converter.py -v
+          python -m unittest discover -s tests/converter -p test_cs3c_decoder.py -v
+
   inference-isolation:
     name: Inference image excludes bpy
     runs-on: ubuntu-latest
