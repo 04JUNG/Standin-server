@@ -95,6 +95,35 @@ def test_empty_settings_preserve_task_exactly():
     assert prepare(task())==task()
 
 
+@pytest.mark.parametrize('problem',[None,'tampered','missing_pin'])
+def test_cli_accepts_pinned_manifest_without_deploy_role_s3_access(tmp_path,monkeypatch,problem):
+    import boto3
+    from scripts.prepare_hand_screen_release_deployment import main
+    objects,env,_=release(tmp_path)
+    key=env['HAND_SCREEN_RELEASE_MANIFEST_KEY']
+    inline=objects[key].decode()
+    if problem=='tampered':inline+=' '
+    for name in ['HAND_SCREEN_RELEASE_MANIFEST_KEY','HAND_SCREEN_RELEASE_MANIFEST_SHA256']:
+        monkeypatch.setenv(name,env[name])
+    if problem=='missing_pin':monkeypatch.delenv('HAND_SCREEN_RELEASE_MANIFEST_SHA256')
+    monkeypatch.setenv('HAND_SCREEN_RELEASE_MANIFEST_JSON',inline)
+    monkeypatch.setenv('HAND_SCREEN_PREVALIDATION_ENABLED','0')
+    monkeypatch.setattr(boto3,'client',lambda *_args,**_kwargs:pytest.fail('deploy role must not need S3'))
+    target=tmp_path/'task.json';original=json.dumps(task());target.write_text(original)
+    monkeypatch.setattr('sys.argv',['prepare',str(target),'--image',
+        '136889124221.dkr.ecr.ap-northeast-2.amazonaws.com/standin/inference:'+'a'*40,
+        '--environment','staging'])
+    if problem:
+        with pytest.raises(ValueError):main()
+        assert target.read_text()==original
+    else:
+        main()
+        result=json.loads(target.read_text())
+        assert any(c['name']==INIT for c in result['containerDefinitions'])
+        assert all(not row['name'].startswith('HAND_SKIN_PREVALIDATED')
+            for row in result['containerDefinitions'][0]['environment'])
+
+
 def test_production_task_cannot_be_enabled(tmp_path):
     value=task();value['family']='StandinAppInferenceTaskProduction'
     with pytest.raises(ValueError):prepare(value,enabled='1')

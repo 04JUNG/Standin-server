@@ -90,15 +90,23 @@ def main():
     args = parser.parse_args()
     key = os.getenv('HAND_SCREEN_RELEASE_MANIFEST_KEY', '')
     pin = os.getenv('HAND_SCREEN_RELEASE_MANIFEST_SHA256', '')
+    inline = os.getenv('HAND_SCREEN_RELEASE_MANIFEST_JSON', '')
     enabled = os.getenv('HAND_SCREEN_PREVALIDATION_ENABLED', '')
     raw = None
+    if inline and not (key and pin):
+        raise ValueError('inline hand screen manifest requires its pinned release key')
     if key or pin:
         if not KEY.fullmatch(key) or not re.fullmatch(r'[a-f0-9]{64}', pin):
             raise ValueError('invalid pinned hand screen manifest')
-        import boto3
-        response = boto3.client('s3').get_object(Bucket=BUCKET, Key=key)
-        with response['Body'] as body:
-            raw = body.read(65537)
+        if inline:
+            # The deploy role need not gain S3 access. Startup independently
+            # downloads and verifies the same manifest using the task read role.
+            raw = inline.encode('utf-8')
+        else:
+            import boto3
+            response = boto3.client('s3').get_object(Bucket=BUCKET, Key=key)
+            with response['Body'] as body:
+                raw = body.read(65537)
     result = prepare(json.loads(args.task.read_text()), key=key, manifest_sha256=pin,
                      manifest_raw=raw, image=args.image, enabled=enabled)
     args.task.write_text(json.dumps(result, indent=2)+'\n')

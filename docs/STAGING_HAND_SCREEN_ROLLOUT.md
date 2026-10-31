@@ -44,9 +44,11 @@ used by the earlier local experiment. The archive also contains thumbnails and
 is about 3.97 GB. Read it inside AWS and stream only BVHs for preparation; do not
 copy private library assets to a developer machine.
 
-After the profile image is deployed, prepare an operator-pinned catalog using the
-actual target code, Blender, registered base body hashes and hand presets. Store
-it as a new immutable staging release. A startup initializer must verify its
+Prepare an operator-pinned catalog using the exact target code, Blender,
+registered base body hashes and hand presets. An isolated job may prepare it
+before serving deployment when its target source bytes and base image are pinned.
+The serving profile must still match after deployment. Store the catalog as a new
+immutable staging release. A startup initializer must verify its
 SHA256 and mount it read-only before setting both `HAND_SKIN_PREVALIDATED_PATH`
 and `HAND_SKIN_PREVALIDATED_SHA256` in the inference task. Do not reuse the Mac
 certificates. Body-specific/custom-shape and partial-coverage limitations in
@@ -83,17 +85,25 @@ geometric safety threshold. Completed receipts must retain exactly the original
 pose/body/hands/runtime binding. This can eliminate former timeout-dependent
 unavailability; it does not claim identical responses under arbitrary timing.
 
+The profile image build checks both the original CSP sources and the exact added
+API/catalog bytes used by preparation. An unrelated later source change cannot
+silently reuse this release: it requires preparing/reviewing a new target profile.
+
 `publish_hand_screen_prevalidation.py` waits for the fixed shard/retry summaries,
 then runs assembly and startup-install verification inside AWS. Assembly rejects
 pilot data, missing/duplicate shards, altered checkpoints, unmatched retries,
 remaining unavailable inspections and incomplete body/hand pose coverage. It
 publishes `catalog.json` first and `manifest.json` last, each to a fresh immutable
 release key. Job-scoped PUT URLs give no general S3 write permission to workers.
+Publication can be retried after a lost acknowledgement only when the catalog
+and manifest contents are identical; it keeps the first publication timestamp.
 
 The inference workflow has a **develop/staging-only** release connection:
 
 - `HAND_SCREEN_RELEASE_MANIFEST_KEY`: pinned `hand-screen/releases/.../manifest.json`.
 - `HAND_SCREEN_RELEASE_MANIFEST_SHA256`: exact manifest SHA256.
+- `HAND_SCREEN_RELEASE_MANIFEST_JSON`: exact small manifest bytes as UTF-8 JSON;
+  the deploy runner verifies its pin without requiring S3 read permission.
 - `HAND_SCREEN_PREVALIDATION_ENABLED=0`: prepare/mount the file, retain live screening.
 - Change the last value to `1` only for the separately verified activation step.
 
@@ -102,8 +112,11 @@ shared volume without changing images/resources/secrets of other containers.
 `install_hand_screen_release.py` checks manifest and catalog SHA256, every receipt,
 entry count and profile binding before an atomic read-only installation. Inference
 waits for successful installation and mounts that volume read-only. Empty rollout
-variables preserve the existing task; explicit `0` without release keys removes
+variables preserve the existing task; explicit `0` after clearing the release
+key, pin and inline JSON removes
 this owned connection and runtime flags. No startup installer accepts a user path.
+The initializer independently downloads the manifest and catalog from S3 using
+the existing task read role; inline deployment metadata grants no extra AWS access.
 
 These sources remain in PR #163 until the normal protected develop review/merge
 path is complete. Preparing data and a task definition does not deploy that code

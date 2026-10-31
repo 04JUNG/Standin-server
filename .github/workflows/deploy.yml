@@ -152,6 +152,7 @@ jobs:
         env:
           HAND_SCREEN_RELEASE_MANIFEST_KEY: ${{ vars.HAND_SCREEN_RELEASE_MANIFEST_KEY }}
           HAND_SCREEN_RELEASE_MANIFEST_SHA256: ${{ vars.HAND_SCREEN_RELEASE_MANIFEST_SHA256 }}
+          HAND_SCREEN_RELEASE_MANIFEST_JSON: ${{ vars.HAND_SCREEN_RELEASE_MANIFEST_JSON }}
           HAND_SCREEN_PREVALIDATION_ENABLED: ${{ vars.HAND_SCREEN_PREVALIDATION_ENABLED }}
           STAGING_IMAGE: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
         run: python scripts/prepare_hand_screen_release_deployment.py taskdef.json --image "$STAGING_IMAGE" --environment staging
