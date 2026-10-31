@@ -3,7 +3,7 @@ import math
 from dataclasses import replace
 import numpy as np
 import bpy
-from .blender_adapter import snapshot,body_frame
+from .blender_adapter import snapshot,body_frame,capture_pose_channels,restore_pose_channels
 from .contact_parts import select_contact_part,contact_axis
 from .contact_adapter import apply_contact_part,hand_samples,target_frame
 from .relational_adapter import apply_relational,restore,new_skin
@@ -24,8 +24,9 @@ def contact_directions(arm,meshes,member,part):
     return checks
 
 
-def apply_language_plan(arm,meshes,plan,skin_check,profile):
-    state={p.name:p.matrix_basis.copy() for p in arm.pose.bones};before=snapshot(arm);baseline=skin_check(arm)
+def apply_language_plan(arm,meshes,plan,skin_check,profile,*,baseline_skin=None):
+    original_channels=capture_pose_channels(arm)
+    state={p.name:p.matrix_basis.copy() for p in arm.pose.bones};before=snapshot(arm);baseline=skin_check(arm) if baseline_skin is None else baseline_skin
     result={'plan':plan,'method':'per_arm_language_direction_fit_v2','accepted':False,'members':[],'trials':[],
             'initial_skin':baseline,'reasons':[],'release_allowed':False}
     if not plan['ready']:
@@ -35,7 +36,7 @@ def apply_language_plan(arm,meshes,plan,skin_check,profile):
     try:
         if engines=={'relational'}:
             relational_plan={**plan,'members':[{'side':m['side'],'part':m['part']} for m in active]}
-            native=apply_relational(arm,meshes,relational_plan,skin_check,profile)
+            native=apply_relational(arm,meshes,relational_plan,skin_check,profile,baseline_skin=baseline)
             result.update(native);result['plan']=plan;result['engine']='relational'
         elif engines=={'contact'}:
             paired=len(active)==2
@@ -52,7 +53,7 @@ def apply_language_plan(arm,meshes,plan,skin_check,profile):
                         accepted=None;member_state={p.name:p.matrix_basis.copy() for p in arm.pose.bones}
                         for bias in [0.,.75,-.75]:
                             restore(arm,member_state)
-                            native=apply_contact_part(arm,meshes,part,member['side'],skin_check,profile,pole_bias=bias)
+                            native=apply_contact_part(arm,meshes,part,member['side'],skin_check,profile,pole_bias=bias,reuse_hand_shape=member.get('part',{}).get('reuse_existing_hand_shape',False))
                             result['trials'].append({'side':member['side'],'pole_bias':bias,'lateral_fraction':fraction,'accepted':native['accepted'],'reasons':native['reasons'],'metrics':native.get('metrics')})
                             if native['accepted']:
                                 checks=contact_directions(arm,meshes,member,part)
@@ -77,9 +78,9 @@ def apply_language_plan(arm,meshes,plan,skin_check,profile):
             if delta>=2e-5:result.update(accepted=False,reasons=['protected_pose_changed'])
             result['protected_matrix_delta']=delta
     except Exception:
-        restore(arm,state);raise
+        restore_pose_channels(arm,original_channels);raise
     if not result['accepted']:
         result['rejected_pose_basis']={p.name:np.array(p.matrix_basis).tolist() for p in arm.pose.bones}
-        restore(arm,state);result['rollback_matrix_delta']=max(float(np.max(abs(snapshot(arm)[n]-v))) for n,v in before.items())
+        restore_pose_channels(arm,original_channels);result['rollback_matrix_delta']=max(float(np.max(abs(snapshot(arm)[n]-v))) for n,v in before.items())
     result['status']='applied' if result['accepted'] else 'not_applied'
     return result

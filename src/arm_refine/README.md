@@ -1,5 +1,9 @@
 # 팔 포즈 파츠 · 로컬 MVP
 
+The opt-in cached limb diagnosis pilot and full-set replay protocol are documented
+in [CACHED_LIMB_DIAGNOSIS.md](../../docs/CACHED_LIMB_DIAGNOSIS.md). It is disabled
+by default and does not change the app/worker execution paths.
+
 04J-318. 기존 BVH에서 쇄골 앵커 → 어깨 → 팔꿈치 → 손목 체인을 추출한다.
 독립 worktree `feat/04j-318-arm-refine`, 기준 커밋 `2eaae51`.
 공통 API/스키마/검색/IK/클라이언트는 수정하지 않는다. 운영 경로에 연결하지 않았다.
