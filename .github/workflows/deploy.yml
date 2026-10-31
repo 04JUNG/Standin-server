@@ -147,6 +147,16 @@ jobs:
           PARALLEL_POSE_DESCRIPTION: ${{ vars.PARALLEL_POSE_DESCRIPTION }}
         run: python scripts/prepare_description_deployment.py taskdef.json
 
+      - name: Prepare pinned staging hand screen release
+        if: github.ref == 'refs/heads/develop'
+        env:
+          HAND_SCREEN_RELEASE_MANIFEST_KEY: ${{ vars.HAND_SCREEN_RELEASE_MANIFEST_KEY }}
+          HAND_SCREEN_RELEASE_MANIFEST_SHA256: ${{ vars.HAND_SCREEN_RELEASE_MANIFEST_SHA256 }}
+          HAND_SCREEN_RELEASE_MANIFEST_JSON: ${{ vars.HAND_SCREEN_RELEASE_MANIFEST_JSON }}
+          HAND_SCREEN_PREVALIDATION_ENABLED: ${{ vars.HAND_SCREEN_PREVALIDATION_ENABLED }}
+          STAGING_IMAGE: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+        run: python scripts/prepare_hand_screen_release_deployment.py taskdef.json --image "$STAGING_IMAGE" --environment staging
+
       - name: Verify Human-Art model source
         if: ${{ env.ROUTING_FULLBODY_ENABLED == '1' || (vars.POSE_MODEL_VARIANT || 'cascade') == 'cascade' }}
         # 모델 URI는 환경별 assets 버킷을 소유한 CDK/CloudFormation이 task

@@ -22,6 +22,7 @@ on:
         options:
           - converter
           - scene-worker
+          - hand-screen-staging-image
         required: true
         default: converter
       deploy_staging:
@@ -46,6 +47,7 @@ jobs:
     name: Deploy isolated converter
     if: >-
       inputs.target != 'scene-worker' &&
+      inputs.target != 'hand-screen-staging-image' &&
       (vars.CONVERTER_AUTO_DEPLOY_ENABLED == 'true' ||
        (github.event_name == 'workflow_dispatch' && inputs.deploy_staging && github.ref == 'refs/heads/develop'))
     runs-on: ubuntu-latest
@@ -166,3 +168,28 @@ jobs:
     uses: ./.github/workflows/scene-worker-deploy.yml
     with:
       deploy_staging: ${{ inputs.deploy_staging }}
+
+  hand_screen_staging_image:
+    name: Build pinned staging hand-screen profile image
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/develop' && inputs.target == 'hand-screen-staging-image'
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.CONVERTER_AWS_DEPLOY_ROLE }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - uses: docker/setup-buildx-action@v3
+      - name: Add read-only screening profile to pinned staging image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.converter.hand-screen-staging
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:hand-screen-staging-${{ github.sha }}
+          build-args: |
+            DEPLOYMENT_VERSION=hand-screen-staging-${{ github.sha }}

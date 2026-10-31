@@ -335,6 +335,8 @@ def create_app(
     app.state.registry = character_registry
     app.state.runner = blender_runner
     app.state.max_bvh_bytes = size_limit
+    from converter_api.csp_shape import register_csp_shape
+    register_csp_shape(app, character_registry, blender_runner)
 
     from converter_api.scene_routes import register_scene_routes
     register_scene_routes(app, blender_runner)
