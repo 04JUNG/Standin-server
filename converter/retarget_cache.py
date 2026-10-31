@@ -41,7 +41,7 @@ def validate_base(data, metadata, identity):
         or body.get('frame') != FRAME or body.get('mirrored') != identity['mirror']
         or body.get('missing_required') or body.get('mapped_bones',0) <= 0):
         raise CacheIntegrityError('invalid retarget body report')
-    if any(name in body for name in ['hands','framing','camera_rotation','preview_sha256','shape_bake']):
+    if any(name in body for name in ['hands','source_fingers','framing','camera_rotation','preview_sha256','shape_bake']):
         raise CacheIntegrityError('postprocessed output is not a retarget base')
     if (not data.startswith(b'Kaydara FBX Binary ') or metadata.get('artifact_sha256') != sha(data)
         or metadata.get('body_report_sha256') != sha(encode(body))):

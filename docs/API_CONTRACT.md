@@ -1040,7 +1040,11 @@ BVH 조건 판정을 보존한다. 의미 점수는 정확도가 아니며 기�
 검색·refine에는 쓰지 않는다.
 
 FBX에 손을 구우려면 converter `POST /convert`·`/convert-bundle`·`/convert-framed`에 form 필드
-`hand_left`, `hand_right`(프리셋 id)를 보낸다. 보내지 않으면 기존과 바이트 단위로 같은 FBX다.
+`hand_left`, `hand_right`(프리셋 id)를 보낸다. 생략한 손은 원본 BVH의 손가락 회전을
+유지한다(`source-fingers-v1`, 몸 변환 뒤·framing 전). 지정한 손만 프리셋으로 덮어쓴다.
+Mixamo/100STYLE/Unreal의 15마디 체인이 없는 원본은 그 손의 기본 형상을 유지하고 converter
+report의 `source_fingers.sides`에 `missing_finger_chain`을 기록한다. 원본에 없는 손 모양을
+추정해 만들지 않는다. `force_exact_v324`는 이 단계를 건너뛰어 기존 복구 규약을 유지한다.
 프리셋 목록·불변식·제약: `docs/HAND_LIBRARY.md`.
 
 

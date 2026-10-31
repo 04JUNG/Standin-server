@@ -401,6 +401,14 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
             "base_sha256":base_metadata["artifact_sha256"],"body_report_sha256":base_metadata["body_report_sha256"]}
     if recipe is not None and ok:
         payload["shape_bake"] = json.loads(Path(job["output_path"]).with_suffix(".shape.json").read_text())
+    if ok:
+        from converter.source_fingers import bake_source_fingers
+        with lab_timings.measure("source_finger_import_apply_export"):
+            payload["source_fingers"] = bake_source_fingers(
+                job["output_path"], job["bvh_path"], frame=FRAME,
+                mirror=job["mirror"], hands=job.get("hands"),
+                force_exact_v324=job["force_exact_v324"],
+            )
     if ok and job.get("hands") is not None:
         # 손은 몸 변환 직후, 메시 절단·카메라 회전·미리보기보다 먼저 굽는다.
         # 그래야 이후 단계가 모두 손이 적용된 실제 산출물을 다시 읽는다.
