@@ -121,3 +121,30 @@ the existing task read role; inline deployment metadata grants no extra AWS acce
 These sources remain in PR #163 until the normal protected develop review/merge
 path is complete. Preparing data and a task definition does not deploy that code
 or activate certificate lookup in the serving process.
+
+## Completed preparation, 2026-10-31
+
+All 11,724 bindings finished in AWS: 10,825 `clear_screen`, 899 `intersection`,
+zero unavailable, no retry pass needed. All eight preparation tasks and the
+assembly/install verification task exited successfully. The 16,645,782-byte
+catalog contains both positive and negative decisions; a saved rejection does
+not become a pass.
+
+- Release: `prevalidation-20261031-59695598-a0a0de`.
+- Manifest SHA256: `4826b936866b1a330aecda8fde512c572740b2f0e062c93fb8c23a1b145038ce`.
+- Catalog SHA256: `5ba5dfa0e7d3cafe6be2d203e86d7113de47a844a7c9c1c1cdb17fec0f5d1ff1`.
+
+An isolated task using the inference image verified every entry and installed
+the catalog with mode `0444`. A preview against the current staging task verified
+the initializer dependency/read-only mount and preservation of existing images,
+resources, secrets and body initialization. The pinned key, hash and exact small
+manifest JSON are saved in GitHub's `staging` environment with
+`HAND_SCREEN_PREVALIDATION_ENABLED=0`. No deploy-role policy was expanded.
+
+The serving task has not received this startup connection, and certificate lookup
+is not enabled. PR review/merge, the matching Converter profile deployment and
+actual request hit/result/timing verification remain necessary. This preparation
+does not establish a new end-to-end generation latency or certify other shapes.
+
+Derived evidence only (no source BVHs/FBXs, pose IDs or signed URLs):
+`experiments/hand_screen_staging/2026-10-31/prevalidation.json`.
