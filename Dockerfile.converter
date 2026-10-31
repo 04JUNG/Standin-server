@@ -67,6 +67,8 @@ RUN python -m pip install --requirement /app/requirements-converter.txt
 
 # Runtime allowlist: no inference source, tests, QA snapshots, or user artifacts.
 COPY converter/__init__.py /app/converter/__init__.py
+COPY converter/csp_vrm.py converter/csp_shape_worker.py /app/converter/
+COPY converter_api/csp_shape.py /app/converter_api/csp_shape.py
 COPY converter/ankle_policy.json /app/converter/ankle_policy.json
 COPY converter/SHA256SUMS.v325 /app/converter/SHA256SUMS.v325
 COPY converter/airborne_plantar.py /app/converter/airborne_plantar.py

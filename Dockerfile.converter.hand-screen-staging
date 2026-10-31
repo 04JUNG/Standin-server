@@ -1,0 +1,12 @@
+# Preserve the exact CSP/body export image already serving staging.
+FROM 136889124221.dkr.ecr.ap-northeast-2.amazonaws.com/standin/converter@sha256:b60b78bffadab4cc07ed71ef33cd8dcecd3a1eac3e04c846fe57a24a27782898
+
+# Fail rather than replace an unexpected API distribution. Geometry workers and
+# the installed CSP exporters remain byte-for-byte unchanged in the base image.
+RUN python -c "import hashlib; from pathlib import Path; expected={'converter_api/app.py':'2613114ebee7167cc564917b6ea91fc03ac8248443fd48c93a16d5f48e6961df','converter/csp_vrm.py':'c033d022d1176113cddcaaa00169b4abc0d850db3f0b6dadb690fee672db8ee6','converter/csp_shape_worker.py':'8c648acf30160c441dd6863cc1c33f40b13b7a1f968d6702a41e632880a998bd','converter_api/csp_shape.py':'87cdeeb08db1253aea6c828054680f21c6f103f7caf3f5a62a131566a8f82813'}; actual={p:hashlib.sha256(Path('/app',p).read_bytes()).hexdigest() for p in expected}; assert actual==expected,actual"
+
+COPY converter/hand_screen_catalog.py /app/converter/hand_screen_catalog.py
+COPY converter_api/app.py /app/converter_api/app.py
+
+ARG DEPLOYMENT_VERSION
+ENV DEPLOYMENT_VERSION=${DEPLOYMENT_VERSION}
