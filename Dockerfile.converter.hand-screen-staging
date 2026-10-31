@@ -8,5 +8,9 @@ RUN python -c "import hashlib; from pathlib import Path; expected={'converter_ap
 COPY converter/hand_screen_catalog.py /app/converter/hand_screen_catalog.py
 COPY converter_api/app.py /app/converter_api/app.py
 
+# These are the precise profile additions used by the offline certificate jobs.
+# A later API/catalog edit requires reviewing and preparing a new target release.
+RUN python -c "import hashlib; from pathlib import Path; expected={'converter_api/app.py':'beadff05862855765924cc0d3f22aeeaaa177bf09ec610d5def2ea804d58ecf6','converter/hand_screen_catalog.py':'377d62a3ba9f0539fb9b5c5643edce1fd34b5d6652ec0211d9e378b833fb9bcb'}; assert {p:hashlib.sha256(Path('/app',p).read_bytes()).hexdigest() for p in expected}==expected,'prepared profile source changed'"
+
 ARG DEPLOYMENT_VERSION
 ENV DEPLOYMENT_VERSION=${DEPLOYMENT_VERSION}

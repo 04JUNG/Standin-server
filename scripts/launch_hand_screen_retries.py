@@ -49,7 +49,8 @@ def launch(path):
     worker['user']='0';worker['command']=['python','-u','-c',bootstrap(
         code_key,pin,plan_key,hashlib.sha256(raw).hexdigest(),'retry_hand_screen_prevalidation.py')]
     env={r['name']:r['value'] for r in worker.get('environment',[])}
-    env.update(CONVERTER_MAX_CONCURRENT_PROCESSES='1',CONVERTER_LOG_LEVEL='ERROR')
+    env.update(CONVERTER_MAX_CONCURRENT_PROCESSES='1',CONVERTER_LOG_LEVEL='ERROR',
+               CONVERTER_TIMEOUT_SECONDS='60')
     worker['environment']=[dict(name=k,value=v) for k,v in env.items()]
     worker['logConfiguration']['options']['awslogs-stream-prefix']='hand-prevalidation-retry'
     definition=ecs.register_task_definition(**task)['taskDefinition']['taskDefinitionArn']

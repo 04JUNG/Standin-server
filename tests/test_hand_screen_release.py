@@ -11,6 +11,7 @@ from scripts.prepare_hand_screen_release_deployment import prepare, ROOT, INIT
 from scripts.prevalidate_hand_screen_batch import fixtures
 from scripts.prevalidate_hand_screen_batch import inspect_one
 from scripts.assemble_hand_screen_release import assemble
+from scripts.assemble_hand_screen_release import existing_manifest
 from converter.hand_screen_catalog import binding
 from tests.test_hand_skin_parallel import receipt
 from tests.test_hand_screen_catalog import catalog_file
@@ -205,3 +206,11 @@ def test_retry_certificate_must_match_original_failed_binding(tmp_path,problem):
     else:
         catalog,manifest=run()
         assert len(json.loads(catalog)['entries'])==3 and manifest['reinspected_entries']==1
+
+
+def test_publishing_retry_keeps_first_timestamp_but_rejects_changed_contents():
+    prior=dict(created_at='first',profile_sha256='c'*64,catalog=dict(sha256='a'*64))
+    fresh=dict(prior,created_at='later')
+    assert existing_manifest(fresh,prior)==prior
+    with pytest.raises(ValueError):existing_manifest(dict(fresh,profile_sha256='d'*64),prior)
+    with pytest.raises(ValueError):existing_manifest(dict(fresh,catalog=dict(sha256='b'*64)),prior)

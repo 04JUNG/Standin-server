@@ -126,6 +126,15 @@ def assemble(summaries, read, *, expected_pose_count, expected_characters, expec
     return catalog, manifest
 
 
+def existing_manifest(fresh, previous):
+    """A lost acknowledgement may be retried without replacing a release."""
+    new = dict(fresh);old = dict(previous)
+    new.pop('created_at',None);old.pop('created_at',None)
+    if new != old:
+        raise ValueError('immutable release manifest collision')
+    return previous
+
+
 def main():
     import argparse
     import boto3
@@ -147,6 +156,12 @@ def main():
     # put_checkpoint uses canonical JSON; this roundtrip retains exactly those bytes.
     cat = put_checkpoint(s3, plan['bucket'], plan['catalog'], json.loads(raw))
     assert cat['sha256'] == manifest['catalog']['sha256']
+    try:
+        prior=json.loads(read(plan['manifest']['key'],65536))
+    except s3.exceptions.NoSuchKey:
+        prior=None
+    if prior is not None:
+        manifest=existing_manifest(manifest,prior)
     result = put_checkpoint(s3, plan['bucket'], plan['manifest'], manifest)
     print(json.dumps(dict(event='hand_screen_release_published', manifest=result,
                          catalog=cat, entries=manifest['catalog']['entries'],

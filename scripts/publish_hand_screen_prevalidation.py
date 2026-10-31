@@ -9,6 +9,7 @@ import hashlib
 import json
 from pathlib import Path
 import sys
+import uuid
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -30,7 +31,13 @@ def launch(receipt_path, output_path):
         s3.head_object(Bucket=BUCKET,Key=job['summary_key'])
     code=code_package();code_sha=hashlib.sha256(code).hexdigest()
     code_key=receipt['prefix']+'/publish-code-'+code_sha[:12]+'.tar.gz'
-    s3.put_object(Bucket=BUCKET,Key=code_key,Body=code,IfNoneMatch='*',ContentType='application/gzip')
+    try:
+        s3.put_object(Bucket=BUCKET,Key=code_key,Body=code,IfNoneMatch='*',ContentType='application/gzip')
+    except s3.exceptions.ClientError as error:
+        if error.response['Error']['Code'] not in ('PreconditionFailed','412'):
+            raise
+        prior=s3.get_object(Bucket=BUCKET,Key=code_key)['Body'].read(len(code)+1)
+        if prior!=code:raise ValueError('publish code collision') from None
     folder = 'hand-screen/releases/'+receipt['version']
     def delegated(key):
         return dict(key=key,url=s3.generate_presigned_url('put_object',Params=dict(
@@ -41,7 +48,7 @@ def launch(receipt_path, output_path):
         retry_summaries=[j['summary_key'] for j in retries],
         catalog=delegated(folder+'/catalog.json'),manifest=delegated(folder+'/manifest.json'))
     raw=json.dumps(plan).encode();pin=hashlib.sha256(raw).hexdigest()
-    plan_key=receipt['prefix']+'/private-publish-plan.json'
+    plan_key=receipt['prefix']+'/private-publish-plan-'+uuid.uuid4().hex[:12]+'.json'
     s3.put_object(Bucket=BUCKET,Key=plan_key,Body=raw,IfNoneMatch='*',ContentType='application/json')
     # This is a verification-only task. Do not import/start inference or expose
     # ports, and do not copy the Converter API into the inference distribution.
