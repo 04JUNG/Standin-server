@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-31",
+  "environment": "staging",
+  "parallel_screening_enabled": true,
+  "inference_screen_capacity": 2,
+  "converter_process_capacity": 2,
+  "service_rollouts_completed": true,
+  "prevalidation_enabled": false,
+  "prevalidation_blocker": "Installed CSP Converter lacks profile endpoint; prepare image through protected develop deployment route before catalog release",
+  "private_asset_processing": "AWS staging only",
+  "smoke": {
+    "input_library_candidates": 6,
+    "selected_candidates_per_mode": 5,
+    "one_worker_seconds": 32.458,
+    "two_workers_seconds": 31.428,
+    "selected_order_and_hand_receipts_equal": true,
+    "compared_receipt_fields": ["status", "reason", "method", "scope", "complete_collision_certificate", "triangle_counts", "intersection_pairs", "source_bvh_sha256", "character_id", "character_sha256", "solver_version", "hands", "hand_library_sha256"],
+    "hand_settings": "original",
+    "rounds": 1,
+    "new_vlm_requests": 0,
+    "limitation": "Single small fixture run. No claim of a general speedup, full-library coverage, or end-to-end generation improvement. FBX exporter metadata hashes excluded."
+  }
+}
