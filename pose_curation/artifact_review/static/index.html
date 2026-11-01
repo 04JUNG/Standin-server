@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>전체 포즈 라이브러리 검수</title><link rel="stylesheet" href="/static/style.css?v=auto-review-1">
+<script type="importmap">{"imports":{"three":"/vendor/build/three.module.js","three/addons/":"/vendor/examples/jsm/"}}</script>
+</head><body>
+<header><div><small>STANDIN · 최종 산출물</small><h1>전체 포즈 라이브러리 검수</h1><p id="summary">라이브러리를 불러오고 있습니다.</p></div>
+<div class="links"><a href="http://127.0.0.1:8776/final-scene-review-r7.html">손·소품 170개 상세 검수</a><a href="/api/reviews/export" download="pose-human-reviews.json">내 검수 기록 내려받기</a><button type="button" id="auto-apply">자동 판정 일괄 적용</button></div></header>
+<p class="notice">목록과 3D 화면은 손 복구를 반영한 최신 FBX에서 만든 모델입니다. <b>내 검수</b>는 기존 자동 검사·AI 검수와 별도로 저장됩니다. 제외를 눌러도 원본 파일이나 S3 배포본은 삭제하지 않습니다.</p>
+<main><section class="library"><div class="filters">
+<input id="query" type="search" placeholder="포즈 이름·동작·태그 검색" aria-label="포즈 검색">
+<select id="group" aria-label="기존 신규 구분"><option value="all">기존 + 추가 포즈 전체</option><option value="existing">기존 라이브러리</option><option value="new">추가한 포즈</option></select>
+<select id="category" aria-label="카테고리"><option value="">모든 카테고리</option></select>
+<select id="cohort" aria-label="검수 대상"><option value="all">전체 5,862개</option><option value="scenes">손·소품 복구 170개</option><option value="repaired">보류 후 수정한 63개</option></select>
+<select id="status" aria-label="내 검수 상태"><option value="all">내 검수 · 전체</option><option value="pending">미검수</option><option value="accepted">채택</option><option value="hold">보류</option><option value="rejected">제외</option></select>
+<select id="auto" aria-label="자동 검사 결과"><option value="all">자동 검사 · 전체</option><option value="flagged">자동 · 보류+제외 권장</option><option value="reject">자동 · 제외 권장</option><option value="hold">자동 · 보류 권장</option><option value="fixable">자동 · 수정안으로 해결</option><option value="pass">자동 · 통과</option></select>
+<select id="code" aria-label="자동 검사 문제 유형"><option value="">문제 유형 · 전체</option></select>
+</div><div class="pagination"><button id="prev-page">← 이전 페이지</button><span id="page-info"></span><button id="next-page">다음 페이지 →</button></div>
+<p id="list-message" role="status"></p><div id="cards"></div></section>
+<section class="inspector" aria-label="포즈 상세 검수"><div class="title-row"><div><small id="provenance"></small><h2 id="pose-title">포즈를 선택해 주세요</h2><p id="pose-id"></p></div></div>
+<div class="toolbar"><select id="scope" aria-label="출력 범위"><option value="full">전신</option></select><button data-angle="0">기본 각도</button><button data-angle="45">45°</button><button data-angle="90">측면</button><button data-angle="180">후면</button><button id="reset">화면 맞춤</button></div>
+<div id="stage"><canvas id="viewer" aria-label="최신 FBX의 3D 미리보기"></canvas><p id="model-status" role="status">포즈를 선택해 주세요</p></div>
+<p class="hint">끌어서 회전 · 휠로 확대 · 오른쪽 버튼으로 이동 · 각도 버튼은 모델 좌표 기준입니다.</p>
+<div class="navigation"><button id="prev-pose">← 이전 포즈</button><span id="selected-position"></span><button id="next-pose">다음 포즈 →</button></div>
+<div id="downloads" class="links"></div>
+<section id="auto-review" hidden><div class="auto-head"><h3>자동 검사</h3><span id="auto-verdict" class="badge"></span><button type="button" id="auto-fill">자동 판정으로 채우기</button></div>
+<ul id="auto-findings"></ul><p id="auto-fix" class="hint"></p>
+<details id="auto-sheet-box"><summary>원본 / 자동 수정안 뼈대 비교 (정면·측면·45°)</summary><img id="auto-sheet" alt="자동 검사 원본과 수정안 비교"></details></section>
+<div id="tags"></div><details><summary>기존 동작 설명</summary><p id="description"></p></details>
+<form id="review-form"><h3>내 검수</h3><div class="decisions"><label><input type="radio" name="decision" value="accepted"> 채택</label><label><input type="radio" name="decision" value="hold"> 보류</label><label><input type="radio" name="decision" value="rejected"> 제외</label><label><input type="radio" name="decision" value="pending" checked> 미검수</label></div>
+<textarea id="note" maxlength="2000" placeholder="손 모양, 관통, 소품 배치 등 수정할 내용을 적어 주세요." aria-label="검수 메모"></textarea>
+<div class="save-row"><button type="submit" id="save" disabled>검수 저장</button><button type="button" id="save-next" disabled>저장 후 다음</button><span id="save-status" role="status"></span></div></form>
+</section></main><script type="module" src="/static/app.js?v=auto-review-1"></script></body></html>
