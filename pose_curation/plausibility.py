@@ -26,11 +26,14 @@ import numpy as np
 from src.collision import (arm_leg_penetration, arm_torso_penetration,
                            leg_leg_penetration, leg_torso_penetration)
 
-VERSION = "plausibility-2026-11-02.5"
+VERSION = "plausibility-2026-11-02.6"
 SIDES = {"left": ("Left", 1.0), "right": ("Right", -1.0)}
 TOLERANCE = 2.0          # degrees; measurement noise allowance before flagging
 COLLISION_HOLD = 0.025   # torso lengths (pose_curation.qa.policy.CAPSULE_DEPTH)
 COLLISION_REJECT = 0.08
+# Never "reject" on these alone: reviewers accepted poses far past their extreme
+# tier (Mixamo Baseball Hit, Arm Stretching), so they only ask for a human look.
+HOLD_ONLY = {"humeral_rotation", "forearm_rotation", "wrist_deviation", "wrist_extension"}
 
 # name: (label, normal (lo, hi), extreme (lo, hi), source)
 LIMITS = {
@@ -417,6 +420,8 @@ def rom_findings(m) -> list[dict]:
             if key not in m: continue
             normal, extreme = limits_for(code, m, side)
             sev = _band(m[key], normal, extreme)
+            if sev == "reject" and code in HOLD_ONLY:
+                sev = "hold"
             if sev:
                 lim = [round(x, 1) for x in (normal if sev == "hold" else extreme)]
                 out.append(_finding(code, side, m[key], sev, list(lim)))
@@ -582,12 +587,13 @@ def _fix_chain(pose, chain, rest_key, rel, parent_frame, codes, signs=(1, 1, 1))
     return True
 
 
-def correct(joints, frame) -> tuple[np.ndarray, list[str]]:
+def correct(joints, frame, keep_ankles=()) -> tuple[np.ndarray, list[str]]:
     """Clamp every measure into the normal tier. Returns (frame, changed steps).
 
     Proximal first so distal joints are measured after their parents settle.
     Elbow/knee off-axis bending is fixed by twisting the upper segment about
-    its own axis, which leaves every joint position unchanged.
+    its own axis, which leaves every joint position unchanged. Ankles of the
+    sides in ``keep_ankles`` are left for ``ankle_correction`` (planted feet).
     """
     sk = Skeleton(joints)
     if sk.missing: return np.asarray(frame, float), []
@@ -635,6 +641,8 @@ def correct(joints, frame) -> tuple[np.ndarray, list[str]]:
         for seg, child, codes, signs, name in (
                 ("thigh", "shin", ("knee_flexion", "knee_offaxis", "knee_rotation"), (1, 1, s), "knee"),
                 ("shin", "foot", ("ankle_plantar", "ankle_eversion", "ankle_toe_out"), (1, s, s), "ankle")):
+            if name == "ankle" and side in keep_ankles:
+                continue
             A, B = pose.seg(f"{side}_{seg}"), pose.seg(f"{side}_{child}")
             rel = euler_angles(A.T @ B, "XZY")
             knee = {f"{side}_knee_flexion": euler_angles(

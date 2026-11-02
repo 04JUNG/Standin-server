@@ -18,6 +18,7 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src.bvh import parse_bvh, write_single_frame_bvh
+from pose_curation import ankle_correction as ac
 from pose_curation import plausibility as pl
 from pose_curation.storage import utc_now
 
@@ -37,6 +38,24 @@ def displacement(joints, before, after):
     return round(moves[worst], 3), worst
 
 
+def corrected_frame(joints, frame):
+    """Clamp everything, then fix planted ankles against the original floor contacts."""
+    contact, _ = ac.planted(joints, frame)
+    fixed, changed = pl.correct(joints, frame, keep_ankles=tuple(contact))
+    ankle = ac.correct_ankles(joints, frame, base=fixed)
+    if ankle["status"] not in ("nothing", "unsupported"):
+        fixed = ankle["frame"]
+        changed.append("planted_" + ankle["status"])
+    return fixed, changed, ankle
+
+
+def ankle_summary(ankle):
+    keys = ("alpha", "ok", "reasons", "ankle_gain", "contact_drift", "silhouette", "heel_lift")
+    return {"status": ankle["status"], "alpha": ankle.get("alpha", 0.0),
+            "sides": ankle.get("sides", []), "gross_sides": ankle.get("gross_sides", []),
+            "steps": [{k: s[k] for k in keys} for s in ankle["steps"]]}
+
+
 def audit(path, corrected_dir):
     pose_id = Path(path).stem
     raw = Path(path).read_bytes()
@@ -49,7 +68,7 @@ def audit(path, corrected_dir):
     result.pop("measures", None)
     result["pose_id"] = pose_id
     if result["verdict"] in ("hold", "reject"):
-        fixed, changed = pl.correct(joints, frames[0])
+        fixed, changed, ankle = corrected_frame(joints, frames[0])
         after = pl.evaluate(joints, fixed)
         moved, where = displacement(joints, frames[0], fixed)
         improves = (RANK[after["verdict"]] < RANK[result["verdict"]]
@@ -60,6 +79,7 @@ def audit(path, corrected_dir):
             "changed": changed, "verdict": after["verdict"], "findings": after["findings"],
             "max_move_torso": moved, "max_move_joint": where,
             "usable": bool(improves and not new_collision),
+            "ankle": ankle_summary(ankle),
         }
         if improves and not new_collision and corrected_dir:
             write_single_frame_bvh(str(path), fixed, str(Path(corrected_dir) / f"{pose_id}.bvh"))

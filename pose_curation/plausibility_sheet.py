@@ -38,20 +38,27 @@ def _project(points, yaw):
     return np.column_stack([c * points[:, 0] + s * points[:, 2], points[:, 1]])
 
 
-def draw_pose(joints, frame, size, highlight=(), title=""):
+def draw_pose(joints, frame, size, highlight=(), title="", ref=None, floor=None):
+    """Three views of one frame. ``ref`` fixes origin and scale (for step rows);
+    ``floor`` is a world height drawn as a grey line."""
     sk = Skeleton(joints)
     pos, _, _ = fk_world(joints, frame)
-    pos = pos - pos[sk.role["pelvis"]]
+    ref_pos = pos if ref is None else fk_world(joints, ref)[0]
+    origin = ref_pos[sk.role["pelvis"]]
+    pos, ref_pos = pos - origin, ref_pos - origin
     img = Image.new("RGB", (size * len(VIEWS), size + 22), "white")
     d = ImageDraw.Draw(img)
-    span = np.ptp(pos, axis=0).max() or 1.0
+    span = np.ptp(ref_pos, axis=0).max() or 1.0
     scale = .8 * size / span
     font = _font(13)
     for v, (label, yaw) in enumerate(VIEWS):
-        p2 = _project(pos, yaw)
-        cx = v * size + size / 2 - (p2[:, 0].max() + p2[:, 0].min()) / 2 * scale
-        cy = 22 + size / 2 + (p2[:, 1].max() + p2[:, 1].min()) / 2 * scale
+        p2, r2 = _project(pos, yaw), _project(ref_pos, yaw)
+        cx = v * size + size / 2 - (r2[:, 0].max() + r2[:, 0].min()) / 2 * scale
+        cy = 22 + size / 2 + (r2[:, 1].max() + r2[:, 1].min()) / 2 * scale
         xy = lambda i: (cx + p2[i, 0] * scale, cy - p2[i, 1] * scale)
+        if floor is not None:
+            fy = cy - (floor - origin[1]) * scale
+            d.line([(v * size + 8, fy), ((v + 1) * size - 8, fy)], fill=(190, 190, 190), width=1)
         # Draw far-to-near for a little depth cue.
         c, s = math.cos(math.radians(yaw)), math.sin(math.radians(yaw))
         depth = -s * pos[:, 0] + c * pos[:, 2]
@@ -66,9 +73,40 @@ def draw_pose(joints, frame, size, highlight=(), title=""):
         for j, sev in highlight:
             x, y = xy(j)
             d.ellipse([x - 7, y - 7, x + 7, y + 7], outline=SEVERITY.get(sev, (0, 0, 0)), width=3)
-        d.text((v * size + 6, 3), label, fill=(90, 90, 90), font=font)
+        if not (title and v == len(VIEWS) - 1 and len(title) > 4):
+            d.text((v * size + 6, 3), label, fill=(90, 90, 90), font=font)
     if title:
+        if len(title) > 4:  # long step titles take the last view's label slot
+            d.rectangle([size * (len(VIEWS) - 1) - 60, 0, size * len(VIEWS), 20], fill="white")
         d.text((size * len(VIEWS) - 6, 3), title, fill=(0, 0, 0), font=font, anchor="ra")
+    return img
+
+
+def draw_zoom(joints, frame, size, focus, ref=None, floor=None):
+    """Front and side close-up around ``focus`` joints (e.g. knees to toes)."""
+    pos, _, _ = fk_world(joints, frame)
+    ref_pos = pos if ref is None else fk_world(joints, ref)[0]
+    img = Image.new("RGB", (size * 2, size + 22), (250, 250, 247))
+    d = ImageDraw.Draw(img)
+    font = _font(12)
+    for v, (label, yaw) in enumerate((("발 정면", 0), ("발 측면", 90))):
+        p2, r2 = _project(pos, yaw), _project(ref_pos, yaw)
+        box = r2[list(focus)]
+        span = max(np.ptp(box, axis=0).max(), 1e-6)
+        scale = .8 * size / span
+        cx = v * size + size / 2 - (box[:, 0].max() + box[:, 0].min()) / 2 * scale
+        cy = 22 + size / 2 + (box[:, 1].max() + box[:, 1].min()) / 2 * scale
+        xy = lambda i: (cx + p2[i, 0] * scale, cy - p2[i, 1] * scale)
+        if floor is not None:
+            fy = cy - floor * scale
+            d.line([(v * size + 4, fy), ((v + 1) * size - 4, fy)], fill=(170, 170, 170), width=2)
+        for i in range(1, len(joints)):
+            p = joints[i][1]
+            if p < 0: continue
+            a, b = xy(p), xy(i)
+            if all(v * size <= x <= (v + 1) * size and 22 <= y <= size + 22 for x, y in (a, b)):
+                d.line([a, b], fill=COLORS[_side(joints[i][0])], width=4)
+        d.text((v * size + 6, 3), label, fill=(90, 90, 90), font=font)
     return img
 
 
@@ -88,12 +126,29 @@ def highlight_joints(sk, findings):
     return out
 
 
-def comparison(joints, before, after, findings, after_findings, header, size=220):
+def comparison(joints, before, after, findings, after_findings, header, size=220,
+               steps=(), floor=None, focus=()):
+    """Original, final correction and optional (frame, title) step rows.
+
+    ``focus`` joint indices add a zoomed close-up (used for feet) to every row.
+    """
     sk = Skeleton(joints)
-    top = draw_pose(joints, before, size, highlight_joints(sk, findings), "원본")
+
+    def row(frame, highlight, title, ref):
+        body = draw_pose(joints, frame, size, highlight, title, ref=ref, floor=floor)
+        if not focus:
+            return body
+        zoom = draw_zoom(joints, frame, size, focus, ref=before, floor=floor)
+        out = Image.new("RGB", (body.width + zoom.width, body.height), "white")
+        out.paste(body, (0, 0)); out.paste(zoom, (body.width, 0))
+        return out
+
+    top = row(before, highlight_joints(sk, findings), "원본", None)
     rows = [top]
     if after is not None:
-        rows.append(draw_pose(joints, after, size, highlight_joints(sk, after_findings), "자동 수정안"))
+        rows.append(row(after, highlight_joints(sk, after_findings), "자동 수정안", before))
+    for frame, title in steps:
+        rows.append(row(frame, (), title, before))
     font = _font(14)
     lines = [header] + [f"[{'제외' if f['severity'] == 'reject' else '보류'}] {f['label']} {f['value']}"
                         f" (한계 {f['limit']})" for f in findings[:6]]

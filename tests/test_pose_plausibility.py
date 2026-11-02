@@ -189,6 +189,22 @@ def test_raised_arm_without_shoulder_lift_held_and_lifted():
     assert abs(after["left_shoulder_elevation"] - r["measures"]["left_shoulder_elevation"]) < 1
 
 
+def test_arm_twist_and_wrist_alone_never_reject():
+    j = _skeleton()
+    for pose in (dict(LeftForeArm=(0, 130, 0)), dict(LeftHand=(0, 0, -70))):
+        r = evaluate(j, _frame(j, **_arms_down(**pose)))
+        assert r["verdict"] == "hold", r["findings"]
+        assert all(f["severity"] == "hold" for f in r["findings"])
+
+
+def test_other_reject_reasons_still_reject_beside_arm_twist():
+    j = _skeleton()
+    r = evaluate(j, _frame(j, **_arms_down(LeftHand=(0, 0, -70), LeftForeArm=(0, 0, 40))))
+    assert r["verdict"] == "reject"
+    severity = {f["code"]: f["severity"] for f in r["findings"]}
+    assert severity["elbow_flexion"] == "reject" and severity["wrist_deviation"] == "hold"
+
+
 def test_alternate_joint_names():
     names = {"Spine2": "Chest4", "LeftShoulder": "LeftCollar", "LeftArm": "LeftShoulder",
              "LeftForeArm": "LeftElbow", "LeftHand": "LeftWrist", "RightShoulder": "RightCollar",

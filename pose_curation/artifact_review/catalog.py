@@ -128,6 +128,7 @@ class ArtifactCatalog:
                     usable=fix["usable"] and corrected.is_file(),
                     max_move_torso=fix["max_move_torso"],
                     changed=fix["changed"],
+                    ankle=fix.get("ankle"),
                 ),
             )
             if row["auto"]["correction"] and row["auto"]["correction"]["usable"]:

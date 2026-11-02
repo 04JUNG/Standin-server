@@ -199,6 +199,16 @@ function autoReview(row) {
   $('#auto-fix').textContent = !fix ? '' : fix.usable
     ? `자동 수정안: ${autoNames[fix.verdict] || fix.verdict} · 손·발·머리 최대 이동 ${fix.max_move_torso} (몸통 길이 단위)${fix.max_move_torso < 0.01 ? ' — 관절 위치는 그대로, 비틀림만 교정' : ''}`
     : '자동 수정안이 결과를 개선하지 못해 제공하지 않습니다.';
+  const ankle = fix?.ankle;
+  if (ankle && ankle.status !== 'nothing') {
+    const ankleText = {
+      corrected: `바닥을 딛은 발목은 접지를 유지한 채 ${Math.round(ankle.alpha * 100)}%까지 보정했습니다.`,
+      gross: '발이 크게 망가져 다시 세웠습니다. 반드시 눈으로 확인해 주세요.',
+      replanted: '다른 관절을 고치며 움직인 발을 원래 접지 위치로 되돌렸습니다.',
+      restored: '접지를 지키며 고칠 수 없어 바닥을 딛은 다리는 원본 그대로 두었습니다.',
+    }[ankle.status];
+    if (ankleText) $('#auto-fix').textContent += ' ' + ankleText;
+  }
   $('#auto-sheet-box').hidden = !auto.findings.length || !row.has_bvh;
   $('#auto-sheet-box').open = false;
   $('#auto-sheet').removeAttribute('src');

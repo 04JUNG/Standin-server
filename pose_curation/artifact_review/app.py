@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from .catalog import ArtifactCatalog
-from .. import plausibility
+from .. import ankle_correction, plausibility
 from ..review.store import ReviewStore
 from src.bvh import parse_bvh
 
@@ -93,7 +93,17 @@ def create_app(base: Path, *, review_path: Path | None = None):
             after_findings = plausibility.evaluate(joints, after)["findings"]
         names = {"pass": "통과", "hold": "보류 권장", "reject": "제외 권장"}
         header = f"{row['pose_id']} · 자동 검사 {names.get(result['verdict'], result['verdict'])}"
-        image = comparison(joints, before, after, result["findings"], after_findings, header)
+        contact, floor = ankle_correction.planted(joints, before)
+        steps = []
+        if result["verdict"] != "pass" and contact:
+            base, _ = plausibility.correct(joints, before, keep_ankles=tuple(contact))
+            for step in ankle_correction.correct_ankles(joints, before, base=base)["steps"]:
+                state = "통과" if step["ok"] else "불가: " + ", ".join(step["reasons"])
+                lift = " · 뒤꿈치 들기" if step["heel_lift"] else ""
+                steps.append((step["_frame"], f"발목 {round(step['alpha'] * 100)}%{lift} · {state}"))
+        focus = ankle_correction.focus_joints(plausibility.Skeleton(joints), contact) if steps else ()
+        image = comparison(joints, before, after, result["findings"], after_findings, header,
+                           steps=steps, floor=floor, focus=focus)
         buffer = io.BytesIO()
         image.save(buffer, "PNG")
         return buffer.getvalue()
