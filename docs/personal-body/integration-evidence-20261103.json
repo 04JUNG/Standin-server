@@ -44,6 +44,10 @@
       "realPackagedTests": 4,
       "durationSeconds": 50.15,
       "execution": "macOS native (sandbox child execution failed; native environment passed)"
+    },
+    "inferenceSmoke": {
+      "passed": 54,
+      "pythonEnvironment": "existing local .venv; system python missing pydantic"
     }
   },
   "geometry": {
