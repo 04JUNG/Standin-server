@@ -1,0 +1,7 @@
+# Preserve the exact staging Blender/dependency runtime and CSP assets.
+ARG BASE_IMAGE=136889124221.dkr.ecr.ap-northeast-2.amazonaws.com/standin/converter@sha256:b60b78bffadab4cc07ed71ef33cd8dcecd3a1eac3e04c846fe57a24a27782898
+FROM ${BASE_IMAGE}
+COPY converter/ /app/converter/
+COPY converter_api/ /app/converter_api/
+ARG DEPLOYMENT_VERSION=props-staging-integration
+ENV DEPLOYMENT_VERSION=$DEPLOYMENT_VERSION

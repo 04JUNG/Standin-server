@@ -1,0 +1,8 @@
+# Preserve the running search models and outline thumbnail overlay.
+ARG BASE_IMAGE=136889124221.dkr.ecr.ap-northeast-2.amazonaws.com/standin/inference@sha256:9ae8a3a09502f59682cb644ad5b4b25dbdb965ba5a253bd2f4cf65e227f50ce5
+FROM ${BASE_IMAGE}
+COPY --chown=standin:standin api/semantic_text.py /app/api/semantic_text.py
+COPY --chown=standin:standin src/pose_scene_assets.py /app/src/pose_scene_assets.py
+COPY --chown=standin:standin config/pose_scene_assets.v1.json /app/config/pose_scene_assets.v1.json
+ARG DEPLOYMENT_VERSION=props-staging-integration
+ENV DEPLOYMENT_VERSION=$DEPLOYMENT_VERSION

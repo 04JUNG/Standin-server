@@ -36,9 +36,21 @@ def main():
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("--library", type=Path, required=True)
     parser.add_argument("--character", type=Path, required=True)
+    parser.add_argument("--character-id", default="standin-master-v2")
+    parser.add_argument("--shape-controls", type=json.loads)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--case", choices=[c[0] for c in CASES])
     args = parser.parse_args(sys.argv[sys.argv.index("--")+1:])
+    shape_recipe = None
+    if args.shape_controls is not None:
+        from converter.shape_spec import load_registry, digest_shape, resolve_shape
+        recipe = load_registry()["characters"][args.character_id]
+        controls = {c["key"]: c["default"] for c in recipe["controls"]}
+        controls.update(args.shape_controls)
+        shape_recipe = resolve_shape(args.character_id, sha(args.character), {
+            "schemaVersion": "body-shape.v1", "controls": controls,
+            "shapeSha256": digest_shape(args.character_id, sha(args.character), controls),
+        })
     results = []
     for name, pose_id, scope, mirror in CASES:
         if args.case and name != args.case:
@@ -49,13 +61,14 @@ def main():
         source_sha = sha(source)
         report = run_job(dict(
             bvh_path=str(source), character_fbx=str(args.character),
-            character_sha256=sha(args.character), character_id="standin-master-v2",
+            character_sha256=sha(args.character), character_id=args.character_id,
             output_path=str(output), temp_dir=str(folder), conversion_id=name,
-            mirror=mirror, force_exact_v324=False, shape_recipe=None, hands=None,
+            mirror=mirror, force_exact_v324=False, shape_recipe=shape_recipe, hands=None,
             output_scope=scope, preview_view=None, preview_model=True,
             camera_rotation=None, thumbnail=None,
         ))
-        assert report["ok"]
+        (folder / "worker-report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+        assert report["ok"], report
         validate_receipt(report["scene_props"], source_sha, mirror=mirror)
         assert report["artifact_sha256"] == sha(output)
         assert metadata((folder / "preview.glb").read_bytes())["base_fbx_sha256"] == sha(output)
