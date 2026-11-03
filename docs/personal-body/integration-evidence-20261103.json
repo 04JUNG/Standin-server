@@ -64,7 +64,16 @@
     "nativePickerOriginalCs3c": true,
     "nativePickerOriginalFbx": true,
     "inlineRename": true,
-    "restartVerified": false
+    "restartVerified": true,
+    "renameEscapeCancellation": true,
+    "deleteConfirmationCancellation": true,
+    "sourceCommit": "d4a273cc845fc4fb167cbb77800fe6293e7a043d",
+    "screenshots": [
+      "native-deforme-restarted-20261103.png",
+      "native-deforme-import-dialog-20261103.png",
+      "native-deforme-inline-rename-20261103.png",
+      "native-deforme-delete-confirm-20261103.png"
+    ]
   },
   "liveOwnedBffE2E": false,
   "csp": {
