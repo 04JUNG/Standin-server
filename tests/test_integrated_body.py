@@ -440,20 +440,16 @@ def test_openai_first_call_keeps_original_prompt_when_disabled(monkeypatch, acti
         raw = payload()
         if active:
             raw["person_bodies"] = [body(), body(1, "feminine")]
-        return SimpleNamespace(
-            choices=[SimpleNamespace(message=SimpleNamespace(content=json.dumps(raw)))]
-        )
+        return SimpleNamespace(text=json.dumps(raw))
 
-    client = OpenAIVLMClient.__new__(OpenAIVLMClient)
-    client._model = "offline-test"
-    client._client = SimpleNamespace(
-        chat=SimpleNamespace(completions=SimpleNamespace(create=create))
-    )
-    got = client.analyze("data:image/png;base64,offline", 200, 300)
+    client = OpenAIVLMClient(model="offline-test", client=SimpleNamespace(
+        models=SimpleNamespace(generate_content=create)))
+    from PIL import Image
+    got = client.analyze(Image.new("RGB", (200, 300)), 200, 300)
     assert len(calls) == 1 and got.num_people == 2
-    assert calls[0]["messages"][0]["content"] == prompts.SYSTEM + (
+    assert calls[0]["config"].system_instruction == prompts.SYSTEM + (
         integrated.SYSTEM_EXTENSION if active else ""
     )
-    assert calls[0]["messages"][1]["content"][0]["text"] == prompts.user_template(
+    assert calls[0]["contents"][0] == prompts.user_template(
         CFG.vlm_prompt_version
     ) + (integrated.PROMPT_EXTENSION if active else "")

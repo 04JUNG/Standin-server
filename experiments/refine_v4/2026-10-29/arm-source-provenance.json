@@ -1,0 +1,39 @@
+{
+  "commit": "d09da4a",
+  "source_branch": "feat/04j-318-arm-refine",
+  "scope": "verified before subsequent hand-shape feedback; not final approval of all arm poses",
+  "sha256": {
+    "src/arm_refine/README.md": "087b4db94b9ecaf499ab5ad4fc7229ef01f3d0432a154584907ce529c22c835a",
+    "src/arm_refine/__init__.py": "2a72d64b09fa067189d413b4be7f1a26a008362f2e843fdfd1acb6bcd8ca43d9",
+    "src/arm_refine/blender_adapter.py": "b61bd11a896b2de4c96856e455256a6e5b67fe7e82ea3ed86cc0718890acce0c",
+    "src/arm_refine/contact_adapter.py": "1e3ecec95dcb40b6875bec63c5f61d4926d616f2f2e593d145e62c7b63615e6f",
+    "src/arm_refine/contact_composition.py": "f67fe11f75f8157be6bf57775c0f06e5ad1ad2567efdc35e0b8c085cc6ba7cbf",
+    "src/arm_refine/contact_parts.py": "664ff916ba15c5fedd1737d88040e1cf4f8aa98bbc6367d3bdab3c3cdaf1aca6",
+    "src/arm_refine/contact_validation.py": "a56ae5ca330698d8e4b9601d84de19f699bc5ce2a92b640c7a18cca448ad284d",
+    "src/arm_refine/fold_fitting.py": "80ea51d958144207af3706095824dc44b21e365ffa2c0cf79bdae57187509030",
+    "src/arm_refine/language_adapter.py": "c2e2fe0a6189a6018bdc8515c361aef35d219aa0a7b20a882c4e258a50868bf1",
+    "src/arm_refine/language_plan.py": "f40b6fa53b6f6223942e1bc13d960432589ab88d1f6553320ffd0b6cf44d7433",
+    "src/arm_refine/native_export.py": "96b472268f3b5fc5f15f1a20bcea2542a623af43b2391a9e29958ea29bca8e8a",
+    "src/arm_refine/pair_skin.py": "349db680f20e8b5d73f1556929d0fe6a3ad85cc265291deddbf6b9ccf28b98de",
+    "src/arm_refine/parts.py": "2ec4dba8fc6d2426240b2b61fe00a0c06d4e614cf6e65606664f01c21e521346",
+    "src/arm_refine/relational_adapter.py": "3194e52f4ea83375893dfde022da74281278ff801731c864e8209526f1e4d184",
+    "src/arm_refine/relational_parts.py": "e5dc647b3d3032ef2d2d1897fd96cede6f8e8773740d9a0616ffa0ac16eba332",
+    "src/arm_refine/score_views.py": "544cecea7f5ac5de85e7c28aeac352b67361b7cbc0b60232747eef44fc2f99bb",
+    "src/arm_refine/semantics.py": "534d7a5f1efb310067095d8758851c37d56e82d2d8087409d0db0a121c9d6ad7",
+    "src/arm_refine/text_search.js": "33ce0fe55c8edbcd71f8750cbf227ffda115d7764bf2caf6c07cd5599ed0e1e4",
+    "src/arm_refine/v4_adapter.py": "1e386fbee4c5c6b02e83b53e716b4405897ea641e465e809679c8badf2e67e53",
+    "src/arm_refine/volume_blockout.py": "cade32388843949939669e3e1793da32c090a207cd7091fa44811f884b35d230",
+    "tests/test_arm_contact_admission.py": "204b92fc79222197a9a635da0ef3f79f8ffac4972bf05525b306324042f1058b",
+    "tests/test_arm_contact_parts.py": "e4c87d27fdeaa904febc4d5480fc375b98030b7ab21b77f12027b629751a4607",
+    "tests/test_arm_language_plan.py": "4f600c9d4f9418f9f705a5f1bf1df43c19e85863650797c348be58a8b4a33c79",
+    "tests/test_arm_parts.py": "8780269b8bd4c7d216cf3b6fb00a92d2be43df3bf314c2777671c0e045181622",
+    "tests/test_arm_relational_parts.py": "756554aa006a8cc21988b4957c8db56cb76ef18b8057cd11958e25fcd1772f61",
+    "tests/test_arm_semantics.py": "9f968c5e45475a9d6f2dd152176fc8dfc35447214cf7270b681b9f0ce5062ad5",
+    "tests/test_arm_thumbnail_provenance.py": "d8c2010ae87d7646795aeff6844fd20edc0070b766f5894a2022028433d8ed42",
+    "scripts/build_arm_parts.py": "23011ccd37eff0bd219e6bff3fb8e6c8d466e01e580029261fb5687d632c75d9",
+    "scripts/publish_arm_thumbnails.py": "8be265fad1764b1cd04f56709947ffccfa0c235306e5fa97e9a99f4aa1478d73"
+  },
+  "integration_adjustments": {
+    "src/arm_refine/score_views.py": "trailing blank line removed; upstream source hash retained above"
+  }
+}

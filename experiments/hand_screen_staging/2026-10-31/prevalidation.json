@@ -1,0 +1,98 @@
+{
+  "schema": "hand-screen-staging-preparation-evidence.v1",
+  "verified_at_utc": "2026-10-31T03:57:10.030858+00:00",
+  "environment": "staging",
+  "library": {
+    "bucket": "standinstagingapp-assetsbucket5cb76180-fiwlikrhl1sk",
+    "key": "pose-library/releases/lib-20261021-21b1b3d9-4scopes-8views-297e8f1ea240.tar.gz",
+    "sha256": "297e8f1ea240961964abd722704b92a0f20bfe190ece400eec156a568f1c0a80",
+    "pose_count": 5862
+  },
+  "scope": {
+    "base_shapes_only": true,
+    "characters": [
+      {
+        "id": "standin-master-v2",
+        "sha256": "7c648b97a24a3bb4914b6e5d515708c33727979881d92ef916d5726e22301f3d"
+      },
+      {
+        "id": "standin-female-v2-lbs",
+        "sha256": "96cd01717ed48ce416333c21dc68e8d62d185e91e016056c9eae305e8c37a186"
+      }
+    ],
+    "hand_settings": [
+      {
+        "hands": {
+          "left": "relaxed",
+          "right": "relaxed"
+        },
+        "id": "both-relaxed"
+      }
+    ],
+    "pose_count": 5862
+  },
+  "counts": {
+    "attempted": 11724,
+    "clear_screen": 10825,
+    "intersection": 899
+  },
+  "profile_sha256": "6353976c30ddcb76e5fd0fc62f596c8cea43a03c938b2e177025bbf572970d0a",
+  "base_converter_image": "136889124221.dkr.ecr.ap-northeast-2.amazonaws.com/standin/converter@sha256:b60b78bffadab4cc07ed71ef33cd8dcecd3a1eac3e04c846fe57a24a27782898",
+  "manifest": {
+    "key": "hand-screen/releases/prevalidation-20261031-59695598-a0a0de/manifest.json",
+    "sha256": "4826b936866b1a330aecda8fde512c572740b2f0e062c93fb8c23a1b145038ce"
+  },
+  "catalog": {
+    "entries": 11724,
+    "path": "catalog.json",
+    "sha256": "5ba5dfa0e7d3cafe6be2d203e86d7113de47a844a7c9c1c1cdb17fec0f5d1ff1",
+    "size": 16645782
+  },
+  "offline_inspection": {
+    "budget_seconds": 60,
+    "attempts": 1,
+    "geometric_thresholds_changed": false
+  },
+  "preparation_jobs": {
+    "count": 8,
+    "all_exit_zero": true
+  },
+  "startup_install": {
+    "event": "hand_screen_startup_install_verified",
+    "manifest_key": "hand-screen/releases/prevalidation-20261031-59695598-a0a0de/manifest.json",
+    "manifest_sha256": "4826b936866b1a330aecda8fde512c572740b2f0e062c93fb8c23a1b145038ce",
+    "entries": 11724,
+    "catalog_sha256": "5ba5dfa0e7d3cafe6be2d203e86d7113de47a844a7c9c1c1cdb17fec0f5d1ff1",
+    "runtime_enabled": false
+  },
+  "startup_connection": {
+    "code_commit": "af3fac5a06a893eb98472eadba7bbcd90561dfa8",
+    "prepared_task_preview": true,
+    "initializer_success_dependency": true,
+    "inference_mount_read_only": true,
+    "existing_images_resources_secrets_preserved": true,
+    "deploy_role_s3_read_required": false,
+    "serving_deployed": false
+  },
+  "staging_release_variables": {
+    "HAND_SCREEN_PREVALIDATION_ENABLED": "0",
+    "HAND_SCREEN_RELEASE_MANIFEST_JSON": "{\"catalog\":{\"entries\":11724,\"path\":\"catalog.json\",\"sha256\":\"5ba5dfa0e7d3cafe6be2d203e86d7113de47a844a7c9c1c1cdb17fec0f5d1ff1\",\"size\":16645782},\"counts\":{\"attempted\":11724,\"clear_screen\":10825,\"intersection\":899},\"created_at\":\"2026-10-31T03:56:17.602481+00:00\",\"library_sha256\":\"297e8f1ea240961964abd722704b92a0f20bfe190ece400eec156a568f1c0a80\",\"preparation_complete\":true,\"profile_sha256\":\"6353976c30ddcb76e5fd0fc62f596c8cea43a03c938b2e177025bbf572970d0a\",\"reinspected_entries\":0,\"schema\":\"hand-screen-release.v1\",\"scope\":{\"base_shapes_only\":true,\"characters\":[{\"id\":\"standin-master-v2\",\"sha256\":\"7c648b97a24a3bb4914b6e5d515708c33727979881d92ef916d5726e22301f3d\"},{\"id\":\"standin-female-v2-lbs\",\"sha256\":\"96cd01717ed48ce416333c21dc68e8d62d185e91e016056c9eae305e8c37a186\"}],\"hand_settings\":[{\"hands\":{\"left\":\"relaxed\",\"right\":\"relaxed\"},\"id\":\"both-relaxed\"}],\"pose_count\":5862}}\n",
+    "HAND_SCREEN_RELEASE_MANIFEST_KEY": "hand-screen/releases/prevalidation-20261031-59695598-a0a0de/manifest.json",
+    "HAND_SCREEN_RELEASE_MANIFEST_SHA256": "4826b936866b1a330aecda8fde512c572740b2f0e062c93fb8c23a1b145038ce"
+  },
+  "runtime_enabled": false,
+  "production_changed": false,
+  "validation": {
+    "inference_tests_passed": 3375,
+    "inference_tests_skipped": 10,
+    "subtests_passed": 31,
+    "converter_contracts_passed": 400,
+    "converter_contracts_skipped": 1
+  },
+  "limits": [
+    "Two exact base FBX characters and both-relaxed hands only.",
+    "Later selected or custom body shapes and generated/refined poses are not certified.",
+    "Certificates preserve geometric crossing decisions, not arbitrary timeout outcomes.",
+    "Serving deployment, profile matching, actual hits and end-to-end timing remain separate."
+  ]
+}

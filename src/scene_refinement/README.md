@@ -53,3 +53,12 @@ Blender and model startup checks. Remote Gemini access requires a separate smoke
 
 The worker remains default-off. Deployment resources and approved assets still
 need provisioning; this code does not activate the BFF or change `/analyze`.
+
+## Native arm/leg parts API
+
+The private worker also exposes authenticated `/parts/capabilities` and `/parts/refine`.
+This is distinct from scene plan/build and default-off (`SCENE_PARTS_ENABLED=1`).
+It preserves the current reviewed native FBX and executes the same checked transaction
+as the CLI, with an operator hash-pinned recipe catalog. See
+[the BFF contract](../../docs/REFINE_V4_PARTS_HTTP.md) before wiring the app.
+Do not feed its output back through the legacy scene IK/reconstruction stages.

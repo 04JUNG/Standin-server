@@ -1,0 +1,44 @@
+{
+  "version": "scene-camera-artifact-v1",
+  "artifact_sha256": "277ecb4fac636e30614454b2ae000b3e93bc7f098b064735689d04e4ed1fd9e0",
+  "recipe": {
+    "version": "scene-camera-v1",
+    "source_dimensions": [
+      1000,
+      768
+    ],
+    "projection": "perspective",
+    "horizontal_fov_degrees": 40.0,
+    "vertical_fov_degrees": 31.23445286902702,
+    "principal_pixels": [
+      500.0,
+      384.0
+    ],
+    "csp": {
+      "coordinate_system": "y-up-centimeters",
+      "camera_position": [
+        0.0,
+        150.0,
+        1000.0
+      ],
+      "focal_point_position": [
+        0.0,
+        150.0,
+        900.0
+      ],
+      "roll_degrees": 0.0,
+      "perspective": 4.928852926150054,
+      "perspective_ui_value": 4.93,
+      "link_camera_advancing_retreating": false,
+      "adapt_view_to_object": false
+    },
+    "requires_camera_application": true,
+    "automatic_import_framing_verified": false,
+    "csp_recipe_application_verified": false,
+    "preconditions": [
+      "same canvas aspect ratio",
+      "unchanged imported scene transform"
+    ],
+    "formula_source": "https://www.clip-studio.com/clip_site/support/help/detail/svc/53/tid/88435"
+  }
+}

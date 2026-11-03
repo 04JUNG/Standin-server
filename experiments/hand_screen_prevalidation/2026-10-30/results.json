@@ -1,0 +1,753 @@
+{
+  "date": "2026-10-30",
+  "scope": "Local loopback HTTP and Blender; six fixed BVHs, two exact base FBXs, original and relaxed hands. No fresh image inference.",
+  "rounds_per_condition": 2,
+  "bodies": {
+    "male": {
+      "character_id": "standin-master-v2",
+      "character_sha256": "7c648b97a24a3bb4914b6e5d515708c33727979881d92ef916d5726e22301f3d",
+      "source": {
+        "base_commit": "b604bd4b6f94b1c397919d19fa8509ce0cf1798e",
+        "changed_file_sha256": {
+          "converter/hand_screen_catalog.py": "377d62a3ba9f0539fb9b5c5643edce1fd34b5d6652ec0211d9e378b833fb9bcb",
+          "converter_api/app.py": "bc797570fa9cb5f2c03b664b7fb6b963bab7724c4c5e7bdc5321a068d5714322",
+          "src/hand_skin_screen.py": "f97f839926d2448bbafda4df28aa52bb996b0b9dc93feb48cf6a4b7b72bf1b11",
+          "src/hand_skin_parallel.py": "1c1766f3635e51dc4840b5e72bcc00e10844c2a84c7b121dc6485986f532ec90",
+          "src/config.py": "8ee7c95fd42e1dfef8809da10ffb56957943245baf2c4c2aec4c285af3ac88d5",
+          "scripts/benchmark_hand_screen_capacity.py": "22f28ba894a566e6bd77768ed03a4ee8748f43013247e0f18dd3d11d122b7157"
+        }
+      },
+      "blender": {
+        "version": "5.2.0",
+        "build_hash": "fbe6228777e7"
+      },
+      "fixtures": {
+        "library_mirror": "976f0c3a95e95ebd9aab70f29f6099254c041e5fb61c018691fb1ca101f2b2a3",
+        "library_original": "75f66c8e3ad0c155f4a6b714892dc7199980837dd275c5c810103e2f3fee9edc",
+        "phone_intersection": "f59129a350ed71521b4b7964adc34ca671c7097ae623d35c4f659ebb58c4ade1",
+        "phone_repaired": "5278c26b261972e0a58329d0cc24a414555a64664591e0c18fb52a013edf3f36",
+        "relaxed_repaired": "2bae8eee7df1322d72e18d174b2cd4de58d211f290aac1218d67419787561cb1",
+        "staff_clear": "80c5a322406d8b7145aaf0e1e9e1e4dab2468cb2503022995a989caaf0c43a85"
+      },
+      "comparisons": [
+        {
+          "preset": "original",
+          "mode": "service",
+          "capacity": 1,
+          "median_seconds": 8.579795666999416,
+          "peak_active_blender": 1,
+          "business_results_equal": true
+        },
+        {
+          "preset": "original",
+          "mode": "service",
+          "capacity": 2,
+          "median_seconds": 4.582223937497474,
+          "peak_active_blender": 2,
+          "business_results_equal": true
+        },
+        {
+          "preset": "original",
+          "mode": "prevalidated",
+          "capacity": 1,
+          "median_seconds": 0.005684187497536186,
+          "peak_active_blender": 0,
+          "business_results_equal": true
+        },
+        {
+          "preset": "original",
+          "mode": "prevalidated",
+          "capacity": 2,
+          "median_seconds": 0.005783812499430496,
+          "peak_active_blender": 0,
+          "business_results_equal": true
+        },
+        {
+          "preset": "relaxed",
+          "mode": "service",
+          "capacity": 1,
+          "median_seconds": 9.215287854494818,
+          "peak_active_blender": 1,
+          "business_results_equal": true
+        },
+        {
+          "preset": "relaxed",
+          "mode": "service",
+          "capacity": 2,
+          "median_seconds": 4.946016125002643,
+          "peak_active_blender": 2,
+          "business_results_equal": true
+        },
+        {
+          "preset": "relaxed",
+          "mode": "prevalidated",
+          "capacity": 1,
+          "median_seconds": 0.00614237500121817,
+          "peak_active_blender": 0,
+          "business_results_equal": true
+        },
+        {
+          "preset": "relaxed",
+          "mode": "prevalidated",
+          "capacity": 2,
+          "median_seconds": 0.005957374996796716,
+          "peak_active_blender": 0,
+          "business_results_equal": true
+        }
+      ],
+      "raw_measurements": [
+        {
+          "preset": "original",
+          "round": 1,
+          "mode": "service",
+          "capacity": 1,
+          "seconds": 8.473714292005752,
+          "peak_active_blender": 1,
+          "fbx_conversions": 6,
+          "prevalidated_checks": 0
+        },
+        {
+          "preset": "original",
+          "round": 1,
+          "mode": "service",
+          "capacity": 2,
+          "seconds": 4.501178499995149,
+          "peak_active_blender": 2,
+          "fbx_conversions": 6,
+          "prevalidated_checks": 0
+        },
+        {
+          "preset": "original",
+          "round": 1,
+          "mode": "prevalidated",
+          "capacity": 1,
+          "seconds": 0.006209416998899542,
+          "peak_active_blender": 0,
+          "fbx_conversions": 0,
+          "prevalidated_checks": 6
+        },
+        {
+          "preset": "original",
+          "round": 1,
+          "mode": "prevalidated",
+          "capacity": 2,
+          "seconds": 0.005285874998662621,
+          "peak_active_blender": 0,
+          "fbx_conversions": 0,
+          "prevalidated_checks": 6
+        },
+        {
+          "preset": "original",
+          "round": 2,
+          "mode": "service",
+          "capacity": 2,
+          "seconds": 4.6632693749998,
+          "peak_active_blender": 2,
+          "fbx_conversions": 6,
+          "prevalidated_checks": 0
+        },
+        {
+          "preset": "original",
+          "round": 2,
+          "mode": "service",
+          "capacity": 1,
+          "seconds": 8.68587704199308,
+          "peak_active_blender": 1,
+          "fbx_conversions": 6,
+          "prevalidated_checks": 0
+        },
+        {
+          "preset": "original",
+          "round": 2,
+          "mode": "prevalidated",
+          "capacity": 2,
+          "seconds": 0.006281750000198372,
+          "peak_active_blender": 0,
+          "fbx_conversions": 0,
+          "prevalidated_checks": 6
+        },
+        {
+          "preset": "original",
+          "round": 2,
+          "mode": "prevalidated",
+          "capacity": 1,
+          "seconds": 0.0051589579961728305,
+          "peak_active_blender": 0,
+          "fbx_conversions": 0,
+          "prevalidated_checks": 6
+        },
+        {
+          "preset": "relaxed",
+          "round": 1,
+          "mode": "service",
+          "capacity": 1,
+          "seconds": 9.177624499992817,
+          "peak_active_blender": 1,
+          "fbx_conversions": 6,
+          "prevalidated_checks": 0
+        },
+        {
+          "preset": "relaxed",
+          "round": 1,
+          "mode": "service",
+          "capacity": 2,
+          "seconds": 4.943092625006102,
+          "peak_active_blender": 2,
+          "fbx_conversions": 6,
+          "prevalidated_checks": 0
+        },
+        {
+          "preset": "relaxed",
+          "round": 1,
+          "mode": "prevalidated",
+          "capacity": 1,
+          "seconds": 0.006684583000605926,
+          "peak_active_blender": 0,
+          "fbx_conversions": 0,
+          "prevalidated_checks": 6
+        },
+        {
+          "preset": "relaxed",
+          "round": 1,
+          "mode": "prevalidated",
+          "capacity": 2,
+          "seconds": 0.005578374999458902,
+          "peak_active_blender": 0,
+          "fbx_conversions": 0,
+          "prevalidated_checks": 6
+        },
+        {
+          "preset": "relaxed",
+          "round": 2,
+          "mode": "service",
+          "capacity": 2,
+          "seconds": 4.948939624999184,
+          "peak_active_blender": 2,
+          "fbx_conversions": 6,
+          "prevalidated_checks": 0
+        },
+        {
+          "preset": "relaxed",
+          "round": 2,
+          "mode": "service",
+          "capacity": 1,
+          "seconds": 9.25295120899682,
+          "peak_active_blender": 1,
+          "fbx_conversions": 6,
+          "prevalidated_checks": 0
+        },
+        {
+          "preset": "relaxed",
+          "round": 2,
+          "mode": "prevalidated",
+          "capacity": 2,
+          "seconds": 0.00633637499413453,
+          "peak_active_blender": 0,
+          "fbx_conversions": 0,
+          "prevalidated_checks": 6
+        },
+        {
+          "preset": "relaxed",
+          "round": 2,
+          "mode": "prevalidated",
+          "capacity": 1,
+          "seconds": 0.005600167001830414,
+          "peak_active_blender": 0,
+          "fbx_conversions": 0,
+          "prevalidated_checks": 6
+        }
+      ],
+      "offline_preparation": [
+        {
+          "preset": "original",
+          "entries": 6,
+          "seconds": 10.013555874989834,
+          "sha256": "6ce0fd774657d95840583b5eb866a060f5b3234ff007ca7f76ea8d133a5ea914"
+        },
+        {
+          "preset": "relaxed",
+          "entries": 6,
+          "seconds": 9.220775084002526,
+          "sha256": "7fe734c1d4bad47643ff10de6746d985cf222d3333e4135d1f440cf4a178326f"
+        }
+      ],
+      "prevalidation_matches_live": {
+        "original": true,
+        "relaxed": true
+      },
+      "geometry": {
+        "all_equal": true,
+        "artifacts_verified": 60,
+        "case_count": 12,
+        "comparison": "Reloaded mesh vertices, evaluated skin, topology, bind and posed bone matrices and vertex weights; exporter metadata excluded.",
+        "fingerprints": {
+          "original__976f0c3a95e95ebd9aab70f29f6099254c041e5fb61c018691fb1ca101f2b2a3": {
+            "artifact_count": 5,
+            "geometry_sha256": "dbe4d9c87d6f332df6baf03e3ebda9c0f96dd0bf1c1ca969f15e631beac6bf93",
+            "vertices": 24988,
+            "triangles": 50000,
+            "bones": 52
+          },
+          "original__75f66c8e3ad0c155f4a6b714892dc7199980837dd275c5c810103e2f3fee9edc": {
+            "artifact_count": 5,
+            "geometry_sha256": "693443c8e61877c0c4c9dbcd991eef106d73c9a6a63f5beffff09d49981899bd",
+            "vertices": 24988,
+            "triangles": 50000,
+            "bones": 52
+          },
+          "original__f59129a350ed71521b4b7964adc34ca671c7097ae623d35c4f659ebb58c4ade1": {
+            "artifact_count": 5,
+            "geometry_sha256": "8b9ea91b19bd29eb24b586374d30d374df3bce795e95f39951dec2a81168e536",
+            "vertices": 24988,
+            "triangles": 50000,
+            "bones": 52
+          },
+          "original__5278c26b261972e0a58329d0cc24a414555a64664591e0c18fb52a013edf3f36": {
+            "artifact_count": 5,
+            "geometry_sha256": "64038248c1fa479510816570f1e840ae7609a23555821240b2c554e5d5ad937b",
+            "vertices": 24988,
+            "triangles": 50000,
+            "bones": 52
+          },
+          "original__2bae8eee7df1322d72e18d174b2cd4de58d211f290aac1218d67419787561cb1": {
+            "artifact_count": 5,
+            "geometry_sha256": "e89d9be99e8e063bfa12f6b98d2c68019b1618ccf91d067391c22f8acf887b12",
+            "vertices": 24988,
+            "triangles": 50000,
+            "bones": 52
+          },
+          "original__80c5a322406d8b7145aaf0e1e9e1e4dab2468cb2503022995a989caaf0c43a85": {
+            "artifact_count": 5,
+            "geometry_sha256": "e3cd87593eabb2bd6f8e2ce85ca233aecf86d80487347b8ea356002ee4014408",
+            "vertices": 24988,
+            "triangles": 50000,
+            "bones": 52
+          },
+          "relaxed__976f0c3a95e95ebd9aab70f29f6099254c041e5fb61c018691fb1ca101f2b2a3": {
+            "artifact_count": 5,
+            "geometry_sha256": "fe540230327d34c1bbba0c8c07dd65039e73105ff51e40b9b4c1946e02e23fe4",
+            "vertices": 24988,
+            "triangles": 50000,
+            "bones": 52
+          },
+          "relaxed__75f66c8e3ad0c155f4a6b714892dc7199980837dd275c5c810103e2f3fee9edc": {
+            "artifact_count": 5,
+            "geometry_sha256": "35847fa8f7badf27fd5e7fbaff56bb5c6b06a3310727791d9031ee31c6679b92",
+            "vertices": 24988,
+            "triangles": 50000,
+            "bones": 52
+          },
+          "relaxed__f59129a350ed71521b4b7964adc34ca671c7097ae623d35c4f659ebb58c4ade1": {
+            "artifact_count": 5,
+            "geometry_sha256": "6b703d383c46af8d5253728bf256f0e853af6a1bfc6e5342179313172fbe7526",
+            "vertices": 24988,
+            "triangles": 50000,
+            "bones": 52
+          },
+          "relaxed__5278c26b261972e0a58329d0cc24a414555a64664591e0c18fb52a013edf3f36": {
+            "artifact_count": 5,
+            "geometry_sha256": "468bbd95357cbcfb5572f557223eea1c91008325125f6b15d5451504829db012",
+            "vertices": 24988,
+            "triangles": 50000,
+            "bones": 52
+          },
+          "relaxed__2bae8eee7df1322d72e18d174b2cd4de58d211f290aac1218d67419787561cb1": {
+            "artifact_count": 5,
+            "geometry_sha256": "5eafdf728fc8f338d27a78a5def6aed9f3ed52fb5693e41f36591c19d0b26856",
+            "vertices": 24988,
+            "triangles": 50000,
+            "bones": 52
+          },
+          "relaxed__80c5a322406d8b7145aaf0e1e9e1e4dab2468cb2503022995a989caaf0c43a85": {
+            "artifact_count": 5,
+            "geometry_sha256": "e4b3bade0f13111ca37ba231fd07e61106026706a0e1042bffcd3466e2517211",
+            "vertices": 24988,
+            "triangles": 50000,
+            "bones": 52
+          }
+        }
+      }
+    },
+    "female": {
+      "character_id": "standin-female-v2-lbs",
+      "character_sha256": "96cd01717ed48ce416333c21dc68e8d62d185e91e016056c9eae305e8c37a186",
+      "source": {
+        "base_commit": "b604bd4b6f94b1c397919d19fa8509ce0cf1798e",
+        "changed_file_sha256": {
+          "converter/hand_screen_catalog.py": "377d62a3ba9f0539fb9b5c5643edce1fd34b5d6652ec0211d9e378b833fb9bcb",
+          "converter_api/app.py": "bc797570fa9cb5f2c03b664b7fb6b963bab7724c4c5e7bdc5321a068d5714322",
+          "src/hand_skin_screen.py": "f97f839926d2448bbafda4df28aa52bb996b0b9dc93feb48cf6a4b7b72bf1b11",
+          "src/hand_skin_parallel.py": "1c1766f3635e51dc4840b5e72bcc00e10844c2a84c7b121dc6485986f532ec90",
+          "src/config.py": "8ee7c95fd42e1dfef8809da10ffb56957943245baf2c4c2aec4c285af3ac88d5",
+          "scripts/benchmark_hand_screen_capacity.py": "22f28ba894a566e6bd77768ed03a4ee8748f43013247e0f18dd3d11d122b7157"
+        }
+      },
+      "blender": {
+        "version": "5.2.0",
+        "build_hash": "fbe6228777e7"
+      },
+      "fixtures": {
+        "library_mirror": "976f0c3a95e95ebd9aab70f29f6099254c041e5fb61c018691fb1ca101f2b2a3",
+        "library_original": "75f66c8e3ad0c155f4a6b714892dc7199980837dd275c5c810103e2f3fee9edc",
+        "phone_intersection": "f59129a350ed71521b4b7964adc34ca671c7097ae623d35c4f659ebb58c4ade1",
+        "phone_repaired": "5278c26b261972e0a58329d0cc24a414555a64664591e0c18fb52a013edf3f36",
+        "relaxed_repaired": "2bae8eee7df1322d72e18d174b2cd4de58d211f290aac1218d67419787561cb1",
+        "staff_clear": "80c5a322406d8b7145aaf0e1e9e1e4dab2468cb2503022995a989caaf0c43a85"
+      },
+      "comparisons": [
+        {
+          "preset": "original",
+          "mode": "service",
+          "capacity": 1,
+          "median_seconds": 8.422048604494194,
+          "peak_active_blender": 1,
+          "business_results_equal": true
+        },
+        {
+          "preset": "original",
+          "mode": "service",
+          "capacity": 2,
+          "median_seconds": 4.634407728997758,
+          "peak_active_blender": 2,
+          "business_results_equal": true
+        },
+        {
+          "preset": "original",
+          "mode": "prevalidated",
+          "capacity": 1,
+          "median_seconds": 0.006279166504100431,
+          "peak_active_blender": 0,
+          "business_results_equal": true
+        },
+        {
+          "preset": "original",
+          "mode": "prevalidated",
+          "capacity": 2,
+          "median_seconds": 0.006159187498269603,
+          "peak_active_blender": 0,
+          "business_results_equal": true
+        },
+        {
+          "preset": "relaxed",
+          "mode": "service",
+          "capacity": 1,
+          "median_seconds": 9.19566718749411,
+          "peak_active_blender": 1,
+          "business_results_equal": true
+        },
+        {
+          "preset": "relaxed",
+          "mode": "service",
+          "capacity": 2,
+          "median_seconds": 4.933327437000116,
+          "peak_active_blender": 2,
+          "business_results_equal": true
+        },
+        {
+          "preset": "relaxed",
+          "mode": "prevalidated",
+          "capacity": 1,
+          "median_seconds": 0.006154499998956453,
+          "peak_active_blender": 0,
+          "business_results_equal": true
+        },
+        {
+          "preset": "relaxed",
+          "mode": "prevalidated",
+          "capacity": 2,
+          "median_seconds": 0.006333103992801625,
+          "peak_active_blender": 0,
+          "business_results_equal": true
+        }
+      ],
+      "raw_measurements": [
+        {
+          "preset": "original",
+          "round": 1,
+          "mode": "service",
+          "capacity": 1,
+          "seconds": 8.428237000000081,
+          "peak_active_blender": 1,
+          "fbx_conversions": 6,
+          "prevalidated_checks": 0
+        },
+        {
+          "preset": "original",
+          "round": 1,
+          "mode": "service",
+          "capacity": 2,
+          "seconds": 4.754172707995167,
+          "peak_active_blender": 2,
+          "fbx_conversions": 6,
+          "prevalidated_checks": 0
+        },
+        {
+          "preset": "original",
+          "round": 1,
+          "mode": "prevalidated",
+          "capacity": 1,
+          "seconds": 0.007032791007077321,
+          "peak_active_blender": 0,
+          "fbx_conversions": 0,
+          "prevalidated_checks": 6
+        },
+        {
+          "preset": "original",
+          "round": 1,
+          "mode": "prevalidated",
+          "capacity": 2,
+          "seconds": 0.005906374994083308,
+          "peak_active_blender": 0,
+          "fbx_conversions": 0,
+          "prevalidated_checks": 6
+        },
+        {
+          "preset": "original",
+          "round": 2,
+          "mode": "service",
+          "capacity": 2,
+          "seconds": 4.514642750000348,
+          "peak_active_blender": 2,
+          "fbx_conversions": 6,
+          "prevalidated_checks": 0
+        },
+        {
+          "preset": "original",
+          "round": 2,
+          "mode": "service",
+          "capacity": 1,
+          "seconds": 8.415860208988306,
+          "peak_active_blender": 1,
+          "fbx_conversions": 6,
+          "prevalidated_checks": 0
+        },
+        {
+          "preset": "original",
+          "round": 2,
+          "mode": "prevalidated",
+          "capacity": 2,
+          "seconds": 0.006412000002455898,
+          "peak_active_blender": 0,
+          "fbx_conversions": 0,
+          "prevalidated_checks": 6
+        },
+        {
+          "preset": "original",
+          "round": 2,
+          "mode": "prevalidated",
+          "capacity": 1,
+          "seconds": 0.00552554200112354,
+          "peak_active_blender": 0,
+          "fbx_conversions": 0,
+          "prevalidated_checks": 6
+        },
+        {
+          "preset": "relaxed",
+          "round": 1,
+          "mode": "service",
+          "capacity": 1,
+          "seconds": 9.178877624988672,
+          "peak_active_blender": 1,
+          "fbx_conversions": 6,
+          "prevalidated_checks": 0
+        },
+        {
+          "preset": "relaxed",
+          "round": 1,
+          "mode": "service",
+          "capacity": 2,
+          "seconds": 4.931357957990258,
+          "peak_active_blender": 2,
+          "fbx_conversions": 6,
+          "prevalidated_checks": 0
+        },
+        {
+          "preset": "relaxed",
+          "round": 1,
+          "mode": "prevalidated",
+          "capacity": 1,
+          "seconds": 0.006862791997264139,
+          "peak_active_blender": 0,
+          "fbx_conversions": 0,
+          "prevalidated_checks": 6
+        },
+        {
+          "preset": "relaxed",
+          "round": 1,
+          "mode": "prevalidated",
+          "capacity": 2,
+          "seconds": 0.006143624996184371,
+          "peak_active_blender": 0,
+          "fbx_conversions": 0,
+          "prevalidated_checks": 6
+        },
+        {
+          "preset": "relaxed",
+          "round": 2,
+          "mode": "service",
+          "capacity": 2,
+          "seconds": 4.935296916009975,
+          "peak_active_blender": 2,
+          "fbx_conversions": 6,
+          "prevalidated_checks": 0
+        },
+        {
+          "preset": "relaxed",
+          "round": 2,
+          "mode": "service",
+          "capacity": 1,
+          "seconds": 9.212456749999546,
+          "peak_active_blender": 1,
+          "fbx_conversions": 6,
+          "prevalidated_checks": 0
+        },
+        {
+          "preset": "relaxed",
+          "round": 2,
+          "mode": "prevalidated",
+          "capacity": 2,
+          "seconds": 0.006522582989418879,
+          "peak_active_blender": 0,
+          "fbx_conversions": 0,
+          "prevalidated_checks": 6
+        },
+        {
+          "preset": "relaxed",
+          "round": 2,
+          "mode": "prevalidated",
+          "capacity": 1,
+          "seconds": 0.005446208000648767,
+          "peak_active_blender": 0,
+          "fbx_conversions": 0,
+          "prevalidated_checks": 6
+        }
+      ],
+      "offline_preparation": [
+        {
+          "preset": "original",
+          "entries": 6,
+          "seconds": 8.437580958998296,
+          "sha256": "cb6b894c353639c7181d0bd2501e9d1f20d91f53b0d83bfbbd09b27e3f5989f7"
+        },
+        {
+          "preset": "relaxed",
+          "entries": 6,
+          "seconds": 9.213297292008065,
+          "sha256": "138182d2f82d5c0775621a52a063a0e4513d3bdcdec0b66cad9c52d44a6446d6"
+        }
+      ],
+      "prevalidation_matches_live": {
+        "original": true,
+        "relaxed": true
+      },
+      "geometry": {
+        "all_equal": true,
+        "artifacts_verified": 60,
+        "case_count": 12,
+        "comparison": "Reloaded mesh vertices, evaluated skin, topology, bind and posed bone matrices and vertex weights; exporter metadata excluded.",
+        "fingerprints": {
+          "original__976f0c3a95e95ebd9aab70f29f6099254c041e5fb61c018691fb1ca101f2b2a3": {
+            "artifact_count": 5,
+            "geometry_sha256": "3d259dba4948e78d9478fe155d79d4eabdd3233a99c302572a996f3392c98380",
+            "vertices": 24994,
+            "triangles": 50000,
+            "bones": 52
+          },
+          "original__75f66c8e3ad0c155f4a6b714892dc7199980837dd275c5c810103e2f3fee9edc": {
+            "artifact_count": 5,
+            "geometry_sha256": "9fafa87ede092dac7e0bb02ec61ca7bbf14238af871e1c0213ccc7792b4f3135",
+            "vertices": 24994,
+            "triangles": 50000,
+            "bones": 52
+          },
+          "original__f59129a350ed71521b4b7964adc34ca671c7097ae623d35c4f659ebb58c4ade1": {
+            "artifact_count": 5,
+            "geometry_sha256": "240e01414dbeda1062ba592c75667ca589f56c4ccbcdec4618660bda78dd3949",
+            "vertices": 24994,
+            "triangles": 50000,
+            "bones": 52
+          },
+          "original__5278c26b261972e0a58329d0cc24a414555a64664591e0c18fb52a013edf3f36": {
+            "artifact_count": 5,
+            "geometry_sha256": "6f9ebc95b234299c1bb471f802be8f12f4a63a2fcb80e86b0ec539e98ef3e11d",
+            "vertices": 24994,
+            "triangles": 50000,
+            "bones": 52
+          },
+          "original__2bae8eee7df1322d72e18d174b2cd4de58d211f290aac1218d67419787561cb1": {
+            "artifact_count": 5,
+            "geometry_sha256": "2fbcc5e60b612117ffc2c4569a3c7dc4b6bcd0ecf7a89cdc4ed2736b3fb82ea4",
+            "vertices": 24994,
+            "triangles": 50000,
+            "bones": 52
+          },
+          "original__80c5a322406d8b7145aaf0e1e9e1e4dab2468cb2503022995a989caaf0c43a85": {
+            "artifact_count": 5,
+            "geometry_sha256": "a8c5cdc3cd9751ecd8db543e12504f5c31c2f653e15c5cbbe05546b90aecf961",
+            "vertices": 24994,
+            "triangles": 50000,
+            "bones": 52
+          },
+          "relaxed__976f0c3a95e95ebd9aab70f29f6099254c041e5fb61c018691fb1ca101f2b2a3": {
+            "artifact_count": 5,
+            "geometry_sha256": "28e3a680d193677d6e2f6afc2d8c3fc7cfe242029daa5118e518f83175275e68",
+            "vertices": 24994,
+            "triangles": 50000,
+            "bones": 52
+          },
+          "relaxed__75f66c8e3ad0c155f4a6b714892dc7199980837dd275c5c810103e2f3fee9edc": {
+            "artifact_count": 5,
+            "geometry_sha256": "3381474553090ffb126f3b6b476b646550c006dcdcc55df6eab5bfdf4483fd64",
+            "vertices": 24994,
+            "triangles": 50000,
+            "bones": 52
+          },
+          "relaxed__f59129a350ed71521b4b7964adc34ca671c7097ae623d35c4f659ebb58c4ade1": {
+            "artifact_count": 5,
+            "geometry_sha256": "9dee04aa1d22f5f385c3d1e416273aca1b8f1564bb623e2e522ef2d7269c1297",
+            "vertices": 24994,
+            "triangles": 50000,
+            "bones": 52
+          },
+          "relaxed__5278c26b261972e0a58329d0cc24a414555a64664591e0c18fb52a013edf3f36": {
+            "artifact_count": 5,
+            "geometry_sha256": "ea82d28e283160b76cb8a441276e3d64e889546d981996555ee254e12b0589ee",
+            "vertices": 24994,
+            "triangles": 50000,
+            "bones": 52
+          },
+          "relaxed__2bae8eee7df1322d72e18d174b2cd4de58d211f290aac1218d67419787561cb1": {
+            "artifact_count": 5,
+            "geometry_sha256": "f5a22c340d6254b746b5db80a74658cb0a6c1a546ed843302c5da06200029120",
+            "vertices": 24994,
+            "triangles": 50000,
+            "bones": 52
+          },
+          "relaxed__80c5a322406d8b7145aaf0e1e9e1e4dab2468cb2503022995a989caaf0c43a85": {
+            "artifact_count": 5,
+            "geometry_sha256": "9a21be3fb61f2b36f9defd7c10367a740c51bf2404ad95add93f57d777d468f6",
+            "vertices": 24994,
+            "triangles": 50000,
+            "bones": 52
+          }
+        }
+      }
+    }
+  },
+  "deployed": false,
+  "custom_shapes_supported": false,
+  "limitations": [
+    "Warm local macOS arm64 experiment, not AWS or end-to-end generation.",
+    "Only 24 body/pose/hand combinations are certified, not the complete service library.",
+    "Certificates are restricted to exact base FBXs; body recommendations attached later and custom morphs are not certified.",
+    "Catalog-enabled library misses use ordered sequential live fallback; generated work keeps the parallel path.",
+    "Runtime, platform, body, pose and hand changes invalidate certificates."
+  ],
+  "expected_60s_example": {
+    "observed_total_seconds": 60.275,
+    "observed_screen_seconds": 33.87552,
+    "remaining_without_screen_seconds": 26.399479999999997,
+    "measured_end_to_end": false
+  },
+  "total_geometry_artifacts": 120
+}

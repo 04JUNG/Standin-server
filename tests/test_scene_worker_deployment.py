@@ -162,13 +162,15 @@ def release(tmp_path):
 
     write("library/bvh/test.bvh", b"synthetic")
     sha = digest(tmp_path / "library/bvh/test.bvh")
-    write("catalog.json", {"poses": [{"pose_id": "test", "bvh_sha256": sha}]})
+    write("catalog.json", {"proposal_policy": "reviewed-only-v1", "poses": [{
+        "pose_id": "test", "bvh_sha256": sha,
+        "proposal_eligible": True, "source_review_status": "ai_visual_reviewed",
+    }]})
     write("rig.fbx", b"synthetic")
     write(
         "axes.json",
-        dict.fromkeys(
-            ("master_body_forward", "head_local_forward", "head_local_up"), [0, 1, 0]
-        ),
+        {"master_body_forward": [0, 1, 0], "head_local_forward": [0, 0, 1],
+         "head_local_up": [0, 1, 0], "character_sha256": digest(tmp_path / "rig.fbx")},
     )
     write("humanart/pose.onnx", b"synthetic-pose")
     write("humanart/det.onnx", b"synthetic-det")
@@ -221,6 +223,57 @@ def test_release_binding_and_mutation(release):
     (root / "rig.fbx").write_bytes(b"substitution")
     with pytest.raises(ValueError, match="hash mismatch"):
         verify_release(manifest, sha)
+
+
+@pytest.mark.parametrize("status,eligible", [
+    ("ai_visual_review_flagged", True), ("generated", True),
+    ("ai_visual_reviewed", "true"), ("ai_visual_reviewed", None),
+])
+def test_release_rejects_unreviewed_or_ambiguous_proposal_permission(release, status, eligible):
+    root, _, seal, write = release
+    catalog = json.loads((root / "catalog.json").read_text())
+    catalog["poses"][0].update(source_review_status=status, proposal_eligible=eligible)
+    write("catalog.json", catalog)
+    manifest, sha = seal()
+    with pytest.raises(ValueError, match="cannot be proposed"):
+        verify_release(manifest, sha)
+
+
+def test_unreviewed_baseline_is_retained_but_never_proposed(release):
+    from src.scene_refinement.plan import proposal_pool
+    root, _, seal, write = release
+    catalog = json.loads((root / "catalog.json").read_text())
+    row = catalog["poses"][0]
+    row.update(source_review_status="ai_visual_review_flagged", proposal_eligible=False)
+    write("catalog.json", catalog)
+    manifest, sha = seal()
+    verify_release(manifest, sha)
+    assert {p["pose_id"]: p for p in catalog["poses"]}["test"] is row
+    assert proposal_pool(catalog["poses"]) == []
+
+
+@pytest.mark.parametrize("change", [
+    {"character_sha256": "0" * 64}, {"head_local_forward": [0, 0, 2]},
+    {"head_local_forward": [0, 1, 0]}, {"head_local_up": [0, float("nan"), 0]},
+])
+def test_head_calibration_cannot_be_rebound_or_degenerate(release, change):
+    root, _, seal, write = release
+    axes = json.loads((root / "axes.json").read_text())
+    axes.update(change)
+    write("axes.json", axes)
+    manifest, sha = seal()
+    with pytest.raises(ValueError, match="calibration"):
+        verify_release(manifest, sha)
+
+
+@pytest.mark.parametrize("pose_id,valid", [
+    ("Arm Stretching_00054", True), ("2hand Idle_01_mirror", True),
+    ("../escape", False), ("/absolute", False), ("..", False),
+    ("dir\\escape", False), ("line\nbreak", False), ("", False), (None, False),
+])
+def test_pose_identity_accepts_registered_names_without_path_escape(pose_id, valid):
+    from src.scene_refinement.assets import valid_pose_id
+    assert valid_pose_id(pose_id) is valid
 
 
 @pytest.mark.parametrize(

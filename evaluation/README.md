@@ -1,5 +1,14 @@
 # Standin evaluation harness
 
+최신 v3.2(전신100·상반신45·보류 점수 범위)의 ZIP 검증, 자동 AI 초안 판정,
+집계와 마지막 사람 검수는 [Rubric 3.2 자동화](../docs/evaluation-harness-20261027/RUBRIC_3_2_AUTOMATION.md)를 따른다.
+[v3.1 문서](../docs/evaluation-harness-20261027/RUBRIC_3_1_AUTOMATION.md)는 이전 계약 참고용이다.
+기존 PCK/검색 relevance와 별도 지표이며, AI 결과는 사람 검수 전 추정으로 표시한다.
+
+유료 고정 50컷 자동 평가는 사용자 요청으로 계속 꺼둔다. 배포 workflow의 평가 호출을 제거했고,
+실행 스크립트도 기본 차단한다. 운영 머지나 환경 변수 변경으로 다시 실행되지 않는다.
+이전 평가 구조와 중단 기록은 [스테이징 고정셋 CI](../docs/evaluation-harness-20261027/STAGING_FIXED50_CI.md)를 따른다.
+
 실행 진입점은 `python -m standin_eval`이다. 저장소의 `.venv`를 쓰는 예시는 다음과 같다.
 
 ```bash
@@ -111,3 +120,10 @@ Mesh evidence는 `mesh-checks-v2` 계약을 따른다. 필수 검사는 `parse_f
 다음 수작업은 이미지 결과를 보지 않은 상태에서 `cuts.jsonl`과 `persons.jsonl`을 채우고
 검토 후 `dataset seal`로 hash를 갱신하는 것이다. D1/D2에는 라이선스·외부 VLM 전송 동의와
 작가/프로젝트/scene group 분리도 반드시 기록한다.
+
+
+## 검색·리파인·최종 파일 확장 (2026-10-27)
+
+2026-10-28: 사용자 지정 **set-01 (27컷·48명)**의 [자동 COCO17 관절 인식 평가](../docs/evaluation-harness-20261027/SET01_AUTOMATIC_POSE_BENCHMARK.md)를 추가했다. 기존 GT 초안을 이용해 저장된 예측을 자동 채점하며, 사용 허용을 다시 묻거나 323장 작업표를 먼저 요구하지 않는다. 기본 실행은 오프라인이다.
+
+명시적 F25/v3 arm, 같은 선택 BVH·카메라, 실제 FBX evidence와 저장 lineage, 제공 러프의 읽기 전용 준비는 [구현 워크플로](../docs/evaluation-harness-20261027/IMPLEMENTED_WORKFLOW.md)를 따른다. 기존 명령과 레거시 B0/B1/B2 계약은 유지한다. 오프라인 fixture 통과는 제품 품질/메시 안전/실제 저장 인증이 아니다.

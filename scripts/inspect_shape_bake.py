@@ -101,7 +101,15 @@ def posed_reference(recipe, values, actual_path, temp, pose):
         for bone in rig.pose.bones:
             if max(abs(x-y) for a,b in zip(bone.matrix, Matrix(native[bone.name])) for x,y in zip(a,b)) > 1e-7:
                 raise ValueError('authoring channels do not reproduce native pose')
+        # The recorded pose is already projected by the authoring joint limits.
+        # Rebuild its cache signature so correct_pose recomputes the surface at
+        # that verified pose instead of projecting the shoulder a second time.
+        if callable(getattr(sb, 'sl_signature', None)):
+            rig['standin_shoulder_signature'] = sb.sl_signature(rig)
         sb.correct_pose(check_intersections=True, contacts=True)
+        for bone in rig.pose.bones:
+            if max(abs(x-y) for a,b in zip(bone.matrix, Matrix(native[bone.name])) for x,y in zip(a,b)) > 1e-7:
+                raise ValueError('surface inspection changed verified native pose')
         expected = np.array([mesh.matrix_world @ Vector(co) for co in sb.evaluated(mesh)])
     finally:
         sb.BUSY = False

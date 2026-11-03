@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import math
 from pathlib import Path
 import re
 
@@ -16,6 +17,12 @@ CLIP_FILES = {
     "vocab.json",
     "merges.txt",
 }
+
+
+def valid_pose_id(value):
+    return (isinstance(value, str) and bool(value)
+            and Path(value).name == value and value not in (".", "..")
+            and "\\" not in value and not any(ord(c) < 32 for c in value))
 
 
 def digest(path):
@@ -92,9 +99,16 @@ def verify_release(manifest, expected_sha):
     poses = catalog["poses"]
     if not poses or len({p["pose_id"] for p in poses}) != len(poses):
         raise ValueError("invalid or duplicate catalog poses")
+    if catalog.get("proposal_policy") != "reviewed-only-v1":
+        raise ValueError("catalog proposal review policy is required")
     for pose in poses:
+        if type(pose.get("proposal_eligible")) is not bool or (
+            pose["proposal_eligible"]
+            and pose.get("source_review_status") != "ai_visual_reviewed"
+        ):
+            raise ValueError("unreviewed catalog pose cannot be proposed")
         name = pose["pose_id"]
-        if not isinstance(name, str) or Path(name).name != name or name in (".", ".."):
+        if not valid_pose_id(name):
             raise ValueError("invalid catalog pose identity")
         bvh = paths["library"] / "bvh" / (name + ".bvh")
         if pinned(bvh) != pose["bvh_sha256"]:
@@ -105,6 +119,16 @@ def verify_release(manifest, expected_sha):
         for key in ("master_body_forward", "head_local_forward", "head_local_up")
     ):
         raise ValueError("head calibration is incomplete")
+    if axes.get("character_sha256") != pinned(paths["character"]):
+        raise ValueError("head calibration and character differ")
+    for key in ("master_body_forward", "head_local_forward", "head_local_up"):
+        vector = axes[key]
+        if (not isinstance(vector, list) or len(vector) != 3
+            or any(type(v) not in (int, float) or not math.isfinite(v) for v in vector)
+            or abs(sum(v * v for v in vector) - 1) > 1e-5):
+            raise ValueError("head calibration requires finite unit axes")
+    if abs(sum(a * b for a, b in zip(axes["head_local_forward"], axes["head_local_up"]))) > 1e-5:
+        raise ValueError("head calibration axes must be orthogonal")
     for name in CLIP_FILES:
         pinned(paths["clip"] / name)
     pose = json.loads(paths["pose_manifest"].read_text())

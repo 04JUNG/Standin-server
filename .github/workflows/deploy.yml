@@ -93,6 +93,34 @@ jobs:
             --task-definition "$TASK_DEFINITION" \
             --query taskDefinition > taskdef.json
 
+      - name: Refresh staging body initializer image
+        if: github.ref == 'refs/heads/develop'
+        env:
+          STAGING_IMAGE_URI: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+        run: python scripts/refresh_staging_body_initializer.py taskdef.json --image "$STAGING_IMAGE_URI"
+
+      - name: Keep staging inline asset initializer on the deployed image
+        if: github.ref == 'refs/heads/develop'
+        env:
+          STAGING_IMAGE: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+        run: python scripts/prepare_staging_asset_initializer.py taskdef.json --image "$STAGING_IMAGE"
+
+      - name: Prepare environment-scoped VLM provider
+        env:
+          VLM_PROVIDER: ${{ vars.VLM_PROVIDER }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
+          OPENAI_REASONING_EFFORT: ${{ vars.OPENAI_REASONING_EFFORT }}
+          OPENAI_REQUEST_TIMEOUT_MS: ${{ vars.OPENAI_REQUEST_TIMEOUT_MS }}
+          OPENAI_MAX_ATTEMPTS: ${{ vars.OPENAI_MAX_ATTEMPTS }}
+          OPENAI_TOTAL_BUDGET_SECONDS: ${{ vars.OPENAI_TOTAL_BUDGET_SECONDS }}
+          BODY_VLM_PROVIDER: ${{ vars.BODY_VLM_PROVIDER }}
+          BODY_VLM_MODEL: ${{ vars.BODY_VLM_MODEL }}
+          BODY_COARSE_FAMILY_REVIEW_MODEL: ${{ vars.BODY_COARSE_FAMILY_REVIEW_MODEL }}
+          POSE_GENERATION_PROVIDER: ${{ vars.POSE_GENERATION_PROVIDER }}
+          POSE_GENERATION_MODEL: ${{ vars.POSE_GENERATION_MODEL }}
+          SKELETON_REPAIR_MODEL: ${{ vars.SKELETON_REPAIR_MODEL }}
+        run: python scripts/prepare_vlm_deployment.py taskdef.json --serving
+
       - name: Prepare explicit fullbody deployment contract
         env:
           REQUESTED_POSE_VARIANT: ${{ vars.POSE_MODEL_VARIANT }}
@@ -101,6 +129,33 @@ jobs:
           python scripts/prepare_fullbody_deployment.py taskdef.json \
             --enabled "$ROUTING_FULLBODY_ENABLED" \
             --variant "$REQUESTED_POSE_VARIANT" --canary "$REQUESTED_CANARY_STAGE"
+
+      - name: Prepare explicit hand screen capacity
+        env:
+          HAND_SKIN_SCREEN_CONCURRENCY: ${{ vars.HAND_SKIN_SCREEN_CONCURRENCY }}
+        run: python scripts/prepare_hand_screen_deployment.py taskdef.json --container inference
+
+      - name: Prepare optional description rollout overrides
+        # Read environment-scoped vars only here. Empty preserves the current
+        # task setting; explicit '0' supports rollback without changing secrets.
+        env:
+          ROUTING_DESCRIBE_TIMEOUT_MS: ${{ vars.ROUTING_DESCRIBE_TIMEOUT_MS }}
+          ROUTING_DESCRIBE_BUDGET_MS: ${{ vars.ROUTING_DESCRIBE_BUDGET_MS }}
+          ROUTING_DESCRIBE_RESERVE_MS: ${{ vars.ROUTING_DESCRIBE_RESERVE_MS }}
+          ROUTING_DESCRIBE_PERSON_CROPS: ${{ vars.ROUTING_DESCRIBE_PERSON_CROPS }}
+          ROUTING_DESCRIBE_PERSON_WORKERS: ${{ vars.ROUTING_DESCRIBE_PERSON_WORKERS }}
+          PARALLEL_POSE_DESCRIPTION: ${{ vars.PARALLEL_POSE_DESCRIPTION }}
+        run: python scripts/prepare_description_deployment.py taskdef.json
+
+      - name: Prepare pinned staging hand screen release
+        if: github.ref == 'refs/heads/develop'
+        env:
+          HAND_SCREEN_RELEASE_MANIFEST_KEY: ${{ vars.HAND_SCREEN_RELEASE_MANIFEST_KEY }}
+          HAND_SCREEN_RELEASE_MANIFEST_SHA256: ${{ vars.HAND_SCREEN_RELEASE_MANIFEST_SHA256 }}
+          HAND_SCREEN_RELEASE_MANIFEST_JSON: ${{ vars.HAND_SCREEN_RELEASE_MANIFEST_JSON }}
+          HAND_SCREEN_PREVALIDATION_ENABLED: ${{ vars.HAND_SCREEN_PREVALIDATION_ENABLED }}
+          STAGING_IMAGE: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+        run: python scripts/prepare_hand_screen_release_deployment.py taskdef.json --image "$STAGING_IMAGE" --environment staging
 
       - name: Verify Human-Art model source
         if: ${{ env.ROUTING_FULLBODY_ENABLED == '1' || (vars.POSE_MODEL_VARIANT || 'cascade') == 'cascade' }}
@@ -181,3 +236,6 @@ jobs:
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
+
+      # Paid fixed-50 evaluation is disabled by owner request (2026-10-31).
+      # Keep model evaluation outside deployment workflows, including main promotion.

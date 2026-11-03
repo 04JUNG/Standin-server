@@ -1,0 +1,283 @@
+{
+  "schema_version": "pose-recognition-report-v1",
+  "dataset_id": "vlm-pose-set01-r3-exclude119-230-252",
+  "source_commit": "5680035be8354916d1b11a980e7817a6cece2015",
+  "decision": "INCONCLUSIVE",
+  "score_status": "PROVISIONAL_DRAFT_GT",
+  "denominator": {
+    "cuts": 27,
+    "persons": 48,
+    "visible_joints": 162,
+    "occluded_estimated_joints": 210,
+    "ignored_visibility_zero": 444
+  },
+  "cut_statuses": {
+    "not_run": 27
+  },
+  "person_association": {
+    "unknown": 48
+  },
+  "person_count": {
+    "denominator": 27,
+    "correct": 0,
+    "incorrect": 0,
+    "unknown": 27,
+    "correct_rate": null,
+    "fixed_denominator_lower_bound": 0.0
+  },
+  "vlm_person_count": {
+    "denominator": 27,
+    "correct": 0,
+    "incorrect": 0,
+    "unknown": 27,
+    "correct_rate": null,
+    "fixed_denominator_lower_bound": 0.0
+  },
+  "visible_primary": {
+    "denominator": 162,
+    "correct": 0,
+    "incorrect": 0,
+    "unknown": 162,
+    "correct_rate": null,
+    "fixed_denominator_lower_bound": 0.0,
+    "mean_error_px_on_comparable_joints": null,
+    "comparable_joints": 0
+  },
+  "occluded_estimates": {
+    "denominator": 210,
+    "correct": 0,
+    "incorrect": 0,
+    "unknown": 210,
+    "correct_rate": null,
+    "fixed_denominator_lower_bound": 0.0,
+    "mean_error_px_on_comparable_joints": null,
+    "comparable_joints": 0
+  },
+  "visible_body_only": {
+    "denominator": 61,
+    "correct": 0,
+    "incorrect": 0,
+    "unknown": 61,
+    "correct_rate": null,
+    "fixed_denominator_lower_bound": 0.0,
+    "mean_error_px_on_comparable_joints": null,
+    "comparable_joints": 0
+  },
+  "by_joint": {
+    "nose": {
+      "denominator": 33,
+      "correct": 0,
+      "incorrect": 0,
+      "unknown": 33,
+      "correct_rate": null,
+      "fixed_denominator_lower_bound": 0.0,
+      "mean_error_px_on_comparable_joints": null,
+      "comparable_joints": 0
+    },
+    "left_eye": {
+      "denominator": 25,
+      "correct": 0,
+      "incorrect": 0,
+      "unknown": 25,
+      "correct_rate": null,
+      "fixed_denominator_lower_bound": 0.0,
+      "mean_error_px_on_comparable_joints": null,
+      "comparable_joints": 0
+    },
+    "right_eye": {
+      "denominator": 25,
+      "correct": 0,
+      "incorrect": 0,
+      "unknown": 25,
+      "correct_rate": null,
+      "fixed_denominator_lower_bound": 0.0,
+      "mean_error_px_on_comparable_joints": null,
+      "comparable_joints": 0
+    },
+    "left_ear": {
+      "denominator": 9,
+      "correct": 0,
+      "incorrect": 0,
+      "unknown": 9,
+      "correct_rate": null,
+      "fixed_denominator_lower_bound": 0.0,
+      "mean_error_px_on_comparable_joints": null,
+      "comparable_joints": 0
+    },
+    "right_ear": {
+      "denominator": 9,
+      "correct": 0,
+      "incorrect": 0,
+      "unknown": 9,
+      "correct_rate": null,
+      "fixed_denominator_lower_bound": 0.0,
+      "mean_error_px_on_comparable_joints": null,
+      "comparable_joints": 0
+    },
+    "left_shoulder": {
+      "denominator": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "unknown": 0,
+      "correct_rate": null,
+      "fixed_denominator_lower_bound": null,
+      "mean_error_px_on_comparable_joints": null,
+      "comparable_joints": 0
+    },
+    "right_shoulder": {
+      "denominator": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "unknown": 0,
+      "correct_rate": null,
+      "fixed_denominator_lower_bound": null,
+      "mean_error_px_on_comparable_joints": null,
+      "comparable_joints": 0
+    },
+    "left_elbow": {
+      "denominator": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "unknown": 0,
+      "correct_rate": null,
+      "fixed_denominator_lower_bound": null,
+      "mean_error_px_on_comparable_joints": null,
+      "comparable_joints": 0
+    },
+    "right_elbow": {
+      "denominator": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "unknown": 0,
+      "correct_rate": null,
+      "fixed_denominator_lower_bound": null,
+      "mean_error_px_on_comparable_joints": null,
+      "comparable_joints": 0
+    },
+    "left_wrist": {
+      "denominator": 25,
+      "correct": 0,
+      "incorrect": 0,
+      "unknown": 25,
+      "correct_rate": null,
+      "fixed_denominator_lower_bound": 0.0,
+      "mean_error_px_on_comparable_joints": null,
+      "comparable_joints": 0
+    },
+    "right_wrist": {
+      "denominator": 18,
+      "correct": 0,
+      "incorrect": 0,
+      "unknown": 18,
+      "correct_rate": null,
+      "fixed_denominator_lower_bound": 0.0,
+      "mean_error_px_on_comparable_joints": null,
+      "comparable_joints": 0
+    },
+    "left_hip": {
+      "denominator": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "unknown": 0,
+      "correct_rate": null,
+      "fixed_denominator_lower_bound": null,
+      "mean_error_px_on_comparable_joints": null,
+      "comparable_joints": 0
+    },
+    "right_hip": {
+      "denominator": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "unknown": 0,
+      "correct_rate": null,
+      "fixed_denominator_lower_bound": null,
+      "mean_error_px_on_comparable_joints": null,
+      "comparable_joints": 0
+    },
+    "left_knee": {
+      "denominator": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "unknown": 0,
+      "correct_rate": null,
+      "fixed_denominator_lower_bound": null,
+      "mean_error_px_on_comparable_joints": null,
+      "comparable_joints": 0
+    },
+    "right_knee": {
+      "denominator": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "unknown": 0,
+      "correct_rate": null,
+      "fixed_denominator_lower_bound": null,
+      "mean_error_px_on_comparable_joints": null,
+      "comparable_joints": 0
+    },
+    "left_ankle": {
+      "denominator": 9,
+      "correct": 0,
+      "incorrect": 0,
+      "unknown": 9,
+      "correct_rate": null,
+      "fixed_denominator_lower_bound": 0.0,
+      "mean_error_px_on_comparable_joints": null,
+      "comparable_joints": 0
+    },
+    "right_ankle": {
+      "denominator": 9,
+      "correct": 0,
+      "incorrect": 0,
+      "unknown": 9,
+      "correct_rate": null,
+      "fixed_denominator_lower_bound": 0.0,
+      "mean_error_px_on_comparable_joints": null,
+      "comparable_joints": 0
+    }
+  },
+  "policy": {
+    "schema_version": "pose-recognition-policy-v1",
+    "pck_image_diagonal_fraction": 0.05,
+    "match_max_image_diagonal_fraction": 0.15,
+    "minimum_common_joints": 1,
+    "prediction_score_threshold": null,
+    "latency_budget_ms": null,
+    "expected_inference_identity": {},
+    "interpretation": "engineering_diagnostic_not_product_acceptance"
+  },
+  "hard_failures": [],
+  "actual_model_cuts": 0,
+  "model_identity_states": {
+    "unknown": 27
+  },
+  "latency": {
+    "kind": "recorded_request_wall_clock_not_native_save",
+    "measured": 0,
+    "p50_ms": null,
+    "p95_ms": null,
+    "budget_ms": null,
+    "within_budget": {
+      "denominator": 27,
+      "correct": 0,
+      "incorrect": 0,
+      "unknown": 27,
+      "correct_rate": null,
+      "fixed_denominator_lower_bound": 0.0
+    }
+  },
+  "excluded_cut_ids": [
+    "p_rough_119",
+    "p_rough_230",
+    "p_rough_252"
+  ],
+  "human_verified_cuts": 0,
+  "limitations": [
+    "no_product_quality_or_mesh_or_FBX_usability_certification",
+    "keypoint_matching_uses_GT_visible_support_not_human_verified_person_boxes",
+    "PCK_is_image_diagonal_normalized_not_bbox_or_head_normalized",
+    "occluded_coordinates_are_estimates_not_observed_truth",
+    "missing_outputs_and_unexecuted_cuts_keep_the_fixed_denominator"
+  ],
+  "operational_deployment": false,
+  "plan_sha256": "7f217b577937e6a0a1cd3b8677e27f01b07b4f11e19f4862c13dc47a563f721a"
+}

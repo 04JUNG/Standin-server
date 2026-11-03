@@ -1,5 +1,10 @@
 name: Build or deploy scene worker (staging only)
 on:
+  workflow_call:
+    inputs:
+      deploy_staging:
+        type: boolean
+        required: true
   workflow_dispatch:
     inputs:
       deploy_staging:
@@ -31,7 +36,7 @@ jobs:
       - name: Runtime contract tests
         run: |
           pip install -r requirements-converter.txt numpy scipy httpx pytest google-genai opencv-python-headless==5.0.0.93
-          python -m pytest -q tests/test_scene_refinement_runtime.py tests/test_scene_worker_deployment.py tests/test_scene_worker_artifact_contract.py
+          python -m pytest -q tests/test_scene_refinement_runtime.py tests/test_scene_worker_deployment.py tests/test_scene_worker_artifact_contract.py tests/converter/test_scene_camera_transport.py tests/test_scene_worker_image_reuse.py tests/test_scene_worker_image.py tests/converter/test_deployment_contract.py
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ vars.SCENE_AWS_DEPLOY_ROLE }}
@@ -53,17 +58,43 @@ jobs:
           fi
       - id: ecr
         uses: aws-actions/amazon-ecr-login@v2
+      - name: Check pinned commit image
+        id: existing
+        run: |
+          if aws ecr describe-images --repository-name "$ECR_REPOSITORY" \
+            --image-ids imageTag="$GITHUB_SHA" > /tmp/scene-image.json 2> /tmp/scene-image-error; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            case "$(cat /tmp/scene-image-error)" in
+              *"(ImageNotFoundException)"*) echo "exists=false" >> "$GITHUB_OUTPUT" ;;
+              *) cat /tmp/scene-image-error >&2; exit 1 ;;
+            esac
+          fi
       - name: Build images from the same commit
+        if: steps.existing.outputs.exists != 'true'
         run: |
           docker build --platform linux/amd64 -f Dockerfile.converter -t standin-converter:scene-base .
           docker build --platform linux/amd64 -f Dockerfile.scene-worker -t standin-scene:release .
+      - name: Load already published commit image
+        if: steps.existing.outputs.exists == 'true'
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+        run: |
+          docker pull --platform linux/amd64 "$REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA"
+          docker tag "$REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA" standin-scene:release
+      - name: Verify worker image imports
+        run: |
           docker run --rm standin-scene:release python -c 'import torch,transformers,rtmlib,onnxruntime,cv2; from src.scene_refinement import runtime,plan; from src.semantic_adapter_285 import excluded_pose_ids; excluded_pose_ids()'
       - name: Push immutable commit tag
+        if: steps.existing.outputs.exists != 'true'
         env:
           REGISTRY: ${{ steps.ecr.outputs.registry }}
         run: |
           docker tag standin-scene:release "$REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA"
           docker push "$REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA"
+      - name: Resolve published commit digest
+        id: image
+        run: python scripts/scene_worker_image.py --commit "$GITHUB_SHA" --require
       - name: Render dedicated task image
         if: inputs.deploy_staging
         id: render
@@ -71,7 +102,7 @@ jobs:
         with:
           task-definition: /tmp/scene-task.json
           container-name: scene-worker
-          image: ${{ steps.ecr.outputs.registry }}/standin/scene-worker:${{ github.sha }}
+          image: ${{ steps.ecr.outputs.registry }}/standin/scene-worker@${{ steps.image.outputs.digest }}
           environment-variables: |
             DEPLOYMENT_VERSION=${{ github.sha }}
       - name: Update dedicated staging service
