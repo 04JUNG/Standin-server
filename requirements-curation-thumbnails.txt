@@ -1,0 +1,4 @@
+# Offline native thumbnail renderer; not an inference runtime dependency.
+moderngl==5.12.0
+numpy>=1.26
+Pillow>=10

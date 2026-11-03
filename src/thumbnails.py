@@ -28,6 +28,11 @@ def find_thumbnail(data_dir: str, pose_id: str, view: str) -> Path | None:
     if view not in THUMBNAIL_VIEWS:
         return None
 
+    from .thumbnail_overlay import legacy_thumbnail_path
+    styled = legacy_thumbnail_path(data_dir, pose_id, view)
+    if styled is not None:
+        return styled
+
     root = (Path(data_dir) / "thumbs").resolve()
     candidate = (root / thumbnail_filename(pose_id, view)).resolve()
     try:
