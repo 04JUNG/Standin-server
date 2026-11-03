@@ -84,6 +84,23 @@ def test_missing_requested_angle_does_not_silently_use_front(assets):
         rough_poster(root, source, 'full', 'yaw_045')
 
 
+def test_explicit_compatible_revision_preserves_actual_producer(assets):
+    root, source, folder, _ = assets
+    path = root / 'thumbs/styled/manifest.json'
+    manifest = json.loads(path.read_text())
+    manifest.update(renderer_revision='c'*64, renderer_revisions=['a'*64, 'c'*64])
+    path.write_text(json.dumps(manifest))
+    _, headers = overlay.read_styled_poster(root, source, 'full', 'yaw_000')
+    assert headers['X-Standin-Preview-Revision'] == 'a'*64
+    record = json.loads((folder / 'pose.json').read_text())
+    record['renderer_revision'] = 'd'*64
+    (folder / 'pose.json').write_text(json.dumps(record))
+    manifest['pose_records'][source] = overlay._sha(folder / 'pose.json')
+    path.write_text(json.dumps(manifest))
+    with pytest.raises(ValueError, match='lineage'):
+        overlay.read_styled_poster(root, source, 'full', 'yaw_000')
+
+
 @pytest.mark.parametrize('name', ['../escape', '/absolute', 'poses.db', 'bvh/a.bvh',
                                   'thumbs/styled/../../poses.db', 'thumbs\\styled\\manifest.json'])
 def test_archive_cannot_change_library_or_escape(tmp_path, name):

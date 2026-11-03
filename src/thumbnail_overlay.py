@@ -58,9 +58,12 @@ def _manifest(path_string, mtime, size):
     if any(manifest.get(k) != v for k, v in expected.items()):
         raise ValueError('incomplete or unsupported thumbnail overlay')
     poses, records = manifest.get('poses', {}), manifest.get('pose_records', {})
+    revisions = manifest.get('renderer_revisions', [manifest.get('renderer_revision')])
     if (len(poses) != 5862 or len(records) != 5862 or set(poses.values()) != set(records)
             or not all(HASH.fullmatch(h) and HASH.fullmatch(d) for h, d in records.items())
             or not HASH.fullmatch(manifest.get('renderer_revision', ''))
+            or not isinstance(revisions, list) or not 1 <= len(revisions) <= 8
+            or not all(isinstance(r, str) and HASH.fullmatch(r) for r in revisions)
             or not re.fullmatch(STYLE + r'-[a-f0-9]{12}', manifest.get('asset_version', ''))):
         raise ValueError('invalid thumbnail overlay inventory')
     return manifest
@@ -86,7 +89,7 @@ def _record(root, manifest, source):
     record = _json(path, 65536)
     names = {f'{s}__{v}.jpg' for s in SCOPES for v in VIEWS}
     if (record.get('style') != STYLE or record.get('source_bvh_sha256') != source
-            or record.get('renderer_revision') != manifest['renderer_revision']
+            or record.get('renderer_revision') not in manifest.get('renderer_revisions', [manifest['renderer_revision']])
             or manifest['poses'].get(record.get('pose_id')) != source
             or set(record.get('images', {})) != names):
         raise ValueError('styled thumbnail lineage changed')
@@ -125,7 +128,7 @@ def read_styled_poster(data_dir, source, scope, view):
     from .pose_posters import headers
     meta = dict(kind='default-body', render_method='frozen-retarget-v1',
                 source_bvh_sha256=source, character_id='standin-master-v2', character_sha256=CHARACTER_SHA,
-                renderer_revision=manifest['renderer_revision'], image_sha256=record['images'][name]['sha256'], scope=scope)
+                renderer_revision=record['renderer_revision'], image_sha256=record['images'][name]['sha256'], scope=scope)
     result = headers(meta)
     result.update({'X-Standin-Poster-Asset-Version': manifest['asset_version'],
                    'X-Standin-Thumbnail-Style': STYLE,

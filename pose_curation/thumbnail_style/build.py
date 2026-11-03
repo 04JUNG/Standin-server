@@ -25,6 +25,18 @@ def sha(path):
         return hashlib.file_digest(stream, 'sha256').hexdigest()
 
 
+def read_framing(path):
+    # Antivirus/indexers can briefly hold a just-renamed file on Windows.
+    # Retry only sharing/permission failures; malformed data still fails closed.
+    for attempt in range(50):
+        try:
+            return json.loads(path.read_text())
+        except PermissionError:
+            if attempt == 49:
+                raise
+            time.sleep(.1)
+
+
 def atomic_json(path, value):
     path.parent.mkdir(parents=True, exist_ok=True)
     temp = path.with_suffix('.tmp')
@@ -102,7 +114,10 @@ def build(args):
         if not path.exists():
             return None
         record = json.loads(path.read_text(encoding='utf-8'))
-        if record.get('renderer_revision') != revision or len(record.get('images', {})) != 32:
+        if (record.get('renderer_revision') not in {revision, *args.reuse_revision}
+                or record.get('style') != STYLE or record.get('source_bvh_sha256') != entry['source']
+                or record.get('pose_id') != entry['pose_id'] or len(record.get('images', {})) != 32
+                or record.get('geometry_sha256') != {s: sha(p) for s, p in entry['glbs'].items()}):
             return None
         for name, info in record['images'].items():
             if not (path.parent / name).is_file() or sha(path.parent / name) != info['sha256']:
@@ -145,7 +160,7 @@ def build(args):
                 renderer = local.renderer
                 destination = root / entry['source']
                 destination.mkdir(exist_ok=True)
-                framing = json.loads((work / 'framing.json').read_text()) if work else {}
+                framing = read_framing(work / 'framing.json') if work else {}
                 record = dict(schema_version=1, style=STYLE, renderer_revision=revision,
                               pose_id=entry['pose_id'], source_bvh_sha256=entry['source'],
                               geometry_origin=entry['geometry_origin'], images={}, framing=framing,
@@ -193,6 +208,7 @@ def build(args):
                 print(json.dumps(status), flush=True)
     stop_workers()
     manifest = dict(schema_version=1, style=STYLE, status='complete', renderer_revision=revision,
+                    renderer_revisions=sorted({r['renderer_revision'] for r in records}),
                     library_db_sha256=sha(base / 'production/poses.db'),
                     source_library_version=json.loads((base / 'deployed/library_manifest.json').read_text())['library_version'],
                     pose_count=len(entries), image_count=len(entries)*32, scopes=SCOPES, angles=ANGLES,
@@ -214,6 +230,8 @@ def main():
     parser.add_argument('--blender', type=Path, required=True)
     parser.add_argument('--workers', type=int, default=4)
     parser.add_argument('--limit', type=int)
+    parser.add_argument('--reuse-revision', action='append', default=[],
+                        help='explicitly audited, appearance-compatible prior renderer revision to reuse')
     build(parser.parse_args())
 
 
