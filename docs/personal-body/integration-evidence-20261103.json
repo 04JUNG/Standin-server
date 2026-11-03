@@ -1,0 +1,75 @@
+{
+  "date": "2026-11-03",
+  "platform": "macOS arm64",
+  "runtimePackages": [
+    {
+      "decoderIncluded": true,
+      "manifestSha256": "07325a2a63ad8e0abfb5547c0e6cd6a5ff775d9af6d45f4b28930450ef64a085",
+      "target": "darwin-arm64",
+      "uncompressedBytes": 935074577,
+      "releaseReady": false,
+      "fileCount": 6579
+    },
+    {
+      "decoderIncluded": false,
+      "manifestSha256": "4f53a27e8ce0f120f5a08e7c997f33727c154699195383bb07a1c283f6d81342",
+      "target": "darwin-arm64",
+      "uncompressedBytes": 935066011,
+      "releaseReady": false,
+      "fileCount": 6578
+    }
+  ],
+  "tests": {
+    "frontend": {
+      "passed": 1302,
+      "skipped": 1,
+      "filesPassed": 160,
+      "node": "26.5.0",
+      "testEnvironment": "NODE_OPTIONS=--no-experimental-webstorage (jsdom localStorage; CI Node22)"
+    },
+    "runtimePackaging": 1,
+    "converterLocal": 11,
+    "decoder": 6,
+    "typecheck": "passed",
+    "lint": {
+      "errors": 0,
+      "preexistingWarnings": 1
+    },
+    "webBuild": "passed",
+    "windowsIconCheck": "passed",
+    "releaseNotes": "passed",
+    "rustClippy": "passed --offline --locked --all-targets -- -D warnings",
+    "rustPersonalBody": {
+      "passed": 8,
+      "realPackagedTests": 4,
+      "durationSeconds": 50.15,
+      "execution": "macOS native (sandbox child execution failed; native environment passed)"
+    }
+  },
+  "geometry": {
+    "files": 9,
+    "worldVertexErrorMaximum": 7.517336939599772e-07,
+    "worldBoneErrorMaximum": 7.462423719218556e-07,
+    "exactSkinWeights": true,
+    "exactObjectScales": true,
+    "singleRotation": true
+  },
+  "nativeUi": {
+    "realRuntime": true,
+    "apiMode": "mock",
+    "nativePickerOriginalCs3c": true,
+    "nativePickerOriginalFbx": true,
+    "inlineRename": true,
+    "restartVerified": false
+  },
+  "liveOwnedBffE2E": false,
+  "csp": {
+    "version": "5.1.1",
+    "output": "model-0-camera-1.fbx",
+    "result": "process exited on 3D import",
+    "crash": "main thread excessive recursion / EXC_BAD_ACCESS / SIGSEGV",
+    "baselineComparison": false
+  },
+  "activationApproved": false,
+  "publicReleaseQualified": false
+}

@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "models": [
+    {
+      "sourceHash": "d4d81aff8b5f0537898e5541279749c46560515e1886f2443f1333094ceb7f4b",
+      "format": "cs3c",
+      "variants": [
+        {
+          "maxWorldVertexError": 6.325600452328217e-07,
+          "maxWorldBoneError": 5.819089469244073e-07,
+          "exactSkinWeights": true,
+          "exactObjectScales": true,
+          "singleRotation": true
+        },
+        {
+          "maxWorldVertexError": 5.93245886193472e-07,
+          "maxWorldBoneError": 3.6983709472390583e-07,
+          "exactSkinWeights": true,
+          "exactObjectScales": true,
+          "singleRotation": true
+        }
+      ]
+    },
+    {
+      "sourceHash": "0410c8b4c50cb896480ac8cd0890407b18df0155cc9a46aba53dcbe0834b20d6",
+      "format": "cs3c",
+      "variants": [
+        {
+          "maxWorldVertexError": 6.325600452328217e-07,
+          "maxWorldBoneError": 5.819089469244073e-07,
+          "exactSkinWeights": true,
+          "exactObjectScales": true,
+          "singleRotation": true
+        },
+        {
+          "maxWorldVertexError": 6.027146923770488e-07,
+          "maxWorldBoneError": 3.6983709472390583e-07,
+          "exactSkinWeights": true,
+          "exactObjectScales": true,
+          "singleRotation": true
+        }
+      ]
+    },
+    {
+      "sourceHash": "866de6cbc1b9f5c910a98aa5ee96fc0ac0b4e00b7fc4064cf23a50d73e2a1ab5",
+      "format": "fbx",
+      "variants": [
+        {
+          "maxWorldVertexError": 7.517336939599772e-07,
+          "maxWorldBoneError": 7.462423719218556e-07,
+          "exactSkinWeights": true,
+          "exactObjectScales": true,
+          "singleRotation": true
+        },
+        {
+          "maxWorldVertexError": 5.5275074828387e-07,
+          "maxWorldBoneError": 6.961011701596612e-07,
+          "exactSkinWeights": true,
+          "exactObjectScales": true,
+          "singleRotation": true
+        }
+      ]
+    }
+  ]
+}

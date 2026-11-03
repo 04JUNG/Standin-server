@@ -7,13 +7,13 @@ import re
 from pathlib import Path
 
 PROTOCOL = "standin.local-converter/1"
-VERSIONS = {"importerVersion": "personal-import/2", "normalizationVersion": "personal-normalize/2",
-            "rigMappingVersion": "personal-rig/2", "converterVersion": "personal-converter/2"}
+VERSIONS = {"importerVersion": "personal-import/2", "normalizationVersion": "personal-normalize/3",
+            "rigMappingVersion": "personal-rig/2", "converterVersion": "personal-converter/3"}
 LIMITS = {"sourceBytes": 128 * 1024**2, "poseBytes": 8 * 1024**2,
           "vertices": 1_000_000, "bones": 512, "meshes": 128,
           "workerSeconds": 120, "workerMemoryBytes": 2 * 1024**3,
           "expandedBytes": 64 * 1024**2, "requestBytes": 65536}
-ERRORS = ["PROTOCOL_MISMATCH", "INVALID_REQUEST", "BUSY", "MODEL_EXISTS", "MODEL_NOT_FOUND",
+ERRORS = ["CAMERA_UNSUPPORTED", "PROTOCOL_MISMATCH", "INVALID_REQUEST", "BUSY", "MODEL_EXISTS", "MODEL_NOT_FOUND",
           "SOURCE_CHANGED", "SOURCE_TOO_LARGE", "UNSUPPORTED_FORMAT", "CS3C_DECODER_UNAVAILABLE",
           "UNSUPPORTED_CS3C_VERSION", "UNSUPPORTED_RIG", "INVALID_HIERARCHY", "UNSUPPORTED_REST_POSE",
           "INVALID_SKIN", "UNSUPPORTED_TRANSFORM", "UNSUPPORTED_MATERIAL", "UNSUPPORTED_FEATURE",
@@ -89,7 +89,7 @@ def validate_request(raw):
         "hello": (set(), set()),
         "import": ({"localModelId", "sourcePath", "sourceHash"}, set()),
         "inspect": ({"localModelId"}, set()),
-        "apply": ({"localModelId", "sourceHash", "posePath", "poseHash", "selectionId", "hands"}, set()),
+        "apply": ({"localModelId", "sourceHash", "posePath", "poseHash", "selectionId", "hands", "camera"}, set()),
         "export": ({"localModelId", "snapshotHash", "destinationPath"}, set()),
         "delete": ({"localModelId"}, set()),
         "cancel": ({"targetRequestId"}, set()),
@@ -106,6 +106,8 @@ def validate_request(raw):
         if key in raw:
             hash_value(raw[key])
     if action == "apply":
+        from converter.local.camera import validate_camera
+        validate_camera(raw["camera"])
         identifier(raw["selectionId"])
         hands = raw["hands"]
         if (not isinstance(hands, dict) or set(hands) != {"left", "right"}
@@ -117,7 +119,9 @@ def validate_request(raw):
     return raw
 
 
-def snapshot(model, pose_hash, hands):
+def snapshot(model, pose_hash, hands, camera=None):
+    from converter.local.camera import SOURCE_CAMERA, validate_camera
+    camera = validate_camera(SOURCE_CAMERA if camera is None else camera)
     return {"localModelId": model["localModelId"], "sourceHash": model["sourceHash"],
             **model["versions"], "poseHash": pose_hash, "hands": hands,
-            "orientation": "source", "outputMode": "rigged_rest"}
+            "orientation": "candidate-y-up-about-hips/1", "camera": camera, "outputMode": "rigged_rest"}

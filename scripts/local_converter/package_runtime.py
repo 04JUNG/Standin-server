@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 
-def build(distribution, output, target, cs3c_modeler_exe=None):
+def build(distribution, output, target, cs3c_modeler_exe=None, cs3c_decoder_resource=None):
     distribution, output = Path(distribution).resolve(), Path(output).absolute()
     if output.exists():
         raise ValueError("Output must be a new directory")
@@ -41,11 +41,19 @@ def build(distribution, output, target, cs3c_modeler_exe=None):
     shutil.copytree(distribution, output / "runtime" / runtime_name, symlinks=True)
     shutil.copytree(ROOT / "converter", output / "converter",
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc", "hand_thumbs", "cs3c_decoder_data.json"))
+    if cs3c_modeler_exe and cs3c_decoder_resource:
+        raise ValueError("Choose one reviewed decoder source")
     cs3c = {"enabled": False}
     if cs3c_modeler_exe:
         from converter.local.cs3c import build_decoder_resource
         cs3c = {"enabled": True, **build_decoder_resource(cs3c_modeler_exe,
                     output / "converter/local/cs3c_decoder_data.json")}
+    if cs3c_decoder_resource:
+        from converter.local.cs3c import read_parameters, DECODER_VERSION, PARAMETER_SHA256, MODELER_SHA256
+        read_parameters(cs3c_decoder_resource)  # Independently pinned payload identity, never executable input.
+        shutil.copy2(cs3c_decoder_resource, output / "converter/local/cs3c_decoder_data.json")
+        cs3c = {"enabled": True, "decoderVersion": DECODER_VERSION, "parameterSha256": PARAMETER_SHA256,
+                "sourceExeSha256": MODELER_SHA256, "modelerExecuted": False, "modelerBundled": False}
     shutil.copy2(ROOT / "docs/personal-body/converter-client-contract.v1.json", output)
     shutil.copy2(ROOT / "LICENSE", output / "CONVERTER_LICENSE.txt")
     shutil.copy2(Path(__file__).with_name("runtime_entry.py"), output / "entry.py")
@@ -85,6 +93,7 @@ if __name__ == "__main__":
     parser.add_argument("--target", choices=["darwin-arm64", "darwin-x64", "windows-x64"], required=True)
     parser.add_argument("--cs3c-modeler-exe", type=Path,
                         help="Reviewed build-only data source; never executed or copied into runtime")
+    parser.add_argument("--cs3c-decoder-resource", type=Path, help="Existing reviewed/pinned decoder build data; not a public redistribution approval")
     args = parser.parse_args()
-    result = build(args.distribution, args.output, args.target, args.cs3c_modeler_exe)
+    result = build(args.distribution, args.output, args.target, args.cs3c_modeler_exe, args.cs3c_decoder_resource)
     print(json.dumps({k: v for k, v in result.items() if k != "files"}, indent=2))

@@ -71,11 +71,13 @@ def run(job):
     inspection.require(edge_error < 2e-5, "CONVERSION_FAILED", "Retarget changed the character's joint lengths")
     bpy.data.objects.remove(src, do_unlink=True)
     rt.apply_output_mode(arm, meshes, "rigged_rest")
+    from converter.local.camera import apply_camera
+    camera_validation = apply_camera(arm, meshes, job["snapshot"]["camera"])
     validation = inspection.roundtrip(arm, meshes, work / "result.fbx", character["mapping"])
     return {"snapshot": job["snapshot"], "snapshotHash": job["snapshotHash"],
             "artifactHash": sha256(work / "result.fbx"), "validation": validation,
             "retarget": {**report.as_dict(), "local_normalization_surface_error": normalization_error,
-                         "max_joint_edge_length_error": edge_error}, "selectionId": job["selectionId"]}
+                         "max_joint_edge_length_error": edge_error, "camera": camera_validation}, "selectionId": job["selectionId"]}
 
 
 def main():

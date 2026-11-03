@@ -92,7 +92,8 @@ def verify(launcher, source, poses, cs3c, report_path, relocated=False):
     for i, pose in enumerate(poses):
         fields = {"localModelId": "regression", "sourceHash": source_hash, "posePath": str(pose),
                   "poseHash": sha(pose), "selectionId": "local-regression-selection",
-                  "hands": {"left": None, "right": None}}
+                  "hands": {"left": None, "right": None},
+                  "camera": {"version":"personal-camera/1", "sourceBvhSha256":None, "rotation":None}}
         applied = session.request("apply", **fields)
         assert applied["validation"]["passed"] and not applied["cacheHit"]
         assert sha(applied["artifactPath"]) == applied["artifactHash"]
@@ -122,7 +123,7 @@ def verify(launcher, source, poses, cs3c, report_path, relocated=False):
             imported = session.request("import", localModelId="cs3c", sourcePath=str(cs3c), sourceHash=sha(cs3c))
             assert imported["sourceFormat"] == "cs3c" and imported["validation"]["passed"]
             applied = session.request("apply", localModelId="cs3c", sourceHash=sha(cs3c), posePath=str(poses[0]),
-                                       poseHash=sha(poses[0]), selectionId="cs3c-regression", hands={"left":None,"right":None})
+                                       poseHash=sha(poses[0]), selectionId="cs3c-regression", hands={"left":None,"right":None}, camera={"version":"personal-camera/1","sourceBvhSha256":None,"rotation":None})
             session.request("export", localModelId="cs3c", snapshotHash=applied["snapshotHash"],
                             destinationPath=str(root / "additional-cs3c.fbx"))
             session.request("delete", localModelId="cs3c")

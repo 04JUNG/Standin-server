@@ -155,7 +155,8 @@ class Host:
                     from converter.local.cs3c import decoder_available
                     self.event(request_id, "result", result={"protocolVersion": PROTOCOL,
                                "versions": versions(), "limits": LIMITS,
-                               "formats": {"fbx": True, "cs3c": decoder_available()}, "hands": False})
+                               "formats": {"fbx": True, "cs3c": decoder_available()}, "hands": False,
+                               "cameraContractVersion": "personal-camera/1"})
                     return
                 if action == "cancel":
                     accepted = self.active == req["targetRequestId"] and not self.committed
@@ -323,7 +324,7 @@ class Host:
         if req["sourceHash"] != manifest["sourceHash"]:
             raise LocalError("SOURCE_CHANGED", "Selected model version has changed")
         pose = absolute_file(req["posePath"], {".bvh"}, LIMITS["poseBytes"])
-        snap = snapshot(manifest, req["poseHash"], req["hands"])
+        snap = snapshot(manifest, req["poseHash"], req["hands"], req["camera"])
         key = digest(snap)
         cache = folder / "results" / key
         if cache.exists():

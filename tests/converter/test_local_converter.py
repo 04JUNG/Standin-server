@@ -34,7 +34,7 @@ class LocalConverterTests(unittest.TestCase):
     def test_no_personal_finger_support_is_invented(self):
         request = {"protocolVersion": PROTOCOL, "requestId": "a", "action": "apply", "localModelId": "m",
                    "sourceHash": "a"*64, "poseHash": "b"*64, "posePath": "/pose.bvh", "selectionId": "selection",
-                   "hands": {"left": "fist", "right": None}}
+                   "hands": {"left": "fist", "right": None}, "camera": {"version":"personal-camera/1", "sourceBvhSha256":None, "rotation":None}}
         with self.assertRaises(LocalError) as error:
             validate_request(request)
         self.assertEqual(error.exception.code, "HAND_UNSUPPORTED")
