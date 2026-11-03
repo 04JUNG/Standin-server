@@ -1,5 +1,6 @@
 """Verify every generated JPEG and package only the immutable thumbnail overlay."""
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import json
 from pathlib import Path
@@ -18,15 +19,20 @@ def main():
         raise ValueError('completed manifest required')
     root = _root(args.directory)
     paths = [root / 'manifest.json']
-    for number, source in enumerate(sorted(manifest['pose_records']), 1):
+    def checked_paths(source):
         record = _record(root, manifest, source)
-        paths.append(root / source / 'pose.json')
+        selected = [root / source / 'pose.json']
         for name, info in sorted(record['images'].items()):
             path = root / source / name
             _raster(path, info)
-            paths.append(path)
-        if number % 500 == 0:
-            print(f'verified {number}/{manifest["pose_count"]} poses', flush=True)
+            selected.append(path)
+        return selected
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        for number, selected in enumerate(pool.map(checked_paths, sorted(manifest['pose_records'])), 1):
+            paths.extend(selected)
+            if number % 500 == 0:
+                print(f'verified {number}/{manifest["pose_count"]} poses', flush=True)
     if len(paths) != 193447:
         raise ValueError('incomplete image package')
     with tarfile.open(args.archive, 'w:gz', compresslevel=1) as archive:
