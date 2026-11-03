@@ -39,6 +39,8 @@ ECR 저장소는 스테이징 계정의 `standin/converter`, `standin/inference`
 
 ## 운영 및 롤백
 
+2026-11-03 스테이징에 변환기 task revision `31`, 검색 서버 revision `108`을 적용했다. 두 새 컨테이너는 `HEALTHY`이며 공개 `/healthz`는 HTTP 200, `ok=true`, `inference=true`를 반환했다. BFF는 기존 revision `106`을 유지했다.
+
 배포는 기존 ECS task definition을 복사해 이미지와 명시한 환경 변수만 바꾼다. 기존 body-assets-init, 볼륨, shape registry, CSP 기능 플래그, 자격 증명 참조, 네트워크 설정을 보존한다.
 
 변환기 이전 task revision은 `StandinStagingAppConverterTask5DE04741:30`, 검색 서버는 `StandinStagingAppInferenceTask76CF0AC4:107`이다. 문제가 발생하면 해당 스테이징 서비스의 task definition을 이 revision으로 되돌린다. 이때 기존 캐시 경로도 함께 복원된다. 운영 서비스에는 적용하지 않는다.
