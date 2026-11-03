@@ -521,6 +521,14 @@ class BlenderRunner:
                 "worker output FBX is missing or empty", report=report
             )
         artifact_sha256 = sha256_file(output_path)
+        from converter.scene_catalog import validate_receipt as validate_scene_receipt
+        try:
+            validate_scene_receipt(
+                report.get("scene_props"), source_bvh_sha256,
+                mirror=mirror, exact=self.settings.force_exact_v324,
+            )
+        except ValueError as exc:
+            raise WorkerIntegrityError("scene recipe receipt mismatch", report=report) from exc
         if report.get("artifact_sha256") != artifact_sha256:
             raise WorkerIntegrityError(
                 "artifact SHA256 does not match worker report", report=report

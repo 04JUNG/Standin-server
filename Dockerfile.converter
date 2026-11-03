@@ -111,6 +111,17 @@ COPY converter/hand_collision.py /app/converter/hand_collision.py
 COPY converter/hand_contact.py /app/converter/hand_contact.py
 COPY converter/hand_screen_catalog.py /app/converter/hand_screen_catalog.py
 COPY converter/hands.py /app/converter/hands.py
+COPY converter/scene_alignment.py converter/scene_catalog.py converter/scene_clearance.py \
+    converter/scene_contact_carry.py converter/scene_contact_fabric.py converter/scene_contact_firearm.py \
+    converter/scene_contact_frames.py converter/scene_contact_guides.py converter/scene_contact_hanging.py \
+    converter/scene_contact_ik.py converter/scene_contact_pose.py converter/scene_contact_profiles.py \
+    converter/scene_contact_revision.py converter/scene_contact_special.py converter/scene_contact_tools.py \
+    converter/scene_containers.py converter/scene_firearms.py converter/scene_guides.py \
+    converter/scene_hand_body_review.py converter/scene_hand_stage.py converter/scene_phone.py \
+    converter/scene_placement.py converter/scene_primitives.py converter/scene_props.py \
+    converter/scene_support.py converter/scene_surfaces.py converter/scene_thumb_adjustment.py \
+    converter/scene_library.v1.json converter/source_fingers.py \
+    /app/converter/
 COPY converter/camera.py /app/converter/camera.py
 COPY converter/preview_model.py /app/converter/preview_model.py
 COPY converter/framed_model.py /app/converter/framed_model.py

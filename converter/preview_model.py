@@ -24,15 +24,21 @@ MAX_MODEL_BYTES = 8 * 1024 * 1024
 def model_revision() -> str:
     # Source edits and frozen runtime changes invalidate precomputed assets.
     source = Path(__file__).read_bytes().replace(b"\r\n", b"\n")
-    return hashlib.sha256(source + SOLVER_MANIFEST_SHA256.encode()
+    fingers = Path(__file__).with_name("source_fingers.py").read_bytes().replace(b"\r\n", b"\n")
+    return hashlib.sha256(source + fingers + SOLVER_MANIFEST_SHA256.encode()
                           + EXPECTED_BLENDER_BUILD_HASH.encode()).hexdigest()
 
 
-def model_key(source_sha: str, character_sha: str) -> str:
+def model_key(source_sha: str, character_sha: str, *, include_pending_scene=False) -> str:
     for digest in (source_sha, character_sha):
         if len(digest) != 64 or any(c not in "0123456789abcdef" for c in digest):
             raise ValueError("expected lowercase SHA256")
-    digest = hashlib.sha256(f"{model_revision()}:{character_sha}:{source_sha}".encode()).hexdigest()
+    from converter.scene_catalog import recipe_token
+    token = recipe_token(source_sha, allow_pending=include_pending_scene)
+    identity = f"{model_revision()}:{character_sha}:{source_sha}"
+    if token:
+        identity += ":scene:" + token
+    digest = hashlib.sha256(identity.encode()).hexdigest()
     return f"{MODEL_VERSION}/{digest}"
 
 

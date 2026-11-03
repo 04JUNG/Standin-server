@@ -63,6 +63,11 @@ class LabTests(unittest.TestCase):
             camera = SimpleNamespace(validate_rotation=lambda _:None,rotate_scene=lambda *_:None)
             modules = {'converter.convert':SimpleNamespace(convert=convert),'converter.hands':SimpleNamespace(bake_hands=hands),
                        'converter.retarget':rt,'converter.camera':camera,
+                       'converter.scene_hand_stage':SimpleNamespace(apply_hand_stage=lambda path,bvh,source,**kw:
+                           dict(source_fingers={'status':'mock'},hands=hands(path,kw['selected']),
+                                scene_hand_bake=None,scene_hand_defaults={})),
+                       'converter.scene_props':SimpleNamespace(bake_scene_props=lambda *a,**kw:
+                           {'status':'no_reviewed_recipe'}),
                        'bpy':SimpleNamespace(app=SimpleNamespace(version_string=worker.EXPECTED_BLENDER_VERSION,
                                                               build_hash=worker.EXPECTED_BLENDER_BUILD_HASH.encode()))}
             job = dict(bvh_path=str(bvh),character_fbx=str(character),character_sha256=hashlib.sha256(character.read_bytes()).hexdigest(),
@@ -87,7 +92,7 @@ class LabTests(unittest.TestCase):
         disabled, off_fbx, off_png = self.execute_mock_worker(False)
         self.assertEqual((fbx,png),(off_fbx,off_png))
         self.assertNotIn('lab_stage_timings', disabled)
-        expected = ['worker_init','retarget_initial_export','hand_import_apply_export','framing_import','crop',
+        expected = ['worker_init','retarget_initial_export','source_and_scene_hands','scene_props','framing_import','crop',
                     'framing_export','final_fbx_reimport','png_render_write']
         self.assertEqual(list(enabled['lab_stage_timings']), expected)
         for metric in enabled['lab_stage_timings'].values():

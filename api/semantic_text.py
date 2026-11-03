@@ -4,6 +4,7 @@ No second index, VLM, skeleton extraction, geometry search, generation or UI.
 Keep this HTTP contract separate from /analyze's SemanticCandidateOut.
 """
 from time import perf_counter
+import os
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -137,6 +138,12 @@ def search_text(request, pipeline, library=None):
                 raise ValueError("candidate_not_validated")
             target = near if checked == "near_match" else candidates
             target.append(SemanticTextCandidate(rank=len(target)+1, **hit))
+        if os.getenv("SEMANTIC_REVIEWED_PROPS_FIRST", "0") == "1":
+            from src.pose_scene_assets import prioritize
+            # Keep exact/near partitions, eligibility, scores and thresholds.
+            # Enable only alongside the converter's scene-attachment release.
+            prioritize(candidates, query.objects)
+            prioritize(near, query.objects)
         # None is an explicit opt-in to all validated matches. Keep the legacy
         # default and /analyze's independent Top5 policy unchanged. Slicing by
         # None returns the whole list, with no padding or threshold relaxation.

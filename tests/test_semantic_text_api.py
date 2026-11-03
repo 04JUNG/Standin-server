@@ -150,6 +150,29 @@ def test_near_match_cannot_masquerade_as_match_and_top_k_applies_after_filter(en
     assert result["near_candidates"]
 
 
+def test_reviewed_props_order_is_opt_in_and_keeps_exact_near_boundaries(environment, monkeypatch):
+    from src import pose_scene_assets
+    client, _, semantic, _ = environment
+    ids = [doc.pose_id for doc in semantic.service.index.docs][:3]
+    monkeypatch.setattr(pose_scene_assets, "evidence", lambda pose: {
+        "objects": ["phone"] if pose["pose_id"] != ids[0] else [],
+        "status": "reviewed_placement" if pose["pose_id"] != ids[0] else "not_registered"})
+    def search(*args, **kwargs):
+        return SemanticSearchResult("ok", [SemanticHit(pid, .8-i*.1, {
+            "whole_pose_validation": {"status": "near_match" if i == 2 else "passed"}},
+            semantic.service.index.pose_records[pid]) for i, pid in enumerate(ids)])
+    monkeypatch.setattr(semantic, "search", search)
+    payload = {"query": "휴대폰을 쥔 자세", "topK": 1}
+    monkeypatch.delenv("SEMANTIC_REVIEWED_PROPS_FIRST", raising=False)
+    assert client.post("/semantic-search", json=payload).json()["candidates"][0]["pose_id"] == ids[0]
+    monkeypatch.setenv("SEMANTIC_REVIEWED_PROPS_FIRST", "1")
+    result = client.post("/semantic-search", json=payload).json()
+    assert result["candidates"][0]["pose_id"] == ids[1]
+    assert result["candidates"][0]["score"] == pytest.approx(.7)
+    assert result["near_candidates"][0]["pose_id"] == ids[2]
+    assert result["total_candidates"] == 2 and result["total_near_candidates"] == 1
+
+
 @pytest.mark.parametrize("bad", ["mismatch", "nan", "unbound", "unvalidated", "raise"])
 def test_inconsistent_candidates_fail_closed(environment, monkeypatch, bad):
     client, _, semantic, _ = environment
