@@ -1,0 +1,67 @@
+{
+  "schema": "interactive-local-audit-v1",
+  "characterSha256": "98338c58635a4d741c646ca15398da767595a965218cb38bf4a69eb78b33b7f0",
+  "sourceBvhSha256": "d22cabce87b52e3b86cf07c74b29b30a2bb76bd536167baec981ff4e88565216",
+  "blenderBuild": "fbe6228777e7",
+  "bodyPrepareMs": 7823.946916003479,
+  "initialFbxRequired": true,
+  "cases": [
+    {
+      "scope": "full",
+      "stateHash": "e9df0af89e3110ced8bfe326110539f182859c8b098df3b23751b3983b4ea2b0",
+      "solveSnapshotMs": 4788.766167010181,
+      "stateBytes": 19433369
+    },
+    {
+      "scope": "half",
+      "stateHash": "54afa0a7fb14fd5395db7f51e1ef9f53a5e7b599cf6bafd25b21d0f19f11ae92",
+      "solveSnapshotMs": 3184.121625003172,
+      "stateBytes": 10718345
+    },
+    {
+      "scope": "bust",
+      "stateHash": "9f241e1179001f1b87a86ba6a0ba013ef0a4a652b3fce04d4ab04bfb3ddd7019",
+      "solveSnapshotMs": 2048.5184580029454,
+      "stateBytes": 3729002
+    },
+    {
+      "scope": "shoulder_head",
+      "stateHash": "1fbb961a837357ca0fd2b259c2f880c2b6c734ab208b05979cbb931f01bc7be2",
+      "solveSnapshotMs": 1964.9147499876563,
+      "stateBytes": 2916431
+    },
+    {
+      "scope": "head",
+      "stateHash": "e2f6fa2364f1c44e15fa4680dfed1fef54f32b460fa111c119098c396b9bdd34",
+      "solveSnapshotMs": 1642.711209016852,
+      "stateBytes": 1513803
+    },
+    {
+      "baseline": "fbx-only",
+      "wallMs": 9753.133958001854,
+      "stages": {
+        "worker_init": {
+          "duration_ms": 12.982417014427483,
+          "ok": true
+        },
+        "retarget_initial_export": {
+          "duration_ms": 7124.782833008794,
+          "ok": true
+        },
+        "hand_import_apply_export": {
+          "duration_ms": 130.50020899390802,
+          "ok": true
+        }
+      },
+      "correspondence": {
+        "passed": false,
+        "reason": "snapshot normal changed"
+      },
+      "artifactSha256": "de2d3b7745b7cd710aa749b8b5a5430ac5126b5f17a36094e05a7668802fa115"
+    }
+  ],
+  "implementationCommit": "3fa41e71fc51b4aa696a2855c858dc5a73d36265",
+  "runtimeSha256": "2bf47b9e187a678960d0265db7cd2a36164639f0c40c94061ad6b4ed3af43572",
+  "classification": "approved local asset; actual baseline correspondence FAILED; no final certification",
+  "timingCaveat": "parallel local validation workloads; use separate single-run legacy-stage-timing.json for stage audit"
+}

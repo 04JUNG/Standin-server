@@ -48,6 +48,9 @@ tags.csv
 !.env.example
 *.key
 
+# Local model-default review: source models, FBX/BVH, runtimes and screenshots.
+/artifacts/body-default-proportions-20261104/
+
 # Claude Code 개인 설정
 .claude/settings.local.json
 

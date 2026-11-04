@@ -20,7 +20,10 @@ env:
 jobs:
   deploy:
     name: Deploy
-    if: vars.AUTO_DEPLOY_ENABLED == 'true'
+    # A code-only merge can suppress deployment without suppressing CI.
+    if: >-
+      vars.AUTO_DEPLOY_ENABLED == 'true' &&
+      (github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip deploy]'))
     runs-on: ubuntu-latest
     # main만 프로덕션이다. 그 외 브랜치는 전부 staging으로 간다.
     environment: ${{ github.ref == 'refs/heads/main' && 'beta' || 'staging' }}

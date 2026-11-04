@@ -1,0 +1,73 @@
+{
+  "version": "0.1.3",
+  "reference_model": "CLIP STUDIO PAINT 3D drawing figure Ver.2, gray/orange guides",
+  "evidence": [
+    {
+      "file": "references/csp-back-user.png",
+      "sha256": "4cec4f17ebfca76777f302d12335bfc97e2f7cad9626ad0b7947d98691c28aa1",
+      "origin": "user-supplied CSP screenshot"
+    },
+    {
+      "file": "references/csp-profile-user.png",
+      "sha256": "374072160458dfca33ac7b23e43efc6621e0e194b2ed94278d45232375a07267",
+      "origin": "user-supplied CSP screenshot"
+    },
+    {
+      "file": "references/csp-tpose-front.png",
+      "sha256": "e57692bc48176eb3de7337d8db22227ab1373c4b187fffeae235735d8b1b39c5",
+      "origin": "direct CSP UI front capture"
+    }
+  ],
+  "manual_url": "https://help.clip-studio.com/en-us/manual_en/660_3d/Set_camera_angle.htm",
+  "coordinate_system": "authored canonical male 1.78m rest space, Z up; named bone heights remap the same stations onto the female source",
+  "head": {
+    "eye_z": 1.657,
+    "orange": "one continuous sagittal surface section: face, crown, occiput, nape",
+    "gray": "one eye-level ring; bilateral side meridians through crown/ear/neck"
+  },
+  "torso": {
+    "cross_sections": {
+      "pectoral section": 1.315,
+      "waist section": 1.135,
+      "pelvis section": 1.025
+    },
+    "gray": "collar loop plus paired anterior/posterior meridians; no extra upper-chest ring",
+    "orange": "sagittal center continues to crotch"
+  },
+  "arm": {
+    "cross_section_fractions": {
+      "deltoid section": 0.2,
+      "upper arm section": 0.6,
+      "elbow section": 1.0,
+      "forearm section": 1.5,
+      "wrist section": 2.0
+    },
+    "fraction_definition": "0 shoulder joint, 1 elbow, 2 wrist",
+    "orange": "superior and inferior surfaces in T pose, carried by the skin when posed",
+    "gray": "anterior/posterior longitudinal meridians and five full transverse sections"
+  },
+  "leg": {
+    "cross_sections": {
+      "thigh-root section": 0.88,
+      "upper thigh section": 0.755,
+      "lower thigh section": 0.635,
+      "upper calf section": 0.445,
+      "lower calf section": 0.275,
+      "ankle section": 0.105
+    },
+    "orange": "paired front/back axes begin at thigh-root section where the torso gray meridians change color",
+    "gray": "inner/outer side meridians; six transverse sections; no ring through knee center"
+  },
+  "foot": {
+    "cross_sections_y": {
+      "instep section": -0.025,
+      "toe-root section": -0.1
+    },
+    "orange": "leg axis continues over instep/toes, heel and sole"
+  },
+  "limitations": [
+    "reference and Standin are different meshes; these positions transfer the observed line layout to the existing Standin anatomy",
+    "profile reference has an arm selection manipulator; only visible surface lines are used, colored UI handles are excluded",
+    "CSP texture/model files were not extracted; lines are newly authored"
+  ]
+}

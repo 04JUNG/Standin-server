@@ -109,7 +109,10 @@ jobs:
             tests/converter/test_latency_probe.py \
             tests/converter/test_retarget_cache.py \
             tests/converter/test_fast_scene_reset.py \
-            tests/converter/test_preview_instrumentation.py
+            tests/converter/test_preview_instrumentation.py \
+            tests/converter/test_interactive_state.py \
+            tests/converter/test_interactive_camera.py \
+            tests/converter/test_interactive_transport.py
 
       - name: Run local IPC and child cancellation contracts
         run: |

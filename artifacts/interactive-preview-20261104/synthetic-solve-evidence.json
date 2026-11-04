@@ -1,0 +1,65 @@
+{
+  "schema": "interactive-local-audit-v1",
+  "characterSha256": "b1fb42368a22120db2250154da0128657c5f2a7528b6a3e9bb37b2a6d9887422",
+  "sourceBvhSha256": "111984af45cdca6514832958c2c2bbe394159b8196a6ee12847c4336c06fba3b",
+  "blenderBuild": "fbe6228777e7",
+  "bodyPrepareMs": 197.7327500062529,
+  "initialFbxRequired": true,
+  "cases": [
+    {
+      "scope": "full",
+      "stateHash": "b0e46b47b79b935242b6af7794417974372a307f38e1151955bf3814ae75239c",
+      "solveSnapshotMs": 32.47487501357682,
+      "stateBytes": 107600
+    },
+    {
+      "scope": "half",
+      "stateHash": "7bf57b4b53990161fb83c3bf655f20600d4caf88b4bc967bd226c1c6c2ac8e4b",
+      "solveSnapshotMs": 28.006749984342605,
+      "stateBytes": 77360
+    },
+    {
+      "scope": "bust",
+      "stateHash": "b989522641087624047ac46be5e30082214b64b9dd28b99521129e30cbcef569",
+      "solveSnapshotMs": 23.52558300481178,
+      "stateBytes": 50694
+    },
+    {
+      "scope": "shoulder_head",
+      "stateHash": "c929efb5a45a4cca6b1f2c3f4f3f95d9528ae440644e648b636baf2cdbd2397a",
+      "solveSnapshotMs": 25.043208006536588,
+      "stateBytes": 50881
+    },
+    {
+      "scope": "head",
+      "stateHash": "855071224a77ec42ba76f340d47b2f7127c08d6f1ccd8261d3629ab6150f541d",
+      "solveSnapshotMs": 22.04587499727495,
+      "stateBytes": 37489
+    },
+    {
+      "baseline": "fbx-only",
+      "wallMs": 112.26570900180377,
+      "stages": {
+        "worker_init": {
+          "duration_ms": 2.646750013809651,
+          "ok": true
+        },
+        "retarget_initial_export": {
+          "duration_ms": 77.54437500261702,
+          "ok": true
+        }
+      },
+      "correspondence": {
+        "passed": true,
+        "maxPositionErrorM": 0.0,
+        "maxMatrixError": 0.0,
+        "maxWeightError": 0.0,
+        "maxNormalError": 0.0
+      },
+      "artifactSha256": "2b11758aa48037f7b2e54bad60ecd19afcfab4ab1f30d517ecfc7d0f6677e7b7"
+    }
+  ],
+  "implementationCommit": "3fa41e71fc51b4aa696a2855c858dc5a73d36265",
+  "runtimeSha256": "2bf47b9e187a678960d0265db7cd2a36164639f0c40c94061ad6b4ed3af43572",
+  "classification": "synthetic local fixture"
+}
