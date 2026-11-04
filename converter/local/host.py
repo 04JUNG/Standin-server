@@ -156,7 +156,8 @@ class Host:
                     self.event(request_id, "result", result={"protocolVersion": PROTOCOL,
                                "versions": versions(), "limits": LIMITS,
                                "formats": {"fbx": True, "cs3c": decoder_available()}, "hands": False,
-                               "cameraContractVersion": "personal-camera/1"})
+                               "cameraContractVersion": "personal-camera/1",
+                               "modelStorageVersion": "personal-fbx/1"})
                     return
                 if action == "cancel":
                     accepted = self.active == req["targetRequestId"] and not self.committed
@@ -188,7 +189,9 @@ class Host:
             raise LocalError("MODEL_NOT_FOUND", "Registered model was not found") from None
         if manifest["versions"] != versions():
             raise LocalError("RUNTIME_MISMATCH", "Reimport this model with the current converter")
-        if sha256(folder / "character.blend") != manifest["normalizedHash"]:
+        if manifest.get("normalizedFormat") != "fbx":
+            raise LocalError("RUNTIME_MISMATCH", "Reimport this model as verified FBX")
+        if sha256(folder / "character.fbx") != manifest["normalizedHash"]:
             raise LocalError("SOURCE_CHANGED", "Stored character integrity check failed")
         return folder, manifest
 
@@ -265,14 +268,15 @@ class Host:
             self.progress(rid, "inspecting", .2)
             manifest = self.worker({"action": "import", "workDir": str(work), "sourcePath": str(copied),
                                     "localModelId": model_id, "sourceHash": req["sourceHash"]}, rid)
-            manifest["normalizedPath"] = str(folder / "character.blend")
+            manifest["normalizedPath"] = str(folder / "character.fbx")
+            manifest["archivePath"] = str(folder / "character.blend")
             manifest["sourcePath"] = str(folder / copied.name)
             manifest["previewPath"] = str(folder / "preview.glb") if manifest["previewPath"] else None
             self.progress(rid, "committing", .95)
             (work / "manifest.json").write_text(json.dumps(manifest))
             # No raw job JSON, temporary FBX, runtime resources or source paths in committed caches.
             for child in list(work.iterdir()):
-                if child.name not in {copied.name, "character.blend", "manifest.json", "preview.glb"}:
+                if child.name not in {copied.name, "character.fbx", "character.blend", "manifest.json", "preview.glb"}:
                     shutil.rmtree(child) if child.is_dir() else child.unlink()
             with self.lock:
                 self.check_cancel()
@@ -337,7 +341,7 @@ class Host:
         copied = work / "pose.bvh"
         self.copy_input(pose, copied, req["poseHash"], LIMITS["poseBytes"])
         self.progress(rid, "retargeting", .15)
-        result = self.worker({"action": "apply", "workDir": str(work), "normalizedPath": str(folder / "character.blend"),
+        result = self.worker({"action": "apply", "workDir": str(work), "normalizedPath": str(folder / "character.fbx"),
                               "posePath": str(copied), "snapshot": snap, "snapshotHash": key,
                               "selectionId": req["selectionId"]}, rid)
         result.update({"localModelId": model_id, "artifactPath": str(cache / "result.fbx"), "cacheHit": False})

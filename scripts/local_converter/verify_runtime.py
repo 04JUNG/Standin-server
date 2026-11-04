@@ -79,6 +79,9 @@ def verify(launcher, source, poses, cs3c, report_path, relocated=False):
     startup = time.monotonic() - start
     model = session.request("import", localModelId="regression", sourcePath=str(source), sourceHash=source_hash)
     assert model["validation"]["passed"] and model["sourceHash"] == source_hash
+    assert model["normalizedFormat"] == "fbx" and Path(model["normalizedPath"]).suffix == ".fbx"
+    assert sha(model["normalizedPath"]) == model["normalizedHash"]
+    assert sha(model["archivePath"]) == model["archiveHash"]
     assert model["capabilities"]["bodyPose"] is True
     if model["previewPath"]:
         assert sha(model["previewPath"]) == model["previewHash"]

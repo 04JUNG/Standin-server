@@ -4,9 +4,9 @@
   "protocolVersion": "standin.local-converter/1",
   "versions": {
     "importerVersion": "personal-import/2",
-    "normalizationVersion": "personal-normalize/3",
+    "normalizationVersion": "personal-normalize/4",
     "rigMappingVersion": "personal-rig/2",
-    "converterVersion": "personal-converter/3",
+    "converterVersion": "personal-converter/4",
     "converterFingerprint": "runtime-computed SHA256 of all shipped converter Python and JSON files"
   },
   "transport": {
@@ -386,9 +386,9 @@
       "protocolVersion": "standin.local-converter/1",
       "versions": {
         "importerVersion": "personal-import/2",
-        "normalizationVersion": "personal-normalize/3",
+        "normalizationVersion": "personal-normalize/4",
         "rigMappingVersion": "personal-rig/2",
-        "converterVersion": "personal-converter/3",
+        "converterVersion": "personal-converter/4",
         "converterFingerprint": "runtime-computed SHA256 of all shipped converter Python and JSON files"
       },
       "limits": {
@@ -407,7 +407,8 @@
         "cs3c": "boolean: validated decoder resource is bundled"
       },
       "hands": false,
-      "cameraContractVersion": "personal-camera/1"
+      "cameraContractVersion": "personal-camera/1",
+      "modelStorageVersion": "personal-fbx/1"
     },
     "import": "model manifest (see modelManifest)",
     "inspect": "same model manifest, version and file hash checked",
@@ -440,18 +441,21 @@
     "sourceHash": "sha256",
     "versions": {
       "importerVersion": "personal-import/2",
-      "normalizationVersion": "personal-normalize/2",
+      "normalizationVersion": "personal-normalize/4",
       "rigMappingVersion": "personal-rig/2",
-      "converterVersion": "personal-converter/2",
+      "converterVersion": "personal-converter/4",
       "converterFingerprint": "runtime-computed SHA256 of all shipped converter Python and JSON files"
     },
     "sourceFormat": "fbx | cs3c",
     "capabilities": "capability",
     "character": "hierarchy, local/world and inverse bind matrices, original mesh transforms, weights hash, counts, solid material descriptors, units and mapping",
-    "normalizedPath": "immutable .blend local path",
+    "normalizedPath": "immutable verified character.fbx local path",
     "previewPath": "optional immutable registration GLB path; null on preview failure",
     "validation": "import FK probe and roundtrip evidence",
-    "previewHash": "SHA256 of optional GLB, null when absent"
+    "previewHash": "SHA256 of optional GLB, null when absent",
+    "normalizedFormat": "fbx",
+    "archivePath": "recovery-only character.blend local path, never used by pose apply",
+    "archiveHash": "SHA256 of recovery archive"
   },
   "$defs": {
     "versions": {
@@ -705,6 +709,16 @@
         },
         "metrics": {
           "$ref": "#/$defs/metrics"
+        },
+        "normalizedFormat": {
+          "const": "fbx"
+        },
+        "archivePath": {
+          "type": "string"
+        },
+        "archiveHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
         }
       },
       "required": [
@@ -721,7 +735,10 @@
         "previewPath",
         "previewHash",
         "validation",
-        "metrics"
+        "metrics",
+        "normalizedFormat",
+        "archivePath",
+        "archiveHash"
       ],
       "additionalProperties": false
     },
@@ -910,6 +927,9 @@
         },
         "cameraContractVersion": {
           "const": "personal-camera/1"
+        },
+        "modelStorageVersion": {
+          "const": "personal-fbx/1"
         }
       },
       "required": [
@@ -918,7 +938,8 @@
         "limits",
         "formats",
         "hands",
-        "cameraContractVersion"
+        "cameraContractVersion",
+        "modelStorageVersion"
       ],
       "additionalProperties": false
     },
@@ -1206,5 +1227,5 @@
       "$ref": "#/$defs/resultEvent"
     }
   ],
-  "contractRevision": 3
+  "contractRevision": 4
 }

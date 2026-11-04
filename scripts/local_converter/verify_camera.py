@@ -25,13 +25,20 @@ def verify(launcher, sources, pose, output):
             try:
                 hello=session.request("hello")
                 assert hello["cameraContractVersion"]=="personal-camera/1"
+                assert hello["modelStorageVersion"]=="personal-fbx/1"
                 imported=session.request("import",localModelId=model,sourcePath=str(source),sourceHash=digest)
                 assert imported["validation"]["passed"]
+                assert imported["normalizedFormat"]=="fbx" and Path(imported["normalizedPath"]).suffix==".fbx"
+                assert sha(imported["normalizedPath"])==imported["normalizedHash"]
+                assert sha(imported["sourcePath"])==digest
+                assert sha(imported["archivePath"])==imported["archiveHash"]
             finally: session.close()
             session=Session(launcher,storage)
             try:
                 inspected=session.request("inspect",localModelId=model)
                 assert inspected["sourceHash"]==digest
+                archive=Path(inspected["archivePath"]); held=archive.with_suffix(".held")
+                archive.rename(held)  # Prove pose jobs do not read the Blender recovery archive.
                 records=[]
                 for i,camera in enumerate(cameras):
                     fields=dict(localModelId=model,sourceHash=digest,posePath=str(Path(pose).resolve()),poseHash=sha(pose),selectionId=f"camera-{i}",hands={"left":None,"right":None},camera=camera)
@@ -49,9 +56,10 @@ def verify(launcher, sources, pose, output):
                 missing={k:v for k,v in fields.items() if k!="camera"}
                 session.request("apply",error="INVALID_REQUEST",**missing)
                 session.request("export",error="SNAPSHOT_MISMATCH",localModelId=model,snapshotHash="0"*64,destinationPath=str(output/f"stale-{index}.fbx"))
+                held.rename(archive)
                 session.request("delete",localModelId=model)
                 assert all(sha(output/f"model-{index}-camera-{i}.fbx")==r["artifactHash"] for i,r in enumerate(records))
-                report["models"].append({"sourceHash":digest,"format":source.suffix[1:],"poseHash":sha(pose),"versions":imported["versions"],"results":records,"restart":True,"cache":True,"invalidCameraRejected":True,"staleRejected":True,"deletePreservedExports":True})
+                report["models"].append({"sourceHash":digest,"format":source.suffix[1:],"poseHash":sha(pose),"versions":imported["versions"],"results":records,"workingFormat":"fbx","archiveExcludedFromApply":True,"restart":True,"cache":True,"invalidCameraRejected":True,"staleRejected":True,"deletePreservedExports":True})
                 (output/"verification.json").write_text(json.dumps(report,indent=2))
             finally: session.close()
     return report

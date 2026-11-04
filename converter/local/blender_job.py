@@ -30,27 +30,26 @@ def run(job):
         else:
             arm, meshes = inspection.import_fbx(source)
         character, capabilities = inspection.inspect(arm, meshes)
-        # .blend is the common representation, not a lossy preview GLB. It keeps
-        # original hierarchy, bind/rest transforms, mesh transforms and weights.
-        normalized = work / "character.blend"
-        bpy.ops.wm.save_as_mainfile(filepath=str(normalized), check_existing=False)
+        # Preserve a recovery archive, but normal pose jobs only read the verified FBX.
+        archive = work / "character.blend"
+        bpy.ops.wm.save_as_mainfile(filepath=str(archive), check_existing=False)
+        normalized = work / "character.fbx"
+        validation = inspection.roundtrip(arm, meshes, normalized, character["mapping"])
+        # roundtrip has reimported the exact admitted FBX. Build its preview, not
+        # a separate reconstruction of the input character.
         preview = work / "preview.glb"
         try:
             bpy.ops.export_scene.gltf(filepath=str(preview), export_format="GLB", export_animations=False,
                                       export_extras=False)
         except Exception:
             preview.unlink(missing_ok=True)
-        validation = inspection.roundtrip(arm, meshes, work / "registration-check.fbx", character["mapping"])
         return {"schemaVersion": 1, "localModelId": job["localModelId"],
                 "sourceHash": job["sourceHash"], "sourceFormat": source.suffix[1:].lower(),
                 "versions": versions(), "character": character, "capabilities": capabilities,
-                "normalizedHash": sha256(normalized), "previewPath": "preview.glb" if preview.is_file() else None,
+                "normalizedFormat": "fbx", "normalizedHash": sha256(normalized),
+                "archiveHash": sha256(archive), "previewPath": "preview.glb" if preview.is_file() else None,
                 "previewHash": sha256(preview) if preview.is_file() else None, "validation": validation}
-    bpy.ops.wm.open_mainfile(filepath=job["normalizedPath"], load_ui=False, use_scripts=False)
-    arms = [o for o in bpy.context.scene.objects if o.type == "ARMATURE"]
-    meshes = [o for o in bpy.context.scene.objects if o.type == "MESH"]
-    inspection.require(len(arms) == 1, "UNSUPPORTED_RIG", "Stored character is invalid")
-    arm = arms[0]
+    arm, meshes = inspection.import_fbx(job["normalizedPath"])
     character, _ = inspection.inspect(arm, meshes)
     # The shared solver writes world rotation frames of unit scale. Preserve the
     # source representation in the cache, but bake the armature object's unit/

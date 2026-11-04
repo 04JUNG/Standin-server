@@ -1,3 +1,5 @@
+> Superseded for working storage and runtime lifecycle by [2026-11-04](FBX_RUNTIME_20261104.md). This file retains the dated revision-3 evidence.
+
 # Personal camera integration — 2026-11-03
 
 This is a disabled-base merge candidate, not approval to enable or release personal models. Original #142 ancestry is preserved; develop `592ab0f059089e64a5c88a3ad607539124e8e6c6` is integrated. Client companion: #159.

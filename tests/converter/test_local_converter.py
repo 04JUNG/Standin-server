@@ -9,11 +9,44 @@ import time
 import unittest
 from unittest.mock import patch
 
-from converter.local.contract import PROTOCOL, LIMITS, LocalError, digest, sha256, validate_request, snapshot, versions
+from converter.local.contract import PROTOCOL, LIMITS, VERSIONS, LocalError, digest, sha256, validate_request, snapshot, versions
 from converter.local.host import Host, resident_bytes
 
 
 class LocalConverterTests(unittest.TestCase):
+    def test_published_contract_matches_storage_and_versions(self):
+        contract = json.loads((Path(__file__).resolve().parents[2] / "docs/personal-body/converter-client-contract.v1.json").read_text())
+        self.assertEqual(contract["contractRevision"], 4)
+        for section in (contract["versions"], contract["results"]["hello"]["versions"], contract["modelManifest"]["versions"]):
+            for key, value in VERSIONS.items():
+                self.assertEqual(section[key], value)
+        self.assertEqual(contract["results"]["hello"]["modelStorageVersion"], "personal-fbx/1")
+
+    def test_only_verified_fbx_is_the_working_model(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            host = Host(root, root / "runtime", lambda _: None)
+            folder = root / "models/registered"
+            folder.mkdir()
+            fbx = folder / "character.fbx"
+            fbx.write_bytes(b"verified FBX")
+            manifest = {"versions": versions(), "normalizedFormat": "fbx", "normalizedHash": sha256(fbx)}
+            (folder / "manifest.json").write_text(json.dumps(manifest))
+            try:
+                # A Blender archive is not required/read on the working-model path.
+                host.load_model("registered")
+                fbx.write_bytes(b"modified FBX")
+                with self.assertRaises(LocalError) as changed:
+                    host.load_model("registered")
+                self.assertEqual(changed.exception.code, "SOURCE_CHANGED")
+                manifest["normalizedFormat"] = "blend"
+                (folder / "manifest.json").write_text(json.dumps(manifest))
+                with self.assertRaises(LocalError) as legacy:
+                    host.load_model("registered")
+                self.assertEqual(legacy.exception.code, "RUNTIME_MISMATCH")
+            finally:
+                host.close()
+
     def test_untrusted_requests_fail_closed(self):
         base = {"protocolVersion": PROTOCOL, "requestId": "valid", "action": "hello"}
         for change in ({"protocolVersion": 2}, {"action": []}, {"action": "upload"},
