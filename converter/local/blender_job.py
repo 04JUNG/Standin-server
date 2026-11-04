@@ -30,11 +30,18 @@ def run(job):
         else:
             arm, meshes = inspection.import_fbx(source)
         character, capabilities = inspection.inspect(arm, meshes)
+        if source.suffix.lower() == ".cs3c":
+            # Keep the *source* parameters as the independent FBX export target.
+            for mesh in meshes:
+                for slot in mesh.material_slots:
+                    mat = slot.material
+                    original = json.loads(mat["cs3c_source_material"])
+                    character["materials"][mat.name]["fbx"] = {k: original[k] for k in ("diffuse", "specular", "shininess", "opacity")}
         # Preserve a recovery archive, but normal pose jobs only read the verified FBX.
         archive = work / "character.blend"
         bpy.ops.wm.save_as_mainfile(filepath=str(archive), check_existing=False)
         normalized = work / "character.fbx"
-        validation = inspection.roundtrip(arm, meshes, normalized, character["mapping"])
+        validation = inspection.roundtrip(arm, meshes, normalized, character["mapping"], character["materials"])
         # roundtrip has reimported the exact admitted FBX. Build its preview, not
         # a separate reconstruction of the input character.
         preview = work / "preview.glb"
@@ -72,7 +79,7 @@ def run(job):
     rt.apply_output_mode(arm, meshes, "rigged_rest")
     from converter.local.camera import apply_camera
     camera_validation = apply_camera(arm, meshes, job["snapshot"]["camera"])
-    validation = inspection.roundtrip(arm, meshes, work / "result.fbx", character["mapping"])
+    validation = inspection.roundtrip(arm, meshes, work / "result.fbx", character["mapping"], job["materialExpectations"])
     return {"snapshot": job["snapshot"], "snapshotHash": job["snapshotHash"],
             "artifactHash": sha256(work / "result.fbx"), "validation": validation,
             "retarget": {**report.as_dict(), "local_normalization_surface_error": normalization_error,

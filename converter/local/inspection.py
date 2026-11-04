@@ -134,8 +134,47 @@ def solid_materials(meshes):
                             ("Subsurface Weight", "Transmission Weight", "Coat Weight", "Sheen Weight", "Emission Strength")),
                         "UNSUPPORTED_MATERIAL", "Layered and emissive materials are not certified")
             require(all(math.isfinite(x) for x in color), "UNSUPPORTED_MATERIAL", "Invalid material values")
-            materials[mat.name] = {"baseColor": color, "scalars": scalar, "support": "solid_principled"}
+            materials[mat.name] = {"baseColor": color, "scalars": scalar, "support": "solid_principled",
+                "fbx": {"diffuse": color[:3],
+                        "specular": [c * scalar.get("Specular IOR Level", mat.specular_intensity) / 2 for c in color[:3]],
+                        "shininess": ((1-scalar["Roughness"])*10)**2, "opacity": color[3]}}
     return materials
+
+
+def fbx_materials(path):
+    """Read actual FBX Phong properties including template defaults."""
+    with bounded_fbx_parser() as parser:
+        tree, _ = parser.parse(str(path))
+    def child(element, name):
+        return next((e for e in element.elems if e.id == name), None)
+    def properties(element):
+        block = child(element, b"Properties70")
+        return {} if block is None else {p.props[0]: p.props[4:] for p in block.elems if p.id == b"P"}
+    defaults = {}
+    definitions = child(tree, b"Definitions")
+    if definitions is not None:
+        for obj in definitions.elems:
+            if obj.id == b"ObjectType" and obj.props[0] == b"Material":
+                template = child(obj, b"PropertyTemplate")
+                if template is not None:
+                    defaults = properties(template)
+    result = {}
+    objects = child(tree, b"Objects")
+    require(objects is not None, "ROUNDTRIP_FAILED", "Missing FBX objects")
+    for mat in objects.elems:
+        if mat.id != b"Material":
+            continue
+        name = mat.props[1].split(b"\x00\x01", 1)[0].decode("utf-8")
+        require(name not in result, "ROUNDTRIP_FAILED", "Duplicate FBX material")
+        values = {**defaults, **properties(mat)}
+        def rgb(key, factor):
+            color, multiplier = values[key], values[factor][0]
+            require(len(color) == 3, "ROUNDTRIP_FAILED", "Invalid FBX material color")
+            return [c*multiplier for c in color]
+        result[name] = {"diffuse": rgb(b"DiffuseColor", b"DiffuseFactor"),
+                        "specular": rgb(b"SpecularColor", b"SpecularFactor"),
+                        "shininess": values[b"Shininess"][0], "opacity": values[b"Opacity"][0]}
+    return result
 
 
 def inspect(arm, meshes):
@@ -282,7 +321,7 @@ def material_regions(meshes, points):
     return regions
 
 
-def roundtrip(arm, meshes, path, table):
+def roundtrip(arm, meshes, path, table, expected_materials=None):
     from converter import retarget as rt
     before = surface(meshes)
     original_bones = {b.name: (b.parent.name if b.parent else None,
@@ -294,6 +333,10 @@ def roundtrip(arm, meshes, path, table):
     probe_before = {joint: deformation_probe(arm, meshes, table, joint)
                     for joint in ("forearm.L", "forearm.R", "leg.L", "leg.R", "spine")}
     rt.export_fbx(str(path), embed_textures=False)
+    from converter.local.materials import compare_materials
+    material_parameters = compare_materials(
+        {name: mat["fbx"] for name, mat in (expected_materials if expected_materials is not None else material_before).items()},
+        fbx_materials(path))
     bpy.ops.wm.read_factory_settings(use_empty=True)
     after_arm, after_meshes = import_fbx(path)
     after_points = surface(after_meshes)
@@ -327,4 +370,4 @@ def roundtrip(arm, meshes, path, table):
             "vertexCount": sum(len(p) for p in before.values()), "maxSurfaceError": error,
             "maxSkinProbeError": probe_error, "maxMaterialRegionError": material_region_error,
             "materialCount": len(material_before), "tolerance": tolerance, "fkProbes": probe_after,
-            "blenderVersion": bpy.app.version_string}
+            "blenderVersion": bpy.app.version_string, "materialPreservation": material_parameters}

@@ -1,3 +1,5 @@
+> Material 지원과 최신 runtime 계약은 [반사광 보존 후속 기록](SPECULAR_20261104.md), revision5를 따른다. 이 문서는 revision4 시점의 저장/host 구조와 측정 기록이다.
+
 # Verified registration FBX and retained host — 2026-11-04
 
 This replaces `.blend` as the active personal-model storage. On registration, import the original FBX/CS3C once, retain its byte-identical original and a Blender recovery archive, then export/reimport and validate `character.fbx`. Registration previews use that admitted FBX scene. Subsequent pose jobs only read `character.fbx` through the personal importer, which preserves helper/terminal bones and original transforms. The original solver and final camera contract stay unchanged.

@@ -308,14 +308,16 @@ def character_data(path, resource=RESOURCE):
     count, data = tables.tables["material"]
     reader = Reader(data)
     materials = []
+    from converter.local.materials import specular_ior_level
     for _ in range(count):
         row = reader.row("<I14f")
         textures = [reader.row("<I")[0] for _ in range(reader.count(64))]
         require(all(t == 0xffffffff for t in textures), "UNSUPPORTED_MATERIAL", "CS3C texture references are not certified")
         require(all(math.isfinite(x) for x in row[1:]) and all(0 <= c <= 1 for c in row[4:7])
                 and abs(row[13]-1) < 1e-6 and 0 <= row[14] <= 100
-                and all(abs(x) < 1e-8 for x in row[7:13]),
-                "UNSUPPORTED_MATERIAL", "Only opaque nonemissive matte CS3C colors are certified")
+                and all(abs(x) < 1e-8 for x in row[10:13]),
+                "UNSUPPORTED_MATERIAL", "Only opaque nonemissive solid CS3C colors are certified")
+        specular_ior_level(row[4:7], row[7:10])
         materials.append({"name": at(names, row[0])["label"], "ambient": row[1:4], "diffuse": row[4:7],
                           "specular": row[7:10], "emission": row[10:13], "opacity": row[13], "shininess": row[14]})
     reader.done()
@@ -391,7 +393,7 @@ def character_data(path, resource=RESOURCE):
             rest_error = max(rest_error, float(np.linalg.norm(skinned-point)))
     require(rest_error < 1e-4, "INVALID_SKIN", "CS3C original rest skin does not reproduce its geometry")
     info.update({"hierarchyNodes": len(nodes), "meshes": len(meshes), "vertices": vertex_count,
-                 "materials": materials, "materialSupport": "source_diffuse_colors_and_face_assignment",
+                 "materials": materials, "materialSupport": "source_solid_diffuse_specular_shininess_and_face_assignment",
                  "sourceShadingMatchToCSP": "unverified", "maxInverseBindError": max_bind_error,
                  "maxSourceRestSkinError": rest_error, "sourceAxisUp": "Y", "sourceUnits": "unconfirmed",
                  "internalDisplayScale": .01, "originalWeightsRenormalized": False})
@@ -408,10 +410,11 @@ def verify_original_skin(data, arm, meshes, conversion):
     import numpy as np
     from mathutils import Matrix
     from converter.local.inspection import surface
+    from converter.local.rig_profiles import skin_probe_names
     by_name = {n["label"]: i for i, n in enumerate(data["nodes"])}
     c = np.asarray(conversion)
     maximum = 0.
-    for name in ("LeftLowerArm", "RightLowerArm", "LeftLowerLeg", "RightLowerLeg", "Spine"):
+    for name in skin_probe_names(by_name):
         require(name in by_name, "UNSUPPORTED_RIG", "Unsupported CS3C humanoid joint mapping")
         selected = by_name[name]
         rotation = np.asarray(Matrix.Rotation(.25, 4, "X"))
@@ -447,6 +450,7 @@ def verify_original_skin(data, arm, meshes, conversion):
 def import_character(path):
     """Create the same Blender character representation used by the FBX adapter."""
     import bpy
+    from converter.local.materials import specular_ior_level
     from mathutils import Matrix
     data = character_data(path)
     conversion = Matrix.Rotation(math.pi/2, 4, "X") @ Matrix.Scale(.01, 4)
@@ -482,7 +486,7 @@ def import_character(path):
         shader = mat.node_tree.nodes.get("Principled BSDF")
         shader.inputs["Base Color"].default_value = (*source["diffuse"], source["opacity"])
         shader.inputs["Roughness"].default_value = 1 - math.sqrt(source["shininess"])/10
-        shader.inputs["Specular IOR Level"].default_value = 0.
+        shader.inputs["Specular IOR Level"].default_value = specular_ior_level(source["diffuse"], source["specular"])
         mat.diffuse_color = (*source["diffuse"], source["opacity"])
         mat["cs3c_source_material"] = json.dumps(source)
         materials.append(mat)

@@ -16,7 +16,7 @@ from converter.local.host import Host, resident_bytes
 class LocalConverterTests(unittest.TestCase):
     def test_published_contract_matches_storage_and_versions(self):
         contract = json.loads((Path(__file__).resolve().parents[2] / "docs/personal-body/converter-client-contract.v1.json").read_text())
-        self.assertEqual(contract["contractRevision"], 4)
+        self.assertEqual(contract["contractRevision"], 5)
         for section in (contract["versions"], contract["results"]["hello"]["versions"], contract["modelManifest"]["versions"]):
             for key, value in VERSIONS.items():
                 self.assertEqual(section[key], value)

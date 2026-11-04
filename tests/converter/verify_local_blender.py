@@ -12,9 +12,41 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from converter.local.contract import LIMITS, LocalError
 from converter.local.inspection import bounded_fbx_parser, import_fbx, inspect, roundtrip
 from scripts.local_converter.make_fixture import build
+from converter.local.materials import specular_ior_level
 
 
 class BlenderLocalTests(unittest.TestCase):
+    def specular_fixture(self, root, lose_specular=False):
+        build(root / "fixture.fbx")
+        bpy.ops.wm.read_factory_settings(use_empty=True)
+        arm, meshes = import_fbx(root / "fixture.fbx")
+        for mat in {s.material for m in meshes for s in m.material_slots}:
+            mat.use_nodes = True
+            shader = mat.node_tree.nodes.get("Principled BSDF")
+            shader.inputs["Base Color"].default_value = (.48, .53, .59, 1)
+            shader.inputs["Roughness"].default_value = .68
+            shader.inputs["Specular IOR Level"].default_value = 0 if lose_specular else specular_ior_level((.48,.53,.59),(.12,.1325,.1475))
+        character, _ = inspect(arm, meshes)
+        expected = {name: {**mat, "fbx": {"diffuse":[.48,.53,.59],"specular":[.12,.1325,.1475],"shininess":10.24,"opacity":1}}
+                    for name,mat in character["materials"].items()}
+        return arm, meshes, character, expected
+
+    def test_nonzero_source_specular_survives_real_fbx_export(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            arm, meshes, character, expected = self.specular_fixture(root)
+            report = roundtrip(arm, meshes, root/"reflective.fbx", character["mapping"], expected)
+            self.assertTrue(report["materialPreservation"]["passed"])
+            self.assertLess(report["materialPreservation"]["maxSpecularError"], 1e-6)
+
+    def test_real_export_of_dropped_specular_is_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            arm, meshes, character, expected = self.specular_fixture(root, lose_specular=True)
+            with self.assertRaises(LocalError) as error:
+                roundtrip(arm, meshes, root/"lost-specular.fbx", character["mapping"], expected)
+            self.assertEqual(error.exception.code, "ROUNDTRIP_FAILED")
+
     def test_declared_array_limit_before_allocation(self):
         from io import BytesIO
         with bounded_fbx_parser() as parser:

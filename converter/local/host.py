@@ -157,7 +157,8 @@ class Host:
                                "versions": versions(), "limits": LIMITS,
                                "formats": {"fbx": True, "cs3c": decoder_available()}, "hands": False,
                                "cameraContractVersion": "personal-camera/1",
-                               "modelStorageVersion": "personal-fbx/1"})
+                               "modelStorageVersion": "personal-fbx/1",
+                               "materialContractVersion": "personal-solid-specular/1"})
                     return
                 if action == "cancel":
                     accepted = self.active == req["targetRequestId"] and not self.committed
@@ -343,6 +344,7 @@ class Host:
         self.progress(rid, "retargeting", .15)
         result = self.worker({"action": "apply", "workDir": str(work), "normalizedPath": str(folder / "character.fbx"),
                               "posePath": str(copied), "snapshot": snap, "snapshotHash": key,
+                              "materialExpectations": manifest["character"]["materials"],
                               "selectionId": req["selectionId"]}, rid)
         result.update({"localModelId": model_id, "artifactPath": str(cache / "result.fbx"), "cacheHit": False})
         self.progress(rid, "validating", .9)

@@ -3,10 +3,10 @@
   "$id": "urn:standin:local-converter:1",
   "protocolVersion": "standin.local-converter/1",
   "versions": {
-    "importerVersion": "personal-import/2",
-    "normalizationVersion": "personal-normalize/4",
+    "importerVersion": "personal-import/3",
+    "normalizationVersion": "personal-normalize/5",
     "rigMappingVersion": "personal-rig/2",
-    "converterVersion": "personal-converter/4",
+    "converterVersion": "personal-converter/5",
     "converterFingerprint": "runtime-computed SHA256 of all shipped converter Python and JSON files"
   },
   "transport": {
@@ -30,7 +30,7 @@
     ],
     "manualInstallRequired": false,
     "network": false,
-    "CS3C": "Catalog version 2 / reviewed schema family: original skinned geometry, matte source diffuse colors, per-face assignments and UV/normals. Requires separately bundled hash-pinned decoder data. No Modeler/Python/Blender user installation. Missing resource fails explicitly.",
+    "CS3C": "Catalog version 2 / reviewed schema family: original skinned geometry, opaque nonemissive solid diffuse/specular/shininess preservation, per-face assignments and UV/normals. SpecularRGB must be representable as DiffuseRGB*k (0<=k<=0.5); unsupported colors/intensity/textures fail explicitly. Separately bundled hash-pinned decoder data; no user Modeler/Python/Blender installation.",
     "manifest": "runtime-manifest.json beside launcher: schemaVersion, protocolVersion, target, launcher, blender, python, files (SHA256), uncompressedBytes, requiresUserInstalledRuntime=false, releaseReady=false; cs3c.enabled and build-only source/hash provenance",
     "launch": "spawn launcher with --storage <absolute app-owned storage>; keep stdin open, parse stdout NDJSON; kill host only after cancel/terminal, EOF cancels child and cleans staging",
     "signing": "Current test candidate is unsigned/unqualified; client must not advertise released support.",
@@ -385,10 +385,10 @@
     "hello": {
       "protocolVersion": "standin.local-converter/1",
       "versions": {
-        "importerVersion": "personal-import/2",
-        "normalizationVersion": "personal-normalize/4",
+        "importerVersion": "personal-import/3",
+        "normalizationVersion": "personal-normalize/5",
         "rigMappingVersion": "personal-rig/2",
-        "converterVersion": "personal-converter/4",
+        "converterVersion": "personal-converter/5",
         "converterFingerprint": "runtime-computed SHA256 of all shipped converter Python and JSON files"
       },
       "limits": {
@@ -408,7 +408,8 @@
       },
       "hands": false,
       "cameraContractVersion": "personal-camera/1",
-      "modelStorageVersion": "personal-fbx/1"
+      "modelStorageVersion": "personal-fbx/1",
+      "materialContractVersion": "personal-solid-specular/1"
     },
     "import": "model manifest (see modelManifest)",
     "inspect": "same model manifest, version and file hash checked",
@@ -440,10 +441,10 @@
     "localModelId": "id",
     "sourceHash": "sha256",
     "versions": {
-      "importerVersion": "personal-import/2",
-      "normalizationVersion": "personal-normalize/4",
+      "importerVersion": "personal-import/3",
+      "normalizationVersion": "personal-normalize/5",
       "rigMappingVersion": "personal-rig/2",
-      "converterVersion": "personal-converter/4",
+      "converterVersion": "personal-converter/5",
       "converterFingerprint": "runtime-computed SHA256 of all shipped converter Python and JSON files"
     },
     "sourceFormat": "fbx | cs3c",
@@ -613,6 +614,9 @@
         "materialCount": {
           "type": "integer",
           "minimum": 0
+        },
+        "materialPreservation": {
+          "$ref": "#/$defs/materialPreservation"
         }
       },
       "required": [
@@ -626,7 +630,8 @@
         "fkProbes",
         "blenderVersion",
         "maxMaterialRegionError",
-        "materialCount"
+        "materialCount",
+        "materialPreservation"
       ],
       "additionalProperties": false
     },
@@ -930,6 +935,9 @@
         },
         "modelStorageVersion": {
           "const": "personal-fbx/1"
+        },
+        "materialContractVersion": {
+          "const": "personal-solid-specular/1"
         }
       },
       "required": [
@@ -939,7 +947,8 @@
         "formats",
         "hands",
         "cameraContractVersion",
-        "modelStorageVersion"
+        "modelStorageVersion",
+        "materialContractVersion"
       ],
       "additionalProperties": false
     },
@@ -1193,6 +1202,47 @@
       ],
       "additionalProperties": false,
       "description": "Rigid proper Y-up model rotation about target Hips, applied exactly once after retarget; non-null rotation requires source BVH SHA lineage. Null is explicitly source orientation."
+    },
+    "materialPreservation": {
+      "type": "object",
+      "properties": {
+        "passed": {
+          "const": true
+        },
+        "materialCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxDiffuseError": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1e-05
+        },
+        "maxSpecularError": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1e-05
+        },
+        "maxShininessError": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1e-05
+        },
+        "maxOpacityError": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1e-05
+        }
+      },
+      "required": [
+        "passed",
+        "materialCount",
+        "maxDiffuseError",
+        "maxSpecularError",
+        "maxShininessError",
+        "maxOpacityError"
+      ],
+      "additionalProperties": false
     }
   },
   "oneOf": [
@@ -1227,5 +1277,5 @@
       "$ref": "#/$defs/resultEvent"
     }
   ],
-  "contractRevision": 4
+  "contractRevision": 5
 }
