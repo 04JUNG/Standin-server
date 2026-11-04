@@ -1,0 +1,44 @@
+{
+  "version": "0.1.3",
+  "flesh": {
+    "base_color_srgb": "#fadfca",
+    "reference_sample_rgb": [250, 223, 202],
+    "reference_image_sha256": "a6a3b64c2cf8b280be8f26c13812e3229d1c6020f33eb63b08907e88402e57c5",
+    "sample_method": "most frequent warm base-color pixel in attached reference",
+    "preview_emissive_fill": 0.3
+  },
+  "guide_join": {
+    "height_m_in_1_78m_rest_model": 0.88,
+    "overlap_m": 0.0015,
+    "construction_above": true,
+    "orange_below": true,
+    "shared_curve": [
+      [0.085, 1.515],
+      [0.105, 1.36],
+      [0.104, 1.315],
+      [0.087, 1.135],
+      [0.095, 1.025],
+      [0.086, 0.88],
+      [0.082, 0.755],
+      [0.075, 0.635],
+      [0.074, 0.514],
+      [0.08, 0.38],
+      [0.075, 0.26],
+      [0.073, 0.105]
+    ]
+  },
+  "lines": {
+    "orange": {
+      "color_srgb": "#f39850",
+      "rgb": [243, 152, 80],
+      "half_width_m": 0.0013,
+      "opacity": 1.0
+    },
+    "gray": {
+      "color_srgb": "#707070",
+      "rgb": [112, 112, 112],
+      "half_width_m": 0.001,
+      "opacity": 0.62
+    }
+  }
+}
