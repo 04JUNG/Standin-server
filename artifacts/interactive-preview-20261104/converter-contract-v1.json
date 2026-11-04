@@ -249,5 +249,15 @@
     "no Converter HTTP adapter/BFF/Client integration",
     "exact search camera matrices/framing bridge and production static asset coverage unverified",
     "full preset/extreme-shape/mirror/camera/OS/CSP suite and performance acceptance pending"
-  ]
+  ],
+  "publication": {
+    "status": "blocked-by-automatic-approval-review",
+    "publicRepository": "https://github.com/04JUNG/Standin-server",
+    "head": "codex/interactive-pose-converter-v1",
+    "base": "develop",
+    "draft": true,
+    "payload": "implementation source/tests, design/contract/schema guide, sanitized asset SHA256 IDs and validation metrics; no original/generated asset bytes, runtime/controller files or secrets",
+    "prBody": "artifacts/interactive-preview-20261104/PR_BODY.md",
+    "required": "explicit confirmation of this public destination/payload"
+  }
 }

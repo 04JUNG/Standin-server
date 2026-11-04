@@ -5,7 +5,7 @@ State: **draft local milestone; full design incomplete; not activated**.
 - Worktree: isolated Converter feature worktree.
 - Branch `codex/interactive-pose-converter-v1`, based on freshly fetched origin/develop `592ab0f059089e64a5c88a3ad607539124e8e6c6`.
 - Implementation source: commit `3fa41e71f` (full SHA/runtime source digest in converter-contract-v1.json). Original checkout/other sessions' dirty edits not imported or overwritten. Only this owner's shared converter contract/status files are published there.
-- PR: pending publication; no merge/deployment/feature activation/AWS/paid inference.
+- Remote PR: **blocked by automatic approval review**. Both the original push and a retry after removing local home paths were rejected because exact public destination/payload authorization was required. Nothing was pushed. Concrete PR body: `PR_BODY.md`; target `https://github.com/04JUNG/Standin-server`, base `develop`, head `codex/interactive-pose-converter-v1`, draft. User confirmation is needed to publish this code/docs/SHA256 evidence to that public repository. No merge/deployment/feature activation/AWS/paid inference.
 
 ## Implemented local boundary
 
