@@ -171,6 +171,84 @@ def limit_strain(candidate, posed, graph, rest_lengths, cap):
     return x
 
 
+def damage_support(graph, rest, posed, faces, rest_lengths, rest_area, rest_alignment):
+    """Seed only measured pose damage and taper through two adjacent rings."""
+    ratio = lengths(posed[graph.b]-posed[graph.a]) / rest_lengths
+    bad = (ratio > 1.8) | (ratio < .25)
+    area, normals = triangle_geometry(posed, faces)
+    i, j = graph.face_pairs.T
+    alignment = np.einsum("ij,ij->i", normals[i], normals[j])
+    folds = (alignment < .5) & (rest_alignment > np.cos(np.pi/6))
+    weight = np.zeros(len(posed))
+    weight[graph.a[bad]] = 1.
+    weight[graph.b[bad]] = 1.
+    weight[faces[area < .05*rest_area].ravel()] = 1.
+    weight[faces[graph.face_pairs[folds]].ravel()] = 1.
+    # A ripple has adjacent peaks and troughs that appeared under posing.
+    # Compare signed curvature against the registered relief so that a rounded
+    # muscle or an ordinary bend does not become a smoothing mask.
+    local_size = graph.total(rest_lengths[:, None])[:, 0] / np.maximum(graph.degree, 1)
+    def signed_relief(points):
+        relative = (points[graph.b]-points[graph.a]) * graph.weights[:, None]
+        lap = np.column_stack([
+            np.bincount(graph.a, col, len(points))-np.bincount(graph.b, col, len(points))
+            for col in relative.T
+        ])
+        normal = geometric_normals(points, faces)
+        return (lap*normal).sum(axis=1) / np.maximum(graph.mass[:, 0]*local_size, 1e-30)
+    ripple = signed_relief(posed) - signed_relief(rest)
+    ridge = ((ripple[graph.a] > .14) & (ripple[graph.b] < -.14)) | (
+            (ripple[graph.b] > .14) & (ripple[graph.a] < -.14))
+    weight[graph.a[ridge]] = 1.
+    weight[graph.b[ridge]] = 1.
+    # Ordinary bending and undamaged authored detail receive no correction.
+    for taper in (.6, .25):
+        adjacent = (weight[graph.a] > 0) | (weight[graph.b] > 0)
+        ids = np.concatenate((graph.a[adjacent], graph.b[adjacent]))
+        weight[ids] = np.maximum(weight[ids], taper)
+    weight[graph.fixed] = 0.
+    return weight
+
+
+def isolated_spikes(rest, posed, faces, graph, rest_lengths, rest_area, smooth, before, cap):
+    """Fit an outlier from its one-ring without moving its healthy neighbors."""
+    ratio = lengths(posed[graph.b]-posed[graph.a]) / rest_lengths
+    strained = (ratio > 1.8) | (ratio < .25)
+    count = np.bincount(np.concatenate((graph.a[strained], graph.b[strained])), minlength=len(rest))
+    suspect = (count >= 3) & (count*2 > graph.degree) & ~graph.fixed
+    i = np.concatenate((graph.a, graph.b))
+    j = np.concatenate((graph.b, graph.a))
+    selected = suspect[i] & ~suspect[j]
+    i, j = i[selected], j[selected]
+    corrected = posed.copy()
+    order = np.argsort(i)
+    for group in np.split(order, np.flatnonzero(np.diff(i[order]))+1):
+        if len(group) < 3:
+            continue
+        vertex = i[group[0]]
+        original, current = rest[j[group]], posed[j[group]]
+        left = original-original.mean(0)
+        right = current-current.mean(0)
+        u, singular, vt = np.linalg.svd(right.T@left)
+        if singular[1] <= singular[0]*1e-8:
+            continue
+        u[:, -1] *= np.sign(np.linalg.det(u@vt))
+        predicted = current.mean(0) + (u@vt) @ (rest[vertex]-original.mean(0))
+        offset = predicted-posed[vertex]
+        corrected[vertex] += offset*min(1., cap/max(np.linalg.norm(offset),1e-30))
+    if np.array_equal(corrected, posed):
+        return None
+    after = metrics(corrected, faces, graph, rest_lengths, rest_area, smooth)
+    old_area, _ = triangle_geometry(posed, faces)
+    new_area, _ = triangle_geometry(corrected, faces)
+    if (np.any((new_area < .01*rest_area) & (old_area >= .01*rest_area))
+            or any(after[k] > before[k]+1e-6 for k in before)
+            or not any(after[k] < before[k]-1e-6 for k in before)):
+        return None
+    return corrected, {"applied": True, "before": before, "after": after,
+                       "filter": "isolated_spikes", "maxMove": float(lengths(corrected-posed).max())}
+
+
 def _correct_part(rest, posed, faces, pinned):
     """Return a candidate in the same units, or the original on fallback."""
     rest, posed = np.asarray(rest, dtype=float), np.asarray(posed, dtype=float)
@@ -201,6 +279,10 @@ def _correct_part(rest, posed, faces, pinned):
     # Anchor both incident faces at already sharp features of the original.
     creases = graph.face_pairs[alignment < np.cos(np.pi/3)]
     graph.fixed[faces[creases].ravel()] = True
+    support = damage_support(graph, rest, posed, faces, edge_lengths, rest_area, alignment)
+    if not support.any():
+        return posed, {"applied": False, "reason": "no_surface_damage"}
+    graph.fixed |= support == 0
     before = metrics(posed, faces, graph, edge_lengths, rest_area, smooth)
     def adaptive(field, band):
         return graph.diffuse(field, .055 * scale * (1., .25, .55)[band])
@@ -211,29 +293,36 @@ def _correct_part(rest, posed, faces, pinned):
     def reference_filter(field, band):
         return graph.smooth(field, (steps, 8, max(12, steps // 3))[band])
 
-    arguments = (rest, posed, faces, graph, edge_lengths, rest_area, smooth, before)
+    arguments = (rest, posed, faces, graph, edge_lengths, rest_area, smooth, before, support)
     baseline, baseline_report = solve(*arguments, legacy_scale, reference_filter, before)
     baseline_report["filter"] = "ring_reference"
+    baseline_report["eligibleVertices"] = int(np.count_nonzero(support))
     ceiling = baseline_report.get("after", before)
     try:
         improved, report = solve(*arguments, scale, adaptive, ceiling)
     except (ArithmeticError, np.linalg.LinAlgError):
         baseline_report["adaptiveFallback"] = "numerical_budget"
-        return baseline, baseline_report
+        report = {"applied": False}
     if report["applied"]:
         report["filter"] = "area_diffusion"
+        report["eligibleVertices"] = int(np.count_nonzero(support))
         return improved, report
+    if not baseline_report["applied"]:
+        sparse = isolated_spikes(rest, posed, faces, graph, edge_lengths, rest_area,
+                                 smooth, before, .021*scale)
+        if sparse is not None:
+            return sparse
     return baseline, baseline_report
 
 
-def solve(rest, posed, faces, graph, edge_lengths, rest_area, smooth, before,
+def solve(rest, posed, faces, graph, edge_lengths, rest_area, smooth, before, support,
           scale, filter_field, ceiling):
     reference = filter_field(rest, 0)
     low_pose = filter_field(posed, 0)
     rotation = rotations(graph, reference, low_pose)
     detail = np.einsum('nij,nj->ni', rotation, rest-reference)
     delta = low_pose + detail - posed
-    cap = np.full(len(rest), .021*scale)
+    cap = .021 * scale * support
     cap[graph.fixed] = 0.
     correction = delta * np.minimum(1., cap/np.maximum(lengths(delta), 1e-30))[:, None]
     if lengths(correction).max() <= scale*1e-6:
@@ -424,11 +513,18 @@ def apply_to_meshes(meshes, neutral, references):
         points, report = correct(neutral[obj.name], posed, faces, pinned)
         if report["applied"]:
             inverse = obj.matrix_world.inverted()
-            moved = np.any(points != posed, axis=1)
+            displacement = lengths(points-posed)
+            moved = displacement > 0
+            posed_normals = np.array([normal.vector[:] for normal in mesh.corner_normals])
             for index in np.flatnonzero(moved):
                 mesh.vertices[int(index)].co = inverse @ Vector(points[index])
             mesh.update()
-            report["updatedCorners"] = update_shading(mesh, reference.normal_weights, moved, pinned)
+            report["movedVertices"] = int(np.count_nonzero(moved))
+            report["vertexCount"] = count
+            report["updatedCorners"] = update_shading(
+                mesh, reference.normal_weights, moved, pinned,
+                displacement / obj.matrix_world.to_scale().x, posed_normals,
+            )
         reports.append(report)
     return {"applied": any(row["applied"] for row in reports), "meshes": reports}
 
@@ -467,15 +563,24 @@ def normal_policy(mesh):
     return strength
 
 
-def update_shading(mesh, policy, moved, pinned=None):
+def update_shading(mesh, policy, moved, pinned=None, displacement=None, posed_normals=None):
     vertex_ids = np.array([loop.vertex_index for loop in mesh.loops])
     faces = np.array([tri.vertices[:] for tri in mesh.loop_triangles], dtype=int)
-    active = np.zeros(len(moved), dtype=bool)
-    active[faces[moved[faces].any(axis=1)].ravel()] = True
+    active = moved.copy()
     if pinned is not None:
         active[pinned] = False
     weights = policy * active[vertex_ids]
-    original = np.array([normal.vector[:] for normal in mesh.corner_normals])
+    if displacement is not None:
+        xyz = np.array([vertex.co[:] for vertex in mesh.vertices])
+        # Compare distances in the same units even for scaled mesh objects.
+        triangle_size = lengths(xyz[faces[:, 1]]-xyz[faces[:, 0]])
+        size_sum = np.bincount(faces.ravel(), np.repeat(triangle_size, 3), minlength=len(moved))
+        degree = np.bincount(faces.ravel(), minlength=len(moved))
+        local_size = size_sum / np.maximum(degree, 1)
+        weights *= np.clip(displacement / np.maximum(.35*local_size, 1e-30), 0., 1.)[vertex_ids]
+    original = posed_normals if posed_normals is not None else np.array(
+        [normal.vector[:] for normal in mesh.corner_normals]
+    )
     current = np.array([v.co[:] for v in mesh.vertices])
     target = geometric_normals(current, faces)[vertex_ids]
     use = (weights > 0) & (lengths(target) > .99)

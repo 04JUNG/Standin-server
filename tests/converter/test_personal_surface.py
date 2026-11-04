@@ -3,7 +3,7 @@ import unittest
 
 import numpy as np
 
-from converter.local.surface import Neighborhood, correct
+from converter.local.surface import Neighborhood, correct, damage_support, triangle_geometry
 
 
 class PersonalSurfaceTests(unittest.TestCase):
@@ -18,7 +18,7 @@ class PersonalSurfaceTests(unittest.TestCase):
         self.faces = np.array(self.faces)
         self.posed = self.rest.copy()
         x, y = (self.rest[:, :2] - 9).T
-        self.posed[:, 2] = np.exp(-(x*x+y*y)/32) * np.cos(x) * np.cos(y)
+        self.posed[:, 2] = 4*np.exp(-(x*x+y*y)/32) * np.cos(x) * np.cos(y)
 
     def test_unnamed_patch_scale_and_coordinate_frame(self):
         fixed, report = correct(self.rest, self.posed, self.faces)
@@ -32,6 +32,38 @@ class PersonalSurfaceTests(unittest.TestCase):
         transform = lambda x: 23*(x@rot) + [100, -10, 8]
         result, _ = correct(transform(self.rest), transform(self.posed), self.faces)
         np.testing.assert_allclose(result, transform(fixed), atol=1e-8)
+
+    def test_benign_bend_and_authored_relief_are_preserved(self):
+        posed = self.rest.copy()
+        posed[:, 2] = .15 * np.cos(self.rest[:, 0]/3)
+        fixed, report = correct(self.rest, posed, self.faces)
+        self.assertFalse(report['applied'])
+        np.testing.assert_array_equal(fixed, posed)
+
+    def test_new_peak_and_trough_are_local_damage(self):
+        graph = Neighborhood(self.faces, self.rest)
+        length = np.linalg.norm(self.rest[graph.b]-self.rest[graph.a], axis=1)
+        area, normals = triangle_geometry(self.rest, self.faces)
+        a, b = graph.face_pairs.T
+        alignment = (normals[a]*normals[b]).sum(1)
+        posed = self.rest.copy()
+        posed[171, 2] += .3
+        posed[172, 2] -= .3
+        mask = damage_support(graph, self.rest, posed, self.faces, length, area, alignment)
+        self.assertEqual(mask[171], 1.)
+        self.assertEqual(mask[172], 1.)
+        self.assertEqual(mask[100], 0.)
+
+    def test_local_spike_keeps_remote_muscle_relief_bit_exact(self):
+        rest = self.rest.copy()
+        rest[:, 2] = .3 * np.cos(rest[:, 0]/4)
+        posed = rest.copy()
+        posed[171, 2] += 4.
+        fixed, report = correct(rest, posed, self.faces)
+        self.assertTrue(report["applied"])
+        remote = np.linalg.norm(rest[:, :2] - rest[171, :2], axis=1) > 6.
+        np.testing.assert_array_equal(fixed[remote], posed[remote])
+        self.assertLess(fixed[171, 2], posed[171, 2])
 
     def test_rigid_detail_and_disconnected_scales(self):
         detail = self.posed.copy()
@@ -131,7 +163,7 @@ class SurfaceShadingTests(unittest.TestCase):
             new = np.array([n.vector[:] for n in mesh.corner_normals])
             expected = geometric_normals(np.array([v.co[:] for v in mesh.vertices]),
                                          np.array([[0,1,2],[0,2,3]]))
-            np.testing.assert_allclose(new[ids == 0], old[ids == 0], atol=.001)
-            np.testing.assert_allclose(new[ids != 0], expected[ids[ids != 0]], atol=.001)
+            np.testing.assert_allclose(new[ids != 2], old[ids != 2], atol=.001)
+            np.testing.assert_allclose(new[ids == 2], expected[ids[ids == 2]], atol=.001)
         finally:
             bpy.data.meshes.remove(mesh)

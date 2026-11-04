@@ -1,0 +1,352 @@
+{
+  "converterVersion": "personal-converter/8",
+  "runtimeManifest": "5d766b0eb36d1f3aa3e870729ce47c06757f28e86b7ea1add4a8fb0a43b8eccc",
+  "manifestFilesChecked": 6582,
+  "scopeChecks": [
+    {
+      "outsideVertices": 23059,
+      "totalVertices": 24988,
+      "withinJobOutsideExact": true,
+      "model": 0,
+      "pose": 0,
+      "exportOutsideMaxM": 0.0,
+      "exactPolygonsAndWeights": true
+    },
+    {
+      "outsideVertices": 22383,
+      "totalVertices": 24988,
+      "withinJobOutsideExact": true,
+      "model": 0,
+      "pose": 1,
+      "exportOutsideMaxM": 0.0,
+      "exactPolygonsAndWeights": true
+    },
+    {
+      "outsideVertices": 84838,
+      "totalVertices": 90143,
+      "withinJobOutsideExact": true,
+      "model": 1,
+      "pose": 0,
+      "exportOutsideMaxM": 0.0,
+      "exactPolygonsAndWeights": true
+    },
+    {
+      "outsideVertices": 82175,
+      "totalVertices": 90143,
+      "withinJobOutsideExact": true,
+      "model": 1,
+      "pose": 1,
+      "exportOutsideMaxM": 0.0,
+      "exactPolygonsAndWeights": true
+    }
+  ],
+  "models": [
+    {
+      "inputName": "standin-male-0.7.6-mapped-review.cs3c",
+      "sourceHash": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+      "poses": [
+        {
+          "poseName": "03-staging-selected-pose.bvh",
+          "file": "model-0-pose-0.fbx",
+          "artifactHash": "468f0b80f2e6c6b6cbd9303951895a8dd3462388a436025d341b8d204288b6d6",
+          "seconds": 9.968257208005525,
+          "cachedSeconds": 0.05339479199028574,
+          "surface": {
+            "applied": true,
+            "meshes": [
+              {
+                "applied": true,
+                "parts": [
+                  {
+                    "applied": true,
+                    "before": {
+                      "excessBend": 705.5974061159194,
+                      "maxStretch": 2.445760943803511,
+                      "stretchP99": 1.477323678708654,
+                      "overDouble": 76,
+                      "compressed": 33,
+                      "collapsed": 0,
+                      "sharp": 176,
+                      "folded": 82
+                    },
+                    "after": {
+                      "excessBend": 613.232599461587,
+                      "maxStretch": 1.9059455059965165,
+                      "stretchP99": 1.446687285299274,
+                      "overDouble": 0,
+                      "compressed": 0,
+                      "collapsed": 0,
+                      "sharp": 129,
+                      "folded": 77
+                    },
+                    "componentScale": 1.9884239923078906,
+                    "strength": 0.5,
+                    "maxMove": 0.02408046150279435,
+                    "filter": "ring_reference",
+                    "eligibleVertices": 1929
+                  }
+                ],
+                "skipped": {
+                  "rigid": 0,
+                  "budget": 0,
+                  "tiny": 0
+                },
+                "movedVertices": 1929,
+                "vertexCount": 24988,
+                "updatedCorners": 11575
+              }
+            ]
+          },
+          "arm": {
+            "L": {
+              "applied": false,
+              "reason": "not_wrist_only_mismatch"
+            },
+            "R": {
+              "applied": false,
+              "reason": "not_wrist_only_mismatch"
+            }
+          }
+        },
+        {
+          "poseName": "cmu_135_01_04368.bvh",
+          "file": "model-0-pose-1.fbx",
+          "artifactHash": "ba67b0c1f9c81cb71f856dff3137819b315812f787bfb9ebfad34a8c594490ec",
+          "seconds": 11.210940458986443,
+          "cachedSeconds": 0.05024549999507144,
+          "surface": {
+            "applied": true,
+            "meshes": [
+              {
+                "applied": true,
+                "parts": [
+                  {
+                    "applied": true,
+                    "before": {
+                      "excessBend": 850.9460540887285,
+                      "maxStretch": 8.320859053538083,
+                      "stretchP99": 1.575033876433608,
+                      "overDouble": 177,
+                      "compressed": 35,
+                      "collapsed": 1,
+                      "sharp": 199,
+                      "folded": 101
+                    },
+                    "after": {
+                      "excessBend": 463.0818070702375,
+                      "maxStretch": 1.9903981133223592,
+                      "stretchP99": 1.5157098813660244,
+                      "overDouble": 0,
+                      "compressed": 0,
+                      "collapsed": 0,
+                      "sharp": 73,
+                      "folded": 42
+                    },
+                    "componentScale": 1.9884239923078906,
+                    "strength": 0.75,
+                    "blend": 1.0,
+                    "heldVertices": 3,
+                    "maxMove": 0.026634604945804618,
+                    "filter": "ring_reference",
+                    "eligibleVertices": 2605
+                  }
+                ],
+                "skipped": {
+                  "rigid": 0,
+                  "budget": 0,
+                  "tiny": 0
+                },
+                "movedVertices": 2602,
+                "vertexCount": 24988,
+                "updatedCorners": 15645
+              }
+            ]
+          },
+          "arm": {
+            "L": {
+              "applied": false,
+              "reason": "palm_basis_unavailable"
+            },
+            "R": {
+              "applied": false,
+              "reason": "palm_basis_unavailable"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "inputName": "female-chubby-tpose.fbx",
+      "sourceHash": "fb47d89d1507c377b0af136b9dc6357ef35787c59ac79467ee180b2e1640017f",
+      "poses": [
+        {
+          "poseName": "03-staging-selected-pose.bvh",
+          "file": "model-1-pose-0.fbx",
+          "artifactHash": "043a463a93ae761381d75f2e3ac5c374fd22d97db3e86236a166782e4ee28138",
+          "seconds": 36.73138291700161,
+          "cachedSeconds": 0.12258879200089723,
+          "surface": {
+            "applied": true,
+            "meshes": [
+              {
+                "applied": true,
+                "parts": [
+                  {
+                    "applied": true,
+                    "before": {
+                      "excessBend": 4220.125984130961,
+                      "maxStretch": 48.251339610708975,
+                      "stretchP99": 1.6078901501155356,
+                      "overDouble": 654,
+                      "compressed": 82,
+                      "collapsed": 2,
+                      "sharp": 426,
+                      "folded": 195
+                    },
+                    "after": {
+                      "excessBend": 3764.085650090313,
+                      "maxStretch": 26.639710021134622,
+                      "stretchP99": 1.598001201413034,
+                      "overDouble": 403,
+                      "compressed": 65,
+                      "collapsed": 0,
+                      "sharp": 340,
+                      "folded": 193
+                    },
+                    "componentScale": 1.9309182695335845,
+                    "strength": 0.4,
+                    "blend": 0.5,
+                    "heldVertices": 3,
+                    "maxMove": 0.010624381491571834,
+                    "filter": "ring_reference",
+                    "eligibleVertices": 5305
+                  }
+                ],
+                "skipped": {
+                  "rigid": 0,
+                  "budget": 0,
+                  "tiny": 0
+                },
+                "movedVertices": 5302,
+                "vertexCount": 90143,
+                "updatedCorners": 31054
+              }
+            ]
+          },
+          "arm": {
+            "L": {
+              "palmFrameErrorBeforeDeg": 25.69470036097841,
+              "directionErrorsBeforeDeg": [
+                1.8398450620154787,
+                3.7699947514120558,
+                3.553884049183939
+              ],
+              "applied": true,
+              "strength": 0.5,
+              "maxHeadDisplacement": 0.011234834825715953,
+              "directionErrorsAfterDeg": [
+                0.9195097471823732,
+                1.8892667811578232,
+                1.8247501013140297
+              ],
+              "palmFrameErrorAfterDeg": 12.93598588029709,
+              "wristLocalAngleDeg": 50.96513671858597
+            },
+            "R": {
+              "palmFrameErrorBeforeDeg": 25.4670125288796,
+              "directionErrorsBeforeDeg": [
+                1.8471352442958064,
+                3.8111660762144273,
+                3.568774633318735
+              ],
+              "applied": true,
+              "strength": 0.5,
+              "maxHeadDisplacement": 0.011229335940783897,
+              "directionErrorsAfterDeg": [
+                0.9232628026230311,
+                1.9097696458085416,
+                1.8334500958461741
+              ],
+              "palmFrameErrorAfterDeg": 13.074581119759396,
+              "wristLocalAngleDeg": 50.88970752448693
+            }
+          }
+        },
+        {
+          "poseName": "cmu_135_01_04368.bvh",
+          "file": "model-1-pose-1.fbx",
+          "artifactHash": "c26f1981874acc76a8e2054d875947da282df3a4f17a0ee6bc73780d6c5356b4",
+          "seconds": 38.034239707980305,
+          "cachedSeconds": 0.11895020899828523,
+          "surface": {
+            "applied": true,
+            "meshes": [
+              {
+                "applied": true,
+                "parts": [
+                  {
+                    "applied": true,
+                    "before": {
+                      "excessBend": 6270.897714899695,
+                      "maxStretch": 219.89973103988808,
+                      "stretchP99": 1.8113034243539459,
+                      "overDouble": 1853,
+                      "compressed": 181,
+                      "collapsed": 3,
+                      "sharp": 896,
+                      "folded": 522
+                    },
+                    "after": {
+                      "excessBend": 5640.751527705728,
+                      "maxStretch": 198.62889581516444,
+                      "stretchP99": 1.806652812711386,
+                      "overDouble": 1785,
+                      "compressed": 180,
+                      "collapsed": 1,
+                      "sharp": 783,
+                      "folded": 482
+                    },
+                    "componentScale": 1.9309182695335845,
+                    "strength": 0.4,
+                    "blend": 0.25,
+                    "heldVertices": 6,
+                    "maxMove": 0.010137320915051347,
+                    "filter": "ring_reference",
+                    "eligibleVertices": 7968
+                  }
+                ],
+                "skipped": {
+                  "rigid": 0,
+                  "budget": 0,
+                  "tiny": 0
+                },
+                "movedVertices": 7962,
+                "vertexCount": 90143,
+                "updatedCorners": 46404
+              }
+            ]
+          },
+          "arm": {
+            "L": {
+              "applied": false,
+              "reason": "palm_basis_unavailable"
+            },
+            "R": {
+              "applied": false,
+              "reason": "palm_basis_unavailable"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "poseAudit": {
+    "seatedForearmLeftTwistDeg": {
+      "source": -70.15,
+      "maleBeforeAndAfter": -66.36,
+      "femaleBefore": 0.0,
+      "femaleAfter": -36.2
+    },
+    "remainingWorstFemaleCmuEdgeRatio": 198.62889581516444
+  }
+}

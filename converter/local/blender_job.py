@@ -74,6 +74,8 @@ def run(job):
     inspection.require(len(src.data.bones) <= 512, "LIMIT_EXCEEDED", "Pose skeleton exceeds the local limit")
     report = rt.retarget(src, arm, dst_profile=character["profile"], apply_root_translation=False)
     inspection.require(report.ok, "CONVERSION_FAILED", "Retarget rejected the selected pose")
+    from converter.local import arm_transfer
+    arm_correction = arm_transfer.apply(src, arm, meshes, before_normalization, report)
     edge_error = max(abs((arm.pose.bones[name].head-arm.pose.bones[name].parent.head).length-length)
                      for name,length in rest_edges.items())
     inspection.require(edge_error < 2e-5, "CONVERSION_FAILED", "Retarget changed the character's joint lengths")
@@ -85,7 +87,7 @@ def run(job):
     validation = inspection.roundtrip(arm, meshes, work / "result.fbx", character["mapping"], job["materialExpectations"])
     return {"snapshot": job["snapshot"], "snapshotHash": job["snapshotHash"],
             "artifactHash": sha256(work / "result.fbx"), "validation": validation,
-            "retarget": {**report.as_dict(), "surfaceCorrection": surface_correction, "local_normalization_surface_error": normalization_error,
+            "retarget": {**report.as_dict(), "surfaceCorrection": surface_correction, "armTransfer": arm_correction, "local_normalization_surface_error": normalization_error,
                          "max_joint_edge_length_error": edge_error, "camera": camera_validation}, "selectionId": job["selectionId"]}
 
 
