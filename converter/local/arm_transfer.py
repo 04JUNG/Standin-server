@@ -7,7 +7,7 @@ from mathutils import Matrix, Quaternion
 
 from converter import bone_map
 from converter import retarget as rt
-from converter.local.surface import lengths, triangle_geometry, within_budget
+from converter.local.surface import Neighborhood, lengths, metrics, triangle_geometry, within_budget
 
 
 def palm_frame_pair(src, dst, source_name, target_name):
@@ -55,7 +55,7 @@ def arm_surface(meshes, neutral, names):
     return samples
 
 
-def skin_safe(samples):
+def skin_safe(samples, strict=False):
     for obj, faces, rest, old in samples:
         current = evaluated_points(obj)
         edges = np.concatenate((faces[:, :2], faces[:, 1:], faces[:, ::2]))
@@ -74,6 +74,27 @@ def skin_safe(samples):
         if (not np.isfinite(after).all() or after.max() > max(2., before.max()) + 1e-5
                 or np.any((new_area < .01*reference) & (old_area >= .01*reference))):
             return False
+        if not strict:
+            continue
+        usable = reference > max(float(reference.max()) * 1e-12, 1e-30)
+        if not usable.any():
+            return False
+        triangles = faces[usable]
+        graph = Neighborhood(triangles, rest)
+        rest_lengths = lengths(rest[graph.b] - rest[graph.a])
+        if np.any(rest_lengths <= 1e-12):
+            return False
+        area, normals = triangle_geometry(rest, triangles)
+        i, j = graph.face_pairs.T
+        smooth = (normals[i] * normals[j]).sum(1) > math.cos(math.pi / 6)
+        old_shape = metrics(old, triangles, graph, rest_lengths, area, smooth)
+        new_shape = metrics(current, triangles, graph, rest_lengths, area, smooth)
+        # A direction improvement must not merely move a crease or compression
+        # into another part of the arm. Keep the existing maximum-strain guard
+        # above and measure the remaining shape criteria on the same triangles.
+        if any(new_shape[key] > old_shape[key] + 1e-6
+               for key in old_shape if key != "maxStretch"):
+            return False
     return True
 
 
@@ -82,9 +103,15 @@ def torso_frame(arm, table, rest):
     def point(role):
         return position(arm, table[role]).translation
     up = point("neck") - point("spine")
-    lateral = point("shoulder.L") - point("shoulder.R")
-    frame, _ = rt._frame_from_direction_normal(up, lateral.cross(up))
-    return frame
+    # Some valid BVHs attach both clavicles at the same chest point. Their
+    # upper-arm heads still provide the shoulder span; do not invent an axis
+    # from the zero-length clavicle span.
+    for role in ("shoulder", "upperarm"):
+        lateral = point(role+".L") - point(role+".R")
+        frame, _ = rt._frame_from_direction_normal(up, lateral.cross(up))
+        if frame is not None:
+            return frame
+    return None
 
 
 def align_direction(rotation_candidate, neutral_edge, posed_edge):
@@ -95,7 +122,7 @@ def align_direction(rotation_candidate, neutral_edge, posed_edge):
     return predicted.rotation_difference(posed_edge).to_matrix().to_4x4() @ rotation_candidate
 
 
-def transfer_side(src, dst, meshes, neutral, report, side):
+def transfer_side(src, dst, meshes, neutral, report, side, allow_direction_only=True):
     chain = report.chain_diagnostics.get("arm."+side, {})
     if (not chain.get("activated") or chain.get("fallback")
             or chain.get("rest_direction_max_deg", 180.) >= 10.
@@ -105,7 +132,7 @@ def transfer_side(src, dst, meshes, neutral, report, side):
     source = [bone_map.PROFILES[report.src_profile][key] for key in roles]
     target = [bone_map.PROFILES[report.dst_profile][key] for key in roles]
     palms = palm_frame_pair(src, dst, source[-1], target[-1])
-    if palms is None:
+    if palms is None and not allow_direction_only:
         return {"applied": False, "reason": "palm_basis_unavailable"}
     source.insert(0, bone_map.PROFILES[report.src_profile]["shoulder."+side])
     target.insert(0, bone_map.PROFILES[report.dst_profile]["shoulder."+side])
@@ -148,15 +175,25 @@ def transfer_side(src, dst, meshes, neutral, report, side):
             return {"applied": False, "reason": "ambiguous_frame"}
         desired.append(aligned @ rt._rot_only(target_rests[k]))
         directions.append(goal)
-    sf, tf = palms
-    desired.append(torso_map @ source_delta[-1] @ sf @ tf.inverted() @ rt._rot_only(target_rests[-1]))
+    if palms is None:
+        # Arm directions and source axial motion are observable without finger
+        # landmarks, but the anatomical palm basis is not. Retain the existing
+        # hand world orientation instead of reporting a fabricated palm match.
+        desired.append(rt._rot_only(world[-1]))
+    else:
+        sf, tf = palms
+        desired.append(torso_map @ source_delta[-1] @ sf @ tf.inverted() @ rt._rot_only(target_rests[-1]))
     samples = arm_surface(meshes, neutral, set(target))
     def errors(points):
         return [rt._angle_deg(points[k+1]-points[k], directions[k]) for k in range(3)]
     old_points = [m.translation for m in world]
     before_errors = errors(old_points)
-    report_row = {"palmFrameErrorBeforeDeg": rt._rotation_error_deg(rt._rot_only(world[-1]),desired[-1]),
+    report_row = {"handFramePolicy": "landmark_pair" if palms else "preserve_world_orientation",
+                  "palmFrameValidated": palms is not None,
                   "directionErrorsBeforeDeg": before_errors}
+    if palms:
+        report_row["palmFrameErrorBeforeDeg"] = rt._rotation_error_deg(rt._rot_only(world[-1]),desired[-1])
+    hand_error_before = rt._rotation_error_deg(rt._rot_only(world[-1]), desired[-1])
     reach = sum((b-a).length for a,b in zip(old_points,old_points[1:]))
     wrist_before = backup[-1].to_quaternion().angle
     wrist_source = src.pose.bones[source[-1]].matrix_basis.to_quaternion().angle
@@ -181,19 +218,47 @@ def transfer_side(src, dst, meshes, neutral, report, side):
         wrist_angle = bones[-1].matrix_basis.to_quaternion().angle
         direction_safe = all(new <= old+.05 for new,old in zip(direction_errors,before_errors))
         palm_error = rt._rotation_error_deg(rotation(dst,target[-1]),desired[-1])
-        if (samples and palm_error <= report_row["palmFrameErrorBeforeDeg"]+.05 and drift <= .12*reach and direction_safe
-                and wrist_angle <= wrist_limit+1e-5 and skin_safe(samples)):
-            return dict(report_row,applied=True,strength=fraction,maxHeadDisplacement=drift,
-                        directionErrorsAfterDeg=direction_errors,
-                        palmFrameErrorAfterDeg=palm_error,
-                        wristLocalAngleDeg=math.degrees(wrist_angle))
+        if (samples and palm_error <= hand_error_before+.05 and drift <= .12*reach and direction_safe
+                and wrist_angle <= wrist_limit+1e-5 and skin_safe(samples, strict=palms is None)):
+            result = dict(report_row,applied=True,strength=fraction,maxHeadDisplacement=drift,
+                          directionErrorsAfterDeg=direction_errors,
+                          wristLocalAngleDeg=math.degrees(wrist_angle))
+            result["palmFrameErrorAfterDeg" if palms else "handWorldRotationErrorDeg"] = palm_error
+            return result
         for bone, basis in zip(bones, backup):
             bone.matrix_basis = basis
         bpy.context.view_layer.update()
     return dict(report_row,applied=False,reason="shape_or_joint_guard")
 
 
-def apply(src, dst, meshes, neutral, report):
+def apply(src, dst, meshes, neutral, report, allow_direction_only=True):
     if not within_budget(meshes):
         return {"applied": False, "reason": "mesh_budget"}
-    return {side:transfer_side(src,dst,meshes,neutral,report,side) for side in ("L","R")}
+    backup = {bone.name: bone.matrix_basis.copy() for bone in dst.pose.bones}
+    result = {side: transfer_side(src, dst, meshes, neutral, report, side, allow_direction_only)
+              for side in ("L", "R")}
+    direction_only = any(row.get("applied") and not row.get("palmFrameValidated", True)
+                         for row in result.values())
+    if direction_only:
+        # A better arm can change the surface selector's global decision. Do
+        # not strand an otherwise repairable pelvis at the raw LBS result.
+        # This probe is conservative: the normal baked-surface checks still run.
+        from converter.local.surface import correct, prepare_reference
+        failed = False
+        for obj in meshes:
+            reference = prepare_reference(obj.data)
+            _, repair = correct(neutral[obj.name], evaluated_points(obj),
+                                reference.triangles, reference.anchors)
+            failed |= any(part.get("reason") == "metrics_regressed"
+                          for part in repair.get("parts", []))
+        if failed:
+            for bone in dst.pose.bones:
+                bone.matrix_basis = backup[bone.name]
+            bpy.context.view_layer.update()
+            baseline = apply(src, dst, meshes, neutral, report, allow_direction_only=False)
+            for side in ("L", "R"):
+                if result[side].get("applied") and not result[side].get("palmFrameValidated", True):
+                    baseline[side]["reason"] = "surface_candidate_rejected"
+                    baseline[side]["rejectedCandidate"] = result[side]
+            return baseline
+    return result
