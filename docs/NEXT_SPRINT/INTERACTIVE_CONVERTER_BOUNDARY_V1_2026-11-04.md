@@ -1,3 +1,5 @@
+> Historical local boundary. Current implemented opt-in transport and canonical-file adapter: [real-model v2](INTERACTIVE_REAL_MODEL_V2_2026-11-04.md).
+
 # Interactive Converter boundary v1 — local draft, not rollout approval
 
 Date: 2026-11-04 KST. Base: `592ab0f059089e64a5c88a3ad607539124e8e6c6`.

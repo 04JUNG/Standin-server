@@ -1,24 +1,37 @@
 {
   "contract": "interactive-pose-model-v1",
-  "status": "draft",
+  "status": "implemented-opt-in-local-real-verified",
   "schemaVersion": 1,
   "source": {
     "repository": "04JUNG/Standin-server",
     "baseCommit": "592ab0f059089e64a5c88a3ad607539124e8e6c6",
-    "branch": "codex/interactive-pose-converter-v1",
-    "implementationCommit": "3fa41e71fc51b4aa696a2855c858dc5a73d36265",
-    "runtimeSha256": "2bf47b9e187a678960d0265db7cd2a36164639f0c40c94061ad6b4ed3af43572"
+    "branch": "codex/interactive-real-model-converter",
+    "runtimeSha256": "d35d8c8c2d7888c437e53791c8dd5ba58c8bd65a597c016eb26e6236c3369eff",
+    "implementationBaseCommit": "32eca7b5d246cae3a5e87d11115e063470616c8f"
   },
   "transport": {
-    "kind": "server-authored local immutable artifacts",
-    "mime": "application/vnd.standin.interactive-pose+json",
-    "httpRoutesImplemented": false,
-    "bffIntegration": "blocked; no fabricated Converter HTTP endpoints",
+    "kind": "private authenticated internal HTTP; immutable file-canonical snapshots",
+    "mime": "application/vnd.standin.solved-pose-state-v1+json",
+    "httpRoutesImplemented": true,
+    "bffIntegration": "implemented; actual Client/Hono/PGlite/live Converter verification passes",
     "entrypoints": {
       "body": "converter.interactive_adapter.prepare_body(job_path, identity, new_directory)",
       "solve": "converter.interactive_adapter.solve_from_body(base_directory, identity, new_directory, checkpoint=latest_revision_fence)",
       "export": "converter.interactive_export.export_bundle(blender_binary, solved_directory, new_directory, expected_state_hash, checkpoint=latest_revision_fence)"
-    }
+    },
+    "documentation": "docs/NEXT_SPRINT/INTERACTIVE_REAL_MODEL_V2_2026-11-04.md",
+    "basePath": "/interactive/v1",
+    "routes": [
+      "POST /solve",
+      "GET /snapshots/{id}/model",
+      "POST /snapshots/{id}/export",
+      "GET /snapshots/{id}/file",
+      "GET /snapshots/{id}/variants",
+      "POST /cancel",
+      "POST /static/resolve",
+      "GET /static/{sha256}"
+    ],
+    "deadline": "BFF expiresAt, maximum one hour; missing or expired handles revoke readiness"
   },
   "stateSchema": "solved-pose-state-v1",
   "previewReadiness": "authoritative; never export-ready",
@@ -66,12 +79,12 @@
     "orbitExcludedFromStateHash": true,
     "searchHypothesisOnly": true,
     "cspCameraTransferCertified": false,
-    "remaining": "BFF camera descriptor currently lacks exact view/projection plus crop/frame/referenceAspect/target; this adapter does not invent those matrices or refit search. Capability must remain absent until a versioned exact projection mapping is supplied."
+    "remaining": "Normalized continuous search projection is implemented and tested; square hip-origin v2 framing is server-owned. Native CSP pixel alignment is not claimed."
   },
   "changes": [
     {
       "date": "2026-11-04",
-      "description": "Draft: retain frozen solver and intermediate FBX; add separately versioned snapshot/export adapter. No runtime activation."
+      "description": "Retain frozen solver and intermediate FBX; file-canonical display/export adapter v2 with opt-in private HTTP."
     },
     {
       "date": "2026-11-04",
@@ -235,29 +248,35 @@
       "shoulder_head",
       "head"
     ],
-    "approvedActualAssetStatus": "FAILED: split-normal correspondence; no capability/ready receipt",
+    "approvedActualAssetStatus": "PASS: 13 independent real-asset cases; zero strict correspondence error",
     "top5CoverageProven": false
   },
   "solver": {
     "version": "chain-transport-v3.2.5",
     "manifestSha256": "52eae0b0eb6a7023540fdf023ad4321f24c11d439f3ecf9f390b5b72358b24e3",
-    "adapterVersion": "post-frozen-snapshot-v1"
+    "adapterVersion": "post-frozen-file-canonical-snapshot-v2"
   },
   "blockers": [
-    "frozen solver/shape still depend on initial/intermediate FBXs",
-    "approved actual asset split-normal correspondence fails strict gate",
-    "no Converter HTTP adapter/BFF/Client integration",
-    "exact search camera matrices/framing bridge and production static asset coverage unverified",
-    "full preset/extreme-shape/mirror/camera/OS/CSP suite and performance acceptance pending"
+    "initial/intermediate FBX dependency retained",
+    "production-wide static inventory and all 79 preset combinations are not precompiled",
+    "native OS/CSP, production PostgreSQL/distributed deployment and fleet performance are deployment acceptance gates"
   ],
-  "publication": {
-    "status": "blocked-by-automatic-approval-review",
-    "publicRepository": "https://github.com/04JUNG/Standin-server",
-    "head": "codex/interactive-pose-converter-v1",
-    "base": "develop",
-    "draft": true,
-    "payload": "implementation source/tests, design/contract/schema guide, sanitized asset SHA256 IDs and validation metrics; no original/generated asset bytes, runtime/controller files or secrets",
-    "prBody": "artifacts/interactive-preview-20261104/PR_BODY.md",
-    "required": "explicit confirmation of this public destination/payload"
+  "localAcceptance": {
+    "realHttp": true,
+    "independentFbxCorrespondence": {
+      "cases": 13,
+      "maxJointVertexSkinNormalError": 0
+    },
+    "actualRefineAndHands": true,
+    "top5Coverage": {
+      "verified": 5,
+      "requested": 5,
+      "globalLibraryClaim": false
+    },
+    "cachedHand40SamplesP95Ms": 19.6,
+    "gpuCompletionMeasured": true,
+    "paidInferenceCalls": 0,
+    "assetsCommitted": false,
+    "displayPresentationMeasured": false
   }
 }

@@ -76,10 +76,21 @@ def capture(origin=None):
             weights.append(sorted(entries))
         # Preserve FBX custom split normals. Vertex.normal silently discards
         # these and can disagree after an otherwise identical FBX round trip.
+        # Index identical split normals without rounding. A smooth vertex often
+        # repeats its exact normal in six corners; preserve real hard edges
+        # while avoiding six copies in canonical JSON and browser validation.
+        normals = []; normal_indices = {}; loops = []
+        for normal in mesh.corner_normals:
+            value = tuple((normal_matrix @ normal.vector).normalized())
+            index = normal_indices.get(value)
+            if index is None:
+                index = len(normals); normal_indices[value] = index
+                normals.append(list(value))
+            loops.append(index)
         meshes.append(dict(name=f'mesh_{len(meshes):03d}',
             positions=[list(matrix @ v.co) for v in mesh.vertices],
-            normals=[list((normal_matrix @ n.vector).normalized()) for n in mesh.corner_normals],
-            normalTriangles=[list(t.loops) for t in mesh.loop_triangles],
+            normals=normals,
+            normalTriangles=[[loops[i] for i in t.loops] for t in mesh.loop_triangles],
             triangles=[list(t.vertices) for t in mesh.loop_triangles], weights=weights))
     result = dict(schema=MODEL_SCHEMA, coordinates=dict(space='right-handed-y-up-metres-hip-origin',
         originBlender=list(pivot), matrixLayout='row-major', baked='rigged_rest'),

@@ -1,3 +1,5 @@
+> Historical v1 draft. The normal correspondence issue is resolved by the current file-canonical v2 adapter; see `docs/NEXT_SPRINT/INTERACTIVE_REAL_MODEL_V2_2026-11-04.md` and `real-model-v2-correspondence.json`.
+
 Frozen V3.2.5 and shaped conversion currently produce intermediate FBXs before a display state can be prepared. This draft adds an opt-in, separately versioned post-frozen snapshot boundary: existing hand rules solve on a private scene, approved body/shape snapshots can be reused, and an immutable state feeds independent display and final-file consumers. No new HTTP route or feature activation is included.
 
 The initial/intermediate FBX dependency remains. Approved actual male/female shape assets fail strict split-normal correspondence, so this is not ready for integration or rollout. The proposed diagnostic-only normal exception was reverted; the strict gate rejects the actual export and publishes no ready receipt.

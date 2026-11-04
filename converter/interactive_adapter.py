@@ -14,12 +14,12 @@ import os
 from converter.protocol import SOLVER_VERSION, SOLVER_MANIFEST_SHA256
 from converter.solved_state import SolvedPoseState, canonical, decode, digest, validate_identity
 
-VERSION = 'post-frozen-snapshot-v1'
+VERSION = 'post-frozen-file-canonical-snapshot-v2'
 
 
 def runtime_revision():
     root = Path(__file__).parent
-    names = ['interactive_adapter.py', 'interactive_scene.py', 'interactive_export.py',
+    names = ['interactive_camera.py', 'interactive_worker.py', 'interactive_adapter.py', 'interactive_scene.py', 'interactive_export.py',
              'interactive_revision.py', 'interactive_variants.py', 'shared/interactive_pose_v1.mjs',
              'solved_state.py', 'hands.py', 'hand_geometry.py', 'hand_library.py',
              'hand_library.v1.json', 'hand_rig.py', 'framing.py', 'camera.py',
@@ -167,13 +167,26 @@ def solve_from_body(base_directory, identity, destination, *, checkpoint):
         raise ValueError('hand self-collision gate failed')
     checkpoint()
     crop_report = crop_meshes(arm, meshes, identity['scope'])
-    model = capture()
-    state = SolvedPoseState.create(identity, model)
     directory = Path(destination); directory.mkdir(parents=True, exist_ok=False)
+    # FBX normal import uses Blender's packed split-normal representation. A
+    # second export can quantize it differently even with identical geometry.
+    # Freeze the file ONCE, then establish the display authority from its import.
+    # Export readiness still requires an independent fresh-process reimport and
+    # the unchanged full correspondence gate. Never export the snapshot again.
+    from converter import retarget as rt
+    from converter.shape_bake import import_full_character
+    origin = capture()['coordinates']['originBlender']
+    staged = directory/'staged.fbx'
+    rt.export_fbx(str(staged), embed_textures=False, bake_anim=False)
+    checkpoint()
+    rt.reset_scene(); import_full_character(str(staged))
+    model = capture(origin)
+    state = SolvedPoseState.create(identity, model)
     snapshot = directory/'solved.blend'; _save_scene(snapshot)
     atomic_write(directory/'state.canonical.json', state.canonical_bytes)
     manifest = dict(schema='interactive-snapshot-v1', stateHash=state.state_hash,
         runtimeRevision=runtime_revision(), snapshotSha256=digest(snapshot.read_bytes()),
+        stagedFbxSha256=digest(staged.read_bytes()),
         handReportSha256=digest(canonical(hand_report)), cropReportSha256=digest(canonical(crop_report)))
     atomic_write(directory/'snapshot.json', canonical(manifest))
     checkpoint()
@@ -188,9 +201,11 @@ def load_solved(directory):
     state = SolvedPoseState((directory/'state.canonical.json').read_bytes())
     metadata = decode((directory/'snapshot.json').read_bytes())
     snapshot = directory/'solved.blend'
+    staged = directory/'staged.fbx'
     if (metadata['schema'] != 'interactive-snapshot-v1' or metadata['stateHash'] != state.state_hash
             or metadata['runtimeRevision'] != runtime_revision() or snapshot.is_symlink()
             or state.payload['identity']['solver']['runtimeSha256'] != runtime_revision()
+            or not staged.is_file() or staged.is_symlink() or metadata.get('stagedFbxSha256') != digest(staged.read_bytes())
             or metadata['snapshotSha256'] != digest(snapshot.read_bytes())):
         raise ValueError('solved snapshot integrity mismatch')
     return state, snapshot

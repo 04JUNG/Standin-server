@@ -11,6 +11,7 @@ from pathlib import Path
 import subprocess
 import sys
 import time
+import shutil
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -98,7 +99,9 @@ def child(stage, bundle, destination, expected_state_hash):
             raise ValueError('export destination already exists')
         bpy.ops.wm.open_mainfile(filepath=str(snapshot), load_ui=False, use_scripts=False)
         compare(model, capture(origin))
-        rt.export_fbx(str(artifact), embed_textures=False, bake_anim=False)
+        # Exact immutable file which established this packet's display surface.
+        # Re-exporting the .blend would quantize split normals a second time.
+        shutil.copyfile(Path(bundle)/'staged.fbx', artifact)
         # Exporter is a consumer; it must not alter the authoritative state.
         compare(model, capture(origin))
     else:

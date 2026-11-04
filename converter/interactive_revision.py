@@ -26,6 +26,14 @@ class LatestRevisionGate:
         key = (identity['ownerBinding'], identity['selection']['person'])
         revision = identity['selection']['revision']
         signature = digest(canonical(identity))
+        return self.select_binding(key[0], key[1], revision, signature)
+
+    def select_binding(self, owner_binding, person, revision, signature):
+        from converter.solved_state import sha
+        sha(owner_binding, 'owner'); sha(signature, 'selection')
+        if not isinstance(person, str) or not person or type(revision) is not int or revision < 1:
+            raise ValueError('invalid revision binding')
+        key = (owner_binding, person)
         with self._lock:
             prior = self._latest.get(key)
             if prior and (revision < prior[0] or (revision == prior[0] and signature != prior[1])):
@@ -39,6 +47,18 @@ class LatestRevisionGate:
                 if epoch is not self._epoch or self._latest.get(key) != (revision, signature):
                     raise Superseded('selection superseded/cancelled/restarted')
         return checkpoint
+
+    def cancel_revision(self, owner_binding, person, revision):
+        with self._lock:
+            key = (owner_binding, person)
+            prior = self._latest.get(key)
+            if prior and prior[0] == revision:
+                self._latest[key] = (revision, None)
+
+    def forget(self, owner_binding, person):
+        """TTL eviction only; BFF remains the durable revision authority."""
+        with self._lock:
+            self._latest.pop((owner_binding, person), None)
 
     def cancel(self, owner_binding, person):
         with self._lock:

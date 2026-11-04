@@ -206,6 +206,12 @@ class SolvedPoseState:
             raise ValueError('state must not certify final export or full collision safety')
         if payload['dependencies'] != {'initialFbxRequired': True, 'boundary': 'post-frozen-body-pre-final-export-v1'}:
             raise ValueError('unsupported solve boundary')
+        # Cache only immutable scalars. Packet construction must not decode a
+        # multi-megabyte surface merely to read its operation/revision.
+        selection = payload['identity']['selection']
+        object.__setattr__(self, '_operation', selection['operation'])
+        object.__setattr__(self, '_revision', selection['revision'])
+        object.__setattr__(self, '_state_hash', digest(self.canonical_bytes))
 
     @classmethod
     def create(cls, identity, model):
@@ -216,14 +222,13 @@ class SolvedPoseState:
 
     @property
     def state_hash(self):
-        return digest(self.canonical_bytes)
+        return self._state_hash
 
     @property
     def payload(self):
         return decode(self.canonical_bytes)
 
     def packet(self):
-        selection = self.payload['identity']['selection']
-        return {'schema': STATE_SCHEMA, 'operation': selection['operation'], 'revision': selection['revision'],
+        return {'schema': STATE_SCHEMA, 'operation': self._operation, 'revision': self._revision,
                 'stateHash': self.state_hash, 'previewState': 'authoritative', 'exportState': 'not-requested',
                 'canonicalEncoding': 'typed-f64be-json-v1', 'canonicalState': self.canonical_bytes.decode('ascii')}

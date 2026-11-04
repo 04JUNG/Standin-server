@@ -195,7 +195,8 @@ def test_snapshot_hash_tamper_and_state_swap_rejected_on_restart(tmp_path):
     state=SolvedPoseState.create(identity(),model())
     (tmp_path/'state.canonical.json').write_bytes(state.canonical_bytes)
     (tmp_path/'solved.blend').write_bytes(b'local-private-snapshot-fixture')
-    metadata=dict(schema='interactive-snapshot-v1',stateHash=state.state_hash,
+    (tmp_path/'staged.fbx').write_bytes(b'immutable-private-file')
+    metadata=dict(stagedFbxSha256=digest(b'immutable-private-file'),schema='interactive-snapshot-v1',stateHash=state.state_hash,
         runtimeRevision=runtime_revision(),snapshotSha256=digest(b'local-private-snapshot-fixture'))
     (tmp_path/'snapshot.json').write_bytes(canonical(metadata))
     assert load_solved(tmp_path)[0].state_hash==state.state_hash
@@ -220,3 +221,14 @@ def test_cancel_running_export_terminates_child(monkeypatch):
     def cancel():raise exporter.Superseded('new hand revision')
     with pytest.raises(exporter.Superseded):exporter._run_child('fixture-binary',[],cancel,10)
     assert process.terminated
+
+
+def test_old_cancel_cannot_revoke_new_selection():
+    from converter.interactive_revision import LatestRevisionGate
+    from converter.interactive_export import Superseded
+    gate=LatestRevisionGate();first=identity();old=gate.select(first)
+    second=copy.deepcopy(first);second['selection']['revision']=2;current=gate.select(second)
+    gate.cancel_revision(first['ownerBinding'],'p',1);current()
+    with pytest.raises(Superseded):old()
+    gate.cancel_revision(first['ownerBinding'],'p',2)
+    with pytest.raises(Superseded):current()
