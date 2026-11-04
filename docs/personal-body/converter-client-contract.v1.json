@@ -6,7 +6,7 @@
     "importerVersion": "personal-import/3",
     "normalizationVersion": "personal-normalize/5",
     "rigMappingVersion": "personal-rig/2",
-    "converterVersion": "personal-converter/5",
+    "converterVersion": "personal-converter/6",
     "converterFingerprint": "runtime-computed SHA256 of all shipped converter Python and JSON files"
   },
   "transport": {
@@ -388,7 +388,7 @@
         "importerVersion": "personal-import/3",
         "normalizationVersion": "personal-normalize/5",
         "rigMappingVersion": "personal-rig/2",
-        "converterVersion": "personal-converter/5",
+        "converterVersion": "personal-converter/6",
         "converterFingerprint": "runtime-computed SHA256 of all shipped converter Python and JSON files"
       },
       "limits": {
@@ -444,7 +444,7 @@
       "importerVersion": "personal-import/3",
       "normalizationVersion": "personal-normalize/5",
       "rigMappingVersion": "personal-rig/2",
-      "converterVersion": "personal-converter/5",
+      "converterVersion": "personal-converter/6",
       "converterFingerprint": "runtime-computed SHA256 of all shipped converter Python and JSON files"
     },
     "sourceFormat": "fbx | cs3c",

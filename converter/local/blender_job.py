@@ -62,6 +62,8 @@ def run(job):
     # source representation in the cache, but bake the armature object's unit/
     # axis transform into its rest data before solving, just as the server core
     # importer does. Otherwise a 0.01 CS3C object scale becomes 100x pose scale.
+    from converter.local import surface
+    normal_policies = {m.name: surface.normal_policy(m.data) for m in meshes} if surface.within_budget(meshes) else {}
     before_normalization = inspection.surface(meshes)
     rt._apply_object_transform(arm)
     normalization_error = inspection.surface_error(before_normalization, inspection.surface(meshes))
@@ -77,12 +79,13 @@ def run(job):
     inspection.require(edge_error < 2e-5, "CONVERSION_FAILED", "Retarget changed the character's joint lengths")
     bpy.data.objects.remove(src, do_unlink=True)
     rt.apply_output_mode(arm, meshes, "rigged_rest")
+    surface_correction = surface.apply_to_meshes(meshes, before_normalization, normal_policies)
     from converter.local.camera import apply_camera
     camera_validation = apply_camera(arm, meshes, job["snapshot"]["camera"])
     validation = inspection.roundtrip(arm, meshes, work / "result.fbx", character["mapping"], job["materialExpectations"])
     return {"snapshot": job["snapshot"], "snapshotHash": job["snapshotHash"],
             "artifactHash": sha256(work / "result.fbx"), "validation": validation,
-            "retarget": {**report.as_dict(), "local_normalization_surface_error": normalization_error,
+            "retarget": {**report.as_dict(), "surfaceCorrection": surface_correction, "local_normalization_surface_error": normalization_error,
                          "max_joint_edge_length_error": edge_error, "camera": camera_validation}, "selectionId": job["selectionId"]}
 
 
