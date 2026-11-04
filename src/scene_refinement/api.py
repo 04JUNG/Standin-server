@@ -73,16 +73,35 @@ def create_app(engine=None, token="", *, factory=None):
             status_code=200 if ok else 503,
         )
 
+    @app.get("/parts/capabilities")
+    async def parts_capabilities(request: Request):
+        if not authorized(request):
+            raise HTTPException(401, "unauthorized")
+        target = state["engine"]
+        if state["phase"] != "ready" or not hasattr(target, "parts_capabilities"):
+            raise HTTPException(503, {"code": "PARTS_UNAVAILABLE"})
+        return target.parts_capabilities()
+
+    def authorized(request):
+        return hmac.compare_digest(request.headers.get("authorization", "").encode("utf-8"),
+                                   ("Bearer " + token).encode("utf-8"))
+
+    @app.post("/parts/refine")
+    async def parts(request: Request):
+        return await dispatch("parts", request)
+
     @app.post("/scene/{stage}")
     async def scene(stage: str, request: Request):
-        nonlocal busy
-        if not hmac.compare_digest(
-            request.headers.get("authorization", "").encode("utf-8"),
-            ("Bearer " + token).encode("utf-8"),
-        ):
-            raise HTTPException(401, "unauthorized")
         if stage not in ("plan", "build"):
+            if not authorized(request):
+                raise HTTPException(401, "unauthorized")
             raise HTTPException(404)
+        return await dispatch(stage, request)
+
+    async def dispatch(stage: str, request: Request):
+        nonlocal busy
+        if not authorized(request):
+            raise HTTPException(401, "unauthorized")
         if state["phase"] != "ready":
             raise HTTPException(503, {"code": "SCENE_WORKER_NOT_READY"})
         # No await between admission check and reservation, including body reads.
@@ -101,9 +120,15 @@ def create_app(engine=None, token="", *, factory=None):
             if not isinstance(payload, dict):
                 raise ValueError("object required")
             target = state["engine"]
+            if stage == "parts":
+                method = getattr(target, "refine_parts", None)
+                if method is None:
+                    raise HTTPException(503, {"code": "PARTS_UNAVAILABLE"})
+            else:
+                method = target.prepare if stage == "plan" else target.build
             task = asyncio.create_task(
                 asyncio.to_thread(
-                    target.prepare if stage == "plan" else target.build, payload
+                    method, payload
                 )
             )
             try:
@@ -118,8 +143,11 @@ def create_app(engine=None, token="", *, factory=None):
                 raise
         except (TimeoutError, subprocess.TimeoutExpired):
             raise HTTPException(504, {"code": "SCENE_WORKER_TIMEOUT"}) from None
-        except (ValueError, KeyError, TypeError, AssertionError):
-            raise HTTPException(422, {"code": "SCENE_EVIDENCE_REJECTED"}) from None
+        except (ValueError, KeyError, TypeError, AssertionError) as exc:
+            from src.refine_v4.service import PartsError
+            if isinstance(exc, PartsError):
+                raise HTTPException(exc.status, {"code": exc.code}) from None
+            raise HTTPException(422, {"code": "PARTS_INVALID_INPUT" if stage == "parts" else "SCENE_EVIDENCE_REJECTED"}) from None
         except HTTPException:
             raise
         except Exception as exc:

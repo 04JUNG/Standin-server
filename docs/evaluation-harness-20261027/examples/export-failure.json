@@ -1,0 +1,114 @@
+{
+  "schema": "evaluation-extension-v1",
+  "evaluation_kind": "final_fbx",
+  "decision": "FAIL",
+  "seal_sha256": "5af94676bd5e5d8a04f913904869e70e10d8770643995bc6fb5e4af8e6627f0f",
+  "mandatory_dimensions": [
+    "integrity",
+    "structure",
+    "mesh",
+    "human_usability",
+    "native_save",
+    "time"
+  ],
+  "totals": {
+    "denominator": 2,
+    "pass": 0,
+    "fail": 1,
+    "unknown": 1
+  },
+  "dimensions": {
+    "integrity": {
+      "denominator": 2,
+      "fail": 1,
+      "unknown": 1
+    },
+    "structure": {
+      "denominator": 2,
+      "pass": 1,
+      "unknown": 1
+    },
+    "mesh": {
+      "denominator": 2,
+      "pass": 1,
+      "unknown": 1
+    },
+    "scene_interaction": {
+      "denominator": 2,
+      "unknown": 2
+    },
+    "human_usability": {
+      "denominator": 2,
+      "pass": 1,
+      "unknown": 1
+    },
+    "native_save": {
+      "denominator": 2,
+      "pass": 1,
+      "unknown": 1
+    },
+    "time": {
+      "denominator": 2,
+      "pass": 1,
+      "unknown": 1
+    }
+  },
+  "tasks": [
+    {
+      "task_id": "task-1",
+      "unit_id": "unit-1",
+      "state": "fail",
+      "dimensions": {
+        "integrity": "fail",
+        "structure": "pass",
+        "mesh": "pass",
+        "scene_interaction": "unknown",
+        "human_usability": "pass",
+        "native_save": "pass",
+        "time": "pass"
+      },
+      "reasons": [
+        "delivery_bytes_mismatch:native_save",
+        "final_artifact_task_mismatch",
+        "offline_or_unmeasured_cannot_certify_product",
+        "scene_interaction_not_applicable"
+      ],
+      "execution_kind": "fixture"
+    },
+    {
+      "task_id": "not-executed",
+      "unit_id": "unit-1",
+      "state": "unknown",
+      "dimensions": {
+        "integrity": "unknown",
+        "structure": "unknown",
+        "mesh": "unknown",
+        "scene_interaction": "unknown",
+        "human_usability": "unknown",
+        "native_save": "unknown",
+        "time": "unknown"
+      },
+      "reasons": [
+        "offline_or_unmeasured_cannot_certify_product",
+        "runtime_binding_mismatch_or_missing:asset_sha256",
+        "runtime_binding_mismatch_or_missing:blender_build",
+        "runtime_binding_mismatch_or_missing:bone_map_sha256",
+        "runtime_binding_mismatch_or_missing:controller_sha256",
+        "runtime_binding_mismatch_or_missing:converter_sha256",
+        "runtime_binding_mismatch_or_missing:db_sha256",
+        "runtime_binding_mismatch_or_missing:hand_library_sha256",
+        "runtime_binding_mismatch_or_missing:model_sha256",
+        "scene_interaction_not_applicable"
+      ],
+      "execution_kind": "not_executed"
+    }
+  ],
+  "coverage_gaps": [
+    "insufficient_distinct_reviewers"
+  ],
+  "distinct_reviewers": 1,
+  "confirmed_independent_groups": 1,
+  "certification_scope": "preregistered_finite_tasks_only",
+  "release_certification": false,
+  "operational_deployment": false
+}

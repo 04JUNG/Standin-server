@@ -1,0 +1,545 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Standin v3.2 scope-aware interval review input (no numeric scores)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "case_id",
+    "rubric_id",
+    "run_id",
+    "result_status",
+    "expected_people",
+    "returned_people",
+    "people",
+    "execution_error",
+    "rubric_version",
+    "evaluation_scope",
+    "review_status"
+  ],
+  "properties": {
+    "case_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "rubric_id": {
+      "const": "standin-deduction-head5-action35-scope-interval"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "result_status": {
+      "enum": [
+        "returned_all",
+        "returned_partial",
+        "returned_none",
+        "execution_error",
+        "missing_artifacts"
+      ]
+    },
+    "expected_people": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "returned_people": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "execution_error": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "people": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reference_person_id",
+          "chosen_rank",
+          "candidate_id",
+          "final_image",
+          "final_image_sha256",
+          "refine_status",
+          "reviewer",
+          "criteria"
+        ],
+        "properties": {
+          "reference_person_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "chosen_rank": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "candidate_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "final_image": {
+            "type": "string",
+            "minLength": 1
+          },
+          "final_image_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "refine_status": {
+            "enum": [
+              "returned",
+              "not_allowed",
+              "not_requested",
+              "timeout",
+              "failed"
+            ]
+          },
+          "reviewer": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "criteria": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "right_arm",
+              "left_arm",
+              "right_leg",
+              "left_leg",
+              "torso",
+              "head",
+              "action"
+            ],
+            "properties": {
+              "right_arm": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "status",
+                  "reason"
+                ],
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "match",
+                      "mismatch",
+                      "unobservable",
+                      "uncertain",
+                      "not_run",
+                      "not_applicable"
+                    ]
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  }
+                }
+              },
+              "left_arm": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "status",
+                  "reason"
+                ],
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "match",
+                      "mismatch",
+                      "unobservable",
+                      "uncertain",
+                      "not_run",
+                      "not_applicable"
+                    ]
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  }
+                }
+              },
+              "right_leg": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "status",
+                  "reason"
+                ],
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "match",
+                      "mismatch",
+                      "unobservable",
+                      "uncertain",
+                      "not_run",
+                      "not_applicable"
+                    ]
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  }
+                }
+              },
+              "left_leg": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "status",
+                  "reason"
+                ],
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "match",
+                      "mismatch",
+                      "unobservable",
+                      "uncertain",
+                      "not_run",
+                      "not_applicable"
+                    ]
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  }
+                }
+              },
+              "torso": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "status",
+                  "reason"
+                ],
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "match",
+                      "mismatch",
+                      "unobservable",
+                      "uncertain",
+                      "not_run",
+                      "not_applicable"
+                    ]
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  }
+                }
+              },
+              "head": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "status",
+                  "reason"
+                ],
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "match",
+                      "mismatch",
+                      "unobservable",
+                      "uncertain",
+                      "not_run",
+                      "not_applicable"
+                    ]
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  }
+                }
+              },
+              "action": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "status",
+                  "reason"
+                ],
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "match",
+                      "mismatch",
+                      "unobservable",
+                      "uncertain",
+                      "not_run",
+                      "not_applicable"
+                    ]
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "rubric_version": {
+      "const": "3.2"
+    },
+    "evaluation_scope": {
+      "enum": [
+        "full_body",
+        "upper_body"
+      ]
+    },
+    "review_status": {
+      "const": "ai_assisted_unreviewed"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "evaluation_scope": {
+            "const": "upper_body"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "people": {
+            "items": {
+              "properties": {
+                "criteria": {
+                  "properties": {
+                    "right_arm": {
+                      "properties": {
+                        "status": {
+                          "enum": [
+                            "match",
+                            "mismatch",
+                            "uncertain",
+                            "unobservable",
+                            "not_run"
+                          ]
+                        }
+                      }
+                    },
+                    "left_arm": {
+                      "properties": {
+                        "status": {
+                          "enum": [
+                            "match",
+                            "mismatch",
+                            "uncertain",
+                            "unobservable",
+                            "not_run"
+                          ]
+                        }
+                      }
+                    },
+                    "right_leg": {
+                      "properties": {
+                        "status": {
+                          "enum": [
+                            "not_applicable"
+                          ]
+                        }
+                      }
+                    },
+                    "left_leg": {
+                      "properties": {
+                        "status": {
+                          "enum": [
+                            "not_applicable"
+                          ]
+                        }
+                      }
+                    },
+                    "torso": {
+                      "properties": {
+                        "status": {
+                          "enum": [
+                            "match",
+                            "mismatch",
+                            "uncertain",
+                            "unobservable",
+                            "not_run"
+                          ]
+                        }
+                      }
+                    },
+                    "head": {
+                      "properties": {
+                        "status": {
+                          "enum": [
+                            "match",
+                            "mismatch",
+                            "uncertain",
+                            "unobservable",
+                            "not_run"
+                          ]
+                        }
+                      }
+                    },
+                    "action": {
+                      "properties": {
+                        "status": {
+                          "enum": [
+                            "not_applicable"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "people": {
+            "items": {
+              "properties": {
+                "criteria": {
+                  "properties": {
+                    "right_arm": {
+                      "properties": {
+                        "status": {
+                          "enum": [
+                            "match",
+                            "mismatch",
+                            "uncertain",
+                            "unobservable",
+                            "not_run"
+                          ]
+                        }
+                      }
+                    },
+                    "left_arm": {
+                      "properties": {
+                        "status": {
+                          "enum": [
+                            "match",
+                            "mismatch",
+                            "uncertain",
+                            "unobservable",
+                            "not_run"
+                          ]
+                        }
+                      }
+                    },
+                    "right_leg": {
+                      "properties": {
+                        "status": {
+                          "enum": [
+                            "match",
+                            "mismatch",
+                            "uncertain",
+                            "unobservable",
+                            "not_run"
+                          ]
+                        }
+                      }
+                    },
+                    "left_leg": {
+                      "properties": {
+                        "status": {
+                          "enum": [
+                            "match",
+                            "mismatch",
+                            "uncertain",
+                            "unobservable",
+                            "not_run"
+                          ]
+                        }
+                      }
+                    },
+                    "torso": {
+                      "properties": {
+                        "status": {
+                          "enum": [
+                            "match",
+                            "mismatch",
+                            "uncertain",
+                            "unobservable",
+                            "not_run"
+                          ]
+                        }
+                      }
+                    },
+                    "head": {
+                      "properties": {
+                        "status": {
+                          "enum": [
+                            "match",
+                            "mismatch",
+                            "uncertain",
+                            "unobservable",
+                            "not_run"
+                          ]
+                        }
+                      }
+                    },
+                    "action": {
+                      "properties": {
+                        "status": {
+                          "enum": [
+                            "match",
+                            "mismatch",
+                            "uncertain",
+                            "unobservable",
+                            "not_run"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "result_status": {
+            "const": "execution_error"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "execution_error": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "execution_error": {
+            "type": "null"
+          }
+        }
+      }
+    }
+  ]
+}

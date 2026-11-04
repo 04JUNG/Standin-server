@@ -124,7 +124,7 @@ def test_default_is_original_session_and_factory_can_opt_in(tmp_path,monkeypatch
     assert type(configured.session()) is ParallelSkinSession
 
 
-@pytest.mark.parametrize('concurrency',[0,3,-1,True,1.5,'2'])
+@pytest.mark.parametrize('concurrency',[0,6,-1,True,1.5,'2'])
 def test_invalid_concurrency_is_rejected(tmp_path,concurrency):
     with pytest.raises(ValueError):HandSkinGate(Checker(),tmp_path,{},concurrency=concurrency)
 

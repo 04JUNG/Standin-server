@@ -27,6 +27,11 @@ contract is unchanged; see `src/scene_refinement/README.md`.
 
 ## Release assets and actual remaining blocker
 
+**Status update 2026-10-29:** the candidate-only inventory below is historical.
+PR #146 records `scene-v4-20261029-staging-002` full-release upload and Linux
+startup verification. See [the current transport/status boundary](scene-camera-transport-v1.md).
+Do not interpret that record as proof of a running AWS service or CSP acceptance.
+
 The locally tested HumanArt bundle is `candidate`, its `license_review` is
 `pending`, and its calibration profile hash is not pinned. It remains experimental.
 **It cannot pass this staging preflight.** Do not relabel it to make startup pass.
@@ -179,6 +184,11 @@ use the same worker concurrency group and preflight checks.
 `deploy_staging=false` uploads only the
 commit-tagged image. `true` requires the ECS target and updates only that service,
 then waits for ECS health/stability. It preserves task environment/secrets/mounts.
+The repository must use fully immutable tags. A retry of the same commit reuses
+its existing ECR image instead of overwriting the tag; only ImageNotFound allows
+a first build. Permission/network/repository errors stop the workflow. Both new
+and reused images are pulled by their resolved digest and dependency-checked,
+and ECS receives that digest rather than a movable tag.
 There is no automatic production deployment. Rollback uses the previously approved
 task/image and matching immutable release; outstanding plans must be recreated.
 Do not run deploy before the asset/infra checklist above is complete.
@@ -261,3 +271,20 @@ Do not scale or declare user readiness based on health alone.
 The paused runtime changes are now based on develop7a3713f and preserve its
 artifact-first engine/final-preview contract. Busy retains the legacy detail
 string required by BFF PR130. See [the pinned comparison and test evidence](scene-worker-compatibility-2026-10-24.md).
+
+## 2026-10-29 asset review policy
+
+A release catalog must declare `proposal_policy: "reviewed-only-v1"`. Every pose
+keeps its original `pose_id`/BVH identity for baseline lookup, with an explicit
+boolean `proposal_eligible` and the original `source_review_status`. Only
+`ai_visual_reviewed` rows may be eligible. Flagged/generated rows remain readable
+as a user's selected baseline but cannot replace that selection automatically.
+The existing quarantine still applies. If no reviewed replacement is available,
+the original selection is preserved. This is a technical source-review policy;
+it does not relabel automated source reviews as human quality acceptance.
+
+Head calibration must bind the exact character SHA and contain finite unit,
+orthogonal head axes. Changing the rig requires new calibration/review. The
+staging bundle initially supports the registered male-base-v0-7-2 body only;
+other/custom bodies must not be silently substituted. Full offline model startup
+and a fresh paid plan/build/download remain separate from component checks.

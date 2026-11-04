@@ -267,7 +267,7 @@ class PoseDescription:
 
 @dataclass
 class DescribeOutcome:
-    """인물별 설명 호출 결과. status: ok | error | not_requested."""
+    """인물별 설명 호출 결과. status: ok | partial_error | error | not_requested."""
 
     status: str
     descriptions: dict = field(default_factory=dict)   # 요청 인덱스 → PoseDescription
@@ -277,6 +277,8 @@ class DescribeOutcome:
     elapsed_ms: float = 0.0
     provider: Optional[str] = None
     attempts: int = 1
+    person_errors: dict = field(default_factory=dict)
+    person_reports: dict = field(default_factory=dict)
 
 
 @dataclass

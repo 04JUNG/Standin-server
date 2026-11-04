@@ -67,3 +67,6 @@ Thumbs.db
 .vscode/
 .idea/
 *.pem
+
+# Private fixed-set staging reports and model outputs
+/out/staging-evaluation*/
