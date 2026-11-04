@@ -325,7 +325,7 @@ def create_app(
 
     app = FastAPI(
         title="Standin Internal Converter",
-        version="1.3.0",
+        version="1.4.0",
         description=(
             "Internal BVH to FBX conversion service "
             "(BFF export bundles, inference refine thumbnails)"
@@ -340,6 +340,9 @@ def create_app(
 
     from converter_api.scene_routes import register_scene_routes
     register_scene_routes(app, blender_runner)
+
+    from converter_api.interactive import register_interactive
+    register_interactive(app, character_registry, blender_runner)
 
     from converter_api.preview_models import PreviewModelStore
     from converter.preview_model import MODEL_VERSION
