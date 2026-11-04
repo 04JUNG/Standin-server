@@ -3,7 +3,7 @@ import unittest
 
 import numpy as np
 
-from converter.local.surface import correct
+from converter.local.surface import Neighborhood, correct
 
 
 class PersonalSurfaceTests(unittest.TestCase):
@@ -49,8 +49,62 @@ class PersonalSurfaceTests(unittest.TestCase):
         np.testing.assert_allclose(fixed[:len(small)], small)
         np.testing.assert_array_equal(fixed[len(small):], large)
 
+    def test_one_degenerate_reference_face_does_not_disable_the_body(self):
+        faces = np.vstack((self.faces, [0, 0, 1]))
+        fixed, report = correct(self.rest, self.posed, faces)
+        self.assertTrue(report["applied"])
+        np.testing.assert_array_equal(fixed[[0, 1]], self.posed[[0, 1]])
+        self.assertLess(fixed[171, 2], self.posed[171, 2])
+
+    def test_hundreds_of_static_islands_do_not_hide_deformed_skin(self):
+        props = np.array([[[i+30, 0, 0], [i+30.4, 0, 0], [i+30, .4, 0]]
+                          for i in range(300)]).reshape(-1, 3)
+        faces = np.vstack((self.faces, np.arange(len(props)).reshape(-1, 3)+len(self.rest)))
+        fixed, report = correct(np.vstack((self.rest, props)), np.vstack((self.posed, props)), faces)
+        self.assertTrue(report["applied"])
+        np.testing.assert_array_equal(fixed[len(self.rest):], props)
+        np.testing.assert_allclose(fixed[:len(self.rest)], correct(self.rest, self.posed, self.faces)[0])
+
+    def test_diffusion_radius_survives_grid_refinement(self):
+        # Sample the same physical ripple on two independently triangulated meshes.
+        amplitudes = []
+        for n in (33, 65):
+            axis = np.linspace(-1., 1., n)
+            x, y = np.meshgrid(axis, axis)
+            rest = np.column_stack((x.ravel(), y.ravel(), np.zeros(n*n)))
+            field = (np.exp(-12*(x*x+y*y))*np.cos(16*x)*np.cos(16*y)).reshape(-1, 1)
+            ids = np.arange(n*n).reshape(n, n)[:-1, :-1].ravel()
+            faces = np.vstack((np.column_stack((ids, ids+1, ids+n+1)),
+                               np.column_stack((ids, ids+n+1, ids+n))))
+            amplitudes.append(Neighborhood(faces, rest).diffuse(field, .15)[n*n//2, 0])
+        self.assertLess(abs(amplitudes[0] / amplitudes[1] - 1), .08)
+        self.assertTrue(all(.1 < value < .25 for value in amplitudes))
+
 
 class SurfaceShadingTests(unittest.TestCase):
+    def test_registered_quad_and_authored_sharp_edge_anchors(self):
+        try:
+            import bpy
+        except ImportError:
+            self.skipTest("Requires Blender")
+        from converter.local.surface import prepare_reference
+
+        mesh = bpy.data.meshes.new("arbitrary-quad-grid")
+        try:
+            points = [(i,j,0.) for i in range(4) for j in range(4)]
+            faces = [(k,k+1,k+5,k+4) for k in range(12) if k%4 < 3]
+            mesh.from_pydata(points, [], faces)
+            sharp = mesh.attributes.new("sharp_edge", "BOOLEAN", "EDGE")
+            marked = next(e for e in mesh.edges if set(e.vertices) == {5,6})
+            sharp.data[marked.index].value = True
+            mesh.update()
+            reference = prepare_reference(mesh)
+            self.assertEqual(len(reference.triangles), 18)
+            self.assertTrue(reference.anchors[[0,5,6]].all())
+            self.assertFalse(reference.anchors[9])
+        finally:
+            bpy.data.meshes.remove(mesh)
+
     def test_authored_corner_and_geometric_corner(self):
         try:
             import bpy
