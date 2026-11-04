@@ -1,7 +1,7 @@
 {
   "schema": "body-default-proportions-public-validation.v1",
   "baseCommit": "592ab0f059089e64a5c88a3ad607539124e8e6c6",
-  "status": "local_validation_complete_visual_approval_pending",
+  "status": "model_approved_for_develop_integration_no_deployment",
   "activationAllowed": false,
   "models": [
     {
@@ -225,5 +225,13 @@
       },
       "models": "confirmed m072/f034; latest m076/f039 remain staging review sources"
     }
+  },
+  "approval": {
+    "date": "2026-11-04",
+    "modelAppearance": true,
+    "appIntegrationRequested": true,
+    "developMerge": true,
+    "stagingDeployment": false,
+    "productionDeployment": false
   }
 }

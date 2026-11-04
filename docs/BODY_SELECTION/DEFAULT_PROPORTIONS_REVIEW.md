@@ -5,6 +5,14 @@ It does not activate a product default, alter a live catalog, merge another
 session, deploy, publish model binaries, or change the frozen Converter solver.
 The implementation uses the existing data-only `shape-bake.v2` contract.
 
+On 2026-11-04 the user approved the two model appearances and requested app
+integration through `develop` only. This supersedes the earlier model-approval
+pending state below, without authorizing staging/production deployment or asset
+publication. Companion app changes are BFF PR #155 and client PR #175.
+Use a squash merge message containing `[skip deploy]` for server/BFF: the
+deployment job alone honors that marker, while normal develop CI still runs.
+Repository-wide automatic deployment settings remain unchanged.
+
 ## Which default is being preserved
 
 Fresh `origin/develop` was `592ab0f059089e64a5c88a3ad607539124e8e6c6`.
@@ -129,7 +137,8 @@ review file, not a deployment instruction. Explicit selection, personal cards,
 last-used state, auto recommendations and historical snapshots keep their
 original identity and controls. The model work does not change those policies.
 
-New rows inherit the latest CSP BASE `supportedPoseIds=[]`. They must not
+New rows inherit the latest CSP BASE coverage for `Finding_01` and
+`rokoko_Lawyer_02_mixamo_00008`. They must not
 silently grant ordinary body-selection fallback eligibility or rewrite search
 recommendations. The app session owns first-use/editor default wiring; general
 pose eligibility remains a separate existing contract.
@@ -145,8 +154,9 @@ not reusing old SHA-labelled media. Search features/ranking/indexes are unchange
 
 Before any later activation, assemble an immutable additive package containing
 all existing files plus the two FBXs, full registries/catalog, new neutral PNGs,
-source copies and the exact referenced runtimes. User model appearance and
-integrated UI approval remain pending. CSP native import/locks and combining
+source copies and the exact referenced runtimes. Model appearance is approved
+for develop integration; deployment and native application acceptance remain
+separate. CSP native import/locks and combining
 breast7 are outside this change and are not claimed verified.
 
 ## Local reproduction and review
