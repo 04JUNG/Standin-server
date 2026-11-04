@@ -1,0 +1,241 @@
+{
+  "schema": "real-model-correspondence-v2",
+  "adapterVersion": "post-frozen-file-canonical-snapshot-v2",
+  "runtimeSha256": "d35d8c8c2d7888c437e53791c8dd5ba58c8bd65a597c016eb26e6236c3369eff",
+  "cases": [
+    {
+      "profile": "male",
+      "scope": "bust",
+      "stateHash": "2805c988dcc0ca216eca5d6f77d7dcd98be587e5b7ba6c52d44da0ef8b7df528",
+      "correspondence": {
+        "jointIdentity": true,
+        "matrixTolerance": 1e-05,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "positionToleranceM": 0.0001,
+        "skinIdentity": true,
+        "topology": true,
+        "weightTolerance": 1e-06
+      },
+      "verifyMs": 3164.970459009055
+    },
+    {
+      "profile": "male",
+      "scope": "full",
+      "stateHash": "f327c4cd8fd037ef3c30405bbd4ccacdf986c6ab47b097b290f04a5e5633d759",
+      "correspondence": {
+        "jointIdentity": true,
+        "matrixTolerance": 1e-05,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "positionToleranceM": 0.0001,
+        "skinIdentity": true,
+        "topology": true,
+        "weightTolerance": 1e-06
+      },
+      "verifyMs": 11005.110083991894
+    },
+    {
+      "profile": "male",
+      "scope": "half",
+      "stateHash": "a3529cd21d447cb455f23ae81f5341de2b75d778c5334c3a058fbcd3cb51cc76",
+      "correspondence": {
+        "jointIdentity": true,
+        "matrixTolerance": 1e-05,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "positionToleranceM": 0.0001,
+        "skinIdentity": true,
+        "topology": true,
+        "weightTolerance": 1e-06
+      },
+      "verifyMs": 7009.855708020041
+    },
+    {
+      "profile": "male",
+      "scope": "head",
+      "stateHash": "26b076b9aae7b000c317c77f881262f7aea8a803b97ec4624b7f74a7b20c8433",
+      "correspondence": {
+        "jointIdentity": true,
+        "matrixTolerance": 1e-05,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "positionToleranceM": 0.0001,
+        "skinIdentity": true,
+        "topology": true,
+        "weightTolerance": 1e-06
+      },
+      "verifyMs": 2187.828082998749
+    },
+    {
+      "profile": "male",
+      "scope": "shoulder_head",
+      "stateHash": "39b0e7c3798b0cedaaa6ed09939189f629e3feada83b5a4228e8bff976dbfda5",
+      "correspondence": {
+        "jointIdentity": true,
+        "matrixTolerance": 1e-05,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "positionToleranceM": 0.0001,
+        "skinIdentity": true,
+        "topology": true,
+        "weightTolerance": 1e-06
+      },
+      "verifyMs": 2780.2361250214744
+    },
+    {
+      "profile": "female",
+      "scope": "bust",
+      "stateHash": "9b0af083e8f0d31ecf338bc58333dd195f7f1d8e733ad4ffca050cad4bf348d0",
+      "correspondence": {
+        "jointIdentity": true,
+        "matrixTolerance": 1e-05,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "positionToleranceM": 0.0001,
+        "skinIdentity": true,
+        "topology": true,
+        "weightTolerance": 1e-06
+      },
+      "verifyMs": 3022.220874991035
+    },
+    {
+      "profile": "female",
+      "scope": "full",
+      "stateHash": "039445ed393fc9f189db2d65f348a6da7d5410a9aa6a3f7e452dd2a8098c2076",
+      "correspondence": {
+        "jointIdentity": true,
+        "matrixTolerance": 1e-05,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "positionToleranceM": 0.0001,
+        "skinIdentity": true,
+        "topology": true,
+        "weightTolerance": 1e-06
+      },
+      "verifyMs": 17816.714832995785
+    },
+    {
+      "profile": "female",
+      "scope": "half",
+      "stateHash": "c0fdd8d48035f2802e2d3f219cecde1393fd2222b6062bf56c1ce634463987f2",
+      "correspondence": {
+        "jointIdentity": true,
+        "matrixTolerance": 1e-05,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "positionToleranceM": 0.0001,
+        "skinIdentity": true,
+        "topology": true,
+        "weightTolerance": 1e-06
+      },
+      "verifyMs": 7547.341833997052
+    },
+    {
+      "profile": "female",
+      "scope": "head",
+      "stateHash": "f3aa1b02545f3b09919acf75c4bc4e951b635bf9c3e01f6153ddce4c1f76053b",
+      "correspondence": {
+        "jointIdentity": true,
+        "matrixTolerance": 1e-05,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "positionToleranceM": 0.0001,
+        "skinIdentity": true,
+        "topology": true,
+        "weightTolerance": 1e-06
+      },
+      "verifyMs": 2102.9003750008997
+    },
+    {
+      "profile": "female",
+      "scope": "shoulder_head",
+      "stateHash": "357fe5a40c412a07eef61b0835a3f6fd5fa4ab5744bddf5737fdd079c2de86a8",
+      "correspondence": {
+        "jointIdentity": true,
+        "matrixTolerance": 1e-05,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "positionToleranceM": 0.0001,
+        "skinIdentity": true,
+        "topology": true,
+        "weightTolerance": 1e-06
+      },
+      "verifyMs": 2663.637292018393
+    },
+    {
+      "profile": "female-fat",
+      "scope": "full",
+      "stateHash": "15b51779e7d59e22bfc88536518edba3b35d0bb9435a320daceba8ddcfc6fa1c",
+      "correspondence": {
+        "jointIdentity": true,
+        "matrixTolerance": 1e-05,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "positionToleranceM": 0.0001,
+        "skinIdentity": true,
+        "topology": true,
+        "weightTolerance": 1e-06
+      },
+      "verifyMs": 11684.906082984526
+    },
+    {
+      "profile": "female-muscle",
+      "scope": "full",
+      "stateHash": "eaa4b0c0cccafc51d01240338393a445dfc8971420520d774d148bb5b233286b",
+      "correspondence": {
+        "jointIdentity": true,
+        "matrixTolerance": 1e-05,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "positionToleranceM": 0.0001,
+        "skinIdentity": true,
+        "topology": true,
+        "weightTolerance": 1e-06
+      },
+      "verifyMs": 10334.078874991974
+    },
+    {
+      "profile": "male-mirror",
+      "scope": "full",
+      "stateHash": "73c8b9d9b8421f0823ca2d03016930ab7c4aed7ed4d7d5792a77233c5ec2f79f",
+      "correspondence": {
+        "jointIdentity": true,
+        "matrixTolerance": 1e-05,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "positionToleranceM": 0.0001,
+        "skinIdentity": true,
+        "topology": true,
+        "weightTolerance": 1e-06
+      },
+      "verifyMs": 10158.635666011833
+    }
+  ]
+}

@@ -1,0 +1,1321 @@
+{
+  "schema": "local-preview-inventory-v1",
+  "searchRoots": "local artifact/data trees only; no remote store access",
+  "modelRevision": "727991b64272ac05b8d7b66826f9362bd67b5947fcae7db140ee0a9f7af093de",
+  "files": 131,
+  "currentStaticCandidateCount": 0,
+  "top5CoverageProven": false,
+  "reason": "No library pose/source/registered-body manifest coverage has been cross-verified; isolated review GLBs are not a Top-5 coverage proof",
+  "assets": [
+    {
+      "localAssetId": "sha256:6699febc9a0bbac5bc33f9d1ab538caf03b6589708f7edde791c1e28d2c13cdd",
+      "bytes": 1201400,
+      "modelVersion": "framed-mesh-v1",
+      "scope": "full",
+      "revisionMatches": false,
+      "skinCount": 0,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:2f365ff66d3498c50905b3c876a4b21a319b080db575872695021412f29839d3",
+      "bytes": 1201400,
+      "modelVersion": "framed-mesh-v1",
+      "scope": "full",
+      "revisionMatches": false,
+      "skinCount": 0,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:5f82984c5868e1d9729e4c9350abaf5b577aa9c43caf96e806fd5739b6dd9ef5",
+      "bytes": 1201248,
+      "modelVersion": "framed-mesh-v1",
+      "scope": "full",
+      "revisionMatches": false,
+      "skinCount": 0,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:de2228c7da7b7079fc2792d3edeb45e929d9133530e8d99097a0a3def2d5694a",
+      "bytes": 1201464,
+      "modelVersion": "framed-mesh-v1",
+      "scope": "full",
+      "revisionMatches": false,
+      "skinCount": 0,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:844b8e636a81687b28207b5fff1f31618cf1736ea4508d3d8b62cea681d28496",
+      "bytes": 1201248,
+      "modelVersion": "framed-mesh-v1",
+      "scope": "full",
+      "revisionMatches": false,
+      "skinCount": 0,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:444fac28f60c63d57ce353a4be7a5db3b2883a98c869cc3b93749f5ea14a46e4",
+      "bytes": 2418184,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:2f5799d434cc944e8c5743175708fdf908eece74bff840962a0d584ffe745543",
+      "bytes": 1201192,
+      "modelVersion": "framed-mesh-v1",
+      "scope": "full",
+      "revisionMatches": false,
+      "skinCount": 0,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:7cad44651aa0c295e044372588e763d3b9222ce581c4df6b6a3efab772252a05",
+      "bytes": 1201400,
+      "modelVersion": "framed-mesh-v1",
+      "scope": "full",
+      "revisionMatches": false,
+      "skinCount": 0,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:3d458f075ae5aef4fcee00988f87e90b118eaeadd8aa953fd25c6c18b391aa23",
+      "bytes": 1201252,
+      "modelVersion": "framed-mesh-v1",
+      "scope": "full",
+      "revisionMatches": false,
+      "skinCount": 0,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:03566c62dcd3eaa19075172c240d6573f669a46f003e023938bb3a84f32b2196",
+      "bytes": 1201400,
+      "modelVersion": "framed-mesh-v1",
+      "scope": "full",
+      "revisionMatches": false,
+      "skinCount": 0,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:c1203502b73268e6087019cdbe7b94a177045fa19ee323fa6558e00e63d79124",
+      "bytes": 1201408,
+      "modelVersion": "framed-mesh-v1",
+      "scope": "full",
+      "revisionMatches": false,
+      "skinCount": 0,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:ffffc18d8060eff0ca06de9a3623d3bd85a0c5dd416b8b5602aed24513b25968",
+      "bytes": 1201404,
+      "modelVersion": "framed-mesh-v1",
+      "scope": "full",
+      "revisionMatches": false,
+      "skinCount": 0,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:0602a094f7ed31ccad7b0453e4176ec16a98a2bd5cf67f0ab881b56d6c27954b",
+      "bytes": 1201248,
+      "modelVersion": "framed-mesh-v1",
+      "scope": "full",
+      "revisionMatches": false,
+      "skinCount": 0,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:54f27059b4325f88127f7ee862867efbba070bad67fcb96fec5d6e481f5dcbba",
+      "bytes": 1201252,
+      "modelVersion": "framed-mesh-v1",
+      "scope": "full",
+      "revisionMatches": false,
+      "skinCount": 0,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:730f5010fa7f5c4ff3ae3097e89376e3a8aaf98f6ddbd7ce2829922d300023cb",
+      "bytes": 1201404,
+      "modelVersion": "framed-mesh-v1",
+      "scope": "full",
+      "revisionMatches": false,
+      "skinCount": 0,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:26a5dab4ac40089486d011c513134998b93af1796f700b7605247f6bcf4fa9b3",
+      "bytes": 1201404,
+      "modelVersion": "framed-mesh-v1",
+      "scope": "full",
+      "revisionMatches": false,
+      "skinCount": 0,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:abbf313c6a7ccabce67f1b03a52968b9d6a4b5686f240a27cc7b6caa882a75ab",
+      "bytes": 1201252,
+      "modelVersion": "framed-mesh-v1",
+      "scope": "full",
+      "revisionMatches": false,
+      "skinCount": 0,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:86f85f4bf531aa801134e8d22535ce630e1f5effb2cd06b68d8c732a7801dfb1",
+      "bytes": 1201248,
+      "modelVersion": "framed-mesh-v1",
+      "scope": "full",
+      "revisionMatches": false,
+      "skinCount": 0,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:52cb2b86570275e1d1f21931c96de8a9344be5bad4b184c395c73ab6b2a3e3a1",
+      "bytes": 1201400,
+      "modelVersion": "framed-mesh-v1",
+      "scope": "full",
+      "revisionMatches": false,
+      "skinCount": 0,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:7321bf4ac2929006d1c829dcb5f54534bbe1f7d26c5369afd23a47cdbde18292",
+      "bytes": 1201404,
+      "modelVersion": "framed-mesh-v1",
+      "scope": "full",
+      "revisionMatches": false,
+      "skinCount": 0,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:d8f1a754713123a2314a56343ae5388af6b53ac6e73ed8b9a436913c41372078",
+      "bytes": 1201400,
+      "modelVersion": "framed-mesh-v1",
+      "scope": "full",
+      "revisionMatches": false,
+      "skinCount": 0,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:a22f8e8cd1a5c695993f848bdba8ec4f1285894671a4c1193b520e740e2171bf",
+      "bytes": 1201400,
+      "modelVersion": "framed-mesh-v1",
+      "scope": "full",
+      "revisionMatches": false,
+      "skinCount": 0,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:c6f1eba86c814ec54a0fb5ac896601cbb33ba67f25ad6098c6218d8c3c28e261",
+      "bytes": 1201404,
+      "modelVersion": "framed-mesh-v1",
+      "scope": "full",
+      "revisionMatches": false,
+      "skinCount": 0,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:b12bde76608c400407a885739cc49753075a1ac119249c37e33a47bef0d88f49",
+      "bytes": 1201248,
+      "modelVersion": "framed-mesh-v1",
+      "scope": "full",
+      "revisionMatches": false,
+      "skinCount": 0,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:495e4161c1e2bcbd54e4cdea59b9d7dbaec717dfe66c599a2a0c9eda23de633e",
+      "bytes": 1201248,
+      "modelVersion": "framed-mesh-v1",
+      "scope": "full",
+      "revisionMatches": false,
+      "skinCount": 0,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:9cc973d076ccd5c461422bf97339b8eefe211e3fa737a306b0b1847ff361590c",
+      "bytes": 1201252,
+      "modelVersion": "framed-mesh-v1",
+      "scope": "full",
+      "revisionMatches": false,
+      "skinCount": 0,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:ae297775bf2b97cde93ab6a08801013a50ae09c3e80cecb05e2a9b94d5ff1280",
+      "bytes": 1201252,
+      "modelVersion": "framed-mesh-v1",
+      "scope": "full",
+      "revisionMatches": false,
+      "skinCount": 0,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:4460f26e27a56c3dd4fddb254c71ea65ffa9dcba6dfcec5e9454563692f6c27a",
+      "bytes": 2418192,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:269b2714ac5f90b7923cf9982b9993dc1a808e46398334f984f66711b99a8415",
+      "bytes": 2419172,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:9677d8edf23dc6448b176920fbafcfec26fc877ffa83034d8c105ebd5947982d",
+      "bytes": 2419600,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:911af4badffc3a262a4c0aee17d32dd609e15ff871f0ccabd9ca135cbbc0a730",
+      "bytes": 2419372,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:6f6cc438edd45ac1b976bf707dc9ac5f01360d1d8b4212508ba7a73d80fdb0d3",
+      "bytes": 2419600,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:f232f227df54a30be14ee773a03b1fe3bde84577e29e4bf519f010ffc00cb330",
+      "bytes": 2419372,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:b9b8320ed3e7b7d6d6766e732737f1a2e2aded16c9f3463dc21e3560a0afb88c",
+      "bytes": 2419600,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:01a501c977e24fa9fa37bf902b72d3e1d49bf83e1945cbc560c0b6f7b324af0a",
+      "bytes": 2419372,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:022af7eb719d9e0f92f423137712b4d8f6d98fd96272e76e2d1814ec3321f182",
+      "bytes": 2418276,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:80aec5df9853e450fa5735983933dfb6c5020ea5c9f258a9868d39a59a3118cd",
+      "bytes": 2418588,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:0fa5a021db9aacfe28fe5584ba06b466595345d232fa251c24838931a01384cf",
+      "bytes": 2419384,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:a155fa2e78ead0c1dff00930061e8f7ec97ff3bf84109c1c8bf0def7b079093e",
+      "bytes": 2419400,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:d7f09f8ab4e33caabd161b35c9413bf55aeea61dabadfddfa46da500d2a079a8",
+      "bytes": 2418328,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:819ea4dcbf8cfe9d50247936a809927873510ec8f8457634bdb374f08dac972b",
+      "bytes": 2418336,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:7ea04da0351349f3b26307e8a777aa8ef97efa88aaa91d4a4f5e75e4d667d426",
+      "bytes": 2419476,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:d99ee341efa97026f09ffba636e2caa466830fbfd9b6e5190529c0f2415d4769",
+      "bytes": 2419376,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:f1cfa010a621a934b1445f596f3aa704cab67a34765d19b1a1863ebfdc41c430",
+      "bytes": 2418284,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:01a5e32bef6c948248c8ef01e88a61c2b923d1459ab5cb249f4aa354dca2c67e",
+      "bytes": 2418376,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:29abd62656b8608bcbceab8d5c46d8352cc7809f2486bbb148e26b1edccfef9a",
+      "bytes": 2418368,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:7581101911bc82eae5756021150082dbedfb04782c241a25294e4adfc6bff4a0",
+      "bytes": 2418196,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:e02248793715372c68513180db2da37b3e322fd7fd3526007d7fe74763106984",
+      "bytes": 2419440,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:763aedd0c4bbf4d4b85287e739b13299805c11350aa6b3b33d51151c0805da0a",
+      "bytes": 2419440,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:d92f3ede7be07c9feef37c1d2679ccf361898eb51791c8be544ddcec183a382c",
+      "bytes": 2419652,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:f54ca53619a0481db60ce98ee1c654406c38683dbd6b926832a6e5c85dc266ad",
+      "bytes": 2419416,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:2d5412decb5b44244f2d24cde8139f9a1a7221fcac7c173b8f24e7baded13fd0",
+      "bytes": 2418276,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:b13dd2bd12621a868355dbda5ef44fcbe2da6a6f0f6677a47073725e844d3cf3",
+      "bytes": 2418588,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:c10dde295f4e4c280a656a6e00b53833a52e48a6bea357b135c36a70ebdf0263",
+      "bytes": 2419320,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:3dabfff36257cdd44ab7d2eb7877f7a1d6a646babe4df8f7cee9fac75846c3f5",
+      "bytes": 2419332,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:858589e7e3ad48d6f58282a7bed76861bc1c686de61517ec704716512a8520c0",
+      "bytes": 2418136,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:a0e8e21c16a685c9cd5fafd4ab7cc6529e4b30fb852e61625b753513b20a0b04",
+      "bytes": 2417920,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:da9f19c44602a256d5057b20c110f51fdade951f6d579e4d48bc3df766093a24",
+      "bytes": 2418024,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:9213e5b2985d042565a7024ee144a19293c89f1cbfa840ee4829fe67fd64b83d",
+      "bytes": 2418348,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:891415435420e7109c5bcf70ee1645b81ba3b5166bbff003fca71d95de2e9581",
+      "bytes": 2418192,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:444fac28f60c63d57ce353a4be7a5db3b2883a98c869cc3b93749f5ea14a46e4",
+      "bytes": 2418184,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:9ab0960fb8b6fec333327453b5930ce2283be985e395946a479849386a39c523",
+      "bytes": 2419384,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:f9378367b95554a131a95ce985b10905edf9289ade1bbc641af12451420711a1",
+      "bytes": 2419400,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:956a60204d4659a55760a9f2701509263c422182cd56d983cbf80a036b97d5b3",
+      "bytes": 2419356,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:22f6275ae5e3742330191a18e2a7e2ccdeaf3e6f35006c5467bfe81874502342",
+      "bytes": 2419556,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:19997d4942286569470fdabb9e1433e0f1de43ee048895fb8612dd23c39503fc",
+      "bytes": 2418248,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:ca46a44019e9b27159a44a63d43f06296d858ef1e935d24c6dcd01d1de87e40a",
+      "bytes": 2418108,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:7840c3cb5c6559f0bc6f9e39da4abb8e9221a5bd1f002c7db914e78286f8b072",
+      "bytes": 2419648,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:cb60126c230ec0f9e56c4ed20d38e91c30bc658b7d2c14717c55aaefa24ae13a",
+      "bytes": 2419420,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:38456e924e818e63db161de83e6d4928a01929e46506e5aaaf640ce1e474b57e",
+      "bytes": 1905572,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:fa7bf695766b8736bfbe2deca1a92df12f7724f682563b5bde02e749bfec8010",
+      "bytes": 2113552,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:893badbe146920798fc85d6cd4ca125152bcfbca333e70daa2eefb9b7dd3c2ce",
+      "bytes": 7112976,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:da6bc433dc57c6f5913549f627f8a82c36ab6b0e2d2d9d3a4a6d8828f9a5f91d",
+      "bytes": 7143440,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:40546c839018fb4c39f3512358414aeb267fa47b99e81d0ae302a2cd19409dd9",
+      "bytes": 2109924,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:1dbcd1c245bb99761d4f3101dda705f61529114f2a98565e5265ab73fe89bcc7",
+      "bytes": 7118248,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:07f4a680018ce2ecfb1b447697f1b4d7a7894317a3be2531dce3bd0b9b507b38",
+      "bytes": 7125740,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:c571c978810187f0d11c0cd466173efcd06c6850c8ce1ec23370357c8759b4dd",
+      "bytes": 7120360,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:7238067e3261bdb5bbaec1c9c14426df2250be202f10c778fa8f9549d7a218a4",
+      "bytes": 7131636,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:a5be8093142700e8c95106e3cc0991bce499ebf4d7feecdc2b3fdda7c1e34bf1",
+      "bytes": 2114496,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:3a65da6f8668269ed4f7d087a38cd9301fb50128dc6b388b8e72f856d4f175f4",
+      "bytes": 7125860,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:b4ac9ad263adb20b0010b223d4687390c20c9150e3a438a6f1d547f89a3c73d7",
+      "bytes": 7120196,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:4fc28db4d86bf36ea897eb27311ac5b3ed2bc3ef27ea28ebf4c87a42897328a6",
+      "bytes": 2113472,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:571a6c9b02f9e47bc6e642e8b785a2eacac846a0c3de0a5d754423109bed1e00",
+      "bytes": 7112488,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:1728be971c47dd129989f57c5390b135783d74cb25da6f8adcb880825aeae1a8",
+      "bytes": 7126168,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:774e7df84bb26c7e58a5416717a81a857d7ab815e6ce625b643eb67736018d95",
+      "bytes": 7120360,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:048df0097aa7e1b5e55193e7712b143b6a3396c7a18685456c3a391d036ad3d9",
+      "bytes": 7112540,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:0ebf049e53a348592c0a5166e7cde79b28d2917884d2e5dcdffc9bdf532c917c",
+      "bytes": 2113520,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:f784aa94b87959923d7b6bae100fed949ddec58c33ae30e5a96d63fc9ad12f13",
+      "bytes": 2109876,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:ba666cf081d108c52095a61a419cec9645d90d4878b96182b7fff67316b6cebf",
+      "bytes": 2113756,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:d90a6f5d9e03e554c94b27e57b2e76d0f774a1bd01f48b34dd6fc9273155773f",
+      "bytes": 7120240,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:17eec975ed180749196c455f501943b1e4f370a308497681cb2ba8d059b2f0b3",
+      "bytes": 7132352,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:297d2c9912a9a3bd177143b5a430f52e613dd94d9343064de1492e2b6fb836fd",
+      "bytes": 7125756,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:fd4812ddcb8535d9e43bdacae2a219d88f7c54bd798766574cd4b7518a3ae239",
+      "bytes": 2067644,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:2c8fbb6bf15377d25c0d859cf748cc3804f45895be7911b3b93cdacebb103278",
+      "bytes": 1894648,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:718c0e7026e82c1d7e031ef0002d1fc676d8839d00b35186b9c39ee74662c02b",
+      "bytes": 2027864,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:ef3981ed864835311cfc42cd577652791d02af18e8e5b0e5f5c825bf12e75c8d",
+      "bytes": 6082560,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:6d5916d6ca0b324d25b469a558dbf8b6df074cd4ec2b68cba1d0c725196212ed",
+      "bytes": 3218624,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:0b7b9c601b6ebea70376b998c6935b54a548b5c987511492b8889bfdc1b8f904",
+      "bytes": 1972404,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:9f8e6ae4b2e15148e85fca35ac7e76ad351d9dfbd478ce119006d82379fb25d4",
+      "bytes": 1948336,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:7652d39575be348fc48ee8cbf2664bff3a093fb17073167828f5351967ff80eb",
+      "bytes": 4099664,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:78c6feb5e8f4ed33f5466895a1f64735b7fccb4617a406b764206941bd1f0533",
+      "bytes": 4047580,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:f07815398a20aeef4e53deb7c08326cbe39c7274991d12c2f5712caab733b4b3",
+      "bytes": 4047580,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:3ad8bdea675e517c83d83af9386246121db6e12633487e2a5f664eb0dee2ea62",
+      "bytes": 4099664,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:54fd42c575b79da38393ecaee5b992032c049f6b188ad5555a5c1d0ace85509e",
+      "bytes": 4099664,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:7e8db61c4e24449669527fa0d2cbf0f907db12b05cb8b45c3e47b9e06f1e58ab",
+      "bytes": 4047580,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:6b0f1fbbfd0b189a2b963c7d2a3aa7827090ef40f336604523d3e546ce2adc3e",
+      "bytes": 4099660,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:6b0f1fbbfd0b189a2b963c7d2a3aa7827090ef40f336604523d3e546ce2adc3e",
+      "bytes": 4099660,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:596fbecee84f4a63c94556162d3c2f0bd25b42264a2adc82928b930b9b85ffb2",
+      "bytes": 4099656,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:e63297d011186d8ed501f3f0633266b28717cdbd6015e692122dac15392babf2",
+      "bytes": 4097292,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:2dda303338076543154886cfc8af9421c61d5bf718acdc2cf6981e93f8a81715",
+      "bytes": 4099660,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:a32c4b4810acf5652aa8f4d9aba84d81a9a34e70132f64346c9e82984d29eec9",
+      "bytes": 4097292,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:2992ac370d096f534dc4a4ae132eec35ac97633c3b1e934f299e721b04fdb11a",
+      "bytes": 1936968,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:2bdf07d8f2fafec1a20f844a85e74199b9c53b014f100e9f814a4abac57b04af",
+      "bytes": 1977216,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:d8a4445570ef2ea66bbb8edcc536ac77b31b061488b6fd9b0d745e71ede8b45b",
+      "bytes": 1844152,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:825a23d29de0051cc7e58f43ea07fa3def33759e1f34d383f947f69b8ee14585",
+      "bytes": 1862072,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:975a6410bcbe8031817f60029ae1bd99703f4420aef63949f05cfe4ea38dc384",
+      "bytes": 1987408,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:6a089fb000955d6afc8c415128c41e0d08d6356dc4dbf95d5b56c57980433796",
+      "bytes": 1843508,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:c7eaa9d3935219297dfc48f514130a336980fc56ea11a9180813fa9fdcdab237",
+      "bytes": 1955572,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:ac4f32bef56c95debed75914a6fdf93a5ce6d352ec15c14b3901eddb93d9b754",
+      "bytes": 1936968,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:46e5799aed299bda541df1179d9b716caedbb79496dfb4857d1a8d7a4fa36726",
+      "bytes": 4094604,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:46e5799aed299bda541df1179d9b716caedbb79496dfb4857d1a8d7a4fa36726",
+      "bytes": 4094604,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:6e639f7dca15f13edddd6962e0e35d74e1070f0890ab185e333770595ef701c9",
+      "bytes": 2302604,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:7d25cfad036786e2e71549f7839cbfb9c2780eb9992331d95653299bc0874ddc",
+      "bytes": 2302604,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:f87e49447b99d9621ababa6e6dfdde1ee9d28e47b29ce5f6936aad11494f9c9f",
+      "bytes": 2007480,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:dc4f74d42c47505ab38b475f0d79c123e4b431e68cbff679b134197a95cd8b7b",
+      "bytes": 4094604,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:e762429377ef681bcd80798e3a13515f27d317a1c4227bc760a7a6491ccfec4c",
+      "bytes": 4094604,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:cd895b1bbf40fd1ef729283ae8346f1e965e262df939a81907b29f469fdbc455",
+      "bytes": 4094608,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:c8faca327f791481503c75d9052c5e23024b0f2745d2610d901b68dd4a0f33da",
+      "bytes": 4094604,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:4333f490282e12cc3872018dfb3bb3c7fb4422d299646bf7f97741eb89763d08",
+      "bytes": 4094604,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:18d16a643cd1dc97fba1698ac243e15efd61392e875fb0e5616d082d0c2a7899",
+      "bytes": 4046680,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    },
+    {
+      "localAssetId": "sha256:f0d5a5c6926272474f1a7db84a6a14dc52f475cd10b8ca2d17603b4bf3fcb854",
+      "bytes": 4032648,
+      "modelVersion": null,
+      "scope": null,
+      "revisionMatches": false,
+      "skinCount": 1,
+      "animationCount": 0,
+      "currentStaticCandidate": false
+    }
+  ]
+}

@@ -1356,3 +1356,8 @@ Converter `/compose-scene` may return an artifact-bound `X-Standin-Scene-Camera`
 기존 120초 제한 및 제한 재시도 정책은 유지됩니다. `person_reports`에는 원문 이미지나
 응답 전체를 기록하지 않습니다. 인물별 격리 실패·원본 인물 순서·공유 예산·프로세스
 동시성 제한을 회귀 테스트로 검증합니다.
+
+
+## Opt-in internal interactive Converter
+
+The separately authenticated internal snapshot/static transport is documented in [real-model interactive v2](NEXT_SPRINT/INTERACTIVE_REAL_MODEL_V2_2026-11-04.md). This does not change public inference `/analyze` or `/refine` request/response contracts.
