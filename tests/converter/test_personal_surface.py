@@ -114,6 +114,27 @@ class PersonalSurfaceTests(unittest.TestCase):
 
 
 class SurfaceShadingTests(unittest.TestCase):
+    def test_cs3c_registration_keeps_authored_directions_across_bent_faces(self):
+        try:
+            import bpy
+        except ImportError:
+            self.skipTest("Requires Blender")
+        from converter.local.cs3c import set_source_normals
+
+        mesh = bpy.data.meshes.new("bent-surface")
+        try:
+            mesh.from_pydata([(0,0,0),(1,0,0),(0,1,0),(1,1,.8)], [],
+                             [(0,1,2),(2,1,3)])
+            source = np.array([[.2,.1,1.],[-.4,-.2,1.],[-.1,-.3,1.],[-.7,-.8,1.]])
+            set_source_normals(mesh, source)
+            mesh.update()
+            expected = source / np.linalg.norm(source, axis=1, keepdims=True)
+            ids = [loop.vertex_index for loop in mesh.loops]
+            observed = np.array([n.vector[:] for n in mesh.corner_normals])
+            np.testing.assert_allclose(observed, expected[ids], atol=.0005)
+        finally:
+            bpy.data.meshes.remove(mesh)
+
     def test_registered_quad_and_authored_sharp_edge_anchors(self):
         try:
             import bpy

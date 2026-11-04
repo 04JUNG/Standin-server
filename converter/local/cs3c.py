@@ -447,6 +447,17 @@ def verify_original_skin(data, arm, meshes, conversion):
     return maximum
 
 
+def set_source_normals(mesh, normals):
+    import numpy as np
+
+    # Blender encodes custom directions in the current corner smoothing frames.
+    # Changing flat faces to smooth after encoding rotates the stored normals.
+    for polygon in mesh.polygons:
+        polygon.use_smooth = True
+    unit = normals / np.linalg.norm(normals, axis=1, keepdims=True)
+    mesh.normals_split_custom_set_from_vertices(unit.tolist())
+
+
 def import_character(path):
     """Create the same Blender character representation used by the FBX adapter."""
     import bpy
@@ -495,7 +506,7 @@ def import_character(path):
         geometry = bpy.data.meshes.new(f"CS3CGeometry_{index}")
         geometry.from_pydata(source["positions"].tolist(), [], source["triangles"])
         geometry.update()
-        geometry.normals_split_custom_set_from_vertices(source["normals"].tolist())
+        set_source_normals(geometry, source["normals"])
         mesh = bpy.data.objects.new(f"CS3CMesh_{index}", geometry)
         bpy.context.collection.objects.link(mesh)
         mesh.matrix_world = conversion
@@ -504,7 +515,6 @@ def import_character(path):
             geometry.materials.append(materials[slot])
         for polygon, slot in zip(geometry.polygons, source["assignment"]):
             polygon.material_index = slot
-            polygon.use_smooth = True
         if source["uv"] is not None:
             layer = geometry.uv_layers.new(name="SourceUV")
             for loop in geometry.loops:
