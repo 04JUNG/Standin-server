@@ -50,16 +50,33 @@ class Settings:
 
 
 class Engine:
-    def __init__(self, settings, reader, visual):
+    def __init__(self, settings, reader, visual, *, parts_service=None):
         self.settings = settings
         self.reader = reader
         self.visual = visual
+        self.parts_service = parts_service
         self.pending = {}
         self.retired = {}
         self.active = None
         if digest(settings.character.read_bytes()) != settings.character_sha256:
             raise ValueError("head-axis character binding mismatch")
         settings.root.mkdir(parents=True, exist_ok=True)
+
+    def parts_capabilities(self):
+        from src.refine_v4.service import CONTRACT
+        from src.refine_v4 import VERSION as parts_version
+        service = getattr(self, "parts_service", None)
+        if service is None:
+            return {"contract_version": CONTRACT, "engine_version": parts_version,
+                    "available": False, "reason": "PARTS_DISABLED", "operations": [], "recipes": []}
+        return service.capabilities()
+
+    def refine_parts(self, request):
+        from src.refine_v4.service import PartsError
+        service = getattr(self, "parts_service", None)
+        if service is None:
+            raise PartsError("PARTS_DISABLED", 503)
+        return service.refine(request)
 
     def stage(self, ctx, *stages):
         path = ctx.work.parent / "context.json"

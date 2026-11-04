@@ -16,3 +16,5 @@ onnxruntime==1.28.0
 # rtmlib declares both OpenCV distributions; hold their binary versions together.
 opencv-python==5.0.0.93
 opencv-contrib-python==5.0.0.93
+
+openai>=3.41,<4

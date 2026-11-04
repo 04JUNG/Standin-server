@@ -1,0 +1,46 @@
+{
+  "rubric_id": "standin-deduction-head5-action35",
+  "rubric_version": "3.1",
+  "handoff_spec_version": "draft-1.0",
+  "date": "2026-10-28",
+  "base_score": 100,
+  "weights": {
+    "right_arm": 10,
+    "left_arm": 10,
+    "right_leg": 10,
+    "left_leg": 10,
+    "torso": 20,
+    "head": 5,
+    "action": 35
+  },
+  "binary_deduction": true,
+  "laterality": "subject_own_left_and_right",
+  "partial_people_cap": 50,
+  "selection_policy": "best_of_returned_top5_plus_allowed_refine",
+  "candidate_limit": 5,
+  "manual_pose_edit_allowed": false,
+  "part_statuses": [
+    "match",
+    "mismatch",
+    "unobservable",
+    "uncertain",
+    "not_run"
+  ],
+  "result_statuses": [
+    "returned_all",
+    "returned_partial",
+    "returned_none",
+    "execution_error"
+  ],
+  "partial_pose_score_policy": "unresolved_exclude_from_full_body_metrics",
+  "primary_metrics_scope": "all_expected_people_returned_and_every_person_all_7_parts_assessed",
+  "pending_run_config": [
+    "refine_attempt_limit",
+    "refine_time_limit_seconds",
+    "selection_before_or_after_refine",
+    "retry_limit",
+    "timeout_seconds"
+  ],
+  "partial_body_output_crop": "proposal_only_not_implemented",
+  "full_100_diagram_is_evaluation_data": false
+}

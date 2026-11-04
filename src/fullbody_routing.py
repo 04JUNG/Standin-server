@@ -487,11 +487,11 @@ def _build_fullbody_resources(entries, *, db_path):
         raise ValueError('fullbody camera index incomplete; invalid BVH assets require curation')
     generator = None
     if os.getenv('POSE_GENERATION_ENABLED', '1') == '1':
-        from .natural_pose import NaturalLanguagePoseGenerator
+        from .natural_pose import NaturalLanguagePoseGenerator, generation_settings
         generator = NaturalLanguagePoseGenerator(
             os.getenv('POSE_GENERATION_RIG', str(root/'bvh/webtoon_combat_03.bvh')),
             os.getenv('POSE_GENERATION_TAXONOMY', str(root/'search-taxonomy-v2.json')),
-            model=os.getenv('POSE_GENERATION_MODEL', 'gemini-3.8-flash'),
+            model=generation_settings()[1],
             review_dir=os.getenv('POSE_GENERATION_REVIEW_DIR', 'tmp/generated-pose-review'))
     engine = FullBodySearch(entries, semantic, camera, generator=generator,
         semantic_weight=API_SEMANTIC_WEIGHT,

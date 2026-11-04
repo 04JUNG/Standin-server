@@ -214,6 +214,11 @@ class Pipeline:
     # ---- 메인 ----
     def process_cut(self, image, img_w: int = 512, img_h: int = 768,
                     rescue_request=None) -> CutResult:
+        from .analysis_budget import analysis_budget
+        with analysis_budget():
+            return self._process_cut_with_budget(image, img_w, img_h, rescue_request)
+
+    def _process_cut_with_budget(self, image, img_w, img_h, rescue_request):
         result = self._process_cut(image, img_w, img_h, rescue_request)
         if CFG.body_matching_mode != "off":
             from .experimental.body_matching.service import attach_body_matching
@@ -745,9 +750,11 @@ class Pipeline:
             if prefetch is not None and prefetch.status in ("used", "used_error"):
                 describe_ms = prefetch.elapsed_ms
             for index, slot in enumerate(need):
-                if describe.status != "ok":
+                person_error = getattr(describe, "person_errors", {}).get(index)
+                if person_error is not None or describe.status not in ("ok", "partial_error"):
                     semantics[id(slot)] = assess_semantic_evidence(
-                        None, rcfg, vlm_error=describe.error_reason or "unknown")
+                        None, rcfg, vlm_error=(person_error or {}).get("error_reason")
+                        or describe.error_reason or "unknown")
                 else:
                     from .pose_relations import reconcile_sides
                     description=describe.descriptions.get(index)
@@ -775,6 +782,8 @@ class Pipeline:
                 "retryable": getattr(describe, "retryable", None),
                 "retry_after_seconds": getattr(describe, "retry_after_seconds", None),
                 "attempts": getattr(describe,"attempts",0),
+                "person_errors": getattr(describe,"person_errors",{}),
+                "person_reports": getattr(describe,"person_reports",{}),
                 "elapsed_ms": round(describe_ms, 3),
             },
             "routing_elapsed_ms": round((perf_counter() - started) * 1000.0, 3),

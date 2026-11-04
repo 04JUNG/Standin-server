@@ -42,10 +42,11 @@ class Reader:
             self.model_name = model or "mlx-community/Qwen3-VL-8B-Instruct-4bit"
             self.model, self.processor = load(self.model_name)
             self.cfg = load_config(self.model_name)
-        elif provider == "gemini":
-            from src.vlm.client import GeminiVLMClient
+        elif provider in {"gemini", "openai"}:
+            from src.vlm.client import GeminiVLMClient, OpenAIVLMClient
 
-            self.adapter = GeminiVLMClient(model=model)
+            adapter = OpenAIVLMClient if provider == "openai" else GeminiVLMClient
+            self.adapter = adapter(model=model)
             self.model_name = self.adapter._model
         else:
             raise ValueError("scene evidence requires a real configured provider")

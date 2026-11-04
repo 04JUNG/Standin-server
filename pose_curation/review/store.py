@@ -68,6 +68,14 @@ class ReviewStore:
             self._write(con, record, evidence)
         return record
 
+    def save_many(self, rows: list[tuple[str, str, str, str]]) -> list[dict]:
+        """Write (key, content_hash, status, note) rows in one transaction."""
+        records = [self._record(*row) for row in rows]
+        with self.connection() as con:
+            for record in records:
+                self._write(con, record, None)
+        return records
+
     def reject_batch(self, rows: list[dict], *, expected_reviews: dict) -> list[dict]:
         """Atomically exclude reviewed revisions, or fail if another review changed.
 

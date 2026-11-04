@@ -2,7 +2,8 @@
 
 [04J-318](https://linear.app/04jung/issue/04J-318). `refine-v4-parts.1`은 명시적으로
 선택한 native 파츠를 적용하고 저장 FBX까지 검증하는 opt-in 경로다.
-기존 `/analyze`, `/refine`, 검색 순위, 배포 설정은 바꾸지 않는다.
+기존 `/analyze`, `/refine`, 검색 순위는 바꾸지 않는다.
+전용 Blender worker의 실제 파츠 HTTP 연결은 [BFF 실행 계약](REFINE_V4_PARTS_HTTP.md)을 따른다.
 
 ## 해결한 문제
 

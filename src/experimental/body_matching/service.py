@@ -11,7 +11,7 @@ from time import perf_counter
 import uuid
 
 from .catalog import file_sha256, load_catalog
-from .observation import (GeminiBodyAttributeClient, MockBodyAttributeClient, PROMPT_VERSION,
+from .observation import (GeminiBodyAttributeClient, OpenAIBodyAttributeClient, MockBodyAttributeClient, PROMPT_VERSION,
                           geometry_ratios)
 from .schema import GEOMETRY_VERSION, OBSERVATION_VERSION, SCHEMA_VERSION, parse_person, unknown_attributes
 from .selection import choose_body
@@ -55,13 +55,17 @@ class BodyMatchingService:
         self.catalog_path = str(catalog_path)
         if not math.isfinite(timeout_seconds) or timeout_seconds <= 0 or not 1 <= max_people <= 20:
             raise ValueError("invalid_body_runtime_limits")
-        if provider not in {"mock", "gemini"}:
+        if provider not in {"mock", "gemini", "openai"}:
             raise ValueError("unsupported_body_provider")
         self.provider_requested = provider
         self.init_error = None
         if client is None:
             try:
-                client = GeminiBodyAttributeClient(model, timeout_seconds) if provider == "gemini" else MockBodyAttributeClient()
+                if provider == "mock":
+                    client = MockBodyAttributeClient()
+                else:
+                    adapter = OpenAIBodyAttributeClient if provider == "openai" else GeminiBodyAttributeClient
+                    client = adapter(model, timeout_seconds)
             except Exception as exc:
                 self.init_error = "body_provider_init_" + type(exc).__name__
                 client = MockBodyAttributeClient()
@@ -223,7 +227,7 @@ def attach_body_matching(pipe, image, result, cfg):
                         shared_provider, shared_model = "mock", "mock"
                     else:
                         shared_model = getattr(pipe.vlm, "_model", shared_model)
-                    if shared_provider == "gemini" and getattr(cfg, "body_integrated_review_enabled", True):
+                    if shared_provider in {"gemini", "openai"} and getattr(cfg, "body_integrated_review_enabled", True):
                         extra["family_review_model"] = shared_model
                 pipe.body_matcher = service_class(
                     catalog_path,

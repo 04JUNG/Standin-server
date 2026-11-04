@@ -1,0 +1,32 @@
+{
+  "repository": "04JUNG/Standin-master-docs",
+  "commit": "5680035be8354916d1b11a980e7817a6cece2015",
+  "source_url": "https://github.com/04JUNG/Standin-master-docs/tree/5680035be8354916d1b11a980e7817a6cece2015/러프%20데이터/vlm-pose-30x5-v1",
+  "source_manifest": "set-01/dataset.json",
+  "dataset_id": "vlm-pose-set01-r3-exclude119-230-252",
+  "counts": {
+    "cuts": 27,
+    "persons": 48,
+    "visible_joints": 162,
+    "occluded_estimated_joints": 210
+  },
+  "source_manifest_sha256": "d466ccda895baa4bea07c24423507deaed73ba8dc2a5d831718ffb6502588ab2",
+  "excluded_cut_ids": [
+    "p_rough_119",
+    "p_rough_230",
+    "p_rough_252"
+  ],
+  "source_gt_status": "draft_unverified",
+  "usage_authorization": "user confirmed evaluation use 2026-10-28",
+  "self_check": {
+    "kind": "GT-derived contract fixture; never model evaluation",
+    "passed": true,
+    "actual_model_calls": 0
+  },
+  "baseline": {
+    "decision": "INCONCLUSIVE",
+    "not_run_cuts": 27,
+    "unknown_persons": 48
+  },
+  "operational_deployment": false
+}
