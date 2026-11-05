@@ -24,6 +24,8 @@ SCOPES = ('full', 'half', 'bust', 'shoulder_head')
 VIEWS = tuple(f'yaw_{a:03d}' for a in range(0, 360, 45))
 LEGACY_VIEWS = dict(front='yaw_000', three_quarter='yaw_045', side='yaw_090', back='yaw_180')
 HASH = re.compile(r'[a-f0-9]{64}')
+MAX_POSES = 10000
+IMAGES_PER_POSE = len(SCOPES) * len(VIEWS)
 
 
 def _sha(path):
@@ -51,15 +53,18 @@ def _root(data_dir):
 @lru_cache(maxsize=4)
 def _manifest(path_string, mtime, size):
     manifest = _json(Path(path_string), 4_000_000)
-    expected = dict(schema_version=1, style=STYLE, status='complete', pose_count=5862,
-                    image_count=187584, scopes=list(SCOPES), angles=list(range(0, 360, 45)),
+    count = manifest.get('pose_count')
+    if type(count) is not int or not 1 <= count <= MAX_POSES:
+        raise ValueError('invalid thumbnail pose count')
+    expected = dict(schema_version=1, style=STYLE, status='complete',
+                    image_count=count * IMAGES_PER_POSE, scopes=list(SCOPES), angles=list(range(0, 360, 45)),
                     width=512, height=512, pitch_degrees=0, projection='orthographic',
                     outline_width=.65, contrast=2.6, lighten=.22, background='white')
     if any(manifest.get(k) != v for k, v in expected.items()):
         raise ValueError('incomplete or unsupported thumbnail overlay')
     poses, records = manifest.get('poses', {}), manifest.get('pose_records', {})
     revisions = manifest.get('renderer_revisions', [manifest.get('renderer_revision')])
-    if (len(poses) != 5862 or len(records) != 5862 or set(poses.values()) != set(records)
+    if (len(poses) != count or len(records) != count or set(poses.values()) != set(records)
             or not all(HASH.fullmatch(h) and HASH.fullmatch(d) for h, d in records.items())
             or not HASH.fullmatch(manifest.get('renderer_revision', ''))
             or not isinstance(revisions, list) or not 1 <= len(revisions) <= 8
@@ -167,14 +172,15 @@ def _extract(archive, destination):
                      (len(parts) == 4 and HASH.fullmatch(parts[2]) and
                       (parts[3] == 'pose.json' or parts[3] in {f'{s}__{v}.jpg' for s in SCOPES for v in VIEWS})))
             total += member.size
-            if not valid or not 0 < member.size <= 4_000_000 or total > 8_000_000_000 or len(seen) >= 193447:
+            if not valid or not 0 < member.size <= 4_000_000 or total > 8_000_000_000 or len(seen) >= MAX_POSES * (IMAGES_PER_POSE + 1) + 1:
                 raise ValueError('invalid thumbnail archive inventory')
             seen.add(name)
             target = destination.joinpath(*parts)
             target.parent.mkdir(parents=True, exist_ok=True)
             with stream.extractfile(member) as source, target.open('xb') as out:
                 shutil.copyfileobj(source, out)
-    if len(seen) != 193447:
+    manifest = manifest_for(destination)
+    if manifest is None or len(seen) != manifest['pose_count'] * (IMAGES_PER_POSE + 1) + 1:
         raise ValueError('incomplete thumbnail archive')
 
 

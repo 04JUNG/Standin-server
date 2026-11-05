@@ -34,7 +34,7 @@ def main():
             paths.extend(selected)
             if number % 500 == 0:
                 print(f'verified {number}/{manifest["pose_count"]} poses', flush=True)
-    if len(paths) != 193447:
+    if len(paths) != manifest['pose_count'] * 33 + 1:
         raise ValueError('incomplete image package')
     # These are generated regular files, not a filesystem backup. Avoid expensive
     # per-file platform ownership lookups and prefetch a bounded batch of bytes.

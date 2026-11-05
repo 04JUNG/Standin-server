@@ -90,6 +90,9 @@ COPY converter/preview_studio.sl /app/converter/preview_studio.sl
 COPY converter/shape_spec.py /app/converter/shape_spec.py
 COPY converter/shape_bake.py /app/converter/shape_bake.py
 COPY converter/worker.py /app/converter/worker.py
+COPY converter/reviewed_library.py /app/converter/reviewed_library.py
+COPY converter/reviewed_source_fingers.py /app/converter/reviewed_source_fingers.py
+COPY scripts/install_reviewed_library.py /app/scripts/install_reviewed_library.py
 COPY converter/lab_timing.py /app/converter/lab_timing.py
 COPY converter/retarget_cache.py /app/converter/retarget_cache.py
 COPY converter/fast_scene_reset.py /app/converter/fast_scene_reset.py
