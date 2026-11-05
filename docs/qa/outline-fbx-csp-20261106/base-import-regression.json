@@ -1,0 +1,68 @@
+{
+  "scope": "Actual approved base solve -> snapshot -> independent fresh-process final FBX export/verify. No outline/CSP claim from this test.",
+  "import_policy": "Existing full importer, scoped to exact approved ID+SHA unshaped interactive jobs; frozen files/gates unchanged",
+  "cases": [
+    {
+      "character_id": "male-default83-v0-7-6-p1",
+      "character_sha256": "085dd9c65a3a66035f7e0ce9e0a9171b9abb0e33dada92194676d92e00c8b026",
+      "source_bvh_sha256": "d3f7039dbc4e5fbab6f8ca2ac9af6f7ec278c5d77f686d28115036c4d8cf1fc6",
+      "source_bvh": "rokoko_Flirty_mixamo_00964.bvh",
+      "seconds": 4.538947167049628,
+      "bone_count": 52,
+      "head_present": true,
+      "state_hash": "5e2eae56eed2cc7f9b0f8f62a54bc10a0aa7755413b3eb7b50e8ef0f0d804fa0",
+      "runtime_revision": "63e24eb8441e3a31f0186e60675d74517a01e3c677c1ab58faa3e6bb236f9859",
+      "artifact_sha256": "1bc7847be0bdfa961fa62c0cbef32d958a059b39c6255b6bfea677d15c7fe0cb",
+      "frozen_lineage": {
+        "retarget_sha256": "2fca3bd577445989c178aa4ca33e772c595ad2aeb6083f817a3824c93508a579",
+        "ankle_policy_sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+        "solver_manifest_sha256": "52eae0b0eb6a7023540fdf023ad4321f24c11d439f3ecf9f390b5b72358b24e3"
+      },
+      "final_fbx_sha256": "4a86ce213a24a87e4596059f360e138050070cda99db9ed0cb4205728723755b",
+      "final_fbx_verified": true,
+      "correspondence": {
+        "jointIdentity": true,
+        "matrixTolerance": 1e-05,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "positionToleranceM": 0.0001,
+        "skinIdentity": true,
+        "topology": true,
+        "weightTolerance": 1e-06
+      }
+    },
+    {
+      "character_id": "female-default80-v0-3-9-p1",
+      "character_sha256": "712ac75e58efd4d6ccded0b1e931590900015de023327f1320cf6d7d94026ffc",
+      "source_bvh_sha256": "d3f7039dbc4e5fbab6f8ca2ac9af6f7ec278c5d77f686d28115036c4d8cf1fc6",
+      "source_bvh": "rokoko_Flirty_mixamo_00964.bvh",
+      "seconds": 3.7827166659990326,
+      "bone_count": 52,
+      "head_present": true,
+      "state_hash": "7d21f53162e647449e9d0d7ed4499f331227d30fe3102607e40a982f95fa3fc3",
+      "runtime_revision": "63e24eb8441e3a31f0186e60675d74517a01e3c677c1ab58faa3e6bb236f9859",
+      "artifact_sha256": "d509432c8e02f7469ad4bb1a7db106a19450dfd8b120a5b2d9dd660a7527b9b8",
+      "frozen_lineage": {
+        "retarget_sha256": "2fca3bd577445989c178aa4ca33e772c595ad2aeb6083f817a3824c93508a579",
+        "ankle_policy_sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+        "solver_manifest_sha256": "52eae0b0eb6a7023540fdf023ad4321f24c11d439f3ecf9f390b5b72358b24e3"
+      },
+      "final_fbx_sha256": "6b44e88a5b4af783bdfe850b59887ba768a570edd70b4e3ef478848c97c32bd1",
+      "final_fbx_verified": true,
+      "correspondence": {
+        "jointIdentity": true,
+        "matrixTolerance": 1e-05,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "positionToleranceM": 0.0001,
+        "skinIdentity": true,
+        "topology": true,
+        "weightTolerance": 1e-06
+      }
+    }
+  ]
+}

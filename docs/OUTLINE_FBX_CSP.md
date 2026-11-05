@@ -83,7 +83,7 @@ Errors: 400 `INVALID_OUTLINE` / `OUTLINE_ZERO_USE_LEGACY`; 401 `UNAUTHORIZED`; 4
 
 ## Verification evidence
 
-- Python 3.12/pinned converter requirements: exact CI Python list **521 passed / 1 existing skip**; repository smoke **54/54**; compileall, frozen lineage and whitespace pass. Docker's explicit copy list includes every outline module, tested via isolated capability/runtime import. Linux CI also runs the synthetic real-binary verifier.
+- Python 3.12/pinned converter requirements: exact CI Python list **529 passed / 1 existing skip**; repository smoke **54/54**; compileall, frozen lineage and whitespace pass. Docker's explicit copy list includes every outline module, tested via isolated capability/runtime import. Linux CI also runs the synthetic real-binary verifier.
 - Final scoped v2 matrix **240/240 passes**: 16 sources × five scopes × .5/1/2. Distinct source sets: preserved approved baselines neutral/bend/sit (6), approved-controller 160/190cm variants (4), current approved defaults neutral/crouch/foot-tap (6).
 - **80 zero** path/hash records and **80 actual Blender pose-edit checks** moving elbow/finger/knee/spine/neck. Original position/normal/matrix/weight comparator maxima **all zero**. Maximum imported displacement error **1.6799306554291134e-7m**; maximum dynamic skin transport error **4.643455606442997e-7m**. Blender editing does not substitute for CSP editing.
 - **10 binary corruption/stale cases rejected**, including native opacity. Native synthetic import checks shader Alpha=0 and exact original object fingerprints.
@@ -99,6 +99,14 @@ Exact current-default implementation files imported into CSP, width 2:
 | female-default80-v0-3-9-p1 | `712ac75e58efd4d6ccded0b1e931590900015de023327f1320cf6d7d94026ffc` | `07295db35bb6a148f14da4fad91d459ee05d1f5859225b29638b71dce9754e3b` | 2,975,260 |
 
 Git-ignored local evidence: `out/outline-fbx-csp-v2/native-scope-qa/{inputs,export-results,verification-results}.json`, `host-qa.json`, `final-tamper/report.json`, `summary.json`, `images/csp-final-comparison.png`, `images/photo-index.json`. Exact final files: `native-scope-qa/cases/{male,female}-current-neutral/full/2/artifact.fbx`. The comparison crops actual CSP canvas screenshots without retouching model pixels. Shared original photos/hashes and reports: primary checkout `artifacts/outline-fbx-csp-20261105/csp-v2/{results.json,report.html,scope-results.json,scope-report.html}`.
+
+## Approved default base-import compatibility
+
+The real BFF base-solve path exposed a separate pre-outline defect: the frozen legacy FBX importer uses `ignore_leaf_bones=True`, removing the actual terminal Head on the fixed #168 defaults. A narrow interactive adapter selects the existing `shape_bake.import_full_character` only for the two exact approved current ID+SHA pairs when no shape recipe is present. It wraps the existing worker call and restores the previous importer in `finally`. Other model IDs, mismatched hashes and the existing shaped path keep their previous behavior. Frozen solver files, source SHA checks, solver acceptance, final skin validation and strict correspondence tolerances are unchanged.
+
+The actual failing `rokoko_Flirty_mixamo_00964.bvh` (SHA `d3f7039dbc4e5fbab6f8ca2ac9af6f7ec278c5d77f686d28115036c4d8cf1fc6`) now passes approved male/female `prepare_body → validated body snapshot → solve_from_body`, retaining all 52 bones including Head. Independent fresh exporter/verifier final FBXs also pass. This is an actual base solve, separate from the earlier pre-posed outline fixtures. Eight regression cases cover approved/unknown-ID/wrong-SHA/shaped selection and success/exception restoration. [Sanitized source/runtime/FBX hashes and exact correspondence](qa/outline-fbx-csp-20261106/base-import-regression.json). Original local private evidence: `out/outline-fbx-csp-v2/base-import-adapter-r2/{report,final-export}.json`.
+
+`interactive_adapter.py` is included in interactive runtime hashing, so this change invalidates prior body/snapshot/cache identities automatically. BFF/client must obtain fresh real metadata and states; substituting hashes is prohibited. Interactive and outline runtime revisions remain separate. The local outline server stays available for companion integration checks.
 
 ## HTTP reproduction and limits
 
