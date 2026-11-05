@@ -132,3 +132,27 @@ def test_disabled_overlay_preserves_existing_deployments(tmp_path, monkeypatch):
 def test_partial_or_unpinned_configuration_fails_before_download(tmp_path):
     with pytest.raises(ValueError):
         overlay.ensure_thumbnail_overlay(tmp_path, tmp_path/'poses.db', 's3://bucket/file', '')
+
+
+def test_expanded_library_keeps_existing_style_and_lineage(assets):
+    root, source, _, _ = assets
+    path = root / 'thumbs/styled/manifest.json'
+    manifest = json.loads(path.read_text())
+    for i in range(58):
+        digest = hashlib.sha256(f'new-{i}'.encode()).hexdigest()
+        manifest['poses'][f'new-{i}'] = digest
+        manifest['pose_records'][digest] = 'b' * 64
+    manifest.update(pose_count=5920, image_count=5920 * 32)
+    path.write_text(json.dumps(manifest))
+    assert overlay.manifest_for(root)['pose_count'] == 5920
+    assert overlay.read_styled_poster(root, source, 'full', 'yaw_000')[1]['X-Standin-Thumbnail-Style'] == overlay.STYLE
+
+
+@pytest.mark.parametrize('count,images', [(True, 32), (0, 0), (10001, 320032), (5920, 187584), (5863, 187616)])
+def test_manifest_cannot_advertise_incomplete_or_unbounded_library(assets, count, images):
+    root, _, _, _ = assets
+    path = root / 'thumbs/styled/manifest.json'
+    manifest = json.loads(path.read_text());manifest.update(pose_count=count, image_count=images)
+    path.write_text(json.dumps(manifest))
+    with pytest.raises(ValueError):
+        overlay.manifest_for(root)
