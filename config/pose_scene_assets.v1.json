@@ -1,0 +1,2202 @@
+{
+  "schema_version": 1,
+  "source_db_sha256": "4e7bec1d99cf889fd8cc90be8e3b27ab8805be0a5e41cca01479f357cf880880",
+  "library_version": "lib-20261020-095b99ca",
+  "poses": [
+    {
+      "pose_id": "combat_ual1_Pistol_Aim_Neutral_f00000",
+      "source_bvh_sha256": "5b3e2caaa6517a308edb86190c7f6fe4df10a4c9d0d323ff905efb8672d34c8d",
+      "recipe_token": "5476275cc1b51b1c99b2054dc6e3bd3542e127427a0e02a17b1eddc3f26dfe07",
+      "reviewed_fbx_sha256": "c8c926c2d5a143be09e2fca8c30bdbf4272d0bfe904136d4ba3bd38fba701ba6",
+      "objects": [
+        "pistol"
+      ],
+      "geometry_kinds": [
+        "pistol"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "daily_seated_put_on_shoe_r4_20261007",
+      "source_bvh_sha256": "8647ba626495d0886fab4e63c9a0d9e15880eb780cd021b01aa88f3ed8a1d437",
+      "recipe_token": "ec5469c4da837b4e728969f56a5c384a3b9e3250f547841cc304ded5df5ac8d9",
+      "reviewed_fbx_sha256": "65facdcee24bcd9ae4a677e4fd7c08b8509959d88e7f879572ef85de4ead9f27",
+      "objects": [
+        "chair"
+      ],
+      "geometry_kinds": [],
+      "support": "seat"
+    },
+    {
+      "pose_id": "dynamic_aerial_daggers_drop",
+      "source_bvh_sha256": "2eb1c71d79178813d4b55662fda79ae3d6a816dbc5e4ee6ac561c52924b1f6b6",
+      "recipe_token": "7c3b5598f447239a0e9f160ab3fa79c825dbde4b4a895d71be09fe0cada746c7",
+      "reviewed_fbx_sha256": "77a3550f2a80f97bd6eb7ee50f07759ce964eca7ee2526e7b8e73ff2209c936a",
+      "objects": [
+        "dagger"
+      ],
+      "geometry_kinds": [
+        "dagger"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "dynamic_aerial_hammer_drop",
+      "source_bvh_sha256": "681c747a1b4680522f5ec28b067095d0f439b46d8264a274ab8ffca1f6d56894",
+      "recipe_token": "7eb244ca9dfc98958799a56425af3905d18c82542cc976cf47b391a6a8d317f9",
+      "reviewed_fbx_sha256": "553b18f5e59e980d15c6b3ae950420918f60907780e91bba47c2fd628035878c",
+      "objects": [
+        "hammer"
+      ],
+      "geometry_kinds": [
+        "hammer"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "dynamic_aerial_spear_dive",
+      "source_bvh_sha256": "bc825e562ecc53371de591d8c65359831ebde712c40b68988baf6383328a995d",
+      "recipe_token": "1fbb98d202288c5fd9d8438d40fd6c3ae46cee59d16ad2741ee768c4a546db11",
+      "reviewed_fbx_sha256": "ade0977582173bafd4938137b968bca2dfe156cc1cb26479669bbccdb3af30e0",
+      "objects": [
+        "spear"
+      ],
+      "geometry_kinds": [
+        "spear"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "dynamic_aerial_split_dive",
+      "source_bvh_sha256": "fd8d023db01af38824ab7081e8217fe9a9fa92080c05949228d47d493e1ab15c",
+      "recipe_token": "e239ed3251f9d3e20d59e40e847fe3d462e72ee3a60dd63d21e48605462cbe76",
+      "reviewed_fbx_sha256": "5e947206f870944b593c02f7aeabad3e66e3d0b162d520445ce6055e7d8f0a6e",
+      "objects": [
+        "sword"
+      ],
+      "geometry_kinds": [
+        "sword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "dynamic_aerial_sword_drop",
+      "source_bvh_sha256": "7b50e4139bb1b2a8fc1214d3a9b099a4a2b04b53fa85c3cea9531f6b81fa2dfa",
+      "recipe_token": "da097837b16cbf1d483fedb7047a7b035a8d4837e35f63274a79937753919b74",
+      "reviewed_fbx_sha256": "384317ee20ac9ab8a0230cd6479825e2f1fb7d31f1a0927f42a6267ff2429a3f",
+      "objects": [
+        "sword"
+      ],
+      "geometry_kinds": [
+        "greatsword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "dynamic_aerial_twist_shot",
+      "source_bvh_sha256": "7366bcea7fc2950074b720dd944bfbf406932ae3a04b7ba35662a8d861aabd74",
+      "recipe_token": "021d2f8c2e4e3ce84973e393a3d74471b4191949a6adf6eca466817b8a4a0424",
+      "reviewed_fbx_sha256": "1fb192fde78ea232cb7fb637ca8f020424b29d56f7577992930c48a520b35992",
+      "objects": [
+        "pistol"
+      ],
+      "geometry_kinds": [
+        "pistol"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "dynamic_fantasy_dual_dash",
+      "source_bvh_sha256": "7f0f7487a06c7b26adc41942e975ed8bfe8421f1684f918e69371c73310dd7e1",
+      "recipe_token": "713750bdae0318230678120efeaefa32bc2159d4a67ce436319251082f7ebfb2",
+      "reviewed_fbx_sha256": "3768aa811060b881fb3597171c0abffd9f959c2c4bef764f4fe3eb1c491a65e2",
+      "objects": [
+        "dagger"
+      ],
+      "geometry_kinds": [
+        "dagger"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "dynamic_fantasy_leap_slash",
+      "source_bvh_sha256": "19f3501a8f915a90274d9318bb69657e9f0dda86ac018de9d07995109e766784",
+      "recipe_token": "82359d860519307a6dab3e25706e40a0443a2a37c5c2dba1c0103c4d82632ad1",
+      "reviewed_fbx_sha256": "69ccffa8bb6caf8b6cdef3a15ea992ec0f071d1dee86a53e48f8da2dc0efac0f",
+      "objects": [
+        "sword"
+      ],
+      "geometry_kinds": [
+        "sword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "dynamic_fantasy_low_sweep",
+      "source_bvh_sha256": "820caea74ab51e27e7da2c89f4665cf3446c82c7d8965442c9ef5e7b8b967016",
+      "recipe_token": "47d5556cbcfe56f2bb2e23156b95dd2947663ff150e214d492f26bb88d0af989",
+      "reviewed_fbx_sha256": "00cbdc989671ee1fe21543fb414d1cdb46603c722c4e47fd09f76a8b042ecdf9",
+      "objects": [
+        "sword"
+      ],
+      "geometry_kinds": [
+        "sword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "dynamic_fantasy_reverse_guard",
+      "source_bvh_sha256": "1580a1793d4f7e9cc0b58c3bffaa32f07a25b0c8975ac0e3ff9f7f3e159cf652",
+      "recipe_token": "1b6cebd07bb911ef8ff0c153acb8146824e784d9f9d69c93d7a21436c0075776",
+      "reviewed_fbx_sha256": "4e3b974ad7761417e445946f88694b4ca0742b9e5a72b72d65043784ea25a169",
+      "objects": [
+        "sword"
+      ],
+      "geometry_kinds": [
+        "sword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "dynamic_fantasy_shield_leap",
+      "source_bvh_sha256": "e1b9678993cc2c3c2339abd23766538282d14dc8c4cffcdce8aee7335c04fb69",
+      "recipe_token": "1f54ee3abb16630e0d3bc04c23df7b93ed4dd57ba19a84d8aa9568524536a5f2",
+      "reviewed_fbx_sha256": "feecc098a67700f36db9446aef6d03428f3378389b9291b51e50d5cc376f4d26",
+      "objects": [
+        "shield",
+        "sword"
+      ],
+      "geometry_kinds": [
+        "shield",
+        "sword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "dynamic_fantasy_staff_vault",
+      "source_bvh_sha256": "25d8ab3d9db995e17092c2705343d37deffd4047ff1375432f27153532b10f64",
+      "recipe_token": "f679e972ac86cb30a20fa56b1295798395e3a7c6d21e117686e9b5c61b41f8c4",
+      "reviewed_fbx_sha256": "20069c60632a27f940ec930f8aeac4087aae47f078a8e33b7b25fa230cd5612d",
+      "objects": [
+        "staff"
+      ],
+      "geometry_kinds": [
+        "staff"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "dynamic_fantasy_twohand_cleave",
+      "source_bvh_sha256": "510a7142a4c5106539155f30c200544ec3fc2765c26cff83f23dc56ce90afe18",
+      "recipe_token": "b1581c7f773446b4f14fa3099ef57d66b500898836226665fa367c2eaec144a7",
+      "reviewed_fbx_sha256": "800262800ac94179c1482090ebeb27344a07a6de9a0dcb209e6fe6129efb3536",
+      "objects": [
+        "sword"
+      ],
+      "geometry_kinds": [
+        "greatsword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "dynamic_shoot_air_dual",
+      "source_bvh_sha256": "1e4f75f3f0663496504e3d3e3a3c644e8beb95ab55720885952c0fe985ef8da1",
+      "recipe_token": "609203ff6bc49407b2c5d97793c9f510421ec0722bb927ea748dc043c2c54026",
+      "reviewed_fbx_sha256": "37f2e5ed11fab01a2da905c28ec104d9c3ce7fb74164d30010a0019616f10d47",
+      "objects": [
+        "pistol"
+      ],
+      "geometry_kinds": [
+        "pistol"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "dynamic_shoot_back_lean",
+      "source_bvh_sha256": "0cdc4681f5ac5ade59ff851c6480ce0c797979f4c9b77150438725af12727c44",
+      "recipe_token": "90f59f0043d9529748c1fcb9c8b5dec734ba013b5989decc4fab94b235c4515e",
+      "reviewed_fbx_sha256": "1993547a5808f1bb0b8b5fc85b31852e0aac3c26927176a681a7e72eb2b4a2fe",
+      "objects": [
+        "pistol"
+      ],
+      "geometry_kinds": [
+        "pistol"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "dynamic_shoot_dual_wide",
+      "source_bvh_sha256": "d5409bf2107eb47cd647c8a722f814972d40e3031672e8b82168a0c33aeea5ef",
+      "recipe_token": "7216c14e19bf0bd4a1a61c6bd2b6f4096592d10dd7f67b5665a4512c0a9cd67b",
+      "reviewed_fbx_sha256": "953c115088cbd352236a0928d13689d2e2b1b6f40a090bdf64f3e137514c9b1c",
+      "objects": [
+        "pistol"
+      ],
+      "geometry_kinds": [
+        "pistol"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "dynamic_shoot_kneel_rifle",
+      "source_bvh_sha256": "c9934eb67cad83c843db3509d18ddcf4b6b79333cf68cc0db557257da472df7b",
+      "recipe_token": "5f72d3504aabd115087dbe973f51001d4520766c924993e526433082ab923c56",
+      "reviewed_fbx_sha256": "3c4a440107bd219aa79375d115d8d2dbcaf4d0a455a26a0e47589d30a48a8c68",
+      "objects": [
+        "rifle"
+      ],
+      "geometry_kinds": [
+        "rifle"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "dynamic_shoot_low_crouch",
+      "source_bvh_sha256": "3abee90cad670e94ac850eb71a7b48bb71468ed43878511c55f6d161a1585f18",
+      "recipe_token": "9eecde647eb180dafafa603ed892ca500a17f4c74907277f62ceb741df7ae9a2",
+      "reviewed_fbx_sha256": "d886a98f1c3924f64e193367fc736bb01310ca07bd118dbb4c21e85cf95e55df",
+      "objects": [
+        "pistol"
+      ],
+      "geometry_kinds": [
+        "pistol"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "dynamic_shoot_onehand_step",
+      "source_bvh_sha256": "c585d83ee1d8d59402d1305e11e2a4ded56c2b048a8f48aaf37b3244c50e6c29",
+      "recipe_token": "a4497c3b251c549a659dbae887615e1dda935dea89393e21d3628cdc789e5847",
+      "reviewed_fbx_sha256": "b5ee80161c9ad913c9c215f876489fe9e6a98cbbfb76688d1e14836012b68b0e",
+      "objects": [
+        "pistol"
+      ],
+      "geometry_kinds": [
+        "pistol"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "dynamic_shoot_prone",
+      "source_bvh_sha256": "cd520b1a99fa581e2e6481e478ec949db75234febd046f750e2f99cbcef5252e",
+      "recipe_token": "0eaed902731421eaea6674001d3c112cdf0efa465e16d6a51989ca07268ad1b6",
+      "reviewed_fbx_sha256": "84608e7ae00e7972d4f79f5e58008c40dbf89fc8afc4563226f60f19572d0f56",
+      "objects": [
+        "rifle"
+      ],
+      "geometry_kinds": [
+        "rifle"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "dynamic_shoot_slide",
+      "source_bvh_sha256": "75ac972e7454ba167c635ed308d19f13fa87d0723c797467bb5474566a180ddb",
+      "recipe_token": "9da47bc262492163c56f9b0fba730500055109f9b5c816e3b98dde6e7d77fb9d",
+      "reviewed_fbx_sha256": "3a9e95c3df02c2ed507cc2c0655e0c934b38a9a6c2da5776032cfc644772acd8",
+      "objects": [
+        "pistol"
+      ],
+      "geometry_kinds": [
+        "pistol"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "exaggerated_sword_shoulder",
+      "source_bvh_sha256": "26e8456d49d1c1387a2276c6ff0f274a35332706eb6e5593610dfe44ea1e96b3",
+      "recipe_token": "b124be69941d08edfd0310f85336f31fa62461edbfa62c10d57da80f09703db2",
+      "reviewed_fbx_sha256": "6b10598f5421b3467ff7e457c9d3063191695dc44d6e907d04102fb28aa64d3c",
+      "objects": [
+        "sword"
+      ],
+      "geometry_kinds": [
+        "sword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "exaggerated_sword_shoulder_mirror",
+      "source_bvh_sha256": "9fc5dbb6430f28ecc86b72abe36894cf82b0a058179dc8c6a1aa9eb1ede54772",
+      "recipe_token": "de4d120b016b702547eb02293e58d627ab72369c216eb2ab4115173940876bfb",
+      "reviewed_fbx_sha256": "66a348929feeb386c09acf39411a333cb34791ba958f01ed8800bb099686fc17",
+      "objects": [
+        "sword"
+      ],
+      "geometry_kinds": [
+        "sword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "mass_daily_seated_forward_reach",
+      "source_bvh_sha256": "1dc96524b0ffc83d468a67eb6bed76063ed42bfb3deeb9507fe8178dada27c4c",
+      "recipe_token": "383b1fd6a40784d0c8cbfaeb66c00c0b53b8bc50a823a3f94c58c80f6f9962bc",
+      "reviewed_fbx_sha256": "0b5a72709cb9cb45c6a75670a74dd5832d83cc37cb349aaec47842d0e3382450",
+      "objects": [
+        "chair"
+      ],
+      "geometry_kinds": [],
+      "support": "seat"
+    },
+    {
+      "pose_id": "mass_daily_seated_over_shoulder",
+      "source_bvh_sha256": "4e353c7ff8f855f8305ca194a1ff4e013d931375ec4a0e378d93f74c4a1f49b2",
+      "recipe_token": "a3b86368e50756dc59814aba117d54bac712380252d83720b21eeadd352fb813",
+      "reviewed_fbx_sha256": "dc8fdc56782572c4fcb2d8cef8e2e3b45d96aa27d3cd67232c0b4bce4e4e33f2",
+      "objects": [
+        "chair"
+      ],
+      "geometry_kinds": [],
+      "support": "seat"
+    },
+    {
+      "pose_id": "mass_daily_seated_stretch",
+      "source_bvh_sha256": "0e9a414ffee9770eac898fbf640a4fd31b7525e44131055a858d7f94df0312f0",
+      "recipe_token": "ff48cbe48e6ca41e3d4f07957f9fe872fcf34d1134e3675a48ba3f2c45994526",
+      "reviewed_fbx_sha256": "c68101cd68cba81eda554437a2053851ad7d48dde919a82e47b8deecaa4f167a",
+      "objects": [
+        "chair"
+      ],
+      "geometry_kinds": [],
+      "support": "seat"
+    },
+    {
+      "pose_id": "mass_daily_seated_yawn",
+      "source_bvh_sha256": "5d31efb3c52a7eb1ec38998313789d55b41bc439618cda33f74a4f7d4ec25348",
+      "recipe_token": "419ad9267b870529b40f13d0af07047d601dda5ccf9bd11606fb56ac0b58d892",
+      "reviewed_fbx_sha256": "5b6be327eb513f376e36dc095f57290dece32a192be41e953c8237b4afc7608a",
+      "objects": [
+        "chair"
+      ],
+      "geometry_kinds": [],
+      "support": "seat"
+    },
+    {
+      "pose_id": "mass_daily_sofa_relax",
+      "source_bvh_sha256": "668f36becc42fa38699976b74c6edb7370dee4e65cd9818250236a6a369a1a4e",
+      "recipe_token": "56f1fac12a1da5f9c67d26a53bd80d62736df3b277c9b244c5eefb1433aa9ae4",
+      "reviewed_fbx_sha256": "93dc067405fad319df4bec4e6d6f8c120ad60da3d2d733316218e0822d18c2a7",
+      "objects": [
+        "chair"
+      ],
+      "geometry_kinds": [],
+      "support": "seat"
+    },
+    {
+      "pose_id": "sd_care_hobby_08",
+      "source_bvh_sha256": "a9d684aa51ec3644124a8713e30f0d7bed926cb11288d1e87403ab07ddb7a3f5",
+      "recipe_token": "89893508c42e7cc736bae1a2d0238ba51db995d4fc8bf634c9bf42aed56e6484",
+      "reviewed_fbx_sha256": "3cf8994201a2c9fe309ed95aac3298fc11dfc86e173b7a63ec540221504931cc",
+      "objects": [
+        "chair"
+      ],
+      "geometry_kinds": [],
+      "support": "seat"
+    },
+    {
+      "pose_id": "sd_desk_06",
+      "source_bvh_sha256": "f788e0269127f5cdf5fca00b29f236c7aaf57906267c92189ef861db344ad859",
+      "recipe_token": "8db6c19018ffc8edb7a9eba614a28bf56fae1828678aa5140bc85a75cba481ed",
+      "reviewed_fbx_sha256": "e61c830bbd0c82259bf9c4a25fef85c7a71901874a820febc0d692d3e8788428",
+      "objects": [
+        "chair"
+      ],
+      "geometry_kinds": [],
+      "support": "seat"
+    },
+    {
+      "pose_id": "sd_rest_01",
+      "source_bvh_sha256": "8e65202fb296cecb7b74330d8abcf0421139c49731f41aab42d6d058a0ab0131",
+      "recipe_token": "a754e2e224d83d84065c8f4d67cc7c2d33b4cea6a2a9f9c93963f7c5dae4f510",
+      "reviewed_fbx_sha256": "b50ba53c5bbe9520bcd5d96ac8362dab6073bf4a7e8eb7c4be8bfc7f70c6611e",
+      "objects": [
+        "chair"
+      ],
+      "geometry_kinds": [],
+      "support": "seat"
+    },
+    {
+      "pose_id": "sd_sport_between_09",
+      "source_bvh_sha256": "5fecf81256d1c296a1155aeeecb644676b4b41a24774fb94e842123102f9ef90",
+      "recipe_token": "da2001e80965a22ca55e3ccfaa46333d0f48c15a5c7fb95f1ca3ca37f1c278a8",
+      "reviewed_fbx_sha256": "86df92a405321b0fd42b39d1b511737c1dbacf7b22fc81511e5fbb56c0132332",
+      "objects": [
+        "chair"
+      ],
+      "geometry_kinds": [],
+      "support": "seat"
+    },
+    {
+      "pose_id": "story_seated_ledge_knees_hug",
+      "source_bvh_sha256": "6b0999fd5b547bc5ab2a4c259f7d98786c36c76b006be9f7b1387b38041c5570",
+      "recipe_token": "f192a6084163af0df8323d4eaf0c54000d1463eb3518462610ec1d56f754677d",
+      "reviewed_fbx_sha256": "9293badf1e8fe0cb9b9f2238a61966e826d7cc2bb799577afb1e541598d00ca1",
+      "objects": [
+        "chair"
+      ],
+      "geometry_kinds": [],
+      "support": "seat"
+    },
+    {
+      "pose_id": "story_seated_ledge_recline",
+      "source_bvh_sha256": "ebba1545f2d07eb85f3150e97d73bb7d0cd7ed1940b180ab6dc5485d50ad1ab4",
+      "recipe_token": "2e394e8f7f6ccfc045fd423c9c2b6d3cfb374a2c6afbee713bafa3cf3896eb4d",
+      "reviewed_fbx_sha256": "26944205bc4052f7c19736318808762f94242cdc848c0af362e2505acab149da",
+      "objects": [
+        "chair"
+      ],
+      "geometry_kinds": [],
+      "support": "seat"
+    },
+    {
+      "pose_id": "webtoon_combat_01",
+      "source_bvh_sha256": "d077630ccafdd98f37ec1a95f6c1794f77ef3ce8c62267436471ad59b73fd797",
+      "recipe_token": "3403da371a941b95203aa52f3101099336237a588b80e773768f1695c1780589",
+      "reviewed_fbx_sha256": "5d63e3c8009ae09621aef70a55ec07d385bf0891328eaa81fed046ad072bb45a",
+      "objects": [
+        "sword"
+      ],
+      "geometry_kinds": [
+        "sword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_02",
+      "source_bvh_sha256": "d5e33444106147238b1701feb34f519d4e2f520f9f4895353d6e1ddd1d0c0971",
+      "recipe_token": "ba665b248245d2c843f48cbfd342734742182e32d12b27353b53d93bb41db5ba",
+      "reviewed_fbx_sha256": "7dd254f8595ddaff913d142bc14693a00ec861e1159ffeeda973df419595e001",
+      "objects": [
+        "sword"
+      ],
+      "geometry_kinds": [
+        "sword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_03",
+      "source_bvh_sha256": "38eb05b7432893fefd4cf31cb6f5fb07e21009946541d5a9d48d19c949991ee1",
+      "recipe_token": "7c5fe6f35797bbf0ffca05dd40986bca57c17f2dfbbcb6ed98890fd598a114d8",
+      "reviewed_fbx_sha256": "018a1417e4d8db5b5e23a62430ba8ee053dbd31d531a1429b96d135b3a148eba",
+      "objects": [
+        "sword"
+      ],
+      "geometry_kinds": [
+        "sword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_04",
+      "source_bvh_sha256": "bbb2259a88b8e031aff0c4fdcc5a82d455dffc202e59491e33899171295fde2c",
+      "recipe_token": "72a3c2b15e703f35ebcfcf9de33857936e46b6947c4a4ae50220fa3af85c5cc7",
+      "reviewed_fbx_sha256": "a10807f0af4be99661d9051cee56ff306a862ff87b96a0f6dd0ebf3570d70d9e",
+      "objects": [
+        "sword"
+      ],
+      "geometry_kinds": [
+        "greatsword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_05",
+      "source_bvh_sha256": "072c0832a9aaaaa001a890e69917e2591ade2d675afcb37e9ebaba6dc9b60218",
+      "recipe_token": "6fe94207c43e36187c45cc6b7977157371912f3bcbe38f4d0eefbe1efa0f138f",
+      "reviewed_fbx_sha256": "83443a08d733ddaac9c7530bee95d96dfafff5500a7674338cf501ea9e4a8c2c",
+      "objects": [
+        "sword"
+      ],
+      "geometry_kinds": [
+        "sword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_06",
+      "source_bvh_sha256": "98567c0787405a72e6bae1e7d197303c32ef2bdf458009cec5c8367f377a23b4",
+      "recipe_token": "2f9e5a72b66c5cb5cbfcf183f97d8552e2e9be719493fd9370458c340d35039f",
+      "reviewed_fbx_sha256": "e15703c3b7a43e4c467598312b9933ce026a1cb6c8aeb6641dac2e9b7f53cf34",
+      "objects": [
+        "sword"
+      ],
+      "geometry_kinds": [
+        "sword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_07",
+      "source_bvh_sha256": "76284ae9a81b0a96e10dd1c5719bd6bc74c00b85dc43c3e9c7414f2776726afa",
+      "recipe_token": "3b603a8f1bfdec2e882b21973625833f63e64061c479d5f151ddf35bc84672e8",
+      "reviewed_fbx_sha256": "cf95da12f548c08bb46b71cb1b0f529436ce168be0354f6ba273fabee0afc847",
+      "objects": [
+        "sword"
+      ],
+      "geometry_kinds": [
+        "greatsword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_08",
+      "source_bvh_sha256": "dfb8f32cde79d8d928ef95065e91db0d081ee576ba3e744953591284e4de23b0",
+      "recipe_token": "fdd53c3d250c5fb49fc990cabc7122ab7073f780f070559d35a642db3aaf6a94",
+      "reviewed_fbx_sha256": "643c8cde474ac62638ff01676e0ccbc151c0a5d8718e1c1dc0c63794351120c7",
+      "objects": [
+        "sword"
+      ],
+      "geometry_kinds": [
+        "sword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_09",
+      "source_bvh_sha256": "70b1e34e43bbac6a36e1f6a6402fd28754cc82c049f955cd352941cbe9eb540d",
+      "recipe_token": "4037cd772c04e4943454043b5dea41b7c1a605ffc7205235e1a3be7437a5b503",
+      "reviewed_fbx_sha256": "b8869d8c50efb525ea8f5a54dcbb93d29ee6e9d73fa465b553a377cf64339c21",
+      "objects": [
+        "sword"
+      ],
+      "geometry_kinds": [
+        "sword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_10",
+      "source_bvh_sha256": "448ac09fd5c355ffb66525936063e95bf838fe63b0277d08fa7111b0cf7f78a7",
+      "recipe_token": "2589ac71347bb0c4753f30a4c77c384b610c945561ff5e838bb3e44fd5e19838",
+      "reviewed_fbx_sha256": "9148d9fff5e5a9637e76084a7204d457046d6203c9ae04470bce41a0711a412c",
+      "objects": [
+        "shield",
+        "sword"
+      ],
+      "geometry_kinds": [
+        "shield",
+        "sword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_11",
+      "source_bvh_sha256": "7852f9ec00da6a5d9ab1c0d2d9adf1c20bb25f74475d0f9e8c9f5bf3a6fac193",
+      "recipe_token": "76981f3c0ace0cfc53c1cf27614059cfc24c483c7cce845911434bbbd69b0024",
+      "reviewed_fbx_sha256": "802dc8121e8a9dcdf94abbb0ad030f1cd666156780e1f7416964de4234b08701",
+      "objects": [
+        "dagger",
+        "shield"
+      ],
+      "geometry_kinds": [
+        "dagger",
+        "shield"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_12",
+      "source_bvh_sha256": "752ad31c328573ead0b090a644681826a7304b7d6e17dce5ff057330ad3b91b6",
+      "recipe_token": "7da36bbb13afd848e1e4a5a27e625160aba439823edc75202fd4c4ec479689d3",
+      "reviewed_fbx_sha256": "bea3332125ad009305385b75934bad99d31b9316870275c46dd6b9eb3164ef2a",
+      "objects": [
+        "shield",
+        "sword"
+      ],
+      "geometry_kinds": [
+        "shield",
+        "sword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_13",
+      "source_bvh_sha256": "1a32d708aba85c28378a40cb43190072c11c0ac155ca3d3a6c102a0a2b10c585",
+      "recipe_token": "afed7d1513ec3f2d06918e1bc7f1f3856931b4fa48e2d37fd1032bb2b8ec42b5",
+      "reviewed_fbx_sha256": "75767151d41e5c30785b8e3e46b5a8090d27bec196ed762f98a54c8636c30901",
+      "objects": [
+        "spear"
+      ],
+      "geometry_kinds": [
+        "spear"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_14",
+      "source_bvh_sha256": "5ab6adb076d96efae09fc2f6caf7b14ca67c981dd3c7f46f9e91a0941c980440",
+      "recipe_token": "4ad3bae88c845837315adddb7bb0b358ddacf25bf38c326a8efe41d857d6253f",
+      "reviewed_fbx_sha256": "8d2c6899d3108eefa9e71701130bbfdd11f7eb362770914843608bc8dfe5f9b2",
+      "objects": [
+        "spear"
+      ],
+      "geometry_kinds": [
+        "spear"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_15",
+      "source_bvh_sha256": "09f238773a4a555e09a0d479fa55bdfb27331acc37f2a69eb78a30e374d8a563",
+      "recipe_token": "365e8a0a81be3535fb1667c47d12b93581176ed9fdb21d9585f6c9f67f59af24",
+      "reviewed_fbx_sha256": "c207402edbd6bd01277f8ed709bc1f1123eb32a0bda4d8082a00e4060e02816c",
+      "objects": [
+        "spear"
+      ],
+      "geometry_kinds": [
+        "spear"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_16",
+      "source_bvh_sha256": "a0dbea799b37da3a3f7a03c2090cbbd15837e19b49baeb14c995dfd204879885",
+      "recipe_token": "9e6d85737d8e965cb96739d205ae16fad15984ed8d0da64ddd296aafba772f73",
+      "reviewed_fbx_sha256": "f70c8d069c056d95c85b2fc55da2724b090e8e4ca1aacf6c705b5d69de538e1b",
+      "objects": [
+        "spear"
+      ],
+      "geometry_kinds": [
+        "spear"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_17",
+      "source_bvh_sha256": "afe1a1bac97a0a48b05321eef0467b125f87ccf7a82b529155cc907142d44b67",
+      "recipe_token": "c5e9315220588c50c0714124ea053b7e9abbf6378327c2fc185ca85dc4fe50da",
+      "reviewed_fbx_sha256": "2b922b5514f3122cfaa2adc4ce11e1d23267836a4776f543985323d32aac1c42",
+      "objects": [
+        "spear"
+      ],
+      "geometry_kinds": [
+        "spear"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_18",
+      "source_bvh_sha256": "d07f1fd3d2b2723323997a0d35c3f6f5c8c6498e1a160cedee7e1cd992e219ea",
+      "recipe_token": "5de6d40f47b14b46445908b4178591b4659b8d6e5aec4869402e70f1f695748a",
+      "reviewed_fbx_sha256": "9673ca94409af45eee3f29a7229b49367671f851bb29729698a658a71e0132e9",
+      "objects": [
+        "axe"
+      ],
+      "geometry_kinds": [
+        "axe"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_20",
+      "source_bvh_sha256": "733905c1d5be47d0a97ca44aeef5ed202f9614fbcbf308699329364a7fe2bebf",
+      "recipe_token": "61333d18b7756a91e79bfedb20e7cd6e525e225a2a44b34f20db36f4913903bb",
+      "reviewed_fbx_sha256": "7067da96b6d1e95a18d0824c590c96db6e847ae5c79eab8debcf47b07ad6d2d9",
+      "objects": [
+        "hammer"
+      ],
+      "geometry_kinds": [
+        "hammer"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_22",
+      "source_bvh_sha256": "cb48f84a5f03f837d984b0d2c4c11fd6843c5c1b5a5a86198ab3a29e95e6fda7",
+      "recipe_token": "e62044a284f0f415b285a2b79e41dadd7d73ee8c8300b2d7a49e2ad99aa25daf",
+      "reviewed_fbx_sha256": "4c75d203585e0ff1a786549660ab114cd7a536e11a03398f68e45d21674d0d8d",
+      "objects": [
+        "dagger"
+      ],
+      "geometry_kinds": [
+        "dagger"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_23",
+      "source_bvh_sha256": "bc30006ce4709715d18666c04b25f93920a50e4dc1fde0248b74f409d9175c7a",
+      "recipe_token": "37b76120648f89e872e3b63f6e36fa926699e6f7942d631decfd1a65f51393f1",
+      "reviewed_fbx_sha256": "bff9b29077917de0a24537d05b1c2cbbde46622a3cac80603afa99e815b4cfb9",
+      "objects": [
+        "dagger"
+      ],
+      "geometry_kinds": [
+        "dagger"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_24",
+      "source_bvh_sha256": "a57e76ec29e6ee07a81fe3ddc2c6d3b917f8af3a9eb91c49a35469dd476f030f",
+      "recipe_token": "8244af34fbb01f065885bf057602e0b4494d0ee5ea798f0d25d8265f3f93bd25",
+      "reviewed_fbx_sha256": "da2956b55e01cb611fe60575e7bd338b5f8687817e5b0d60d4a14bbc13674bc8",
+      "objects": [
+        "bow"
+      ],
+      "geometry_kinds": [
+        "bow"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_25",
+      "source_bvh_sha256": "71620a714ad091197c306900518192fe721f9bc38b404fa08eef4570f0765f70",
+      "recipe_token": "ea2154f05313d08b0439eb5f3dfc60d1a0e1c1d2b2ce561b147c6b497fb3b02e",
+      "reviewed_fbx_sha256": "9d2d3dc9683b185506e941fee7edda7797786b189360458938d86dc3d548bc07",
+      "objects": [
+        "bow"
+      ],
+      "geometry_kinds": [
+        "bow"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_27",
+      "source_bvh_sha256": "1e2c9f10e7056db1e4ded4b488cd9bdf7c28dc99f00166a85444265e9b2f06c3",
+      "recipe_token": "4a7e90a8a30b04182d63702ff3bff44a7c3aa0ef543590108e3b65e5b62adb3f",
+      "reviewed_fbx_sha256": "0e8864ca3dac3155de1e7bc3690de58b508de41b6eae6cea68205bf38b3730e5",
+      "objects": [
+        "pistol"
+      ],
+      "geometry_kinds": [
+        "pistol"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_28",
+      "source_bvh_sha256": "4da795023499aa44285fd03c4c0a0fcb69a584b892c724bb96ca41a40bceb4ab",
+      "recipe_token": "6a0769af5a798a05a70419d6e0e96f6df01889cee2d91c57bd66643f3778bf3c",
+      "reviewed_fbx_sha256": "c2e58464ab03de57d404b4d6045c215632c4a79794b690a8cb7d49d7bb1b15e2",
+      "objects": [
+        "pistol"
+      ],
+      "geometry_kinds": [
+        "pistol"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_41",
+      "source_bvh_sha256": "84846576b73966d85c783f042678d91e4711c515cf4d79e071484beb7c2dd202",
+      "recipe_token": "e74091649c70715e59a8c1167704aed29da19c1346f1231002a1e11d08f6e963",
+      "reviewed_fbx_sha256": "2fa2156491dd58fcd3ee23ff08c6866ac05602e0b171025195d847a9c5d49fdc",
+      "objects": [
+        "dagger"
+      ],
+      "geometry_kinds": [
+        "dagger"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_42",
+      "source_bvh_sha256": "9db7a931a08b9dfce625eb8bd98ab8b23f4639d6bd85bcee770cf8e6a3a1f33e",
+      "recipe_token": "fea2486fb8d2f49b75609d04340cb954d215f43edd48c6a05fa2a3563e5a1ea5",
+      "reviewed_fbx_sha256": "b946153187fab48c183fa6fdb56b38778b557123721ff47003a375d755657926",
+      "objects": [
+        "stone"
+      ],
+      "geometry_kinds": [
+        "boulder"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_43",
+      "source_bvh_sha256": "483b3fe64827770fd8cf4be12e98788aa01b8aecff2e9b85572a960f813b97de",
+      "recipe_token": "a8c1027ed6452cb09f4c8874d334ce2e42d77802f916ae3a058fba1afb15161b",
+      "reviewed_fbx_sha256": "64de2316fade44225e6b1eaf5cf6a94f616a5d11a68889becd8210432d375534",
+      "objects": [
+        "rope"
+      ],
+      "geometry_kinds": [
+        "rope"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_44",
+      "source_bvh_sha256": "b1b710f27520bad28ceb25dd098b93dbd34af58ba34f5dfb3f0ec14a172bf3ae",
+      "recipe_token": "121210a785c3e7914bb0cbf570950498fbd7b2a4b73fabe58bba9b4a114ecd0d",
+      "reviewed_fbx_sha256": "de7887f87fdd270e870d83b89616062012be32dbcf2237128c5cfb31d5d89f7d",
+      "objects": [
+        "staff"
+      ],
+      "geometry_kinds": [
+        "staff"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_45",
+      "source_bvh_sha256": "9ce938ab7a8d11cd14b4de840e6667e608598a25723abdb7cece513db04a73be",
+      "recipe_token": "982de9b4031953bee6f7693f674154c9441006ef48234bb77d54294996c5fb0c",
+      "reviewed_fbx_sha256": "dae887fc4ee813a77726c3af1a7e852042ecade78f4ae14077070eb8aba75f05",
+      "objects": [
+        "staff"
+      ],
+      "geometry_kinds": [
+        "staff"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_46",
+      "source_bvh_sha256": "2096ba87eff4cded53263cae32d2ae92716f790d452f54042ce4256d38d4cd06",
+      "recipe_token": "1b34df5ba6ba4112fd977af49c240f8cb314849dece2d5264131d7864341aca5",
+      "reviewed_fbx_sha256": "d70315fb0b97f2b7d25a385c393c446eddb15ffe63a4805721a4fd3b887eec19",
+      "objects": [
+        "sword"
+      ],
+      "geometry_kinds": [
+        "greatsword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_combat_48",
+      "source_bvh_sha256": "287442988d4ea6a96829c090f20084eac93b4857088a8f1fff702724c53c7509",
+      "recipe_token": "91ed2a8d1581e1c9dd71632ae86fa303a1562da2ef0172f61523e016e1a78dcb",
+      "reviewed_fbx_sha256": "76ef23f6179dd3f8d8c15c5c9282953d3a35b84fe7b44b68fef1c44cca27c655",
+      "objects": [
+        "box"
+      ],
+      "geometry_kinds": [
+        "crate"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_daily_01",
+      "source_bvh_sha256": "00930cca1b796a8fd9a88b27f9b51dd1bbae258f99d486ec2f77de18212afbb3",
+      "recipe_token": "9fa48efcd7da92e457c4affa3de097ad5cf4901421c44c909833e102a19ef7be",
+      "reviewed_fbx_sha256": "f1d48370c03e0e3789ce5b6d3e78f399a85b62045fe7a46358f56acdbc5349c9",
+      "objects": [
+        "chair",
+        "dryer"
+      ],
+      "geometry_kinds": [
+        "dryer"
+      ],
+      "support": "seat"
+    },
+    {
+      "pose_id": "webtoon_daily_02",
+      "source_bvh_sha256": "f37d172b2f22e1db701b86a9ec60acdf56f1c54126fc79b35e9a5f59fbdf8d1a",
+      "recipe_token": "ebe200ace62e4e8cfe226a1d2aacd8f8e75fd8a626a9ead9b354e248edf59095",
+      "reviewed_fbx_sha256": "a090c0a26cc7196f659632557982bb16c22b373b403c13287723fa2589ac5275",
+      "objects": [
+        "dryer"
+      ],
+      "geometry_kinds": [
+        "dryer"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_daily_04",
+      "source_bvh_sha256": "d78ac4376c42d4bc84fbf8216f101fde148d073d23d136e44a461e491c73a347",
+      "recipe_token": "5cc63a40517d106f9d5c07cc750e036c7582270a9ceb927e06bdb0e98dd4cce2",
+      "reviewed_fbx_sha256": "51d14dccea61391bd73e1d4a01a9496328bde5fbe5b8fbefd8d093707d05c614",
+      "objects": [
+        "chair"
+      ],
+      "geometry_kinds": [],
+      "support": "seat"
+    },
+    {
+      "pose_id": "webtoon_daily_07",
+      "source_bvh_sha256": "3929c2f68722206aab1a28aa6ad022367f9f5fb312727bea1fe9f39d27bdf5fb",
+      "recipe_token": "6dad04110da9583fbc825e99411b258dbd6581d462657369aaa685467a281f24",
+      "reviewed_fbx_sha256": "ae77942006887c06d523f8b35101cd2f37b2b6b9c7fa9522bfa943480ed46514",
+      "objects": [
+        "chair"
+      ],
+      "geometry_kinds": [],
+      "support": "seat"
+    },
+    {
+      "pose_id": "webtoon_daily_08",
+      "source_bvh_sha256": "ecb1f39c7481d3a93aff1f90ab94a85b73bf79a7de5caf4c4e2586e6e0499938",
+      "recipe_token": "612ccbf562e8323f9830560f8dfe283fb214576cc2c8fbf6525bc61fef76b9b7",
+      "reviewed_fbx_sha256": "c983a6c2616a6d44bd85246a014063aed1e3321c80478a3cd0bb517d26127830",
+      "objects": [
+        "cup"
+      ],
+      "geometry_kinds": [
+        "cup"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_daily_11",
+      "source_bvh_sha256": "2477fcd0dc593376f7a919467390962f438455810f74e613d6a3eff2455d9c30",
+      "recipe_token": "4fd4c25b65c6fac4d19113162e0e6892295c3e28f6fe9bc861efdb33ce24aa92",
+      "reviewed_fbx_sha256": "70cfc40cc88b91b263e589b45f37177fea92c59093fc84895b1c243dc73caa55",
+      "objects": [
+        "tray"
+      ],
+      "geometry_kinds": [
+        "tray"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_daily_12",
+      "source_bvh_sha256": "7d5f65b35cbf0c1204b05094f8a648ebc9b68c57da9a1e1fc6ff4e91897f90e2",
+      "recipe_token": "0a4afe287776053e056eaf56e2d2a7e7cb4d19aa8b394f85c802f2d1dcaecada",
+      "reviewed_fbx_sha256": "22eeade6cc6fe5a081b235763edd3d20c1de8ee0c4292ad3ecc22f9657df22f1",
+      "objects": [
+        "box"
+      ],
+      "geometry_kinds": [
+        "crate"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_daily_13",
+      "source_bvh_sha256": "ee1fe61586696b44e7ea938a6b64078f80c8a8ece42ff30b0068daf3c855764a",
+      "recipe_token": "f6c4ac5889627ab3c7960d43f8922ec0f38bab9151d3b92a6dd829673855218b",
+      "reviewed_fbx_sha256": "d3e8d0da8a1a9a20ef11969a73caeefd20477451a83a796450fd9957e470e883",
+      "objects": [
+        "box"
+      ],
+      "geometry_kinds": [
+        "crate"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_daily_15",
+      "source_bvh_sha256": "53da0ed2d16144847d4885a3d799263df1f1be2e65a0efdc4243ddc5fee089b6",
+      "recipe_token": "b6b6c5bc1cfebef99529031c26f5b64e4bc3fab6ef500ec5cd107059d26179e4",
+      "reviewed_fbx_sha256": "cc86478c0300336cb773418b112091087778a279c398d70d713366f8aabf6f0a",
+      "objects": [
+        "box"
+      ],
+      "geometry_kinds": [
+        "crate"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_daily_16",
+      "source_bvh_sha256": "a61a84158afdbdae640594262d0aa0203af985c5dc9f74df91f8a713bd6e8b64",
+      "recipe_token": "d5a791f346c7e32e74709abb2801fb83556a971f87469d9fbe7532d8c3155a6f",
+      "reviewed_fbx_sha256": "25f3f7e94d950f3077fff2620f36ba97ebd4195fd49d5b886326e4f9d81c1e4e",
+      "objects": [
+        "bag"
+      ],
+      "geometry_kinds": [
+        "bag"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_daily_17",
+      "source_bvh_sha256": "dbc423238636aed04ba9ef313353580dda9df6cbea6763ab2acaf9305e53558d",
+      "recipe_token": "cbc0cb136ad934c19349f9aab4453a0e9c38039c3600a311a69801fae72c68bd",
+      "reviewed_fbx_sha256": "d71278f88f3685fa8c74aabf423cae06bf1f5b099af3f265acafeacdae8242f4",
+      "objects": [
+        "basket"
+      ],
+      "geometry_kinds": [
+        "basket"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_daily_18",
+      "source_bvh_sha256": "5b0636f9583b0b4172366c866c9319fd95b4b9b200a76162eceaf07e7d59d737",
+      "recipe_token": "dcbdc18b00d581ebdb135a86ce082a2e12aa5538636e492b1b99dd97fea515d4",
+      "reviewed_fbx_sha256": "2a5eabd2687b817954ad0e13da975aeb9e144909ac43cc53445ff158120da81c",
+      "objects": [
+        "book",
+        "chair"
+      ],
+      "geometry_kinds": [
+        "book"
+      ],
+      "support": "seat"
+    },
+    {
+      "pose_id": "webtoon_daily_19",
+      "source_bvh_sha256": "17d7d582b5e435a0b947a573e2a69a380553fcd6613ddeab143285dfd96185d8",
+      "recipe_token": "6a83aeb2af3125b6ca03154bb35434d7ae5887de19639cc9ccc4ebca03f5a3ac",
+      "reviewed_fbx_sha256": "241fd3a7fb3e2b91ef9663aa70aaa31b8b266410e7cb2b2ef7ebf93213248748",
+      "objects": [
+        "phone"
+      ],
+      "geometry_kinds": [
+        "phone"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_daily_20",
+      "source_bvh_sha256": "aaa92c2e4747dd1e2cf1a75d12a2d3a905357d12cb2a5b578305349cf1d9e047",
+      "recipe_token": "50911a4815baf1589cd4fe6d79ec2d1e35c834b35c48ca7cc4a2c09babf19500",
+      "reviewed_fbx_sha256": "c040deac2bbaf5c02a4c478f602f0aea3fefef9f84581c3574eb6d32de6cf16e",
+      "objects": [
+        "phone"
+      ],
+      "geometry_kinds": [
+        "phone"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_daily_21",
+      "source_bvh_sha256": "30c8a31617386a326299b9681d5181cf4f60255f4774c6e271d75af638f02022",
+      "recipe_token": "4d3d65475ad71c761cc966d4ac493ae23305bd4f7a39858b12201478dab6f32a",
+      "reviewed_fbx_sha256": "fb53258775397466cde24a074b2faa2fcc2adc6d41bd9c09220fd76d3693901a",
+      "objects": [
+        "chair",
+        "pen"
+      ],
+      "geometry_kinds": [
+        "pen"
+      ],
+      "support": "seat"
+    },
+    {
+      "pose_id": "webtoon_daily_22",
+      "source_bvh_sha256": "b0517365e33baa3cac50a0f6b2ac41fdb204a260992e13d63151cc4121f4e566",
+      "recipe_token": "b14eb83549eb316a75f4c14459b4b56f1b0d6ce5a93d8dad047a5c75993600fb",
+      "reviewed_fbx_sha256": "a7a3f0946364add7451519e16f17f9b5a382d36bd94e33dd54f8115c22d9cf46",
+      "objects": [
+        "chair"
+      ],
+      "geometry_kinds": [],
+      "support": "seat"
+    },
+    {
+      "pose_id": "webtoon_daily_23",
+      "source_bvh_sha256": "9d0bb7971403be220d0da7a49435203b0dc65190040adb743569bcb36a3ffeca",
+      "recipe_token": "dc377d672cedad05815e8a7338b5561fee1f3b2fec5e7fb2af9c334a43e47a05",
+      "reviewed_fbx_sha256": "9e0237fc74bc0accd80abb90f1b9bffb336aa724794eb2cb16dacbde9dfba692",
+      "objects": [
+        "spoon"
+      ],
+      "geometry_kinds": [
+        "spoon"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_daily_24",
+      "source_bvh_sha256": "a94d24c2191efc4b4f153d4e3ca97aea3c547bde21767673452cac17c632e850",
+      "recipe_token": "e16da5a8fd441d791b2427c7e5a6c7952232bc0efa915ccf1f0599de9d442ab2",
+      "reviewed_fbx_sha256": "ff8298db169dfbd0e366a2dd94eda847e8ee95283da7d07126611091e711bc16",
+      "objects": [
+        "knife"
+      ],
+      "geometry_kinds": [
+        "knife"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_daily_27",
+      "source_bvh_sha256": "d46866936a17ae943024aa8c265987081ea466d8a7718916d64599291a80c54a",
+      "recipe_token": "f0176dd484b9b94cc2f83440110eb8451162009f1d84473713448382b14ffcbc",
+      "reviewed_fbx_sha256": "e8180d96b216b9b80d42c2c8de4e9652869a47fdbbe1f40778701e1030379628",
+      "objects": [
+        "towel"
+      ],
+      "geometry_kinds": [
+        "towel"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_daily_29",
+      "source_bvh_sha256": "c2fa68d330acc7ca5608ed5a35b003a2d40ee9dc734837cc349e89c4593ea8e9",
+      "recipe_token": "e8d3cd04d9247978828f5414e56de9201ac7aa596041e74abc97ade821aba6cf",
+      "reviewed_fbx_sha256": "91506baab53c5705d7ee4578d4f44443a315668d3736bc488b2e70fd7937818c",
+      "objects": [
+        "chair",
+        "comb"
+      ],
+      "geometry_kinds": [
+        "comb"
+      ],
+      "support": "seat"
+    },
+    {
+      "pose_id": "webtoon_daily_30",
+      "source_bvh_sha256": "adc09de7d8600f15344d27a43e817bc529e2f3bbf36b117bee0966207c897683",
+      "recipe_token": "300c138b364258eb72bef0f13e8882f3ba766345e8ec7370bd0ab347362d1403",
+      "reviewed_fbx_sha256": "7df434294a1f92a66e59ac83595f3f4e033e4d6284dc8d7c489e88cd63df5a6c",
+      "objects": [
+        "jar"
+      ],
+      "geometry_kinds": [
+        "jar"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_daily_31",
+      "source_bvh_sha256": "81bbc25a88f083f0900a28d223d4dba6e9c72b60a90d9f8e3314873c9e60d8e6",
+      "recipe_token": "bb63b3fe93c981b1082fbdf6f8dc152a49c5b261c69eb13956d50ac310eae474",
+      "reviewed_fbx_sha256": "66456748b8ea2142f8188226e58cd49d76c25c652fcc8238796e2d972e4d5fc7",
+      "objects": [
+        "phone"
+      ],
+      "geometry_kinds": [
+        "phone"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_daily_34",
+      "source_bvh_sha256": "9a167c9188a861aea6fca0bb4944d3ab93874819e08fc286d288f571d4221cf9",
+      "recipe_token": "257fd2d3ce40d75d99ef1a78eb7de7b37e0cee32a4c59c5022f90eca0f979f35",
+      "reviewed_fbx_sha256": "418b00a7c11aca1bb7e7e0016272fd867ceae1630cabad2974335633e93e4621",
+      "objects": [
+        "umbrella"
+      ],
+      "geometry_kinds": [
+        "umbrella"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_daily_36",
+      "source_bvh_sha256": "50477ab887c4a47631a8f54db99cd85b558b1d864d30cc7a693bfc92891b0f00",
+      "recipe_token": "f62ee2f3031edb5d2fd4bbca79a425965cf2a0e9918086d3c2fdd1e0775a7a07",
+      "reviewed_fbx_sha256": "0a8e22d3f37ec5ad4cf9632f7e0c7296f0cac8f6f8160ea398ce957d33c12849",
+      "objects": [
+        "chair"
+      ],
+      "geometry_kinds": [],
+      "support": "seat"
+    },
+    {
+      "pose_id": "webtoon_daily_37",
+      "source_bvh_sha256": "d89634ef2ac9123029be053ccb19454ce34c7d74116a3844de92c56fa61bab11",
+      "recipe_token": "696ddf234cb3aaa8fb70ca84370467bd782bfd3f8461b551802c1fee23ede891",
+      "reviewed_fbx_sha256": "8760a8340a21dca9be30d032ea36c3705e05f9e590867eb169f61cee4cb1dffc",
+      "objects": [
+        "plate"
+      ],
+      "geometry_kinds": [
+        "plate"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_daily_40",
+      "source_bvh_sha256": "3c02b3609e55e917eaa817503e375251a0a094e411563318054656c5495b1b0b",
+      "recipe_token": "4de1bcceea5fed226eed537e0e748874df3d3222f4ac376bae0953104447b96b",
+      "reviewed_fbx_sha256": "edafc4de7674d00fe9388ef1f239114fa5a942dc2ac19fd20958c93db15d1ee2",
+      "objects": [
+        "chair"
+      ],
+      "geometry_kinds": [],
+      "support": "seat"
+    },
+    {
+      "pose_id": "webtoon_daily_41",
+      "source_bvh_sha256": "0377d8926667898681ad139011c2dccdbb5a9d7ca7a97fe69e77a618dfa067c7",
+      "recipe_token": "f706fbdcee8becf4ebb8af527d1c9276e400f2da7b730d2bdebe417289bc70a3",
+      "reviewed_fbx_sha256": "88e49166e5c1341c1cc91419603ebd48eb0d9ef1fd7fa5614bf053ddfafece1f",
+      "objects": [
+        "cup"
+      ],
+      "geometry_kinds": [
+        "cup"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_daily_42",
+      "source_bvh_sha256": "03ba5accfb91b94fc7cdb7ff8945010a9b274819d5aec81b6bb495aeb7a9f799",
+      "recipe_token": "47d7b1e765aef0b4138fbbfa1685a0b5bc77d82d68cf255c9503056423a05a88",
+      "reviewed_fbx_sha256": "f133ee8bb6c89e68e5ca8d8ec9a93cf33431f375855f0196de829fce828ff7f8",
+      "objects": [
+        "broom"
+      ],
+      "geometry_kinds": [
+        "broom"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_daily_43",
+      "source_bvh_sha256": "295c3823b01797ff3425a721ec3b02ea6d814ace93512dd7756ea8cbfb31e02f",
+      "recipe_token": "16a8f3d240ec5de48c4d597a57b18626316f52cd989f1a4028845b30f5a95066",
+      "reviewed_fbx_sha256": "ab235e3deab99fb377a435f62540f6c98188a816001664bce054a053f46b571d",
+      "objects": [
+        "towel"
+      ],
+      "geometry_kinds": [
+        "towel"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_daily_44",
+      "source_bvh_sha256": "6b4904fd2bc15532f39581c3508e31ed6e5e418231a765fac612609e5e2fb490",
+      "recipe_token": "9ee12a0e6b9962b2cd84735159eabbbb7cdb5ab73db9f5abd7637f01bccc4f1c",
+      "reviewed_fbx_sha256": "9e440a97777d7a7e527b956c11224a64ce80688f98d2f5025dd28008b0b1ff4b",
+      "objects": [
+        "watering_can"
+      ],
+      "geometry_kinds": [
+        "watering_can"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_daily_45",
+      "source_bvh_sha256": "6edfaa4961bde5eba55d61a0831094d001f7ef8a1a100f7bfc9a1b93a0342737",
+      "recipe_token": "c3eb92c9b438766c5fbe4004cd11084796e61542841b68fb2a2dfafd7af0e643",
+      "reviewed_fbx_sha256": "412126160536f61f458e39dd02ad494b2532140fdcb1b9bfe5405d77050ef101",
+      "objects": [
+        "chair",
+        "pillow"
+      ],
+      "geometry_kinds": [
+        "pillow"
+      ],
+      "support": "seat"
+    },
+    {
+      "pose_id": "webtoon_daily_46",
+      "source_bvh_sha256": "23a2ba29a16d9c26fb8c53eb648ef8ce1767fe404594f7a7aa0d069807a2a4d8",
+      "recipe_token": "485129b8e6b9d26df260af51528b9f73e84739f8ab5257346e4a34d361660d4c",
+      "reviewed_fbx_sha256": "a5305ea9835ec178cb4cacf6f3a82d2b159438457124b9bfbb3c1a08ea52e85a",
+      "objects": [
+        "bag"
+      ],
+      "geometry_kinds": [
+        "bag"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_daily_47",
+      "source_bvh_sha256": "ee2956ee4c97cc360608f7f0dd32ac53b636f74ab245e9ee1b4725c29e40297f",
+      "recipe_token": "65900b6da456e32a5b2174e6267a0771fcfeb4b5a63ba33d98b9dfd7b79223f0",
+      "reviewed_fbx_sha256": "5091fdd1669f2e4701f544cfe43a1eb80d27fa6a7d23c4192ce616657c75c4cb",
+      "objects": [
+        "laundry"
+      ],
+      "geometry_kinds": [
+        "laundry"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_daily_48",
+      "source_bvh_sha256": "70e935934dcef02afb41b07d5cc573fd0b9d27b31fa7666087fa2091aef00e60",
+      "recipe_token": "0562cc09d5eb05f65d4f2144421eefbd880d00e7d57ea803549cf4daf043ef3c",
+      "reviewed_fbx_sha256": "ddc1c2999eadebc04bc99364289aee90e30c01f34aea3516e322cfd996e0ff7a",
+      "objects": [
+        "chair",
+        "photo"
+      ],
+      "geometry_kinds": [
+        "photo"
+      ],
+      "support": "seat"
+    },
+    {
+      "pose_id": "webtoon_daily_49",
+      "source_bvh_sha256": "912b08b303c9cc189669249b34c606d33c8eeac10a0a43d392069c4ae5a8db1c",
+      "recipe_token": "61c2619b40219abda5b47750d8c95be6c4e8c7dd2de766d500610a1aaaf1c799",
+      "reviewed_fbx_sha256": "97fafedb88c6d2acb5d6857a02d3bd225ee455b76ea184ef72dd7c96f25c18c2",
+      "objects": [
+        "book"
+      ],
+      "geometry_kinds": [
+        "book"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_daily_50",
+      "source_bvh_sha256": "d004ac30827cd039aabab8b777515a26ed1f9f6dd3ee7b071933ab81f9c3c1dd",
+      "recipe_token": "71601f018df48ab239e20cd2a6dbd2b6ea0b52a11958e1edbaf55e348215fbf5",
+      "reviewed_fbx_sha256": "02681f1006a4f7756783b394394ec9ad0ba9abc9177c3a0feffec5b135c9922a",
+      "objects": [
+        "mop"
+      ],
+      "geometry_kinds": [
+        "mop"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_01",
+      "source_bvh_sha256": "31f6851f9efe5125d4c04b379fb3cf758b66c395c0c8c38e22c49dd674920382",
+      "recipe_token": "b92f9d958eae2e68027048e8d6d9992ed585c8a176eb307b3dc7b5d520e4e14d",
+      "reviewed_fbx_sha256": "0a562446794a546bb71c37cf12cc00d33c5d9d6f0c6d0f3db7c653042d3116ec",
+      "objects": [
+        "sword"
+      ],
+      "geometry_kinds": [
+        "sword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_02",
+      "source_bvh_sha256": "b002ec82d2e4b05f09d4eebf44405419e4526fd6826b5ae55e79834239ec42c1",
+      "recipe_token": "11f06604bc337d078438d3da6b3172572f958277126b7b00954b8c1b3b65cefd",
+      "reviewed_fbx_sha256": "cc25de7d572d93644bd30b5f4aa68f13afc1399964f7ccce7faae779a26a0508",
+      "objects": [
+        "sword"
+      ],
+      "geometry_kinds": [
+        "greatsword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_04",
+      "source_bvh_sha256": "20f9f5746dec9aa75fa1885ef69068c16ad09fb0ebd59bad89bd2bb3865397e6",
+      "recipe_token": "38a1c79f92085787b184d3cb6504d72750a275b56aa64f8c9ec542e24be17bf7",
+      "reviewed_fbx_sha256": "ce5440920cc5c05504d34e5db9e6dcd1b34b9c282b6ea7f067cfaa8782ee90a9",
+      "objects": [
+        "shield",
+        "sword"
+      ],
+      "geometry_kinds": [
+        "shield",
+        "sword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_05",
+      "source_bvh_sha256": "ad8eb51d3a3acbc32c4f565c4f337e0f0a9657b2d03ed0792de3d137119841c7",
+      "recipe_token": "fefcbbc4cad87f93de23e408782f41421d1d63798b5f0f4e2be24faac60032ce",
+      "reviewed_fbx_sha256": "5ebd5f30b5927d21742f746d2615f6e524f79f9ed8ae4adf854a51c131d1ef8b",
+      "objects": [
+        "spear"
+      ],
+      "geometry_kinds": [
+        "spear"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_06",
+      "source_bvh_sha256": "94d7b83bc9e9f03525d38b0c70b16b805809aedb391cdb059c70831662a2f106",
+      "recipe_token": "747d7cdc32a332424df98bc07ce31d1c87c036a3a7e65be0073a4fe667d3cf95",
+      "reviewed_fbx_sha256": "2e68f76eb9f5bdc964b8054c7f6fcfd95e11425f308b6051e8ffb24f3340c969",
+      "objects": [
+        "spear"
+      ],
+      "geometry_kinds": [
+        "spear"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_07",
+      "source_bvh_sha256": "fd6998184a9711f6083497348e819bb61804e89a8fed9a5e8fb032415a446632",
+      "recipe_token": "99fbc0915ee9f6246f4c8e9f81c44fb6155ece92a085ba25d5032a6140f1a298",
+      "reviewed_fbx_sha256": "002051c60581fecbe547629b2718c379c4f05292eb634230bffdc0f8e7abcc7c",
+      "objects": [
+        "staff"
+      ],
+      "geometry_kinds": [
+        "staff"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_08",
+      "source_bvh_sha256": "3db748cb12abb69c8100fe783068a060465eb5dc59cb91abeebb919b84cfb844",
+      "recipe_token": "9f706af47b383ffb1b268edac5072f5c559f55db791ae1bba565898cfe3cf3e7",
+      "reviewed_fbx_sha256": "990724b69c1e7873ec56df1d1f27210b1acc441a1f6f3e1b53215fcd902c0d43",
+      "objects": [
+        "orb"
+      ],
+      "geometry_kinds": [
+        "orb"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_09",
+      "source_bvh_sha256": "b65d0875e119269e3637ee8613a4ff962fbb636072418c9bbb35a1db093336e2",
+      "recipe_token": "4adcef1f89c994ef2518c3a896cde7aec771265f6954837bf71180cd4ec8ffb1",
+      "reviewed_fbx_sha256": "2ca27db30b02e483d39e8074efdd1fc0284860307442ba76e8722408f600b9e8",
+      "objects": [
+        "wand"
+      ],
+      "geometry_kinds": [
+        "wand"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_10",
+      "source_bvh_sha256": "ee28eb39bbe85c6568ce98f35160cc286090bea74c50f29d9ca76e5c6c728571",
+      "recipe_token": "463f052aa46ec865b977809cded969aae82712893c6901c35a7c1633ed2f42ae",
+      "reviewed_fbx_sha256": "81f58f1bc7d2ed39580a471219dae7d07453e2ab1d8bf429cba0f24891218fb1",
+      "objects": [
+        "orb"
+      ],
+      "geometry_kinds": [
+        "orb"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_12",
+      "source_bvh_sha256": "b4f3c6843245b8a9ded34e1071f64b9d51e70355beeb4696feefa59cb16bef90",
+      "recipe_token": "708bc84642d3b29bd577da5026270dd4f13ebb3e9d0ca7b14a0427ad6c72ed9d",
+      "reviewed_fbx_sha256": "f4ce27e15e79b77044c2cc2a384a82dff2f295b8ddb4cd60fb6158981bac4d7c",
+      "objects": [
+        "book"
+      ],
+      "geometry_kinds": [
+        "book"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_14",
+      "source_bvh_sha256": "94217f4e35e2b90610767434dc7650e82614f03ed1593affb6c4e32c137725d7",
+      "recipe_token": "431934f3fa70a3ee63be1e3fd7211fb69969c5a4c1cd2eef27e8605bf98a456b",
+      "reviewed_fbx_sha256": "b0d40bdfb2ae7ab5a6f03b1c0ac0c844268c1d2b5b425728be05a99b8d1c6732",
+      "objects": [
+        "potion"
+      ],
+      "geometry_kinds": [
+        "potion"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_15",
+      "source_bvh_sha256": "d75fcf903ba80d8a3d6da559796356a668cc320b2ddae8be41d46a30bd4f6a7c",
+      "recipe_token": "84bcb770f948e0ceb08b19a1a8b960c9839b4aa8863e12c9ff8445d7fba7926f",
+      "reviewed_fbx_sha256": "d7d6d07cb758ee65c3d4221ab55326fc3e1bbbe2b35591ee0c9046199e7fab57",
+      "objects": [
+        "lantern"
+      ],
+      "geometry_kinds": [
+        "lantern"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_16",
+      "source_bvh_sha256": "501c28b81511bc434f4b2bfe8df7b8c47a796ac853f995be76bb2fc46d2db126",
+      "recipe_token": "e4b09334ec3c35b622a8d1f93ee1c276160d99f260e2c4f210dda0239d11132f",
+      "reviewed_fbx_sha256": "a23c5cc946308cc760e6e8c548aabf26539dc87062994107aa7206969b7b71cc",
+      "objects": [
+        "torch"
+      ],
+      "geometry_kinds": [
+        "torch"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_17",
+      "source_bvh_sha256": "f2aedcd86a23d055291bd64f8e361c1fb079762a4bbe8f00ad97c35a8831a7c5",
+      "recipe_token": "fd37bc5be3076a8a67cfada9708c7db63952693dd00966448e10712a15f018f9",
+      "reviewed_fbx_sha256": "b1dc3cb6e5bbd1d01c5a51168381b4d89272714fac0226e4a1a42fde9f3abff3",
+      "objects": [
+        "box"
+      ],
+      "geometry_kinds": [
+        "chest"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_19",
+      "source_bvh_sha256": "99091b3f06b2164157abb0fa0d6855064976e25f0bc0afd97678e1509839ef28",
+      "recipe_token": "a9a5232cc4189d6cd41cf637655c25b18e65839a6fb34462b5f736c6f02a59b0",
+      "reviewed_fbx_sha256": "7a2791d1d819305009a366c5393fe42819bead96dd1c4ac45bbd0990898c49fb",
+      "objects": [
+        "sword"
+      ],
+      "geometry_kinds": [
+        "sword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_21",
+      "source_bvh_sha256": "a075c9302654f6db4507e7616c0cd054ff19d544f0aab168087b755d337c476f",
+      "recipe_token": "e83f1ce8d4ceca3722bfc28be1b4ad16351de7b115366980c3c2165c1dec7553",
+      "reviewed_fbx_sha256": "e8389da6bf9f09a15f1ec5efa61071bace9ce0f0d60c6f6f6d5fcbb899ca59b1",
+      "objects": [
+        "crown"
+      ],
+      "geometry_kinds": [
+        "crown"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_22",
+      "source_bvh_sha256": "c1ad01c25b4fdf82a6ea0b100cad5bdb4de542b2113dce951416b4f4dc8e08c2",
+      "recipe_token": "c9321f9010c80c0329808b1304b9c88d82a99f6e2cd35b704892f4802ee04a5d",
+      "reviewed_fbx_sha256": "33f7b8d20b7c2b4dc0e8fc9aaf3080d72fc871a4c71a9aa9023d6fe6b529adfd",
+      "objects": [
+        "cup"
+      ],
+      "geometry_kinds": [
+        "goblet"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_23",
+      "source_bvh_sha256": "a5beea391b3e681d7a1c5846dda8445ac4622860b6a0203d7723ece172c39786",
+      "recipe_token": "85b6428c207f42200d2ca41b3dfdf0273d21b87631ac4a3e8624cac9317394f4",
+      "reviewed_fbx_sha256": "d9cef0d590ec0683132e7bf1053168fbac2b5dfebe1da99973268264958e48db",
+      "objects": [
+        "bow"
+      ],
+      "geometry_kinds": [
+        "bow"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_24",
+      "source_bvh_sha256": "fd215b139ca7b793af47745c38bf366747747bbf7193de591e5601b229455dde",
+      "recipe_token": "7afc79befc59563e5701a513f26a1419d7fc8b3a3b3e3906b4f71b65922528c8",
+      "reviewed_fbx_sha256": "209f117a830112f409e496d544df4b282bed1294aff7565e3b650d4ad9b6baa0",
+      "objects": [
+        "bow"
+      ],
+      "geometry_kinds": [
+        "bow"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_25",
+      "source_bvh_sha256": "75c3ab4cf2be489529180d346145602a9d00b6e00e670256169423994b8cefd1",
+      "recipe_token": "8e7f180b74f8d183bbc4ab77d067927bedb7e858e328098af6c100aa68715cac",
+      "reviewed_fbx_sha256": "f0400f09ca50d88971a44f3f6d57205e4d7ef65bcb4daa3dd82ea9619435fbb7",
+      "objects": [
+        "crossbow"
+      ],
+      "geometry_kinds": [
+        "crossbow"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_26",
+      "source_bvh_sha256": "f5f76d187c13800f388a5fdd5bee79b82ecede6bd1c7d2bde7c64a34eae09749",
+      "recipe_token": "d57c3cbebf537370bbfd1966e9b0d01177febcde50a63d037b9b7cece2932cff",
+      "reviewed_fbx_sha256": "a74e653290daa78704aae2d1d879cfbabd09d3fd3faf4990f4c6f3d708fa5a28",
+      "objects": [
+        "axe"
+      ],
+      "geometry_kinds": [
+        "axe"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_27",
+      "source_bvh_sha256": "f53cb6fbbf353ac9fe225f9bbb97666327fc2c0e0282fb11f9dabbbe44f2eb07",
+      "recipe_token": "e063bc8dd3d573f2c71da47a328c04d7a7f21909c0e759efcb1d76c74ba0ed27",
+      "reviewed_fbx_sha256": "ce84ea225f76a3ee66160be2c34eea5ec0d13c57eab837877f8b97b3c3849548",
+      "objects": [
+        "hammer"
+      ],
+      "geometry_kinds": [
+        "hammer"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_28",
+      "source_bvh_sha256": "aeafc39fa0880d3d763b7a286eeeb29087bb03659a9d1e74cda084dc237a49c2",
+      "recipe_token": "6bff2d930c95387e5448ec439af9fa62d793229a3234143a30822eb12a55e0b3",
+      "reviewed_fbx_sha256": "6aa5b83fea2912ec4c5fa5c1954342d065ca5dda5e1efdd94998c100414ca705",
+      "objects": [
+        "pickaxe"
+      ],
+      "geometry_kinds": [
+        "pickaxe"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_29",
+      "source_bvh_sha256": "a9d0d9ebb2abfe30962330e32b0aea58855607bc725f43b0cc3ad97e0b6eaf43",
+      "recipe_token": "9485b0e660c6486dfb0ff4f33531dd4439d930076fc1d3b16293eb8659bf8da3",
+      "reviewed_fbx_sha256": "7f87a289b00072ed3f6e8557ed23e3e3cdf12a4631e214c46933dcb16fa64510",
+      "objects": [
+        "gem"
+      ],
+      "geometry_kinds": [
+        "gem"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_30",
+      "source_bvh_sha256": "e5ed177962021cb4552e79d8eafbe343deb9592fb1dd556ae83c9ba9c3e4b21c",
+      "recipe_token": "8f10f16d90a1db1ce6d552ac46b26c7ef1a8f1ce6d10f594b416129b343a2d5a",
+      "reviewed_fbx_sha256": "f1f2268b1ca05199a638d90477a213d01a70598830ae55366381ef32152b7f76",
+      "objects": [
+        "letter"
+      ],
+      "geometry_kinds": [
+        "letter"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_31",
+      "source_bvh_sha256": "f770ea585fb6dc8585a5e5c3d50375028fb1c6634e8a39a610cf95b5354141de",
+      "recipe_token": "a4d46ff4594d6124b1e5eb2db755d197cc8ed1614813f3f7891feb3a4e7046df",
+      "reviewed_fbx_sha256": "d5cce695fc60b57a7ebd4c3e0aa6448345e910fe4a6f89424c466da2b89a9768",
+      "objects": [
+        "sword"
+      ],
+      "geometry_kinds": [
+        "sword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_32",
+      "source_bvh_sha256": "33c7860336915dbfa5948d16714b76b40547ebab5651075ddbec3684ec39005a",
+      "recipe_token": "c481f5d69403a1574cdcfe355f3371d1da6f95cc38ba2562ad02a0c27e634073",
+      "reviewed_fbx_sha256": "7985ffbee2410c2093989c47ae4cb9398d99643ecfc6e78841135a8a21dbcb7f",
+      "objects": [
+        "dagger"
+      ],
+      "geometry_kinds": [
+        "dagger"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_33",
+      "source_bvh_sha256": "e73f83f2d2a9256fe4c7eefea3d517c79d07147fd317b9860bfc2d685309ed77",
+      "recipe_token": "6f65838d4b19e7cad989906e1db9f267f6c6568bf7288ea4a82b2131f20d3728",
+      "reviewed_fbx_sha256": "c8877fb2a8f9fe6396996bcacca04db347019bf7292626cc7bbdf46d0e3b38c6",
+      "objects": [
+        "dagger"
+      ],
+      "geometry_kinds": [
+        "dagger"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_34",
+      "source_bvh_sha256": "ec75bd8765a5e95331b5d3d517ae731e00ad858382dd67ea31c34c23f84b4ce3",
+      "recipe_token": "f51d0c13390f726e110933f7e191faaa70e2503d3fff0777f153d485e3554482",
+      "reviewed_fbx_sha256": "c257c2a2861e2f7452220edb92549ddceb054441179489c39b9ae75ca17862c9",
+      "objects": [
+        "shield",
+        "sword"
+      ],
+      "geometry_kinds": [
+        "shield",
+        "sword"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_35",
+      "source_bvh_sha256": "a76a98a6e840a4c1625ec4696a34a7dda0f0d4f91851878c47fbce39654544c6",
+      "recipe_token": "9c3bd009bf3fdfc9554e62e3c051268d1e5b501c72e15d6f00c5eb1f9289f989",
+      "reviewed_fbx_sha256": "2300d8db98f586afece29d4426bc7f0fc2a248988562ef8cdb953e4f02eceb20",
+      "objects": [
+        "spear"
+      ],
+      "geometry_kinds": [
+        "spear"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_36",
+      "source_bvh_sha256": "74ba902dd592a39909c30066ba0782d6e97fa2ffd9877a89ee04b5127cdb91d9",
+      "recipe_token": "59b8fad505d05dc51238570e331a7ab0d9c7ade106127fabd7b651fb7f2a5324",
+      "reviewed_fbx_sha256": "f3f74a3d338340b5ee98d8fd29ffcf1a8bb96b87bf990699085ef145214d57e2",
+      "objects": [
+        "wand"
+      ],
+      "geometry_kinds": [
+        "wand"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_37",
+      "source_bvh_sha256": "f97a8613bb412107de122670f526710818f28ef928346d907975ff795c5cefa2",
+      "recipe_token": "4973c012af9de655b616d583322ead9988ec26e8cff1c13457222ea2836a3237",
+      "reviewed_fbx_sha256": "346835d3632d6b9be95def940a753f2f1a0dcbc606137df036c4e1810892de6b",
+      "objects": [
+        "wand"
+      ],
+      "geometry_kinds": [
+        "wand"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_43",
+      "source_bvh_sha256": "01877d353e43fadab9b89e125585e55a95eae0e4ac3403e846779403e97d189f",
+      "recipe_token": "e65812aaa5aafd9168bfa86d5f92dd8ea9413472f1126c7c325c8ee0713a0228",
+      "reviewed_fbx_sha256": "d7bb3a90fdfcb3c047ea160d69c652eebde8c563b9ee29cd76f6300ded8e92f3",
+      "objects": [
+        "key"
+      ],
+      "geometry_kinds": [
+        "key"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_44",
+      "source_bvh_sha256": "eb87614b04544e29b9a8545b0daf1bdcdaecf6a05de9cc1ad4d6c7faf7ed4ec7",
+      "recipe_token": "fc68ca00d93c4ed3921f91e44249c149398fa01e3c8a92ef8306427f54a6ea46",
+      "reviewed_fbx_sha256": "3c2c8ffd24c040d0febd88bad7d528e80fbae1ccc00c1aa83794870e8535c009",
+      "objects": [
+        "stone"
+      ],
+      "geometry_kinds": [
+        "boulder"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_45",
+      "source_bvh_sha256": "2cb4fcff5b85d981b559546edbd3a2c8de4e16f82bcc5a47ff147abe35f9d585",
+      "recipe_token": "3c4696a5ae31d56424f0fc5bc138d5807480bf2afa7b14bbf69fffd18c04a9af",
+      "reviewed_fbx_sha256": "ca70ea17fa2d11fdcaebc3d4586d67b29dd6720851c41085502b75b491c144ee",
+      "objects": [
+        "pouch"
+      ],
+      "geometry_kinds": [
+        "pouch"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_46",
+      "source_bvh_sha256": "f1c1c3f4a7980aa909740b053077975a265464b6c5d05ee5f7b5dd15dfce4168",
+      "recipe_token": "287bf540fe2b710c849267f30b95c983a0c1d9374ee1d6cd1850c6c61cc2bead",
+      "reviewed_fbx_sha256": "e580eaee1f9939a3b49c69586fc636c198944d99208d9306566275a7a84e7952",
+      "objects": [
+        "chair",
+        "dagger"
+      ],
+      "geometry_kinds": [
+        "dagger"
+      ],
+      "support": "seat"
+    },
+    {
+      "pose_id": "webtoon_fantasy_47",
+      "source_bvh_sha256": "87ac801706b1e9be45c2d0eafa66affc6314114156bce8dfa7ac49f51281417e",
+      "recipe_token": "054092bc7ac788be4efa2825304d28d40243767313dfbe109dd1a9f7baeaabd5",
+      "reviewed_fbx_sha256": "8ed20f7ff954c8fbe1a0f46c221220785d8495a1e14be6248f06a0bbc3e7c876",
+      "objects": [
+        "bow",
+        "chair"
+      ],
+      "geometry_kinds": [
+        "bow"
+      ],
+      "support": "seat"
+    },
+    {
+      "pose_id": "webtoon_fantasy_48",
+      "source_bvh_sha256": "0d652a0bf1a5f3978792f9be413409374ed119d7c2cb24def5ef13c336cf6103",
+      "recipe_token": "e6c867ec0282d15a1c50aaa67d38cb2dbb7ab2301df6776afb5fcb526b33476a",
+      "reviewed_fbx_sha256": "0358b0f979316d5400a7b061baf91f9c1545339347809bb7af6af101eb3198d2",
+      "objects": [
+        "orb"
+      ],
+      "geometry_kinds": [
+        "orb"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_49",
+      "source_bvh_sha256": "2fdd1fa48d999ee4a757c32fd1f18d40ae7aa4f2a0364b34d8d75290a2f1070c",
+      "recipe_token": "3859c2f4576c3f0c0d948d751b0426aae8307e5ce1b34aa789da633220a9de1c",
+      "reviewed_fbx_sha256": "aa4a7f6aa7947f21ae62116b9d2bfba2af77da2979afd59b65b88fb2065c43d6",
+      "objects": [
+        "spear"
+      ],
+      "geometry_kinds": [
+        "spear"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_fantasy_50",
+      "source_bvh_sha256": "ef4abd0c4cdadd61d7a55055fb30544d8acd2005751519ed15ce69d5663876d8",
+      "recipe_token": "b5ef4d03a123e6e9272d6dc515941552ee38ddc4e1bb3064c7c6a991cc85f92d",
+      "reviewed_fbx_sha256": "6ebf6d6e334074bfd9319dfedac0ae856b117a8bc8c3e7d5f65d7426b028ac72",
+      "objects": [
+        "cup"
+      ],
+      "geometry_kinds": [
+        "goblet"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_romance_02",
+      "source_bvh_sha256": "b38c5efe447f42fb2a75912524d9a0ad4c1b1bcbf8710694cb360684345a5a6a",
+      "recipe_token": "b8942f9755913a68469142475b47aa6f7a558f3bfd1d28aac5376d6c1952df46",
+      "reviewed_fbx_sha256": "6bd4b9e478830b44cfd76b5424378331b62f8bcf8709cba4f75ab391af1d2c63",
+      "objects": [
+        "chair",
+        "cup"
+      ],
+      "geometry_kinds": [
+        "cup"
+      ],
+      "support": "seat"
+    },
+    {
+      "pose_id": "webtoon_romance_03",
+      "source_bvh_sha256": "8ca4eee308a9a5a40c9f0c09988546fba6ff9ad1cfadbaabb3db9b37fff43a9f",
+      "recipe_token": "cabe4cf4354501c82ca8bcb786a6b2776a242bf89c2ceb320a7330a67b4c5c35",
+      "reviewed_fbx_sha256": "0218d8ae011681301c40248041df0507b1c50d5fddb7655c0343235ad1fc1e58",
+      "objects": [
+        "flower"
+      ],
+      "geometry_kinds": [
+        "flower"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_romance_04",
+      "source_bvh_sha256": "fc6ab1ed0ec7e74c06748b438e59960ac12a1e3fd89b7bddd3cd4d599d7642a4",
+      "recipe_token": "fb5767693236c5b3ab6d84dcf4e7b282a1b97909bd133ae4f53afd680a70c4bb",
+      "reviewed_fbx_sha256": "b4570f42510995782bbe7743f444a818366b38c15a7b44e4b9a4a3dfdec4119a",
+      "objects": [
+        "flower"
+      ],
+      "geometry_kinds": [
+        "bouquet"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_romance_05",
+      "source_bvh_sha256": "84b569b607a72f5da9556edd76c3cffecb5956463b33bf0cc67a79b009bd9222",
+      "recipe_token": "d5a67f031063eaef8df5e43f42ace5a577dac3c5521b27e5d004fec4ea00bbc1",
+      "reviewed_fbx_sha256": "bee74beacc35f5d01dbb78da6e5a24d17932a1f5fe561ad530b031ec75b80b40",
+      "objects": [
+        "gift"
+      ],
+      "geometry_kinds": [
+        "gift"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_romance_06",
+      "source_bvh_sha256": "79b8ea452042e3726b5e078b1087b6c765f1bfd36678e4247a437f5592c6116a",
+      "recipe_token": "d7162c296d2071208640a6aa62f488c6f71c6458fa70b31d80f811159c19cb27",
+      "reviewed_fbx_sha256": "71c98b1dbbfabb8a404b7b7e182928bb5bc38b3cad9ca0eaf9bfecc94b18ad28",
+      "objects": [
+        "gift"
+      ],
+      "geometry_kinds": [
+        "gift"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_romance_07",
+      "source_bvh_sha256": "5a37275e06a41e9611ed197dafe619b7cddcfa69caac484f7743edb347f0af10",
+      "recipe_token": "a83907fdb9acd5a374ec43d4a0f3151544e0f1f8cc2ccf0cf04e18e0146c65f1",
+      "reviewed_fbx_sha256": "6daafeaf29821129aa0148e9dacfb8280506c4ca94b36a099fe7a0b3828b0138",
+      "objects": [
+        "letter"
+      ],
+      "geometry_kinds": [
+        "letter"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_romance_08",
+      "source_bvh_sha256": "c26e61b29f4f0e0688f219ab97e5455ced78f9471988bd7243f4566b99771f48",
+      "recipe_token": "24c77f2fecc2b845f4e2e941e3d9153e9cdb6d86fe11c86eb0d53c1d652d59de",
+      "reviewed_fbx_sha256": "dd6f34811e176b85a8b00cc68c1dbfea61a51918dd68b93d3920798f97a2e7b1",
+      "objects": [
+        "chair",
+        "letter"
+      ],
+      "geometry_kinds": [
+        "letter"
+      ],
+      "support": "seat"
+    },
+    {
+      "pose_id": "webtoon_romance_09",
+      "source_bvh_sha256": "9fd5717a982e11b61a91488eafa520f10d320dc8a1a014e6315f9256547169fe",
+      "recipe_token": "34832f6ae58d42fe841a568fff31152b539f35e58270547175de6354d277070f",
+      "reviewed_fbx_sha256": "53ef41df3f3619be89b30e0d978c5082dbd5c487e07f4c0b998bff27e3f334d1",
+      "objects": [
+        "letter"
+      ],
+      "geometry_kinds": [
+        "letter"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_romance_20",
+      "source_bvh_sha256": "3b9fe82cba79c50b48db50266d992ad1168be039344ccfd1c76ff817ef6d2eba",
+      "recipe_token": "b44865708eb935568fd955f88aef6771c32af270fa523fc9295874212adadb13",
+      "reviewed_fbx_sha256": "6b965eb14d02f317a03265e2819aadbb37623a7bb06764a32029bc341cf239f5",
+      "objects": [
+        "umbrella"
+      ],
+      "geometry_kinds": [
+        "umbrella"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_romance_21",
+      "source_bvh_sha256": "2652ed4619147468d22b2faf7104266264bece5832a3a4afbb1f724a7304a3f3",
+      "recipe_token": "5537e09bb2722ec0719752ee992ffccc138b467ede49ffea7e0a92e560a851f6",
+      "reviewed_fbx_sha256": "06822c421287695a2b89bdbf10f13d038aa7acd92765bc13d12bc2941fc17f3e",
+      "objects": [
+        "bag"
+      ],
+      "geometry_kinds": [
+        "bag"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_romance_23",
+      "source_bvh_sha256": "655d5167c9a06fa727a1a9bb1242ed46dd17666860da2239f6efc2e7c163d805",
+      "recipe_token": "0cbc115679352e2274e428d4e17d4ebcf757a60e06dc2bd53bb959473ea0dbb5",
+      "reviewed_fbx_sha256": "ee6f08f8d2c47b7d62078aa35331fd6b5ea2177e1ddf5b44ea992c4f7b5fa5f1",
+      "objects": [
+        "chair"
+      ],
+      "geometry_kinds": [],
+      "support": "seat"
+    },
+    {
+      "pose_id": "webtoon_romance_28",
+      "source_bvh_sha256": "1f45ee6b9d732360f0227cc9f726bb763a3ad54ad4118e9d0475bbb80d34c7e4",
+      "recipe_token": "58cd7afc3f83de1661a18d74fd637ca28df082af78102125ce40132c847b7cf3",
+      "reviewed_fbx_sha256": "2f2556b96911d675237b32a0f761dd074ebb7187255f75a7729536de7b369adf",
+      "objects": [
+        "chair"
+      ],
+      "geometry_kinds": [],
+      "support": "seat"
+    },
+    {
+      "pose_id": "webtoon_romance_29",
+      "source_bvh_sha256": "9c089c1837abf068295fa4efa8dd6610d5937ff8814344b56ae63521c0f9434c",
+      "recipe_token": "65c86b3923274a83d58af121b606e705536e2955a50e35d6306c8809cd2e4759",
+      "reviewed_fbx_sha256": "bf693bff42f71759062460310b2853aa8f47bf015be046e6b0081ed1a6bc7a2b",
+      "objects": [
+        "chair"
+      ],
+      "geometry_kinds": [],
+      "support": "seat"
+    },
+    {
+      "pose_id": "webtoon_romance_30",
+      "source_bvh_sha256": "874b0b87326e9769e938f7659ed18939ce1278cf3345d4b4ccec684332250cd8",
+      "recipe_token": "557ebe95e93f19e23ca8067df63143cfd196626f9834a2f1a16e20a3ae77dbbf",
+      "reviewed_fbx_sha256": "6d83e993d1f5ebc97acd8ff23b565db1c43c0550cb588150c2cc06fc34710705",
+      "objects": [
+        "book",
+        "chair"
+      ],
+      "geometry_kinds": [
+        "book"
+      ],
+      "support": "seat"
+    },
+    {
+      "pose_id": "webtoon_romance_32",
+      "source_bvh_sha256": "5fe2f68a0336ec83f28430d58ee71c67daaebf12ffceb6be7dac2e21b9e8390c",
+      "recipe_token": "dc0174d9359a1d1f09945b92e6db444a6d2116e60b6e693f34bc3562144ad587",
+      "reviewed_fbx_sha256": "e8580a6db492cfbc47cb96d32dc992f23204fffced1bf939f8a16d95bfdfc046",
+      "objects": [
+        "chair",
+        "spoon"
+      ],
+      "geometry_kinds": [
+        "spoon"
+      ],
+      "support": "seat"
+    },
+    {
+      "pose_id": "webtoon_romance_33",
+      "source_bvh_sha256": "d2118b81722527da2cd2767beb92ad20f992c7c71e8bf7b50a9c4fefdff6b36e",
+      "recipe_token": "9c6ba5b00b9682ef0eaefea7e232212dd2f0651069829c51150bde6c5076dcb0",
+      "reviewed_fbx_sha256": "2802233abcac29bf40592cbb9c2dfae7a35abba3b079c339e2dc8b05b8ad8f2e",
+      "objects": [
+        "cake"
+      ],
+      "geometry_kinds": [
+        "cake"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_romance_34",
+      "source_bvh_sha256": "8da44b0b2496e79a812bd78383ab674c17534226d64fe643993eaac97a95a9e8",
+      "recipe_token": "58bf2f2eff5df2407c2e261d2a71de2831bb2cbe31275c7a997d8c57a99c23af",
+      "reviewed_fbx_sha256": "3dcbea4147226843d9321f1b07835bbf4f37ce92efd1fe63be490756188264a3",
+      "objects": [
+        "cake"
+      ],
+      "geometry_kinds": [
+        "cake"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_romance_35",
+      "source_bvh_sha256": "95f203448a5aa25eb225a001860b56b703e0be1cb4701ef5b9466c73723ed5be",
+      "recipe_token": "9ea5c078c6dfedbb70f5f6c0aaaead8c479ee080ed2c27214825546c569a55db",
+      "reviewed_fbx_sha256": "c0bf97a65c9bb97b451aba7f7a78fbb3f9c91361fe73812b770e1b99c40d8f33",
+      "objects": [
+        "scarf"
+      ],
+      "geometry_kinds": [
+        "scarf"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_romance_36",
+      "source_bvh_sha256": "22e223b27b3af2e5d95f79b0636d745dbb06464e01b32269046996bab168e907",
+      "recipe_token": "0f55383d1a93d7637a95207494908a20f8721aa77bb22ac042137f8b0dd7ff58",
+      "reviewed_fbx_sha256": "cfc3d90423832578866be8fa3880425733bb33deca2ddd1df1c8d77f11e5b788",
+      "objects": [
+        "scarf"
+      ],
+      "geometry_kinds": [
+        "scarf"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_romance_37",
+      "source_bvh_sha256": "5f7c9b388ee33d5159701b4eebc8a9e6ddee8cabac9a2396d8c12cbc2548e456",
+      "recipe_token": "45498cc9520d9b94fa760b290815d0a70608a18c00e996a8ff00f5dbb9812c9b",
+      "reviewed_fbx_sha256": "b746be1385107cac6f5c06ecee2ea19c8ee8c0689c4269fe2656a4fa4407f3bf",
+      "objects": [
+        "ringbox"
+      ],
+      "geometry_kinds": [
+        "ringbox"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_romance_43",
+      "source_bvh_sha256": "f163af0b6366baaf5ba5bc1ed9770c26e406cbedee347ea1886cc61dd3a9fa44",
+      "recipe_token": "a9cca414332602cf63123c9755404ff437e9d9ae0fd43c05afe9a96d974537ae",
+      "reviewed_fbx_sha256": "0de8cf4a639bc80c6179ddd175d02b37dc57af451c75b35b8faeeb70a903412b",
+      "objects": [
+        "handkerchief"
+      ],
+      "geometry_kinds": [
+        "handkerchief"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_romance_44",
+      "source_bvh_sha256": "752ee34eef919425be03544d54c66eb78d654a8127e40f497e4168ce5a225212",
+      "recipe_token": "f28c8c67d8698cd1af6e62567dd22e327d0659ab83c3b7818f012be1d5e502de",
+      "reviewed_fbx_sha256": "13749d8c1f91aadea02ba1cb2ec3368ca8117413b7b0603a5436248f9bf3db22",
+      "objects": [
+        "handkerchief"
+      ],
+      "geometry_kinds": [
+        "handkerchief"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_romance_45",
+      "source_bvh_sha256": "f66744b6db3500a4b4a672a613284b02d73031a32b98e2a45d8d0218316f8a81",
+      "recipe_token": "dc140631538c2d4ff4ca8a0809088cdc3e9c303b56e58ba33dbf21e2bdf68faf",
+      "reviewed_fbx_sha256": "25e1bda58d4a4169464e31eafd144800f6b93159cf050ed2d069414b7ed7b0bb",
+      "objects": [
+        "bag"
+      ],
+      "geometry_kinds": [
+        "bag"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_romance_46",
+      "source_bvh_sha256": "d7490f7cc909bb8c879c27248b0fa4c90a1fd8e9ebf5080ac975f5ba601dcff0",
+      "recipe_token": "0cb97e0c5e3bf917e480fccb73a4465eff361501fac661e84f23076a43e8f718",
+      "reviewed_fbx_sha256": "e9258c5a2ccdb9e99bc1120042db1a9d9a9649d882bac1ecc8b8901f5aaa262c",
+      "objects": [
+        "teddy"
+      ],
+      "geometry_kinds": [
+        "teddy"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_romance_47",
+      "source_bvh_sha256": "2322b3c3f1bc32b68f36cc127e4985176e5c6fda9ad6eb1e03fa6ec5d732b046",
+      "recipe_token": "e60baed9c338bbc4b5aaabbb8de6ea34cd5791e9023b8f7b2997c6a8baad2835",
+      "reviewed_fbx_sha256": "f09d2fed8312a0cbfeea5a01d24caa7ebddfc2e2b12c0859df4b68d7d45e2e5f",
+      "objects": [
+        "phone"
+      ],
+      "geometry_kinds": [
+        "phone"
+      ],
+      "support": ""
+    },
+    {
+      "pose_id": "webtoon_romance_48",
+      "source_bvh_sha256": "8dd8e20bf409f9f710a4f4a0898193aa12f26c822a10bb4dea84d3fc3c00a3ee",
+      "recipe_token": "99744eceefaa1455c73d44c45601cd3086feb8f3198303884042238edeee52d8",
+      "reviewed_fbx_sha256": "03008bfd6f5c38af72807d3c6b05509acbaff9637d1036c352420409c3eae139",
+      "objects": [
+        "chair",
+        "photo"
+      ],
+      "geometry_kinds": [
+        "photo"
+      ],
+      "support": "seat"
+    }
+  ]
+}

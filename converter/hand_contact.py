@@ -77,6 +77,9 @@ def screen_hands(meshes):
     vertices=[];triangles={'left':[],'right':[]}
     for obj in meshes:
         if obj.type!='MESH':continue
+        # Generated rigid props can be weighted to Hand for framing. They are
+        # objects, not hand skin, and cannot count as an opposite-hand surface.
+        if obj.name.startswith('StandinScene__'):continue
         groups={g.index:g.name.lower().replace('_','').replace(':','') for g in obj.vertex_groups}
         labels=[]
         for vertex in obj.data.vertices:

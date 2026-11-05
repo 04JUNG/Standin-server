@@ -401,12 +401,28 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
             "base_sha256":base_metadata["artifact_sha256"],"body_report_sha256":base_metadata["body_report_sha256"]}
     if recipe is not None and ok:
         payload["shape_bake"] = json.loads(Path(job["output_path"]).with_suffix(".shape.json").read_text())
-    if ok and job.get("hands") is not None:
-        # 손은 몸 변환 직후, 메시 절단·카메라 회전·미리보기보다 먼저 굽는다.
-        # 그래야 이후 단계가 모두 손이 적용된 실제 산출물을 다시 읽는다.
-        from converter.hands import bake_hands
-        with lab_timings.measure("hand_import_apply_export"):
-            payload["hands"] = bake_hands(job["output_path"], job["hands"])
+    if ok:
+        # One ordered stage: source fingers -> explicit/default grip -> props.
+        # Crops, camera transforms, PNG, GLB and FBX all consume this same file.
+        from converter.scene_hand_stage import apply_hand_stage
+        from converter.scene_props import bake_scene_props
+        with lab_timings.measure("source_and_scene_hands"):
+            hand_stage = apply_hand_stage(
+                job["output_path"], job["bvh_path"], source_bvh_sha256,
+                frame=FRAME, mirror=job["mirror"], selected=job.get("hands"),
+                exact=job["force_exact_v324"],
+            )
+            payload["source_fingers"] = hand_stage["source_fingers"]
+            if job.get("hands") is not None:
+                payload["hands"] = hand_stage["hands"]
+            payload["scene_hand_bake"] = hand_stage["scene_hand_bake"]
+        with lab_timings.measure("scene_props"):
+            payload["scene_props"] = bake_scene_props(
+                job["output_path"], source_bvh_sha256, mirror=job["mirror"],
+                force_exact_v324=job["force_exact_v324"],
+                selected_hands=job.get("hands"),
+                prepared_hand_defaults=hand_stage["scene_hand_defaults"],
+            )
     if ok and job.get('hand_contact_screen'):
         from converter.hand_contact import screen_artifact
         # AFTER hand baking, BEFORE crop/camera/preview. Screening does not
