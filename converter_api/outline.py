@@ -14,7 +14,7 @@ from fastapi import File, Form, Request, UploadFile
 from fastapi.responses import JSONResponse
 from converter.outline_spec import (VERSION, EXPRESSION, MAPPING, CSP_CERTIFIED,
     CHARACTERS, MAX_FBX_BYTES, normalize, appearance_hash, thickness_m, physical_thickness,
-    runtime_revision, certified, DEFAULT_SURFACE)
+    runtime_revision, certified, DEFAULT_SURFACE, ACCEPTANCE_SCOPE, supported_targets)
 from converter.scene_contract import FBX_MAGIC
 from converter.framing import validate_scope
 from converter_api.work_queue import current_work
@@ -61,7 +61,10 @@ def prepare(runner, data, job, *, checkpoint):
                 or receipt.get('file_verified') is not True
                 or receipt.get('base',{}).get('typed_fbx_values_preserved') is not True
                 or receipt.get('outline',{}).get('skin_verified') is not True
-                or receipt.get('outline',{}).get('displacement_verified') is not True):
+                or receipt.get('outline',{}).get('displacement_verified') is not True
+                or receipt.get('csp_certified') is not certified(job['character_sha256'],
+                    job['output_scope'],job['appearance']['width'],
+                    surface=job.get('surface',DEFAULT_SURFACE))):
             raise ValueError('OUTLINE_INTEGRITY_ERROR')
         checkpoint()
         return output,receipt
@@ -79,6 +82,7 @@ def register_outline(app,registry,runner):
             certified_expressions=sorted({e[0] for e in CSP_CERTIFIED}),
             supported_characters=sorted(k for k,v in CHARACTERS.items() if any(e[2]==v for e in CSP_CERTIFIED)),
             supported_scopes=sorted({e[3] for e in CSP_CERTIFIED}),
+            supported_targets=supported_targets(),acceptance_scope=ACCEPTANCE_SCOPE,
             candidate_characters=CHARACTERS,width=dict(min=0,max=2),zero='legacy-byte-preserving'),
             headers={'Cache-Control':'no-store'})
 
@@ -108,7 +112,7 @@ def register_outline(app,registry,runner):
             if registry.metadata(character_id).sha256!=character_sha256: raise ValueError('character changed')
         except Exception:
             raise ApiProblem(409,'OUTLINE_BINDING_MISMATCH','outline character binding changed')
-        if not certified(character_sha256,output_scope):
+        if not certified(character_sha256,output_scope,settings['width']):
             raise ApiProblem(503,'OUTLINE_NOT_CSP_CERTIFIED','outline import acceptance incomplete')
         data=fbx.file.read(MAX_FBX_BYTES+1)
         if len(data)>MAX_FBX_BYTES or not data.startswith(FBX_MAGIC):

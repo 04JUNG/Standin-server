@@ -104,7 +104,9 @@ def test_runtime_contract_imports_from_exact_docker_copy_allowlist(tmp_path):
     from converter.outline_spec import VERSION, runtime_revision
     assert result['outline']['version'] == VERSION
     assert result['outline']['runtime_revision'] == runtime_revision()
-    assert result['outline']['csp_certified'] is False
+    assert result['outline']['csp_certified'] is True
+    assert result['outline']['enabled'] is False
+    assert result['outline']['acceptance_scope'] == 'posed-fbx-import'
 
 @pytest.mark.parametrize("expected,status", [(hashlib.sha256(b"character").hexdigest(), 200), ("a"*64, 409)])
 def test_final_model_keeps_body_and_runtime_contract(tmp_path, expected, status):

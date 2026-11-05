@@ -10,7 +10,7 @@ from fastapi.testclient import TestClient
 from converter.outline_spec import (normalize, appearance_hash, thickness_m,
     CHARACTERS, CSP_CERTIFIED, VERSION, cache_key, expression_for, NATIVE_SURFACE,
     NATIVE_EXPRESSION, NATIVE_MAPPING, certified)
-from converter.outline_spec import physical_thickness, LEGACY_SURFACE
+from converter.outline_spec import physical_thickness, LEGACY_SURFACE, supported_targets
 from converter_api.outline import register_outline
 
 
@@ -28,11 +28,26 @@ def test_zero_and_numeric_encoding_have_stable_identity():
     assert appearance_hash({'version':VERSION,'width':1})!=appearance_hash({'version':VERSION,'width':2})
 
 
-def test_native_transparent_expression_is_distinct_and_not_implicitly_certified():
+def test_native_transparent_acceptance_excludes_old_models_and_rejected_surface():
     assert expression_for(NATIVE_SURFACE)==(NATIVE_EXPRESSION,NATIVE_MAPPING)
     assert expression_for(NATIVE_SURFACE)!=expression_for('inverted-opaque')
-    assert not certified(next(iter(CHARACTERS.values())),'full',surface=NATIVE_SURFACE)
+    assert not certified(next(iter(CHARACTERS.values())),'full',2,surface=NATIVE_SURFACE)
+    for cid in ('male-default83-v0-7-6-p1','female-default80-v0-3-9-p1'):
+        assert certified(CHARACTERS[cid],'full',.65)
+        assert certified(CHARACTERS[cid],'head',2)
+        assert not certified(CHARACTERS[cid],'head',1)
+        assert not certified(CHARACTERS[cid],'full',0)
+        assert not certified(CHARACTERS[cid],'full',2,surface=LEGACY_SURFACE)
     with pytest.raises(ValueError): expression_for('unreviewed')
+
+
+def test_capability_intervals_match_actual_acceptance_without_cartesian_widening():
+    for row in supported_targets():
+        bounds=row['width']
+        for width in (0,.25,.5,.65,1,1.25,1.75,2):
+            lower=width>bounds['min'] if bounds['min_exclusive'] else width>=bounds['min']
+            advertised=lower and width<=bounds['max']
+            assert certified(row['character_sha256'],row['output_scope'],width)==advertised
 
 
 def test_physical_width_is_stature_relative_and_scope_independent():
@@ -95,10 +110,40 @@ def test_capability_never_advertises_rejected_expression_even_if_env_enabled(htt
     capability=http.get('/outline-contract')
     assert capability.headers['cache-control']=='no-store'
     data=capability.json()
-    assert data['enabled'] is True and data['csp_certified'] is False
-    assert data['supported_characters']==data['supported_scopes']==data['certified_expressions']==[]
-    assert not CSP_CERTIFIED
+    assert data['enabled'] is True and data['csp_certified'] is True
+    assert data['certified_expressions']==[NATIVE_EXPRESSION]
+    assert data['acceptance_scope']=='posed-fbx-import'
+    assert len(data['supported_targets'])==10
+    for row in data['supported_targets']:
+        assert row['character_id'] in data['supported_characters']
+        assert row['character_sha256']==CHARACTERS[row['character_id']]
+        bounds=(dict(min=0,max=2,min_exclusive=True) if row['output_scope']=='full'
+            else dict(min=2,max=2,min_exclusive=False))
+        assert row['width']==bounds
+    assert CSP_CERTIFIED
     assert post(http).status_code==503
+
+
+@pytest.mark.parametrize('width',[.5,.65,1,1.5])
+@pytest.mark.parametrize('scope',['half','bust','shoulder_head','head'])
+def test_uncertified_crop_width_never_starts_worker(http,monkeypatch,width,scope):
+    monkeypatch.setenv('CONVERTER_OUTLINE_ENABLED','true')
+    cid='male-default83-v0-7-6-p1'
+    r=post(http,character_id=cid,character_sha256=CHARACTERS[cid],output_scope=scope,
+        appearance=json.dumps(dict(version=VERSION,width=width)))
+    assert r.status_code==503 and r.json()['error']['code']=='OUTLINE_NOT_CSP_CERTIFIED'
+
+
+def test_accepted_full_midpoint_still_checks_actual_source_hash(http,monkeypatch):
+    from converter.scene_contract import FBX_MAGIC
+    monkeypatch.setenv('CONVERTER_OUTLINE_ENABLED','true')
+    cid='male-default83-v0-7-6-p1'
+    r=http.post('/outline-fbx',headers={'Authorization':'Bearer '+'t'*32},
+        files={'fbx':('source.fbx',FBX_MAGIC+b'not-the-bound-source')},
+        data=dict(source_artifact_sha256='a'*64,appearance=json.dumps(dict(version=VERSION,width=.65)),
+            output_scope='full',character_id=cid,character_sha256=CHARACTERS[cid],
+            binding_sha256='b'*64,stature_m='1.78'))
+    assert r.status_code==409 and r.json()['error']['code']=='SOURCE_FBX_SHA256_MISMATCH'
 
 
 def test_default_off_and_zero_keeps_legacy_path_without_worker(http,monkeypatch):

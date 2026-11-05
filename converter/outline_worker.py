@@ -1,4 +1,4 @@
-"""Isolated candidate writer / independent verifier. Never certifies CSP."""
+"""Isolated writer/verifier; CSP acceptance comes only from exact observed targets."""
 import hashlib
 import json
 import math
@@ -166,7 +166,8 @@ def run(stage, directory):
             outline=dict(manifest=manifest,skin_verified=skin['skin_verified'],
                 displacement_verified=True,max_displacement_error_m=displacement_error,
                 blender_import_backface_culling=imported_culling),
-            file_verified=True,csp_certified=certified(job['character_sha256'],job['output_scope'],surface=surface),
+            file_verified=True,csp_certified=certified(job['character_sha256'],job['output_scope'],
+                appearance['width'],surface=surface),
             verification_seconds=time.monotonic()-start)
         (directory/'verified.json').write_text(json.dumps(receipt,sort_keys=True,allow_nan=False))
 
