@@ -50,6 +50,7 @@ from src.logging_setup import (configure_logging, log_error, log_info,
 from src import notify as alerts
 from src.ops_metrics import COLLECTOR, TASK_ID
 from src.pipeline import Pipeline
+from src import analysis_progress as progress
 from src.pose_rescue import parse_rescue_request
 from src.library import build_synthetic_index
 from src.library_manifest import (MANIFEST_NAME, LibraryManifestError,
@@ -582,6 +583,9 @@ def _routing_fields(res, index: int) -> dict:
             person_index=index,
             output_scope=mesh_scope(descriptor.output_scope.detected),
             resolve_library=_library_preview_asset)
+        previews = progress.presentation_previews(presentation)
+        if previews:
+            progress.emit(person=dict(personIndex=index, candidates=previews))
         log_info("pose_presentation", status=presentation.status,
             searchStatus=presentation.search_status,
             libraryCount=len(presentation.library_candidates),
@@ -625,7 +629,22 @@ def _library_preview_asset(pose_id: str):
 @app.post("/analyze", response_model=CutResultOut)
 def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
             rescue: Annotated[str, Form()] = "",
-            response: Response = None):
+            response: Response = None, request: Request = None):
+    if request is not None and "application/x-ndjson" in request.headers.get("accept", ""):
+        from .analysis_stream import stream_analysis
+        # UploadFile closes after the endpoint returns; own its bytes for the stream.
+        from starlette.datastructures import UploadFile as OwnedUpload
+        owned = OwnedUpload(io.BytesIO(file.file.read()), filename=file.filename)
+        def run():
+            try:
+                return _analyze(owned, hint, rescue)
+            finally:
+                owned.file.close()
+        return stream_analysis(run)
+    return _analyze(file, hint, rescue, response)
+
+
+def _analyze(file, hint="", rescue="", response=None):
     try:
         rescue_request = parse_rescue_request(rescue)
     except ValueError as exc:
@@ -717,7 +736,7 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
     vlm_model = (CFG.gemini_model if STATE.get("provider") == "gemini"
                  else CFG.openai_model if STATE.get("provider") == "openai"
                  else "mock")
-    return CutResultOut(
+    output = CutResultOut(
         body_matching=validated_body_sidecar(res.body_matching, people),
         route=res.route, count_confidence=res.count_confidence,
         detector_count=res.detector_count, vlm_count=res.vlm_count,
@@ -738,6 +757,8 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
             feature_version=FEATURE_VERSION,
         ),
     )
+    progress.finish()
+    return output
 
 
 @app.get("/pose/{pose_id}/bvh")

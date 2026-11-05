@@ -20,6 +20,7 @@
 from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
+from . import analysis_progress as progress
 from dataclasses import dataclass
 from time import perf_counter
 
@@ -216,6 +217,7 @@ class Pipeline:
                     rescue_request=None) -> CutResult:
         from .analysis_budget import analysis_budget
         with analysis_budget():
+            progress.emit("analyzing")
             return self._process_cut_with_budget(image, img_w, img_h, rescue_request)
 
     def _process_cut_with_budget(self, image, img_w, img_h, rescue_request):
@@ -234,6 +236,7 @@ class Pipeline:
         with span("vlm"):
             analyze = getattr(self.vlm, "analyze_for_pipeline", self.vlm.analyze)
             vlm: VLMAnalysis = analyze(image, img_w, img_h)
+        progress.emit("extracting", completed=("analyzing",))
         from .experimental.body_matching.integrated_review import finish_pipeline_review, abandon_pipeline_review
         from .description_prefetch import start_description_prefetch
         description_job = None
@@ -294,6 +297,7 @@ class Pipeline:
             descs = build_slot_descriptors(vlm, slots)
             for desc in descs:
                 desc.quality_reasons.append("head_search_unsupported")
+            progress.emit(skipped=("extracting", "understanding", "searching", "refining", "ranking"))
             return CutResult(
                 route=r, count_confidence="n/a", detector_count=0,
                 vlm_count=vlm.num_people, descriptors=descs,
@@ -494,6 +498,11 @@ class Pipeline:
                     f"Gemini 스켈레톤 보완 {repair_trace['status']}: "
                     f"수정 {len(repair_trace.get('repaired_slots') or [])}명, "
                     f"{repair_trace['elapsed_ms']:.0f}ms")
+        early_people = []
+        if len(slots) == 1:
+            overlay = progress.skeleton_overlay(slots[0], img_w, img_h)
+            early_people = [dict(personIndex=0, **({"skeleton": overlay} if overlay else {}))]
+        progress.emit("understanding", completed=("extracting",), people=early_people)
         threshold_scale = 0.7 if count_confidence == "low" else 1.0
         routing = None
         if CFG.search_routing_enabled or self._fullbody_search is not None:
@@ -536,7 +545,11 @@ class Pipeline:
                     "hand_presets": {side: getattr(desc.hands, side).preset
                                      for side in ('left', 'right')} if desc.hands else None,
                 }
-                with span("fullbody_search"):
+                if len(slots) == 1:
+                    progress.emit(person=dict(personIndex=0,
+                        observations=progress.observations(decision.semantic.description)))
+                progress.start_search(routing)
+                with progress.person_scope(0 if len(slots) == 1 else None), span("fullbody_search"):
                     review_options = {"review_geometry": True} if integrated_enabled(CFG) else {}
                     report = self._fullbody_search.search(decision, evidence, **review_options)
                 bindings = dynamic_refine_candidates(
@@ -567,14 +580,16 @@ class Pipeline:
                 continue
             if decision is not None and decision.route in ("semantic", "undetermined", "error") \
                     and decision.joint.policy_block is None:
-                with span("routed_non_geometric"):
+                progress.start_search(routing)
+                with progress.person_scope(0 if len(slots) == 1 else None), span("routed_non_geometric"):
                     outcome = self._route_non_geometric(
                         vlm, slot, decision, routing, (img_w, img_h))
                 outcome.descriptor.quality_reasons = list(dict.fromkeys(slot.reasons))
                 processed.append((slot, outcome))
                 continue
+            progress.start_search(routing)
             geometric_started = perf_counter()
-            with span("descriptor_search"):
+            with progress.person_scope(0 if len(slots) == 1 else None), span("descriptor_search"):
                 outcome = self._evaluate_slot(
                     vlm, slot, threshold_scale, (img_w, img_h),
                     search_image=image if len(slots) == 1 and vlm.num_people == 1 else None)
@@ -586,7 +601,7 @@ class Pipeline:
                 if attempted:
                     with span("skeleton_finalize"):
                         finalize_slot(slot, CFG)
-                    with span("descriptor_search"):
+                    with progress.person_scope(0 if len(slots) == 1 else None), span("descriptor_search"):
                         outcome = self._evaluate_slot(
                             vlm, slot, threshold_scale, (img_w, img_h),
                             search_image=image if len(slots) == 1 and vlm.num_people == 1 else None)
@@ -685,6 +700,7 @@ class Pipeline:
             if reason:
                 result.notes.append(f"인물 {index}: {reason}")
 
+        progress.publish_ranked(processed, img_w, img_h, routing, CFG.data_dir)
         result.candidates = result.person_candidates[0] if result.person_candidates else []
         if routing is not None:
             result.routing_summary = routing["summary"]
@@ -763,6 +779,11 @@ class Pipeline:
                         if checks:description.laterality_review['joint_conflicts']=checks
                     semantics[id(slot)] = assess_semantic_evidence(
                         description, rcfg)
+        if len(slots) == 1:
+            semantic = semantics.get(id(slots[0]))
+            observed = progress.observations(semantic.description if semantic else None)
+            if observed:
+                progress.emit(person=dict(personIndex=0, observations=observed))
         decisions = {}
         for slot in slots:
             joint = joints[id(slot)]
@@ -820,6 +841,7 @@ class Pipeline:
             with span("semantic_search"):
                 search_started = perf_counter()
                 try:
+                    progress.record_descriptor_search(desc, "description")
                     result = self.semantic_searcher.search(query, top_k=CFG.semantic_top_k)
                 except Exception as error:
                     from .semantic_search import SemanticSearchResult
@@ -1059,6 +1081,7 @@ class Pipeline:
             candidates = []
             if (slot.state == "partial" and slot.slot_origin == "vlm"
                     and desc.feature is not None):
+                progress.record_descriptor_search(desc, "upper_body")
                 candidates = knn_upper_body(
                     self.entries, desc.feature, desc.valid_joint_mask,
                     search_index=self.search_index,
@@ -1257,6 +1280,7 @@ class Pipeline:
                 float(np.mean(skel.scores)) < CFG.min_skeleton_score:
             return [], "low", "스켈레톤 추출 실패 → 폴백(작가)"
 
+        progress.record_descriptor_search(desc, "upper_body" if desc.quality_trace.get("search_scope") == "upper_body" else "pose")
         if query_valid_mask is None:
             query_valid_mask = desc.valid_joint_mask
         desc.quality_trace["perspective_search"] = {

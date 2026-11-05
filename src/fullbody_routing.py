@@ -13,6 +13,7 @@ from time import perf_counter
 import numpy as np
 
 from .camera_search import CameraIndex
+from . import analysis_progress as progress
 from .config import CFG
 from .semantic_adapter_285 import excluded_pose_ids
 from .search import pose_family_id
@@ -285,6 +286,10 @@ class FullBodySearch:
                 futures['geometry'] = pool.submit(self.geometry_search, evidence, required)
             if semantic_valid:
                 futures['semantic'] = pool.submit(self.semantic_search, description, required)
+            mode = ('combined' if len(futures) == 2 else
+                    'upper_body' if 'geometry' in futures and evidence.get('coverage_class') == 'upper_only' else
+                    'pose' if 'geometry' in futures else 'description')
+            progress.record_search_mode(out, mode)
             out['branches'] = {k:v.result() for k,v in futures.items()}
         if not semantic_valid:
             failed = decision.semantic.status in ('error', 'vlm_error')
