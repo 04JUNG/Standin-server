@@ -68,4 +68,4 @@ Pinned source and candidate hashes:
 
 No accepted replacement FBX expression exists in this change. Do not merge/enable it as a completed CSP outline feature. A viable representation must first pass automatic import without black-body/internal-face/finger-blockage defects at all requested widths/views/scopes, then real CSP pose editing and `.clip` save/close/reopen on a legitimately registered test installation. The license blocker and the rejected representation are separate issues. Blender checks cannot replace either acceptance step.
 
-Related: [client #162](https://github.com/04JUNG/Standin-client/pull/162), already merged [base server #167](https://github.com/04JUNG/Standin-server/pull/167), and the separate BFF appearance companion PR. No staging branch or personal-model #142 code was imported.
+Related: [client #162](https://github.com/04JUNG/Standin-client/pull/162), already merged [base server #167](https://github.com/04JUNG/Standin-server/pull/167), and [BFF companion #161](https://github.com/04JUNG/Standin-app-server/pull/161). No staging branch or personal-model #142 code was imported.
