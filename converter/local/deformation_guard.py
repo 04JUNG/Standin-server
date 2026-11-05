@@ -46,6 +46,11 @@ class DeformationGuard:
         self.bend_limit = np.maximum.reduce([
             np.full_like(self.rest_bend, np.pi/3),
             np.abs(self.rest_bend), np.abs(self.reference["bend"])])
+        # Keep healthy hinges below the reporting threshold despite solver tolerance.
+        healthy = (np.abs(self.rest_bend) < np.pi/6) & (
+            np.abs(self.reference["bend"]) < np.pi/3)
+        self.bend_limit[healthy] = np.maximum(
+            np.abs(self.reference["bend"][healthy]), np.pi/3-1e-5)
         # Authored creases preserve their signed angle relative to rest.
         self.crease = np.abs(self.rest_bend) > np.pi/6
         self.crease_limit = np.maximum(np.pi/18, np.abs(

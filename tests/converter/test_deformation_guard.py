@@ -52,6 +52,14 @@ class GuardTests(unittest.TestCase):
         self.assertFalse(guard.violations(hinge(90)))
         self.assertIn("bend", guard.violations(hinge(120)))
 
+    def test_hinge_threshold_has_numerical_clearance(self):
+        def hinge(angle):
+            return np.array([[0.,0.,0.],[1.,0.,0.],[0.,1.,0.],
+                             [0.,-np.cos(angle),np.sin(angle)]])
+        rest = hinge(0.)
+        guard = DeformationGuard(rest, rest, np.array([[0,1,2],[1,0,3]]), self.free)
+        self.assertIn("bend", guard.violations(hinge(np.pi/3+1e-9)))
+
     def test_input_arrays_are_not_modified(self):
         guard = DeformationGuard(self.rest, self.rest, self.faces, self.free)
         expected = self.rest.copy()
