@@ -20,7 +20,10 @@ env:
 jobs:
   deploy:
     name: Deploy
-    if: vars.AUTO_DEPLOY_ENABLED == 'true'
+    # A code-only merge can suppress deployment without suppressing CI.
+    if: >-
+      vars.AUTO_DEPLOY_ENABLED == 'true' &&
+      (github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip deploy]'))
     runs-on: ubuntu-latest
     # main만 프로덕션이다. 그 외 브랜치는 전부 staging으로 간다.
     environment: ${{ github.ref == 'refs/heads/main' && 'beta' || 'staging' }}
@@ -94,13 +97,13 @@ jobs:
             --query taskDefinition > taskdef.json
 
       - name: Refresh staging body initializer image
-        if: github.ref == 'refs/heads/develop'
+        if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/codex/staging-latestdevelop-20261105'
         env:
           STAGING_IMAGE_URI: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
         run: python scripts/refresh_staging_body_initializer.py taskdef.json --image "$STAGING_IMAGE_URI"
 
       - name: Keep staging inline asset initializer on the deployed image
-        if: github.ref == 'refs/heads/develop'
+        if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/codex/staging-latestdevelop-20261105'
         env:
           STAGING_IMAGE: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
         run: python scripts/prepare_staging_asset_initializer.py taskdef.json --image "$STAGING_IMAGE"
@@ -148,7 +151,7 @@ jobs:
         run: python scripts/prepare_description_deployment.py taskdef.json
 
       - name: Prepare pinned staging hand screen release
-        if: github.ref == 'refs/heads/develop'
+        if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/codex/staging-latestdevelop-20261105'
         env:
           HAND_SCREEN_RELEASE_MANIFEST_KEY: ${{ vars.HAND_SCREEN_RELEASE_MANIFEST_KEY }}
           HAND_SCREEN_RELEASE_MANIFEST_SHA256: ${{ vars.HAND_SCREEN_RELEASE_MANIFEST_SHA256 }}

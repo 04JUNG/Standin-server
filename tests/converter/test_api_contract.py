@@ -468,7 +468,7 @@ def test_convert_is_503_on_character_hash_mismatch(tmp_path):
 
 def test_openapi_declares_multipart_convert_contract(tmp_path):
     payload = _client(tmp_path).get("/openapi.json").json()
-    assert payload["info"]["version"] == "1.3.0"
+    assert payload["info"]["version"] == "1.4.0"
     assert "/convert-framed-export" in payload["paths"]
     request_body = payload["paths"]["/convert"]["post"]["requestBody"]
     assert "multipart/form-data" in request_body["content"]

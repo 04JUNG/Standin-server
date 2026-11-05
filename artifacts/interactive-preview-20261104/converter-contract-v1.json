@@ -1,0 +1,282 @@
+{
+  "contract": "interactive-pose-model-v1",
+  "status": "implemented-opt-in-local-real-verified",
+  "schemaVersion": 1,
+  "source": {
+    "repository": "04JUNG/Standin-server",
+    "baseCommit": "592ab0f059089e64a5c88a3ad607539124e8e6c6",
+    "branch": "codex/interactive-real-model-converter",
+    "runtimeSha256": "d35d8c8c2d7888c437e53791c8dd5ba58c8bd65a597c016eb26e6236c3369eff",
+    "implementationBaseCommit": "32eca7b5d246cae3a5e87d11115e063470616c8f"
+  },
+  "transport": {
+    "kind": "private authenticated internal HTTP; immutable file-canonical snapshots",
+    "mime": "application/vnd.standin.solved-pose-state-v1+json",
+    "httpRoutesImplemented": true,
+    "bffIntegration": "implemented; actual Client/Hono/PGlite/live Converter verification passes",
+    "entrypoints": {
+      "body": "converter.interactive_adapter.prepare_body(job_path, identity, new_directory)",
+      "solve": "converter.interactive_adapter.solve_from_body(base_directory, identity, new_directory, checkpoint=latest_revision_fence)",
+      "export": "converter.interactive_export.export_bundle(blender_binary, solved_directory, new_directory, expected_state_hash, checkpoint=latest_revision_fence)"
+    },
+    "documentation": "docs/NEXT_SPRINT/INTERACTIVE_REAL_MODEL_V2_2026-11-04.md",
+    "basePath": "/interactive/v1",
+    "routes": [
+      "POST /solve",
+      "GET /snapshots/{id}/model",
+      "POST /snapshots/{id}/export",
+      "GET /snapshots/{id}/file",
+      "GET /snapshots/{id}/variants",
+      "POST /cancel",
+      "POST /static/resolve",
+      "GET /static/{sha256}"
+    ],
+    "deadline": "BFF expiresAt, maximum one hour; missing or expired handles revoke readiness"
+  },
+  "stateSchema": "solved-pose-state-v1",
+  "previewReadiness": "authoritative; never export-ready",
+  "exportReceiptSchema": "interactive-fbx-receipt-v1",
+  "stateIdentityFields": [
+    "ownerBinding",
+    "selection",
+    "source",
+    "body",
+    "shape",
+    "hands",
+    "scope",
+    "mirror",
+    "camera",
+    "solver"
+  ],
+  "initialFbxDependency": true,
+  "preInitialFbxSolveImplemented": false,
+  "localHands": {
+    "strategy": "exact server-generated hand combination table, including baked surface/rig/skin corrections",
+    "tableSchema": "interactive-hand-variants-v1",
+    "maxCombinations": 32,
+    "requires": "allowlisted registered character SHA plus matching independently verified FBX receipt for every exact left/right combination",
+    "defaultCapability": false,
+    "personalFbxAndCs3c": false,
+    "arbitraryCombinationInference": false,
+    "predictionState": "local-draft only; basisStateHash is not new revision/file authority",
+    "actualApprovedTablePublished": false
+  },
+  "camera": {
+    "projection": [
+      "orthographic",
+      "perspective"
+    ],
+    "required": [
+      "projection",
+      "viewMatrix",
+      "projectionMatrix",
+      "distanceTorso",
+      "torsoReferenceSha256",
+      "baked"
+    ],
+    "matrixLayout": "row-major in packet model coordinates",
+    "bakedSupported": false,
+    "orbitExcludedFromStateHash": true,
+    "searchHypothesisOnly": true,
+    "cspCameraTransferCertified": false,
+    "remaining": "Normalized continuous search projection is implemented and tested; square hip-origin v2 framing is server-owned. Native CSP pixel alignment is not claimed."
+  },
+  "changes": [
+    {
+      "date": "2026-11-04",
+      "description": "Retain frozen solver and intermediate FBX; file-canonical display/export adapter v2 with opt-in private HTTP."
+    },
+    {
+      "date": "2026-11-04",
+      "description": "Implementation pinned; canonical state includes geometry/safety/dependencies and full shape/runtime lineage; exact hand table + shared module; 5 current server scopes. Local boundary only, strict actual-asset normal failure and initial FBX dependency block freeze/integration."
+    }
+  ],
+  "frozen": false,
+  "implementationStatus": "local opt-in boundary; not end-to-end integrated or activated",
+  "schemaDocument": "docs/NEXT_SPRINT/INTERACTIVE_CONVERTER_BOUNDARY_V1_2026-11-04.md",
+  "validator": "converter/solved_state.py::SolvedPoseState / validate_identity / validate_model",
+  "fixture": "tests/fixtures/interactive_preview_v1.json (synthetic only)",
+  "sharedClientModule": "converter/shared/interactive_pose_v1.mjs",
+  "wire": {
+    "encoding": "typed-f64be-json-v1",
+    "canonical": "ASCII compact sorted-key JSON; floats encoded as {\"$f64\":\"16 lowercase big-endian IEEE754 hex digits\"}; integers exact within 2^53-1",
+    "stateHash": "SHA256(canonical entire solved-pose-state-v1 envelope)",
+    "modelHash": "SHA256(canonical model)",
+    "stateEnvelope": [
+      "schema",
+      "identity",
+      "model",
+      "safety",
+      "dependencies"
+    ],
+    "identityFields": [
+      "body",
+      "camera",
+      "hands",
+      "mirror",
+      "ownerBinding",
+      "scope",
+      "selection",
+      "shape",
+      "solver",
+      "source"
+    ],
+    "packetFields": [
+      "schema",
+      "operation",
+      "revision",
+      "stateHash",
+      "previewState",
+      "exportState",
+      "canonicalEncoding",
+      "canonicalState"
+    ]
+  },
+  "identity": {
+    "ownerBinding": "opaque owner-bound SHA256 sized binding; BFF remains authorization authority",
+    "selection": [
+      "operation",
+      "revision",
+      "person",
+      "candidate"
+    ],
+    "source": [
+      "originalBvhSha256",
+      "refinedBvhSha256 (nullable)",
+      "refineVersion"
+    ],
+    "body": [
+      "characterId",
+      "characterSha256",
+      "rigProfile"
+    ],
+    "shape": [
+      "sha256 (nullable)",
+      "rulesVersion",
+      "sourceSha256 (asset/blend/controller composite; nullable without recipe)",
+      "controlsSha256 (nullable without recipe)"
+    ],
+    "hands": [
+      "left (nullable)",
+      "right (nullable)",
+      "librarySha256",
+      "rulesVersion"
+    ],
+    "solver": [
+      "version",
+      "manifestSha256",
+      "adapterVersion",
+      "runtimeSha256"
+    ],
+    "scope": [
+      "full",
+      "half",
+      "bust",
+      "shoulder_head",
+      "head"
+    ],
+    "mirror": "anatomical pose identity"
+  },
+  "model": {
+    "format": "bounded JSON; separate from existing static GLB",
+    "coordinates": "right-handed-y-up-metres-hip-origin",
+    "blenderMapping": "subtract fixed originBlender, then (x,z,-y)",
+    "matrixLayout": "row-major",
+    "baked": "rigged_rest",
+    "bones": [
+      "name",
+      "parent (-1 or earlier index)",
+      "restLocal",
+      "poseLocal",
+      "inverseBind"
+    ],
+    "meshes": [
+      "name",
+      "positions",
+      "normals (split/corner)",
+      "triangles (position indices)",
+      "normalTriangles (normal indices)",
+      "weights (all positive influences retained)"
+    ],
+    "limits": {
+      "bytes": 67108864,
+      "bones": 256,
+      "meshes": 32,
+      "totalVertices": 500000,
+      "trianglesPerMesh": 1000000,
+      "influencesPerVertex": 32
+    },
+    "externalUris": false,
+    "animations": false,
+    "arbitraryExtensions": false
+  },
+  "exportReceipt": {
+    "schema": "interactive-fbx-receipt-v1",
+    "publisher": "host after fresh exporter process + fresh FBX reimport validator + latest-revision fence",
+    "fields": [
+      "schema",
+      "stateHash",
+      "revision",
+      "operation",
+      "identity",
+      "verified",
+      "artifactSha256",
+      "artifactBytes",
+      "runtimeRevision",
+      "packetModelSha256",
+      "reimportModelSha256",
+      "skin",
+      "correspondence",
+      "safety",
+      "limitations"
+    ],
+    "downloadAuthorization": "BFF must independently recheck current selection/ownership/review/source/quarantine/expiry",
+    "normalMismatch": "fails; never produces ready receipt"
+  },
+  "validation": {
+    "positionToleranceM": 0.0001,
+    "matrixTolerance": 1e-05,
+    "weightTolerance": 1e-06,
+    "splitNormalVectorTolerance": 0.0001,
+    "existingFrozenAndStaticValidatorsChanged": false,
+    "unitTestsPassed": 201,
+    "smokeTestsPassed": 54,
+    "syntheticFreshProcessFbxScopesPassed": [
+      "full",
+      "half",
+      "bust",
+      "shoulder_head",
+      "head"
+    ],
+    "approvedActualAssetStatus": "PASS: 13 independent real-asset cases; zero strict correspondence error",
+    "top5CoverageProven": false
+  },
+  "solver": {
+    "version": "chain-transport-v3.2.5",
+    "manifestSha256": "52eae0b0eb6a7023540fdf023ad4321f24c11d439f3ecf9f390b5b72358b24e3",
+    "adapterVersion": "post-frozen-file-canonical-snapshot-v2"
+  },
+  "blockers": [
+    "initial/intermediate FBX dependency retained",
+    "production-wide static inventory and all 79 preset combinations are not precompiled",
+    "native OS/CSP, production PostgreSQL/distributed deployment and fleet performance are deployment acceptance gates"
+  ],
+  "localAcceptance": {
+    "realHttp": true,
+    "independentFbxCorrespondence": {
+      "cases": 13,
+      "maxJointVertexSkinNormalError": 0
+    },
+    "actualRefineAndHands": true,
+    "top5Coverage": {
+      "verified": 5,
+      "requested": 5,
+      "globalLibraryClaim": false
+    },
+    "cachedHand40SamplesP95Ms": 19.6,
+    "gpuCompletionMeasured": true,
+    "paidInferenceCalls": 0,
+    "assetsCommitted": false,
+    "displayPresentationMeasured": false
+  }
+}

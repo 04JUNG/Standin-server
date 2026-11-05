@@ -113,7 +113,10 @@ jobs:
             tests/converter/test_scene_hand_stage.py \
             tests/converter/test_scene_contact_profiles.py \
             tests/converter/test_fast_scene_reset.py \
-            tests/converter/test_preview_instrumentation.py
+            tests/converter/test_preview_instrumentation.py \
+            tests/converter/test_interactive_state.py \
+            tests/converter/test_interactive_camera.py \
+            tests/converter/test_interactive_transport.py
 
   inference-isolation:
     name: Inference image excludes bpy

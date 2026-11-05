@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   staging:
-    if: github.ref == 'refs/heads/develop'
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/codex/staging-latestdevelop-20261105'
     environment: staging
     runs-on: ubuntu-latest
     timeout-minutes: 50

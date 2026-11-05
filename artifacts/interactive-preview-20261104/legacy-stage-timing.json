@@ -1,0 +1,197 @@
+{
+  "schema": "local-baseline-timing-v1",
+  "classification": "single local approved master-v2 asset, no network/paid inference, warm OS file cache; no service p50/p95 or speedup claim",
+  "sourceBvhSha256": "d22cabce87b52e3b86cf07c74b29b30a2bb76bd536167baec981ff4e88565216",
+  "characterSha256": "7c648b97a24a3bb4914b6e5d515708c33727979881d92ef916d5726e22301f3d",
+  "artifactSha256": "a475e55825d89238f9ee278987a4702db28b204b186dab6f7cfd76aa2a389fe0",
+  "blenderVersion": "5.2.0 LTS",
+  "blenderBuild": "fbe6228777e7",
+  "stages": {
+    "worker_init": {
+      "duration_ms": 13.997415982885286,
+      "ok": true
+    },
+    "retarget_initial_export": {
+      "duration_ms": 676.8840840086341,
+      "ok": true
+    },
+    "hand_import_apply_export": {
+      "duration_ms": 128.4992089786101,
+      "ok": true
+    },
+    "framing_import": {
+      "duration_ms": 66.66541699087247,
+      "ok": true
+    },
+    "crop": {
+      "duration_ms": 0.04237500252202153,
+      "ok": true
+    },
+    "final_fbx_reimport": {
+      "duration_ms": 66.61924999207258,
+      "ok": true
+    },
+    "png_render_write": {
+      "duration_ms": 142.56462501361966,
+      "ok": true
+    }
+  },
+  "calls": [
+    {
+      "function": "retarget.reset_scene",
+      "caller": "foot_plant.py:convert_safe",
+      "durationMs": 19.231832993682474,
+      "ok": true
+    },
+    {
+      "function": "fbx.parse",
+      "caller": "import_fbx.py:load",
+      "durationMs": 5.802999978186563,
+      "ok": true
+    },
+    {
+      "function": "retarget.import_character",
+      "caller": "foot_plant.py:convert_safe",
+      "durationMs": 76.21170798665844,
+      "ok": true
+    },
+    {
+      "function": "retarget.import_bvh",
+      "caller": "foot_plant.py:convert_safe",
+      "durationMs": 5.959458008874208,
+      "ok": true
+    },
+    {
+      "function": "retarget.apply_output_mode",
+      "caller": "foot_plant.py:convert_safe",
+      "durationMs": 1.3001250044908375,
+      "ok": true
+    },
+    {
+      "function": "retarget.export_fbx",
+      "caller": "foot_plant.py:convert_safe",
+      "durationMs": 63.263541989726946,
+      "ok": true
+    },
+    {
+      "function": "foot_plant.convert_safe",
+      "caller": "airborne_plantar.py:convert_safe",
+      "durationMs": 259.0589579776861,
+      "ok": true
+    },
+    {
+      "function": "retarget.reset_scene",
+      "caller": "airborne_plantar.py:_reference_evidence",
+      "durationMs": 18.173999997088686,
+      "ok": true
+    },
+    {
+      "function": "fbx.parse",
+      "caller": "import_fbx.py:load",
+      "durationMs": 5.476416990859434,
+      "ok": true
+    },
+    {
+      "function": "retarget.import_character",
+      "caller": "airborne_plantar.py:_reference_evidence",
+      "durationMs": 51.54020799091086,
+      "ok": true
+    },
+    {
+      "function": "retarget.import_bvh",
+      "caller": "airborne_plantar.py:_reference_evidence",
+      "durationMs": 3.5092920006718487,
+      "ok": true
+    },
+    {
+      "function": "retarget.reset_scene",
+      "caller": "airborne_plantar.py:convert_safe",
+      "durationMs": 19.81591698131524,
+      "ok": true
+    },
+    {
+      "function": "fbx.parse",
+      "caller": "import_fbx.py:load",
+      "durationMs": 5.449167016195133,
+      "ok": true
+    },
+    {
+      "function": "retarget.import_character",
+      "caller": "airborne_plantar.py:convert_safe",
+      "durationMs": 49.61162499967031,
+      "ok": true
+    },
+    {
+      "function": "airborne_plantar.convert_safe",
+      "caller": "convert.py:convert",
+      "durationMs": 676.8765420129057,
+      "ok": true
+    },
+    {
+      "function": "retarget.reset_scene",
+      "caller": "hands.py:bake_hands",
+      "durationMs": 17.860624997410923,
+      "ok": true
+    },
+    {
+      "function": "fbx.parse",
+      "caller": "import_fbx.py:load",
+      "durationMs": 5.380374990636483,
+      "ok": true
+    },
+    {
+      "function": "retarget.import_character",
+      "caller": "hands.py:bake_hands",
+      "durationMs": 49.86145798466168,
+      "ok": true
+    },
+    {
+      "function": "retarget.apply_output_mode",
+      "caller": "hands.py:solve_hands",
+      "durationMs": 0.7465419766958803,
+      "ok": true
+    },
+    {
+      "function": "retarget.export_fbx",
+      "caller": "hands.py:bake_hands",
+      "durationMs": 57.11391699151136,
+      "ok": true
+    },
+    {
+      "function": "retarget.reset_scene",
+      "caller": "framing.py:process_output",
+      "durationMs": 17.716792004648596,
+      "ok": true
+    },
+    {
+      "function": "fbx.parse",
+      "caller": "import_fbx.py:load",
+      "durationMs": 5.3472089930437505,
+      "ok": true
+    },
+    {
+      "function": "retarget.import_character",
+      "caller": "framing.py:process_output",
+      "durationMs": 48.93945800722577,
+      "ok": true
+    },
+    {
+      "function": "retarget.reset_scene",
+      "caller": "framing.py:process_output",
+      "durationMs": 17.541625013109297,
+      "ok": true
+    },
+    {
+      "function": "fbx.parse",
+      "caller": "import_fbx.py:load",
+      "durationMs": 5.541249993257225,
+      "ok": true
+    },
+    {
+      "function": "retarget.import_character",
+      "caller": "framing.py:process_output",
+      "durationMs": 49.06812502304092,
+      "ok": true
+    }
+  ]
+}
