@@ -138,3 +138,27 @@ def test_api_native_assets_never_bypass_quarantine(tmp_path, monkeypatch):
     monkeypatch.setattr(api.CFG, "data_dir", str(tmp_path))
     monkeypatch.setattr(api, "quarantine_record", lambda *a: {"reason": "known_bad"})
     assert TestClient(api.app).get("/pose/bad/poster?source_sha256=" + source).status_code == 409
+
+
+@pytest.mark.parametrize("scope", native.SCOPES)
+def test_restored_source_hands_keep_the_existing_app_png_protocol(tmp_path, scope):
+    from converter.library_source_preview import METHOD, revision
+    from converter.source_fingers import VERSION
+    source, _, meta, stem = asset(tmp_path, scope)
+    meta.update(render_method=METHOD, renderer_revision=revision(),
+        source_fingers_version=VERSION,
+        source_fingers=dict(version=VERSION, status="transferred", applied_bones=30,
+                            body_bones_preserved=True))
+    stem.with_suffix(".json").write_text(json.dumps(meta))
+    manifest_path = tmp_path / "library_manifest.json"
+    manifest = json.loads(manifest_path.read_text())
+    manifest["directional_thumbnails"].update(render_method=METHOD, renderer_revisions=[revision()])
+    manifest_path.write_text(json.dumps(manifest))
+    png, headers = native.read_native_png(tmp_path, source, scope)
+    assert png.startswith(b"\x89PNG")
+    assert headers["X-Standin-Preview-Method"] == "frozen-retarget-v1"
+    assert headers["X-Standin-Native-Render-Method"] == METHOD
+    meta["source_fingers"]["body_bones_preserved"] = False
+    stem.with_suffix(".json").write_text(json.dumps(meta))
+    with pytest.raises(ValueError, match="source fingers"):
+        native.read_native_png(tmp_path, source, scope)

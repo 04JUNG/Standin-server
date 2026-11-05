@@ -32,7 +32,7 @@ def revision() -> str:
         'src/pose_posters.py', 'converter/preview_style.py', 'converter/preview_studio.sl',
         'converter/framing.py', 'converter/protocol.py', 'converter/worker.py',
         'converter/camera.py', 'converter/convert.py', 'converter/retarget.py',
-        'converter/thumbnail_render.py', 'converter/framed_model.py')))
+        'converter/thumbnail_render.py', 'converter/framed_model.py', 'converter/source_fingers.py')))
 
 
 def identity(source_sha256: str, scope="full") -> dict:

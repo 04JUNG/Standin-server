@@ -65,8 +65,12 @@ def read_native_png(data_dir: Path, source: str, scope="full"):
     declared = manifest.get("directional_thumbnails")
     if declared is None and not root.exists() and not root.is_symlink():
         return None
+    from converter.library_source_preview import METHOD as SOURCE_METHOD, revision as source_revision
+    source_hands = isinstance(declared, dict) and declared.get("render_method") == SOURCE_METHOD
+    method = SOURCE_METHOD if source_hands else METHOD
+    revisions = {source_revision()} if source_hands else REVISIONS
     if (not isinstance(declared, dict) or declared.get("status") != "complete"
-            or declared.get("render_method") != METHOD
+            or declared.get("render_method") != method
             or scope not in declared.get("output_scopes", [])
             or "yaw_000" not in declared.get("views", [])
             or not isinstance(manifest.get("library_version"), str)
@@ -77,17 +81,25 @@ def read_native_png(data_dir: Path, source: str, scope="full"):
         raise ValueError("invalid native reference directory")
     stem = root / (source + "__" + scope + "__yaw_000")
     meta = _json(stem.with_suffix(".json"), 32768)
-    expected = dict(schema_version=2, render_method=METHOD, source_bvh_sha256=source,
+    expected = dict(schema_version=2, render_method=method, source_bvh_sha256=source,
         character_id="standin-master-v2", character_sha256=CHARACTER_SHA,
         scope=scope, view="yaw_000", azimuth_degrees=0, native_camera_yaw=180,
         pitch_degrees=0, projection="orthographic", projection_matches_search=False,
         selected_body=False, hands_applied=False, source_frame=0, preview_only=True,
         anatomy_approval=False, width=512, height=512, format="jpeg", quality=90,
         style="approved-anatomy-detail-dark-5scope-8view-v1", solver_manifest_sha256=SOLVER_SHA)
+    if source_hands:
+        from converter.source_fingers import VERSION
+        expected["source_fingers_version"] = VERSION
+        fingers = meta.get("source_fingers")
+        if (not isinstance(fingers, dict) or fingers.get("version") != VERSION
+                or fingers.get("body_bones_preserved") is not True
+                or fingers.get("status") not in ("transferred", "source_unavailable")):
+            raise ValueError("native reference source fingers changed")
     from src.pose_posters import character_sha256, digest, headers
     if (any(type(meta.get(k)) is not type(v) or meta.get(k) != v for k, v in expected.items())
             or character_sha256() != CHARACTER_SHA
-            or meta.get("renderer_revision") not in REVISIONS
+            or meta.get("renderer_revision") not in revisions
             or meta["renderer_revision"] not in declared.get("renderer_revisions", [])):
         raise ValueError("native reference lineage changed")
     crop = meta.get("framing")

@@ -87,7 +87,7 @@ class LabTests(unittest.TestCase):
         disabled, off_fbx, off_png = self.execute_mock_worker(False)
         self.assertEqual((fbx,png),(off_fbx,off_png))
         self.assertNotIn('lab_stage_timings', disabled)
-        expected = ['worker_init','retarget_initial_export','hand_import_apply_export','framing_import','crop',
+        expected = ['worker_init','retarget_initial_export','source_finger_import_apply_export','hand_import_apply_export','framing_import','crop',
                     'framing_export','final_fbx_reimport','png_render_write']
         self.assertEqual(list(enabled['lab_stage_timings']), expected)
         for metric in enabled['lab_stage_timings'].values():
