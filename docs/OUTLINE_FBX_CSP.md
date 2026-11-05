@@ -4,7 +4,7 @@ Current status: **Draft infrastructure; no CSP-supported nonzero export.** The t
 
 ## Observed representation result
 
-CSP 5.1.1 automatic import displayed the original controls correctly but displayed solid black surfaces for all three hull culling variants, on both the small control and the pinned male/female bodies. The client/CSP session performed these imports in a new test canvas without enabling native outlines or changing culling. This is an appearance failure despite valid FBX geometry and skin. `.clip` save/reopen is independently blocked by that installation's Unregistered license state. Rotation and CSP pose-edit acceptance remain unpassed.
+CSP 5.1.1 automatic import (16 initial import cases reported by the exclusive client/CSP owner, including 0/.5/1/2 on real male bend and female sit poses) displayed the original controls correctly but displayed solid black surfaces for all three hull culling variants, on both the small control and the pinned male/female bodies. The client/CSP session performed these imports in a new test canvas without enabling native outlines or changing culling. This is an appearance failure despite valid FBX geometry and skin. `.clip` save/reopen is independently blocked by that installation's Unregistered license state. Rotation and CSP pose-edit acceptance remain unpassed.
 
 | Representation | Actual transport / import result | Decision |
 |---|---|---|
@@ -47,7 +47,7 @@ Errors: 400 `INVALID_OUTLINE` / `OUTLINE_ZERO_USE_LEGACY`; 401 `UNAUTHORIZED`; 4
 
 ## Verification evidence
 
-- Python 3.12 and pinned `requirements-converter.txt`: 117 focused appearance/API/final/interactive tests passed. Repository smoke: 54/54. Python compilation passed. Converter CI runs the new contract tests and the real synthetic FBX tamper verifier.
+- Python 3.12 and pinned `requirements-converter.txt`: 117 focused appearance/API/final/interactive tests passed. Repository smoke: 54/54. Python compilation passed. The exact converter CI Python list passes locally: 501 passed / 1 existing skip. The Docker copy allowlist includes the required new modules, and its isolated import test also calls the packaged outline capability to verify runtime-source availability. Converter CI runs the new contract tests and the real synthetic FBX tamper verifier.
 - 90/90 baseline files: 2 pinned bodies × neutral/bend/sit90 × full/half/bust/shoulder_head/head × .5/1/2. 30 width-zero records preserve the existing source/path/hash. All original body position, normal, matrix and weight comparator maxima are exactly zero.
 - 42 maximum-width deformation checks move real elbow/finger/knee/spine/neck joints. Maximum measured outline skin-transport error: 3.67779365048e-07m (0.000368mm). This proves Blender skin following, not CSP editing.
 - Additional 36/36 real 160/190cm files passed (both approved controllers × full/half/head × .5/1/2), plus 12 zero path records. Across all 126 files, world-metre displacement error after independent import is at most 1.74580918136e-07m (0.000175mm).
@@ -55,7 +55,7 @@ Errors: 400 `INVALID_OUTLINE` / `OUTLINE_ZERO_USE_LEGACY`; 401 `UNAUTHORIZED`; 4
 - Isolated local host preparation, including two fresh Blender processes: 2.949s first / 2.913s repeated. Repeat output SHA matches. These exclude network, solver and CSP. In-process matrix medians are .096s export / .392s verify and exclude process startup; they are not endpoint latency. Cancellation before work propagates without publication.
 - BFF session separately reports live TCP → Hono/PGlite → converter/Blender zero-byte reuse and cancellation tests, plus .5/1/2 fail-closed before superseding the previous zero operation. See companion PR evidence; synthetic positive outline fixtures are not product acceptance.
 
-Local evidence stays Git-ignored under `out/outline-fbx-csp/`: `summary.json`, `matrix/verification-results.json`, `heights/verification-results.json`, `host-qa.json`, `tamper/report.json`, `images/csp-approved-comparison.png`, and original screenshot path/hash index `images/screenshots.json`. Shared `artifacts/outline-fbx-csp-20261105/{CONTRACT.md,converter-status.md,csp-probes.json}` in the primary checkout records handoff paths. The comparison photo is the actual CSP zero vs rejected hull output, without changing the model pixels.
+Local evidence stays Git-ignored under `out/outline-fbx-csp/`: `summary.json`, `matrix/verification-results.json`, `heights/verification-results.json`, `host-qa.json`, `tamper/report.json`, `images/csp-approved-comparison.png`, `images/csp-width-pose-comparison.png`, and original screenshot path/hash indices `images/screenshots.json` / `images/pose-screenshots.json`. Shared `artifacts/outline-fbx-csp-20261105/{CONTRACT.md,converter-status.md,csp-probes.json}` in the primary checkout records handoff paths. The comparison photo is the actual CSP zero vs rejected hull output, without changing the model pixels.
 
 Pinned source and candidate hashes:
 
