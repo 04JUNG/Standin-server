@@ -8,7 +8,8 @@ import time
 
 ROOT=Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path: sys.path.insert(0,str(ROOT))
-from converter.outline_spec import normalize, appearance_hash, thickness_m, EXPRESSION, MAPPING, runtime_revision, certified
+from converter.outline_spec import (normalize, appearance_hash, physical_thickness, runtime_revision,
+    certified, expression_for, LEGACY_SURFACE, NATIVE_SURFACE)
 from converter.outline_fbx import one, augment, fingerprint, write, PREFIX
 
 
@@ -65,18 +66,18 @@ def tree(path):
     return parse_fbx.parse(str(path))
 
 
-def expected_tree(source, distance, culling):
+def expected_tree(source, distance, culling, *, surface=LEGACY_SURFACE):
     root,version=tree(source)
     if any(e.id.startswith(b'Animation') for e in one(root,b'Objects').elems):
         raise ValueError('animated source FBX is outside the rigged-rest contract')
     arm,meshes=import_source(source)
     displacement=offsets(root,meshes,distance)
-    manifest=augment(root,displacement,culling=culling.encode())
+    manifest=augment(root,displacement,culling=culling.encode(),surface=surface)
     return root,version,manifest
 
 
-def verify_tree(source, output, distance, culling):
-    expected,version,manifest=expected_tree(source,distance,culling)
+def verify_tree(source, output, distance, culling, *, surface=LEGACY_SURFACE):
+    expected,version,manifest=expected_tree(source,distance,culling,surface=surface)
     actual,actual_version=tree(output)
     if version!=actual_version: raise ValueError('FBX version changed')
     # The encoder normalizes header timestamps/FileId. Everything affecting the
@@ -95,17 +96,19 @@ def run(stage, directory):
     source=directory/'source.fbx'; output=directory/'artifact.fbx'
     if sha(source)!=job['source_artifact_sha256']: raise ValueError('source checksum mismatch')
     appearance=normalize(job['appearance'])
+    surface=job.get('surface',LEGACY_SURFACE)
+    expression,mapping=expression_for(surface)
     if not appearance['width']: raise ValueError('zero must retain original output path')
-    distance=thickness_m(appearance,job['stature_m'])
+    distance=physical_thickness(appearance,job['stature_m'],job['output_scope'],surface=surface)
     start=time.monotonic()
     if stage=='export':
         if output.exists(): raise ValueError('output already exists')
-        root,version,manifest=expected_tree(source,distance,job['culling'])
+        root,version,manifest=expected_tree(source,distance,job['culling'],surface=surface)
         write(output,root,version)
         (directory/'candidate.json').write_text(json.dumps(manifest,sort_keys=True))
     else:
         output_sha=sha(output)
-        manifest=verify_tree(source,output,distance,job['culling'])
+        manifest=verify_tree(source,output,distance,job['culling'],surface=surface)
         # Reimport source and output separately. Delete only manifest-authored
         # hulls AFTER exact tree validation, then reuse the strict existing body
         # comparator unchanged. Arbitrary extra meshes never reach this step.
@@ -135,15 +138,24 @@ def run(stage, directory):
                 displacement_error=max(displacement_error,error)
             if len(h.material_slots)!=1: raise ValueError('outline material count changed')
             mat=h.material_slots[0].material
-            if mat is None or any(abs(v)>1e-6 for v in mat.diffuse_color[:3]) or abs(mat.diffuse_color[3]-1)>1e-6:
-                raise ValueError('outline is not opaque black')
+            alpha=0. if surface==NATIVE_SURFACE else 1.
+            # Blender's FBX importer writes transparency to the Principled
+            # socket, while the separate viewport diffuse alpha can stay 1.
+            # Verify the actual imported shader, not that viewport cache.
+            nodes=[] if mat is None or mat.node_tree is None else [
+                n for n in mat.node_tree.nodes if n.type=='BSDF_PRINCIPLED']
+            if (len(nodes)!=1 or nodes[0].inputs['Alpha'].is_linked
+                    or nodes[0].inputs['Base Color'].is_linked
+                    or any(abs(v)>1e-6 for v in nodes[0].inputs['Base Color'].default_value[:3])
+                    or abs(nodes[0].inputs['Alpha'].default_value-alpha)>1e-6):
+                raise ValueError('outline material differs from its expression')
             bpy.data.objects.remove(h,do_unlink=True)
         if {o.name for o in bpy.context.scene.objects if o.type=='MESH'}!=source_names:
             raise ValueError('base mesh names changed')
         errors=compare(base,capture(origin))
         if sha(output)!=output_sha or sha(source)!=job['source_artifact_sha256']:
             raise ValueError('verification changed artifact')
-        receipt=dict(version='outlined-fbx-receipt-v1',expression=EXPRESSION,mapping=MAPPING,
+        receipt=dict(version='outlined-fbx-receipt-v1',expression=expression,mapping=mapping,
             runtime_revision=runtime_revision(),blender_version=bpy.app.version_string,
             source_artifact_sha256=job['source_artifact_sha256'],fbx_sha256=output_sha,
             appearance=appearance,appearance_sha256=appearance_hash(appearance),
@@ -154,7 +166,7 @@ def run(stage, directory):
             outline=dict(manifest=manifest,skin_verified=skin['skin_verified'],
                 displacement_verified=True,max_displacement_error_m=displacement_error,
                 blender_import_backface_culling=imported_culling),
-            file_verified=True,csp_certified=certified(job['character_sha256'],job['output_scope']),
+            file_verified=True,csp_certified=certified(job['character_sha256'],job['output_scope'],surface=surface),
             verification_seconds=time.monotonic()-start)
         (directory/'verified.json').write_text(json.dumps(receipt,sort_keys=True,allow_nan=False))
 

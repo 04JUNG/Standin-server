@@ -13,7 +13,8 @@ import time
 from fastapi import File, Form, Request, UploadFile
 from fastapi.responses import JSONResponse
 from converter.outline_spec import (VERSION, EXPRESSION, MAPPING, CSP_CERTIFIED,
-    CHARACTERS, MAX_FBX_BYTES, normalize, appearance_hash, thickness_m, runtime_revision, certified)
+    CHARACTERS, MAX_FBX_BYTES, normalize, appearance_hash, thickness_m, physical_thickness,
+    runtime_revision, certified, DEFAULT_SURFACE)
 from converter.scene_contract import FBX_MAGIC
 from converter.framing import validate_scope
 from converter_api.work_queue import current_work
@@ -55,7 +56,8 @@ def prepare(runner, data, job, *, checkpoint):
                     'binding_sha256','character_id','character_sha256','output_scope','stature_m','culling'))
                 or receipt.get('appearance_sha256')!=appearance_hash(job['appearance'])
                 or receipt.get('expression')!=EXPRESSION or receipt.get('mapping')!=MAPPING
-                or receipt.get('thickness_m')!=thickness_m(job['appearance'],job['stature_m'])
+                or receipt.get('thickness_m')!=physical_thickness(job['appearance'],job['stature_m'],
+                    job['output_scope'],surface=job.get('surface',DEFAULT_SURFACE))
                 or receipt.get('file_verified') is not True
                 or receipt.get('base',{}).get('typed_fbx_values_preserved') is not True
                 or receipt.get('outline',{}).get('skin_verified') is not True
@@ -115,7 +117,7 @@ def register_outline(app,registry,runner):
             raise ApiProblem(409,'SOURCE_FBX_SHA256_MISMATCH','source FBX changed')
         job=dict(source_artifact_sha256=source_artifact_sha256,appearance=settings,
             output_scope=output_scope,character_id=character_id,character_sha256=character_sha256,
-            binding_sha256=binding_sha256,stature_m=stature_m,culling='CullingOnCCW')
+            binding_sha256=binding_sha256,stature_m=stature_m,culling='CullingOff',surface=DEFAULT_SURFACE)
         control=current_work.get()
         def check():
             if control: control.check('execution')

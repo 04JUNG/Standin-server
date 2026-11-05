@@ -34,7 +34,9 @@ def export(root):
                 shutil.copyfile(source,d/'source.fbx')
                 job=dict(source_artifact_sha256=sha(source),appearance=dict(version=VERSION,width=width),
                     stature_m=item['stature_m'],output_scope=scope,character_id=item['character_id'],
-                    character_sha256=item['character_sha256'],binding_sha256='0'*64,culling='CullingOnCCW')
+                    character_sha256=item['character_sha256'],binding_sha256='0'*64,
+                    surface=inputs.get('surface','inverted-opaque'),
+                    culling='CullingOff' if inputs.get('surface')=='outward-transparent' else 'CullingOnCCW')
                 (d/'job.json').write_text(json.dumps(job))
                 start=time.monotonic();run('export',d)
                 cases.append(dict(directory=str(d.resolve()),name=item['name'],scope=scope,width=width,

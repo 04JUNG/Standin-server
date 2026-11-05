@@ -5,8 +5,19 @@ import math
 from pathlib import Path
 
 VERSION = 'fbx-outline-v1'
-EXPRESSION = 'skinned-inverted-hull-fbx-culling-v1'
-MAPPING = 'stature-relative-v1-experimental'
+LEGACY_EXPRESSION = 'skinned-inverted-hull-fbx-culling-v1'
+LEGACY_MAPPING = 'stature-relative-v1-experimental'
+LEGACY_SURFACE = 'inverted-opaque'
+NATIVE_SURFACE = 'outward-transparent'
+NATIVE_EXPRESSION = 'skinned-outward-transparent-native-outline-v2'
+NATIVE_MAPPING = 'csp-native-scope-stature-v2-experimental'
+DEFAULT_SURFACE = NATIVE_SURFACE
+EXPRESSION = NATIVE_EXPRESSION
+MAPPING = NATIVE_MAPPING
+# Crops are framed much closer in the target app. Retain the supplied full
+# stature, then apply a separate explicit style scale for each output scope.
+# These factors require actual CSP comparison; they do not promise CSS pixels.
+NATIVE_SCOPE_SCALE = {'full':1.,'half':.60,'bust':.35,'shoulder_head':.27,'head':.15}
 # Exact (expression, mapping, character SHA, scope) acceptance records only.
 # Actual CSP import/save/reopen evidence is required before populating this set.
 CSP_CERTIFIED = frozenset()
@@ -14,11 +25,22 @@ MAX_FBX_BYTES = 30 * 1024 * 1024
 CHARACTERS = {
     'male-base-v0-7-2': '809a131510434089888429605bf7cd2e3bc75b63109e4ac5c9734b211ee52365',
     'female-base-v0-3-4': 'e6947d8e2aeb1014e9505a61d2f42e6bd9d34965cc7bb3a6c2fcd2722d4f280a',
+    'male-default83-v0-7-6-p1': '085dd9c65a3a66035f7e0ce9e0a9171b9abb0e33dada92194676d92e00c8b026',
+    'female-default80-v0-3-9-p1': '712ac75e58efd4d6ccded0b1e931590900015de023327f1320cf6d7d94026ffc',
 }
 
 
-def certified(character_sha, scope):
-    return (EXPRESSION, MAPPING, character_sha, scope) in CSP_CERTIFIED
+def expression_for(surface):
+    if surface == LEGACY_SURFACE:
+        return LEGACY_EXPRESSION, LEGACY_MAPPING
+    if surface == NATIVE_SURFACE:
+        return NATIVE_EXPRESSION, NATIVE_MAPPING
+    raise ValueError('unsupported outline surface')
+
+
+def certified(character_sha, scope, *, surface=DEFAULT_SURFACE):
+    expression, mapping = expression_for(surface)
+    return (expression, mapping, character_sha, scope) in CSP_CERTIFIED
 
 
 def normalize(value=None):
@@ -56,6 +78,13 @@ def thickness_m(appearance, stature_m):
             or not 1 <= stature_m <= 2.5):
         raise ValueError('INVALID_OUTLINE_STATURE')
     return normalize(appearance)['width'] / 2 * stature_m * .0015
+
+
+def physical_thickness(appearance, stature_m, scope, *, surface=DEFAULT_SURFACE):
+    from converter.framing import validate_scope
+    validate_scope(scope); expression_for(surface)
+    distance=thickness_m(appearance,stature_m)
+    return distance*NATIVE_SCOPE_SCALE[scope] if surface==NATIVE_SURFACE else distance
 
 
 def runtime_revision():

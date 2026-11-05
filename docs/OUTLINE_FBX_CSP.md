@@ -1,71 +1,90 @@
 # Final FBX outline preparation and CSP acceptance
 
-Current status: **Draft infrastructure; no CSP-supported nonzero export.** The tested inverted hull is rejected. The default remains off and width zero uses the existing artifact and path. No deployment or global activation is part of this change.
+Current status: **Replacement final FBXs display grey body surfaces and black contours in actual CSP imports. Full product acceptance remains incomplete.** The opaque inverted hull is replaced by an outward-facing, fully transparent skinned guide. The exact implementation bytes for both current approved defaults were imported by the exclusive client/CSP owner without manually enabling native outlines or changing culling. Width zero retains the existing file/path. The feature remains default-off and uncertified pending CSP joint editing and licensed `.clip` save/close/reopen. No merge, deployment or global activation is included.
 
-## Observed representation result
+## Actual CSP observations
 
-CSP 5.1.1 automatic import (16 initial import cases reported by the exclusive client/CSP owner, including 0/.5/1/2 on real male bend and female sit poses) displayed the original controls correctly but displayed solid black surfaces for all three hull culling variants, on both the small control and the pinned male/female bodies. The client/CSP session performed these imports in a new test canvas without enabling native outlines or changing culling. This is an appearance failure despite valid FBX geometry and skin. `.clip` save/reopen is independently blocked by that installation's Unregistered license state. Rotation and CSP pose-edit acceptance remain unpassed.
+CSP EX 5.1.1 build 202607291835 was tested in separate new canvases using File > Import > 3D Data, automatic import, with no mode-selection prompt. The exact Basic/Realistic property was not read. These observations do not certify every mode or renderer.
 
-| Representation | Actual transport / import result | Decision |
+| Representation | Actual CSP result | Decision |
 |---|---|---|
-| Existing body, width 0 | Original bytes/path; normal white/grey body in CSP | Preserve |
-| Reversed skinned hull, CullingOff | Black body in actual CSP import | Reject |
-| Same hull, CullingOnCCW | Black body in actual CSP import, including real male/female | Reject |
-| Same hull, CullingOnCW | Black body in actual small-control CSP import | Reject |
-| Backfacing → transparent/black Blender graph | Geometry/Mix/Transparent shader nodes absent after actual FBX reimport | Reject as portable FBX graph |
-| CSP native Add outline / width | Application state; no verified FBX width transport | Not an automatic FBX solution |
+| Original body, width 0 | Grey surfaces with CSP's existing native contours | Preserve original bytes/path |
+| Opaque reversed skinned hull, Off/OnCCW/OnCW | Solid black surfaces | Reject v1 |
+| Transparent reversed hull | Grey body without useful extra contour | Reject |
+| Transparent outward-facing skinned guide | Grey body plus darker contours on actual male/female final files | Implement v2; retain certification gate |
+| Fixed-view black contour tubes | No black body initially; internal lines after orbit | Diagnostic only |
+| Blender Backfacing/Mix/Transparent graph | Required nodes absent after FBX reimport | Reject as portable FBX expression |
 
-The installed official Blender 5.2 exporter writes Model `CullingOff` unconditionally. The candidate writer therefore used explicit FBX node culling values as separate controls. Blender reimport also loses the material backface flag; the verifier reports this fact and does not repair it or equate Blender success with CSP success.
+The new guide keeps outward winding/normals and `CullingOff`. Its black material has `Opacity=0`, `TransparencyFactor=1`, `TransparentColor=(1,1,1)`. CSP's automatic outline pass visibly outlines the expanded transparent guide while retaining the original body. This is observed CSP behavior, not an assumption about shader graphs or backface culling surviving transport. Other renderers need not draw the transparent guide.
 
-Official references checked on 2026-11-05: [CSP FBX import and Basic/Realistic modes](https://help.clip-studio.com/en-us/manual_en/660_3d/Importing_3D_Files.htm), [CSP application outline/backface settings](https://help.clip-studio.com/en-us/manual_en/810_subtools/P.htm), [Autodesk FBX culling tokens](https://help.autodesk.com/cloudhelp/2020/ENU/FBX-API-Reference/cpp_ref/fbxfiletokens_8h.html), [Blender supported material-node export](https://docs.blender.org/manual/en/4.1/addons/import_export/node_shaders_info.html). These describe supported settings/data; they do not certify preservation in CSP.
+Actual CSP evidence:
 
-## Boundary and integrity
+- Current male/female full-body comparisons at 0/.5/1/2, male crouch, preserved male bend/female sit: grey surfaces and progressively stronger contours. This is visual comparison, not measured pixel width.
+- Exact final implementation male/female width-2 imports and 200% front detail: no large black patch, obvious white halo or doubled exterior silhouette in these views. Fine dotted interior occlusion lines remain near some knee/shin views.
+- Earlier male candidate front/three-quarter/side/back orbit and exact final female near-side/rear-three-quarter orbit. These are distinct hashes/evidence sets. The female screenshot named `back` is not an exact-back observation. Extra exact final male side/back testing stopped when the Mac locked; candidate orbit does not certify final-byte orbit.
+- Both sexes at half/bust/shoulder_head/head: eight paired 0/2 comparisons, 16 exact hashes checked; grey bodies and stronger contours in every initial view. Both head width-2 files were orbited near-side/profile with a clean visible lower cut edge. Head zero already has native contour; width two is modestly stronger. Cropped .5/1 are file-tested, not CSP UI-tested. Male bust/shoulder cut jaggedness already exists in zero controls.
 
-- `outline_spec.py` strictly validates `{version:"fbx-outline-v1",width:0..2}`; bools, nonfinite numbers, unknown versions/keys and out-of-range widths fail. Black and full opacity are fixed. Missing/zero appearance stays out of legacy identity and output handling.
-- `outline_fbx.py` parses the original FBX and adds a named hull, black material, copied skin/cluster records and separate bind pose. Original object values, geometry, normals, materials, UVs, morph records, skin and bones are not exported again through Blender. Unrecognized skin/normal/instance structures fail. Animated source files are outside the rigged-rest contract.
-- The independent verifier rebuilds an exact allowlist from the original source/settings and compares every scene-affecting typed FBX record. Arbitrary extra meshes, missing hulls, material/skin changes and stale width/culling fail. It then imports the file, checks the complete skin, removes only the exact verified hull set and runs the existing strict body comparator unchanged.
-- The immutable solved-state/display model, frozen solver, retarget implementation, bone/weight tolerances and preview outline renderer are unchanged. This is a postprocess of a previously verified individual FBX. It grants no BFF ownership/release authority.
-- Personal models, combined-scene FBX and VRM ZIP are outside nonzero support. No source model/controller/key/private screenshot is committed.
+Save As on the exact final female file produced the actual license acquisition/registration dialog and was cancelled. The installation is Unregistered; no `.clip` was saved/reopened. CSP joint editing remains unverified: available object-edit controls did not expose demonstrated bone manipulation. Arbitrary views and every occluded cut face remain uncertified. These limits are distinct from successful initial import.
 
-## Physical mapping remains experimental
+Official references checked during the investigation: [CSP FBX import and modes](https://help.clip-studio.com/en-us/manual_en/660_3d/Importing_3D_Files.htm), [CSP outline/backface settings](https://help.clip-studio.com/en-us/manual_en/810_subtools/P.htm), [Autodesk culling tokens](https://help.autodesk.com/cloudhelp/2020/ENU/FBX-API-Reference/cpp_ref/fbxfiletokens_8h.html), [Blender material-node export](https://docs.blender.org/manual/en/4.1/addons/import_export/node_shaders_info.html). These describe settings/data, not acceptance of this expression; screenshots and hashes establish the observations above.
 
-`stature-relative-v1-experimental`: displacement in world metres = width / 2 × full stature in metres × 0.0015. At 1.75m, widths .5/1/2 correspond to .65625/1.3125/2.625mm. The same full stature is used for cropped outputs. Width is the logical UI choice, never a direct CSS-px-to-mm conversion. Pose or crop bounds cannot supply stature.
+## Integrity and versioned mapping
 
-The pin-specific baseline metadata is 1.75m for both character SHAs below; shaped requests must use the resolved approved height control. Additional real 160/190cm inputs use the original approved controllers, their unchanged field ranges and fixed-source hashes. Because the representation fails CSP rendering, this mapping has no accepted visual calibration and must not be advertised as constant pixels or supported thickness. A replacement expression requires a new version and fresh visual acceptance.
+`outline_spec.py` strictly validates `{version:"fbx-outline-v1",width:0..2}`. Bools, nonfinite values, unknown versions/keys and invalid ranges fail. The logical schema stays stable while v2 changes expression/mapping/runtime identity. Missing/zero appearance stays outside legacy identity/output handling.
 
-## Internal API
+`outline_fbx.py` preserves original typed FBX object values and adds named guide geometry/material, copied skin/cluster records and a separate bind pose. Original geometry/normals/UVs/morphs/materials/skin/bones are not re-exported through Blender. Unsupported source structures and animated sources fail. The independent verifier reconstructs an exact allowlist and compares every scene-affecting typed record. It checks actual imported Principled Base Color/Alpha sockets, not viewport diffuse alpha, then removes only the exact validated guide set before the unchanged strict body comparator runs. Extra/missing meshes, material/skin changes, stale width/culling and opaque-guide corruption fail.
 
-`GET /outline-contract` reports version, expression, mapping, runtime revision, enabled state, CSP certification and supported targets. Current supported characters/scopes/expressions are empty; candidate character metadata is not support. `CONVERTER_OUTLINE_ENABLED=false` by default. Setting it true cannot bypass the empty compile-time exact `(expression,mapping,character SHA,scope)` certification set.
+Frozen solver, retarget, immutable solved state/display model, bone/weight tolerances and preview outline renderer remain unchanged. Personal models, combined-scene FBX and VRM ZIP remain outside nonzero support. Models/controllers/keys/binary screenshots stay Git-excluded.
 
-`POST /outline-fbx` uses the existing private interactive Bearer token and multipart fields: `fbx`, `source_artifact_sha256`, `appearance` JSON, `output_scope`, `character_id`, `character_sha256`, `binding_sha256`, `stature_m`. Files are binary FBX bounded to 30 MiB. Width zero returns `OUTLINE_ZERO_USE_LEGACY` instead of minting a new file. Current nonzero requests fail with `OUTLINE_DISABLED`, `OUTLINE_UNSUPPORTED`, or `OUTLINE_NOT_CSP_CERTIFIED`; no file-ready marker or fallback success is issued.
+Expression: `skinned-outward-transparent-native-outline-v2`.
+Mapping: `csp-native-scope-stature-v2-experimental`.
 
-When a future expression is accepted, the JSON envelope is `{artifact_contract:"outlined-fbx-v1",fbx_base64,fbx_sha256,receipt}`. The receipt binds source/final hashes, normalized appearance/hash, BFF selection binding, character SHA, scope, stature, physical displacement, expression/mapping/runtime, exact outline manifest, `outline.displacement_verified`/`max_displacement_error_m`, base correspondence and separate file/CSP booleans. Only the verifier writes the candidate receipt. Public delivery additionally requires a true exact-target CSP certification. Candidate CLI receipts are false.
+World-metre displacement = width / 2 × supplied full stature in metres × 0.0015 × scope factor.
 
-BFF must check the capability, maintain appearance in its operation/revision/cache identity, independently hash returned bytes and recheck all bindings/authorization/expiry/current-selection fences at build and delivery. Slider motion does not start Blender per frame. BFF owns verified-byte reuse and latest-operation rebinding; the converter has no persistent artifact cache. Cancellation/deadline/worker/integrity failures clean the private temporary directory and retain the previous successful download.
+| Scope | Factor |
+|---|---:|
+| full | 1.00 |
+| half | 0.60 |
+| bust | 0.35 |
+| shoulder_head | 0.27 |
+| head | 0.15 |
 
-Errors: 400 `INVALID_OUTLINE` / `OUTLINE_ZERO_USE_LEGACY`; 401 `UNAUTHORIZED`; 409 `SOURCE_FBX_SHA256_MISMATCH` / `OUTLINE_BINDING_MISMATCH`; 422 `OUTLINE_UNSUPPORTED`; 503 `OUTLINE_DISABLED` / `OUTLINE_NOT_CSP_CERTIFIED`; 500 `OUTLINE_INTEGRITY_ERROR`; 504 `OUTLINE_TIMEOUT`. BFF maps these to brief retry/unsupported user text.
+The factors reduce excessive expansion in close framing. Full stature is explicit, never inferred from cropped/posed bounds. At 1.75m, full .5/1/2 gives .65625/1.3125/2.625mm; head width two gives .39375mm. Current-default jobs use resolved stature. Height variants use approved hash-pinned sources/controllers within original ranges. This is experimental style mapping, not CSS-pixel conversion or constant pixels across cameras.
+
+Legacy diagnostics retain `skinned-inverted-hull-fbx-culling-v1` / `stature-relative-v1-experimental` and original unscaled opaque behavior. API jobs explicitly select v2. Cache identity binds source, normalized appearance, stature, scope, character, expression, mapping and runtime; old representation bytes cannot masquerade as v2.
+
+## Internal API and release gate
+
+`GET /outline-contract` reports appearance version, expression, mapping, runtime revision, enabled state and supported targets. `CONVERTER_OUTLINE_ENABLED=false` remains the default. `CSP_CERTIFIED` remains empty: an environment flag cannot bypass exact `(expression,mapping,character SHA,scope)` acceptance. Candidate character metadata is not support; supported lists are empty.
+
+`POST /outline-fbx` uses the existing private interactive Bearer token and multipart `fbx`, `source_artifact_sha256`, `appearance`, `output_scope`, `character_id`, `character_sha256`, `binding_sha256`, `stature_m`. Binary FBX is bounded to 30 MiB. Zero returns `OUTLINE_ZERO_USE_LEGACY` for existing-byte reuse. Current public nonzero requests fail closed without fallback success/file-ready markers.
+
+The prospective positive envelope is `{artifact_contract:"outlined-fbx-v1",fbx_base64,fbx_sha256,receipt}`. Verifier receipts bind source/final hashes, appearance/hash, selection binding, character SHA, scope, stature, displacement, expression/mapping/runtime, exact manifest, skin/displacement checks, unchanged-body correspondence and separate file/CSP booleans. Internal QA receipts are `file_verified:true,csp_certified:false`; direct preparation measurements do not bypass the public gate.
+
+BFF validates capability, operation/revision/cache identity, returned byte hashes and ownership/authorization/expiry/current-selection fences at build/delivery. BFF owns byte reuse/latest-operation rebinding. Slider motion does not start Blender per frame; converter has no persistent artifact cache. Failure/cancellation cleans temporary files and preserves the previous successful download.
+
+Errors: 400 `INVALID_OUTLINE` / `OUTLINE_ZERO_USE_LEGACY`; 401 `UNAUTHORIZED`; 409 `SOURCE_FBX_SHA256_MISMATCH` / `OUTLINE_BINDING_MISMATCH`; 422 `OUTLINE_UNSUPPORTED`; 503 `OUTLINE_DISABLED` / `OUTLINE_NOT_CSP_CERTIFIED`; 500 `OUTLINE_INTEGRITY_ERROR`; 504 `OUTLINE_TIMEOUT`.
 
 ## Verification evidence
 
-- Python 3.12 and pinned `requirements-converter.txt`: 117 focused appearance/API/final/interactive tests passed. Repository smoke: 54/54. Python compilation passed. The exact converter CI Python list passes locally: 501 passed / 1 existing skip. The Docker copy allowlist includes the required new modules, and its isolated import test also calls the packaged outline capability to verify runtime-source availability. Converter CI runs the new contract tests and the real synthetic FBX tamper verifier.
-- 90/90 baseline files: 2 pinned bodies × neutral/bend/sit90 × full/half/bust/shoulder_head/head × .5/1/2. 30 width-zero records preserve the existing source/path/hash. All original body position, normal, matrix and weight comparator maxima are exactly zero.
-- 42 maximum-width deformation checks move real elbow/finger/knee/spine/neck joints. Maximum measured outline skin-transport error: 3.67779365048e-07m (0.000368mm). This proves Blender skin following, not CSP editing.
-- Additional 36/36 real 160/190cm files passed (both approved controllers × full/half/head × .5/1/2), plus 12 zero path records. Across all 126 files, world-metre displacement error after independent import is at most 1.74580918136e-07m (0.000175mm).
-- Nine real binary corruption/stale cases rejected: base position/material/weight; hull displacement; extra mesh; missing hull; connection; different width; different culling.
-- Isolated local host preparation, including two fresh Blender processes: 2.949s first / 2.913s repeated. Repeat output SHA matches. These exclude network, solver and CSP. In-process matrix medians are .096s export / .392s verify and exclude process startup; they are not endpoint latency. Cancellation before work propagates without publication.
-- BFF session separately reports live TCP → Hono/PGlite → converter/Blender zero-byte reuse and cancellation tests, plus .5/1/2 fail-closed before superseding the previous zero operation. See companion PR evidence; synthetic positive outline fixtures are not product acceptance.
+- Python 3.12/pinned converter requirements: exact CI Python list **503 passed / 1 existing skip**; repository smoke **54/54**; compileall, frozen lineage and whitespace pass. Docker's explicit copy list includes every outline module, tested via isolated capability/runtime import. Linux CI also runs the synthetic real-binary verifier.
+- Final scoped v2 matrix **240/240 passes**: 16 sources × five scopes × .5/1/2. Distinct source sets: preserved approved baselines neutral/bend/sit (6), approved-controller 160/190cm variants (4), current approved defaults neutral/crouch/foot-tap (6).
+- **80 zero** path/hash records and **80 actual Blender pose-edit checks** moving elbow/finger/knee/spine/neck. Original position/normal/matrix/weight comparator maxima **all zero**. Maximum imported displacement error **1.6799306554291134e-7m**; maximum dynamic skin transport error **4.643455606442997e-7m**. Blender editing does not substitute for CSP editing.
+- **10 binary corruption/stale cases rejected**, including native opacity. Native synthetic import checks shader Alpha=0 and exact original object fingerprints.
+- Internal host preparation with two fresh Blender processes: **3.057s first / 2.575s repeated**, identical repeated SHA. Warm local samples exclude solver/network/CSP and are not production latency promises.
+- Earlier v1 file results are historical; CSP rejected v1. BFF/client zero/stale/cancellation/disabled contracts and synthetic positives do not establish product acceptance.
 
-Local evidence stays Git-ignored under `out/outline-fbx-csp/`: `summary.json`, `matrix/verification-results.json`, `heights/verification-results.json`, `host-qa.json`, `tamper/report.json`, `images/csp-approved-comparison.png`, `images/csp-width-pose-comparison.png`, and original screenshot path/hash indices `images/screenshots.json` / `images/pose-screenshots.json`. Shared `artifacts/outline-fbx-csp-20261105/{CONTRACT.md,converter-status.md,csp-probes.json}` in the primary checkout records handoff paths. The comparison photo is the actual CSP zero vs rejected hull output, without changing the model pixels.
+Exact current-default implementation files imported into CSP, width 2:
 
-Pinned source and candidate hashes:
+| Body | Original source SHA-256 | Final FBX SHA-256 | Bytes |
+|---|---|---|---:|
+| male-default83-v0-7-6-p1 | `085dd9c65a3a66035f7e0ce9e0a9171b9abb0e33dada92194676d92e00c8b026` | `02799598d9f60899e83627446c80bf9c6f7f737a47b8b2de7e7f92612200a4e3` | 3,881,916 |
+| female-default80-v0-3-9-p1 | `712ac75e58efd4d6ccded0b1e931590900015de023327f1320cf6d7d94026ffc` | `07295db35bb6a148f14da4fad91d459ee05d1f5859225b29638b71dce9754e3b` | 2,975,260 |
 
-| Body | Original source SHA-256 | OnCCW candidate SHA-256 |
-|---|---|---|
-| male | `809a131510434089888429605bf7cd2e3bc75b63109e4ac5c9734b211ee52365` | `d15773b775e5ed4637969ed4a1aa4fc86c19c61a5c2a7c7907ef2d538d255c1d` |
-| female | `e6947d8e2aeb1014e9505a61d2f42e6bd9d34965cc7bb3a6c2fcd2722d4f280a` | `29b7e2cfc0c1f6d94ca7e5fc84d449039cfa8544ce28d6246318188c0a48b2da` |
+Git-ignored local evidence: `out/outline-fbx-csp-v2/native-scope-qa/{inputs,export-results,verification-results}.json`, `host-qa.json`, `final-tamper/report.json`, `summary.json`, `images/csp-final-comparison.png`, `images/photo-index.json`. Exact final files: `native-scope-qa/cases/{male,female}-current-neutral/full/2/artifact.fbx`. The comparison crops actual CSP canvas screenshots without retouching model pixels. Shared original photos/hashes and reports: primary checkout `artifacts/outline-fbx-csp-20261105/csp-v2/{results.json,report.html,scope-results.json,scope-report.html}`.
 
 ## Remaining acceptance
 
-No accepted replacement FBX expression exists in this change. Do not merge/enable it as a completed CSP outline feature. A viable representation must first pass automatic import without black-body/internal-face/finger-blockage defects at all requested widths/views/scopes, then real CSP pose editing and `.clip` save/close/reopen on a legitimately registered test installation. The license blocker and the rejected representation are separate issues. Blender checks cannot replace either acceptance step.
+Initial automatic final-FBX import now has positive visual evidence. Full acceptance needs demonstrated CSP joint manipulation, licensed `.clip` save/close/reopen and remaining widths/views/scope inspection. Fine interior occlusion lines and untested arbitrary angles remain explicit limits. Keep PR Draft and server/client certification lists empty until these pass. Purchase/settings reset/source-document changes/merge/deployment are outside scope.
 
-Related: [client #162](https://github.com/04JUNG/Standin-client/pull/162), already merged [base server #167](https://github.com/04JUNG/Standin-server/pull/167), and [BFF companion #161](https://github.com/04JUNG/Standin-app-server/pull/161). No staging branch or personal-model #142 code was imported.
+Related: [client #162](https://github.com/04JUNG/Standin-client/pull/162), [BFF #161](https://github.com/04JUNG/Standin-app-server/pull/161), merged [base server #167](https://github.com/04JUNG/Standin-server/pull/167). No staging branch or personal-model #142 code imported.

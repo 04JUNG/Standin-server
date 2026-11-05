@@ -77,7 +77,24 @@ def black_material(uid):
             prop(b'TransparencyFactor', b'Number', [0.])])])
 
 
-def augment(root, displacement, *, culling=b'CullingOnCCW'):
+def transparent_material(uid):
+    """Outward transparent guide for CSP's automatic native outline pass.
+
+    No original material or application setting is changed. This does not
+    claim a native outline exists in other renderers, or in every CSP mode.
+    """
+    material = black_material(uid)
+    material.props[1] = PREFIX+b'TransparentNative\x00\x01Material'
+    properties = one(material,b'Properties70')
+    for prop in properties.elems:
+        if prop.props[0]==b'TransparencyFactor': prop.props[-1]=1.
+    properties.elems.extend([
+        element(b'P',[b'TransparentColor',b'Color',b'',b'A',1.,1.,1.],b'SSSSDDD'),
+        element(b'P',[b'Opacity',b'Number',b'',b'A',0.],b'SSSSD')])
+    return material
+
+
+def augment(root, displacement, *, culling=b'CullingOnCCW', surface='inverted-opaque'):
     """displacement maps source Geometry ID -> one local-space delta/vertex.
 
     Returns an exact allowlist of new object/connection fingerprints, which the
@@ -85,6 +102,10 @@ def augment(root, displacement, *, culling=b'CullingOnCCW'):
     """
     if culling not in CULLING:
         raise ValueError('unsupported culling expression')
+    if surface not in ('inverted-opaque','outward-transparent'):
+        raise ValueError('unsupported outline surface')
+    if surface=='outward-transparent' and culling!=b'CullingOff':
+        raise ValueError('transparent native outline must not depend on culling')
     objects = one(root, b'Objects'); connections = one(root, b'Connections')
     original = list(objects.elems); links = list(connections.elems)
     by_id = {e.props[0]: e for e in original}
@@ -97,7 +118,8 @@ def augment(root, displacement, *, culling=b'CullingOnCCW'):
         result=next_id; next_id+=1
         if result >= 2**63: raise ValueError('FBX ID overflow')
         return result
-    material = black_material(uid()); added.append(material)
+    material = (black_material if surface=='inverted-opaque' else transparent_material)(uid())
+    added.append(material)
     def link(child, parent):
         added_links.append(element(b'C', [b'OO', child, parent], b'SLL'))
     geometries = [e for e in original if e.id==b'Geometry' and e.props[2]==b'Mesh']
@@ -129,35 +151,36 @@ def augment(root, displacement, *, culling=b'CullingOnCCW'):
             raise ValueError('source vertex correspondence mismatch')
         for i, d in enumerate(delta):
             for axis in range(3): points[3*i+axis] += d[axis]
-        # Reverse winding, retaining the first vertex so normal indices can be
-        # reversed in exactly the same order. Drop unused UV/edge layers on hull.
-        indices = one(hull, b'PolygonVertexIndex').props[0]
-        faces=[]; face=[]; permutation=[]; start=0
-        for i, v in enumerate(indices):
-            face.append(-v-1 if v<0 else v)
-            if v<0:
-                order=[0, *range(len(face)-1,0,-1)]
-                faces.extend(face[j] for j in order)
-                faces[-1] = -faces[-1]-1
-                permutation.extend(start+j for j in order)
-                face=[]; start=i+1
-        if face: raise ValueError('unterminated FBX polygon')
-        indices[:] = array.array(indices.typecode, faces)
-        normals = one(hull, b'LayerElementNormal')
-        reference=one(normals,b'ReferenceInformationType').props[0]
-        mapping=one(normals,b'MappingInformationType').props[0]
-        if (mapping not in (b'ByPolygonVertex',b'ByVertice')
-                or reference not in (b'IndexToDirect',b'Direct')):
-            raise ValueError('unsupported source normal mapping')
-        values=one(normals,b'Normals').props[0]
-        if mapping==b'ByVertice':
-            values[:] = array.array(values.typecode,(-v for v in values))
-        elif reference==b'Direct':
-            values[:] = array.array(values.typecode, (-values[3*i+a] for i in permutation for a in range(3)))
-        else:
-            values[:] = array.array(values.typecode, (-v for v in values))
-            ni=one(normals,b'NormalsIndex').props[0]
-            ni[:] = array.array(ni.typecode, (ni[i] for i in permutation))
+        if surface=='inverted-opaque':
+            # Reverse winding and corresponding corner normals only for the
+            # legacy diagnostic. Native transparent guides remain outward.
+            indices = one(hull, b'PolygonVertexIndex').props[0]
+            faces=[]; face=[]; permutation=[]; start=0
+            for i, v in enumerate(indices):
+                face.append(-v-1 if v<0 else v)
+                if v<0:
+                    order=[0, *range(len(face)-1,0,-1)]
+                    faces.extend(face[j] for j in order)
+                    faces[-1] = -faces[-1]-1
+                    permutation.extend(start+j for j in order)
+                    face=[]; start=i+1
+            if face: raise ValueError('unterminated FBX polygon')
+            indices[:] = array.array(indices.typecode, faces)
+            normals = one(hull, b'LayerElementNormal')
+            reference=one(normals,b'ReferenceInformationType').props[0]
+            mapping=one(normals,b'MappingInformationType').props[0]
+            if (mapping not in (b'ByPolygonVertex',b'ByVertice')
+                    or reference not in (b'IndexToDirect',b'Direct')):
+                raise ValueError('unsupported source normal mapping')
+            values=one(normals,b'Normals').props[0]
+            if mapping==b'ByVertice':
+                values[:] = array.array(values.typecode,(-v for v in values))
+            elif reference==b'Direct':
+                values[:] = array.array(values.typecode, (-values[3*i+a] for i in permutation for a in range(3)))
+            else:
+                values[:] = array.array(values.typecode, (-v for v in values))
+                ni=one(normals,b'NormalsIndex').props[0]
+                ni[:] = array.array(ni.typecode, (ni[i] for i in permutation))
         material_layer=one(hull,b'LayerElementMaterial')
         one(material_layer,b'MappingInformationType').props[0]=b'AllSame'
         one(material_layer,b'Materials').props[0]=array.array('i',[0])
@@ -194,6 +217,8 @@ def augment(root, displacement, *, culling=b'CullingOnCCW'):
         d=[e for e in definitions.elems if e.id==b'ObjectType' and e.props==[kind]]
         if len(d)!=1: raise ValueError('unsupported FBX definition')
         one(d[0],b'Count').props[0]+=sum(e.id==kind for e in added)
-    return {'objects': {str(e.props[0]):fingerprint(e) for e in added},
+    result = {'objects': {str(e.props[0]):fingerprint(e) for e in added},
         'connections':[fingerprint(c) for c in added_links], 'culling':culling.decode(),
         'meshes':len(geometries)}
+    if surface!='inverted-opaque': result['surface']=surface
+    return result

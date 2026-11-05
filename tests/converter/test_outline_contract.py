@@ -8,7 +8,9 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from converter.outline_spec import (normalize, appearance_hash, thickness_m,
-    CHARACTERS, CSP_CERTIFIED, VERSION, cache_key)
+    CHARACTERS, CSP_CERTIFIED, VERSION, cache_key, expression_for, NATIVE_SURFACE,
+    NATIVE_EXPRESSION, NATIVE_MAPPING, certified)
+from converter.outline_spec import physical_thickness, LEGACY_SURFACE
 from converter_api.outline import register_outline
 
 
@@ -26,12 +28,29 @@ def test_zero_and_numeric_encoding_have_stable_identity():
     assert appearance_hash({'version':VERSION,'width':1})!=appearance_hash({'version':VERSION,'width':2})
 
 
+def test_native_transparent_expression_is_distinct_and_not_implicitly_certified():
+    assert expression_for(NATIVE_SURFACE)==(NATIVE_EXPRESSION,NATIVE_MAPPING)
+    assert expression_for(NATIVE_SURFACE)!=expression_for('inverted-opaque')
+    assert not certified(next(iter(CHARACTERS.values())),'full',surface=NATIVE_SURFACE)
+    with pytest.raises(ValueError): expression_for('unreviewed')
+
+
 def test_physical_width_is_stature_relative_and_scope_independent():
     assert thickness_m({'version':VERSION,'width':2},1.75)==.002625
     assert thickness_m({'version':VERSION,'width':.5},1.75)==.00065625
     assert thickness_m({'version':VERSION,'width':1},2)==.0015
     for height in (False,0,2.51,float('nan')):
         with pytest.raises(ValueError): thickness_m(None,height)
+
+
+def test_native_scope_mapping_keeps_full_stature_but_reduces_close_crop_width():
+    appearance={'version':VERSION,'width':2}
+    assert physical_thickness(appearance,1.75,'full')==.002625
+    assert physical_thickness(appearance,1.75,'head')==.002625*.15
+    assert physical_thickness(appearance,1.75,'half')==.002625*.60
+    assert physical_thickness(appearance,1.75,'head',surface=LEGACY_SURFACE)==.002625
+    for scope in ('full','half','bust','shoulder_head','head'):
+        assert physical_thickness(None,1.75,scope)==0
 
 
 def test_cache_identity_covers_appearance_stature_scope_source_and_runtime(monkeypatch):
