@@ -236,7 +236,7 @@ class Pipeline:
         with span("vlm"):
             analyze = getattr(self.vlm, "analyze_for_pipeline", self.vlm.analyze)
             vlm: VLMAnalysis = analyze(image, img_w, img_h)
-        progress.emit("extracting", completed=("analyzing",))
+        progress.emit("extracting", completed=("analyzing",), scene=progress.scene_observations(vlm))
         from .experimental.body_matching.integrated_review import finish_pipeline_review, abandon_pipeline_review
         from .description_prefetch import start_description_prefetch
         description_job = None

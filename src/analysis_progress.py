@@ -27,7 +27,7 @@ class Progress:
         self.state = dict(version=VERSION, sequence=0, stage="analyzing",
                           completedStages=[], skippedStages=[], people=[])
 
-    def emit(self, stage=None, *, completed=(), skipped=(), people=None, person=None, focus=_UNSET):
+    def emit(self, stage=None, *, completed=(), skipped=(), people=None, person=None, focus=_UNSET, scene=_UNSET):
         try:
             with self.lock:
                 s = self.state
@@ -38,6 +38,11 @@ class Progress:
                 # Job-level completion means at least one person actually ran it.
                 # A skipped path on another person cannot undo that evidence.
                 s["skippedStages"] = [v for v in s["skippedStages"] if v not in s["completedStages"]]
+                if scene is not _UNSET:
+                    if scene:
+                        s["scene"] = deepcopy(scene)
+                    else:
+                        s.pop("scene", None)
                 if focus is not _UNSET:
                     if focus is None:
                         s.pop("focus", None)
@@ -109,6 +114,27 @@ def best_effort(fn):
         except Exception:
             return None
     return wrapped
+
+
+@best_effort
+def scene_observations(vlm):
+    # Control enums have defaults; only validated first-call declarations are
+    # scene observations. Never borrow a representative person's view.
+    tags = vlm.stated_tags if isinstance(vlm.stated_tags, dict) else {}
+    result = {}
+    for name, allowed in (("shot", ("full_half", "bust", "face")),
+                          ("view", ("front", "side", "back", "three_quarter"))):
+        value = tags.get(name)
+        if isinstance(value, str) and value in allowed:
+            result[name] = value
+    raw = vlm.raw if isinstance(vlm.raw, dict) else {}
+    count = raw.get("num_people")
+    # _coerce may clamp/coerce/default num_people from boxes. Require the actual
+    # original numeric integer to agree with the existing parsed analysis count.
+    if (type(count) in (int, float) and 0 <= count <= 20 and math.isfinite(count)
+            and int(count) == count and type(vlm.num_people) is int and count == vlm.num_people):
+        result["personCount"] = int(count)
+    return result or None
 
 
 def start_search(routing):

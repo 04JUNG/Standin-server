@@ -305,3 +305,98 @@ def test_focus_keywords_and_route_only_follow_identical_slot_reference():
         with person_scope(None,selected):
             record_descriptor_search(SimpleNamespace(),"description")
         assert "focus" not in snapshots[-1]
+
+
+def test_scene_uses_stated_cut_labels_and_explicit_original_count_not_defaults_or_people():
+    from src.analysis_progress import scene_observations
+    from src.schema import Shot, View
+    from src.vlm.client import _coerce
+    valid=_coerce({"shot":"bust","view":"side","num_people":2,
+        "person_views":["front","back"],"dialogue":"private", "approx_boxes":[]},100,200)
+    assert scene_observations(valid) == dict(shot="bust",view="side",personCount=2)
+    fallback=_coerce({"shot":"unknown","view":"top","approx_boxes":[{},{}]},100,200)
+    assert (fallback.shot,fallback.view,fallback.num_people) == (Shot.FULL_HALF,View.FRONT,2)
+    assert scene_observations(fallback) is None
+    for raw in (None,"private",[]):
+        valid.raw=raw
+        assert scene_observations(valid) == dict(shot="bust",view="side")
+    valid.raw={"num_people":2};valid.num_people=1
+    assert scene_observations(valid) == dict(shot="bust",view="side")
+    valid.stated_tags=None
+    assert scene_observations(valid) is None
+    snapshots=[]
+    with capture_progress(snapshots.append):
+        emit("extracting",scene=scene_observations(fallback),people=[dict(personIndex=i) for i in range(3)])
+    assert "scene" not in snapshots[0]
+
+
+@pytest.mark.parametrize("count",[0,20,2.0])
+def test_scene_retains_exact_valid_original_numeric_count(count):
+    from src.analysis_progress import scene_observations
+    from src.vlm.client import _coerce
+    vlm=_coerce({"num_people":count},100,200)
+    assert scene_observations(vlm) == dict(personCount=int(count))
+
+
+@pytest.mark.parametrize("count",[None,True,False,-1,21,1.5,"2",[],{},float("nan"),float("inf"),10**1000])
+def test_scene_bad_count_does_not_discard_valid_independent_cut_observations(count):
+    from src.analysis_progress import scene_observations
+    from src.vlm.client import _coerce
+    vlm=_coerce({"shot":"face","view":"back","num_people":count},100,200)
+    assert scene_observations(vlm) == dict(shot="face",view="back")
+
+
+def test_scene_is_cumulative_and_request_local_independent_of_focus_or_final_people():
+    snapshots=[]
+    declared=dict(shot="full_half",view="back",personCount=2)
+    with capture_progress(snapshots.append):
+        emit("extracting",scene=declared)
+        declared["view"]="side"
+        emit("understanding",focus=dict(id="temporary",skeleton={}),people=[])
+        emit("ranking",people=[dict(personIndex=0)])
+    assert all(s["scene"] == dict(shot="full_half",view="back",personCount=2) for s in snapshots)
+    assert all("scene" not in person for s in snapshots for person in s["people"])
+    other=[]
+    with capture_progress(other.append):
+        emit("extracting")
+    assert "scene" not in other[0]
+
+
+def test_real_cut_scene_arrives_after_vlm_before_pose_and_survives_final_ranking(monkeypatch):
+    from src.config import CFG
+    from tests.test_description_prefetch import Client
+    from tests.test_search_routing import _pipe, _Img
+    monkeypatch.setattr(CFG,"body_matching_mode","off")
+    monkeypatch.setattr(CFG,"vlm_person_tags",False)
+    monkeypatch.setattr(CFG,"vlm_hand_shapes",False)
+    monkeypatch.setattr(CFG,"search_routing_enabled",True)
+    client=Client(people=2)
+    pipe=_pipe(vlm=client)
+    snapshots,errors=[],[]
+    at_pose,release,finished=Event(),Event(),Event()
+    estimate=pipe.pose.estimate
+    def blocked(*args,**kwargs):
+        at_pose.set()
+        assert release.wait(5)
+        return estimate(*args,**kwargs)
+    monkeypatch.setattr(pipe.pose,"estimate",blocked)
+    def run():
+        try:
+            with capture_progress(snapshots.append):
+                pipe.process_cut(_Img("offline 2p"),100,200)
+        except BaseException as error:
+            errors.append(error)
+        finally:
+            finished.set()
+    worker=Thread(target=run);worker.start()
+    try:
+        assert at_pose.wait(5)
+        assert not finished.is_set()
+        assert "scene" not in snapshots[0]
+        assert snapshots[-1]["scene"] == dict(shot="full_half",view="front",personCount=2)
+        assert snapshots[-1]["people"] == []
+        assert "focus" not in snapshots[-1]
+    finally:
+        release.set();worker.join(5)
+    assert not worker.is_alive() and not errors
+    assert snapshots[-1]["scene"] == dict(shot="full_half",view="front",personCount=2)
