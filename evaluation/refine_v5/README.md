@@ -13,3 +13,7 @@ Splits remain unassigned until prior exposure/artist/scene review is completed;
 known inspected groups 001/018/026/041/074/087 are development only. All persons
 from one cut must stay together. A completed machine audit is not a certified
 60/20/20 split. Raw images/FBX/checkpoints belong in private output, not Git.
+
+Follow-up: use `curation` and `visual_review_v2.json` for the versioned agent review
+and exploratory 60/20/20 cut split. Initial inventory splits remain historical.
+Direct human coordinate labels and artist-disjoint certification remain absent.

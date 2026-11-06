@@ -1,0 +1,804 @@
+{
+  "schema": "v5-curated-exploratory-v2",
+  "independent_blind_evaluation": false,
+  "records": [
+    {
+      "case_id": "001",
+      "original_cut_id": "001",
+      "source_risk_group": "001",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "002",
+      "original_cut_id": "002",
+      "source_risk_group": "001",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "003",
+      "original_cut_id": "003",
+      "source_risk_group": "001",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "004",
+      "original_cut_id": "004",
+      "source_risk_group": "004",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "005",
+      "original_cut_id": "005",
+      "source_risk_group": "005",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "006",
+      "original_cut_id": "006",
+      "source_risk_group": "005",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "007",
+      "original_cut_id": "007",
+      "source_risk_group": "007",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "008",
+      "original_cut_id": "008",
+      "source_risk_group": "008",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "009",
+      "original_cut_id": "009",
+      "source_risk_group": "008",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "010",
+      "original_cut_id": "010",
+      "source_risk_group": "010",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "011",
+      "original_cut_id": "011",
+      "source_risk_group": "011",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "012",
+      "original_cut_id": "012",
+      "source_risk_group": "012",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "013",
+      "original_cut_id": "013",
+      "source_risk_group": "013",
+      "split": "validation",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "014",
+      "original_cut_id": "014",
+      "source_risk_group": "014",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "015",
+      "original_cut_id": "015",
+      "source_risk_group": "014",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "016",
+      "original_cut_id": "016",
+      "source_risk_group": "016",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "017",
+      "original_cut_id": "017",
+      "source_risk_group": "017",
+      "split": "test",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "018",
+      "original_cut_id": "018",
+      "source_risk_group": "018",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "019.1",
+      "original_cut_id": "019",
+      "source_risk_group": "019",
+      "split": "test",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "019.2",
+      "original_cut_id": "019",
+      "source_risk_group": "019",
+      "split": "test",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "020",
+      "original_cut_id": "020",
+      "source_risk_group": "020",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "021",
+      "original_cut_id": "021",
+      "source_risk_group": "021",
+      "split": "validation",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "022",
+      "original_cut_id": "022",
+      "source_risk_group": "021",
+      "split": "validation",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "023.1",
+      "original_cut_id": "023",
+      "source_risk_group": "023",
+      "split": "test",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "023.2",
+      "original_cut_id": "023",
+      "source_risk_group": "023",
+      "split": "test",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "024",
+      "original_cut_id": "024",
+      "source_risk_group": "024",
+      "split": "test",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "025",
+      "original_cut_id": "025",
+      "source_risk_group": "025",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "026",
+      "original_cut_id": "026",
+      "source_risk_group": "026",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "027",
+      "original_cut_id": "027",
+      "source_risk_group": "027",
+      "split": "test",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "028",
+      "original_cut_id": "028",
+      "source_risk_group": "028",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "029",
+      "original_cut_id": "029",
+      "source_risk_group": "029",
+      "split": "validation",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "030",
+      "original_cut_id": "030",
+      "source_risk_group": "030",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "031",
+      "original_cut_id": "031",
+      "source_risk_group": "031",
+      "split": "test",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "032",
+      "original_cut_id": "032",
+      "source_risk_group": "032",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "033",
+      "original_cut_id": "033",
+      "source_risk_group": "033",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "034",
+      "original_cut_id": "034",
+      "source_risk_group": "034",
+      "split": "test",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "035",
+      "original_cut_id": "035",
+      "source_risk_group": "035",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "036",
+      "original_cut_id": "036",
+      "source_risk_group": "036",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "037",
+      "original_cut_id": "037",
+      "source_risk_group": "037",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "038",
+      "original_cut_id": "038",
+      "source_risk_group": "038",
+      "split": "validation",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "039",
+      "original_cut_id": "039",
+      "source_risk_group": "039",
+      "split": "validation",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "040",
+      "original_cut_id": "040",
+      "source_risk_group": "040",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "041",
+      "original_cut_id": "041",
+      "source_risk_group": "041",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "042",
+      "original_cut_id": "042",
+      "source_risk_group": "042",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "043",
+      "original_cut_id": "043",
+      "source_risk_group": "043",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "044",
+      "original_cut_id": "044",
+      "source_risk_group": "044",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "045",
+      "original_cut_id": "045",
+      "source_risk_group": "045",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "046",
+      "original_cut_id": "046",
+      "source_risk_group": "046",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "047.1",
+      "original_cut_id": "047",
+      "source_risk_group": "047",
+      "split": "validation",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "047.2",
+      "original_cut_id": "047",
+      "source_risk_group": "047",
+      "split": "validation",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "047.3",
+      "original_cut_id": "047",
+      "source_risk_group": "047",
+      "split": "validation",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "048",
+      "original_cut_id": "048",
+      "source_risk_group": "048",
+      "split": "test",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "049",
+      "original_cut_id": "049",
+      "source_risk_group": "049",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "050",
+      "original_cut_id": "050",
+      "source_risk_group": "050",
+      "split": "validation",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "051",
+      "original_cut_id": "051",
+      "source_risk_group": "051",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "052",
+      "original_cut_id": "052",
+      "source_risk_group": "052",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "053",
+      "original_cut_id": "053",
+      "source_risk_group": "053",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "054",
+      "original_cut_id": "054",
+      "source_risk_group": "054",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "055",
+      "original_cut_id": "055",
+      "source_risk_group": "055",
+      "split": "test",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "056",
+      "original_cut_id": "056",
+      "source_risk_group": "056",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "057",
+      "original_cut_id": "057",
+      "source_risk_group": "057",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "058",
+      "original_cut_id": "058",
+      "source_risk_group": "058",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "059",
+      "original_cut_id": "059",
+      "source_risk_group": "059",
+      "split": "validation",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "060",
+      "original_cut_id": "060",
+      "source_risk_group": "060",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "061",
+      "original_cut_id": "061",
+      "source_risk_group": "061",
+      "split": "test",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "062",
+      "original_cut_id": "062",
+      "source_risk_group": "062",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "063",
+      "original_cut_id": "063",
+      "source_risk_group": "063",
+      "split": "test",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "064",
+      "original_cut_id": "064",
+      "source_risk_group": "064",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "065",
+      "original_cut_id": "065",
+      "source_risk_group": "065",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "066",
+      "original_cut_id": "066",
+      "source_risk_group": "066",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "067.1",
+      "original_cut_id": "067",
+      "source_risk_group": "067",
+      "split": "validation",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "067.2",
+      "original_cut_id": "067",
+      "source_risk_group": "067",
+      "split": "validation",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "067.3",
+      "original_cut_id": "067",
+      "source_risk_group": "067",
+      "split": "validation",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "068",
+      "original_cut_id": "068",
+      "source_risk_group": "068",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "069",
+      "original_cut_id": "069",
+      "source_risk_group": "069",
+      "split": "test",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "070",
+      "original_cut_id": "070",
+      "source_risk_group": "070",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "071",
+      "original_cut_id": "071",
+      "source_risk_group": "071",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "072.1",
+      "original_cut_id": "072",
+      "source_risk_group": "072",
+      "split": "test",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "072.2",
+      "original_cut_id": "072",
+      "source_risk_group": "072",
+      "split": "test",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "073",
+      "original_cut_id": "073",
+      "source_risk_group": "073",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "074",
+      "original_cut_id": "074",
+      "source_risk_group": "074",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "075",
+      "original_cut_id": "075",
+      "source_risk_group": "075",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "076",
+      "original_cut_id": "076",
+      "source_risk_group": "076",
+      "split": "test",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "077",
+      "original_cut_id": "077",
+      "source_risk_group": "077",
+      "split": "test",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "078.1",
+      "original_cut_id": "078",
+      "source_risk_group": "078",
+      "split": "validation",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "078.2",
+      "original_cut_id": "078",
+      "source_risk_group": "078",
+      "split": "validation",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "079",
+      "original_cut_id": "079",
+      "source_risk_group": "079",
+      "split": "validation",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "080",
+      "original_cut_id": "080",
+      "source_risk_group": "080",
+      "split": "validation",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "081",
+      "original_cut_id": "081",
+      "source_risk_group": "081",
+      "split": "validation",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "082",
+      "original_cut_id": "082",
+      "source_risk_group": "082",
+      "split": "validation",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "083",
+      "original_cut_id": "083",
+      "source_risk_group": "083",
+      "split": "test",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "084",
+      "original_cut_id": "084",
+      "source_risk_group": "065",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "085",
+      "original_cut_id": "085",
+      "source_risk_group": "085",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "086",
+      "original_cut_id": "086",
+      "source_risk_group": "086",
+      "split": "test",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "087.1",
+      "original_cut_id": "087",
+      "source_risk_group": "087",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "087.2",
+      "original_cut_id": "087",
+      "source_risk_group": "087",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "087.3",
+      "original_cut_id": "087",
+      "source_risk_group": "087",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "087.4",
+      "original_cut_id": "087",
+      "source_risk_group": "087",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "088",
+      "original_cut_id": "088",
+      "source_risk_group": "088",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "089",
+      "original_cut_id": "089",
+      "source_risk_group": "089",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "090",
+      "original_cut_id": "090",
+      "source_risk_group": "090",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "091.1",
+      "original_cut_id": "091",
+      "source_risk_group": "091",
+      "split": "validation",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "091.2",
+      "original_cut_id": "091",
+      "source_risk_group": "091",
+      "split": "validation",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "092",
+      "original_cut_id": "092",
+      "source_risk_group": "092",
+      "split": "test",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "093.1",
+      "original_cut_id": "093",
+      "source_risk_group": "093",
+      "split": "test",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "093.2",
+      "original_cut_id": "093",
+      "source_risk_group": "093",
+      "split": "test",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "093.3",
+      "original_cut_id": "093",
+      "source_risk_group": "093",
+      "split": "test",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "094",
+      "original_cut_id": "094",
+      "source_risk_group": "094",
+      "split": "validation",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "095",
+      "original_cut_id": "095",
+      "source_risk_group": "095",
+      "split": "test",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "096",
+      "original_cut_id": "096",
+      "source_risk_group": "096",
+      "split": "validation",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "097",
+      "original_cut_id": "097",
+      "source_risk_group": "097",
+      "split": "validation",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "098",
+      "original_cut_id": "098",
+      "source_risk_group": "098",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "099",
+      "original_cut_id": "099",
+      "source_risk_group": "099",
+      "split": "development",
+      "split_certification": "exploratory_not_artist_blind"
+    },
+    {
+      "case_id": "100",
+      "original_cut_id": "100",
+      "source_risk_group": "100",
+      "split": "validation",
+      "split_certification": "exploratory_not_artist_blind"
+    }
+  ]
+}

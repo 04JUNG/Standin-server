@@ -1,0 +1,77 @@
+{
+  "schema": "v5-p0-review-summary-v2",
+  "reviewed_pairs": 114,
+  "reviewer": "agent_visual_review",
+  "human_verified": false,
+  "artist_disjoint_verified": false,
+  "independent_blind_evaluation": false,
+  "unknown_artist_rows": 114,
+  "representations": {
+    "outlined": 66,
+    "illustration": 25,
+    "rendered": 6,
+    "photo": 6,
+    "stylized": 2,
+    "stick": 9
+  },
+  "scopes": {
+    "upper": 34,
+    "full": 56,
+    "partial": 16,
+    "face": 6,
+    "ambiguous": 2
+  },
+  "source_risk_groups": 93,
+  "ambiguous_targets": [
+    "023.2",
+    "055",
+    "059",
+    "071",
+    "093.2"
+  ],
+  "face_only": [
+    "047.3",
+    "067.3",
+    "072.1",
+    "087.2",
+    "087.3",
+    "091.2"
+  ],
+  "historically_exposed": [
+    "035",
+    "036",
+    "042",
+    "043",
+    "058",
+    "060"
+  ],
+  "visibility_counts": {
+    "visible": 853,
+    "partial": 385,
+    "cropped": 391,
+    "occluded": 21,
+    "unknown": 60
+  },
+  "split": {
+    "development": {
+      "rows": 63,
+      "cuts": 60,
+      "source_ready": 58,
+      "visible_arm_source_ready": 39
+    },
+    "validation": {
+      "rows": 26,
+      "cuts": 20,
+      "source_ready": 19,
+      "visible_arm_source_ready": 13
+    },
+    "test": {
+      "rows": 25,
+      "cuts": 20,
+      "source_ready": 18,
+      "visible_arm_source_ready": 10
+    }
+  },
+  "review_sha256": "547997356d2244d5902fecb99604e74ddff5e960a37822f12a997827c66eaf98",
+  "curated_sha256": "3c5147fb85dc789c70eb86af533490d06ce0bf526161915a622a390438fbeaea"
+}
