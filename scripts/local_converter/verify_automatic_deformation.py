@@ -11,7 +11,10 @@ from scripts.local_converter.experimental.deformation_guard import DeformationGu
 base,out=map(Path,sys.argv[1:])
 out.mkdir(parents=True,exist_ok=True)
 rows=[]
-for source in sorted(base.glob("stages-*.npz")):
+sources = sorted(base.glob("stages-*.npz"))
+if not sources:
+    raise ValueError("No staged meshes found in the verification input")
+for source in sources:
     data=np.load(source)
     rest,posed,faces=data["rest"],data["corrected"],data["triangles"]
     started=time.monotonic()

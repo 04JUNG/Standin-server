@@ -2,6 +2,8 @@
 
 Uses scipy only when invoked. Source topology and weights are not modified.
 """
+import time
+
 import numpy as np
 from scipy.optimize import linprog
 from scipy.optimize._numdiff import approx_derivative
@@ -12,7 +14,7 @@ from .deformation_guard import DeformationGuard
 from converter.local import surface
 
 
-def solve_patch(rest, posed, faces, anchors, free, target_points, iterations=40):
+def solve_patch(rest, posed, faces, anchors, free, target_points, iterations=40, deadline=None):
     # Include all faces incident to a movable vertex and one hinge neighborhood.
     graph = surface.Neighborhood(faces, rest)
     affected = free[faces].any(1)
@@ -65,7 +67,15 @@ def solve_patch(rest, posed, faces, anchors, free, target_points, iterations=40)
 
     blocked_vertex_ids = []
     history=[]
+    def budget_options():
+        if deadline is None:
+            return {}
+        return {"time_limit": max(.001, deadline-time.monotonic())}
+
     for iteration in range(iterations):
+        if deadline is not None and time.monotonic() >= deadline:
+            history.append(dict(iteration=iteration,reason="time_budget"))
+            break
         vector = current[movable].ravel()
         value = constraints(vector)
         jacobian = approx_derivative(constraints, vector, method="3-point",
@@ -76,13 +86,19 @@ def solve_patch(rest, posed, faces, anchors, free, target_points, iterations=40)
         margin = np.asarray(abs(jacobian).sum(axis=1)).ravel()*cap*.005
         rhs = np.maximum(-value,0)-margin
         solution = linprog(direction, A_ub=jacobian, b_ub=rhs,
-                           bounds=[(-cap,cap)]*nvar, method="highs")
+                           bounds=[(-cap,cap)]*nvar, method="highs", options=budget_options())
+        used_tangent = not solution.success
+        if used_tangent:
+            # Try a tangent direction, then restore nonlinear feasibility.
+            # The same rest, crease and contact gates still decide acceptance.
+            solution = linprog(direction, A_ub=jacobian, b_ub=np.maximum(-value,0),
+                               bounds=[(-cap,cap)]*nvar, method="highs", options=budget_options())
         if not solution.success:
             # Elastic LP identifies constraints that prevent an inward feasible step.
             penalty = np.r_[np.zeros(nvar), np.ones(len(value))]
             elastic = linprog(penalty, A_ub=hstack([jacobian, -eye(len(value))]).tocsr(),
                               b_ub=rhs, bounds=[(-cap,cap)]*nvar+[(0,None)]*len(value),
-                              method="highs")
+                              method="highs", options=budget_options())
             blocked = np.flatnonzero(elastic.x[nvar:] > 1e-8) if elastic.success else np.array([],int)
             blocked_vertices = []
             start = 0
@@ -99,6 +115,8 @@ def solve_patch(rest, posed, faces, anchors, free, target_points, iterations=40)
         proposal[movable] += solution.x.reshape(-1,3)
         correction_steps = 0
         for correction_steps in range(12):
+            if deadline is not None and time.monotonic() >= deadline:
+                break
             trial = proposal[movable].ravel()
             residual = constraints(trial)
             if residual.max() <= 5e-8:
@@ -113,7 +131,7 @@ def solve_patch(rest, posed, faces, anchors, free, target_points, iterations=40)
             correction = linprog(np.r_[np.zeros(nvar), np.ones(nvar)],
                 A_ub=matrix, b_ub=bounds,
                 bounds=[(-cap,cap)]*nvar+[(0,None)]*nvar, method="highs",
-                options={"primal_feasibility_tolerance":1e-9,
+                options={**budget_options(), "primal_feasibility_tolerance":1e-9,
                          "dual_feasibility_tolerance":1e-9})
             if not correction.success:
                 break
@@ -122,7 +140,7 @@ def solve_patch(rest, posed, faces, anchors, free, target_points, iterations=40)
         step = float(np.linalg.norm(accepted-current,axis=1).max())
         violations = guard.violations(proposal)
         current = accepted
-        history.append(dict(iteration=iteration,stepM=step, correctionSteps=correction_steps, fullStepViolations=violations, **status))
+        history.append(dict(iteration=iteration,stepM=step, usedTangent=used_tangent, correctionSteps=correction_steps, fullStepViolations=violations, **status))
         if step < guard.scale*1e-9:
             trial = current + (proposal-current)*2.**-17
             residual = constraints(trial[movable].ravel())
@@ -140,12 +158,13 @@ def solve_patch(rest, posed, faces, anchors, free, target_points, iterations=40)
     return points, {"history": history, "blockers": blocked_vertex_ids}
 
 
-def correct(rest, posed, faces, anchors, *, iterations=40, expansions=4):
+def correct(rest, posed, faces, anchors, *, iterations=40, expansions=4, regions=3, seconds=30.):
     """Return conservative automatic repair and explicit unresolved status.
 
     The worst stretched edge seeds a dimensionless geodesic region. Intentional
     seams remain pinned; semantic seam detection and self collision are pending.
     """
+    deadline = time.monotonic()+seconds
     rest = np.asarray(rest, dtype=float)
     posed = np.asarray(posed, dtype=float)
     faces = np.asarray(faces, dtype=int)
@@ -169,56 +188,86 @@ def correct(rest, posed, faces, anchors, *, iterations=40, expansions=4):
     if ratio.max() <= 2:
         return posed.copy(), dict(applied=False, reason="no_severe_stretch",
                                   otherDefectsEvaluated=False)
-    worst = int(ratio.argmax())
-    seed = [int(graph.a[worst]), int(graph.b[worst])]
     cost = guard.lengths / np.clip(ratio, 1, 10)
     adjacency = csr_matrix((cost, (graph.a, graph.b)), shape=(len(rest),len(rest)))
     adjacency += adjacency.T
-    distance = dijkstra(adjacency, indices=seed, min_only=True)
     _, coincident, counts = np.unique(rest, axis=0, return_inverse=True, return_counts=True)
     fixed = anchors | graph.fixed | (counts[coincident.ravel()] > 1)
-    free = (distance < guard.scale*.012) & ~fixed
     best = posed.copy()
     best_ratio = float(ratio.max())
     history = []
-    for expansion in range(expansions):
-        if not free.any() or free.sum() > 3000:
+    best_excess = float(np.maximum(ratio-2., 0.).sum())
+    attempted = np.zeros(len(rest), dtype=bool)
+    seeds = []
+    for _ in range(regions):
+        if time.monotonic() >= deadline:
             break
-        graph.fixed = ~free
-        target = surface.limit_strain(posed, posed, graph, guard.lengths, guard.scale*.08)
-        candidate, report = solve_patch(rest,posed,faces,anchors,free,target,iterations)
-        violations = guard.violations(candidate)
-        candidate_ratio = float(guard.measure(candidate)["edge"].max())
-        accepted = not violations and candidate_ratio < best_ratio-1e-4
-        contact = None
-        if accepted:
-            contact = contact_guard(posed, candidate, faces)
-            accepted = contact["passCheck"]
-        if accepted:
-            best, best_ratio = candidate, candidate_ratio
-        history.append(dict(expansion=expansion, vertices=int(free.sum()),
-                            maxStretch=candidate_ratio, accepted=accepted,
-                            violations=violations, contact=contact, solver=report))
-        if contact and not contact["passCheck"]:
-            if "faces" not in contact:
+        eligible = (ratio > 2.) & ~(attempted[graph.a] | attempted[graph.b])
+        eligible &= ~(fixed[graph.a] & fixed[graph.b])
+        if not eligible.any():
+            break
+        worst = int(np.where(eligible, ratio, -np.inf).argmax())
+        seed = [int(graph.a[worst]), int(graph.b[worst])]
+        seeds.append(seed)
+        distance = dijkstra(adjacency, indices=seed, min_only=True)
+        nearby = np.isin(graph.a,seed) | np.isin(graph.b,seed)
+        local_spacing = float(np.median(guard.lengths[nearby]))
+        radius = max(guard.scale*.012, 2.5*local_spacing)
+        region = distance < radius
+        locked = np.any(best != posed, axis=1)
+        free = region & ~(fixed | attempted | locked)
+        attempted |= region
+        for expansion in range(expansions):
+            if time.monotonic() >= deadline or not free.any() or free.sum() > 3000:
                 break
-            fixed[faces[contact["faces"]].ravel()] = True
-            free = free & ~fixed
-            continue
-        if not report["blockers"]:
-            break
-        expand = np.zeros(len(rest), dtype=bool)
-        expand[report["blockers"]] = True
-        for _ in range(2):
-            previous = expand.copy()
-            expand[graph.a[previous[graph.b]]] = True
-            expand[graph.b[previous[graph.a]]] = True
-        updated = (free | expand) & ~fixed
-        if np.array_equal(updated,free):
-            break
-        free = updated
-    return best, dict(applied=best_ratio < float(ratio.max())-1e-4,
+            graph.fixed = ~free
+            target = surface.limit_strain(posed, posed, graph, guard.lengths, guard.scale*.08)
+            candidate, report = solve_patch(rest,posed,faces,anchors,free,target,iterations,deadline)
+            candidate[locked] = best[locked]
+            violations = guard.violations(candidate)
+            measured = guard.measure(candidate)["edge"]
+            candidate_ratio = float(measured.max())
+            excess = float(np.maximum(measured-2.,0.).sum())
+            accepted = (not violations and candidate_ratio <= best_ratio+1e-7
+                        and excess < best_excess-1e-4 and guard.trajectory_safe(posed,candidate))
+            contact = None
+            if accepted:
+                contact = contact_guard(posed, candidate, faces)
+                accepted = contact["passCheck"]
+            if accepted:
+                best, best_ratio, best_excess = candidate, candidate_ratio, excess
+            history.append(dict(seed=seed, expansion=expansion, vertices=int(free.sum()),
+                                maxStretch=candidate_ratio, accepted=accepted,
+                                violations=violations, contact=contact, solver=report))
+            if contact and not contact["passCheck"]:
+                if "faces" not in contact:
+                    break
+                fixed[faces[contact["faces"]].ravel()] = True
+                free = free & ~fixed
+                continue
+            if not report["blockers"]:
+                break
+            expand = np.zeros(len(rest), dtype=bool)
+            expand[report["blockers"]] = True
+            for _ in range(2):
+                previous = expand.copy()
+                expand[graph.a[previous[graph.b]]] = True
+                expand[graph.b[previous[graph.a]]] = True
+            updated = (free | expand) & ~(fixed | locked)
+            if np.array_equal(updated,free):
+                break
+            free = updated
+    # A numerical drop in total excess alone does not justify changing the file.
+    # Require a severe edge to leave the damage class or measurable peak relief.
+    original_severe = int(np.count_nonzero(ratio > 2.))
+    new_severe = int(np.count_nonzero(guard.measure(best)["edge"] > 2.))
+    material = new_severe < original_severe or best_ratio <= .99*float(ratio.max())
+    if not material:
+        best = posed.copy()
+        best_ratio = float(ratio.max())
+        best_excess = float(np.maximum(ratio-2.,0.).sum())
+    return best, dict(applied=material, timeBudgetReached=time.monotonic() >= deadline, totalExcessAboveTwo=best_excess,
                       beforeMaxStretch=float(ratio.max()), afterMaxStretch=best_ratio,
-                      unresolved=best_ratio > 2, seed=seed, history=history,
+                      unresolved=best_ratio > 2, seeds=seeds, history=history,
                       contactScope="one mesh, disjoint vertex sets, straight output displacement",
                       seamClassification="open boundaries and coincident source vertices pinned")

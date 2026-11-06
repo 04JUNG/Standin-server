@@ -1,4 +1,5 @@
 """Blender export/reimport and matched diagnostic views for adaptive result."""
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -10,14 +11,22 @@ from converter.local import inspection, surface
 from converter import retarget
 from scripts.local_converter.render_followup import render
 
-base,candidate,out=map(Path,sys.argv[sys.argv.index("--")+1:])
+parser = argparse.ArgumentParser()
+parser.add_argument("base",type=Path)
+parser.add_argument("candidate",type=Path)
+parser.add_argument("out",type=Path)
+parser.add_argument("--model",type=int,default=1)
+parser.add_argument("--pose",type=int,default=1)
+args = parser.parse_args(sys.argv[sys.argv.index("--")+1:])
+base,candidate,out=args.base,args.candidate,args.out
+case=f"{args.model}-{args.pose}"
 out.mkdir(parents=True,exist_ok=True)
-raw=np.load(base/"stages-1-1.npz")
+raw=np.load(base/f"stages-{case}.npz")
 change=np.load(candidate)
 posed=raw["corrected"]
 corrected=posed.copy()
 corrected[change["ids"]]+=change["delta"]
-reference=base/"stage-1-1-before-surface.fbx"
+reference=base/f"stage-{case}-before-surface.fbx"
 center=posed[change["ids"]].mean(0)
 rows=[]
 for label,points in (("baseline",posed),("guarded",corrected)):

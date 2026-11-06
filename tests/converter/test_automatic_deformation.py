@@ -19,6 +19,15 @@ class AutomaticDeformationTests(unittest.TestCase):
         self.assertEqual(report["reason"],"unsupported_geometry")
         np.testing.assert_array_equal(result,rest)
 
+    def test_exhausted_budget_returns_original_positions(self):
+        rest = np.array([[0.,0.,0.],[1.,0.,0.],[0.,1.,0.]])
+        posed = rest.copy()
+        posed[1,0] = 5.
+        result, report = correct(rest,posed,np.array([[0,1,2]]),np.zeros(3,bool),seconds=0.)
+        self.assertTrue(report["timeBudgetReached"])
+        self.assertFalse(report["applied"])
+        np.testing.assert_array_equal(result,posed)
+
     def test_missing_topology_returns_explicit_status(self):
         rest = np.zeros((3,3))
         _, report = correct(rest,rest,np.empty((0,3),int),np.zeros(3,bool))

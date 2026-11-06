@@ -3,6 +3,45 @@ import numpy as np
 from scipy.spatial import cKDTree
 
 
+def _axes(first, second):
+    a = np.roll(first,-1,axis=0)-first
+    b = np.roll(second,-1,axis=0)-second
+    na, nb = np.cross(a[0],a[1]), np.cross(b[0],b[1])
+    return np.vstack([na, nb, np.cross(a[:,None],b).reshape(-1,3),
+                      np.cross(na,a), np.cross(nb,b)])
+
+
+def static_relation(first, second, extent):
+    axes = _axes(first, second)
+    if np.any(np.linalg.norm(axes[:2], axis=1) < extent**2*1e-14):
+        return "degenerate"
+    left, right = first @ axes.T, second @ axes.T
+    margin = 1e-12*np.linalg.norm(axes,axis=1)*extent
+    if ((left.max(0)+margin < right.min(0)) |
+        (right.max(0)+margin < left.min(0))).any():
+        return "separated"
+    return "overlap_or_touch_within_tolerance"
+
+
+def interval_separated(a0, a1, b0, b1, extent, depth=0):
+    left_vertices = np.vstack([a0,a1])
+    right_vertices = np.vstack([b0,b1])
+    for first, second in ((a0,b0),(a1,b1)):
+        axes = _axes(first, second)
+        left, right = left_vertices @ axes.T, right_vertices @ axes.T
+        margin = 1e-12*np.linalg.norm(axes,axis=1)*extent
+        if ((left.max(0)+margin < right.min(0)) |
+            (right.max(0)+margin < left.min(0))).any():
+            return True
+    if depth >= 5:
+        return False
+    am, bm = (a0+a1)/2, (b0+b1)/2
+    if static_relation(am,bm,extent) != "separated":
+        return False
+    return (interval_separated(a0,am,b0,bm,extent,depth+1) and
+            interval_separated(am,a1,bm,b1,extent,depth+1))
+
+
 def contact_guard(start, end, faces, pair_budget=250000):
     """Reject when separation throughout a straight displacement is unproven.
 
@@ -31,22 +70,9 @@ def contact_guard(start, end, faces, pair_budget=250000):
             checked += 1
             if checked > pair_budget:
                 return dict(passCheck=False, reason="contact_budget", pairs=checked)
-            separated = False
-            for first, second in ((old[i],old[j]),(new[i],new[j])):
-                a = np.roll(first,-1,axis=0)-first
-                b = np.roll(second,-1,axis=0)-second
-                na, nb = np.cross(a[0],a[1]), np.cross(b[0],b[1])
-                axes = np.vstack([na, nb, np.cross(a[:,None],b).reshape(-1,3),
-                                  np.cross(na,a), np.cross(nb,b)])
-                left = np.vstack([old[i],new[i]]) @ axes.T
-                right = np.vstack([old[j],new[j]]) @ axes.T
-                # Insist on a positive separation with a roundoff margin.
-                tol = 1e-12*np.linalg.norm(axes,axis=1)*extent
-                if ((left.max(0)+tol < right.min(0)) |
-                    (right.max(0)+tol < left.min(0))).any():
-                    separated = True
-                    break
-            if not separated:
+            if not interval_separated(old[i],new[i],old[j],new[j],extent):
                 return dict(passCheck=False, reason="contact_unresolved", pairs=checked,
-                            faces=[int(i),int(j)])
+                            faces=[int(i),int(j)],
+                            baseline=static_relation(old[i],old[j],extent),
+                            proposed=static_relation(new[i],new[j],extent))
     return dict(passCheck=True, pairs=checked)
