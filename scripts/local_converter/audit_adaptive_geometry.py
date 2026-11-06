@@ -44,8 +44,8 @@ def audit(source, candidate, output):
         edgeLengthIncreasedCount=int((b["edge"]>a["edge"]+1e-7).sum()),
         alreadyStretchedWorsened=int(((a["edge"]>1)&(b["edge"]>a["edge"]+1e-7)).sum()),
         newlyStretched=int(((a["edge"]<=1)&(b["edge"]>1+1e-7)).sum()),
-        maxCreaseDeviationIncreaseDegrees=float(np.degrees(
-            (corrected_error-original_error)[guard.crease]).max()),
+        maxCreaseDeviationIncreaseDegrees=(float(np.degrees(
+            (corrected_error-original_error)[guard.crease]).max()) if guard.crease.any() else None),
         originalCreasesOutsideTenDegrees=int((guard.crease&(corrected_error>np.pi/18)).sum()))
     stats["sourceGeometrySha256"] = hashlib.sha256(source.read_bytes()).hexdigest()
     output.write_text(json.dumps(stats,indent=2))

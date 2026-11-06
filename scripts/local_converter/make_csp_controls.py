@@ -16,6 +16,14 @@ import bpy
 import numpy as np
 
 
+def export_existing_rig(path):
+    bpy.ops.export_scene.fbx(filepath=str(path), use_selection=False,
+        apply_unit_scale=True, global_scale=1., axis_forward="-Z", axis_up="Y",
+        object_types={"ARMATURE", "MESH"}, use_mesh_modifiers=True,
+        add_leaf_bones=False, primary_bone_axis="Y", secondary_bone_axis="X",
+        bake_anim=False, path_mode="AUTO", embed_textures=False, mesh_smooth_type="FACE")
+
+
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -114,11 +122,7 @@ def make(runtime, source, output):
             # The production file already contains its export leaf bones. A
             # second automatic leaf generation would confound the camera test
             # with a hierarchy change. Keep every existing leaf on import.
-            bpy.ops.export_scene.fbx(filepath=str(path), use_selection=False,
-                apply_unit_scale=True, global_scale=1., axis_forward="-Z", axis_up="Y",
-                object_types={"ARMATURE", "MESH"}, use_mesh_modifiers=True,
-                add_leaf_bones=False, primary_bone_axis="Y", secondary_bone_axis="X",
-                bake_anim=False, path_mode="AUTO", embed_textures=False, mesh_smooth_type="FACE")
+            export_existing_rig(path)
         after = snapshot(*load(path))
         position_error = max(float(np.linalg.norm(after["points"][key] - value, axis=1).max())
                              for key, value in before["points"].items())

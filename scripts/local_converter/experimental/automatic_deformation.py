@@ -9,6 +9,7 @@ from scipy.optimize import linprog
 from scipy.optimize._numdiff import approx_derivative
 from scipy.sparse import coo_matrix, eye, hstack, vstack, csr_matrix
 from scipy.sparse.csgraph import dijkstra
+from .isolated_influence import propose as propose_isolated
 from .contact_features import measures as contact_measures
 from .contact import baseline_contact_pins, contact_guard
 from .deformation_guard import DeformationGuard
@@ -170,7 +171,7 @@ def solve_patch(rest, posed, faces, anchors, free, target_points, iterations=40,
     return points, {"history": history, "blockers": blocked_vertex_ids}
 
 
-def correct(rest, posed, faces, anchors, *, iterations=40, expansions=4, regions=3, seconds=30., sliding=False):
+def correct(rest, posed, faces, anchors, *, iterations=40, expansions=4, regions=3, seconds=30., sliding=False, bone_ids=None, bone_weights=None):
     """Return conservative automatic repair and explicit unresolved status.
 
     The worst stretched edge seeds a dimensionless geodesic region. Intentional
@@ -206,9 +207,18 @@ def correct(rest, posed, faces, anchors, *, iterations=40, expansions=4, regions
     _, coincident, counts = np.unique(rest, axis=0, return_inverse=True, return_counts=True)
     fixed = anchors | graph.fixed | (counts[coincident.ravel()] > 1)
     best = posed.copy()
-    best_ratio = float(ratio.max())
+    isolated_report = None
+    if bone_ids is not None or bone_weights is not None:
+        if bone_ids is None or bone_weights is None:
+            return best,dict(applied=False,reason="incomplete_weights")
+        best,isolated_report=propose_isolated(rest,posed,faces,fixed,guard,
+                                             np.asarray(bone_ids),np.asarray(bone_weights),deadline)
+        if isolated_report.get("reason")=="invalid_weights":
+            return posed.copy(),isolated_report
+    best_edges=guard.measure(best)["edge"] if isolated_report else ratio
+    best_ratio = float(best_edges.max())
     history = []
-    best_excess = float(np.maximum(ratio-2., 0.).sum())
+    best_excess = float(np.maximum(best_edges-2., 0.).sum())
     attempted = np.zeros(len(rest), dtype=bool)
     seeds = []
     for _ in range(regions):
@@ -286,7 +296,7 @@ def correct(rest, posed, faces, anchors, *, iterations=40, expansions=4, regions
         best = posed.copy()
         best_ratio = float(ratio.max())
         best_excess = float(np.maximum(ratio-2.,0.).sum())
-    return best, dict(applied=material, timeBudgetReached=time.monotonic() >= deadline, totalExcessAboveTwo=best_excess,
+    return best, dict(applied=material, isolatedInfluence=isolated_report, timeBudgetReached=time.monotonic() >= deadline, totalExcessAboveTwo=best_excess,
                       beforeMaxStretch=float(ratio.max()), afterMaxStretch=best_ratio,
                       unresolved=best_ratio > 2, seeds=seeds, history=history,
                       contactScope="one mesh, disjoint vertex sets, straight output displacement",

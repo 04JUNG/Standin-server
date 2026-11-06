@@ -5,10 +5,13 @@ from pathlib import Path
 
 import bpy
 from mathutils import Matrix
+sys.path.insert(0,str(Path(__file__).resolve().parents[3]))
+from converter.local import surface
+from scripts.local_converter.experimental.read_registered_weights import mesh_weights
 import numpy as np
 
 
-def build(folder, local_patch):
+def build(folder, local_patch, isolated, smooth):
     folder.mkdir(exist_ok=False)
     bpy.ops.wm.read_factory_settings(use_empty=True)
     sides, levels = 16, 18
@@ -34,6 +37,8 @@ def build(folder, local_patch):
     mesh = bpy.data.meshes.new("Control surface")
     mesh.from_pydata(vertices,[],faces)
     mesh.update()
+    for polygon in mesh.polygons:
+        polygon.use_smooth=smooth
     body = bpy.data.objects.new("Control body",mesh)
     bpy.context.collection.objects.link(body)
     rig = bpy.data.armatures.new("Control skeleton")
@@ -55,6 +60,10 @@ def build(folder, local_patch):
         moves = point[2] >= .5
         if local_patch:
             moves = point[0] > .17 and .35 < point[2] < .65
+        if isolated:
+            # Fixture only. The upper segment is driven legitimately. One
+            # isolated lower vertex also receives that driver's translation.
+            moves = point[2] >= .65 or index == 4*sides
         group = upper if moves else lower
         group.add([index],1.,"REPLACE")
     file = folder/"control.fbx"
@@ -71,7 +80,7 @@ def build(folder, local_patch):
 
     rest=sample()
     tip = arm.pose.bones["Distal"]
-    shift = (.18,0,0) if local_patch else (0,0,.18)
+    shift = (.18,0,0) if local_patch or isolated else (0,0,.18)
     tip.matrix = (arm.matrix_world.inverted() @ Matrix.Translation(shift)
                   @ arm.matrix_world @ tip.matrix)
     posed=sample()
@@ -80,9 +89,18 @@ def build(folder, local_patch):
     motion = float(np.linalg.norm(posed-rest,axis=1).max())
     assert motion>.15, (motion, tip.bone.use_connect, tip.location[:],
                          list(body.vertex_groups.keys()),list(body.modifiers.keys()))
+    # Preserve the imported index ordering and the actual group values.
+    bones,weights=mesh_weights(body)
     np.savez_compressed(folder/"stages-control.npz",rest=rest,corrected=posed,
-                        triangles=triangles,anchors=np.zeros(len(rest),bool))
+                        triangles=triangles,anchors=surface.prepare_reference(body.data).anchors,
+                        boneIds=bones,boneWeights=weights)
+    if isolated:
+        # Independent oracle for the declared synthetic motion, not solver input.
+        oracle=rest.copy()
+        oracle[rest[:,2]>=.65]+=np.asarray(shift)
+        np.savez_compressed(folder/"oracle.npz",points=oracle)
 
 
 if __name__=="__main__":
-    build(Path(sys.argv[-1]), "--local-patch" in sys.argv)
+    build(Path(sys.argv[-1]), "--local-patch" in sys.argv, "--isolated" in sys.argv,
+          "--smooth" in sys.argv)
