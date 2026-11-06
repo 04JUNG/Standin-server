@@ -112,6 +112,10 @@ class TargetSelection:
     output_scope: str = "full"
     appearance_id: str = "default"
 
+    def __post_init__(self):
+        object.__setattr__(self, "shape_recipe_json", bytes(self.shape_recipe_json))
+        object.__setattr__(self, "hands_json", bytes(self.hands_json))
+
     def identity(self):
         recipe = json.loads(self.shape_recipe_json)
         hands = normalize_request(json.loads(self.hands_json))
@@ -242,6 +246,7 @@ class SelectedTargetProvider:
         self._cache, self._flights, self._bytes = OrderedDict(), {}, 0
 
     def _context(self, source, binding, target):
+        binding = json.loads(encode(binding))
         if not isinstance(target, dict) or set(target) != {"selection_id", "revision"}:
             raise TargetUnsupported("expected registered target selection identity")
         selection = self.selections.get(target["selection_id"])
@@ -263,7 +268,9 @@ class SelectedTargetProvider:
         return selection, context
 
     def prepare(self, source_bvh_bytes, binding, target):
+        source_bvh_bytes = bytes(source_bvh_bytes)
         selection, context = self._context(source_bvh_bytes, binding, target)
+        binding = context["engine_binding"]
         key = sha(encode(context))
         with self._lock:
             entry = self._cache.get(key)
@@ -362,6 +369,8 @@ class SelectedTargetProvider:
 
     def prepare_or_base(self, source_bvh_bytes, base_bvh_bytes, binding, target):
         """Independent same-condition fallback. A failed base is never ready_base."""
+        source_bvh_bytes, base_bvh_bytes = bytes(source_bvh_bytes), bytes(base_bvh_bytes)
+        binding = json.loads(encode(binding))
         if binding.get("source_sha256") != sha(base_bvh_bytes):
             raise ValueError("fallback must be the authoritative original source")
         try:

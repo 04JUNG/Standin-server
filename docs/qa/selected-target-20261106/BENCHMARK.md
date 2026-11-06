@@ -48,7 +48,7 @@ All 16 final-file inspections retain52 bones and exact float32 GLB surface; maxi
 
 - Same-process inspection A/B/A deliberately polluted previous mesh, shape key, weights, transform and material. Independent factory-empty restoration and A-repeat artifact/joints/geometry/GLB hashes matched exactly. Audit proves isolated sequential inspection reset; it does not enable warm solved-target mutation. See restore-raw.json.
 - Source engine function-level prepare/reuse → selected provider → real female FBX/GLB passed. Input was actual stored BVH with synthetic invalid observations: ready_base/source_only, one source adapter call before selection, zero after selection,52bones, exact surface and byte reuse. This is not a live BFF/UI/native CSP test. See source-target-integration.json.
-- Local validation: converter host contracts727 passed/1 optional skip; Blender-only pytest modules are excluded from host collection and actual Blender evidence is above. Smoke54/54, compileall, frozen SHA manifest and git diff check pass. New selected-only contracts29 passed (included in727).
+- Local validation: converter host contracts729 passed/1 optional skip; Blender-only pytest modules are excluded from host collection and actual Blender evidence is above. Smoke54/54, compileall, frozen SHA manifest and git diff check pass. New selected-only contracts31 passed (included in729).
 
 ## Files and reproduction
 
@@ -57,4 +57,4 @@ All 16 final-file inspections retain52 bones and exact float32 GLB surface; maxi
 - `tests/converter/measure_selected_target.py` takes local model manifest/shape registry/stored standing and sitting BVH paths plus output directory. `tests/converter/verify_selected_restore.py` runs inside pinned Blender.
 - Remaining acceptance: production-equivalent1vCPU/6GiB target/source runs; actual rough/contact accuracy holdouts; accepted full mesh policy and complete certificate; live selected BFF/current-revision wire; non-default appearance adapter integration; selected-scene relationships. These are not asserted by this PR.
 
-Measurement revision and final revision are retained in target-raw.json. A subsequent status-only guard labels identical original/source bytes ready_base; it does not change the measured conversion/inspection/cache path.
+Measurement revision and final revision are retained in target-raw.json. Subsequent guards label identical original/source bytes ready_base and detach caller binding/source/recipe buffers before work. No solver/export/inspection algorithm changed; measured and final code revisions remain distinct.

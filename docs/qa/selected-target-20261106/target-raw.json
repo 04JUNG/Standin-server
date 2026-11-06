@@ -2308,8 +2308,9 @@
   "warm_definition": "runner version cache/OS warm; all Blender processes cold-isolated",
   "measured_runtime_revision": "e55b280d9abf5d752af41ea456fc119b68887b6c00fc1bcc2cbb104a487ad83b",
   "blender_threads": 1,
-  "final_runtime_revision": "a4f5ff081b858ecd0083d0808fd83376792e2742cc5f369a0e8e9a6cc065f243",
+  "final_runtime_revision": "fd2ed2885b44e4e73227095039da27570d786b0e820b31b593d2e4e33625891a",
   "post_measurement_changes": [
-    "Status-only fix: prepare_or_base returns ready_base for identical input/original bytes; no measured convert/inspection/cache path changed."
+    "Status-only guard: identical source/original is ready_base.",
+    "Caller binding/source/recipe buffers are detached before work; no solver/export/inspection algorithm changed."
   ]
 }

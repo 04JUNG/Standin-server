@@ -256,3 +256,26 @@ def test_unmodified_source_is_never_labelled_refined(setup):
     binding = {**binding, "source_sha256": sha(SOURCE)}
     status, value = provider.prepare_or_base(SOURCE, SOURCE, binding, target)
     assert status == "ready_base" and value.artifact == FBX_MAGIC+SOURCE
+
+
+def test_caller_mutation_cannot_rebind_running_source_or_selection(setup):
+    provider, runner, _, binding, target = setup
+    data = bytearray(SOURCE)
+    provider.is_current = lambda value: value["selection_revision"] == 1
+    def mutate_caller(*args):
+        binding["selection_revision"] = 2
+        data[:] = b"changed source"
+        return inspected(*args)
+    provider.inspector = mutate_caller
+    value = provider.prepare(data, binding, target)
+    assert value.receipt["binding"]["engine_binding"]["selection_revision"] == 1
+    assert runner.calls[0]["bvh_bytes"] == SOURCE
+
+
+def test_registered_recipe_buffers_are_detached(setup):
+    _, _, selection, _, _ = setup
+    recipe, hands = bytearray(b"null"), bytearray(b"null")
+    immutable = replace(selection, shape_recipe_json=recipe, hands_json=hands)
+    recipe[:] = b"changed"
+    hands[:] = b"changed"
+    assert immutable.shape_recipe_json == immutable.hands_json == b"null"
