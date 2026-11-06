@@ -8,6 +8,7 @@ from experiments.refine_v5.learning_data import BONES,POINTS,frame
 def derive(source_bones,predicted_axes):
     by,center,scale,body=frame(source_bones);target=np.asarray(predicted_axes,float)
     if target.shape!=(13,2,3) or not np.isfinite(target).all():raise ValueError('invalid proposed frames')
+    if not np.allclose(np.linalg.norm(target,axis=-1),1,atol=1e-4) or not np.allclose((target[:,0]*target[:,1]).sum(-1),0,atol=1e-4):raise ValueError('non-orthonormal proposed frame')
     points=(np.array([np.array(by[n]['matrix'])[:3,3] for n in POINTS])-center)@body/scale
     output=points.copy()
     for chain,start in enumerate([0,3,6,9]):

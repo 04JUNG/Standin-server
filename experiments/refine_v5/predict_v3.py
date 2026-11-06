@@ -20,3 +20,9 @@ def predict(checkpoint,row):
     pred=infer(checkpoint,g,feature,base);partmask=visibility(review)
     if not row['ownership_verified']:partmask[:]=0
     return dict(case_id=row['case_id'],axes=pred['axes'].tolist(),uncertainty_rad=pred['uncertainty'].tolist(),observed_parts=partmask.tolist(),source_sha256=row['source_sha256'],image_sha256=row['image_sha256'],fixed_camera=camera.tolist(),ownership_verified=row['ownership_verified'],target_applied=False,version=pred['version'],proposals=derive(row['source_bones'],pred['axes']))
+
+if __name__=='__main__':
+    import argparse,json
+    p=argparse.ArgumentParser();p.add_argument('--checkpoint',required=True);p.add_argument('--input',required=True);p.add_argument('--out',required=True);a=p.parse_args()
+    destination=Path(a.out)
+    with destination.open('x') as stream:json.dump(predict(a.checkpoint,json.loads(Path(a.input).read_text())),stream,indent=2)
