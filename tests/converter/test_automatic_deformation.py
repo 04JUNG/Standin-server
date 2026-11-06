@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from converter.local.automatic_deformation import correct
+from scripts.local_converter.experimental.automatic_deformation import correct
 
 
 class AutomaticDeformationTests(unittest.TestCase):

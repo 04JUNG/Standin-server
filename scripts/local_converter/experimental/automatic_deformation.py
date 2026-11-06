@@ -7,8 +7,9 @@ from scipy.optimize import linprog
 from scipy.optimize._numdiff import approx_derivative
 from scipy.sparse import coo_matrix, eye, hstack, vstack, csr_matrix
 from scipy.sparse.csgraph import dijkstra
+from .contact import contact_guard
 from .deformation_guard import DeformationGuard
-from . import surface
+from converter.local import surface
 
 
 def solve_patch(rest, posed, faces, anchors, free, target_points, iterations=40):
@@ -174,7 +175,8 @@ def correct(rest, posed, faces, anchors, *, iterations=40, expansions=4):
     adjacency = csr_matrix((cost, (graph.a, graph.b)), shape=(len(rest),len(rest)))
     adjacency += adjacency.T
     distance = dijkstra(adjacency, indices=seed, min_only=True)
-    fixed = anchors | graph.fixed
+    _, coincident, counts = np.unique(rest, axis=0, return_inverse=True, return_counts=True)
+    fixed = anchors | graph.fixed | (counts[coincident.ravel()] > 1)
     free = (distance < guard.scale*.012) & ~fixed
     best = posed.copy()
     best_ratio = float(ratio.max())
@@ -188,11 +190,21 @@ def correct(rest, posed, faces, anchors, *, iterations=40, expansions=4):
         violations = guard.violations(candidate)
         candidate_ratio = float(guard.measure(candidate)["edge"].max())
         accepted = not violations and candidate_ratio < best_ratio-1e-4
+        contact = None
+        if accepted:
+            contact = contact_guard(posed, candidate, faces)
+            accepted = contact["passCheck"]
         if accepted:
             best, best_ratio = candidate, candidate_ratio
         history.append(dict(expansion=expansion, vertices=int(free.sum()),
                             maxStretch=candidate_ratio, accepted=accepted,
-                            violations=violations, solver=report))
+                            violations=violations, contact=contact, solver=report))
+        if contact and not contact["passCheck"]:
+            if "faces" not in contact:
+                break
+            fixed[faces[contact["faces"]].ravel()] = True
+            free = free & ~fixed
+            continue
         if not report["blockers"]:
             break
         expand = np.zeros(len(rest), dtype=bool)
@@ -208,4 +220,5 @@ def correct(rest, posed, faces, anchors, *, iterations=40, expansions=4):
     return best, dict(applied=best_ratio < float(ratio.max())-1e-4,
                       beforeMaxStretch=float(ratio.max()), afterMaxStretch=best_ratio,
                       unresolved=best_ratio > 2, seed=seed, history=history,
-                      selfIntersectionChecked=False, seamClassification="unresolved boundaries pinned")
+                      contactScope="one mesh, disjoint vertex sets, straight output displacement",
+                      seamClassification="open boundaries and coincident source vertices pinned")

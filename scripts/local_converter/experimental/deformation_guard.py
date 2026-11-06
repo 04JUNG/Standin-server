@@ -5,7 +5,7 @@ listed endpoint constraints and non-collapse along its linear trajectory.
 It does not certify absence of self intersections.
 """
 import numpy as np
-from . import surface
+from converter.local import surface
 
 
 class DeformationGuard:

@@ -7,7 +7,7 @@ from scipy.optimize import linprog
 from scipy.optimize._numdiff import approx_derivative
 from scipy.sparse import coo_matrix
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from converter.local.deformation_guard import DeformationGuard
+from scripts.local_converter.experimental.deformation_guard import DeformationGuard
 from converter.local import surface
 
 base, candidate, destination = map(Path, sys.argv[1:])

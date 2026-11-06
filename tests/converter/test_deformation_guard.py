@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from converter.local.deformation_guard import DeformationGuard
+from scripts.local_converter.experimental.deformation_guard import DeformationGuard
 
 
 class GuardTests(unittest.TestCase):

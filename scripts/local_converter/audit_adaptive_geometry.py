@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]))
 from converter.local import surface
-from converter.local.deformation_guard import DeformationGuard
+from scripts.local_converter.experimental.deformation_guard import DeformationGuard
 
 
 def audit(source, candidate, output):
