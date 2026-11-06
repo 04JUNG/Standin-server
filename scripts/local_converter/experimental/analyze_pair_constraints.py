@@ -18,6 +18,32 @@ def barycentric(triangle, point):
     return np.array([1-u-v,u,v])
 
 
+def pair_modes(pairs,interior,triangles,faces,ids,scale):
+    constraints = []
+    proper = []
+    uncertain = 0
+    for i,j in pairs:
+        if not interior[i] or not interior[j]:
+            continue
+        ti,tj = triangles[i],triangles[j]
+        hits = strict_crossings(ti,tj)+strict_crossings(tj,ti)
+        if len(hits)==2 and np.linalg.norm(hits[0]-hits[1]) > scale*1e-10:
+            for hit in hits:
+                row = np.zeros(len(ids))
+                row[np.searchsorted(ids,faces[i])] = barycentric(ti,hit)
+                row[np.searchsorted(ids,faces[j])] -= barycentric(tj,hit)
+                constraints.append(row)
+            proper.append((i,j))
+        else:
+            for vertex in np.r_[faces[i],faces[j]]:
+                row = np.zeros(len(ids))
+                row[np.searchsorted(ids,vertex)] = 1.
+                constraints.append(row)
+            uncertain += 1
+    null = null_space(np.asarray(constraints),rcond=1e-9)
+    return null,proper,uncertain
+
+
 def analyze(source, components):
     raw = np.load(source)
     data = np.load(components)
@@ -40,34 +66,13 @@ def analyze(source, components):
     directions = left[limited,:,1]
     # If a triangle is already compressed, the new least singular value
     # cannot drop. A common contraction must preserve each such direction.
-    constraints = []
-    proper = 0
-    uncertain = 0
-    for i,j in data["pairs"]:
-        if not interior[i] or not interior[j]:
-            continue
-        ti,tj = triangles[i],triangles[j]
-        hits = strict_crossings(ti,tj)+strict_crossings(tj,ti)
-        if len(hits)==2 and np.linalg.norm(hits[0]-hits[1]) > guard.scale*1e-10:
-            for hit in hits:
-                row = np.zeros(len(ids))
-                row[np.searchsorted(ids,faces[i])] = barycentric(ti,hit)
-                row[np.searchsorted(ids,faces[j])] -= barycentric(tj,hit)
-                constraints.append(row)
-            proper += 1
-        else:
-            for vertex in np.r_[faces[i],faces[j]]:
-                row = np.zeros(len(ids))
-                row[np.searchsorted(ids,vertex)] = 1.
-                constraints.append(row)
-            uncertain += 1
-    null = null_space(np.asarray(constraints),rcond=1e-9)
+    null,proper,uncertain=pair_modes(data["pairs"],interior,triangles,faces,ids,guard.scale)
     target = np.zeros(len(ids))
     target[np.searchsorted(ids,[u,v])] = [1,-1]
     return dict(vertices=len(ids),interiorFaces=int(interior.sum()),
                 compressedInteriorFaces=int(limited.sum()),
                 directionSingularValues=np.linalg.svd(directions,compute_uv=False).tolist(),
-                properPairs=proper,ambiguousPairsPinned=uncertain,
+                properPairs=len(proper),ambiguousPairsPinned=uncertain,
                 constrainedScalarNullity=null.shape[1],
                 projectedEdgeDifference=float(np.linalg.norm(target @ null)),
                 meaning="pair equalities only; no finite step or shape/penetration gate certified")
