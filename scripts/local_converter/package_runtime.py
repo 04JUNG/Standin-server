@@ -37,6 +37,13 @@ def build(distribution, output, target, cs3c_modeler_exe=None, cs3c_decoder_reso
     for relative in (blender, python):
         if not (distribution / Path(relative).relative_to(Path("runtime") / runtime_name)).is_file():
             raise ValueError("Blender 5.2.0 distribution is missing the required executable")
+    from scripts.local_converter.runtime_entry import verify_executable_target
+    for relative in (blender, python):
+        verify_executable_target(distribution / Path(relative).relative_to(Path("runtime") / runtime_name), target)
+    # Reject unmanifested links before copying a candidate. Accepted artifacts use
+    # regular files only; a linked distribution needs an explicit future contract.
+    if any(path.is_symlink() for path in distribution.rglob("*")):
+        raise ValueError("Runtime distribution symlinks are not supported")
     output.mkdir(parents=True)
     shutil.copytree(distribution, output / "runtime" / runtime_name, symlinks=True)
     shutil.copytree(ROOT / "converter", output / "converter",
