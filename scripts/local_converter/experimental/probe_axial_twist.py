@@ -13,7 +13,11 @@ from scripts.local_converter.experimental.probe_joint_rotation import capture_po
 def probe(runtime,model,pose,stage,output,palette=None):
     arm,_,guard,bones,transforms,weights,homogeneous,error = capture_pose(runtime,model,pose,stage)
     if palette:
-        np.savez_compressed(palette,maps=transforms,weights=weights)
+        indices={bone.name:i for i,bone in enumerate(bones)}
+        heads=np.array([arm.matrix_world @ bone.head for bone in bones])
+        parents=[-1 if bone.parent is None else indices[bone.parent.name] for bone in bones]
+        np.savez_compressed(palette,maps=transforms,weights=weights,heads=heads,parents=parents,
+                            names=[bone.name for bone in bones])
     index = guard.reference["edge"].argmax()
     a,b = guard.graph.a[index],guard.graph.b[index]
     edge = guard.baseline[b]-guard.baseline[a]

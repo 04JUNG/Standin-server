@@ -9,7 +9,7 @@ from scripts.local_converter.experimental.deformation_guard import DeformationGu
 
 
 class PoseLimits:
-    def __init__(self, guard, free, contacts, selected_pairs=None):
+    def __init__(self, guard, free, contacts, selected_pairs=None, path_limits=False):
         features=[]
         if contacts:
             fixed,scan=baseline_contact_pins(guard.baseline,guard.faces,free,sliding_features=features)
@@ -54,12 +54,22 @@ class PoseLimits:
 
         self.contact_structure=self.structure[-len(self.contact_reference):] if len(self.contact_reference) else None
         self.initial_rate=None
+        self.path_limits=path_limits and bool(features)
+        if self.path_limits:
+            base_rows=self.contact_structure[::7]
+            self.path_structure=base_rows[np.repeat(np.arange(len(self.pairs)),50)]
         self.swept_pairs = contacts and selected_pairs is not None and bool(features)
 
     def contact_residual(self,x):
         points=self.guard.baseline.copy()
         points[self.movable]+=x.reshape(-1,3)*self.unit
         return (measures(points,self.pairs,self.spec)-self.contact_reference)/self.unit
+
+    def path_residual(self,x):
+        from scripts.local_converter.experimental.contact_path_limits import motion_limits
+        points=self.guard.baseline.copy()
+        points[self.movable]+=x.reshape(-1,3)*self.unit
+        return motion_limits(self.guard.baseline,points,self.pairs,self.spec,self.unit)
 
     def residual(self,x):
         g=self.guard
@@ -78,6 +88,15 @@ class PoseLimits:
         keep=scale>1e-10
         mat=jac[keep].multiply(1/scale[keep,None]).tocsr()
         rhs=mat@x-value[keep]/scale[keep]
+        if self.path_limits:
+            excess=self.path_residual(x)
+            derivative=approx_derivative(self.path_residual,x,method="3-point",
+                                         sparsity=self.path_structure,abs_step=2e-6)
+            norms=np.asarray(abs(derivative).max(axis=1).toarray()).ravel()
+            active=norms>1e-10
+            path_matrix=derivative[active].multiply(1/norms[active,None]).tocsr()
+            bounds=path_matrix@x-excess[active]/norms[active]
+            return vstack([mat,path_matrix],format="csr"),np.r_[rhs,bounds]
         if not self.swept_pairs:
             return mat,rhs
         if self.initial_rate is None:
@@ -94,7 +113,7 @@ class PoseLimits:
         return vstack(pieces,format="csr"),np.concatenate(limits)
 
 
-def hinge_jacobian(guard, variable, unit):
+def hinge_jacobian(guard, variable, unit, coordinates=None):
     left,right=guard.graph.face_pairs.T
     lf,rf=guard.faces[left],guard.faces[right]
     active=((variable[lf]>=0)|(variable[rf]>=0)).any(1)
@@ -103,7 +122,7 @@ def hinge_jacobian(guard, variable, unit):
     shared=(lf[:,:,None]==rf[:,None,:]).any(2)
     endpoints=np.nonzero(shared)[1].reshape(-1,2)
     row=np.arange(len(corners))
-    points=guard.baseline[corners].copy()
+    points=(guard.baseline if coordinates is None else coordinates)[corners].copy()
     def angle():
         first=np.cross(points[:,1]-points[:,0],points[:,2]-points[:,0])
         second=np.cross(points[:,4]-points[:,3],points[:,5]-points[:,3])

@@ -7,14 +7,14 @@ from pathlib import Path
 
 import clarabel
 import numpy as np
-from scipy.sparse import csr_matrix, eye, vstack, hstack
+from scipy.sparse import csr_matrix, eye, vstack, hstack, diags
 from scipy.sparse.csgraph import dijkstra
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[3]))
 from scripts.local_converter.experimental.deformation_guard import DeformationGuard
 
 
-def probe(stage, output, radius, goal, compression, extra=(), shape_steps=0, contacts=False, witnesses=None, edges_only=False, sparse_motion=False, seconds=40., step_mm=None, bend_weight=0.):
+def probe(stage, output, radius, goal, compression, extra=(), shape_steps=0, contacts=False, witnesses=None, edges_only=False, sparse_motion=False, seconds=40., step_mm=None, bend_weight=0., bend_reference=None):
     with np.load(stage) as raw:
         r,p,f = raw["rest"],raw["corrected"],raw["triangles"]
         g = DeformationGuard(r,p,f,raw["anchors"])
@@ -115,6 +115,21 @@ def probe(stage, output, radius, goal, compression, extra=(), shape_steps=0, con
             for b0 in f[j]:
                 affine((p[b0]-p[a0])@normal-margin,
                        [(vertex,k,sign*normal[k]) for vertex,sign in ((a0,-1),(b0,1)) for k in range(3)])
+    for i,j,start_time,end_time,normal in policy.get("intervalSeparators",[]):
+        normal=np.asarray(normal,dtype=float)
+        # The projection of each vertex pair is affine in time. Satisfying
+        # both endpoint inequalities certifies separation throughout this cell.
+        for fraction in (start_time,end_time):
+            if fraction==0.:
+                if (p[f[j]]@normal).min()-(p[f[i]]@normal).max() <= g.scale*1e-12:
+                    raise ValueError("Initial interval plane does not separate")
+                continue
+            cones.append(clarabel.NonnegativeConeT(9))
+            for a0 in f[i]:
+                for b0 in f[j]:
+                    affine((p[b0]-p[a0])@normal-g.scale*1e-9,
+                           [(vertex,k,sign*fraction*normal[k]) for vertex,sign in ((a0,-1),(b0,1))
+                            for k in range(3)])
     pose_vars=3*len(ids)
     minimize_peak=goal<0
     if sparse_motion and minimize_peak:
@@ -131,7 +146,37 @@ def probe(stage, output, radius, goal, compression, extra=(), shape_steps=0, con
                 cols.append(3*j+k)
                 coeff.append(-1.)
                 affine(0.)
-    nv=pose_vars+int(minimize_peak)+(len(ids) if sparse_motion else 0)
+    base_vars=pose_vars+int(minimize_peak)+(len(ids) if sparse_motion else 0)
+    from scripts.local_converter.experimental.hinge_normal_caps import caps, cap_frame
+    normal_caps=caps(g,policy.get("hinges",[]))
+    nv=base_vars+len(normal_caps)
+    for index,(face_index,axis,half_angle) in enumerate(normal_caps):
+        face=f[face_index]
+        weights,tangent=cap_frame(p[face],axis)
+        basis=p[face].T@weights
+        aux=base_vars+index
+        # Bound normal slope for every tangent vector. The symmetric tangent
+        # block bounds its in-plane scale from below in every direction.
+        cones.append(clarabel.SecondOrderConeT(3))
+        rows.append(len(values))
+        cols.append(aux)
+        coeff.append(-np.tan(half_angle))
+        affine(0.)
+        for j in range(2):
+            affine(axis@basis[:,j],[(vertex,k,axis[k]*w) for vertex,w in zip(face,weights[:,j])
+                                    for k in range(3)])
+        cones.append(clarabel.PSDTriangleConeT(2))
+        for j in range(2):
+            for k in range(j+1):
+                scale=1. if j==k else np.sqrt(2)
+                if j==k:
+                    rows.append(len(values))
+                    cols.append(aux)
+                    coeff.append(1.)
+                tensors=.5*(np.outer(weights[:,j],tangent[:,k])+np.outer(weights[:,k],tangent[:,j]))
+                affine(scale*.5*(tangent[:,k]@basis[:,j]+tangent[:,j]@basis[:,k]),
+                       [(vertex,a0,scale*tensors[corner,a0]) for corner,vertex in enumerate(face)
+                        for a0 in range(3)])
     if step_mm is not None:
         for j in range(pose_vars):
             cones.append(clarabel.NonnegativeConeT(2))
@@ -147,18 +192,44 @@ def probe(stage, output, radius, goal, compression, extra=(), shape_steps=0, con
     settings.time_limit=seconds
     settings.chordal_decomposition_enable=False
     point=np.zeros(pose_vars)
-    quadratic=csr_matrix((nv,nv)).tocsc() if minimize_peak else eye(nv,format="csc")
+    quadratic=(csr_matrix((nv,nv)).tocsc() if minimize_peak else
+               diags(np.r_[np.ones(pose_vars),np.zeros(nv-pose_vars)],format="csc"))
+    bend_linear=np.zeros(nv)
     if bend_weight:
         if minimize_peak or sparse_motion:
             raise ValueError("Use a fixed target with bend regularization")
         from scripts.local_converter.experimental.localized_pose_limits import hinge_jacobian
-        derivative=hinge_jacobian(g,variables,unit)
-        quadratic=(quadratic+bend_weight*(derivative.T@derivative)).tocsc()
-    cost=np.zeros(nv)
-    if minimize_peak: cost[-1]=1.
+        base=p
+        offset=np.zeros(pose_vars)
+        if bend_reference:
+            with np.load(bend_reference) as ref:
+                if not np.isin(ref["ids"],ids).all():
+                    raise ValueError("Bend reference extends outside the trial")
+                base=p.copy()
+                base[ref["ids"]]+=ref["delta"]
+                offset=((base[ids]-p[ids])/unit).ravel()
+        derivative=hinge_jacobian(g,variables,unit,base)
+        if nv>pose_vars:
+            derivative=hstack([derivative,csr_matrix((derivative.shape[0],nv-pose_vars))])
+        weights=np.ones(derivative.shape[0])
+        if bend_reference:
+            left,right=g.graph.face_pairs.T
+            active=(free[f[left]]|free[f[right]]).any(1)
+            signed=g.measure(base)["bend"]
+            error=signed-np.clip(signed,-g.bend_limit,g.bend_limit)
+            crease=g.angle_difference(signed,g.rest_bend)
+            crease_limit=np.maximum(1e-7,abs(g.angle_difference(g.reference["bend"],g.rest_bend)))
+            crease_error=np.where(g.crease,crease-np.clip(crease,-crease_limit,crease_limit),0.)
+            weights=(.03+(abs(error)>1e-8).astype(float)+(abs(crease_error)>1e-8).astype(float))[active]
+            offset_full=np.r_[offset,np.zeros(nv-pose_vars)]
+            residual=(error+crease_error)[active]-weights*(derivative@offset_full)
+            bend_linear=bend_weight*(derivative.T@residual)-offset_full
+        quadratic=(quadratic+bend_weight*(derivative.T@diags(weights)@derivative)).tocsc()
+    cost=bend_linear.copy()
+    if minimize_peak: cost[pose_vars]=1.
     if sparse_motion:
         quadratic=1e-6*eye(nv,format="csc")
-        cost[pose_vars:]=1.
+        cost[pose_vars:pose_vars+len(ids)]=1.
 
     if policy.get("initial"):
         with np.load(policy["initial"]) as previous:
@@ -169,7 +240,7 @@ def probe(stage, output, radius, goal, compression, extra=(), shape_steps=0, con
     if shape_steps:
         from scripts.local_converter.experimental.localized_pose_limits import PoseLimits
         selected_pairs=None if witnesses is None or policy.get("all_pairs") else {tuple(sorted(pair)) for pair in policy.get("pairs",[])}
-        model=PoseLimits(g,free,contacts,selected_pairs=selected_pairs)
+        model=PoseLimits(g,free,contacts,selected_pairs=selected_pairs,path_limits=policy.get("pathLimits",False))
     for iteration in range(max(1,shape_steps)):
         constraints,rhs,kinds=system,np.asarray(values),cones
         if shape_steps:
@@ -181,26 +252,32 @@ def probe(stage, output, radius, goal, compression, extra=(), shape_steps=0, con
             kinds=[*cones,clarabel.NonnegativeConeT(len(upper))]
         solver=clarabel.DefaultSolver(quadratic,cost,constraints,rhs,kinds,settings)
         solved=solver.solve()
+        diagnostic_status=str(solved.status) in ("MaxTime","MaxIterations","InsufficientProgress")
         if str(solved.status) not in ("Solved","AlmostSolved"):
+            if diagnostic_status and np.isfinite(solved.x).all():
+                point=np.asarray(solved.x)[:pose_vars]
             break
         point=np.asarray(solved.x)[:pose_vars]
         if shape_steps:
             residual=float(model.residual(point).max())
+            if model.path_limits:
+                residual=max(residual,float(model.path_residual(point).max()))
             progress.append(dict(iteration=iteration,maxNonlinearResidual=residual))
             if residual<=1e-9: break
     result=dict(radius=radius,goal=goal,compression=compression,edgesOnly=edges_only,vertices=len(ids),shapeHistory=progress,
                 peakBefore=float(g.reference["edge"][peak]),status=str(solved.status),
                 seconds=solved.solve_time,iterations=solved.iterations,primalResidual=solved.r_prim)
-    if str(solved.status) in ("Solved","AlmostSolved"):
+    converged=str(solved.status) in ("Solved","AlmostSolved")
+    if converged or (diagnostic_status and solved.r_prim < 2e-5 and np.isfinite(point).all()):
         q=p.copy()
         q[ids]+=unit*point.reshape(-1,3)
         g.upper=np.maximum(1.,g.reference["stretch"])
         g.edge_upper=np.maximum(1.,g.reference["edge"])
         g.crease_limit=np.maximum(1e-7,abs(g.angle_difference(g.reference["bend"],g.rest_bend)))
         m=g.measure(q)
-        if minimize_peak:
+        if minimize_peak and converged:
             result.update(primalBound=solved.obj_val,dualBound=solved.obj_val_dual)
-        result.update(target=float(m["edge"][peak]), peakAfter=float(m["edge"].max()),
+        result.update(solverConverged=converged,target=float(m["edge"][peak]), peakAfter=float(m["edge"].max()),
                       violations=g.violations(q),moveMm=float(1000*np.linalg.norm(q-p,axis=1).max()))
         np.savez_compressed(output.with_suffix(".npz"),ids=ids,delta=q[ids]-p[ids],
                             sourceSHA=hashlib.sha256(stage.read_bytes()).hexdigest())
@@ -232,6 +309,7 @@ if __name__=="__main__":
     parser.add_argument("--radius",type=float,default=.012)
     parser.add_argument("--goal",type=float,default=2.)
     parser.add_argument("--compression",action="store_true")
+    parser.add_argument("--bend-reference",type=Path)
     parser.add_argument("--bend-weight",type=float,default=0.)
     parser.add_argument("--step-mm",type=float)
     parser.add_argument("--seconds",type=float,default=40.)
