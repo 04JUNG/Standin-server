@@ -1,0 +1,198 @@
+[
+  {
+    "id": "T001-P1",
+    "final_applied": false,
+    "selected_supported_goals_match": null,
+    "final_fbx_sha256": "75e1ce5825eb101c069b0c773dabd5051148d05154570037b72f03ca9c9d1654",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T002-P1",
+    "final_applied": true,
+    "selected_supported_goals_match": true,
+    "final_fbx_sha256": "a60ff27f235b0b834ec508c3dc750079e4cbfc16cc1aee09374dbc698b2e6c08",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T003-P1",
+    "final_applied": false,
+    "selected_supported_goals_match": null,
+    "final_fbx_sha256": "76817a93b87de41c60f804ed5047111d28e3f11dd844a5ea64d6cfab704fa812",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T004-P1",
+    "final_applied": false,
+    "selected_supported_goals_match": null,
+    "final_fbx_sha256": "20d5a223a54754b1f0e61598c74692955196107f2684cce56de75092e2e34a2d",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T007-P2",
+    "final_applied": false,
+    "selected_supported_goals_match": null,
+    "final_fbx_sha256": "73c568974bdee1d9a888d50c1ab34651c24dd09e4f88c214ec57376b649253d7",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T008-P1",
+    "final_applied": false,
+    "selected_supported_goals_match": null,
+    "final_fbx_sha256": "ddfe00ff1fd6e71e24381b1257149396f9b7e62c55a7c5b23594c68ef2f5a35d",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T009-P1",
+    "final_applied": false,
+    "selected_supported_goals_match": null,
+    "final_fbx_sha256": "7a2d7456dd5e7886deb11f2f12f378cec3ba8b68a9091601e07891225a75f266",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T010-P1",
+    "final_applied": false,
+    "selected_supported_goals_match": null,
+    "final_fbx_sha256": "9cac76656b46cb71e1641b992646422688538db24dda9e32a10d43ad5c9c6ee8",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T011-P1",
+    "final_applied": false,
+    "selected_supported_goals_match": null,
+    "final_fbx_sha256": "b747aae0494de9e58361ce4059affe7142c2272cedc5954e4456a7e716e6083c",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T012-P1",
+    "final_applied": false,
+    "selected_supported_goals_match": null,
+    "final_fbx_sha256": "fc83082a3b5b52052fc7d2b9cccbe432d217be6d6792a0948eee8ac706126713",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T013-P1",
+    "final_applied": false,
+    "selected_supported_goals_match": null,
+    "final_fbx_sha256": "7f6585fa0b497ca80ffacfef56424658bc4d3f2a08384d03dc9cbd7fe5a64a6d",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T013-P2",
+    "final_applied": false,
+    "selected_supported_goals_match": null,
+    "final_fbx_sha256": "6a11a248718e6ee84e3b7f18231e8af27ee1b38d43f950ed33c429ada06d4195",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T015-P1",
+    "final_applied": true,
+    "selected_supported_goals_match": true,
+    "final_fbx_sha256": "fa5ca4e63751891d270e419a1c7e27ba633756a18f0936412da954ee51a9e5a8",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T017-P1",
+    "final_applied": false,
+    "selected_supported_goals_match": null,
+    "final_fbx_sha256": "36c453f3939ac7430e309989829670622ad5717bf6dc2f8977db0d4b9873f84d",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T018-P1",
+    "final_applied": true,
+    "selected_supported_goals_match": true,
+    "final_fbx_sha256": "8b8115360f155be0f45a2d645567f9f20d4698b16989bd86f3e35459431679a7",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T019-P1",
+    "final_applied": false,
+    "selected_supported_goals_match": null,
+    "final_fbx_sha256": "edb8e433af8d7dbe221a65c5adffdc7aabd6b2a9540ff8c412802069fc5e31b6",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T020-P1",
+    "final_applied": false,
+    "selected_supported_goals_match": null,
+    "final_fbx_sha256": "f6c82d39a47bd6776fba252344750c31d6e7f6334e9d3830ed574934dc519842",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T021-P1",
+    "final_applied": false,
+    "selected_supported_goals_match": null,
+    "final_fbx_sha256": "874fd2d154c4087f6a00823d76b200aef77f16806f31863f9c1ce29973718c2e",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T022-P1",
+    "final_applied": false,
+    "selected_supported_goals_match": null,
+    "final_fbx_sha256": "7599f71070f0d118d6b1fa37924b44b367e0690c0c426ed4d38844253f3a7fa0",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T024-P1",
+    "final_applied": true,
+    "selected_supported_goals_match": true,
+    "final_fbx_sha256": "8bf843865b8da1051cbcd9de2ff8a41950a86e2e768110dc024cf281fc6610ed",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T025-P1",
+    "final_applied": false,
+    "selected_supported_goals_match": null,
+    "final_fbx_sha256": "638cd7f65d3585b9d0fbc47caf6c035b9bd0d15aea5d0584cc4d71d6bd309636",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T026-P1",
+    "final_applied": false,
+    "selected_supported_goals_match": null,
+    "final_fbx_sha256": "ec7a7ace858044e72111d1d83dd7040dc0661948204df3391fff33dde55b231a",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T027-P1",
+    "final_applied": true,
+    "selected_supported_goals_match": true,
+    "final_fbx_sha256": "dc55cdc6508e2b890403b1b67846adf8a5495442a24a425f76bce84581dd306e",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T028-P1",
+    "final_applied": false,
+    "selected_supported_goals_match": null,
+    "final_fbx_sha256": "6f73d6b7b257adb8cb2bf8a3281c83960d6a1ce826b970c5c65bb5d5d0aa5f41",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T029-P1",
+    "final_applied": true,
+    "selected_supported_goals_match": true,
+    "final_fbx_sha256": "b81f9749aa7049606febe4754c2c503f35788003d5c0e76077c46cbffadd7acc",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T030-P1",
+    "final_applied": false,
+    "selected_supported_goals_match": null,
+    "final_fbx_sha256": "c1ec3465fb92f386304d84b9ed83dacd3439294d8f5262cb74fe477c50f7b18d",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T032-P1",
+    "final_applied": false,
+    "selected_supported_goals_match": null,
+    "final_fbx_sha256": "b10ee7ee141c5725f79dea8cbb592d06856177636dbae066acdd52691a16a5a8",
+    "read_only_matrix_delta": 0.0
+  },
+  {
+    "id": "T034-P1",
+    "final_applied": true,
+    "selected_supported_goals_match": true,
+    "final_fbx_sha256": "be15a9d9855eb19d4908734b7ef7f00a5b9bab136b3c0f4241abc9dae9d10d22",
+    "read_only_matrix_delta": 0.0
+  }
+]
