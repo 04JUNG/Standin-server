@@ -1,4 +1,5 @@
 """Run the same automatic policy on the six approved staged geometries."""
+import argparse
 import json
 import sys
 import time
@@ -8,7 +9,12 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[2]))
 from scripts.local_converter.experimental.automatic_deformation import correct
 from scripts.local_converter.experimental.deformation_guard import DeformationGuard
 
-base,out=map(Path,sys.argv[1:])
+parser=argparse.ArgumentParser()
+parser.add_argument("base",type=Path)
+parser.add_argument("out",type=Path)
+parser.add_argument("--sliding",action="store_true")
+args=parser.parse_args()
+base,out=args.base,args.out
 out.mkdir(parents=True,exist_ok=True)
 rows=[]
 sources = sorted(base.glob("stages-*.npz"))
@@ -18,7 +24,7 @@ for source in sources:
     data=np.load(source)
     rest,posed,faces=data["rest"],data["corrected"],data["triangles"]
     started=time.monotonic()
-    points,report=correct(rest,posed,faces,data["anchors"],iterations=12,expansions=2)
+    points,report=correct(rest,posed,faces,data["anchors"],iterations=12,expansions=2,sliding=args.sliding)
     report["elapsedSeconds"]=time.monotonic()-started
     guard=DeformationGuard(rest,posed,faces,data["anchors"])
     guard.upper=np.maximum(1.,guard.reference["stretch"])

@@ -1,5 +1,6 @@
 """Conservative swept bounds for non-neighbor triangle pairs of one mesh."""
 import numpy as np
+from .contact_features import crossing_edges
 from scipy.spatial import cKDTree
 
 
@@ -58,7 +59,7 @@ def potential_pairs(faces, moving, lower, upper):
             yield i, j
 
 
-def baseline_contact_pins(points, faces, free, pair_budget=250000):
+def baseline_contact_pins(points, faces, free, pair_budget=250000, *, sliding_features=None):
     """Keep the six input coordinates of each possible existing contact fixed."""
     triangles = points[faces]
     extent = np.ptp(points,axis=0).max()
@@ -69,12 +70,17 @@ def baseline_contact_pins(points, faces, free, pair_budget=250000):
         if checked > pair_budget:
             return free.copy(), dict(complete=False, checked=checked)
         if static_relation(triangles[i],triangles[j],extent) != "separated":
-            pinned[faces[[i,j]].ravel()] = True
             count += 1
+            if sliding_features is not None:
+                edge_spec=crossing_edges(triangles[i],triangles[j],extent)
+                if edge_spec is not None:
+                    sliding_features.append((i,j,edge_spec))
+                    continue
+            pinned[faces[[i,j]].ravel()] = True
     return pinned, dict(complete=True, pairs=count, freePinned=int((free&pinned).sum()))
 
 
-def contact_guard(start, end, faces, pair_budget=250000):
+def contact_guard(start, end, faces, pair_budget=250000, *, sliding=False):
     """Reject when separation throughout a straight displacement is unproven.
 
     A fixed separating axis at both endpoints certifies separation throughout
@@ -87,13 +93,24 @@ def contact_guard(start, end, faces, pair_budget=250000):
     upper = np.maximum(old.max(1), new.max(1))
     extent = np.ptp(start,axis=0).max()
     checked = 0
+    certified = 0
     for i,j in potential_pairs(faces,moving,lower,upper):
         checked += 1
         if checked > pair_budget:
             return dict(passCheck=False, reason="contact_budget", pairs=checked)
         if not interval_separated(old[i],new[i],old[j],new[j],extent):
+            sliding_reason = "disabled"
+            if sliding:
+                from .sliding_contact import certificate
+                safe, sliding_reason = certificate(old[i],new[i],old[j],new[j])
+                if safe:
+                    certified += 1
+                    if certified > 128:
+                        return dict(passCheck=False,reason="sliding_pair_budget",pairs=checked)
+                    continue
             return dict(passCheck=False, reason="contact_unresolved", pairs=checked,
+                        slidingReason=sliding_reason,certifiedExistingPairs=certified,
                         faces=[int(i),int(j)],
                         baseline=static_relation(old[i],old[j],extent),
                         proposed=static_relation(new[i],new[j],extent))
-    return dict(passCheck=True, pairs=checked)
+    return dict(passCheck=True, pairs=checked, certifiedExistingPairs=certified)

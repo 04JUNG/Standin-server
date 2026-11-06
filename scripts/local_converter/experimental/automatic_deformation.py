@@ -9,12 +9,13 @@ from scipy.optimize import linprog
 from scipy.optimize._numdiff import approx_derivative
 from scipy.sparse import coo_matrix, eye, hstack, vstack, csr_matrix
 from scipy.sparse.csgraph import dijkstra
+from .contact_features import measures as contact_measures
 from .contact import baseline_contact_pins, contact_guard
 from .deformation_guard import DeformationGuard
 from converter.local import surface
 
 
-def solve_patch(rest, posed, faces, anchors, free, target_points, iterations=40, deadline=None):
+def solve_patch(rest, posed, faces, anchors, free, target_points, iterations=40, deadline=None, sliding_features=(), initial_points=None):
     # Include all faces incident to a movable vertex and one hinge neighborhood.
     graph = surface.Neighborhood(faces, rest)
     affected = free[faces].any(1)
@@ -22,6 +23,9 @@ def solve_patch(rest, posed, faces, anchors, free, target_points, iterations=40,
     halo = affected.copy()
     halo[left[affected[right]]] = True
     halo[right[affected[left]]] = True
+    pair_ids=np.asarray([(i,j) for i,j,_ in sliding_features],dtype=int).reshape(-1,2)
+    edge_spec=np.asarray([spec for _,_,spec in sliding_features],dtype=int).reshape(-1,2,2)
+    halo[pair_ids.ravel()] = True
     local_faces = faces[halo]
     ids = np.unique(local_faces)
     local_faces = np.searchsorted(ids, local_faces)
@@ -33,6 +37,13 @@ def solve_patch(rest, posed, faces, anchors, free, target_points, iterations=40,
         guard.angle_difference(guard.reference["bend"], guard.rest_bend)))
     target = target_points[ids]
     current = posed[ids].copy()
+    pair_vertices=np.searchsorted(ids,faces[pair_ids])
+    contact_reference=contact_measures(current,pair_vertices,edge_spec)
+    if initial_points is not None:
+        proposed_start=initial_points[ids].copy()
+        proposed_start[fixed]=posed[ids][fixed]
+        if not guard.violations(proposed_start) and guard.trajectory_safe(current,proposed_start):
+            current=proposed_start
     movable = np.flatnonzero(~fixed)
     nvar = len(movable)*3
     mapping = np.full(len(ids), -1)
@@ -41,6 +52,7 @@ def solve_patch(rest, posed, faces, anchors, free, target_points, iterations=40,
     hinges = np.concatenate([local_faces[left], local_faces[right]], axis=1)
     edges = np.column_stack([guard.graph.a, guard.graph.b])
     supports = [local_faces, local_faces, edges, edges, local_faces, hinges, hinges]
+    supports.append(np.repeat(pair_vertices.reshape(-1,6),7,axis=0))
     rows, columns = [], []
     offset = 0
     for support in supports:
@@ -63,7 +75,7 @@ def solve_patch(rest, posed, faces, anchors, free, target_points, iterations=40,
             values["stretch"]-guard.upper, guard.lower-values["compression"],
             values["edge"]-guard.edge_upper, guard.edge_lower-values["edge"],
             guard.area_floor-values["area"], np.abs(values["bend"])-guard.bend_limit,
-            crease])
+            crease, (contact_measures(points,pair_vertices,edge_spec)-contact_reference)/guard.scale])
 
     blocked_vertex_ids = []
     history=[]
@@ -103,7 +115,7 @@ def solve_patch(rest, posed, faces, anchors, free, target_points, iterations=40,
             blocked_vertices = []
             start = 0
             groups = {}
-            for label, support in zip(("stretch","compression","edge_stretch","edge_compression","area","bend","crease"), supports):
+            for label, support in zip(("stretch","compression","edge_stretch","edge_compression","area","bend","crease","contact"), supports):
                 selected = blocked[(blocked >= start)&(blocked < start+len(support))]-start
                 groups[label] = len(selected)
                 blocked_vertices.extend(ids[support[selected]].ravel().tolist())
@@ -158,7 +170,7 @@ def solve_patch(rest, posed, faces, anchors, free, target_points, iterations=40,
     return points, {"history": history, "blockers": blocked_vertex_ids}
 
 
-def correct(rest, posed, faces, anchors, *, iterations=40, expansions=4, regions=3, seconds=30.):
+def correct(rest, posed, faces, anchors, *, iterations=40, expansions=4, regions=3, seconds=30., sliding=False):
     """Return conservative automatic repair and explicit unresolved status.
 
     The worst stretched edge seeds a dimensionless geodesic region. Intentional
@@ -220,7 +232,8 @@ def correct(rest, posed, faces, anchors, *, iterations=40, expansions=4, regions
         for expansion in range(expansions):
             if time.monotonic() >= deadline or not free.any() or free.sum() > 3000:
                 break
-            pinned, pin_report = baseline_contact_pins(posed,faces,free)
+            features=[] if sliding else None
+            pinned,pin_report=baseline_contact_pins(posed,faces,free,sliding_features=features)
             fixed |= pinned
             free &= ~fixed
             if not free.any():
@@ -229,7 +242,7 @@ def correct(rest, posed, faces, anchors, *, iterations=40, expansions=4, regions
                 break
             graph.fixed = ~free
             target = surface.limit_strain(posed, posed, graph, guard.lengths, guard.scale*.08)
-            candidate, report = solve_patch(rest,posed,faces,anchors,free,target,iterations,deadline)
+            candidate, report = solve_patch(rest,posed,faces,anchors,free,target,iterations,deadline,features or ())
             candidate[locked] = best[locked]
             violations = guard.violations(candidate)
             measured = guard.measure(candidate)["edge"]
@@ -239,7 +252,7 @@ def correct(rest, posed, faces, anchors, *, iterations=40, expansions=4, regions
                         and excess < best_excess-1e-4 and guard.trajectory_safe(posed,candidate))
             contact = None
             if accepted:
-                contact = contact_guard(posed, candidate, faces)
+                contact = contact_guard(posed, candidate, faces, sliding=sliding)
                 accepted = contact["passCheck"]
             if accepted:
                 best, best_ratio, best_excess = candidate, candidate_ratio, excess
