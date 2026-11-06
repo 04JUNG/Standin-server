@@ -9,7 +9,8 @@ from scipy.optimize import linprog
 from scipy.optimize._numdiff import approx_derivative
 from scipy.sparse import coo_matrix, eye, hstack, vstack, csr_matrix
 from scipy.sparse.csgraph import dijkstra
-from .isolated_influence import propose as propose_isolated
+from .isolated_influence import propose as propose_isolated, valid_weights
+from .seams import gap_changes, guard_gap_step, split_boundaries
 from .contact_features import measures as contact_measures
 from .contact import baseline_contact_pins, contact_guard
 from .deformation_guard import DeformationGuard
@@ -198,9 +199,20 @@ def correct(rest, posed, faces, anchors, *, iterations=40, expansions=4, regions
         guard.angle_difference(guard.reference["bend"], guard.rest_bend)))
     graph = guard.graph
     ratio = guard.reference["edge"]
+    pairs=np.empty((0,2),dtype=int)
+    seam_info={"status":"weights_unavailable"}
+    if bone_ids is not None or bone_weights is not None:
+        if bone_ids is None or bone_weights is None:
+            return posed.copy(),dict(applied=False,reason="incomplete_weights")
+        bone_ids, bone_weights=np.asarray(bone_ids),np.asarray(bone_weights)
+        if not valid_weights(rest,bone_ids,bone_weights):
+            return posed.copy(),dict(applied=False,reason="invalid_weights")
+        pairs,seam_info=split_boundaries(rest,faces,bone_ids,bone_weights)
+        seam_info["input"]=gap_changes(rest,posed,pairs)
+        seam_info["status"]="structural_candidates_only"
     if ratio.max() <= 2:
         return posed.copy(), dict(applied=False, reason="no_severe_stretch",
-                                  otherDefectsEvaluated=False)
+                                  otherDefectsEvaluated=False,seams=seam_info)
     cost = guard.lengths / np.clip(ratio, 1, 10)
     adjacency = csr_matrix((cost, (graph.a, graph.b)), shape=(len(rest),len(rest)))
     adjacency += adjacency.T
@@ -292,11 +304,14 @@ def correct(rest, posed, faces, anchors, *, iterations=40, expansions=4, regions
     original_severe = int(np.count_nonzero(ratio > 2.))
     new_severe = int(np.count_nonzero(guard.measure(best)["edge"] > 2.))
     material = new_severe < original_severe or best_ratio <= .99*float(ratio.max())
+    best,seam_info["trial"]=guard_gap_step(posed,best,pairs)
+    if not seam_info["trial"]["accepted"]:
+        material=False
     if not material:
         best = posed.copy()
         best_ratio = float(ratio.max())
         best_excess = float(np.maximum(ratio-2.,0.).sum())
-    return best, dict(applied=material, isolatedInfluence=isolated_report, timeBudgetReached=time.monotonic() >= deadline, totalExcessAboveTwo=best_excess,
+    return best, dict(applied=material, seams=seam_info, isolatedInfluence=isolated_report, timeBudgetReached=time.monotonic() >= deadline, totalExcessAboveTwo=best_excess,
                       beforeMaxStretch=float(ratio.max()), afterMaxStretch=best_ratio,
                       unresolved=best_ratio > 2, seeds=seeds, history=history,
                       contactScope="one mesh, disjoint vertex sets, straight output displacement",

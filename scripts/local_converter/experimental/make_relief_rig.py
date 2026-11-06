@@ -16,7 +16,7 @@ from converter.local import surface
 from scripts.local_converter.experimental.read_registered_weights import mesh_weights
 
 
-def write_asset(path, anomaly):
+def write_asset(path, anomaly, split):
     bpy.ops.wm.read_factory_settings(use_empty=True)
     nx,ny=29,13
     vertices=[]
@@ -30,6 +30,15 @@ def write_asset(path, anomaly):
         for col in range(nx-1):
             a=row*nx+col
             faces.extend([(a,a+1,a+nx),(a+nx,a+1,a+nx+1)])
+    if split:
+        copies={}
+        column=nx//2
+        for row in range(ny):
+            old=row*nx+column
+            copies[old]=len(vertices)
+            vertices.append(vertices[old])
+        faces=[tuple(copies.get(i,i) for i in face) if max(vertices[i][0] for i in face)>0
+               else face for face in faces]
     mesh=bpy.data.meshes.new("Relief")
     mesh.from_pydata(vertices,[],faces)
     mesh.update()
@@ -87,9 +96,9 @@ def sample(path):
     return arm,body,rest,evaluated()
 
 
-def make(out):
+def make(out,split):
     out.mkdir(exist_ok=False)
-    write_asset(out/"clean-source.fbx",False)
+    write_asset(out/"clean-source.fbx",False,split)
     _,clean_body,clean_rest,oracle=sample(out/"clean-source.fbx")
     clean_body.data.calc_loop_triangles()
     clean_faces=np.array([tuple(t.vertices) for t in clean_body.data.loop_triangles])
@@ -97,7 +106,7 @@ def make(out):
     np.savez_compressed(out/"clean-control.npz",rest=clean_rest,corrected=oracle,
                         triangles=clean_faces,anchors=surface.prepare_reference(clean_body.data).anchors,
                         boneIds=clean_ids,boneWeights=clean_weights)
-    write_asset(out/"input.fbx",True)
+    write_asset(out/"input.fbx",True,split)
     arm,body,rest,posed=sample(out/"input.fbx")
     np.testing.assert_allclose(clean_rest,rest,rtol=0,atol=1e-7)
     body.data.calc_loop_triangles()
@@ -111,4 +120,4 @@ def make(out):
 
 
 if __name__=="__main__":
-    make(Path(sys.argv[-1]))
+    make(Path(sys.argv[-1]),"--split" in sys.argv)

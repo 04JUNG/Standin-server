@@ -23,15 +23,21 @@ def rigid_prediction(rest, posed, vertex, ring):
     return (rest[vertex]-source.mean(axis=0))@rotation+target.mean(axis=0)
 
 
-def propose(rest, posed, faces, protected, guard, bone_ids, weights, deadline=None):
+def valid_weights(rest,bone_ids,weights):
     if bone_ids.shape != weights.shape or bone_ids.ndim!=2 or len(rest)!=len(weights):
-        return posed.copy(), {"applied":False,"reason":"invalid_weights"}
+        return False
     if (not np.issubdtype(bone_ids.dtype,np.integer) or
             not np.issubdtype(weights.dtype,np.number) or np.iscomplexobj(weights)):
-        return posed.copy(), {"applied":False,"reason":"invalid_weights"}
+        return False
     if (np.any(weights<0) or not np.isfinite(weights).all() or
             np.any((weights>0)&(bone_ids<0)) or
             np.max(np.abs(weights.sum(axis=1)-1.))>1e-4):
+        return False
+    return True
+
+
+def propose(rest, posed, faces, protected, guard, bone_ids, weights, deadline=None):
+    if not valid_weights(rest,bone_ids,weights):
         return posed.copy(), {"applied":False,"reason":"invalid_weights"}
     graph=guard.graph
     a,b=graph.a,graph.b
