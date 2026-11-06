@@ -1,0 +1,2316 @@
+{
+  "cache_hit": {
+    "artifact_sha256": "56ba4611e9882b3b7a1e5e8f29047c0800bac6b9f749e04253160013c68cc8ec",
+    "exact_object_and_bytes": true,
+    "hit_ms": 4.600915999617428,
+    "kind": "actual-approved-female-recorded-source-local-selected-binding",
+    "miss_ms": 3539.8165000369772,
+    "reuse_ms": 4.170749976765364,
+    "skin_safe": false
+  },
+  "hand_change": {
+    "body_cache": "reuse",
+    "skin_safe": false,
+    "source_solver_calls": 0,
+    "wall_ms": 2706.9325000047684
+  },
+  "host": {
+    "blas_threads": 1,
+    "cpu_quota": null,
+    "logical_cpus": 15,
+    "machine": "arm64",
+    "one_vcpu_conclusion": false,
+    "platform": "macOS-26.6.2-arm64-arm-64bit"
+  },
+  "inputs": [
+    {
+      "character_id": "male-default83-v0-7-6-p1",
+      "character_sha256": "085dd9c65a3a66035f7e0ce9e0a9171b9abb0e33dada92194676d92e00c8b026",
+      "hands": {
+        "left": "relaxed",
+        "right": "relaxed"
+      },
+      "pose": "standing",
+      "sex": "male",
+      "shape": false,
+      "source_sha256": "ef953402a048a819b44d8211f5990b9a43b6a67e393d7ddbe2321b7da3461165"
+    },
+    {
+      "character_id": "female-default80-v0-3-9-p1",
+      "character_sha256": "712ac75e58efd4d6ccded0b1e931590900015de023327f1320cf6d7d94026ffc",
+      "hands": {
+        "left": "relaxed",
+        "right": "relaxed"
+      },
+      "pose": "standing",
+      "sex": "female",
+      "shape": false,
+      "source_sha256": "ef953402a048a819b44d8211f5990b9a43b6a67e393d7ddbe2321b7da3461165"
+    },
+    {
+      "character_id": "male-default83-v0-7-6-p1",
+      "character_sha256": "085dd9c65a3a66035f7e0ce9e0a9171b9abb0e33dada92194676d92e00c8b026",
+      "hands": {
+        "left": "relaxed",
+        "right": "relaxed"
+      },
+      "pose": "sitting-diagnostic-only",
+      "sex": "male",
+      "shape": false,
+      "source_sha256": "7b55b57677e698b749196d38fc7918e5b39ba14960075880fe870d1d4c03e5b0"
+    },
+    {
+      "character_id": "female-default80-v0-3-9-p1",
+      "character_sha256": "712ac75e58efd4d6ccded0b1e931590900015de023327f1320cf6d7d94026ffc",
+      "hands": {
+        "left": "relaxed",
+        "right": "relaxed"
+      },
+      "pose": "standing-shaped",
+      "sex": "female",
+      "shape": true,
+      "source_sha256": "ef953402a048a819b44d8211f5990b9a43b6a67e393d7ddbe2321b7da3461165"
+    }
+  ],
+  "kind": "recorded-source-real-approved-target-post-selection",
+  "png_renders": 0,
+  "runs": [
+    {
+      "child_cpu_seconds": 23.737367000000003,
+      "child_peak_rss_bytes": 471318528,
+      "concurrency": 1,
+      "mode": "cold",
+      "rows": [
+        {
+          "artifact_bytes": 2006940,
+          "artifact_sha256": "39187491160bbfe045b2b698d7168312d51d6d9a9cddc3f415c6eb2ed46d079c",
+          "baseline_restored": true,
+          "baseline_sha256": "3445801cfa1b38081bb84715d69ae0f55e7d2a0da21f6ea7119fb89b006f0b44",
+          "convert_ms": 2442.0068329782225,
+          "correspondence": {
+            "max_coordinate_error_m": 0.0,
+            "surface_verified": true,
+            "tolerance_m": 0.0001,
+            "triangles": 50000
+          },
+          "execution_ms": 2440.7720409799367,
+          "fbx_serialization": [
+            {
+              "bytes": 2006444,
+              "duration_ms": 77.94608297990635
+            },
+            {
+              "bytes": 2006940,
+              "duration_ms": 96.79958299966529
+            }
+          ],
+          "hands": {
+            "complete_collision_certificate": false,
+            "examples": [],
+            "intersection_pairs": 0,
+            "method": "evaluated_skin_opposite_hand_triangle_crossing_v1",
+            "scope": "opposite_hands_only",
+            "screened_artifact_sha256": "39187491160bbfe045b2b698d7168312d51d6d9a9cddc3f415c6eb2ed46d079c",
+            "status": "clear_screen",
+            "triangle_counts": {
+              "left": 3636,
+              "right": 3659
+            }
+          },
+          "inspection_wall_ms": 4220.198167022318,
+          "inspection_worker_ms": 3573.2156250160187,
+          "mesh": {
+            "broadphase_pairs_examined": 334148,
+            "closed_manifold": true,
+            "complete_collision_certificate": false,
+            "components": 1,
+            "consistently_oriented": true,
+            "contained_components": [],
+            "elapsed_sec": 2.747721666994039,
+            "folded_faces": [],
+            "full_body": true,
+            "hard_violations": [
+              "skin_triangle_intersection"
+            ],
+            "mesh_policy_sha256": null,
+            "mesh_policy_version": null,
+            "profile_sha256": null,
+            "shared_boundary_certified_pairs": 313110,
+            "status": "validation_blocked",
+            "topology_sha256": "c538e0c65c2bda575ee073c8e728bac892b6909d5b85bdd44b4c4a1889ab303a",
+            "triangle_intersections": [
+              [
+                10962,
+                11041
+              ],
+              [
+                10962,
+                11042
+              ],
+              [
+                10963,
+                11041
+              ],
+              [
+                10961,
+                11042
+              ],
+              [
+                11041,
+                10966
+              ],
+              [
+                11041,
+                10956
+              ],
+              [
+                11042,
+                10958
+              ],
+              [
+                11042,
+                10956
+              ],
+              [
+                9458,
+                9974
+              ],
+              [
+                9649,
+                9974
+              ],
+              [
+                14054,
+                14675
+              ],
+              [
+                14054,
+                14676
+              ],
+              [
+                14055,
+                14675
+              ],
+              [
+                14061,
+                14675
+              ],
+              [
+                9407,
+                10345
+              ],
+              [
+                9408,
+                10345
+              ]
+            ],
+            "triangle_pairs_checked": 21038,
+            "triangles": 50000,
+            "unverified_reasons": [
+              "mesh_policy_unsupported",
+              "fold_reference_unavailable"
+            ],
+            "version": "full-body-posed-skin-v2",
+            "vertices": 24988
+          },
+          "pose": "standing",
+          "preview_bytes": 1200920,
+          "queue_ms": 0.010957999620586634,
+          "sex": "male",
+          "skin_safe": false,
+          "stages": {
+            "hand_import_apply_export": {
+              "duration_ms": 221.95820894557983,
+              "ok": true
+            },
+            "retarget_initial_export": {
+              "duration_ms": 1207.3281660559587,
+              "ok": true
+            },
+            "worker_init": {
+              "duration_ms": 16.71616599196568,
+              "ok": true
+            }
+          },
+          "strict_adapter_outcome": "blocked_not_cached",
+          "structure": {
+            "artifact_sha256": "39187491160bbfe045b2b698d7168312d51d6d9a9cddc3f415c6eb2ed46d079c",
+            "bones": 52,
+            "meshes": 1,
+            "polygons": 50000,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 24988
+          },
+          "total_ms": 6662.206207984127
+        },
+        {
+          "artifact_bytes": 1701164,
+          "artifact_sha256": "9c641fe4b9d08ad5e7b1de4e6eb7fab860bffc704087cc995b0765a6eed7c561",
+          "baseline_restored": true,
+          "baseline_sha256": "3445801cfa1b38081bb84715d69ae0f55e7d2a0da21f6ea7119fb89b006f0b44",
+          "convert_ms": 1576.7125830170698,
+          "correspondence": {
+            "max_coordinate_error_m": 0.0,
+            "surface_verified": true,
+            "tolerance_m": 0.0001,
+            "triangles": 50010
+          },
+          "execution_ms": 1576.600167027209,
+          "fbx_serialization": [
+            {
+              "bytes": 1699884,
+              "duration_ms": 61.8659169995226
+            },
+            {
+              "bytes": 1701164,
+              "duration_ms": 61.874541046563536
+            }
+          ],
+          "hands": {
+            "complete_collision_certificate": false,
+            "examples": [],
+            "intersection_pairs": 0,
+            "method": "evaluated_skin_opposite_hand_triangle_crossing_v1",
+            "scope": "opposite_hands_only",
+            "screened_artifact_sha256": "9c641fe4b9d08ad5e7b1de4e6eb7fab860bffc704087cc995b0765a6eed7c561",
+            "status": "clear_screen",
+            "triangle_counts": {
+              "left": 3754,
+              "right": 3758
+            }
+          },
+          "inspection_wall_ms": 1318.5146249597892,
+          "inspection_worker_ms": 757.7235840144567,
+          "mesh": {
+            "complete_collision_certificate": false,
+            "contained_components": [],
+            "elapsed_sec": 0.02432487503392622,
+            "folded_faces": [],
+            "full_body": true,
+            "hard_violations": [],
+            "mesh_policy_sha256": null,
+            "mesh_policy_version": null,
+            "profile_sha256": null,
+            "status": "mesh_unverified",
+            "topology_sha256": "caeb067cd69232d4256a9dc087ae2bf2dfe65fcc00f2e96f0ffb78de1742fd09",
+            "triangle_intersections": [],
+            "triangle_pairs_checked": 0,
+            "triangles": 50010,
+            "unverified_reasons": [
+              "mesh_policy_unsupported",
+              "mesh_triangle_budget"
+            ],
+            "version": "full-body-posed-skin-v2",
+            "vertices": 24999
+          },
+          "pose": "standing",
+          "preview_bytes": 1201308,
+          "queue_ms": 0.01337495632469654,
+          "sex": "female",
+          "skin_safe": false,
+          "stages": {
+            "hand_import_apply_export": {
+              "duration_ms": 156.00245801033452,
+              "ok": true
+            },
+            "retarget_initial_export": {
+              "duration_ms": 751.327832986135,
+              "ok": true
+            },
+            "worker_init": {
+              "duration_ms": 12.734916992485523,
+              "ok": true
+            }
+          },
+          "strict_adapter_outcome": "structural_checked_not_skin_safe",
+          "structure": {
+            "artifact_sha256": "9c641fe4b9d08ad5e7b1de4e6eb7fab860bffc704087cc995b0765a6eed7c561",
+            "bones": 52,
+            "meshes": 1,
+            "polygons": 50010,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 24999
+          },
+          "total_ms": 2895.2285000123084
+        },
+        {
+          "artifact_bytes": 2003212,
+          "artifact_sha256": "0fd8975fccc00b50a2d0a2e9fd60e590216d981d81254af9419349db320b31b9",
+          "baseline_restored": true,
+          "baseline_sha256": "3445801cfa1b38081bb84715d69ae0f55e7d2a0da21f6ea7119fb89b006f0b44",
+          "convert_ms": 1725.122542004101,
+          "correspondence": {
+            "max_coordinate_error_m": 0.0,
+            "surface_verified": true,
+            "tolerance_m": 0.0001,
+            "triangles": 50000
+          },
+          "execution_ms": 1725.0336660072207,
+          "fbx_serialization": [
+            {
+              "bytes": 2002940,
+              "duration_ms": 73.86004098225385
+            },
+            {
+              "bytes": 2003212,
+              "duration_ms": 72.30604201322421
+            }
+          ],
+          "hands": {
+            "complete_collision_certificate": false,
+            "examples": [
+              [
+                3069,
+                1031
+              ],
+              [
+                3496,
+                1031
+              ],
+              [
+                3495,
+                1031
+              ],
+              [
+                3481,
+                1031
+              ],
+              [
+                3482,
+                1031
+              ],
+              [
+                3498,
+                1031
+              ],
+              [
+                3487,
+                2232
+              ],
+              [
+                3486,
+                2232
+              ]
+            ],
+            "intersection_pairs": 150,
+            "method": "evaluated_skin_opposite_hand_triangle_crossing_v1",
+            "scope": "opposite_hands_only",
+            "screened_artifact_sha256": "0fd8975fccc00b50a2d0a2e9fd60e590216d981d81254af9419349db320b31b9",
+            "status": "intersection",
+            "triangle_counts": {
+              "left": 3636,
+              "right": 3659
+            }
+          },
+          "inspection_wall_ms": 3759.6204170258716,
+          "inspection_worker_ms": 3212.200334004592,
+          "mesh": {
+            "broadphase_pairs_examined": 341902,
+            "closed_manifold": true,
+            "complete_collision_certificate": false,
+            "components": 1,
+            "consistently_oriented": true,
+            "contained_components": [],
+            "elapsed_sec": 2.42970845795935,
+            "folded_faces": [],
+            "full_body": true,
+            "hard_violations": [
+              "skin_triangle_intersection"
+            ],
+            "mesh_policy_sha256": null,
+            "mesh_policy_version": null,
+            "profile_sha256": null,
+            "shared_boundary_certified_pairs": 313122,
+            "status": "validation_blocked",
+            "topology_sha256": "c538e0c65c2bda575ee073c8e728bac892b6909d5b85bdd44b4c4a1889ab303a",
+            "triangle_intersections": [
+              [
+                10962,
+                11041
+              ],
+              [
+                10962,
+                11042
+              ],
+              [
+                10963,
+                11041
+              ],
+              [
+                10961,
+                11042
+              ],
+              [
+                11041,
+                10966
+              ],
+              [
+                11041,
+                10956
+              ],
+              [
+                11042,
+                10958
+              ],
+              [
+                11042,
+                10956
+              ],
+              [
+                14054,
+                14675
+              ],
+              [
+                14054,
+                14676
+              ],
+              [
+                14055,
+                14675
+              ],
+              [
+                14061,
+                14675
+              ],
+              [
+                14675,
+                14062
+              ],
+              [
+                13898,
+                16431
+              ],
+              [
+                13898,
+                16049
+              ],
+              [
+                13898,
+                16048
+              ]
+            ],
+            "triangle_pairs_checked": 28780,
+            "triangles": 50000,
+            "unverified_reasons": [
+              "mesh_policy_unsupported",
+              "fold_reference_unavailable"
+            ],
+            "version": "full-body-posed-skin-v2",
+            "vertices": 24988
+          },
+          "pose": "sitting-diagnostic-only",
+          "preview_bytes": 1200920,
+          "queue_ms": 0.0118750031106174,
+          "sex": "male",
+          "skin_safe": false,
+          "stages": {
+            "hand_import_apply_export": {
+              "duration_ms": 172.9053750168532,
+              "ok": true
+            },
+            "retarget_initial_export": {
+              "duration_ms": 852.511124976445,
+              "ok": true
+            },
+            "worker_init": {
+              "duration_ms": 15.482041984796524,
+              "ok": true
+            }
+          },
+          "strict_adapter_outcome": "blocked_not_cached",
+          "structure": {
+            "artifact_sha256": "0fd8975fccc00b50a2d0a2e9fd60e590216d981d81254af9419349db320b31b9",
+            "bones": 52,
+            "meshes": 1,
+            "polygons": 50000,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 24988
+          },
+          "total_ms": 5484.74400001578
+        },
+        {
+          "artifact_bytes": 1700748,
+          "artifact_sha256": "733ed09126b567fb9aea7113fc59e9612a21b84fdec5e1394a3b35b7e260f896",
+          "baseline_restored": true,
+          "baseline_sha256": "3445801cfa1b38081bb84715d69ae0f55e7d2a0da21f6ea7119fb89b006f0b44",
+          "convert_ms": 7983.098917000461,
+          "correspondence": {
+            "max_coordinate_error_m": 0.0,
+            "surface_verified": true,
+            "tolerance_m": 0.0001,
+            "triangles": 50010
+          },
+          "execution_ms": 7983.009833958931,
+          "fbx_serialization": [
+            {
+              "bytes": 1699884,
+              "duration_ms": 58.1635829876177
+            },
+            {
+              "bytes": 1700748,
+              "duration_ms": 58.45250003039837
+            }
+          ],
+          "hands": {
+            "complete_collision_certificate": false,
+            "examples": [],
+            "intersection_pairs": 0,
+            "method": "evaluated_skin_opposite_hand_triangle_crossing_v1",
+            "scope": "opposite_hands_only",
+            "screened_artifact_sha256": "733ed09126b567fb9aea7113fc59e9612a21b84fdec5e1394a3b35b7e260f896",
+            "status": "clear_screen",
+            "triangle_counts": {
+              "left": 3754,
+              "right": 3758
+            }
+          },
+          "inspection_wall_ms": 1288.7057500192896,
+          "inspection_worker_ms": 753.3105000038631,
+          "mesh": {
+            "complete_collision_certificate": false,
+            "contained_components": [],
+            "elapsed_sec": 0.025046250026207417,
+            "folded_faces": [],
+            "full_body": true,
+            "hard_violations": [],
+            "mesh_policy_sha256": null,
+            "mesh_policy_version": null,
+            "profile_sha256": null,
+            "status": "mesh_unverified",
+            "topology_sha256": "caeb067cd69232d4256a9dc087ae2bf2dfe65fcc00f2e96f0ffb78de1742fd09",
+            "triangle_intersections": [],
+            "triangle_pairs_checked": 0,
+            "triangles": 50010,
+            "unverified_reasons": [
+              "mesh_policy_unsupported",
+              "mesh_triangle_budget"
+            ],
+            "version": "full-body-posed-skin-v2",
+            "vertices": 24999
+          },
+          "pose": "standing-shaped",
+          "preview_bytes": 1201324,
+          "queue_ms": 0.011417025234550238,
+          "sex": "female",
+          "skin_safe": false,
+          "stages": {
+            "hand_import_apply_export": {
+              "duration_ms": 151.31362504325807,
+              "ok": true
+            },
+            "retarget_initial_export": {
+              "duration_ms": 7177.021750016138,
+              "ok": true
+            },
+            "worker_init": {
+              "duration_ms": 12.20533304149285,
+              "ok": true
+            }
+          },
+          "strict_adapter_outcome": "structural_checked_not_skin_safe",
+          "structure": {
+            "artifact_sha256": "733ed09126b567fb9aea7113fc59e9612a21b84fdec5e1394a3b35b7e260f896",
+            "bones": 52,
+            "meshes": 1,
+            "polygons": 50010,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 24999
+          },
+          "total_ms": 9271.805417025462
+        }
+      ],
+      "rss_scope": "process-lifetime child high-water; not sum of simultaneous child RSS",
+      "samples": 4,
+      "wall_ms": 24316.701165982522
+    },
+    {
+      "child_cpu_seconds": 22.937007,
+      "child_peak_rss_bytes": 485130240,
+      "concurrency": 1,
+      "mode": "warm",
+      "rows": [
+        {
+          "artifact_bytes": 2006940,
+          "artifact_sha256": "8b0fb88046f947cadfaf1d50fe3a426b3f0dcb7f29a39bac99415e36c1b3a05a",
+          "baseline_restored": true,
+          "baseline_sha256": "3445801cfa1b38081bb84715d69ae0f55e7d2a0da21f6ea7119fb89b006f0b44",
+          "convert_ms": 1699.6661250013858,
+          "correspondence": {
+            "max_coordinate_error_m": 0.0,
+            "surface_verified": true,
+            "tolerance_m": 0.0001,
+            "triangles": 50000
+          },
+          "execution_ms": 1699.5749580091797,
+          "fbx_serialization": [
+            {
+              "bytes": 2006444,
+              "duration_ms": 74.55804100027308
+            },
+            {
+              "bytes": 2006940,
+              "duration_ms": 71.51533401338384
+            }
+          ],
+          "hands": {
+            "complete_collision_certificate": false,
+            "examples": [],
+            "intersection_pairs": 0,
+            "method": "evaluated_skin_opposite_hand_triangle_crossing_v1",
+            "scope": "opposite_hands_only",
+            "screened_artifact_sha256": "8b0fb88046f947cadfaf1d50fe3a426b3f0dcb7f29a39bac99415e36c1b3a05a",
+            "status": "clear_screen",
+            "triangle_counts": {
+              "left": 3636,
+              "right": 3659
+            }
+          },
+          "inspection_wall_ms": 3847.913499979768,
+          "inspection_worker_ms": 3299.9252500012517,
+          "mesh": {
+            "broadphase_pairs_examined": 334148,
+            "closed_manifold": true,
+            "complete_collision_certificate": false,
+            "components": 1,
+            "consistently_oriented": true,
+            "contained_components": [],
+            "elapsed_sec": 2.547976417001337,
+            "folded_faces": [],
+            "full_body": true,
+            "hard_violations": [
+              "skin_triangle_intersection"
+            ],
+            "mesh_policy_sha256": null,
+            "mesh_policy_version": null,
+            "profile_sha256": null,
+            "shared_boundary_certified_pairs": 313110,
+            "status": "validation_blocked",
+            "topology_sha256": "c538e0c65c2bda575ee073c8e728bac892b6909d5b85bdd44b4c4a1889ab303a",
+            "triangle_intersections": [
+              [
+                10962,
+                11041
+              ],
+              [
+                10962,
+                11042
+              ],
+              [
+                10963,
+                11041
+              ],
+              [
+                10961,
+                11042
+              ],
+              [
+                11041,
+                10966
+              ],
+              [
+                11041,
+                10956
+              ],
+              [
+                11042,
+                10958
+              ],
+              [
+                11042,
+                10956
+              ],
+              [
+                9458,
+                9974
+              ],
+              [
+                9649,
+                9974
+              ],
+              [
+                14054,
+                14675
+              ],
+              [
+                14054,
+                14676
+              ],
+              [
+                14055,
+                14675
+              ],
+              [
+                14061,
+                14675
+              ],
+              [
+                9407,
+                10345
+              ],
+              [
+                9408,
+                10345
+              ]
+            ],
+            "triangle_pairs_checked": 21038,
+            "triangles": 50000,
+            "unverified_reasons": [
+              "mesh_policy_unsupported",
+              "fold_reference_unavailable"
+            ],
+            "version": "full-body-posed-skin-v2",
+            "vertices": 24988
+          },
+          "pose": "standing",
+          "preview_bytes": 1200920,
+          "queue_ms": 0.00904203625395894,
+          "sex": "male",
+          "skin_safe": false,
+          "stages": {
+            "hand_import_apply_export": {
+              "duration_ms": 169.9726249789819,
+              "ok": true
+            },
+            "retarget_initial_export": {
+              "duration_ms": 843.5728329932317,
+              "ok": true
+            },
+            "worker_init": {
+              "duration_ms": 15.162916970439255,
+              "ok": true
+            }
+          },
+          "strict_adapter_outcome": "blocked_not_cached",
+          "structure": {
+            "artifact_sha256": "8b0fb88046f947cadfaf1d50fe3a426b3f0dcb7f29a39bac99415e36c1b3a05a",
+            "bones": 52,
+            "meshes": 1,
+            "polygons": 50000,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 24988
+          },
+          "total_ms": 5547.580624988768
+        },
+        {
+          "artifact_bytes": 1701164,
+          "artifact_sha256": "5c18857bbdc0c30b6a8845c0511b798aad031dbd0f528378c6525b4c4d8a2f82",
+          "baseline_restored": true,
+          "baseline_sha256": "3445801cfa1b38081bb84715d69ae0f55e7d2a0da21f6ea7119fb89b006f0b44",
+          "convert_ms": 1554.757208970841,
+          "correspondence": {
+            "max_coordinate_error_m": 0.0,
+            "surface_verified": true,
+            "tolerance_m": 0.0001,
+            "triangles": 50010
+          },
+          "execution_ms": 1554.662999988068,
+          "fbx_serialization": [
+            {
+              "bytes": 1699884,
+              "duration_ms": 60.757291968911886
+            },
+            {
+              "bytes": 1701164,
+              "duration_ms": 58.1125000026077
+            }
+          ],
+          "hands": {
+            "complete_collision_certificate": false,
+            "examples": [],
+            "intersection_pairs": 0,
+            "method": "evaluated_skin_opposite_hand_triangle_crossing_v1",
+            "scope": "opposite_hands_only",
+            "screened_artifact_sha256": "5c18857bbdc0c30b6a8845c0511b798aad031dbd0f528378c6525b4c4d8a2f82",
+            "status": "clear_screen",
+            "triangle_counts": {
+              "left": 3754,
+              "right": 3758
+            }
+          },
+          "inspection_wall_ms": 1334.2229580157436,
+          "inspection_worker_ms": 741.8102090014145,
+          "mesh": {
+            "complete_collision_certificate": false,
+            "contained_components": [],
+            "elapsed_sec": 0.024994749983306974,
+            "folded_faces": [],
+            "full_body": true,
+            "hard_violations": [],
+            "mesh_policy_sha256": null,
+            "mesh_policy_version": null,
+            "profile_sha256": null,
+            "status": "mesh_unverified",
+            "topology_sha256": "caeb067cd69232d4256a9dc087ae2bf2dfe65fcc00f2e96f0ffb78de1742fd09",
+            "triangle_intersections": [],
+            "triangle_pairs_checked": 0,
+            "triangles": 50010,
+            "unverified_reasons": [
+              "mesh_policy_unsupported",
+              "mesh_triangle_budget"
+            ],
+            "version": "full-body-posed-skin-v2",
+            "vertices": 24999
+          },
+          "pose": "standing",
+          "preview_bytes": 1201308,
+          "queue_ms": 0.013000040780752897,
+          "sex": "female",
+          "skin_safe": false,
+          "stages": {
+            "hand_import_apply_export": {
+              "duration_ms": 145.30416700290516,
+              "ok": true
+            },
+            "retarget_initial_export": {
+              "duration_ms": 730.498582997825,
+              "ok": true
+            },
+            "worker_init": {
+              "duration_ms": 13.259208993986249,
+              "ok": true
+            }
+          },
+          "strict_adapter_outcome": "structural_checked_not_skin_safe",
+          "structure": {
+            "artifact_sha256": "5c18857bbdc0c30b6a8845c0511b798aad031dbd0f528378c6525b4c4d8a2f82",
+            "bones": 52,
+            "meshes": 1,
+            "polygons": 50010,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 24999
+          },
+          "total_ms": 2888.981124968268
+        },
+        {
+          "artifact_bytes": 2003212,
+          "artifact_sha256": "9d51ba2186b6709cdd480fd4d80c009f99be0ce6d5b9f73f1cb6585a17f4b46e",
+          "baseline_restored": true,
+          "baseline_sha256": "3445801cfa1b38081bb84715d69ae0f55e7d2a0da21f6ea7119fb89b006f0b44",
+          "convert_ms": 1707.8439579927363,
+          "correspondence": {
+            "max_coordinate_error_m": 0.0,
+            "surface_verified": true,
+            "tolerance_m": 0.0001,
+            "triangles": 50000
+          },
+          "execution_ms": 1707.75737502845,
+          "fbx_serialization": [
+            {
+              "bytes": 2002940,
+              "duration_ms": 75.72362496284768
+            },
+            {
+              "bytes": 2003212,
+              "duration_ms": 73.15129099879414
+            }
+          ],
+          "hands": {
+            "complete_collision_certificate": false,
+            "examples": [
+              [
+                3069,
+                1031
+              ],
+              [
+                3496,
+                1031
+              ],
+              [
+                3495,
+                1031
+              ],
+              [
+                3481,
+                1031
+              ],
+              [
+                3482,
+                1031
+              ],
+              [
+                3498,
+                1031
+              ],
+              [
+                3487,
+                2232
+              ],
+              [
+                3486,
+                2232
+              ]
+            ],
+            "intersection_pairs": 150,
+            "method": "evaluated_skin_opposite_hand_triangle_crossing_v1",
+            "scope": "opposite_hands_only",
+            "screened_artifact_sha256": "9d51ba2186b6709cdd480fd4d80c009f99be0ce6d5b9f73f1cb6585a17f4b46e",
+            "status": "intersection",
+            "triangle_counts": {
+              "left": 3636,
+              "right": 3659
+            }
+          },
+          "inspection_wall_ms": 3705.026582989376,
+          "inspection_worker_ms": 3155.7853329577483,
+          "mesh": {
+            "broadphase_pairs_examined": 341902,
+            "closed_manifold": true,
+            "complete_collision_certificate": false,
+            "components": 1,
+            "consistently_oriented": true,
+            "contained_components": [],
+            "elapsed_sec": 2.393808832974173,
+            "folded_faces": [],
+            "full_body": true,
+            "hard_violations": [
+              "skin_triangle_intersection"
+            ],
+            "mesh_policy_sha256": null,
+            "mesh_policy_version": null,
+            "profile_sha256": null,
+            "shared_boundary_certified_pairs": 313122,
+            "status": "validation_blocked",
+            "topology_sha256": "c538e0c65c2bda575ee073c8e728bac892b6909d5b85bdd44b4c4a1889ab303a",
+            "triangle_intersections": [
+              [
+                10962,
+                11041
+              ],
+              [
+                10962,
+                11042
+              ],
+              [
+                10963,
+                11041
+              ],
+              [
+                10961,
+                11042
+              ],
+              [
+                11041,
+                10966
+              ],
+              [
+                11041,
+                10956
+              ],
+              [
+                11042,
+                10958
+              ],
+              [
+                11042,
+                10956
+              ],
+              [
+                14054,
+                14675
+              ],
+              [
+                14054,
+                14676
+              ],
+              [
+                14055,
+                14675
+              ],
+              [
+                14061,
+                14675
+              ],
+              [
+                14675,
+                14062
+              ],
+              [
+                13898,
+                16431
+              ],
+              [
+                13898,
+                16049
+              ],
+              [
+                13898,
+                16048
+              ]
+            ],
+            "triangle_pairs_checked": 28780,
+            "triangles": 50000,
+            "unverified_reasons": [
+              "mesh_policy_unsupported",
+              "fold_reference_unavailable"
+            ],
+            "version": "full-body-posed-skin-v2",
+            "vertices": 24988
+          },
+          "pose": "sitting-diagnostic-only",
+          "preview_bytes": 1200920,
+          "queue_ms": 0.012083037290722132,
+          "sex": "male",
+          "skin_safe": false,
+          "stages": {
+            "hand_import_apply_export": {
+              "duration_ms": 174.23816700465977,
+              "ok": true
+            },
+            "retarget_initial_export": {
+              "duration_ms": 844.8599579860456,
+              "ok": true
+            },
+            "worker_init": {
+              "duration_ms": 14.68458300223574,
+              "ok": true
+            }
+          },
+          "strict_adapter_outcome": "blocked_not_cached",
+          "structure": {
+            "artifact_sha256": "9d51ba2186b6709cdd480fd4d80c009f99be0ce6d5b9f73f1cb6585a17f4b46e",
+            "bones": 52,
+            "meshes": 1,
+            "polygons": 50000,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 24988
+          },
+          "total_ms": 5412.871415959671
+        },
+        {
+          "artifact_bytes": 1700748,
+          "artifact_sha256": "48389faf9d4351cfbce8f57c4d5c01b311fb53ea8c9f150dcf2b28055a93095e",
+          "baseline_restored": true,
+          "baseline_sha256": "3445801cfa1b38081bb84715d69ae0f55e7d2a0da21f6ea7119fb89b006f0b44",
+          "convert_ms": 7852.6592500275,
+          "correspondence": {
+            "max_coordinate_error_m": 0.0,
+            "surface_verified": true,
+            "tolerance_m": 0.0001,
+            "triangles": 50010
+          },
+          "execution_ms": 7852.568790956866,
+          "fbx_serialization": [
+            {
+              "bytes": 1699884,
+              "duration_ms": 58.32283402560279
+            },
+            {
+              "bytes": 1700748,
+              "duration_ms": 59.75179100641981
+            }
+          ],
+          "hands": {
+            "complete_collision_certificate": false,
+            "examples": [],
+            "intersection_pairs": 0,
+            "method": "evaluated_skin_opposite_hand_triangle_crossing_v1",
+            "scope": "opposite_hands_only",
+            "screened_artifact_sha256": "48389faf9d4351cfbce8f57c4d5c01b311fb53ea8c9f150dcf2b28055a93095e",
+            "status": "clear_screen",
+            "triangle_counts": {
+              "left": 3754,
+              "right": 3758
+            }
+          },
+          "inspection_wall_ms": 1338.4263750049286,
+          "inspection_worker_ms": 763.3798750466667,
+          "mesh": {
+            "complete_collision_certificate": false,
+            "contained_components": [],
+            "elapsed_sec": 0.02600054204231128,
+            "folded_faces": [],
+            "full_body": true,
+            "hard_violations": [],
+            "mesh_policy_sha256": null,
+            "mesh_policy_version": null,
+            "profile_sha256": null,
+            "status": "mesh_unverified",
+            "topology_sha256": "caeb067cd69232d4256a9dc087ae2bf2dfe65fcc00f2e96f0ffb78de1742fd09",
+            "triangle_intersections": [],
+            "triangle_pairs_checked": 0,
+            "triangles": 50010,
+            "unverified_reasons": [
+              "mesh_policy_unsupported",
+              "mesh_triangle_budget"
+            ],
+            "version": "full-body-posed-skin-v2",
+            "vertices": 24999
+          },
+          "pose": "standing-shaped",
+          "preview_bytes": 1201324,
+          "queue_ms": 0.010542047675698996,
+          "sex": "female",
+          "skin_safe": false,
+          "stages": {
+            "hand_import_apply_export": {
+              "duration_ms": 153.07495900196955,
+              "ok": true
+            },
+            "retarget_initial_export": {
+              "duration_ms": 7026.016167015769,
+              "ok": true
+            },
+            "worker_init": {
+              "duration_ms": 12.291208025999367,
+              "ok": true
+            }
+          },
+          "strict_adapter_outcome": "structural_checked_not_skin_safe",
+          "structure": {
+            "artifact_sha256": "48389faf9d4351cfbce8f57c4d5c01b311fb53ea8c9f150dcf2b28055a93095e",
+            "bones": 52,
+            "meshes": 1,
+            "polygons": 50010,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 24999
+          },
+          "total_ms": 9191.086583014112
+        }
+      ],
+      "rss_scope": "process-lifetime child high-water; not sum of simultaneous child RSS",
+      "samples": 4,
+      "wall_ms": 23043.12770802062
+    },
+    {
+      "child_cpu_seconds": 27.286734000000003,
+      "child_peak_rss_bytes": 485130240,
+      "concurrency": 2,
+      "mode": "cold",
+      "rows": [
+        {
+          "artifact_bytes": 2006940,
+          "artifact_sha256": "4e9ab894fbb6b31f137105170ecc2742bc9df68da60eaf75955ffd725834e77f",
+          "baseline_restored": true,
+          "baseline_sha256": "3445801cfa1b38081bb84715d69ae0f55e7d2a0da21f6ea7119fb89b006f0b44",
+          "convert_ms": 2026.196540973615,
+          "correspondence": {
+            "max_coordinate_error_m": 0.0,
+            "surface_verified": true,
+            "tolerance_m": 0.0001,
+            "triangles": 50000
+          },
+          "execution_ms": 2026.113667001482,
+          "fbx_serialization": [
+            {
+              "bytes": 2006444,
+              "duration_ms": 76.89570804359391
+            },
+            {
+              "bytes": 2006940,
+              "duration_ms": 84.31616600137204
+            }
+          ],
+          "hands": {
+            "complete_collision_certificate": false,
+            "examples": [],
+            "intersection_pairs": 0,
+            "method": "evaluated_skin_opposite_hand_triangle_crossing_v1",
+            "scope": "opposite_hands_only",
+            "screened_artifact_sha256": "4e9ab894fbb6b31f137105170ecc2742bc9df68da60eaf75955ffd725834e77f",
+            "status": "clear_screen",
+            "triangle_counts": {
+              "left": 3636,
+              "right": 3659
+            }
+          },
+          "inspection_wall_ms": 4473.87945902301,
+          "inspection_worker_ms": 3854.022042010911,
+          "mesh": {
+            "broadphase_pairs_examined": 332018,
+            "closed_manifold": true,
+            "complete_collision_certificate": false,
+            "components": 1,
+            "consistently_oriented": true,
+            "contained_components": [],
+            "elapsed_sec": 3.0012133750133216,
+            "folded_faces": [],
+            "full_body": true,
+            "hard_violations": [
+              "skin_triangle_intersection"
+            ],
+            "mesh_policy_sha256": null,
+            "mesh_policy_version": null,
+            "profile_sha256": null,
+            "shared_boundary_certified_pairs": 311104,
+            "status": "validation_blocked",
+            "topology_sha256": "c538e0c65c2bda575ee073c8e728bac892b6909d5b85bdd44b4c4a1889ab303a",
+            "triangle_intersections": [
+              [
+                10962,
+                11041
+              ],
+              [
+                10962,
+                11042
+              ],
+              [
+                10963,
+                11041
+              ],
+              [
+                10961,
+                11042
+              ],
+              [
+                11041,
+                10966
+              ],
+              [
+                11041,
+                10956
+              ],
+              [
+                11042,
+                10958
+              ],
+              [
+                11042,
+                10956
+              ],
+              [
+                9458,
+                9974
+              ],
+              [
+                9649,
+                9974
+              ],
+              [
+                14054,
+                14675
+              ],
+              [
+                14054,
+                14676
+              ],
+              [
+                14055,
+                14675
+              ],
+              [
+                14061,
+                14675
+              ],
+              [
+                9407,
+                10345
+              ],
+              [
+                9408,
+                10345
+              ]
+            ],
+            "triangle_pairs_checked": 20914,
+            "triangles": 50000,
+            "unverified_reasons": [
+              "mesh_policy_unsupported",
+              "fold_reference_unavailable",
+              "validation_deadline"
+            ],
+            "version": "full-body-posed-skin-v2",
+            "vertices": 24988
+          },
+          "pose": "standing",
+          "preview_bytes": 1200920,
+          "queue_ms": 0.008125032763928175,
+          "sex": "male",
+          "skin_safe": false,
+          "stages": {
+            "hand_import_apply_export": {
+              "duration_ms": 196.9900419935584,
+              "ok": true
+            },
+            "retarget_initial_export": {
+              "duration_ms": 892.6592079806142,
+              "ok": true
+            },
+            "worker_init": {
+              "duration_ms": 15.371749992482364,
+              "ok": true
+            }
+          },
+          "strict_adapter_outcome": "blocked_not_cached",
+          "structure": {
+            "artifact_sha256": "4e9ab894fbb6b31f137105170ecc2742bc9df68da60eaf75955ffd725834e77f",
+            "bones": 52,
+            "meshes": 1,
+            "polygons": 50000,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 24988
+          },
+          "total_ms": 6500.077124976087
+        },
+        {
+          "artifact_bytes": 1701164,
+          "artifact_sha256": "fe32f855ec59211f27d8a429717166bf69a9cbcd5675bea357d39157c199e318",
+          "baseline_restored": true,
+          "baseline_sha256": "3445801cfa1b38081bb84715d69ae0f55e7d2a0da21f6ea7119fb89b006f0b44",
+          "convert_ms": 1825.5120830144733,
+          "correspondence": {
+            "max_coordinate_error_m": 0.0,
+            "surface_verified": true,
+            "tolerance_m": 0.0001,
+            "triangles": 50010
+          },
+          "execution_ms": 1825.461542000994,
+          "fbx_serialization": [
+            {
+              "bytes": 1699884,
+              "duration_ms": 62.53037502756342
+            },
+            {
+              "bytes": 1701164,
+              "duration_ms": 61.91616697469726
+            }
+          ],
+          "hands": {
+            "complete_collision_certificate": false,
+            "examples": [],
+            "intersection_pairs": 0,
+            "method": "evaluated_skin_opposite_hand_triangle_crossing_v1",
+            "scope": "opposite_hands_only",
+            "screened_artifact_sha256": "fe32f855ec59211f27d8a429717166bf69a9cbcd5675bea357d39157c199e318",
+            "status": "clear_screen",
+            "triangle_counts": {
+              "left": 3754,
+              "right": 3758
+            }
+          },
+          "inspection_wall_ms": 1448.1854580226354,
+          "inspection_worker_ms": 813.3327079704031,
+          "mesh": {
+            "complete_collision_certificate": false,
+            "contained_components": [],
+            "elapsed_sec": 0.026387125020846725,
+            "folded_faces": [],
+            "full_body": true,
+            "hard_violations": [],
+            "mesh_policy_sha256": null,
+            "mesh_policy_version": null,
+            "profile_sha256": null,
+            "status": "mesh_unverified",
+            "topology_sha256": "caeb067cd69232d4256a9dc087ae2bf2dfe65fcc00f2e96f0ffb78de1742fd09",
+            "triangle_intersections": [],
+            "triangle_pairs_checked": 0,
+            "triangles": 50010,
+            "unverified_reasons": [
+              "mesh_policy_unsupported",
+              "mesh_triangle_budget"
+            ],
+            "version": "full-body-posed-skin-v2",
+            "vertices": 24999
+          },
+          "pose": "standing",
+          "preview_bytes": 1201308,
+          "queue_ms": 0.0040839659050107,
+          "sex": "female",
+          "skin_safe": false,
+          "stages": {
+            "hand_import_apply_export": {
+              "duration_ms": 158.3971250220202,
+              "ok": true
+            },
+            "retarget_initial_export": {
+              "duration_ms": 768.1855830014683,
+              "ok": true
+            },
+            "worker_init": {
+              "duration_ms": 12.67883402761072,
+              "ok": true
+            }
+          },
+          "strict_adapter_outcome": "structural_checked_not_skin_safe",
+          "structure": {
+            "artifact_sha256": "fe32f855ec59211f27d8a429717166bf69a9cbcd5675bea357d39157c199e318",
+            "bones": 52,
+            "meshes": 1,
+            "polygons": 50010,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 24999
+          },
+          "total_ms": 3273.6985000083223
+        },
+        {
+          "artifact_bytes": 2003212,
+          "artifact_sha256": "6515d5dbeb7377c2c0f0c3bad46d4b473076f2996e3d7216fd66d9cdb2c58d62",
+          "baseline_restored": true,
+          "baseline_sha256": "3445801cfa1b38081bb84715d69ae0f55e7d2a0da21f6ea7119fb89b006f0b44",
+          "convert_ms": 1989.6595000172965,
+          "correspondence": {
+            "max_coordinate_error_m": 0.0,
+            "surface_verified": true,
+            "tolerance_m": 0.0001,
+            "triangles": 50000
+          },
+          "execution_ms": 1989.5697920001112,
+          "fbx_serialization": [
+            {
+              "bytes": 2002940,
+              "duration_ms": 89.04808398801833
+            },
+            {
+              "bytes": 2003212,
+              "duration_ms": 85.90437500970438
+            }
+          ],
+          "hands": {
+            "complete_collision_certificate": false,
+            "examples": [
+              [
+                3069,
+                1031
+              ],
+              [
+                3496,
+                1031
+              ],
+              [
+                3495,
+                1031
+              ],
+              [
+                3481,
+                1031
+              ],
+              [
+                3482,
+                1031
+              ],
+              [
+                3498,
+                1031
+              ],
+              [
+                3487,
+                2232
+              ],
+              [
+                3486,
+                2232
+              ]
+            ],
+            "intersection_pairs": 150,
+            "method": "evaluated_skin_opposite_hand_triangle_crossing_v1",
+            "scope": "opposite_hands_only",
+            "screened_artifact_sha256": "6515d5dbeb7377c2c0f0c3bad46d4b473076f2996e3d7216fd66d9cdb2c58d62",
+            "status": "intersection",
+            "triangle_counts": {
+              "left": 3636,
+              "right": 3659
+            }
+          },
+          "inspection_wall_ms": 4629.076250013895,
+          "inspection_worker_ms": 3908.099291031249,
+          "mesh": {
+            "broadphase_pairs_examined": 341902,
+            "closed_manifold": true,
+            "complete_collision_certificate": false,
+            "components": 1,
+            "consistently_oriented": true,
+            "contained_components": [],
+            "elapsed_sec": 2.968097749981098,
+            "folded_faces": [],
+            "full_body": true,
+            "hard_violations": [
+              "skin_triangle_intersection"
+            ],
+            "mesh_policy_sha256": null,
+            "mesh_policy_version": null,
+            "profile_sha256": null,
+            "shared_boundary_certified_pairs": 313122,
+            "status": "validation_blocked",
+            "topology_sha256": "c538e0c65c2bda575ee073c8e728bac892b6909d5b85bdd44b4c4a1889ab303a",
+            "triangle_intersections": [
+              [
+                10962,
+                11041
+              ],
+              [
+                10962,
+                11042
+              ],
+              [
+                10963,
+                11041
+              ],
+              [
+                10961,
+                11042
+              ],
+              [
+                11041,
+                10966
+              ],
+              [
+                11041,
+                10956
+              ],
+              [
+                11042,
+                10958
+              ],
+              [
+                11042,
+                10956
+              ],
+              [
+                14054,
+                14675
+              ],
+              [
+                14054,
+                14676
+              ],
+              [
+                14055,
+                14675
+              ],
+              [
+                14061,
+                14675
+              ],
+              [
+                14675,
+                14062
+              ],
+              [
+                13898,
+                16431
+              ],
+              [
+                13898,
+                16049
+              ],
+              [
+                13898,
+                16048
+              ]
+            ],
+            "triangle_pairs_checked": 28780,
+            "triangles": 50000,
+            "unverified_reasons": [
+              "mesh_policy_unsupported",
+              "fold_reference_unavailable"
+            ],
+            "version": "full-body-posed-skin-v2",
+            "vertices": 24988
+          },
+          "pose": "sitting-diagnostic-only",
+          "preview_bytes": 1200920,
+          "queue_ms": 0.011041003745049238,
+          "sex": "male",
+          "skin_safe": false,
+          "stages": {
+            "hand_import_apply_export": {
+              "duration_ms": 207.06662494922057,
+              "ok": true
+            },
+            "retarget_initial_export": {
+              "duration_ms": 978.0867090448737,
+              "ok": true
+            },
+            "worker_init": {
+              "duration_ms": 16.55141601804644,
+              "ok": true
+            }
+          },
+          "strict_adapter_outcome": "blocked_not_cached",
+          "structure": {
+            "artifact_sha256": "6515d5dbeb7377c2c0f0c3bad46d4b473076f2996e3d7216fd66d9cdb2c58d62",
+            "bones": 52,
+            "meshes": 1,
+            "polygons": 50000,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 24988
+          },
+          "total_ms": 6618.73700004071
+        },
+        {
+          "artifact_bytes": 1700748,
+          "artifact_sha256": "3d0e58940e91bb30cade01bbb7bd33b37e55445e1a6407363659f50ffcb2dd6a",
+          "baseline_restored": true,
+          "baseline_sha256": "3445801cfa1b38081bb84715d69ae0f55e7d2a0da21f6ea7119fb89b006f0b44",
+          "convert_ms": 13574.685958039481,
+          "correspondence": {
+            "max_coordinate_error_m": 0.0,
+            "surface_verified": true,
+            "tolerance_m": 0.0001,
+            "triangles": 50010
+          },
+          "execution_ms": 13574.513166036922,
+          "fbx_serialization": [
+            {
+              "bytes": 1699884,
+              "duration_ms": 73.59762501437217
+            },
+            {
+              "bytes": 1700748,
+              "duration_ms": 75.32837498001754
+            }
+          ],
+          "hands": {
+            "complete_collision_certificate": false,
+            "examples": [],
+            "intersection_pairs": 0,
+            "method": "evaluated_skin_opposite_hand_triangle_crossing_v1",
+            "scope": "opposite_hands_only",
+            "screened_artifact_sha256": "3d0e58940e91bb30cade01bbb7bd33b37e55445e1a6407363659f50ffcb2dd6a",
+            "status": "clear_screen",
+            "triangle_counts": {
+              "left": 3754,
+              "right": 3758
+            }
+          },
+          "inspection_wall_ms": 1793.4538749977946,
+          "inspection_worker_ms": 933.8948749937117,
+          "mesh": {
+            "complete_collision_certificate": false,
+            "contained_components": [],
+            "elapsed_sec": 0.03030362498247996,
+            "folded_faces": [],
+            "full_body": true,
+            "hard_violations": [],
+            "mesh_policy_sha256": null,
+            "mesh_policy_version": null,
+            "profile_sha256": null,
+            "status": "mesh_unverified",
+            "topology_sha256": "caeb067cd69232d4256a9dc087ae2bf2dfe65fcc00f2e96f0ffb78de1742fd09",
+            "triangle_intersections": [],
+            "triangle_pairs_checked": 0,
+            "triangles": 50010,
+            "unverified_reasons": [
+              "mesh_policy_unsupported",
+              "mesh_triangle_budget"
+            ],
+            "version": "full-body-posed-skin-v2",
+            "vertices": 24999
+          },
+          "pose": "standing-shaped",
+          "preview_bytes": 1201324,
+          "queue_ms": 0.0160830095410347,
+          "sex": "female",
+          "skin_safe": false,
+          "stages": {
+            "hand_import_apply_export": {
+              "duration_ms": 219.56075000343844,
+              "ok": true
+            },
+            "retarget_initial_export": {
+              "duration_ms": 12482.796707947273,
+              "ok": true
+            },
+            "worker_init": {
+              "duration_ms": 16.033917025197297,
+              "ok": true
+            }
+          },
+          "strict_adapter_outcome": "structural_checked_not_skin_safe",
+          "structure": {
+            "artifact_sha256": "3d0e58940e91bb30cade01bbb7bd33b37e55445e1a6407363659f50ffcb2dd6a",
+            "bones": 52,
+            "meshes": 1,
+            "polygons": 50010,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 24999
+          },
+          "total_ms": 15368.140999984462
+        }
+      ],
+      "rss_scope": "process-lifetime child high-water; not sum of simultaneous child RSS",
+      "samples": 4,
+      "wall_ms": 21870.271332969423
+    },
+    {
+      "child_cpu_seconds": 27.545496999999997,
+      "child_peak_rss_bytes": 485130240,
+      "concurrency": 2,
+      "mode": "warm",
+      "rows": [
+        {
+          "artifact_bytes": 2006940,
+          "artifact_sha256": "8a3d64f31f3294ae714f5a9ed3def4230cf5c8629f2834129db0ba8745659ade",
+          "baseline_restored": true,
+          "baseline_sha256": "3445801cfa1b38081bb84715d69ae0f55e7d2a0da21f6ea7119fb89b006f0b44",
+          "convert_ms": 2311.9456249987707,
+          "correspondence": {
+            "max_coordinate_error_m": 0.0,
+            "surface_verified": true,
+            "tolerance_m": 0.0001,
+            "triangles": 50000
+          },
+          "execution_ms": 2311.784624995198,
+          "fbx_serialization": [
+            {
+              "bytes": 2006444,
+              "duration_ms": 97.04695898108184
+            },
+            {
+              "bytes": 2006940,
+              "duration_ms": 95.24616599082947
+            }
+          ],
+          "hands": {
+            "complete_collision_certificate": false,
+            "examples": [],
+            "intersection_pairs": 0,
+            "method": "evaluated_skin_opposite_hand_triangle_crossing_v1",
+            "scope": "opposite_hands_only",
+            "screened_artifact_sha256": "8a3d64f31f3294ae714f5a9ed3def4230cf5c8629f2834129db0ba8745659ade",
+            "status": "clear_screen",
+            "triangle_counts": {
+              "left": 3636,
+              "right": 3659
+            }
+          },
+          "inspection_wall_ms": 4643.036334018689,
+          "inspection_worker_ms": 3947.0130419940688,
+          "mesh": {
+            "broadphase_pairs_examined": 311519,
+            "closed_manifold": true,
+            "complete_collision_certificate": false,
+            "components": 1,
+            "consistently_oriented": true,
+            "contained_components": [],
+            "elapsed_sec": 3.0058229999849573,
+            "folded_faces": [],
+            "full_body": true,
+            "hard_violations": [
+              "skin_triangle_intersection"
+            ],
+            "mesh_policy_sha256": null,
+            "mesh_policy_version": null,
+            "profile_sha256": null,
+            "shared_boundary_certified_pairs": 291954,
+            "status": "validation_blocked",
+            "topology_sha256": "c538e0c65c2bda575ee073c8e728bac892b6909d5b85bdd44b4c4a1889ab303a",
+            "triangle_intersections": [
+              [
+                10962,
+                11041
+              ],
+              [
+                10962,
+                11042
+              ],
+              [
+                10963,
+                11041
+              ],
+              [
+                10961,
+                11042
+              ],
+              [
+                11041,
+                10966
+              ],
+              [
+                11041,
+                10956
+              ],
+              [
+                11042,
+                10958
+              ],
+              [
+                11042,
+                10956
+              ],
+              [
+                9458,
+                9974
+              ],
+              [
+                9649,
+                9974
+              ],
+              [
+                14054,
+                14675
+              ],
+              [
+                14054,
+                14676
+              ],
+              [
+                14055,
+                14675
+              ],
+              [
+                14061,
+                14675
+              ],
+              [
+                9407,
+                10345
+              ],
+              [
+                9408,
+                10345
+              ]
+            ],
+            "triangle_pairs_checked": 19565,
+            "triangles": 50000,
+            "unverified_reasons": [
+              "mesh_policy_unsupported",
+              "fold_reference_unavailable",
+              "validation_deadline"
+            ],
+            "version": "full-body-posed-skin-v2",
+            "vertices": 24988
+          },
+          "pose": "standing",
+          "preview_bytes": 1200920,
+          "queue_ms": 0.019874947611242533,
+          "sex": "male",
+          "skin_safe": false,
+          "stages": {
+            "hand_import_apply_export": {
+              "duration_ms": 231.81495803873986,
+              "ok": true
+            },
+            "retarget_initial_export": {
+              "duration_ms": 1117.821624968201,
+              "ok": true
+            },
+            "worker_init": {
+              "duration_ms": 20.35850001266226,
+              "ok": true
+            }
+          },
+          "strict_adapter_outcome": "blocked_not_cached",
+          "structure": {
+            "artifact_sha256": "8a3d64f31f3294ae714f5a9ed3def4230cf5c8629f2834129db0ba8745659ade",
+            "bones": 52,
+            "meshes": 1,
+            "polygons": 50000,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 24988
+          },
+          "total_ms": 6954.984000010882
+        },
+        {
+          "artifact_bytes": 1701164,
+          "artifact_sha256": "45bf923dfa6712a895998160e3256659fd6c60619c3295f6d88388b48df40a0e",
+          "baseline_restored": true,
+          "baseline_sha256": "3445801cfa1b38081bb84715d69ae0f55e7d2a0da21f6ea7119fb89b006f0b44",
+          "convert_ms": 2028.5151250427589,
+          "correspondence": {
+            "max_coordinate_error_m": 0.0,
+            "surface_verified": true,
+            "tolerance_m": 0.0001,
+            "triangles": 50010
+          },
+          "execution_ms": 2028.3907919656485,
+          "fbx_serialization": [
+            {
+              "bytes": 1699884,
+              "duration_ms": 76.21808297699317
+            },
+            {
+              "bytes": 1701164,
+              "duration_ms": 73.68999999016523
+            }
+          ],
+          "hands": {
+            "complete_collision_certificate": false,
+            "examples": [],
+            "intersection_pairs": 0,
+            "method": "evaluated_skin_opposite_hand_triangle_crossing_v1",
+            "scope": "opposite_hands_only",
+            "screened_artifact_sha256": "45bf923dfa6712a895998160e3256659fd6c60619c3295f6d88388b48df40a0e",
+            "status": "clear_screen",
+            "triangle_counts": {
+              "left": 3754,
+              "right": 3758
+            }
+          },
+          "inspection_wall_ms": 1664.2719999654219,
+          "inspection_worker_ms": 932.7937500202097,
+          "mesh": {
+            "complete_collision_certificate": false,
+            "contained_components": [],
+            "elapsed_sec": 0.030613499984610826,
+            "folded_faces": [],
+            "full_body": true,
+            "hard_violations": [],
+            "mesh_policy_sha256": null,
+            "mesh_policy_version": null,
+            "profile_sha256": null,
+            "status": "mesh_unverified",
+            "topology_sha256": "caeb067cd69232d4256a9dc087ae2bf2dfe65fcc00f2e96f0ffb78de1742fd09",
+            "triangle_intersections": [],
+            "triangle_pairs_checked": 0,
+            "triangles": 50010,
+            "unverified_reasons": [
+              "mesh_policy_unsupported",
+              "mesh_triangle_budget"
+            ],
+            "version": "full-body-posed-skin-v2",
+            "vertices": 24999
+          },
+          "pose": "standing",
+          "preview_bytes": 1201308,
+          "queue_ms": 0.010791991371661425,
+          "sex": "female",
+          "skin_safe": false,
+          "stages": {
+            "hand_import_apply_export": {
+              "duration_ms": 189.64691704604775,
+              "ok": true
+            },
+            "retarget_initial_export": {
+              "duration_ms": 947.02179095475,
+              "ok": true
+            },
+            "worker_init": {
+              "duration_ms": 16.294167027808726,
+              "ok": true
+            }
+          },
+          "strict_adapter_outcome": "structural_checked_not_skin_safe",
+          "structure": {
+            "artifact_sha256": "45bf923dfa6712a895998160e3256659fd6c60619c3295f6d88388b48df40a0e",
+            "bones": 52,
+            "meshes": 1,
+            "polygons": 50010,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 24999
+          },
+          "total_ms": 3692.787915992085
+        },
+        {
+          "artifact_bytes": 2003212,
+          "artifact_sha256": "f7a92dabd9bfaa475087163a238a8d10280e5ffed14332588fa004aa750d4251",
+          "baseline_restored": true,
+          "baseline_sha256": "3445801cfa1b38081bb84715d69ae0f55e7d2a0da21f6ea7119fb89b006f0b44",
+          "convert_ms": 2060.6318340287544,
+          "correspondence": {
+            "max_coordinate_error_m": 0.0,
+            "surface_verified": true,
+            "tolerance_m": 0.0001,
+            "triangles": 50000
+          },
+          "execution_ms": 2060.538124991581,
+          "fbx_serialization": [
+            {
+              "bytes": 2002940,
+              "duration_ms": 90.84583300864324
+            },
+            {
+              "bytes": 2003212,
+              "duration_ms": 89.27749999566004
+            }
+          ],
+          "hands": {
+            "complete_collision_certificate": false,
+            "examples": [
+              [
+                3069,
+                1031
+              ],
+              [
+                3496,
+                1031
+              ],
+              [
+                3495,
+                1031
+              ],
+              [
+                3481,
+                1031
+              ],
+              [
+                3482,
+                1031
+              ],
+              [
+                3498,
+                1031
+              ],
+              [
+                3487,
+                2232
+              ],
+              [
+                3486,
+                2232
+              ]
+            ],
+            "intersection_pairs": 150,
+            "method": "evaluated_skin_opposite_hand_triangle_crossing_v1",
+            "scope": "opposite_hands_only",
+            "screened_artifact_sha256": "f7a92dabd9bfaa475087163a238a8d10280e5ffed14332588fa004aa750d4251",
+            "status": "intersection",
+            "triangle_counts": {
+              "left": 3636,
+              "right": 3659
+            }
+          },
+          "inspection_wall_ms": 4679.800332989544,
+          "inspection_worker_ms": 3988.654166983906,
+          "mesh": {
+            "broadphase_pairs_examined": 340269,
+            "closed_manifold": true,
+            "complete_collision_certificate": false,
+            "components": 1,
+            "consistently_oriented": true,
+            "contained_components": [],
+            "elapsed_sec": 3.0180300420033745,
+            "folded_faces": [],
+            "full_body": true,
+            "hard_violations": [
+              "skin_triangle_intersection"
+            ],
+            "mesh_policy_sha256": null,
+            "mesh_policy_version": null,
+            "profile_sha256": null,
+            "shared_boundary_certified_pairs": 311616,
+            "status": "validation_blocked",
+            "topology_sha256": "c538e0c65c2bda575ee073c8e728bac892b6909d5b85bdd44b4c4a1889ab303a",
+            "triangle_intersections": [
+              [
+                10962,
+                11041
+              ],
+              [
+                10962,
+                11042
+              ],
+              [
+                10963,
+                11041
+              ],
+              [
+                10961,
+                11042
+              ],
+              [
+                11041,
+                10966
+              ],
+              [
+                11041,
+                10956
+              ],
+              [
+                11042,
+                10958
+              ],
+              [
+                11042,
+                10956
+              ],
+              [
+                14054,
+                14675
+              ],
+              [
+                14054,
+                14676
+              ],
+              [
+                14055,
+                14675
+              ],
+              [
+                14061,
+                14675
+              ],
+              [
+                14675,
+                14062
+              ],
+              [
+                13898,
+                16431
+              ],
+              [
+                13898,
+                16049
+              ],
+              [
+                13898,
+                16048
+              ]
+            ],
+            "triangle_pairs_checked": 28653,
+            "triangles": 50000,
+            "unverified_reasons": [
+              "mesh_policy_unsupported",
+              "fold_reference_unavailable",
+              "validation_deadline"
+            ],
+            "version": "full-body-posed-skin-v2",
+            "vertices": 24988
+          },
+          "pose": "sitting-diagnostic-only",
+          "preview_bytes": 1200920,
+          "queue_ms": 0.011834024917334318,
+          "sex": "male",
+          "skin_safe": false,
+          "stages": {
+            "hand_import_apply_export": {
+              "duration_ms": 214.15604196954519,
+              "ok": true
+            },
+            "retarget_initial_export": {
+              "duration_ms": 1007.6709169661626,
+              "ok": true
+            },
+            "worker_init": {
+              "duration_ms": 18.6226669466123,
+              "ok": true
+            }
+          },
+          "strict_adapter_outcome": "blocked_not_cached",
+          "structure": {
+            "artifact_sha256": "f7a92dabd9bfaa475087163a238a8d10280e5ffed14332588fa004aa750d4251",
+            "bones": 52,
+            "meshes": 1,
+            "polygons": 50000,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 24988
+          },
+          "total_ms": 6740.433875005692
+        },
+        {
+          "artifact_bytes": 1700748,
+          "artifact_sha256": "d047cd2e00f2caa0d16ac54c28e8832eb04bdcfccba66f7a6bb8d9eb63c210d9",
+          "baseline_restored": true,
+          "baseline_sha256": "3445801cfa1b38081bb84715d69ae0f55e7d2a0da21f6ea7119fb89b006f0b44",
+          "convert_ms": 9291.360249975696,
+          "correspondence": {
+            "max_coordinate_error_m": 0.0,
+            "surface_verified": true,
+            "tolerance_m": 0.0001,
+            "triangles": 50010
+          },
+          "execution_ms": 9291.273292037658,
+          "fbx_serialization": [
+            {
+              "bytes": 1699884,
+              "duration_ms": 71.12787500955164
+            },
+            {
+              "bytes": 1700748,
+              "duration_ms": 65.17545803217217
+            }
+          ],
+          "hands": {
+            "complete_collision_certificate": false,
+            "examples": [],
+            "intersection_pairs": 0,
+            "method": "evaluated_skin_opposite_hand_triangle_crossing_v1",
+            "scope": "opposite_hands_only",
+            "screened_artifact_sha256": "d047cd2e00f2caa0d16ac54c28e8832eb04bdcfccba66f7a6bb8d9eb63c210d9",
+            "status": "clear_screen",
+            "triangle_counts": {
+              "left": 3754,
+              "right": 3758
+            }
+          },
+          "inspection_wall_ms": 1536.810500023421,
+          "inspection_worker_ms": 874.9406660208479,
+          "mesh": {
+            "complete_collision_certificate": false,
+            "contained_components": [],
+            "elapsed_sec": 0.028554791992064565,
+            "folded_faces": [],
+            "full_body": true,
+            "hard_violations": [],
+            "mesh_policy_sha256": null,
+            "mesh_policy_version": null,
+            "profile_sha256": null,
+            "status": "mesh_unverified",
+            "topology_sha256": "caeb067cd69232d4256a9dc087ae2bf2dfe65fcc00f2e96f0ffb78de1742fd09",
+            "triangle_intersections": [],
+            "triangle_pairs_checked": 0,
+            "triangles": 50010,
+            "unverified_reasons": [
+              "mesh_policy_unsupported",
+              "mesh_triangle_budget"
+            ],
+            "version": "full-body-posed-skin-v2",
+            "vertices": 24999
+          },
+          "pose": "standing-shaped",
+          "preview_bytes": 1201324,
+          "queue_ms": 0.011417025234550238,
+          "sex": "female",
+          "skin_safe": false,
+          "stages": {
+            "hand_import_apply_export": {
+              "duration_ms": 173.7661249935627,
+              "ok": true
+            },
+            "retarget_initial_export": {
+              "duration_ms": 8322.610375005752,
+              "ok": true
+            },
+            "worker_init": {
+              "duration_ms": 15.080416982527822,
+              "ok": true
+            }
+          },
+          "strict_adapter_outcome": "structural_checked_not_skin_safe",
+          "structure": {
+            "artifact_sha256": "d047cd2e00f2caa0d16ac54c28e8832eb04bdcfccba66f7a6bb8d9eb63c210d9",
+            "bones": 52,
+            "meshes": 1,
+            "polygons": 50010,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 24999
+          },
+          "total_ms": 10828.171667002607
+        }
+      ],
+      "rss_scope": "process-lifetime child high-water; not sum of simultaneous child RSS",
+      "samples": 4,
+      "wall_ms": 17784.866041969508
+    }
+  ],
+  "source_solver_calls": 0,
+  "vlm_calls": 0,
+  "warm_definition": "runner version cache/OS warm; all Blender processes cold-isolated",
+  "measured_runtime_revision": "e55b280d9abf5d752af41ea456fc119b68887b6c00fc1bcc2cbb104a487ad83b",
+  "blender_threads": 1,
+  "final_runtime_revision": "fd2ed2885b44e4e73227095039da27570d786b0e820b31b593d2e4e33625891a",
+  "post_measurement_changes": [
+    "Status-only guard: identical source/original is ready_base.",
+    "Caller binding/source/recipe buffers are detached before work; no solver/export/inspection algorithm changed."
+  ]
+}

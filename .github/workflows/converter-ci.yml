@@ -2,7 +2,7 @@ name: Converter CI
 
 on:
   pull_request:
-    branches: [main, develop]
+    branches: [main, develop, codex/outline-fbx-csp-20261105]
     paths:
       - ".github/workflows/converter-ci.yml"
       - ".github/workflows/converter-deploy.yml"
@@ -108,6 +108,7 @@ jobs:
             tests/converter/test_deployment_contract.py \
             tests/converter/test_latency_probe.py \
             tests/converter/test_retarget_cache.py \
+            tests/converter/test_selected_target.py \
             tests/converter/test_fast_scene_reset.py \
             tests/converter/test_preview_instrumentation.py \
             tests/converter/test_interactive_state.py \
