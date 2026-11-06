@@ -2,6 +2,7 @@
 import sys
 from pathlib import Path
 import json
+import hashlib
 import numpy as np
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from compare_posed_intersections import overlaps
@@ -31,7 +32,9 @@ def inspect(source,out):
     seed=edges[ratio.argmax()]
     pairs=overlaps(posed,faces)
     labels=groups(posed,faces,pairs)
-    np.savez_compressed(out.with_suffix(".npz"),labels=labels)
+    np.savez_compressed(out.with_suffix(".npz"),labels=labels,
+                        pairs=np.asarray(sorted(pairs),dtype=int).reshape(-1,2),
+                        sourceSha256=hashlib.sha256(source.read_bytes()).hexdigest())
     row=dict(totalPairs=len(pairs),targetEdge=seed.tolist(),
              sameGroup=bool(labels[seed[0]]==labels[seed[1]]),
              groupSizes=[int((labels==labels[v]).sum()) for v in seed])
