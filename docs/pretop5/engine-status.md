@@ -2,21 +2,37 @@
 
 - Worktree: `/Users/dowon/.codex/worktrees/d3aa/Standin-server`
 - Branch: `codex/pretop5-candidate-engine`
-- Latest fetched develop: `f260b1e6843996935ab287cdfad63465c18f7266`
-- Ownership: api/new candidate source batch, src/refine candidate adapter, scene admission boundary, common CONTRACT.md/schema and corrected design copy. No target/converter or appearance files edited.
-- Dependencies: develop only; no unmerged PR. SelectedTargetProvider is separate post-selection converter/BFF integration. Existing outline/skin/large-preview PRs untouched.
-- Latest user correction implemented: pre-Top5 source only; body/shape/hands/appearance rejected by source API and excluded from cache. Actual target applies only after user pose selection. Source prepare never calls selected target provider.
-- Implemented: private default-off authenticated capabilities/prepare/reuse; immutable read-only source snapshot, exact code/config/runtime/library/set metadata identity; global per-process bounded C1/2 FIFO admission + single-flight + TTL cache; exact base bytes on retention, retryable timeout/crash, zero source solver on selection; no PNG/FBX/VLM/shadow recompute. Repeated scene HTTP cancellation retains actual worker slot.
-- Published contract: shared CONTRACT.md/schema.json. 10 is transport chunk bound; BFF must sequentially chunk 3+ people under one job/revision and whole barrier, never truncate 11+.
-- Validation: Python3.12 full suite3446 passed/10 skipped/31 subtests; final focused56 passed; smoke54/54; compileall/diff check clean. Actual synthetic default-gate ASGI response refined/base accepted by BFF actual schema2/2. Shared `engine-wire-fixture.json` contains source-only evidence, not usable prepared/download authority. See worktree `docs/pretop5/VERIFICATION.md`.
-- Measurement handoff: `/Users/dowon/.codex/worktrees/d3aa/Standin-server/scripts/benchmark_candidate_source.py`, Python `/tmp/pretop5-engine-py312/bin/python`. Target owner schedules C1 then C2 with identical quota/BLAS/resource conditions; report distinguishes cold, warm process without result cache, cache hit, selected reuse. Driver ready, source quant not independently run while target measurement is active. Synthetic two-person10-candidate standing/arm+leg bend/occlusion/unowned partial; no real sitting/contact or target safety claims.
-- Limits: prepared/source capacity64+TTL600s, one engine process for ID affinity; eviction/restart means reuse409 and BFF invalidation/reprepare. Docker daemon absent locally; CI image check required. Empty automatic v3/v4 allowlist; target_refine/automatic_parts/scene_joint_validation false.
-- PR: https://github.com/04JUNG/Standin-server/pull/171 (draft, develop base). Initial PR checks passed; mixed-admission hardening follow-up pending push. No deployment/protected push/merge/activation/paid call/AWS changes.
+- Base/latest fetched develop: `f260b1e6843996935ab287cdfad63465c18f7266`
+- New draft PR: https://github.com/04JUNG/Standin-server/pull/171
+- Verified code commit: `9b6b76df5c63b0dc2b2bb2fd1e5eedd48a1e72c4`; CI and Scene worker CI both success. Evidence-only documentation update follows.
+- Ownership: new api/source batch+reuse, src/refine source adapters/admission, scene cancellation admission, common CONTRACT.md/schema and user-corrected design. Converter/target/appearance files untouched.
+- Dependencies: develop only, no unmerged PR for source. SelectedTargetProvider belongs to the separate post-selection converter/BFF integration. Existing outline/skin/private-model/large-preview PRs untouched.
 
-## PR and final admission review
+## Implemented and verified
 
-- New draft PR: https://github.com/04JUNG/Standin-server/pull/171 (develop base). Initial commit `76641849720cf9d3dc3c51b51b690b0cc7fcfc20`; next hardening commit in progress.
-- Final review added process-wide numerical slots shared by opted-in candidate batch and legacy `/refine`. Actual source C<=1/2 holds for mixed old/new clients; selected legacy work precedes queued auto candidates. Feature OFF preserves original legacy path; opted-in selected saturation returns bounded503/Retry-After1. Automatic batches never enter Blender scene/parts slots.
-- 56 focused tests and final whole Python3.12 suite3446 passed/10 skipped/31 subtests after mixed-admission priority/deadline regressions; source wire fixture regenerated and BFF actual schema2/2 accepted.
+- Latest user flow: search → source-only candidate refine → Top5 → user selects pose → actual body/shape/hands/target/final FBX. Preselection source API rejects target/body/shape/hand/appearance and excludes them from cache. No preselection model/target/PNG/FBX/VLM calls.
+- Private default-off authenticated capabilities/prepare/reuse; immutable source bytes/private read-only file; exact code/config/runtime/library/authoritative set metadata identity; single-flight/TTL; exact source bytes on normal base retention; timeout/crash remains retryable; selected source solver calls0.
+- Source candidate admission20, C1 default/C2 maximum. Opted-in legacy `/refine` and batch share actual process-wide source slots; selected legacy work precedes waiting candidates. Feature OFF preserves original legacy behavior. Queue saturation/timeouts are bounded; actual running work retains its slot. Auto candidates never enter/retry Blender scene/parts slots; repeated scene HTTP cancellation retains admission until actual completion.
+- Internal10 is transport chunk bound, not product person limit. BFF sequential chunks and one job/revision/all-candidate barrier, no truncation11+. BFF role has now explicitly capped public batch64 to match process-local prepared capacity.
+- Python3.12 final full server suite (converter excluded):3446 passed,10 skipped,31 subtests; focused56 passed; smoke54/54; compileall/diff check/pip check clean. CI and Scene worker CI passed for implementation commit9b6b76df5.
+- Actual default-gate authenticated ASGI synthetic refined/base wire accepted by BFF actual compiled schema2/2. Shared engine-wire-fixture.json includes exact bytes/versions. BFF owner additionally recorded real Hono+PGlite→engine HTTP/source solver integration with5candidates (1refined/4base), selected source calls0, PNG/body/target calls0; its own outputs path is in bff-status.md.
 
-- Source quantitative handoff remains pending target-owner resource scheduling; please run driver C1 then C2 (same Python3.12 env + fixed BLAS/quota) and publish outputs/source verdict in shared BENCHMARK.md. Source driver does not run target/model/Blender or VLM; it is independently safe to schedule after target measurement completes. No source latency target/SLA claimed before this evidence.
+## Client display sample
+
+- Shared **fully synthetic Neck-bearing** sample: `engine-synthetic-neck-source/synthetic-neck.base.bvh`, `synthetic-neck.refined.bvh`, `manifest.json`. Repo-authored scaffold + hand-authored Neck, all neutral rotations0; no licensed source/user data. Actual default-gate source prepare returned ready_refined/ok for synthetic LeftArm Z+15deg front observation.
+- Synthetic source SHA `e9cfa2b18e26848dd5f3db26b90313a2b3a2f26247c40fbad471a6d828d19593`; output SHA `496ee278d8b5ac3bb61d38a970872b515369572b1a1f706cfce25a90235b9998`. Required Neck gate intact. Exact receipt in docs/pretop5/neck-wire-fixture.json; IDs illustrative/ephemeral, not download authority.
+- Automatic approval review rejected copying a separate real licensed BVH/derived output to the shared folder because explicit disclosure authorization was absent. That copy did not happen. The wholly synthetic replacement was separately approved and shared; rejected asset was not indirectly released.
+
+## Owner-coordinated source benchmark
+
+- Target/performance owner ran source C1 then C2 sequentially; shared BENCHMARK.md + source-c1-raw.json/source-c2-raw.json inspected. Summary/raw version evidence attached to PR as docs/pretop5/source-benchmark.json.
+- Resource: macOS arm64,15logical CPUs, no quota, BLAS threads1; synthetic2people×5candidates. **Not production1vCPU/p95/SLA**. Measured source code digest `00f635d84716b7cc76a8a0969d86f7908362ddf9fbbb0523dcdcff8623183b5f`, before final shared legacy admission hardening. Mixed-load measurement still required.
+- C1: cold199.47ms, warm recompute192.63ms, cache2.97ms, selected10reuse2.17ms. C2:215.73/210.62/3.41/2.10ms. C2 slower here; default remainsC1.
+- Both:8ready_base+2ready_refined, exact base restoration, identical cold/warm bytes; adapter calls cold/warm10/10, cache/selected0/0; actual peak1/2. All source_only; mesh/contact certificationfalse.
+- Driver: scripts/benchmark_candidate_source.py, venv `/tmp/pretop5-engine-py312/bin/python`. Reports cold empty result cache, warm process with result cache cleared, cache hit, selected reuse; does not imply warm Blender mutation.
+
+## Limits / remaining acceptance
+
+Prepared/source cache capacity64+TTL600s, one engine process for prepared-ID affinity; eviction/restart gives409 and BFF invalidation/reprepare. No durable/multi-replica authority claim. No accepted automatic v3/v4 profile; target_refine/automatic_parts/scene_joint_validation false, original explicit v4 intent and shadow boundaries preserved. Actual selected target/final FBX/relationships belong to other roles. Production-equivalent1vCPU/6GiB and real-rough/contact acceptance remain unclaimed. Docker daemon absent locally; GitHub CI image validation passed.
+
+No deployment/staging rollout/protected branch push or merge/global activation/paid provider/cloud evaluation/AWS changes.
