@@ -17,3 +17,16 @@ The early proposal introduced local strain and bend violations even though the g
 At a radius of 0.012 body extents, the contact guard left 173 movable vertices. Each direction received up to 12 iterations and a 60-second solver budget under the same geometry and motion guards. The length-based direction reached 2.00544 from 2.03294 in 12 iterations. The bone-derived direction reached 2.02431 before its deadline and missed the minimum improvement threshold. The independent audit of the accepted length-based candidate found zero newly stretched edges and zero new threshold crossings for compression, sharpness, folding and collapse.
 
 With the automatic boundary and a 90-second solver budget, the length-based method reached 1.99985 at onset. The single edge above 2× left that class. Maximum displacement was 0.02578 mm, with zero displacement outside the patch. The swept-contact and independent geometry audits passed at their configured tolerances. The elapsed-time limit was reached. The constructed onset is an interpolation of the original rig’s bone transforms. Actual final-pose repair still requires a different feasible correction. All scripts in this experiment are offline probes.
+
+## Bounded retarget adjustments
+
+The joint probe reconstructs the actual raw skinned mesh, selects its longest relative edge, then ranks ancestor joints by the derivative of that edge's length. It rotates the most sensitive joint about its current head. Blender's evaluated mesh matched the predicted vertex positions within 0.44 µm in all six trials.
+
+| Raw skinning pose | Peak before | Peak after 2° | New edges above 2× | Lower bound if each contributing joint can turn up to 2° |
+|---|---:|---:|---:|---:|
+| CMU | 219.90 | 214.41 | 3 | 208.28 |
+| Held-out jump | 200.96 | 195.79 | 0 | 189.34 |
+
+The most sensitive joint was the right thigh for CMU and the left thigh for jump. The jump trial also introduced an area-collapse violation. Neither trial qualified. These are raw skinning results before the v10 surface correction. The 2° cap is an experimental pose-fidelity assumption.
+
+For each joint, the change in the edge vector equals the rotated lever vector minus the original lever vector. The probe computes the minimum length over the spherical cap of possible single-joint rotations. For both measured edges, the partially influencing subtrees are disjoint. A common ancestor rigidly moves both endpoints. Summing each partial subtree's maximum chord gives a conservative bound for simultaneous rotations. This combined bound applies only to rotation around the existing joint heads, without translations or scales.
