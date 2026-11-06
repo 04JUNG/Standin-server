@@ -35,3 +35,9 @@ def test_native_camera_matches_shared_library_projection():
         actual=(native@body@source_camera(bones,view).T)[:,:2]
         expected=project_3d_to_2d(search,view_angle(view))*np.array([1,-1])
         assert np.allclose(actual,expected,atol=1e-6)
+
+
+def test_occluded_forearm_does_not_mask_visible_elbow():
+    from experiments.refine_v5.learning_data import point_visibility
+    m=np.zeros(13,bool);m[0]=True;m[6]=True
+    assert point_visibility(m).tolist()==[True,True,False,False,False,False,False,False,False,True,True,False]

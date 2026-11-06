@@ -47,6 +47,12 @@ def visibility(review):
     for child,parent in [(1,0),(3,2),(5,4),(7,6),(9,1),(10,3),(11,5),(12,7)]:m[child]*=m[parent]
     return m
 
+def point_visibility(part_mask):
+    # Shared elbow/knee belongs to the visible parent even if the child is hidden.
+    m=np.asarray(part_mask,bool);out=[]
+    for start in [0,2,4,6]:out.extend([m[start],m[start],m[start] and m[start+1]])
+    return np.asarray(out,bool)
+
 def normalized_points(kp,scores):
     q=np.array(kp,float)[COCO];score=np.array(scores,float)[COCO]
     center=q[[0,3]].mean(0);width=np.linalg.norm(q[0]-q[3])
