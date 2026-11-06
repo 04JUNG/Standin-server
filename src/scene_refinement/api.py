@@ -109,6 +109,7 @@ def create_app(engine=None, token="", *, factory=None):
         if busy:
             raise HTTPException(503, "scene worker busy", headers={"Retry-After": "5"})
         busy = True
+        worker_task = None
         try:
             data = bytearray()
             async with asyncio.timeout(60):
@@ -126,7 +127,7 @@ def create_app(engine=None, token="", *, factory=None):
                     raise HTTPException(503, {"code": "PARTS_UNAVAILABLE"})
             else:
                 method = target.prepare if stage == "plan" else target.build
-            task = asyncio.create_task(
+            task = worker_task = asyncio.create_task(
                 asyncio.to_thread(
                     method, payload
                 )
@@ -154,6 +155,16 @@ def create_app(engine=None, token="", *, factory=None):
             LOG.warning("scene failed: %s", type(exc).__name__)
             raise HTTPException(502, {"code": "SCENE_WORKER_FAILED"}) from None
         finally:
-            busy = False
+            if worker_task is not None and not worker_task.done():
+                # Repeated ASGI cancellation can interrupt the drain await too.
+                # The actual worker, rather than the HTTP lease, releases admission.
+                def release(completed):
+                    nonlocal busy
+                    if not completed.cancelled():
+                        completed.exception()  # Consume failures without dumping private worker paths.
+                    busy = False
+                worker_task.add_done_callback(release)
+            else:
+                busy = False
 
     return app

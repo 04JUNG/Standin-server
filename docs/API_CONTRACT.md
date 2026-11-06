@@ -1361,3 +1361,17 @@ Converter `/compose-scene` may return an artifact-bound `X-Standin-Scene-Camera`
 ## Opt-in internal interactive Converter
 
 The separately authenticated internal snapshot/static transport is documented in [real-model interactive v2](NEXT_SPRINT/INTERACTIVE_REAL_MODEL_V2_2026-11-04.md). This does not change public inference `/analyze` or `/refine` request/response contracts.
+
+## Source 후보 사전 준비 (private, default OFF)
+
+`candidate-refine-v1`은 검색 후 **체형 적용 전** source 후보를 준비하는 내부 BFF API다.
+`GET /internal/candidate-refine/v1/capabilities`, `POST .../prepare`, `POST .../reuse`는
+`CANDIDATE_REFINE_ENABLED=1` + 32자 이상 `CANDIDATE_REFINE_TOKEN` Bearer 인증을 요구한다.
+요청은 등록된 후보/관측/정확한 검색 카메라와 source SHA만 포함한다. 사용자 체형·shape·손·외양,
+파일 경로, target 메시·안전 주장은 사전 입력으로 받지 않는다. PNG/FBX/VLM 호출이 없다.
+기본 C=1, 최대 C=2와 20개 admission 상한. 최대 10개는 transport chunk이며 BFF가
+3명 이상도 순차 chunk와 한 전체 barrier로 처리한다. 선택 후 source reuse는 solver 호출 없이
+정확한 준비 BVH를 반환한다. 실제 target 적용·선택 조합·최종 파일 검증과 다운로드 권한은 이후 단계다.
+기존 `/refine`과 기존 v3 shadow/v4 명시 지시 API의 동작은 유지한다.
+기계 schema·기한·캐시·원본복구·실패·소유권은 [공통 계약](pretop5/CONTRACT.md),
+요청/응답은 [schema.json](pretop5/schema.json)을 참조한다.

@@ -293,3 +293,13 @@ coarse의 tentative 계열에 제공하는 반대 계열 BASE도 진단용 대�
 선택 후보에 보관한다. 최종 미리보기와 저장은 이 조정 BVH를 사용하며 원본 라이브러리의
 격리/해시 검사는 별도로 유지한다. 조정본의 해시를 원본 해시와 같아야 한다고 검사하면 안 된다.
 참고·생성 후보의 자동 보정/자동 내보내기 제한과 사용자 최종 확인 절차는 변경하지 않는다.
+
+### 사전 source 준비 결과와 선택 후 출력
+
+새 private `candidate-refine-v1`의 준비/재사용 결과는 체형을 입히기 전의 exact source BVH다.
+`prepared_id`/`context_fingerprint`/SHA는 source 계보이며 target 피부 안전이나 최종 FBX
+다운로드 영수증이 아니다. 실제 사용자 선택 후 BFF가 `/internal/candidate-refine/v1/reuse`로
+동일 source를 확인하고, 선택한 후보에만 체형·수치·손·범위를 적용하여 기존 최종 검증을 수행한다.
+source solver를 다시 실행하거나 원본 BVH로 조정본을 덮어쓰지 않는다. 체형/손/외양 변경은
+source 캐시를 무효화하지 않는다. 최종 target/scene 작업으로 자세가 달라지면 새 preview revision과
+동일 파일 검증을 요구한다. [공통 계약](pretop5/CONTRACT.md).
