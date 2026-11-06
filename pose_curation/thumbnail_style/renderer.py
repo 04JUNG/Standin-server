@@ -118,7 +118,10 @@ class Renderer:
         self.ctx = c = gl.create_standalone_context(require=330)
         self.programs = [c.program(vertex_shader=VERTEX, fragment_shader=f) for f in (COLOR, NORMAL)]
         self.color = c.texture((size, size), 4)
-        self.normal = c.texture((size, size), 4)
+        # Alpha carries gl_FragCoord.z for the outline pass. An 8-bit texture
+        # quantizes smooth depth into 1/255 steps, exceeding edgeAt's .003
+        # threshold and drawing false contours across otherwise smooth faces.
+        self.normal = c.texture((size, size), 4, dtype='f4')
         self.color.repeat_x = self.color.repeat_y = False
         self.normal.repeat_x = self.normal.repeat_y = False
         self.normal.filter = (gl.NEAREST, gl.NEAREST)
