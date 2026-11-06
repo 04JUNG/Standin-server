@@ -28,7 +28,7 @@ def _read(root):
 
 
 def _verify(root, base, *, check_images=True):
-    from .thumbnail_overlay import manifest_for, _record, _root
+    from .thumbnail_overlay import manifest_for, _record, _root, _raster
     from .directional_posters import CHARACTER_SHA
     patch = _read(root)
     original = manifest_for(base)
@@ -61,6 +61,7 @@ def _verify(root, base, *, check_images=True):
                 or not HASH.fullmatch(info.get('sha256', ''))):
             raise ValueError('thumbnail patch key or original digest mismatch')
         if check_images:
+            _raster(_root(base) / source / name, record['images'][name])
             _image(root / name, info)
     return patch
 
