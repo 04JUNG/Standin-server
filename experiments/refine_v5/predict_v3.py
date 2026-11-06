@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 from experiments.refine_v5.learning_data import axes,frame,geometry,image_features,normalized_points,visibility,COCO,digest
 from experiments.refine_v5.learned import infer
+from experiments.refine_v5.proposals import derive
 ALLOWED={'case_id','image','image_sha256','source_fbx','source_sha256','source_bones','keypoints','scores','review','seed_kind','fixed_camera','ownership_verified'}
 
 def predict(checkpoint,row):
@@ -18,4 +19,4 @@ def predict(checkpoint,row):
     feature=image_features(im,np.array(row['keypoints'])[COCO]);g=geometry(base,q,m,review['representation'],camera)
     pred=infer(checkpoint,g,feature,base);partmask=visibility(review)
     if not row['ownership_verified']:partmask[:]=0
-    return dict(case_id=row['case_id'],axes=pred['axes'].tolist(),uncertainty_rad=pred['uncertainty'].tolist(),observed_parts=partmask.tolist(),source_sha256=row['source_sha256'],image_sha256=row['image_sha256'],fixed_camera=camera.tolist(),ownership_verified=row['ownership_verified'],target_applied=False,version=pred['version'])
+    return dict(case_id=row['case_id'],axes=pred['axes'].tolist(),uncertainty_rad=pred['uncertainty'].tolist(),observed_parts=partmask.tolist(),source_sha256=row['source_sha256'],image_sha256=row['image_sha256'],fixed_camera=camera.tolist(),ownership_verified=row['ownership_verified'],target_applied=False,version=pred['version'],proposals=derive(row['source_bones'],pred['axes']))
