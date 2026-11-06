@@ -1,5 +1,6 @@
 """Apply a staged world-space delta directly to one posed FBX control table."""
 import argparse
+import hashlib
 import sys
 from pathlib import Path
 
@@ -35,6 +36,8 @@ def patch(source, stage, changes, output, subset=None, scale=1.):
     if np.linalg.norm(centered@linear-centered_world,axis=1).max()>np.ptp(world,axis=0).max()*1e-6:
         raise ValueError("Control table does not match the evaluated posed mesh")
     with np.load(changes) as data:
+        if "sourceSHA" in data and str(data["sourceSHA"])!=hashlib.sha256(stage.read_bytes()).hexdigest():
+            raise ValueError("Patch belongs to another stage")
         ids, delta = data["ids"], data["delta"]
     if ids.ndim!=1 or len(np.unique(ids))!=len(ids) or np.any(ids<0) or np.any(ids>=len(local)):
         raise ValueError("Invalid patch indices")

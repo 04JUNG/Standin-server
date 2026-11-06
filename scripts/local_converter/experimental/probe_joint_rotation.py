@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 from scripts.local_converter.experimental.deformation_guard import DeformationGuard
 
 
-def probe(runtime, model, pose, source, output):
+def capture_pose(runtime, model, pose, source):
     sys.path.insert(0, str(runtime))
     from converter import retarget
     from converter.local import inspection
@@ -33,10 +33,6 @@ def probe(runtime, model, pose, source, output):
     guard.upper = np.maximum(1., guard.reference["stretch"])
     guard.edge_upper = np.maximum(1., guard.reference["edge"])
     guard.crease_limit = np.maximum(1e-7, abs(guard.angle_difference(guard.reference["bend"], guard.rest_bend)))
-    index = guard.reference["edge"].argmax()
-    a, b = guard.graph.a[index], guard.graph.b[index]
-    edge = baseline[b] - baseline[a]
-    unit = edge / np.linalg.norm(edge)
     bones = list(arm.pose.bones)
     index_by_name = {bone.name: i for i, bone in enumerate(bones)}
     transforms = []
@@ -55,6 +51,19 @@ def probe(runtime, model, pose, source, output):
     reconstruction_error = float(np.linalg.norm(reconstruction - baseline, axis=1).max())
     if reconstruction_error >= 2e-5:
         raise ValueError("The captured skin matrices do not reproduce the source pose")
+    return arm, meshes, guard, bones, transforms, weights, homogeneous, reconstruction_error
+
+
+def probe(runtime, model, pose, source, output):
+    from converter.local import inspection
+    arm, meshes, guard, bones, transforms, weights, homogeneous, reconstruction_error = capture_pose(
+        runtime, model, pose, source)
+    baseline = guard.baseline
+    index = guard.reference["edge"].argmax()
+    a, b = guard.graph.a[index], guard.graph.b[index]
+    edge = baseline[b] - baseline[a]
+    unit = edge / np.linalg.norm(edge)
+    index_by_name = {bone.name: i for i, bone in enumerate(bones)}
     rows = []
     joint_bounds = {}
     partial_subtrees = []
@@ -97,7 +106,7 @@ def probe(runtime, model, pose, source, output):
         transform = center @ rotation @ center.inverted()
         selected.matrix = arm.matrix_world.inverted() @ transform @ arm.matrix_world @ original
         bpy.context.view_layer.update()
-        evaluated = np.asarray(inspection.surface(meshes)[mesh.name])
+        evaluated = np.asarray(inspection.surface(meshes)[meshes[0].name])
         proposed = baseline + delta
         pose_error = float(np.linalg.norm(proposed - evaluated, axis=1).max())
         if pose_error >= 2e-5:
