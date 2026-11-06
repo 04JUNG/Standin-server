@@ -102,3 +102,30 @@ class RuntimeArtifactTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "architecture"):
                 build(distribution, root/"rejected", "darwin-x64")
             self.assertFalse((root/"rejected").exists())
+
+    def test_windows_launcher_keeps_exact_crlf_under_windows_text_translation(self):
+        from io import BytesIO, TextIOWrapper
+        original_write = Path.write_text
+        def windows_write(path, text, *args, **kwargs):
+            if path.suffix != ".cmd":
+                return original_write(path, text, *args, **kwargs)
+            # Emulate Windows text-mode newline translation on this POSIX runner.
+            raw = BytesIO()
+            writer = TextIOWrapper(raw, encoding="utf-8", newline="\r\n")
+            writer.write(text)
+            writer.flush()
+            return path.write_bytes(raw.getvalue())
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            distribution = root/"Windows Blender 한글 공백"
+            for relative in ["blender.exe", "5.2/python/bin/python.exe"]:
+                file = distribution/relative
+                file.parent.mkdir(parents=True, exist_ok=True)
+                file.write_bytes(executable("windows-x64"))
+            with patch.object(Path, "write_text", windows_write):
+                manifest = build(distribution, root/"candidate", "windows-x64")
+            launcher = (root/"candidate"/manifest["launcher"]).read_bytes()
+            self.assertTrue(launcher.startswith(b"@echo off\r\n"))
+            self.assertNotIn(b"\r\r\n", launcher)
+            self.assertIn(b'"%~dp0runtime\\blender\\5.2\\python\\bin\\python.exe"', launcher)
+            self.assertFalse(manifest["releaseReady"])

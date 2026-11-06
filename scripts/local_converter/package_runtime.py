@@ -68,7 +68,8 @@ def build(distribution, output, target, cs3c_modeler_exe=None, cs3c_decoder_reso
         text = '@echo off\r\nset "PYTHONHOME="\r\nset "PYTHONPATH="\r\nset "PYTHONNOUSERSITE=1"\r\nset "PYTHONDONTWRITEBYTECODE=1"\r\n"%~dp0' + python.replace("/", "\\") + '" -B -I "%~dp0entry.py" %*\r\n'
     else:
         text = '#!/bin/sh\nset -eu\nHERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)\nunset PYTHONHOME PYTHONPATH\nexport PYTHONNOUSERSITE=1 PYTHONDONTWRITEBYTECODE=1\nexec "$HERE/' + python + '" -B -I "$HERE/entry.py" "$@"\n'
-    (output / launcher).write_text(text)
+    # Preserve intentional CRLF on Windows; text-mode translation would create CRCRLF.
+    (output / launcher).write_bytes(text.encode("utf-8"))
     (output / launcher).chmod(0o755)
     files = {}
     byte_count = 0

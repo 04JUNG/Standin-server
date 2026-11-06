@@ -19,8 +19,8 @@ The converter owner must issue and record the next version/manifest/fingerprint,
 then rerun native packaging and model checks. No new runtime is adopted here.
 No geometry, retarget, deformation selector or safety threshold changed.
 
-Validation on macOS 26.6.2 arm64: four new synthetic artifact tests; local
-regression suite 26 collected / 22 passed / four Blender-only skips; 54 smoke
+Validation on macOS 26.6.2 arm64: five new synthetic artifact tests; local
+regression suite 27 collected / 23 passed / four Blender-only skips; 54 smoke
 tests passed using the existing project Python environment; compileall and diff
 checks passed. The new validator also accepted all 6,591 files of immutable v10.
 Synthetic Mach-O/PE headers and mocked host identity test rejection behavior,
@@ -37,3 +37,9 @@ Signing/notarization, Windows/Intel runtime execution, decoder redistribution,
 Blender corresponding-source/notices delivery, CSP acceptance, live BFF and
 geometry quality remain distinct gates. Draft/default-off/releaseReady:false
 remain. No deployment, merge, release, key or production-setting change occurred.
+
+The Windows batch launcher is written as exact UTF-8 bytes. Its authored CRLF
+must not be translated again by Windows text mode (which would produce
+CRCRLF). A synthetic Windows-layout build with emulated text translation checks
+the exact launcher line endings and quoted bundled-interpreter path. This is a
+source/byte regression, not Windows execution or signing acceptance.
