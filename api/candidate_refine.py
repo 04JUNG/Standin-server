@@ -83,8 +83,10 @@ def install_candidate_routes(app):
                     return runtime._refine_impl(req, source_snapshot=({"set_id": snapshot.set_id}, path),
                                                 execution_deadline=deadline, run_shadow=False)
 
-                concurrency = int(os.getenv("CANDIDATE_REFINE_CONCURRENCY", "1"))
-                service = CandidatePreparer(resolve, solve, engine_identity, concurrency=concurrency)
+                from src.refine_admission import source_admission
+                admission = source_admission()
+                service = CandidatePreparer(resolve, solve, engine_identity,
+                                            concurrency=admission.concurrency, admission=admission)
             return service
 
     async def payload(request, model):
@@ -114,6 +116,7 @@ def install_candidate_routes(app):
                 "accepted_automatic_profiles": [], "quality_scope": "source_only",
                 "max_candidates": 10, "max_candidates_per_person": 5,
                 "concurrency": get_service().concurrency,
+                "selected_source_priority": True, "source_execution_scope": "process_wide",
                 "durable_jobs": False, "prepared_capacity": get_service().cache_capacity,
                 "ttl_seconds": get_service().ttl, "engine": identity}
 

@@ -1369,7 +1369,10 @@ The separately authenticated internal snapshot/static transport is documented in
 `CANDIDATE_REFINE_ENABLED=1` + 32자 이상 `CANDIDATE_REFINE_TOKEN` Bearer 인증을 요구한다.
 요청은 등록된 후보/관측/정확한 검색 카메라와 source SHA만 포함한다. 사용자 체형·shape·손·외양,
 파일 경로, target 메시·안전 주장은 사전 입력으로 받지 않는다. PNG/FBX/VLM 호출이 없다.
-기본 C=1, 최대 C=2와 20개 admission 상한. 최대 10개는 transport chunk이며 BFF가
+기본 C=1, 최대 C=2와 20개 후보 admission 상한. 새 기능이 켜진 경우 기존 `/refine`도 같은
+프로세스 CPU 슬롯을 공유하며 선택 작업이 대기 후보보다 우선한다. 선택 큐 포화/기한은
+503 `REFINE_SOURCE_BUSY` + `Retry-After: 1`이며 기능 OFF일 때 기존 동작은 그대로다.
+최대 10개는 transport chunk이며 BFF가
 3명 이상도 순차 chunk와 한 전체 barrier로 처리한다. 선택 후 source reuse는 solver 호출 없이
 정확한 준비 BVH를 반환한다. 실제 target 적용·선택 조합·최종 파일 검증과 다운로드 권한은 이후 단계다.
 기존 `/refine`과 기존 v3 shadow/v4 명시 지시 API의 동작은 유지한다.

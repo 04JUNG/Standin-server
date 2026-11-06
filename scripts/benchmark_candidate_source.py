@@ -71,6 +71,12 @@ def run(concurrency, output):
         try:
             cold = service.prepare(batch)
             cold_calls = calls
+            # Drain completion callbacks on every worker before clearing cache;
+            # Future.result() can return before its callback finishes publishing.
+            barrier = threading.Barrier(concurrency)
+            drains = [service.pool.submit(barrier.wait) for _ in range(concurrency)]
+            for drain in drains:
+                drain.result(timeout=10)
             # Warm process, empty result cache: exercise source computation again.
             with service.lock:
                 service.cache.clear()

@@ -1011,7 +1011,17 @@ def _effective_refine_mode(requested: Optional[str]) -> str:
 @app.post("/refine", response_model=RefineResponse)
 def refine(req: RefineRequest):
     """선택 후보를 기존 안전 정책으로 보정하고 조정 BVH/미리보기를 반환한다."""
-    return _refine_impl(req)
+    if os.getenv("CANDIDATE_REFINE_ENABLED", "0") != "1":
+        return _refine_impl(req)
+    # Mixed old/new clients share the same actual numerical capacity when the
+    # new preparation service is enabled; old selected work has priority.
+    from src.refine_admission import source_admission, SourceAdmissionError
+    wait_budget = min(30., max(1., float(CFG.refine_timeout_seconds) or 30.))
+    try:
+        with source_admission().slot("selected", time.monotonic() + wait_budget):
+            return _refine_impl(req)
+    except SourceAdmissionError:
+        raise HTTPException(503, {"code": "REFINE_SOURCE_BUSY"}, headers={"Retry-After": "1"}) from None
 
 
 def _refine_impl(req: RefineRequest, *, source_snapshot=None, execution_deadline=None, run_shadow=True):

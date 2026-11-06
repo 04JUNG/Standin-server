@@ -292,3 +292,55 @@ def test_library_entangled_metadata_participates_in_source_identity(harness):
     second = service.prepare(batch(1)).results[0]
     assert first.source_fingerprint != second.source_fingerprint
     assert state["calls"] == 2
+
+
+def test_mixed_legacy_selected_and_candidate_execution_share_slots_with_selected_priority():
+    from src.refine_admission import SourceAdmission
+    slots = SourceAdmission(1)
+    holding, release = threading.Event(), threading.Event()
+    order = []
+    def first():
+        with slots.slot("candidate", time.monotonic() + 3):
+            holding.set(); assert release.wait(3)
+    def queued(stage):
+        with slots.slot(stage, time.monotonic() + 3):
+            order.append(stage)
+    with ThreadPoolExecutor(3) as pool:
+        first_task = pool.submit(first); assert holding.wait(2)
+        candidate = pool.submit(queued, "candidate")
+        selected = pool.submit(queued, "selected")
+        for _ in range(100):
+            with slots.condition:
+                if len(slots.waiting) == 2: break
+            time.sleep(.005)
+        assert len(slots.waiting) == 2 and slots.active == 1
+        release.set()
+        first_task.result(); candidate.result(); selected.result()
+    assert order == ["selected", "candidate"]
+    assert slots.active == 0 and not slots.waiting
+
+
+def test_source_admission_deadline_removes_queued_ticket_without_releasing_running():
+    from src.refine_admission import SourceAdmission, SourceAdmissionError
+    slots = SourceAdmission(1)
+    with slots.slot("candidate", time.monotonic() + 2):
+        with pytest.raises(SourceAdmissionError, match="source_queue_timeout"):
+            with slots.slot("selected", time.monotonic() + .01):
+                pytest.fail("must not enter while actual work is running")
+        assert slots.active == 1 and not slots.waiting
+    assert slots.active == 0
+
+
+def test_legacy_refine_uses_common_admission_only_when_opted_in(monkeypatch):
+    import api.app as runtime
+    from src.refine_admission import source_admission
+    monkeypatch.setenv("CANDIDATE_REFINE_ENABLED", "1")
+    calls = []
+    def solve(req):
+        assert source_admission().active == 1
+        calls.append(req)
+        return "selected result"
+    monkeypatch.setattr(runtime, "_refine_impl", solve)
+    req = batch(1).candidates[0].request
+    assert runtime.refine(req) == "selected result"
+    assert calls == [req] and source_admission().active == 0

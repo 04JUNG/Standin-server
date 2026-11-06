@@ -256,6 +256,8 @@
     "max_candidates": 10,
     "max_candidates_per_person": 5,
     "concurrency": 1,
+    "selected_source_priority": true,
+    "source_execution_scope": "process_wide",
     "durable_jobs": false,
     "prepared_capacity": 64,
     "ttl_seconds": 600,
@@ -373,7 +375,7 @@
       "pose_library_version": "v1",
       "deployment_version": "development",
       "source_revision": "development",
-      "source_code_sha256": "00f635d84716b7cc76a8a0969d86f7908362ddf9fbbb0523dcdcff8623183b5f",
+      "source_code_sha256": "f7e3b22d0c32efb63614b34f23c31c10f27a5659c861956584816b6228d227c0",
       "runtime": {
         "python": "3.12.13",
         "numpy": "2.5.4",
@@ -392,8 +394,8 @@
       {
         "person_id": "0",
         "candidate_id": "0",
-        "context_fingerprint": "3fc13a07d7557c1bc9832653901a39875635dbf66c414b548f0f9b263773521d",
-        "source_fingerprint": "43f75ce8be6668d48b3e02a4ef88396772c12a5acbea3d1e23e3bac3be05ccd8",
+        "context_fingerprint": "421ba5a4bfa775100ea1557fb86d478b83ee463809b316956aed0f8d2a8ba86f",
+        "source_fingerprint": "ede31da0d48c92749cbcf8e582baf35b40581606c5cca13f12b8bf704ffbc05a",
         "status": "ready_refined",
         "reason": "ok",
         "quality_scope": "source_only",
@@ -510,7 +512,7 @@
           },
           "selector_enabled": false,
           "selector_version": "v2.5.2",
-          "source_code_sha256": "00f635d84716b7cc76a8a0969d86f7908362ddf9fbbb0523dcdcff8623183b5f",
+          "source_code_sha256": "f7e3b22d0c32efb63614b34f23c31c10f27a5659c861956584816b6228d227c0",
           "source_revision": "development",
           "supported_modes": [
             "conservative"
@@ -521,21 +523,21 @@
         "source_sha256": "9f093da9234d8cd436f247946844658aca75f733a83980d2cfb5bfa7acc3a35a",
         "artifact_sha256": "c298cbc5c9c18545aca9dfcd0bdea96a3c113e788c742c166b54cbb2c14f83b7",
         "bvh": "HIERARCHY\nROOT Hips\n{ OFFSET 0 0 0\n  CHANNELS 6 Xposition Yposition Zposition Zrotation Xrotation Yrotation\n  JOINT Spine\n  { OFFSET 0 10 0\n    CHANNELS 3 Zrotation Xrotation Yrotation\n    JOINT LeftArm\n    { OFFSET 5 5 0\n      CHANNELS 3 Zrotation Xrotation Yrotation\n      JOINT LeftForeArm\n      { OFFSET 0 -8 0\n        CHANNELS 3 Zrotation Xrotation Yrotation\n        JOINT LeftHand\n        { OFFSET 0 -8 0\n          CHANNELS 3 Zrotation Xrotation Yrotation\n          End Site { OFFSET 0 -2 0 }\n        }\n      }\n    }\n    JOINT RightArm\n    { OFFSET -5 5 0\n      CHANNELS 3 Zrotation Xrotation Yrotation\n      JOINT RightForeArm\n      { OFFSET 0 -8 0\n        CHANNELS 3 Zrotation Xrotation Yrotation\n        JOINT RightHand\n        { OFFSET 0 -8 0\n          CHANNELS 3 Zrotation Xrotation Yrotation\n          End Site { OFFSET 0 -2 0 }\n        }\n      }\n    }\n    JOINT Head\n    { OFFSET 0 8 0\n      CHANNELS 3 Zrotation Xrotation Yrotation\n      End Site { OFFSET 0 3 0 }\n    }\n  }\n  JOINT LeftUpLeg\n  { OFFSET 3 0 0\n    CHANNELS 3 Zrotation Xrotation Yrotation\n    JOINT LeftLeg\n    { OFFSET 0 -10 0\n      CHANNELS 3 Zrotation Xrotation Yrotation\n      JOINT LeftFoot\n      { OFFSET 0 -10 0\n        CHANNELS 3 Zrotation Xrotation Yrotation\n        End Site { OFFSET 0 -2 0 }\n      }\n    }\n  }\n  JOINT RightUpLeg\n  { OFFSET -3 0 0\n    CHANNELS 3 Zrotation Xrotation Yrotation\n    JOINT RightLeg\n    { OFFSET 0 -10 0\n      CHANNELS 3 Zrotation Xrotation Yrotation\n      JOINT RightFoot\n      { OFFSET 0 -10 0\n        CHANNELS 3 Zrotation Xrotation Yrotation\n        End Site { OFFSET 0 -2 0 }\n      }\n    }\n  }\n}\nMOTION\nFrames: 1\nFrame Time: 0.033333\n0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 12.267306 -0.000027 0.000000 2.840389 -0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000\n",
-        "prepared_id": "26aa4595c93b4a70a21f77c43108ffcd",
+        "prepared_id": "a56d6d9af4d54839a39865d00dde2758",
         "timing": {
-          "queue_ms": 0.03566697705537081,
-          "execution_ms": 91.33891703095287,
-          "total_ms": 92.68408303614706,
+          "queue_ms": 0.03166700480505824,
+          "execution_ms": 86.07429201947525,
+          "total_ms": 87.35462499316782,
           "cache": "miss",
-          "origin_queue_ms": 0.03566697705537081,
-          "origin_execution_ms": 91.33891703095287
+          "origin_queue_ms": 0.03166700480505824,
+          "origin_execution_ms": 86.07429201947525
         }
       },
       {
         "person_id": "0",
         "candidate_id": "1",
-        "context_fingerprint": "49c0072ecf9cc16dc69c91dc7bd6596845990295be45fcf3b3a6eaa06614eee7",
-        "source_fingerprint": "74b11ea95681ab507e799ce6823b79f25b6f6d18b34f78d3a84f0e5da0bf2bd6",
+        "context_fingerprint": "95c3e51d42cb8b6aa380502c179a5397ea0c53d845973db9471ef0a791cc5521",
+        "source_fingerprint": "f81e35670cfab0363faffe7f06f306892863febefeb72f2a52610eaf649d85fd",
         "status": "ready_base",
         "reason": "skeleton_policy",
         "quality_scope": "source_only",
@@ -652,7 +654,7 @@
           },
           "selector_enabled": false,
           "selector_version": "v2.5.2",
-          "source_code_sha256": "00f635d84716b7cc76a8a0969d86f7908362ddf9fbbb0523dcdcff8623183b5f",
+          "source_code_sha256": "f7e3b22d0c32efb63614b34f23c31c10f27a5659c861956584816b6228d227c0",
           "source_revision": "development",
           "supported_modes": [
             "conservative"
@@ -663,18 +665,18 @@
         "source_sha256": "9f093da9234d8cd436f247946844658aca75f733a83980d2cfb5bfa7acc3a35a",
         "artifact_sha256": "9f093da9234d8cd436f247946844658aca75f733a83980d2cfb5bfa7acc3a35a",
         "bvh": "HIERARCHY\nROOT Hips\n{ OFFSET 0 0 0\n  CHANNELS 6 Xposition Yposition Zposition Zrotation Xrotation Yrotation\n  JOINT Spine\n  { OFFSET 0 10 0\n    CHANNELS 3 Zrotation Xrotation Yrotation\n    JOINT LeftArm\n    { OFFSET 5 5 0\n      CHANNELS 3 Zrotation Xrotation Yrotation\n      JOINT LeftForeArm\n      { OFFSET 0 -8 0\n        CHANNELS 3 Zrotation Xrotation Yrotation\n        JOINT LeftHand\n        { OFFSET 0 -8 0\n          CHANNELS 3 Zrotation Xrotation Yrotation\n          End Site { OFFSET 0 -2 0 }\n        }\n      }\n    }\n    JOINT RightArm\n    { OFFSET -5 5 0\n      CHANNELS 3 Zrotation Xrotation Yrotation\n      JOINT RightForeArm\n      { OFFSET 0 -8 0\n        CHANNELS 3 Zrotation Xrotation Yrotation\n        JOINT RightHand\n        { OFFSET 0 -8 0\n          CHANNELS 3 Zrotation Xrotation Yrotation\n          End Site { OFFSET 0 -2 0 }\n        }\n      }\n    }\n    JOINT Head\n    { OFFSET 0 8 0\n      CHANNELS 3 Zrotation Xrotation Yrotation\n      End Site { OFFSET 0 3 0 }\n    }\n  }\n  JOINT LeftUpLeg\n  { OFFSET 3 0 0\n    CHANNELS 3 Zrotation Xrotation Yrotation\n    JOINT LeftLeg\n    { OFFSET 0 -10 0\n      CHANNELS 3 Zrotation Xrotation Yrotation\n      JOINT LeftFoot\n      { OFFSET 0 -10 0\n        CHANNELS 3 Zrotation Xrotation Yrotation\n        End Site { OFFSET 0 -2 0 }\n      }\n    }\n  }\n  JOINT RightUpLeg\n  { OFFSET -3 0 0\n    CHANNELS 3 Zrotation Xrotation Yrotation\n    JOINT RightLeg\n    { OFFSET 0 -10 0\n      CHANNELS 3 Zrotation Xrotation Yrotation\n      JOINT RightFoot\n      { OFFSET 0 -10 0\n        CHANNELS 3 Zrotation Xrotation Yrotation\n        End Site { OFFSET 0 -2 0 }\n      }\n    }\n  }\n}\nMOTION\nFrames: 1\nFrame Time: 0.033333\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n",
-        "prepared_id": "69c5065e67284f3e88f564c2efa1bd9f",
+        "prepared_id": "d49eab5faecb42c8859b7b4f9f40f907",
         "timing": {
-          "queue_ms": 91.23499999986961,
-          "execution_ms": 1.1678329901769757,
-          "total_ms": 93.54241698747501,
+          "queue_ms": 85.86933399783447,
+          "execution_ms": 0.9119579917751253,
+          "total_ms": 87.90649997536093,
           "cache": "miss",
-          "origin_queue_ms": 91.23499999986961,
-          "origin_execution_ms": 1.1678329901769757
+          "origin_queue_ms": 85.86933399783447,
+          "origin_execution_ms": 0.9119579917751253
         }
       }
     ],
-    "elapsed_ms": 93.57670799363405
+    "elapsed_ms": 87.93129195692018
   },
   "source_only": true,
   "target_model_loaded": false,

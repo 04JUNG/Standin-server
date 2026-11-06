@@ -8,6 +8,7 @@ from __future__ import annotations
 from collections import OrderedDict
 from concurrent.futures import ThreadPoolExecutor, TimeoutError
 from dataclasses import dataclass
+from contextlib import nullcontext
 import hashlib
 import json
 from pathlib import Path
@@ -35,10 +36,11 @@ class SourceSnapshot:
 
 class CandidatePreparer:
     def __init__(self, resolve, solve, identity, *, concurrency=1, capacity=20,
-                 cache_capacity=64, ttl=600):
+                 cache_capacity=64, ttl=600, admission=None):
         if concurrency not in (1, 2) or capacity < concurrency:
             raise ValueError("candidate concurrency must be 1 or 2 with bounded admission")
         self.resolve, self.solve, self.identity = resolve, solve, identity
+        self.admission = admission
         self.concurrency, self.capacity = concurrency, capacity
         self.cache_capacity, self.ttl = cache_capacity, ttl
         self.pool = ThreadPoolExecutor(max_workers=concurrency, thread_name_prefix="candidate-source")
@@ -81,6 +83,14 @@ class CandidatePreparer:
                 mapping.popitem(last=False)
 
     def _run(self, item, snapshot, deadline, budget_ms, enqueued):
+        from src.refine_admission import SourceAdmissionError
+        try:
+            with self.admission.slot("candidate", deadline) if self.admission else nullcontext():
+                return self._execute(item, snapshot, deadline, budget_ms, enqueued)
+        except SourceAdmissionError as exc:
+            raise CandidateError(str(exc)) from None
+
+    def _execute(self, item, snapshot, deadline, budget_ms, enqueued):
         start = time.monotonic()
         if start >= deadline:
             raise CandidateError("queue_timeout")
