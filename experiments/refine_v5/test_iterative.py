@@ -65,4 +65,10 @@ class SourceIsolationTests(unittest.TestCase):
             self.assertAlmostEqual(np.linalg.norm(points[a]-points[b]),length,places=6)
         self.assertLess(max(np.linalg.norm(v) for v in out['local_SO3_residual_proposals'].values()),1e-6)
 
+class SelectedSupportTests(unittest.TestCase):
+    def test_unknown_support_keeps_foot_frames_even_after_selection(self):
+        r,e,p,f=fixture();context=dict(kind='offline_fixture_selection',source_sha256=r['source_sha256'],body_asset_sha256=f['body_asset_sha256'])
+        out=solve(r,e,p,profile=f,selection=context,max_nfev=8)
+        self.assertNotIn('LeftFoot',out['active_bones']);self.assertNotIn('RightFoot',out['active_bones'])
+
 if __name__=='__main__':unittest.main()

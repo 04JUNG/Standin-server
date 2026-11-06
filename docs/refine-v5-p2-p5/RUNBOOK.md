@@ -8,7 +8,7 @@
 
 - 학습 worktree: `/private/tmp/standin-refine-v5-p2-p5-20261107/learning`, branch `codex/refine-v5-learning-p2-p3`.
 - 통합 worktree: `/private/tmp/standin-refine-v5-p2-p5-20261107/native`, branch `codex/refine-v5-native-p4-p5`.
-- 최종 run: `/private/tmp/standin-refine-v5-p2-p5-final-20261107`.
+- 최종 run: `/private/tmp/standin-refine-v5-p2-p5-supported-20261107`.
 - P0 원본: `/private/tmp/standin-refine-v5-20261106`.
 - 실험 Python: `/private/tmp/standin-refine-v5-p2-p5-20261107/venv/bin/python`.
 
@@ -50,7 +50,7 @@ python -m experiments.refine_v5.check
 python tests/test_smoke.py
 ```
 
-`check`는 unittest 32개와 `test_learning.py`의 독립 함수 6개를 함께 실행한다. 총 38개다. 기존 smoke는 54개다.
+`check`는 unittest 33개와 `test_learning.py`의 독립 함수 6개를 함께 실행한다. 총 39개다. 기존 smoke는 54개다.
 
 - `models/metrics.json`: 학습 조건별 검증과 사례별 오차.
 - `frame-evaluation.json`: 학습 재현/검증, 합성/실제 분리. 완전 관측 8뼈 분모 포함.

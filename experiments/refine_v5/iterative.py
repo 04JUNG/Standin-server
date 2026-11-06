@@ -68,6 +68,7 @@ def solve(rig,evidence,prediction,*,profile,selection=None,rounds=1,max_nfev=35,
     if orientation.shape!=(5,):raise ValueError('invalid orientation mask')
     if selected:
         for j,kind in enumerate(['head','wrist','wrist','foot','foot']):
+            if kind=='foot' and not evidence.get('support_verified',False):continue
             # A learned prior is allowed as a diagnostic proposal, never called observed.
             if mask[j+8] and unc[j+8]<np.radians(75):add(BONES[j+8],limits[kind])
     activeix=[ix[n] for n in active];bound=np.repeat(np.radians(degrees)/np.sqrt(3),3)
@@ -100,7 +101,7 @@ def solve(rig,evidence,prediction,*,profile,selection=None,rounds=1,max_nfev=35,
         if not np.allclose(world[ix['Hips']],base[ix['Hips']],atol=1e-8):violations.append('root_changed')
         if not evidence.get('support_verified',False):
             low=[ix[n] for n in POINTS[6:]]
-            if np.max(abs(world[low,:3,3]-base[low,:3,3]))>1e-7:violations.append('unsupported_lower_changed')
+            if np.max(abs(world[low]-base[low]))>1e-7:violations.append('unsupported_lower_changed')
         # Preserve bend branch and avoid folding a chain through itself.
         for ids in CHAINS:
             ids=[pts[k] for k in ids];old=base[ids,:3,3];new=world[ids,:3,3]
