@@ -1,0 +1,913 @@
+{
+  "contract_version": "candidate-refine-v1",
+  "prepare_request": {
+    "$defs": {
+      "CandidateCamera": {
+        "properties": {
+          "version": {
+            "enum": [
+              "candidate-camera-v1",
+              "candidate-camera-v2"
+            ],
+            "title": "Version",
+            "type": "string"
+          },
+          "rotation": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "title": "Rotation",
+            "type": "array"
+          },
+          "source_bvh_sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Source Bvh Sha256",
+            "type": "string"
+          },
+          "reference": {
+            "enum": [
+              "pelvis-torso-yaw",
+              "search-fit"
+            ],
+            "title": "Reference",
+            "type": "string"
+          },
+          "canonical_yaw": {
+            "title": "Canonical Yaw",
+            "type": "number"
+          },
+          "display_view": {
+            "enum": [
+              "front",
+              "back",
+              "side",
+              "three_quarter"
+            ],
+            "title": "Display View",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "fitted",
+              "canonical_fallback"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "fit_error": {
+            "title": "Fit Error",
+            "type": "number"
+          },
+          "facing_source": {
+            "enum": [
+              "person_observation",
+              "geometry_only"
+            ],
+            "title": "Facing Source",
+            "type": "string"
+          },
+          "depth_ambiguous": {
+            "title": "Depth Ambiguous",
+            "type": "boolean"
+          },
+          "projection": {
+            "anyOf": [
+              {
+                "enum": [
+                  "orthographic",
+                  "perspective"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Projection"
+          },
+          "distance_torso": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Distance Torso"
+          },
+          "labels_swapped": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Labels Swapped"
+          },
+          "pose_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Pose Id"
+          },
+          "query_sha256": {
+            "anyOf": [
+              {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Query Sha256"
+          },
+          "observed_joint_mask": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "boolean"
+                },
+                "maxItems": 17,
+                "minItems": 17,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Observed Joint Mask"
+          }
+        },
+        "required": [
+          "version",
+          "rotation",
+          "source_bvh_sha256",
+          "reference",
+          "canonical_yaw",
+          "display_view",
+          "status",
+          "fit_error",
+          "facing_source",
+          "depth_ambiguous"
+        ],
+        "title": "CandidateCamera",
+        "type": "object"
+      },
+      "CandidateInput": {
+        "additionalProperties": false,
+        "properties": {
+          "person_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_.:-]+$",
+            "title": "Person Id",
+            "type": "string"
+          },
+          "candidate_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_.:-]+$",
+            "title": "Candidate Id",
+            "type": "string"
+          },
+          "source_sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Source Sha256",
+            "type": "string"
+          },
+          "request": {
+            "$ref": "#/$defs/SourceRequest"
+          }
+        },
+        "required": [
+          "person_id",
+          "candidate_id",
+          "source_sha256",
+          "request"
+        ],
+        "title": "CandidateInput",
+        "type": "object"
+      },
+      "SourceRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "refine_v3": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Refine V3"
+          },
+          "render_thumbnail": {
+            "default": true,
+            "title": "Render Thumbnail",
+            "type": "boolean"
+          },
+          "camera": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/CandidateCamera"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "pose_id": {
+            "description": "작가가 고른 후보의 pose_id",
+            "title": "Pose Id",
+            "type": "string"
+          },
+          "view": {
+            "description": "그 후보의 view(=매칭된 투영 각도)",
+            "enum": [
+              "front",
+              "three_quarter",
+              "side",
+              "back"
+            ],
+            "title": "View",
+            "type": "string"
+          },
+          "keypoints": {
+            "description": "/analyze가 준 PersonOut.keypoints를 그대로 (17×2)",
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "maxItems": 2,
+              "minItems": 2,
+              "type": "array"
+            },
+            "maxItems": 17,
+            "minItems": 17,
+            "title": "Keypoints",
+            "type": "array"
+          },
+          "scores": {
+            "items": {
+              "type": "number"
+            },
+            "maxItems": 17,
+            "minItems": 17,
+            "title": "Scores",
+            "type": "array"
+          },
+          "search_distance": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "그 후보의 distance. v1에서는 베이스 불일치 게이트, v2.5에서는 실행을 막지 않는 검색 lineage",
+            "title": "Search Distance"
+          },
+          "refine_allowed": {
+            "title": "Refine Allowed",
+            "type": "boolean"
+          },
+          "refinable_limbs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Refinable Limbs",
+            "type": "array"
+          },
+          "lower_body_observed": {
+            "title": "Lower Body Observed",
+            "type": "boolean"
+          },
+          "skeleton_state": {
+            "title": "Skeleton State",
+            "type": "string"
+          },
+          "coverage_class": {
+            "title": "Coverage Class",
+            "type": "string"
+          },
+          "slot_origin": {
+            "title": "Slot Origin",
+            "type": "string"
+          },
+          "skeleton_source": {
+            "title": "Skeleton Source",
+            "type": "string"
+          },
+          "search_stability": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "partial 스켈레톤의 보수적 mask 검색 안정성",
+            "title": "Search Stability"
+          },
+          "distance_metric": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "후보를 검색할 때 사용한 거리 metric",
+            "title": "Distance Metric"
+          },
+          "confidence_threshold": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "검색 당시 metric×coverage confidence threshold",
+            "title": "Confidence Threshold"
+          },
+          "gap_type": {
+            "default": "unknown",
+            "description": "평가 라벨. refine 실행 게이트로 사용하지 않음",
+            "enum": [
+              "near_gap",
+              "structural_gap",
+              "unknown"
+            ],
+            "title": "Gap Type",
+            "type": "string"
+          },
+          "refine_mode": {
+            "anyOf": [
+              {
+                "enum": [
+                  "conservative",
+                  "aggressive"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "v2.5 조정 정책. 생략/null이면 서버 REFINE_DEFAULT_MODE를 사용. aggressive도 final selector 실패 시 conservative/base로 복구",
+            "title": "Refine Mode"
+          }
+        },
+        "required": [
+          "pose_id",
+          "view",
+          "keypoints",
+          "scores",
+          "refine_allowed",
+          "refinable_limbs",
+          "lower_body_observed",
+          "skeleton_state",
+          "coverage_class",
+          "slot_origin",
+          "skeleton_source"
+        ],
+        "title": "SourceRequest",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "contract_version": {
+        "const": "candidate-refine-v1",
+        "default": "candidate-refine-v1",
+        "title": "Contract Version",
+        "type": "string"
+      },
+      "batch_id": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9_.:-]+$",
+        "title": "Batch Id",
+        "type": "string"
+      },
+      "owner_id": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9_.:-]+$",
+        "title": "Owner Id",
+        "type": "string"
+      },
+      "job_id": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9_.:-]+$",
+        "title": "Job Id",
+        "type": "string"
+      },
+      "candidate_set_revision": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9_.:-]+$",
+        "title": "Candidate Set Revision",
+        "type": "string"
+      },
+      "candidates": {
+        "items": {
+          "$ref": "#/$defs/CandidateInput"
+        },
+        "maxItems": 10,
+        "minItems": 1,
+        "title": "Candidates",
+        "type": "array"
+      },
+      "batch_budget_ms": {
+        "default": 60000,
+        "maximum": 120000,
+        "minimum": 1,
+        "title": "Batch Budget Ms",
+        "type": "integer"
+      },
+      "candidate_budget_ms": {
+        "default": 5000,
+        "maximum": 30000,
+        "minimum": 1,
+        "title": "Candidate Budget Ms",
+        "type": "integer"
+      }
+    },
+    "required": [
+      "batch_id",
+      "owner_id",
+      "job_id",
+      "candidate_set_revision",
+      "candidates"
+    ],
+    "title": "PrepareRequest",
+    "type": "object"
+  },
+  "prepare_response": {
+    "$defs": {
+      "CandidateResult": {
+        "additionalProperties": false,
+        "properties": {
+          "person_id": {
+            "title": "Person Id",
+            "type": "string"
+          },
+          "candidate_id": {
+            "title": "Candidate Id",
+            "type": "string"
+          },
+          "context_fingerprint": {
+            "title": "Context Fingerprint",
+            "type": "string"
+          },
+          "source_fingerprint": {
+            "title": "Source Fingerprint",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "ready_refined",
+              "ready_base",
+              "unsupported",
+              "failed_retryable"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "quality_scope": {
+            "const": "source_only",
+            "default": "source_only",
+            "title": "Quality Scope",
+            "type": "string"
+          },
+          "engine": {
+            "additionalProperties": true,
+            "title": "Engine",
+            "type": "object"
+          },
+          "source_sha256": {
+            "title": "Source Sha256",
+            "type": "string"
+          },
+          "artifact_sha256": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Artifact Sha256"
+          },
+          "bvh": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Bvh"
+          },
+          "prepared_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Prepared Id"
+          },
+          "timing": {
+            "$ref": "#/$defs/Timing"
+          }
+        },
+        "required": [
+          "person_id",
+          "candidate_id",
+          "context_fingerprint",
+          "source_fingerprint",
+          "status",
+          "reason",
+          "engine",
+          "source_sha256"
+        ],
+        "title": "CandidateResult",
+        "type": "object"
+      },
+      "Timing": {
+        "additionalProperties": false,
+        "properties": {
+          "queue_ms": {
+            "default": 0,
+            "title": "Queue Ms",
+            "type": "number"
+          },
+          "execution_ms": {
+            "default": 0,
+            "title": "Execution Ms",
+            "type": "number"
+          },
+          "total_ms": {
+            "default": 0,
+            "title": "Total Ms",
+            "type": "number"
+          },
+          "cache": {
+            "default": "miss",
+            "enum": [
+              "miss",
+              "hit",
+              "in_flight"
+            ],
+            "title": "Cache",
+            "type": "string"
+          },
+          "origin_queue_ms": {
+            "default": 0,
+            "title": "Origin Queue Ms",
+            "type": "number"
+          },
+          "origin_execution_ms": {
+            "default": 0,
+            "title": "Origin Execution Ms",
+            "type": "number"
+          }
+        },
+        "title": "Timing",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "contract_version": {
+        "const": "candidate-refine-v1",
+        "default": "candidate-refine-v1",
+        "title": "Contract Version",
+        "type": "string"
+      },
+      "batch_id": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9_.:-]+$",
+        "title": "Batch Id",
+        "type": "string"
+      },
+      "owner_id": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9_.:-]+$",
+        "title": "Owner Id",
+        "type": "string"
+      },
+      "job_id": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9_.:-]+$",
+        "title": "Job Id",
+        "type": "string"
+      },
+      "candidate_set_revision": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9_.:-]+$",
+        "title": "Candidate Set Revision",
+        "type": "string"
+      },
+      "all_terminal": {
+        "const": true,
+        "default": true,
+        "title": "All Terminal",
+        "type": "boolean"
+      },
+      "results": {
+        "items": {
+          "$ref": "#/$defs/CandidateResult"
+        },
+        "title": "Results",
+        "type": "array"
+      },
+      "elapsed_ms": {
+        "title": "Elapsed Ms",
+        "type": "number"
+      }
+    },
+    "required": [
+      "batch_id",
+      "owner_id",
+      "job_id",
+      "candidate_set_revision",
+      "results",
+      "elapsed_ms"
+    ],
+    "title": "PrepareResponse",
+    "type": "object"
+  },
+  "reuse_request": {
+    "additionalProperties": false,
+    "properties": {
+      "contract_version": {
+        "const": "candidate-refine-v1",
+        "default": "candidate-refine-v1",
+        "title": "Contract Version",
+        "type": "string"
+      },
+      "batch_id": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9_.:-]+$",
+        "title": "Batch Id",
+        "type": "string"
+      },
+      "owner_id": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9_.:-]+$",
+        "title": "Owner Id",
+        "type": "string"
+      },
+      "job_id": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9_.:-]+$",
+        "title": "Job Id",
+        "type": "string"
+      },
+      "candidate_set_revision": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9_.:-]+$",
+        "title": "Candidate Set Revision",
+        "type": "string"
+      },
+      "person_id": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9_.:-]+$",
+        "title": "Person Id",
+        "type": "string"
+      },
+      "candidate_id": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9_.:-]+$",
+        "title": "Candidate Id",
+        "type": "string"
+      },
+      "prepared_id": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9_.:-]+$",
+        "title": "Prepared Id",
+        "type": "string"
+      },
+      "context_fingerprint": {
+        "pattern": "^[a-f0-9]{64}$",
+        "title": "Context Fingerprint",
+        "type": "string"
+      }
+    },
+    "required": [
+      "batch_id",
+      "owner_id",
+      "job_id",
+      "candidate_set_revision",
+      "person_id",
+      "candidate_id",
+      "prepared_id",
+      "context_fingerprint"
+    ],
+    "title": "ReuseRequest",
+    "type": "object"
+  },
+  "reuse_response": {
+    "$defs": {
+      "Timing": {
+        "additionalProperties": false,
+        "properties": {
+          "queue_ms": {
+            "default": 0,
+            "title": "Queue Ms",
+            "type": "number"
+          },
+          "execution_ms": {
+            "default": 0,
+            "title": "Execution Ms",
+            "type": "number"
+          },
+          "total_ms": {
+            "default": 0,
+            "title": "Total Ms",
+            "type": "number"
+          },
+          "cache": {
+            "default": "miss",
+            "enum": [
+              "miss",
+              "hit",
+              "in_flight"
+            ],
+            "title": "Cache",
+            "type": "string"
+          },
+          "origin_queue_ms": {
+            "default": 0,
+            "title": "Origin Queue Ms",
+            "type": "number"
+          },
+          "origin_execution_ms": {
+            "default": 0,
+            "title": "Origin Execution Ms",
+            "type": "number"
+          }
+        },
+        "title": "Timing",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "person_id": {
+        "title": "Person Id",
+        "type": "string"
+      },
+      "candidate_id": {
+        "title": "Candidate Id",
+        "type": "string"
+      },
+      "context_fingerprint": {
+        "title": "Context Fingerprint",
+        "type": "string"
+      },
+      "source_fingerprint": {
+        "title": "Source Fingerprint",
+        "type": "string"
+      },
+      "status": {
+        "enum": [
+          "ready_refined",
+          "ready_base",
+          "unsupported",
+          "failed_retryable"
+        ],
+        "title": "Status",
+        "type": "string"
+      },
+      "reason": {
+        "title": "Reason",
+        "type": "string"
+      },
+      "quality_scope": {
+        "const": "source_only",
+        "default": "source_only",
+        "title": "Quality Scope",
+        "type": "string"
+      },
+      "engine": {
+        "additionalProperties": true,
+        "title": "Engine",
+        "type": "object"
+      },
+      "source_sha256": {
+        "title": "Source Sha256",
+        "type": "string"
+      },
+      "artifact_sha256": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Artifact Sha256"
+      },
+      "bvh": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Bvh"
+      },
+      "prepared_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Prepared Id"
+      },
+      "timing": {
+        "$ref": "#/$defs/Timing"
+      }
+    },
+    "required": [
+      "person_id",
+      "candidate_id",
+      "context_fingerprint",
+      "source_fingerprint",
+      "status",
+      "reason",
+      "engine",
+      "source_sha256"
+    ],
+    "title": "CandidateResult",
+    "type": "object"
+  }
+}

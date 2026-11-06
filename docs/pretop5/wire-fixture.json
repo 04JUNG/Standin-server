@@ -1,0 +1,684 @@
+{
+  "fixture_type": "synthetic",
+  "gate_override": false,
+  "request": {
+    "contract_version": "candidate-refine-v1",
+    "batch_id": "synthetic-wire",
+    "owner_id": "local-wire",
+    "job_id": "local-wire",
+    "candidate_set_revision": "1",
+    "candidates": [
+      {
+        "person_id": "0",
+        "candidate_id": "0",
+        "source_sha256": "9f093da9234d8cd436f247946844658aca75f733a83980d2cfb5bfa7acc3a35a",
+        "request": {
+          "refine_v3": null,
+          "render_thumbnail": false,
+          "camera": null,
+          "pose_id": "synthetic",
+          "view": "front",
+          "keypoints": [
+            [
+              0.0,
+              -18.0
+            ],
+            [
+              0.0,
+              -18.0
+            ],
+            [
+              0.0,
+              -18.0
+            ],
+            [
+              0.0,
+              -18.0
+            ],
+            [
+              0.0,
+              -18.0
+            ],
+            [
+              5.0,
+              -15.0
+            ],
+            [
+              -5.0,
+              -15.0
+            ],
+            [
+              7.070552349090576,
+              -7.2725934982299805
+            ],
+            [
+              -5.0,
+              -7.0
+            ],
+            [
+              9.141104698181152,
+              0.4548132121562958
+            ],
+            [
+              -5.0,
+              1.0
+            ],
+            [
+              3.0,
+              -0.0
+            ],
+            [
+              -3.0,
+              -0.0
+            ],
+            [
+              3.0,
+              10.0
+            ],
+            [
+              -3.0,
+              10.0
+            ],
+            [
+              3.0,
+              20.0
+            ],
+            [
+              -3.0,
+              20.0
+            ]
+          ],
+          "scores": [
+            0.800000011920929,
+            0.4000000059604645,
+            0.4000000059604645,
+            0.4000000059604645,
+            0.4000000059604645,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "search_distance": null,
+          "refine_allowed": true,
+          "refinable_limbs": [
+            "left_arm"
+          ],
+          "lower_body_observed": false,
+          "skeleton_state": "valid",
+          "coverage_class": "full",
+          "slot_origin": "vlm",
+          "skeleton_source": "full_image",
+          "search_stability": null,
+          "distance_metric": null,
+          "confidence_threshold": null,
+          "gap_type": "unknown",
+          "refine_mode": null
+        }
+      },
+      {
+        "person_id": "0",
+        "candidate_id": "1",
+        "source_sha256": "9f093da9234d8cd436f247946844658aca75f733a83980d2cfb5bfa7acc3a35a",
+        "request": {
+          "refine_v3": null,
+          "render_thumbnail": false,
+          "camera": null,
+          "pose_id": "synthetic",
+          "view": "front",
+          "keypoints": [
+            [
+              0.0,
+              -18.0
+            ],
+            [
+              0.0,
+              -18.0
+            ],
+            [
+              0.0,
+              -18.0
+            ],
+            [
+              0.0,
+              -18.0
+            ],
+            [
+              0.0,
+              -18.0
+            ],
+            [
+              5.0,
+              -15.0
+            ],
+            [
+              -5.0,
+              -15.0
+            ],
+            [
+              7.070552349090576,
+              -7.2725934982299805
+            ],
+            [
+              -5.0,
+              -7.0
+            ],
+            [
+              9.141104698181152,
+              0.4548132121562958
+            ],
+            [
+              -5.0,
+              1.0
+            ],
+            [
+              3.0,
+              -0.0
+            ],
+            [
+              -3.0,
+              -0.0
+            ],
+            [
+              3.0,
+              10.0
+            ],
+            [
+              -3.0,
+              10.0
+            ],
+            [
+              3.0,
+              20.0
+            ],
+            [
+              -3.0,
+              20.0
+            ]
+          ],
+          "scores": [
+            0.800000011920929,
+            0.4000000059604645,
+            0.4000000059604645,
+            0.4000000059604645,
+            0.4000000059604645,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "search_distance": null,
+          "refine_allowed": false,
+          "refinable_limbs": [
+            "left_arm"
+          ],
+          "lower_body_observed": false,
+          "skeleton_state": "valid",
+          "coverage_class": "full",
+          "slot_origin": "vlm",
+          "skeleton_source": "full_image",
+          "search_stability": null,
+          "distance_metric": null,
+          "confidence_threshold": null,
+          "gap_type": "unknown",
+          "refine_mode": null
+        }
+      }
+    ],
+    "batch_budget_ms": 60000,
+    "candidate_budget_ms": 5000
+  },
+  "capabilities": {
+    "contract_version": "candidate-refine-v1",
+    "available": true,
+    "source_refine": true,
+    "target_refine": false,
+    "automatic_parts": false,
+    "scene_joint_validation": false,
+    "accepted_automatic_profiles": [],
+    "quality_scope": "source_only",
+    "max_candidates": 10,
+    "max_candidates_per_person": 5,
+    "concurrency": 1,
+    "selected_source_priority": true,
+    "source_execution_scope": "process_wide",
+    "durable_jobs": false,
+    "prepared_capacity": 64,
+    "ttl_seconds": 600,
+    "engine": {
+      "adapter_version": "candidate-source-adapter-v1",
+      "selector_version": "v2.5.2",
+      "projection_version": "search-refine-projection-v1",
+      "policy_version": "structural-refine-v1",
+      "refine_v3": {
+        "version": "refine-shadow-v1",
+        "mode": "off",
+        "regional_apply": false,
+        "target_apply": false,
+        "certified_profiles": 0,
+        "binding_available": false,
+        "mesh_validation_required": true
+      },
+      "enabled": true,
+      "v2_enabled": false,
+      "torso_enabled": false,
+      "default_mode": "conservative",
+      "selector_enabled": false,
+      "config_valid": true,
+      "pose_quarantine_sha256": "6e3956b322eef0993080f0c953ae8a4d6a75de2784b70ac9b4a8857136af0162",
+      "code_version": "v1.4",
+      "supported_modes": [
+        "conservative"
+      ],
+      "config_sha256": "7709d63b0e0efa6d81d14526bb7b7d08b401b39fc4545486adff62a2237f49d8",
+      "config": {
+        "refine_pose_quarantine_path": "config/refine_pose_quarantine.v1.json",
+        "distance_metric": "pos",
+        "fallback_distance": 0.45,
+        "fallback_pos_full": 0.45,
+        "fallback_pos_reduced": 0.45,
+        "fallback_angle_full": 0.45,
+        "fallback_angle_reduced": 0.45,
+        "fallback_hybrid_full": 0.45,
+        "fallback_hybrid_reduced": 0.45,
+        "min_skeleton_score": 0.2,
+        "refine_enabled": true,
+        "refine_min_gain": 0.95,
+        "refine_min_loss": 0.01,
+        "refine_max_iter": 100,
+        "refine_lambda": 0.05,
+        "refine_max_delta_deg": 45.0,
+        "refine_limbs": "arms",
+        "refine_observability_gate": true,
+        "refine_min_observability": 0.34,
+        "refine_min_observability_abs": 0.1,
+        "refine_axis_observability": true,
+        "refine_axis_lambda_max_mult": 100.0,
+        "refine_svd_observability": true,
+        "refine_svd_lambda_max_mult": 2.0,
+        "refine_move_gate": false,
+        "refine_max_move_mean": 0.2,
+        "refine_max_move_max": 0.35,
+        "refine_collision_gate": true,
+        "refine_collision_torso_shoulder_scale": 0.38,
+        "refine_collision_torso_hip_scale": 0.45,
+        "refine_collision_arm_radius": 0.035,
+        "refine_collision_hand_radius": 0.025,
+        "refine_collision_leg_radius": 0.045,
+        "refine_collision_samples": 9,
+        "refine_collision_min_depth": 0.05,
+        "refine_collision_worsen_delta": 0.01,
+        "refine_min_bend_deg": 20.0,
+        "refine_v2_enabled": false,
+        "refine_gain_epsilon": 0.0001,
+        "refine_v2_endpoint_weight": 0.35,
+        "refine_v2_endpoint_huber_delta": 0.15,
+        "refine_v2_move_weight": 0.08,
+        "refine_v2_collision_weight": 0.1,
+        "refine_v2_anatomy_weight": 0.05,
+        "refine_v2_hand_leg_min_depth": 0.01,
+        "refine_v2_hand_leg_worsen_delta": 0.005,
+        "refine_v2_lower_pair_weight": 0.35,
+        "refine_v2_lower_pair_min_gap_delta": 0.02,
+        "refine_v2_foreshortening_direction_scale": 0.25,
+        "refine_v2_hand_pair_weight": 0.8,
+        "refine_v2_hand_pair_midpoint_weight": 0.6,
+        "refine_v2_hand_pair_min_gap_delta": 0.02,
+        "refine_v2_lap_contact_2d_threshold": 0.25,
+        "refine_v2_lap_contact_weight": 1.5,
+        "refine_v2_lap_contact_min_clearance": -0.003,
+        "refine_v2_lap_contact_max_clearance": 0.02,
+        "refine_v2_aggressive_lower_pair_weight": 0.9,
+        "refine_v2_ankle_counter_max_delta_deg": 18.0,
+        "refine_v253_single_leg_extension_enabled": true,
+        "refine_v253_straight_angle_min_deg": 160.0,
+        "refine_v253_extension_delta_min_deg": 15.0,
+        "refine_v253_extension_delta_max_deg": 45.0,
+        "refine_v253_up_leg_max_delta_deg": 18.0,
+        "refine_v2_lower_body": true,
+        "refine_v2_torso_enabled": false,
+        "refine_v2_torso_max_delta_deg": 8.0,
+        "refine_v2_blend_alphas": "1.0,0.75,0.5,0.25",
+        "refine_v2_foot_direction_deg": 12.0,
+        "refine_v2_ground_tolerance": 0.08,
+        "refine_default_mode": "aggressive",
+        "refine_v25_selector_enabled": true,
+        "refine_v25_joint_nme_epsilon": 1e-06,
+        "refine_v25_endpoint_nme_epsilon": 1e-06,
+        "refine_v25_pair_epsilon": 1e-06,
+        "refine_v25_contact_epsilon": 1e-08,
+        "refine_v25_joint_nme_weight": 0.15,
+        "refine_v25_partial_alphas": "0.75,0.5,0.25",
+        "refine_v25_skip_inactive_aggressive": true,
+        "refine_v25_inactive_skip_budget_fraction": 0.25,
+        "refine_v25_final_check_reserve_seconds": 0.15,
+        "refine_v25_aggressive_min_remaining_seconds": 0.75,
+        "refine_timeout_seconds": 5.0
+      },
+      "feature_version": 1,
+      "pose_library_version": "v1",
+      "deployment_version": "development",
+      "source_revision": "development",
+      "source_code_sha256": "f7e3b22d0c32efb63614b34f23c31c10f27a5659c861956584816b6228d227c0",
+      "runtime": {
+        "python": "3.12.13",
+        "numpy": "2.5.4",
+        "scipy": "1.18.1"
+      }
+    }
+  },
+  "response": {
+    "contract_version": "candidate-refine-v1",
+    "batch_id": "synthetic-wire",
+    "owner_id": "local-wire",
+    "job_id": "local-wire",
+    "candidate_set_revision": "1",
+    "all_terminal": true,
+    "results": [
+      {
+        "person_id": "0",
+        "candidate_id": "0",
+        "context_fingerprint": "421ba5a4bfa775100ea1557fb86d478b83ee463809b316956aed0f8d2a8ba86f",
+        "source_fingerprint": "ede31da0d48c92749cbcf8e582baf35b40581606c5cca13f12b8bf704ffbc05a",
+        "status": "ready_refined",
+        "reason": "ok",
+        "quality_scope": "source_only",
+        "engine": {
+          "adapter_version": "candidate-source-adapter-v1",
+          "code_version": "v1.4",
+          "config": {
+            "distance_metric": "pos",
+            "fallback_angle_full": 0.45,
+            "fallback_angle_reduced": 0.45,
+            "fallback_distance": 0.45,
+            "fallback_hybrid_full": 0.45,
+            "fallback_hybrid_reduced": 0.45,
+            "fallback_pos_full": 0.45,
+            "fallback_pos_reduced": 0.45,
+            "min_skeleton_score": 0.2,
+            "refine_axis_lambda_max_mult": 100.0,
+            "refine_axis_observability": true,
+            "refine_collision_arm_radius": 0.035,
+            "refine_collision_gate": true,
+            "refine_collision_hand_radius": 0.025,
+            "refine_collision_leg_radius": 0.045,
+            "refine_collision_min_depth": 0.05,
+            "refine_collision_samples": 9,
+            "refine_collision_torso_hip_scale": 0.45,
+            "refine_collision_torso_shoulder_scale": 0.38,
+            "refine_collision_worsen_delta": 0.01,
+            "refine_default_mode": "aggressive",
+            "refine_enabled": true,
+            "refine_gain_epsilon": 0.0001,
+            "refine_lambda": 0.05,
+            "refine_limbs": "arms",
+            "refine_max_delta_deg": 45.0,
+            "refine_max_iter": 100,
+            "refine_max_move_max": 0.35,
+            "refine_max_move_mean": 0.2,
+            "refine_min_bend_deg": 20.0,
+            "refine_min_gain": 0.95,
+            "refine_min_loss": 0.01,
+            "refine_min_observability": 0.34,
+            "refine_min_observability_abs": 0.1,
+            "refine_move_gate": false,
+            "refine_observability_gate": true,
+            "refine_pose_quarantine_path": "config/refine_pose_quarantine.v1.json",
+            "refine_svd_lambda_max_mult": 2.0,
+            "refine_svd_observability": true,
+            "refine_timeout_seconds": 5.0,
+            "refine_v253_extension_delta_max_deg": 45.0,
+            "refine_v253_extension_delta_min_deg": 15.0,
+            "refine_v253_single_leg_extension_enabled": true,
+            "refine_v253_straight_angle_min_deg": 160.0,
+            "refine_v253_up_leg_max_delta_deg": 18.0,
+            "refine_v25_aggressive_min_remaining_seconds": 0.75,
+            "refine_v25_contact_epsilon": 1e-08,
+            "refine_v25_endpoint_nme_epsilon": 1e-06,
+            "refine_v25_final_check_reserve_seconds": 0.15,
+            "refine_v25_inactive_skip_budget_fraction": 0.25,
+            "refine_v25_joint_nme_epsilon": 1e-06,
+            "refine_v25_joint_nme_weight": 0.15,
+            "refine_v25_pair_epsilon": 1e-06,
+            "refine_v25_partial_alphas": "0.75,0.5,0.25",
+            "refine_v25_selector_enabled": true,
+            "refine_v25_skip_inactive_aggressive": true,
+            "refine_v2_aggressive_lower_pair_weight": 0.9,
+            "refine_v2_anatomy_weight": 0.05,
+            "refine_v2_ankle_counter_max_delta_deg": 18.0,
+            "refine_v2_blend_alphas": "1.0,0.75,0.5,0.25",
+            "refine_v2_collision_weight": 0.1,
+            "refine_v2_enabled": false,
+            "refine_v2_endpoint_huber_delta": 0.15,
+            "refine_v2_endpoint_weight": 0.35,
+            "refine_v2_foot_direction_deg": 12.0,
+            "refine_v2_foreshortening_direction_scale": 0.25,
+            "refine_v2_ground_tolerance": 0.08,
+            "refine_v2_hand_leg_min_depth": 0.01,
+            "refine_v2_hand_leg_worsen_delta": 0.005,
+            "refine_v2_hand_pair_midpoint_weight": 0.6,
+            "refine_v2_hand_pair_min_gap_delta": 0.02,
+            "refine_v2_hand_pair_weight": 0.8,
+            "refine_v2_lap_contact_2d_threshold": 0.25,
+            "refine_v2_lap_contact_max_clearance": 0.02,
+            "refine_v2_lap_contact_min_clearance": -0.003,
+            "refine_v2_lap_contact_weight": 1.5,
+            "refine_v2_lower_body": true,
+            "refine_v2_lower_pair_min_gap_delta": 0.02,
+            "refine_v2_lower_pair_weight": 0.35,
+            "refine_v2_move_weight": 0.08,
+            "refine_v2_torso_enabled": false,
+            "refine_v2_torso_max_delta_deg": 8.0
+          },
+          "config_sha256": "7709d63b0e0efa6d81d14526bb7b7d08b401b39fc4545486adff62a2237f49d8",
+          "config_valid": true,
+          "default_mode": "conservative",
+          "deployment_version": "development",
+          "enabled": true,
+          "feature_version": 1,
+          "policy_version": "structural-refine-v1",
+          "pose_library_version": "v1",
+          "pose_quarantine_sha256": "6e3956b322eef0993080f0c953ae8a4d6a75de2784b70ac9b4a8857136af0162",
+          "projection_version": "search-refine-projection-v1",
+          "refine_v3": {
+            "binding_available": false,
+            "certified_profiles": 0,
+            "mesh_validation_required": true,
+            "mode": "off",
+            "regional_apply": false,
+            "target_apply": false,
+            "version": "refine-shadow-v1"
+          },
+          "runtime": {
+            "numpy": "2.5.4",
+            "python": "3.12.13",
+            "scipy": "1.18.1"
+          },
+          "selector_enabled": false,
+          "selector_version": "v2.5.2",
+          "source_code_sha256": "f7e3b22d0c32efb63614b34f23c31c10f27a5659c861956584816b6228d227c0",
+          "source_revision": "development",
+          "supported_modes": [
+            "conservative"
+          ],
+          "torso_enabled": false,
+          "v2_enabled": false
+        },
+        "source_sha256": "9f093da9234d8cd436f247946844658aca75f733a83980d2cfb5bfa7acc3a35a",
+        "artifact_sha256": "c298cbc5c9c18545aca9dfcd0bdea96a3c113e788c742c166b54cbb2c14f83b7",
+        "bvh": "HIERARCHY\nROOT Hips\n{ OFFSET 0 0 0\n  CHANNELS 6 Xposition Yposition Zposition Zrotation Xrotation Yrotation\n  JOINT Spine\n  { OFFSET 0 10 0\n    CHANNELS 3 Zrotation Xrotation Yrotation\n    JOINT LeftArm\n    { OFFSET 5 5 0\n      CHANNELS 3 Zrotation Xrotation Yrotation\n      JOINT LeftForeArm\n      { OFFSET 0 -8 0\n        CHANNELS 3 Zrotation Xrotation Yrotation\n        JOINT LeftHand\n        { OFFSET 0 -8 0\n          CHANNELS 3 Zrotation Xrotation Yrotation\n          End Site { OFFSET 0 -2 0 }\n        }\n      }\n    }\n    JOINT RightArm\n    { OFFSET -5 5 0\n      CHANNELS 3 Zrotation Xrotation Yrotation\n      JOINT RightForeArm\n      { OFFSET 0 -8 0\n        CHANNELS 3 Zrotation Xrotation Yrotation\n        JOINT RightHand\n        { OFFSET 0 -8 0\n          CHANNELS 3 Zrotation Xrotation Yrotation\n          End Site { OFFSET 0 -2 0 }\n        }\n      }\n    }\n    JOINT Head\n    { OFFSET 0 8 0\n      CHANNELS 3 Zrotation Xrotation Yrotation\n      End Site { OFFSET 0 3 0 }\n    }\n  }\n  JOINT LeftUpLeg\n  { OFFSET 3 0 0\n    CHANNELS 3 Zrotation Xrotation Yrotation\n    JOINT LeftLeg\n    { OFFSET 0 -10 0\n      CHANNELS 3 Zrotation Xrotation Yrotation\n      JOINT LeftFoot\n      { OFFSET 0 -10 0\n        CHANNELS 3 Zrotation Xrotation Yrotation\n        End Site { OFFSET 0 -2 0 }\n      }\n    }\n  }\n  JOINT RightUpLeg\n  { OFFSET -3 0 0\n    CHANNELS 3 Zrotation Xrotation Yrotation\n    JOINT RightLeg\n    { OFFSET 0 -10 0\n      CHANNELS 3 Zrotation Xrotation Yrotation\n      JOINT RightFoot\n      { OFFSET 0 -10 0\n        CHANNELS 3 Zrotation Xrotation Yrotation\n        End Site { OFFSET 0 -2 0 }\n      }\n    }\n  }\n}\nMOTION\nFrames: 1\nFrame Time: 0.033333\n0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 12.267306 -0.000027 0.000000 2.840389 -0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000\n",
+        "prepared_id": "a56d6d9af4d54839a39865d00dde2758",
+        "timing": {
+          "queue_ms": 0.03166700480505824,
+          "execution_ms": 86.07429201947525,
+          "total_ms": 87.35462499316782,
+          "cache": "miss",
+          "origin_queue_ms": 0.03166700480505824,
+          "origin_execution_ms": 86.07429201947525
+        }
+      },
+      {
+        "person_id": "0",
+        "candidate_id": "1",
+        "context_fingerprint": "95c3e51d42cb8b6aa380502c179a5397ea0c53d845973db9471ef0a791cc5521",
+        "source_fingerprint": "f81e35670cfab0363faffe7f06f306892863febefeb72f2a52610eaf649d85fd",
+        "status": "ready_base",
+        "reason": "skeleton_policy",
+        "quality_scope": "source_only",
+        "engine": {
+          "adapter_version": "candidate-source-adapter-v1",
+          "code_version": "v1.4",
+          "config": {
+            "distance_metric": "pos",
+            "fallback_angle_full": 0.45,
+            "fallback_angle_reduced": 0.45,
+            "fallback_distance": 0.45,
+            "fallback_hybrid_full": 0.45,
+            "fallback_hybrid_reduced": 0.45,
+            "fallback_pos_full": 0.45,
+            "fallback_pos_reduced": 0.45,
+            "min_skeleton_score": 0.2,
+            "refine_axis_lambda_max_mult": 100.0,
+            "refine_axis_observability": true,
+            "refine_collision_arm_radius": 0.035,
+            "refine_collision_gate": true,
+            "refine_collision_hand_radius": 0.025,
+            "refine_collision_leg_radius": 0.045,
+            "refine_collision_min_depth": 0.05,
+            "refine_collision_samples": 9,
+            "refine_collision_torso_hip_scale": 0.45,
+            "refine_collision_torso_shoulder_scale": 0.38,
+            "refine_collision_worsen_delta": 0.01,
+            "refine_default_mode": "aggressive",
+            "refine_enabled": true,
+            "refine_gain_epsilon": 0.0001,
+            "refine_lambda": 0.05,
+            "refine_limbs": "arms",
+            "refine_max_delta_deg": 45.0,
+            "refine_max_iter": 100,
+            "refine_max_move_max": 0.35,
+            "refine_max_move_mean": 0.2,
+            "refine_min_bend_deg": 20.0,
+            "refine_min_gain": 0.95,
+            "refine_min_loss": 0.01,
+            "refine_min_observability": 0.34,
+            "refine_min_observability_abs": 0.1,
+            "refine_move_gate": false,
+            "refine_observability_gate": true,
+            "refine_pose_quarantine_path": "config/refine_pose_quarantine.v1.json",
+            "refine_svd_lambda_max_mult": 2.0,
+            "refine_svd_observability": true,
+            "refine_timeout_seconds": 5.0,
+            "refine_v253_extension_delta_max_deg": 45.0,
+            "refine_v253_extension_delta_min_deg": 15.0,
+            "refine_v253_single_leg_extension_enabled": true,
+            "refine_v253_straight_angle_min_deg": 160.0,
+            "refine_v253_up_leg_max_delta_deg": 18.0,
+            "refine_v25_aggressive_min_remaining_seconds": 0.75,
+            "refine_v25_contact_epsilon": 1e-08,
+            "refine_v25_endpoint_nme_epsilon": 1e-06,
+            "refine_v25_final_check_reserve_seconds": 0.15,
+            "refine_v25_inactive_skip_budget_fraction": 0.25,
+            "refine_v25_joint_nme_epsilon": 1e-06,
+            "refine_v25_joint_nme_weight": 0.15,
+            "refine_v25_pair_epsilon": 1e-06,
+            "refine_v25_partial_alphas": "0.75,0.5,0.25",
+            "refine_v25_selector_enabled": true,
+            "refine_v25_skip_inactive_aggressive": true,
+            "refine_v2_aggressive_lower_pair_weight": 0.9,
+            "refine_v2_anatomy_weight": 0.05,
+            "refine_v2_ankle_counter_max_delta_deg": 18.0,
+            "refine_v2_blend_alphas": "1.0,0.75,0.5,0.25",
+            "refine_v2_collision_weight": 0.1,
+            "refine_v2_enabled": false,
+            "refine_v2_endpoint_huber_delta": 0.15,
+            "refine_v2_endpoint_weight": 0.35,
+            "refine_v2_foot_direction_deg": 12.0,
+            "refine_v2_foreshortening_direction_scale": 0.25,
+            "refine_v2_ground_tolerance": 0.08,
+            "refine_v2_hand_leg_min_depth": 0.01,
+            "refine_v2_hand_leg_worsen_delta": 0.005,
+            "refine_v2_hand_pair_midpoint_weight": 0.6,
+            "refine_v2_hand_pair_min_gap_delta": 0.02,
+            "refine_v2_hand_pair_weight": 0.8,
+            "refine_v2_lap_contact_2d_threshold": 0.25,
+            "refine_v2_lap_contact_max_clearance": 0.02,
+            "refine_v2_lap_contact_min_clearance": -0.003,
+            "refine_v2_lap_contact_weight": 1.5,
+            "refine_v2_lower_body": true,
+            "refine_v2_lower_pair_min_gap_delta": 0.02,
+            "refine_v2_lower_pair_weight": 0.35,
+            "refine_v2_move_weight": 0.08,
+            "refine_v2_torso_enabled": false,
+            "refine_v2_torso_max_delta_deg": 8.0
+          },
+          "config_sha256": "7709d63b0e0efa6d81d14526bb7b7d08b401b39fc4545486adff62a2237f49d8",
+          "config_valid": true,
+          "default_mode": "conservative",
+          "deployment_version": "development",
+          "enabled": true,
+          "feature_version": 1,
+          "policy_version": "structural-refine-v1",
+          "pose_library_version": "v1",
+          "pose_quarantine_sha256": "6e3956b322eef0993080f0c953ae8a4d6a75de2784b70ac9b4a8857136af0162",
+          "projection_version": "search-refine-projection-v1",
+          "refine_v3": {
+            "binding_available": false,
+            "certified_profiles": 0,
+            "mesh_validation_required": true,
+            "mode": "off",
+            "regional_apply": false,
+            "target_apply": false,
+            "version": "refine-shadow-v1"
+          },
+          "runtime": {
+            "numpy": "2.5.4",
+            "python": "3.12.13",
+            "scipy": "1.18.1"
+          },
+          "selector_enabled": false,
+          "selector_version": "v2.5.2",
+          "source_code_sha256": "f7e3b22d0c32efb63614b34f23c31c10f27a5659c861956584816b6228d227c0",
+          "source_revision": "development",
+          "supported_modes": [
+            "conservative"
+          ],
+          "torso_enabled": false,
+          "v2_enabled": false
+        },
+        "source_sha256": "9f093da9234d8cd436f247946844658aca75f733a83980d2cfb5bfa7acc3a35a",
+        "artifact_sha256": "9f093da9234d8cd436f247946844658aca75f733a83980d2cfb5bfa7acc3a35a",
+        "bvh": "HIERARCHY\nROOT Hips\n{ OFFSET 0 0 0\n  CHANNELS 6 Xposition Yposition Zposition Zrotation Xrotation Yrotation\n  JOINT Spine\n  { OFFSET 0 10 0\n    CHANNELS 3 Zrotation Xrotation Yrotation\n    JOINT LeftArm\n    { OFFSET 5 5 0\n      CHANNELS 3 Zrotation Xrotation Yrotation\n      JOINT LeftForeArm\n      { OFFSET 0 -8 0\n        CHANNELS 3 Zrotation Xrotation Yrotation\n        JOINT LeftHand\n        { OFFSET 0 -8 0\n          CHANNELS 3 Zrotation Xrotation Yrotation\n          End Site { OFFSET 0 -2 0 }\n        }\n      }\n    }\n    JOINT RightArm\n    { OFFSET -5 5 0\n      CHANNELS 3 Zrotation Xrotation Yrotation\n      JOINT RightForeArm\n      { OFFSET 0 -8 0\n        CHANNELS 3 Zrotation Xrotation Yrotation\n        JOINT RightHand\n        { OFFSET 0 -8 0\n          CHANNELS 3 Zrotation Xrotation Yrotation\n          End Site { OFFSET 0 -2 0 }\n        }\n      }\n    }\n    JOINT Head\n    { OFFSET 0 8 0\n      CHANNELS 3 Zrotation Xrotation Yrotation\n      End Site { OFFSET 0 3 0 }\n    }\n  }\n  JOINT LeftUpLeg\n  { OFFSET 3 0 0\n    CHANNELS 3 Zrotation Xrotation Yrotation\n    JOINT LeftLeg\n    { OFFSET 0 -10 0\n      CHANNELS 3 Zrotation Xrotation Yrotation\n      JOINT LeftFoot\n      { OFFSET 0 -10 0\n        CHANNELS 3 Zrotation Xrotation Yrotation\n        End Site { OFFSET 0 -2 0 }\n      }\n    }\n  }\n  JOINT RightUpLeg\n  { OFFSET -3 0 0\n    CHANNELS 3 Zrotation Xrotation Yrotation\n    JOINT RightLeg\n    { OFFSET 0 -10 0\n      CHANNELS 3 Zrotation Xrotation Yrotation\n      JOINT RightFoot\n      { OFFSET 0 -10 0\n        CHANNELS 3 Zrotation Xrotation Yrotation\n        End Site { OFFSET 0 -2 0 }\n      }\n    }\n  }\n}\nMOTION\nFrames: 1\nFrame Time: 0.033333\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n",
+        "prepared_id": "d49eab5faecb42c8859b7b4f9f40f907",
+        "timing": {
+          "queue_ms": 85.86933399783447,
+          "execution_ms": 0.9119579917751253,
+          "total_ms": 87.90649997536093,
+          "cache": "miss",
+          "origin_queue_ms": 85.86933399783447,
+          "origin_execution_ms": 0.9119579917751253
+        }
+      }
+    ],
+    "elapsed_ms": 87.93129195692018
+  },
+  "source_only": true,
+  "target_model_loaded": false,
+  "note": "Prepared IDs are illustrative expired local test handles; not downloadable artifacts."
+}

@@ -1010,6 +1010,21 @@ def _effective_refine_mode(requested: Optional[str]) -> str:
 
 @app.post("/refine", response_model=RefineResponse)
 def refine(req: RefineRequest):
+    """선택 후보를 기존 안전 정책으로 보정하고 조정 BVH/미리보기를 반환한다."""
+    if os.getenv("CANDIDATE_REFINE_ENABLED", "0") != "1":
+        return _refine_impl(req)
+    # Mixed old/new clients share the same actual numerical capacity when the
+    # new preparation service is enabled; old selected work has priority.
+    from src.refine_admission import source_admission, SourceAdmissionError
+    wait_budget = min(30., max(1., float(CFG.refine_timeout_seconds) or 30.))
+    try:
+        with source_admission().slot("selected", time.monotonic() + wait_budget):
+            return _refine_impl(req)
+    except SourceAdmissionError:
+        raise HTTPException(503, {"code": "REFINE_SOURCE_BUSY"}, headers={"Retry-After": "1"}) from None
+
+
+def _refine_impl(req: RefineRequest, *, source_snapshot=None, execution_deadline=None, run_shadow=True):
     """
     작가가 고른 후보 1개를 러프에 맞춰 safe aggressive 정책으로 조정한다.
 
@@ -1036,10 +1051,11 @@ def refine(req: RefineRequest):
             f"({quarantine['reason']})",
         )
 
-    meta = get_pose_meta(STATE["db_path"], req.pose_id)
+    meta = (source_snapshot[0] if source_snapshot else
+            get_pose_meta(STATE["db_path"], req.pose_id))
     if meta is None:
         raise HTTPException(404, f"unknown pose_id: {req.pose_id}")
-    base = meta["bvh_path"]
+    base = source_snapshot[1] if source_snapshot else meta["bvh_path"]
     if not base or not os.path.exists(base):
         raise HTTPException(409, f"pose '{req.pose_id}' 등록됨(경로={base})이나 BVH 파일 미존재.")
     try:
@@ -1065,7 +1081,7 @@ def refine(req: RefineRequest):
         }
 
     def _base_response(reason: str, *, attempted: bool = False) -> RefineResponse:
-        shadow = (None if meta.get("set_id") else
+        shadow = (None if meta.get("set_id") or not run_shadow else
                   shadow_for_request(req, base, deadline=shadow_deadline))
         return RefineResponse(
             pose_id=req.pose_id, view=req.view, refined=False,
@@ -1132,6 +1148,8 @@ def refine(req: RefineRequest):
 
     timeout = max(float(CFG.refine_timeout_seconds), 0.0)
     deadline = None if timeout == 0.0 else time.monotonic() + timeout
+    if execution_deadline is not None:
+        deadline = min(deadline, execution_deadline) if deadline else execution_deadline
     try:
         # out_path=None → 로컬 파일을 쓰지 않는다. selector는 내부 임시파일로 최종
         # 후보를 재검증하고, 채택본의 본문만 응답으로 나간다.
@@ -1152,7 +1170,7 @@ def refine(req: RefineRequest):
         raise HTTPException(409, f"refine BVH 처리 실패: {exc}") from exc
 
     diagnostics = dict(res.diagnostics)
-    shadow = shadow_for_request(req, base, deadline=shadow_deadline)
+    shadow = shadow_for_request(req, base, deadline=shadow_deadline) if run_shadow else None
     if shadow is not None:
         diagnostics["refine_v3"] = shadow
     diagnostics.setdefault("mode_requested", mode_requested)
@@ -1233,3 +1251,7 @@ def export_order(req: ExportOrderRequest):
         created_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
         items=items, notes=notes,
     )
+
+
+from api.candidate_refine import install_candidate_routes
+install_candidate_routes(app)
