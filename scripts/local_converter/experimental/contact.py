@@ -1,6 +1,7 @@
 """Conservative swept bounds for non-neighbor triangle pairs of one mesh."""
 import numpy as np
 from .contact_features import crossing_edges
+from .vertex_contact import shared_vertex_guard
 from scipy.spatial import cKDTree
 
 
@@ -43,7 +44,7 @@ def interval_separated(a0, a1, b0, b1, extent, depth=0):
             interval_separated(am,a1,bm,b1,extent,depth+1))
 
 
-def potential_pairs(faces, moving, lower, upper):
+def potential_pairs(faces, moving, lower, upper, owners=None):
     centers = (lower+upper)/2
     radius = ((upper-lower)/2).max(axis=1)
     tree = cKDTree(centers)
@@ -51,6 +52,8 @@ def potential_pairs(faces, moving, lower, upper):
     for i in np.flatnonzero(moving):
         near = np.asarray(tree.query_ball_point(centers[i], radius[i]+max_radius,
                                                 p=np.inf), dtype=int)
+        if owners is not None:
+            near = near[owners[near]!=owners[i]]
         near = near[(near != i) & (~moving[near] | (near > i))]
         near = near[((upper[near] >= lower[i]) & (lower[near] <= upper[i])).all(1)]
         for j in near:
@@ -85,7 +88,7 @@ def contact_guard(start, end, faces, pair_budget=250000, *, sliding=False):
 
     A fixed separating axis at both endpoints certifies separation throughout
     linear motion. Uncertain pairs (including pre-existing contact) fail closed.
-    Topological neighbors are excluded, so this is a partial intersection test.
+    Topological neighbors must stay separated except at their shared features.
     """
     moving = np.any(start != end, axis=1)[faces].any(axis=1)
     old, new = start[faces], end[faces]
@@ -113,4 +116,7 @@ def contact_guard(start, end, faces, pair_budget=250000, *, sliding=False):
                         faces=[int(i),int(j)],
                         baseline=static_relation(old[i],old[j],extent),
                         proposed=static_relation(new[i],new[j],extent))
-    return dict(passCheck=True, pairs=checked, certifiedExistingPairs=certified)
+    neighbors=shared_vertex_guard(start,end,faces,pair_budget=max(0,pair_budget-checked))
+    if not neighbors["passCheck"]:
+        return dict(neighbors,disjointPairs=checked)
+    return dict(passCheck=True, pairs=checked, certifiedExistingPairs=certified,neighbors=neighbors)

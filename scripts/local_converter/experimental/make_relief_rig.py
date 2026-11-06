@@ -78,6 +78,14 @@ def write_asset(path, anomaly, split):
     bpy.ops.export_scene.fbx(filepath=str(path),add_leaf_bones=False,bake_anim=False)
 
 
+def apply_relief_pose(arm):
+    for name,angle,shift in (("Left",.18,(.01,.02,.03)),("Middle",-.22,(0,0,.01)),
+                             ("Right",.72,(0,.05,.22))):
+        bone=arm.pose.bones[name]
+        delta=Matrix.Translation(shift)@Matrix.Rotation(angle,4,"Y")
+        bone.matrix=arm.matrix_world.inverted()@delta@arm.matrix_world@bone.matrix
+
+
 def sample(path):
     bpy.ops.wm.read_factory_settings(use_empty=True)
     bpy.ops.import_scene.fbx(filepath=str(path))
@@ -88,11 +96,7 @@ def sample(path):
         obj=body.evaluated_get(bpy.context.evaluated_depsgraph_get())
         return np.array([obj.matrix_world@v.co for v in obj.data.vertices],dtype=float)
     rest=evaluated()
-    for name,angle,shift in (("Left",.18,(.01,.02,.03)),("Middle",-.22,(0,0,.01)),
-                             ("Right",.72,(0,.05,.22))):
-        bone=arm.pose.bones[name]
-        delta=Matrix.Translation(shift)@Matrix.Rotation(angle,4,"Y")
-        bone.matrix=arm.matrix_world.inverted()@delta@arm.matrix_world@bone.matrix
+    apply_relief_pose(arm)
     return arm,body,rest,evaluated()
 
 

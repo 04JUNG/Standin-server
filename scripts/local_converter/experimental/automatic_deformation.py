@@ -314,5 +314,5 @@ def correct(rest, posed, faces, anchors, *, iterations=40, expansions=4, regions
     return best, dict(applied=material, seams=seam_info, isolatedInfluence=isolated_report, timeBudgetReached=time.monotonic() >= deadline, totalExcessAboveTwo=best_excess,
                       beforeMaxStretch=float(ratio.max()), afterMaxStretch=best_ratio,
                       unresolved=best_ratio > 2, seeds=seeds, history=history,
-                      contactScope="one mesh, disjoint vertex sets, straight output displacement",
+                      contactScope="one mesh, shared and disjoint triangle features, straight output displacement",
                       seamClassification="open boundaries and coincident source vertices pinned")
