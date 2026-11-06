@@ -33,6 +33,8 @@ def select(stage, patch, capture, source, candidate):
         fixed[expected["ids"]] = False
         faces = measured["faces"]
         guard = DeformationGuard(raw["rest"],start,faces,fixed | raw["anchors"])
+        _, groups, counts = np.unique(raw["rest"],axis=0,return_inverse=True,return_counts=True)
+        guard.fixed |= guard.graph.fixed | (counts[groups.ravel()]>1)
         guard.upper = np.maximum(1.,guard.reference["stretch"])
         guard.edge_upper = np.maximum(1.,guard.reference["edge"])
         guard.crease_limit = np.maximum(1e-7, abs(guard.angle_difference(guard.reference["bend"],guard.rest_bend)))
