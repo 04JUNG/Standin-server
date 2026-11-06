@@ -154,6 +154,7 @@ def _enabled(condition, event, branch, target, deploy_staging, auto):
         "github": SimpleNamespace(event_name=event, ref="refs/heads/" + branch),
         "inputs": SimpleNamespace(target=target, deploy_staging=deploy_staging),
         "variables": SimpleNamespace(CONVERTER_AUTO_DEPLOY_ENABLED=str(auto).lower()),
+        "startsWith": lambda value, prefix: value.startswith(prefix),
     }))
 
 
@@ -169,6 +170,12 @@ def test_manual_target_routing_never_deploys_worker_outside_develop():
         ("push", "main", "", False, True, {"converter"}),
         ("workflow_dispatch", "develop", "converter", True, False, {"converter"}),
         ("workflow_dispatch", "develop", "converter", False, False, set()),
+        ("workflow_dispatch", "codex/interactive-staging-fix", "converter", True, False, {"converter"}),
+        ("workflow_dispatch", "codex/interactive-staging-fix", "converter", False, False, set()),
+        ("push", "codex/interactive-staging-fix", "converter", True, False, set()),
+        ("workflow_dispatch", "feature", "converter", True, False, set()),
+        ("workflow_dispatch", "main", "converter", True, False, set()),
+        ("workflow_dispatch", "codex/interactive-staging-fix", "scene-worker", True, False, set()),
         ("workflow_dispatch", "develop", "scene-worker", True, False, {"worker"}),
         ("workflow_dispatch", "develop", "scene-worker", True, True, {"worker"}),
         ("workflow_dispatch", "develop", "scene-worker", False, True, {"worker"}),
