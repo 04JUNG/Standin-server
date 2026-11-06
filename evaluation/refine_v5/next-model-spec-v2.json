@@ -1,0 +1,67 @@
+{
+  "status": "DESIGN_NOT_IMPLEMENTED",
+  "purpose": "P2 model and correction-range work derived from P0/P1 follow-up",
+  "training_split": "evaluation/refine_v5/split-v2.json",
+  "development_rows": 63,
+  "development_source_ready": 58,
+  "development_visible_arm_source_ready": 39,
+  "input": [
+    "rough_part_features",
+    "pose_model_coordinates_and_mask",
+    "source_FK_joints_and_frames",
+    "fixed_search_camera_context",
+    "representation_type_and_visibility"
+  ],
+  "output": [
+    "body_relative_joint_targets",
+    "local_SO3_residual_proposals",
+    "per_part_uncertainty"
+  ],
+  "target_only_output": [
+    "reviewed_palm_sole_head_orientation",
+    "hand_surface_contact_and_finger_detail"
+  ],
+  "supervision_roles": [
+    "observed",
+    "weak_hidden_prior",
+    "unlabeled"
+  ],
+  "ablations": [
+    "masked_geometry_shared_head",
+    "same_head_plus_frozen_image_features"
+  ],
+  "losses": [
+    "observed_joint_endpoint",
+    "bone_direction",
+    "body_anchor",
+    "part_orientation_when_observable",
+    "verified_relation_or_contact",
+    "prior_change_regularization"
+  ],
+  "scope": [
+    "preserve_original_B0_reference",
+    "supported_lower_body_and_support_guards",
+    "limited_spine_clavicle_with_limbs",
+    "selected_target_wrist_foot_head_details"
+  ],
+  "promotion_constraints": [
+    "new_rig_range_profile_required",
+    "do_not_promote_diagnostic_60_degree_budget",
+    "inactive_part_and_support_nonregression",
+    "independent_actual_file_and_skin_validation",
+    "exact_valid_fallback"
+  ],
+  "independence": {
+    "no_GT_at_inference": true,
+    "no_test_augmentation_leak": true,
+    "artist_blind_claim": false,
+    "rig_library_normalization_unchanged": true
+  },
+  "first_sanity_cases": [
+    "hand_at_waist",
+    "hand_at_face",
+    "straight_arms",
+    "crossed_arms"
+  ],
+  "evidence": "evaluation/refine_v5/p1-followup-summary-v2.json"
+}

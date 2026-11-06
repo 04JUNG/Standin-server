@@ -54,7 +54,9 @@ scope. The pixel ridge baseline does not generalize sufficiently. Full-pose
 similarity is not achieved. Next engine work needs torso/shoulder anchors and
 hand orientation, plus a stronger rough-conditioned learned representation.
 
-P0 artist/scene/exposure grouping and visibility/camera review remain pending;
+Historical first-run status: P0 reviews were pending. Current agent review, goal
+comparison and diagnosis are in [FOLLOWUP_V2.md](FOLLOWUP_V2.md); author provenance
+and camera calibration remain unavailable;
 there is no certified split. The planned manual **2D** target comparison has not
 been performed. The 3D oracle must remain labeled separately. Mesh/contact,
 protected-branch/world-frame audits and production angle budgets were not

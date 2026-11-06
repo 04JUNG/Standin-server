@@ -23,7 +23,7 @@ def snapshot(arm):
 
 def load(path):
     bpy.ops.wm.read_factory_settings(use_empty=True)
-    bpy.ops.import_scene.fbx(filepath=str(path))
+    bpy.ops.import_scene.fbx(filepath=str(path), ignore_leaf_bones=False)
     arm = next((o for o in bpy.context.scene.objects if o.type == 'ARMATURE'))
     return (arm, [o for o in bpy.context.scene.objects if o.type == 'MESH'])
 
@@ -32,6 +32,8 @@ def main():
     sys.path.insert(0, a['repo'])
     from converter.convert import convert
     from converter import retarget as rt
+    from experiments.refine_v5.export_native_v2 import export_preserving_bones
+    from experiments.refine_v5.native_contract_v2 import compare_native
     root = Path(a['out'])
     root.mkdir(exist_ok=False, parents=True)
     records = []
@@ -60,12 +62,16 @@ def main():
                 b.matrix = arm.matrix_world.inverted() @ world
                 bpy.context.view_layer.update()
             planned = snapshot(arm)
+            expected_heads = {b.name: list(arm.matrix_world @ b.head) for b in arm.pose.bones}
+            expected_parents = {b.name: b.parent.name if b.parent else None for b in arm.pose.bones}
+            expected_lengths = {b.name: (arm.matrix_world @ (b.tail - b.head)).length for b in arm.pose.bones}
             dest = root / (case + '.candidate-not-for-service.fbx')
             rt.apply_output_mode(arm, meshes, 'rigged_rest')
-            rt.export_fbx(str(dest), embed_textures=False, bake_anim=False)
+            export_preserving_bones(dest)
             arm, _ = load(dest)
             actual = snapshot(arm)
-            records.append(dict(case_id=case, before=before, planned=planned, actual=actual, artifact=str(dest), sha256=hashlib.sha256(dest.read_bytes()).hexdigest(), production_ready=False, mesh_checked=False))
+            structural = compare_native(expected_heads, {b.name: list(arm.matrix_world @ b.head) for b in arm.pose.bones}, expected_parents, {b.name: b.parent.name if b.parent else None for b in arm.pose.bones}, expected_lengths, {b.name: (arm.matrix_world @ (b.tail - b.head)).length for b in arm.pose.bones})
+            records.append(dict(case_id=case, before=before, planned=planned, actual=actual, artifact=str(dest), sha256=hashlib.sha256(dest.read_bytes()).hexdigest(), production_ready=False, mesh_checked=False, native_structure=structural, preserved_bones=len(expected_heads)))
     (root / 'records.json').write_text(json.dumps(records, indent=2))
     print('V5_NATIVE', len(records))
 if __name__ == '__main__':
