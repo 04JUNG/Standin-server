@@ -1199,6 +1199,8 @@ def create_app(
     register_final_preview(app, blender_runner)
     from converter_api.outline import register_outline
     register_outline(app, character_registry, blender_runner)
+    from converter_api.skin import register_skin
+    register_skin(app, character_registry, blender_runner)
     return app
 
 
