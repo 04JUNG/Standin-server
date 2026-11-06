@@ -138,6 +138,11 @@ COPY converter_api/__init__.py /app/converter_api/__init__.py
 COPY converter_api/app.py /app/converter_api/app.py
 COPY converter_api/final_preview.py /app/converter_api/final_preview.py
 COPY converter_api/outline.py /app/converter_api/outline.py
+COPY converter_api/skin.py /app/converter_api/skin.py
+COPY converter/skin_spec.py /app/converter/skin_spec.py
+COPY converter/skin_fbx.py /app/converter/skin_fbx.py
+COPY converter/skin_worker.py /app/converter/skin_worker.py
+COPY converter/skin_assets.v1.json /app/converter/skin_assets.v1.json
 COPY converter_api/registry.py /app/converter_api/registry.py
 COPY converter_api/runner.py /app/converter_api/runner.py
 COPY converter_api/work_queue.py /app/converter_api/work_queue.py

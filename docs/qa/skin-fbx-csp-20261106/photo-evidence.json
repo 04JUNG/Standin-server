@@ -1,0 +1,197 @@
+{
+  "method": "Test-canvas-only crops of actual screenshots, resized for layout; no model pixels retouched. Raw captures/models/tokens/user-document UI excluded.",
+  "images": [
+    {
+      "published": "csp-skins.png",
+      "source_photo": "skin-only-male-gray-guide.jpg",
+      "source_photo_sha256": "8c7590a12a4d7b3e7445f3aa787f6c96727304f58dac2ca80c80d4f2637482f8",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "90b2b3e7192d538d6bb7cacf7bf761257b81d37902d46d62376015a11ce04e6f"
+    },
+    {
+      "published": "csp-skins.png",
+      "source_photo": "skin-only-female-gray-guide.jpg",
+      "source_photo_sha256": "cbd034ab49176599dbba540cc2afb9e64cd51c9ad21558ac5288eae9df6a68b4",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "60078ead1e4c0a181f5a2cd543cb9fe8d23d32b6fa44aa210e9024664a1b7d8b"
+    },
+    {
+      "published": "csp-skins.png",
+      "source_photo": "skin-only-male-flesh.jpg",
+      "source_photo_sha256": "6e58612199420e1681fe6c5e90739c838548f954921a01d16499acb26fd8ebb6",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "3722318e641e8e8afcee085a2b9bd53b96aa17b8e3036aa4f2198978653b2658"
+    },
+    {
+      "published": "csp-skins.png",
+      "source_photo": "skin-only-female-flesh.jpg",
+      "source_photo_sha256": "2d8c7b7b246ad178fdd80408e06fbf9b1ae22ee146cdd401cd56cea37706f61b",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "c8ffc8aefa1d9b07ce897a9514af98036361cdbb8fe43fa276dccf61e8fe1365"
+    },
+    {
+      "published": "csp-skins.png",
+      "source_photo": "skin-only-male-flesh-guide.jpg",
+      "source_photo_sha256": "0244ba0c300e3ba1e469a4cf6a4c14a7197795bb131edc195e28fdab4d0b30ba",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "4f52220cb9c4719358ac58d93005fcf2730fe620f9f31e796c822359fd182135"
+    },
+    {
+      "published": "csp-skins.png",
+      "source_photo": "skin-only-female-flesh-guide.jpg",
+      "source_photo_sha256": "9030c19a00928927b1e3c30d933634769b7c95e49f25f2289847b7b734a456b0",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "27a188b136780027cefbecfc79d651e8d2116a4a1a14c841e0abdc6132f68f9e"
+    },
+    {
+      "published": "csp-skins.png",
+      "source_photo": "skin-only-male-muscle.jpg",
+      "source_photo_sha256": "1386430a4e23dbe99ce542593f9a8751fb8f6b31ccf26acb247009c05a216e1e",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "63ebe25cebf95120c9c72d83c53df1c6a85503c357635a832689585398dbcf5a"
+    },
+    {
+      "published": "csp-skins.png",
+      "source_photo": "skin-only-female-muscle.jpg",
+      "source_photo_sha256": "7006df83ce84cb3d5d57b6ba60dfc8560f5f9e6b03fe143c3203be5094bccb6b",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "15b2ad7fd16facd06a121d6fbcbed0fe7c44065f193132858017db7c57a71d99"
+    },
+    {
+      "published": "csp-posed.png",
+      "source_photo": "posed-male-control.jpg",
+      "source_photo_sha256": "074d253c13d5a2a4ce42d79f00e8f30d5cee5eb134d27bfaaf3c9f30508029f1",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "0cf2a8dbd3b5923ec02d177a20e338b91e1939d16f0878656453940db4412b74"
+    },
+    {
+      "published": "csp-posed.png",
+      "source_photo": "posed-male-flesh-guide-outline2.jpg",
+      "source_photo_sha256": "705a4f67cf99f3407c4c0c7b9ec933c02032aea3b68a32c6a1581f9be691e39d",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "4d204950f7d03d9d672b894019c096881a02528b1445205bc0baa7a4ed3d541e"
+    },
+    {
+      "published": "csp-posed.png",
+      "source_photo": "posed-female-control.jpg",
+      "source_photo_sha256": "16c68eda9fcd8b737fea95d169ec4ae680c7a8ff2525466427f1cddc87ea0efc",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "d4fa440d5174eacc01b9cf82cbb4655c1381d0ac159302f0d8018c131b89cea2"
+    },
+    {
+      "published": "csp-posed.png",
+      "source_photo": "posed-female-flesh-guide-outline2.jpg",
+      "source_photo_sha256": "adbbafabb6508ef07560c63a0b1ce6ae95ab1d5eb680b17646b45d0972c67a0e",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "cec107cff26742bd80dfe94a8c9627f76044adc87b3d29ffaf0557b641132331"
+    },
+    {
+      "published": "csp-outline.png",
+      "source_photo": "skin-only-male-flesh-guide.jpg",
+      "source_photo_sha256": "0244ba0c300e3ba1e469a4cf6a4c14a7197795bb131edc195e28fdab4d0b30ba",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "4f52220cb9c4719358ac58d93005fcf2730fe620f9f31e796c822359fd182135"
+    },
+    {
+      "published": "csp-outline.png",
+      "source_photo": "combined-male-flesh-guide.jpg",
+      "source_photo_sha256": "356058e28cb577ea3ca11d5a2193af479cb2c4d079ef96e5cf943d109532a6dc",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "cc8c0b6a0c294d97e5c1a2354ff25a65fe2522985164f3af89bf438d8df5c681"
+    },
+    {
+      "published": "csp-outline.png",
+      "source_photo": "skin-only-female-flesh-guide.jpg",
+      "source_photo_sha256": "9030c19a00928927b1e3c30d933634769b7c95e49f25f2289847b7b734a456b0",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "27a188b136780027cefbecfc79d651e8d2116a4a1a14c841e0abdc6132f68f9e"
+    },
+    {
+      "published": "csp-outline.png",
+      "source_photo": "combined-female-flesh-guide.jpg",
+      "source_photo_sha256": "1af9316fd9aeda100ae6cd06aa58477e491a407981183fd62e6152d0776399a1",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "981ffe459e112ef23d1e28c555cd2bf15ffcb32fd7d3fa29dd4dbf795fe0e3c1"
+    }
+  ]
+}

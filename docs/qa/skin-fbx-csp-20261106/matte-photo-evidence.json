@@ -1,0 +1,222 @@
+{
+  "method": "Actual CSP test-canvas crops and downsampling only; no model pixel retouching",
+  "published": "csp-matte-before-after.png",
+  "images": [
+    {
+      "source_photo": "material-control.jpg",
+      "source_photo_sha256": "5ea1e59d0d74636acce0b258458628d62210b8a7f234f6ebf2db05e4ae233974",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "4f52220cb9c4719358ac58d93005fcf2730fe620f9f31e796c822359fd182135"
+    },
+    {
+      "source_photo": "material-phong-explicit-matte.jpg",
+      "source_photo_sha256": "6ba3c97998a00b997b4d4583e0df6584d8666fb930637945ec3a26ed49f464fd",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "c9b6f763ae53f6a286a97b9ed8a68f04c027f394979462b36d71e03b83d44274"
+    }
+  ],
+  "additional_sheets": [
+    {
+      "published": "csp-matte-skins.png",
+      "source_photo": "skin_only-male-gray-guide.jpg",
+      "source_photo_sha256": "332b6817af3391c44927063b0c59473c7e189be7b1e1c4131a3bcd3d6f0095d4",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "080c1df9824a4ada4de0191594f10c8303520ad4197161bdf0eaef48b2faad90"
+    },
+    {
+      "published": "csp-matte-skins.png",
+      "source_photo": "skin_only-female-gray-guide.jpg",
+      "source_photo_sha256": "28ff9ad462a71117a2732cb4f797cec7d367540b34fc2ae85bcbca7bf9937331",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "34dd0bd1a7b3025d1611f4f31bec92b4e3654a8dbce779a42ff819d3d803c65f"
+    },
+    {
+      "published": "csp-matte-skins.png",
+      "source_photo": "skin_only-male-flesh.jpg",
+      "source_photo_sha256": "29a046e6a82fe4c1c3e9a9509e10f91e9e6649e2d3684c3731ba8e51ba395616",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "c11559f5429340c9c70910c8712973c2d25dda657f26231decf19f7399015829"
+    },
+    {
+      "published": "csp-matte-skins.png",
+      "source_photo": "skin_only-female-flesh.jpg",
+      "source_photo_sha256": "7257417b2b52bdee5da741c978fa423fdea0ec2de514e5ba56a7352268094329",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "8e8b76ba7d9d99aa03e1269de542bbc82cf3620ff701697b4805388b1a1899b5"
+    },
+    {
+      "published": "csp-matte-skins.png",
+      "source_photo": "skin_only-male-flesh-guide.jpg",
+      "source_photo_sha256": "483f499ae21ee09f9cea248f39300a292e0a318aaf9947d698f8fb4a03261e4b",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "c9b6f763ae53f6a286a97b9ed8a68f04c027f394979462b36d71e03b83d44274"
+    },
+    {
+      "published": "csp-matte-skins.png",
+      "source_photo": "skin_only-female-flesh-guide.jpg",
+      "source_photo_sha256": "d3bd9e901a226ef95e8e91e4ae84d75b5274f8a070e7232e97ce01e7f6877664",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "68e20babad6f4a54947414bdaa608ce7ba4c1260bfa7f8d1bb399bea2467323d"
+    },
+    {
+      "published": "csp-matte-skins.png",
+      "source_photo": "skin_only-male-muscle.jpg",
+      "source_photo_sha256": "e20acf399e662db8b9561bb2e3d52008cdfe0c4072798746c9b106a3f55d923d",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "1e98f21232cf682fc35cee1cfb9990c3bf08e0345247c7264f3ca47b7f9ff758"
+    },
+    {
+      "published": "csp-matte-skins.png",
+      "source_photo": "skin_only-female-muscle.jpg",
+      "source_photo_sha256": "9e8ad288725129bfa48ce6f44512f7ef8519fff8ba62e426827e5d5b6a4499de",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "3b5ceac15c0dc77d36c514362e34025f85471fde0be86a98619fe15e6a8fa672"
+    },
+    {
+      "published": "csp-matte-posed.png",
+      "source_photo": "posed-male-control.jpg",
+      "source_photo_sha256": "074d253c13d5a2a4ce42d79f00e8f30d5cee5eb134d27bfaaf3c9f30508029f1",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "0cf2a8dbd3b5923ec02d177a20e338b91e1939d16f0878656453940db4412b74"
+    },
+    {
+      "published": "csp-matte-posed.png",
+      "source_photo": "posed_combined-male-flesh-guide.jpg",
+      "source_photo_sha256": "34a819906ac241b565bb257686b35a399d45c1925997175b7d0ed254f20d996b",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "f1bf1c3bc0c5ced07680ab313d037e3c55a20e18beee7e13c385becc4393f161"
+    },
+    {
+      "published": "csp-matte-posed.png",
+      "source_photo": "posed-female-control.jpg",
+      "source_photo_sha256": "16c68eda9fcd8b737fea95d169ec4ae680c7a8ff2525466427f1cddc87ea0efc",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "d4fa440d5174eacc01b9cf82cbb4655c1381d0ac159302f0d8018c131b89cea2"
+    },
+    {
+      "published": "csp-matte-posed.png",
+      "source_photo": "posed_combined-female-flesh-guide.jpg",
+      "source_photo_sha256": "3523dfcbd0abb38e2f03a060868c35614c942e81a84aa936521593e1fa72bb92",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "8b62af248181f8a7e81acd8baf8e3fc901d7e42de6ada277c11ca3857c340858"
+    },
+    {
+      "published": "csp-matte-orbit.png",
+      "source_photo": "posed_combined-female-flesh-guide.jpg",
+      "source_photo_sha256": "3523dfcbd0abb38e2f03a060868c35614c942e81a84aa936521593e1fa72bb92",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "8b62af248181f8a7e81acd8baf8e3fc901d7e42de6ada277c11ca3857c340858"
+    },
+    {
+      "published": "csp-matte-orbit.png",
+      "source_photo": "posed_combined-female-flesh-guide-orbit.jpg",
+      "source_photo_sha256": "0639c30abe96cd8a6c819e8cf232c48de23e3f47c3355da3be0477737b0c8777",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "8b62af248181f8a7e81acd8baf8e3fc901d7e42de6ada277c11ca3857c340858"
+    },
+    {
+      "published": "csp-matte-orbit.png",
+      "source_photo": "combined-male-flesh-guide.jpg",
+      "source_photo_sha256": "85682ceab78576bb0ab6c239db492d2694a7b3d9910548af8d9c3f05cc72fc43",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "639a17a4309f7241c4b26b1ca7600f8d588169998fe483ad8e474d9c9f020cf7"
+    },
+    {
+      "published": "csp-matte-orbit.png",
+      "source_photo": "combined-male-flesh-guide-orbit.jpg",
+      "source_photo_sha256": "892a2202870e1605af38c6606a794de0f08fbd020d7808e047bf65d3babe873a",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "639a17a4309f7241c4b26b1ca7600f8d588169998fe483ad8e474d9c9f020cf7"
+    }
+  ]
+}
