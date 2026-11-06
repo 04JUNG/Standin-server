@@ -84,7 +84,8 @@ def run(job):
     surface_correction = surface.apply_to_meshes(meshes, before_normalization, references)
     from converter.local.camera import apply_camera
     camera_validation = apply_camera(arm, meshes, job["snapshot"]["camera"])
-    validation = inspection.roundtrip(arm, meshes, work / "result.fbx", character["mapping"], job["materialExpectations"])
+    validation = inspection.roundtrip(arm, meshes, work / "result.fbx", character["mapping"], job["materialExpectations"],
+                                      csp_compatibility=True)
     return {"snapshot": job["snapshot"], "snapshotHash": job["snapshotHash"],
             "artifactHash": sha256(work / "result.fbx"), "validation": validation,
             "retarget": {**report.as_dict(), "surfaceCorrection": surface_correction, "armTransfer": arm_correction, "local_normalization_surface_error": normalization_error,

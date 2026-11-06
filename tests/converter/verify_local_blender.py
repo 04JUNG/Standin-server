@@ -47,6 +47,37 @@ class BlenderLocalTests(unittest.TestCase):
                 roundtrip(arm, meshes, root/"lost-specular.fbx", character["mapping"], expected)
             self.assertEqual(error.exception.code, "ROUNDTRIP_FAILED")
 
+    def test_csp_reserved_root_alias_keeps_hierarchy_and_deformation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            build(root / "fixture.fbx")
+            bpy.ops.wm.read_factory_settings(use_empty=True)
+            arm, meshes = import_fbx(root / "fixture.fbx")
+            bpy.context.view_layer.objects.active = arm
+            bpy.ops.object.mode_set(mode="EDIT")
+            base = arm.data.edit_bones.new("root_group_")
+            base.head, base.tail = (0, 0, 0), (0, 0, .1)
+            for bone in list(arm.data.edit_bones):
+                if bone != base and bone.parent is None:
+                    bone.parent = base
+            bpy.ops.object.mode_set(mode="OBJECT")
+            character, _ = inspect(arm, meshes)
+            # Registration retains original names; final apply alone uses alias.
+            normalized = roundtrip(arm, meshes, root/"normalized.fbx", character["mapping"])
+            self.assertNotIn("cspCompatibility", normalized)
+            bpy.ops.wm.read_factory_settings(use_empty=True)
+            arm, meshes = import_fbx(root/"normalized.fbx")
+            report = roundtrip(arm, meshes, root/"final.fbx", character["mapping"], csp_compatibility=True)
+            self.assertTrue(report["passed"])
+            compat = report["cspCompatibility"]
+            self.assertTrue(compat["allOtherBytesExact"])
+            self.assertFalse(compat["weightsTruncated"])
+            self.assertEqual(compat["nameAliases"][0]["original"], "root_group_")
+            bpy.ops.wm.read_factory_settings(use_empty=True)
+            arm, meshes = import_fbx(root/"final.fbx")
+            self.assertIn("StandinBase", arm.data.bones)
+            self.assertNotIn("root_group_", arm.data.bones)
+
     def test_declared_array_limit_before_allocation(self):
         from io import BytesIO
         with bounded_fbx_parser() as parser:

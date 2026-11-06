@@ -321,7 +321,7 @@ def material_regions(meshes, points):
     return regions
 
 
-def roundtrip(arm, meshes, path, table, expected_materials=None):
+def roundtrip(arm, meshes, path, table, expected_materials=None, *, csp_compatibility=False):
     from converter import retarget as rt
     before = surface(meshes)
     original_bones = {b.name: (b.parent.name if b.parent else None,
@@ -333,6 +333,12 @@ def roundtrip(arm, meshes, path, table, expected_materials=None):
     probe_before = {joint: deformation_probe(arm, meshes, table, joint)
                     for joint in ("forearm.L", "forearm.R", "leg.L", "leg.R", "spine")}
     rt.export_fbx(str(path), embed_textures=False)
+    compatibility = None
+    aliases = {}
+    if csp_compatibility:
+        from converter.local.csp_compat import apply_final_aliases
+        compatibility = apply_final_aliases(path)
+        aliases = {a["original"]: a["exported"] for a in compatibility["nameAliases"]}
     from converter.local.materials import compare_materials
     material_parameters = compare_materials(
         {name: mat["fbx"] for name, mat in (expected_materials if expected_materials is not None else material_before).items()},
@@ -347,8 +353,8 @@ def roundtrip(arm, meshes, path, table, expected_materials=None):
     material_region_error = surface_error(regions_before, material_regions(after_meshes, after_points))
     require(material_region_error <= tolerance, "ROUNDTRIP_FAILED", "Face material regions changed during FBX roundtrip")
     for name, (parent, head) in original_bones.items():
-        bone = after_arm.data.bones.get(name)
-        require(bone is not None and (bone.parent.name if bone.parent else None) == parent,
+        bone = after_arm.data.bones.get(aliases.get(name, name))
+        require(bone is not None and (bone.parent.name if bone.parent else None) == aliases.get(parent, parent),
                 "ROUNDTRIP_FAILED", "Original bone hierarchy changed during FBX roundtrip")
         require(math.dist(head, after_arm.matrix_world @ bone.head_local) <= tolerance,
                 "ROUNDTRIP_FAILED", "Bone position changed during FBX roundtrip")
@@ -362,7 +368,8 @@ def roundtrip(arm, meshes, path, table, expected_materials=None):
         require(mat["scalars"].keys() == after_materials[name]["scalars"].keys()
                 and all(abs(v-after_materials[name]["scalars"][k]) < 1e-4 for k, v in mat["scalars"].items()),
                 "ROUNDTRIP_FAILED", "Solid material properties changed")
-    probe_after = {joint: deformation_probe(after_arm, after_meshes, table, joint) for joint in probe_before}
+    exported_table = {joint: aliases.get(name, name) for joint, name in table.items()}
+    probe_after = {joint: deformation_probe(after_arm, after_meshes, exported_table, joint) for joint in probe_before}
     probe_error = max(surface_error(probe_before[j].pop("surface"), probe_after[j].pop("surface"))
                       for j in probe_before)
     require(probe_error <= tolerance, "ROUNDTRIP_FAILED", "Skin deformation changed during FBX roundtrip")
@@ -370,4 +377,5 @@ def roundtrip(arm, meshes, path, table, expected_materials=None):
             "vertexCount": sum(len(p) for p in before.values()), "maxSurfaceError": error,
             "maxSkinProbeError": probe_error, "maxMaterialRegionError": material_region_error,
             "materialCount": len(material_before), "tolerance": tolerance, "fkProbes": probe_after,
-            "blenderVersion": bpy.app.version_string, "materialPreservation": material_parameters}
+            "blenderVersion": bpy.app.version_string, "materialPreservation": material_parameters,
+            **({"cspCompatibility": compatibility} if compatibility is not None else {})}
