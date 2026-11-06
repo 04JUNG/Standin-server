@@ -42,6 +42,38 @@ def interval_separated(a0, a1, b0, b1, extent, depth=0):
             interval_separated(am,a1,bm,b1,extent,depth+1))
 
 
+def potential_pairs(faces, moving, lower, upper):
+    centers = (lower+upper)/2
+    radius = ((upper-lower)/2).max(axis=1)
+    tree = cKDTree(centers)
+    max_radius = radius.max()
+    for i in np.flatnonzero(moving):
+        near = np.asarray(tree.query_ball_point(centers[i], radius[i]+max_radius,
+                                                p=np.inf), dtype=int)
+        near = near[(near != i) & (~moving[near] | (near > i))]
+        near = near[((upper[near] >= lower[i]) & (lower[near] <= upper[i])).all(1)]
+        for j in near:
+            if np.isin(faces[i], faces[j]).any():
+                continue
+            yield i, j
+
+
+def baseline_contact_pins(points, faces, free, pair_budget=250000):
+    """Keep the six input coordinates of each possible existing contact fixed."""
+    triangles = points[faces]
+    extent = np.ptp(points,axis=0).max()
+    pinned = np.zeros(len(points),bool)
+    count = 0
+    for checked,(i,j) in enumerate(potential_pairs(
+            faces,free[faces].any(1),triangles.min(1),triangles.max(1)), start=1):
+        if checked > pair_budget:
+            return free.copy(), dict(complete=False, checked=checked)
+        if static_relation(triangles[i],triangles[j],extent) != "separated":
+            pinned[faces[[i,j]].ravel()] = True
+            count += 1
+    return pinned, dict(complete=True, pairs=count, freePinned=int((free&pinned).sum()))
+
+
 def contact_guard(start, end, faces, pair_budget=250000):
     """Reject when separation throughout a straight displacement is unproven.
 
@@ -53,26 +85,15 @@ def contact_guard(start, end, faces, pair_budget=250000):
     old, new = start[faces], end[faces]
     lower = np.minimum(old.min(1), new.min(1))
     upper = np.maximum(old.max(1), new.max(1))
-    centers = (lower+upper)/2
-    radius = ((upper-lower)/2).max(axis=1)
-    tree = cKDTree(centers)
     extent = np.ptp(start,axis=0).max()
-    max_radius = radius.max()
     checked = 0
-    for i in np.flatnonzero(moving):
-        near = np.asarray(tree.query_ball_point(centers[i], radius[i]+max_radius,
-                                                p=np.inf), dtype=int)
-        near = near[(near != i) & (~moving[near] | (near > i))]
-        near = near[((upper[near] >= lower[i]) & (lower[near] <= upper[i])).all(1)]
-        for j in near:
-            if np.isin(faces[i], faces[j]).any():
-                continue
-            checked += 1
-            if checked > pair_budget:
-                return dict(passCheck=False, reason="contact_budget", pairs=checked)
-            if not interval_separated(old[i],new[i],old[j],new[j],extent):
-                return dict(passCheck=False, reason="contact_unresolved", pairs=checked,
-                            faces=[int(i),int(j)],
-                            baseline=static_relation(old[i],old[j],extent),
-                            proposed=static_relation(new[i],new[j],extent))
+    for i,j in potential_pairs(faces,moving,lower,upper):
+        checked += 1
+        if checked > pair_budget:
+            return dict(passCheck=False, reason="contact_budget", pairs=checked)
+        if not interval_separated(old[i],new[i],old[j],new[j],extent):
+            return dict(passCheck=False, reason="contact_unresolved", pairs=checked,
+                        faces=[int(i),int(j)],
+                        baseline=static_relation(old[i],old[j],extent),
+                        proposed=static_relation(new[i],new[j],extent))
     return dict(passCheck=True, pairs=checked)

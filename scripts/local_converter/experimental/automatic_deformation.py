@@ -9,7 +9,7 @@ from scipy.optimize import linprog
 from scipy.optimize._numdiff import approx_derivative
 from scipy.sparse import coo_matrix, eye, hstack, vstack, csr_matrix
 from scipy.sparse.csgraph import dijkstra
-from .contact import contact_guard
+from .contact import baseline_contact_pins, contact_guard
 from .deformation_guard import DeformationGuard
 from converter.local import surface
 
@@ -220,6 +220,13 @@ def correct(rest, posed, faces, anchors, *, iterations=40, expansions=4, regions
         for expansion in range(expansions):
             if time.monotonic() >= deadline or not free.any() or free.sum() > 3000:
                 break
+            pinned, pin_report = baseline_contact_pins(posed,faces,free)
+            fixed |= pinned
+            free &= ~fixed
+            if not free.any():
+                history.append(dict(seed=seed,expansion=expansion,vertices=0,
+                                    accepted=False,baselineContact=pin_report))
+                break
             graph.fixed = ~free
             target = surface.limit_strain(posed, posed, graph, guard.lengths, guard.scale*.08)
             candidate, report = solve_patch(rest,posed,faces,anchors,free,target,iterations,deadline)
@@ -238,7 +245,7 @@ def correct(rest, posed, faces, anchors, *, iterations=40, expansions=4, regions
                 best, best_ratio, best_excess = candidate, candidate_ratio, excess
             history.append(dict(seed=seed, expansion=expansion, vertices=int(free.sum()),
                                 maxStretch=candidate_ratio, accepted=accepted,
-                                violations=violations, contact=contact, solver=report))
+                                violations=violations, baselineContact=pin_report, contact=contact, solver=report))
             if contact and not contact["passCheck"]:
                 if "faces" not in contact:
                     break

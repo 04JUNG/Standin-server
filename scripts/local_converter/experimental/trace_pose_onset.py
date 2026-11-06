@@ -10,7 +10,25 @@ import numpy as np
 from mathutils import Matrix
 
 
-def trace(runtime, model, pose, stages, output, pairs):
+def linear_skin_maps(arm,mesh,ids):
+    matrices = {}
+    world = np.asarray(arm.matrix_world)
+    for bone in arm.pose.bones:
+        rest = world @ np.asarray(bone.bone.matrix_local)
+        matrices[bone.name] = (world @ np.asarray(bone.matrix) @ np.linalg.inv(rest))
+    maps = np.zeros((len(ids),4,4))
+    for i,index in enumerate(ids):
+        vertex = mesh.data.vertices[int(index)]
+        total = sum(g.weight for g in vertex.groups)
+        if total <= 0:
+            raise ValueError("Cannot transport an offset on an unweighted vertex")
+        for group in vertex.groups:
+            name = mesh.vertex_groups[group.group].name
+            maps[i] += matrices[name]*(group.weight/total)
+    return maps
+
+
+def trace(runtime, model, pose, stages, output, pairs, carry=None):
     sys.path.insert(0, str(runtime))
     from converter import retarget
     from converter.local import inspection, surface
@@ -36,6 +54,9 @@ def trace(runtime, model, pose, stages, output, pairs):
     contact_ids = np.array(pairs,dtype=int).reshape(-1,2)
     frames = []
     contacts = []
+    output.mkdir(parents=True,exist_ok=True)
+    previous = np.load(carry) if carry is not None else None
+    local_offsets = None
     first_damage = None
     for amount in (0.,.001,.005,.01,.02,.05,.1,.25,.5,.75,1.):
         for b in arm.pose.bones:
@@ -52,6 +73,15 @@ def trace(runtime, model, pose, stages, output, pairs):
         ratios = surface.lengths(points[graph.a]-points[graph.b])/lengths
         if first_damage is None and ratios.max()>2.:
             first_damage = points.copy()
+        if previous is not None and first_damage is not None:
+            ids = previous["ids"]
+            maps = linear_skin_maps(arm,mesh,ids)
+            expected = np.einsum("nij,nj->ni",maps[:,:3,:3],rest[ids])+maps[:,:3,3]
+            assert np.linalg.norm(expected-points[ids],axis=1).max() < 2e-5
+            if local_offsets is None:
+                local_offsets = np.linalg.solve(maps[:,:3,:3],previous["delta"][:,:,None])[:,:,0]
+            carried = np.einsum("nij,nj->ni",maps[:,:3,:3],local_offsets)
+            np.savez_compressed(output/f"carry-{amount:.3f}.npz",posed=points,ids=ids,delta=carried)
         frames.append(dict(fraction=amount,targetRatio=float(ratios[edge]),
                            maxRatio=float(ratios.max()),aboveTwo=int((ratios>2).sum())))
         contacts.append(points[reference.triangles[contact_ids]])
@@ -71,5 +101,6 @@ if __name__=="__main__":
     parser=argparse.ArgumentParser()
     for name in ("runtime","model","pose","stages","output"):
         parser.add_argument(name,type=Path)
+    parser.add_argument("--carry",type=Path)
     parser.add_argument("--pairs",nargs="*",type=int,default=[])
     trace(**vars(parser.parse_args(sys.argv[sys.argv.index("--")+1:])))
