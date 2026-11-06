@@ -37,7 +37,13 @@ def augment(root,asset,uv,png,skin_id):
         element(b'Version',[102],b'I'),element(b'ShadingModel',[b'Phong'],b'S'),element(b'MultiLayer',[0],b'I'),
         element(b'Properties70',children=[_property(b'DiffuseColor',b'Color',[1.,1.,1.]),_property(b'DiffuseFactor',b'Number',[1.]),
             _property(b'EmissiveColor',b'Color',[0.,0.,0.]),_property(b'EmissiveFactor',b'Number',[0.]),
-            _property(b'SpecularFactor',b'Number',[0.]),_property(b'TransparencyFactor',b'Number',[0.]),_property(b'Opacity',b'Number',[1.])])])
+            _property(b'SpecularFactor',b'Number',[0.]),_property(b'TransparencyFactor',b'Number',[0.]),_property(b'Opacity',b'Number',[1.]),
+            # Factor=0 alone still produced strong highlights in CSP. Explicit
+            # colors match the observed matte FBX diagnostic.
+            _property(b'SpecularColor',b'Color',[0.,0.,0.]),_property(b'ReflectionColor',b'Color',[0.,0.,0.]),
+            _property(b'ReflectionFactor',b'Number',[0.]),_property(b'Shininess',b'Number',[4.]),
+            _property(b'ShininessExponent',b'Number',[4.]),_property(b'AmbientColor',b'Color',[0.,0.,0.]),
+            _property(b'AmbientFactor',b'Number',[0.])])])
     texture=element(b'Texture',[texid,name+b'\x00\x01Texture',b''],b'LSS',[
         element(b'Type',[b'TextureVideoClip'],b'S'),element(b'Version',[202],b'I'),
         element(b'TextureName',[name+b'\x00\x01Texture'],b'S'),element(b'Media',[name+b'\x00\x01Video'],b'S'),

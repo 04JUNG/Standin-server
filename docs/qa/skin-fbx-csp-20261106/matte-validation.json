@@ -1,0 +1,879 @@
+{
+  "schema": "skin-matte-qa-v1",
+  "date": "2026-11-06",
+  "runtime_revision": "a6983aadd75f7c3b418fd1a37de6fbe3eaf78bea3b0ac8f9c4c91c0106c549db",
+  "material_writer_sha256": "59a37984fdd9546be05cc7c2f9ca100f5bc9b673a7bf10b8b3c654d5bbc49ba4",
+  "asset_manifest_sha256": "1fb0fa382d4fa7d27233b6139cba9c5f1ec575c6b8f86b7deac2a3dc4d447386",
+  "material_properties": {
+    "SpecularColor": [
+      0,
+      0,
+      0
+    ],
+    "SpecularFactor": 0,
+    "ReflectionColor": [
+      0,
+      0,
+      0
+    ],
+    "ReflectionFactor": 0,
+    "Shininess": 4,
+    "ShininessExponent": 4,
+    "AmbientColor": [
+      0,
+      0,
+      0
+    ],
+    "AmbientFactor": 0
+  },
+  "csp": {
+    "scope": "NEW final typed writer matte bytes only; prior glossy acceptance retained separately",
+    "method": "actual automatic CSP import; same existing default lighting/settings; no .clip or CSP-internal posing",
+    "observations": [
+      {
+        "kind": "skin_only",
+        "gender": "female",
+        "skin": "flesh",
+        "sha256": "8e8b76ba7d9d99aa03e1269de542bbc82cf3620ff701697b4805388b1a1899b5",
+        "bytes": 2362764,
+        "import": "PASS",
+        "matte_surface_visible": true,
+        "strong_metallic_specular_bands_absent": true,
+        "body_not_black": true,
+        "expected_skin_color_visible": true,
+        "guide_or_muscle_lines_visible": false,
+        "outline_visible": false,
+        "pose_preserved": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "kind": "skin_only",
+        "gender": "female",
+        "skin": "flesh-guide",
+        "sha256": "68e20babad6f4a54947414bdaa608ce7ba4c1260bfa7f8d1bb399bea2467323d",
+        "bytes": 2773468,
+        "import": "PASS",
+        "matte_surface_visible": true,
+        "strong_metallic_specular_bands_absent": true,
+        "body_not_black": true,
+        "expected_skin_color_visible": true,
+        "guide_or_muscle_lines_visible": true,
+        "outline_visible": false,
+        "pose_preserved": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "kind": "skin_only",
+        "gender": "female",
+        "skin": "gray-guide",
+        "sha256": "34dd0bd1a7b3025d1611f4f31bec92b4e3654a8dbce779a42ff819d3d803c65f",
+        "bytes": 2760572,
+        "import": "PASS",
+        "matte_surface_visible": true,
+        "strong_metallic_specular_bands_absent": true,
+        "body_not_black": true,
+        "expected_skin_color_visible": true,
+        "guide_or_muscle_lines_visible": true,
+        "outline_visible": false,
+        "pose_preserved": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "kind": "skin_only",
+        "gender": "female",
+        "skin": "muscle",
+        "sha256": "3b5ceac15c0dc77d36c514362e34025f85471fde0be86a98619fe15e6a8fa672",
+        "bytes": 2612444,
+        "import": "PASS",
+        "matte_surface_visible": true,
+        "strong_metallic_specular_bands_absent": true,
+        "body_not_black": true,
+        "expected_skin_color_visible": true,
+        "guide_or_muscle_lines_visible": true,
+        "outline_visible": false,
+        "pose_preserved": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "kind": "skin_only",
+        "gender": "male",
+        "skin": "flesh",
+        "sha256": "c11559f5429340c9c70910c8712973c2d25dda657f26231decf19f7399015829",
+        "bytes": 2813548,
+        "import": "PASS",
+        "matte_surface_visible": true,
+        "strong_metallic_specular_bands_absent": true,
+        "body_not_black": true,
+        "expected_skin_color_visible": true,
+        "guide_or_muscle_lines_visible": false,
+        "outline_visible": false,
+        "pose_preserved": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "kind": "skin_only",
+        "gender": "male",
+        "skin": "flesh-guide",
+        "sha256": "c9b6f763ae53f6a286a97b9ed8a68f04c027f394979462b36d71e03b83d44274",
+        "bytes": 3171756,
+        "import": "PASS",
+        "matte_surface_visible": true,
+        "strong_metallic_specular_bands_absent": true,
+        "body_not_black": true,
+        "expected_skin_color_visible": true,
+        "guide_or_muscle_lines_visible": true,
+        "outline_visible": false,
+        "pose_preserved": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "kind": "skin_only",
+        "gender": "male",
+        "skin": "gray-guide",
+        "sha256": "080c1df9824a4ada4de0191594f10c8303520ad4197161bdf0eaef48b2faad90",
+        "bytes": 3163276,
+        "import": "PASS",
+        "matte_surface_visible": true,
+        "strong_metallic_specular_bands_absent": true,
+        "body_not_black": true,
+        "expected_skin_color_visible": true,
+        "guide_or_muscle_lines_visible": true,
+        "outline_visible": false,
+        "pose_preserved": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "kind": "skin_only",
+        "gender": "male",
+        "skin": "muscle",
+        "sha256": "1e98f21232cf682fc35cee1cfb9990c3bf08e0345247c7264f3ca47b7f9ff758",
+        "bytes": 3041596,
+        "import": "PASS",
+        "matte_surface_visible": true,
+        "strong_metallic_specular_bands_absent": true,
+        "body_not_black": true,
+        "expected_skin_color_visible": true,
+        "guide_or_muscle_lines_visible": true,
+        "outline_visible": false,
+        "pose_preserved": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "kind": "combined",
+        "gender": "female",
+        "skin": "flesh",
+        "sha256": "2ebd06f1af5fe054f49e71e5a2390b8a9638d9e111fbb76f5220c8e0ed4f43cc",
+        "bytes": 3806204,
+        "import": "PASS",
+        "matte_surface_visible": true,
+        "strong_metallic_specular_bands_absent": true,
+        "body_not_black": true,
+        "expected_skin_color_visible": true,
+        "guide_or_muscle_lines_visible": false,
+        "outline_visible": true,
+        "pose_preserved": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "kind": "combined",
+        "gender": "female",
+        "skin": "flesh-guide",
+        "sha256": "80eef3e1855a88b7998746dc4c83ea10aeb9ac427543cc5e89480075b6a18ca3",
+        "bytes": 4216908,
+        "import": "PASS",
+        "matte_surface_visible": true,
+        "strong_metallic_specular_bands_absent": true,
+        "body_not_black": true,
+        "expected_skin_color_visible": true,
+        "guide_or_muscle_lines_visible": true,
+        "outline_visible": true,
+        "pose_preserved": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "kind": "combined",
+        "gender": "female",
+        "skin": "gray-guide",
+        "sha256": "82575f4f4fbf7c3315d51c6a43332cf17cab200ceb7f54c9801a58194a67f87e",
+        "bytes": 4204012,
+        "import": "PASS",
+        "matte_surface_visible": true,
+        "strong_metallic_specular_bands_absent": true,
+        "body_not_black": true,
+        "expected_skin_color_visible": true,
+        "guide_or_muscle_lines_visible": true,
+        "outline_visible": true,
+        "pose_preserved": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "kind": "combined",
+        "gender": "female",
+        "skin": "muscle",
+        "sha256": "6bb945ce89375fbdbd278b832fbe0a9a23888a90aec20674edac2c210958c63b",
+        "bytes": 4055884,
+        "import": "PASS",
+        "matte_surface_visible": true,
+        "strong_metallic_specular_bands_absent": true,
+        "body_not_black": true,
+        "expected_skin_color_visible": true,
+        "guide_or_muscle_lines_visible": true,
+        "outline_visible": true,
+        "pose_preserved": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "kind": "combined",
+        "gender": "male",
+        "skin": "flesh",
+        "sha256": "3a7081d9a947d2e96f81bc4b75d4a8c3651b1156ee246c219965dab04d3c62e7",
+        "bytes": 4711660,
+        "import": "PASS",
+        "matte_surface_visible": true,
+        "strong_metallic_specular_bands_absent": true,
+        "body_not_black": true,
+        "expected_skin_color_visible": true,
+        "guide_or_muscle_lines_visible": false,
+        "outline_visible": true,
+        "pose_preserved": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "kind": "combined",
+        "gender": "male",
+        "skin": "flesh-guide",
+        "sha256": "639a17a4309f7241c4b26b1ca7600f8d588169998fe483ad8e474d9c9f020cf7",
+        "bytes": 5069868,
+        "import": "PASS",
+        "matte_surface_visible": true,
+        "strong_metallic_specular_bands_absent": true,
+        "body_not_black": true,
+        "expected_skin_color_visible": true,
+        "guide_or_muscle_lines_visible": true,
+        "outline_visible": true,
+        "pose_preserved": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "kind": "combined",
+        "gender": "male",
+        "skin": "gray-guide",
+        "sha256": "23180a09a7764e7cf7203a4dbf5895a6796314567a580c3d6047aa5118e4f510",
+        "bytes": 5061388,
+        "import": "PASS",
+        "matte_surface_visible": true,
+        "strong_metallic_specular_bands_absent": true,
+        "body_not_black": true,
+        "expected_skin_color_visible": true,
+        "guide_or_muscle_lines_visible": true,
+        "outline_visible": true,
+        "pose_preserved": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "kind": "combined",
+        "gender": "male",
+        "skin": "muscle",
+        "sha256": "d398a089c0042c267d076743ed026112e7af2146a7165d60fb823489d86c8b7a",
+        "bytes": 4939724,
+        "import": "PASS",
+        "matte_surface_visible": true,
+        "strong_metallic_specular_bands_absent": true,
+        "body_not_black": true,
+        "expected_skin_color_visible": true,
+        "guide_or_muscle_lines_visible": true,
+        "outline_visible": true,
+        "pose_preserved": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "kind": "posed_combined",
+        "gender": "male",
+        "skin": "flesh-guide",
+        "sha256": "f1bf1c3bc0c5ced07680ab313d037e3c55a20e18beee7e13c385becc4393f161",
+        "bytes": 5096204,
+        "import": "PASS",
+        "matte_surface_visible": true,
+        "strong_metallic_specular_bands_absent": true,
+        "body_not_black": true,
+        "expected_skin_color_visible": true,
+        "guide_or_muscle_lines_visible": true,
+        "outline_visible": true,
+        "pose_preserved": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "kind": "posed_combined",
+        "gender": "female",
+        "skin": "flesh-guide",
+        "sha256": "8b62af248181f8a7e81acd8baf8e3fc901d7e42de6ada277c11ca3857c340858",
+        "bytes": 4206924,
+        "import": "PASS",
+        "matte_surface_visible": true,
+        "strong_metallic_specular_bands_absent": true,
+        "body_not_black": true,
+        "expected_skin_color_visible": true,
+        "guide_or_muscle_lines_visible": true,
+        "outline_visible": true,
+        "pose_preserved": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      }
+    ],
+    "orbit_observations": [
+      {
+        "gender": "female",
+        "kind": "posed_combined",
+        "sha256": "8b62af248181f8a7e81acd8baf8e3fc901d7e42de6ada277c11ca3857c340858",
+        "observed": "actual camera changed to three-quarter; matte skin/guide/pose/black contour remain visible"
+      },
+      {
+        "gender": "male",
+        "kind": "combined",
+        "sha256": "639a17a4309f7241c4b26b1ca7600f8d588169998fe483ad8e474d9c9f020cf7",
+        "observed": "fresh test-only canvas13, actual camera changed to three-quarter; matte skin/guide/black contour remain visible"
+      }
+    ],
+    "limits": [
+      "qualitative visual comparison; no numeric reflectance/pixel equivalence",
+      "soft diffuse shading and natural shadows remain; metallic highlight bands removed",
+      "not native-save proof for new runtime until separately completed"
+    ]
+  },
+  "only_material_audit": [
+    {
+      "gender": "female",
+      "skin": "flesh",
+      "pose": "neutral",
+      "stage": "skin",
+      "before_sha256": "c8ffc8aefa1d9b07ce897a9514af98036361cdbb8fe43fa276dccf61e8fe1365",
+      "after_sha256": "8e8b76ba7d9d99aa03e1269de542bbc82cf3620ff701697b4805388b1a1899b5",
+      "only_new_skin_material_changed": true
+    },
+    {
+      "gender": "female",
+      "skin": "flesh",
+      "pose": "neutral",
+      "stage": "combined",
+      "before_sha256": "849720fbc935c17866a05fe9f56f1ee289b82011e6df8a755b708f071c309e1a",
+      "after_sha256": "2ebd06f1af5fe054f49e71e5a2390b8a9638d9e111fbb76f5220c8e0ed4f43cc",
+      "only_new_skin_material_changed": true
+    },
+    {
+      "gender": "female",
+      "skin": "flesh-guide",
+      "pose": "neutral",
+      "stage": "skin",
+      "before_sha256": "27a188b136780027cefbecfc79d651e8d2116a4a1a14c841e0abdc6132f68f9e",
+      "after_sha256": "68e20babad6f4a54947414bdaa608ce7ba4c1260bfa7f8d1bb399bea2467323d",
+      "only_new_skin_material_changed": true
+    },
+    {
+      "gender": "female",
+      "skin": "flesh-guide",
+      "pose": "neutral",
+      "stage": "combined",
+      "before_sha256": "981ffe459e112ef23d1e28c555cd2bf15ffcb32fd7d3fa29dd4dbf795fe0e3c1",
+      "after_sha256": "80eef3e1855a88b7998746dc4c83ea10aeb9ac427543cc5e89480075b6a18ca3",
+      "only_new_skin_material_changed": true
+    },
+    {
+      "gender": "female",
+      "skin": "gray-guide",
+      "pose": "neutral",
+      "stage": "skin",
+      "before_sha256": "60078ead1e4c0a181f5a2cd543cb9fe8d23d32b6fa44aa210e9024664a1b7d8b",
+      "after_sha256": "34dd0bd1a7b3025d1611f4f31bec92b4e3654a8dbce779a42ff819d3d803c65f",
+      "only_new_skin_material_changed": true
+    },
+    {
+      "gender": "female",
+      "skin": "gray-guide",
+      "pose": "neutral",
+      "stage": "combined",
+      "before_sha256": "ea44c5290d13e8e54cecc9b51a36d40bba9fa015eb0d0a3f2b8d071220eee5ec",
+      "after_sha256": "82575f4f4fbf7c3315d51c6a43332cf17cab200ceb7f54c9801a58194a67f87e",
+      "only_new_skin_material_changed": true
+    },
+    {
+      "gender": "female",
+      "skin": "muscle",
+      "pose": "neutral",
+      "stage": "skin",
+      "before_sha256": "15b2ad7fd16facd06a121d6fbcbed0fe7c44065f193132858017db7c57a71d99",
+      "after_sha256": "3b5ceac15c0dc77d36c514362e34025f85471fde0be86a98619fe15e6a8fa672",
+      "only_new_skin_material_changed": true
+    },
+    {
+      "gender": "female",
+      "skin": "muscle",
+      "pose": "neutral",
+      "stage": "combined",
+      "before_sha256": "216712aa2f084ba6b1bc3cf9aa70eb5dd76ac9f6abc01cc26611c6f6e3c3edb5",
+      "after_sha256": "6bb945ce89375fbdbd278b832fbe0a9a23888a90aec20674edac2c210958c63b",
+      "only_new_skin_material_changed": true
+    },
+    {
+      "gender": "male",
+      "skin": "flesh",
+      "pose": "neutral",
+      "stage": "skin",
+      "before_sha256": "3722318e641e8e8afcee085a2b9bd53b96aa17b8e3036aa4f2198978653b2658",
+      "after_sha256": "c11559f5429340c9c70910c8712973c2d25dda657f26231decf19f7399015829",
+      "only_new_skin_material_changed": true
+    },
+    {
+      "gender": "male",
+      "skin": "flesh",
+      "pose": "neutral",
+      "stage": "combined",
+      "before_sha256": "b5861463fd306def6d7952830dcd4e3e34103f41154f714bfebbeecccb1b41fb",
+      "after_sha256": "3a7081d9a947d2e96f81bc4b75d4a8c3651b1156ee246c219965dab04d3c62e7",
+      "only_new_skin_material_changed": true
+    },
+    {
+      "gender": "male",
+      "skin": "flesh-guide",
+      "pose": "neutral",
+      "stage": "skin",
+      "before_sha256": "4f52220cb9c4719358ac58d93005fcf2730fe620f9f31e796c822359fd182135",
+      "after_sha256": "c9b6f763ae53f6a286a97b9ed8a68f04c027f394979462b36d71e03b83d44274",
+      "only_new_skin_material_changed": true
+    },
+    {
+      "gender": "male",
+      "skin": "flesh-guide",
+      "pose": "neutral",
+      "stage": "combined",
+      "before_sha256": "cc8c0b6a0c294d97e5c1a2354ff25a65fe2522985164f3af89bf438d8df5c681",
+      "after_sha256": "639a17a4309f7241c4b26b1ca7600f8d588169998fe483ad8e474d9c9f020cf7",
+      "only_new_skin_material_changed": true
+    },
+    {
+      "gender": "male",
+      "skin": "gray-guide",
+      "pose": "neutral",
+      "stage": "skin",
+      "before_sha256": "90b2b3e7192d538d6bb7cacf7bf761257b81d37902d46d62376015a11ce04e6f",
+      "after_sha256": "080c1df9824a4ada4de0191594f10c8303520ad4197161bdf0eaef48b2faad90",
+      "only_new_skin_material_changed": true
+    },
+    {
+      "gender": "male",
+      "skin": "gray-guide",
+      "pose": "neutral",
+      "stage": "combined",
+      "before_sha256": "db78225977c2f7c95ceef7dd5a7eafa87f31c83ce8373e01d30d20f1f6c99357",
+      "after_sha256": "23180a09a7764e7cf7203a4dbf5895a6796314567a580c3d6047aa5118e4f510",
+      "only_new_skin_material_changed": true
+    },
+    {
+      "gender": "male",
+      "skin": "muscle",
+      "pose": "neutral",
+      "stage": "skin",
+      "before_sha256": "63ebe25cebf95120c9c72d83c53df1c6a85503c357635a832689585398dbcf5a",
+      "after_sha256": "1e98f21232cf682fc35cee1cfb9990c3bf08e0345247c7264f3ca47b7f9ff758",
+      "only_new_skin_material_changed": true
+    },
+    {
+      "gender": "male",
+      "skin": "muscle",
+      "pose": "neutral",
+      "stage": "combined",
+      "before_sha256": "3def2a539ba32c2f438dfd9135979799569a83368726ca607c83d50af70e73be",
+      "after_sha256": "d398a089c0042c267d076743ed026112e7af2146a7165d60fb823489d86c8b7a",
+      "only_new_skin_material_changed": true
+    },
+    {
+      "gender": "male",
+      "skin": "flesh-guide",
+      "pose": "crouch",
+      "stage": "skin",
+      "before_sha256": "855dc33d3ffadf188b62f201b801ebfd87ab7f6525f495194ab4a6bab7b01446",
+      "after_sha256": "1a167c992507fb65ec85202664cff83d78d1fe84d0c2f7b79069024d2d7d5fb6",
+      "only_new_skin_material_changed": true
+    },
+    {
+      "gender": "male",
+      "skin": "flesh-guide",
+      "pose": "crouch",
+      "stage": "combined",
+      "before_sha256": "4d204950f7d03d9d672b894019c096881a02528b1445205bc0baa7a4ed3d541e",
+      "after_sha256": "f1bf1c3bc0c5ced07680ab313d037e3c55a20e18beee7e13c385becc4393f161",
+      "only_new_skin_material_changed": true
+    },
+    {
+      "gender": "female",
+      "skin": "flesh-guide",
+      "pose": "crouch",
+      "stage": "skin",
+      "before_sha256": "7703c393105cacc3af86073de12f88f486e2f517e56bd91a0012ba2a94be429e",
+      "after_sha256": "98aa762a1fd08bb5faa0e506a5495c6961de268fbe99e371b9f1884b3dde1707",
+      "only_new_skin_material_changed": true
+    },
+    {
+      "gender": "female",
+      "skin": "flesh-guide",
+      "pose": "crouch",
+      "stage": "combined",
+      "before_sha256": "cec107cff26742bd80dfe94a8c9627f76044adc87b3d29ffaf0557b641132331",
+      "after_sha256": "8b62af248181f8a7e81acd8baf8e3fc901d7e42de6ada277c11ca3857c340858",
+      "only_new_skin_material_changed": true
+    }
+  ],
+  "http": [
+    {
+      "name": "female-flesh",
+      "source_sha256": "712ac75e58efd4d6ccded0b1e931590900015de023327f1320cf6d7d94026ffc",
+      "skin_sha256": "8e8b76ba7d9d99aa03e1269de542bbc82cf3620ff701697b4805388b1a1899b5",
+      "skin_bytes": 2362764,
+      "combined_sha256": "2ebd06f1af5fe054f49e71e5a2390b8a9638d9e111fbb76f5220c8e0ed4f43cc",
+      "combined_bytes": 3806204,
+      "uv_sha256": "e4afff362ded41e19883371bd1d92766267ba8fe8a726d76a04b70c0ccb09022",
+      "texture_sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808",
+      "base": {
+        "approved_surface_changes_only": true,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      },
+      "skin_seconds": 3.9383737919852138,
+      "outline_seconds": 2.8253059160197154
+    },
+    {
+      "name": "female-flesh-guide",
+      "source_sha256": "712ac75e58efd4d6ccded0b1e931590900015de023327f1320cf6d7d94026ffc",
+      "skin_sha256": "68e20babad6f4a54947414bdaa608ce7ba4c1260bfa7f8d1bb399bea2467323d",
+      "skin_bytes": 2773468,
+      "combined_sha256": "80eef3e1855a88b7998746dc4c83ea10aeb9ac427543cc5e89480075b6a18ca3",
+      "combined_bytes": 4216908,
+      "uv_sha256": "e4afff362ded41e19883371bd1d92766267ba8fe8a726d76a04b70c0ccb09022",
+      "texture_sha256": "37cc35a4f48740be2a059ef3d3c8a6b9dc64a8301fa101fe9f09fec8d9f60b13",
+      "base": {
+        "approved_surface_changes_only": true,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      },
+      "skin_seconds": 3.0180607910151593,
+      "outline_seconds": 2.9556409590295516
+    },
+    {
+      "name": "female-gray-guide",
+      "source_sha256": "712ac75e58efd4d6ccded0b1e931590900015de023327f1320cf6d7d94026ffc",
+      "skin_sha256": "34dd0bd1a7b3025d1611f4f31bec92b4e3654a8dbce779a42ff819d3d803c65f",
+      "skin_bytes": 2760572,
+      "combined_sha256": "82575f4f4fbf7c3315d51c6a43332cf17cab200ceb7f54c9801a58194a67f87e",
+      "combined_bytes": 4204012,
+      "uv_sha256": "e4afff362ded41e19883371bd1d92766267ba8fe8a726d76a04b70c0ccb09022",
+      "texture_sha256": "4193ac78942e117aa3c55bf5ef36ec4f797f1f45940ab0df942d50cd3be36b46",
+      "base": {
+        "approved_surface_changes_only": true,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      },
+      "skin_seconds": 3.0074687090236694,
+      "outline_seconds": 2.8583020829828456
+    },
+    {
+      "name": "female-muscle",
+      "source_sha256": "712ac75e58efd4d6ccded0b1e931590900015de023327f1320cf6d7d94026ffc",
+      "skin_sha256": "3b5ceac15c0dc77d36c514362e34025f85471fde0be86a98619fe15e6a8fa672",
+      "skin_bytes": 2612444,
+      "combined_sha256": "6bb945ce89375fbdbd278b832fbe0a9a23888a90aec20674edac2c210958c63b",
+      "combined_bytes": 4055884,
+      "uv_sha256": "e4afff362ded41e19883371bd1d92766267ba8fe8a726d76a04b70c0ccb09022",
+      "texture_sha256": "cc3f8b1beed0a53a2053b923f70d6e86ccce57a5bf3ed0b1f712b83ae51a960c",
+      "base": {
+        "approved_surface_changes_only": true,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      },
+      "skin_seconds": 3.305743250006344,
+      "outline_seconds": 3.1396971250069328
+    },
+    {
+      "name": "male-flesh",
+      "source_sha256": "085dd9c65a3a66035f7e0ce9e0a9171b9abb0e33dada92194676d92e00c8b026",
+      "skin_sha256": "c11559f5429340c9c70910c8712973c2d25dda657f26231decf19f7399015829",
+      "skin_bytes": 2813548,
+      "combined_sha256": "3a7081d9a947d2e96f81bc4b75d4a8c3651b1156ee246c219965dab04d3c62e7",
+      "combined_bytes": 4711660,
+      "uv_sha256": "ef2f7f29d100645affec83214383f66a62eb2073b9d80229fc2d3c32e9ac146c",
+      "texture_sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808",
+      "base": {
+        "approved_surface_changes_only": true,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      },
+      "skin_seconds": 3.398765749996528,
+      "outline_seconds": 3.2367658329894766
+    },
+    {
+      "name": "male-flesh-guide",
+      "source_sha256": "085dd9c65a3a66035f7e0ce9e0a9171b9abb0e33dada92194676d92e00c8b026",
+      "skin_sha256": "c9b6f763ae53f6a286a97b9ed8a68f04c027f394979462b36d71e03b83d44274",
+      "skin_bytes": 3171756,
+      "combined_sha256": "639a17a4309f7241c4b26b1ca7600f8d588169998fe483ad8e474d9c9f020cf7",
+      "combined_bytes": 5069868,
+      "uv_sha256": "ef2f7f29d100645affec83214383f66a62eb2073b9d80229fc2d3c32e9ac146c",
+      "texture_sha256": "11ea27f724646374c384a0a742ca5745052b67ba1570d750f8bac47e63e390a5",
+      "base": {
+        "approved_surface_changes_only": true,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      },
+      "skin_seconds": 3.3594110420090146,
+      "outline_seconds": 3.2055230839760043
+    },
+    {
+      "name": "male-gray-guide",
+      "source_sha256": "085dd9c65a3a66035f7e0ce9e0a9171b9abb0e33dada92194676d92e00c8b026",
+      "skin_sha256": "080c1df9824a4ada4de0191594f10c8303520ad4197161bdf0eaef48b2faad90",
+      "skin_bytes": 3163276,
+      "combined_sha256": "23180a09a7764e7cf7203a4dbf5895a6796314567a580c3d6047aa5118e4f510",
+      "combined_bytes": 5061388,
+      "uv_sha256": "ef2f7f29d100645affec83214383f66a62eb2073b9d80229fc2d3c32e9ac146c",
+      "texture_sha256": "4c7089217111004a2d581f3367c3265c334fac2932df8a6875a279ab45f5b293",
+      "base": {
+        "approved_surface_changes_only": true,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      },
+      "skin_seconds": 3.4029290830367245,
+      "outline_seconds": 3.0817195419804193
+    },
+    {
+      "name": "male-muscle",
+      "source_sha256": "085dd9c65a3a66035f7e0ce9e0a9171b9abb0e33dada92194676d92e00c8b026",
+      "skin_sha256": "1e98f21232cf682fc35cee1cfb9990c3bf08e0345247c7264f3ca47b7f9ff758",
+      "skin_bytes": 3041596,
+      "combined_sha256": "d398a089c0042c267d076743ed026112e7af2146a7165d60fb823489d86c8b7a",
+      "combined_bytes": 4939724,
+      "uv_sha256": "ef2f7f29d100645affec83214383f66a62eb2073b9d80229fc2d3c32e9ac146c",
+      "texture_sha256": "40d5a186d6edbbeed0b95f5bc80c398facee9e0078833bbda6726a1b3a3781ab",
+      "base": {
+        "approved_surface_changes_only": true,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      },
+      "skin_seconds": 3.333233291981742,
+      "outline_seconds": 3.05933591700159
+    },
+    {
+      "name": "female-shaped-flesh-guide",
+      "source_sha256": "26c2c757189debff1ea84c25f642e36b320ef788e9c02022286ddf83f36c6e29",
+      "skin_sha256": "5b0e431aaf7142ed06a34efba66410f54a36fd3e40fe57a57fc48fd13db71103",
+      "skin_bytes": 2769100,
+      "combined_sha256": "bcf9c70c7b73976e46678fed33f93fdacea93b1cacd180f0079054728de43ad5",
+      "combined_bytes": 4211836,
+      "uv_sha256": "e4afff362ded41e19883371bd1d92766267ba8fe8a726d76a04b70c0ccb09022",
+      "texture_sha256": "37cc35a4f48740be2a059ef3d3c8a6b9dc64a8301fa101fe9f09fec8d9f60b13",
+      "base": {
+        "approved_surface_changes_only": true,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      },
+      "skin_seconds": 3.114746000035666,
+      "outline_seconds": 3.288641458027996
+    },
+    {
+      "name": "male-shaped-flesh-guide",
+      "source_sha256": "a6e7034af476754f6c62322b243bef1d6b66fc34239441137c2c55dba93f5403",
+      "skin_sha256": "f8767f306e78c5f988783618bb54803f40864b0f378c01ae4018c8794c040b7a",
+      "skin_bytes": 3182684,
+      "combined_sha256": "9992f1f017a94b5bb1d005965c098e157b09c158b628ee1955adaa28a84bb5bd",
+      "combined_bytes": 5091980,
+      "uv_sha256": "ef2f7f29d100645affec83214383f66a62eb2073b9d80229fc2d3c32e9ac146c",
+      "texture_sha256": "11ea27f724646374c384a0a742ca5745052b67ba1570d750f8bac47e63e390a5",
+      "base": {
+        "approved_surface_changes_only": true,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      },
+      "skin_seconds": 3.52917295799125,
+      "outline_seconds": 3.077548165980261
+    },
+    {
+      "name": "male-crouch-flesh-guide",
+      "source_sha256": "0cf2a8dbd3b5923ec02d177a20e338b91e1939d16f0878656453940db4412b74",
+      "skin_sha256": "1a167c992507fb65ec85202664cff83d78d1fe84d0c2f7b79069024d2d7d5fb6",
+      "skin_bytes": 3182252,
+      "combined_sha256": "f1bf1c3bc0c5ced07680ab313d037e3c55a20e18beee7e13c385becc4393f161",
+      "combined_bytes": 5096204,
+      "uv_sha256": "ef2f7f29d100645affec83214383f66a62eb2073b9d80229fc2d3c32e9ac146c",
+      "texture_sha256": "11ea27f724646374c384a0a742ca5745052b67ba1570d750f8bac47e63e390a5",
+      "base": {
+        "approved_surface_changes_only": true,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      },
+      "skin_seconds": 3.4835552910226397,
+      "outline_seconds": 3.317643499991391
+    },
+    {
+      "name": "female-crouch-flesh-guide",
+      "source_sha256": "d4fa440d5174eacc01b9cf82cbb4655c1381d0ac159302f0d8018c131b89cea2",
+      "skin_sha256": "98aa762a1fd08bb5faa0e506a5495c6961de268fbe99e371b9f1884b3dde1707",
+      "skin_bytes": 2763932,
+      "combined_sha256": "8b62af248181f8a7e81acd8baf8e3fc901d7e42de6ada277c11ca3857c340858",
+      "combined_bytes": 4206924,
+      "uv_sha256": "e4afff362ded41e19883371bd1d92766267ba8fe8a726d76a04b70c0ccb09022",
+      "texture_sha256": "37cc35a4f48740be2a059ef3d3c8a6b9dc64a8301fa101fe9f09fec8d9f60b13",
+      "base": {
+        "approved_surface_changes_only": true,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      },
+      "skin_seconds": 5.9267616249853745,
+      "outline_seconds": 3.288705667015165
+    },
+    {
+      "name": "male-relaxed-hand",
+      "source_sha256": "7d1265d8273aef7fe7b00a40d1021351b2d0010fe3d13b9c2ba5d68be02246da",
+      "skin_sha256": "6bf094065160eecc036f8c501c06381b14de07d662151a5b3d7841a3afa4920a",
+      "skin_bytes": 3196428,
+      "combined_sha256": "36340c10aeb12e30e8b23187d350284ed3bde26a9cb5015cef499c8dc6f0bfe2",
+      "combined_bytes": 5105884,
+      "uv_sha256": "ef2f7f29d100645affec83214383f66a62eb2073b9d80229fc2d3c32e9ac146c",
+      "texture_sha256": "11ea27f724646374c384a0a742ca5745052b67ba1570d750f8bac47e63e390a5",
+      "base": {
+        "approved_surface_changes_only": true,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      },
+      "skin_seconds": 3.4454242910142057,
+      "outline_seconds": 3.0512747079483233
+    },
+    {
+      "name": "female-relaxed-hand",
+      "source_sha256": "5541de966b6d3e355861311224ca77d653bac9eb3e9d57d3d328965cd27821d9",
+      "skin_sha256": "f4f54be91dd95109c46b7bdbbf8484b5cc0d1e373e5bfc872a366a2ef5fb8414",
+      "skin_bytes": 2945804,
+      "combined_sha256": "b7f9bea3f0f426edda0623be05a0259b82d8f393974ff19482c338e08cd8eeb1",
+      "combined_bytes": 4551004,
+      "uv_sha256": "e4afff362ded41e19883371bd1d92766267ba8fe8a726d76a04b70c0ccb09022",
+      "texture_sha256": "37cc35a4f48740be2a059ef3d3c8a6b9dc64a8301fa101fe9f09fec8d9f60b13",
+      "base": {
+        "approved_surface_changes_only": true,
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      },
+      "skin_seconds": 3.053073458955623,
+      "outline_seconds": 2.9491976250428706
+    }
+  ],
+  "http_negative": [
+    {
+      "name": "default",
+      "status": 400,
+      "code": "SKIN_DEFAULT_USE_LEGACY"
+    },
+    {
+      "name": "crop",
+      "status": 422,
+      "code": "SKIN_UNSUPPORTED"
+    },
+    {
+      "name": "source-sha",
+      "status": 409,
+      "code": "SOURCE_FBX_SHA256_MISMATCH"
+    },
+    {
+      "name": "personal",
+      "status": 422,
+      "code": "SKIN_UNSUPPORTED"
+    },
+    {
+      "name": "auth",
+      "status": 401
+    }
+  ],
+  "assets_verified": 18,
+  "synthetic_tamper": {
+    "valid": true,
+    "rejected": [
+      "base-position",
+      "base-weight",
+      "uv",
+      "embedded-bytes",
+      "external-image",
+      "missing-image",
+      "material",
+      "specular-highlight",
+      "reflection-highlight",
+      "connection",
+      "extra-mesh",
+      "source-topology",
+      "skin-after-outline"
+    ],
+    "base": {
+      "maxPositionErrorM": 0.0,
+      "maxMatrixError": 0.0,
+      "maxWeightError": 0.0,
+      "maxNormalError": 0.0
+    },
+    "embedded_sha256": "84c465e005daefbf9228adb79c1f7f32b4abb57b9d492441500a6ec57afb7cc0",
+    "synthetic_only": true,
+    "csp_certified": false
+  },
+  "scope": "Actual converter TCP HTTP outputs match the new18 CSP-observed hashes. Product/native refresh is a companion-owned separate stage; original glossy bytes are historical."
+}

@@ -46,6 +46,8 @@ def main():
         'external-image':lambda r:one(obj(r,video.props[0]),b'Filename').props.__setitem__(0,b'../../external.png'),
         'missing-image':lambda r:one(r,b'Objects').elems.remove(obj(r,video.props[0])),
         'material':lambda r:one(obj(r,newmat.props[0]),b'Properties70').elems.pop(),
+        'specular-highlight':lambda r:next(p for p in one(obj(r,newmat.props[0]),b'Properties70').elems if p.props[0]==b'SpecularColor').props.__setitem__(slice(4,None),[1.,1.,1.]),
+        'reflection-highlight':lambda r:next(p for p in one(obj(r,newmat.props[0]),b'Properties70').elems if p.props[0]==b'ReflectionColor').props.__setitem__(slice(4,None),[1.,1.,1.]),
         'connection':lambda r:one(r,b'Connections').elems.pop(),
         'extra-mesh':lambda r:one(r,b'Objects').elems.append(copy.deepcopy(geom)),
     }

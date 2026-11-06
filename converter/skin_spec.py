@@ -9,14 +9,15 @@ EXPRESSION='neutral-uv-embedded-basecolor-v1'
 SKINS=('default','gray-guide','flesh','flesh-guide','muscle')
 MAX_FBX_BYTES=30*1024*1024
 MANIFEST=Path(__file__).with_name('skin_assets.v1.json')
-# Actual single-FBX neutral16 imports + representative male/female posed imports.
-# Acceptance binds the exact asset manifest as well as expression/model/scope/ID.
+# Actual explicit-matte neutral16 and representative posed2 CSP imports.
+# Both immutable assets and exact material writer must retain their acceptance.
 CSP_CERTIFIED=frozenset((EXPRESSION,
     '1fb0fa382d4fa7d27233b6139cba9c5f1ec575c6b8f86b7deac2a3dc4d447386',
     sha,'full',skin) for sha in (
         '085dd9c65a3a66035f7e0ce9e0a9171b9abb0e33dada92194676d92e00c8b026',
         '712ac75e58efd4d6ccded0b1e931590900015de023327f1320cf6d7d94026ffc')
     for skin in SKINS[1:])
+CSP_MATERIAL_SHA256='59a37984fdd9546be05cc7c2f9ca100f5bc9b673a7bf10b8b3c654d5bbc49ba4'
 
 
 def normalize(value=None):
@@ -43,8 +44,13 @@ def runtime_revision():
         ('skin_spec.py','skin_fbx.py','skin_worker.py','skin_assets.v1.json'))).hexdigest()
 
 
+def material_revision():
+    return hashlib.sha256(Path(__file__).with_name('skin_fbx.py').read_bytes().replace(b'\r\n',b'\n')).hexdigest()
+
+
 def certified(character_sha,scope,skin):
-    return (EXPRESSION,manifest_hash(),character_sha,scope,normalize(skin)['id']) in CSP_CERTIFIED
+    return (material_revision()==CSP_MATERIAL_SHA256
+        and (EXPRESSION,manifest_hash(),character_sha,scope,normalize(skin)['id']) in CSP_CERTIFIED)
 
 
 def checked_asset(character_id,character_sha,skin):

@@ -84,3 +84,12 @@ def test_replaced_asset_manifest_cannot_inherit_csp_acceptance(monkeypatch):
     assert spec.certified(sha,'full',skin)
     monkeypatch.setattr(spec,'manifest_hash',lambda:'f'*64)
     assert not spec.certified(sha,'full',skin)
+
+
+def test_changed_material_writer_cannot_inherit_csp_acceptance(monkeypatch):
+    from converter import skin_spec as spec
+    sha=next(iter(spec.manifest()['models'].values()))['character_sha256']
+    skin=dict(version=VERSION,id='flesh')
+    assert spec.certified(sha,'full',skin)
+    monkeypatch.setattr(spec,'material_revision',lambda:'f'*64)
+    assert not spec.certified(sha,'full',skin)
