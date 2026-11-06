@@ -56,6 +56,15 @@ def read_native_png(data_dir: Path, source: str, scope="full"):
         raise ValueError("invalid native reference source")
     if scope not in SCOPES:
         return None
+    from .thumbnail_overlay import read_styled_poster
+    styled = read_styled_poster(data_dir, source, scope, 'yaw_000')
+    if styled is not None:
+        jpeg, response_headers = styled
+        png = _png(jpeg)
+        from .pose_posters import digest
+        response_headers['X-Standin-Native-Artifact-SHA256'] = digest(jpeg)
+        response_headers['X-Standin-Artifact-SHA256'] = digest(png)
+        return png, response_headers
     base = data_dir.resolve()
     root = base / "thumbs" / "scope8"
     manifest_path = base / "library_manifest.json"

@@ -1,0 +1,7 @@
+# Stage-only candidate: preserve the exact running inference dependencies/model code.
+ARG BASE_IMAGE=136889124221.dkr.ecr.ap-northeast-2.amazonaws.com/standin/inference@sha256:49b467b5d4aa240371aea07179092759e9beadfa87ab5102d71577418de33029
+FROM ${BASE_IMAGE}
+COPY --chown=standin:standin api/app.py /app/api/app.py
+COPY --chown=standin:standin src/thumbnail_overlay.py src/directional_posters.py src/native_png_posters.py src/thumbnails.py /app/src/
+ARG DEPLOYMENT_VERSION=thumbnail-outline-staging
+ENV DEPLOYMENT_VERSION=$DEPLOYMENT_VERSION

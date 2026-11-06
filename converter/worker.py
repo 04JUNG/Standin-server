@@ -375,7 +375,11 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
     if base:
         from converter.retarget_cache import binding, restore_base, capture_base, cache_key
         base_identity = binding(source_bvh_sha256, job["character_sha256"], job["character_id"], job["mirror"])
-    if base and base["mode"] == "reuse":
+    from converter.reviewed_library import restore as restore_reviewed
+    reviewed_payload = restore_reviewed(job)
+    if reviewed_payload is not None:
+        payload = reviewed_payload
+    elif base and base["mode"] == "reuse":
         with lab_timings.measure("retarget_base_restore_verify"):
             payload, base_metadata = restore_base(base["fbx_path"],base["meta_path"],job["output_path"],base_identity)
     else:
@@ -401,6 +405,11 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
             "base_sha256":base_metadata["artifact_sha256"],"body_report_sha256":base_metadata["body_report_sha256"]}
     if recipe is not None and ok:
         payload["shape_bake"] = json.loads(Path(job["output_path"]).with_suffix(".shape.json").read_text())
+    if ok and reviewed_payload is None:
+        from converter.reviewed_library import transfer_registered_fingers
+        source_fingers = transfer_registered_fingers(job)
+        if source_fingers is not None:
+            payload['reviewed_source_fingers'] = source_fingers
     if ok and job.get("hands") is not None:
         # 손은 몸 변환 직후, 메시 절단·카메라 회전·미리보기보다 먼저 굽는다.
         # 그래야 이후 단계가 모두 손이 적용된 실제 산출물을 다시 읽는다.

@@ -15,6 +15,31 @@ from converter.protocol import SOLVER_VERSION, SOLVER_MANIFEST_SHA256
 from converter.solved_state import SolvedPoseState, canonical, decode, digest, validate_identity
 
 VERSION = 'post-frozen-file-canonical-snapshot-v2'
+# Approved #168 fixed defaults contain real terminal Head/ToeBase bones and no
+# synthetic leaf children. The frozen legacy importer drops those real bones.
+# Limit the existing full-character importer to these exact immutable assets;
+# generic/unrecognized assets retain the frozen import path.
+TERMINAL_BONE_ASSETS = {
+    'male-default83-v0-7-6-p1': '085dd9c65a3a66035f7e0ce9e0a9171b9abb0e33dada92194676d92e00c8b026',
+    'female-default80-v0-3-9-p1': '712ac75e58efd4d6ccded0b1e931590900015de023327f1320cf6d7d94026ffc',
+}
+
+
+def _run_body_job(job):
+    from converter.worker import run_job
+    if (job.get('shape_recipe') is not None
+            or TERMINAL_BONE_ASSETS.get(job['character_id']) != job['character_sha256']):
+        return run_job(job)
+    from converter import retarget as rt
+    from converter.shape_bake import import_full_character
+    previous = rt.import_character
+    rt.import_character = import_full_character
+    try:
+        # run_job independently re-hashes the source and frozen lineage before
+        # opening it, and retains every solver/export/final-skin safety gate.
+        return run_job(job)
+    finally:
+        rt.import_character = previous
 
 
 def runtime_revision():
@@ -79,7 +104,7 @@ def prepare_body(job, identity, destination):
     job is a load_job-validated, server-created full-body job with hands absent.
     This deliberately retains every old solver, shape and file-validation gate.
     """
-    from converter.worker import load_job, run_job
+    from converter.worker import load_job
     from converter.solved_state import validate_identity
     from converter.interactive_scene import capture
     import bpy
@@ -103,7 +128,7 @@ def prepare_body(job, identity, destination):
     if binding['solver'] != {'version': SOLVER_VERSION, 'manifestSha256': SOLVER_MANIFEST_SHA256,
                              'adapterVersion': VERSION, 'runtimeSha256': runtime_revision()}:
         raise ValueError('body solver binding mismatch')
-    report = run_job(job)
+    report = _run_body_job(job)
     if report.get('ok') is not True or report.get('artifact_validation', {}).get('skin_verified') is not True:
         raise ValueError(f"body was not accepted and file validated: ok={report.get('ok')}; missing={report.get('missing_required')}; error={report.get('error_code')}")
     # run_job's final validator left the approved final body loaded, including
