@@ -2,7 +2,7 @@
 import numpy as np
 import torch
 from torch import nn
-VERSION='v5-p2-p3-masked-residual-frames-v1'
+VERSION='v5-p2-p3-masked-residual-frames-v2'
 class ResidualFrames(nn.Module):
     def __init__(self,geometry_dim,image_dim,use_image=True):
         super().__init__();self.use_image=use_image

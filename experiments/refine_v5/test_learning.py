@@ -24,3 +24,14 @@ def test_reflected_camera_rejected():
     from experiments.refine_v5.learning_data import frame
     b=[dict(name=n,head=p,matrix=np.eye(4).tolist()) for n,p in [('Hips',[0,0,0]),('Spine2',[0,1,0]),('LeftArm',[1,1,0]),('RightArm',[-1,1,0])]]
     _,_,_,f=frame(b);assert np.linalg.det(f)>.999
+
+def test_native_camera_matches_shared_library_projection():
+    from experiments.refine_v5.learning_data import source_camera,frame
+    from src.library import project_3d_to_2d,view_angle
+    bones=[dict(name=n,head=p,matrix=np.eye(4).tolist()) for n,p in [('Hips',[0,0,0]),('Spine2',[0,0,1]),('LeftArm',[1,0,1]),('RightArm',[-1,0,1])]]
+    _,_,_,body=frame(bones);native=np.array([[.2,.3,.4],[-.6,.1,.8]])
+    search=native[:,[0,2,1]]*np.array([1,1,-1])
+    for view in ['front','three_quarter','side','back']:
+        actual=(native@body@source_camera(bones,view).T)[:,:2]
+        expected=project_3d_to_2d(search,view_angle(view))*np.array([1,-1])
+        assert np.allclose(actual,expected,atol=1e-6)

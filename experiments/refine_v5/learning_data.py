@@ -26,6 +26,14 @@ def frame(bones):
     right/=np.linalg.norm(right);forward=np.cross(right,up)
     return by,center,scale,np.column_stack([right,up,forward])
 
+def source_camera(bones,view):
+    # Reuse the library's view angle; native FBX is Z-up, BVH/search is Y-up.
+    from src.library import view_angle, _rot_y
+    _,_,_,body=frame(bones)
+    native_to_search=np.array([[1,0,0],[0,0,1],[0,-1,0]])
+    image_camera=np.diag([1.,-1.,-1.])@_rot_y(view_angle(view))@native_to_search
+    return image_camera@body
+
 def axes(bones):
     by,c,s,f=frame(bones)
     a=np.array([np.array(by[n]['matrix'])[:3,:2].T@f for n in BONES])
@@ -105,7 +113,7 @@ def build(run,previous,repo,variants=32):
         case=rig['case_id'];review=reviews[case];seed=seeds[case]
         base=axes(rig['bones']);label=axes(gt[case]['bones']);mask=visibility(review)
         q,qmask=normalized_points(seed['keypoints'],seed['scores'])
-        by,c,s,f=frame(rig['bones']);camera=np.array([[1,0,0],[0,0,-1],[0,1,0]])@f
+        by,c,s,f=frame(rig['bones']);camera=source_camera(rig['bones'],seed['view'])
         gray=cv2.imread(seed['image'],cv2.IMREAD_GRAYSCALE)
         if gray is None:raise ValueError('missing image')
         coords=np.array(seed['keypoints'])[COCO]
@@ -133,7 +141,7 @@ def build(run,previous,repo,variants=32):
                 imf=image_features(image,pix)
                 arrays.append((geometry(b,noisy,obs,'outlined',rot),imf,b,label,np.ones(13,'float32'),1.,case,rig['split'],style))
                 if k==0 and style=='randomized':cv2.imwrite(str(out/(case+'.synthetic.png')),image)
-        manifest.append(dict(case_id=case,split=rig['split'],image_sha256=seed['image_sha256'],source_sha256=digest(rig['base_fbx']),gt_sha256=gt[case]['sha256'],source_risk_group=groups[case],real_camera='source_frame_hypothesis_not_calibrated',seed_kind=seed['seed_kind']))
+        manifest.append(dict(case_id=case,split=rig['split'],image_sha256=seed['image_sha256'],source_sha256=digest(rig['base_fbx']),gt_sha256=gt[case]['sha256'],source_risk_group=groups[case],real_camera='fixed_selected_library_view_GT_camera_unavailable',seed_kind=seed['seed_kind']))
     keys=['geometry','image','base','target','mask','synthetic','case_id','split','domain']
     data={k:np.array([row[i] for row in arrays]) for i,k in enumerate(keys)}
     np.savez_compressed(out/'examples.npz',**data)

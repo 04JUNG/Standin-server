@@ -48,7 +48,7 @@ def main():
         av=angles(pv.numpy(),d['target'][vi]);floors=[]
         for j in range(13):
             vals=np.radians(av[:,j][mask[:,j]>0]);floors.append(float(np.sqrt(np.mean(vals**2))) if len(vals) else float(np.pi))
-        checkpoint=dict(version=VERSION,weights=best,geometry_dim=d['geometry'].shape[1],image_dim=d['image'].shape[1],use_image=useimage,validation_error_floor_rad=floors,train_cases=sorted(set(d['case_id'][ix].tolist())),training_domains=domains,test_used=False,camera_status='real_unknown_source_frame_hypothesis',image_features='frozen_engineered_not_pretrained')
+        checkpoint=dict(version=VERSION,weights=best,geometry_dim=d['geometry'].shape[1],image_dim=d['image'].shape[1],use_image=useimage,validation_error_floor_rad=floors,train_cases=sorted(set(d['case_id'][ix].tolist())),training_domains=domains,test_used=False,camera_status='selected_library_camera_fixed_GT_camera_unknown',image_features='frozen_engineered_not_pretrained')
         torch.save(checkpoint,out/(name+'.pt'))
         # Save development+validation predictions independent of the label evaluation file.
         ri=np.where(real)[0]
