@@ -498,6 +498,7 @@ class Pipeline:
                     f"Gemini 스켈레톤 보완 {repair_trace['status']}: "
                     f"수정 {len(repair_trace.get('repaired_slots') or [])}명, "
                     f"{repair_trace['elapsed_ms']:.0f}ms")
+        progress.publish_focus(slots, img_w, img_h)
         early_people = []
         if len(slots) == 1:
             overlay = progress.skeleton_overlay(slots[0], img_w, img_h)
@@ -549,7 +550,7 @@ class Pipeline:
                     progress.emit(person=dict(personIndex=0,
                         observations=progress.observations(decision.semantic.description)))
                 progress.start_search(routing)
-                with progress.person_scope(0 if len(slots) == 1 else None), span("fullbody_search"):
+                with progress.person_scope(0 if len(slots) == 1 else None, slot), span("fullbody_search"):
                     review_options = {"review_geometry": True} if integrated_enabled(CFG) else {}
                     report = self._fullbody_search.search(decision, evidence, **review_options)
                 bindings = dynamic_refine_candidates(
@@ -581,7 +582,7 @@ class Pipeline:
             if decision is not None and decision.route in ("semantic", "undetermined", "error") \
                     and decision.joint.policy_block is None:
                 progress.start_search(routing)
-                with progress.person_scope(0 if len(slots) == 1 else None), span("routed_non_geometric"):
+                with progress.person_scope(0 if len(slots) == 1 else None, slot), span("routed_non_geometric"):
                     outcome = self._route_non_geometric(
                         vlm, slot, decision, routing, (img_w, img_h))
                 outcome.descriptor.quality_reasons = list(dict.fromkeys(slot.reasons))
@@ -589,7 +590,7 @@ class Pipeline:
                 continue
             progress.start_search(routing)
             geometric_started = perf_counter()
-            with progress.person_scope(0 if len(slots) == 1 else None), span("descriptor_search"):
+            with progress.person_scope(0 if len(slots) == 1 else None, slot), span("descriptor_search"):
                 outcome = self._evaluate_slot(
                     vlm, slot, threshold_scale, (img_w, img_h),
                     search_image=image if len(slots) == 1 and vlm.num_people == 1 else None)
@@ -601,7 +602,7 @@ class Pipeline:
                 if attempted:
                     with span("skeleton_finalize"):
                         finalize_slot(slot, CFG)
-                    with progress.person_scope(0 if len(slots) == 1 else None), span("descriptor_search"):
+                    with progress.person_scope(0 if len(slots) == 1 else None, slot), span("descriptor_search"):
                         outcome = self._evaluate_slot(
                             vlm, slot, threshold_scale, (img_w, img_h),
                             search_image=image if len(slots) == 1 and vlm.num_people == 1 else None)
@@ -779,6 +780,7 @@ class Pipeline:
                         if checks:description.laterality_review['joint_conflicts']=checks
                     semantics[id(slot)] = assess_semantic_evidence(
                         description, rcfg)
+        progress.publish_focus_observations(slots, semantics)
         if len(slots) == 1:
             semantic = semantics.get(id(slots[0]))
             observed = progress.observations(semantic.description if semantic else None)

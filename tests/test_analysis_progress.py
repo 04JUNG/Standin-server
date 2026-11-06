@@ -8,7 +8,7 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 from fastapi import HTTPException
-from src.analysis_progress import capture_progress, emit, skeleton_overlay, observations, candidates
+from src.analysis_progress import capture_progress, emit, skeleton_overlay, observations, candidates, publish_focus
 from api.analysis_stream import stream_analysis
 
 
@@ -104,19 +104,44 @@ def test_pipeline_progress_preserves_exact_results_calls_and_final_person_identi
     monkeypatch.setattr(CFG, "search_routing_enabled", True)
     hint = _Img(f"full_half standing front {people}p" + (" rough" if rough else ""))
     before, with_progress = _pipe(), _pipe()
+    from collections import Counter
+    call_counts = [Counter(), Counter()]
+    for i, pipe in enumerate((before, with_progress)):
+        calls = [(pipe.pose, "estimate"), (pipe.pose, "estimate_crop_candidates"),
+                 (pipe.vlm, "analyze"), (pipe.vlm, "rerank"), (pipe.semantic_searcher, "search")]
+        for target, name in calls:
+            original = getattr(target, name)
+            def counted(*args, _index=i, _name=name, _original=original, **kwargs):
+                call_counts[_index][_name] += 1
+                return _original(*args, **kwargs)
+            monkeypatch.setattr(target, name, counted)
+    import src.pipeline as pipeline_module
+    active = [0]
+    for name in ("knn_geometric", "knn_upper_body"):
+        original = getattr(pipeline_module, name)
+        def counted_search(*args, _name=name, _original=original, **kwargs):
+            call_counts[active[0]][_name] += 1
+            return _original(*args, **kwargs)
+        monkeypatch.setattr(pipeline_module, name, counted_search)
     normal = before.process_cut(hint)
+    active[0] = 1
     snapshots=[]
     with capture_progress(snapshots.append):
         actual=with_progress.process_cut(hint)
     from tests.test_description_prefetch import clean
     assert clean(asdict(normal)) == clean(asdict(actual))
     assert before.vlm.describe_calls == with_progress.vlm.describe_calls
+    assert call_counts[0] == call_counts[1]
     assert [p["personIndex"] for p in snapshots[-1]["people"]] == list(range(people))
     assert snapshots[-1]["stage"] == "ranking"
     assert "refining" in snapshots[-1]["skippedStages"]
     assert all("refinement" not in p for s in snapshots for p in s["people"])
     if people > 1:
         assert not any(s["people"] for s in snapshots if s["stage"] != "ranking")
+        assert any("focus" in s for s in snapshots if s["stage"] == "extracting")
+        assert "focus" not in snapshots[-1]
+    else:
+        assert all("focus" not in s for s in snapshots)
     if people == 2 and rough:
         assert [p.get("searchMode") for p in snapshots[-1]["people"]] == ["pose", "description"]
     for s in snapshots:
@@ -173,3 +198,110 @@ def test_presentation_preview_keeps_exact_final_ids_ranks_and_only_existing_asse
           SimpleNamespace(candidate_id="preview_"+"b"*64,asset=SimpleNamespace(thumbnail_url="/pose/b/thumbnail?view=front"))]
     value=presentation_previews(SimpleNamespace(library_candidates=rows,review_candidates=[]))
     assert value == [dict(id="preview_"+"b"*64,rank=2,thumbnailUrl="/pose/b/thumbnail?view=front")]
+
+
+
+def test_multi_person_real_focus_arrives_before_search_without_final_person_index(monkeypatch):
+    from src.config import CFG
+    from tests.test_search_routing import _pipe, _Img
+    monkeypatch.setattr(CFG, "body_matching_mode", "off")
+    monkeypatch.setattr(CFG, "vlm_person_tags", False)
+    monkeypatch.setattr(CFG, "vlm_hand_shapes", False)
+    monkeypatch.setattr(CFG, "search_routing_enabled", True)
+    pipe = _pipe()
+    snapshots, errors, observed_slots = [], [], []
+    at_routing, release, finished = Event(), Event(), Event()
+    route_slots = pipe._route_slots
+    def blocked(*args, **kwargs):
+        observed_slots.extend(args[-1])
+        at_routing.set()
+        assert release.wait(5)
+        return route_slots(*args, **kwargs)
+    monkeypatch.setattr(pipe, "_route_slots", blocked)
+    def run():
+        try:
+            with capture_progress(snapshots.append):
+                pipe.process_cut(_Img("full_half standing front 2p rough"), 512, 768)
+        except BaseException as error:
+            errors.append(error)
+        finally:
+            finished.set()
+    worker = Thread(target=run)
+    worker.start()
+    try:
+        assert at_routing.wait(5)
+        assert not finished.is_set()
+        focus = next(s["focus"] for s in snapshots if s["stage"] == "extracting" and "focus" in s)
+        assert set(focus) == {"id", "skeleton"}
+        assert focus["id"].startswith("focus_")
+        assert any(point is not None for point in focus["skeleton"]["points"][5:])
+        assert focus["skeleton"] in [skeleton_overlay(slot,512,768) for slot in observed_slots]
+        assert all(s["people"] == [] for s in snapshots)
+        assert all("activePersonIndex" not in s for s in snapshots)
+        assert all(s["stage"] not in ("searching", "ranking") for s in snapshots)
+    finally:
+        release.set()
+        worker.join(5)
+    assert not errors
+    assert not worker.is_alive()
+    assert "focus" not in snapshots[-1]
+    assert [p["personIndex"] for p in snapshots[-1]["people"]] == [0,1]
+
+
+def test_focus_uses_only_existing_valid_body_points_and_clears_on_people():
+    points = np.array([[20.,40.]] * 17)
+    mask = np.zeros(17,bool); mask[[5,7]] = True
+    def slot(state="partial", valid=mask):
+        return SimpleNamespace(state=state,skeleton=SimpleNamespace(keypoints=points),
+            evidence=SimpleNamespace(valid_joint_mask=valid))
+    valid = slot()
+    invalid, suspect, empty = slot("invalid"), slot("suspect"), slot(valid=np.zeros(17,bool))
+    snapshots=[]
+    with capture_progress(snapshots.append):
+        publish_focus([invalid,suspect,empty],100,200)
+        assert snapshots == []
+        publish_focus([valid],100,200)
+        assert snapshots == []
+        publish_focus([invalid,suspect,empty,valid],100,200)
+        publish_focus([valid,invalid],100,200)
+        assert snapshots[-1]["focus"]["id"] == snapshots[-2]["focus"]["id"]
+        emit("ranking",people=[dict(personIndex=0)])
+    focus=snapshots[0]["focus"]
+    assert focus["skeleton"]["points"][5] == [.2,.2]
+    assert sum(p is not None for p in focus["skeleton"]["points"]) == 2
+    assert "focus" not in snapshots[-1]
+    other=[]
+    with capture_progress(other.append):
+        publish_focus([valid,invalid],100,200)
+    assert other[0]["focus"]["id"] != focus["id"]
+
+
+def test_focus_keywords_and_route_only_follow_identical_slot_reference():
+    from src.analysis_progress import publish_focus_observations, person_scope, record_descriptor_search
+    points=np.array([[20.,40.]]*17)
+    mask=np.zeros(17,bool);mask[5]=True
+    selected=SimpleNamespace(slot_id=0,state="partial",skeleton=SimpleNamespace(keypoints=points),
+        evidence=SimpleNamespace(valid_joint_mask=mask))
+    # Same numeric slot_id is not sufficient evidence of identity.
+    other=SimpleNamespace(slot_id=0,state="invalid",skeleton=selected.skeleton,evidence=selected.evidence)
+    description=lambda data: SimpleNamespace(description={"body_observations":data})
+    snapshots=[]
+    with capture_progress(snapshots.append):
+        publish_focus([selected,other],100,200)
+        publish_focus_observations([selected,other],{id(other):description({"torso":"forward"})})
+        with person_scope(None,other):
+            record_descriptor_search(SimpleNamespace(),"description")
+        assert "observations" not in snapshots[-1]["focus"]
+        assert "searchMode" not in snapshots[-1]["focus"]
+        publish_focus_observations([selected,other],{
+            id(selected):description({"arms":"raised"}), id(other):description({"torso":"forward"})})
+        with person_scope(None,selected):
+            record_descriptor_search(SimpleNamespace(),"pose")
+        focus=snapshots[-1]["focus"]
+        assert focus["observations"] == {"arms":"raised"}
+        assert focus["searchMode"] == "pose"
+        assert snapshots[-1]["people"] == []
+        emit("ranking",people=[dict(personIndex=0)])
+        with person_scope(None,selected):
+            record_descriptor_search(SimpleNamespace(),"description")
+        assert "focus" not in snapshots[-1]

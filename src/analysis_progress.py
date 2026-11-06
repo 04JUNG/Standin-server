@@ -6,11 +6,14 @@ from datetime import datetime, timezone
 from threading import Lock
 import math
 from functools import wraps
+from uuid import uuid4
 
 VERSION = "pose-analysis-progress.v1"
 STAGES = ("analyzing", "extracting", "understanding", "searching", "refining", "ranking")
 _current = ContextVar("analysis_progress", default=None)
 _person = ContextVar("analysis_progress_person", default=None)
+_slot = ContextVar("analysis_progress_slot", default=None)
+_UNSET = object()
 
 
 class Progress:
@@ -19,10 +22,12 @@ class Progress:
         self.lock = Lock()
         self.search_modes = {}
         self.descriptor_modes = {}
+        self.focus_id = None
+        self.focus_slot = None
         self.state = dict(version=VERSION, sequence=0, stage="analyzing",
                           completedStages=[], skippedStages=[], people=[])
 
-    def emit(self, stage=None, *, completed=(), skipped=(), people=None, person=None):
+    def emit(self, stage=None, *, completed=(), skipped=(), people=None, person=None, focus=_UNSET):
         try:
             with self.lock:
                 s = self.state
@@ -33,8 +38,15 @@ class Progress:
                 # Job-level completion means at least one person actually ran it.
                 # A skipped path on another person cannot undo that evidence.
                 s["skippedStages"] = [v for v in s["skippedStages"] if v not in s["completedStages"]]
+                if focus is not _UNSET:
+                    if focus is None:
+                        s.pop("focus", None)
+                    else:
+                        s["focus"] = deepcopy(focus)
                 if people is not None:
                     s["people"] = deepcopy(people)
+                    if people:
+                        s.pop("focus", None)
                 if person is not None:
                     index = person["personIndex"]
                     previous = next((p for p in s["people"] if p["personIndex"] == index), None)
@@ -62,11 +74,13 @@ def capture_progress(sink):
 
 
 @contextmanager
-def person_scope(index):
+def person_scope(index, slot=None):
     token = _person.set(index)
+    slot_token = _slot.set(slot)
     try:
         yield
     finally:
+        _slot.reset(slot_token)
         _person.reset(token)
 
 
@@ -80,6 +94,11 @@ def person_update(**kwargs):
     index = _person.get()
     if index is not None:
         emit(person=dict(personIndex=index, **kwargs))
+    else:
+        current = _current.get()
+        if (current and current.focus_slot is not None and _slot.get() is current.focus_slot
+                and not current.state["people"] and "focus" in current.state):
+            emit(focus={**current.state["focus"], **kwargs})
 
 
 def best_effort(fn):
@@ -121,12 +140,47 @@ def skeleton_overlay(slot, width, height):
 
 
 @best_effort
+def publish_focus(slots, width, height):
+    current = _current.get()
+    if current is None or len(slots) <= 1:
+        return
+    # This observational choice never reorders/modifies slots or assigns an index.
+    selected, selected_slot, count = None, None, 0
+    for slot in slots:
+        skeleton = skeleton_overlay(slot, width, height)
+        observed = sum(point is not None for point in skeleton["points"]) if skeleton else 0
+        if observed > count:
+            selected, selected_slot, count = skeleton, slot, observed
+    if selected is None:
+        return
+    if current.focus_id is None:
+        current.focus_id = f"focus_{uuid4().hex}"
+    current.focus_slot = selected_slot
+    emit("extracting", focus=dict(id=current.focus_id, skeleton=selected))
+
+
+@best_effort
 def observations(description):
     # Exact VLM observation fields only, never search text/context/reasoning.
     if not isinstance(description, dict):
         return {}
     from .body_language import validated_observations
     return validated_observations(description.get("body_observations"))
+
+
+@best_effort
+def publish_focus_observations(slots, semantics):
+    current = _current.get()
+    if current is None or current.focus_slot is None or current.state["people"]:
+        return
+    # Both dictionaries and scopes refer to the same live slot object. Never use
+    # an output index or a nearby person's description as an association.
+    if not any(slot is current.focus_slot for slot in slots):
+        return
+    semantic = semantics.get(id(current.focus_slot))
+    observed = observations(semantic.description if semantic else None)
+    if observed and "focus" in current.state:
+        emit(focus={**current.state["focus"], "observations": observed})
 
 
 @best_effort
@@ -175,7 +229,7 @@ def publish_ranked(processed, width, height, routing, data_dir):
         progress_people.append(person)
     ran = any("searchMode" in person for person in progress_people)
     emit("ranking", completed=("searching",) if ran else (),
-         skipped=("refining",) if ran else ("searching", "refining"), people=progress_people)
+         skipped=("refining",) if ran else ("searching", "refining"), people=progress_people, focus=None)
 
 
 @best_effort

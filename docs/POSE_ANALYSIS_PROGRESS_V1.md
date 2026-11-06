@@ -37,3 +37,14 @@ python -m uvicorn api.app:app --host 127.0.0.1 --port 18000
 ```
 
 Install repository requirements in a local environment first. With no prepared thumbnail files the correct output has no previews; the mock adapter also has no real observation keywords. For actual local model integration use your existing local model/library configuration and this worktree's API; do not point the smoke commands at production.
+
+
+## Early multi-person focus extension (2026-11-06)
+
+After existing crop/rescue/repair and before routing/search, multi-person analyses now publish an optional focus with a validated original-image overlay. The existing skeleton/quality mask is reused; invalid/missing/suspect slots and unverified/out-of-frame joints remain absent. We choose one slot with the most validated body points without changing slots, their ordering, indices or any search decision. If no eligible slot has a validated body point, focus is omitted. Single-person behavior is unchanged.
+
+The public focus ID is a request-local `focus_<random>` observation identity, never a personIndex/candidateId. Only the internal live slot reference is retained to associate observations/mode. Existing semantic evidence is attached only when keyed to that identical slot object, and actual search mode only inside that slot's existing search scope. No matching by output number/nearby person/numeric slot ID is attempted. Unknown association => omit observations/mode. Final sorted people clears focus; late same-slot metadata cannot resurrect it.
+
+New raw offline fixture: `tests/fixtures/analysis_progress/focus-producer-v1.json`. Existing raw/public v1 fixtures are preserved unchanged. BFF focus fixture: `/private/tmp/standin-pose-progress-bff/fixtures/analysis-progress/focus-v1.json`.
+
+Validation: 15 producer progress tests, including an Event-gated actual two-person pipeline that observes extracting focus before routing/search runs; identical final normalized results and unchanged VLM/pose/search call counts; invalid/suspect/empty masks; exact-slot-only metadata; final people clearing. Selected regression suite: 124 passed, 3 existing Gemini cases excluded for missing google-genai in the QA environment. Additional model/pose inference/render/search calls and artificial stage timers were not added.
