@@ -18,6 +18,7 @@ parser.add_argument("candidate",type=Path)
 parser.add_argument("out",type=Path)
 parser.add_argument("--authored-shading",action="store_true")
 parser.add_argument("--original-rig",type=Path)
+parser.add_argument("--reference",type=Path,help="Posed FBX corresponding to the staged baseline")
 parser.add_argument("--model",type=int,default=1)
 parser.add_argument("--pose",type=int,default=1)
 args = parser.parse_args(sys.argv[sys.argv.index("--")+1:])
@@ -29,7 +30,7 @@ change=np.load(candidate)
 posed=raw["corrected"]
 corrected=posed.copy()
 corrected[change["ids"]]+=change["delta"]
-reference=base/f"stage-{case}-before-surface.fbx"
+reference=args.reference or base/f"stage-{case}-before-surface.fbx"
 center=posed[change["ids"]].mean(0)
 original=None
 if args.original_rig:
