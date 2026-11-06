@@ -1,0 +1,510 @@
+{
+  "schema": "skin-fbx-qa-v1",
+  "date": "2026-11-06",
+  "expression": "neutral-uv-embedded-basecolor-v1",
+  "runtime_revision": "aeebc9f63136509a3d8b001a9ebf60ee7acd1ac715e00757b30d32f761fbae6a",
+  "asset_manifest_sha256": "1fb0fa382d4fa7d27233b6139cba9c5f1ec575c6b8f86b7deac2a3dc4d447386",
+  "asset_version": "current-neutral-uv-20261106-v1",
+  "csp": {
+    "version": "EX 5.1.1 build 202607291835",
+    "conditions": "fresh 1000x768 72dpi 100% test canvases; automatic import; exact rendering mode not queried; no settings changed",
+    "neutral": [
+      {
+        "gender": "female",
+        "skin": "flesh",
+        "combination": "skin-only",
+        "sha256": "c8ffc8aefa1d9b07ce897a9514af98036361cdbb8fe43fa276dccf61e8fe1365",
+        "bytes": 2362268,
+        "import": "PASS",
+        "surface_visible": true,
+        "black_outline_visible": false,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "gender": "female",
+        "skin": "flesh-guide",
+        "combination": "skin-only",
+        "sha256": "27a188b136780027cefbecfc79d651e8d2116a4a1a14c841e0abdc6132f68f9e",
+        "bytes": 2772972,
+        "import": "PASS",
+        "surface_visible": true,
+        "black_outline_visible": false,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "gender": "female",
+        "skin": "gray-guide",
+        "combination": "skin-only",
+        "sha256": "60078ead1e4c0a181f5a2cd543cb9fe8d23d32b6fa44aa210e9024664a1b7d8b",
+        "bytes": 2760076,
+        "import": "PASS",
+        "surface_visible": true,
+        "black_outline_visible": false,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "gender": "female",
+        "skin": "muscle",
+        "combination": "skin-only",
+        "sha256": "15b2ad7fd16facd06a121d6fbcbed0fe7c44065f193132858017db7c57a71d99",
+        "bytes": 2611948,
+        "import": "PASS",
+        "surface_visible": true,
+        "black_outline_visible": false,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "gender": "male",
+        "skin": "flesh",
+        "combination": "skin-only",
+        "sha256": "3722318e641e8e8afcee085a2b9bd53b96aa17b8e3036aa4f2198978653b2658",
+        "bytes": 2813052,
+        "import": "PASS",
+        "surface_visible": true,
+        "black_outline_visible": false,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "gender": "male",
+        "skin": "flesh-guide",
+        "combination": "skin-only",
+        "sha256": "4f52220cb9c4719358ac58d93005fcf2730fe620f9f31e796c822359fd182135",
+        "bytes": 3171260,
+        "import": "PASS",
+        "surface_visible": true,
+        "black_outline_visible": false,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "gender": "male",
+        "skin": "gray-guide",
+        "combination": "skin-only",
+        "sha256": "90b2b3e7192d538d6bb7cacf7bf761257b81d37902d46d62376015a11ce04e6f",
+        "bytes": 3162780,
+        "import": "PASS",
+        "surface_visible": true,
+        "black_outline_visible": false,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "gender": "male",
+        "skin": "muscle",
+        "combination": "skin-only",
+        "sha256": "63ebe25cebf95120c9c72d83c53df1c6a85503c357635a832689585398dbcf5a",
+        "bytes": 3041100,
+        "import": "PASS",
+        "surface_visible": true,
+        "black_outline_visible": false,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "gender": "female",
+        "skin": "flesh",
+        "combination": "combined",
+        "sha256": "849720fbc935c17866a05fe9f56f1ee289b82011e6df8a755b708f071c309e1a",
+        "bytes": 3805708,
+        "import": "PASS",
+        "surface_visible": true,
+        "black_outline_visible": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "gender": "female",
+        "skin": "flesh-guide",
+        "combination": "combined",
+        "sha256": "981ffe459e112ef23d1e28c555cd2bf15ffcb32fd7d3fa29dd4dbf795fe0e3c1",
+        "bytes": 4216412,
+        "import": "PASS",
+        "surface_visible": true,
+        "black_outline_visible": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "gender": "female",
+        "skin": "gray-guide",
+        "combination": "combined",
+        "sha256": "ea44c5290d13e8e54cecc9b51a36d40bba9fa015eb0d0a3f2b8d071220eee5ec",
+        "bytes": 4203516,
+        "import": "PASS",
+        "surface_visible": true,
+        "black_outline_visible": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "gender": "female",
+        "skin": "muscle",
+        "combination": "combined",
+        "sha256": "216712aa2f084ba6b1bc3cf9aa70eb5dd76ac9f6abc01cc26611c6f6e3c3edb5",
+        "bytes": 4055388,
+        "import": "PASS",
+        "surface_visible": true,
+        "black_outline_visible": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "gender": "male",
+        "skin": "flesh",
+        "combination": "combined",
+        "sha256": "b5861463fd306def6d7952830dcd4e3e34103f41154f714bfebbeecccb1b41fb",
+        "bytes": 4711164,
+        "import": "PASS",
+        "surface_visible": true,
+        "black_outline_visible": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "gender": "male",
+        "skin": "flesh-guide",
+        "combination": "combined",
+        "sha256": "cc8c0b6a0c294d97e5c1a2354ff25a65fe2522985164f3af89bf438d8df5c681",
+        "bytes": 5069372,
+        "import": "PASS",
+        "surface_visible": true,
+        "black_outline_visible": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "gender": "male",
+        "skin": "gray-guide",
+        "combination": "combined",
+        "sha256": "db78225977c2f7c95ceef7dd5a7eafa87f31c83ce8373e01d30d20f1f6c99357",
+        "bytes": 5060892,
+        "import": "PASS",
+        "surface_visible": true,
+        "black_outline_visible": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "gender": "male",
+        "skin": "muscle",
+        "combination": "combined",
+        "sha256": "3def2a539ba32c2f438dfd9135979799569a83368726ca607c83d50af70e73be",
+        "bytes": 4939228,
+        "import": "PASS",
+        "surface_visible": true,
+        "black_outline_visible": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      }
+    ],
+    "posed": [
+      {
+        "gender": "male",
+        "skin": "flesh-guide",
+        "pose": "approved-current-crouch",
+        "sha256": "4d204950f7d03d9d672b894019c096881a02528b1445205bc0baa7a4ed3d541e",
+        "source_sha256": "0cf2a8dbd3b5923ec02d177a20e338b91e1939d16f0878656453940db4412b74",
+        "import": "PASS",
+        "pose_visually_matches_source": true,
+        "skin_visible": true,
+        "black_outline_visible": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      },
+      {
+        "gender": "female",
+        "skin": "flesh-guide",
+        "pose": "approved-current-crouch",
+        "sha256": "cec107cff26742bd80dfe94a8c9627f76044adc87b3d29ffaf0557b641132331",
+        "source_sha256": "d4fa440d5174eacc01b9cf82cbb4655c1381d0ac159302f0d8018c131b89cea2",
+        "import": "PASS",
+        "pose_visually_matches_source": true,
+        "skin_visible": true,
+        "black_outline_visible": true,
+        "manual_sidecar": false,
+        "texture_locator_prompt": false
+      }
+    ]
+  },
+  "http": [
+    {
+      "group": "neutral-and-shape",
+      "name": "female-flesh",
+      "source_sha256": "712ac75e58efd4d6ccded0b1e931590900015de023327f1320cf6d7d94026ffc",
+      "skin_sha256": "c8ffc8aefa1d9b07ce897a9514af98036361cdbb8fe43fa276dccf61e8fe1365",
+      "skin_bytes": 2362268,
+      "combined_sha256": "849720fbc935c17866a05fe9f56f1ee289b82011e6df8a755b708f071c309e1a",
+      "combined_bytes": 3805708,
+      "body_errors": {
+        "maxPositionErrorM": 0.0,
+        "maxNormalError": 0.0,
+        "maxMatrixError": 0.0,
+        "maxWeightError": 0.0
+      },
+      "skin_seconds": 3.262802583980374,
+      "outline_seconds": 2.908622707996983
+    },
+    {
+      "group": "neutral-and-shape",
+      "name": "female-flesh-guide",
+      "source_sha256": "712ac75e58efd4d6ccded0b1e931590900015de023327f1320cf6d7d94026ffc",
+      "skin_sha256": "27a188b136780027cefbecfc79d651e8d2116a4a1a14c841e0abdc6132f68f9e",
+      "skin_bytes": 2772972,
+      "combined_sha256": "981ffe459e112ef23d1e28c555cd2bf15ffcb32fd7d3fa29dd4dbf795fe0e3c1",
+      "combined_bytes": 4216412,
+      "body_errors": {
+        "maxPositionErrorM": 0.0,
+        "maxNormalError": 0.0,
+        "maxMatrixError": 0.0,
+        "maxWeightError": 0.0
+      },
+      "skin_seconds": 3.276480917003937,
+      "outline_seconds": 6.385141541017219
+    },
+    {
+      "group": "neutral-and-shape",
+      "name": "female-gray-guide",
+      "source_sha256": "712ac75e58efd4d6ccded0b1e931590900015de023327f1320cf6d7d94026ffc",
+      "skin_sha256": "60078ead1e4c0a181f5a2cd543cb9fe8d23d32b6fa44aa210e9024664a1b7d8b",
+      "skin_bytes": 2760076,
+      "combined_sha256": "ea44c5290d13e8e54cecc9b51a36d40bba9fa015eb0d0a3f2b8d071220eee5ec",
+      "combined_bytes": 4203516,
+      "body_errors": {
+        "maxPositionErrorM": 0.0,
+        "maxNormalError": 0.0,
+        "maxMatrixError": 0.0,
+        "maxWeightError": 0.0
+      },
+      "skin_seconds": 3.4447799579938874,
+      "outline_seconds": 3.1850643749930896
+    },
+    {
+      "group": "neutral-and-shape",
+      "name": "female-muscle",
+      "source_sha256": "712ac75e58efd4d6ccded0b1e931590900015de023327f1320cf6d7d94026ffc",
+      "skin_sha256": "15b2ad7fd16facd06a121d6fbcbed0fe7c44065f193132858017db7c57a71d99",
+      "skin_bytes": 2611948,
+      "combined_sha256": "216712aa2f084ba6b1bc3cf9aa70eb5dd76ac9f6abc01cc26611c6f6e3c3edb5",
+      "combined_bytes": 4055388,
+      "body_errors": {
+        "maxPositionErrorM": 0.0,
+        "maxNormalError": 0.0,
+        "maxMatrixError": 0.0,
+        "maxWeightError": 0.0
+      },
+      "skin_seconds": 3.4943953749607317,
+      "outline_seconds": 3.1907885000109673
+    },
+    {
+      "group": "neutral-and-shape",
+      "name": "male-flesh",
+      "source_sha256": "085dd9c65a3a66035f7e0ce9e0a9171b9abb0e33dada92194676d92e00c8b026",
+      "skin_sha256": "3722318e641e8e8afcee085a2b9bd53b96aa17b8e3036aa4f2198978653b2658",
+      "skin_bytes": 2813052,
+      "combined_sha256": "b5861463fd306def6d7952830dcd4e3e34103f41154f714bfebbeecccb1b41fb",
+      "combined_bytes": 4711164,
+      "body_errors": {
+        "maxPositionErrorM": 0.0,
+        "maxNormalError": 0.0,
+        "maxMatrixError": 0.0,
+        "maxWeightError": 0.0
+      },
+      "skin_seconds": 3.4572193340281956,
+      "outline_seconds": 6.574670750007499
+    },
+    {
+      "group": "neutral-and-shape",
+      "name": "male-flesh-guide",
+      "source_sha256": "085dd9c65a3a66035f7e0ce9e0a9171b9abb0e33dada92194676d92e00c8b026",
+      "skin_sha256": "4f52220cb9c4719358ac58d93005fcf2730fe620f9f31e796c822359fd182135",
+      "skin_bytes": 3171260,
+      "combined_sha256": "cc8c0b6a0c294d97e5c1a2354ff25a65fe2522985164f3af89bf438d8df5c681",
+      "combined_bytes": 5069372,
+      "body_errors": {
+        "maxPositionErrorM": 0.0,
+        "maxNormalError": 0.0,
+        "maxMatrixError": 0.0,
+        "maxWeightError": 0.0
+      },
+      "skin_seconds": 7.363827458000742,
+      "outline_seconds": 3.591030834009871
+    },
+    {
+      "group": "neutral-and-shape",
+      "name": "male-gray-guide",
+      "source_sha256": "085dd9c65a3a66035f7e0ce9e0a9171b9abb0e33dada92194676d92e00c8b026",
+      "skin_sha256": "90b2b3e7192d538d6bb7cacf7bf761257b81d37902d46d62376015a11ce04e6f",
+      "skin_bytes": 3162780,
+      "combined_sha256": "db78225977c2f7c95ceef7dd5a7eafa87f31c83ce8373e01d30d20f1f6c99357",
+      "combined_bytes": 5060892,
+      "body_errors": {
+        "maxPositionErrorM": 0.0,
+        "maxNormalError": 0.0,
+        "maxMatrixError": 0.0,
+        "maxWeightError": 0.0
+      },
+      "skin_seconds": 3.5309598749736324,
+      "outline_seconds": 6.343955332995392
+    },
+    {
+      "group": "neutral-and-shape",
+      "name": "male-muscle",
+      "source_sha256": "085dd9c65a3a66035f7e0ce9e0a9171b9abb0e33dada92194676d92e00c8b026",
+      "skin_sha256": "63ebe25cebf95120c9c72d83c53df1c6a85503c357635a832689585398dbcf5a",
+      "skin_bytes": 3041100,
+      "combined_sha256": "3def2a539ba32c2f438dfd9135979799569a83368726ca607c83d50af70e73be",
+      "combined_bytes": 4939228,
+      "body_errors": {
+        "maxPositionErrorM": 0.0,
+        "maxNormalError": 0.0,
+        "maxMatrixError": 0.0,
+        "maxWeightError": 0.0
+      },
+      "skin_seconds": 6.347683708008844,
+      "outline_seconds": 6.594084375014063
+    },
+    {
+      "group": "neutral-and-shape",
+      "name": "female-shaped-flesh-guide",
+      "source_sha256": "26c2c757189debff1ea84c25f642e36b320ef788e9c02022286ddf83f36c6e29",
+      "skin_sha256": "86dc8a4e5c5e22c07e32f93fa2aba62004b7af4a877956c51d0c77fd1518c37a",
+      "skin_bytes": 2768604,
+      "combined_sha256": "b9e75ebcd0e2c298934891a22f51007904884dcad634c9e892809bbc40c3b420",
+      "combined_bytes": 4211340,
+      "body_errors": {
+        "maxPositionErrorM": 0.0,
+        "maxNormalError": 0.0,
+        "maxMatrixError": 0.0,
+        "maxWeightError": 0.0
+      },
+      "skin_seconds": 6.365992707957048,
+      "outline_seconds": 2.905661000055261
+    },
+    {
+      "group": "neutral-and-shape",
+      "name": "male-shaped-flesh-guide",
+      "source_sha256": "a6e7034af476754f6c62322b243bef1d6b66fc34239441137c2c55dba93f5403",
+      "skin_sha256": "6a727855b1f8875fdf0dd3ee952259d299a4eab5bbaa7a72b62c99a82a323c0a",
+      "skin_bytes": 3182188,
+      "combined_sha256": "1d51fc0b9c296a03f712402b5c1a2f4bb82afc8d7472909c175594e9dbb514a2",
+      "combined_bytes": 5091484,
+      "body_errors": {
+        "maxPositionErrorM": 0.0,
+        "maxNormalError": 0.0,
+        "maxMatrixError": 0.0,
+        "maxWeightError": 0.0
+      },
+      "skin_seconds": 3.320049458008725,
+      "outline_seconds": 2.9264666250091977
+    },
+    {
+      "group": "accepted-relaxed-hands",
+      "name": "male-relaxed-hand",
+      "source_sha256": "7d1265d8273aef7fe7b00a40d1021351b2d0010fe3d13b9c2ba5d68be02246da",
+      "skin_sha256": "8c6712e79a8bc104505a12d79281704895c41abe9e6a1eba40f06f17f25250bf",
+      "skin_bytes": 3195932,
+      "combined_sha256": "fb4ef73a257578bec9294385413ee961455ce981dfedb56589842d9f581a7790",
+      "combined_bytes": 5105388,
+      "body_errors": {
+        "maxPositionErrorM": 0.0,
+        "maxNormalError": 0.0,
+        "maxMatrixError": 0.0,
+        "maxWeightError": 0.0
+      },
+      "skin_seconds": 3.250622999970801,
+      "outline_seconds": 2.9963463749736547
+    },
+    {
+      "group": "accepted-relaxed-hands",
+      "name": "female-relaxed-hand",
+      "source_sha256": "5541de966b6d3e355861311224ca77d653bac9eb3e9d57d3d328965cd27821d9",
+      "skin_sha256": "ad97743eefe9ec064cb4d26fb5fa7f48ed46ad889a328beedc87558be98ce188",
+      "skin_bytes": 2945308,
+      "combined_sha256": "60adae69278b28de0d806486c82e8b5bfcca228be6c07f9f46624f1ef48f02be",
+      "combined_bytes": 4550508,
+      "body_errors": {
+        "maxPositionErrorM": 0.0,
+        "maxNormalError": 0.0,
+        "maxMatrixError": 0.0,
+        "maxWeightError": 0.0
+      },
+      "skin_seconds": 2.9789687499869615,
+      "outline_seconds": 2.8466794170089997
+    }
+  ],
+  "negative": [
+    {
+      "name": "default",
+      "status": 400,
+      "code": "SKIN_DEFAULT_USE_LEGACY"
+    },
+    {
+      "name": "crop",
+      "status": 422,
+      "code": "SKIN_UNSUPPORTED"
+    },
+    {
+      "name": "source-sha",
+      "status": 409,
+      "code": "SOURCE_FBX_SHA256_MISMATCH"
+    },
+    {
+      "name": "personal",
+      "status": 422,
+      "code": "SKIN_UNSUPPORTED"
+    },
+    {
+      "name": "auth",
+      "status": 401
+    },
+    {
+      "name": "order",
+      "status": 422,
+      "code": "SKIN_OUTLINE_ORDER"
+    },
+    {
+      "name": "uv-topology",
+      "status": 422,
+      "code": "SKIN_UV_INCOMPATIBLE"
+    }
+  ],
+  "assets_verified": 18,
+  "cancellation": {
+    "cancelled": true,
+    "checkpoints": 20,
+    "no_file_returned": true,
+    "temporary_files_cleaned": true,
+    "source_unchanged": true
+  },
+  "synthetic_tamper": {
+    "valid": true,
+    "rejected": [
+      "base-position",
+      "base-weight",
+      "uv",
+      "embedded-bytes",
+      "external-image",
+      "missing-image",
+      "material",
+      "connection",
+      "extra-mesh",
+      "source-topology",
+      "skin-after-outline"
+    ],
+    "base": {
+      "maxPositionErrorM": 0.0,
+      "maxMatrixError": 0.0,
+      "maxWeightError": 0.0,
+      "maxNormalError": 0.0
+    },
+    "embedded_sha256": "84c465e005daefbf9228adb79c1f7f32b4abb57b9d492441500a6ec57afb7cc0",
+    "synthetic_only": true,
+    "csp_certified": false
+  },
+  "scope": "Full current approved male/female only. Actual converter HTTP and CSP observations are separate stages. BFF/native product integration belongs to companion PRs; no production deployment or every-pose claim."
+}

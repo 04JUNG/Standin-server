@@ -1361,3 +1361,8 @@ Converter `/compose-scene` may return an artifact-bound `X-Standin-Scene-Camera`
 ## Opt-in internal interactive Converter
 
 The separately authenticated internal snapshot/static transport is documented in [real-model interactive v2](NEXT_SPRINT/INTERACTIVE_REAL_MODEL_V2_2026-11-04.md). This does not change public inference `/analyze` or `/refine` request/response contracts.
+
+
+## Internal converter: approved final-FBX skin (2026-11-06)
+
+The private `GET /skin-contract`, `GET /skin-assets/{sha256}` and `POST /skin-fbx` endpoints add a separate strict `fbx-skin-v1` choice. Default is omitted to retain the legacy byte-preserving path. Nondefault skins are limited to exact approved current male/female full individual FBXs, with source/runtime/manifest/UV/texture-bound proof and independent fresh-process verification. Combined exports apply skin before outline. Global enablement remains off. See [full contract, actual CSP evidence and limitations](SKIN_FBX_CSP.md).
