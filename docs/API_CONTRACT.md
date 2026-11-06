@@ -1364,7 +1364,6 @@ The separately authenticated internal snapshot/static transport is documented in
 
 The private snapshot camera accepts both the continuous `candidate-camera-v2` (`reference=search-fit`) and the explicit `pose-preview-camera-v1` presentation contract. The latter retains its original version and `projection_matches_search` value: a fixed/semantic reference is never relabeled as a fitted search camera. Its right-handed Y-up basis, hip origin/torso scale, image-down projection rule, unbaked rotation and finite projection parameters are validated before the same torso-calibrated camera calculation. BFF binds the validated original BVH SHA to either camera dialect; Converter still checks that binding against the source. Ownership, hand/body lineage, immutable snapshots, release checks and final FBX validation are unchanged.
 
-For a staging-only pre-merge check, the existing Converter workflow permits an explicit manual `deploy_staging=true` from `develop` or `codex/*`. This opt-in never selects the `main`/`beta` production environment, does not publish a moving `latest` tag, and does not broaden the separate scene-worker deployment guard. Automatic deployment settings remain unchanged.
 
 
 ## Internal converter: approved final-FBX skin (2026-11-06)
