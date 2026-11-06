@@ -1,0 +1,6 @@
+# Offline experiments only. Production requirements remain unchanged.
+numpy
+scipy
+opencv-python
+pillow
+torch==2.15.0
