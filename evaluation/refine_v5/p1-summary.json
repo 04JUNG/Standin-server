@@ -1,0 +1,676 @@
+{
+  "experiment": "P1 supervised fitting sanity and exploratory development probe",
+  "scope": "four_arm_bone_directions_only",
+  "model": "v5-p1-pixel-bone-ridge-v1",
+  "training_cases": [
+    "001",
+    "074"
+  ],
+  "development_probe_cases": [
+    "001",
+    "002",
+    "003",
+    "004",
+    "005",
+    "006",
+    "007",
+    "008",
+    "009",
+    "010",
+    "041",
+    "074"
+  ],
+  "native_fbx_outputs": 26,
+  "independent_blind_evaluation": false,
+  "gt_3d_oracle_is_not_manual_2d_observation": true,
+  "training": {
+    "version": "v5-p1-pixel-bone-ridge-v1",
+    "experiment": "training_reconstruction",
+    "cases": 2,
+    "output": "four_arm_bone_directions_only",
+    "gt_runtime_input": false,
+    "independent_holdout": false,
+    "training_metadata": [
+      {
+        "case_id": "001",
+        "image_sha256": "c11d1241b1b8cc1993358ff0c981308498a29dd64ce21445575b429f19d7ab4d",
+        "gt_sha256": "a426f5721b746ba44f20fc7eee9b6ca684afed159c3afe5c15a479f1835da73c",
+        "seed_kind": "reconstructed_seed"
+      },
+      {
+        "case_id": "074",
+        "image_sha256": "9520ea90fc020c2a1b371dbd46bd0da08fd47e3fb6e1c38efa53c814c0661e0a",
+        "gt_sha256": "6c76f3a92187413303dd17e70c0c51029f717b7a7b0c62b7d0381f08eb14d6a7",
+        "seed_kind": "reconstructed_seed"
+      }
+    ],
+    "checkpoint_sha256": "c90ae62c12640ddb70e1641f6e1fdf20f703b36b58db192c37927bd3ca257e18",
+    "metrics": [
+      {
+        "case_id": "001",
+        "baseline_angle_deg": [
+          27.755451463987484,
+          26.64080104738688,
+          27.60996450153744,
+          50.05440079439683
+        ],
+        "predicted_angle_deg": [
+          7.871404088081626e-06,
+          2.4148365394514667e-06,
+          4.90455619685548e-06,
+          3.6222548091772e-06
+        ]
+      },
+      {
+        "case_id": "074",
+        "baseline_angle_deg": [
+          37.454378681515365,
+          73.81095128095247,
+          34.18033429600247,
+          94.14505165932911
+        ],
+        "predicted_angle_deg": [
+          8.831503268221697e-06,
+          9.234973977599935e-06,
+          6.776618231767655e-06,
+          9.88314448090898e-06
+        ]
+      }
+    ],
+    "full_pose_complete": false,
+    "mesh_checked": false
+  },
+  "automatic": [
+    {
+      "case_id": "001",
+      "metrics": {
+        "before": {
+          "mean_angle_deg": 33.01515445182716,
+          "max_angle_deg": 50.05440079439683,
+          "joint_nme": 0.33311592478039875
+        },
+        "planned": {
+          "mean_angle_deg": 7.825099832349195e-06,
+          "max_angle_deg": 1.0697753125226707e-05,
+          "joint_nme": 0.20354005118486587
+        },
+        "actual": {
+          "mean_angle_deg": 5.24965199321267e-05,
+          "max_angle_deg": 0.00010341239674268713,
+          "joint_nme": 0.2035405123973384
+        }
+      },
+      "max_arm_length_drift_m": 3.1113099985269344e-07,
+      "full_pose_complete": false,
+      "hand_orientation_trained": false,
+      "mesh_checked": false
+    },
+    {
+      "case_id": "002",
+      "metrics": {
+        "before": {
+          "mean_angle_deg": 42.4930734640768,
+          "max_angle_deg": 69.40939831865124,
+          "joint_nme": 0.9958870740977639
+        },
+        "planned": {
+          "mean_angle_deg": 33.87763800279424,
+          "max_angle_deg": 43.32527034288969,
+          "joint_nme": 1.0676135942690124
+        },
+        "actual": {
+          "mean_angle_deg": 33.8776502524979,
+          "max_angle_deg": 43.32525579400746,
+          "joint_nme": 1.067613414255249
+        }
+      },
+      "max_arm_length_drift_m": 2.9463870315771246e-07,
+      "full_pose_complete": false,
+      "hand_orientation_trained": false,
+      "mesh_checked": false
+    },
+    {
+      "case_id": "003",
+      "metrics": {
+        "before": {
+          "mean_angle_deg": 70.18465860373595,
+          "max_angle_deg": 93.56579915191338,
+          "joint_nme": 0.9438511039171307
+        },
+        "planned": {
+          "mean_angle_deg": 73.04090462548568,
+          "max_angle_deg": 115.2700370138965,
+          "joint_nme": 0.9307074362925628
+        },
+        "actual": {
+          "mean_angle_deg": 73.04090903764639,
+          "max_angle_deg": 115.2700227904654,
+          "joint_nme": 0.9307073766705924
+        }
+      },
+      "max_arm_length_drift_m": 1.481079840437438e-07,
+      "full_pose_complete": false,
+      "hand_orientation_trained": false,
+      "mesh_checked": false
+    },
+    {
+      "case_id": "004",
+      "metrics": {
+        "before": {
+          "mean_angle_deg": 60.06470694910841,
+          "max_angle_deg": 83.90949164266101,
+          "joint_nme": 1.0198389696201224
+        },
+        "planned": {
+          "mean_angle_deg": 56.11176996290719,
+          "max_angle_deg": 81.96671173716099,
+          "joint_nme": 1.0613360247204233
+        },
+        "actual": {
+          "mean_angle_deg": 56.111791250598614,
+          "max_angle_deg": 81.96673944920866,
+          "joint_nme": 1.0613367440399801
+        }
+      },
+      "max_arm_length_drift_m": 2.709696511338233e-07,
+      "full_pose_complete": false,
+      "hand_orientation_trained": false,
+      "mesh_checked": false
+    },
+    {
+      "case_id": "005",
+      "metrics": {
+        "before": {
+          "mean_angle_deg": 53.25011424075477,
+          "max_angle_deg": 91.42068155598345,
+          "joint_nme": 0.670146455492787
+        },
+        "planned": {
+          "mean_angle_deg": 60.51456930049377,
+          "max_angle_deg": 101.05803305994267,
+          "joint_nme": 0.668401738359434
+        },
+        "actual": {
+          "mean_angle_deg": 60.51456774878824,
+          "max_angle_deg": 101.05803462917895,
+          "joint_nme": 0.6684020396129737
+        }
+      },
+      "max_arm_length_drift_m": 3.983759107595297e-07,
+      "full_pose_complete": false,
+      "hand_orientation_trained": false,
+      "mesh_checked": false
+    },
+    {
+      "case_id": "006",
+      "metrics": {
+        "before": {
+          "mean_angle_deg": 29.409294424930145,
+          "max_angle_deg": 62.228849634560696,
+          "joint_nme": 0.2703204690037847
+        },
+        "planned": {
+          "mean_angle_deg": 54.24218408001569,
+          "max_angle_deg": 142.8971990109132,
+          "joint_nme": 0.49100828074329406
+        },
+        "actual": {
+          "mean_angle_deg": 54.24215390382514,
+          "max_angle_deg": 142.89712633920925,
+          "joint_nme": 0.4910083792012151
+        }
+      },
+      "max_arm_length_drift_m": 2.250567924799718e-07,
+      "full_pose_complete": false,
+      "hand_orientation_trained": false,
+      "mesh_checked": false
+    },
+    {
+      "case_id": "007",
+      "metrics": {
+        "before": {
+          "mean_angle_deg": 65.75031851800043,
+          "max_angle_deg": 79.50616626574481,
+          "joint_nme": 1.4219612970260278
+        },
+        "planned": {
+          "mean_angle_deg": 65.45249049964497,
+          "max_angle_deg": 85.63163550976704,
+          "joint_nme": 1.4428265101658608
+        },
+        "actual": {
+          "mean_angle_deg": 65.45251842381786,
+          "max_angle_deg": 85.63173831022753,
+          "joint_nme": 1.4428276179178994
+        }
+      },
+      "max_arm_length_drift_m": 3.064265107488584e-07,
+      "full_pose_complete": false,
+      "hand_orientation_trained": false,
+      "mesh_checked": false
+    },
+    {
+      "case_id": "008",
+      "metrics": {
+        "before": {
+          "mean_angle_deg": 53.150443493321475,
+          "max_angle_deg": 109.11466483260662,
+          "joint_nme": 0.5673115561007231
+        },
+        "planned": {
+          "mean_angle_deg": 41.921144487237555,
+          "max_angle_deg": 76.53182088403392,
+          "joint_nme": 0.5098614837570294
+        },
+        "actual": {
+          "mean_angle_deg": 41.92113497150723,
+          "max_angle_deg": 76.53180043734648,
+          "joint_nme": 0.5098613348742838
+        }
+      },
+      "max_arm_length_drift_m": 3.850465183363738e-07,
+      "full_pose_complete": false,
+      "hand_orientation_trained": false,
+      "mesh_checked": false
+    },
+    {
+      "case_id": "009",
+      "metrics": {
+        "before": {
+          "mean_angle_deg": 59.591418695581716,
+          "max_angle_deg": 151.91437939510348,
+          "joint_nme": 0.6401048643553028
+        },
+        "planned": {
+          "mean_angle_deg": 59.64841562456353,
+          "max_angle_deg": 135.95231271876696,
+          "joint_nme": 0.5958638037690825
+        },
+        "actual": {
+          "mean_angle_deg": 59.64843789614784,
+          "max_angle_deg": 135.95246770470172,
+          "joint_nme": 0.5958626409188158
+        }
+      },
+      "max_arm_length_drift_m": 3.1635320726919325e-07,
+      "full_pose_complete": false,
+      "hand_orientation_trained": false,
+      "mesh_checked": false
+    },
+    {
+      "case_id": "010",
+      "metrics": {
+        "before": {
+          "mean_angle_deg": 52.40233604190137,
+          "max_angle_deg": 82.74011922562158,
+          "joint_nme": 1.092586422268277
+        },
+        "planned": {
+          "mean_angle_deg": 64.13439118449557,
+          "max_angle_deg": 111.509945947249,
+          "joint_nme": 0.9876879225592687
+        },
+        "actual": {
+          "mean_angle_deg": 64.13433925174644,
+          "max_angle_deg": 111.50990220215847,
+          "joint_nme": 0.9876871291586945
+        }
+      },
+      "max_arm_length_drift_m": 3.872148536254727e-07,
+      "full_pose_complete": false,
+      "hand_orientation_trained": false,
+      "mesh_checked": false
+    },
+    {
+      "case_id": "041",
+      "metrics": {
+        "before": {
+          "mean_angle_deg": 33.81752000641803,
+          "max_angle_deg": 59.94756536136733,
+          "joint_nme": 0.4148886683828313
+        },
+        "planned": {
+          "mean_angle_deg": 38.14989735458612,
+          "max_angle_deg": 50.70112568892352,
+          "joint_nme": 0.5616962903306002
+        },
+        "actual": {
+          "mean_angle_deg": 38.149884496146456,
+          "max_angle_deg": 50.701122376898155,
+          "joint_nme": 0.5616958550520905
+        }
+      },
+      "max_arm_length_drift_m": 3.0033118580963247e-07,
+      "full_pose_complete": false,
+      "hand_orientation_trained": false,
+      "mesh_checked": false
+    },
+    {
+      "case_id": "074",
+      "metrics": {
+        "before": {
+          "mean_angle_deg": 59.89767897944985,
+          "max_angle_deg": 94.14505165932911,
+          "joint_nme": 0.6908702269445295
+        },
+        "planned": {
+          "mean_angle_deg": 1.0991630676406776e-05,
+          "max_angle_deg": 1.6422663987382993e-05,
+          "joint_nme": 0.13865647145458448
+        },
+        "actual": {
+          "mean_angle_deg": 0.0002450263214648765,
+          "max_angle_deg": 0.0003003269400625986,
+          "joint_nme": 0.13865502660391996
+        }
+      },
+      "max_arm_length_drift_m": 2.553374937597219e-07,
+      "full_pose_complete": false,
+      "hand_orientation_trained": false,
+      "mesh_checked": false
+    }
+  ],
+  "oracle": [
+    {
+      "case_id": "001",
+      "metrics": {
+        "before": {
+          "mean_angle_deg": 33.01515445182716,
+          "max_angle_deg": 50.05440079439683,
+          "joint_nme": 0.33311592478039875
+        },
+        "planned": {
+          "mean_angle_deg": 9.29659167193474e-06,
+          "max_angle_deg": 1.52966123677706e-05,
+          "joint_nme": 0.20354013095912699
+        },
+        "actual": {
+          "mean_angle_deg": 6.355080236247612e-05,
+          "max_angle_deg": 0.00011283709723139143,
+          "joint_nme": 0.20354053551326898
+        }
+      },
+      "max_arm_length_drift_m": 3.0524265759446223e-07,
+      "full_pose_complete": false,
+      "hand_orientation_trained": false,
+      "mesh_checked": false
+    },
+    {
+      "case_id": "002",
+      "metrics": {
+        "before": {
+          "mean_angle_deg": 42.4930734640768,
+          "max_angle_deg": 69.40939831865124,
+          "joint_nme": 0.9958870740977639
+        },
+        "planned": {
+          "mean_angle_deg": 1.1778552790713698e-05,
+          "max_angle_deg": 1.4763126439582163e-05,
+          "joint_nme": 0.859048938332255
+        },
+        "actual": {
+          "mean_angle_deg": 8.482173634258655e-05,
+          "max_angle_deg": 0.0001266149483776525,
+          "joint_nme": 0.8590487846570267
+        }
+      },
+      "max_arm_length_drift_m": 1.9949357990545202e-07,
+      "full_pose_complete": false,
+      "hand_orientation_trained": false,
+      "mesh_checked": false
+    },
+    {
+      "case_id": "003",
+      "metrics": {
+        "before": {
+          "mean_angle_deg": 70.18465860373595,
+          "max_angle_deg": 93.56579915191338,
+          "joint_nme": 0.9438511039171307
+        },
+        "planned": {
+          "mean_angle_deg": 1.569706416337599e-05,
+          "max_angle_deg": 2.4448356591142834e-05,
+          "joint_nme": 0.13998458850615614
+        },
+        "actual": {
+          "mean_angle_deg": 4.180066345194416e-05,
+          "max_angle_deg": 5.21780744641963e-05,
+          "joint_nme": 0.13998423880586588
+        }
+      },
+      "max_arm_length_drift_m": 5.679513125911306e-07,
+      "full_pose_complete": false,
+      "hand_orientation_trained": false,
+      "mesh_checked": false
+    },
+    {
+      "case_id": "004",
+      "metrics": {
+        "before": {
+          "mean_angle_deg": 60.06470694910841,
+          "max_angle_deg": 83.90949164266101,
+          "joint_nme": 1.0198389696201224
+        },
+        "planned": {
+          "mean_angle_deg": 2.0332960633498164e-05,
+          "max_angle_deg": 3.526405567985059e-05,
+          "joint_nme": 0.4652445927504254
+        },
+        "actual": {
+          "mean_angle_deg": 5.197003112188228e-05,
+          "max_angle_deg": 9.121403739081439e-05,
+          "joint_nme": 0.46524578720142334
+        }
+      },
+      "max_arm_length_drift_m": 4.3763819079778443e-07,
+      "full_pose_complete": false,
+      "hand_orientation_trained": false,
+      "mesh_checked": false
+    },
+    {
+      "case_id": "005",
+      "metrics": {
+        "before": {
+          "mean_angle_deg": 53.25011424075477,
+          "max_angle_deg": 91.42068155598345,
+          "joint_nme": 0.670146455492787
+        },
+        "planned": {
+          "mean_angle_deg": 2.2249714547638076e-05,
+          "max_angle_deg": 4.902326346230321e-05,
+          "joint_nme": 0.2816081673370589
+        },
+        "actual": {
+          "mean_angle_deg": 3.40947012615941e-05,
+          "max_angle_deg": 6.342107413619386e-05,
+          "joint_nme": 0.2816083650460158
+        }
+      },
+      "max_arm_length_drift_m": 2.7050222251023825e-07,
+      "full_pose_complete": false,
+      "hand_orientation_trained": false,
+      "mesh_checked": false
+    },
+    {
+      "case_id": "006",
+      "metrics": {
+        "before": {
+          "mean_angle_deg": 29.409294424930145,
+          "max_angle_deg": 62.228849634560696,
+          "joint_nme": 0.2703204690037847
+        },
+        "planned": {
+          "mean_angle_deg": 1.7295114140682345e-05,
+          "max_angle_deg": 3.808634379508224e-05,
+          "joint_nme": 0.20052592324499463
+        },
+        "actual": {
+          "mean_angle_deg": 0.00011817022304965938,
+          "max_angle_deg": 0.00015070495499958328,
+          "joint_nme": 0.20052651690950124
+        }
+      },
+      "max_arm_length_drift_m": 1.7433834126334702e-07,
+      "full_pose_complete": false,
+      "hand_orientation_trained": false,
+      "mesh_checked": false
+    },
+    {
+      "case_id": "007",
+      "metrics": {
+        "before": {
+          "mean_angle_deg": 65.75031851800043,
+          "max_angle_deg": 79.50616626574481,
+          "joint_nme": 1.4219612970260278
+        },
+        "planned": {
+          "mean_angle_deg": 1.3214721789485976e-05,
+          "max_angle_deg": 2.05970127328611e-05,
+          "joint_nme": 0.6182167364919882
+        },
+        "actual": {
+          "mean_angle_deg": 0.00019504719073293179,
+          "max_angle_deg": 0.0002718085987675232,
+          "joint_nme": 0.6182166418691143
+        }
+      },
+      "max_arm_length_drift_m": 2.2951667894011152e-07,
+      "full_pose_complete": false,
+      "hand_orientation_trained": false,
+      "mesh_checked": false
+    },
+    {
+      "case_id": "008",
+      "metrics": {
+        "before": {
+          "mean_angle_deg": 53.150443493321475,
+          "max_angle_deg": 109.11466483260662,
+          "joint_nme": 0.5673115561007231
+        },
+        "planned": {
+          "mean_angle_deg": 6.235285329223995e-06,
+          "max_angle_deg": 1.0421635496217848e-05,
+          "joint_nme": 0.15142753228642597
+        },
+        "actual": {
+          "mean_angle_deg": 2.7218563815660754e-05,
+          "max_angle_deg": 8.10050789159719e-05,
+          "joint_nme": 0.15142753349856397
+        }
+      },
+      "max_arm_length_drift_m": 3.6462796210168236e-07,
+      "full_pose_complete": false,
+      "hand_orientation_trained": false,
+      "mesh_checked": false
+    },
+    {
+      "case_id": "009",
+      "metrics": {
+        "before": {
+          "mean_angle_deg": 59.591418695581716,
+          "max_angle_deg": 151.91437939510348,
+          "joint_nme": 0.6401048643553028
+        },
+        "planned": {
+          "mean_angle_deg": 1.3299486343578424e-05,
+          "max_angle_deg": 3.30995611280232e-05,
+          "joint_nme": 0.15940393239787282
+        },
+        "actual": {
+          "mean_angle_deg": 0.0001608514620691383,
+          "max_angle_deg": 0.000374174032082863,
+          "joint_nme": 0.159402417086245
+        }
+      },
+      "max_arm_length_drift_m": 3.4592433459379457e-07,
+      "full_pose_complete": false,
+      "hand_orientation_trained": false,
+      "mesh_checked": false
+    },
+    {
+      "case_id": "010",
+      "metrics": {
+        "before": {
+          "mean_angle_deg": 52.40233604190137,
+          "max_angle_deg": 82.74011922562158,
+          "joint_nme": 1.092586422268277
+        },
+        "planned": {
+          "mean_angle_deg": 1.5185663041374305e-05,
+          "max_angle_deg": 2.366046933553774e-05,
+          "joint_nme": 0.7964787141679939
+        },
+        "actual": {
+          "mean_angle_deg": 9.117007682015433e-05,
+          "max_angle_deg": 0.00018635357880780325,
+          "joint_nme": 0.7964794090669892
+        }
+      },
+      "max_arm_length_drift_m": 2.430009722886872e-07,
+      "full_pose_complete": false,
+      "hand_orientation_trained": false,
+      "mesh_checked": false
+    },
+    {
+      "case_id": "041",
+      "metrics": {
+        "before": {
+          "mean_angle_deg": 33.81752000641803,
+          "max_angle_deg": 59.94756536136733,
+          "joint_nme": 0.4148886683828313
+        },
+        "planned": {
+          "mean_angle_deg": 1.0485782028423052e-05,
+          "max_angle_deg": 1.624415146845831e-05,
+          "joint_nme": 0.10808452080210115
+        },
+        "actual": {
+          "mean_angle_deg": 3.1176822042528545e-05,
+          "max_angle_deg": 4.9739184915724896e-05,
+          "joint_nme": 0.10808399605653349
+        }
+      },
+      "max_arm_length_drift_m": 1.9635655906791172e-07,
+      "full_pose_complete": false,
+      "hand_orientation_trained": false,
+      "mesh_checked": false
+    },
+    {
+      "case_id": "074",
+      "metrics": {
+        "before": {
+          "mean_angle_deg": 59.89767897944985,
+          "max_angle_deg": 94.14505165932911,
+          "joint_nme": 0.6908702269445295
+        },
+        "planned": {
+          "mean_angle_deg": 5.608246942144416e-06,
+          "max_angle_deg": 8.009106731400786e-06,
+          "joint_nme": 0.13865644432810922
+        },
+        "actual": {
+          "mean_angle_deg": 0.00025004378319122566,
+          "max_angle_deg": 0.00031628136624943704,
+          "joint_nme": 0.13865492773133328
+        }
+      },
+      "max_arm_length_drift_m": 4.071816281370211e-07,
+      "full_pose_complete": false,
+      "hand_orientation_trained": false,
+      "mesh_checked": false
+    }
+  ],
+  "full_pose_complete": false,
+  "mesh_checked": false,
+  "paid_provider_calls": 0,
+  "raw_report_sha256": {
+    "training.json": "263559d75b5983c5adf99d596c0c425d2d71efb997ef5003368b908b7c5fa4ee",
+    "pilot12-auto-metrics.json": "55d403758e8d09931c6df72b9eea45a3d164cf651295023a453e64e6c045cfb7",
+    "pilot12-oracle-metrics.json": "5e4aa7a3845037de65594a5c5828269ef49d865446a66b96ec398762131b18cc"
+  },
+  "reproduction": {
+    "additional_saved_fbx": 2,
+    "same_geometry_metrics": true,
+    "tolerance": 1e-05
+  }
+}
