@@ -1,0 +1,29 @@
+{
+  "dataset_commit": "61eed393408552e1a0b28645f2e409be217bfcfb",
+  "pairs": 114,
+  "original_cuts": 100,
+  "verified_pairs": 114,
+  "native_imported": 114,
+  "valid_native_labels": 114,
+  "rig_counts": {
+    "52": 112,
+    "65": 2
+  },
+  "rig_65_cases": [
+    "047.1",
+    "059"
+  ],
+  "no_camera": 114,
+  "baked_rest": 114,
+  "original_seeds": "unavailable_user_confirmed",
+  "reconstructed_seeds": 95,
+  "ambiguous_person_cases": 19,
+  "blind_split_ready": false,
+  "human_visibility_review": false,
+  "paid_provider_calls": 0,
+  "inventory_sha256": "c8854cd7ecdf418abe6763aff3db1d206954cf05593a777683f94c928c391c0f",
+  "native_audit_sha256": "890f81b3a257cd319b7c9456c7ac2b946abaad4127062854c5a54e40f0481892",
+  "native_labels_sha256": "cd79ed1481a4a878c6f825c041a3e07d6612bebb56f4bfca997e1e84e5aca970",
+  "pairing_sha256": "f4f52c397d0667b982cc9faa6f7229c144d725cf8da758543d776c5c3fb0c4c4",
+  "review_template_sha256": "d616c0bc4d2adeb82ccfd5f9f8e6f2feffa64551f3f483fcb08c8cc1a9eeadd0"
+}
