@@ -106,6 +106,10 @@ COPY converter/scene_worker.py /app/converter/scene_worker.py
 COPY converter/framing.py /app/converter/framing.py
 COPY converter/final_preview_worker.py /app/converter/final_preview_worker.py
 COPY converter/final_artifact.py /app/converter/final_artifact.py
+COPY converter/outline_spec.py /app/converter/outline_spec.py
+COPY converter/outline_fbx.py /app/converter/outline_fbx.py
+COPY converter/outline_worker.py /app/converter/outline_worker.py
+COPY converter/outline_probe.py /app/converter/outline_probe.py
 COPY converter/hand_library.py /app/converter/hand_library.py
 COPY converter/hand_library.v1.json /app/converter/hand_library.v1.json
 COPY converter/hand_geometry.py /app/converter/hand_geometry.py
@@ -133,6 +137,7 @@ COPY converter_api/body_preview.py /app/converter_api/body_preview.py
 COPY converter_api/__init__.py /app/converter_api/__init__.py
 COPY converter_api/app.py /app/converter_api/app.py
 COPY converter_api/final_preview.py /app/converter_api/final_preview.py
+COPY converter_api/outline.py /app/converter_api/outline.py
 COPY converter_api/registry.py /app/converter_api/registry.py
 COPY converter_api/runner.py /app/converter_api/runner.py
 COPY converter_api/work_queue.py /app/converter_api/work_queue.py

@@ -112,7 +112,8 @@ jobs:
             tests/converter/test_preview_instrumentation.py \
             tests/converter/test_interactive_state.py \
             tests/converter/test_interactive_camera.py \
-            tests/converter/test_interactive_transport.py
+            tests/converter/test_interactive_transport.py \
+            tests/converter/test_outline_contract.py
 
   inference-isolation:
     name: Inference image excludes bpy
@@ -202,6 +203,15 @@ jobs:
             "$CONVERTER_IMAGE" \
             /opt/blender/blender --background --python-exit-code 1 \
             --python /app/tests/converter/test_convert.py
+
+      - name: Verify explicit outline FBX preservation and reject tampering
+        run: |
+          docker run --rm --platform linux/amd64 \
+            --mount type=bind,source="$ARTIFACT_ROOT",target=/artifacts \
+            --mount type=bind,source="$GITHUB_WORKSPACE/tests/converter",target=/app/tests/converter,readonly \
+            "$CONVERTER_IMAGE" \
+            /opt/blender/blender --background --factory-startup --disable-autoexec --python-exit-code 1 \
+            --python /app/tests/converter/verify_outline_roundtrip.py -- /artifacts/outline-tamper
 
       - name: Verify single-cut multi-person FBX round trip
         run: |

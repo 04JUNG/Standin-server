@@ -1,0 +1,145 @@
+{
+  "method": "Canvas-only crops of actual CSP captures; resized for layout. No model pixels retouched, no source models/tokens/user documents included.",
+  "images": [
+    {
+      "published": "csp-posed.png",
+      "source": "final-pose-male-foot-tap-w0.png",
+      "screenshot_sha256": "1d41bd40a6b0d42aad7a1873b2b4b4391ad1d0b26d5d151341d7c777d63e0469",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "0066a62aa4735b5da7b5340e82aede7d1dc446969aa8d6ef9abb8f5d83d308df"
+    },
+    {
+      "published": "csp-posed.png",
+      "source": "final-pose-male-foot-tap-w2.png",
+      "screenshot_sha256": "854846823ad826d2ff3423e3ad63dafac43cad9455f3ff988f385dbac7ad5bbd",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "81a559fb4279440858a62a73f7abb6c3304039c01095ed3160c772d7ffcaa84d"
+    },
+    {
+      "published": "csp-posed.png",
+      "source": "final-pose-female-crouch-w0.png",
+      "screenshot_sha256": "53b64673d938076245c304841c06c00359660a672405e82e6921409883823672",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "d4fa440d5174eacc01b9cf82cbb4655c1381d0ac159302f0d8018c131b89cea2"
+    },
+    {
+      "published": "csp-posed.png",
+      "source": "final-pose-female-crouch-w2.png",
+      "screenshot_sha256": "276e0909a93e19b902ce85013d3d468f42ce120af61b1694204dbe6e24722576",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "c47f586d0bebfeaa05f2334338734fe0d0de7b315c2d490d0a3aee5d3e35aa5e"
+    },
+    {
+      "published": "csp-orbit.png",
+      "source": "implementation-male-final-w2-front.png",
+      "screenshot_sha256": "b55d063c5664545920d4a7d2d8d70bd824816774da896a984bf59c9787b099bf",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "02799598d9f60899e83627446c80bf9c6f7f737a47b8b2de7e7f92612200a4e3"
+    },
+    {
+      "published": "csp-orbit.png",
+      "source": "implementation-male-final-w2-side.png",
+      "screenshot_sha256": "4147590b0b1bec5deabb9dcea876f9911582f6bcdb6a1ee0fa3e978b23a7a944",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "02799598d9f60899e83627446c80bf9c6f7f737a47b8b2de7e7f92612200a4e3"
+    },
+    {
+      "published": "csp-orbit.png",
+      "source": "implementation-male-final-w2-back.png",
+      "screenshot_sha256": "2c198513da3fdea57b0363606abd0d92e876ab3bf4b077a4ee5611b930b05d89",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "02799598d9f60899e83627446c80bf9c6f7f737a47b8b2de7e7f92612200a4e3"
+    },
+    {
+      "published": "csp-orbit.png",
+      "source": "implementation-female-w2-back.png",
+      "screenshot_sha256": "8543ae782e47d6a43e04c6ec990238eaec4fa6a90106ddc3417de66ae2bde2f1",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ],
+      "fbx_sha256": "07295db35bb6a148f14da4fad91d459ee05d1f5859225b29638b71dce9754e3b"
+    },
+    {
+      "published": "csp-neutral.png",
+      "source": "male-current-neutral-w0.png",
+      "screenshot_sha256": "6e574ddc2206e6e9b824fd4ce227919eab29200bd2ee2f8d79cbc12a24037fa8",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ]
+    },
+    {
+      "published": "csp-neutral.png",
+      "source": "implementation-male-w2.png",
+      "screenshot_sha256": "6f80f8e2b3bf8514b5facc8046b12bc531fe7a3069696cc4f262e7b5e83f38df",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ]
+    },
+    {
+      "published": "csp-neutral.png",
+      "source": "female-current-neutral-w0.png",
+      "screenshot_sha256": "66201557954a3b4117002f4d4f2da192f201bb4f46b3d32488b29b1b9b103c36",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ]
+    },
+    {
+      "published": "csp-neutral.png",
+      "source": "implementation-female-w2.png",
+      "screenshot_sha256": "c8ca7c31e5f0ea79c096b2ff4c1e8029180338aac903de450b15308930fb67e7",
+      "crop": [
+        872,
+        568,
+        1872,
+        1336
+      ]
+    }
+  ]
+}

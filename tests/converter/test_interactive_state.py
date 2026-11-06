@@ -33,6 +33,32 @@ def model():
             normals=[[0.,0.,1.]]*3, normalTriangles=[[0,1,2]], triangles=[[0,1,2]], weights=[[[0,1.]]]*3)], capabilities={'localHands':False})
 
 
+@pytest.mark.parametrize('variant',['approved','wrong-hash','unknown-id','shaped'])
+@pytest.mark.parametrize('raises',[False,True])
+def test_terminal_bone_adapter_is_hash_pinned_and_restored(monkeypatch,variant,raises):
+    import sys
+    from types import SimpleNamespace
+    from converter import interactive_adapter as adapter, worker, shape_bake
+    legacy=object();full=object();rt=SimpleNamespace(import_character=legacy)
+    monkeypatch.setitem(sys.modules,'converter.retarget',rt)
+    monkeypatch.setattr(shape_bake,'import_full_character',full)
+    cid=next(iter(adapter.TERMINAL_BONE_ASSETS))
+    job=dict(character_id=cid,character_sha256=adapter.TERMINAL_BONE_ASSETS[cid])
+    if variant=='wrong-hash':job['character_sha256']='f'*64
+    if variant=='unknown-id':job['character_id']='unapproved-model'
+    if variant=='shaped':job['shape_recipe']={'existing':'shape path'}
+    def run(value):
+        assert value is job
+        assert rt.import_character is (full if variant=='approved' else legacy)
+        if raises:raise ValueError('existing gate rejected')
+        return {'ok':True}
+    monkeypatch.setattr(worker,'run_job',run)
+    if raises:
+        with pytest.raises(ValueError,match='existing gate rejected'):adapter._run_body_job(job)
+    else:assert adapter._run_body_job(job)=={'ok':True}
+    assert rt.import_character is legacy
+
+
 def receipt(state):
     return dict(schema='interactive-fbx-receipt-v1', verified=True, stateHash=state.state_hash,
         identity=state.payload['identity'], packetModelSha256=digest(canonical(state.payload['model'])))
