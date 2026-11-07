@@ -1,0 +1,11 @@
+{
+  "scope": "rough-only analyst labels; source/target same for every method within a case; exploratory",
+  "cases": {
+    "001": {"arms": {"Left": [[0.638, 0.315], [0.640, 0.517], [0.645, 0.665]], "Right": [[0.307, 0.311], [0.185, 0.510], [0.345, 0.609]]}, "contact": [["Right", "waist"]]},
+    "006": {"arms": {"Left": [[0.538, 0.185], [0.689, 0.216], [0.834, 0.249]], "Right": [[0.369, 0.194], [0.242, 0.220], [0.111, 0.245]]}, "foreground": "orange", "contact": []},
+    "029": {"arms": {"Right": [[0.381, 0.245], [0.325, 0.346], [0.250, 0.435]]}, "contact": []},
+    "039": {"arms": {"Left": [[0.660, 0.205], [0.878, 0.285], [0.843, 0.364]], "Right": [[0.354, 0.192], [0.162, 0.073], [0.418, 0.110]]}, "foreground": "outlined_on_white", "contact": [["Left", "waist"], ["Right", "head"]]},
+    "053": {"arms": {"Left": [[0.456, 0.346], [0.681, 0.393], [0.562, 0.266]], "Right": [[0.444, 0.341], [0.509, 0.557], [0.666, 0.486]]}, "foreground": "gray_on_white", "contact": [["Left", "head"]]},
+    "074": {"arms": {"Left": [[0.770, 0.511], [0.881, 0.868]], "Right": [[0.303, 0.522], [0.203, 0.767], [0.354, 0.408]]}, "hips_cropped": true, "contact": [["Right", "head"]]}
+  }
+}
