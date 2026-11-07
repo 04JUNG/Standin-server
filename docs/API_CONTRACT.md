@@ -1362,6 +1362,9 @@ Converter `/compose-scene` may return an artifact-bound `X-Standin-Scene-Camera`
 
 The separately authenticated internal snapshot/static transport is documented in [real-model interactive v2](NEXT_SPRINT/INTERACTIVE_REAL_MODEL_V2_2026-11-04.md). This does not change public inference `/analyze` or `/refine` request/response contracts.
 
+The private snapshot camera accepts both the continuous `candidate-camera-v2` (`reference=search-fit`) and the explicit `pose-preview-camera-v1` presentation contract. The latter retains its original version and `projection_matches_search` value: a fixed/semantic reference is never relabeled as a fitted search camera. Its right-handed Y-up basis, hip origin/torso scale, image-down projection rule, unbaked rotation and finite projection parameters are validated before the same torso-calibrated camera calculation. BFF binds the validated original BVH SHA to either camera dialect; Converter still checks that binding against the source. Ownership, hand/body lineage, immutable snapshots, release checks and final FBX validation are unchanged.
+
+
 
 ## Internal converter: approved final-FBX skin (2026-11-06)
 
