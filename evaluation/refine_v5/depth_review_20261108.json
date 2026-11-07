@@ -1,0 +1,35 @@
+{
+  "version": "v5-user-depth-review-v1",
+  "authority": "user_reviewed_rough_vs_fbx_comparison_rows_1_to_4",
+  "margin_units": "torso_length; solver margins, not measured image depth",
+  "cases": {
+    "001": {
+      "movable": ["RightArm", "RightForeArm", "RightHand"],
+      "cues": [
+        {"kind": "waist_side_contact", "subject": "RightPalm", "reference": "RightWaistSide", "margin": 0.025}
+      ]
+    },
+    "006": {
+      "movable": ["LeftUpLeg", "LeftLeg", "LeftFoot"],
+      "locked_support": "Right",
+      "cues": [
+        {"kind": "body_behind", "subject": "LeftFoot", "reference": "RightFoot", "margin": 0.10},
+        {"kind": "camera_farther", "subject": "LeftFoot", "reference": "RightFoot", "margin": 0.10},
+        {"kind": "sole_clearance", "subject": "LeftSole", "reference": "RightSole", "margin": 0.08}
+      ]
+    },
+    "029": {
+      "movable": ["RightArm", "RightForeArm", "RightHand"],
+      "cues": [
+        {"kind": "body_behind", "subject": "RightHand", "reference": "RightArm", "margin": 0.10},
+        {"kind": "body_behind", "subject": "RightForeArm", "reference": "RightArm", "margin": 0.035}
+      ]
+    },
+    "039": {
+      "movable": ["RightArm", "RightForeArm", "RightHand"],
+      "cues": [
+        {"kind": "head_behind", "subject": "RightPalm", "reference": "HeadRear", "margin": 0.02}
+      ]
+    }
+  }
+}
