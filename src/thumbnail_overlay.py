@@ -129,13 +129,20 @@ def read_styled_poster(data_dir, source, scope, view):
         # rough_posters allows a fallback only for genuinely old/missing bundles.
         # A declared complete style release must never mix angles or styles.
         raise ValueError('advertised styled thumbnail is missing') from error
+    from .thumbnail_patch import read_patch
+    replacement = read_patch(data_dir, source, name, data)
+    revision, asset_version = record['renderer_revision'], manifest['asset_version']
+    if replacement is not None:
+        data, patch = replacement
+        revision = patch['renderer_revision']
+        asset_version = patch['asset_version']
     from .directional_posters import CHARACTER_SHA
     from .pose_posters import headers
     meta = dict(kind='default-body', render_method='frozen-retarget-v1',
                 source_bvh_sha256=source, character_id='standin-master-v2', character_sha256=CHARACTER_SHA,
-                renderer_revision=record['renderer_revision'], image_sha256=record['images'][name]['sha256'], scope=scope)
+                renderer_revision=revision, image_sha256=hashlib.sha256(data).hexdigest(), scope=scope)
     result = headers(meta)
-    result.update({'X-Standin-Poster-Asset-Version': manifest['asset_version'],
+    result.update({'X-Standin-Poster-Asset-Version': asset_version,
                    'X-Standin-Thumbnail-Style': STYLE,
                    'X-Standin-Native-Render-Method': 'reviewed-surface-outline-v1',
                    'X-Standin-Preview-View': view,
@@ -154,7 +161,11 @@ def legacy_thumbnail_path(data_dir, pose_id, view):
     record = _record(root, manifest, source)
     name = f'full__{LEGACY_VIEWS[view]}.jpg'
     path = root / source / name
-    _raster(path, record['images'][name])
+    data = _raster(path, record['images'][name])
+    from .thumbnail_patch import read_patch
+    replacement = read_patch(data_dir, source, name, data)
+    if replacement is not None:
+        return Path(data_dir) / 'thumbs/raster-patch' / name
     return path
 
 

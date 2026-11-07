@@ -138,6 +138,9 @@ def _ensure_db():
     from src.thumbnail_overlay import ensure_thumbnail_overlay
     if ensure_thumbnail_overlay(CFG.data_dir, DB_PATH):
         log_info('pose_thumbnails', '검증한 썸네일 스타일 오버레이를 적용했습니다')
+    from src.thumbnail_patch import ensure_thumbnail_patch
+    if ensure_thumbnail_patch(CFG.data_dir):
+        log_info('pose_thumbnails', '검증한 개별 포스터 이미지 패치를 적용했습니다')
     return load_entries(DB_PATH)
 
 
