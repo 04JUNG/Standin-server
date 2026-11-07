@@ -5,14 +5,16 @@ from pathlib import Path
 
 import numpy as np
 
-from experiments.refine_v5.ab_common import load_json, save_json
-from experiments.refine_v5.learning_data import digest, frame
-
 KINDS = {
     'body_behind', 'camera_farther', 'sole_clearance', 'waist_side_contact', 'head_behind',
 }
 ARM = ('RightArm', 'RightForeArm', 'RightHand')
 LIFTED_LEG = ('LeftUpLeg', 'LeftLeg', 'LeftFoot')
+
+
+
+def has_cue(case, kind):
+    return any(cue['kind'] == kind for cue in case['depth_evidence']['cues'])
 
 
 def cue_value(kind, subject, reference, body_forward, camera_farther, torso):
@@ -32,6 +34,9 @@ def cue_minimum(cue):
 
 
 def bind(run, previous, output):
+    from experiments.refine_v5.ab_common import load_json, save_json
+    from experiments.refine_v5.learning_data import digest, frame
+
     repo = Path(__file__).resolve().parents[2]
     review = load_json(repo / 'evaluation/refine_v5/depth_review_20261108.json')
     old = {r['case_id']: r for r in load_json(run / 'manifest.json')['cases']}

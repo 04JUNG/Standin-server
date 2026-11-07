@@ -4,10 +4,6 @@ import json
 from pathlib import Path
 
 import numpy as np
-from PIL import Image
-
-from experiments.refine_v5.goal_probe_v2 import fk, prepare
-from experiments.refine_v5.learning_data import digest, frame, source_camera, visibility
 
 
 def load_json(path):
@@ -22,6 +18,10 @@ def save_json(path, value):
 
 
 def prepare_manifest(run, previous, body, output):
+    from PIL import Image
+
+    from experiments.refine_v5.learning_data import digest, frame, source_camera, visibility
+
     repo = Path(__file__).resolve().parents[2]
     fixture = load_json(repo / 'evaluation/refine_v5/camera_vlm_ab.json')
     reviews = {r['case_id']: r for r in load_json(repo / 'evaluation/refine_v5/visual_review_v2.json')['records']}
@@ -68,6 +68,8 @@ def prepare_manifest(run, previous, body, output):
 
 def named_pose(case, edits, *, historical=False):
     """Apply post-multiplied B0-local rotvecs. The original hierarchy stays fixed."""
+    from experiments.refine_v5.goal_probe_v2 import fk, prepare
+
     names, lookup, parents, local, base = prepare(case)
     active = list(edits)
     angles = np.array(list(edits.values()), dtype=float).reshape(-1, 3)
