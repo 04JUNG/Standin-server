@@ -106,3 +106,17 @@ def project(points, camera):
     if np.any(depth <= .25):
         raise ValueError('near plane')
     return camera_space[:, :2] / depth[:, None] * camera['pixel_scale'] + camera['pixel_offset']
+
+
+def main():
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    for option in ('run', 'previous', 'body', 'out'):
+        parser.add_argument(f'--{option}', type=Path, required=True)
+    args = parser.parse_args()
+    prepare_manifest(args.run, args.previous, args.body, args.out)
+
+
+if __name__ == '__main__':
+    main()
