@@ -17,13 +17,14 @@ def save_json(path, value):
     temporary.replace(path)
 
 
-def prepare_manifest(run, previous, body, output):
+def prepare_manifest(run, previous, body, output, *, fixture=None):
     from PIL import Image
 
     from experiments.refine_v5.learning_data import digest, frame, source_camera, visibility
 
     repo = Path(__file__).resolve().parents[2]
-    fixture = load_json(repo / 'evaluation/refine_v5/camera_vlm_ab.json')
+    if fixture is None:
+        fixture = load_json(repo / 'evaluation/refine_v5/camera_vlm_ab.json')
     reviews = {r['case_id']: r for r in load_json(repo / 'evaluation/refine_v5/visual_review_v2.json')['records']}
     seeds = {r['case_id']: r for r in load_json(previous / 'all-seeds/seeds.json')}
     rigs = {r['case_id']: r for r in load_json(run / 'native-data/records.json') if r['status'] == 'ready'}

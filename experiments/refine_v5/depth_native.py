@@ -24,8 +24,9 @@ def inspect_depth(case, world, names, mesh, base_mesh, regions):
         raise ValueError('source triangle identities changed')
     cues = measure(case, depth_points(case, names, world, v, f, w, regions))
     chain = case['depth_evidence']['movable']
+    side = 'Left' if chain[0].startswith('Left') else 'Right'
     target = (np.asarray(case['lifted_leg_targets_px']) if 'lifted_leg_targets_px' in case
-              else np.asarray(case['arms']['Right']) * case['dimensions'])
+              else np.asarray(case['arms'][side]) * case['dimensions'])
     lookup = {name: i for i, name in enumerate(names)}
     screen = project(world[[lookup[n] for n in chain], :3, 3], case['camera'])
     nme = np.linalg.norm(screen[1:] - target[1:], axis=1).mean() / case['camera']['rough_unit_px']
@@ -35,15 +36,20 @@ def inspect_depth(case, world, names, mesh, base_mesh, regions):
         palm = v[np.unique(f[regions['palm']])]
         detail['side_waist_palm_gap_mm'] = 1000 * min(waist.find_nearest(Vector(p))[3] for p in palm)
     if 'locked_support' in case['depth_evidence']:
-        support = sole_indices(w, names, 'Right')
-        detail['right_sole_max_drift_mm'] = 1000 * float(np.linalg.norm(v[support] - base_mesh[0][support], axis=1).max())
-    if has_cue(case, 'head_behind'):
-        arm_bones = [i for i, name in enumerate(names) if name.startswith(('RightForeArm', 'RightHand'))]
+        support_side = case['depth_evidence']['locked_support']
+        support = sole_indices(w, names, support_side)
+        detail['support_sole_max_drift_mm'] = 1000 * float(np.linalg.norm(v[support] - base_mesh[0][support], axis=1).max())
+        if support_side == 'Right':
+            detail['right_sole_max_drift_mm'] = detail['support_sole_max_drift_mm']
+    if has_cue(case, 'head_behind') or has_cue(case, 'head_front'):
+        arm_bones = [i for i, name in enumerate(names) if name.startswith((side + 'ForeArm', side + 'Hand'))]
         arm = w[:, arm_bones].sum(axis=1)
         active = (arm[f] > .60).all(axis=1)
         head = surface_tree(v, f[regions['target']])
         forearm_and_hand = surface_tree(v, f[active])
-        detail['right_forearm_hand_head_crossings'] = len(forearm_and_hand.overlap(head))
+        detail['forearm_hand_head_crossings'] = len(forearm_and_hand.overlap(head))
+        if side == 'Right':
+            detail['right_forearm_hand_head_crossings'] = detail['forearm_hand_head_crossings']
     return detail
 
 

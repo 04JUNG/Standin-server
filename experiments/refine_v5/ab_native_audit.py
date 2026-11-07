@@ -88,6 +88,33 @@ def write(path, obj):
     temp.replace(path)
 
 
+class RoundtripError(ValueError):
+    """Saved FBX failed a structural or mesh verification gate."""
+
+
+def export_checked(path, armature, meshes, names, base, load):
+    planned = snapshot(armature)
+    vertices, faces, _ = weighted_mesh(meshes, names)
+    retarget.apply_output_mode(armature, meshes, 'rigged_rest')
+    export_preserving_bones(path)
+    armature, meshes = load(path)
+    actual = snapshot(armature)
+    try:
+        native = compare_native(planned['heads'], actual['heads'], planned['parents'],
+                                actual['parents'], base['lengths'], actual['lengths'])
+    except ValueError as exc:
+        raise RoundtripError(str(exc)) from exc
+    av, af, _ = weighted_mesh(meshes, names)
+    if len(av) != len(vertices) or len(af) != len(faces):
+        raise RoundtripError('saved mesh inventory changed')
+    cloud = max(cloud_distance(vertices, av), cloud_distance(av, vertices))
+    frame = max(float(np.max(abs(np.asarray(planned['matrices'][name])[:3, :3]
+                                 - np.asarray(actual['matrices'][name])[:3, :3]))) for name in names)
+    if cloud > 1e-5 or frame > 2e-4:
+        raise RoundtripError(f'saved skin or bone frame differs (cloud={cloud:.8g}m, frame={frame:.8g})')
+    return armature, av, af, native, cloud, frame
+
+
 def audit(root, cases, gt_root, load):
     frozen = json.loads((root / 'frozen.json').read_text())
     if sha(root / 'manifest.json') != frozen['manifest_sha256']:
@@ -116,33 +143,21 @@ def audit(root, cases, gt_root, load):
             base = snapshot(armature)
             apply_rotations(armature, row['edits_deg'])
             plan_error = verify_plan(armature, row['expected_heads'])
-            planned = snapshot(armature)
             v, f, _ = weighted_mesh(meshes, names)
             if not np.array_equal(f, b0_faces):
                 raise ValueError('posed mesh changed B0 triangle identities')
             contact = measure_contact(v, f, patches)
-            if method == 'B0':
+            if method == 'B0' or row['status'] == 'fallback_exact_B0':
+                if row['edits_deg']:
+                    raise ValueError('B0 fallback contains edits')
                 saved = source
                 native_error = {'max_head_error_m': 0., 'max_length_error_m': 0.}
                 cloud_error = 0.
                 frame_error = 0.
             else:
                 saved = out / f'{case_id}-{method}.diagnostic.fbx'
-                retarget.apply_output_mode(armature, meshes, 'rigged_rest')
-                export_preserving_bones(saved)
-                armature, meshes = load(saved)
-                actual = snapshot(armature)
-                native_error = compare_native(planned['heads'], actual['heads'], planned['parents'],
-                                              actual['parents'], base['lengths'], actual['lengths'])
-                av, af, _ = weighted_mesh(meshes, names)
-                if len(av) != len(v) or len(af) != len(f):
-                    raise ValueError('saved mesh inventory changed')
-                cloud_error = max(cloud_distance(v, av), cloud_distance(av, v))
-                frame_error = max(float(np.max(abs(np.asarray(planned['matrices'][name])[:3, :3]
-                                                     - np.asarray(actual['matrices'][name])[:3, :3]))) for name in names)
-                if cloud_error > 1e-5 or frame_error > 2e-4:
-                    raise ValueError('saved skin or bone frame differs')
-                v, f = av, af
+                armature, v, f, native_error, cloud_error, frame_error = export_checked(
+                    saved, armature, meshes, names, base, load)
             regional = triage(armature)
             if method == 'B0':
                 base_skin = regional

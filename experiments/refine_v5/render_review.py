@@ -12,10 +12,19 @@ def canonical(mesh,bones):
 def render(vertices,faces,size=(260,330),yaw=0,framing=None):
     v=vertices@Rotation.from_euler('y',yaw,degrees=True).as_matrix().T
     xy=v[:,:2]*np.array([1,-1]);scale,origin=framing;xy=xy*scale+origin
-    image=np.full((size[1],size[0],3),248,np.uint8);tri=v[faces];normal=np.cross(tri[:,1]-tri[:,0],tri[:,2]-tri[:,0]);normal/=np.maximum(np.linalg.norm(normal,axis=1,keepdims=True),1e-8)
-    light=np.array([-.3,.5,-.8]);shade=np.clip(abs(normal@light),0,1)*75+145
-    for i in np.argsort(tri[:,:,2].mean(1)):
-        color=int(shade[i]);cv2.fillConvexPoly(image,xy[faces[i]].astype('int32'),(color,color+min(8,255-color),color+min(12,255-color)))
+    return render_projected(v, faces, xy, size)
+
+def render_projected(vertices, faces, xy, size):
+    image = np.full((size[1], size[0], 3), 248, np.uint8)
+    triangles = vertices[faces]
+    normal = np.cross(triangles[:, 1] - triangles[:, 0], triangles[:, 2] - triangles[:, 0])
+    normal /= np.maximum(np.linalg.norm(normal, axis=1, keepdims=True), 1e-8)
+    light = np.array([-.3, .5, -.8])
+    shade = np.clip(abs(normal @ light), 0, 1) * 75 + 145
+    pixels = xy.astype('int32')
+    for i in np.argsort(triangles[:, :, 2].mean(1)):
+        color = int(shade[i])
+        cv2.fillConvexPoly(image, pixels[faces[i]], (color, color + 8, color + 12))
     return Image.fromarray(image)
 def main():
     p=argparse.ArgumentParser();p.add_argument('--run',required=True);p.add_argument('--previous',required=True);a=p.parse_args();run=Path(a.run);old=Path(a.previous)

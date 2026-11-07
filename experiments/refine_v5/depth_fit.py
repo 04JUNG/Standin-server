@@ -96,33 +96,37 @@ def fit(case, skin, previous):
     regions = surface_regions(case, names, base, vertices, faces, weights)
     source_points = depth_points(case, names, base, vertices, faces, weights, regions)
     leg = 'locked_support' in case['depth_evidence']
+    side = 'Left' if chain[0].startswith('Left') else 'Right'
     dominant = np.argmax(weights, axis=1)
     if leg:
         target_px = np.asarray(case['lifted_leg_targets_px'])
-        sole = sole_indices(weights, names, 'Left')
+        sole = sole_indices(weights, names, side)
         sole_sample = SkinSample(vertices[sole], dominant[sole], base)
         palm_sample = None
     else:
-        target_px = np.asarray(case['arms']['Right']) * case['dimensions']
+        target_px = np.asarray(case['arms'][side]) * case['dimensions']
         sole_sample = None
         palm_sample = None
         if regions is not None:
             palm = vertices[faces[regions['palm']]].mean(axis=1)
-            palm_sample = SkinSample(subsample(palm, 52), np.repeat(lookup['RightHand'], min(52, len(palm))), base)
+            palm_sample = SkinSample(subsample(palm, 52), np.repeat(lookup[side + 'Hand'], min(52, len(palm))), base)
     attached = {index for index, name in enumerate(names)
-                if name == chain[1] or name.startswith(chain[2]) or (leg and name.startswith('LeftToe'))}
+                if name == chain[1] or name.startswith(chain[2]) or (leg and name.startswith(side + 'Toe'))}
     moving = np.flatnonzero(np.isin(dominant, list(attached)) & (weights.max(axis=1) > .65))
     probe_ids = subsample(moving, 260)
     moving_skin = SkinSample(vertices[probe_ids], dominant[probe_ids], base)
     blocker_names = ['Hips', 'Spine', 'Spine1', 'Spine2', 'RightUpLeg', 'LeftUpLeg']
-    if has_cue(case, 'head_behind'):
-        blocker_names += ['Head', 'Neck', 'LeftShoulder', 'LeftArm', 'LeftForeArm']
+    opposite = 'Left' if side == 'Right' else 'Right'
+    if has_cue(case, 'head_behind') or has_cue(case, 'head_front'):
+        blocker_names += ['Head', 'Neck'] + [opposite + part for part in ('Shoulder', 'Arm', 'ForeArm')]
     if leg:
-        blocker_names = ['RightUpLeg', 'RightLeg', 'RightFoot', 'RightToeBase']
+        support = case['depth_evidence']['locked_support']
+        blocker_names = [support + part for part in ('UpLeg', 'Leg', 'Foot', 'ToeBase')]
     blockers = [lookup[name] for name in blocker_names]
     blocker_mask = (weights[:, blockers].sum(axis=1)[faces] > .75).all(axis=1)
     blocker = Surface(vertices[faces[blocker_mask]])
-    touch = Surface(vertices[faces[regions['target']]]) if has_cue(case, 'waist_side_contact') else None
+    seek_contact = has_cue(case, 'waist_side_contact') or (has_cue(case, 'head_front') and [side, 'head'] in case['contact'])
+    touch = Surface(vertices[faces[regions['target']]]) if seek_contact else None
     exact = {name: source_points[name] for name in source_points if name not in names}
     head_limit = exact.get('HeadRear')
     prior = np.array([previous.get(name, [0., 0., 0.]) for name in chain])
@@ -132,9 +136,9 @@ def fit(case, skin, previous):
         points.update(exact)
         palm = palm_sample(world) if palm_sample is not None else None
         if palm is not None:
-            points['RightPalm'] = palm.mean(axis=0)
+            points[side + 'Palm'] = palm.mean(axis=0)
         if sole_sample is not None:
-            points['LeftSole'] = lowest(sole_sample(world))
+            points[side + 'Sole'] = lowest(sole_sample(world))
         return measure(case, points), palm
 
     def stats(world):
@@ -184,7 +188,9 @@ def fit(case, skin, previous):
             return np.r_[endpoints, tangents, penalties, clearance_weight * worst / torso / np.sqrt(len(worst)),
                          2 * max(0., -.92 - cosine), .045 * applied.ravel()]
 
-        starts = [np.zeros(9), limit_vectors(np.deg2rad(prior), caps).ravel()]
+        starts = [np.zeros(9)]
+        if np.any(prior):
+            starts.append(limit_vectors(np.deg2rad(prior), caps).ravel())
         starts.extend(limit_vectors(rng.normal(0., .42, (3, 3)) * caps[:, None], caps).ravel() for _ in range(6))
         candidates = []
         for index, start in enumerate(starts):

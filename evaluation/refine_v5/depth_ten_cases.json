@@ -1,0 +1,44 @@
+{
+  "scope": "Four user-reviewed cases plus six exploratory rough-only analyst observations.",
+  "case_order": ["001", "006", "007", "029", "039", "043", "050", "053", "074", "081"],
+  "added": {
+    "007": {
+      "arms": {"Right": [[0.319, 0.277], [0.190, 0.213], [0.326, 0.160]]}, "contact": [],
+      "depth": {"movable": ["RightArm", "RightForeArm", "RightHand"], "cues": [
+        {"kind": "head_front", "subject": "RightPalm", "reference": "HeadFront", "margin": 0.006}
+      ]}
+    },
+    "043": {
+      "arms": {}, "contact": [], "lifted_leg_points": [[0.426, 0.466], [0.512, 0.658], [0.246, 0.560]],
+      "depth": {"movable": ["RightUpLeg", "RightLeg", "RightFoot"], "locked_support": "Left", "cues": [
+        {"kind": "body_behind", "subject": "RightFoot", "reference": "LeftFoot", "margin": 0.10},
+        {"kind": "sole_clearance", "subject": "RightSole", "reference": "LeftSole", "margin": 0.08}
+      ]}
+    },
+    "050": {
+      "arms": {"Right": [[0.178, 0.530], [0.425, 0.852], [0.550, 0.535]]}, "hips_cropped": true, "contact": [["Right", "head"]],
+      "depth": {"movable": ["RightArm", "RightForeArm", "RightHand"], "cues": [
+        {"kind": "head_front", "subject": "RightPalm", "reference": "HeadFront", "margin": 0.006}
+      ]}
+    },
+    "053": {
+      "arms": {"Left": [[0.456, 0.346], [0.681, 0.393], [0.562, 0.266]]}, "contact": [["Left", "head"]],
+      "depth": {"movable": ["LeftArm", "LeftForeArm", "LeftHand"], "cues": [
+        {"kind": "head_front", "subject": "LeftPalm", "reference": "HeadFront", "margin": 0.006}
+      ]}
+    },
+    "074": {
+      "arms": {"Right": [[0.303, 0.522], [0.203, 0.767], [0.354, 0.408]]}, "hips_cropped": true, "contact": [["Right", "head"]],
+      "depth": {"movable": ["RightArm", "RightForeArm", "RightHand"], "cues": [
+        {"kind": "head_front", "subject": "RightPalm", "reference": "HeadFront", "margin": 0.006}
+      ]}
+    },
+    "081": {
+      "arms": {"Right": [[0.298, 0.390], [0.183, 0.568], [0.370, 0.477]]}, "hips_cropped": true,
+      "shoulder_anchors": [[0.746, 0.392], [0.298, 0.390]], "contact": [],
+      "depth": {"movable": ["RightArm", "RightForeArm", "RightHand"], "cues": [
+        {"kind": "body_in_front", "subject": "RightHand", "reference": "Spine2", "margin": 0.08}
+      ]}
+    }
+  }
+}

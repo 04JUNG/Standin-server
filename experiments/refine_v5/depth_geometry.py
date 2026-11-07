@@ -22,11 +22,12 @@ def surface_regions(case, names, world, vertices, faces, weights):
     """Keep the side-waist surface distinct from the front abdomen and thigh."""
     if has_cue(case, 'waist_side_contact'):
         target = 'waist'
-    elif has_cue(case, 'head_behind'):
+    elif has_cue(case, 'head_behind') or has_cue(case, 'head_front'):
         target = 'head'
     else:
         return None
-    hand, palm, surface = contact_faces(vertices, faces, weights, names, world, 'Right', target)
+    side = 'Left' if case['depth_evidence']['movable'][0].startswith('Left') else 'Right'
+    hand, palm, surface = contact_faces(vertices, faces, weights, names, world, side, target)
     if not len(hand) or not len(palm) or not len(surface):
         raise ValueError('missing weighted depth surface')
     centers = vertices[faces[surface]].mean(axis=1)
@@ -43,17 +44,21 @@ def surface_regions(case, names, world, vertices, faces, weights):
         # Posterior boundary of the central head volume. Skin intersections are
         # checked separately, including fingers and forearm.
         reference = centers.mean(axis=0)
-        reference += (np.quantile(depth, .30) - reference @ forward) * forward
+        quantile = .65 if has_cue(case, 'head_front') else .30
+        reference += (np.quantile(depth, quantile) - reference @ forward) * forward
     return dict(hand=hand, palm=palm, target=surface, reference=reference)
 
 
 def depth_points(case, names, world, vertices, faces, weights, regions=None):
     points = dict(zip(names, world[:, :3, 3], strict=True))
     waist = has_cue(case, 'waist_side_contact')
-    if waist or has_cue(case, 'head_behind'):
+    head_front = has_cue(case, 'head_front')
+    if waist or head_front or has_cue(case, 'head_behind'):
         regions = regions or surface_regions(case, names, world, vertices, faces, weights)
-        points['RightPalm'] = vertices[faces[regions['palm']]].mean(axis=(0, 1))
-        points['RightWaistSide' if waist else 'HeadRear'] = regions['reference']
+        side = 'Left' if case['depth_evidence']['movable'][0].startswith('Left') else 'Right'
+        points[side + 'Palm'] = vertices[faces[regions['palm']]].mean(axis=(0, 1))
+        reference = 'RightWaistSide' if waist else ('HeadFront' if head_front else 'HeadRear')
+        points[reference] = regions['reference']
     if has_cue(case, 'sole_clearance'):
         for side in ('Left', 'Right'):
             points[side + 'Sole'] = lowest(vertices[sole_indices(weights, names, side)])
@@ -62,7 +67,7 @@ def depth_points(case, names, world, vertices, faces, weights, regions=None):
 
 def measure(case, points):
     forward = np.asarray(case['body_forward'])
-    camera = np.asarray(case['camera']['rotation'])[2]
+    camera = np.asarray(case.get('depth_camera_farther', case['camera']['rotation'][2]))
     torso = case['torso_world']
     rows = []
     for cue in case['depth_evidence']['cues']:

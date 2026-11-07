@@ -77,15 +77,32 @@ def cameras(case, lookup, base, vertices):
         if perspective:
             orientation = np.asarray(alternatives['ortho_calibrated']['camera_delta_deg'])
             starts = [np.r_[orientation, inverse] for inverse in (.12, .38)]
-        fitted = min(
-            (least_squares(residual, start, bounds=(lower, bounds), max_nfev=80) for start in starts),
-            key=lambda fit: fit.cost,
-        )
-        params = fitted.x if perspective else np.r_[fitted.x, 0.]
-        try:
-            candidate = camera_for(params)
-            project(vertices, candidate)
-        except ValueError:
+        def valid_fit(initials, upper):
+            valid = []
+            for start in initials:
+                fit = least_squares(residual, start, bounds=(lower, upper), max_nfev=80)
+                parameters = fit.x if perspective else np.r_[fit.x, 0.]
+                camera = camera_for(parameters)
+                try:
+                    project(vertices, camera)
+                except ValueError:
+                    continue
+                valid.append((fit.cost, camera))
+            return min(valid, key=lambda item: item[0])[1] if valid else None
+
+        candidate = valid_fit(starts, bounds)
+        if candidate is None and perspective:
+            # The full mesh can cross the near plane even if torso anchors fit.
+            # A tighter depth bound leaves a margin for the subsequent limb edit.
+            radius = np.linalg.norm((vertices - hip) / torso, axis=1).max()
+            upper = bounds.copy()
+            upper[3] = min(upper[3], .58 / radius)
+            if upper[3] > lower[3] + 1e-5:
+                start = np.r_[orientation, (upper[3] + lower[3]) * .5]
+                candidate = valid_fit([start], upper)
+                if candidate is not None:
+                    candidate['near_plane_bound_retry'] = True
+        if candidate is None:
             candidate = dict(base_camera, status='fallback_near_plane')
         alternatives[name] = candidate
     for camera in alternatives.values():

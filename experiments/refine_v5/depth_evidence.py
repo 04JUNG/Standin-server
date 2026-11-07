@@ -7,6 +7,7 @@ import numpy as np
 
 KINDS = {
     'body_behind', 'camera_farther', 'sole_clearance', 'waist_side_contact', 'head_behind',
+    'head_front', 'body_in_front',
 }
 ARM = ('RightArm', 'RightForeArm', 'RightHand')
 LIFTED_LEG = ('LeftUpLeg', 'LeftLeg', 'LeftFoot')
@@ -22,6 +23,8 @@ def cue_value(kind, subject, reference, body_forward, camera_farther, torso):
     delta = np.asarray(subject, float) - np.asarray(reference, float)
     if kind in ('body_behind', 'waist_side_contact', 'head_behind'):
         return float(-delta @ body_forward / torso)
+    if kind in ('head_front', 'body_in_front'):
+        return float(delta @ body_forward / torso)
     if kind == 'camera_farther':
         return float(delta @ camera_farther / torso)
     if kind == 'sole_clearance':
