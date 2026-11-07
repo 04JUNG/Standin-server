@@ -1,0 +1,109 @@
+"""One private local job per Blender process; only the host reads its result."""
+from __future__ import annotations
+
+import json
+from pathlib import Path
+import sys
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
+
+from converter.local.contract import LocalError, versions, sha256  # noqa: E402
+
+
+def run(job):
+    import bpy
+    from converter import retarget as rt
+    from converter.local import inspection
+
+    if bpy.app.version[:3] != (5, 2, 0):
+        raise LocalError("RUNTIME_MISMATCH", "This local converter requires Blender 5.2.0")
+    if not (sys.dont_write_bytecode and sys.flags.no_user_site and sys.flags.safe_path):
+        raise LocalError("RUNTIME_MISMATCH", "The local child must disable bytecode writes and unsafe Python paths")
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    work = Path(job["workDir"])
+    if job["action"] == "import":
+        source = Path(job["sourcePath"])
+        if source.suffix.lower() == ".cs3c":
+            from converter.local.cs3c import import_character
+            arm, meshes = import_character(source)
+        else:
+            arm, meshes = inspection.import_fbx(source)
+        character, capabilities = inspection.inspect(arm, meshes)
+        if source.suffix.lower() == ".cs3c":
+            # Keep the *source* parameters as the independent FBX export target.
+            for mesh in meshes:
+                for slot in mesh.material_slots:
+                    mat = slot.material
+                    original = json.loads(mat["cs3c_source_material"])
+                    character["materials"][mat.name]["fbx"] = {k: original[k] for k in ("diffuse", "specular", "shininess", "opacity")}
+        # Preserve a recovery archive, but normal pose jobs only read the verified FBX.
+        archive = work / "character.blend"
+        bpy.ops.wm.save_as_mainfile(filepath=str(archive), check_existing=False)
+        normalized = work / "character.fbx"
+        validation = inspection.roundtrip(arm, meshes, normalized, character["mapping"], character["materials"])
+        # roundtrip has reimported the exact admitted FBX. Build its preview, not
+        # a separate reconstruction of the input character.
+        preview = work / "preview.glb"
+        try:
+            bpy.ops.export_scene.gltf(filepath=str(preview), export_format="GLB", export_animations=False,
+                                      export_extras=False)
+        except Exception:
+            preview.unlink(missing_ok=True)
+        return {"schemaVersion": 1, "localModelId": job["localModelId"],
+                "sourceHash": job["sourceHash"], "sourceFormat": source.suffix[1:].lower(),
+                "versions": versions(), "character": character, "capabilities": capabilities,
+                "normalizedFormat": "fbx", "normalizedHash": sha256(normalized),
+                "archiveHash": sha256(archive), "previewPath": "preview.glb" if preview.is_file() else None,
+                "previewHash": sha256(preview) if preview.is_file() else None, "validation": validation}
+    arm, meshes = inspection.import_fbx(job["normalizedPath"])
+    character, _ = inspection.inspect(arm, meshes)
+    # The shared solver writes world rotation frames of unit scale. Preserve the
+    # source representation in the cache, but bake the armature object's unit/
+    # axis transform into its rest data before solving, just as the server core
+    # importer does. Otherwise a 0.01 CS3C object scale becomes 100x pose scale.
+    from converter.local import surface
+    references = {m.name: surface.prepare_reference(m.data) for m in meshes} if surface.within_budget(meshes) else {}
+    before_normalization = inspection.surface(meshes)
+    rt._apply_object_transform(arm)
+    normalization_error = inspection.surface_error(before_normalization, inspection.surface(meshes))
+    inspection.require(normalization_error < 2e-5, "INVALID_SKIN", "Target normalization changed the original surface")
+    rest_edges = {b.name: (b.head_local-b.parent.head_local).length
+                  for b in arm.data.bones if b.parent}
+    src = rt.import_bvh(job["posePath"], frame=0)
+    inspection.require(len(src.data.bones) <= 512, "LIMIT_EXCEEDED", "Pose skeleton exceeds the local limit")
+    report = rt.retarget(src, arm, dst_profile=character["profile"], apply_root_translation=False)
+    inspection.require(report.ok, "CONVERSION_FAILED", "Retarget rejected the selected pose")
+    from converter.local import arm_transfer
+    arm_correction = arm_transfer.apply(src, arm, meshes, before_normalization, report)
+    edge_error = max(abs((arm.pose.bones[name].head-arm.pose.bones[name].parent.head).length-length)
+                     for name,length in rest_edges.items())
+    inspection.require(edge_error < 2e-5, "CONVERSION_FAILED", "Retarget changed the character's joint lengths")
+    bpy.data.objects.remove(src, do_unlink=True)
+    rt.apply_output_mode(arm, meshes, "rigged_rest")
+    surface_correction = surface.apply_to_meshes(meshes, before_normalization, references)
+    from converter.local.camera import apply_camera
+    camera_validation = apply_camera(arm, meshes, job["snapshot"]["camera"])
+    validation = inspection.roundtrip(arm, meshes, work / "result.fbx", character["mapping"], job["materialExpectations"],
+                                      csp_compatibility=True)
+    return {"snapshot": job["snapshot"], "snapshotHash": job["snapshotHash"],
+            "artifactHash": sha256(work / "result.fbx"), "validation": validation,
+            "retarget": {**report.as_dict(), "surfaceCorrection": surface_correction, "armTransfer": arm_correction, "local_normalization_surface_error": normalization_error,
+                         "max_joint_edge_length_error": edge_error, "camera": camera_validation}, "selectionId": job["selectionId"]}
+
+
+def main():
+    job = json.loads(Path(sys.argv[sys.argv.index("--") + 1]).read_text())
+    try:
+        result = {"ok": True, "result": run(job)}
+    except LocalError as exc:
+        result = {"ok": False, "error": exc.payload()}
+    except Exception:
+        # Blender traces contain model names and local paths. Keep private child
+        # diagnostics out of IPC, telemetry and persisted logs.
+        result = {"ok": False, "error": LocalError("CONVERSION_FAILED", "Local conversion failed").payload()}
+    Path(job["resultPath"]).write_text(json.dumps(result, allow_nan=False))
+
+
+if __name__ == "__main__":
+    main()

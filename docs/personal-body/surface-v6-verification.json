@@ -1,0 +1,196 @@
+{
+  "manifest": "996de96f9d94aef1d5fe68f1b2197771290f6d7578cf86960558b3798aee43eb",
+  "models": [
+    {
+      "input": "standin-male-0.7.6-mapped-review.cs3c",
+      "sha256": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+      "poses": [
+        {
+          "file": "model-0-pose-0.fbx",
+          "sha256": "bc93f67ec1898cc04ae6fee4d0f44fd584f7e841c2e066c26fd2471ee69d0b1c",
+          "seconds": 7.267120417003753,
+          "cachedSeconds": 0.053900958999292925,
+          "roundtripPassed": true,
+          "correction": {
+            "applied": true,
+            "meshes": [
+              {
+                "applied": true,
+                "parts": [
+                  {
+                    "applied": true,
+                    "before": {
+                      "maxStretch": 2.445760943803511,
+                      "stretchP99": 1.477323678708654,
+                      "overDouble": 76,
+                      "compressed": 33,
+                      "collapsed": 0,
+                      "sharp": 176,
+                      "folded": 82
+                    },
+                    "after": {
+                      "maxStretch": 1.8500090809924767,
+                      "stretchP99": 1.2939143381850557,
+                      "overDouble": 0,
+                      "compressed": 0,
+                      "collapsed": 0,
+                      "sharp": 32,
+                      "folded": 20
+                    },
+                    "rings": 140,
+                    "strength": 1.0,
+                    "maxMove": 0.041756903838465705
+                  }
+                ],
+                "updatedCorners": 141919
+              }
+            ]
+          }
+        },
+        {
+          "file": "model-0-pose-1.fbx",
+          "sha256": "eca0212fe2bb0383d5f490a1812b43b7291506a8e0407d779179aa953bb77890",
+          "seconds": 6.829947791993618,
+          "cachedSeconds": 0.05073737501516007,
+          "roundtripPassed": true,
+          "correction": {
+            "applied": true,
+            "meshes": [
+              {
+                "applied": true,
+                "parts": [
+                  {
+                    "applied": true,
+                    "before": {
+                      "maxStretch": 8.320859053538083,
+                      "stretchP99": 1.575033876433608,
+                      "overDouble": 177,
+                      "compressed": 35,
+                      "collapsed": 1,
+                      "sharp": 199,
+                      "folded": 101
+                    },
+                    "after": {
+                      "maxStretch": 1.987485530202413,
+                      "stretchP99": 1.4424478652672013,
+                      "overDouble": 0,
+                      "compressed": 0,
+                      "collapsed": 0,
+                      "sharp": 46,
+                      "folded": 33
+                    },
+                    "rings": 140,
+                    "strength": 0.4,
+                    "maxMove": 0.027638591083122156
+                  }
+                ],
+                "updatedCorners": 141919
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "input": "standin-master-v1-rig-clean-mixamo-core.fbx",
+      "sha256": "ec2d642f61ab812aec9a865f975733d2884bc443ac03367ff0dd832e085396dc",
+      "poses": [
+        {
+          "file": "model-1-pose-0.fbx",
+          "sha256": "63efda66ced8c11dce078f3210e900afb44ab0cc73d590cebcbc4cc9bc9c5c4a",
+          "seconds": 5.981310667004436,
+          "cachedSeconds": 0.04821616702247411,
+          "roundtripPassed": true,
+          "correction": {
+            "applied": true,
+            "meshes": [
+              {
+                "applied": true,
+                "parts": [
+                  {
+                    "applied": true,
+                    "before": {
+                      "maxStretch": 4.337775803942045,
+                      "stretchP99": 1.5683590580177675,
+                      "overDouble": 88,
+                      "compressed": 26,
+                      "collapsed": 0,
+                      "sharp": 119,
+                      "folded": 54
+                    },
+                    "after": {
+                      "maxStretch": 1.8500068871506314,
+                      "stretchP99": 1.4117949882957912,
+                      "overDouble": 0,
+                      "compressed": 0,
+                      "collapsed": 0,
+                      "sharp": 53,
+                      "folded": 25
+                    },
+                    "rings": 140,
+                    "strength": 0.75,
+                    "maxMove": 0.01887005661896611
+                  },
+                  {
+                    "applied": false,
+                    "reason": "already_smooth"
+                  }
+                ],
+                "updatedCorners": 146967
+              }
+            ]
+          }
+        },
+        {
+          "file": "model-1-pose-1.fbx",
+          "sha256": "a2071156563964718d7e5703c9e2cbf36b333e4163ab04e0f8296f4677a253f3",
+          "seconds": 5.472323291993234,
+          "cachedSeconds": 0.04823512499569915,
+          "roundtripPassed": true,
+          "correction": {
+            "applied": true,
+            "meshes": [
+              {
+                "applied": true,
+                "parts": [
+                  {
+                    "applied": true,
+                    "before": {
+                      "maxStretch": 5.68035609594944,
+                      "stretchP99": 1.7753993889253938,
+                      "overDouble": 351,
+                      "compressed": 12,
+                      "collapsed": 2,
+                      "sharp": 172,
+                      "folded": 66
+                    },
+                    "after": {
+                      "maxStretch": 2.782939414543744,
+                      "stretchP99": 1.4961932024264966,
+                      "overDouble": 32,
+                      "compressed": 0,
+                      "collapsed": 0,
+                      "sharp": 59,
+                      "folded": 22
+                    },
+                    "rings": 140,
+                    "strength": 1.0,
+                    "maxMove": 0.02393059934918718
+                  },
+                  {
+                    "applied": false,
+                    "reason": "already_smooth"
+                  }
+                ],
+                "updatedCorners": 146967
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "unchangedWeightAndTriangleIndices": 4,
+  "localConverterVersion": "personal-converter/6",
+  "comparison": "Previous experimental FBX vs new packaged pose job, same camera and lights."
+}

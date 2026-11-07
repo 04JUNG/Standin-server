@@ -1,0 +1,1053 @@
+{
+  "dateKst": "2026-11-05",
+  "scope": "female CMU local surface candidates; no weight, bone or material edits",
+  "baseSourceSha256": "fb47d89d1507c377b0af136b9dc6357ef35787c59ac79467ee180b2e1640017f",
+  "poseSha256": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+  "referenceNeutral": "registered v10 FBX with original source geometry and weights",
+  "rawBefore": {
+    "excessBend": 6271.007974486211,
+    "maxStretch": 219.8996502479944,
+    "stretchP99": 1.8113011307462323,
+    "overDouble": 1853,
+    "compressed": 181,
+    "collapsed": 3,
+    "sharp": 897,
+    "folded": 522
+  },
+  "candidateCount": 37,
+  "adopted": 0,
+  "rows": [
+    {
+      "name": "0.021-strain-1.0",
+      "metrics": {
+        "excessBend": 6916.79773320589,
+        "maxStretch": 134.81639531847284,
+        "stretchP99": 1.9153973537578366,
+        "overDouble": 2009,
+        "compressed": 0,
+        "collapsed": 2,
+        "sharp": 977,
+        "folded": 594
+      },
+      "newCollapse": 2,
+      "regressed": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "sharp",
+        "folded"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "collapsed",
+        "sharp",
+        "folded"
+      ],
+      "maxMoveM": 0.040549283660205306,
+      "moved": 3964
+    },
+    {
+      "name": "0.021-strain-0.75",
+      "metrics": {
+        "excessBend": 6757.4356234164115,
+        "maxStretch": 156.08692041711134,
+        "stretchP99": 1.8879765563312183,
+        "overDouble": 1904,
+        "compressed": 1,
+        "collapsed": 2,
+        "sharp": 936,
+        "folded": 565
+      },
+      "newCollapse": 2,
+      "regressed": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "sharp",
+        "folded"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "collapsed",
+        "sharp",
+        "folded"
+      ],
+      "maxMoveM": 0.03041196274515399,
+      "moved": 3964
+    },
+    {
+      "name": "0.021-strain-0.5",
+      "metrics": {
+        "excessBend": 6614.185537063916,
+        "maxStretch": 177.35768409327113,
+        "stretchP99": 1.8525764209384974,
+        "overDouble": 1827,
+        "compressed": 50,
+        "collapsed": 2,
+        "sharp": 904,
+        "folded": 538
+      },
+      "newCollapse": 2,
+      "regressed": [
+        "excessBend",
+        "stretchP99",
+        "sharp",
+        "folded"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "collapsed",
+        "sharp",
+        "folded"
+      ],
+      "maxMoveM": 0.020274641830102687,
+      "moved": 3964
+    },
+    {
+      "name": "0.021-detail-1.0",
+      "metrics": {
+        "excessBend": 8548.524148867906,
+        "maxStretch": 134.8163797667686,
+        "stretchP99": 1.889656080981561,
+        "overDouble": 1830,
+        "compressed": 0,
+        "collapsed": 0,
+        "sharp": 1294,
+        "folded": 735
+      },
+      "newCollapse": 0,
+      "regressed": [
+        "excessBend",
+        "stretchP99",
+        "sharp",
+        "folded"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "sharp",
+        "folded"
+      ],
+      "maxMoveM": 0.040549283660205306,
+      "moved": 8039
+    },
+    {
+      "name": "0.021-detail-0.75",
+      "metrics": {
+        "excessBend": 7382.9227412912505,
+        "maxStretch": 156.0869103427984,
+        "stretchP99": 1.850314131448445,
+        "overDouble": 1706,
+        "compressed": 72,
+        "collapsed": 4,
+        "sharp": 1049,
+        "folded": 611
+      },
+      "newCollapse": 4,
+      "regressed": [
+        "excessBend",
+        "stretchP99",
+        "collapsed",
+        "sharp",
+        "folded"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "collapsed",
+        "sharp",
+        "folded"
+      ],
+      "maxMoveM": 0.030411962745153998,
+      "moved": 8039
+    },
+    {
+      "name": "0.021-detail-0.5",
+      "metrics": {
+        "excessBend": 6652.216469021077,
+        "maxStretch": 177.3576781825471,
+        "stretchP99": 1.8123304022860285,
+        "overDouble": 1682,
+        "compressed": 152,
+        "collapsed": 2,
+        "sharp": 940,
+        "folded": 526
+      },
+      "newCollapse": 2,
+      "regressed": [
+        "excessBend",
+        "stretchP99",
+        "sharp",
+        "folded"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "collapsed",
+        "sharp",
+        "folded"
+      ],
+      "maxMoveM": 0.020274641830102674,
+      "moved": 8039
+    },
+    {
+      "name": "0.021-fair-1.0",
+      "metrics": {
+        "excessBend": 5820.463716333718,
+        "maxStretch": 134.81660639268057,
+        "stretchP99": 1.8953999436108486,
+        "overDouble": 1902,
+        "compressed": 0,
+        "collapsed": 1,
+        "sharp": 842,
+        "folded": 484
+      },
+      "newCollapse": 1,
+      "regressed": [
+        "stretchP99",
+        "overDouble"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "sharp",
+        "folded"
+      ],
+      "maxMoveM": 0.040549283660205306,
+      "moved": 8039
+    },
+    {
+      "name": "0.021-fair-0.75",
+      "metrics": {
+        "excessBend": 5243.873416413832,
+        "maxStretch": 156.08705714993417,
+        "stretchP99": 1.8553275257400923,
+        "overDouble": 1740,
+        "compressed": 46,
+        "collapsed": 2,
+        "sharp": 695,
+        "folded": 401
+      },
+      "newCollapse": 2,
+      "regressed": [
+        "stretchP99"
+      ],
+      "vsBaseline": [
+        "stretchP99",
+        "collapsed"
+      ],
+      "maxMoveM": 0.030411962745153988,
+      "moved": 8039
+    },
+    {
+      "name": "0.021-fair-0.5",
+      "metrics": {
+        "excessBend": 5281.920528322495,
+        "maxStretch": 177.3577643161265,
+        "stretchP99": 1.8162170836155518,
+        "overDouble": 1692,
+        "compressed": 143,
+        "collapsed": 3,
+        "sharp": 710,
+        "folded": 381
+      },
+      "newCollapse": 3,
+      "regressed": [
+        "stretchP99"
+      ],
+      "vsBaseline": [
+        "stretchP99",
+        "collapsed"
+      ],
+      "maxMoveM": 0.02027464183010267,
+      "moved": 8039
+    },
+    {
+      "name": "0.04-strain-1.0",
+      "metrics": {
+        "excessBend": 6716.077129684853,
+        "maxStretch": 57.83518876523347,
+        "stretchP99": 1.916431425991895,
+        "overDouble": 2025,
+        "compressed": 1,
+        "collapsed": 2,
+        "sharp": 960,
+        "folded": 578
+      },
+      "newCollapse": 2,
+      "regressed": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "sharp",
+        "folded"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "collapsed",
+        "sharp",
+        "folded"
+      ],
+      "maxMoveM": 0.0772367307813434,
+      "moved": 3965
+    },
+    {
+      "name": "0.04-strain-0.75",
+      "metrics": {
+        "excessBend": 6527.318281893423,
+        "maxStretch": 98.34998784350753,
+        "stretchP99": 1.8881869771211781,
+        "overDouble": 1909,
+        "compressed": 2,
+        "collapsed": 2,
+        "sharp": 922,
+        "folded": 553
+      },
+      "newCollapse": 2,
+      "regressed": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "sharp",
+        "folded"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "collapsed",
+        "sharp",
+        "folded"
+      ],
+      "maxMoveM": 0.05792754808600754,
+      "moved": 3965
+    },
+    {
+      "name": "0.04-strain-0.5",
+      "metrics": {
+        "excessBend": 6403.060322072006,
+        "maxStretch": 138.86617651009925,
+        "stretchP99": 1.853657984910767,
+        "overDouble": 1835,
+        "compressed": 50,
+        "collapsed": 2,
+        "sharp": 894,
+        "folded": 526
+      },
+      "newCollapse": 2,
+      "regressed": [
+        "excessBend",
+        "stretchP99",
+        "folded"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "collapsed",
+        "sharp",
+        "folded"
+      ],
+      "maxMoveM": 0.03861836539067172,
+      "moved": 3965
+    },
+    {
+      "name": "0.04-detail-1.0",
+      "metrics": {
+        "excessBend": 8181.566444356013,
+        "maxStretch": 57.83230819318413,
+        "stretchP99": 1.890322060351044,
+        "overDouble": 1822,
+        "compressed": 0,
+        "collapsed": 0,
+        "sharp": 1264,
+        "folded": 699
+      },
+      "newCollapse": 0,
+      "regressed": [
+        "excessBend",
+        "stretchP99",
+        "sharp",
+        "folded"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "sharp",
+        "folded"
+      ],
+      "maxMoveM": 0.07723673078134338,
+      "moved": 8039
+    },
+    {
+      "name": "0.04-detail-0.75",
+      "metrics": {
+        "excessBend": 7245.2310571983535,
+        "maxStretch": 98.34871741613618,
+        "stretchP99": 1.8502523184792365,
+        "overDouble": 1707,
+        "compressed": 73,
+        "collapsed": 3,
+        "sharp": 1031,
+        "folded": 599
+      },
+      "newCollapse": 3,
+      "regressed": [
+        "excessBend",
+        "stretchP99",
+        "sharp",
+        "folded"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "collapsed",
+        "sharp",
+        "folded"
+      ],
+      "maxMoveM": 0.057927548086007544,
+      "moved": 8039
+    },
+    {
+      "name": "0.04-detail-0.5",
+      "metrics": {
+        "excessBend": 6438.972562814577,
+        "maxStretch": 138.8655766713071,
+        "stretchP99": 1.8118935286269022,
+        "overDouble": 1675,
+        "compressed": 152,
+        "collapsed": 2,
+        "sharp": 922,
+        "folded": 513
+      },
+      "newCollapse": 2,
+      "regressed": [
+        "excessBend",
+        "stretchP99",
+        "sharp"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "collapsed",
+        "sharp",
+        "folded"
+      ],
+      "maxMoveM": 0.03861836539067169,
+      "moved": 8039
+    },
+    {
+      "name": "0.04-fair-1.0",
+      "metrics": {
+        "excessBend": 5370.584775397674,
+        "maxStretch": 57.83359134632294,
+        "stretchP99": 1.894160353324166,
+        "overDouble": 1894,
+        "compressed": 0,
+        "collapsed": 1,
+        "sharp": 777,
+        "folded": 437
+      },
+      "newCollapse": 1,
+      "regressed": [
+        "stretchP99",
+        "overDouble"
+      ],
+      "vsBaseline": [
+        "stretchP99",
+        "overDouble"
+      ],
+      "maxMoveM": 0.0772367307813434,
+      "moved": 8039
+    },
+    {
+      "name": "0.04-fair-0.75",
+      "metrics": {
+        "excessBend": 4974.730732393992,
+        "maxStretch": 98.34928332324306,
+        "stretchP99": 1.8550318789047102,
+        "overDouble": 1739,
+        "compressed": 49,
+        "collapsed": 2,
+        "sharp": 667,
+        "folded": 384
+      },
+      "newCollapse": 2,
+      "regressed": [
+        "stretchP99"
+      ],
+      "vsBaseline": [
+        "stretchP99",
+        "collapsed"
+      ],
+      "maxMoveM": 0.05792754808600757,
+      "moved": 8039
+    },
+    {
+      "name": "0.04-fair-0.5",
+      "metrics": {
+        "excessBend": 5056.98615630754,
+        "maxStretch": 138.86584386660996,
+        "stretchP99": 1.8154166908972216,
+        "overDouble": 1685,
+        "compressed": 143,
+        "collapsed": 3,
+        "sharp": 687,
+        "folded": 376
+      },
+      "newCollapse": 3,
+      "regressed": [
+        "stretchP99"
+      ],
+      "vsBaseline": [
+        "stretchP99",
+        "collapsed"
+      ],
+      "maxMoveM": 0.0386183653906717,
+      "moved": 8039
+    },
+    {
+      "name": "0.08-strain-1.0",
+      "metrics": {
+        "excessBend": 6693.502803309186,
+        "maxStretch": 47.697601602511455,
+        "stretchP99": 1.9158116259666755,
+        "overDouble": 2021,
+        "compressed": 1,
+        "collapsed": 2,
+        "sharp": 958,
+        "folded": 578
+      },
+      "newCollapse": 2,
+      "regressed": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "sharp",
+        "folded"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "collapsed",
+        "sharp",
+        "folded"
+      ],
+      "maxMoveM": 0.08470797611519378,
+      "moved": 3965
+    },
+    {
+      "name": "0.08-strain-0.75",
+      "metrics": {
+        "excessBend": 6526.616642395953,
+        "maxStretch": 86.59666897955886,
+        "stretchP99": 1.8880311809795198,
+        "overDouble": 1907,
+        "compressed": 2,
+        "collapsed": 2,
+        "sharp": 926,
+        "folded": 554
+      },
+      "newCollapse": 2,
+      "regressed": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "sharp",
+        "folded"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "collapsed",
+        "sharp",
+        "folded"
+      ],
+      "maxMoveM": 0.06353098208639531,
+      "moved": 3965
+    },
+    {
+      "name": "0.08-strain-0.5",
+      "metrics": {
+        "excessBend": 6414.502325343673,
+        "maxStretch": 131.02953665815045,
+        "stretchP99": 1.8538193865380794,
+        "overDouble": 1836,
+        "compressed": 50,
+        "collapsed": 2,
+        "sharp": 891,
+        "folded": 528
+      },
+      "newCollapse": 2,
+      "regressed": [
+        "excessBend",
+        "stretchP99",
+        "folded"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "collapsed",
+        "sharp",
+        "folded"
+      ],
+      "maxMoveM": 0.04235398805759689,
+      "moved": 3965
+    },
+    {
+      "name": "0.08-detail-1.0",
+      "metrics": {
+        "excessBend": 8171.527159107225,
+        "maxStretch": 47.697601602511455,
+        "stretchP99": 1.8897236473268146,
+        "overDouble": 1813,
+        "compressed": 0,
+        "collapsed": 0,
+        "sharp": 1263,
+        "folded": 706
+      },
+      "newCollapse": 0,
+      "regressed": [
+        "excessBend",
+        "stretchP99",
+        "sharp",
+        "folded"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "sharp",
+        "folded"
+      ],
+      "maxMoveM": 0.08628150618552681,
+      "moved": 8039
+    },
+    {
+      "name": "0.08-detail-0.75",
+      "metrics": {
+        "excessBend": 7309.350540705336,
+        "maxStretch": 84.12067355393985,
+        "stretchP99": 1.8494072011766218,
+        "overDouble": 1699,
+        "compressed": 73,
+        "collapsed": 3,
+        "sharp": 1039,
+        "folded": 603
+      },
+      "newCollapse": 3,
+      "regressed": [
+        "excessBend",
+        "stretchP99",
+        "sharp",
+        "folded"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "collapsed",
+        "sharp",
+        "folded"
+      ],
+      "maxMoveM": 0.06471112963914512,
+      "moved": 8039
+    },
+    {
+      "name": "0.08-detail-0.5",
+      "metrics": {
+        "excessBend": 6495.415001086009,
+        "maxStretch": 129.37874479467632,
+        "stretchP99": 1.811421882760963,
+        "overDouble": 1668,
+        "compressed": 153,
+        "collapsed": 2,
+        "sharp": 920,
+        "folded": 512
+      },
+      "newCollapse": 2,
+      "regressed": [
+        "excessBend",
+        "stretchP99",
+        "sharp"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "collapsed",
+        "sharp",
+        "folded"
+      ],
+      "maxMoveM": 0.043140753092763384,
+      "moved": 8039
+    },
+    {
+      "name": "0.08-fair-1.0",
+      "metrics": {
+        "excessBend": 5441.259174668345,
+        "maxStretch": 47.697601602511455,
+        "stretchP99": 1.8933598207811273,
+        "overDouble": 1885,
+        "compressed": 0,
+        "collapsed": 1,
+        "sharp": 790,
+        "folded": 446
+      },
+      "newCollapse": 1,
+      "regressed": [
+        "stretchP99",
+        "overDouble"
+      ],
+      "vsBaseline": [
+        "stretchP99",
+        "overDouble",
+        "sharp"
+      ],
+      "maxMoveM": 0.08631824970620647,
+      "moved": 8039
+    },
+    {
+      "name": "0.08-fair-0.75",
+      "metrics": {
+        "excessBend": 5022.049098025238,
+        "maxStretch": 84.06355017003268,
+        "stretchP99": 1.8528812098172347,
+        "overDouble": 1730,
+        "compressed": 47,
+        "collapsed": 2,
+        "sharp": 676,
+        "folded": 384
+      },
+      "newCollapse": 2,
+      "regressed": [
+        "stretchP99"
+      ],
+      "vsBaseline": [
+        "stretchP99",
+        "collapsed"
+      ],
+      "maxMoveM": 0.06473868727965484,
+      "moved": 8039
+    },
+    {
+      "name": "0.08-fair-0.5",
+      "metrics": {
+        "excessBend": 5099.380859944913,
+        "maxStretch": 129.34049759653104,
+        "stretchP99": 1.8127172573046515,
+        "overDouble": 1677,
+        "compressed": 145,
+        "collapsed": 4,
+        "sharp": 691,
+        "folded": 376
+      },
+      "newCollapse": 4,
+      "regressed": [
+        "stretchP99",
+        "collapsed"
+      ],
+      "vsBaseline": [
+        "stretchP99",
+        "collapsed"
+      ],
+      "maxMoveM": 0.043159124853103234,
+      "moved": 8039
+    },
+    {
+      "name": "arap-0.01-0.04",
+      "metrics": {
+        "excessBend": 7073.859737282436,
+        "maxStretch": 59.04935523313356,
+        "stretchP99": 1.863135149018044,
+        "overDouble": 2127,
+        "compressed": 2,
+        "collapsed": 1,
+        "sharp": 938,
+        "folded": 368
+      },
+      "newCollapse": 1,
+      "regressed": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "sharp"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "sharp"
+      ],
+      "maxMoveM": 0.07666050732460439
+    },
+    {
+      "name": "arap-0.01-0.08",
+      "metrics": {
+        "excessBend": 7027.470961091352,
+        "maxStretch": 54.36961734318939,
+        "stretchP99": 1.8629879353988188,
+        "overDouble": 2127,
+        "compressed": 2,
+        "collapsed": 1,
+        "sharp": 938,
+        "folded": 370
+      },
+      "newCollapse": 1,
+      "regressed": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "sharp"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "sharp"
+      ],
+      "maxMoveM": 0.07889363125258837
+    },
+    {
+      "name": "arap-0.04-0.04",
+      "metrics": {
+        "excessBend": 7020.0829309608225,
+        "maxStretch": 70.9944454900241,
+        "stretchP99": 1.8771667839376496,
+        "overDouble": 2207,
+        "compressed": 6,
+        "collapsed": 0,
+        "sharp": 949,
+        "folded": 406
+      },
+      "newCollapse": 0,
+      "regressed": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "sharp"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "sharp"
+      ],
+      "maxMoveM": 0.07096586357562752
+    },
+    {
+      "name": "arap-0.04-0.08",
+      "metrics": {
+        "excessBend": 7020.0829309608225,
+        "maxStretch": 70.9944454900241,
+        "stretchP99": 1.8771667839376496,
+        "overDouble": 2207,
+        "compressed": 6,
+        "collapsed": 0,
+        "sharp": 949,
+        "folded": 406
+      },
+      "newCollapse": 0,
+      "regressed": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "sharp"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "sharp"
+      ],
+      "maxMoveM": 0.07096586357562752
+    },
+    {
+      "name": "arap-0.15-0.04",
+      "metrics": {
+        "excessBend": 6953.180229281881,
+        "maxStretch": 99.85025420557466,
+        "stretchP99": 1.8912992730552303,
+        "overDouble": 2259,
+        "compressed": 13,
+        "collapsed": 0,
+        "sharp": 1011,
+        "folded": 484
+      },
+      "newCollapse": 0,
+      "regressed": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "sharp"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "sharp",
+        "folded"
+      ],
+      "maxMoveM": 0.05721216190491254
+    },
+    {
+      "name": "arap-0.15-0.08",
+      "metrics": {
+        "excessBend": 6953.180229281881,
+        "maxStretch": 99.85025420557466,
+        "stretchP99": 1.8912992730552303,
+        "overDouble": 2259,
+        "compressed": 13,
+        "collapsed": 0,
+        "sharp": 1011,
+        "folded": 484
+      },
+      "newCollapse": 0,
+      "regressed": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "sharp"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "overDouble",
+        "sharp",
+        "folded"
+      ],
+      "maxMoveM": 0.05721216190491254
+    },
+    {
+      "name": "band-1.7-0.04",
+      "metrics": {
+        "excessBend": 22212.569375370003,
+        "maxStretch": 57.83519619713252,
+        "stretchP99": 1.8216655965131752,
+        "overDouble": 1735,
+        "compressed": 0,
+        "collapsed": 0,
+        "sharp": 3668,
+        "folded": 2277
+      },
+      "newCollapse": 0,
+      "regressed": [
+        "excessBend",
+        "stretchP99",
+        "sharp",
+        "folded"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "sharp",
+        "folded"
+      ],
+      "maxMoveM": 0.07723673078134337
+    },
+    {
+      "name": "band-1.7-0.08",
+      "metrics": {
+        "excessBend": 22130.325103770083,
+        "maxStretch": 47.697601602511455,
+        "stretchP99": 1.8196341967831138,
+        "overDouble": 1718,
+        "compressed": 0,
+        "collapsed": 0,
+        "sharp": 3668,
+        "folded": 2272
+      },
+      "newCollapse": 0,
+      "regressed": [
+        "excessBend",
+        "stretchP99",
+        "sharp",
+        "folded"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "stretchP99",
+        "sharp",
+        "folded"
+      ],
+      "maxMoveM": 0.0868153751000642
+    },
+    {
+      "name": "band-1.5-0.04",
+      "metrics": {
+        "excessBend": 22261.709724980556,
+        "maxStretch": 57.835605101668925,
+        "stretchP99": 1.7936876765077272,
+        "overDouble": 1762,
+        "compressed": 0,
+        "collapsed": 0,
+        "sharp": 3672,
+        "folded": 2290
+      },
+      "newCollapse": 0,
+      "regressed": [
+        "excessBend",
+        "sharp",
+        "folded"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "sharp",
+        "folded"
+      ],
+      "maxMoveM": 0.07723673078134338
+    },
+    {
+      "name": "band-1.5-0.08",
+      "metrics": {
+        "excessBend": 22162.912044332305,
+        "maxStretch": 47.697601602511455,
+        "stretchP99": 1.7907846669363334,
+        "overDouble": 1742,
+        "compressed": 0,
+        "collapsed": 0,
+        "sharp": 3670,
+        "folded": 2284
+      },
+      "newCollapse": 0,
+      "regressed": [
+        "excessBend",
+        "sharp",
+        "folded"
+      ],
+      "vsBaseline": [
+        "excessBend",
+        "sharp",
+        "folded"
+      ],
+      "maxMoveM": 0.08710025414011584
+    }
+  ],
+  "limitations": "Offline exploratory candidates. Metric thresholds unchanged. Every candidate regressed at least one existing raw-pose shape metric; newCollapse is independently recorded. Not a CSP or general model qualification.",
+  "retainedBaseline": {
+    "excessBend": 5640.842856615753,
+    "maxStretch": 198.6287880280724,
+    "stretchP99": 1.8066536507985997,
+    "overDouble": 1785,
+    "compressed": 180,
+    "collapsed": 1,
+    "sharp": 783,
+    "folded": 482
+  },
+  "retainedBaselineNote": "v10 female CMU restores the v9 path; max final vertex difference from v9 is below 1 micrometer",
+  "reproductionScript": "scripts/local_converter/experiment_followup_surface.py",
+  "inputStagesSha256": "28cfd70f6148ff2016c7ec8c48e8d5f9664e00b51e3d4023774f3bc60e129c00",
+  "runtimeManifestSha256": "eaac3841c8b9e693ff88c959eabaceaf1ecc298e547eede748e83ad4a0de1d70"
+}
