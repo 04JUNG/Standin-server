@@ -156,7 +156,7 @@ RUN /usr/sbin/useradd --system --uid 10001 --create-home --home-dir /home/standi
     && mkdir --parents /characters "$CONVERTER_TEMP_ROOT" "$BLENDER_USER_RESOURCES" \
     && chown --recursive standin:standin \
         /app /characters /home/standin "$CONVERTER_TEMP_ROOT" "$BLENDER_USER_RESOURCES" \
-    && python -c "import importlib.util,sys; sys.exit(0 if importlib.util.find_spec('bpy') is None else 1)"
+    && python -c "import importlib.util, sys; import numpy; sys.exit(0 if importlib.util.find_spec('bpy') is None else 1)"
 
 USER 10001:10001
 
