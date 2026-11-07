@@ -1,0 +1,9 @@
+{
+  "source": "rough-only visual review of foreground and arm windows before candidate scoring",
+  "cases": {
+    "005": {"foreground": "orange", "windows": [[0.16, 0.28, 0.39, 0.44], [0.72, 0.14, 0.88, 0.25]]},
+    "006": {"foreground": "orange", "windows": [[0.10, 0.16, 0.30, 0.27], [0.67, 0.16, 0.85, 0.29]]},
+    "039": {"foreground": "outlined_on_white", "windows": [[0.10, 0.05, 0.36, 0.18], [0.75, 0.23, 0.97, 0.37]]},
+    "053": {"foreground": "gray_on_white", "windows": [[0.53, 0.25, 0.78, 0.60]]}
+  }
+}
