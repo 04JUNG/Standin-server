@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from experiments.refine_v5.ab_blender import apply_rotations, bone_world, sha, verify_plan, weighted_mesh
 from experiments.refine_v5.ab_native_audit import export_checked, snapshot, strict_skin, triage, write
 from experiments.refine_v5.audit_iterative_native import load
-from experiments.refine_v5.target_safety import skin_nonregression
+from experiments.refine_v5.target_safety import independent_edits, skin_nonregression
 
 
 METHODS = ('oracle', 'automatic', 'learned')
@@ -69,7 +69,29 @@ def regional_trial(arm, meshes, names, baseline, baseline_skin, edits, output, e
     return (matrices, vertices, faces, cloud, frame_error), []
 
 
-def audit(p1, run, method):
+def salvage(source, names, baseline, baseline_skin, edits, attempts, saved):
+    groups, blocked = independent_edits(edits, attempts)
+    combined, fractions, records = {}, {}, []
+    selected = None
+    for group, group_edits in groups.items():
+        for fraction in FRACTIONS:
+            scaled = {name: (fraction * np.asarray(value)).tolist() for name, value in group_edits.items()}
+            trial = dict(combined, **scaled)
+            arm, meshes = load(source)
+            try:
+                pose, reasons = regional_trial(arm, meshes, names, baseline, baseline_skin, trial, saved)
+            except ValueError as exc:
+                pose, reasons = None, ['fk: ' + str(exc)]
+            records.append(dict(group=group, fraction=fraction, combined_groups=[*fractions, group], reasons=reasons))
+            if pose is not None:
+                combined = trial
+                fractions[group] = fraction
+                selected = pose
+                break
+    return selected, fractions, blocked, records
+
+
+def audit(p1, run, method, *, salvage_partial=False):
     cohort = read(run / 'cohort.json')
     if sha(p1 / 'manifest.json') != cohort['p1_manifest_sha256']:
         raise ValueError('P0 manifest changed')
@@ -108,6 +130,11 @@ def audit(p1, run, method):
             if selected is not None:
                 fraction = trial
                 break
+        group_fractions, blocked_groups, partial_attempts = {}, [], []
+        if salvage_partial and selected is None and edits:
+            selected, group_fractions, blocked_groups, partial_attempts = salvage(
+                source, names, baseline, baseline_skin, edits, attempt_rows, saved)
+        selection = 'partial' if group_fractions else ('uniform' if fraction is not None else 'fallback')
         skin, cloud, frame_error = None, None, None
         if selected is None:
             shutil.copyfile(source, saved)
@@ -116,12 +143,14 @@ def audit(p1, run, method):
             matrices, vertices, faces, cloud, frame_error = selected
             skin = strict_skin(vertices, faces, rig['body_asset_sha256'], full_body=True)
         write(output / f'{cid}.json', dict(case_id=cid, fraction=fraction, attempts=attempt_rows,
+            selection=selection, group_fractions=group_fractions, blocked_groups=blocked_groups,
+            partial_attempts=partial_attempts,
             source_sha256=rig['source_sha256'], output_sha256=sha(saved), cloud_m=cloud, frame_error=frame_error,
             full_skin_status=skin['status'] if skin else None,
             full_skin_certified=skin['complete_collision_certificate'] if skin else False,
             full_skin_reasons=(skin['hard_violations'] + skin['unverified_reasons']) if skin else [],
             matrices=matrices))
-        print('P4', method, cid, fraction, attempt_rows[-1]['reasons'] if attempt_rows else 'no edit', flush=True)
+        print('P4', method, cid, selection, fraction, group_fractions, attempt_rows[-1]['reasons'] if attempt_rows else 'no edit', flush=True)
 
 
 def capture(p1, run):
@@ -155,8 +184,8 @@ if __name__ == '__main__':
     stage, p1, run, *args = sys.argv[sys.argv.index('--') + 1:]
     if stage == 'prepare':
         prepare(Path(p1), Path(run))
-    elif stage == 'audit' and len(args) == 1 and args[0] in METHODS:
-        audit(Path(p1), Path(run), args[0])
+    elif stage in ('audit', 'audit-partial') and len(args) == 1 and args[0] in METHODS:
+        audit(Path(p1), Path(run), args[0], salvage_partial=stage == 'audit-partial')
     elif stage == 'capture':
         capture(Path(p1), Path(run))
     else:

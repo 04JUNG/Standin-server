@@ -40,6 +40,10 @@ def mean_direction(row):
     return float(np.mean(parts)) if parts else None
 
 
+def kept(audit):
+    return audit['fraction'] is not None or bool(audit.get('group_fractions'))
+
+
 def draw_case(p1, run, case, row):
     cid = row['case_id']
     width, height = 245, 220
@@ -150,7 +154,7 @@ def run_report(p1, run, gt_audit):
             audit = load_json(run / 'native' / method / f'{cid}.json')
             path = run / 'native' / method / f'{cid}.fbx'
             if (audit['source_sha256'] != source_sha or digest(path) != audit['output_sha256']
-                    or (audit['fraction'] is None and audit['output_sha256'] != source_sha)):
+                    or (not kept(audit) and audit['output_sha256'] != source_sha)):
                 raise ValueError('saved pose binding differs')
             row['proposed'][method] = score(planned_pose(data, plan), data)
             row['saved'][method] = score(np.asarray([audit['matrices'][n] for n in names]), data)
@@ -162,12 +166,13 @@ def run_report(p1, run, gt_audit):
     for method in METHODS:
         audits = [row['audit'][method] for row in rows]
         gate[method] = dict(
-            accepted=sum(a['fraction'] is not None for a in audits),
+            accepted=sum(kept(a) for a in audits),
+            partial_accepted=sum(bool(a.get('group_fractions')) for a in audits),
             fractions=dict(Counter(str(a['fraction']) for a in audits)),
             no_supported_edit=sum(not a['attempts'] for a in audits),
-            rejected_after_attempts=sum(a['fraction'] is None and bool(a['attempts']) for a in audits),
+            rejected_after_attempts=sum(not kept(a) and bool(a['attempts']) for a in audits),
             full_skin_certified=sum(a['full_skin_certified'] for a in audits),
-            failure_reasons=dict(Counter(reason for a in audits if a['fraction'] is None and a['attempts']
+            failure_reasons=dict(Counter(reason for a in audits if not kept(a) and a['attempts']
                                          for reason in a['attempts'][-1]['reasons'])),
         )
     report = dict(training={key: model[key] for key in ('development_used', 'development_skipped', 'method')},
