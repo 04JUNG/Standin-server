@@ -64,3 +64,22 @@ python tests/test_smoke.py
 - `*.safe.fbx`: 현재는 전부 B0와 바이트까지 동일. 후보 개선치를 안전 출력 성능으로 인용하지 않는다.
 
 보류된 finger/contact/support/surface-normal/profile 인증과 P6는 보고서의 다음 개선 항목으로 남아 있다.
+
+### VLM 팔다리 목표 10컷
+
+`part_vlm_observe`는 이전 20컷 재생에서 다리가 관측된 9컷과 다리가 잘린 대조 1컷을 고정한다. OpenAI에는 러프만 보낸다. VLM은 해부학적 좌우, 굽힘 범위, 앞뒤, 허벅지 높이, 지지와 손 접촉 단서를 제공한다. 솔버는 기존 RTMPose와 독립 가시성 검수에서 확인한 화면 위치를 결합하고, 같은 B0에서 네 팔다리를 한 번에 조정한다.
+
+아래에서 `REPLAY20`은 기존 20컷의 원본 실행 폴더, `RUN`과 `OUT`은 새 폴더, `P0`는 정답 FBX 및 동결된 검출 결과가 있는 P0 폴더다. `VLM_ENV`는 OpenAI 설정을 가진 로컬 env 파일이다.
+
+```sh
+python -m experiments.refine_v5.part_vlm_observe \
+  --root "$RUN" --prepare-control "$REPLAY20" --env-file "$VLM_ENV"
+python -m experiments.refine_v5.part_vlm_fit \
+  --root "$RUN" --seeds "$P0/all-seeds/seeds.json"
+blender -b --python-exit-code 1 --python experiments/refine_v5/part_vlm_native.py -- \
+  "$RUN" "$REPLAY20" "$P0/data/정답_3d인형"
+python -m experiments.refine_v5.part_vlm_report \
+  --root "$RUN" --control "$REPLAY20" --out "$OUT"
+```
+
+같은 러프와 스키마에 이미 받은 응답을 재사용할 때는 `--prepare-control`을 빼고 같은 `RUN`을 지정한다. 비교 시트는 기존 검출 방식, 피부 검사 전 VLM 보정안, 피부 검사 후 저장 결과를 따로 표시한다. 지역 피부 검사에서 회귀하면 원본 B0를 그대로 저장한다. 전체 피부 인증 상태와 컷별 손 접촉은 비교 JSON에 기록한다.
