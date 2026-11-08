@@ -85,7 +85,7 @@ class Limb:
     cap: np.ndarray
 
 
-def make_limb(key, goal, lookup, base, basis):
+def make_limb(key, goal, lookup, base, basis, caps):
     chain = CHAINS[key][0]
     leg = key.endswith('leg')
     ids = [lookup[name] for name in chain]
@@ -102,17 +102,19 @@ def make_limb(key, goal, lookup, base, basis):
     if np.linalg.norm(axis) < 1e-6:
         raise ValueError('indeterminate hinge')
     hinge = unit(np.linalg.solve(base[ids[1], :3, :3], axis))
-    return Limb(chain, ids, goal, leg, hinge, bend, np.deg2rad([JOINT_CAPS[n] for n in chain[:2]]))
+    return Limb(chain, ids, goal, leg, hinge, bend, np.deg2rad([caps[n] for n in chain[:2]]))
 
 
-def fit(case, mesh, goals):
+def fit(case, mesh, goals, *, caps=None, prior=None):
     if not goals:
         return None
     names, lookup, parents, local, base = prepare(case)
     _, _, torso, basis = frame(case['bones'])
     camera = case['camera']
     scale = max(1., camera['rough_unit_px'])
-    limbs = [make_limb(key, goal, lookup, base, basis) for key, goal in goals.items()]
+    caps = JOINT_CAPS if caps is None else caps
+    prior = prior or {}
+    limbs = [make_limb(key, goal, lookup, base, basis, caps) for key, goal in goals.items()]
     active = [index for limb in limbs for index in limb.ids[:2]]
     all_pts = base[:, :3, 3]
     body_up = basis[:, 1]
@@ -170,7 +172,7 @@ def fit(case, mesh, goals):
                     endpoint_height_change_torso=float((points[-1] - all_pts[limb.ids[-1]]) @ body_up / torso),
                     screen=screen, hand_gap_m=float(gap) if gap is not None else None)
 
-    def terms(world, limb, *, include_safety):
+    def terms(world, limb, *, include_safety, learned=None):
         goal = limb.goal
         values = observations(world, limb)
         out = []
@@ -191,6 +193,11 @@ def fit(case, mesh, goals):
         if gap is not None:
             interval = (.040, 10.) if goal['contact'] == 'clear_of_waist' else (0., .021)
             out.append(1.8 * outside(gap, interval) / torso)
+        if learned:
+            directions = np.asarray([unit(v) for v in np.diff(world[limb.ids, :3, 3], axis=0)]) @ basis
+            for direction, wanted in zip(directions, learned, strict=True):
+                if wanted is not None:
+                    out.extend(.38 * (direction - wanted))
         if include_safety and limb.chain[0] in probes:
             distance, signed = body_surface.sample(probes[limb.chain[0]](world))
             intrusion = np.where(distance < .07, np.maximum(0., .007 - signed), 0.)
@@ -199,7 +206,8 @@ def fit(case, mesh, goals):
 
     def residual(parameters):
         edits, world = pose(parameters)
-        return np.r_[np.concatenate([terms(world, limb, include_safety=True) for limb in limbs]),
+        return np.r_[np.concatenate([terms(world, limb, include_safety=True, learned=prior.get(key))
+                                     for key, limb in zip(goals, limbs, strict=True)]),
                      .085 * edits.ravel()]
 
     zero = np.clip(np.zeros(len(lower)), lower, upper)
@@ -224,7 +232,7 @@ def fit(case, mesh, goals):
         if limb.goal['support'] == 'planted':
             foot = limb.ids[-1]
             delta = Rotation.from_matrix(np.linalg.solve(world[foot, :3, :3], base[foot, :3, :3])).as_rotvec()
-            rotations[names[foot]] = limit_vectors(delta, [np.deg2rad(JOINT_CAPS[names[foot]])])[0]
+            rotations[names[foot]] = limit_vectors(delta, [np.deg2rad(caps[names[foot]])])[0]
     world = fk(local, parents, [lookup[name] for name in rotations], list(rotations.values()))
     for key, limb in zip(goals, limbs, strict=True):
         outcomes[key]['after'] = observations(world, limb)

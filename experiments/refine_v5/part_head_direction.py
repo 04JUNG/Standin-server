@@ -12,7 +12,8 @@ from experiments.refine_v5.part_head import head_axes
 REVIEW = Path(__file__).resolve().parents[2] / 'evaluation/refine_v5/head_direction_review_20261108.json'
 HEAD_CAP = 72.
 NECK_CAP = 12.
-LIMITS = {'yaw_deg': (-175., 175.), 'pitch_deg': (-80., 80.), 'neck_tilt_deg': (-175., 175.)}
+LIMITS = {'yaw_deg': (-175., 175.), 'pitch_deg': (-80., 80.), 'neck_tilt_deg': (-175., 175.),
+          'roll_deg': (-100., 100.)}
 
 
 def measure(case, world, names):
@@ -21,9 +22,13 @@ def measure(case, world, names):
     camera = np.asarray(case['camera']['rotation'])
     x, down, z = camera @ axes['forward']
     neck = camera @ axes['neck']
-    return dict(yaw_deg=float(np.degrees(np.arctan2(x, -z))),
+    values = dict(yaw_deg=float(np.degrees(np.arctan2(x, -z))),
                 pitch_deg=float(np.degrees(np.arctan2(down, np.hypot(x, z)))),
                 neck_tilt_deg=float(np.degrees(np.arctan2(neck[0], -neck[1]))))
+    if 'roll_deg' in case.get('direction_goal', {}):
+        up = camera @ axes['up']
+        values['roll_deg'] = float(np.degrees(np.arctan2(up[0], -up[1])))
+    return values
 
 
 def range_error(values, goal):
@@ -37,7 +42,7 @@ def range_error(values, goal):
 
 
 def validate_goal(goal):
-    if set(goal) - {*LIMITS, 'rough_crop', 'evidence'} or not {'yaw_deg', 'pitch_deg'} <= goal.keys():
+    if set(goal) - {*LIMITS, 'rough_crop', 'evidence'} or not {'yaw_deg', 'pitch_deg', 'roll_deg'} & goal.keys():
         raise ValueError('invalid head review')
     for name in (key for key in LIMITS if key in goal):
         lower, upper = LIMITS[name]
