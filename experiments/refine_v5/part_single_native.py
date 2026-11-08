@@ -38,6 +38,7 @@ def export(root, mode):
     if (output/'audit.json').exists():
         raise FileExistsError('FBX outcome is already frozen')
     case = json.loads((root/'input.json').read_text())
+    filename = f"{case['case_id']}-part-goals-head-limbs.fbx"
     source = Path(case['source'])
     bound = json.loads((output/'plan.json').read_text())
     if sha(root/'input.json') != bound['input_sha256'] or sha(source) != case['source_sha256']:
@@ -49,7 +50,7 @@ def export(root, mode):
     world = np.array(list(world_by_name.values()))
     verts, faces, weights = weighted_mesh(meshes, names)
     if plan is None:
-        shutil.copyfile(source, output/'029-part-goals-head-limbs.fbx')
+        shutil.copyfile(source, output/filename)
         np.savez_compressed(output/'final.npz', vertices=verts, faces=faces)
         write(output/'audit.json', dict(accepted=False, reason='no_supported_goal', source_sha256=sha(source),
              output_sha256=sha(source), bones=[dict(name=n,matrix=m.tolist()) for n,m in world_by_name.items()]))
@@ -57,15 +58,18 @@ def export(root, mode):
     if plan['source_sha256'] != case['source_sha256']:
         raise ValueError('plan source differs')
     active = set(plan['edits_deg'])
-    permitted = {'RightUpLeg':110.,'RightLeg':65.,'RightFoot':72.,'LeftArm':54.,'LeftForeArm':53.}
+    permitted = {'RightUpLeg':110.,'RightLeg':65.,'RightFoot':72.,'LeftArm':54.,'LeftForeArm':53.,'RightArm':54.,'RightForeArm':53.}
     if not active or active - permitted.keys():
         raise ValueError('unexpected edited joints')
     if any(np.asarray(r).shape != (3,) or not np.isfinite(r).all() or np.linalg.norm(r) > permitted[n]+1e-5
            for n,r in plan['edits_deg'].items()):
         raise ValueError('edit outside the pilot profile')
-    frozen_patches = frozen_contacts(verts, faces, weights, names, world, [('Left','waist')])
+    measure_waist = plan['goal'].get('left_arm', {}).get('clearance_m') is not None
+    frozen_patches = frozen_contacts(verts, faces, weights, names, world, [('Left','waist')]) if measure_waist else []
 
     def left_waist(v, f):
+        if not frozen_patches:
+            return None
         value = measure_contact(v, f, frozen_patches)[0]
         hand, _, waist = frozen_patches[0][2]
         tree = lambda idx: BVHTree.FromPolygons(v.tolist(), f[idx].tolist(), all_triangles=True)
@@ -95,7 +99,7 @@ def export(root, mode):
         try:
             arm, v, f, _, cloud, frame = export_checked(stage_file, arm, meshes, names, before, load)
         except RoundtripError as exc:
-            shutil.copyfile(source, output/'029-part-goals-head-limbs.fbx')
+            shutil.copyfile(source, output/filename)
             np.savez_compressed(output/'final.npz', vertices=verts, faces=faces)
             write(output/'audit.json', dict(accepted=False, reason=str(exc), source_sha256=sha(source),
                   output_sha256=sha(source), bones=[dict(name=n,matrix=m.tolist()) for n,m in world_by_name.items()]))
@@ -108,13 +112,13 @@ def export(root, mode):
         new_waist = left_waist(v, f)
         safety = (['skin_triage_unavailable'] if 'unavailable' in old_skin or 'unavailable' in new_skin
                   else skin_nonregression(old_skin, new_skin))
-        accepted = not safety and new_waist['triangle_crossings'] <= old_waist['triangle_crossings']
+        accepted = not safety and (not measure_waist or new_waist['triangle_crossings'] <= old_waist['triangle_crossings'])
         if not accepted:
             print('REGIONAL_REJECTED', safety, new_waist, flush=True)
         if accepted:
-            stage_file.replace(output/'029-part-goals-head-limbs.fbx')
+            stage_file.replace(output/filename)
         else:
-            shutil.copyfile(source, output/'029-part-goals-head-limbs.fbx')
+            shutil.copyfile(source, output/filename)
     np.savez_compressed(output/'final.npz', vertices=v if accepted else verts, faces=f if accepted else faces)
     saved_v, saved_f = (v, f) if accepted else (verts, faces)
     full_skin = strict_skin(saved_v, saved_f, case['body_asset_sha256'], full_body=True)
@@ -123,8 +127,8 @@ def export(root, mode):
         full_skin_status=full_skin['status'], full_skin_certified=full_skin['complete_collision_certificate'],
         before_waist=old_waist, after_waist=new_waist if accepted else old_waist, before_bends=bends(before['matrices']), after_bends=bends(actual if accepted else before['matrices']),
         bones=[dict(name=n, matrix=np.asarray(m).tolist()) for n,m in (actual if accepted else before['matrices']).items()],
-        source_sha256=sha(source), output_sha256=sha(output/'029-part-goals-head-limbs.fbx') if accepted else sha(source)))
-    print('029_NATIVE', accepted, drift, safety, new_waist, bends(actual), flush=True)
+        source_sha256=sha(source), output_sha256=sha(output/filename) if accepted else sha(source)))
+    print('SINGLE_NATIVE', case['case_id'], accepted, drift, safety, new_waist, bends(actual), flush=True)
 
 
 if __name__ == '__main__':

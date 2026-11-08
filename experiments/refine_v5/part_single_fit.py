@@ -1,4 +1,4 @@
-"""One constrained FK solve for the reviewed 029 limb pilot."""
+"""One constrained FK solve for a reviewed lift and a visible arm."""
 
 import numpy as np
 from scipy.optimize import least_squares
@@ -13,7 +13,15 @@ from experiments.refine_v5.part_quality import segment_cos
 def fit(case, mesh, goals):
     names, lookup, parents, local, base = prepare(case)
     _, hips, torso, basis = frame(case['bones'])
-    active = ('RightUpLeg', 'RightLeg', 'RightFoot', 'LeftArm', 'LeftForeArm')
+    leg = goals.get('right_leg')
+    arm = goals.get('left_arm') or goals.get('right_arm')
+    if not leg and not arm:
+        return None
+    if 'left_arm' in goals and 'right_arm' in goals:
+        raise ValueError('the current pilot can open one arm')
+    side = 'Right' if 'right_arm' in goals else 'Left'
+    arm_chain = tuple(side + suffix for suffix in ('Arm', 'ForeArm', 'Hand'))
+    active = ('RightUpLeg', 'RightLeg', 'RightFoot', *arm_chain[:2])
     ids = [lookup[n] for n in active]
     caps = np.deg2rad([110, 65., 72, 54, 53])
     box = np.repeat(caps, [3, 1, 3, 3, 3])
@@ -27,10 +35,6 @@ def fit(case, mesh, goals):
     weights = mesh['weights'][:, [list(mesh['names']).index(n) for n in names]]
     dominant = np.argmax(weights, axis=1)
 
-    leg = goals.get('right_leg')
-    arm = goals.get('left_arm')
-    if not leg and not arm:
-        return None
     observed_pixels = {name: bounds for goal in goals.values() for name, bounds in goal['pixels'].items()}
     unit = lambda v: v / np.linalg.norm(v)
     if leg:
@@ -47,20 +51,20 @@ def fit(case, mesh, goals):
     def samples(bones, limit, near_distal=False):
         indices = np.flatnonzero(np.isin(dominant, [lookup[n] for n in bones]) & (weights.max(axis=1) > .63))
         if near_distal:
-            first, last = base[[lookup['LeftArm'], lookup['LeftForeArm']], :3, 3]
+            first, last = base[[lookup[arm_chain[0]], lookup[arm_chain[1]]], :3, 3]
             direction = last-first
             x = (verts[indices]-first) @ direction / (direction @ direction)
             indices = indices[x > .35]
         indices = subsample(indices, limit)
         return SkinSample(verts[indices], dominant[indices], base)
 
-    pelvis = surface(['Hips','Spine','LeftUpLeg'])
+    pelvis = surface(['Hips', 'Spine', side + 'UpLeg']) if arm and arm.get('clearance_m') else None
     torso_surface = surface(['Hips','Spine','Spine1','Spine2'])
     left_leg = surface(['LeftUpLeg','LeftLeg','LeftFoot','LeftToeBase'])
-    hands = [n for n in names if n.startswith('LeftHand')]
+    hands = [n for n in names if n.startswith(arm_chain[2])]
     left_hand = samples(hands, 135)
-    left_forearm = samples(['LeftForeArm'], 65)
-    left_upperarm = samples(['LeftArm'], 75, near_distal=True)
+    left_forearm = samples([arm_chain[1]], 65)
+    left_upperarm = samples([arm_chain[0]], 75, near_distal=True)
     right_thigh = samples(['RightUpLeg'], 150)
     right_hip = base[lookup['RightUpLeg'], :3, 3]
     right_lower = samples(['RightLeg','RightFoot','RightToeBase'], 95)
@@ -109,20 +113,21 @@ def fit(case, mesh, goals):
             screen_terms.extend((weight*outside(xy,bounds)+.16*(xy-mid))/case['camera']['rough_unit_px'])
         foot = pixels[lookup['RightToeBase']]-pixels[lookup['RightFoot']]
         foot /= max(1e-6,np.linalg.norm(foot))
-        body_wrist = (pts[lookup['LeftHand']]-hips)@basis/torso
+        body_wrist = (pts[lookup[arm_chain[2]]]-hips)@basis/torso
         leg_vectors = np.diff(pts[[lookup[n] for n in ('RightUpLeg','RightLeg','RightFoot')]],axis=0) @ basis
-        arm_vectors = np.diff(pts[[lookup[n] for n in ('LeftArm','LeftForeArm','LeftHand')]],axis=0) @ basis
+        arm_vectors = np.diff(pts[[lookup[n] for n in arm_chain]],axis=0) @ basis
         terms = list(screen_terms)
         if leg:
             terms.append(1.8 * np.radians(outside(m['right_knee_bend'], knee_range)))
         if arm:
-            terms.append(1.5 * np.radians(outside(m['left_elbow_bend'], elbow_range)))
+            terms.append(1.5 * np.radians(outside(np.degrees(np.arccos(segment_cos(pts[[lookup[n] for n in arm_chain]]))), elbow_range)))
         if leg:
             terms.extend(np.r_[1.5 * outside(m['right_thigh_up_torso'], (-1.05, -.59)),
                                hip_clearance(right_thigh(world)), .12 * delta[0, 1],
                                1.1 * max(0., .80 - m['right_knee_forward_torso'])])
-        if arm:
-            terms.append(.50 * max(0., .85 - body_wrist[0]))
+        if pelvis is not None:
+            lateral = body_wrist[0] * (1. if side == 'Left' else -1.)
+            terms.append(.50 * max(0., .85 - lateral))
         if leg:
             terms.extend(np.r_[.66 * (unit(leg_vectors[0]) - desired_thigh),
                                .55 * (unit(leg_vectors[1]) - desired_shin)])
@@ -132,11 +137,12 @@ def fit(case, mesh, goals):
         if leg:
             terms.extend(.18 * (foot - np.asarray(leg['foot_screen'])))
         if arm:
-            terms.extend(np.r_[clearance(pelvis, left_hand(world), arm['clearance_m'], 6.),
-                               clearance(pelvis, left_forearm(world), .030, 4.),
-                               clearance(torso_surface, left_upperarm(world), .026, 6.)])
+            if pelvis is not None:
+                terms.extend(np.r_[clearance(pelvis, left_hand(world), arm['clearance_m'], 6.),
+                                   clearance(pelvis, left_forearm(world), .030, 4.),
+                                   clearance(torso_surface, left_upperarm(world), .026, 6.)])
             if arm.get('preserve_camera_depth'):
-                wrist_and_elbow = [lookup[n] for n in ('LeftForeArm', 'LeftHand')]
+                wrist_and_elbow = [lookup[n] for n in arm_chain[1:]]
                 axis = np.asarray(case['camera']['rotation'])[2]
                 change = ((pts[wrist_and_elbow] - base[wrist_and_elbow, :3, 3]) @ axis) / torso
                 terms.extend(.8 * outside(change, (-.06, .06)))

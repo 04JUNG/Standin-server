@@ -41,3 +41,13 @@ for mode in reviewed detector; do
 done
 python -m experiments.refine_v5.part_single_report --root "$single_run" --prior "$part_run" --out "$single_review"
 ```
+
+## 검증 split의 별도 10컷
+
+`single_goal_ten.json`은 기존 깊이 10컷과 029를 제외한 동일 정답셋의 단일 대상 validation 표본이다. `prepare_manifest(..., fixture=...)`와 `ab_blender.py -- prepare`로 B0와 메시를 준비한 뒤 아래 명령을 실행한다. 두 팔 중 관측이 충분한 한쪽을 고른다. 골반과의 공간 분리나 다리 들어 올림을 자동으로 확정할 독립 근거가 없어, 이 비교에서는 해당 자유도를 보호한다.
+
+```bash
+python -m experiments.refine_v5.part_single_batch --root "$ten_run" --previous "$p0_run"
+"$blender" -b --python-exit-code 1 --python experiments/refine_v5/part_single_batch_native.py -- "$ten_run" "$p0_run"
+python -m experiments.refine_v5.part_single_batch_report --root "$ten_run" --out "$ten_review"
+```
