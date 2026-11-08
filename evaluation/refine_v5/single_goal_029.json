@@ -1,0 +1,24 @@
+{
+  "case_id": "029",
+  "intent": {
+    "right_leg": "lift_forward_and_bend",
+    "left_arm": "extend_and_separate_from_waist",
+    "right_knee_intent_min_deg": 85,
+    "left_elbow_intent_max_deg": 18,
+    "left_waist_clearance_m": 0.042
+  },
+  "reviewed": {
+    "right_leg": {
+      "pixels": {"RightLeg": [[244,500],[294,565]], "RightFoot": [[230,674],[276,731]]},
+      "bend_deg": [92,96],
+      "directions": [[-0.08,-0.46,0.89],[0.02,-0.84,-0.54]],
+      "foot_screen": [-0.28,0.96]
+    },
+    "left_arm": {
+      "pixels": {"LeftForeArm": [[344,360],[389,415]], "LeftHand": [[370,475],[415,527]]},
+      "bend_deg": [3,12],
+      "directions": [[0.25,-0.96,-0.10],[0.33,-0.94,0]],
+      "clearance_m": 0.042
+    }
+  }
+}

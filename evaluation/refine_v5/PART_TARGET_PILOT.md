@@ -28,3 +28,16 @@ python -m experiments.refine_v5.part_head_direction --prior "$part_run" --out "$
 "$blender" -b --python-exit-code 1 --python experiments/refine_v5/part_head_direction_native.py -- "$direction_run" "$direction_native"
 python -m experiments.refine_v5.part_head_direction_report --root "$direction_run" --native "$direction_native" --prior "$part_run" --out "$direction_review"
 ```
+
+## 029 단일 시작 자세의 수동·검출 목표 비교
+
+수동 목표를 재현한 뒤 같은 FBX·카메라·보호 본·회전 한도에서 검출 목표를 실행한다. `head_review`는 기존 머리 보정 보고서 폴더, `direction_run`은 그 준비 manifest가 있는 폴더다. `single_run`과 `single_review`는 새 경로다. 두 실행은 각각 한 번의 IK를 수행한다. 검출 기반 실행의 펴기와 분리 의도는 사람이 제공한다. 깊이 방향을 확정할 수 없는 다리는 보류하고, 팔은 기존 카메라 깊이 근처에서 표면 간격을 푼다.
+
+```bash
+"$blender" -b --python-exit-code 1 --python experiments/refine_v5/part_single_native.py -- prepare "$single_run" "$direction_run" "$head_review"
+python -m experiments.refine_v5.part_single_pilot --root "$single_run" --seeds "$seed_json"
+for mode in reviewed detector; do
+  "$blender" -b --python-exit-code 1 --python experiments/refine_v5/part_single_native.py -- export "$single_run" "$mode"
+done
+python -m experiments.refine_v5.part_single_report --root "$single_run" --prior "$part_run" --out "$single_review"
+```
