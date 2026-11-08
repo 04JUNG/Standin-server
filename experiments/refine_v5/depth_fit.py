@@ -12,6 +12,7 @@ from experiments.refine_v5.depth_evidence import has_cue
 from experiments.refine_v5.depth_geometry import depth_points, lowest, measure, sole_indices, surface_regions
 from experiments.refine_v5.goal_probe_v2 import fk, prepare
 from experiments.refine_v5.learning_data import digest
+from experiments.refine_v5.part_quality import limb_terms
 
 PROFILES = {
     'depth_local': {'arm': [30., 30., 12.], 'leg': [30., 40., 12.]},
@@ -39,7 +40,7 @@ class Surface:
         self.normals = normals / np.maximum(np.linalg.norm(normals, axis=1)[:, None], 1e-12)
         self.tree = cKDTree(self.centers)
 
-    def sample(self, points):
+    def sample(self, points, *, with_normals=False):
         _, indices = self.tree.query(points, k=min(8, len(self.triangles)))
         if indices.ndim == 1:
             indices = indices[:, None]
@@ -64,7 +65,8 @@ class Surface:
             squared = np.minimum(squared, dot(points - closest, points - closest))
         nearest = squared.argmin(axis=1)
         row = np.arange(len(points))
-        return np.sqrt(squared[row, nearest]), normal_distance[row, nearest]
+        result = (np.sqrt(squared[row, nearest]), normal_distance[row, nearest])
+        return (*result, normals[row, nearest]) if with_normals else result
 
 
 def limit_vectors(values, bounds):
@@ -84,7 +86,13 @@ def candidate_row(case, method, names, world, edits, **diagnostics):
                 **diagnostics)
 
 
-def fit(case, skin, previous):
+def fit(case, skin, previous, *, part_mode=None):
+    if part_mode not in (None, 'ordinal', 'fused', 'learned'):
+        raise ValueError('unknown part pilot mode')
+    goal = case['part_goal'] if part_mode else None
+    if goal is not None and goal['reason'] is not None:
+        return {}
+    enriched = goal if part_mode in ('fused', 'learned') else None
     names, lookup, parents, local, base = prepare(case)
     camera = case['camera']
     torso = case['torso_world']
@@ -126,7 +134,14 @@ def fit(case, skin, previous):
     blocker_mask = (weights[:, blockers].sum(axis=1)[faces] > .75).all(axis=1)
     blocker = Surface(vertices[faces[blocker_mask]])
     seek_contact = has_cue(case, 'waist_side_contact') or (has_cue(case, 'head_front') and [side, 'head'] in case['contact'])
+    if goal is not None:
+        seek_contact = goal['contact'] is not None
     touch = Surface(vertices[faces[regions['target']]]) if seek_contact else None
+    palm_normal_local = None
+    if touch is not None and enriched is not None:
+        from converter.palm_waist_contact import palm_frame
+        _, palm_frame_b0, _ = palm_frame(base, names, side)
+        palm_normal_local = np.linalg.solve(base[ids[-1], :3, :3], palm_frame_b0.palm_normal)
     exact = {name: source_points[name] for name in source_points if name not in names}
     head_limit = exact.get('HeadRear')
     prior = np.array([previous.get(name, [0., 0., 0.]) for name in chain])
@@ -169,11 +184,20 @@ def fit(case, skin, previous):
             tangents = .12 * (unit(image_lines) - unit(rough_lines)).ravel()
             penalties = [3.2 * max(0., r['threshold_torso'] + .018 - r['value_torso'])
                          for r in relations]
+            if enriched is not None:
+                terms, _ = limb_terms(enriched, screen, world[ids, :3, 3], camera)
+                penalties.extend(terms)
             if touch is not None:
-                distances, _ = touch.sample(palm)
+                distances, _, outward = touch.sample(palm, with_normals=True)
                 # Keep a patch close to the side waist while leaving room for
                 # curved skin and the existing hand articulation.
                 penalties.append(2.0 * max(0., np.quantile(distances, .25) - .008) / torso)
+                if palm_normal_local is not None:
+                    palm_normal = world[ids[-1], :3, :3] @ palm_normal_local
+                    palm_normal /= np.linalg.norm(palm_normal)
+                    opposed = -(outward @ palm_normal)
+                    penalties.extend((1.4 * max(0., np.median(distances) - .012) / torso,
+                                      .18 * max(0., .45 - np.median(opposed))))
             if head_limit is not None:
                 ahead = (palm - head_limit) @ forward
                 penalties.append(1.1 * max(0., np.quantile(ahead, .90)) / torso)
@@ -191,7 +215,8 @@ def fit(case, skin, previous):
         starts = [np.zeros(9)]
         if np.any(prior):
             starts.append(limit_vectors(np.deg2rad(prior), caps).ravel())
-        starts.extend(limit_vectors(rng.normal(0., .42, (3, 3)) * caps[:, None], caps).ravel() for _ in range(6))
+        starts.extend(limit_vectors(rng.normal(0., .42, (3, 3)) * caps[:, None], caps).ravel()
+                      for _ in range(max(0, 2 - len(starts)) if part_mode else 6))
         candidates = []
         for index, start in enumerate(starts):
             clearance_weight = 8. if index % 2 == 0 else 20.

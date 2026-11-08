@@ -112,7 +112,7 @@ def measure(root, out, cases):
     return summary, records, native
 
 
-def review_images(root, out, cases, rows, native):
+def review_images(root, out, cases, rows, native, *, labels=LABELS, short=SHORT):
     lookup = {(r['case_id'], r['method']): r for r in rows}
     try:
         font = ImageFont.truetype('/System/Library/Fonts/Supplemental/Arial.ttf', 15)
@@ -124,14 +124,14 @@ def review_images(root, out, cases, rows, native):
     strips = []
     for case in cases:
         cid = case['case_id']
-        strip = Image.new('RGB', (width * 6, height), 'white')
+        strip = Image.new('RGB', (width * (len(labels) + 1), height), 'white')
         draw = ImageDraw.Draw(strip)
         draw.text((9, 8), cid + ' | Rough', fill='#202020', font=font)
         with Image.open(case['image']) as source:
             image = source.convert('RGB')
         image.thumbnail((width - 16, height - 45))
         strip.paste(image, ((width - image.width) // 2, 36))
-        screen = Image.new('RGB', (width * 5, 224), 'white')
+        screen = Image.new('RGB', (width * len(labels), 224), 'white')
         camera_draw = ImageDraw.Draw(screen)
         with Image.open(case['image']) as source:
             rough = source.convert('RGB')
@@ -141,7 +141,7 @@ def review_images(root, out, cases, rows, native):
         screen.paste(rough, (margin[0], 30 + margin[1]))
         camera_draw.text((9, 8), cid + ' | Rough', fill='#202020', font=font)
         views = []
-        for col, method in enumerate(LABELS, 1):
+        for col, method in enumerate(labels, 1):
             _, center, torso, basis = frame(native[cid, method]['bones'])
             with np.load(root / 'native' / f'{cid}-{method}.npz') as mesh:
                 vertices, faces = mesh['vertices'], mesh['faces']
@@ -161,7 +161,7 @@ def review_images(root, out, cases, rows, native):
             else:
                 screen.paste(render_projected(camera_space, faces, pixels, rough.size),
                              (col * width + margin[0], 30 + margin[1]))
-            camera_draw.text((col * width + 8, 8), SHORT[method], fill='#202020', font=font)
+            camera_draw.text((col * width + 8, 8), short[method], fill='#202020', font=font)
         screen.save(out / 'images' / f'{cid}-rough-camera.png')
         for index, yaw in enumerate((0., 90.)):
             rotation = Rotation.from_euler('y', yaw, degrees=True).as_matrix()
@@ -172,8 +172,8 @@ def review_images(root, out, cases, rows, native):
             for column, (vertices, faces) in enumerate(views, 1):
                 strip.paste(render(vertices, faces, size=size, yaw=yaw, framing=(scale, origin)),
                             (column * width, 43 + index * size[1]))
-        for col, method in enumerate(LABELS, 1):
-            draw.text((col * width + 8, 8), SHORT[method], fill='#202020', font=font)
+        for col, method in enumerate(labels, 1):
+            draw.text((col * width + 8, 8), short[method], fill='#202020', font=font)
             if method != 'GT':
                 row = lookup[cid, method]
                 label = f"{row['chain_error_deg']:.1f}°"

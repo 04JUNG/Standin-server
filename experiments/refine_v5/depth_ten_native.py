@@ -11,7 +11,21 @@ METHODS = ('ortho_fixed', 'ortho_calibrated', 'perspective')
 
 
 def context(case, method):
+    if 'part_goal' in case:
+        return case
     return dict(case, camera=case['cameras']['perspective' if method == 'B0' else method])
+
+
+def part_metrics(case, world, names):
+    from experiments.refine_v5.ab_common import project
+    from experiments.refine_v5.part_quality import limb_terms
+
+    goal = case['part_goal']
+    if goal['reason'] is not None:
+        return {}
+    points = world[[names.index(n) for n in case['depth_evidence']['movable']], :3, 3]
+    terms, metrics = limb_terms(goal, project(points, case['camera']), points, case['camera'])
+    return dict(metrics, part_residual=float(np.linalg.norm(terms)))
 
 
 def select(root, cases, load):
@@ -19,11 +33,16 @@ def select(root, cases, load):
     from experiments.refine_v5.ab_native_audit import RoundtripError, export_checked, snapshot, triage, write
     from experiments.refine_v5.depth_geometry import surface_regions
     from experiments.refine_v5.depth_native import inspect_depth
+    from experiments.refine_v5.part_quality import LIFTED_BEND_MAX_CHANGE_DEG
     from experiments.refine_v5.target_safety import skin_nonregression
 
     proposals = json.loads((root / 'depth-ten-proposals.json').read_text())
     if (root / 'frozen.json').exists():
         raise FileExistsError('already frozen')
+    part_pilot = bool(cases and 'part_goal' in cases[0])
+    methods = ('ordinal', 'fused') if part_pilot else METHODS
+    if part_pilot and 'learned_prior' in json.loads((root / 'manifest.json').read_text()):
+        methods += ('learned',)
     results, ledger = [], []
     for case in cases:
         cid = case['case_id']
@@ -52,16 +71,18 @@ def select(root, cases, load):
         results.append(base_plan)
         ledger.append(dict(case_id=cid, method='B0', **inspect_depth(context(case, 'B0'), base, names, base_mesh, base_mesh, regions)))
         memo = {}
-        for method in METHODS:
+        for method in methods:
             trial = context(case, method)
             view = trial['camera']
             key = repr([view[name] for name in ('rotation', 'inverse_distance_torso', 'pixel_scale', 'pixel_offset')])
-            if key in memo:
+            if not part_pilot and key in memo:
                 old_plan, old_details = memo[key]
                 results.append(dict(old_plan, method=method, camera_status=view['status']))
                 ledger.append(dict(old_details, method=method))
                 continue
             before = inspect_depth(trial, base, names, base_mesh, base_mesh, regions)
+            if part_pilot:
+                before.update(part_metrics(trial, base, names))
             baseline_deficit = sum(c['deficit_torso'] for c in before['cues'])
             candidates = []
             rejected = []
@@ -83,6 +104,10 @@ def select(root, cases, load):
                     metrics = inspect_depth(trial, world, names, weighted_mesh(meshes, names), base_mesh, regions)
                     deficit = sum(c['deficit_torso'] for c in metrics['cues'])
                     reasons = []
+                    if part_pilot:
+                        metrics.update(part_metrics(trial, world, names))
+                    if method in ('fused', 'learned') and metrics.get('b0_bend_change_deg', 0.) > LIFTED_BEND_MAX_CHANGE_DEG:
+                        reasons.append('unsupported_bend_change')
                     if deficit > baseline_deficit + .002:
                         reasons.append('depth_regression')
                     if metrics['screen_nme'] > before['screen_nme'] + .035:
@@ -104,7 +129,8 @@ def select(root, cases, load):
                     if 'locked_support' in case['depth_evidence']:
                         depth_drift = .06 * abs(metrics['cues'][0]['value_torso'] - before['cues'][0]['value_torso'])
                     score = (not all(c['passes'] for c in metrics['cues']), metrics.get('side_waist_palm_gap_mm', 0) > 12,
-                             deficit, metrics['screen_nme'] + .0006 * rotations + depth_drift)
+                             deficit, metrics['screen_nme'] + .0006 * rotations + depth_drift
+                             + (.25 * metrics['part_residual'] if method in ('fused', 'learned') else 0.))
                     candidates.append((score, row, metrics, tier, rank))
             chosen = None
             for _, row, metrics, tier, rank in sorted(candidates, key=lambda value: value[0]):
@@ -148,10 +174,12 @@ def select(root, cases, load):
                               camera_status=view['status'], selected_profile=None)
                 chosen_metrics = before
             detail = dict(case_id=cid, method=method, **chosen_metrics, rejected=rejected)
+            if part_pilot:
+                detail['observation_abstention'] = trial['part_goal']['reason']
             results.append(chosen)
             ledger.append(detail)
             memo[key] = (chosen, detail)
-        print('DEPTH_TEN_SELECT', cid, [r['status'] for r in results[-3:]], flush=True)
+        print('DEPTH_TEN_SELECT', cid, [r['status'] for r in results[-len(methods):]], flush=True)
     write(root / 'selection.json', ledger)
     write(root / 'frozen.json', dict(manifest_sha256=sha(root / 'manifest.json'), results=results))
 
@@ -161,6 +189,7 @@ def readback(root, cases, load):
     from experiments.refine_v5.ab_native_audit import write
     from experiments.refine_v5.depth_geometry import surface_regions
     from experiments.refine_v5.depth_native import inspect_depth
+    from experiments.refine_v5.part_quality import LIFTED_BEND_MAX_CHANGE_DEG
 
     audit = json.loads((root / 'native/audit.json').read_text())
     planned = {(r['case_id'], r['method']): r for r in json.loads((root / 'selection.json').read_text())}
@@ -190,6 +219,11 @@ def readback(root, cases, load):
             if row['status'] not in ('reference', 'fallback_exact_B0'):
                 if measured.get('forearm_hand_head_crossings', 0) or measured.get('support_sole_max_drift_mm', 0) > .01:
                     raise ValueError('saved candidate no longer passes the native gate')
+            if 'part_goal' in case:
+                measured.update(part_metrics(context(case, method), world, names))
+                if (method in ('fused', 'learned') and row['status'] != 'fallback_exact_B0'
+                        and measured.get('b0_bend_change_deg', 0.) > LIFTED_BEND_MAX_CHANGE_DEG + .01):
+                    raise ValueError('saved candidate exceeded the lifted-leg bend limit')
             common = inspect_depth(context(case, 'B0'), world, names, weights, base_mesh, regions)
             records.append(dict(case_id=cid, method=method, max_depth_drift_mm=error,
                                 common_screen_nme=common['screen_nme'], **measured))
