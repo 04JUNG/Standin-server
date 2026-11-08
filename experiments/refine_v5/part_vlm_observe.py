@@ -80,7 +80,7 @@ def schema():
 
 
 def observe(case, output, model, api_key, *, instructions=SYSTEM, response_schema=schema,
-            image_transform=None, reasoning_effort='low'):
+            image_transform=None, reasoning_effort='low', max_output_tokens=3200):
     if digest(case['image']) != case['image_sha256']:
         raise ValueError('rough changed')
     with Image.open(case['image']) as source:
@@ -94,7 +94,7 @@ def observe(case, output, model, api_key, *, instructions=SYSTEM, response_schem
     with io.BytesIO() as buffer:
         rough.save(buffer, format='PNG')
         encoded = base64.b64encode(buffer.getvalue()).decode('ascii')
-    payload = dict(model=model, instructions=instructions, store=False, max_output_tokens=3200,
+    payload = dict(model=model, instructions=instructions, store=False, max_output_tokens=max_output_tokens,
                    reasoning={'effort': reasoning_effort},
                    input=[{'role': 'user', 'content': [
                        {'type': 'input_image', 'detail': 'high', 'image_url': 'data:image/png;base64,' + encoded},

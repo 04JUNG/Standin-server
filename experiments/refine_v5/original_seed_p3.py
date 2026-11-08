@@ -11,6 +11,7 @@ from PIL import Image
 from experiments.refine_v5.ab_common import load_json, save_json
 from experiments.refine_v5.goal_probe_v2 import fk, prepare
 from experiments.refine_v5.learning_data import digest, frame, source_camera
+from experiments.refine_v5.original_seed_laterality import bound_goals, guide_digest, leg_roles
 from experiments.refine_v5.original_seed_oracle import CAPS
 from experiments.refine_v5.original_seed_prior import checked_seed, predict
 from experiments.refine_v5.part_head_direction import fit as fit_head
@@ -76,9 +77,10 @@ def visibility(seed, cues, size):
     return observed
 
 
-def compile_observation(case, cue, seed):
+def compile_observation(case, cue, seed, *, bound_roles=None):
     cue = deepcopy(cue)
-    role_status, support_side = bind_leg_roles(cue, seed, case['dimensions'])
+    role_status, support_side = (bound_roles if bound_roles is not None
+                                 else bind_leg_roles(cue, seed, case['dimensions']))
     automatic_visibility = visibility(seed, cue, case['dimensions'])
     goals, statuses = compile_goals(case, cue, seed, automatic_visibility)
     for side in ('left', 'right'):
@@ -168,7 +170,15 @@ def solve_case(args):
         mesh = {key: mesh_file[key] for key in ('vertices', 'faces', 'weights')}
     case['camera'] = registration(case, lookup, world, mesh['vertices'])
     cue = response['goals']
-    goals, statuses, roles = compile_observation(case, cue, seed)
+    anchor_status, checked_roles = {}, None
+    if 'anchor_harness' in response:
+        if response['guide_sha256'] != guide_digest(seed):
+            raise ValueError('detector guides changed after observation')
+        raw = cue
+        cue, anchor_status = bound_goals(raw, seed, response['anchor_harness'])
+        checked_roles = leg_roles(raw, response['anchor_harness'], cue, anchor_status, seed)
+    goals, statuses, roles = compile_observation(case, cue, seed, bound_roles=checked_roles)
+    statuses.update({name: status for name, status in anchor_status.items() if status != 'bound'})
     head = head_goal(cue, case, seed)
     head_candidates = fit_head(dict(case, direction_goal=head)) if head else []
     head_plan = head_candidates[0] if head_candidates else None
@@ -178,6 +188,7 @@ def solve_case(args):
         value is not None for part in prior.values() for value in part) else auto_fit
     return cid, dict(result, status='computed', camera=case['camera']['status'], leg_roles=roles,
                      goal_status=statuses, goals=goals, head_goal=head, learned_prior=prior,
+                     anchor_status=anchor_status, locked_support=checked_roles[1] if checked_roles else None,
                      automatic=compose(source, auto_fit, head_plan), learned=compose(source, learned_fit, head_plan))
 
 

@@ -152,6 +152,7 @@ def run_report(p1, run, gt_audit):
         start = score(base, data)
         row = dict(case_id=cid, representation=case['representation'], source_sha256=source_sha,
                    observation_status=auto[cid]['status'], leg_roles=auto[cid].get('leg_roles'),
+                   anchor_status=auto[cid].get('anchor_status'), locked_support=auto[cid].get('locked_support'),
                    head_goal=auto[cid].get('head_goal'), audit={}, proposed={'B0': start}, saved={'B0': start})
         observation = load_json(run / 'observations' / f'{cid}.json')
         receipt.append(dict(case_id=cid, model=observation['model'], response_id=observation['response_id']))
