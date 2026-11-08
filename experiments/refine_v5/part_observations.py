@@ -13,7 +13,7 @@ from experiments.refine_v5.learning_data import digest
 SIDES = {'Left', 'Right'}
 RESOLVED = {'reviewed', 'confirmed'}
 STATUSES = RESOLVED | {'unknown', 'ambiguous'}
-REVIEW_FIELDS = {'side', 'side_status', 'support', 'support_status', 'contact', 'head'}
+REVIEW_FIELDS = {'side', 'side_status', 'support', 'support_status', 'contact', 'head', 'upper'}
 DEFAULT_REVIEW = Path(__file__).resolve().parents[2] / 'evaluation/refine_v5/part_observations_20261108.json'
 
 
@@ -46,6 +46,23 @@ def validate_review(review):
                     raise ValueError('invalid head axis')
         else:
             raise ValueError('unsupported head observation')
+
+    if 'upper' in review:
+        upper = review['upper']
+        if set(upper) - {'source', 'independent_camera', 'chest_up_screen', 'shoulders_px'}:
+            raise ValueError('unsupported upper-body observation')
+        if upper.get('source') not in {'reviewed', 'synthetic'} or upper.get('independent_camera') is not True:
+            raise ValueError('upper-body goals require independent camera evidence')
+        if 'chest_up_screen' not in upper and not upper.get('shoulders_px'):
+            raise ValueError('upper-body goals must contain an observation')
+        if 'chest_up_screen' in upper:
+            axis = np.asarray(upper['chest_up_screen'], float)
+            if axis.shape != (2,) or not np.isclose(np.linalg.norm(axis), 1., atol=.002):
+                raise ValueError('invalid chest axis')
+        for side, point in upper.get('shoulders_px', {}).items():
+            xy = np.asarray(point, float)
+            if side not in SIDES or xy.shape != (2,) or not np.isfinite(xy).all():
+                raise ValueError('invalid shoulder point')
 
 
 def abstention_reason(case, review, leg):
@@ -83,6 +100,9 @@ def bind_case(case, review, camera):
                  side=review.get('side'), support=review.get('support'), source=case['depth_authority'],
                  contact=None, head=review.get('head') if case['ownership_authority'] == 'offline_single_target_review' else None,
                  reason=abstention_reason(case, review, leg))
+    if (case['ownership_authority'] == 'offline_single_target_review'
+            and camera['status'] == 'fitted' and review.get('upper')):
+        bound['upper'] = review['upper']
     if bound['reason'] is not None:
         return bound
     side = bound['side']

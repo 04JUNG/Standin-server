@@ -24,3 +24,7 @@ class PartObservationsTest(unittest.TestCase):
             validate_review(dict(side_status='ambiguous', side='Left'))
         with self.assertRaises(ValueError):
             validate_review(dict(side_status='unknown', head={'source': 'reviewed', 'up_screen': [1., 1.]}))
+
+    def test_rejects_upper_goal_tied_to_camera_anchors(self):
+        with self.assertRaises(ValueError):
+            validate_review({'upper': dict(source='reviewed', independent_camera=False, shoulders_px={'Left': [12., 3.]})})
