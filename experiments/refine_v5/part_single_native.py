@@ -43,6 +43,11 @@ def export(root, mode):
     bound = json.loads((output/'plan.json').read_text())
     if sha(root/'input.json') != bound['input_sha256'] or sha(source) != case['source_sha256']:
         raise ValueError('single-goal inputs changed')
+    if mode == 'grounded':
+        for observation_file, field in (('grounded-response.json', 'response_sha256'),
+                                ('limb-response.json', 'limb_response_sha256')):
+            if sha(root / observation_file) != bound[field]:
+                raise ValueError('grounded observation changed')
     plan = bound['result']
     arm, meshes = load(source)
     world_by_name = bone_world(arm)
@@ -136,7 +141,7 @@ if __name__ == '__main__':
     root = Path(root_arg)
     if stage == 'prepare':
         prepare(root, *map(Path, rest))
-    elif stage == 'export' and rest in (['reviewed'], ['detector']):
+    elif stage == 'export' and rest in (['reviewed'], ['detector'], ['grounded']):
         export(root, rest[0])
     else:
         raise ValueError('expected prepare or export with a pilot mode')

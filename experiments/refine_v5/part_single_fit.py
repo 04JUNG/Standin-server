@@ -39,6 +39,9 @@ def fit(case, mesh, goals):
     unit = lambda v: v / np.linalg.norm(v)
     if leg:
         knee_range = leg['bend_deg']
+        height_bounds = leg.get('height_torso', (-1.05, -.59))
+        forward_min = leg.get('forward_min_torso', .80)
+        initial_bend = leg.get('initial_bend_deg', 94.)
         desired_thigh, desired_shin = map(unit, np.asarray(leg['directions']))
     if arm:
         elbow_range = arm['bend_deg']
@@ -122,15 +125,17 @@ def fit(case, mesh, goals):
         if arm:
             terms.append(1.5 * np.radians(outside(np.degrees(np.arccos(segment_cos(pts[[lookup[n] for n in arm_chain]]))), elbow_range)))
         if leg:
-            terms.extend(np.r_[1.5 * outside(m['right_thigh_up_torso'], (-1.05, -.59)),
+            terms.extend(np.r_[1.5 * outside(m['right_thigh_up_torso'], height_bounds),
                                hip_clearance(right_thigh(world)), .12 * delta[0, 1],
-                               1.1 * max(0., .80 - m['right_knee_forward_torso'])])
+                               1.1 * max(0., forward_min - m['right_knee_forward_torso'])])
         if pelvis is not None:
             lateral = body_wrist[0] * (1. if side == 'Left' else -1.)
             terms.append(.50 * max(0., .85 - lateral))
         if leg:
             terms.extend(np.r_[.66 * (unit(leg_vectors[0]) - desired_thigh),
                                .55 * (unit(leg_vectors[1]) - desired_shin)])
+        if leg and 'shin_forward_max' in leg:
+            terms.append(2.5 * max(0., unit(leg_vectors[1])[2] - leg['shin_forward_max']))
         if arm and arm_directions:
             terms.extend(np.r_[.70 * (unit(arm_vectors[0]) - arm_directions[0]),
                                .68 * (unit(arm_vectors[1]) - arm_directions[1])])
@@ -164,7 +169,7 @@ def fit(case, mesh, goals):
         swing = hinge_frame(basis @ desired_thigh,basis @ desired_shin) @ hinge_frame(*segments).T
         hip_orientation = rotation_matrix(base[lookup['RightUpLeg']])
         initial[:3] = Rotation.from_matrix(hip_orientation.T @ swing @ hip_orientation).as_rotvec()
-        initial[3] = np.radians(94.-metrics(base)['right_knee_bend'])
+        initial[3] = np.radians(initial_bend - metrics(base)['right_knee_bend'])
         # Preserve foot direction on initialization before the projection term refines it.
         _, seeded = pose(initial)
         foot_base = rotation_matrix(base[lookup['RightFoot']])

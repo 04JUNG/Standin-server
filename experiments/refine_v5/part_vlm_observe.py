@@ -79,7 +79,8 @@ def schema():
     return object_schema(dict(sides=enum(('resolved', 'uncertain')), **dict.fromkeys(CHAINS, limb)))
 
 
-def observe(case, output, model, api_key):
+def observe(case, output, model, api_key, *, instructions=SYSTEM, response_schema=schema,
+            image_transform=None, reasoning_effort='low'):
     if digest(case['image']) != case['image_sha256']:
         raise ValueError('rough changed')
     with Image.open(case['image']) as source:
@@ -88,14 +89,16 @@ def observe(case, output, model, api_key):
         background.alpha_composite(rough)
         rough = background.convert('RGB')
     rough.thumbnail((960, 960), Image.Resampling.LANCZOS)
+    if image_transform is not None:
+        rough = image_transform(rough)
     with io.BytesIO() as buffer:
         rough.save(buffer, format='PNG')
         encoded = base64.b64encode(buffer.getvalue()).decode('ascii')
-    payload = dict(model=model, instructions=SYSTEM, store=False, max_output_tokens=3200,
-                   reasoning={'effort': 'low'},
+    payload = dict(model=model, instructions=instructions, store=False, max_output_tokens=3200,
+                   reasoning={'effort': reasoning_effort},
                    input=[{'role': 'user', 'content': [
                        {'type': 'input_image', 'detail': 'high', 'image_url': 'data:image/png;base64,' + encoded},
-                   ]}], text={'format': dict(type='json_schema', name='standin_limb_goals', strict=True, schema=schema())})
+                   ]}], text={'format': dict(type='json_schema', name='standin_limb_goals', strict=True, schema=response_schema())})
     body = json.dumps(payload).encode()
     request_sha = hashlib.sha256(body).hexdigest()
     if output.exists():

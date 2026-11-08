@@ -83,3 +83,22 @@ python -m experiments.refine_v5.part_vlm_report \
 ```
 
 같은 러프와 스키마에 이미 받은 응답을 재사용할 때는 `--prepare-control`을 빼고 같은 `RUN`을 지정한다. 비교 시트는 기존 검출 방식, 피부 검사 전 VLM 보정안, 피부 검사 후 저장 결과를 따로 표시한다. 지역 피부 검사에서 회귀하면 원본 B0를 그대로 저장한다. 전체 피부 인증 상태와 컷별 손 접촉은 비교 JSON에 기록한다.
+
+### 029 기준 후보와 자동 재생
+
+`evaluation/refine_v5/leading_reference_029.json`이 029의 수동 결과를 오프라인 기준으로 지정한다. 백업 ZIP에는 시작 FBX, 수동 결과 FBX, 계획, 검증 기록, 비교 이미지와 해시를 보관했다.
+
+자동 경로는 동일한 `Part goals + head` FBX에서 시작한다. 새 VLM 응답은 러프의 격자 영역과 다리의 앞뒤를 관측한다. 별도 팔다리 VLM 응답의 손 분리 단서는 RTMPose와 대조한다. 각도 범위는 격자와 리그 길이로 추정한 3D 방향에서 보완한다. 이 실행은 정면에서 앞으로 들린 오른 무릎과 골반에서 분리된 왼팔을 다룬다. 다른 포즈 유형의 평가와 자동 머리 목표 생성은 별도로 검증해야 한다.
+
+```sh
+python -m experiments.refine_v5.part_grounded_observe \
+  --input "$RUN/input.json" --out "$RUN/grounded-response.json" --env-file "$VLM_ENV"
+python -m experiments.refine_v5.part_grounded_fit --root "$RUN" \
+  --seeds "$P0/all-seeds/seeds.json" --limb-response "$LIMB_VLM_RESPONSE"
+blender -b --python-exit-code 1 --python experiments/refine_v5/part_single_native.py -- \
+  export "$RUN" grounded
+python -m experiments.refine_v5.part_single_report \
+  --root "$RUN" --prior "$PART_GOALS_RUN" --out "$OUT" --comparison-mode grounded
+```
+
+`RUN`에는 같은 시작 포즈의 `input.json`, `base.npz`, 비교용 `reviewed/`가 필요하다. `LIMB_VLM_RESPONSE`는 같은 러프에서 `part_vlm_observe`가 받은 JSON이다. 정답과 수동 결과는 자동 목표 생성에 사용하지 않고 보고서에서만 읽는다.

@@ -1,0 +1,9 @@
+{
+  "case_id": "029",
+  "status": "leading_reference",
+  "scope": "offline single-cut benchmark",
+  "label": "Part goals + head + reviewed limbs",
+  "input_fbx_sha256": "7ad0285c56b934c9271a344cae48b72847c788b9577aa29ce0402c4755ba921c",
+  "reference_fbx_sha256": "c8a4f9997fbf2ba11656cbce894c153875730e25283722be56df624435d647a9",
+  "archive": "out/eval/refine_v5/leading-029-20261108/029-leading-reference.zip"
+}

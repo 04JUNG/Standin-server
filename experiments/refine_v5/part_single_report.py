@@ -5,9 +5,11 @@ from pathlib import Path
 import shutil
 from tempfile import TemporaryDirectory
 
+import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
 from experiments.refine_v5.ab_common import load_json, save_json
+from experiments.refine_v5.ab_evaluate import error_deg, point_map
 from experiments.refine_v5.depth_ten_report import review_images
 from experiments.refine_v5.learning_data import digest
 
@@ -16,7 +18,25 @@ LABELS = {'B0': 'Part goals + head', 'reviewed': 'Reviewed goals', 'detector': '
           'GT': 'Ground truth'}
 
 
-def bundle(root, prior, out):
+def direction_errors(bones, truth):
+    actual, target = point_map(bones), point_map(truth)
+    chains = {'right_leg': ('RightUpLeg', 'RightLeg', 'RightFoot'),
+              'left_arm': ('LeftArm', 'LeftForeArm', 'LeftHand')}
+    scores = {}
+    for key, chain in chains.items():
+        vectors = np.diff([actual[name] for name in chain], axis=0)
+        reference = np.diff([target[name] for name in chain], axis=0)
+        angles = [error_deg(v / np.linalg.norm(v), r / np.linalg.norm(r))
+                  for v, r in zip(vectors, reference, strict=True)]
+        scores[key] = float(np.mean(angles))
+    return scores
+
+
+def bundle(root, prior, out, *, comparison_mode='detector'):
+    labels = dict(LABELS)
+    if comparison_mode == 'grounded':
+        labels = {'B0': LABELS['B0'], 'reviewed': 'Leading manual reference',
+                  'grounded': 'Automatic + VLM', 'GT': LABELS['GT']}
     case = load_json(root / 'input.json')
     cid = case['case_id']
     source = Path(case['source'])
@@ -24,17 +44,19 @@ def bundle(root, prior, out):
               if row['case_id'] == cid and row['method'] == 'GT')
     if digest(source) != case['source_sha256'] or digest(gt['path']) != gt['sha256']:
         raise ValueError('comparison references changed')
-    observed = load_json(root / 'observation.json')
+    observed = (load_json(root / 'observation.json') if comparison_mode == 'detector'
+                else dict(grounded=load_json(root / 'grounded-response.json'),
+                          limb=load_json(root / 'limb-response.json')))
     out.mkdir(exist_ok=False)
     (out / 'images').mkdir()
-    case['cameras'].update({method: case['camera'] for method in LABELS})
+    case['cameras'].update({method: case['camera'] for method in labels})
     case['cameras']['ortho_fixed'] = case['camera']
-    audits = {mode: load_json(root / mode / 'audit.json') for mode in ('reviewed', 'detector')}
+    audits = {mode: load_json(root / mode / 'audit.json') for mode in ('reviewed', comparison_mode)}
     native = {(cid, 'B0'): {'bones': case['bones']}, (cid, 'GT'): gt,
               **{(cid, mode): audit for mode, audit in audits.items()}}
     # Reuse the front/side renderer with its prior label area blanked below.
     rows = [dict(case_id=cid, method=mode, chain_error_deg=0.,
-                 status='reference', camera_status=None) for mode in LABELS if mode != 'GT']
+                 status='reference', camera_status=None) for mode in labels if mode != 'GT']
     with TemporaryDirectory() as tmp:
         staging = Path(tmp) / 'native'
         staging.mkdir()
@@ -42,7 +64,7 @@ def bundle(root, prior, out):
                  **{mode: root / mode / 'final.npz' for mode in audits}}
         for mode, path in paths.items():
             (staging / f'{cid}-{mode}.npz').symlink_to(path.resolve())
-        review_images(staging.parent, out, [case], rows, native, labels=LABELS, short=LABELS)
+        review_images(staging.parent, out, [case], rows, native, labels=labels, short=labels)
     metrics = {}
     for mode, audit in audits.items():
         plan = load_json(root / mode / 'plan.json')['result']
@@ -69,7 +91,14 @@ def bundle(root, prior, out):
         draw.text((x + 8, 25), caption, fill='#333333', font=font)
     for path in (out / '029-comparison.png', out / 'overview.png', out / 'images' / f'{cid}.png'):
         comparison.save(path)
-    save_json(out / 'comparison.json', dict(case_id=cid, observation=observed, results=metrics))
+    result = dict(case_id=cid, observation=observed, results=metrics)
+    if comparison_mode == 'grounded':
+        result['direction_error_to_gt_deg'] = {
+            mode: direction_errors(native[cid, mode]['bones'], gt['bones'])
+            for mode in ('B0', 'reviewed', 'grounded')
+        }
+        result['automatic_goal_plan'] = load_json(root / 'grounded' / 'plan.json')
+    save_json(out / 'comparison.json', result)
     print({key: data['audit'].get('after_bends') for key, data in metrics.items()})
 
 
@@ -77,4 +106,5 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('root', 'prior', 'out'):
         parser.add_argument('--' + name, type=Path, required=True)
+    parser.add_argument('--comparison-mode', choices=('detector', 'grounded'), default='detector')
     bundle(**vars(parser.parse_args()))
