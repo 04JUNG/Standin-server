@@ -29,8 +29,8 @@ def edit_region(name):
     return None
 
 
-def independent_edits(edits, attempts):
-    """Keep only editable groups that did not participate in a measured regression."""
+def independent_edits(edits, attempts, *, retry_implicated=False):
+    """Return editable groups, with groups implicated in a regression ordered last."""
     grouped = {}
     for name, value in edits.items():
         region = edit_region(name)
@@ -44,4 +44,7 @@ def independent_edits(edits, attempts):
             if kind in COLLISION_REASONS:
                 implicated.update(edit_region(part) for part in parts.split(':'))
     blocked = sorted(set(grouped) & implicated)
-    return {key: grouped[key] for key in sorted(grouped) if key not in implicated}, blocked
+    groups = {key: grouped[key] for key in sorted(grouped) if key not in implicated}
+    if retry_implicated:
+        groups.update({key: grouped[key] for key in blocked})
+    return groups, blocked

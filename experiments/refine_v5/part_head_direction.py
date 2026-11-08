@@ -11,6 +11,7 @@ from experiments.refine_v5.part_head import head_axes
 
 REVIEW = Path(__file__).resolve().parents[2] / 'evaluation/refine_v5/head_direction_review_20261108.json'
 HEAD_CAP = 72.
+WEAK_HEAD_CAP = 48.
 NECK_CAP = 12.
 LIMITS = {'yaw_deg': (-175., 175.), 'pitch_deg': (-80., 80.), 'neck_tilt_deg': (-175., 175.),
           'roll_deg': (-100., 100.)}
@@ -63,7 +64,9 @@ def fit(case):
     initial = measure(case, base, names)
     active = ['Neck', 'Head'] if 'neck_tilt_deg' in goal else ['Head']
     indices = [lookup[n] for n in active]
-    caps_deg = [NECK_CAP, HEAD_CAP] if len(active) == 2 else [HEAD_CAP]
+    weak_axes = set(case.get('weak_head_axes', ()))
+    head_cap = WEAK_HEAD_CAP if goal.keys() <= weak_axes else HEAD_CAP
+    caps_deg = [NECK_CAP, head_cap] if len(active) == 2 else [head_cap]
     caps = np.deg2rad(caps_deg)
     box = np.repeat(caps, 3)
     wanted = {key: float(np.clip(initial[key], low + 1., high - 1.)) if not low <= initial[key] <= high else initial[key]
@@ -77,7 +80,8 @@ def fit(case):
         delta, world = pose(x)
         actual = measure(case, world, names)
         angular = np.deg2rad([(actual[k] - wanted[k] + 180.) % 360. - 180. for k in wanted])
-        return np.r_[angular, .09 * delta.ravel()]
+        weights = [.45 if key in weak_axes else 1. for key in wanted]
+        return np.r_[angular * weights, .09 * delta.ravel()]
 
     solve = least_squares(residual, np.zeros(len(box)), bounds=(-box, box), max_nfev=60)
     delta, _ = pose(solve.x)
@@ -92,7 +96,7 @@ def fit(case):
             continue
         edits = dict(zip(active, np.rad2deg(scaled).tolist(), strict=True))
         candidates.append(candidate_row(case, 'head_direction', names, world, edits,
-                                        before_deg=initial, after_deg=after, scale=scale))
+                                        before_deg=initial, after_deg=after, scale=scale, head_cap_deg=head_cap))
     return candidates
 
 

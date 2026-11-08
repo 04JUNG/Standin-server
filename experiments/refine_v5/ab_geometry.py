@@ -23,16 +23,23 @@ def contact_faces(vertices, faces, weights, names, bones, side, target):
     )
     if target == 'head':
         is_target = weights[:, indices['Head']][faces].min(axis=1) > .55
-    elif target == 'waist':
-        hip, lateral, up, _, torso = anatomical_axes(bones, names)
+    elif target in ('waist', 'waist_front', 'waist_side', 'waist_unspecified'):
+        hip, lateral, up, front, torso = anatomical_axes(bones, names)
         outward = lateral if side == 'Left' else -lateral
         height = (centers - hip) @ up
         side_position = (centers - hip) @ outward
         names_in_waist = ('Hips', 'Spine', 'Spine1', side + 'UpLeg')
         torso_weight = weights[:, [indices[name] for name in names_in_waist]].sum(axis=1)
-        is_target = ((torso_weight[faces].min(axis=1) > .65) &
-                     (height > -.23 * torso) & (height < .55 * torso) &
-                     (side_position > .12 * torso) & (normals @ outward > .25))
+        band = ((torso_weight[faces].min(axis=1) > .65) &
+                (height > -.23 * torso) & (height < .55 * torso))
+        outward_normal = normals @ outward
+        forward_normal = normals @ front
+        legacy_side = (side_position > .12 * torso) & (outward_normal > .25)
+        side_surface = (side_position > .12 * torso) & (outward_normal > .55) & (outward_normal > forward_normal)
+        front_surface = (side_position > 0.) & (forward_normal > .55) & (forward_normal > outward_normal)
+        region = {'waist': legacy_side, 'waist_front': front_surface,
+                  'waist_side': side_surface, 'waist_unspecified': side_surface | front_surface}
+        is_target = band & region[target]
     else:
         raise ValueError('unknown contact target')
     valid = double_area > 1e-12

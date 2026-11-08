@@ -69,11 +69,19 @@ def regional_trial(arm, meshes, names, baseline, baseline_skin, edits, output, e
     return (matrices, vertices, faces, cloud, frame_error), []
 
 
-def salvage(source, names, baseline, baseline_skin, edits, attempts, saved):
-    groups, blocked = independent_edits(edits, attempts)
+def salvage(source, names, baseline, baseline_skin, edits, attempts, saved, *,
+            retry_implicated=False, coupled_regions=()):
+    groups, implicated = independent_edits(edits, attempts, retry_implicated=retry_implicated)
+    batches = []
+    if coupled_regions:
+        linked = {name: value for group in coupled_regions for name, value in groups.pop(group, {}).items()}
+        if linked:
+            batches.append((tuple(coupled_regions), linked))
+    batches.extend(((group,), group_edits) for group, group_edits in groups.items())
     combined, fractions, records = {}, {}, []
     selected = None
-    for group, group_edits in groups.items():
+    for batch, group_edits in batches:
+        group = '+'.join(batch)
         for fraction in FRACTIONS:
             scaled = {name: (fraction * np.asarray(value)).tolist() for name, value in group_edits.items()}
             trial = dict(combined, **scaled)
@@ -82,16 +90,16 @@ def salvage(source, names, baseline, baseline_skin, edits, attempts, saved):
                 pose, reasons = regional_trial(arm, meshes, names, baseline, baseline_skin, trial, saved)
             except ValueError as exc:
                 pose, reasons = None, ['fk: ' + str(exc)]
-            records.append(dict(group=group, fraction=fraction, combined_groups=[*fractions, group], reasons=reasons))
+            records.append(dict(group=group, fraction=fraction, combined_groups=[*fractions, *batch], reasons=reasons))
             if pose is not None:
                 combined = trial
-                fractions[group] = fraction
+                fractions.update(dict.fromkeys(batch, fraction))
                 selected = pose
                 break
-    return selected, fractions, blocked, records
+    return selected, fractions, [name for name in implicated if name not in fractions], records
 
 
-def audit(p1, run, method, *, salvage_partial=False):
+def audit(p1, run, method, *, salvage_partial=False, retry_implicated=False, case_id=None):
     cohort = read(run / 'cohort.json')
     if sha(p1 / 'manifest.json') != cohort['p1_manifest_sha256']:
         raise ValueError('P0 manifest changed')
@@ -102,7 +110,12 @@ def audit(p1, run, method, *, salvage_partial=False):
         raise ValueError('P3 plans do not match cohort')
     output = run / 'native' / method
     output.mkdir(parents=True, exist_ok=True)
-    for cid in cohort['validation']:
+    validation = cohort['validation']
+    if case_id is not None:
+        if case_id not in validation:
+            raise ValueError(f'{case_id}: not in validation cohort')
+        validation = [case_id]
+    for cid in validation:
         rig, source = source_file(p1, cid)
         entry = oracle[cid] if method == 'oracle' else frozen['cases'][cid]
         if entry['source_sha256'] != rig['source_sha256']:
@@ -117,7 +130,9 @@ def audit(p1, run, method, *, salvage_partial=False):
         baseline_skin = triage(arm) if edits else None
         names = list(baseline['matrices'])
         attempt_rows, fraction, selected = [], None, None
-        for trial in FRACTIONS if edits else ():
+        coupled_regions = plan.get('coupled_regions', ()) if plan else ()
+        trial_fractions = FRACTIONS[:1] if coupled_regions and salvage_partial else FRACTIONS
+        for trial in trial_fractions if edits else ():
             if trial != 1.:
                 arm, meshes = load(source)
             scaled = {name: (trial * np.asarray(vector)).tolist() for name, vector in edits.items()}
@@ -133,7 +148,8 @@ def audit(p1, run, method, *, salvage_partial=False):
         group_fractions, blocked_groups, partial_attempts = {}, [], []
         if salvage_partial and selected is None and edits:
             selected, group_fractions, blocked_groups, partial_attempts = salvage(
-                source, names, baseline, baseline_skin, edits, attempt_rows, saved)
+                source, names, baseline, baseline_skin, edits, attempt_rows, saved,
+                retry_implicated=retry_implicated or bool(coupled_regions), coupled_regions=coupled_regions)
         selection = 'partial' if group_fractions else ('uniform' if fraction is not None else 'fallback')
         skin, cloud, frame_error = None, None, None
         if selected is None:
@@ -153,13 +169,18 @@ def audit(p1, run, method, *, salvage_partial=False):
         print('P4', method, cid, selection, fraction, group_fractions, attempt_rows[-1]['reasons'] if attempt_rows else 'no edit', flush=True)
 
 
-def capture(p1, run):
+def capture(p1, run, *, case_id=None):
     from converter.mesh_validation import extract_evaluated_skin
 
     cases = {row['case_id']: row for row in read(p1 / 'manifest.json')['rows']}
     output = run / 'gallery-native'
     output.mkdir(exist_ok=True)
-    for cid in read(run / 'cohort.json')['validation']:
+    validation = read(run / 'cohort.json')['validation']
+    if case_id is not None:
+        if case_id not in validation:
+            raise ValueError(f'{case_id}: not in validation cohort')
+        validation = [case_id]
+    for cid in validation:
         _, source = source_file(p1, cid)
         row = cases[cid]
         paths = {'B0': source, 'GT': p1 / row['ground_truth']}
@@ -184,9 +205,10 @@ if __name__ == '__main__':
     stage, p1, run, *args = sys.argv[sys.argv.index('--') + 1:]
     if stage == 'prepare':
         prepare(Path(p1), Path(run))
-    elif stage in ('audit', 'audit-partial') and len(args) == 1 and args[0] in METHODS:
-        audit(Path(p1), Path(run), args[0], salvage_partial=stage == 'audit-partial')
-    elif stage == 'capture':
-        capture(Path(p1), Path(run))
+    elif stage in ('audit', 'audit-partial', 'audit-partial-retry') and len(args) in (1, 2) and args[0] in METHODS:
+        audit(Path(p1), Path(run), args[0], salvage_partial=stage != 'audit', retry_implicated=stage == 'audit-partial-retry',
+              case_id=args[1] if len(args) == 2 else None)
+    elif stage == 'capture' and len(args) <= 1:
+        capture(Path(p1), Path(run), case_id=args[0] if args else None)
     else:
         raise ValueError('expected prepare, capture, or audit with a known method')

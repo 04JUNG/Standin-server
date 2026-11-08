@@ -10,11 +10,13 @@ from PIL import Image
 
 from experiments.refine_v5.ab_common import load_json, save_json
 from experiments.refine_v5.goal_probe_v2 import fk, prepare
+from experiments.refine_v5.hand_targets import HEAD_REGIONS
 from experiments.refine_v5.learning_data import digest, frame, source_camera
 from experiments.refine_v5.original_seed_laterality import bound_goals, guide_digest, leg_roles
 from experiments.refine_v5.original_seed_oracle import CAPS
 from experiments.refine_v5.original_seed_prior import checked_seed, predict
 from experiments.refine_v5.part_head_direction import fit as fit_head
+from experiments.refine_v5.part_head_direction import measure as measure_head
 from experiments.refine_v5.part_single_batch import registration
 from experiments.refine_v5.part_vlm_fit import compile_goals, fit
 
@@ -85,7 +87,7 @@ def compile_observation(case, cue, seed, *, bound_roles=None):
     goals, statuses = compile_goals(case, cue, seed, automatic_visibility)
     for side in ('left', 'right'):
         name = side + '_leg'
-        if role_status not in ('no_unique_raise', 'screen_roles_agree') or side == support_side:
+        if role_status not in ('no_unique_raise', 'screen_roles_agree', 'independent_roles') or side == support_side:
             goals.pop(name, None)
             statuses[name] = 'locked_support' if side == support_side else role_status
         if name in goals and not goals[name]['screen']:
@@ -109,6 +111,41 @@ def head_goal(cue, case, seed):
             for axis, (field, intervals) in HEAD_RANGES.items() if cue['head'][field] in intervals}
 
 
+def head_fallback(cue, case, seed, basis, observed):
+    """Give missing head axes a broad, low-authority neutral target."""
+    if case['camera']['status'] != 'fitted' or cue['torso_view'] not in ('facing_camera', 'profile'):
+        return {}
+    points = np.asarray(seed['keypoints'][:5], float)
+    scores = np.asarray(seed['scores'][:5], float)
+    valid = (scores >= .50) & np.all((points >= 0) & (points < case['dimensions']), axis=1)
+    if not valid[0] or np.count_nonzero(valid) < 3:
+        return {}
+
+    x, down, z = np.asarray(case['camera']['rotation']) @ basis[:, 2]
+    yaw = float(np.degrees(np.arctan2(x, -z)))
+    pitch = float(np.degrees(np.arctan2(down, np.hypot(x, z))))
+    fallback = {}
+    if 'yaw_deg' not in observed:
+        if cue['torso_view'] == 'facing_camera' and valid[3:].all():
+            ears = points[3:5, 0]
+            span = abs(ears[0] - ears[1])
+            if span >= 6.:
+                offset = (points[0, 0] - ears.mean()) / span
+                yaw = float(np.clip(70. * offset, -30., 30.))
+        yaw = float(np.clip(yaw, -153., 153.))
+        fallback['yaw_deg'] = [yaw - 20., yaw + 20.]
+    if 'pitch_deg' not in observed:
+        pitch = float(np.clip(pitch, -22., 22.))
+        fallback['pitch_deg'] = [pitch - 9., pitch + 13.]
+    if 'roll_deg' not in observed and valid[1:3].all():
+        eyes = points[1:3][np.argsort(points[1:3, 0])]
+        dx, dy = eyes[1] - eyes[0]
+        if dx >= 6.:
+            roll = float(np.clip(np.degrees(np.arctan2(dy, dx)), -35., 35.))
+            fallback['roll_deg'] = [roll - 10., roll + 10.]
+    return fallback
+
+
 def compatible_prior(goals, predictions):
     cleaned = {}
     for name, goal in goals.items():
@@ -122,12 +159,13 @@ def compatible_prior(goals, predictions):
     return cleaned
 
 
-def compose(source, body_plan, head_plan):
+def compose(source, body_plan, head_plan, head_case):
     if body_plan and body_plan['status'] == 'proposal':
         edits = dict(body_plan['edits_deg'])
     else:
         edits = {}
-    if head_plan:
+    coupled = body_plan and body_plan.get('head_coupled') and body_plan['status'] == 'proposal'
+    if head_plan and not coupled:
         if edits.keys() & head_plan['edits_deg'].keys():
             raise ValueError('head and limbs share edited bones')
         edits.update(head_plan['edits_deg'])
@@ -135,11 +173,16 @@ def compose(source, body_plan, head_plan):
         return dict(edits_deg={}, status='no_supported_edit')
     names, lookup, parents, local, _ = prepare(source)
     world = fk(local, parents, [lookup[n] for n in edits], np.radians(list(edits.values())))
+    outcomes = body_plan.get('outcomes', {}) if body_plan else {}
+    coupled_regions = ['head'] + [
+        limb for limb, outcome in outcomes.items() if
+        any(t['target_region'] in HEAD_REGIONS for t in outcome['after'].get('hand_targets', ()))
+    ] if coupled else []
     return dict(edits_deg=edits, status='proposal',
                 expected_heads={n: value[:3, 3].tolist() for n, value in zip(names, world, strict=True)},
-                body_outcomes=body_plan.get('outcomes', {}) if body_plan else {},
+                body_outcomes=outcomes, head_coupled=bool(coupled), coupled_regions=coupled_regions,
                 head_before=head_plan['before_deg'] if head_plan else None,
-                head_after=head_plan['after_deg'] if head_plan else None)
+                head_after=measure_head(head_case, world, names) if head_plan else None)
 
 
 def solve_case(args):
@@ -170,29 +213,40 @@ def solve_case(args):
         mesh = {key: mesh_file[key] for key in ('vertices', 'faces', 'weights')}
     case['camera'] = registration(case, lookup, world, mesh['vertices'])
     cue = response['goals']
-    anchor_status, checked_roles = {}, None
+    anchor_status, checked_roles, raised_limb = {}, None, None
     if 'anchor_harness' in response:
         if response['guide_sha256'] != guide_digest(seed):
             raise ValueError('detector guides changed after observation')
         raw = cue
-        cue, anchor_status = bound_goals(raw, seed, response['anchor_harness'])
+        cue, anchor_status = bound_goals(raw, seed, response['anchor_harness'], stage=response.get('observation_stage', 0))
         checked_roles = leg_roles(raw, response['anchor_harness'], cue, anchor_status, seed)
+        raised = response['anchor_harness'].get(raw['raised_guide'])
+        if raised and anchor_status.get(raised) == 'bound':
+            raised_limb = raised
+    hand_relations = {name: cue[name]['hand_relations'] for name in ('left_arm', 'right_arm')
+                      if 'hand_relations' in cue[name] and anchor_status.get(name) == 'bound'}
     goals, statuses, roles = compile_observation(case, cue, seed, bound_roles=checked_roles)
     statuses.update({name: status for name, status in anchor_status.items() if status != 'bound'})
-    head = head_goal(cue, case, seed)
-    head_candidates = fit_head(dict(case, direction_goal=head)) if head else []
+    observed_head = head_goal(cue, case, seed)
+    fallback = head_fallback(cue, case, seed, basis, observed_head)
+    head = {**fallback, **observed_head}
+    head_case = dict(case, direction_goal=head, weak_head_axes=tuple(fallback))
+    head_candidates = fit_head(head_case) if head else []
     head_plan = head_candidates[0] if head_candidates else None
     prior = compatible_prior(goals, predict(row, source, seed, model))
-    auto_fit = fit(case, mesh, goals, caps=LIMB_CAPS)
-    learned_fit = fit(case, mesh, goals, caps=LIMB_CAPS, prior=prior) if any(
+    auto_fit = fit(case, mesh, goals, caps=LIMB_CAPS, head_plan=head_plan)
+    learned_fit = fit(case, mesh, goals, caps=LIMB_CAPS, prior=prior, head_plan=head_plan) if any(
         value is not None for part in prior.values() for value in part) else auto_fit
     return cid, dict(result, status='computed', camera=case['camera']['status'], leg_roles=roles,
-                     goal_status=statuses, goals=goals, head_goal=head, learned_prior=prior,
-                     anchor_status=anchor_status, locked_support=checked_roles[1] if checked_roles else None,
-                     automatic=compose(source, auto_fit, head_plan), learned=compose(source, learned_fit, head_plan))
+                     goal_status=statuses, goals=goals, hand_relations=hand_relations, head_goal=head,
+                     head_goal_sources={axis: 'vlm' if axis in observed_head else 'weak_geometry' for axis in head},
+                     learned_prior=prior,
+                     anchor_status=anchor_status, raised_limb=raised_limb, locked_support=checked_roles[1] if checked_roles else None,
+                     automatic=compose(source, auto_fit, head_plan, head_case),
+                     learned=compose(source, learned_fit, head_plan, head_case))
 
 
-def run(p1, out, seeds_path, workers):
+def run(p1, out, seeds_path, workers, case_id=None):
     cohort_path = out / 'cohort.json'
     cohort = load_json(cohort_path)
     model = load_json(out / 'model.json')
@@ -200,7 +254,12 @@ def run(p1, out, seeds_path, workers):
         raise ValueError('frozen inference binding changed')
     rows = {row['case_id']: row for row in load_json(p1 / 'manifest.json')['rows']}
     seeds = {row['case_id']: row for row in load_json(seeds_path)}
-    tasks = [(p1, out, rows[cid], seeds.get(cid), model) for cid in cohort['validation']]
+    validation = cohort['validation']
+    if case_id is not None:
+        if case_id not in validation:
+            raise ValueError(f'{case_id}: not in validation cohort')
+        validation = [case_id]
+    tasks = [(p1, out, rows[cid], seeds.get(cid), model) for cid in validation]
     cases = {}
     with ProcessPoolExecutor(max_workers=workers) as pool:
         for cid, case in pool.map(solve_case, tasks):
@@ -215,5 +274,6 @@ if __name__ == '__main__':
     for field in ('p1', 'out', 'seeds'):
         parser.add_argument('--' + field, type=Path, required=True)
     parser.add_argument('--workers', type=int, default=5)
+    parser.add_argument('--case-id')
     args = parser.parse_args()
-    run(args.p1, args.out, args.seeds, args.workers)
+    run(args.p1, args.out, args.seeds, args.workers, args.case_id)
