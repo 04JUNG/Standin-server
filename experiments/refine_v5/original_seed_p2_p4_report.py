@@ -65,8 +65,14 @@ def draw_case(p1, run, case, row):
             number = mean_direction(row['saved'][name])
             caption = f'{number:.1f}°' if number is not None else 'No visible limb score'
             if name != 'B0':
-                fraction = row['audit'][name]['fraction']
-                caption += f' | {fraction:.0%} of edit' if fraction is not None else ' | B0 retained'
+                audit = row['audit'][name]
+                fraction = audit['fraction']
+                if audit.get('group_fractions'):
+                    caption += ' | Head only' if set(audit['group_fractions']) == {'head'} else ' | Partial edit'
+                elif fraction is not None:
+                    caption += f' | {fraction:.0%} of edit'
+                else:
+                    caption += ' | B0 retained'
             draw.text((column * width + 8, 25), caption, fill='#333', font=small)
         with np.load(gallery / f'{cid}-{name}.npz') as mesh:
             shape = canonical(mesh, load_json(gallery / f'{cid}-{name}.json')['bones'])
