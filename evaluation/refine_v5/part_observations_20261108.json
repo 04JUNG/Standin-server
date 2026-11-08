@@ -1,0 +1,15 @@
+{
+  "schema": "v5-part-review-v1",
+  "cases": {
+    "001": {"side": "Right", "side_status": "confirmed", "contact": "waist", "head": {"source": "reviewed", "up_screen": [0.061, -0.998]}},
+    "006": {"side": "Left", "side_status": "confirmed", "support": "Right", "support_status": "confirmed"},
+    "007": {"side": "Right", "side_status": "reviewed"},
+    "029": {"side": "Right", "side_status": "confirmed"},
+    "039": {"side": "Right", "side_status": "confirmed"},
+    "043": {"side_status": "ambiguous", "support_status": "ambiguous"},
+    "050": {"side": "Right", "side_status": "reviewed"},
+    "053": {"side": "Left", "side_status": "reviewed"},
+    "074": {"side": "Right", "side_status": "reviewed"},
+    "081": {"side": "Right", "side_status": "reviewed"}
+  }
+}
