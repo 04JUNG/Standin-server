@@ -18,3 +18,13 @@ python -m experiments.refine_v5.part_pilot --root "$part_run" --head-only
 "$blender" -b --python-exit-code 1 --python experiments/refine_v5/part_head_native.py -- "$part_run" "$head_out"
 python -m experiments.refine_v5.part_report --root "$part_run" --head "$head_out" --out "$review_out"
 ```
+
+## Part goals에 머리 방향 이어 붙이기
+
+006·029·053의 기존 Part goals 저장본에 러프의 얼굴 방향과 숙임 검수 범위를 적용한다. 053은 별도의 목 축 범위도 사용한다. 보정 한도나 피부 검사에서 차단되면 축소 후보를 확인한다. 세 컷의 팔·다리와 몸통 자세를 보존하고, 같은 러프 카메라와 몸통 기준 측면을 출력한다. 이 파일럿의 넓은 머리 회전 범위는 개발 검수 전용이다.
+
+```bash
+python -m experiments.refine_v5.part_head_direction --prior "$part_run" --out "$direction_run"
+"$blender" -b --python-exit-code 1 --python experiments/refine_v5/part_head_direction_native.py -- "$direction_run" "$direction_native"
+python -m experiments.refine_v5.part_head_direction_report --root "$direction_run" --native "$direction_native" --prior "$part_run" --out "$direction_review"
+```

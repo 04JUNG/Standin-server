@@ -1,0 +1,24 @@
+{
+  "schema": "v5-rough-head-direction-v1",
+  "cases": {
+    "006": {
+      "yaw_deg": [-100, -76],
+      "pitch_deg": [-8, 13],
+      "rough_crop": [170, 0, 309, 138],
+      "evidence": "Face silhouette points to image left in profile. The overlay obscures the crown, so the chin and eye contour only support a broad pitch range."
+    },
+    "029": {
+      "yaw_deg": [-12, 13],
+      "pitch_deg": [-10, 9],
+      "rough_crop": [215, 85, 365, 236],
+      "evidence": "Both eyes and the face centerline are visible, with a near-frontal face and a lifted chin relative to the fitted figure."
+    },
+    "053": {
+      "yaw_deg": [68, 90],
+      "pitch_deg": [45, 55],
+      "neck_tilt_deg": [22, 38],
+      "rough_crop": [366, 106, 627, 348],
+      "evidence": "The near ear, cheek and nose indicate right-facing profile and a lowered face. The visible neck edge runs up and right from the shoulder; its tilt is only a broad observation."
+    }
+  }
+}
