@@ -60,10 +60,11 @@ def frame(points, part, mask=None):
 
 
 class CameraIndex:
-    def __init__(self, pose_ids, points, scores, *, cameras=None, errors=None, hashes=None):
+    def __init__(self, pose_ids, points, scores, *, cameras=None, errors=None, hashes=None, hand_contacts=None):
         self.pose_ids=tuple(pose_ids);self.points=np.asarray(points,np.float32)
         self.scores=np.asarray(scores,np.float32);self.cameras=tuple(cameras or camera_grid())
         self.errors=errors or {};self.hashes=hashes or {}
+        self.hand_contacts=hand_contacts or {}
         projections=[];valid=[]
         for camera in self.cameras:
             xy,ok=project(self.points,camera);projections.append(xy);valid.append(ok)
@@ -74,20 +75,24 @@ class CameraIndex:
         for value in (self.points,self.scores,self.projections,self.valid):value.setflags(write=False)
 
     @classmethod
-    def from_library(cls, pose_ids, bvh_root, *, count=117):
-        root=Path(bvh_root).resolve();ids=[];points=[];scores=[];errors={};hashes={}
+    def from_library(cls, pose_ids, bvh_root, *, count=117, measure_hands=False):
+        root=Path(bvh_root).resolve();ids=[];points=[];scores=[];errors={};hashes={};contacts={}
+        if measure_hands:
+            from .search_hand_contacts import contact_measurements
         for pose_id in sorted(set(pose_ids)):
             try:
                 path=(root/(pose_id+'.bvh')).resolve()
                 if path.parent!=root:raise ValueError('outside_bvh_root')
-                data=path.read_bytes();j,f=parse_bvh(str(path));p,s=coco17_from_fk(j,fk(j,f[0]))
+                data=path.read_bytes();j,f=parse_bvh(str(path));world=fk(j,f[0]);p,s=coco17_from_fk(j,world)
                 if np.any(s[[5,6,11,12]]<.3):raise ValueError('missing_torso_mapping')
                 project(p,Camera(0))
+                if measure_hands:
+                    contacts[pose_id]=contact_measurements(j,world)
                 ids.append(pose_id);points.append(p);scores.append(s)
                 hashes[pose_id]=hashlib.sha256(data).hexdigest()
             except Exception as error:errors[pose_id]=type(error).__name__+':'+str(error)[:120]
         if not ids:raise ValueError('no_valid_camera_gallery')
-        return cls(ids,points,scores,cameras=camera_grid(count),errors=errors,hashes=hashes)
+        return cls(ids,points,scores,cameras=camera_grid(count),errors=errors,hashes=hashes,hand_contacts=contacts)
 
     def search(self, points, mask, part='full'):
         m=np.asarray(mask,bool);selected=np.array(range(5,17) if part=='full' else range(5,11) if part=='upper' else range(11,17))
