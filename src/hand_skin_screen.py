@@ -4,6 +4,7 @@ Only the opposite-hand skin triangle test is certified by a clear receipt.
 Unknown/errors are review evidence, never eligible library/generated results.
 """
 from contextlib import contextmanager
+from contextvars import ContextVar
 from copy import copy, deepcopy
 import hashlib
 import json
@@ -20,6 +21,9 @@ from converter.hand_library import load_library, normalize_request
 from converter.protocol import SOLVER_VERSION
 from .refine_thumbnail import _multipart
 from .hand_skin_capacity import validate_concurrency
+
+
+request_receipts: ContextVar[dict | None] = ContextVar('hand_screen_receipts', default=None)
 
 
 def unknown(reason, **diagnostics):
@@ -205,6 +209,33 @@ class SkinSession:
         self._profile_checked = False
         self._screening_profile = None
         self._library_cache = {}
+        self.request_cache = request_receipts.get()
+        self.request_identity = None
+        if self.request_cache is not None and isinstance(self.client, HandSkinClient):
+            try:
+                hands = normalize_request(self.hands) or {}
+                self.request_identity = (self.client.base_url, self.client.character_id,
+                    self.client.character_sha256, self.client.shape_sha256,
+                    hands.get('left'), hands.get('right'))
+            except (OSError, ValueError):
+                pass  # Let the converter path report invalid presets as usual.
+
+    def cached_receipt(self, key):
+        if key in self.cache:
+            return deepcopy(self.cache[key])
+        if self.request_identity is not None:
+            receipt = self.request_cache.get((self.request_identity, key))
+            if receipt is not None:
+                from .logging_setup import log_info
+                log_info('hand_skin_screen_check', status=receipt['status'],
+                         elapsed_ms=0., source='request_cache')
+                return deepcopy(receipt)
+        return None
+
+    def remember_receipt(self, key, receipt):
+        self.cache[key] = deepcopy(receipt)
+        if self.request_identity is not None and receipt['status'] in ('clear_screen', 'intersection'):
+            self.request_cache[(self.request_identity, key)] = deepcopy(receipt)
 
     def library_check(self, pose_id, text):
         """Use only a pinned operator certificate for a verified library asset.
@@ -268,8 +299,8 @@ class SkinSession:
 
     def check(self, text, *, timeout_seconds=None):
         key = hashlib.sha256(text.encode('utf-8')).hexdigest()
-        if key in self.cache:
-            return self.cache[key]
+        if (receipt := self.cached_receipt(key)) is not None:
+            return receipt
         remaining = self.gate.budget_seconds-self.spent_seconds
         if timeout_seconds is not None:
             remaining = min(remaining, timeout_seconds)
@@ -288,7 +319,7 @@ class SkinSession:
             result = unknown('hand_screen_failed')
         self.spent_seconds += monotonic()-started
         self.failed = result['status'] == 'unavailable'
-        self.cache[key] = result
+        self.remember_receipt(key, result)
         timing = result.get('availability') or {}
         event = dict(check=self.checks, status=result['status'],
                      reason=result.get('reason'), elapsed_ms=round((monotonic()-started)*1000, 3),
