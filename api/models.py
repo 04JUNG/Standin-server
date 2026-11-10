@@ -90,6 +90,7 @@ class ImageInfoOut(BaseModel):
 
 class InferenceMetadataOut(BaseModel):
     deployment_version: str
+    pose_search_profile: Optional[str] = None
     vlm_provider: str
     vlm_model: str
     # 어느 VLM 프롬프트가 답했는지(src/vlm/prompts.py의 USER_TEMPLATES 키).
@@ -168,7 +169,7 @@ class WholePoseCandidateOut(BaseModel):
     pose_id: str
     kind: Literal["library_original"] = "library_original"
     library_source: Optional[str] = Field(None, description="저장 포즈 출처. generated_composition도 전신 검색 후보이며 이번 요청에서 합성하지 않음")
-    rank_score: float
+    rank_score: Optional[float] = None
     evidence: dict = Field(default_factory=dict)
     core_conditions: Optional[dict] = None
     camera: Optional[dict] = None
