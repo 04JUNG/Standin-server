@@ -1,7 +1,7 @@
 """Ordered, bounded screening with request/session-local state only.
 
-Receipts certify opposite-hand skin triangles, never export permission. No
-receipt, BVH, candidate or ownership cache is shared across sessions/users.
+Receipts certify opposite-hand skin triangles, never export permission.
+Completed live receipts can be reused by sessions in the same request.
 """
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
@@ -141,8 +141,7 @@ class ParallelSkinSession(SkinSession):
         if receipt['status'] == 'unavailable':
             self.failed = True
         else:
-            # Only determinate receipts in this session; never cross-request.
-            self.cache[hashlib.sha256(text.encode('utf-8')).hexdigest()] = deepcopy(receipt)
+            self.remember_receipt(hashlib.sha256(text.encode('utf-8')).hexdigest(), receipt)
         timing = receipt.get('availability') or {}
         event = dict(check=check_number, status=receipt['status'], reason=receipt.get('reason'),
             elapsed_ms=round(outcome.elapsed*1000, 3), call_budget_ms=round(outcome.budget*1000, 3),
@@ -158,8 +157,8 @@ class ParallelSkinSession(SkinSession):
         if stop:
             return stop
         key = hashlib.sha256(text.encode('utf-8')).hexdigest()
-        if key in self.cache:
-            return deepcopy(self.cache[key])
+        if (receipt := self.cached_receipt(key)) is not None:
+            return receipt
         if self.checks >= self.gate.max_checks:
             return unknown('hand_screen_check_limit_exhausted')
         budget = min(CALL_SECONDS, self.remaining())
@@ -217,8 +216,8 @@ class ParallelSkinSession(SkinSession):
                     except Exception:
                         receipt = unknown('hand_screen_bvh_unavailable_or_changed')
                     key = hashlib.sha256(text.encode('utf-8')).hexdigest() if text else None
-                    if receipt is None and key in self.cache:
-                        receipt = deepcopy(self.cache[key])
+                    if receipt is None:
+                        receipt = self.cached_receipt(key)
                     if receipt is None and key not in futures:
                         if self.checks >= self.gate.max_checks:
                             receipt = unknown('hand_screen_check_limit_exhausted')
