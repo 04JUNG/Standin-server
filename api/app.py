@@ -246,6 +246,15 @@ async def lifespan(app: FastAPI):
         # production에서 converter 주소가 없으면 여기서 기동이 실패한다(옛 마네킹을
         # 조용히 서빙하지 않는다). 개발은 경고 후 마네킹으로 폴백한다.
         thumbnail_renderer = _build_thumbnail_renderer()
+        recall_search = None
+        if recall_assets := os.getenv("ROUTING_RECALL_ASSETS_DIR"):
+            from src.experimental.search_recall.engine import RecallAssets, RecallSearch
+            fullbody = getattr(pipeline, "_fullbody_search", None)
+            if (getattr(fullbody, "search_evidence", None) is None
+                    or not getattr(pipeline.vlm, "single_description_call", False)):
+                raise ValueError("04J-344 recall requires full-body routing and the Luna six-field profile")
+            recall_search = RecallSearch(entries, Path(DB_PATH), Path(CFG.data_dir),
+                                         RecallAssets.from_root(recall_assets))
     except Exception as exc:
         # 기동 실패는 컨테이너가 뜨지 않는다는 뜻이고, 그 상태에서는 앱이 더 이상
         # 아무것도 보고할 수 없다. 죽기 전에 동기로 한 번 보낸다.
@@ -272,6 +281,7 @@ async def lifespan(app: FastAPI):
     STATE["thumbnail_renderer"] = thumbnail_renderer
     STATE["quarantined_pose_count"] = len(quarantine)
     STATE["pipeline"] = pipeline
+    STATE["recall_search"] = recall_search
     STATE["db_path"] = DB_PATH
     STATE["pose_library"] = library_identity
     STATE["pose_count"] = len(entries)
@@ -292,11 +302,15 @@ async def lifespan(app: FastAPI):
         f"추론 서버 기동 — 포즈 {len(entries)}개, vlm={actual_vlm}, pose={actual_pose}",
         context={"env": CFG.app_env, "version": CFG.deployment_version},
     )
-    yield
-    log_info("shutdown", "종료")
-    STATE.clear()
-    # 종료 신호 뒤에는 배치 창을 기다릴 수 없다. 버퍼에 남은 알림을 밀어낸다.
-    alerts.flush()
+    try:
+        yield
+    finally:
+        if recall_search is not None:
+            recall_search.close()
+        log_info("shutdown", "종료")
+        STATE.clear()
+        # 종료 신호 뒤에는 배치 창을 기다릴 수 없다. 버퍼에 남은 알림을 밀어낸다.
+        alerts.flush()
 
 
 app = FastAPI(title="Standin Pose Pipeline", version="0.2.2", lifespan=lifespan)
@@ -449,6 +463,7 @@ def healthz():
     camera = getattr(engine, 'camera', None)
     body = {
         "ok": ok,
+        "pose_search_profile": "recall-90-v1" if STATE.get("recall_search") is not None else None,
         "env": CFG.app_env,
         "provider": STATE.get("provider", CFG.vlm_provider),
         "pose_backend": STATE.get("pose_backend", CFG.pose_backend),
@@ -760,6 +775,11 @@ def _analyze(file, hint="", rescue="", response=None):
             feature_version=FEATURE_VERSION,
         ),
     )
+    if (recall_search := STATE.get("recall_search")) is not None:
+        from src.experimental.search_recall.verified_recall import PROFILE
+        updated = recall_search.rerank(data, output.model_dump(mode="json"))
+        updated["inference_metadata"]["pose_search_profile"] = PROFILE
+        output = CutResultOut.model_validate(updated)
     progress.finish()
     return output
 
