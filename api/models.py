@@ -216,6 +216,7 @@ class DynamicSearchOut(BaseModel):
     split_search_enabled: Literal[False] = False
     ranking: str
     condition_ranking: Optional[str] = None
+    search_evidence_rerank: Optional[str] = None
     candidate_validation: Optional[dict] = None
     hand_skin_screen: Optional[dict] = Field(None,
         description="실제 FBX 손 검사·탈락·미확인 또는 head 생략(checks=0, not_applicable). 안전 인증은 아님")
