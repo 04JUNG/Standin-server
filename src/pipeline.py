@@ -546,7 +546,10 @@ class Pipeline:
                 evidence = {
                     "keypoints": slot.skeleton.keypoints.tolist() if slot.skeleton is not None else [],
                     "joint_mask": slot.evidence.valid_joint_mask.tolist() if slot.evidence is not None else [],
+                    "joint_scores": slot.evidence.raw_scores.tolist() if slot.evidence is not None else [],
                     "coverage_class": desc.coverage_class,
+                    "lower_body_observed": desc.lower_body_observed,
+                    "person_count": len(slots),
                     "output_scope": desc.output_scope.detected.value if desc.output_scope.detected else None,
                     "output_scope_source": desc.output_scope.source,
                     # Post-retrieval mesh gate only; never feeds pose ranking.
