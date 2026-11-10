@@ -30,7 +30,7 @@ def configure(task, enabled, pin):
                 or env.get('OPENAI_MODEL') != 'gpt-6-luna'
                 or env.get('OPENAI_REASONING_EFFORT') != 'low'):
             raise ValueError('staging recall requires full-body search and gpt-6-luna low')
-        prefix = 's3://standinstagingapp-assetsbucket5cb76180-fiwlikrhl1sk/pose-models/recall-90-v1/'
+        prefix = 's3://standinstagingapp-assetsbucket5cb76180-fiwlikrhl1sk/pose-library/runtime-assets/recall-90-v1/'
         digest = pin['sha256']
         if not re.fullmatch(r'[0-9a-f]{64}', digest) or pin['uri'] != (
                 f'{prefix}recall-models-{digest[:16]}.tar'):

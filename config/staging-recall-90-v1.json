@@ -1,4 +1,4 @@
 {
-  "uri": "s3://standinstagingapp-assetsbucket5cb76180-fiwlikrhl1sk/pose-models/recall-90-v1/recall-models-839a2d0a9ea54c5e.tar",
+  "uri": "s3://standinstagingapp-assetsbucket5cb76180-fiwlikrhl1sk/pose-library/runtime-assets/recall-90-v1/recall-models-839a2d0a9ea54c5e.tar",
   "sha256": "839a2d0a9ea54c5e4fade054bbf631a06d19945f4398771a3d094eede96c62d7"
 }
