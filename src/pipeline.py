@@ -800,7 +800,8 @@ class Pipeline:
                 "requested_people": len(need),
                 "status": describe.status if describe is not None else "not_requested",
                 "provider": getattr(describe, "provider", None),
-                "prompt_version": prompts.POSE_DESCRIBE_VERSION if need else None,
+                "prompt_version": getattr(self.vlm, 'description_prompt_version', prompts.POSE_DESCRIBE_VERSION)
+                                  if need else None,
                 "error_reason": getattr(describe, "error_reason", None),
                 "retryable": getattr(describe, "retryable", None),
                 "retry_after_seconds": getattr(describe, "retry_after_seconds", None),

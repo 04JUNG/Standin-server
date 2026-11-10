@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import random
 import re
 import time
@@ -274,13 +275,15 @@ def _mock_describe(self, image, boxes: list):
 MockVLMClient.describe_people = _mock_describe
 
 
-def parse_pose_descriptions(payload, count: int) -> dict:
+def parse_pose_descriptions(payload, count: int, *, vocabulary=None) -> dict:
     """설명 응답 → {인덱스: PoseDescription}. 길이가 다르면 통째로 버린다(한 칸 밀림 방지)."""
     from ..search_routing import PoseDescription
     from ..semantic_vocab import VOCABULARY
     from ..body_language import validated_observations
     from ..pose_relations import validate_relations
     from .description_contract import DescriptionResponseError
+
+    vocabulary = VOCABULARY if vocabulary is None else vocabulary
 
     people = payload.get("people") if isinstance(payload, dict) else None
     if not isinstance(people, list) or len(people) != count:
@@ -298,7 +301,7 @@ def parse_pose_descriptions(payload, count: int) -> dict:
         for field_name, group in groups.items():
             values = item.get(field_name)
             values = values if isinstance(values, list) else []
-            allowed = VOCABULARY[group]
+            allowed = vocabulary[group]
             kept[field_name] = list(dict.fromkeys(
                 value for value in values if isinstance(value, str) and value in allowed))
             bad = [value for value in values if not (isinstance(value, str) and value in allowed)]
@@ -826,6 +829,19 @@ class OpenAIVLMClient(GeminiVLMClient):
         transport = client if client is not None else OpenAIContentClient(
             timeout_ms=CFG.openai_request_timeout_ms)
         super().__init__(selected, client=transport, **kwargs)
+        recall_default = '1' if os.getenv('ROUTING_RECALL_ASSETS_DIR') else '0'
+        self.single_description_call = (selected == 'gpt-6-luna'
+                                        and os.getenv('ROUTING_LUNA_SIX_FIELD_ENABLED', recall_default) == '1')
+        if self.single_description_call:
+            from .luna_search_description import VERSION, profile
+            profile()
+            self.description_prompt_version = VERSION
+
+    def describe_people(self, image, boxes: list):
+        if self.single_description_call:
+            from .luna_search_description import describe
+            return describe(self, image, boxes)
+        return super().describe_people(image, boxes)
 
 
 def build_vlm_client() -> BaseVLMClient:
