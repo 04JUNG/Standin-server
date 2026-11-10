@@ -68,7 +68,7 @@ def pinned_archive(tmp_path, monkeypatch):
     sha = hashlib.sha256(bundle.read_bytes()).hexdigest()
     destination = tmp_path / 'models'
     monkeypatch.setenv('ROUTING_RECALL_ASSETS_DIR', str(destination))
-    monkeypatch.setenv('ROUTING_RECALL_ASSETS_URI', 's3://private-staging/pose-models/recall-90-v1/fixture.tar')
+    monkeypatch.setenv('ROUTING_RECALL_ASSETS_URI', 's3://private-staging/pose-library/runtime-assets/recall-90-v1/fixture.tar')
     monkeypatch.setenv('ROUTING_RECALL_ASSETS_SHA256', sha)
     calls = []
 

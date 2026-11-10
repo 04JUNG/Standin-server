@@ -56,7 +56,8 @@ def ensure_recall_assets() -> Path | None:
         return Path(directory) if directory else None
     if (not directory or not uri or not digest
             or not re.fullmatch(r'[0-9a-f]{64}', digest)
-            or not re.fullmatch(r's3://[a-z0-9.-]+/pose-models/recall-90-v1/[a-z0-9.-]+\.tar', uri)):
+            or not re.fullmatch(r's3://[a-z0-9.-]+/(?:pose-models|pose-library/runtime-assets)/'
+                                r'recall-90-v1/[a-z0-9.-]+\.tar', uri)):
         raise ValueError('recall models require a directory and a pinned S3 archive')
     destination = Path(directory).resolve()
     if destination.exists():
