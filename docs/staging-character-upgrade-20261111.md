@@ -97,6 +97,22 @@ Policy `StagingAnatomyAssets20261111` grants no write/delete access. Earlier BFF
 121 startup attempts generated `body-assets-init=1` alerts due to AccessDenied;
 the prior healthy BFF 120 remained running during those failed attempts.
 
+Final rollout: inference 127, converter 42, BFF 121. BFF's retry after the approved
+grant completed with zero failed tasks. Public `/healthz` returned 200.
+An isolated task using the deployed BFF image, environment and asset initializer
+verified the new catalog, both SSR2 files and hand revision, then called the live
+converter with `shoulders=0.2`, `muscle=0.5`, left fist and right relaxed hand:
+
+| Live export | FBX bytes | Preview bytes | Time |
+|---|---:|---:|---:|
+| Male | 9,051,084 | 161,372 | 79.653 s |
+| Female | 6,707,644 | 161,707 | 50.718 s |
+
+Both artifact integrity checks passed. The QA task emitted `LIVE_QA_PASS` and
+both containers exited 0. Its log is `live-qa-bff.log` in the diagnostic folder.
+Temporary registry credentials were removed. Completed sample caches and failed
+local release attempts were removed, recovering approximately 1.4 GiB.
+
 Reproduction scripts are in `scripts/character_upgrade`. Sampling runs inside
 the pinned Blender. Export metadata with `--export-metadata`, then compress
 completed samples with host NumPy using `--metadata`; Blender's bundled Windows

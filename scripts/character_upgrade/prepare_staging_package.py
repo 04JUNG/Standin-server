@@ -2,7 +2,7 @@
 
 Writes a reviewable local package and upload plan. Does not activate any service.
 """
-import argparse,copy,hashlib,json,shutil,struct
+import argparse,copy,hashlib,json,shutil,struct,re
 from pathlib import Path
 BUCKET='standinstagingapp-assetsbucket5cb76180-fiwlikrhl1sk'
 OLD={'converter':'body-models/releases/csp-shape-20261030-170c4df72c41-converter',
@@ -71,7 +71,11 @@ for role in (['converter'] if args.converter_only else OLD):
         rel=p.relative_to(package/role).as_posix();local[rel]=str(p)
         entries[rel]={'path':rel,'roles':[role],'size':p.stat().st_size,'sha256':sha(p)}
     manifest={'schema':'body-assets.v1','version':catalog['version'],'files':list(entries.values())}
+    allowed=re.compile(r'(?:shape-bakes\.json|sources/[a-z0-9-]+\.(?:blend|py)|runtime/[a-z0-9-]+\.ssr|body-catalog\.json|body-models\.json|characters\.json|fbx/[a-z0-9-]+\.fbx|png/[a-z0-9-]+\.png|qa/[a-z0-9-]+\.json|preview/posed-mesh-v1/[a-f0-9]{64}\.(?:json|glb))\Z')
+    if any(not allowed.fullmatch(f['path']) or not 0<f['size']<=300*1024*1024 for f in entries.values()):raise ValueError('asset violates deployed installer path/size contract')
+    if sum(f['size'] for f in entries.values())>(512 if role=='converter' else 300)*1024*1024:raise ValueError('release exceeds reviewed installer total limit')
     target=package/role/'manifest.json';write(target,manifest);digest=sha(target)
+    if target.stat().st_size>65536:raise ValueError('manifest exceeds installer limit')
     prefix='body-models/releases/anatomy-20261111-'+digest[:12]+'-'+role
     plan['roles'][role]={'prefix':prefix,'manifestSha256':digest,'manifest':str(target),
         'upload':[{'path':rel,'local':path} for rel,path in local.items()],
