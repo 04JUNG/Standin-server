@@ -34,13 +34,16 @@ def main():
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--character", required=True, type=Path)
+    parser.add_argument("--character-id", default="standin-master-v2")
+    parser.add_argument("--character-sha256", default=CHARACTER_SHA,
+                        help="Pinned SHA-256 of the reviewed source FBX")
     parser.add_argument("--out", type=Path, default=ROOT / "converter/hand_thumbs")
     parser.add_argument("--size", type=int, default=320)
     parser.add_argument("--presets", nargs="+", help="Preview subset; do not replace the catalog manifest")
     args = parser.parse_args(sys.argv[sys.argv.index("--") + 1:])
     character_sha = hashlib.sha256(args.character.read_bytes()).hexdigest()
-    if character_sha != CHARACTER_SHA:
-        raise ValueError("Use the approved standin-master-v2 source character")
+    if character_sha != args.character_sha256:
+        raise ValueError("Source FBX does not match the pinned character SHA-256")
     if not 64 <= args.size <= 1024 or args.size % 2:
         raise ValueError("size must be an even number between 64 and 1024")
     library = load_library()
@@ -175,7 +178,7 @@ def main():
             size_css_px=args.size // 2, scale=2,
             view="palm-oblique, fingers-up; thumb-side for closed grips",
             renderer="default-human-hand-mesh-v1", style=STYLE,
-            character_id="standin-master-v2", character_sha256=character_sha, files=files)
+            character_id=args.character_id, character_sha256=character_sha, files=files)
         pending = args.out / "manifest.json.tmp"
         pending.write_text(json.dumps(manifest, indent=1) + "\n")
         pending.replace(args.out / "manifest.json")
