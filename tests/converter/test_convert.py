@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import os
 import sys
+from pathlib import Path
 
 TEST_ROOT = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.dirname(os.path.dirname(TEST_ROOT))
@@ -28,6 +29,7 @@ from mathutils import Vector
 
 from converter.convert import convert
 from converter.bone_map import MIXAMO
+from converter.retarget import import_bvh, reset_scene
 
 ASSETS = os.path.join(ARTIFACT_ROOT, "assets")
 OUT = os.path.join(ARTIFACT_ROOT, "out")
@@ -155,6 +157,47 @@ dl, dr = bone_dir(None, LARM), bone_dir(None, RARM)
 check("mirror: 들린 팔이 왼쪽->오른쪽으로 바뀜",
       dr is not None and dr.z > 0.85 and (dl is None or dl.z < 0.5),
       f"L={tuple(round(c,2) for c in dl)} R={tuple(round(c,2) for c in dr)}")
+
+# The library's baked BVH and a Blender-style BVH describe the same arm.
+# Exercise the actual importer so both formats retain the bone separation.
+offset_bvh = """HIERARCHY
+ROOT mixamorig:Hips
+{
+  OFFSET 0 0 0
+  CHANNELS 6 Xposition Yposition Zposition Xrotation Yrotation Zrotation
+  JOINT mixamorig:LeftArm
+  {
+    OFFSET 12 0 0
+    CHANNELS 6 Xposition Yposition Zposition Xrotation Yrotation Zrotation
+    JOINT mixamorig:LeftForeArm
+    {
+      OFFSET 0 -28 3
+      CHANNELS 6 Xposition Yposition Zposition Xrotation Yrotation Zrotation
+      End Site
+      {
+        OFFSET 0 -24 0
+      }
+    }
+  }
+}
+MOTION
+Frames: 1
+Frame Time: 0.03333333
+3 90 5 0 0 0 {position_channels}
+"""
+for name, positions in (
+    ("baked offset + delta", "0 0 0 0 0 0 0 -0.001 0 0 0 0"),
+    ("legacy absolute position", "12 0 0 0 0 0 0 -28.001 3 0 0 0"),
+):
+    path = Path(OUT) / (name + ".bvh")
+    path.write_text(offset_bvh.replace("{position_channels}", positions), encoding="utf-8")
+    reset_scene()
+    armature = import_bvh(str(path))
+    arm = armature.pose.bones[MIXAMO["upperarm.L"]]
+    forearm = armature.pose.bones[MIXAMO["forearm.L"]]
+    edge = armature.matrix_world.to_3x3() @ (forearm.head - arm.head)
+    check(f"{name}: BVH 팔꿈치 위치 보존", (edge - Vector((0, -3, -28.001))).length < 1e-4,
+          f"edge={tuple(edge)}")
 
 # ---------------------------------------------------------------------------
 print("\n" + "=" * 60)
