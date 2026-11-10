@@ -240,6 +240,8 @@ async def lifespan(app: FastAPI):
         entries = _ensure_db()                      # 1회 로드
         library_identity = _resolve_library_identity()  # 응답에 실을 번들 버전
         model_bundle = _ensure_pose_model_bundle()  # S3 bundle → local manifest
+        from src.search_recall_assets import ensure_recall_assets
+        recall_assets = ensure_recall_assets()
         from src.fullbody_routing import build_api_pipeline
         pipeline = build_api_pipeline(entries, db_path=DB_PATH)
         _check_backends(pipeline)                   # 팩토리 폴백 후 실제 인스턴스 검사
@@ -247,7 +249,7 @@ async def lifespan(app: FastAPI):
         # 조용히 서빙하지 않는다). 개발은 경고 후 마네킹으로 폴백한다.
         thumbnail_renderer = _build_thumbnail_renderer()
         recall_search = None
-        if recall_assets := os.getenv("ROUTING_RECALL_ASSETS_DIR"):
+        if recall_assets is not None:
             from src.experimental.search_recall.engine import RecallAssets, RecallSearch
             fullbody = getattr(pipeline, "_fullbody_search", None)
             if (getattr(fullbody, "search_evidence", None) is None
