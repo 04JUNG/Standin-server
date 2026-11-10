@@ -408,7 +408,7 @@ class BlenderRunner:
     def _report_error(report: dict[str, Any]) -> RunnerError:
         code = report.get("error_code")
         message = str(report.get("error_message") or "conversion failed")[:300]
-        if code in {"invalid_input", "conversion_rejected"}:
+        if code in {"invalid_input", "conversion_rejected", "HAND_CONTACT_INTERSECTION", "HAND_CONTACT_UNAVAILABLE"}:
             return ConversionRejectedError(message, report=report)
         if code == "thumbnail_render_failed":
             return ThumbnailRenderFailedError(message, report=report)
@@ -444,6 +444,7 @@ class BlenderRunner:
         shape_recipe: dict | None = None,
         hands: dict | None = None,
         hand_contact_screen: bool = False,
+        selected_hand_screen: bool = False,
     ) -> ConversionResult:
         if (self.settings.fast_scene_reset and shape_recipe is None and hands is not None
                 and preview_view in (None, "front") and not preview_model and thumbnail is None
@@ -463,6 +464,8 @@ class BlenderRunner:
                 raise WorkerIntegrityError("shape bake lineage mismatch", report=report)
         if not report.get("ok"):
             raise self._report_error(report)
+        if selected_hand_screen and report.get('framing', {}).get('selected_hand_screen') != 'clear_screen':
+            raise WorkerIntegrityError('missing selected hand screen result', report=report)
         if returncode != 0:
             raise WorkerIntegrityError(
                 "worker exited non-zero after reporting success", report=report
@@ -663,6 +666,7 @@ class BlenderRunner:
         shape_recipe: dict | None = None,
         hands: dict | None = None,
         hand_contact_screen: bool = False,
+        selected_hand_screen: bool = False,
     ) -> ConversionResult:
         if shape_recipe is not None and self.settings.force_exact_v324:
             raise ConversionRejectedError("exact V3.2.4 mode does not permit shape baking")
@@ -734,6 +738,7 @@ class BlenderRunner:
                 shape_recipe=shape_recipe,
                 hands=hands,
                 hand_contact_screen=hand_contact_screen,
+                **({'selected_hand_screen': True} if selected_hand_screen else {}),
             )
             control.check("execution")
         finally:
@@ -767,6 +772,7 @@ class BlenderRunner:
         shape_recipe: dict | None = None,
         hands: dict | None = None,
         hand_contact_screen: bool = False,
+        selected_hand_screen: bool = False,
     ) -> ConversionResult:
         control = current_work.get()
         if control is not None:
@@ -825,6 +831,8 @@ class BlenderRunner:
                 job["hands"] = hands
             if hand_contact_screen:
                 job['hand_contact_screen'] = True
+            if selected_hand_screen:
+                job['selected_hand_screen'] = True
             if (self.settings.fast_scene_reset and shape_recipe is None and hands is not None
                     and preview_view in (None, "front") and not preview_model and thumbnail is None
                     and not hand_contact_screen and not self.settings.force_exact_v324):
@@ -903,6 +911,7 @@ class BlenderRunner:
                 shape_recipe=shape_recipe,
                 hands=hands,
                 hand_contact_screen=hand_contact_screen,
+                **({'selected_hand_screen': True} if selected_hand_screen else {}),
             )
             if base_identity is not None:
                 from converter.retarget_cache import validate_base, cache_key

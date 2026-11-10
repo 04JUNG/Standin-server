@@ -92,7 +92,15 @@ class SnapshotStore:
                     if time.monotonic()-start>self.runner.settings.shape_timeout_seconds:raise TimeoutError('interactive deadline')
                     time.sleep(.05)
                 check()
-                if p.returncode:raise RuntimeError('interactive worker failed')
+                if p.returncode:
+                    failure = Path(destination).parent/'hand-contact-error'
+                    if stage == 'solve' and failure.is_file():
+                        code = failure.read_text()
+                        if code == 'HAND_CONTACT_INTERSECTION':
+                            raise HTTPException(409, code)
+                        if code == 'HAND_CONTACT_UNAVAILABLE':
+                            raise HTTPException(503, code)
+                    raise RuntimeError('interactive worker failed')
             finally:
                 if p.poll() is None:
                     p.terminate()

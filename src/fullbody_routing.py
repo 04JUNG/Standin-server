@@ -30,7 +30,8 @@ class FullBodySearch:
                  geometry_max_distance=1.0, geometry_upper_max_distance=1.5,
                  generator=None, startup_error=None, include_stored_compositions=True,
                  semantic_weight=.35, hand_skin_gate=None, hand_spacing_repairer=None,
-                 enable_waist_down_pair=False, enable_cross_chest_hint=False, search_evidence=None):
+                 enable_waist_down_pair=False, enable_cross_chest_hint=False, search_evidence=None,
+                 defer_library_hand_screen=False):
         if not 1 <= top_k <= pool_k <= 200:
             raise ValueError('invalid search limits')
         if any(not math.isfinite(v) or v <= 0 for v in (geometry_max_distance, geometry_upper_max_distance)):
@@ -47,6 +48,7 @@ class FullBodySearch:
         self.cutoffs = {'full': geometry_max_distance, 'upper': geometry_upper_max_distance}
         self.generator, self.startup_error = generator, startup_error
         self.hand_skin_gate = hand_skin_gate
+        self.defer_library_hand_screen = defer_library_hand_screen
         self.hand_spacing_repairer = hand_spacing_repairer
         self.include_stored_compositions = include_stored_compositions
         self.enable_waist_down_pair = enable_waist_down_pair
@@ -401,7 +403,7 @@ class FullBodySearch:
         out['framing_references']=[r for r in out['selected'] if r['kind']=='framing_reference']
         out['selected']=[r for r in out['selected'] if r['kind']!='framing_reference']
         skin_session = None
-        if self.hand_skin_gate is not None and not head_only:
+        if self.hand_skin_gate is not None and not head_only and not self.defer_library_hand_screen:
             skin_session = self.hand_skin_gate.session(evidence.get('hand_presets'))
             eligible = [r for r in ranked if r.get('match_level') != 'near_match'
                         and r['kind'] != 'framing_reference']
@@ -468,6 +470,9 @@ class FullBodySearch:
                 out['generation']['diagnostics']['whole_pose_conditions']=audits
                 if any(a['status'] not in ('passed','not_required') for a in audits):
                     out['generation'].update(status='rejected',reason='generated_observation_conditions_failed',candidates=[])
+            if (self.defer_library_hand_screen and self.hand_skin_gate is not None
+                    and not head_only and out['generation']['status'] == 'preview_ready'):
+                skin_session = self.hand_skin_gate.session(evidence.get('hand_presets'))
             if skin_session and out['generation']['status'] == 'preview_ready':
                 generated = out['generation']['candidates']
                 if self.hand_spacing_repairer:
@@ -511,7 +516,7 @@ class FullBodySearch:
                     if self.validator and required and required['active']:
                         row['core_conditions'] = dict(whole_pose_validation=
                             self.validator.check(required, row['pose_id']))
-                if skin_session:
+                if skin_session and not self.defer_library_hand_screen:
                     rows = skin_session.filter(rows, limit=self.top_k)
                     out['hand_skin_screen'] = skin_session.report()
                     if skin_session.unverified:
@@ -599,6 +604,7 @@ def _build_fullbody_resources(entries, *, db_path):
         search_evidence = SearchEvidence(camera, semantic, depth_observer=depth_observer)
     engine = FullBodySearch(entries, semantic, camera, generator=generator, search_evidence=search_evidence,
         semantic_weight=API_SEMANTIC_WEIGHT,
+        defer_library_hand_screen=CFG.hand_skin_screen_on_selection,
         enable_waist_down_pair=search_evidence_enabled,
         enable_cross_chest_hint=search_evidence_enabled,
         include_stored_compositions=include_stored,

@@ -45,6 +45,7 @@ from converter.thumbnail_render import (  # noqa: E402 - bpy는 함수 안에서
 )
 from converter.framing import FRAMING_VERSION, PREVIEW_VIEWS, validate_scope
 from converter.hand_library import HandLibraryError, normalize_request as normalize_hands
+from converter.hand_contact import SelectedHandContactError
 
 
 class JobValidationError(ValueError):
@@ -105,7 +106,8 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
         "force_exact_v324", "thumbnail",
     }
     unknown = set(raw) - required - {
-        "output_scope", "preview_view", "camera_rotation", "preview_model", "shape_recipe", "hands", "hand_contact_screen", "retarget_cache", "fast_scene_reset"}
+        "output_scope", "preview_view", "camera_rotation", "preview_model", "shape_recipe", "hands",
+        "hand_contact_screen", "selected_hand_screen", "retarget_cache", "fast_scene_reset"}
     missing = required - set(raw)
     if missing or unknown:
         raise JobValidationError(
@@ -165,6 +167,9 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
             output_scope != 'full' or preview_view or preview_model or camera_rotation is not None
             or raw['thumbnail'] is not None or raw['mirror'] or raw['force_exact_v324'])):
         raise JobValidationError('hand screening requires an unframed, non-mirrored full artifact')
+    selected_screening = raw.get('selected_hand_screen', False)
+    if type(selected_screening) is not bool or (selected_screening and (screening or output_scope not in ('full', 'half'))):
+        raise JobValidationError('selected hand screening requires a single pose containing hands')
 
     unresolved_temp = _absolute_path(raw["temp_dir"], "temp_dir")
     if unresolved_temp.is_symlink():
@@ -443,6 +448,7 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
             view=preview_view or "front",
             camera_rotation=job.get("camera_rotation"),
             lab_timings=lab_timings,
+            **({"selected_hand_screen": True} if job.get("selected_hand_screen") else {}),
         )
         payload["camera_rotation"] = job.get("camera_rotation")
         payload["output_scope"] = scope
@@ -552,7 +558,9 @@ def main(argv: list[str] | None = None) -> int:
         print(f"[OK] conversion {job['conversion_id']}")
         return 0
     except Exception as exc:
-        if isinstance(exc, ThumbnailRenderError):
+        if isinstance(exc, SelectedHandContactError):
+            error_code = exc.code
+        elif isinstance(exc, ThumbnailRenderError):
             error_code = "thumbnail_render_failed"
         elif isinstance(exc, (FrozenLineageError, ArtifactValidationError)):
             error_code = "internal_error"

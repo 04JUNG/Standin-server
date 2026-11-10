@@ -91,10 +91,16 @@ def reselect(engine, person, order, library_cameras, trace, *, lexical_fallback=
     trace['before_screen'] = [row['pose_id'] for row in candidates]
     if not candidates:
         return False
-    hands = {side: person['hands'][side]['preset'] for side in ('left', 'right')}
-    session = engine.hand_skin_gate.session(hands)
-    accepted = session.filter(candidates, limit=5)
-    screening = session.report()
+    deferred = getattr(engine, 'defer_library_hand_screen', False)
+    if deferred:
+        accepted = candidates[:5]
+        trace['screen_deferred'] = True
+        screening = {'rejected': [], 'unverified': []}
+    else:
+        hands = {side: person['hands'][side]['preset'] for side in ('left', 'right')}
+        session = engine.hand_skin_gate.session(hands)
+        accepted = session.filter(candidates, limit=5)
+        screening = session.report()
     trace['after_screen'] = [row['pose_id'] for row in accepted]
     trace['screen_rejected'] = {row['pose_id']: row['hand_skin_screen'].get('reason')
                                 for key in ('rejected', 'unverified') for row in screening[key]}
@@ -103,7 +109,9 @@ def reselect(engine, person, order, library_cameras, trace, *, lexical_fallback=
         raise ScreeningUnavailable(sorted(reasons))
     if not accepted:
         return False
-    report.update(status='ok', reason=None, selected=accepted, hand_skin_screen=screening)
+    report.update(status='ok', reason=None, selected=accepted)
+    if not deferred:
+        report['hand_skin_screen'] = screening
     if crop_recovery:
         report.update(route='geometric', reason='single_subject_recovered_from_crop')
         joint['policy_block'] = None

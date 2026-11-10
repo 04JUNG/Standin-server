@@ -46,7 +46,7 @@ def runtime_revision():
     root = Path(__file__).parent
     names = ['interactive_camera.py', 'interactive_worker.py', 'interactive_adapter.py', 'interactive_scene.py', 'interactive_export.py',
              'interactive_revision.py', 'interactive_variants.py', 'shared/interactive_pose_v1.mjs',
-             'solved_state.py', 'hands.py', 'hand_geometry.py', 'hand_library.py',
+             'solved_state.py', 'hands.py', 'hand_geometry.py', 'hand_library.py', 'hand_contact.py',
              'hand_library.v1.json', 'hand_rig.py', 'framing.py', 'camera.py',
              'shape_bake.py', 'final_artifact.py', 'protocol.py', 'worker.py']
     return digest(b''.join(canonical([n, digest((root/n).read_bytes())]) for n in names))
@@ -190,6 +190,9 @@ def solve_from_body(base_directory, identity, destination, *, checkpoint):
     # boundary: never call a failed hand safety result authoritative.
     if hand_report and hand_report['self_collision_free'] is not True:
         raise ValueError('hand self-collision gate failed')
+    from converter.hand_contact import require_clear_selected_hands, selected_hand_screen_enabled
+    if selected_hand_screen_enabled(identity['scope']):
+        require_clear_selected_hands(meshes)
     checkpoint()
     crop_report = crop_meshes(arm, meshes, identity['scope'])
     directory = Path(destination); directory.mkdir(parents=True, exist_ok=False)

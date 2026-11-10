@@ -43,6 +43,17 @@ def test_only_selected_capacity_changes(container, value):
     assert original == before and after == expected
 
 
+@pytest.mark.parametrize('container', ['inference', 'converter'])
+def test_selection_screen_can_be_rolled_out_independently(container):
+    original = task()
+    expected = deepcopy(original)
+    target = next(c for c in expected['containerDefinitions'] if c['name'] == container)
+    target['environment'].append({'name': deploy.SELECTION_SETTINGS[container], 'value': '1'})
+    assert deploy.prepare(original, container, None, '1') == expected
+    with pytest.raises(ValueError):
+        deploy.prepare(original, container, None, 'true')
+
+
 @pytest.mark.parametrize('value', ['0', '6', '-1', '02', '2.0', ' 2', 2, True])
 def test_bad_override_fails_before_deployment(value):
     with pytest.raises(ValueError):

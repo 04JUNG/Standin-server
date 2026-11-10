@@ -1,4 +1,4 @@
-"""Apply one explicit capacity override; empty values preserve the ECS task."""
+"""Apply explicit hand-screen overrides; empty values preserve the ECS task."""
 from __future__ import annotations
 
 import argparse
@@ -15,9 +15,13 @@ SETTINGS = {
     'inference': 'HAND_SKIN_SCREEN_CONCURRENCY',
     'converter': 'CONVERTER_MAX_CONCURRENT_PROCESSES',
 }
+SELECTION_SETTINGS = {
+    'inference': 'HAND_SKIN_SCREEN_ON_SELECTION',
+    'converter': 'CONVERTER_SCREEN_SELECTED_HANDS',
+}
 
 
-def prepare(task, container_name, value):
+def prepare(task, container_name, value, selection=None):
     if container_name not in SETTINGS:
         raise ValueError('unsupported hand screen container')
     result = copy.deepcopy(task)
@@ -29,15 +33,21 @@ def prepare(task, container_name, value):
     env = {r['name']: r['value'] for r in rows}
     if len(env) != len(rows):
         raise ValueError('duplicate environment names in task definition')
-    if value in (None, ''):
+    overrides = {}
+    if value not in (None, ''):
+        if not isinstance(value, str) or value not in {'1', '2', '3', '4', '5'}:
+            raise ValueError('capacity override must be an integer in [1,5]')
+        validate_concurrency(int(value))
+        overrides[SETTINGS[container_name]] = value
+    if selection not in (None, ''):
+        if selection not in ('0', '1'):
+            raise ValueError('selection screening override must be 0 or 1')
+        overrides[SELECTION_SETTINGS[container_name]] = selection
+    if not overrides:
         return result
-    if not isinstance(value, str) or value not in {'1', '2', '3', '4', '5'}:
-        raise ValueError('capacity override must be an integer in [1,5]')
-    validate_concurrency(int(value))
-    name = SETTINGS[container_name]
-    if name in {s['name'] for s in container.get('secrets', [])}:
-        raise ValueError('capacity setting conflicts with an existing secret')
-    env[name] = value
+    if overrides.keys() & {s['name'] for s in container.get('secrets', [])}:
+        raise ValueError('hand screen setting conflicts with an existing secret')
+    env.update(overrides)
     container['environment'] = [{'name': k, 'value': v} for k, v in env.items()]
     return result
 
@@ -48,9 +58,10 @@ def main():
     parser.add_argument('--container', choices=SETTINGS, required=True)
     args = parser.parse_args()
     value = os.getenv(SETTINGS[args.container], '')
-    result = prepare(json.loads(args.task.read_text()), args.container, value)
+    selection = os.getenv(SELECTION_SETTINGS[args.container], '')
+    result = prepare(json.loads(args.task.read_text()), args.container, value, selection)
     args.task.write_text(json.dumps(result), encoding='utf-8')
-    print('hand screen capacity prepared; unspecified settings preserved')
+    print('hand screen settings prepared; unspecified settings preserved')
 
 
 if __name__ == '__main__':
