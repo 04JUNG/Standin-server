@@ -56,7 +56,11 @@ class ArmContactCorrectionTest(TestCase):
                     )})),
                 )
                 engine = FullBodySearch([], None, None)
-                engine.search_evidence = SimpleNamespace(observe_depth=Mock(return_value=None))
+                engine.search_evidence = SimpleNamespace(
+                    observe_depth=Mock(return_value=None),
+                    semantic_contacts=lambda branch, *_: branch,
+                    rerank=lambda ranked, *_: (ranked, None),
+                )
                 engine.geometry_search = Mock(return_value={"status": "no_result", "hits": []})
                 engine.semantic_search = Mock(return_value={"status": "no_result", "hits": []})
                 pipeline = Pipeline([], vlm_client=vlm, pose_model=pose, fullbody_search=engine,

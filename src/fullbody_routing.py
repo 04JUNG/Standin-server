@@ -19,6 +19,7 @@ from .semantic_adapter_285 import excluded_pose_ids
 from .search import pose_family_id
 from .search_routing import PoseDescription
 from .semantic_search import SemanticQuery
+from . import waist_arm_pair
 
 VERSION = 'fullbody-dynamic-v1'
 API_SEMANTIC_WEIGHT = .6
@@ -28,7 +29,8 @@ class FullBodySearch:
     def __init__(self, entries, semantic, camera_index, *, top_k=5, pool_k=40,
                  geometry_max_distance=1.0, geometry_upper_max_distance=1.5,
                  generator=None, startup_error=None, include_stored_compositions=True,
-                 semantic_weight=.35, hand_skin_gate=None, hand_spacing_repairer=None):
+                 semantic_weight=.35, hand_skin_gate=None, hand_spacing_repairer=None,
+                 enable_waist_down_pair=False, enable_cross_chest_hint=False, search_evidence=None):
         if not 1 <= top_k <= pool_k <= 200:
             raise ValueError('invalid search limits')
         if any(not math.isfinite(v) or v <= 0 for v in (geometry_max_distance, geometry_upper_max_distance)):
@@ -47,6 +49,9 @@ class FullBodySearch:
         self.hand_skin_gate = hand_skin_gate
         self.hand_spacing_repairer = hand_spacing_repairer
         self.include_stored_compositions = include_stored_compositions
+        self.enable_waist_down_pair = enable_waist_down_pair
+        self.enable_cross_chest_hint = enable_cross_chest_hint
+        self.search_evidence = search_evidence
         self.validator=None
         if hasattr(camera_index,'pose_ids') and hasattr(semantic,'core_records'):
             from .pose_requirements import WholePoseValidator
@@ -92,22 +97,49 @@ class FullBodySearch:
                 raise ValueError('sufficient_gate_missing_anchors')
             hits = self._clean(self.camera.search(points, mask, part), 'geometry')
             hits = [h for h in hits if 0 <= h['distance'] <= self.cutoffs[part]]
+            pair = bool(required and required.get('waist_down_pair'))
+            cross_chest_matches = None
+            if required and required.get('cross_chest_hint'):
+                from .semantic_shapes import cross_chest_with_bent_arm
+                matching = []
+                for hit in hits:
+                    index = self.validator.positions[hit['pose_id']]
+                    if cross_chest_with_bent_arm(self.camera.points[index], self.camera.scores[index]):
+                        matching.append(hit)
+                cross_chest_matches = len(matching)
+                if matching:
+                    hits = matching
             validation_counts={};examples=[]
             if self.validator and required and required['active']:
                 accepted=[]
                 for hit in hits:
                     checked=self.validator.check(required,hit['pose_id'])
+                    if pair:
+                        checked,cost=waist_arm_pair.soften_arm_checks(checked,conflicts=True)
+                        mismatch=0. if checked['waist_down_pair'] else waist_arm_pair.PAIR_MISMATCH_COST
+                        hit['penalized_distance']=hit['distance']+cost+mismatch+checked['side_penalty']
+                    elif self.search_evidence is not None:
+                        checked,cost=waist_arm_pair.soften_arm_checks(checked,conflicts=True)
+                        hit['penalized_distance']=hit['distance']+cost
                     validation_counts[checked['status']]=validation_counts.get(checked['status'],0)+1
                     if checked['status'] in ('passed','near_match'):
                         hit['whole_pose_validation']=checked;accepted.append(hit)
                     elif len(examples)<20:examples.append(dict(pose_id=hit['pose_id'],**checked))
                 hits=accepted
-            hits=hits[:self.pool_k]
+            if pair or self.search_evidence is not None:
+                hits.sort(key=lambda hit: hit.get('penalized_distance', hit['distance']))
+            geometry_cap = waist_arm_pair.GEOMETRY_CAP if pair or cross_chest_matches else self.pool_k
+            if self.search_evidence is not None and not pair and not cross_chest_matches:
+                hits = self.search_evidence.geometry_shortlist(hits, evidence)
+            else:
+                hits = hits[:geometry_cap]
             return dict(status='ok' if hits else 'no_result', hits=hits, backend='geometry_117',
                 reason=None if hits else 'no_original_within_geometry_cutoff', camera_count=117,
                 observation_scope=part, retrieval_scope='whole_library_pose', cutoff=self.cutoffs[part],
                 cutoff_calibration='experimental_not_validated_on_holdout',
                 whole_pose_validation=dict(counts=validation_counts,excluded_examples=examples),
+                **({'cross_chest_hint': dict(measured_matches=cross_chest_matches, candidate_cap=geometry_cap)}
+                   if cross_chest_matches is not None else {}),
                 elapsed_ms=(perf_counter()-started)*1000)
         except Exception as error:
             return dict(status='error', hits=[], backend='geometry_117',
@@ -116,7 +148,13 @@ class FullBodySearch:
     def semantic_search(self, description, required=None):
         started = perf_counter()
         try:
-            result = self.semantic.search(SemanticQuery.from_description(description), top_k=self.pool_k)
+            pair = bool(required and required.get('waist_down_pair'))
+            query = SemanticQuery.from_description(description)
+            if pair:
+                result = self.semantic.search(query, top_k=self.semantic.service.index.pose_count,
+                                              pair_requirements=required)
+            else:
+                result = self.semantic.search(query, top_k=self.pool_k)
             if result.status not in ('ok', 'no_result', 'error'):
                 raise ValueError('invalid_search_status')
             if (result.status == 'ok') != bool(result.hits):
@@ -124,7 +162,14 @@ class FullBodySearch:
             hits = self._clean([h.to_dict() for h in result.hits], 'semantic')
             # The semantic adapter also validates, but no alternative adapter
             # may bypass the shared requirements enforced on geometry/generation.
-            if self.validator and required and required['active']:
+            if pair:
+                def pair_order(hit):
+                    checked = hit['matched']['whole_pose_validation']
+                    return not checked['waist_down_pair'], checked['side_penalty']
+
+                hits.sort(key=pair_order)
+                hits=hits[:waist_arm_pair.SEMANTIC_CAP]
+            elif self.validator and required and required['active']:
                 accepted=[]
                 for hit in hits:
                     checked=self.validator.check(required,hit['pose_id'])
@@ -139,11 +184,14 @@ class FullBodySearch:
             return dict(status='error', hits=[], backend='semantic',
                         reason='semantic_search:'+type(error).__name__, elapsed_ms=(perf_counter()-started)*1000)
 
-    def _fuse(self, branches, core_evidence=None, allow_mirror_pair=False, *, detail_evidence=None, limit=None):
+    def _fuse(self, branches, core_evidence=None, allow_mirror_pair=False, *, detail_evidence=None,
+              limit=None, semantic_weight=None):
         rows = {}
+        text_weight = self.semantic_weight if semantic_weight is None else semantic_weight
+        geometry_weight = self.geometry_weight if semantic_weight is None else 1. - semantic_weight
         active = {k:v for k,v in branches.items() if v['status'] in ('ok', 'no_result')}
         for name, branch in active.items():
-            weight = (self.geometry_weight if name == 'geometry' else self.semantic_weight) if len(active) == 2 else 1.
+            weight = (geometry_weight if name == 'geometry' else text_weight) if len(active) == 2 else 1.
             for rank, hit in enumerate(branch['hits'], 1):
                 pid = hit['pose_id']
                 row = rows.setdefault(pid, dict(pose_id=pid, kind='library_original',
@@ -265,14 +313,31 @@ class FullBodySearch:
         if description is not None and not description.visible_scope:
             description.visible_scope=evidence.get('output_scope')
         required=None
+        pair=False
         if description is not None and self.validator:
             from .pose_query import prepare_pose_query
             from .pose_requirements import requirements
             q=SemanticQuery.from_description(description)
             required=requirements(q,prepare_pose_query(q,self.semantic.service.index.lexicon))
+            pair=(self.enable_waist_down_pair and not required['relations']
+                  and description.visible_scope not in ('head','shoulder_head')
+                  and waist_arm_pair.describes_pair(description))
+            if pair:
+                required.update(waist_down_pair=True,active=True)
+                out['ranking']='weighted_rrf_k60_geometry_0.7_semantic_0.3'
             from .pose_requirements import CONDITIONS_VERSION
             out['candidate_validation']=dict(version=CONDITIONS_VERSION,requirements=required,
                 unknown_policy='separate_review_not_selected',split_search=False)
+            if pair:
+                out['candidate_validation']['waist_down_pair'] = dict(
+                    geometry_cap=waist_arm_pair.GEOMETRY_CAP, semantic_cap=waist_arm_pair.SEMANTIC_CAP,
+                    side_conflict_cost=waist_arm_pair.SIDE_CONFLICT_COST)
+        elif sufficient and self.validator and self.enable_cross_chest_hint:
+            from .semantic_shapes import cross_chest_hint
+            if cross_chest_hint(decision.semantic, evidence):
+                # Use the specific shape cue with measured library joints.
+                # Keep the low-certainty free text out of general text search.
+                required = dict(cross_chest_hint=True, active=False)
         out['route'] = 'hybrid' if sufficient and semantic_valid else 'geometric' if sufficient else 'semantic' if semantic_valid else 'undetermined'
         if not sufficient and not semantic_valid:
             if decision.semantic.status in ('error', 'vlm_error'):
@@ -291,6 +356,9 @@ class FullBodySearch:
                     'pose' if 'geometry' in futures else 'description')
             progress.record_search_mode(out, mode)
             out['branches'] = {k:v.result() for k,v in futures.items()}
+        if self.search_evidence is not None and sufficient and semantic_valid and not pair:
+            out['branches']['semantic'] = self.search_evidence.semantic_contacts(
+                out['branches']['semantic'], evidence, description, required, self.validator)
         if not semantic_valid:
             failed = decision.semantic.status in ('error', 'vlm_error')
             out['branches']['semantic'] = dict(status='error' if failed else 'not_run',
@@ -305,7 +373,25 @@ class FullBodySearch:
             or any(r.get('side')=='unknown' for r in description.pose_relations)))
         ids={h['pose_id'] for b in out['branches'].values() for h in b.get('hits',[])}
         fits=self._pose_detail_evidence(evidence,ids) if sufficient else {}
-        ranked=self._fuse(out['branches'],core,allow_mirror_pair=ambiguous,detail_evidence=fits,limit=self.pool_k*2)
+        fusion_options=dict(limit=(waist_arm_pair.GEOMETRY_CAP + self.pool_k
+                                   if self.search_evidence is not None else self.pool_k*2))
+        if pair:
+            matched_pairs = {
+                hit['pose_id'] for branch in out['branches'].values() for hit in branch.get('hits', [])
+                if (hit.get('whole_pose_validation') or hit.get('matched', {}).get('whole_pose_validation')
+                    or {}).get('waist_down_pair')
+            }
+            core = {pid: {**core.get(pid, {}),
+                          'priority': [*core.get(pid, {}).get('priority', [0, 0]), pid not in matched_pairs]}
+                    for pid in ids}
+            fusion_options.update(limit=waist_arm_pair.GEOMETRY_CAP*2,
+                                  semantic_weight=waist_arm_pair.SEMANTIC_WEIGHT)
+        ranked=self._fuse(out['branches'],core,allow_mirror_pair=ambiguous,
+                          detail_evidence=fits,**fusion_options)
+        if self.search_evidence is not None and sufficient:
+            ranked, reason = self.search_evidence.rerank(ranked, out['branches'], evidence, description, self.top_k)
+            if reason:
+                out['search_evidence_rerank'] = reason
         out['selected']=[r for r in ranked if r.get('match_level')!='near_match'][:self.top_k]
         out['near_candidates']=[dict(r,review_required=True,not_exact_match=True) for r in ranked
                                 if r.get('match_level')=='near_match'][:self.top_k]
@@ -487,7 +573,9 @@ def _build_fullbody_resources(entries, *, db_path):
         dense_model_dir=os.getenv('SEMANTIC_EMBEDDING_DIR') or None)
     if getattr(semantic, 'service', None) is None:
         raise ValueError('fullbody semantic index unavailable: '+getattr(semantic, 'reason', 'unknown'))
-    camera = CameraIndex.from_library(allowed, paths['bvh'], count=117)
+    recall_assets = os.getenv('ROUTING_RECALL_ASSETS_DIR')
+    search_evidence_enabled = os.getenv('ROUTING_SEARCH_EVIDENCE_ENABLED', '1' if recall_assets else '0') == '1'
+    camera = CameraIndex.from_library(allowed, paths['bvh'], count=117, measure_hands=search_evidence_enabled)
     if camera.errors:
         raise ValueError('fullbody camera index incomplete; invalid BVH assets require curation')
     generator = None
@@ -498,8 +586,21 @@ def _build_fullbody_resources(entries, *, db_path):
             os.getenv('POSE_GENERATION_TAXONOMY', str(root/'search-taxonomy-v2.json')),
             model=generation_settings()[1],
             review_dir=os.getenv('POSE_GENERATION_REVIEW_DIR', 'tmp/generated-pose-review'))
-    engine = FullBodySearch(entries, semantic, camera, generator=generator,
+    search_evidence = None
+    if search_evidence_enabled:
+        from .search_evidence import SearchEvidence
+        depth_observer = None
+        depth_path = os.getenv('ROUTING_SEARCH_DEPTH_MODEL_PATH')
+        if not depth_path and recall_assets:
+            depth_path = str(Path(recall_assets) / 'depth.onnx')
+        if depth_path:
+            from .search_depth import SearchDepthObserver
+            depth_observer = SearchDepthObserver(depth_path)
+        search_evidence = SearchEvidence(camera, semantic, depth_observer=depth_observer)
+    engine = FullBodySearch(entries, semantic, camera, generator=generator, search_evidence=search_evidence,
         semantic_weight=API_SEMANTIC_WEIGHT,
+        enable_waist_down_pair=search_evidence_enabled,
+        enable_cross_chest_hint=search_evidence_enabled,
         include_stored_compositions=include_stored,
         geometry_max_distance=float(os.getenv('ROUTING_GEOMETRY_MAX_DISTANCE', '1.0')),
         geometry_upper_max_distance=float(os.getenv('ROUTING_GEOMETRY_UPPER_MAX_DISTANCE', '1.5')))
