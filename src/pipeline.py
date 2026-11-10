@@ -21,7 +21,7 @@ from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
 from . import analysis_progress as progress
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from time import perf_counter
 
 import numpy as np
@@ -32,6 +32,7 @@ from .vlm.client import build_vlm_client, BaseVLMClient
 from .detect import MockDetector, reconcile, reconcile_count
 from .pose import build_pose_model
 from .pose_rescue import parse_rescue_request, rescue_slots
+from .arm_contact_correction import find_elbow_wrist_swap
 from .routing import route
 from .descriptor import build_slot_descriptors
 from .person_tags import apply_person_tags
@@ -532,8 +533,14 @@ class Pipeline:
         for slot in slots:
             decision = routing["decisions"].get(id(slot)) if routing else None
             if self._fullbody_search is not None and decision is not None:
+                search_evidence = getattr(self._fullbody_search, 'search_evidence', None)
+                arm_correction = None
+                if search_evidence is not None:
+                    slot, arm_correction = self._correct_arm_contact(slot, decision)
                 desc = build_slot_descriptors(vlm, [slot], image_size=(img_w, img_h))[0]
                 desc.refine_evidence = evidence_by_slot.get(slot.slot_id)
+                if arm_correction is not None:
+                    desc.quality_trace["arm_contact_correction"] = arm_correction
                 desc.output_scope = refine_scope_from_description(
                     desc.output_scope, decision.semantic.description)
                 evidence = {
@@ -554,6 +561,10 @@ class Pipeline:
                         observations=progress.observations(decision.semantic.description)))
                 progress.start_search(routing)
                 with progress.person_scope(0 if len(slots) == 1 else None, slot), span("fullbody_search"):
+                    if search_evidence is not None and decision.joint.sufficient and not decision.joint.policy_block:
+                        depth = search_evidence.observe_depth(image, slot.result_box, evidence)
+                        if depth is not None:
+                            evidence["search_depth"] = depth
                     review_options = {"review_geometry": True} if integrated_enabled(CFG) else {}
                     report = self._fullbody_search.search(decision, evidence, **review_options)
                 bindings = dynamic_refine_candidates(
@@ -721,6 +732,33 @@ class Pipeline:
         return result
 
     # ---- 04J-286: 러프함 기반 인물별 검색 경로 ----
+    @staticmethod
+    def _correct_arm_contact(slot, decision):
+        if (not decision.joint.sufficient or decision.joint.policy_block
+                or not decision.semantic.valid or slot.skeleton is None or slot.evidence is None):
+            return slot, None
+        skeleton, evidence = slot.skeleton, slot.evidence
+        correction = find_elbow_wrist_swap(
+            skeleton.keypoints, evidence.valid_joint_mask, decision.semantic.description or {})
+        if correction is None:
+            return slot, None
+
+        elbow, wrist = correction["elbow"], correction["wrist"]
+        pair, reverse = [elbow, wrist], [wrist, elbow]
+        keypoints, scores = skeleton.keypoints.copy(), skeleton.scores.copy()
+        keypoints[pair], scores[pair] = keypoints[reverse], scores[reverse]
+        raw_scores = evidence.raw_scores.copy()
+        raw_scores[pair] = raw_scores[reverse]
+        refine_mask = evidence.refine_valid_joint_mask
+        if refine_mask is not None:
+            # A relabeling must not make a previously excluded refine joint usable.
+            refine_mask = refine_mask.copy()
+            refine_mask[pair] = refine_mask[pair].all()
+        return replace(slot,
+                       skeleton=replace(skeleton, keypoints=keypoints, scores=scores),
+                       evidence=replace(evidence, raw_scores=raw_scores,
+                                        refine_valid_joint_mask=refine_mask)), correction
+
     def _route_slots(self, image, img_w: int, img_h: int, vlm: VLMAnalysis,
                      slots) -> dict:
         """전신 hybrid에서는 관절이 충분한 인물도 설명을 추출한다. 레거시는 부족할 때만."""
