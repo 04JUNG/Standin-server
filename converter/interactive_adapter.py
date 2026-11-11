@@ -49,7 +49,7 @@ def runtime_revision():
              'solved_state.py', 'hands.py', 'hand_geometry.py', 'hand_library.py', 'hand_contact.py',
              'hand_library.v1.json', 'hand_rig.py', 'framing.py', 'camera.py',
              'shape_bake.py', 'final_artifact.py', 'protocol.py', 'worker.py',
-             'reviewed_library.py', 'reviewed_source_fingers.py', 'body_material.py']
+             'reviewed_library.py', 'reviewed_source_fingers.py', 'source_body.py', 'body_material.py']
     return digest(b''.join(canonical([n, digest((root/n).read_bytes())]) for n in names))
 
 

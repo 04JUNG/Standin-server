@@ -40,10 +40,11 @@ def _rotation(matrix):
     return matrix.to_quaternion().to_matrix()
 
 
-def _palm_frame(arm, wrist, fingers):
+def _palm_frame(arm, wrist, fingers, *, posed=False):
     from mathutils import Matrix
     def head(name):
-        return arm.matrix_world @ arm.data.bones[name].head_local
+        joint = arm.pose.bones[name].head if posed else arm.data.bones[name].head_local
+        return arm.matrix_world @ joint
     origin = head(wrist)
     length = head(fingers["middle", 1]) - origin
     across = head(fingers["index", 1]) - head(fingers["pinky", 1])

@@ -14,6 +14,8 @@
 from __future__ import annotations
 
 import os
+import math
+import shutil
 import sys
 from pathlib import Path
 
@@ -23,6 +25,7 @@ ARTIFACT_ROOT = os.path.abspath(
     os.environ.get("CONVERTER_TEST_ARTIFACT_ROOT", TEST_ROOT)
 )
 sys.path.insert(0, REPO_ROOT)
+sys.path.insert(0, TEST_ROOT)
 
 import bpy
 from mathutils import Vector
@@ -30,6 +33,9 @@ from mathutils import Vector
 from converter.convert import convert
 from converter.bone_map import MIXAMO
 from converter.retarget import import_bvh, reset_scene
+from converter.shape_bake import import_full_character
+from converter.source_body import bake_source_body
+from make_fixtures import CHILDREN, LEAVES, SKELETON, _bvh_offset, _end_offset
 
 ASSETS = os.path.join(ARTIFACT_ROOT, "assets")
 OUT = os.path.join(ARTIFACT_ROOT, "out")
@@ -198,6 +204,58 @@ for name, positions in (
     edge = armature.matrix_world.to_3x3() @ (forearm.head - arm.head)
     check(f"{name}: BVH 팔꿈치 위치 보존", (edge - Vector((0, -3, -28.001))).length < 1e-4,
           f"edge={tuple(edge)}")
+
+# Bent spine offsets with zero rotation channels used to produce a straight torso.
+def baked_body_bvh(role="hips"):
+    offsets = {
+        "spine1": (0, .13, .08), "spine2": (0, .13, .08), "neck": (0, .13, .08),
+        "forearm.L": (.16, .25, .04), "leg.L": (.11, -.41, .04), "foot.L": (0, -.37, -.13),
+    }
+    offset = offsets.get(role, _bvh_offset(role))
+    kind = "ROOT" if role == "hips" else "JOINT"
+    lines = [f"{kind} {MIXAMO[role]}", "{", "OFFSET " + " ".join(map(str, offset)),
+             "CHANNELS 6 Xposition Yposition Zposition Xrotation Yrotation Zrotation"]
+    for child in CHILDREN.get(role, []):
+        lines.extend(baked_body_bvh(child))
+    if role in LEAVES:
+        ends = {"head": (0, .11, -.06), "toe.L": (0, .045, .08)}
+        end = ends.get(role, _end_offset(role))
+        lines.extend(["End Site", "{", "OFFSET " + " ".join(map(str, end)), "}"])
+    return [*lines, "}"]
+
+
+source = Path(OUT) / "baked-spine.bvh"
+source.write_text("\n".join(["HIERARCHY", *baked_body_bvh(), "MOTION", "Frames: 1",
+                             "Frame Time: 0.033333", " ".join(["0"] * 6 * len(SKELETON))]) + "\n")
+corrected = Path(OUT) / "baked-spine.fbx"
+shutil.copyfile(Path(OUT) / "pose_rigged_rest.fbx", corrected)
+receipt = bake_source_body(corrected, source)
+check("baked spine: a bent offset is transported", receipt["status"] == "transferred"
+      and receipt["max_direction_error_before_deg"] > 20)
+reset_scene()
+armature, _ = import_full_character(str(corrected))
+def head(role):
+    return armature.matrix_world @ armature.pose.bones[MIXAMO[role]].head
+
+
+actual_bend = math.degrees((head("spine") - head("hips")).angle(head("spine1") - head("spine")))
+check("baked spine: FBX reimport retains torso bend", abs(actual_bend - math.degrees(math.atan2(.08, .13))) < .5,
+      f"bend={actual_bend:.2f}")
+
+def tail_direction(role):
+    bone = armature.pose.bones[MIXAMO[role]]
+    return armature.matrix_world.to_3x3() @ (bone.tail - bone.head)
+
+
+for label, actual, expected in (
+    ("head", tail_direction("head"), Vector((0, .06, .11))),
+    ("upper arm", head("forearm.L") - head("upperarm.L"), Vector((.16, -.04, .25))),
+    ("thigh", head("leg.L") - head("upleg.L"), Vector((.11, -.04, -.41))),
+    ("shin", head("foot.L") - head("leg.L"), Vector((0, .13, -.37))),
+    ("toe", tail_direction("toe.L"), Vector((0, -.08, .045))),
+):
+    error = math.degrees(actual.angle(expected))
+    check(f"baked body: FBX reimport retains {label} direction", error < .5, f"error={error:.3f}°")
 
 # ---------------------------------------------------------------------------
 print("\n" + "=" * 60)
