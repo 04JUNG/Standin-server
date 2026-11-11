@@ -80,6 +80,7 @@ def test_unregistered_pose_transfers_fingers_before_framing(tmp_path, monkeypatc
     final_artifact = import_module("converter.final_artifact")
     framing = import_module("converter.framing")
     reviewed_source_fingers = import_module("converter.reviewed_source_fingers")
+    body_material = import_module("converter.body_material")
 
     path, _ = _job(tmp_path)
     job = load_job(path)
@@ -102,15 +103,21 @@ def test_unregistered_pose_transfers_fingers_before_framing(tmp_path, monkeypatc
         return {"applied_bones": 30}
 
     def frame(path, scope, **kwargs):
-        assert Path(path).read_bytes() == b"body and fingers"
+        assert Path(path).read_bytes() == b"body and fingers and gray"
         return {"scope": scope}
+
+    def gray(path):
+        assert Path(path).read_bytes() == b"body and fingers"
+        Path(path).write_bytes(b"body and fingers and gray")
+        return {"changed_materials": ["Standin anatomical clay"]}
 
     monkeypatch.setitem(sys.modules, "converter.convert", SimpleNamespace(convert=convert))
     monkeypatch.setattr(reviewed_source_fingers, "bake_source_fingers", bake)
+    monkeypatch.setattr(body_material, "restore_anatomical_clay", gray)
     monkeypatch.setattr(framing, "process_output", frame)
     monkeypatch.setattr(final_artifact, "validate", lambda *args: {"skin_verified": True})
     assert run_job(job)["source_fingers"] == {"applied_bones": 30}
-    assert output.read_bytes() == b"body and fingers"
+    assert output.read_bytes() == b"body and fingers and gray"
 
 
 def test_valid_job_preserves_locked_options(tmp_path):
