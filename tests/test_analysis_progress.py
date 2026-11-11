@@ -218,7 +218,7 @@ def test_http_opt_in_same_analysis_and_final_json_model(monkeypatch):
         result.person_candidates[0] = [PoseCandidate("base_pose", View.FRONT, .25, {})]
         return result
 
-    def rerank(_data, cut):
+    def rerank(_data, cut, *, extracted=None):
         cut["people"][0]["candidates"][0]["pose_id"] = "reranked_pose"
         return cut
 
@@ -231,6 +231,65 @@ def test_http_opt_in_same_analysis_and_final_json_model(monkeypatch):
     monkeypatch.setattr(analysis_stream, "stream_analysis", lambda run: run(fallback_results.append))
     assert request({"Accept": "application/x-ndjson"}).json()["people"][0]["candidates"][0]["pose_id"] == "reranked_pose"
     assert fallback_results[0]["people"][0]["candidates"][0]["pose_id"] == "base_pose"
+
+
+def test_recall_observations_precede_search_and_fallback_precedes_final_ranking(monkeypatch):
+    from io import BytesIO
+    from PIL import Image
+    from starlette.datastructures import UploadFile
+
+    import api.app as api
+    from src.config import CFG
+    from src.pose import MockSelfDetectingPoseModel
+    from tests.test_description_prefetch import Client, pipeline
+
+    monkeypatch.setattr(CFG, "body_matching_mode", "off")
+    monkeypatch.setattr(CFG, "vlm_hand_shapes", False)
+    vlm = Client(people=2)
+    vlm.analysis.approx_boxes.reverse()
+    pipe = pipeline(vlm, pose=MockSelfDetectingPoseModel())
+    monkeypatch.setitem(api.STATE, "pipeline", pipe)
+    monkeypatch.setattr(api, "_library_preview_asset", lambda pose_id: api.PreviewAssetOut(
+        transport="library_bvh", bvh_url=f"/pose/{pose_id}/bvh", bvh_sha256="a" * 64,
+        library_lookup_supported=True))
+    snapshots, calls = [], []
+    observed_people = []
+    extracted = object()
+
+    def extract(_data, people):
+        assert snapshots[-1]["stage"] == "understanding"
+        assert vlm.calls
+        assert pipe._fullbody_search.camera.calls == 0
+        observed_people.extend(people)
+        calls.append("observations")
+        return extracted
+
+    def fallback(cut):
+        assert snapshots[-1]["stage"] == "searching"
+        assert "searching" not in snapshots[-1]["completedStages"]
+        assert all(p["pose_presentation"]["library_candidates"] for p in cut["people"])
+        for observed, person in zip(observed_people, cut["people"], strict=True):
+            assert all(person[key] == value for key, value in observed.items())
+        calls.append("fallback")
+
+    def rerank(_data, cut, **kwargs):
+        assert kwargs["extracted"] is extracted
+        assert snapshots[-1]["stage"] == "searching"
+        calls.append("rank")
+        return cut
+
+    monkeypatch.setitem(api.STATE, "recall_search",
+                        SimpleNamespace(extract_observations=extract, rerank=rerank))
+    data = BytesIO()
+    Image.new("RGB", (512, 768), "white").save(data, format="PNG")
+    data.seek(0)
+    with capture_progress(snapshots.append):
+        result = api._analyze(UploadFile(data, filename="rough.png"), on_fallback=fallback)
+    assert calls == ["observations", "fallback", "rank"]
+    assert len(result.people) == 2
+    assert len(vlm.calls) == 1
+    assert "searching" in snapshots[-1]["completedStages"]
+    assert not any(snapshot["stage"] == "ranking" for snapshot in snapshots)
 
 
 def test_presentation_preview_keeps_exact_final_ids_ranks_and_only_existing_assets():

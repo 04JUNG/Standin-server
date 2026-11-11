@@ -94,6 +94,7 @@ class RecallSearch:
             raise ValueError('Unexpected compound ranking weights')
         self.weights = weights
         self.verified_recall = VerifiedRecall(self.engine, assets, paths['tags'])
+        self.observation_lock = Lock()
         self.lock = Lock()
 
     def _baseline(self, person):
@@ -130,22 +131,33 @@ class RecallSearch:
             if result is None:
                 replay_cross_chest(self.cross_chest, person)
 
-    def rerank(self, data, cut):
-        digest = hashlib.sha256(data).hexdigest()
-        weights = self.weights[fold(digest)]
-        with TemporaryDirectory(prefix='standin-search-recall-') as directory, self.lock:
+    def extract_observations(self, data, people):
+        with TemporaryDirectory(prefix='standin-search-recall-') as directory, self.observation_lock:
             image = Path(directory) / 'rough.png'
             image.write_bytes(data)
-            observations = self.verified_recall.observe(cut, image)
-            for attempt in range(2):
-                try:
-                    candidate = deepcopy(cut)
-                    self._search(candidate, image, weights)
-                    return self.verified_recall.rerank(candidate, digest, observations)
-                except ScreeningUnavailable:
-                    if attempt:
-                        raise
-                    sleep(1)
+            return self.verified_recall.observations.extract(people, image)
+
+    def rerank(self, data, cut, *, extracted=None):
+        digest = hashlib.sha256(data).hexdigest()
+        weights = self.weights[fold(digest)]
+        with TemporaryDirectory(prefix='standin-search-recall-') as directory:
+            image = Path(directory) / 'rough.png'
+            image.write_bytes(data)
+            people = cut['people']
+            if extracted is None or any(person['index'] not in extracted[1] for person in people):
+                with self.observation_lock:
+                    extracted = self.verified_recall.observations.extract(people, image, previous=extracted)
+            with self.lock:
+                observations = self.verified_recall.observe(cut, image, extracted=extracted)
+                for attempt in range(2):
+                    try:
+                        candidate = deepcopy(cut)
+                        self._search(candidate, image, weights)
+                        return self.verified_recall.rerank(candidate, digest, observations)
+                    except ScreeningUnavailable:
+                        if attempt:
+                            raise
+                        sleep(1)
 
     def close(self):
         self.verified_recall.close()

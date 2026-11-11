@@ -104,21 +104,39 @@ class RecallObservations:
                         costs = np.minimum(costs, alternate + .024)
             record['profiles'][f'{part}_bend'] = profiles(self.ids, costs, semantic, ())
 
-    def joint_models(self, person, path, image, description):
+    def extract(self, people, path, *, previous=None):
+        """Read the rough without consulting the pose library."""
+        image, by_person = previous if previous is not None else (_load_bgr(str(path)), {})
+        return image, {
+            person['index']: by_person[person['index']] if person['index'] in by_person
+            else self._extract_person(person, path, image)
+            for person in people
+        }
+
+    def _extract_person(self, person, path, image):
+        hypotheses = tuple(joint_hypotheses(image, person, self.crop, self.depth, path))
+        contrast = contrast_joints(image, person, self.crop)
+        detail = tuple(box_hypotheses(self.body_x, image, person.get('box'),
+                                      person['lower_body_observed']))
+        depth = self.depth.predict(path, person) if any(
+            name == 'rtmw' for name, _, _ in hypotheses) else None
+        return dict(hypotheses=hypotheses, contrast=contrast, detail=detail, depth=depth)
+
+    def joint_models(self, person, image, description, extracted):
         lower = person['lower_body_observed']
         semantic = self.body_scores(description, lower=lower)
         models = {}
-        for name, query, spatial in joint_hypotheses(image, person, self.crop, self.depth, path):
+        for name, query, spatial in extracted['hypotheses']:
             measured = {kind: profiles(self.ids, costs, semantic, ())
                         for kind, costs in score_profiles(self.fitter, query, spatial)}
             models[name] = observation_record(query, measured)
         # The earlier bend pass used only the upper-body semantic cues.
-        relational = self.body_scores(description, lower=False)
+        relational = self.body_scores(description, lower=False) if lower else semantic
         for name, record in models.items():
             if name in ('original', 'tight_mirror', 'wide_mirror', 'rtmw'):
                 self.add_bends(record, relational, allow_reverse=True)
         outline_models = deepcopy(models)
-        strong = contrast_joints(image, person, self.crop)
+        strong = extracted['contrast']
         if strong is not None:
             measured = {kind: profiles(self.ids, costs, semantic, ())
                         for kind, costs in score_profiles(self.fitter, strong, None)}
@@ -135,15 +153,15 @@ class RecallObservations:
                 models[name]['profiles'][label] = profiles(self.ids, costs, semantic, ())
         return outline_models, models, semantic
 
-    def detailed_models(self, models, person, image, path, language, semantic):
+    def detailed_models(self, models, person, image, language, semantic, extracted):
         models = deepcopy(models)
         lower = person['lower_body_observed']
-        for name, detected in box_hypotheses(self.body_x, image, person.get('box'), lower):
+        for name, detected in extracted['detail']:
             fits = {kind: profiles(self.ids, costs, semantic, ())
                     for kind, costs in score_profiles(self.fitter, detected, None)}
             models[name] = observation_record(detected, fits)
         if 'rtmw' in models:
-            measured = self.depth.predict(path, person)
+            measured = extracted['depth']
             if measured is not None:
                 xy, confidence, z, _ = measured
                 detected = observation(xy, confidence, image.shape[:2], lower)
@@ -182,9 +200,6 @@ class RecallObservations:
         return language
 
     def add_text_cues(self, language, description, models, lower):
-        for field, scores in self.clauses.search(description):
-            top = ranked(self.clauses.ids, scores, 70)
-            language[field] = dict(top=[[pid, round(score, 6)] for pid, score in top])
         scores = self.aligned.search(description)
         if scores is not None:
             top = [[pid, round(score, 6)] for pid, score in ranked(self.aligned.ids, scores, 70)]
@@ -223,21 +238,23 @@ class RecallObservations:
                                                 for pid in sorted(costs, key=costs.get)])
         return result
 
-    def observe(self, cut, path, prop_hits=()):
-        image = _load_bgr(str(path))
+    def observe(self, cut, path, prop_hits=(), *, extracted=None):
+        if extracted is None:
+            extracted = self.extract(cut['people'], path)
+        image, by_person = extracted
         result = {name: {} for name in ('hypotheses', 'language', 'visual', 'tilt', 'prop_review',
                                         'contextual', 'heads', 'detected_props')}
         people = cut['people']
         for person in people:
             i = person['index']
             raw = person['dynamic_search']['description_evidence'].get('description') or {}
+            cues = by_person[i]
             text = self.text_profiles(raw)
-            outline, occluded, semantic = self.joint_models(person, path, image, raw)
+            outline, occluded, semantic = self.joint_models(person, image, raw, cues)
             appearance = self.visual_profiles(path, image, person, len(people), outline, occluded, text)
-            query_cues = dict(text)
             for field, scores in self.clauses.search(raw):
-                query_cues[field] = dict(top=[[pid, round(score, 6)] for pid, score in ranked(self.clauses.ids, scores, 70)])
-            detailed = self.detailed_models(occluded, person, image, path, query_cues, semantic)
+                text[field] = dict(top=[[pid, round(score, 6)] for pid, score in ranked(self.clauses.ids, scores, 70)])
+            detailed = self.detailed_models(occluded, person, image, text, semantic, cues)
             self.add_text_cues(text, raw, detailed, person['lower_body_observed'])
             result['hypotheses'][i] = occluded
             result['language'][i] = text

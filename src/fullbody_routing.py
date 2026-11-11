@@ -4,6 +4,7 @@ Distances and semantic scores retain their own units. Reciprocal rank fusion
 combines ranked original-pose lists; the resulting score is not confidence.
 """
 from concurrent.futures import ThreadPoolExecutor
+from contextvars import copy_context
 from copy import deepcopy
 import math
 import os
@@ -350,9 +351,9 @@ class FullBodySearch:
         with ThreadPoolExecutor(max_workers=2, thread_name_prefix='fullbody-search') as pool:
             futures = {}
             if sufficient:
-                futures['geometry'] = pool.submit(self.geometry_search, evidence, required)
+                futures['geometry'] = pool.submit(copy_context().run, self.geometry_search, evidence, required)
             if semantic_valid:
-                futures['semantic'] = pool.submit(self.semantic_search, description, required)
+                futures['semantic'] = pool.submit(copy_context().run, self.semantic_search, description, required)
             mode = ('combined' if len(futures) == 2 else
                     'upper_body' if 'geometry' in futures and evidence.get('coverage_class') == 'upper_only' else
                     'pose' if 'geometry' in futures else 'description')

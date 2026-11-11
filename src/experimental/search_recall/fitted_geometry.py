@@ -7,27 +7,15 @@ from .evaluate import validation
 from .robust_geometry import soften
 from src.camera_search import Camera
 from src.camera_search import project
-from src.pose import _load_bgr
+from src.search_computation import cached_search_work
+from src.search_depth import SearchDepthObserver
 
 class DepthObserver:
     def __init__(self, model_path):
-        from standin_eval.mixed_z import corrected_rtmw
-        self.model = corrected_rtmw(model_path)
+        self.model = SearchDepthObserver(model_path)
 
     def predict(self, path, person):
-        box = person.get('box')
-        if not box:
-            return None
-        image = _load_bgr(str(path))
-        height, width = image.shape[:2]
-        box = np.clip(box, [0, 0, 0, 0], [width, height, width, height])
-        if min(box[2] - box[0], box[3] - box[1]) < 32:
-            return None
-        rgb = np.ascontiguousarray(image[..., ::-1])
-        joints_3d, scores, _, xy = self.model(rgb, bboxes=[box])
-        if len(xy) != 1:
-            return None
-        return xy[0, :17], scores[0, :17], joints_3d[0, :17, 2], box
+        return self.model.predict(str(path), person.get('box'))
 
     def observe(self, path, person, evidence):
         if evidence['coverage_class'] == 'upper_only':
@@ -127,6 +115,24 @@ class FittedGeometry:
         return self.head_projections
 
     def costs(self, evidence, part, depth, *, max_roll=.52, roll_penalty=.15, head_anchor=False):
+        points = np.asarray(evidence['keypoints'], dtype=np.float32)
+        mask = np.asarray(evidence['joint_mask'], dtype=bool)
+        scores = np.asarray(evidence['joint_scores'], dtype=np.float32)
+        depth_key = None if depth is None else tuple(
+            (value.shape, value.dtype.str, value.tobytes()) for value in depth
+        )
+        key = (id(self.camera), part, max_roll, roll_penalty, head_anchor,
+               evidence['lower_body_observed'] is False,
+               points.shape, points.tobytes(), mask.shape, mask.tobytes(),
+               scores.shape, scores.tobytes(), depth_key)
+        return cached_search_work(
+            'fitted_geometry', key,
+            lambda: self._costs(evidence, part, depth, max_roll=max_roll,
+                                roll_penalty=roll_penalty, head_anchor=head_anchor),
+            limit=100,
+        )
+
+    def _costs(self, evidence, part, depth, *, max_roll, roll_penalty, head_anchor):
         camera = self.camera
         mask = np.asarray(evidence['joint_mask'], dtype=bool)
         selected = np.arange(5, 11 if part == 'upper' else 17)
