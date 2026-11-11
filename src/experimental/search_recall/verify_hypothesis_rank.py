@@ -481,8 +481,16 @@ def apply_ranking(engine, cut, hypotheses, language, weights, clause_weights, ar
                                     lexical_fallback=proposal is not None,
                                     crop_recovery=crop_recovery, geometry_review=review)
                 confirmed_slot |= review['pose_id'] in review_trace.get('after_screen', ())
-        if args.context_slot and not confirmed_slot:
-            contextual_pick = contextual.get(index)
+        contextual_pick = contextual.get(index)
+        visual_step = trace.get('visual_slot', {})
+        # Give a specific visible contact priority over a general shape match
+        # when choosing the last candidate.
+        exact_contact_over_visual = (
+            contextual_pick is not None
+            and contextual_pick['basis'] == 'exact_visible_contact_in_clause_search'
+            and visual_step.get('proposal') in visual_step.get('after_screen', ())
+        )
+        if args.context_slot and (not confirmed_slot or exact_contact_over_visual):
             report = person['dynamic_search']
             chosen = [row['pose_id'] for row in report.get('selected', [])]
             if contextual_pick and chosen and contextual_pick['pose_id'] not in chosen:
