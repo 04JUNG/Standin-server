@@ -75,6 +75,7 @@ from src.refine_thumbnail import (
     build_refine_thumbnail_renderer,
 )
 from src.tracing import capture_trace, span
+from src.search_computation import share_search_computation
 from src.vlm.client import VLMUnavailable
 from src.runtime_guard import (
     MockBackendError,
@@ -236,12 +237,23 @@ async def lifespan(app: FastAPI):
         entries = _ensure_db()                      # 1회 로드
         library_identity = _resolve_library_identity()  # 응답에 실을 번들 버전
         model_bundle = _ensure_pose_model_bundle()  # S3 bundle → local manifest
+        from src.search_recall_assets import ensure_recall_assets
+        recall_assets = ensure_recall_assets()
         from src.fullbody_routing import build_api_pipeline
         pipeline = build_api_pipeline(entries, db_path=DB_PATH)
         _check_backends(pipeline)                   # 팩토리 폴백 후 실제 인스턴스 검사
         # production에서 converter 주소가 없으면 여기서 기동이 실패한다(옛 마네킹을
         # 조용히 서빙하지 않는다). 개발은 경고 후 마네킹으로 폴백한다.
         thumbnail_renderer = _build_thumbnail_renderer()
+        recall_search = None
+        if recall_assets is not None:
+            from src.experimental.search_recall.engine import RecallAssets, RecallSearch
+            fullbody = getattr(pipeline, "_fullbody_search", None)
+            if (getattr(fullbody, "search_evidence", None) is None
+                    or not getattr(pipeline.vlm, "single_description_call", False)):
+                raise ValueError("04J-344 recall requires full-body routing and the Luna six-field profile")
+            recall_search = RecallSearch(entries, Path(DB_PATH), Path(CFG.data_dir),
+                                         RecallAssets.from_root(recall_assets))
     except Exception as exc:
         # 기동 실패는 컨테이너가 뜨지 않는다는 뜻이고, 그 상태에서는 앱이 더 이상
         # 아무것도 보고할 수 없다. 죽기 전에 동기로 한 번 보낸다.
@@ -268,6 +280,7 @@ async def lifespan(app: FastAPI):
     STATE["thumbnail_renderer"] = thumbnail_renderer
     STATE["quarantined_pose_count"] = len(quarantine)
     STATE["pipeline"] = pipeline
+    STATE["recall_search"] = recall_search
     STATE["db_path"] = DB_PATH
     STATE["pose_library"] = library_identity
     STATE["pose_count"] = len(entries)
@@ -288,11 +301,15 @@ async def lifespan(app: FastAPI):
         f"추론 서버 기동 — 포즈 {len(entries)}개, vlm={actual_vlm}, pose={actual_pose}",
         context={"env": CFG.app_env, "version": CFG.deployment_version},
     )
-    yield
-    log_info("shutdown", "종료")
-    STATE.clear()
-    # 종료 신호 뒤에는 배치 창을 기다릴 수 없다. 버퍼에 남은 알림을 밀어낸다.
-    alerts.flush()
+    try:
+        yield
+    finally:
+        if recall_search is not None:
+            recall_search.close()
+        log_info("shutdown", "종료")
+        STATE.clear()
+        # 종료 신호 뒤에는 배치 창을 기다릴 수 없다. 버퍼에 남은 알림을 밀어낸다.
+        alerts.flush()
 
 
 app = FastAPI(title="Standin Pose Pipeline", version="0.2.2", lifespan=lifespan)
@@ -445,6 +462,7 @@ def healthz():
     camera = getattr(engine, 'camera', None)
     body = {
         "ok": ok,
+        "pose_search_profile": "recall-90-v1" if STATE.get("recall_search") is not None else None,
         "env": CFG.app_env,
         "provider": STATE.get("provider", CFG.vlm_provider),
         "pose_backend": STATE.get("pose_backend", CFG.pose_backend),
@@ -634,16 +652,34 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
         # UploadFile closes after the endpoint returns; own its bytes for the stream.
         from starlette.datastructures import UploadFile as OwnedUpload
         owned = OwnedUpload(io.BytesIO(file.file.read()), filename=file.filename)
-        def run():
+        def run(on_fallback):
             try:
-                return _analyze(owned, hint, rescue)
+                return _analyze(owned, hint, rescue, on_fallback=on_fallback)
             finally:
                 owned.file.close()
         return stream_analysis(run)
     return _analyze(file, hint, rescue, response)
 
 
-def _analyze(file, hint="", rescue="", response=None):
+def _pose_observation_fields(desc):
+    skel = desc.skeleton
+    raw_scores = None
+    if desc.raw_scores is not None:
+        raw = np.asarray(desc.raw_scores, dtype=float).reshape(-1)
+        if raw.shape == (17,) and np.isfinite(raw).all():
+            raw_scores = raw.tolist()
+    return dict(
+        box=[float(value) for value in desc.box.as_list()] if desc.box else None,
+        keypoints=np.asarray(skel.keypoints, dtype=float).reshape(-1, 2).tolist()
+                  if skel is not None else None,
+        raw_scores=raw_scores,
+        lower_body_observed=bool(desc.lower_body_observed),
+        quality_trace=desc.quality_trace,
+    )
+
+
+@share_search_computation()
+def _analyze(file, hint="", rescue="", response=None, *, on_fallback=None):
     try:
         rescue_request = parse_rescue_request(rescue)
     except ValueError as exc:
@@ -661,11 +697,29 @@ def _analyze(file, hint="", rescue="", response=None):
         image = _HintImg(hint)
 
     pipe: Pipeline = STATE["pipeline"]
+    recall_search = STATE.get("recall_search")
+    extracted = None
+
+    def prepare_search_observations(people):
+        nonlocal extracted
+        with span("recall_observations"):
+            try:
+                extracted = recall_search.extract_observations(
+                    data, [dict(index=index, **_pose_observation_fields(desc))
+                           for index, desc in people])
+            except Exception as exc:
+                # Complete base search first if optional evidence extraction failed.
+                log_warn("recall_observations", status="deferred", errorType=type(exc).__name__)
+                return
+        progress.emit(completed=("understanding",))
+
+    options = (dict(prepare_search_observations=prepare_search_observations)
+               if recall_search is not None else {})
     with capture_trace() as timing:
         with span("pipeline_total"):
             try:
                 res = pipe.process_cut(
-                    image, w, h, rescue_request=rescue_request,
+                    image, w, h, rescue_request=rescue_request, **options,
                 )
             except VLMUnavailable as exc:
                 raise _vlm_unavailable_response(exc) from exc
@@ -678,15 +732,9 @@ def _analyze(file, hint="", rescue="", response=None):
     for i, desc in enumerate(res.descriptors):
         cands = per_person[i] if i < len(per_person) else []
         skel = desc.skeleton
-        raw_scores = None
-        if desc.raw_scores is not None:
-            raw = np.asarray(desc.raw_scores, dtype=float).reshape(-1)
-            if raw.shape == (17,) and np.isfinite(raw).all():
-                raw_scores = raw.tolist()
         people.append(PersonOut(
             index=i,
             refine_candidates=[CandidateOut(**c) for c in desc.refine_candidates],
-            box=desc.box.as_list() if desc.box else None,
             tags=desc.tag_dict(),
             skeleton=(SkeletonOut(
                 keypoints=desc.skeleton.keypoints.tolist(),
@@ -700,11 +748,8 @@ def _analyze(file, hint="", rescue="", response=None):
                 camera=candidate_camera(STATE.get("db_path"), c, desc),
             ) for c in cands],
             # 이미 추출한 스켈레톤을 실어 보낸다(연산 추가 0) → /refine이 순수 함수가 된다.
-            keypoints=np.asarray(skel.keypoints, dtype=float).reshape(-1, 2).tolist()
-                      if skel is not None else None,
             scores=np.asarray(skel.scores, dtype=float).reshape(-1).tolist()
                    if skel is not None else None,
-            raw_scores=raw_scores,
             confidence=(res.person_confidence[i]
                         if i < len(res.person_confidence) else "low"),
             skeleton_state=desc.skeleton_state,
@@ -717,13 +762,12 @@ def _analyze(file, hint="", rescue="", response=None):
             confidence_threshold=desc.confidence_threshold,
             valid_limbs=list(desc.valid_limbs),
             refinable_limbs=list(desc.refinable_limbs),
-            lower_body_observed=bool(desc.lower_body_observed),
             refine_allowed=desc.refine_allowed,
-            quality_trace=desc.quality_trace,
             quality_reasons=desc.quality_reasons,
             output_scope=asdict(desc.output_scope),
             person_tags=asdict(desc.person_tags),
             hands=asdict(desc.hands if desc.hands is not None else default_hands()),
+            **_pose_observation_fields(desc),
             **_routing_fields(res, i),
         ))
     vlm_model = (CFG.gemini_model if STATE.get("provider") == "gemini"
@@ -750,7 +794,21 @@ def _analyze(file, hint="", rescue="", response=None):
             feature_version=FEATURE_VERSION,
         ),
     )
-    progress.finish()
+    if recall_search is not None:
+        from src.experimental.search_recall.verified_recall import PROFILE
+        if on_fallback is not None and any(
+            person.candidates or person.semantic_candidates or (
+                person.pose_presentation is not None and (
+                    person.pose_presentation.library_candidates
+                    or person.pose_presentation.review_candidates
+                )
+            ) for person in people
+        ):
+            on_fallback(output.model_dump(mode="json"))
+        updated = recall_search.rerank(data, output.model_dump(mode="json"), extracted=extracted)
+        updated["inference_metadata"]["pose_search_profile"] = PROFILE
+        output = CutResultOut.model_validate(updated)
+    progress.finish(search_pending=recall_search is not None)
     return output
 
 

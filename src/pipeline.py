@@ -21,7 +21,7 @@ from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
 from . import analysis_progress as progress
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from time import perf_counter
 
 import numpy as np
@@ -32,6 +32,7 @@ from .vlm.client import build_vlm_client, BaseVLMClient
 from .detect import MockDetector, reconcile, reconcile_count
 from .pose import build_pose_model
 from .pose_rescue import parse_rescue_request, rescue_slots
+from .arm_contact_correction import find_elbow_wrist_swap
 from .routing import route
 from .descriptor import build_slot_descriptors
 from .person_tags import apply_person_tags
@@ -79,6 +80,13 @@ class _SlotOutcome:
     hard_fallback: bool = False
     routing: dict | None = None
     semantic_candidates: list | None = None
+
+
+def _result_slot_order(slot):
+    return (
+        float(slot.result_box.x1) if slot.result_box is not None else float("inf"),
+        slot.slot_id,
+    )
 
 
 class Pipeline:
@@ -208,14 +216,15 @@ class Pipeline:
 
     # ---- 메인 ----
     def process_cut(self, image, img_w: int = 512, img_h: int = 768,
-                    rescue_request=None) -> CutResult:
+                    rescue_request=None, *, prepare_search_observations=None) -> CutResult:
         from .analysis_budget import analysis_budget
         with analysis_budget():
             progress.emit("analyzing")
-            return self._process_cut_with_budget(image, img_w, img_h, rescue_request)
+            return self._process_cut_with_budget(
+                image, img_w, img_h, rescue_request, prepare_search_observations)
 
-    def _process_cut_with_budget(self, image, img_w, img_h, rescue_request):
-        result = self._process_cut(image, img_w, img_h, rescue_request)
+    def _process_cut_with_budget(self, image, img_w, img_h, rescue_request, prepare_search_observations):
+        result = self._process_cut(image, img_w, img_h, rescue_request, prepare_search_observations)
         if CFG.body_matching_mode != "off":
             from .experimental.body_matching.service import attach_body_matching
             attach_body_matching(self, image, result, CFG)
@@ -224,7 +233,7 @@ class Pipeline:
                 result.body_matching["parallel_review"] = execution
         return result
 
-    def _process_cut(self, image, img_w, img_h, rescue_request):
+    def _process_cut(self, image, img_w, img_h, rescue_request, prepare_search_observations):
         rescue_request = parse_rescue_request(rescue_request)
         # 1) VLM: 러프 → 제어 신호(shot·사람수·대략박스)
         with span("vlm"):
@@ -239,7 +248,8 @@ class Pipeline:
             description_job = start_description_prefetch(
                 self.vlm, image, vlm, img_w, img_h, fullbody=self._fullbody_search is not None)
             vlm._description_prefetch = description_job
-            result = self._process_analyzed_cut(image, img_w, img_h, rescue_request, vlm)
+            result = self._process_analyzed_cut(
+                image, img_w, img_h, rescue_request, vlm, prepare_search_observations)
             try:
                 finish_pipeline_review(vlm, result, pose_started)
             except Exception as error:
@@ -251,7 +261,7 @@ class Pipeline:
             # A failed pose path never waits for body review or accepts late writes.
             abandon_pipeline_review(vlm)
 
-    def _process_analyzed_cut(self, image, img_w, img_h, rescue_request, vlm):
+    def _process_analyzed_cut(self, image, img_w, img_h, rescue_request, vlm, prepare_search_observations):
         # 1-b) 인물별 태그는 **별도 호출**로 받는다(기록용). 분석 프롬프트를 건드리지
         #      않으므로 route·인원수·박스가 이 호출 때문에 달라질 수 없다.
         #      스켈레톤 추출과 겹쳐 돌려 지연을 숨긴다 — 결과는 descriptor를 만들기
@@ -298,7 +308,8 @@ class Pipeline:
 
         if getattr(self.pose, "self_detecting", False):
             return self._process_self_detecting(
-                image, img_w, img_h, vlm, rescue_request
+                image, img_w, img_h, vlm, rescue_request,
+                prepare_search_observations=prepare_search_observations,
             )
 
         # 3) 검출 + VLM 사람 수 보정 (개수 일치=신뢰도 신호)
@@ -315,11 +326,12 @@ class Pipeline:
             image, img_w, img_h, vlm, skeletons,
             detector_count=len(det_boxes), count_record=rec,
             rescue_request=rescue_request,
-            rescue_context=None,
+            prepare_search_observations=prepare_search_observations,
         )
 
     def _process_self_detecting(self, image, img_w: int, img_h: int,
-                                vlm: VLMAnalysis, rescue_request) -> CutResult:
+                                vlm: VLMAnalysis, rescue_request, *,
+                                prepare_search_observations=None) -> CutResult:
         """RTMPose Body path: pose inference itself is the first detection pass."""
         rescue_context = None
         with span("pose_full"):
@@ -339,12 +351,13 @@ class Pipeline:
             detector_count=rec["detector_count"], count_record=rec,
             rescue_request=rescue_request,
             rescue_context=rescue_context,
+            prepare_search_observations=prepare_search_observations,
         )
 
     def _process_slots(self, image, img_w: int, img_h: int,
                        vlm: VLMAnalysis, skeletons, detector_count: int,
                        count_record: dict, rescue_request,
-                       rescue_context=None) -> CutResult:
+                       rescue_context=None, *, prepare_search_observations=None) -> CutResult:
         """RTM candidate를 슬롯에 배정하고 필요한 슬롯만 crop 복구한다."""
         from .experimental.body_matching.integrated import enabled as integrated_enabled
         repair_options = {"recover_invalid": True} if integrated_enabled(CFG) else {}
@@ -513,17 +526,43 @@ class Pipeline:
         # Hybrid/semantic paths bypass _evaluate_slot; retain the same per-slot
         # hands there, with omitted head slots explicitly left not_requested.
         self._join_hand_shapes(vlm)
+        fullbody_inputs = {}
+        search_evidence = getattr(self._fullbody_search, "search_evidence", None)
+        if self._fullbody_search is not None and routing:
+            for slot in slots:
+                decision = routing["decisions"].get(id(slot))
+                if decision is None:
+                    continue
+                corrected, arm_correction = (
+                    self._correct_arm_contact(slot, decision) if search_evidence is not None
+                    else (slot, None))
+                desc = build_slot_descriptors(vlm, [corrected], image_size=(img_w, img_h))[0]
+                if arm_correction is not None:
+                    desc.quality_trace["arm_contact_correction"] = arm_correction
+                desc.output_scope = refine_scope_from_description(
+                    desc.output_scope, decision.semantic.description)
+                fullbody_inputs[id(slot)] = (corrected, desc)
+        if prepare_search_observations is not None and fullbody_inputs:
+            # Bind observations to the same person indices used in the result.
+            ordered = sorted(slots, key=lambda slot: _result_slot_order(
+                fullbody_inputs[id(slot)][0] if id(slot) in fullbody_inputs else slot))
+            prepare_search_observations([
+                (index, fullbody_inputs[id(slot)][1])
+                for index, slot in enumerate(ordered) if id(slot) in fullbody_inputs
+            ])
+
         processed: list[tuple[object, _SlotOutcome]] = []
         for slot in slots:
             decision = routing["decisions"].get(id(slot)) if routing else None
-            if self._fullbody_search is not None and decision is not None:
-                desc = build_slot_descriptors(vlm, [slot], image_size=(img_w, img_h))[0]
-                desc.output_scope = refine_scope_from_description(
-                    desc.output_scope, decision.semantic.description)
+            if id(slot) in fullbody_inputs:
+                slot, desc = fullbody_inputs[id(slot)]
                 evidence = {
                     "keypoints": slot.skeleton.keypoints.tolist() if slot.skeleton is not None else [],
                     "joint_mask": slot.evidence.valid_joint_mask.tolist() if slot.evidence is not None else [],
+                    "joint_scores": slot.evidence.raw_scores.tolist() if slot.evidence is not None else [],
                     "coverage_class": desc.coverage_class,
+                    "lower_body_observed": desc.lower_body_observed,
+                    "person_count": len(slots),
                     "output_scope": desc.output_scope.detected.value if desc.output_scope.detected else None,
                     "output_scope_source": desc.output_scope.source,
                     # Post-retrieval mesh gate only; never feeds pose ranking.
@@ -535,6 +574,10 @@ class Pipeline:
                         observations=progress.observations(decision.semantic.description)))
                 progress.start_search(routing)
                 with progress.person_scope(0 if len(slots) == 1 else None, slot), span("fullbody_search"):
+                    if search_evidence is not None and decision.joint.sufficient and not decision.joint.policy_block:
+                        depth = search_evidence.observe_depth(image, slot.result_box, evidence)
+                        if depth is not None:
+                            evidence["search_depth"] = depth
                     review_options = {"review_geometry": True} if integrated_enabled(CFG) else {}
                     report = self._fullbody_search.search(decision, evidence, **review_options)
                 bindings = dynamic_refine_candidates(
@@ -627,11 +670,7 @@ class Pipeline:
             outcome.descriptor.quality_reasons = list(dict.fromkeys(slot.reasons))
             processed.append((slot, outcome))
 
-        processed.sort(key=lambda item: (
-            float(item[0].result_box.x1)
-            if item[0].result_box is not None else float("inf"),
-            item[0].slot_id,
-        ))
+        processed.sort(key=lambda item: _result_slot_order(item[0]))
         descs = [outcome.descriptor for _, outcome in processed]
         if recovered:
             notes.append(
@@ -673,7 +712,8 @@ class Pipeline:
             if reason:
                 result.notes.append(f"인물 {index}: {reason}")
 
-        progress.publish_ranked(processed, img_w, img_h, routing, CFG.data_dir)
+        progress.publish_ranked(processed, img_w, img_h, routing, CFG.data_dir,
+                                search_pending=prepare_search_observations is not None)
         result.candidates = result.person_candidates[0] if result.person_candidates else []
         if routing is not None:
             result.routing_summary = routing["summary"]
@@ -690,6 +730,33 @@ class Pipeline:
         return result
 
     # ---- 04J-286: 러프함 기반 인물별 검색 경로 ----
+    @staticmethod
+    def _correct_arm_contact(slot, decision):
+        if (not decision.joint.sufficient or decision.joint.policy_block
+                or not decision.semantic.valid or slot.skeleton is None or slot.evidence is None):
+            return slot, None
+        skeleton, evidence = slot.skeleton, slot.evidence
+        correction = find_elbow_wrist_swap(
+            skeleton.keypoints, evidence.valid_joint_mask, decision.semantic.description or {})
+        if correction is None:
+            return slot, None
+
+        elbow, wrist = correction["elbow"], correction["wrist"]
+        pair, reverse = [elbow, wrist], [wrist, elbow]
+        keypoints, scores = skeleton.keypoints.copy(), skeleton.scores.copy()
+        keypoints[pair], scores[pair] = keypoints[reverse], scores[reverse]
+        raw_scores = evidence.raw_scores.copy()
+        raw_scores[pair] = raw_scores[reverse]
+        refine_mask = evidence.refine_valid_joint_mask
+        if refine_mask is not None:
+            # A relabeling must not make a previously excluded refine joint usable.
+            refine_mask = refine_mask.copy()
+            refine_mask[pair] = refine_mask[pair].all()
+        return replace(slot,
+                       skeleton=replace(skeleton, keypoints=keypoints, scores=scores),
+                       evidence=replace(evidence, raw_scores=raw_scores,
+                                        refine_valid_joint_mask=refine_mask)), correction
+
     def _route_slots(self, image, img_w: int, img_h: int, vlm: VLMAnalysis,
                      slots) -> dict:
         """전신 hybrid에서는 관절이 충분한 인물도 설명을 추출한다. 레거시는 부족할 때만."""
@@ -770,7 +837,8 @@ class Pipeline:
                 "requested_people": len(need),
                 "status": describe.status if describe is not None else "not_requested",
                 "provider": getattr(describe, "provider", None),
-                "prompt_version": prompts.POSE_DESCRIBE_VERSION if need else None,
+                "prompt_version": getattr(self.vlm, 'description_prompt_version', prompts.POSE_DESCRIBE_VERSION)
+                                  if need else None,
                 "error_reason": getattr(describe, "error_reason", None),
                 "retryable": getattr(describe, "retryable", None),
                 "retry_after_seconds": getattr(describe, "retry_after_seconds", None),

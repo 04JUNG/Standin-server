@@ -32,7 +32,7 @@ jobs:
       ECS_SERVICE: ${{ vars.ECS_SERVICE }}
       # Explicit rollout: develop uses the requested fullbody path. Main stays
       # legacy unless its own environment explicitly opts in; no production rollout by accident.
-      ROUTING_FULLBODY_ENABLED: ${{ vars.ROUTING_FULLBODY_ENABLED || (github.ref == 'refs/heads/develop' && '1' || '0') }}
+      ROUTING_FULLBODY_ENABLED: ${{ vars.ROUTING_FULLBODY_ENABLED || ((github.ref == 'refs/heads/develop' || vars.ROUTING_RECALL_ENABLED == '1') && '1' || '0') }}
     steps:
       - uses: actions/checkout@v4
 
@@ -57,6 +57,14 @@ jobs:
 
       - uses: docker/setup-buildx-action@v3
 
+      - name: Select Recall profile
+        id: recall-profile
+        env:
+          RECALL_ENABLED: ${{ vars.ROUTING_RECALL_ENABLED || (github.ref == 'refs/heads/develop' && '1' || '0') }}
+        run: |
+          [[ "$RECALL_ENABLED" == 0 || "$RECALL_ENABLED" == 1 ]]
+          echo "enabled=$RECALL_ENABLED" >> "$GITHUB_OUTPUT"
+
       - name: Build and push image
         uses: docker/build-push-action@v6
         with:
@@ -78,6 +86,7 @@ jobs:
           # 로그의 version 필드가 된다. 이미지에 구워야 cdk deploy가 돌아도 남는다.
           build-args: |
             DEPLOYMENT_VERSION=${{ github.sha }}
+            INSTALL_RECALL_PROP_RUNTIME=${{ steps.recall-profile.outputs.enabled }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -123,6 +132,18 @@ jobs:
             --enabled "$ROUTING_FULLBODY_ENABLED" \
             --variant "$REQUESTED_POSE_VARIANT" --canary "$REQUESTED_CANARY_STAGE"
 
+      - name: Prepare environment-specific Recall profile
+        env:
+          RECALL_ENABLED: ${{ steps.recall-profile.outputs.enabled }}
+          ROUTING_RECALL_ASSETS_URI: ${{ vars.ROUTING_RECALL_ASSETS_URI }}
+          ROUTING_RECALL_ASSETS_SHA256: ${{ vars.ROUTING_RECALL_ASSETS_SHA256 }}
+        run: |
+          if [[ "$GITHUB_REF" == refs/heads/main ]]; then
+            python scripts/prepare_staging_recall_deployment.py taskdef.json --enabled "$RECALL_ENABLED" --production
+          else
+            python scripts/prepare_staging_recall_deployment.py taskdef.json --enabled "$RECALL_ENABLED"
+          fi
+
       - name: Verify Human-Art model source
         if: ${{ env.ROUTING_FULLBODY_ENABLED == '1' || (vars.POSE_MODEL_VARIANT || 'cascade') == 'cascade' }}
         # 모델 URI는 환경별 assets 버킷을 소유한 CDK/CloudFormation이 task
@@ -162,7 +183,8 @@ jobs:
           # POSE_CANARY_STAGE=off로 바꾼 뒤 workflow_dispatch를 실행한다.
           # VLM_PROMPT_VERSION은 src/vlm/prompts.py의 버전이다. 바꾸기 전에 standin_eval run
           # vlm-compare를 통과시키고, 되돌릴 때는 environment var를 지우거나 p1-scope로 둔다.
-          # VLM_PERSON_TAGS=1이면 인물별 태그를 별도 호출로 받는다(기록용). 분석 호출은
+          # Recall은 Luna 6필드 설명을 쓰므로 인물별 태그의 별도 호출은 끈다.
+          # 그 외에는 VLM_PERSON_TAGS=1이면 인물별 태그를 별도 호출로 받는다(기록용). 분석 호출은
           # 그대로라 route·인원수·박스는 영향이 없다. 되돌리려면 0으로 두거나 지운다.
           # ⚠ 아래 블록(|) 안에는 주석을 쓰지 않는다. YAML 블록 안의 #은 주석이 아니라 값이라
           #   렌더 액션이 그 줄을 환경 변수로 읽다가 배포가 실패한다.
@@ -173,7 +195,7 @@ jobs:
             POSE_STRICT=1
             REFINE_THUMBNAIL_RENDERER=${{ vars.REFINE_THUMBNAIL_RENDERER || 'converter' }}
             VLM_PROMPT_VERSION=${{ vars.VLM_PROMPT_VERSION || 'p1-scope' }}
-            VLM_PERSON_TAGS=${{ vars.VLM_PERSON_TAGS || '0' }}
+            VLM_PERSON_TAGS=${{ steps.recall-profile.outputs.enabled == '1' && '0' || vars.VLM_PERSON_TAGS || '0' }}
             VLM_PERSON_TAGS_TIMEOUT_MS=${{ vars.VLM_PERSON_TAGS_TIMEOUT_MS || '15000' }}
 
       - name: Preflight real fullbody model and library in deployment image

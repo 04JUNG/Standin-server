@@ -6,7 +6,7 @@ from time import monotonic
 analysis_deadline = ContextVar("analysis_deadline", default=None)
 
 @contextmanager
-def analysis_budget(seconds=120., *, clock=monotonic):
+def analysis_budget(seconds=180., *, clock=monotonic):
     existing = analysis_deadline.get()
     token = analysis_deadline.set(min(existing, clock() + seconds) if existing is not None else clock() + seconds)
     try:
