@@ -43,7 +43,7 @@ class VerifiedRecall:
         self.assets = assets
         self.detector = None
 
-    def observe(self, cut, path):
+    def observe(self, cut, path, *, extracted=None):
         hits = ()
         if len(cut['people']) == 1:
             person, = cut['people']
@@ -55,7 +55,7 @@ class VerifiedRecall:
                 if self.detector is None:
                     self.detector = LocalPropDetector(self.assets.prop_python, self.assets.prop_model)
                 hits = self.detector.observe(path)
-        return self.observations.observe(cut, path, hits)
+        return self.observations.observe(cut, path, hits, extracted=extracted)
 
     def rerank(self, cut, digest, evidence):
         index = fold(digest)

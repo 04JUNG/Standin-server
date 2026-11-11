@@ -14,6 +14,7 @@ import numpy as np
 
 from .bvh import coco17_from_fk, fk, parse_bvh
 from .experimental.geometric_parts import part_frame
+from .search_computation import cached_search_work
 
 VERSION = 'fixed-perspective-117-v1'
 
@@ -72,6 +73,7 @@ class CameraIndex:
         self.frames={p:frame(self.projections,p) for p in ('full','upper','lower')}
         self.identity=hashlib.sha256(json.dumps(dict(version=VERSION,source=self.hashes,
             cameras=[asdict(c) for c in self.cameras]),sort_keys=True).encode()).hexdigest()
+        self._search_library = None
         for value in (self.points,self.scores,self.projections,self.valid):value.setflags(write=False)
 
     @classmethod
@@ -92,9 +94,21 @@ class CameraIndex:
                 hashes[pose_id]=hashlib.sha256(data).hexdigest()
             except Exception as error:errors[pose_id]=type(error).__name__+':'+str(error)[:120]
         if not ids:raise ValueError('no_valid_camera_gallery')
-        return cls(ids,points,scores,cameras=camera_grid(count),errors=errors,hashes=hashes,hand_contacts=contacts)
+        index = cls(ids, points, scores, cameras=camera_grid(count), errors=errors,
+                    hashes=hashes, hand_contacts=contacts)
+        index._search_library = index.identity
+        return index
 
     def search(self, points, mask, part='full'):
+        if self._search_library is None:
+            return self._search(points, mask, part)
+        points, mask = np.asarray(points, dtype=np.float32), np.asarray(mask, dtype=bool)
+        key = (self._search_library, part, points.shape, points.tobytes(), mask.shape, mask.tobytes())
+        hits = cached_search_work('camera_matches', key, lambda: self._search(points, mask, part), limit=6)
+        # Each search branch can annotate matches with its own checks.
+        return [dict(hit, camera=hit['camera'].copy()) for hit in hits]
+
+    def _search(self, points, mask, part):
         m=np.asarray(mask,bool);selected=np.array(range(5,17) if part=='full' else range(5,11) if part=='upper' else range(11,17))
         selected=selected[m[selected]]
         if len(selected)<(6 if part=='full' else 4):return []
