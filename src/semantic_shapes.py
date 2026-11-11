@@ -78,6 +78,45 @@ def _frame(points):
     return shoulder, hip, up, lateral / width, length, width
 
 
+def cross_chest_hint(semantic, evidence):
+    """Recover one specific tag from an otherwise low-certainty description."""
+    description = semantic.description or {}
+    if (semantic.status != 'low_certainty' or semantic.reasons != ['certainty_low']
+            or not description.get('visible')):
+        return False
+    tags = set((description.get('body_details') or '').split(' · '))
+    if not {'팔을 가슴 앞으로 가로지르기', '반대 팔 굽히기'} <= tags:
+        return False
+    mask = np.asarray(evidence.get('joint_mask'), dtype=bool)
+    return (mask.shape == (17,) and mask[[5, 6, 11, 12]].all()
+            and bool(mask[[7, 9]].all()) != bool(mask[[8, 10]].all()))
+
+
+def cross_chest_with_bent_arm(points, scores):
+    """One wrist crosses the torso at chest height and the other elbow bends."""
+    if not (np.asarray(scores)[5:13] >= .3).all():
+        return False
+    frame = _frame(points)
+    if frame is None:
+        return False
+    shoulder, hip, up, lateral, length, width = frame
+    for start, wrist, sign, other_shoulder, other_elbow, other_wrist in (
+        (5, 9, 1, 6, 8, 10),
+        (6, 10, -1, 5, 7, 9),
+    ):
+        across = sign * np.dot(points[wrist] - shoulder, lateral) / width
+        height = np.dot(points[wrist] - hip, up) / length
+        rise = abs(np.dot(points[wrist] - points[start], up)) / length
+        if across < .25 or not .60 <= height <= 1.30 or rise > .40:
+            continue
+        upper = points[other_shoulder] - points[other_elbow]
+        lower = points[other_wrist] - points[other_elbow]
+        length_product = np.linalg.norm(upper) * np.linalg.norm(lower)
+        if length_product > 1e-8 and np.dot(upper, lower) / length_product >= np.cos(np.deg2rad(125)):
+            return True
+    return False
+
+
 def relational_geometry(points, scores) -> dict:
     p=np.asarray(points,dtype=float); s=np.asarray(scores,dtype=float)
     if p.shape!=(17,3) or s.shape!=(17,) or not np.isfinite(p).all() or not np.isfinite(s).all():

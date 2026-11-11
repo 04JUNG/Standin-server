@@ -129,6 +129,9 @@ class DescriptionPrefetch:
 def start_description_prefetch(client, image, analysis, img_w, img_h, *, fullbody):
     if not fullbody or os.getenv("PARALLEL_POSE_DESCRIPTION", "1") != "1":
         return None
+    # This profile promises one request even when final person boxes change.
+    if getattr(client, 'single_description_call', False) is True:
+        return DescriptionPrefetch('skipped_single_call_contract')
     # An optional optimization must not break the existing pose path if request
     # preparation is unsupported. Actual provider failures are NOT swallowed here.
     try:
