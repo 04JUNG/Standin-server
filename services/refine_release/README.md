@@ -33,10 +33,11 @@ REFINE_RELEASE_ENABLED=1
 REFINE_RELEASE_WORKER_URL=http://127.0.0.1:8002
 ```
 
-BFF staging only: `REFINE_RELEASE_ENABLED=1`. Only clients sending
+BFF staging only: `REFINE_RELEASE_ENABLED=1`. The current job response advertises `refineRelease` only for a single target.
+Only clients sending
 `releaseVersion: RC4` use this path. Existing clients and legacy `/refine` remain
-unchanged. Turn this flag off first to stop new RC4 calls. Restore the recorded
-staging BFF/inference task definitions to roll back the deployment.
+unchanged. Turn this flag off first to stop new RC4 calls. Prepare rollback from the current staging task definitions; do not restore an
+old revision over unrelated concurrent deployments.
 
 The isolated worker runs `services.refine_release.worker:app` on port 8002 inside
 the inference task. It needs Blender 5.2.0 LTS, Git, the locked Python requirements,
@@ -61,7 +62,6 @@ PYTHONPATH=services/refine_release/runtime/experiments/refine_final_gate:. \
 python tests/test_smoke.py
 ```
 
-50 existing RC4 contracts and 54 smoke tests passed in the clean develop worktree.
-Fresh staging execution, authenticated persistence/download, camera rendering and
-production task-definition comparison must be recorded before declaring staging
-end-to-end validation complete. Do not equate unit tests with that evidence.
+54 release/adapter tests and 54 smoke tests passed in the clean develop worktree.
+Actual staging/native validation and remaining limits are recorded in
+[the staging report](../../docs/qa/refine-rc4-staging-20261111.md).
