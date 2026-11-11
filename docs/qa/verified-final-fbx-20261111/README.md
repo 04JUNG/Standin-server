@@ -2,7 +2,12 @@
 
 Server base: `5868bee279c89bd47ffbe2e79cfe23b8287760e7`.
 BFF base: `541ed219e5b3df7e059aa8c4b9847b2923842a28`.
-Both were fetched again before PR preparation. No deployment or shared-S3 write
+This is the historical manual pilot for the original recorded policy. The PR
+now includes develop 5999fe397 and automatic default-model preparation; see
+[the newer automatic report](../automatic-default-fbx-20261111/README.md).
+Those changes correctly invalidate the old policy keys.
+
+Both were fetched again before that pilot PR preparation. No deployment or shared-S3 write
 was performed. The old dirty server checkout was not changed or copied.
 
 ## Actual catalog and population
@@ -26,7 +31,7 @@ The primary pilot prepared **6**, failed **0**, and left **7,000 ungenerated**.
 The sample poses are `2hand Idle_01`, `Asking Question_01`, and
 `MH__anrico_sitting02`, each with both defaults. This is not full-library readiness.
 
-There are **27 current-policy valid local FBXs (207,264,260 bytes)** total: the
+There are **27 valid local FBXs for that recorded policy (207,264,260 bytes)** total: the
 six primary samples, the same six without a baked camera, six explicit-default
 numeric shapes in each camera form, and three extra edits (height +1cm, left-hand
 relaxed, head scope). Earlier development-policy artifacts are excluded. Every

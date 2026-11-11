@@ -43,6 +43,7 @@ assert all(shapes[section][k]==v for section in ('sources','characters') for k,v
 assert all(characters['characters'][k]==v for k,v in old_chars['characters'].items())
 catalog['assets']=assets+[a for a in catalog['assets'] if a['characterId'] not in {x['characterId'] for x in assets}];catalog['version']='anatomy-presets-20261111-v1'
 write(target/'bff/body-models.json',catalog);write(target/'converter/characters.json',characters);write(target/'converter/shape-bakes.json',shapes)
+write(target/'converter/body-models.json',catalog)  # Same authoritative defaults for automatic FBX prewarming.
 for role in ('converter','bff'):
     prior=old_plan['roles'][role];manifest=read(old/role/'manifest.json');entries={f['path']:f for f in manifest['files']};local={}
     for f in (target/role).rglob('*'):

@@ -53,9 +53,13 @@ def identity(settings, options):
     # or private uploads retain the BFF's owner/job-scoped result cache.
     source = digest(options['bvh_bytes'])
     expected = os.getenv('CONVERTER_FINAL_LIBRARY_SHA256', '')
-    if not expected:
+    if len(expected) != 64 or any(c not in '0123456789abcdef' for c in expected):
         return None
-    registry_bytes = FinalStore(os.environ['CONVERTER_FINAL_CACHE_ROOT']).read('library.json', 2 * 1024 * 1024)
+    store = FinalStore(os.environ['CONVERTER_FINAL_CACHE_ROOT'])
+    try:
+        registry_bytes = store.read('library-' + expected + '.json', 2 * 1024 * 1024)
+    except FileNotFoundError:
+        registry_bytes = store.read('library.json', 2 * 1024 * 1024)
     registry = json.loads(registry_bytes)
     if digest(registry_bytes) != expected or registry.get('version') != 'final-library-inputs-v1':
         return None
@@ -79,7 +83,7 @@ def identity(settings, options):
     # policy, etc.) also change lineage. Never persist environment values.
     switches = {k: v for k, v in env.items()
                 if k.startswith(('CONVERTER_', 'REVIEWED_', 'STANDIN_'))
-                and k not in ('CONVERTER_FINAL_CACHE_ROOT',)}
+                and not k.startswith('CONVERTER_FINAL_')}
     return dict(version=VERSION, policy_sha256=policy_sha256(),
                 runtime_policy_sha256=digest(canonical(switches)),
                 blender_version=settings.expected_blender_version,

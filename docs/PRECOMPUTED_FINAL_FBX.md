@@ -15,7 +15,10 @@ response fences retain their existing checks. Only immutable bytes are shared.
 ## Inputs and invalidation
 
 `library.json` contains allowed source BVH hashes and catalog character IDs/hashes.
-The operator must set `CONVERTER_FINAL_LIBRARY_SHA256` to its exact SHA-256. A
+Manual-only operation sets `CONVERTER_FINAL_LIBRARY_SHA256` explicitly. Automatic
+preparation derives and updates the process-local pin from approved local inputs.
+Readers select immutable `library-<pin>.json` files; older pinned requests remain
+consistent while a new catalog is registered. A
 missing, changed, unpinned or malformed registry cannot grant a cache hit. This
 registry is generated from the active library DB/BVHs and authoritative catalog,
 not request paths. Refined/private source hashes outside this registry use the
@@ -70,7 +73,54 @@ backend and must not be mounted as a web static directory. Multiple replicas
 share reuse only on the same supported persistent POSIX volume or separately
 installed immutable offline assets. No distributed lock is claimed for S3/NFS.
 
-## Batch procedure
+## Automatic default-model changes
+
+Set `CONVERTER_FINAL_CACHE_ROOT`, `CONVERTER_FINAL_LIBRARY_ROOT` (active read-only
+bundle with poses.db and bvh/), and `CONVERTER_FINAL_CATALOG_PATH` once when the
+feature is installed. With all three configured, the API lifespan starts a
+background worker automatically. No request or manual batch command is needed.
+`CONVERTER_FINAL_PREWARM_ENABLED=0` disables that worker without disabling cache
+reads or normal fallback. No environment or service was changed in this task.
+Future anatomy package builders now include the identical BFF body-models.json
+in the converter release, so the declared defaults cannot be guessed from IDs.
+The active library and private persistent volume must also be mounted at rollout.
+
+The worker watches catalog/DB/approved character and shape registry revisions,
+and the runtime policy fingerprint. Polling defaults to 30 seconds, failed work
+retries after 60 seconds, and a full hash audit runs every 300 seconds. It uses
+the actual catalog roles, numeric defaults and source hashes, and refuses a
+catalog whose defaults disagree with the approved authoring recipe. Immutable
+registry updates still follow the existing service restart/release policy; startup
+then resumes preparation automatically. No library download or remote write is
+performed by this worker.
+
+It prepares full-scope original-hand FBXs for both the semantic front-reference
+identity camera and the unbaked camera form. Other cameras/scopes/appearance and
+user edits retain exact-key fallback. Catalog changes do not invalidate unrelated
+model outputs solely because the input manifest pin changed: authorization is
+rechecked independently, while every output-affecting model/control/source/policy
+remains in the cache key. A changed male default therefore reuses verified female
+files; reverting to the original model can reuse its original verified bytes.
+Operational prewarm intervals/paths/pins are excluded from output identity.
+
+Background work shares the API runner's priority pool and is preemptible by
+foreground/safety work. Per-key locks coalesce runtime requests; a generation
+lock coalesces replicas. Checkpoints are atomically written to
+`prewarm-<generation>.json` and `prewarm-status.json`. Restart resumes by checking
+committed bytes, failed entries retry, and old-generation completion cannot
+publish readiness for a changed catalog. Shutdown cancels the worker. Missing
+models, failed source/final validation or unavailable cache storage cannot certify
+an output. Existing request fallback and ownership/revision gates remain active.
+
+`GET /final-cache/prewarm-status` is internal, read-only diagnostics. It reports
+starting/running/ready/retry_pending/paused_for_foreground and exact ready/failed/
+pending counts with model IDs and the generation; it accepts no paths or trigger.
+Starting a generation does not imply the whole library is ready. Production
+rollout should check this status and the full required generation coverage before
+expecting cache-hit latency. Prewarming itself never deploys, uploads or changes
+the default model selection.
+
+## Optional manual batch procedure
 
 Use the same converter image, registry and policy environment intended for serving:
 
@@ -125,5 +175,8 @@ binds only localhost and fails any conversion attempt. In the BFF checkout run
 and confirmations are fixtures; the semantic presentation, BFF routes, Converter
 HTTP, exact FBX/PNG and receipt fencing are real. Never deploy the probe.
 
-Local measured evidence and remaining coverage are in
-[the pilot report](qa/verified-final-fbx-20261111/README.md).
+Automatic startup/model-change evidence is in
+[the automatic preparation report](qa/automatic-default-fbx-20261111/README.md).
+The earlier [manual pilot report](qa/verified-final-fbx-20261111/README.md) records
+its original policy and coverage; those versioned artifacts are historical after
+the latest develop/automatic-worker policy update.

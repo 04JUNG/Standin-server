@@ -8,7 +8,6 @@ from dataclasses import replace
 import json
 import os
 from pathlib import Path
-import sqlite3
 import sys
 import time
 import uuid
@@ -19,6 +18,7 @@ from converter_api.final_cache import FinalStore, canonical, digest, identity, p
 from converter_api.registry import CharacterRegistry
 from converter_api.runner import BlenderRunner, RunnerSettings
 from converter.shape_spec import resolve_shape, digest_shape
+from converter_api.final_inputs import load_inputs, install_inputs, approved_default
 
 
 def main():
@@ -36,31 +36,13 @@ def main():
     ap.add_argument('--bytes-per-asset', type=int, default=10 * 1024 * 1024)
     args = ap.parse_args()
     library = args.library.resolve(strict=True)
-    catalog_bytes = args.catalog.read_bytes()
-    catalog = json.loads(catalog_bytes)
-    defaults = [a for a in catalog['assets'] if a.get('role') == 'default']
-    if (len(defaults) != 2 or {a.get('gender') for a in defaults} != {'male', 'female'}
-            or next(a['characterId'] for a in defaults if a['gender'] == 'male') != catalog['defaultCharacterId']):
-        raise ValueError('catalog must declare current male/female defaults')
-    with sqlite3.connect(f'file:{library / "poses.db"}?mode=ro', uri=True) as db:
-        rows = db.execute('SELECT DISTINCT pose_id, bvh_path FROM poses ORDER BY pose_id').fetchall()
-    sources = []
-    for pose, raw in rows:
-        path = library / 'bvh' / Path(raw.replace('\\', '/')).name
-        if path.is_symlink() or not path.resolve(strict=True).is_relative_to((library / 'bvh').resolve()):
-            raise ValueError('registered BVH outside library')
-        sources.append(dict(pose_id=pose, path=str(path), source_bvh_sha256=digest(path.read_bytes())))
+    defaults, sources, registered = load_inputs(library, args.catalog)
     store = FinalStore(args.out)
-    registered = canonical(dict(version='final-library-inputs-v1',
-        library_db_sha256=digest((library / 'poses.db').read_bytes()),
-        catalog_sha256=digest(catalog_bytes),
-        sources=sorted({s['source_bvh_sha256'] for s in sources}),
-        characters={a['characterId']: a['assetSha256'] for a in catalog['assets']}))
-    store.atomic('library.json', registered)
+    pin = install_inputs(store, registered)
     os.environ['CONVERTER_FINAL_CACHE_ROOT'] = str(store.root)
-    os.environ['CONVERTER_FINAL_LIBRARY_SHA256'] = digest(registered)
+    os.environ['CONVERTER_FINAL_LIBRARY_SHA256'] = pin
     base_plan = dict(version='final-fbx-batch-v1', policy_sha256=policy_sha256(), library_db_sha256=digest((library / 'poses.db').read_bytes()),
-        catalog_sha256=digest(catalog_bytes), library_manifest_sha256=digest(registered), sources=sources,
+        catalog_sha256=json.loads(registered)['catalog_sha256'], library_manifest_sha256=digest(registered), sources=sources,
         defaults=[{k: a[k] for k in ('characterId', 'assetSha256', 'shape', 'shapeSource')} for a in defaults],
         options=dict(scope=args.scope, camera_rotation=json.loads(args.camera) if args.camera else None,
                      explicit_defaults=args.explicit_defaults),
@@ -92,21 +74,21 @@ def main():
             cid = body['characterId']
             row = dict(pose_id=source['pose_id'], character_id=cid, status='failed')
             try:
-                character = registry.resolve(cid)
-                if character.metadata.sha256 != body['assetSha256']:
-                    raise ValueError('catalog/registry character mismatch')
+                character, default_recipe = approved_default(body, registry)
                 raw = None
                 if args.explicit_defaults:
                     controls = {c['key']: c['default'] for c in body['shape']['controls']}
                     raw = dict(schemaVersion='body-shape.v1', controls=controls,
                                shapeSha256=digest_shape(cid, body['assetSha256'], controls))
-                recipe = resolve_shape(cid, body['assetSha256'], raw, body['shapeSource'])
+                recipe = default_recipe if raw is None else resolve_shape(cid, body['assetSha256'], raw, body['shapeSource'])
                 if recipe is None:
                     raise ValueError('approved default source missing')
                 options = dict(bvh_bytes=Path(source['path']).read_bytes(), character_path=character.path,
                     character_id=cid, character_sha256=body['assetSha256'], conversion_id=str(uuid.uuid4()),
                     shape_recipe=recipe, output_scope=args.scope,
                     camera_rotation=base_plan['options']['camera_rotation'])
+                from converter.hand_contact import selected_hand_screen_enabled
+                options['selected_hand_screen'] = selected_hand_screen_enabled(args.scope)
                 binding = identity(settings, options)
                 row['key'] = digest(canonical(binding))
                 result = runner.convert(**options)

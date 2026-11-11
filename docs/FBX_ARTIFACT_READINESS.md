@@ -22,3 +22,11 @@ The artifact-only contract optionally reuses the exact registered final FBX from
 path or safety flag selects it. `final_cache` is diagnostic metadata; the existing
 job review/ownership contract remains authoritative. See
 [batch procedure, invalidation and validation limits](PRECOMPUTED_FINAL_FBX.md).
+
+When the server-owned library/catalog/cache paths are installed, the API starts
+its default-model prewarmer automatically. A new declared male/female default,
+its actual controls/source, or a new runtime policy is detected and prepared
+through the same final validation path. `GET /final-cache/prewarm-status` reports
+per-generation ready/failed/pending coverage; it is not a trigger or an export
+receipt. Requests keep the existing safe fallback until their exact artifact is
+registered. See the automatic preparation section of PRECOMPUTED_FINAL_FBX.md.

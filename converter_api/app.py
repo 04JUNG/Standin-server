@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from contextlib import asynccontextmanager
+import asyncio
 import hashlib
 import base64
 import hmac
@@ -323,7 +325,21 @@ def create_app(
     if size_limit <= 0:
         raise ValueError("CONVERTER_MAX_BVH_BYTES must be positive")
 
+    from converter_api.final_prewarm import DefaultFbxPrewarmer
+    prewarmer = DefaultFbxPrewarmer.from_env(blender_runner)
+
+    @asynccontextmanager
+    async def lifespan(_app):
+        if prewarmer is not None:
+            prewarmer.start()
+        try:
+            yield
+        finally:
+            if prewarmer is not None:
+                await asyncio.to_thread(prewarmer.stop)
+
     app = FastAPI(
+        lifespan=lifespan,
         title="Standin Internal Converter",
         version="1.4.0",
         description=(
@@ -335,6 +351,11 @@ def create_app(
     app.state.registry = character_registry
     app.state.runner = blender_runner
     app.state.max_bvh_bytes = size_limit
+    app.state.final_prewarm = prewarmer
+
+    @app.get('/final-cache/prewarm-status')
+    def final_prewarm_status():
+        return prewarmer.snapshot() if prewarmer is not None else {'status': 'disabled'}
     from converter_api.csp_shape import register_csp_shape
     register_csp_shape(app, character_registry, blender_runner)
 
