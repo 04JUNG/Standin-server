@@ -1,0 +1,969 @@
+[
+  {
+    "id": "T022",
+    "case_id": "CB029",
+    "intent": "오른다리가 위인 관계를 유지하고 왼무릎을 조금 더 펴며 오른발끝을 화면 왼쪽으로 더 감는다.",
+    "anatomical_side_reference": "subject_own_left_right",
+    "input_sha256": "caa4a76c30f8ed0cbdafc40e46f4cf9c290928b16bcd9289f3346790a391db02",
+    "initial_vlm_body_details": "몸통이 비스듬히 기울어진 상태에서 한쪽 팔은 구부려 올리고 다른 한쪽 팔은 아래로 뻗어 있으며 두 다리는 엇갈려 뻗어 있다.",
+    "initial_vlm_search_text": "비스듬히 떠서 한쪽 팔을 올리고 두 다리를 엇갈려 뻗은 수영 자세",
+    "initial_vlm_source_sha256": "ee270f9f4b67ba47b81ee3c67ea0ed0d812ff1ebe4665fb0b9c485da73913b9d",
+    "authored_fbx_sha256": "55249547caa4f0f48c911f034f10c3ad6f4943c5535a466418a7ce79ebe69e2b",
+    "generated_previews": [
+      {
+        "file": "images/T022/before_legs_reference.png",
+        "sha256": "00add912dfc1fe7647d6b877e1e1f46ad146a173d7e64d33baafd281ed8635c2",
+        "native_sha256": "ed4fbe12a4f6f9208516289c10590ee1ace035dac5f593b87ba344d993343514"
+      },
+      {
+        "file": "images/T022/before_legs_front.png",
+        "sha256": "cc8e334683b791f7aa1844e09f97c4e7402e3e4d1bfe45bb727ae688e246a2d0",
+        "native_sha256": "ed4fbe12a4f6f9208516289c10590ee1ace035dac5f593b87ba344d993343514"
+      },
+      {
+        "file": "images/T022/before_legs_oblique.png",
+        "sha256": "564057c3083e8d4ecc47681a485bd89df0d990926d198c57592d47bba0be60b9",
+        "native_sha256": "ed4fbe12a4f6f9208516289c10590ee1ace035dac5f593b87ba344d993343514"
+      },
+      {
+        "file": "images/T022/before_legs_side.png",
+        "sha256": "61a073b17cdff67c5ed02b1eea41752f2c26da26f60a270c4fdf9ab855552d1a",
+        "native_sha256": "ed4fbe12a4f6f9208516289c10590ee1ace035dac5f593b87ba344d993343514"
+      },
+      {
+        "file": "images/T022/after_legs_reference.png",
+        "sha256": "ae5b047d705ba4a6bfd795b5bb187e01ae0699d035175cc836a4dc2715b8b380",
+        "native_sha256": "55249547caa4f0f48c911f034f10c3ad6f4943c5535a466418a7ce79ebe69e2b"
+      },
+      {
+        "file": "images/T022/after_legs_front.png",
+        "sha256": "270f738d41013cb5aec8aad70c79d09c7f866793f0954ba590be757bffc82ec1",
+        "native_sha256": "55249547caa4f0f48c911f034f10c3ad6f4943c5535a466418a7ce79ebe69e2b"
+      },
+      {
+        "file": "images/T022/after_legs_oblique.png",
+        "sha256": "12d19701187114f0cb6081c2f8d72c25f13d02eb9f83a2b02b526c8e5417c7a3",
+        "native_sha256": "55249547caa4f0f48c911f034f10c3ad6f4943c5535a466418a7ce79ebe69e2b"
+      },
+      {
+        "file": "images/T022/after_legs_side.png",
+        "sha256": "e30f2b4315a64120aa22055b76d9ab4a5c78723f7b2e12cd21365b202cc0ae7f",
+        "native_sha256": "55249547caa4f0f48c911f034f10c3ad6f4943c5535a466418a7ce79ebe69e2b"
+      }
+    ],
+    "skin_triage": {
+      "version": "full-weighted-skin-v2-whole-hands-20261015",
+      "method": "deformed weighted triangle regions + capped-region ray-parity containment; local connected-joint seam exemptions",
+      "depth_tolerance_mm": 2.0,
+      "regions": 14,
+      "finger_skin_included": true,
+      "tested_overlapping_region_pairs": 17,
+      "raw_surface_crossings": 301,
+      "collisions": [
+        {
+          "regions": [
+            "LeftShin",
+            "RightShin"
+          ],
+          "penetrating_vertices": 5,
+          "max_depth_mm": 3.333,
+          "surface_crossing_triangle_pairs": 14,
+          "witness_world": [
+            -0.05875493213534355,
+            0.3183130621910095,
+            0.5988824367523193
+          ]
+        },
+        {
+          "regions": [
+            "LeftThigh",
+            "RightShin"
+          ],
+          "penetrating_vertices": 8,
+          "max_depth_mm": 49.961,
+          "surface_crossing_triangle_pairs": 74,
+          "witness_world": [
+            -0.09359829872846603,
+            0.16190314292907715,
+            0.6280505061149597
+          ]
+        },
+        {
+          "regions": [
+            "LeftThigh",
+            "RightThigh"
+          ],
+          "penetrating_vertices": 57,
+          "max_depth_mm": 18.217,
+          "surface_crossing_triangle_pairs": 60,
+          "witness_world": [
+            -0.018435444682836533,
+            0.025806378573179245,
+            0.8946709036827087
+          ]
+        },
+        {
+          "regions": [
+            "LeftThigh",
+            "Torso"
+          ],
+          "penetrating_vertices": 4,
+          "max_depth_mm": 18.217,
+          "surface_crossing_triangle_pairs": 12,
+          "witness_world": [
+            -0.018435444682836533,
+            0.025806378573179245,
+            0.8946709036827087
+          ]
+        },
+        {
+          "regions": [
+            "LeftUpperArm",
+            "Torso"
+          ],
+          "penetrating_vertices": 1,
+          "max_depth_mm": 49.202,
+          "surface_crossing_triangle_pairs": 12,
+          "witness_world": [
+            0.1631530076265335,
+            -0.21372494101524353,
+            1.0657178163528442
+          ]
+        },
+        {
+          "regions": [
+            "RightThigh",
+            "Torso"
+          ],
+          "penetrating_vertices": 13,
+          "max_depth_mm": 66.572,
+          "surface_crossing_triangle_pairs": 42,
+          "witness_world": [
+            -0.12515944242477417,
+            -0.004775546956807375,
+            0.8565491437911987
+          ]
+        }
+      ],
+      "flags": [
+        "LeftShin / RightShin: 3.3 mm skin penetration",
+        "LeftThigh / RightShin: 50.0 mm skin penetration",
+        "LeftThigh / RightThigh: 18.2 mm skin penetration",
+        "LeftThigh / Torso: 18.2 mm skin penetration",
+        "LeftUpperArm / Torso: 49.2 mm skin penetration",
+        "RightThigh / Torso: 66.6 mm skin penetration"
+      ],
+      "region_closure_failures": {
+        "Torso": 1,
+        "RightThigh": 2,
+        "RightShin": 1,
+        "LeftThigh": 2
+      },
+      "limitations": [
+        "Automated triage, not human visual approval.",
+        "Within one anatomical region is not tested against itself, including finger-to-finger/palm collisions within the same hand.",
+        "Connected-joint seams have small local exemptions.",
+        "Cut capping can overapproximate concave regions; flagged contacts require inspection."
+      ]
+    },
+    "automatic_image_diagnosis": false,
+    "global_skin_certification": false,
+    "latest_authored_adjustment": {
+      "source_sha256": "ed4fbe12a4f6f9208516289c10590ee1ace035dac5f593b87ba344d993343514",
+      "after_sha256": "55249547caa4f0f48c911f034f10c3ad6f4943c5535a466418a7ce79ebe69e2b",
+      "parameters": {
+        "left_knee_target_deg": 60.0,
+        "right_ankle_screen_left_m": 0.04,
+        "right_toe_extra_screen_left_m": 0.025,
+        "right_knee_screen_left_m": 0.035
+      },
+      "left_knee_before_after_deg": [
+        75.38466808745767,
+        59.99999521885492
+      ],
+      "right_toe_screen_left_shift_m": 0.02847951557896496,
+      "screen_left_world": [
+        -0.3792337365019087,
+        0.7021239147923862,
+        -0.6026639041583749
+      ],
+      "top_side": "right",
+      "protected_upper_matrix_error": 0.0,
+      "saved_matrix_error": 8.821487426757812e-06,
+      "skin": {
+        "version": "full-weighted-skin-v2-whole-hands-20261015",
+        "method": "deformed weighted triangle regions + capped-region ray-parity containment; local connected-joint seam exemptions",
+        "depth_tolerance_mm": 2.0,
+        "regions": 14,
+        "finger_skin_included": true,
+        "tested_overlapping_region_pairs": 17,
+        "raw_surface_crossings": 301,
+        "collisions": [
+          {
+            "regions": [
+              "LeftShin",
+              "RightShin"
+            ],
+            "penetrating_vertices": 5,
+            "max_depth_mm": 3.333,
+            "surface_crossing_triangle_pairs": 14,
+            "witness_world": [
+              -0.05875493213534355,
+              0.3183130621910095,
+              0.5988824367523193
+            ]
+          },
+          {
+            "regions": [
+              "LeftThigh",
+              "RightShin"
+            ],
+            "penetrating_vertices": 8,
+            "max_depth_mm": 49.961,
+            "surface_crossing_triangle_pairs": 74,
+            "witness_world": [
+              -0.09359829872846603,
+              0.16190314292907715,
+              0.6280505061149597
+            ]
+          },
+          {
+            "regions": [
+              "LeftThigh",
+              "RightThigh"
+            ],
+            "penetrating_vertices": 57,
+            "max_depth_mm": 18.217,
+            "surface_crossing_triangle_pairs": 60,
+            "witness_world": [
+              -0.018435444682836533,
+              0.025806378573179245,
+              0.8946709036827087
+            ]
+          },
+          {
+            "regions": [
+              "LeftThigh",
+              "Torso"
+            ],
+            "penetrating_vertices": 4,
+            "max_depth_mm": 18.217,
+            "surface_crossing_triangle_pairs": 12,
+            "witness_world": [
+              -0.018435444682836533,
+              0.025806378573179245,
+              0.8946709036827087
+            ]
+          },
+          {
+            "regions": [
+              "LeftUpperArm",
+              "Torso"
+            ],
+            "penetrating_vertices": 1,
+            "max_depth_mm": 49.202,
+            "surface_crossing_triangle_pairs": 12,
+            "witness_world": [
+              0.1631530076265335,
+              -0.21372494101524353,
+              1.0657178163528442
+            ]
+          },
+          {
+            "regions": [
+              "RightThigh",
+              "Torso"
+            ],
+            "penetrating_vertices": 13,
+            "max_depth_mm": 66.572,
+            "surface_crossing_triangle_pairs": 42,
+            "witness_world": [
+              -0.12515944242477417,
+              -0.004775546956807375,
+              0.8565491437911987
+            ]
+          }
+        ],
+        "flags": [
+          "LeftShin / RightShin: 3.3 mm skin penetration",
+          "LeftThigh / RightShin: 50.0 mm skin penetration",
+          "LeftThigh / RightThigh: 18.2 mm skin penetration",
+          "LeftThigh / Torso: 18.2 mm skin penetration",
+          "LeftUpperArm / Torso: 49.2 mm skin penetration",
+          "RightThigh / Torso: 66.6 mm skin penetration"
+        ],
+        "region_closure_failures": {
+          "Torso": 1,
+          "RightThigh": 2,
+          "RightShin": 1,
+          "LeftThigh": 2
+        },
+        "limitations": [
+          "Automated triage, not human visual approval.",
+          "Within one anatomical region is not tested against itself, including finger-to-finger/palm collisions within the same hand.",
+          "Connected-joint seams have small local exemptions.",
+          "Cut capping can overapproximate concave regions; flagged contacts require inspection."
+        ]
+      },
+      "preview_only": true,
+      "automatic_apply_allowed": false,
+      "score_status": "changed_user_reference_not_comparable_to_frozen_rough"
+    }
+  },
+  {
+    "id": "T024",
+    "case_id": "CB034",
+    "intent": "의자에 기대어 양다리를 책상 위로 뻗고 오른발목을 왼발목 위로 겹친다.",
+    "anatomical_side_reference": "subject_own_left_right",
+    "input_sha256": "5e68063d0244b8727ee325992f0ba4c1f1a5d347ef280f39453195863e98b44d",
+    "initial_vlm_body_details": "의자에 몸을 뒤로 젖혀 앉아 오른손으로 머리를 괴고 두 다리를 책상 위에 올려 뻗은 모습.",
+    "initial_vlm_search_text": "의자에 뒤로 기대어 앉아 오른손으로 머리를 괴고 책상 위에 다리를 올려 휴식하는 자세",
+    "initial_vlm_source_sha256": "ede3ca915cc57e1fdd3d5f3270a0633744b0581594032c1846b80469a4528b12",
+    "authored_fbx_sha256": "ae83ab00f1308ccfd2fc26d3b850808161a995ca660d2ab97f9e269dce5b6dfb",
+    "generated_previews": [
+      {
+        "file": "images/T024/before_legs_reference.png",
+        "sha256": "599f15b0e26d58cb3c87dc63e586361c25b839541b4d589a8474df597d071385",
+        "native_sha256": "356c041e744f2565110cfa1693bf99054a5972ff086c2056644c53c39b236bd3"
+      },
+      {
+        "file": "images/T024/before_legs_front.png",
+        "sha256": "d58bbe8b71a5a1b59dd355d545a6c9362e0dd0e481e3bf5f1b81f581a238adf5",
+        "native_sha256": "356c041e744f2565110cfa1693bf99054a5972ff086c2056644c53c39b236bd3"
+      },
+      {
+        "file": "images/T024/before_legs_oblique.png",
+        "sha256": "c875e02f15a52e9ef96f1fd7924aa3c4525fe91fc520aa234216da8c4456796c",
+        "native_sha256": "356c041e744f2565110cfa1693bf99054a5972ff086c2056644c53c39b236bd3"
+      },
+      {
+        "file": "images/T024/before_legs_side.png",
+        "sha256": "f892c60cad411dd7b502933c9bd95656ddc9bc314f39072f73963a5e738bd6de",
+        "native_sha256": "356c041e744f2565110cfa1693bf99054a5972ff086c2056644c53c39b236bd3"
+      },
+      {
+        "file": "images/T024/after_legs_reference.png",
+        "sha256": "07cb17d11bb4c7dbd075f1bd2a99fddc1e89318424fd5845a15f8003e532f94b",
+        "native_sha256": "ae83ab00f1308ccfd2fc26d3b850808161a995ca660d2ab97f9e269dce5b6dfb"
+      },
+      {
+        "file": "images/T024/after_legs_front.png",
+        "sha256": "c3c07eb5c1bce44d54f02ea645fe2588376057f33709e4ad02264d7588bc3de1",
+        "native_sha256": "ae83ab00f1308ccfd2fc26d3b850808161a995ca660d2ab97f9e269dce5b6dfb"
+      },
+      {
+        "file": "images/T024/after_legs_oblique.png",
+        "sha256": "abb5726845c0f2c61b9706af22f225e06a5c691b7b1f56b60736fdd3a884c593",
+        "native_sha256": "ae83ab00f1308ccfd2fc26d3b850808161a995ca660d2ab97f9e269dce5b6dfb"
+      },
+      {
+        "file": "images/T024/after_legs_side.png",
+        "sha256": "e16425b433315e7967ee31d72e547638208a094c0484b996ee5cda607cb23102",
+        "native_sha256": "ae83ab00f1308ccfd2fc26d3b850808161a995ca660d2ab97f9e269dce5b6dfb"
+      }
+    ],
+    "skin_triage": {
+      "version": "full-weighted-skin-v2-whole-hands-20261015",
+      "method": "deformed weighted triangle regions + capped-region ray-parity containment; local connected-joint seam exemptions",
+      "depth_tolerance_mm": 2.0,
+      "regions": 14,
+      "finger_skin_included": true,
+      "tested_overlapping_region_pairs": 21,
+      "raw_surface_crossings": 761,
+      "collisions": [
+        {
+          "regions": [
+            "LeftThigh",
+            "RightThigh"
+          ],
+          "penetrating_vertices": 106,
+          "max_depth_mm": 9.623,
+          "surface_crossing_triangle_pairs": 161,
+          "witness_world": [
+            -0.0021367992740124464,
+            -0.15481500327587128,
+            1.0235790014266968
+          ]
+        },
+        {
+          "regions": [
+            "RightForearm",
+            "RightUpperArm"
+          ],
+          "penetrating_vertices": 66,
+          "max_depth_mm": 31.018,
+          "surface_crossing_triangle_pairs": 153,
+          "witness_world": [
+            -0.30268773436546326,
+            -0.05850847437977791,
+            1.3489410877227783
+          ]
+        },
+        {
+          "regions": [
+            "RightThigh",
+            "Torso"
+          ],
+          "penetrating_vertices": 28,
+          "max_depth_mm": 16.942,
+          "surface_crossing_triangle_pairs": 159,
+          "witness_world": [
+            -0.0384390689432621,
+            -0.07687655091285706,
+            1.0444620847702026
+          ]
+        }
+      ],
+      "flags": [
+        "LeftThigh / RightThigh: 9.6 mm skin penetration",
+        "RightForearm / RightUpperArm: 31.0 mm skin penetration",
+        "RightThigh / Torso: 16.9 mm skin penetration"
+      ],
+      "region_closure_failures": {},
+      "limitations": [
+        "Automated triage, not human visual approval.",
+        "Within one anatomical region is not tested against itself, including finger-to-finger/palm collisions within the same hand.",
+        "Connected-joint seams have small local exemptions.",
+        "Cut capping can overapproximate concave regions; flagged contacts require inspection."
+      ]
+    },
+    "automatic_image_diagnosis": false,
+    "global_skin_certification": false
+  },
+  {
+    "id": "T041",
+    "case_id": "CB026",
+    "intent": "무릎을 가까이 모으고 오른무릎을 뒤로 깊게 접어 오른발을 몸 바깥쪽으로 뺀다.",
+    "anatomical_side_reference": "subject_own_left_right",
+    "input_sha256": "5b77a2c51b73f6e00b9748d46a9b447381ae0113a8f1d17724fa39ff5e2f4aa4",
+    "initial_vlm_body_details": "한쪽 다리를 뒤로 구부린 채 오른손은 허리 뒤에 대고, 왼손은 위로 들어 손가락 포즈를 취하고 있는 전신 모습이다.",
+    "initial_vlm_search_text": "한쪽 다리를 뒤로 굽히고 왼팔을 들어 브이 포즈를 취한 전신 서 있는 자세",
+    "initial_vlm_source_sha256": "cc212c24c20873a98851c1ff534e37da515b921af89b843abc3d70b22a60a25f",
+    "authored_fbx_sha256": "57b968cf88dfd46612a17ec640b4fc922bc73b89913f9ed5dfd3b05d8bef396b",
+    "generated_previews": [
+      {
+        "file": "images/T041/before_legs_reference.png",
+        "sha256": "c045cf77285b265897a5657cd055e8f6930445b0db4a6da82796c7d44e1a89d7",
+        "native_sha256": "9edcf6394bc157b62ed54256090336cdac2839c650764361ae5bff4c3c7dac47"
+      },
+      {
+        "file": "images/T041/before_legs_front.png",
+        "sha256": "31d12e6d7b43f7555e6e885e45fe3fcf621093aee6b13238d0d2cfec64f9420d",
+        "native_sha256": "9edcf6394bc157b62ed54256090336cdac2839c650764361ae5bff4c3c7dac47"
+      },
+      {
+        "file": "images/T041/before_legs_oblique.png",
+        "sha256": "33f85c2cb75a475670dee7f5103dabb56c7024a41858dda82a79a2430eaa7d78",
+        "native_sha256": "9edcf6394bc157b62ed54256090336cdac2839c650764361ae5bff4c3c7dac47"
+      },
+      {
+        "file": "images/T041/before_legs_side.png",
+        "sha256": "4ebc21940d8af3bad41d974bac04e3c8f1f5c5d5d01c178c13fb5a6d03485bd6",
+        "native_sha256": "9edcf6394bc157b62ed54256090336cdac2839c650764361ae5bff4c3c7dac47"
+      },
+      {
+        "file": "images/T041/after_legs_reference.png",
+        "sha256": "c0780e51ed75bf793b29e4acf3bc37ff2b53c18ebd6a7e15163fdfc398ac648f",
+        "native_sha256": "57b968cf88dfd46612a17ec640b4fc922bc73b89913f9ed5dfd3b05d8bef396b"
+      },
+      {
+        "file": "images/T041/after_legs_front.png",
+        "sha256": "d2dda46492800db85a45434ba74a9dd67205a6a85ac9b7643c6f27ae07baa90b",
+        "native_sha256": "57b968cf88dfd46612a17ec640b4fc922bc73b89913f9ed5dfd3b05d8bef396b"
+      },
+      {
+        "file": "images/T041/after_legs_oblique.png",
+        "sha256": "3add7e063e9c2644353ec229015cc542e137a70fbfe3663763bc0c90f503d3c7",
+        "native_sha256": "57b968cf88dfd46612a17ec640b4fc922bc73b89913f9ed5dfd3b05d8bef396b"
+      },
+      {
+        "file": "images/T041/after_legs_side.png",
+        "sha256": "a88f7d3d29c1504e926bc2d56cc72eab0aef1b6dfff3d0c97d39fb0a39d5960f",
+        "native_sha256": "57b968cf88dfd46612a17ec640b4fc922bc73b89913f9ed5dfd3b05d8bef396b"
+      }
+    ],
+    "skin_triage": {
+      "version": "full-weighted-skin-v2-whole-hands-20261015",
+      "method": "deformed weighted triangle regions + capped-region ray-parity containment; local connected-joint seam exemptions",
+      "depth_tolerance_mm": 2.0,
+      "regions": 14,
+      "finger_skin_included": true,
+      "tested_overlapping_region_pairs": 17,
+      "raw_surface_crossings": 611,
+      "collisions": [
+        {
+          "regions": [
+            "LeftThigh",
+            "RightThigh"
+          ],
+          "penetrating_vertices": 436,
+          "max_depth_mm": 36.386,
+          "surface_crossing_triangle_pairs": 279,
+          "witness_world": [
+            0.04663076996803284,
+            -0.19930487871170044,
+            0.6529359817504883
+          ]
+        },
+        {
+          "regions": [
+            "RightShin",
+            "RightThigh"
+          ],
+          "penetrating_vertices": 75,
+          "max_depth_mm": 38.23,
+          "surface_crossing_triangle_pairs": 169,
+          "witness_world": [
+            0.004262049216777086,
+            -0.17004276812076569,
+            0.6715587973594666
+          ]
+        }
+      ],
+      "flags": [
+        "LeftThigh / RightThigh: 36.4 mm skin penetration",
+        "RightShin / RightThigh: 38.2 mm skin penetration"
+      ],
+      "region_closure_failures": {},
+      "limitations": [
+        "Automated triage, not human visual approval.",
+        "Within one anatomical region is not tested against itself, including finger-to-finger/palm collisions within the same hand.",
+        "Connected-joint seams have small local exemptions.",
+        "Cut capping can overapproximate concave regions; flagged contacts require inspection."
+      ]
+    },
+    "automatic_image_diagnosis": false,
+    "global_skin_certification": false
+  },
+  {
+    "id": "T042",
+    "case_id": "CB027",
+    "intent": "오른다리로 지지하고 왼다리는 무릎을 거의 편 채 옆으로 길게 뻗는다.",
+    "anatomical_side_reference": "subject_own_left_right",
+    "input_sha256": "3f490c70eb30f085f83cca45414d0132a682d9cb949b7bb747f8c738b454c5b0",
+    "initial_vlm_body_details": "왼팔은 위로 들어 올리고 오른팔은 아래로 펼치며 두 다리를 옆으로 벌려 균형을 잡고 있다.",
+    "initial_vlm_search_text": "한쪽 팔을 위로 올리고 한쪽 팔을 내린 채 다리를 벌려 균형을 잡는 전신 자세",
+    "initial_vlm_source_sha256": "707aa0deb3f037a77bf4f6efb4bdd3789c1c632d01646bcc5df389927b824777",
+    "authored_fbx_sha256": "ef47ec6aa43f343f6ac52c01687a908db8e586226c6701ee48a668d01220a373",
+    "generated_previews": [
+      {
+        "file": "images/T042/before_legs_reference.png",
+        "sha256": "5af4bed6ac85de414d6678652520d4314eec8c66f0920709dd8ec993491c8578",
+        "native_sha256": "bcd5575df8a102852a289c8452960ada156b42c45e53b764963089908563b38f"
+      },
+      {
+        "file": "images/T042/before_legs_front.png",
+        "sha256": "314ca7a309cd4ea031ad094eb4019fad50785de2ef56304dad211d1d99bab7ae",
+        "native_sha256": "bcd5575df8a102852a289c8452960ada156b42c45e53b764963089908563b38f"
+      },
+      {
+        "file": "images/T042/before_legs_oblique.png",
+        "sha256": "e91f8b3a98f7e5501462d1a0fce3d593abf3f9be8cd559fa0431f83b246d475f",
+        "native_sha256": "bcd5575df8a102852a289c8452960ada156b42c45e53b764963089908563b38f"
+      },
+      {
+        "file": "images/T042/before_legs_side.png",
+        "sha256": "62d32ca2d9068dce3ad73c34dc2636e0dcbec2ff4fb9393e6a9c9461a8d0a8d7",
+        "native_sha256": "bcd5575df8a102852a289c8452960ada156b42c45e53b764963089908563b38f"
+      },
+      {
+        "file": "images/T042/after_legs_reference.png",
+        "sha256": "371a6d28d44d71005c81d46f09e90c628c5d71d327bd6d0bda5754be0e30baaf",
+        "native_sha256": "ef47ec6aa43f343f6ac52c01687a908db8e586226c6701ee48a668d01220a373"
+      },
+      {
+        "file": "images/T042/after_legs_front.png",
+        "sha256": "60d647ff466065136cf97a877b722fe20431579b812df23d7159bd5005bedc0e",
+        "native_sha256": "ef47ec6aa43f343f6ac52c01687a908db8e586226c6701ee48a668d01220a373"
+      },
+      {
+        "file": "images/T042/after_legs_oblique.png",
+        "sha256": "e62f924803313022cb44ece8058725f24248b0ce9fdef40f648360d9dbb43f3c",
+        "native_sha256": "ef47ec6aa43f343f6ac52c01687a908db8e586226c6701ee48a668d01220a373"
+      },
+      {
+        "file": "images/T042/after_legs_side.png",
+        "sha256": "7f33491ef01d910a587a9c9a29921e440dc68612454ea1e6f001d09cfadf2c57",
+        "native_sha256": "ef47ec6aa43f343f6ac52c01687a908db8e586226c6701ee48a668d01220a373"
+      }
+    ],
+    "skin_triage": {
+      "version": "full-weighted-skin-v2-whole-hands-20261015",
+      "method": "deformed weighted triangle regions + capped-region ray-parity containment; local connected-joint seam exemptions",
+      "depth_tolerance_mm": 2.0,
+      "regions": 14,
+      "finger_skin_included": true,
+      "tested_overlapping_region_pairs": 16,
+      "raw_surface_crossings": 184,
+      "collisions": [],
+      "flags": [],
+      "region_closure_failures": {},
+      "limitations": [
+        "Automated triage, not human visual approval.",
+        "Within one anatomical region is not tested against itself, including finger-to-finger/palm collisions within the same hand.",
+        "Connected-joint seams have small local exemptions.",
+        "Cut capping can overapproximate concave regions; flagged contacts require inspection."
+      ]
+    },
+    "automatic_image_diagnosis": false,
+    "global_skin_certification": false
+  },
+  {
+    "id": "T043",
+    "case_id": "CB028",
+    "intent": "오른다리로 지지하고 왼다리는 무릎을 거의 편 채 옆으로 길게 뻗는다.",
+    "anatomical_side_reference": "subject_own_left_right",
+    "input_sha256": "687bc08bebf3e874de2fa783de05edd858814aa2277db673ef4af2790e882790",
+    "initial_vlm_body_details": "오른다리로 체중을 받치고 왼다리를 옆으로 길게 뻗은 채, 왼팔은 위로 올리고 오른팔은 아래로 뻗어 균형을 잡고 있다.",
+    "initial_vlm_search_text": "한쪽 다리로 서서 양팔을 대각선 방향으로 넓게 벌려 균형을 잡는 자세",
+    "initial_vlm_source_sha256": "2a83e956f36b8c9794cf83d9c54759ab845a9a54314df6b51bcc6850060dc3e7",
+    "authored_fbx_sha256": "13ddc7c592426da96d3090a202226a470dc2b987f70d3aab279011c3f5c0a68a",
+    "generated_previews": [
+      {
+        "file": "images/T043/before_legs_reference.png",
+        "sha256": "4cf0c1d994cf9412337f734083bdfdea0eed4ab0ef15b95973c4ca1419c53869",
+        "native_sha256": "a438ca8dca475ed602824003aa4a1863e0c708f5d7cd8387268ef9e477dd23c9"
+      },
+      {
+        "file": "images/T043/before_legs_front.png",
+        "sha256": "12195b0ab4f72b0405fa0dff2730e5c7f50c91b962f54f0d81ddbd56a0a06f7c",
+        "native_sha256": "a438ca8dca475ed602824003aa4a1863e0c708f5d7cd8387268ef9e477dd23c9"
+      },
+      {
+        "file": "images/T043/before_legs_oblique.png",
+        "sha256": "206f85d17c1960d1d965391893bb329f4fdc67b2942434ca363600753d96a7a6",
+        "native_sha256": "a438ca8dca475ed602824003aa4a1863e0c708f5d7cd8387268ef9e477dd23c9"
+      },
+      {
+        "file": "images/T043/before_legs_side.png",
+        "sha256": "a2b2a8382967b614a5830c362fa29fe354045da62b8b586f11530c184faedd32",
+        "native_sha256": "a438ca8dca475ed602824003aa4a1863e0c708f5d7cd8387268ef9e477dd23c9"
+      },
+      {
+        "file": "images/T043/after_legs_reference.png",
+        "sha256": "5e0dd3449a599521630f7f2b19e58875dd54c839dd927ec454980faef8087f24",
+        "native_sha256": "13ddc7c592426da96d3090a202226a470dc2b987f70d3aab279011c3f5c0a68a"
+      },
+      {
+        "file": "images/T043/after_legs_front.png",
+        "sha256": "5429daf7220c45099d2e520e20415107b17321d8c26a1bdce2d49d8ef7b74e9b",
+        "native_sha256": "13ddc7c592426da96d3090a202226a470dc2b987f70d3aab279011c3f5c0a68a"
+      },
+      {
+        "file": "images/T043/after_legs_oblique.png",
+        "sha256": "84774856d14e34694aaeb1e7b1ae81aed072215e3ec934c62ee0a25829f644eb",
+        "native_sha256": "13ddc7c592426da96d3090a202226a470dc2b987f70d3aab279011c3f5c0a68a"
+      },
+      {
+        "file": "images/T043/after_legs_side.png",
+        "sha256": "06da3165b5de3d835b56963b5f292d84b3cd660472405f73f8872cb674bac3d7",
+        "native_sha256": "13ddc7c592426da96d3090a202226a470dc2b987f70d3aab279011c3f5c0a68a"
+      }
+    ],
+    "skin_triage": {
+      "version": "full-weighted-skin-v2-whole-hands-20261015",
+      "method": "deformed weighted triangle regions + capped-region ray-parity containment; local connected-joint seam exemptions",
+      "depth_tolerance_mm": 2.0,
+      "regions": 14,
+      "finger_skin_included": true,
+      "tested_overlapping_region_pairs": 16,
+      "raw_surface_crossings": 120,
+      "collisions": [],
+      "flags": [],
+      "region_closure_failures": {},
+      "limitations": [
+        "Automated triage, not human visual approval.",
+        "Within one anatomical region is not tested against itself, including finger-to-finger/palm collisions within the same hand.",
+        "Connected-joint seams have small local exemptions.",
+        "Cut capping can overapproximate concave regions; flagged contacts require inspection."
+      ]
+    },
+    "automatic_image_diagnosis": false,
+    "global_skin_certification": false
+  },
+  {
+    "id": "T049",
+    "case_id": "CB067",
+    "intent": "양무릎을 바깥쪽으로 넓게 벌리고 골반을 낮춰 깊게 쪼그려 앉는다.",
+    "anatomical_side_reference": "subject_own_left_right",
+    "input_sha256": "32a5828e30795a23554df07aa975509fdb21e46867ac2714717eb8ad8d2bcb9e",
+    "initial_vlm_body_details": "팔짱을 끼고 양 무릎을 바깥쪽으로 넓게 벌린 채 쪼그려 앉아 있다.",
+    "initial_vlm_search_text": "팔짱을 끼고 다리를 벌려 쪼그려 앉은 자세",
+    "initial_vlm_source_sha256": "a8c9c8d9929cf3366b7fd97e4b720927e90bfab9c1b463271092c43d6d26cbba",
+    "authored_fbx_sha256": "0ba871dafe9dde88015046153325678b3975dafa4cba30d541408c7614a2f5ec",
+    "generated_previews": [
+      {
+        "file": "images/T049/before_legs_reference.png",
+        "sha256": "a8a46c94b6be47eaad56557b7d873dccd470b4ffbbb5a221f39cf2798e5f1627",
+        "native_sha256": "2d07747a379852825ab56b98dbabcb25271520c503b80d0317fa17b0ae0ef178"
+      },
+      {
+        "file": "images/T049/before_legs_front.png",
+        "sha256": "e89657db79e635aa64d34cdd7677ab802fb5d99f50e9e4fc315099047fc9e0b6",
+        "native_sha256": "2d07747a379852825ab56b98dbabcb25271520c503b80d0317fa17b0ae0ef178"
+      },
+      {
+        "file": "images/T049/before_legs_oblique.png",
+        "sha256": "d72ce954c3fce5044db918f13e115f428b5afa67b8f40788f4d49d1b586784aa",
+        "native_sha256": "2d07747a379852825ab56b98dbabcb25271520c503b80d0317fa17b0ae0ef178"
+      },
+      {
+        "file": "images/T049/before_legs_side.png",
+        "sha256": "4cf193d2e310408a853cca0683c65e4c6a5656fb6686ac74dfbb103b4ff791cc",
+        "native_sha256": "2d07747a379852825ab56b98dbabcb25271520c503b80d0317fa17b0ae0ef178"
+      },
+      {
+        "file": "images/T049/after_legs_reference.png",
+        "sha256": "47c2cf37a868723e8cef68eb30f76a6b88e76f51f2d57a53a42667550dee48a5",
+        "native_sha256": "0ba871dafe9dde88015046153325678b3975dafa4cba30d541408c7614a2f5ec"
+      },
+      {
+        "file": "images/T049/after_legs_front.png",
+        "sha256": "3ec87e203ba1a3256a7982c27c48802e1e56dbebcca00f01c9b437e4335fe932",
+        "native_sha256": "0ba871dafe9dde88015046153325678b3975dafa4cba30d541408c7614a2f5ec"
+      },
+      {
+        "file": "images/T049/after_legs_oblique.png",
+        "sha256": "a6e260630ba7f1e72ba88dfd9e32d839f1165e6ba3acd671263254f5c321d4bd",
+        "native_sha256": "0ba871dafe9dde88015046153325678b3975dafa4cba30d541408c7614a2f5ec"
+      },
+      {
+        "file": "images/T049/after_legs_side.png",
+        "sha256": "9f7df42694f7110151b16c38daafef37dd15eac90ba532d7a5ae20f59ff930f2",
+        "native_sha256": "0ba871dafe9dde88015046153325678b3975dafa4cba30d541408c7614a2f5ec"
+      }
+    ],
+    "skin_triage": {
+      "version": "full-weighted-skin-v2-whole-hands-20261015",
+      "method": "deformed weighted triangle regions + capped-region ray-parity containment; local connected-joint seam exemptions",
+      "depth_tolerance_mm": 2.0,
+      "regions": 14,
+      "finger_skin_included": true,
+      "tested_overlapping_region_pairs": 26,
+      "raw_surface_crossings": 1233,
+      "collisions": [
+        {
+          "regions": [
+            "LeftShin",
+            "LeftThigh"
+          ],
+          "penetrating_vertices": 168,
+          "max_depth_mm": 52.109,
+          "surface_crossing_triangle_pairs": 193,
+          "witness_world": [
+            0.20654189586639404,
+            -0.2634623348712921,
+            0.829738438129425
+          ]
+        },
+        {
+          "regions": [
+            "LeftThigh",
+            "RightHand"
+          ],
+          "penetrating_vertices": 43,
+          "max_depth_mm": 9.073,
+          "surface_crossing_triangle_pairs": 101,
+          "witness_world": [
+            0.15306244790554047,
+            -0.15991033613681793,
+            0.8596309423446655
+          ]
+        },
+        {
+          "regions": [
+            "LeftThigh",
+            "Torso"
+          ],
+          "penetrating_vertices": 8,
+          "max_depth_mm": 8.58,
+          "surface_crossing_triangle_pairs": 144,
+          "witness_world": [
+            0.10333442687988281,
+            -0.05683295056223869,
+            0.789398729801178
+          ]
+        },
+        {
+          "regions": [
+            "RightForearm",
+            "RightThigh"
+          ],
+          "penetrating_vertices": 39,
+          "max_depth_mm": 13.398,
+          "surface_crossing_triangle_pairs": 59,
+          "witness_world": [
+            -0.1457671970129013,
+            -0.12664330005645752,
+            0.8439770936965942
+          ]
+        },
+        {
+          "regions": [
+            "RightShin",
+            "RightThigh"
+          ],
+          "penetrating_vertices": 168,
+          "max_depth_mm": 52.044,
+          "surface_crossing_triangle_pairs": 188,
+          "witness_world": [
+            -0.22621449828147888,
+            -0.28439685702323914,
+            0.784193217754364
+          ]
+        },
+        {
+          "regions": [
+            "RightThigh",
+            "RightUpperArm"
+          ],
+          "penetrating_vertices": 8,
+          "max_depth_mm": 9.867,
+          "surface_crossing_triangle_pairs": 25,
+          "witness_world": [
+            -0.15418826043605804,
+            -0.13030865788459778,
+            0.851264238357544
+          ]
+        },
+        {
+          "regions": [
+            "RightThigh",
+            "Torso"
+          ],
+          "penetrating_vertices": 9,
+          "max_depth_mm": 18.652,
+          "surface_crossing_triangle_pairs": 161,
+          "witness_world": [
+            0.0020972394850105047,
+            -0.07063979655504227,
+            0.750224769115448
+          ]
+        },
+        {
+          "regions": [
+            "RightUpperArm",
+            "Torso"
+          ],
+          "penetrating_vertices": 81,
+          "max_depth_mm": 23.111,
+          "surface_crossing_triangle_pairs": 166,
+          "witness_world": [
+            -0.10018306970596313,
+            -0.025688333436846733,
+            0.9943831562995911
+          ]
+        }
+      ],
+      "flags": [
+        "LeftShin / LeftThigh: 52.1 mm skin penetration",
+        "LeftThigh / RightHand: 9.1 mm skin penetration",
+        "LeftThigh / Torso: 8.6 mm skin penetration",
+        "RightForearm / RightThigh: 13.4 mm skin penetration",
+        "RightShin / RightThigh: 52.0 mm skin penetration",
+        "RightThigh / RightUpperArm: 9.9 mm skin penetration",
+        "RightThigh / Torso: 18.7 mm skin penetration",
+        "RightUpperArm / Torso: 23.1 mm skin penetration"
+      ],
+      "region_closure_failures": {},
+      "limitations": [
+        "Automated triage, not human visual approval.",
+        "Within one anatomical region is not tested against itself, including finger-to-finger/palm collisions within the same hand.",
+        "Connected-joint seams have small local exemptions.",
+        "Cut capping can overapproximate concave regions; flagged contacts require inspection."
+      ]
+    },
+    "automatic_image_diagnosis": false,
+    "global_skin_certification": false
+  },
+  {
+    "id": "T050",
+    "case_id": "CB074",
+    "intent": "서서 왼다리를 오른다리 앞쪽으로 교차하고 왼발을 몸 앞쪽으로 더 내민다.",
+    "anatomical_side_reference": "subject_own_left_right",
+    "input_sha256": "de0fa370996d5f704f5298f590ff9e9a157d299ca94b37730f461014e1db13fd",
+    "initial_vlm_body_details": "오른손은 머리 뒤에 대고 왼팔은 굽혀 위로 올린 채 두 다리를 교차하듯 모으고 서 있는 전신 자세",
+    "initial_vlm_search_text": "머리 뒤로 오른손을 짚고 왼팔을 굽혀 올린 채 곧게 서서 스트레칭하는 자세",
+    "initial_vlm_source_sha256": "960e46f291e4d5d1a234e524d47a926367be8159e42b1b543ad36f23c28632cf",
+    "authored_fbx_sha256": "3cb6affadeb521c9538b4aa9c1218a41339d5adabe7ff8263cd678e76cd2db7d",
+    "generated_previews": [
+      {
+        "file": "images/T050/before_legs_reference.png",
+        "sha256": "3f1de5732606f640d434fdbda69568a550b2f8be9ca02b998bd86b3890a728c7",
+        "native_sha256": "203b9f6d155a57c4e78cc27d5f89e26c4b89a4d486a575825670bdd5aef7a2a3"
+      },
+      {
+        "file": "images/T050/before_legs_front.png",
+        "sha256": "cf602c7d92826ee8f37a4eecbcd296561b8822584a0c9b67bc40bd0b1caef2db",
+        "native_sha256": "203b9f6d155a57c4e78cc27d5f89e26c4b89a4d486a575825670bdd5aef7a2a3"
+      },
+      {
+        "file": "images/T050/before_legs_oblique.png",
+        "sha256": "680d37e6d4c49575f4b2566e1587a8f8eea320f6d58222111087b789fc540d73",
+        "native_sha256": "203b9f6d155a57c4e78cc27d5f89e26c4b89a4d486a575825670bdd5aef7a2a3"
+      },
+      {
+        "file": "images/T050/before_legs_side.png",
+        "sha256": "34dfc077abe369c4764d42f83d724486b37bb16abe4a23c7f1d0f9fd00bb4b8f",
+        "native_sha256": "203b9f6d155a57c4e78cc27d5f89e26c4b89a4d486a575825670bdd5aef7a2a3"
+      },
+      {
+        "file": "images/T050/after_legs_reference.png",
+        "sha256": "10bfd02478882e55525dbd7e19a40ed57dc2ad2b4a5caa6e5d2321381fea2633",
+        "native_sha256": "3cb6affadeb521c9538b4aa9c1218a41339d5adabe7ff8263cd678e76cd2db7d"
+      },
+      {
+        "file": "images/T050/after_legs_front.png",
+        "sha256": "5ec340280d8ebeac5cfd7f65b5447ee4b26173300095d1f34c2792108978dcea",
+        "native_sha256": "3cb6affadeb521c9538b4aa9c1218a41339d5adabe7ff8263cd678e76cd2db7d"
+      },
+      {
+        "file": "images/T050/after_legs_oblique.png",
+        "sha256": "0d3fc155a6b98849962e4fb0f1b3003e7a43cf3f6e9c6ad6ad5691267404d73b",
+        "native_sha256": "3cb6affadeb521c9538b4aa9c1218a41339d5adabe7ff8263cd678e76cd2db7d"
+      },
+      {
+        "file": "images/T050/after_legs_side.png",
+        "sha256": "c37fc0e28688d1e55413e896211fd755db11986361a766bcc7c5d1e8eb96efd4",
+        "native_sha256": "3cb6affadeb521c9538b4aa9c1218a41339d5adabe7ff8263cd678e76cd2db7d"
+      }
+    ],
+    "skin_triage": {
+      "version": "full-weighted-skin-v2-whole-hands-20261015",
+      "method": "deformed weighted triangle regions + capped-region ray-parity containment; local connected-joint seam exemptions",
+      "depth_tolerance_mm": 2.0,
+      "regions": 14,
+      "finger_skin_included": true,
+      "tested_overlapping_region_pairs": 19,
+      "raw_surface_crossings": 368,
+      "collisions": [
+        {
+          "regions": [
+            "LeftThigh",
+            "RightThigh"
+          ],
+          "penetrating_vertices": 391,
+          "max_depth_mm": 55.241,
+          "surface_crossing_triangle_pairs": 260,
+          "witness_world": [
+            -0.023799458518624306,
+            -0.04199637845158577,
+            0.6864810585975647
+          ]
+        }
+      ],
+      "flags": [
+        "LeftThigh / RightThigh: 55.2 mm skin penetration"
+      ],
+      "region_closure_failures": {},
+      "limitations": [
+        "Automated triage, not human visual approval.",
+        "Within one anatomical region is not tested against itself, including finger-to-finger/palm collisions within the same hand.",
+        "Connected-joint seams have small local exemptions.",
+        "Cut capping can overapproximate concave regions; flagged contacts require inspection."
+      ]
+    },
+    "automatic_image_diagnosis": false,
+    "global_skin_certification": false
+  }
+]

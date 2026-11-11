@@ -47,6 +47,61 @@ def _load(recipe):
     module.register();module.set_controls(recipe['values'],correct=False)
     return module
 
+
+def transfer_solver_pose(rig, deform):
+    """Transfer exact solver frames, then evaluate the approved shoulder girdle.
+
+    FBX omits the drivers. Muting them during transfer prevents driven helper
+    translations from being incorrectly counteracted by the pose assignment.
+    Upper-arm orientation stays at the requested solver angle while its socket
+    is allowed to rise with the clavicle/scapular rig.
+    """
+    import bpy
+    helpers = {'Standin_LeftScapularLift', 'Standin_RightScapularLift'}
+    approved = helpers.issubset(rig.data.bones.keys())
+    drivers = list(rig.animation_data.drivers) if approved and rig.animation_data else []
+    muted = [d.mute for d in drivers]
+    inv = rig.matrix_world.inverted()
+    desired = {b.name: inv @ deform[b.name] @ rig.matrix_world @ b.matrix_local for b in rig.data.bones}
+    try:
+        for d in drivers: d.mute = True
+        for bone in rig.data.bones:
+            rig.pose.bones[bone.name].matrix = desired[bone.name]
+            bpy.context.view_layer.update()
+        error = max((rig.matrix_world @ rig.pose.bones[b.name].matrix.translation -
+                     deform[b.name] @ rig.matrix_world @ b.head_local).length for b in rig.data.bones)
+        if error > 1e-5:
+            raise ValueError('solver-to-author joint transfer exceeded 0.01 mm')
+    finally:
+        for d, was_muted in zip(drivers, muted): d.mute = was_muted
+    if approved:
+        driven = helpers | {'mixamorig:LeftShoulder', 'mixamorig:RightShoulder'}
+        upper_arms = {'mixamorig:LeftArm', 'mixamorig:RightArm'}
+        def put_rotation(name):
+            bone = rig.data.bones[name]
+            pb = rig.pose.bones[name]
+            rest = bone.matrix_local.to_quaternion()
+            if pb.parent:
+                relative = pb.parent.bone.matrix_local.to_quaternion().inverted() @ rest
+                rotation = relative.inverted() @ pb.parent.matrix.to_quaternion().inverted() @ desired[name].to_quaternion()
+            else:
+                rotation = rest.inverted() @ desired[name].to_quaternion()
+            pb.rotation_mode = 'QUATERNION'
+            pb.rotation_quaternion = rotation
+            bpy.context.view_layer.update()
+        for _ in range(24):
+            bpy.context.view_layer.update()
+            for name in sorted(upper_arms): put_rotation(name)
+            if max(rig.pose.bones[n].matrix.to_quaternion().rotation_difference(desired[n].to_quaternion()).angle
+                   for n in upper_arms) < .0005: break
+        for bone in rig.data.bones:
+            if bone.name not in driven | upper_arms: put_rotation(bone.name)
+        angular_error = max(rig.pose.bones[n].matrix.to_quaternion().rotation_difference(desired[n].to_quaternion()).angle
+                            for n in desired if n not in driven)
+        if angular_error > .002:
+            raise ValueError('approved shoulder transfer did not converge within 0.12 degrees')
+    return error
+
 def convert_shaped(*, recipe, bvh_path, character_fbx, out_path, **options):
     import bpy,numpy as np
     from mathutils import Matrix
@@ -71,14 +126,7 @@ def convert_shaped(*, recipe, bvh_path, character_fbx, out_path, **options):
     deform={b.name:(posed.matrix_world@b.matrix_local)@rest[b.name].inverted() for b in posed.data.bones}
     module=_load(recipe);mesh,rig=module.objects();module.BUSY=True
     try:
-        inv=rig.matrix_world.inverted()
-        # Parents before children; update after each assignment for Blender dependencies.
-        for bone in rig.data.bones:
-            rig.pose.bones[bone.name].matrix=inv@deform[bone.name]@rig.matrix_world@bone.matrix_local
-            bpy.context.view_layer.update()
-        transfer_error=max((rig.matrix_world@rig.pose.bones[b.name].matrix.translation-
-                            deform[b.name]@rig.matrix_world@b.head_local).length for b in rig.data.bones)
-        if transfer_error>1e-5:raise ValueError('solver-to-author joint transfer exceeded 0.01 mm')
+        transfer_error=transfer_solver_pose(rig,deform)
         module.correct_pose(check_intersections=True,contacts=True)
         posed_bundle=module.export_fixed(str(Path(out_path).parent/'corrected'),posed=True)
     finally:module.BUSY=False

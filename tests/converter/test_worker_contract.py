@@ -76,14 +76,17 @@ def test_worker_module_does_not_import_bpy():
     assert "bpy" not in sys.modules
 
 
-def test_source_pose_transfers_fingers_before_framing(tmp_path, monkeypatch):
+def test_unregistered_pose_transfers_fingers_before_framing(tmp_path, monkeypatch):
     final_artifact = import_module("converter.final_artifact")
     framing = import_module("converter.framing")
     reviewed_source_fingers = import_module("converter.reviewed_source_fingers")
+    body_material = import_module("converter.body_material")
 
     path, _ = _job(tmp_path)
     job = load_job(path)
     output = Path(job["output_path"])
+    monkeypatch.delenv("REVIEWED_LIBRARY_ROOT", raising=False)
+    monkeypatch.delenv("REVIEWED_LIBRARY_SHA256", raising=False)
     monkeypatch.setitem(sys.modules, "bpy", SimpleNamespace(app=SimpleNamespace(
         version_string=EXPECTED_BLENDER_VERSION, build_hash=EXPECTED_BLENDER_BUILD_HASH,
     )))
@@ -92,22 +95,29 @@ def test_source_pose_transfers_fingers_before_framing(tmp_path, monkeypatch):
         Path(kwargs["out_path"]).write_bytes(b"body")
         return SimpleNamespace(ok=True, as_dict=lambda: {"ok": True})
 
-    def bake(path, source, *, frame, mirror, hands):
+    def bake(path, source, *, frame, mirror, hands, transfer_posed_offsets):
         assert (source, frame, mirror, hands) == (job["bvh_path"], FRAME, False, None)
+        assert transfer_posed_offsets
         assert Path(path).read_bytes() == b"body"
         Path(path).write_bytes(b"body and fingers")
         return {"applied_bones": 30}
 
     def frame(path, scope, **kwargs):
-        assert Path(path).read_bytes() == b"body and fingers"
+        assert Path(path).read_bytes() == b"body and fingers and gray"
         return {"scope": scope}
+
+    def gray(path):
+        assert Path(path).read_bytes() == b"body and fingers"
+        Path(path).write_bytes(b"body and fingers and gray")
+        return {"changed_materials": ["Standin anatomical clay"]}
 
     monkeypatch.setitem(sys.modules, "converter.convert", SimpleNamespace(convert=convert))
     monkeypatch.setattr(reviewed_source_fingers, "bake_source_fingers", bake)
+    monkeypatch.setattr(body_material, "restore_anatomical_clay", gray)
     monkeypatch.setattr(framing, "process_output", frame)
     monkeypatch.setattr(final_artifact, "validate", lambda *args: {"skin_verified": True})
     assert run_job(job)["source_fingers"] == {"applied_bones": 30}
-    assert output.read_bytes() == b"body and fingers"
+    assert output.read_bytes() == b"body and fingers and gray"
 
 
 def test_valid_job_preserves_locked_options(tmp_path):

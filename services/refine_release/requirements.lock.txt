@@ -1,0 +1,13 @@
+# Direct dependency versions validated on Python 3.12 for RC3.
+# Resolve and lock transitive wheels for the deployment platform.
+numpy==2.5.1
+scipy==1.18.0
+Pillow==12.3.0
+opencv-python==5.0.0.93
+opencv-contrib-python==5.0.0.93
+rtmlib==0.0.15
+onnxruntime==1.28.0
+fastapi==0.141.1
+pydantic==2.13.4
+python-multipart==0.0.32
+uvicorn==0.52.0

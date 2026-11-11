@@ -50,16 +50,33 @@ class Settings:
 
 
 class Engine:
-    def __init__(self, settings, reader, visual):
+    def __init__(self, settings, reader, visual, *, parts_service=None):
         self.settings = settings
         self.reader = reader
         self.visual = visual
+        self.parts_service = parts_service
         self.pending = {}
         self.retired = {}
         self.active = None
         if digest(settings.character.read_bytes()) != settings.character_sha256:
             raise ValueError("head-axis character binding mismatch")
         settings.root.mkdir(parents=True, exist_ok=True)
+
+    def parts_capabilities(self):
+        from src.refine_v4.service import CONTRACT
+        from src.refine_v4 import VERSION as parts_version
+        service = getattr(self, "parts_service", None)
+        if service is None:
+            return {"contract_version": CONTRACT, "engine_version": parts_version,
+                    "available": False, "reason": "PARTS_DISABLED", "operations": [], "recipes": []}
+        return service.capabilities()
+
+    def refine_parts(self, request):
+        from src.refine_v4.service import PartsError
+        service = getattr(self, "parts_service", None)
+        if service is None:
+            raise PartsError("PARTS_DISABLED", 503)
+        return service.refine(request)
 
     def stage(self, ctx, *stages):
         path = ctx.work.parent / "context.json"
@@ -154,7 +171,8 @@ class Engine:
             i = p["person_index"]
             pose = p["pose_id"]
             obs = p["observation"]
-            if not re.fullmatch(r"[A-Za-z0-9_\-]+", pose) or p["output_scope"] not in (
+            from .assets import valid_pose_id
+            if not valid_pose_id(pose) or p["output_scope"] not in (
                 "full",
                 "half",
                 "bust",
@@ -285,7 +303,10 @@ class Engine:
         validate_layout(layout)
         data = (folder / "scene.fbx").read_bytes()
         preview = b"" if artifact_only else (folder / "final.png").read_bytes()
+        from converter.scene_camera_transport import camera_binding
+        framing = result["results"]["final"]["verification"]["framing"]
         return dict(
+            camera=camera_binding(framing, digest(data)),
             version=VERSION,
             plan_id=key,
             artifact_sha256=digest(data),

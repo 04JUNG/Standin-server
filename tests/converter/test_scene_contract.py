@@ -100,6 +100,18 @@ def test_api_returns_atomic_scene_bundle_with_placements_and_hashes():
     assert runner.calls[0]["fbx_bytes"] == [FBX, FBX]
 
 
+def test_scene_bundle_preserves_camera_receipt_without_changing_zip_members():
+    from converter.rough_layout import camera_for
+    from converter.scene_camera import framing_recipe
+    from converter_api.scene_routes import scene_bundle
+    recipe = framing_recipe(camera_for(690, 1168))
+    data = scene_bundle(manifest(), SceneResult(FBX, {"framing": recipe}))
+    with zipfile.ZipFile(io.BytesIO(data)) as archive:
+        assert archive.namelist() == ["scene.fbx", "manifest.json"]
+        payload = json.loads(archive.read("manifest.json"))
+    assert payload["composition"]["framing"] == recipe
+
+
 @pytest.mark.parametrize("rough", [False, True])
 def test_raw_fbx_binds_artifact_person_count_and_exact_manifest(rough):
     value = manifest()

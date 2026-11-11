@@ -135,16 +135,16 @@ def compose(manifest, fbx_paths, output_path):
         people.append({**row, "root_name": group.name, "armature_name": rigs[0].name,
                        "bone_count": len(rigs[0].data.bones), "mesh_count": len(meshes),
                        **({"layout_fit": fit_report} if fit_report else {})})
+    framing = None
     if camera:
         from mathutils import Vector
+        from converter.scene_camera import configure_camera
         data = bpy.data.cameras.new("rough_camera")
         obj = bpy.data.objects.new("rough_camera", data)
         bpy.context.collection.objects.link(obj)
         obj.location = camera["position_blender"]
         obj.rotation_euler = Vector((0, 1, 0)).to_track_quat("-Z", "Y").to_euler()
-        data.sensor_fit = "HORIZONTAL"
-        data.lens_unit = "FOV"
-        data.angle = math.radians(camera["horizontal_fov_degrees"])
+        framing = configure_camera(obj, camera)
         scene = bpy.context.scene
         scene.render.resolution_x = rough["width"]
         scene.render.resolution_y = rough["height"]
@@ -163,9 +163,16 @@ def compose(manifest, fbx_paths, output_path):
     _import(output_path)
     bpy.context.view_layer.update()
     error = _verify(before, _snapshot())
+    if framing:
+        from converter.scene_camera import verify_camera_recipe
+        cameras = [o for o in bpy.context.scene.objects if o.type == "CAMERA"]
+        if len(cameras) != 1:
+            raise ValueError("scene camera did not survive export")
+        verify_camera_recipe(cameras[0], framing)
     return dict(ok=True, version=SCENE_VERSION, blender_version=bpy.app.version_string,
                 person_count=len(people), persons=people, roundtrip_verified=True,
                 max_world_error_m=error, tolerance_m=0.0001,
+                **({"framing": framing} if framing else {}),
                 **({"rough_layout": {"version": "rough-layout-v1", "camera": camera,
                     "depth_is_estimate": True, "manual_adjustment": False,
                     "csp_camera_preservation": False}} if rough else {}))

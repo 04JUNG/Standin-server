@@ -20,7 +20,10 @@ env:
 jobs:
   deploy:
     name: Deploy
-    if: vars.AUTO_DEPLOY_ENABLED == 'true'
+    # A code-only merge can suppress deployment without suppressing CI.
+    if: >-
+      vars.AUTO_DEPLOY_ENABLED == 'true' &&
+      (github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip deploy]'))
     runs-on: ubuntu-latest
     # main만 프로덕션이다. 그 외 브랜치는 전부 staging으로 간다.
     environment: ${{ github.ref == 'refs/heads/main' && 'beta' || 'staging' }}
@@ -107,6 +110,19 @@ jobs:
           INFERENCE_IMAGE: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
         run: python scripts/prepare_body_initializer_deployment.py taskdef.json --image "$INFERENCE_IMAGE"
 
+
+      - name: Refresh staging body initializer image
+        if: github.ref == 'refs/heads/develop'
+        env:
+          STAGING_IMAGE_URI: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+        run: python scripts/refresh_staging_body_initializer.py taskdef.json --image "$STAGING_IMAGE_URI"
+
+      - name: Keep staging inline asset initializer on the deployed image
+        if: github.ref == 'refs/heads/develop'
+        env:
+          STAGING_IMAGE: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+        run: python scripts/prepare_staging_asset_initializer.py taskdef.json --image "$STAGING_IMAGE"
+
       - name: Prepare environment-scoped VLM provider
         env:
           VLM_PROVIDER: ${{ vars.VLM_PROVIDER }}
@@ -144,6 +160,34 @@ jobs:
             python scripts/prepare_staging_recall_deployment.py taskdef.json --enabled "$RECALL_ENABLED"
           fi
 
+      - name: Prepare explicit hand screen capacity
+        env:
+          HAND_SKIN_SCREEN_CONCURRENCY: ${{ vars.HAND_SKIN_SCREEN_CONCURRENCY }}
+          HAND_SKIN_SCREEN_ON_SELECTION: ${{ vars.HAND_SKIN_SCREEN_ON_SELECTION }}
+        run: python scripts/prepare_hand_screen_deployment.py taskdef.json --container inference
+
+      - name: Prepare optional description rollout overrides
+        # Read environment-scoped vars only here. Empty preserves the current
+        # task setting; explicit '0' supports rollback without changing secrets.
+        env:
+          ROUTING_DESCRIBE_TIMEOUT_MS: ${{ vars.ROUTING_DESCRIBE_TIMEOUT_MS }}
+          ROUTING_DESCRIBE_BUDGET_MS: ${{ vars.ROUTING_DESCRIBE_BUDGET_MS }}
+          ROUTING_DESCRIBE_RESERVE_MS: ${{ vars.ROUTING_DESCRIBE_RESERVE_MS }}
+          ROUTING_DESCRIBE_PERSON_CROPS: ${{ vars.ROUTING_DESCRIBE_PERSON_CROPS }}
+          ROUTING_DESCRIBE_PERSON_WORKERS: ${{ vars.ROUTING_DESCRIBE_PERSON_WORKERS }}
+          PARALLEL_POSE_DESCRIPTION: ${{ vars.PARALLEL_POSE_DESCRIPTION || (github.ref == 'refs/heads/main' && '1' || '') }}
+        run: python scripts/prepare_description_deployment.py taskdef.json
+
+      - name: Prepare pinned staging hand screen release
+        if: github.ref == 'refs/heads/develop'
+        env:
+          HAND_SCREEN_RELEASE_MANIFEST_KEY: ${{ vars.HAND_SCREEN_RELEASE_MANIFEST_KEY }}
+          HAND_SCREEN_RELEASE_MANIFEST_SHA256: ${{ vars.HAND_SCREEN_RELEASE_MANIFEST_SHA256 }}
+          HAND_SCREEN_RELEASE_MANIFEST_JSON: ${{ vars.HAND_SCREEN_RELEASE_MANIFEST_JSON }}
+          HAND_SCREEN_PREVALIDATION_ENABLED: ${{ vars.HAND_SCREEN_PREVALIDATION_ENABLED }}
+          STAGING_IMAGE: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+        run: python scripts/prepare_hand_screen_release_deployment.py taskdef.json --image "$STAGING_IMAGE" --environment staging
+
       - name: Verify Human-Art model source
         if: ${{ env.ROUTING_FULLBODY_ENABLED == '1' || (vars.POSE_MODEL_VARIANT || 'cascade') == 'cascade' }}
         # 모델 URI는 환경별 assets 버킷을 소유한 CDK/CloudFormation이 task
@@ -171,6 +215,10 @@ jobs:
                 | select(.name == "REFINE_THUMBNAIL_CONVERTER_URL" and (.value | length > 0))]
             | length == 1
           ' taskdef.json
+
+      - name: Pin production refine policy
+        if: github.ref == 'refs/heads/main'
+        run: python scripts/prepare_production_refine.py taskdef.json
 
       - uses: aws-actions/amazon-ecs-render-task-definition@v1
         id: render
@@ -224,3 +272,6 @@ jobs:
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
+
+      # Paid fixed-50 evaluation is disabled by owner request (2026-10-31).
+      # Keep model evaluation outside deployment workflows, including main promotion.

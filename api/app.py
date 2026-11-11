@@ -61,6 +61,7 @@ from src.refine import (REFINE_CODE_VERSION, REFINE_V2_CODE_VERSION,
                         refine_bvh)
 from src.experimental.body_matching.integrated import VERSION as INTEGRATED_BODY_VERSION
 from src.refine_policy import structural_refine_allowed
+from src.refine_v3_runtime import capabilities as refine_v3_capabilities
 from src.refine_projection import ProjectionDomainError, VERSION as REFINE_PROJECTION_VERSION
 from src.pose_catalog import build_catalog, folders as pose_catalog_folders, page as pose_catalog_page
 from src.pose_quarantine import (load_pose_quarantine, pose_quarantine_sha256,
@@ -137,7 +138,10 @@ def _ensure_db():
 
     from src.thumbnail_overlay import ensure_thumbnail_overlay
     if ensure_thumbnail_overlay(CFG.data_dir, DB_PATH):
-        log_info("pose_thumbnails", "검증한 썸네일 스타일 오버레이를 적용했습니다")
+        log_info('pose_thumbnails', '검증한 썸네일 스타일 오버레이를 적용했습니다')
+    from src.thumbnail_patch import ensure_thumbnail_patch
+    if ensure_thumbnail_patch(CFG.data_dir):
+        log_info('pose_thumbnails', '검증한 개별 포스터 이미지 패치를 적용했습니다')
     return load_entries(DB_PATH)
 
 
@@ -313,8 +317,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Standin Pose Pipeline", version="0.2.2", lifespan=lifespan)
-if CFG.hand_skin_screen_concurrency == 2:
-    app.add_middleware(HandSkinMiddleware)
+app.add_middleware(HandSkinMiddleware)
 
 
 def _refine_capability() -> dict:
@@ -352,6 +355,7 @@ def _refine_capability() -> dict:
         and not CFG.refine_v25_selector_enabled
     )
     return {
+        "refine_v3": refine_v3_capabilities(),
         "enabled": bool(CFG.refine_enabled),
         "v2_enabled": bool(CFG.refine_v2_enabled),
         "torso_enabled": bool(CFG.refine_v2_torso_enabled),
@@ -734,6 +738,12 @@ def _analyze(file, hint="", rescue="", response=None, *, on_fallback=None):
         skel = desc.skeleton
         people.append(PersonOut(
             index=i,
+            refine_v3=getattr(desc, "_refine_v3", None),
+            refine_evidence=getattr(desc, "refine_evidence", None),
+            joint_provenance=([r.to_serializable() for r in skel.joint_provenance]
+                              if skel is not None and getattr(skel, "joint_provenance", None)
+                              and (os.getenv("REFINE_V3_EVIDENCE_ENABLED") == "1"
+                                   or os.getenv("REFINE_V3_MODE") == "shadow") else None),
             refine_candidates=[CandidateOut(**c) for c in desc.refine_candidates],
             tags=desc.tag_dict(),
             skeleton=(SkeletonOut(
@@ -963,7 +973,7 @@ def get_hand_catalog():
     catalog = build_hand_catalog()
     return JSONResponse(catalog, headers={
         "Cache-Control": "private, max-age=3600",
-        "ETag": f'"{catalog["library_sha256"][:32]}"',
+        "ETag": f'"{catalog["library_sha256"][:32]}-{(catalog["thumbnail_revision"] or "legacy")[:32]}"',
     })
 
 
@@ -1094,6 +1104,8 @@ def refine(req: RefineRequest):
     같은 선택을 다시 눌러도 재계산하지 않는 멱등성은 BFF의 refined_artifacts PK
     (job_id, person_index, candidate_id)가 담당한다.
     """
+    from src.refine_v3_runtime import shadow_for_request
+    shadow_deadline = time.monotonic() + (max(float(CFG.refine_timeout_seconds), 0.0) or 1.0)
     effective_mode = _effective_refine_mode(req.refine_mode)
     mode_requested = req.refine_mode or "default"
 
@@ -1135,6 +1147,8 @@ def refine(req: RefineRequest):
         }
 
     def _base_response(reason: str, *, attempted: bool = False) -> RefineResponse:
+        shadow = (None if meta.get("set_id") else
+                  shadow_for_request(req, base, deadline=shadow_deadline))
         return RefineResponse(
             pose_id=req.pose_id, view=req.view, refined=False,
             reason=reason, bvh_url=f"/pose/{req.pose_id}/bvh", bvh=None,
@@ -1147,6 +1161,7 @@ def refine(req: RefineRequest):
                             else REFINE_CODE_VERSION),
             refine_outcome="reverted" if attempted else "not_attempted",
             diagnostics={
+                **({"refine_v3": shadow} if shadow is not None else {}),
                 "mode_requested": mode_requested,
                 "mode_effective": effective_mode,
                 "mode_applied": "base",
@@ -1219,6 +1234,9 @@ def refine(req: RefineRequest):
         raise HTTPException(409, f"refine BVH 처리 실패: {exc}") from exc
 
     diagnostics = dict(res.diagnostics)
+    shadow = shadow_for_request(req, base, deadline=shadow_deadline)
+    if shadow is not None:
+        diagnostics["refine_v3"] = shadow
     diagnostics.setdefault("mode_requested", mode_requested)
     diagnostics.setdefault("mode_effective", effective_mode)
     context = diagnostics.setdefault("context", {})
@@ -1297,3 +1315,7 @@ def export_order(req: ExportOrderRequest):
         created_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
         items=items, notes=notes,
     )
+
+# RC4 is independently opt-in; the existing /refine contract is unchanged.
+from api.refine_release import router as release_refine_router
+app.include_router(release_refine_router)

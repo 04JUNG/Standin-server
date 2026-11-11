@@ -1,0 +1,140 @@
+{
+  "kind": "synthetic-source-cache-off",
+  "runs": 70,
+  "cold_process_measured": false,
+  "actual_target_fbx_quality": false,
+  "production_support": false,
+  "rows": [
+    {
+      "mask": [],
+      "eligible_limbs": [
+        "left_arm",
+        "right_arm"
+      ],
+      "policy_ms": 0.3802499268203974,
+      "first_ms": 13.816541992127895,
+      "warm_p50_ms": 12.776916846632957,
+      "warm_p95_ms": 13.766916934400797,
+      "reasons": [
+        "source_candidate_improved"
+      ],
+      "mesh_status": "mesh_unverified"
+    },
+    {
+      "mask": [
+        10
+      ],
+      "eligible_limbs": [
+        "left_arm"
+      ],
+      "policy_ms": 0.13741711154580116,
+      "first_ms": 7.695124950259924,
+      "warm_p50_ms": 7.456040941178799,
+      "warm_p95_ms": 7.769416505470872,
+      "reasons": [
+        "source_candidate_improved"
+      ],
+      "mesh_status": "mesh_unverified"
+    },
+    {
+      "mask": [
+        8,
+        10,
+        14,
+        16
+      ],
+      "eligible_limbs": [
+        "left_arm"
+      ],
+      "policy_ms": 0.1087910495698452,
+      "first_ms": 7.568209199234843,
+      "warm_p50_ms": 7.483625086024404,
+      "warm_p95_ms": 7.786750188097358,
+      "reasons": [
+        "source_candidate_improved"
+      ],
+      "mesh_status": "mesh_unverified"
+    },
+    {
+      "mask": [
+        13,
+        14,
+        15,
+        16
+      ],
+      "eligible_limbs": [
+        "left_arm",
+        "right_arm"
+      ],
+      "policy_ms": 0.12033293023705482,
+      "first_ms": 13.754084007814527,
+      "warm_p50_ms": 12.939041014760733,
+      "warm_p95_ms": 13.306449772790074,
+      "reasons": [
+        "source_candidate_improved"
+      ],
+      "mesh_status": "mesh_unverified"
+    },
+    {
+      "mask": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "eligible_limbs": [
+        "left_arm",
+        "right_arm"
+      ],
+      "policy_ms": 0.1302498858422041,
+      "first_ms": 13.10558314435184,
+      "warm_p50_ms": 12.909958139061928,
+      "warm_p95_ms": 13.173366384580731,
+      "reasons": [
+        "source_candidate_improved"
+      ],
+      "mesh_status": "mesh_unverified"
+    },
+    {
+      "mask": [
+        8,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "eligible_limbs": [
+        "left_arm"
+      ],
+      "policy_ms": 0.11554104276001453,
+      "first_ms": 7.453457918018103,
+      "warm_p50_ms": 8.003958035260439,
+      "warm_p95_ms": 8.498875051736832,
+      "reasons": [
+        "source_candidate_improved"
+      ],
+      "mesh_status": "mesh_unverified"
+    },
+    {
+      "mask": [
+        7
+      ],
+      "eligible_limbs": [
+        "right_arm"
+      ],
+      "policy_ms": 0.14779088087379932,
+      "first_ms": 3.2339580357074738,
+      "warm_p50_ms": 3.0820409301668406,
+      "warm_p95_ms": 3.623791551217437,
+      "reasons": [
+        "insufficient_gain"
+      ],
+      "mesh_status": "mesh_unverified"
+    }
+  ]
+}

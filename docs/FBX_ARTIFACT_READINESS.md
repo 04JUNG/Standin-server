@@ -14,3 +14,19 @@ The optional scene worker's `build` accepts `artifact_only=true`. Composition, l
 - `docs/qa/fbx-ready/real-converter.json` records the local Blender 5.2.0 result. This is a single local probe with an existing generated BVH and approved male model, not a before/after benchmark or an estimate of production latency reduction.
 
 No installed Standin application, GUI E2E, CSP import, paid scene-model run, or live production S3 test was performed. Merge/deploy this PR (Converter **and** scene worker), then BFF, then client. Existing clients remain compatible. The converter preview revision changes intentionally, invalidating old runtime-bound caches.
+
+## Persistent registered-library final bytes
+
+The artifact-only contract optionally reuses the exact registered final FBX from
+`CONVERTER_FINAL_CACHE_ROOT`, pinned by the server's library manifest. No client
+path or safety flag selects it. `final_cache` is diagnostic metadata; the existing
+job review/ownership contract remains authoritative. See
+[batch procedure, invalidation and validation limits](PRECOMPUTED_FINAL_FBX.md).
+
+When the server-owned library/catalog/cache paths are installed, the API starts
+its default-model prewarmer automatically. A new declared male/female default,
+its actual controls/source, or a new runtime policy is detected and prepared
+through the same final validation path. `GET /final-cache/prewarm-status` reports
+per-generation ready/failed/pending coverage; it is not a trigger or an export
+receipt. Requests keep the existing safe fallback until their exact artifact is
+registered. See the automatic preparation section of PRECOMPUTED_FINAL_FBX.md.

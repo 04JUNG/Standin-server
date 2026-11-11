@@ -17,6 +17,7 @@ from .person_tags import detect_person_tags
 from .hand_shapes import detect_person_hands
 from .experimental.body_matching.integrated import detect_body
 from .partial_pose import shoulder_frame
+from .skeleton_extraction import observed_joints_without_torso
 
 
 def order_left_to_right(skeletons: List[Optional[Skeleton]],
@@ -106,11 +107,17 @@ def build_slot_descriptors(vlm: VLMAnalysis, slots,
             )
             and (slot.state == "valid" or slot.search_stability == "stable")
         )
-        # hard invalid 좌표(NaN/Inf 포함)는 네트워크 경계로 내보내지 않는다. raw 값은
-        # slot/evidence trace에만 남기고 descriptor 자리는 유지한다.
+        # 몸통 기준의 검색 불가와 관절 관측값의 존재는 별개다. NaN/Inf·소유권
+        # 충돌은 계속 차단하고, 몸통 앵커 부족만 관측용 mask로 보존한다.
         output_skeleton = skeleton if slot.state not in ("missing", "invalid") else None
+        observed_mask = observed_joints_without_torso(slot, image_size)
+        if observed_mask is not None:
+            output_skeleton = skeleton
         if output_skeleton is not None:
-            output_scores = evidence.effective_scores
+            # Legacy clients pass these scores back to refine. Observation-only
+            # coordinates must not bypass the original torso/ownership gates.
+            output_scores = (np.zeros(17, dtype=np.float32) if observed_mask is not None
+                             else evidence.effective_scores)
             output_skeleton = Skeleton(
                 np.asarray(output_skeleton.keypoints, dtype=np.float32).copy(),
                 output_scores,
@@ -195,6 +202,14 @@ def build_slot_descriptors(vlm: VLMAnalysis, slots,
                 vlm, slot.slot_id if slot.slot_origin == "vlm" else None,
             ),
         ))
+        if observed_mask is not None:
+            observed_scores = evidence.raw_scores.copy()
+            observed_scores[~observed_mask] = 0.0
+            out[-1].quality_trace.update({
+                "observation_policy": "torso_insufficient_observations_v1",
+                "observed_joint_mask": observed_mask.tolist(),
+                "observed_joint_scores": observed_scores.tolist(),
+            })
         if getattr(slot, "box_recovery", None):
             out[-1].quality_trace["box_recovery"] = dict(slot.box_recovery)
         if output_scope is not vlm_scope:

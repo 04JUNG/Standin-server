@@ -5,6 +5,30 @@ triangles on opposite hands; containment and same-hand contacts need other gates
 """
 SCREEN_VERSION = 'evaluated_skin_opposite_hand_triangle_crossing_v1'
 
+class SelectedHandContactError(ValueError):
+    def __init__(self, code):
+        super().__init__(code)
+        self.code = code
+
+
+def selected_hand_screen_enabled(scope):
+    import os
+    return scope in ('full', 'half') and os.getenv('CONVERTER_SCREEN_SELECTED_HANDS', '0') == '1'
+
+
+def require_clear_selected_hands(meshes):
+    """Reject a selected hand bake before publishing a preview or export."""
+    try:
+        report = screen_hands(meshes)
+        if report.get('status') != 'unavailable':
+            validate_screen(report)
+    except Exception as exc:
+        raise SelectedHandContactError('HAND_CONTACT_UNAVAILABLE') from exc
+    if report['status'] == 'intersection':
+        raise SelectedHandContactError('HAND_CONTACT_INTERSECTION')
+    if report['status'] != 'clear_screen':
+        raise SelectedHandContactError('HAND_CONTACT_UNAVAILABLE')
+
 
 def validate_screen(report, *, artifact_sha256=None):
     """Independent, bpy-free receipt validation at process/HTTP boundaries."""

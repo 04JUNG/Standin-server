@@ -195,6 +195,49 @@ def test_screen_api_missing_or_wrong_receipt_is_failure(tmp_path):
     assert response.json()['error']['code'] == 'WORKER_INTEGRITY_ERROR'
 
 
+@pytest.mark.parametrize(('route', 'scope', 'selected'), [
+    ('convert-framed', 'full', False),
+    ('convert-framed-export', 'full', True),
+    ('convert-framed-export', 'head', False),
+])
+def test_selected_hand_screen_is_only_requested_on_applicable_exports(tmp_path, monkeypatch, route, scope, selected):
+    monkeypatch.setenv('CONVERTER_SCREEN_SELECTED_HANDS', '1')
+    runner = FakeRunner(failure=ConversionRejectedError('failed', report={
+        'error_code': 'HAND_CONTACT_INTERSECTION'}))
+    response = _client(tmp_path, runner=runner).post('/' + route,
+        files={'bvh': ('pose.bvh', VALID_BVH, 'application/octet-stream')},
+        data={'expected_bvh_sha256': hashlib.sha256(VALID_BVH).hexdigest(),
+              'output_scope': scope, 'preview_format': 'none'})
+    assert len(runner.calls) == 1
+    assert runner.calls[0].get('selected_hand_screen', False) is selected
+    assert response.status_code == 422
+    assert response.json()['error']['code'] == ('HAND_CONTACT_INTERSECTION' if selected else 'INVALID_BVH')
+
+
+@pytest.mark.parametrize(('status', 'code'), [
+    ('clear_screen', None),
+    ('intersection', 'HAND_CONTACT_INTERSECTION'),
+    ('unavailable', 'HAND_CONTACT_UNAVAILABLE'),
+])
+def test_selected_hand_mesh_gate(monkeypatch, status, code):
+    from converter import hand_contact
+    calls = []
+    def screen(meshes):
+        calls.append(meshes)
+        return dict(status=status, method=hand_contact.SCREEN_VERSION,
+                    scope='opposite_hands_only', complete_collision_certificate=False,
+                    triangle_counts={'left': 4, 'right': 4},
+                    intersection_pairs=int(status == 'intersection'))
+    monkeypatch.setattr(hand_contact, 'screen_hands', screen)
+    meshes = [object()]
+    if code is None:
+        hand_contact.require_clear_selected_hands(meshes)
+    else:
+        with pytest.raises(hand_contact.SelectedHandContactError, match=code):
+            hand_contact.require_clear_selected_hands(meshes)
+    assert calls == [meshes]
+
+
 def test_screen_api_source_hash_checked_before_conversion(tmp_path):
     runner = FakeRunner()
     response = _client(tmp_path, runner=runner).post('/screen-hand-contact',
@@ -232,6 +275,30 @@ def test_health_is_503_on_character_hash_mismatch(tmp_path):
     response = _client(tmp_path, expected_sha="0" * 64).get("/healthz")
     assert response.status_code == 503
     assert response.json()["ok"] is False
+
+
+def test_hand_screen_profile_is_read_only_and_binds_verified_character(tmp_path,monkeypatch):
+    from converter.hand_library import load_library
+    from converter.hand_screen_catalog import PROFILE_VERSION
+    monkeypatch.setattr('converter.hand_screen_catalog.runtime_profile',lambda runner:'c'*64)
+    runner=FakeRunner();client=_client(tmp_path,runner=runner)
+    response=client.get('/hand-screen-profile',params={'character_id':'standin-master-v2'})
+    assert response.status_code==200
+    body=response.json()
+    assert body['version']==PROFILE_VERSION and body['profile_sha256']=='c'*64
+    assert body['character_id']=='standin-master-v2'
+    assert body['hand_library_sha256']==load_library().sha256
+    assert len(body['character_sha256'])==64 and not runner.calls
+    assert body['shape_sha256'] is None
+    assert set(body)=={'version','profile_sha256','character_id','character_sha256','shape_sha256','hand_library_sha256'}
+
+
+def test_hand_screen_profile_fails_closed_on_asset_hash_mismatch(tmp_path,monkeypatch):
+    monkeypatch.setattr('converter.hand_screen_catalog.runtime_profile',lambda runner:'c'*64)
+    runner=FakeRunner();client=_client(tmp_path,runner=runner,expected_sha='0'*64)
+    response=client.get('/hand-screen-profile')
+    assert response.status_code==503 and not runner.calls
+    assert response.json()['error']['code']=='SCREEN_PROFILE_UNAVAILABLE'
 
 
 def test_convert_success_streams_fbx_and_required_headers(tmp_path):
@@ -444,7 +511,7 @@ def test_convert_is_503_on_character_hash_mismatch(tmp_path):
 
 def test_openapi_declares_multipart_convert_contract(tmp_path):
     payload = _client(tmp_path).get("/openapi.json").json()
-    assert payload["info"]["version"] == "1.3.0"
+    assert payload["info"]["version"] == "1.4.0"
     assert "/convert-framed-export" in payload["paths"]
     request_body = payload["paths"]["/convert"]["post"]["requestBody"]
     assert "multipart/form-data" in request_body["content"]

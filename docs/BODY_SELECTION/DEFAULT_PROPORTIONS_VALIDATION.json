@@ -1,0 +1,237 @@
+{
+  "schema": "body-default-proportions-public-validation.v1",
+  "baseCommit": "592ab0f059089e64a5c88a3ad607539124e8e6c6",
+  "status": "model_approved_for_develop_integration_no_deployment",
+  "activationAllowed": false,
+  "models": [
+    {
+      "characterId": "male-default83-v0-7-6-p1",
+      "sourceRules": "standin-body-0.7.6",
+      "blendSha256": "faa8904946b293d629dcedd4bff6dd50505bad2a5853bcaa21556882272d6398",
+      "controllerSha256": "fdad7dcf789a40a0adcc91f5dd71b91b0c53a2a099a58bcb1782fd593b4a86fb",
+      "fbxSha256": "085dd9c65a3a66035f7e0ce9e0a9171b9abb0e33dada92194676d92e00c8b026",
+      "shapeSha256": "0772ce3d0d43330e6e169473c7881dff1ca3569c07cea0ebbeed17baa2e204d7",
+      "rigSha256": "e902dbc6243b15e239dd0a8163e0f2ead6678e234bca804eba47deae45ab28ad",
+      "basisSha256": "f71fce9ae9517cfd2e5844feb137e23ac99f13eeba75d7f0b15a377ccfa9f9dc",
+      "weightsSha256": "57879c289b365308d7cc628c76142637aa69513cad7b554b1d6d260dea7dad38",
+      "topologySha256": "e5b4a535895fb265f13d7ac50121a2fcd7452046bc2a51d21806a23d7425c5c8",
+      "bodyDeltasSha256": "e8770dd11f4f18807bc1c33e0684813ac4a3e8211218d4a1d03e367efec39d32",
+      "measurement": {
+        "pose": "T",
+        "axis": "world Z; feet on floor",
+        "definition": "stature / (actual crown vertex Z - authored chin-plane vertex Z)",
+        "heightMm": 1780.0,
+        "headHeightMm": 214.45783132530093,
+        "measuredHeads": 8.30000000000001,
+        "requestedHeads": 8.3,
+        "errorHeads": 8.881784197001252e-15,
+        "chinVertex": 5305,
+        "crownVertex": 11463,
+        "storedChinIndexRemapped": false,
+        "chinPlaneAgreementMm": 0.0,
+        "soleZMm": 0.0
+      },
+      "changedControls": {
+        "heads": [
+          7.201584,
+          8.3
+        ]
+      },
+      "runtimeSha256": "cbbef2afd29dd87b5f0c6a01ff7cf3ac0e712602e8a749899f146f949d6ecd36",
+      "runtimeBytes": 33490388,
+      "runtimePreset": "BASE",
+      "neutralPngSha256": "a1fe5a85ec196ff12788cf6cd39cda87521ee41159ead4e34e4d7556cb4ca30d",
+      "neutralRoundtrip": {
+        "roundtrip_max_error_mm": 0.00029059651751595084,
+        "roundtrip_joint_error_mm": 0.0005464895799426601,
+        "roundtrip_weight_error": 0.0
+      }
+    },
+    {
+      "characterId": "female-default80-v0-3-9-p1",
+      "sourceRules": "standin-female-body-0.3.9",
+      "blendSha256": "3adba411fa3ee9d9b50c40cd8bcbd15eb26f41606aefebfd07db914ecbfbbb31",
+      "controllerSha256": "2221c65d6ebb51210c1cecbe5e5039c87e5a069960ee17120630482cc1d457e9",
+      "fbxSha256": "712ac75e58efd4d6ccded0b1e931590900015de023327f1320cf6d7d94026ffc",
+      "shapeSha256": "69aa3d041a46b1d3a3f0658cbf432ae9a1179e592ea8bb3f016e91c361189ad0",
+      "rigSha256": "67a2d016232126795cb206b6b154abc8739022ffb3f3c84802bb1a6c2478bdb9",
+      "basisSha256": "61e92d576d588eb2b6a6f14db855191496af94291e22775b31c6e8a127d0c7d4",
+      "weightsSha256": "75c9159f447bae1c5aec879e29c7ea1a5e7d72bf2e76bbfac585f5cd08a2b8b3",
+      "topologySha256": "9dc27b94d24632b93c61838f14998d832df79ae9e329b08c70f326444c1db724",
+      "bodyDeltasSha256": "122309a7fa2b2e6277c585ddc29c496318df0b2e45671dcf1b5245c15927ede8",
+      "measurement": {
+        "pose": "T",
+        "axis": "world Z; feet on floor",
+        "definition": "stature / (actual crown vertex Z - authored chin-plane vertex Z)",
+        "heightMm": 1750.0,
+        "headHeightMm": 218.75,
+        "measuredHeads": 8.0,
+        "requestedHeads": 8.0,
+        "errorHeads": 0.0,
+        "chinVertex": 12003,
+        "crownVertex": 11997,
+        "storedChinIndexRemapped": true,
+        "chinPlaneAgreementMm": 0.0,
+        "soleZMm": 0.0
+      },
+      "changedControls": {
+        "heads": [
+          7.37018,
+          8.0
+        ]
+      },
+      "runtimeSha256": "0a886f9d8eb6ba9bff90fef1788466738b5acab40a6a7c4096d69dd1b3a5d172",
+      "runtimeBytes": 33473592,
+      "runtimePreset": "BASE",
+      "neutralPngSha256": "af5d455e81757d31f57b99a6a2207990d07a9c93b953b4467bb482d5c0c2bb99",
+      "neutralRoundtrip": {
+        "roundtrip_max_error_mm": 0.0002983082936225401,
+        "roundtrip_joint_error_mm": 0.0005339525004377638,
+        "roundtrip_weight_error": 0.0
+      }
+    }
+  ],
+  "preservedEditorDefaults": [
+    {
+      "characterId": "male-base-v0-7-2",
+      "fbxSha256": "809a131510434089888429605bf7cd2e3bc75b63109e4ac5c9734b211ee52365",
+      "rigSha256": "e902dbc6243b15e239dd0a8163e0f2ead6678e234bca804eba47deae45ab28ad",
+      "blendSha256": "9ff276f6f2c78bd935e1f4179f5e3f6a9c7ef869e3fa60d43b45eb53072d5998",
+      "controllerSha256": "51baa18d05bb1cf4a4268886486f62d6ad16e538dfe234ab75feab4e32d745b9",
+      "measurement": {
+        "pose": "T",
+        "axis": "world Z; feet on floor",
+        "definition": "stature / (actual crown vertex Z - authored chin-plane vertex Z)",
+        "heightMm": 1779.9999713897705,
+        "headHeightMm": 247.16782569885254,
+        "measuredHeads": 7.201584455245843,
+        "requestedHeads": 7.201584,
+        "errorHeads": 4.5524584280087765e-07,
+        "chinVertex": 5305,
+        "crownVertex": 11463,
+        "storedChinIndexRemapped": false,
+        "chinPlaneAgreementMm": 9.012825152865389e-06,
+        "soleZMm": 0.0
+      },
+      "shapeSha256": "06b702df74a822fbda32cfc3acdec245791482204905b23a301695f116b8a1ef"
+    },
+    {
+      "characterId": "female-base-v0-3-4",
+      "fbxSha256": "e6947d8e2aeb1014e9505a61d2f42e6bd9d34965cc7bb3a6c2fcd2722d4f280a",
+      "rigSha256": "7837aad5e1779ed4edfd14829728d36493861046c8a62a2c66a721cebf9e7c39",
+      "blendSha256": "a3622a9d4ae7fa2e88aa3903db102a3f9c4660b3fb34ce376950e8cd2f2bae32",
+      "controllerSha256": "df981aedc3784d38e008f6ddb7c7108ce26d8a528ef31539facdabfe2937eb1f",
+      "measurement": {
+        "pose": "T",
+        "axis": "world Z; feet on floor",
+        "definition": "stature / (actual crown vertex Z - authored chin-plane vertex Z)",
+        "heightMm": 1750.0,
+        "headHeightMm": 237.44332790374756,
+        "measuredHeads": 7.370179720145254,
+        "requestedHeads": 7.37018,
+        "errorHeads": -2.798547464877288e-07,
+        "chinVertex": 5061,
+        "crownVertex": 10036,
+        "storedChinIndexRemapped": false,
+        "chinPlaneAgreementMm": 9.016013491347508e-06,
+        "soleZMm": 0.0
+      },
+      "shapeSha256": "e99d0277b1442254a6ee31225b01f5ee73da4f23cf82fe6606c99b76db172748"
+    }
+  ],
+  "validation": {
+    "neutralRoundtrips": 4,
+    "poseComparisons": 12,
+    "poseRoundtrips": 12,
+    "actualConverterRuns": 8,
+    "independentInspectionPairs": 4,
+    "maximumFinalSurfaceErrorMm": 0.0004704644914835048,
+    "maximumFinalJointErrorMm": 0.0024303188486951566,
+    "minimumDeltaCorrelation": 0.9999999999889265,
+    "newIntersectionPairs": 0,
+    "sampledRuntime": {
+      "status": "measured",
+      "rows": [
+        {
+          "sex": "male",
+          "mode": "default",
+          "maxErrorMm": 0.0242213620366602,
+          "rmsErrorMm": 0.0026529654644390733,
+          "sourceMatches": true,
+          "controlsMatch": true,
+          "presetAnchor": "BASE"
+        },
+        {
+          "sex": "male",
+          "mode": "slider",
+          "maxErrorMm": 0.06655627713942551,
+          "rmsErrorMm": 0.02345113549657126,
+          "sourceMatches": true,
+          "controlsMatch": true,
+          "presetAnchor": "BASE"
+        },
+        {
+          "sex": "female",
+          "mode": "default",
+          "maxErrorMm": 0.15823389179515776,
+          "rmsErrorMm": 0.055492318233564604,
+          "sourceMatches": true,
+          "controlsMatch": true,
+          "presetAnchor": "BASE"
+        },
+        {
+          "sex": "female",
+          "mode": "slider",
+          "maxErrorMm": 0.22001387881725484,
+          "rmsErrorMm": 0.1013591596989901,
+          "sourceMatches": true,
+          "controlsMatch": true,
+          "presetAnchor": "BASE"
+        }
+      ],
+      "note": "Sampled live preview is approximate; final FBX uses the exact controller. No FBX tolerance is applied or relaxed here."
+    }
+  },
+  "preservation": {
+    "publishedRecipesUnchanged": true,
+    "characterEntriesUnchanged": true,
+    "originalModelFilesUnchanged": true,
+    "sourceCopiesByteIdentical": true
+  },
+  "checks": {
+    "pytestPassed": 65,
+    "smokePassed": 54,
+    "compileall": "passed"
+  },
+  "liveModelAudit": {
+    "staging": {
+      "bffTaskRevision": 106,
+      "converterTaskRevision": 31,
+      "manifestSha256": [
+        "45ee1c64fa312bf5d301824f3b67880c07e5644b2ea0fabd05bd192d042fffc3",
+        "170c4df72c410a4fb7c5b4696e9e387848cc471da0c64d03cb7dd46cb4b85015"
+      ]
+    },
+    "production": {
+      "bffTask": 51,
+      "converterTask": 3,
+      "manifestSha256": "c481055df5cd980c6918d32c9620795faaa8d3f5d764ea8ce5cbf52e5dc4745f",
+      "remoteManifestMatchesOldPackage": true,
+      "catalogDefaultCharacterId": "body-male-base",
+      "converterDefaultCharacterId": "standin-master-v2",
+      "editorBaseIds": {
+        "male": "male-base-v0-7-2",
+        "female": "female-base-v0-3-4"
+      },
+      "models": "confirmed m072/f034; latest m076/f039 remain staging review sources"
+    }
+  },
+  "approval": {
+    "date": "2026-11-04",
+    "modelAppearance": true,
+    "appIntegrationRequested": true,
+    "developMerge": true,
+    "stagingDeployment": false,
+    "productionDeployment": false
+  }
+}

@@ -1029,6 +1029,12 @@ def select_crop_candidate(slot: PersonSlot, candidates: list[Skeleton], cfg=CFG,
 
 
 def apply_crop_result(slot: PersonSlot, selected: CropSelection) -> None:
+    from .joint_provenance import initialize_joint_provenance, transfer_joint_provenance
+    old = slot.skeleton
+    if old is not None and old.joint_provenance is None:
+        old.joint_provenance = initialize_joint_provenance(old, source=slot.skeleton_source, person_id=slot.slot_id)
+    selected.skeleton.joint_provenance = transfer_joint_provenance(
+        old, selected.skeleton, source="crop_retry", person_id=slot.slot_id)
     slot.skeleton = selected.skeleton
     slot.skeleton_box = selected.box
     slot.evidence = selected.evidence
@@ -1048,6 +1054,10 @@ def finalize_slot(slot: PersonSlot, cfg=CFG) -> PersonSlot:
         if "missing_skeleton" not in slot.reasons:
             slot.reasons.append("missing_skeleton")
         return slot
+    from .joint_provenance import initialize_joint_provenance
+    if slot.skeleton.joint_provenance is None:
+        slot.skeleton.joint_provenance = initialize_joint_provenance(
+            slot.skeleton, source=slot.skeleton_source, person_id=slot.slot_id)
     if slot.evidence is None:
         slot.skeleton_box = skeleton_bbox(slot.skeleton, cfg.skeleton_kpt_threshold)
         slot.evidence = analyze_skeleton(
@@ -1061,6 +1071,49 @@ def finalize_slot(slot: PersonSlot, cfg=CFG) -> PersonSlot:
     elif slot.state not in ("suspect",):
         slot.state = slot.evidence.state
     return slot
+
+
+def observed_joints_without_torso(
+    slot: PersonSlot, image_size: Optional[tuple[int, int]], cfg=CFG,
+) -> Optional[np.ndarray]:
+    """Retain bounded observations when only the full-body anchor gate failed.
+
+    This is an output mask, never a search/refine eligibility override. Explicit
+    ownership conflicts, malformed coordinates and degenerate torsos stay closed.
+    Missing points are not inferred; the existing per-joint evidence is reused.
+    """
+    evidence = slot.evidence
+    if (slot.state != "invalid" or slot.skeleton is None or evidence is None
+            or evidence.coverage_class != "insufficient"
+            or "invalid_torso_anchors" not in evidence.reasons
+            or slot.slot_origin != "vlm" or slot.vlm_box is None
+            or image_size is None):
+        return None
+    reasons = set(slot.reasons) | set(evidence.reasons)
+    blocked = {"invalid_shape", "non_finite_keypoints", "torso_degenerate",
+               "torso_width_outlier", "torso_outside_slot", "assignment_ambiguous",
+               "duplicate_candidate", "merge_suspected", "unstable_search_after_retry"}
+    if reasons & blocked or any(reason.endswith("_cross_slot") for reason in reasons):
+        return None
+    points = np.asarray(slot.skeleton.keypoints, dtype=np.float32)
+    scores = np.asarray(evidence.raw_scores, dtype=np.float32)
+    if (points.shape != (17, 2) or scores.shape != (17,)
+            or not np.isfinite(points).all() or not np.isfinite(scores).all()):
+        return None
+    width, height = image_size
+    owner = _expanded_box(slot.vlm_box, cfg.slot_owner_padding)
+    mask = np.asarray(evidence.valid_joint_mask, dtype=bool).copy()
+    mask &= np.asarray([_point_in_box(point, owner) for point in points])
+    mask &= ((points[:, 0] >= 0) & (points[:, 0] < width)
+             & (points[:, 1] >= 0) & (points[:, 1] < height))
+    # Without a torso frame, an isolated high-score wrist/knee is not enough
+    # body evidence. Keep body joints only on an existing valid local segment.
+    connected = np.zeros(17, dtype=bool)
+    for valid, (start, end) in zip(evidence.valid_bone_mask, _BONES):
+        if valid and mask[start] and mask[end]:
+            connected[[start, end]] = True
+    mask[5:] &= connected[5:]
+    return mask if mask.any() else None
 
 
 def sort_slots_left_to_right(slots: list[PersonSlot]) -> list[PersonSlot]:
