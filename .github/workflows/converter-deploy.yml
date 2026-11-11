@@ -19,6 +19,11 @@ on:
         type: boolean
         required: false
         default: false
+      deploy_beta:
+        description: "Deploy main to beta even when automatic converter deploys are disabled"
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   id-token: write
@@ -36,7 +41,9 @@ jobs:
     name: Deploy isolated converter
     if: >-
       vars.CONVERTER_AUTO_DEPLOY_ENABLED == 'true' ||
-      (github.event_name == 'workflow_dispatch' && inputs.deploy_staging && github.ref == 'refs/heads/develop')
+      (github.event_name == 'workflow_dispatch' &&
+       ((inputs.deploy_staging && github.ref == 'refs/heads/develop') ||
+        (inputs.deploy_beta && github.ref == 'refs/heads/main')))
     runs-on: ubuntu-latest
     environment: ${{ github.ref == 'refs/heads/main' && 'beta' || 'staging' }}
     env:

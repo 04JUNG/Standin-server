@@ -104,8 +104,10 @@ report
 
 `.github/workflows/converter-deploy.yml`은 converter 경로가 `main` 또는 `develop`에서 바뀔 때
 후보가 된다. `main`은 GitHub environment `beta`와 `:latest`, `develop`은 `staging`과
-`:develop`을 사용한다. 실제 job은 repository variable
-`CONVERTER_AUTO_DEPLOY_ENABLED=true`일 때만 실행된다.
+`:develop`을 사용한다. push 배포는 repository variable
+`CONVERTER_AUTO_DEPLOY_ENABLED=true`일 때 실행된다. 자동 배포가 꺼져 있으면
+**Run workflow**에서 `main`과 `deploy_beta`를 선택해 베타에 수동 배포하거나,
+`develop`과 `deploy_staging`을 선택해 스테이징에 수동 배포할 수 있다.
 
 repository-level GitHub variables:
 
