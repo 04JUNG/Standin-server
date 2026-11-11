@@ -76,6 +76,7 @@ from src.refine_thumbnail import (
     build_refine_thumbnail_renderer,
 )
 from src.tracing import capture_trace, span
+from src.search_computation import share_search_computation
 from src.vlm.client import VLMUnavailable
 from src.runtime_guard import (
     MockBackendError,
@@ -664,6 +665,24 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
     return _analyze(file, hint, rescue, response)
 
 
+def _pose_observation_fields(desc):
+    skel = desc.skeleton
+    raw_scores = None
+    if desc.raw_scores is not None:
+        raw = np.asarray(desc.raw_scores, dtype=float).reshape(-1)
+        if raw.shape == (17,) and np.isfinite(raw).all():
+            raw_scores = raw.tolist()
+    return dict(
+        box=[float(value) for value in desc.box.as_list()] if desc.box else None,
+        keypoints=np.asarray(skel.keypoints, dtype=float).reshape(-1, 2).tolist()
+                  if skel is not None else None,
+        raw_scores=raw_scores,
+        lower_body_observed=bool(desc.lower_body_observed),
+        quality_trace=desc.quality_trace,
+    )
+
+
+@share_search_computation()
 def _analyze(file, hint="", rescue="", response=None, *, on_fallback=None):
     try:
         rescue_request = parse_rescue_request(rescue)
@@ -682,11 +701,29 @@ def _analyze(file, hint="", rescue="", response=None, *, on_fallback=None):
         image = _HintImg(hint)
 
     pipe: Pipeline = STATE["pipeline"]
+    recall_search = STATE.get("recall_search")
+    extracted = None
+
+    def prepare_search_observations(people):
+        nonlocal extracted
+        with span("recall_observations"):
+            try:
+                extracted = recall_search.extract_observations(
+                    data, [dict(index=index, **_pose_observation_fields(desc))
+                           for index, desc in people])
+            except Exception as exc:
+                # Complete base search first if optional evidence extraction failed.
+                log_warn("recall_observations", status="deferred", errorType=type(exc).__name__)
+                return
+        progress.emit(completed=("understanding",))
+
+    options = (dict(prepare_search_observations=prepare_search_observations)
+               if recall_search is not None else {})
     with capture_trace() as timing:
         with span("pipeline_total"):
             try:
                 res = pipe.process_cut(
-                    image, w, h, rescue_request=rescue_request,
+                    image, w, h, rescue_request=rescue_request, **options,
                 )
             except VLMUnavailable as exc:
                 raise _vlm_unavailable_response(exc) from exc
@@ -699,11 +736,6 @@ def _analyze(file, hint="", rescue="", response=None, *, on_fallback=None):
     for i, desc in enumerate(res.descriptors):
         cands = per_person[i] if i < len(per_person) else []
         skel = desc.skeleton
-        raw_scores = None
-        if desc.raw_scores is not None:
-            raw = np.asarray(desc.raw_scores, dtype=float).reshape(-1)
-            if raw.shape == (17,) and np.isfinite(raw).all():
-                raw_scores = raw.tolist()
         people.append(PersonOut(
             index=i,
             refine_v3=getattr(desc, "_refine_v3", None),
@@ -713,7 +745,6 @@ def _analyze(file, hint="", rescue="", response=None, *, on_fallback=None):
                               and (os.getenv("REFINE_V3_EVIDENCE_ENABLED") == "1"
                                    or os.getenv("REFINE_V3_MODE") == "shadow") else None),
             refine_candidates=[CandidateOut(**c) for c in desc.refine_candidates],
-            box=desc.box.as_list() if desc.box else None,
             tags=desc.tag_dict(),
             skeleton=(SkeletonOut(
                 keypoints=desc.skeleton.keypoints.tolist(),
@@ -727,11 +758,8 @@ def _analyze(file, hint="", rescue="", response=None, *, on_fallback=None):
                 camera=candidate_camera(STATE.get("db_path"), c, desc),
             ) for c in cands],
             # 이미 추출한 스켈레톤을 실어 보낸다(연산 추가 0) → /refine이 순수 함수가 된다.
-            keypoints=np.asarray(skel.keypoints, dtype=float).reshape(-1, 2).tolist()
-                      if skel is not None else None,
             scores=np.asarray(skel.scores, dtype=float).reshape(-1).tolist()
                    if skel is not None else None,
-            raw_scores=raw_scores,
             confidence=(res.person_confidence[i]
                         if i < len(res.person_confidence) else "low"),
             skeleton_state=desc.skeleton_state,
@@ -744,13 +772,12 @@ def _analyze(file, hint="", rescue="", response=None, *, on_fallback=None):
             confidence_threshold=desc.confidence_threshold,
             valid_limbs=list(desc.valid_limbs),
             refinable_limbs=list(desc.refinable_limbs),
-            lower_body_observed=bool(desc.lower_body_observed),
             refine_allowed=desc.refine_allowed,
-            quality_trace=desc.quality_trace,
             quality_reasons=desc.quality_reasons,
             output_scope=asdict(desc.output_scope),
             person_tags=asdict(desc.person_tags),
             hands=asdict(desc.hands if desc.hands is not None else default_hands()),
+            **_pose_observation_fields(desc),
             **_routing_fields(res, i),
         ))
     vlm_model = (CFG.gemini_model if STATE.get("provider") == "gemini"
@@ -777,7 +804,7 @@ def _analyze(file, hint="", rescue="", response=None, *, on_fallback=None):
             feature_version=FEATURE_VERSION,
         ),
     )
-    if (recall_search := STATE.get("recall_search")) is not None:
+    if recall_search is not None:
         from src.experimental.search_recall.verified_recall import PROFILE
         if on_fallback is not None and any(
             person.candidates or person.semantic_candidates or (
@@ -788,10 +815,10 @@ def _analyze(file, hint="", rescue="", response=None, *, on_fallback=None):
             ) for person in people
         ):
             on_fallback(output.model_dump(mode="json"))
-        updated = recall_search.rerank(data, output.model_dump(mode="json"))
+        updated = recall_search.rerank(data, output.model_dump(mode="json"), extracted=extracted)
         updated["inference_metadata"]["pose_search_profile"] = PROFILE
         output = CutResultOut.model_validate(updated)
-    progress.finish()
+    progress.finish(search_pending=recall_search is not None)
     return output
 
 

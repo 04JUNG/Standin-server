@@ -144,10 +144,11 @@ def start_search(routing):
          skipped=() if understanding else ("understanding",))
 
 
-def finish():
+def finish(*, search_pending=False):
     current = _current.get()
-    if current and current.state["stage"] == "ranking":
-        emit(completed=("ranking",))
+    stage = "searching" if search_pending else "ranking"
+    if current and current.state["stage"] == stage:
+        emit(completed=(stage,))
 
 
 @best_effort
@@ -227,7 +228,7 @@ def candidates(rows, data_dir, source="pose"):
 
 
 @best_effort
-def publish_ranked(processed, width, height, routing, data_dir):
+def publish_ranked(processed, width, height, routing, data_dir, *, search_pending=False):
     if _current.get() is None:
         return
     progress_people = []
@@ -253,6 +254,9 @@ def publish_ranked(processed, width, height, routing, data_dir):
         if previews:
             person["candidates"] = previews
         progress_people.append(person)
+    if search_pending:
+        emit("searching", skipped=("refining",), people=progress_people, focus=None)
+        return
     ran = any("searchMode" in person for person in progress_people)
     emit("ranking", completed=("searching",) if ran else (),
          skipped=("refining",) if ran else ("searching", "refining"), people=progress_people, focus=None)
