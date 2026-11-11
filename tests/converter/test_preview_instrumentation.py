@@ -62,6 +62,7 @@ class LabTests(unittest.TestCase):
             rt = SimpleNamespace(reset_scene=lambda:None,import_character=import_character,export_fbx=export)
             camera = SimpleNamespace(validate_rotation=lambda _:None,rotate_scene=lambda *_:None)
             modules = {'converter.convert':SimpleNamespace(convert=convert),'converter.hands':SimpleNamespace(bake_hands=hands),
+                       'converter.body_material':SimpleNamespace(restore_anatomical_clay=lambda path:{'changed_materials':[]}),
                        'converter.retarget':rt,'converter.camera':camera,
                        'bpy':SimpleNamespace(app=SimpleNamespace(version_string=worker.EXPECTED_BLENDER_VERSION,
                                                               build_hash=worker.EXPECTED_BLENDER_BUILD_HASH.encode()))}
@@ -88,7 +89,7 @@ class LabTests(unittest.TestCase):
         self.assertEqual((fbx,png),(off_fbx,off_png))
         self.assertNotIn('lab_stage_timings', disabled)
         expected = ['worker_init','retarget_initial_export','source_finger_bake',
-                    'hand_import_apply_export','framing_import','crop',
+                    'hand_import_apply_export','body_material','framing_import','crop',
                     'framing_export','final_fbx_reimport','png_render_write']
         self.assertEqual(list(enabled['lab_stage_timings']), expected)
         for metric in enabled['lab_stage_timings'].values():
