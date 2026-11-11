@@ -89,6 +89,7 @@ jobs:
           python -m pytest -q \
             tests/test_hand_screen_deployment.py \
             tests/converter/test_worker_contract.py \
+            tests/converter/test_body_material.py \
             tests/converter/test_shape_bake_contract.py \
             tests/converter/test_shape_inspection.py \
             tests/converter/test_shape_hand_integration.py \
@@ -206,6 +207,15 @@ jobs:
             "$CONVERTER_IMAGE" \
             /opt/blender/blender --background --python-exit-code 1 \
             --python /app/tests/converter/test_convert.py
+
+      - name: Verify source finger directions and anatomical clay round trip
+        run: |
+          docker run --rm --platform linux/amd64 \
+            --mount type=bind,source="$ARTIFACT_ROOT",target=/artifacts \
+            --mount type=bind,source="$GITHUB_WORKSPACE/tests/converter",target=/app/tests/converter,readonly \
+            "$CONVERTER_IMAGE" \
+            /opt/blender/blender --background --factory-startup --disable-autoexec --python-exit-code 1 \
+            --python /app/tests/converter/verify_source_fingers.py -- /artifacts/source-fingers
 
       - name: Verify explicit outline FBX preservation and reject tampering
         run: |
