@@ -73,6 +73,7 @@ jobs:
           python -m compileall converter converter_api scripts/measure_converter_latency.py
           python -m pytest -q \
             tests/test_hand_screen_deployment.py \
+            tests/test_staging_anatomy_deployment.py \
             tests/converter/test_worker_contract.py \
             tests/converter/test_registry.py \
             tests/converter/test_runner_failures.py \
@@ -143,6 +144,10 @@ jobs:
           CONVERTER_MAX_CONCURRENT_PROCESSES: ${{ vars.CONVERTER_MAX_CONCURRENT_PROCESSES }}
           CONVERTER_SCREEN_SELECTED_HANDS: ${{ vars.CONVERTER_SCREEN_SELECTED_HANDS }}
         run: python scripts/prepare_hand_screen_deployment.py taskdef.json --container converter
+
+      - name: Prevent staging anatomy release regression
+        if: env.ECS_SERVICE != '' && github.ref == 'refs/heads/develop'
+        run: python scripts/verify_staging_anatomy.py taskdef.json
 
       - uses: aws-actions/amazon-ecs-render-task-definition@v1
         id: render

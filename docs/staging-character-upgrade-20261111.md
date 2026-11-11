@@ -118,3 +118,8 @@ the pinned Blender. Export metadata with `--export-metadata`, then compress
 completed samples with host NumPy using `--metadata`; Blender's bundled Windows
 BLAS makes large matrix compression substantially slower. Run independent
 checks and the installed client parser before publishing.
+# Persistence follow-up (2026-11-11)
+
+Merge the anatomy pose-transfer code and hand thumbnail assets into develop before future staging deployments. A later image built from develop without these commits had replaced the manually layered rollout. The BFF also required migration of unshaped inherited old BASE preferences; changing the catalog default alone was insufficient.
+
+`scripts/verify_staging_anatomy.py` now gates develop converter deployments on the approved release manifest, both new FBX paths, shape registry and successful initializer dependency. It refuses production tasks and does not disable ECS health rollback. Existing S3 object IDs and permissions are unchanged.
