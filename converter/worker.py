@@ -401,7 +401,8 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
             "base_sha256":base_metadata["artifact_sha256"],"body_report_sha256":base_metadata["body_report_sha256"]}
     if recipe is not None and ok:
         payload["shape_bake"] = json.loads(Path(job["output_path"]).with_suffix(".shape.json").read_text())
-    if ok and not job["force_exact_v324"]:
+    if (ok and not job["force_exact_v324"] and job["thumbnail"] is None
+            and not job.get("hand_contact_screen")):
         from converter.reviewed_source_fingers import bake_source_fingers
         with lab_timings.measure("source_finger_bake"):
             payload["source_fingers"] = bake_source_fingers(

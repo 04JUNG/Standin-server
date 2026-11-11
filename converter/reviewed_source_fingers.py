@@ -1,7 +1,7 @@
 """Transfer source finger articulation after the frozen body conversion.
 
 The body solver deliberately maps only 22 bones. This separate stage transports
-finger rotations in rest palm frames, then bakes the result before cropping,
+finger poses in palm frames, then bakes the result before cropping,
 previewing or export. Explicit hand presets take precedence, independently per
 side. Missing source finger data is reported, never replaced with an invented
 gesture. This module is safe to import outside Blender.
@@ -114,10 +114,10 @@ def bake_source_fingers(path, bvh_path, *, frame=0, mirror=False, hands=None,
             receipt["sides"][side] = dict(status="missing_finger_chain",
                 source_bones=len(sf), target_bones=len(df))
             continue
-        if all(src.pose.bones[name].matrix_basis.to_quaternion().angle <= 1e-4
-               for name in sf.values()):
-            receipt["sides"][side] = dict(status="no_finger_rotation")
-            continue
+        offset_pose = all(
+            src.pose.bones[name].matrix_basis.to_quaternion().angle <= 1e-4
+            for name in sf.values()
+        )
         try:
             source_rest = _palm_frame(src, sw, sf)
             target_rest = _palm_frame(dst, dw, df)
@@ -131,14 +131,39 @@ def bake_source_fingers(path, bvh_path, *, frame=0, mirror=False, hands=None,
         # Parent before child: each new head follows its target parent.
         for key in keys:
             sname, dname = sf[key], df[key]
-            delta = (source_posed.transposed()
-                     @ _rotation(rt._pose_world(src, sname))
-                     @ _rotation(rt._rest_world(src, sname)).transposed()
-                     @ source_rest)
-            if mirror:
-                delta = reflect @ delta @ reflect
-            desired = (target_rest @ delta @ target_rest.transposed()
-                       @ _rotation(rt._rest_world(dst, dname)))
+            if offset_pose:
+                # Single-frame library BVHs can store curled fingers directly
+                # in OFFSETs, with identity rotation channels on every joint.
+                # Aim each target segment in the source palm, keeping the
+                # target rig's lengths and the already converted wrist.
+                sp = src.pose.bones[sname]
+                dp = dst.pose.bones[dname]
+                finger, joint = key
+                next_key = (finger, joint + 1)
+                source_tip = src.pose.bones[sf[next_key]].head if next_key in sf else sp.tail
+                target_tip = dst.pose.bones[df[next_key]].head if next_key in df else dp.tail
+                source_segment = src.matrix_world.to_3x3() @ (source_tip - sp.head)
+                current = dst.matrix_world.to_3x3() @ (target_tip - dp.head)
+                local_direction = source_posed.transposed() @ source_segment
+                if mirror:
+                    local_direction = reflect @ local_direction
+                posed_target_palm = (_rotation(rt._pose_world(dst, dw))
+                                     @ _rotation(rt._rest_world(dst, dw)).transposed()
+                                     @ target_rest)
+                target = posed_target_palm @ local_direction
+                if min(current.length, target.length) < 1e-8:
+                    continue
+                delta = current.rotation_difference(target).to_matrix()
+                desired = delta @ _rotation(rt._pose_world(dst, dname))
+            else:
+                delta = (source_posed.transposed()
+                         @ _rotation(rt._pose_world(src, sname))
+                         @ _rotation(rt._rest_world(src, sname)).transposed()
+                         @ source_rest)
+                if mirror:
+                    delta = reflect @ delta @ reflect
+                desired = (target_rest @ delta @ target_rest.transposed()
+                           @ _rotation(rt._rest_world(dst, dname)))
             if not all(math.isfinite(v) for row in desired for v in row):
                 raise ValueError("non-finite source finger rotation: " + sname)
             pb = dst.pose.bones[dname]
@@ -148,8 +173,13 @@ def bake_source_fingers(path, bvh_path, *, frame=0, mirror=False, hands=None,
             bpy.context.view_layer.update()
             assigned.add(dname)
             maximum = max(maximum, abs(delta.to_quaternion().angle))
-        receipt["sides"][side] = dict(status="transferred", applied_bones=15,
-            source_side=source_side, max_cumulative_rotation_deg=math.degrees(maximum))
+        count = sum(n in assigned for n in df.values())
+        receipt["sides"][side] = dict(
+            status="transferred" if count else "missing_finger_geometry",
+            applied_bones=count, source_side=source_side,
+            transfer="posed_offsets" if offset_pose else "rotations",
+            max_cumulative_rotation_deg=math.degrees(maximum),
+        )
 
     bpy.data.objects.remove(src, do_unlink=True)
     for name, before in body_before.items():
