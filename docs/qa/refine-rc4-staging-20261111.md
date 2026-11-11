@@ -1,3 +1,5 @@
+> Historical first staging validation. The 45-pose limitation below was subsequently removed; see [on-demand original validation](refine-rc4-on-demand-20261111.md).
+
 # RC4 staging integration verification — 2026-11-11
 
 No pose tuning. All frozen runtime source hashes still match the RC4 manifest.

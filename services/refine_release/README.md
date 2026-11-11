@@ -7,7 +7,6 @@ this integration PR. The endpoint verifies hashes before any work or download.
 ## Boundary
 
 - Internal `POST /refine/release`: PNG `image`, library `pose_id`.
-- The main API reads the current library BVH and sends its SHA to the private worker.
 - The API resolves the selected pose in its current library and sends the **unedited BVH bytes** plus their hash over the private worker connection.
 - The worker automatically retargets frame 0 to the unchanged RC4 source body, extracts the rig and evaluated skin, and binds every generated file. There is no pose registration list.
 - One new `gpt-6-luna` / `low` call; automatic skeleton and conditions; no manual targets.
@@ -74,6 +73,6 @@ PYTHONPATH=services/refine_release/runtime/experiments/refine_final_gate:. \
 python tests/test_smoke.py
 ```
 
-54 release/adapter tests and 54 smoke tests passed in the clean develop worktree.
+59 release/adapter tests and 54 smoke tests passed in the clean develop worktree.
 Actual staging/native validation and remaining limits are recorded in
-[the staging report](../../docs/qa/refine-rc4-staging-20261111.md).
+[the on-demand validation report](../../docs/qa/refine-rc4-on-demand-20261111.md).
