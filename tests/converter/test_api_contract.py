@@ -195,6 +195,49 @@ def test_screen_api_missing_or_wrong_receipt_is_failure(tmp_path):
     assert response.json()['error']['code'] == 'WORKER_INTEGRITY_ERROR'
 
 
+@pytest.mark.parametrize(('route', 'scope', 'selected'), [
+    ('convert-framed', 'full', False),
+    ('convert-framed-export', 'full', True),
+    ('convert-framed-export', 'head', False),
+])
+def test_selected_hand_screen_is_only_requested_on_applicable_exports(tmp_path, monkeypatch, route, scope, selected):
+    monkeypatch.setenv('CONVERTER_SCREEN_SELECTED_HANDS', '1')
+    runner = FakeRunner(failure=ConversionRejectedError('failed', report={
+        'error_code': 'HAND_CONTACT_INTERSECTION'}))
+    response = _client(tmp_path, runner=runner).post('/' + route,
+        files={'bvh': ('pose.bvh', VALID_BVH, 'application/octet-stream')},
+        data={'expected_bvh_sha256': hashlib.sha256(VALID_BVH).hexdigest(),
+              'output_scope': scope, 'preview_format': 'none'})
+    assert len(runner.calls) == 1
+    assert runner.calls[0].get('selected_hand_screen', False) is selected
+    assert response.status_code == 422
+    assert response.json()['error']['code'] == ('HAND_CONTACT_INTERSECTION' if selected else 'INVALID_BVH')
+
+
+@pytest.mark.parametrize(('status', 'code'), [
+    ('clear_screen', None),
+    ('intersection', 'HAND_CONTACT_INTERSECTION'),
+    ('unavailable', 'HAND_CONTACT_UNAVAILABLE'),
+])
+def test_selected_hand_mesh_gate(monkeypatch, status, code):
+    from converter import hand_contact
+    calls = []
+    def screen(meshes):
+        calls.append(meshes)
+        return dict(status=status, method=hand_contact.SCREEN_VERSION,
+                    scope='opposite_hands_only', complete_collision_certificate=False,
+                    triangle_counts={'left': 4, 'right': 4},
+                    intersection_pairs=int(status == 'intersection'))
+    monkeypatch.setattr(hand_contact, 'screen_hands', screen)
+    meshes = [object()]
+    if code is None:
+        hand_contact.require_clear_selected_hands(meshes)
+    else:
+        with pytest.raises(hand_contact.SelectedHandContactError, match=code):
+            hand_contact.require_clear_selected_hands(meshes)
+    assert calls == [meshes]
+
+
 def test_screen_api_source_hash_checked_before_conversion(tmp_path):
     runner = FakeRunner()
     response = _client(tmp_path, runner=runner).post('/screen-hand-contact',

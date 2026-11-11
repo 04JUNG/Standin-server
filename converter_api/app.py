@@ -544,6 +544,7 @@ def create_app(
         hand_left: str | None = None,
         hand_right: str | None = None,
         hand_contact_screen: bool = False,
+        selected_hand_screen: bool = False,
     ) -> CompletedConversion:
         conversion_id = str(uuid.uuid4())
         control = current_work.get()
@@ -642,6 +643,7 @@ def create_app(
                 **({"preview_model": True} if preview_model else {}),
                 **({"hands": hands} if hands is not None else {}),
                 **({"hand_contact_screen": True} if hand_contact_screen else {}),
+                **({"selected_hand_screen": True} if selected_hand_screen else {}),
             )
             if camera_rotation is not None and result.report.get("camera_rotation") != camera_rotation:
                 raise WorkerIntegrityError("camera rotation lineage mismatch")
@@ -683,6 +685,11 @@ def create_app(
                 conversion_id=conversion_id,
             ) from exc
         except ConversionRejectedError as exc:
+            selected_code = (exc.report or {}).get('error_code')
+            if selected_hand_screen and selected_code in ('HAND_CONTACT_INTERSECTION', 'HAND_CONTACT_UNAVAILABLE'):
+                raise ApiProblem(422 if selected_code == 'HAND_CONTACT_INTERSECTION' else 503,
+                                 selected_code, 'selected pose hand screening failed',
+                                 conversion_id=conversion_id) from exc
             _structured_log(
                 logging.WARNING,
                 "converter_rejected",
@@ -1072,6 +1079,7 @@ def create_app(
     @app.post("/convert-framed")
     @app.post("/convert-framed-export")
     def convert_framed(
+        request: Request,
         bvh: UploadFile = File(...),
         character_id: str = Form(default=default_character_id),
         output_scope: str = Form(default="full"),
@@ -1097,6 +1105,7 @@ def create_app(
                 raise ValueError("aligned output requires front preview and a matrix")
         except (ValueError, TypeError) as exc:
             raise ApiProblem(400, "INVALID_OPTION", "invalid camera_rotation") from exc
+        from converter.hand_contact import selected_hand_screen_enabled
         completed = _execute_conversion(
             bvh=bvh, character_id=character_id, frame=FRAME, mirror=False,
             output_mode=OUTPUT_MODE, apply_root_translation=APPLY_ROOT_TRANSLATION,
@@ -1106,6 +1115,7 @@ def create_app(
             camera_rotation=rotation, preview_model=preview_format == "model", shape=shape,
             expected_shape_source=expected_shape_source,
             hand_left=hand_left, hand_right=hand_right,
+            selected_hand_screen=request.url.path == '/convert-framed-export' and selected_hand_screen_enabled(output_scope),
         )
         baked = result_hands(completed.result.report)
         result = completed.result

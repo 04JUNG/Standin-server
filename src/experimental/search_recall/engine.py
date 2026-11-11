@@ -74,9 +74,11 @@ class RecallSearch:
         if gate is None:
             raise ValueError('04J-344 recall requires the hand mesh screening service')
         self.engine = service.ArmPenaltySearch(entries, semantic, camera,
-                                               semantic_weight=API_SEMANTIC_WEIGHT, hand_skin_gate=gate)
+                                               semantic_weight=API_SEMANTIC_WEIGHT, hand_skin_gate=gate,
+                                               defer_library_hand_screen=service.CFG.hand_skin_screen_on_selection)
         self.cross_chest = FullBodySearch(
             entries, copy(semantic), camera, semantic_weight=API_SEMANTIC_WEIGHT, hand_skin_gate=gate,
+            defer_library_hand_screen=service.CFG.hand_skin_screen_on_selection,
             enable_waist_down_pair=True, enable_cross_chest_hint=True)
         self.bone = BoneEvidence(camera)
         self.fitted = FittedGeometry(camera)

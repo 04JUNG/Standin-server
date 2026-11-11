@@ -155,6 +155,7 @@ jobs:
       - name: Prepare explicit hand screen capacity
         env:
           HAND_SKIN_SCREEN_CONCURRENCY: ${{ vars.HAND_SKIN_SCREEN_CONCURRENCY }}
+          HAND_SKIN_SCREEN_ON_SELECTION: ${{ vars.HAND_SKIN_SCREEN_ON_SELECTION }}
         run: python scripts/prepare_hand_screen_deployment.py taskdef.json --container inference
 
       - name: Prepare optional description rollout overrides

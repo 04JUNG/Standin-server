@@ -179,6 +179,7 @@ class Config:
     ))
     # Opt-in; shared per-process capacity 1..5. Session work budgets still apply.
     hand_skin_screen_concurrency: int = int(os.getenv("HAND_SKIN_SCREEN_CONCURRENCY", "1"))
+    hand_skin_screen_on_selection: bool = os.getenv("HAND_SKIN_SCREEN_ON_SELECTION", "0") == "1"
     # Trusted release asset only. Both values are required; default disabled.
     hand_skin_prevalidated_path: str = os.getenv("HAND_SKIN_PREVALIDATED_PATH", "")
     hand_skin_prevalidated_sha256: str = os.getenv("HAND_SKIN_PREVALIDATED_SHA256", "")

@@ -137,10 +137,11 @@ jobs:
           jq -e '.containerDefinitions | any(.name == "converter")' taskdef.json
           jq -e '.containerDefinitions | all(.name != "inference")' taskdef.json
 
-      - name: Prepare explicit Converter capacity
+      - name: Prepare explicit Converter hand-screen settings
         if: env.ECS_SERVICE != ''
         env:
           CONVERTER_MAX_CONCURRENT_PROCESSES: ${{ vars.CONVERTER_MAX_CONCURRENT_PROCESSES }}
+          CONVERTER_SCREEN_SELECTED_HANDS: ${{ vars.CONVERTER_SCREEN_SELECTED_HANDS }}
         run: python scripts/prepare_hand_screen_deployment.py taskdef.json --container converter
 
       - uses: aws-actions/amazon-ecs-render-task-definition@v1
