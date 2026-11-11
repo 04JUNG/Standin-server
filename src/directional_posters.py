@@ -37,6 +37,17 @@ def read_directional_poster(data_dir: Path, source_sha: str, scope='full', view=
     if (len(source_sha) != 64 or any(c not in '0123456789abcdef' for c in source_sha)
             or scope not in SCOPES or view not in VIEWS):
         raise ValueError('invalid directional identity')
+    from .thumbnail_overlay import read_styled_poster
+    styled = read_styled_poster(data_dir, source_sha, scope, view)
+    if styled is not None:
+        # Existing BFF accepts the frozen-retarget PNG wire family. Keep the
+        # actual renderer/style identity in separate provenance headers.
+        from .native_png_posters import _png
+        jpeg, response_headers = styled
+        png = _png(jpeg)
+        response_headers['X-Standin-Native-Artifact-SHA256'] = hashlib.sha256(jpeg).hexdigest()
+        response_headers['X-Standin-Artifact-SHA256'] = hashlib.sha256(png).hexdigest()
+        return png, response_headers
     base = data_dir.resolve()
     root = base / 'thumbs' / 'scope8'
     if root.is_symlink() or not root.resolve().is_relative_to(base):
