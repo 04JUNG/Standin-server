@@ -946,7 +946,7 @@ def get_hand_catalog():
     catalog = build_hand_catalog()
     return JSONResponse(catalog, headers={
         "Cache-Control": "private, max-age=3600",
-        "ETag": f'"{catalog["library_sha256"][:32]}"',
+        "ETag": f'"{catalog["library_sha256"][:32]}-{(catalog["thumbnail_revision"] or "legacy")[:32]}"',
     })
 
 
