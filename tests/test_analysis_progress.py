@@ -59,7 +59,7 @@ def test_snapshots_are_cumulative_immutable_and_parallel_request_isolated():
 @pytest.mark.anyio
 async def test_stream_produces_real_milestone_before_completion_and_terminal_is_immediate():
     reached, release = Event(), Event()
-    def run():
+    def run(_on_fallback):
         emit("extracting", completed=("analyzing",))
         reached.set()
         assert release.wait(5)
@@ -77,12 +77,32 @@ async def test_stream_produces_real_milestone_before_completion_and_terminal_is_
 
 
 @pytest.mark.anyio
+async def test_fallback_survives_later_progress_and_is_sent_while_ranking_waits():
+    release = Event()
+    base = {"people": [{"candidates": [{"pose_id": "base_pose"}]}]}
+
+    def run(on_fallback):
+        on_fallback(base)
+        emit("ranking")
+        assert release.wait(5)
+        return SimpleNamespace(model_dump=lambda **_: {"people": []})
+
+    iterator = stream_analysis(run).body_iterator
+    try:
+        assert json.loads(await anext(iterator)) == {"type": "fallback", "result": base}
+        assert json.loads(await anext(iterator))["type"] == "progress"
+    finally:
+        release.set()
+    assert json.loads(await anext(iterator))["type"] == "result"
+
+
+@pytest.mark.anyio
 async def test_stream_error_retains_failure_contract_and_hides_exception_text():
-    def unavailable():
+    def unavailable(_on_fallback):
         raise HTTPException(503, dict(code="VLM_UNAVAILABLE", reason="rate_limited"))
     event = json.loads(await anext(stream_analysis(unavailable).body_iterator))
     assert event == dict(type="error", status=503, detail=dict(code="VLM_UNAVAILABLE", reason="rate_limited"))
-    def private():
+    def private(_on_fallback):
         raise RuntimeError("secret private prompt")
     event = json.loads(await anext(stream_analysis(private).body_iterator))
     assert event["detail"] == "internal error"
@@ -164,6 +184,7 @@ def test_http_opt_in_same_analysis_and_final_json_model(monkeypatch):
     from fastapi.testclient import TestClient
     import api.app as api
     from src.config import CFG
+    from src.schema import PoseCandidate, View
     from tests.test_search_routing import _pipe
     from tests.test_description_prefetch import clean
     monkeypatch.setattr(CFG,"body_matching_mode","off")
@@ -190,6 +211,26 @@ def test_http_opt_in_same_analysis_and_final_json_model(monkeypatch):
     assert clean(normal.json()) == clean(events[-1]["result"])
     assert pipe.vlm.describe_calls == 2  # one per actual request, no loading call
     assert not any("quality_trace" in e.get("progress",{}) for e in events)
+
+    process_cut = pipe.process_cut
+    def with_candidate(*args, **kwargs):
+        result = process_cut(*args, **kwargs)
+        result.person_candidates[0] = [PoseCandidate("base_pose", View.FRONT, .25, {})]
+        return result
+
+    def rerank(_data, cut):
+        cut["people"][0]["candidates"][0]["pose_id"] = "reranked_pose"
+        return cut
+
+    monkeypatch.setattr(pipe, "process_cut", with_candidate)
+    monkeypatch.setitem(api.STATE, "recall_search", SimpleNamespace(rerank=rerank))
+    assert request({}).json()["people"][0]["candidates"][0]["pose_id"] == "reranked_pose"
+
+    from api import analysis_stream
+    fallback_results = []
+    monkeypatch.setattr(analysis_stream, "stream_analysis", lambda run: run(fallback_results.append))
+    assert request({"Accept": "application/x-ndjson"}).json()["people"][0]["candidates"][0]["pose_id"] == "reranked_pose"
+    assert fallback_results[0]["people"][0]["candidates"][0]["pose_id"] == "base_pose"
 
 
 def test_presentation_preview_keeps_exact_final_ids_ranks_and_only_existing_assets():

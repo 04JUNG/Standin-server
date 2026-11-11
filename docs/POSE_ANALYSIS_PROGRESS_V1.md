@@ -5,7 +5,7 @@ BFF implementation/report: `/Users/dowon/.codex/worktrees/eef0/Standin-app-serve
 
 ## Transport and actual milestones
 
-`POST /analyze` retains its JSON response. Only `Accept: application/x-ndjson` opts into newline records `{type:"progress",progress}`, `{type:"result",result}` or `{type:"error",status,detail}`. Same analysis call, same final schema, no retry/fallback request, additional VLM invocation or render. Proxy buffering must be disabled for this content type; response sets `X-Accel-Buffering: no` and `Cache-Control: no-store`.
+`POST /analyze` retains its JSON response. `Accept: application/x-ndjson` opts into newline records `{type:"progress",progress}`, `{type:"fallback",result}`, `{type:"result",result}` or `{type:"error",status,detail}`. `fallback` carries the base result before Recall ranking so the BFF can use already found candidates if the analysis times out. The stream uses the same analysis call and result schema. Disable proxy buffering for this content type. The response sets `X-Accel-Buffering: no` and `Cache-Control: no-store`.
 
 - analyzing: entering existing pipeline, completed when initial VLM returns.
 - extracting: existing detector/pose/crop/rescue/repair work; validated mask after recovery, before routing. Coordinates use original input pixels divided by original width/height, never crop-local pixels; invalid/unverified/suspect joints are null/absent. Face points are null.
