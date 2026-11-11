@@ -94,8 +94,9 @@ def test_unregistered_pose_transfers_fingers_before_framing(tmp_path, monkeypatc
         Path(kwargs["out_path"]).write_bytes(b"body")
         return SimpleNamespace(ok=True, as_dict=lambda: {"ok": True})
 
-    def bake(path, source, *, frame, mirror, hands):
+    def bake(path, source, *, frame, mirror, hands, transfer_posed_offsets):
         assert (source, frame, mirror, hands) == (job["bvh_path"], FRAME, False, None)
+        assert transfer_posed_offsets
         assert Path(path).read_bytes() == b"body"
         Path(path).write_bytes(b"body and fingers")
         return {"applied_bones": 30}

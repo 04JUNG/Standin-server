@@ -416,6 +416,7 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
             payload["source_fingers"] = bake_source_fingers(
                 job["output_path"], job["bvh_path"], frame=FRAME,
                 mirror=job["mirror"], hands=job.get("hands"),
+                transfer_posed_offsets=job["thumbnail"] is None and not job.get("hand_contact_screen"),
             )
     if ok and job.get("hands") is not None:
         # 손은 몸 변환 직후, 메시 절단·카메라 회전·미리보기보다 먼저 굽는다.
