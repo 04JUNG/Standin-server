@@ -655,16 +655,16 @@ def analyze(file: UploadFile = File(...), hint: str = Form(default=""),
         # UploadFile closes after the endpoint returns; own its bytes for the stream.
         from starlette.datastructures import UploadFile as OwnedUpload
         owned = OwnedUpload(io.BytesIO(file.file.read()), filename=file.filename)
-        def run():
+        def run(on_fallback):
             try:
-                return _analyze(owned, hint, rescue)
+                return _analyze(owned, hint, rescue, on_fallback=on_fallback)
             finally:
                 owned.file.close()
         return stream_analysis(run)
     return _analyze(file, hint, rescue, response)
 
 
-def _analyze(file, hint="", rescue="", response=None):
+def _analyze(file, hint="", rescue="", response=None, *, on_fallback=None):
     try:
         rescue_request = parse_rescue_request(rescue)
     except ValueError as exc:
@@ -779,6 +779,15 @@ def _analyze(file, hint="", rescue="", response=None):
     )
     if (recall_search := STATE.get("recall_search")) is not None:
         from src.experimental.search_recall.verified_recall import PROFILE
+        if on_fallback is not None and any(
+            person.candidates or person.semantic_candidates or (
+                person.pose_presentation is not None and (
+                    person.pose_presentation.library_candidates
+                    or person.pose_presentation.review_candidates
+                )
+            ) for person in people
+        ):
+            on_fallback(output.model_dump(mode="json"))
         updated = recall_search.rerank(data, output.model_dump(mode="json"))
         updated["inference_metadata"]["pose_search_profile"] = PROFILE
         output = CutResultOut.model_validate(updated)
