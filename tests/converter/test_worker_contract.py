@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import hashlib
+from importlib import import_module
 import json
 from pathlib import Path
 import sys
+from types import SimpleNamespace
 
 import pytest
 
@@ -11,13 +13,15 @@ from converter.protocol import (
     ANKLE_POLICY_SHA256,
     APPLY_ROOT_TRANSLATION,
     EMBED_TEXTURES,
+    EXPECTED_BLENDER_BUILD_HASH,
+    EXPECTED_BLENDER_VERSION,
     FRAME,
     JOB_SCHEMA_VERSION,
     OUTPUT_MODE,
     RETARGET_SHA256,
     SOLVER_MANIFEST_SHA256,
 )
-from converter.worker import JobValidationError, load_job
+from converter.worker import JobValidationError, load_job, run_job
 from converter.thumbnail_render import _image_has_contrast
 
 
@@ -70,6 +74,40 @@ def test_screening_job_is_explicit_and_does_not_change_legacy_defaults(tmp_path)
 
 def test_worker_module_does_not_import_bpy():
     assert "bpy" not in sys.modules
+
+
+def test_source_pose_transfers_fingers_before_framing(tmp_path, monkeypatch):
+    final_artifact = import_module("converter.final_artifact")
+    framing = import_module("converter.framing")
+    reviewed_source_fingers = import_module("converter.reviewed_source_fingers")
+
+    path, _ = _job(tmp_path)
+    job = load_job(path)
+    output = Path(job["output_path"])
+    monkeypatch.setitem(sys.modules, "bpy", SimpleNamespace(app=SimpleNamespace(
+        version_string=EXPECTED_BLENDER_VERSION, build_hash=EXPECTED_BLENDER_BUILD_HASH,
+    )))
+
+    def convert(**kwargs):
+        Path(kwargs["out_path"]).write_bytes(b"body")
+        return SimpleNamespace(ok=True, as_dict=lambda: {"ok": True})
+
+    def bake(path, source, *, frame, mirror, hands):
+        assert (source, frame, mirror, hands) == (job["bvh_path"], FRAME, False, None)
+        assert Path(path).read_bytes() == b"body"
+        Path(path).write_bytes(b"body and fingers")
+        return {"applied_bones": 30}
+
+    def frame(path, scope, **kwargs):
+        assert Path(path).read_bytes() == b"body and fingers"
+        return {"scope": scope}
+
+    monkeypatch.setitem(sys.modules, "converter.convert", SimpleNamespace(convert=convert))
+    monkeypatch.setattr(reviewed_source_fingers, "bake_source_fingers", bake)
+    monkeypatch.setattr(framing, "process_output", frame)
+    monkeypatch.setattr(final_artifact, "validate", lambda *args: {"skin_verified": True})
+    assert run_job(job)["source_fingers"] == {"applied_bones": 30}
+    assert output.read_bytes() == b"body and fingers"
 
 
 def test_valid_job_preserves_locked_options(tmp_path):
