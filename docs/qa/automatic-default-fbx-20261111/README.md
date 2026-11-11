@@ -1,7 +1,7 @@
 # Automatic default-model FBX preparation (2026-11-11)
 
 The Blender probe ran with develop `5999fe397a1b81cd8c2cbc9b71166a978d7c58c1`
-(the posed-finger and anatomical-clay fixes). The PR is also integrating newer
+(the posed-finger and anatomical-clay fixes). The PR also includes newer
 develop `b258bae2e0d15c8c1ac3cd59573d083eec3c06f3`; that upstream isolated RC4
 change does not modify the Converter runtime/policy used in this probe. The earlier manual-pilot artifacts
 record their original policy and are historical. This report covers automatic
