@@ -131,9 +131,13 @@ def test_foreground_preemption_leaves_pending_work_for_retry(setup, monkeypatch)
     assert s.worker.snapshot()['status']=='ready'
 
 
-def test_completed_generation_audit_repairs_corrupt_final_bytes(setup):
+def test_completed_generation_audit_repairs_corrupt_final_bytes(setup, monkeypatch):
+    import converter_api.final_prewarm as prewarm
+    # A fresh Linux VM can have monotonic() < audit interval; zero is not
+    # necessarily in the past. Exercise that epoch without changing other clocks.
+    monkeypatch.setattr(prewarm, 'time', SimpleNamespace(monotonic=lambda: 5.0))
     s=setup;s.worker.run_once();next(s.root.glob('*.fbx')).write_bytes(b'corrupt')
-    s.worker._last_audit=0;s.worker.run_once()
+    s.worker._last_audit=prewarm.time.monotonic()-s.worker.audit-1;s.worker.run_once()
     assert s.worker.snapshot()['status']=='ready' and Runner.calls==5
 
 
