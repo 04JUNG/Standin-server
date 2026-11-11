@@ -63,6 +63,7 @@ catalog['assets']=new['assets']+catalog['assets'];catalog['version']=new['versio
 assert all(chars['characters'][k]==v for k,v in old_chars['characters'].items())
 assert all(shapes[section][k]==v for section in ('characters','sources') for k,v in old_shapes[section].items())
 write(package/'converter/characters.json',chars);write(package/'converter/shape-bakes.json',shapes);write(package/'bff/body-models.json',catalog)
+write(package/'converter/body-models.json',catalog)  # Future releases carry the exact BFF defaults for prewarming.
 for role in (['converter'] if args.converter_only else OLD):
     manifest=read(active/(role+'-manifest.json'));entries={f['path']:f for f in manifest['files']}
     local={}

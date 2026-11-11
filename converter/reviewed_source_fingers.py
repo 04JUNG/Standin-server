@@ -190,6 +190,24 @@ def bake_source_fingers(path, bvh_path, *, frame=0, mirror=False, hands=None,
         # Never replace the artifact with an incomplete export.
         temporary = Path(path).with_name(Path(path).stem + ".source-fingers.fbx")
         rt.export_fbx(str(temporary), embed_textures=False)
+        # Verify the saved bytes, including articulation stored in rest offsets.
+        # The subsequent framing stage may crop or rotate this exact pose.
+        expected = {name: (dst.matrix_world @ dst.data.bones[name].head_local,
+                           dst.matrix_world @ dst.data.bones[name].tail_local)
+                    for name in assigned}
+        rt.reset_scene()
+        restored, _ = rt.import_character(str(temporary))
+        error = 0.0
+        for name, (head, tail) in expected.items():
+            if name not in restored.data.bones:
+                raise RuntimeError('saved FBX lost source finger: ' + name)
+            bone = restored.data.bones[name]
+            error = max(error, (restored.matrix_world @ bone.head_local - head).length,
+                        (restored.matrix_world @ bone.tail_local - tail).length)
+        if error > 1e-4:
+            raise RuntimeError('saved source finger roundtrip mismatch')
+        receipt['saved_fbx_roundtrip'] = dict(verified=True, bones=len(expected),
+                                            max_endpoint_error_m=error)
         temporary.replace(path)
     return receipt
 

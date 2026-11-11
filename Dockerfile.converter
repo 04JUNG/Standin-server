@@ -146,6 +146,10 @@ COPY converter/skin_worker.py /app/converter/skin_worker.py
 COPY converter/skin_assets.v1.json /app/converter/skin_assets.v1.json
 COPY converter_api/registry.py /app/converter_api/registry.py
 COPY converter_api/runner.py /app/converter_api/runner.py
+COPY converter_api/final_cache.py /app/converter_api/final_cache.py
+COPY converter_api/final_inputs.py /app/converter_api/final_inputs.py
+COPY converter_api/final_prewarm.py /app/converter_api/final_prewarm.py
+COPY Dockerfile.converter /app/Dockerfile.converter
 COPY converter_api/work_queue.py /app/converter_api/work_queue.py
 COPY converter_api/work_middleware.py /app/converter_api/work_middleware.py
 COPY converter_api/scene_runner.py /app/converter_api/scene_runner.py
