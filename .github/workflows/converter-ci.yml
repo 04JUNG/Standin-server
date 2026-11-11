@@ -108,6 +108,8 @@ jobs:
             tests/converter/test_deployment_contract.py \
             tests/converter/test_latency_probe.py \
             tests/converter/test_retarget_cache.py \
+            tests/converter/test_final_cache.py \
+            tests/converter/test_final_artifact.py \
             tests/converter/test_fast_scene_reset.py \
             tests/converter/test_preview_instrumentation.py \
             tests/converter/test_interactive_state.py \
