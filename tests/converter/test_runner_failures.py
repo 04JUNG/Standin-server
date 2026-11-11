@@ -62,7 +62,7 @@ report = {
     ).hexdigest(),
     "retarget_sha256": "96831e315a99ace3cf7121dd315c49e8dbe2f4e98beed6d2633abb57e1d0b6cd",
     "ankle_policy_sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
-    "solver_manifest_sha256": "5f4353d03e440b68983c196ebc58ba8f756016f76c2f2b8d55f62593f5862116",
+    "solver_manifest_sha256": "fa951f0a45c27e71d4f1b88f47af576dd366c3005d794d47ffb59336e6280065",
     "force_exact_v324": job["force_exact_v324"],
     "output_mode": "rigged_rest",
     "frame": 0,

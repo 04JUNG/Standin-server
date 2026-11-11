@@ -100,7 +100,7 @@ def identity(settings, options):
 
 def validate(data, report, binding):
     from converter.final_artifact import valid_receipt
-    from converter.protocol import SOLVER_VERSION
+    from converter.protocol import SOLVER_VERSION, SOLVER_MANIFEST_SHA256, RETARGET_SHA256, ANKLE_POLICY_SHA256
     from converter.scene_contract import FBX_MAGIC
     sha = digest(data)
     if (not 0 < len(data) <= MAX_BYTES or not data.startswith(FBX_MAGIC)
@@ -110,6 +110,9 @@ def validate(data, report, binding):
             or report.get('character_sha256') != binding['character_sha256']
             or report.get('character_id') != binding['character_id']
             or report.get('solver_version') != SOLVER_VERSION
+            or report.get('solver_manifest_sha256') != SOLVER_MANIFEST_SHA256
+            or report.get('retarget_sha256') != RETARGET_SHA256
+            or report.get('ankle_policy_sha256') != ANKLE_POLICY_SHA256
             or report.get('camera_rotation') != binding['camera_rotation']
             or report.get('mirrored') != binding['mirror']
             or not valid_receipt(report.get('artifact_validation'), sha, binding['output_scope'])):
@@ -145,6 +148,8 @@ class FinalStore:
     def __init__(self, root):
         self.root = Path(root).resolve()
         self.root.mkdir(parents=True, exist_ok=True)
+        from converter_api.final_cache_remote import RemoteStore
+        self.remote = RemoteStore.from_env()
 
     def atomic(self, name, data):
         with tempfile.NamedTemporaryFile(dir=self.root, delete=False) as stream:
@@ -179,8 +184,20 @@ class FinalStore:
             os.close(fd)
 
     def read(self, name, limit):
+        # Refresh shared receipts/revocations and keep large artifacts in S3,
+        # rather than accumulating an unbounded task-local FBX hot cache.
+        if self.remote and (name == 'revoked.json' or name.endswith('.fbx') or
+                (len(name) == 69 and name.endswith('.json'))):
+            return self.remote.read(name, limit)
         path = self.root / name
-        fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+        try:
+            fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+        except FileNotFoundError:
+            if not self.remote:
+                raise
+            data = self.remote.read(name, limit)
+            self.atomic(name, data)
+            return data
         with os.fdopen(fd, 'rb') as stream:
             data = stream.read(limit + 1)
         if len(data) > limit:
@@ -217,12 +234,16 @@ class FinalStore:
         key = digest(canonical(binding))
         if self.revoked(key, result.artifact_sha256):
             raise ValueError('revoked final artifact')
-        self.atomic(key + '.' + result.artifact_sha256 + '.fbx', result.artifact)
-        self.atomic(key + '.json', canonical(dict(status='ready', binding=binding,
+        metadata = canonical(dict(status='ready', binding=binding,
             artifact_sha256=result.artifact_sha256, report=result.report,
             report_sha256=digest(canonical(result.report)), generated_at=time.time(),
             validation_scope='existing-converter-gates-and-final-reimport',
-            complete_collision_certificate=False)))
+            complete_collision_certificate=False))
+        if self.remote:
+            self.remote.publish(key, result.artifact_sha256, result.artifact, metadata)
+        else:
+            self.atomic(key + '.' + result.artifact_sha256 + '.fbx', result.artifact)
+            self.atomic(key + '.json', metadata)
 
 
 def cached_final(method):

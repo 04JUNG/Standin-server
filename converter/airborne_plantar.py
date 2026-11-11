@@ -119,7 +119,7 @@ class PlantarFrame:
 
 def _plantar_frame(v322, mesh, arm, rt, dst_table, side: str,
                    rest_positions: list[Vector], posed_positions: list[Vector],
-                   policy: dict) -> tuple[PlantarFrame, Vector | None]:
+                   policy: dict, weights=None) -> tuple[PlantarFrame, Vector | None]:
     measure = policy["measurement"]
     inv = arm.matrix_world.inverted()
     ankle = inv @ rt._rest_world(arm, dst_table[f"foot.{side}"]).translation
@@ -128,7 +128,8 @@ def _plantar_frame(v322, mesh, arm, rt, dst_table, side: str,
     if forward.length <= _EPS:
         return PlantarFrame(False, "target_rest_foot_edge_degenerate"), None
     forward.normalize()
-    weights = v322._vertex_weight_rows(mesh)
+    if weights is None:
+        weights = v322._vertex_weight_rows(mesh)
     names = (dst_table[f"foot.{side}"], dst_table[f"toe.{side}"])
     rows = []
     for index, (point, row) in enumerate(zip(rest_positions, weights)):
@@ -518,6 +519,12 @@ def convert_safe(
             rest_positions = v322._positions(mesh, dst_arm, evaluated=False)
             baseline_positions = v322._positions(mesh, dst_arm, evaluated=True)
             baseline_snapshot = v322._pose_snapshot(rt, dst_arm, dst_table)
+            reuse_rest = os.getenv("CONVERTER_REUSE_REST_METRICS", "0") == "1"
+            selection["rest_metrics_reused"] = reuse_rest
+            weights = v322._vertex_weight_rows(mesh) if reuse_rest else None
+            from .rest_surface import RestSurface
+            surfaces = {side: RestSurface(v322, mesh, dst_arm, rt, dst_table, side,
+                rest_positions, policy, weights) for side in _SIDES} if reuse_rest else {}
             baseline_frames = {}
             baseline_vectors = {}
             baseline_surfaces = {}
@@ -530,14 +537,13 @@ def convert_safe(
             for side in _SIDES:
                 frame_row, plantar = _plantar_frame(
                     v322, mesh, dst_arm, rt, dst_table, side,
-                    rest_positions, baseline_positions, policy,
+                    rest_positions, baseline_positions, policy, weights=weights,
                 )
                 baseline_frames[side] = frame_row
                 baseline_vectors[side] = plantar
-                baseline_surfaces[side] = v322._surface_metrics(
-                    mesh, dst_arm, rt, dst_table, side,
-                    rest_positions, baseline_positions, policy,
-                )
+                baseline_surfaces[side] = (surfaces[side].measure(baseline_positions) if reuse_rest else
+                    v322._surface_metrics(mesh, dst_arm, rt, dst_table, side,
+                        rest_positions, baseline_positions, policy))
                 ref = reference.get(side, {})
                 reasons = []
                 parent_owned = bool(parent_selected.get(side, 0.0))
@@ -594,7 +600,7 @@ def convert_safe(
                         gain, contexts[side], reference[side], rest_positions,
                         baseline_snapshot, baseline_surfaces[side],
                         selection["activation"][side]["parent_relative_bend_error_deg"],
-                        policy,
+                        policy, surface=surfaces.get(side), weights=weights,
                     )
                     coarse_rows.append(row)
                 selection["candidates"][side].extend(coarse_rows)
@@ -625,7 +631,7 @@ def convert_safe(
                         gain, contexts[side], reference[side], rest_positions,
                         baseline_snapshot, baseline_surfaces[side],
                         selection["activation"][side]["parent_relative_bend_error_deg"],
-                        policy,
+                        policy, surface=surfaces.get(side), weights=weights,
                     ))
                 rescued = [
                     row for row in selection["candidates"][side]
@@ -658,12 +664,11 @@ def convert_safe(
             for side, row in selected_rows.items():
                 frame_row, plantar = _plantar_frame(
                     v322, mesh, dst_arm, rt, dst_table, side,
-                    rest_positions, final_positions, policy,
+                    rest_positions, final_positions, policy, weights=weights,
                 )
-                surface = v322._surface_metrics(
-                    mesh, dst_arm, rt, dst_table, side,
-                    rest_positions, final_positions, policy,
-                )
+                surface = (surfaces[side].measure(final_positions) if reuse_rest else
+                    v322._surface_metrics(mesh, dst_arm, rt, dst_table, side,
+                        rest_positions, final_positions, policy))
                 reasons = []
                 if not frame_row.measurable or plantar is None:
                     reasons.append("FINAL_PLANTAR_UNMEASURABLE")
@@ -733,18 +738,17 @@ def convert_safe(
 def _candidate(v324, v322, rt, arm, mesh, dst_table, side: str,
                gain: float, context: dict, reference: dict,
                rest_positions: list[Vector], baseline_snapshot: dict,
-               baseline_surface, parent_error: float, policy: dict) -> dict:
+               baseline_surface, parent_error: float, policy: dict, *, surface=None, weights=None) -> dict:
     v322._reset_pose(arm)
     applied = _apply_correction(v322, rt, arm, dst_table, side, context, gain)
     positions = v322._positions(mesh, arm, evaluated=True)
     frame_row, plantar = _plantar_frame(
         v322, mesh, arm, rt, dst_table, side,
-        rest_positions, positions, policy,
+        rest_positions, positions, policy, weights=weights,
     )
-    surface = v322._surface_metrics(
-        mesh, arm, rt, dst_table, side,
-        rest_positions, positions, policy,
-    )
+    surface = (surface.measure(positions) if surface is not None else
+        v322._surface_metrics(mesh, arm, rt, dst_table, side,
+            rest_positions, positions, policy))
     after = v322._pose_snapshot(rt, arm, dst_table)
     proximal = v322._proximal_error(baseline_snapshot, after)
     reasons = []
