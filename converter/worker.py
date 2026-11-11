@@ -411,6 +411,11 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
     if recipe is not None and ok:
         payload["shape_bake"] = json.loads(Path(job["output_path"]).with_suffix(".shape.json").read_text())
     if ok and reviewed_payload is None and not job["force_exact_v324"]:
+        if recipe is None:
+            from converter.source_body import bake_source_body
+            source_body = bake_source_body(job["output_path"], job["bvh_path"], frame=FRAME, mirror=job["mirror"])
+            if source_body is not None:
+                payload["source_body"] = source_body
         from converter.reviewed_source_fingers import bake_source_fingers
         with lab_timings.measure("source_finger_bake"):
             payload["source_fingers"] = bake_source_fingers(
