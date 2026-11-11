@@ -14,6 +14,9 @@ on:
       - "deploy/ecs/**"
       - "scripts/prepare_hand_screen_deployment.py"
       - "scripts/verify_staging_anatomy.py"
+      - "scripts/prepare_staging_anatomy.py"
+      - "scripts/staging_body_assets_init.py"
+      - "config/staging-anatomy-release.json"
       - "src/hand_skin_capacity.py"
   workflow_dispatch:
     inputs:
@@ -148,7 +151,9 @@ jobs:
 
       - name: Prevent staging anatomy release regression
         if: env.ECS_SERVICE != '' && github.ref == 'refs/heads/develop'
-        run: python scripts/verify_staging_anatomy.py taskdef.json
+        run: |
+          python scripts/prepare_staging_anatomy.py taskdef.json
+          python scripts/verify_staging_anatomy.py taskdef.json
 
       - uses: aws-actions/amazon-ecs-render-task-definition@v1
         id: render

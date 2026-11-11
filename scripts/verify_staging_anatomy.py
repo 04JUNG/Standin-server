@@ -2,6 +2,10 @@
 import argparse
 import json
 from pathlib import Path
+try:
+    from scripts.prepare_staging_anatomy import RELEASE, INITIALIZER
+except ModuleNotFoundError:
+    from prepare_staging_anatomy import RELEASE, INITIALIZER
 
 
 def verify(task):
@@ -14,12 +18,18 @@ def verify(task):
     expected = {
         "BODY_ASSETS_ROLE": "converter",
         "BODY_ASSETS_ROOT": "/app/body-staging",
-        "BODY_ASSETS_MANIFEST_KEY": "body-models/releases/anatomy-20261111-bf9439491bef-converter/manifest.json",
-        "BODY_ASSETS_MANIFEST_SHA256": "bf9439491befc529b1a7b1072bfa46b2fb91f2d3eef93ed36b52f847a0534c3c",
+        "BODY_ASSETS_MANIFEST_KEY": RELEASE['prefix'] + '/manifest.json',
+        "BODY_ASSETS_MANIFEST_SHA256": RELEASE['manifestSha256'],
     }
     for key, value in expected.items():
         if env(init).get(key) != value:
             raise ValueError(f"Staging anatomy release changed: {key}")
+    if init.get('command') != ['python', '-c', INITIALIZER]:
+        raise ValueError('Staging body initializer changed')
+    for cid in RELEASE['characterIds']:
+        key = 'BODY_' + cid.upper().replace('-', '_') + '_URI'
+        if env(main).get(key) != '/app/body-staging/fbx/' + cid + '.fbx':
+            raise ValueError('Staging preset changed: ' + cid)
     for key, value in {
         "CONVERTER_CHARACTER_REGISTRY": "/app/body-staging/characters.json",
         "CONVERTER_SHAPE_REGISTRY": "/app/body-staging/shape-bakes.json",
