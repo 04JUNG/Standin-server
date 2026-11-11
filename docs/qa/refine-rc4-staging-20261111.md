@@ -48,7 +48,7 @@ be exported. Existing legacy routes retain their eligibility checks.
 
 ## Deployment and limitations
 
-Staging inference task revision 136 and BFF revision 136 run RC4 enabled.
+Staging inference task revision 138 and BFF revision 136 run RC4 enabled.
 The worker is loopback-only within the inference task. Production RC4 remains
 disabled; this work did not deploy or change production.
 
@@ -56,6 +56,10 @@ During validation, unrelated GitHub Actions changed staging BFF revision 134 to
 135. The deployment guard stopped an overwrite. The latest image (including the
 new default-hand fix) was retained as the base for RC4 revision 136. No existing
 hand behavior was rolled back.
+
+The concurrent inference deployment also moved staging from revision 136 to 137
+with the develop finger-offset fix. Revision 138 retains that newer base and
+reapplies only the RC4 HTTP adapter; the private RC4 worker image is unchanged.
 
 Unrelated GitHub Actions also changed production inference 49 to 50 and BFF 58
 to 59 during this session. Therefore before/after production task definitions
@@ -74,5 +78,5 @@ registration are outside this staging check.
 - BFF PR CI passed, including new RC4 ownership/eligibility checks.
 - Client targeted tests: 91 passed, plus 48 HTTP contract tests after updating
   the default-off capability assertion. Native macOS build passed.
-- Client full CI is tracked on PR 194; do not infer its status from targeted tests.
+- Client full CI passed (frontend, macOS Rust, Windows Rust and final PR gate).
 - No PR merge or production activation performed.
