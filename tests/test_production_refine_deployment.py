@@ -31,3 +31,14 @@ def test_policy_runs_only_for_production_before_render():
     i = next(i for i, s in enumerate(steps) if s.get("name") == "Pin production refine policy")
     assert steps[i]["if"] == "github.ref == 'refs/heads/main'"
     assert i < next(i for i, s in enumerate(steps) if s.get("id") == "render")
+
+
+def test_rollout_does_not_turn_an_explicit_emergency_kill_switch_back_on():
+    value = {"containerDefinitions": [{"name": "inference", "environment": [
+        {"name": "REFINE_ENABLED", "value": "0"},
+        {"name": "REFINE_RELEASE_ENABLED", "value": "1"}]}]}
+    result = prepare(value)
+    env = {e["name"]:e["value"] for e in result["containerDefinitions"][0]["environment"]}
+    assert env["REFINE_ENABLED"] == "0"
+    assert env["REFINE_RELEASE_ENABLED"] == "0"
+    assert env["REFINE_DEFAULT_MODE"] == "aggressive"

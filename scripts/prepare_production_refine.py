@@ -3,7 +3,7 @@ import json
 import sys
 from pathlib import Path
 
-POLICY = {"REFINE_ENABLED": "1", "REFINE_V2_ENABLED": "1",
+POLICY = {"REFINE_V2_ENABLED": "1",
           "REFINE_DEFAULT_MODE": "aggressive", "REFINE_V25_SELECTOR_ENABLED": "1",
           "REFINE_V2_TORSO": "0", "REFINE_V3_MODE": "off",
           "REFINE_V3_EVIDENCE_ENABLED": "0", "REFINE_RELEASE_ENABLED": "0"}
@@ -14,6 +14,10 @@ def prepare(task):
         raise ValueError("exactly one inference container required")
     container = containers[0]
     env = {v["name"]: v["value"] for v in container.get("environment", [])}
+    # Preserve the global emergency kill switch while pinning the approved engine.
+    env.setdefault("REFINE_ENABLED", "1")
+    if env["REFINE_ENABLED"] not in ("0", "1"):
+        raise ValueError("invalid production refine kill switch")
     env.update(POLICY)
     env.pop("REFINE_RELEASE_WORKER_URL", None)
     container["environment"] = [{"name": k, "value": v} for k, v in env.items()]
