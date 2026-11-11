@@ -26,3 +26,4 @@ def accept(c,seed,row):
  if not fixed_ok or not samecam:issues.append(dict(kind='fixed_frame_changed'))
  if any(n not in [s+t for s in ['Left','Right'] for t in ['Arm','ForeArm','Hand']] for n in set(row['pr']['edits'])|set(seed['pr']['edits']) if row['pr']['edits'].get(n)!=seed['pr']['edits'].get(n)):issues.append(dict(kind='out_of_scope_edit'))
  result=dict(passed=not issues,issues=issues,silhouette_iou=iou,fixed_bones_unchanged=fixed_ok,camera_unchanged=samecam,legacy_gate_passed=d['passed'],legacy_gate_issues=d['issues'],manual_targets=False);write(row['path']/'shell-gate.json',result);return result
+

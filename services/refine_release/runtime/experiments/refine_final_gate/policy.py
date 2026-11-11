@@ -131,7 +131,7 @@ class MeshPolicy:
   edges=np.sort(np.concatenate([faces[:,[0,1]],faces[:,[1,2]],faces[:,[2,0]]]),axis=1);fi=np.tile(np.arange(len(faces)),3)
   order=np.lexsort((edges[:,1],edges[:,0]));ee=edges[order];same=np.flatnonzero((ee[1:]==ee[:-1]).all(1))
   self.adj_a=fi[order[same]];self.adj_b=fi[order[same+1]];self.adj_edge=ee[same]
-  self.patches={}
+  self.patches={} 
   if joint_positions is not None:
    centers=vertices[faces].mean(1)
    for i,n in enumerate(names):

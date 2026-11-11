@@ -52,3 +52,4 @@ def render_projected(vertices, faces, xy, size):
         color = int(shade[i])
         cv2.fillConvexPoly(image, pixels[faces[i]], (color, color + 8, color + 12))
     return Image.fromarray(image)
+
