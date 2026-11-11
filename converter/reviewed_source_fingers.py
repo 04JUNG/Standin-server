@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import math
 from pathlib import Path
+import re
 
 VERSION = "source-fingers-v1"
 FINGERS = ("thumb", "index", "middle", "ring", "pinky")
@@ -79,6 +80,22 @@ def bake_source_fingers(path, bvh_path, *, frame=0, mirror=False, hands=None,
         receipt["status"] = "preset_override"
         return receipt
 
+    # A body-only BVH has nothing to transfer and needs no extra Blender import.
+    header = Path(bvh_path).read_text(encoding="utf-8-sig", errors="replace").partition("MOTION")[0]
+    joint_names = re.findall(r"\bJOINT\s+(\S+)", header)
+    source_sides = {}
+    keys = [(finger, joint) for finger in FINGERS for joint in range(1, 4)]
+    for side in wanted:
+        source_side = ("right" if side == "left" else "left") if mirror else side
+        wrist, fingers = bone_names(joint_names, source_side)
+        if wrist and len(fingers) == len(keys):
+            source_sides[side] = source_side
+        else:
+            receipt["sides"][side] = dict(status="missing_finger_chain", source_bones=len(fingers))
+    if not source_sides:
+        receipt["status"] = "source_unavailable"
+        return receipt
+
     import bpy
     from mathutils import Matrix
     from converter import retarget as rt
@@ -90,17 +107,23 @@ def bake_source_fingers(path, bvh_path, *, frame=0, mirror=False, hands=None,
     src = rt.import_bvh(str(bvh_path), frame=frame)
     reflect = Matrix.Diagonal((1.0, 1.0, -1.0))
     assigned = set()
-    for side in wanted:
-        source_side = ("right" if side == "left" else "left") if mirror else side
+    for side, source_side in source_sides.items():
         sw, sf = bone_names(src.data.bones.keys(), source_side)
         dw, df = bone_names(dst.data.bones.keys(), side)
-        keys = [(f, j) for f in FINGERS for j in range(1, 4)]
-        if not sw or not dw or any(k not in sf or k not in df for k in keys):
+        if not sw or not dw or len(sf) != len(keys) or len(df) != len(keys):
             receipt["sides"][side] = dict(status="missing_finger_chain",
                 source_bones=len(sf), target_bones=len(df))
             continue
-        source_rest = _palm_frame(src, sw, sf)
-        target_rest = _palm_frame(dst, dw, df)
+        if all(src.pose.bones[name].matrix_basis.to_quaternion().angle <= 1e-4
+               for name in sf.values()):
+            receipt["sides"][side] = dict(status="no_finger_rotation")
+            continue
+        try:
+            source_rest = _palm_frame(src, sw, sf)
+            target_rest = _palm_frame(dst, dw, df)
+        except ValueError as exc:
+            receipt["sides"][side] = dict(status="invalid_palm_frame", reason=str(exc))
+            continue
         wrist_delta = (_rotation(rt._pose_world(src, sw))
                        @ _rotation(rt._rest_world(src, sw)).transposed())
         source_posed = wrist_delta @ source_rest
