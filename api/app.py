@@ -1315,3 +1315,7 @@ def export_order(req: ExportOrderRequest):
         created_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
         items=items, notes=notes,
     )
+
+# RC4 is independently opt-in; the existing /refine contract is unchanged.
+from api.refine_release import router as release_refine_router
+app.include_router(release_refine_router)
