@@ -33,9 +33,9 @@ jobs:
       #   거기 두면 staging 배포가 프로덕션 클러스터로 나간다.
       ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
       ECS_SERVICE: ${{ vars.ECS_SERVICE }}
-      # Explicit rollout: develop uses the requested fullbody path. Main stays
-      # legacy unless its own environment explicitly opts in; no production rollout by accident.
-      ROUTING_FULLBODY_ENABLED: ${{ vars.ROUTING_FULLBODY_ENABLED || ((github.ref == 'refs/heads/develop' || vars.ROUTING_RECALL_ENABLED == '1') && '1' || '0') }}
+      # Approved main promotion uses the same fullbody/Recall defaults as develop.
+      # Explicit environment overrides remain available for rollback.
+      ROUTING_FULLBODY_ENABLED: ${{ vars.ROUTING_FULLBODY_ENABLED || '1' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -63,7 +63,7 @@ jobs:
       - name: Select Recall profile
         id: recall-profile
         env:
-          RECALL_ENABLED: ${{ vars.ROUTING_RECALL_ENABLED || (github.ref == 'refs/heads/develop' && '1' || '0') }}
+          RECALL_ENABLED: ${{ vars.ROUTING_RECALL_ENABLED || '1' }}
         run: |
           [[ "$RECALL_ENABLED" == 0 || "$RECALL_ENABLED" == 1 ]]
           echo "enabled=$RECALL_ENABLED" >> "$GITHUB_OUTPUT"
@@ -104,6 +104,10 @@ jobs:
           aws ecs describe-task-definition \
             --task-definition "$TASK_DEFINITION" \
             --query taskDefinition > taskdef.json
+
+      - name: Verify production feature and asset parity
+        if: github.ref == 'refs/heads/main'
+        run: python scripts/verify_production_parity.py taskdef.json --role inference
 
       - name: Refresh body initializer to the deployment image
         env:

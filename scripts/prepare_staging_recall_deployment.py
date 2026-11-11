@@ -60,8 +60,14 @@ def main():
     pin = {}
     if args.enabled == '1':
         if args.production:
-            pin = {'uri': os.getenv('ROUTING_RECALL_ASSETS_URI', ''),
-                   'sha256': os.getenv('ROUTING_RECALL_ASSETS_SHA256', '')}
+            task = json.loads(args.task.read_text())
+            env = {e['name']:e['value'] for c in task['containerDefinitions'] if c['name']=='inference' for e in c.get('environment',[])}
+            bucket = re.fullmatch(r's3://([a-z0-9.-]+)/pose-library/.+', env.get('POSE_LIBRARY_URI',''))
+            if bucket is None or bucket[1].startswith('standinstagingapp-'):
+                raise ValueError('production Recall requires a production library bucket')
+            profile=json.loads((PIN.parents[0]/'production-runtime-parity.json').read_text())
+            pin = {'uri': os.getenv('ROUTING_RECALL_ASSETS_URI') or f"s3://{bucket[1]}/{profile['recallKey']}",
+                   'sha256': os.getenv('ROUTING_RECALL_ASSETS_SHA256') or profile['recallSha256']}
         else:
             pin = json.loads(PIN.read_text())
     result = configure(json.loads(args.task.read_text()), args.enabled, pin,

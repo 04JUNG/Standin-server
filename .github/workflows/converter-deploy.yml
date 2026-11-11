@@ -149,6 +149,10 @@ jobs:
           jq -e '.containerDefinitions | any(.name == "converter")' taskdef.json
           jq -e '.containerDefinitions | all(.name != "inference")' taskdef.json
 
+      - name: Verify production feature and asset parity
+        if: env.ECS_SERVICE != '' && github.ref == 'refs/heads/main'
+        run: python scripts/verify_production_parity.py taskdef.json --role converter
+
       - name: Prepare explicit Converter hand-screen settings
         if: env.ECS_SERVICE != ''
         env:
