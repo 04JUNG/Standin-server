@@ -133,6 +133,9 @@ def _ensure_db():
                  errorCode="LIBRARY_MISSING", dbPath=DB_PATH)
         build_db(build_synthetic_index(), DB_PATH)
 
+    from src.thumbnail_overlay import ensure_thumbnail_overlay
+    if ensure_thumbnail_overlay(CFG.data_dir, DB_PATH):
+        log_info("pose_thumbnails", "검증한 썸네일 스타일 오버레이를 적용했습니다")
     return load_entries(DB_PATH)
 
 
