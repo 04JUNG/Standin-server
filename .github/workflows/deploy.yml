@@ -208,6 +208,16 @@ jobs:
             | length == 1
           ' taskdef.json
 
+      - name: Pin staging legacy refine policy
+        if: github.ref == 'refs/heads/develop'
+        env:
+          STAGING_REFINE_RELEASE_ENABLED: ${{ vars.REFINE_RELEASE_ENABLED || '0' }}
+          STAGING_REFINE_ENABLED: ${{ vars.REFINE_ENABLED || '1' }}
+          STAGING_REFINE_V2_ENABLED: ${{ vars.REFINE_V2_ENABLED || '1' }}
+          STAGING_REFINE_DEFAULT_MODE: ${{ vars.REFINE_DEFAULT_MODE || 'aggressive' }}
+          STAGING_REFINE_V25_SELECTOR_ENABLED: ${{ vars.REFINE_V25_SELECTOR_ENABLED || '1' }}
+        run: python scripts/prepare_staging_refine_deployment.py taskdef.json
+
       - uses: aws-actions/amazon-ecs-render-task-definition@v1
         id: render
         with:
