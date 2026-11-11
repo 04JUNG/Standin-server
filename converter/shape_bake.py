@@ -61,6 +61,11 @@ def convert_shaped(*, recipe, bvh_path, character_fbx, out_path, **options):
     solver_output=Path(out_path).with_name('solver.fbx')
     report=convert(bvh_path=bvh_path,character_fbx=str(neutral/'model.fbx'),out_path=str(solver_output),**options)
     if not report.ok:return report
+    source_body = None
+    if not options.get('force_exact_v324', False):
+        from converter.source_body import bake_source_body
+        source_body = bake_source_body(solver_output, bvh_path,
+            frame=options.get('frame', 0), mirror=options.get('mirror', False))
     rt.reset_scene();posed,_=rt.import_character(str(solver_output))
     if set(rest)!=set(b.name for b in posed.data.bones):raise ValueError('solver changed shape rig bone set')
     deform={b.name:(posed.matrix_world@b.matrix_local)@rest[b.name].inverted() for b in posed.data.bones}
@@ -94,6 +99,7 @@ def convert_shaped(*, recipe, bvh_path, character_fbx, out_path, **options):
       'roundtrip_joint_error_mm':final['roundtrip_joint_error_mm'],
       'roundtrip_weight_error':final['roundtrip_weight_error'],
       'pose_qa':final['pose_qa'],'contact_qa':final['contact_qa'],
+      **({'source_body': source_body} if source_body is not None else {}),
       # Native authoring frames avoid amplifying FBX axis/float round-trip noise
       # when an independent verifier reconstructs the requested source surface.
       # This records pose only: expected geometry is recomputed by that verifier.
