@@ -124,3 +124,21 @@ def test_stale_frozen_solver_receipt_is_not_authorized(request_options, remote, 
     result = Runner().convert(**request_options)
     assert Runner.calls == 2 and result.report['final_cache']['status'] == 'miss'
     assert not list((tmp_path / 'new-task').glob('*.fbx'))
+
+
+@pytest.mark.parametrize('corruption', ['metadata_list', 'report_list', 'hands_list', 'fingers_list', 'roundtrip_list'])
+def test_malformed_remote_receipts_recompute_instead_of_500(request_options, remote, tmp_path, monkeypatch, corruption):
+    Runner().convert(**request_options)
+    key = next(k for k in remote.objects if k[1].startswith('cache/data/') and k[1].endswith('.json'))
+    metadata = json.loads(remote.objects[key])
+    if corruption == 'metadata_list': metadata = []
+    else:
+        if corruption == 'report_list': metadata['report'] = []
+        if corruption == 'hands_list': metadata['report']['hands'] = ['invalid']
+        if corruption == 'fingers_list': metadata['report']['source_fingers'] = ['invalid']
+        if corruption == 'roundtrip_list': metadata['report']['source_fingers']['saved_fbx_roundtrip'] = ['invalid']
+        metadata['report_sha256'] = digest(canonical(metadata['report']))
+    remote.objects[key] = canonical(metadata)
+    monkeypatch.setenv('CONVERTER_FINAL_CACHE_ROOT', str(tmp_path / 'new-task'))
+    result = Runner().convert(**request_options)
+    assert Runner.calls == 2 and result.report['ok'] and result.report['final_cache']['status'] == 'miss'

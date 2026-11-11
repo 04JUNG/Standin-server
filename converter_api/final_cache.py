@@ -102,6 +102,8 @@ def validate(data, report, binding):
     from converter.final_artifact import valid_receipt
     from converter.protocol import SOLVER_VERSION, SOLVER_MANIFEST_SHA256, RETARGET_SHA256, ANKLE_POLICY_SHA256
     from converter.scene_contract import FBX_MAGIC
+    if not isinstance(report, dict):
+        raise ValueError('invalid final cache report')
     sha = digest(data)
     if (not 0 < len(data) <= MAX_BYTES or not data.startswith(FBX_MAGIC)
             or report.get('ok') is not True or report.get('artifact_sha256') != sha
@@ -120,12 +122,16 @@ def validate(data, report, binding):
     recipe = binding['shape_recipe']
     if recipe:
         baked = report.get('shape_bake') or {}
+        if not isinstance(baked, dict):
+            raise ValueError('invalid cached shape receipt')
         if any(baked.get(k) != v for k, v in {
                 'shape_sha256': recipe['shape_sha256'], 'rules': recipe['rules'],
                 'controls': recipe['values'], 'blend_sha256': recipe['blend_sha256'],
                 'controller_sha256': recipe['controller_sha256']}.items()):
             raise ValueError('cached shape lineage mismatch')
     baked_hands = report.get('hands') or {}
+    if not isinstance(baked_hands, dict):
+        raise ValueError('invalid cached hand receipt')
     if binding['hands']:
         if (any(baked_hands.get(side) != binding['hands'].get(side) for side in ('left', 'right'))
                 or baked_hands.get('library_sha256') != binding['hand_library_sha256']
@@ -134,13 +140,18 @@ def validate(data, report, binding):
     elif baked_hands:
         raise ValueError('unexpected cached hand preset')
     fingers = report.get('source_fingers')
+    if fingers is not None and not isinstance(fingers, dict):
+        raise ValueError('invalid source finger receipt')
     if not binding['hands'] and (not isinstance(fingers, dict)
             or fingers.get('status') not in ('transferred', 'source_unavailable')
             or fingers.get('body_bones_preserved') is not True):
         raise ValueError('source finger evidence missing')
-    if fingers and fingers.get('status') == 'transferred' and fingers.get('saved_fbx_roundtrip', {}).get('verified') is not True:
-        raise ValueError('source finger saved FBX unverified')
-    if binding['selected_hand_screen'] and report.get('framing', {}).get('selected_hand_screen') != 'clear_screen':
+    if fingers and fingers.get('status') == 'transferred':
+        roundtrip = fingers.get('saved_fbx_roundtrip')
+        if not isinstance(roundtrip, dict) or roundtrip.get('verified') is not True:
+            raise ValueError('source finger saved FBX unverified')
+    if binding['selected_hand_screen'] and (not isinstance(report.get('framing'), dict) or
+            report['framing'].get('selected_hand_screen') != 'clear_screen'):
         raise ValueError('selected hand screen missing')
 
 
@@ -216,7 +227,7 @@ class FinalStore:
     def get(self, binding):
         key = digest(canonical(binding))
         metadata = json.loads(self.read(key + '.json', 2 * 1024 * 1024))
-        if metadata.get('binding') != binding or metadata.get('status') != 'ready':
+        if not isinstance(metadata, dict) or metadata.get('binding') != binding or metadata.get('status') != 'ready':
             raise ValueError('stale final cache policy')
         sha = metadata['artifact_sha256']
         if not isinstance(sha, str) or len(sha) != 64 or any(c not in '0123456789abcdef' for c in sha):
