@@ -95,5 +95,10 @@ def test_environment_scoped_overrides_are_prepared_before_image_render():
     env_start = step.index("        env:\n") + len("        env:\n")
     env_end = step.index("        run:", env_start)
     env = dict(line.strip().split(": ", 1) for line in step[env_start:env_end].splitlines())
-    assert env == {k: "${{ vars." + k + " }}" for k in NAMES}
+    expected = {k: "${{ vars." + k + " }}" for k in NAMES}
+    # Preserve main's existing prefetch default while staging remains opt-in.
+    # A nonempty environment override, including the string '0', wins.
+    expected["PARALLEL_POSE_DESCRIPTION"] = (
+        "${{ vars.PARALLEL_POSE_DESCRIPTION || (github.ref == 'refs/heads/main' && '1' || '') }}")
+    assert env == expected
     assert "run: python scripts/prepare_description_deployment.py taskdef.json" in step
