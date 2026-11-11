@@ -2,6 +2,8 @@
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 import os
+from pathlib import Path
+import hashlib
 import httpx
 
 def worker_url():
@@ -40,11 +42,13 @@ def refine_release(image: UploadFile = File(...), pose_id: str = Form(...)):
     if not bvh: raise HTTPException(404, "unknown pose_id")
     data = image.file.read(12*1024*1024+1)
     if len(data) > 12*1024*1024: raise HTTPException(413, "image exceeds limit")
+    original = Path(bvh).read_bytes()
+    if len(original) > 16*1024*1024: raise HTTPException(422, "library BVH exceeds limit")
     if worker_url():
-        return remote("POST", "/refine/release", data={"pose_id":pose_id, "source_sha256":service.sha(bvh)}, files={"image":("rough.png",data,"image/png")}).json()
-    try: return service.execute(pose_id, data, expected_bvh=bvh)
+        return remote("POST", "/refine/release", data={"pose_id":pose_id, "source_sha256":hashlib.sha256(original).hexdigest()}, files={"image":("rough.png",data,"image/png"),"original_bvh":("source.bvh",original,"application/octet-stream")}).json()
+    try: return service.execute(pose_id, data, bvh_bytes=original)
     except service.Busy: raise HTTPException(409, "release worker is busy; retry later")
-    except (ValueError, KeyError): raise HTTPException(422, "invalid image or unregistered original asset")
+    except (ValueError, KeyError): raise HTTPException(422, "invalid image or original asset")
     except Exception:
         import logging
         logging.getLogger(__name__).exception("Release refine failed")

@@ -19,7 +19,7 @@ def verify_runtime():
             raise Unavailable("release runtime hash mismatch")
 
 def settings():
-    required = ["REFINE_RELEASE_REGISTRY", "REFINE_RELEASE_STATE", "REFINE_EXTRACTOR_CHECKOUT", "REFINE_MODEL_MANIFEST", "REFINE_EXTRACTOR_REVISION", "REFINE_MODEL_MANIFEST_SHA256", "REFINE_EXTRACTOR_SOURCE_MANIFEST", "REFINE_EXTRACTOR_SOURCE_SHA256"]
+    required = ["REFINE_RELEASE_BODY", "REFINE_RELEASE_BODY_SHA256", "REFINE_RELEASE_STATE", "REFINE_EXTRACTOR_CHECKOUT", "REFINE_MODEL_MANIFEST", "REFINE_EXTRACTOR_REVISION", "REFINE_MODEL_MANIFEST_SHA256", "REFINE_EXTRACTOR_SOURCE_MANIFEST", "REFINE_EXTRACTOR_SOURCE_SHA256"]
     if os.getenv("REFINE_RELEASE_ENABLED") != "1": raise Unavailable("release refine is disabled")
     if any(not os.getenv(k) for k in required) or not os.getenv("OPENAI_API_KEY"):
         raise Unavailable("release configuration is incomplete")
@@ -39,8 +39,8 @@ def settings():
     for relative, digest in sources.items():
         if sha(inside(Path(cfg["REFINE_EXTRACTOR_CHECKOUT"]), relative)) != digest:
             raise Unavailable("extractor source changed")
-    registry = json.loads(Path(cfg["REFINE_RELEASE_REGISTRY"]).read_text())
-    if not isinstance(registry, dict) or not registry: raise Unavailable("asset registry is empty")
+    from .assets import configuration
+    configuration()
     for module in ["numpy", "scipy", "cv2", "onnxruntime", "rtmlib"]:
         __import__(module)
     return cfg
@@ -73,7 +73,7 @@ def prepare(registry, pose_id, image, destination, expected_bvh=None):
     (destination/"input/manifest.json").write_text(json.dumps({"rows":[row]}))
     return case
 
-def execute(pose_id, image, expected_bvh=None):
+def execute(pose_id, image, expected_bvh=None, bvh_bytes=None):
     cfg = settings()
     if len(image) > 12*1024*1024: raise ValueError("image exceeds 12 MiB")
     try:
@@ -87,7 +87,11 @@ def execute(pose_id, image, expected_bvh=None):
         try: fcntl.flock(lock, fcntl.LOCK_EX|fcntl.LOCK_NB)
         except BlockingIOError: raise Busy("release worker is busy")
         handle = uuid.uuid4().hex; job = state/handle; job.mkdir()
-        case = prepare(cfg["REFINE_RELEASE_REGISTRY"], pose_id, image, job/"assets", expected_bvh)
+        from .assets import prepare as prepare_original
+        if bvh_bytes is None:
+            if expected_bvh is None: raise ValueError("library original BVH required")
+            bvh_bytes = Path(expected_bvh).read_bytes()
+        case = prepare_original(pose_id, bvh_bytes, image, job/"assets", cfg)
         command = [sys.executable, str(Path(__file__).parent/"runtime/run_minute.py"), "--assets", str(job/"assets"), "--out", str(job/"run"), "--case", case, "--extractor-checkout", cfg["REFINE_EXTRACTOR_CHECKOUT"], "--model-manifest", cfg["REFINE_MODEL_MANIFEST"]]
         env = dict(os.environ, REFINE_BLENDER=cfg["blender"], REFINE_MANAGED_PROCESS="1")
         with (job/"worker.log").open("w") as log:
@@ -109,6 +113,7 @@ def execute(pose_id, image, expected_bvh=None):
             shutil.copyfile(outputs[0], job/"result.fbx")
             camera = json.loads((job/"run/gate"/case/"release/camera.json").read_text())
             result.update(camera=camera, status="accepted", reason_codes=[], download_url=f"/refine/release/{handle}/fbx", artifact_sha256=sha(job/"result.fbx"))
+        result['source'] = json.loads((job/'assets/original-provenance.json').read_text())
         (job/"result.json").write_text(json.dumps(result))
         return result
 

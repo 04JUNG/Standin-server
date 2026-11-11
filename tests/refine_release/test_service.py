@@ -2,7 +2,7 @@ import io, json, os, tempfile, unittest
 from pathlib import Path
 from unittest.mock import patch
 from PIL import Image
-from services.refine_release import service
+from services.refine_release import service, assets
 
 class ServiceContracts(unittest.TestCase):
     def test_default_off(self):
@@ -68,7 +68,7 @@ class RegisteredAssetContracts(unittest.TestCase):
                 p=root/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text('# extractor')
             pin=root/'source.json';pin.write_text(json.dumps({n:service.sha(root/n) for n in relative}))
             model=root/'model.json';model.write_text('{}')
-            env=dict(REFINE_RELEASE_ENABLED='1',REFINE_RELEASE_REGISTRY=str(registry),REFINE_RELEASE_STATE=str(root/'state'),REFINE_EXTRACTOR_CHECKOUT=str(root),REFINE_EXTRACTOR_REVISION='rev',REFINE_MODEL_MANIFEST=str(model),REFINE_MODEL_MANIFEST_SHA256=service.sha(model),REFINE_EXTRACTOR_SOURCE_MANIFEST=str(pin),REFINE_EXTRACTOR_SOURCE_SHA256=service.sha(pin),OPENAI_API_KEY='not-sent')
+            env=dict(REFINE_RELEASE_ENABLED='1',REFINE_RELEASE_BODY=str(source/'input/original.fbx'),REFINE_RELEASE_BODY_SHA256=service.sha(source/'input/original.fbx'),REFINE_RELEASE_STATE=str(root/'state'),REFINE_EXTRACTOR_CHECKOUT=str(root),REFINE_EXTRACTOR_REVISION='rev',REFINE_MODEL_MANIFEST=str(model),REFINE_MODEL_MANIFEST_SHA256=service.sha(model),REFINE_EXTRACTOR_SOURCE_MANIFEST=str(pin),REFINE_EXTRACTOR_SOURCE_SHA256=service.sha(pin),OPENAI_API_KEY='not-sent')
             with patch.dict(os.environ,env,clear=True),patch.object(service.shutil,'which',return_value='/bin/blender'),patch.object(service.subprocess,'check_output',return_value='rev'):
                 self.assertEqual(service.settings()['blender'],'/bin/blender')
                 (root/relative[0]).write_text('# changed')
@@ -78,17 +78,19 @@ class RegisteredAssetContracts(unittest.TestCase):
 class DeliveryContracts(unittest.TestCase):
     def run_fake_worker(self, decision, root):
         image=io.BytesIO();Image.new('RGB',(2,2)).save(image,'PNG')
-        def prepare(registry, pose_id, data, destination, expected_bvh):
+        def prepare(pose_id, bvh_bytes, data, destination, cfg):
             output=destination.parent/'run/gate/asset';(output/'release').mkdir(parents=True)
             (output/'decision.json').write_text(json.dumps(decision))
             (output/'release/result.fbx').write_bytes(b'verified-test-artifact')
             (output/'release/camera.json').write_text(json.dumps({'projection':'orthographic'}))
+            destination.mkdir(parents=True,exist_ok=True)
+            (destination/'original-provenance.json').write_text('{}')
             return 'asset'
         from unittest.mock import MagicMock
         process=MagicMock();process.pid=123456;process.wait.return_value=0
         cfg={'REFINE_RELEASE_STATE':str(root),'REFINE_RELEASE_REGISTRY':'registry','REFINE_EXTRACTOR_CHECKOUT':'extractor','REFINE_MODEL_MANIFEST':'model','blender':'blender'}
-        with patch.object(service,'settings',return_value=cfg),patch.object(service,'prepare',side_effect=prepare),patch.object(service.subprocess,'Popen',return_value=process),patch.object(service.os,'killpg') as kill:
-            result=service.execute('pose',image.getvalue());kill.assert_called_once()
+        with patch.object(service,'settings',return_value=cfg),patch.object(assets,'prepare',side_effect=prepare),patch.object(service.subprocess,'Popen',return_value=process),patch.object(service.os,'killpg') as kill:
+            result=service.execute('pose',image.getvalue(),bvh_bytes=b'original');kill.assert_called_once()
             return result
     def test_accepted_requires_roundtrip_and_returns_camera(self):
         with tempfile.TemporaryDirectory() as d:

@@ -8,7 +8,8 @@ this integration PR. The endpoint verifies hashes before any work or download.
 
 - Internal `POST /refine/release`: PNG `image`, library `pose_id`.
 - The main API reads the current library BVH and sends its SHA to the private worker.
-- The worker accepts only registered, hash-pinned **unedited** BVH/FBX/rig/mesh assets.
+- The API resolves the selected pose in its current library and sends the **unedited BVH bytes** plus their hash over the private worker connection.
+- The worker automatically retargets frame 0 to the unchanged RC4 source body, extracts the rig and evaluated skin, and binds every generated file. There is no pose registration list.
 - One new `gpt-6-luna` / `low` call; automatic skeleton and conditions; no manual targets.
 - `accepted`: verified FBX hash, selected mode, separate camera, display GLB hash.
 - `withheld`: no corrected download. No rejected candidate is released.
@@ -47,12 +48,23 @@ not checked into Git. Do not expose the worker directly to the Internet.
 
 ## Scope
 
-The first staging bundle contains 45 distinct original library poses from the
-validated cohorts. It contains no rough images, manual conditions, adjusted poses
-or expected results. Other poses fail closed until their original assets have
-been registered and bound to the deployed BVH. This is **not** an all-library
-promotion. The fixed source mesh is displayed/exported; later body, hand and crop
-choices are not silently applied to it.
+Every pose resolvable in the deployed library can enter the same automatic source
+preparation path. No case ID, prepared experiment asset, manual coordinate, camera
+or adjusted pose is used. Invalid/missing originals or incompatible conversion
+fail closed; successful preparation is not a promise of passing the safety gate.
+
+The converter used for the original RC4 fixtures is pinned separately in
+`asset_runtime/` and `asset-runtime-manifest.json`. It is not the pose solver.
+Configure `REFINE_RELEASE_BODY` and `REFINE_RELEASE_BODY_SHA256` with the same
+unchanged source-body template. The cache identity includes original BVH hash,
+body hash, converter/build-script hash and Blender version. Cached file hashes
+are rechecked; each request gets a fresh rough binding outside the asset cache.
+The old `register_assets.py` utility and `service.prepare` are retained solely
+for historical fixture verification tests; the request path never calls them.
+
+The fixed source mesh is displayed/exported; later body, hand and crop choices
+are not silently applied to it. Single-target extraction and the unchanged
+release safety gate still apply.
 
 ## Validation
 

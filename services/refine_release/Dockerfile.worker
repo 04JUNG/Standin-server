@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /
 RUN rm -rf /app/services/refine_release
 COPY services/refine_release /app/services/refine_release
 # External private bundle: extractor checkout + source pin, model pin/weights,
-# original assets/registry, and env.json. It must contain no rough inputs or secrets.
+# hash-pinned source body and env.json. No prepared pose assets, registry, roughs or secrets.
 COPY rc4-bundle /opt/rc4
 RUN mkdir -p /var/lib/refine && chown -R 10001:10001 /var/lib/refine /opt/rc4/extractor
 USER 10001
