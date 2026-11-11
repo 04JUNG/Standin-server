@@ -1,0 +1,15 @@
+# Build a dependency image from Dockerfile.base and requirements.lock.txt first.
+# Pass a verified registry digest, never a moving production tag.
+ARG REFINE_RUNTIME_IMAGE
+FROM ${REFINE_RUNTIME_IMAGE}
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
+RUN rm -rf /app/services/refine_release
+COPY services/refine_release /app/services/refine_release
+# External private bundle: extractor checkout + source pin, model pin/weights,
+# original assets/registry, and env.json. It must contain no rough inputs or secrets.
+COPY rc4-bundle /opt/rc4
+RUN mkdir -p /var/lib/refine && chown -R 10001:10001 /var/lib/refine /opt/rc4/extractor
+USER 10001
+ENV REFINE_RELEASE_ENABLED=1 REFINE_RELEASE_STATE=/var/lib/refine REFINE_BLENDER=blender
+ENTRYPOINT ["python", "-m", "services.refine_release.start_worker"]
