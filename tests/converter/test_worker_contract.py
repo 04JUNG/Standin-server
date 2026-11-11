@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+from importlib import import_module
 import json
 from pathlib import Path
 import sys
@@ -76,7 +77,9 @@ def test_worker_module_does_not_import_bpy():
 
 
 def test_unregistered_pose_transfers_fingers_before_framing(tmp_path, monkeypatch):
-    from converter import final_artifact, framing, reviewed_source_fingers
+    final_artifact = import_module("converter.final_artifact")
+    framing = import_module("converter.framing")
+    reviewed_source_fingers = import_module("converter.reviewed_source_fingers")
 
     path, _ = _job(tmp_path)
     job = load_job(path)
