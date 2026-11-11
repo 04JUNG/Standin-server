@@ -2,6 +2,7 @@
 
 from collections import Counter
 import re
+from src.semantic_search_285 import DISCRETE_ACTIONS
 from .bound_body_recall_probe import description_roles
 from .bound_body_recall_probe import geometry_support
 
@@ -41,6 +42,16 @@ class ContextSlots:
             return candidates[0][0]
         return None
 
+    def _contact_terms(self, description, max_frequency):
+        contacts = set()
+        for clause in (description.get('body_details') or '').split('·'):
+            limb_roles = description_roles({'body_details': clause}, False)[0]
+            term = normalized(clause)
+            if (any(role in CONTACT_ROLES for role, _ in limb_roles)
+                    and 1 <= self.frequency[term] <= max_frequency):
+                contacts.add(term)
+        return contacts
+
     def propose(self, description, text):
         if description.get('certainty') not in ('medium', 'high'):
             return None
@@ -57,12 +68,7 @@ class ContextSlots:
                 return dict(pose_id=winner, basis='specific_activity_and_action')
         if description.get('visible_scope') not in ('half', 'bust'):
             return None
-        contacts = set()
-        for clause in (description.get('body_details') or '').split('·'):
-            limb_roles = description_roles({'body_details': clause}, False)[0]
-            term = normalized(clause)
-            if any(role in CONTACT_ROLES for role, _ in limb_roles) and 1 <= self.frequency[term] <= 50:
-                contacts.add(term)
+        contacts = self._contact_terms(description, 50)
         if contacts:
             relevant = [(pid, score) for pid, score in top[:12] if contacts & self.labels.get(pid, set())]
             winner = self.clear_winner(relevant, .016)
@@ -70,6 +76,50 @@ class ContextSlots:
                 return dict(pose_id=winner, basis='specific_visible_contact')
         return None
 
+
+    def fallback(self, description, text, models):
+        if not description.get('visible') or description.get('certainty') not in ('medium', 'high'):
+            return None
+        return (self.pose_with_specific_action(description, text, models)
+                or self.pose_with_specific_contact(description, text))
+
+    def pose_with_specific_action(self, description, text, models):
+        """Use the reviewed action value when both the pose fit and wording support it."""
+        if description.get('visible_scope') in ('head', 'shoulder_head'):
+            return None
+        actions = DISCRETE_ACTIONS.intersection(description.get('actions') or ())
+        if not actions:
+            return None
+        top = (text.get('both') or {}).get('top', ())
+        matching = {pid for pid, _ in top[:8] if actions & self.actions.get(pid, set())}
+        if not matching:
+            return None
+        corroborated = {
+            pid for model in models.values()
+            for methods in model['profiles'].values()
+            for mode in ('geometry', 'hybrid')
+            for pid, _ in methods.get(mode, {}).get('top', ())[:8]
+            if pid in matching
+        }
+        if len(corroborated) == 1:
+            return dict(pose_id=corroborated.pop(), basis='specific_action_with_pose_fit')
+        return None
+
+    def pose_with_specific_contact(self, description, text):
+        """Keep an exact, uncommon contact in view when the other arm is ambiguous."""
+        if description.get('visible_scope') not in ('half', 'bust'):
+            return None
+        contacts = self._contact_terms(description, 3)
+        if not contacts:
+            return None
+        clauses = (text.get('dense_clauses') or {}).get('top', ())
+        actions = (text.get('dense_action_tags') or {}).get('top', ())
+        supported = {pid for pid, _ in actions[:12]}
+        matches = [pid for pid, _ in clauses[:8]
+                   if pid in supported and contacts & self.labels.get(pid, set())]
+        if len(matches) == 1:
+            return dict(pose_id=matches[0], basis='exact_visible_contact_in_clause_search')
+        return None
 
     def head_only(self, person, description, text, models):
         search = person['dynamic_search']

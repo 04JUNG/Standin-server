@@ -244,7 +244,8 @@ class RecallObservations:
             result['visual'][i] = visual_candidates(appearance, detailed)
             result['tilt'][i] = tilt_candidates(appearance, detailed)
             result['prop_review'][i] = prop_review_candidate(person, detailed)
-            result['contextual'][i] = self.context.propose(raw, text)
+            result['contextual'][i] = (self.context.propose(raw, text)
+                                       or self.context.fallback(raw, text, detailed))
             result['heads'][i] = self.context.head_only(person, raw, text, detailed)
             if len(people) == 1:
                 result['detected_props'][i] = self.context.detected_prop(person, raw, text, detailed, prop_hits)
