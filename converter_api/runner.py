@@ -43,6 +43,7 @@ from converter.protocol import (
 )
 from converter.framing import FRAMING_VERSION, PREVIEW_VIEWS, validate_scope
 from converter_api.work_queue import PrioritySlots, WorkControl, WorkStopped, current_work
+from converter_api.final_cache import cached_final
 
 
 class RunnerError(RuntimeError):
@@ -649,6 +650,7 @@ class BlenderRunner:
             raise WorkerIntegrityError("thumbnail output is not a PNG", report=report)
         return data, {key: value for key, value in rendered.items() if key != "path"}
 
+    @cached_final
     def convert(
         self,
         *,

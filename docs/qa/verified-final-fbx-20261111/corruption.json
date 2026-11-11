@@ -1,0 +1,17 @@
+{
+  "corrupt_file_never_served": true,
+  "safe_rebuild_seconds": 19.269561292021535,
+  "initial": {
+    "status": "miss",
+    "reason": "invalid_or_revoked",
+    "blender_runs": 1,
+    "total_ms": 19269.483
+  },
+  "retry": {
+    "status": "hit",
+    "key": "98ceb77ffbacf9ad2e66894a44f81a6f0324ebd4f6af5ba4c90a0c42207d59e9",
+    "lookup_ms": 56.113,
+    "blender_runs": 0
+  },
+  "worker_runs": 1
+}

@@ -1142,6 +1142,7 @@ def create_app(
                 "shape_sha256": result.report.get("shape_bake", {}).get("shape_sha256"),
                 "shape_bake": result.report.get("shape_bake"), "hands": baked,
                 "fbx_sha256": result.artifact_sha256,
+                "final_cache": result.report.get("final_cache"),
                 "fbx_base64": base64.b64encode(result.artifact).decode("ascii"),
             }
         if preview_format == "model":
