@@ -172,7 +172,8 @@ class Config:
     ))
     # Opt-in; one shared gate admits at most two in-flight checks per process.
     hand_skin_screen_concurrency: int = int(os.getenv("HAND_SKIN_SCREEN_CONCURRENCY", "1"))
-    hand_skin_screen_on_selection: bool = os.getenv("HAND_SKIN_SCREEN_ON_SELECTION", "0") == "1"
+    # Skip library hand screening during search by default. Set 0 to re-enable it.
+    hand_skin_screen_on_selection: bool = os.getenv("HAND_SKIN_SCREEN_ON_SELECTION", "1") == "1"
     # 변환(~3s)+렌더 한 번의 상한. 초과하면 그림 없이 응답한다(조정 결과는 유지).
     thumbnail_timeout_seconds: float = float(
         os.getenv("REFINE_THUMBNAIL_TIMEOUT_SECONDS", "20")
