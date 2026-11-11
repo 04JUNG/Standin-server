@@ -424,6 +424,10 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
         from converter.hands import bake_hands
         with lab_timings.measure("hand_import_apply_export"):
             payload["hands"] = bake_hands(job["output_path"], job["hands"])
+    if ok and not job["force_exact_v324"]:
+        from converter.body_material import restore_anatomical_clay
+        with lab_timings.measure("body_material"):
+            payload["body_material"] = restore_anatomical_clay(job["output_path"])
     if ok and job.get('hand_contact_screen'):
         from converter.hand_contact import screen_artifact
         # AFTER hand baking, BEFORE crop/camera/preview. Screening does not

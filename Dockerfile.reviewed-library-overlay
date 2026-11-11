@@ -1,7 +1,7 @@
 # Staging candidate: retain the exact running runtime and body customisation.
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
-COPY converter/worker.py converter/reviewed_library.py converter/reviewed_source_fingers.py /app/converter/
+COPY converter/worker.py converter/reviewed_library.py converter/reviewed_source_fingers.py converter/body_material.py converter/preview_model.py converter/interactive_adapter.py /app/converter/
 COPY scripts/install_reviewed_library.py /app/scripts/install_reviewed_library.py
 ARG DEPLOYMENT_VERSION
 ENV DEPLOYMENT_VERSION=$DEPLOYMENT_VERSION
