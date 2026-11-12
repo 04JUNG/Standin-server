@@ -130,6 +130,7 @@ COPY converter/preview_model.py /app/converter/preview_model.py
 COPY converter/framed_model.py /app/converter/framed_model.py
 COPY converter_api/preview_models.py /app/converter_api/preview_models.py
 COPY converter/solved_state.py /app/converter/solved_state.py
+COPY converter/solved_state_v2.py /app/converter/solved_state_v2.py
 COPY converter/interactive_adapter.py /app/converter/interactive_adapter.py
 COPY converter/interactive_scene.py /app/converter/interactive_scene.py
 COPY converter/interactive_export.py /app/converter/interactive_export.py
@@ -139,6 +140,7 @@ COPY converter/interactive_variants.py /app/converter/interactive_variants.py
 COPY converter/interactive_camera.py /app/converter/interactive_camera.py
 COPY converter/interactive_worker.py /app/converter/interactive_worker.py
 COPY converter/shared/interactive_pose_v1.mjs /app/converter/shared/interactive_pose_v1.mjs
+COPY converter/shared/interactive_pose_v2.mjs /app/converter/shared/interactive_pose_v2.mjs
 COPY converter_api/interactive.py /app/converter_api/interactive.py
 COPY converter_api/interactive_static.py /app/converter_api/interactive_static.py
 COPY converter_api/body_preview.py /app/converter_api/body_preview.py

@@ -119,6 +119,7 @@ jobs:
             tests/converter/test_fast_scene_reset.py \
             tests/converter/test_preview_instrumentation.py \
             tests/converter/test_interactive_state.py \
+            tests/converter/test_solved_state_v2.py \
             tests/converter/test_interactive_camera.py \
             tests/converter/test_interactive_transport.py \
             tests/converter/test_interactive_timing.py \

@@ -9,7 +9,10 @@ import base64, hmac, json, logging, os, re, shutil, tempfile, threading, time, u
 from pathlib import Path
 from fastapi import Request, HTTPException
 from fastapi.responses import Response
-from converter.interactive_adapter import VERSION, atomic_write, body_binding, runtime_revision, shape_binding, load_solved
+from converter.interactive_adapter import (VERSION, STATE_FILES, atomic_write, body_binding, read_body_metadata,
+    runtime_revision, shape_binding, load_solved)
+from converter.solved_state import V1_ENCODING
+from converter.solved_state_v2 import ENCODING as V2_ENCODING, MEDIA_TYPE as V2_MEDIA_TYPE, is_v2
 from converter.interactive_camera import camera_for_model
 from converter.interactive_export import export_bundle, Superseded
 from converter.interactive_revision import LatestRevisionGate
@@ -97,7 +100,7 @@ class SnapshotStore:
             e['checkpoint']()
             return e
 
-    def _child(self, stage, job, identity, base, destination, checkpoint):
+    def _child(self, stage, job, identity, base, destination, checkpoint, encoding=None):
         # Reuse the production scheduler and kill-on-deadline/disconnect fence.
         control=current_work.get()
         def check():
@@ -112,7 +115,7 @@ class SnapshotStore:
             queue_ms=(start-queued)*1000
             p=subprocess.Popen([self.runner.settings.blender_binary,'--background','--factory-startup',
                 '--disable-autoexec','--python-exit-code','1','--python',str(Path(__file__).resolve().parents[1]/'converter/interactive_worker.py'),
-                '--',stage,str(job),str(identity),str(base),str(destination)],stdout=log,stderr=log)
+                '--',stage,str(job),str(identity),str(base),str(destination),*([encoding] if encoding else [])],stdout=log,stderr=log)
             try:
                 while p.poll() is None:
                     check()
@@ -141,10 +144,11 @@ class SnapshotStore:
                     request_id=control.request_id if control else None)))
 
     def _body_metadata(self,directory,binding):
-        """An interrupted preparation must never poison the next hand revision."""
+        """Reuse compact camera metadata; rehash v1/v2 artifacts on every access."""
         return self.body_metadata.read(directory,binding)
 
-    def solve(self, payload):
+    def solve(self, payload, encoding=V1_ENCODING):
+        if encoding not in STATE_FILES:raise ValueError('unsupported state encoding')
         if set(payload)!={'selection','operation','revision','person','bvhBase64','expiresAt'}:raise ValueError('invalid request')
         from datetime import datetime
         deadline=datetime.fromisoformat(payload['expiresAt'].replace('Z','+00:00'))
@@ -180,7 +184,9 @@ class SnapshotStore:
             camera=dict(projection='orthographic',viewMatrix=eye,projectionMatrix=eye,distanceTorso=12.,torsoReferenceSha256=resolved.metadata.sha256,baked=False),
             solver=dict(version=SOLVER_VERSION,manifestSha256=SOLVER_MANIFEST_SHA256,adapterVersion=VERSION,runtimeSha256=runtime_revision()))
         # A per-owner/base lock prevents duplicate retarget jobs and cache races.
-        binding=body_binding(identity);base_key=digest(canonical(binding));request_hash=digest(canonical(payload))
+        binding=body_binding(identity);base_key=digest(canonical(binding))
+        # The same selection in another encoding is a different immutable bundle.
+        request_hash=digest(canonical(payload)) if encoding==V1_ENCODING else digest(canonical([payload,encoding]))
         with self.lock:
             for sid,e in self.entries.items():
                 if e['request']==request_hash:
@@ -223,6 +229,7 @@ class SnapshotStore:
                 checkpoint()
                 ip.unlink();atomic_write(ip,canonical(identity))
                 core_key = digest(canonical(core_binding(identity)))
+                if encoding != V1_ENCODING:core_key += '-' + encoding
                 core = base['directory']/'cores'/core_key
                 state = None
                 if core.is_dir():
@@ -234,16 +241,22 @@ class SnapshotStore:
                         shutil.rmtree(directory/'solved', ignore_errors=True)
                         checkpoint()
                 if state is None:
-                    measured('blender_solve',self._child,'solve',job_dir/'job.json',ip,base_directory,directory/'solved',checkpoint)
+                    # v1 keeps the exact previous child invocation; only v2 adds the encoding argument.
+                    measured('blender_solve',self._child,'solve',job_dir/'job.json',ip,base_directory,directory/'solved',checkpoint,
+                             *(() if encoding==V1_ENCODING else (encoding,)))
                     state,_=measured('validate_before_cache',load_solved,directory/'solved'); checkpoint()
                     core.parent.mkdir(exist_ok=True)
                     shutil.copytree(directory/'solved', core)
                 entry['core'] = core
                 entry['base'] = base
             checkpoint()
+            if state.encoding!=encoding:raise ValueError('solved state encoding mismatch')
             with self.lock:
                 entry['stateHash']=state.state_hash
-                entry['packetSha256']=digest((directory/'solved/packet.json').read_bytes())
+                entry['encoding']=state.encoding
+                # v1 serves the JSON packet; v2 serves the binary state itself.
+                entry['modelFile']='solved/packet.json' if encoding==V1_ENCODING else 'solved/'+STATE_FILES[encoding]
+                entry['packetSha256']=digest((directory/entry['modelFile']).read_bytes())
                 entry['runtimeRevision']=runtime_revision()
                 entry['busy']=False;base['expiry']=time.monotonic()+self.ttl
             return dict(snapshotId=sid,packet=state.packet())
@@ -265,7 +278,7 @@ class SnapshotStore:
         # a second time merely to deliver it. BFF independently parses it too.
         if runtime_revision()!=e['runtimeRevision']:raise ValueError('runtime changed')
         if kind=='model':
-            raw=(e['directory']/'solved/packet.json').read_bytes()
+            raw=(e['directory']/e.get('modelFile','solved/packet.json')).read_bytes()
             if digest(raw)!=e['packetSha256']:raise ValueError('packet changed')
         else:
             from converter.solved_state import decode
@@ -310,11 +323,12 @@ class SnapshotStore:
                     check()
             e['checkpoint']()
             with self.lock:
-                if receipt['stateHash'] not in self.variant_cache:
+                # Only typed JSON states can join the v1 hand variant atlas.
+                if e.get('encoding',V1_ENCODING)==V1_ENCODING and receipt['stateHash'] not in self.variant_cache:
                     while len(self.variant_cache)>=16:
                         oldest=next(iter(self.variant_cache));shutil.rmtree(self.variant_cache.pop(oldest)['directory'])
                     cache=Path(tempfile.mkdtemp(prefix='variant-',dir=self.root))
-                    atomic_write(cache/'state.json',(e['directory']/'solved/state.canonical.json').read_bytes())
+                    atomic_write(cache/'state.json',(e['directory']/'solved'/STATE_FILES[V1_ENCODING]).read_bytes())
                     atomic_write(cache/'receipt.json',json.dumps(receipt,separators=(',',':')).encode())
                     self.variant_cache[receipt['stateHash']]=dict(directory=cache,owner=owner,expiry=e['expiry'])
             return receipt
@@ -324,6 +338,8 @@ class SnapshotStore:
     def variants(self,snapshot,owner):
         from converter.interactive_variants import asset_binding, build_table
         current=self._get(snapshot,owner)
+        # Answer before decoding anything: binary states have no v1 atlas.
+        if current.get('encoding',V1_ENCODING)!=V1_ENCODING:raise HTTPException(409,'VARIANTS_UNAVAILABLE')
         state,_=load_solved(current['directory']/'solved')
         binding=asset_binding(state.payload['identity']);pairs=[];keys=set();budget=0
         with self.lock:entries=list(reversed(list(self.variant_cache.values())))
@@ -355,7 +371,23 @@ class SnapshotStore:
             self.gate.cancel_revision(owner,person,revision)
 
 
+def binary_state_enabled():
+    """Operator kill switch. Disabled answers v2 requests with v1 packets."""
+    value=os.getenv('CONVERTER_INTERACTIVE_BINARY_STATE','1').strip().lower()
+    if value not in ('0','1','true','false'):raise ValueError('CONVERTER_INTERACTIVE_BINARY_STATE must be 0 or 1')
+    return value in ('1','true')
+
+
+def requested_encoding(request):
+    """BFF opt-in via X-Standin-State-Encoding. Absent keeps the v1 contract."""
+    value=request.headers.get('x-standin-state-encoding','').strip()
+    if value in ('',V1_ENCODING):return V1_ENCODING
+    if value!=V2_ENCODING:raise HTTPException(400,'UNSUPPORTED_STATE_ENCODING')
+    return V2_ENCODING if binary_state_enabled() else V1_ENCODING
+
+
 def register_interactive(app,registry,runner):
+    binary_state_enabled()  # fail startup on an invalid operator value
     if os.getenv('CONVERTER_INTERACTIVE_ENABLED','false').lower()!='true':return
     token=os.getenv('CONVERTER_INTERACTIVE_TOKEN','')
     root=os.getenv('CONVERTER_INTERACTIVE_ROOT','')
@@ -382,9 +414,13 @@ def register_interactive(app,registry,runner):
         except Exception:raise HTTPException(503,'INTERACTIVE_WORKER_FAILED')
     @app.post('/interactive/v1/solve')
     async def solve(request:Request):
-        authorized(request);payload=await body(request)
+        authorized(request);encoding=requested_encoding(request);payload=await body(request)
         from starlette.concurrency import run_in_threadpool
-        return await run_in_threadpool(measured,'solve_total',guarded,store.solve,payload)
+        from fastapi.responses import JSONResponse
+        args=(payload,) if encoding==V1_ENCODING else (payload,encoding)
+        result=await run_in_threadpool(measured,'solve_total',guarded,store.solve,*args)
+        actual=(result.get('packet') or {}).get('canonicalEncoding') if isinstance(result,dict) else None
+        return JSONResponse(result,headers={'X-Standin-State-Encoding':actual} if actual else None)
     @app.post('/interactive/v1/static/resolve')
     async def resolve_static(request:Request):
         authorized(request);payload=await body(request)
@@ -403,7 +439,9 @@ def register_interactive(app,registry,runner):
         authorized(request)
         kind=request.url.path.rsplit('/',1)[-1]
         raw=guarded(store.read,snapshot,request.headers.get('x-standin-owner',''),kind)
-        return Response(raw,media_type='application/vnd.standin.solved-pose-state-v1+json' if kind=='model' else 'application/octet-stream',headers={'Cache-Control':'private, no-store'})
+        media=('application/octet-stream' if kind!='model' else V2_MEDIA_TYPE if is_v2(raw)
+               else 'application/vnd.standin.solved-pose-state-v1+json')
+        return Response(raw,media_type=media,headers={'Cache-Control':'private, no-store'})
     @app.post('/interactive/v1/snapshots/{snapshot}/export')
     def export(snapshot:str,request:Request):
         authorized(request);return measured('export_total',guarded,store.export,snapshot,request.headers.get('x-standin-owner',''))
