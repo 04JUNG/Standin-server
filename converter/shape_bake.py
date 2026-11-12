@@ -5,7 +5,7 @@ are transported back to the source rig, where approved pose correctives run.
 Only the final, corrected fixed FBX is passed to PNG/GLB generation.
 """
 from __future__ import annotations
-import importlib.util,json,shutil,hashlib
+import importlib.util,json,shutil,hashlib,time
 from pathlib import Path
 from .shape_spec import validate_source
 
@@ -107,14 +107,26 @@ def convert_shaped(*, recipe, bvh_path, character_fbx, out_path, **options):
     from mathutils import Matrix
     from . import retarget as rt
     from .convert import convert
-    module=_load(recipe);mesh,rig=module.objects()
-    neutral=module.export_fixed(str(Path(out_path).parent/'neutral'))
-    manifest=json.loads((neutral/'manifest.json').read_text())
-    # Capture imported FBX rest frames, including FBX bone-axis conversion.
-    rt.reset_scene();arm,_=rt.import_character(str(neutral/'model.fbx'))
-    rest={b.name:arm.matrix_world@b.matrix_local for b in arm.data.bones}
+    from .prepared_body import restore
+    started=time.monotonic()
+    prepared,preparation_status=restore(recipe,Path(out_path).parent/'prepared-neutral')
+    if prepared:
+        neutral_fbx=prepared['path']
+        manifest={'fbx_sha256':prepared['fbx_sha256']}
+        rest={name:Matrix(matrix) for name,matrix in prepared['rest_frames'].items()}
+    else:
+        module=_load(recipe);mesh,rig=module.objects()
+        neutral=module.export_fixed(str(Path(out_path).parent/'neutral'))
+        manifest=json.loads((neutral/'manifest.json').read_text())
+        neutral_fbx=neutral/'model.fbx'
+        # Capture imported FBX rest frames, including FBX bone-axis conversion.
+        rt.reset_scene();arm,_=rt.import_character(str(neutral_fbx))
+        rest={b.name:arm.matrix_world@b.matrix_local for b in arm.data.bones}
+    preparation={'status':preparation_status,'seconds':time.monotonic()-started,
+                 'generation_skipped':prepared is not None,'rest_import_skipped':prepared is not None}
+    if prepared:preparation['key']=prepared['key']
     solver_output=Path(out_path).with_name('solver.fbx')
-    report=convert(bvh_path=bvh_path,character_fbx=str(neutral/'model.fbx'),out_path=str(solver_output),**options)
+    report=convert(bvh_path=bvh_path,character_fbx=str(neutral_fbx),out_path=str(solver_output),**options)
     if not report.ok:return report
     source_body = None
     if not options.get('force_exact_v324', False):
@@ -143,6 +155,7 @@ def convert_shaped(*, recipe, bvh_path, character_fbx, out_path, **options):
       'shape_sha256':recipe['shape_sha256'],'controls':recipe['values'],
       'pose_transfer_max_joint_error_mm':transfer_error*1000,
       'neutral_fbx_sha256':manifest['fbx_sha256'],'final_fbx_sha256':final['fbx_sha256'],
+      'neutral_preparation':preparation,
       'roundtrip_max_error_mm':final['roundtrip_max_error_mm'],
       'roundtrip_joint_error_mm':final['roundtrip_joint_error_mm'],
       'roundtrip_weight_error':final['roundtrip_weight_error'],

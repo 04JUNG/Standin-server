@@ -91,6 +91,7 @@ jobs:
             tests/converter/test_worker_contract.py \
             tests/converter/test_body_material.py \
             tests/converter/test_shape_bake_contract.py \
+            tests/converter/test_prepared_body.py \
             tests/converter/test_shape_inspection.py \
             tests/converter/test_shape_hand_integration.py \
             tests/converter/test_registry.py \
