@@ -112,6 +112,7 @@ COPY converter/framing.py /app/converter/framing.py
 COPY converter/final_preview_worker.py /app/converter/final_preview_worker.py
 COPY converter/final_artifact.py /app/converter/final_artifact.py
 COPY converter/outline_spec.py /app/converter/outline_spec.py
+COPY converter/appearance_models.v1.json /app/converter/appearance_models.v1.json
 COPY converter/outline_fbx.py /app/converter/outline_fbx.py
 COPY converter/outline_worker.py /app/converter/outline_worker.py
 COPY converter/outline_probe.py /app/converter/outline_probe.py
@@ -132,6 +133,7 @@ COPY converter/interactive_adapter.py /app/converter/interactive_adapter.py
 COPY converter/interactive_scene.py /app/converter/interactive_scene.py
 COPY converter/interactive_export.py /app/converter/interactive_export.py
 COPY converter/interactive_revision.py /app/converter/interactive_revision.py
+COPY converter/interactive_reuse.py /app/converter/interactive_reuse.py
 COPY converter/interactive_variants.py /app/converter/interactive_variants.py
 COPY converter/interactive_camera.py /app/converter/interactive_camera.py
 COPY converter/interactive_worker.py /app/converter/interactive_worker.py
@@ -144,6 +146,7 @@ COPY converter_api/app.py /app/converter_api/app.py
 COPY converter_api/final_preview.py /app/converter_api/final_preview.py
 COPY converter_api/outline.py /app/converter_api/outline.py
 COPY converter_api/skin.py /app/converter_api/skin.py
+COPY converter_api/appearance_cache.py /app/converter_api/appearance_cache.py
 COPY converter/skin_spec.py /app/converter/skin_spec.py
 COPY converter/skin_fbx.py /app/converter/skin_fbx.py
 COPY converter/skin_worker.py /app/converter/skin_worker.py

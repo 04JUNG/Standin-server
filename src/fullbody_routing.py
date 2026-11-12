@@ -611,9 +611,7 @@ def _build_fullbody_resources(entries, *, db_path):
         include_stored_compositions=include_stored,
         geometry_max_distance=float(os.getenv('ROUTING_GEOMETRY_MAX_DISTANCE', '1.0')),
         geometry_upper_max_distance=float(os.getenv('ROUTING_GEOMETRY_UPPER_MAX_DISTANCE', '1.5')))
-    from .hand_skin_screen import build_hand_skin_gate
-    engine.hand_skin_gate = build_hand_skin_gate(camera, paths['bvh'])
-    if generator is not None:
-        from .hand_spacing_repair import GeneratedHandSpacingRepair
-        engine.hand_spacing_repairer = GeneratedHandSpacingRepair(generator.repair_hand_spacing)
+    # Serving no longer performs hand quality screening, including stale ON envs.
+    engine.hand_skin_gate = None
+    engine.hand_spacing_repairer = None
     return pose, semantic, engine

@@ -23,7 +23,9 @@ def prepare(task):
     setenv(init, {'BODY_ASSETS_ROLE': 'converter', 'BODY_ASSETS_ROOT': '/app/body-staging',
                  'BODY_ASSETS_MANIFEST_KEY': RELEASE['prefix'] + '/manifest.json',
                  'BODY_ASSETS_MANIFEST_SHA256': RELEASE['manifestSha256']})
-    setenv(main, {'CONVERTER_CHARACTER_REGISTRY': '/app/body-staging/characters.json',
+    setenv(main, {'CONVERTER_SKIN_ENABLED': 'true', 'CONVERTER_OUTLINE_ENABLED': 'true',
+                 'CONVERTER_SKIN_ASSET_ROOT': '/app/body-staging/skin',
+                 'CONVERTER_CHARACTER_REGISTRY': '/app/body-staging/characters.json',
                  'CONVERTER_SHAPE_REGISTRY': '/app/body-staging/shape-bakes.json',
                  **{'BODY_' + cid.upper().replace('-', '_') + '_URI': '/app/body-staging/fbx/' + cid + '.fbx' for cid in RELEASE['characterIds']}})
     init['command'] = ['python', '-c', INITIALIZER]
