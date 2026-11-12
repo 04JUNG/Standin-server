@@ -175,6 +175,7 @@ def test_variants_require_registry_exact_receipt_and_binding(tmp_path):
 def test_late_revision_and_exception_never_publish_ready(tmp_path,monkeypatch):
     import converter.interactive_export as exporter
     state=SolvedPoseState.create(identity(),model())
+    bundle=tmp_path/'bundle';bundle.mkdir();(bundle/'staged.fbx').write_bytes(b'fixture-only')
     monkeypatch.setattr('converter.interactive_adapter.load_solved',lambda _: (state,None))
     def child(binary,args,checkpoint,timeout):
         directory=Path(args[args.index('--destination')+1])
@@ -188,11 +189,11 @@ def test_late_revision_and_exception_never_publish_ready(tmp_path,monkeypatch):
         count+=1
         if count==2:raise exporter.Superseded('late hand/refine change')
     with pytest.raises(exporter.Superseded):
-        exporter.export_bundle('binary','bundle',tmp_path/'stale',state.state_hash,checkpoint=checkpoint)
+        exporter.export_bundle('binary',bundle,tmp_path/'stale',state.state_hash,checkpoint=checkpoint)
     assert not (tmp_path/'stale/receipt.json').exists()
     def crash(*args):raise RuntimeError('export failed')
     monkeypatch.setattr(exporter,'_run_child',crash)
-    with pytest.raises(RuntimeError):exporter.export_bundle('binary','bundle',tmp_path/'failed',state.state_hash,checkpoint=lambda:None)
+    with pytest.raises(RuntimeError):exporter.export_bundle('binary',bundle,tmp_path/'failed',state.state_hash,checkpoint=lambda:None)
     assert not (tmp_path/'failed/receipt.json').exists()
 
 
@@ -258,3 +259,30 @@ def test_old_cancel_cannot_revoke_new_selection():
     with pytest.raises(Superseded):old()
     gate.cancel_revision(first['ownerBinding'],'p',2)
     with pytest.raises(Superseded):current()
+
+
+def test_existing_fbx_is_copied_and_only_independent_verifier_runs(tmp_path,monkeypatch):
+    import converter.interactive_export as exporter
+    state=SolvedPoseState.create(identity(),model())
+    bundle=tmp_path/'bundle';bundle.mkdir();data=b'verified-source-fixture'
+    (bundle/'staged.fbx').write_bytes(data)
+    monkeypatch.setattr('converter.interactive_adapter.load_solved',lambda _: (state,None))
+    stages=[]
+    def verify(binary,args,checkpoint,timeout):
+        stages.append(args[args.index('--stage')+1])
+        destination=Path(args[args.index('--destination')+1])
+        assert (destination/'artifact.fbx').read_bytes()==data
+        (destination/'verified.canonical.json').write_bytes(canonical({**receipt(state),
+            'revision':state.payload['identity']['selection']['revision'],
+            'artifactSha256':digest(data),'artifactBytes':len(data)}))
+    monkeypatch.setattr(exporter,'_run_child',verify)
+    result=exporter.export_bundle('binary',bundle,tmp_path/'result',state.state_hash,checkpoint=lambda:None)
+    assert stages==['verify']
+    assert result['verified'] and result['artifactSha256']==digest(data)
+    assert (tmp_path/'result/receipt.json').exists()
+    def corrupt(source,destination):Path(destination).write_bytes(b'changed')
+    monkeypatch.setattr(exporter.shutil,'copyfile',corrupt)
+    with pytest.raises(ValueError,match='immutable FBX copy changed'):
+        exporter.export_bundle('binary',bundle,tmp_path/'corrupt',state.state_hash,checkpoint=lambda:None)
+    assert not (tmp_path/'corrupt/receipt.json').exists()
+    assert stages==['verify']
