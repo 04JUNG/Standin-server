@@ -23,9 +23,17 @@ The benchmark copied an existing fixture and rebound only its solver runtime dig
 
 ## Verification
 
-- `tests/converter/test_interactive*.py`: 130 passed (including state suite: 36 passed).
+- `tests/converter/test_interactive*.py`: 133 passed (including state suite: 39 passed).
 - `tests/test_smoke.py`: 54/54 passed.
 - `python3 -m compileall -q src api scripts converter`: passed.
 - `git diff --check`: passed.
 
 The positive regression test requires the exact staged bytes and only the verify child; tampered copies cannot reach the verifier or publish a ready receipt. Existing stale revision, cancellation, child crash and integrity tests remain passing. Merge requires at least one review under `docs/COLLABORATION.md`; deployment remains a separate operation.
+
+## Handoff review and production follow-up
+
+Reviewed against fetched develop `45e42e9`; no merge conflicts or blocking code/safety findings. The final publication fence now has explicit tests where a verifier finishes successfully but the real latest-selection gate receives a newer hand revision, cancellation or restart before publication. In all three cases the private verification proof exists and no public `receipt.json` is written. Product code and the measured runtime remain unchanged from `5edd7a0`.
+
+At `5edd7a0`, GitHub CI, Converter CI and Scene worker CI all passed, including the pinned Linux Blender image and real-conversion job. Those jobs do not replace the exact local interactive-export benchmark above. Review approval was still pending at handoff; CI and this code review do not satisfy or bypass repository protection rules.
+
+After a separately authorized deployment, repeat the same production selection before/after and record preview preparation, export request-to-ready and actual transfer separately. Include repeated cold/warm runs, artifact byte count/SHA, verified receipt and correspondence errors, then exercise a changed hand/shape selection and cancellation during export to ensure stale files stay unavailable. Compare export p50/p95 and error rates; do not extrapolate the single local 38.9% result to production. No production measurements, deployment or infrastructure changes were performed in this review.

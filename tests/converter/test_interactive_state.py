@@ -217,6 +217,41 @@ def test_rapid_hands_late_refine_cancel_and_restart():
     with pytest.raises(Superseded):current()
 
 
+@pytest.mark.parametrize('invalidate', ['revision', 'cancel', 'restart'])
+def test_selection_changed_during_verification_never_publishes_ready(tmp_path, monkeypatch, invalidate):
+    import converter.interactive_export as exporter
+    from converter.interactive_revision import LatestRevisionGate
+    state = SolvedPoseState.create(identity(), model())
+    selection = state.payload['identity']
+    gate = LatestRevisionGate()
+    checkpoint = gate.select(selection)
+    bundle = tmp_path/'bundle'; bundle.mkdir()
+    data = b'fixture-only'
+    (bundle/'staged.fbx').write_bytes(data)
+    monkeypatch.setattr('converter.interactive_adapter.load_solved', lambda _: (state, None))
+
+    def verify(binary, args, checkpoint, timeout):
+        directory = Path(args[args.index('--destination')+1])
+        proof = {**receipt(state), 'revision': 1, 'artifactSha256': digest(data)}
+        (directory/'verified.canonical.json').write_bytes(canonical(proof))
+        if invalidate == 'revision':
+            changed = copy.deepcopy(selection)
+            changed['selection']['revision'] += 1
+            changed['hands']['left'] = 'fist'
+            gate.select(changed)
+        elif invalidate == 'cancel':
+            gate.cancel(selection['ownerBinding'], selection['selection']['person'])
+        else:
+            gate.restart()
+
+    monkeypatch.setattr(exporter, '_run_child', verify)
+    destination = tmp_path/'result'
+    with pytest.raises(exporter.Superseded):
+        exporter.export_bundle('binary', bundle, destination, state.state_hash, checkpoint=checkpoint)
+    assert (destination/'verified.canonical.json').exists()
+    assert not (destination/'receipt.json').exists()
+
+
 def test_snapshot_hash_tamper_and_state_swap_rejected_on_restart(tmp_path):
     from converter.interactive_adapter import load_solved
     state=SolvedPoseState.create(identity(),model())
