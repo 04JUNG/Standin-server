@@ -22,7 +22,7 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from converter.prepared_body import identity, body_key, preset_values, read_prepared, MAX_RECEIPT_BYTES  # noqa: E402
+from converter.prepared_body import identity, body_key, preset_values, read_prepared, MAX_RECEIPT_BYTES, _read  # noqa: E402
 from converter.shape_spec import load_registry  # noqa: E402
 
 
@@ -31,15 +31,39 @@ def write(path, value):
     path.write_text(json.dumps(value, sort_keys=True, indent=2) + '\n')
 
 
-def bake(recipe, output):
+def require_runtime():
     import bpy
     from converter.protocol import EXPECTED_BLENDER_VERSION, EXPECTED_BLENDER_BUILD_HASH
-    from converter.shape_bake import _load, import_full_character
-    from converter.final_artifact import validate
-    from converter import retarget as rt
     if (bpy.app.version_string.split()[0] != EXPECTED_BLENDER_VERSION
             or bpy.app.build_hash.decode() != EXPECTED_BLENDER_BUILD_HASH):
         raise ValueError('prepared bodies require the pinned Blender runtime')
+    return bpy
+
+
+def reuse_existing(recipe, entry, output):
+    """Preserve an already approved prototype byte-for-byte, only on this runtime."""
+    started = time.monotonic()
+    prototype = read_prepared(recipe, entry)  # exact code/build/platform + every hash
+    raw = _read(entry['path'], MAX_RECEIPT_BYTES)
+    if hashlib.sha256(raw).hexdigest() != entry['sha256']:
+        raise ValueError('prepared receipt changed during reuse')
+    key = prototype['key']; output = Path(output)
+    receipt = output/'qa'/f'prepared-{key}.json'
+    if receipt.exists():
+        raise ValueError('duplicate prepared identity; output must be fresh')
+    for path, data in [(output/'fbx'/f'prepared-{key}.fbx', prototype['data']), (receipt, raw)]:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
+    return dict(path=str(receipt), sha256=entry['sha256'], key=key,
+                fbx_bytes=len(prototype['data']), generation_seconds=0.,
+                reused_existing=True, reuse_seconds=time.monotonic()-started)
+
+
+def bake(recipe, output):
+    bpy = require_runtime()
+    from converter.shape_bake import _load, import_full_character
+    from converter.final_artifact import validate
+    from converter import retarget as rt
     expected = identity(recipe)
     if expected is None:
         raise ValueError('only registered preset defaults may be prepared')
@@ -79,6 +103,7 @@ def bake(recipe, output):
 
 
 def run_worker(job):
+    require_runtime()  # reusing old files must not bypass the actual Blender pin
     output = Path(job['out'])
     registry = job['registry']
     entries, results, completed = {}, [], {}
@@ -91,7 +116,15 @@ def run_worker(job):
             if key in completed:
                 result = {**completed[key], 'generation_seconds': 0., 'alias_reused': True}
             else:
-                result = bake(recipe, output)
+                previous = registry.get('prepared_neutrals', {}).get('entries', {}).get(character_id)
+                result = None
+                if previous is not None:
+                    try:
+                        result = reuse_existing(recipe, previous, output)
+                    except (OSError, ValueError, TypeError, KeyError):
+                        pass  # stale/corrupt optimization input uses the approved generator
+                if result is None:
+                    result = bake(recipe, output)
                 completed[key] = result
             entries[character_id] = {k: result[k] for k in ('path', 'sha256')}
             results.append({'character': character_id, 'ok': True, **result})
@@ -145,6 +178,8 @@ def main(argv=None):
     selection = ap.add_mutually_exclusive_group()
     selection.add_argument('--character', action='append', default=[])
     selection.add_argument('--rules', action='append', default=[], help='prepare only these approved body versions')
+    selection.add_argument('--catalog', help='approved body-models.json; select exposed default/preset entries')
+    ap.add_argument('--catalog-sha256', help='required approval pin with --catalog')
     ap.add_argument('--blender', default=os.getenv('BLENDER_BINARY', 'blender'))
     ap.add_argument('--worker')
     args = ap.parse_args(argv)
@@ -154,9 +189,13 @@ def main(argv=None):
     if not args.registry or not args.out:
         ap.error('--registry and --out are required')
     registry = load_registry(Path(args.registry).resolve())
-    if not args.character and not args.rules:
+    if not args.character and not args.rules and not args.catalog:
         ap.error('explicit --character or --rules selection is required; historical bodies are not prepared automatically')
     characters = args.character or [cid for cid, recipe in registry['characters'].items() if recipe['rules'] in args.rules]
+    if args.catalog:
+        from scripts.prepared_preset_scope import pinned_catalog, select
+        characters = select(pinned_catalog(args.catalog, args.catalog_sha256), registry,
+                            {'male': 9, 'female': 11})
     if not characters or len(characters) != len(set(characters)) or set(characters) - set(registry['characters']):
         ap.error('choose distinct registered characters')
     output = Path(args.out).resolve()

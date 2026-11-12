@@ -59,6 +59,8 @@ def main(argv=None):
     ap.add_argument('--registry')
     ap.add_argument('--characters-root')
     ap.add_argument('--character', action='append', default=[])
+    ap.add_argument('--catalog')
+    ap.add_argument('--catalog-sha256')
     ap.add_argument('--bvh', action='append', default=[])
     ap.add_argument('--out')
     ap.add_argument('--blender', default=os.getenv('BLENDER_BINARY', 'blender'))
@@ -67,13 +69,19 @@ def main(argv=None):
     if args.compare:
         compare(json.loads(Path(args.compare).read_text()))
         return
-    if not all([args.registry, args.characters_root, args.character, args.bvh, args.out]):
+    if not all([args.registry, args.characters_root, args.character or args.catalog, args.bvh, args.out]):
         ap.error('registry, characters-root, character, bvh and out are required')
     os.environ['CONVERTER_SHAPE_REGISTRY'] = str(Path(args.registry).resolve())
     os.environ['CONVERTER_FINAL_CACHE_ENABLED'] = '0'
     from converter.shape_spec import load_registry, resolve_shape
     from converter_api.runner import BlenderRunner, RunnerSettings
     registry = load_registry()
+    if args.catalog:
+        if args.character:
+            ap.error('choose --catalog or --character')
+        from scripts.prepared_preset_scope import pinned_catalog, select
+        args.character = select(pinned_catalog(args.catalog, args.catalog_sha256), registry,
+                                {'male': 9, 'female': 11})
     output = Path(args.out).resolve()
     output.mkdir(parents=True, exist_ok=False)
     rows = []

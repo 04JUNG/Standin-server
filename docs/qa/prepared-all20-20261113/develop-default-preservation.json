@@ -1,0 +1,39 @@
+{
+  "localRegressionOnly": true,
+  "notAnUploadedSourceRelease": true,
+  "defaultReuse": [
+    {
+      "character": "male-base-v0-8-0",
+      "fbx_bytes": 9063420,
+      "generation_seconds": 0.0,
+      "key": "c2e12f360659969f5149acb1bd92129ecd0bc67cfa8d9ea7ba9afe44c16bfdc8",
+      "ok": true,
+      "path": "/output/develop-preservation-proof/reused-defaults/qa/prepared-c2e12f360659969f5149acb1bd92129ecd0bc67cfa8d9ea7ba9afe44c16bfdc8.json",
+      "reuse_seconds": 0.34132683300049393,
+      "reused_existing": true,
+      "sha256": "c3e7356fe4710704b393d0f393d9a8e13290655f74f0dc17a34688106568db10"
+    },
+    {
+      "character": "female-base-v0-4-0",
+      "fbx_bytes": 6706748,
+      "generation_seconds": 0.0,
+      "key": "c9dbb6a3c11c137ac0eaf22994e6fcb752d7859b76c8a2b7835fe98a0cc6e03d",
+      "ok": true,
+      "path": "/output/develop-preservation-proof/reused-defaults/qa/prepared-c9dbb6a3c11c137ac0eaf22994e6fcb752d7859b76c8a2b7835fe98a0cc6e03d.json",
+      "reuse_seconds": 0.2407090420001623,
+      "reused_existing": true,
+      "sha256": "4e210dd3b65ef16d9552781032c70f9f5957916ff724acf9e467ae6310876017"
+    }
+  ],
+  "sourceFiles": 197,
+  "targetFiles": 233,
+  "preservedObjects": 196,
+  "addedPreparedObjects": 36,
+  "registryChangedOnly": true,
+  "prototypeAndOtherFilesByteIdenticalToPoseQa": true,
+  "logicalRegistryIdenticalToPoseQa": true,
+  "poseQaManifestSha256": "1a4625142f7a3d1f39cca10964259bf822f1f3ec11bd53c174f8e3a2ce04971d",
+  "proofManifestSha256": "c314e91738f5e3e2ba2fe4dee4e9416fd9f3fa89c7ab92009f11fdbfd2a55c60",
+  "totalBytes": 910022778,
+  "defaultsManifestSha256": "e02384fe3ecaa6adc295ad81da54b33b03744b78635aef552bb4ce0a14ae98b4"
+}
