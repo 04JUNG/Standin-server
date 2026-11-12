@@ -122,6 +122,7 @@ jobs:
             tests/converter/test_interactive_transport.py \
             tests/converter/test_outline_contract.py \
             tests/converter/test_skin_contract.py \
+            tests/converter/test_skin_asset_cache.py \
             tests/converter/test_staging_appearance.py
 
   inference-isolation:

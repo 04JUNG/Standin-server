@@ -146,6 +146,7 @@ COPY converter_api/app.py /app/converter_api/app.py
 COPY converter_api/final_preview.py /app/converter_api/final_preview.py
 COPY converter_api/outline.py /app/converter_api/outline.py
 COPY converter_api/skin.py /app/converter_api/skin.py
+COPY converter_api/skin_asset_cache.py /app/converter_api/skin_asset_cache.py
 COPY converter_api/appearance_cache.py /app/converter_api/appearance_cache.py
 COPY converter/skin_spec.py /app/converter/skin_spec.py
 COPY converter/skin_fbx.py /app/converter/skin_fbx.py
