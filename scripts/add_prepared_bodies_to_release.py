@@ -25,7 +25,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from scripts.prepare_preset_bodies import stage_prepared  # noqa: E402
-from scripts.staging_body_assets_init import check_budget, validate_files, PREPARED_PROFILE  # noqa: E402
+from scripts.staging_body_assets_init import check_budget, validate_files, PREPARED_PROFILE, RELEASE_CAP  # noqa: E402
 from scripts.prepared_preset_scope import select, pinned_catalog  # noqa: E402
 from converter.prepared_body import MAX_RECEIPT_BYTES  # noqa: E402
 
@@ -40,6 +40,17 @@ def dump(value):
     return (json.dumps(value, indent=2) + '\n').encode()
 
 
+def initializer_budget(files, profile, *, legacy_errors=False):
+    try:
+        validate_files(files)
+        return check_budget(files, profile)
+    except ValueError as error:
+        # Preserve the original small-release helper's CLI error contract.
+        if legacy_errors:
+            raise SystemExit(f'body initializer would refuse release: {error}') from None
+        raise
+
+
 def build(release, prepared, version, out, *, catalog=None, budget_profile=None, release_sha256=None):
     release, prepared, out = Path(release), Path(prepared), Path(out)
     manifest_raw = (release/'manifest.json').read_bytes()
@@ -48,13 +59,14 @@ def build(release, prepared, version, out, *, catalog=None, budget_profile=None,
     manifest = json.loads(manifest_raw)
     if manifest.get('schema') != 'body-assets.v1':
         raise SystemExit('not a body-assets.v1 manifest')
-    validate_files(manifest['files'])
-    check_budget(manifest['files'], manifest.get('budgetProfile'))
+    initializer_budget(manifest['files'], manifest.get('budgetProfile'), legacy_errors=budget_profile is None)
     files = {f['path']: f for f in manifest['files']}
     registry_raw = (release/'shape-bakes.json').read_bytes()
     if sha(registry_raw) != files['shape-bakes.json']['sha256']:
         raise SystemExit('local shape-bakes.json is not the pinned release copy')
     registry = json.loads(registry_raw)
+    if budget_profile is None and 'prepared_neutrals' in registry:
+        raise SystemExit('release already has prepared neutrals; use the explicit extension profile')
     original_registry = copy.deepcopy(registry)
     prepared_index = json.loads((prepared/'shape-bakes.local.json').read_text())['prepared_neutrals']['entries']
     if budget_profile == PREPARED_PROFILE:
@@ -94,9 +106,8 @@ def build(release, prepared, version, out, *, catalog=None, budget_profile=None,
             data = path.read_bytes()
             files[name] = {'path': name, 'roles': ['converter'], 'size': len(data), 'sha256': sha(data)}
             added.append(name)
-    validate_files(list(files.values()))
     total = sum(f['size'] for f in files.values())
-    cap = check_budget(list(files.values()), budget_profile)
+    cap = initializer_budget(list(files.values()), budget_profile, legacy_errors=budget_profile is None)
     new_manifest = {'schema': 'body-assets.v1', 'version': version,
                     'files': [files[name] for name in sorted(files)]}
     if budget_profile:
@@ -118,7 +129,7 @@ def build(release, prepared, version, out, *, catalog=None, budget_profile=None,
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--release', required=True)
-    ap.add_argument('--release-sha256', required=True)
+    ap.add_argument('--release-sha256', help='required approval pin with --budget-profile')
     ap.add_argument('--prepared', required=True)
     ap.add_argument('--version', required=True)
     ap.add_argument('--out', required=True)
@@ -126,6 +137,8 @@ def main():
     ap.add_argument('--catalog-sha256')
     ap.add_argument('--budget-profile', choices=[PREPARED_PROFILE])
     args = ap.parse_args()
+    if args.budget_profile and not args.release_sha256:
+        ap.error('--release-sha256 is required with --budget-profile')
     if not re.fullmatch(r'[a-z0-9][a-z0-9.-]*', args.version):
         raise SystemExit('invalid version')
     catalog = pinned_catalog(args.catalog, args.catalog_sha256) if args.catalog else None
