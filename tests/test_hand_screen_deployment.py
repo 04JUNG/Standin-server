@@ -24,9 +24,11 @@ def task():
 
 @pytest.mark.parametrize('container', ['inference', 'converter'])
 @pytest.mark.parametrize('value', [None, ''])
-def test_empty_override_is_exact_noop(container, value):
+def test_empty_override_retires_selection_screen(container, value):
     original = task()
-    assert deploy.prepare(original, container, value) == original
+    result = deploy.prepare(original, container, value)
+    target = next(c for c in result['containerDefinitions'] if c['name'] == container)
+    assert {r['name']:r['value'] for r in target['environment']}[deploy.SELECTION_SETTINGS[container]] == '0'
 
 
 @pytest.mark.parametrize('container', ['inference', 'converter'])
@@ -40,15 +42,16 @@ def test_only_selected_capacity_changes(container, value):
     name = deploy.SETTINGS[container]
     target['environment'] = [r for r in target['environment'] if r['name'] != name]
     target['environment'].append({'name': name, 'value': value})
+    target['environment'].append({'name': deploy.SELECTION_SETTINGS[container], 'value': '0'})
     assert original == before and after == expected
 
 
 @pytest.mark.parametrize('container', ['inference', 'converter'])
-def test_selection_screen_can_be_rolled_out_independently(container):
+def test_old_selection_screen_on_override_is_retired(container):
     original = task()
     expected = deepcopy(original)
     target = next(c for c in expected['containerDefinitions'] if c['name'] == container)
-    target['environment'].append({'name': deploy.SELECTION_SETTINGS[container], 'value': '1'})
+    target['environment'].append({'name': deploy.SELECTION_SETTINGS[container], 'value': '0'})
     assert deploy.prepare(original, container, None, '1') == expected
     with pytest.raises(ValueError):
         deploy.prepare(original, container, None, 'true')

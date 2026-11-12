@@ -201,7 +201,7 @@ class SolvedPoseState:
         if set(payload) != {'schema', 'identity', 'model', 'safety', 'dependencies'} or payload['schema'] != STATE_SCHEMA:
             raise ValueError('invalid solved state envelope')
         validate_identity(payload['identity']); validate_model(payload['model'])
-        if payload['safety'] != {'bodyAccepted': True, 'handChecksPassed': True,
+        if type(payload['safety'].get('handChecksPassed')) is not bool or payload['safety'] != {'bodyAccepted': True, 'handChecksPassed': payload['safety']['handChecksPassed'],
                                  'surface': 'existing-adapter-checks-only', 'finalFileVerified': False}:
             raise ValueError('state must not certify final export or full collision safety')
         if payload['dependencies'] != {'initialFbxRequired': True, 'boundary': 'post-frozen-body-pre-final-export-v1'}:
@@ -216,7 +216,7 @@ class SolvedPoseState:
     @classmethod
     def create(cls, identity, model):
         return cls(canonical({'schema': STATE_SCHEMA, 'identity': identity, 'model': model,
-            'safety': {'bodyAccepted': True, 'handChecksPassed': True,
+            'safety': {'bodyAccepted': True, 'handChecksPassed': False,
                        'surface': 'existing-adapter-checks-only', 'finalFileVerified': False},
             'dependencies': {'initialFbxRequired': True, 'boundary': 'post-frozen-body-pre-final-export-v1'}}))
 

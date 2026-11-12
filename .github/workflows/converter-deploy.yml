@@ -88,6 +88,7 @@ jobs:
             tests/test_hand_screen_deployment.py \
             tests/test_staging_anatomy_deployment.py \
             tests/converter/test_staging_appearance.py \
+            tests/converter/test_interactive_reuse.py \
             tests/converter/test_skin_contract.py \
             tests/converter/test_outline_contract.py \
             tests/converter/test_worker_contract.py \

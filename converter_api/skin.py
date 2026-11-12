@@ -11,7 +11,13 @@ from converter_api.work_queue import current_work
 SHA=re.compile(r'^[0-9a-f]{64}$')
 
 
-def prepare(runner,data,job,*,checkpoint):
+def prepare(runner, data, job, *, checkpoint):
+    from converter_api.appearance_cache import verified_appearance
+    return verified_appearance('skin', data, job, runtime_revision(),
+        lambda: _prepare_uncached(runner, data, job, checkpoint=checkpoint), checkpoint)
+
+
+def _prepare_uncached(runner,data,job,*,checkpoint):
     runner.inspect_blender()
     with runner._process_slots,tempfile.TemporaryDirectory(prefix='standin-skin-',dir=runner.settings.temp_root) as tmp:
         root=Path(tmp);(root/'source.fbx').write_bytes(data);job_bytes=json.dumps(job,sort_keys=True,allow_nan=False).encode();(root/'job.json').write_bytes(job_bytes)
