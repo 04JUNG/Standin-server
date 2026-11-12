@@ -1,0 +1,50 @@
+{
+  "states": [
+    {
+      "branch": "develop",
+      "neutralSourceBaseCommit": "e9de78d6c7bd99ed3e918a98046e0783d3ae144d",
+      "currentQaCommit": "624cd7b7f588a715c00d9bb8c25404fb1c69bce3",
+      "neutralImplementationSha256": "2b2595e06ba460b840059be52e2b0f6f63b21c855f25b33b29061b30a9c4996d",
+      "files": {
+        "converter/prepared_body.py": "5f65775a79503eb5219aa9705e1ea4ad7ba6fec00a97ee0ac970a8717e36ae8b",
+        "converter/shape_bake.py": "d9aa5229f880c75eee95a9b813b6795b86716ab981a18f9283fd9462ce47afd6",
+        "converter/shape_spec.py": "c1fccfddc073b23a13120561d205becc261255d9bc080eb5767545fdbc7a0255",
+        "converter/retarget.py": "96831e315a99ace3cf7121dd315c49e8dbe2f4e98beed6d2633abb57e1d0b6cd",
+        "converter/bone_map.py": "50fafaafe4350da4b8916a8cdace028ab5fd91f45dd49fa7afb6b2337e642af7",
+        "converter/final_artifact.py": "d723dd59f959e3c8735261175cb8666d9a5d34a46bdc8a9d9291dfe4937d675b"
+      }
+    },
+    {
+      "branch": "main",
+      "neutralSourceBaseCommit": "fa59197989e73135182246b1ccd4e1a308d687e1",
+      "currentQaCommit": "13480e85068adcf69e9a9d3766722e38abb676f5",
+      "neutralImplementationSha256": "143fac771bd45decc8bfbb973c13ba9830a53d9d32e207212815c92beee8937d",
+      "files": {
+        "converter/prepared_body.py": "5f65775a79503eb5219aa9705e1ea4ad7ba6fec00a97ee0ac970a8717e36ae8b",
+        "converter/shape_bake.py": "d599d80a7df8853e844abfc0fb617f735fa1e0a18948960862e2948908160c54",
+        "converter/shape_spec.py": "c1fccfddc073b23a13120561d205becc261255d9bc080eb5767545fdbc7a0255",
+        "converter/retarget.py": "96831e315a99ace3cf7121dd315c49e8dbe2f4e98beed6d2633abb57e1d0b6cd",
+        "converter/bone_map.py": "50fafaafe4350da4b8916a8cdace028ab5fd91f45dd49fa7afb6b2337e642af7",
+        "converter/final_artifact.py": "d723dd59f959e3c8735261175cb8666d9a5d34a46bdc8a9d9291dfe4937d675b"
+      }
+    },
+    {
+      "branch": "integration",
+      "neutralSourceBaseCommit": "f31558c305c8bb4c1687ab8fe4e15f001ca26f24",
+      "currentQaCommit": "e2cda8ef4e3fe3e0d2f72cf468dd01484fb3a174",
+      "neutralImplementationSha256": "143fac771bd45decc8bfbb973c13ba9830a53d9d32e207212815c92beee8937d",
+      "files": {
+        "converter/prepared_body.py": "5f65775a79503eb5219aa9705e1ea4ad7ba6fec00a97ee0ac970a8717e36ae8b",
+        "converter/shape_bake.py": "d599d80a7df8853e844abfc0fb617f735fa1e0a18948960862e2948908160c54",
+        "converter/shape_spec.py": "c1fccfddc073b23a13120561d205becc261255d9bc080eb5767545fdbc7a0255",
+        "converter/retarget.py": "96831e315a99ace3cf7121dd315c49e8dbe2f4e98beed6d2633abb57e1d0b6cd",
+        "converter/bone_map.py": "50fafaafe4350da4b8916a8cdace028ab5fd91f45dd49fa7afb6b2337e642af7",
+        "converter/final_artifact.py": "d723dd59f959e3c8735261175cb8666d9a5d34a46bdc8a9d9291dfe4937d675b"
+      }
+    }
+  ],
+  "mainCapacity234ChangesNeutralIdentity": false,
+  "separateSceneTransferExperimentIncluded": false,
+  "commonDevelopSynchronizationIncluded": false,
+  "policy": "Use the exact runtime identity. After any bound-code/build/asset/default change, rebuild or verify an exactly matching approved Linux bundle. Never edit keys/receipts to bypass mismatch."
+}
