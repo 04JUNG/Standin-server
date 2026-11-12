@@ -152,3 +152,5 @@ the existing parent budget. No process-crash availability improvement is claimed
 남녀 OFF/ON의 flesh-guide와 기존 native outline width2를 순차 적용한 4개 조합도 기존 독립 skin/outline verifier를 모두 통과했다. UV·이미지·typed FBX 값 보존·skin binding·outline displacement 검사를 생략하지 않았다. 실제 CSP UI 재검수 및 Linux 실모델 성능 측정은 수행하지 않았다.
 
 정량/원본 해시/한계: [evidence.json](qa/body-scene-transfer-20261113/evidence.json). 실제 FBX/Blend/보고서는 JSON의 raw_artifact_roots 아래 로컬에 보존하며 Git에 넣지 않았다.
+
+최종 검증: host 933 passed / 기존 optional skip1, smoke54/54, compileall·diff-check 통과. 최신 #235 c54ea9724와 merge-tree clean이며 가상 통합 트리의 Converter + prepared release 계약은 956 passed / skip1이다. #172의 기존 충돌 파일8개는 선행 #237 기준과 동일하고 실험이 추가한 충돌 파일은0이다. #235의 소유 스크립트/번들을 수정하지 않았다. #237 최종 head의 추가 변경은 문서뿐이며 재배치 후 모든 측정 실행 코드/프로브 SHA가 동일함을 확인했다.

@@ -1960,7 +1960,12 @@
     "converter_api/body_preview.py": "078fdac5fc450e8a8871766b9725a7a871085482b44b153c8e36855b8658e620",
     "converter_api/interactive.py": "9834a1e857d52020a3f0adeef20f66571b4176b21f83960946485a088bcbe29f",
     "scripts/benchmark_body_scene_native.py": "b40044008844c92fa825c9add1a4cfd86ac24d014ec242060bae532d2e7f7014",
-    "tests/converter/body_scene_transfer_probe.py": "f84997a002a1d9bdb7d0083318a85a273ce9adf70d068ba0626dd3c0a1e275b3"
+    "tests/converter/body_scene_transfer_probe.py": "f84997a002a1d9bdb7d0083318a85a273ce9adf70d068ba0626dd3c0a1e275b3",
+    "Dockerfile.converter": "fa25f3802dd8768df9832715e38921ef95520a79214ac68635eec8573700bafd",
+    "converter/interactive_scene.py": "3571623526e84b7911e74d62510fd19b25b54228b2f2aada88e527f92ea491b0",
+    "converter/lab_timing.py": "8bd59e8039d6f0a15dc222914f423808d75384f2f41ffd75a17402fef8ea4ea9",
+    "converter/first_entry_profile.py": "62aa85f9ab8786ff769799aed463af5b35091f7acaac3bc9e2f0900dadbbb4f9",
+    "converter_api/runner.py": "9c9f7e64f39f3efa2ee42a2e2a4d11c257c77638994a3348e39ef65545024aa8"
   },
   "limitations": [
     "One fresh pair per primary condition; no statistical latency or memory improvement claim.",
@@ -2003,5 +2008,50 @@
       "blend_sha256": "5a62d2f3fb49d77fdc04d1c78a361edf9fbab55e71e0e47d3b6b393fae14d3a9",
       "controller_sha256": "1164dff9a4c6069d0da37b80dd26c61544bc6f9eb9c9f3469c33d457e893e9af"
     }
-  }
+  },
+  "integration": {
+    "pr237_head": "5e6a63fdecf8a6d1ed8dc88fd19203e510ab8ba1",
+    "pr235_head": "c54ea97244be13cd47ccd292b05ae15a29cf89b7",
+    "pr235_merge_tree": "e1776aa3efa85089e675bb572c11352cac898c90",
+    "pr235_merge_clean": true,
+    "integrated_contracts_passed": 956,
+    "integrated_contracts_skipped": 1,
+    "pr172": {
+      "prerequisite": {
+        "returncode": 1,
+        "conflicts": [
+          ".env.example",
+          ".github/workflows/converter-ci.yml",
+          "Dockerfile.converter",
+          "converter/outline_spec.py",
+          "converter_api/app.py",
+          "converter_api/outline.py",
+          "tests/converter/test_body_preview_contract.py",
+          "tests/converter/test_outline_contract.py"
+        ]
+      },
+      "experiment": {
+        "returncode": 1,
+        "conflicts": [
+          ".env.example",
+          ".github/workflows/converter-ci.yml",
+          "Dockerfile.converter",
+          "converter/outline_spec.py",
+          "converter_api/app.py",
+          "converter_api/outline.py",
+          "tests/converter/test_body_preview_contract.py",
+          "tests/converter/test_outline_contract.py"
+        ]
+      },
+      "added_conflict_files": []
+    },
+    "measured_source_hashes_unchanged_after_documentation_rebase": true
+  },
+  "exploratory_raw_artifact_roots": [
+    "/private/tmp/standin-scene-transfer-20261113-native",
+    "/private/tmp/standin-scene-transfer-20261113-matrix-v1",
+    "/private/tmp/standin-scene-transfer-20261113-probe",
+    "/private/tmp/standin-scene-transfer-20261113-rig-probe",
+    "/private/tmp/standin-scene-transfer-20261113-binding-probe"
+  ]
 }
