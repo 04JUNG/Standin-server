@@ -34,6 +34,10 @@ def build_table(states_and_receipts, *, registered_character_sha256):
         raise ValueError('variant count exceeds atlas bounds')
     library = load_library(); variants = {}; binding = None
     for state, receipt in pairs:
+        if state.is_binary:
+            # The v1 atlas embeds each full typed-JSON state; binary states are
+            # never transcoded into it. Clients keep the authoritative model.
+            raise ValueError('hand variant atlas requires typed JSON states')
         payload = state.payload; identity = payload['identity']
         if identity['body']['characterSha256'] not in registered_character_sha256:
             raise ValueError('character is not approved for local variant preparation')

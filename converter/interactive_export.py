@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from converter.solved_state import RECEIPT_SCHEMA, canonical, digest
+from converter.solved_state import RECEIPT_SCHEMA, canonical, digest, model_digest
 
 
 class Superseded(RuntimeError):
@@ -129,7 +129,8 @@ def child(stage, bundle, destination, expected_state_hash):
             revision=identity['selection']['revision'], operation=identity['selection']['operation'],
             identity=identity, verified=True, artifactSha256=artifact_sha,
             artifactBytes=artifact.stat().st_size, runtimeRevision=runtime_revision(),
-            packetModelSha256=digest(canonical(model)), reimportModelSha256=digest(canonical(actual)),
+            # Both digests use the state's own canonical encoding (v1 typed JSON or v2 binary).
+            packetModelSha256=state.model_sha256, reimportModelSha256=model_digest(actual, state.encoding),
             skin=skin, correspondence=dict(topology=True, jointIdentity=True, skinIdentity=True,
                 **errors, positionToleranceM=POSITION_TOLERANCE_M,
                 matrixTolerance=MATRIX_TOLERANCE, weightTolerance=WEIGHT_TOLERANCE),
