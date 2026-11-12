@@ -1,7 +1,7 @@
 """Ordered, bounded screening with request/session-local state only.
 
-Receipts certify opposite-hand skin triangles, never export permission. No
-receipt, BVH, candidate or ownership cache is shared across sessions/users.
+Receipts certify opposite-hand skin triangles, never export permission.
+Completed live receipts can be reused by sessions in the same request.
 """
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
@@ -14,6 +14,7 @@ from time import monotonic
 
 from converter.hand_contact import validate_screen
 from .hand_skin_screen import SkinSession, unknown
+from .hand_skin_capacity import validate_concurrency
 
 
 # Cancellation is bound by ASGI lifetime, never by a client-provided request ID.
@@ -29,8 +30,9 @@ class Outcome:
 
 
 class ScreenSlots:
-    """Two calls per gate; optional work always leaves one safety slot free."""
-    def __init__(self):
+    """Bound all sessions of one gate; optional work only starts on an idle gate."""
+    def __init__(self, capacity=2):
+        self.capacity = validate_concurrency(capacity)
         self.condition = threading.Condition()
         self.active = 0
         self.waiting = 0
@@ -44,7 +46,7 @@ class ScreenSlots:
             else:
                 self.waiting += 1
                 try:
-                    while self.active >= 2:
+                    while self.active >= self.capacity:
                         remaining = deadline-monotonic()
                         if remaining <= 0:
                             return False
@@ -139,8 +141,7 @@ class ParallelSkinSession(SkinSession):
         if receipt['status'] == 'unavailable':
             self.failed = True
         else:
-            # Only determinate receipts in this session; never cross-request.
-            self.cache[hashlib.sha256(text.encode('utf-8')).hexdigest()] = deepcopy(receipt)
+            self.remember_receipt(hashlib.sha256(text.encode('utf-8')).hexdigest(), receipt)
         timing = receipt.get('availability') or {}
         event = dict(check=check_number, status=receipt['status'], reason=receipt.get('reason'),
             elapsed_ms=round(outcome.elapsed*1000, 3), call_budget_ms=round(outcome.budget*1000, 3),
@@ -156,8 +157,8 @@ class ParallelSkinSession(SkinSession):
         if stop:
             return stop
         key = hashlib.sha256(text.encode('utf-8')).hexdigest()
-        if key in self.cache:
-            return deepcopy(self.cache[key])
+        if (receipt := self.cached_receipt(key)) is not None:
+            return receipt
         if self.checks >= self.gate.max_checks:
             return unknown('hand_screen_check_limit_exhausted')
         budget = min(CALL_SECONDS, self.remaining())
@@ -181,17 +182,24 @@ class ParallelSkinSession(SkinSession):
             target.append(item)
 
     def filter(self, candidates, *, generated=False, limit=5):
+        if self.gate.catalog is not None and not generated:
+            # Static certificates are cheap and commit strictly in order. This
+            # keeps mixed hit/miss/failure semantics identical to serial. A
+            # certificate miss uses live checks in order; generated work still
+            # uses the unchanged bounded parallel path below.
+            result = SkinSession.filter(self, candidates, generated=False, limit=limit)
+            return [] if self.cancelled.is_set() else result
         accepted = []
         pending = iter(candidates)
         finished = False
-        with ThreadPoolExecutor(max_workers=2, thread_name_prefix='hand-skin') as pool:
+        with ThreadPoolExecutor(max_workers=self.gate.concurrency, thread_name_prefix='hand-skin') as pool:
             while not finished and len(accepted) < limit:
                 remaining = self.remaining()
-                width = min(2, limit-len(accepted))
-                # Preserve a full timeout for both speculative reservations;
-                # near the session limit, fall back to one check at a time.
-                if remaining < width*CALL_SECONDS:
-                    width = 1
+                # Never buy more concurrency by shortening a mandatory call or
+                # increasing the session's aggregate work allowance. With the
+                # default 45s budget, at most three full 15s reservations fit.
+                width = min(self.gate.concurrency, limit-len(accepted),
+                            max(1, int(remaining // CALL_SECONDS)))
                 wave, futures = [], {}
                 wall_started = monotonic()
                 for _ in range(width):
@@ -208,8 +216,8 @@ class ParallelSkinSession(SkinSession):
                     except Exception:
                         receipt = unknown('hand_screen_bvh_unavailable_or_changed')
                     key = hashlib.sha256(text.encode('utf-8')).hexdigest() if text else None
-                    if receipt is None and key in self.cache:
-                        receipt = deepcopy(self.cache[key])
+                    if receipt is None:
+                        receipt = self.cached_receipt(key)
                     if receipt is None and key not in futures:
                         if self.checks >= self.gate.max_checks:
                             receipt = unknown('hand_screen_check_limit_exhausted')

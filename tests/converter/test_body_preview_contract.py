@@ -94,10 +94,19 @@ def test_runtime_contract_imports_from_exact_docker_copy_allowlist(tmp_path):
             dst.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(src, dst)
     process = subprocess.run([sys.executable, '-c',
-        'import json; import converter_api.app; from converter_api.body_preview import preview_contract; print(json.dumps(preview_contract()))'],
+        'import json; from fastapi.testclient import TestClient; from converter_api.app import app; '
+        'from converter_api.body_preview import preview_contract; '
+        'print(json.dumps({"preview":preview_contract(),"outline":TestClient(app).get("/outline-contract").json()}))'],
         cwd=tmp_path, capture_output=True, text=True)
     assert process.returncode == 0, process.stderr
-    assert json.loads(process.stdout) == preview_contract()
+    result = json.loads(process.stdout)
+    assert result['preview'] == preview_contract()
+    from converter.outline_spec import VERSION, runtime_revision
+    assert result['outline']['version'] == VERSION
+    assert result['outline']['runtime_revision'] == runtime_revision()
+    assert result['outline']['csp_certified'] is True
+    assert result['outline']['enabled'] is False
+    assert result['outline']['acceptance_scope'] == 'posed-fbx-import'
 
 @pytest.mark.parametrize("expected,status", [(hashlib.sha256(b"character").hexdigest(), 200), ("a"*64, 409)])
 def test_final_model_keeps_body_and_runtime_contract(tmp_path, expected, status):

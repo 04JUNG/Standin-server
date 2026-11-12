@@ -95,6 +95,21 @@ def _hand_length(arm, side: str, prefix: str) -> float:
 
 def bake_hands(path, hands: Mapping[str, Optional[str]], *, library_path: Optional[str] = None) -> dict:
     """산출 FBX(``path``)를 제자리에서 손 프리셋이 적용된 FBX로 바꾼다."""
+    from converter import retarget as rt
+    rt.reset_scene()
+    arm, meshes = rt.import_character(str(path))
+    report = solve_hands(arm, meshes, hands, library_path=library_path)
+    rt.export_fbx(str(path), embed_textures=False)
+    return report
+
+
+def solve_hands(arm, meshes, hands: Mapping[str, Optional[str]], *, library_path: Optional[str] = None) -> dict:
+    """Apply the existing hand rules to a private scene, without file I/O.
+
+    This boundary includes rig repair, skin changes, baking and smoothing. A
+    caller must snapshot it before any exporter mutates/resets the scene.
+    It does not remove the frozen body's intermediate FBX dependency.
+    """
     import bpy
     from mathutils import Quaternion
 
@@ -106,8 +121,6 @@ def bake_hands(path, hands: Mapping[str, Optional[str]], *, library_path: Option
         raise HandLibraryError("bake_hands called without any preset")
     presets = {side: library.preset(preset_id) for side, preset_id in wanted.items()}
 
-    rt.reset_scene()
-    arm, meshes = rt.import_character(str(path))
     prefix = _prefix(arm)
     finger_names = {bone_name(side, finger, joint, prefix)
                     for side in SIDES for finger in FINGERS for joint in range(JOINTS_PER_FINGER)}
@@ -165,7 +178,6 @@ def bake_hands(path, hands: Mapping[str, Optional[str]], *, library_path: Option
             sides = [side for side in closed_sides
                      if presets[side].articulation.smoothing_iterations == iterations]
             smooth_baked_fingers(meshes, sides, prefix, iterations)
-    rt.export_fbx(str(path), embed_textures=False)
 
     return {
         "version": HAND_BAKE_VERSION,

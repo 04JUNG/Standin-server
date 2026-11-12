@@ -1,0 +1,155 @@
+{
+  "T022": {
+    "id": "T022",
+    "saved_fbx_sha256": "ed4fbe12a4f6f9208516289c10590ee1ace035dac5f593b87ba344d993343514",
+    "legs": {
+      "knee_flex_deg": {
+        "left": 75.38466808745767,
+        "right": 89.06489236963466
+      },
+      "knee_order_lateral_m": -0.026284047649845856,
+      "right_knee_above_left_m": 0.23585813358811059,
+      "top_side": "right",
+      "basis": "anatomical_hip_axis_reversal_and_body_up_knee_order",
+      "shin_body_up": {
+        "left": -0.9645928300790503,
+        "right": -0.920690266845128
+      },
+      "scope": "knee_over_knee_joint_relation_not_skin_or_photo_score"
+    },
+    "exact_retained_authored_asset": true
+  },
+  "T024": {
+    "id": "T024",
+    "saved_fbx_sha256": "ae83ab00f1308ccfd2fc26d3b850808161a995ca660d2ab97f9e269dce5b6dfb",
+    "legs": {
+      "knee_flex_deg": {
+        "left": 6.257350612264664,
+        "right": 14.997946638688003
+      },
+      "knee_order_lateral_m": 0.0512316613692328,
+      "right_knee_above_left_m": 0.14545796418491458,
+      "top_side": null,
+      "basis": "anatomical_hip_axis_reversal_and_body_up_knee_order",
+      "shin_body_up": {
+        "left": 0.13476447273851191,
+        "right": 0.1436745428076289
+      },
+      "scope": "knee_over_knee_joint_relation_not_skin_or_photo_score"
+    },
+    "exact_retained_authored_asset": true,
+    "right_ankle_above_left_m": 0.14023220539093018
+  },
+  "T041": {
+    "id": "T041",
+    "saved_fbx_sha256": "57b968cf88dfd46612a17ec640b4fc922bc73b89913f9ed5dfd3b05d8bef396b",
+    "legs": {
+      "knee_flex_deg": {
+        "left": 58.64995523100246,
+        "right": 131.03156232606227
+      },
+      "knee_order_lateral_m": 0.06925262779250489,
+      "right_knee_above_left_m": 0.00039192752963341116,
+      "top_side": null,
+      "basis": "anatomical_hip_axis_reversal_and_body_up_knee_order",
+      "shin_body_up": {
+        "left": -0.9037843182924895,
+        "right": 0.1488854816940477
+      },
+      "scope": "knee_over_knee_joint_relation_not_skin_or_photo_score"
+    },
+    "exact_retained_authored_asset": true
+  },
+  "T042": {
+    "id": "T042",
+    "saved_fbx_sha256": "ef47ec6aa43f343f6ac52c01687a908db8e586226c6701ee48a668d01220a373",
+    "legs": {
+      "knee_flex_deg": {
+        "left": 4.804240955005691,
+        "right": 9.254431654306345
+      },
+      "knee_order_lateral_m": 0.37247698414717895,
+      "right_knee_above_left_m": -0.046608601850216966,
+      "top_side": null,
+      "basis": "anatomical_hip_axis_reversal_and_body_up_knee_order",
+      "shin_body_up": {
+        "left": -0.8206059140059834,
+        "right": -0.9198921291089085
+      },
+      "scope": "knee_over_knee_joint_relation_not_skin_or_photo_score"
+    },
+    "exact_retained_authored_asset": true
+  },
+  "T043": {
+    "id": "T043",
+    "saved_fbx_sha256": "13ddc7c592426da96d3090a202226a470dc2b987f70d3aab279011c3f5c0a68a",
+    "legs": {
+      "knee_flex_deg": {
+        "left": 4.804244067984557,
+        "right": 9.254440820553167
+      },
+      "knee_order_lateral_m": 0.37247697717530426,
+      "right_knee_above_left_m": -0.046608922566217736,
+      "top_side": null,
+      "basis": "anatomical_hip_axis_reversal_and_body_up_knee_order",
+      "shin_body_up": {
+        "left": -0.8206058690742638,
+        "right": -0.9198920600879328
+      },
+      "scope": "knee_over_knee_joint_relation_not_skin_or_photo_score"
+    },
+    "shared_with": "T042",
+    "saved_normalized_leg_matrix_error": 1.5795230865478516e-06,
+    "saved_lower_vertex_error_m": 1.9443533695297724e-07,
+    "saved_upper_vertex_error_m": 3.0973964410492636e-07,
+    "saved_protected_nonleg_matrix_error": 5.632638931274414e-06,
+    "verified_lower_vertices": 9669
+  },
+  "T049": {
+    "id": "T049",
+    "saved_fbx_sha256": "0ba871dafe9dde88015046153325678b3975dafa4cba30d541408c7614a2f5ec",
+    "legs": {
+      "knee_flex_deg": {
+        "left": 140.37538179850327,
+        "right": 140.31103833079757
+      },
+      "knee_order_lateral_m": 0.4985234435237742,
+      "right_knee_above_left_m": 3.606260238161425e-05,
+      "top_side": null,
+      "basis": "anatomical_hip_axis_reversal_and_body_up_knee_order",
+      "shin_body_up": {
+        "left": -0.9016180846710998,
+        "right": -0.9022002865130092
+      },
+      "scope": "knee_over_knee_joint_relation_not_skin_or_photo_score"
+    },
+    "exact_retained_authored_asset": true,
+    "knee_width_before_after_m": [
+      0.26980817317962646,
+      0.49852344393730164
+    ],
+    "pelvis_drop_m": 0.2657617926597595
+  },
+  "T050": {
+    "id": "T050",
+    "saved_fbx_sha256": "3cb6affadeb521c9538b4aa9c1218a41339d5adabe7ff8263cd678e76cd2db7d",
+    "legs": {
+      "knee_flex_deg": {
+        "left": 20.434054320718538,
+        "right": 15.180545168432891
+      },
+      "knee_order_lateral_m": -0.03451079544461165,
+      "right_knee_above_left_m": -0.012436424057354957,
+      "top_side": "left",
+      "basis": "anatomical_hip_axis_reversal_and_body_up_knee_order",
+      "shin_body_up": {
+        "left": -0.9375636956424612,
+        "right": -0.9570615850940949
+      },
+      "scope": "knee_over_knee_joint_relation_not_skin_or_photo_score"
+    },
+    "saved_left_foot_advance_m": 0.04999988526105881,
+    "saved_left_ankle_height_error_m": 2.682209014892578e-07,
+    "saved_protected_nonleftleg_matrix_error": 1.0281801223754883e-05
+  }
+}

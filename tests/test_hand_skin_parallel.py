@@ -13,7 +13,7 @@ import pytest
 from converter.hand_contact import validate_screen, SCREEN_VERSION
 from converter.hand_library import load_library, normalize_request
 from converter.protocol import SOLVER_VERSION
-from src.hand_skin_screen import HandSkinGate, SkinSession, unknown
+from src.hand_skin_screen import HandSkinClient, HandSkinGate, SkinSession, request_receipts, unknown
 from src.hand_skin_parallel import ParallelSkinSession, Outcome, ScreenSlots, request_cancelled
 from src.logging_setup import request_id_var
 from tests.test_fullbody_routing import engine, decision, evidence, Camera, Semantic
@@ -107,6 +107,40 @@ def test_duplicate_bytes_screened_once_and_no_bvh_leaks(tmp_path):
     assert len(c.calls)==1 and len(s.rejected)==2
     assert all('bvh' not in r and not r['release_allowed'] for r in s.rejected)
 
+@pytest.mark.parametrize('parallel', [False, True])
+def test_analysis_reuses_only_completed_checks_with_the_same_inputs(tmp_path, parallel):
+    class LiveChecker(HandSkinClient):
+        def __init__(self):
+            super().__init__('http://converter', 'master', 'a' * 64)
+            self.transport = Checker({'a': 'intersection', 'c': 'unavailable'})
+
+        def check(self, text, hands, timeout):
+            return self.transport.check(text, hands, timeout)
+
+    client = LiveChecker()
+    base = gate(tmp_path, client, parallel)
+    recall = gate(tmp_path, client, parallel)
+    hands = {'left': 'fist'}
+    candidates = [{'pose_id': pid} for pid in ('a', 'b', 'c')]
+    token = request_receipts.set({})
+    try:
+        assert [row['pose_id'] for row in base.session(hands).filter(candidates)] == ['b']
+        assert len(client.transport.calls) == 3
+
+        session = recall.session({'left': 'fist', 'right': None})
+        assert [row['pose_id'] for row in session.filter(candidates)] == ['b']
+        assert session.rejected[0]['pose_id'] == 'a'
+        assert [call[0] for call in client.transport.calls[3:]] == ['c']
+
+        assert recall.session({'right': 'fist'}).filter([{'pose_id': 'b'}])
+        assert len(client.transport.calls) == 5
+    finally:
+        request_receipts.reset(token)
+
+    assert recall.session(hands).filter([{'pose_id': 'b'}])
+    assert len(client.transport.calls) == 6
+
+
 def test_optional_failure_does_not_revoke_committed_main_matches(tmp_path):
     c=Checker({'c':'unavailable'});s=gate(tmp_path,c).session()
     accepted=s.filter([{'pose_id':'a'},{'pose_id':'b'}]);main=deepcopy(s.report())
@@ -124,7 +158,7 @@ def test_default_is_original_session_and_factory_can_opt_in(tmp_path,monkeypatch
     assert type(configured.session()) is ParallelSkinSession
 
 
-@pytest.mark.parametrize('concurrency',[0,3,-1,True,1.5,'2'])
+@pytest.mark.parametrize('concurrency',[0,6,-1,True,1.5,'2'])
 def test_invalid_concurrency_is_rejected(tmp_path,concurrency):
     with pytest.raises(ValueError):HandSkinGate(Checker(),tmp_path,{},concurrency=concurrency)
 

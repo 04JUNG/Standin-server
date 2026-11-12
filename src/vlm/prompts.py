@@ -310,3 +310,27 @@ def pose_describe_prompt(boxes) -> str:
         activities=keys("activity"), objects=keys("object"), intents=keys("intent"),
         emotions=keys("emotion"),
     )
+
+
+# Default-off extensions attach to the already scheduled analyze/read_hands calls.
+# They are deliberately separate from search taxonomy and never contain coordinates.
+def refine_evidence_prompt(prompt, *, kind="observations"):
+    from ..refine_evidence import evidence_schema
+    import json
+    field = "refine_observations" if kind == "observations" else "refine_contacts"
+    return prompt + (
+        "\n선택적 진단 근거 " + field + "를 같은 JSON에 추가할 수 있다. "
+        "기존 인원수/구도/박스/손 모양 판단 기준은 그대로 유지하라. "
+        "추가 질문이나 관절/접촉 좌표, 각도, 힘, 3D 점을 만들지 마라. "
+        "people의 person_id는 위 요청 목록의 명시적 번호이며 0부터 시작한다. "
+        "분석에서는 approx_boxes의 최초 인물 번호다. 사람을 생략하거나 재명명하지 마라. "
+        "left/right는 화면 기준이 아닌 인물 본인의 해부학적 좌우다. "
+        "팔 연결/좌우가 모호하면 side_certainty=unknown, evidence=unknown으로 기권하라. "
+        "body_scope는 기존 body_scopes와 일치해야 한다. 부위의 숫자 confidence를 만들지 마라. "
+        "관계 id는 r0,r1,...이며 preserve는 그 id만 참조한다. "
+        "target=self_region일 때 target_ref는 해부학적 region, other_person이면 같은 요청의 "
+        "person_id 정수, ground/external_object/unknown이면 null이다. "
+        "판독할 수 없으면 선택 필드를 생략하거나 빈 배열을 사용하라. "
+        "아래 선택 필드 schema와 배열 상한을 지켜라.\n" + field + ": " +
+        json.dumps(evidence_schema(kind), ensure_ascii=False, separators=(",", ":"))
+    )

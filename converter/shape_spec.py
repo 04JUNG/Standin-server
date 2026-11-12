@@ -173,4 +173,10 @@ def resolve_shape(character_id, asset_sha, raw=None, expected_source=None):
     full = dict(recipe['defaults'])
     for k, v in controls.items():
         full[controller_key(k)] = v
-    return {**recipe, **source, 'values': full, 'shape_sha256': shape_sha}
+    result = {**recipe, **source, 'values': full, 'shape_sha256': shape_sha}
+    prepared = registry.get('prepared_neutrals', {})
+    if isinstance(prepared, dict) and prepared.get('schema') == 'prepared-neutral-index.v1':
+        entries = prepared.get('entries', {})
+        if isinstance(entries, dict) and character_id in entries:
+            result['prepared_neutral'] = entries[character_id]
+    return result

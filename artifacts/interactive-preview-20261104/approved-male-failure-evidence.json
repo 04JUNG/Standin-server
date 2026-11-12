@@ -1,0 +1,106 @@
+{
+  "schema": "interactive-local-audit-v1",
+  "characterSha256": "7c648b97a24a3bb4914b6e5d515708c33727979881d92ef916d5726e22301f3d",
+  "sourceBvhSha256": "d22cabce87b52e3b86cf07c74b29b30a2bb76bd536167baec981ff4e88565216",
+  "blenderBuild": "fbe6228777e7",
+  "bodyPrepareMs": 1530.0641249923501,
+  "initialFbxRequired": true,
+  "cases": [
+    {
+      "scope": "full",
+      "stateHash": "774436de19fbd9e91f421238e9be67d98c36568e09cb1ae641fa23d319fb29b9",
+      "solveSnapshotMs": 4598.493249999592,
+      "stateBytes": 19399280
+    },
+    {
+      "scope": "half",
+      "stateHash": "56cddff93cc840cd6c8ce922e8ffb08e8300a997a6484fe25a66242fae2dafa4",
+      "solveSnapshotMs": 3382.8909999865573,
+      "stateBytes": 10934485
+    },
+    {
+      "scope": "bust",
+      "stateHash": "bd564900a48ca6955b42d235a547c138994e3c5785dde64f4064d9b5a85b5210",
+      "solveSnapshotMs": 2072.192499996163,
+      "stateBytes": 3588538
+    },
+    {
+      "scope": "shoulder_head",
+      "stateHash": "c31ac33f513bf01d4cda719025aff90575ba901af75f64b63c6ce73772c66ce1",
+      "solveSnapshotMs": 1905.2646250056569,
+      "stateBytes": 2896554
+    },
+    {
+      "scope": "head",
+      "stateHash": "2c638bcfc5b851afa5297734a8908264ea28cb1d95a59c7108b985307367f47c",
+      "solveSnapshotMs": 1719.6240420162212,
+      "stateBytes": 1544709
+    },
+    {
+      "baseline": "fbx-only",
+      "wallMs": 3337.909000023501,
+      "stages": {
+        "worker_init": {
+          "duration_ms": 13.157374982256442,
+          "ok": true
+        },
+        "retarget_initial_export": {
+          "duration_ms": 632.6253750012256,
+          "ok": true
+        },
+        "hand_import_apply_export": {
+          "duration_ms": 157.26737497607246,
+          "ok": true
+        }
+      },
+      "correspondence": {
+        "passed": false,
+        "reason": "snapshot normal changed"
+      },
+      "artifactSha256": "e0eb3d0bcc1aaf7f5ce00162aa6e321feafbb2056e76ac655fc84dd9c664be72"
+    },
+    {
+      "baseline": "png",
+      "wallMs": 3497.7589170157444,
+      "stages": {
+        "worker_init": {
+          "duration_ms": 12.958957988303155,
+          "ok": true
+        },
+        "retarget_initial_export": {
+          "duration_ms": 640.6290419981815,
+          "ok": true
+        },
+        "hand_import_apply_export": {
+          "duration_ms": 133.8997079874389,
+          "ok": true
+        },
+        "framing_import": {
+          "duration_ms": 67.92649999260902,
+          "ok": true
+        },
+        "crop": {
+          "duration_ms": 0.045958004193380475,
+          "ok": true
+        },
+        "final_fbx_reimport": {
+          "duration_ms": 71.50620900210924,
+          "ok": true
+        },
+        "png_render_write": {
+          "duration_ms": 119.72225000499748,
+          "ok": true
+        }
+      },
+      "correspondence": {
+        "passed": false,
+        "reason": "snapshot normal changed"
+      },
+      "artifactSha256": "6e8280ebac60bcf674884526664b54cf8fe422f195ffd2c2e993181505971326"
+    }
+  ],
+  "implementationCommit": "3fa41e71fc51b4aa696a2855c858dc5a73d36265",
+  "runtimeSha256": "2bf47b9e187a678960d0265db7cd2a36164639f0c40c94061ad6b4ed3af43572",
+  "classification": "approved local asset; actual baseline correspondence FAILED; no final certification",
+  "timingCaveat": "parallel local validation workloads; use separate single-run legacy-stage-timing.json for stage audit"
+}

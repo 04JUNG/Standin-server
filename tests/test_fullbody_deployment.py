@@ -90,7 +90,7 @@ def test_workflow_preflights_rendered_image_before_changing_running_service():
     assert workflow.index('id: render') < workflow.index('check_fullbody_startup.py')
     assert workflow.index('check_fullbody_startup.py') < workflow.index('aws ecs update-service')
     assert workflow.index('check_fullbody_startup.py') < workflow.index('amazon-ecs-deploy-task-definition@')
-    assert "github.ref == 'refs/heads/develop' && '1' || '0'" in workflow
+    assert "vars.ROUTING_FULLBODY_ENABLED || '1'" in workflow
     assert 'POSE_MODEL_VARIANT=${{' not in workflow  # cannot overwrite prepared contract with cascade
 
 

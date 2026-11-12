@@ -15,6 +15,9 @@ on:
       - "tests/converter/**"
       - "deploy/ecs/**"
       - "scripts/measure_converter_latency.py"
+      - "scripts/prepare_hand_screen_deployment.py"
+      - "src/hand_skin_capacity.py"
+      - "tests/test_hand_screen_deployment.py"
       - "scripts/verify_shape_bake.py"
       - "scripts/inspect_shape_bake.py"
       - "scripts/shape_inspection_metrics.py"
@@ -35,6 +38,9 @@ on:
       - "tests/converter/**"
       - "deploy/ecs/**"
       - "scripts/measure_converter_latency.py"
+      - "scripts/prepare_hand_screen_deployment.py"
+      - "src/hand_skin_capacity.py"
+      - "tests/test_hand_screen_deployment.py"
       - "scripts/verify_shape_bake.py"
       - "scripts/inspect_shape_bake.py"
       - "scripts/shape_inspection_metrics.py"
@@ -81,8 +87,13 @@ jobs:
       - name: Run worker, API, failure, and handoff contracts
         run: |
           python -m pytest -q \
+            tests/test_hand_screen_deployment.py \
+            tests/test_staging_final_cache.py \
+            tests/converter/test_final_cache_remote.py \
             tests/converter/test_worker_contract.py \
+            tests/converter/test_body_material.py \
             tests/converter/test_shape_bake_contract.py \
+            tests/converter/test_prepared_body.py \
             tests/converter/test_shape_inspection.py \
             tests/converter/test_shape_hand_integration.py \
             tests/converter/test_registry.py \
@@ -90,6 +101,7 @@ jobs:
             tests/converter/test_work_queue.py \
             tests/converter/test_api_contract.py \
             tests/converter/test_scene_contract.py \
+            tests/converter/test_scene_camera.py \
             tests/converter/test_scene_runner.py \
             tests/converter/test_preview_models.py \
             tests/converter/test_body_preview_contract.py \
@@ -100,8 +112,16 @@ jobs:
             tests/converter/test_deployment_contract.py \
             tests/converter/test_latency_probe.py \
             tests/converter/test_retarget_cache.py \
+            tests/converter/test_final_cache.py \
+            tests/converter/test_final_prewarm.py \
+            tests/converter/test_final_artifact.py \
             tests/converter/test_fast_scene_reset.py \
-            tests/converter/test_preview_instrumentation.py
+            tests/converter/test_preview_instrumentation.py \
+            tests/converter/test_interactive_state.py \
+            tests/converter/test_interactive_camera.py \
+            tests/converter/test_interactive_transport.py \
+            tests/converter/test_outline_contract.py \
+            tests/converter/test_skin_contract.py
 
   inference-isolation:
     name: Inference image excludes bpy
@@ -191,6 +211,41 @@ jobs:
             "$CONVERTER_IMAGE" \
             /opt/blender/blender --background --python-exit-code 1 \
             --python /app/tests/converter/test_convert.py
+
+      - name: Verify cached rest geometry preserves every safety metric
+        run: |
+          docker run --rm --platform linux/amd64 \
+            --mount type=bind,source="$GITHUB_WORKSPACE/tests/converter",target=/app/tests/converter,readonly \
+            "$CONVERTER_IMAGE" \
+            /opt/blender/blender --background --factory-startup --disable-autoexec --python-exit-code 1 \
+            --python /app/tests/converter/verify_rest_surface.py
+
+      - name: Verify source finger directions and anatomical clay round trip
+        run: |
+          docker run --rm --platform linux/amd64 \
+            --mount type=bind,source="$ARTIFACT_ROOT",target=/artifacts \
+            --mount type=bind,source="$GITHUB_WORKSPACE/tests/converter",target=/app/tests/converter,readonly \
+            "$CONVERTER_IMAGE" \
+            /opt/blender/blender --background --factory-startup --disable-autoexec --python-exit-code 1 \
+            --python /app/tests/converter/verify_source_fingers.py -- /artifacts/source-fingers
+
+      - name: Verify explicit outline FBX preservation and reject tampering
+        run: |
+          docker run --rm --platform linux/amd64 \
+            --mount type=bind,source="$ARTIFACT_ROOT",target=/artifacts \
+            --mount type=bind,source="$GITHUB_WORKSPACE/tests/converter",target=/app/tests/converter,readonly \
+            "$CONVERTER_IMAGE" \
+            /opt/blender/blender --background --factory-startup --disable-autoexec --python-exit-code 1 \
+            --python /app/tests/converter/verify_outline_roundtrip.py -- /artifacts/outline-tamper
+
+      - name: Verify approved skin data boundaries and reject binary tampering
+        run: |
+          docker run --rm --platform linux/amd64 \
+            --mount type=bind,source="$ARTIFACT_ROOT",target=/artifacts \
+            --mount type=bind,source="$GITHUB_WORKSPACE/tests/converter",target=/app/tests/converter,readonly \
+            "$CONVERTER_IMAGE" \
+            /opt/blender/blender --background --factory-startup --disable-autoexec --python-exit-code 1 \
+            --python /app/tests/converter/verify_skin_roundtrip.py -- /artifacts/skin-tamper
 
       - name: Verify single-cut multi-person FBX round trip
         run: |

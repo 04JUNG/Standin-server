@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from contextlib import asynccontextmanager
+import asyncio
 import hashlib
 import base64
 import hmac
@@ -323,9 +325,23 @@ def create_app(
     if size_limit <= 0:
         raise ValueError("CONVERTER_MAX_BVH_BYTES must be positive")
 
+    from converter_api.final_prewarm import DefaultFbxPrewarmer
+    prewarmer = DefaultFbxPrewarmer.from_env(blender_runner)
+
+    @asynccontextmanager
+    async def lifespan(_app):
+        if prewarmer is not None:
+            prewarmer.start()
+        try:
+            yield
+        finally:
+            if prewarmer is not None:
+                await asyncio.to_thread(prewarmer.stop)
+
     app = FastAPI(
+        lifespan=lifespan,
         title="Standin Internal Converter",
-        version="1.3.0",
+        version="1.4.0",
         description=(
             "Internal BVH to FBX conversion service "
             "(BFF export bundles, inference refine thumbnails)"
@@ -335,9 +351,19 @@ def create_app(
     app.state.registry = character_registry
     app.state.runner = blender_runner
     app.state.max_bvh_bytes = size_limit
+    app.state.final_prewarm = prewarmer
+
+    @app.get('/final-cache/prewarm-status')
+    def final_prewarm_status():
+        return prewarmer.snapshot() if prewarmer is not None else {'status': 'disabled'}
+    from converter_api.csp_shape import register_csp_shape
+    register_csp_shape(app, character_registry, blender_runner)
 
     from converter_api.scene_routes import register_scene_routes
     register_scene_routes(app, blender_runner)
+
+    from converter_api.interactive import register_interactive
+    register_interactive(app, character_registry, blender_runner)
 
     from converter_api.preview_models import PreviewModelStore
     from converter.preview_model import MODEL_VERSION
@@ -539,6 +565,7 @@ def create_app(
         hand_left: str | None = None,
         hand_right: str | None = None,
         hand_contact_screen: bool = False,
+        selected_hand_screen: bool = False,
     ) -> CompletedConversion:
         conversion_id = str(uuid.uuid4())
         control = current_work.get()
@@ -637,6 +664,7 @@ def create_app(
                 **({"preview_model": True} if preview_model else {}),
                 **({"hands": hands} if hands is not None else {}),
                 **({"hand_contact_screen": True} if hand_contact_screen else {}),
+                **({"selected_hand_screen": True} if selected_hand_screen else {}),
             )
             if camera_rotation is not None and result.report.get("camera_rotation") != camera_rotation:
                 raise WorkerIntegrityError("camera rotation lineage mismatch")
@@ -678,6 +706,11 @@ def create_app(
                 conversion_id=conversion_id,
             ) from exc
         except ConversionRejectedError as exc:
+            selected_code = (exc.report or {}).get('error_code')
+            if selected_hand_screen and selected_code in ('HAND_CONTACT_INTERSECTION', 'HAND_CONTACT_UNAVAILABLE'):
+                raise ApiProblem(422 if selected_code == 'HAND_CONTACT_INTERSECTION' else 503,
+                                 selected_code, 'selected pose hand screening failed',
+                                 conversion_id=conversion_id) from exc
             _structured_log(
                 logging.WARNING,
                 "converter_rejected",
@@ -1014,6 +1047,22 @@ def create_app(
             headers=headers,
         )
 
+    @app.get('/hand-screen-profile')
+    def hand_screen_profile(character_id: str = 'standin-master-v2'):
+        """Read-only identity for operator-prevalidated immutable library poses."""
+        from converter.hand_screen_catalog import PROFILE_VERSION, runtime_profile
+        from converter.hand_library import load_library
+        try:
+            character = character_registry.resolve(character_id)
+            fingerprint = runtime_profile(blender_runner)
+        except (RegistryError, RunnerError, ValueError, OSError):
+            raise ApiProblem(503, 'SCREEN_PROFILE_UNAVAILABLE', 'screening profile unavailable') from None
+        return dict(version=PROFILE_VERSION, profile_sha256=fingerprint,
+            character_id=character.metadata.character_id,
+            character_sha256=character.metadata.sha256,
+            shape_sha256=None,
+            hand_library_sha256=load_library().sha256)
+
     @app.post('/screen-hand-contact')
     def screen_hand_contact(
         bvh: UploadFile = File(...),
@@ -1051,6 +1100,7 @@ def create_app(
     @app.post("/convert-framed")
     @app.post("/convert-framed-export")
     def convert_framed(
+        request: Request,
         bvh: UploadFile = File(...),
         character_id: str = Form(default=default_character_id),
         output_scope: str = Form(default="full"),
@@ -1076,6 +1126,7 @@ def create_app(
                 raise ValueError("aligned output requires front preview and a matrix")
         except (ValueError, TypeError) as exc:
             raise ApiProblem(400, "INVALID_OPTION", "invalid camera_rotation") from exc
+        from converter.hand_contact import selected_hand_screen_enabled
         completed = _execute_conversion(
             bvh=bvh, character_id=character_id, frame=FRAME, mirror=False,
             output_mode=OUTPUT_MODE, apply_root_translation=APPLY_ROOT_TRANSLATION,
@@ -1085,6 +1136,7 @@ def create_app(
             camera_rotation=rotation, preview_model=preview_format == "model", shape=shape,
             expected_shape_source=expected_shape_source,
             hand_left=hand_left, hand_right=hand_right,
+            selected_hand_screen=request.url.path == '/convert-framed-export' and selected_hand_screen_enabled(output_scope),
         )
         baked = result_hands(completed.result.report)
         result = completed.result
@@ -1111,6 +1163,7 @@ def create_app(
                 "shape_sha256": result.report.get("shape_bake", {}).get("shape_sha256"),
                 "shape_bake": result.report.get("shape_bake"), "hands": baked,
                 "fbx_sha256": result.artifact_sha256,
+                "final_cache": result.report.get("final_cache"),
                 "fbx_base64": base64.b64encode(result.artifact).decode("ascii"),
             }
         if preview_format == "model":
@@ -1176,6 +1229,10 @@ def create_app(
 
     from converter_api.final_preview import register_final_preview
     register_final_preview(app, blender_runner)
+    from converter_api.outline import register_outline
+    register_outline(app, character_registry, blender_runner)
+    from converter_api.skin import register_skin
+    register_skin(app, character_registry, blender_runner)
     return app
 
 

@@ -45,6 +45,7 @@ from converter.thumbnail_render import (  # noqa: E402 - bpy는 함수 안에서
 )
 from converter.framing import FRAMING_VERSION, PREVIEW_VIEWS, validate_scope
 from converter.hand_library import HandLibraryError, normalize_request as normalize_hands
+from converter.hand_contact import SelectedHandContactError
 
 
 class JobValidationError(ValueError):
@@ -105,7 +106,8 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
         "force_exact_v324", "thumbnail",
     }
     unknown = set(raw) - required - {
-        "output_scope", "preview_view", "camera_rotation", "preview_model", "shape_recipe", "hands", "hand_contact_screen", "retarget_cache", "fast_scene_reset"}
+        "output_scope", "preview_view", "camera_rotation", "preview_model", "shape_recipe", "hands",
+        "hand_contact_screen", "selected_hand_screen", "retarget_cache", "fast_scene_reset"}
     missing = required - set(raw)
     if missing or unknown:
         raise JobValidationError(
@@ -165,6 +167,9 @@ def load_job(job_path: str | os.PathLike[str]) -> dict[str, Any]:
             output_scope != 'full' or preview_view or preview_model or camera_rotation is not None
             or raw['thumbnail'] is not None or raw['mirror'] or raw['force_exact_v324'])):
         raise JobValidationError('hand screening requires an unframed, non-mirrored full artifact')
+    selected_screening = raw.get('selected_hand_screen', False)
+    if type(selected_screening) is not bool or (selected_screening and (screening or output_scope not in ('full', 'half'))):
+        raise JobValidationError('selected hand screening requires a single pose containing hands')
 
     unresolved_temp = _absolute_path(raw["temp_dir"], "temp_dir")
     if unresolved_temp.is_symlink():
@@ -375,7 +380,11 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
     if base:
         from converter.retarget_cache import binding, restore_base, capture_base, cache_key
         base_identity = binding(source_bvh_sha256, job["character_sha256"], job["character_id"], job["mirror"])
-    if base and base["mode"] == "reuse":
+    from converter.reviewed_library import restore as restore_reviewed
+    reviewed_payload = restore_reviewed(job)
+    if reviewed_payload is not None:
+        payload = reviewed_payload
+    elif base and base["mode"] == "reuse":
         with lab_timings.measure("retarget_base_restore_verify"):
             payload, base_metadata = restore_base(base["fbx_path"],base["meta_path"],job["output_path"],base_identity)
     else:
@@ -401,18 +410,18 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
             "base_sha256":base_metadata["artifact_sha256"],"body_report_sha256":base_metadata["body_report_sha256"]}
     if recipe is not None and ok:
         payload["shape_bake"] = json.loads(Path(job["output_path"]).with_suffix(".shape.json").read_text())
-    if ok and recipe is None and not job["force_exact_v324"]:
-        from converter.source_body import bake_source_body
-        source_body = bake_source_body(job["output_path"], job["bvh_path"], frame=FRAME, mirror=job["mirror"])
-        if source_body is not None:
-            payload["source_body"] = source_body
-    if (ok and not job["force_exact_v324"] and job["thumbnail"] is None
-            and not job.get("hand_contact_screen")):
+    if ok and reviewed_payload is None and not job["force_exact_v324"]:
+        if recipe is None:
+            from converter.source_body import bake_source_body
+            source_body = bake_source_body(job["output_path"], job["bvh_path"], frame=FRAME, mirror=job["mirror"])
+            if source_body is not None:
+                payload["source_body"] = source_body
         from converter.reviewed_source_fingers import bake_source_fingers
         with lab_timings.measure("source_finger_bake"):
             payload["source_fingers"] = bake_source_fingers(
                 job["output_path"], job["bvh_path"], frame=FRAME,
                 mirror=job["mirror"], hands=job.get("hands"),
+                transfer_posed_offsets=job["thumbnail"] is None and not job.get("hand_contact_screen"),
             )
     if ok and job.get("hands") is not None:
         # 손은 몸 변환 직후, 메시 절단·카메라 회전·미리보기보다 먼저 굽는다.
@@ -420,11 +429,27 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
         from converter.hands import bake_hands
         with lab_timings.measure("hand_import_apply_export"):
             payload["hands"] = bake_hands(job["output_path"], job["hands"])
+    if ok and not job["force_exact_v324"]:
+        from converter.body_material import restore_anatomical_clay
+        with lab_timings.measure("body_material"):
+            payload["body_material"] = restore_anatomical_clay(job["output_path"])
     if ok and job.get('hand_contact_screen'):
         from converter.hand_contact import screen_artifact
         # AFTER hand baking, BEFORE crop/camera/preview. Screening does not
         # export or change the frozen retarget solver or delivered FBX bytes.
         payload['hand_contact_screen'] = screen_artifact(job['output_path'])
+    # Additive diagnostic only. Default off; no production safety authority is
+    # granted to an unsupported profile or to the existing skin-binding receipt.
+    mesh_shadow = os.getenv("CONVERTER_REFINE_V3_MESH_SHADOW", "0") == "1"
+    if ok and mesh_shadow:
+        from converter.mesh_validation import audit_artifact
+        try:
+            payload["refine_v3_mesh_shadow"] = audit_artifact(job["output_path"], seconds=3.0)
+        except Exception as exc:
+            payload["refine_v3_mesh_shadow"] = {
+                "status": "mesh_unverified", "complete_collision_certificate": False,
+                "unverified_reasons": ["skin_evaluation:" + type(exc).__name__],
+            }
     if ok:
         from converter.framing import process_output
         scope = job.get("output_scope", "full")
@@ -435,6 +460,7 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
             view=preview_view or "front",
             camera_rotation=job.get("camera_rotation"),
             lab_timings=lab_timings,
+            **({"selected_hand_screen": True} if job.get("selected_hand_screen") else {}),
         )
         payload["camera_rotation"] = job.get("camera_rotation")
         payload["output_scope"] = scope
@@ -464,7 +490,7 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
             )
         payload["artifact_sha256"] = _sha256(output)
         payload["artifact_size"] = output.stat().st_size
-        if not job.get("preview_view") and not job.get("preview_model") and job["thumbnail"] is None:
+        if mesh_shadow or (not job.get("preview_view") and not job.get("preview_model") and job["thumbnail"] is None):
             # PNG/model reimports used to provide this structural check. Retain
             # it when no visual is requested, without rendering or re-exporting.
             from converter.final_artifact import validate
@@ -544,7 +570,9 @@ def main(argv: list[str] | None = None) -> int:
         print(f"[OK] conversion {job['conversion_id']}")
         return 0
     except Exception as exc:
-        if isinstance(exc, ThumbnailRenderError):
+        if isinstance(exc, SelectedHandContactError):
+            error_code = exc.code
+        elif isinstance(exc, ThumbnailRenderError):
             error_code = "thumbnail_render_failed"
         elif isinstance(exc, (FrozenLineageError, ArtifactValidationError)):
             error_code = "internal_error"

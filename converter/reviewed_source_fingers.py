@@ -12,7 +12,7 @@ import math
 from pathlib import Path
 import re
 
-VERSION = "source-fingers-v1"
+VERSION = "source-fingers-v2"
 FINGERS = ("thumb", "index", "middle", "ring", "pinky")
 SIDES = ("left", "right")
 
@@ -60,13 +60,13 @@ def _palm_frame(arm, wrist, fingers, *, posed=False):
 
 
 def bake_source_fingers(path, bvh_path, *, frame=0, mirror=False, hands=None,
-                        force_exact_v324=False):
-    """Update a full, rigged-rest FBX using only source finger rotations.
+                        force_exact_v324=False, transfer_posed_offsets=True):
+    """Update a full, rigged-rest FBX using the final source finger directions.
 
-    Rotation deltas are cumulative relative to the source wrist, expressed in
-    an anatomical rest palm frame. This removes wrist motion already owned by
-    the frozen solver and handles different BVH/FBX bone axes. Child heads keep
-    the target rig's lengths/offsets. No source translations or scale are copied.
+    Both BVH offsets and animation channels can encode articulation. Transport
+    the evaluated segments in the posed palm frame instead of adding rotation
+    deltas to a target with a different rest bend. Child heads keep the target
+    rig's lengths/offsets. No source translations or scale are copied.
     """
     receipt = dict(version=VERSION, applied_bones=0, body_bones_preserved=True,
                    sides={}, source_frame=frame, mirrored=mirror)
@@ -119,6 +119,9 @@ def bake_source_fingers(path, bvh_path, *, frame=0, mirror=False, hands=None,
             src.pose.bones[name].matrix_basis.to_quaternion().angle <= 1e-4
             for name in sf.values()
         )
+        if offset_pose and not transfer_posed_offsets:
+            receipt["sides"][side] = dict(status="no_finger_rotation")
+            continue
         try:
             source_rest = _palm_frame(src, sw, sf)
             target_rest = _palm_frame(dst, dw, df)
@@ -132,39 +135,28 @@ def bake_source_fingers(path, bvh_path, *, frame=0, mirror=False, hands=None,
         # Parent before child: each new head follows its target parent.
         for key in keys:
             sname, dname = sf[key], df[key]
-            if offset_pose:
-                # Single-frame library BVHs can store curled fingers directly
-                # in OFFSETs, with identity rotation channels on every joint.
-                # Aim each target segment in the source palm, keeping the
-                # target rig's lengths and the already converted wrist.
-                sp = src.pose.bones[sname]
-                dp = dst.pose.bones[dname]
-                finger, joint = key
-                next_key = (finger, joint + 1)
-                source_tip = src.pose.bones[sf[next_key]].head if next_key in sf else sp.tail
-                target_tip = dst.pose.bones[df[next_key]].head if next_key in df else dp.tail
-                source_segment = src.matrix_world.to_3x3() @ (source_tip - sp.head)
-                current = dst.matrix_world.to_3x3() @ (target_tip - dp.head)
-                local_direction = source_posed.transposed() @ source_segment
-                if mirror:
-                    local_direction = reflect @ local_direction
-                posed_target_palm = (_rotation(rt._pose_world(dst, dw))
-                                     @ _rotation(rt._rest_world(dst, dw)).transposed()
-                                     @ target_rest)
-                target = posed_target_palm @ local_direction
-                if min(current.length, target.length) < 1e-8:
-                    continue
-                delta = current.rotation_difference(target).to_matrix()
-                desired = delta @ _rotation(rt._pose_world(dst, dname))
-            else:
-                delta = (source_posed.transposed()
-                         @ _rotation(rt._pose_world(src, sname))
-                         @ _rotation(rt._rest_world(src, sname)).transposed()
-                         @ source_rest)
-                if mirror:
-                    delta = reflect @ delta @ reflect
-                desired = (target_rest @ delta @ target_rest.transposed()
-                           @ _rotation(rt._rest_world(dst, dname)))
+            # A pre-bent OFFSET plus a nonzero channel is just as important as
+            # an offset-only pose: e.g. a 77-degree rest bend opened by 50
+            # degrees must become 27 degrees, not hyperextend a straight rig.
+            sp = src.pose.bones[sname]
+            dp = dst.pose.bones[dname]
+            finger, joint = key
+            next_key = (finger, joint + 1)
+            source_tip = src.pose.bones[sf[next_key]].head if next_key in sf else sp.tail
+            target_tip = dst.pose.bones[df[next_key]].head if next_key in df else dp.tail
+            source_segment = src.matrix_world.to_3x3() @ (source_tip - sp.head)
+            current = dst.matrix_world.to_3x3() @ (target_tip - dp.head)
+            local_direction = source_posed.transposed() @ source_segment
+            if mirror:
+                local_direction = reflect @ local_direction
+            posed_target_palm = (_rotation(rt._pose_world(dst, dw))
+                                 @ _rotation(rt._rest_world(dst, dw)).transposed()
+                                 @ target_rest)
+            target = posed_target_palm @ local_direction
+            if min(current.length, target.length) < 1e-8:
+                continue
+            delta = current.rotation_difference(target).to_matrix()
+            desired = delta @ _rotation(rt._pose_world(dst, dname))
             if not all(math.isfinite(v) for row in desired for v in row):
                 raise ValueError("non-finite source finger rotation: " + sname)
             pb = dst.pose.bones[dname]
@@ -178,7 +170,7 @@ def bake_source_fingers(path, bvh_path, *, frame=0, mirror=False, hands=None,
         receipt["sides"][side] = dict(
             status="transferred" if count else "missing_finger_geometry",
             applied_bones=count, source_side=source_side,
-            transfer="posed_offsets" if offset_pose else "rotations",
+            transfer="posed_directions", source_offset_only=offset_pose,
             max_cumulative_rotation_deg=math.degrees(maximum),
         )
 
@@ -199,5 +191,53 @@ def bake_source_fingers(path, bvh_path, *, frame=0, mirror=False, hands=None,
         # Never replace the artifact with an incomplete export.
         temporary = Path(path).with_name(Path(path).stem + ".source-fingers.fbx")
         rt.export_fbx(str(temporary), embed_textures=False)
+        # Verify the saved bytes, including articulation stored in rest offsets.
+        # The subsequent framing stage may crop or rotate this exact pose.
+        expected = {name: (dst.matrix_world @ dst.data.bones[name].head_local,
+                           dst.matrix_world @ dst.data.bones[name].tail_local)
+                    for name in assigned}
+        rt.reset_scene()
+        restored, _ = rt.import_character(str(temporary))
+        error = 0.0
+        for name, (head, tail) in expected.items():
+            if name not in restored.data.bones:
+                raise RuntimeError('saved FBX lost source finger: ' + name)
+            bone = restored.data.bones[name]
+            error = max(error, (restored.matrix_world @ bone.head_local - head).length,
+                        (restored.matrix_world @ bone.tail_local - tail).length)
+        if error > 1e-4:
+            raise RuntimeError('saved source finger roundtrip mismatch')
+        receipt['saved_fbx_roundtrip'] = dict(verified=True, bones=len(expected),
+                                            max_endpoint_error_m=error)
         temporary.replace(path)
     return receipt
+
+
+class SourcePoseReport:
+    def __init__(self, body, fingers, material=None):
+        self.body, self.fingers, self.material = body, fingers, material
+
+    def __getattr__(self, name):
+        return getattr(self.body, name)
+
+    def as_dict(self):
+        return {**self.body.as_dict(), "source_fingers": self.fingers,
+                **({"body_material": self.material} if self.material is not None else {})}
+
+
+def convert_source_pose(**options):
+    """Batch-library entry point, sharing the live worker's finger stage."""
+    if options.get("output_mode", "rigged_rest") != "rigged_rest":
+        raise ValueError("source finger baking requires rigged_rest")
+    from converter.convert import convert
+    report = convert(**options)
+    if not report.ok:
+        return report
+    fingers = bake_source_fingers(options["out_path"], options["bvh_path"],
+        frame=options.get("frame", 0), mirror=options.get("mirror", False),
+        force_exact_v324=options.get("force_exact_v324", False))
+    material = None
+    if not options.get("force_exact_v324", False):
+        from converter.body_material import restore_anatomical_clay
+        material = restore_anatomical_clay(options["out_path"])
+    return SourcePoseReport(report, fingers, material)

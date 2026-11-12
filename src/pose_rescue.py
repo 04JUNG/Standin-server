@@ -351,6 +351,12 @@ def rescue_slots(slots: list[PersonSlot], pose_model, image,
             slot.rescue_trace = trace
             slot.reasons.append("fallback_shadow_candidate")
             continue
+        from .joint_provenance import initialize_joint_provenance, transfer_joint_provenance
+        if slot.skeleton is not None and slot.skeleton.joint_provenance is None:
+            slot.skeleton.joint_provenance = initialize_joint_provenance(
+                slot.skeleton, source=slot.skeleton_source, person_id=slot.slot_id)
+        candidates[column].joint_provenance = transfer_joint_provenance(
+            slot.skeleton, candidates[column], source="fallback_full_image", person_id=slot.slot_id)
         slot.skeleton = candidates[column]
         slot.skeleton_box = candidate_boxes[column]
         slot.evidence = evidence

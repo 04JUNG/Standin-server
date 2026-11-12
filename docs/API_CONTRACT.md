@@ -36,7 +36,7 @@ build로 보냅니다. 최종 FBX·PNG와 SHA·인원 수·원본 SHA·plan ID�
 인물별 새 응답 `people[].dynamic_search`를 읽는다. 세부 파이프라인·기동 조건은
 [`FULLBODY_DYNAMIC_ROUTING.md`](FULLBODY_DYNAMIC_ROUTING.md)가 기준이다.
 
-`PARALLEL_POSE_DESCRIPTION=1`(미설정 시 기본값 `1`)은 기존 인물별 자세 설명 호출을
+로컬 opt-in `PARALLEL_POSE_DESCRIPTION=1`(기본값 `0`)은 기존 인물별 자세 설명 호출을
 관절 처리와 겹쳐 실행한다. 입력·전체 인물 순서가 정확히 일치할 때만 채택하며, 검색/검증 정책은
 유지한다. 활성화한 HTTP 응답의 `search_routing.describe.prefetch`
 (내부 `CutResult.routing_summary.describe.prefetch`)에는 `status`,
@@ -44,11 +44,10 @@ build로 보냅니다. 최종 FBX·PNG와 SHA·인원 수·원본 SHA·plan ID�
 `status=used|used_error`는 같은 요청 결과 채택(오류 포함), `discarded_request_changed`는
 입력 변경으로 기존 경로 실행, `skipped_*`는 선행 실행 미사용, `join_failed|cancelled`는
 합류 실패/취소다. 기존 `describe.status/error_reason/retryable` 실패 구분은 유지한다.
-`PARALLEL_POSE_DESCRIPTION=0`은 기존 순차 경로로 되돌리는 롤백이며 선행 실행 진단 필드도 추가하지 않는다.
-활성화해도 요청 형식·후보/내보내기 권한은 바꾸지 않는다. 환경에 명시된 `0`은 기본값보다 우선한다.
+기본값에서는 응답 필드도 기존과 같으며, 활성화해도 요청 형식·후보/내보내기 권한은 바꾸지 않는다.
 `ROUTING_FULLBODY_ENABLED`는 이 기능 브랜치의 API 팩토리에서 변수가 없을 때도 1이므로,
 기존 mock/레거시 개발 환경은 명시적으로 0을 설정해야 한다. `.env.example`은 0으로 유지한다.
-이는 기본값 1인 위 병렬 옵션과 별개다. PR 생성은 배포가 아니다.
+이는 기본값 0인 위 병렬 옵션과 별개다. PR 생성은 배포가 아니다.
 
 - `selected`: 일반 경로에서는 핵심 동작 및 확인된 세부 조건을 통과한 전신 라이브러리 후보, 최대 5개.
   통합 체형 opt-in 경로에서 조건 통과 후보가 0개면 기존 생성 시도 이후 기하 참고를 반환할 수 있다.
@@ -1288,3 +1287,93 @@ semantic-only, geometry fallback, near/framing/mirror 참고, 생성 후보 및 
 기존 `GET /pose/{pose_id}/poster`에 선택적으로 `variant=rough-yaw8-v1&view=yaw_045`를 전달하면 검색 좌표계 기준 45도 간격의 검증된 정적 참고 이미지를 제공합니다. BFF가 후보별 카메라로 view를 결정합니다. `source_sha256`·scope·등록/격리 검증은 유지하며 variant 없는 호출은 기존 native PNG 호환 경로를 유지합니다.
 
 실제 served yaw·폴백·투영 불일치는 버전 있는 헤더로 전달합니다. 없는 방향이나 머리 단독 자산을 임의로 채우거나 원본 포즈·정밀 카메라·내보내기 권한을 바꾸지 않습니다. 자산 좌표 변환, JPEG 형식, 누락/손상 구분 및 헤더는 [ROUGH_YAW8_PREVIEWS.md](ROUGH_YAW8_PREVIEWS.md)를 참조합니다.
+
+## Refine v3 experimental sidecars (2026-10-22, default off)
+
+This additive phase preserves the existing candidate selection, automatic `/refine`, F25 selector, `refined=false` fallback, thumbnail timing and accepted output bytes. It does **not** enable regional or target-aware product refinement.
+
+- `/analyze` people may carry `joint_provenance` (`joint-observation-v1`) and diagnostic-only `refine_evidence` when `REFINE_V3_EVIDENCE_ENABLED=1`. Original/current coordinates and scores, actual source, visibility, reason and stable slot ID are distinct. Detector scores and VLM `visible` remain `model_inferred`; repaired occluded coordinates remain `occluded_estimated`. None creates direct-observation authority.
+- The existing analyze/read_hands calls can return bounded optional evidence; invalid optional fields are discarded independently of valid core control/hand fields. Strict explicit person-ID and hand-subset mapping is required. No new refine VLM call is scheduled; call traces distinguish logical calls, provider attempts (unknown for hidden SDK retries), image count and available token usage.
+- `REFINE_V3_MODE=shadow` adds `quality_trace.refine_v3` and, with a local `REFINE_V3_BINDING_SECRET` of at least 32 bytes, a private optional `people[].refine_v3` envelope. BFF stores this sidecar privately; it is not a public client permission or request field. It binds the original library source, query, stable person lineage, fixed indexed camera and evidence. Missing direct visibility/independent side authority yields an ineligible diagnostic; it never rewrites the existing global gate.
+- `/refine` accepts optional `refine_v3` (maximum canonical JSON size 65,536 bytes). HMAC, exact selected-source/query and supplied camera-context checks precede shadow execution. Spoofed/stale/unsupported sidecars abstain. Shadow runs consume the original request's remaining budget and discard all experiment BVH bytes. Diagnostics identify the B0 source experiment and explicitly do not claim an F25/target/FBX improvement. Existing response `bvh`, `refined`, limbs and fallback remain authoritative.
+- `GET /healthz` refine capability adds `refine_v3`: mode, version, key availability, `regional_apply=false`, `target_apply=false`, `certified_profiles=0`, and mesh-validation requirement. `on`/unknown mode values fail closed to off. No signing key is exposed.
+
+The Converter's existing `final-fbx-v1`/`skin_verified` receipt checks finite geometry, skeleton and skin binding. It does **not** certify absence of penetration or folding. `CONVERTER_REFINE_V3_MESH_SHADOW=1` optionally records a separate full-body audit before framing, default off. Strict `refine-v3-final-artifact-v1` issuance requires a supported complete mesh audit, exact full-body bytes, reimport integrity, profile/context/revision match; current production profiles are unsupported. Cropped/rotated strict derivations remain unsupported. Existing five-scope artifact-ready and separate preview continue unchanged.
+
+[Implementation, verification and unsupported scope](REFINE_V3_IMPLEMENTATION_2026-10-22.md), [Converter support boundary](../converter/REFINE_V3_SUPPORT.md).
+
+## Scene camera transport extension
+
+Converter `/compose-scene` may return an artifact-bound `X-Standin-Scene-Camera` header; v4 `/scene/build` returns the matching `camera` object. See [scene-camera-transport-v1.md](scene-camera-transport-v1.md). Binary bodies and existing version/hash fields remain unchanged. This does not claim automatic CSP camera application.
+
+## 자연어 설명 재시도와 전체 분석 기한 (2026-10-29)
+
+`/analyze`는 요청 수신부터 최대 120초를 공유합니다. 기한 초과는 HTTP 504,
+`detail.code=ANALYSIS_TIMEOUT`이며 정상 무결과와 구분합니다. API 연결 종료 또는
+기한 초과 뒤 설명 재시도/좌우 검수를 새로 시작하지 않습니다. 이미 실행 중인
+동기 CPU/native 작업을 강제 종료하는 기능은 아닙니다. HTTP 응답은 기한에 종료하고,
+실행 중인 provider 호출은 기존의 남은 시간 상한으로 종료합니다.
+
+자세 설명은 최초 최대 15초(`ROUTING_DESCRIBE_TIMEOUT_MS`), 일시 오류에 한해서
+.5~1초 지터 후 최대 30초로 한 번 재시도합니다. SDK 중첩 재시도는 지원 버전에서
+비활성화합니다. 설명·재시도 대기·선택적 독립 좌우 검수의 합은 최대 45초
+(`ROUTING_DESCRIBE_BUDGET_MS`)이며 전체 120초의 남은 시간에서 검색용 15초
+(`ROUTING_DESCRIBE_RESERVE_MS`)를 뺀 값으로 더 줄어듭니다. 좌우 검수 시간이
+부족하면 기존 `unknown`/검수 불가 규칙을 적용합니다. 긴 provider cooldown과
+일일 한도, 비일시 오류를 무시해 재시도하지 않습니다.
+
+`Pipeline.process_cut`을 직접 호출하는 로컬 평가도 동일한 요청 시작 기한을
+설명 호출에 전달합니다. 직접 호출에는 HTTP 미들웨어의 응답 종료 기능이 없습니다.
+프롬프트·모델·응답 스키마와 검색 품질 문턱은 이 수정으로 변경하지 않습니다.
+설명이 모두 실패하면 실제 오류와 기존 기하 폴백을 유지합니다.
+
+
+## 다인 컷 인물별 크롭 설명 (2026-10-29)
+
+`ROUTING_DESCRIBE_PERSON_CROPS=1`(기본)에서는 두 명 이상을 설명할 때 원본 인물
+박스별로 문맥 크롭을 만들고 1인 응답 스키마로 각각 요청합니다. 박스 너비·높이의
+20%(최소 8픽셀)를 문맥으로 남기고 이미지 경계에서 자릅니다. 대상 박스는 크롭
+좌표로 다시 정규화합니다. 좌우 반전, 포즈 좌표 생성, 가려진 부위의 보완은 하지 않습니다.
+크롭 대상 외 인물을 섞지 않고 보이는 부위만 설명하라는 지시가 추가됩니다.
+`person-context-crop-v1`이 이 입력/지시 정책의 버전입니다. 1인 입력은 기존 방식입니다.
+
+동시에 실행하는 크롭은 컷당 최대 2개(`ROUTING_DESCRIBE_PERSON_WORKERS`)이며,
+프로세스 전체에도 2개 상한이 있습니다. 슬롯 대기·크롭·각 인물의 재시도·독립 좌우
+검수 모두 같은 설명 종료 시각을 공유합니다. 사람마다 새 45초를 만들지 않습니다.
+전체 요청 120초와 검색 예비 시간 15초 제한이 먼저 적용됩니다. 기한 뒤 대기 중인
+작업은 취소하고, 이미 호출 중인 HTTP 결과가 늦게 와도 반환 결과에 합치지 않습니다.
+
+한 인물이 실패해도 다른 인물의 성공 설명은 검색에 전달됩니다. 집계 status는
+전원 성공 `ok`, 일부 성공 `partial_error`, 전원 실패 `error`입니다. `person_errors`는
+실패한 **설명 요청 배열 인덱스**별 사유·재시도 정보를, `person_reports`는 원본 박스,
+크롭 영역, 재정규화 대상 박스, 시도 수와 소요 시간을 기록합니다. 최종 화면 인물
+순서와 설명 요청 순서는 다를 수 있으며 이 숫자를 최종 화면 인물 번호로 재해석하면
+안 됩니다. Pipeline은 요청 슬롯별로 정확히 대응한 뒤 기존 화면 정렬을 적용합니다.
+이 정보는 `search_routing.describe`에도 실립니다. 오류 인물을 빈 정상 설명으로
+채우지 않고 그 인물의 `vlm_error`로 남깁니다. 품질 문턱·관절 판정·검색 랭킹은 유지합니다.
+
+롤백은 `ROUTING_DESCRIBE_PERSON_CROPS=0`으로 기존 묶음 호출로 돌아가는 방식입니다.
+기존 120초 제한 및 제한 재시도 정책은 유지됩니다. `person_reports`에는 원문 이미지나
+응답 전체를 기록하지 않습니다. 인물별 격리 실패·원본 인물 순서·공유 예산·프로세스
+동시성 제한을 회귀 테스트로 검증합니다.
+
+
+## Opt-in internal interactive Converter
+
+The separately authenticated internal snapshot/static transport is documented in [real-model interactive v2](NEXT_SPRINT/INTERACTIVE_REAL_MODEL_V2_2026-11-04.md). This does not change public inference `/analyze` or `/refine` request/response contracts.
+
+The private snapshot camera accepts both the continuous `candidate-camera-v2` (`reference=search-fit`) and the explicit `pose-preview-camera-v1` presentation contract. The latter retains its original version and `projection_matches_search` value: a fixed/semantic reference is never relabeled as a fitted search camera. Its right-handed Y-up basis, hip origin/torso scale, image-down projection rule, unbaked rotation and finite projection parameters are validated before the same torso-calibrated camera calculation. BFF binds the validated original BVH SHA to either camera dialect; Converter still checks that binding against the source. Ownership, hand/body lineage, immutable snapshots, release checks and final FBX validation are unchanged.
+
+
+
+## Internal converter: approved final-FBX skin (2026-11-06)
+
+The private `GET /skin-contract`, `GET /skin-assets/{sha256}` and `POST /skin-fbx` endpoints add a separate strict `fbx-skin-v1` choice. Default is omitted to retain the legacy byte-preserving path. Nondefault skins are limited to exact approved current male/female full individual FBXs, with source/runtime/manifest/UV/texture-bound proof and independent fresh-process verification. Combined exports apply skin before outline. Global enablement remains off. See [full contract, actual CSP evidence and limitations](SKIN_FBX_CSP.md).
+
+
+## RC4 staging adapter
+
+Opt-in `/refine/release` returns a verified FBX, baked display GLB and separate
+camera; it does not replace the legacy BVH `/refine` contract. See
+[RC4 integration](../services/refine_release/README.md) for deployment flags,
+original asset registration, persistence and withholding requirements.

@@ -127,8 +127,6 @@ def read_styled_poster(data_dir, source, scope, view):
     manifest = manifest_for(data_dir)
     if manifest is None or scope not in SCOPES:
         return None
-    if 'serving_library_version' in manifest and source not in manifest['pose_records']:
-        return None
     if view not in VIEWS:
         raise ValueError('invalid styled thumbnail view')
     root = _root(data_dir)
@@ -140,7 +138,13 @@ def read_styled_poster(data_dir, source, scope, view):
         # rough_posters allows a fallback only for genuinely old/missing bundles.
         # A declared complete style release must never mix angles or styles.
         raise ValueError('advertised styled thumbnail is missing') from error
+    from .thumbnail_patch import read_patch
+    replacement = read_patch(data_dir, source, name, data)
     revision, asset_version = record['renderer_revision'], manifest['asset_version']
+    if replacement is not None:
+        data, patch = replacement
+        revision = patch['renderer_revision']
+        asset_version = patch['asset_version']
     from .directional_posters import CHARACTER_SHA
     from .pose_posters import headers
     meta = dict(kind='default-body', render_method='frozen-retarget-v1',
@@ -151,7 +155,7 @@ def read_styled_poster(data_dir, source, scope, view):
                    'X-Standin-Thumbnail-Style': STYLE,
                    'X-Standin-Native-Render-Method': 'reviewed-surface-outline-v1',
                    'X-Standin-Preview-View': view,
-                   'X-Standin-Asset-Library-Version': manifest.get('serving_library_version', manifest['source_library_version'])})
+                   'X-Standin-Asset-Library-Version': manifest['source_library_version']})
     return data, result
 
 
@@ -160,15 +164,17 @@ def legacy_thumbnail_path(data_dir, pose_id, view):
     if manifest is None:
         return None
     source = manifest['poses'].get(pose_id)
-    if source is None and 'serving_library_version' in manifest:
-        return None
     if source is None or view not in LEGACY_VIEWS:
         raise ValueError('unregistered styled legacy thumbnail')
     root = _root(data_dir)
     record = _record(root, manifest, source)
     name = f'full__{LEGACY_VIEWS[view]}.jpg'
     path = root / source / name
-    _raster(path, record['images'][name])
+    data = _raster(path, record['images'][name])
+    from .thumbnail_patch import read_patch
+    replacement = read_patch(data_dir, source, name, data)
+    if replacement is not None:
+        return Path(data_dir) / 'thumbs/raster-patch' / name
     return path
 
 
@@ -198,21 +204,18 @@ def _extract(archive, destination):
         raise ValueError('incomplete thumbnail archive')
 
 
-def _verify_library_pose_map(base, db_path, manifest, *, partial=False):
+def _verify_library_pose_map(base, db_path, manifest):
     """An alias must bind to the bytes registered for its own pose ID."""
     db = Path(db_path).resolve(strict=True)
     with sqlite3.connect(db.as_uri() + '?mode=ro', uri=True) as connection:
         rows = connection.execute('SELECT pose_id, bvh_path FROM poses').fetchall()
     expected = manifest['poses']
-    registered = {pose for pose, _ in rows}
-    if not (set(expected) < registered if partial else set(expected) == registered):
+    if {pose for pose, _ in rows} != set(expected):
         raise ValueError('thumbnail overlay pose IDs do not match the library')
     bvh_dir = base / 'bvh'
     if bvh_dir.is_symlink():
         raise ValueError('invalid thumbnail overlay BVH directory')
     for pose, raw in rows:
-        if pose not in expected:
-            continue
         if not isinstance(raw, str) or not raw:
             raise ValueError('thumbnail overlay pose has no BVH path')
         name = PurePosixPath(raw.replace(chr(92), '/')).name
@@ -230,33 +233,14 @@ def ensure_thumbnail_overlay(data_dir, db_path, uri=None, archive_sha=None):
         raise ValueError('thumbnail overlay needs an S3 URI and pinned SHA256')
     base = Path(data_dir).resolve()
     root = _root(base)
-    library = _json(base / 'library_manifest.json', 65536)
-    declaration = library.get('thumbnail_overlay')
-    partial = declaration is not None
-    db_sha = _sha(Path(db_path))
-    if library['db_sha256'] != db_sha:
-        raise ValueError('serving library database changed')
-
-    def validate_binding(manifest):
-        if partial:
-            expected = dict(archive_sha256=archive_sha,
-                            source_library_version=manifest['source_library_version'],
-                            source_db_sha256=manifest['library_db_sha256'],
-                            pose_count=manifest['pose_count'])
-            if declaration != expected:
-                raise ValueError('thumbnail overlay does not match the declared source release')
-        elif (manifest['library_db_sha256'] != db_sha
-                or manifest['source_library_version'] != library['library_version']):
-            raise ValueError('thumbnail overlay belongs to a different library')
-        _verify_library_pose_map(base, db_path, manifest, partial=partial)
-
     marker = root / 'archive.sha256'
     if marker.is_file() and marker.read_text() == archive_sha:
-        installed = manifest_for(base)
-        if installed is None or (partial and installed.get('serving_library_version') != library['library_version']):
-            raise ValueError('installed thumbnail overlay database changed')
-        validate_binding(installed)
-        return False
+        manifest = manifest_for(base)
+        if manifest and manifest['library_db_sha256'] == _sha(Path(db_path)):
+            if 'source_count' in manifest:
+                _verify_library_pose_map(base, db_path, manifest)
+            return False
+        raise ValueError('installed thumbnail overlay database changed')
     from .library_source import _download_s3
     with tempfile.TemporaryDirectory(prefix='thumbnail-overlay-', dir=base) as temporary:
         work = Path(temporary)
@@ -267,16 +251,19 @@ def ensure_thumbnail_overlay(data_dir, db_path, uri=None, archive_sha=None):
         unpacked = work / 'unpacked'
         _extract(archive, unpacked)
         manifest = manifest_for(unpacked)
-        validate_binding(manifest)
+        library = _json(base / 'library_manifest.json', 65536)
+        if (manifest['library_db_sha256'] != _sha(Path(db_path))
+                or manifest['source_library_version'] != library['library_version']):
+            raise ValueError('thumbnail overlay belongs to a different library')
+        if 'source_count' in manifest:
+            _verify_library_pose_map(base, db_path, manifest)
         incoming = _root(unpacked)
         for source in manifest['pose_records']:
             record = _record(incoming, manifest, source)
             for name, info in record['images'].items():
                 _raster(incoming / source / name, info)
-        if partial:
-            installed = dict(manifest, serving_library_version=library['library_version'])
-            (incoming / 'manifest.json').write_text(json.dumps(installed, ensure_ascii=False))
         (incoming / 'archive.sha256').write_text(archive_sha)
+        # Startup only: no requests can observe a partially installed release.
         if root.exists():
             raise ValueError('remove the previous overlay only through a fresh task deployment')
         root.parent.mkdir(parents=True, exist_ok=True)

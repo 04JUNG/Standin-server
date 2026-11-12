@@ -177,6 +177,7 @@ class Pipeline:
         """손 모양 호출을 백그라운드로 띄운다. 끄면(기본) 손은 기본값으로 나간다."""
         vlm._hand_shapes_future = None
         vlm._hand_shapes_person_indices = ()
+        vlm._refine_contact_evidence = None
         if not CFG.vlm_hand_shapes or vlm.num_people <= 0:
             return
         boxes = [
@@ -213,6 +214,11 @@ class Pipeline:
             future.cancel()
             payload = None
         apply_hand_shapes(vlm, payload, person_indices=vlm._hand_shapes_person_indices)
+        from .refine_evidence import bind_hand_contact_evidence
+        if getattr(vlm, "_refine_image_digest", None):
+            vlm._refine_contact_evidence = bind_hand_contact_evidence(payload,
+                vlm._hand_shapes_person_indices, image_digest=vlm._refine_image_digest,
+                image_size=vlm._refine_image_size)
 
     # ---- 메인 ----
     def process_cut(self, image, img_w: int = 512, img_h: int = 768,
@@ -262,6 +268,11 @@ class Pipeline:
             abandon_pipeline_review(vlm)
 
     def _process_analyzed_cut(self, image, img_w, img_h, rescue_request, vlm, prepare_search_observations):
+        from .refine_evidence import enabled as refine_evidence_enabled
+        from .refine_v3_runtime import image_digest, mode as refine_v3_mode
+        vlm._refine_image_size = (img_w, img_h)
+        vlm._refine_image_digest = (image_digest(image)
+            if refine_evidence_enabled() or refine_v3_mode() == "shadow" else None)
         # 1-b) 인물별 태그는 **별도 호출**로 받는다(기록용). 분석 프롬프트를 건드리지
         #      않으므로 route·인원수·박스가 이 호출 때문에 달라질 수 없다.
         #      스켈레톤 추출과 겹쳐 돌려 지연을 숨긴다 — 결과는 descriptor를 만들기
@@ -526,6 +537,10 @@ class Pipeline:
         # Hybrid/semantic paths bypass _evaluate_slot; retain the same per-slot
         # hands there, with omitted head slots explicitly left not_requested.
         self._join_hand_shapes(vlm)
+        from .refine_evidence import bind_analysis_evidence
+        refine_image_sha = getattr(vlm, "_refine_image_digest", None)
+        evidence_by_slot = (bind_analysis_evidence(vlm, slots, refine_image_sha,
+                            (img_w, img_h)) if refine_image_sha else {})
         fullbody_inputs = {}
         search_evidence = getattr(self._fullbody_search, "search_evidence", None)
         if self._fullbody_search is not None and routing:
@@ -537,6 +552,7 @@ class Pipeline:
                     self._correct_arm_contact(slot, decision) if search_evidence is not None
                     else (slot, None))
                 desc = build_slot_descriptors(vlm, [corrected], image_size=(img_w, img_h))[0]
+                desc.refine_evidence = evidence_by_slot.get(corrected.slot_id)
                 if arm_correction is not None:
                     desc.quality_trace["arm_contact_correction"] = arm_correction
                 desc.output_scope = refine_scope_from_description(
@@ -584,6 +600,16 @@ class Pipeline:
                     desc, slot, report, getattr(self._fullbody_search, 'camera', None))
                 self._apply_refine_policy(desc, slot, "low", has_candidates=bool(bindings))
                 desc.refine_candidates = bindings if desc.refine_allowed else []
+                from .refine_v3_runtime import mode as refine_v3_mode
+                if refine_v3_mode() == "shadow":
+                    from .refine_v3_runtime import issue_for_slot
+                    try:
+                        desc._refine_v3 = issue_for_slot(desc, slot, report,
+                            getattr(self._fullbody_search, 'camera', None),
+                            image_sha256=refine_image_sha)
+                    except (ValueError, TypeError, KeyError, OSError):
+                        desc.quality_trace["refine_v3"] = {
+                            "mode": "shadow", "applied": False, "reason": "binding_failed"}
                 desc.quality_trace['dynamic_refine_candidate_count'] = len(desc.refine_candidates)
                 desc.quality_trace["search_scope"] = "whole_library_pose"
                 record = self._routing_record(decision, routing,
@@ -671,6 +697,8 @@ class Pipeline:
             processed.append((slot, outcome))
 
         processed.sort(key=lambda item: _result_slot_order(item[0]))
+        for slot, outcome in processed:
+            outcome.descriptor.refine_evidence = evidence_by_slot.get(slot.slot_id)
         descs = [outcome.descriptor for _, outcome in processed]
         if recovered:
             notes.append(
@@ -806,9 +834,11 @@ class Pipeline:
             if prefetch is not None and prefetch.status in ("used", "used_error"):
                 describe_ms = prefetch.elapsed_ms
             for index, slot in enumerate(need):
-                if describe.status != "ok":
+                person_error = getattr(describe, "person_errors", {}).get(index)
+                if person_error is not None or describe.status not in ("ok", "partial_error"):
                     semantics[id(slot)] = assess_semantic_evidence(
-                        None, rcfg, vlm_error=describe.error_reason or "unknown")
+                        None, rcfg, vlm_error=(person_error or {}).get("error_reason")
+                        or describe.error_reason or "unknown")
                 else:
                     from .pose_relations import reconcile_sides
                     description=describe.descriptions.get(index)
@@ -843,6 +873,8 @@ class Pipeline:
                 "retryable": getattr(describe, "retryable", None),
                 "retry_after_seconds": getattr(describe, "retry_after_seconds", None),
                 "attempts": getattr(describe,"attempts",0),
+                "person_errors": getattr(describe,"person_errors",{}),
+                "person_reports": getattr(describe,"person_reports",{}),
                 "elapsed_ms": round(describe_ms, 3),
             },
             "routing_elapsed_ms": round((perf_counter() - started) * 1000.0, 3),

@@ -40,6 +40,7 @@ from src.library import project_3d_to_2d, view_angle
 
 
 EVALUATOR_VERSION = "refine-external-v1.1"
+CAMERA_EVALUATOR_VERSION = "refine-external-v1.2-fixed-camera"
 
 # These are evaluator constants, not values read from a particular solver arm.
 # Changing one requires an evaluator version bump and a new frozen run manifest.
@@ -514,11 +515,70 @@ def _identity(base: _Artifact, result: _Artifact) -> dict:
     }
 
 
+@dataclass(frozen=True)
+class _FrozenCamera:
+    rotation: np.ndarray
+    origin: np.ndarray
+    distance_world: float | None
+    near_world: float
+    labels_swapped: bool
+    identity: str
+
+    def __str__(self):
+        return "frozen-camera:" + self.identity
+
+
+def _freeze_camera(camera: dict, base: _Artifact) -> _FrozenCamera:
+    # Independent projection arithmetic below deliberately does not invoke the
+    # solver's projection_scope/FixedProjection implementation.
+    from converter.camera import validate_rotation
+
+    rotation = np.asarray(validate_rotation(camera.get("rotation")), dtype=np.float64)
+    if rotation.shape != (3, 3) or not base.valid:
+        raise ValueError("camera requires a valid rotation and parsed base")
+    if camera.get("source_bvh_sha256") != str(base.content_sha256).removeprefix("sha256:"):
+        raise ValueError("camera source BVH differs from selected base")
+    if camera.get("version") not in {"candidate-camera-v1", "candidate-camera-v2"}:
+        raise ValueError("unsupported camera version")
+    projection = camera.get("projection") or "orthographic"
+    distance = camera.get("distance_torso")
+    if projection not in {"orthographic", "perspective"}:
+        raise ValueError("unsupported camera projection")
+    if projection == "perspective" and (isinstance(distance, bool) or not isinstance(distance, (int, float))
+                                         or not math.isfinite(distance) or distance < .8):
+        raise ValueError("invalid perspective distance")
+    if projection == "orthographic" and distance is not None:
+        raise ValueError("orthographic camera cannot have perspective distance")
+    origin = base.kp3d[[11, 12]].mean(axis=0)
+    torso = float(np.linalg.norm(base.kp3d[[5, 6]].mean(axis=0) - origin))
+    if torso <= 1e-6:
+        raise ValueError("invalid camera base torso")
+    swapped = camera.get("labels_swapped", False)
+    if type(swapped) is not bool:
+        raise ValueError("camera label swap must be boolean")
+    return _FrozenCamera(rotation, origin, distance * torso if distance is not None else None,
+                         .1 * torso, swapped, _canonical_sha256(camera))
+
+
 def _aligned_projection(artifact: _Artifact, evidence: dict, view) -> tuple:
-    angle = view_angle(view)
-    projection = project_3d_to_2d(artifact.kp3d, angle).astype(np.float64)
-    projection[:, 1] *= -1.0
-    mapped = artifact.scores >= float(evidence["score_threshold"])
+    if isinstance(view, _FrozenCamera):
+        points = (artifact.kp3d - view.origin) @ view.rotation.T
+        projection = points[:, :2].copy()
+        projection[:, 1] *= -1.0
+        if view.distance_world is not None:
+            depth = points[:, 2] + view.distance_world
+            if not np.isfinite(depth).all() or np.any(depth <= view.near_world):
+                raise ValueError("artifact crosses frozen camera near plane")
+            projection /= depth[:, None]
+        mapped = artifact.scores >= float(evidence["score_threshold"])
+        if view.labels_swapped:
+            swap = [0, 2, 1, 4, 3, 6, 5, 8, 7, 10, 9, 12, 11, 14, 13, 16, 15]
+            projection, mapped = projection[swap], mapped[swap]
+    else:
+        angle = view_angle(view)
+        projection = project_3d_to_2d(artifact.kp3d, angle).astype(np.float64)
+        projection[:, 1] *= -1.0
+        mapped = artifact.scores >= float(evidence["score_threshold"])
     if not bool(mapped[[5, 6, 11, 12]].all()):
         raise ValueError("BVH shoulders and hips are not fully mapped")
     hip = (projection[11] + projection[12]) * 0.5
@@ -1371,6 +1431,7 @@ def evaluate_refine_artifacts(
     score_threshold: float = 0.3,
     *,
     allowed_joint_suffixes: Iterable[str] | None = None,
+    camera: dict | None = None,
 ) -> dict:
     """Evaluate one returned BVH against its frozen base and query.
 
@@ -1383,6 +1444,20 @@ def evaluate_refine_artifacts(
     )
     base = _load_artifact(base_path)
     result = _load_artifact(result_path)
+    camera_error = None
+    if camera is not None:
+        try:
+            view = _freeze_camera(camera, base)
+            if camera.get("observed_joint_mask") is not None:
+                mask = camera["observed_joint_mask"]
+                if not isinstance(mask, list) or len(mask) != 17 or any(type(v) is not bool for v in mask):
+                    raise ValueError("invalid camera observed joint mask")
+                masked_scores = [score if keep else 0.0 for score, keep in zip(target_scores, mask)]
+                evidence = query_evidence(target_keypoints, masked_scores, score_threshold=score_threshold)
+        except (ValueError, TypeError, KeyError) as exc:
+            camera_error = "invalid_frozen_camera: " + _safe_error(exc)
+            evidence.update(valid=False, error=camera_error)
+            _rehash_evidence(evidence)
     _freeze_base_relative_pair_evidence(evidence, base, view)
     identity = _identity(base, result)
     allowed = frozenset(
@@ -1391,9 +1466,16 @@ def evaluate_refine_artifacts(
         else (str(value) for value in allowed_joint_suffixes)
     )
     evaluator_config = _evaluator_config(allowed)
+    evaluator_version = CAMERA_EVALUATOR_VERSION if camera is not None else EVALUATOR_VERSION
+    if camera is not None:
+        evaluator_config.update(evaluator_version=evaluator_version, camera_sha256=_canonical_sha256(camera))
+        evaluator_config.pop("config_sha256", None)
+        evaluator_config["config_sha256"] = _canonical_sha256(evaluator_config)
+        evidence["evaluator_version"] = evaluator_version
+        _rehash_evidence(evidence)
     if not evidence["valid"]:
         output = {
-            "evaluator_version": EVALUATOR_VERSION,
+            "evaluator_version": evaluator_version,
             "evaluator_config": evaluator_config,
             "ok": False,
             "query_evidence": evidence,
@@ -1447,7 +1529,7 @@ def evaluate_refine_artifacts(
         safety["violation_count"] = len(safety.get("violations", []))
         safety["absolute_violation_count"] = len(safety["absolute_violations"])
     output = {
-        "evaluator_version": EVALUATOR_VERSION,
+        "evaluator_version": evaluator_version,
         "evaluator_config": evaluator_config,
         "ok": bool(
             base.valid and result.valid

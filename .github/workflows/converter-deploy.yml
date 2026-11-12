@@ -12,8 +12,25 @@ on:
       - "converter_api/**"
       - "config/characters.example.json"
       - "deploy/ecs/**"
+      - "scripts/prepare_hand_screen_deployment.py"
+      - "scripts/prepare_staging_final_cache.py"
+      - "config/staging-final-cache.json"
+      - "scripts/verify_staging_anatomy.py"
+      - "scripts/prepare_staging_anatomy.py"
+      - "scripts/staging_body_assets_init.py"
+      - "config/staging-anatomy-release.json"
+      - "src/hand_skin_capacity.py"
   workflow_dispatch:
     inputs:
+      target:
+        description: "Manual target (scene-worker runs only on develop/staging)"
+        type: choice
+        options:
+          - converter
+          - scene-worker
+          - hand-screen-staging-image
+        required: true
+        default: converter
       deploy_staging:
         description: "Deploy develop to staging even when automatic deploys are disabled (never main/beta)"
         type: boolean
@@ -40,10 +57,12 @@ jobs:
   deploy:
     name: Deploy isolated converter
     if: >-
-      vars.CONVERTER_AUTO_DEPLOY_ENABLED == 'true' ||
-      (github.event_name == 'workflow_dispatch' &&
-       ((inputs.deploy_staging && github.ref == 'refs/heads/develop') ||
-        (inputs.deploy_beta && github.ref == 'refs/heads/main')))
+      inputs.target != 'scene-worker' &&
+      inputs.target != 'hand-screen-staging-image' &&
+      (vars.CONVERTER_AUTO_DEPLOY_ENABLED == 'true' ||
+       (github.event_name == 'workflow_dispatch' &&
+        ((inputs.deploy_staging && github.ref == 'refs/heads/develop') ||
+         (inputs.deploy_beta && github.ref == 'refs/heads/main'))))
     runs-on: ubuntu-latest
     environment: ${{ github.ref == 'refs/heads/main' && 'beta' || 'staging' }}
     env:
@@ -66,7 +85,10 @@ jobs:
           python -m pip install httpx pytest
           python -m compileall converter converter_api scripts/measure_converter_latency.py
           python -m pytest -q \
+            tests/test_hand_screen_deployment.py \
+            tests/test_staging_anatomy_deployment.py \
             tests/converter/test_worker_contract.py \
+            tests/converter/test_prepared_body.py \
             tests/converter/test_registry.py \
             tests/converter/test_runner_failures.py \
             tests/converter/test_api_contract.py \
@@ -130,6 +152,30 @@ jobs:
           jq -e '.containerDefinitions | any(.name == "converter")' taskdef.json
           jq -e '.containerDefinitions | all(.name != "inference")' taskdef.json
 
+      - name: Verify production feature and asset parity
+        if: env.ECS_SERVICE != '' && github.ref == 'refs/heads/main'
+        run: python scripts/verify_production_parity.py taskdef.json --role converter
+
+      - name: Prepare explicit Converter hand-screen settings
+        if: env.ECS_SERVICE != ''
+        env:
+          CONVERTER_MAX_CONCURRENT_PROCESSES: ${{ vars.CONVERTER_MAX_CONCURRENT_PROCESSES }}
+          CONVERTER_SCREEN_SELECTED_HANDS: ${{ vars.CONVERTER_SCREEN_SELECTED_HANDS }}
+        run: python scripts/prepare_hand_screen_deployment.py taskdef.json --container converter
+
+      - name: Prevent staging anatomy release regression
+        if: env.ECS_SERVICE != '' && github.ref == 'refs/heads/develop'
+        run: |
+          python scripts/prepare_staging_anatomy.py taskdef.json
+          python scripts/verify_staging_anatomy.py taskdef.json
+
+      - name: Configure staging verified final FBX persistence
+        if: github.ref == 'refs/heads/develop' && env.ECS_SERVICE != ''
+        env:
+          STAGING_FINAL_CACHE_ENABLED: ${{ vars.CONVERTER_FINAL_CACHE_ENABLED || '1' }}
+          STAGING_REUSE_REST_METRICS: ${{ vars.CONVERTER_REUSE_REST_METRICS || '1' }}
+        run: python scripts/prepare_staging_final_cache.py taskdef.json
+
       - uses: aws-actions/amazon-ecs-render-task-definition@v1
         id: render
         if: env.ECS_SERVICE != ''
@@ -148,3 +194,35 @@ jobs:
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
+
+  scene_worker:
+    name: Build or deploy v4 scene worker (staging)
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/develop' && inputs.target == 'scene-worker'
+    uses: ./.github/workflows/scene-worker-deploy.yml
+    with:
+      deploy_staging: ${{ inputs.deploy_staging }}
+
+  hand_screen_staging_image:
+    name: Build pinned staging hand-screen profile image
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/develop' && inputs.target == 'hand-screen-staging-image'
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.CONVERTER_AWS_DEPLOY_ROLE }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - uses: docker/setup-buildx-action@v3
+      - name: Add read-only screening profile to pinned staging image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.converter.hand-screen-staging
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:hand-screen-staging-${{ github.sha }}
+          build-args: |
+            DEPLOYMENT_VERSION=hand-screen-staging-${{ github.sha }}

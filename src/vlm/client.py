@@ -26,6 +26,7 @@ from ..logging_setup import log_info, log_warn
 from ..pose_query import validated_object_hands
 from . import prompts
 from .failures import classify_failure, failure_reason, NONRETRYABLE_REASONS
+from ..refine_evidence import enabled as refine_evidence_enabled, parse_refine_evidence, response_trace
 
 
 _MAX_VLM_PEOPLE = 20
@@ -71,6 +72,13 @@ def _coerce(analysis: dict, img_w: int, img_h: int) -> VLMAnalysis:
     if "person_bodies" in analysis:
         from ..experimental.body_matching.integrated import parse_bodies
         person_bodies = parse_bodies(analysis["person_bodies"], num)
+    evidence = None
+    if refine_evidence_enabled():
+        evidence = parse_refine_evidence(
+            analysis.get("refine_observations"), expected_person_ids=range(num),
+            body_scopes={i: scope for i, scope in enumerate(
+                parse_person_scopes(analysis.get("body_scopes"), num)) if scope is not None},
+        ).to_serializable()
     return VLMAnalysis(
         num_people=num,
         shot=pick(Shot, analysis.get("shot"), Shot.FULL_HALF),
@@ -82,6 +90,7 @@ def _coerce(analysis: dict, img_w: int, img_h: int) -> VLMAnalysis:
         dialogue=analysis.get("dialogue"),
         raw=analysis,
         person_bodies=person_bodies,
+        refine_evidence=evidence,
         lower_body_visible=lower_body_visible,
         lower_body_visibility_known=lower_body_visibility_known,
         body_scopes=parse_person_scopes(analysis.get("body_scopes"), num),
@@ -427,19 +436,32 @@ class GeminiVLMClient(BaseVLMClient):
         library = load_library()
         presets = [(p.preset_id, p.label_ko, p.vlm_hint, library.categories[p.category])
                    for p in library.presets.values()]
+        hand_prompt = prompts.hand_shapes_prompt(boxes, presets)
+        evidence_options = {}
+        if refine_evidence_enabled():
+            hand_prompt = prompts.refine_evidence_prompt(hand_prompt, kind="contacts")
+            from ..refine_evidence import hand_response_schema
+            evidence_options["response_json_schema"] = hand_response_schema()
         started = self._clock()
         try:
             resp = self._client.models.generate_content(
                 model=self._model,
-                contents=[prompts.hand_shapes_prompt(boxes, presets), self._to_part(image)],
+                contents=[hand_prompt, self._to_part(image)],
                 config=types.GenerateContentConfig(
                     system_instruction=prompts.HAND_SHAPES_SYSTEM,
                     response_mime_type="application/json",
                     temperature=0,
-                    http_options=types.HttpOptions(timeout=CFG.vlm_hand_shapes_timeout_ms),
+                    http_options=(_gemini_attempt_options(types, CFG.vlm_hand_shapes_timeout_ms)
+                                  if refine_evidence_enabled() else types.HttpOptions(timeout=CFG.vlm_hand_shapes_timeout_ms)),
+                    **evidence_options,
                 ),
             )
             payload = _extract_json(resp.text)
+            if refine_evidence_enabled() and isinstance(payload, dict):
+                payload["refine_evidence"] = parse_refine_evidence(
+                    payload.get("refine_contacts"), expected_person_ids=range(len(boxes)), kind="contacts",
+                    provenance=response_trace(resp, provider=self.provider, model=self._model, logical_call_id="read_hands"),
+                ).to_serializable()
             log_info(f"{self.provider}_hand_shapes", model=self._model, status="ok",
                      people=len(boxes),
                      elapsedMs=round((self._clock() - started) * 1000))
@@ -451,21 +473,74 @@ class GeminiVLMClient(BaseVLMClient):
             return None
 
     def describe_people(self, image, boxes: list):
-        """One bounded retry for transient errors, then independent side review."""
-        result = self._describe_people_once(image, boxes)
-        delay = result.retry_after_seconds or 0
-        if result.status == 'error' and result.retryable and delay <= 2:
-            if delay > 0:
+        from ..analysis_budget import bounded_deadline
+        deadline = bounded_deadline(self._clock() + max(1, CFG.routing_describe_budget_ms) / 1000,
+            reserve=max(0, CFG.routing_describe_reserve_ms) / 1000)
+        if len(boxes) > 1 and CFG.routing_describe_person_crops:
+            from .person_crops import describe_cropped_people
+            return describe_cropped_people(self, image, boxes, deadline)
+        return self._describe_people_bounded(image, boxes, deadline=deadline)
+
+    def _describe_people_bounded(self, image, boxes, *, deadline, stop=None):
+        """At most two attempts; retry gets more time, never unbounded waiting.
+
+        Description, backoff and independent review share at most 45 seconds,
+        shortened by the request deadline with 15 seconds reserved for matching.
+        Prompt/schema/model and quality/abstention rules remain unchanged.
+        """
+        started = self._clock()
+        from ..analysis_budget import bounded_deadline
+        from ..hand_skin_parallel import request_cancelled
+        deadline = bounded_deadline(deadline,
+            reserve=max(0, CFG.routing_describe_reserve_ms) / 1000)
+        cancelled = stop or request_cancelled.get()
+        first_timeout = max(1, CFG.routing_describe_timeout_ms)
+        attempts = 0
+        result = None
+        for attempt in (1, 2):
+            if cancelled is not None and cancelled.is_set():
+                break
+            if attempt == 2:
+                if result.status != 'error' or not result.retryable:
+                    break
+                hint = result.retry_after_seconds or 0
+                # Do not shorten a long provider cooldown to force a retry.
+                if hint > 2:
+                    break
+                delay = max(hint, self._jitter(.5, 1.))
+                if self._clock() + delay + 1. >= deadline:
+                    break
                 self._sleep(delay)
-            first_ms=result.elapsed_ms
-            result=self._describe_people_once(image, boxes)
-            result.attempts=2
-            result.elapsed_ms+=first_ms
+            if cancelled is not None and cancelled.is_set():
+                break
+            remaining_ms = int((deadline - self._clock()) * 1000)
+            if remaining_ms < 1:
+                break
+            timeout_ms = min(first_timeout * attempt, remaining_ms)
+            log_info(f'{self.provider}_pose_describe_attempt', model=self._model,
+                     attempt=attempt, timeoutMs=timeout_ms,
+                     remainingBudgetMs=remaining_ms)
+            result = self._describe_people_once(image, boxes, timeout_ms)
+            attempts += 1
+        if result is None:
+            from ..search_routing import DescribeOutcome
+            result = DescribeOutcome('error', error_reason='timeout',
+                                     retryable=True, provider=self.provider)
+        result.attempts = attempts
+        result.elapsed_ms = (self._clock() - started) * 1000
+        log_info(f'{self.provider}_pose_describe_summary', model=self._model,
+                 status=result.status, attempts=attempts,
+                 failureReason=result.error_reason,
+                 elapsedMs=round(result.elapsed_ms))
         if result.status == 'ok' and any(d and (d.held_object_hands or d.pose_relations) for d in result.descriptions.values()):
-            self._review_pose_sides(image, boxes, result.descriptions)
+            remaining_ms = max(0, int((deadline - self._clock()) * 1000))
+            if cancelled is not None and cancelled.is_set():
+                remaining_ms = 0
+            self._review_pose_sides(image, boxes, result.descriptions, min(20000, remaining_ms))
+        result.elapsed_ms = (self._clock() - started) * 1000
         return result
 
-    def _review_pose_sides(self, image, boxes, descriptions):
+    def _review_pose_sides(self, image, boxes, descriptions, timeout_ms=20000):
         from google.genai import types
         from ..pose_relations import validate_relations
         requested=[{'objects':list(d.held_object_hands), 'actions':[r['kind'] for r in d.pose_relations]} if d else {} for d in descriptions.values()]
@@ -476,9 +551,11 @@ class GeminiVLMClient(BaseVLMClient):
             '확인할 물건/동작만 답하고 새 사람/좌표는 만들지 않는다. JSON만 반환. '
             +json.dumps({'boxes':boxes,'requested':requested},ensure_ascii=False))
         try:
+            if timeout_ms < 1:
+                raise TimeoutError("side_review_budget_exhausted")
             resp=self._client.models.generate_content(model=self._model,contents=[prompt,self._to_part(image)],
                 config=types.GenerateContentConfig(response_mime_type='application/json',temperature=0,
-                    http_options=types.HttpOptions(timeout=20000)))
+                    http_options=_gemini_attempt_options(types, timeout_ms)))
             rows=_extract_json(resp.text)['people']
             if not isinstance(rows,list) or len(rows)!=len(boxes):raise ValueError('side_review_length')
         except Exception:
@@ -501,23 +578,29 @@ class GeminiVLMClient(BaseVLMClient):
             d.laterality_review=dict(status='reviewed' if row else 'unavailable_abstain',changes=changes,
                 evidence=str(row.get('evidence') or '')[:300],independent=True,not_ground_truth=True)
 
-    def _describe_people_once(self, image, boxes: list):
+    def _describe_people_once(self, image, boxes: list, timeout_ms=None):
         """Single request; caller controls the bounded retry."""
         from google.genai import types
         from ..search_routing import DescribeOutcome
         from .description_contract import description_schema, description_payload, DescriptionResponseError
 
         started = self._clock()
+        from .person_crops import active_person_crop
+        prompt = prompts.pose_describe_prompt(boxes)
+        if active_person_crop.get():
+            prompt = ("원본에서 한 인물 주변만 자른 이미지다. 아래 박스로 지정한 대상 한 명만 설명하라. "
+                "주변 인물이나 화면·그림 속의 다른 인물 자세를 대상에게 섞지 마라. "
+                "잘린 몸을 복원하지 말고 실제 보이는 부위와 방향만 설명하라.\n" + prompt)
         try:
             resp = self._client.models.generate_content(
                 model=self._model,
-                contents=[prompts.pose_describe_prompt(boxes), self._to_part(image)],
+                contents=[prompt, self._to_part(image)],
                 config=types.GenerateContentConfig(
                     system_instruction=prompts.POSE_DESCRIBE_SYSTEM,
                     response_json_schema=description_schema(len(boxes)),
                     response_mime_type="application/json",
                     temperature=0,
-                    http_options=types.HttpOptions(timeout=CFG.routing_describe_timeout_ms),
+                    http_options=_gemini_attempt_options(types, timeout_ms if timeout_ms is not None else CFG.routing_describe_timeout_ms),
                 ),
             )
             descriptions = parse_pose_descriptions(description_payload(resp.text), len(boxes))
@@ -557,6 +640,15 @@ class GeminiVLMClient(BaseVLMClient):
         if body_enabled and CFG.vlm_prompt_version == "p3-output-scope":
             from ..experimental.body_matching.integrated import response_schema
             body_options["response_json_schema"] = response_schema()
+        if refine_evidence_enabled():
+            from ..refine_evidence import extend_analysis_schema
+            from ..experimental.body_matching.integrated import response_schema
+            prompt = prompts.refine_evidence_prompt(prompt)
+            schema = body_options.get("response_json_schema") or response_schema()
+            if not body_enabled:
+                schema["properties"].pop("person_bodies", None)
+                schema["required"] = [key for key in schema["required"] if key != "person_bodies"]
+            body_options["response_json_schema"] = extend_analysis_schema(schema)
         if body_enabled and CFG.vlm_body_thinking_level:
             body_options["thinking_config"] = types.ThinkingConfig(thinking_level=CFG.vlm_body_thinking_level)
         attempts = max(1, getattr(CFG, self.provider + "_max_attempts"))
@@ -598,6 +690,9 @@ class GeminiVLMClient(BaseVLMClient):
                     elapsedMs=round((self._clock() - started) * 1000),
                 )
                 analysis = _coerce(_extract_json(resp.text), img_w, img_h)
+                if analysis.refine_evidence is not None:
+                    analysis.refine_evidence["call_trace"] = response_trace(
+                        resp, provider=self.provider, model=self._model, logical_call_id="analyze", attempts=attempt)
                 if body_enabled and getattr(CFG, "body_integrated_review_enabled", True):
                     # Optional read-only body review must never retry/replace a
                     # successful control analysis or receive a fresh time budget.

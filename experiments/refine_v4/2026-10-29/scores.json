@@ -1,0 +1,778 @@
+{
+  "mode": "authored_partial_visual_review",
+  "rubric_weights_version": "3.2",
+  "frozen_protocol_conformant": false,
+  "manual_authoring_allowed_in_this_experiment": true,
+  "automatic_benchmark": false,
+  "human_rubric_reviewed": false,
+  "selected_cases": 7,
+  "comparable_scored_cases": 6,
+  "reference_changed_cases_excluded": [
+    "T022"
+  ],
+  "mean_before": [
+    65.0,
+    73.33333333333333
+  ],
+  "mean_after": [
+    76.66666666666667,
+    86.66666666666667
+  ],
+  "mean_paired_gain": [
+    10.0,
+    15.0
+  ],
+  "scale": 100,
+  "rows": [
+    {
+      "test_id": "T022",
+      "case_id": "CB029",
+      "baseline": {
+        "case_id": "CB029",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 35,
+        "score_high": 60,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 40,
+        "uncertain_loss": 25,
+        "mismatch_keys": [
+          "right_arm",
+          "left_arm",
+          "right_leg",
+          "left_leg"
+        ],
+        "uncertain_keys": [
+          "torso",
+          "head"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "after": null,
+      "status": "changed_reference_excluded",
+      "reason": "추가 사진과 이후 사용자 지시로 하체 목표가 바뀌어 동결 원래 러프와 직접 점수 비교하지 않는다. 오른다리 위·무릎 펴기·발끝 방향은 별도 형상 검증이다."
+    },
+    {
+      "test_id": "T024",
+      "case_id": "CB034",
+      "baseline": {
+        "case_id": "CB034",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 65,
+        "score_high": 65,
+        "exact_score": 65,
+        "score_kind": "exact",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": true,
+        "confirmed_loss": 35,
+        "uncertain_loss": 0,
+        "mismatch_keys": [
+          "left_arm",
+          "right_leg",
+          "left_leg",
+          "head"
+        ],
+        "uncertain_keys": [],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "after": {
+        "case_id": "CB034",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 85,
+        "score_high": 85,
+        "exact_score": 85,
+        "score_kind": "exact",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": true,
+        "confirmed_loss": 15,
+        "uncertain_loss": 0,
+        "mismatch_keys": [
+          "left_arm",
+          "head"
+        ],
+        "uncertain_keys": [],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "status": "authored_partial_visual_review",
+      "paired_gain": [
+        20,
+        20
+      ],
+      "changed_criteria": {
+        "right_leg": [
+          "match",
+          "무릎을 거의 편 채 책상 위로 길게 뻗고 오른발목을 위에 겹친 배치를 확인했다."
+        ],
+        "left_leg": [
+          "match",
+          "왼다리도 길게 뻗고 오른발목 아래에 둔 배치를 확인했다. 실제 책상 접촉력은 측정하지 않았다."
+        ]
+      },
+      "human_rubric_reviewed": false,
+      "output_sha256": "ae83ab00f1308ccfd2fc26d3b850808161a995ca660d2ab97f9e269dce5b6dfb",
+      "evidence": [
+        {
+          "file": "images/T024/before_legs_reference.png",
+          "sha256": "599f15b0e26d58cb3c87dc63e586361c25b839541b4d589a8474df597d071385",
+          "native_sha256": "356c041e744f2565110cfa1693bf99054a5972ff086c2056644c53c39b236bd3"
+        },
+        {
+          "file": "images/T024/before_legs_front.png",
+          "sha256": "d58bbe8b71a5a1b59dd355d545a6c9362e0dd0e481e3bf5f1b81f581a238adf5",
+          "native_sha256": "356c041e744f2565110cfa1693bf99054a5972ff086c2056644c53c39b236bd3"
+        },
+        {
+          "file": "images/T024/before_legs_oblique.png",
+          "sha256": "c875e02f15a52e9ef96f1fd7924aa3c4525fe91fc520aa234216da8c4456796c",
+          "native_sha256": "356c041e744f2565110cfa1693bf99054a5972ff086c2056644c53c39b236bd3"
+        },
+        {
+          "file": "images/T024/before_legs_side.png",
+          "sha256": "f892c60cad411dd7b502933c9bd95656ddc9bc314f39072f73963a5e738bd6de",
+          "native_sha256": "356c041e744f2565110cfa1693bf99054a5972ff086c2056644c53c39b236bd3"
+        },
+        {
+          "file": "images/T024/after_legs_reference.png",
+          "sha256": "07cb17d11bb4c7dbd075f1bd2a99fddc1e89318424fd5845a15f8003e532f94b",
+          "native_sha256": "ae83ab00f1308ccfd2fc26d3b850808161a995ca660d2ab97f9e269dce5b6dfb"
+        },
+        {
+          "file": "images/T024/after_legs_front.png",
+          "sha256": "c3c07eb5c1bce44d54f02ea645fe2588376057f33709e4ad02264d7588bc3de1",
+          "native_sha256": "ae83ab00f1308ccfd2fc26d3b850808161a995ca660d2ab97f9e269dce5b6dfb"
+        },
+        {
+          "file": "images/T024/after_legs_oblique.png",
+          "sha256": "abb5726845c0f2c61b9706af22f225e06a5c691b7b1f56b60736fdd3a884c593",
+          "native_sha256": "ae83ab00f1308ccfd2fc26d3b850808161a995ca660d2ab97f9e269dce5b6dfb"
+        },
+        {
+          "file": "images/T024/after_legs_side.png",
+          "sha256": "e16425b433315e7967ee31d72e547638208a094c0484b996ee5cda607cb23102",
+          "native_sha256": "ae83ab00f1308ccfd2fc26d3b850808161a995ca660d2ab97f9e269dce5b6dfb"
+        }
+      ]
+    },
+    {
+      "test_id": "T041",
+      "case_id": "CB026",
+      "baseline": {
+        "case_id": "CB026",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 75,
+        "score_high": 80,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 20,
+        "uncertain_loss": 5,
+        "mismatch_keys": [
+          "right_arm",
+          "right_leg"
+        ],
+        "uncertain_keys": [
+          "head"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "after": {
+        "case_id": "CB026",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 85,
+        "score_high": 90,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 10,
+        "uncertain_loss": 5,
+        "mismatch_keys": [
+          "right_arm"
+        ],
+        "uncertain_keys": [
+          "head"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "status": "authored_partial_visual_review",
+      "paired_gain": [
+        10,
+        10
+      ],
+      "changed_criteria": {
+        "right_leg": [
+          "match",
+          "뒤로 깊게 접힌 오른무릎과 바깥쪽으로 빠진 발의 큰 배치를 확인했다. 이전 사용자 확정본 그대로다."
+        ]
+      },
+      "human_rubric_reviewed": false,
+      "output_sha256": "57b968cf88dfd46612a17ec640b4fc922bc73b89913f9ed5dfd3b05d8bef396b",
+      "evidence": [
+        {
+          "file": "images/T041/before_legs_reference.png",
+          "sha256": "c045cf77285b265897a5657cd055e8f6930445b0db4a6da82796c7d44e1a89d7",
+          "native_sha256": "9edcf6394bc157b62ed54256090336cdac2839c650764361ae5bff4c3c7dac47"
+        },
+        {
+          "file": "images/T041/before_legs_front.png",
+          "sha256": "31d12e6d7b43f7555e6e885e45fe3fcf621093aee6b13238d0d2cfec64f9420d",
+          "native_sha256": "9edcf6394bc157b62ed54256090336cdac2839c650764361ae5bff4c3c7dac47"
+        },
+        {
+          "file": "images/T041/before_legs_oblique.png",
+          "sha256": "33f85c2cb75a475670dee7f5103dabb56c7024a41858dda82a79a2430eaa7d78",
+          "native_sha256": "9edcf6394bc157b62ed54256090336cdac2839c650764361ae5bff4c3c7dac47"
+        },
+        {
+          "file": "images/T041/before_legs_side.png",
+          "sha256": "4ebc21940d8af3bad41d974bac04e3c8f1f5c5d5d01c178c13fb5a6d03485bd6",
+          "native_sha256": "9edcf6394bc157b62ed54256090336cdac2839c650764361ae5bff4c3c7dac47"
+        },
+        {
+          "file": "images/T041/after_legs_reference.png",
+          "sha256": "c0780e51ed75bf793b29e4acf3bc37ff2b53c18ebd6a7e15163fdfc398ac648f",
+          "native_sha256": "57b968cf88dfd46612a17ec640b4fc922bc73b89913f9ed5dfd3b05d8bef396b"
+        },
+        {
+          "file": "images/T041/after_legs_front.png",
+          "sha256": "d2dda46492800db85a45434ba74a9dd67205a6a85ac9b7643c6f27ae07baa90b",
+          "native_sha256": "57b968cf88dfd46612a17ec640b4fc922bc73b89913f9ed5dfd3b05d8bef396b"
+        },
+        {
+          "file": "images/T041/after_legs_oblique.png",
+          "sha256": "3add7e063e9c2644353ec229015cc542e137a70fbfe3663763bc0c90f503d3c7",
+          "native_sha256": "57b968cf88dfd46612a17ec640b4fc922bc73b89913f9ed5dfd3b05d8bef396b"
+        },
+        {
+          "file": "images/T041/after_legs_side.png",
+          "sha256": "a88f7d3d29c1504e926bc2d56cc72eab0aef1b6dfff3d0c97d39fb0a39d5960f",
+          "native_sha256": "57b968cf88dfd46612a17ec640b4fc922bc73b89913f9ed5dfd3b05d8bef396b"
+        }
+      ]
+    },
+    {
+      "test_id": "T042",
+      "case_id": "CB027",
+      "baseline": {
+        "case_id": "CB027",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 55,
+        "score_high": 65,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 35,
+        "uncertain_loss": 10,
+        "mismatch_keys": [
+          "right_arm",
+          "left_arm",
+          "left_leg",
+          "head"
+        ],
+        "uncertain_keys": [
+          "right_leg"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "after": {
+        "case_id": "CB027",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 65,
+        "score_high": 75,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 25,
+        "uncertain_loss": 10,
+        "mismatch_keys": [
+          "right_arm",
+          "left_arm",
+          "head"
+        ],
+        "uncertain_keys": [
+          "right_leg"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "status": "authored_partial_visual_review",
+      "paired_gain": [
+        0,
+        20
+      ],
+      "changed_criteria": {
+        "left_leg": [
+          "match",
+          "왼무릎을 거의 펴고 몸 바깥쪽으로 길게 뻗은 배치가 원래 러프와 일치한다."
+        ],
+        "right_leg": [
+          "uncertain",
+          "오른다리의 아래쪽 배치는 확인했으나 검증된 바닥선·체중 지지 자료가 없어 실제 지지발 접촉은 보류한다."
+        ]
+      },
+      "human_rubric_reviewed": false,
+      "output_sha256": "ef47ec6aa43f343f6ac52c01687a908db8e586226c6701ee48a668d01220a373",
+      "evidence": [
+        {
+          "file": "images/T042/before_legs_reference.png",
+          "sha256": "5af4bed6ac85de414d6678652520d4314eec8c66f0920709dd8ec993491c8578",
+          "native_sha256": "bcd5575df8a102852a289c8452960ada156b42c45e53b764963089908563b38f"
+        },
+        {
+          "file": "images/T042/before_legs_front.png",
+          "sha256": "314ca7a309cd4ea031ad094eb4019fad50785de2ef56304dad211d1d99bab7ae",
+          "native_sha256": "bcd5575df8a102852a289c8452960ada156b42c45e53b764963089908563b38f"
+        },
+        {
+          "file": "images/T042/before_legs_oblique.png",
+          "sha256": "e91f8b3a98f7e5501462d1a0fce3d593abf3f9be8cd559fa0431f83b246d475f",
+          "native_sha256": "bcd5575df8a102852a289c8452960ada156b42c45e53b764963089908563b38f"
+        },
+        {
+          "file": "images/T042/before_legs_side.png",
+          "sha256": "62d32ca2d9068dce3ad73c34dc2636e0dcbec2ff4fb9393e6a9c9461a8d0a8d7",
+          "native_sha256": "bcd5575df8a102852a289c8452960ada156b42c45e53b764963089908563b38f"
+        },
+        {
+          "file": "images/T042/after_legs_reference.png",
+          "sha256": "371a6d28d44d71005c81d46f09e90c628c5d71d327bd6d0bda5754be0e30baaf",
+          "native_sha256": "ef47ec6aa43f343f6ac52c01687a908db8e586226c6701ee48a668d01220a373"
+        },
+        {
+          "file": "images/T042/after_legs_front.png",
+          "sha256": "60d647ff466065136cf97a877b722fe20431579b812df23d7159bd5005bedc0e",
+          "native_sha256": "ef47ec6aa43f343f6ac52c01687a908db8e586226c6701ee48a668d01220a373"
+        },
+        {
+          "file": "images/T042/after_legs_oblique.png",
+          "sha256": "e62f924803313022cb44ece8058725f24248b0ce9fdef40f648360d9dbb43f3c",
+          "native_sha256": "ef47ec6aa43f343f6ac52c01687a908db8e586226c6701ee48a668d01220a373"
+        },
+        {
+          "file": "images/T042/after_legs_side.png",
+          "sha256": "7f33491ef01d910a587a9c9a29921e440dc68612454ea1e6f001d09cfadf2c57",
+          "native_sha256": "ef47ec6aa43f343f6ac52c01687a908db8e586226c6701ee48a668d01220a373"
+        }
+      ]
+    },
+    {
+      "test_id": "T043",
+      "case_id": "CB028",
+      "baseline": {
+        "case_id": "CB028",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 55,
+        "score_high": 80,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 20,
+        "uncertain_loss": 25,
+        "mismatch_keys": [
+          "right_arm",
+          "left_leg"
+        ],
+        "uncertain_keys": [
+          "torso",
+          "head"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "after": {
+        "case_id": "CB028",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 55,
+        "score_high": 90,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 10,
+        "uncertain_loss": 35,
+        "mismatch_keys": [
+          "right_arm"
+        ],
+        "uncertain_keys": [
+          "right_leg",
+          "torso",
+          "head"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "status": "authored_partial_visual_review",
+      "paired_gain": [
+        0,
+        10
+      ],
+      "changed_criteria": {
+        "left_leg": [
+          "match",
+          "같은 러프의 T042와 동일한 하체 파츠를 적용하여 왼다리의 바깥쪽 뻗기를 확인했다."
+        ],
+        "right_leg": [
+          "uncertain",
+          "같은 파츠를 옮기며 오른다리도 바뀌었다. 검증된 접지 자료가 없어 기존 match를 자동 계승하지 않고 보류한다."
+        ]
+      },
+      "human_rubric_reviewed": false,
+      "output_sha256": "13ddc7c592426da96d3090a202226a470dc2b987f70d3aab279011c3f5c0a68a",
+      "evidence": [
+        {
+          "file": "images/T043/before_legs_reference.png",
+          "sha256": "4cf0c1d994cf9412337f734083bdfdea0eed4ab0ef15b95973c4ca1419c53869",
+          "native_sha256": "a438ca8dca475ed602824003aa4a1863e0c708f5d7cd8387268ef9e477dd23c9"
+        },
+        {
+          "file": "images/T043/before_legs_front.png",
+          "sha256": "12195b0ab4f72b0405fa0dff2730e5c7f50c91b962f54f0d81ddbd56a0a06f7c",
+          "native_sha256": "a438ca8dca475ed602824003aa4a1863e0c708f5d7cd8387268ef9e477dd23c9"
+        },
+        {
+          "file": "images/T043/before_legs_oblique.png",
+          "sha256": "206f85d17c1960d1d965391893bb329f4fdc67b2942434ca363600753d96a7a6",
+          "native_sha256": "a438ca8dca475ed602824003aa4a1863e0c708f5d7cd8387268ef9e477dd23c9"
+        },
+        {
+          "file": "images/T043/before_legs_side.png",
+          "sha256": "a2b2a8382967b614a5830c362fa29fe354045da62b8b586f11530c184faedd32",
+          "native_sha256": "a438ca8dca475ed602824003aa4a1863e0c708f5d7cd8387268ef9e477dd23c9"
+        },
+        {
+          "file": "images/T043/after_legs_reference.png",
+          "sha256": "5e0dd3449a599521630f7f2b19e58875dd54c839dd927ec454980faef8087f24",
+          "native_sha256": "13ddc7c592426da96d3090a202226a470dc2b987f70d3aab279011c3f5c0a68a"
+        },
+        {
+          "file": "images/T043/after_legs_front.png",
+          "sha256": "5429daf7220c45099d2e520e20415107b17321d8c26a1bdce2d49d8ef7b74e9b",
+          "native_sha256": "13ddc7c592426da96d3090a202226a470dc2b987f70d3aab279011c3f5c0a68a"
+        },
+        {
+          "file": "images/T043/after_legs_oblique.png",
+          "sha256": "84774856d14e34694aaeb1e7b1ae81aed072215e3ec934c62ee0a25829f644eb",
+          "native_sha256": "13ddc7c592426da96d3090a202226a470dc2b987f70d3aab279011c3f5c0a68a"
+        },
+        {
+          "file": "images/T043/after_legs_side.png",
+          "sha256": "06da3165b5de3d835b56963b5f292d84b3cd660472405f73f8872cb674bac3d7",
+          "native_sha256": "13ddc7c592426da96d3090a202226a470dc2b987f70d3aab279011c3f5c0a68a"
+        }
+      ]
+    },
+    {
+      "test_id": "T049",
+      "case_id": "CB067",
+      "baseline": {
+        "case_id": "CB067",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 75,
+        "score_high": 80,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 20,
+        "uncertain_loss": 5,
+        "mismatch_keys": [
+          "right_leg",
+          "left_leg"
+        ],
+        "uncertain_keys": [
+          "head"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "after": {
+        "case_id": "CB067",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 95,
+        "score_high": 100,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 0,
+        "uncertain_loss": 5,
+        "mismatch_keys": [],
+        "uncertain_keys": [
+          "head"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "status": "authored_partial_visual_review",
+      "paired_gain": [
+        20,
+        20
+      ],
+      "changed_criteria": {
+        "right_leg": [
+          "match",
+          "골반을 낮추고 오른무릎을 바깥으로 벌린 깊은 쪼그림을 확인했다."
+        ],
+        "left_leg": [
+          "match",
+          "왼무릎 역시 바깥으로 넓게 벌려 깊게 굽힌 배치를 확인했다. 피부 triage 경고 해소를 뜻하지 않는다."
+        ]
+      },
+      "human_rubric_reviewed": false,
+      "output_sha256": "0ba871dafe9dde88015046153325678b3975dafa4cba30d541408c7614a2f5ec",
+      "evidence": [
+        {
+          "file": "images/T049/before_legs_reference.png",
+          "sha256": "a8a46c94b6be47eaad56557b7d873dccd470b4ffbbb5a221f39cf2798e5f1627",
+          "native_sha256": "2d07747a379852825ab56b98dbabcb25271520c503b80d0317fa17b0ae0ef178"
+        },
+        {
+          "file": "images/T049/before_legs_front.png",
+          "sha256": "e89657db79e635aa64d34cdd7677ab802fb5d99f50e9e4fc315099047fc9e0b6",
+          "native_sha256": "2d07747a379852825ab56b98dbabcb25271520c503b80d0317fa17b0ae0ef178"
+        },
+        {
+          "file": "images/T049/before_legs_oblique.png",
+          "sha256": "d72ce954c3fce5044db918f13e115f428b5afa67b8f40788f4d49d1b586784aa",
+          "native_sha256": "2d07747a379852825ab56b98dbabcb25271520c503b80d0317fa17b0ae0ef178"
+        },
+        {
+          "file": "images/T049/before_legs_side.png",
+          "sha256": "4cf193d2e310408a853cca0683c65e4c6a5656fb6686ac74dfbb103b4ff791cc",
+          "native_sha256": "2d07747a379852825ab56b98dbabcb25271520c503b80d0317fa17b0ae0ef178"
+        },
+        {
+          "file": "images/T049/after_legs_reference.png",
+          "sha256": "47c2cf37a868723e8cef68eb30f76a6b88e76f51f2d57a53a42667550dee48a5",
+          "native_sha256": "0ba871dafe9dde88015046153325678b3975dafa4cba30d541408c7614a2f5ec"
+        },
+        {
+          "file": "images/T049/after_legs_front.png",
+          "sha256": "3ec87e203ba1a3256a7982c27c48802e1e56dbebcca00f01c9b437e4335fe932",
+          "native_sha256": "0ba871dafe9dde88015046153325678b3975dafa4cba30d541408c7614a2f5ec"
+        },
+        {
+          "file": "images/T049/after_legs_oblique.png",
+          "sha256": "a6e260630ba7f1e72ba88dfd9e32d839f1165e6ba3acd671263254f5c321d4bd",
+          "native_sha256": "0ba871dafe9dde88015046153325678b3975dafa4cba30d541408c7614a2f5ec"
+        },
+        {
+          "file": "images/T049/after_legs_side.png",
+          "sha256": "9f7df42694f7110151b16c38daafef37dd15eac90ba532d7a5ae20f59ff930f2",
+          "native_sha256": "0ba871dafe9dde88015046153325678b3975dafa4cba30d541408c7614a2f5ec"
+        }
+      ]
+    },
+    {
+      "test_id": "T050",
+      "case_id": "CB074",
+      "baseline": {
+        "case_id": "CB074",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 65,
+        "score_high": 70,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 30,
+        "uncertain_loss": 5,
+        "mismatch_keys": [
+          "right_arm",
+          "left_arm",
+          "left_leg"
+        ],
+        "uncertain_keys": [
+          "head"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "after": {
+        "case_id": "CB074",
+        "evaluation_scope": "full_body",
+        "score_max": 100,
+        "score_low": 75,
+        "score_high": 80,
+        "exact_score": null,
+        "score_kind": "interval",
+        "eligible_for_scope_metrics": true,
+        "exclusion_reason": null,
+        "all_active_parts_definitive": false,
+        "confirmed_loss": 20,
+        "uncertain_loss": 5,
+        "mismatch_keys": [
+          "right_arm",
+          "left_arm"
+        ],
+        "uncertain_keys": [
+          "head"
+        ],
+        "unobservable_keys": [],
+        "not_run_keys": [],
+        "inactive_keys": [],
+        "confirmed_perfect": false,
+        "result_status": "returned_all",
+        "expected_people": 1,
+        "returned_people": 1
+      },
+      "status": "authored_partial_visual_review",
+      "paired_gain": [
+        10,
+        10
+      ],
+      "changed_criteria": {
+        "left_leg": [
+          "match",
+          "서 있는 교차에서 왼다리가 반대 다리 앞으로 오고 왼발이 더 앞쪽으로 나온 배치를 확인했다."
+        ]
+      },
+      "human_rubric_reviewed": false,
+      "output_sha256": "3cb6affadeb521c9538b4aa9c1218a41339d5adabe7ff8263cd678e76cd2db7d",
+      "evidence": [
+        {
+          "file": "images/T050/before_legs_reference.png",
+          "sha256": "3f1de5732606f640d434fdbda69568a550b2f8be9ca02b998bd86b3890a728c7",
+          "native_sha256": "203b9f6d155a57c4e78cc27d5f89e26c4b89a4d486a575825670bdd5aef7a2a3"
+        },
+        {
+          "file": "images/T050/before_legs_front.png",
+          "sha256": "cf602c7d92826ee8f37a4eecbcd296561b8822584a0c9b67bc40bd0b1caef2db",
+          "native_sha256": "203b9f6d155a57c4e78cc27d5f89e26c4b89a4d486a575825670bdd5aef7a2a3"
+        },
+        {
+          "file": "images/T050/before_legs_oblique.png",
+          "sha256": "680d37e6d4c49575f4b2566e1587a8f8eea320f6d58222111087b789fc540d73",
+          "native_sha256": "203b9f6d155a57c4e78cc27d5f89e26c4b89a4d486a575825670bdd5aef7a2a3"
+        },
+        {
+          "file": "images/T050/before_legs_side.png",
+          "sha256": "34dfc077abe369c4764d42f83d724486b37bb16abe4a23c7f1d0f9fd00bb4b8f",
+          "native_sha256": "203b9f6d155a57c4e78cc27d5f89e26c4b89a4d486a575825670bdd5aef7a2a3"
+        },
+        {
+          "file": "images/T050/after_legs_reference.png",
+          "sha256": "10bfd02478882e55525dbd7e19a40ed57dc2ad2b4a5caa6e5d2321381fea2633",
+          "native_sha256": "3cb6affadeb521c9538b4aa9c1218a41339d5adabe7ff8263cd678e76cd2db7d"
+        },
+        {
+          "file": "images/T050/after_legs_front.png",
+          "sha256": "5ec340280d8ebeac5cfd7f65b5447ee4b26173300095d1f34c2792108978dcea",
+          "native_sha256": "3cb6affadeb521c9538b4aa9c1218a41339d5adabe7ff8263cd678e76cd2db7d"
+        },
+        {
+          "file": "images/T050/after_legs_oblique.png",
+          "sha256": "0d3fc155a6b98849962e4fb0f1b3003e7a43cf3f6e9c6ad6ad5691267404d73b",
+          "native_sha256": "3cb6affadeb521c9538b4aa9c1218a41339d5adabe7ff8263cd678e76cd2db7d"
+        },
+        {
+          "file": "images/T050/after_legs_side.png",
+          "sha256": "c37fc0e28688d1e55413e896211fd755db11986361a766bcc7c5d1e8eb96efd4",
+          "native_sha256": "3cb6affadeb521c9538b4aa9c1218a41339d5adabe7ff8263cd678e76cd2db7d"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "수정하지 않은 항목의 기존 판정은 유지했다.",
+    "카메라·가림·접지 불확실성을 일치로 올리지 않았다.",
+    "피부 triage 경고는 별도 공개하며 점수 상승이 전체 피부 검증 통과를 의미하지 않는다.",
+    "50장 재실행 성능이나 자동 검색 성공률이 아니다. 상반신 /45와 전신 /100을 합산하지 않는다."
+  ]
+}
