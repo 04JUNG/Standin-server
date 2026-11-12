@@ -124,3 +124,37 @@ def test_solve_rejects_expired_or_unbounded_bff_deadline(tmp_path,delta):
     assert store.ttl==3600
     payload=dict(selection={},operation='operation',revision=1,person='0',bvhBase64='',expiresAt=datetime.fromtimestamp(time.time()+delta,timezone.utc).isoformat())
     with pytest.raises(ValueError,match='deadline'):store.solve(payload)
+
+def test_published_model_is_readable_while_its_fbx_is_exporting(tmp_path, monkeypatch):
+    from fastapi import HTTPException
+    from converter.solved_state import digest
+    from converter_api import interactive
+    store = SnapshotStore(tmp_path/'private', None, None)
+    directory = tmp_path/'operation'
+    (directory/'solved').mkdir(parents=True)
+    packet = directory/'solved/packet.json'
+    packet.write_bytes(b'verified model')
+    entry = dict(directory=directory, busy=True, packetSha256=digest(packet.read_bytes()),
+                 runtimeRevision='fixture', checkpoint=lambda: None)
+    monkeypatch.setattr(store, '_get', lambda *_: entry)
+    monkeypatch.setattr(interactive, 'runtime_revision', lambda: 'fixture')
+    assert store.read('snapshot', 'a'*64, 'model') == b'verified model'
+    with pytest.raises(HTTPException) as error:
+        store.read('snapshot', 'a'*64, 'file')
+    assert error.value.status_code == 409
+    packet.write_bytes(b'changed')
+    with pytest.raises(ValueError, match='packet changed'):
+        store.read('snapshot', 'a'*64, 'model')
+
+
+def test_gc_removes_only_idle_superseded_snapshots(tmp_path):
+    store = SnapshotStore(tmp_path/'private', None, None)
+    for sid, owner, revision, busy in [('old','a',1,False), ('working','a',2,True),
+                                      ('current','a',3,False), ('other','b',1,False)]:
+        directory = store.root / ('snapshot-' + sid)
+        directory.mkdir()
+        store.entries[sid] = dict(owner=owner*64, person='0', revision=revision,
+                                  busy=busy, expiry=time.monotonic()+60, directory=directory)
+    store._gc()
+    assert set(store.entries) == {'working', 'current', 'other'}
+    assert not (store.root/'snapshot-old').exists()

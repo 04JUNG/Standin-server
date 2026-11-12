@@ -49,8 +49,13 @@ class SnapshotStore:
 
     def _gc(self):
         now=time.monotonic()
+        latest = {}
+        for e in self.entries.values():
+            scope = (e['owner'], e['person'])
+            latest[scope] = max(latest.get(scope, 0), e['revision'])
         for key,e in list(self.entries.items()):
-            if not e['busy'] and now>=e['expiry']:
+            scope = (e['owner'], e['person'])
+            if not e['busy'] and (now >= e['expiry'] or e['revision'] < latest[scope]):
                 shutil.rmtree(e['directory']);del self.entries[key]
                 if not any(other['owner']==e['owner'] and other['person']==e['person'] for other in self.entries.values()):
                     self.gate.forget(e['owner'],e['person'])
@@ -198,24 +203,23 @@ class SnapshotStore:
                 ip.unlink();atomic_write(ip,canonical(identity))
                 core_key = digest(canonical(core_binding(identity)))
                 core = base['directory']/'cores'/core_key
-                reused = False
+                state = None
                 if core.is_dir():
                     try:
-                        rebind_solved(core, directory/'solved', identity)
-                        reused = True
+                        state = rebind_solved(core, directory/'solved', identity)
                     except (OSError, ValueError):
                         # Private partial/corrupt cache is never display authority.
                         shutil.rmtree(core)
                         shutil.rmtree(directory/'solved', ignore_errors=True)
                         checkpoint()
-                if not reused:
+                if state is None:
                     self._child('solve',job_dir/'job.json',ip,base_directory,directory/'solved',checkpoint)
-                    load_solved(directory/'solved'); checkpoint()
+                    state,_=load_solved(directory/'solved'); checkpoint()
                     core.parent.mkdir(exist_ok=True)
                     shutil.copytree(directory/'solved', core)
                 entry['core'] = core
                 entry['base'] = base
-            state,_=load_solved(directory/'solved');checkpoint()
+            checkpoint()
             with self.lock:
                 entry['stateHash']=state.state_hash
                 entry['packetSha256']=digest((directory/'solved/packet.json').read_bytes())
@@ -231,7 +235,9 @@ class SnapshotStore:
 
     def read(self,snapshot,owner,kind):
         e=self._get(snapshot,owner)
-        if e['busy']:raise HTTPException(409,'NOT_READY')
+        if e['busy'] and (kind != 'model' or 'packetSha256' not in e):
+            raise HTTPException(409,'NOT_READY')
+        # A published packet is immutable even while its FBX is exporting.
         # Publication already fully validated this immutable packet. Rehash its
         # original bytes on every read instead of decoding the entire surface
         # a second time merely to deliver it. BFF independently parses it too.

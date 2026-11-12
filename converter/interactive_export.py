@@ -78,7 +78,7 @@ def export_bundle(binary, bundle, destination, expected_state_hash, *, checkpoin
     checkpoint()
     _run_child(binary, ['--stage', 'verify', *common], checkpoint, timeout)
     receipt = decode((directory/'verified.canonical.json').read_bytes())
-    identity = state.payload['identity']
+    identity = state.identity
     if (receipt.get('schema') != RECEIPT_SCHEMA or receipt.get('stateHash') != expected_state_hash
             or receipt.get('revision') != identity['selection']['revision']
             or receipt.get('artifactSha256') != digest((directory/'artifact.fbx').read_bytes())

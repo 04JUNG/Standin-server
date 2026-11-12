@@ -13,7 +13,7 @@ class WorkMiddleware:
         if scope['type'] != 'http':
             return await self.app(scope, receive, send)
         path = scope.get('path', '')
-        interactive_calculation = (path in ('/interactive/v1/solve', '/skin-fbx')
+        interactive_calculation = (path in ('/interactive/v1/solve', '/skin-fbx', '/outline-fbx')
                                    or re.fullmatch(r'/interactive/v1/snapshots/[^/]+/export', path))
         headers = dict(scope.get('headers', []))
         screening = path == '/screen-hand-contact'
