@@ -17,7 +17,7 @@ from converter.solved_state import canonical, decode, digest
 from converter.hand_library import load_library, normalize_request
 from converter.protocol import SOLVER_VERSION, SOLVER_MANIFEST_SHA256, JOB_SCHEMA_VERSION
 from converter.shape_spec import resolve_shape
-from converter_api.work_queue import current_work
+from converter_api.work_queue import current_work, measured_slot
 from converter.interactive_reuse import core_binding, rebind_solved, rebind_export
 
 MAX_REQUEST = 3 * 1024 * 1024
@@ -66,8 +66,13 @@ class SnapshotStore:
 
     def _gc(self):
         now=time.monotonic()
+        latest = {}
+        for e in self.entries.values():
+            scope = (e['owner'], e['person'])
+            latest[scope] = max(latest.get(scope, 0), e['revision'])
         for key,e in list(self.entries.items()):
-            if not e['busy'] and now>=e['expiry']:
+            scope = (e['owner'], e['person'])
+            if not e['busy'] and (now >= e['expiry'] or e['revision'] < latest[scope]):
                 shutil.rmtree(e['directory']);del self.entries[key]
                 if not any(other['owner']==e['owner'] and other['person']==e['person'] for other in self.entries.values()):
                     self.gate.forget(e['owner'],e['person'])
@@ -207,7 +212,7 @@ class SnapshotStore:
                 apply_root_translation=False,embed_textures=False,force_exact_v324=False,thumbnail=None,output_scope='full',
                 **({'shape_recipe':recipe} if recipe else {}))
             (job_dir/'job.json').write_text(json.dumps(job));ip=directory/'identity.json';atomic_write(ip,canonical(identity))
-            with base['lock']:
+            with measured_slot(base['lock']):
                 checkpoint()
                 base_directory=base['directory']/'base'
                 metadata=measured('body_metadata',self._body_metadata,base_directory,binding)
@@ -223,24 +228,23 @@ class SnapshotStore:
                 ip.unlink();atomic_write(ip,canonical(identity))
                 core_key = digest(canonical(core_binding(identity)))
                 core = base['directory']/'cores'/core_key
-                reused = False
+                state = None
                 if core.is_dir():
                     try:
-                        measured('core_rebind',rebind_solved,core, directory/'solved', identity)
-                        reused = True
+                        state = measured('core_rebind',rebind_solved,core, directory/'solved', identity)
                     except (OSError, ValueError):
                         # Private partial/corrupt cache is never display authority.
                         shutil.rmtree(core)
                         shutil.rmtree(directory/'solved', ignore_errors=True)
                         checkpoint()
-                if not reused:
+                if state is None:
                     measured('blender_solve',self._child,'solve',job_dir/'job.json',ip,base_directory,directory/'solved',checkpoint)
-                    measured('validate_before_cache',load_solved,directory/'solved'); checkpoint()
+                    state,_=measured('validate_before_cache',load_solved,directory/'solved'); checkpoint()
                     core.parent.mkdir(exist_ok=True)
                     shutil.copytree(directory/'solved', core)
                 entry['core'] = core
                 entry['base'] = base
-            state,_=measured('validate_before_publish',load_solved,directory/'solved');checkpoint()
+            checkpoint()
             with self.lock:
                 entry['stateHash']=state.state_hash
                 entry['packetSha256']=digest((directory/'solved/packet.json').read_bytes())
@@ -291,7 +295,7 @@ class SnapshotStore:
                 def check():
                     e['checkpoint']()
                     if control:control.check('execution')
-                with e['base']['lock']:
+                with measured_slot(e['base']['lock']):
                     check()
                     cached = e['core']/'verified-export'
                     receipt = None
@@ -303,7 +307,7 @@ class SnapshotStore:
                             shutil.rmtree(path, ignore_errors=True)
                             check()
                     if receipt is None:
-                        with self.runner._process_slots:
+                        with measured_slot(self.runner._process_slots, worker=True):
                             receipt=measured('export_bundle',lambda: export_bundle(self.runner.settings.blender_binary,e['directory']/'solved',path,e['stateHash'],checkpoint=check))
                         check()
                         shutil.copytree(path, cached)

@@ -212,6 +212,7 @@ class SolvedPoseState:
         object.__setattr__(self, '_operation', selection['operation'])
         object.__setattr__(self, '_revision', selection['revision'])
         object.__setattr__(self, '_state_hash', digest(self.canonical_bytes))
+        object.__setattr__(self, '_identity_bytes', canonical(payload['identity']))
 
     @classmethod
     def create(cls, identity, model):
@@ -225,8 +226,13 @@ class SolvedPoseState:
         return self._state_hash
 
     @property
+    def identity(self):
+        return decode(self._identity_bytes)
+
+    @property
     def payload(self):
-        return decode(self.canonical_bytes)
+        # These immutable bytes passed canonical decoding at construction.
+        return _untyped(json.loads(self.canonical_bytes))
 
     def packet(self):
         return {'schema': STATE_SCHEMA, 'operation': self._operation, 'revision': self._revision,

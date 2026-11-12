@@ -220,15 +220,19 @@ def solve_from_body(base_directory, identity, destination, *, checkpoint):
     return state
 
 
-def load_solved(directory):
+def load_solved(directory, *, verified_state=None):
     directory = Path(directory)
-    state = SolvedPoseState((directory/'state.canonical.json').read_bytes())
+    raw = (directory/'state.canonical.json').read_bytes()
+    if verified_state is not None and raw != verified_state.canonical_bytes:
+        raise ValueError('solved snapshot state changed')
+    state = verified_state if verified_state is not None else SolvedPoseState(raw)
     metadata = decode((directory/'snapshot.json').read_bytes())
     snapshot = directory/'solved.blend'
     staged = directory/'staged.fbx'
+    revision = runtime_revision()
     if (metadata['schema'] != 'interactive-snapshot-v1' or metadata['stateHash'] != state.state_hash
-            or metadata['runtimeRevision'] != runtime_revision() or snapshot.is_symlink()
-            or state.payload['identity']['solver']['runtimeSha256'] != runtime_revision()
+            or metadata['runtimeRevision'] != revision or snapshot.is_symlink()
+            or state.identity['solver']['runtimeSha256'] != revision
             or not staged.is_file() or staged.is_symlink() or metadata.get('stagedFbxSha256') != digest(staged.read_bytes())
             or metadata['snapshotSha256'] != digest(snapshot.read_bytes())):
         raise ValueError('solved snapshot integrity mismatch')

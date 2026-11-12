@@ -34,6 +34,18 @@ def test_appearance_revision_rebinds_without_blender_and_survives_original_remov
     assert load_solved(tmp_path/'new')[0].state_hash==new.state_hash
 
 
+def test_bound_snapshot_read_rejects_changed_bytes_and_preserves_identity(tmp_path):
+    root = tmp_path/'snapshot'
+    state = bundle(root)
+    identity_copy = state.identity
+    identity_copy['selection']['revision'] = 2
+    assert state.identity['selection']['revision'] == 1
+    assert load_solved(root, verified_state=state)[0] is state
+    (root/'state.canonical.json').write_bytes(state.canonical_bytes + b' ')
+    with pytest.raises(ValueError, match='state changed'):
+        load_solved(root, verified_state=state)
+
+
 @pytest.mark.parametrize('field,part,value',[
     ('ownerBinding',None,'e'*64),('body','characterSha256','d'*64),
     ('source','originalBvhSha256','d'*64),('hands','left','other'),

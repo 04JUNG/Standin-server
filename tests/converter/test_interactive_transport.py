@@ -1,10 +1,13 @@
 """Private HTTP boundary, distinct from the separately run real Blender gate."""
 import json
+import time
+from contextlib import contextmanager
 from types import SimpleNamespace
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from converter_api.interactive import register_interactive, SnapshotStore, MAX_REQUEST
+from converter_api.work_queue import current_work, measured_slot
 from converter.interactive_revision import LatestRevisionGate
 from converter.interactive_export import Superseded
 
@@ -35,6 +38,32 @@ def test_token_required_before_body_or_worker(client,monkeypatch):
     assert response.status_code==200
     assert response.headers['x-standin-work-class']=='preview'
     assert calls==[{}]
+
+
+def test_interactive_timing_reports_queue_and_cumulative_worker_time(client, monkeypatch):
+    http, store = client
+
+    @contextmanager
+    def worker_slot():
+        # Model a new admission overwriting the slot's previous wait sample.
+        current_work.get().queue_wait_ms = 0
+        time.sleep(.005)
+        yield
+
+    def solve(_):
+        for _ in range(2):
+            with measured_slot(worker_slot(), worker=True):
+                time.sleep(.01)
+        return {'snapshotId': 'verified'}
+
+    monkeypatch.setattr(store, 'solve', solve)
+    response = http.post('/interactive/v1/solve', headers={'Authorization': 'Bearer ' + 't' * 32}, json={})
+    assert response.status_code == 200
+    handler = float(response.headers['x-standin-interactive-handler-ms'])
+    wait = float(response.headers['x-standin-queue-wait-ms'])
+    work = float(response.headers['x-standin-execution-ms'])
+    assert wait >= 9 and work >= 19
+    assert handler + .01 >= wait + work
 
 
 def test_bounded_chunked_body_and_parse_errors(client):
@@ -95,3 +124,15 @@ def test_solve_rejects_expired_or_unbounded_bff_deadline(tmp_path,delta):
     assert store.ttl==3600
     payload=dict(selection={},operation='operation',revision=1,person='0',bvhBase64='',expiresAt=datetime.fromtimestamp(time.time()+delta,timezone.utc).isoformat())
     with pytest.raises(ValueError,match='deadline'):store.solve(payload)
+
+def test_gc_removes_only_idle_superseded_snapshots(tmp_path):
+    store = SnapshotStore(tmp_path/'private', None, None)
+    for sid, owner, revision, busy in [('old','a',1,False), ('working','a',2,True),
+                                      ('current','a',3,False), ('other','b',1,False)]:
+        directory = store.root / ('snapshot-' + sid)
+        directory.mkdir()
+        store.entries[sid] = dict(owner=owner*64, person='0', revision=revision,
+                                  busy=busy, expiry=time.monotonic()+60, directory=directory)
+    store._gc()
+    assert set(store.entries) == {'working', 'current', 'other'}
+    assert not (store.root/'snapshot-old').exists()
