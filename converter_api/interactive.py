@@ -18,6 +18,7 @@ from converter.hand_library import load_library, normalize_request
 from converter.protocol import SOLVER_VERSION, SOLVER_MANIFEST_SHA256, JOB_SCHEMA_VERSION
 from converter.shape_spec import resolve_shape
 from converter_api.work_queue import current_work
+from converter.interactive_reuse import core_binding, rebind_solved, rebind_export
 
 MAX_REQUEST = 3 * 1024 * 1024
 MAX_RESPONSE = 64 * 1024 * 1024
@@ -195,7 +196,25 @@ class SnapshotStore:
                 # Camera participates in latest revision fencing as well as state hash.
                 checkpoint()
                 ip.unlink();atomic_write(ip,canonical(identity))
-                self._child('solve',job_dir/'job.json',ip,base['directory']/'base',directory/'solved',checkpoint)
+                core_key = digest(canonical(core_binding(identity)))
+                core = base['directory']/'cores'/core_key
+                reused = False
+                if core.is_dir():
+                    try:
+                        rebind_solved(core, directory/'solved', identity)
+                        reused = True
+                    except (OSError, ValueError):
+                        # Private partial/corrupt cache is never display authority.
+                        shutil.rmtree(core)
+                        shutil.rmtree(directory/'solved', ignore_errors=True)
+                        checkpoint()
+                if not reused:
+                    self._child('solve',job_dir/'job.json',ip,base_directory,directory/'solved',checkpoint)
+                    load_solved(directory/'solved'); checkpoint()
+                    core.parent.mkdir(exist_ok=True)
+                    shutil.copytree(directory/'solved', core)
+                entry['core'] = core
+                entry['base'] = base
             state,_=load_solved(directory/'solved');checkpoint()
             with self.lock:
                 entry['stateHash']=state.state_hash
@@ -244,8 +263,23 @@ class SnapshotStore:
                 def check():
                     e['checkpoint']()
                     if control:control.check('execution')
-                with self.runner._process_slots:
-                    receipt=export_bundle(self.runner.settings.blender_binary,e['directory']/'solved',path,e['stateHash'],checkpoint=check)
+                with e['base']['lock']:
+                    check()
+                    cached = e['core']/'verified-export'
+                    receipt = None
+                    if cached.is_dir():
+                        try:
+                            receipt = rebind_export(cached, path, e['directory']/'solved')
+                        except (OSError, ValueError):
+                            shutil.rmtree(cached)
+                            shutil.rmtree(path, ignore_errors=True)
+                            check()
+                    if receipt is None:
+                        with self.runner._process_slots:
+                            receipt=export_bundle(self.runner.settings.blender_binary,e['directory']/'solved',path,e['stateHash'],checkpoint=check)
+                        check()
+                        shutil.copytree(path, cached)
+                    check()
             e['checkpoint']()
             with self.lock:
                 if receipt['stateHash'] not in self.variant_cache:

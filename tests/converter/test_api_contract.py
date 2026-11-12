@@ -197,10 +197,10 @@ def test_screen_api_missing_or_wrong_receipt_is_failure(tmp_path):
 
 @pytest.mark.parametrize(('route', 'scope', 'selected'), [
     ('convert-framed', 'full', False),
-    ('convert-framed-export', 'full', True),
+    ('convert-framed-export', 'full', False),
     ('convert-framed-export', 'head', False),
 ])
-def test_selected_hand_screen_is_only_requested_on_applicable_exports(tmp_path, monkeypatch, route, scope, selected):
+def test_stale_selected_hand_screen_flag_never_requests_quality_screening(tmp_path, monkeypatch, route, scope, selected):
     monkeypatch.setenv('CONVERTER_SCREEN_SELECTED_HANDS', '1')
     runner = FakeRunner(failure=ConversionRejectedError('failed', report={
         'error_code': 'HAND_CONTACT_INTERSECTION'}))

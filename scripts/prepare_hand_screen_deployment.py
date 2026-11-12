@@ -42,9 +42,9 @@ def prepare(task, container_name, value, selection=None):
     if selection not in (None, ''):
         if selection not in ('0', '1'):
             raise ValueError('selection screening override must be 0 or 1')
-        overrides[SELECTION_SETTINGS[container_name]] = selection
-    if not overrides:
-        return result
+        overrides[SELECTION_SETTINGS[container_name]] = "0"
+    # Retire historical ON values on every deploy, not only explicit overrides.
+    overrides[SELECTION_SETTINGS[container_name]] = "0"
     if overrides.keys() & {s['name'] for s in container.get('secrets', [])}:
         raise ValueError('hand screen setting conflicts with an existing secret')
     env.update(overrides)
