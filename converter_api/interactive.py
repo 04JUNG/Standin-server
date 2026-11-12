@@ -62,6 +62,8 @@ class SnapshotStore:
         for old in self.root.iterdir():
             if old.name.startswith(('body-','snapshot-','variant-')) and old.is_dir() and not old.is_symlink():shutil.rmtree(old)
         self.registry=registry;self.runner=runner;self.ttl=ttl;self.capacity=capacity;self.byte_limit=byte_limit
+        from converter_api.body_metadata import BodyMetadataCache
+        self.body_metadata = BodyMetadataCache(capacity)
         self.entries={};self.bases={};self.variant_cache={};self.lock=threading.RLock();self.gate=LatestRevisionGate(capacity)
 
     def _gc(self):
@@ -140,13 +142,7 @@ class SnapshotStore:
 
     def _body_metadata(self,directory,binding):
         """An interrupted preparation must never poison the next hand revision."""
-        try:
-            metadata=decode((directory/'base.json').read_bytes());snapshot=directory/'body.blend'
-            if (metadata.get('schema')!='interactive-body-base-v1' or metadata.get('binding')!=binding
-                or metadata.get('runtimeRevision')!=runtime_revision() or snapshot.is_symlink()
-                or metadata.get('snapshotSha256')!=digest(snapshot.read_bytes())):return None
-            return metadata
-        except (OSError,ValueError,KeyError,TypeError):return None
+        return self.body_metadata.read(directory,binding)
 
     def solve(self, payload):
         if set(payload)!={'selection','operation','revision','person','bvhBase64','expiresAt'}:raise ValueError('invalid request')

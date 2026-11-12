@@ -507,9 +507,9 @@ def create_app(
             }
         if os.getenv("CONVERTER_SHAPE_REGISTRY"):
             try:
-                from converter.shape_spec import load_registry, REGISTRY_SCHEMA
-                # Re-hashes each approved source once and checks its VERSION literal.
-                registry_data = measured_health('shape_sources', load_registry)
+                from converter.shape_spec import REGISTRY_SCHEMA
+                from converter_api.health_assets import health_shape_registry
+                registry_data = measured_health('shape_sources', health_shape_registry)
                 checks["shape_sources"] = {
                     "ok": True,
                     "schema": REGISTRY_SCHEMA,

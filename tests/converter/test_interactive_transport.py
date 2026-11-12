@@ -111,7 +111,7 @@ def test_partial_or_tampered_body_base_is_not_reused(tmp_path):
     store=SnapshotStore(tmp_path/'private',None,None);base=tmp_path/'partial';base.mkdir()
     (base/'body.blend').write_bytes(b'interrupted')
     assert store._body_metadata(base,{'owner':'fixture'}) is None
-    metadata=dict(schema='interactive-body-base-v1',binding={'owner':'fixture'},runtimeRevision=runtime_revision(),snapshotSha256=digest(b'interrupted'))
+    metadata=dict(schema='interactive-body-base-v1',binding={'owner':'fixture'},runtimeRevision=runtime_revision(),snapshotSha256=digest(b'interrupted'),model={'bones': []})
     (base/'base.json').write_bytes(canonical(metadata));assert store._body_metadata(base,{'owner':'fixture'})==metadata
     (base/'body.blend').write_bytes(b'changed');assert store._body_metadata(base,{'owner':'fixture'}) is None
 
