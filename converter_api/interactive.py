@@ -17,7 +17,7 @@ from converter.solved_state import canonical, decode, digest
 from converter.hand_library import load_library, normalize_request
 from converter.protocol import SOLVER_VERSION, SOLVER_MANIFEST_SHA256, JOB_SCHEMA_VERSION
 from converter.shape_spec import resolve_shape
-from converter_api.work_queue import current_work
+from converter_api.work_queue import current_work, measured_slot
 from converter.interactive_reuse import core_binding, rebind_solved, rebind_export
 
 MAX_REQUEST = 3 * 1024 * 1024
@@ -82,7 +82,7 @@ class SnapshotStore:
         # _run_child is dedicated to the final exporter; this worker has its own
         # fixed script, with the same bounded subprocess cancellation behavior.
         import subprocess
-        with self.runner._process_slots, tempfile.TemporaryFile() as log:
+        with measured_slot(self.runner._process_slots, worker=True), tempfile.TemporaryFile() as log:
             check();start=time.monotonic()
             p=subprocess.Popen([self.runner.settings.blender_binary,'--background','--factory-startup',
                 '--disable-autoexec','--python-exit-code','1','--python',str(Path(__file__).resolve().parents[1]/'converter/interactive_worker.py'),
@@ -182,7 +182,7 @@ class SnapshotStore:
                 apply_root_translation=False,embed_textures=False,force_exact_v324=False,thumbnail=None,output_scope='full',
                 **({'shape_recipe':recipe} if recipe else {}))
             (job_dir/'job.json').write_text(json.dumps(job));ip=directory/'identity.json';atomic_write(ip,canonical(identity))
-            with base['lock']:
+            with measured_slot(base['lock']):
                 checkpoint()
                 base_directory=base['directory']/'base'
                 metadata=self._body_metadata(base_directory,binding)
@@ -263,7 +263,7 @@ class SnapshotStore:
                 def check():
                     e['checkpoint']()
                     if control:control.check('execution')
-                with e['base']['lock']:
+                with measured_slot(e['base']['lock']):
                     check()
                     cached = e['core']/'verified-export'
                     receipt = None
@@ -275,7 +275,7 @@ class SnapshotStore:
                             shutil.rmtree(path, ignore_errors=True)
                             check()
                     if receipt is None:
-                        with self.runner._process_slots:
+                        with measured_slot(self.runner._process_slots, worker=True):
                             receipt=export_bundle(self.runner.settings.blender_binary,e['directory']/'solved',path,e['stateHash'],checkpoint=check)
                         check()
                         shutil.copytree(path, cached)

@@ -5,6 +5,7 @@ always discarded. Export/scene work is never preempted by another request.
 """
 from __future__ import annotations
 
+from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
 import threading
@@ -54,6 +55,33 @@ class WorkControl:
 
 
 current_work: ContextVar[WorkControl | None] = ContextVar('converter_work', default=None)
+
+
+@contextmanager
+def measured_slot(slot, *, worker=False):
+    """Track waiting for interactive work and time spent in worker slots."""
+    control = current_work.get()
+    if control is None:
+        with slot:
+            yield
+        return
+
+    prior_wait = control.queue_wait_ms
+    waiting = time.monotonic()
+    started = None
+    try:
+        with slot:
+            started = time.monotonic()
+            # PrioritySlots overwrites queue_wait_ms on each acquisition.
+            control.queue_wait_ms = prior_wait + (started - waiting) * 1000
+            try:
+                yield
+            finally:
+                if worker:
+                    control.execution_ms += (time.monotonic() - started) * 1000
+    finally:
+        if started is None:
+            control.queue_wait_ms = prior_wait + (time.monotonic() - waiting) * 1000
 
 
 class PrioritySlots:
