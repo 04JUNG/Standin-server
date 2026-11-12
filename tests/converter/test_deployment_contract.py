@@ -262,3 +262,22 @@ def test_explicit_beta_deploy_preserves_staging_worker_isolation():
     assert not _enabled(converter, "workflow_dispatch", "feature", "converter", False, False, True)
     assert not _enabled(converter, "workflow_dispatch", "main", "scene-worker", False, False, True)
     assert not _enabled(worker, "workflow_dispatch", "main", "scene-worker", False, False, True)
+
+def test_skin_contract_cache_imports_from_the_converter_image_allowlist(tmp_path):
+    for line in (ROOT / "Dockerfile.converter").read_text().splitlines():
+        if not line.lstrip().startswith("COPY "):
+            continue
+        parts = shlex.split(line, comments=True)
+        if len(parts) != 3 or parts[0] != "COPY":
+            continue
+        source, destination = parts[1:]
+        if not source.startswith("converter_api/") or not destination.startswith("/app/converter_api/"):
+            continue
+        target = tmp_path / destination.removeprefix("/app/")
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / source, target)
+    subprocess.run([sys.executable, "-I", "-c",
+        "import sys; sys.path.insert(0, sys.argv[1]); "
+        "from converter_api.skin_asset_cache import SkinAssetVerificationCache; "
+        "assert callable(SkinAssetVerificationCache)", str(tmp_path)],
+        check=True, cwd=tmp_path, capture_output=True, text=True)
