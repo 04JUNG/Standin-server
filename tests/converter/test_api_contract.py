@@ -141,6 +141,28 @@ def _post(client: TestClient, *, filename="pose.bvh", data=VALID_BVH, fields=Non
     )
 
 
+@pytest.mark.parametrize('code,status,phase', [
+    ('WORK_QUEUE_FULL', 503, 'queue'), ('WORK_BUDGET_EXHAUSTED', 504, 'execution'),
+    ('REQUEST_CANCELLED', 499, 'execution'), ('INTERACTIVE_CAPACITY', 429, None)])
+def test_interactive_failures_keep_capacity_and_scheduler_diagnostics(tmp_path, monkeypatch, code, status, phase):
+    from fastapi import HTTPException
+    from converter_api.work_queue import WorkStopped
+    monkeypatch.setenv('CONVERTER_INTERACTIVE_ENABLED', 'true')
+    monkeypatch.setenv('CONVERTER_INTERACTIVE_TOKEN', 't'*32)
+    monkeypatch.setenv('CONVERTER_INTERACTIVE_ROOT', str(tmp_path/'private'))
+    client = _client(tmp_path)
+    def solve(_):
+        if phase is None:
+            raise HTTPException(status, code)
+        raise WorkStopped(code, status, phase)
+    monkeypatch.setattr(client.app.state.interactive, 'solve', solve)
+    response = client.post('/interactive/v1/solve', json={}, headers={'Authorization': 'Bearer '+'t'*32})
+    assert response.status_code == status
+    assert response.json()['error']['code'] == code
+    if phase is not None:
+        assert 'diagnostics' in response.json()['error']
+
+
 def _post_bundle(
     client: TestClient,
     *,
