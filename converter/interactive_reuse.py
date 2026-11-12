@@ -34,24 +34,26 @@ def rebind_solved(source, destination, identity):
     atomic_write(target/'snapshot.json', canonical(metadata))
     (target/'packet.json').unlink()
     atomic_write(target/'packet.json', json.dumps(state.packet(), separators=(',', ':')).encode())
-    load_solved(target)
+    load_solved(target, verified_state=state)
     return state
 
 
 def rebind_export(source, destination, bundle):
     from converter.interactive_adapter import load_solved, atomic_write, runtime_revision
     state, _ = load_solved(bundle)
+    payload = state.payload
+    identity = payload['identity']
     previous = decode((Path(source)/'verified.canonical.json').read_bytes())
     raw = (Path(source)/'artifact.fbx').read_bytes()
     if (previous.get('verified') is not True or previous.get('runtimeRevision') != runtime_revision()
             or previous.get('artifactSha256') != digest(raw)
             or previous.get('artifactBytes') != len(raw)
-            or previous.get('packetModelSha256') != digest(canonical(state.payload['model']))
-            or core_binding(previous['identity']) != core_binding(state.payload['identity'])):
+            or previous.get('packetModelSha256') != digest(canonical(payload['model']))
+            or core_binding(previous['identity']) != core_binding(identity)):
         raise ValueError('verified core artifact changed')
     receipt = {**previous, 'stateHash': state.state_hash,
-        'revision': state.payload['identity']['selection']['revision'],
-        'operation': state.payload['identity']['selection']['operation'],
+        'revision': identity['selection']['revision'],
+        'operation': identity['selection']['operation'],
         'identity': state.payload['identity']}
     target = Path(destination); target.mkdir(parents=True, exist_ok=False)
     atomic_write(target/'artifact.fbx', raw)
