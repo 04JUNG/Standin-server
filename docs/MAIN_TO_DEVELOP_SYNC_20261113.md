@@ -34,3 +34,7 @@ main의 #233에 포함된 과거 검증과 이번 실행은 구분한다. 이번
 최종 Converter 회귀: Python3.12에서 918 passed / 1 skipped. Blender 전용 test_convert/v325/parent_coherent는 host pytest 수집에서 제외하고 실제 Blender 검사는 별도 실행했다. smoke54/54·compileall 통과. 이번 v1/v2 실제 Blender 검사는 15개 모두 PASS, 합성176 vertices, v1 68,480 bytes / v2 27,192 bytes. 원본 ob_083 자산의 재검수/새 렌더는 실행하지 않았고 main 검수값과 hash-bound 선택을 보존하는 회귀를 확인했다.
 
 Converter 배포 workflow는 develop 그대로 유지하므로 main 전용 beta 배포 허용을 기대하는 test_deployment_contract.py의 delta는 제외했다. runtime binary 파일 allowlist와 v1/v2 CI 검사는 유지했다.
+
+추론 전체: Python3.12 3,592 passed / 11 skipped / 36 subtests, loopback SDK fault fixture를 허용한 전체 재실행 결과. Converter host 회귀와 별개이며 유료 모델 호출 없음. 환경·배포/solver/prepare 생성기 경로는 고정 develop과 byte diff 없음.
+
+병렬 통합: 프리셋 #235 head `624cd7b7f588a715c00d9bb8c25404fb1c69bce3`, 메모리 전달 실험 head `afd3c509172b5489b5ebea5a42d92c2322dd6563`와 각각 merge-tree clean. 실험/프리셋 코드는 이번 브랜치에 반영하지 않았고 해당 head도 수정하지 않았다. prepared key 재생성 의존성은 여전히 유효하다.
