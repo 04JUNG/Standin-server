@@ -1,0 +1,21 @@
+{
+  "component": "converter",
+  "startedAt": "2026-11-13T03:45:06.601960+09:00",
+  "scope": "local-only",
+  "pushed": false,
+  "deployed": false,
+  "sourceSha": "f31558c305c8bb4c1687ab8fe4e15f001ca26f24",
+  "image": "standin-prebuild/converter:f31558c305c8bb4c1687ab8fe4e15f001ca26f24",
+  "imageId": "sha256:eca16e9d4c89d80f667f2f23105fb8b78168ae0111893d863210d5ac1a01d5aa",
+  "platform": "linux/amd64",
+  "imageBytes": 681614209,
+  "os": "linux",
+  "architecture": "amd64",
+  "status": "passed",
+  "seconds": 152.255,
+  "finishedAt": "2026-11-13T03:47:38.857104+09:00",
+  "log": "/private/tmp/standin-release-preparation-20261113/logs/converter.log",
+  "portableCache": "/private/tmp/standin-release-preparation-20261113/docker-cache/converter",
+  "helperScriptsMountedForQA": true,
+  "runtimeConverterCodeOverlaid": false
+}
