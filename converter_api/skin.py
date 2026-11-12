@@ -72,7 +72,7 @@ def register_skin(app,registry,runner):
         try:
             for _,_,_,entry in files():asset_data(entry)
         except (ValueError,OSError):available=False
-        targets=[dict(character_id=cid,character_sha256=row['character_sha256'],output_scope='full',skin_ids=[sid for sid in SKINS[1:] if certified(row['character_sha256'],'full',dict(version=VERSION,id=sid))]) for cid,row in manifest()['models'].items()]
+        targets=[dict(character_id=cid,character_sha256=row['character_sha256'],output_scope='full',skin_ids=[sid for sid in row['textures'] if certified(row['character_sha256'],'full',dict(version=VERSION,id=sid))]) for cid,row in manifest()['models'].items()]
         targets=[row for row in targets if row['skin_ids']]
         assets=[dict(character_id=cid,kind=kind,skin_id=sid,sha256=entry['sha256'],bytes=entry['bytes'],url='/skin-assets/'+entry['sha256']) for cid,kind,sid,entry in files()]
         return JSONResponse(dict(version=VERSION,expression=EXPRESSION,enabled=enabled(),assets_available=available,

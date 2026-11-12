@@ -1,6 +1,6 @@
 {
-  "prefix": "body-models/releases/anatomy-presets-20261111-f590cdb9f4ed-converter",
-  "manifestSha256": "f590cdb9f4ed0a78fb331bdde90c715c526c1314ce03d046432ac8eeaf3bf973",
+  "prefix": "body-models/releases/anatomy-skin-20261112-eb70160769a1-converter",
+  "manifestSha256": "eb70160769a1b1577576f99d3862f84ef1f6f595b402f574fae7c03cd7a00edc",
   "characterIds": [
     "male-base-v0-8-0",
     "male-ideal83-v0-8-0",

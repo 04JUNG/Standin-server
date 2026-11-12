@@ -1,0 +1,491 @@
+{
+  "schema": "staging-appearance-review-v1",
+  "date": "2026-11-12",
+  "assetManifestSha256": "7dd37c62d9778963348870690ac4ca967fec7789ecdf6323d997065d7aa2aa17",
+  "files": [
+    {
+      "name": "male-base-v0-8-0",
+      "characterId": "male-base-v0-8-0",
+      "sourceSha256": "705035f1bd247b3bf63a6d293065a5a39390b2d228df559474f9dc6682bf8c43",
+      "skinSha256": "e1a06ed09e80b4edd56ef16a4d7b829230034b42dc111903859c0e493cf04e2e",
+      "finalSha256": "a8ba70a6924012b61f7ef84da29857a106eff85b3ac926eb3cbb5bbd7037800e",
+      "skinBytes": 10353852,
+      "finalBytes": 19219980,
+      "bodyErrors": {
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      }
+    },
+    {
+      "name": "female-base-v0-4-0",
+      "characterId": "female-base-v0-4-0",
+      "sourceSha256": "ffd7b57d6ebba06299be252976b511afe5684a237e6f7d440bb90b2ba20f0c33",
+      "skinSha256": "a995488f2fc1062a64db316dc0253cbbde458e3805df62477d8f4b8d74c73c9a",
+      "finalSha256": "4965fb271812f9914819bb47574c9350070f76d40fdba1773998c75229a7d7aa",
+      "skinBytes": 7697404,
+      "finalBytes": 14237260,
+      "bodyErrors": {
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      }
+    },
+    {
+      "name": "male-ideal83-v0-8-0",
+      "characterId": "male-ideal83-v0-8-0",
+      "sourceSha256": "56248a449cbe312b87687c7e6ffcb35149ed62ee02f1dc8700052025a7dc786f",
+      "skinSha256": "14ccb05120d7e0e53aff247925b7e49d22ec621efdaa560d0f868a83e7ba83f1",
+      "finalSha256": "da2f2b019e8670c261262f21d10db4ac74312a20fd76aabf590e4da2f3b23496",
+      "skinBytes": 10357980,
+      "finalBytes": 19227372,
+      "bodyErrors": {
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      }
+    },
+    {
+      "name": "male-ideal70-v0-8-0",
+      "characterId": "male-ideal70-v0-8-0",
+      "sourceSha256": "5c29616fd615db67070f4ab26bb3c46158f43801805cdf53dacc10819ec969cb",
+      "skinSha256": "f914463bfee5d64b55b41c4c99bd56e35193eda4735047070eeec7a2a86e296c",
+      "finalSha256": "8c64c1079ee484ea63fd6a25ca0c0bd83a76b42315a709c84317899f5f63fb27",
+      "skinBytes": 10355916,
+      "finalBytes": 19222412,
+      "bodyErrors": {
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      }
+    },
+    {
+      "name": "male-toon64-v0-8-0",
+      "characterId": "male-toon64-v0-8-0",
+      "sourceSha256": "29aacebd756619bf62dd6f760a9966797e42dcd485dfcff82f0f878adabc595a",
+      "skinSha256": "b27a2ab3efe8cf6cd869e78d8c07dd3d41870d866aea9145c51792506525a3cb",
+      "finalSha256": "baca8cac75d7de580841076078c0e18a137663431d5fd2318c8e43213712509a",
+      "skinBytes": 10355388,
+      "finalBytes": 19218044,
+      "bodyErrors": {
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      }
+    },
+    {
+      "name": "male-muscular-v0-8-0",
+      "characterId": "male-muscular-v0-8-0",
+      "sourceSha256": "37c6ad6e8f61354dc51f99594efecdc8b4c48d03b7e611a4e648fc0e64925e2a",
+      "skinSha256": "539ea9b077bdbfeb8fa2977eeba45bf9de61b4987daf36a46831550577a9ca1a",
+      "finalSha256": "3425c5def35064f7342e3326b82f4023693ad2edf08b013c5a495b9e15f4343f",
+      "skinBytes": 10362972,
+      "finalBytes": 19237948,
+      "bodyErrors": {
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      }
+    },
+    {
+      "name": "male-muscle-max-v0-8-0",
+      "characterId": "male-muscle-max-v0-8-0",
+      "sourceSha256": "11e88a4df956e9bd2c25f058265eb7530257f196ae54f1ad5f01099f090f38b4",
+      "skinSha256": "ed65ac744175ad78fe2490c6000d14cdb0192e8badeaafb249b92462edbbb5cf",
+      "finalSha256": "049aae0fab328994fbee9814d38a9bd41601275c5f59d15a6b1abb007041c4bb",
+      "skinBytes": 10362524,
+      "finalBytes": 19237852,
+      "bodyErrors": {
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      }
+    },
+    {
+      "name": "male-bulk-v0-8-0",
+      "characterId": "male-bulk-v0-8-0",
+      "sourceSha256": "9bbd89667c4d38a80b6600f318b84550021d389a0a92c3713b9bb8fb22be2901",
+      "skinSha256": "e99600e7a147aa2f7f64e759227a0b479a26eac8c7ab6547b978b2a6b068d0f5",
+      "finalSha256": "4b06f17bc44d8ec11d178012e375903183de8accf4097aef90cd8cb260c7b37b",
+      "skinBytes": 10366636,
+      "finalBytes": 19246876,
+      "bodyErrors": {
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      }
+    },
+    {
+      "name": "male-soft-v0-8-0",
+      "characterId": "male-soft-v0-8-0",
+      "sourceSha256": "a9dcd65e68d03e62d89ff3cffd27c330361595d9407d02ba16b2720086582f2e",
+      "skinSha256": "fadd3056d62ac8daa497f35ef60fa5ff31ae33b5c87b9a38bb440e1620146b61",
+      "finalSha256": "a09876eaaeedf314613c2c5ba9b263c6802121cc9465bdc563558b7a5799ae1f",
+      "skinBytes": 10360956,
+      "finalBytes": 19234972,
+      "bodyErrors": {
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      }
+    },
+    {
+      "name": "male-fat-max-v0-8-0",
+      "characterId": "male-fat-max-v0-8-0",
+      "sourceSha256": "61d0ededbc9e7d71c01b44196e93aa1278ff49fe603bfca28cca2cbd2eac4234",
+      "skinSha256": "3b069f62df2f1eaedd9b494c03fc9d75520ff6dd72549b6c3ced15142d956a34",
+      "finalSha256": "ff725339ef73f95abef598ceb446ed23b6aae0e119a031a7246feed17dbf9196",
+      "skinBytes": 10366700,
+      "finalBytes": 19246252,
+      "bodyErrors": {
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      }
+    },
+    {
+      "name": "female-slim-v0-4-0",
+      "characterId": "female-slim-v0-4-0",
+      "sourceSha256": "33e5041fdfc61ef26553a12d52464a1050cfa8a7a04d98668aeb250f9fb33c38",
+      "skinSha256": "b3cac64b7cd51e43b3c104ab467805881c040d50087dd9c2b2f19fd53d9c85ad",
+      "finalSha256": "bf97900ed90ec6073f3a34e9c837946439eb39994b5ca6bfac60908181264bcd",
+      "skinBytes": 7697260,
+      "finalBytes": 14236748,
+      "bodyErrors": {
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      }
+    },
+    {
+      "name": "female-ideal83-v0-4-0",
+      "characterId": "female-ideal83-v0-4-0",
+      "sourceSha256": "4cbc58767c54c0ccc1dfd46a7d086a3503af3fc7e1dfa69a21c02eedd1a2234d",
+      "skinSha256": "26edb84f5f66d04b50d92d00e28f2dc0121cc05bd2c2a6a8237cb198c456d110",
+      "finalSha256": "f5d089c9eae01abe7c6d63902792b4281bed6dfed5186bcb531f5b891e6a1e3d",
+      "skinBytes": 7698060,
+      "finalBytes": 14236892,
+      "bodyErrors": {
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      }
+    },
+    {
+      "name": "female-ideal70-v0-4-0",
+      "characterId": "female-ideal70-v0-4-0",
+      "sourceSha256": "669d62723f743163fce7cb1351004f7300cb6d5903761b8e8d2add38b754a6ba",
+      "skinSha256": "749f0a4eaf4c29fe18eb521671df5b05a4df4ee5c5cbc5b1cf80db12601e6492",
+      "finalSha256": "4664890fcdbb50bb0216a8efa6ce63fb99be60a85abc2366a1c7ee5ebddc590d",
+      "skinBytes": 7695420,
+      "finalBytes": 14231708,
+      "bodyErrors": {
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      }
+    },
+    {
+      "name": "female-toon64-v0-4-0",
+      "characterId": "female-toon64-v0-4-0",
+      "sourceSha256": "dc12c453dbc46f175351d72a73fc8b0f8bc3f8ec15316fb72d2a1082b66a4a68",
+      "skinSha256": "233f9109da35f6aadc6df4218e278798a3cf1829255a87d71046fe955f1d81d8",
+      "finalSha256": "f71348af2d9d0e1c3bba9a19981827009704887ac916ed1710aa2039c83720fa",
+      "skinBytes": 7693980,
+      "finalBytes": 14227356,
+      "bodyErrors": {
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      }
+    },
+    {
+      "name": "female-muscular-v0-4-0",
+      "characterId": "female-muscular-v0-4-0",
+      "sourceSha256": "76558d763ba524101fd9c3b50458641423869a2602d9198d05d41cc46efcd522",
+      "skinSha256": "5570b377aded8794dfd3030b8b39a50b5919c0a0f264d86072517dacfd9bbf59",
+      "finalSha256": "9405ec280d373c6690d505582ca047ca01102b0a720800903b2bdbe5a56c2862",
+      "skinBytes": 7698220,
+      "finalBytes": 14239004,
+      "bodyErrors": {
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      }
+    },
+    {
+      "name": "female-muscle-max-v0-4-0",
+      "characterId": "female-muscle-max-v0-4-0",
+      "sourceSha256": "8e2407d0118a7d38b4d2553d260778683c5ef8ef3819e6dba18bf43650c7585f",
+      "skinSha256": "5c67d1682b98799a5bd695d8731f326afcd41ab7219cd8821296c80a28359f84",
+      "finalSha256": "34949ad3475618ded40af8e86d2573701652f648082d57c7b7b8a02416472d31",
+      "skinBytes": 7699036,
+      "finalBytes": 14241148,
+      "bodyErrors": {
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      }
+    },
+    {
+      "name": "female-soft-v0-4-0",
+      "characterId": "female-soft-v0-4-0",
+      "sourceSha256": "5d0345f98d881ce46777fdf91129d02a54ff20619ee63e5af9c47738ec4057b2",
+      "skinSha256": "5fdadce0467720edf5889c688227c0023bd477f655a390a587609a138ba6757c",
+      "finalSha256": "d636e6f1df7c71df90e40602a8096d916b991f97c88f0245b787c8ab0aea92d7",
+      "skinBytes": 7699004,
+      "finalBytes": 14240604,
+      "bodyErrors": {
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      }
+    },
+    {
+      "name": "female-fat-max-v0-4-0",
+      "characterId": "female-fat-max-v0-4-0",
+      "sourceSha256": "87563be9bbb84e8d3c2f22b542a27a5c9d49bd939156338b45c40e323fb82cb9",
+      "skinSha256": "410df2424bc840f7cf0b0494d119571d8fc715008ff46dbfb139e5c792f46a61",
+      "finalSha256": "f2129b59d31b66378a00cec8729c8ce90acb028526353fad520c787495db65d5",
+      "skinBytes": 7699580,
+      "finalBytes": 14242204,
+      "bodyErrors": {
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      }
+    },
+    {
+      "name": "female-new-fat-v0-4-0",
+      "characterId": "female-new-fat-v0-4-0",
+      "sourceSha256": "43e0cff054daed6a7d76b5e338c6a0bb941760cecff417c7ca9f4ae3f5bf0f3f",
+      "skinSha256": "0fb08c9cc339b9992afe1a51417de2d9d20d48d37fb6f988124232cc83d10373",
+      "finalSha256": "def8534e78622f9622b41fc3ab6477e4ffb1e75fe45c16433235a711ca05568b",
+      "skinBytes": 7701228,
+      "finalBytes": 14245676,
+      "bodyErrors": {
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      }
+    },
+    {
+      "name": "female-new-muscular-v0-4-0",
+      "characterId": "female-new-muscular-v0-4-0",
+      "sourceSha256": "b22bf84b91a7af1dbb4328aaafa99fbe5d89c30b29dd2c8987b65fd0fb223a96",
+      "skinSha256": "1b27f5350c1e027807fdd93c906fcc194868655473971f9dc91f63b9aaf5dffb",
+      "finalSha256": "e7c3412f4189a2af1252d8923e3f48f491a531d160d5b5a7bf01d30f54aec125",
+      "skinBytes": 7701404,
+      "finalBytes": 14245724,
+      "bodyErrors": {
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      }
+    },
+    {
+      "name": "male-custom-shaped-bent",
+      "characterId": "male-base-v0-8-0",
+      "sourceSha256": "82dfa6b00f1f525e3f25e69cb229db741bfd8aa7bddce156f503de560dc304e4",
+      "skinSha256": "f9c741b72d2fc0086c0f7d7ea1178e58045138500bf1496c2615448b4d41c94b",
+      "finalSha256": "f9c9240b2b19bac8d00d919cba69017e790418ab6f7e142b169f9751e9d38f5a",
+      "skinBytes": 10311308,
+      "finalBytes": 19215116,
+      "bodyErrors": {
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      },
+      "shape": {
+        "schemaVersion": "body-shape.v1",
+        "controls": {
+          "height": 189.684899,
+          "heads": 7.943109,
+          "physique": 0.0,
+          "muscle": 0.4,
+          "muscle_bulk": 0.0,
+          "shoulders": 0.55,
+          "head_scale": 1.0,
+          "head_width": 0.0,
+          "head_depth": 0.0,
+          "neck_width": 0.0,
+          "neck_length": 0.0,
+          "definition": 0.0,
+          "chest_width": 0.0,
+          "chest_depth": 0.0,
+          "waist": -0.3,
+          "pelvis": 0.0,
+          "glute": 0.0,
+          "thigh": 0.0,
+          "calf": 0.0,
+          "torso_length": 0.0,
+          "arm_length": 0.0,
+          "leg_length": 0.0,
+          "leg_ratio": 0.0,
+          "detail_chest": 0.0,
+          "detail_back": 0.0,
+          "detail_shoulder": 0.0,
+          "detail_upperarm": 0.0,
+          "detail_forearm": 0.0,
+          "detail_thigh": 0.0,
+          "detail_calf": 0.0,
+          "fat_torso": 0.0,
+          "fat_arms": 0.0,
+          "fat_legs": 0.0
+        },
+        "shapeSha256": "8f6cdbe25a889609864d7058a713d549e017fa4d92378238760b908e63ed0bc8"
+      },
+      "shapeSource": {
+        "rules": "standin-body-0.8.0",
+        "blend_sha256": "a03550749315592c543eeda66a183fe4116380f2068b412105f751c7b2e9c39a",
+        "controller_sha256": "bcdabb7d69534f08400dfbd8a91a52ddc01528428332d4f14d4ad6792a7af8da"
+      }
+    },
+    {
+      "name": "female-custom-shaped-bent",
+      "characterId": "female-base-v0-4-0",
+      "sourceSha256": "f80bd52de6fb97469164de2338d63d9099b16efada502dfa16c2a2224fdaec2b",
+      "skinSha256": "422aeec2b6614026c7822c7193b9bcffd163bf8a24682d6892629b9c9b0bca0a",
+      "finalSha256": "c2943ebcbce2ecfc45d5373f290525d8b2374a21761388d9fb6b33f6079b448b",
+      "skinBytes": 7657356,
+      "finalBytes": 14224316,
+      "bodyErrors": {
+        "maxMatrixError": 0.0,
+        "maxNormalError": 0.0,
+        "maxPositionErrorM": 0.0,
+        "maxWeightError": 0.0,
+        "typed_fbx_values_preserved": true
+      },
+      "shape": {
+        "schemaVersion": "body-shape.v1",
+        "controls": {
+          "height": 161.893087,
+          "heads": 8.000001,
+          "shoulders": 0.55,
+          "muscle": 0.4,
+          "physique": 0.0,
+          "fat_gain": 0.0,
+          "breast_size": 0.0,
+          "head_scale": 1.04,
+          "head_width": 0.0,
+          "head_depth": 0.0,
+          "neck_width": 0.0,
+          "neck_length": 0.0,
+          "definition": 0.0,
+          "chest_width": 0.0,
+          "chest_depth": 0.0,
+          "waist": -0.3,
+          "pelvis": 0.0,
+          "glute": 0.0,
+          "thigh": 0.0,
+          "calf": 0.0,
+          "torso_length": 0.0,
+          "arm_length": 0.0,
+          "leg_length": 0.0,
+          "leg_ratio": 0.0,
+          "breast_projection": 0.0,
+          "breast_spacing": 0.0,
+          "breast_height": 0.0,
+          "breast_width": 0.0,
+          "fat_distribution": 0.0,
+          "detail_chest": 0.0,
+          "detail_back": 0.0,
+          "detail_shoulder": 0.0,
+          "detail_upperarm": 0.0,
+          "detail_forearm": 0.0,
+          "detail_thigh": 0.0,
+          "detail_calf": 0.0,
+          "fat_torso": 0.0,
+          "fat_arms": 0.0,
+          "fat_legs": 0.0
+        },
+        "shapeSha256": "5de1357a30e2cbbd03fdf5775fdc426961494f87a2d2c969705599c9e4ab752d"
+      },
+      "shapeSource": {
+        "rules": "standin-female-body-0.4.0",
+        "blend_sha256": "5a62d2f3fb49d77fdc04d1c78a361edf9fbab55e71e0e47d3b6b393fae14d3a9",
+        "controller_sha256": "1164dff9a4c6069d0da37b80dd26c61544bc6f9eb9c9f3469c33d457e893e9af"
+      }
+    }
+  ],
+  "csp": {
+    "method": "Actual File > Import > 3D Data, isolated Standin appearance QA 20261112 canvas; 1000x768px72dpi100%; default settings; no manual outline/culling changes",
+    "observations": [
+      {
+        "name": "male-base-v0-8-0",
+        "width": 2,
+        "sha256": "a8ba70a6924012b61f7ef84da29857a106eff85b3ac926eb3cbb5bbd7037800e",
+        "skinVisible": true,
+        "blackContourVisible": true,
+        "largeBlackFillObserved": false
+      },
+      {
+        "name": "female-base-v0-4-0",
+        "width": 2,
+        "sha256": "4965fb271812f9914819bb47574c9350070f76d40fdba1773998c75229a7d7aa",
+        "skinVisible": true,
+        "blackContourVisible": true,
+        "largeBlackFillObserved": false
+      },
+      {
+        "name": "male-custom-shaped-bent",
+        "width": 1.2,
+        "sha256": "f9c9240b2b19bac8d00d919cba69017e790418ab6f7e142b169f9751e9d38f5a",
+        "skinVisible": true,
+        "blackContourVisible": true,
+        "largeBlackFillObserved": false
+      },
+      {
+        "name": "female-custom-shaped-bent",
+        "width": 2,
+        "sha256": "19c0774815aeb06b3d7676cd976ccea3001faff081c386040bb75aa240b8db7f",
+        "skinVisible": true,
+        "blackContourVisible": true,
+        "largeBlackFillObserved": false
+      }
+    ]
+  },
+  "scope": "Current 20 anatomy preset models and shape-preserving slider changes; full individual FBX, solid flesh skin; maximum outline2. Current guide skins and cropped skin targets remain unsupported."
+}

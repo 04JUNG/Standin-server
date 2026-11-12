@@ -5,11 +5,41 @@
     "guide_spec.json": "ebba06ac1d99496bf412110be145c55a90d8075190aa70483fd8894507826b58",
     "male-muscle-paths.v2.json": "97c068293d49785637230fa804d90329196e8dd36bf4dfede37d6a04407484b7",
     "package_assets.py": "e9e6de479e2b45280ea7965ed1c1957fca6f80d71df3efcf4a109763cbb7a12a",
+    "package_staging_skin_assets.py": "54a1e7cd46de551e2f0fc2252b2e998cb7630ca2ec6946b1c6205bbfb5c7d53d",
     "prepare_preview_textures.py": "1f43888261ffb2bb35abe12a305acde28f613a2a53674e0740690b692ea7af64",
     "skin_style.json": "52fc1512c5d72dab13c1d70d1aa5429a34eed626bd30ea4f20557d1394ba9ff7"
   },
   "guide_revision": "0.1.3",
   "models": {
+    "female-base-v0-4-0": {
+      "bones": 54,
+      "character_sha256": "ffd7b57d6ebba06299be252976b511afe5684a237e6f7d440bb90b2ba20f0c33",
+      "polygon_indices_sha256": "336c1d07cf47e56d618ea48ef0890e7c4167b12cd37f40504251324162dd624a",
+      "preview_mesh": "mesh_000",
+      "preview_resolution": 2048,
+      "preview_textures": {
+        "flesh": {
+          "bytes": 15790,
+          "path": "female-flesh-preview.png",
+          "sha256": "294e93d6d007bf20b0fbf205670a1eb45b2ad98c52f116faa2e11db72e0206f4"
+        }
+      },
+      "textures": {
+        "flesh": {
+          "bytes": 58638,
+          "path": "female-flesh.png",
+          "sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808"
+        }
+      },
+      "triangles_sha256": "ad292d6aaccc3194aa347c0741729370b28e3e71f9304e569af04c574bc5a0e1",
+      "uv": {
+        "bytes": 1330319,
+        "path": "female-base-v0-4-0-uv.json.gz",
+        "sha256": "d019095837c78df4a30f1d7e0efc35305e1be085072eae9d00297845ec70bc63"
+      },
+      "vertices": 105430,
+      "weights_sha256": "92d7730b1a817a28a4cc685bcb679dcf549f9d4f37baa50d7444985718d984aa"
+    },
     "female-default80-v0-3-9-p1": {
       "bones": 52,
       "character_sha256": "712ac75e58efd4d6ccded0b1e931590900015de023327f1320cf6d7d94026ffc",
@@ -69,6 +99,354 @@
       "vertices": 24999,
       "weights_sha256": "e562bb2613d2539f803f80c35adc9453f9cbb3780a1b9fc84ad1b31d572393bd"
     },
+    "female-fat-max-v0-4-0": {
+      "bones": 54,
+      "character_sha256": "87563be9bbb84e8d3c2f22b542a27a5c9d49bd939156338b45c40e323fb82cb9",
+      "polygon_indices_sha256": "336c1d07cf47e56d618ea48ef0890e7c4167b12cd37f40504251324162dd624a",
+      "preview_mesh": "mesh_000",
+      "preview_resolution": 2048,
+      "preview_textures": {
+        "flesh": {
+          "bytes": 15790,
+          "path": "female-flesh-preview.png",
+          "sha256": "294e93d6d007bf20b0fbf205670a1eb45b2ad98c52f116faa2e11db72e0206f4"
+        }
+      },
+      "textures": {
+        "flesh": {
+          "bytes": 58638,
+          "path": "female-flesh.png",
+          "sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808"
+        }
+      },
+      "triangles_sha256": "ad292d6aaccc3194aa347c0741729370b28e3e71f9304e569af04c574bc5a0e1",
+      "uv": {
+        "bytes": 1330320,
+        "path": "female-fat-max-v0-4-0-uv.json.gz",
+        "sha256": "f254e15fc23963910c0f32982b9d36551339bb8801e333accc6d4550a869e5a0"
+      },
+      "vertices": 105430,
+      "weights_sha256": "92d7730b1a817a28a4cc685bcb679dcf549f9d4f37baa50d7444985718d984aa"
+    },
+    "female-ideal70-v0-4-0": {
+      "bones": 54,
+      "character_sha256": "669d62723f743163fce7cb1351004f7300cb6d5903761b8e8d2add38b754a6ba",
+      "polygon_indices_sha256": "336c1d07cf47e56d618ea48ef0890e7c4167b12cd37f40504251324162dd624a",
+      "preview_mesh": "mesh_000",
+      "preview_resolution": 2048,
+      "preview_textures": {
+        "flesh": {
+          "bytes": 15790,
+          "path": "female-flesh-preview.png",
+          "sha256": "294e93d6d007bf20b0fbf205670a1eb45b2ad98c52f116faa2e11db72e0206f4"
+        }
+      },
+      "textures": {
+        "flesh": {
+          "bytes": 58638,
+          "path": "female-flesh.png",
+          "sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808"
+        }
+      },
+      "triangles_sha256": "ad292d6aaccc3194aa347c0741729370b28e3e71f9304e569af04c574bc5a0e1",
+      "uv": {
+        "bytes": 1330318,
+        "path": "female-ideal70-v0-4-0-uv.json.gz",
+        "sha256": "20d1915bd3ce6bc8a5ed2cfc67683215a2b65c18d99a7f89bb52ae0928a8affb"
+      },
+      "vertices": 105430,
+      "weights_sha256": "92d7730b1a817a28a4cc685bcb679dcf549f9d4f37baa50d7444985718d984aa"
+    },
+    "female-ideal83-v0-4-0": {
+      "bones": 54,
+      "character_sha256": "4cbc58767c54c0ccc1dfd46a7d086a3503af3fc7e1dfa69a21c02eedd1a2234d",
+      "polygon_indices_sha256": "336c1d07cf47e56d618ea48ef0890e7c4167b12cd37f40504251324162dd624a",
+      "preview_mesh": "mesh_000",
+      "preview_resolution": 2048,
+      "preview_textures": {
+        "flesh": {
+          "bytes": 15790,
+          "path": "female-flesh-preview.png",
+          "sha256": "294e93d6d007bf20b0fbf205670a1eb45b2ad98c52f116faa2e11db72e0206f4"
+        }
+      },
+      "textures": {
+        "flesh": {
+          "bytes": 58638,
+          "path": "female-flesh.png",
+          "sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808"
+        }
+      },
+      "triangles_sha256": "ad292d6aaccc3194aa347c0741729370b28e3e71f9304e569af04c574bc5a0e1",
+      "uv": {
+        "bytes": 1330320,
+        "path": "female-ideal83-v0-4-0-uv.json.gz",
+        "sha256": "1d85738e21d5063b11a2f846d3d10946e107b5b3311559b2c4aa1514856c7665"
+      },
+      "vertices": 105430,
+      "weights_sha256": "92d7730b1a817a28a4cc685bcb679dcf549f9d4f37baa50d7444985718d984aa"
+    },
+    "female-muscle-max-v0-4-0": {
+      "bones": 54,
+      "character_sha256": "8e2407d0118a7d38b4d2553d260778683c5ef8ef3819e6dba18bf43650c7585f",
+      "polygon_indices_sha256": "336c1d07cf47e56d618ea48ef0890e7c4167b12cd37f40504251324162dd624a",
+      "preview_mesh": "mesh_000",
+      "preview_resolution": 2048,
+      "preview_textures": {
+        "flesh": {
+          "bytes": 15790,
+          "path": "female-flesh-preview.png",
+          "sha256": "294e93d6d007bf20b0fbf205670a1eb45b2ad98c52f116faa2e11db72e0206f4"
+        }
+      },
+      "textures": {
+        "flesh": {
+          "bytes": 58638,
+          "path": "female-flesh.png",
+          "sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808"
+        }
+      },
+      "triangles_sha256": "ad292d6aaccc3194aa347c0741729370b28e3e71f9304e569af04c574bc5a0e1",
+      "uv": {
+        "bytes": 1330318,
+        "path": "female-muscle-max-v0-4-0-uv.json.gz",
+        "sha256": "70c1254984d4ee7051b63502948d38accd0053d646f6e0ee4c057816b8062c5a"
+      },
+      "vertices": 105430,
+      "weights_sha256": "92d7730b1a817a28a4cc685bcb679dcf549f9d4f37baa50d7444985718d984aa"
+    },
+    "female-muscular-v0-4-0": {
+      "bones": 54,
+      "character_sha256": "76558d763ba524101fd9c3b50458641423869a2602d9198d05d41cc46efcd522",
+      "polygon_indices_sha256": "336c1d07cf47e56d618ea48ef0890e7c4167b12cd37f40504251324162dd624a",
+      "preview_mesh": "mesh_000",
+      "preview_resolution": 2048,
+      "preview_textures": {
+        "flesh": {
+          "bytes": 15790,
+          "path": "female-flesh-preview.png",
+          "sha256": "294e93d6d007bf20b0fbf205670a1eb45b2ad98c52f116faa2e11db72e0206f4"
+        }
+      },
+      "textures": {
+        "flesh": {
+          "bytes": 58638,
+          "path": "female-flesh.png",
+          "sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808"
+        }
+      },
+      "triangles_sha256": "ad292d6aaccc3194aa347c0741729370b28e3e71f9304e569af04c574bc5a0e1",
+      "uv": {
+        "bytes": 1330314,
+        "path": "female-muscular-v0-4-0-uv.json.gz",
+        "sha256": "4615379c60c2dca378253bf9f439863a69ac9797cf1f3d5733136cd0eb848979"
+      },
+      "vertices": 105430,
+      "weights_sha256": "92d7730b1a817a28a4cc685bcb679dcf549f9d4f37baa50d7444985718d984aa"
+    },
+    "female-new-fat-v0-4-0": {
+      "bones": 54,
+      "character_sha256": "43e0cff054daed6a7d76b5e338c6a0bb941760cecff417c7ca9f4ae3f5bf0f3f",
+      "polygon_indices_sha256": "336c1d07cf47e56d618ea48ef0890e7c4167b12cd37f40504251324162dd624a",
+      "preview_mesh": "mesh_000",
+      "preview_resolution": 2048,
+      "preview_textures": {
+        "flesh": {
+          "bytes": 15790,
+          "path": "female-flesh-preview.png",
+          "sha256": "294e93d6d007bf20b0fbf205670a1eb45b2ad98c52f116faa2e11db72e0206f4"
+        }
+      },
+      "textures": {
+        "flesh": {
+          "bytes": 58638,
+          "path": "female-flesh.png",
+          "sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808"
+        }
+      },
+      "triangles_sha256": "ad292d6aaccc3194aa347c0741729370b28e3e71f9304e569af04c574bc5a0e1",
+      "uv": {
+        "bytes": 1330322,
+        "path": "female-new-fat-v0-4-0-uv.json.gz",
+        "sha256": "42760457f288e9f148697e27c7de800896104d8727b7b942b6761d93f775d598"
+      },
+      "vertices": 105430,
+      "weights_sha256": "92d7730b1a817a28a4cc685bcb679dcf549f9d4f37baa50d7444985718d984aa"
+    },
+    "female-new-muscular-v0-4-0": {
+      "bones": 54,
+      "character_sha256": "b22bf84b91a7af1dbb4328aaafa99fbe5d89c30b29dd2c8987b65fd0fb223a96",
+      "polygon_indices_sha256": "336c1d07cf47e56d618ea48ef0890e7c4167b12cd37f40504251324162dd624a",
+      "preview_mesh": "mesh_000",
+      "preview_resolution": 2048,
+      "preview_textures": {
+        "flesh": {
+          "bytes": 15790,
+          "path": "female-flesh-preview.png",
+          "sha256": "294e93d6d007bf20b0fbf205670a1eb45b2ad98c52f116faa2e11db72e0206f4"
+        }
+      },
+      "textures": {
+        "flesh": {
+          "bytes": 58638,
+          "path": "female-flesh.png",
+          "sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808"
+        }
+      },
+      "triangles_sha256": "ad292d6aaccc3194aa347c0741729370b28e3e71f9304e569af04c574bc5a0e1",
+      "uv": {
+        "bytes": 1330321,
+        "path": "female-new-muscular-v0-4-0-uv.json.gz",
+        "sha256": "477f1619df9a7bdd74846bacc2a11e70eef4bff5a73aa43baac224b9861d0888"
+      },
+      "vertices": 105430,
+      "weights_sha256": "92d7730b1a817a28a4cc685bcb679dcf549f9d4f37baa50d7444985718d984aa"
+    },
+    "female-slim-v0-4-0": {
+      "bones": 54,
+      "character_sha256": "33e5041fdfc61ef26553a12d52464a1050cfa8a7a04d98668aeb250f9fb33c38",
+      "polygon_indices_sha256": "336c1d07cf47e56d618ea48ef0890e7c4167b12cd37f40504251324162dd624a",
+      "preview_mesh": "mesh_000",
+      "preview_resolution": 2048,
+      "preview_textures": {
+        "flesh": {
+          "bytes": 15790,
+          "path": "female-flesh-preview.png",
+          "sha256": "294e93d6d007bf20b0fbf205670a1eb45b2ad98c52f116faa2e11db72e0206f4"
+        }
+      },
+      "textures": {
+        "flesh": {
+          "bytes": 58638,
+          "path": "female-flesh.png",
+          "sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808"
+        }
+      },
+      "triangles_sha256": "ad292d6aaccc3194aa347c0741729370b28e3e71f9304e569af04c574bc5a0e1",
+      "uv": {
+        "bytes": 1330318,
+        "path": "female-slim-v0-4-0-uv.json.gz",
+        "sha256": "ee8568ada485ed102ba7fd41c3f33aa3bfa6f91aea22319cbe479aa6c99d2b18"
+      },
+      "vertices": 105430,
+      "weights_sha256": "92d7730b1a817a28a4cc685bcb679dcf549f9d4f37baa50d7444985718d984aa"
+    },
+    "female-soft-v0-4-0": {
+      "bones": 54,
+      "character_sha256": "5d0345f98d881ce46777fdf91129d02a54ff20619ee63e5af9c47738ec4057b2",
+      "polygon_indices_sha256": "336c1d07cf47e56d618ea48ef0890e7c4167b12cd37f40504251324162dd624a",
+      "preview_mesh": "mesh_000",
+      "preview_resolution": 2048,
+      "preview_textures": {
+        "flesh": {
+          "bytes": 15790,
+          "path": "female-flesh-preview.png",
+          "sha256": "294e93d6d007bf20b0fbf205670a1eb45b2ad98c52f116faa2e11db72e0206f4"
+        }
+      },
+      "textures": {
+        "flesh": {
+          "bytes": 58638,
+          "path": "female-flesh.png",
+          "sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808"
+        }
+      },
+      "triangles_sha256": "ad292d6aaccc3194aa347c0741729370b28e3e71f9304e569af04c574bc5a0e1",
+      "uv": {
+        "bytes": 1330318,
+        "path": "female-soft-v0-4-0-uv.json.gz",
+        "sha256": "8f2b3541e30909048caa99692a3a3efbf7b4e155ef3a8c27d34c154b8b4f0321"
+      },
+      "vertices": 105430,
+      "weights_sha256": "92d7730b1a817a28a4cc685bcb679dcf549f9d4f37baa50d7444985718d984aa"
+    },
+    "female-toon64-v0-4-0": {
+      "bones": 54,
+      "character_sha256": "dc12c453dbc46f175351d72a73fc8b0f8bc3f8ec15316fb72d2a1082b66a4a68",
+      "polygon_indices_sha256": "336c1d07cf47e56d618ea48ef0890e7c4167b12cd37f40504251324162dd624a",
+      "preview_mesh": "mesh_000",
+      "preview_resolution": 2048,
+      "preview_textures": {
+        "flesh": {
+          "bytes": 15790,
+          "path": "female-flesh-preview.png",
+          "sha256": "294e93d6d007bf20b0fbf205670a1eb45b2ad98c52f116faa2e11db72e0206f4"
+        }
+      },
+      "textures": {
+        "flesh": {
+          "bytes": 58638,
+          "path": "female-flesh.png",
+          "sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808"
+        }
+      },
+      "triangles_sha256": "ad292d6aaccc3194aa347c0741729370b28e3e71f9304e569af04c574bc5a0e1",
+      "uv": {
+        "bytes": 1330319,
+        "path": "female-toon64-v0-4-0-uv.json.gz",
+        "sha256": "7f1e53f1cc0545cf57833af54a79127a8e125e58442f117c64dedbd73a54a90b"
+      },
+      "vertices": 105430,
+      "weights_sha256": "92d7730b1a817a28a4cc685bcb679dcf549f9d4f37baa50d7444985718d984aa"
+    },
+    "male-base-v0-8-0": {
+      "bones": 54,
+      "character_sha256": "705035f1bd247b3bf63a6d293065a5a39390b2d228df559474f9dc6682bf8c43",
+      "polygon_indices_sha256": "81b17d37385e3c7e1322caa579b9e3a47fc51f36be0e1c727ea3ebc17b3212a0",
+      "preview_mesh": "mesh_000",
+      "preview_resolution": 2048,
+      "preview_textures": {
+        "flesh": {
+          "bytes": 15790,
+          "path": "female-flesh-preview.png",
+          "sha256": "294e93d6d007bf20b0fbf205670a1eb45b2ad98c52f116faa2e11db72e0206f4"
+        }
+      },
+      "textures": {
+        "flesh": {
+          "bytes": 58638,
+          "path": "female-flesh.png",
+          "sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808"
+        }
+      },
+      "triangles_sha256": "09dcb9b7135d099a1d6e4df44a6d5aed48c96f72b3d8ddd2efea275d1851c958",
+      "uv": {
+        "bytes": 1712736,
+        "path": "male-base-v0-8-0-uv.json.gz",
+        "sha256": "78f2b18b512c3fa7ca55fa642359939d6141e4ba3b7ed5ebd23ed84154fea2e2"
+      },
+      "vertices": 139474,
+      "weights_sha256": "b718af8b8f900a8c24cd10951bcf8a85e2852e3b004fe1ee5d0a21476d68d170"
+    },
+    "male-bulk-v0-8-0": {
+      "bones": 54,
+      "character_sha256": "9bbd89667c4d38a80b6600f318b84550021d389a0a92c3713b9bb8fb22be2901",
+      "polygon_indices_sha256": "81b17d37385e3c7e1322caa579b9e3a47fc51f36be0e1c727ea3ebc17b3212a0",
+      "preview_mesh": "mesh_000",
+      "preview_resolution": 2048,
+      "preview_textures": {
+        "flesh": {
+          "bytes": 15790,
+          "path": "female-flesh-preview.png",
+          "sha256": "294e93d6d007bf20b0fbf205670a1eb45b2ad98c52f116faa2e11db72e0206f4"
+        }
+      },
+      "textures": {
+        "flesh": {
+          "bytes": 58638,
+          "path": "female-flesh.png",
+          "sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808"
+        }
+      },
+      "triangles_sha256": "09dcb9b7135d099a1d6e4df44a6d5aed48c96f72b3d8ddd2efea275d1851c958",
+      "uv": {
+        "bytes": 1712736,
+        "path": "male-bulk-v0-8-0-uv.json.gz",
+        "sha256": "74f453510bdac585afd38d614f062300bf6a70a0620956384676c501cdf09cc1"
+      },
+      "vertices": 139474,
+      "weights_sha256": "b718af8b8f900a8c24cd10951bcf8a85e2852e3b004fe1ee5d0a21476d68d170"
+    },
     "male-default83-v0-7-6-p1": {
       "bones": 52,
       "character_sha256": "085dd9c65a3a66035f7e0ce9e0a9171b9abb0e33dada92194676d92e00c8b026",
@@ -127,9 +505,212 @@
       },
       "vertices": 24988,
       "weights_sha256": "0348dac96177afd6bf7e60f8da13902c8d896dbdfed37c602decf929427212ac"
+    },
+    "male-fat-max-v0-8-0": {
+      "bones": 54,
+      "character_sha256": "61d0ededbc9e7d71c01b44196e93aa1278ff49fe603bfca28cca2cbd2eac4234",
+      "polygon_indices_sha256": "81b17d37385e3c7e1322caa579b9e3a47fc51f36be0e1c727ea3ebc17b3212a0",
+      "preview_mesh": "mesh_000",
+      "preview_resolution": 2048,
+      "preview_textures": {
+        "flesh": {
+          "bytes": 15790,
+          "path": "female-flesh-preview.png",
+          "sha256": "294e93d6d007bf20b0fbf205670a1eb45b2ad98c52f116faa2e11db72e0206f4"
+        }
+      },
+      "textures": {
+        "flesh": {
+          "bytes": 58638,
+          "path": "female-flesh.png",
+          "sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808"
+        }
+      },
+      "triangles_sha256": "09dcb9b7135d099a1d6e4df44a6d5aed48c96f72b3d8ddd2efea275d1851c958",
+      "uv": {
+        "bytes": 1712743,
+        "path": "male-fat-max-v0-8-0-uv.json.gz",
+        "sha256": "50b40de288950f4279b0d2fa26a6cca111dc80ec1b282be1c01a56b38d36c190"
+      },
+      "vertices": 139474,
+      "weights_sha256": "b718af8b8f900a8c24cd10951bcf8a85e2852e3b004fe1ee5d0a21476d68d170"
+    },
+    "male-ideal70-v0-8-0": {
+      "bones": 54,
+      "character_sha256": "5c29616fd615db67070f4ab26bb3c46158f43801805cdf53dacc10819ec969cb",
+      "polygon_indices_sha256": "81b17d37385e3c7e1322caa579b9e3a47fc51f36be0e1c727ea3ebc17b3212a0",
+      "preview_mesh": "mesh_000",
+      "preview_resolution": 2048,
+      "preview_textures": {
+        "flesh": {
+          "bytes": 15790,
+          "path": "female-flesh-preview.png",
+          "sha256": "294e93d6d007bf20b0fbf205670a1eb45b2ad98c52f116faa2e11db72e0206f4"
+        }
+      },
+      "textures": {
+        "flesh": {
+          "bytes": 58638,
+          "path": "female-flesh.png",
+          "sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808"
+        }
+      },
+      "triangles_sha256": "09dcb9b7135d099a1d6e4df44a6d5aed48c96f72b3d8ddd2efea275d1851c958",
+      "uv": {
+        "bytes": 1712740,
+        "path": "male-ideal70-v0-8-0-uv.json.gz",
+        "sha256": "3db5bf316b7282f1240014d2cc43027760cb7934ab881ee051a9edbd8fc5e834"
+      },
+      "vertices": 139474,
+      "weights_sha256": "b718af8b8f900a8c24cd10951bcf8a85e2852e3b004fe1ee5d0a21476d68d170"
+    },
+    "male-ideal83-v0-8-0": {
+      "bones": 54,
+      "character_sha256": "56248a449cbe312b87687c7e6ffcb35149ed62ee02f1dc8700052025a7dc786f",
+      "polygon_indices_sha256": "81b17d37385e3c7e1322caa579b9e3a47fc51f36be0e1c727ea3ebc17b3212a0",
+      "preview_mesh": "mesh_000",
+      "preview_resolution": 2048,
+      "preview_textures": {
+        "flesh": {
+          "bytes": 15790,
+          "path": "female-flesh-preview.png",
+          "sha256": "294e93d6d007bf20b0fbf205670a1eb45b2ad98c52f116faa2e11db72e0206f4"
+        }
+      },
+      "textures": {
+        "flesh": {
+          "bytes": 58638,
+          "path": "female-flesh.png",
+          "sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808"
+        }
+      },
+      "triangles_sha256": "09dcb9b7135d099a1d6e4df44a6d5aed48c96f72b3d8ddd2efea275d1851c958",
+      "uv": {
+        "bytes": 1712738,
+        "path": "male-ideal83-v0-8-0-uv.json.gz",
+        "sha256": "d772f58b261e45b50dae18410c70309e2d83476f13a59b97dc08bd9d6c867c91"
+      },
+      "vertices": 139474,
+      "weights_sha256": "b718af8b8f900a8c24cd10951bcf8a85e2852e3b004fe1ee5d0a21476d68d170"
+    },
+    "male-muscle-max-v0-8-0": {
+      "bones": 54,
+      "character_sha256": "11e88a4df956e9bd2c25f058265eb7530257f196ae54f1ad5f01099f090f38b4",
+      "polygon_indices_sha256": "81b17d37385e3c7e1322caa579b9e3a47fc51f36be0e1c727ea3ebc17b3212a0",
+      "preview_mesh": "mesh_000",
+      "preview_resolution": 2048,
+      "preview_textures": {
+        "flesh": {
+          "bytes": 15790,
+          "path": "female-flesh-preview.png",
+          "sha256": "294e93d6d007bf20b0fbf205670a1eb45b2ad98c52f116faa2e11db72e0206f4"
+        }
+      },
+      "textures": {
+        "flesh": {
+          "bytes": 58638,
+          "path": "female-flesh.png",
+          "sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808"
+        }
+      },
+      "triangles_sha256": "09dcb9b7135d099a1d6e4df44a6d5aed48c96f72b3d8ddd2efea275d1851c958",
+      "uv": {
+        "bytes": 1712736,
+        "path": "male-muscle-max-v0-8-0-uv.json.gz",
+        "sha256": "3f622409061d4033359726494d4de3fbcaecc1d4750fcd98e37f374b96f26908"
+      },
+      "vertices": 139474,
+      "weights_sha256": "b718af8b8f900a8c24cd10951bcf8a85e2852e3b004fe1ee5d0a21476d68d170"
+    },
+    "male-muscular-v0-8-0": {
+      "bones": 54,
+      "character_sha256": "37c6ad6e8f61354dc51f99594efecdc8b4c48d03b7e611a4e648fc0e64925e2a",
+      "polygon_indices_sha256": "81b17d37385e3c7e1322caa579b9e3a47fc51f36be0e1c727ea3ebc17b3212a0",
+      "preview_mesh": "mesh_000",
+      "preview_resolution": 2048,
+      "preview_textures": {
+        "flesh": {
+          "bytes": 15790,
+          "path": "female-flesh-preview.png",
+          "sha256": "294e93d6d007bf20b0fbf205670a1eb45b2ad98c52f116faa2e11db72e0206f4"
+        }
+      },
+      "textures": {
+        "flesh": {
+          "bytes": 58638,
+          "path": "female-flesh.png",
+          "sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808"
+        }
+      },
+      "triangles_sha256": "09dcb9b7135d099a1d6e4df44a6d5aed48c96f72b3d8ddd2efea275d1851c958",
+      "uv": {
+        "bytes": 1712740,
+        "path": "male-muscular-v0-8-0-uv.json.gz",
+        "sha256": "76cbac3b8438a870843afa09cee0758cf896923f8f75ab65553e8e9ed4bc9d36"
+      },
+      "vertices": 139474,
+      "weights_sha256": "b718af8b8f900a8c24cd10951bcf8a85e2852e3b004fe1ee5d0a21476d68d170"
+    },
+    "male-soft-v0-8-0": {
+      "bones": 54,
+      "character_sha256": "a9dcd65e68d03e62d89ff3cffd27c330361595d9407d02ba16b2720086582f2e",
+      "polygon_indices_sha256": "81b17d37385e3c7e1322caa579b9e3a47fc51f36be0e1c727ea3ebc17b3212a0",
+      "preview_mesh": "mesh_000",
+      "preview_resolution": 2048,
+      "preview_textures": {
+        "flesh": {
+          "bytes": 15790,
+          "path": "female-flesh-preview.png",
+          "sha256": "294e93d6d007bf20b0fbf205670a1eb45b2ad98c52f116faa2e11db72e0206f4"
+        }
+      },
+      "textures": {
+        "flesh": {
+          "bytes": 58638,
+          "path": "female-flesh.png",
+          "sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808"
+        }
+      },
+      "triangles_sha256": "09dcb9b7135d099a1d6e4df44a6d5aed48c96f72b3d8ddd2efea275d1851c958",
+      "uv": {
+        "bytes": 1712739,
+        "path": "male-soft-v0-8-0-uv.json.gz",
+        "sha256": "2de0b68a16181ddd5cc6dbd14d77bf148f1af175edb70e145e11a89c61aab2b9"
+      },
+      "vertices": 139474,
+      "weights_sha256": "b718af8b8f900a8c24cd10951bcf8a85e2852e3b004fe1ee5d0a21476d68d170"
+    },
+    "male-toon64-v0-8-0": {
+      "bones": 54,
+      "character_sha256": "29aacebd756619bf62dd6f760a9966797e42dcd485dfcff82f0f878adabc595a",
+      "polygon_indices_sha256": "81b17d37385e3c7e1322caa579b9e3a47fc51f36be0e1c727ea3ebc17b3212a0",
+      "preview_mesh": "mesh_000",
+      "preview_resolution": 2048,
+      "preview_textures": {
+        "flesh": {
+          "bytes": 15790,
+          "path": "female-flesh-preview.png",
+          "sha256": "294e93d6d007bf20b0fbf205670a1eb45b2ad98c52f116faa2e11db72e0206f4"
+        }
+      },
+      "textures": {
+        "flesh": {
+          "bytes": 58638,
+          "path": "female-flesh.png",
+          "sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808"
+        }
+      },
+      "triangles_sha256": "09dcb9b7135d099a1d6e4df44a6d5aed48c96f72b3d8ddd2efea275d1851c958",
+      "uv": {
+        "bytes": 1712743,
+        "path": "male-toon64-v0-8-0-uv.json.gz",
+        "sha256": "953b0846cea257ecab0320d75ed11ed9f51948bc072f73ea7e05266558980947"
+      },
+      "vertices": 139474,
+      "weights_sha256": "b718af8b8f900a8c24cd10951bcf8a85e2852e3b004fe1ee5d0a21476d68d170"
     }
   },
   "muscle_revision": "anatomy-v2-neutral-rebind-v1",
-  "revision": "current-neutral-uv-20261106-v1",
+  "revision": "staging-anatomy-flesh-20261112-v1",
   "schema": "skin-assets.v1"
 }
