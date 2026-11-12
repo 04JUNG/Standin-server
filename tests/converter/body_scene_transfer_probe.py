@@ -14,6 +14,7 @@ directory = os.getenv('STANDIN_SCENE_PROBE_DIR')
 if directory:
     started = time.monotonic()
     records = {}
+    io_records = []
 
     def wrap(module, name):
         original = getattr(module, name)
@@ -36,9 +37,31 @@ if directory:
     wrap(interactive_adapter, 'prepare_body')
     wrap(interactive_adapter, 'solve_from_body')
 
+    def io_wrap(module, name, operation):
+        original = getattr(module, name)
+        @functools.wraps(original)
+        def measured(path, *args, **kwargs):
+            before = time.monotonic()
+            ok = False
+            try:
+                value = original(path, *args, **kwargs)
+                ok = True
+                return value
+            finally:
+                file = Path(path)
+                memory = file.name.endswith('.memory-rig.fbx')
+                io_records.append(dict(operation=operation, memory=memory,
+                    file=file.name, bytes=file.stat().st_size if file.exists() else None,
+                    seconds=time.monotonic()-before, ok=ok))
+        setattr(module, name, measured)
+
+    from io_scene_fbx import parse_fbx, encode_bin
+    io_wrap(parse_fbx, 'parse', 'parse')
+    io_wrap(encode_bin, 'write', 'write')
+
     def finish():
         usage = resource.getrusage(resource.RUSAGE_SELF)
-        value = dict(stages=records, child_wall_seconds=time.monotonic()-started,
+        value = dict(stages=records, io=io_records, child_wall_seconds=time.monotonic()-started,
             peak_rss_bytes=usage.ru_maxrss if sys.platform == 'darwin' else usage.ru_maxrss*1024,
             user_seconds=usage.ru_utime, system_seconds=usage.ru_stime)
         (Path(directory)/('process-'+str(os.getpid())+'.json')).write_text(json.dumps(value, indent=2))

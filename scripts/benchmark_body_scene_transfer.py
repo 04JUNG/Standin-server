@@ -119,7 +119,7 @@ def run(args):
                     retarget_exports=sum(r['function'] == 'retarget.export_fbx' for r in profile),
                     memory_exports=sum(r['function'] == 'retarget.export_fbx' and (r.get('file') or '').endswith('.memory-rig.fbx') for r in profile),
                     shape_controls=result.report['shape_bake']['controls'])
-                row['runs'][variant]['probes'] = [json.loads(p.read_text()) for p in probe.glob('*.json')]
+                row['runs'][variant]['probes'] = [json.loads(p.read_text()) for p in probe.glob('process-*.json')]
             except Exception as exc:
                 row['runs'][variant] = dict(seconds=time.monotonic()-started, error=type(exc).__name__)
                 row['ok'] = False
