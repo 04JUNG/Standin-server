@@ -37,6 +37,7 @@ def test_description_rollout_preserves_prepared_hand_screen_capacity():
         "PARALLEL_POSE_DESCRIPTION": "0",
         "POSE_LIBRARY_URI": "existing-library",
         "HAND_SKIN_SCREEN_CONCURRENCY": "2",
+        "HAND_SKIN_SCREEN_ON_SELECTION": "0",
         "ROUTING_DESCRIBE_BUDGET_MS": "45000",
     }
     before["containerDefinitions"][0].pop("environment")
