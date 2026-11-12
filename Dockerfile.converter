@@ -162,6 +162,7 @@ COPY converter_api/final_prewarm.py /app/converter_api/final_prewarm.py
 COPY Dockerfile.converter /app/Dockerfile.converter
 COPY converter_api/work_queue.py /app/converter_api/work_queue.py
 COPY converter_api/work_middleware.py /app/converter_api/work_middleware.py
+COPY converter_api/health_timing.py /app/converter_api/health_timing.py
 COPY converter_api/scene_runner.py /app/converter_api/scene_runner.py
 COPY converter_api/scene_routes.py /app/converter_api/scene_routes.py
 COPY converter_api/schemas.py /app/converter_api/schemas.py
