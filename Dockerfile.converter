@@ -112,6 +112,7 @@ COPY converter/framing.py /app/converter/framing.py
 COPY converter/final_preview_worker.py /app/converter/final_preview_worker.py
 COPY converter/final_artifact.py /app/converter/final_artifact.py
 COPY converter/outline_spec.py /app/converter/outline_spec.py
+COPY converter/appearance_models.v1.json /app/converter/appearance_models.v1.json
 COPY converter/outline_fbx.py /app/converter/outline_fbx.py
 COPY converter/outline_worker.py /app/converter/outline_worker.py
 COPY converter/outline_probe.py /app/converter/outline_probe.py

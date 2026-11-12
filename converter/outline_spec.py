@@ -30,11 +30,13 @@ CHARACTERS = {
     'male-default83-v0-7-6-p1': '085dd9c65a3a66035f7e0ce9e0a9171b9abb0e33dada92194676d92e00c8b026',
     'female-default80-v0-3-9-p1': '712ac75e58efd4d6ccded0b1e931590900015de023327f1320cf6d7d94026ffc',
 }
-CURRENT_CHARACTERS = ('male-default83-v0-7-6-p1', 'female-default80-v0-3-9-p1')
+STAGING_CHARACTERS = json.loads(Path(__file__).with_name('appearance_models.v1.json').read_bytes())
+CHARACTERS.update({cid: row['sha256'] for cid, row in STAGING_CHARACTERS.items()})
+CURRENT_CHARACTERS = ('male-default83-v0-7-6-p1', 'female-default80-v0-3-9-p1', *STAGING_CHARACTERS)
 CSP_CERTIFIED = frozenset(
     (NATIVE_EXPRESSION, NATIVE_MAPPING, CHARACTERS[character], scope)
     for character in CURRENT_CHARACTERS
-    for scope in NATIVE_SCOPE_SCALE
+    for scope in (STAGING_CHARACTERS[character]['scopes'] if character in STAGING_CHARACTERS else NATIVE_SCOPE_SCALE)
 )
 
 
@@ -58,7 +60,9 @@ def supported_targets():
     return [dict(character_id=character, character_sha256=CHARACTERS[character],
         output_scope=scope, width=dict(min=0 if scope=='full' else 2,
             max=2, min_exclusive=scope=='full'))
-        for character in CURRENT_CHARACTERS for scope in NATIVE_SCOPE_SCALE]
+        for character in CURRENT_CHARACTERS
+        for scope in NATIVE_SCOPE_SCALE
+        if (NATIVE_EXPRESSION, NATIVE_MAPPING, CHARACTERS[character], scope) in CSP_CERTIFIED]
 
 
 def normalize(value=None):
@@ -108,4 +112,4 @@ def physical_thickness(appearance, stature_m, scope, *, surface=DEFAULT_SURFACE)
 def runtime_revision():
     root = Path(__file__).parent
     return hashlib.sha256(b''.join((root/name).read_bytes().replace(b'\r\n', b'\n')
-        for name in ('outline_spec.py', 'outline_fbx.py', 'outline_worker.py'))).hexdigest()
+        for name in ('appearance_models.v1.json','outline_spec.py', 'outline_fbx.py', 'outline_worker.py'))).hexdigest()

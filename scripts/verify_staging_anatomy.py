@@ -31,6 +31,9 @@ def verify(task):
         if env(main).get(key) != '/app/body-staging/fbx/' + cid + '.fbx':
             raise ValueError('Staging preset changed: ' + cid)
     for key, value in {
+        "CONVERTER_SKIN_ENABLED": "true",
+        "CONVERTER_OUTLINE_ENABLED": "true",
+        "CONVERTER_SKIN_ASSET_ROOT": "/app/body-staging/skin",
         "CONVERTER_CHARACTER_REGISTRY": "/app/body-staging/characters.json",
         "CONVERTER_SHAPE_REGISTRY": "/app/body-staging/shape-bakes.json",
         "BODY_MALE_BASE_V0_8_0_URI": "/app/body-staging/fbx/male-base-v0-8-0.fbx",
