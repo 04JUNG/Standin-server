@@ -30,3 +30,7 @@ main의 #233에 포함된 과거 검증과 이번 실행은 구분한다. 이번
 인프라 main `1345a833522c425d49af69674e756a6596f8d998` / develop `33d4fdb409552b26eb02ea7181db81052edcd5b7`의 전체 tree diff를 별도 워크트리에서 확인했다. #89/#90/#91과 production parity, prod inference/BFF capacity, ALB timeout, image/library/skin/prepared pin, production-only initializer/asset promote helper가 전부 운영 전용 변경이다. body-assets 모듈 차이도 운영 appearance 허용 확장이다. staging에 필요한 공통 runtime 수정이 없어 인프라 코드는 변경하지 않고 PR도 만들지 않는다. #92/#93 및 replay #75는 제외했다. 인프라 변경이 없으므로 synth/deploy를 실행하지 않았다.
 
 어느 저장소도 main/develop 직접 변경·병합·배포·릴리스·AWS/SSM/ECS/자산 업로드를 하지 않는다.
+
+최종 Converter 회귀: Python3.12에서 918 passed / 1 skipped. Blender 전용 test_convert/v325/parent_coherent는 host pytest 수집에서 제외하고 실제 Blender 검사는 별도 실행했다. smoke54/54·compileall 통과. 이번 v1/v2 실제 Blender 검사는 15개 모두 PASS, 합성176 vertices, v1 68,480 bytes / v2 27,192 bytes. 원본 ob_083 자산의 재검수/새 렌더는 실행하지 않았고 main 검수값과 hash-bound 선택을 보존하는 회귀를 확인했다.
+
+Converter 배포 workflow는 develop 그대로 유지하므로 main 전용 beta 배포 허용을 기대하는 test_deployment_contract.py의 delta는 제외했다. runtime binary 파일 allowlist와 v1/v2 CI 검사는 유지했다.
