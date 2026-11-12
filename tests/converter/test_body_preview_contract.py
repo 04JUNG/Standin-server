@@ -95,6 +95,8 @@ def test_runtime_contract_imports_from_exact_docker_copy_allowlist(tmp_path):
             shutil.copyfile(src, dst)
     process = subprocess.run([sys.executable, '-c',
         'import json; from fastapi.testclient import TestClient; from converter_api.app import app; '
+        'from converter.interactive_reuse import rebind_solved, rebind_export; '
+        'from converter_api.appearance_cache import verified_appearance; '
         'from converter_api.body_preview import preview_contract; '
         'print(json.dumps({"preview":preview_contract(),"outline":TestClient(app).get("/outline-contract").json()}))'],
         cwd=tmp_path, capture_output=True, text=True)
