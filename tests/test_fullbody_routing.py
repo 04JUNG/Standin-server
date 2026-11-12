@@ -77,12 +77,14 @@ def test_deferred_hand_screen_does_not_check_ranked_library_candidates():
     assert all('hand_skin_screen' not in candidate for candidate in result['selected'])
 
 
-def test_recall_can_rank_library_candidates_without_hand_mesh_calls(monkeypatch):
+@pytest.mark.parametrize('deferred', [False, True])
+def test_recall_can_rank_library_candidates_without_hand_mesh_calls(monkeypatch, deferred):
     from src.experimental.search_recall import verify_hypothesis_rank as recall
     pose_ids = ('a', 'b')
     report = {'route': 'hybrid', 'status': 'ok', 'selected': [
         {'pose_id': pid, 'kind': 'library_original'} for pid in pose_ids]}
-    e = SimpleNamespace(defer_library_hand_screen=True, _fuse=lambda *a, **k: [],
+    gate = SimpleNamespace(session=lambda *_: pytest.fail('searched library hand mesh')) if deferred else None
+    e = SimpleNamespace(defer_library_hand_screen=deferred, hand_skin_gate=gate, _fuse=lambda *a, **k: [],
                         validator=SimpleNamespace(positions=dict.fromkeys(pose_ids)),
                         meta={pid: {} for pid in pose_ids})
     person = {'index': 0, 'dynamic_search': report, 'output_scope': {'mesh_scope': 'full'}}
@@ -91,7 +93,7 @@ def test_recall_can_rank_library_candidates_without_hand_mesh_calls(monkeypatch)
                         lambda *a, **k: SimpleNamespace(model_dump=lambda **kw: {}))
     assert recall.reselect(e, person, list(reversed(pose_ids)), {}, trace)
     assert [row['pose_id'] for row in report['selected']] == ['b', 'a']
-    assert trace['screen_deferred'] is True
+    assert trace.get('screen_deferred', False) is deferred
     assert 'hand_skin_screen' not in report
 
 
