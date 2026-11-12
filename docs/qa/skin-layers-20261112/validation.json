@@ -1,0 +1,128 @@
+{
+  "skin": "flesh-muscle",
+  "outlineWidth": 2,
+  "assetManifestSha256": "f4d37bf100dcdec1de5c115d06fa68b30d3213d864d95e540c2d6bbc3676d265",
+  "cases": [
+    {
+      "name": "male-base-v0-8-0--flesh-muscle",
+      "characterId": "male-base-v0-8-0",
+      "stages": {
+        "skin": {
+          "sha256": "2191f090775c317e1c924e13343c5ab3de87b14e262a3e8f602157da3fb110bf",
+          "bytes": 14005196,
+          "geometry": {
+            "approved_surface_changes_only": true,
+            "maxMatrixError": 0.0,
+            "maxNormalError": 0.0,
+            "maxPositionErrorM": 0.0,
+            "maxWeightError": 0.0,
+            "typed_fbx_values_preserved": true
+          }
+        },
+        "outline": {
+          "sha256": "14fd85b3e9c5822bbdbc887908c1208a0c4ac28a0144cdafcc62263cef3cfd7b",
+          "bytes": 22871308,
+          "geometry": {
+            "maxMatrixError": 0.0,
+            "maxNormalError": 0.0,
+            "maxPositionErrorM": 0.0,
+            "maxWeightError": 0.0,
+            "typed_fbx_values_preserved": true
+          }
+        }
+      }
+    },
+    {
+      "name": "female-base-v0-4-0--flesh-muscle",
+      "characterId": "female-base-v0-4-0",
+      "stages": {
+        "skin": {
+          "sha256": "284d0bf4051a083d002d2250b13e97495164750f245c926fd058bb72d2b6d045",
+          "bytes": 10644428,
+          "geometry": {
+            "approved_surface_changes_only": true,
+            "maxMatrixError": 0.0,
+            "maxNormalError": 0.0,
+            "maxPositionErrorM": 0.0,
+            "maxWeightError": 0.0,
+            "typed_fbx_values_preserved": true
+          }
+        },
+        "outline": {
+          "sha256": "0bb1bb22f9d75c227cb4717c3ea803b2dc1452ecde9d008b96540daf9c64f212",
+          "bytes": 17184284,
+          "geometry": {
+            "maxMatrixError": 0.0,
+            "maxNormalError": 0.0,
+            "maxPositionErrorM": 0.0,
+            "maxWeightError": 0.0,
+            "typed_fbx_values_preserved": true
+          }
+        }
+      }
+    },
+    {
+      "name": "male-custom-shaped-bent--flesh-muscle",
+      "characterId": "male-base-v0-8-0",
+      "stages": {
+        "skin": {
+          "sha256": "e85fdb9f064c6c5b15b62eb12d7df98a6dcda7e5cd429bf2954ba245fe92e08b",
+          "bytes": 13962636,
+          "geometry": {
+            "approved_surface_changes_only": true,
+            "maxMatrixError": 0.0,
+            "maxNormalError": 0.0,
+            "maxPositionErrorM": 0.0,
+            "maxWeightError": 0.0,
+            "typed_fbx_values_preserved": true
+          }
+        },
+        "outline": {
+          "sha256": "a5323c07f681387890fe8dd4bf646fdf24b08799183f8c09fb89b7fd8c4c6d34",
+          "bytes": 22828284,
+          "geometry": {
+            "maxMatrixError": 0.0,
+            "maxNormalError": 0.0,
+            "maxPositionErrorM": 0.0,
+            "maxWeightError": 0.0,
+            "typed_fbx_values_preserved": true
+          }
+        }
+      }
+    },
+    {
+      "name": "female-custom-shaped-bent--flesh-muscle",
+      "characterId": "female-base-v0-4-0",
+      "stages": {
+        "skin": {
+          "sha256": "b83e83f7b92999eb6eabea0022c607e9c949c6fe4c74177e828aa0a8db16d97b",
+          "bytes": 10604380,
+          "geometry": {
+            "approved_surface_changes_only": true,
+            "maxMatrixError": 0.0,
+            "maxNormalError": 0.0,
+            "maxPositionErrorM": 0.0,
+            "maxWeightError": 0.0,
+            "typed_fbx_values_preserved": true
+          }
+        },
+        "outline": {
+          "sha256": "c17b9ffc0c05c6d7224777df64865ca125f0e240312e222567c0567d337793f1",
+          "bytes": 17145228,
+          "geometry": {
+            "maxMatrixError": 0.0,
+            "maxNormalError": 0.0,
+            "maxPositionErrorM": 0.0,
+            "maxWeightError": 0.0,
+            "typed_fbx_values_preserved": true
+          }
+        }
+      }
+    }
+  ],
+  "cspObserved": [
+    "male-custom-shaped-bent",
+    "female-custom-shaped-bent"
+  ],
+  "cspScope": "individual posed FBX import only"
+}

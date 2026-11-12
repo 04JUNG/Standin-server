@@ -13,9 +13,10 @@ def test_current_targets_are_exact_and_do_not_inherit_crop_acceptance():
     for cid in RELEASE['characterIds']:
         row = models[cid]
         assert row['bones'] == 54 and row['vertices'] > 100000
-        assert set(row['textures']) == {'flesh','gray-guide','flesh-guide','muscle'}
+        assert set(row['textures']) == {'flesh','gray-guide','flesh-guide','muscle','flesh-muscle'}
         assert skin_spec.certified(row['character_sha256'], 'full', dict(version='fbx-skin-v1', id='flesh'))
         assert skin_spec.certified(row['character_sha256'], 'full', dict(version='fbx-skin-v1', id='muscle'))
+        assert skin_spec.certified(row['character_sha256'], 'full', dict(version='fbx-skin-v1', id='flesh-muscle'))
         assert not skin_spec.certified(row['character_sha256'], 'head', dict(version='fbx-skin-v1', id='flesh'))
         for width in (.5, 1.2, 2):
             assert outline_spec.certified(row['character_sha256'], 'full', width)

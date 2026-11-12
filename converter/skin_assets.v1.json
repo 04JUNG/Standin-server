@@ -1,5 +1,6 @@
 {
   "authoring_sha256": {
+    "compose_flesh_muscle.py": "039a856c2f15030687aa62dd21a19ee479cc95c5130b12037caed58879fea113",
     "female-muscle-paths.v2.json": "1c7450e1d34218f06e5ac5cb66f306a6873ffef59f60727ae296d3d1908b23c3",
     "generate_textures.py": "5ba642b4afbe52cbbb02d23d1acae51af1f0766b4c0fab724a285234f51e296f",
     "guide_spec.json": "ebba06ac1d99496bf412110be145c55a90d8075190aa70483fd8894507826b58",
@@ -28,6 +29,11 @@
           "path": "anatomy-female-flesh-guide-preview.png",
           "sha256": "7f49c637bffd3e40acc792c5259d5503a1db39ddfedfdca25e7a25ea369b0ae9"
         },
+        "flesh-muscle": {
+          "bytes": 189298,
+          "path": "anatomy-female-flesh-muscle-preview.png",
+          "sha256": "e3577c4e566c31c525fe2cef54b7485e2265afc53a02605c0c3ac7dfe8c55e29"
+        },
         "gray-guide": {
           "bytes": 277252,
           "path": "anatomy-female-gray-guide-preview.png",
@@ -49,6 +55,11 @@
           "bytes": 429265,
           "path": "anatomy-female-flesh-guide.png",
           "sha256": "e34f0a717589134d7722dd46528ca753984b003a8b10e5ad685bd1acaa8d0820"
+        },
+        "flesh-muscle": {
+          "bytes": 292773,
+          "path": "anatomy-female-flesh-muscle.png",
+          "sha256": "d5c1578f3a7d6c9021253e92d62afaf0294e56ac1f1eeb2fd314492691a24567"
         },
         "gray-guide": {
           "bytes": 421155,
@@ -146,6 +157,11 @@
           "path": "anatomy-female-flesh-guide-preview.png",
           "sha256": "7f49c637bffd3e40acc792c5259d5503a1db39ddfedfdca25e7a25ea369b0ae9"
         },
+        "flesh-muscle": {
+          "bytes": 189298,
+          "path": "anatomy-female-flesh-muscle-preview.png",
+          "sha256": "e3577c4e566c31c525fe2cef54b7485e2265afc53a02605c0c3ac7dfe8c55e29"
+        },
         "gray-guide": {
           "bytes": 277252,
           "path": "anatomy-female-gray-guide-preview.png",
@@ -167,6 +183,11 @@
           "bytes": 429265,
           "path": "anatomy-female-flesh-guide.png",
           "sha256": "e34f0a717589134d7722dd46528ca753984b003a8b10e5ad685bd1acaa8d0820"
+        },
+        "flesh-muscle": {
+          "bytes": 292773,
+          "path": "anatomy-female-flesh-muscle.png",
+          "sha256": "d5c1578f3a7d6c9021253e92d62afaf0294e56ac1f1eeb2fd314492691a24567"
         },
         "gray-guide": {
           "bytes": 421155,
@@ -205,6 +226,11 @@
           "path": "anatomy-female-flesh-guide-preview.png",
           "sha256": "7f49c637bffd3e40acc792c5259d5503a1db39ddfedfdca25e7a25ea369b0ae9"
         },
+        "flesh-muscle": {
+          "bytes": 189298,
+          "path": "anatomy-female-flesh-muscle-preview.png",
+          "sha256": "e3577c4e566c31c525fe2cef54b7485e2265afc53a02605c0c3ac7dfe8c55e29"
+        },
         "gray-guide": {
           "bytes": 277252,
           "path": "anatomy-female-gray-guide-preview.png",
@@ -226,6 +252,11 @@
           "bytes": 429265,
           "path": "anatomy-female-flesh-guide.png",
           "sha256": "e34f0a717589134d7722dd46528ca753984b003a8b10e5ad685bd1acaa8d0820"
+        },
+        "flesh-muscle": {
+          "bytes": 292773,
+          "path": "anatomy-female-flesh-muscle.png",
+          "sha256": "d5c1578f3a7d6c9021253e92d62afaf0294e56ac1f1eeb2fd314492691a24567"
         },
         "gray-guide": {
           "bytes": 421155,
@@ -264,6 +295,11 @@
           "path": "anatomy-female-flesh-guide-preview.png",
           "sha256": "7f49c637bffd3e40acc792c5259d5503a1db39ddfedfdca25e7a25ea369b0ae9"
         },
+        "flesh-muscle": {
+          "bytes": 189298,
+          "path": "anatomy-female-flesh-muscle-preview.png",
+          "sha256": "e3577c4e566c31c525fe2cef54b7485e2265afc53a02605c0c3ac7dfe8c55e29"
+        },
         "gray-guide": {
           "bytes": 277252,
           "path": "anatomy-female-gray-guide-preview.png",
@@ -285,6 +321,11 @@
           "bytes": 429265,
           "path": "anatomy-female-flesh-guide.png",
           "sha256": "e34f0a717589134d7722dd46528ca753984b003a8b10e5ad685bd1acaa8d0820"
+        },
+        "flesh-muscle": {
+          "bytes": 292773,
+          "path": "anatomy-female-flesh-muscle.png",
+          "sha256": "d5c1578f3a7d6c9021253e92d62afaf0294e56ac1f1eeb2fd314492691a24567"
         },
         "gray-guide": {
           "bytes": 421155,
@@ -323,6 +364,11 @@
           "path": "anatomy-female-flesh-guide-preview.png",
           "sha256": "7f49c637bffd3e40acc792c5259d5503a1db39ddfedfdca25e7a25ea369b0ae9"
         },
+        "flesh-muscle": {
+          "bytes": 189298,
+          "path": "anatomy-female-flesh-muscle-preview.png",
+          "sha256": "e3577c4e566c31c525fe2cef54b7485e2265afc53a02605c0c3ac7dfe8c55e29"
+        },
         "gray-guide": {
           "bytes": 277252,
           "path": "anatomy-female-gray-guide-preview.png",
@@ -344,6 +390,11 @@
           "bytes": 429265,
           "path": "anatomy-female-flesh-guide.png",
           "sha256": "e34f0a717589134d7722dd46528ca753984b003a8b10e5ad685bd1acaa8d0820"
+        },
+        "flesh-muscle": {
+          "bytes": 292773,
+          "path": "anatomy-female-flesh-muscle.png",
+          "sha256": "d5c1578f3a7d6c9021253e92d62afaf0294e56ac1f1eeb2fd314492691a24567"
         },
         "gray-guide": {
           "bytes": 421155,
@@ -382,6 +433,11 @@
           "path": "anatomy-female-flesh-guide-preview.png",
           "sha256": "7f49c637bffd3e40acc792c5259d5503a1db39ddfedfdca25e7a25ea369b0ae9"
         },
+        "flesh-muscle": {
+          "bytes": 189298,
+          "path": "anatomy-female-flesh-muscle-preview.png",
+          "sha256": "e3577c4e566c31c525fe2cef54b7485e2265afc53a02605c0c3ac7dfe8c55e29"
+        },
         "gray-guide": {
           "bytes": 277252,
           "path": "anatomy-female-gray-guide-preview.png",
@@ -403,6 +459,11 @@
           "bytes": 429265,
           "path": "anatomy-female-flesh-guide.png",
           "sha256": "e34f0a717589134d7722dd46528ca753984b003a8b10e5ad685bd1acaa8d0820"
+        },
+        "flesh-muscle": {
+          "bytes": 292773,
+          "path": "anatomy-female-flesh-muscle.png",
+          "sha256": "d5c1578f3a7d6c9021253e92d62afaf0294e56ac1f1eeb2fd314492691a24567"
         },
         "gray-guide": {
           "bytes": 421155,
@@ -441,6 +502,11 @@
           "path": "anatomy-female-flesh-guide-preview.png",
           "sha256": "7f49c637bffd3e40acc792c5259d5503a1db39ddfedfdca25e7a25ea369b0ae9"
         },
+        "flesh-muscle": {
+          "bytes": 189298,
+          "path": "anatomy-female-flesh-muscle-preview.png",
+          "sha256": "e3577c4e566c31c525fe2cef54b7485e2265afc53a02605c0c3ac7dfe8c55e29"
+        },
         "gray-guide": {
           "bytes": 277252,
           "path": "anatomy-female-gray-guide-preview.png",
@@ -462,6 +528,11 @@
           "bytes": 429265,
           "path": "anatomy-female-flesh-guide.png",
           "sha256": "e34f0a717589134d7722dd46528ca753984b003a8b10e5ad685bd1acaa8d0820"
+        },
+        "flesh-muscle": {
+          "bytes": 292773,
+          "path": "anatomy-female-flesh-muscle.png",
+          "sha256": "d5c1578f3a7d6c9021253e92d62afaf0294e56ac1f1eeb2fd314492691a24567"
         },
         "gray-guide": {
           "bytes": 421155,
@@ -500,6 +571,11 @@
           "path": "anatomy-female-flesh-guide-preview.png",
           "sha256": "7f49c637bffd3e40acc792c5259d5503a1db39ddfedfdca25e7a25ea369b0ae9"
         },
+        "flesh-muscle": {
+          "bytes": 189298,
+          "path": "anatomy-female-flesh-muscle-preview.png",
+          "sha256": "e3577c4e566c31c525fe2cef54b7485e2265afc53a02605c0c3ac7dfe8c55e29"
+        },
         "gray-guide": {
           "bytes": 277252,
           "path": "anatomy-female-gray-guide-preview.png",
@@ -521,6 +597,11 @@
           "bytes": 429265,
           "path": "anatomy-female-flesh-guide.png",
           "sha256": "e34f0a717589134d7722dd46528ca753984b003a8b10e5ad685bd1acaa8d0820"
+        },
+        "flesh-muscle": {
+          "bytes": 292773,
+          "path": "anatomy-female-flesh-muscle.png",
+          "sha256": "d5c1578f3a7d6c9021253e92d62afaf0294e56ac1f1eeb2fd314492691a24567"
         },
         "gray-guide": {
           "bytes": 421155,
@@ -559,6 +640,11 @@
           "path": "anatomy-female-flesh-guide-preview.png",
           "sha256": "7f49c637bffd3e40acc792c5259d5503a1db39ddfedfdca25e7a25ea369b0ae9"
         },
+        "flesh-muscle": {
+          "bytes": 189298,
+          "path": "anatomy-female-flesh-muscle-preview.png",
+          "sha256": "e3577c4e566c31c525fe2cef54b7485e2265afc53a02605c0c3ac7dfe8c55e29"
+        },
         "gray-guide": {
           "bytes": 277252,
           "path": "anatomy-female-gray-guide-preview.png",
@@ -580,6 +666,11 @@
           "bytes": 429265,
           "path": "anatomy-female-flesh-guide.png",
           "sha256": "e34f0a717589134d7722dd46528ca753984b003a8b10e5ad685bd1acaa8d0820"
+        },
+        "flesh-muscle": {
+          "bytes": 292773,
+          "path": "anatomy-female-flesh-muscle.png",
+          "sha256": "d5c1578f3a7d6c9021253e92d62afaf0294e56ac1f1eeb2fd314492691a24567"
         },
         "gray-guide": {
           "bytes": 421155,
@@ -618,6 +709,11 @@
           "path": "anatomy-female-flesh-guide-preview.png",
           "sha256": "7f49c637bffd3e40acc792c5259d5503a1db39ddfedfdca25e7a25ea369b0ae9"
         },
+        "flesh-muscle": {
+          "bytes": 189298,
+          "path": "anatomy-female-flesh-muscle-preview.png",
+          "sha256": "e3577c4e566c31c525fe2cef54b7485e2265afc53a02605c0c3ac7dfe8c55e29"
+        },
         "gray-guide": {
           "bytes": 277252,
           "path": "anatomy-female-gray-guide-preview.png",
@@ -639,6 +735,11 @@
           "bytes": 429265,
           "path": "anatomy-female-flesh-guide.png",
           "sha256": "e34f0a717589134d7722dd46528ca753984b003a8b10e5ad685bd1acaa8d0820"
+        },
+        "flesh-muscle": {
+          "bytes": 292773,
+          "path": "anatomy-female-flesh-muscle.png",
+          "sha256": "d5c1578f3a7d6c9021253e92d62afaf0294e56ac1f1eeb2fd314492691a24567"
         },
         "gray-guide": {
           "bytes": 421155,
@@ -677,6 +778,11 @@
           "path": "anatomy-female-flesh-guide-preview.png",
           "sha256": "7f49c637bffd3e40acc792c5259d5503a1db39ddfedfdca25e7a25ea369b0ae9"
         },
+        "flesh-muscle": {
+          "bytes": 189298,
+          "path": "anatomy-female-flesh-muscle-preview.png",
+          "sha256": "e3577c4e566c31c525fe2cef54b7485e2265afc53a02605c0c3ac7dfe8c55e29"
+        },
         "gray-guide": {
           "bytes": 277252,
           "path": "anatomy-female-gray-guide-preview.png",
@@ -698,6 +804,11 @@
           "bytes": 429265,
           "path": "anatomy-female-flesh-guide.png",
           "sha256": "e34f0a717589134d7722dd46528ca753984b003a8b10e5ad685bd1acaa8d0820"
+        },
+        "flesh-muscle": {
+          "bytes": 292773,
+          "path": "anatomy-female-flesh-muscle.png",
+          "sha256": "d5c1578f3a7d6c9021253e92d62afaf0294e56ac1f1eeb2fd314492691a24567"
         },
         "gray-guide": {
           "bytes": 421155,
@@ -736,6 +847,11 @@
           "path": "anatomy-male-flesh-guide-preview.png",
           "sha256": "d188b7d20345850bbc7dcf352a2cd67b570d337b1d553f9cec844e30496c574b"
         },
+        "flesh-muscle": {
+          "bytes": 180433,
+          "path": "anatomy-male-flesh-muscle-preview.png",
+          "sha256": "0e17f10d6a814c12fd572031820f04dafa380ad66abfd6b3c0a2d474f29303b5"
+        },
         "gray-guide": {
           "bytes": 283038,
           "path": "anatomy-male-gray-guide-preview.png",
@@ -757,6 +873,11 @@
           "bytes": 436664,
           "path": "anatomy-male-flesh-guide.png",
           "sha256": "b7c5924cdc47745c14efdbce4efd23db4d74403687eea85221aa1f8268125921"
+        },
+        "flesh-muscle": {
+          "bytes": 284908,
+          "path": "anatomy-male-flesh-muscle.png",
+          "sha256": "2c9ac2d72809db3d43bd05045c8af18fe04a2bd9e4448e583a0acf90f17762b9"
         },
         "gray-guide": {
           "bytes": 430521,
@@ -795,6 +916,11 @@
           "path": "anatomy-male-flesh-guide-preview.png",
           "sha256": "d188b7d20345850bbc7dcf352a2cd67b570d337b1d553f9cec844e30496c574b"
         },
+        "flesh-muscle": {
+          "bytes": 180433,
+          "path": "anatomy-male-flesh-muscle-preview.png",
+          "sha256": "0e17f10d6a814c12fd572031820f04dafa380ad66abfd6b3c0a2d474f29303b5"
+        },
         "gray-guide": {
           "bytes": 283038,
           "path": "anatomy-male-gray-guide-preview.png",
@@ -816,6 +942,11 @@
           "bytes": 436664,
           "path": "anatomy-male-flesh-guide.png",
           "sha256": "b7c5924cdc47745c14efdbce4efd23db4d74403687eea85221aa1f8268125921"
+        },
+        "flesh-muscle": {
+          "bytes": 284908,
+          "path": "anatomy-male-flesh-muscle.png",
+          "sha256": "2c9ac2d72809db3d43bd05045c8af18fe04a2bd9e4448e583a0acf90f17762b9"
         },
         "gray-guide": {
           "bytes": 430521,
@@ -913,6 +1044,11 @@
           "path": "anatomy-male-flesh-guide-preview.png",
           "sha256": "d188b7d20345850bbc7dcf352a2cd67b570d337b1d553f9cec844e30496c574b"
         },
+        "flesh-muscle": {
+          "bytes": 180433,
+          "path": "anatomy-male-flesh-muscle-preview.png",
+          "sha256": "0e17f10d6a814c12fd572031820f04dafa380ad66abfd6b3c0a2d474f29303b5"
+        },
         "gray-guide": {
           "bytes": 283038,
           "path": "anatomy-male-gray-guide-preview.png",
@@ -934,6 +1070,11 @@
           "bytes": 436664,
           "path": "anatomy-male-flesh-guide.png",
           "sha256": "b7c5924cdc47745c14efdbce4efd23db4d74403687eea85221aa1f8268125921"
+        },
+        "flesh-muscle": {
+          "bytes": 284908,
+          "path": "anatomy-male-flesh-muscle.png",
+          "sha256": "2c9ac2d72809db3d43bd05045c8af18fe04a2bd9e4448e583a0acf90f17762b9"
         },
         "gray-guide": {
           "bytes": 430521,
@@ -972,6 +1113,11 @@
           "path": "anatomy-male-flesh-guide-preview.png",
           "sha256": "d188b7d20345850bbc7dcf352a2cd67b570d337b1d553f9cec844e30496c574b"
         },
+        "flesh-muscle": {
+          "bytes": 180433,
+          "path": "anatomy-male-flesh-muscle-preview.png",
+          "sha256": "0e17f10d6a814c12fd572031820f04dafa380ad66abfd6b3c0a2d474f29303b5"
+        },
         "gray-guide": {
           "bytes": 283038,
           "path": "anatomy-male-gray-guide-preview.png",
@@ -993,6 +1139,11 @@
           "bytes": 436664,
           "path": "anatomy-male-flesh-guide.png",
           "sha256": "b7c5924cdc47745c14efdbce4efd23db4d74403687eea85221aa1f8268125921"
+        },
+        "flesh-muscle": {
+          "bytes": 284908,
+          "path": "anatomy-male-flesh-muscle.png",
+          "sha256": "2c9ac2d72809db3d43bd05045c8af18fe04a2bd9e4448e583a0acf90f17762b9"
         },
         "gray-guide": {
           "bytes": 430521,
@@ -1031,6 +1182,11 @@
           "path": "anatomy-male-flesh-guide-preview.png",
           "sha256": "d188b7d20345850bbc7dcf352a2cd67b570d337b1d553f9cec844e30496c574b"
         },
+        "flesh-muscle": {
+          "bytes": 180433,
+          "path": "anatomy-male-flesh-muscle-preview.png",
+          "sha256": "0e17f10d6a814c12fd572031820f04dafa380ad66abfd6b3c0a2d474f29303b5"
+        },
         "gray-guide": {
           "bytes": 283038,
           "path": "anatomy-male-gray-guide-preview.png",
@@ -1052,6 +1208,11 @@
           "bytes": 436664,
           "path": "anatomy-male-flesh-guide.png",
           "sha256": "b7c5924cdc47745c14efdbce4efd23db4d74403687eea85221aa1f8268125921"
+        },
+        "flesh-muscle": {
+          "bytes": 284908,
+          "path": "anatomy-male-flesh-muscle.png",
+          "sha256": "2c9ac2d72809db3d43bd05045c8af18fe04a2bd9e4448e583a0acf90f17762b9"
         },
         "gray-guide": {
           "bytes": 430521,
@@ -1090,6 +1251,11 @@
           "path": "anatomy-male-flesh-guide-preview.png",
           "sha256": "d188b7d20345850bbc7dcf352a2cd67b570d337b1d553f9cec844e30496c574b"
         },
+        "flesh-muscle": {
+          "bytes": 180433,
+          "path": "anatomy-male-flesh-muscle-preview.png",
+          "sha256": "0e17f10d6a814c12fd572031820f04dafa380ad66abfd6b3c0a2d474f29303b5"
+        },
         "gray-guide": {
           "bytes": 283038,
           "path": "anatomy-male-gray-guide-preview.png",
@@ -1111,6 +1277,11 @@
           "bytes": 436664,
           "path": "anatomy-male-flesh-guide.png",
           "sha256": "b7c5924cdc47745c14efdbce4efd23db4d74403687eea85221aa1f8268125921"
+        },
+        "flesh-muscle": {
+          "bytes": 284908,
+          "path": "anatomy-male-flesh-muscle.png",
+          "sha256": "2c9ac2d72809db3d43bd05045c8af18fe04a2bd9e4448e583a0acf90f17762b9"
         },
         "gray-guide": {
           "bytes": 430521,
@@ -1149,6 +1320,11 @@
           "path": "anatomy-male-flesh-guide-preview.png",
           "sha256": "d188b7d20345850bbc7dcf352a2cd67b570d337b1d553f9cec844e30496c574b"
         },
+        "flesh-muscle": {
+          "bytes": 180433,
+          "path": "anatomy-male-flesh-muscle-preview.png",
+          "sha256": "0e17f10d6a814c12fd572031820f04dafa380ad66abfd6b3c0a2d474f29303b5"
+        },
         "gray-guide": {
           "bytes": 283038,
           "path": "anatomy-male-gray-guide-preview.png",
@@ -1170,6 +1346,11 @@
           "bytes": 436664,
           "path": "anatomy-male-flesh-guide.png",
           "sha256": "b7c5924cdc47745c14efdbce4efd23db4d74403687eea85221aa1f8268125921"
+        },
+        "flesh-muscle": {
+          "bytes": 284908,
+          "path": "anatomy-male-flesh-muscle.png",
+          "sha256": "2c9ac2d72809db3d43bd05045c8af18fe04a2bd9e4448e583a0acf90f17762b9"
         },
         "gray-guide": {
           "bytes": 430521,
@@ -1208,6 +1389,11 @@
           "path": "anatomy-male-flesh-guide-preview.png",
           "sha256": "d188b7d20345850bbc7dcf352a2cd67b570d337b1d553f9cec844e30496c574b"
         },
+        "flesh-muscle": {
+          "bytes": 180433,
+          "path": "anatomy-male-flesh-muscle-preview.png",
+          "sha256": "0e17f10d6a814c12fd572031820f04dafa380ad66abfd6b3c0a2d474f29303b5"
+        },
         "gray-guide": {
           "bytes": 283038,
           "path": "anatomy-male-gray-guide-preview.png",
@@ -1229,6 +1415,11 @@
           "bytes": 436664,
           "path": "anatomy-male-flesh-guide.png",
           "sha256": "b7c5924cdc47745c14efdbce4efd23db4d74403687eea85221aa1f8268125921"
+        },
+        "flesh-muscle": {
+          "bytes": 284908,
+          "path": "anatomy-male-flesh-muscle.png",
+          "sha256": "2c9ac2d72809db3d43bd05045c8af18fe04a2bd9e4448e583a0acf90f17762b9"
         },
         "gray-guide": {
           "bytes": 430521,
@@ -1267,6 +1458,11 @@
           "path": "anatomy-male-flesh-guide-preview.png",
           "sha256": "d188b7d20345850bbc7dcf352a2cd67b570d337b1d553f9cec844e30496c574b"
         },
+        "flesh-muscle": {
+          "bytes": 180433,
+          "path": "anatomy-male-flesh-muscle-preview.png",
+          "sha256": "0e17f10d6a814c12fd572031820f04dafa380ad66abfd6b3c0a2d474f29303b5"
+        },
         "gray-guide": {
           "bytes": 283038,
           "path": "anatomy-male-gray-guide-preview.png",
@@ -1288,6 +1484,11 @@
           "bytes": 436664,
           "path": "anatomy-male-flesh-guide.png",
           "sha256": "b7c5924cdc47745c14efdbce4efd23db4d74403687eea85221aa1f8268125921"
+        },
+        "flesh-muscle": {
+          "bytes": 284908,
+          "path": "anatomy-male-flesh-muscle.png",
+          "sha256": "2c9ac2d72809db3d43bd05045c8af18fe04a2bd9e4448e583a0acf90f17762b9"
         },
         "gray-guide": {
           "bytes": 430521,
@@ -1311,6 +1512,6 @@
     }
   },
   "muscle_revision": "anatomy-v2-neutral-rebind-v1",
-  "revision": "staging-anatomy-skins-20261112-v2",
+  "revision": "staging-composed-skins-20261112-v3",
   "schema": "skin-assets.v1"
 }
