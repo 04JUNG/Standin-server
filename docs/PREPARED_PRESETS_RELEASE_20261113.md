@@ -133,4 +133,31 @@ HTTP 검사는 각 조건마다 신규 API 프로세스·private/cache/character
 | `female-new-fat-v0-4-0` | female | preset |
 | `female-new-muscular-v0-4-0` | female | preset |
 
-각각의 원본 해시·정확한 기본값은 [scope JSON](qa/prepared-all20-20261113/catalog-scope.json), Linux key/runtime/크기/중립 검증은 [develop 설치 결과](qa/prepared-all20-20261113/develop-install.json)에 기록했다. develop 20종의 ob_015 독립 비교도 모두 통과했고 모든 정점·뼈대·메시 행렬·가중치 최대 차이는 0이다([결과](qa/prepared-all20-20261113/develop-ob015.json)). 오프라인 준비 합계는 199.512초이며 사용자 요청 시간과 분리했다. main 전체 검증과 대표 HTTP 검사는 진행 중이다.
+각각의 원본 해시·정확한 기본값은 [scope JSON](qa/prepared-all20-20261113/catalog-scope.json), Linux key/runtime/크기/중립 검증은 [develop 설치 결과](qa/prepared-all20-20261113/develop-install.json)에 기록했다. develop 20종의 ob_015 독립 비교도 모두 통과했고 모든 정점·뼈대·메시 행렬·가중치 최대 차이는 0이다([결과](qa/prepared-all20-20261113/develop-ob015.json)). 오프라인 준비 합계는 199.512초이며 사용자 요청 시간과 분리했다. main 20종의 ob_015와 대표6종 ob_001 품질 비교도 모두 통과했다. HTTP 실측은 실제 사전 빌드 이미지에서 별도로 기록한다.
+
+## 병렬 작업·통합 기준
+
+대응 PR: 서버 [develop #235](https://github.com/04JUNG/Standin-server/pull/235) / [main #236](https://github.com/04JUNG/Standin-server/pull/236), 실제 인라인 설치기 [develop #92](https://github.com/04JUNG/Standin-infra/pull/92) / [main #93](https://github.com/04JUNG/Standin-infra/pull/93).
+
+main 준비의 중립 코드 기준은 `fa5919798`이다. 원격에서 추가된 main `f31558c30`(#234 capacity)의 API 변경을 보존한 뒤에도 6개 중립 구현 파일 해시는 `143fac…`로 같으며 준비 key는 바뀌지 않았다. 최신 main+#230의 별도 로컬 통합 트리를 만들었고 #229/#233도 이미 포함돼 있다. 정확한 commit·각 파일 SHA는 [runtime 기록](qa/prepared-all20-20261113/runtime-versions.json)에 있다. main 20종의 Linux 생성·설치·prepared 채택은 [설치 결과](qa/prepared-all20-20261113/main-install.json)에 기록했다.
+
+별도 중간 FBX/장면 전달 실험과 main 공통 수정의 develop 동기화는 다른 세션 소유이며 이 PR에 중복 이식하지 않는다. 현 develop 번들은 동기화 전 neutral 구현 `2b2595…`, main 번들은 `143fac…`다. 나중 통합으로 준비 identity에 묶인 코드·Blender/build·원본·기본값이 달라지면 해당 최종 이미지에서 다시 생성·검증해야 한다. key/receipt를 수정해 불일치를 우회하지 않는다. key가 유지되더라도 새 worker/장면 전달 경로의 포즈/파일 품질은 그 통합 버전에서 별도 검증해야 한다.
+
+## 완료한 품질·보존 검증
+
+- develop / main 각각20종을 ob_015에서 baseline/prepared로 변환하고 독립 Blender 재로드 비교를 통과했다. 모든 정점·뼈대·메시 행렬·가중치 최대 차이는0이다. main 대표6종은 ob_001도 통과했다.
+- 실제 Linux 기본2종을 read_prepared의 code/build/platform/asset/hash 검증 후 바이트 그대로 재사용하도록 준비기를 확장했다. 재사용 경로도 실제 Blender pin을 먼저 검사한다. 무효/손상/다른 runtime이면 승인된 생성기로 돌아간다.
+- 두 브랜치 모두 실제 Linux 기본2종으로 만든 **로컬197파일 reference**에서233파일로 확장했다. registry 외196객체를 보존하고 준비 객체36개(18쌍)만 추가했다. 이 회귀 테스트의 모든 prototype 및 다른 파일은 포즈 QA 번들과 같은 바이트이고 logical registry도 같다. 운영197파일 원본을 다운로드/승인했다고 주장하지 않는다. 새 볼륨에 전체 설치·20종 prepared도 다시 확인했다.
+- 별도 새 Linux 볼륨에서2 prepared/18 not_prepared →20 prepared →2 prepared/18 not_prepared rollback을 통과했다. 손상된 FBX 재설치는 거부됐고 기존 모든 파일 SHA와 ready/registry가 보존됐다.
+- 여성 기본형 키+1 실제 변환은 custom_shape, 요청 수치 유지, 최종 FBX skin 검증 통과다. 공용 registry SHA와20개 index는 그대로다. 이 검사는 품질용이며 성능 표본에서 제외했다.
+- 호스트 계약: develop893 passed/1 skipped, main952 passed/1 skipped, #229+#230+#233+#234 통합952 passed/1 skipped. 각 smoke54/54와 compileall도 통과했다. Blender 전용 호스트 수집 제외3개는 계약 수치에 포함하지 않는다. 실제 Blender 품질 검사는 별도 실행했다.
+
+수치·증거는 이 문서의 QA 폴더에 있는 main-ob015, contracts, 각 default-preservation/preservation-install, main-rollback, main-custom JSON에 있다. 기존 기본형용 helper의 상한/오류/CLI 계약은 유지하고, 새 확장은 명시적 프로필에서만 허용한다.
+
+## 측정 부하와 실제 이미지
+
+루트의 사전 빌드는2026-11-13 03:45경 시작해03:55:14 KST에 끝났다. 보수적으로03:44부터 종료까지 겹칠 수 있는 표본은 제외했다. develop20종과 main20종 ob_015는 이 창 전에 완료됐다. 첫 main ob_001의12회 중9회는 경합 가능 표본이며 품질 증거로만 쓴다([구간 기록](qa/prepared-all20-20261113/resource-contention.json)).
+
+깨끗한 후속 측정은 사전 빌드된 실제 Converter 이미지 `sha256:eca16e9d4c89d80f667f2f23105fb8b78168ae0111893d863210d5ac1a01d5aa`(source `f31558c305c8bb4c1687ab8fe4e15f001ca26f24`, Linux/amd64, 기본 uid10001)에서 실행한다. converter/API 코드는 오버레이하지 않고 검증용 scripts만 mount했다. 이미지 자체의 neutral 구현 SHA는 main 번들의143fac…와 일치한다. 운영/ECR에는 올리지 않은 로컬 후보 이미지다.
+
+실제 승인된 다음 준비에서는 현재 pinned 릴리스 사본과 기존 prepared 파일을 read-only 입력으로 사용한다. 같은 identity의 기존2종은 그대로 재사용하고 나머지만 생성한다. runtime이 달라졌다면 재생성 후 이전 파일도 보존하는 확장 프로필을 사용하며 최대22쌍/192 MiB를 넘으면 발행하지 않는다.

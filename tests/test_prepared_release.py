@@ -152,6 +152,25 @@ def test_upgrading_two_defaults_keeps_their_old_objects_and_all_twenty_recipes(t
     assert json.loads((tmp_path/'out/shape-bakes.json').read_text())['characters'] == registry['characters']
 
 
+def test_preparation_reuses_verified_defaults_without_changing_their_bytes(tmp_path, monkeypatch):
+    from scripts import prepare_preset_bodies as prepare
+    recipe, fbx, metadata, _, _ = bundle(tmp_path, monkeypatch)
+    registry = json.loads((tmp_path/'shape-bakes.json').read_text())
+    registry['prepared_neutrals'] = dict(schema='prepared-neutral-index.v1',
+        entries={CHARACTER: recipe['prepared_neutral']})
+    monkeypatch.setattr(prepare, 'require_runtime', lambda: None)
+    monkeypatch.setattr(prepare, 'bake', lambda *_: pytest.fail('verified existing default must be preserved'))
+    out = tmp_path/'reused'; out.mkdir()
+    prepare.run_worker(dict(out=str(out), registry=registry, characters=[CHARACTER]))
+    result = json.loads((out/'results.json').read_text())[0]
+    assert result['reused_existing'] and result['generation_seconds'] == 0
+    assert (out/'fbx'/fbx.name).read_bytes() == fbx.read_bytes()
+    assert (out/'qa'/metadata.name).read_bytes() == metadata.read_bytes()
+    entry = json.loads((out/'shape-bakes.local.json').read_text())['prepared_neutrals']['entries'][CHARACTER]
+    from converter.prepared_body import read_prepared
+    assert read_prepared(recipe, entry)['fbx_sha256'] == hashlib.sha256(fbx.read_bytes()).hexdigest()
+
+
 def test_installer_corruption_preserves_previous_release_and_rollback(tmp_path):
     key = 'body-models/releases/test/presets-aaaaaaaaaaaa/manifest.json'
     data = {'characters.json': b'{}', 'shape-bakes.json': b'old'}

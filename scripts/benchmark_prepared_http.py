@@ -37,6 +37,9 @@ def main():
     characters = json.loads((assets/'characters.json').read_text())['characters']
     manifest = json.loads((assets/'.body-assets-ready.json').read_text())
     registry = json.loads((assets/'shape-bakes.json').read_text())
+    if (len(args.character) != len(set(args.character))
+            or any(cid not in registry['characters'] or cid not in characters for cid in args.character)):
+        raise ValueError('choose distinct registered shape characters')
     env = {**os.environ, 'PYTHONPATH': str(ROOT), 'CONVERTER_CHARACTER_REGISTRY': str(assets/'characters.json'),
         'CONVERTER_DEFAULT_CHARACTER_ID': args.character[0], 'CONVERTER_SHAPE_REGISTRY': str(assets/'shape-bakes.json'),
         'CONVERTER_FINAL_CACHE_ENABLED': '0', 'CONVERTER_RETARGET_CACHE_BYTES': '0',
@@ -44,7 +47,12 @@ def main():
     # Resolve every character's approved bytes by digest, including old aliases.
     by_sha = {sha(p.read_bytes()): p for p in sorted((assets/'fbx').glob('*.fbx'))}
     for character in characters.values():
-        env[character['artifact_uri_env']] = str(by_sha[character['sha256']])
+        # The registry also lists generic characters outside this body release.
+        # They are never requested by this preset-only benchmark.
+        if character['sha256'] in by_sha:
+            env[character['artifact_uri_env']] = str(by_sha[character['sha256']])
+    if any(characters[cid]['sha256'] not in by_sha for cid in args.character):
+        raise ValueError('selected approved character bytes are missing')
     rows = []
     url = f'http://127.0.0.1:{args.port}'
     for i, cid in enumerate(args.character):
@@ -91,7 +99,11 @@ def main():
                             or result['character_sha256'] != registry['characters'][cid]['asset_sha256']
                             or result['source_bvh_sha256'] != sha(bvh)):
                         raise ValueError('HTTP artifact identity or validation failed')
-                    target = out/(cid+'-'+variant+'.fbx'); target.write_bytes(artifact)
+                    target = out/(cid+'-'+variant+'.fbx')
+                    with target.open('xb') as handle:
+                        handle.write(artifact); handle.flush(); os.fsync(handle.fileno())
+                    if sha(target.read_bytes()) != result['fbx_sha256']:
+                        raise ValueError('saved HTTP artifact checksum mismatch')
                     preparation = result['shape_bake']['neutral_preparation']
                     if preparation['status'] != ('prepared' if variant=='prepared' else 'disabled'):
                         raise ValueError('HTTP neutral path differs from requested condition')
