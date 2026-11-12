@@ -8,12 +8,10 @@ from pathlib import Path
 import sys
 from tempfile import TemporaryDirectory
 from threading import Lock
-from time import sleep
 
 from src.camera_search import CameraIndex
 from src.fullbody_assets import prepare_assets
 from src.fullbody_routing import API_SEMANTIC_WEIGHT, FullBodySearch
-from src.hand_skin_screen import build_hand_skin_gate
 from src.semantic_adapter_285 import build_semantic285_searcher, excluded_pose_ids
 
 from . import service_context as service
@@ -23,7 +21,7 @@ from .display import prepare_engine as prepare_baseline
 from .fitted_geometry import AlternatePoseObserver, DepthObserver, FittedGeometry
 from .hand_geometry import HandContactIndex, VERSION as HAND_INDEX_VERSION
 from .learned_fusion import FOLDS, fold
-from .overnight_search import BoneEvidence, COMPOUND_CONTACT_EXPERIMENT, ScreeningUnavailable, replay
+from .overnight_search import BoneEvidence, COMPOUND_CONTACT_EXPERIMENT, replay
 from .structured_search import StructuredIndex
 from .verified_recall import VerifiedRecall
 from .visible_relations import VisibleRelations
@@ -70,15 +68,10 @@ class RecallSearch:
             db_path=db_path, library_pose_ids={entry.pose_id for entry in entries},
             body_index_path=paths['body'], shape_index_path=paths['shapes'])
         camera = CameraIndex.from_library(allowed, paths['bvh'], count=117)
-        gate = build_hand_skin_gate(camera, paths['bvh'])
-        if gate is None:
-            raise ValueError('04J-344 recall requires the hand mesh screening service')
         self.engine = service.ArmPenaltySearch(entries, semantic, camera,
-                                               semantic_weight=API_SEMANTIC_WEIGHT, hand_skin_gate=gate,
-                                               defer_library_hand_screen=service.CFG.hand_skin_screen_on_selection)
+                                               semantic_weight=API_SEMANTIC_WEIGHT)
         self.cross_chest = FullBodySearch(
-            entries, copy(semantic), camera, semantic_weight=API_SEMANTIC_WEIGHT, hand_skin_gate=gate,
-            defer_library_hand_screen=service.CFG.hand_skin_screen_on_selection,
+            entries, copy(semantic), camera, semantic_weight=API_SEMANTIC_WEIGHT,
             enable_waist_down_pair=True, enable_cross_chest_hint=True)
         self.bone = BoneEvidence(camera)
         self.fitted = FittedGeometry(camera)
@@ -149,15 +142,9 @@ class RecallSearch:
                     extracted = self.verified_recall.observations.extract(people, image, previous=extracted)
             with self.lock:
                 observations = self.verified_recall.observe(cut, image, extracted=extracted)
-                for attempt in range(2):
-                    try:
-                        candidate = deepcopy(cut)
-                        self._search(candidate, image, weights)
-                        return self.verified_recall.rerank(candidate, digest, observations)
-                    except ScreeningUnavailable:
-                        if attempt:
-                            raise
-                        sleep(1)
+                candidate = deepcopy(cut)
+                self._search(candidate, image, weights)
+                return self.verified_recall.rerank(candidate, digest, observations)
 
     def close(self):
         self.verified_recall.close()
