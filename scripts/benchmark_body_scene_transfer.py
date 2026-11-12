@@ -100,6 +100,8 @@ def run(args):
             env['STANDIN_SCENE_PROBE_DIR'] = str(probe)
             if case.get('budget') is not None:
                 env['CONVERTER_EXPERIMENT_BODY_SCENE_SECONDS'] = str(case['budget'])
+            if case.get('codec_failure') and variant == 'on':
+                env['STANDIN_SCENE_FAULT_MEMORY_CODEC'] = '1'
             settings = replace(RunnerSettings.from_env(ROOT), blender_binary=args.blender, temp_root=output,
                                retarget_cache_bytes=0, fast_scene_reset=False, shape_timeout_seconds=600, process_env=env)
             started = time.monotonic()

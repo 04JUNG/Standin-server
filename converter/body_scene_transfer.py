@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import builtins
+import hashlib
 import io
 import json
 import math
@@ -20,10 +21,23 @@ import time
 FLAG = 'CONVERTER_EXPERIMENT_BODY_SCENE_TRANSFER'
 VERSION = 'body-scene-transfer.v1'
 MAX_MEMORY_RIG_BYTES = 2*1024*1024
+# This adapter mirrors one orchestration revision, not the frozen solver. An
+# upstream quality update must use legacy until this bridge is re-qualified.
+SUPPORTED_SOURCES = {
+    'shape_bake.py': 'd599d80a7df8853e844abfc0fb617f735fa1e0a18948960862e2948908160c54',
+    'source_body.py': 'd11618a2283f3ba43eb54f9e29e6f4ea0c19b209074efab0c9b94f2f9a065def',
+    'reviewed_pose_frames.json': '2602d9469859fc0ce89d8de0da7c2ffd30874fa98645cca86c6f1ab1d72f84d1',
+}
 
 
 def enabled():
     return os.getenv(FLAG, '0') == '1'
+
+
+def sources_supported():
+    root = Path(__file__).parent
+    return all(hashlib.sha256((root/name).read_bytes().replace(b'\r\n', b'\n')).hexdigest() == digest
+               for name, digest in SUPPORTED_SOURCES.items())
 
 
 @dataclass(frozen=True)
@@ -52,6 +66,21 @@ def canonical_frames(path):
     data = None
     absent = object()
     prior = {module: vars(module).get('open', absent) for module in (encode_bin, parse_fbx)}
+    original_write = encode_bin.write
+    codec_error = None
+
+    def memory_write(file, *args, **kwargs):
+        nonlocal codec_error
+        if str(file) != sentinel:
+            return original_write(file, *args, **kwargs)
+        try:
+            return original_write(file, *args, **kwargs)
+        except Exception as exc:
+            # Return through the exporter so its cleanup still runs. Re-raise
+            # outside bpy's operator boundary below: the legacy recovery must
+            # not inherit a traceback sentinel from an already rejected attempt.
+            # Final worker log/error checks remain unchanged.
+            codec_error = exc
 
     class Sink(io.BytesIO):
         def write(self, value):
@@ -76,6 +105,7 @@ def canonical_frames(path):
 
     try:
         encode_bin.open = parse_fbx.open = memory_open
+        encode_bin.write = memory_write
         # Bind-pose cluster TransformLink matrices affect Blender bone import.
         # Keep each mesh object/modifier/transform so those matrices are emitted,
         # but omit its surface: the next stage only consumes bone frames.
@@ -93,6 +123,8 @@ def canonical_frames(path):
             for obj, surface, tiny in replacements:
                 obj.data = surface
                 bpy.data.meshes.remove(tiny)
+        if codec_error is not None:
+            raise codec_error
         if data is None or not 0 < len(data) <= MAX_MEMORY_RIG_BYTES:
             raise ValueError('memory rig export failed or exceeded bound')
         rt.reset_scene()
@@ -102,6 +134,7 @@ def canonical_frames(path):
         frames = {b.name: (arm.matrix_world @ b.matrix_local).copy() for b in arm.data.bones}
         return frames, len(data)
     finally:
+        encode_bin.write = original_write
         for module, value in prior.items():
             if value is absent:
                 del module.open
@@ -248,6 +281,8 @@ def convert_shaped(*, recipe, out_path, **options):
     trace = dict(schema=VERSION, status='attempting', disk_full_mesh_imports_avoided=0,
                  disk_full_mesh_exports_avoided=0, memory_rig_roundtrips=0, memory_rig_bytes=0)
     try:
+        if not sources_supported():
+            raise ValueError('unsupported scene adapter sources')
         budget = float(os.getenv('CONVERTER_EXPERIMENT_BODY_SCENE_SECONDS', '120'))
         if not math.isfinite(budget) or budget <= 0:
             raise ValueError('invalid scene budget')

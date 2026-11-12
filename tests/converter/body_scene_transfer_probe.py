@@ -56,6 +56,13 @@ if directory:
         setattr(module, name, measured)
 
     from io_scene_fbx import parse_fbx, encode_bin
+    if os.getenv('STANDIN_SCENE_FAULT_MEMORY_CODEC') == '1':
+        codec_write = encode_bin.write
+        def fault(file, *args, **kwargs):
+            if str(file).endswith('.memory-rig.fbx'):
+                raise RuntimeError('synthetic memory codec failure')
+            return codec_write(file, *args, **kwargs)
+        encode_bin.write = fault
     io_wrap(parse_fbx, 'parse', 'parse')
     io_wrap(encode_bin, 'write', 'write')
 

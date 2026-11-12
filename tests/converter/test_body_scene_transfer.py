@@ -132,3 +132,13 @@ def test_prepared_identity_sources_are_not_changed_by_experiment():
     # or flag. The runtime snapshot identity above does include both.
     text = Path(transfer.__file__).with_name('prepared_body.py').read_text()
     assert 'body_scene_transfer.py' not in text
+
+
+def test_new_upstream_quality_revision_bypasses_stale_scene_orchestrator(monkeypatch, tmp_path):
+    monkeypatch.setenv(transfer.FLAG, '1')
+    monkeypatch.setattr(transfer, 'sources_supported', lambda: False)
+    monkeypatch.setattr(transfer, '_candidate', lambda **kw: pytest.fail('stale adapter ran'))
+    monkeypatch.setattr(shape_bake, 'convert_shaped', lambda **kw: Report())
+    result = transfer.convert_shaped(recipe={}, out_path=str(tmp_path/'out.fbx'))
+    assert result.trace['status'] == 'legacy_recovery'
+    assert result.trace['reason'] == 'ValueError'

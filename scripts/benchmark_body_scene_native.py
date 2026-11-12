@@ -24,6 +24,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for key in ('assets', 'blender', 'out'):
         parser.add_argument('--'+key, required=True)
+    parser.add_argument('--cases')
     args = parser.parse_args()
     from fastapi import FastAPI
     from fastapi.testclient import TestClient
@@ -33,16 +34,22 @@ def main():
     from converter.body_scene_transfer import FLAG
     from converter.solved_state import V1_ENCODING
     from converter.solved_state_v2 import ENCODING as V2_ENCODING
+    from converter.shape_spec import resolve_shape, digest_shape
     assets, output = Path(args.assets).resolve(), Path(args.out).resolve()
     output.mkdir(parents=True, exist_ok=False)
-    raw = (assets/'ob_015.bvh').read_bytes()
-    source_sha = hashlib.sha256(raw).hexdigest()
     character_config = json.loads((assets/'characters.json').read_text())
     rows = []
-    for cid, encoding in [('male-base-v0-8-0', V2_ENCODING), ('female-base-v0-4-0', V1_ENCODING)]:
-        row = dict(character=cid, encoding=encoding, source_sha256=source_sha, runs={})
-        for variant in ('off', 'on'):
-            directory = output/(cid+'-'+variant)
+    cases = json.loads(Path(args.cases).read_text()) if args.cases else [
+        dict(character='male-base-v0-8-0', encoding=V2_ENCODING),
+        dict(character='female-base-v0-4-0', encoding=V1_ENCODING)]
+    for index, case in enumerate(cases):
+        cid, encoding = case['character'], case.get('encoding', V2_ENCODING)
+        name = f'{index:02d}-'+cid
+        raw = Path(case.get('bvh', assets/'ob_015.bvh')).read_bytes()
+        source_sha = hashlib.sha256(raw).hexdigest()
+        row = dict(character=cid, case=case, encoding=encoding, source_sha256=source_sha, runs={})
+        for variant in (('off', 'on') if index % 2 == 0 else ('on', 'off')):
+            directory = output/(name+'-'+variant)
             directory.mkdir()
             probe = directory/'probe'
             probe.mkdir()
@@ -56,6 +63,13 @@ def main():
                 'STANDIN_SCENE_PROBE_DIR': str(probe), 'STANDIN_LAB_FIRST_ENTRY_PROFILE': '1',
                 'STANDIN_LAB_PREVIEW_TRACE': '1', 'OMP_NUM_THREADS': '1', 'OPENBLAS_NUM_THREADS': '1'})
             cfg = character_config['characters'][cid]
+            shape = None
+            if case.get('controls'):
+                recipe = resolve_shape(cid, cfg['sha256'])
+                values = {c['key']: c['default'] for c in recipe['controls']}
+                values.update(case['controls'])
+                shape = dict(schemaVersion='body-shape.v1', controls=values,
+                             shapeSha256=digest_shape(cid, cfg['sha256'], values))
             registry = CharacterRegistry(assets/'characters.json', default_character_id=cid,
                 environ={cfg['artifact_uri_env']: str(assets/'fbx'/(cid+'.fbx'))})
             settings = replace(RunnerSettings.from_env(ROOT), blender_binary=args.blender,
@@ -64,7 +78,7 @@ def main():
             register_interactive(app, registry, BlenderRunner(settings))
             owner = 'a'*64
             payload = dict(selection=dict(schema='interactive-selection-v1', ownerBinding=owner,
-                candidateId='ob015', body=dict(characterId=cid, assetSha256=cfg['sha256']), shape=None,
+                candidateId='fixture', body=dict(characterId=cid, assetSha256=cfg['sha256']), shape=shape,
                 shapeSource=None, source=dict(variant='base', originalBvhSha256=source_sha, outputBvhSha256=source_sha),
                 camera=dict(version='candidate-camera-v2', reference='search-fit', source_bvh_sha256=source_sha,
                     projection='orthographic', rotation=[[1,0,0],[0,1,0],[0,0,1]], distance_torso=None),
@@ -91,7 +105,7 @@ def main():
                 assert artifact.status_code == 200
                 elapsed = time.monotonic()-start
                 assert hashlib.sha256(artifact.content).hexdigest() == receipt['artifactSha256']
-                (output/(cid+'-'+variant+'.fbx')).write_bytes(artifact.content)
+                (output/(name+'-'+variant+'.fbx')).write_bytes(artifact.content)
                 (directory/'receipt.json').write_text(json.dumps(receipt, indent=2))
                 probe_rows = [json.loads(p.read_text()) for p in probe.glob('process-*.json')]
                 body = next(p for p in probe_rows if 'prepare_body' in p['stages'])
@@ -103,11 +117,11 @@ def main():
                     scene_transfer=worker.get('scene_transfer'), probes=probe_rows,
                     correspondence=receipt['correspondence'], canonical_encoding=encoding)
             app.state.interactive._volume_lock.close()
-        job = dict(off=str(output/(cid+'-off.fbx')), on=str(output/(cid+'-on.fbx')),
-                   result=str(output/(cid+'-comparison.json')))
-        path = output/(cid+'-compare-job.json')
+        job = dict(off=str(output/(name+'-off.fbx')), on=str(output/(name+'-on.fbx')),
+                   result=str(output/(name+'-comparison.json')))
+        path = output/(name+'-compare-job.json')
         path.write_text(json.dumps(job))
-        with (output/(cid+'-compare.log')).open('w') as log:
+        with (output/(name+'-compare.log')).open('w') as log:
             completed = subprocess.run([args.blender, '--background', '--factory-startup', '--disable-autoexec',
                 '--python-exit-code', '1', '--python', str(ROOT/'scripts/benchmark_body_scene_transfer.py'),
                 '--', '--compare', str(path)], stdout=log, stderr=subprocess.STDOUT, timeout=120)

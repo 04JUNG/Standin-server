@@ -47,7 +47,7 @@ try:
     try:
         canonical_frames(out/'bounded.fbx')
         raise AssertionError('codec exceeded its memory bound')
-    except RuntimeError as exc:  # bpy operator wraps the codec ValueError.
+    except (RuntimeError, ValueError) as exc:
         assert 'memory rig exceeded bound' in str(exc)
 finally:
     transfer.MAX_MEMORY_RIG_BYTES = limit
