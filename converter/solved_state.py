@@ -189,37 +189,93 @@ def validate_model(model):
                 raise ValueError('skin weights are not normalized')
 
 
+V1_ENCODING = 'typed-f64be-json-v1'
+SAFETY_FIELDS = {'bodyAccepted', 'handChecksPassed', 'surface', 'finalFileVerified'}
+DEPENDENCIES = {'initialFbxRequired': True, 'boundary': 'post-frozen-body-pre-final-export-v1'}
+
+
+def _check_envelope(payload):
+    if set(payload) != {'schema', 'identity', 'model', 'safety', 'dependencies'} or payload['schema'] != STATE_SCHEMA:
+        raise ValueError('invalid solved state envelope')
+    validate_identity(payload['identity'])
+    safety = payload['safety']
+    if (type(safety) is not dict or type(safety.get('handChecksPassed')) is not bool
+            or safety != {'bodyAccepted': True, 'handChecksPassed': safety['handChecksPassed'],
+                          'surface': 'existing-adapter-checks-only', 'finalFileVerified': False}):
+        raise ValueError('state must not certify final export or full collision safety')
+    if payload['dependencies'] != DEPENDENCIES:
+        raise ValueError('unsupported solve boundary')
+
+
+def model_digest(model, encoding=V1_ENCODING):
+    """Digest of a v1-shaped model dict under the requested canonical encoding."""
+    if encoding == V1_ENCODING:
+        return digest(canonical(model))
+    from converter import solved_state_v2 as v2
+    if encoding != v2.ENCODING:
+        raise ValueError('unsupported state encoding')
+    return v2.model_digest(v2.encode_model(model))
+
+
 @dataclass(frozen=True)
 class SolvedPoseState:
-    """Store only immutable canonical bytes; getters always return fresh values."""
+    """Store only immutable canonical bytes; getters always return fresh values.
+
+    Two canonical encodings of the same logical state exist: v1 typed JSON and
+    v2 binary (``solved_state_v2``). The encoding is detected from the bytes and
+    stateHash is always SHA256 of exactly these bytes.
+    """
     canonical_bytes: bytes
 
     def __post_init__(self):
         if type(self.canonical_bytes) is not bytes:
             raise ValueError('state storage must be immutable bytes')
-        payload = decode(self.canonical_bytes)
-        if set(payload) != {'schema', 'identity', 'model', 'safety', 'dependencies'} or payload['schema'] != STATE_SCHEMA:
-            raise ValueError('invalid solved state envelope')
-        validate_identity(payload['identity']); validate_model(payload['model'])
-        if type(payload['safety'].get('handChecksPassed')) is not bool or payload['safety'] != {'bodyAccepted': True, 'handChecksPassed': payload['safety']['handChecksPassed'],
-                                 'surface': 'existing-adapter-checks-only', 'finalFileVerified': False}:
-            raise ValueError('state must not certify final export or full collision safety')
-        if payload['dependencies'] != {'initialFbxRequired': True, 'boundary': 'post-frozen-body-pre-final-export-v1'}:
-            raise ValueError('unsupported solve boundary')
+        if not 0 < len(self.canonical_bytes) <= MAX_BYTES:
+            raise ValueError('state size exceeded')
+        from converter import solved_state_v2 as v2
+        if v2.is_v2(self.canonical_bytes):
+            head, model_offset, view = v2.decode_state(self.canonical_bytes)
+            _check_envelope({**head, 'model': None})
+            identity = head['identity']
+            object.__setattr__(self, '_encoding', v2.ENCODING)
+            object.__setattr__(self, '_view', view)
+            object.__setattr__(self, '_head', head)
+            object.__setattr__(self, '_model_offset', model_offset)
+            object.__setattr__(self, '_model_sha256', v2.model_digest(self.canonical_bytes, model_offset))
+        else:
+            payload = decode(self.canonical_bytes)
+            _check_envelope(payload); validate_model(payload['model'])
+            identity = payload['identity']
+            object.__setattr__(self, '_encoding', V1_ENCODING)
+            object.__setattr__(self, '_model_sha256', None)
         # Cache only immutable scalars. Packet construction must not decode a
         # multi-megabyte surface merely to read its operation/revision.
-        selection = payload['identity']['selection']
+        selection = identity['selection']
         object.__setattr__(self, '_operation', selection['operation'])
         object.__setattr__(self, '_revision', selection['revision'])
         object.__setattr__(self, '_state_hash', digest(self.canonical_bytes))
-        object.__setattr__(self, '_identity_bytes', canonical(payload['identity']))
+        object.__setattr__(self, '_identity_bytes', canonical(identity))
 
     @classmethod
-    def create(cls, identity, model):
-        return cls(canonical({'schema': STATE_SCHEMA, 'identity': identity, 'model': model,
+    def create(cls, identity, model, encoding=V1_ENCODING):
+        head = {'schema': STATE_SCHEMA, 'identity': identity,
             'safety': {'bodyAccepted': True, 'handChecksPassed': False,
                        'surface': 'existing-adapter-checks-only', 'finalFileVerified': False},
-            'dependencies': {'initialFbxRequired': True, 'boundary': 'post-frozen-body-pre-final-export-v1'}}))
+            'dependencies': dict(DEPENDENCIES)}
+        if encoding == V1_ENCODING:
+            return cls(canonical({**head, 'model': model}))
+        from converter import solved_state_v2 as v2
+        if encoding != v2.ENCODING:
+            raise ValueError('unsupported state encoding')
+        return cls(v2.encode_state(head, v2.encode_model(model)))
+
+    @property
+    def encoding(self):
+        return self._encoding
+
+    @property
+    def is_binary(self):
+        return self._encoding != V1_ENCODING
 
     @property
     def state_hash(self):
@@ -230,11 +286,37 @@ class SolvedPoseState:
         return decode(self._identity_bytes)
 
     @property
+    def model_sha256(self):
+        """Receipt ``packetModelSha256``: v1 typed-JSON model digest or v2 model suffix digest."""
+        if self._model_sha256 is None:
+            object.__setattr__(self, '_model_sha256', digest(canonical(self.payload['model'])))
+        return self._model_sha256
+
+    @property
+    def model_view(self):
+        """Validated binary arrays (v2 only); None for v1 typed JSON."""
+        return self._view if self.is_binary else None
+
+    @property
     def payload(self):
         # These immutable bytes passed canonical decoding at construction.
+        if self.is_binary:
+            return {**decode(canonical(self._head)), 'model': self._view.to_dict()}
         return _untyped(json.loads(self.canonical_bytes))
 
+    def with_identity(self, identity):
+        """Same geometry, new operation authority. v2 reuses the model bytes verbatim."""
+        if not self.is_binary:
+            return SolvedPoseState(canonical({**self.payload, 'identity': identity}))
+        from converter import solved_state_v2 as v2
+        head = {**decode(canonical(self._head)), 'identity': identity}
+        return SolvedPoseState(v2.encode_state(head, self.canonical_bytes[self._model_offset:]))
+
     def packet(self):
-        return {'schema': STATE_SCHEMA, 'operation': self._operation, 'revision': self._revision,
-                'stateHash': self.state_hash, 'previewState': 'authoritative', 'exportState': 'not-requested',
-                'canonicalEncoding': 'typed-f64be-json-v1', 'canonicalState': self.canonical_bytes.decode('ascii')}
+        packet = {'schema': STATE_SCHEMA, 'operation': self._operation, 'revision': self._revision,
+                  'stateHash': self.state_hash, 'previewState': 'authoritative', 'exportState': 'not-requested',
+                  'canonicalEncoding': self._encoding}
+        if self.is_binary:
+            # Binary bytes are delivered by GET /model; the solve response stays small.
+            return {**packet, 'stateBytes': len(self.canonical_bytes), 'modelSha256': self.model_sha256}
+        return {**packet, 'canonicalState': self.canonical_bytes.decode('ascii')}

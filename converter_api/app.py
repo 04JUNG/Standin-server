@@ -448,9 +448,12 @@ def create_app(
         return _error_response(ApiProblem(400, "INVALID_REQUEST", "invalid request fields"))
 
     @app.exception_handler(StarletteHTTPException)
-    async def http_handler(_request: Request, exc: StarletteHTTPException):
+    async def http_handler(request: Request, exc: StarletteHTTPException):
         code = "NOT_FOUND" if exc.status_code == 404 else "HTTP_ERROR"
         message = "not found" if exc.status_code == 404 else "request failed"
+        if (request.url.path.startswith('/interactive/v1/') and exc.status_code == 429
+                and exc.detail == 'INTERACTIVE_CAPACITY'):
+            code = 'INTERACTIVE_CAPACITY'
         return _error_response(ApiProblem(exc.status_code, code, message))
 
     @app.exception_handler(Exception)
@@ -507,9 +510,9 @@ def create_app(
             }
         if os.getenv("CONVERTER_SHAPE_REGISTRY"):
             try:
-                from converter.shape_spec import load_registry, REGISTRY_SCHEMA
-                # Re-hashes each approved source once and checks its VERSION literal.
-                registry_data = measured_health('shape_sources', load_registry)
+                from converter.shape_spec import REGISTRY_SCHEMA
+                from converter_api.health_assets import health_shape_registry
+                registry_data = measured_health('shape_sources', health_shape_registry)
                 checks["shape_sources"] = {
                     "ok": True,
                     "schema": REGISTRY_SCHEMA,

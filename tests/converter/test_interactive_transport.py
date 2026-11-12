@@ -111,7 +111,7 @@ def test_partial_or_tampered_body_base_is_not_reused(tmp_path):
     store=SnapshotStore(tmp_path/'private',None,None);base=tmp_path/'partial';base.mkdir()
     (base/'body.blend').write_bytes(b'interrupted')
     assert store._body_metadata(base,{'owner':'fixture'}) is None
-    metadata=dict(schema='interactive-body-base-v1',binding={'owner':'fixture'},runtimeRevision=runtime_revision(),snapshotSha256=digest(b'interrupted'))
+    metadata=dict(schema='interactive-body-base-v1',binding={'owner':'fixture'},runtimeRevision=runtime_revision(),snapshotSha256=digest(b'interrupted'),model={'bones': []})
     (base/'base.json').write_bytes(canonical(metadata));assert store._body_metadata(base,{'owner':'fixture'})==metadata
     (base/'body.blend').write_bytes(b'changed');assert store._body_metadata(base,{'owner':'fixture'}) is None
 
@@ -174,3 +174,93 @@ def test_gc_reclaims_optional_cache_before_rejecting_a_new_solve(tmp_path):
     assert store.bases == dict(live=active_base, working=working_base)
     assert (active_base['directory']/'data').read_bytes() == bytes(32)
     assert (working_base['directory']/'data').read_bytes() == bytes(32)
+
+
+def test_gc_reclaims_old_cores_but_preserves_live_and_working_bodies(tmp_path):
+    store = SnapshotStore(tmp_path/'private', None, None)
+    expiry = time.monotonic()+60
+    base = dict(directory=store.root/'body-live', expiry=expiry, busy=0)
+    working = dict(directory=store.root/'body-working', expiry=expiry, busy=1)
+    live = base['directory']/'cores'/'live-v2'
+    old = base['directory']/'cores'/'old-v1'/'verified-export'
+    preparing = working['directory']/'cores'/'building-v2'
+    for directory in (live, old, preparing):
+        directory.mkdir(parents=True)
+        (directory/'data').write_bytes(bytes(32))
+    snapshot = store.root/'snapshot-ready'; snapshot.mkdir()
+    store.entries['ready'] = dict(owner='a'*64, person='p', revision=1, busy=False,
+        expiry=expiry, directory=snapshot, base=base, core=live)
+    store.bases.update(live=base, working=working)
+    store.byte_limit = store.SOLVE_RESERVE_BYTES + store._disk_bytes(store.root)-32
+    store._gc()
+    assert not old.parent.exists()
+    assert (live/'data').read_bytes() == bytes(32)
+    assert (preparing/'data').read_bytes() == bytes(32)
+    assert store.bases == dict(live=base, working=working)
+
+
+# --- Binary solved state (v2) negotiation and delivery -------------------------------
+
+V2_HEADERS={'Authorization':'Bearer '+'t'*32,'X-Standin-State-Encoding':'standin-binary-f64le-v2'}
+
+
+@pytest.mark.parametrize('header,env,expected',[
+    (None,None,()),('typed-f64be-json-v1',None,()),
+    ('standin-binary-f64le-v2',None,('standin-binary-f64le-v2',)),
+    ('standin-binary-f64le-v2','0',())])
+def test_solve_encoding_is_opt_in_and_operator_can_force_v1(client,monkeypatch,header,env,expected):
+    http,store=client;calls=[]
+    if env is not None:monkeypatch.setenv('CONVERTER_INTERACTIVE_BINARY_STATE',env)
+    def solve(payload,*encoding):
+        calls.append(encoding)
+        return {'snapshotId':'s','packet':{'canonicalEncoding':encoding[0] if encoding else 'typed-f64be-json-v1'}}
+    monkeypatch.setattr(store,'solve',solve)
+    headers={'Authorization':'Bearer '+'t'*32,**({'X-Standin-State-Encoding':header} if header else {})}
+    response=http.post('/interactive/v1/solve',headers=headers,json={})
+    assert response.status_code==200 and calls==[expected]
+    assert response.headers['x-standin-state-encoding']==(expected[0] if expected else 'typed-f64be-json-v1')
+
+
+def test_unknown_state_encoding_is_rejected_before_body_or_worker(client,monkeypatch):
+    http,store=client;calls=[]
+    monkeypatch.setattr(store,'solve',lambda *a:calls.append(a))
+    response=http.post('/interactive/v1/solve',headers={**V2_HEADERS,'X-Standin-State-Encoding':'gzip-json'},json={})
+    assert response.status_code==400 and calls==[]
+
+
+def test_invalid_binary_state_switch_fails_startup(tmp_path,monkeypatch):
+    monkeypatch.setenv('CONVERTER_INTERACTIVE_ENABLED','true');monkeypatch.setenv('CONVERTER_INTERACTIVE_TOKEN','t'*32)
+    monkeypatch.setenv('CONVERTER_INTERACTIVE_ROOT',str(tmp_path/'private'));monkeypatch.setenv('CONVERTER_INTERACTIVE_BINARY_STATE','maybe')
+    with pytest.raises(ValueError):register_interactive(FastAPI(),None,None)
+
+
+def _binary_entry(store,tmp_path):
+    from converter.interactive_adapter import runtime_revision
+    from converter.solved_state import SolvedPoseState,digest
+    from tests.converter.test_interactive_state import identity,model
+    state=SolvedPoseState.create(identity(),model(),encoding='standin-binary-f64le-v2')
+    directory=tmp_path/'snapshot';(directory/'solved').mkdir(parents=True)
+    (directory/'solved/state.canonical.bin').write_bytes(state.canonical_bytes)
+    store.entries['binary']=dict(owner='a'*64,person='p',revision=1,request='r',busy=False,directory=directory,
+        expiry=time.monotonic()+60,checkpoint=lambda:None,stateHash=state.state_hash,
+        encoding='standin-binary-f64le-v2',modelFile='solved/state.canonical.bin',
+        packetSha256=digest(state.canonical_bytes),runtimeRevision=runtime_revision())
+    return state,directory
+
+
+def test_binary_model_is_served_as_exact_state_bytes_with_v2_media_type(client,tmp_path):
+    http,store=client;state,directory=_binary_entry(store,tmp_path)
+    headers={'Authorization':'Bearer '+'t'*32,'X-Standin-Owner':'a'*64}
+    response=http.get('/interactive/v1/snapshots/binary/model',headers=headers)
+    assert response.status_code==200 and response.content==state.canonical_bytes
+    assert response.headers['content-type']=='application/vnd.standin.solved-pose-state-v2'
+    (directory/'solved/state.canonical.bin').write_bytes(state.canonical_bytes[:-1]+b'\1')
+    assert http.get('/interactive/v1/snapshots/binary/model',headers=headers).status_code==409
+
+
+def test_binary_snapshot_answers_variants_without_decoding(client,tmp_path,monkeypatch):
+    http,store=client;_binary_entry(store,tmp_path)
+    def forbidden(*a,**k):raise AssertionError('variants must not decode a binary state')
+    monkeypatch.setattr('converter_api.interactive.load_solved',forbidden)
+    response=http.get('/interactive/v1/snapshots/binary/variants',headers={'Authorization':'Bearer '+'t'*32,'X-Standin-Owner':'a'*64})
+    assert response.status_code==409 and response.json()['detail']=='VARIANTS_UNAVAILABLE'
