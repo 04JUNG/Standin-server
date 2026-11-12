@@ -88,9 +88,12 @@ jobs:
         run: |
           python -m pytest -q \
             tests/test_hand_screen_deployment.py \
+            tests/test_staging_final_cache.py \
+            tests/converter/test_final_cache_remote.py \
             tests/converter/test_worker_contract.py \
             tests/converter/test_body_material.py \
             tests/converter/test_shape_bake_contract.py \
+            tests/converter/test_prepared_body.py \
             tests/converter/test_shape_inspection.py \
             tests/converter/test_shape_hand_integration.py \
             tests/converter/test_registry.py \
@@ -208,6 +211,14 @@ jobs:
             "$CONVERTER_IMAGE" \
             /opt/blender/blender --background --python-exit-code 1 \
             --python /app/tests/converter/test_convert.py
+
+      - name: Verify cached rest geometry preserves every safety metric
+        run: |
+          docker run --rm --platform linux/amd64 \
+            --mount type=bind,source="$GITHUB_WORKSPACE/tests/converter",target=/app/tests/converter,readonly \
+            "$CONVERTER_IMAGE" \
+            /opt/blender/blender --background --factory-startup --disable-autoexec --python-exit-code 1 \
+            --python /app/tests/converter/verify_rest_surface.py
 
       - name: Verify source finger directions and anatomical clay round trip
         run: |
