@@ -261,14 +261,21 @@ def test_characters_hides_path_uri_hash_and_env_name(tmp_path):
     assert "sha256" not in serialized
 
 
-def test_health_checks_blender_tempdir_and_default_character(tmp_path):
-    response = _client(tmp_path).get("/healthz")
+def test_health_checks_blender_tempdir_and_default_character(tmp_path, caplog):
+    with caplog.at_level(logging.INFO, logger='standin.converter'):
+        response = _client(tmp_path).get("/healthz")
     assert response.status_code == 200
     payload = response.json()
     assert payload["ok"] is True
     assert payload["checks"]["blender"]["version"] == "5.2.0"
     assert payload["checks"]["tempdir"]["ok"] is True
     assert payload["checks"]["default_character"]["ok"] is True
+    trace = next(json.loads(record.message) for record in caplog.records
+                 if 'converter_health_probe' in record.message)
+    assert trace['status'] == 200 and trace['handler_wait_ms'] >= 0
+    assert {'blender', 'tempdir', 'default_character', 'preview_revision',
+            'hand_library', 'character_hashes'} <= trace['stages'].keys()
+    assert all(stage['succeeded'] for stage in trace['stages'].values())
 
 
 def test_health_is_503_on_character_hash_mismatch(tmp_path):

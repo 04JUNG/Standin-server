@@ -56,6 +56,7 @@ from converter_api.runner import (
 from converter_api.schemas import CharactersResponse, HealthResponse
 from converter_api.work_queue import WorkStopped, current_work
 from converter_api.work_middleware import WorkMiddleware
+from converter_api.health_timing import HealthTimingMiddleware, health_handler_started, measured_health
 from converter.framing import FRAMING_VERSION, OUTPUT_SCOPES, PREVIEW_VIEWS
 from converter.hand_library import HandLibraryError, normalize_request as normalize_hands
 
@@ -348,6 +349,7 @@ def create_app(
         ),
     )
     app.add_middleware(WorkMiddleware)
+    app.add_middleware(HealthTimingMiddleware)
     app.state.registry = character_registry
     app.state.runner = blender_runner
     app.state.max_bvh_bytes = size_limit
@@ -467,13 +469,14 @@ def create_app(
 
     @app.get("/healthz", response_model=HealthResponse)
     def healthz():
+        health_handler_started()
         checks: dict[str, Any] = {"api": {"ok": True}}
         slots = getattr(blender_runner, "_process_slots", None)
         if slots is not None and hasattr(slots, "snapshot"):
             checks["work_queue"] = {"ok": True, **slots.snapshot()}
         ok = True
         try:
-            info = blender_runner.inspect_blender(refresh=True)
+            info = measured_health('blender', blender_runner.inspect_blender, refresh=True)
             checks["blender"] = {
                 "ok": True,
                 "version": info.version,
@@ -483,13 +486,14 @@ def create_app(
             ok = False
             checks["blender"] = {"ok": False, "code": exc.code}
         try:
-            blender_runner.check_tempdir()
+            measured_health('tempdir', blender_runner.check_tempdir)
             checks["tempdir"] = {"ok": True}
         except RunnerError as exc:
             ok = False
             checks["tempdir"] = {"ok": False, "code": exc.code}
         try:
-            resolved = character_registry.resolve(character_registry.default_character_id)
+            resolved = measured_health('default_character', character_registry.resolve,
+                                       character_registry.default_character_id)
             checks["default_character"] = {
                 "ok": True,
                 "character_id": resolved.metadata.character_id,
@@ -505,7 +509,7 @@ def create_app(
             try:
                 from converter.shape_spec import load_registry, REGISTRY_SCHEMA
                 # Re-hashes each approved source once and checks its VERSION literal.
-                registry_data = load_registry()
+                registry_data = measured_health('shape_sources', load_registry)
                 checks["shape_sources"] = {
                     "ok": True,
                     "schema": REGISTRY_SCHEMA,
@@ -526,19 +530,19 @@ def create_app(
             "checks": checks,
         }
         from converter.framed_model import revision
-        payload["preview_model_revision"] = (revision() if not getattr(
+        payload["preview_model_revision"] = (measured_health('preview_revision', revision) if not getattr(
             getattr(blender_runner, "settings", None), "force_exact_v324", False) else None)
         # 손 굽기 지원 여부(04J-290). exact V3.2.4 모드에서는 손 요청을 거부하므로 null.
         from converter.hand_library import load_library
-        hand_library = load_library()
+        hand_library = measured_health('hand_library', load_library)
         payload["hand_library"] = (None if getattr(
             getattr(blender_runner, "settings", None), "force_exact_v324", False) else {
             "version": hand_library.library_version, "sha256": hand_library.sha256,
             "presets": len(hand_library.presets)})
-        payload["character_hashes"] = {
+        payload["character_hashes"] = measured_health('character_hashes', lambda: {
             c["character_id"]: character_registry.metadata(c["character_id"]).sha256
             for c in character_registry.list_public(available_only=True)
-        }
+        })
         if ok:
             return payload
         return JSONResponse(status_code=503, content=payload)
