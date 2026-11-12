@@ -12,8 +12,9 @@ class SelectedHandContactError(ValueError):
 
 
 def selected_hand_screen_enabled(scope):
-    import os
-    return scope in ('full', 'half') and os.getenv('CONVERTER_SCREEN_SELECTED_HANDS', '0') == '1'
+    # Product policy: hand quality is not a runtime preview/export gate.
+    # Keep explicit diagnostic tooling callable separately from serving.
+    return False
 
 
 def require_clear_selected_hands(meshes):

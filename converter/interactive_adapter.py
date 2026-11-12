@@ -45,7 +45,7 @@ def _run_body_job(job):
 def runtime_revision():
     root = Path(__file__).parent
     names = ['interactive_camera.py', 'interactive_worker.py', 'interactive_adapter.py', 'interactive_scene.py', 'interactive_export.py',
-             'interactive_revision.py', 'interactive_variants.py', 'shared/interactive_pose_v1.mjs',
+             'interactive_revision.py', 'interactive_reuse.py', 'interactive_variants.py', 'shared/interactive_pose_v1.mjs',
              'solved_state.py', 'hands.py', 'hand_geometry.py', 'hand_library.py', 'hand_contact.py',
              'hand_library.v1.json', 'hand_rig.py', 'framing.py', 'camera.py',
              'shape_bake.py', 'final_artifact.py', 'protocol.py', 'worker.py',
@@ -187,13 +187,7 @@ def solve_from_body(base_directory, identity, destination, *, checkpoint):
     meshes = [o for o in bpy.context.scene.objects if o.type == 'MESH']
     wanted = normalize_request({side: identity['hands'][side] for side in ('left', 'right')})
     hand_report = solve_hands(arm, meshes, wanted) if wanted else None
-    # Existing hand self-collision diagnostics are stricter for this new display
-    # boundary: never call a failed hand safety result authoritative.
-    if hand_report and hand_report['self_collision_free'] is not True:
-        raise ValueError('hand self-collision gate failed')
-    from converter.hand_contact import require_clear_selected_hands, selected_hand_screen_enabled
-    if selected_hand_screen_enabled(identity['scope']):
-        require_clear_selected_hands(meshes)
+    # Hand choices still bake into the pose; quality screening is no longer a serving gate.
     checkpoint()
     crop_report = crop_meshes(arm, meshes, identity['scope'])
     directory = Path(destination); directory.mkdir(parents=True, exist_ok=False)

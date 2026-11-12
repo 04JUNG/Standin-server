@@ -23,6 +23,12 @@ SHA = re.compile(r'^[0-9a-f]{64}$')
 
 
 def prepare(runner, data, job, *, checkpoint):
+    from converter_api.appearance_cache import verified_appearance
+    return verified_appearance('outline', data, job, runtime_revision(),
+        lambda: _prepare_uncached(runner, data, job, checkpoint=checkpoint), checkpoint)
+
+
+def _prepare_uncached(runner, data, job, *, checkpoint):
     """Fresh exporter + fresh verifier; publish nothing after cancellation."""
     runner.inspect_blender()
     with runner._process_slots, tempfile.TemporaryDirectory(prefix='standin-outline-',dir=runner.settings.temp_root) as tmp:
