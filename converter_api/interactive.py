@@ -65,6 +65,8 @@ class SnapshotStore:
         for old in self.root.iterdir():
             if old.name.startswith(('body-','snapshot-','variant-')) and old.is_dir() and not old.is_symlink():shutil.rmtree(old)
         self.registry=registry;self.runner=runner;self.ttl=ttl;self.capacity=capacity;self.byte_limit=byte_limit
+        from converter_api.body_metadata import BodyMetadataCache
+        self.body_metadata = BodyMetadataCache(capacity)
         self.entries={};self.bases={};self.variant_cache={};self.lock=threading.RLock();self.gate=LatestRevisionGate(capacity)
 
     def _gc(self):
@@ -142,13 +144,8 @@ class SnapshotStore:
                     request_id=control.request_id if control else None)))
 
     def _body_metadata(self,directory,binding):
-        """An interrupted preparation must never poison the next hand revision.
-
-        v2 bases keep a small JSON index and a hash-pinned binary model, so this
-        no longer decodes the whole surface as typed JSON (5-9 s in production).
-        """
-        try:return read_body_metadata(directory,binding)
-        except (OSError,ValueError,KeyError,TypeError):return None
+        """Reuse compact camera metadata; rehash v1/v2 artifacts on every access."""
+        return self.body_metadata.read(directory,binding)
 
     def solve(self, payload, encoding=V1_ENCODING):
         if encoding not in STATE_FILES:raise ValueError('unsupported state encoding')
