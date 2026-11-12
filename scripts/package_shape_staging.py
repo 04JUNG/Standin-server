@@ -59,6 +59,7 @@ def main():
     ap.add_argument('--bake-qa', required=True)
     ap.add_argument('--version', required=True)
     ap.add_argument('--upload', action='store_true')
+    ap.add_argument('--prepared-bodies', help='offline prepare_preset_bodies.py output')
     args = ap.parse_args()
     release = Path(args.release)
     package = release / 'package'
@@ -76,6 +77,9 @@ def main():
     require_inspection(runs, json.loads(inspection.read_text()))
     runtimes = dict(item.split('=', 1) for item in args.runtime)
     package.mkdir()
+    if args.prepared_bodies:
+        from scripts.prepare_preset_bodies import stage_prepared
+        stage_prepared(args.prepared_bodies, registry, package, DEPLOY)
 
     def copy(src, rel):
         dest = package / rel
@@ -125,7 +129,7 @@ def main():
         if not p.is_file():
             continue
         n = p.relative_to(package).as_posix()
-        roles = (['converter'] if n.startswith('sources/') or n in ('characters.json', 'shape-bakes.json')
+        roles = (['converter'] if n.startswith(('sources/', 'fbx/prepared-', 'qa/prepared-')) or n in ('characters.json', 'shape-bakes.json')
                  else ['bff'] if n.startswith(('png/', 'runtime/')) or n == 'body-models.json'
                  else ['inference', 'converter'] if n.startswith('fbx/') else ['inference'])
         files.append({'path': n, 'roles': roles, 'size': p.stat().st_size, 'sha256': sha(p.read_bytes())})
