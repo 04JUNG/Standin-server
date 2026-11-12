@@ -8,6 +8,9 @@ import pytest
 
 from converter_api.interactive import SnapshotStore, measured
 from converter_api.work_queue import current_work
+from converter.interactive_adapter import runtime_revision
+from converter.solved_state import digest
+from fastapi import HTTPException
 
 
 def test_stage_correlates_without_payload_or_exception_text(caplog):
@@ -45,3 +48,25 @@ def test_blender_queue_execution_are_separate_and_accumulate(monkeypatch, caplog
         assert row['request_id'] == 'req_test'
     finally:
         current_work.reset(token)
+
+
+def test_published_model_remains_readable_during_export_but_never_bypasses_hash(tmp_path):
+    solved = tmp_path/'solved'
+    solved.mkdir()
+    raw = b'{"immutable":"published model"}'
+    (solved/'packet.json').write_bytes(raw)
+    entry = dict(busy=True, stateHash='a'*64, runtimeRevision=runtime_revision(),
+                 directory=tmp_path, packetSha256=digest(raw), checkpoint=lambda: None)
+    store = SnapshotStore.__new__(SnapshotStore)
+    store._get = lambda snapshot, owner: entry
+    assert store.read('snapshot', 'owner', 'model') == raw
+    with pytest.raises(HTTPException) as pending_file:
+        store.read('snapshot', 'owner', 'file')
+    assert pending_file.value.status_code == 409
+    (solved/'packet.json').write_bytes(b'tampered')
+    with pytest.raises(ValueError, match='packet changed'):
+        store.read('snapshot', 'owner', 'model')
+    del entry['stateHash']
+    with pytest.raises(HTTPException) as pending_model:
+        store.read('snapshot', 'owner', 'model')
+    assert pending_model.value.status_code == 409

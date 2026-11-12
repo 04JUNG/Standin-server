@@ -256,7 +256,10 @@ class SnapshotStore:
 
     def read(self,snapshot,owner,kind):
         e=self._get(snapshot,owner)
-        if e['busy']:raise HTTPException(409,'NOT_READY')
+        # Export writes only its separate artifact directory. Once the immutable
+        # model is published, an export must not revoke preview reads.
+        if e['busy'] and (kind!='model' or not e.get('stateHash')):
+            raise HTTPException(409,'NOT_READY')
         # Publication already fully validated this immutable packet. Rehash its
         # original bytes on every read instead of decoding the entire surface
         # a second time merely to deliver it. BFF independently parses it too.
