@@ -70,3 +70,60 @@ def test_published_model_remains_readable_during_export_but_never_bypasses_hash(
     with pytest.raises(HTTPException) as pending_model:
         store.read('snapshot', 'owner', 'model')
     assert pending_model.value.status_code == 409
+
+
+def test_health_timing_separates_handler_wait_and_failure_without_changing_response(monkeypatch, caplog):
+    import asyncio
+    from converter_api.health_timing import HealthTimingMiddleware, current_health, health_handler_started, measured_health
+    now = [0.]
+    monkeypatch.setattr('converter_api.health_timing.time.perf_counter', lambda: now[0])
+    messages = []
+
+    async def handler(scope, receive, send):
+        now[0] = 2.
+        health_handler_started()
+        def failing_probe():
+            now[0] = 8.
+            raise ValueError('private path or geometry')
+        with pytest.raises(ValueError, match='private path'):
+            measured_health('blender', failing_probe)
+        await send({'type': 'http.response.start', 'status': 503, 'headers': []})
+        await send({'type': 'http.response.body', 'body': b'unchanged'})
+
+    async def send(message):
+        messages.append(message)
+
+    async def receive():
+        return {'type': 'http.request', 'body': b''}
+
+    scope = {'type': 'http', 'path': '/healthz', 'headers': [
+        (b'x-request-id', b'req_12345678-1234-1234-1234-123456789abc')]}
+    with caplog.at_level(logging.INFO, logger='standin.converter'):
+        asyncio.run(HealthTimingMiddleware(handler)(scope, receive, send))
+    row = json.loads(caplog.records[-1].message)
+    assert row['duration_ms'] == 8000 and row['handler_wait_ms'] == 2000
+    assert row['stages'] == {'blender': {'duration_ms': 6000, 'succeeded': False}}
+    assert row['status'] == 503 and row['request_id'] == scope['headers'][0][1].decode()
+    assert messages[-1]['body'] == b'unchanged'
+    assert 'private path' not in caplog.text
+    assert current_health.get() is None
+
+
+def test_health_timing_does_not_log_other_routes_or_untrusted_request_ids(caplog):
+    import asyncio
+    from converter_api.health_timing import HealthTimingMiddleware, health_handler_started, measured_health
+    async def handler(scope, receive, send):
+        health_handler_started()
+        assert measured_health('tempdir', lambda: 7) == 7
+        await send({'type': 'http.response.start', 'status': 200, 'headers': []})
+    async def send(message):
+        pass
+    async def receive():
+        return {'type': 'http.request', 'body': b''}
+    with caplog.at_level(logging.INFO, logger='standin.converter'):
+        for path in ['/other', '/healthz']:
+            asyncio.run(HealthTimingMiddleware(handler)(
+                {'type': 'http', 'path': path, 'headers': [(b'x-request-id', b'private-path')]}, receive, send))
+    assert len(caplog.records) == 1
+    assert 'request_id' not in json.loads(caplog.records[0].message)
+    assert 'private-path' not in caplog.text
