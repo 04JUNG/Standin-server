@@ -1,0 +1,2057 @@
+{
+  "schema": "body-scene-transfer-evidence.v1",
+  "measured_code_commit": "564c31f39",
+  "runtime_prerequisite": "a770d0cde",
+  "runtime_prerequisite_final": "5e6a63fde",
+  "main_reference": "f31558c305c8bb4c1687ab8fe4e15f001ca26f24",
+  "develop_reference": "e9de78d6c7bd99ed3e918a98046e0783d3ae144d",
+  "host": {
+    "system": "Darwin",
+    "architecture": "arm64",
+    "logical_cpus": 15,
+    "blender_version": "5.2.0",
+    "blender_build": "fbe6228777e7",
+    "cpu_quota": null
+  },
+  "scope": "fixture selection, native Converter ASGI + real Blender + separate export/verify; no BFF/app/CSP UI",
+  "timing_definition": {
+    "body_prepare_seconds": "prepare_body function inside Blender; excludes child startup/shutdown",
+    "body_run_job_seconds": "nested within prepare_body; do not add",
+    "file_ready_seconds": "ASGI solve/model GET/export/file GET including child starts and independent verification",
+    "peak_rss_bytes": "maximum individual Blender child, not whole system"
+  },
+  "primary_native_v2": [
+    {
+      "case": "male-base",
+      "character": "male-base-v0-8-0",
+      "character_sha256": "705035f1bd247b3bf63a6d293065a5a39390b2d228df559474f9dc6682bf8c43",
+      "source_sha256": "a98738379acb614c5d070cec2f53e1f7df4fae0cef4c97dee1b08201caa8ef83",
+      "encoding": "standin-binary-f64le-v2",
+      "comparison": {
+        "ok": true,
+        "errors": {
+          "position_m": 0.0,
+          "matrix": 0.0,
+          "weight": 0.0,
+          "normal": 0.0
+        },
+        "limits": {
+          "position_m": 0.0001,
+          "matrix": 1e-05,
+          "weight": 1e-06,
+          "normal": 0.0001
+        },
+        "topology_equal": true,
+        "joint_identity_equal": true,
+        "off_validation": {
+          "version": "final-fbx-v1",
+          "artifact_sha256": "f8b6bf7672a5689a0fe43dc9aac5c293074dd61f246c1d9252e12ac73cb0ad88",
+          "scope": "full",
+          "bones": 54,
+          "meshes": 1,
+          "vertices": 139474,
+          "polygons": 278944,
+          "skin_verified": true
+        },
+        "on_validation": {
+          "version": "final-fbx-v1",
+          "artifact_sha256": "f59ccfef34da21443792f35c70a2cecfba2f844182522a6c37793be498bb8eaa",
+          "scope": "full",
+          "bones": 54,
+          "meshes": 1,
+          "vertices": 139474,
+          "polygons": 278944,
+          "skin_verified": true
+        }
+      },
+      "runs": {
+        "off": {
+          "body_prepare_seconds": 28.97459691693075,
+          "body_run_job_seconds": 27.3543274999829,
+          "file_ready_seconds": 40.75499091704842,
+          "model_ready_seconds": 36.63434941705782,
+          "peak_rss_bytes": 1463222272,
+          "fbx_io": {
+            "parse": {
+              "disk_calls": 13,
+              "memory_calls": 0,
+              "disk_bytes": 117744044
+            },
+            "write": {
+              "disk_calls": 6,
+              "memory_calls": 0,
+              "disk_bytes": 54339704
+            }
+          },
+          "scene_transfer": null,
+          "controls_match": true,
+          "neutral_preparation": {
+            "status": "disabled",
+            "seconds": 7.712421500007622,
+            "generation_skipped": false,
+            "rest_import_skipped": false
+          },
+          "shape_controls": {
+            "arm_length": 0.0,
+            "calf": 0.0,
+            "chest_depth": 0.0,
+            "chest_width": 0.0,
+            "definition": 0.0,
+            "detail_back": 0.0,
+            "detail_calf": 0.0,
+            "detail_chest": 0.0,
+            "detail_forearm": 0.0,
+            "detail_shoulder": 0.0,
+            "detail_thigh": 0.0,
+            "detail_upperarm": 0.0,
+            "fat_arms": 0.0,
+            "fat_legs": 0.0,
+            "fat_torso": 0.0,
+            "glute": 0.0,
+            "head_depth": 0.0,
+            "head_scale": 1.0,
+            "head_width": 0.0,
+            "heads": 7.943109,
+            "height_cm": 168.684899,
+            "leg_length": 0.0,
+            "leg_ratio": 0.0,
+            "muscle": 0.0,
+            "muscle_bulk": 0.0,
+            "neck_length": 0.0,
+            "neck_width": 0.0,
+            "pelvis": 0.0,
+            "physique": 0.0,
+            "shoulders": 0.0,
+            "thigh": 0.0,
+            "torso_length": 0.0,
+            "waist": 0.0
+          },
+          "correspondence": {
+            "jointIdentity": true,
+            "matrixTolerance": 1e-05,
+            "maxMatrixError": 0.0,
+            "maxNormalError": 0.0,
+            "maxPositionErrorM": 0.0,
+            "maxWeightError": 0.0,
+            "positionToleranceM": 0.0001,
+            "skinIdentity": true,
+            "topology": true,
+            "weightTolerance": 1e-06
+          },
+          "host_load_before": [
+            2.9140625,
+            3.87158203125,
+            4.95068359375
+          ],
+          "host_load_after": [
+            3.10888671875,
+            3.81787109375,
+            4.8759765625
+          ]
+        },
+        "on": {
+          "body_prepare_seconds": 27.728580624912865,
+          "body_run_job_seconds": 26.095589124946855,
+          "file_ready_seconds": 38.806672082981095,
+          "model_ready_seconds": 35.07223945797887,
+          "peak_rss_bytes": 1359593472,
+          "fbx_io": {
+            "parse": {
+              "disk_calls": 12,
+              "memory_calls": 1,
+              "disk_bytes": 108682320
+            },
+            "write": {
+              "disk_calls": 5,
+              "memory_calls": 1,
+              "disk_bytes": 45277980
+            }
+          },
+          "scene_transfer": {
+            "schema": "body-scene-transfer.v1",
+            "status": "transferred",
+            "disk_full_mesh_imports_avoided": 1,
+            "disk_full_mesh_exports_avoided": 1,
+            "memory_rig_roundtrips": 1,
+            "memory_rig_bytes": 127356,
+            "seconds": 23.766023625037633
+          },
+          "controls_match": true,
+          "neutral_preparation": {
+            "status": "disabled",
+            "seconds": 6.800616458058357,
+            "generation_skipped": false,
+            "rest_import_skipped": false
+          },
+          "shape_controls": {
+            "arm_length": 0.0,
+            "calf": 0.0,
+            "chest_depth": 0.0,
+            "chest_width": 0.0,
+            "definition": 0.0,
+            "detail_back": 0.0,
+            "detail_calf": 0.0,
+            "detail_chest": 0.0,
+            "detail_forearm": 0.0,
+            "detail_shoulder": 0.0,
+            "detail_thigh": 0.0,
+            "detail_upperarm": 0.0,
+            "fat_arms": 0.0,
+            "fat_legs": 0.0,
+            "fat_torso": 0.0,
+            "glute": 0.0,
+            "head_depth": 0.0,
+            "head_scale": 1.0,
+            "head_width": 0.0,
+            "heads": 7.943109,
+            "height_cm": 168.684899,
+            "leg_length": 0.0,
+            "leg_ratio": 0.0,
+            "muscle": 0.0,
+            "muscle_bulk": 0.0,
+            "neck_length": 0.0,
+            "neck_width": 0.0,
+            "pelvis": 0.0,
+            "physique": 0.0,
+            "shoulders": 0.0,
+            "thigh": 0.0,
+            "torso_length": 0.0,
+            "waist": 0.0
+          },
+          "correspondence": {
+            "jointIdentity": true,
+            "matrixTolerance": 1e-05,
+            "maxMatrixError": 0.0,
+            "maxNormalError": 0.0,
+            "maxPositionErrorM": 0.0,
+            "maxWeightError": 0.0,
+            "positionToleranceM": 0.0001,
+            "skinIdentity": true,
+            "topology": true,
+            "weightTolerance": 1e-06
+          },
+          "host_load_before": [
+            3.10888671875,
+            3.81787109375,
+            4.8759765625
+          ],
+          "host_load_after": [
+            2.689453125,
+            3.6318359375,
+            4.76416015625
+          ]
+        }
+      }
+    },
+    {
+      "case": "male-fat",
+      "character": "male-fat-max-v0-8-0",
+      "character_sha256": "61d0ededbc9e7d71c01b44196e93aa1278ff49fe603bfca28cca2cbd2eac4234",
+      "source_sha256": "a98738379acb614c5d070cec2f53e1f7df4fae0cef4c97dee1b08201caa8ef83",
+      "encoding": "standin-binary-f64le-v2",
+      "comparison": {
+        "ok": true,
+        "errors": {
+          "position_m": 0.0,
+          "matrix": 0.0,
+          "weight": 0.0,
+          "normal": 0.0
+        },
+        "limits": {
+          "position_m": 0.0001,
+          "matrix": 1e-05,
+          "weight": 1e-06,
+          "normal": 0.0001
+        },
+        "topology_equal": true,
+        "joint_identity_equal": true,
+        "off_validation": {
+          "version": "final-fbx-v1",
+          "artifact_sha256": "04240a6027c30bdf9d6adae46ac196c3bc2e5416258cb78e3591611ad98f86c5",
+          "scope": "full",
+          "bones": 54,
+          "meshes": 1,
+          "vertices": 139474,
+          "polygons": 278944,
+          "skin_verified": true
+        },
+        "on_validation": {
+          "version": "final-fbx-v1",
+          "artifact_sha256": "4f9d02363ef5e60b18c138a15010ff03d8a613df289de08dfd7fe528f02e3e54",
+          "scope": "full",
+          "bones": 54,
+          "meshes": 1,
+          "vertices": 139474,
+          "polygons": 278944,
+          "skin_verified": true
+        }
+      },
+      "runs": {
+        "on": {
+          "body_prepare_seconds": 35.81895933300257,
+          "body_run_job_seconds": 34.22859583306126,
+          "file_ready_seconds": 47.03869516705163,
+          "model_ready_seconds": 43.03761666698847,
+          "peak_rss_bytes": 1380958208,
+          "fbx_io": {
+            "parse": {
+              "disk_calls": 12,
+              "memory_calls": 1,
+              "disk_bytes": 108770992
+            },
+            "write": {
+              "disk_calls": 5,
+              "memory_calls": 1,
+              "disk_bytes": 45309468
+            }
+          },
+          "scene_transfer": {
+            "schema": "body-scene-transfer.v1",
+            "status": "transferred",
+            "disk_full_mesh_imports_avoided": 1,
+            "disk_full_mesh_exports_avoided": 1,
+            "memory_rig_roundtrips": 1,
+            "memory_rig_bytes": 127276,
+            "seconds": 31.850842584040947
+          },
+          "controls_match": true,
+          "neutral_preparation": {
+            "status": "disabled",
+            "seconds": 11.63597020902671,
+            "generation_skipped": false,
+            "rest_import_skipped": false
+          },
+          "shape_controls": {
+            "arm_length": 0.0,
+            "calf": 0.0,
+            "chest_depth": 0.0,
+            "chest_width": 0.0,
+            "definition": 0.0,
+            "detail_back": 0.0,
+            "detail_calf": 0.0,
+            "detail_chest": 0.0,
+            "detail_forearm": 0.0,
+            "detail_shoulder": 0.0,
+            "detail_thigh": 0.0,
+            "detail_upperarm": 0.0,
+            "fat_arms": 0.0,
+            "fat_legs": 0.0,
+            "fat_torso": 0.0,
+            "glute": 0.0,
+            "head_depth": 0.0,
+            "head_scale": 0.927,
+            "head_width": 0.0,
+            "heads": 6.7,
+            "height_cm": 168.684899,
+            "leg_length": 0.0,
+            "leg_ratio": 0.0,
+            "muscle": 0.0,
+            "muscle_bulk": 0.0,
+            "neck_length": -0.2,
+            "neck_width": 0.4,
+            "pelvis": 0.2,
+            "physique": 1.7,
+            "shoulders": 0.0,
+            "thigh": 0.0,
+            "torso_length": 0.0,
+            "waist": 0.1
+          },
+          "correspondence": {
+            "jointIdentity": true,
+            "matrixTolerance": 1e-05,
+            "maxMatrixError": 0.0,
+            "maxNormalError": 0.0,
+            "maxPositionErrorM": 0.0,
+            "maxWeightError": 0.0,
+            "positionToleranceM": 0.0001,
+            "skinIdentity": true,
+            "topology": true,
+            "weightTolerance": 1e-06
+          },
+          "host_load_before": [
+            2.5537109375,
+            3.587890625,
+            4.74169921875
+          ],
+          "host_load_after": [
+            3.14208984375,
+            3.59814453125,
+            4.6845703125
+          ]
+        },
+        "off": {
+          "body_prepare_seconds": 34.16609866602812,
+          "body_run_job_seconds": 32.60836820793338,
+          "file_ready_seconds": 44.85141404194292,
+          "model_ready_seconds": 41.07364212500397,
+          "peak_rss_bytes": 1491697664,
+          "fbx_io": {
+            "parse": {
+              "disk_calls": 13,
+              "memory_calls": 0,
+              "disk_bytes": 117835964
+            },
+            "write": {
+              "disk_calls": 6,
+              "memory_calls": 0,
+              "disk_bytes": 54374440
+            }
+          },
+          "scene_transfer": null,
+          "controls_match": true,
+          "neutral_preparation": {
+            "status": "disabled",
+            "seconds": 11.127857750048861,
+            "generation_skipped": false,
+            "rest_import_skipped": false
+          },
+          "shape_controls": {
+            "arm_length": 0.0,
+            "calf": 0.0,
+            "chest_depth": 0.0,
+            "chest_width": 0.0,
+            "definition": 0.0,
+            "detail_back": 0.0,
+            "detail_calf": 0.0,
+            "detail_chest": 0.0,
+            "detail_forearm": 0.0,
+            "detail_shoulder": 0.0,
+            "detail_thigh": 0.0,
+            "detail_upperarm": 0.0,
+            "fat_arms": 0.0,
+            "fat_legs": 0.0,
+            "fat_torso": 0.0,
+            "glute": 0.0,
+            "head_depth": 0.0,
+            "head_scale": 0.927,
+            "head_width": 0.0,
+            "heads": 6.7,
+            "height_cm": 168.684899,
+            "leg_length": 0.0,
+            "leg_ratio": 0.0,
+            "muscle": 0.0,
+            "muscle_bulk": 0.0,
+            "neck_length": -0.2,
+            "neck_width": 0.4,
+            "pelvis": 0.2,
+            "physique": 1.7,
+            "shoulders": 0.0,
+            "thigh": 0.0,
+            "torso_length": 0.0,
+            "waist": 0.1
+          },
+          "correspondence": {
+            "jointIdentity": true,
+            "matrixTolerance": 1e-05,
+            "maxMatrixError": 0.0,
+            "maxNormalError": 0.0,
+            "maxPositionErrorM": 0.0,
+            "maxWeightError": 0.0,
+            "positionToleranceM": 0.0001,
+            "skinIdentity": true,
+            "topology": true,
+            "weightTolerance": 1e-06
+          },
+          "host_load_before": [
+            3.14208984375,
+            3.59814453125,
+            4.6845703125
+          ],
+          "host_load_after": [
+            5.49755859375,
+            4.3701171875,
+            4.92529296875
+          ]
+        }
+      }
+    },
+    {
+      "case": "male-large",
+      "character": "male-base-v0-8-0",
+      "character_sha256": "705035f1bd247b3bf63a6d293065a5a39390b2d228df559474f9dc6682bf8c43",
+      "source_sha256": "a98738379acb614c5d070cec2f53e1f7df4fae0cef4c97dee1b08201caa8ef83",
+      "encoding": "standin-binary-f64le-v2",
+      "comparison": {
+        "ok": true,
+        "errors": {
+          "position_m": 0.0,
+          "matrix": 0.0,
+          "weight": 0.0,
+          "normal": 0.0
+        },
+        "limits": {
+          "position_m": 0.0001,
+          "matrix": 1e-05,
+          "weight": 1e-06,
+          "normal": 0.0001
+        },
+        "topology_equal": true,
+        "joint_identity_equal": true,
+        "off_validation": {
+          "version": "final-fbx-v1",
+          "artifact_sha256": "a50829365d57c2ec1cd464e5e6ddaafe1fb2f39163912ccbf2e7f09848f528dd",
+          "scope": "full",
+          "bones": 54,
+          "meshes": 1,
+          "vertices": 139474,
+          "polygons": 278944,
+          "skin_verified": true
+        },
+        "on_validation": {
+          "version": "final-fbx-v1",
+          "artifact_sha256": "8077b3ce96822c0fb3ad13904d9e1457554856d2c975dcf0450d51145c92744f",
+          "scope": "full",
+          "bones": 54,
+          "meshes": 1,
+          "vertices": 139474,
+          "polygons": 278944,
+          "skin_verified": true
+        }
+      },
+      "runs": {
+        "off": {
+          "body_prepare_seconds": 34.321356541942805,
+          "body_run_job_seconds": 32.686767208972014,
+          "file_ready_seconds": 45.49352283310145,
+          "model_ready_seconds": 41.51985958300065,
+          "peak_rss_bytes": 1441333248,
+          "fbx_io": {
+            "parse": {
+              "disk_calls": 13,
+              "memory_calls": 0,
+              "disk_bytes": 117832284
+            },
+            "write": {
+              "disk_calls": 6,
+              "memory_calls": 0,
+              "disk_bytes": 54372360
+            }
+          },
+          "scene_transfer": null,
+          "controls_match": true,
+          "neutral_preparation": {
+            "status": "disabled",
+            "seconds": 10.373931832960807,
+            "generation_skipped": false,
+            "rest_import_skipped": false
+          },
+          "shape_controls": {
+            "arm_length": 0.0,
+            "calf": 0.0,
+            "chest_depth": 0.0,
+            "chest_width": 0.0,
+            "definition": 0.0,
+            "detail_back": 0.0,
+            "detail_calf": 0.0,
+            "detail_chest": 0.0,
+            "detail_forearm": 0.0,
+            "detail_shoulder": 0.0,
+            "detail_thigh": 0.0,
+            "detail_upperarm": 0.0,
+            "fat_arms": 0.0,
+            "fat_legs": 0.0,
+            "fat_torso": 0.0,
+            "glute": 0.0,
+            "head_depth": 0.0,
+            "head_scale": 1.0,
+            "head_width": 0.0,
+            "heads": 7.943109,
+            "height_cm": 183.684899,
+            "leg_length": 0.0,
+            "leg_ratio": 0.0,
+            "muscle": 0.0,
+            "muscle_bulk": 0.0,
+            "neck_length": 0.0,
+            "neck_width": 0.0,
+            "pelvis": 0.0,
+            "physique": 1.5,
+            "shoulders": 0.0,
+            "thigh": 0.0,
+            "torso_length": 0.0,
+            "waist": 0.0
+          },
+          "correspondence": {
+            "jointIdentity": true,
+            "matrixTolerance": 1e-05,
+            "maxMatrixError": 0.0,
+            "maxNormalError": 0.0,
+            "maxPositionErrorM": 0.0,
+            "maxWeightError": 0.0,
+            "positionToleranceM": 0.0001,
+            "skinIdentity": true,
+            "topology": true,
+            "weightTolerance": 1e-06
+          },
+          "host_load_before": [
+            5.13720703125,
+            4.31396484375,
+            4.90185546875
+          ],
+          "host_load_after": [
+            4.7744140625,
+            4.35546875,
+            4.88671875
+          ]
+        },
+        "on": {
+          "body_prepare_seconds": 36.077217792044394,
+          "body_run_job_seconds": 34.453874874976464,
+          "file_ready_seconds": 48.34899262501858,
+          "model_ready_seconds": 43.86972700001206,
+          "peak_rss_bytes": 1303314432,
+          "fbx_io": {
+            "parse": {
+              "disk_calls": 12,
+              "memory_calls": 1,
+              "disk_bytes": 108767536
+            },
+            "write": {
+              "disk_calls": 5,
+              "memory_calls": 1,
+              "disk_bytes": 45307612
+            }
+          },
+          "scene_transfer": {
+            "schema": "body-scene-transfer.v1",
+            "status": "transferred",
+            "disk_full_mesh_imports_avoided": 1,
+            "disk_full_mesh_exports_avoided": 1,
+            "memory_rig_roundtrips": 1,
+            "memory_rig_bytes": 127020,
+            "seconds": 31.93282366602216
+          },
+          "controls_match": true,
+          "neutral_preparation": {
+            "status": "disabled",
+            "seconds": 11.329189332900569,
+            "generation_skipped": false,
+            "rest_import_skipped": false
+          },
+          "shape_controls": {
+            "arm_length": 0.0,
+            "calf": 0.0,
+            "chest_depth": 0.0,
+            "chest_width": 0.0,
+            "definition": 0.0,
+            "detail_back": 0.0,
+            "detail_calf": 0.0,
+            "detail_chest": 0.0,
+            "detail_forearm": 0.0,
+            "detail_shoulder": 0.0,
+            "detail_thigh": 0.0,
+            "detail_upperarm": 0.0,
+            "fat_arms": 0.0,
+            "fat_legs": 0.0,
+            "fat_torso": 0.0,
+            "glute": 0.0,
+            "head_depth": 0.0,
+            "head_scale": 1.0,
+            "head_width": 0.0,
+            "heads": 7.943109,
+            "height_cm": 183.684899,
+            "leg_length": 0.0,
+            "leg_ratio": 0.0,
+            "muscle": 0.0,
+            "muscle_bulk": 0.0,
+            "neck_length": 0.0,
+            "neck_width": 0.0,
+            "pelvis": 0.0,
+            "physique": 1.5,
+            "shoulders": 0.0,
+            "thigh": 0.0,
+            "torso_length": 0.0,
+            "waist": 0.0
+          },
+          "correspondence": {
+            "jointIdentity": true,
+            "matrixTolerance": 1e-05,
+            "maxMatrixError": 0.0,
+            "maxNormalError": 0.0,
+            "maxPositionErrorM": 0.0,
+            "maxWeightError": 0.0,
+            "positionToleranceM": 0.0001,
+            "skinIdentity": true,
+            "topology": true,
+            "weightTolerance": 1e-06
+          },
+          "host_load_before": [
+            4.7744140625,
+            4.35546875,
+            4.88671875
+          ],
+          "host_load_after": [
+            4.7890625,
+            4.39697265625,
+            4.8681640625
+          ]
+        }
+      }
+    },
+    {
+      "case": "female-base",
+      "character": "female-base-v0-4-0",
+      "character_sha256": "ffd7b57d6ebba06299be252976b511afe5684a237e6f7d440bb90b2ba20f0c33",
+      "source_sha256": "a98738379acb614c5d070cec2f53e1f7df4fae0cef4c97dee1b08201caa8ef83",
+      "encoding": "standin-binary-f64le-v2",
+      "comparison": {
+        "ok": true,
+        "errors": {
+          "position_m": 0.0,
+          "matrix": 0.0,
+          "weight": 0.0,
+          "normal": 0.0
+        },
+        "limits": {
+          "position_m": 0.0001,
+          "matrix": 1e-05,
+          "weight": 1e-06,
+          "normal": 0.0001
+        },
+        "topology_equal": true,
+        "joint_identity_equal": true,
+        "off_validation": {
+          "version": "final-fbx-v1",
+          "artifact_sha256": "d20f3fe8a701046e9a0ac9b9ab5ecd589287280ce1205ba722174d019e9e154f",
+          "scope": "full",
+          "bones": 54,
+          "meshes": 1,
+          "vertices": 105430,
+          "polygons": 210856,
+          "skin_verified": true
+        },
+        "on_validation": {
+          "version": "final-fbx-v1",
+          "artifact_sha256": "f905d2489334e2dcd3b8e0ddc9ba2dddc4656a3bd584ed32759fa253d2fef380",
+          "scope": "full",
+          "bones": 54,
+          "meshes": 1,
+          "vertices": 105430,
+          "polygons": 210856,
+          "skin_verified": true
+        }
+      },
+      "runs": {
+        "off": {
+          "body_prepare_seconds": 18.764158666948788,
+          "body_run_job_seconds": 17.607814125018194,
+          "file_ready_seconds": 28.306063874973916,
+          "model_ready_seconds": 24.652557583991438,
+          "peak_rss_bytes": 1257865216,
+          "fbx_io": {
+            "parse": {
+              "disk_calls": 13,
+              "memory_calls": 0,
+              "disk_bytes": 87119132
+            },
+            "write": {
+              "disk_calls": 6,
+              "memory_calls": 0,
+              "disk_bytes": 40205176
+            }
+          },
+          "scene_transfer": null,
+          "controls_match": true,
+          "neutral_preparation": {
+            "status": "disabled",
+            "seconds": 3.9043474160134792,
+            "generation_skipped": false,
+            "rest_import_skipped": false
+          },
+          "shape_controls": {
+            "arm_length": 0.0,
+            "breast_height": 0.0,
+            "breast_projection": 0.0,
+            "breast_size": 0.0,
+            "breast_spacing": 0.0,
+            "breast_width": 0.0,
+            "calf": 0.0,
+            "chest_depth": 0.0,
+            "chest_width": 0.0,
+            "definition": 0.0,
+            "detail_back": 0.0,
+            "detail_calf": 0.0,
+            "detail_chest": 0.0,
+            "detail_forearm": 0.0,
+            "detail_shoulder": 0.0,
+            "detail_thigh": 0.0,
+            "detail_upperarm": 0.0,
+            "fat_arms": 0.0,
+            "fat_distribution": 0.0,
+            "fat_gain": 0.0,
+            "fat_legs": 0.0,
+            "fat_torso": 0.0,
+            "glute": 0.0,
+            "head_depth": 0.0,
+            "head_scale": 1.0,
+            "head_width": 0.0,
+            "heads": 8.000001,
+            "height_cm": 169.893087,
+            "leg_length": 0.0,
+            "leg_ratio": 0.0,
+            "muscle": 0.0,
+            "neck_length": 0.0,
+            "neck_width": 0.0,
+            "pelvis": 0.0,
+            "physique": 0.0,
+            "shoulders": 0.0,
+            "thigh": 0.0,
+            "torso_length": 0.0,
+            "waist": 0.0
+          },
+          "correspondence": {
+            "jointIdentity": true,
+            "matrixTolerance": 1e-05,
+            "maxMatrixError": 0.0,
+            "maxNormalError": 0.0,
+            "maxPositionErrorM": 0.0,
+            "maxWeightError": 0.0,
+            "positionToleranceM": 0.0001,
+            "skinIdentity": true,
+            "topology": true,
+            "weightTolerance": 1e-06
+          },
+          "host_load_before": [
+            3.9912109375,
+            4.2890625,
+            4.67236328125
+          ],
+          "host_load_after": [
+            4.34814453125,
+            4.3330078125,
+            4.67578125
+          ]
+        },
+        "on": {
+          "body_prepare_seconds": 19.586460917023942,
+          "body_run_job_seconds": 18.40117474994622,
+          "file_ready_seconds": 28.224871499929577,
+          "model_ready_seconds": 25.182962249964476,
+          "peak_rss_bytes": 1149206528,
+          "fbx_io": {
+            "parse": {
+              "disk_calls": 12,
+              "memory_calls": 1,
+              "disk_bytes": 80414416
+            },
+            "write": {
+              "disk_calls": 5,
+              "memory_calls": 1,
+              "disk_bytes": 33500460
+            }
+          },
+          "scene_transfer": {
+            "schema": "body-scene-transfer.v1",
+            "status": "transferred",
+            "disk_full_mesh_imports_avoided": 1,
+            "disk_full_mesh_exports_avoided": 1,
+            "memory_rig_roundtrips": 1,
+            "memory_rig_bytes": 126940,
+            "seconds": 16.562114082975313
+          },
+          "controls_match": true,
+          "neutral_preparation": {
+            "status": "disabled",
+            "seconds": 3.752794416039251,
+            "generation_skipped": false,
+            "rest_import_skipped": false
+          },
+          "shape_controls": {
+            "arm_length": 0.0,
+            "breast_height": 0.0,
+            "breast_projection": 0.0,
+            "breast_size": 0.0,
+            "breast_spacing": 0.0,
+            "breast_width": 0.0,
+            "calf": 0.0,
+            "chest_depth": 0.0,
+            "chest_width": 0.0,
+            "definition": 0.0,
+            "detail_back": 0.0,
+            "detail_calf": 0.0,
+            "detail_chest": 0.0,
+            "detail_forearm": 0.0,
+            "detail_shoulder": 0.0,
+            "detail_thigh": 0.0,
+            "detail_upperarm": 0.0,
+            "fat_arms": 0.0,
+            "fat_distribution": 0.0,
+            "fat_gain": 0.0,
+            "fat_legs": 0.0,
+            "fat_torso": 0.0,
+            "glute": 0.0,
+            "head_depth": 0.0,
+            "head_scale": 1.0,
+            "head_width": 0.0,
+            "heads": 8.000001,
+            "height_cm": 169.893087,
+            "leg_length": 0.0,
+            "leg_ratio": 0.0,
+            "muscle": 0.0,
+            "neck_length": 0.0,
+            "neck_width": 0.0,
+            "pelvis": 0.0,
+            "physique": 0.0,
+            "shoulders": 0.0,
+            "thigh": 0.0,
+            "torso_length": 0.0,
+            "waist": 0.0
+          },
+          "correspondence": {
+            "jointIdentity": true,
+            "matrixTolerance": 1e-05,
+            "maxMatrixError": 0.0,
+            "maxNormalError": 0.0,
+            "maxPositionErrorM": 0.0,
+            "maxWeightError": 0.0,
+            "positionToleranceM": 0.0001,
+            "skinIdentity": true,
+            "topology": true,
+            "weightTolerance": 1e-06
+          },
+          "host_load_before": [
+            4.34814453125,
+            4.3330078125,
+            4.67578125
+          ],
+          "host_load_after": [
+            4.60009765625,
+            4.39501953125,
+            4.68505859375
+          ]
+        }
+      }
+    },
+    {
+      "case": "female-fat",
+      "character": "female-fat-max-v0-4-0",
+      "character_sha256": "87563be9bbb84e8d3c2f22b542a27a5c9d49bd939156338b45c40e323fb82cb9",
+      "source_sha256": "a98738379acb614c5d070cec2f53e1f7df4fae0cef4c97dee1b08201caa8ef83",
+      "encoding": "standin-binary-f64le-v2",
+      "comparison": {
+        "ok": true,
+        "errors": {
+          "position_m": 0.0,
+          "matrix": 0.0,
+          "weight": 0.0,
+          "normal": 0.0
+        },
+        "limits": {
+          "position_m": 0.0001,
+          "matrix": 1e-05,
+          "weight": 1e-06,
+          "normal": 0.0001
+        },
+        "topology_equal": true,
+        "joint_identity_equal": true,
+        "off_validation": {
+          "version": "final-fbx-v1",
+          "artifact_sha256": "62dbcb244d3b6eba04fca39fd691f193d0329fcf6cc68cc7e3786843684c1863",
+          "scope": "full",
+          "bones": 54,
+          "meshes": 1,
+          "vertices": 105430,
+          "polygons": 210856,
+          "skin_verified": true
+        },
+        "on_validation": {
+          "version": "final-fbx-v1",
+          "artifact_sha256": "2cae1a8ee37855f9db03d39d039f4f542cb6ac18306b6afedb4d4155f9446010",
+          "scope": "full",
+          "bones": 54,
+          "meshes": 1,
+          "vertices": 105430,
+          "polygons": 210856,
+          "skin_verified": true
+        }
+      },
+      "runs": {
+        "off": {
+          "body_prepare_seconds": 24.711139541934244,
+          "body_run_job_seconds": 23.51843583304435,
+          "file_ready_seconds": 33.674315416952595,
+          "model_ready_seconds": 30.41096666699741,
+          "peak_rss_bytes": 1031503872,
+          "fbx_io": {
+            "parse": {
+              "disk_calls": 13,
+              "memory_calls": 0,
+              "disk_bytes": 87118524
+            },
+            "write": {
+              "disk_calls": 6,
+              "memory_calls": 0,
+              "disk_bytes": 40202872
+            }
+          },
+          "scene_transfer": null,
+          "controls_match": true,
+          "neutral_preparation": {
+            "status": "disabled",
+            "seconds": 6.913832749938592,
+            "generation_skipped": false,
+            "rest_import_skipped": false
+          },
+          "shape_controls": {
+            "arm_length": 0.0,
+            "breast_height": 0.0,
+            "breast_projection": 0.0,
+            "breast_size": 0.0,
+            "breast_spacing": 0.0,
+            "breast_width": 0.0,
+            "calf": 0.0,
+            "chest_depth": 0.0,
+            "chest_width": 0.0,
+            "definition": 0.0,
+            "detail_back": 0.0,
+            "detail_calf": 0.0,
+            "detail_chest": 0.0,
+            "detail_forearm": 0.0,
+            "detail_shoulder": 0.0,
+            "detail_thigh": 0.0,
+            "detail_upperarm": 0.0,
+            "fat_arms": 0.0,
+            "fat_distribution": 0.2,
+            "fat_gain": 0.0,
+            "fat_legs": 0.0,
+            "fat_torso": 0.0,
+            "glute": 0.0,
+            "head_depth": 0.0,
+            "head_scale": 1.03,
+            "head_width": 0.0,
+            "heads": 8.000001,
+            "height_cm": 169.893087,
+            "leg_length": 0.0,
+            "leg_ratio": 0.0,
+            "muscle": 0.0,
+            "neck_length": 0.0,
+            "neck_width": 0.0,
+            "pelvis": 0.0,
+            "physique": 1.4,
+            "shoulders": 0.0,
+            "thigh": 0.0,
+            "torso_length": 0.0,
+            "waist": 0.0
+          },
+          "correspondence": {
+            "jointIdentity": true,
+            "matrixTolerance": 1e-05,
+            "maxMatrixError": 0.0,
+            "maxNormalError": 0.0,
+            "maxPositionErrorM": 0.0,
+            "maxWeightError": 0.0,
+            "positionToleranceM": 0.0001,
+            "skinIdentity": true,
+            "topology": true,
+            "weightTolerance": 1e-06
+          },
+          "host_load_before": [
+            4.13037109375,
+            4.26806640625,
+            4.76513671875
+          ],
+          "host_load_after": [
+            4.4228515625,
+            4.3046875,
+            4.75634765625
+          ]
+        },
+        "on": {
+          "body_prepare_seconds": 24.45703033299651,
+          "body_run_job_seconds": 23.148175291949883,
+          "file_ready_seconds": 33.74151637498289,
+          "model_ready_seconds": 30.615976457949728,
+          "peak_rss_bytes": 1188036608,
+          "fbx_io": {
+            "parse": {
+              "disk_calls": 12,
+              "memory_calls": 1,
+              "disk_bytes": 80413936
+            },
+            "write": {
+              "disk_calls": 5,
+              "memory_calls": 1,
+              "disk_bytes": 33498284
+            }
+          },
+          "scene_transfer": {
+            "schema": "body-scene-transfer.v1",
+            "status": "transferred",
+            "disk_full_mesh_imports_avoided": 1,
+            "disk_full_mesh_exports_avoided": 1,
+            "memory_rig_roundtrips": 1,
+            "memory_rig_bytes": 127116,
+            "seconds": 21.067526416969486
+          },
+          "controls_match": true,
+          "neutral_preparation": {
+            "status": "disabled",
+            "seconds": 6.910288000013679,
+            "generation_skipped": false,
+            "rest_import_skipped": false
+          },
+          "shape_controls": {
+            "arm_length": 0.0,
+            "breast_height": 0.0,
+            "breast_projection": 0.0,
+            "breast_size": 0.0,
+            "breast_spacing": 0.0,
+            "breast_width": 0.0,
+            "calf": 0.0,
+            "chest_depth": 0.0,
+            "chest_width": 0.0,
+            "definition": 0.0,
+            "detail_back": 0.0,
+            "detail_calf": 0.0,
+            "detail_chest": 0.0,
+            "detail_forearm": 0.0,
+            "detail_shoulder": 0.0,
+            "detail_thigh": 0.0,
+            "detail_upperarm": 0.0,
+            "fat_arms": 0.0,
+            "fat_distribution": 0.2,
+            "fat_gain": 0.0,
+            "fat_legs": 0.0,
+            "fat_torso": 0.0,
+            "glute": 0.0,
+            "head_depth": 0.0,
+            "head_scale": 1.03,
+            "head_width": 0.0,
+            "heads": 8.000001,
+            "height_cm": 169.893087,
+            "leg_length": 0.0,
+            "leg_ratio": 0.0,
+            "muscle": 0.0,
+            "neck_length": 0.0,
+            "neck_width": 0.0,
+            "pelvis": 0.0,
+            "physique": 1.4,
+            "shoulders": 0.0,
+            "thigh": 0.0,
+            "torso_length": 0.0,
+            "waist": 0.0
+          },
+          "correspondence": {
+            "jointIdentity": true,
+            "matrixTolerance": 1e-05,
+            "maxMatrixError": 0.0,
+            "maxNormalError": 0.0,
+            "maxPositionErrorM": 0.0,
+            "maxWeightError": 0.0,
+            "positionToleranceM": 0.0001,
+            "skinIdentity": true,
+            "topology": true,
+            "weightTolerance": 1e-06
+          },
+          "host_load_before": [
+            4.4228515625,
+            4.3046875,
+            4.75634765625
+          ],
+          "host_load_after": [
+            5.845703125,
+            4.6025390625,
+            4.841796875
+          ]
+        }
+      }
+    },
+    {
+      "case": "female-large",
+      "character": "female-base-v0-4-0",
+      "character_sha256": "ffd7b57d6ebba06299be252976b511afe5684a237e6f7d440bb90b2ba20f0c33",
+      "source_sha256": "a98738379acb614c5d070cec2f53e1f7df4fae0cef4c97dee1b08201caa8ef83",
+      "encoding": "standin-binary-f64le-v2",
+      "comparison": {
+        "ok": true,
+        "errors": {
+          "position_m": 0.0,
+          "matrix": 0.0,
+          "weight": 0.0,
+          "normal": 0.0
+        },
+        "limits": {
+          "position_m": 0.0001,
+          "matrix": 1e-05,
+          "weight": 1e-06,
+          "normal": 0.0001
+        },
+        "topology_equal": true,
+        "joint_identity_equal": true,
+        "off_validation": {
+          "version": "final-fbx-v1",
+          "artifact_sha256": "cd1e2f7a993de53e1bace0c566d1a66b6fd39bb0b3d53f35bf90b3440d9ae7eb",
+          "scope": "full",
+          "bones": 54,
+          "meshes": 1,
+          "vertices": 105430,
+          "polygons": 210856,
+          "skin_verified": true
+        },
+        "on_validation": {
+          "version": "final-fbx-v1",
+          "artifact_sha256": "0dc2337362ffcc42d5264948e5995451d9ad97bc121b145c5bf3067f4ef471bb",
+          "scope": "full",
+          "bones": 54,
+          "meshes": 1,
+          "vertices": 105430,
+          "polygons": 210856,
+          "skin_verified": true
+        }
+      },
+      "runs": {
+        "on": {
+          "body_prepare_seconds": 20.514030833961442,
+          "body_run_job_seconds": 19.360469041974284,
+          "file_ready_seconds": 29.341756084002554,
+          "model_ready_seconds": 26.231623917003162,
+          "peak_rss_bytes": 1357135872,
+          "fbx_io": {
+            "parse": {
+              "disk_calls": 12,
+              "memory_calls": 1,
+              "disk_bytes": 80446224
+            },
+            "write": {
+              "disk_calls": 5,
+              "memory_calls": 1,
+              "disk_bytes": 33510508
+            }
+          },
+          "scene_transfer": {
+            "schema": "body-scene-transfer.v1",
+            "status": "transferred",
+            "disk_full_mesh_imports_avoided": 1,
+            "disk_full_mesh_exports_avoided": 1,
+            "memory_rig_roundtrips": 1,
+            "memory_rig_bytes": 127116,
+            "seconds": 17.631339833023958
+          },
+          "controls_match": true,
+          "neutral_preparation": {
+            "status": "disabled",
+            "seconds": 5.003662458038889,
+            "generation_skipped": false,
+            "rest_import_skipped": false
+          },
+          "shape_controls": {
+            "arm_length": 0.0,
+            "breast_height": 0.0,
+            "breast_projection": 0.0,
+            "breast_size": 0.0,
+            "breast_spacing": 0.0,
+            "breast_width": 0.0,
+            "calf": 0.0,
+            "chest_depth": 0.0,
+            "chest_width": 0.0,
+            "definition": 0.0,
+            "detail_back": 0.0,
+            "detail_calf": 0.0,
+            "detail_chest": 0.0,
+            "detail_forearm": 0.0,
+            "detail_shoulder": 0.0,
+            "detail_thigh": 0.0,
+            "detail_upperarm": 0.0,
+            "fat_arms": 0.0,
+            "fat_distribution": 0.0,
+            "fat_gain": 0.0,
+            "fat_legs": 0.0,
+            "fat_torso": 0.0,
+            "glute": 0.0,
+            "head_depth": 0.0,
+            "head_scale": 1.0,
+            "head_width": 0.0,
+            "heads": 8.000001,
+            "height_cm": 184.893087,
+            "leg_length": 0.0,
+            "leg_ratio": 0.0,
+            "muscle": 0.0,
+            "neck_length": 0.0,
+            "neck_width": 0.0,
+            "pelvis": 0.0,
+            "physique": 1.2,
+            "shoulders": 0.0,
+            "thigh": 0.0,
+            "torso_length": 0.0,
+            "waist": 0.0
+          },
+          "correspondence": {
+            "jointIdentity": true,
+            "matrixTolerance": 1e-05,
+            "maxMatrixError": 0.0,
+            "maxNormalError": 0.0,
+            "maxPositionErrorM": 0.0,
+            "maxWeightError": 0.0,
+            "positionToleranceM": 0.0001,
+            "skinIdentity": true,
+            "topology": true,
+            "weightTolerance": 1e-06
+          },
+          "host_load_before": [
+            5.61767578125,
+            4.57568359375,
+            4.83056640625
+          ],
+          "host_load_after": [
+            4.93505859375,
+            4.49658203125,
+            4.79443359375
+          ]
+        },
+        "off": {
+          "body_prepare_seconds": 21.30880649993196,
+          "body_run_job_seconds": 20.11228745803237,
+          "file_ready_seconds": 30.119643041980453,
+          "model_ready_seconds": 27.00413200003095,
+          "peak_rss_bytes": 1158709248,
+          "fbx_io": {
+            "parse": {
+              "disk_calls": 13,
+              "memory_calls": 0,
+              "disk_bytes": 87153484
+            },
+            "write": {
+              "disk_calls": 6,
+              "memory_calls": 0,
+              "disk_bytes": 40217768
+            }
+          },
+          "scene_transfer": null,
+          "controls_match": true,
+          "neutral_preparation": {
+            "status": "disabled",
+            "seconds": 4.897479249979369,
+            "generation_skipped": false,
+            "rest_import_skipped": false
+          },
+          "shape_controls": {
+            "arm_length": 0.0,
+            "breast_height": 0.0,
+            "breast_projection": 0.0,
+            "breast_size": 0.0,
+            "breast_spacing": 0.0,
+            "breast_width": 0.0,
+            "calf": 0.0,
+            "chest_depth": 0.0,
+            "chest_width": 0.0,
+            "definition": 0.0,
+            "detail_back": 0.0,
+            "detail_calf": 0.0,
+            "detail_chest": 0.0,
+            "detail_forearm": 0.0,
+            "detail_shoulder": 0.0,
+            "detail_thigh": 0.0,
+            "detail_upperarm": 0.0,
+            "fat_arms": 0.0,
+            "fat_distribution": 0.0,
+            "fat_gain": 0.0,
+            "fat_legs": 0.0,
+            "fat_torso": 0.0,
+            "glute": 0.0,
+            "head_depth": 0.0,
+            "head_scale": 1.0,
+            "head_width": 0.0,
+            "heads": 8.000001,
+            "height_cm": 184.893087,
+            "leg_length": 0.0,
+            "leg_ratio": 0.0,
+            "muscle": 0.0,
+            "neck_length": 0.0,
+            "neck_width": 0.0,
+            "pelvis": 0.0,
+            "physique": 1.2,
+            "shoulders": 0.0,
+            "thigh": 0.0,
+            "torso_length": 0.0,
+            "waist": 0.0
+          },
+          "correspondence": {
+            "jointIdentity": true,
+            "matrixTolerance": 1e-05,
+            "maxMatrixError": 0.0,
+            "maxNormalError": 0.0,
+            "maxPositionErrorM": 0.0,
+            "maxWeightError": 0.0,
+            "positionToleranceM": 0.0001,
+            "skinIdentity": true,
+            "topology": true,
+            "weightTolerance": 1e-06
+          },
+          "host_load_before": [
+            4.93505859375,
+            4.49658203125,
+            4.79443359375
+          ],
+          "host_load_after": [
+            4.341796875,
+            4.3857421875,
+            4.74267578125
+          ]
+        }
+      }
+    }
+  ],
+  "v1_compatibility": {
+    "character": "female-base-v0-4-0",
+    "encoding": "typed-f64be-json-v1",
+    "comparison": {
+      "ok": true,
+      "errors": {
+        "position_m": 0.0,
+        "matrix": 0.0,
+        "weight": 0.0,
+        "normal": 0.0
+      },
+      "limits": {
+        "position_m": 0.0001,
+        "matrix": 1e-05,
+        "weight": 1e-06,
+        "normal": 0.0001
+      },
+      "topology_equal": true,
+      "joint_identity_equal": true,
+      "off_validation": {
+        "version": "final-fbx-v1",
+        "artifact_sha256": "118945aa0d7d8d9915df6993340d77a4cf5664991af81742e7a170ee3959d95c",
+        "scope": "full",
+        "bones": 54,
+        "meshes": 1,
+        "vertices": 105430,
+        "polygons": 210856,
+        "skin_verified": true
+      },
+      "on_validation": {
+        "version": "final-fbx-v1",
+        "artifact_sha256": "9a195778ae24107957435705698e531da7d418fcb87249baac9d429014b3bd23",
+        "scope": "full",
+        "bones": 54,
+        "meshes": 1,
+        "vertices": 105430,
+        "polygons": 210856,
+        "skin_verified": true
+      }
+    }
+  },
+  "contracts": [
+    {
+      "character": "male-base-v0-8-0",
+      "pose": "ob_001.bvh",
+      "scope": "full",
+      "hands": null,
+      "budget": null,
+      "ok": true,
+      "comparison": {
+        "ok": true,
+        "errors": {
+          "position_m": 0.0,
+          "matrix": 0.0,
+          "weight": 0.0,
+          "normal": 0.0
+        },
+        "limits": {
+          "position_m": 0.0001,
+          "matrix": 1e-05,
+          "weight": 1e-06,
+          "normal": 0.0001
+        },
+        "topology_equal": true,
+        "joint_identity_equal": true,
+        "off_validation": {
+          "version": "final-fbx-v1",
+          "artifact_sha256": "9e1a0170f3ff8288fbf39e1bc69bf045ec7bb45b8e64238034c7c76ae99a1276",
+          "scope": "full",
+          "bones": 54,
+          "meshes": 1,
+          "vertices": 139474,
+          "polygons": 278944,
+          "skin_verified": true
+        },
+        "on_validation": {
+          "version": "final-fbx-v1",
+          "artifact_sha256": "226e6af4c0b2634b36e0a3931fb019946bdc036e1c3cd7f77e8ec30a8cd858d4",
+          "scope": "full",
+          "bones": 54,
+          "meshes": 1,
+          "vertices": 139474,
+          "polygons": 278944,
+          "skin_verified": true
+        }
+      },
+      "scene_transfer": {
+        "disk_full_mesh_exports_avoided": 1,
+        "disk_full_mesh_imports_avoided": 1,
+        "memory_rig_bytes": 127196,
+        "memory_rig_roundtrips": 1,
+        "schema": "body-scene-transfer.v1",
+        "seconds": 16.132368292077444,
+        "status": "transferred"
+      }
+    },
+    {
+      "character": "male-base-v0-8-0",
+      "pose": "ob_001.bvh",
+      "scope": "bust",
+      "hands": {
+        "left": "open",
+        "right": "relaxed"
+      },
+      "budget": null,
+      "ok": true,
+      "comparison": {
+        "ok": true,
+        "errors": {
+          "position_m": 0.0,
+          "matrix": 0.0,
+          "weight": 0.0,
+          "normal": 0.0
+        },
+        "limits": {
+          "position_m": 0.0001,
+          "matrix": 1e-05,
+          "weight": 1e-06,
+          "normal": 0.0001
+        },
+        "topology_equal": true,
+        "joint_identity_equal": true,
+        "off_validation": {
+          "version": "final-fbx-v1",
+          "artifact_sha256": "3ad5591ccbc7434a416777ba39238172f2c3f0374bd287d7680a84e8014ef8cb",
+          "scope": "bust",
+          "bones": 54,
+          "meshes": 1,
+          "vertices": 22141,
+          "polygons": 43773,
+          "skin_verified": true
+        },
+        "on_validation": {
+          "version": "final-fbx-v1",
+          "artifact_sha256": "c10454047216d987f5e7d967b336017034b1dceebfb941d3ddb48da34b7d617a",
+          "scope": "bust",
+          "bones": 54,
+          "meshes": 1,
+          "vertices": 22141,
+          "polygons": 43773,
+          "skin_verified": true
+        }
+      },
+      "scene_transfer": {
+        "disk_full_mesh_exports_avoided": 1,
+        "disk_full_mesh_imports_avoided": 1,
+        "memory_rig_bytes": 127196,
+        "memory_rig_roundtrips": 1,
+        "schema": "body-scene-transfer.v1",
+        "seconds": 17.962171333958395,
+        "status": "transferred"
+      }
+    },
+    {
+      "character": "female-base-v0-4-0",
+      "pose": "ob_001.bvh",
+      "scope": "full",
+      "hands": null,
+      "budget": null,
+      "ok": true,
+      "comparison": {
+        "ok": true,
+        "errors": {
+          "position_m": 0.0,
+          "matrix": 0.0,
+          "weight": 0.0,
+          "normal": 0.0
+        },
+        "limits": {
+          "position_m": 0.0001,
+          "matrix": 1e-05,
+          "weight": 1e-06,
+          "normal": 0.0001
+        },
+        "topology_equal": true,
+        "joint_identity_equal": true,
+        "off_validation": {
+          "version": "final-fbx-v1",
+          "artifact_sha256": "169e49ed801a6a562460981db2f64c874c9837ee4760ad8e7308f73dd83474b4",
+          "scope": "full",
+          "bones": 54,
+          "meshes": 1,
+          "vertices": 105430,
+          "polygons": 210856,
+          "skin_verified": true
+        },
+        "on_validation": {
+          "version": "final-fbx-v1",
+          "artifact_sha256": "5df8e6f2307c731743fa1bf1c09503aca83fed67c3f65d68ceda4e6eeeb5e5e8",
+          "scope": "full",
+          "bones": 54,
+          "meshes": 1,
+          "vertices": 105430,
+          "polygons": 210856,
+          "skin_verified": true
+        }
+      },
+      "scene_transfer": {
+        "disk_full_mesh_exports_avoided": 1,
+        "disk_full_mesh_imports_avoided": 1,
+        "memory_rig_bytes": 127020,
+        "memory_rig_roundtrips": 1,
+        "schema": "body-scene-transfer.v1",
+        "seconds": 10.50425166694913,
+        "status": "transferred"
+      }
+    },
+    {
+      "character": "female-base-v0-4-0",
+      "pose": "ob_001.bvh",
+      "scope": "bust",
+      "hands": {
+        "left": "open",
+        "right": "relaxed"
+      },
+      "budget": null,
+      "ok": true,
+      "comparison": {
+        "ok": true,
+        "errors": {
+          "position_m": 0.0,
+          "matrix": 0.0,
+          "weight": 0.0,
+          "normal": 0.0
+        },
+        "limits": {
+          "position_m": 0.0001,
+          "matrix": 1e-05,
+          "weight": 1e-06,
+          "normal": 0.0001
+        },
+        "topology_equal": true,
+        "joint_identity_equal": true,
+        "off_validation": {
+          "version": "final-fbx-v1",
+          "artifact_sha256": "7302e9af5c05382e8db99ee480560c18f183adab0b1c2c3dee757e24c553affe",
+          "scope": "bust",
+          "bones": 54,
+          "meshes": 1,
+          "vertices": 4865,
+          "polygons": 9491,
+          "skin_verified": true
+        },
+        "on_validation": {
+          "version": "final-fbx-v1",
+          "artifact_sha256": "28c6312e2dd9b9a936e023f24ba7786316ac3256776540b9c9c59093f8d65147",
+          "scope": "bust",
+          "bones": 54,
+          "meshes": 1,
+          "vertices": 4865,
+          "polygons": 9491,
+          "skin_verified": true
+        }
+      },
+      "scene_transfer": {
+        "disk_full_mesh_exports_avoided": 1,
+        "disk_full_mesh_imports_avoided": 1,
+        "memory_rig_bytes": 127020,
+        "memory_rig_roundtrips": 1,
+        "schema": "body-scene-transfer.v1",
+        "seconds": 9.688265291042626,
+        "status": "transferred"
+      }
+    },
+    {
+      "character": "male-base-v0-8-0",
+      "pose": "ob_083.bvh",
+      "scope": "full",
+      "hands": null,
+      "budget": null,
+      "ok": true,
+      "comparison": {
+        "ok": true,
+        "errors": {
+          "position_m": 0.0,
+          "matrix": 0.0,
+          "weight": 0.0,
+          "normal": 0.0
+        },
+        "limits": {
+          "position_m": 0.0001,
+          "matrix": 1e-05,
+          "weight": 1e-06,
+          "normal": 0.0001
+        },
+        "topology_equal": true,
+        "joint_identity_equal": true,
+        "off_validation": {
+          "version": "final-fbx-v1",
+          "artifact_sha256": "50ea4b05859af110ecf70e594e47e68530cc5c6849cb5e3191e628bf85b9e7f3",
+          "scope": "full",
+          "bones": 54,
+          "meshes": 1,
+          "vertices": 139474,
+          "polygons": 278944,
+          "skin_verified": true
+        },
+        "on_validation": {
+          "version": "final-fbx-v1",
+          "artifact_sha256": "14d302ebb9e4c0bcb5fb6dab3cf791e5ba14a917269a824ecdffa3e7f0ccbdf9",
+          "scope": "full",
+          "bones": 54,
+          "meshes": 1,
+          "vertices": 139474,
+          "polygons": 278944,
+          "skin_verified": true
+        }
+      },
+      "scene_transfer": {
+        "disk_full_mesh_exports_avoided": 1,
+        "disk_full_mesh_imports_avoided": 1,
+        "memory_rig_bytes": 127020,
+        "memory_rig_roundtrips": 1,
+        "schema": "body-scene-transfer.v1",
+        "seconds": 19.136539957951754,
+        "status": "transferred"
+      }
+    },
+    {
+      "character": "female-base-v0-4-0",
+      "pose": "ob_015.bvh",
+      "scope": "full",
+      "hands": null,
+      "budget": 1e-09,
+      "ok": true,
+      "comparison": {
+        "ok": true,
+        "errors": {
+          "position_m": 0.0,
+          "matrix": 0.0,
+          "weight": 0.0,
+          "normal": 0.0
+        },
+        "limits": {
+          "position_m": 0.0001,
+          "matrix": 1e-05,
+          "weight": 1e-06,
+          "normal": 0.0001
+        },
+        "topology_equal": true,
+        "joint_identity_equal": true,
+        "off_validation": {
+          "version": "final-fbx-v1",
+          "artifact_sha256": "84ecde45af363330543b60a0df41ff886aa0e413e61c30c7df45c986363a219d",
+          "scope": "full",
+          "bones": 54,
+          "meshes": 1,
+          "vertices": 105430,
+          "polygons": 210856,
+          "skin_verified": true
+        },
+        "on_validation": {
+          "version": "final-fbx-v1",
+          "artifact_sha256": "80915194b256380571cf82a981d3125745717d9de19019704b69663ca948f55b",
+          "scope": "full",
+          "bones": 54,
+          "meshes": 1,
+          "vertices": 105430,
+          "polygons": 210856,
+          "skin_verified": true
+        }
+      },
+      "scene_transfer": {
+        "attempt_seconds": 3.546530249994248,
+        "disk_full_mesh_exports_avoided": 0,
+        "disk_full_mesh_imports_avoided": 0,
+        "memory_rig_bytes": 0,
+        "memory_rig_roundtrips": 0,
+        "reason": "TimeoutError",
+        "recovery_seconds": 14.945785292075016,
+        "schema": "body-scene-transfer.v1",
+        "seconds": 18.492415041895583,
+        "status": "legacy_recovery"
+      }
+    }
+  ],
+  "codec_failure_recovery": {
+    "ok": true,
+    "comparison": {
+      "ok": true,
+      "errors": {
+        "position_m": 0.0,
+        "matrix": 0.0,
+        "weight": 0.0,
+        "normal": 0.0
+      },
+      "limits": {
+        "position_m": 0.0001,
+        "matrix": 1e-05,
+        "weight": 1e-06,
+        "normal": 0.0001
+      },
+      "topology_equal": true,
+      "joint_identity_equal": true,
+      "off_validation": {
+        "version": "final-fbx-v1",
+        "artifact_sha256": "f8c039d8a31854b43b0531637bd2ae94091c9b7e89e826fdd6d2404201d80c8b",
+        "scope": "full",
+        "bones": 54,
+        "meshes": 1,
+        "vertices": 105430,
+        "polygons": 210856,
+        "skin_verified": true
+      },
+      "on_validation": {
+        "version": "final-fbx-v1",
+        "artifact_sha256": "8f8e03f2973e1b2177f9eb17773d316dc96ef6756c6d98dbaf913589d272273b",
+        "scope": "full",
+        "bones": 54,
+        "meshes": 1,
+        "vertices": 105430,
+        "polygons": 210856,
+        "skin_verified": true
+      }
+    },
+    "scene_transfer": {
+      "attempt_seconds": 11.903122958960012,
+      "disk_full_mesh_exports_avoided": 0,
+      "disk_full_mesh_imports_avoided": 0,
+      "memory_rig_bytes": 0,
+      "memory_rig_roundtrips": 0,
+      "reason": "RuntimeError",
+      "recovery_seconds": 15.024289957946166,
+      "schema": "body-scene-transfer.v1",
+      "seconds": 26.927537209005095,
+      "status": "legacy_recovery"
+    }
+  },
+  "codec_binding": {
+    "ok": true,
+    "bones": 22,
+    "max_matrix_error": 0.0,
+    "memory_bytes": 57500,
+    "codec_failure_restored_mesh_data": true,
+    "codec_hooks_restored": true,
+    "memory_bound_enforced": true,
+    "recovery_disk_export_succeeded": true
+  },
+  "appearance": [
+    {
+      "character": "male-base-v0-8-0",
+      "flag": "off",
+      "skin_file_verified": true,
+      "skin_csp_certified": true,
+      "outline_file_verified": true,
+      "outline_csp_certified": true
+    },
+    {
+      "character": "male-base-v0-8-0",
+      "flag": "on",
+      "skin_file_verified": true,
+      "skin_csp_certified": true,
+      "outline_file_verified": true,
+      "outline_csp_certified": true
+    },
+    {
+      "character": "female-base-v0-4-0",
+      "flag": "off",
+      "skin_file_verified": true,
+      "skin_csp_certified": true,
+      "outline_file_verified": true,
+      "outline_csp_certified": true
+    },
+    {
+      "character": "female-base-v0-4-0",
+      "flag": "on",
+      "skin_file_verified": true,
+      "skin_csp_certified": true,
+      "outline_file_verified": true,
+      "outline_csp_certified": true
+    }
+  ],
+  "rejected_prototypes": {
+    "direct_frames": {
+      "ok": false,
+      "errors": {
+        "position_m": 6.661563080494495e-06,
+        "matrix": 2.44826078414917e-05,
+        "weight": 0.0,
+        "normal": 0.001767352026397675
+      },
+      "limits": {
+        "position_m": 0.0001,
+        "matrix": 1e-05,
+        "weight": 1e-06,
+        "normal": 0.0001
+      },
+      "topology_equal": true,
+      "joint_identity_equal": true,
+      "off_validation": {
+        "version": "final-fbx-v1",
+        "artifact_sha256": "b6406ceb9f403c822b8b1e461781855e53326105e5f7504d27f84ca1cb461da7",
+        "scope": "full",
+        "bones": 54,
+        "meshes": 1,
+        "vertices": 105430,
+        "polygons": 210856,
+        "skin_verified": true
+      },
+      "on_validation": {
+        "version": "final-fbx-v1",
+        "artifact_sha256": "232d8578ecca49e037ba10f5d94353e65c4be1596677790c12ca636d385c5915",
+        "scope": "full",
+        "bones": 54,
+        "meshes": 1,
+        "vertices": 105430,
+        "polygons": 210856,
+        "skin_verified": true
+      }
+    },
+    "armature_only": {
+      "ok": false,
+      "errors": {
+        "position_m": 5.569511531816863e-06,
+        "matrix": 4.8160552978515625e-05,
+        "weight": 0.0,
+        "normal": 0.001494251787498928
+      },
+      "limits": {
+        "position_m": 0.0001,
+        "matrix": 1e-05,
+        "weight": 1e-06,
+        "normal": 0.0001
+      },
+      "topology_equal": true,
+      "joint_identity_equal": true,
+      "off_validation": {
+        "version": "final-fbx-v1",
+        "artifact_sha256": "c2fdd3a57fe755273190a4a5edaf7251e4beb0b2c01e3566019af0080b1546b6",
+        "scope": "full",
+        "bones": 54,
+        "meshes": 1,
+        "vertices": 105430,
+        "polygons": 210856,
+        "skin_verified": true
+      },
+      "on_validation": {
+        "version": "final-fbx-v1",
+        "artifact_sha256": "95f17e024e7d38633073a516daa3bcd3d7f1106baaa60403b31707b84e487d5f",
+        "scope": "full",
+        "bones": 54,
+        "meshes": 1,
+        "vertices": 105430,
+        "polygons": 210856,
+        "skin_verified": true
+      }
+    }
+  },
+  "checks": {
+    "host_passed": 933,
+    "host_skipped": 1,
+    "smoke_passed": 54,
+    "compileall": true,
+    "diff_check": true
+  },
+  "source_sha256": {
+    "converter/body_scene_transfer.py": "00f0a6964ed567e5db4efabcd0d0b692f18f4209f1539e8b00b23155f2112ef9",
+    "converter/worker.py": "e8c64d689fca59c7198d23c4bd0188644e387a86fd99596b3583b68e174e62dd",
+    "converter/interactive_adapter.py": "e83223e1d4b961327b71c7071f8b02b08fea6fba31bb8d7fc09b95dfb70bff0f",
+    "converter/shape_bake.py": "d599d80a7df8853e844abfc0fb617f735fa1e0a18948960862e2948908160c54",
+    "converter/source_body.py": "d11618a2283f3ba43eb54f9e29e6f4ea0c19b209074efab0c9b94f2f9a065def",
+    "converter/reviewed_pose_frames.json": "2602d9469859fc0ce89d8de0da7c2ffd30874fa98645cca86c6f1ab1d72f84d1",
+    "converter/prepared_body.py": "5f65775a79503eb5219aa9705e1ea4ad7ba6fec00a97ee0ac970a8717e36ae8b",
+    "converter/retarget.py": "96831e315a99ace3cf7121dd315c49e8dbe2f4e98beed6d2633abb57e1d0b6cd",
+    "converter/protocol.py": "008567a7f883f87052d7e80cbe51d2a514008d2a8e7fe15cc06e5606d5e079a2",
+    "converter/final_artifact.py": "d723dd59f959e3c8735261175cb8666d9a5d34a46bdc8a9d9291dfe4937d675b",
+    "converter/interactive_export.py": "7f3a77020cb2abedfffb02bac7f4b1014a5ddc10f7803b1542bc7efb9b05cd46",
+    "converter_api/body_preview.py": "078fdac5fc450e8a8871766b9725a7a871085482b44b153c8e36855b8658e620",
+    "converter_api/interactive.py": "9834a1e857d52020a3f0adeef20f66571b4176b21f83960946485a088bcbe29f",
+    "scripts/benchmark_body_scene_native.py": "b40044008844c92fa825c9add1a4cfd86ac24d014ec242060bae532d2e7f7014",
+    "tests/converter/body_scene_transfer_probe.py": "f84997a002a1d9bdb7d0083318a85a273ce9adf70d068ba0626dd3c0a1e275b3",
+    "Dockerfile.converter": "fa25f3802dd8768df9832715e38921ef95520a79214ac68635eec8573700bafd",
+    "converter/interactive_scene.py": "3571623526e84b7911e74d62510fd19b25b54228b2f2aada88e527f92ea491b0",
+    "converter/lab_timing.py": "8bd59e8039d6f0a15dc222914f423808d75384f2f41ffd75a17402fef8ea4ea9",
+    "converter/first_entry_profile.py": "62aa85f9ab8786ff769799aed463af5b35091f7acaac3bc9e2f0900dadbbb4f9",
+    "converter_api/runner.py": "9c9f7e64f39f3efa2ee42a2e2a4d11c257c77638994a3348e39ef65545024aa8"
+  },
+  "limitations": [
+    "One fresh pair per primary condition; no statistical latency or memory improvement claim.",
+    "Prepared neutrals and completed-result caches disabled on both sides.",
+    "Initial native run overlapped root build ending 2026-11-13T03:55:14+09:00; excluded from primary timing.",
+    "Earlier worker matrix is exploratory and male-large overlaps host tests.",
+    "Hard parent deadline/cancellation rejects publication; no second process beyond caller budget.",
+    "Linux real-model timing and fresh CSP UI review not performed."
+  ],
+  "raw_artifact_roots": [
+    "/private/tmp/standin-scene-transfer-20261113-native-final",
+    "/private/tmp/standin-scene-transfer-20261113-native-final-female-v2",
+    "/private/tmp/standin-scene-transfer-20261113-contracts",
+    "/private/tmp/standin-scene-transfer-20261113-codec-recovery",
+    "/private/tmp/standin-scene-transfer-20261113-appearance"
+  ],
+  "shape_registry_sha256": "90f1bf1ee6974f92170a96c4d694c9a2f6af48aea02be9a0d85ea93038ef2dab",
+  "approved_shape_sources": {
+    "standin-body-0.7.2": {
+      "blend_sha256": "9ff276f6f2c78bd935e1f4179f5e3f6a9c7ef869e3fa60d43b45eb53072d5998",
+      "controller_sha256": "51baa18d05bb1cf4a4268886486f62d6ad16e538dfe234ab75feab4e32d745b9"
+    },
+    "standin-body-0.7.6": {
+      "blend_sha256": "faa8904946b293d629dcedd4bff6dd50505bad2a5853bcaa21556882272d6398",
+      "controller_sha256": "fdad7dcf789a40a0adcc91f5dd71b91b0c53a2a099a58bcb1782fd593b4a86fb"
+    },
+    "standin-body-0.8.0": {
+      "blend_sha256": "a03550749315592c543eeda66a183fe4116380f2068b412105f751c7b2e9c39a",
+      "controller_sha256": "bcdabb7d69534f08400dfbd8a91a52ddc01528428332d4f14d4ad6792a7af8da"
+    },
+    "standin-female-body-0.3.4": {
+      "blend_sha256": "a3622a9d4ae7fa2e88aa3903db102a3f9c4660b3fb34ce376950e8cd2f2bae32",
+      "controller_sha256": "df981aedc3784d38e008f6ddb7c7108ce26d8a528ef31539facdabfe2937eb1f"
+    },
+    "standin-female-body-0.3.9": {
+      "blend_sha256": "3adba411fa3ee9d9b50c40cd8bcbd15eb26f41606aefebfd07db914ecbfbbb31",
+      "controller_sha256": "2221c65d6ebb51210c1cecbe5e5039c87e5a069960ee17120630482cc1d457e9"
+    },
+    "standin-female-body-0.4.0": {
+      "blend_sha256": "5a62d2f3fb49d77fdc04d1c78a361edf9fbab55e71e0e47d3b6b393fae14d3a9",
+      "controller_sha256": "1164dff9a4c6069d0da37b80dd26c61544bc6f9eb9c9f3469c33d457e893e9af"
+    }
+  },
+  "integration": {
+    "pr237_head": "5e6a63fdecf8a6d1ed8dc88fd19203e510ab8ba1",
+    "pr235_head": "c54ea97244be13cd47ccd292b05ae15a29cf89b7",
+    "pr235_merge_tree": "e1776aa3efa85089e675bb572c11352cac898c90",
+    "pr235_merge_clean": true,
+    "integrated_contracts_passed": 956,
+    "integrated_contracts_skipped": 1,
+    "pr172": {
+      "prerequisite": {
+        "returncode": 1,
+        "conflicts": [
+          ".env.example",
+          ".github/workflows/converter-ci.yml",
+          "Dockerfile.converter",
+          "converter/outline_spec.py",
+          "converter_api/app.py",
+          "converter_api/outline.py",
+          "tests/converter/test_body_preview_contract.py",
+          "tests/converter/test_outline_contract.py"
+        ]
+      },
+      "experiment": {
+        "returncode": 1,
+        "conflicts": [
+          ".env.example",
+          ".github/workflows/converter-ci.yml",
+          "Dockerfile.converter",
+          "converter/outline_spec.py",
+          "converter_api/app.py",
+          "converter_api/outline.py",
+          "tests/converter/test_body_preview_contract.py",
+          "tests/converter/test_outline_contract.py"
+        ]
+      },
+      "added_conflict_files": []
+    },
+    "measured_source_hashes_unchanged_after_documentation_rebase": true
+  },
+  "exploratory_raw_artifact_roots": [
+    "/private/tmp/standin-scene-transfer-20261113-native",
+    "/private/tmp/standin-scene-transfer-20261113-matrix-v1",
+    "/private/tmp/standin-scene-transfer-20261113-probe",
+    "/private/tmp/standin-scene-transfer-20261113-rig-probe",
+    "/private/tmp/standin-scene-transfer-20261113-binding-probe"
+  ]
+}

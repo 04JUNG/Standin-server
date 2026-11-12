@@ -97,6 +97,27 @@ async def test_fallback_survives_later_progress_and_is_sent_while_ranking_waits(
 
 
 @pytest.mark.anyio
+async def test_queued_fallback_is_delivered_before_ranking_error(monkeypatch):
+    from api import analysis_stream
+
+    # Complete the producer before the consumer reads either queued event.
+    monkeypatch.setattr(analysis_stream, "Thread", lambda *, target, args, **_: (
+        SimpleNamespace(start=lambda: target(*args))
+    ))
+    base = {"people": [{"candidates": [{"pose_id": "base_pose"}]}]}
+
+    def run(on_fallback):
+        on_fallback(base)
+        raise RuntimeError("ranking failed")
+
+    iterator = stream_analysis(run).body_iterator
+    assert json.loads(await anext(iterator)) == {"type": "fallback", "result": base}
+    assert json.loads(await anext(iterator)) == {"type": "error", "status": 500, "detail": "internal error"}
+    with pytest.raises(StopAsyncIteration):
+        await anext(iterator)
+
+
+@pytest.mark.anyio
 async def test_stream_error_retains_failure_contract_and_hides_exception_text():
     def unavailable(_on_fallback):
         raise HTTPException(503, dict(code="VLM_UNAVAILABLE", reason="rate_limited"))

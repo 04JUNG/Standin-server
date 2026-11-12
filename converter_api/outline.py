@@ -17,7 +17,7 @@ from converter.outline_spec import (VERSION, EXPRESSION, MAPPING, CSP_CERTIFIED,
     runtime_revision, certified, DEFAULT_SURFACE, ACCEPTANCE_SCOPE, supported_targets)
 from converter.scene_contract import FBX_MAGIC
 from converter.framing import validate_scope
-from converter_api.work_queue import current_work
+from converter_api.work_queue import current_work, measured_slot
 
 SHA = re.compile(r'^[0-9a-f]{64}$')
 
@@ -31,7 +31,7 @@ def prepare(runner, data, job, *, checkpoint):
 def _prepare_uncached(runner, data, job, *, checkpoint):
     """Fresh exporter + fresh verifier; publish nothing after cancellation."""
     runner.inspect_blender()
-    with runner._process_slots, tempfile.TemporaryDirectory(prefix='standin-outline-',dir=runner.settings.temp_root) as tmp:
+    with measured_slot(runner._process_slots, worker=True), tempfile.TemporaryDirectory(prefix='standin-outline-',dir=runner.settings.temp_root) as tmp:
         root=Path(tmp); (root/'source.fbx').write_bytes(data)
         job_bytes=json.dumps(job,sort_keys=True,allow_nan=False).encode()
         (root/'job.json').write_bytes(job_bytes)

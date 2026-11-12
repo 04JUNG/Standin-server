@@ -5,11 +5,14 @@ scheduler. Opaque IDs and service authentication, no client-authored file paths.
 Restart invalidates outstanding operations instead of reviving ready markers.
 """
 from __future__ import annotations
-import base64, hmac, json, os, re, shutil, tempfile, threading, time, uuid
+import base64, hmac, json, logging, os, re, shutil, stat, tempfile, threading, time, uuid
 from pathlib import Path
 from fastapi import Request, HTTPException
 from fastapi.responses import Response
-from converter.interactive_adapter import VERSION, atomic_write, body_binding, runtime_revision, shape_binding, load_solved
+from converter.interactive_adapter import (VERSION, STATE_FILES, atomic_write, body_binding, read_body_metadata,
+    runtime_revision, shape_binding, load_solved)
+from converter.solved_state import V1_ENCODING
+from converter.solved_state_v2 import ENCODING as V2_ENCODING, MEDIA_TYPE as V2_MEDIA_TYPE, is_v2
 from converter.interactive_camera import camera_for_model
 from converter.interactive_export import export_bundle, Superseded
 from converter.interactive_revision import LatestRevisionGate
@@ -17,7 +20,7 @@ from converter.solved_state import canonical, decode, digest
 from converter.hand_library import load_library, normalize_request
 from converter.protocol import SOLVER_VERSION, SOLVER_MANIFEST_SHA256, JOB_SCHEMA_VERSION
 from converter.shape_spec import resolve_shape
-from converter_api.work_queue import current_work
+from converter_api.work_queue import WorkStopped, current_work, measured_slot
 from converter.interactive_reuse import core_binding, rebind_solved, rebind_export
 
 MAX_REQUEST = 3 * 1024 * 1024
@@ -26,7 +29,26 @@ ID = re.compile(r'^[A-Za-z0-9_-]{1,128}$')
 SHA = re.compile(r'^[a-f0-9]{64}$')
 
 
+def measured(stage, function, *args):
+    """Correlate private work without logging geometry, paths or owner bindings."""
+    started = time.monotonic()
+    succeeded = False
+    try:
+        result = function(*args)
+        succeeded = True
+        return result
+    finally:
+        control = current_work.get()
+        logging.getLogger('standin.converter').info(json.dumps(dict(
+            event='interactive_stage', stage=stage,
+            duration_ms=round((time.monotonic()-started)*1000, 3),
+            succeeded=succeeded,
+            request_id=control.request_id if control else None)))
+
+
 class SnapshotStore:
+    SOLVE_RESERVE_BYTES = 512 * 1024**2
+
     def __init__(self, root, registry, runner, *, ttl=3600, capacity=64, byte_limit=2*1024**3):
         requested=Path(root)
         if requested.is_symlink():raise ValueError('private root cannot be a symlink')
@@ -45,23 +67,83 @@ class SnapshotStore:
         for old in self.root.iterdir():
             if old.name.startswith(('body-','snapshot-','variant-')) and old.is_dir() and not old.is_symlink():shutil.rmtree(old)
         self.registry=registry;self.runner=runner;self.ttl=ttl;self.capacity=capacity;self.byte_limit=byte_limit
+        from converter_api.body_metadata import BodyMetadataCache
+        self.body_metadata = BodyMetadataCache(capacity)
         self.entries={};self.bases={};self.variant_cache={};self.lock=threading.RLock();self.gate=LatestRevisionGate(capacity)
 
-    def _gc(self):
+    @staticmethod
+    def _disk_bytes(directory):
+        size = 0
+        for path in directory.rglob('*'):
+            try:
+                info = path.lstat()
+            except FileNotFoundError:
+                # A running worker can rename a temporary file during the walk.
+                continue
+            if stat.S_ISREG(info.st_mode):
+                size += info.st_size
+        return size
+
+    def _gc(self, preferred_base=None):
         now=time.monotonic()
+        latest = {}
+        for e in self.entries.values():
+            scope = (e['owner'], e['person'])
+            latest[scope] = max(latest.get(scope, 0), e['revision'])
         for key,e in list(self.entries.items()):
-            if not e['busy'] and now>=e['expiry']:
+            scope = (e['owner'], e['person'])
+            if not e['busy'] and (now >= e['expiry'] or e['revision'] < latest[scope]):
                 shutil.rmtree(e['directory']);del self.entries[key]
                 if not any(other['owner']==e['owner'] and other['person']==e['person'] for other in self.entries.values()):
                     self.gate.forget(e['owner'],e['person'])
-        for key,b in list(self.bases.items()):
-            if now>=b['expiry'] and not b['busy']:
+        referenced_bases = {id(e['base']) for e in self.entries.values() if 'base' in e}
+        idle_bases = {key:b for key,b in self.bases.items() if not b['busy'] and id(b) not in referenced_bases}
+        for key,b in list(idle_bases.items()):
+            if now>=b['expiry']:
                 shutil.rmtree(b['directory']);del self.bases[key]
+                del idle_bases[key]
         for key,v in list(self.variant_cache.items()):
             if now>=v['expiry']:
                 shutil.rmtree(v['directory']);del self.variant_cache[key]
-        size=sum(p.stat().st_size for p in self.root.rglob('*') if p.is_file() and not p.is_symlink())
-        if len(self.entries)>=self.capacity or size+512*1024**2*(1+sum(e['busy'] for e in self.entries.values()))>self.byte_limit:
+        size = self._disk_bytes(self.root)
+        busy = sum(e['busy'] for e in self.entries.values())
+        reserve = self.SOLVE_RESERVE_BYTES * (1 + busy)
+        entry_limit = len(self.entries) >= self.capacity
+        reclaimed = 0
+        if not entry_limit and size + reserve > self.byte_limit:
+            # Variants are optional suggestions, and an unused body can be rebuilt.
+            # Keep live snapshot files and their bases, including active workers.
+            referenced_cores = {e['core'] for e in self.entries.values() if 'core' in e}
+            unused_cores = [core for b in self.bases.values() if not b['busy']
+                            for core in (b['directory']/'cores').glob('*')
+                            if core.is_dir() and not core.is_symlink() and core not in referenced_cores]
+            eviction_order = [
+                *((self.variant_cache, key, value['directory']) for key, value in self.variant_cache.items()),
+                *((None, None, core) for core in unused_cores),
+                *((self.bases, key, self.bases[key]['directory']) for key in sorted(
+                    idle_bases, key=lambda key: (key == preferred_base, idle_bases[key]['expiry'])
+                )),
+            ]
+            for cache, key, directory in eviction_order:
+                removed = self._disk_bytes(directory)
+                shutil.rmtree(directory)
+                if cache is not None:
+                    del cache[key]
+                reclaimed += removed
+                size -= removed
+                if size + reserve <= self.byte_limit:
+                    size = self._disk_bytes(self.root)
+                    if size + reserve <= self.byte_limit:
+                        break
+        reason = 'entries' if entry_limit else 'disk' if size + reserve > self.byte_limit else None
+        if reason or reclaimed:
+            control = current_work.get()
+            logging.getLogger('standin.converter').info(json.dumps(dict(
+                event='interactive_capacity', result='rejected' if reason else 'reclaimed',
+                reason=reason, used_bytes=size, reserved_bytes=reserve, reclaimed_bytes=reclaimed,
+                byte_limit=self.byte_limit, entries=len(self.entries), entry_limit=self.capacity,
+                busy=busy, request_id=control.request_id if control else None)))
+        if reason:
             raise HTTPException(429,'INTERACTIVE_CAPACITY')
 
     def _get(self, snapshot, owner):
@@ -73,7 +155,7 @@ class SnapshotStore:
             e['checkpoint']()
             return e
 
-    def _child(self, stage, job, identity, base, destination, checkpoint):
+    def _child(self, stage, job, identity, base, destination, checkpoint, encoding=None):
         # Reuse the production scheduler and kill-on-deadline/disconnect fence.
         control=current_work.get()
         def check():
@@ -82,11 +164,13 @@ class SnapshotStore:
         # _run_child is dedicated to the final exporter; this worker has its own
         # fixed script, with the same bounded subprocess cancellation behavior.
         import subprocess
+        queued=time.monotonic()
         with self.runner._process_slots, tempfile.TemporaryFile() as log:
             check();start=time.monotonic()
+            queue_ms=(start-queued)*1000
             p=subprocess.Popen([self.runner.settings.blender_binary,'--background','--factory-startup',
                 '--disable-autoexec','--python-exit-code','1','--python',str(Path(__file__).resolve().parents[1]/'converter/interactive_worker.py'),
-                '--',stage,str(job),str(identity),str(base),str(destination)],stdout=log,stderr=log)
+                '--',stage,str(job),str(identity),str(base),str(destination),*([encoding] if encoding else [])],stdout=log,stderr=log)
             try:
                 while p.poll() is None:
                     check()
@@ -107,18 +191,19 @@ class SnapshotStore:
                     p.terminate()
                     try:p.wait(timeout=2)
                     except subprocess.TimeoutExpired:p.kill();p.wait()
+                execution_ms=(time.monotonic()-start)*1000
+                if control:control.execution_ms+=execution_ms
+                logging.getLogger('standin.converter').info(json.dumps(dict(
+                    event='interactive_blender', stage=stage, queue_wait_ms=round(queue_ms,3),
+                    execution_ms=round(execution_ms,3), return_code=p.returncode,
+                    request_id=control.request_id if control else None)))
 
     def _body_metadata(self,directory,binding):
-        """An interrupted preparation must never poison the next hand revision."""
-        try:
-            metadata=decode((directory/'base.json').read_bytes());snapshot=directory/'body.blend'
-            if (metadata.get('schema')!='interactive-body-base-v1' or metadata.get('binding')!=binding
-                or metadata.get('runtimeRevision')!=runtime_revision() or snapshot.is_symlink()
-                or metadata.get('snapshotSha256')!=digest(snapshot.read_bytes())):return None
-            return metadata
-        except (OSError,ValueError,KeyError,TypeError):return None
+        """Reuse compact camera metadata; rehash v1/v2 artifacts on every access."""
+        return self.body_metadata.read(directory,binding)
 
-    def solve(self, payload):
+    def solve(self, payload, encoding=V1_ENCODING):
+        if encoding not in STATE_FILES:raise ValueError('unsupported state encoding')
         if set(payload)!={'selection','operation','revision','person','bvhBase64','expiresAt'}:raise ValueError('invalid request')
         from datetime import datetime
         deadline=datetime.fromisoformat(payload['expiresAt'].replace('Z','+00:00'))
@@ -154,14 +239,16 @@ class SnapshotStore:
             camera=dict(projection='orthographic',viewMatrix=eye,projectionMatrix=eye,distanceTorso=12.,torsoReferenceSha256=resolved.metadata.sha256,baked=False),
             solver=dict(version=SOLVER_VERSION,manifestSha256=SOLVER_MANIFEST_SHA256,adapterVersion=VERSION,runtimeSha256=runtime_revision()))
         # A per-owner/base lock prevents duplicate retarget jobs and cache races.
-        binding=body_binding(identity);base_key=digest(canonical(binding));request_hash=digest(canonical(payload))
+        binding=body_binding(identity);base_key=digest(canonical(binding))
+        # The same selection in another encoding is a different immutable bundle.
+        request_hash=digest(canonical(payload)) if encoding==V1_ENCODING else digest(canonical([payload,encoding]))
         with self.lock:
             for sid,e in self.entries.items():
                 if e['request']==request_hash:
                     if e['busy']:raise HTTPException(409,'SOLVE_IN_PROGRESS')
                     self._get(sid,owner)
                     return dict(snapshotId=sid,packet=json.loads((e['directory']/'solved/packet.json').read_bytes()))
-            self._gc();revision_checkpoint=self.gate.select_binding(owner,person,revision,request_hash)
+            self._gc(preferred_base=base_key);revision_checkpoint=self.gate.select_binding(owner,person,revision,request_hash)
             expires=time.monotonic()+min(self.ttl,remaining)
             def checkpoint():
                 revision_checkpoint()
@@ -182,14 +269,14 @@ class SnapshotStore:
                 apply_root_translation=False,embed_textures=False,force_exact_v324=False,thumbnail=None,output_scope='full',
                 **({'shape_recipe':recipe} if recipe else {}))
             (job_dir/'job.json').write_text(json.dumps(job));ip=directory/'identity.json';atomic_write(ip,canonical(identity))
-            with base['lock']:
+            with measured_slot(base['lock']):
                 checkpoint()
                 base_directory=base['directory']/'base'
-                metadata=self._body_metadata(base_directory,binding)
+                metadata=measured('body_metadata',self._body_metadata,base_directory,binding)
                 if metadata is None:
                     if base_directory.exists():shutil.rmtree(base_directory)
-                    self._child('prepare',job_dir/'job.json',ip,base_directory,directory/'unused',checkpoint)
-                    metadata=self._body_metadata(base_directory,binding)
+                    measured('body_prepare',self._child,'prepare',job_dir/'job.json',ip,base_directory,directory/'unused',checkpoint)
+                    metadata=measured('body_metadata_after_prepare',self._body_metadata,base_directory,binding)
                 if metadata is None:raise ValueError('body snapshot did not publish completely')
                 # This camera is immutable and never affected by hand variant bounds.
                 identity['camera']=camera_for_model(selection['camera'],metadata['model'],resolved.metadata.sha256,identity['scope'])
@@ -197,28 +284,34 @@ class SnapshotStore:
                 checkpoint()
                 ip.unlink();atomic_write(ip,canonical(identity))
                 core_key = digest(canonical(core_binding(identity)))
+                if encoding != V1_ENCODING:core_key += '-' + encoding
                 core = base['directory']/'cores'/core_key
-                reused = False
+                state = None
                 if core.is_dir():
                     try:
-                        rebind_solved(core, directory/'solved', identity)
-                        reused = True
+                        state = measured('core_rebind',rebind_solved,core, directory/'solved', identity)
                     except (OSError, ValueError):
                         # Private partial/corrupt cache is never display authority.
                         shutil.rmtree(core)
                         shutil.rmtree(directory/'solved', ignore_errors=True)
                         checkpoint()
-                if not reused:
-                    self._child('solve',job_dir/'job.json',ip,base_directory,directory/'solved',checkpoint)
-                    load_solved(directory/'solved'); checkpoint()
+                if state is None:
+                    # v1 keeps the exact previous child invocation; only v2 adds the encoding argument.
+                    measured('blender_solve',self._child,'solve',job_dir/'job.json',ip,base_directory,directory/'solved',checkpoint,
+                             *(() if encoding==V1_ENCODING else (encoding,)))
+                    state,_=measured('validate_before_cache',load_solved,directory/'solved'); checkpoint()
                     core.parent.mkdir(exist_ok=True)
                     shutil.copytree(directory/'solved', core)
                 entry['core'] = core
                 entry['base'] = base
-            state,_=load_solved(directory/'solved');checkpoint()
+            checkpoint()
+            if state.encoding!=encoding:raise ValueError('solved state encoding mismatch')
             with self.lock:
                 entry['stateHash']=state.state_hash
-                entry['packetSha256']=digest((directory/'solved/packet.json').read_bytes())
+                entry['encoding']=state.encoding
+                # v1 serves the JSON packet; v2 serves the binary state itself.
+                entry['modelFile']='solved/packet.json' if encoding==V1_ENCODING else 'solved/'+STATE_FILES[encoding]
+                entry['packetSha256']=digest((directory/entry['modelFile']).read_bytes())
                 entry['runtimeRevision']=runtime_revision()
                 entry['busy']=False;base['expiry']=time.monotonic()+self.ttl
             return dict(snapshotId=sid,packet=state.packet())
@@ -231,13 +324,16 @@ class SnapshotStore:
 
     def read(self,snapshot,owner,kind):
         e=self._get(snapshot,owner)
-        if e['busy']:raise HTTPException(409,'NOT_READY')
+        # Export writes only its separate artifact directory. Once the immutable
+        # model is published, an export must not revoke preview reads.
+        if e['busy'] and (kind!='model' or not e.get('stateHash')):
+            raise HTTPException(409,'NOT_READY')
         # Publication already fully validated this immutable packet. Rehash its
         # original bytes on every read instead of decoding the entire surface
         # a second time merely to deliver it. BFF independently parses it too.
         if runtime_revision()!=e['runtimeRevision']:raise ValueError('runtime changed')
         if kind=='model':
-            raw=(e['directory']/'solved/packet.json').read_bytes()
+            raw=(e['directory']/e.get('modelFile','solved/packet.json')).read_bytes()
             if digest(raw)!=e['packetSha256']:raise ValueError('packet changed')
         else:
             from converter.solved_state import decode
@@ -263,30 +359,31 @@ class SnapshotStore:
                 def check():
                     e['checkpoint']()
                     if control:control.check('execution')
-                with e['base']['lock']:
+                with measured_slot(e['base']['lock']):
                     check()
                     cached = e['core']/'verified-export'
                     receipt = None
                     if cached.is_dir():
                         try:
-                            receipt = rebind_export(cached, path, e['directory']/'solved')
+                            receipt = measured('export_rebind',rebind_export,cached, path, e['directory']/'solved')
                         except (OSError, ValueError):
                             shutil.rmtree(cached)
                             shutil.rmtree(path, ignore_errors=True)
                             check()
                     if receipt is None:
-                        with self.runner._process_slots:
-                            receipt=export_bundle(self.runner.settings.blender_binary,e['directory']/'solved',path,e['stateHash'],checkpoint=check)
+                        with measured_slot(self.runner._process_slots, worker=True):
+                            receipt=measured('export_bundle',lambda: export_bundle(self.runner.settings.blender_binary,e['directory']/'solved',path,e['stateHash'],checkpoint=check))
                         check()
                         shutil.copytree(path, cached)
                     check()
             e['checkpoint']()
             with self.lock:
-                if receipt['stateHash'] not in self.variant_cache:
+                # Only typed JSON states can join the v1 hand variant atlas.
+                if e.get('encoding',V1_ENCODING)==V1_ENCODING and receipt['stateHash'] not in self.variant_cache:
                     while len(self.variant_cache)>=16:
                         oldest=next(iter(self.variant_cache));shutil.rmtree(self.variant_cache.pop(oldest)['directory'])
                     cache=Path(tempfile.mkdtemp(prefix='variant-',dir=self.root))
-                    atomic_write(cache/'state.json',(e['directory']/'solved/state.canonical.json').read_bytes())
+                    atomic_write(cache/'state.json',(e['directory']/'solved'/STATE_FILES[V1_ENCODING]).read_bytes())
                     atomic_write(cache/'receipt.json',json.dumps(receipt,separators=(',',':')).encode())
                     self.variant_cache[receipt['stateHash']]=dict(directory=cache,owner=owner,expiry=e['expiry'])
             return receipt
@@ -296,18 +393,26 @@ class SnapshotStore:
     def variants(self,snapshot,owner):
         from converter.interactive_variants import asset_binding, build_table
         current=self._get(snapshot,owner)
+        # Answer before decoding anything: binary states have no v1 atlas.
+        if current.get('encoding',V1_ENCODING)!=V1_ENCODING:raise HTTPException(409,'VARIANTS_UNAVAILABLE')
         state,_=load_solved(current['directory']/'solved')
         binding=asset_binding(state.payload['identity']);pairs=[];keys=set();budget=0
         with self.lock:entries=list(reversed(list(self.variant_cache.values())))
         for entry in entries:
             proof=entry['directory']/'receipt.json'
-            if entry['owner']!=owner or time.monotonic()>=entry['expiry'] or not proof.is_file():continue
-            receipt=json.loads(proof.read_bytes())
+            if entry['owner']!=owner or time.monotonic()>=entry['expiry']:continue
+            try:
+                receipt=json.loads(proof.read_bytes())
+            except FileNotFoundError:
+                continue
             if asset_binding(receipt['identity'])!=binding:continue
             hands=receipt['identity']['hands'];key=(hands['left'],hands['right'])
             if key in keys:continue
             from converter.solved_state import SolvedPoseState
-            candidate=SolvedPoseState((entry['directory']/'state.json').read_bytes())
+            try:
+                candidate=SolvedPoseState((entry['directory']/'state.json').read_bytes())
+            except FileNotFoundError:
+                continue
             # Keep the whole response bounded, including canonical JSON escaping.
             cost=len(candidate.canonical_bytes)*2
             if budget+cost>60*1024*1024:continue
@@ -327,7 +432,23 @@ class SnapshotStore:
             self.gate.cancel_revision(owner,person,revision)
 
 
+def binary_state_enabled():
+    """Operator kill switch. Disabled answers v2 requests with v1 packets."""
+    value=os.getenv('CONVERTER_INTERACTIVE_BINARY_STATE','1').strip().lower()
+    if value not in ('0','1','true','false'):raise ValueError('CONVERTER_INTERACTIVE_BINARY_STATE must be 0 or 1')
+    return value in ('1','true')
+
+
+def requested_encoding(request):
+    """BFF opt-in via X-Standin-State-Encoding. Absent keeps the v1 contract."""
+    value=request.headers.get('x-standin-state-encoding','').strip()
+    if value in ('',V1_ENCODING):return V1_ENCODING
+    if value!=V2_ENCODING:raise HTTPException(400,'UNSUPPORTED_STATE_ENCODING')
+    return V2_ENCODING if binary_state_enabled() else V1_ENCODING
+
+
 def register_interactive(app,registry,runner):
+    binary_state_enabled()  # fail startup on an invalid operator value
     if os.getenv('CONVERTER_INTERACTIVE_ENABLED','false').lower()!='true':return
     token=os.getenv('CONVERTER_INTERACTIVE_TOKEN','')
     root=os.getenv('CONVERTER_INTERACTIVE_ROOT','')
@@ -348,15 +469,19 @@ def register_interactive(app,registry,runner):
         except (ValueError,UnicodeError):raise HTTPException(400,'INVALID_INPUT')
     def guarded(function,*args):
         try:return function(*args)
-        except HTTPException:raise
+        except (HTTPException, WorkStopped):raise
         except Superseded:raise HTTPException(409,'SUPERSEDED')
         except (ValueError,KeyError,TypeError):raise HTTPException(409,'INTERACTIVE_INTEGRITY')
         except Exception:raise HTTPException(503,'INTERACTIVE_WORKER_FAILED')
     @app.post('/interactive/v1/solve')
     async def solve(request:Request):
-        authorized(request);payload=await body(request)
+        authorized(request);encoding=requested_encoding(request);payload=await body(request)
         from starlette.concurrency import run_in_threadpool
-        return await run_in_threadpool(guarded,store.solve,payload)
+        from fastapi.responses import JSONResponse
+        args=(payload,) if encoding==V1_ENCODING else (payload,encoding)
+        result=await run_in_threadpool(measured,'solve_total',guarded,store.solve,*args)
+        actual=(result.get('packet') or {}).get('canonicalEncoding') if isinstance(result,dict) else None
+        return JSONResponse(result,headers={'X-Standin-State-Encoding':actual} if actual else None)
     @app.post('/interactive/v1/static/resolve')
     async def resolve_static(request:Request):
         authorized(request);payload=await body(request)
@@ -375,10 +500,12 @@ def register_interactive(app,registry,runner):
         authorized(request)
         kind=request.url.path.rsplit('/',1)[-1]
         raw=guarded(store.read,snapshot,request.headers.get('x-standin-owner',''),kind)
-        return Response(raw,media_type='application/vnd.standin.solved-pose-state-v1+json' if kind=='model' else 'application/octet-stream',headers={'Cache-Control':'private, no-store'})
+        media=('application/octet-stream' if kind!='model' else V2_MEDIA_TYPE if is_v2(raw)
+               else 'application/vnd.standin.solved-pose-state-v1+json')
+        return Response(raw,media_type=media,headers={'Cache-Control':'private, no-store'})
     @app.post('/interactive/v1/snapshots/{snapshot}/export')
     def export(snapshot:str,request:Request):
-        authorized(request);return guarded(store.export,snapshot,request.headers.get('x-standin-owner',''))
+        authorized(request);return measured('export_total',guarded,store.export,snapshot,request.headers.get('x-standin-owner',''))
     @app.get('/interactive/v1/snapshots/{snapshot}/variants')
     def variants(snapshot:str,request:Request):
         authorized(request);raw=guarded(store.variants,snapshot,request.headers.get('x-standin-owner',''))

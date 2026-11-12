@@ -91,14 +91,17 @@ def reselect(engine, person, order, library_cameras, trace, *, lexical_fallback=
     trace['before_screen'] = [row['pose_id'] for row in candidates]
     if not candidates:
         return False
+    gate = getattr(engine, 'hand_skin_gate', None)
     deferred = getattr(engine, 'defer_library_hand_screen', False)
-    if deferred:
+    screened = gate is not None and not deferred
+    if not screened:
         accepted = candidates[:5]
-        trace['screen_deferred'] = True
+        if deferred:
+            trace['screen_deferred'] = True
         screening = {'rejected': [], 'unverified': []}
     else:
         hands = {side: person['hands'][side]['preset'] for side in ('left', 'right')}
-        session = engine.hand_skin_gate.session(hands)
+        session = gate.session(hands)
         accepted = session.filter(candidates, limit=5)
         screening = session.report()
     trace['after_screen'] = [row['pose_id'] for row in accepted]
@@ -110,7 +113,7 @@ def reselect(engine, person, order, library_cameras, trace, *, lexical_fallback=
     if not accepted:
         return False
     report.update(status='ok', reason=None, selected=accepted)
-    if not deferred:
+    if screened:
         report['hand_skin_screen'] = screening
     if crop_recovery:
         report.update(route='geometric', reason='single_subject_recovered_from_crop')
