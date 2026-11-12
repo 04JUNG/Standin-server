@@ -217,6 +217,15 @@ jobs:
             /opt/blender/blender --background --python-exit-code 1 \
             --python /app/tests/converter/test_convert.py
 
+      - name: Verify interactive prepare/solve/export for typed JSON and binary states
+        run: |
+          docker run --rm --platform linux/amd64 \
+            --mount type=bind,source="$ARTIFACT_ROOT",target=/artifacts \
+            --mount type=bind,source="$GITHUB_WORKSPACE/tests/converter",target=/app/tests/converter,readonly \
+            "$CONVERTER_IMAGE" \
+            /opt/blender/blender --background --factory-startup --disable-autoexec --python-exit-code 1 \
+            --python /app/tests/converter/verify_interactive_binary.py -- /artifacts/assets /artifacts/interactive-binary
+
       - name: Verify cached rest geometry preserves every safety metric
         run: |
           docker run --rm --platform linux/amd64 \
