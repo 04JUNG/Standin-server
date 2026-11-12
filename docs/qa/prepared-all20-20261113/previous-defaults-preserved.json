@@ -1,0 +1,30 @@
+{
+  "platform": "darwin/arm64; reference only, never used as a Linux prototype",
+  "unchanged": true,
+  "files": {
+    "results.json": {
+      "bytes": 939,
+      "sha256": "3ede1824183e12b35f0f6cc73edaa31cf2981f790e638b87c8e592eef99462e1"
+    },
+    "shape-bakes.local.json": {
+      "bytes": 399043,
+      "sha256": "5e94fb85c902e5de65d75e63bbccbb63af2c7e87148edc54204863f38088fd3a"
+    },
+    "fbx/prepared-7e145ce6844d71b45a052ca0b236b5c5ad3b2dd8aeea9bb4eb2fcd2054a470b0.fbx": {
+      "bytes": 9063164,
+      "sha256": "36252f375cfb424c723b6eb6694df77bedb59bb97566cbaa7e1163fbb44faf3a"
+    },
+    "fbx/prepared-c80d7d2685abe11404fbee64a2f237f05c76b4083cdc955535d9f1783c49973c.fbx": {
+      "bytes": 6706748,
+      "sha256": "446a5f35a8a3243dbd0acd58a327bf1d51d3954a716fda314c31faa629f8a3f7"
+    },
+    "qa/prepared-c80d7d2685abe11404fbee64a2f237f05c76b4083cdc955535d9f1783c49973c.json": {
+      "bytes": 29113,
+      "sha256": "492482e567d109534516579b40129d1d0d914fc8e95d4ddbbe2ca213c550c21e"
+    },
+    "qa/prepared-7e145ce6844d71b45a052ca0b236b5c5ad3b2dd8aeea9bb4eb2fcd2054a470b0.json": {
+      "bytes": 28960,
+      "sha256": "b940876e34a7ae3277b8a3c36e5c780e40aa1d1faf459900a5c88a8b0043dc81"
+    }
+  }
+}

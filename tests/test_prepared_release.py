@@ -111,6 +111,47 @@ def test_release_rejects_duplicate_source_paths_before_collapsing_them(tmp_path,
         build(release, prepared, 'bad', tmp_path/'out', catalog=catalog, budget_profile=PREPARED_PROFILE)
 
 
+@pytest.mark.parametrize('change', ['catalog-pin', 'release-pin', 'platform', 'partial'])
+def test_release_approval_and_runtime_gates_fail_before_publication(tmp_path, monkeypatch, change):
+    _, catalog, release, prepared = scope_fixture(tmp_path, monkeypatch)
+    kwargs = dict(catalog=catalog, budget_profile=PREPARED_PROFILE)
+    if change == 'catalog-pin':
+        kwargs['catalog'] = None
+    if change == 'release-pin':
+        kwargs['release_sha256'] = '0'*64
+    if change == 'partial':
+        index = json.loads((prepared/'shape-bakes.local.json').read_text())
+        index['prepared_neutrals']['entries'].pop('preset-19')
+        (prepared/'shape-bakes.local.json').write_text(json.dumps(index))
+    if change == 'platform':
+        path = next((prepared/'qa').glob('*.json'))
+        receipt = json.loads(path.read_text()); receipt['identity']['runtime'][2:4] = ['darwin', 'arm64']
+        path.write_text(json.dumps(receipt))
+    with pytest.raises(ValueError):
+        build(release, prepared, 'bad', tmp_path/'out', **kwargs)
+    assert not (tmp_path/'out/manifest.json').exists()
+
+
+def test_upgrading_two_defaults_keeps_their_old_objects_and_all_twenty_recipes(tmp_path, monkeypatch):
+    registry, catalog, release, prepared = scope_fixture(tmp_path, monkeypatch)
+    manifest = json.loads((release/'manifest.json').read_text())
+    previous = {}
+    old_files = []
+    for cid, key in [('preset-0', 'b'*64), ('preset-9', 'c'*64)]:
+        old_files.extend(pair(key, 10))
+        previous[cid] = dict(path=f'/app/body-staging/qa/prepared-{key}.json', sha256='d'*64)
+    registry['prepared_neutrals'] = dict(schema='prepared-neutral-index.v1', entries=previous)
+    raw = json.dumps(registry).encode(); (release/'shape-bakes.json').write_bytes(raw)
+    manifest['files'][0].update(size=len(raw), sha256=hashlib.sha256(raw).hexdigest())
+    manifest['files'].extend(old_files); (release/'manifest.json').write_text(json.dumps(manifest))
+    plan = build(release, prepared, 'expanded', tmp_path/'out', catalog=catalog, budget_profile=PREPARED_PROFILE)
+    new = {f['path']: f for f in json.loads((tmp_path/'out/manifest.json').read_text())['files']}
+    assert all(new[f['path']] == f and f['path'] in plan['copyUnchanged'] for f in old_files)
+    index = json.loads((tmp_path/'out/shape-bakes.json').read_text())['prepared_neutrals']['entries']
+    assert len(index) == 20 and set(previous) <= set(index)
+    assert json.loads((tmp_path/'out/shape-bakes.json').read_text())['characters'] == registry['characters']
+
+
 def test_installer_corruption_preserves_previous_release_and_rollback(tmp_path):
     key = 'body-models/releases/test/presets-aaaaaaaaaaaa/manifest.json'
     data = {'characters.json': b'{}', 'shape-bakes.json': b'old'}
