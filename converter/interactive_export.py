@@ -51,7 +51,7 @@ def _run_child(binary, args, checkpoint, timeout):
 
 
 def export_bundle(binary, bundle, destination, expected_state_hash, *, checkpoint, timeout=180):
-    """Host-side runner: isolated export -> isolated reimport -> latest fence.
+    """Host-side runner: verified immutable copy -> isolated reimport -> latest fence.
 
     A BFF caller must recheck ownership/review/quarantine/expiry/current selection
     when accepting and downloading. This function grants none of those rights.
@@ -65,7 +65,17 @@ def export_bundle(binary, bundle, destination, expected_state_hash, *, checkpoin
     directory = Path(destination); directory.mkdir(parents=True, exist_ok=False)
     common = ['--bundle', str(Path(bundle).resolve()), '--destination', str(directory.resolve()),
               '--state-hash', expected_state_hash]
-    _run_child(binary, ['--stage', 'export', *common], checkpoint, timeout)
+    # solve already froze the exact display FBX. Reopening its .blend in an
+    # export child only copied these same bytes after two redundant scene
+    # captures. Copy on the host, then retain the independent fresh-process
+    # FBX reimport verifier which alone is allowed to emit a receipt.
+    source = Path(bundle)/'staged.fbx'
+    source_sha = digest(source.read_bytes())
+    artifact = directory/'artifact.fbx'
+    shutil.copyfile(source, artifact)
+    if digest(artifact.read_bytes()) != source_sha:
+        raise ValueError('immutable FBX copy changed')
+    checkpoint()
     _run_child(binary, ['--stage', 'verify', *common], checkpoint, timeout)
     receipt = decode((directory/'verified.canonical.json').read_bytes())
     identity = state.payload['identity']
