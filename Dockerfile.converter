@@ -165,6 +165,7 @@ COPY Dockerfile.converter /app/Dockerfile.converter
 COPY converter_api/work_queue.py /app/converter_api/work_queue.py
 COPY converter_api/work_middleware.py /app/converter_api/work_middleware.py
 COPY converter_api/health_timing.py /app/converter_api/health_timing.py
+COPY converter_api/verified_files.py converter_api/body_metadata.py converter_api/health_assets.py /app/converter_api/
 COPY converter_api/scene_runner.py /app/converter_api/scene_runner.py
 COPY converter_api/scene_routes.py /app/converter_api/scene_routes.py
 COPY converter_api/schemas.py /app/converter_api/schemas.py
