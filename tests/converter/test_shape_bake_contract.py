@@ -87,6 +87,19 @@ def test_default_shape_without_request_has_no_digest(tmp_path, monkeypatch):
     assert recipe['shape_sha256'] is None and recipe['values']['muscle'] == 0
 
 
+def test_reviewed_frames_require_the_exact_pose_body_and_unmirrored_export():
+    from converter.source_body import reviewed_frames
+
+    source = '7a15fb28160afdc07ab12f858ff277a7a67f245108f2496ba534a2a572c35962'
+    body = '705035f1bd247b3bf63a6d293065a5a39390b2d228df559474f9dc6682bf8c43'
+    frames = reviewed_frames(source, body)
+    assert frames['pose_id'] == 'ob_083'
+    assert frames['smooth_waist']
+    assert reviewed_frames('0' * 64, body) is None
+    assert reviewed_frames(source, '0' * 64) is None
+    assert reviewed_frames(source, body, mirror=True) is None
+
+
 def test_controller_version_must_match_rules(tmp_path, monkeypatch):
     write_registry(tmp_path, monkeypatch, rules='standin-body-0.7.1', version='standin-body-0.7.0')
     with pytest.raises(ShapeError, match='VERSION'):
