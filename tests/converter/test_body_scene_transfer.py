@@ -105,6 +105,18 @@ def test_recovery_failure_is_recorded_and_propagated(monkeypatch, tmp_path):
     assert trace['status'] == 'failed' and trace['recovery_reason'] == 'RuntimeError'
 
 
+def test_legacy_rejection_cannot_be_reported_as_recovery_success(monkeypatch, tmp_path):
+    monkeypatch.setenv(transfer.FLAG, '1')
+    def fail(**kw):
+        raise ValueError('candidate failed')
+    rejected = Report()
+    rejected.ok = False
+    monkeypatch.setattr(transfer, '_candidate', fail)
+    monkeypatch.setattr(shape_bake, 'convert_shaped', lambda **kw: rejected)
+    result = transfer.convert_shaped(recipe={}, out_path=str(tmp_path/'out.fbx'))
+    assert not result.ok and result.trace['status'] == 'failed'
+
+
 def test_runtime_and_preview_identities_separate_flag_values(monkeypatch):
     from converter.interactive_adapter import runtime_revision
     from converter_api.body_preview import preview_contract

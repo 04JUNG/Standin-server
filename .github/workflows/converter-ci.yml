@@ -91,6 +91,7 @@ jobs:
             tests/test_staging_final_cache.py \
             tests/converter/test_final_cache_remote.py \
             tests/converter/test_worker_contract.py \
+            tests/converter/test_body_scene_transfer.py \
             tests/converter/test_body_material.py \
             tests/converter/test_shape_bake_contract.py \
             tests/converter/test_prepared_body.py \
@@ -225,6 +226,15 @@ jobs:
             "$CONVERTER_IMAGE" \
             /opt/blender/blender --background --factory-startup --disable-autoexec --python-exit-code 1 \
             --python /app/tests/converter/verify_interactive_binary.py -- /artifacts/assets /artifacts/interactive-binary
+
+      - name: Verify bounded memory binding and codec failure recovery
+        run: |
+          docker run --rm --platform linux/amd64 \
+            --mount type=bind,source="$ARTIFACT_ROOT",target=/artifacts \
+            --mount type=bind,source="$GITHUB_WORKSPACE/tests/converter",target=/app/tests/converter,readonly \
+            "$CONVERTER_IMAGE" \
+            /opt/blender/blender --background --factory-startup --disable-autoexec --python-exit-code 1 \
+            --python /app/tests/converter/verify_body_scene_binding.py -- /artifacts/assets /artifacts/body-scene-binding
 
       - name: Verify cached rest geometry preserves every safety metric
         run: |

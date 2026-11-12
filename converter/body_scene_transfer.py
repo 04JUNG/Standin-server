@@ -101,6 +101,10 @@ def canonical_frames(path):
                 del module.open
             else:
                 module.open = value
+        # Blender normally clears this after a successful write. A failed codec
+        # must not retain wrappers for objects discarded by the legacy retry.
+        from io_scene_fbx.fbx_utils import ObjectWrapper
+        ObjectWrapper.cache_clear()
 
 
 def solver_scene(path, bvh_path, *, recipe, rest, options):
@@ -266,6 +270,8 @@ def convert_shaped(*, recipe, out_path, **options):
             trace['recovery_seconds'] = time.monotonic()-recovery
             trace['seconds'] = time.monotonic()-started
             Path(out_path).with_suffix('.scene-transfer.json').write_text(json.dumps(trace, indent=2))
+        if not report.ok:
+            trace['status'] = 'failed'
     trace['seconds'] = time.monotonic()-started
     Path(out_path).with_suffix('.scene-transfer.json').write_text(json.dumps(trace, indent=2))
     return SceneTransferReport(report, trace)
