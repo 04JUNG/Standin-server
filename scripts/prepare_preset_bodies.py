@@ -145,6 +145,8 @@ def main(argv=None):
     selection = ap.add_mutually_exclusive_group()
     selection.add_argument('--character', action='append', default=[])
     selection.add_argument('--rules', action='append', default=[], help='prepare only these approved body versions')
+    selection.add_argument('--catalog', help='approved body-models.json; select exposed default/preset entries')
+    ap.add_argument('--catalog-sha256', help='required approval pin with --catalog')
     ap.add_argument('--blender', default=os.getenv('BLENDER_BINARY', 'blender'))
     ap.add_argument('--worker')
     args = ap.parse_args(argv)
@@ -154,9 +156,13 @@ def main(argv=None):
     if not args.registry or not args.out:
         ap.error('--registry and --out are required')
     registry = load_registry(Path(args.registry).resolve())
-    if not args.character and not args.rules:
+    if not args.character and not args.rules and not args.catalog:
         ap.error('explicit --character or --rules selection is required; historical bodies are not prepared automatically')
     characters = args.character or [cid for cid, recipe in registry['characters'].items() if recipe['rules'] in args.rules]
+    if args.catalog:
+        from scripts.prepared_preset_scope import pinned_catalog, select
+        characters = select(pinned_catalog(args.catalog, args.catalog_sha256), registry,
+                            {'male': 9, 'female': 11})
     if not characters or len(characters) != len(set(characters)) or set(characters) - set(registry['characters']):
         ap.error('choose distinct registered characters')
     output = Path(args.out).resolve()
