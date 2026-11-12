@@ -5,7 +5,7 @@ scheduler. Opaque IDs and service authentication, no client-authored file paths.
 Restart invalidates outstanding operations instead of reviving ready markers.
 """
 from __future__ import annotations
-import base64, hmac, json, logging, os, re, shutil, tempfile, threading, time, uuid
+import base64, hmac, json, logging, os, re, shutil, stat, tempfile, threading, time, uuid
 from pathlib import Path
 from fastapi import Request, HTTPException
 from fastapi.responses import Response
@@ -20,7 +20,7 @@ from converter.solved_state import canonical, decode, digest
 from converter.hand_library import load_library, normalize_request
 from converter.protocol import SOLVER_VERSION, SOLVER_MANIFEST_SHA256, JOB_SCHEMA_VERSION
 from converter.shape_spec import resolve_shape
-from converter_api.work_queue import current_work, measured_slot
+from converter_api.work_queue import WorkStopped, current_work, measured_slot
 from converter.interactive_reuse import core_binding, rebind_solved, rebind_export
 
 MAX_REQUEST = 3 * 1024 * 1024
@@ -47,6 +47,8 @@ def measured(stage, function, *args):
 
 
 class SnapshotStore:
+    SOLVE_RESERVE_BYTES = 512 * 1024**2
+
     def __init__(self, root, registry, runner, *, ttl=3600, capacity=64, byte_limit=2*1024**3):
         requested=Path(root)
         if requested.is_symlink():raise ValueError('private root cannot be a symlink')
@@ -69,7 +71,20 @@ class SnapshotStore:
         self.body_metadata = BodyMetadataCache(capacity)
         self.entries={};self.bases={};self.variant_cache={};self.lock=threading.RLock();self.gate=LatestRevisionGate(capacity)
 
-    def _gc(self):
+    @staticmethod
+    def _disk_bytes(directory):
+        size = 0
+        for path in directory.rglob('*'):
+            try:
+                info = path.lstat()
+            except FileNotFoundError:
+                # A running worker can rename a temporary file during the walk.
+                continue
+            if stat.S_ISREG(info.st_mode):
+                size += info.st_size
+        return size
+
+    def _gc(self, preferred_base=None):
         now=time.monotonic()
         latest = {}
         for e in self.entries.values():
@@ -81,14 +96,54 @@ class SnapshotStore:
                 shutil.rmtree(e['directory']);del self.entries[key]
                 if not any(other['owner']==e['owner'] and other['person']==e['person'] for other in self.entries.values()):
                     self.gate.forget(e['owner'],e['person'])
-        for key,b in list(self.bases.items()):
-            if now>=b['expiry'] and not b['busy']:
+        referenced_bases = {id(e['base']) for e in self.entries.values() if 'base' in e}
+        idle_bases = {key:b for key,b in self.bases.items() if not b['busy'] and id(b) not in referenced_bases}
+        for key,b in list(idle_bases.items()):
+            if now>=b['expiry']:
                 shutil.rmtree(b['directory']);del self.bases[key]
+                del idle_bases[key]
         for key,v in list(self.variant_cache.items()):
             if now>=v['expiry']:
                 shutil.rmtree(v['directory']);del self.variant_cache[key]
-        size=sum(p.stat().st_size for p in self.root.rglob('*') if p.is_file() and not p.is_symlink())
-        if len(self.entries)>=self.capacity or size+512*1024**2*(1+sum(e['busy'] for e in self.entries.values()))>self.byte_limit:
+        size = self._disk_bytes(self.root)
+        busy = sum(e['busy'] for e in self.entries.values())
+        reserve = self.SOLVE_RESERVE_BYTES * (1 + busy)
+        entry_limit = len(self.entries) >= self.capacity
+        reclaimed = 0
+        if not entry_limit and size + reserve > self.byte_limit:
+            # Variants are optional suggestions, and an unused body can be rebuilt.
+            # Keep live snapshot files and their bases, including active workers.
+            referenced_cores = {e['core'] for e in self.entries.values() if 'core' in e}
+            unused_cores = [core for b in self.bases.values() if not b['busy']
+                            for core in (b['directory']/'cores').glob('*')
+                            if core.is_dir() and not core.is_symlink() and core not in referenced_cores]
+            eviction_order = [
+                *((self.variant_cache, key, value['directory']) for key, value in self.variant_cache.items()),
+                *((None, None, core) for core in unused_cores),
+                *((self.bases, key, self.bases[key]['directory']) for key in sorted(
+                    idle_bases, key=lambda key: (key == preferred_base, idle_bases[key]['expiry'])
+                )),
+            ]
+            for cache, key, directory in eviction_order:
+                removed = self._disk_bytes(directory)
+                shutil.rmtree(directory)
+                if cache is not None:
+                    del cache[key]
+                reclaimed += removed
+                size -= removed
+                if size + reserve <= self.byte_limit:
+                    size = self._disk_bytes(self.root)
+                    if size + reserve <= self.byte_limit:
+                        break
+        reason = 'entries' if entry_limit else 'disk' if size + reserve > self.byte_limit else None
+        if reason or reclaimed:
+            control = current_work.get()
+            logging.getLogger('standin.converter').info(json.dumps(dict(
+                event='interactive_capacity', result='rejected' if reason else 'reclaimed',
+                reason=reason, used_bytes=size, reserved_bytes=reserve, reclaimed_bytes=reclaimed,
+                byte_limit=self.byte_limit, entries=len(self.entries), entry_limit=self.capacity,
+                busy=busy, request_id=control.request_id if control else None)))
+        if reason:
             raise HTTPException(429,'INTERACTIVE_CAPACITY')
 
     def _get(self, snapshot, owner):
@@ -193,7 +248,7 @@ class SnapshotStore:
                     if e['busy']:raise HTTPException(409,'SOLVE_IN_PROGRESS')
                     self._get(sid,owner)
                     return dict(snapshotId=sid,packet=json.loads((e['directory']/'solved/packet.json').read_bytes()))
-            self._gc();revision_checkpoint=self.gate.select_binding(owner,person,revision,request_hash)
+            self._gc(preferred_base=base_key);revision_checkpoint=self.gate.select_binding(owner,person,revision,request_hash)
             expires=time.monotonic()+min(self.ttl,remaining)
             def checkpoint():
                 revision_checkpoint()
@@ -345,13 +400,19 @@ class SnapshotStore:
         with self.lock:entries=list(reversed(list(self.variant_cache.values())))
         for entry in entries:
             proof=entry['directory']/'receipt.json'
-            if entry['owner']!=owner or time.monotonic()>=entry['expiry'] or not proof.is_file():continue
-            receipt=json.loads(proof.read_bytes())
+            if entry['owner']!=owner or time.monotonic()>=entry['expiry']:continue
+            try:
+                receipt=json.loads(proof.read_bytes())
+            except FileNotFoundError:
+                continue
             if asset_binding(receipt['identity'])!=binding:continue
             hands=receipt['identity']['hands'];key=(hands['left'],hands['right'])
             if key in keys:continue
             from converter.solved_state import SolvedPoseState
-            candidate=SolvedPoseState((entry['directory']/'state.json').read_bytes())
+            try:
+                candidate=SolvedPoseState((entry['directory']/'state.json').read_bytes())
+            except FileNotFoundError:
+                continue
             # Keep the whole response bounded, including canonical JSON escaping.
             cost=len(candidate.canonical_bytes)*2
             if budget+cost>60*1024*1024:continue
@@ -408,7 +469,7 @@ def register_interactive(app,registry,runner):
         except (ValueError,UnicodeError):raise HTTPException(400,'INVALID_INPUT')
     def guarded(function,*args):
         try:return function(*args)
-        except HTTPException:raise
+        except (HTTPException, WorkStopped):raise
         except Superseded:raise HTTPException(409,'SUPERSEDED')
         except (ValueError,KeyError,TypeError):raise HTTPException(409,'INTERACTIVE_INTEGRITY')
         except Exception:raise HTTPException(503,'INTERACTIVE_WORKER_FAILED')

@@ -4,7 +4,7 @@ import time
 from contextlib import contextmanager
 from types import SimpleNamespace
 import pytest
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
 from converter_api.interactive import register_interactive, SnapshotStore, MAX_REQUEST
 from converter_api.work_queue import current_work, measured_slot
@@ -136,6 +136,67 @@ def test_gc_removes_only_idle_superseded_snapshots(tmp_path):
     store._gc()
     assert set(store.entries) == {'working', 'current', 'other'}
     assert not (store.root/'snapshot-old').exists()
+
+
+def test_gc_reclaims_optional_cache_before_rejecting_a_new_solve(tmp_path):
+    store = SnapshotStore(tmp_path/'private', None, None)
+    expiry = time.monotonic() + 60
+
+    def cached(name):
+        directory = store.root/name
+        directory.mkdir()
+        (directory/'data').write_bytes(bytes(32))
+        return dict(directory=directory, expiry=expiry)
+
+    active_base = dict(cached('body-live'), busy=0)
+    working_base = dict(cached('body-working'), busy=1)
+    preferred = dict(cached('body-preferred'), busy=0)
+    store.bases.update(live=active_base, working=working_base, preferred=preferred,
+                       stale=dict(cached('body-stale'), busy=0))
+    store.entries['ready'] = dict(cached('snapshot-ready'), owner='a'*64,
+                                  person='0', revision=1, busy=False, base=active_base)
+    store.variant_cache['optional'] = cached('variant-optional')
+    store.byte_limit = store.SOLVE_RESERVE_BYTES + store._disk_bytes(store.root) - 64
+
+    store._gc(preferred_base='preferred')
+
+    assert not store.variant_cache
+    assert not (store.root/'body-stale').exists()
+    assert not (store.root/'variant-optional').exists()
+    assert store.bases == dict(live=active_base, working=working_base, preferred=preferred)
+    assert (store.entries['ready']['directory']/'data').read_bytes() == bytes(32)
+
+    # If the working set alone exceeds the budget, preserve it and reject.
+    store.byte_limit -= 64
+    with pytest.raises(HTTPException) as rejected:
+        store._gc()
+    assert (rejected.value.status_code, rejected.value.detail) == (429, 'INTERACTIVE_CAPACITY')
+    assert store.bases == dict(live=active_base, working=working_base)
+    assert (active_base['directory']/'data').read_bytes() == bytes(32)
+    assert (working_base['directory']/'data').read_bytes() == bytes(32)
+
+
+def test_gc_reclaims_old_cores_but_preserves_live_and_working_bodies(tmp_path):
+    store = SnapshotStore(tmp_path/'private', None, None)
+    expiry = time.monotonic()+60
+    base = dict(directory=store.root/'body-live', expiry=expiry, busy=0)
+    working = dict(directory=store.root/'body-working', expiry=expiry, busy=1)
+    live = base['directory']/'cores'/'live-v2'
+    old = base['directory']/'cores'/'old-v1'/'verified-export'
+    preparing = working['directory']/'cores'/'building-v2'
+    for directory in (live, old, preparing):
+        directory.mkdir(parents=True)
+        (directory/'data').write_bytes(bytes(32))
+    snapshot = store.root/'snapshot-ready'; snapshot.mkdir()
+    store.entries['ready'] = dict(owner='a'*64, person='p', revision=1, busy=False,
+        expiry=expiry, directory=snapshot, base=base, core=live)
+    store.bases.update(live=base, working=working)
+    store.byte_limit = store.SOLVE_RESERVE_BYTES + store._disk_bytes(store.root)-32
+    store._gc()
+    assert not old.parent.exists()
+    assert (live/'data').read_bytes() == bytes(32)
+    assert (preparing/'data').read_bytes() == bytes(32)
+    assert store.bases == dict(live=base, working=working)
 
 
 # --- Binary solved state (v2) negotiation and delivery -------------------------------
