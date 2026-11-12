@@ -6,12 +6,12 @@ from pathlib import Path
 
 VERSION='fbx-skin-v1'
 EXPRESSION='neutral-uv-embedded-basecolor-v1'
-SKINS=('default','gray-guide','flesh','flesh-guide','muscle')
+SKINS=('default','gray-guide','flesh','flesh-guide','muscle','flesh-muscle')
 MAX_FBX_BYTES=30*1024*1024
 MANIFEST=Path(__file__).with_name('skin_assets.v1.json')
 # Actual explicit-matte neutral16 and representative posed2 CSP imports.
 # Both immutable assets and exact material writer must retain their acceptance.
-CSP_ASSET_MANIFEST_SHA256='936e9fe9c2b7258d599b383b3001ce3f308b3a429c254177895f65cba66da6e7'
+CSP_ASSET_MANIFEST_SHA256='f4d37bf100dcdec1de5c115d06fa68b30d3213d864d95e540c2d6bbc3676d265'
 CSP_CERTIFIED=frozenset((EXPRESSION, CSP_ASSET_MANIFEST_SHA256, row['character_sha256'], 'full', skin)
     for row in json.loads(MANIFEST.read_bytes())['models'].values() for skin in row['textures'])
 CSP_MATERIAL_SHA256='59a37984fdd9546be05cc7c2f9ca100f5bc9b673a7bf10b8b3c654d5bbc49ba4'

@@ -24,7 +24,7 @@ def main():
     p.add_argument('--character', action='append')
     p.add_argument('--cases', type=Path, help='Additional shape/pose cases with source, characterId, statureM')
     p.add_argument('--cases-only', action='store_true')
-    p.add_argument('--skin', action='append', choices=('flesh','flesh-guide','gray-guide','muscle'))
+    p.add_argument('--skin', action='append', choices=('flesh','flesh-guide','gray-guide','muscle','flesh-muscle'))
     p.add_argument('--outline-width', type=float)
     a = p.parse_args()
     release = json.loads((ROOT / 'config/staging-anatomy-release.json').read_bytes())
