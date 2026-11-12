@@ -100,8 +100,10 @@ def identity(settings, options):
 
 def validate(data, report, binding):
     from converter.final_artifact import valid_receipt
-    from converter.protocol import SOLVER_VERSION
+    from converter.protocol import SOLVER_VERSION, SOLVER_MANIFEST_SHA256, RETARGET_SHA256, ANKLE_POLICY_SHA256
     from converter.scene_contract import FBX_MAGIC
+    if not isinstance(report, dict):
+        raise ValueError('invalid final cache report')
     sha = digest(data)
     if (not 0 < len(data) <= MAX_BYTES or not data.startswith(FBX_MAGIC)
             or report.get('ok') is not True or report.get('artifact_sha256') != sha
@@ -110,6 +112,9 @@ def validate(data, report, binding):
             or report.get('character_sha256') != binding['character_sha256']
             or report.get('character_id') != binding['character_id']
             or report.get('solver_version') != SOLVER_VERSION
+            or report.get('solver_manifest_sha256') != SOLVER_MANIFEST_SHA256
+            or report.get('retarget_sha256') != RETARGET_SHA256
+            or report.get('ankle_policy_sha256') != ANKLE_POLICY_SHA256
             or report.get('camera_rotation') != binding['camera_rotation']
             or report.get('mirrored') != binding['mirror']
             or not valid_receipt(report.get('artifact_validation'), sha, binding['output_scope'])):
@@ -117,12 +122,16 @@ def validate(data, report, binding):
     recipe = binding['shape_recipe']
     if recipe:
         baked = report.get('shape_bake') or {}
+        if not isinstance(baked, dict):
+            raise ValueError('invalid cached shape receipt')
         if any(baked.get(k) != v for k, v in {
                 'shape_sha256': recipe['shape_sha256'], 'rules': recipe['rules'],
                 'controls': recipe['values'], 'blend_sha256': recipe['blend_sha256'],
                 'controller_sha256': recipe['controller_sha256']}.items()):
             raise ValueError('cached shape lineage mismatch')
     baked_hands = report.get('hands') or {}
+    if not isinstance(baked_hands, dict):
+        raise ValueError('invalid cached hand receipt')
     if binding['hands']:
         if (any(baked_hands.get(side) != binding['hands'].get(side) for side in ('left', 'right'))
                 or baked_hands.get('library_sha256') != binding['hand_library_sha256']
@@ -131,13 +140,18 @@ def validate(data, report, binding):
     elif baked_hands:
         raise ValueError('unexpected cached hand preset')
     fingers = report.get('source_fingers')
+    if fingers is not None and not isinstance(fingers, dict):
+        raise ValueError('invalid source finger receipt')
     if not binding['hands'] and (not isinstance(fingers, dict)
             or fingers.get('status') not in ('transferred', 'source_unavailable')
             or fingers.get('body_bones_preserved') is not True):
         raise ValueError('source finger evidence missing')
-    if fingers and fingers.get('status') == 'transferred' and fingers.get('saved_fbx_roundtrip', {}).get('verified') is not True:
-        raise ValueError('source finger saved FBX unverified')
-    if binding['selected_hand_screen'] and report.get('framing', {}).get('selected_hand_screen') != 'clear_screen':
+    if fingers and fingers.get('status') == 'transferred':
+        roundtrip = fingers.get('saved_fbx_roundtrip')
+        if not isinstance(roundtrip, dict) or roundtrip.get('verified') is not True:
+            raise ValueError('source finger saved FBX unverified')
+    if binding['selected_hand_screen'] and (not isinstance(report.get('framing'), dict) or
+            report['framing'].get('selected_hand_screen') != 'clear_screen'):
         raise ValueError('selected hand screen missing')
 
 
@@ -145,6 +159,8 @@ class FinalStore:
     def __init__(self, root):
         self.root = Path(root).resolve()
         self.root.mkdir(parents=True, exist_ok=True)
+        from converter_api.final_cache_remote import RemoteStore
+        self.remote = RemoteStore.from_env()
 
     def atomic(self, name, data):
         with tempfile.NamedTemporaryFile(dir=self.root, delete=False) as stream:
@@ -179,8 +195,20 @@ class FinalStore:
             os.close(fd)
 
     def read(self, name, limit):
+        # Refresh shared receipts/revocations and keep large artifacts in S3,
+        # rather than accumulating an unbounded task-local FBX hot cache.
+        if self.remote and (name == 'revoked.json' or name.endswith('.fbx') or
+                (len(name) == 69 and name.endswith('.json'))):
+            return self.remote.read(name, limit)
         path = self.root / name
-        fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+        try:
+            fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+        except FileNotFoundError:
+            if not self.remote:
+                raise
+            data = self.remote.read(name, limit)
+            self.atomic(name, data)
+            return data
         with os.fdopen(fd, 'rb') as stream:
             data = stream.read(limit + 1)
         if len(data) > limit:
@@ -199,7 +227,7 @@ class FinalStore:
     def get(self, binding):
         key = digest(canonical(binding))
         metadata = json.loads(self.read(key + '.json', 2 * 1024 * 1024))
-        if metadata.get('binding') != binding or metadata.get('status') != 'ready':
+        if not isinstance(metadata, dict) or metadata.get('binding') != binding or metadata.get('status') != 'ready':
             raise ValueError('stale final cache policy')
         sha = metadata['artifact_sha256']
         if not isinstance(sha, str) or len(sha) != 64 or any(c not in '0123456789abcdef' for c in sha):
@@ -217,12 +245,16 @@ class FinalStore:
         key = digest(canonical(binding))
         if self.revoked(key, result.artifact_sha256):
             raise ValueError('revoked final artifact')
-        self.atomic(key + '.' + result.artifact_sha256 + '.fbx', result.artifact)
-        self.atomic(key + '.json', canonical(dict(status='ready', binding=binding,
+        metadata = canonical(dict(status='ready', binding=binding,
             artifact_sha256=result.artifact_sha256, report=result.report,
             report_sha256=digest(canonical(result.report)), generated_at=time.time(),
             validation_scope='existing-converter-gates-and-final-reimport',
-            complete_collision_certificate=False)))
+            complete_collision_certificate=False))
+        if self.remote:
+            self.remote.publish(key, result.artifact_sha256, result.artifact, metadata)
+        else:
+            self.atomic(key + '.' + result.artifact_sha256 + '.fbx', result.artifact)
+            self.atomic(key + '.json', metadata)
 
 
 def cached_final(method):

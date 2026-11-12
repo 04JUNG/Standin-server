@@ -13,6 +13,8 @@ on:
       - "config/characters.example.json"
       - "deploy/ecs/**"
       - "scripts/prepare_hand_screen_deployment.py"
+      - "scripts/prepare_staging_final_cache.py"
+      - "config/staging-final-cache.json"
       - "scripts/verify_staging_anatomy.py"
       - "scripts/prepare_staging_anatomy.py"
       - "scripts/staging_body_assets_init.py"
@@ -155,6 +157,13 @@ jobs:
         run: |
           python scripts/prepare_staging_anatomy.py taskdef.json
           python scripts/verify_staging_anatomy.py taskdef.json
+
+      - name: Configure staging verified final FBX persistence
+        if: github.ref == 'refs/heads/develop' && env.ECS_SERVICE != ''
+        env:
+          STAGING_FINAL_CACHE_ENABLED: ${{ vars.CONVERTER_FINAL_CACHE_ENABLED || '1' }}
+          STAGING_REUSE_REST_METRICS: ${{ vars.CONVERTER_REUSE_REST_METRICS || '1' }}
+        run: python scripts/prepare_staging_final_cache.py taskdef.json
 
       - uses: aws-actions/amazon-ecs-render-task-definition@v1
         id: render

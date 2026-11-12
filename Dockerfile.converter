@@ -72,6 +72,7 @@ COPY converter_api/csp_shape.py /app/converter_api/csp_shape.py
 COPY converter/ankle_policy.json /app/converter/ankle_policy.json
 COPY converter/SHA256SUMS.v325 /app/converter/SHA256SUMS.v325
 COPY converter/airborne_plantar.py /app/converter/airborne_plantar.py
+COPY converter/rest_surface.py /app/converter/rest_surface.py
 COPY converter/airborne_plantar_policy.json /app/converter/airborne_plantar_policy.json
 COPY converter/ankle_clearance.py /app/converter/ankle_clearance.py
 COPY converter/ankle_clearance_policy.json /app/converter/ankle_clearance_policy.json
@@ -150,6 +151,7 @@ COPY converter/skin_assets.v1.json /app/converter/skin_assets.v1.json
 COPY converter_api/registry.py /app/converter_api/registry.py
 COPY converter_api/runner.py /app/converter_api/runner.py
 COPY converter_api/final_cache.py /app/converter_api/final_cache.py
+COPY converter_api/final_cache_remote.py /app/converter_api/final_cache_remote.py
 COPY converter_api/final_inputs.py /app/converter_api/final_inputs.py
 COPY converter_api/final_prewarm.py /app/converter_api/final_prewarm.py
 COPY Dockerfile.converter /app/Dockerfile.converter
