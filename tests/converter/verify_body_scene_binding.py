@@ -11,6 +11,7 @@ from io_scene_fbx import encode_bin, parse_fbx
 from converter import retarget as rt
 from converter.shape_bake import import_full_character
 from converter.body_scene_transfer import canonical_frames
+from converter import body_scene_transfer as transfer
 
 assets, out = map(Path, sys.argv[sys.argv.index('--')+1:])
 out.mkdir(parents=True, exist_ok=False)
@@ -32,13 +33,25 @@ try:
         canonical_frames(out/'failure.fbx')
         raise AssertionError('codec failure was not propagated')
     except RuntimeError as exc:
-        assert str(exc) == 'synthetic codec failure'
+        assert 'synthetic codec failure' in str(exc)
 finally:
     encode_bin.write = original_write
 assert all(obj.data == data for obj, data in before_data)
 assert all(('open' in vars(module)) == present and vars(module).get('open') is value
            for module, value, present in before_open)
 assert not list(out.glob('*.memory-rig.fbx'))
+
+limit = transfer.MAX_MEMORY_RIG_BYTES
+transfer.MAX_MEMORY_RIG_BYTES = 32
+try:
+    try:
+        canonical_frames(out/'bounded.fbx')
+        raise AssertionError('codec exceeded its memory bound')
+    except RuntimeError as exc:  # bpy operator wraps the codec ValueError.
+        assert 'memory rig exceeded bound' in str(exc)
+finally:
+    transfer.MAX_MEMORY_RIG_BYTES = limit
+assert all(obj.data == data for obj, data in before_data)
 
 # Successful export immediately after failure also proves stale exporter wrapper
 # state cannot poison the original disk recovery path.
@@ -56,5 +69,5 @@ assert all(('open' in vars(module)) == present and vars(module).get('open') is v
            for module, value, present in before_open)
 (out/'verification.json').write_text(json.dumps(dict(ok=True, bones=len(disk), max_matrix_error=error,
     memory_bytes=size, codec_failure_restored_mesh_data=True, codec_hooks_restored=True,
-    recovery_disk_export_succeeded=True), indent=2))
+    memory_bound_enforced=True, recovery_disk_export_succeeded=True), indent=2))
 print('PASS memory binding and codec failure recovery', flush=True)

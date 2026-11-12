@@ -19,6 +19,7 @@ import time
 
 FLAG = 'CONVERTER_EXPERIMENT_BODY_SCENE_TRANSFER'
 VERSION = 'body-scene-transfer.v1'
+MAX_MEMORY_RIG_BYTES = 2*1024*1024
 
 
 def enabled():
@@ -53,6 +54,11 @@ def canonical_frames(path):
     prior = {module: vars(module).get('open', absent) for module in (encode_bin, parse_fbx)}
 
     class Sink(io.BytesIO):
+        def write(self, value):
+            if self.tell()+len(value) > MAX_MEMORY_RIG_BYTES:
+                raise ValueError('memory rig exceeded bound')
+            return super().write(value)
+
         def close(self):
             nonlocal data
             if not self.closed:
@@ -87,7 +93,7 @@ def canonical_frames(path):
             for obj, surface, tiny in replacements:
                 obj.data = surface
                 bpy.data.meshes.remove(tiny)
-        if data is None or not 0 < len(data) <= 2*1024*1024:
+        if data is None or not 0 < len(data) <= MAX_MEMORY_RIG_BYTES:
             raise ValueError('memory rig export failed or exceeded bound')
         rt.reset_scene()
         arm, meshes = import_full_character(sentinel)
