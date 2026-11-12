@@ -161,3 +161,26 @@ main 준비의 중립 코드 기준은 `fa5919798`이다. 원격에서 추가된
 깨끗한 후속 측정은 사전 빌드된 실제 Converter 이미지 `sha256:eca16e9d4c89d80f667f2f23105fb8b78168ae0111893d863210d5ac1a01d5aa`(source `f31558c305c8bb4c1687ab8fe4e15f001ca26f24`, Linux/amd64, 기본 uid10001)에서 실행한다. converter/API 코드는 오버레이하지 않고 검증용 scripts만 mount했다. 이미지 자체의 neutral 구현 SHA는 main 번들의143fac…와 일치한다. 운영/ECR에는 올리지 않은 로컬 후보 이미지다.
 
 실제 승인된 다음 준비에서는 현재 pinned 릴리스 사본과 기존 prepared 파일을 read-only 입력으로 사용한다. 같은 identity의 기존2종은 그대로 재사용하고 나머지만 생성한다. runtime이 달라졌다면 재생성 후 이전 파일도 보존하는 확장 프로필을 사용하며 최대22쌍/192 MiB를 넘으면 발행하지 않는다.
+
+## 실제 이미지의 HTTP file-ready 결과
+
+실제 Converter 이미지의 기본 uid10001에서20종 모두 prepared를 확인했다([audit](qa/prepared-all20-20261113/prebuilt-runtime-audit.json)). 빌드 완료 후 대표6종을 각 조건 새 API 프로세스에서 순차 실행했고 모두 독립 FBX 재로드 비교를 통과했다. 최종파일/retarget 재사용은 없었으며 응답도 각1회 Blender 실행의 cache miss였다.
+
+| 프리셋 | baseline file-ready | prepared file-ready | 중립 준비 baseline→prepared |
+|---|---:|---:|---:|
+| `male-base-v0-8-0` | 48.39s | 39.51s | 11.224s → 0.223s |
+| `male-fat-max-v0-8-0` | 57.94s | 39.86s | 16.813s → 0.247s |
+| `male-muscle-max-v0-8-0` | 51.06s | 37.17s | 12.747s → 0.214s |
+| `female-base-v0-4-0` | 29.36s | 25.46s | 5.229s → 0.209s |
+| `female-fat-max-v0-4-0` | 38.11s | 30.62s | 9.827s → 0.259s |
+| `female-muscle-max-v0-4-0` | 31.58s | 25.37s | 6.210s → 0.176s |
+
+POST 시작부터 응답 JSON/base64 decode·artifact SHA·파일 fsync·저장 파일 SHA 확인까지다. 단순 중립 준비 시간과 전체 file-ready를 구분했다. 6쌍 모두 정점·뼈대·메시 행렬·가중치 최대 차이는0이고 최종 FBX skin 검증도 통과했다([원시 결과](qa/prepared-all20-20261113/main-http-ob015.json)). 각 조건1회·OS 파일 캐시 통제 없음·Mac 위 Linux/amd64 Docker 수치이며 운영/BFF/네이티브 UI SLA가 아니다.
+
+실제 ECS/S3 네트워크 다운로드·task 기동 시간은 이번 로컬 검증에 포함하지 않았다. 인프라의 기존 Converter startTimeout/health startPeriod는120초로 유지했다. 이후 승인된 환경 검증에서 initializer 성공과 기동 제한을 확인해야 하며, 로컬 설치7초대를 Fargate 시간으로 환산하지 않는다.
+
+## 최종 완료 범위
+
+깨끗한 실제 이미지의 HTTP6쌍 및 ob_0016쌍도 모두 완료했다. develop20 + main20 ob_015, main 대표6 HTTP + 대표6 ob_001 모두 geometry/bones/행렬/weights 최대 차이0이다. 깨끗한 후속 측정은 루트 빌드 종료 후30초 이상 지난 뒤 시작했다. 경합 가능9개 시간은 별도로 보존하고 primary 성능 요약에 사용하지 않았다.
+
+실제 요청 시간, 중립 단계, offline 준비 시간을 섞지 않았다. 최종 [summary](qa/prepared-all20-20261113/final-summary.json)와 [깨끗한 ob_001 원시 결과](qa/prepared-all20-20261113/main-ob001-clean.json)에 완료 범위·제외 범위가 있다. CPU/OS/이미지/소스/기본값이 달라지는 통합은 해당 최종 버전에서 별도 재검증한다.
