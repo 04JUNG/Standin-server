@@ -58,11 +58,13 @@ def main():
                 'CONVERTER_INTERACTIVE_ENABLED': 'true', 'CONVERTER_INTERACTIVE_TOKEN': token,
                 'CONVERTER_INTERACTIVE_ROOT': str(directory/'private'),
                 'CONVERTER_INTERACTIVE_BODY_FORMAT': 'v2',
+                'CONVERTER_INTERACTIVE_BINARY_STATE': '1',
                 'CONVERTER_PREPARED_PRESETS_ENABLED': '0', 'CONVERTER_FINAL_CACHE_ENABLED': '0',
                 'CONVERTER_SHAPE_REGISTRY': str(assets/'shape-bakes.json'),
                 'STANDIN_SCENE_PROBE_DIR': str(probe), 'STANDIN_LAB_FIRST_ENTRY_PROFILE': '1',
                 'STANDIN_LAB_PREVIEW_TRACE': '1', 'OMP_NUM_THREADS': '1', 'OPENBLAS_NUM_THREADS': '1'})
             cfg = character_config['characters'][cid]
+            row['character_sha256'] = cfg['sha256']
             shape = None
             if case.get('controls'):
                 recipe = resolve_shape(cid, cfg['sha256'])
@@ -88,11 +90,13 @@ def main():
             headers = {'Authorization': 'Bearer '+token, 'X-Standin-Owner': owner,
                        'X-Standin-State-Encoding': encoding}
             with TestClient(app) as client:
+                load_before = os.getloadavg()
                 start = time.monotonic()
                 response = client.post('/interactive/v1/solve', json=payload, headers=headers)
                 if response.status_code != 200:
                     raise ValueError('native solve failed: '+str(response.status_code)+' '+response.text[:500])
                 value = response.json()
+                assert response.headers['x-standin-state-encoding'] == encoding
                 snapshot = value['snapshotId']
                 model = client.get('/interactive/v1/snapshots/'+snapshot+'/model', headers=headers)
                 assert model.status_code == 200
@@ -110,12 +114,23 @@ def main():
                 probe_rows = [json.loads(p.read_text()) for p in probe.glob('process-*.json')]
                 body = next(p for p in probe_rows if 'prepare_body' in p['stages'])
                 worker = json.loads((probe/'worker-report.json').read_text())
+                expected = resolve_shape(cid, cfg['sha256'], shape)
+                assert worker['shape_bake']['controls'] == expected['values']
+                assert worker['shape_bake']['neutral_preparation']['status'] == 'disabled'
+                io = body['io']
                 row['runs'][variant] = dict(file_ready_seconds=elapsed, model_ready_seconds=model_seconds,
                     body_prepare_seconds=body['stages']['prepare_body']['seconds'],
                     body_run_job_seconds=body['stages']['run_job']['seconds'],
                     peak_rss_bytes=max(p['peak_rss_bytes'] for p in probe_rows),
                     scene_transfer=worker.get('scene_transfer'), probes=probe_rows,
-                    correspondence=receipt['correspondence'], canonical_encoding=encoding)
+                    correspondence=receipt['correspondence'], canonical_encoding=encoding,
+                    shape_controls=worker['shape_bake']['controls'], controls_match=True,
+                    neutral_preparation=worker['shape_bake']['neutral_preparation'],
+                    host_load_before=load_before, host_load_after=os.getloadavg(),
+                    fbx_io={op:dict(disk_calls=sum(e['operation']==op and not e['memory'] for e in io),
+                        memory_calls=sum(e['operation']==op and e['memory'] for e in io),
+                        disk_bytes=sum((e['bytes'] or 0) for e in io if e['operation']==op and not e['memory']))
+                        for op in ('parse', 'write')})
             app.state.interactive._volume_lock.close()
         job = dict(off=str(output/(name+'-off.fbx')), on=str(output/(name+'-on.fbx')),
                    result=str(output/(name+'-comparison.json')))
