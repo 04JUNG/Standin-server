@@ -95,6 +95,7 @@ COPY scripts/prepare_preset_bodies.py /app/scripts/prepare_preset_bodies.py
 COPY converter/source_body.py /app/converter/source_body.py
 COPY converter/reviewed_pose_frames.json /app/converter/reviewed_pose_frames.json
 COPY converter/worker.py /app/converter/worker.py
+COPY converter/body_scene_transfer.py /app/converter/body_scene_transfer.py
 COPY converter/reviewed_library.py /app/converter/reviewed_library.py
 COPY converter/reviewed_source_fingers.py /app/converter/reviewed_source_fingers.py
 COPY converter/body_material.py /app/converter/body_material.py

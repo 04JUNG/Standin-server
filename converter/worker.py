@@ -369,6 +369,9 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
     recipe = job.get("shape_recipe")
     if recipe is not None:
         from converter.shape_bake import convert_shaped, import_full_character
+        from converter.body_scene_transfer import enabled as scene_transfer_enabled
+        if scene_transfer_enabled():
+            from converter.body_scene_transfer import convert_shaped
         from converter import retarget as rt
         # This fresh one-job process uses the shape FBX terminal-bone policy
         # through retarget, framing and final GLB/PNG reimports.

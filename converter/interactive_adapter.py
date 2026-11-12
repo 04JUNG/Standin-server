@@ -49,10 +49,12 @@ def runtime_revision():
              'shared/interactive_pose_v2.mjs', 'solved_state.py', 'solved_state_v2.py',
              'hands.py', 'hand_geometry.py', 'hand_library.py', 'hand_contact.py',
              'hand_library.v1.json', 'hand_rig.py', 'framing.py', 'camera.py',
-             'shape_bake.py', 'final_artifact.py', 'protocol.py', 'worker.py',
+             'shape_bake.py', 'body_scene_transfer.py', 'final_artifact.py', 'protocol.py', 'worker.py',
              'reviewed_library.py', 'reviewed_source_fingers.py', 'source_body.py',
              'reviewed_pose_frames.json', 'body_material.py']
-    return digest(b''.join(canonical([n, digest((root/n).read_bytes())]) for n in names))
+    from converter.body_scene_transfer import enabled
+    return digest(b''.join(canonical([n, digest((root/n).read_bytes())]) for n in names)
+                  + canonical({'body_scene_transfer': enabled()}))
 
 
 def checked_runtime():

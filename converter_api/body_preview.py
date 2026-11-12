@@ -16,10 +16,13 @@ def preview_contract() -> dict:
                  "converter/framed_model.py", "converter_api/body_preview.py",
                  "converter/final_preview_worker.py", "converter_api/final_preview.py", "converter/final_artifact.py",
                  "converter/shape_spec.py", "converter/shape_bake.py", "converter/prepared_body.py",
-                 "converter/source_body.py", "converter/reviewed_pose_frames.json"):
+                 "converter/source_body.py", "converter/reviewed_pose_frames.json",
+                 "converter/body_scene_transfer.py"):
         digest.update(name.encode())
         digest.update((root / name).read_bytes().replace(b"\r\n", b"\n"))
     digest.update((root / 'converter/fast_scene_reset.py').read_bytes())
+    from converter.body_scene_transfer import enabled
+    digest.update(str(enabled()).encode())
     return {
         "schema_version": "body-preview-runtime.v1",
         "preview_revision": digest.hexdigest(),
