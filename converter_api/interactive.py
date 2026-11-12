@@ -5,7 +5,7 @@ scheduler. Opaque IDs and service authentication, no client-authored file paths.
 Restart invalidates outstanding operations instead of reviving ready markers.
 """
 from __future__ import annotations
-import base64, hmac, json, os, re, shutil, tempfile, threading, time, uuid
+import base64, hmac, json, logging, os, re, shutil, tempfile, threading, time, uuid
 from pathlib import Path
 from fastapi import Request, HTTPException
 from fastapi.responses import Response
@@ -24,6 +24,23 @@ MAX_REQUEST = 3 * 1024 * 1024
 MAX_RESPONSE = 64 * 1024 * 1024
 ID = re.compile(r'^[A-Za-z0-9_-]{1,128}$')
 SHA = re.compile(r'^[a-f0-9]{64}$')
+
+
+def measured(stage, function, *args):
+    """Correlate private work without logging geometry, paths or owner bindings."""
+    started = time.monotonic()
+    succeeded = False
+    try:
+        result = function(*args)
+        succeeded = True
+        return result
+    finally:
+        control = current_work.get()
+        logging.getLogger('standin.converter').info(json.dumps(dict(
+            event='interactive_stage', stage=stage,
+            duration_ms=round((time.monotonic()-started)*1000, 3),
+            succeeded=succeeded,
+            request_id=control.request_id if control else None)))
 
 
 class SnapshotStore:
@@ -82,8 +99,10 @@ class SnapshotStore:
         # _run_child is dedicated to the final exporter; this worker has its own
         # fixed script, with the same bounded subprocess cancellation behavior.
         import subprocess
+        queued=time.monotonic()
         with self.runner._process_slots, tempfile.TemporaryFile() as log:
             check();start=time.monotonic()
+            queue_ms=(start-queued)*1000
             p=subprocess.Popen([self.runner.settings.blender_binary,'--background','--factory-startup',
                 '--disable-autoexec','--python-exit-code','1','--python',str(Path(__file__).resolve().parents[1]/'converter/interactive_worker.py'),
                 '--',stage,str(job),str(identity),str(base),str(destination)],stdout=log,stderr=log)
@@ -107,6 +126,12 @@ class SnapshotStore:
                     p.terminate()
                     try:p.wait(timeout=2)
                     except subprocess.TimeoutExpired:p.kill();p.wait()
+                execution_ms=(time.monotonic()-start)*1000
+                if control:control.execution_ms+=execution_ms
+                logging.getLogger('standin.converter').info(json.dumps(dict(
+                    event='interactive_blender', stage=stage, queue_wait_ms=round(queue_ms,3),
+                    execution_ms=round(execution_ms,3), return_code=p.returncode,
+                    request_id=control.request_id if control else None)))
 
     def _body_metadata(self,directory,binding):
         """An interrupted preparation must never poison the next hand revision."""
@@ -185,11 +210,11 @@ class SnapshotStore:
             with base['lock']:
                 checkpoint()
                 base_directory=base['directory']/'base'
-                metadata=self._body_metadata(base_directory,binding)
+                metadata=measured('body_metadata',self._body_metadata,base_directory,binding)
                 if metadata is None:
                     if base_directory.exists():shutil.rmtree(base_directory)
-                    self._child('prepare',job_dir/'job.json',ip,base_directory,directory/'unused',checkpoint)
-                    metadata=self._body_metadata(base_directory,binding)
+                    measured('body_prepare',self._child,'prepare',job_dir/'job.json',ip,base_directory,directory/'unused',checkpoint)
+                    metadata=measured('body_metadata_after_prepare',self._body_metadata,base_directory,binding)
                 if metadata is None:raise ValueError('body snapshot did not publish completely')
                 # This camera is immutable and never affected by hand variant bounds.
                 identity['camera']=camera_for_model(selection['camera'],metadata['model'],resolved.metadata.sha256,identity['scope'])
@@ -201,7 +226,7 @@ class SnapshotStore:
                 reused = False
                 if core.is_dir():
                     try:
-                        rebind_solved(core, directory/'solved', identity)
+                        measured('core_rebind',rebind_solved,core, directory/'solved', identity)
                         reused = True
                     except (OSError, ValueError):
                         # Private partial/corrupt cache is never display authority.
@@ -209,13 +234,13 @@ class SnapshotStore:
                         shutil.rmtree(directory/'solved', ignore_errors=True)
                         checkpoint()
                 if not reused:
-                    self._child('solve',job_dir/'job.json',ip,base_directory,directory/'solved',checkpoint)
-                    load_solved(directory/'solved'); checkpoint()
+                    measured('blender_solve',self._child,'solve',job_dir/'job.json',ip,base_directory,directory/'solved',checkpoint)
+                    measured('validate_before_cache',load_solved,directory/'solved'); checkpoint()
                     core.parent.mkdir(exist_ok=True)
                     shutil.copytree(directory/'solved', core)
                 entry['core'] = core
                 entry['base'] = base
-            state,_=load_solved(directory/'solved');checkpoint()
+            state,_=measured('validate_before_publish',load_solved,directory/'solved');checkpoint()
             with self.lock:
                 entry['stateHash']=state.state_hash
                 entry['packetSha256']=digest((directory/'solved/packet.json').read_bytes())
@@ -269,14 +294,14 @@ class SnapshotStore:
                     receipt = None
                     if cached.is_dir():
                         try:
-                            receipt = rebind_export(cached, path, e['directory']/'solved')
+                            receipt = measured('export_rebind',rebind_export,cached, path, e['directory']/'solved')
                         except (OSError, ValueError):
                             shutil.rmtree(cached)
                             shutil.rmtree(path, ignore_errors=True)
                             check()
                     if receipt is None:
                         with self.runner._process_slots:
-                            receipt=export_bundle(self.runner.settings.blender_binary,e['directory']/'solved',path,e['stateHash'],checkpoint=check)
+                            receipt=measured('export_bundle',lambda: export_bundle(self.runner.settings.blender_binary,e['directory']/'solved',path,e['stateHash'],checkpoint=check))
                         check()
                         shutil.copytree(path, cached)
                     check()
@@ -356,7 +381,7 @@ def register_interactive(app,registry,runner):
     async def solve(request:Request):
         authorized(request);payload=await body(request)
         from starlette.concurrency import run_in_threadpool
-        return await run_in_threadpool(guarded,store.solve,payload)
+        return await run_in_threadpool(measured,'solve_total',guarded,store.solve,payload)
     @app.post('/interactive/v1/static/resolve')
     async def resolve_static(request:Request):
         authorized(request);payload=await body(request)
@@ -378,7 +403,7 @@ def register_interactive(app,registry,runner):
         return Response(raw,media_type='application/vnd.standin.solved-pose-state-v1+json' if kind=='model' else 'application/octet-stream',headers={'Cache-Control':'private, no-store'})
     @app.post('/interactive/v1/snapshots/{snapshot}/export')
     def export(snapshot:str,request:Request):
-        authorized(request);return guarded(store.export,snapshot,request.headers.get('x-standin-owner',''))
+        authorized(request);return measured('export_total',guarded,store.export,snapshot,request.headers.get('x-standin-owner',''))
     @app.get('/interactive/v1/snapshots/{snapshot}/variants')
     def variants(snapshot:str,request:Request):
         authorized(request);raw=guarded(store.variants,snapshot,request.headers.get('x-standin-owner',''))

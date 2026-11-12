@@ -120,6 +120,7 @@ jobs:
             tests/converter/test_interactive_state.py \
             tests/converter/test_interactive_camera.py \
             tests/converter/test_interactive_transport.py \
+            tests/converter/test_interactive_timing.py \
             tests/converter/test_outline_contract.py \
             tests/converter/test_skin_contract.py \
             tests/converter/test_skin_asset_cache.py \
