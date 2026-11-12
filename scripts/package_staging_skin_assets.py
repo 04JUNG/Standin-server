@@ -13,6 +13,7 @@ import shutil
 import sys
 
 import bpy
+import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -30,6 +31,7 @@ def main():
     p.add_argument('--models', type=Path, required=True)
     p.add_argument('--existing-assets', type=Path, required=True)
     p.add_argument('--out', type=Path, required=True)
+    p.add_argument('--guide-assets', type=Path, help='Reviewed current-base UV surfaces and authored guide textures')
     a = p.parse_args(sys.argv[sys.argv.index('--') + 1:])
     manifest_path = ROOT / 'converter/skin_assets.v1.json'
     manifest = json.loads(manifest_path.read_bytes())
@@ -42,8 +44,11 @@ def main():
             assert len(data) == entry['bytes'] and digest(data) == entry['sha256']
             (a.out / entry['path']).write_bytes(data)
     flesh = next(iter(manifest['models'].values()))
-    manifest['revision'] = 'staging-anatomy-flesh-20261112-v1'
+    manifest['revision'] = 'staging-anatomy-skins-20261112-v2' if a.guide_assets else 'staging-anatomy-flesh-20261112-v1'
     manifest['authoring_sha256'][Path(__file__).name] = digest(Path(__file__).read_bytes())
+    for name in ('generate_textures.py', 'skin_style.json'):
+        manifest['authoring_sha256'][name] = digest((ROOT / 'scripts/skin_fbx' / name).read_bytes())
+    surfaces = {gender: np.load(a.guide_assets / (gender+'-surface.npz')) for gender in ('male','female')} if a.guide_assets else {}
     for cid in release['characterIds']:
         source = a.models / 'fbx' / (cid + '.fbx')
         source_sha = digest(source.read_bytes())
@@ -73,6 +78,15 @@ def main():
         obj.data.calc_loop_triangles()
         triangles = [list(t.vertices) for t in obj.data.loop_triangles]
         assert all(len(f) == 3 for f in faces) and faces == triangles
+        if a.guide_assets:
+            gender = 'female' if cid.startswith('female') else 'male'
+            surface = surfaces[gender]
+            info = json.loads((a.guide_assets / (gender+'-source.json')).read_bytes())
+            # Fixed preset/slider deformation retains exact vertex/index/weight identity.
+            # Transfer UV corners by index only after proving that identity, never by proximity.
+            assert info['weights_sha256'] == weights and info['vertices'] == len(points)
+            assert np.array_equal(surface['triangles'], np.asarray(triangles))
+            values = surface['uv'].reshape(-1,2).tolist()
         data = gzip.compress(json.dumps(dict(uv=values, triangles=triangles, source_sha256=source_sha), separators=(',', ':'), allow_nan=False).encode(), mtime=0)
         name = cid + '-uv.json.gz'
         (a.out / name).write_bytes(data)
@@ -84,6 +98,15 @@ def main():
             textures={'flesh': flesh['textures']['flesh']},
             preview_textures={'flesh': flesh['preview_textures']['flesh']},
             preview_mesh='mesh_000', preview_resolution=2048)
+        if a.guide_assets:
+            row = manifest['models'][cid]
+            for kind, suffix in [('textures',''), ('preview_textures','-preview')]:
+                row[kind] = {}
+                for skin in ('flesh','gray-guide','flesh-guide','muscle'):
+                    name = 'anatomy-'+gender+'-'+skin+suffix+'.png'
+                    data = (a.guide_assets / (gender+'-'+skin+suffix+'.png')).read_bytes()
+                    (a.out / name).write_bytes(data)
+                    row[kind][skin] = dict(path=name, bytes=len(data), sha256=digest(data))
         print('PACKAGED', cid, len(obj.data.vertices), len(arm.data.bones), flush=True)
     raw = (json.dumps(manifest, sort_keys=True, indent=2) + '\n').encode()
     manifest_path.write_bytes(raw)

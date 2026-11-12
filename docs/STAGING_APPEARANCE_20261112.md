@@ -1,33 +1,41 @@
 # Current staging flesh skin and outline
 
-The anatomy release now accepts solid flesh skin and full-body outline on all
-20 current male0.8.0/female0.4.0 models. The exact model SHA, triangle indices,
+The anatomy release now accepts all four nondefault skins (gray guide, flesh,
+flesh guide, muscle lines) and full-body outline on all20 current
+male0.8.0/female0.4.0 models. The exact model SHA, triangle indices,
 weights, UV corners and texture bytes are pinned independently in Converter,
-BFF and client. Skin-only and combined outline widths0–2 share the same binding;
-the requested maximum is2. Default skin/outline0 retain their original path.
+BFF and client. Flesh supports outline widths0–2; guides/muscle support0or2.
+The requested maximum is2. Default skin/outline0 retain their original path.
 
 Manual shape changes retain the registered base character identity and bind the
 actual controls, controller/blend hashes, body revision and final source FBX into
-the operation. The solid flesh texture uses exact corner-center UVs. It follows
-the deformed surface without texture stretching seams; topology and weights are
+the operation. Authored anatomical lines are freshly projected onto current base
+rest surfaces and baked into exact UV corners. Presets and slider edits share
+proven identical vertex/index/weight correspondence within each gender; UVs are
+transferred by that identity rather than nearest-position guesses. Lines follow
+the deformed surface; topology and weights are
 checked on every postprocess. No body points, bone transforms or weights are
 changed by appearance processing.
 
-Fresh Blender writer/verifier processes checked skin→outline on20 current
-neutral bodies and2 actual slider-edited/bent bodies. All measured base body
-errors are0. Actual CSP imports checked male/female neutral width2, a male custom
-shape width1.2 and a female custom shape width2. Flesh and black silhouette
-remained visible. No large black fills were observed. These four observations
-do not claim visual inspection of every preset/pose/view. Exact hashes and
+Fresh Blender writer/verifier processes checked the new flesh-guide UVs and
+outline2 on all20 current neutral bodies, all four styles on both base bodies,
+and all four styles on both actual slider-edited/bent bodies (36case pairs).
+All measured base body errors are0. Actual CSP imports additionally checked a
+male neutral flesh-guide, male custom muscle lines and female custom gray-guide,
+each with outline2 in its own QA canvas. Lines and black silhouette remained
+visible without large black fills. Earlier solid-flesh observations are retained
+separately. These observations do not claim visual inspection of every
+preset/pose/view. Exact hashes and
 controls: [validation](qa/staging-appearance-20261112/validation.json).
 
 New models have54bones and105430/139474vertices; the old52bone/200000triangle
 client limits rejected them before display. Bounds now cover the exact pinned
-models while still rejecting a mismatched bone count or topology.
+models, up to16MiB compressed assets and64MiB UV inflation, while still rejecting
+a mismatched bone count/topology. The198-entry live skin capability requires a
+bounded128KiB contract rather than the previous64KiB (actual66066bytes).
 
-Current support is solid flesh and full individual FBX. New anatomy guide or
-muscle artwork needs a separate authoring review; old reviewed assets retain
-their existing availability. Cropped skin and new-model cropped outline remain
+Current support is all original skin choices and full individual FBX. Old reviewed
+assets retain their existing availability. Cropped skin and new-model cropped outline remain
 unadvertised. Arbitrary personal models do not inherit these pins.
 
 Skin assets are installed from a new immutable staging body bundle under

@@ -23,15 +23,20 @@ def main():
     p.add_argument('--blender', default='/Applications/Blender.app/Contents/MacOS/Blender')
     p.add_argument('--character', action='append')
     p.add_argument('--cases', type=Path, help='Additional shape/pose cases with source, characterId, statureM')
+    p.add_argument('--cases-only', action='store_true')
+    p.add_argument('--skin', action='append', choices=('flesh','flesh-guide','gray-guide','muscle'))
+    p.add_argument('--outline-width', type=float)
     a = p.parse_args()
     release = json.loads((ROOT / 'config/staging-anatomy-release.json').read_bytes())
     manifest = json.loads((ROOT / 'converter/skin_assets.v1.json').read_bytes())
     a.out.mkdir(parents=True, exist_ok=True)
     cases = [dict(name=cid, characterId=cid, source=str(a.models / 'fbx' / (cid + '.fbx')),
                   statureM=1.78 if cid.startswith('male') else 1.75)
-             for cid in (a.character or release['characterIds'])]
+             for cid in ([] if a.cases_only else (a.character or release['characterIds']))]
     if a.cases:
         cases.extend(json.loads(a.cases.read_bytes()))
+    if a.skin:
+        cases = [dict(case, name=case['name']+'--'+skin, skinId=skin) for case in cases for skin in a.skin]
     rows = []
     for case in cases:
         cid = case['characterId']
@@ -45,9 +50,9 @@ def main():
             shutil.copyfile(source, directory / 'source.fbx')
             job = dict(common, source_artifact_sha256=sha(source))
             if stage == 'skin':
-                job['skin'] = dict(version='fbx-skin-v1', id='flesh')
+                job['skin'] = dict(version='fbx-skin-v1', id=case.get('skinId','flesh'))
             else:
-                job.update(appearance=dict(version='fbx-outline-v1', width=case.get('width', 2)),
+                job.update(appearance=dict(version='fbx-outline-v1', width=a.outline_width if a.outline_width is not None else case.get('width', 2)),
                            stature_m=case['statureM'], culling='CullingOff', surface='outward-transparent')
             (directory / 'job.json').write_text(json.dumps(job))
             started = time.monotonic()

@@ -11,7 +11,7 @@ MAX_FBX_BYTES=30*1024*1024
 MANIFEST=Path(__file__).with_name('skin_assets.v1.json')
 # Actual explicit-matte neutral16 and representative posed2 CSP imports.
 # Both immutable assets and exact material writer must retain their acceptance.
-CSP_ASSET_MANIFEST_SHA256='7dd37c62d9778963348870690ac4ca967fec7789ecdf6323d997065d7aa2aa17'
+CSP_ASSET_MANIFEST_SHA256='936e9fe9c2b7258d599b383b3001ce3f308b3a429c254177895f65cba66da6e7'
 CSP_CERTIFIED=frozenset((EXPRESSION, CSP_ASSET_MANIFEST_SHA256, row['character_sha256'], 'full', skin)
     for row in json.loads(MANIFEST.read_bytes())['models'].values() for skin in row['textures'])
 CSP_MATERIAL_SHA256='59a37984fdd9546be05cc7c2f9ca100f5bc9b673a7bf10b8b3c654d5bbc49ba4'

@@ -21,7 +21,7 @@ def test_default_choice_and_asset_pins_are_independent_of_outline_json():
     assert len(manifest_hash())==64 and len(manifest()['models'])==22
     for row in manifest()['models'].values():
         assert row['bones'] in (52,54) and 'flesh' in row['textures']
-        assert set(row['textures']) == ({'flesh'} if row['bones']==54 else {'gray-guide','flesh','flesh-guide','muscle'})
+        assert set(row['textures']) == {'gray-guide','flesh','flesh-guide','muscle'}
         assert len(row['uv']['sha256'])==64
 
 
