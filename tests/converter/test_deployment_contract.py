@@ -117,7 +117,7 @@ def test_converter_deploy_is_gated_and_path_filtered():
     assert ":develop'" in workflow
     assert "Verify isolated ECR target exists" in workflow
     assert "Verify optional isolated ECS target exists" in workflow
-    assert workflow.count("if: env.ECS_SERVICE != ''") == 6
+    assert workflow.count("if: env.ECS_SERVICE != ''") == 7
     assert "scripts/verify_staging_anatomy.py taskdef.json" in workflow
     assert "CONVERTER_MAX_CONCURRENT_PROCESSES: ${{ vars.CONVERTER_MAX_CONCURRENT_PROCESSES }}" in workflow
     assert 'scripts/prepare_hand_screen_deployment.py taskdef.json --container converter' in workflow
@@ -146,14 +146,14 @@ def _job_condition(filename: str, job: str) -> str:
     return condition
 
 
-def _enabled(condition, event, branch, target, deploy_staging, auto):
+def _enabled(condition, event, branch, target, deploy_staging, auto, deploy_beta=False):
     # Evaluate the actual simple job guards, including short-circuit operators,
     # so a missing branch/event/target guard fails the routing matrix below.
     expression = condition.replace("&&", " and ").replace("||", " or ")
     expression = expression.replace("vars.", "variables.")
     return bool(eval(expression, {"__builtins__": {}}, {
         "github": SimpleNamespace(event_name=event, ref="refs/heads/" + branch),
-        "inputs": SimpleNamespace(target=target, deploy_staging=deploy_staging),
+        "inputs": SimpleNamespace(target=target, deploy_staging=deploy_staging, deploy_beta=deploy_beta),
         "variables": SimpleNamespace(CONVERTER_AUTO_DEPLOY_ENABLED=str(auto).lower()),
     }))
 
@@ -254,6 +254,14 @@ def test_converter_image_defines_runtime_healthcheck_and_json_logs():
     assert "CONVERTER_JSON_LOGS=1" in dockerfile
     assert "DEPLOYMENT_VERSION=$DEPLOYMENT_VERSION" in dockerfile
 
+
+def test_explicit_beta_deploy_preserves_staging_worker_isolation():
+    converter = _job_condition("converter-deploy.yml", "deploy")
+    worker = _job_condition("converter-deploy.yml", "scene_worker")
+    assert _enabled(converter, "workflow_dispatch", "main", "converter", False, False, True)
+    assert not _enabled(converter, "workflow_dispatch", "feature", "converter", False, False, True)
+    assert not _enabled(converter, "workflow_dispatch", "main", "scene-worker", False, False, True)
+    assert not _enabled(worker, "workflow_dispatch", "main", "scene-worker", False, False, True)
 
 def test_skin_contract_cache_imports_from_the_converter_image_allowlist(tmp_path):
     for line in (ROOT / "Dockerfile.converter").read_text().splitlines():

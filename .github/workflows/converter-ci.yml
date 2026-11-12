@@ -97,6 +97,7 @@ jobs:
             tests/converter/test_shape_inspection.py \
             tests/converter/test_shape_hand_integration.py \
             tests/converter/test_registry.py \
+            tests/converter/test_preparation_cache.py \
             tests/converter/test_runner_failures.py \
             tests/converter/test_work_queue.py \
             tests/converter/test_api_contract.py \
@@ -118,8 +119,10 @@ jobs:
             tests/converter/test_fast_scene_reset.py \
             tests/converter/test_preview_instrumentation.py \
             tests/converter/test_interactive_state.py \
+            tests/converter/test_solved_state_v2.py \
             tests/converter/test_interactive_camera.py \
             tests/converter/test_interactive_transport.py \
+            tests/converter/test_interactive_timing.py \
             tests/converter/test_outline_contract.py \
             tests/converter/test_skin_contract.py \
             tests/converter/test_skin_asset_cache.py \
@@ -213,6 +216,15 @@ jobs:
             "$CONVERTER_IMAGE" \
             /opt/blender/blender --background --python-exit-code 1 \
             --python /app/tests/converter/test_convert.py
+
+      - name: Verify interactive prepare/solve/export for typed JSON and binary states
+        run: |
+          docker run --rm --platform linux/amd64 \
+            --mount type=bind,source="$ARTIFACT_ROOT",target=/artifacts \
+            --mount type=bind,source="$GITHUB_WORKSPACE/tests/converter",target=/app/tests/converter,readonly \
+            "$CONVERTER_IMAGE" \
+            /opt/blender/blender --background --factory-startup --disable-autoexec --python-exit-code 1 \
+            --python /app/tests/converter/verify_interactive_binary.py -- /artifacts/assets /artifacts/interactive-binary
 
       - name: Verify cached rest geometry preserves every safety metric
         run: |
