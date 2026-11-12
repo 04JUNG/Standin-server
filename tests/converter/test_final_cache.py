@@ -12,7 +12,7 @@ import pytest
 from converter_api.final_cache import FinalStore, cached_final, canonical, digest, identity
 from converter_api.runner import ConversionResult, RunnerSettings
 from converter.scene_contract import FBX_MAGIC
-from converter.protocol import SOLVER_VERSION
+from converter.protocol import SOLVER_VERSION, SOLVER_MANIFEST_SHA256, RETARGET_SHA256, ANKLE_POLICY_SHA256
 from converter.hand_library import load_library, normalize_request
 
 
@@ -33,7 +33,9 @@ class Runner:
         time.sleep(.01)
         artifact = FBX_MAGIC + bvh_bytes + canonical([hands, mirror, camera_rotation, output_scope])
         sha = digest(artifact)
-        report = dict(ok=True, solver_version=SOLVER_VERSION, artifact_sha256=sha, artifact_size=len(artifact),
+        report = dict(ok=True, solver_version=SOLVER_VERSION, solver_manifest_sha256=SOLVER_MANIFEST_SHA256,
+            retarget_sha256=RETARGET_SHA256, ankle_policy_sha256=ANKLE_POLICY_SHA256,
+            artifact_sha256=sha, artifact_size=len(artifact),
             source_bvh_sha256=digest(bvh_bytes), character_id=character_id,
             character_sha256=character_sha256, camera_rotation=camera_rotation, mirrored=mirror,
             source_fingers=dict(status='transferred', body_bones_preserved=True,
