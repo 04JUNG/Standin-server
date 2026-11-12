@@ -87,6 +87,9 @@ jobs:
           python -m pytest -q \
             tests/test_hand_screen_deployment.py \
             tests/test_staging_anatomy_deployment.py \
+            tests/converter/test_staging_appearance.py \
+            tests/converter/test_skin_contract.py \
+            tests/converter/test_outline_contract.py \
             tests/converter/test_worker_contract.py \
             tests/converter/test_prepared_body.py \
             tests/converter/test_registry.py \
