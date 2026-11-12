@@ -46,5 +46,14 @@
   "mainCapacity234ChangesNeutralIdentity": false,
   "separateSceneTransferExperimentIncluded": false,
   "commonDevelopSynchronizationIncluded": false,
-  "policy": "Use the exact runtime identity. After any bound-code/build/asset/default change, rebuild or verify an exactly matching approved Linux bundle. Never edit keys/receipts to bypass mismatch."
+  "policy": "Use the exact runtime identity. After any bound-code/build/asset/default change, rebuild or verify an exactly matching approved Linux bundle. Never edit keys/receipts to bypass mismatch.",
+  "verificationScriptsSha256": {
+    "scripts/prepare_preset_bodies.py": "7f35cf7f85ae57d9976a2c7f1031245a05497dd51c3e372fee7ae2d04071b404",
+    "scripts/add_prepared_bodies_to_release.py": "5f5c847e4ec28907bc915caefa2e47819a4e68f5e3a15bee1fd4b28f0bd280c2",
+    "scripts/benchmark_prepared_bodies.py": "c975f8dc366364d3d28936835e2ba6cbd7c0540da16611b76165aff6f6b1853e",
+    "scripts/benchmark_prepared_http.py": "18eea0b02a6eadeeeea96330c10b5d7b175bdf3ad88633db01b6c00440f2fdcc",
+    "scripts/verify_prepared_release.py": "da2813b3d02d43a8f76fffb8e680087d1cf4fa0b7a129996b04a84af7ae4274b",
+    "scripts/prepared_preset_scope.py": "3607044c0d3295fd576fd2dc916f2e9c9d3434b153b099e6affca7654e2e59c8",
+    "scripts/staging_body_assets_init.py": "e3b2ed7763000f17d169c3a7e73cf1bd7441e617466bd6760eccfa66f94186b1"
+  }
 }
