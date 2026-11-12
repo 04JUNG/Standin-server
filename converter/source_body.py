@@ -1,6 +1,8 @@
 """Retarget evaluated body landmarks from library poses encoded in BVH offsets."""
 from __future__ import annotations
 
+import hashlib
+import json
 from pathlib import Path
 
 from converter.bone_map import PROFILES, mirror_name, resolve_profile
@@ -12,10 +14,52 @@ UPPER_ARMS = tuple(arm[0] for arm in ARMS)
 LEGS = tuple(tuple(f"{joint}.{side}" for joint in ("upleg", "leg", "foot", "toe")) for side in "LR")
 
 
-def apply_source_body(src, dst, *, mirror=False):
+def reviewed_frames(source_sha256, character_sha256, *, mirror=False):
+    """Look up reviewed Blender world-space quaternions for the exact pose and rig."""
+    if mirror or not character_sha256:
+        return None
+    catalog = json.loads(Path(__file__).with_name("reviewed_pose_frames.json").read_text())
+    row = catalog.get(source_sha256)
+    return row if row and row["character_sha256"] == character_sha256 else None
+
+
+def smooth_reviewed_waist(mesh, rig, neutral, posed):
+    """Blend the corrected waist surface while keeping the rig and weights intact."""
+    import numpy as np
+
+    core = {"Hips", "Spine", "Spine1", "LeftUpLeg", "RightUpLeg"}
+    groups = {g.index for g in mesh.vertex_groups if g.name.split(":")[-1] in core}
+    weights = np.array([sum(g.weight for g in v.groups if g.group in groups) for v in mesh.data.vertices])
+    spine = rig.data.bones["mixamorig:Spine"]
+    center = (mesh.matrix_world.inverted() @ rig.matrix_world @ spine.head_local).z
+    alpha = np.clip((weights - .68) / .32, 0, 1) * np.clip(1 - np.abs(neutral[:, 2] - center) / .16, 0, 1) ** .9
+    edges = np.empty((len(mesh.data.edges), 2), dtype=np.int32)
+    mesh.data.edges.foreach_get("vertices", edges.ravel())
+    src = np.concatenate((edges[:, 0], edges[:, 1]))
+    dst = np.concatenate((edges[:, 1], edges[:, 0]))
+    affected = np.flatnonzero(alpha)
+    # Only solve for vertices in the waist band. Neighboring vertices are fixed.
+    slots = np.full(len(alpha), -1, dtype=np.int32)
+    slots[affected] = np.arange(len(affected))
+    inside = slots[dst] >= 0
+    src, dst = src[inside], slots[dst[inside]]
+    degree = np.maximum(1, np.bincount(dst, minlength=len(affected)))
+    coords = np.array(posed, dtype=float)
+    for _ in range(160):
+        mean = np.column_stack([np.bincount(dst, weights=coords[src, i], minlength=len(affected)) / degree
+                                for i in range(3)])
+        coords[affected] += (mean - coords[affected]) * (.68 * alpha[affected, None])
+    delta = coords[affected] - posed[affected]
+    # The original thumbnail also blends this seam. Limit movement to 25 mm.
+    delta *= np.minimum(1, .025 / np.maximum(np.linalg.norm(delta, axis=1), 1e-9))[:, None]
+    coords[affected] = posed[affected] + delta
+    return coords
+
+
+def apply_source_body(src, dst, *, mirror=False, authored=None):
     """Match source joint directions using the target's own bone lengths and weights."""
     import bpy
-    from mathutils import Matrix
+    from mathutils import Matrix, Quaternion
     from converter import retarget as rt
     from converter.reviewed_source_fingers import bone_names, _palm_frame
 
@@ -74,6 +118,9 @@ def apply_source_body(src, dst, *, mirror=False):
         set_rotation(bone, (desired @ current.transposed()).to_quaternion() @ rotation(bone))
 
     retained = {role: rotation(target[role]) for role in ("head", *limb_roles)}
+    authored_rotations = {
+        role: Quaternion(q).normalized() for role, q in (authored or {}).get("rotations", {}).items()
+    }
     edges = list(zip(SPINE, SPINE[1:]))
 
     def spine_error():
@@ -89,6 +136,8 @@ def apply_source_body(src, dst, *, mirror=False):
         skipped["hips"] = src_reason or dst_reason
 
     for parent, child in edges[:3]:
+        if parent in authored_rotations:
+            set_rotation(target[parent], authored_rotations[parent])
         align_edge(parent, child)
 
     # The spine axis leaves roll free. Use the shoulder line to recover it.
@@ -106,10 +155,10 @@ def apply_source_body(src, dst, *, mirror=False):
     # Restore each segment's solved twist before steering its child into place.
     for limb in (*ARMS, *LEGS):
         for parent, child in zip(limb, limb[1:]):
-            set_rotation(target[parent], retained[parent])
+            set_rotation(target[parent], authored_rotations.get(parent, retained[parent]))
             align_edge(parent, child)
         end = limb[-1]
-        set_rotation(target[end], retained[end])
+        set_rotation(target[end], authored_rotations.get(end, retained[end]))
         if end.startswith("toe."):
             align_end(end)
 
@@ -130,13 +179,18 @@ def apply_source_body(src, dst, *, mirror=False):
             desired = Matrix.Diagonal((-1.0, 1.0, 1.0)) @ desired @ Matrix.Diagonal((1.0, 1.0, -1.0))
         match_frame(dst.pose.bones[dw], current, desired)
 
-    return {"status": "transferred", "max_direction_error_before_deg": before,
-            "max_direction_error_after_deg": spine_error(), "skipped": skipped}
+    result = {"status": "transferred", "max_direction_error_before_deg": before,
+              "max_direction_error_after_deg": spine_error(), "skipped": skipped}
+    if authored:
+        result["reviewed_pose_frames"] = {key: authored[key] for key in
+                                          ("pose_id", "reference_fbx_sha256", "smooth_waist")}
+    return result
 
 
-def bake_source_body(path, bvh_path, *, frame=0, mirror=False):
+def bake_source_body(path, bvh_path, *, frame=0, mirror=False, character_sha256=None):
     """Apply to the single-frame baked-offset format recognized by the importer."""
-    source = Path(bvh_path).read_text(encoding="utf-8-sig", errors="replace")
+    source_bytes = Path(bvh_path).read_bytes()
+    source = source_bytes.decode("utf-8-sig", errors="replace")
     if "ROOT mixamorig:Hips" not in source:
         return None
     from converter import retarget as rt
@@ -152,7 +206,8 @@ def bake_source_body(path, bvh_path, *, frame=0, mirror=False):
     rt.reset_scene()
     dst, meshes = import_full_character(str(path))
     src = rt.import_bvh(str(bvh_path), frame=frame)
-    report = apply_source_body(src, dst, mirror=mirror)
+    authored = reviewed_frames(hashlib.sha256(source_bytes).hexdigest(), character_sha256, mirror=mirror)
+    report = apply_source_body(src, dst, mirror=mirror, authored=authored)
     if report["status"] == "transferred":
         bpy.data.objects.remove(src, do_unlink=True)
         rt.apply_output_mode(dst, meshes, "rigged_rest")
