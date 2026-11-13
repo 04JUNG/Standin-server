@@ -18,10 +18,10 @@ def _flat(matrix):
     return [float(matrix[r][c]) for r in range(4) for c in range(4)]
 
 
-def capture(origin=None):
+def _checked_scene():
+    """Scene invariants every capture enforces; returns (objects, armature, profile)."""
     import bpy
-    from mathutils import Matrix, Vector
-    from converter.bone_map import PROFILES, resolve_profile
+    from converter.bone_map import resolve_profile
     bpy.context.view_layer.update()
     objects = list(bpy.context.scene.objects)
     arms = [o for o in objects if o.type == 'ARMATURE']
@@ -33,8 +33,29 @@ def capture(origin=None):
     if any(abs(float(pb.matrix_basis[r][c]) - (r == c)) > MATRIX_TOLERANCE
            for pb in arm.pose.bones for r in range(4) for c in range(4)):
         raise ValueError('snapshot must have all deformation baked to rigged_rest')
-    profile = resolve_profile(list(arm.data.bones.keys()))
-    pivot = Vector(origin) if origin is not None else arm.matrix_world @ arm.data.bones[PROFILES[profile]['hips']].head_local
+    return objects, arm, resolve_profile(list(arm.data.bones.keys()))
+
+
+def _hip_pivot(arm, profile):
+    from converter.bone_map import PROFILES
+    return arm.matrix_world @ arm.data.bones[PROFILES[profile]['hips']].head_local
+
+
+def scene_origin():
+    """The originBlender capture() would report, without traversing the surface.
+
+    Same scene invariants and the same mathutils expression as capture(), so the
+    value is bit-identical; the solve stage only needs this before freezing the FBX.
+    """
+    _, arm, profile = _checked_scene()
+    return list(_hip_pivot(arm, profile))
+
+
+def capture(origin=None):
+    import bpy
+    from mathutils import Matrix, Vector
+    objects, arm, profile = _checked_scene()
+    pivot = Vector(origin) if origin is not None else _hip_pivot(arm, profile)
     conversion = Matrix(((1, 0, 0, 0), (0, 0, 1, 0), (0, -1, 0, 0), (0, 0, 0, 1))) @ Matrix.Translation(-pivot)
     order = []
     def visit(bone):

@@ -12,7 +12,7 @@ import json
 import os
 
 from converter.protocol import SOLVER_VERSION, SOLVER_MANIFEST_SHA256
-from converter.solved_state import SolvedPoseState, canonical, decode, digest, validate_identity
+from converter.solved_state import SolvedPoseState, canonical, decode, digest, model_digest, validate_identity
 
 VERSION = 'post-frozen-file-canonical-snapshot-v2'
 # Approved #168 fixed defaults contain real terminal Head/ToeBase bones and no
@@ -225,17 +225,26 @@ def state_file(directory):
     return found[0]
 
 
-def solve_from_body(base_directory, identity, destination, *, checkpoint, encoding='typed-f64be-json-v1'):
+SOLVE_SCHEMA = 'interactive-solve-v1'
+
+
+def solve_from_body(base_directory, identity, destination, *, checkpoint, encoding='typed-f64be-json-v1',
+                    publish=True):
     """Restore approved body/shape; latest hand selection wins at each checkpoint.
 
     checkpoint is a worker-supplied revision/cancellation fence. It must raise
     before publication if a newer hand/refine/shape/scope selection exists.
-    Returned packet is display authority only; no final file receipt is issued.
+
+    With publish=False (the serving path) this only freezes ``staged.fbx`` and a
+    ``solve.json`` index. ``publish_solved`` then runs in a separate fresh
+    Blender process: one reimport of the exact bytes yields both the display
+    packet and the verified file receipt. publish=True keeps the previous
+    single-process behaviour (in-process reimport, no receipt) for local tools.
     """
     from converter.hand_library import load_library, normalize_request
     from converter.hands import solve_hands
     from converter.framing import crop_meshes
-    from converter.interactive_scene import capture
+    from converter.interactive_scene import capture, scene_origin
     import bpy
     validate_identity(identity); checkpoint()
     if identity['camera']['baked']:
@@ -259,25 +268,86 @@ def solve_from_body(base_directory, identity, destination, *, checkpoint, encodi
     # the unchanged full correspondence gate. Never export the snapshot again.
     from converter import retarget as rt
     from converter.shape_bake import import_full_character
-    origin = capture()['coordinates']['originBlender']
+    # Same scene invariants and bit-identical hip pivot as capture(), without
+    # traversing the whole surface just to read the origin (~3 s per solve).
+    origin = scene_origin()
     staged = directory/'staged.fbx'
     rt.export_fbx(str(staged), embed_textures=False, bake_anim=False)
     checkpoint()
+    solve = dict(schema=SOLVE_SCHEMA, runtimeRevision=runtime_revision(), originBlender=origin,
+        stagedFbxSha256=digest(staged.read_bytes()),
+        handReportSha256=digest(canonical(hand_report)), cropReportSha256=digest(canonical(crop_report)))
+    atomic_write(directory/'solve.json', canonical(solve))
+    if not publish:
+        return solve
     rt.reset_scene(); import_full_character(str(staged))
-    model = capture(origin)
+    return _publish(directory, identity, solve, capture(origin), encoding, receipt=None)
+
+
+def _publish(directory, identity, solve, model, encoding, *, receipt):
+    """Write the state, snapshot index, optional verified receipt, then the packet last."""
+    import shutil
     state = SolvedPoseState.create(identity, model, encoding=encoding)
     snapshot = directory/'solved.blend'; _save_scene(snapshot)
     atomic_write(directory/STATE_FILES[state.encoding], state.canonical_bytes)
     manifest = dict(schema='interactive-snapshot-v1', stateHash=state.state_hash,
         runtimeRevision=runtime_revision(), snapshotSha256=digest(snapshot.read_bytes()),
-        stagedFbxSha256=digest(staged.read_bytes()),
-        handReportSha256=digest(canonical(hand_report)), cropReportSha256=digest(canonical(crop_report)))
+        stagedFbxSha256=solve['stagedFbxSha256'],
+        handReportSha256=solve['handReportSha256'], cropReportSha256=solve['cropReportSha256'])
     atomic_write(directory/'snapshot.json', canonical(manifest))
-    checkpoint()
+    if receipt is not None:
+        verified = directory/VERIFIED_DIR; verified.mkdir()
+        shutil.copyfile(directory/'staged.fbx', verified/'artifact.fbx')
+        if digest((verified/'artifact.fbx').read_bytes()) != solve['stagedFbxSha256']:
+            raise ValueError('immutable FBX copy changed')
+        atomic_write(verified/'verified.canonical.json', canonical(receipt(state)))
     # Publish last; an exception/restart can leave private partial files but no
     # authoritative packet. BFF still fences revision before accepting this.
     atomic_write(directory/'packet.json', json.dumps(state.packet(), separators=(',', ':')).encode())
     return state
+
+
+VERIFIED_DIR = 'verified'
+
+
+def publish_solved(directory, identity, *, encoding='typed-f64be-json-v1'):
+    """Fresh Blender process only: the single reimport of the frozen ``staged.fbx``.
+
+    The same import that passes the final-file structural validation is captured
+    as the display packet, so what the user sees is exactly what the verified
+    file reimports to. Only this verifier mints the receipt; ``export`` merely
+    rebinds it under the current operation/revision fences.
+    """
+    from converter import retarget as rt
+    from converter.shape_bake import import_full_character
+    from converter.final_artifact import validate
+    from converter.interactive_scene import capture
+    from converter.interactive_export import verified_receipt
+    checked_runtime(); validate_identity(identity)
+    directory = Path(directory); staged = directory/'staged.fbx'
+    solve = decode((directory/'solve.json').read_bytes())
+    if (solve.get('schema') != SOLVE_SCHEMA or solve.get('runtimeRevision') != runtime_revision()
+            or staged.is_symlink() or not staged.is_file() or digest(staged.read_bytes()) != solve['stagedFbxSha256']):
+        raise ValueError('solved snapshot integrity mismatch')
+    # Shaped/approved rigs keep their real terminal bones (same importer as the
+    # previous in-process reimport and the standalone verifier).
+    previous = rt.import_character
+    rt.import_character = import_full_character
+    try:
+        skin = validate(staged, identity['scope'])
+    finally:
+        rt.import_character = previous
+    model = capture(solve['originBlender'])
+    if digest(staged.read_bytes()) != solve['stagedFbxSha256']:
+        raise ValueError('FBX changed during validation')
+    zero = dict(maxPositionErrorM=0.0, maxMatrixError=0.0, maxWeightError=0.0, maxNormalError=0.0)
+    def receipt(state):
+        # The packet IS this reimport, so both digests are the same model digest.
+        model_sha = state.model_sha256 if state.is_binary else model_digest(model, state.encoding)
+        return verified_receipt(state, artifact_sha=solve['stagedFbxSha256'],
+            artifact_bytes=staged.stat().st_size, skin=skin, errors=zero,
+            packet_model_sha256=model_sha, reimport_model_sha256=model_sha)
+    return _publish(directory, identity, solve, model, encoding, receipt=receipt)
 
 
 def load_solved(directory, *, verified_state=None):

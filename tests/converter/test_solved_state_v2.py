@@ -355,9 +355,9 @@ def test_snapshot_store_v2_end_to_end_reuses_core_and_serves_binary(tmp_path, mo
             (base/'base.json').write_bytes(canonical(dict(schema='interactive-body-base-v2',
                 binding=body_binding(current), runtimeRevision=runtime_revision(), snapshotSha256=digest(b'base'),
                 modelSha256=v2.model_digest(body), bodyReportSha256='e'*64, initialFbxRequired=True)))
-        else:
-            # v1 calls keep the previous six-argument form (no encoding argument).
-            write_bundle(destination, SolvedPoseState.create(current, model(), encoding=encoding[0] if encoding else V1_ENCODING))
+        elif stage == 'publish':
+            # The fresh publish process writes the state in the requested encoding.
+            write_bundle(destination, SolvedPoseState.create(current, model(), encoding=encoding[0]))
     monkeypatch.setattr(store, '_child', child)
     selection = dict(schema='interactive-selection-v1', ownerBinding='a'*64, candidateId='c',
         body=dict(characterId='registered-fixture', assetSha256='c'*64), shape=None, shapeSource=None,
@@ -367,7 +367,8 @@ def test_snapshot_store_v2_end_to_end_reuses_core_and_serves_binary(tmp_path, mo
         expiresAt=datetime.fromtimestamp(time.time() + 600, timezone.utc).isoformat())
     first = store.solve(payload, V2)
     second = store.solve({**payload, 'operation': 'two', 'revision': 2}, V2)
-    assert calls == [('prepare', ()), ('solve', (V2,))]  # the appearance revision reused the v2 core
+    # solve freezes the FBX; publish receives the encoding. The appearance revision reused the v2 core.
+    assert calls == [('prepare', ()), ('solve', ()), ('publish', (V2,))]
     assert seen_bones and seen_bones[0] == model()['bones']
     for result in (first, second):
         assert result['packet']['canonicalEncoding'] == V2 and 'canonicalState' not in result['packet']
@@ -379,4 +380,4 @@ def test_snapshot_store_v2_end_to_end_reuses_core_and_serves_binary(tmp_path, mo
     assert unavailable.value.status_code == 409
     # The same selection requested as v1 is a separate bundle (no cross-encoding reuse).
     legacy = store.solve({**payload, 'operation': 'three', 'revision': 3})
-    assert legacy['packet']['canonicalEncoding'] == V1_ENCODING and calls[-1] == ('solve', ())
+    assert legacy['packet']['canonicalEncoding'] == V1_ENCODING and calls[-1] == ('publish', (V1_ENCODING,))

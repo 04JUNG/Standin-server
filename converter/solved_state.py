@@ -242,12 +242,14 @@ class SolvedPoseState:
             object.__setattr__(self, '_head', head)
             object.__setattr__(self, '_model_offset', model_offset)
             object.__setattr__(self, '_model_sha256', v2.model_digest(self.canonical_bytes, model_offset))
+            safety = head['safety']
         else:
             payload = decode(self.canonical_bytes)
             _check_envelope(payload); validate_model(payload['model'])
             identity = payload['identity']
             object.__setattr__(self, '_encoding', V1_ENCODING)
             object.__setattr__(self, '_model_sha256', None)
+            safety = payload['safety']
         # Cache only immutable scalars. Packet construction must not decode a
         # multi-megabyte surface merely to read its operation/revision.
         selection = identity['selection']
@@ -255,6 +257,7 @@ class SolvedPoseState:
         object.__setattr__(self, '_revision', selection['revision'])
         object.__setattr__(self, '_state_hash', digest(self.canonical_bytes))
         object.__setattr__(self, '_identity_bytes', canonical(identity))
+        object.__setattr__(self, '_safety_bytes', canonical(safety))
 
     @classmethod
     def create(cls, identity, model, encoding=V1_ENCODING):
@@ -280,6 +283,11 @@ class SolvedPoseState:
     @property
     def state_hash(self):
         return self._state_hash
+
+    @property
+    def safety(self):
+        """Fresh copy of the (scalar-only) safety block without decoding the surface."""
+        return decode(self._safety_bytes)
 
     @property
     def identity(self):
