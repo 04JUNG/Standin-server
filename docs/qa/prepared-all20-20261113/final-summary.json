@@ -1,0 +1,43 @@
+{
+  "complete": true,
+  "sourceCatalogSha256": "76ff5d66d13097839293fe8ae7464fae9a22463081582b27246a4b2d4344b635",
+  "preparedPerBranch": 20,
+  "developPosePairs": 20,
+  "mainPosePairs": 20,
+  "mainCleanHttpPairs": 6,
+  "mainCleanOb001Pairs": 6,
+  "allGeometryBoneMatrixWeightDeltasZero": true,
+  "actualPrebuiltImage": "sha256:eca16e9d4c89d80f667f2f23105fb8b78168ae0111893d863210d5ac1a01d5aa",
+  "imageSourceCommit": "f31558c305c8bb4c1687ab8fe4e15f001ca26f24",
+  "runtimeCodeOverlaid": false,
+  "uid": 10001,
+  "cleanHttpEstimatedStartUtc": "2026-11-12T19:02:38.509719+00:00",
+  "rootBuildCompletedKst": "2026-11-13T03:55:14.262128+09:00",
+  "runtimeAuditCount": 20,
+  "oldOb001PossiblyContendedRunsExcluded": 9,
+  "localDefaultPreservation": {
+    "sourceFiles": 197,
+    "targetFiles": 233,
+    "unchanged": 196,
+    "newPreparedObjects": 36
+  },
+  "rollback": true,
+  "customShapeFallback": true,
+  "awsOrProtectedBranchWrites": false,
+  "limitations": [
+    "Mac arm64 host running Linux/amd64 containers; not native Linux performance",
+    "one timing sample per condition; OS filesystem cache uncontrolled",
+    "localhost Converter HTTP only; BFF/native UI/PNG/appearance postprocessing excluded",
+    "ECS/S3 download and startup time not measured",
+    "separate scene-transfer and develop-common-sync experiments excluded"
+  ],
+  "writeScope": "No AWS or protected-branch writes by this preparation session. Functional PRs were observed merged externally while final measurements were running.",
+  "mergedFunctionalPrsObserved": [
+    235,
+    236,
+    92,
+    93
+  ],
+  "evidenceBaseBranch": "develop",
+  "evidenceBaseCommit": "797fcf0b84bd61cf3ef02a3e3ce63f2888132986"
+}
