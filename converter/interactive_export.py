@@ -91,6 +91,32 @@ def export_bundle(binary, bundle, destination, expected_state_hash, *, checkpoin
     return receipt
 
 
+LIMITATIONS = ['initial-fbx-dependency', 'not-full-collision-certificate',
+               'display-camera-not-csp-camera', 'bff-authorization-required']
+
+
+def verified_receipt(state, *, artifact_sha, artifact_bytes, skin, errors, packet_model_sha256,
+                     reimport_model_sha256):
+    """The one receipt shape a fresh-process FBX verifier may emit.
+
+    Callers pass the model digests they already hold: recomputing them from a
+    typed-JSON (v1) state would decode the whole surface again (~10 s).
+    """
+    from converter.interactive_adapter import runtime_revision
+    from converter.interactive_scene import POSITION_TOLERANCE_M, MATRIX_TOLERANCE, WEIGHT_TOLERANCE
+    identity = state.identity
+    return dict(schema=RECEIPT_SCHEMA, stateHash=state.state_hash,
+        revision=identity['selection']['revision'], operation=identity['selection']['operation'],
+        identity=identity, verified=True, artifactSha256=artifact_sha,
+        artifactBytes=artifact_bytes, runtimeRevision=runtime_revision(),
+        # Both digests use the state's own canonical encoding (v1 typed JSON or v2 binary).
+        packetModelSha256=packet_model_sha256, reimportModelSha256=reimport_model_sha256,
+        skin=skin, correspondence=dict(topology=True, jointIdentity=True, skinIdentity=True,
+            **errors, positionToleranceM=POSITION_TOLERANCE_M,
+            matrixTolerance=MATRIX_TOLERANCE, weightTolerance=WEIGHT_TOLERANCE),
+        safety=state.safety, limitations=list(LIMITATIONS))
+
+
 def child(stage, bundle, destination, expected_state_hash):
     import bpy
     from converter import retarget as rt
@@ -125,17 +151,10 @@ def child(stage, bundle, destination, expected_state_hash):
         errors = compare(model, actual)
         if digest(artifact.read_bytes()) != artifact_sha:
             raise ValueError('FBX changed during validation')
-        receipt = dict(schema=RECEIPT_SCHEMA, stateHash=state.state_hash,
-            revision=identity['selection']['revision'], operation=identity['selection']['operation'],
-            identity=identity, verified=True, artifactSha256=artifact_sha,
-            artifactBytes=artifact.stat().st_size, runtimeRevision=runtime_revision(),
-            # Both digests use the state's own canonical encoding (v1 typed JSON or v2 binary).
-            packetModelSha256=state.model_sha256, reimportModelSha256=model_digest(actual, state.encoding),
-            skin=skin, correspondence=dict(topology=True, jointIdentity=True, skinIdentity=True,
-                **errors, positionToleranceM=POSITION_TOLERANCE_M,
-                matrixTolerance=MATRIX_TOLERANCE, weightTolerance=WEIGHT_TOLERANCE),
-            safety=payload['safety'], limitations=['initial-fbx-dependency', 'not-full-collision-certificate',
-                'display-camera-not-csp-camera', 'bff-authorization-required'])
+        # model (decoded above) gives the packet digest without decoding the state again.
+        receipt = verified_receipt(state, artifact_sha=artifact_sha, artifact_bytes=artifact.stat().st_size,
+            skin=skin, errors=errors, packet_model_sha256=model_digest(model, state.encoding),
+            reimport_model_sha256=model_digest(actual, state.encoding))
         atomic_write(directory/'verified.canonical.json', canonical(receipt))
 
 

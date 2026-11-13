@@ -121,5 +121,35 @@ check('v2 fresh-process reimport matched the binary packet (topology, joints, sk
       all(json.loads((out/'export-v2/receipt.json').read_text())['correspondence'][k]
           for k in ('topology', 'jointIdentity', 'skinIdentity')))
 
+# 4. Serving path: solve only freezes staged.fbx; a fresh publish process reimports it once,
+#    and its capture is both the display packet and the verified receipt.
+import subprocess
+from converter.interactive_adapter import VERIFIED_DIR
+from converter.interactive_reuse import rebind_export
+worker = Path(__file__).resolve().parents[2]/'converter/interactive_worker.py'
+ip = out/'identity.json'; ip.write_bytes(canonical(identity))
+for tag, encoding, reference in (('v1', V1_ENCODING, s1), ('v2', v2.ENCODING, s2)):
+    destination = out/f'published-{tag}'
+    solve = timed(f'serving_solve_{tag}', lambda: solve_from_body(out/'base-v2', copy.deepcopy(identity), destination,
+                                                                  checkpoint=lambda: None, publish=False))
+    check(f'{tag} serving solve freezes the FBX without publishing a packet',
+          (destination/'staged.fbx').is_file() and not (destination/'packet.json').exists())
+    check(f'{tag} solve origin equals the full-capture origin', solve['originBlender']
+          == reference.payload['model']['coordinates']['originBlender'])
+    timed(f'publish_child_{tag}', lambda: subprocess.run([binary, '--background', '--factory-startup', '--disable-autoexec',
+        '--python-exit-code', '1', '--python', str(worker), '--', 'publish', 'unused', str(ip), 'unused',
+        str(destination), encoding], check=True, capture_output=True))
+    published, _ = load_solved(destination)
+    check(f'{tag} published packet is byte-identical to the previous in-process reimport packet',
+          published.canonical_bytes == reference.canonical_bytes)
+    receipt = timed(f'export_published_{tag}', lambda: rebind_export(destination/VERIFIED_DIR,
+                                                                    out/f'export-published-{tag}', destination))
+    check(f'{tag} published receipt rebinds without another Blender process', receipt['verified'] is True
+          and receipt['stateHash'] == published.state_hash and receipt['packetModelSha256'] == published.model_sha256)
+    fallback = timed(f'export_fallback_{tag}', lambda: export_bundle(binary, destination, out/f'export-fallback-{tag}',
+                                                                    published.state_hash, checkpoint=lambda: None))
+    check(f'{tag} independent verifier still accepts the published bundle', fallback['verified'] is True
+          and fallback['packetModelSha256'] == receipt['packetModelSha256'])
+
 (out/'evidence.json').write_text(json.dumps(evidence, indent=2))
 print(json.dumps(evidence, indent=2))

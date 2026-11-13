@@ -9,8 +9,8 @@ import base64, hmac, json, logging, os, re, shutil, stat, tempfile, threading, t
 from pathlib import Path
 from fastapi import Request, HTTPException
 from fastapi.responses import Response
-from converter.interactive_adapter import (VERSION, STATE_FILES, atomic_write, body_binding, read_body_metadata,
-    runtime_revision, shape_binding, load_solved)
+from converter.interactive_adapter import (VERSION, STATE_FILES, VERIFIED_DIR, atomic_write, body_binding,
+    read_body_metadata, runtime_revision, shape_binding, load_solved)
 from converter.solved_state import V1_ENCODING
 from converter.solved_state_v2 import ENCODING as V2_ENCODING, MEDIA_TYPE as V2_MEDIA_TYPE, is_v2
 from converter.interactive_camera import camera_for_model
@@ -296,9 +296,11 @@ class SnapshotStore:
                         shutil.rmtree(directory/'solved', ignore_errors=True)
                         checkpoint()
                 if state is None:
-                    # v1 keeps the exact previous child invocation; only v2 adds the encoding argument.
-                    measured('blender_solve',self._child,'solve',job_dir/'job.json',ip,base_directory,directory/'solved',checkpoint,
-                             *(() if encoding==V1_ENCODING else (encoding,)))
+                    # solve freezes staged.fbx; a fresh publish process reimports those exact
+                    # bytes once, validates them and captures the display packet + receipt.
+                    measured('blender_solve',self._child,'solve',job_dir/'job.json',ip,base_directory,directory/'solved',checkpoint)
+                    checkpoint()
+                    measured('blender_publish',self._child,'publish',job_dir/'job.json',ip,base_directory,directory/'solved',checkpoint,encoding)
                     state,_=measured('validate_before_cache',load_solved,directory/'solved'); checkpoint()
                     core.parent.mkdir(exist_ok=True)
                     shutil.copytree(directory/'solved', core)
@@ -363,7 +365,16 @@ class SnapshotStore:
                     check()
                     cached = e['core']/'verified-export'
                     receipt = None
-                    if cached.is_dir():
+                    published = e['directory']/'solved'/VERIFIED_DIR
+                    if published.is_dir():
+                        # The publish verifier already reimported these exact bytes in a
+                        # fresh process; only rebind its receipt under current fences.
+                        try:
+                            receipt = measured('export_published',rebind_export,published, path, e['directory']/'solved')
+                        except (OSError, ValueError):
+                            shutil.rmtree(path, ignore_errors=True)
+                            check()
+                    if receipt is None and cached.is_dir():
                         try:
                             receipt = measured('export_rebind',rebind_export,cached, path, e['directory']/'solved')
                         except (OSError, ValueError):

@@ -102,13 +102,14 @@ def test_snapshot_store_reuses_core_without_repeating_prepare_or_solve(tmp_path,
     monkeypatch.setattr(api,'resolve_shape',lambda *a:None)
     monkeypatch.setattr(api,'camera_for_model',lambda *a:identity()['camera'])
     calls=[]
-    def child(stage,job,ip,base,destination,checkpoint):
+    def child(stage,job,ip,base,destination,checkpoint,*encoding):
         checkpoint();calls.append(stage);current=decode(Path(ip).read_bytes())
         if stage=='prepare':
             base.mkdir(parents=True);(base/'body.blend').write_bytes(b'base')
             (base/'base.json').write_bytes(canonical(dict(schema='interactive-body-base-v1',
                 binding=body_binding(current),runtimeRevision=runtime_revision(),snapshotSha256=digest(b'base'),model=model())))
-        else:bundle(destination,current)
+        elif stage=='publish':bundle(destination,current)
+        # 'solve' only freezes staged.fbx in production; the fake publish writes the bundle.
     monkeypatch.setattr(store,'_child',child)
     selection=dict(schema='interactive-selection-v1',ownerBinding='a'*64,candidateId='c',
         body=dict(characterId='registered-fixture',assetSha256='c'*64),shape=None,shapeSource=None,
@@ -118,14 +119,14 @@ def test_snapshot_store_reuses_core_without_repeating_prepare_or_solve(tmp_path,
         expiresAt=datetime.fromtimestamp(time.time()+600,timezone.utc).isoformat())
     first=store.solve(payload)
     second=store.solve({**payload,'operation':'two','revision':2})
-    assert calls==['prepare','solve']
+    assert calls==['prepare','solve','publish']
     assert first['packet']['stateHash']!=second['packet']['stateHash']
     assert second['packet']['operation']=='two'
     store.cancel('a'*64,'p',1)
     assert store.read(second['snapshotId'],'a'*64,'model')
     (store.entries[second['snapshotId']]['core']/'staged.fbx').write_bytes(b'broken cache')
     third=store.solve({**payload,'operation':'three','revision':3})
-    assert calls==['prepare','solve','solve']
+    assert calls==['prepare','solve','publish','solve','publish']
     assert third['packet']['operation']=='three'
 
 
