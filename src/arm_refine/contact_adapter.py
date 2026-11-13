@@ -113,9 +113,10 @@ def target_frame(arm, meshes, side, part):
     b = bones(arm); basis = body_frame(arm)
     left, up, forward = map(Vector, (-basis[:, 0], basis[:, 1], -basis[:, 2]))
     outward = left if side == "Left" else -left
-    if part.target == "waist_side":
+    if part.target in ("waist_side","pelvis_side"):
         tree, pts, _ = surface(meshes, "Torso")
         waist = arm.matrix_world @ ((b["Hips"].head + b["Spine1"].head) * .5)
+        if part.target=='pelvis_side':waist=arm.matrix_world@b['Hips'].head+up*.055
         size = max(np.ptp(pts @ np.array(outward)), .1)
         hit = tree.ray_cast(waist + outward * size * 2, -outward, size * 4)
         if hit[0] is None:
@@ -123,6 +124,7 @@ def target_frame(arm, meshes, side, part):
         anchor, normal = hit[:2]; normal = unit(normal)
         if normal.dot(outward) < 0: normal = -normal
         hu, hn = -up, -normal
+        if part.target=='pelvis_side':hu=unit(-up+outward*.6)
         pole_direction = unit(outward - up * .5)
     elif part.target in ('abdomen_front','chest_front','collar_front'):
         tree,pts,_=surface(meshes,'Torso')
@@ -172,6 +174,9 @@ def target_frame(arm, meshes, side, part):
             if hit[0] is None:raise ValueError('head front/back ray missed')
             anchor=hit[0];hu=hup if back else -(hl if side=='Left' else -hl);hn=-normal
             pole_direction=unit(outward+up*.35+forward*(-.3 if back else .25))
+            if part.id=='forehead_straight':
+                hu=unit(hu+hup*.3)
+                pole_direction=unit(outward+up*1.25+forward*.45)
         else:
             profile = []
             for f in np.linspace(.04, .44, 41):
@@ -192,7 +197,7 @@ def hand_samples(arm, meshes, side, part):
     bases = {f: np.array(arm.matrix_world @ b[side + "Hand" + f.title() + "1"].head) for f in ("thumb", "index", "middle", "ring", "pinky")}
     hf = hand_frame(side.lower(), np.array(w), bases); h = frame(hf.length_axis, hf.palm_normal)
     _, _, raw = surface(meshes, side + "Hand")
-    ids = np.flatnonzero(raw["weights"] >= .9)
+    ids = np.flatnonzero(raw["weights"] >= (.2 if part.patch=='wrist_side' else .9))
     local = (raw["points"][ids] - np.array(w)) @ np.array(h)
     if part.patch == "palm":
         length = np.linalg.norm(bases["middle"] - np.array(w))
@@ -200,6 +205,9 @@ def hand_samples(arm, meshes, side, part):
         normals = raw["normals"][ids] @ np.array(h)
         patch_ids = np.flatnonzero((local[:, 0] > length * .25) & (local[:, 0] < length * .85)
                                   & (abs(local[:, 2]) < width * .35) & (normals[:, 1] > .35))
+    elif part.patch=='wrist_side':
+        normals=raw['normals'][ids]@np.array(h)
+        patch_ids=np.flatnonzero((local[:,0]>-.006)&(local[:,0]<.014)&(abs(local[:,2])<.014)&(normals[:,1]>.35))
     elif part.patch == 'thumb_pad':
         thumb = raw['thumb_weights'][ids] > .8
         patch_ids = np.flatnonzero(thumb & (local[:,1] > np.quantile(local[thumb,1],.6)))
@@ -313,7 +321,7 @@ def apply_native(arm, side, e, w, desired_frame, original_hand_frame, rig_profil
     return best[2]
 
 
-def apply_contact_part(arm, meshes, part, side, skin_check, rig_profile, *, pole_bias=0.):
+def apply_contact_part(arm, meshes, part, side, skin_check, rig_profile, *, pole_bias=0.,reuse_hand_shape=False):
     """Return a receipt; on failure restore every original local bone matrix."""
     validate_rig(arm, meshes)
     if side not in ("left", "right"): raise ValueError("explicit side required")
@@ -329,7 +337,8 @@ def apply_contact_part(arm, meshes, part, side, skin_check, rig_profile, *, pole
     receipt = {"part": part.record(), "side": side.lower(), "accepted": False, "release_allowed": False,
                "method": "common_destination_contact_fit_v1", "trials": [], "initial_skin": initial_skin}
     try:
-        set_hand_shape(arm, side, part)
+        if not reuse_hand_shape:set_hand_shape(arm, side, part)
+        receipt['reused_existing_hand_shape']=bool(reuse_hand_shape)
         shaped = {p.name: p.matrix_basis.copy() for p in arm.pose.bones}
         target, anchor, normal, desired, preferred, axes = target_frame(arm, meshes, side, part)
         preferred=unit(preferred+axes[0]*float(pole_bias))
@@ -357,8 +366,10 @@ def apply_contact_part(arm, meshes, part, side, skin_check, rig_profile, *, pole
         def objective(z):
             try:
                 e, w, h, ds, signed, norm, wrist, margin = measure(z)
-                violation = max(0, -float(signed.min()) - .0005, (wrist-55)*.001, -margin, (norm-25)*.001)
+                wrist_target=min(55,part.max_wrist_axis_deg-5)
+                violation = max(0, -float(signed.min()) - .0005, (wrist-wrist_target)*.001, -margin, (norm-25)*.001)
                 appearance = float(np.mean(ds ** 2) * 100 + norm ** 2 * .00001 + .0002 * np.sum(z[:4] ** 2))
+                if part.max_wrist_axis_deg<55:appearance+=wrist**2*.00002
                 return violation, appearance
             except ValueError: return 1e3, 1e3
         bounds = [(-1.05, 1.05), (-.30, .30), (-.45, .45), (-.30, .30), (.001, .008)]
