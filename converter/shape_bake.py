@@ -132,16 +132,27 @@ def convert_shaped(*, recipe, bvh_path, character_fbx, out_path, **options):
     if not options.get('force_exact_v324', False):
         from converter.source_body import bake_source_body
         source_body = bake_source_body(solver_output, bvh_path,
-            frame=options.get('frame', 0), mirror=options.get('mirror', False))
+            frame=options.get('frame', 0), mirror=options.get('mirror', False),
+            character_sha256=recipe['asset_sha256'])
     rt.reset_scene();posed,_=rt.import_character(str(solver_output))
     if set(rest)!=set(b.name for b in posed.data.bones):raise ValueError('solver changed shape rig bone set')
     deform={b.name:(posed.matrix_world@b.matrix_local)@rest[b.name].inverted() for b in posed.data.bones}
     module=_load(recipe);mesh,rig=module.objects();module.BUSY=True
+    evaluated = module.evaluated
     try:
         transfer_error=transfer_solver_pose(rig,deform)
         module.correct_pose(check_intersections=True,contacts=True)
+        if (source_body or {}).get("reviewed_pose_frames", {}).get("smooth_waist"):
+            from converter.source_body import smooth_reviewed_waist
+            neutral = module.compute(recipe['values'])[0]
+            waist_surface = smooth_reviewed_waist(mesh, rig, neutral, evaluated(mesh))
+            # Use the corrected source surface in the pinned exporter's own
+            # topology, weights and round-trip checks.
+            module.evaluated = lambda obj: waist_surface if obj == mesh else evaluated(obj)
         posed_bundle=module.export_fixed(str(Path(out_path).parent/'corrected'),posed=True)
-    finally:module.BUSY=False
+    finally:
+        module.evaluated = evaluated
+        module.BUSY = False
     shutil.copyfile(posed_bundle/'model.fbx',out_path)
     final=json.loads((posed_bundle/'manifest.json').read_text())
     channels = {b.name: {'rotation_mode': b.rotation_mode,
