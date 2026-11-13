@@ -49,7 +49,9 @@ def stream_analysis(run):
             while True:
                 with ready:
                     ready.wait_for(lambda: latest is not None or fallback is not None)
-                    if fallback is not None and not terminal:
+                    # Send usable base candidates before an error, even when both
+                    # events were queued before the reader woke up.
+                    if fallback is not None and (latest is None or latest["type"] != "result"):
                         event, fallback = fallback, None
                     else:
                         event, latest = latest, None

@@ -46,10 +46,12 @@ def runtime_revision():
     root = Path(__file__).parent
     names = ['interactive_camera.py', 'interactive_worker.py', 'interactive_adapter.py', 'interactive_scene.py', 'interactive_export.py',
              'interactive_revision.py', 'interactive_reuse.py', 'interactive_variants.py', 'shared/interactive_pose_v1.mjs',
-             'solved_state.py', 'hands.py', 'hand_geometry.py', 'hand_library.py', 'hand_contact.py',
+             'shared/interactive_pose_v2.mjs', 'solved_state.py', 'solved_state_v2.py',
+             'hands.py', 'hand_geometry.py', 'hand_library.py', 'hand_contact.py',
              'hand_library.v1.json', 'hand_rig.py', 'framing.py', 'camera.py',
              'shape_bake.py', 'final_artifact.py', 'protocol.py', 'worker.py',
-             'reviewed_library.py', 'reviewed_source_fingers.py', 'source_body.py', 'body_material.py']
+             'reviewed_library.py', 'reviewed_source_fingers.py', 'source_body.py',
+             'reviewed_pose_frames.json', 'body_material.py']
     return digest(b''.join(canonical([n, digest((root/n).read_bytes())]) for n in names))
 
 
@@ -137,14 +139,66 @@ def prepare_body(job, identity, destination):
     model = capture()
     directory = Path(destination); directory.mkdir(parents=True, exist_ok=False)
     snapshot = directory/'body.blend'; _save_scene(snapshot)
-    metadata = dict(schema='interactive-body-base-v1', binding=binding,
+    metadata = dict(binding=binding,
         runtimeRevision=runtime_revision(), snapshotSha256=digest(snapshot.read_bytes()),
         # Frozen diagnostics may contain Infinity for an unmeasurable rejected
         # candidate. Preserve/hash that legacy report without admitting any
         # nonfinite value into the authoritative state/model serialization.
-        model=model, bodyReportSha256=digest(json.dumps(report, sort_keys=True,
+        bodyReportSha256=digest(json.dumps(report, sort_keys=True,
             separators=(',', ':'), ensure_ascii=True).encode()), initialFbxRequired=True)
+    if body_base_format() == BODY_BASE_V2:
+        # The parent API process only needs bindings and camera bones. A small
+        # JSON index plus a hash-pinned binary model avoids re-parsing the full
+        # surface as typed JSON on every hand/appearance revision.
+        from converter import solved_state_v2 as v2
+        raw = v2.encode_model(model)
+        atomic_write(directory/BODY_MODEL_FILE, raw)
+        metadata = dict(metadata, schema=BODY_BASE_V2, modelSha256=v2.model_digest(raw))
+    else:
+        metadata = dict(metadata, schema=BODY_BASE_V1, model=model)
     atomic_write(directory/'base.json', canonical(metadata))
+    return metadata
+
+
+BODY_BASE_V1 = 'interactive-body-base-v1'
+BODY_BASE_V2 = 'interactive-body-base-v2'
+BODY_MODEL_FILE = 'base.model.bin'
+
+
+def body_base_format():
+    """Private body snapshot format. Readers accept both; rollback writes v1."""
+    value = os.getenv('CONVERTER_INTERACTIVE_BODY_FORMAT', 'v2').strip().lower()
+    if value not in ('v1', 'v2'):
+        raise ValueError('CONVERTER_INTERACTIVE_BODY_FORMAT must be v1 or v2')
+    return BODY_BASE_V2 if value == 'v2' else BODY_BASE_V1
+
+
+def read_body_metadata(directory, binding, *, with_model=False):
+    """Verify a private body base. Returns metadata with ``model``.
+
+    v2 always includes ``model['bones']`` (camera calibration); the full v1-shaped
+    model is decoded only when with_model is set (Blender scene correspondence).
+    """
+    directory = Path(directory)
+    source, snapshot = directory/'base.json', directory/'body.blend'
+    if source.is_symlink() or snapshot.is_symlink():
+        raise ValueError('body snapshot binding/integrity mismatch')
+    metadata = decode(source.read_bytes())
+    if (metadata.get('schema') not in (BODY_BASE_V1, BODY_BASE_V2) or metadata.get('binding') != binding
+            or metadata.get('runtimeRevision') != runtime_revision()
+            or metadata.get('snapshotSha256') != digest(snapshot.read_bytes())):
+        raise ValueError('body snapshot binding/integrity mismatch')
+    if metadata['schema'] == BODY_BASE_V2:
+        from converter import solved_state_v2 as v2
+        path = directory/BODY_MODEL_FILE
+        if path.is_symlink():
+            raise ValueError('body snapshot binding/integrity mismatch')
+        raw = path.read_bytes()
+        if v2.model_digest(raw) != metadata.get('modelSha256'):
+            raise ValueError('body snapshot binding/integrity mismatch')
+        view = v2.decode_model(raw)
+        metadata['model'] = view.to_dict() if with_model else {
+            'bones': view.bones(), 'coordinates': dict(view.meta['coordinates'])}
     return metadata
 
 
@@ -153,18 +207,25 @@ def load_body(directory, identity):
     from converter.interactive_scene import capture, compare
     checked_runtime()
     directory = Path(directory)
-    metadata = decode((directory/'base.json').read_bytes())
+    metadata = read_body_metadata(directory, body_binding(identity), with_model=True)
     snapshot = directory/'body.blend'
-    if (metadata['schema'] != 'interactive-body-base-v1' or metadata['binding'] != body_binding(identity)
-            or metadata['runtimeRevision'] != runtime_revision() or snapshot.is_symlink()
-            or metadata['snapshotSha256'] != digest(snapshot.read_bytes())):
-        raise ValueError('body snapshot binding/integrity mismatch')
     bpy.ops.wm.open_mainfile(filepath=str(snapshot), load_ui=False, use_scripts=False)
     compare(metadata['model'], capture(metadata['model']['coordinates']['originBlender']))
     return metadata
 
 
-def solve_from_body(base_directory, identity, destination, *, checkpoint):
+STATE_FILES = {'typed-f64be-json-v1': 'state.canonical.json', 'standin-binary-f64le-v2': 'state.canonical.bin'}
+
+
+def state_file(directory):
+    """The single canonical state file of a solved bundle (v1 JSON or v2 binary)."""
+    found = [Path(directory)/name for name in STATE_FILES.values() if (Path(directory)/name).exists()]
+    if len(found) != 1 or found[0].is_symlink():
+        raise ValueError('solved snapshot integrity mismatch')
+    return found[0]
+
+
+def solve_from_body(base_directory, identity, destination, *, checkpoint, encoding='typed-f64be-json-v1'):
     """Restore approved body/shape; latest hand selection wins at each checkpoint.
 
     checkpoint is a worker-supplied revision/cancellation fence. It must raise
@@ -204,9 +265,9 @@ def solve_from_body(base_directory, identity, destination, *, checkpoint):
     checkpoint()
     rt.reset_scene(); import_full_character(str(staged))
     model = capture(origin)
-    state = SolvedPoseState.create(identity, model)
+    state = SolvedPoseState.create(identity, model, encoding=encoding)
     snapshot = directory/'solved.blend'; _save_scene(snapshot)
-    atomic_write(directory/'state.canonical.json', state.canonical_bytes)
+    atomic_write(directory/STATE_FILES[state.encoding], state.canonical_bytes)
     manifest = dict(schema='interactive-snapshot-v1', stateHash=state.state_hash,
         runtimeRevision=runtime_revision(), snapshotSha256=digest(snapshot.read_bytes()),
         stagedFbxSha256=digest(staged.read_bytes()),
@@ -219,15 +280,22 @@ def solve_from_body(base_directory, identity, destination, *, checkpoint):
     return state
 
 
-def load_solved(directory):
+def load_solved(directory, *, verified_state=None):
     directory = Path(directory)
-    state = SolvedPoseState((directory/'state.canonical.json').read_bytes())
+    path = state_file(directory)
+    raw = path.read_bytes()
+    if verified_state is not None and raw != verified_state.canonical_bytes:
+        raise ValueError('solved snapshot state changed')
+    state = verified_state if verified_state is not None else SolvedPoseState(raw)
+    if STATE_FILES[state.encoding] != path.name:
+        raise ValueError('solved snapshot integrity mismatch')
     metadata = decode((directory/'snapshot.json').read_bytes())
     snapshot = directory/'solved.blend'
     staged = directory/'staged.fbx'
+    revision = runtime_revision()
     if (metadata['schema'] != 'interactive-snapshot-v1' or metadata['stateHash'] != state.state_hash
-            or metadata['runtimeRevision'] != runtime_revision() or snapshot.is_symlink()
-            or state.payload['identity']['solver']['runtimeSha256'] != runtime_revision()
+            or metadata['runtimeRevision'] != revision or snapshot.is_symlink()
+            or state.identity['solver']['runtimeSha256'] != revision
             or not staged.is_file() or staged.is_symlink() or metadata.get('stagedFbxSha256') != digest(staged.read_bytes())
             or metadata['snapshotSha256'] != digest(snapshot.read_bytes())):
         raise ValueError('solved snapshot integrity mismatch')
