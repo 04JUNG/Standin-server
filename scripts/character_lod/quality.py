@@ -12,6 +12,7 @@ from mathutils.bvhtree import BVHTree
 ROOT=Path(__file__).resolve().parents[2];sys.path.insert(0,str(ROOT))
 from converter.shape_bake import import_full_character
 from converter import retarget as rt
+from scripts.character_lod.correspondence import load as load_correspondence
 
 def write(p,d):p.write_text(json.dumps(d,indent=2,allow_nan=False)+'\n')
 def load(blend,controller):
@@ -41,9 +42,14 @@ def main(a):
  base=rows[gender+'-base-v'+('0-8-0' if gender=='male' else '0-4-0')]['defaults']
  cases={k:dict(v['defaults']) for k,v in rows.items()}
  cases['custom-large']={**base,'height_cm':190.,'heads':7.,'physique':1.2,'muscle':1.8,'shoulders':.6,'leg_length':.55,'arm_length':.3}
+ if a.case:
+  if set(a.case)-set(cases):raise ValueError('unknown selected case')
+  cases={k:v for k,v in cases.items() if k in a.case}
  originals=Path(a.originals);stem='standin-body-0-8-0' if gender=='male' else 'standin-female-body-0-4-0'
  report={'gender':gender,'source_cases':{},'candidates':{},'limits':{'retained_p99_mm':.5,'protected_max_mm':.05,'surface_p99_mm':.5},'limitations':['No automatic penetration-free or CSP certificate is implied by finite geometry or round-trip success.']}
  if a.reference:report['source_cases']=json.loads((Path(a.reference)/'quality.json').read_text())['source_cases']
+ report['probe_only']=bool(a.case)
+ if a.case:report['source_cases']={k:v for k,v in report['source_cases'].items() if k in cases}
  # Source references are produced once, including every registered preset.
  for cid,values in ([] if a.reference else cases.items()):
   c=load(originals/(stem+'.blend'),originals/(stem+'.py'));m,arm=c.objects();values=c.normalize(values);c.set_controls(values,correct=False)
@@ -56,23 +62,36 @@ def main(a):
   pose(c,'neutral');export=c.export_fixed(str(out/'original-fbx'),posed=False);row['neutral_export']=str(export/'model.fbx');row['roundtrip']=json.loads((export/'manifest.json').read_text())
   report['source_cases'][cid]=row;write(out/'quality.json',report);print('SOURCE',cid,flush=True)
  for folder in [Path(p) for p in a.candidate]:
-  tag=folder.name;ids=np.load(folder/'source-indices.npy');protected=set(np.load(folder/'protected-source.npy'));pidx=np.array([i for i,x in enumerate(ids) if x in protected]);cr={}
+  tag=folder.name;mapping=load_correspondence(folder);ids=mapping.indices[:,0];protected=set(np.load(folder/'protected-source.npy'));pidx=np.flatnonzero(mapping.exact_mask(list(protected)));cr={}
+  if len(pidx)!=len(protected):raise ValueError('protected source correspondence is not exact and complete')
+  meta=json.loads((folder/'manifest.json').read_text());body=None
+  if meta.get('surface_profile')=='hands-body-v4':
+   from scripts.character_lod.region_policy import REGIONS
+   body=np.isin(np.load(folder/'source-regions.npy'),[REGIONS.index(x) for x in ('torso','arms','legs')])
   for cid,values in cases.items():
    row={'poses':{}}
    try:
     c=load(folder/'model.blend',folder/'controller.py');m,arm=c.objects();c.set_controls(values,correct=False);faces=np.array([p.vertices[:] for p in m.data.polygons],np.int32)
     row['geometry']=c.validate_geometry(values)
     for name in report['source_cases'][cid]['poses']:
-     co=pose(c,name);ref=np.load((Path(a.reference) if a.reference else out)/(cid+'-'+name+'.npz'));d=np.linalg.norm(co-ref['co'][ids],axis=1)*1000
+     co=pose(c,name);ref=np.load((Path(a.reference) if a.reference else out)/(cid+'-'+name+'.npz'));d=np.linalg.norm(co-mapping.apply(ref['co']),axis=1)*1000
      metrics={'finite':bool(np.isfinite(co).all()),'retained_max_mm':float(d.max()),'retained_p99_mm':float(np.percentile(d,99)),'protected_max_mm':float(d[pidx].max()),'source_to_candidate':dist(ref['co'],co,faces),'candidate_to_source':dist(co,ref['co'],ref['faces'])}
      metrics['within_numeric_screen']=metrics['finite'] and metrics['retained_p99_mm']<=.5 and metrics['protected_max_mm']<=.05 and metrics['source_to_candidate']['p99_mm']<=.5
+     if body is not None:
+      metrics['body_source_to_candidate']=dist(ref['co'][body],co,faces)
+      metrics['within_numeric_screen'] &= metrics['body_source_to_candidate']['p99_mm']<=.5
      row['poses'][name]=metrics;np.savez_compressed(out/(tag+'-'+cid+'-'+name+'.npz'),co=co,faces=faces)
     pose(c,'neutral');export=c.export_fixed(str(out/tag/'neutral-fbx'));row['neutral_export']=str(export/'model.fbx');row['roundtrip']=json.loads((export/'manifest.json').read_text())
     # Independently reload real final neutral file and prove subset weights/rig.
     rt.reset_scene();arm,meshes=import_full_character(export/'model.fbx');mesh=meshes[0];names={g.index:g.name for g in mesh.vertex_groups}
     candidate_weights=[{names[g.group]:float(g.weight) for g in v.groups if g.weight>1e-7} for v in mesh.data.vertices];candidate_rig={b.name:np.array(arm.matrix_world@b.matrix_local) for b in arm.data.bones}
     rt.reset_scene();arm,meshes=import_full_character(report['source_cases'][cid]['neutral_export']);mesh=meshes[0];names={g.index:g.name for g in mesh.vertex_groups}
-    original_weights=[{names[g.group]:float(g.weight) for g in mesh.data.vertices[int(i)].groups if g.weight>1e-7} for i in ids]
+    source_weights=[{names[g.group]:float(g.weight) for g in v.groups if g.weight>1e-7} for v in mesh.data.vertices];original_weights=[]
+    for indices,weights in zip(mapping.indices,mapping.weights):
+     combined={}
+     for sid,weight in zip(indices,weights):
+      for name,value in source_weights[sid].items():combined[name]=combined.get(name,0.)+value*weight
+     original_weights.append(combined)
     row['reload_weight_max_delta']=max(abs(v.get(k,0)-w.get(k,0)) for v,w in zip(original_weights,candidate_weights) for k in v.keys()|w.keys());row['reload_rig_max_delta']=max(float(np.max(abs(candidate_rig[b.name]-np.array(arm.matrix_world@b.matrix_local)))) for b in arm.data.bones)
     row['numeric_screen_pass']=all(p['within_numeric_screen'] for p in row['poses'].values()) and row['reload_weight_max_delta']<1e-5 and row['reload_rig_max_delta']<1e-5
    except Exception as e:row['error']=str(e);row['numeric_screen_pass']=False
@@ -80,4 +99,4 @@ def main(a):
  write(out/'quality.json',report)
 
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--reference');p.add_argument('--originals',required=True);p.add_argument('--registry',required=True);p.add_argument('--gender',required=True);p.add_argument('--candidate',action='append',required=True);p.add_argument('--out',required=True);main(p.parse_args(sys.argv[sys.argv.index('--')+1:]))
+ p=argparse.ArgumentParser();p.add_argument('--case',action='append');p.add_argument('--reference');p.add_argument('--originals',required=True);p.add_argument('--registry',required=True);p.add_argument('--gender',required=True);p.add_argument('--candidate',action='append',required=True);p.add_argument('--out',required=True);main(p.parse_args(sys.argv[sys.argv.index('--')+1:]))

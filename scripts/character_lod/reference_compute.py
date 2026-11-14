@@ -56,12 +56,29 @@ def _lod_reference(scene=None):
         exec(compile(_LOD_REFERENCE_CODE,'<pinned-reference-controller>','exec'),reference.__dict__)
         reference.source = lambda scene=None: source_data
         reference.objects = lambda scene=None: (metadata['properties'], a)
-        ids = np.frombuffer(base64.b64decode(m['lod_source_indices']),dtype='<i4').copy()
-        _LOD_REFERENCE_CACHE[key] = (reference, ids)
+        if 'lod_source_projection' in m:
+            raw_projection = base64.b64decode(m['lod_source_projection'])
+            if hashlib.sha256(raw_projection).hexdigest() != m['lod_source_projection_sha256']:
+                raise ValueError('source projection checksum changed')
+            projection = np.load(io.BytesIO(raw_projection),allow_pickle=False)
+            ids, bary = projection['indices'].copy(), projection['weights'].copy()
+            offsets = projection['offsets'].copy() if 'offsets' in projection else np.zeros((len(ids),3))
+        else:
+            ids = np.frombuffer(base64.b64decode(m['lod_source_indices']),dtype='<i4').copy()[:,None]
+            bary = np.ones(ids.shape)
+            offsets = np.zeros((len(ids),3))
+        _LOD_REFERENCE_CACHE[key] = (reference, ids, bary, offsets)
     return _LOD_REFERENCE_CACHE[key]
 
 def compute(c, scene=None):
-    reference, ids = _lod_reference(scene)
+    reference, ids, bary, offsets = _lod_reference(scene)
     result, weights, neutral = reference.compute(c, scene)
-    return result[ids].copy(), weights, neutral[ids].copy()
+    def embed(values):
+        tri=values[ids];out=np.einsum('ni,nij->nj',bary,tri)
+        if offsets.any():
+            u=tri[:,1]-tri[:,0];v=tri[:,2]-tri[:,0];cross=np.cross(u,v)
+            normal=cross/np.sqrt(np.maximum(np.linalg.norm(cross,axis=1),1e-30))[:,None]
+            out+=u*offsets[:,0,None]+v*offsets[:,1,None]+normal*offsets[:,2,None]
+        return out
+    return embed(result), weights, embed(neutral)
 ''' % original_code

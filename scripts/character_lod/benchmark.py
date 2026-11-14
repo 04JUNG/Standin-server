@@ -11,6 +11,8 @@ ROOT=Path(__file__).resolve().parents[2];sys.path.insert(0,str(ROOT))
 def write(p,x):p.write_text(json.dumps(x,indent=2)+'\n')
 def sha(data):return hashlib.sha256(data).hexdigest()
 def main(a):
+ if a.smoke and a.gender not in (None,'male'):raise ValueError('smoke selects male only')
+ sexes=(a.gender,) if a.gender else (('male',) if a.smoke else ('male','female'))
  out=Path(a.out);out.mkdir(parents=True,exist_ok=a.resume);package=Path(a.package)
  os.environ.update(CONVERTER_SHAPE_REGISTRY=a.registry,CONVERTER_FINAL_CACHE_ENABLED='0',CONVERTER_PREPARED_PRESETS_ENABLED='1',CONVERTER_SKIN_ASSET_ROOT=str(package/'skins'))
  from converter.shape_spec import load_registry,resolve_shape
@@ -19,7 +21,7 @@ def main(a):
  from converter import skin_spec
  registry=load_registry();jobs=json.loads((package/'jobs.json').read_text());bvh=Path(a.bvh).read_bytes();rows=json.loads((out/'results.json').read_text()) if a.resume and (out/'results.json').exists() else []
  settings=replace(RunnerSettings.from_env(ROOT),blender_binary=a.blender,worker_path=Path(__file__).with_name('bench_worker.py'),retarget_cache_bytes=0,fast_scene_reset=False,shape_timeout_seconds=600,process_env={'CONVERTER_FINAL_CACHE_ENABLED':'0','CONVERTER_PREPARED_PRESETS_ENABLED':'1','STANDIN_LAB_PREVIEW_TRACE':'1','STANDIN_LAB_FIRST_ENTRY_PROFILE':'1'})
- for sex in (('male',) if a.smoke else ('male','female')):
+ for sex in sexes:
   for case in (('base',) if a.smoke else ('base','preset','custom')):
    for skin in (('default',) if a.smoke else ('default','flesh-guide')):
     for trial in range(1 if a.smoke else a.repeats):
@@ -41,7 +43,7 @@ def main(a):
  from scripts.character_lod.contract import require_paired_runs
  require_paired_runs(rows,1 if a.smoke else a.repeats)
  summary=[]
- for sex in ('male','female'):
+ for sex in sexes:
   for case in ('base','preset','custom'):
    for skin in ('default','flesh-guide'):
     item={'gender':sex,'case':case,'skin':skin,'runs':{}}
@@ -52,4 +54,4 @@ def main(a):
  write(out/'summary.json',{'scope':'Local Converter, final reload, optional verified skin and local fsync file-ready. No API/network/UI/CSP timing. Nested worker spans must not be added together.','repeats':a.repeats,'rows':summary})
  if any(not r['ok'] for r in rows):raise SystemExit(1)
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--resume',action='store_true');p.add_argument('--smoke',action='store_true');p.add_argument('--package',required=True);p.add_argument('--registry',required=True);p.add_argument('--bvh',required=True);p.add_argument('--blender',default='/opt/blender/blender');p.add_argument('--repeats',type=int,default=3);p.add_argument('--out',required=True);main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--gender',choices=('male','female'));p.add_argument('--resume',action='store_true');p.add_argument('--smoke',action='store_true');p.add_argument('--package',required=True);p.add_argument('--registry',required=True);p.add_argument('--bvh',required=True);p.add_argument('--blender',default='/opt/blender/blender');p.add_argument('--repeats',type=int,default=3);p.add_argument('--out',required=True);main(p.parse_args())

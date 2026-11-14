@@ -1,5 +1,8 @@
 # Neutral-hand fix and stronger mesh candidates
 
+Historical v3 report. The newer fist/body candidates and their separate evidence
+are documented in [HANDS_BODY_V4.md](HANDS_BODY_V4.md).
+
 This follow-up supersedes the first 3.64% / 3.03% candidates for review. The
 original assets and the first run's binaries/evidence remain preserved.
 

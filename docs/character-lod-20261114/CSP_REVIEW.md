@@ -1,5 +1,8 @@
 # CSP 5.1.1 manual import review — 2026-11-14
 
+These successful imports belong to v3. The newer v4 candidates have a separate
+[blocked CSP attempt](HANDS_BODY_V4.md#csp-attempt-and-review-scope); no v4 pass is inferred here.
+
 The Mac was available on the follow-up attempt. **Five actual FBX imports passed**
 in macOS CLIP STUDIO PAINT EX 5.1.1 (trial mode): four new candidate cases and
 one original comparison. This supersedes the earlier “Mac locked / unverified”

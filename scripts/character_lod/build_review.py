@@ -30,9 +30,18 @@ if any(meta.get('exact_source_control_graph') for meta in candidates.values()):
  html=html.replace('Standin — 원본 / 경량화 검수','Standin — v3 중립 손 / 확장 경량화 검수').replace('ENGINEERING REVIEW / 2026.11.14','ENGINEERING REVIEW / 2026.11.14 / V3')
  html=html.replace('CSP에서 남성 기본 / 여성 가이드선 2개 실제 FBX 가져오기를 확인했습니다. 전체 체형·스킨 인증은 아닙니다. 새 SSR2는 생성했지만 큰 체형 근사 오차로 승격 보류이며, 이 화면은 실제 FBX 렌더만 사용합니다.','원본 체형 계산용 수치 그래프를 보존하고 실제 포즈·FBX·검증 메시를 줄였습니다. 새 후보에 기존 SSR2·CSP 인증 pin을 재사용하지 않았습니다. 이 화면은 실제 FBX 렌더를 사용합니다.')
 if (root/'benchmark/final-pairs.json').exists():
- pairs=json.loads((root/'benchmark/final-pairs.json').read_text());worst=max(r['retained_world_max_mm'] for r in pairs)
- html=html.replace('이번 후보는 전체 체형의 추가 정밀 오차 화면도 통과했습니다.',f'Authoring 포즈 비교는 전체 체형에서 통과했습니다. 별도 실제 Converter 주먹 후처리는 연결 관계 변화로 최대 {worst:.2f}mm 차이가 있어 승격 보류입니다. 체형 메뉴의 converter-ob015에서 실제 결과를 비교하세요.')
+ pairs=json.loads((root/'benchmark/final-pairs.json').read_text());worst=max(r['retained_world_max_mm'] for r in pairs);passed=all(r.get('numeric_screen_pass',r.get('additional_final_correspondence_screen_pass',False)) for r in pairs)
+ message=(f'Authoring과 실제 Converter 최종 결과 모두 정밀 비교를 통과했습니다. 주먹을 포함한 보호 영역 최대 오차는 {max(r["protected_max_mm"] for r in pairs):.4f}mm입니다. 체형 메뉴의 converter-ob015에서 실제 결과를 비교하세요.' if passed else f'Authoring과 별도로 실제 Converter 최종 결과에서 최대 {worst:.2f}mm 차이가 있습니다. 정밀 비교 보류 항목을 확인하세요.')
+ html=html.replace('이번 후보는 전체 체형의 추가 정밀 오차 화면도 통과했습니다.',message)
  html=html.replace('추가 정밀 비교</th>','Authoring 정밀 비교</th>')
  html=html.replace('labels={base:',"labels={'converter-ob015':'실제 Converter · ob_015 + 주먹',base:")
- html=html.replace('function drawQuality(){', '''function drawQuality(){if($('shape').value==='converter-ob015'){const ps=__FINAL_PAIRS__.filter(r=>r.gender===$('gender').value);$('quality').innerHTML='<p class="warn">실제 Converter 주먹 후처리 · 추가 대응 오차 화면 보류</p><table><tr><th>조건 / 스킨</th><th>보호 정점 최대(mm)</th><th>대응 p99(mm)</th><th>판정</th></tr>'+ps.map(r=>`<tr><td>${r.case} / ${labels[r.skin]}</td><td>${r.protected_max_mm.toFixed(3)}</td><td>${r.retained_world_p99_mm.toFixed(3)}</td><td class="warn">보류</td></tr>`).join('')+'</table>';return;}'''.replace('__FINAL_PAIRS__',json.dumps(pairs)))
+ block="""function drawQuality(){if($('shape').value==='converter-ob015'){const ps=__FINAL_PAIRS__.filter(r=>r.gender===$('gender').value);$('quality').innerHTML='<p>실제 Converter 최종 주먹 · 손과 몸통·팔·다리 별도 검사</p><table><tr><th>조건 / 스킨</th><th>손 최대(mm)</th><th>대응 p99(mm)</th><th>몸통·팔·다리 표면 p99(mm)</th><th>판정</th></tr>'+ps.map(r=>`<tr><td>${r.case} / ${labels[r.skin]}</td><td>${r.hand_max_mm?.toFixed(4)??'—'}</td><td>${r.retained_world_p99_mm.toFixed(3)}</td><td>${r.body_surface_p99_mm?.toFixed(3)??'—'}</td><td class="${(r.numeric_screen_pass??r.additional_final_correspondence_screen_pass)?'':'warn'}">${(r.numeric_screen_pass??r.additional_final_correspondence_screen_pass)?'통과':'보류'}</td></tr>`).join('')+'</table>';return;}"""
+ html=html.replace('function drawQuality(){',block.replace('__FINAL_PAIRS__',json.dumps(pairs)))
+if any(meta.get('surface_profile')=='hands-body-v4' for meta in candidates.values()):
+ previous={'hands':36857,'feet':25659,'head_neck':2039,'arms':11461,'legs':6093,'torso':10929}
+ current=candidates['male']['region_vertices'];labels_ko={'torso':'몸통','arms':'팔','legs':'다리','hands':'손','feet':'발','head_neck':'머리·목'}
+ table='<section class="evidence" style="margin-bottom:18px"><b>남자 영역별 정점 수 · 이전 v3와 비교</b><p class="muted">최대 가중치 뼈를 기준으로 나눈 중복 없는 영역입니다. 손의 주먹 연결 구조를 복원했으므로 전체 정점 수와 몸통·팔·다리 감소량을 함께 확인하세요.</p><table><tr><th>영역</th><th>v3</th><th>v4</th><th>차이</th></tr>'+''.join(f'<tr><td>{labels_ko[key]}</td><td>{previous[key]:,}</td><td>{current[key]:,}</td><td>{current[key]-previous[key]:+,}</td></tr>' for key in ('torso','arms','legs','hands','feet','head_neck'))+'</table></section>'
+ html=html.replace('<div class="controls">',table+'<div class="controls">')
+ html=html.replace('이 화면은 실제 FBX 렌더를 사용합니다.','이 화면은 실제 FBX 렌더를 사용합니다. 새 후보 CSP 가져오기는 파일 선택창에서 열기가 비활성화되어 확인하지 못했습니다.')
+ html=html.replace('v3 중립 손 / 확장 경량화','v4 주먹 보존 / 몸통·팔·다리 경량화').replace('2026.11.14 / V3','2026.11.15 / V4')
 html=html.replace('__RENDERS__',json.dumps(rows,ensure_ascii=False)).replace('__QUALITY__',json.dumps(quality,ensure_ascii=False));(out/'index.html').write_text(html);print(out/'index.html')

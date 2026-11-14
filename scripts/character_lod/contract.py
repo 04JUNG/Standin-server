@@ -1,5 +1,6 @@
 """Pure data guards shared by the offline authoring and evidence workflow."""
 import hashlib
+import math
 from pathlib import Path
 
 APPROVED = {
@@ -53,3 +54,11 @@ def require_paired_runs(rows, repeats=3):
             raise ValueError('paired BVH inputs differ')
     if not groups:
         raise ValueError('empty measurement')
+
+
+def final_geometry_pass(metrics):
+    """Same correspondence gates, plus explicit hand/body regional checks."""
+    limits = {'retained_world_p99_mm': .5, 'protected_max_mm': .05,
+              'hand_max_mm': .05, 'body_surface_p99_mm': .5}
+    return all(key in metrics and math.isfinite(metrics[key])
+               and metrics[key] <= limit for key, limit in limits.items())
