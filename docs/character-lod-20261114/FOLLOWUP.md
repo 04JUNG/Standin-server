@@ -128,9 +128,10 @@ Evidence is under [evidence/followup](evidence/followup).
 ![Male: neutral hand, explicit fist and deep joints](images/v3-male-comparison.jpg)
 ![Female: neutral hand, explicit fist and deep joints](images/v3-female-comparison.jpg)
 
-A new CSP import was attempted but the Mac was locked and could not be
-unlocked automatically. This is recorded as unverified; the first run's CSP
-screenshots are not evidence for the new sources. No Mac settings were changed.
+The first new CSP attempt was blocked by the Mac lock. A later direct review
+in CSP EX 5.1.1 imported five files successfully (four candidate cases plus one
+original comparison); see [CSP_REVIEW.md](CSP_REVIEW.md). The first run's older
+CSP screenshots are not used as evidence for these new sources.
 
 The selected candidates' worst sampled surface p99 values are 0.4201mm male
 and 0.4323mm female. This is a percentile screen, not a maximum-error guarantee:
@@ -192,7 +193,9 @@ with 24 new direct final-file images. Total comparison images: 432. No gate was
 lowered and no production asset is replaced. These stronger assets are review
 candidates, not a zero-regression production recommendation. Preserving the
 closed-fist smoothing graph (or independently approving its changed folds) is
-still needed before promotion. New CSP import also remains unverified.
+still needed before promotion. Representative new CSP imports/display now pass;
+this does not clear the numerical fist hold or certify every shape/skin. See
+[CSP_REVIEW.md](CSP_REVIEW.md).
 
 ![Male actual Converter fist; held](images/v3-male-converter-fist.jpg)
 ![Female actual Converter fist; held](images/v3-female-converter-fist.jpg)

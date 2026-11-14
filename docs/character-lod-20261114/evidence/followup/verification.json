@@ -17,8 +17,14 @@
     "actual_converter": 24
   },
   "new_csp_import": {
-    "status": "unverified",
-    "reason": "Mac locked; automatic unlock unavailable; previous candidate screenshots not reused"
+    "status": "representative imports and display pass",
+    "version": "CLIP STUDIO PAINT EX 5.1.1 macOS trial",
+    "files": 5,
+    "candidate_files": 4,
+    "original_comparison_files": 1,
+    "receipt": "csp-review.json",
+    "all_shapes_skins_certified": false,
+    "final_fist_numerical_hold_cleared": false
   },
   "new_ssr2": {
     "status": "not activated",
