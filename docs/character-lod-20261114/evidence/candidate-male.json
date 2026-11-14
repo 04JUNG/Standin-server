@@ -1,0 +1,39 @@
+{
+  "schema": "protected-body-lod.v1",
+  "id": "male-protected-3-articulated-local",
+  "rules": "standin-lod-male-protected-3-articulated-local",
+  "gender": "male",
+  "source_blend_sha256": "a03550749315592c543eeda66a183fe4116380f2068b412105f751c7b2e9c39a",
+  "source_controller_sha256": "bcdabb7d69534f08400dfbd8a91a52ddc01528428332d4f14d4ad6792a7af8da",
+  "source_vertices": 139474,
+  "vertices": 134398,
+  "triangles": 268792,
+  "protected_vertices": 105463,
+  "correspondence": "source-vertex-subset",
+  "method": "local",
+  "rounds_or_angle": 3.0,
+  "hand_policy": "articulated",
+  "preview_vertices": 50001,
+  "preview_projection_p999_mm": 0.05323788354871834,
+  "bones": 54,
+  "psd_keys": 24,
+  "uv_source": "approved FBX corner UVs; seam-delimited transfer; fresh candidate skin hashes",
+  "promotion": "candidate-only; human signoff and skin certification required",
+  "files": {
+    "model.blend": "2acfd5cf1757b95b61dd2a12bba46405b54cb9589e5a08780a3908452f0f9a96",
+    "source-indices.npy": "9918a14e87bab29f933d3b2d812448c8136826670334ad6cf0ce94f64d11070a",
+    "controller.py": "28e1e0603abbfd76e0e412b9430d042c23c2c6bed6b4c56d3ca00a2510c10c10",
+    "protected-source.npy": "933f9742553f53d21d33088cd65276cefc105d879c3407caa17be13c131eacb9",
+    "skin-uv.npy": "199192656e894c9f24df498065232bc6a3c9eff58ddc33b275dc508b7691cee8"
+  },
+  "container_cleanup": {
+    "source_blend_sha256": "33b98fdbf30c2a9fe0666266fc3a34ef0617d0bc91e9814ea9920b9e4ed3ab51",
+    "semantic_sha256": "92461dcc64d691cb16189f0252c19425b7ad09913474f6532bacd88ecf7f27d0",
+    "bytes_before": 177116608,
+    "bytes_after": 118840347
+  },
+  "body_shape_keys": 20,
+  "controls": 33,
+  "protected_source_indices_and_connectivity_exact": true,
+  "deformed_coordinates_exact": false
+}

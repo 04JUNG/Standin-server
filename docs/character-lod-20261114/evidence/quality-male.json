@@ -1,0 +1,875 @@
+{
+  "gender": "male",
+  "limits": {
+    "retained_p99_mm": 0.5,
+    "protected_max_mm": 0.05,
+    "surface_p99_mm": 0.5
+  },
+  "limitations": [
+    "No automatic penetration-free or CSP certificate is implied by finite geometry or round-trip success."
+  ],
+  "cases": {
+    "male-base-v0-8-0": {
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 168.684899,
+        "sole_z_mm": 0.0
+      },
+      "poses": {
+        "neutral": {
+          "finite": true,
+          "retained_max_mm": 0.0,
+          "retained_p99_mm": 0.0,
+          "protected_max_mm": 0.0,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.853166333399713,
+            "p99_mm": 0.05713113278034204,
+            "mean_mm": 0.0017831330436367614
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.0,
+            "p99_mm": 0.0,
+            "mean_mm": 0.0
+          },
+          "within_numeric_screen": true
+        },
+        "raised": {
+          "finite": true,
+          "retained_max_mm": 0.0,
+          "retained_p99_mm": 0.0,
+          "protected_max_mm": 0.0,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.8531868807040155,
+            "p99_mm": 0.055605288798688014,
+            "mean_mm": 0.0017603027515213344
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.0,
+            "p99_mm": 0.0,
+            "mean_mm": 0.0
+          },
+          "within_numeric_screen": true
+        },
+        "elbow": {
+          "finite": true,
+          "retained_max_mm": 0.0,
+          "retained_p99_mm": 0.0,
+          "protected_max_mm": 0.0,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.8531296625733376,
+            "p99_mm": 0.05708553799195252,
+            "mean_mm": 0.0017827759815577451
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.0,
+            "p99_mm": 0.0,
+            "mean_mm": 0.0
+          },
+          "within_numeric_screen": true
+        },
+        "deep": {
+          "finite": true,
+          "retained_max_mm": 0.0,
+          "retained_p99_mm": 0.0,
+          "protected_max_mm": 0.0,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.853166333399713,
+            "p99_mm": 0.05713113278034204,
+            "mean_mm": 0.001784338948837025
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.0,
+            "p99_mm": 0.0,
+            "mean_mm": 0.0
+          },
+          "within_numeric_screen": true
+        },
+        "sit": {
+          "finite": true,
+          "retained_max_mm": 0.0,
+          "retained_p99_mm": 0.0,
+          "protected_max_mm": 0.0,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.853166333399713,
+            "p99_mm": 0.05713113278034204,
+            "mean_mm": 0.001784338948837025
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.0,
+            "p99_mm": 0.0,
+            "mean_mm": 0.0
+          },
+          "within_numeric_screen": true
+        },
+        "cross": {
+          "finite": true,
+          "retained_max_mm": 0.0,
+          "retained_p99_mm": 0.0,
+          "protected_max_mm": 0.0,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.8531146449968219,
+            "p99_mm": 0.057637664576759756,
+            "mean_mm": 0.0017972183169347113
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.0,
+            "p99_mm": 0.0,
+            "mean_mm": 0.0
+          },
+          "within_numeric_screen": true
+        },
+        "hands": {
+          "finite": true,
+          "retained_max_mm": 0.0,
+          "retained_p99_mm": 0.0,
+          "protected_max_mm": 0.0,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.853166333399713,
+            "p99_mm": 0.05713113278034204,
+            "mean_mm": 0.0017831330436367614
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.0,
+            "p99_mm": 0.0,
+            "mean_mm": 0.0
+          },
+          "within_numeric_screen": true
+        }
+      },
+      "reload_weight_max_delta": 0.0,
+      "reload_rig_max_delta": 0.0,
+      "numeric_screen_pass": true
+    },
+    "male-ideal83-v0-8-0": {
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 168.684899,
+        "sole_z_mm": 0.0
+      },
+      "poses": {
+        "neutral": {
+          "finite": true,
+          "retained_max_mm": 0.18147532043472006,
+          "retained_p99_mm": 0.03508990933870092,
+          "protected_max_mm": 0.03893900095771964,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.8272905251942575,
+            "p99_mm": 0.06308667652774606,
+            "mean_mm": 0.002539598290150875
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.07630983600392938,
+            "p99_mm": 0.018992439690919096,
+            "mean_mm": 0.0007062232144552379
+          },
+          "within_numeric_screen": true
+        },
+        "raised": {
+          "finite": true,
+          "retained_max_mm": 0.18147532043472006,
+          "retained_p99_mm": 0.03486080914104924,
+          "protected_max_mm": 0.03864276576939443,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.8272232953459024,
+            "p99_mm": 0.061761743563693024,
+            "mean_mm": 0.002508503508797315
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.0775821172283031,
+            "p99_mm": 0.018991487959283394,
+            "mean_mm": 0.0006910914250397387
+          },
+          "within_numeric_screen": true
+        },
+        "sit": {
+          "finite": true,
+          "retained_max_mm": 0.18147532043472006,
+          "retained_p99_mm": 0.03508990933870092,
+          "protected_max_mm": 0.03893900095771964,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.8272905251942575,
+            "p99_mm": 0.06308667652774606,
+            "mean_mm": 0.0025371508866579946
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.07630983600392938,
+            "p99_mm": 0.01907053687318688,
+            "mean_mm": 0.0007058177994304106
+          },
+          "within_numeric_screen": true
+        }
+      },
+      "reload_weight_max_delta": 0.0,
+      "reload_rig_max_delta": 0.0,
+      "numeric_screen_pass": true
+    },
+    "male-ideal70-v0-8-0": {
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 168.684899,
+        "sole_z_mm": 0.0
+      },
+      "poses": {
+        "neutral": {
+          "finite": true,
+          "retained_max_mm": 0.11443159326727789,
+          "retained_p99_mm": 0.022283442414269602,
+          "protected_max_mm": 0.026591325688899152,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.8303109207190573,
+            "p99_mm": 0.0598108585109003,
+            "mean_mm": 0.0022422583020484613
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.043213265598751605,
+            "p99_mm": 0.011755885170714443,
+            "mean_mm": 0.00044682693752212855
+          },
+          "within_numeric_screen": true
+        },
+        "raised": {
+          "finite": true,
+          "retained_max_mm": 0.11443159326727789,
+          "retained_p99_mm": 0.0221177260562346,
+          "protected_max_mm": 0.02641121530154789,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.8303826907649636,
+            "p99_mm": 0.05816654229420239,
+            "mean_mm": 0.002211999471516999
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.04338089274824597,
+            "p99_mm": 0.01155487465439362,
+            "mean_mm": 0.0004356691356334732
+          },
+          "within_numeric_screen": true
+        },
+        "sit": {
+          "finite": true,
+          "retained_max_mm": 0.11443159326727789,
+          "retained_p99_mm": 0.022283442414269602,
+          "protected_max_mm": 0.026591325688899152,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.8303109207190573,
+            "p99_mm": 0.0598108585109003,
+            "mean_mm": 0.0022404493904607764
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.043213265598751605,
+            "p99_mm": 0.011755885170714443,
+            "mean_mm": 0.0004464933563938721
+          },
+          "within_numeric_screen": true
+        }
+      },
+      "reload_weight_max_delta": 0.0,
+      "reload_rig_max_delta": 0.0,
+      "numeric_screen_pass": true
+    },
+    "male-toon64-v0-8-0": {
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 165.0,
+        "sole_z_mm": 0.0
+      },
+      "poses": {
+        "neutral": {
+          "finite": true,
+          "retained_max_mm": 0.4071627304120123,
+          "retained_p99_mm": 0.03237597862094799,
+          "protected_max_mm": 0.03330012514217612,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.8182920282706618,
+            "p99_mm": 0.05426888310466902,
+            "mean_mm": 0.002201993783746473
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.08760109631111845,
+            "p99_mm": 0.012109455255995267,
+            "mean_mm": 0.0005422796850908235
+          },
+          "within_numeric_screen": true
+        },
+        "raised": {
+          "finite": true,
+          "retained_max_mm": 0.4071627304120123,
+          "retained_p99_mm": 0.032183271690867404,
+          "protected_max_mm": 0.03259124143332521,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.8183341706171632,
+            "p99_mm": 0.05221449391683569,
+            "mean_mm": 0.002125079977811453
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.089770503109321,
+            "p99_mm": 0.009849429225141612,
+            "mean_mm": 0.0004922916625076904
+          },
+          "within_numeric_screen": true
+        },
+        "sit": {
+          "finite": true,
+          "retained_max_mm": 0.4071627304120123,
+          "retained_p99_mm": 0.03237597862094799,
+          "protected_max_mm": 0.03330012514217612,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.8182920282706618,
+            "p99_mm": 0.05426888310466902,
+            "mean_mm": 0.0022005116326095
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.08760109631111845,
+            "p99_mm": 0.012104385514248847,
+            "mean_mm": 0.0005423825678970797
+          },
+          "within_numeric_screen": true
+        }
+      },
+      "reload_weight_max_delta": 0.0,
+      "reload_rig_max_delta": 0.0,
+      "numeric_screen_pass": true
+    },
+    "male-muscular-v0-8-0": {
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 168.684899,
+        "sole_z_mm": 0.0
+      },
+      "poses": {
+        "neutral": {
+          "finite": true,
+          "retained_max_mm": 0.6245631366297554,
+          "retained_p99_mm": 0.11898965250378538,
+          "protected_max_mm": 0.09548464484435608,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.8385195396840572,
+            "p99_mm": 0.11075870716013023,
+            "mean_mm": 0.0047512652673388075
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.30846550362184644,
+            "p99_mm": 0.06622918241191644,
+            "mean_mm": 0.0023990888660047447
+          },
+          "within_numeric_screen": false
+        },
+        "raised": {
+          "finite": true,
+          "retained_max_mm": 0.6245631366297554,
+          "retained_p99_mm": 0.11820057995456744,
+          "protected_max_mm": 0.0947763005742354,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.8387343841604888,
+            "p99_mm": 0.10941103391814982,
+            "mean_mm": 0.004592016333279572
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.31169684370979667,
+            "p99_mm": 0.06688515262794677,
+            "mean_mm": 0.002298612697803187
+          },
+          "within_numeric_screen": false
+        },
+        "sit": {
+          "finite": true,
+          "retained_max_mm": 0.6245631366297554,
+          "retained_p99_mm": 0.11898965250378538,
+          "protected_max_mm": 0.09548464484435608,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.8385195396840572,
+            "p99_mm": 0.11075870716013023,
+            "mean_mm": 0.004748982326774041
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.30846550362184644,
+            "p99_mm": 0.06622918241191644,
+            "mean_mm": 0.0023984321307579342
+          },
+          "within_numeric_screen": false
+        }
+      },
+      "reload_weight_max_delta": 0.0,
+      "reload_rig_max_delta": 0.0,
+      "numeric_screen_pass": false
+    },
+    "male-muscle-max-v0-8-0": {
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 168.684899,
+        "sole_z_mm": 0.0
+      },
+      "poses": {
+        "neutral": {
+          "finite": true,
+          "retained_max_mm": 0.6822091837783268,
+          "retained_p99_mm": 0.13955388974772803,
+          "protected_max_mm": 0.11303468213027545,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.8365656831301749,
+            "p99_mm": 0.11870725575136051,
+            "mean_mm": 0.005139117782080673
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.3350043552927673,
+            "p99_mm": 0.07350341984420078,
+            "mean_mm": 0.002709094450531367
+          },
+          "within_numeric_screen": false
+        },
+        "raised": {
+          "finite": true,
+          "retained_max_mm": 0.6822091837783268,
+          "retained_p99_mm": 0.13849097172503136,
+          "protected_max_mm": 0.11214821115142591,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.8366212714463472,
+            "p99_mm": 0.1168451839475895,
+            "mean_mm": 0.004955874007745402
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.33869739854708314,
+            "p99_mm": 0.07329030529945153,
+            "mean_mm": 0.0025823992936756966
+          },
+          "within_numeric_screen": false
+        },
+        "sit": {
+          "finite": true,
+          "retained_max_mm": 0.6822091837783268,
+          "retained_p99_mm": 0.13955388974772803,
+          "protected_max_mm": 0.11303468213027545,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.8365656831301749,
+            "p99_mm": 0.11870725575136051,
+            "mean_mm": 0.00513641036826333
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.3350043552927673,
+            "p99_mm": 0.07350341984420078,
+            "mean_mm": 0.002708436003654874
+          },
+          "within_numeric_screen": false
+        }
+      },
+      "reload_weight_max_delta": 0.0,
+      "reload_rig_max_delta": 0.0,
+      "numeric_screen_pass": false
+    },
+    "male-bulk-v0-8-0": {
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 168.684899,
+        "sole_z_mm": 0.0
+      },
+      "poses": {
+        "neutral": {
+          "finite": true,
+          "retained_max_mm": 1.5088191952691055,
+          "retained_p99_mm": 0.40970146998128204,
+          "protected_max_mm": 0.4026325018217474,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.8365656831301749,
+            "p99_mm": 0.18865624733734906,
+            "mean_mm": 0.00793604069078613
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.7758631254546344,
+            "p99_mm": 0.1308085021446459,
+            "mean_mm": 0.00505273286914444
+          },
+          "within_numeric_screen": false
+        },
+        "raised": {
+          "finite": true,
+          "retained_max_mm": 1.5086805278073199,
+          "retained_p99_mm": 0.40829324782504256,
+          "protected_max_mm": 0.39835827191284173,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.8366212714463472,
+            "p99_mm": 0.1820657169446355,
+            "mean_mm": 0.00760784208464463
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.7846521330066025,
+            "p99_mm": 0.1274412483326157,
+            "mean_mm": 0.004696057154833101
+          },
+          "within_numeric_screen": false
+        },
+        "sit": {
+          "finite": true,
+          "retained_max_mm": 1.5088191952691055,
+          "retained_p99_mm": 0.40970146998128204,
+          "protected_max_mm": 0.4026325018217474,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.8365656831301749,
+            "p99_mm": 0.18865624733734906,
+            "mean_mm": 0.007926689449631097
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.7758631254546344,
+            "p99_mm": 0.1308085021446459,
+            "mean_mm": 0.005051068196794451
+          },
+          "within_numeric_screen": false
+        }
+      },
+      "reload_weight_max_delta": 0.0,
+      "reload_rig_max_delta": 0.0,
+      "numeric_screen_pass": false
+    },
+    "male-soft-v0-8-0": {
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 166.91310078028778,
+        "sole_z_mm": 0.0
+      },
+      "poses": {
+        "neutral": {
+          "finite": true,
+          "retained_max_mm": 2.2492441873156057,
+          "retained_p99_mm": 0.2280552306644058,
+          "protected_max_mm": 0.37671136958593066,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.8367204573005438,
+            "p99_mm": 0.17090798937715593,
+            "mean_mm": 0.009127023605949107
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.6058821454644203,
+            "p99_mm": 0.14286340272519732,
+            "mean_mm": 0.0063846427063757195
+          },
+          "within_numeric_screen": false
+        },
+        "raised": {
+          "finite": true,
+          "retained_max_mm": 2.2492441873156057,
+          "retained_p99_mm": 0.22675895000551988,
+          "protected_max_mm": 0.3689950655757291,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.8367641130462289,
+            "p99_mm": 0.1711268909275532,
+            "mean_mm": 0.008888137078011558
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.5966649041511118,
+            "p99_mm": 0.1376447427901437,
+            "mean_mm": 0.006124467151621572
+          },
+          "within_numeric_screen": false
+        },
+        "sit": {
+          "finite": true,
+          "retained_max_mm": 2.2492441873156057,
+          "retained_p99_mm": 0.2280552306644058,
+          "protected_max_mm": 0.37671136958593066,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.8367204573005438,
+            "p99_mm": 0.17090798937715593,
+            "mean_mm": 0.009118696858018596
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 0.6058821454644203,
+            "p99_mm": 0.14282019401434798,
+            "mean_mm": 0.0063652683568427414
+          },
+          "within_numeric_screen": false
+        }
+      },
+      "reload_weight_max_delta": 0.0,
+      "reload_rig_max_delta": 0.0,
+      "numeric_screen_pass": false
+    },
+    "male-fat-max-v0-8-0": {
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 166.84698890641792,
+        "sole_z_mm": 0.0
+      },
+      "poses": {
+        "neutral": {
+          "finite": true,
+          "retained_max_mm": 4.906915925701436,
+          "retained_p99_mm": 0.570745443262938,
+          "protected_max_mm": 1.138964939886394,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 1.052621635608375,
+            "p99_mm": 0.3260130528360627,
+            "mean_mm": 0.018204187651358502
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 1.6038198955357075,
+            "p99_mm": 0.2908112359000367,
+            "mean_mm": 0.014476774826023364
+          },
+          "within_numeric_screen": false
+        },
+        "raised": {
+          "finite": true,
+          "retained_max_mm": 4.906915925701436,
+          "retained_p99_mm": 0.5665683324038985,
+          "protected_max_mm": 1.1146943077732234,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 1.052621635608375,
+            "p99_mm": 0.3217216173652565,
+            "mean_mm": 0.01777616989892735
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 1.642945921048522,
+            "p99_mm": 0.27916785329580257,
+            "mean_mm": 0.01402025553824628
+          },
+          "within_numeric_screen": false
+        },
+        "sit": {
+          "finite": true,
+          "retained_max_mm": 4.906909523620101,
+          "retained_p99_mm": 0.570602111734772,
+          "protected_max_mm": 1.138964939886394,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 1.0616298532113433,
+            "p99_mm": 0.32496419735252896,
+            "mean_mm": 0.01814127205585685
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 1.6038198955357075,
+            "p99_mm": 0.2928259869804599,
+            "mean_mm": 0.014420767554646441
+          },
+          "within_numeric_screen": false
+        }
+      },
+      "reload_weight_max_delta": 0.0,
+      "reload_rig_max_delta": 0.0,
+      "numeric_screen_pass": false
+    },
+    "custom-large": {
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 190.0,
+        "sole_z_mm": 0.0
+      },
+      "poses": {
+        "neutral": {
+          "finite": true,
+          "retained_max_mm": 2.257923824950198,
+          "retained_p99_mm": 0.47643832245678097,
+          "protected_max_mm": 0.9154475454515244,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.9132400737144053,
+            "p99_mm": 0.3009999811183666,
+            "mean_mm": 0.015799757371770598
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 1.2306062271818519,
+            "p99_mm": 0.2555538946762678,
+            "mean_mm": 0.012335666216673001
+          },
+          "within_numeric_screen": false
+        },
+        "raised": {
+          "finite": true,
+          "retained_max_mm": 2.257923824950198,
+          "retained_p99_mm": 0.4749243970713723,
+          "protected_max_mm": 0.8996498897865176,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.9132605046033859,
+            "p99_mm": 0.29500547097996094,
+            "mean_mm": 0.015193128951770985
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 1.2173247523605824,
+            "p99_mm": 0.25135899661108807,
+            "mean_mm": 0.01165866536350939
+          },
+          "within_numeric_screen": false
+        },
+        "elbow": {
+          "finite": true,
+          "retained_max_mm": 2.257923824950198,
+          "retained_p99_mm": 0.47643832245678097,
+          "protected_max_mm": 0.9154475454515244,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.9132273844443262,
+            "p99_mm": 0.30076465336605906,
+            "mean_mm": 0.015775715044068574
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 1.2306062271818519,
+            "p99_mm": 0.25556050532031777,
+            "mean_mm": 0.012316247067776634
+          },
+          "within_numeric_screen": false
+        },
+        "deep": {
+          "finite": true,
+          "retained_max_mm": 2.257923824950198,
+          "retained_p99_mm": 0.4763658266032146,
+          "protected_max_mm": 0.9154475454515244,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.9132400737144053,
+            "p99_mm": 0.3009999811183666,
+            "mean_mm": 0.01575821142395582
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 1.2306062271818519,
+            "p99_mm": 0.2555538946762678,
+            "mean_mm": 0.012287581296050003
+          },
+          "within_numeric_screen": false
+        },
+        "sit": {
+          "finite": true,
+          "retained_max_mm": 2.257923824950198,
+          "retained_p99_mm": 0.4764252442931121,
+          "protected_max_mm": 0.9154475454515244,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.9132400737144053,
+            "p99_mm": 0.3009999811183666,
+            "mean_mm": 0.01576448116557595
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 1.2306062271818519,
+            "p99_mm": 0.2555538946762678,
+            "mean_mm": 0.012292643849763196
+          },
+          "within_numeric_screen": false
+        },
+        "cross": {
+          "finite": true,
+          "retained_max_mm": 2.257923824950198,
+          "retained_p99_mm": 0.4753422982088892,
+          "protected_max_mm": 0.9064521157415851,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.9132054401561618,
+            "p99_mm": 0.3012855828274047,
+            "mean_mm": 0.015615809877224673
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 1.201380742713809,
+            "p99_mm": 0.2548556495457886,
+            "mean_mm": 0.012154193132887183
+          },
+          "within_numeric_screen": false
+        },
+        "hands": {
+          "finite": true,
+          "retained_max_mm": 2.257923824950198,
+          "retained_p99_mm": 0.47643832245678097,
+          "protected_max_mm": 0.9154475454515244,
+          "source_to_candidate": {
+            "sample_count": 12681,
+            "max_mm": 0.9132400737144053,
+            "p99_mm": 0.3009999811183666,
+            "mean_mm": 0.015799757371770598
+          },
+          "candidate_to_source": {
+            "sample_count": 12219,
+            "max_mm": 1.2306062271818519,
+            "p99_mm": 0.2555538946762678,
+            "mean_mm": 0.012335666216673001
+          },
+          "within_numeric_screen": false
+        }
+      },
+      "reload_weight_max_delta": 0.0,
+      "reload_rig_max_delta": 0.0,
+      "numeric_screen_pass": false
+    }
+  }
+}

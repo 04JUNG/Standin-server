@@ -1,0 +1,217 @@
+{
+  "rules": "standin-lod-male-protected-3-articulated-local",
+  "source": {
+    "blendSha256": "33b98fdbf30c2a9fe0666266fc3a34ef0617d0bc91e9814ea9920b9e4ed3ab51",
+    "controllerSha256": "28e1e0603abbfd76e0e412b9430d042c23c2c6bed6b4c56d3ca00a2510c10c10"
+  },
+  "basis": 96,
+  "bytes": 31208692,
+  "sha256": "e75d1f71ba3322463eac870aa99bd777c5a820222e338eb1088f479b9c8cbee1",
+  "seconds": 5503,
+  "evals": 8442,
+  "singular_values_head": [
+    173.847488,
+    53.414773,
+    31.153011,
+    15.738961,
+    12.152574,
+    10.563503,
+    9.337084,
+    8.146792
+  ],
+  "quality": {
+    "basisMaxRowErrorMm": 11.863,
+    "presets": {
+      "BASE": {
+        "preset_mm": 0.098,
+        "few": {
+          "max_mm": 1.79,
+          "median_mm": 0.66,
+          "n": 6
+        },
+        "basic": {
+          "max_mm": 5.01,
+          "median_mm": 3.9,
+          "n": 4
+        },
+        "all": {
+          "max_mm": 8.37,
+          "median_mm": 5.74,
+          "n": 4
+        },
+        "evals": 929,
+        "pairs": 12,
+        "pair_candidates": 12
+      },
+      "IDEAL83": {
+        "preset_mm": 0.145,
+        "few": {
+          "max_mm": 1.25,
+          "median_mm": 0.21,
+          "n": 6
+        },
+        "basic": {
+          "max_mm": 3.94,
+          "median_mm": 3.34,
+          "n": 4
+        },
+        "all": {
+          "max_mm": 11.33,
+          "median_mm": 3.57,
+          "n": 4
+        },
+        "evals": 941,
+        "pairs": 9,
+        "pair_candidates": 12
+      },
+      "IDEAL70": {
+        "preset_mm": 0.075,
+        "few": {
+          "max_mm": 0.82,
+          "median_mm": 0.47,
+          "n": 6
+        },
+        "basic": {
+          "max_mm": 26.62,
+          "median_mm": 7.44,
+          "n": 4
+        },
+        "all": {
+          "max_mm": 13.68,
+          "median_mm": 7.63,
+          "n": 4
+        },
+        "evals": 943,
+        "pairs": 7,
+        "pair_candidates": 12
+      },
+      "TOON64": {
+        "preset_mm": 0.104,
+        "few": {
+          "max_mm": 2.08,
+          "median_mm": 0.23,
+          "n": 6
+        },
+        "basic": {
+          "max_mm": 5.71,
+          "median_mm": 3.61,
+          "n": 4
+        },
+        "all": {
+          "max_mm": 25.86,
+          "median_mm": 12.05,
+          "n": 4
+        },
+        "evals": 963,
+        "pairs": 12,
+        "pair_candidates": 12
+      },
+      "MUSCULAR": {
+        "preset_mm": 0.084,
+        "few": {
+          "max_mm": 1.91,
+          "median_mm": 0.15,
+          "n": 6
+        },
+        "basic": {
+          "max_mm": 5.01,
+          "median_mm": 2.74,
+          "n": 4
+        },
+        "all": {
+          "max_mm": 14.87,
+          "median_mm": 8.4,
+          "n": 4
+        },
+        "evals": 932,
+        "pairs": 12,
+        "pair_candidates": 12
+      },
+      "MUSCLE_MAX": {
+        "preset_mm": 0.115,
+        "few": {
+          "max_mm": 1.14,
+          "median_mm": 0.68,
+          "n": 6
+        },
+        "basic": {
+          "max_mm": 7.09,
+          "median_mm": 5.26,
+          "n": 4
+        },
+        "all": {
+          "max_mm": 8.93,
+          "median_mm": 5.85,
+          "n": 4
+        },
+        "evals": 935,
+        "pairs": 7,
+        "pair_candidates": 12
+      },
+      "BULK": {
+        "preset_mm": 0.203,
+        "few": {
+          "max_mm": 5.5,
+          "median_mm": 0.25,
+          "n": 6
+        },
+        "basic": {
+          "max_mm": 7.39,
+          "median_mm": 2.01,
+          "n": 4
+        },
+        "all": {
+          "max_mm": 11.16,
+          "median_mm": 8.4,
+          "n": 4
+        },
+        "evals": 935,
+        "pairs": 5,
+        "pair_candidates": 12
+      },
+      "SOFT": {
+        "preset_mm": 0.121,
+        "few": {
+          "max_mm": 1.57,
+          "median_mm": 0.96,
+          "n": 6
+        },
+        "basic": {
+          "max_mm": 8.48,
+          "median_mm": 5.27,
+          "n": 4
+        },
+        "all": {
+          "max_mm": 10.06,
+          "median_mm": 7.1,
+          "n": 4
+        },
+        "evals": 944,
+        "pairs": 8,
+        "pair_candidates": 12
+      },
+      "FAT_MAX": {
+        "preset_mm": 0.151,
+        "few": {
+          "max_mm": 8.19,
+          "median_mm": 1.88,
+          "n": 6
+        },
+        "basic": {
+          "max_mm": 37.35,
+          "median_mm": 17.23,
+          "n": 4
+        },
+        "all": {
+          "max_mm": 19.55,
+          "median_mm": 7.48,
+          "n": 4
+        },
+        "evals": 920,
+        "pairs": 8,
+        "pair_candidates": 12
+      }
+    },
+    "note": "validation set also used to prune pairs; see check_sampled_runtime.py for an independent set"
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "female-protected-7-articulated": {
+    "female-base-v0-4-0": {
+      "error": null,
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": 0.0,
+      "max_surface_p99_mm": 1.530759788583963
+    },
+    "female-slim-v0-4-0": {
+      "error": null,
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": 7.075272636582922,
+      "max_surface_p99_mm": 1.5954093146137858
+    },
+    "female-ideal83-v0-4-0": {
+      "error": null,
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": 0.6130144517029587,
+      "max_surface_p99_mm": 1.5709888108540315
+    },
+    "female-ideal70-v0-4-0": {
+      "error": null,
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": 0.367863959354042,
+      "max_surface_p99_mm": 1.5214610379189202
+    },
+    "female-toon64-v0-4-0": {
+      "error": null,
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": 0.3266776909999358,
+      "max_surface_p99_mm": 1.3976510579232049
+    },
+    "female-muscular-v0-4-0": {
+      "error": null,
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": 2.676141396009049,
+      "max_surface_p99_mm": 2.1679166168905715
+    },
+    "female-muscle-max-v0-4-0": {
+      "error": null,
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": 3.5651453831899595,
+      "max_surface_p99_mm": 2.5963119603693405
+    },
+    "female-soft-v0-4-0": {
+      "error": null,
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": 3.479326876763312,
+      "max_surface_p99_mm": 2.3385790362954126
+    },
+    "female-fat-max-v0-4-0": {
+      "error": null,
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": 36.578714784903894,
+      "max_surface_p99_mm": 3.704348844476043
+    },
+    "female-new-fat-v0-4-0": {
+      "error": null,
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": 94.94783612627204,
+      "max_surface_p99_mm": 20.619004704058113
+    },
+    "female-new-muscular-v0-4-0": {
+      "error": null,
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": 35.53620439084512,
+      "max_surface_p99_mm": 8.65889589302241
+    },
+    "custom-large": {
+      "error": null,
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": 34.73515276218205,
+      "max_surface_p99_mm": 5.2604911429807535
+    }
+  }
+}

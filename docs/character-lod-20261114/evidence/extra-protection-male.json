@@ -1,0 +1,120 @@
+{
+  "cases": {
+    "male-base-v0-8-0": {
+      "bad_triangles": 0,
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 168.684899,
+        "sole_z_mm": 0.0
+      }
+    },
+    "male-ideal83-v0-8-0": {
+      "bad_triangles": 0,
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 168.684899,
+        "sole_z_mm": 0.0
+      }
+    },
+    "male-ideal70-v0-8-0": {
+      "bad_triangles": 0,
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 168.684899,
+        "sole_z_mm": 0.0
+      }
+    },
+    "male-toon64-v0-8-0": {
+      "bad_triangles": 0,
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 165.0,
+        "sole_z_mm": 0.0
+      }
+    },
+    "male-muscular-v0-8-0": {
+      "bad_triangles": 0,
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 168.684899,
+        "sole_z_mm": 0.0
+      }
+    },
+    "male-muscle-max-v0-8-0": {
+      "bad_triangles": 23,
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 23,
+        "height_cm": 168.684899,
+        "sole_z_mm": 0.0
+      }
+    },
+    "male-bulk-v0-8-0": {
+      "bad_triangles": 91,
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 91,
+        "height_cm": 168.684899,
+        "sole_z_mm": 0.0
+      }
+    },
+    "male-soft-v0-8-0": {
+      "bad_triangles": 44,
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 44,
+        "height_cm": 166.91310078028778,
+        "sole_z_mm": 0.0
+      }
+    },
+    "male-fat-max-v0-8-0": {
+      "bad_triangles": 162,
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 162,
+        "height_cm": 166.84698890641792,
+        "sole_z_mm": 0.0
+      }
+    },
+    "custom-large": {
+      "bad_triangles": 236,
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 236,
+        "height_cm": 190.0,
+        "sole_z_mm": 0.0
+      }
+    }
+  },
+  "failed_source_vertices": 712,
+  "expanded_protection_vertices": 30724,
+  "failed_bounds": {
+    "min": [
+      -0.6799764633178711,
+      -0.09206517785787582,
+      0.13929866254329681
+    ],
+    "max": [
+      0.6695061326026917,
+      0.14126284420490265,
+      1.4638506174087524
+    ]
+  },
+  "mask_sha256": "db5ee4b9df7c0c3ab5ed1945c816f6b3e8b25a5605109b1d3e782fb25f825d28",
+  "local_path": "/private/tmp/standin-mesh-light-assets-20261114/extra-male-1.npy"
+}
