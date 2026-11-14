@@ -1,0 +1,34 @@
+{
+  "neutral_finger_regression": "both selected sources pass",
+  "python_contract_tests": {
+    "passed": 4,
+    "total": 4
+  },
+  "core_smoke_tests": {
+    "passed": 54,
+    "total": 54
+  },
+  "compileall": "pass",
+  "git_diff_check": "pass",
+  "rendered_images": {
+    "posed": 320,
+    "all_shapes": 88,
+    "total": 432,
+    "actual_converter": 24
+  },
+  "new_csp_import": {
+    "status": "unverified",
+    "reason": "Mac locked; automatic unlock unavailable; previous candidate screenshots not reused"
+  },
+  "new_ssr2": {
+    "status": "not activated",
+    "old_certification_reused": false
+  },
+  "actual_final_pairs": {
+    "compared": 12,
+    "additional_correspondence_pass": 0,
+    "held": 12,
+    "reason": "closed-fist topology-dependent smoothing; see actual-final-pairs.json"
+  },
+  "final_file_sha256_checks": 72
+}

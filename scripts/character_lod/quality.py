@@ -23,12 +23,8 @@ def pose(c,name):
  c.apply_pose({'neutral':'T','raised':'RAISE','elbow':'ELBOW','deep':'DEEP','sit':'SIT90','cross':'T','hands':'T'}[name])
  if name=='cross':
   for s,sign in [('Left',1),('Right',-1)]:c.rotate(a,s+'Arm',(0,0,1),sign*35);c.rotate(a,s+'ForeArm',(0,0,1),sign*120)
- # Left fist / right spread, extra thumb opposition. Same meaningful bone axes.
- for s in ('Left','Right'):
-  for digit in ('Index','Middle','Ring','Pinky'):
-   for joint in (1,2,3):
-    c.rotate(a,s+'Hand'+digit+str(joint),(0,0,1 if s=='Left' else -1),75 if s=='Left' else (10 if joint==1 else 0))
-  c.rotate(a,s+'HandThumb2',(0,0,1 if s=='Left' else -1),45 if s=='Left' else 0)
+ from scripts.character_lod.pose_controls import finger_test_rotations
+ for bone,axis,degrees in finger_test_rotations(name):c.rotate(a,bone,axis,degrees)
  a.update_tag();bpy.context.view_layer.update();c.correct_pose(check_intersections=True,contacts=True)
  return c.evaluated(m)
 

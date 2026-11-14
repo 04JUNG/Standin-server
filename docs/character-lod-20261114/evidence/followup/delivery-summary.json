@@ -1,0 +1,17 @@
+{
+  "schema": "local-character-lod-review.v1",
+  "revision": "followup",
+  "baseline_sha": "ee965494435dbaf26b643c2e1f8da1fe404dc513",
+  "scope": "local review only; no deployment or catalog replacement",
+  "promotable": false,
+  "reasons": [
+    "actual Converter closed-fist final correspondence screen remains held",
+    "human review and skin certification still required",
+    "new topology has no activated approximate SSR2 certification",
+    "earlier CSP checks belong to different candidates"
+  ],
+  "file_count": 945,
+  "total_bytes": 3314627774,
+  "delivery_manifest_sha256": "6565a25623cdf5a70ffbcfbb84f090904b585e9c4102767818b5cf1b077ab70e",
+  "path": "/private/tmp/standin-mesh-light-followup-20261114/delivery-manifest.json"
+}

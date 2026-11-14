@@ -1,5 +1,7 @@
 # Latest-body protected mesh reduction — local review, 2026-11-14
 
+> Follow-up: [neutral-hand fix and stronger 33.3% / 24.4% candidates](FOLLOWUP.md). The sections below preserve the first experiment and its limitations.
+
 The deliverables are offline candidate authoring assets, actual final FBXs,
 quality evidence, a local browser comparison, and a repeated Converter benchmark.
 The approved male/female defaults are unchanged. This is not a release or a

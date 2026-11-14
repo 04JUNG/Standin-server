@@ -1,0 +1,3637 @@
+{
+  "gender": "female",
+  "source_cases": {
+    "female-base-v0-4-0": {
+      "controls": {
+        "height_cm": 169.893087,
+        "heads": 8.000001,
+        "head_scale": 1.0,
+        "head_width": 0.0,
+        "head_depth": 0.0,
+        "neck_width": 0.0,
+        "neck_length": 0.0,
+        "physique": 0.0,
+        "fat_gain": 0.0,
+        "muscle": 0.0,
+        "definition": 0.0,
+        "shoulders": 0.0,
+        "chest_width": 0.0,
+        "chest_depth": 0.0,
+        "waist": 0.0,
+        "pelvis": 0.0,
+        "glute": 0.0,
+        "thigh": 0.0,
+        "calf": 0.0,
+        "torso_length": 0.0,
+        "arm_length": 0.0,
+        "leg_length": 0.0,
+        "leg_ratio": 0.0,
+        "breast_size": 0.0,
+        "breast_projection": 0.0,
+        "breast_spacing": 0.0,
+        "breast_height": 0.0,
+        "breast_width": 0.0,
+        "fat_distribution": 0.0,
+        "detail_chest": 0.0,
+        "detail_back": 0.0,
+        "detail_shoulder": 0.0,
+        "detail_upperarm": 0.0,
+        "detail_forearm": 0.0,
+        "detail_thigh": 0.0,
+        "detail_calf": 0.0,
+        "fat_torso": 0.0,
+        "fat_arms": 0.0,
+        "fat_legs": 0.0
+      },
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 169.89308700000004,
+        "sole_z_mm": 0.0
+      },
+      "poses": {
+        "neutral": {
+          "finite": true,
+          "psd": {}
+        },
+        "raised": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_shoulder_raise": 1.0,
+            "PSD_Right_shoulder_raise": 1.0
+          }
+        },
+        "elbow": {
+          "finite": true,
+          "psd": {}
+        },
+        "deep": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_hip_flex": 0.7029293179512024,
+            "PSD_Left_knee_flex": 1.0,
+            "PSD_Right_hip_flex": 0.7029292583465576,
+            "PSD_Right_knee_flex": 1.0
+          }
+        },
+        "sit": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_hip_flex": 0.7029293179512024,
+            "PSD_Left_knee_flex": 0.6087215542793274,
+            "PSD_Right_hip_flex": 0.7029292583465576,
+            "PSD_Right_knee_flex": 0.6087215542793274
+          }
+        },
+        "cross": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_shoulder_back": 0.6174535751342773,
+            "PSD_Right_shoulder_back": 0.6174535751342773
+          }
+        },
+        "hands": {
+          "finite": true,
+          "psd": {}
+        }
+      },
+      "neutral_export": "/private/tmp/standin-mesh-light-assets-20261114/quality-surface-v2-female/original-fbx/4100780dad75f4bcc62a916bebca48f2f076d49026d6f25cabe753769b92bc27/model.fbx",
+      "roundtrip": {
+        "identity": "4100780dad75f4bcc62a916bebca48f2f076d49026d6f25cabe753769b92bc27",
+        "shape": {
+          "schema": 1,
+          "asset": "standin-approved-female-ceee9f20f03e7cbd2df2",
+          "rules": "standin-female-body-0.4.0",
+          "rig_rules": "female-hip-profile-1+separated-hands-1",
+          "controls": {
+            "height_cm": 169.893082,
+            "heads": 8.000001,
+            "head_scale": 1.0,
+            "head_width": 0.0,
+            "head_depth": 0.0,
+            "neck_width": 0.0,
+            "neck_length": 0.0,
+            "physique": 0.0,
+            "fat_gain": 0.0,
+            "muscle": 0.0,
+            "definition": 0.0,
+            "shoulders": 0.0,
+            "chest_width": 0.0,
+            "chest_depth": 0.0,
+            "waist": 0.0,
+            "pelvis": 0.0,
+            "glute": 0.0,
+            "thigh": 0.0,
+            "calf": 0.0,
+            "torso_length": 0.0,
+            "arm_length": 0.0,
+            "leg_length": 0.0,
+            "leg_ratio": 0.0,
+            "breast_size": 0.0,
+            "breast_projection": 0.0,
+            "breast_spacing": 0.0,
+            "breast_height": 0.0,
+            "breast_width": 0.0,
+            "fat_distribution": 0.0,
+            "detail_chest": 0.0,
+            "detail_back": 0.0,
+            "detail_shoulder": 0.0,
+            "detail_upperarm": 0.0,
+            "detail_forearm": 0.0,
+            "detail_thigh": 0.0,
+            "detail_calf": 0.0,
+            "fat_torso": 0.0,
+            "fat_arms": 0.0,
+            "fat_legs": 0.0
+          }
+        },
+        "pose": null,
+        "posed": false,
+        "vertices": 105430,
+        "triangles": 210856,
+        "bones": 54,
+        "morph_channels": 0,
+        "fbx_sha256": "2a9eb0d2e0b1a7541ac0af652da3a0b9aa429bc6e1959c5435d52b38341cddfc",
+        "roundtrip_max_error_mm": 0.0003096980094596802,
+        "roundtrip_joint_error_mm": 0.00043108164540174695,
+        "roundtrip_weight_error": 0.0,
+        "pose_qa": {
+          "active": {},
+          "finite": true,
+          "rules": "approved-anatomy-psd-v1"
+        },
+        "contact_qa": {
+          "checked": false,
+          "reason": "approved anatomical PSDs; no collision solver"
+        },
+        "status": "local_authoring_candidate; product integration and artist signoff required"
+      }
+    },
+    "female-slim-v0-4-0": {
+      "controls": {
+        "height_cm": 169.893087,
+        "heads": 8.000001,
+        "head_scale": 1.0,
+        "head_width": 0.0,
+        "head_depth": 0.0,
+        "neck_width": 0.0,
+        "neck_length": 0.0,
+        "physique": -0.8,
+        "fat_gain": 0.0,
+        "muscle": 0.12,
+        "definition": 0.0,
+        "shoulders": 0.0,
+        "chest_width": 0.0,
+        "chest_depth": 0.0,
+        "waist": 0.0,
+        "pelvis": 0.0,
+        "glute": 0.0,
+        "thigh": 0.0,
+        "calf": 0.0,
+        "torso_length": 0.0,
+        "arm_length": 0.0,
+        "leg_length": 0.0,
+        "leg_ratio": 0.0,
+        "breast_size": 0.0,
+        "breast_projection": 0.0,
+        "breast_spacing": 0.0,
+        "breast_height": 0.0,
+        "breast_width": 0.0,
+        "fat_distribution": 0.0,
+        "detail_chest": 0.0,
+        "detail_back": 0.0,
+        "detail_shoulder": 0.0,
+        "detail_upperarm": 0.0,
+        "detail_forearm": 0.0,
+        "detail_thigh": 0.0,
+        "detail_calf": 0.0,
+        "fat_torso": 0.0,
+        "fat_arms": 0.0,
+        "fat_legs": 0.0
+      },
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 169.89308700000004,
+        "sole_z_mm": 0.0
+      },
+      "poses": {
+        "neutral": {
+          "finite": true,
+          "psd": {}
+        },
+        "raised": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_shoulder_raise": 1.0,
+            "PSD_Right_shoulder_raise": 1.0
+          }
+        },
+        "sit": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_hip_flex": 0.7029293179512024,
+            "PSD_Left_knee_flex": 0.6087215542793274,
+            "PSD_Right_hip_flex": 0.7029292583465576,
+            "PSD_Right_knee_flex": 0.6087215542793274
+          }
+        }
+      },
+      "neutral_export": "/private/tmp/standin-mesh-light-assets-20261114/quality-surface-v2-female/original-fbx/64643b19618b4c2f6b105102574c4e030cbb183e4375921871b9d08997122b4e/model.fbx",
+      "roundtrip": {
+        "identity": "64643b19618b4c2f6b105102574c4e030cbb183e4375921871b9d08997122b4e",
+        "shape": {
+          "schema": 1,
+          "asset": "standin-approved-female-ceee9f20f03e7cbd2df2",
+          "rules": "standin-female-body-0.4.0",
+          "rig_rules": "female-hip-profile-1+separated-hands-1",
+          "controls": {
+            "height_cm": 169.893082,
+            "heads": 8.000001,
+            "head_scale": 1.0,
+            "head_width": 0.0,
+            "head_depth": 0.0,
+            "neck_width": 0.0,
+            "neck_length": 0.0,
+            "physique": -0.8,
+            "fat_gain": 0.0,
+            "muscle": 0.12,
+            "definition": 0.0,
+            "shoulders": 0.0,
+            "chest_width": 0.0,
+            "chest_depth": 0.0,
+            "waist": 0.0,
+            "pelvis": 0.0,
+            "glute": 0.0,
+            "thigh": 0.0,
+            "calf": 0.0,
+            "torso_length": 0.0,
+            "arm_length": 0.0,
+            "leg_length": 0.0,
+            "leg_ratio": 0.0,
+            "breast_size": 0.0,
+            "breast_projection": 0.0,
+            "breast_spacing": 0.0,
+            "breast_height": 0.0,
+            "breast_width": 0.0,
+            "fat_distribution": 0.0,
+            "detail_chest": 0.0,
+            "detail_back": 0.0,
+            "detail_shoulder": 0.0,
+            "detail_upperarm": 0.0,
+            "detail_forearm": 0.0,
+            "detail_thigh": 0.0,
+            "detail_calf": 0.0,
+            "fat_torso": 0.0,
+            "fat_arms": 0.0,
+            "fat_legs": 0.0
+          }
+        },
+        "pose": null,
+        "posed": false,
+        "vertices": 105430,
+        "triangles": 210856,
+        "bones": 54,
+        "morph_channels": 0,
+        "fbx_sha256": "2592ec8441e1ccc2b4410ebaa8d8d8add05c68441001f1637b2253839bbcc63b",
+        "roundtrip_max_error_mm": 0.0003096980094596802,
+        "roundtrip_joint_error_mm": 0.00043108164540174695,
+        "roundtrip_weight_error": 0.0,
+        "pose_qa": {
+          "active": {},
+          "finite": true,
+          "rules": "approved-anatomy-psd-v1"
+        },
+        "contact_qa": {
+          "checked": false,
+          "reason": "approved anatomical PSDs; no collision solver"
+        },
+        "status": "local_authoring_candidate; product integration and artist signoff required"
+      }
+    },
+    "female-ideal83-v0-4-0": {
+      "controls": {
+        "height_cm": 169.893087,
+        "heads": 8.3,
+        "head_scale": 1.0,
+        "head_width": 0.0,
+        "head_depth": 0.0,
+        "neck_width": 0.0,
+        "neck_length": 0.0,
+        "physique": -0.2,
+        "fat_gain": 0.0,
+        "muscle": 0.35,
+        "definition": 0.0,
+        "shoulders": 0.12,
+        "chest_width": 0.0,
+        "chest_depth": 0.0,
+        "waist": -0.12,
+        "pelvis": 0.0,
+        "glute": 0.0,
+        "thigh": 0.0,
+        "calf": 0.0,
+        "torso_length": 0.0,
+        "arm_length": 0.0,
+        "leg_length": 0.35,
+        "leg_ratio": 0.0,
+        "breast_size": 0.0,
+        "breast_projection": 0.0,
+        "breast_spacing": 0.0,
+        "breast_height": 0.0,
+        "breast_width": 0.0,
+        "fat_distribution": 0.0,
+        "detail_chest": 0.0,
+        "detail_back": 0.0,
+        "detail_shoulder": 0.0,
+        "detail_upperarm": 0.0,
+        "detail_forearm": 0.0,
+        "detail_thigh": 0.0,
+        "detail_calf": 0.0,
+        "fat_torso": 0.0,
+        "fat_arms": 0.0,
+        "fat_legs": 0.0
+      },
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 169.893087,
+        "sole_z_mm": 0.0
+      },
+      "poses": {
+        "neutral": {
+          "finite": true,
+          "psd": {}
+        },
+        "raised": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_shoulder_raise": 1.0,
+            "PSD_Right_shoulder_raise": 1.0
+          }
+        },
+        "sit": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_hip_flex": 0.7029291391372681,
+            "PSD_Left_knee_flex": 0.6087214946746826,
+            "PSD_Right_hip_flex": 0.7029290795326233,
+            "PSD_Right_knee_flex": 0.6087214946746826
+          }
+        }
+      },
+      "neutral_export": "/private/tmp/standin-mesh-light-assets-20261114/quality-surface-v2-female/original-fbx/821571e36eddcbbde2bcfedc4fe87cf563ef62ce66fb52b08cadfbf64dca35fc/model.fbx",
+      "roundtrip": {
+        "identity": "821571e36eddcbbde2bcfedc4fe87cf563ef62ce66fb52b08cadfbf64dca35fc",
+        "shape": {
+          "schema": 1,
+          "asset": "standin-approved-female-ceee9f20f03e7cbd2df2",
+          "rules": "standin-female-body-0.4.0",
+          "rig_rules": "female-hip-profile-1+separated-hands-1",
+          "controls": {
+            "height_cm": 169.893082,
+            "heads": 8.3,
+            "head_scale": 1.0,
+            "head_width": 0.0,
+            "head_depth": 0.0,
+            "neck_width": 0.0,
+            "neck_length": 0.0,
+            "physique": -0.2,
+            "fat_gain": 0.0,
+            "muscle": 0.35,
+            "definition": 0.0,
+            "shoulders": 0.12,
+            "chest_width": 0.0,
+            "chest_depth": 0.0,
+            "waist": -0.12,
+            "pelvis": 0.0,
+            "glute": 0.0,
+            "thigh": 0.0,
+            "calf": 0.0,
+            "torso_length": 0.0,
+            "arm_length": 0.0,
+            "leg_length": 0.35,
+            "leg_ratio": 0.0,
+            "breast_size": 0.0,
+            "breast_projection": 0.0,
+            "breast_spacing": 0.0,
+            "breast_height": 0.0,
+            "breast_width": 0.0,
+            "fat_distribution": 0.0,
+            "detail_chest": 0.0,
+            "detail_back": 0.0,
+            "detail_shoulder": 0.0,
+            "detail_upperarm": 0.0,
+            "detail_forearm": 0.0,
+            "detail_thigh": 0.0,
+            "detail_calf": 0.0,
+            "fat_torso": 0.0,
+            "fat_arms": 0.0,
+            "fat_legs": 0.0
+          }
+        },
+        "pose": null,
+        "posed": false,
+        "vertices": 105430,
+        "triangles": 210856,
+        "bones": 54,
+        "morph_channels": 0,
+        "fbx_sha256": "501029c5456a2c4c6643042c124b6907e3772fad4843fd8dd7c756eff65bda24",
+        "roundtrip_max_error_mm": 0.00020874925610314676,
+        "roundtrip_joint_error_mm": 0.0005561547758138633,
+        "roundtrip_weight_error": 0.0,
+        "pose_qa": {
+          "active": {},
+          "finite": true,
+          "rules": "approved-anatomy-psd-v1"
+        },
+        "contact_qa": {
+          "checked": false,
+          "reason": "approved anatomical PSDs; no collision solver"
+        },
+        "status": "local_authoring_candidate; product integration and artist signoff required"
+      }
+    },
+    "female-ideal70-v0-4-0": {
+      "controls": {
+        "height_cm": 168.0,
+        "heads": 7.0,
+        "head_scale": 1.0,
+        "head_width": 0.0,
+        "head_depth": 0.0,
+        "neck_width": 0.0,
+        "neck_length": 0.0,
+        "physique": 0.0,
+        "fat_gain": 0.0,
+        "muscle": 0.2,
+        "definition": 0.0,
+        "shoulders": 0.0,
+        "chest_width": 0.0,
+        "chest_depth": 0.0,
+        "waist": 0.0,
+        "pelvis": 0.0,
+        "glute": 0.0,
+        "thigh": 0.0,
+        "calf": 0.0,
+        "torso_length": 0.0,
+        "arm_length": 0.0,
+        "leg_length": 0.1,
+        "leg_ratio": 0.0,
+        "breast_size": 0.0,
+        "breast_projection": 0.0,
+        "breast_spacing": 0.0,
+        "breast_height": 0.0,
+        "breast_width": 0.0,
+        "fat_distribution": 0.0,
+        "detail_chest": 0.0,
+        "detail_back": 0.0,
+        "detail_shoulder": 0.0,
+        "detail_upperarm": 0.0,
+        "detail_forearm": 0.0,
+        "detail_thigh": 0.0,
+        "detail_calf": 0.0,
+        "fat_torso": 0.0,
+        "fat_arms": 0.0,
+        "fat_legs": 0.0
+      },
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 168.0,
+        "sole_z_mm": 0.0
+      },
+      "poses": {
+        "neutral": {
+          "finite": true,
+          "psd": {}
+        },
+        "raised": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_shoulder_raise": 1.0,
+            "PSD_Right_shoulder_raise": 1.0
+          }
+        },
+        "sit": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_hip_flex": 0.7029292583465576,
+            "PSD_Left_knee_flex": 0.6087214946746826,
+            "PSD_Right_hip_flex": 0.7029292583465576,
+            "PSD_Right_knee_flex": 0.6087215542793274
+          }
+        }
+      },
+      "neutral_export": "/private/tmp/standin-mesh-light-assets-20261114/quality-surface-v2-female/original-fbx/be8d52334628ceafce3c5e535589ef1337028df58909c4eac93c5c7faa698ff4/model.fbx",
+      "roundtrip": {
+        "identity": "be8d52334628ceafce3c5e535589ef1337028df58909c4eac93c5c7faa698ff4",
+        "shape": {
+          "schema": 1,
+          "asset": "standin-approved-female-ceee9f20f03e7cbd2df2",
+          "rules": "standin-female-body-0.4.0",
+          "rig_rules": "female-hip-profile-1+separated-hands-1",
+          "controls": {
+            "height_cm": 168.0,
+            "heads": 7.0,
+            "head_scale": 1.0,
+            "head_width": 0.0,
+            "head_depth": 0.0,
+            "neck_width": 0.0,
+            "neck_length": 0.0,
+            "physique": 0.0,
+            "fat_gain": 0.0,
+            "muscle": 0.2,
+            "definition": 0.0,
+            "shoulders": 0.0,
+            "chest_width": 0.0,
+            "chest_depth": 0.0,
+            "waist": 0.0,
+            "pelvis": 0.0,
+            "glute": 0.0,
+            "thigh": 0.0,
+            "calf": 0.0,
+            "torso_length": 0.0,
+            "arm_length": 0.0,
+            "leg_length": 0.1,
+            "leg_ratio": 0.0,
+            "breast_size": 0.0,
+            "breast_projection": 0.0,
+            "breast_spacing": 0.0,
+            "breast_height": 0.0,
+            "breast_width": 0.0,
+            "fat_distribution": 0.0,
+            "detail_chest": 0.0,
+            "detail_back": 0.0,
+            "detail_shoulder": 0.0,
+            "detail_upperarm": 0.0,
+            "detail_forearm": 0.0,
+            "detail_thigh": 0.0,
+            "detail_calf": 0.0,
+            "fat_torso": 0.0,
+            "fat_arms": 0.0,
+            "fat_legs": 0.0
+          }
+        },
+        "pose": null,
+        "posed": false,
+        "vertices": 105430,
+        "triangles": 210856,
+        "bones": 54,
+        "morph_channels": 0,
+        "fbx_sha256": "03471dba04e60c34825ede5652ec73419aabef5f9016edd5d0c3277406a52389",
+        "roundtrip_max_error_mm": 0.00020214045548527793,
+        "roundtrip_joint_error_mm": 0.0005703466894926023,
+        "roundtrip_weight_error": 0.0,
+        "pose_qa": {
+          "active": {},
+          "finite": true,
+          "rules": "approved-anatomy-psd-v1"
+        },
+        "contact_qa": {
+          "checked": false,
+          "reason": "approved anatomical PSDs; no collision solver"
+        },
+        "status": "local_authoring_candidate; product integration and artist signoff required"
+      }
+    },
+    "female-toon64-v0-4-0": {
+      "controls": {
+        "height_cm": 162.0,
+        "heads": 6.4,
+        "head_scale": 1.0,
+        "head_width": 0.0,
+        "head_depth": 0.0,
+        "neck_width": 0.0,
+        "neck_length": 0.0,
+        "physique": -0.2,
+        "fat_gain": 0.0,
+        "muscle": 0.0,
+        "definition": 0.0,
+        "shoulders": -0.1,
+        "chest_width": 0.0,
+        "chest_depth": 0.0,
+        "waist": 0.0,
+        "pelvis": 0.0,
+        "glute": 0.0,
+        "thigh": 0.0,
+        "calf": 0.0,
+        "torso_length": 0.0,
+        "arm_length": 0.0,
+        "leg_length": 0.0,
+        "leg_ratio": 0.0,
+        "breast_size": -0.2,
+        "breast_projection": 0.0,
+        "breast_spacing": 0.0,
+        "breast_height": 0.0,
+        "breast_width": 0.0,
+        "fat_distribution": 0.0,
+        "detail_chest": 0.0,
+        "detail_back": 0.0,
+        "detail_shoulder": 0.0,
+        "detail_upperarm": 0.0,
+        "detail_forearm": 0.0,
+        "detail_thigh": 0.0,
+        "detail_calf": 0.0,
+        "fat_torso": 0.0,
+        "fat_arms": 0.0,
+        "fat_legs": 0.0
+      },
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 162.0,
+        "sole_z_mm": 0.0
+      },
+      "poses": {
+        "neutral": {
+          "finite": true,
+          "psd": {}
+        },
+        "raised": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_shoulder_raise": 1.0,
+            "PSD_Right_shoulder_raise": 1.0
+          }
+        },
+        "sit": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_hip_flex": 0.7029293179512024,
+            "PSD_Left_knee_flex": 0.6087215542793274,
+            "PSD_Right_hip_flex": 0.7029292583465576,
+            "PSD_Right_knee_flex": 0.6087215542793274
+          }
+        }
+      },
+      "neutral_export": "/private/tmp/standin-mesh-light-assets-20261114/quality-surface-v2-female/original-fbx/d4b79ff196a1334548a14fd920489e86b1001aa859ba236897639fdd9a7f802f/model.fbx",
+      "roundtrip": {
+        "identity": "d4b79ff196a1334548a14fd920489e86b1001aa859ba236897639fdd9a7f802f",
+        "shape": {
+          "schema": 1,
+          "asset": "standin-approved-female-ceee9f20f03e7cbd2df2",
+          "rules": "standin-female-body-0.4.0",
+          "rig_rules": "female-hip-profile-1+separated-hands-1",
+          "controls": {
+            "height_cm": 162.0,
+            "heads": 6.4,
+            "head_scale": 1.0,
+            "head_width": 0.0,
+            "head_depth": 0.0,
+            "neck_width": 0.0,
+            "neck_length": 0.0,
+            "physique": -0.2,
+            "fat_gain": 0.0,
+            "muscle": 0.0,
+            "definition": 0.0,
+            "shoulders": -0.1,
+            "chest_width": 0.0,
+            "chest_depth": 0.0,
+            "waist": 0.0,
+            "pelvis": 0.0,
+            "glute": 0.0,
+            "thigh": 0.0,
+            "calf": 0.0,
+            "torso_length": 0.0,
+            "arm_length": 0.0,
+            "leg_length": 0.0,
+            "leg_ratio": 0.0,
+            "breast_size": -0.2,
+            "breast_projection": 0.0,
+            "breast_spacing": 0.0,
+            "breast_height": 0.0,
+            "breast_width": 0.0,
+            "fat_distribution": 0.0,
+            "detail_chest": 0.0,
+            "detail_back": 0.0,
+            "detail_shoulder": 0.0,
+            "detail_upperarm": 0.0,
+            "detail_forearm": 0.0,
+            "detail_thigh": 0.0,
+            "detail_calf": 0.0,
+            "fat_torso": 0.0,
+            "fat_arms": 0.0,
+            "fat_legs": 0.0
+          }
+        },
+        "pose": null,
+        "posed": false,
+        "vertices": 105430,
+        "triangles": 210856,
+        "bones": 54,
+        "morph_channels": 0,
+        "fbx_sha256": "234e894bff38b1259650f3161c8084ba786e91c240f12aeec2e56bc3ea810c02",
+        "roundtrip_max_error_mm": 0.0003048598955501802,
+        "roundtrip_joint_error_mm": 0.0004224615630082296,
+        "roundtrip_weight_error": 0.0,
+        "pose_qa": {
+          "active": {},
+          "finite": true,
+          "rules": "approved-anatomy-psd-v1"
+        },
+        "contact_qa": {
+          "checked": false,
+          "reason": "approved anatomical PSDs; no collision solver"
+        },
+        "status": "local_authoring_candidate; product integration and artist signoff required"
+      }
+    },
+    "female-muscular-v0-4-0": {
+      "controls": {
+        "height_cm": 169.893087,
+        "heads": 8.000001,
+        "head_scale": 1.0,
+        "head_width": 0.0,
+        "head_depth": 0.0,
+        "neck_width": 0.0,
+        "neck_length": 0.0,
+        "physique": 0.0,
+        "fat_gain": 0.0,
+        "muscle": 1.25,
+        "definition": 0.45,
+        "shoulders": 0.25,
+        "chest_width": 0.0,
+        "chest_depth": 0.0,
+        "waist": 0.0,
+        "pelvis": 0.0,
+        "glute": 0.0,
+        "thigh": 0.12,
+        "calf": 0.0,
+        "torso_length": 0.0,
+        "arm_length": 0.0,
+        "leg_length": 0.0,
+        "leg_ratio": 0.0,
+        "breast_size": 0.0,
+        "breast_projection": 0.0,
+        "breast_spacing": 0.0,
+        "breast_height": 0.0,
+        "breast_width": 0.0,
+        "fat_distribution": 0.0,
+        "detail_chest": 0.0,
+        "detail_back": 0.0,
+        "detail_shoulder": 0.0,
+        "detail_upperarm": 0.0,
+        "detail_forearm": 0.0,
+        "detail_thigh": 0.0,
+        "detail_calf": 0.0,
+        "fat_torso": 0.0,
+        "fat_arms": 0.0,
+        "fat_legs": 0.0
+      },
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 169.89308700000004,
+        "sole_z_mm": 0.0
+      },
+      "poses": {
+        "neutral": {
+          "finite": true,
+          "psd": {}
+        },
+        "raised": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_shoulder_raise": 1.0,
+            "PSD_Right_shoulder_raise": 1.0
+          }
+        },
+        "sit": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_hip_flex": 0.7029293179512024,
+            "PSD_Left_knee_flex": 0.6087215542793274,
+            "PSD_Right_hip_flex": 0.7029292583465576,
+            "PSD_Right_knee_flex": 0.6087215542793274
+          }
+        }
+      },
+      "neutral_export": "/private/tmp/standin-mesh-light-assets-20261114/quality-surface-v2-female/original-fbx/0dd486dbb1947f7e0669831fbe602182e56dde19eaf27c2f7bdd3c5d91d60386/model.fbx",
+      "roundtrip": {
+        "identity": "0dd486dbb1947f7e0669831fbe602182e56dde19eaf27c2f7bdd3c5d91d60386",
+        "shape": {
+          "schema": 1,
+          "asset": "standin-approved-female-ceee9f20f03e7cbd2df2",
+          "rules": "standin-female-body-0.4.0",
+          "rig_rules": "female-hip-profile-1+separated-hands-1",
+          "controls": {
+            "height_cm": 169.893082,
+            "heads": 8.000001,
+            "head_scale": 1.0,
+            "head_width": 0.0,
+            "head_depth": 0.0,
+            "neck_width": 0.0,
+            "neck_length": 0.0,
+            "physique": 0.0,
+            "fat_gain": 0.0,
+            "muscle": 1.25,
+            "definition": 0.45,
+            "shoulders": 0.25,
+            "chest_width": 0.0,
+            "chest_depth": 0.0,
+            "waist": 0.0,
+            "pelvis": 0.0,
+            "glute": 0.0,
+            "thigh": 0.12,
+            "calf": 0.0,
+            "torso_length": 0.0,
+            "arm_length": 0.0,
+            "leg_length": 0.0,
+            "leg_ratio": 0.0,
+            "breast_size": 0.0,
+            "breast_projection": 0.0,
+            "breast_spacing": 0.0,
+            "breast_height": 0.0,
+            "breast_width": 0.0,
+            "fat_distribution": 0.0,
+            "detail_chest": 0.0,
+            "detail_back": 0.0,
+            "detail_shoulder": 0.0,
+            "detail_upperarm": 0.0,
+            "detail_forearm": 0.0,
+            "detail_thigh": 0.0,
+            "detail_calf": 0.0,
+            "fat_torso": 0.0,
+            "fat_arms": 0.0,
+            "fat_legs": 0.0
+          }
+        },
+        "pose": null,
+        "posed": false,
+        "vertices": 105430,
+        "triangles": 210856,
+        "bones": 54,
+        "morph_channels": 0,
+        "fbx_sha256": "a8de1419f3a8db0f13509f52e69efb15e9ccba92e66dc8811229d104d267cf73",
+        "roundtrip_max_error_mm": 0.0003096980094596802,
+        "roundtrip_joint_error_mm": 0.0005048971026275985,
+        "roundtrip_weight_error": 0.0,
+        "pose_qa": {
+          "active": {},
+          "finite": true,
+          "rules": "approved-anatomy-psd-v1"
+        },
+        "contact_qa": {
+          "checked": false,
+          "reason": "approved anatomical PSDs; no collision solver"
+        },
+        "status": "local_authoring_candidate; product integration and artist signoff required"
+      }
+    },
+    "female-muscle-max-v0-4-0": {
+      "controls": {
+        "height_cm": 169.893087,
+        "heads": 8.000001,
+        "head_scale": 1.0,
+        "head_width": 0.0,
+        "head_depth": 0.0,
+        "neck_width": 0.0,
+        "neck_length": 0.0,
+        "physique": 0.0,
+        "fat_gain": 0.0,
+        "muscle": 2.0,
+        "definition": 0.7,
+        "shoulders": 0.4,
+        "chest_width": 0.0,
+        "chest_depth": 0.0,
+        "waist": 0.0,
+        "pelvis": 0.0,
+        "glute": 0.0,
+        "thigh": 0.2,
+        "calf": 0.0,
+        "torso_length": 0.0,
+        "arm_length": 0.0,
+        "leg_length": 0.0,
+        "leg_ratio": 0.0,
+        "breast_size": 0.0,
+        "breast_projection": 0.0,
+        "breast_spacing": 0.0,
+        "breast_height": 0.0,
+        "breast_width": 0.0,
+        "fat_distribution": 0.0,
+        "detail_chest": 0.0,
+        "detail_back": 0.0,
+        "detail_shoulder": 0.0,
+        "detail_upperarm": 0.0,
+        "detail_forearm": 0.0,
+        "detail_thigh": 0.0,
+        "detail_calf": 0.0,
+        "fat_torso": 0.0,
+        "fat_arms": 0.0,
+        "fat_legs": 0.0
+      },
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 169.89308700000004,
+        "sole_z_mm": 0.0
+      },
+      "poses": {
+        "neutral": {
+          "finite": true,
+          "psd": {}
+        },
+        "raised": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_shoulder_raise": 1.0,
+            "PSD_Right_shoulder_raise": 1.0
+          }
+        },
+        "sit": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_hip_flex": 0.7029293179512024,
+            "PSD_Left_knee_flex": 0.6087215542793274,
+            "PSD_Right_hip_flex": 0.7029292583465576,
+            "PSD_Right_knee_flex": 0.6087215542793274
+          }
+        }
+      },
+      "neutral_export": "/private/tmp/standin-mesh-light-assets-20261114/quality-surface-v2-female/original-fbx/84b9ccff651bc724e356d72952cbded51212e8880384795ae9c106a9e9c11f64/model.fbx",
+      "roundtrip": {
+        "identity": "84b9ccff651bc724e356d72952cbded51212e8880384795ae9c106a9e9c11f64",
+        "shape": {
+          "schema": 1,
+          "asset": "standin-approved-female-ceee9f20f03e7cbd2df2",
+          "rules": "standin-female-body-0.4.0",
+          "rig_rules": "female-hip-profile-1+separated-hands-1",
+          "controls": {
+            "height_cm": 169.893082,
+            "heads": 8.000001,
+            "head_scale": 1.0,
+            "head_width": 0.0,
+            "head_depth": 0.0,
+            "neck_width": 0.0,
+            "neck_length": 0.0,
+            "physique": 0.0,
+            "fat_gain": 0.0,
+            "muscle": 2.0,
+            "definition": 0.7,
+            "shoulders": 0.4,
+            "chest_width": 0.0,
+            "chest_depth": 0.0,
+            "waist": 0.0,
+            "pelvis": 0.0,
+            "glute": 0.0,
+            "thigh": 0.2,
+            "calf": 0.0,
+            "torso_length": 0.0,
+            "arm_length": 0.0,
+            "leg_length": 0.0,
+            "leg_ratio": 0.0,
+            "breast_size": 0.0,
+            "breast_projection": 0.0,
+            "breast_spacing": 0.0,
+            "breast_height": 0.0,
+            "breast_width": 0.0,
+            "fat_distribution": 0.0,
+            "detail_chest": 0.0,
+            "detail_back": 0.0,
+            "detail_shoulder": 0.0,
+            "detail_upperarm": 0.0,
+            "detail_forearm": 0.0,
+            "detail_thigh": 0.0,
+            "detail_calf": 0.0,
+            "fat_torso": 0.0,
+            "fat_arms": 0.0,
+            "fat_legs": 0.0
+          }
+        },
+        "pose": null,
+        "posed": false,
+        "vertices": 105430,
+        "triangles": 210856,
+        "bones": 54,
+        "morph_channels": 0,
+        "fbx_sha256": "740fe6aa45504d897fcee4e0a40231cd1e7aa55d1c9fcf9433b346b1ba041820",
+        "roundtrip_max_error_mm": 0.0003096980094596802,
+        "roundtrip_joint_error_mm": 0.0005071322940361987,
+        "roundtrip_weight_error": 0.0,
+        "pose_qa": {
+          "active": {},
+          "finite": true,
+          "rules": "approved-anatomy-psd-v1"
+        },
+        "contact_qa": {
+          "checked": false,
+          "reason": "approved anatomical PSDs; no collision solver"
+        },
+        "status": "local_authoring_candidate; product integration and artist signoff required"
+      }
+    },
+    "female-soft-v0-4-0": {
+      "controls": {
+        "height_cm": 169.893087,
+        "heads": 8.000001,
+        "head_scale": 1.03,
+        "head_width": 0.0,
+        "head_depth": 0.0,
+        "neck_width": 0.0,
+        "neck_length": 0.0,
+        "physique": 0.8,
+        "fat_gain": 0.0,
+        "muscle": 0.0,
+        "definition": 0.0,
+        "shoulders": 0.0,
+        "chest_width": 0.0,
+        "chest_depth": 0.0,
+        "waist": 0.0,
+        "pelvis": 0.0,
+        "glute": 0.0,
+        "thigh": 0.0,
+        "calf": 0.0,
+        "torso_length": 0.0,
+        "arm_length": 0.0,
+        "leg_length": 0.0,
+        "leg_ratio": 0.0,
+        "breast_size": 0.0,
+        "breast_projection": 0.0,
+        "breast_spacing": 0.0,
+        "breast_height": 0.0,
+        "breast_width": 0.0,
+        "fat_distribution": 0.15,
+        "detail_chest": 0.0,
+        "detail_back": 0.0,
+        "detail_shoulder": 0.0,
+        "detail_upperarm": 0.0,
+        "detail_forearm": 0.0,
+        "detail_thigh": 0.0,
+        "detail_calf": 0.0,
+        "fat_torso": 0.0,
+        "fat_arms": 0.0,
+        "fat_legs": 0.0
+      },
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 170.53018599661266,
+        "sole_z_mm": 0.0
+      },
+      "poses": {
+        "neutral": {
+          "finite": true,
+          "psd": {}
+        },
+        "raised": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_shoulder_raise": 1.0,
+            "PSD_Right_shoulder_raise": 1.0
+          }
+        },
+        "sit": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_hip_flex": 0.7029293179512024,
+            "PSD_Left_knee_flex": 0.6087215542793274,
+            "PSD_Right_hip_flex": 0.7029292583465576,
+            "PSD_Right_knee_flex": 0.6087215542793274
+          }
+        }
+      },
+      "neutral_export": "/private/tmp/standin-mesh-light-assets-20261114/quality-surface-v2-female/original-fbx/e253d06c56ab696dc006bff2f8c33eae11134e3286763bb7f48199b77e9a9b43/model.fbx",
+      "roundtrip": {
+        "identity": "e253d06c56ab696dc006bff2f8c33eae11134e3286763bb7f48199b77e9a9b43",
+        "shape": {
+          "schema": 1,
+          "asset": "standin-approved-female-ceee9f20f03e7cbd2df2",
+          "rules": "standin-female-body-0.4.0",
+          "rig_rules": "female-hip-profile-1+separated-hands-1",
+          "controls": {
+            "height_cm": 169.893082,
+            "heads": 8.000001,
+            "head_scale": 1.03,
+            "head_width": 0.0,
+            "head_depth": 0.0,
+            "neck_width": 0.0,
+            "neck_length": 0.0,
+            "physique": 0.8,
+            "fat_gain": 0.0,
+            "muscle": 0.0,
+            "definition": 0.0,
+            "shoulders": 0.0,
+            "chest_width": 0.0,
+            "chest_depth": 0.0,
+            "waist": 0.0,
+            "pelvis": 0.0,
+            "glute": 0.0,
+            "thigh": 0.0,
+            "calf": 0.0,
+            "torso_length": 0.0,
+            "arm_length": 0.0,
+            "leg_length": 0.0,
+            "leg_ratio": 0.0,
+            "breast_size": 0.0,
+            "breast_projection": 0.0,
+            "breast_spacing": 0.0,
+            "breast_height": 0.0,
+            "breast_width": 0.0,
+            "fat_distribution": 0.15,
+            "detail_chest": 0.0,
+            "detail_back": 0.0,
+            "detail_shoulder": 0.0,
+            "detail_upperarm": 0.0,
+            "detail_forearm": 0.0,
+            "detail_thigh": 0.0,
+            "detail_calf": 0.0,
+            "fat_torso": 0.0,
+            "fat_arms": 0.0,
+            "fat_legs": 0.0
+          }
+        },
+        "pose": null,
+        "posed": false,
+        "vertices": 105430,
+        "triangles": 210856,
+        "bones": 54,
+        "morph_channels": 0,
+        "fbx_sha256": "9f885c2d23c3ec8246db7d8a0dc7b2cc8e275289f722a5916e0ef357e2dfe7a5",
+        "roundtrip_max_error_mm": 0.0003096980094596802,
+        "roundtrip_joint_error_mm": 0.00055231825975538,
+        "roundtrip_weight_error": 0.0,
+        "pose_qa": {
+          "active": {},
+          "finite": true,
+          "rules": "approved-anatomy-psd-v1"
+        },
+        "contact_qa": {
+          "checked": false,
+          "reason": "approved anatomical PSDs; no collision solver"
+        },
+        "status": "local_authoring_candidate; product integration and artist signoff required"
+      }
+    },
+    "female-fat-max-v0-4-0": {
+      "controls": {
+        "height_cm": 169.893087,
+        "heads": 8.000001,
+        "head_scale": 1.03,
+        "head_width": 0.0,
+        "head_depth": 0.0,
+        "neck_width": 0.0,
+        "neck_length": 0.0,
+        "physique": 1.4,
+        "fat_gain": 0.0,
+        "muscle": 0.0,
+        "definition": 0.0,
+        "shoulders": 0.0,
+        "chest_width": 0.0,
+        "chest_depth": 0.0,
+        "waist": 0.0,
+        "pelvis": 0.0,
+        "glute": 0.0,
+        "thigh": 0.0,
+        "calf": 0.0,
+        "torso_length": 0.0,
+        "arm_length": 0.0,
+        "leg_length": 0.0,
+        "leg_ratio": 0.0,
+        "breast_size": 0.0,
+        "breast_projection": 0.0,
+        "breast_spacing": 0.0,
+        "breast_height": 0.0,
+        "breast_width": 0.0,
+        "fat_distribution": 0.2,
+        "detail_chest": 0.0,
+        "detail_back": 0.0,
+        "detail_shoulder": 0.0,
+        "detail_upperarm": 0.0,
+        "detail_forearm": 0.0,
+        "detail_thigh": 0.0,
+        "detail_calf": 0.0,
+        "fat_torso": 0.0,
+        "fat_arms": 0.0,
+        "fat_legs": 0.0
+      },
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 170.53018599661266,
+        "sole_z_mm": 0.0
+      },
+      "poses": {
+        "neutral": {
+          "finite": true,
+          "psd": {}
+        },
+        "raised": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_shoulder_raise": 1.0,
+            "PSD_Right_shoulder_raise": 1.0
+          }
+        },
+        "sit": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_hip_flex": 0.7029293179512024,
+            "PSD_Left_knee_flex": 0.6087215542793274,
+            "PSD_Right_hip_flex": 0.7029292583465576,
+            "PSD_Right_knee_flex": 0.6087215542793274
+          }
+        }
+      },
+      "neutral_export": "/private/tmp/standin-mesh-light-assets-20261114/quality-surface-v2-female/original-fbx/ba9cea96c860ea27fdbacd3f55906cfa0b2e2971b81110c3c213b93734d0ec79/model.fbx",
+      "roundtrip": {
+        "identity": "ba9cea96c860ea27fdbacd3f55906cfa0b2e2971b81110c3c213b93734d0ec79",
+        "shape": {
+          "schema": 1,
+          "asset": "standin-approved-female-ceee9f20f03e7cbd2df2",
+          "rules": "standin-female-body-0.4.0",
+          "rig_rules": "female-hip-profile-1+separated-hands-1",
+          "controls": {
+            "height_cm": 169.893082,
+            "heads": 8.000001,
+            "head_scale": 1.03,
+            "head_width": 0.0,
+            "head_depth": 0.0,
+            "neck_width": 0.0,
+            "neck_length": 0.0,
+            "physique": 1.4,
+            "fat_gain": 0.0,
+            "muscle": 0.0,
+            "definition": 0.0,
+            "shoulders": 0.0,
+            "chest_width": 0.0,
+            "chest_depth": 0.0,
+            "waist": 0.0,
+            "pelvis": 0.0,
+            "glute": 0.0,
+            "thigh": 0.0,
+            "calf": 0.0,
+            "torso_length": 0.0,
+            "arm_length": 0.0,
+            "leg_length": 0.0,
+            "leg_ratio": 0.0,
+            "breast_size": 0.0,
+            "breast_projection": 0.0,
+            "breast_spacing": 0.0,
+            "breast_height": 0.0,
+            "breast_width": 0.0,
+            "fat_distribution": 0.2,
+            "detail_chest": 0.0,
+            "detail_back": 0.0,
+            "detail_shoulder": 0.0,
+            "detail_upperarm": 0.0,
+            "detail_forearm": 0.0,
+            "detail_thigh": 0.0,
+            "detail_calf": 0.0,
+            "fat_torso": 0.0,
+            "fat_arms": 0.0,
+            "fat_legs": 0.0
+          }
+        },
+        "pose": null,
+        "posed": false,
+        "vertices": 105430,
+        "triangles": 210856,
+        "bones": 54,
+        "morph_channels": 0,
+        "fbx_sha256": "14f3a069a16a9d8d0fafef7a84756fa632cca86092bfc857381158040c606010",
+        "roundtrip_max_error_mm": 0.0003096980094596802,
+        "roundtrip_joint_error_mm": 0.00055231825975538,
+        "roundtrip_weight_error": 0.0,
+        "pose_qa": {
+          "active": {},
+          "finite": true,
+          "rules": "approved-anatomy-psd-v1"
+        },
+        "contact_qa": {
+          "checked": false,
+          "reason": "approved anatomical PSDs; no collision solver"
+        },
+        "status": "local_authoring_candidate; product integration and artist signoff required"
+      }
+    },
+    "female-new-fat-v0-4-0": {
+      "controls": {
+        "height_cm": 169.893087,
+        "heads": 8.000001,
+        "head_scale": 1.0,
+        "head_width": 0.0,
+        "head_depth": 0.0,
+        "neck_width": 0.0,
+        "neck_length": 0.0,
+        "physique": 1.4,
+        "fat_gain": 2.0,
+        "muscle": 0.0,
+        "definition": 0.0,
+        "shoulders": 0.0,
+        "chest_width": 0.0,
+        "chest_depth": 0.0,
+        "waist": 0.0,
+        "pelvis": 0.0,
+        "glute": 0.0,
+        "thigh": 0.0,
+        "calf": 0.0,
+        "torso_length": 0.0,
+        "arm_length": 0.0,
+        "leg_length": 0.0,
+        "leg_ratio": 0.0,
+        "breast_size": 0.0,
+        "breast_projection": 0.0,
+        "breast_spacing": 0.0,
+        "breast_height": 0.0,
+        "breast_width": 0.0,
+        "fat_distribution": 0.2,
+        "detail_chest": 0.0,
+        "detail_back": 0.0,
+        "detail_shoulder": 0.0,
+        "detail_upperarm": 0.0,
+        "detail_forearm": 0.0,
+        "detail_thigh": 0.0,
+        "detail_calf": 0.0,
+        "fat_torso": 0.0,
+        "fat_arms": 0.0,
+        "fat_legs": 0.0
+      },
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 169.89308700000004,
+        "sole_z_mm": 0.0
+      },
+      "poses": {
+        "neutral": {
+          "finite": true,
+          "psd": {}
+        },
+        "raised": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_shoulder_raise": 1.0,
+            "PSD_Right_shoulder_raise": 1.0
+          }
+        },
+        "sit": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_hip_flex": 0.7029293179512024,
+            "PSD_Left_knee_flex": 0.6087215542793274,
+            "PSD_Right_hip_flex": 0.7029292583465576,
+            "PSD_Right_knee_flex": 0.6087215542793274
+          }
+        }
+      },
+      "neutral_export": "/private/tmp/standin-mesh-light-assets-20261114/quality-surface-v2-female/original-fbx/089e1203b78685d374aae7ea1af4416004ebed64e1c09c3f730617c9e6ec97c5/model.fbx",
+      "roundtrip": {
+        "identity": "089e1203b78685d374aae7ea1af4416004ebed64e1c09c3f730617c9e6ec97c5",
+        "shape": {
+          "schema": 1,
+          "asset": "standin-approved-female-ceee9f20f03e7cbd2df2",
+          "rules": "standin-female-body-0.4.0",
+          "rig_rules": "female-hip-profile-1+separated-hands-1",
+          "controls": {
+            "height_cm": 169.893082,
+            "heads": 8.000001,
+            "head_scale": 1.0,
+            "head_width": 0.0,
+            "head_depth": 0.0,
+            "neck_width": 0.0,
+            "neck_length": 0.0,
+            "physique": 1.4,
+            "fat_gain": 2.0,
+            "muscle": 0.0,
+            "definition": 0.0,
+            "shoulders": 0.0,
+            "chest_width": 0.0,
+            "chest_depth": 0.0,
+            "waist": 0.0,
+            "pelvis": 0.0,
+            "glute": 0.0,
+            "thigh": 0.0,
+            "calf": 0.0,
+            "torso_length": 0.0,
+            "arm_length": 0.0,
+            "leg_length": 0.0,
+            "leg_ratio": 0.0,
+            "breast_size": 0.0,
+            "breast_projection": 0.0,
+            "breast_spacing": 0.0,
+            "breast_height": 0.0,
+            "breast_width": 0.0,
+            "fat_distribution": 0.2,
+            "detail_chest": 0.0,
+            "detail_back": 0.0,
+            "detail_shoulder": 0.0,
+            "detail_upperarm": 0.0,
+            "detail_forearm": 0.0,
+            "detail_thigh": 0.0,
+            "detail_calf": 0.0,
+            "fat_torso": 0.0,
+            "fat_arms": 0.0,
+            "fat_legs": 0.0
+          }
+        },
+        "pose": null,
+        "posed": false,
+        "vertices": 105430,
+        "triangles": 210856,
+        "bones": 54,
+        "morph_channels": 0,
+        "fbx_sha256": "ebbc8c33062828805ed8075eb4d06210a604d4ec18bbcab5de22b3e930c5d795",
+        "roundtrip_max_error_mm": 0.0003096980094596802,
+        "roundtrip_joint_error_mm": 0.00043108164540174695,
+        "roundtrip_weight_error": 0.0,
+        "pose_qa": {
+          "active": {},
+          "finite": true,
+          "rules": "approved-anatomy-psd-v1"
+        },
+        "contact_qa": {
+          "checked": false,
+          "reason": "approved anatomical PSDs; no collision solver"
+        },
+        "status": "local_authoring_candidate; product integration and artist signoff required"
+      }
+    },
+    "female-new-muscular-v0-4-0": {
+      "controls": {
+        "height_cm": 169.893087,
+        "heads": 8.000001,
+        "head_scale": 1.0,
+        "head_width": 0.0,
+        "head_depth": 0.0,
+        "neck_width": 0.0,
+        "neck_length": 0.0,
+        "physique": 0.0,
+        "fat_gain": 0.0,
+        "muscle": 4.0,
+        "definition": 0.7,
+        "shoulders": 0.4,
+        "chest_width": 0.0,
+        "chest_depth": 0.0,
+        "waist": 0.0,
+        "pelvis": 0.0,
+        "glute": 0.0,
+        "thigh": 0.2,
+        "calf": 0.0,
+        "torso_length": 0.0,
+        "arm_length": 0.0,
+        "leg_length": 0.0,
+        "leg_ratio": 0.0,
+        "breast_size": 0.0,
+        "breast_projection": 0.0,
+        "breast_spacing": 0.0,
+        "breast_height": 0.0,
+        "breast_width": 0.0,
+        "fat_distribution": 0.0,
+        "detail_chest": 0.0,
+        "detail_back": 0.0,
+        "detail_shoulder": 0.0,
+        "detail_upperarm": 0.0,
+        "detail_forearm": 0.0,
+        "detail_thigh": 0.0,
+        "detail_calf": 0.0,
+        "fat_torso": 0.0,
+        "fat_arms": 0.0,
+        "fat_legs": 0.0
+      },
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 169.89308700000004,
+        "sole_z_mm": 0.0
+      },
+      "poses": {
+        "neutral": {
+          "finite": true,
+          "psd": {}
+        },
+        "raised": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_shoulder_raise": 1.0,
+            "PSD_Right_shoulder_raise": 1.0
+          }
+        },
+        "sit": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_hip_flex": 0.7029293179512024,
+            "PSD_Left_knee_flex": 0.6087215542793274,
+            "PSD_Right_hip_flex": 0.7029292583465576,
+            "PSD_Right_knee_flex": 0.6087215542793274
+          }
+        }
+      },
+      "neutral_export": "/private/tmp/standin-mesh-light-assets-20261114/quality-surface-v2-female/original-fbx/de56bb1f79621c719f8115017399fc8b55faf3512adee27a130f0dd9f23be516/model.fbx",
+      "roundtrip": {
+        "identity": "de56bb1f79621c719f8115017399fc8b55faf3512adee27a130f0dd9f23be516",
+        "shape": {
+          "schema": 1,
+          "asset": "standin-approved-female-ceee9f20f03e7cbd2df2",
+          "rules": "standin-female-body-0.4.0",
+          "rig_rules": "female-hip-profile-1+separated-hands-1",
+          "controls": {
+            "height_cm": 169.893082,
+            "heads": 8.000001,
+            "head_scale": 1.0,
+            "head_width": 0.0,
+            "head_depth": 0.0,
+            "neck_width": 0.0,
+            "neck_length": 0.0,
+            "physique": 0.0,
+            "fat_gain": 0.0,
+            "muscle": 4.0,
+            "definition": 0.7,
+            "shoulders": 0.4,
+            "chest_width": 0.0,
+            "chest_depth": 0.0,
+            "waist": 0.0,
+            "pelvis": 0.0,
+            "glute": 0.0,
+            "thigh": 0.2,
+            "calf": 0.0,
+            "torso_length": 0.0,
+            "arm_length": 0.0,
+            "leg_length": 0.0,
+            "leg_ratio": 0.0,
+            "breast_size": 0.0,
+            "breast_projection": 0.0,
+            "breast_spacing": 0.0,
+            "breast_height": 0.0,
+            "breast_width": 0.0,
+            "fat_distribution": 0.0,
+            "detail_chest": 0.0,
+            "detail_back": 0.0,
+            "detail_shoulder": 0.0,
+            "detail_upperarm": 0.0,
+            "detail_forearm": 0.0,
+            "detail_thigh": 0.0,
+            "detail_calf": 0.0,
+            "fat_torso": 0.0,
+            "fat_arms": 0.0,
+            "fat_legs": 0.0
+          }
+        },
+        "pose": null,
+        "posed": false,
+        "vertices": 105430,
+        "triangles": 210856,
+        "bones": 54,
+        "morph_channels": 0,
+        "fbx_sha256": "2191f3307c91657b2eadcbeb5edf2062b65e3b1739bd4621568b450ec6aa599d",
+        "roundtrip_max_error_mm": 0.0003096980094596802,
+        "roundtrip_joint_error_mm": 0.0005071322940361987,
+        "roundtrip_weight_error": 0.0,
+        "pose_qa": {
+          "active": {},
+          "finite": true,
+          "rules": "approved-anatomy-psd-v1"
+        },
+        "contact_qa": {
+          "checked": false,
+          "reason": "approved anatomical PSDs; no collision solver"
+        },
+        "status": "local_authoring_candidate; product integration and artist signoff required"
+      }
+    },
+    "custom-large": {
+      "controls": {
+        "height_cm": 190.0,
+        "heads": 7.0,
+        "head_scale": 1.0,
+        "head_width": 0.0,
+        "head_depth": 0.0,
+        "neck_width": 0.0,
+        "neck_length": 0.0,
+        "physique": 1.2,
+        "fat_gain": 0.0,
+        "muscle": 1.8,
+        "definition": 0.0,
+        "shoulders": 0.6,
+        "chest_width": 0.0,
+        "chest_depth": 0.0,
+        "waist": 0.0,
+        "pelvis": 0.0,
+        "glute": 0.0,
+        "thigh": 0.0,
+        "calf": 0.0,
+        "torso_length": 0.0,
+        "arm_length": 0.3,
+        "leg_length": 0.55,
+        "leg_ratio": 0.0,
+        "breast_size": 0.0,
+        "breast_projection": 0.0,
+        "breast_spacing": 0.0,
+        "breast_height": 0.0,
+        "breast_width": 0.0,
+        "fat_distribution": 0.0,
+        "detail_chest": 0.0,
+        "detail_back": 0.0,
+        "detail_shoulder": 0.0,
+        "detail_upperarm": 0.0,
+        "detail_forearm": 0.0,
+        "detail_thigh": 0.0,
+        "detail_calf": 0.0,
+        "fat_torso": 0.0,
+        "fat_arms": 0.0,
+        "fat_legs": 0.0
+      },
+      "geometry": {
+        "finite": true,
+        "degenerate_faces": 0,
+        "reversed_faces": 0,
+        "height_cm": 190.0,
+        "sole_z_mm": 0.0
+      },
+      "poses": {
+        "neutral": {
+          "finite": true,
+          "psd": {}
+        },
+        "raised": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_shoulder_raise": 1.0,
+            "PSD_Right_shoulder_raise": 1.0
+          }
+        },
+        "elbow": {
+          "finite": true,
+          "psd": {}
+        },
+        "deep": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_hip_flex": 0.702928900718689,
+            "PSD_Left_knee_flex": 1.0,
+            "PSD_Right_hip_flex": 0.7029287219047546,
+            "PSD_Right_knee_flex": 1.0
+          }
+        },
+        "sit": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_hip_flex": 0.702928900718689,
+            "PSD_Left_knee_flex": 0.6087214946746826,
+            "PSD_Right_hip_flex": 0.7029287219047546,
+            "PSD_Right_knee_flex": 0.6087214946746826
+          }
+        },
+        "cross": {
+          "finite": true,
+          "psd": {
+            "PSD_Left_shoulder_back": 0.6174513101577759,
+            "PSD_Right_shoulder_back": 0.6174513697624207
+          }
+        },
+        "hands": {
+          "finite": true,
+          "psd": {}
+        }
+      },
+      "neutral_export": "/private/tmp/standin-mesh-light-assets-20261114/quality-surface-v2-female/original-fbx/fd6dbd17e0a3587fde74373ab50a8be151edcb98badec8ee3441808879f78529/model.fbx",
+      "roundtrip": {
+        "identity": "fd6dbd17e0a3587fde74373ab50a8be151edcb98badec8ee3441808879f78529",
+        "shape": {
+          "schema": 1,
+          "asset": "standin-approved-female-ceee9f20f03e7cbd2df2",
+          "rules": "standin-female-body-0.4.0",
+          "rig_rules": "female-hip-profile-1+separated-hands-1",
+          "controls": {
+            "height_cm": 190.0,
+            "heads": 7.0,
+            "head_scale": 1.0,
+            "head_width": 0.0,
+            "head_depth": 0.0,
+            "neck_width": 0.0,
+            "neck_length": 0.0,
+            "physique": 1.2,
+            "fat_gain": 0.0,
+            "muscle": 1.8,
+            "definition": 0.0,
+            "shoulders": 0.6,
+            "chest_width": 0.0,
+            "chest_depth": 0.0,
+            "waist": 0.0,
+            "pelvis": 0.0,
+            "glute": 0.0,
+            "thigh": 0.0,
+            "calf": 0.0,
+            "torso_length": 0.0,
+            "arm_length": 0.3,
+            "leg_length": 0.55,
+            "leg_ratio": 0.0,
+            "breast_size": 0.0,
+            "breast_projection": 0.0,
+            "breast_spacing": 0.0,
+            "breast_height": 0.0,
+            "breast_width": 0.0,
+            "fat_distribution": 0.0,
+            "detail_chest": 0.0,
+            "detail_back": 0.0,
+            "detail_shoulder": 0.0,
+            "detail_upperarm": 0.0,
+            "detail_forearm": 0.0,
+            "detail_thigh": 0.0,
+            "detail_calf": 0.0,
+            "fat_torso": 0.0,
+            "fat_arms": 0.0,
+            "fat_legs": 0.0
+          }
+        },
+        "pose": null,
+        "posed": false,
+        "vertices": 105430,
+        "triangles": 210856,
+        "bones": 54,
+        "morph_channels": 0,
+        "fbx_sha256": "d71cf144da6c2c9cb579237fb3d2d9c579a611788591fc01bdaf7025426238df",
+        "roundtrip_max_error_mm": 0.00023848406272009015,
+        "roundtrip_joint_error_mm": 0.0007514959524163476,
+        "roundtrip_weight_error": 0.0,
+        "pose_qa": {
+          "active": {},
+          "finite": true,
+          "rules": "approved-anatomy-psd-v1"
+        },
+        "contact_qa": {
+          "checked": false,
+          "reason": "approved anatomical PSDs; no collision solver"
+        },
+        "status": "local_authoring_candidate; product integration and artist signoff required"
+      }
+    }
+  },
+  "candidates": {
+    "female-surface-250um-ref-v3": {
+      "female-base-v0-4-0": {
+        "poses": {
+          "neutral": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.005374826490879,
+              "p99_mm": 0.3627549757948143,
+              "mean_mm": 0.03635443924822626
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "raised": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.005374826490879,
+              "p99_mm": 0.3628459552419371,
+              "mean_mm": 0.036369849239690354
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "elbow": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.005374826490879,
+              "p99_mm": 0.3631252294871949,
+              "mean_mm": 0.03638577371639065
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "deep": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.100136199966073,
+              "p99_mm": 0.3645850703469477,
+              "mean_mm": 0.036499954094696696
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "sit": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 0.9718029177747667,
+              "p99_mm": 0.3645850703469477,
+              "mean_mm": 0.03641455785166881
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "cross": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.005374826490879,
+              "p99_mm": 0.3613512692390937,
+              "mean_mm": 0.036088992141235024
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "hands": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.005374826490879,
+              "p99_mm": 0.3910379699664187,
+              "mean_mm": 0.03764537690123045
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          }
+        },
+        "geometry": {
+          "finite": true,
+          "degenerate_faces": 0,
+          "reversed_faces": 0,
+          "height_cm": 169.89308700000004,
+          "sole_z_mm": 0.0
+        },
+        "neutral_export": "/private/tmp/standin-mesh-light-followup-20261114/quality-female-250/female-surface-250um-ref-v3/neutral-fbx/6b072c71e19c7c45f0eb6a9d0d81f5672261f27d77d2570ba35feb0accc560bd/model.fbx",
+        "roundtrip": {
+          "identity": "6b072c71e19c7c45f0eb6a9d0d81f5672261f27d77d2570ba35feb0accc560bd",
+          "shape": {
+            "schema": 1,
+            "asset": "standin-lod-female-surface-250um-ref-v3-5a62d2f3fb49d77f",
+            "rules": "standin-lod-female-surface-250um-ref-v3",
+            "rig_rules": "female-hip-profile-1+separated-hands-1",
+            "controls": {
+              "height_cm": 169.893082,
+              "heads": 8.000001,
+              "head_scale": 1.0,
+              "head_width": 0.0,
+              "head_depth": 0.0,
+              "neck_width": 0.0,
+              "neck_length": 0.0,
+              "physique": 0.0,
+              "fat_gain": 0.0,
+              "muscle": 0.0,
+              "definition": 0.0,
+              "shoulders": 0.0,
+              "chest_width": 0.0,
+              "chest_depth": 0.0,
+              "waist": 0.0,
+              "pelvis": 0.0,
+              "glute": 0.0,
+              "thigh": 0.0,
+              "calf": 0.0,
+              "torso_length": 0.0,
+              "arm_length": 0.0,
+              "leg_length": 0.0,
+              "leg_ratio": 0.0,
+              "breast_size": 0.0,
+              "breast_projection": 0.0,
+              "breast_spacing": 0.0,
+              "breast_height": 0.0,
+              "breast_width": 0.0,
+              "fat_distribution": 0.0,
+              "detail_chest": 0.0,
+              "detail_back": 0.0,
+              "detail_shoulder": 0.0,
+              "detail_upperarm": 0.0,
+              "detail_forearm": 0.0,
+              "detail_thigh": 0.0,
+              "detail_calf": 0.0,
+              "fat_torso": 0.0,
+              "fat_arms": 0.0,
+              "fat_legs": 0.0
+            }
+          },
+          "pose": null,
+          "posed": false,
+          "vertices": 79731,
+          "triangles": 159458,
+          "bones": 54,
+          "morph_channels": 0,
+          "fbx_sha256": "58fdd2a31d605124040e282364f610491bd5175b4879c53df185c881d41d0a35",
+          "roundtrip_max_error_mm": 0.0003096980094596802,
+          "roundtrip_joint_error_mm": 0.00043108164540174695,
+          "roundtrip_weight_error": 0.0,
+          "pose_qa": {
+            "active": {},
+            "finite": true,
+            "rules": "approved-anatomy-psd-v1"
+          },
+          "contact_qa": {
+            "checked": false,
+            "reason": "approved anatomical PSDs; no collision solver"
+          },
+          "status": "local_authoring_candidate; product integration and artist signoff required"
+        },
+        "reload_weight_max_delta": 0.0,
+        "reload_rig_max_delta": 0.0,
+        "numeric_screen_pass": true
+      },
+      "female-slim-v0-4-0": {
+        "poses": {
+          "neutral": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 0.941639649681747,
+              "p99_mm": 0.3631252294871949,
+              "mean_mm": 0.03634071363816914
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "raised": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 0.941639649681747,
+              "p99_mm": 0.3631252294871949,
+              "mean_mm": 0.036348958158445056
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "sit": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 0.9380431729368865,
+              "p99_mm": 0.36386238498380363,
+              "mean_mm": 0.0363491824876651
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          }
+        },
+        "geometry": {
+          "finite": true,
+          "degenerate_faces": 0,
+          "reversed_faces": 0,
+          "height_cm": 169.89308700000004,
+          "sole_z_mm": 0.0
+        },
+        "neutral_export": "/private/tmp/standin-mesh-light-followup-20261114/quality-female-250/female-surface-250um-ref-v3/neutral-fbx/f62fb2808a911f1bf3ce1bc05fe01ca926cceb44f8f5166b33a4289e03c364c7/model.fbx",
+        "roundtrip": {
+          "identity": "f62fb2808a911f1bf3ce1bc05fe01ca926cceb44f8f5166b33a4289e03c364c7",
+          "shape": {
+            "schema": 1,
+            "asset": "standin-lod-female-surface-250um-ref-v3-5a62d2f3fb49d77f",
+            "rules": "standin-lod-female-surface-250um-ref-v3",
+            "rig_rules": "female-hip-profile-1+separated-hands-1",
+            "controls": {
+              "height_cm": 169.893082,
+              "heads": 8.000001,
+              "head_scale": 1.0,
+              "head_width": 0.0,
+              "head_depth": 0.0,
+              "neck_width": 0.0,
+              "neck_length": 0.0,
+              "physique": -0.8,
+              "fat_gain": 0.0,
+              "muscle": 0.12,
+              "definition": 0.0,
+              "shoulders": 0.0,
+              "chest_width": 0.0,
+              "chest_depth": 0.0,
+              "waist": 0.0,
+              "pelvis": 0.0,
+              "glute": 0.0,
+              "thigh": 0.0,
+              "calf": 0.0,
+              "torso_length": 0.0,
+              "arm_length": 0.0,
+              "leg_length": 0.0,
+              "leg_ratio": 0.0,
+              "breast_size": 0.0,
+              "breast_projection": 0.0,
+              "breast_spacing": 0.0,
+              "breast_height": 0.0,
+              "breast_width": 0.0,
+              "fat_distribution": 0.0,
+              "detail_chest": 0.0,
+              "detail_back": 0.0,
+              "detail_shoulder": 0.0,
+              "detail_upperarm": 0.0,
+              "detail_forearm": 0.0,
+              "detail_thigh": 0.0,
+              "detail_calf": 0.0,
+              "fat_torso": 0.0,
+              "fat_arms": 0.0,
+              "fat_legs": 0.0
+            }
+          },
+          "pose": null,
+          "posed": false,
+          "vertices": 79731,
+          "triangles": 159458,
+          "bones": 54,
+          "morph_channels": 0,
+          "fbx_sha256": "c4cb6d4ad54fdacc9371dd8a259b6e25b42ef25b8debf8151f27f74f1465d607",
+          "roundtrip_max_error_mm": 0.0003096980094596802,
+          "roundtrip_joint_error_mm": 0.00043108164540174695,
+          "roundtrip_weight_error": 0.0,
+          "pose_qa": {
+            "active": {},
+            "finite": true,
+            "rules": "approved-anatomy-psd-v1"
+          },
+          "contact_qa": {
+            "checked": false,
+            "reason": "approved anatomical PSDs; no collision solver"
+          },
+          "status": "local_authoring_candidate; product integration and artist signoff required"
+        },
+        "reload_weight_max_delta": 0.0,
+        "reload_rig_max_delta": 0.0,
+        "numeric_screen_pass": true
+      },
+      "female-ideal83-v0-4-0": {
+        "poses": {
+          "neutral": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 0.990420812740922,
+              "p99_mm": 0.358670073328539,
+              "mean_mm": 0.03595141243326386
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "raised": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 0.990420812740922,
+              "p99_mm": 0.35857976065017205,
+              "mean_mm": 0.03596387465970199
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "sit": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 0.9491696255281568,
+              "p99_mm": 0.36080709251109494,
+              "mean_mm": 0.0360086301078704
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          }
+        },
+        "geometry": {
+          "finite": true,
+          "degenerate_faces": 0,
+          "reversed_faces": 0,
+          "height_cm": 169.893087,
+          "sole_z_mm": 0.0
+        },
+        "neutral_export": "/private/tmp/standin-mesh-light-followup-20261114/quality-female-250/female-surface-250um-ref-v3/neutral-fbx/ffccaf31c8a0d4ed87c339a1c2aa3ed053b31c22d9249ad42b3576102a42b91a/model.fbx",
+        "roundtrip": {
+          "identity": "ffccaf31c8a0d4ed87c339a1c2aa3ed053b31c22d9249ad42b3576102a42b91a",
+          "shape": {
+            "schema": 1,
+            "asset": "standin-lod-female-surface-250um-ref-v3-5a62d2f3fb49d77f",
+            "rules": "standin-lod-female-surface-250um-ref-v3",
+            "rig_rules": "female-hip-profile-1+separated-hands-1",
+            "controls": {
+              "height_cm": 169.893082,
+              "heads": 8.3,
+              "head_scale": 1.0,
+              "head_width": 0.0,
+              "head_depth": 0.0,
+              "neck_width": 0.0,
+              "neck_length": 0.0,
+              "physique": -0.2,
+              "fat_gain": 0.0,
+              "muscle": 0.35,
+              "definition": 0.0,
+              "shoulders": 0.12,
+              "chest_width": 0.0,
+              "chest_depth": 0.0,
+              "waist": -0.12,
+              "pelvis": 0.0,
+              "glute": 0.0,
+              "thigh": 0.0,
+              "calf": 0.0,
+              "torso_length": 0.0,
+              "arm_length": 0.0,
+              "leg_length": 0.35,
+              "leg_ratio": 0.0,
+              "breast_size": 0.0,
+              "breast_projection": 0.0,
+              "breast_spacing": 0.0,
+              "breast_height": 0.0,
+              "breast_width": 0.0,
+              "fat_distribution": 0.0,
+              "detail_chest": 0.0,
+              "detail_back": 0.0,
+              "detail_shoulder": 0.0,
+              "detail_upperarm": 0.0,
+              "detail_forearm": 0.0,
+              "detail_thigh": 0.0,
+              "detail_calf": 0.0,
+              "fat_torso": 0.0,
+              "fat_arms": 0.0,
+              "fat_legs": 0.0
+            }
+          },
+          "pose": null,
+          "posed": false,
+          "vertices": 79731,
+          "triangles": 159458,
+          "bones": 54,
+          "morph_channels": 0,
+          "fbx_sha256": "59593a33ba9b035aaea0b68342185aff81ee8fd7e921e9487be1cff99b245fc2",
+          "roundtrip_max_error_mm": 0.00020874925610314676,
+          "roundtrip_joint_error_mm": 0.0005561547758138633,
+          "roundtrip_weight_error": 0.0,
+          "pose_qa": {
+            "active": {},
+            "finite": true,
+            "rules": "approved-anatomy-psd-v1"
+          },
+          "contact_qa": {
+            "checked": false,
+            "reason": "approved anatomical PSDs; no collision solver"
+          },
+          "status": "local_authoring_candidate; product integration and artist signoff required"
+        },
+        "reload_weight_max_delta": 0.0,
+        "reload_rig_max_delta": 0.0,
+        "numeric_screen_pass": true
+      },
+      "female-ideal70-v0-4-0": {
+        "poses": {
+          "neutral": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 0.977860763669014,
+              "p99_mm": 0.3497899914509614,
+              "mean_mm": 0.035048893256829326
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "raised": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 0.977860763669014,
+              "p99_mm": 0.3496361977886404,
+              "mean_mm": 0.0350638752909337
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "sit": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 0.9383803699165583,
+              "p99_mm": 0.3516200077137909,
+              "mean_mm": 0.035111689244111115
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          }
+        },
+        "geometry": {
+          "finite": true,
+          "degenerate_faces": 0,
+          "reversed_faces": 0,
+          "height_cm": 168.0,
+          "sole_z_mm": 0.0
+        },
+        "neutral_export": "/private/tmp/standin-mesh-light-followup-20261114/quality-female-250/female-surface-250um-ref-v3/neutral-fbx/2ea94aa21411e0f6e319c3dfd0b6d6f14bda30648e30c589ec66a2bb4527c2f2/model.fbx",
+        "roundtrip": {
+          "identity": "2ea94aa21411e0f6e319c3dfd0b6d6f14bda30648e30c589ec66a2bb4527c2f2",
+          "shape": {
+            "schema": 1,
+            "asset": "standin-lod-female-surface-250um-ref-v3-5a62d2f3fb49d77f",
+            "rules": "standin-lod-female-surface-250um-ref-v3",
+            "rig_rules": "female-hip-profile-1+separated-hands-1",
+            "controls": {
+              "height_cm": 168.0,
+              "heads": 7.0,
+              "head_scale": 1.0,
+              "head_width": 0.0,
+              "head_depth": 0.0,
+              "neck_width": 0.0,
+              "neck_length": 0.0,
+              "physique": 0.0,
+              "fat_gain": 0.0,
+              "muscle": 0.2,
+              "definition": 0.0,
+              "shoulders": 0.0,
+              "chest_width": 0.0,
+              "chest_depth": 0.0,
+              "waist": 0.0,
+              "pelvis": 0.0,
+              "glute": 0.0,
+              "thigh": 0.0,
+              "calf": 0.0,
+              "torso_length": 0.0,
+              "arm_length": 0.0,
+              "leg_length": 0.1,
+              "leg_ratio": 0.0,
+              "breast_size": 0.0,
+              "breast_projection": 0.0,
+              "breast_spacing": 0.0,
+              "breast_height": 0.0,
+              "breast_width": 0.0,
+              "fat_distribution": 0.0,
+              "detail_chest": 0.0,
+              "detail_back": 0.0,
+              "detail_shoulder": 0.0,
+              "detail_upperarm": 0.0,
+              "detail_forearm": 0.0,
+              "detail_thigh": 0.0,
+              "detail_calf": 0.0,
+              "fat_torso": 0.0,
+              "fat_arms": 0.0,
+              "fat_legs": 0.0
+            }
+          },
+          "pose": null,
+          "posed": false,
+          "vertices": 79731,
+          "triangles": 159458,
+          "bones": 54,
+          "morph_channels": 0,
+          "fbx_sha256": "5c90a981c8b50a4660fd61f119bb66577ff79c3427436857775b6fe63704ab00",
+          "roundtrip_max_error_mm": 0.00020214045548527793,
+          "roundtrip_joint_error_mm": 0.0005703466894926023,
+          "roundtrip_weight_error": 0.0,
+          "pose_qa": {
+            "active": {},
+            "finite": true,
+            "rules": "approved-anatomy-psd-v1"
+          },
+          "contact_qa": {
+            "checked": false,
+            "reason": "approved anatomical PSDs; no collision solver"
+          },
+          "status": "local_authoring_candidate; product integration and artist signoff required"
+        },
+        "reload_weight_max_delta": 0.0,
+        "reload_rig_max_delta": 0.0,
+        "numeric_screen_pass": true
+      },
+      "female-toon64-v0-4-0": {
+        "poses": {
+          "neutral": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 0.9088790975511074,
+              "p99_mm": 0.3338349016848947,
+              "mean_mm": 0.03342202506417119
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "raised": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 0.9088790975511074,
+              "p99_mm": 0.3338349016848947,
+              "mean_mm": 0.033431422041258596
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "sit": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 0.8807472186163068,
+              "p99_mm": 0.3352382886805571,
+              "mean_mm": 0.03346343417528383
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          }
+        },
+        "geometry": {
+          "finite": true,
+          "degenerate_faces": 0,
+          "reversed_faces": 0,
+          "height_cm": 162.0,
+          "sole_z_mm": 0.0
+        },
+        "neutral_export": "/private/tmp/standin-mesh-light-followup-20261114/quality-female-250/female-surface-250um-ref-v3/neutral-fbx/2f75805c8aed98d1a2120d52c3a5807b321bef7c84f48ec37b483eae5a2fa29e/model.fbx",
+        "roundtrip": {
+          "identity": "2f75805c8aed98d1a2120d52c3a5807b321bef7c84f48ec37b483eae5a2fa29e",
+          "shape": {
+            "schema": 1,
+            "asset": "standin-lod-female-surface-250um-ref-v3-5a62d2f3fb49d77f",
+            "rules": "standin-lod-female-surface-250um-ref-v3",
+            "rig_rules": "female-hip-profile-1+separated-hands-1",
+            "controls": {
+              "height_cm": 162.0,
+              "heads": 6.4,
+              "head_scale": 1.0,
+              "head_width": 0.0,
+              "head_depth": 0.0,
+              "neck_width": 0.0,
+              "neck_length": 0.0,
+              "physique": -0.2,
+              "fat_gain": 0.0,
+              "muscle": 0.0,
+              "definition": 0.0,
+              "shoulders": -0.1,
+              "chest_width": 0.0,
+              "chest_depth": 0.0,
+              "waist": 0.0,
+              "pelvis": 0.0,
+              "glute": 0.0,
+              "thigh": 0.0,
+              "calf": 0.0,
+              "torso_length": 0.0,
+              "arm_length": 0.0,
+              "leg_length": 0.0,
+              "leg_ratio": 0.0,
+              "breast_size": -0.2,
+              "breast_projection": 0.0,
+              "breast_spacing": 0.0,
+              "breast_height": 0.0,
+              "breast_width": 0.0,
+              "fat_distribution": 0.0,
+              "detail_chest": 0.0,
+              "detail_back": 0.0,
+              "detail_shoulder": 0.0,
+              "detail_upperarm": 0.0,
+              "detail_forearm": 0.0,
+              "detail_thigh": 0.0,
+              "detail_calf": 0.0,
+              "fat_torso": 0.0,
+              "fat_arms": 0.0,
+              "fat_legs": 0.0
+            }
+          },
+          "pose": null,
+          "posed": false,
+          "vertices": 79731,
+          "triangles": 159458,
+          "bones": 54,
+          "morph_channels": 0,
+          "fbx_sha256": "f726224a2a03bbc4b9d5d42763484bf38db9f12e371403fcff509a7ea6b79788",
+          "roundtrip_max_error_mm": 0.0003048598955501802,
+          "roundtrip_joint_error_mm": 0.0004224615630082296,
+          "roundtrip_weight_error": 0.0,
+          "pose_qa": {
+            "active": {},
+            "finite": true,
+            "rules": "approved-anatomy-psd-v1"
+          },
+          "contact_qa": {
+            "checked": false,
+            "reason": "approved anatomical PSDs; no collision solver"
+          },
+          "status": "local_authoring_candidate; product integration and artist signoff required"
+        },
+        "reload_weight_max_delta": 0.0,
+        "reload_rig_max_delta": 0.0,
+        "numeric_screen_pass": true
+      },
+      "female-muscular-v0-4-0": {
+        "poses": {
+          "neutral": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.0559067595750093,
+              "p99_mm": 0.3627551597310228,
+              "mean_mm": 0.03631790971816348
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "raised": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.0559067595750093,
+              "p99_mm": 0.3627024160232392,
+              "mean_mm": 0.03633138186017371
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "sit": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 0.9709311416372657,
+              "p99_mm": 0.3643214731710029,
+              "mean_mm": 0.03640351402315868
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          }
+        },
+        "geometry": {
+          "finite": true,
+          "degenerate_faces": 0,
+          "reversed_faces": 0,
+          "height_cm": 169.89308700000004,
+          "sole_z_mm": 0.0
+        },
+        "neutral_export": "/private/tmp/standin-mesh-light-followup-20261114/quality-female-250/female-surface-250um-ref-v3/neutral-fbx/7749679e09e53ffbc3674caf78c4ed54182af63d69a5a94633e456db9e81a984/model.fbx",
+        "roundtrip": {
+          "identity": "7749679e09e53ffbc3674caf78c4ed54182af63d69a5a94633e456db9e81a984",
+          "shape": {
+            "schema": 1,
+            "asset": "standin-lod-female-surface-250um-ref-v3-5a62d2f3fb49d77f",
+            "rules": "standin-lod-female-surface-250um-ref-v3",
+            "rig_rules": "female-hip-profile-1+separated-hands-1",
+            "controls": {
+              "height_cm": 169.893082,
+              "heads": 8.000001,
+              "head_scale": 1.0,
+              "head_width": 0.0,
+              "head_depth": 0.0,
+              "neck_width": 0.0,
+              "neck_length": 0.0,
+              "physique": 0.0,
+              "fat_gain": 0.0,
+              "muscle": 1.25,
+              "definition": 0.45,
+              "shoulders": 0.25,
+              "chest_width": 0.0,
+              "chest_depth": 0.0,
+              "waist": 0.0,
+              "pelvis": 0.0,
+              "glute": 0.0,
+              "thigh": 0.12,
+              "calf": 0.0,
+              "torso_length": 0.0,
+              "arm_length": 0.0,
+              "leg_length": 0.0,
+              "leg_ratio": 0.0,
+              "breast_size": 0.0,
+              "breast_projection": 0.0,
+              "breast_spacing": 0.0,
+              "breast_height": 0.0,
+              "breast_width": 0.0,
+              "fat_distribution": 0.0,
+              "detail_chest": 0.0,
+              "detail_back": 0.0,
+              "detail_shoulder": 0.0,
+              "detail_upperarm": 0.0,
+              "detail_forearm": 0.0,
+              "detail_thigh": 0.0,
+              "detail_calf": 0.0,
+              "fat_torso": 0.0,
+              "fat_arms": 0.0,
+              "fat_legs": 0.0
+            }
+          },
+          "pose": null,
+          "posed": false,
+          "vertices": 79731,
+          "triangles": 159458,
+          "bones": 54,
+          "morph_channels": 0,
+          "fbx_sha256": "47fcb6bee0fbe63907d716ba09ba82bc56af666f8f459ce03c5a91d03bd0fe60",
+          "roundtrip_max_error_mm": 0.0003096980094596802,
+          "roundtrip_joint_error_mm": 0.0005048971026275985,
+          "roundtrip_weight_error": 0.0,
+          "pose_qa": {
+            "active": {},
+            "finite": true,
+            "rules": "approved-anatomy-psd-v1"
+          },
+          "contact_qa": {
+            "checked": false,
+            "reason": "approved anatomical PSDs; no collision solver"
+          },
+          "status": "local_authoring_candidate; product integration and artist signoff required"
+        },
+        "reload_weight_max_delta": 0.0,
+        "reload_rig_max_delta": 0.0,
+        "numeric_screen_pass": true
+      },
+      "female-muscle-max-v0-4-0": {
+        "poses": {
+          "neutral": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.073861843906343,
+              "p99_mm": 0.3630837731179776,
+              "mean_mm": 0.036315333895066325
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "raised": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.073861843906343,
+              "p99_mm": 0.3630837731179776,
+              "mean_mm": 0.03632695140960692
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "sit": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 0.9688340360298753,
+              "p99_mm": 0.3643214731710029,
+              "mean_mm": 0.03640906725817689
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          }
+        },
+        "geometry": {
+          "finite": true,
+          "degenerate_faces": 0,
+          "reversed_faces": 0,
+          "height_cm": 169.89308700000004,
+          "sole_z_mm": 0.0
+        },
+        "neutral_export": "/private/tmp/standin-mesh-light-followup-20261114/quality-female-250/female-surface-250um-ref-v3/neutral-fbx/d9a382d0918ce3289960597154f857be950afcdfc18339bc902928c95b4c736a/model.fbx",
+        "roundtrip": {
+          "identity": "d9a382d0918ce3289960597154f857be950afcdfc18339bc902928c95b4c736a",
+          "shape": {
+            "schema": 1,
+            "asset": "standin-lod-female-surface-250um-ref-v3-5a62d2f3fb49d77f",
+            "rules": "standin-lod-female-surface-250um-ref-v3",
+            "rig_rules": "female-hip-profile-1+separated-hands-1",
+            "controls": {
+              "height_cm": 169.893082,
+              "heads": 8.000001,
+              "head_scale": 1.0,
+              "head_width": 0.0,
+              "head_depth": 0.0,
+              "neck_width": 0.0,
+              "neck_length": 0.0,
+              "physique": 0.0,
+              "fat_gain": 0.0,
+              "muscle": 2.0,
+              "definition": 0.7,
+              "shoulders": 0.4,
+              "chest_width": 0.0,
+              "chest_depth": 0.0,
+              "waist": 0.0,
+              "pelvis": 0.0,
+              "glute": 0.0,
+              "thigh": 0.2,
+              "calf": 0.0,
+              "torso_length": 0.0,
+              "arm_length": 0.0,
+              "leg_length": 0.0,
+              "leg_ratio": 0.0,
+              "breast_size": 0.0,
+              "breast_projection": 0.0,
+              "breast_spacing": 0.0,
+              "breast_height": 0.0,
+              "breast_width": 0.0,
+              "fat_distribution": 0.0,
+              "detail_chest": 0.0,
+              "detail_back": 0.0,
+              "detail_shoulder": 0.0,
+              "detail_upperarm": 0.0,
+              "detail_forearm": 0.0,
+              "detail_thigh": 0.0,
+              "detail_calf": 0.0,
+              "fat_torso": 0.0,
+              "fat_arms": 0.0,
+              "fat_legs": 0.0
+            }
+          },
+          "pose": null,
+          "posed": false,
+          "vertices": 79731,
+          "triangles": 159458,
+          "bones": 54,
+          "morph_channels": 0,
+          "fbx_sha256": "c1720bf69e7c71dcb9a24d7b7f2d99181e06c4e223ca948c6adcab4af73ea967",
+          "roundtrip_max_error_mm": 0.0003096980094596802,
+          "roundtrip_joint_error_mm": 0.0005071322940361987,
+          "roundtrip_weight_error": 0.0,
+          "pose_qa": {
+            "active": {},
+            "finite": true,
+            "rules": "approved-anatomy-psd-v1"
+          },
+          "contact_qa": {
+            "checked": false,
+            "reason": "approved anatomical PSDs; no collision solver"
+          },
+          "status": "local_authoring_candidate; product integration and artist signoff required"
+        },
+        "reload_weight_max_delta": 0.0,
+        "reload_rig_max_delta": 0.0,
+        "numeric_screen_pass": true
+      },
+      "female-soft-v0-4-0": {
+        "poses": {
+          "neutral": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.1074718786403537,
+              "p99_mm": 0.36385952436830804,
+              "mean_mm": 0.03640520763249602
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "raised": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.1074718786403537,
+              "p99_mm": 0.3638363850768652,
+              "mean_mm": 0.03643186206889933
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "sit": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.0607840958982706,
+              "p99_mm": 0.3643271268811074,
+              "mean_mm": 0.036498197796473335
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          }
+        },
+        "geometry": {
+          "finite": true,
+          "degenerate_faces": 0,
+          "reversed_faces": 0,
+          "height_cm": 170.53018599661266,
+          "sole_z_mm": 0.0
+        },
+        "neutral_export": "/private/tmp/standin-mesh-light-followup-20261114/quality-female-250/female-surface-250um-ref-v3/neutral-fbx/9d6ff112c7ad4e4e0db927ad3d993ce62decb0b61481b717a5aa724c69b77d63/model.fbx",
+        "roundtrip": {
+          "identity": "9d6ff112c7ad4e4e0db927ad3d993ce62decb0b61481b717a5aa724c69b77d63",
+          "shape": {
+            "schema": 1,
+            "asset": "standin-lod-female-surface-250um-ref-v3-5a62d2f3fb49d77f",
+            "rules": "standin-lod-female-surface-250um-ref-v3",
+            "rig_rules": "female-hip-profile-1+separated-hands-1",
+            "controls": {
+              "height_cm": 169.893082,
+              "heads": 8.000001,
+              "head_scale": 1.03,
+              "head_width": 0.0,
+              "head_depth": 0.0,
+              "neck_width": 0.0,
+              "neck_length": 0.0,
+              "physique": 0.8,
+              "fat_gain": 0.0,
+              "muscle": 0.0,
+              "definition": 0.0,
+              "shoulders": 0.0,
+              "chest_width": 0.0,
+              "chest_depth": 0.0,
+              "waist": 0.0,
+              "pelvis": 0.0,
+              "glute": 0.0,
+              "thigh": 0.0,
+              "calf": 0.0,
+              "torso_length": 0.0,
+              "arm_length": 0.0,
+              "leg_length": 0.0,
+              "leg_ratio": 0.0,
+              "breast_size": 0.0,
+              "breast_projection": 0.0,
+              "breast_spacing": 0.0,
+              "breast_height": 0.0,
+              "breast_width": 0.0,
+              "fat_distribution": 0.15,
+              "detail_chest": 0.0,
+              "detail_back": 0.0,
+              "detail_shoulder": 0.0,
+              "detail_upperarm": 0.0,
+              "detail_forearm": 0.0,
+              "detail_thigh": 0.0,
+              "detail_calf": 0.0,
+              "fat_torso": 0.0,
+              "fat_arms": 0.0,
+              "fat_legs": 0.0
+            }
+          },
+          "pose": null,
+          "posed": false,
+          "vertices": 79731,
+          "triangles": 159458,
+          "bones": 54,
+          "morph_channels": 0,
+          "fbx_sha256": "6adec0a860806cc440bfa820c46a0aef1fd5d67f4a07d176ad5849a795f1d864",
+          "roundtrip_max_error_mm": 0.0003096980094596802,
+          "roundtrip_joint_error_mm": 0.00055231825975538,
+          "roundtrip_weight_error": 0.0,
+          "pose_qa": {
+            "active": {},
+            "finite": true,
+            "rules": "approved-anatomy-psd-v1"
+          },
+          "contact_qa": {
+            "checked": false,
+            "reason": "approved anatomical PSDs; no collision solver"
+          },
+          "status": "local_authoring_candidate; product integration and artist signoff required"
+        },
+        "reload_weight_max_delta": 0.0,
+        "reload_rig_max_delta": 0.0,
+        "numeric_screen_pass": true
+      },
+      "female-fat-max-v0-4-0": {
+        "poses": {
+          "neutral": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.1854751501232386,
+              "p99_mm": 0.3684833773877455,
+              "mean_mm": 0.03651680593533829
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "raised": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.1854751501232386,
+              "p99_mm": 0.37102633970789417,
+              "mean_mm": 0.0365509628470267
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "sit": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.1263365158811212,
+              "p99_mm": 0.3735174395842466,
+              "mean_mm": 0.0366015081533729
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          }
+        },
+        "geometry": {
+          "finite": true,
+          "degenerate_faces": 0,
+          "reversed_faces": 0,
+          "height_cm": 170.53018599661266,
+          "sole_z_mm": 0.0
+        },
+        "neutral_export": "/private/tmp/standin-mesh-light-followup-20261114/quality-female-250/female-surface-250um-ref-v3/neutral-fbx/3361673645d7115e32ebd0cbc1a430f56c05e184a36aa84e7fabef02247e4100/model.fbx",
+        "roundtrip": {
+          "identity": "3361673645d7115e32ebd0cbc1a430f56c05e184a36aa84e7fabef02247e4100",
+          "shape": {
+            "schema": 1,
+            "asset": "standin-lod-female-surface-250um-ref-v3-5a62d2f3fb49d77f",
+            "rules": "standin-lod-female-surface-250um-ref-v3",
+            "rig_rules": "female-hip-profile-1+separated-hands-1",
+            "controls": {
+              "height_cm": 169.893082,
+              "heads": 8.000001,
+              "head_scale": 1.03,
+              "head_width": 0.0,
+              "head_depth": 0.0,
+              "neck_width": 0.0,
+              "neck_length": 0.0,
+              "physique": 1.4,
+              "fat_gain": 0.0,
+              "muscle": 0.0,
+              "definition": 0.0,
+              "shoulders": 0.0,
+              "chest_width": 0.0,
+              "chest_depth": 0.0,
+              "waist": 0.0,
+              "pelvis": 0.0,
+              "glute": 0.0,
+              "thigh": 0.0,
+              "calf": 0.0,
+              "torso_length": 0.0,
+              "arm_length": 0.0,
+              "leg_length": 0.0,
+              "leg_ratio": 0.0,
+              "breast_size": 0.0,
+              "breast_projection": 0.0,
+              "breast_spacing": 0.0,
+              "breast_height": 0.0,
+              "breast_width": 0.0,
+              "fat_distribution": 0.2,
+              "detail_chest": 0.0,
+              "detail_back": 0.0,
+              "detail_shoulder": 0.0,
+              "detail_upperarm": 0.0,
+              "detail_forearm": 0.0,
+              "detail_thigh": 0.0,
+              "detail_calf": 0.0,
+              "fat_torso": 0.0,
+              "fat_arms": 0.0,
+              "fat_legs": 0.0
+            }
+          },
+          "pose": null,
+          "posed": false,
+          "vertices": 79731,
+          "triangles": 159458,
+          "bones": 54,
+          "morph_channels": 0,
+          "fbx_sha256": "1f335a572f7718547158c852a40de4fda2c8701e76d01a5eb1868683316fe0ce",
+          "roundtrip_max_error_mm": 0.0003096980094596802,
+          "roundtrip_joint_error_mm": 0.00055231825975538,
+          "roundtrip_weight_error": 0.0,
+          "pose_qa": {
+            "active": {},
+            "finite": true,
+            "rules": "approved-anatomy-psd-v1"
+          },
+          "contact_qa": {
+            "checked": false,
+            "reason": "approved anatomical PSDs; no collision solver"
+          },
+          "status": "local_authoring_candidate; product integration and artist signoff required"
+        },
+        "reload_weight_max_delta": 0.0,
+        "reload_rig_max_delta": 0.0,
+        "numeric_screen_pass": true
+      },
+      "female-new-fat-v0-4-0": {
+        "poses": {
+          "neutral": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.2640641070902348,
+              "p99_mm": 0.3794517929782154,
+              "mean_mm": 0.036861396970033565
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "raised": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.2640641070902348,
+              "p99_mm": 0.38044424989493475,
+              "mean_mm": 0.03692767017227468
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "sit": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.1830430012196302,
+              "p99_mm": 0.3804280189797273,
+              "mean_mm": 0.0369863923284078
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          }
+        },
+        "geometry": {
+          "finite": true,
+          "degenerate_faces": 0,
+          "reversed_faces": 0,
+          "height_cm": 169.89308700000004,
+          "sole_z_mm": 0.0
+        },
+        "neutral_export": "/private/tmp/standin-mesh-light-followup-20261114/quality-female-250/female-surface-250um-ref-v3/neutral-fbx/8efb779daffe0b5c39d7f428f533a7e10bac9e2a0017d9f04c171de2991ba927/model.fbx",
+        "roundtrip": {
+          "identity": "8efb779daffe0b5c39d7f428f533a7e10bac9e2a0017d9f04c171de2991ba927",
+          "shape": {
+            "schema": 1,
+            "asset": "standin-lod-female-surface-250um-ref-v3-5a62d2f3fb49d77f",
+            "rules": "standin-lod-female-surface-250um-ref-v3",
+            "rig_rules": "female-hip-profile-1+separated-hands-1",
+            "controls": {
+              "height_cm": 169.893082,
+              "heads": 8.000001,
+              "head_scale": 1.0,
+              "head_width": 0.0,
+              "head_depth": 0.0,
+              "neck_width": 0.0,
+              "neck_length": 0.0,
+              "physique": 1.4,
+              "fat_gain": 2.0,
+              "muscle": 0.0,
+              "definition": 0.0,
+              "shoulders": 0.0,
+              "chest_width": 0.0,
+              "chest_depth": 0.0,
+              "waist": 0.0,
+              "pelvis": 0.0,
+              "glute": 0.0,
+              "thigh": 0.0,
+              "calf": 0.0,
+              "torso_length": 0.0,
+              "arm_length": 0.0,
+              "leg_length": 0.0,
+              "leg_ratio": 0.0,
+              "breast_size": 0.0,
+              "breast_projection": 0.0,
+              "breast_spacing": 0.0,
+              "breast_height": 0.0,
+              "breast_width": 0.0,
+              "fat_distribution": 0.2,
+              "detail_chest": 0.0,
+              "detail_back": 0.0,
+              "detail_shoulder": 0.0,
+              "detail_upperarm": 0.0,
+              "detail_forearm": 0.0,
+              "detail_thigh": 0.0,
+              "detail_calf": 0.0,
+              "fat_torso": 0.0,
+              "fat_arms": 0.0,
+              "fat_legs": 0.0
+            }
+          },
+          "pose": null,
+          "posed": false,
+          "vertices": 79731,
+          "triangles": 159458,
+          "bones": 54,
+          "morph_channels": 0,
+          "fbx_sha256": "6863d7d5edb30df63ce66a837b8962f084cae9a086208b6d1d1dbf62e2c74fdf",
+          "roundtrip_max_error_mm": 0.0003096980094596802,
+          "roundtrip_joint_error_mm": 0.00043108164540174695,
+          "roundtrip_weight_error": 0.0,
+          "pose_qa": {
+            "active": {},
+            "finite": true,
+            "rules": "approved-anatomy-psd-v1"
+          },
+          "contact_qa": {
+            "checked": false,
+            "reason": "approved anatomical PSDs; no collision solver"
+          },
+          "status": "local_authoring_candidate; product integration and artist signoff required"
+        },
+        "reload_weight_max_delta": 0.0,
+        "reload_rig_max_delta": 0.0,
+        "numeric_screen_pass": true
+      },
+      "female-new-muscular-v0-4-0": {
+        "poses": {
+          "neutral": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.2176792370155454,
+              "p99_mm": 0.37182694504735886,
+              "mean_mm": 0.03652548491642118
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "raised": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.2176792370155454,
+              "p99_mm": 0.3728796320501711,
+              "mean_mm": 0.03657713055945484
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "sit": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 0.9616181487217546,
+              "p99_mm": 0.3728783459519032,
+              "mean_mm": 0.03649011325802227
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          }
+        },
+        "geometry": {
+          "finite": true,
+          "degenerate_faces": 0,
+          "reversed_faces": 0,
+          "height_cm": 169.89308700000004,
+          "sole_z_mm": 0.0
+        },
+        "neutral_export": "/private/tmp/standin-mesh-light-followup-20261114/quality-female-250/female-surface-250um-ref-v3/neutral-fbx/71953b67b16ed579fa67fdac87c13061daf84ca65e72e85eb9b15d405032f444/model.fbx",
+        "roundtrip": {
+          "identity": "71953b67b16ed579fa67fdac87c13061daf84ca65e72e85eb9b15d405032f444",
+          "shape": {
+            "schema": 1,
+            "asset": "standin-lod-female-surface-250um-ref-v3-5a62d2f3fb49d77f",
+            "rules": "standin-lod-female-surface-250um-ref-v3",
+            "rig_rules": "female-hip-profile-1+separated-hands-1",
+            "controls": {
+              "height_cm": 169.893082,
+              "heads": 8.000001,
+              "head_scale": 1.0,
+              "head_width": 0.0,
+              "head_depth": 0.0,
+              "neck_width": 0.0,
+              "neck_length": 0.0,
+              "physique": 0.0,
+              "fat_gain": 0.0,
+              "muscle": 4.0,
+              "definition": 0.7,
+              "shoulders": 0.4,
+              "chest_width": 0.0,
+              "chest_depth": 0.0,
+              "waist": 0.0,
+              "pelvis": 0.0,
+              "glute": 0.0,
+              "thigh": 0.2,
+              "calf": 0.0,
+              "torso_length": 0.0,
+              "arm_length": 0.0,
+              "leg_length": 0.0,
+              "leg_ratio": 0.0,
+              "breast_size": 0.0,
+              "breast_projection": 0.0,
+              "breast_spacing": 0.0,
+              "breast_height": 0.0,
+              "breast_width": 0.0,
+              "fat_distribution": 0.0,
+              "detail_chest": 0.0,
+              "detail_back": 0.0,
+              "detail_shoulder": 0.0,
+              "detail_upperarm": 0.0,
+              "detail_forearm": 0.0,
+              "detail_thigh": 0.0,
+              "detail_calf": 0.0,
+              "fat_torso": 0.0,
+              "fat_arms": 0.0,
+              "fat_legs": 0.0
+            }
+          },
+          "pose": null,
+          "posed": false,
+          "vertices": 79731,
+          "triangles": 159458,
+          "bones": 54,
+          "morph_channels": 0,
+          "fbx_sha256": "3d07a1d03e2fe150139c7d3659723bb9b1f4469689a2daff413c5a80d6792309",
+          "roundtrip_max_error_mm": 0.0003096980094596802,
+          "roundtrip_joint_error_mm": 0.0005071322940361987,
+          "roundtrip_weight_error": 0.0,
+          "pose_qa": {
+            "active": {},
+            "finite": true,
+            "rules": "approved-anatomy-psd-v1"
+          },
+          "contact_qa": {
+            "checked": false,
+            "reason": "approved anatomical PSDs; no collision solver"
+          },
+          "status": "local_authoring_candidate; product integration and artist signoff required"
+        },
+        "reload_weight_max_delta": 0.0,
+        "reload_rig_max_delta": 0.0,
+        "numeric_screen_pass": true
+      },
+      "custom-large": {
+        "poses": {
+          "neutral": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.2995024444535375,
+              "p99_mm": 0.39647785655688356,
+              "mean_mm": 0.03901293394181198
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "raised": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.2995024444535375,
+              "p99_mm": 0.398895795224234,
+              "mean_mm": 0.03904885221751932
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "elbow": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.2995024444535375,
+              "p99_mm": 0.39796167489839623,
+              "mean_mm": 0.0390212117302476
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "deep": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.447435119189322,
+              "p99_mm": 0.400023015099576,
+              "mean_mm": 0.03926157764024539
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "sit": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.1853872565552592,
+              "p99_mm": 0.40001816378207716,
+              "mean_mm": 0.03914967303296173
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "cross": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.2995024444535375,
+              "p99_mm": 0.39796167489839623,
+              "mean_mm": 0.03886022842118879
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          },
+          "hands": {
+            "finite": true,
+            "retained_max_mm": 0.0,
+            "retained_p99_mm": 0.0,
+            "protected_max_mm": 0.0,
+            "source_to_candidate": {
+              "sample_count": 13180,
+              "max_mm": 1.2995024444535375,
+              "p99_mm": 0.43233816919382634,
+              "mean_mm": 0.0403939268248884
+            },
+            "candidate_to_source": {
+              "sample_count": 13290,
+              "max_mm": 0.0,
+              "p99_mm": 0.0,
+              "mean_mm": 0.0
+            },
+            "within_numeric_screen": true
+          }
+        },
+        "geometry": {
+          "finite": true,
+          "degenerate_faces": 0,
+          "reversed_faces": 0,
+          "height_cm": 190.0,
+          "sole_z_mm": 0.0
+        },
+        "neutral_export": "/private/tmp/standin-mesh-light-followup-20261114/quality-female-250/female-surface-250um-ref-v3/neutral-fbx/cc47b65dd5e1108d294bb246e9073edf4342f67c86a9e35e8bdd5ecc6d6b41ae/model.fbx",
+        "roundtrip": {
+          "identity": "cc47b65dd5e1108d294bb246e9073edf4342f67c86a9e35e8bdd5ecc6d6b41ae",
+          "shape": {
+            "schema": 1,
+            "asset": "standin-lod-female-surface-250um-ref-v3-5a62d2f3fb49d77f",
+            "rules": "standin-lod-female-surface-250um-ref-v3",
+            "rig_rules": "female-hip-profile-1+separated-hands-1",
+            "controls": {
+              "height_cm": 190.0,
+              "heads": 7.0,
+              "head_scale": 1.0,
+              "head_width": 0.0,
+              "head_depth": 0.0,
+              "neck_width": 0.0,
+              "neck_length": 0.0,
+              "physique": 1.2,
+              "fat_gain": 0.0,
+              "muscle": 1.8,
+              "definition": 0.0,
+              "shoulders": 0.6,
+              "chest_width": 0.0,
+              "chest_depth": 0.0,
+              "waist": 0.0,
+              "pelvis": 0.0,
+              "glute": 0.0,
+              "thigh": 0.0,
+              "calf": 0.0,
+              "torso_length": 0.0,
+              "arm_length": 0.3,
+              "leg_length": 0.55,
+              "leg_ratio": 0.0,
+              "breast_size": 0.0,
+              "breast_projection": 0.0,
+              "breast_spacing": 0.0,
+              "breast_height": 0.0,
+              "breast_width": 0.0,
+              "fat_distribution": 0.0,
+              "detail_chest": 0.0,
+              "detail_back": 0.0,
+              "detail_shoulder": 0.0,
+              "detail_upperarm": 0.0,
+              "detail_forearm": 0.0,
+              "detail_thigh": 0.0,
+              "detail_calf": 0.0,
+              "fat_torso": 0.0,
+              "fat_arms": 0.0,
+              "fat_legs": 0.0
+            }
+          },
+          "pose": null,
+          "posed": false,
+          "vertices": 79731,
+          "triangles": 159458,
+          "bones": 54,
+          "morph_channels": 0,
+          "fbx_sha256": "9a0f6a2bb928787f2e7904570ea9973b68fe91482f9fd5b73e299ae58f3eb96a",
+          "roundtrip_max_error_mm": 0.00023848406272009015,
+          "roundtrip_joint_error_mm": 0.0007514959524163476,
+          "roundtrip_weight_error": 0.0,
+          "pose_qa": {
+            "active": {},
+            "finite": true,
+            "rules": "approved-anatomy-psd-v1"
+          },
+          "contact_qa": {
+            "checked": false,
+            "reason": "approved anatomical PSDs; no collision solver"
+          },
+          "status": "local_authoring_candidate; product integration and artist signoff required"
+        },
+        "reload_weight_max_delta": 0.0,
+        "reload_rig_max_delta": 0.0,
+        "numeric_screen_pass": true
+      }
+    }
+  },
+  "limits": {
+    "retained_p99_mm": 0.5,
+    "protected_max_mm": 0.05,
+    "surface_p99_mm": 0.5
+  },
+  "limitations": [
+    "No automatic penetration-free or CSP certificate is implied by finite geometry or round-trip success."
+  ]
+}

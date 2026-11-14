@@ -9,12 +9,12 @@ from converter.outline_worker import tree
 from converter.outline_fbx import write as write_fbx
 from converter.skin_fbx import augment
 from converter.skin_worker import verify_import
-p=argparse.ArgumentParser();p.add_argument('--assets',required=True);a=p.parse_args(sys.argv[sys.argv.index('--')+1:]);root=Path(a.assets);out=root/'review';package=root/'delivery-package';registry=json.loads((package/'shape-bakes.compact.host.json').read_text());manifest=json.loads((package/'skin-assets.json').read_text());rows=[]
+p=argparse.ArgumentParser();p.add_argument('--assets',required=True);a=p.parse_args(sys.argv[sys.argv.index('--')+1:]);root=Path(a.assets);out=root/'review';package=root/'delivery-package';registry=json.loads((package/'shape-bakes.compact.host.json').read_text());manifest=json.loads((package/'skin-assets.json').read_text());rows=[];jobs=json.loads((package/'jobs.json').read_text())
 for sex in ('male','female'):
  cases=json.loads((root/('quality-'+sex)/'quality.json').read_text())['source_cases']
  for cid,record in cases.items():
   for variant in ('original','candidate'):
-   base=sex+'-'+variant+'-base-lod-review-20261114';recipe=registry['characters'][base];source=registry['sources'][recipe['rules']];c=load(source['blend'],source['controller']);c.set_controls(record['controls'],correct=False);bundle=c.export_fixed(str(out/'shape-exports'));fbx=bundle/'model.fbx';asset=manifest['models'][base];uv=json.loads(gzip.decompress((package/'skins'/asset['uv']['path']).read_bytes()))
+   base=next(j['character'] for j in jobs if j['gender']==sex and j['variant']==variant and j['case']=='base');recipe=registry['characters'][base];source=registry['sources'][recipe['rules']];c=load(source['blend'],source['controller']);c.set_controls(record['controls'],correct=False);bundle=c.export_fixed(str(out/'shape-exports'));fbx=bundle/'model.fbx';asset=manifest['models'][base];uv=json.loads(gzip.decompress((package/'skins'/asset['uv']['path']).read_bytes()))
    for skin in ('default','flesh-guide'):
     actual=fbx;png=None;receipt=None
     if skin!='default':

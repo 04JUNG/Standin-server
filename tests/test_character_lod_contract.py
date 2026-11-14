@@ -4,6 +4,13 @@ from pathlib import Path
 from scripts.character_lod.contract import require_hash,require_subset,require_paired_runs
 
 class CharacterLODContract(unittest.TestCase):
+    def test_neutral_and_body_views_never_curl_fingers(self):
+        from scripts.character_lod.pose_controls import finger_test_rotations
+        for pose in ('neutral','raised','elbow','deep','sit','cross'):
+            self.assertEqual(finger_test_rotations(pose), ())
+        self.assertTrue(any(name.startswith('LeftHand') and angle==75
+            for name,axis,angle in finger_test_rotations('hands')))
+
     def test_unapproved_input_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
             p=Path(tmp)/'model.blend';p.write_bytes(b'approved')

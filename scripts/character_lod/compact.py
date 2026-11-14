@@ -22,8 +22,8 @@ def semantic():
    for d in data.animation_data.drivers:
     h.update(json.dumps([d.data_path,d.array_index,d.driver.expression,[(v.name,v.type,[(getattr(t.id,'name',None),t.data_path,t.bone_target,t.transform_type,t.transform_space) for t in v.targets]) for v in d.driver.variables]],sort_keys=True).encode())
  return h.hexdigest()
-bpy.ops.wm.open_mainfile(filepath=str(source/'model.blend'));before=semantic();bpy.data.libraries.write(str(out/'model.blend'),{bpy.context.scene},fake_user=False,compress=False);bpy.ops.wm.open_mainfile(filepath=str(out/'model.blend'));after=semantic();assert before==after,'packing changed semantic data'
-bpy.context.preferences.filepaths.save_version=0;bpy.ops.wm.save_as_mainfile(filepath=str(out/'model.blend'))
+bpy.ops.wm.open_mainfile(filepath=str(source/'model.blend'));before=semantic();bpy.data.libraries.write(str(out/'model.blend'),{bpy.context.scene},fake_user=False,compress=True);bpy.ops.wm.open_mainfile(filepath=str(out/'model.blend'));after=semantic();assert before==after,'packing changed semantic data'
+bpy.context.preferences.filepaths.save_version=0;bpy.ops.wm.save_as_mainfile(filepath=str(out/'model.blend'),compress=True)
 for item in source.iterdir():
  if item.is_file() and item.name not in ('model.blend','manifest.json'):shutil.copyfile(item,out/item.name)
 manifest=json.loads((source/'manifest.json').read_text());manifest['container_cleanup']={'source_blend_sha256':sha(source/'model.blend'),'semantic_sha256':after,'bytes_before':(source/'model.blend').stat().st_size,'bytes_after':(out/'model.blend').stat().st_size};manifest['files']={x.name:sha(x) for x in out.iterdir() if x.is_file()};(out/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n');print(json.dumps(manifest['container_cleanup']),flush=True)
