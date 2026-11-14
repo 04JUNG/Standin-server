@@ -1,0 +1,83 @@
+{
+  "thresholds_unchanged": true,
+  "trials": [
+    {
+      "gender": "male",
+      "id": "male-surface-150um-ref-v3",
+      "vertices": 100827,
+      "selected": false,
+      "cases": 10,
+      "worst_surface_p99_mm": 0.2901926462072879,
+      "worst_case": "custom-large",
+      "worst_pose": "raised",
+      "numeric_failures": []
+    },
+    {
+      "gender": "male",
+      "id": "male-surface-300um-ref-v3",
+      "vertices": 90724,
+      "selected": false,
+      "cases": 10,
+      "worst_surface_p99_mm": 0.5038900999352338,
+      "worst_case": "custom-large",
+      "worst_pose": "raised",
+      "numeric_failures": [
+        {
+          "case": "custom-large",
+          "pose": "raised",
+          "surface_p99_mm": 0.5038900999352338
+        }
+      ]
+    },
+    {
+      "gender": "male",
+      "id": "male-surface-250um-ref-v3",
+      "vertices": 93038,
+      "selected": true,
+      "cases": 10,
+      "worst_surface_p99_mm": 0.4200712312012912,
+      "worst_case": "custom-large",
+      "worst_pose": "raised",
+      "numeric_failures": []
+    },
+    {
+      "gender": "female",
+      "id": "female-surface-150um-ref-v3",
+      "vertices": 82514,
+      "selected": false,
+      "cases": 12,
+      "worst_surface_p99_mm": 0.2945947434636763,
+      "worst_case": "custom-large",
+      "worst_pose": "hands",
+      "numeric_failures": []
+    },
+    {
+      "gender": "female",
+      "id": "female-surface-300um-ref-v3",
+      "vertices": 78805,
+      "selected": false,
+      "cases": 12,
+      "worst_surface_p99_mm": 0.5057982885045926,
+      "worst_case": "custom-large",
+      "worst_pose": "hands",
+      "numeric_failures": [
+        {
+          "case": "custom-large",
+          "pose": "hands",
+          "surface_p99_mm": 0.5057982885045926
+        }
+      ]
+    },
+    {
+      "gender": "female",
+      "id": "female-surface-250um-ref-v3",
+      "vertices": 79731,
+      "selected": true,
+      "cases": 12,
+      "worst_surface_p99_mm": 0.43233816919382634,
+      "worst_case": "custom-large",
+      "worst_pose": "hands",
+      "numeric_failures": []
+    }
+  ]
+}

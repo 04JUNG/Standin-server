@@ -1,0 +1,6 @@
+{
+  "neutral_finger_matrix_max_delta": 0.0,
+  "neutral_hand_surface_max_mm": 0.0002665170582922507,
+  "hand_vertices": 37600,
+  "passed": true
+}

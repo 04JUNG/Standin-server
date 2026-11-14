@@ -1,0 +1,42 @@
+{
+  "male": {
+    "vertices": 105791,
+    "triangles": 211578,
+    "source_vertices": 139474,
+    "regions": {
+      "hands": 51058,
+      "feet": 25667,
+      "head_neck": 2039,
+      "arms": 11134,
+      "legs": 5876,
+      "torso": 10017
+    },
+    "qa_cases": 10,
+    "passed": 10,
+    "body_p99_max_mm": 0.4645534063456571,
+    "source_surface_p99_max_mm": 0.417097297031434,
+    "protected_max_mm": 0.0,
+    "blend_sha256": "4aa2e7d5cd6913f3429f5af10e724361706d5a74c9c8ccf00e61ad8928a1f985",
+    "controller_sha256": "5fe05a304eff1c2d918eafd70cc0c6af047687211b32db889022906af6e3ed37"
+  },
+  "female": {
+    "vertices": 94901,
+    "triangles": 189798,
+    "source_vertices": 105430,
+    "regions": {
+      "hands": 51058,
+      "feet": 24785,
+      "head_neck": 1983,
+      "arms": 5813,
+      "legs": 6494,
+      "torso": 4768
+    },
+    "qa_cases": 12,
+    "passed": 12,
+    "body_p99_max_mm": 0.42927491129375855,
+    "source_surface_p99_max_mm": 0.3477902660961262,
+    "protected_max_mm": 0.0,
+    "blend_sha256": "aa10276a7c63a2b0f2336b6f4569e0fb541c6f2aa2dcf689ab96ec04573159d3",
+    "controller_sha256": "3a3ccd4e1fe09967b86dde7823aad9d0886d47b86b47021a3fcea58e61145052"
+  }
+}

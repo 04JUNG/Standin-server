@@ -1,0 +1,11 @@
+{
+  "files": 946,
+  "bytes": 3395641869,
+  "manifest_sha256": "aaabb8e3d2275650824ab45589f18695ed8dcd7295fbf67acbf786ec56e48310",
+  "promotable": false,
+  "reasons": [
+    "human review and skin certification still required",
+    "new topology has no activated approximate SSR2 certification",
+    "new candidate CSP import is unverified; picker Open disabled even for previous files"
+  ]
+}

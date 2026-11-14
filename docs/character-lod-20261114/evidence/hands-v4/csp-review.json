@@ -1,0 +1,27 @@
+{
+  "application": "CLIP STUDIO PAINT",
+  "version": "5.1.1",
+  "result": "blocked before import; no new-candidate CSP pass claimed",
+  "observed": "Open button disabled for both new female neutral and previously imported v3 files. Coordinate clicks returned noWindowsAvailable; accessibility menu/path selection worked. Cancelled file picker and closed the empty test canvas. Existing authoring documents were not saved.",
+  "files": [
+    {
+      "path": "/private/tmp/standin-mesh-light-v4-20261115/csp-v4/female-neutral.fbx",
+      "sha256": "1f829170179b50962473abf62cd1d242f0df918b2157edf0d8c2f8cf7b80c61c"
+    },
+    {
+      "path": "/private/tmp/standin-mesh-light-followup-20261114/benchmark/female-original-base-lod-surface-v3-20261114-flesh-guide-0.fbx",
+      "sha256": "6256b6ad0332337b621bbd3f102f7ed2165f6a3f05ecab77479d111a292cfa8e"
+    },
+    {
+      "path": "/private/tmp/standin-mesh-light-followup-20261114/benchmark/female-candidate-base-lod-surface-v3-20261114-default-0.fbx",
+      "sha256": "3a752a5cb137ace47eede3bed3af1cc690a9d07d4d18957979a55532f5edec5d"
+    }
+  ],
+  "screenshot": "import-picker-disabled.png",
+  "scope_exclusions": [
+    "new model import/display",
+    "save/reopen",
+    "arbitrary CSP reposing",
+    "all presets/skins"
+  ]
+}

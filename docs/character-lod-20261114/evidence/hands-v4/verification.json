@@ -1,0 +1,20 @@
+{
+  "contract_tests": {
+    "passed": 8,
+    "total": 8
+  },
+  "core_smoke": {
+    "passed": 54,
+    "total": 54
+  },
+  "authoring_cases": {
+    "male": "10/10",
+    "female": "12/12"
+  },
+  "converter_runs": "72/72",
+  "actual_final_pairs": "12/12",
+  "compileall": "passed",
+  "scene_audit": "two meshes per source: selected authoring mesh and UI-only preview; no original dense mesh object",
+  "csp": "blocked before import; Open disabled for new and previously imported files",
+  "browser": "neutral startup and male/female real-fist controls/images verified"
+}

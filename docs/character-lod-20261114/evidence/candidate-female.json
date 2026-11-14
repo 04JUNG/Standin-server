@@ -1,0 +1,39 @@
+{
+  "schema": "protected-body-lod.v1",
+  "id": "female-protected-3-articulated-local",
+  "rules": "standin-lod-female-protected-3-articulated-local",
+  "gender": "female",
+  "source_blend_sha256": "5a62d2f3fb49d77fdc04d1c78a361edf9fbab55e71e0e47d3b6b393fae14d3a9",
+  "source_controller_sha256": "1164dff9a4c6069d0da37b80dd26c61544bc6f9eb9c9f3469c33d457e893e9af",
+  "source_vertices": 105430,
+  "vertices": 102233,
+  "triangles": 204462,
+  "protected_vertices": 76838,
+  "correspondence": "source-vertex-subset",
+  "method": "local",
+  "rounds_or_angle": 3.0,
+  "hand_policy": "articulated",
+  "preview_vertices": 50001,
+  "preview_projection_p999_mm": 0.038423655496444664,
+  "bones": 54,
+  "psd_keys": 22,
+  "uv_source": "approved FBX corner UVs; seam-delimited transfer; fresh candidate skin hashes",
+  "promotion": "candidate-only; human signoff and skin certification required",
+  "files": {
+    "model.blend": "e81c1c3329bf59ea0efaef81776329bfafeda5b243beacf36b17581badde6368",
+    "source-indices.npy": "808af1f890c1e2a373c9c7d17e77a127255b1016002edfcdbc773db11d6ce311",
+    "controller.py": "970d08a8c71a3d764aa98d603fc13791d2dacb413ed7ab8ee811fee8bdf9af11",
+    "protected-source.npy": "5db82aa1438a9444e3e3189db5e37074807225ac93bab7cd53b41747668bd044",
+    "skin-uv.npy": "5968ed11d8d2ba992725d8bb04ff716ca176c0feef1b10b0ee23fdfa6995414c"
+  },
+  "container_cleanup": {
+    "source_blend_sha256": "f2668a56d27b14e310ea5a3abd6e1ff6dffe62469381b7419d0ba9b1dd1ec667",
+    "semantic_sha256": "92bc381777551cbf44b5b632e2659c7ac32a3870b62d6b73bd90792e08926df4",
+    "bytes_before": 157360868,
+    "bytes_after": 104755178
+  },
+  "body_shape_keys": 32,
+  "controls": 39,
+  "protected_source_indices_and_connectivity_exact": true,
+  "deformed_coordinates_exact": false
+}

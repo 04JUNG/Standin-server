@@ -1,0 +1,80 @@
+{
+  "male-candidate-base-lod-surface-v3-20261114": {
+    "character_sha256": "3299e6ba63824b306e0cf963da95b03eab6d6b5690360b249cecfa658d5722bc",
+    "vertices": 93038,
+    "bones": 54,
+    "weights_sha256": "7fdf619cf0f86223b75eea49f5b5696dd0e6f47f5c5ea14533f279cfa7eb697d",
+    "polygon_indices_sha256": "7fdab86510f7489400d1b8945860b9299f9e4c633e13b4771382e9c9557c203f",
+    "triangles_sha256": "7d434554b80ceb7a9980b6aee8395af54bc4d37766f297f08350330731a44159",
+    "uv": {
+      "path": "male-candidate-base-lod-surface-v3-20261114-uv.json.gz",
+      "bytes": 7048357,
+      "sha256": "5726ef943c2ca0e37127179f6047ad97c5c55a274781197556e9ed6fa86667db"
+    }
+  },
+  "male-candidate-preset-lod-surface-v3-20261114": {
+    "character_sha256": "130a4fa8d6296346830ef0954d720be1311c27c21a07b9d02afbd7fd5c9350e8",
+    "vertices": 93038,
+    "bones": 54,
+    "weights_sha256": "7fdf619cf0f86223b75eea49f5b5696dd0e6f47f5c5ea14533f279cfa7eb697d",
+    "polygon_indices_sha256": "7fdab86510f7489400d1b8945860b9299f9e4c633e13b4771382e9c9557c203f",
+    "triangles_sha256": "7d434554b80ceb7a9980b6aee8395af54bc4d37766f297f08350330731a44159",
+    "uv": {
+      "path": "male-candidate-preset-lod-surface-v3-20261114-uv.json.gz",
+      "bytes": 7048355,
+      "sha256": "629192149d50279fb2d8a65b13ba20653cae4ede607d5b7583e93d25d1327600"
+    }
+  },
+  "male-candidate-custom-lod-surface-v3-20261114": {
+    "character_sha256": "aae126ad78426e94bce041285ca7a52e5a6cb55944c2bfd365937010dd9df88b",
+    "vertices": 93038,
+    "bones": 54,
+    "weights_sha256": "7fdf619cf0f86223b75eea49f5b5696dd0e6f47f5c5ea14533f279cfa7eb697d",
+    "polygon_indices_sha256": "7fdab86510f7489400d1b8945860b9299f9e4c633e13b4771382e9c9557c203f",
+    "triangles_sha256": "7d434554b80ceb7a9980b6aee8395af54bc4d37766f297f08350330731a44159",
+    "uv": {
+      "path": "male-candidate-custom-lod-surface-v3-20261114-uv.json.gz",
+      "bytes": 7048356,
+      "sha256": "b0c060944694e478826ebd001d4d26c2b3713a719b971522c675e63028a51394"
+    }
+  },
+  "female-candidate-base-lod-surface-v3-20261114": {
+    "character_sha256": "7bbf9590f291d44dcdc55594944f28e32b338655040072e76d7a2732100b290b",
+    "vertices": 79731,
+    "bones": 54,
+    "weights_sha256": "239fec58cc800eabf3bef814cba76507ffca1116705e1253f5b80a4165ae721f",
+    "polygon_indices_sha256": "5801c96c46bc8ff9c133cc99d36d0930cb3d3a69fea41dd94c6f8e84cfd8f297",
+    "triangles_sha256": "3264539450b86764011e4fd140b6a8ac9eb4c262f5878ed01d5c92d982703b09",
+    "uv": {
+      "path": "female-candidate-base-lod-surface-v3-20261114-uv.json.gz",
+      "bytes": 5829515,
+      "sha256": "ce32afa57800377179d36658aebe5a53f0a18d4a54c22f8babcae30d12b9a170"
+    }
+  },
+  "female-candidate-preset-lod-surface-v3-20261114": {
+    "character_sha256": "0e98b90594c6ce84fa578d058e9eb63fbed3d2bc92388a87c30c8b7d305265f3",
+    "vertices": 79731,
+    "bones": 54,
+    "weights_sha256": "239fec58cc800eabf3bef814cba76507ffca1116705e1253f5b80a4165ae721f",
+    "polygon_indices_sha256": "5801c96c46bc8ff9c133cc99d36d0930cb3d3a69fea41dd94c6f8e84cfd8f297",
+    "triangles_sha256": "3264539450b86764011e4fd140b6a8ac9eb4c262f5878ed01d5c92d982703b09",
+    "uv": {
+      "path": "female-candidate-preset-lod-surface-v3-20261114-uv.json.gz",
+      "bytes": 5829519,
+      "sha256": "1a035b4ea9eb8571e1d25f43a5db8faf0b319722c27dca2db8282590734d59fc"
+    }
+  },
+  "female-candidate-custom-lod-surface-v3-20261114": {
+    "character_sha256": "2f6c5f314eb64e8656f0c811a8b1ba8076c4ba83a69375156cdb8cccfd125d6a",
+    "vertices": 79731,
+    "bones": 54,
+    "weights_sha256": "239fec58cc800eabf3bef814cba76507ffca1116705e1253f5b80a4165ae721f",
+    "polygon_indices_sha256": "5801c96c46bc8ff9c133cc99d36d0930cb3d3a69fea41dd94c6f8e84cfd8f297",
+    "triangles_sha256": "3264539450b86764011e4fd140b6a8ac9eb4c262f5878ed01d5c92d982703b09",
+    "uv": {
+      "path": "female-candidate-custom-lod-surface-v3-20261114-uv.json.gz",
+      "bytes": 5829518,
+      "sha256": "be7c6f042c046a1157f37bf7f0d83847eda79f034c85b8f47b8717e50696b466"
+    }
+  }
+}

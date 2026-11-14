@@ -1,0 +1,294 @@
+{
+  "scope": "Local Converter, final reload, optional verified skin and local fsync file-ready. No API/network/UI/CSP timing. Nested worker spans must not be added together.",
+  "repeats": 3,
+  "rows": [
+    {
+      "gender": "male",
+      "case": "base",
+      "skin": "default",
+      "runs": {
+        "original": {
+          "successes": 3,
+          "failures": 0,
+          "mean": 41.07827639366668,
+          "median": 42.187960144000016,
+          "min": 38.30809364299999,
+          "max": 42.738775394000015
+        },
+        "candidate": {
+          "successes": 3,
+          "failures": 0,
+          "mean": 39.409614892666674,
+          "median": 39.47740226800002,
+          "min": 37.639068933000004,
+          "max": 41.112373477000006
+        }
+      },
+      "median_reduction_percent": 6.424955998697401
+    },
+    {
+      "gender": "male",
+      "case": "base",
+      "skin": "flesh-guide",
+      "runs": {
+        "original": {
+          "successes": 3,
+          "failures": 0,
+          "mean": 57.19410094266667,
+          "median": 57.24583594200004,
+          "min": 55.803632525999944,
+          "max": 58.53283436000004
+        },
+        "candidate": {
+          "successes": 3,
+          "failures": 0,
+          "mean": 58.59749077666665,
+          "median": 57.806129776000034,
+          "min": 55.71301110899998,
+          "max": 62.27333144499994
+        }
+      },
+      "median_reduction_percent": -0.9787503750799731
+    },
+    {
+      "gender": "male",
+      "case": "preset",
+      "skin": "default",
+      "runs": {
+        "original": {
+          "successes": 3,
+          "failures": 0,
+          "mean": 42.781834213666684,
+          "median": 42.634092853000084,
+          "min": 41.41236522700001,
+          "max": 44.29904456099996
+        },
+        "candidate": {
+          "successes": 3,
+          "failures": 0,
+          "mean": 40.95197196299997,
+          "median": 42.59205347699992,
+          "min": 37.59704676699994,
+          "max": 42.66681564500004
+        }
+      },
+      "median_reduction_percent": 0.09860506741661279
+    },
+    {
+      "gender": "male",
+      "case": "preset",
+      "skin": "flesh-guide",
+      "runs": {
+        "original": {
+          "successes": 3,
+          "failures": 0,
+          "mean": 61.43485680600005,
+          "median": 63.32750677900003,
+          "min": 57.17932656800008,
+          "max": 63.79773707100003
+        },
+        "candidate": {
+          "successes": 3,
+          "failures": 0,
+          "mean": 58.565135998666655,
+          "median": 56.58397319200003,
+          "min": 56.08056214999999,
+          "max": 63.03087265399995
+        }
+      },
+      "median_reduction_percent": 10.64866426927803
+    },
+    {
+      "gender": "male",
+      "case": "custom",
+      "skin": "default",
+      "runs": {
+        "original": {
+          "successes": 3,
+          "failures": 0,
+          "mean": 42.14985450466679,
+          "median": 42.567317394000156,
+          "min": 40.71284576800008,
+          "max": 43.16940035200014
+        },
+        "candidate": {
+          "successes": 3,
+          "failures": 0,
+          "mean": 41.23518914399998,
+          "median": 41.108434434999936,
+          "min": 40.38802081099993,
+          "max": 42.209112186000084
+        }
+      },
+      "median_reduction_percent": 3.427237252225457
+    },
+    {
+      "gender": "male",
+      "case": "custom",
+      "skin": "flesh-guide",
+      "runs": {
+        "original": {
+          "successes": 3,
+          "failures": 0,
+          "mean": 59.48129601366668,
+          "median": 60.71734390400002,
+          "min": 56.18342698399988,
+          "max": 61.54311715300014
+        },
+        "candidate": {
+          "successes": 3,
+          "failures": 0,
+          "mean": 59.21388152666668,
+          "median": 60.129219192999926,
+          "min": 57.275450109000076,
+          "max": 60.236975278000045
+        }
+      },
+      "median_reduction_percent": 0.9686272046583122
+    },
+    {
+      "gender": "female",
+      "case": "base",
+      "skin": "default",
+      "runs": {
+        "original": {
+          "successes": 3,
+          "failures": 0,
+          "mean": 26.437382290000112,
+          "median": 26.503228054000147,
+          "min": 26.04258205400015,
+          "max": 26.766336762000037
+        },
+        "candidate": {
+          "successes": 3,
+          "failures": 0,
+          "mean": 25.999135039666726,
+          "median": 26.022793052999987,
+          "min": 25.793480137000188,
+          "max": 26.181131929000003
+        }
+      },
+      "median_reduction_percent": 1.8127414518008034
+    },
+    {
+      "gender": "female",
+      "case": "base",
+      "skin": "flesh-guide",
+      "runs": {
+        "original": {
+          "successes": 3,
+          "failures": 0,
+          "mean": 42.21653865799999,
+          "median": 42.26390735299992,
+          "min": 42.11909997700013,
+          "max": 42.266608643999916
+        },
+        "candidate": {
+          "successes": 3,
+          "failures": 0,
+          "mean": 41.33645308800002,
+          "median": 41.33946714400008,
+          "min": 41.313017517999924,
+          "max": 41.35687460200006
+        }
+      },
+      "median_reduction_percent": 2.187304172514526
+    },
+    {
+      "gender": "female",
+      "case": "preset",
+      "skin": "default",
+      "runs": {
+        "original": {
+          "successes": 3,
+          "failures": 0,
+          "mean": 27.953269679000034,
+          "median": 28.02049009600023,
+          "min": 27.73939676200007,
+          "max": 28.099922178999805
+        },
+        "candidate": {
+          "successes": 3,
+          "failures": 0,
+          "mean": 27.486922637666794,
+          "median": 27.467283178999878,
+          "min": 27.229717888000323,
+          "max": 27.76376684600018
+        }
+      },
+      "median_reduction_percent": 1.9742942222103377
+    },
+    {
+      "gender": "female",
+      "case": "preset",
+      "skin": "flesh-guide",
+      "runs": {
+        "original": {
+          "successes": 3,
+          "failures": 0,
+          "mean": 42.80924803300013,
+          "median": 42.87738510200006,
+          "min": 42.39221814400025,
+          "max": 43.15814085300008
+        },
+        "candidate": {
+          "successes": 3,
+          "failures": 0,
+          "mean": 41.77240974133338,
+          "median": 41.71885922799993,
+          "min": 41.56818656099995,
+          "max": 42.030183435000254
+        }
+      },
+      "median_reduction_percent": 2.7019508564809724
+    },
+    {
+      "gender": "female",
+      "case": "custom",
+      "skin": "default",
+      "runs": {
+        "original": {
+          "successes": 3,
+          "failures": 0,
+          "mean": 28.348439596333264,
+          "median": 28.38084459599986,
+          "min": 28.204662138000003,
+          "max": 28.45981205499993
+        },
+        "candidate": {
+          "successes": 3,
+          "failures": 0,
+          "mean": 27.862566206666845,
+          "median": 27.923382804000084,
+          "min": 27.645073721000244,
+          "max": 28.01924209500021
+        }
+      },
+      "median_reduction_percent": 1.6118681403310076
+    },
+    {
+      "gender": "female",
+      "case": "custom",
+      "skin": "flesh-guide",
+      "runs": {
+        "original": {
+          "successes": 3,
+          "failures": 0,
+          "mean": 43.10228049200017,
+          "median": 43.06066343700013,
+          "min": 43.0305906450003,
+          "max": 43.21558739400007
+        },
+        "candidate": {
+          "successes": 3,
+          "failures": 0,
+          "mean": 42.58215704666676,
+          "median": 42.46731481100005,
+          "min": 42.43895339400024,
+          "max": 42.84020293499998
+        }
+      },
+      "median_reduction_percent": 1.3779365635371077
+    }
+  ]
+}
