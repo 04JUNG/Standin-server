@@ -1,0 +1,19 @@
+{
+  "male": {
+    "file": "/private/tmp/standin-model-color-fix-20261116/models/male-guide.fbx",
+    "imported": true,
+    "skinColorVisible": true,
+    "guideLinesVisible": true,
+    "clip": "/private/tmp/standin-model-color-fix-20261116/qa/CSP-male.clip"
+  },
+  "female": {
+    "file": "/private/tmp/standin-model-color-fix-20261116/models/female-guide.fbx",
+    "imported": true,
+    "skinColorVisible": true,
+    "guideLinesVisible": true,
+    "clip": "/private/tmp/standin-model-color-fix-20261116/qa/CSP-female.clip"
+  },
+  "route": "File > Import > 3D data",
+  "documentExpressionColor": "Color",
+  "scope": "base flesh-guide material display only; not a poseability or all-shape CSP certificate"
+}

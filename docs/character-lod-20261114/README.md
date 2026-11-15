@@ -1,6 +1,8 @@
 # Latest-body protected mesh reduction — local review, 2026-11-14
 
-> Latest: [v5 male 93,000 vertices with the repaired fist preserved](BODY_TARGET_V5.md).
+> Latest delivery: [backed-up male/female models with visible skin and actual CSP color checks](COLOR_DELIVERY.md).
+
+> Geometry selection: [v5 male 93,000 vertices with the repaired fist preserved](BODY_TARGET_V5.md).
 
 > Previous: [v4 closed-fist graph preservation and further male body reduction](HANDS_BODY_V4.md).
 
