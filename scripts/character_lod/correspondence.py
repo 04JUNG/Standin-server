@@ -17,7 +17,12 @@ class Correspondence:
 
     def linear(self, values):
         values=np.asarray(values)
-        return np.einsum('ni,nij->nj',self.weights,values[self.indices])
+        if self.indices.shape[1]<=3:return np.einsum('ni,nij->nj',self.weights,values[self.indices])
+        result=np.zeros((len(self.indices),values.shape[1]),dtype=np.result_type(values,float))
+        for k in range(self.indices.shape[1]):
+            rows=np.flatnonzero(self.weights[:,k])
+            result[rows]+=values[self.indices[rows,k]]*self.weights[rows,k,None]
+        return result
 
     def apply(self, values):
         values=np.asarray(values);result=self.linear(values)

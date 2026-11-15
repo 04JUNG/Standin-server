@@ -141,3 +141,41 @@ lost protected connectivity, incomplete paired results, mismatched body/BVH
 conditions, and mixed prepared/generated paths. The existing core smoke suite
 passed 54/54 in the repository's Python 3.12 environment. Host Python without
 Pydantic could not run that suite; no environment dependencies were changed.
+
+## v5 male target follow-up
+
+Read [BODY_TARGET_V5.md](BODY_TARGET_V5.md) for the changed body protection
+strategy and unchanged hand graph/error limits. Reuse the approved original
+quality pose cache and immutable v4 seed, not a v3 reduced-hand graph. In the
+pinned native Blender runtime, the reproducible planner entry point is:
+
+```bash
+blender -b -t 2 --python scripts/character_lod/plan_body.py -- \
+  --out /new/path/body-plan \
+  --seed /private/tmp/standin-mesh-light-v4-20261115/compact/male-hands-body-500um-ref-v4-targeted \
+  --original-quality /private/tmp/standin-mesh-light-followup-20261114/quality-male \
+  --originals /private/tmp/standin-mesh-light-v5-final-20261115/originals \
+  --skin-uv /private/tmp/standin-final-preparation-qa-20261112/skin-assets/male-base-v0-8-0-uv.json.gz \
+  --converter-fields /private/tmp/standin-mesh-light-v5-final-20261115/planning-inputs \
+  --target 93000
+```
+
+The selected saved plan is also delivered as `topology-plan.npz` beside its
+manifest; its SHA256 is `218ed702a9fd1d2e0a29b0aaa8362bfc5848b2ae007d292d2a4f3837fbd4d7c3`.
+Build from the approved original with `build.py --method body
+--surface-profile hands-body-v5 --topology-plan <plan> --topology-seed <v4-seed>`
+and the approved recipe `--registry` plus usual male original
+blend/controller/skin-UV/output arguments. Use
+`--variant-suffix final115` to reproduce the selected identifier. This path checks
+the frozen hand/non-body graph and refuses counts >=93,038.
+
+Follow the existing export/package/fresh-Linux-preparation sequence, selecting
+male only (`package.py --gender male --identity-suffix lod-body-v5-final-20261115`).
+The prepared registry is copied to `delivery-package/shape-bakes.benchmark.json`.
+Run the existing pinned Docker command with `benchmark.py --gender male
+--repeats 1`, then `analyze.py --gender male --repeats 1` and native Blender
+`compare_finals.py --gender male --repeats 1 --require-pass`. This requires 12
+successful conversions and six strict final pairs; it is functional evidence,
+not a new repeated timing campaign. Render scripts accept `--gender male` too.
+Finally run `build_review.py --gender male` and
+`delivery_manifest.py --revision body-v5` against the new artifact root.

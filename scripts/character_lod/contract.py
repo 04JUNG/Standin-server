@@ -62,3 +62,10 @@ def final_geometry_pass(metrics):
               'hand_max_mm': .05, 'body_surface_p99_mm': .5}
     return all(key in metrics and math.isfinite(metrics[key])
                and metrics[key] <= limit for key, limit in limits.items())
+
+
+def body_target_pass(metrics, exclusive_limit=93038):
+    """User's strict whole-mesh ceiling plus the already-zero fist result."""
+    vertices=metrics.get('vertices')
+    return (type(vertices) is int and 0<vertices<exclusive_limit
+            and metrics.get('hand_max_mm')==0.0 and final_geometry_pass(metrics))

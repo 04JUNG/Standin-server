@@ -1,0 +1,29 @@
+{
+  "entries": {
+    "male-candidate-base-lod-body-v5-final-20261115": {
+      "path": "/work/prepared-bodies/qa/prepared-9f15374f6584a6e4ed37f47b58144ff67684c5737aee40e3445d99f3711b18f6.json",
+      "sha256": "ecf292087a0496b0e8cb6a5f9e0592b7f795149b0c954c6be313a8f25364d577"
+    },
+    "male-candidate-custom-lod-body-v5-final-20261115": {
+      "path": "/work/prepared-bodies/qa/prepared-293ab1f128efd6d17ed75c38cb46960dd6419684993556ee1b6d5aa61aacfe38.json",
+      "sha256": "707e393a60e5e81ef25b1c5a0b7f005829941d1d4b68a7146dce6393bdf8e66c"
+    },
+    "male-candidate-preset-lod-body-v5-final-20261115": {
+      "path": "/work/prepared-bodies/qa/prepared-fef6e81c073eab2a5a1747016dd556e2b0529e407bae991dbf35e7599de65d67.json",
+      "sha256": "2713615e600634e8eca28b4070083219a6e181c24013da688c833d5459aab397"
+    },
+    "male-original-base-lod-body-v5-final-20261115": {
+      "path": "/work/prepared-bodies/qa/prepared-6f2bd430c96fbeb3a6a92ad594af944392e72bcb8e70bca060485af7d0226d0b.json",
+      "sha256": "00617a5b67142c2b7bce7da1a1ad5e201a924016441a764e8d726c1ebf2920b0"
+    },
+    "male-original-custom-lod-body-v5-final-20261115": {
+      "path": "/work/prepared-bodies/qa/prepared-3c7e65d618c154f9f45f3c4ff087a2bf0af177c54e5181285b9a0aa741a0806a.json",
+      "sha256": "3983a87bb3d917e0cf544832ccad0fc45d23e6805bbb6555e8117ce2150e2ba0"
+    },
+    "male-original-preset-lod-body-v5-final-20261115": {
+      "path": "/work/prepared-bodies/qa/prepared-ec2ab7298893e05f00909952aadc249f6303aefb06c7370e9e348a5a9db2e62e.json",
+      "sha256": "67e2d108d9fbe9036de1790e3b6806e21ad503774e509359745c0358612c58e3"
+    }
+  },
+  "schema": "prepared-neutral-index.v1"
+}

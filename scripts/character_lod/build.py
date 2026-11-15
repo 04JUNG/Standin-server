@@ -119,10 +119,10 @@ def main(args):
  skin=json.loads(gzip.decompress(Path(args.skin_uv).read_bytes()));assert skin['triangles']==[list(p.vertices) for p in m.data.polygons]
  source_uv=np.array(skin['uv']);protected=protection(m,a,co,args.hand_policy)
  extra_fields=[];full_reference=None
- if args.method in ('surface','qem'):
+ if args.method in ('surface','qem','body'):
   from scripts.character_lod.surface_topology import mask,simplify
   from scripts.character_lod.reference_compute import payload
-  protected=mask(m,a,co,source_uv,np.array(skin['triangles'],np.int32),args.surface_profile=='hands-body-v4')
+  protected=mask(m,a,co,source_uv,np.array(skin['triangles'],np.int32),args.surface_profile in ('hands-body-v4','hands-body-v5'))
   if not args.registry:raise ValueError('surface method requires the pinned recipe registry')
   registry=json.loads(Path(args.registry).read_text());recipes=[v for k,v in registry['characters'].items() if k.startswith(args.gender+'-') and v['rules']==c.VERSION]
   for recipe in recipes:
@@ -133,39 +133,49 @@ def main(args):
   full_reference=payload(original_source,reference_properties)
   from scripts.character_lod.region_policy import region_labels,region_counts,hand_graph_mask,REGIONS
   source_regions=region_labels(c.source()['names'],c.source()['W'])
-  if args.surface_profile=='hands-body-v4':
+  if args.surface_profile in ('hands-body-v4','hands-body-v5'):
    assert protected[hand_graph_mask(c.source()['names'],c.source()['W'])].all()
  if args.extra_protected:protected[np.load(args.extra_protected)]=True
+ body_plan=None
+ if args.method=='body':
+  if not args.topology_plan or not args.topology_seed:raise ValueError('body requires a validated seed and topology plan')
+  from scripts.character_lod.progressive_body import load_plan
+  body_plan=load_plan(args.topology_plan,args.topology_seed,co,source_regions,hand_graph_mask(original_source['names'],original_source['W']))
+  protected=np.zeros(len(co),bool);protected[body_plan[3]]=True
+  args.surface_profile='hands-body-v5'
  trials=[];np.save(out/'source-co.npy',co)
  keep=np.zeros(len(co),bool)
  if args.keep_indices:keep[np.load(args.keep_indices)]=True
  topo=local_topology if args.method=='local' else topology
- if args.method in ('surface','qem'):
+ if args.method in ('surface','qem','body'):
   def topo(mesh,p,level,uv):
    tolerance=level/1000
-   if args.surface_profile=='hands-body-v4':
+   if args.surface_profile in ('hands-body-v4','hands-body-v5'):
     body=np.isin(source_regions,[REGIONS.index(x) for x in ('torso','arms','legs')])
     tolerance=np.where(body,level,args.other_tolerance_mm)/1000
    return simplify(mesh,p,args.rounds,uv,tolerance,args.span_mm/1000,extra_fields,keep,args.cost_order)[:3]
- levels=(args.qem_ratio if args.method=='qem' else args.tolerance_mm if args.method=='surface' else ((1.,3.) if args.method=='local' else (.25,1.,3.,7.,15.)))
+ levels=(0.,) if args.method=='body' else (args.qem_ratio if args.method=='qem' else args.tolerance_mm if args.method=='surface' else ((1.,3.) if args.method=='local' else (.25,1.,3.,7.,15.)))
  cache={};projection_cache={}
  for angle in levels:
-  if args.method=='qem':
+  if args.method=='body':
+   mapping,faces,uv,_,_,_=body_plan;ids=mapping.indices[:,0];projection_cache[angle]=(mapping,mapping.apply(co),{})
+  elif args.method=='qem':
    from scripts.character_lod.qem_topology import simplify as qem
    projected,faces,uv,mapping,qem_meta=qem(m,co,protected,source_uv,angle,keep);ids=mapping.indices[:,0];projection_cache[angle]=(mapping,projected,qem_meta)
   else:ids,faces,uv=topo(m,protected,angle,source_uv)
-  cache[angle]=(ids,faces,uv);trials.append(dict(level=angle,level_unit='ratio' if args.method=='qem' else 'mm' if args.method=='surface' else ('rounds' if args.method=='local' else 'degrees'),vertices=len(ids),triangles=len(faces),retained=len(ids)/len(co)))
+  cache[angle]=(ids,faces,uv);trials.append(dict(level=len(ids) if args.method=='body' else angle,level_unit='vertices' if args.method=='body' else 'ratio' if args.method=='qem' else 'mm' if args.method=='surface' else ('rounds' if args.method=='local' else 'degrees'),vertices=len(ids),triangles=len(faces),retained=len(ids)/len(co)))
   print('TRIAL',trials[-1],flush=True)
  (out/'trials.json').write_text(json.dumps({'protected_vertices':int(protected.sum()),'trials':trials},indent=2))
  # Emit distinct quality levels, even when protected density prevents 75%/50%.
- for angle in (levels if args.method in ('surface','qem') else ((1.,3.) if args.method=='local' else (1.,7.))):
+ for angle in (levels if args.method in ('surface','qem','body') else ((1.,3.) if args.method=='local' else (1.,7.))):
   ids,faces,uv=cache[angle];tag=args.gender+'-protected-'+str(int(angle))+('-articulated' if args.hand_policy=='articulated' else '')+('-local' if args.method=='local' else '')
-  if args.method in ('surface','qem'):tag=args.gender+'-surface-'+str(round(angle*1000))+'um-ref-v3'
-  if args.method=='surface' and args.surface_profile=='hands-body-v4':tag=args.gender+'-hands-body-'+str(round(angle*1000))+'um-ref-v4'
+  if args.method in ('surface','qem','body'):tag=args.gender+'-surface-'+str(round(angle*1000))+'um-ref-v3'
+  if args.method=='surface' and args.surface_profile in ('hands-body-v4','hands-body-v5'):tag=args.gender+'-hands-body-'+str(round(angle*1000))+'um-ref-v4'
+  if args.method=='body':tag=args.gender+'-frozen-hands-body-'+str(len(ids))+'-v5'
   if args.method=='qem':tag=args.gender+'-hands-qem-'+str(round(angle*100))+'-ref-v4'
   if args.variant_suffix:tag+='-'+args.variant_suffix
   folder=out/tag;folder.mkdir()
-  mapping=projection_cache[angle][0] if args.method=='qem' else None
+  mapping=projection_cache[angle][0] if args.method in ('qem','body') else None
   def transfer(values,positions=True):return (mapping.apply(values) if positions else mapping.linear(values)) if mapping is not None else values[ids]
   n=m.copy();n.data=bpy.data.meshes.new(tag);bpy.context.collection.objects.link(n);n.name=tag
   n.data.from_pydata(transfer(co).tolist(),[],faces.tolist());n.data.update()
@@ -240,16 +250,21 @@ def main(args):
    for name in smooth:text+=f"    s['fat_smooth'][{name!r}] = np.frombuffer(zlib.decompress(base64.b64decode(_LOD_{name})),dtype='<f8').reshape(-1,3)\n"
    text+='    return s\n'
   (folder/'controller.py').write_text(text);np.save(folder/'skin-uv.npy',uv);np.save(folder/'source-indices.npy',ids);np.save(folder/'protected-source.npy',np.flatnonzero(protected))
-  if args.method in ('surface','qem'):np.save(folder/'source-regions.npy',source_regions)
+  if args.method in ('surface','qem','body'):np.save(folder/'source-regions.npy',source_regions)
   if mapping is not None:np.savez_compressed(folder/'source-projection.npz',indices=mapping.indices,weights=mapping.weights,offsets=mapping.offsets)
   if args.keep_indices:np.save(folder/'required-source.npy',np.flatnonzero(keep))
+  if body_plan is not None:
+   np.save(folder/'graph-source.npy',body_plan[4]);(folder/'topology-plan.npz').write_bytes(Path(args.topology_plan).read_bytes())
   bpy.context.preferences.filepaths.save_version=0;bpy.data.libraries.write(str(folder/'model.blend'),{bpy.context.scene},fake_user=False,compress=True)
   manifest={'schema':'protected-body-lod.v1','id':tag,'rules':version,'gender':args.gender,'source_blend_sha256':sha(args.blend),'source_controller_sha256':sha(args.controller),'extra_protected_sha256':sha(args.extra_protected) if args.extra_protected else None,'source_vertices':len(co),'vertices':len(ids),'triangles':len(faces),'protected_vertices':int(protected.sum()),'protected_source_indices_and_connectivity_exact':True,'deformed_coordinates_exact':False,'correspondence':'source-vertex-subset','method':args.method,'rounds_or_angle':angle,'surface_rounds':args.rounds if args.method=='surface' else None,'exact_source_control_graph':bool(full_reference),'source_control_math_remains_full_resolution':bool(full_reference),'neutral_fingers':'identity matrix_basis','hand_policy':args.hand_policy,'preview_vertices':len(preview.data.vertices),'preview_projection_p999_mm':float(np.percentile(projection_distance,99.9)*1000),'bones':len(a.data.bones),'body_shape_keys':len(ds),'total_shape_keys':len(n.data.shape_keys.key_blocks),'controls':len(c.FIELDS),'psd_keys':len([k for k in n.data.shape_keys.key_blocks if k.name.startswith('PSD_')]),'uv_source':'approved FBX corner UVs; seam-delimited transfer; fresh candidate skin hashes','promotion':'candidate-only; human signoff and skin certification required','files':{p.name:sha(p) for p in folder.iterdir() if p.is_file()}}
-  if args.method in ('surface','qem'):
-   manifest.update(surface_profile=args.surface_profile,hand_smoothing_graph_frozen=args.surface_profile=='hands-body-v4',other_tolerance_mm=args.other_tolerance_mm if args.surface_profile=='hands-body-v4' else angle,region_definition='disjoint dominant original bone; fixed source IDs',source_region_vertices=region_counts(source_regions),region_vertices=region_counts(source_regions,ids))
+  if args.method in ('surface','qem','body'):
+   manifest.update(surface_profile=args.surface_profile,hand_smoothing_graph_frozen=args.surface_profile in ('hands-body-v4','hands-body-v5'),other_tolerance_mm=args.other_tolerance_mm if args.surface_profile in ('hands-body-v4','hands-body-v5') else angle,region_definition='disjoint dominant original bone; fixed source IDs',source_region_vertices=region_counts(source_regions),region_vertices=region_counts(source_regions,ids))
   if mapping is not None:
    manifest.update(correspondence='source-triangle frame embedding; protected vertices one-hot',qem=projection_cache[angle][2])
    manifest['region_vertices']=region_counts(region_labels(original_source['names'],mapping.linear(original_source['W'])))
+  if body_plan is not None:
+   region_mass=mapping.linear(np.eye(len(REGIONS))[source_regions]);manifest['region_vertices']=region_counts(np.argmax(region_mass,axis=1))
+   manifest.update(protected_source_indices_and_connectivity_exact=False,protected_source_indices_exact=True,frozen_graph_connectivity_exact=True,region_definition='dominant immutable source-region mass; original source regions are dominant bones',correspondence='fixed sparse affine source map; non-body and full hand graph one-hot',body_retopology={'seed_blend_sha256':body_plan[5]['files']['model.blend'],'plan_sha256':sha(args.topology_plan),'exclusive_vertex_limit':93038,'strategy':'body UV seams and joint anchors pinned; non-body/full-hand graph frozen'})
   if args.keep_indices:manifest.update(required_surface_support=len(np.flatnonzero(keep)),required_surface_support_sha256=sha(args.keep_indices))
   manifest['cost_ordered_removal']=args.cost_order
   (folder/'manifest.json').write_text(json.dumps(manifest,indent=2));print('BUILT',tag,len(ids),flush=True)
@@ -258,4 +273,4 @@ def main(args):
   m['standin_studio_mesh']=True
 
 if __name__=='__main__':
- ap=argparse.ArgumentParser();ap.add_argument('--method',choices=['planar','local','surface','qem'],default='local');ap.add_argument('--qem-ratio',type=float,nargs='+',default=[.68,.65]);ap.add_argument('--cost-order',action='store_true');ap.add_argument('--keep-indices');ap.add_argument('--variant-suffix',default='');ap.add_argument('--surface-profile',choices=['v3','hands-body-v4'],default='v3');ap.add_argument('--other-tolerance-mm',type=float,default=.25);ap.add_argument('--registry');ap.add_argument('--rounds',type=int,default=18);ap.add_argument('--tolerance-mm',type=float,nargs='+',default=[.15,.3]);ap.add_argument('--span-mm',type=float,default=30.);ap.add_argument('--extra-protected');ap.add_argument('--blend',required=True);ap.add_argument('--skin-uv',required=True);ap.add_argument('--controller',required=True);ap.add_argument('--gender',required=True);ap.add_argument('--hand-policy',choices=['frozen','articulated'],default='frozen');ap.add_argument('--out',required=True);main(ap.parse_args(sys.argv[sys.argv.index('--')+1:]))
+ ap=argparse.ArgumentParser();ap.add_argument('--method',choices=['planar','local','surface','qem','body'],default='local');ap.add_argument('--qem-ratio',type=float,nargs='+',default=[.68,.65]);ap.add_argument('--cost-order',action='store_true');ap.add_argument('--keep-indices');ap.add_argument('--variant-suffix',default='');ap.add_argument('--surface-profile',choices=['v3','hands-body-v4','hands-body-v5'],default='v3');ap.add_argument('--other-tolerance-mm',type=float,default=.25);ap.add_argument('--topology-plan');ap.add_argument('--topology-seed');ap.add_argument('--registry');ap.add_argument('--rounds',type=int,default=18);ap.add_argument('--tolerance-mm',type=float,nargs='+',default=[.15,.3]);ap.add_argument('--span-mm',type=float,default=30.);ap.add_argument('--extra-protected');ap.add_argument('--blend',required=True);ap.add_argument('--skin-uv',required=True);ap.add_argument('--controller',required=True);ap.add_argument('--gender',required=True);ap.add_argument('--hand-policy',choices=['frozen','articulated'],default='frozen');ap.add_argument('--out',required=True);main(ap.parse_args(sys.argv[sys.argv.index('--')+1:]))

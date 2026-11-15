@@ -1,6 +1,8 @@
 # Closed-fist graph preservation and further male body reduction
 
-This review supersedes v3 for the current fist/body work. The earlier v3 assets,
+The male selection is superseded by [v5: 93,000 vertices with the repaired fist preserved](BODY_TARGET_V5.md). The female selection remains unchanged.
+
+This historical review superseded v3 for the fist/body work. The earlier v3 assets,
 measurements and CSP evidence remain historical; they are not modified or used
 as certification of these new hashes. The production Converter is unchanged. **All twelve actual Converter final-fist
 pairs now pass the original correspondence gates and the new hand/body regional

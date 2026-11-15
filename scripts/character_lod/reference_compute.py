@@ -74,7 +74,12 @@ def compute(c, scene=None):
     reference, ids, bary, offsets = _lod_reference(scene)
     result, weights, neutral = reference.compute(c, scene)
     def embed(values):
-        tri=values[ids];out=np.einsum('ni,nij->nj',bary,tri)
+        if ids.shape[1]<=3:
+            tri=values[ids];out=np.einsum('ni,nij->nj',bary,tri)
+        else:
+            out=np.zeros((len(ids),3))
+            for k in range(ids.shape[1]):
+                rows=np.flatnonzero(bary[:,k]);out[rows]+=values[ids[rows,k]]*bary[rows,k,None]
         if offsets.any():
             u=tri[:,1]-tri[:,0];v=tri[:,2]-tri[:,0];cross=np.cross(u,v)
             normal=cross/np.sqrt(np.maximum(np.linalg.norm(cross,axis=1),1e-30))[:,None]

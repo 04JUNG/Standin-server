@@ -65,7 +65,7 @@ def main(a):
   tag=folder.name;mapping=load_correspondence(folder);ids=mapping.indices[:,0];protected=set(np.load(folder/'protected-source.npy'));pidx=np.flatnonzero(mapping.exact_mask(list(protected)));cr={}
   if len(pidx)!=len(protected):raise ValueError('protected source correspondence is not exact and complete')
   meta=json.loads((folder/'manifest.json').read_text());body=None
-  if meta.get('surface_profile')=='hands-body-v4':
+  if meta.get('surface_profile') in ('hands-body-v4','hands-body-v5'):
    from scripts.character_lod.region_policy import REGIONS
    body=np.isin(np.load(folder/'source-regions.npy'),[REGIONS.index(x) for x in ('torso','arms','legs')])
   for cid,values in cases.items():

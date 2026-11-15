@@ -1,6 +1,8 @@
 # Latest-body protected mesh reduction — local review, 2026-11-14
 
-> Latest: [v4 closed-fist graph preservation and further male body reduction](HANDS_BODY_V4.md).
+> Latest: [v5 male 93,000 vertices with the repaired fist preserved](BODY_TARGET_V5.md).
+
+> Previous: [v4 closed-fist graph preservation and further male body reduction](HANDS_BODY_V4.md).
 
 > Historical follow-up: [neutral-hand fix and stronger 33.3% / 24.4% candidates](FOLLOWUP.md). The sections below preserve the first experiment and its limitations.
 

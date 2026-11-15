@@ -1,0 +1,41 @@
+{
+  "male-candidate-base-lod-body-v5-final-20261115": {
+    "character_sha256": "af407ec554b8c6a3fbf2bc67700fb4f1c45fe5d2ec24a94ea894a73ced7eb636",
+    "vertices": 93000,
+    "bones": 54,
+    "weights_sha256": "4d1e4deae6092b0ca375a0221827f485a684066afe16328fd18e65643f6f6ada",
+    "polygon_indices_sha256": "16dc8fc9281000cb38923a7015239393968ea6dbd8bc4d85c695b356f5809427",
+    "triangles_sha256": "7f1e7c238a5c57ee8bfb0d0515bd866522955539e6aa572b098f4d6e4785959c",
+    "uv": {
+      "path": "male-candidate-base-lod-body-v5-final-20261115-uv.json.gz",
+      "bytes": 6381424,
+      "sha256": "1d695d43e8af06f23bb6f77e76b549573f8092194ae74872665bd402c48239fa"
+    }
+  },
+  "male-candidate-preset-lod-body-v5-final-20261115": {
+    "character_sha256": "6d5aacf6582d17a57247a182d8fefdbb16da29bf7c8113e4919c42cb76af32fa",
+    "vertices": 93000,
+    "bones": 54,
+    "weights_sha256": "4d1e4deae6092b0ca375a0221827f485a684066afe16328fd18e65643f6f6ada",
+    "polygon_indices_sha256": "16dc8fc9281000cb38923a7015239393968ea6dbd8bc4d85c695b356f5809427",
+    "triangles_sha256": "7f1e7c238a5c57ee8bfb0d0515bd866522955539e6aa572b098f4d6e4785959c",
+    "uv": {
+      "path": "male-candidate-preset-lod-body-v5-final-20261115-uv.json.gz",
+      "bytes": 6381421,
+      "sha256": "89c78692e004066085fc23cb6633adbc0bf6393cc008d25b0d0bf36994277421"
+    }
+  },
+  "male-candidate-custom-lod-body-v5-final-20261115": {
+    "character_sha256": "3b1d9e69805a771b099652317bf5d8040b1e257c430fe24b2ce86e7bbe18ddc7",
+    "vertices": 93000,
+    "bones": 54,
+    "weights_sha256": "4d1e4deae6092b0ca375a0221827f485a684066afe16328fd18e65643f6f6ada",
+    "polygon_indices_sha256": "16dc8fc9281000cb38923a7015239393968ea6dbd8bc4d85c695b356f5809427",
+    "triangles_sha256": "7f1e7c238a5c57ee8bfb0d0515bd866522955539e6aa572b098f4d6e4785959c",
+    "uv": {
+      "path": "male-candidate-custom-lod-body-v5-final-20261115-uv.json.gz",
+      "bytes": 6381419,
+      "sha256": "4e6c56cbb21f9e9de6148064baf3f744424af6775e2e62e53397903e437b3ae4"
+    }
+  }
+}

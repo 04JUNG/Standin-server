@@ -1,0 +1,20 @@
+{
+  "blend_sha256": "fe427a686e9efe88b49b118e95249dec1a09b5ed6b705ca71b96d3c4a90e0c73",
+  "meshes": [
+    {
+      "name": "male-frozen-hands-body-93000-v5-final115",
+      "vertices": 93000,
+      "faces": 185996,
+      "users": 1
+    },
+    {
+      "name": "male-frozen-hands-body-93000-v5-final115.001",
+      "vertices": 50000,
+      "faces": 99996,
+      "users": 1
+    }
+  ],
+  "whole_mesh_vertex_limit": 93038,
+  "hidden_full_resolution_mesh": false,
+  "passed": true
+}

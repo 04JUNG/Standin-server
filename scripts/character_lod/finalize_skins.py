@@ -8,7 +8,7 @@ from converter.outline_worker import tree
 from converter.outline_fbx import one
 from converter.shape_bake import import_full_character
 from converter import retarget as rt
-p=argparse.ArgumentParser();p.add_argument('--package',required=True);p.add_argument('--male',required=True);p.add_argument('--female',required=True);a=p.parse_args(sys.argv[sys.argv.index('--')+1:]);out=Path(a.package);manifest=json.loads((out/'skin-assets.json').read_text());jobs=json.loads((out/'jobs.json').read_text());report={}
+p=argparse.ArgumentParser();p.add_argument('--package',required=True);p.add_argument('--male');p.add_argument('--female');a=p.parse_args(sys.argv[sys.argv.index('--')+1:]);out=Path(a.package);manifest=json.loads((out/'skin-assets.json').read_text());jobs=json.loads((out/'jobs.json').read_text());report={}
 for job in jobs:
  if job['variant']!='candidate':continue
  cid=job['character'];folder=Path(getattr(a,job['gender']));source=out/'fbx'/(cid+'.fbx');rt.reset_scene();arm,meshes=import_full_character(source);obj=meshes[0];faces=[list(p.vertices) for p in obj.data.polygons];uv=np.load(folder/'skin-uv.npy');assert uv.shape==(len(faces),3,2)

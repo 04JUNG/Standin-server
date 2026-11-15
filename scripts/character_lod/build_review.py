@@ -1,14 +1,14 @@
 """Self-contained HTML controls for real local FBX renders and measured evidence."""
 import argparse,json
 from pathlib import Path
-p=argparse.ArgumentParser();p.add_argument('--assets',required=True);a=p.parse_args();root=Path(a.assets);out=root/'review';rows=json.loads((out/'renders.json').read_text())
+p=argparse.ArgumentParser();p.add_argument('--gender',choices=('male','female'));p.add_argument('--assets',required=True);a=p.parse_args();root=Path(a.assets);out=root/'review';rows=json.loads((out/'renders.json').read_text())
 for r in rows:r['shape']='base'
 if (out/'shapes.json').exists():rows+=json.loads((out/'shapes.json').read_text())
 if (out/'converter-renders.json').exists():rows+=json.loads((out/'converter-renders.json').read_text())
 for r in rows:r['download']='/'+str(Path(r['file']).relative_to(root))
 quality={};candidates={}
 package=root/'delivery-package';registry=json.loads((package/'shape-bakes.host.json').read_text());jobs=json.loads((package/'jobs.json').read_text())
-for sex in ('male','female'):
+for sex in ((a.gender,) if a.gender else ('male','female')):
  cid=next(j['character'] for j in jobs if j['gender']==sex and j['variant']=='candidate' and j['case']=='base');source=registry['sources'][registry['characters'][cid]['rules']];folder=Path(source['blend']).parent;candidates[sex]=json.loads((folder/'manifest.json').read_text())
  qroot=root/('quality-'+sex+'-local')
  if not qroot.exists():qroot=root/('quality-'+sex)
@@ -23,6 +23,7 @@ function drawQuality(){let q=quality[$('gender').value],cs=Object.values(q.candi
 ['gender','shape','pose','skin','view'].forEach((id,i)=>$(id).onchange=()=>update(i));function mode(o){overlay=o;document.querySelector('.pair').style.display=o?'none':'grid';document.querySelector('.overlay').style.display=o?'block':'none';document.querySelector('.slider').style.display=o?'block':'none';$('side').classList.toggle('active',!o);$('wipe').classList.toggle('active',o)}$('side').onclick=()=>mode(false);$('wipe').onclick=()=>mode(true);$('range').oninput=()=>{let v=$('range').value;$('over').style.clipPath=`inset(0 ${100-v}% 0 0)`;document.querySelector('.line').style.left=v+'%'};$('toggle').onclick=()=>{mode(true);toggle=!toggle;$('range').value=toggle?0:100;$('range').oninput()};update();fetch('../benchmark/summary.json').then(r=>r.ok?r.json():Promise.reject()).then(d=>{$('timing').innerHTML='<table><tr><th>모델 / 조건</th><th>원본 중위(범위) 초</th><th>후보 중위(범위) 초</th><th>중위 감소율</th></tr>'+d.rows.map(r=>{let f=v=>v.successes?`${v.median.toFixed(2)} (${v.min.toFixed(2)}–${v.max.toFixed(2)})`:'측정 실패';return `<tr><td>${r.gender} / ${r.case} / ${labels[r.skin]}</td><td>${f(r.runs.original)}</td><td>${f(r.runs.candidate)}</td><td>${r.median_reduction_percent?.toFixed(1)??'—'}%</td></tr>`}).join('')+'</table><p>각 조건 n=3. 양수는 단축, 음수는 증가입니다. 범위가 겹치면 작은 차이를 확정적인 개선으로 해석하지 마세요.</p>'}).catch(()=>{});
 </script></html>'''
 for sex,old_count,old_percent in [('male','134,398','3.64%'),('female','102,233','3.03%')]:
+ if sex not in candidates:continue
  meta=candidates[sex];html=html.replace(old_count,format(meta['vertices'],','));html=html.replace(old_percent,f"{100*(1-meta['vertices']/meta['source_vertices']):.2f}%")
 if all(v['numeric_screen_pass'] for q in quality.values() for cs in q['candidates'].values() for v in cs.values()):
  html=html.replace('현재 후보도 추가 정밀 오차 화면을 모든 체형에서 통과한 것은 아니며 승인 전 원본을 유지합니다.','이번 후보는 전체 체형의 추가 정밀 오차 화면도 통과했습니다. 관통·미적 품질의 자동 보증은 아니며 승인 전 원본을 유지합니다.')
@@ -37,11 +38,30 @@ if (root/'benchmark/final-pairs.json').exists():
  html=html.replace('labels={base:',"labels={'converter-ob015':'실제 Converter · ob_015 + 주먹',base:")
  block="""function drawQuality(){if($('shape').value==='converter-ob015'){const ps=__FINAL_PAIRS__.filter(r=>r.gender===$('gender').value);$('quality').innerHTML='<p>실제 Converter 최종 주먹 · 손과 몸통·팔·다리 별도 검사</p><table><tr><th>조건 / 스킨</th><th>손 최대(mm)</th><th>대응 p99(mm)</th><th>몸통·팔·다리 표면 p99(mm)</th><th>판정</th></tr>'+ps.map(r=>`<tr><td>${r.case} / ${labels[r.skin]}</td><td>${r.hand_max_mm?.toFixed(4)??'—'}</td><td>${r.retained_world_p99_mm.toFixed(3)}</td><td>${r.body_surface_p99_mm?.toFixed(3)??'—'}</td><td class="${(r.numeric_screen_pass??r.additional_final_correspondence_screen_pass)?'':'warn'}">${(r.numeric_screen_pass??r.additional_final_correspondence_screen_pass)?'통과':'보류'}</td></tr>`).join('')+'</table>';return;}"""
  html=html.replace('function drawQuality(){',block.replace('__FINAL_PAIRS__',json.dumps(pairs)))
-if any(meta.get('surface_profile')=='hands-body-v4' for meta in candidates.values()):
+if any(meta.get('surface_profile') in ('hands-body-v4','hands-body-v5') for meta in candidates.values()):
  previous={'hands':36857,'feet':25659,'head_neck':2039,'arms':11461,'legs':6093,'torso':10929}
  current=candidates['male']['region_vertices'];labels_ko={'torso':'몸통','arms':'팔','legs':'다리','hands':'손','feet':'발','head_neck':'머리·목'}
  table='<section class="evidence" style="margin-bottom:18px"><b>남자 영역별 정점 수 · 이전 v3와 비교</b><p class="muted">최대 가중치 뼈를 기준으로 나눈 중복 없는 영역입니다. 손의 주먹 연결 구조를 복원했으므로 전체 정점 수와 몸통·팔·다리 감소량을 함께 확인하세요.</p><table><tr><th>영역</th><th>v3</th><th>v4</th><th>차이</th></tr>'+''.join(f'<tr><td>{labels_ko[key]}</td><td>{previous[key]:,}</td><td>{current[key]:,}</td><td>{current[key]-previous[key]:+,}</td></tr>' for key in ('torso','arms','legs','hands','feet','head_neck'))+'</table></section>'
  html=html.replace('<div class="controls">',table+'<div class="controls">')
  html=html.replace('이 화면은 실제 FBX 렌더를 사용합니다.','이 화면은 실제 FBX 렌더를 사용합니다. 새 후보 CSP 가져오기는 파일 선택창에서 열기가 비활성화되어 확인하지 못했습니다.')
  html=html.replace('v3 중립 손 / 확장 경량화','v4 주먹 보존 / 몸통·팔·다리 경량화').replace('2026.11.14 / V3','2026.11.15 / V4')
+if any(meta.get('surface_profile')=='hands-body-v5' for meta in candidates.values()):
+ pairs=json.loads((root/'benchmark/final-pairs.json').read_text())
+ if not all(r['numeric_screen_pass'] and r['vertices']<93038 and r['hand_max_mm']==0 for r in pairs):raise ValueError('whole-model target not passed')
+ current=candidates['male'];previous={'hands':51058,'feet':25667,'head_neck':2039,'arms':11134,'legs':5876,'torso':10017}
+ start=html.index('<section class="evidence" style="margin-bottom:18px">');end=html.index('</section>',start)+len('</section>')
+ names={'torso':'몸통','arms':'팔','legs':'다리','hands':'손','feet':'발','head_neck':'머리·목'}
+ table='<section class="evidence" style="margin-bottom:18px"><b>남자 전체 정점 목표: 93,038개 미만</b><p>이전 v4 105,791개 → 현재 '+format(current['vertices'],',')+'개. 손·발·머리의 정점과 손 연결 구조를 보존했습니다. 몸통은 원본 영역 대응 가중치로 분류합니다.</p><table><tr><th>영역</th><th>v4</th><th>v5</th><th>차이</th></tr>'+''.join(f'<tr><td>{names[k]}</td><td>{previous[k]:,}</td><td>{current["region_vertices"][k]:,}</td><td>{current["region_vertices"][k]-previous[k]:+,}</td></tr>' for k in ('torso','arms','legs','hands','feet','head_neck'))+'</table></section>'
+ html=html[:start]+table+html[end:]
+ html=html.replace('v4 주먹 보존 / 몸통·팔·다리 경량화','v5 주먹 유지 / 전체 93,038개 미만').replace('/ V4','/ V5')
+ html=html.replace('새 후보 CSP 가져오기는 파일 선택창에서 열기가 비활성화되어 확인하지 못했습니다.','이 후보의 CSP 가져오기는 아직 확인하지 않았습니다. 앞선 CSP 시도는 파일 선택창에서 열기가 비활성화되어 막혔습니다.')
+ html=html.replace('전체 20개 기본 프리셋','남자 9개 기본 프리셋').replace('+ 남녀 큰 커스텀','+ 큰 커스텀').replace('남녀 전체 프리셋','남자 전체 프리셋')
+ # This follow-up validates the changed male only; n=1 is functional evidence.
+ start=html.index('<details open><summary>동일 조건 성능 비교</summary>');end=html.index('</details>',start)+len('</details>')
+ html=html[:start]+'<details open><summary>실제 Converter 기능 검증</summary><p>기본형 / 프리셋 / 큰 커스텀 × 기본 / 살색 가이드선 × 원본 / 후보 = 12회. 최종 파일 6쌍 모두 손 최대 오차 0mm, 전체 정점 수 93,038개 미만, 몸통 표면 p99 0.5mm 이하를 확인했습니다. 이번 실행은 기능 검증이며 반복 성능 측정은 아닙니다.</p></details>'+html[end:]
+ start=html.index("fetch('../benchmark/summary.json')");end=html.index('.catch(()=>{});',start)+len('.catch(()=>{});');html=html[:start]+html[end:]
+ if a.gender=='male':
+  start=html.index('<div class="card muted">여성 정점 수');end=html.index('</div>',start)+len('</div>')
+  html=html[:start]+'<div class="card muted">이전 정점 예산<b>93,038개 미만 달성</b><span>최종 FBX 기준 · 손 최대 오차 0mm</span></div>'+html[end:]
+  html=html.replace('<option value="female">여성</option>','')
 html=html.replace('__RENDERS__',json.dumps(rows,ensure_ascii=False)).replace('__QUALITY__',json.dumps(quality,ensure_ascii=False));(out/'index.html').write_text(html);print(out/'index.html')

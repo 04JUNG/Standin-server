@@ -10,6 +10,7 @@ def main(a):
  out=Path(a.out);out.mkdir(parents=True,exist_ok=False);original=json.loads(Path(a.registry).read_text());r={'schema':'shape-bake.v2','sources':{},'characters':{}};jobs=[]
  root=Path(a.assets);sourceassets=Path(a.skin_assets);skins=json.loads((ROOT/'converter/skin_assets.v1.json').read_text());skins['models']={};skins['revision']='protected-'+a.identity_suffix;(out/'fbx').mkdir();(out/'skins').mkdir()
  for sex,ver,rules,stem in [('male','0-8-0','standin-body-0.8.0','standin-body-0-8-0'),('female','0-4-0','standin-female-body-0.4.0','standin-female-body-0-4-0')]:
+  if a.gender and sex!=a.gender:continue
   base=sex+'-base-v'+ver;quality=json.loads((root/('quality-'+sex)/'quality.json').read_text());selected=Path(getattr(a,sex)) if getattr(a,sex) else None
   for variant in ('original','candidate') if selected else ('original',):
    if variant=='original':folder=root/'originals';blend=folder/(stem+'.blend');controller=folder/(stem+'.py');version=rules
@@ -40,4 +41,4 @@ def main(a):
  write(out/'shape-bakes.json',r);write(out/'jobs.json',jobs);write(out/'skin-assets.json',skins)
  print('LOCAL_PACKAGE',out,len(jobs))
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--identity-suffix',default='lod-review-20261114');p.add_argument('--registry',required=True);p.add_argument('--assets',required=True);p.add_argument('--skin-assets',required=True);p.add_argument('--original-fbx',required=True);p.add_argument('--male');p.add_argument('--female');p.add_argument('--male-quality');p.add_argument('--female-quality');p.add_argument('--out',required=True);main(p.parse_args())
+ p=argparse.ArgumentParser();p.add_argument('--gender',choices=('male','female'));p.add_argument('--identity-suffix',default='lod-review-20261114');p.add_argument('--registry',required=True);p.add_argument('--assets',required=True);p.add_argument('--skin-assets',required=True);p.add_argument('--original-fbx',required=True);p.add_argument('--male');p.add_argument('--female');p.add_argument('--male-quality');p.add_argument('--female-quality');p.add_argument('--out',required=True);main(p.parse_args())

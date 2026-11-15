@@ -6,8 +6,8 @@ ROOT=Path(__file__).resolve().parents[2];sys.path.insert(0,str(ROOT))
 from scripts.character_lod.render_review import render
 from converter.shape_bake import import_full_character
 from converter import retarget as rt
-p=argparse.ArgumentParser();p.add_argument('--assets',required=True);a=p.parse_args(sys.argv[sys.argv.index('--')+1:]);root=Path(a.assets);review=root/'review';out=review/'converter-images';out.mkdir(exist_ok=False);rows=json.loads((root/'benchmark/results.json').read_text());skins=json.loads((root/'delivery-package/skin-assets.json').read_text());cameras={};renders=[]
-for sex in ('male','female'):
+p=argparse.ArgumentParser();p.add_argument('--gender',choices=('male','female'));p.add_argument('--assets',required=True);a=p.parse_args(sys.argv[sys.argv.index('--')+1:]);root=Path(a.assets);review=root/'review';out=review/'converter-images';out.mkdir(exist_ok=False);rows=json.loads((root/'benchmark/results.json').read_text());skins=json.loads((root/'delivery-package/skin-assets.json').read_text());cameras={};renders=[]
+for sex in ((a.gender,) if a.gender else ('male','female')):
  original=next(r for r in rows if r['gender']==sex and r['case']=='base' and r['skin']=='default' and r['variant']=='original' and r['trial']==0);rt.reset_scene();arm,meshes=import_full_character(original['file'].replace('/work',str(root),1))
  def head(name):return list(arm.matrix_world@arm.data.bones['mixamorig:'+name].head_local)
  cameras[sex]={'full':{'target':[0,0,.92],'offset':[0,-5,.15],'scale':2.15},'left_hand':{'target':head('LeftHandMiddle1'),'offset':[0,-5,1.4],'scale':.22},'right_hand':{'target':head('RightHandMiddle1'),'offset':[0,-5,1.4],'scale':.22}}

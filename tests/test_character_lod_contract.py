@@ -4,6 +4,33 @@ from pathlib import Path
 from scripts.character_lod.contract import require_hash,require_subset,require_paired_runs
 
 class CharacterLODContract(unittest.TestCase):
+    def test_whole_body_target_is_strict_and_keeps_zero_fist(self):
+        from scripts.character_lod.contract import body_target_pass
+        good=dict(vertices=93000,retained_world_p99_mm=.1,protected_max_mm=0.,hand_max_mm=0.,body_surface_p99_mm=.49)
+        self.assertTrue(body_target_pass(good))
+        for patch in [dict(vertices=True),dict(vertices=93000.),dict(vertices=93038),dict(vertices=105791),dict(hand_max_mm=.001),dict(body_surface_p99_mm=.501)]:
+            self.assertFalse(body_target_pass({**good,**patch}))
+        self.assertFalse(body_target_pass({}))
+
+    def test_body_plan_rejects_changed_hand_face_or_unfrozen_nonbody(self):
+        import numpy as np
+        from unittest.mock import patch
+        from scripts.character_lod.progressive_body import load_plan
+        from scripts.character_lod.contract import APPROVED
+        faces=np.array([[0,2,1],[0,1,3],[0,3,2],[1,2,3]])
+        uv=np.zeros((4,3,2));ids=np.arange(4)
+        seed=(ids,faces,uv,{'source_blend_sha256':APPROVED['male']['blend']})
+        data=dict(indices=ids[:,None],weights=np.ones((4,1)),faces=faces,uv=uv,protected=ids,graph=np.array([0,1]))
+        with tempfile.TemporaryDirectory() as tmp,patch('scripts.character_lod.progressive_body.read_seed',return_value=seed):
+            path=Path(tmp)/'plan.npz'
+            def run(payload):
+                np.savez(path,**payload)
+                return load_plan(path,'unused',np.zeros((4,3)),np.array([0,1,3,3]),np.array([True,False,False,False]))
+            run(data)
+            changed=faces.copy();changed[0]=changed[0,::-1]
+            for bad in ({**data,'faces':changed},{**data,'graph':np.array([0])},{**data,'graph':np.array([1])},{**data,'offsets':np.ones((4,3))}):
+                with self.assertRaises(ValueError):run(bad)
+
     def test_projection_is_fixed_normalized_and_protected_points_are_exact(self):
         import numpy as np
         from scripts.character_lod.correspondence import Correspondence
@@ -11,6 +38,8 @@ class CharacterLODContract(unittest.TestCase):
         values=np.array([[0.,0.,0.],[2.,0.,0.],[0.,2.,0.]])
         np.testing.assert_array_equal(mapping.apply(values),[[0,0,0],[.5,1,0]])
         self.assertEqual(mapping.exact_mask([0]).tolist(),[True,False])
+        wide=Correspondence([[0,1,2,0]],[[.1,.2,.3,.4]])
+        np.testing.assert_allclose(wide.linear(values),[[.4,.6,0.]])
         for bad in [[[1,0,0],[.5,.5,.5]],[[1,0,0],[-.1,.1,1]],[[1,0,0],[float('nan'),0,1]]]:
             with self.assertRaises(ValueError):Correspondence([[0,0,0],[0,1,2]],bad)
 

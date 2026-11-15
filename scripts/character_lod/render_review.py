@@ -36,7 +36,7 @@ def render(path,uv,png,sex,view,out):
 
 def main(a):
  package=Path(a.package);out=Path(a.out);out.mkdir(parents=True,exist_ok=a.resume);(out/'images').mkdir(exist_ok=a.resume);(out/'fbx').mkdir(exist_ok=a.resume);registry=json.loads((package/'shape-bakes.host.json').read_text());skinmanifest=json.loads((package/'skin-assets.json').read_text());jobs=json.loads((package/'jobs.json').read_text());rows=json.loads((out/'renders.json').read_text()) if a.resume and (out/'renders.json').exists() else [];cameras={}
- for sex in ('male','female'):
+ for sex in ((a.gender,) if a.gender else ('male','female')):
   for pname in ('neutral','hands','raised','deep'):
    for variant in ('original','candidate'):
     cid=next(j['character'] for j in jobs if j['gender']==sex and j['variant']==variant and j['case']=='base');recipe=registry['characters'][cid];source=registry['sources'][recipe['rules']];c=load(source['blend'],source['controller']);c.set_controls(preset_values(recipe),correct=False);co=pose(c,pname);m,arm=c.objects();bundle=c.export_fixed(str(out/'exports'),posed=True);fbx=bundle/'model.fbx';asset=skinmanifest['models'][cid];uv=json.loads(gzip.decompress((package/'skins'/asset['uv']['path']).read_bytes()))
@@ -56,4 +56,4 @@ def main(a):
      write(out/'renders.json',rows);print('REVIEW_RENDER',sex,variant,pname,skin,flush=True)
  write(out/'renders.json',rows)
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--resume',action='store_true');p.add_argument('--package',required=True);p.add_argument('--out',required=True);main(p.parse_args(sys.argv[sys.argv.index('--')+1:]))
+ p=argparse.ArgumentParser();p.add_argument('--gender',choices=('male','female'));p.add_argument('--resume',action='store_true');p.add_argument('--package',required=True);p.add_argument('--out',required=True);main(p.parse_args(sys.argv[sys.argv.index('--')+1:]))
