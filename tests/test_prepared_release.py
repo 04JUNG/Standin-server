@@ -6,7 +6,7 @@ import pytest
 
 from scripts.prepared_preset_scope import select, pinned_catalog
 from scripts.staging_body_assets_init import (check_budget, validate_files, install,
-    PREPARED_PROFILE, RELEASE_CAP, PREPARED_CAP)
+    PREPARED_PROFILE, RELEASE_CAP, PREPARED_CAP, LOD_PROFILE, LOD_RELEASE_CAP)
 from scripts.add_prepared_bodies_to_release import build
 from tests.converter.test_prepared_body import bundle, CHARACTER
 
@@ -30,6 +30,16 @@ def test_budget_extends_only_prepared_converter_files():
     with pytest.raises(ValueError): check_budget(files, 'unknown')
     with pytest.raises(ValueError): check_budget(files + [file('fbx/extra.fbx')], PREPARED_PROFILE)
 
+
+
+def test_lod_budget_preserves_history_with_bounded_new_sources_and_uvs():
+    base = [file(f'fbx/base-{n}.fbx', LOD_RELEASE_CAP//5) for n in range(5)]
+    files = base + pair()
+    validate_files(files)
+    assert check_budget(files, LOD_PROFILE) == LOD_RELEASE_CAP + PREPARED_CAP
+    for profile, role in ((None, 'converter'), (PREPARED_PROFILE, 'converter'), (LOD_PROFILE, 'bff'), (LOD_PROFILE, 'inference')):
+        with pytest.raises(ValueError): check_budget(files, profile, role)
+    with pytest.raises(ValueError): check_budget(files + [file('fbx/extra.fbx')], LOD_PROFILE)
 
 @pytest.mark.parametrize('change', ['unpaired', 'too-many', 'prepared-cap', 'roles', 'extension', 'receipt-size'])
 def test_budget_rejects_invalid_supplement(change):

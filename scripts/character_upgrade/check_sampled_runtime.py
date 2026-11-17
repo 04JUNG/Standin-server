@@ -17,6 +17,32 @@ import numpy as np
 BASIC_GUESS = ['height_cm', 'heads', 'physique', 'muscle', 'muscle_bulk', 'shoulders', 'fat_gain', 'breast_size']
 
 
+def catalog_controls(path, expected_sha256, header):
+    """Test every exposed preset over its actual, hash-pinned slider domain."""
+    raw = Path(path).read_bytes()
+    if hashlib.sha256(raw).hexdigest() != expected_sha256:
+        raise ValueError('published catalog checksum mismatch')
+    source = {'rules': header['rules'], **header['source']}
+    presets = {}
+    for asset in json.loads(raw)['assets']:
+        if asset.get('shapeSource') != source:
+            continue
+        name = asset['shapeRuntime']['preset']
+        controls = {('height_cm' if c['key'] == 'height' else c['key']):
+                    {'min': c['min'], 'max': c['max']} for c in asset['shape']['controls']}
+        if (name in presets or set(controls) != set(header['controls'])
+                or len(controls) != len(asset['shape']['controls'])):
+            raise ValueError('incomplete or duplicate published controls')
+        for key, bounds in controls.items():
+            allowed = header['controls'][key]
+            if not allowed['min'] <= bounds['min'] < bounds['max'] <= allowed['max']:
+                raise ValueError('published controls escape runtime domain')
+        presets[name] = controls
+    if set(presets) != set(header['presets']):
+        raise ValueError('published preset coverage differs from runtime')
+    return presets
+
+
 def read_ssr2(path):
     raw = Path(path).read_bytes()
     if raw[:4] != b'SSR2':
@@ -95,6 +121,8 @@ def main():
     ap.add_argument('--controller', required=True)
     ap.add_argument('--report', required=True)
     ap.add_argument('--control-spec', help='Published slider bounds; verify that subset explicitly')
+    ap.add_argument('--catalog', help='Published body-models.json with exact source/runtime bindings')
+    ap.add_argument('--catalog-sha256', help='Required approval pin with --catalog')
     ap.add_argument('--truncate-basis', type=int, default=0)
     ap.add_argument('--out')
     ap.add_argument('--few', type=int, default=12)
@@ -104,7 +132,10 @@ def main():
     ap.add_argument('--selection-cut-ratio', type=float, default=0, help='write/enable idw2 model blending (0 = keep header)')
     args = ap.parse_args(sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else None)
     header, arrays = read_ssr2(args.runtime)
+    if args.catalog and (args.control_spec or not args.catalog_sha256):
+        ap.error('--catalog requires --catalog-sha256 and excludes --control-spec')
     published = json.loads(Path(args.control_spec).read_text()) if args.control_spec else header['controls']
+    per_preset = catalog_controls(args.catalog, args.catalog_sha256, header) if args.catalog else None
     for key, path in (('blendSha256', args.blend), ('controllerSha256', args.controller)):
         if hashlib.sha256(Path(path).read_bytes()).hexdigest() != header['source'][key]:
             raise SystemExit(f'{path} is not the source this runtime was built from')
@@ -125,6 +156,7 @@ def main():
     basic = [k for k in BASIC_GUESS if k in sb.FIELDS]
     quality = {}
     for preset, values in header['presets'].items():
+        bounds = per_preset[preset] if per_preset else published
         per = {}
         compute = sb.preview_compute if hasattr(sb, 'preview_compute') else lambda c: sb.compute(c)[0]
         truth0 = compute(sb.normalize(values))
@@ -134,7 +166,7 @@ def main():
                 c = dict(values)
                 moved = keys if mode == 'all' else basic if mode == 'basic' else list(rng.choice(keys, int(rng.integers(2, 7)), replace=False))
                 for k in moved:
-                    lo, hi = published[k]['min'], published[k]['max']
+                    lo, hi = bounds[k]['min'], bounds[k]['max']
                     x = rng.uniform(lo, hi) if mode != 'few' else np.clip(values[k] + rng.normal(0, .3) * (hi - lo), lo, hi)
                     c[k] = float(np.round(x, 3))
                 truth = compute(sb.normalize(c))
@@ -144,9 +176,16 @@ def main():
                 if error > 5:
                     print('ERROR_CASE', mode, round(error, 2), 'vertex', int(errors.argmax()),
                           json.dumps({k:v for k,v in c.items() if v != values[k]}), flush=True)
-        quality[preset] = {'preset_mm': round(exact, 3), **{m: {'max_mm': round(max(v), 2), 'median_mm': round(float(np.median(v)), 2), 'p90_mm': round(float(np.percentile(v, 90)), 2), 'n': len(v)} for m, v in per.items()}}
+        # Gate on full precision; rounding near a limit can turn a failure into
+        # a pass. These are the measurements of the actual written float arrays.
+        quality[preset] = {'preset_mm': exact, **{m: {'max_mm': max(v), 'median_mm': float(np.median(v)), 'p90_mm': float(np.percentile(v, 90)), 'n': len(v)} for m, v in per.items()}}
         print('CHECK', preset, json.dumps(quality[preset]), flush=True)
-    report = {'runtime': args.runtime, 'rules': header['rules'], 'basis': K, 'seed': args.seed, 'quality': quality, 'publishedControls': published}
+    report = {'runtime': args.runtime, 'runtimeSha256': hashlib.sha256(Path(args.runtime).read_bytes()).hexdigest(),
+              'source': header['source'], 'rules': header['rules'], 'basis': K, 'seed': args.seed,
+              'quality': quality, 'publishedControls': published}
+    if per_preset:
+        report['publishedControls'] = per_preset
+        report['catalogSha256'] = args.catalog_sha256
     limits = {'preset_mm': .5, 'few': 5., 'basic': 10., 'all': 20.}
     report['limits_mm'] = limits
     report['passed'] = all(q['preset_mm'] <= limits['preset_mm'] and
