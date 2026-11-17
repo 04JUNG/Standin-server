@@ -1,0 +1,55 @@
+{
+  "started_utc": "2026-11-14T18:45:56.188236+00:00",
+  "image": "sha256:a4d731fe35682f3e97f2bbeb53e188c3f43fd2bdc3f6da6a89cedb41ab2c5fd6",
+  "platform": "linux/amd64",
+  "docker_vcpus": 15,
+  "docker_memory_bytes": 8318844928,
+  "groups": {
+    "male": {
+      "cpuset": "0-1",
+      "cpu_quota": 2,
+      "memory_bytes": 4294967296
+    },
+    "female": {
+      "cpuset": "2-3",
+      "cpu_quota": 2,
+      "memory_bytes": 4294967296
+    }
+  },
+  "policy": "parallel sex groups on disjoint CPU sets; alternate original/candidate; 3 fresh workers per variant/condition; all native rendering and source builds finished; functional smoke excluded",
+  "helper_sha256": {
+    "scripts/character_lod/repair.py": "7d62fb0b0229229129e98af66548d181eaca47cef84792476b1b8bfaa4346ce4",
+    "scripts/character_lod/render_shapes.py": "6711542ba73c9af89924599000ef7fe3a52b63cc29a2fa4e8d67b34854b15c31",
+    "scripts/character_lod/package.py": "fed84deb7541edd66f11afccb9531b5b6271a32788c5b8a4249cbad166cdc35a",
+    "scripts/character_lod/verify_neutral.py": "329fa95f0bc491d676f92001a6f8c363ee1b927cf3eb8eaaa041e884f53c7028",
+    "scripts/character_lod/build.py": "9acf66f58c0e37255cc8977306030f1eb1f2bab49943088897dc0a647b96f861",
+    "scripts/character_lod/region_metrics.py": "edeb1b1ed046f7e480e016510f1d38500c1381beeb44e0908a6865ca9d765416",
+    "scripts/character_lod/benchmark.py": "008eb9cbf893c10620522181ac13e0b5c40d6ac04d7433a16360880430c93cbe",
+    "scripts/character_lod/audit.py": "d8e5b87727a584f143e55e7e825610e45a6e94cfb2e657b85035c0589e9a47a5",
+    "scripts/character_lod/finalize_skins.py": "d9ba64ab80b512ae8e34a6dbcc7a3bb7873231509392beef2fe38ec2bdffb920",
+    "scripts/character_lod/qem_topology.py": "2a5244d278b66dc399d5743c47c8bd6869ba039e4e18d02324eba992e2b67bc1",
+    "scripts/character_lod/render_review.py": "756240c4bd6215d7680770baf36073956f28182b2073ee99631a550cafb7e213",
+    "scripts/character_lod/compact.py": "bb59bce98a1aaa7ad15c29ccf4e64e0e9470bb7e698e2aae0df376894b73b120",
+    "scripts/character_lod/export_delivery.py": "1d4ed629c5690284bc5a55b3937b9fcfd322ed21ed442089989a081ceff91f0d",
+    "scripts/character_lod/rebind_runtime.py": "0eed30888139b3ed8f74133e75f82bf771d79a1bce70f4b4521a4dfe39da27af",
+    "scripts/character_lod/sample_preset.py": "ee99fb815b7d77fec5832eb8f49043f50c7e07d65fd25dc2d0a6abf8c5c6a675",
+    "scripts/character_lod/runtime.py": "bd42774c4260ea68bf877497d3d37d01e7fbc3102af3948d393a18fdd19f271a",
+    "scripts/character_lod/delivery_manifest.py": "51e3f8f5c0a4301ae24fcf663deabf8eac2ae7e0252c9e66afb348e251bc9190",
+    "scripts/character_lod/repair_surface.py": "7f04746e19a8dc95681dec4f50fea4ef8f73da5d86d650d18b1f510db38d44d3",
+    "scripts/character_lod/probe_hands.py": "984837d47ea6387e6b34c2e34170d87146dc490b130dd56c8b06151bc4e1c19d",
+    "scripts/character_lod/pose_controls.py": "2415027577aadf6ad89850182642e86c73375a303eaf9ad369abfd8d57981403",
+    "scripts/character_lod/render_final_pairs.py": "48b853e249a2c4ab52356670975f7c1853962fb9fe33c9b626318eb7fd2098d0",
+    "scripts/character_lod/correspondence.py": "e962c4f73092fc8bae6c5d827d0b64599a7f70bef831b5024df2660815b40a1d",
+    "scripts/character_lod/surface_topology.py": "8f4a549084b8ab44d1f96f93ad52514e30b510e9c9b2af84ebbc00d7a3e825da",
+    "scripts/character_lod/region_policy.py": "8049c3b7f0dce1acadf4c5888c465f89576d0a33f03f7a0ad0a29c602565ef47",
+    "scripts/character_lod/compare_finals.py": "b0850bbddefedb208b1ac35247d0e97ef9b4840fc63546714a9bcd3a23a650ca",
+    "scripts/character_lod/reference_compute.py": "5abcf3782fb61d8745818e5587743acc6595b2f2a5881f56e3abea78a171a2d3",
+    "scripts/character_lod/contract.py": "2e52ca883550b18d9d12ddced1f389b53b9c71843dd7aff5e64f2be69619b531",
+    "scripts/character_lod/quality.py": "0ea89f2c3227893384ac9e57500e58c114b27e58e468f9a2293df2114c17221f",
+    "scripts/character_lod/build_review.py": "652b315d931f446c8f7f96534514a39caaf9313d75e3857a59448d754b2fa967",
+    "scripts/character_lod/bench_worker.py": "d812f712b22914537d6e0f21f569cecb87b80906454aa3913cefcd413b4fa7b5",
+    "scripts/character_lod/analyze.py": "5d447122d037e5d1d08113e428d1ff1c5b9c31299ac0b4f1f9dfd27abe78a1c3"
+  },
+  "finished_utc": "2026-11-14T19:11:36.144871+00:00",
+  "artifacts_reorganized_after_measurement": "Moved, not rewritten; SHA256 rechecked. file_ready_seconds measures the original per-group fsync path retained as measured_file."
+}

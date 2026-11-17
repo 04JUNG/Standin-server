@@ -1,0 +1,126 @@
+{
+  "male-protected-1": {
+    "male-base-v0-8-0": {
+      "error": null,
+      "numeric_screen_pass": true,
+      "max_retained_error_mm": 0.0,
+      "max_surface_p99_mm": 0.18992568948306643
+    },
+    "male-ideal83-v0-8-0": {
+      "error": null,
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": 1.2282919869034719,
+      "max_surface_p99_mm": 0.28135942993685736
+    },
+    "male-ideal70-v0-8-0": {
+      "error": null,
+      "numeric_screen_pass": true,
+      "max_retained_error_mm": 0.7420376724130826,
+      "max_surface_p99_mm": 0.2503868949133914
+    },
+    "male-toon64-v0-8-0": {
+      "error": null,
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": 1.143099763771461,
+      "max_surface_p99_mm": 0.2559533168096097
+    },
+    "male-muscular-v0-8-0": {
+      "error": null,
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": 3.9447142366415284,
+      "max_surface_p99_mm": 0.5839080200530625
+    },
+    "male-muscle-max-v0-8-0": {
+      "error": null,
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": 4.639740365976603,
+      "max_surface_p99_mm": 0.6693581934086991
+    },
+    "male-bulk-v0-8-0": {
+      "error": "\uae30\ud558 \uac80\uc99d \uc2e4\ud328: {\"degenerate_faces\":0,\"finite\":true,\"height_cm\":168.684899,\"reversed_faces\":269,\"sole_z_mm\":0.0}",
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": null,
+      "max_surface_p99_mm": null
+    },
+    "male-soft-v0-8-0": {
+      "error": null,
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": 6.14369841303495,
+      "max_surface_p99_mm": 0.7728447788394991
+    },
+    "male-fat-max-v0-8-0": {
+      "error": null,
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": 11.337080893457857,
+      "max_surface_p99_mm": 1.6888173297047901
+    },
+    "custom-large": {
+      "error": null,
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": 11.547693655236369,
+      "max_surface_p99_mm": 1.3736582361161807
+    }
+  },
+  "male-protected-7": {
+    "male-base-v0-8-0": {
+      "error": null,
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": 0.0,
+      "max_surface_p99_mm": 3.217314276844284
+    },
+    "male-ideal83-v0-8-0": {
+      "error": null,
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": 1.7441901308628933,
+      "max_surface_p99_mm": 3.999726194888356
+    },
+    "male-ideal70-v0-8-0": {
+      "error": null,
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": 1.090462763011095,
+      "max_surface_p99_mm": 3.8870875723660054
+    },
+    "male-toon64-v0-8-0": {
+      "error": null,
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": 1.5972878830046404,
+      "max_surface_p99_mm": 3.243838343769328
+    },
+    "male-muscular-v0-8-0": {
+      "error": "\uae30\ud558 \uac80\uc99d \uc2e4\ud328: {\"degenerate_faces\":0,\"finite\":true,\"height_cm\":168.684899,\"reversed_faces\":2,\"sole_z_mm\":0.0}",
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": null,
+      "max_surface_p99_mm": null
+    },
+    "male-muscle-max-v0-8-0": {
+      "error": "\uae30\ud558 \uac80\uc99d \uc2e4\ud328: {\"degenerate_faces\":0,\"finite\":true,\"height_cm\":168.684899,\"reversed_faces\":8,\"sole_z_mm\":0.0}",
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": null,
+      "max_surface_p99_mm": null
+    },
+    "male-bulk-v0-8-0": {
+      "error": "\uae30\ud558 \uac80\uc99d \uc2e4\ud328: {\"degenerate_faces\":0,\"finite\":true,\"height_cm\":168.684899,\"reversed_faces\":139,\"sole_z_mm\":0.0}",
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": null,
+      "max_surface_p99_mm": null
+    },
+    "male-soft-v0-8-0": {
+      "error": null,
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": 8.941513805296365,
+      "max_surface_p99_mm": 6.018229853361847
+    },
+    "male-fat-max-v0-8-0": {
+      "error": "\uae30\ud558 \uac80\uc99d \uc2e4\ud328: {\"degenerate_faces\":0,\"finite\":true,\"height_cm\":166.84698890641792,\"reversed_faces\":126,\"sole_z_mm\":0.0}",
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": null,
+      "max_surface_p99_mm": null
+    },
+    "custom-large": {
+      "error": "\uae30\ud558 \uac80\uc99d \uc2e4\ud328: {\"degenerate_faces\":0,\"finite\":true,\"height_cm\":190.0,\"reversed_faces\":202,\"sole_z_mm\":0.0}",
+      "numeric_screen_pass": false,
+      "max_retained_error_mm": null,
+      "max_surface_p99_mm": null
+    }
+  }
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "name": "standin-body-0-8-0.blend",
+    "sha256": "a03550749315592c543eeda66a183fe4116380f2068b412105f751c7b2e9c39a",
+    "bytes": 90244658
+  },
+  {
+    "name": "standin-body-0-8-0.py",
+    "sha256": "bcdabb7d69534f08400dfbd8a91a52ddc01528428332d4f14d4ad6792a7af8da",
+    "bytes": 199131
+  },
+  {
+    "name": "standin-female-body-0-4-0.py",
+    "sha256": "1164dff9a4c6069d0da37b80dd26c61544bc6f9eb9c9f3469c33d457e893e9af",
+    "bytes": 148685
+  },
+  {
+    "name": "male-base-v0-8-0.fbx",
+    "sha256": "705035f1bd247b3bf63a6d293065a5a39390b2d228df559474f9dc6682bf8c43",
+    "bytes": 9063180
+  },
+  {
+    "name": "standin-female-body-0-4-0.blend",
+    "sha256": "5a62d2f3fb49d77fdc04d1c78a361edf9fbab55e71e0e47d3b6b393fae14d3a9",
+    "bytes": 80044756
+  },
+  {
+    "name": "female-base-v0-4-0.fbx",
+    "sha256": "ffd7b57d6ebba06299be252976b511afe5684a237e6f7d440bb90b2ba20f0c33",
+    "bytes": 6706764
+  }
+]

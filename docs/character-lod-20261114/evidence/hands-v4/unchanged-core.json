@@ -1,0 +1,8 @@
+{
+  "converter/worker.py": "3f63585b128e4a130a19344ca24a63f08fecb3a68604745a99f9b88eb44a27db",
+  "converter/shape_bake.py": "d599d80a7df8853e844abfc0fb617f735fa1e0a18948960862e2948908160c54",
+  "converter/retarget.py": "96831e315a99ace3cf7121dd315c49e8dbe2f4e98beed6d2633abb57e1d0b6cd",
+  "converter/hand_rig.py": "a439dbb14253a6499df9cb5b6f44660016448c2dd41615c9ad5f5364f72faeea",
+  "converter/skin_fbx.py": "59a37984fdd9546be05cc7c2f9ca100f5bc9b673a7bf10b8b3c654d5bbc49ba4",
+  "converter/skin_assets.v1.json": "f4d37bf100dcdec1de5c115d06fa68b30d3213d864d95e540c2d6bbc3676d265"
+}

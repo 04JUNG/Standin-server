@@ -1,0 +1,1400 @@
+[
+  {
+    "gender": "male",
+    "case": "base",
+    "skin": "default",
+    "vertices": 93000,
+    "correspondence": "projected source triangles",
+    "retained_world_max_mm": 0.6039725146249811,
+    "retained_world_p99_mm": 0.01816194928632887,
+    "retained_world_mean_mm": 0.0007207597351229084,
+    "protected_max_mm": 0.0,
+    "hand_max_mm": 0.0,
+    "rig_head_max_mm": 0.0,
+    "bone_regions": {
+      "mixamorig:Hips": {
+        "max_mm": 0.03131042816732955,
+        "p99_mm": 0.020047650685846286
+      },
+      "mixamorig:Spine": {
+        "max_mm": 0.05712893957458395,
+        "p99_mm": 0.024233794138110012
+      },
+      "mixamorig:Spine1": {
+        "max_mm": 0.057672927625085,
+        "p99_mm": 0.03354643817268297
+      },
+      "mixamorig:Spine2": {
+        "max_mm": 0.11542907026575558,
+        "p99_mm": 0.04015366988285299
+      },
+      "mixamorig:Neck": {
+        "max_mm": 0.009001973321664516,
+        "p99_mm": 0.0036367824377486887
+      },
+      "mixamorig:Head": {
+        "max_mm": 0.0052861380239828054,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftShoulder": {
+        "max_mm": 0.06792448968916634,
+        "p99_mm": 0.0555201157007124
+      },
+      "mixamorig:LeftArm": {
+        "max_mm": 0.6039725146249811,
+        "p99_mm": 0.14114803277145416
+      },
+      "mixamorig:LeftForeArm": {
+        "max_mm": 0.6039725146249811,
+        "p99_mm": 0.14795938117742907
+      },
+      "mixamorig:LeftHand": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandThumb1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandThumb2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandThumb3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandIndex1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandIndex2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandIndex3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandMiddle1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandMiddle2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandMiddle3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandRing1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandRing2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandRing3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandPinky1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandPinky2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandPinky3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightShoulder": {
+        "max_mm": 0.16967417926133382,
+        "p99_mm": 0.08387713810845285
+      },
+      "mixamorig:RightArm": {
+        "max_mm": 0.2267071009731392,
+        "p99_mm": 0.0920002968737779
+      },
+      "mixamorig:RightForeArm": {
+        "max_mm": 0.2267071009731392,
+        "p99_mm": 0.06828306503502639
+      },
+      "mixamorig:RightHand": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandThumb1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandThumb2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandThumb3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandIndex1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandIndex2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandIndex3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandMiddle1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandMiddle2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandMiddle3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandRing1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandRing2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandRing3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandPinky1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandPinky2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandPinky3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftUpLeg": {
+        "max_mm": 0.31512495401889196,
+        "p99_mm": 0.10306982586605294
+      },
+      "mixamorig:LeftLeg": {
+        "max_mm": 0.31512495401889196,
+        "p99_mm": 0.12703239712524775
+      },
+      "mixamorig:LeftFoot": {
+        "max_mm": 0.09590371860448356,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftToeBase": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightUpLeg": {
+        "max_mm": 0.03833888152597131,
+        "p99_mm": 0.022898285626986026
+      },
+      "mixamorig:RightLeg": {
+        "max_mm": 0.08051951908770255,
+        "p99_mm": 0.034513888294145915
+      },
+      "mixamorig:RightFoot": {
+        "max_mm": 0.03986068684779396,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightToeBase": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      }
+    },
+    "body_source_to_candidate": {
+      "sample_count": 13070,
+      "max_mm": 3.25381918810308,
+      "p99_mm": 0.46120488666929293,
+      "mean_mm": 0.09973612256483087
+    },
+    "body_surface_p99_mm": 0.46120488666929293,
+    "additional_final_correspondence_screen_pass": true,
+    "whole_mesh_target_pass": true,
+    "numeric_screen_pass": true
+  },
+  {
+    "gender": "male",
+    "case": "base",
+    "skin": "flesh-guide",
+    "vertices": 93000,
+    "correspondence": "projected source triangles",
+    "retained_world_max_mm": 0.6039725146249811,
+    "retained_world_p99_mm": 0.01816194928632887,
+    "retained_world_mean_mm": 0.0007207597351229084,
+    "protected_max_mm": 0.0,
+    "hand_max_mm": 0.0,
+    "rig_head_max_mm": 0.0,
+    "bone_regions": {
+      "mixamorig:Hips": {
+        "max_mm": 0.03131042816732955,
+        "p99_mm": 0.020047650685846286
+      },
+      "mixamorig:Spine": {
+        "max_mm": 0.05712893957458395,
+        "p99_mm": 0.024233794138110012
+      },
+      "mixamorig:Spine1": {
+        "max_mm": 0.057672927625085,
+        "p99_mm": 0.03354643817268297
+      },
+      "mixamorig:Spine2": {
+        "max_mm": 0.11542907026575558,
+        "p99_mm": 0.04015366988285299
+      },
+      "mixamorig:Neck": {
+        "max_mm": 0.009001973321664516,
+        "p99_mm": 0.0036367824377486887
+      },
+      "mixamorig:Head": {
+        "max_mm": 0.0052861380239828054,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftShoulder": {
+        "max_mm": 0.06792448968916634,
+        "p99_mm": 0.0555201157007124
+      },
+      "mixamorig:LeftArm": {
+        "max_mm": 0.6039725146249811,
+        "p99_mm": 0.14114803277145416
+      },
+      "mixamorig:LeftForeArm": {
+        "max_mm": 0.6039725146249811,
+        "p99_mm": 0.14795938117742907
+      },
+      "mixamorig:LeftHand": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandThumb1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandThumb2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandThumb3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandIndex1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandIndex2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandIndex3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandMiddle1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandMiddle2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandMiddle3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandRing1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandRing2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandRing3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandPinky1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandPinky2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandPinky3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightShoulder": {
+        "max_mm": 0.16967417926133382,
+        "p99_mm": 0.08387713810845285
+      },
+      "mixamorig:RightArm": {
+        "max_mm": 0.2267071009731392,
+        "p99_mm": 0.0920002968737779
+      },
+      "mixamorig:RightForeArm": {
+        "max_mm": 0.2267071009731392,
+        "p99_mm": 0.06828306503502639
+      },
+      "mixamorig:RightHand": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandThumb1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandThumb2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandThumb3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandIndex1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandIndex2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandIndex3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandMiddle1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandMiddle2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandMiddle3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandRing1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandRing2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandRing3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandPinky1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandPinky2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandPinky3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftUpLeg": {
+        "max_mm": 0.31512495401889196,
+        "p99_mm": 0.10306982586605294
+      },
+      "mixamorig:LeftLeg": {
+        "max_mm": 0.31512495401889196,
+        "p99_mm": 0.12703239712524775
+      },
+      "mixamorig:LeftFoot": {
+        "max_mm": 0.09590371860448356,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftToeBase": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightUpLeg": {
+        "max_mm": 0.03833888152597131,
+        "p99_mm": 0.022898285626986026
+      },
+      "mixamorig:RightLeg": {
+        "max_mm": 0.08051951908770255,
+        "p99_mm": 0.034513888294145915
+      },
+      "mixamorig:RightFoot": {
+        "max_mm": 0.03986068684779396,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightToeBase": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      }
+    },
+    "body_source_to_candidate": {
+      "sample_count": 13070,
+      "max_mm": 3.25381918810308,
+      "p99_mm": 0.46120488666929293,
+      "mean_mm": 0.09973612256483087
+    },
+    "body_surface_p99_mm": 0.46120488666929293,
+    "additional_final_correspondence_screen_pass": true,
+    "whole_mesh_target_pass": true,
+    "numeric_screen_pass": true
+  },
+  {
+    "gender": "male",
+    "case": "preset",
+    "skin": "default",
+    "vertices": 93000,
+    "correspondence": "projected source triangles",
+    "retained_world_max_mm": 0.6016746069567963,
+    "retained_world_p99_mm": 0.021042412113711353,
+    "retained_world_mean_mm": 0.0008201746024844277,
+    "protected_max_mm": 0.0,
+    "hand_max_mm": 0.0,
+    "rig_head_max_mm": 0.0,
+    "bone_regions": {
+      "mixamorig:Hips": {
+        "max_mm": 0.047144000136210194,
+        "p99_mm": 0.023293952711699765
+      },
+      "mixamorig:Spine": {
+        "max_mm": 0.08189146263044875,
+        "p99_mm": 0.03383558001644565
+      },
+      "mixamorig:Spine1": {
+        "max_mm": 0.08340957814807795,
+        "p99_mm": 0.045889968445341496
+      },
+      "mixamorig:Spine2": {
+        "max_mm": 0.12936425348617997,
+        "p99_mm": 0.050134224839117586
+      },
+      "mixamorig:Neck": {
+        "max_mm": 0.01268872140543046,
+        "p99_mm": 0.005246744930896904
+      },
+      "mixamorig:Head": {
+        "max_mm": 0.01268872140543046,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftShoulder": {
+        "max_mm": 0.07356122429075418,
+        "p99_mm": 0.05821508037863166
+      },
+      "mixamorig:LeftArm": {
+        "max_mm": 0.6016746069567963,
+        "p99_mm": 0.140113940293959
+      },
+      "mixamorig:LeftForeArm": {
+        "max_mm": 0.6016746069567963,
+        "p99_mm": 0.14720594623106137
+      },
+      "mixamorig:LeftHand": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandThumb1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandThumb2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandThumb3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandIndex1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandIndex2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandIndex3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandMiddle1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandMiddle2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandMiddle3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandRing1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandRing2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandRing3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandPinky1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandPinky2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandPinky3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightShoulder": {
+        "max_mm": 0.16403310498829415,
+        "p99_mm": 0.0878928442376326
+      },
+      "mixamorig:RightArm": {
+        "max_mm": 0.22411952475450425,
+        "p99_mm": 0.09410682776235274
+      },
+      "mixamorig:RightForeArm": {
+        "max_mm": 0.22411952475450425,
+        "p99_mm": 0.06768748259522996
+      },
+      "mixamorig:RightHand": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandThumb1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandThumb2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandThumb3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandIndex1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandIndex2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandIndex3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandMiddle1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandMiddle2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandMiddle3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandRing1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandRing2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandRing3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandPinky1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandPinky2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandPinky3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftUpLeg": {
+        "max_mm": 0.3288600658998849,
+        "p99_mm": 0.10640080770439742
+      },
+      "mixamorig:LeftLeg": {
+        "max_mm": 0.3288600658998849,
+        "p99_mm": 0.13324771704255292
+      },
+      "mixamorig:LeftFoot": {
+        "max_mm": 0.09585787308570255,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftToeBase": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightUpLeg": {
+        "max_mm": 0.04130813059846003,
+        "p99_mm": 0.024536932350638623
+      },
+      "mixamorig:RightLeg": {
+        "max_mm": 0.0869584523190674,
+        "p99_mm": 0.037438860121513734
+      },
+      "mixamorig:RightFoot": {
+        "max_mm": 0.03984360423021879,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightToeBase": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      }
+    },
+    "body_source_to_candidate": {
+      "sample_count": 13070,
+      "max_mm": 3.147260984405875,
+      "p99_mm": 0.4449068545363843,
+      "mean_mm": 0.09869830211283848
+    },
+    "body_surface_p99_mm": 0.4449068545363843,
+    "additional_final_correspondence_screen_pass": true,
+    "whole_mesh_target_pass": true,
+    "numeric_screen_pass": true
+  },
+  {
+    "gender": "male",
+    "case": "preset",
+    "skin": "flesh-guide",
+    "vertices": 93000,
+    "correspondence": "projected source triangles",
+    "retained_world_max_mm": 0.6016746069567963,
+    "retained_world_p99_mm": 0.021042412113711353,
+    "retained_world_mean_mm": 0.0008201746024844277,
+    "protected_max_mm": 0.0,
+    "hand_max_mm": 0.0,
+    "rig_head_max_mm": 0.0,
+    "bone_regions": {
+      "mixamorig:Hips": {
+        "max_mm": 0.047144000136210194,
+        "p99_mm": 0.023293952711699765
+      },
+      "mixamorig:Spine": {
+        "max_mm": 0.08189146263044875,
+        "p99_mm": 0.03383558001644565
+      },
+      "mixamorig:Spine1": {
+        "max_mm": 0.08340957814807795,
+        "p99_mm": 0.045889968445341496
+      },
+      "mixamorig:Spine2": {
+        "max_mm": 0.12936425348617997,
+        "p99_mm": 0.050134224839117586
+      },
+      "mixamorig:Neck": {
+        "max_mm": 0.01268872140543046,
+        "p99_mm": 0.005246744930896904
+      },
+      "mixamorig:Head": {
+        "max_mm": 0.01268872140543046,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftShoulder": {
+        "max_mm": 0.07356122429075418,
+        "p99_mm": 0.05821508037863166
+      },
+      "mixamorig:LeftArm": {
+        "max_mm": 0.6016746069567963,
+        "p99_mm": 0.140113940293959
+      },
+      "mixamorig:LeftForeArm": {
+        "max_mm": 0.6016746069567963,
+        "p99_mm": 0.14720594623106137
+      },
+      "mixamorig:LeftHand": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandThumb1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandThumb2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandThumb3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandIndex1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandIndex2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandIndex3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandMiddle1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandMiddle2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandMiddle3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandRing1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandRing2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandRing3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandPinky1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandPinky2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandPinky3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightShoulder": {
+        "max_mm": 0.16403310498829415,
+        "p99_mm": 0.0878928442376326
+      },
+      "mixamorig:RightArm": {
+        "max_mm": 0.22411952475450425,
+        "p99_mm": 0.09410682776235274
+      },
+      "mixamorig:RightForeArm": {
+        "max_mm": 0.22411952475450425,
+        "p99_mm": 0.06768748259522996
+      },
+      "mixamorig:RightHand": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandThumb1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandThumb2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandThumb3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandIndex1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandIndex2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandIndex3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandMiddle1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandMiddle2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandMiddle3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandRing1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandRing2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandRing3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandPinky1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandPinky2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandPinky3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftUpLeg": {
+        "max_mm": 0.3288600658998849,
+        "p99_mm": 0.10640080770439742
+      },
+      "mixamorig:LeftLeg": {
+        "max_mm": 0.3288600658998849,
+        "p99_mm": 0.13324771704255292
+      },
+      "mixamorig:LeftFoot": {
+        "max_mm": 0.09585787308570255,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftToeBase": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightUpLeg": {
+        "max_mm": 0.04130813059846003,
+        "p99_mm": 0.024536932350638623
+      },
+      "mixamorig:RightLeg": {
+        "max_mm": 0.0869584523190674,
+        "p99_mm": 0.037438860121513734
+      },
+      "mixamorig:RightFoot": {
+        "max_mm": 0.03984360423021879,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightToeBase": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      }
+    },
+    "body_source_to_candidate": {
+      "sample_count": 13070,
+      "max_mm": 3.147260984405875,
+      "p99_mm": 0.4449068545363843,
+      "mean_mm": 0.09869830211283848
+    },
+    "body_surface_p99_mm": 0.4449068545363843,
+    "additional_final_correspondence_screen_pass": true,
+    "whole_mesh_target_pass": true,
+    "numeric_screen_pass": true
+  },
+  {
+    "gender": "male",
+    "case": "custom",
+    "skin": "default",
+    "vertices": 93000,
+    "correspondence": "projected source triangles",
+    "retained_world_max_mm": 0.6722839130559537,
+    "retained_world_p99_mm": 0.023857602136276187,
+    "retained_world_mean_mm": 0.0009350772651319078,
+    "protected_max_mm": 0.0,
+    "hand_max_mm": 0.0,
+    "rig_head_max_mm": 0.0,
+    "bone_regions": {
+      "mixamorig:Hips": {
+        "max_mm": 0.04824547868658337,
+        "p99_mm": 0.02759484209173078
+      },
+      "mixamorig:Spine": {
+        "max_mm": 0.11357004428804147,
+        "p99_mm": 0.046859221909829114
+      },
+      "mixamorig:Spine1": {
+        "max_mm": 0.11791434358724388,
+        "p99_mm": 0.06143379949173508
+      },
+      "mixamorig:Spine2": {
+        "max_mm": 0.13724181814693692,
+        "p99_mm": 0.06034787400680004
+      },
+      "mixamorig:Neck": {
+        "max_mm": 0.05236839633723234,
+        "p99_mm": 0.014939901406494392
+      },
+      "mixamorig:Head": {
+        "max_mm": 0.035466738073182694,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftShoulder": {
+        "max_mm": 0.0883123801812482,
+        "p99_mm": 0.0640300309615554
+      },
+      "mixamorig:LeftArm": {
+        "max_mm": 0.6722839130559537,
+        "p99_mm": 0.1657868501857838
+      },
+      "mixamorig:LeftForeArm": {
+        "max_mm": 0.6722839130559537,
+        "p99_mm": 0.16968024149824829
+      },
+      "mixamorig:LeftHand": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandThumb1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandThumb2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandThumb3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandIndex1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandIndex2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandIndex3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandMiddle1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandMiddle2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandMiddle3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandRing1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandRing2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandRing3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandPinky1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandPinky2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandPinky3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightShoulder": {
+        "max_mm": 0.16286799444176647,
+        "p99_mm": 0.09468052303359523
+      },
+      "mixamorig:RightArm": {
+        "max_mm": 0.23368855242684275,
+        "p99_mm": 0.10238054172227479
+      },
+      "mixamorig:RightForeArm": {
+        "max_mm": 0.23368855242684275,
+        "p99_mm": 0.07552637841502503
+      },
+      "mixamorig:RightHand": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandThumb1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandThumb2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandThumb3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandIndex1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandIndex2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandIndex3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandMiddle1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandMiddle2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandMiddle3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandRing1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandRing2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandRing3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandPinky1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandPinky2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandPinky3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftUpLeg": {
+        "max_mm": 0.36036293512641254,
+        "p99_mm": 0.11974346551194551
+      },
+      "mixamorig:LeftLeg": {
+        "max_mm": 0.36036293512641254,
+        "p99_mm": 0.1454547118575803
+      },
+      "mixamorig:LeftFoot": {
+        "max_mm": 0.10685463988670399,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftToeBase": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightUpLeg": {
+        "max_mm": 0.04699614940435557,
+        "p99_mm": 0.02797150027797584
+      },
+      "mixamorig:RightLeg": {
+        "max_mm": 0.09442104703333416,
+        "p99_mm": 0.043239559693345475
+      },
+      "mixamorig:RightFoot": {
+        "max_mm": 0.051297990652094574,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightToeBase": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      }
+    },
+    "body_source_to_candidate": {
+      "sample_count": 13070,
+      "max_mm": 3.8182903081178665,
+      "p99_mm": 0.5751882196636868,
+      "mean_mm": 0.1370790515240267
+    },
+    "body_surface_p99_mm": 0.5751882196636868,
+    "additional_final_correspondence_screen_pass": false,
+    "whole_mesh_target_pass": false,
+    "numeric_screen_pass": false
+  },
+  {
+    "gender": "male",
+    "case": "custom",
+    "skin": "flesh-guide",
+    "vertices": 93000,
+    "correspondence": "projected source triangles",
+    "retained_world_max_mm": 0.6722839130559537,
+    "retained_world_p99_mm": 0.023857602136276187,
+    "retained_world_mean_mm": 0.0009350772651319078,
+    "protected_max_mm": 0.0,
+    "hand_max_mm": 0.0,
+    "rig_head_max_mm": 0.0,
+    "bone_regions": {
+      "mixamorig:Hips": {
+        "max_mm": 0.04824547868658337,
+        "p99_mm": 0.02759484209173078
+      },
+      "mixamorig:Spine": {
+        "max_mm": 0.11357004428804147,
+        "p99_mm": 0.046859221909829114
+      },
+      "mixamorig:Spine1": {
+        "max_mm": 0.11791434358724388,
+        "p99_mm": 0.06143379949173508
+      },
+      "mixamorig:Spine2": {
+        "max_mm": 0.13724181814693692,
+        "p99_mm": 0.06034787400680004
+      },
+      "mixamorig:Neck": {
+        "max_mm": 0.05236839633723234,
+        "p99_mm": 0.014939901406494392
+      },
+      "mixamorig:Head": {
+        "max_mm": 0.035466738073182694,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftShoulder": {
+        "max_mm": 0.0883123801812482,
+        "p99_mm": 0.0640300309615554
+      },
+      "mixamorig:LeftArm": {
+        "max_mm": 0.6722839130559537,
+        "p99_mm": 0.1657868501857838
+      },
+      "mixamorig:LeftForeArm": {
+        "max_mm": 0.6722839130559537,
+        "p99_mm": 0.16968024149824829
+      },
+      "mixamorig:LeftHand": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandThumb1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandThumb2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandThumb3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandIndex1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandIndex2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandIndex3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandMiddle1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandMiddle2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandMiddle3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandRing1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandRing2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandRing3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandPinky1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandPinky2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftHandPinky3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightShoulder": {
+        "max_mm": 0.16286799444176647,
+        "p99_mm": 0.09468052303359523
+      },
+      "mixamorig:RightArm": {
+        "max_mm": 0.23368855242684275,
+        "p99_mm": 0.10238054172227479
+      },
+      "mixamorig:RightForeArm": {
+        "max_mm": 0.23368855242684275,
+        "p99_mm": 0.07552637841502503
+      },
+      "mixamorig:RightHand": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandThumb1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandThumb2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandThumb3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandIndex1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandIndex2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandIndex3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandMiddle1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandMiddle2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandMiddle3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandRing1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandRing2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandRing3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandPinky1": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandPinky2": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightHandPinky3": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftUpLeg": {
+        "max_mm": 0.36036293512641254,
+        "p99_mm": 0.11974346551194551
+      },
+      "mixamorig:LeftLeg": {
+        "max_mm": 0.36036293512641254,
+        "p99_mm": 0.1454547118575803
+      },
+      "mixamorig:LeftFoot": {
+        "max_mm": 0.10685463988670399,
+        "p99_mm": 0.0
+      },
+      "mixamorig:LeftToeBase": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightUpLeg": {
+        "max_mm": 0.04699614940435557,
+        "p99_mm": 0.02797150027797584
+      },
+      "mixamorig:RightLeg": {
+        "max_mm": 0.09442104703333416,
+        "p99_mm": 0.043239559693345475
+      },
+      "mixamorig:RightFoot": {
+        "max_mm": 0.051297990652094574,
+        "p99_mm": 0.0
+      },
+      "mixamorig:RightToeBase": {
+        "max_mm": 0.0,
+        "p99_mm": 0.0
+      }
+    },
+    "body_source_to_candidate": {
+      "sample_count": 13070,
+      "max_mm": 3.8182903081178665,
+      "p99_mm": 0.5751882196636868,
+      "mean_mm": 0.1370790515240267
+    },
+    "body_surface_p99_mm": 0.5751882196636868,
+    "additional_final_correspondence_screen_pass": false,
+    "whole_mesh_target_pass": false,
+    "numeric_screen_pass": false
+  }
+]

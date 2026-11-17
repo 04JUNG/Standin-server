@@ -1,0 +1,132 @@
+{
+  "schema": "local-csp-manual-review.v1",
+  "date": "2026-11-14",
+  "app": "CLIP STUDIO PAINT EX",
+  "version": "5.1.1",
+  "platform": "macOS",
+  "license_mode": "trial; some features unavailable",
+  "base_delivery_manifest_sha256": "6565a25623cdf5a70ffbcfbb84f090904b585e9c4102767818b5cf1b077ab70e",
+  "checked_files": [
+    {
+      "case": "male-neutral",
+      "path": "delivery-package/fbx/male-candidate-base-lod-surface-v3-20261114.fbx",
+      "sha256": "3299e6ba63824b306e0cf963da95b03eab6d6b5690360b249cecfa658d5722bc",
+      "bytes": 6196012,
+      "canvas": "LOD-v3-male-neutral",
+      "import_display_pass": true,
+      "observed": "neutral fingers extended; camera orbit and 1600% detail observed; nails visible"
+    },
+    {
+      "case": "female-neutral-guide",
+      "path": "review/fbx/female-candidate-neutral-flesh-guide.fbx",
+      "sha256": "24b04f86909c0fe77012fffbe83e9990bf2854a8f4c7cbc3a7a836da22b82a73",
+      "bytes": 8574700,
+      "canvas": "LOD-v3-female-neutral-guide",
+      "import_display_pass": true,
+      "observed": "flesh and guide texture visible; front and oblique views"
+    },
+    {
+      "case": "male-converter-fist",
+      "path": "benchmark/male-candidate-base-lod-surface-v3-20261114-default-0.fbx",
+      "sha256": "22f591762c4b055025c1742dd79515cda162f4501bc91402ea09a64147a1c42f",
+      "bytes": 6204620,
+      "canvas": "LOD-v3-male-Converter-fist",
+      "import_display_pass": true,
+      "observed": "actual ob_015 output; left fist/right open; full and 800% detail"
+    },
+    {
+      "case": "female-converter-guide",
+      "path": "benchmark/female-candidate-base-lod-surface-v3-20261114-flesh-guide-0.fbx",
+      "sha256": "0f6b29e28c47c5ef683d0aa4b773f40af1495b7b59cdcb513b6a395365641162",
+      "bytes": 8583404,
+      "canvas": "LOD-v3-female-Converter-guide",
+      "import_display_pass": true,
+      "observed": "actual ob_015 output; skin/guide and fist visible; full and 800% detail"
+    },
+    {
+      "case": "female-original-guide",
+      "path": "benchmark/female-original-base-lod-surface-v3-20261114-flesh-guide-0.fbx",
+      "sha256": "6256b6ad0332337b621bbd3f102f7ed2165f6a3f05ecab77479d111a292cfa8e",
+      "bytes": 10782668,
+      "canvas": "ORIGINAL-female-Converter-guide",
+      "import_display_pass": true,
+      "observed": "original comparison; same default import view, 1000x768 canvas, 800% detail and anchor"
+    }
+  ],
+  "screenshots": [
+    {
+      "raw_path": "csp-review/female-converter-guide-detail.png",
+      "raw_sha256": "9ea52a3f57f75024a8476834e9cd934b75bb24f383ea986c6c444ff6e989a86d",
+      "review_image": "docs/character-lod-20261114/images/csp-v3/female-converter-guide-detail.jpg",
+      "review_sha256": "7ab5ca8850219210fc0b6a9386f1aa1bf55c26bb6d05656714ff3264791ad72b"
+    },
+    {
+      "raw_path": "csp-review/female-converter-guide-full.png",
+      "raw_sha256": "d66b90878fb2ee235d5d2ae82bd278cdf421fba15834452b3ff094f101434f48",
+      "review_image": "docs/character-lod-20261114/images/csp-v3/female-converter-guide-full.jpg",
+      "review_sha256": "d3d8810e5d131d1566acf36f18d17a87db3ada3536b23e04b27396bac3afacc8"
+    },
+    {
+      "raw_path": "csp-review/female-neutral-guide-full.png",
+      "raw_sha256": "c3c8713f3d3fb01949017439387baf363d6b01721b38d0a153ad3e01f36dbbc0",
+      "review_image": "docs/character-lod-20261114/images/csp-v3/female-neutral-guide-full.jpg",
+      "review_sha256": "87f9c94c4ea6772bb05d09514be43cd8e5d5d8dea2979b02d1fc6c9f5a865873"
+    },
+    {
+      "raw_path": "csp-review/female-neutral-guide-oblique.png",
+      "raw_sha256": "5534300030de164b03a74b86d5a9f91f14d06f7ecc76849a715805a385f1052f",
+      "review_image": "docs/character-lod-20261114/images/csp-v3/female-neutral-guide-oblique.jpg",
+      "review_sha256": "868f42f7abbc60122483b8407c8b4a861a5e7e8a1b84f41dea0d143f66069c3c"
+    },
+    {
+      "raw_path": "csp-review/female-original-guide-detail.png",
+      "raw_sha256": "8c0f1befcc0df60dcd090169aa001d82ac0a6d707e8dd5e9dc52741e4bd83b21",
+      "review_image": "docs/character-lod-20261114/images/csp-v3/female-original-guide-detail.jpg",
+      "review_sha256": "2363439f3bbf2e75f625acee1609186bd985e3f1f2a071433ce7ae893d0e856a"
+    },
+    {
+      "raw_path": "csp-review/female-original-guide-full.png",
+      "raw_sha256": "c2425ac5e7058b97d2746e78e0a492196f741b63a3bafb4e8641bb818fc319c1",
+      "review_image": "docs/character-lod-20261114/images/csp-v3/female-original-guide-full.jpg",
+      "review_sha256": "dbb3fde44a7b747c115f6c67493ab229aa55bec70bcc23ece23225d2d217c966"
+    },
+    {
+      "raw_path": "csp-review/final-candidate-visible.png",
+      "raw_sha256": "b4b99f952f73d541a5fb492f53624cb9e9b7f25e3aa8e363feea7934ea8f37f8",
+      "review_image": "docs/character-lod-20261114/images/csp-v3/final-candidate-visible.jpg",
+      "review_sha256": "091ba08f6ffe4fff7c8e475632dc22abdb06909fe087ceb74d1c985e2543ac26"
+    },
+    {
+      "raw_path": "csp-review/male-converter-fist-detail.png",
+      "raw_sha256": "ac77cc2082b1c3204da2f40c7a5d1c4b4a019d6b94a968bda6950b0b659cf3b0",
+      "review_image": "docs/character-lod-20261114/images/csp-v3/male-converter-fist-detail.jpg",
+      "review_sha256": "a7daefeccd552143c796732150d78737da1c3ff12b44aa76a515eb646f59a9fb"
+    },
+    {
+      "raw_path": "csp-review/male-converter-fist-full.png",
+      "raw_sha256": "38639847faba0aa6e0b5d2ec6bf1ce8edf65e0e8aeb931e5b68057add47a422d",
+      "review_image": "docs/character-lod-20261114/images/csp-v3/male-converter-fist-full.jpg",
+      "review_sha256": "bea1096a26a6d76008968a1ed401a3f6e147af846808426452526f1e5bc29a7f"
+    },
+    {
+      "raw_path": "csp-review/male-neutral-full.png",
+      "raw_sha256": "494c2aa601023eb775d59e436fc6e90c1f8727877771640bec4796cdc37487c0",
+      "review_image": "docs/character-lod-20261114/images/csp-v3/male-neutral-full.jpg",
+      "review_sha256": "663c1f13789e41151ea57dce57653e6d5dc4302ca2c71909925259ff9ee31b25"
+    },
+    {
+      "raw_path": "csp-review/male-neutral-left-hand.png",
+      "raw_sha256": "472da9c1f7cedfbc1f38caa0029e7e68d6a38e3b708212c05e4d97889e65e4ac",
+      "review_image": "docs/character-lod-20261114/images/csp-v3/male-neutral-left-hand.jpg",
+      "review_sha256": "a969fba8bad86542a3ac640913e2cf10975dd302b1c30b21a0327dfb3b633a31"
+    }
+  ],
+  "result": "five imports and representative display checks pass; neutral left-hand fix observed; final closed-fist numerical hold remains",
+  "limitations": [
+    "four candidate cases plus one original; not all presets or all six skins",
+    "no save/reopen check in trial mode",
+    "no arbitrary rig reposing or joint-limit certification",
+    "manual display success does not waive existing final-fist correspondence hold"
+  ],
+  "workspace_effects": "five separate unsaved review canvases; existing documents and input FBX files preserved; candidate female canvas left visible"
+}

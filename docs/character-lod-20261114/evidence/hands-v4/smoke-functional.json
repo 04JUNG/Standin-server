@@ -1,0 +1,9 @@
+{
+  "scope": "functional smoke only; excluded from repeated performance evidence",
+  "retained_world_p99_mm": 0.0,
+  "retained_world_max_mm": 0.0,
+  "hand_max_mm": 0.0,
+  "protected_max_mm": 0.0,
+  "body_surface_p99_mm": 0.3736670897342263,
+  "pass": true
+}

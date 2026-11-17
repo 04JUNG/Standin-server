@@ -1,0 +1,31 @@
+{
+  "candidateDownload": "/benchmark/male-candidate-base-lod-body-v5-final-20261115-flesh-guide-0.fbx",
+  "choices": {
+    "gender": "male",
+    "pose": "hands",
+    "range": "50",
+    "shape": "converter-ob015",
+    "skin": "flesh-guide",
+    "view": "left_hand"
+  },
+  "images": [
+    {
+      "loaded": true,
+      "src": "converter-images/male-original-flesh-guide-left_hand.png"
+    },
+    {
+      "loaded": true,
+      "src": "converter-images/male-candidate-flesh-guide-left_hand.png"
+    },
+    {
+      "loaded": true,
+      "src": "converter-images/male-original-flesh-guide-left_hand.png"
+    },
+    {
+      "loaded": true,
+      "src": "converter-images/male-candidate-flesh-guide-left_hand.png"
+    }
+  ],
+  "quality": "실제 Converter 최종 주먹 · 손과 몸통·팔·다리 별도 검사\n\n조건 / 스킨\t손 최대(mm)\t대응 p99(mm)\t몸통·팔·다리 표면 p99(mm)\t판정\nbase / 기본\t0.0000\t0.018\t0.414\t통과\nbase / 살색 가이드선\t0.0000\t0.018\t0.414\t통과\npreset / 기본\t0.0000\t0.021\t0.390\t통과\npreset / 살색 가이드선\t0.0000\t0.021\t0.390\t통과\ncustom / 기본\t0.0000\t0.023\t0.491\t통과\ncustom / 살색 가이드선\t0.0000\t0.023\t0.491\t통과",
+  "title": "Standin — v5 주먹 유지 / 전체 93,038개 미만 검수"
+}

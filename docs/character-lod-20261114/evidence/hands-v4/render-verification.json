@@ -1,0 +1,11 @@
+{
+  "render_count": 320,
+  "skin_import_checks": 80,
+  "maximum_import_errors": {
+    "maxPositionErrorM": 0.0,
+    "maxMatrixError": 0.0,
+    "maxWeightError": 0.0,
+    "maxNormalError": 0.0
+  },
+  "every_skin_verified": true
+}

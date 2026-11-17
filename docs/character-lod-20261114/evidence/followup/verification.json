@@ -1,0 +1,40 @@
+{
+  "neutral_finger_regression": "both selected sources pass",
+  "python_contract_tests": {
+    "passed": 4,
+    "total": 4
+  },
+  "core_smoke_tests": {
+    "passed": 54,
+    "total": 54
+  },
+  "compileall": "pass",
+  "git_diff_check": "pass",
+  "rendered_images": {
+    "posed": 320,
+    "all_shapes": 88,
+    "total": 432,
+    "actual_converter": 24
+  },
+  "new_csp_import": {
+    "status": "representative imports and display pass",
+    "version": "CLIP STUDIO PAINT EX 5.1.1 macOS trial",
+    "files": 5,
+    "candidate_files": 4,
+    "original_comparison_files": 1,
+    "receipt": "csp-review.json",
+    "all_shapes_skins_certified": false,
+    "final_fist_numerical_hold_cleared": false
+  },
+  "new_ssr2": {
+    "status": "not activated",
+    "old_certification_reused": false
+  },
+  "actual_final_pairs": {
+    "compared": 12,
+    "additional_correspondence_pass": 0,
+    "held": 12,
+    "reason": "closed-fist topology-dependent smoothing; see actual-final-pairs.json"
+  },
+  "final_file_sha256_checks": 72
+}

@@ -1,0 +1,44 @@
+{
+  "female-hands-body-250um-ref-v4-final": {
+    "mesh_objects": [
+      {
+        "name": "female-hands-body-250um-ref-v4-final",
+        "vertices": 94901,
+        "scene_linked": true,
+        "authoring": true,
+        "preview": false
+      },
+      {
+        "name": "female-hands-body-250um-ref-v4-final.001",
+        "vertices": 50000,
+        "scene_linked": true,
+        "authoring": false,
+        "preview": true
+      }
+    ],
+    "bone_count": 54,
+    "main_vertices": 94901,
+    "numeric_reference_graph": true
+  },
+  "male-hands-body-500um-ref-v4-targeted": {
+    "mesh_objects": [
+      {
+        "name": "male-hands-body-500um-ref-v4-targeted",
+        "vertices": 105791,
+        "scene_linked": true,
+        "authoring": true,
+        "preview": false
+      },
+      {
+        "name": "male-hands-body-500um-ref-v4-targeted.001",
+        "vertices": 50001,
+        "scene_linked": true,
+        "authoring": false,
+        "preview": true
+      }
+    ],
+    "bone_count": 54,
+    "main_vertices": 105791,
+    "numeric_reference_graph": true
+  }
+}

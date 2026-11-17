@@ -1,0 +1,525 @@
+{
+  "schema": "local-colored-character-delivery.v1",
+  "reason": "geometry-only default deliveries had no skin texture/UV",
+  "backup_sha256": "91fa92c1785a7f0139fc306683aef3dc6a6803ec1128befb95e8764ecf6ae457",
+  "fbx": [
+    {
+      "file": "/private/tmp/standin-model-color-fix-20261116/models/male.fbx",
+      "source_sha256": "af407ec554b8c6a3fbf2bc67700fb4f1c45fe5d2ec24a94ea894a73ced7eb636",
+      "sha256": "8abc8566cc0178a989c8fa1f07f15b927332fc04bd14cccada273cbc19cf4fca",
+      "vertices": 93000,
+      "bones": 54,
+      "skin": "flesh",
+      "geometry_and_rig_typed_data_exact": true,
+      "uv_verified": true,
+      "image_sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808",
+      "embedded_image": true,
+      "relative_texture": "Standin_SkinV1_flesh_1b3c18f727c29019.png",
+      "nonwhite_fallback_rgb": [
+        0.9803921568627451,
+        0.8745098039215686,
+        0.792156862745098
+      ],
+      "imported_texture_loaded": true,
+      "import_errors": {
+        "maxPositionErrorM": 0.0,
+        "maxMatrixError": 0.0,
+        "maxWeightError": 0.0,
+        "maxNormalError": 0.0
+      },
+      "final_validation": {
+        "version": "final-fbx-v1",
+        "artifact_sha256": "8abc8566cc0178a989c8fa1f07f15b927332fc04bd14cccada273cbc19cf4fca",
+        "scope": "full",
+        "bones": 54,
+        "meshes": 1,
+        "vertices": 93000,
+        "polygons": 185996,
+        "skin_verified": true
+      },
+      "render": "/private/tmp/standin-model-color-fix-20261116/qa/male.png",
+      "gender": "male",
+      "case": "base",
+      "csp_certified": false,
+      "csp_import_display_verified": false
+    },
+    {
+      "file": "/private/tmp/standin-model-color-fix-20261116/models/male-guide.fbx",
+      "source_sha256": "af407ec554b8c6a3fbf2bc67700fb4f1c45fe5d2ec24a94ea894a73ced7eb636",
+      "sha256": "f4934c621da95a0a0c812581740a456d638af15c08b38812afc6adf60e98be57",
+      "vertices": 93000,
+      "bones": 54,
+      "skin": "flesh-guide",
+      "geometry_and_rig_typed_data_exact": true,
+      "uv_verified": true,
+      "image_sha256": "b7c5924cdc47745c14efdbce4efd23db4d74403687eea85221aa1f8268125921",
+      "embedded_image": true,
+      "relative_texture": "Standin_SkinV1_flesh-guide_b7c5924cdc47745c.png",
+      "nonwhite_fallback_rgb": [
+        0.9803921568627451,
+        0.8745098039215686,
+        0.792156862745098
+      ],
+      "imported_texture_loaded": true,
+      "import_errors": {
+        "maxPositionErrorM": 0.0,
+        "maxMatrixError": 0.0,
+        "maxWeightError": 0.0,
+        "maxNormalError": 0.0
+      },
+      "final_validation": {
+        "version": "final-fbx-v1",
+        "artifact_sha256": "f4934c621da95a0a0c812581740a456d638af15c08b38812afc6adf60e98be57",
+        "scope": "full",
+        "bones": 54,
+        "meshes": 1,
+        "vertices": 93000,
+        "polygons": 185996,
+        "skin_verified": true
+      },
+      "render": "/private/tmp/standin-model-color-fix-20261116/qa/male-guide.png",
+      "gender": "male",
+      "case": "base",
+      "csp_certified": false,
+      "csp_import_display_verified": true,
+      "csp_capture_sha256": "4d997d6052238b65f620684537964a300b8424267d809ef762ea36c83bc38199"
+    },
+    {
+      "file": "/private/tmp/standin-model-color-fix-20261116/models/variants/male-preset.fbx",
+      "source_sha256": "6d5aacf6582d17a57247a182d8fefdbb16da29bf7c8113e4919c42cb76af32fa",
+      "sha256": "257fc7b65d2ab82a8de28c1501a217531b8c3de6cd17b74e5983526954a453bf",
+      "vertices": 93000,
+      "bones": 54,
+      "skin": "flesh",
+      "geometry_and_rig_typed_data_exact": true,
+      "uv_verified": true,
+      "image_sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808",
+      "embedded_image": true,
+      "relative_texture": "Standin_SkinV1_flesh_1b3c18f727c29019.png",
+      "nonwhite_fallback_rgb": [
+        0.9803921568627451,
+        0.8745098039215686,
+        0.792156862745098
+      ],
+      "imported_texture_loaded": true,
+      "import_errors": {
+        "maxPositionErrorM": 0.0,
+        "maxMatrixError": 0.0,
+        "maxWeightError": 0.0,
+        "maxNormalError": 0.0
+      },
+      "final_validation": {
+        "version": "final-fbx-v1",
+        "artifact_sha256": "257fc7b65d2ab82a8de28c1501a217531b8c3de6cd17b74e5983526954a453bf",
+        "scope": "full",
+        "bones": 54,
+        "meshes": 1,
+        "vertices": 93000,
+        "polygons": 185996,
+        "skin_verified": true
+      },
+      "gender": "male",
+      "case": "preset",
+      "csp_certified": false,
+      "csp_import_display_verified": false
+    },
+    {
+      "file": "/private/tmp/standin-model-color-fix-20261116/models/variants/male-preset-guide.fbx",
+      "source_sha256": "6d5aacf6582d17a57247a182d8fefdbb16da29bf7c8113e4919c42cb76af32fa",
+      "sha256": "2eda7b37e893205c97979552d16c75770939f4a36662024712f87e441c8f2894",
+      "vertices": 93000,
+      "bones": 54,
+      "skin": "flesh-guide",
+      "geometry_and_rig_typed_data_exact": true,
+      "uv_verified": true,
+      "image_sha256": "b7c5924cdc47745c14efdbce4efd23db4d74403687eea85221aa1f8268125921",
+      "embedded_image": true,
+      "relative_texture": "Standin_SkinV1_flesh-guide_b7c5924cdc47745c.png",
+      "nonwhite_fallback_rgb": [
+        0.9803921568627451,
+        0.8745098039215686,
+        0.792156862745098
+      ],
+      "imported_texture_loaded": true,
+      "import_errors": {
+        "maxPositionErrorM": 0.0,
+        "maxMatrixError": 0.0,
+        "maxWeightError": 0.0,
+        "maxNormalError": 0.0
+      },
+      "final_validation": {
+        "version": "final-fbx-v1",
+        "artifact_sha256": "2eda7b37e893205c97979552d16c75770939f4a36662024712f87e441c8f2894",
+        "scope": "full",
+        "bones": 54,
+        "meshes": 1,
+        "vertices": 93000,
+        "polygons": 185996,
+        "skin_verified": true
+      },
+      "gender": "male",
+      "case": "preset",
+      "csp_certified": false,
+      "csp_import_display_verified": false
+    },
+    {
+      "file": "/private/tmp/standin-model-color-fix-20261116/models/variants/male-custom.fbx",
+      "source_sha256": "3b1d9e69805a771b099652317bf5d8040b1e257c430fe24b2ce86e7bbe18ddc7",
+      "sha256": "935cea7e51111ddf9e14df5f8d78dad9381a020d7646c52d2a37fadeb422400e",
+      "vertices": 93000,
+      "bones": 54,
+      "skin": "flesh",
+      "geometry_and_rig_typed_data_exact": true,
+      "uv_verified": true,
+      "image_sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808",
+      "embedded_image": true,
+      "relative_texture": "Standin_SkinV1_flesh_1b3c18f727c29019.png",
+      "nonwhite_fallback_rgb": [
+        0.9803921568627451,
+        0.8745098039215686,
+        0.792156862745098
+      ],
+      "imported_texture_loaded": true,
+      "import_errors": {
+        "maxPositionErrorM": 0.0,
+        "maxMatrixError": 0.0,
+        "maxWeightError": 0.0,
+        "maxNormalError": 0.0
+      },
+      "final_validation": {
+        "version": "final-fbx-v1",
+        "artifact_sha256": "935cea7e51111ddf9e14df5f8d78dad9381a020d7646c52d2a37fadeb422400e",
+        "scope": "full",
+        "bones": 54,
+        "meshes": 1,
+        "vertices": 93000,
+        "polygons": 185996,
+        "skin_verified": true
+      },
+      "gender": "male",
+      "case": "custom",
+      "csp_certified": false,
+      "csp_import_display_verified": false
+    },
+    {
+      "file": "/private/tmp/standin-model-color-fix-20261116/models/variants/male-custom-guide.fbx",
+      "source_sha256": "3b1d9e69805a771b099652317bf5d8040b1e257c430fe24b2ce86e7bbe18ddc7",
+      "sha256": "7d805263db3aeb48331f8fd000d959eef14a21cc564e8edf0525357662b1db92",
+      "vertices": 93000,
+      "bones": 54,
+      "skin": "flesh-guide",
+      "geometry_and_rig_typed_data_exact": true,
+      "uv_verified": true,
+      "image_sha256": "b7c5924cdc47745c14efdbce4efd23db4d74403687eea85221aa1f8268125921",
+      "embedded_image": true,
+      "relative_texture": "Standin_SkinV1_flesh-guide_b7c5924cdc47745c.png",
+      "nonwhite_fallback_rgb": [
+        0.9803921568627451,
+        0.8745098039215686,
+        0.792156862745098
+      ],
+      "imported_texture_loaded": true,
+      "import_errors": {
+        "maxPositionErrorM": 0.0,
+        "maxMatrixError": 0.0,
+        "maxWeightError": 0.0,
+        "maxNormalError": 0.0
+      },
+      "final_validation": {
+        "version": "final-fbx-v1",
+        "artifact_sha256": "7d805263db3aeb48331f8fd000d959eef14a21cc564e8edf0525357662b1db92",
+        "scope": "full",
+        "bones": 54,
+        "meshes": 1,
+        "vertices": 93000,
+        "polygons": 185996,
+        "skin_verified": true
+      },
+      "gender": "male",
+      "case": "custom",
+      "csp_certified": false,
+      "csp_import_display_verified": false
+    },
+    {
+      "file": "/private/tmp/standin-model-color-fix-20261116/models/female.fbx",
+      "source_sha256": "f356b57ac97a95b1252a5f3cd3f49e56ff58364ad9b1b51508b4dc2ed4ee2001",
+      "sha256": "e3f1aea5c842b538a1ea4630bd59d0b7bfc48bb68d4f290172618d35efde9c3a",
+      "vertices": 94901,
+      "bones": 54,
+      "skin": "flesh",
+      "geometry_and_rig_typed_data_exact": true,
+      "uv_verified": true,
+      "image_sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808",
+      "embedded_image": true,
+      "relative_texture": "Standin_SkinV1_flesh_1b3c18f727c29019.png",
+      "nonwhite_fallback_rgb": [
+        0.9803921568627451,
+        0.8745098039215686,
+        0.792156862745098
+      ],
+      "imported_texture_loaded": true,
+      "import_errors": {
+        "maxPositionErrorM": 0.0,
+        "maxMatrixError": 0.0,
+        "maxWeightError": 0.0,
+        "maxNormalError": 0.0
+      },
+      "final_validation": {
+        "version": "final-fbx-v1",
+        "artifact_sha256": "e3f1aea5c842b538a1ea4630bd59d0b7bfc48bb68d4f290172618d35efde9c3a",
+        "scope": "full",
+        "bones": 54,
+        "meshes": 1,
+        "vertices": 94901,
+        "polygons": 189798,
+        "skin_verified": true
+      },
+      "render": "/private/tmp/standin-model-color-fix-20261116/qa/female.png",
+      "gender": "female",
+      "case": "base",
+      "csp_certified": false,
+      "csp_import_display_verified": false
+    },
+    {
+      "file": "/private/tmp/standin-model-color-fix-20261116/models/female-guide.fbx",
+      "source_sha256": "f356b57ac97a95b1252a5f3cd3f49e56ff58364ad9b1b51508b4dc2ed4ee2001",
+      "sha256": "bb2ff682ca2a33a15105d3ace38c4acf1acaaef34ce95e176a68f8edd406338e",
+      "vertices": 94901,
+      "bones": 54,
+      "skin": "flesh-guide",
+      "geometry_and_rig_typed_data_exact": true,
+      "uv_verified": true,
+      "image_sha256": "e34f0a717589134d7722dd46528ca753984b003a8b10e5ad685bd1acaa8d0820",
+      "embedded_image": true,
+      "relative_texture": "Standin_SkinV1_flesh-guide_e34f0a717589134d.png",
+      "nonwhite_fallback_rgb": [
+        0.9803921568627451,
+        0.8745098039215686,
+        0.792156862745098
+      ],
+      "imported_texture_loaded": true,
+      "import_errors": {
+        "maxPositionErrorM": 0.0,
+        "maxMatrixError": 0.0,
+        "maxWeightError": 0.0,
+        "maxNormalError": 0.0
+      },
+      "final_validation": {
+        "version": "final-fbx-v1",
+        "artifact_sha256": "bb2ff682ca2a33a15105d3ace38c4acf1acaaef34ce95e176a68f8edd406338e",
+        "scope": "full",
+        "bones": 54,
+        "meshes": 1,
+        "vertices": 94901,
+        "polygons": 189798,
+        "skin_verified": true
+      },
+      "render": "/private/tmp/standin-model-color-fix-20261116/qa/female-guide.png",
+      "gender": "female",
+      "case": "base",
+      "csp_certified": false,
+      "csp_import_display_verified": true,
+      "csp_capture_sha256": "b148a24f5fed8fa1ff3efbbf2eb477d33a0a21bc97d7e63cf6d9a1a4d66c6d1b"
+    },
+    {
+      "file": "/private/tmp/standin-model-color-fix-20261116/models/variants/female-preset.fbx",
+      "source_sha256": "87a6019380f20b6c8191ca93685bbf1703103477860d8a470dc8b1d2737fa15e",
+      "sha256": "5991f758ce5a737a508edf83c45c24c2d8f523429f10deb731e2c3f69f1dd050",
+      "vertices": 94901,
+      "bones": 54,
+      "skin": "flesh",
+      "geometry_and_rig_typed_data_exact": true,
+      "uv_verified": true,
+      "image_sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808",
+      "embedded_image": true,
+      "relative_texture": "Standin_SkinV1_flesh_1b3c18f727c29019.png",
+      "nonwhite_fallback_rgb": [
+        0.9803921568627451,
+        0.8745098039215686,
+        0.792156862745098
+      ],
+      "imported_texture_loaded": true,
+      "import_errors": {
+        "maxPositionErrorM": 0.0,
+        "maxMatrixError": 0.0,
+        "maxWeightError": 0.0,
+        "maxNormalError": 0.0
+      },
+      "final_validation": {
+        "version": "final-fbx-v1",
+        "artifact_sha256": "5991f758ce5a737a508edf83c45c24c2d8f523429f10deb731e2c3f69f1dd050",
+        "scope": "full",
+        "bones": 54,
+        "meshes": 1,
+        "vertices": 94901,
+        "polygons": 189798,
+        "skin_verified": true
+      },
+      "gender": "female",
+      "case": "preset",
+      "csp_certified": false,
+      "csp_import_display_verified": false
+    },
+    {
+      "file": "/private/tmp/standin-model-color-fix-20261116/models/variants/female-preset-guide.fbx",
+      "source_sha256": "87a6019380f20b6c8191ca93685bbf1703103477860d8a470dc8b1d2737fa15e",
+      "sha256": "79df3a8e2fe86aa1548e29b7ce1e68cf3d46aea7cc008d91cd4b264685d58a2b",
+      "vertices": 94901,
+      "bones": 54,
+      "skin": "flesh-guide",
+      "geometry_and_rig_typed_data_exact": true,
+      "uv_verified": true,
+      "image_sha256": "e34f0a717589134d7722dd46528ca753984b003a8b10e5ad685bd1acaa8d0820",
+      "embedded_image": true,
+      "relative_texture": "Standin_SkinV1_flesh-guide_e34f0a717589134d.png",
+      "nonwhite_fallback_rgb": [
+        0.9803921568627451,
+        0.8745098039215686,
+        0.792156862745098
+      ],
+      "imported_texture_loaded": true,
+      "import_errors": {
+        "maxPositionErrorM": 0.0,
+        "maxMatrixError": 0.0,
+        "maxWeightError": 0.0,
+        "maxNormalError": 0.0
+      },
+      "final_validation": {
+        "version": "final-fbx-v1",
+        "artifact_sha256": "79df3a8e2fe86aa1548e29b7ce1e68cf3d46aea7cc008d91cd4b264685d58a2b",
+        "scope": "full",
+        "bones": 54,
+        "meshes": 1,
+        "vertices": 94901,
+        "polygons": 189798,
+        "skin_verified": true
+      },
+      "gender": "female",
+      "case": "preset",
+      "csp_certified": false,
+      "csp_import_display_verified": false
+    },
+    {
+      "file": "/private/tmp/standin-model-color-fix-20261116/models/variants/female-custom.fbx",
+      "source_sha256": "eeda7a1846a0c5548596a7f05c892beb3a3af0c144bbdf55f39df93ff68b73b0",
+      "sha256": "0c3443ed0b60473dda2e3756a28525506888329e45e2c8fbe69fb0c0fc237774",
+      "vertices": 94901,
+      "bones": 54,
+      "skin": "flesh",
+      "geometry_and_rig_typed_data_exact": true,
+      "uv_verified": true,
+      "image_sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808",
+      "embedded_image": true,
+      "relative_texture": "Standin_SkinV1_flesh_1b3c18f727c29019.png",
+      "nonwhite_fallback_rgb": [
+        0.9803921568627451,
+        0.8745098039215686,
+        0.792156862745098
+      ],
+      "imported_texture_loaded": true,
+      "import_errors": {
+        "maxPositionErrorM": 0.0,
+        "maxMatrixError": 0.0,
+        "maxWeightError": 0.0,
+        "maxNormalError": 0.0
+      },
+      "final_validation": {
+        "version": "final-fbx-v1",
+        "artifact_sha256": "0c3443ed0b60473dda2e3756a28525506888329e45e2c8fbe69fb0c0fc237774",
+        "scope": "full",
+        "bones": 54,
+        "meshes": 1,
+        "vertices": 94901,
+        "polygons": 189798,
+        "skin_verified": true
+      },
+      "gender": "female",
+      "case": "custom",
+      "csp_certified": false,
+      "csp_import_display_verified": false
+    },
+    {
+      "file": "/private/tmp/standin-model-color-fix-20261116/models/variants/female-custom-guide.fbx",
+      "source_sha256": "eeda7a1846a0c5548596a7f05c892beb3a3af0c144bbdf55f39df93ff68b73b0",
+      "sha256": "1af77a673970d1586f642ef1e0d88852ef22dacf3d6dd342188a10693b80435b",
+      "vertices": 94901,
+      "bones": 54,
+      "skin": "flesh-guide",
+      "geometry_and_rig_typed_data_exact": true,
+      "uv_verified": true,
+      "image_sha256": "e34f0a717589134d7722dd46528ca753984b003a8b10e5ad685bd1acaa8d0820",
+      "embedded_image": true,
+      "relative_texture": "Standin_SkinV1_flesh-guide_e34f0a717589134d.png",
+      "nonwhite_fallback_rgb": [
+        0.9803921568627451,
+        0.8745098039215686,
+        0.792156862745098
+      ],
+      "imported_texture_loaded": true,
+      "import_errors": {
+        "maxPositionErrorM": 0.0,
+        "maxMatrixError": 0.0,
+        "maxWeightError": 0.0,
+        "maxNormalError": 0.0
+      },
+      "final_validation": {
+        "version": "final-fbx-v1",
+        "artifact_sha256": "1af77a673970d1586f642ef1e0d88852ef22dacf3d6dd342188a10693b80435b",
+        "scope": "full",
+        "bones": 54,
+        "meshes": 1,
+        "vertices": 94901,
+        "polygons": 189798,
+        "skin_verified": true
+      },
+      "gender": "female",
+      "case": "custom",
+      "csp_certified": false,
+      "csp_import_display_verified": false
+    }
+  ],
+  "authoring": {
+    "male": {
+      "file": "/private/tmp/standin-model-color-fix-20261116/authoring/male/model.blend",
+      "sha256": "0e3ef79443e2cc65765803d6141076bb4d76652820e73efaccff89b9ad118bdf",
+      "source_blend_sha256": "fe427a686e9efe88b49b118e95249dec1a09b5ed6b705ca71b96d3c4a90e0c73",
+      "geometry_controls_rig_drivers_sha256": "80bf15398e46832722286832476672426918c2c97603db46e69436ae0617cf2f",
+      "editable_geometry_exact": true,
+      "vertices": 93000,
+      "packed_image_sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808",
+      "source_geometry_manifest": "/private/tmp/standin-model-color-fix-20261116/backup/male/authoring/manifest.json",
+      "controller_sha256": "a79223464e924e9d09c7b0e480bd2ae7b079c4393ed1de7e5f3a0ea080f6ab5d"
+    },
+    "female": {
+      "file": "/private/tmp/standin-model-color-fix-20261116/authoring/female/model.blend",
+      "sha256": "196cde83c3b68f03bd540eb222edf3a4a8f8d1ccdd794634817a21f1b7244097",
+      "source_blend_sha256": "aa10276a7c63a2b0f2336b6f4569e0fb541c6f2aa2dcf689ab96ec04573159d3",
+      "geometry_controls_rig_drivers_sha256": "4b5f9cbbcdac7ca7823d60bee549959508d699a1556225853eb9b924669f1994",
+      "editable_geometry_exact": true,
+      "vertices": 94901,
+      "packed_image_sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808",
+      "source_geometry_manifest": "/private/tmp/standin-model-color-fix-20261116/backup/female/authoring/manifest.json",
+      "controller_sha256": "3a3ccd4e1fe09967b86dde7823aad9d0886d47b86b47021a3fcea58e61145052"
+    }
+  },
+  "production_activated": false,
+  "csp_display_checks": {
+    "male": {
+      "file": "/private/tmp/standin-model-color-fix-20261116/models/male-guide.fbx",
+      "imported": true,
+      "skinColorVisible": true,
+      "guideLinesVisible": true,
+      "clip": "/private/tmp/standin-model-color-fix-20261116/qa/CSP-male.clip"
+    },
+    "female": {
+      "file": "/private/tmp/standin-model-color-fix-20261116/models/female-guide.fbx",
+      "imported": true,
+      "skinColorVisible": true,
+      "guideLinesVisible": true,
+      "clip": "/private/tmp/standin-model-color-fix-20261116/qa/CSP-female.clip"
+    },
+    "route": "File > Import > 3D data",
+    "documentExpressionColor": "Color",
+    "scope": "base flesh-guide material display only; not a poseability or all-shape CSP certificate"
+  }
+}

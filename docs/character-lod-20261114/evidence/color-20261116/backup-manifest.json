@@ -1,0 +1,403 @@
+{
+  "schema": "character-model-backup.v1",
+  "before_edit": true,
+  "all_copies_sha256_verified": true,
+  "models": {
+    "male": {
+      "root": "/private/tmp/standin-mesh-light-v5-final-20261115",
+      "tag": "male-frozen-hands-body-93000-v5-final115",
+      "authoring": "/private/tmp/standin-mesh-light-v5-final-20261115/compact/male-frozen-hands-body-93000-v5-final115",
+      "package": "/private/tmp/standin-mesh-light-v5-final-20261115/delivery-package",
+      "jobs": [
+        {
+          "gender": "male",
+          "variant": "candidate",
+          "case": "base",
+          "character": "male-candidate-base-lod-body-v5-final-20261115"
+        },
+        {
+          "gender": "male",
+          "variant": "candidate",
+          "case": "preset",
+          "character": "male-candidate-preset-lod-body-v5-final-20261115"
+        },
+        {
+          "gender": "male",
+          "variant": "candidate",
+          "case": "custom",
+          "character": "male-candidate-custom-lod-body-v5-final-20261115"
+        }
+      ]
+    },
+    "female": {
+      "root": "/private/tmp/standin-mesh-light-v4-20261115",
+      "tag": "female-hands-body-250um-ref-v4-final",
+      "authoring": "/private/tmp/standin-mesh-light-v4-20261115/compact/female-hands-body-250um-ref-v4-final",
+      "package": "/private/tmp/standin-mesh-light-v4-20261115/delivery-package",
+      "jobs": [
+        {
+          "gender": "female",
+          "variant": "candidate",
+          "case": "base",
+          "character": "female-candidate-base-lod-hands-v4-20261115"
+        },
+        {
+          "gender": "female",
+          "variant": "candidate",
+          "case": "preset",
+          "character": "female-candidate-preset-lod-hands-v4-20261115"
+        },
+        {
+          "gender": "female",
+          "variant": "candidate",
+          "case": "custom",
+          "character": "female-candidate-custom-lod-hands-v4-20261115"
+        }
+      ]
+    }
+  },
+  "files": [
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/compact/male-frozen-hands-body-93000-v5-final115/model.blend",
+      "backup": "backup/male/authoring/model.blend",
+      "bytes": 73165113,
+      "sha256": "fe427a686e9efe88b49b118e95249dec1a09b5ed6b705ca71b96d3c4a90e0c73"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/compact/male-frozen-hands-body-93000-v5-final115/graph-source.npy",
+      "backup": "backup/male/authoring/graph-source.npy",
+      "bytes": 325264,
+      "sha256": "278c4d957e41271a4f36560886a9cffd659341359cb2f6292e7f550e7818a14f"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/compact/male-frozen-hands-body-93000-v5-final115/source-regions.npy",
+      "backup": "backup/male/authoring/source-regions.npy",
+      "bytes": 139602,
+      "sha256": "6705b81f321b1f5b69f579a68a2f56f1de75b77b4a2f2b737e62c1cbb8188f99"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/compact/male-frozen-hands-body-93000-v5-final115/source-indices.npy",
+      "backup": "backup/male/authoring/source-indices.npy",
+      "bytes": 372128,
+      "sha256": "60b24f51e6355eeb5538aaf0ef99b623ddefa8f957a2ebe2866dfc88d4729012"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/compact/male-frozen-hands-body-93000-v5-final115/controller.py",
+      "backup": "backup/male/authoring/controller.py",
+      "bytes": 402269,
+      "sha256": "a79223464e924e9d09c7b0e480bd2ae7b079c4393ed1de7e5f3a0ea080f6ab5d"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/compact/male-frozen-hands-body-93000-v5-final115/topology-plan.npz",
+      "backup": "backup/male/authoring/topology-plan.npz",
+      "bytes": 3903855,
+      "sha256": "218ed702a9fd1d2e0a29b0aaa8362bfc5848b2ae007d292d2a4f3837fbd4d7c3"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/compact/male-frozen-hands-body-93000-v5-final115/protected-source.npy",
+      "backup": "backup/male/authoring/protected-source.npy",
+      "bytes": 674744,
+      "sha256": "028426763433ec4d76826714a3034316fbe7d7487e9a215f26e700a27d587723"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/compact/male-frozen-hands-body-93000-v5-final115/skin-uv.npy",
+      "backup": "backup/male/authoring/skin-uv.npy",
+      "bytes": 8927936,
+      "sha256": "83670a9b5ca639f0d729b3122342f6299fcd3d99ba498ed5f08fb53694929166"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/compact/male-frozen-hands-body-93000-v5-final115/source-projection.npz",
+      "backup": "backup/male/authoring/source-projection.npz",
+      "bytes": 360390,
+      "sha256": "900e032c761f1177d72650f04ae29ef1b9788c8fb03deb00d9115e2e0a5b68d7"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/compact/male-frozen-hands-body-93000-v5-final115/manifest.json",
+      "backup": "backup/male/authoring/manifest.json",
+      "bytes": 3396,
+      "sha256": "c091783ece9aabbf3e0097b30487390df712e4f79c90756448a0709dfd47e835"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/delivery-package/fbx/male-candidate-base-lod-body-v5-final-20261115.fbx",
+      "backup": "backup/male/fbx/male-candidate-base-lod-body-v5-final-20261115.fbx",
+      "bytes": 5939724,
+      "sha256": "af407ec554b8c6a3fbf2bc67700fb4f1c45fe5d2ec24a94ea894a73ced7eb636"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/delivery-package/fbx/male-candidate-preset-lod-body-v5-final-20261115.fbx",
+      "backup": "backup/male/fbx/male-candidate-preset-lod-body-v5-final-20261115.fbx",
+      "bytes": 5940732,
+      "sha256": "6d5aacf6582d17a57247a182d8fefdbb16da29bf7c8113e4919c42cb76af32fa"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/delivery-package/fbx/male-candidate-custom-lod-body-v5-final-20261115.fbx",
+      "backup": "backup/male/fbx/male-candidate-custom-lod-body-v5-final-20261115.fbx",
+      "bytes": 5945164,
+      "sha256": "3b1d9e69805a771b099652317bf5d8040b1e257c430fe24b2ce86e7bbe18ddc7"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/delivery-package/skins/anatomy-male-flesh-guide-preview.png",
+      "backup": "backup/male/skins/anatomy-male-flesh-guide-preview.png",
+      "bytes": 291711,
+      "sha256": "d188b7d20345850bbc7dcf352a2cd67b570d337b1d553f9cec844e30496c574b"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/delivery-package/skins/anatomy-male-flesh-guide.png",
+      "backup": "backup/male/skins/anatomy-male-flesh-guide.png",
+      "bytes": 436664,
+      "sha256": "b7c5924cdc47745c14efdbce4efd23db4d74403687eea85221aa1f8268125921"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/delivery-package/skins/anatomy-male-flesh-muscle-preview.png",
+      "backup": "backup/male/skins/anatomy-male-flesh-muscle-preview.png",
+      "bytes": 180433,
+      "sha256": "0e17f10d6a814c12fd572031820f04dafa380ad66abfd6b3c0a2d474f29303b5"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/delivery-package/skins/anatomy-male-flesh-muscle.png",
+      "backup": "backup/male/skins/anatomy-male-flesh-muscle.png",
+      "bytes": 284908,
+      "sha256": "2c9ac2d72809db3d43bd05045c8af18fe04a2bd9e4448e583a0acf90f17762b9"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/delivery-package/skins/anatomy-male-flesh-preview.png",
+      "backup": "backup/male/skins/anatomy-male-flesh-preview.png",
+      "bytes": 15790,
+      "sha256": "294e93d6d007bf20b0fbf205670a1eb45b2ad98c52f116faa2e11db72e0206f4"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/delivery-package/skins/anatomy-male-flesh.png",
+      "backup": "backup/male/skins/anatomy-male-flesh.png",
+      "bytes": 58638,
+      "sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/delivery-package/skins/anatomy-male-gray-guide-preview.png",
+      "backup": "backup/male/skins/anatomy-male-gray-guide-preview.png",
+      "bytes": 283038,
+      "sha256": "7250869f5badb5f838951f375a94cf157d7a1efc55514bdbc9ba0ac76be80eff"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/delivery-package/skins/anatomy-male-gray-guide.png",
+      "backup": "backup/male/skins/anatomy-male-gray-guide.png",
+      "bytes": 430521,
+      "sha256": "224ad8c751c43fe9b9c687cbe20acbb08cac762673180946805c7835180eb068"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/delivery-package/skins/anatomy-male-muscle-preview.png",
+      "backup": "backup/male/skins/anatomy-male-muscle-preview.png",
+      "bytes": 168699,
+      "sha256": "22363adadbf8b50cf3419c9962d0c02a69804b5776923b6cf48bf36742c50e7e"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/delivery-package/skins/anatomy-male-muscle.png",
+      "backup": "backup/male/skins/anatomy-male-muscle.png",
+      "bytes": 281485,
+      "sha256": "1972be061b5af8ce677363db7ae65f1fd919f944d82a0262625f303c73ccceb0"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/delivery-package/skins/male-candidate-base-lod-body-v5-final-20261115-uv.json.gz",
+      "backup": "backup/male/skins/male-candidate-base-lod-body-v5-final-20261115-uv.json.gz",
+      "bytes": 6381424,
+      "sha256": "1d695d43e8af06f23bb6f77e76b549573f8092194ae74872665bd402c48239fa"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/delivery-package/skins/male-candidate-custom-lod-body-v5-final-20261115-uv.json.gz",
+      "backup": "backup/male/skins/male-candidate-custom-lod-body-v5-final-20261115-uv.json.gz",
+      "bytes": 6381419,
+      "sha256": "4e6c56cbb21f9e9de6148064baf3f744424af6775e2e62e53397903e437b3ae4"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/delivery-package/skins/male-candidate-preset-lod-body-v5-final-20261115-uv.json.gz",
+      "backup": "backup/male/skins/male-candidate-preset-lod-body-v5-final-20261115-uv.json.gz",
+      "bytes": 6381421,
+      "sha256": "89c78692e004066085fc23cb6633adbc0bf6393cc008d25b0d0bf36994277421"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/delivery-package/skin-assets.json",
+      "backup": "backup/male/skin-assets.json",
+      "bytes": 17961,
+      "sha256": "265ede4402e449bed71d415fe9f9e32a6aef4fc6e3830b125792d7f39880737e"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/delivery-package/shape-bakes.host.json",
+      "backup": "backup/male/shape-bakes.host.json",
+      "bytes": 37388,
+      "sha256": "2a63237087aec333826ebda1a75142ecebda46afa461b97dbd4ba23954a43acd"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/delivery-package/jobs.json",
+      "backup": "backup/male/jobs.json",
+      "bytes": 883,
+      "sha256": "ff42c36b736db80880751ad41e947510c0fe545efb776a44f2a4882f237279ed"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v5-final-20261115/delivery-package/skin-identity-report.json",
+      "backup": "backup/male/skin-identity-report.json",
+      "bytes": 2024,
+      "sha256": "8bc8b7027b59472eb2566295659683b18650c6a216f1d3a919ac4533a3dd596a"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/compact/female-hands-body-250um-ref-v4-final/model.blend",
+      "backup": "backup/female/authoring/model.blend",
+      "bytes": 78911166,
+      "sha256": "aa10276a7c63a2b0f2336b6f4569e0fb541c6f2aa2dcf689ab96ec04573159d3"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/compact/female-hands-body-250um-ref-v4-final/source-regions.npy",
+      "backup": "backup/female/authoring/source-regions.npy",
+      "bytes": 105558,
+      "sha256": "36e932117602ccb35c719117f435c043cba6a1c90b4cb30d86cfb859f0663b10"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/compact/female-hands-body-250um-ref-v4-final/source-indices.npy",
+      "backup": "backup/female/authoring/source-indices.npy",
+      "bytes": 759336,
+      "sha256": "ceaff36fe92da786d198d5c6a371ebccea4f89fc57af30529650b18075ce0157"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/compact/female-hands-body-250um-ref-v4-final/controller.py",
+      "backup": "backup/female/authoring/controller.py",
+      "bytes": 300987,
+      "sha256": "3a3ccd4e1fe09967b86dde7823aad9d0886d47b86b47021a3fcea58e61145052"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/compact/female-hands-body-250um-ref-v4-final/protected-source.npy",
+      "backup": "backup/female/authoring/protected-source.npy",
+      "bytes": 647408,
+      "sha256": "2243173ccb115b81819fa5f0e61d6adf782b39ef47d6664397bd91e5a2d4f3b5"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/compact/female-hands-body-250um-ref-v4-final/skin-uv.npy",
+      "backup": "backup/female/authoring/skin-uv.npy",
+      "bytes": 9110432,
+      "sha256": "7e42b217a486d7b18ef132a99427eb4e1d9cac82034e12fe42939a5c3fb258c1"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/compact/female-hands-body-250um-ref-v4-final/manifest.json",
+      "backup": "backup/female/authoring/manifest.json",
+      "bytes": 2594,
+      "sha256": "ff1acfb58b7752286ef693fe04fbc6def8149f824a66d160ec7afa814f36a16f"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/delivery-package/fbx/female-candidate-base-lod-hands-v4-20261115.fbx",
+      "backup": "backup/female/fbx/female-candidate-base-lod-hands-v4-20261115.fbx",
+      "bytes": 6119948,
+      "sha256": "f356b57ac97a95b1252a5f3cd3f49e56ff58364ad9b1b51508b4dc2ed4ee2001"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/delivery-package/fbx/female-candidate-preset-lod-hands-v4-20261115.fbx",
+      "backup": "backup/female/fbx/female-candidate-preset-lod-hands-v4-20261115.fbx",
+      "bytes": 6119740,
+      "sha256": "87a6019380f20b6c8191ca93685bbf1703103477860d8a470dc8b1d2737fa15e"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/delivery-package/fbx/female-candidate-custom-lod-hands-v4-20261115.fbx",
+      "backup": "backup/female/fbx/female-candidate-custom-lod-hands-v4-20261115.fbx",
+      "bytes": 6125468,
+      "sha256": "eeda7a1846a0c5548596a7f05c892beb3a3af0c144bbdf55f39df93ff68b73b0"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/delivery-package/skins/anatomy-female-flesh-guide-preview.png",
+      "backup": "backup/female/skins/anatomy-female-flesh-guide-preview.png",
+      "bytes": 285631,
+      "sha256": "7f49c637bffd3e40acc792c5259d5503a1db39ddfedfdca25e7a25ea369b0ae9"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/delivery-package/skins/anatomy-female-flesh-guide.png",
+      "backup": "backup/female/skins/anatomy-female-flesh-guide.png",
+      "bytes": 429265,
+      "sha256": "e34f0a717589134d7722dd46528ca753984b003a8b10e5ad685bd1acaa8d0820"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/delivery-package/skins/anatomy-female-flesh-muscle-preview.png",
+      "backup": "backup/female/skins/anatomy-female-flesh-muscle-preview.png",
+      "bytes": 189298,
+      "sha256": "e3577c4e566c31c525fe2cef54b7485e2265afc53a02605c0c3ac7dfe8c55e29"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/delivery-package/skins/anatomy-female-flesh-muscle.png",
+      "backup": "backup/female/skins/anatomy-female-flesh-muscle.png",
+      "bytes": 292773,
+      "sha256": "d5c1578f3a7d6c9021253e92d62afaf0294e56ac1f1eeb2fd314492691a24567"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/delivery-package/skins/anatomy-female-flesh-preview.png",
+      "backup": "backup/female/skins/anatomy-female-flesh-preview.png",
+      "bytes": 15790,
+      "sha256": "294e93d6d007bf20b0fbf205670a1eb45b2ad98c52f116faa2e11db72e0206f4"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/delivery-package/skins/anatomy-female-flesh.png",
+      "backup": "backup/female/skins/anatomy-female-flesh.png",
+      "bytes": 58638,
+      "sha256": "1b3c18f727c29019fcd65e19778932f70a6742716b8f1e0e2d7e934c5d5b7808"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/delivery-package/skins/anatomy-female-gray-guide-preview.png",
+      "backup": "backup/female/skins/anatomy-female-gray-guide-preview.png",
+      "bytes": 277252,
+      "sha256": "ab7e062652c230ac20017e4d1af0c69857b6ca0d3725a543e86a15c11f028b83"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/delivery-package/skins/anatomy-female-gray-guide.png",
+      "backup": "backup/female/skins/anatomy-female-gray-guide.png",
+      "bytes": 421155,
+      "sha256": "74b2d2fd23c595f17e5fec762554cb87798eb08697cad244565f4b5443843d2c"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/delivery-package/skins/anatomy-female-muscle-preview.png",
+      "backup": "backup/female/skins/anatomy-female-muscle-preview.png",
+      "bytes": 176601,
+      "sha256": "ab3962d0ef5f1e77ffb1835c1b08cd7785b0d3f09a945623383638058b2921d1"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/delivery-package/skins/anatomy-female-muscle.png",
+      "backup": "backup/female/skins/anatomy-female-muscle.png",
+      "bytes": 288418,
+      "sha256": "cd64611621e5de175ae3be19ac627d066556bdee18b933e66bc84322317c1011"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/delivery-package/skins/female-candidate-base-lod-hands-v4-20261115-uv.json.gz",
+      "backup": "backup/female/skins/female-candidate-base-lod-hands-v4-20261115-uv.json.gz",
+      "bytes": 6577106,
+      "sha256": "161bfb58d28e118842abdcde5cc251dea37f28ad74b2fbca1c9d2907578c5930"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/delivery-package/skins/female-candidate-custom-lod-hands-v4-20261115-uv.json.gz",
+      "backup": "backup/female/skins/female-candidate-custom-lod-hands-v4-20261115-uv.json.gz",
+      "bytes": 6577107,
+      "sha256": "7bd33a43fd75b436c48ebd89456342dc0d0307015200fd16bbe1368abb676905"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/delivery-package/skins/female-candidate-preset-lod-hands-v4-20261115-uv.json.gz",
+      "backup": "backup/female/skins/female-candidate-preset-lod-hands-v4-20261115-uv.json.gz",
+      "bytes": 6577103,
+      "sha256": "3dd00d1a5461c74f2b869fc8c111fe310ac28d40860859a645273421791bacdf"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/delivery-package/skin-assets.json",
+      "backup": "backup/female/skin-assets.json",
+      "bytes": 34876,
+      "sha256": "ac2bcd866791c7b5205634cf37462977b850d4dbc57a136f0d336d1c703759b8"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/delivery-package/shape-bakes.host.json",
+      "backup": "backup/female/shape-bakes.host.json",
+      "bytes": 81062,
+      "sha256": "7ffb4adf5a5453020ed07df046c50bc715c55b036530899285029b99486d37cb"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/delivery-package/jobs.json",
+      "backup": "backup/female/jobs.json",
+      "bytes": 1727,
+      "sha256": "2929923268e11f2a2fdff5ba85926dbba236168d4ff64a142435e6eeaf4ae1c1"
+    },
+    {
+      "source": "/private/tmp/standin-mesh-light-v4-20261115/delivery-package/skin-identity-report.json",
+      "backup": "backup/female/skin-identity-report.json",
+      "bytes": 4000,
+      "sha256": "fb86be9a4400d7e8802e09784b2b7ace20a014d6f5252e1eeb5507335abf434f"
+    }
+  ]
+}
