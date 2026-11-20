@@ -9,7 +9,8 @@ draws a fresh test set with another seed, so the numbers are not tuned to it. Wi
 value) to fit a size budget; the written file's header ``quality`` is replaced by this
 check's numbers.
 """
-import argparse, hashlib, importlib.util, json, struct, sys
+import argparse, hashlib, importlib.util, json, math, struct, sys
+from decimal import Decimal
 from pathlib import Path
 
 import numpy as np
@@ -17,7 +18,7 @@ import numpy as np
 BASIC_GUESS = ['height_cm', 'heads', 'physique', 'muscle', 'muscle_bulk', 'shoulders', 'fat_gain', 'breast_size']
 
 
-def catalog_controls(path, expected_sha256, header):
+def catalog_controls(path, expected_sha256, header, runtime_identity=None):
     """Test every exposed preset over its actual, hash-pinned slider domain."""
     raw = Path(path).read_bytes()
     if hashlib.sha256(raw).hexdigest() != expected_sha256:
@@ -27,9 +28,14 @@ def catalog_controls(path, expected_sha256, header):
     for asset in json.loads(raw)['assets']:
         if asset.get('shapeSource') != source:
             continue
-        name = asset['shapeRuntime']['preset']
+        runtime = asset['shapeRuntime']
+        if runtime['format'] != 'standin-shape-runtime.v2' or runtime['rules'] != header['rules']:
+            raise ValueError('published runtime format or rules differ')
+        if runtime_identity and any(runtime[k] != v for k,v in runtime_identity.items()):
+            raise ValueError('published runtime checksum or size differs from tested bytes')
+        name = runtime['preset']
         controls = {('height_cm' if c['key'] == 'height' else c['key']):
-                    {'min': c['min'], 'max': c['max']} for c in asset['shape']['controls']}
+                    {k: c[k] for k in ('min', 'max', 'step', 'default')} for c in asset['shape']['controls']}
         if (name in presets or set(controls) != set(header['controls'])
                 or len(controls) != len(asset['shape']['controls'])):
             raise ValueError('incomplete or duplicate published controls')
@@ -37,10 +43,38 @@ def catalog_controls(path, expected_sha256, header):
             allowed = header['controls'][key]
             if not allowed['min'] <= bounds['min'] < bounds['max'] <= allowed['max']:
                 raise ValueError('published controls escape runtime domain')
+            if (not math.isfinite(bounds['step']) or bounds['step'] <= 0
+                    or bounds['default'] != header['presets'][name][key]):
+                raise ValueError('published preset defaults or slider step differ')
         presets[name] = controls
     if set(presets) != set(header['presets']):
         raise ValueError('published preset coverage differs from runtime')
     return presets
+
+
+def published_value(bounds, value):
+    """Use the actual public slider grid; decimal rounding must not escape its bounds."""
+    lo, hi, step = (Decimal(str(bounds[k])) for k in ('min', 'max', 'step'))
+    last = int((hi - lo) // step)
+    index = max(0, min(last, int(round((Decimal(str(value)) - lo) / step))))
+    return float(lo + index * step)
+
+
+def verify_geometry(header, arrays, preview):
+    nv = len(preview.data.vertices)
+    faces = [p.vertices[:] for p in preview.data.polygons]
+    if (nv > 65535 or header['vertexCount'] != nv or header['faceCount'] != len(faces)
+            or any(len(p) != 3 for p in faces)):
+        raise ValueError('runtime vertex/face counts differ from final source')
+    expected = np.asarray(faces, dtype=np.uint16).reshape(-1)
+    if not np.array_equal(arrays['faces'], expected) or (len(expected) and int(expected.max()) >= nv):
+        raise ValueError('runtime indices differ from final source')
+    sizes = {'faces': len(faces) * 3, 'mean': nv * 3, 'basisScale': header['basisCount'],
+             'basis': header['basisCount'] * nv * 3, 'coef': header['coefCount'] * header['basisCount']}
+    if set(arrays) != set(sizes) or any(len(arrays[k]) != n or not np.isfinite(arrays[k]).all() for k,n in sizes.items()):
+        raise ValueError('runtime array shape or finite-value check failed')
+    return {'vertexCount': nv, 'faceCount': len(faces), 'indicesMatchFinalSource': True,
+            'facesSha256': hashlib.sha256(expected.tobytes()).hexdigest()}
 
 
 def read_ssr2(path):
@@ -135,7 +169,11 @@ def main():
     if args.catalog and (args.control_spec or not args.catalog_sha256):
         ap.error('--catalog requires --catalog-sha256 and excludes --control-spec')
     published = json.loads(Path(args.control_spec).read_text()) if args.control_spec else header['controls']
-    per_preset = catalog_controls(args.catalog, args.catalog_sha256, header) if args.catalog else None
+    runtime_path = Path(args.runtime)
+    runtime_identity = None if args.out else {
+        'sha256': hashlib.sha256(runtime_path.read_bytes()).hexdigest(),
+        'bytes': runtime_path.stat().st_size}
+    per_preset = catalog_controls(args.catalog, args.catalog_sha256, header, runtime_identity) if args.catalog else None
     for key, path in (('blendSha256', args.blend), ('controllerSha256', args.controller)):
         if hashlib.sha256(Path(path).read_bytes()).hexdigest() != header['source'][key]:
             raise SystemExit(f'{path} is not the source this runtime was built from')
@@ -147,6 +185,7 @@ def main():
     sb.register()
     if sb.VERSION != header['rules']:
         raise SystemExit('controller VERSION differs from runtime rules')
+    geometry = verify_geometry(header, arrays, sb.preview_mesh() if hasattr(sb, 'preview_mesh') else sb.objects()[0])
     K = args.truncate_basis or header['basisCount']
     if args.selection_cut_ratio:
         header['selection'] = {'mode': 'idw2', 'cutRatio': args.selection_cut_ratio}
@@ -168,7 +207,7 @@ def main():
                 for k in moved:
                     lo, hi = bounds[k]['min'], bounds[k]['max']
                     x = rng.uniform(lo, hi) if mode != 'few' else np.clip(values[k] + rng.normal(0, .3) * (hi - lo), lo, hi)
-                    c[k] = float(np.round(x, 3))
+                    c[k] = published_value(bounds[k], x) if per_preset else float(np.round(x, 3))
                 truth = compute(sb.normalize(c))
                 errors = np.linalg.norm(evaluate(preset, c) - truth, axis=1) * 1000
                 error = float(errors.max())
@@ -182,7 +221,7 @@ def main():
         print('CHECK', preset, json.dumps(quality[preset]), flush=True)
     report = {'runtime': args.runtime, 'runtimeSha256': hashlib.sha256(Path(args.runtime).read_bytes()).hexdigest(),
               'source': header['source'], 'rules': header['rules'], 'basis': K, 'seed': args.seed,
-              'quality': quality, 'publishedControls': published}
+              'quality': quality, 'publishedControls': published, 'geometry': geometry}
     if per_preset:
         report['publishedControls'] = per_preset
         report['catalogSha256'] = args.catalog_sha256
@@ -207,6 +246,9 @@ def main():
         report['out'] = {'path': args.out, 'bytes': Path(args.out).stat().st_size,
                          'sha256': hashlib.sha256(Path(args.out).read_bytes()).hexdigest()}
         print('WROTE', json.dumps(report['out']), flush=True)
+    shipped_path = Path(args.out or args.runtime)
+    report['size'] = {'bytes': shipped_path.stat().st_size, 'limitBytes': 32 * 1024 * 1024}
+    report['passed'] = report['passed'] and report['size']['bytes'] <= report['size']['limitBytes']
     Path(args.report).write_text(json.dumps(report, ensure_ascii=False, indent=2))
 
 
