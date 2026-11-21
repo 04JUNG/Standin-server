@@ -12,7 +12,10 @@ p=argparse.ArgumentParser();p.add_argument('--input',required=True);p.add_argume
 p.add_argument('--expected-rules',required=True,help='Pinned authoring rules expected in the input; mismatches fail closed')
 p.add_argument('--balance-blocks',action='store_true',help='Give each referenced training axis/pair equal row mass so dense grids cannot suppress rare controls')
 p.add_argument('--selection-cut-ratio',type=float,help='0 uses each selected preset model; positive values use the existing SSR2 idw2 rule')
+p.add_argument('--axis-weight',type=float,default=1.,help='Relative training covariance mass for each complete single-control axis')
 args=p.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else None)
+assert np.isfinite(args.axis_weight) and 1<=args.axis_weight<=64
+assert args.axis_weight==1 or args.balance_blocks, 'Axis weighting requires balanced training blocks'
 source=Path(args.input);out=Path(args.output);h,a=read_ssr2(source);oldK=h['basisCount'];nv=h['vertexCount']
 assert not out.exists(),'A changed candidate must use a new output path'
 assert h['rules']==args.expected_rules,'Input authoring rules differ from the explicit pin'
@@ -23,9 +26,15 @@ def block(offset,count):
     if key not in remapped:
         remapped[key]=len(rows);rows.extend(oldCo[offset:offset+count]);row_weights.extend([1/np.sqrt(count)]*count)
     return remapped[key]
+weighted_axes=set()
 for model in h['models'].values():
     model['base']=block(model['base'],1)
-    for axis in model['axes']:axis['offset']=block(axis['offset'],len(axis['knots']))
+    for axis in model['axes']:
+        axis['offset']=block(axis['offset'],len(axis['knots']))
+        identity=(axis['offset'],len(axis['knots']))
+        if identity not in weighted_axes:
+            weighted_axes.add(identity)
+            for index in range(axis['offset'],axis['offset']+len(axis['knots'])):row_weights[index]*=np.sqrt(args.axis_weight)
     for pair in model['pairs']:pair['offset']=block(pair['offset'],len(pair['ga'])*len(pair['gb']))
     for triple in model.get('triples',[]):triple['offset']=block(triple['offset'],len(triple['ga'])*len(triple['gb'])*len(triple['gc']))
     for quad in model.get('quads',[]):quad['offset']=block(quad['offset'],len(quad['ga'])*len(quad['gb'])*len(quad['gc'])*len(quad['gd']))
@@ -88,6 +97,7 @@ report={'parentSha256':hashlib.sha256(source.read_bytes()).hexdigest(),'runtimeS
     'method':'Referenced coefficient compaction; exact preset span plus residual training PCA; re-quantized int16 SSR2',
     'freshIndependentControllerCatalogCheckRequired':True}
 report['trainingBlockBalanced']=args.balance_blocks
+report['axisWeight']=args.axis_weight
 report['compressionAlgorithmSha256']=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 out.with_suffix(out.suffix+'.compression.json').write_text(json.dumps(report,indent=2)+'\n')
 print('COMPRESSED_CANDIDATE',json.dumps(report),flush=True)

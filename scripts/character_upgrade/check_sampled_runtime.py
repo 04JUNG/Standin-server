@@ -115,7 +115,17 @@ def make_evaluator(header, arrays, K):
         raise ValueError('three-control terms require explicit trilinear mode')
     if any(m.get('quads') for m in header['models'].values()) and (not selection or selection['mode'] != 'idw2-varying-multilinear'):
         raise ValueError('four-control terms require explicit multilinear mode')
-    keys = list(header['controls'])
+    explicit_keys = selection.get('distanceKeys') if selection else None
+    if selection and 'distanceKeys' in selection:
+        if (selection['mode'] != 'idw2-varying-multilinear' or not isinstance(explicit_keys, list)
+                or not 1 <= len(explicit_keys) <= 16
+                or any(not isinstance(key,str) or key not in header['controls'] for key in explicit_keys)
+                or len(set(explicit_keys)) != len(explicit_keys) or selection['cutRatio']<=1):
+            raise ValueError('invalid explicit selection dimensions')
+        centers = {tuple(p[key] for key in explicit_keys) for p in header['presets'].values()}
+        if len(centers) != len(header['presets']):
+            raise ValueError('selection dimensions do not distinguish presets')
+    keys = explicit_keys if explicit_keys is not None else list(header['controls'])
     if selection and selection['mode'] in ('idw2-varying', 'idw2-varying-trilinear', 'idw2-varying-multilinear'):
         # Common offsets cannot distinguish preset centers. They still affect
         # every axis/pair below; only the model-selection distance omits them.

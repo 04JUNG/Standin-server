@@ -76,3 +76,34 @@ def test_four_control_interpolation_matches_independent_polynomial(values):
     header['selection']['mode']='idw2-varying-trilinear'
     with pytest.raises(ValueError,match='explicit multilinear'):
         make_evaluator(header,arrays,1)
+
+
+def test_declared_family_metric_keeps_varying_detail_in_geometry():
+    header, arrays = runtime("idw2-varying-multilinear")
+    header['presets']['B']['detail'] = .5
+    header['selection']['distanceKeys'] = ['shape']
+    evaluate = make_evaluator(header, arrays, 1)
+    np.testing.assert_array_equal(evaluate('A', {'shape': .3, 'detail': 0}), [[0, 0, 0]])
+    np.testing.assert_array_equal(evaluate('A', {'shape': .3, 'detail': 1}), [[1, 0, 0]])
+
+
+@pytest.mark.parametrize('keys', [[], ['shape','shape'], ['unknown'], ['detail'], None, ['shape',0], ['shape',{}]])
+def test_invalid_family_dimensions_fail_closed(keys):
+    header, arrays = runtime("idw2-varying-multilinear")
+    header['selection']['distanceKeys'] = keys
+    with pytest.raises(ValueError):
+        make_evaluator(header, arrays, 1)
+
+
+def test_declared_family_metric_cannot_change_legacy_modes():
+    header, arrays = runtime('idw2-varying')
+    header['selection']['distanceKeys'] = ['shape']
+    with pytest.raises(ValueError, match='invalid explicit'):
+        make_evaluator(header, arrays, 1)
+
+
+def test_explicit_family_metric_rejects_zero_total_weight_cutoff():
+    header, arrays = runtime('idw2-varying-multilinear')
+    header['selection'].update(distanceKeys=['shape'], cutRatio=1)
+    with pytest.raises(ValueError, match='invalid explicit'):
+        make_evaluator(header, arrays, 1)
