@@ -108,7 +108,16 @@ def make_evaluator(header, arrays, K):
     coef = arrays['coef'].reshape(header['coefCount'], full)[:, :K].astype(np.float64)
     mean = arrays['mean'].astype(np.float64)
 
+    selection = header.get('selection')
+    if selection and selection.get('mode') not in ('idw2', 'idw2-varying', 'idw2-varying-trilinear'):
+        raise ValueError('unsupported sampled-runtime model selection')
+    if any(m.get('triples') for m in header['models'].values()) and (not selection or selection['mode'] != 'idw2-varying-trilinear'):
+        raise ValueError('three-control terms require explicit trilinear mode')
     keys = list(header['controls'])
+    if selection and selection['mode'] in ('idw2-varying', 'idw2-varying-trilinear'):
+        # Common offsets cannot distinguish preset centers. They still affect
+        # every axis/pair below; only the model-selection distance omits them.
+        keys = [k for k in keys if len({v[k] for v in header['presets'].values()}) > 1]
     ranges = np.array([header['controls'][k]['max'] - header['controls'][k]['min'] for k in keys])
     centers = {n: np.array([v[k] for k in keys]) for n, v in header['presets'].items()}
 
@@ -140,6 +149,14 @@ def make_evaluator(header, arrays, K):
             at = lambda a, b: pair['offset'] + a * nb + b
             co += (coef[at(i, j)] * (1 - u) * (1 - v) + coef[at(i + 1, j)] * u * (1 - v)
                    + coef[at(i, j + 1)] * (1 - u) * v + coef[at(i + 1, j + 1)] * u * v)
+        for triple in m.get('triples', []):
+            indices, fractions = zip(*(locate(triple[g], c[triple[k]]) for k,g in [('a','ga'),('b','gb'),('c','gc')]))
+            for ia in (0,1):
+                for ib in (0,1):
+                    for ic in (0,1):
+                        row=triple['offset']+((indices[0]+ia)*len(triple['gb'])+indices[1]+ib)*len(triple['gc'])+indices[2]+ic
+                        weight=(fractions[0] if ia else 1-fractions[0])*(fractions[1] if ib else 1-fractions[1])*(fractions[2] if ic else 1-fractions[2])
+                        co += coef[row]*weight
         return co
 
     def evaluate(preset, c):
