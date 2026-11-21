@@ -6,7 +6,7 @@ import pytest
 
 from scripts.prepared_preset_scope import select, pinned_catalog
 from scripts.staging_body_assets_init import (check_budget, validate_files, install,
-    PREPARED_PROFILE, RELEASE_CAP, PREPARED_CAP)
+    PREPARED_PROFILE, RELEASE_CAP, PREPARED_CAP, LOD_PROFILE, LOD_RELEASE_CAP)
 from scripts.add_prepared_bodies_to_release import build
 from tests.converter.test_prepared_body import bundle, CHARACTER
 
@@ -30,6 +30,16 @@ def test_budget_extends_only_prepared_converter_files():
     with pytest.raises(ValueError): check_budget(files, 'unknown')
     with pytest.raises(ValueError): check_budget(files + [file('fbx/extra.fbx')], PREPARED_PROFILE)
 
+
+
+def test_lod_budget_preserves_history_with_bounded_new_sources_and_uvs():
+    base = [file(f'fbx/base-{n}.fbx', LOD_RELEASE_CAP//5) for n in range(5)]
+    files = base + pair()
+    validate_files(files)
+    assert check_budget(files, LOD_PROFILE) == LOD_RELEASE_CAP + PREPARED_CAP
+    for profile, role in ((None, 'converter'), (PREPARED_PROFILE, 'converter'), (LOD_PROFILE, 'bff'), (LOD_PROFILE, 'inference')):
+        with pytest.raises(ValueError): check_budget(files, profile, role)
+    with pytest.raises(ValueError): check_budget(files + [file('fbx/extra.fbx')], LOD_PROFILE)
 
 @pytest.mark.parametrize('change', ['unpaired', 'too-many', 'prepared-cap', 'roles', 'extension', 'receipt-size'])
 def test_budget_rejects_invalid_supplement(change):
@@ -87,18 +97,28 @@ def test_catalog_pin_is_required(tmp_path):
     with pytest.raises(ValueError): pinned_catalog(path, 'a'*64)
 
 
-def test_release_reuses_framework_and_preserves_existing_files_and_entries(tmp_path, monkeypatch):
+@pytest.mark.parametrize('profile', [PREPARED_PROFILE, LOD_PROFILE])
+def test_expanded_profiles_require_all_twenty_catalog_presets(tmp_path, monkeypatch, profile):
+    _, catalog, release, prepared = scope_fixture(tmp_path, monkeypatch)
+    catalog['assets'].pop()
+    with pytest.raises(ValueError):
+        build(release, prepared, 'incomplete', tmp_path/'out', catalog=catalog, budget_profile=profile)
+    assert not (tmp_path/'out').exists()
+
+
+@pytest.mark.parametrize('profile', [PREPARED_PROFILE, LOD_PROFILE])
+def test_release_reuses_framework_and_preserves_existing_files_and_entries(tmp_path, monkeypatch, profile):
     registry, catalog, release, prepared = scope_fixture(tmp_path, monkeypatch)
     original = json.loads((release/'manifest.json').read_text())
-    plan = build(release, prepared, 'test', tmp_path/'out', catalog=catalog, budget_profile=PREPARED_PROFILE)
+    plan = build(release, prepared, 'test', tmp_path/'out', catalog=catalog, budget_profile=profile)
     result = json.loads((tmp_path/'out/manifest.json').read_text())
-    assert result['budgetProfile'] == PREPARED_PROFILE
+    assert result['budgetProfile'] == profile
     assert len(plan['preparedEntries']) == 20
     assert next(f for f in result['files'] if f['path']=='characters.json') == original['files'][1]
     assert json.loads((tmp_path/'out/shape-bakes.json').read_text())['characters'] == registry['characters']
     assert len([f for f in result['files'] if f['path'].startswith('fbx/prepared-')]) == 1  # identical aliases
     # Re-derive from a prepared release: preserve hashes and avoid duplicate paths.
-    second = build(tmp_path/'out', prepared, 'test2', tmp_path/'out2', catalog=catalog, budget_profile=PREPARED_PROFILE)
+    second = build(tmp_path/'out', prepared, 'test2', tmp_path/'out2', catalog=catalog, budget_profile=profile)
     assert second['putNew'] == ['shape-bakes.json']
     assert len(second['preparedEntries']) == 20
 

@@ -186,3 +186,5 @@ POST 시작부터 응답 JSON/base64 decode·artifact SHA·파일 fsync·저장 
 실제 요청 시간, 중립 단계, offline 준비 시간을 섞지 않았다. 최종 [summary](qa/prepared-all20-20261113/final-summary.json)와 [깨끗한 ob_001 원시 결과](qa/prepared-all20-20261113/main-ob001-clean.json)에 완료 범위·제외 범위가 있다. CPU/OS/이미지/소스/기본값이 달라지는 통합은 해당 최종 버전에서 별도 재검증한다.
 
 기능 PR #235/#236 및 infra #92/#93은 최종 측정 진행 중 별도로 병합된 것을 확인했다. 이 준비 세션은 보호 브랜치 병합이나 배포를 실행하지 않았다. 이 후속 문서 PR은 병합된 구현을 다시 제출하지 않고 마지막 HTTP/ob_001 원시 결과·실제 이미지 audit·검증 summary만 추가한다.
+
+새 LOD 20종과 기존 자산을 함께 유지하는 별도 유한 예산과 공개 슬라이더 범위 검사는 [새 기본 모델 스테이징 조건](LOD_DEFAULT_STAGING_20261118.md)을 따른다. 기존 prepared profile의 상한은 바꾸지 않는다.

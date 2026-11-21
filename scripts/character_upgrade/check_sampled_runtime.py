@@ -9,12 +9,72 @@ draws a fresh test set with another seed, so the numbers are not tuned to it. Wi
 value) to fit a size budget; the written file's header ``quality`` is replaced by this
 check's numbers.
 """
-import argparse, hashlib, importlib.util, json, struct, sys
+import argparse, hashlib, importlib.util, itertools, json, math, struct, sys
+from decimal import Decimal
 from pathlib import Path
 
 import numpy as np
 
 BASIC_GUESS = ['height_cm', 'heads', 'physique', 'muscle', 'muscle_bulk', 'shoulders', 'fat_gain', 'breast_size']
+
+
+def catalog_controls(path, expected_sha256, header, runtime_identity=None):
+    """Test every exposed preset over its actual, hash-pinned slider domain."""
+    raw = Path(path).read_bytes()
+    if hashlib.sha256(raw).hexdigest() != expected_sha256:
+        raise ValueError('published catalog checksum mismatch')
+    source = {'rules': header['rules'], **header['source']}
+    presets = {}
+    for asset in json.loads(raw)['assets']:
+        if asset.get('shapeSource') != source:
+            continue
+        runtime = asset['shapeRuntime']
+        if runtime['format'] != 'standin-shape-runtime.v2' or runtime['rules'] != header['rules']:
+            raise ValueError('published runtime format or rules differ')
+        if runtime_identity and any(runtime[k] != v for k,v in runtime_identity.items()):
+            raise ValueError('published runtime checksum or size differs from tested bytes')
+        name = runtime['preset']
+        controls = {('height_cm' if c['key'] == 'height' else c['key']):
+                    {k: c[k] for k in ('min', 'max', 'step', 'default')} for c in asset['shape']['controls']}
+        if (name in presets or set(controls) != set(header['controls'])
+                or len(controls) != len(asset['shape']['controls'])):
+            raise ValueError('incomplete or duplicate published controls')
+        for key, bounds in controls.items():
+            allowed = header['controls'][key]
+            if not allowed['min'] <= bounds['min'] < bounds['max'] <= allowed['max']:
+                raise ValueError('published controls escape runtime domain')
+            if (not math.isfinite(bounds['step']) or bounds['step'] <= 0
+                    or bounds['default'] != header['presets'][name][key]):
+                raise ValueError('published preset defaults or slider step differ')
+        presets[name] = controls
+    if set(presets) != set(header['presets']):
+        raise ValueError('published preset coverage differs from runtime')
+    return presets
+
+
+def published_value(bounds, value):
+    """Use the actual public slider grid; decimal rounding must not escape its bounds."""
+    lo, hi, step = (Decimal(str(bounds[k])) for k in ('min', 'max', 'step'))
+    last = int((hi - lo) // step)
+    index = max(0, min(last, int(round((Decimal(str(value)) - lo) / step))))
+    return float(lo + index * step)
+
+
+def verify_geometry(header, arrays, preview):
+    nv = len(preview.data.vertices)
+    faces = [p.vertices[:] for p in preview.data.polygons]
+    if (nv > 65535 or header['vertexCount'] != nv or header['faceCount'] != len(faces)
+            or any(len(p) != 3 for p in faces)):
+        raise ValueError('runtime vertex/face counts differ from final source')
+    expected = np.asarray(faces, dtype=np.uint16).reshape(-1)
+    if not np.array_equal(arrays['faces'], expected) or (len(expected) and int(expected.max()) >= nv):
+        raise ValueError('runtime indices differ from final source')
+    sizes = {'faces': len(faces) * 3, 'mean': nv * 3, 'basisScale': header['basisCount'],
+             'basis': header['basisCount'] * nv * 3, 'coef': header['coefCount'] * header['basisCount']}
+    if set(arrays) != set(sizes) or any(len(arrays[k]) != n or not np.isfinite(arrays[k]).all() for k,n in sizes.items()):
+        raise ValueError('runtime array shape or finite-value check failed')
+    return {'vertexCount': nv, 'faceCount': len(faces), 'indicesMatchFinalSource': True,
+            'facesSha256': hashlib.sha256(expected.tobytes()).hexdigest()}
 
 
 def read_ssr2(path):
@@ -48,7 +108,28 @@ def make_evaluator(header, arrays, K):
     coef = arrays['coef'].reshape(header['coefCount'], full)[:, :K].astype(np.float64)
     mean = arrays['mean'].astype(np.float64)
 
-    keys = list(header['controls'])
+    selection = header.get('selection')
+    if selection and selection.get('mode') not in ('idw2', 'idw2-varying', 'idw2-varying-trilinear', 'idw2-varying-multilinear'):
+        raise ValueError('unsupported sampled-runtime model selection')
+    if any(m.get('triples') for m in header['models'].values()) and (not selection or selection['mode'] not in ('idw2-varying-trilinear','idw2-varying-multilinear')):
+        raise ValueError('three-control terms require explicit trilinear mode')
+    if any(m.get('quads') for m in header['models'].values()) and (not selection or selection['mode'] != 'idw2-varying-multilinear'):
+        raise ValueError('four-control terms require explicit multilinear mode')
+    explicit_keys = selection.get('distanceKeys') if selection else None
+    if selection and 'distanceKeys' in selection:
+        if (selection['mode'] != 'idw2-varying-multilinear' or not isinstance(explicit_keys, list)
+                or not 1 <= len(explicit_keys) <= 16
+                or any(not isinstance(key,str) or key not in header['controls'] for key in explicit_keys)
+                or len(set(explicit_keys)) != len(explicit_keys) or selection['cutRatio']<=1):
+            raise ValueError('invalid explicit selection dimensions')
+        centers = {tuple(p[key] for key in explicit_keys) for p in header['presets'].values()}
+        if len(centers) != len(header['presets']):
+            raise ValueError('selection dimensions do not distinguish presets')
+    keys = explicit_keys if explicit_keys is not None else list(header['controls'])
+    if selection and selection['mode'] in ('idw2-varying', 'idw2-varying-trilinear', 'idw2-varying-multilinear'):
+        # Common offsets cannot distinguish preset centers. They still affect
+        # every axis/pair below; only the model-selection distance omits them.
+        keys = [k for k in keys if len({v[k] for v in header['presets'].values()}) > 1]
     ranges = np.array([header['controls'][k]['max'] - header['controls'][k]['min'] for k in keys])
     centers = {n: np.array([v[k] for k in keys]) for n, v in header['presets'].items()}
 
@@ -80,6 +161,23 @@ def make_evaluator(header, arrays, K):
             at = lambda a, b: pair['offset'] + a * nb + b
             co += (coef[at(i, j)] * (1 - u) * (1 - v) + coef[at(i + 1, j)] * u * (1 - v)
                    + coef[at(i, j + 1)] * (1 - u) * v + coef[at(i + 1, j + 1)] * u * v)
+        for triple in m.get('triples', []):
+            indices, fractions = zip(*(locate(triple[g], c[triple[k]]) for k,g in [('a','ga'),('b','gb'),('c','gc')]))
+            for ia in (0,1):
+                for ib in (0,1):
+                    for ic in (0,1):
+                        row=triple['offset']+((indices[0]+ia)*len(triple['gb'])+indices[1]+ib)*len(triple['gc'])+indices[2]+ic
+                        weight=(fractions[0] if ia else 1-fractions[0])*(fractions[1] if ib else 1-fractions[1])*(fractions[2] if ic else 1-fractions[2])
+                        co += coef[row]*weight
+        for quad in m.get('quads', []):
+            grids=[quad[k] for k in ('ga','gb','gc','gd')]
+            located=[locate(grid,c[quad[key]]) for grid,key in zip(grids,('a','b','c','d'))]
+            for corner in itertools.product((0,1),repeat=4):
+                row=0;weight=1.
+                for axis,upper in enumerate(corner):
+                    index,fraction=located[axis];row=row*len(grids[axis])+index+upper
+                    weight*=fraction if upper else 1-fraction
+                co+=coef[quad['offset']+row]*weight
         return co
 
     def evaluate(preset, c):
@@ -95,6 +193,8 @@ def main():
     ap.add_argument('--controller', required=True)
     ap.add_argument('--report', required=True)
     ap.add_argument('--control-spec', help='Published slider bounds; verify that subset explicitly')
+    ap.add_argument('--catalog', help='Published body-models.json with exact source/runtime bindings')
+    ap.add_argument('--catalog-sha256', help='Required approval pin with --catalog')
     ap.add_argument('--truncate-basis', type=int, default=0)
     ap.add_argument('--out')
     ap.add_argument('--few', type=int, default=12)
@@ -104,7 +204,14 @@ def main():
     ap.add_argument('--selection-cut-ratio', type=float, default=0, help='write/enable idw2 model blending (0 = keep header)')
     args = ap.parse_args(sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else None)
     header, arrays = read_ssr2(args.runtime)
+    if args.catalog and (args.control_spec or not args.catalog_sha256):
+        ap.error('--catalog requires --catalog-sha256 and excludes --control-spec')
     published = json.loads(Path(args.control_spec).read_text()) if args.control_spec else header['controls']
+    runtime_path = Path(args.runtime)
+    runtime_identity = None if args.out else {
+        'sha256': hashlib.sha256(runtime_path.read_bytes()).hexdigest(),
+        'bytes': runtime_path.stat().st_size}
+    per_preset = catalog_controls(args.catalog, args.catalog_sha256, header, runtime_identity) if args.catalog else None
     for key, path in (('blendSha256', args.blend), ('controllerSha256', args.controller)):
         if hashlib.sha256(Path(path).read_bytes()).hexdigest() != header['source'][key]:
             raise SystemExit(f'{path} is not the source this runtime was built from')
@@ -116,6 +223,7 @@ def main():
     sb.register()
     if sb.VERSION != header['rules']:
         raise SystemExit('controller VERSION differs from runtime rules')
+    geometry = verify_geometry(header, arrays, sb.preview_mesh() if hasattr(sb, 'preview_mesh') else sb.objects()[0])
     K = args.truncate_basis or header['basisCount']
     if args.selection_cut_ratio:
         header['selection'] = {'mode': 'idw2', 'cutRatio': args.selection_cut_ratio}
@@ -125,6 +233,7 @@ def main():
     basic = [k for k in BASIC_GUESS if k in sb.FIELDS]
     quality = {}
     for preset, values in header['presets'].items():
+        bounds = per_preset[preset] if per_preset else published
         per = {}
         compute = sb.preview_compute if hasattr(sb, 'preview_compute') else lambda c: sb.compute(c)[0]
         truth0 = compute(sb.normalize(values))
@@ -134,9 +243,9 @@ def main():
                 c = dict(values)
                 moved = keys if mode == 'all' else basic if mode == 'basic' else list(rng.choice(keys, int(rng.integers(2, 7)), replace=False))
                 for k in moved:
-                    lo, hi = published[k]['min'], published[k]['max']
+                    lo, hi = bounds[k]['min'], bounds[k]['max']
                     x = rng.uniform(lo, hi) if mode != 'few' else np.clip(values[k] + rng.normal(0, .3) * (hi - lo), lo, hi)
-                    c[k] = float(np.round(x, 3))
+                    c[k] = published_value(bounds[k], x) if per_preset else float(np.round(x, 3))
                 truth = compute(sb.normalize(c))
                 errors = np.linalg.norm(evaluate(preset, c) - truth, axis=1) * 1000
                 error = float(errors.max())
@@ -144,9 +253,16 @@ def main():
                 if error > 5:
                     print('ERROR_CASE', mode, round(error, 2), 'vertex', int(errors.argmax()),
                           json.dumps({k:v for k,v in c.items() if v != values[k]}), flush=True)
-        quality[preset] = {'preset_mm': round(exact, 3), **{m: {'max_mm': round(max(v), 2), 'median_mm': round(float(np.median(v)), 2), 'p90_mm': round(float(np.percentile(v, 90)), 2), 'n': len(v)} for m, v in per.items()}}
+        # Gate on full precision; rounding near a limit can turn a failure into
+        # a pass. These are the measurements of the actual written float arrays.
+        quality[preset] = {'preset_mm': exact, **{m: {'max_mm': max(v), 'median_mm': float(np.median(v)), 'p90_mm': float(np.percentile(v, 90)), 'n': len(v)} for m, v in per.items()}}
         print('CHECK', preset, json.dumps(quality[preset]), flush=True)
-    report = {'runtime': args.runtime, 'rules': header['rules'], 'basis': K, 'seed': args.seed, 'quality': quality, 'publishedControls': published}
+    report = {'runtime': args.runtime, 'runtimeSha256': hashlib.sha256(Path(args.runtime).read_bytes()).hexdigest(),
+              'source': header['source'], 'rules': header['rules'], 'basis': K, 'seed': args.seed,
+              'quality': quality, 'publishedControls': published, 'geometry': geometry}
+    if per_preset:
+        report['publishedControls'] = per_preset
+        report['catalogSha256'] = args.catalog_sha256
     limits = {'preset_mm': .5, 'few': 5., 'basic': 10., 'all': 20.}
     report['limits_mm'] = limits
     report['passed'] = all(q['preset_mm'] <= limits['preset_mm'] and
@@ -168,6 +284,9 @@ def main():
         report['out'] = {'path': args.out, 'bytes': Path(args.out).stat().st_size,
                          'sha256': hashlib.sha256(Path(args.out).read_bytes()).hexdigest()}
         print('WROTE', json.dumps(report['out']), flush=True)
+    shipped_path = Path(args.out or args.runtime)
+    report['size'] = {'bytes': shipped_path.stat().st_size, 'limitBytes': 32 * 1024 * 1024}
+    report['passed'] = report['passed'] and report['size']['bytes'] <= report['size']['limitBytes']
     Path(args.report).write_text(json.dumps(report, ensure_ascii=False, indent=2))
 
 

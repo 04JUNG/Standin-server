@@ -18,7 +18,10 @@ def test_default_choice_and_asset_pins_are_independent_of_outline_json():
     assert skin_hash()!=skin_hash(dict(version=VERSION,id='flesh'))
     from converter.outline_spec import normalize as outline
     with pytest.raises(ValueError):outline(dict(version='fbx-outline-v1',width=1,skin='flesh'))
-    assert len(manifest_hash())==64 and len(manifest()['models'])==22
+    models=manifest()['models']
+    assert len(manifest_hash())==64 and len(models)==42
+    assert models['male-base-lod-v5p2-20261118']['character_sha256']=='3bed84be1bad274310fae73a2e1f14e279817006acc2c9b69936f99630f6078e'
+    assert models['female-base-lod-v4-20261118']['character_sha256']=='d9f65329a59ef043abcd7af48c33da1d0f8399632e27c65a29cbe545c99499d0'
     for row in manifest()['models'].values():
         assert row['bones'] in (52,54) and 'flesh' in row['textures']
         assert {'gray-guide','flesh','flesh-guide','muscle'} <= set(row['textures']) <= {'gray-guide','flesh','flesh-guide','muscle','flesh-muscle'}

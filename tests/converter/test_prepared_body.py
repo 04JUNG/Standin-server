@@ -158,7 +158,8 @@ def test_packaging_can_relocate_a_container_built_bundle(tmp_path, monkeypatch):
     assert (output / 'fbx' / fbx.name).read_bytes() == fbx.read_bytes()
 
 
-def test_prepared_paths_install_with_the_existing_body_asset_allowlist(tmp_path, monkeypatch):
+@pytest.mark.parametrize('change', [None, 'platform', 'code', 'source', 'character', 'unindexed'])
+def test_prepared_install_checks_identity_before_publishing(tmp_path, monkeypatch, change):
     from scripts.prepare_preset_bodies import stage_prepared
     from scripts.staging_body_assets_init import install
     recipe, _, meta, _, _ = bundle(tmp_path, monkeypatch)
@@ -168,8 +169,25 @@ def test_prepared_paths_install_with_the_existing_body_asset_allowlist(tmp_path,
                              'entries': {CHARACTER: recipe['prepared_neutral']}}}))
     package = tmp_path / 'package'; target = tmp_path / 'installed'
     stage_prepared(meta.parent.parent, registry, package, str(target))
+    source = registry['sources'][recipe['rules']]
+    for name, ext in [('blend', '.blend'), ('controller', '.py')]:
+        dest = package / 'sources' / ('body' + ext)
+        dest.parent.mkdir(exist_ok=True)
+        dest.write_bytes(Path(source[name]).read_bytes())
+        source[name] = str(target / 'sources' / dest.name)
+    if change in ('platform', 'code'):
+        receipt_path = next((package / 'qa').glob('*.json'))
+        receipt = json.loads(receipt_path.read_bytes())
+        receipt['identity']['runtime'][2 if change == 'platform' else 4] = 'wrong-runtime'
+        receipt_path.write_text(json.dumps(receipt))
+        registry['prepared_neutrals']['entries'][CHARACTER]['sha256'] = hashlib.sha256(receipt_path.read_bytes()).hexdigest()
+    if change == 'source':
+        source['blend_sha256'] = '0' * 64
+    if change == 'unindexed':
+        registry['prepared_neutrals']['entries'] = {}
     (package / 'shape-bakes.json').write_text(json.dumps(registry))
-    (package / 'characters.json').write_text('{"schema_version":1,"characters":{}}')
+    (package / 'characters.json').write_text(json.dumps({'schema_version': 1, 'characters': {
+        CHARACTER: {'sha256': '0' * 64 if change == 'character' else recipe['asset_sha256']}}}))
     entries = []
     for file in package.rglob('*'):
         if file.is_file(): entries.append({'path': file.relative_to(package).as_posix(),
@@ -178,9 +196,17 @@ def test_prepared_paths_install_with_the_existing_body_asset_allowlist(tmp_path,
     prefix = 'body-models/releases/prepared-fixture'
     def fetch(key, _limit):
         return manifest if key == prefix + '/manifest.json' else (package / key.removeprefix(prefix + '/')).read_bytes()
-    report = install(fetch, {'BODY_ASSETS_ROLE':'converter', 'BODY_ASSETS_MANIFEST_KEY':prefix+'/manifest.json',
-        'BODY_ASSETS_MANIFEST_SHA256':hashlib.sha256(manifest).hexdigest(), 'BODY_ASSETS_ROOT':str(target)})
-    assert report['files'] == 4
+    env = {'BODY_ASSETS_ROLE':'converter', 'BODY_ASSETS_MANIFEST_KEY':prefix+'/manifest.json',
+        'BODY_ASSETS_MANIFEST_SHA256':hashlib.sha256(manifest).hexdigest(), 'BODY_ASSETS_ROOT':str(target)}
+    if change:
+        with pytest.raises(ValueError):
+            install(fetch, env)
+        assert not (target / 'characters.json').exists()
+        assert not (target / '.body-assets-ready.json').exists()
+        return
+    report = install(fetch, env)
+    assert report['files'] == 6
+    assert report['preparedIdentitiesVerified'] == 1
     assert json.loads((target / 'shape-bakes.json').read_text())['prepared_neutrals']['entries'][CHARACTER]['path'].startswith(str(target))
 
 
