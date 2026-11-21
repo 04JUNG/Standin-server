@@ -1,5 +1,5 @@
 """Private approved final-FBX skin postprocess, independent of outline JSON."""
-import base64,hashlib,hmac,json,os,re,subprocess,tempfile,time
+import base64,hashlib,hmac,json,logging,os,re,subprocess,tempfile,time
 from pathlib import Path
 from fastapi import File,Form,Request,UploadFile
 from fastapi.responses import JSONResponse,Response
@@ -7,13 +7,19 @@ from converter.skin_spec import (VERSION,EXPRESSION,SKINS,MAX_FBX_BYTES,normaliz
     manifest,manifest_hash,runtime_revision,certified,checked_asset,CSP_CERTIFIED)
 from converter.scene_contract import FBX_MAGIC
 from converter.framing import validate_scope
-from converter_api.work_queue import current_work
+from converter_api.work_queue import current_work, measured_slot
 SHA=re.compile(r'^[0-9a-f]{64}$')
 
 
-def prepare(runner,data,job,*,checkpoint):
+def prepare(runner, data, job, *, checkpoint):
+    from converter_api.appearance_cache import verified_appearance
+    return verified_appearance('skin', data, job, runtime_revision(),
+        lambda: _prepare_uncached(runner, data, job, checkpoint=checkpoint), checkpoint)
+
+
+def _prepare_uncached(runner,data,job,*,checkpoint):
     runner.inspect_blender()
-    with runner._process_slots,tempfile.TemporaryDirectory(prefix='standin-skin-',dir=runner.settings.temp_root) as tmp:
+    with measured_slot(runner._process_slots, worker=True), tempfile.TemporaryDirectory(prefix='standin-skin-',dir=runner.settings.temp_root) as tmp:
         root=Path(tmp);(root/'source.fbx').write_bytes(data);job_bytes=json.dumps(job,sort_keys=True,allow_nan=False).encode();(root/'job.json').write_bytes(job_bytes)
         for stage in ('export','verify'):
             checkpoint();started=time.monotonic();command=[runner.settings.blender_binary,'--background','--factory-startup','--disable-autoexec','--python-exit-code','1','--python',str(Path(__file__).resolve().parents[1]/'converter/skin_worker.py'),'--',stage,str(root)]
@@ -49,6 +55,8 @@ def prepare(runner,data,job,*,checkpoint):
 
 def register_skin(app,registry,runner):
     from converter_api.app import ApiProblem
+    from converter_api.skin_asset_cache import SkinAssetVerificationCache
+    verification = SkinAssetVerificationCache()
     def auth(request):
         token=os.getenv('CONVERTER_INTERACTIVE_TOKEN','')
         if len(token)<32 or not hmac.compare_digest(request.headers.get('authorization',''),'Bearer '+token):raise ApiProblem(401,'UNAUTHORIZED','service authentication required')
@@ -68,11 +76,12 @@ def register_skin(app,registry,runner):
         return data
     @app.get('/skin-contract')
     def contract():
-        available=True
-        try:
-            for _,_,_,entry in files():asset_data(entry)
-        except (ValueError,OSError):available=False
-        targets=[dict(character_id=cid,character_sha256=row['character_sha256'],output_scope='full',skin_ids=[sid for sid in SKINS[1:] if certified(row['character_sha256'],'full',dict(version=VERSION,id=sid))]) for cid,row in manifest()['models'].items()]
+        manifest_sha=manifest_hash()
+        entries=tuple(entry for _,_,_,entry in files())
+        available,metrics=verification.check(entries,os.getenv('CONVERTER_SKIN_ASSET_ROOT',''),manifest_sha)
+        logging.getLogger('standin.converter').info(json.dumps(dict(event='skin_contract_asset_verification',
+            asset_manifest_sha256=manifest_sha,**metrics),sort_keys=True))
+        targets=[dict(character_id=cid,character_sha256=row['character_sha256'],output_scope='full',skin_ids=[sid for sid in row['textures'] if certified(row['character_sha256'],'full',dict(version=VERSION,id=sid))]) for cid,row in manifest()['models'].items()]
         targets=[row for row in targets if row['skin_ids']]
         assets=[dict(character_id=cid,kind=kind,skin_id=sid,sha256=entry['sha256'],bytes=entry['bytes'],url='/skin-assets/'+entry['sha256']) for cid,kind,sid,entry in files()]
         return JSONResponse(dict(version=VERSION,expression=EXPRESSION,enabled=enabled(),assets_available=available,

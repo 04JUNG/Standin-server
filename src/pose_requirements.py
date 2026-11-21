@@ -264,10 +264,20 @@ class WholePoseValidator:
         detail_unknown=[k for k,c in checks.items() if k.startswith('body:') and c['status']=='unknown']
         conflicts=[k for k,c in checks.items() if c['status']=='conflict' and k not in detail_conflicts]
         unknown=[k for k,c in checks.items() if c['status']=='unknown' and not c.get('missing_is_optional')]
+        pair = {}
+        if required.get('waist_down_pair'):
+            arm_roles = observed['arms']
+            matches = {arm_roles.get('left'), arm_roles.get('right')} == {'waist', 'lowered'}
+            side_conflicts = [key for key in conflicts if matches and key.startswith('arm:')]
+            conflicts = [key for key in conflicts if key not in side_conflicts]
+            from .waist_arm_pair import SIDE_CONFLICT_COST
+            pair = dict(waist_down_pair=matches, arm_roles=arm_roles,
+                        softened_arm_sides=side_conflicts,
+                        side_penalty=SIDE_CONFLICT_COST if side_conflicts else 0.)
         return dict(status='conflict' if conflicts else 'needs_review' if unknown else 'near_match' if detail_conflicts or detail_unknown else 'passed',
                     checks=checks,conflicts=conflicts,unknown=unknown,
                     detail_conflicts=detail_conflicts,detail_unknown=detail_unknown,body_metrics=observed.get('metrics',{}),
-                    actual_mesh_contact_validated=False)
+                    actual_mesh_contact_validated=False, **pair)
 
     @staticmethod
     def _check_posture(add,wanted,actual,observed,postures,bound):

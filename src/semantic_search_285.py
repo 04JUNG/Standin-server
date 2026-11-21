@@ -50,11 +50,13 @@ import sqlite3
 import time
 import unicodedata
 from collections import Counter
+from copy import deepcopy
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Iterable, Mapping, Optional, Protocol, Sequence
 from urllib.parse import quote
 
+from .search_computation import cached_search_work
 from .semantic_relevance import relevance_constraints
 
 import numpy as np
@@ -718,6 +720,7 @@ class SemanticIndex:
     dense_encoder: Optional[object] = None    # 선택: 문장 임베딩(src/semantic_embedding.py)
     dense_matrix: Optional[np.ndarray] = None
     review_preferences: dict = field(default_factory=dict)  # optional explicit local feedback
+    _scoring_key: tuple | None = field(default=None, init=False, repr=False, compare=False)
 
     @property
     def pose_count(self) -> int:
@@ -863,6 +866,12 @@ class SemanticIndex:
         if review_preferences_path:
             from .semantic_relevance import load_review_preferences
             load_review_preferences(index, review_preferences_path, normalize_text)
+        if type(encoder) is CharNgramTfidf and dense_encoder is None and not review_preferences_path:
+            index._scoring_key = (
+                db_sha, identity["tags_sha256"], file_sha256(taxonomy_path),
+                file_sha256(lexicon_path), file_sha256(mined_path) if mined_raw is not None else None,
+                tuple(encoder.ns), tuple(d.pose_id for d in docs),
+            )
         return index
 
     # ── 포즈 JSON ──
@@ -991,6 +1000,93 @@ def _search(index, text, norm, source, top_k, min_score, settings, started, quer
             tag_list=()):
     k = max(1, min(int(top_k or settings.top_k), settings.max_top_k))
     threshold = settings.min_score(source) if min_score is None else float(min_score)
+    key = None
+    if index._scoring_key is not None and not index.review_preferences:
+        # Basic search and Recall apply different cutoffs to the same document scores.
+        scoring_settings = replace(settings, min_score_user=0., min_score_vlm=0.)
+        key = (index._scoring_key, norm, tuple(tag_list), scoring_settings)
+    scored_query, preferred_pose_ids, rows = cached_search_work(
+        'semantic_documents', key,
+        lambda: _score_documents(index, norm, settings, tag_list), limit=6,
+    )
+    query_info.update(deepcopy(scored_query))
+    # Feedback cannot resurrect low-score, constraint-failing, missing or excluded assets.
+    # Retrieval scores remain unchanged; this is an explicitly labeled second-stage order.
+    preferred_rows = []
+    for order, pose_id in enumerate(preferred_pose_ids, 1):
+        for row in rows:
+            if (index.docs[row[1]].pose_id == pose_id and row[0] >= threshold
+                    and row[2].get('requested_constraint_match') == 1.0):
+                components = dict(row[2], human_preference=1.0, human_preference_order=float(order))
+                preferred_rows.append((*row[:2], components, *row[3:]))
+                break
+    if preferred_rows:
+        preferred_indices = {r[1] for r in preferred_rows}
+        rows = preferred_rows + [r for r in rows if r[1] not in preferred_indices]
+
+    picked, alternates, seen_family = [], {}, {}
+    for row in rows:
+        pose_id = index.docs[row[1]].pose_id
+        fam = index.family.get(pose_id, pose_id) if settings.collapse_mirrors else pose_id
+        if fam in seen_family:
+            alternates.setdefault(seen_family[fam], []).append(
+                {"pose_id": pose_id, "score": round(row[0], 4)})
+            continue
+        seen_family[fam] = pose_id
+        picked.append(row)
+        if len(picked) >= k + settings.near_miss_count:
+            break
+
+    above = [r for r in picked if r[0] >= threshold][:k]
+    candidates = []
+    for rank, (score, i, comps, matched, missing, body_detail, raw_cos, uncovered) in enumerate(above, 1):
+        pose_id = index.docs[i].pose_id
+        pose = index.pose_json(pose_id)
+        if pose is None:
+            raise SemanticSearchError(ErrorCode.POSE_JSON_MISSING,
+                                      f"pose JSON could not be built for {pose_id}",
+                                      {"pose_id": pose_id})
+        if pose.get("pose_id") != pose_id:
+            raise SemanticSearchError(ErrorCode.POSE_ID_MISMATCH,
+                                      f"candidate {pose_id} != pose JSON {pose.get('pose_id')}",
+                                      {"candidate_pose_id": pose_id,
+                                       "pose_json_pose_id": pose.get("pose_id")})
+        candidates.append({
+            "rank": rank,
+            "pose_id": pose_id,
+            "score": round(score, 4),
+            "score_components": {n: round(v, 4) for n, v in comps.items()},
+            "evidence": {
+                "matched_tags": [dict(tag) for tag in matched],
+                "missing_concepts": list(missing),
+                "uncovered_words": list(uncovered),
+                "body": dict(body_detail),
+                "text_cosine": round(raw_cos, 4),
+                "description": index.docs[i].description,
+            },
+            "mirror_alternates": alternates.get(pose_id, []),
+            "refine_allowed": False,
+            "pose": pose,
+        })
+    near = [] if candidates else [
+        {"pose_id": index.docs[r[1]].pose_id, "score": round(r[0], 4)}
+        for r in picked[: settings.near_miss_count]
+    ]
+    return {
+        "status": STATUS_OK if candidates else STATUS_NO_RESULT,
+        "error": None,
+        "query": query_info,
+        "candidates": candidates,
+        "near_misses": near,
+        "threshold": threshold,
+        "top_k": k,
+        "index": index.identity,
+        "elapsed_ms": round((time.perf_counter() - started) * 1000, 2),
+    }
+
+
+def _score_documents(index, norm, settings, tag_list):
+    query_info = {}
     lex = index.lexicon
     original_norm = norm
     review_preference = index.review_preferences.get(original_norm, {})
@@ -1240,80 +1336,7 @@ def _search(index, text, norm, source, top_k, min_score, settings, started, quer
         rows.append((score, i, comps, matched, missing, body_detail, float(cos[i]), uncovered))
 
     rows.sort(key=lambda r: (-r[0], index.docs[r[1]].pose_id))
-    # Feedback cannot resurrect low-score, constraint-failing, missing or excluded assets.
-    # Retrieval scores remain unchanged; this is an explicitly labeled second-stage order.
-    preferred_rows = []
-    for order, pose_id in enumerate(preferred_pose_ids, 1):
-        for row in rows:
-            if (index.docs[row[1]].pose_id == pose_id and row[0] >= threshold
-                    and row[2].get('requested_constraint_match') == 1.0):
-                row[2]['human_preference'] = 1.0
-                row[2]['human_preference_order'] = float(order)
-                preferred_rows.append(row)
-                break
-    if preferred_rows:
-        preferred_indices = {r[1] for r in preferred_rows}
-        rows = preferred_rows + [r for r in rows if r[1] not in preferred_indices]
-
-    picked, alternates, seen_family = [], {}, {}
-    for row in rows:
-        pose_id = index.docs[row[1]].pose_id
-        fam = index.family.get(pose_id, pose_id) if settings.collapse_mirrors else pose_id
-        if fam in seen_family:
-            alternates.setdefault(seen_family[fam], []).append(
-                {"pose_id": pose_id, "score": round(row[0], 4)})
-            continue
-        seen_family[fam] = pose_id
-        picked.append(row)
-        if len(picked) >= k + settings.near_miss_count:
-            break
-
-    above = [r for r in picked if r[0] >= threshold][:k]
-    candidates = []
-    for rank, (score, i, comps, matched, missing, body_detail, raw_cos, uncovered) in enumerate(above, 1):
-        pose_id = index.docs[i].pose_id
-        pose = index.pose_json(pose_id)
-        if pose is None:
-            raise SemanticSearchError(ErrorCode.POSE_JSON_MISSING,
-                                      f"pose JSON could not be built for {pose_id}",
-                                      {"pose_id": pose_id})
-        if pose.get("pose_id") != pose_id:
-            raise SemanticSearchError(ErrorCode.POSE_ID_MISMATCH,
-                                      f"candidate {pose_id} != pose JSON {pose.get('pose_id')}",
-                                      {"candidate_pose_id": pose_id,
-                                       "pose_json_pose_id": pose.get("pose_id")})
-        candidates.append({
-            "rank": rank,
-            "pose_id": pose_id,
-            "score": round(score, 4),
-            "score_components": {n: round(v, 4) for n, v in comps.items()},
-            "evidence": {
-                "matched_tags": matched,
-                "missing_concepts": missing,
-                "uncovered_words": uncovered,
-                "body": body_detail,
-                "text_cosine": round(raw_cos, 4),
-                "description": index.docs[i].description,
-            },
-            "mirror_alternates": alternates.get(pose_id, []),
-            "refine_allowed": False,
-            "pose": pose,
-        })
-    near = [] if candidates else [
-        {"pose_id": index.docs[r[1]].pose_id, "score": round(r[0], 4)}
-        for r in picked[: settings.near_miss_count]
-    ]
-    return {
-        "status": STATUS_OK if candidates else STATUS_NO_RESULT,
-        "error": None,
-        "query": query_info,
-        "candidates": candidates,
-        "near_misses": near,
-        "threshold": threshold,
-        "top_k": k,
-        "index": index.identity,
-        "elapsed_ms": round((time.perf_counter() - started) * 1000, 2),
-    }
+    return query_info, preferred_pose_ids, rows
 
 
 # ─────────────────────────────── 서비스 ───────────────────────────────

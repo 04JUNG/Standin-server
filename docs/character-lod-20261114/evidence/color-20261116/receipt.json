@@ -1,0 +1,16 @@
+{
+  "files": 106,
+  "bytes": 575231524,
+  "manifest_sha256": "add47bff30924f2f39ed3ed0f9aec62537d42fcfd8d712b92d040f43cf1a9c96",
+  "backup_manifest_sha256": "91fa92c1785a7f0139fc306683aef3dc6a6803ec1128befb95e8764ecf6ae457",
+  "model_files": {
+    "male": {
+      "plain": "8abc8566cc0178a989c8fa1f07f15b927332fc04bd14cccada273cbc19cf4fca",
+      "guide": "f4934c621da95a0a0c812581740a456d638af15c08b38812afc6adf60e98be57"
+    },
+    "female": {
+      "plain": "e3f1aea5c842b538a1ea4630bd59d0b7bfc48bb68d4f290172618d35efde9c3a",
+      "guide": "bb2ff682ca2a33a15105d3ace38c4acf1acaaef34ce95e176a68f8edd406338e"
+    }
+  }
+}

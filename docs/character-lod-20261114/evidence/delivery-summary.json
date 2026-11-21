@@ -1,0 +1,14 @@
+{
+  "schema": "local-character-lod-review.v1",
+  "baseline_sha": "ee965494435dbaf26b643c2e1f8da1fe404dc513",
+  "scope": "local review only; no deployment or catalog replacement",
+  "promotable": false,
+  "reasons": [
+    "extra conservative deformed-protected-point screen has held cases",
+    "both new SSR2 independent approximation checks fail",
+    "representative CSP imports do not certify every shape/skin"
+  ],
+  "file_count": 805,
+  "total_bytes": 3403462463,
+  "local_manifest": "/private/tmp/standin-mesh-light-assets-20261114/delivery-manifest.json"
+}

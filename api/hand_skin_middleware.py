@@ -6,6 +6,7 @@ from src.analysis_budget import analysis_deadline
 from starlette.responses import JSONResponse
 
 from src.hand_skin_parallel import request_cancelled
+from src.hand_skin_screen import request_receipts
 
 
 class HandSkinMiddleware:
@@ -18,6 +19,7 @@ class HandSkinMiddleware:
             return await self.app(scope, receive, send)
         cancelled = threading.Event()
         token = request_cancelled.set(cancelled)
+        receipt_token = request_receipts.set({})
         deadline_token = analysis_deadline.set(monotonic() + self.timeout_seconds)
         response_started = False
         async def bounded_send(message):
@@ -59,4 +61,5 @@ class HandSkinMiddleware:
             task.cancel()
             await asyncio.gather(task, return_exceptions=True)
             analysis_deadline.reset(deadline_token)
+            request_receipts.reset(receipt_token)
             request_cancelled.reset(token)

@@ -1,6 +1,8 @@
 # Converter HTTP process only. bpy is provided exclusively by the pinned Blender binary.
 boto3==1.40.24
 fastapi==0.141.1
+# The HTTP process computes interactive preview camera matrices.
+numpy==2.3.5
 pydantic==2.13.4
 python-multipart==0.0.32
 # /render-thumbnail: Blender가 쓴 원본 PNG를 서비스 크기(256px JPEG/PNG)로 줄인다.

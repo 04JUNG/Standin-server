@@ -1,0 +1,278 @@
+{
+  "scope": "local macOS Blender 5.2.0; not staging latency",
+  "completed_fbx_cache": false,
+  "preset_count": 20,
+  "preset_bytes": 155410272,
+  "preparation_seconds": 132.5749834595481,
+  "trials": "five distinct cases, one paired trial each; alternating baseline/optimized order",
+  "cases": [
+    {
+      "character": "male-base-v0-8-0",
+      "bvh_name": "ob_001.bvh",
+      "bvh_sha256": "64960a0467565407c32e917a21be81492918f96bc1eca40904bc93becc65689d",
+      "baseline_seconds": 18.027867625001818,
+      "prepared_seconds": 12.450808582943864,
+      "baseline_neutral_seconds": 6.151875499985181,
+      "prepared_neutral_seconds": 0.5549416249850765,
+      "reduction_percent": 30.93576654802729,
+      "adopted": true,
+      "baseline_fbx_validated": true,
+      "prepared_fbx_validated": true,
+      "comparison": {
+        "vertices": 139474,
+        "bones": 54,
+        "vertex_max_delta": 0.0,
+        "rig_max_delta": 0.0,
+        "mesh_matrix_max_delta": 0.0,
+        "weight_max_delta": 0.0,
+        "ok": true
+      },
+      "ok": true
+    },
+    {
+      "character": "female-base-v0-4-0",
+      "bvh_name": "ob_001.bvh",
+      "bvh_sha256": "64960a0467565407c32e917a21be81492918f96bc1eca40904bc93becc65689d",
+      "baseline_seconds": 11.355772207956761,
+      "prepared_seconds": 8.411411999957636,
+      "baseline_neutral_seconds": 3.4296209160238504,
+      "prepared_neutral_seconds": 0.4894391670823097,
+      "reduction_percent": 25.928313408189634,
+      "adopted": true,
+      "baseline_fbx_validated": true,
+      "prepared_fbx_validated": true,
+      "comparison": {
+        "vertices": 105430,
+        "bones": 54,
+        "vertex_max_delta": 0.0,
+        "rig_max_delta": 0.0,
+        "mesh_matrix_max_delta": 0.0,
+        "weight_max_delta": 0.0,
+        "ok": true
+      },
+      "ok": true
+    },
+    {
+      "character": "male-ideal83-v0-8-0",
+      "bvh_name": "ob_001.bvh",
+      "bvh_sha256": "64960a0467565407c32e917a21be81492918f96bc1eca40904bc93becc65689d",
+      "baseline_seconds": 20.490127084078267,
+      "prepared_seconds": 13.647643208038062,
+      "baseline_neutral_seconds": 7.560552709037438,
+      "prepared_neutral_seconds": 0.5793390839826316,
+      "reduction_percent": 33.394052891732024,
+      "adopted": true,
+      "baseline_fbx_validated": true,
+      "prepared_fbx_validated": true,
+      "comparison": {
+        "vertices": 139474,
+        "bones": 54,
+        "vertex_max_delta": 0.0,
+        "rig_max_delta": 0.0,
+        "mesh_matrix_max_delta": 0.0,
+        "weight_max_delta": 0.0,
+        "ok": true
+      },
+      "ok": true
+    },
+    {
+      "character": "male-base-v0-8-0",
+      "bvh_name": "ob_015.bvh",
+      "bvh_sha256": "a98738379acb614c5d070cec2f53e1f7df4fae0cef4c97dee1b08201caa8ef83",
+      "baseline_seconds": 24.561413583927788,
+      "prepared_seconds": 19.161831917008385,
+      "baseline_neutral_seconds": 6.1501781669212505,
+      "prepared_neutral_seconds": 0.5574142079567537,
+      "reduction_percent": 21.98400205455894,
+      "adopted": true,
+      "baseline_fbx_validated": true,
+      "prepared_fbx_validated": true,
+      "comparison": {
+        "vertices": 139474,
+        "bones": 54,
+        "vertex_max_delta": 0.0,
+        "rig_max_delta": 0.0,
+        "mesh_matrix_max_delta": 0.0,
+        "weight_max_delta": 0.0,
+        "ok": true
+      },
+      "ok": true
+    },
+    {
+      "character": "female-base-v0-4-0",
+      "bvh_name": "ob_015.bvh",
+      "bvh_sha256": "a98738379acb614c5d070cec2f53e1f7df4fae0cef4c97dee1b08201caa8ef83",
+      "baseline_seconds": 16.78729937504977,
+      "prepared_seconds": 13.789705584058538,
+      "baseline_neutral_seconds": 3.477281083003618,
+      "prepared_neutral_seconds": 0.49173095799051225,
+      "reduction_percent": 17.856319375863546,
+      "adopted": true,
+      "baseline_fbx_validated": true,
+      "prepared_fbx_validated": true,
+      "comparison": {
+        "vertices": 105430,
+        "bones": 54,
+        "vertex_max_delta": 0.0,
+        "rig_max_delta": 0.0,
+        "mesh_matrix_max_delta": 0.0,
+        "weight_max_delta": 0.0,
+        "ok": true
+      },
+      "ok": true
+    }
+  ],
+  "custom_shape_smoke": {
+    "status": {
+      "generation_skipped": false,
+      "rest_import_skipped": false,
+      "seconds": 3.5432655840413645,
+      "status": "custom_shape"
+    },
+    "shapeControlsMatch": true,
+    "finalFbxValidated": true,
+    "prototypeCount": 20
+  },
+  "presets": [
+    {
+      "character": "male-base-v0-8-0",
+      "key": "5249d8cc85b22dae2c58e08f922e9abd5b6ea817c79e8bd4c03eaf28351ead46",
+      "fbx_bytes": 9063180,
+      "generation_seconds": 6.7124073329614475,
+      "ok": true
+    },
+    {
+      "character": "female-base-v0-4-0",
+      "key": "57beee1f9cfaafed076e14abb093df1c5246fe6ea27d6960d03dbb7233a323aa",
+      "fbx_bytes": 6706764,
+      "generation_seconds": 3.5507975419750437,
+      "ok": true
+    },
+    {
+      "character": "male-ideal83-v0-8-0",
+      "key": "689e399e10e2760fbd9999ac0a654c84609ce8d88cfe8c69795d6c7c9fafed7a",
+      "fbx_bytes": 9067052,
+      "generation_seconds": 7.6999706669012085,
+      "ok": true
+    },
+    {
+      "character": "male-ideal70-v0-8-0",
+      "key": "df545222149742529d392fccfa1509be8f188eb44cf229e7bc003592476a82ad",
+      "fbx_bytes": 9065004,
+      "generation_seconds": 7.64857633295469,
+      "ok": true
+    },
+    {
+      "character": "male-toon64-v0-8-0",
+      "key": "1b6c8d6da90a60d9608d3c0db32b2d264a4df592e04fb0c83366b74c4e5eb55a",
+      "fbx_bytes": 9064732,
+      "generation_seconds": 8.097707167034969,
+      "ok": true
+    },
+    {
+      "character": "male-muscular-v0-8-0",
+      "key": "38a8b842cb99bac2942963d820e96427c55168248bbfc82f466203ef485f866e",
+      "fbx_bytes": 9072316,
+      "generation_seconds": 7.348308083950542,
+      "ok": true
+    },
+    {
+      "character": "male-muscle-max-v0-8-0",
+      "key": "4a82622a0fe960167848c0a610b1d17a1610a8ddaa1b4f74cf89ee16e6664587",
+      "fbx_bytes": 9071932,
+      "generation_seconds": 7.415884374990128,
+      "ok": true
+    },
+    {
+      "character": "male-bulk-v0-8-0",
+      "key": "bab22a0112ee429087345bbbcdaf3273f0fbbf0d43fa7e9fb93517ea7c73e82d",
+      "fbx_bytes": 9076060,
+      "generation_seconds": 9.331971250008792,
+      "ok": true
+    },
+    {
+      "character": "male-soft-v0-8-0",
+      "key": "e00a2b1bb22b65349ce54addfeb297f99eb755d8f59007ea8fdc7dc23d2a984a",
+      "fbx_bytes": 9070444,
+      "generation_seconds": 9.698998457984999,
+      "ok": true
+    },
+    {
+      "character": "male-fat-max-v0-8-0",
+      "key": "1e6393a9e888b4a87e07ad9dd69460d9a511f1e2ab2392bc99bb00accc3ae109",
+      "fbx_bytes": 9076028,
+      "generation_seconds": 10.114379832986742,
+      "ok": true
+    },
+    {
+      "character": "female-slim-v0-4-0",
+      "key": "fec4011a68b0bcacc02938f3aff432f84bbaf47b7a6dbfe016857f4c9beea6e1",
+      "fbx_bytes": 6706636,
+      "generation_seconds": 9.560692874947563,
+      "ok": true
+    },
+    {
+      "character": "female-ideal83-v0-4-0",
+      "key": "8318382db3ad359fb02637f6e52809c8fb49c5ed4a2f8b10eeba35aba2af0c23",
+      "fbx_bytes": 6707420,
+      "generation_seconds": 4.585331792011857,
+      "ok": true
+    },
+    {
+      "character": "female-ideal70-v0-4-0",
+      "key": "7dbe02d75a0d73ae18910a50ced83ebea03148314f1287129e3386f9052fddbc",
+      "fbx_bytes": 6704700,
+      "generation_seconds": 4.442893416970037,
+      "ok": true
+    },
+    {
+      "character": "female-toon64-v0-4-0",
+      "key": "91f9dcc3c3bfa545527d69c3cdf739fdae3592a235d1e66fa93f60cd7e4504ef",
+      "fbx_bytes": 6703340,
+      "generation_seconds": 3.9788518749410287,
+      "ok": true
+    },
+    {
+      "character": "female-muscular-v0-4-0",
+      "key": "037eb15a5bea9a674ea15dcf18df6cc7c8e33c9c4e257c3e2ea6cc4fdaa57649",
+      "fbx_bytes": 6707756,
+      "generation_seconds": 4.216254084021784,
+      "ok": true
+    },
+    {
+      "character": "female-muscle-max-v0-4-0",
+      "key": "203a7210e3759fecf28de8f5466b4053472e740957ae7f3f2ff142aa1bf45d25",
+      "fbx_bytes": 6708556,
+      "generation_seconds": 4.392657082993537,
+      "ok": true
+    },
+    {
+      "character": "female-soft-v0-4-0",
+      "key": "ff441054c4140579b8642f9bb8697d8495eeabcd94de56ae8cefd215b43914ec",
+      "fbx_bytes": 6708108,
+      "generation_seconds": 4.4831214169971645,
+      "ok": true
+    },
+    {
+      "character": "female-fat-max-v0-4-0",
+      "key": "73482241c2a002d35a62328d0bb311153df23b33c7b26d3ef4d6731fd65804e8",
+      "fbx_bytes": 6708700,
+      "generation_seconds": 5.987838082946837,
+      "ok": true
+    },
+    {
+      "character": "female-new-fat-v0-4-0",
+      "key": "f8fb0526452270ecde4ff2627ca6218a9687fac76decf6bfc80ec9b08c33cd6f",
+      "fbx_bytes": 6710604,
+      "generation_seconds": 6.755553166964091,
+      "ok": true
+    },
+    {
+      "character": "female-new-muscular-v0-4-0",
+      "key": "c23d602f42c2240b2ad3bc484ef3fd8c65956c4c255545e8cae8728d295d6e1c",
+      "fbx_bytes": 6710940,
+      "generation_seconds": 6.552788625005633,
+      "ok": true
+    }
+  ]
+}

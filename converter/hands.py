@@ -152,13 +152,8 @@ def solve_hands(arm, meshes, hands: Mapping[str, Optional[str]], *, library_path
             applied += 1
         bpy.context.view_layer.update()
         after = _tip_metrics(arm, side, prefix, frame.palm_normal)
-        # 표준 두께를 이 리그의 손 길이에 맞춰 관통을 잰다. 메시 자체의 교차는 Blender 검증이 본다.
-        found = contacts(_posed_chains(arm, side, prefix), palm_normal=frame.palm_normal,
-                         pinky_side=frame.pinky_side, length_axis=frame.length_axis, wrist=wrist,
-                         hand_length=_hand_length(arm, side, prefix))
         report_sides[side] = {"preset": preset.preset_id, "before": before, "after": after,
-                              "self_collisions": [
-                                  {"a": c.a, "b": c.b, "depth_m": round(c.depth, 6)} for c in found]}
+                              "self_collisions": None}
 
     for name, before in body_before.items():
         after = arm.pose.bones[name].matrix
@@ -189,5 +184,6 @@ def solve_hands(arm, meshes, hands: Mapping[str, Optional[str]], *, library_path
         "body_bones_preserved": True,
         "rig_repairs": rig_repairs,
         "sides": report_sides,
-        "self_collision_free": all(not s["self_collisions"] for s in report_sides.values()),
+        "self_collision_free": None,
+        "quality_checks_performed": False,
     }

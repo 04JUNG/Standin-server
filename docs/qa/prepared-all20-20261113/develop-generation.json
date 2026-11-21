@@ -1,0 +1,182 @@
+[
+  {
+    "character": "male-base-v0-8-0",
+    "fbx_bytes": 9063420,
+    "generation_seconds": 10.038961588000006,
+    "key": "c2e12f360659969f5149acb1bd92129ecd0bc67cfa8d9ea7ba9afe44c16bfdc8",
+    "ok": true,
+    "path": "/output/linux-prepared/qa/prepared-c2e12f360659969f5149acb1bd92129ecd0bc67cfa8d9ea7ba9afe44c16bfdc8.json",
+    "sha256": "c3e7356fe4710704b393d0f393d9a8e13290655f74f0dc17a34688106568db10"
+  },
+  {
+    "character": "male-ideal83-v0-8-0",
+    "fbx_bytes": 9067292,
+    "generation_seconds": 11.48727996400001,
+    "key": "704adf9bf706b1d91c21f3532a5871d9f8c2462bd88808f08b12809254b83c52",
+    "ok": true,
+    "path": "/output/linux-prepared/qa/prepared-704adf9bf706b1d91c21f3532a5871d9f8c2462bd88808f08b12809254b83c52.json",
+    "sha256": "afae83254aabf1aa460cc9212d9dea7c4a19c2444469f20a98e4ab19d90917d1"
+  },
+  {
+    "character": "male-ideal70-v0-8-0",
+    "fbx_bytes": 9064972,
+    "generation_seconds": 11.411366837999992,
+    "key": "1092dd66647ea1d1e393e5f4455a94e68c11467c5f932ea70a31259270918692",
+    "ok": true,
+    "path": "/output/linux-prepared/qa/prepared-1092dd66647ea1d1e393e5f4455a94e68c11467c5f932ea70a31259270918692.json",
+    "sha256": "76578b056b42c4beee0771c308ef1fd2dbf5f31bec48dc7bf8aada789b6b9158"
+  },
+  {
+    "character": "male-toon64-v0-8-0",
+    "fbx_bytes": 9064700,
+    "generation_seconds": 12.098748422,
+    "key": "5ae8369296b9d5177f458e0d97f583e5fc51ab6b3aaf309cf2268e87f4d39fcf",
+    "ok": true,
+    "path": "/output/linux-prepared/qa/prepared-5ae8369296b9d5177f458e0d97f583e5fc51ab6b3aaf309cf2268e87f4d39fcf.json",
+    "sha256": "54c457df7e9878a944658446ab14349f9ad5e512a93c1f1a7118a042947e9af4"
+  },
+  {
+    "character": "male-muscular-v0-8-0",
+    "fbx_bytes": 9072124,
+    "generation_seconds": 10.80860729699998,
+    "key": "7ef309be725701a53313386754f0eac48fabcc552d45ba96dc8aa873decbfe9c",
+    "ok": true,
+    "path": "/output/linux-prepared/qa/prepared-7ef309be725701a53313386754f0eac48fabcc552d45ba96dc8aa873decbfe9c.json",
+    "sha256": "a7f5e6faa811aa6dfcb67bbd4deb68c442b9a166a84955fb19bd9c02eb569a8b"
+  },
+  {
+    "character": "male-muscle-max-v0-8-0",
+    "fbx_bytes": 9071580,
+    "generation_seconds": 10.942597670999987,
+    "key": "2be6267942799253f90b2dc711317c773662e7dd7f9e0e3c4586bfb70686f995",
+    "ok": true,
+    "path": "/output/linux-prepared/qa/prepared-2be6267942799253f90b2dc711317c773662e7dd7f9e0e3c4586bfb70686f995.json",
+    "sha256": "5d7cf4da8a28975ada65953252fe71bf40e23bbddd374c91d391b714f294d811"
+  },
+  {
+    "character": "male-bulk-v0-8-0",
+    "fbx_bytes": 9075692,
+    "generation_seconds": 13.985330963999985,
+    "key": "8d51c70828274db723b9ec3251890a2332dc167efb5b82460619fd7533b9af1c",
+    "ok": true,
+    "path": "/output/linux-prepared/qa/prepared-8d51c70828274db723b9ec3251890a2332dc167efb5b82460619fd7533b9af1c.json",
+    "sha256": "68a9c2f05e5435aed52d35d21932559d93ff78e110bcffb12bbccaf74eb61898"
+  },
+  {
+    "character": "male-soft-v0-8-0",
+    "fbx_bytes": 9070428,
+    "generation_seconds": 13.800850964999995,
+    "key": "46a8d3cf64c6b835dbaf6caa4fe9e4fd19696eabf5bf346af116d98b9306866f",
+    "ok": true,
+    "path": "/output/linux-prepared/qa/prepared-46a8d3cf64c6b835dbaf6caa4fe9e4fd19696eabf5bf346af116d98b9306866f.json",
+    "sha256": "9b5a9b46b4fe05d243bfd45365eecfcd643a540278f01ca158a73711d0459399"
+  },
+  {
+    "character": "male-fat-max-v0-8-0",
+    "fbx_bytes": 9076092,
+    "generation_seconds": 14.804829673,
+    "key": "ac4d9065b9a25af5f9ff7d93677ca80cc78e096ba9c18e0ab43ff4fb18ffb600",
+    "ok": true,
+    "path": "/output/linux-prepared/qa/prepared-ac4d9065b9a25af5f9ff7d93677ca80cc78e096ba9c18e0ab43ff4fb18ffb600.json",
+    "sha256": "ec06ce2cbdf710be57ead356a83fc1a777323a5db253ce75311c644dc100e5ae"
+  },
+  {
+    "character": "female-base-v0-4-0",
+    "fbx_bytes": 6706748,
+    "generation_seconds": 5.362854461000012,
+    "key": "c9dbb6a3c11c137ac0eaf22994e6fcb752d7859b76c8a2b7835fe98a0cc6e03d",
+    "ok": true,
+    "path": "/output/linux-prepared/qa/prepared-c9dbb6a3c11c137ac0eaf22994e6fcb752d7859b76c8a2b7835fe98a0cc6e03d.json",
+    "sha256": "4e210dd3b65ef16d9552781032c70f9f5957916ff724acf9e467ae6310876017"
+  },
+  {
+    "character": "female-slim-v0-4-0",
+    "fbx_bytes": 6706604,
+    "generation_seconds": 14.966496297999981,
+    "key": "4a0dc4984b79ee84677a3027535c35428631a6d3b9157c8f8e8d49ae4d6f9745",
+    "ok": true,
+    "path": "/output/linux-prepared/qa/prepared-4a0dc4984b79ee84677a3027535c35428631a6d3b9157c8f8e8d49ae4d6f9745.json",
+    "sha256": "d99d3c7e7ec4dfa4dddcc0ebe49d1b5cba6575f6ff133387be75dea7761b1a3e"
+  },
+  {
+    "character": "female-ideal83-v0-4-0",
+    "fbx_bytes": 6707564,
+    "generation_seconds": 6.899638836999998,
+    "key": "1d452f495825428e976eaae7942031fa56dca7badd82e50512149a32110cb2e3",
+    "ok": true,
+    "path": "/output/linux-prepared/qa/prepared-1d452f495825428e976eaae7942031fa56dca7badd82e50512149a32110cb2e3.json",
+    "sha256": "daaf447ffcfdae9b8181e38d2232756ef6f9d0f4c6184c40be0c031e7189c9f6"
+  },
+  {
+    "character": "female-ideal70-v0-4-0",
+    "fbx_bytes": 6704684,
+    "generation_seconds": 6.637659212000017,
+    "key": "7978bda696faab6fa1d2882deb1c9f7ffad5372811326461900973c4ab9016ab",
+    "ok": true,
+    "path": "/output/linux-prepared/qa/prepared-7978bda696faab6fa1d2882deb1c9f7ffad5372811326461900973c4ab9016ab.json",
+    "sha256": "7c17575ec902451dfa3053cfaafd9656febefd75f48183eece8e32a8689976d5"
+  },
+  {
+    "character": "female-toon64-v0-4-0",
+    "fbx_bytes": 6703484,
+    "generation_seconds": 5.921633918999987,
+    "key": "0ca7050129d48dff29666fc74eb18010bfd1474f302ba6f13afd1e9969593bde",
+    "ok": true,
+    "path": "/output/linux-prepared/qa/prepared-0ca7050129d48dff29666fc74eb18010bfd1474f302ba6f13afd1e9969593bde.json",
+    "sha256": "7cb718031b80cc99ae772296d8ef5e5f022bbd61b3d0ca25e930d32928deaaa8"
+  },
+  {
+    "character": "female-muscular-v0-4-0",
+    "fbx_bytes": 6707724,
+    "generation_seconds": 6.260663378000004,
+    "key": "3c0380ccd0d77c8acf53d8ac15167a1137127125885819a607debc038b9073ac",
+    "ok": true,
+    "path": "/output/linux-prepared/qa/prepared-3c0380ccd0d77c8acf53d8ac15167a1137127125885819a607debc038b9073ac.json",
+    "sha256": "3cf42da0614dc0b3c04814e4976023719c32cfb7127b77b74a0a37aba156ab0c"
+  },
+  {
+    "character": "female-muscle-max-v0-4-0",
+    "fbx_bytes": 6708460,
+    "generation_seconds": 6.512231417999999,
+    "key": "80a2a88456a15ed946c87ddfd67ccb180f090ce8bc4a001a0562f8e23dc5853e",
+    "ok": true,
+    "path": "/output/linux-prepared/qa/prepared-80a2a88456a15ed946c87ddfd67ccb180f090ce8bc4a001a0562f8e23dc5853e.json",
+    "sha256": "00990dc3b5e30a77def4e32b5169cff3c11e8ed48f025d90e780ef6100e6cefd"
+  },
+  {
+    "character": "female-soft-v0-4-0",
+    "fbx_bytes": 6708252,
+    "generation_seconds": 6.655884086000015,
+    "key": "a26b6356e35064f48f314d84edd676f855ff086391472ac1a14b13a3e8475911",
+    "ok": true,
+    "path": "/output/linux-prepared/qa/prepared-a26b6356e35064f48f314d84edd676f855ff086391472ac1a14b13a3e8475911.json",
+    "sha256": "19e4ca9aa8dc1e5b44a40eef97db55ebae190bc0181429920814f9581865f233"
+  },
+  {
+    "character": "female-fat-max-v0-4-0",
+    "fbx_bytes": 6708844,
+    "generation_seconds": 9.762412795999978,
+    "key": "d6ae288ffe9a0dc27229a72645bf39b6b761c8b443b1c9e0e9cd36359e0e0fe8",
+    "ok": true,
+    "path": "/output/linux-prepared/qa/prepared-d6ae288ffe9a0dc27229a72645bf39b6b761c8b443b1c9e0e9cd36359e0e0fe8.json",
+    "sha256": "c45b91751f292cada35422449fe2cef713ca7e755f270f0b3a9805abd315a0a1"
+  },
+  {
+    "character": "female-new-fat-v0-4-0",
+    "fbx_bytes": 6710572,
+    "generation_seconds": 10.987187628999948,
+    "key": "16b385f4bb3790ba16e0e80d0ae0d19797ab1811e372e330c80937642393888b",
+    "ok": true,
+    "path": "/output/linux-prepared/qa/prepared-16b385f4bb3790ba16e0e80d0ae0d19797ab1811e372e330c80937642393888b.json",
+    "sha256": "68c8498aab07d630a251976e98891b30ca883e0a55ce3fe1bb1406b853041e00"
+  },
+  {
+    "character": "female-new-muscular-v0-4-0",
+    "fbx_bytes": 6710828,
+    "generation_seconds": 10.166689546999976,
+    "key": "7800a1d3f59edbaddfb892f2eb587f1286575b4506d2b0acc5fc89a4a061bcf9",
+    "ok": true,
+    "path": "/output/linux-prepared/qa/prepared-7800a1d3f59edbaddfb892f2eb587f1286575b4506d2b0acc5fc89a4a061bcf9.json",
+    "sha256": "4bff31898bce4c7b41d26e722d111bea1ed5fef928740d26c0e4044885716bb2"
+  }
+]

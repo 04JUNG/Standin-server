@@ -1,0 +1,56 @@
+[
+  {
+    "character": "male-original-base-lod-hands-v4-20261115",
+    "fbx_bytes": 9063372,
+    "generation_seconds": 10.067121046,
+    "key": "6f2bd430c96fbeb3a6a92ad594af944392e72bcb8e70bca060485af7d0226d0b",
+    "ok": true,
+    "path": "/work/prepared-baseline/qa/prepared-6f2bd430c96fbeb3a6a92ad594af944392e72bcb8e70bca060485af7d0226d0b.json",
+    "sha256": "5c9c9b5699a0e41406eb88b463d8a3b5537a4a82d6dff4bec5997eb78221a36b"
+  },
+  {
+    "character": "male-original-preset-lod-hands-v4-20261115",
+    "fbx_bytes": 9067244,
+    "generation_seconds": 12.338897465,
+    "key": "ec2ab7298893e05f00909952aadc249f6303aefb06c7370e9e348a5a9db2e62e",
+    "ok": true,
+    "path": "/work/prepared-baseline/qa/prepared-ec2ab7298893e05f00909952aadc249f6303aefb06c7370e9e348a5a9db2e62e.json",
+    "sha256": "0cf5097922d38fcc57d3585ef301e6e7d732eab8d63ba3e4ff4c68885128d73d"
+  },
+  {
+    "character": "male-original-custom-lod-hands-v4-20261115",
+    "fbx_bytes": 9077132,
+    "generation_seconds": 16.303973091000003,
+    "key": "3c7e65d618c154f9f45f3c4ff087a2bf0af177c54e5181285b9a0aa741a0806a",
+    "ok": true,
+    "path": "/work/prepared-baseline/qa/prepared-3c7e65d618c154f9f45f3c4ff087a2bf0af177c54e5181285b9a0aa741a0806a.json",
+    "sha256": "0eecb4ea9ca2ca34d2739c4d69edb96975508635de25a248aa6728dfbac1042a"
+  },
+  {
+    "character": "female-original-base-lod-hands-v4-20261115",
+    "fbx_bytes": 6706700,
+    "generation_seconds": 5.857359711000001,
+    "key": "44792e06aec47d059e60269bfa22f5de25b62813567ac454cd8a1733a7057934",
+    "ok": true,
+    "path": "/work/prepared-baseline/qa/prepared-44792e06aec47d059e60269bfa22f5de25b62813567ac454cd8a1733a7057934.json",
+    "sha256": "21a60161a0f02c00d3f70b2c57cb524bd0e5b253d80d2ca4d82120daffc8da47"
+  },
+  {
+    "character": "female-original-preset-lod-hands-v4-20261115",
+    "fbx_bytes": 6707532,
+    "generation_seconds": 7.4842838369999996,
+    "key": "f4fc2430c69d122b1e216f94d21dc2186e0bf41b5bf328f477a0deea665fc9c9",
+    "ok": true,
+    "path": "/work/prepared-baseline/qa/prepared-f4fc2430c69d122b1e216f94d21dc2186e0bf41b5bf328f477a0deea665fc9c9.json",
+    "sha256": "ca9af179a292c7eeea32b7b5c2e42dfb5b7c9b787e8de7b18a4adeafe436001d"
+  },
+  {
+    "character": "female-original-custom-lod-hands-v4-20261115",
+    "fbx_bytes": 6712588,
+    "generation_seconds": 8.695202752999997,
+    "key": "e32d27d1b0c09ae4f6e8378860476fe58488790a7c9f35f086c12ba783bbc233",
+    "ok": true,
+    "path": "/work/prepared-baseline/qa/prepared-e32d27d1b0c09ae4f6e8378860476fe58488790a7c9f35f086c12ba783bbc233.json",
+    "sha256": "279f6492c56e99f9aaec41abb9db340ee8f4edaf3a1f1c7ba5e19051c3fc3503"
+  }
+]

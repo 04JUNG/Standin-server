@@ -21,7 +21,17 @@ def main():
     entries = _ensure_db()
     library = _resolve_library_identity()
     _ensure_pose_model_bundle()
+    from src.search_recall_assets import ensure_recall_assets
+    assets_root = ensure_recall_assets()
     pose, semantic, engine = _build_fullbody_resources(entries, db_path=DB_PATH)
+    if assets_root is not None:
+        if engine.search_evidence is None or os.getenv('ROUTING_LUNA_SIX_FIELD_ENABLED') != '1':
+            raise ValueError('staging recall requires search evidence and Luna six-field descriptions')
+        from src.config import CFG
+        from src.experimental.search_recall.engine import RecallAssets, RecallSearch
+        assets = RecallAssets.from_root(assets_root)
+        recall = RecallSearch(entries, Path(DB_PATH), Path(CFG.data_dir), assets)
+        recall.close()
     print(json.dumps(dict(status='passed', pose_model=pose.model_id,
                           library_version=library['version'],
                           searchable_poses=len(engine.camera.pose_ids), camera_count=len(engine.camera.cameras),
@@ -29,6 +39,7 @@ def main():
                           ranking=engine.ranking, semantic_weight=engine.semantic_weight,
                           geometry_weight=engine.geometry_weight,
                           generation_files_checked=engine.generator is not None,
+                          recall_assets_checked=assets_root is not None,
                           vlm_request_tested=False, deployed=False)))
 
 

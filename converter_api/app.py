@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from contextlib import asynccontextmanager
+import asyncio
 import hashlib
 import base64
 import hmac
@@ -54,6 +56,7 @@ from converter_api.runner import (
 from converter_api.schemas import CharactersResponse, HealthResponse
 from converter_api.work_queue import WorkStopped, current_work
 from converter_api.work_middleware import WorkMiddleware
+from converter_api.health_timing import HealthTimingMiddleware, health_handler_started, measured_health
 from converter.framing import FRAMING_VERSION, OUTPUT_SCOPES, PREVIEW_VIEWS
 from converter.hand_library import HandLibraryError, normalize_request as normalize_hands
 
@@ -323,7 +326,21 @@ def create_app(
     if size_limit <= 0:
         raise ValueError("CONVERTER_MAX_BVH_BYTES must be positive")
 
+    from converter_api.final_prewarm import DefaultFbxPrewarmer
+    prewarmer = DefaultFbxPrewarmer.from_env(blender_runner)
+
+    @asynccontextmanager
+    async def lifespan(_app):
+        if prewarmer is not None:
+            prewarmer.start()
+        try:
+            yield
+        finally:
+            if prewarmer is not None:
+                await asyncio.to_thread(prewarmer.stop)
+
     app = FastAPI(
+        lifespan=lifespan,
         title="Standin Internal Converter",
         version="1.4.0",
         description=(
@@ -332,9 +349,15 @@ def create_app(
         ),
     )
     app.add_middleware(WorkMiddleware)
+    app.add_middleware(HealthTimingMiddleware)
     app.state.registry = character_registry
     app.state.runner = blender_runner
     app.state.max_bvh_bytes = size_limit
+    app.state.final_prewarm = prewarmer
+
+    @app.get('/final-cache/prewarm-status')
+    def final_prewarm_status():
+        return prewarmer.snapshot() if prewarmer is not None else {'status': 'disabled'}
     from converter_api.csp_shape import register_csp_shape
     register_csp_shape(app, character_registry, blender_runner)
 
@@ -425,9 +448,12 @@ def create_app(
         return _error_response(ApiProblem(400, "INVALID_REQUEST", "invalid request fields"))
 
     @app.exception_handler(StarletteHTTPException)
-    async def http_handler(_request: Request, exc: StarletteHTTPException):
+    async def http_handler(request: Request, exc: StarletteHTTPException):
         code = "NOT_FOUND" if exc.status_code == 404 else "HTTP_ERROR"
         message = "not found" if exc.status_code == 404 else "request failed"
+        if (request.url.path.startswith('/interactive/v1/') and exc.status_code == 429
+                and exc.detail == 'INTERACTIVE_CAPACITY'):
+            code = 'INTERACTIVE_CAPACITY'
         return _error_response(ApiProblem(exc.status_code, code, message))
 
     @app.exception_handler(Exception)
@@ -446,13 +472,14 @@ def create_app(
 
     @app.get("/healthz", response_model=HealthResponse)
     def healthz():
+        health_handler_started()
         checks: dict[str, Any] = {"api": {"ok": True}}
         slots = getattr(blender_runner, "_process_slots", None)
         if slots is not None and hasattr(slots, "snapshot"):
             checks["work_queue"] = {"ok": True, **slots.snapshot()}
         ok = True
         try:
-            info = blender_runner.inspect_blender(refresh=True)
+            info = measured_health('blender', blender_runner.inspect_blender, refresh=True)
             checks["blender"] = {
                 "ok": True,
                 "version": info.version,
@@ -462,13 +489,14 @@ def create_app(
             ok = False
             checks["blender"] = {"ok": False, "code": exc.code}
         try:
-            blender_runner.check_tempdir()
+            measured_health('tempdir', blender_runner.check_tempdir)
             checks["tempdir"] = {"ok": True}
         except RunnerError as exc:
             ok = False
             checks["tempdir"] = {"ok": False, "code": exc.code}
         try:
-            resolved = character_registry.resolve(character_registry.default_character_id)
+            resolved = measured_health('default_character', character_registry.resolve,
+                                       character_registry.default_character_id)
             checks["default_character"] = {
                 "ok": True,
                 "character_id": resolved.metadata.character_id,
@@ -482,9 +510,9 @@ def create_app(
             }
         if os.getenv("CONVERTER_SHAPE_REGISTRY"):
             try:
-                from converter.shape_spec import load_registry, REGISTRY_SCHEMA
-                # Re-hashes each approved source once and checks its VERSION literal.
-                registry_data = load_registry()
+                from converter.shape_spec import REGISTRY_SCHEMA
+                from converter_api.health_assets import health_shape_registry
+                registry_data = measured_health('shape_sources', health_shape_registry)
                 checks["shape_sources"] = {
                     "ok": True,
                     "schema": REGISTRY_SCHEMA,
@@ -505,19 +533,19 @@ def create_app(
             "checks": checks,
         }
         from converter.framed_model import revision
-        payload["preview_model_revision"] = (revision() if not getattr(
+        payload["preview_model_revision"] = (measured_health('preview_revision', revision) if not getattr(
             getattr(blender_runner, "settings", None), "force_exact_v324", False) else None)
         # 손 굽기 지원 여부(04J-290). exact V3.2.4 모드에서는 손 요청을 거부하므로 null.
         from converter.hand_library import load_library
-        hand_library = load_library()
+        hand_library = measured_health('hand_library', load_library)
         payload["hand_library"] = (None if getattr(
             getattr(blender_runner, "settings", None), "force_exact_v324", False) else {
             "version": hand_library.library_version, "sha256": hand_library.sha256,
             "presets": len(hand_library.presets)})
-        payload["character_hashes"] = {
+        payload["character_hashes"] = measured_health('character_hashes', lambda: {
             c["character_id"]: character_registry.metadata(c["character_id"]).sha256
             for c in character_registry.list_public(available_only=True)
-        }
+        })
         if ok:
             return payload
         return JSONResponse(status_code=503, content=payload)
@@ -544,6 +572,7 @@ def create_app(
         hand_left: str | None = None,
         hand_right: str | None = None,
         hand_contact_screen: bool = False,
+        selected_hand_screen: bool = False,
     ) -> CompletedConversion:
         conversion_id = str(uuid.uuid4())
         control = current_work.get()
@@ -642,6 +671,7 @@ def create_app(
                 **({"preview_model": True} if preview_model else {}),
                 **({"hands": hands} if hands is not None else {}),
                 **({"hand_contact_screen": True} if hand_contact_screen else {}),
+                **({"selected_hand_screen": True} if selected_hand_screen else {}),
             )
             if camera_rotation is not None and result.report.get("camera_rotation") != camera_rotation:
                 raise WorkerIntegrityError("camera rotation lineage mismatch")
@@ -683,6 +713,11 @@ def create_app(
                 conversion_id=conversion_id,
             ) from exc
         except ConversionRejectedError as exc:
+            selected_code = (exc.report or {}).get('error_code')
+            if selected_hand_screen and selected_code in ('HAND_CONTACT_INTERSECTION', 'HAND_CONTACT_UNAVAILABLE'):
+                raise ApiProblem(422 if selected_code == 'HAND_CONTACT_INTERSECTION' else 503,
+                                 selected_code, 'selected pose hand screening failed',
+                                 conversion_id=conversion_id) from exc
             _structured_log(
                 logging.WARNING,
                 "converter_rejected",
@@ -1072,6 +1107,7 @@ def create_app(
     @app.post("/convert-framed")
     @app.post("/convert-framed-export")
     def convert_framed(
+        request: Request,
         bvh: UploadFile = File(...),
         character_id: str = Form(default=default_character_id),
         output_scope: str = Form(default="full"),
@@ -1097,6 +1133,7 @@ def create_app(
                 raise ValueError("aligned output requires front preview and a matrix")
         except (ValueError, TypeError) as exc:
             raise ApiProblem(400, "INVALID_OPTION", "invalid camera_rotation") from exc
+        from converter.hand_contact import selected_hand_screen_enabled
         completed = _execute_conversion(
             bvh=bvh, character_id=character_id, frame=FRAME, mirror=False,
             output_mode=OUTPUT_MODE, apply_root_translation=APPLY_ROOT_TRANSLATION,
@@ -1106,6 +1143,7 @@ def create_app(
             camera_rotation=rotation, preview_model=preview_format == "model", shape=shape,
             expected_shape_source=expected_shape_source,
             hand_left=hand_left, hand_right=hand_right,
+            selected_hand_screen=request.url.path == '/convert-framed-export' and selected_hand_screen_enabled(output_scope),
         )
         baked = result_hands(completed.result.report)
         result = completed.result
@@ -1132,6 +1170,7 @@ def create_app(
                 "shape_sha256": result.report.get("shape_bake", {}).get("shape_sha256"),
                 "shape_bake": result.report.get("shape_bake"), "hands": baked,
                 "fbx_sha256": result.artifact_sha256,
+                "final_cache": result.report.get("final_cache"),
                 "fbx_base64": base64.b64encode(result.artifact).decode("ascii"),
             }
         if preview_format == "model":

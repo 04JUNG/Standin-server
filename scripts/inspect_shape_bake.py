@@ -39,7 +39,7 @@ def controller(recipe):
     return sb
 
 
-def posed_reference(recipe, values, actual_path, temp, pose):
+def posed_reference(recipe, values, actual_path, temp, pose, source_bvh_sha256=None):
     """Read observed pose frames, then author expected geometry from requested values.
 
     The output's surface and weights never enter the reference calculation.
@@ -110,7 +110,12 @@ def posed_reference(recipe, values, actual_path, temp, pose):
         for bone in rig.pose.bones:
             if max(abs(x-y) for a,b in zip(bone.matrix, Matrix(native[bone.name])) for x,y in zip(a,b)) > 1e-7:
                 raise ValueError('surface inspection changed verified native pose')
-        expected = np.array([mesh.matrix_world @ Vector(co) for co in sb.evaluated(mesh)])
+        surface = sb.evaluated(mesh)
+        from converter.source_body import reviewed_frames, smooth_reviewed_waist
+        reviewed = reviewed_frames(source_bvh_sha256, recipe['asset_sha256'])
+        if reviewed and reviewed["smooth_waist"]:
+            surface = smooth_reviewed_waist(mesh, rig, neutral, surface)
+        expected = np.array([mesh.matrix_world @ Vector(co) for co in surface])
     finally:
         sb.BUSY = False
     return actual, expected, neutral, faces, max(joint_errors), len(joint_errors)
@@ -125,7 +130,8 @@ def inspect_pair(recipe, pair, folder, temp):
         if artifacts[label] != pair[label]['fbx_sha256']:
             raise ValueError('bake run artifact checksum mismatch')
         actual[label], reference[label], neutral[label], current_faces, error, count = posed_reference(
-            recipe, pair[label]['values'], path, temp, pair[label].get('authoring_pose'))
+            recipe, pair[label]['values'], path, temp, pair[label].get('authoring_pose'),
+            pair[label].get('source_bvh_sha256'))
         if faces is not None and not np.array_equal(faces, current_faces):
             raise ValueError('preset/slider topology mismatch')
         faces = current_faces; joint_error = max(joint_error, error); joint_count = count

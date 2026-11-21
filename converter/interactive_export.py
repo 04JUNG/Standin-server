@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from converter.solved_state import RECEIPT_SCHEMA, canonical, digest
+from converter.solved_state import RECEIPT_SCHEMA, canonical, digest, model_digest
 
 
 class Superseded(RuntimeError):
@@ -51,7 +51,7 @@ def _run_child(binary, args, checkpoint, timeout):
 
 
 def export_bundle(binary, bundle, destination, expected_state_hash, *, checkpoint, timeout=180):
-    """Host-side runner: isolated export -> isolated reimport -> latest fence.
+    """Host-side runner: verified immutable copy -> isolated reimport -> latest fence.
 
     A BFF caller must recheck ownership/review/quarantine/expiry/current selection
     when accepting and downloading. This function grants none of those rights.
@@ -65,10 +65,20 @@ def export_bundle(binary, bundle, destination, expected_state_hash, *, checkpoin
     directory = Path(destination); directory.mkdir(parents=True, exist_ok=False)
     common = ['--bundle', str(Path(bundle).resolve()), '--destination', str(directory.resolve()),
               '--state-hash', expected_state_hash]
-    _run_child(binary, ['--stage', 'export', *common], checkpoint, timeout)
+    # solve already froze the exact display FBX. Reopening its .blend in an
+    # export child only copied these same bytes after two redundant scene
+    # captures. Copy on the host, then retain the independent fresh-process
+    # FBX reimport verifier which alone is allowed to emit a receipt.
+    source = Path(bundle)/'staged.fbx'
+    source_sha = digest(source.read_bytes())
+    artifact = directory/'artifact.fbx'
+    shutil.copyfile(source, artifact)
+    if digest(artifact.read_bytes()) != source_sha:
+        raise ValueError('immutable FBX copy changed')
+    checkpoint()
     _run_child(binary, ['--stage', 'verify', *common], checkpoint, timeout)
     receipt = decode((directory/'verified.canonical.json').read_bytes())
-    identity = state.payload['identity']
+    identity = state.identity
     if (receipt.get('schema') != RECEIPT_SCHEMA or receipt.get('stateHash') != expected_state_hash
             or receipt.get('revision') != identity['selection']['revision']
             or receipt.get('artifactSha256') != digest((directory/'artifact.fbx').read_bytes())
@@ -119,7 +129,8 @@ def child(stage, bundle, destination, expected_state_hash):
             revision=identity['selection']['revision'], operation=identity['selection']['operation'],
             identity=identity, verified=True, artifactSha256=artifact_sha,
             artifactBytes=artifact.stat().st_size, runtimeRevision=runtime_revision(),
-            packetModelSha256=digest(canonical(model)), reimportModelSha256=digest(canonical(actual)),
+            # Both digests use the state's own canonical encoding (v1 typed JSON or v2 binary).
+            packetModelSha256=state.model_sha256, reimportModelSha256=model_digest(actual, state.encoding),
             skin=skin, correspondence=dict(topology=True, jointIdentity=True, skinIdentity=True,
                 **errors, positionToleranceM=POSITION_TOLERANCE_M,
                 matrixTolerance=MATRIX_TOLERANCE, weightTolerance=WEIGHT_TOLERANCE),

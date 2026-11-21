@@ -1,0 +1,39 @@
+{
+  "localRegressionOnly": true,
+  "notAnUploadedSourceRelease": true,
+  "defaultReuse": [
+    {
+      "character": "male-base-v0-8-0",
+      "fbx_bytes": 9063388,
+      "generation_seconds": 0.0,
+      "key": "6f2bd430c96fbeb3a6a92ad594af944392e72bcb8e70bca060485af7d0226d0b",
+      "ok": true,
+      "path": "/output/main-preservation-proof/reused-defaults/qa/prepared-6f2bd430c96fbeb3a6a92ad594af944392e72bcb8e70bca060485af7d0226d0b.json",
+      "reuse_seconds": 0.24612674999934825,
+      "reused_existing": true,
+      "sha256": "a5574845d275afc5616fdc26233ee46ee748b7bf6b34a137fdd5946a093deea7"
+    },
+    {
+      "character": "female-base-v0-4-0",
+      "fbx_bytes": 6706716,
+      "generation_seconds": 0.0,
+      "key": "44792e06aec47d059e60269bfa22f5de25b62813567ac454cd8a1733a7057934",
+      "ok": true,
+      "path": "/output/main-preservation-proof/reused-defaults/qa/prepared-44792e06aec47d059e60269bfa22f5de25b62813567ac454cd8a1733a7057934.json",
+      "reuse_seconds": 0.2099224999992657,
+      "reused_existing": true,
+      "sha256": "ab6b284124b83118d405491cc8d33de4957695b88093ad450b257aeb0b931580"
+    }
+  ],
+  "sourceFiles": 197,
+  "targetFiles": 233,
+  "preservedObjects": 196,
+  "addedPreparedObjects": 36,
+  "registryChangedOnly": true,
+  "prototypeAndOtherFilesByteIdenticalToPoseQa": true,
+  "logicalRegistryIdenticalToPoseQa": true,
+  "poseQaManifestSha256": "1b87ea49c6fa5ce9f4b8afab40bca9e12226d996780d2ce3a3806e89b28bc909",
+  "proofManifestSha256": "26a1149a3234c3f8cbe9685fc6a577d5838ba0812bbd51db177801179a5b077e",
+  "totalBytes": 910022138,
+  "defaultsManifestSha256": "33f15ac2fa628e5d29c156b91f94f33c2fc49f7bd41945c19b7848f14a5f1a14"
+}

@@ -69,7 +69,10 @@ def path(name,points,channel=2,side='front',mirror=True,projected=False,z_min=No
  for sign in ([1,-1] if mirror else [1]):
   pts=np.array(points,dtype=np.float32);pts[:,0]*=sign
   # Match rest bone stations; women have a shorter upper arm, longer forearm.
-  if a.id=='female':
+  if source.get('characterId') in ('male-base-v0-8-0','female-base-v0-4-0'):
+   xx=np.abs(pts[:,0]);stations_x=[0,float(bones['LeftArm'][0]),float(bones['LeftForeArm'][0]),float(bones['LeftHand'][0]),.9]
+   pts[:,0]=np.sign(pts[:,0])*np.interp(xx,[0,.165,.453,.701,.9],stations_x)
+  elif a.id=='female':
    xx=np.abs(pts[:,0]);pts[:,0]=np.sign(pts[:,0])*np.interp(xx,[0,.165,.453,.701,.9],[0,.167,.420,.693,.9])
   s=smooth(pts)
   front=(Y<.025) if side=='front' else (Y>.025) if side=='back' else np.ones_like(Y,dtype=bool)

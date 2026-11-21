@@ -79,6 +79,7 @@ def main():
                     (out / (stem + '.png')).write_bytes(result.preview)
                     lineage = result.report.get('shape_bake') or {}
                     row = {'id': stem, 'case': cid, 'bvh': bvh_path.name, 'label': label, 'ok': True,
+                           'source_bvh_sha256': result.source_bvh_sha256,
                            'seconds': round(time.monotonic() - t, 2), 'values': resolved['values'],
                            'lineage_controls_match': lineage.get('controls') == resolved['values'],
                            'shape_sha256': lineage.get('shape_sha256'), 'rules': lineage.get('rules'),

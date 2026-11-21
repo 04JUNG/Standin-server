@@ -1,0 +1,26 @@
+{
+  "prefix": "body-models/releases/anatomy-composed-skins-20261112-8149c1568539-converter",
+  "manifestSha256": "8149c15685398ba279550a9887fa8d05b5208e26b60264e6fa55a6cc20a09771",
+  "characterIds": [
+    "male-base-v0-8-0",
+    "male-ideal83-v0-8-0",
+    "male-ideal70-v0-8-0",
+    "male-toon64-v0-8-0",
+    "male-muscular-v0-8-0",
+    "male-muscle-max-v0-8-0",
+    "male-bulk-v0-8-0",
+    "male-soft-v0-8-0",
+    "male-fat-max-v0-8-0",
+    "female-base-v0-4-0",
+    "female-slim-v0-4-0",
+    "female-ideal83-v0-4-0",
+    "female-ideal70-v0-4-0",
+    "female-toon64-v0-4-0",
+    "female-muscular-v0-4-0",
+    "female-muscle-max-v0-4-0",
+    "female-soft-v0-4-0",
+    "female-fat-max-v0-4-0",
+    "female-new-fat-v0-4-0",
+    "female-new-muscular-v0-4-0"
+  ]
+}

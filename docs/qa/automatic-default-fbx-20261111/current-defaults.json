@@ -1,0 +1,613 @@
+{
+  "defaultCharacterId": "male-base-v0-8-0",
+  "defaults": [
+    {
+      "characterId": "male-base-v0-8-0",
+      "assetSha256": "705035f1bd247b3bf63a6d293065a5a39390b2d228df559474f9dc6682bf8c43",
+      "gender": "male",
+      "shape": {
+        "schemaVersion": "body-shape.v1",
+        "controls": [
+          {
+            "key": "height",
+            "min": 160.684899,
+            "max": 195.0,
+            "step": 1.0,
+            "default": 168.684899,
+            "label": "\ud0a4"
+          },
+          {
+            "key": "heads",
+            "min": 7.2,
+            "max": 8.7,
+            "step": 1e-06,
+            "default": 7.943109,
+            "label": "\ub4f1\uc2e0"
+          },
+          {
+            "key": "physique",
+            "min": -0.6,
+            "max": 0.6,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uc9c0\ubc29"
+          },
+          {
+            "key": "muscle",
+            "min": 0.0,
+            "max": 1.5,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uadfc\uc721\ub7c9"
+          },
+          {
+            "key": "muscle_bulk",
+            "min": 0.0,
+            "max": 0.5,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uadfc\uc721 \ubcfc\ub968"
+          },
+          {
+            "key": "shoulders",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uc5b4\uae68\ub108\ube44"
+          },
+          {
+            "key": "head_scale",
+            "min": 0.9,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 1.0,
+            "label": "\uba38\ub9ac \ud06c\uae30"
+          },
+          {
+            "key": "head_width",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uba38\ub9ac \ub108\ube44"
+          },
+          {
+            "key": "head_depth",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uba38\ub9ac \uc55e\ub4a4 \uae38\uc774"
+          },
+          {
+            "key": "neck_width",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ubaa9 \ub450\uaed8"
+          },
+          {
+            "key": "neck_length",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ubaa9 \uae38\uc774"
+          },
+          {
+            "key": "definition",
+            "min": 0.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ucd94\uac00 \uc120\uba85\ub3c4"
+          },
+          {
+            "key": "chest_width",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ud749\uacfd \ub108\ube44"
+          },
+          {
+            "key": "chest_depth",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ud749\uacfd \ub450\uaed8"
+          },
+          {
+            "key": "waist",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ud5c8\ub9ac \ub108\ube44"
+          },
+          {
+            "key": "pelvis",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uace8\ubc18 \ub108\ube44"
+          },
+          {
+            "key": "glute",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uc5c9\ub369\uc774 \ubcfc\ub968"
+          },
+          {
+            "key": "thigh",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ud5c8\ubc85\uc9c0 \ubcfc\ub968"
+          },
+          {
+            "key": "calf",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uc885\uc544\ub9ac \ubcfc\ub968"
+          },
+          {
+            "key": "torso_length",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ubab8\ud1b5 \uae38\uc774"
+          },
+          {
+            "key": "arm_length",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ud314 \uae38\uc774"
+          },
+          {
+            "key": "leg_length",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ub2e4\ub9ac \uae38\uc774"
+          },
+          {
+            "key": "leg_ratio",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ud5c8\ubc85\uc9c0 : \uc885\uc544\ub9ac"
+          },
+          {
+            "key": "detail_chest",
+            "min": -0.5,
+            "max": 0.5,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uac00\uc2b4 \uadfc\uc721 \ubcf4\uc815"
+          },
+          {
+            "key": "detail_back",
+            "min": -0.5,
+            "max": 0.5,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ub4f1 \uadfc\uc721 \ubcf4\uc815"
+          },
+          {
+            "key": "detail_shoulder",
+            "min": -0.5,
+            "max": 0.5,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uc5b4\uae68 \uadfc\uc721 \ubcf4\uc815"
+          },
+          {
+            "key": "detail_upperarm",
+            "min": -0.5,
+            "max": 0.5,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uc0c1\uc644 \uadfc\uc721 \ubcf4\uc815"
+          },
+          {
+            "key": "detail_forearm",
+            "min": -0.5,
+            "max": 0.5,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uc804\uc644 \uadfc\uc721 \ubcf4\uc815"
+          },
+          {
+            "key": "detail_thigh",
+            "min": -0.5,
+            "max": 0.5,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ud5c8\ubc85\uc9c0 \uadfc\uc721 \ubcf4\uc815"
+          },
+          {
+            "key": "detail_calf",
+            "min": -0.5,
+            "max": 0.5,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uc885\uc544\ub9ac \uadfc\uc721 \ubcf4\uc815"
+          },
+          {
+            "key": "fat_torso",
+            "min": -0.4,
+            "max": 0.4,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ubab8\ud1b5 \uc9c0\ubc29 \ubcf4\uc815"
+          },
+          {
+            "key": "fat_arms",
+            "min": -0.4,
+            "max": 0.4,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ud314 \uc9c0\ubc29 \ubcf4\uc815"
+          },
+          {
+            "key": "fat_legs",
+            "min": -0.4,
+            "max": 0.4,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ub2e4\ub9ac \uc9c0\ubc29 \ubcf4\uc815"
+          }
+        ],
+        "basic": 6
+      },
+      "shapeSource": {
+        "rules": "standin-body-0.8.0",
+        "blendSha256": "a03550749315592c543eeda66a183fe4116380f2068b412105f751c7b2e9c39a",
+        "controllerSha256": "bcdabb7d69534f08400dfbd8a91a52ddc01528428332d4f14d4ad6792a7af8da"
+      }
+    },
+    {
+      "characterId": "female-base-v0-4-0",
+      "assetSha256": "ffd7b57d6ebba06299be252976b511afe5684a237e6f7d440bb90b2ba20f0c33",
+      "gender": "female",
+      "shape": {
+        "schemaVersion": "body-shape.v1",
+        "controls": [
+          {
+            "key": "height",
+            "min": 150.893087,
+            "max": 190.0,
+            "step": 1.0,
+            "default": 169.893087,
+            "label": "\ud0a4"
+          },
+          {
+            "key": "heads",
+            "min": 7.2,
+            "max": 8.7,
+            "step": 1e-06,
+            "default": 8.000001,
+            "label": "\ub4f1\uc2e0"
+          },
+          {
+            "key": "shoulders",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uc5b4\uae68\ub108\ube44"
+          },
+          {
+            "key": "muscle",
+            "min": 0.0,
+            "max": 1.5,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uadfc\uc721\ub7c9"
+          },
+          {
+            "key": "physique",
+            "min": -0.6,
+            "max": 0.6,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uc9c0\ubc29"
+          },
+          {
+            "key": "fat_gain",
+            "min": 0.0,
+            "max": 1,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uc9c0\ubc29 \ubcfc\ub968"
+          },
+          {
+            "key": "breast_size",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uac00\uc2b4 \ud06c\uae30"
+          },
+          {
+            "key": "head_scale",
+            "min": 0.94,
+            "max": 1.04,
+            "step": 0.01,
+            "default": 1.0,
+            "label": "\uba38\ub9ac \ud06c\uae30"
+          },
+          {
+            "key": "head_width",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uba38\ub9ac \ub108\ube44"
+          },
+          {
+            "key": "head_depth",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uba38\ub9ac \uc55e\ub4a4 \uae38\uc774"
+          },
+          {
+            "key": "neck_width",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ubaa9 \ub450\uaed8"
+          },
+          {
+            "key": "neck_length",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ubaa9 \uae38\uc774"
+          },
+          {
+            "key": "definition",
+            "min": 0.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uadfc\uc721 \uc120\uba85\ub3c4"
+          },
+          {
+            "key": "chest_width",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ud749\uacfd \ub108\ube44"
+          },
+          {
+            "key": "chest_depth",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ud749\uacfd \ub450\uaed8"
+          },
+          {
+            "key": "waist",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ud5c8\ub9ac \ub108\ube44"
+          },
+          {
+            "key": "pelvis",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uace8\ubc18 \ub108\ube44"
+          },
+          {
+            "key": "glute",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uc5c9\ub369\uc774 \ub3cc\ucd9c"
+          },
+          {
+            "key": "thigh",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ud5c8\ubc85\uc9c0 \ub450\uaed8"
+          },
+          {
+            "key": "calf",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uc885\uc544\ub9ac \ub450\uaed8"
+          },
+          {
+            "key": "torso_length",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ubab8\ud1b5 \uae38\uc774"
+          },
+          {
+            "key": "arm_length",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ud314 \uae38\uc774"
+          },
+          {
+            "key": "leg_length",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ub2e4\ub9ac \uae38\uc774"
+          },
+          {
+            "key": "leg_ratio",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ud5c8\ubc85\uc9c0 : \uc885\uc544\ub9ac"
+          },
+          {
+            "key": "breast_projection",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uac00\uc2b4 \ub3cc\ucd9c\ub3c4"
+          },
+          {
+            "key": "breast_spacing",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uac00\uc2b4 \uac04\uaca9"
+          },
+          {
+            "key": "breast_height",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uac00\uc2b4 \ub192\uc774"
+          },
+          {
+            "key": "breast_width",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uac00\uc2b4 \ub108\ube44"
+          },
+          {
+            "key": "fat_distribution",
+            "min": -1.0,
+            "max": 1.0,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uc9c0\ubc29 \ubd84\ud3ec"
+          },
+          {
+            "key": "detail_chest",
+            "min": -0.5,
+            "max": 0.5,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uac00\uc2b4 \uadfc\uc721 \uadfc\uc721 \ubcf4\uc815"
+          },
+          {
+            "key": "detail_back",
+            "min": -0.5,
+            "max": 0.5,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ub4f1 \uadfc\uc721 \ubcf4\uc815"
+          },
+          {
+            "key": "detail_shoulder",
+            "min": -0.5,
+            "max": 0.5,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uc5b4\uae68 \uadfc\uc721 \ubcf4\uc815"
+          },
+          {
+            "key": "detail_upperarm",
+            "min": -0.5,
+            "max": 0.5,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uc0c1\uc644 \uadfc\uc721 \ubcf4\uc815"
+          },
+          {
+            "key": "detail_forearm",
+            "min": -0.5,
+            "max": 0.5,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uc804\uc644 \uadfc\uc721 \ubcf4\uc815"
+          },
+          {
+            "key": "detail_thigh",
+            "min": -0.5,
+            "max": 0.5,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ud5c8\ubc85\uc9c0 \uadfc\uc721 \ubcf4\uc815"
+          },
+          {
+            "key": "detail_calf",
+            "min": -0.5,
+            "max": 0.5,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\uc885\uc544\ub9ac \uadfc\uc721 \ubcf4\uc815"
+          },
+          {
+            "key": "fat_torso",
+            "min": -0.3,
+            "max": 0.3,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ubab8\ud1b5 \uc9c0\ubc29 \ubcf4\uc815"
+          },
+          {
+            "key": "fat_arms",
+            "min": -0.3,
+            "max": 0.3,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ud314 \uc9c0\ubc29 \ubcf4\uc815"
+          },
+          {
+            "key": "fat_legs",
+            "min": -0.3,
+            "max": 0.3,
+            "step": 0.01,
+            "default": 0.0,
+            "label": "\ub2e4\ub9ac \uc9c0\ubc29 \ubcf4\uc815"
+          }
+        ],
+        "basic": 7
+      },
+      "shapeSource": {
+        "rules": "standin-female-body-0.4.0",
+        "blendSha256": "5a62d2f3fb49d77fdc04d1c78a361edf9fbab55e71e0e47d3b6b393fae14d3a9",
+        "controllerSha256": "1164dff9a4c6069d0da37b80dd26c61544bc6f9eb9c9f3469c33d457e893e9af"
+      }
+    }
+  ]
+}

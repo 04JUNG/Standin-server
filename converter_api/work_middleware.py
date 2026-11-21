@@ -1,6 +1,7 @@
 """ASGI request lifetime -> thread-safe Blender cancellation/deadline control."""
 import asyncio
 import re
+import time
 from .work_queue import WorkControl, current_work
 
 
@@ -12,6 +13,8 @@ class WorkMiddleware:
         if scope['type'] != 'http':
             return await self.app(scope, receive, send)
         path = scope.get('path', '')
+        interactive_calculation = (path in ('/interactive/v1/solve', '/skin-fbx', '/outline-fbx')
+                                   or re.fullmatch(r'/interactive/v1/snapshots/[^/]+/export', path))
         headers = dict(scope.get('headers', []))
         screening = path == '/screen-hand-contact'
         optional = headers.get(b'x-standin-screen-optional') == b'1'
@@ -56,6 +59,9 @@ class WorkMiddleware:
                          (b'x-standin-work-reason', control.reason.encode()),
                          (b'x-standin-queue-wait-ms', str(meta['queue_wait_ms']).encode()),
                          (b'x-standin-execution-ms', str(meta['execution_ms']).encode())]
+                if interactive_calculation:
+                    elapsed_ms = round((time.monotonic() - control.started) * 1000, 3)
+                    extra.append((b'x-standin-interactive-handler-ms', str(elapsed_ms).encode()))
                 existing = {key.lower() for key, _ in message.get('headers', [])}
                 if control.conversion_id and b'x-standin-conversion-id' not in existing:
                     extra.append((b'x-standin-conversion-id', control.conversion_id.encode()))

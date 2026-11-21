@@ -14,6 +14,7 @@ import os
 from pathlib import Path, PurePosixPath
 import re
 import shutil
+import sqlite3
 import tarfile
 import tempfile
 
@@ -56,15 +57,23 @@ def _manifest(path_string, mtime, size):
     count = manifest.get('pose_count')
     if type(count) is not int or not 1 <= count <= MAX_POSES:
         raise ValueError('invalid thumbnail pose count')
+    # New releases can share one immutable raster set between IDs whose
+    # registered BVH files are byte-identical. Older releases are one-to-one.
+    source_count = manifest.get('source_count', count)
+    if type(source_count) is not int or not 1 <= source_count <= count:
+        raise ValueError('invalid thumbnail source count')
     expected = dict(schema_version=1, style=STYLE, status='complete',
-                    image_count=count * IMAGES_PER_POSE, scopes=list(SCOPES), angles=list(range(0, 360, 45)),
+                    image_count=source_count * IMAGES_PER_POSE, scopes=list(SCOPES), angles=list(range(0, 360, 45)),
                     width=512, height=512, pitch_degrees=0, projection='orthographic',
                     outline_width=.65, contrast=2.6, lighten=.22, background='white')
     if any(manifest.get(k) != v for k, v in expected.items()):
         raise ValueError('incomplete or unsupported thumbnail overlay')
     poses, records = manifest.get('poses', {}), manifest.get('pose_records', {})
     revisions = manifest.get('renderer_revisions', [manifest.get('renderer_revision')])
-    if (len(poses) != count or len(records) != count or set(poses.values()) != set(records)
+    if (not isinstance(poses, dict) or not isinstance(records, dict)
+            or len(poses) != count or len(records) != source_count
+            or not all(isinstance(value, str) for value in poses.values())
+            or set(poses.values()) != set(records)
             or not all(HASH.fullmatch(h) and HASH.fullmatch(d) for h, d in records.items())
             or not HASH.fullmatch(manifest.get('renderer_revision', ''))
             or not isinstance(revisions, list) or not 1 <= len(revisions) <= 8
@@ -129,13 +138,20 @@ def read_styled_poster(data_dir, source, scope, view):
         # rough_posters allows a fallback only for genuinely old/missing bundles.
         # A declared complete style release must never mix angles or styles.
         raise ValueError('advertised styled thumbnail is missing') from error
+    from .thumbnail_patch import read_patch
+    replacement = read_patch(data_dir, source, name, data)
+    revision, asset_version = record['renderer_revision'], manifest['asset_version']
+    if replacement is not None:
+        data, patch = replacement
+        revision = patch['renderer_revision']
+        asset_version = patch['asset_version']
     from .directional_posters import CHARACTER_SHA
     from .pose_posters import headers
     meta = dict(kind='default-body', render_method='frozen-retarget-v1',
                 source_bvh_sha256=source, character_id='standin-master-v2', character_sha256=CHARACTER_SHA,
-                renderer_revision=record['renderer_revision'], image_sha256=record['images'][name]['sha256'], scope=scope)
+                renderer_revision=revision, image_sha256=hashlib.sha256(data).hexdigest(), scope=scope)
     result = headers(meta)
-    result.update({'X-Standin-Poster-Asset-Version': manifest['asset_version'],
+    result.update({'X-Standin-Poster-Asset-Version': asset_version,
                    'X-Standin-Thumbnail-Style': STYLE,
                    'X-Standin-Native-Render-Method': 'reviewed-surface-outline-v1',
                    'X-Standin-Preview-View': view,
@@ -154,7 +170,11 @@ def legacy_thumbnail_path(data_dir, pose_id, view):
     record = _record(root, manifest, source)
     name = f'full__{LEGACY_VIEWS[view]}.jpg'
     path = root / source / name
-    _raster(path, record['images'][name])
+    data = _raster(path, record['images'][name])
+    from .thumbnail_patch import read_patch
+    replacement = read_patch(data_dir, source, name, data)
+    if replacement is not None:
+        return Path(data_dir) / 'thumbs/raster-patch' / name
     return path
 
 
@@ -180,8 +200,28 @@ def _extract(archive, destination):
             with stream.extractfile(member) as source, target.open('xb') as out:
                 shutil.copyfileobj(source, out)
     manifest = manifest_for(destination)
-    if manifest is None or len(seen) != manifest['pose_count'] * (IMAGES_PER_POSE + 1) + 1:
+    if manifest is None or len(seen) != len(manifest['pose_records']) * (IMAGES_PER_POSE + 1) + 1:
         raise ValueError('incomplete thumbnail archive')
+
+
+def _verify_library_pose_map(base, db_path, manifest):
+    """An alias must bind to the bytes registered for its own pose ID."""
+    db = Path(db_path).resolve(strict=True)
+    with sqlite3.connect(db.as_uri() + '?mode=ro', uri=True) as connection:
+        rows = connection.execute('SELECT pose_id, bvh_path FROM poses').fetchall()
+    expected = manifest['poses']
+    if {pose for pose, _ in rows} != set(expected):
+        raise ValueError('thumbnail overlay pose IDs do not match the library')
+    bvh_dir = base / 'bvh'
+    if bvh_dir.is_symlink():
+        raise ValueError('invalid thumbnail overlay BVH directory')
+    for pose, raw in rows:
+        if not isinstance(raw, str) or not raw:
+            raise ValueError('thumbnail overlay pose has no BVH path')
+        name = PurePosixPath(raw.replace(chr(92), '/')).name
+        path = bvh_dir / name
+        if path.suffix != '.bvh' or path.is_symlink() or not path.is_file() or _sha(path) != expected[pose]:
+            raise ValueError('thumbnail overlay pose BVH does not match the library')
 
 
 def ensure_thumbnail_overlay(data_dir, db_path, uri=None, archive_sha=None):
@@ -197,6 +237,8 @@ def ensure_thumbnail_overlay(data_dir, db_path, uri=None, archive_sha=None):
     if marker.is_file() and marker.read_text() == archive_sha:
         manifest = manifest_for(base)
         if manifest and manifest['library_db_sha256'] == _sha(Path(db_path)):
+            if 'source_count' in manifest:
+                _verify_library_pose_map(base, db_path, manifest)
             return False
         raise ValueError('installed thumbnail overlay database changed')
     from .library_source import _download_s3
@@ -213,6 +255,8 @@ def ensure_thumbnail_overlay(data_dir, db_path, uri=None, archive_sha=None):
         if (manifest['library_db_sha256'] != _sha(Path(db_path))
                 or manifest['source_library_version'] != library['library_version']):
             raise ValueError('thumbnail overlay belongs to a different library')
+        if 'source_count' in manifest:
+            _verify_library_pose_map(base, db_path, manifest)
         incoming = _root(unpacked)
         for source in manifest['pose_records']:
             record = _record(incoming, manifest, source)

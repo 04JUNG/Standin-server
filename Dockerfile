@@ -18,6 +18,19 @@ RUN pip install --no-cache-dir -r requirements.txt \
     && pip uninstall -y opencv-python opencv-contrib-python \
     && pip install --no-cache-dir --no-deps --force-reinstall "opencv-python-headless>=4.9"
 
+# Keep the CPU-only detector in a dedicated environment for staging recall.
+ARG INSTALL_RECALL_PROP_RUNTIME=0
+RUN if [ "$INSTALL_RECALL_PROP_RUNTIME" = "1" ]; then \
+        python -m venv /opt/recall-prop \
+        && /opt/recall-prop/bin/pip install --no-cache-dir \
+            --index-url https://download.pytorch.org/whl/cpu \
+            torch==2.15.0+cpu torchvision==0.29.1+cpu \
+        && /opt/recall-prop/bin/pip install --no-cache-dir \
+            transformers==5.22.1 Pillow==12.3.0 safetensors==0.8.0 \
+        && /opt/recall-prop/bin/pip check \
+        && /opt/recall-prop/bin/python -c 'from transformers import AutoProcessor, AutoModelForZeroShotObjectDetection'; \
+    fi
+
 COPY . .
 
 # 루트로 돌리지 않는다. 라이브러리를 받아 풀 디렉터리를 미리 만들고 소유권을 준다.

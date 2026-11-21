@@ -1,0 +1,7 @@
+{
+  "manifest_sha256": "d68d99286c912c53cc418193d600eacafb6498e19dc5abb5df331947a6cf185e",
+  "files": 457,
+  "bytes": 1478614694,
+  "scope": "local review only; no deployment or catalog replacement",
+  "promotable": false
+}

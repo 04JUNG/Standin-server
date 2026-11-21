@@ -122,6 +122,30 @@ def _index(tmp: str, **overrides) -> SemanticIndex:
 # ───────────── ok: 후보 + 유효 JSON + ID 일치 ─────────────
 
 
+def test_basic_and_recall_share_document_scores_with_independent_cutoffs(tmp_path):
+    from src.search_computation import share_search_computation
+    from src.tracing import capture_trace
+
+    paths = _write_library(str(tmp_path))
+    basic = SemanticIndex.load(**paths)
+    recall = SemanticIndex.load(**paths)
+    query = "팔을 머리 위로 휘두르는 자세"
+    strict = SemanticSettings(min_score_vlm=1.)
+    relaxed = SemanticSettings(min_score_vlm=.26)
+    expected = semantic_search(recall, query, source="vlm", settings=relaxed)
+    with share_search_computation(), capture_trace() as trace:
+        first = semantic_search(basic, query, source="vlm", settings=strict)
+        second = semantic_search(recall, query, source="vlm", settings=relaxed)
+        assert first["candidates"] == []
+        assert second["candidates"] == expected["candidates"]
+        assert second["candidates"]
+        assert trace.counts == {"semantic_documents_compute": 1, "semantic_documents_reuse": 1}
+
+    with share_search_computation(), capture_trace() as trace:
+        semantic_search(recall, query, source="vlm", settings=relaxed)
+        assert trace.counts == {"semantic_documents_compute": 1}
+
+
 def test_ok_returns_candidates_with_matching_pose_json():
     with tempfile.TemporaryDirectory() as tmp:
         idx = _index(tmp)

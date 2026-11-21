@@ -1,0 +1,362 @@
+{
+  "cases": [
+    {
+      "character": "male-base-v0-8-0",
+      "bvh_sha256": "64960a0467565407c32e917a21be81492918f96bc1eca40904bc93becc65689d",
+      "bvh_name": "ob_001.bvh",
+      "runs": {
+        "baseline": {
+          "artifact_ready_seconds": 29.613842637999824,
+          "neutral_preparation": {
+            "generation_skipped": false,
+            "rest_import_skipped": false,
+            "seconds": 9.573721921000015,
+            "status": "disabled"
+          },
+          "validation": {
+            "artifact_sha256": "c39c8851c20f60d8d20bb2a8e34f0031c8dd1a57998bad57eb37c94d9e824bb6",
+            "bones": 54,
+            "meshes": 1,
+            "polygons": 278944,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 139474
+          },
+          "controls_sha256": "5d7ae99cf5bc743e083f8c0f68f1fd0b029befe69435051ca251f73ecd831fcd"
+        },
+        "prepared": {
+          "artifact_ready_seconds": 19.884548966999773,
+          "neutral_preparation": {
+            "generation_skipped": true,
+            "key": "6f2bd430c96fbeb3a6a92ad594af944392e72bcb8e70bca060485af7d0226d0b",
+            "rest_import_skipped": true,
+            "seconds": 0.19995641699961197,
+            "status": "prepared"
+          },
+          "validation": {
+            "artifact_sha256": "b4649311fcb72b9e02db639cdcfd26607606247c1c77b8554b937756f9a163cf",
+            "bones": 54,
+            "meshes": 1,
+            "polygons": 278944,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 139474
+          },
+          "controls_sha256": "5d7ae99cf5bc743e083f8c0f68f1fd0b029befe69435051ca251f73ecd831fcd"
+        }
+      },
+      "comparison": {
+        "vertices": 139474,
+        "bones": 54,
+        "vertex_max_delta": 0.0,
+        "rig_max_delta": 0.0,
+        "mesh_matrix_max_delta": 0.0,
+        "weight_max_delta": 0.0,
+        "ok": true
+      },
+      "controls_equal": true,
+      "ok": true
+    },
+    {
+      "character": "male-fat-max-v0-8-0",
+      "bvh_sha256": "64960a0467565407c32e917a21be81492918f96bc1eca40904bc93becc65689d",
+      "bvh_name": "ob_001.bvh",
+      "runs": {
+        "prepared": {
+          "artifact_ready_seconds": 26.49168263699994,
+          "neutral_preparation": {
+            "generation_skipped": true,
+            "key": "2503a8a3fc460645e9c09af97acb5e29c70b14899f4a3a4264fe84d680c80690",
+            "rest_import_skipped": true,
+            "seconds": 0.21610554100016088,
+            "status": "prepared"
+          },
+          "validation": {
+            "artifact_sha256": "7e5ff00fe8f4ce8737937c59a463b80a06b4ca73f77b587cf404bb3c4dd61038",
+            "bones": 54,
+            "meshes": 1,
+            "polygons": 278944,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 139474
+          },
+          "controls_sha256": "61c3740837543234a79c71ae3cbebfdb8b7fe913545def587063a4b7e21d17e0"
+        },
+        "baseline": {
+          "artifact_ready_seconds": 36.61272522499985,
+          "neutral_preparation": {
+            "generation_skipped": false,
+            "rest_import_skipped": false,
+            "seconds": 14.443328506999933,
+            "status": "disabled"
+          },
+          "validation": {
+            "artifact_sha256": "4db01dcbf7538931a1b6daf3d6c77a80351ba631eab6e46737a47504f59e0305",
+            "bones": 54,
+            "meshes": 1,
+            "polygons": 278944,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 139474
+          },
+          "controls_sha256": "61c3740837543234a79c71ae3cbebfdb8b7fe913545def587063a4b7e21d17e0"
+        }
+      },
+      "comparison": {
+        "vertices": 139474,
+        "bones": 54,
+        "vertex_max_delta": 0.0,
+        "rig_max_delta": 0.0,
+        "mesh_matrix_max_delta": 0.0,
+        "weight_max_delta": 0.0,
+        "ok": true
+      },
+      "controls_equal": true,
+      "ok": true
+    },
+    {
+      "character": "male-muscle-max-v0-8-0",
+      "bvh_sha256": "64960a0467565407c32e917a21be81492918f96bc1eca40904bc93becc65689d",
+      "bvh_name": "ob_001.bvh",
+      "runs": {
+        "baseline": {
+          "artifact_ready_seconds": 32.44878459799975,
+          "neutral_preparation": {
+            "generation_skipped": false,
+            "rest_import_skipped": false,
+            "seconds": 10.887414505999914,
+            "status": "disabled"
+          },
+          "validation": {
+            "artifact_sha256": "cc6f8392dba569d9462f3b533e898b1f2e04b5137f5b29cb9431fc65ee7a1059",
+            "bones": 54,
+            "meshes": 1,
+            "polygons": 278944,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 139474
+          },
+          "controls_sha256": "bb5327b6113228084aeb82767534b9d2141f16038bd71f91009ee9db770b136d"
+        },
+        "prepared": {
+          "artifact_ready_seconds": 21.703085384999667,
+          "neutral_preparation": {
+            "generation_skipped": true,
+            "key": "590361b46aaef3e7ef94421a59e80fc4cb6ce281302c84e21a40c1a2a4d2930d",
+            "rest_import_skipped": true,
+            "seconds": 0.22627437499977532,
+            "status": "prepared"
+          },
+          "validation": {
+            "artifact_sha256": "2583586e7bf564a1f03c1bf6d4919a9b8b868171f1cb543a504f6a68913a9d2e",
+            "bones": 54,
+            "meshes": 1,
+            "polygons": 278944,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 139474
+          },
+          "controls_sha256": "bb5327b6113228084aeb82767534b9d2141f16038bd71f91009ee9db770b136d"
+        }
+      },
+      "comparison": {
+        "vertices": 139474,
+        "bones": 54,
+        "vertex_max_delta": 0.0,
+        "rig_max_delta": 0.0,
+        "mesh_matrix_max_delta": 0.0,
+        "weight_max_delta": 0.0,
+        "ok": true
+      },
+      "controls_equal": true,
+      "ok": true
+    },
+    {
+      "character": "female-base-v0-4-0",
+      "bvh_sha256": "64960a0467565407c32e917a21be81492918f96bc1eca40904bc93becc65689d",
+      "bvh_name": "ob_001.bvh",
+      "runs": {
+        "prepared": {
+          "artifact_ready_seconds": 16.797413216000223,
+          "neutral_preparation": {
+            "generation_skipped": true,
+            "key": "44792e06aec47d059e60269bfa22f5de25b62813567ac454cd8a1733a7057934",
+            "rest_import_skipped": true,
+            "seconds": 0.1911139170001661,
+            "status": "prepared"
+          },
+          "validation": {
+            "artifact_sha256": "20f130295120a1798fbc39ee38c1a3a0910bfea9c7ba3f79bd019e98de2d31ec",
+            "bones": 54,
+            "meshes": 1,
+            "polygons": 210856,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 105430
+          },
+          "controls_sha256": "04c1a288236b6d8b7cf9ffe46c0f44e3e9784263e51f75c91aa2f373d2cc51a1"
+        },
+        "baseline": {
+          "artifact_ready_seconds": 20.70386775900033,
+          "neutral_preparation": {
+            "generation_skipped": false,
+            "rest_import_skipped": false,
+            "seconds": 6.238721752999936,
+            "status": "disabled"
+          },
+          "validation": {
+            "artifact_sha256": "e89876b1ce2cff089cf5448c077a454e5fb133f6f8dc04329ca0fdae393ca7e2",
+            "bones": 54,
+            "meshes": 1,
+            "polygons": 210856,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 105430
+          },
+          "controls_sha256": "04c1a288236b6d8b7cf9ffe46c0f44e3e9784263e51f75c91aa2f373d2cc51a1"
+        }
+      },
+      "comparison": {
+        "vertices": 105430,
+        "bones": 54,
+        "vertex_max_delta": 0.0,
+        "rig_max_delta": 0.0,
+        "mesh_matrix_max_delta": 0.0,
+        "weight_max_delta": 0.0,
+        "ok": true
+      },
+      "controls_equal": true,
+      "ok": true
+    },
+    {
+      "character": "female-fat-max-v0-4-0",
+      "bvh_sha256": "64960a0467565407c32e917a21be81492918f96bc1eca40904bc93becc65689d",
+      "bvh_name": "ob_001.bvh",
+      "runs": {
+        "baseline": {
+          "artifact_ready_seconds": 27.814432261999627,
+          "neutral_preparation": {
+            "generation_skipped": false,
+            "rest_import_skipped": false,
+            "seconds": 9.746062961999996,
+            "status": "disabled"
+          },
+          "validation": {
+            "artifact_sha256": "6fa0221c71d2087b6ffff9c92a7b5ceae4f3ca925cc0381a24b0918e065977fe",
+            "bones": 54,
+            "meshes": 1,
+            "polygons": 210856,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 105430
+          },
+          "controls_sha256": "31faa91d41b787e5c94c31863eaac890c8ab3d7ab16be8539276a1f4df163c34"
+        },
+        "prepared": {
+          "artifact_ready_seconds": 20.70102746700013,
+          "neutral_preparation": {
+            "generation_skipped": true,
+            "key": "8e67be50ec344935df412c488002262313290ef430c0432cb050b8c13925a6af",
+            "rest_import_skipped": true,
+            "seconds": 0.290017583000008,
+            "status": "prepared"
+          },
+          "validation": {
+            "artifact_sha256": "c2a70367484fddffa65453849d6135d95f7849862114eb0d91862fe85aac5999",
+            "bones": 54,
+            "meshes": 1,
+            "polygons": 210856,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 105430
+          },
+          "controls_sha256": "31faa91d41b787e5c94c31863eaac890c8ab3d7ab16be8539276a1f4df163c34"
+        }
+      },
+      "comparison": {
+        "vertices": 105430,
+        "bones": 54,
+        "vertex_max_delta": 0.0,
+        "rig_max_delta": 0.0,
+        "mesh_matrix_max_delta": 0.0,
+        "weight_max_delta": 0.0,
+        "ok": true
+      },
+      "controls_equal": true,
+      "ok": true
+    },
+    {
+      "character": "female-muscle-max-v0-4-0",
+      "bvh_sha256": "64960a0467565407c32e917a21be81492918f96bc1eca40904bc93becc65689d",
+      "bvh_name": "ob_001.bvh",
+      "runs": {
+        "prepared": {
+          "artifact_ready_seconds": 19.652483842000038,
+          "neutral_preparation": {
+            "generation_skipped": true,
+            "key": "3890b46412aa160abe3dabea10ba2abd7970a70ec909a3ee5814034f547b6d30",
+            "rest_import_skipped": true,
+            "seconds": 0.30012041700001646,
+            "status": "prepared"
+          },
+          "validation": {
+            "artifact_sha256": "803d516fd51a267e2350ae191637b69acd7365c6fe7a2edbf939e8fbd16d7c80",
+            "bones": 54,
+            "meshes": 1,
+            "polygons": 210856,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 105430
+          },
+          "controls_sha256": "ec9c2ac41a21c2daaf94cda9395adaa764f4c21f038cdd98857f97903ed27735"
+        },
+        "baseline": {
+          "artifact_ready_seconds": 31.393616430999828,
+          "neutral_preparation": {
+            "generation_skipped": false,
+            "rest_import_skipped": false,
+            "seconds": 8.33084491999989,
+            "status": "disabled"
+          },
+          "validation": {
+            "artifact_sha256": "a16049e4c8411551d17506f119fd2dcf4bae3316a29fb514a9500037810bfd26",
+            "bones": 54,
+            "meshes": 1,
+            "polygons": 210856,
+            "scope": "full",
+            "skin_verified": true,
+            "version": "final-fbx-v1",
+            "vertices": 105430
+          },
+          "controls_sha256": "ec9c2ac41a21c2daaf94cda9395adaa764f4c21f038cdd98857f97903ed27735"
+        }
+      },
+      "comparison": {
+        "vertices": 105430,
+        "bones": 54,
+        "vertex_max_delta": 0.0,
+        "rig_max_delta": 0.0,
+        "mesh_matrix_max_delta": 0.0,
+        "weight_max_delta": 0.0,
+        "ok": true
+      },
+      "controls_equal": true,
+      "ok": true
+    }
+  ],
+  "completed": true,
+  "samplesPerCondition": 1,
+  "osFileCache": "uncontrolled",
+  "scope": "Linux/amd64 BlenderRunner artifact-byte-ready, cache off, independent Blender FBX reimport"
+}

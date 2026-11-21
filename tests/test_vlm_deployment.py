@@ -100,6 +100,7 @@ def test_serving_profile_migrates_legacy_task_without_github_variables():
     for name in ("OPENAI_MODEL", "BODY_VLM_MODEL", "BODY_COARSE_FAMILY_REVIEW_MODEL", "POSE_GENERATION_MODEL", "SKELETON_REPAIR_MODEL"):
         assert env[name] == "gpt-6-luna"
     assert env["OPENAI_REASONING_EFFORT"] == "low"
+    assert env["BODY_MATCHING_MODE"] == "off"
     assert original == before
     before["containerDefinitions"][0].pop("environment")
     assert result == before

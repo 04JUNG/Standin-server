@@ -1,0 +1,6 @@
+{
+  "source-indices.npy": true,
+  "protected-source.npy": true,
+  "skin-uv.npy": true,
+  "controller.py": true
+}

@@ -1,0 +1,22 @@
+{
+  "app_version": "5.1.1",
+  "bundle_version": "5.1.1",
+  "mode": "macOS trial drawing mode, new unsaved canvases, existing user documents unchanged",
+  "confirmed": "actual imported FBX displayed as a 3D layer; no full skin/body certification",
+  "files": [
+    {
+      "gender": "male",
+      "skin": "default",
+      "fbx_sha256": "1751102fee888c5252de9428ca96f2929501784f87647d91134026424f6ee92e",
+      "path": "/private/tmp/standin-mesh-light-assets-20261114/benchmark/male-candidate-base-lod-review-20261114-default-0.fbx",
+      "screenshot": "images/csp-male-candidate.jpg"
+    },
+    {
+      "gender": "female",
+      "skin": "flesh-guide",
+      "fbx_sha256": "a9c540aecf81d5f5a316aea507f1c00d8f4b2dcaad72a5332ac259244f09e1ed",
+      "path": "/private/tmp/standin-mesh-light-assets-20261114/benchmark/female-candidate-base-lod-review-20261114-flesh-guide-0.fbx",
+      "screenshot": "images/csp-female-candidate-guide.jpg"
+    }
+  ]
+}

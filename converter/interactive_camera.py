@@ -1,4 +1,4 @@
-"""Exact continuous search projection; fixed, server-defined torso framing v2.
+"""Exact search or explicit presentation projection; fixed torso framing v2.
 
 Search looks along +Z and uses image-down Y. WebGL looks along -Z; the
 proper camera rotation and negative X projection preserve the same screen
@@ -11,17 +11,46 @@ from converter.solved_state import digest, canonical
 FRAME = dict(target=[0., 0., 0.], referenceAspect=1., projectionIncludesCenterScaleCrop=True)
 
 
+def _validate_descriptor(descriptor):
+    """Accept both server camera contracts without calling a fixed view search-fit."""
+    version = descriptor.get('version')
+    if version == 'candidate-camera-v2':
+        if descriptor.get('reference') != 'search-fit':
+            raise ValueError('complete search projection required')
+    elif version == 'pose-preview-camera-v1':
+        required = dict(basis='right-handed-Y-up', rotation_order='Rz@Rx@Ry_column_vectors',
+                        origin='hip_midpoint', scale='hip_to_shoulder_midpoint_length', screen_y='down')
+        if (any(descriptor.get(key) != value for key, value in required.items())
+                or descriptor.get('fit_to_rough_pixels') is not False
+                or descriptor.get('bvh_camera_rotation_applied') is not False
+                or type(descriptor.get('projection_matches_search')) is not bool):
+            raise ValueError('invalid presentation camera contract')
+        angles = [descriptor.get(key) for key in ('yaw_degrees', 'pitch_degrees', 'roll_degrees')]
+        if any(type(value) not in (int, float) or not math.isfinite(value) for value in angles):
+            raise ValueError('invalid presentation camera angles')
+        projection = descriptor.get('projection')
+        rule = 'xy=(x,-y)' if projection == 'orthographic' else 'xy=(x,-y)/(z+distance_torso)'
+        if descriptor.get('projection_rule') != rule:
+            raise ValueError('invalid presentation projection rule')
+    else:
+        raise ValueError('complete camera projection required')
+    rotation = validate_rotation(descriptor.get('rotation'))
+    if rotation is None:
+        raise ValueError('camera rotation required')
+    return rotation
+
+
 def camera_for_model(descriptor, model, character_sha, scope):
     import numpy as np
     from converter.bone_map import PROFILES, resolve_profile
-    if descriptor.get('version') != 'candidate-camera-v2' or descriptor.get('reference') != 'search-fit':
-        raise ValueError('complete search projection required')
-    rotation = np.asarray(validate_rotation(descriptor['rotation']), float)
+    rotation = np.asarray(_validate_descriptor(descriptor), float)
     projection = descriptor.get('projection')
     distance_torso = descriptor.get('distance_torso')
     if projection not in ('orthographic', 'perspective'):
         raise ValueError('unknown search projection')
-    if projection == 'perspective' and (type(distance_torso) not in (int,float) or not math.isfinite(distance_torso) or distance_torso < .8):
+    minimum = .8 if descriptor['version'] == 'candidate-camera-v2' else 0.
+    if projection == 'perspective' and (type(distance_torso) not in (int,float) or not math.isfinite(distance_torso)
+                                      or distance_torso < minimum or distance_torso <= 0):
         raise ValueError('invalid perspective distance')
     if projection == 'orthographic' and distance_torso is not None:
         raise ValueError('orthographic distance must be absent')

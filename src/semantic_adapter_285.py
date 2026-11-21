@@ -55,7 +55,7 @@ class Semantic285Adapter:
             measured=self.relation_cache[pose_id]
         return candidate_conditions(prepared,record,self.service.index.lexicon,self.body.get(pose_id),measured)
 
-    def search(self,query,top_k=5,*,source='vlm'):
+    def search(self,query,top_k=5,*,source='vlm',pair_requirements=None):
         started=perf_counter()
         prepared=None
         def result(status,hits=None,reason=None):
@@ -102,7 +102,7 @@ class Semantic285Adapter:
         whole_required=None
         if validator and prepared is not None:
             from .pose_requirements import requirements
-            whole_required=requirements(query,prepared)
+            whole_required=pair_requirements or requirements(query,prepared)
             prepared['whole_pose_requirements']=whole_required
             prepared['validation_counts']={}
             prepared['excluded_examples']=[]
@@ -111,7 +111,11 @@ class Semantic285Adapter:
             # labelled near-match again via the older world-frame body cache.
             for field in whole_required.get('body_states',{}):observed.pop(field,None)
         kwargs={'tags':prepared['tags']} if prepared and prepared['enabled'] and prepared['tags'] else {}
-        raw=self.pool_service.search(prepared['core_text'] if prepared else query.text,
+        pool=self.pool_service
+        if pair_requirements:
+            from .waist_arm_pair import MIN_TEXT_SCORE, soften_arm_checks
+            pool=SemanticSearchService(pool.index,replace(pool.settings,min_score_vlm=MIN_TEXT_SCORE))
+        raw=pool.search(prepared['core_text'] if prepared else query.text,
             source=source,top_k=self.service.index.pose_count,**kwargs)
         if raw['status']=='error':
             return result('error',reason='semantic285:'+(raw.get('error') or {}).get('code','unknown'))
@@ -129,7 +133,7 @@ class Semantic285Adapter:
             for relation in prepared.get('action_relations',[]):
                 text=action_queries.get(relation['kind'])
                 if not text:continue
-                extra=self.pool_service.search(text,source=source,top_k=self.service.index.pose_count)
+                extra=pool.search(text,source=source,top_k=self.service.index.pose_count)
                 if extra['status']=='error':return result('error',reason='action_relation_search_failed')
                 for c in extra['candidates']:
                     if c['pose_id'] not in by_id:
@@ -143,6 +147,8 @@ class Semantic285Adapter:
             checked=None
             if validator and whole_required and whole_required['active']:
                 checked=validator.check(whole_required,pose_id)
+                if pair_requirements and not checked['conflicts']:
+                    checked,_=soften_arm_checks(checked,conflicts=False)
                 counts=prepared['validation_counts'];counts[checked['status']]=counts.get(checked['status'],0)+1
                 if checked['status'] not in ('passed','near_match'):
                     if len(prepared['excluded_examples'])<20:

@@ -1,0 +1,26 @@
+{
+  "qualityOnly": true,
+  "performanceTimingExcluded": true,
+  "character": "female-base-v0-4-0",
+  "requestedHeight": 170.893087,
+  "neutralPreparation": {
+    "generation_skipped": false,
+    "rest_import_skipped": false,
+    "seconds": 5.291050044000258,
+    "status": "custom_shape"
+  },
+  "controlsMatch": true,
+  "validation": {
+    "artifact_sha256": "c333c41436c8899123aeb3b7c0df113a84e01607d095078327f00cc59fbc37dd",
+    "bones": 54,
+    "meshes": 1,
+    "polygons": 210856,
+    "scope": "full",
+    "skin_verified": true,
+    "version": "final-fbx-v1",
+    "vertices": 105430
+  },
+  "registryUnchanged": true,
+  "preparedCount": 20,
+  "artifactSha256": "c333c41436c8899123aeb3b7c0df113a84e01607d095078327f00cc59fbc37dd"
+}

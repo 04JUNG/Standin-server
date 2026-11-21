@@ -1,0 +1,26 @@
+{
+  "229": {
+    "baseline": [
+      "Dockerfile.converter",
+      "converter_api/app.py",
+      "converter_api/interactive.py"
+    ],
+    "with_feature": [
+      "Dockerfile.converter",
+      "converter_api/app.py",
+      "converter_api/interactive.py"
+    ],
+    "new_conflicts": []
+  },
+  "230": {
+    "baseline": [
+      "converter_api/interactive.py",
+      "tests/converter/test_interactive_transport.py"
+    ],
+    "with_feature": [
+      "converter_api/interactive.py",
+      "tests/converter/test_interactive_transport.py"
+    ],
+    "new_conflicts": []
+  }
+}

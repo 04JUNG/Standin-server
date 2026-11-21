@@ -1,0 +1,80 @@
+[
+  {
+    "body_surface": {
+      "sample_count": 13070,
+      "max_mm": 2.6922510005533695,
+      "p99_mm": 0.4140249916235912,
+      "mean_mm": 0.09398126129695637
+    },
+    "case": "base",
+    "files": {
+      "original": "/private/tmp/standin-mesh-light-v5-final-20261115/probe-physical/base-original/7921cdf621bdb0b076ca52569dfc76f9f2f3141307de087ad09398533bae98b5/model.fbx",
+      "candidate": "/private/tmp/standin-mesh-light-v5-final-20261115/probe-physical/base-candidate/ac5e7762aa262541a8411353800b1a3a6bc998df9a6714eddf27e7dc586125f6/model.fbx"
+    },
+    "hand_max_mm": 0.0,
+    "protected_max_mm": 0.0,
+    "retained_p99_mm": 0.018377906707684265,
+    "retained_max_mm": 0.5615180748065592,
+    "root_repairs": {
+      "original": {
+        "left": []
+      },
+      "candidate": {
+        "left": []
+      }
+    },
+    "pass": true
+  },
+  {
+    "body_surface": {
+      "sample_count": 13070,
+      "max_mm": 2.705411287024617,
+      "p99_mm": 0.39044184930389747,
+      "mean_mm": 0.09313147943871418
+    },
+    "case": "preset",
+    "files": {
+      "original": "/private/tmp/standin-mesh-light-v5-final-20261115/probe-physical/preset-original/3d492989a8f2d7b38fea48d83542fcbe9737cc272e54bd013d7af3f7dc339dae/model.fbx",
+      "candidate": "/private/tmp/standin-mesh-light-v5-final-20261115/probe-physical/preset-candidate/b0c1c940c5e9f0ba8ef7189b5389c7bfdf9e83f0b77ec7fdfa64d950fd05c408/model.fbx"
+    },
+    "hand_max_mm": 0.0,
+    "protected_max_mm": 0.0,
+    "retained_p99_mm": 0.020782298927135893,
+    "retained_max_mm": 0.5595141176943019,
+    "root_repairs": {
+      "original": {
+        "left": []
+      },
+      "candidate": {
+        "left": []
+      }
+    },
+    "pass": true
+  },
+  {
+    "body_surface": {
+      "sample_count": 13070,
+      "max_mm": 2.9672959353774786,
+      "p99_mm": 0.4909797466825694,
+      "mean_mm": 0.1293600300748657
+    },
+    "case": "custom",
+    "files": {
+      "original": "/private/tmp/standin-mesh-light-v5-final-20261115/probe-physical/custom-original/92940a65c6989b13206f8b13984dec959673c4d8951d4933e035dacd9c4b7a44/model.fbx",
+      "candidate": "/private/tmp/standin-mesh-light-v5-final-20261115/probe-physical/custom-candidate/8f2e497b90ae9c45a9c09b6895aae29dd618a9538390c261c3c6c90acc3d6faf/model.fbx"
+    },
+    "hand_max_mm": 0.0,
+    "protected_max_mm": 0.0,
+    "retained_p99_mm": 0.023472687089996534,
+    "retained_max_mm": 0.5766941462636019,
+    "root_repairs": {
+      "original": {
+        "left": []
+      },
+      "candidate": {
+        "left": []
+      }
+    },
+    "pass": true
+  }
+]

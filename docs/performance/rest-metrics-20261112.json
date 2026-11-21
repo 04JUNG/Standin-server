@@ -1,0 +1,35 @@
+{
+  "blender": "5.2.0 LTS",
+  "vertices": 141561,
+  "cases": {
+    "neutral": {
+      "status": "ok",
+      "metricsExactlyEqual": true
+    },
+    "mild": {
+      "status": "ok",
+      "metricsExactlyEqual": true
+    },
+    "folded": {
+      "status": "ok",
+      "metricsExactlyEqual": true
+    },
+    "degenerate": {
+      "status": "ankle_surface_distributions_empty",
+      "metricsExactlyEqual": true
+    },
+    "no_weights": {
+      "status": "ankle_mesh_roi_unmeasurable",
+      "metricsExactlyEqual": true
+    },
+    "zero_rig": {
+      "status": "target_rest_edges_degenerate",
+      "metricsExactlyEqual": true
+    }
+  },
+  "buildSeconds": 0.7453108750050887,
+  "referenceSeconds": 4.046143834013492,
+  "cachedMeasurementsSeconds": 1.2383721261285245,
+  "optimizedTotalSeconds": 1.9836830011336133,
+  "note": "isolated measurements; not a complete export latency benchmark"
+}

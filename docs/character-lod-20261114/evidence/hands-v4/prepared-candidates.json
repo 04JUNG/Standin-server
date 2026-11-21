@@ -1,0 +1,56 @@
+[
+  {
+    "character": "male-candidate-base-lod-hands-v4-20261115",
+    "fbx_bytes": 6952028,
+    "generation_seconds": 9.45156521300001,
+    "key": "0477723f9be7438c69f311a07ab7dd2eb00f796ea6d3a0bd0de7d42865207cfc",
+    "ok": true,
+    "path": "/work/prepared-candidates/qa/prepared-0477723f9be7438c69f311a07ab7dd2eb00f796ea6d3a0bd0de7d42865207cfc.json",
+    "sha256": "04497a99145346f2925cbf6615233d722f9e4852817ce3817b40687371c22753"
+  },
+  {
+    "character": "male-candidate-preset-lod-hands-v4-20261115",
+    "fbx_bytes": 6953276,
+    "generation_seconds": 11.237928381000003,
+    "key": "ee9229c6457ce60fdbc195496d5640c08e17cc31a946aca6903309981081c3ca",
+    "ok": true,
+    "path": "/work/prepared-candidates/qa/prepared-ee9229c6457ce60fdbc195496d5640c08e17cc31a946aca6903309981081c3ca.json",
+    "sha256": "1d344b2ad689a13ee6ca6991dbd33936958c8267b2ccc2b27dd12a011cc8929b"
+  },
+  {
+    "character": "male-candidate-custom-lod-hands-v4-20261115",
+    "fbx_bytes": 6959580,
+    "generation_seconds": 15.251875964999996,
+    "key": "5911708b8a494811b357419d1359517d490629a1a92e64a0081b0723e74e2b93",
+    "ok": true,
+    "path": "/work/prepared-candidates/qa/prepared-5911708b8a494811b357419d1359517d490629a1a92e64a0081b0723e74e2b93.json",
+    "sha256": "37d46ec393d2cd87d0eef18e1b0ae50a2f857088f29f4c83437dee53cfc7dd07"
+  },
+  {
+    "character": "female-candidate-base-lod-hands-v4-20261115",
+    "fbx_bytes": 6119996,
+    "generation_seconds": 5.930893252999994,
+    "key": "bc0c5a2e53bafec1565dc840ac722929db18540f70c8ce57ccce037898e7bcaa",
+    "ok": true,
+    "path": "/work/prepared-candidates/qa/prepared-bc0c5a2e53bafec1565dc840ac722929db18540f70c8ce57ccce037898e7bcaa.json",
+    "sha256": "0698f577af0151b8cf44b1aa1ac08858409fe3851203cba14078425747f9ce28"
+  },
+  {
+    "character": "female-candidate-preset-lod-hands-v4-20261115",
+    "fbx_bytes": 6119772,
+    "generation_seconds": 7.654596919999989,
+    "key": "e82170428941f669cc9ab2bd84eb89aa607e7d386fa14c4e4be9841d2c4e6800",
+    "ok": true,
+    "path": "/work/prepared-candidates/qa/prepared-e82170428941f669cc9ab2bd84eb89aa607e7d386fa14c4e4be9841d2c4e6800.json",
+    "sha256": "f79bbc4972d00c5de1f30a84d76dcc0c47b598385c2fc602802d05f2c8a502f6"
+  },
+  {
+    "character": "female-candidate-custom-lod-hands-v4-20261115",
+    "fbx_bytes": 6125452,
+    "generation_seconds": 9.086972462000006,
+    "key": "dc3bebfb3c1b3b14626d33cc76117adba274d2b8b8a47d6c772ef41c9c090129",
+    "ok": true,
+    "path": "/work/prepared-candidates/qa/prepared-dc3bebfb3c1b3b14626d33cc76117adba274d2b8b8a47d6c772ef41c9c090129.json",
+    "sha256": "2d0de9781240d48d1f9214042008823e001518c6837a80ca5985e7a999cb73fc"
+  }
+]

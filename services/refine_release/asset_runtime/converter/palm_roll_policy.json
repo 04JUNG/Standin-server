@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "selector": "uniform_mu_ladder",
+  "mu_candidates": [0.0, 0.25, 0.5, 0.75, 1.0],
+  "default_mu": 0.5,
+  "identity_deg": 0.5,
+  "degenerate_deg": 175.0,
+  "min_plane_deg": 2.0
+}

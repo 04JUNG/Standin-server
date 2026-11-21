@@ -1,0 +1,392 @@
+[
+  {
+    "key": "e94940806da8829485849acf7ba044707f684f038f9197051f258e14122f5579",
+    "character_id": "male-base-v0-8-0",
+    "character_sha256": "705035f1bd247b3bf63a6d293065a5a39390b2d228df559474f9dc6682bf8c43",
+    "source_sha256": "49874a96b54473a2a663a3ef590f747c54f0234f2ac99222c5455bed96a6c098",
+    "camera_rotation": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0
+      ],
+      [
+        0,
+        0,
+        1
+      ]
+    ],
+    "artifact_sha256": "ae3cd39320c8ea45eca40182bc18c9ca88a0ce2e728a16aca5a1a7ee45265e92",
+    "bytes": 9075884,
+    "artifact_validation": {
+      "artifact_sha256": "ae3cd39320c8ea45eca40182bc18c9ca88a0ce2e728a16aca5a1a7ee45265e92",
+      "bones": 54,
+      "meshes": 1,
+      "polygons": 278944,
+      "scope": "full",
+      "skin_verified": true,
+      "version": "final-fbx-v1",
+      "vertices": 139474
+    },
+    "source_fingers": {
+      "applied_bones": 30,
+      "body_bones_preserved": true,
+      "mirrored": false,
+      "saved_fbx_roundtrip": {
+        "bones": 30,
+        "max_endpoint_error_m": 4.5252694603980227e-07,
+        "verified": true
+      },
+      "sides": {
+        "left": {
+          "applied_bones": 15,
+          "max_cumulative_rotation_deg": 74.41476074312718,
+          "source_offset_only": false,
+          "source_side": "left",
+          "status": "transferred",
+          "transfer": "posed_directions"
+        },
+        "right": {
+          "applied_bones": 15,
+          "max_cumulative_rotation_deg": 54.3232743561036,
+          "source_offset_only": false,
+          "source_side": "right",
+          "status": "transferred",
+          "transfer": "posed_directions"
+        }
+      },
+      "source_frame": 0,
+      "status": "transferred",
+      "version": "source-fingers-v2"
+    },
+    "shape_roundtrip": {
+      "roundtrip_joint_error_mm": 0.0006447900717237025,
+      "roundtrip_max_error_mm": 0.00021811248984704434,
+      "roundtrip_weight_error": 0.0,
+      "pose_transfer_max_joint_error_mm": 0.00024087970197688357
+    },
+    "complete_collision_certificate": false
+  },
+  {
+    "key": "613039c0d19a1f87aa5a68757a4598e9f22fae22cad9f60ef163db6e95ef38e2",
+    "character_id": "male-ideal83-v0-8-0",
+    "character_sha256": "56248a449cbe312b87687c7e6ffcb35149ed62ee02f1dc8700052025a7dc786f",
+    "source_sha256": "49874a96b54473a2a663a3ef590f747c54f0234f2ac99222c5455bed96a6c098",
+    "camera_rotation": null,
+    "artifact_sha256": "f60fdf88c6b885e8dae526f191ebcd545fd5b18d250136601462f1368c7f4649",
+    "bytes": 9067836,
+    "artifact_validation": {
+      "artifact_sha256": "f60fdf88c6b885e8dae526f191ebcd545fd5b18d250136601462f1368c7f4649",
+      "bones": 54,
+      "meshes": 1,
+      "polygons": 278944,
+      "scope": "full",
+      "skin_verified": true,
+      "version": "final-fbx-v1",
+      "vertices": 139474
+    },
+    "source_fingers": {
+      "applied_bones": 30,
+      "body_bones_preserved": true,
+      "mirrored": false,
+      "saved_fbx_roundtrip": {
+        "bones": 30,
+        "max_endpoint_error_m": 5.607273495860928e-07,
+        "verified": true
+      },
+      "sides": {
+        "left": {
+          "applied_bones": 15,
+          "max_cumulative_rotation_deg": 74.50422939106518,
+          "source_offset_only": false,
+          "source_side": "left",
+          "status": "transferred",
+          "transfer": "posed_directions"
+        },
+        "right": {
+          "applied_bones": 15,
+          "max_cumulative_rotation_deg": 54.333253262480994,
+          "source_offset_only": false,
+          "source_side": "right",
+          "status": "transferred",
+          "transfer": "posed_directions"
+        }
+      },
+      "source_frame": 0,
+      "status": "transferred",
+      "version": "source-fingers-v2"
+    },
+    "shape_roundtrip": {
+      "roundtrip_joint_error_mm": 0.0006351811136587594,
+      "roundtrip_max_error_mm": 0.00038201937968551647,
+      "roundtrip_weight_error": 0.0,
+      "pose_transfer_max_joint_error_mm": 0.0002666641796853137
+    },
+    "complete_collision_certificate": false
+  },
+  {
+    "key": "9a6e2bb5c6014d9e9f4bbdbefc145cc81dad329e1ac1337f5b24ffc13cdf4824",
+    "character_id": "female-base-v0-4-0",
+    "character_sha256": "ffd7b57d6ebba06299be252976b511afe5684a237e6f7d440bb90b2ba20f0c33",
+    "source_sha256": "49874a96b54473a2a663a3ef590f747c54f0234f2ac99222c5455bed96a6c098",
+    "camera_rotation": null,
+    "artifact_sha256": "3c504f465fc1dde4e958bb76c8155e4cb67d54f4acca6a44add07afa73055768",
+    "bytes": 6720028,
+    "artifact_validation": {
+      "artifact_sha256": "3c504f465fc1dde4e958bb76c8155e4cb67d54f4acca6a44add07afa73055768",
+      "bones": 54,
+      "meshes": 1,
+      "polygons": 210856,
+      "scope": "full",
+      "skin_verified": true,
+      "version": "final-fbx-v1",
+      "vertices": 105430
+    },
+    "source_fingers": {
+      "applied_bones": 30,
+      "body_bones_preserved": true,
+      "mirrored": false,
+      "saved_fbx_roundtrip": {
+        "bones": 30,
+        "max_endpoint_error_m": 5.611355696901616e-07,
+        "verified": true
+      },
+      "sides": {
+        "left": {
+          "applied_bones": 15,
+          "max_cumulative_rotation_deg": 74.41006157297821,
+          "source_offset_only": false,
+          "source_side": "left",
+          "status": "transferred",
+          "transfer": "posed_directions"
+        },
+        "right": {
+          "applied_bones": 15,
+          "max_cumulative_rotation_deg": 54.344919225583375,
+          "source_offset_only": false,
+          "source_side": "right",
+          "status": "transferred",
+          "transfer": "posed_directions"
+        }
+      },
+      "source_frame": 0,
+      "status": "transferred",
+      "version": "source-fingers-v2"
+    },
+    "shape_roundtrip": {
+      "roundtrip_joint_error_mm": 0.0007360630652444641,
+      "roundtrip_max_error_mm": 0.00022794392862124369,
+      "roundtrip_weight_error": 0.0,
+      "pose_transfer_max_joint_error_mm": 0.00024978897890806515
+    },
+    "complete_collision_certificate": false
+  },
+  {
+    "key": "5eaf012a3242c0fd5a65ac45a839ac5a3e62ce53db73d0deffb5247bff726a84",
+    "character_id": "female-base-v0-4-0",
+    "character_sha256": "ffd7b57d6ebba06299be252976b511afe5684a237e6f7d440bb90b2ba20f0c33",
+    "source_sha256": "49874a96b54473a2a663a3ef590f747c54f0234f2ac99222c5455bed96a6c098",
+    "camera_rotation": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0
+      ],
+      [
+        0,
+        0,
+        1
+      ]
+    ],
+    "artifact_sha256": "2831705c64cc0a787d1cfe70ec7eaad7c4f50953a9528b38a3f274ddd0e6961b",
+    "bytes": 6719596,
+    "artifact_validation": {
+      "artifact_sha256": "2831705c64cc0a787d1cfe70ec7eaad7c4f50953a9528b38a3f274ddd0e6961b",
+      "bones": 54,
+      "meshes": 1,
+      "polygons": 210856,
+      "scope": "full",
+      "skin_verified": true,
+      "version": "final-fbx-v1",
+      "vertices": 105430
+    },
+    "source_fingers": {
+      "applied_bones": 30,
+      "body_bones_preserved": true,
+      "mirrored": false,
+      "saved_fbx_roundtrip": {
+        "bones": 30,
+        "max_endpoint_error_m": 5.611355696901616e-07,
+        "verified": true
+      },
+      "sides": {
+        "left": {
+          "applied_bones": 15,
+          "max_cumulative_rotation_deg": 74.41006157297821,
+          "source_offset_only": false,
+          "source_side": "left",
+          "status": "transferred",
+          "transfer": "posed_directions"
+        },
+        "right": {
+          "applied_bones": 15,
+          "max_cumulative_rotation_deg": 54.344919225583375,
+          "source_offset_only": false,
+          "source_side": "right",
+          "status": "transferred",
+          "transfer": "posed_directions"
+        }
+      },
+      "source_frame": 0,
+      "status": "transferred",
+      "version": "source-fingers-v2"
+    },
+    "shape_roundtrip": {
+      "roundtrip_joint_error_mm": 0.0007360630652444641,
+      "roundtrip_max_error_mm": 0.00022794392862124369,
+      "roundtrip_weight_error": 0.0,
+      "pose_transfer_max_joint_error_mm": 0.00024978897890806515
+    },
+    "complete_collision_certificate": false
+  },
+  {
+    "key": "5ee58dfd578cf12571a938ec42ebc4ae2b380a50f3d2980b77df46e9f565edd0",
+    "character_id": "male-base-v0-8-0",
+    "character_sha256": "705035f1bd247b3bf63a6d293065a5a39390b2d228df559474f9dc6682bf8c43",
+    "source_sha256": "49874a96b54473a2a663a3ef590f747c54f0234f2ac99222c5455bed96a6c098",
+    "camera_rotation": null,
+    "artifact_sha256": "495cd96c932c6a37fd79061da56e46a3f290e1b204d716e321475217d35743d0",
+    "bytes": 9075788,
+    "artifact_validation": {
+      "artifact_sha256": "495cd96c932c6a37fd79061da56e46a3f290e1b204d716e321475217d35743d0",
+      "bones": 54,
+      "meshes": 1,
+      "polygons": 278944,
+      "scope": "full",
+      "skin_verified": true,
+      "version": "final-fbx-v1",
+      "vertices": 139474
+    },
+    "source_fingers": {
+      "applied_bones": 30,
+      "body_bones_preserved": true,
+      "mirrored": false,
+      "saved_fbx_roundtrip": {
+        "bones": 30,
+        "max_endpoint_error_m": 4.5252694603980227e-07,
+        "verified": true
+      },
+      "sides": {
+        "left": {
+          "applied_bones": 15,
+          "max_cumulative_rotation_deg": 74.41476074312718,
+          "source_offset_only": false,
+          "source_side": "left",
+          "status": "transferred",
+          "transfer": "posed_directions"
+        },
+        "right": {
+          "applied_bones": 15,
+          "max_cumulative_rotation_deg": 54.3232743561036,
+          "source_offset_only": false,
+          "source_side": "right",
+          "status": "transferred",
+          "transfer": "posed_directions"
+        }
+      },
+      "source_frame": 0,
+      "status": "transferred",
+      "version": "source-fingers-v2"
+    },
+    "shape_roundtrip": {
+      "roundtrip_joint_error_mm": 0.0006447900717237025,
+      "roundtrip_max_error_mm": 0.00021811248984704434,
+      "roundtrip_weight_error": 0.0,
+      "pose_transfer_max_joint_error_mm": 0.00024087970197688357
+    },
+    "complete_collision_certificate": false
+  },
+  {
+    "key": "601ed08a807135848a0c5af6b69d9078cdee41afc4908666b679e57e4114609d",
+    "character_id": "male-ideal83-v0-8-0",
+    "character_sha256": "56248a449cbe312b87687c7e6ffcb35149ed62ee02f1dc8700052025a7dc786f",
+    "source_sha256": "49874a96b54473a2a663a3ef590f747c54f0234f2ac99222c5455bed96a6c098",
+    "camera_rotation": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0
+      ],
+      [
+        0,
+        0,
+        1
+      ]
+    ],
+    "artifact_sha256": "32238126d66f8a5fc9639c44e35df814ad6d45df7e57890faaf67dfa62d9c9ff",
+    "bytes": 9068092,
+    "artifact_validation": {
+      "artifact_sha256": "32238126d66f8a5fc9639c44e35df814ad6d45df7e57890faaf67dfa62d9c9ff",
+      "bones": 54,
+      "meshes": 1,
+      "polygons": 278944,
+      "scope": "full",
+      "skin_verified": true,
+      "version": "final-fbx-v1",
+      "vertices": 139474
+    },
+    "source_fingers": {
+      "applied_bones": 30,
+      "body_bones_preserved": true,
+      "mirrored": false,
+      "saved_fbx_roundtrip": {
+        "bones": 30,
+        "max_endpoint_error_m": 5.607273495860928e-07,
+        "verified": true
+      },
+      "sides": {
+        "left": {
+          "applied_bones": 15,
+          "max_cumulative_rotation_deg": 74.50422939106518,
+          "source_offset_only": false,
+          "source_side": "left",
+          "status": "transferred",
+          "transfer": "posed_directions"
+        },
+        "right": {
+          "applied_bones": 15,
+          "max_cumulative_rotation_deg": 54.333253262480994,
+          "source_offset_only": false,
+          "source_side": "right",
+          "status": "transferred",
+          "transfer": "posed_directions"
+        }
+      },
+      "source_frame": 0,
+      "status": "transferred",
+      "version": "source-fingers-v2"
+    },
+    "shape_roundtrip": {
+      "roundtrip_joint_error_mm": 0.0006351811136587594,
+      "roundtrip_max_error_mm": 0.00038201937968551647,
+      "roundtrip_weight_error": 0.0,
+      "pose_transfer_max_joint_error_mm": 0.0002666641796853137
+    },
+    "complete_collision_certificate": false
+  }
+]

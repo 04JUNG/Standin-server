@@ -191,7 +191,8 @@ def render_preview(meshes, output: Path, view="front", *, aligned=False) -> None
     bpy.ops.render.render(write_still=True)
 
 
-def process_output(path, scope="full", *, preview_path=None, view="front", camera_rotation=None, lab_timings=None) -> dict:
+def process_output(path, scope="full", *, preview_path=None, view="front",
+                   camera_rotation=None, lab_timings=None, selected_hand_screen=False) -> dict:
     from converter import retarget as rt
     from converter.camera import validate_rotation, rotate_scene
 
@@ -199,14 +200,22 @@ def process_output(path, scope="full", *, preview_path=None, view="front", camer
     validate_rotation(camera_rotation)
     if camera_rotation is not None and view != "front":
         raise ValueError("aligned output requires a fixed front camera")
-    if scope == "full" and preview_path is None and camera_rotation is None:
+    unchanged = scope == "full" and preview_path is None and camera_rotation is None
+    if unchanged and not selected_hand_screen:
         return {"version": FRAMING_VERSION, "scope": scope}
     timings = lab_timings if lab_timings is not None else StageTimings()
     with timings.measure("framing_import"):
         rt.reset_scene()
         arm, meshes = rt.import_character(str(path))
+    if selected_hand_screen:
+        from converter.hand_contact import require_clear_selected_hands
+        require_clear_selected_hands(meshes)
+    if unchanged:
+        return {"version": FRAMING_VERSION, "scope": scope, "selected_hand_screen": "clear_screen"}
     with timings.measure("crop"):
         report = crop_meshes(arm, meshes, scope)
+    if selected_hand_screen:
+        report['selected_hand_screen'] = 'clear_screen'
     if camera_rotation is not None:
         with timings.measure("camera_rotate"):
             rotate_scene(arm, camera_rotation)

@@ -1,0 +1,480 @@
+{
+  "policy_sha256": "3eeaa22cc908cd7a99e2e24b6b920c980a7f787029941e8c7695776fd1f3df1b",
+  "server_develop_base": "5999fe397a1b81cd8c2cbc9b71166a978d7c58c1",
+  "scope": "isolated local active-library subset: one real pose; full scope; semantic identity camera and unbaked variants; no deployment or S3 writes",
+  "tested_default_change": "male-base-v0-8-0 -> male-ideal83-v0-8-0 -> male-base-v0-8-0",
+  "source_sha256": "49874a96b54473a2a663a3ef590f747c54f0234f2ac99222c5455bed96a6c098",
+  "total_blender_conversions": 6,
+  "conversions": [
+    {
+      "character_id": "male-base-v0-8-0",
+      "camera_rotation": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "character_id": "male-base-v0-8-0",
+      "camera_rotation": null
+    },
+    {
+      "character_id": "female-base-v0-4-0",
+      "camera_rotation": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "character_id": "female-base-v0-4-0",
+      "camera_rotation": null
+    },
+    {
+      "character_id": "male-ideal83-v0-8-0",
+      "camera_rotation": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "character_id": "male-ideal83-v0-8-0",
+      "camera_rotation": null
+    }
+  ],
+  "events": [
+    {
+      "label": "startup-background-preparation",
+      "seconds": 63.14107579202391,
+      "worker_runs": 4,
+      "state": {
+        "status": "ready",
+        "generation": "0a956f40bb0bf4d36e57ab03b244ea01e7d18a296221402b6a7c8002b4011da6",
+        "library_manifest_sha256": "5ecd6bf452c6f0c138aa10ca8dd2656d3069d239821c1bcaff5f0a14199ae957",
+        "defaults": [
+          "male-base-v0-8-0",
+          "female-base-v0-4-0"
+        ],
+        "total": 4,
+        "ready": 4,
+        "failed": 0,
+        "pending": 0,
+        "results": [
+          {
+            "pose_id": "2hand Idle_01",
+            "character_id": "male-base-v0-8-0",
+            "camera_rotation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ],
+            "key": "e94940806da8829485849acf7ba044707f684f038f9197051f258e14122f5579",
+            "status": "ready",
+            "origin": "miss"
+          },
+          {
+            "pose_id": "2hand Idle_01",
+            "character_id": "male-base-v0-8-0",
+            "camera_rotation": null,
+            "key": "5ee58dfd578cf12571a938ec42ebc4ae2b380a50f3d2980b77df46e9f565edd0",
+            "status": "ready",
+            "origin": "miss"
+          },
+          {
+            "pose_id": "2hand Idle_01",
+            "character_id": "female-base-v0-4-0",
+            "camera_rotation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ],
+            "key": "5eaf012a3242c0fd5a65ac45a839ac5a3e62ce53db73d0deffb5247bff726a84",
+            "status": "ready",
+            "origin": "miss"
+          },
+          {
+            "pose_id": "2hand Idle_01",
+            "character_id": "female-base-v0-4-0",
+            "camera_rotation": null,
+            "key": "9a6e2bb5c6014d9e9f4bbdbefc145cc81dad329e1ac1337f5b24ffc13cdf4824",
+            "status": "ready",
+            "origin": "miss"
+          }
+        ]
+      }
+    },
+    {
+      "label": "initial-request-hit",
+      "ms": 178.29504201654345,
+      "artifact_sha256": "ae3cd39320c8ea45eca40182bc18c9ca88a0ce2e728a16aca5a1a7ee45265e92",
+      "conversion_id": "f6786c0a-8831-4a96-bce7-f72d2682cb14",
+      "cache": {
+        "status": "hit",
+        "key": "e94940806da8829485849acf7ba044707f684f038f9197051f258e14122f5579",
+        "lookup_ms": 47.532,
+        "blender_runs": 0
+      }
+    },
+    {
+      "label": "second-job-equivalent-hit",
+      "ms": 166.3848749594763,
+      "artifact_sha256": "ae3cd39320c8ea45eca40182bc18c9ca88a0ce2e728a16aca5a1a7ee45265e92",
+      "conversion_id": "895bfb17-adf6-42f2-a6d2-6376b09fcb5b",
+      "cache": {
+        "status": "hit",
+        "key": "e94940806da8829485849acf7ba044707f684f038f9197051f258e14122f5579",
+        "lookup_ms": 46.564,
+        "blender_runs": 0
+      }
+    },
+    {
+      "label": "catalog-change-automatically-prepared",
+      "seconds": 43.35950404196046,
+      "worker_runs": 6,
+      "state": {
+        "status": "ready",
+        "generation": "4a86363057d77d5829311f1624048722a8597ab1086cd61c223f6fd0bf79fea3",
+        "library_manifest_sha256": "cdc458537c5e2989dbfb599f5eef3f3d554596e8c437ba055762c95ca3bd05fa",
+        "defaults": [
+          "male-ideal83-v0-8-0",
+          "female-base-v0-4-0"
+        ],
+        "total": 4,
+        "ready": 4,
+        "failed": 0,
+        "pending": 0,
+        "results": [
+          {
+            "pose_id": "2hand Idle_01",
+            "character_id": "male-ideal83-v0-8-0",
+            "camera_rotation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ],
+            "key": "601ed08a807135848a0c5af6b69d9078cdee41afc4908666b679e57e4114609d",
+            "status": "ready",
+            "origin": "miss"
+          },
+          {
+            "pose_id": "2hand Idle_01",
+            "character_id": "male-ideal83-v0-8-0",
+            "camera_rotation": null,
+            "key": "613039c0d19a1f87aa5a68757a4598e9f22fae22cad9f60ef163db6e95ef38e2",
+            "status": "ready",
+            "origin": "miss"
+          },
+          {
+            "pose_id": "2hand Idle_01",
+            "character_id": "female-base-v0-4-0",
+            "camera_rotation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ],
+            "key": "5eaf012a3242c0fd5a65ac45a839ac5a3e62ce53db73d0deffb5247bff726a84",
+            "status": "ready",
+            "origin": "hit"
+          },
+          {
+            "pose_id": "2hand Idle_01",
+            "character_id": "female-base-v0-4-0",
+            "camera_rotation": null,
+            "key": "9a6e2bb5c6014d9e9f4bbdbefc145cc81dad329e1ac1337f5b24ffc13cdf4824",
+            "status": "ready",
+            "origin": "hit"
+          }
+        ]
+      }
+    },
+    {
+      "label": "changed-default-request-hit",
+      "ms": 178.24858298990875,
+      "artifact_sha256": "32238126d66f8a5fc9639c44e35df814ad6d45df7e57890faaf67dfa62d9c9ff",
+      "conversion_id": "5bf72c5b-c849-4287-a28f-d17f58c7bb06",
+      "cache": {
+        "status": "hit",
+        "key": "601ed08a807135848a0c5af6b69d9078cdee41afc4908666b679e57e4114609d",
+        "lookup_ms": 44.315,
+        "blender_runs": 0
+      }
+    },
+    {
+      "label": "catalog-revert-reused-verified-original",
+      "seconds": 0.5399122079834342,
+      "worker_runs": 6,
+      "state": {
+        "status": "ready",
+        "generation": "0a956f40bb0bf4d36e57ab03b244ea01e7d18a296221402b6a7c8002b4011da6",
+        "library_manifest_sha256": "5ecd6bf452c6f0c138aa10ca8dd2656d3069d239821c1bcaff5f0a14199ae957",
+        "defaults": [
+          "male-base-v0-8-0",
+          "female-base-v0-4-0"
+        ],
+        "total": 4,
+        "ready": 4,
+        "failed": 0,
+        "pending": 0,
+        "results": [
+          {
+            "pose_id": "2hand Idle_01",
+            "character_id": "male-base-v0-8-0",
+            "camera_rotation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ],
+            "key": "e94940806da8829485849acf7ba044707f684f038f9197051f258e14122f5579",
+            "status": "ready",
+            "origin": "hit"
+          },
+          {
+            "pose_id": "2hand Idle_01",
+            "character_id": "male-base-v0-8-0",
+            "camera_rotation": null,
+            "key": "5ee58dfd578cf12571a938ec42ebc4ae2b380a50f3d2980b77df46e9f565edd0",
+            "status": "ready",
+            "origin": "hit"
+          },
+          {
+            "pose_id": "2hand Idle_01",
+            "character_id": "female-base-v0-4-0",
+            "camera_rotation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ],
+            "key": "5eaf012a3242c0fd5a65ac45a839ac5a3e62ce53db73d0deffb5247bff726a84",
+            "status": "ready",
+            "origin": "hit"
+          },
+          {
+            "pose_id": "2hand Idle_01",
+            "character_id": "female-base-v0-4-0",
+            "camera_rotation": null,
+            "key": "9a6e2bb5c6014d9e9f4bbdbefc145cc81dad329e1ac1337f5b24ffc13cdf4824",
+            "status": "ready",
+            "origin": "hit"
+          }
+        ]
+      }
+    },
+    {
+      "label": "restored-default-request-hit",
+      "ms": 161.86904103960842,
+      "artifact_sha256": "ae3cd39320c8ea45eca40182bc18c9ca88a0ce2e728a16aca5a1a7ee45265e92",
+      "conversion_id": "859ceb4f-29c5-40f5-afb0-0c7c18ce4db4",
+      "cache": {
+        "status": "hit",
+        "key": "e94940806da8829485849acf7ba044707f684f038f9197051f258e14122f5579",
+        "lookup_ms": 43.789,
+        "blender_runs": 0
+      }
+    },
+    {
+      "label": "api-restart-resumed-without-conversion",
+      "seconds": 0.4227407919242978,
+      "worker_runs": 6,
+      "state": {
+        "status": "ready",
+        "generation": "0a956f40bb0bf4d36e57ab03b244ea01e7d18a296221402b6a7c8002b4011da6",
+        "library_manifest_sha256": "5ecd6bf452c6f0c138aa10ca8dd2656d3069d239821c1bcaff5f0a14199ae957",
+        "defaults": [
+          "male-base-v0-8-0",
+          "female-base-v0-4-0"
+        ],
+        "total": 4,
+        "ready": 4,
+        "failed": 0,
+        "pending": 0,
+        "results": [
+          {
+            "pose_id": "2hand Idle_01",
+            "character_id": "male-base-v0-8-0",
+            "camera_rotation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ],
+            "key": "e94940806da8829485849acf7ba044707f684f038f9197051f258e14122f5579",
+            "status": "ready",
+            "origin": "hit"
+          },
+          {
+            "pose_id": "2hand Idle_01",
+            "character_id": "male-base-v0-8-0",
+            "camera_rotation": null,
+            "key": "5ee58dfd578cf12571a938ec42ebc4ae2b380a50f3d2980b77df46e9f565edd0",
+            "status": "ready",
+            "origin": "hit"
+          },
+          {
+            "pose_id": "2hand Idle_01",
+            "character_id": "female-base-v0-4-0",
+            "camera_rotation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ],
+            "key": "5eaf012a3242c0fd5a65ac45a839ac5a3e62ce53db73d0deffb5247bff726a84",
+            "status": "ready",
+            "origin": "hit"
+          },
+          {
+            "pose_id": "2hand Idle_01",
+            "character_id": "female-base-v0-4-0",
+            "camera_rotation": null,
+            "key": "9a6e2bb5c6014d9e9f4bbdbefc145cc81dad329e1ac1337f5b24ffc13cdf4824",
+            "status": "ready",
+            "origin": "hit"
+          }
+        ]
+      }
+    },
+    {
+      "label": "after-restart-request-hit",
+      "ms": 162.22287504933774,
+      "artifact_sha256": "ae3cd39320c8ea45eca40182bc18c9ca88a0ce2e728a16aca5a1a7ee45265e92",
+      "conversion_id": "9c78cd65-5876-4243-84c6-14c11ff9704f",
+      "cache": {
+        "status": "hit",
+        "key": "e94940806da8829485849acf7ba044707f684f038f9197051f258e14122f5579",
+        "lookup_ms": 42.734,
+        "blender_runs": 0
+      }
+    }
+  ]
+}

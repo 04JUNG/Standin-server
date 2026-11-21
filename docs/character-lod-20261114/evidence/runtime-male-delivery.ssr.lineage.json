@@ -1,0 +1,16 @@
+{
+  "original_candidate_runtime_sha256": "e75d1f71ba3322463eac870aa99bd777c5a820222e338eb1088f479b9c8cbee1",
+  "source_before": {
+    "blendSha256": "33b98fdbf30c2a9fe0666266fc3a34ef0617d0bc91e9814ea9920b9e4ed3ab51",
+    "controllerSha256": "28e1e0603abbfd76e0e412b9430d042c23c2c6bed6b4c56d3ca00a2510c10c10"
+  },
+  "source_after": {
+    "blendSha256": "2acfd5cf1757b95b61dd2a12bba46405b54cb9589e5a08780a3908452f0f9a96",
+    "controllerSha256": "28e1e0603abbfd76e0e412b9430d042c23c2c6bed6b4c56d3ca00a2510c10c10"
+  },
+  "semantic_sha256": "92461dcc64d691cb16189f0252c19425b7ad09913474f6532bacd88ecf7f27d0",
+  "runtime_sha256": "5c266d96959addd2f7de53237d6648ead9912188fba7594e7995fde7781628ef",
+  "bytes": 31208692,
+  "same_candidate_topology": true,
+  "original_release_runtime_reused": false
+}

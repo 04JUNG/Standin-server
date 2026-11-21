@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "selector": "spherical_soft_cap",
+  "global_hard_deg": 120.0,
+  "default": {
+    "soft_cap_deg": null,
+    "hard_deg": 120.0
+  },
+  "profiles": {
+    "canonical": {
+      "soft_cap_deg": null,
+      "hard_deg": 120.0
+    },
+    "mixamo": {
+      "soft_cap_deg": null,
+      "hard_deg": 120.0
+    },
+    "mixamo_noprefix": {
+      "soft_cap_deg": 80.0,
+      "hard_deg": 120.0
+    },
+    "cmu_bvh": {
+      "soft_cap_deg": null,
+      "hard_deg": 120.0
+    },
+    "csp": {
+      "soft_cap_deg": null,
+      "hard_deg": 120.0
+    }
+  },
+  "notes": [
+    "No file-name or case-label branches are allowed.",
+    "Profiles without an explicit override preserve frozen V3 below the 120 degree guard.",
+    "The frozen V3 parent-follow guard above 120 degrees cannot be bypassed by this policy."
+  ]
+}

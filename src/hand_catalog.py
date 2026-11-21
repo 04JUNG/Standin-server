@@ -66,6 +66,7 @@ def build_catalog(thumbnail_base: str = "/hands", directory: str = str(THUMBS_DI
     """클라이언트용 카탈로그. 묶음 순서·프리셋 순서는 라이브러리 정의 순서 그대로다."""
     library = load_library()
     manifest = _thumb_manifest(directory)
+    revision = hashlib.sha256(json.dumps(manifest, sort_keys=True, separators=(",", ":")).encode()).hexdigest() if manifest else None
     groups = []
     for category_id, label in library.categories.items():
         presets = []
@@ -75,7 +76,7 @@ def build_catalog(thumbnail_base: str = "/hands", directory: str = str(THUMBS_DI
                 "id": preset_id,
                 "label": preset.label_ko,
                 "description": preset.vlm_hint,
-                "thumbnails": ({side: f"{thumbnail_base}/{preset_id}/thumbnail?side={side}"
+                "thumbnails": ({side: f"{thumbnail_base}/{preset_id}/thumbnail?side={side}&revision={revision}"
                                 for side in SIDES} if manifest else None),
             })
         groups.append({"id": category_id, "label": label, "presets": presets})
@@ -86,5 +87,6 @@ def build_catalog(thumbnail_base: str = "/hands", directory: str = str(THUMBS_DI
         "default_preset": DEFAULT_PRESET,
         "fallback_order": list(library.fallback_order),
         "thumbnails_available": manifest is not None,
+        "thumbnail_revision": revision,
         "categories": groups,
     }

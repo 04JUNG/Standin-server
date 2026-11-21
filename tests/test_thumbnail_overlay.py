@@ -156,3 +156,45 @@ def test_manifest_cannot_advertise_incomplete_or_unbounded_library(assets, count
     path.write_text(json.dumps(manifest))
     with pytest.raises(ValueError):
         overlay.manifest_for(root)
+
+
+def test_byte_identical_library_ids_share_one_raster_set(assets):
+    import sqlite3
+
+    root, source, folder, _ = assets
+    path = root / 'thumbs/styled/manifest.json'
+    manifest = json.loads(path.read_text())
+    manifest.update(pose_count=2, source_count=1, image_count=overlay.IMAGES_PER_POSE,
+                    poses={'sample': source, 'sample-alias': source},
+                    pose_records={source: overlay._sha(folder / 'pose.json')})
+    path.write_text(json.dumps(manifest))
+    db = root / 'poses.db'
+    bvh = root / 'bvh'
+    bvh.mkdir()
+    with sqlite3.connect(db) as conn:
+        conn.execute('CREATE TABLE poses (pose_id TEXT PRIMARY KEY, bvh_path TEXT)')
+        for pose in manifest['poses']:
+            conn.execute('INSERT INTO poses VALUES (?,?)', (pose, f'data/bvh/{pose}.bvh'))
+            (bvh / f'{pose}.bvh').write_bytes(b'pose')
+
+    parsed = overlay.manifest_for(root)
+    overlay._verify_library_pose_map(root, db, parsed)
+    assert overlay.legacy_thumbnail_path(root, 'sample-alias', 'front') == folder / 'full__yaw_000.jpg'
+
+    archive = root / 'shared.tar.gz'
+    with tarfile.open(archive, 'w:gz') as tar:
+        for item in [path, *folder.iterdir()]:
+            tar.add(item, arcname=item.relative_to(root).as_posix())
+    overlay._extract(archive, root / 'extracted')
+
+    # Matching ID counts alone cannot authorize an alias to different bytes.
+    (bvh / 'sample-alias.bvh').write_bytes(b'different pose')
+    with pytest.raises(ValueError, match='BVH does not match'):
+        overlay._verify_library_pose_map(root, db, parsed)
+
+    # Legacy release manifests still require one independent source per ID.
+    manifest.pop('source_count')
+    manifest['image_count'] = 2 * overlay.IMAGES_PER_POSE
+    path.write_text(json.dumps(manifest))
+    with pytest.raises(ValueError, match='inventory'):
+        overlay.manifest_for(root)

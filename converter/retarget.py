@@ -73,7 +73,10 @@ import hashlib
 import json
 import math
 import os
+import re
 from dataclasses import dataclass, field, asdict
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import bpy
 from mathutils import Matrix, Quaternion, Vector
@@ -153,11 +156,46 @@ def _apply_object_transform(obj: bpy.types.Object) -> None:
     bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
 
 
+def _offset_delta_pose(text: str) -> str | None:
+    """Translate the baked library format to Blender's position convention."""
+    header, marker, motion = text.partition("MOTION")
+    if not marker or not re.search(r"^ROOT mixamorig:Hips\s*\{", header, re.MULTILINE):
+        return None
+    frame = re.fullmatch(r"(\s*Frames:\s*1\s+Frame Time:[^\r\n]+\r?\n)([^\r\n]+)\s*", motion)
+    if frame is None:
+        return None
+
+    # This exporter writes XYZ position deltas on every joint. Older six-channel
+    # BVHs in the library store absolute local positions of the order of the
+    # OFFSETs, so only adapt the baked format with near-zero non-root deltas.
+    offsets = re.findall(
+        r"(?:ROOT|JOINT)\s+\S+\s*\{\s*OFFSET\s+(\S+)\s+(\S+)\s+(\S+)\s*"
+        r"CHANNELS\s+6\s+Xposition\s+Yposition\s+Zposition\s+"
+        r"Xrotation\s+Yrotation\s+Zrotation\b",
+        header,
+    )
+    values = frame[2].split()
+    if len(offsets) < 2 or len(offsets) != header.count("CHANNELS") or len(values) != 6 * len(offsets):
+        return None
+
+    non_root = [tuple(map(float, offset)) for offset in offsets[1:]]
+    positions = [tuple(map(float, values[i:i + 3])) for i in range(6, len(values), 6)]
+    lengths = [math.hypot(*offset) for offset in non_root]
+    scale = max(lengths)
+    if scale <= 0 or not all(map(math.isfinite, lengths)):
+        return None
+    if not all(math.hypot(*position) <= 0.0001 * scale for position in positions):
+        return None
+
+    for start, offset, position in zip(range(6, len(values), 6), non_root, positions):
+        values[start:start + 3] = [str(base + delta) for base, delta in zip(offset, position)]
+    return header + marker + frame[1] + " ".join(values) + "\n"
+
+
 def import_bvh(path: str, frame: int = 0) -> bpy.types.Object:
     """BVH 를 불러 아마추어로 만들고 지정 프레임으로 이동시킨다."""
     before = set(bpy.data.objects)
-    bpy.ops.import_anim.bvh(
-        filepath=path,
+    options = dict(
         axis_forward="-Z",
         axis_up="Y",
         rotate_mode="NATIVE",
@@ -165,6 +203,18 @@ def import_bvh(path: str, frame: int = 0) -> bpy.types.Object:
         update_scene_fps=False,
         update_scene_duration=True,
     )
+    source = Path(path)
+    try:
+        normalized = _offset_delta_pose(source.read_text(encoding="utf-8-sig"))
+    except ValueError:
+        normalized = None
+    if normalized is None:
+        bpy.ops.import_anim.bvh(filepath=path, **options)
+    else:
+        with TemporaryDirectory(prefix="standin-bvh-") as temp:
+            normalized_path = Path(temp) / source.name
+            normalized_path.write_text(normalized, encoding="utf-8")
+            bpy.ops.import_anim.bvh(filepath=str(normalized_path), **options)
     new = [o for o in bpy.data.objects if o not in before and o.type == "ARMATURE"]
     if not new:
         raise RuntimeError(f"BVH 임포트 실패(아마추어 없음): {path}")

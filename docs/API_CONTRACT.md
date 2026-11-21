@@ -1362,7 +1362,18 @@ Converter `/compose-scene` may return an artifact-bound `X-Standin-Scene-Camera`
 
 The separately authenticated internal snapshot/static transport is documented in [real-model interactive v2](NEXT_SPRINT/INTERACTIVE_REAL_MODEL_V2_2026-11-04.md). This does not change public inference `/analyze` or `/refine` request/response contracts.
 
+The private snapshot camera accepts both the continuous `candidate-camera-v2` (`reference=search-fit`) and the explicit `pose-preview-camera-v1` presentation contract. The latter retains its original version and `projection_matches_search` value: a fixed/semantic reference is never relabeled as a fitted search camera. Its right-handed Y-up basis, hip origin/torso scale, image-down projection rule, unbaked rotation and finite projection parameters are validated before the same torso-calibrated camera calculation. BFF binds the validated original BVH SHA to either camera dialect; Converter still checks that binding against the source. Ownership, hand/body lineage, immutable snapshots, release checks and final FBX validation are unchanged.
+
+
 
 ## Internal converter: approved final-FBX skin (2026-11-06)
 
 The private `GET /skin-contract`, `GET /skin-assets/{sha256}` and `POST /skin-fbx` endpoints add a separate strict `fbx-skin-v1` choice. Default is omitted to retain the legacy byte-preserving path. Nondefault skins are limited to exact approved current male/female full individual FBXs, with source/runtime/manifest/UV/texture-bound proof and independent fresh-process verification. Combined exports apply skin before outline. Global enablement remains off. See [full contract, actual CSP evidence and limitations](SKIN_FBX_CSP.md).
+
+
+## RC4 staging adapter
+
+Opt-in `/refine/release` returns a verified FBX, baked display GLB and separate
+camera; it does not replace the legacy BVH `/refine` contract. See
+[RC4 integration](../services/refine_release/README.md) for deployment flags,
+original asset registration, persistence and withholding requirements.

@@ -1,0 +1,182 @@
+[
+  {
+    "character": "male-base-v0-8-0",
+    "fbx_bytes": 9063388,
+    "generation_seconds": 10.730395255000076,
+    "key": "6f2bd430c96fbeb3a6a92ad594af944392e72bcb8e70bca060485af7d0226d0b",
+    "ok": true,
+    "path": "/output/main/linux-prepared/qa/prepared-6f2bd430c96fbeb3a6a92ad594af944392e72bcb8e70bca060485af7d0226d0b.json",
+    "sha256": "a5574845d275afc5616fdc26233ee46ee748b7bf6b34a137fdd5946a093deea7"
+  },
+  {
+    "character": "male-ideal83-v0-8-0",
+    "fbx_bytes": 9067260,
+    "generation_seconds": 12.768880340000123,
+    "key": "ec2ab7298893e05f00909952aadc249f6303aefb06c7370e9e348a5a9db2e62e",
+    "ok": true,
+    "path": "/output/main/linux-prepared/qa/prepared-ec2ab7298893e05f00909952aadc249f6303aefb06c7370e9e348a5a9db2e62e.json",
+    "sha256": "697789716f525940e48a260771b078fc9407edcf51353aac7dd214dafd455225"
+  },
+  {
+    "character": "male-ideal70-v0-8-0",
+    "fbx_bytes": 9064940,
+    "generation_seconds": 13.81328075700003,
+    "key": "745d8c666a8e8668de5381d90970c09be2c378c4038d5ee01b3da5b97630a256",
+    "ok": true,
+    "path": "/output/main/linux-prepared/qa/prepared-745d8c666a8e8668de5381d90970c09be2c378c4038d5ee01b3da5b97630a256.json",
+    "sha256": "7b22bc8c5d7bd80e36d93da901d0f1cbc41c461a36fa183671658c98b15372bf"
+  },
+  {
+    "character": "male-toon64-v0-8-0",
+    "fbx_bytes": 9064668,
+    "generation_seconds": 13.389566964000096,
+    "key": "5e669bb57fbd92845b228081421ec18d596447c9374ace8ba9e76f0c0604a47f",
+    "ok": true,
+    "path": "/output/main/linux-prepared/qa/prepared-5e669bb57fbd92845b228081421ec18d596447c9374ace8ba9e76f0c0604a47f.json",
+    "sha256": "a7d1120233dafaba2cab6b3b2d250ee5bbb21e88b0871b10e5f693560dff6dfc"
+  },
+  {
+    "character": "male-muscular-v0-8-0",
+    "fbx_bytes": 9072092,
+    "generation_seconds": 11.228273172000172,
+    "key": "ccf0d19c5c5f4617bbf54e73f7018bcc76f7db3eb4ac6cbc46ad8d889a567c93",
+    "ok": true,
+    "path": "/output/main/linux-prepared/qa/prepared-ccf0d19c5c5f4617bbf54e73f7018bcc76f7db3eb4ac6cbc46ad8d889a567c93.json",
+    "sha256": "ca5424f7f58f6eb233807d495f42a9742099c787c16fff292c456323986a59fb"
+  },
+  {
+    "character": "male-muscle-max-v0-8-0",
+    "fbx_bytes": 9071548,
+    "generation_seconds": 11.409165296000083,
+    "key": "590361b46aaef3e7ef94421a59e80fc4cb6ce281302c84e21a40c1a2a4d2930d",
+    "ok": true,
+    "path": "/output/main/linux-prepared/qa/prepared-590361b46aaef3e7ef94421a59e80fc4cb6ce281302c84e21a40c1a2a4d2930d.json",
+    "sha256": "a45e79b5631d0067c1af1ecbcac541afb56b9cbfadc521c8044f00a04a4e21fb"
+  },
+  {
+    "character": "male-bulk-v0-8-0",
+    "fbx_bytes": 9075660,
+    "generation_seconds": 14.617758674000243,
+    "key": "16fbf1912e266a2bc6d8b3b7961b3ec7785904d9af52f3e000008ca05b107e87",
+    "ok": true,
+    "path": "/output/main/linux-prepared/qa/prepared-16fbf1912e266a2bc6d8b3b7961b3ec7785904d9af52f3e000008ca05b107e87.json",
+    "sha256": "4a821d98677d4f7575f9a6370cc98c668d21edb57dab3ec61edcaaacb0bf7311"
+  },
+  {
+    "character": "male-soft-v0-8-0",
+    "fbx_bytes": 9070396,
+    "generation_seconds": 14.376614090000203,
+    "key": "9fb25af365da829ef99fbc1373a4321d6d168542a55b5801aa4481446c214c17",
+    "ok": true,
+    "path": "/output/main/linux-prepared/qa/prepared-9fb25af365da829ef99fbc1373a4321d6d168542a55b5801aa4481446c214c17.json",
+    "sha256": "cab64a474174ddca0c08245fc3e431f37af0a7d87abdfe19c452aeca39bacf51"
+  },
+  {
+    "character": "male-fat-max-v0-8-0",
+    "fbx_bytes": 9076060,
+    "generation_seconds": 15.446054132999961,
+    "key": "2503a8a3fc460645e9c09af97acb5e29c70b14899f4a3a4264fe84d680c80690",
+    "ok": true,
+    "path": "/output/main/linux-prepared/qa/prepared-2503a8a3fc460645e9c09af97acb5e29c70b14899f4a3a4264fe84d680c80690.json",
+    "sha256": "ec7e867e96fa3f476c9a10b30b68e2bf2774a9c42a20204aebe6b63d540e0e29"
+  },
+  {
+    "character": "female-base-v0-4-0",
+    "fbx_bytes": 6706716,
+    "generation_seconds": 5.65034475199991,
+    "key": "44792e06aec47d059e60269bfa22f5de25b62813567ac454cd8a1733a7057934",
+    "ok": true,
+    "path": "/output/main/linux-prepared/qa/prepared-44792e06aec47d059e60269bfa22f5de25b62813567ac454cd8a1733a7057934.json",
+    "sha256": "ab6b284124b83118d405491cc8d33de4957695b88093ad450b257aeb0b931580"
+  },
+  {
+    "character": "female-slim-v0-4-0",
+    "fbx_bytes": 6706572,
+    "generation_seconds": 16.92303092400016,
+    "key": "26d8886d11bef5c6594866ae035cfe9a1298ba5554fbb061c21b0d4f7a52731c",
+    "ok": true,
+    "path": "/output/main/linux-prepared/qa/prepared-26d8886d11bef5c6594866ae035cfe9a1298ba5554fbb061c21b0d4f7a52731c.json",
+    "sha256": "51efb5a779f62b50c1c31eccd60aba7977ae0eac992c4e17ffb78a2aee8e5333"
+  },
+  {
+    "character": "female-ideal83-v0-4-0",
+    "fbx_bytes": 6707532,
+    "generation_seconds": 7.222541670999817,
+    "key": "f4fc2430c69d122b1e216f94d21dc2186e0bf41b5bf328f477a0deea665fc9c9",
+    "ok": true,
+    "path": "/output/main/linux-prepared/qa/prepared-f4fc2430c69d122b1e216f94d21dc2186e0bf41b5bf328f477a0deea665fc9c9.json",
+    "sha256": "47c4fa1fea15758eee0c1373723454e3f6329ff9cddab013a2a1714a4803f3b5"
+  },
+  {
+    "character": "female-ideal70-v0-4-0",
+    "fbx_bytes": 6704652,
+    "generation_seconds": 7.095146045000092,
+    "key": "eddeee85729c927f883b95d3f1e5e478378b8ccf5f514456fb7891a5fdcf8c57",
+    "ok": true,
+    "path": "/output/main/linux-prepared/qa/prepared-eddeee85729c927f883b95d3f1e5e478378b8ccf5f514456fb7891a5fdcf8c57.json",
+    "sha256": "9a3fe319dab899396912f87e6cd5d844a0335f4f74d7fae804c343019555aeeb"
+  },
+  {
+    "character": "female-toon64-v0-4-0",
+    "fbx_bytes": 6703452,
+    "generation_seconds": 6.124981627000125,
+    "key": "0af530a685a1d0ed4c75a08bf32847dda839ec4a17b5f528d327a96c4ec0b63f",
+    "ok": true,
+    "path": "/output/main/linux-prepared/qa/prepared-0af530a685a1d0ed4c75a08bf32847dda839ec4a17b5f528d327a96c4ec0b63f.json",
+    "sha256": "6ffd409aca51360fe37ca54efb3bd7fd36633f71663279fba5d5b4831868b080"
+  },
+  {
+    "character": "female-muscular-v0-4-0",
+    "fbx_bytes": 6707692,
+    "generation_seconds": 6.814562377999664,
+    "key": "4ddad449958b48b408aabac8067a85a7c433a38fef011c66cd2b5e520fd4642b",
+    "ok": true,
+    "path": "/output/main/linux-prepared/qa/prepared-4ddad449958b48b408aabac8067a85a7c433a38fef011c66cd2b5e520fd4642b.json",
+    "sha256": "943295ec9c5e0a12dc43c9404133bd42a7955bb63c0cdc056360c4d5d5606949"
+  },
+  {
+    "character": "female-muscle-max-v0-4-0",
+    "fbx_bytes": 6708428,
+    "generation_seconds": 6.8960265439995965,
+    "key": "3890b46412aa160abe3dabea10ba2abd7970a70ec909a3ee5814034f547b6d30",
+    "ok": true,
+    "path": "/output/main/linux-prepared/qa/prepared-3890b46412aa160abe3dabea10ba2abd7970a70ec909a3ee5814034f547b6d30.json",
+    "sha256": "7a2aa1cf60f3c2b7ce6d9df9574f4dd6c3aaacd3231740c75e9b6e9aad2e1f1a"
+  },
+  {
+    "character": "female-soft-v0-4-0",
+    "fbx_bytes": 6708220,
+    "generation_seconds": 7.324514587000067,
+    "key": "4384b85ceb93f5998cc610f2c14326c89b602b18f925c1d473588945f1a0fac6",
+    "ok": true,
+    "path": "/output/main/linux-prepared/qa/prepared-4384b85ceb93f5998cc610f2c14326c89b602b18f925c1d473588945f1a0fac6.json",
+    "sha256": "ef7778a3f2d52fa8043f1c74de22e25fde8c0e8ea1092ba2718dcef31237fc4a"
+  },
+  {
+    "character": "female-fat-max-v0-4-0",
+    "fbx_bytes": 6708812,
+    "generation_seconds": 9.927622712000357,
+    "key": "8e67be50ec344935df412c488002262313290ef430c0432cb050b8c13925a6af",
+    "ok": true,
+    "path": "/output/main/linux-prepared/qa/prepared-8e67be50ec344935df412c488002262313290ef430c0432cb050b8c13925a6af.json",
+    "sha256": "304c5e49725da0f4d64aa48a9fe9922f4e60a4e22801832a4171d82ce8a2967a"
+  },
+  {
+    "character": "female-new-fat-v0-4-0",
+    "fbx_bytes": 6710540,
+    "generation_seconds": 11.49357738100025,
+    "key": "73f7d0f767bcac52cf9b01bb7afeb0da42eb35c82e310e768a2bd2f19c432352",
+    "ok": true,
+    "path": "/output/main/linux-prepared/qa/prepared-73f7d0f767bcac52cf9b01bb7afeb0da42eb35c82e310e768a2bd2f19c432352.json",
+    "sha256": "4689488295327d68117c4974c76e7841bc232acf2abb1ff50fbf92e5a2c815f7"
+  },
+  {
+    "character": "female-new-muscular-v0-4-0",
+    "fbx_bytes": 6710796,
+    "generation_seconds": 10.492947587999879,
+    "key": "8c7d405e22e1405dd76ca3457adea2397d39c2fa800e848c3adbebd8c4d89f12",
+    "ok": true,
+    "path": "/output/main/linux-prepared/qa/prepared-8c7d405e22e1405dd76ca3457adea2397d39c2fa800e848c3adbebd8c4d89f12.json",
+    "sha256": "65ebe78ae3d3a14c00497c213407760c9f838c58a844d70254d03d660f37ea6f"
+  }
+]

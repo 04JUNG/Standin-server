@@ -1,0 +1,2493 @@
+{
+  "region_definition": "Original neutral bone weights / joint spheres; fixed source IDs. Fingertips are a conservative nail-support proxy, not a nail segmentation or thickness guarantee.",
+  "cases": {
+    "female-base-v0-4-0": {
+      "neutral": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "raised": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "elbow": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "deep": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "sit": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "cross": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "hands": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      }
+    },
+    "female-slim-v0-4-0": {
+      "neutral": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "raised": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "sit": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      }
+    },
+    "female-ideal83-v0-4-0": {
+      "neutral": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "raised": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "sit": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      }
+    },
+    "female-ideal70-v0-4-0": {
+      "neutral": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "raised": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "sit": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      }
+    },
+    "female-toon64-v0-4-0": {
+      "neutral": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "raised": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "sit": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      }
+    },
+    "female-muscular-v0-4-0": {
+      "neutral": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "raised": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "sit": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      }
+    },
+    "female-muscle-max-v0-4-0": {
+      "neutral": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "raised": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "sit": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      }
+    },
+    "female-soft-v0-4-0": {
+      "neutral": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "raised": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "sit": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      }
+    },
+    "female-fat-max-v0-4-0": {
+      "neutral": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "raised": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "sit": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      }
+    },
+    "female-new-fat-v0-4-0": {
+      "neutral": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "raised": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "sit": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      }
+    },
+    "female-new-muscular-v0-4-0": {
+      "neutral": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "raised": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "sit": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      }
+    },
+    "custom-large": {
+      "neutral": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "raised": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "elbow": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "deep": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "sit": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "cross": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      },
+      "hands": {
+        "hands": {
+          "retained": 37600,
+          "original": 52128,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "fingertips_nail_proxy": {
+          "retained": 24292,
+          "original": 24292,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "face": {
+          "retained": 2055,
+          "original": 2055,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "feet": {
+          "retained": 25223,
+          "original": 34937,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "shoulder": {
+          "retained": 925,
+          "original": 932,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "elbow": {
+          "retained": 577,
+          "original": 637,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "wrist": {
+          "retained": 2157,
+          "original": 4294,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "hip": {
+          "retained": 341,
+          "original": 343,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        },
+        "knee": {
+          "retained": 607,
+          "original": 625,
+          "max_mm": 0.0,
+          "p95_mm": 0.0
+        }
+      }
+    }
+  }
+}

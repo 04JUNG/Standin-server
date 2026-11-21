@@ -39,7 +39,8 @@ def test_shipped_hand_mesh_previews_are_complete_and_identify_the_approved_chara
     manifest = json.loads((THUMBS_DIR / "manifest.json").read_text())
     assert manifest["renderer"] == "default-human-hand-mesh-v1"
     assert manifest["style"] == "approved-reference-anatomy-detail-dark-v1"
-    assert manifest["character_sha256"] == "7c648b97a24a3bb4914b6e5d515708c33727979881d92ef916d5726e22301f3d"
+    assert manifest["character_id"] == "standin-male-v5.4"
+    assert manifest["character_sha256"] == "f7c74512d8f1adac528a2fd8a93baacc794ddeb4d6d298c57cd5e6fa8df19f77"
     expected = {f"{preset}__{side}.png" for preset in load_library().preset_ids
                 for side in ("left", "right")}
     assert set(manifest["files"]) == expected
@@ -90,3 +91,18 @@ def test_dockerignore_keeps_hand_thumbnails_in_the_image():
 def test_unknown_preset_or_side_has_no_thumbnail():
     assert thumbnail_path("tentacle", "left") is None
     assert thumbnail_path("fist", "middle") is None
+
+
+def test_new_mesh_invalidates_thumbnail_urls_without_changing_finger_poses(tmp_path):
+    before = build_catalog()
+    shutil.copytree(THUMBS_DIR, tmp_path / "thumbs")
+    path = tmp_path / "thumbs" / "manifest.json"
+    manifest = json.loads(path.read_text(encoding="utf-8"))
+    manifest["character_sha256"] = "a" * 64
+    path.write_text(json.dumps(manifest), encoding="utf-8")
+    _thumb_manifest.cache_clear()
+    after = build_catalog(directory=str(path.parent))
+    assert before["library_sha256"] == after["library_sha256"]
+    assert before["thumbnail_revision"] != after["thumbnail_revision"]
+    assert before["categories"][0]["presets"][0]["thumbnails"] != after["categories"][0]["presets"][0]["thumbnails"]
+    _thumb_manifest.cache_clear()

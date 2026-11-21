@@ -34,7 +34,7 @@ def main():
             paths.extend(selected)
             if number % 500 == 0:
                 print(f'verified {number}/{manifest["pose_count"]} poses', flush=True)
-    if len(paths) != manifest['pose_count'] * 33 + 1:
+    if len(paths) != len(manifest['pose_records']) * 33 + 1:
         raise ValueError('incomplete image package')
     # These are generated regular files, not a filesystem backup. Avoid expensive
     # per-file platform ownership lookups and prefetch a bounded batch of bytes.
@@ -52,7 +52,7 @@ def main():
         digest = hashlib.file_digest(data, 'sha256').hexdigest()
     receipt = dict(asset_version=manifest['asset_version'], archive=str(args.archive.resolve()),
                    sha256=digest, bytes=args.archive.stat().st_size, files=len(paths),
-                   poses=manifest['pose_count'], images=manifest['image_count'])
+                   poses=manifest['pose_count'], sources=len(manifest['pose_records']), images=manifest['image_count'])
     args.archive.with_suffix('.json').write_text(json.dumps(receipt, indent=2))
     print(json.dumps(receipt), flush=True)
 

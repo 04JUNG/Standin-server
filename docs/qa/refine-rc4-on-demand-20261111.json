@@ -1,0 +1,151 @@
+{
+  "scope": "same original 004 rough, two previously unused original library poses",
+  "runtime_files_unchanged": 60,
+  "results": [
+    {
+      "pose_id": "sd_cmu_13_04_f02064",
+      "selected": "shadow",
+      "source": {
+        "identity": {
+          "version": "original-bvh-assets-v1",
+          "bvh_sha256": "49e231e842386eeebc282bc526a1090e45053ec2323d32ca8e5dcf0c01245948",
+          "body_sha256": "7c648b97a24a3bb4914b6e5d515708c33727979881d92ef916d5726e22301f3d",
+          "builder_sha256": "d7e15159a2b9bdebf85dc8cf795ff90160038dc15de6188914decbde3423a044",
+          "blender_version": "Blender 5.2.0 LTS"
+        },
+        "cache_key": "7387c005765f20a41c6789272af324ca3c5a91d2c4d1ceadf30a1970eabc2c16",
+        "cache_hit": false,
+        "pose_id": "sd_cmu_13_04_f02064",
+        "zero_manual_edits": true
+      },
+      "download_sha256": "6980cbc1d5cde4c31ccc103c62e535b5572b2f0218c8393a3f185c990b42a844",
+      "bytes": 1832972,
+      "fbx": "first-cmu.fbx",
+      "request_seconds": 180.528,
+      "camera": {
+        "camera": [
+          [
+            0.9743723185468991,
+            -0.021942711327417642,
+            -0.22386849324802732
+          ],
+          [
+            -0.2030805367367947,
+            0.3421652860591614,
+            -0.9174318572050723
+          ],
+          [
+            0.09673096943707225,
+            0.9393835395809605,
+            0.3289402455098956
+          ]
+        ],
+        "origin": [
+          -1.989992171047561e-09,
+          0.009779850021004677,
+          0.9960023164749146
+        ],
+        "anchor_camera_xyz": [
+          0,
+          0,
+          0
+        ],
+        "projection": "orthographic",
+        "inverse_distance": 0,
+        "pixel_scale": 606.8484595712354,
+        "offset": [
+          258.1027989969552,
+          533.1769991359162
+        ],
+        "image_size": [
+          535,
+          687
+        ],
+        "embedded_in_fbx": false
+      },
+      "unused_in_known_history": true,
+      "download_matches_server": true
+    },
+    {
+      "pose_id": "rokoko_Judges_mixamo_00711_mirror",
+      "selected": "preserve",
+      "source": {
+        "identity": {
+          "version": "original-bvh-assets-v1",
+          "bvh_sha256": "7611e404557d97cd4e06ced9f4e1aff04f4b1e8dbc51b33bc07b0e7ab8e3a009",
+          "body_sha256": "7c648b97a24a3bb4914b6e5d515708c33727979881d92ef916d5726e22301f3d",
+          "builder_sha256": "d7e15159a2b9bdebf85dc8cf795ff90160038dc15de6188914decbde3423a044",
+          "blender_version": "Blender 5.2.0 LTS"
+        },
+        "cache_key": "116781239c7fbde1d5d38c14ed920106f80186af06b66e32bcb0b6da1e73d0ac",
+        "cache_hit": false,
+        "pose_id": "rokoko_Judges_mixamo_00711_mirror",
+        "zero_manual_edits": true
+      },
+      "download_sha256": "989a97745067aaf07c0ea99ccc0a03f35b9a6b31c3a6c5eb8f386ac28116bd7e",
+      "bytes": 1835548,
+      "fbx": "second-rokoko.fbx",
+      "request_seconds": 192.325,
+      "camera": {
+        "camera": [
+          [
+            0.7721953633088906,
+            -0.14868591754397034,
+            -0.6177433276113616
+          ],
+          [
+            -0.622505709730019,
+            -0.3717999232564964,
+            -0.6886591743525883
+          ],
+          [
+            -0.12728300058442935,
+            0.9163281699208918,
+            -0.37966000944483624
+          ]
+        ],
+        "origin": [
+          -8.127104322852574e-09,
+          0.009779827669262886,
+          0.9960023760795593
+        ],
+        "anchor_camera_xyz": [
+          0,
+          0,
+          0
+        ],
+        "projection": "orthographic",
+        "inverse_distance": 0,
+        "pixel_scale": 631.0524507039287,
+        "offset": [
+          259.6208515425962,
+          530.7418952424249
+        ],
+        "image_size": [
+          535,
+          687
+        ],
+        "embedded_in_fbx": false
+      },
+      "unused_in_known_history": true,
+      "download_matches_server": true
+    }
+  ],
+  "reimport": [
+    {
+      "file": "first-cmu.fbx",
+      "armatures": 1,
+      "bones": 65,
+      "vertices": 24988,
+      "finite_evaluated_skin": true
+    },
+    {
+      "file": "second-rokoko.fbx",
+      "armatures": 1,
+      "bones": 65,
+      "vertices": 24988,
+      "finite_evaluated_skin": true
+    }
+  ],
+  "production": true
+}

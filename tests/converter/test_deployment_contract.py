@@ -117,7 +117,8 @@ def test_converter_deploy_is_gated_and_path_filtered():
     assert ":develop'" in workflow
     assert "Verify isolated ECR target exists" in workflow
     assert "Verify optional isolated ECS target exists" in workflow
-    assert workflow.count("if: env.ECS_SERVICE != ''") == 5
+    assert workflow.count("if: env.ECS_SERVICE != ''") == 6
+    assert "scripts/verify_staging_anatomy.py taskdef.json" in workflow
     assert "CONVERTER_MAX_CONCURRENT_PROCESSES: ${{ vars.CONVERTER_MAX_CONCURRENT_PROCESSES }}" in workflow
     assert 'scripts/prepare_hand_screen_deployment.py taskdef.json --container converter' in workflow
     assert '"scripts/prepare_hand_screen_deployment.py"' in workflow
@@ -252,3 +253,23 @@ def test_converter_image_defines_runtime_healthcheck_and_json_logs():
     assert "http://127.0.0.1:8001/healthz" in dockerfile
     assert "CONVERTER_JSON_LOGS=1" in dockerfile
     assert "DEPLOYMENT_VERSION=$DEPLOYMENT_VERSION" in dockerfile
+
+
+def test_skin_contract_cache_imports_from_the_converter_image_allowlist(tmp_path):
+    for line in (ROOT / "Dockerfile.converter").read_text().splitlines():
+        if not line.lstrip().startswith("COPY "):
+            continue
+        parts = shlex.split(line, comments=True)
+        if len(parts) != 3 or parts[0] != "COPY":
+            continue
+        source, destination = parts[1:]
+        if not source.startswith("converter_api/") or not destination.startswith("/app/converter_api/"):
+            continue
+        target = tmp_path / destination.removeprefix("/app/")
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / source, target)
+    subprocess.run([sys.executable, "-I", "-c",
+        "import sys; sys.path.insert(0, sys.argv[1]); "
+        "from converter_api.skin_asset_cache import SkinAssetVerificationCache; "
+        "assert callable(SkinAssetVerificationCache)", str(tmp_path)],
+        check=True, cwd=tmp_path, capture_output=True, text=True)

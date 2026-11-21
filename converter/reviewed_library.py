@@ -63,16 +63,3 @@ def restore(job):
                 reviewed_library=dict(version=VERSION, pose_id=row['pose_id'],
                     source_bvh_sha256=source, reviewed_fbx_sha256=row['fbx_sha256'],
                     manifest_sha256=expected, character_sha256=catalog['character_sha256']))
-
-
-def transfer_registered_fingers(job):
-    """Keep source articulation for an ordinary retarget onto another body."""
-    root, expected = os.getenv('REVIEWED_LIBRARY_ROOT', ''), os.getenv('REVIEWED_LIBRARY_SHA256', '')
-    if not root or not expected or job.get('force_exact_v324'):
-        return None
-    _, catalog = _catalog(root, expected)
-    if sha(job['bvh_path']) not in catalog['poses']:
-        return None
-    from converter.reviewed_source_fingers import bake_source_fingers
-    return bake_source_fingers(job['output_path'], job['bvh_path'],
-                               mirror=job['mirror'], hands=job.get('hands'))

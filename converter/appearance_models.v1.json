@@ -1,0 +1,142 @@
+{
+  "female-base-v0-4-0": {
+    "scopes": [
+      "full"
+    ],
+    "sha256": "ffd7b57d6ebba06299be252976b511afe5684a237e6f7d440bb90b2ba20f0c33",
+    "statureM": 1.69893087
+  },
+  "female-fat-max-v0-4-0": {
+    "scopes": [
+      "full"
+    ],
+    "sha256": "87563be9bbb84e8d3c2f22b542a27a5c9d49bd939156338b45c40e323fb82cb9",
+    "statureM": 1.69893087
+  },
+  "female-ideal70-v0-4-0": {
+    "scopes": [
+      "full"
+    ],
+    "sha256": "669d62723f743163fce7cb1351004f7300cb6d5903761b8e8d2add38b754a6ba",
+    "statureM": 1.68
+  },
+  "female-ideal83-v0-4-0": {
+    "scopes": [
+      "full"
+    ],
+    "sha256": "4cbc58767c54c0ccc1dfd46a7d086a3503af3fc7e1dfa69a21c02eedd1a2234d",
+    "statureM": 1.69893087
+  },
+  "female-muscle-max-v0-4-0": {
+    "scopes": [
+      "full"
+    ],
+    "sha256": "8e2407d0118a7d38b4d2553d260778683c5ef8ef3819e6dba18bf43650c7585f",
+    "statureM": 1.69893087
+  },
+  "female-muscular-v0-4-0": {
+    "scopes": [
+      "full"
+    ],
+    "sha256": "76558d763ba524101fd9c3b50458641423869a2602d9198d05d41cc46efcd522",
+    "statureM": 1.69893087
+  },
+  "female-new-fat-v0-4-0": {
+    "scopes": [
+      "full"
+    ],
+    "sha256": "43e0cff054daed6a7d76b5e338c6a0bb941760cecff417c7ca9f4ae3f5bf0f3f",
+    "statureM": 1.69893087
+  },
+  "female-new-muscular-v0-4-0": {
+    "scopes": [
+      "full"
+    ],
+    "sha256": "b22bf84b91a7af1dbb4328aaafa99fbe5d89c30b29dd2c8987b65fd0fb223a96",
+    "statureM": 1.69893087
+  },
+  "female-slim-v0-4-0": {
+    "scopes": [
+      "full"
+    ],
+    "sha256": "33e5041fdfc61ef26553a12d52464a1050cfa8a7a04d98668aeb250f9fb33c38",
+    "statureM": 1.69893087
+  },
+  "female-soft-v0-4-0": {
+    "scopes": [
+      "full"
+    ],
+    "sha256": "5d0345f98d881ce46777fdf91129d02a54ff20619ee63e5af9c47738ec4057b2",
+    "statureM": 1.69893087
+  },
+  "female-toon64-v0-4-0": {
+    "scopes": [
+      "full"
+    ],
+    "sha256": "dc12c453dbc46f175351d72a73fc8b0f8bc3f8ec15316fb72d2a1082b66a4a68",
+    "statureM": 1.62
+  },
+  "male-base-v0-8-0": {
+    "scopes": [
+      "full"
+    ],
+    "sha256": "705035f1bd247b3bf63a6d293065a5a39390b2d228df559474f9dc6682bf8c43",
+    "statureM": 1.68684899
+  },
+  "male-bulk-v0-8-0": {
+    "scopes": [
+      "full"
+    ],
+    "sha256": "9bbd89667c4d38a80b6600f318b84550021d389a0a92c3713b9bb8fb22be2901",
+    "statureM": 1.68684899
+  },
+  "male-fat-max-v0-8-0": {
+    "scopes": [
+      "full"
+    ],
+    "sha256": "61d0ededbc9e7d71c01b44196e93aa1278ff49fe603bfca28cca2cbd2eac4234",
+    "statureM": 1.68684899
+  },
+  "male-ideal70-v0-8-0": {
+    "scopes": [
+      "full"
+    ],
+    "sha256": "5c29616fd615db67070f4ab26bb3c46158f43801805cdf53dacc10819ec969cb",
+    "statureM": 1.68684899
+  },
+  "male-ideal83-v0-8-0": {
+    "scopes": [
+      "full"
+    ],
+    "sha256": "56248a449cbe312b87687c7e6ffcb35149ed62ee02f1dc8700052025a7dc786f",
+    "statureM": 1.68684899
+  },
+  "male-muscle-max-v0-8-0": {
+    "scopes": [
+      "full"
+    ],
+    "sha256": "11e88a4df956e9bd2c25f058265eb7530257f196ae54f1ad5f01099f090f38b4",
+    "statureM": 1.68684899
+  },
+  "male-muscular-v0-8-0": {
+    "scopes": [
+      "full"
+    ],
+    "sha256": "37c6ad6e8f61354dc51f99594efecdc8b4c48d03b7e611a4e648fc0e64925e2a",
+    "statureM": 1.68684899
+  },
+  "male-soft-v0-8-0": {
+    "scopes": [
+      "full"
+    ],
+    "sha256": "a9dcd65e68d03e62d89ff3cffd27c330361595d9407d02ba16b2720086582f2e",
+    "statureM": 1.68684899
+  },
+  "male-toon64-v0-8-0": {
+    "scopes": [
+      "full"
+    ],
+    "sha256": "29aacebd756619bf62dd6f760a9966797e42dcd485dfcff82f0f878adabc595a",
+    "statureM": 1.65
+  }
+}

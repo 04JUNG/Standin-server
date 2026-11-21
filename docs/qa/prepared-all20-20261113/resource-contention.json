@@ -1,0 +1,748 @@
+{
+  "buildStartReportedKst": "2026-11-13 03:45 approximately",
+  "conservativeExclusionStartUtc": "2026-11-12T18:44:00+00:00",
+  "buildEndPending": false,
+  "qualityResultsRemainValid": true,
+  "estimatedSpansFromFbxMtime": true,
+  "cases": [
+    {
+      "suite": "develop-ob015",
+      "character": "male-base-v0-8-0",
+      "runs": {
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T17:48:28.906447+00:00",
+          "estimatedEndUtc": "2026-11-12T17:49:09.715898+00:00",
+          "possiblyContended": false
+        },
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T17:49:09.723412+00:00",
+          "estimatedEndUtc": "2026-11-12T17:49:43.152203+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "develop-ob015",
+      "character": "male-ideal83-v0-8-0",
+      "runs": {
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T17:49:47.651591+00:00",
+          "estimatedEndUtc": "2026-11-12T17:50:21.717232+00:00",
+          "possiblyContended": false
+        },
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T17:50:21.726142+00:00",
+          "estimatedEndUtc": "2026-11-12T17:51:08.155799+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "develop-ob015",
+      "character": "male-ideal70-v0-8-0",
+      "runs": {
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T17:51:12.431050+00:00",
+          "estimatedEndUtc": "2026-11-12T17:51:57.625864+00:00",
+          "possiblyContended": false
+        },
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T17:51:57.640284+00:00",
+          "estimatedEndUtc": "2026-11-12T17:52:33.194896+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "develop-ob015",
+      "character": "male-toon64-v0-8-0",
+      "runs": {
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T17:52:38.495010+00:00",
+          "estimatedEndUtc": "2026-11-12T17:53:13.343262+00:00",
+          "possiblyContended": false
+        },
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T17:53:13.355020+00:00",
+          "estimatedEndUtc": "2026-11-12T17:53:58.939474+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "develop-ob015",
+      "character": "male-muscular-v0-8-0",
+      "runs": {
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T17:54:03.733881+00:00",
+          "estimatedEndUtc": "2026-11-12T17:54:50.785743+00:00",
+          "possiblyContended": false
+        },
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T17:54:50.797705+00:00",
+          "estimatedEndUtc": "2026-11-12T17:55:23.769106+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "develop-ob015",
+      "character": "male-muscle-max-v0-8-0",
+      "runs": {
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T17:55:27.890031+00:00",
+          "estimatedEndUtc": "2026-11-12T17:56:00.681557+00:00",
+          "possiblyContended": false
+        },
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T17:56:00.689434+00:00",
+          "estimatedEndUtc": "2026-11-12T17:56:43.758047+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "develop-ob015",
+      "character": "male-bulk-v0-8-0",
+      "runs": {
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T17:56:47.864828+00:00",
+          "estimatedEndUtc": "2026-11-12T17:57:35.374516+00:00",
+          "possiblyContended": false
+        },
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T17:57:35.380661+00:00",
+          "estimatedEndUtc": "2026-11-12T17:58:09.885945+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "develop-ob015",
+      "character": "male-soft-v0-8-0",
+      "runs": {
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T17:58:14.938806+00:00",
+          "estimatedEndUtc": "2026-11-12T17:58:51.634017+00:00",
+          "possiblyContended": false
+        },
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T17:58:51.648654+00:00",
+          "estimatedEndUtc": "2026-11-12T17:59:40.632159+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "develop-ob015",
+      "character": "male-fat-max-v0-8-0",
+      "runs": {
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T17:59:45.122535+00:00",
+          "estimatedEndUtc": "2026-11-12T18:00:34.657716+00:00",
+          "possiblyContended": false
+        },
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:00:34.667381+00:00",
+          "estimatedEndUtc": "2026-11-12T18:01:11.543250+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "develop-ob015",
+      "character": "female-base-v0-4-0",
+      "runs": {
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:01:15.814799+00:00",
+          "estimatedEndUtc": "2026-11-12T18:01:40.158916+00:00",
+          "possiblyContended": false
+        },
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:01:40.164242+00:00",
+          "estimatedEndUtc": "2026-11-12T18:02:10.380973+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "develop-ob015",
+      "character": "female-slim-v0-4-0",
+      "runs": {
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:02:14.397343+00:00",
+          "estimatedEndUtc": "2026-11-12T18:03:01.569773+00:00",
+          "possiblyContended": false
+        },
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:03:01.576235+00:00",
+          "estimatedEndUtc": "2026-11-12T18:03:31.370298+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "develop-ob015",
+      "character": "female-ideal83-v0-4-0",
+      "runs": {
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:03:35.357249+00:00",
+          "estimatedEndUtc": "2026-11-12T18:04:00.720142+00:00",
+          "possiblyContended": false
+        },
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:04:00.725725+00:00",
+          "estimatedEndUtc": "2026-11-12T18:04:32.968990+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "develop-ob015",
+      "character": "female-ideal70-v0-4-0",
+      "runs": {
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:04:37.010952+00:00",
+          "estimatedEndUtc": "2026-11-12T18:05:07.924253+00:00",
+          "possiblyContended": false
+        },
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:05:07.936740+00:00",
+          "estimatedEndUtc": "2026-11-12T18:05:34.439201+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "develop-ob015",
+      "character": "female-toon64-v0-4-0",
+      "runs": {
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:05:38.279750+00:00",
+          "estimatedEndUtc": "2026-11-12T18:06:03.526619+00:00",
+          "possiblyContended": false
+        },
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:06:03.537555+00:00",
+          "estimatedEndUtc": "2026-11-12T18:06:35.182072+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "develop-ob015",
+      "character": "female-muscular-v0-4-0",
+      "runs": {
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:06:38.944699+00:00",
+          "estimatedEndUtc": "2026-11-12T18:07:08.153270+00:00",
+          "possiblyContended": false
+        },
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:07:08.161946+00:00",
+          "estimatedEndUtc": "2026-11-12T18:07:31.565735+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "develop-ob015",
+      "character": "female-muscle-max-v0-4-0",
+      "runs": {
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:07:35.187328+00:00",
+          "estimatedEndUtc": "2026-11-12T18:07:58.888631+00:00",
+          "possiblyContended": false
+        },
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:07:58.898444+00:00",
+          "estimatedEndUtc": "2026-11-12T18:08:29.257885+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "develop-ob015",
+      "character": "female-soft-v0-4-0",
+      "runs": {
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:08:32.993458+00:00",
+          "estimatedEndUtc": "2026-11-12T18:09:04.200165+00:00",
+          "possiblyContended": false
+        },
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:09:04.210362+00:00",
+          "estimatedEndUtc": "2026-11-12T18:09:29.410882+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "develop-ob015",
+      "character": "female-fat-max-v0-4-0",
+      "runs": {
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:09:33.300880+00:00",
+          "estimatedEndUtc": "2026-11-12T18:09:59.143508+00:00",
+          "possiblyContended": false
+        },
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:09:59.154244+00:00",
+          "estimatedEndUtc": "2026-11-12T18:10:34.576542+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "develop-ob015",
+      "character": "female-new-fat-v0-4-0",
+      "runs": {
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:10:38.739151+00:00",
+          "estimatedEndUtc": "2026-11-12T18:11:15.399024+00:00",
+          "possiblyContended": false
+        },
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:11:15.405089+00:00",
+          "estimatedEndUtc": "2026-11-12T18:11:41.415134+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "develop-ob015",
+      "character": "female-new-muscular-v0-4-0",
+      "runs": {
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:11:45.030916+00:00",
+          "estimatedEndUtc": "2026-11-12T18:12:10.720591+00:00",
+          "possiblyContended": false
+        },
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:12:10.733388+00:00",
+          "estimatedEndUtc": "2026-11-12T18:12:45.760427+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "main-ob015",
+      "character": "male-base-v0-8-0",
+      "runs": {
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:16:39.231121+00:00",
+          "estimatedEndUtc": "2026-11-12T18:17:20.518160+00:00",
+          "possiblyContended": false
+        },
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:17:20.524409+00:00",
+          "estimatedEndUtc": "2026-11-12T18:17:53.276208+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "main-ob015",
+      "character": "male-ideal83-v0-8-0",
+      "runs": {
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:17:57.408875+00:00",
+          "estimatedEndUtc": "2026-11-12T18:18:32.194799+00:00",
+          "possiblyContended": false
+        },
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:18:32.206515+00:00",
+          "estimatedEndUtc": "2026-11-12T18:19:17.697711+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "main-ob015",
+      "character": "male-ideal70-v0-8-0",
+      "runs": {
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:19:22.370797+00:00",
+          "estimatedEndUtc": "2026-11-12T18:20:09.202760+00:00",
+          "possiblyContended": false
+        },
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:20:09.209768+00:00",
+          "estimatedEndUtc": "2026-11-12T18:20:44.051788+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "main-ob015",
+      "character": "male-toon64-v0-8-0",
+      "runs": {
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:20:48.424469+00:00",
+          "estimatedEndUtc": "2026-11-12T18:21:23.351624+00:00",
+          "possiblyContended": false
+        },
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:21:23.359020+00:00",
+          "estimatedEndUtc": "2026-11-12T18:22:07.726611+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "main-ob015",
+      "character": "male-muscular-v0-8-0",
+      "runs": {
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:22:11.885714+00:00",
+          "estimatedEndUtc": "2026-11-12T18:22:55.551713+00:00",
+          "possiblyContended": false
+        },
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:22:55.562976+00:00",
+          "estimatedEndUtc": "2026-11-12T18:23:29.301487+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "main-ob015",
+      "character": "male-muscle-max-v0-8-0",
+      "runs": {
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:23:33.492662+00:00",
+          "estimatedEndUtc": "2026-11-12T18:24:07.283664+00:00",
+          "possiblyContended": false
+        },
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:24:07.293322+00:00",
+          "estimatedEndUtc": "2026-11-12T18:24:52.053902+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "main-ob015",
+      "character": "male-bulk-v0-8-0",
+      "runs": {
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:24:56.861191+00:00",
+          "estimatedEndUtc": "2026-11-12T18:25:49.989685+00:00",
+          "possiblyContended": false
+        },
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:25:49.999661+00:00",
+          "estimatedEndUtc": "2026-11-12T18:26:27.814891+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "main-ob015",
+      "character": "male-soft-v0-8-0",
+      "runs": {
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:26:32.588256+00:00",
+          "estimatedEndUtc": "2026-11-12T18:27:08.139988+00:00",
+          "possiblyContended": false
+        },
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:27:08.148878+00:00",
+          "estimatedEndUtc": "2026-11-12T18:27:59.241844+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "main-ob015",
+      "character": "male-fat-max-v0-8-0",
+      "runs": {
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:28:03.381719+00:00",
+          "estimatedEndUtc": "2026-11-12T18:28:52.579557+00:00",
+          "possiblyContended": false
+        },
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:28:52.613709+00:00",
+          "estimatedEndUtc": "2026-11-12T18:29:37.657835+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "main-ob015",
+      "character": "female-base-v0-4-0",
+      "runs": {
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:29:43.813829+00:00",
+          "estimatedEndUtc": "2026-11-12T18:30:09.228899+00:00",
+          "possiblyContended": false
+        },
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:30:09.236495+00:00",
+          "estimatedEndUtc": "2026-11-12T18:30:42.250618+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "main-ob015",
+      "character": "female-slim-v0-4-0",
+      "runs": {
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:30:45.900078+00:00",
+          "estimatedEndUtc": "2026-11-12T18:31:29.832076+00:00",
+          "possiblyContended": false
+        },
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:31:29.840422+00:00",
+          "estimatedEndUtc": "2026-11-12T18:32:08.203072+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "main-ob015",
+      "character": "female-ideal83-v0-4-0",
+      "runs": {
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:32:12.684542+00:00",
+          "estimatedEndUtc": "2026-11-12T18:32:38.995509+00:00",
+          "possiblyContended": false
+        },
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:32:39.000150+00:00",
+          "estimatedEndUtc": "2026-11-12T18:33:10.611619+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "main-ob015",
+      "character": "female-ideal70-v0-4-0",
+      "runs": {
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:33:14.162325+00:00",
+          "estimatedEndUtc": "2026-11-12T18:33:44.086725+00:00",
+          "possiblyContended": false
+        },
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:33:44.092323+00:00",
+          "estimatedEndUtc": "2026-11-12T18:34:09.099681+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "main-ob015",
+      "character": "female-toon64-v0-4-0",
+      "runs": {
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:34:14.339931+00:00",
+          "estimatedEndUtc": "2026-11-12T18:34:44.904426+00:00",
+          "possiblyContended": false
+        },
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:34:44.913960+00:00",
+          "estimatedEndUtc": "2026-11-12T18:35:15.793816+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "main-ob015",
+      "character": "female-muscular-v0-4-0",
+      "runs": {
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:35:20.000772+00:00",
+          "estimatedEndUtc": "2026-11-12T18:35:51.185406+00:00",
+          "possiblyContended": false
+        },
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:35:51.191085+00:00",
+          "estimatedEndUtc": "2026-11-12T18:36:15.728152+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "main-ob015",
+      "character": "female-muscle-max-v0-4-0",
+      "runs": {
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:36:19.435283+00:00",
+          "estimatedEndUtc": "2026-11-12T18:36:44.024006+00:00",
+          "possiblyContended": false
+        },
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:36:44.033309+00:00",
+          "estimatedEndUtc": "2026-11-12T18:37:17.955916+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "main-ob015",
+      "character": "female-soft-v0-4-0",
+      "runs": {
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:37:22.466532+00:00",
+          "estimatedEndUtc": "2026-11-12T18:37:56.871113+00:00",
+          "possiblyContended": false
+        },
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:37:56.880655+00:00",
+          "estimatedEndUtc": "2026-11-12T18:38:24.243364+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "main-ob015",
+      "character": "female-fat-max-v0-4-0",
+      "runs": {
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:38:29.055142+00:00",
+          "estimatedEndUtc": "2026-11-12T18:38:58.399449+00:00",
+          "possiblyContended": false
+        },
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:38:58.421701+00:00",
+          "estimatedEndUtc": "2026-11-12T18:39:38.331820+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "main-ob015",
+      "character": "female-new-fat-v0-4-0",
+      "runs": {
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:39:44.934262+00:00",
+          "estimatedEndUtc": "2026-11-12T18:40:31.744714+00:00",
+          "possiblyContended": false
+        },
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:40:31.754886+00:00",
+          "estimatedEndUtc": "2026-11-12T18:40:59.460764+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "main-ob015",
+      "character": "female-new-muscular-v0-4-0",
+      "runs": {
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:41:03.402479+00:00",
+          "estimatedEndUtc": "2026-11-12T18:41:30.996673+00:00",
+          "possiblyContended": false
+        },
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:41:31.004198+00:00",
+          "estimatedEndUtc": "2026-11-12T18:42:09.147503+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "main-ob001",
+      "character": "male-base-v0-8-0",
+      "runs": {
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:42:14.118040+00:00",
+          "estimatedEndUtc": "2026-11-12T18:42:43.731883+00:00",
+          "possiblyContended": false
+        },
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:42:43.742054+00:00",
+          "estimatedEndUtc": "2026-11-12T18:43:03.626602+00:00",
+          "possiblyContended": false
+        }
+      }
+    },
+    {
+      "suite": "main-ob001",
+      "character": "male-fat-max-v0-8-0",
+      "runs": {
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:43:07.745633+00:00",
+          "estimatedEndUtc": "2026-11-12T18:43:34.237316+00:00",
+          "possiblyContended": false
+        },
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:43:34.246753+00:00",
+          "estimatedEndUtc": "2026-11-12T18:44:10.859478+00:00",
+          "possiblyContended": true
+        }
+      }
+    },
+    {
+      "suite": "main-ob001",
+      "character": "male-muscle-max-v0-8-0",
+      "runs": {
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:44:14.947253+00:00",
+          "estimatedEndUtc": "2026-11-12T18:44:47.396037+00:00",
+          "possiblyContended": true
+        },
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:44:47.404441+00:00",
+          "estimatedEndUtc": "2026-11-12T18:45:09.107526+00:00",
+          "possiblyContended": true
+        }
+      }
+    },
+    {
+      "suite": "main-ob001",
+      "character": "female-base-v0-4-0",
+      "runs": {
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:45:13.718048+00:00",
+          "estimatedEndUtc": "2026-11-12T18:45:30.515461+00:00",
+          "possiblyContended": true
+        },
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:45:30.526192+00:00",
+          "estimatedEndUtc": "2026-11-12T18:45:51.230060+00:00",
+          "possiblyContended": true
+        }
+      }
+    },
+    {
+      "suite": "main-ob001",
+      "character": "female-fat-max-v0-4-0",
+      "runs": {
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:45:55.730213+00:00",
+          "estimatedEndUtc": "2026-11-12T18:46:23.544645+00:00",
+          "possiblyContended": true
+        },
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:46:23.555917+00:00",
+          "estimatedEndUtc": "2026-11-12T18:46:44.256944+00:00",
+          "possiblyContended": true
+        }
+      }
+    },
+    {
+      "suite": "main-ob001",
+      "character": "female-muscle-max-v0-4-0",
+      "runs": {
+        "prepared": {
+          "estimatedStartUtc": "2026-11-12T18:46:49.156414+00:00",
+          "estimatedEndUtc": "2026-11-12T18:47:08.808898+00:00",
+          "possiblyContended": true
+        },
+        "baseline": {
+          "estimatedStartUtc": "2026-11-12T18:47:08.817858+00:00",
+          "estimatedEndUtc": "2026-11-12T18:47:40.211475+00:00",
+          "possiblyContended": true
+        }
+      }
+    }
+  ],
+  "buildCompletedKst": "2026-11-13T03:55:14.262128+09:00",
+  "buildEvidence": "/private/tmp/standin-release-preparation-20261113/prepared-result.json",
+  "exclusionPolicy": "Do not use possibly contended samples in primary performance summaries; repeat clean representative measurements after the build."
+}

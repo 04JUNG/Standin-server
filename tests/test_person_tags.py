@@ -152,7 +152,7 @@ def test_person_tags_change_nothing_in_search(monkeypatch, hint):
 # 인물 태그를 다룰 수 있는 곳. 검색·라우팅·refine 모듈이 이 목록에 들면 안 된다.
 _ALLOWED = {
     "src/person_tags.py", "src/schema.py", "src/descriptor.py", "src/pipeline.py",
-    "src/vlm/client.py",
+    "src/vlm/client.py", "src/analysis_progress.py",
 }
 _TAG_NAMES = {"person_tags", "person_actions", "person_views", "stated_tags",
               "detect_person_tags"}

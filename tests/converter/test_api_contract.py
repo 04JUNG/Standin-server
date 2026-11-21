@@ -141,6 +141,28 @@ def _post(client: TestClient, *, filename="pose.bvh", data=VALID_BVH, fields=Non
     )
 
 
+@pytest.mark.parametrize('code,status,phase', [
+    ('WORK_QUEUE_FULL', 503, 'queue'), ('WORK_BUDGET_EXHAUSTED', 504, 'execution'),
+    ('REQUEST_CANCELLED', 499, 'execution'), ('INTERACTIVE_CAPACITY', 429, None)])
+def test_interactive_failures_keep_capacity_and_scheduler_diagnostics(tmp_path, monkeypatch, code, status, phase):
+    from fastapi import HTTPException
+    from converter_api.work_queue import WorkStopped
+    monkeypatch.setenv('CONVERTER_INTERACTIVE_ENABLED', 'true')
+    monkeypatch.setenv('CONVERTER_INTERACTIVE_TOKEN', 't'*32)
+    monkeypatch.setenv('CONVERTER_INTERACTIVE_ROOT', str(tmp_path/'private'))
+    client = _client(tmp_path)
+    def solve(_):
+        if phase is None:
+            raise HTTPException(status, code)
+        raise WorkStopped(code, status, phase)
+    monkeypatch.setattr(client.app.state.interactive, 'solve', solve)
+    response = client.post('/interactive/v1/solve', json={}, headers={'Authorization': 'Bearer '+'t'*32})
+    assert response.status_code == status
+    assert response.json()['error']['code'] == code
+    if phase is not None:
+        assert 'diagnostics' in response.json()['error']
+
+
 def _post_bundle(
     client: TestClient,
     *,
@@ -195,6 +217,49 @@ def test_screen_api_missing_or_wrong_receipt_is_failure(tmp_path):
     assert response.json()['error']['code'] == 'WORKER_INTEGRITY_ERROR'
 
 
+@pytest.mark.parametrize(('route', 'scope', 'selected'), [
+    ('convert-framed', 'full', False),
+    ('convert-framed-export', 'full', False),
+    ('convert-framed-export', 'head', False),
+])
+def test_stale_selected_hand_screen_flag_never_requests_quality_screening(tmp_path, monkeypatch, route, scope, selected):
+    monkeypatch.setenv('CONVERTER_SCREEN_SELECTED_HANDS', '1')
+    runner = FakeRunner(failure=ConversionRejectedError('failed', report={
+        'error_code': 'HAND_CONTACT_INTERSECTION'}))
+    response = _client(tmp_path, runner=runner).post('/' + route,
+        files={'bvh': ('pose.bvh', VALID_BVH, 'application/octet-stream')},
+        data={'expected_bvh_sha256': hashlib.sha256(VALID_BVH).hexdigest(),
+              'output_scope': scope, 'preview_format': 'none'})
+    assert len(runner.calls) == 1
+    assert runner.calls[0].get('selected_hand_screen', False) is selected
+    assert response.status_code == 422
+    assert response.json()['error']['code'] == ('HAND_CONTACT_INTERSECTION' if selected else 'INVALID_BVH')
+
+
+@pytest.mark.parametrize(('status', 'code'), [
+    ('clear_screen', None),
+    ('intersection', 'HAND_CONTACT_INTERSECTION'),
+    ('unavailable', 'HAND_CONTACT_UNAVAILABLE'),
+])
+def test_selected_hand_mesh_gate(monkeypatch, status, code):
+    from converter import hand_contact
+    calls = []
+    def screen(meshes):
+        calls.append(meshes)
+        return dict(status=status, method=hand_contact.SCREEN_VERSION,
+                    scope='opposite_hands_only', complete_collision_certificate=False,
+                    triangle_counts={'left': 4, 'right': 4},
+                    intersection_pairs=int(status == 'intersection'))
+    monkeypatch.setattr(hand_contact, 'screen_hands', screen)
+    meshes = [object()]
+    if code is None:
+        hand_contact.require_clear_selected_hands(meshes)
+    else:
+        with pytest.raises(hand_contact.SelectedHandContactError, match=code):
+            hand_contact.require_clear_selected_hands(meshes)
+    assert calls == [meshes]
+
+
 def test_screen_api_source_hash_checked_before_conversion(tmp_path):
     runner = FakeRunner()
     response = _client(tmp_path, runner=runner).post('/screen-hand-contact',
@@ -218,14 +283,21 @@ def test_characters_hides_path_uri_hash_and_env_name(tmp_path):
     assert "sha256" not in serialized
 
 
-def test_health_checks_blender_tempdir_and_default_character(tmp_path):
-    response = _client(tmp_path).get("/healthz")
+def test_health_checks_blender_tempdir_and_default_character(tmp_path, caplog):
+    with caplog.at_level(logging.INFO, logger='standin.converter'):
+        response = _client(tmp_path).get("/healthz")
     assert response.status_code == 200
     payload = response.json()
     assert payload["ok"] is True
     assert payload["checks"]["blender"]["version"] == "5.2.0"
     assert payload["checks"]["tempdir"]["ok"] is True
     assert payload["checks"]["default_character"]["ok"] is True
+    trace = next(json.loads(record.message) for record in caplog.records
+                 if 'converter_health_probe' in record.message)
+    assert trace['status'] == 200 and trace['handler_wait_ms'] >= 0
+    assert {'blender', 'tempdir', 'default_character', 'preview_revision',
+            'hand_library', 'character_hashes'} <= trace['stages'].keys()
+    assert all(stage['succeeded'] for stage in trace['stages'].values())
 
 
 def test_health_is_503_on_character_hash_mismatch(tmp_path):

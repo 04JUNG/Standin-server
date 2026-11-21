@@ -1,0 +1,29 @@
+{
+  "hostContracts": {
+    "develop": {
+      "passed": 893,
+      "skipped": 1
+    },
+    "main": {
+      "passed": 952,
+      "skipped": 1
+    },
+    "integratedMain229230233234": {
+      "passed": 952,
+      "skipped": 1
+    }
+  },
+  "blenderOnlyHostCollectionExcluded": [
+    "test_convert.py",
+    "test_v325_runtime.py",
+    "test_v32_parent_coherent_math.py"
+  ],
+  "smoke": {
+    "develop": 54,
+    "main": 54,
+    "integration": 54
+  },
+  "compileall": true,
+  "qualityOnlyDuringBuild": true,
+  "fullContractLogRoot": "/private/tmp/standin-prepared-all20-artifacts-20261113"
+}
