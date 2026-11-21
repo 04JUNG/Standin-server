@@ -9,7 +9,7 @@ draws a fresh test set with another seed, so the numbers are not tuned to it. Wi
 value) to fit a size budget; the written file's header ``quality`` is replaced by this
 check's numbers.
 """
-import argparse, hashlib, importlib.util, json, math, struct, sys
+import argparse, hashlib, importlib.util, itertools, json, math, struct, sys
 from decimal import Decimal
 from pathlib import Path
 
@@ -109,12 +109,14 @@ def make_evaluator(header, arrays, K):
     mean = arrays['mean'].astype(np.float64)
 
     selection = header.get('selection')
-    if selection and selection.get('mode') not in ('idw2', 'idw2-varying', 'idw2-varying-trilinear'):
+    if selection and selection.get('mode') not in ('idw2', 'idw2-varying', 'idw2-varying-trilinear', 'idw2-varying-multilinear'):
         raise ValueError('unsupported sampled-runtime model selection')
-    if any(m.get('triples') for m in header['models'].values()) and (not selection or selection['mode'] != 'idw2-varying-trilinear'):
+    if any(m.get('triples') for m in header['models'].values()) and (not selection or selection['mode'] not in ('idw2-varying-trilinear','idw2-varying-multilinear')):
         raise ValueError('three-control terms require explicit trilinear mode')
+    if any(m.get('quads') for m in header['models'].values()) and (not selection or selection['mode'] != 'idw2-varying-multilinear'):
+        raise ValueError('four-control terms require explicit multilinear mode')
     keys = list(header['controls'])
-    if selection and selection['mode'] in ('idw2-varying', 'idw2-varying-trilinear'):
+    if selection and selection['mode'] in ('idw2-varying', 'idw2-varying-trilinear', 'idw2-varying-multilinear'):
         # Common offsets cannot distinguish preset centers. They still affect
         # every axis/pair below; only the model-selection distance omits them.
         keys = [k for k in keys if len({v[k] for v in header['presets'].values()}) > 1]
@@ -157,6 +159,15 @@ def make_evaluator(header, arrays, K):
                         row=triple['offset']+((indices[0]+ia)*len(triple['gb'])+indices[1]+ib)*len(triple['gc'])+indices[2]+ic
                         weight=(fractions[0] if ia else 1-fractions[0])*(fractions[1] if ib else 1-fractions[1])*(fractions[2] if ic else 1-fractions[2])
                         co += coef[row]*weight
+        for quad in m.get('quads', []):
+            grids=[quad[k] for k in ('ga','gb','gc','gd')]
+            located=[locate(grid,c[quad[key]]) for grid,key in zip(grids,('a','b','c','d'))]
+            for corner in itertools.product((0,1),repeat=4):
+                row=0;weight=1.
+                for axis,upper in enumerate(corner):
+                    index,fraction=located[axis];row=row*len(grids[axis])+index+upper
+                    weight*=fraction if upper else 1-fraction
+                co+=coef[quad['offset']+row]*weight
         return co
 
     def evaluate(preset, c):

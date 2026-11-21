@@ -28,6 +28,7 @@ for model in h['models'].values():
     for axis in model['axes']:axis['offset']=block(axis['offset'],len(axis['knots']))
     for pair in model['pairs']:pair['offset']=block(pair['offset'],len(pair['ga'])*len(pair['gb']))
     for triple in model.get('triples',[]):triple['offset']=block(triple['offset'],len(triple['ga'])*len(triple['gb'])*len(triple['gc']))
+    for quad in model.get('quads',[]):quad['offset']=block(quad['offset'],len(quad['ga'])*len(quad['gb'])*len(quad['gc'])*len(quad['gd']))
 C=np.asarray(rows);h['coefCount']=len(C)
 presets=[]
 for name,values in h['presets'].items():
@@ -45,6 +46,13 @@ for name,values in h['presets'].items():
                 for ic in (0,1):
                     row=triple['offset']+((ix[0]+ia)*len(triple['gb'])+ix[1]+ib)*len(triple['gc'])+ix[2]+ic
                     co+=C[row]*(fr[0] if ia else 1-fr[0])*(fr[1] if ib else 1-fr[1])*(fr[2] if ic else 1-fr[2])
+    for quad in model.get('quads',[]):
+        grids=[quad[k] for k in ('ga','gb','gc','gd')];located=[locate(g,values[quad[k]]) for g,k in zip(grids,('a','b','c','d'))]
+        for mask in range(16):
+            row=0;weight=1.
+            for axis in range(4):
+                upper=(mask>>(3-axis))&1;index,fraction=located[axis];row=row*len(grids[axis])+index+upper;weight*=fraction if upper else 1-fraction
+            co+=C[quad['offset']+row]*weight
     presets.append(co)
 Q=np.linalg.qr(np.asarray(presets).T,mode='reduced')[0]
 residual=C-(C@Q)@Q.T

@@ -60,3 +60,19 @@ def test_three_control_interpolation_matches_independent_polynomial(values):
     header['selection']['mode']='idw2'
     with pytest.raises(ValueError,match='explicit trilinear'):
         make_evaluator(header,arrays,1)
+
+
+@pytest.mark.parametrize('values',list(__import__('itertools').product((0,1),repeat=4))+[(.2,.4,.7,.3),(-1,.4,2,.2)])
+def test_four_control_interpolation_matches_independent_polynomial(values):
+    polynomial=lambda x,y,z,w:1+2*x+3*y+4*z+5*w+6*x*z+7*y*z*w+11*x*y*z*w
+    rows=[0]+[polynomial(*v) for v in __import__('itertools').product((0,1),repeat=4)]
+    term=dict(a='x',b='y',c='z',d='w',ga=[0,1],gb=[0,1],gc=[0,1],gd=[0,1],offset=1)
+    model=dict(base=0,axes=[],pairs=[],quads=[term])
+    header=dict(vertexCount=1,basisCount=1,coefCount=17,controls={k:dict(min=0,max=1,default=0) for k in ('x','y','z','w')},
+        presets={'A':dict(x=0,y=0,z=0,w=0),'B':dict(x=1,y=0,z=0,w=0)},models={'A':model,'B':model},selection=dict(mode='idw2-varying-multilinear',cutRatio=2))
+    arrays=dict(basis=np.array([1,0,0]),basisScale=np.ones(1),coef=np.array(rows),mean=np.zeros(3))
+    actual=make_evaluator(header,arrays,1)('A',dict(zip(('x','y','z','w'),values)))
+    assert actual[0,0]==pytest.approx(polynomial(*(min(1,max(0,v)) for v in values)))
+    header['selection']['mode']='idw2-varying-trilinear'
+    with pytest.raises(ValueError,match='explicit multilinear'):
+        make_evaluator(header,arrays,1)
