@@ -1,0 +1,32 @@
+{
+  "converter": {
+    "published": false,
+    "activated": false,
+    "manifestSha256": "236b0e5b7c4ab2cc43afaab177e9acb9375e8a7a03bbc052d3a7e4285f87ae28",
+    "files": 281,
+    "manifestBytes": 48624,
+    "totalBytes": 1294777663,
+    "budgetBytes": 1543503872,
+    "proposedKey": "body-models/releases/lod-v5p2-converter-20261121-236b0e5b7c4a/manifest.json"
+  },
+  "inference": {
+    "published": false,
+    "activated": false,
+    "manifestSha256": "69ed20040aa88f8e9ca600311f14d470080722f21be4095504c51c4f211bd5bc",
+    "files": 70,
+    "manifestBytes": 12914,
+    "totalBytes": 161743930,
+    "budgetBytes": 805306368,
+    "proposedKey": "body-models/releases/lod-v5p2-inference-20261121-69ed20040aa8/manifest.json"
+  },
+  "bff": {
+    "published": false,
+    "activated": false,
+    "manifestSha256": "c8d06bb14c54382341e2900398484b63b09f813009a2093bc8b2326a45674e02",
+    "files": 84,
+    "manifestBytes": 12524,
+    "totalBytes": 280162855,
+    "budgetBytes": 805306368,
+    "proposedKey": "body-models/releases/lod-v5p2-bff-20261121-c8d06bb14c54/manifest.json"
+  }
+}

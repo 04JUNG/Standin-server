@@ -1,0 +1,36 @@
+{
+  "catalogSha256": "6e35fd3b12b345915e6e2430644a22bbe9ca6349e1948ac89122f44a6aa7aa29",
+  "catalogVersion": "newbody-v5p2-v4-20261121",
+  "historicalRecordsPreserved": true,
+  "functionalCatalogBeforeSha256": "1ef2bcc34dfad933e34cee1e081e8a8d24b50991faf69f0de769e35c487666f9",
+  "onlyRuntimeBindingsAndCatalogVersionChanged": true,
+  "geometryControlsSourcesNeutralAndAliasesByteSemanticsPreserved": true,
+  "localOnly": true,
+  "published": false,
+  "activated": false,
+  "qaBinaryRebuildAndUiValidationStillRequired": true,
+  "records": [
+    {
+      "sex": "male",
+      "runtimeSha256": "7c8f92faef196060316834dc6a1b852508c296616151302d395f9e51d6bbc2e6",
+      "bytes": 33431776,
+      "assets": 9,
+      "clientParityReport": "qa-evidence/client-runtime-male-v16/client-check.json",
+      "independentSeeds": [
+        99,
+        873421
+      ]
+    },
+    {
+      "sex": "female",
+      "runtimeSha256": "c417ac1e59b9350d1745a4061e75ecfa35e6389bb44797cfcd3c4053929d7592",
+      "bytes": 17392897,
+      "assets": 11,
+      "clientParityReport": "qa-evidence/client-runtime-female-v16/client-check.json",
+      "independentSeeds": [
+        271828183,
+        577215665
+      ]
+    }
+  ]
+}

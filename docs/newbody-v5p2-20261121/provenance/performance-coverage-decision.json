@@ -1,0 +1,54 @@
+{
+  "observedUtc": "2026-11-21T18:54:37.979937+00:00",
+  "reason": "The user asked to finish promptly. The original request requires all representative paths and repeated representative measurements, without specifying 108 API repetitions. Avoid duplicating the same repeated base-body measurement in API and actual native UI.",
+  "api": {
+    "expectedSaves": 36,
+    "oldNewPairs": 18,
+    "sexes": [
+      "male",
+      "female"
+    ],
+    "kinds": [
+      "base",
+      "preset",
+      "custom"
+    ],
+    "modes": [
+      "source cold",
+      "prepared cold",
+      "prepared warm"
+    ],
+    "repeatsPerCondition": 1,
+    "statistics": "Report individual observations, not inferred variability"
+  },
+  "native": {
+    "expectedSaves": 36,
+    "oldNewPairs": 18,
+    "sexes": [
+      "male",
+      "female"
+    ],
+    "kinds": [
+      "base"
+    ],
+    "modes": [
+      "source cold",
+      "prepared cold",
+      "prepared warm"
+    ],
+    "repeatsPerCondition": 3,
+    "statistics": "Median and complete min/max including operator gaps"
+  },
+  "selectionRule": "Retain the first complete repetition for every API condition equally; no time-based filtering. All other raw attempts remain preserved.",
+  "unchangedGates": [
+    "Exact source/controller/rig/weights",
+    "20 prepared identities",
+    "12 final FBX checks",
+    "480 direct and 480 BFF appearance combinations",
+    "Full-precision SSR2 public accuracy/size limits",
+    "Actual functional app saves and CSP import/save/close/reopen",
+    "All three Linux role installers",
+    "Required review and CI"
+  ],
+  "productionLatencyClaim": false
+}

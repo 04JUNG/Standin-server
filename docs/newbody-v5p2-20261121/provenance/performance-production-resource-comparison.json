@@ -1,0 +1,33 @@
+{
+  "observedUtc": "2026-11-21T18:47:00.506855+00:00",
+  "readOnly": true,
+  "production": {
+    "converter": {
+      "task": "StandinAppConverterTask0B8C1552:21",
+      "cpu": "2048",
+      "memory": "4096",
+      "runtimePlatform": {
+        "cpuArchitecture": "X86_64",
+        "operatingSystemFamily": "LINUX"
+      }
+    },
+    "bff": {
+      "task": "StandinAppBffTask89CBA6C3:79",
+      "cpu": "1024",
+      "memory": "2048",
+      "runtimePlatform": {
+        "cpuArchitecture": "ARM64",
+        "operatingSystemFamily": "LINUX"
+      }
+    }
+  },
+  "qa": {
+    "converterCpu": 2,
+    "converterMemoryGiB": 4,
+    "converterPlatform": "Linux/amd64 under Docker on Apple M5 Pro",
+    "bffCpu": 0.5,
+    "bffMemoryGiB": 1,
+    "bffPlatform": "Linux/arm64"
+  },
+  "interpretation": "Within-QA matched asset comparison. Converter CPU/memory match production. BFF QA quota is half production, and host execution differs. These results do not establish production latency or the cause of a difference from a historical 40-second observation."
+}

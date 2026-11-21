@@ -1,0 +1,2022 @@
+{
+  "runtime": "/private/tmp/standin-v5p2-closeout-20261121/runtime-male/shipping-candidate.ssr",
+  "runtimeSha256": "7c8f92faef196060316834dc6a1b852508c296616151302d395f9e51d6bbc2e6",
+  "source": {
+    "blendSha256": "f9a6d73af8b34ce0ac4eabfab9c19704cfacfad20f5da9d7d1c83bb498e95abe",
+    "controllerSha256": "711d4aa2d1b38798b562aefb8fa6e72eed2d961fba44eb2bf0042e03036cb6e9"
+  },
+  "rules": "standin-lod-male-v5p2-staging-20261118",
+  "basis": 95,
+  "seed": 99,
+  "quality": {
+    "BASE": {
+      "preset_mm": 0.09722817788614607,
+      "few": {
+        "max_mm": 1.699166403382237,
+        "median_mm": 0.4021764318422341,
+        "p90_mm": 1.5228007592941872,
+        "n": 12
+      },
+      "basic": {
+        "max_mm": 1.3028877075813186,
+        "median_mm": 0.5944145997593306,
+        "p90_mm": 1.2630732502737894,
+        "n": 8
+      },
+      "all": {
+        "max_mm": 7.006695829367142,
+        "median_mm": 2.9737302728087953,
+        "p90_mm": 6.0953240308890555,
+        "n": 4
+      }
+    },
+    "IDEAL83": {
+      "preset_mm": 0.21539469596185737,
+      "few": {
+        "max_mm": 1.3259587093094853,
+        "median_mm": 0.24463759803219062,
+        "p90_mm": 1.1122188407097318,
+        "n": 12
+      },
+      "basic": {
+        "max_mm": 1.465918359781965,
+        "median_mm": 0.8853340428423048,
+        "p90_mm": 1.462646296703604,
+        "n": 8
+      },
+      "all": {
+        "max_mm": 7.255006927312617,
+        "median_mm": 4.734648631063397,
+        "p90_mm": 6.8453274356741405,
+        "n": 4
+      }
+    },
+    "IDEAL70": {
+      "preset_mm": 0.06630893198790089,
+      "few": {
+        "max_mm": 1.9118688219527,
+        "median_mm": 0.5140268936584147,
+        "p90_mm": 1.5281465261047709,
+        "n": 12
+      },
+      "basic": {
+        "max_mm": 1.4434657595870706,
+        "median_mm": 0.7025635769851755,
+        "p90_mm": 1.2188552311010625,
+        "n": 8
+      },
+      "all": {
+        "max_mm": 4.811088059848674,
+        "median_mm": 3.2546558720969543,
+        "p90_mm": 4.424733718891837,
+        "n": 4
+      }
+    },
+    "TOON64": {
+      "preset_mm": 0.09847886095448918,
+      "few": {
+        "max_mm": 0.9946949985830366,
+        "median_mm": 0.31726049260395855,
+        "p90_mm": 0.9361375591973436,
+        "n": 12
+      },
+      "basic": {
+        "max_mm": 1.489054415394738,
+        "median_mm": 0.9078827717877315,
+        "p90_mm": 1.4820215363473792,
+        "n": 8
+      },
+      "all": {
+        "max_mm": 7.774419438995421,
+        "median_mm": 4.680818769485523,
+        "p90_mm": 6.977162102890359,
+        "n": 4
+      }
+    },
+    "MUSCULAR": {
+      "preset_mm": 0.09649709020046057,
+      "few": {
+        "max_mm": 2.0164018606564262,
+        "median_mm": 0.30383112168906135,
+        "p90_mm": 1.9031055423398595,
+        "n": 12
+      },
+      "basic": {
+        "max_mm": 0.89049359527701,
+        "median_mm": 0.4371511475710916,
+        "p90_mm": 0.7867885437083054,
+        "n": 8
+      },
+      "all": {
+        "max_mm": 5.683517705625635,
+        "median_mm": 5.048748743179551,
+        "p90_mm": 5.546002173001972,
+        "n": 4
+      }
+    },
+    "MUSCLE_MAX": {
+      "preset_mm": 0.09952050488828929,
+      "few": {
+        "max_mm": 0.7739064405547571,
+        "median_mm": 0.3631481613193266,
+        "p90_mm": 0.7702831944219277,
+        "n": 12
+      },
+      "basic": {
+        "max_mm": 0.9737515480327381,
+        "median_mm": 0.6128293817279644,
+        "p90_mm": 0.8295529465427918,
+        "n": 8
+      },
+      "all": {
+        "max_mm": 3.358041592719951,
+        "median_mm": 2.9167552537347214,
+        "p90_mm": 3.2493245894052225,
+        "n": 4
+      }
+    },
+    "BULK": {
+      "preset_mm": 0.22443602985601568,
+      "few": {
+        "max_mm": 1.636690599487297,
+        "median_mm": 0.3159429465316318,
+        "p90_mm": 1.3643709099158474,
+        "n": 12
+      },
+      "basic": {
+        "max_mm": 1.3895018840922777,
+        "median_mm": 0.7795424736971494,
+        "p90_mm": 1.2094965372966688,
+        "n": 8
+      },
+      "all": {
+        "max_mm": 7.174274081932853,
+        "median_mm": 4.136605722793512,
+        "p90_mm": 6.534842261353196,
+        "n": 4
+      }
+    },
+    "SOFT": {
+      "preset_mm": 0.1407561763091195,
+      "few": {
+        "max_mm": 2.763521262689239,
+        "median_mm": 0.419701771915981,
+        "p90_mm": 2.454522859798253,
+        "n": 12
+      },
+      "basic": {
+        "max_mm": 2.199841051294574,
+        "median_mm": 1.287817651149187,
+        "p90_mm": 1.7756453076276362,
+        "n": 8
+      },
+      "all": {
+        "max_mm": 8.042549230705822,
+        "median_mm": 4.9353395169388845,
+        "p90_mm": 7.480160115124409,
+        "n": 4
+      }
+    },
+    "FAT_MAX": {
+      "preset_mm": 0.1311835244828985,
+      "few": {
+        "max_mm": 3.8456182815471083,
+        "median_mm": 0.7601348548515263,
+        "p90_mm": 1.8853581523838685,
+        "n": 12
+      },
+      "basic": {
+        "max_mm": 8.490463644403851,
+        "median_mm": 1.1963012313022245,
+        "p90_mm": 3.686123117748145,
+        "n": 8
+      },
+      "all": {
+        "max_mm": 6.4823229277009355,
+        "median_mm": 4.376385968236335,
+        "p90_mm": 6.259815930339026,
+        "n": 4
+      }
+    }
+  },
+  "publishedControls": {
+    "BASE": {
+      "height_cm": {
+        "min": 160.684899,
+        "max": 195.0,
+        "step": 1.0,
+        "default": 168.684899
+      },
+      "heads": {
+        "min": 7.2,
+        "max": 8.7,
+        "step": 1e-06,
+        "default": 7.943109
+      },
+      "physique": {
+        "min": -0.6,
+        "max": 0.6,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "muscle": {
+        "min": 0.0,
+        "max": 1.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "muscle_bulk": {
+        "min": 0.0,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "shoulders": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "head_scale": {
+        "min": 0.9,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 1.0
+      },
+      "head_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "head_depth": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "neck_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "neck_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "definition": {
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "chest_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "chest_depth": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "waist": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "pelvis": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "glute": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "thigh": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "calf": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "torso_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "arm_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "leg_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "leg_ratio": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_chest": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_back": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_shoulder": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_upperarm": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_forearm": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_thigh": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_calf": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "fat_torso": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "fat_arms": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "fat_legs": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      }
+    },
+    "IDEAL83": {
+      "height_cm": {
+        "min": 160.684899,
+        "max": 195.0,
+        "step": 1.0,
+        "default": 168.684899
+      },
+      "heads": {
+        "min": 7.2,
+        "max": 8.7,
+        "step": 1e-06,
+        "default": 8.3
+      },
+      "physique": {
+        "min": -0.6,
+        "max": 0.6,
+        "step": 0.01,
+        "default": -0.25
+      },
+      "muscle": {
+        "min": 0.0,
+        "max": 1.5,
+        "step": 0.01,
+        "default": 0.65
+      },
+      "muscle_bulk": {
+        "min": 0.0,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "shoulders": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.65
+      },
+      "head_scale": {
+        "min": 0.9,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 1.0
+      },
+      "head_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "head_depth": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "neck_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "neck_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "definition": {
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "chest_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "chest_depth": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "waist": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": -0.25
+      },
+      "pelvis": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "glute": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "thigh": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "calf": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "torso_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "arm_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.2
+      },
+      "leg_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.65
+      },
+      "leg_ratio": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_chest": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_back": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_shoulder": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_upperarm": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_forearm": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_thigh": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_calf": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": -0.2
+      },
+      "fat_torso": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "fat_arms": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "fat_legs": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      }
+    },
+    "IDEAL70": {
+      "height_cm": {
+        "min": 160.684899,
+        "max": 195.0,
+        "step": 1.0,
+        "default": 168.684899
+      },
+      "heads": {
+        "min": 7.0,
+        "max": 8.7,
+        "step": 1e-06,
+        "default": 7.0
+      },
+      "physique": {
+        "min": -0.6,
+        "max": 0.6,
+        "step": 0.01,
+        "default": -0.2
+      },
+      "muscle": {
+        "min": 0.0,
+        "max": 1.5,
+        "step": 0.01,
+        "default": 0.45
+      },
+      "muscle_bulk": {
+        "min": 0.0,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "shoulders": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.15
+      },
+      "head_scale": {
+        "min": 0.9,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 1.0
+      },
+      "head_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "head_depth": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "neck_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "neck_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "definition": {
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "chest_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "chest_depth": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "waist": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": -0.2
+      },
+      "pelvis": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.08
+      },
+      "glute": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "thigh": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "calf": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "torso_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": -0.08
+      },
+      "arm_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": -0.12
+      },
+      "leg_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.18
+      },
+      "leg_ratio": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_chest": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_back": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_shoulder": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_upperarm": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_forearm": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_thigh": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_calf": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "fat_torso": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "fat_arms": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "fat_legs": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      }
+    },
+    "TOON64": {
+      "height_cm": {
+        "min": 160.0,
+        "max": 195.0,
+        "step": 1.0,
+        "default": 165.0
+      },
+      "heads": {
+        "min": 6.4,
+        "max": 8.7,
+        "step": 1e-06,
+        "default": 6.4
+      },
+      "physique": {
+        "min": -0.85,
+        "max": 0.6,
+        "step": 0.01,
+        "default": -0.85
+      },
+      "muscle": {
+        "min": 0.0,
+        "max": 1.5,
+        "step": 0.01,
+        "default": 0.1
+      },
+      "muscle_bulk": {
+        "min": 0.0,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "shoulders": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": -0.7
+      },
+      "head_scale": {
+        "min": 0.9,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 1.0
+      },
+      "head_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "head_depth": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": -0.1
+      },
+      "neck_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.1
+      },
+      "neck_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": -0.3
+      },
+      "definition": {
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "chest_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": -0.35
+      },
+      "chest_depth": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": -0.2
+      },
+      "waist": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": -0.35
+      },
+      "pelvis": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": -0.25
+      },
+      "glute": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "thigh": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": -0.25
+      },
+      "calf": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": -0.2
+      },
+      "torso_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": -0.08
+      },
+      "arm_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": -0.35
+      },
+      "leg_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": -0.15
+      },
+      "leg_ratio": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_chest": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_back": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_shoulder": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_upperarm": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_forearm": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_thigh": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_calf": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "fat_torso": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "fat_arms": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "fat_legs": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      }
+    },
+    "MUSCULAR": {
+      "height_cm": {
+        "min": 160.684899,
+        "max": 195.0,
+        "step": 1.0,
+        "default": 168.684899
+      },
+      "heads": {
+        "min": 7.1,
+        "max": 8.7,
+        "step": 1e-06,
+        "default": 7.1
+      },
+      "physique": {
+        "min": -0.6,
+        "max": 0.6,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "muscle": {
+        "min": -0.0,
+        "max": 1.5,
+        "step": 0.01,
+        "default": 1.4
+      },
+      "muscle_bulk": {
+        "min": 0.0,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "shoulders": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.65
+      },
+      "head_scale": {
+        "min": 0.9,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 1.0
+      },
+      "head_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "head_depth": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "neck_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "neck_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "definition": {
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.65
+      },
+      "chest_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.15
+      },
+      "chest_depth": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "waist": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "pelvis": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "glute": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "thigh": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.25
+      },
+      "calf": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "torso_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "arm_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "leg_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "leg_ratio": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_chest": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_back": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_shoulder": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_upperarm": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_forearm": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_thigh": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_calf": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "fat_torso": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "fat_arms": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "fat_legs": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      }
+    },
+    "MUSCLE_MAX": {
+      "height_cm": {
+        "min": 160.684899,
+        "max": 195.0,
+        "step": 1.0,
+        "default": 168.684899
+      },
+      "heads": {
+        "min": 7.0,
+        "max": 8.7,
+        "step": 1e-06,
+        "default": 7.0
+      },
+      "physique": {
+        "min": -0.6,
+        "max": 0.6,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "muscle": {
+        "min": 0.0,
+        "max": 2.0,
+        "step": 0.01,
+        "default": 2.0
+      },
+      "muscle_bulk": {
+        "min": 0.0,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "shoulders": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.75
+      },
+      "head_scale": {
+        "min": 0.9,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 1.0
+      },
+      "head_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "head_depth": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "neck_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "neck_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "definition": {
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.65
+      },
+      "chest_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.2
+      },
+      "chest_depth": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "waist": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "pelvis": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "glute": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "thigh": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "calf": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "torso_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "arm_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "leg_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "leg_ratio": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_chest": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_back": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_shoulder": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_upperarm": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_forearm": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_thigh": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_calf": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "fat_torso": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "fat_arms": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "fat_legs": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      }
+    },
+    "BULK": {
+      "height_cm": {
+        "min": 160.684899,
+        "max": 195.0,
+        "step": 1.0,
+        "default": 168.684899
+      },
+      "heads": {
+        "min": 7.0,
+        "max": 8.7,
+        "step": 1e-06,
+        "default": 7.0
+      },
+      "physique": {
+        "min": -0.6,
+        "max": 0.6,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "muscle": {
+        "min": 0.0,
+        "max": 2.0,
+        "step": 0.01,
+        "default": 2.0
+      },
+      "muscle_bulk": {
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 1.0
+      },
+      "shoulders": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.75
+      },
+      "head_scale": {
+        "min": 0.9,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 1.0
+      },
+      "head_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "head_depth": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "neck_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "neck_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "definition": {
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.65
+      },
+      "chest_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.2
+      },
+      "chest_depth": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "waist": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "pelvis": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "glute": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "thigh": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "calf": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "torso_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "arm_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "leg_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "leg_ratio": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_chest": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_back": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_shoulder": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_upperarm": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_forearm": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_thigh": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_calf": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "fat_torso": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "fat_arms": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "fat_legs": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      }
+    },
+    "SOFT": {
+      "height_cm": {
+        "min": 160.684899,
+        "max": 195.0,
+        "step": 1.0,
+        "default": 168.684899
+      },
+      "heads": {
+        "min": 6.95,
+        "max": 8.7,
+        "step": 1e-06,
+        "default": 6.95
+      },
+      "physique": {
+        "min": -0.6,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 1.0
+      },
+      "muscle": {
+        "min": 0.0,
+        "max": 1.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "muscle_bulk": {
+        "min": 0.0,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "shoulders": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "head_scale": {
+        "min": 0.907,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.927
+      },
+      "head_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "head_depth": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "neck_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.2
+      },
+      "neck_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": -0.1
+      },
+      "definition": {
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "chest_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "chest_depth": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "waist": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.1
+      },
+      "pelvis": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.1
+      },
+      "glute": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "thigh": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "calf": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "torso_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "arm_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "leg_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "leg_ratio": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_chest": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_back": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_shoulder": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_upperarm": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_forearm": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_thigh": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_calf": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "fat_torso": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "fat_arms": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "fat_legs": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      }
+    },
+    "FAT_MAX": {
+      "height_cm": {
+        "min": 160.684899,
+        "max": 185.0,
+        "step": 1.0,
+        "default": 168.684899
+      },
+      "heads": {
+        "min": 6.7,
+        "max": 7.7,
+        "step": 1e-06,
+        "default": 6.7
+      },
+      "physique": {
+        "min": -0.6,
+        "max": 1.7,
+        "step": 0.01,
+        "default": 1.7
+      },
+      "muscle": {
+        "min": 0.0,
+        "max": 1.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "muscle_bulk": {
+        "min": 0.0,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "shoulders": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "head_scale": {
+        "min": 0.907,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.927
+      },
+      "head_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "head_depth": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "neck_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.4
+      },
+      "neck_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": -0.2
+      },
+      "definition": {
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "chest_width": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "chest_depth": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "waist": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.1
+      },
+      "pelvis": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.2
+      },
+      "glute": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "thigh": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "calf": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "torso_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "arm_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "leg_length": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "leg_ratio": {
+        "min": -1.0,
+        "max": 1.0,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_chest": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_back": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_shoulder": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_upperarm": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_forearm": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_thigh": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "detail_calf": {
+        "min": -0.5,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "fat_torso": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "fat_arms": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      },
+      "fat_legs": {
+        "min": -0.4,
+        "max": 0.4,
+        "step": 0.01,
+        "default": 0.0
+      }
+    }
+  },
+  "geometry": {
+    "vertexCount": 50000,
+    "faceCount": 99996,
+    "indicesMatchFinalSource": true,
+    "facesSha256": "74c6df8d3e07c23c1aa2e5ed789342754def68cd177e6425a0335d994259b83c"
+  },
+  "catalogSha256": "6e35fd3b12b345915e6e2430644a22bbe9ca6349e1948ac89122f44a6aa7aa29",
+  "limits_mm": {
+    "preset_mm": 0.5,
+    "few": 5.0,
+    "basic": 10.0,
+    "all": 20.0
+  },
+  "passed": true,
+  "size": {
+    "bytes": 33431776,
+    "limitBytes": 33554432
+  }
+}
