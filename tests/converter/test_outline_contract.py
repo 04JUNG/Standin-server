@@ -113,7 +113,9 @@ def test_capability_never_advertises_rejected_expression_even_if_env_enabled(htt
     assert data['enabled'] is True and data['csp_certified'] is True
     assert data['certified_expressions']==[NATIVE_EXPRESSION]
     assert data['acceptance_scope']=='posed-fbx-import'
-    assert len(data['supported_targets'])==30
+    assert len(data['supported_targets'])==50
+    lod=[row for row in data['supported_targets'] if '-lod-' in row['character_id']]
+    assert len(lod)==20 and all(row['output_scope']=='full' for row in lod)
     for row in data['supported_targets']:
         assert row['character_id'] in data['supported_characters']
         assert row['character_sha256']==CHARACTERS[row['character_id']]
