@@ -3568,7 +3568,7 @@
       "observedReason": "POSE_QUALITY_REJECTED",
       "downloadDisabled": true,
       "fileNotCreated": true,
-      "recoveryButtonBuild": "older 20:46 app still displayed retry; later 23af50fa source fixes action; final rebuild verification separate"
+      "recoveryButtonBuild": "20:46 app showed retry; final rebuild source23af50fa observed choose action, download disabled, recovery navigates to candidates with personal body selected"
     }
   },
   "validation": {
@@ -3582,7 +3582,17 @@
     "typecheck": "pass",
     "webBuild": "pass",
     "lint": "0 errors, 2 pre-existing warnings",
-    "packaging": "5 passed"
+    "packaging": "5 passed",
+    "clientCiLatest": {
+      "head": "07e4b480f56ae71d91133982a85ab573e26f565b",
+      "testsPassed": 1746,
+      "testsSkipped": 7,
+      "checks": "frontend, macOS Rust, Windows Rust, PR checks passed; dev/staging builds skipped by existing policy"
+    },
+    "serverCiLatest": {
+      "head": "4ced33ef4ed01c1bb5d2adb23b3a5a1f6a66f3cb",
+      "checks": "5 passed"
+    }
   },
   "unresolved": [
     "severe pose deformation including female CMU pelvic triangles",
@@ -3626,6 +3636,30 @@
     "finalAppBinarySha256": "cec89b45c0c0e94771e8c3138ae096b202dbb25d48fec70fad39241596eaebf7",
     "finalAppRecoverySource": "23af50fa",
     "finalAppBuildComplete": true,
-    "finalAppKeychainReapprovalPending": true
+    "finalAppKeychainReapprovalPending": false,
+    "keychainApprovedByUser": true,
+    "finalAppCardsObservedAfterRestart": true,
+    "uiRenameCancelPreservedName": true,
+    "uiDeleteCancelPreservedCard": true,
+    "uiFilePickerCancelNoRegistration": true,
+    "appBarAppTransitionPassed": true,
+    "cuaModifierStateRecovered": true,
+    "qualityRejectionObservedInFinalBuild": true,
+    "qualityRecoveryButtonLabel": "다른 포즈 고르기",
+    "qualityRecoveryReturnsToCandidates": true,
+    "privateBodySelectionPreservedAfterRecovery": true,
+    "unsafeDownloadDisabled": true,
+    "finalRebuildActualDownloadRepeat": {
+      "gender": "female",
+      "cameraCase": "identity",
+      "originalDownloadName": "standin_job_personal_hono_sql_20261121_standin_pose (1).fbx",
+      "artifactSha256": "ead8f61e5ba2541783dc97e05ab3d592255ba0339dec5c1662c4f9b7444e10f1",
+      "matchesEarlierActualAppFileAndCspInput": true,
+      "bytes": 6132700,
+      "persistedCacheArtifactModifiedAt": "2026-11-21T13:11:44.695731+00:00",
+      "newDownloadModifiedAt": "2026-11-21T13:51:25.057076+00:00",
+      "oldSnapshotHash": "82389bdb63fe480c6708a13753b8eefdbc7e1e45af61de380305970075f196e6"
+    },
+    "unsafeDownloadFileAbsent": true
   }
 }
