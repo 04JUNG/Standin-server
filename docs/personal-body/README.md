@@ -1,5 +1,7 @@
 # Personal character local converter — draft implementation
 
+> 최신 상태(2026-11-21): [develop 통합·v12 저장 차단·검증과 미완료 항목](CLOSEOUT_20261121.md). 심한 변형·최종 앱/CSP 수용은 미완료이며 출시 불가다. 과거 v10/v11 본문의 성공/실패는 해당 시점의 범위다.
+
 Integrated base: `origin/develop` at `efa8d68ff6ad7a27b1c613069ea77af53c00b109` (freshly fetched 2026-11-05 KST). The original #142 history is retained through a normal merge. Current evidence and unresolved deformation/CSP gates: [2026-11-05 follow-up](FOLLOWUP_20261105.md). Earlier material/storage records: [specular fix and actual Standin CS3C](SPECULAR_20261104.md), [2026-11-04](FBX_RUNTIME_20261104.md); historical camera record: [2026-11-03](INTEGRATION_20261103.md).
 Implements the local-compute direction in `PERSONAL_BODY_LOCAL_REGISTRATION_STRATEGY_2026-10-28.md`, read from the existing checkout without copying any unrelated changes. This is a development foundation and **does not complete the FBX + CS3C product or its release gates**.
 

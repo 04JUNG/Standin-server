@@ -1,0 +1,3631 @@
+{
+  "status": "NOT_RELEASE_READY; severe deformation repair not qualified",
+  "runtime": {
+    "exactFiles": 6616,
+    "manifestSha256": "4929a7ab3200a96533a674361669ab278da108c46663d9b9b9f26d8257b1c852",
+    "target": "darwin-arm64",
+    "releaseReady": false,
+    "hello": {
+      "protocolVersion": "standin.local-converter/1",
+      "event": "result",
+      "result": {
+        "protocolVersion": "standin.local-converter/1",
+        "versions": {
+          "importerVersion": "personal-import/4",
+          "normalizationVersion": "personal-normalize/5",
+          "rigMappingVersion": "personal-rig/2",
+          "converterVersion": "personal-converter/12",
+          "converterFingerprint": "2c59a03937a4316e3a6901e413b5353be39760981ed199a6d45f3f69accf2c47"
+        },
+        "limits": {
+          "sourceBytes": 134217728,
+          "poseBytes": 8388608,
+          "vertices": 1000000,
+          "bones": 512,
+          "meshes": 128,
+          "workerSeconds": 120,
+          "workerMemoryBytes": 2147483648,
+          "expandedBytes": 67108864,
+          "requestBytes": 65536
+        },
+        "formats": {
+          "fbx": true,
+          "cs3c": true
+        },
+        "hands": false,
+        "cameraContractVersion": "personal-camera/1",
+        "modelStorageVersion": "personal-fbx/1",
+        "materialContractVersion": "personal-solid-specular/1"
+      }
+    },
+    "exactAudit": "PASS"
+  },
+  "baselineRuntime": {
+    "manifestSha256": "2540a161e19fa34ad1d9c38bcc79751d471b938f6de5b0757923e303def5789b",
+    "files": 6606,
+    "exactAudit": "PASS",
+    "seconds": 2.322530583012849,
+    "releaseReady": false,
+    "target": "darwin-arm64"
+  },
+  "baselineGeometry": {
+    "versions": {
+      "importerVersion": "personal-import/4",
+      "normalizationVersion": "personal-normalize/5",
+      "rigMappingVersion": "personal-rig/2",
+      "converterVersion": "personal-converter/11",
+      "converterFingerprint": "5fdc61c7775279392171e8002aece0e87744fe6187855746fe7411b4004458d1"
+    },
+    "runtimeManifestSha256": "2540a161e19fa34ad1d9c38bcc79751d471b938f6de5b0757923e303def5789b",
+    "cspImport": "unverified",
+    "overallDeformationQuality": "not qualified",
+    "models": [
+      {
+        "source": "standin-male-0.7.6-mapped-review.cs3c",
+        "registration": {
+          "sourceSha256": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+          "decodedToRegisteredMaxPositionErrorM": 5.841112257546553e-07,
+          "decodedToRegisteredNormalErrorP50P95MaxDeg": [
+            0.00022164973534618683,
+            0.0022419030376825077,
+            0.04055118484241258
+          ]
+        },
+        "poses": [
+          {
+            "poseSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+            "exportSha256": "d45b112861b9668c42d572293cadd75e9976fd460f71f3f128ca65d4d30a3038",
+            "independentLbsMaxErrorM": 7.632569869190857e-07,
+            "armTransfer": {
+              "L": {
+                "applied": false,
+                "reason": "not_wrist_only_mismatch"
+              },
+              "R": {
+                "applied": false,
+                "reason": "not_wrist_only_mismatch"
+              }
+            },
+            "surfaceCorrection": {
+              "applied": true,
+              "meshes": [
+                {
+                  "applied": true,
+                  "parts": [
+                    {
+                      "applied": true,
+                      "before": {
+                        "excessBend": 705.5974061159194,
+                        "maxStretch": 2.445760943803511,
+                        "stretchP99": 1.477323678708654,
+                        "overDouble": 76,
+                        "compressed": 33,
+                        "collapsed": 0,
+                        "sharp": 176,
+                        "folded": 82
+                      },
+                      "after": {
+                        "excessBend": 613.232599461587,
+                        "maxStretch": 1.9059455059965165,
+                        "stretchP99": 1.446687285299274,
+                        "overDouble": 0,
+                        "compressed": 0,
+                        "collapsed": 0,
+                        "sharp": 129,
+                        "folded": 77
+                      },
+                      "componentScale": 1.9884239923078906,
+                      "strength": 0.5,
+                      "maxMove": 0.02408046150279435,
+                      "filter": "ring_reference",
+                      "eligibleVertices": 1929
+                    }
+                  ],
+                  "skipped": {
+                    "rigid": 0,
+                    "budget": 0,
+                    "tiny": 0
+                  },
+                  "movedVertices": 1929,
+                  "vertexCount": 24988,
+                  "updatedCorners": 11625
+                }
+              ]
+            },
+            "stageMetrics": {
+              "solver": {
+                "excessBend": 705.5974061159194,
+                "maxStretch": 2.445760943803511,
+                "stretchP99": 1.477323678708654,
+                "overDouble": 76,
+                "compressed": 33,
+                "collapsed": 0,
+                "sharp": 176,
+                "folded": 82
+              },
+              "arm": {
+                "excessBend": 705.5974061159194,
+                "maxStretch": 2.445760943803511,
+                "stretchP99": 1.477323678708654,
+                "overDouble": 76,
+                "compressed": 33,
+                "collapsed": 0,
+                "sharp": 176,
+                "folded": 82
+              },
+              "surface": {
+                "excessBend": 613.2236283403371,
+                "maxStretch": 1.9059422113909839,
+                "stretchP99": 1.4466850862795793,
+                "overDouble": 0,
+                "compressed": 0,
+                "collapsed": 0,
+                "sharp": 129,
+                "folded": 77
+              }
+            },
+            "solverWorstEdgeWitness": {
+              "vertices": [
+                3742,
+                4032
+              ],
+              "restLengthM": 0.007270484795761653,
+              "solverLengthM": 0.017781867755991096,
+              "correctedLengthM": 0.008411308595992264,
+              "averageWeightEdgeTermM": 0.007174582235368776,
+              "weightGradientTermM": 0.012391232111026542,
+              "decompositionResidualM": 6.640045386107016e-08
+            },
+            "outsideSupportVertices": 23059,
+            "outsideSupportMaxPositionDeltaM": 0.0,
+            "outsideSupportMaxNormalDeltaDeg": 0.14444662025628185,
+            "exportToRegeneratedSurfaceMaxErrorM": 7.588719000337781e-07,
+            "exportToRegeneratedWorldNormalMaxErrorDeg": 0.0274387103180043,
+            "exactPolygonsWeightsOriginalHierarchy": true
+          },
+          {
+            "poseSha256": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+            "exportSha256": "0489f7827d47d5b9302ac971efc1d7d110e86309c2cca123b8188b672eaa8b5d",
+            "independentLbsMaxErrorM": 7.024232035349297e-07,
+            "armTransfer": {
+              "L": {
+                "handFramePolicy": "preserve_world_orientation",
+                "palmFrameValidated": false,
+                "directionErrorsBeforeDeg": [
+                  6.072868709281473,
+                  7.270768666081855,
+                  7.5761624897690165
+                ],
+                "applied": true,
+                "strength": 1.0,
+                "maxHeadDisplacement": 0.042526585591585155,
+                "directionErrorsAfterDeg": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "wristLocalAngleDeg": 62.633510877744754,
+                "handWorldRotationErrorDeg": 0.0
+              },
+              "R": {
+                "handFramePolicy": "preserve_world_orientation",
+                "palmFrameValidated": false,
+                "directionErrorsBeforeDeg": [
+                  5.822192127966459,
+                  7.024824178938731,
+                  6.6056936899259755
+                ],
+                "applied": true,
+                "strength": 0.5,
+                "maxHeadDisplacement": 0.0355779101991326,
+                "directionErrorsAfterDeg": [
+                  2.9111474853637116,
+                  3.6609171374124845,
+                  3.5053164951907543
+                ],
+                "wristLocalAngleDeg": 45.26398123347091,
+                "handWorldRotationErrorDeg": 0.0
+              }
+            },
+            "surfaceCorrection": {
+              "applied": true,
+              "meshes": [
+                {
+                  "applied": true,
+                  "parts": [
+                    {
+                      "applied": true,
+                      "before": {
+                        "excessBend": 581.7831282059967,
+                        "maxStretch": 8.320859053538083,
+                        "stretchP99": 1.5431083562484624,
+                        "overDouble": 160,
+                        "compressed": 23,
+                        "collapsed": 0,
+                        "sharp": 134,
+                        "folded": 64
+                      },
+                      "after": {
+                        "excessBend": 401.78005362280373,
+                        "maxStretch": 2.0007383059711654,
+                        "stretchP99": 1.52526792063342,
+                        "overDouble": 1,
+                        "compressed": 0,
+                        "collapsed": 0,
+                        "sharp": 64,
+                        "folded": 38
+                      },
+                      "componentScale": 1.9884239923078906,
+                      "strength": 1.0,
+                      "maxMove": 0.02910033082537036,
+                      "filter": "ring_reference",
+                      "eligibleVertices": 2061
+                    }
+                  ],
+                  "skipped": {
+                    "rigid": 0,
+                    "budget": 0,
+                    "tiny": 0
+                  },
+                  "movedVertices": 2061,
+                  "vertexCount": 24988,
+                  "updatedCorners": 12469
+                }
+              ]
+            },
+            "stageMetrics": {
+              "solver": {
+                "excessBend": 850.9460540887285,
+                "maxStretch": 8.320859053538083,
+                "stretchP99": 1.575033876433608,
+                "overDouble": 177,
+                "compressed": 35,
+                "collapsed": 1,
+                "sharp": 199,
+                "folded": 101
+              },
+              "arm": {
+                "excessBend": 581.7831282059967,
+                "maxStretch": 8.320859053538083,
+                "stretchP99": 1.5431083562484624,
+                "overDouble": 160,
+                "compressed": 23,
+                "collapsed": 0,
+                "sharp": 134,
+                "folded": 64
+              },
+              "surface": {
+                "excessBend": 401.7907346012614,
+                "maxStretch": 2.0007368540043458,
+                "stretchP99": 1.5252690513223137,
+                "overDouble": 1,
+                "compressed": 0,
+                "collapsed": 0,
+                "sharp": 64,
+                "folded": 38
+              }
+            },
+            "solverWorstEdgeWitness": {
+              "vertices": [
+                20273,
+                20334
+              ],
+              "restLengthM": 0.0047541842207261716,
+              "solverLengthM": 0.03955889681521726,
+              "correctedLengthM": 0.008780470993395652,
+              "averageWeightEdgeTermM": 0.004266017910892335,
+              "weightGradientTermM": 0.038019574862214404,
+              "decompositionResidualM": 3.228105125161257e-08
+            },
+            "outsideSupportVertices": 22927,
+            "outsideSupportMaxPositionDeltaM": 0.0,
+            "outsideSupportMaxNormalDeltaDeg": 0.02999413905573959,
+            "exportToRegeneratedSurfaceMaxErrorM": 7.863804579948641e-07,
+            "exportToRegeneratedWorldNormalMaxErrorDeg": 0.027727723933474672,
+            "exactPolygonsWeightsOriginalHierarchy": true
+          }
+        ]
+      },
+      {
+        "source": "female-chubby-tpose.fbx",
+        "registration": {
+          "sourceSha256": "fb47d89d1507c377b0af136b9dc6357ef35787c59ac79467ee180b2e1640017f"
+        },
+        "poses": [
+          {
+            "poseSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+            "exportSha256": "0a7dfccecae889e563d0f78df00022ad58180a2cda699e1d1466f10a14d2f908",
+            "independentLbsMaxErrorM": 5.977201536367072e-07,
+            "armTransfer": {
+              "L": {
+                "handFramePolicy": "landmark_pair",
+                "palmFrameValidated": true,
+                "directionErrorsBeforeDeg": [
+                  1.8398450620154787,
+                  3.7699947514120558,
+                  3.553884049183939
+                ],
+                "palmFrameErrorBeforeDeg": 25.69470036097841,
+                "applied": true,
+                "strength": 0.5,
+                "maxHeadDisplacement": 0.011234834825715953,
+                "directionErrorsAfterDeg": [
+                  0.9195097471823732,
+                  1.8892667811578232,
+                  1.8247501013140297
+                ],
+                "wristLocalAngleDeg": 50.96513671858597,
+                "palmFrameErrorAfterDeg": 12.93598588029709
+              },
+              "R": {
+                "handFramePolicy": "landmark_pair",
+                "palmFrameValidated": true,
+                "directionErrorsBeforeDeg": [
+                  1.8471352442958064,
+                  3.8111660762144273,
+                  3.568774633318735
+                ],
+                "palmFrameErrorBeforeDeg": 25.4670125288796,
+                "applied": true,
+                "strength": 0.5,
+                "maxHeadDisplacement": 0.011229335940783897,
+                "directionErrorsAfterDeg": [
+                  0.9232628026230311,
+                  1.9097696458085416,
+                  1.8334500958461741
+                ],
+                "wristLocalAngleDeg": 50.88970752448693,
+                "palmFrameErrorAfterDeg": 13.074581119759396
+              }
+            },
+            "surfaceCorrection": {
+              "applied": true,
+              "meshes": [
+                {
+                  "applied": true,
+                  "parts": [
+                    {
+                      "applied": true,
+                      "before": {
+                        "excessBend": 4220.125984130961,
+                        "maxStretch": 48.251339610708975,
+                        "stretchP99": 1.6078901501155356,
+                        "overDouble": 654,
+                        "compressed": 82,
+                        "collapsed": 2,
+                        "sharp": 426,
+                        "folded": 195
+                      },
+                      "after": {
+                        "excessBend": 3764.085650090313,
+                        "maxStretch": 26.639710021134622,
+                        "stretchP99": 1.598001201413034,
+                        "overDouble": 403,
+                        "compressed": 65,
+                        "collapsed": 0,
+                        "sharp": 340,
+                        "folded": 193
+                      },
+                      "componentScale": 1.9309182695335845,
+                      "strength": 0.4,
+                      "blend": 0.5,
+                      "heldVertices": 3,
+                      "maxMove": 0.010624381491571834,
+                      "filter": "ring_reference",
+                      "eligibleVertices": 5305
+                    }
+                  ],
+                  "skipped": {
+                    "rigid": 0,
+                    "budget": 0,
+                    "tiny": 0
+                  },
+                  "movedVertices": 5302,
+                  "vertexCount": 90143,
+                  "updatedCorners": 31054
+                }
+              ]
+            },
+            "stageMetrics": {
+              "solver": {
+                "excessBend": 3469.625231918986,
+                "maxStretch": 48.251339610708975,
+                "stretchP99": 1.6062366992272272,
+                "overDouble": 654,
+                "compressed": 110,
+                "collapsed": 2,
+                "sharp": 385,
+                "folded": 158
+              },
+              "arm": {
+                "excessBend": 4220.125984130961,
+                "maxStretch": 48.251339610708975,
+                "stretchP99": 1.6078901501155356,
+                "overDouble": 654,
+                "compressed": 82,
+                "collapsed": 2,
+                "sharp": 426,
+                "folded": 195
+              },
+              "surface": {
+                "excessBend": 3764.056008278176,
+                "maxStretch": 26.63970660185597,
+                "stretchP99": 1.5979999441129342,
+                "overDouble": 403,
+                "compressed": 65,
+                "collapsed": 0,
+                "sharp": 340,
+                "folded": 193
+              }
+            },
+            "solverWorstEdgeWitness": {
+              "vertices": [
+                28683,
+                28685
+              ],
+              "restLengthM": 0.0004765677791296209,
+              "solverLengthM": 0.022995033758304684,
+              "correctedLengthM": 0.0126956258119112,
+              "averageWeightEdgeTermM": 0.00047125339985192965,
+              "weightGradientTermM": 0.022532771092282557,
+              "decompositionResidualM": 4.818284847205499e-08
+            },
+            "outsideSupportVertices": 84830,
+            "outsideSupportMaxPositionDeltaM": 0.0,
+            "outsideSupportMaxNormalDeltaDeg": 0.031011403581455627,
+            "exportToRegeneratedSurfaceMaxErrorM": 4.989108157987358e-07,
+            "exportToRegeneratedWorldNormalMaxErrorDeg": 0.039109697611009346,
+            "exactPolygonsWeightsOriginalHierarchy": true
+          },
+          {
+            "poseSha256": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+            "exportSha256": "cead62f91a3801cc4608e63fabbe49c82e60dcc9ea93dfddf17dc901a725765f",
+            "independentLbsMaxErrorM": 5.637109407812864e-07,
+            "armTransfer": {
+              "L": {
+                "applied": false,
+                "reason": "surface_candidate_rejected",
+                "rejectedCandidate": {
+                  "handFramePolicy": "preserve_world_orientation",
+                  "palmFrameValidated": false,
+                  "directionErrorsBeforeDeg": [
+                    5.426160020581849,
+                    5.475127747265474,
+                    6.000466540528004
+                  ],
+                  "applied": true,
+                  "strength": 0.75,
+                  "maxHeadDisplacement": 0.019121215393959168,
+                  "directionErrorsAfterDeg": [
+                    1.3566373620525387,
+                    1.7079235498680951,
+                    1.683503920274451
+                  ],
+                  "wristLocalAngleDeg": 39.31722239108594,
+                  "handWorldRotationErrorDeg": 0.0
+                }
+              },
+              "R": {
+                "applied": false,
+                "reason": "palm_basis_unavailable"
+              }
+            },
+            "surfaceCorrection": {
+              "applied": true,
+              "meshes": [
+                {
+                  "applied": true,
+                  "parts": [
+                    {
+                      "applied": true,
+                      "before": {
+                        "excessBend": 6270.9885176337675,
+                        "maxStretch": 219.89972520195624,
+                        "stretchP99": 1.8113014221337276,
+                        "overDouble": 1853,
+                        "compressed": 181,
+                        "collapsed": 3,
+                        "sharp": 897,
+                        "folded": 522
+                      },
+                      "after": {
+                        "excessBend": 5640.808302997812,
+                        "maxStretch": 198.62888987212668,
+                        "stretchP99": 1.8066514741167694,
+                        "overDouble": 1785,
+                        "compressed": 180,
+                        "collapsed": 1,
+                        "sharp": 783,
+                        "folded": 482
+                      },
+                      "componentScale": 1.9309182695335845,
+                      "strength": 0.4,
+                      "blend": 0.25,
+                      "heldVertices": 6,
+                      "maxMove": 0.010137320915051349,
+                      "filter": "ring_reference",
+                      "eligibleVertices": 7968
+                    }
+                  ],
+                  "skipped": {
+                    "rigid": 0,
+                    "budget": 0,
+                    "tiny": 0
+                  },
+                  "movedVertices": 7962,
+                  "vertexCount": 90143,
+                  "updatedCorners": 46404
+                }
+              ]
+            },
+            "stageMetrics": {
+              "solver": {
+                "excessBend": 6270.897714899695,
+                "maxStretch": 219.89973103988808,
+                "stretchP99": 1.8113034243539459,
+                "overDouble": 1853,
+                "compressed": 181,
+                "collapsed": 3,
+                "sharp": 896,
+                "folded": 522
+              },
+              "arm": {
+                "excessBend": 6270.9885176337675,
+                "maxStretch": 219.89972520195624,
+                "stretchP99": 1.8113014221337276,
+                "overDouble": 1853,
+                "compressed": 181,
+                "collapsed": 3,
+                "sharp": 897,
+                "folded": 522
+              },
+              "surface": {
+                "excessBend": 5640.842856615753,
+                "maxStretch": 198.6287880280724,
+                "stretchP99": 1.8066536507985997,
+                "overDouble": 1785,
+                "compressed": 180,
+                "collapsed": 1,
+                "sharp": 783,
+                "folded": 482
+              }
+            },
+            "solverWorstEdgeWitness": {
+              "vertices": [
+                28683,
+                28685
+              ],
+              "restLengthM": 0.0004765677791296209,
+              "solverLengthM": 0.10479712645288043,
+              "correctedLengthM": 0.0946600803817467,
+              "averageWeightEdgeTermM": 0.0004007314926176324,
+              "weightGradientTermM": 0.10454702666973192,
+              "decompositionResidualM": 1.1260992445055088e-07
+            },
+            "outsideSupportVertices": 82104,
+            "outsideSupportMaxPositionDeltaM": 0.0,
+            "outsideSupportMaxNormalDeltaDeg": 0.03475956440430958,
+            "exportToRegeneratedSurfaceMaxErrorM": 6.265579474457693e-07,
+            "exportToRegeneratedWorldNormalMaxErrorDeg": 0.034599360989730266,
+            "exactPolygonsWeightsOriginalHierarchy": true
+          }
+        ]
+      },
+      {
+        "source": "child-tpose.fbx",
+        "registration": {
+          "sourceSha256": "b195a3ff87d67365f343fee9049f9d25026d6a49e4987d9e895d3a3f25e72385"
+        },
+        "poses": [
+          {
+            "poseSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+            "exportSha256": "866aa6811326daf3f45decad409a02c4b993567e8c304a64bcc866dd187ea69d",
+            "independentLbsMaxErrorM": 3.429569398322981e-07,
+            "armTransfer": {
+              "L": {
+                "handFramePolicy": "landmark_pair",
+                "palmFrameValidated": true,
+                "directionErrorsBeforeDeg": [
+                  1.3618870950476085,
+                  0.2064449763879079,
+                  0.4727641102914155
+                ],
+                "palmFrameErrorBeforeDeg": 22.827981307794005,
+                "applied": true,
+                "strength": 0.25,
+                "maxHeadDisplacement": 0.0009179241160978906,
+                "directionErrorsAfterDeg": [
+                  1.0215313129792458,
+                  0.15414847209339247,
+                  0.36063855741573947
+                ],
+                "wristLocalAngleDeg": 52.030325210216965,
+                "palmFrameErrorAfterDeg": 0.0
+              },
+              "R": {
+                "handFramePolicy": "landmark_pair",
+                "palmFrameValidated": true,
+                "directionErrorsBeforeDeg": [
+                  1.3890304850534088,
+                  0.44960082264100437,
+                  0.5263873244394588
+                ],
+                "palmFrameErrorBeforeDeg": 21.825393366083087,
+                "applied": true,
+                "strength": 0.5,
+                "maxHeadDisplacement": 0.0014372788632116024,
+                "directionErrorsAfterDeg": [
+                  0.6949249813555599,
+                  0.2250106855042783,
+                  0.27130966837273585
+                ],
+                "wristLocalAngleDeg": 53.649667439778604,
+                "palmFrameErrorAfterDeg": 10.872056804212265
+              }
+            },
+            "surfaceCorrection": {
+              "applied": true,
+              "meshes": [
+                {
+                  "applied": true,
+                  "parts": [
+                    {
+                      "applied": true,
+                      "before": {
+                        "excessBend": 73134.72715803981,
+                        "maxStretch": 2.8591481165183055,
+                        "stretchP99": 1.520116932077159,
+                        "overDouble": 166,
+                        "compressed": 242,
+                        "collapsed": 3,
+                        "sharp": 4172,
+                        "folded": 2118
+                      },
+                      "after": {
+                        "excessBend": 67276.66529868238,
+                        "maxStretch": 2.605287923332489,
+                        "stretchP99": 1.5129885382567763,
+                        "overDouble": 120,
+                        "compressed": 224,
+                        "collapsed": 1,
+                        "sharp": 3662,
+                        "folded": 1886
+                      },
+                      "componentScale": 1.3537316855368737,
+                      "strength": 0.2,
+                      "blend": 0.25,
+                      "heldVertices": 9,
+                      "maxMove": 0.0071070913490686475,
+                      "filter": "area_diffusion",
+                      "eligibleVertices": 14301
+                    }
+                  ],
+                  "skipped": {
+                    "rigid": 0,
+                    "budget": 0,
+                    "tiny": 0
+                  },
+                  "movedVertices": 14292,
+                  "vertexCount": 179990,
+                  "updatedCorners": 81212
+                }
+              ]
+            },
+            "stageMetrics": {
+              "solver": {
+                "excessBend": 63880.25927284554,
+                "maxStretch": 2.8853749963252566,
+                "stretchP99": 1.4932864824304863,
+                "overDouble": 171,
+                "compressed": 292,
+                "collapsed": 4,
+                "sharp": 3757,
+                "folded": 1790
+              },
+              "arm": {
+                "excessBend": 73134.72715803981,
+                "maxStretch": 2.8591481165183055,
+                "stretchP99": 1.520116932077159,
+                "overDouble": 166,
+                "compressed": 242,
+                "collapsed": 3,
+                "sharp": 4172,
+                "folded": 2118
+              },
+              "surface": {
+                "excessBend": 67276.53995374552,
+                "maxStretch": 2.605289781015315,
+                "stretchP99": 1.5129883999787643,
+                "overDouble": 120,
+                "compressed": 224,
+                "collapsed": 1,
+                "sharp": 3662,
+                "folded": 1886
+              }
+            },
+            "solverWorstEdgeWitness": {
+              "vertices": [
+                111535,
+                111536
+              ],
+              "restLengthM": 0.005492511647538707,
+              "solverLengthM": 0.015847955774833427,
+              "correctedLengthM": 0.014309584467440186,
+              "averageWeightEdgeTermM": 0.004629230615891597,
+              "weightGradientTermM": 0.014471405799041446,
+              "decompositionResidualM": 1.9948004252561198e-07
+            },
+            "outsideSupportVertices": 165295,
+            "outsideSupportMaxPositionDeltaM": 0.0,
+            "outsideSupportMaxNormalDeltaDeg": 0.049747160823257516,
+            "exportToRegeneratedSurfaceMaxErrorM": 3.3785322955282504e-07,
+            "exportToRegeneratedWorldNormalMaxErrorDeg": 0.038729551460668143,
+            "exactPolygonsWeightsOriginalHierarchy": true
+          },
+          {
+            "poseSha256": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+            "exportSha256": "26c359d95e68e3107327a1f70c5325670528509c3120f057d0e56175f74086b0",
+            "independentLbsMaxErrorM": 3.98855619437548e-07,
+            "armTransfer": {
+              "L": {
+                "handFramePolicy": "preserve_world_orientation",
+                "palmFrameValidated": false,
+                "directionErrorsBeforeDeg": [
+                  6.175262102009567,
+                  1.8197494454031695,
+                  3.6579324689964765
+                ],
+                "applied": false,
+                "reason": "shape_or_joint_guard"
+              },
+              "R": {
+                "handFramePolicy": "preserve_world_orientation",
+                "palmFrameValidated": false,
+                "directionErrorsBeforeDeg": [
+                  5.914026181983044,
+                  3.592554472139498,
+                  3.686646670937105
+                ],
+                "applied": false,
+                "reason": "shape_or_joint_guard"
+              }
+            },
+            "surfaceCorrection": {
+              "applied": false,
+              "meshes": [
+                {
+                  "applied": false,
+                  "parts": [
+                    {
+                      "applied": false,
+                      "reason": "metrics_regressed",
+                      "before": {
+                        "excessBend": 47482.20229091389,
+                        "maxStretch": 4.788609483299597,
+                        "stretchP99": 1.6926537909842734,
+                        "overDouble": 1989,
+                        "compressed": 285,
+                        "collapsed": 0,
+                        "sharp": 2672,
+                        "folded": 1263
+                      },
+                      "filter": "ring_reference",
+                      "eligibleVertices": 16279
+                    }
+                  ],
+                  "skipped": {
+                    "rigid": 0,
+                    "budget": 0,
+                    "tiny": 0
+                  }
+                }
+              ]
+            },
+            "stageMetrics": {
+              "solver": {
+                "excessBend": 47482.08092963346,
+                "maxStretch": 4.788621870999053,
+                "stretchP99": 1.6926642666791591,
+                "overDouble": 1989,
+                "compressed": 285,
+                "collapsed": 0,
+                "sharp": 2672,
+                "folded": 1263
+              },
+              "arm": {
+                "excessBend": 47482.20229091389,
+                "maxStretch": 4.788609483299597,
+                "stretchP99": 1.6926537909842734,
+                "overDouble": 1989,
+                "compressed": 285,
+                "collapsed": 0,
+                "sharp": 2672,
+                "folded": 1263
+              },
+              "surface": {
+                "excessBend": 47482.2214676851,
+                "maxStretch": 4.788576175960403,
+                "stretchP99": 1.6926537609133785,
+                "overDouble": 1988,
+                "compressed": 285,
+                "collapsed": 0,
+                "sharp": 2672,
+                "folded": 1263
+              }
+            },
+            "solverWorstEdgeWitness": {
+              "vertices": [
+                31535,
+                31920
+              ],
+              "restLengthM": 0.0014743968704536204,
+              "solverLengthM": 0.007060329100386765,
+              "correctedLengthM": 0.007060261727764783,
+              "averageWeightEdgeTermM": 0.0014568246273100748,
+              "weightGradientTermM": 0.00711504056599638,
+              "decompositionResidualM": 6.865817545020638e-08
+            },
+            "outsideSupportVertices": 163437,
+            "outsideSupportMaxPositionDeltaM": 0.0,
+            "outsideSupportMaxNormalDeltaDeg": 0.0,
+            "exportToRegeneratedSurfaceMaxErrorM": 4.6843951671177594e-07,
+            "exportToRegeneratedWorldNormalMaxErrorDeg": 1.2548866968721886e-05,
+            "exactPolygonsWeightsOriginalHierarchy": true
+          }
+        ]
+      }
+    ]
+  },
+  "parentTransportExperiment": {
+    "registeredSha256": "5db73f45761d1a50ba4cdb3bb45c55569de37a6984e761818f1717c0928390cd",
+    "poseSha256": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+    "trials": [
+      {
+        "trial": "baseline",
+        "rotations": [],
+        "maxHeadDriftM": 0.0,
+        "meshes": [
+          {
+            "raw": {
+              "version": "personal-pose-quality/1",
+              "triangles": 180290,
+              "edges": 270435,
+              "maxStretch": 219.89972520195624,
+              "minCompression": 0.023486432085886442,
+              "stretchP99": 1.8113014221337276,
+              "overDouble": 1853,
+              "compressed": 181,
+              "collapsed": 3,
+              "openedZeroLengthEdges": 0,
+              "maxTriangleStretch": 265.8326383191119,
+              "triangleOverDouble": 3223,
+              "repairQualified": false
+            },
+            "corrected": {
+              "version": "personal-pose-quality/1",
+              "triangles": 180290,
+              "edges": 270435,
+              "maxStretch": 198.6287880280724,
+              "minCompression": 0.023486432085886442,
+              "stretchP99": 1.8066536507985997,
+              "overDouble": 1785,
+              "compressed": 180,
+              "collapsed": 1,
+              "openedZeroLengthEdges": 0,
+              "maxTriangleStretch": 265.83265348115293,
+              "triangleOverDouble": 3386,
+              "repairQualified": false
+            },
+            "shape": {
+              "excessBend": 5640.842856615753,
+              "maxStretch": 198.6287880280724,
+              "stretchP99": 1.8066536507985997,
+              "overDouble": 1785,
+              "compressed": 180,
+              "collapsed": 1,
+              "sharp": 783,
+              "folded": 482
+            },
+            "surfaceApplied": true,
+            "metricRegressions": []
+          }
+        ],
+        "adopted": false,
+        "qualification": "diagnostic only; contact/export/CSP gate not reached"
+      },
+      {
+        "trial": "hips-X--3",
+        "rotations": [
+          [
+            "hips",
+            "X",
+            -3
+          ]
+        ],
+        "maxHeadDriftM": 2.504824917616582e-07,
+        "meshes": [
+          {
+            "raw": {
+              "version": "personal-pose-quality/1",
+              "triangles": 180290,
+              "edges": 270435,
+              "maxStretch": 220.22343289539512,
+              "minCompression": 0.023482161552682637,
+              "stretchP99": 1.819622425309109,
+              "overDouble": 1878,
+              "compressed": 170,
+              "collapsed": 2,
+              "openedZeroLengthEdges": 0,
+              "maxTriangleStretch": 264.9599778921307,
+              "triangleOverDouble": 3267,
+              "repairQualified": false
+            },
+            "corrected": {
+              "version": "personal-pose-quality/1",
+              "triangles": 180290,
+              "edges": 270435,
+              "maxStretch": 220.22345174155953,
+              "minCompression": 0.023481002936739073,
+              "stretchP99": 1.819623735162937,
+              "overDouble": 1878,
+              "compressed": 170,
+              "collapsed": 2,
+              "openedZeroLengthEdges": 0,
+              "maxTriangleStretch": 264.9599673780114,
+              "triangleOverDouble": 3267,
+              "repairQualified": false
+            },
+            "shape": {
+              "excessBend": 6130.972346003032,
+              "maxStretch": 220.22345174155953,
+              "stretchP99": 1.819623735162937,
+              "overDouble": 1878,
+              "compressed": 170,
+              "collapsed": 2,
+              "sharp": 883,
+              "folded": 494
+            },
+            "surfaceApplied": false,
+            "metricRegressions": [
+              "excessBend",
+              "maxStretch",
+              "stretchP99",
+              "overDouble",
+              "collapsed",
+              "sharp",
+              "folded"
+            ]
+          }
+        ],
+        "adopted": false,
+        "qualification": "diagnostic only; contact/export/CSP gate not reached"
+      },
+      {
+        "trial": "hips-X-3",
+        "rotations": [
+          [
+            "hips",
+            "X",
+            3
+          ]
+        ],
+        "maxHeadDriftM": 2.9107369267370637e-07,
+        "meshes": [
+          {
+            "raw": {
+              "version": "personal-pose-quality/1",
+              "triangles": 180290,
+              "edges": 270435,
+              "maxStretch": 219.56860890990404,
+              "minCompression": 0.023486004089451985,
+              "stretchP99": 1.8050359478316642,
+              "overDouble": 1823,
+              "compressed": 179,
+              "collapsed": 2,
+              "openedZeroLengthEdges": 0,
+              "maxTriangleStretch": 266.724126277459,
+              "triangleOverDouble": 3181,
+              "repairQualified": false
+            },
+            "corrected": {
+              "version": "personal-pose-quality/1",
+              "triangles": 180290,
+              "edges": 270435,
+              "maxStretch": 198.29782565311075,
+              "minCompression": 0.023486004089451985,
+              "stretchP99": 1.8007938476116787,
+              "overDouble": 1771,
+              "compressed": 178,
+              "collapsed": 0,
+              "openedZeroLengthEdges": 0,
+              "maxTriangleStretch": 266.72409377454846,
+              "triangleOverDouble": 3358,
+              "repairQualified": false
+            },
+            "shape": {
+              "excessBend": 5683.904270014561,
+              "maxStretch": 198.29782565311075,
+              "stretchP99": 1.8007938476116787,
+              "overDouble": 1771,
+              "compressed": 178,
+              "collapsed": 0,
+              "sharp": 821,
+              "folded": 494
+            },
+            "surfaceApplied": true,
+            "metricRegressions": [
+              "excessBend",
+              "sharp",
+              "folded"
+            ]
+          }
+        ],
+        "adopted": false,
+        "qualification": "diagnostic only; contact/export/CSP gate not reached"
+      },
+      {
+        "trial": "hips-Y--3",
+        "rotations": [
+          [
+            "hips",
+            "Y",
+            -3
+          ]
+        ],
+        "maxHeadDriftM": 2.1696418193818683e-07,
+        "meshes": [
+          {
+            "raw": {
+              "version": "personal-pose-quality/1",
+              "triangles": 180290,
+              "edges": 270435,
+              "maxStretch": 219.90063055857786,
+              "minCompression": 0.02348795549086397,
+              "stretchP99": 1.8143235696443076,
+              "overDouble": 1864,
+              "compressed": 179,
+              "collapsed": 2,
+              "openedZeroLengthEdges": 0,
+              "maxTriangleStretch": 265.80567190701106,
+              "triangleOverDouble": 3266,
+              "repairQualified": false
+            },
+            "corrected": {
+              "version": "personal-pose-quality/1",
+              "triangles": 180290,
+              "edges": 270435,
+              "maxStretch": 219.90052348488683,
+              "minCompression": 0.02348679658879414,
+              "stretchP99": 1.814318510929883,
+              "overDouble": 1864,
+              "compressed": 179,
+              "collapsed": 2,
+              "openedZeroLengthEdges": 0,
+              "maxTriangleStretch": 265.80566956481647,
+              "triangleOverDouble": 3266,
+              "repairQualified": false
+            },
+            "shape": {
+              "excessBend": 6303.8802234388395,
+              "maxStretch": 219.90052348488683,
+              "stretchP99": 1.814318510929883,
+              "overDouble": 1864,
+              "compressed": 179,
+              "collapsed": 2,
+              "sharp": 927,
+              "folded": 539
+            },
+            "surfaceApplied": false,
+            "metricRegressions": [
+              "excessBend",
+              "maxStretch",
+              "stretchP99",
+              "overDouble",
+              "collapsed",
+              "sharp",
+              "folded"
+            ]
+          }
+        ],
+        "adopted": false,
+        "qualification": "diagnostic only; contact/export/CSP gate not reached"
+      },
+      {
+        "trial": "hips-Y-3",
+        "rotations": [
+          [
+            "hips",
+            "Y",
+            3
+          ]
+        ],
+        "maxHeadDriftM": 2.691506127743191e-07,
+        "meshes": [
+          {
+            "raw": {
+              "version": "personal-pose-quality/1",
+              "triangles": 180290,
+              "edges": 270435,
+              "maxStretch": 219.89116764577764,
+              "minCompression": 0.023484845205485085,
+              "stretchP99": 1.812739062833641,
+              "overDouble": 1859,
+              "compressed": 171,
+              "collapsed": 3,
+              "openedZeroLengthEdges": 0,
+              "maxTriangleStretch": 265.8555875585504,
+              "triangleOverDouble": 3219,
+              "repairQualified": false
+            },
+            "corrected": {
+              "version": "personal-pose-quality/1",
+              "triangles": 180290,
+              "edges": 270435,
+              "maxStretch": 198.62023961594397,
+              "minCompression": 0.023484845205485085,
+              "stretchP99": 1.8066325776092074,
+              "overDouble": 1786,
+              "compressed": 168,
+              "collapsed": 0,
+              "openedZeroLengthEdges": 0,
+              "maxTriangleStretch": 265.8555108992947,
+              "triangleOverDouble": 3389,
+              "repairQualified": false
+            },
+            "shape": {
+              "excessBend": 5491.108956349024,
+              "maxStretch": 198.62023961594397,
+              "stretchP99": 1.8066325776092074,
+              "overDouble": 1786,
+              "compressed": 168,
+              "collapsed": 0,
+              "sharp": 752,
+              "folded": 460
+            },
+            "surfaceApplied": true,
+            "metricRegressions": [
+              "overDouble"
+            ]
+          }
+        ],
+        "adopted": false,
+        "qualification": "diagnostic only; contact/export/CSP gate not reached"
+      },
+      {
+        "trial": "hips-Z--3",
+        "rotations": [
+          [
+            "hips",
+            "Z",
+            -3
+          ]
+        ],
+        "maxHeadDriftM": 3.701371654383606e-07,
+        "meshes": [
+          {
+            "raw": {
+              "version": "personal-pose-quality/1",
+              "triangles": 180290,
+              "edges": 270435,
+              "maxStretch": 220.0256592920599,
+              "minCompression": 0.023476869198767118,
+              "stretchP99": 1.8111093975962682,
+              "overDouble": 1846,
+              "compressed": 164,
+              "collapsed": 2,
+              "openedZeroLengthEdges": 0,
+              "maxTriangleStretch": 265.8717359205502,
+              "triangleOverDouble": 3211,
+              "repairQualified": false
+            },
+            "corrected": {
+              "version": "personal-pose-quality/1",
+              "triangles": 180290,
+              "edges": 270435,
+              "maxStretch": 199.1450950337651,
+              "minCompression": 0.023476869198767118,
+              "stretchP99": 1.806221856199993,
+              "overDouble": 1812,
+              "compressed": 162,
+              "collapsed": 0,
+              "openedZeroLengthEdges": 0,
+              "maxTriangleStretch": 265.8716913162862,
+              "triangleOverDouble": 3441,
+              "repairQualified": false
+            },
+            "shape": {
+              "excessBend": 6085.427710942442,
+              "maxStretch": 199.1450950337651,
+              "stretchP99": 1.806221856199993,
+              "overDouble": 1812,
+              "compressed": 162,
+              "collapsed": 0,
+              "sharp": 860,
+              "folded": 501
+            },
+            "surfaceApplied": true,
+            "metricRegressions": [
+              "excessBend",
+              "maxStretch",
+              "overDouble",
+              "sharp",
+              "folded"
+            ]
+          }
+        ],
+        "adopted": false,
+        "qualification": "diagnostic only; contact/export/CSP gate not reached"
+      },
+      {
+        "trial": "hips-Z-3",
+        "rotations": [
+          [
+            "hips",
+            "Z",
+            3
+          ]
+        ],
+        "maxHeadDriftM": 3.1994149913763833e-07,
+        "meshes": [
+          {
+            "raw": {
+              "version": "personal-pose-quality/1",
+              "triangles": 180290,
+              "edges": 270435,
+              "maxStretch": 219.7722301492572,
+              "minCompression": 0.023489114450133648,
+              "stretchP99": 1.8147928698031959,
+              "overDouble": 1862,
+              "compressed": 182,
+              "collapsed": 2,
+              "openedZeroLengthEdges": 0,
+              "maxTriangleStretch": 265.81872084301034,
+              "triangleOverDouble": 3242,
+              "repairQualified": false
+            },
+            "corrected": {
+              "version": "personal-pose-quality/1",
+              "triangles": 180290,
+              "edges": 270435,
+              "maxStretch": 198.5013841885035,
+              "minCompression": 0.023489114450133648,
+              "stretchP99": 1.8087780174522496,
+              "overDouble": 1793,
+              "compressed": 178,
+              "collapsed": 0,
+              "openedZeroLengthEdges": 0,
+              "maxTriangleStretch": 265.81882448729834,
+              "triangleOverDouble": 3408,
+              "repairQualified": false
+            },
+            "shape": {
+              "excessBend": 5592.647841100039,
+              "maxStretch": 198.5013841885035,
+              "stretchP99": 1.8087780174522496,
+              "overDouble": 1793,
+              "compressed": 178,
+              "collapsed": 0,
+              "sharp": 787,
+              "folded": 484
+            },
+            "surfaceApplied": true,
+            "metricRegressions": [
+              "stretchP99",
+              "overDouble",
+              "sharp",
+              "folded"
+            ]
+          }
+        ],
+        "adopted": false,
+        "qualification": "diagnostic only; contact/export/CSP gate not reached"
+      },
+      {
+        "trial": "spine-X--3",
+        "rejected": "joint_head_drift",
+        "maxHeadDriftM": 0.00486261915892407
+      },
+      {
+        "trial": "spine-X-3",
+        "rejected": "joint_head_drift",
+        "maxHeadDriftM": 0.004862605598681974
+      },
+      {
+        "trial": "spine-Y--3",
+        "rejected": "joint_head_drift",
+        "maxHeadDriftM": 0.004503519952233665
+      },
+      {
+        "trial": "spine-Y-3",
+        "rejected": "joint_head_drift",
+        "maxHeadDriftM": 0.0045034982281453315
+      },
+      {
+        "trial": "spine-Z--3",
+        "rejected": "joint_head_drift",
+        "maxHeadDriftM": 0.001838090997644736
+      },
+      {
+        "trial": "spine-Z-3",
+        "rejected": "joint_head_drift",
+        "maxHeadDriftM": 0.001838122849225978
+      },
+      {
+        "trial": "hips-spine-counter",
+        "rejected": "joint_head_drift",
+        "maxHeadDriftM": 0.004862629446030453
+      },
+      {
+        "trial": "hips-spine-counter-reverse",
+        "rejected": "joint_head_drift",
+        "maxHeadDriftM": 0.0048626443388716835
+      }
+    ],
+    "productChanged": false
+  },
+  "finalActualModels": [
+    {
+      "inputName": "standin-male-0.7.6-mapped-review.cs3c",
+      "sourceSha256": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+      "registrationSeconds": 13.997175416909158,
+      "registrationEvent": "result",
+      "registration": {
+        "normalizedFormat": "fbx",
+        "normalizedHash": "c93072473fe3f2ad76f675f0e1b1c383afdf3851ffd2143631c6bebc9284647c",
+        "archiveHash": "72efda799bf5803e32e1bf446e0cade5aca6b33fcf8b81a4b37b6addf8051e2d",
+        "validation": {
+          "passed": true,
+          "meshCount": 1,
+          "originalBoneCount": 53,
+          "vertexCount": 24988,
+          "maxSurfaceError": 5.101335887047753e-07,
+          "maxSkinProbeError": 7.601418019476114e-07,
+          "maxMaterialRegionError": 5.101335887047753e-07,
+          "materialCount": 1,
+          "tolerance": 1.780109771384568e-05,
+          "fkProbes": {
+            "forearm.L": {
+              "joint": "forearm.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1088190872464659
+            },
+            "forearm.R": {
+              "joint": "forearm.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.10896417965076514
+            },
+            "leg.L": {
+              "joint": "leg.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.13425406683096436
+            },
+            "leg.R": {
+              "joint": "leg.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1342576162504657
+            },
+            "spine": {
+              "joint": "spine",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1684601450844222
+            }
+          },
+          "blenderVersion": "5.2.0 LTS",
+          "materialPreservation": {
+            "passed": true,
+            "materialCount": 1,
+            "maxDiffuseError": 0.0,
+            "maxSpecularError": 0.0,
+            "maxShininessError": 2.288818308215923e-07,
+            "maxOpacityError": 0.0
+          }
+        },
+        "versions": {
+          "importerVersion": "personal-import/4",
+          "normalizationVersion": "personal-normalize/5",
+          "rigMappingVersion": "personal-rig/2",
+          "converterVersion": "personal-converter/12",
+          "converterFingerprint": "2c59a03937a4316e3a6901e413b5353be39760981ed199a6d45f3f69accf2c47"
+        },
+        "capabilities": {
+          "supportLevel": "body_only",
+          "bodyPose": true,
+          "hands": {
+            "left": {
+              "supported": false,
+              "fingerBones": 15,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            },
+            "right": {
+              "supported": false,
+              "fingerBones": 15,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            }
+          },
+          "collisionPrevention": false,
+          "shapeSliders": false
+        }
+      },
+      "poses": [
+        {
+          "poseName": "03-staging-selected-pose.bvh",
+          "poseHash": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+          "event": "error",
+          "seconds": 13.238336249953136,
+          "error": {
+            "code": "POSE_QUALITY_REJECTED",
+            "message": "This model and pose exceed the personal export strain limits",
+            "details": {
+              "version": "personal-pose-quality/1",
+              "triangles": 50000,
+              "edges": 75000,
+              "maxStretch": 1.9059426050586534,
+              "minCompression": 0.26928924599440246,
+              "stretchP99": 1.4466855502359741,
+              "overDouble": 0,
+              "compressed": 0,
+              "collapsed": 0,
+              "openedZeroLengthEdges": 0,
+              "openedDegenerateTriangles": 0,
+              "maxTriangleStretch": 5.916456265643131,
+              "triangleOverDouble": 24,
+              "repairQualified": false
+            },
+            "retryable": false
+          }
+        },
+        {
+          "poseName": "cmu_135_01_04368.bvh",
+          "poseHash": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+          "event": "error",
+          "seconds": 23.588498750003055,
+          "error": {
+            "code": "POSE_QUALITY_REJECTED",
+            "message": "This model and pose exceed the personal export strain limits",
+            "details": {
+              "version": "personal-pose-quality/1",
+              "triangles": 50000,
+              "edges": 75000,
+              "maxStretch": 2.000737840441755,
+              "minCompression": 0.256516849056899,
+              "stretchP99": 1.525268842841018,
+              "overDouble": 1,
+              "compressed": 0,
+              "collapsed": 0,
+              "openedZeroLengthEdges": 0,
+              "openedDegenerateTriangles": 0,
+              "maxTriangleStretch": 8.239763474205155,
+              "triangleOverDouble": 148,
+              "repairQualified": false
+            },
+            "retryable": false
+          }
+        },
+        {
+          "poseName": "neutral.bvh",
+          "poseHash": "24852fcb5222a9a8c4511db527b479bc85f1122238260e0b75adede225d42a8d",
+          "event": "result",
+          "seconds": 6.721229917136952,
+          "artifactHash": "e75e9e2f05934e4f5eeb5b952edecfbeb0bc83957a234b7a53c5a31b66beefed",
+          "snapshotHash": "c890fd437ba9a0a26ef498c56e16a1c8b5c332fdd5827b24df0072e33521f656",
+          "validation": {
+            "passed": true,
+            "meshCount": 1,
+            "originalBoneCount": 66,
+            "vertexCount": 24988,
+            "maxSurfaceError": 6.585234473277524e-07,
+            "maxSkinProbeError": 7.301568984985352e-07,
+            "maxMaterialRegionError": 6.3430655927732e-07,
+            "materialCount": 1,
+            "tolerance": 1.7801097716436052e-05,
+            "fkProbes": {
+              "forearm.L": {
+                "joint": "forearm.L",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.10881908939854547
+              },
+              "forearm.R": {
+                "joint": "forearm.R",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.10896417828712075
+              },
+              "leg.L": {
+                "joint": "leg.L",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.13425415105491398
+              },
+              "leg.R": {
+                "joint": "leg.R",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.1342574737382386
+              },
+              "spine": {
+                "joint": "spine",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.16846015686297253
+              }
+            },
+            "blenderVersion": "5.2.0 LTS",
+            "materialPreservation": {
+              "passed": true,
+              "materialCount": 1,
+              "maxDiffuseError": 0.0,
+              "maxSpecularError": 0.0,
+              "maxShininessError": 2.288818308215923e-07,
+              "maxOpacityError": 0.0
+            },
+            "cspCompatibility": {
+              "version": "personal-csp-names/1",
+              "applied": true,
+              "nameAliases": [
+                {
+                  "objectId": 255703017,
+                  "original": "root_group_",
+                  "exported": "StandinBase"
+                }
+              ],
+              "allOtherBytesExact": true,
+              "weightsTruncated": false,
+              "beforeSha256": "8c3ec4f4bb352e2c41feafc55ef59034dd7735159f4cf687d91b166e44d7fb2a",
+              "outputSha256": "e75e9e2f05934e4f5eeb5b952edecfbeb0bc83957a234b7a53c5a31b66beefed"
+            },
+            "reloadedPoseQuality": {
+              "version": "personal-pose-quality/1",
+              "meshes": [
+                {
+                  "version": "personal-pose-quality/1",
+                  "triangles": 50000,
+                  "edges": 75000,
+                  "maxStretch": 1.0003161123472766,
+                  "minCompression": 0.9997723863370235,
+                  "stretchP99": 1.0000318674411612,
+                  "overDouble": 0,
+                  "compressed": 0,
+                  "collapsed": 0,
+                  "openedZeroLengthEdges": 0,
+                  "openedDegenerateTriangles": 0,
+                  "maxTriangleStretch": 1.0051571557178447,
+                  "triangleOverDouble": 0,
+                  "repairQualified": false
+                }
+              ],
+              "repairQualified": false
+            },
+            "poseQuality": {
+              "version": "personal-pose-quality/1",
+              "meshes": [
+                {
+                  "version": "personal-pose-quality/1",
+                  "triangles": 50000,
+                  "edges": 75000,
+                  "maxStretch": 1.0003161123472766,
+                  "minCompression": 0.9997723863370235,
+                  "stretchP99": 1.0000314167311044,
+                  "overDouble": 0,
+                  "compressed": 0,
+                  "collapsed": 0,
+                  "openedZeroLengthEdges": 0,
+                  "openedDegenerateTriangles": 0,
+                  "maxTriangleStretch": 1.0052343380353959,
+                  "triangleOverDouble": 0,
+                  "repairQualified": false
+                }
+              ],
+              "repairQualified": false
+            }
+          },
+          "cachedSeconds": 0.09923049993813038
+        }
+      ]
+    },
+    {
+      "inputName": "female-chubby-tpose.fbx",
+      "sourceSha256": "fb47d89d1507c377b0af136b9dc6357ef35787c59ac79467ee180b2e1640017f",
+      "registrationSeconds": 16.33965320792049,
+      "registrationEvent": "result",
+      "registration": {
+        "normalizedFormat": "fbx",
+        "normalizedHash": "9da3414cca91f1333b3fd5c74bbf46f39152151aec56f0dc52800949ac442fff",
+        "archiveHash": "8fd6e6b5fc0fd865baca0b08250a8b3b8b24f75526e017583f29d4ae9c0c0fa3",
+        "validation": {
+          "passed": true,
+          "meshCount": 1,
+          "originalBoneCount": 65,
+          "vertexCount": 90143,
+          "maxSurfaceError": 5.964653837509104e-07,
+          "maxSkinProbeError": 7.818496214895276e-07,
+          "maxMaterialRegionError": 5.964312208561751e-07,
+          "materialCount": 2,
+          "tolerance": 1.6805063650993922e-05,
+          "fkProbes": {
+            "forearm.L": {
+              "joint": "forearm.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.09234117604469821
+            },
+            "forearm.R": {
+              "joint": "forearm.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.09233935884212574
+            },
+            "leg.L": {
+              "joint": "leg.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.13833344943756284
+            },
+            "leg.R": {
+              "joint": "leg.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.13833923776528562
+            },
+            "spine": {
+              "joint": "spine",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.14665100718655352
+            }
+          },
+          "blenderVersion": "5.2.0 LTS",
+          "materialPreservation": {
+            "passed": true,
+            "materialCount": 2,
+            "maxDiffuseError": 0.0,
+            "maxSpecularError": 0.0,
+            "maxShininessError": 0.0,
+            "maxOpacityError": 0.0
+          }
+        },
+        "versions": {
+          "importerVersion": "personal-import/4",
+          "normalizationVersion": "personal-normalize/5",
+          "rigMappingVersion": "personal-rig/2",
+          "converterVersion": "personal-converter/12",
+          "converterFingerprint": "2c59a03937a4316e3a6901e413b5353be39760981ed199a6d45f3f69accf2c47"
+        },
+        "capabilities": {
+          "supportLevel": "body_only",
+          "bodyPose": true,
+          "hands": {
+            "left": {
+              "supported": false,
+              "fingerBones": 20,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            },
+            "right": {
+              "supported": false,
+              "fingerBones": 20,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            }
+          },
+          "collisionPrevention": false,
+          "shapeSliders": false
+        }
+      },
+      "poses": [
+        {
+          "poseName": "03-staging-selected-pose.bvh",
+          "poseHash": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+          "event": "error",
+          "seconds": 68.31737666693516,
+          "error": {
+            "code": "POSE_QUALITY_REJECTED",
+            "message": "This model and pose exceed the personal export strain limits",
+            "details": {
+              "version": "personal-pose-quality/1",
+              "triangles": 180302,
+              "edges": 270441,
+              "maxStretch": 26.639711781328895,
+              "minCompression": 0.06829999014418846,
+              "stretchP99": 1.5979915020792188,
+              "overDouble": 403,
+              "compressed": 66,
+              "collapsed": 0,
+              "openedZeroLengthEdges": 0,
+              "openedDegenerateTriangles": 0,
+              "maxTriangleStretch": 35.574622676575764,
+              "triangleOverDouble": 820,
+              "repairQualified": false
+            },
+            "retryable": false
+          }
+        },
+        {
+          "poseName": "cmu_135_01_04368.bvh",
+          "poseHash": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+          "event": "error",
+          "seconds": 120.37516637495719,
+          "error": {
+            "code": "TIMEOUT",
+            "message": "Local conversion exceeded the time limit",
+            "details": {},
+            "retryable": true
+          }
+        },
+        {
+          "poseName": "neutral.bvh",
+          "poseHash": "24852fcb5222a9a8c4511db527b479bc85f1122238260e0b75adede225d42a8d",
+          "event": "result",
+          "seconds": 23.254851958015934,
+          "artifactHash": "9921a3636f3417f958ed8ad30370c8eaebf2143ad6aebf7e87581aeb947d78eb",
+          "snapshotHash": "050c40b7ede47fa2dad39c223b8c00b618403f063c33e0b89dbd90bd68d83d58",
+          "validation": {
+            "passed": true,
+            "meshCount": 1,
+            "originalBoneCount": 78,
+            "vertexCount": 90143,
+            "maxSurfaceError": 5.568031724578759e-07,
+            "maxSkinProbeError": 7.656445859538508e-07,
+            "maxMaterialRegionError": 6.219784722816257e-07,
+            "materialCount": 2,
+            "tolerance": 1.680506127237149e-05,
+            "fkProbes": {
+              "forearm.L": {
+                "joint": "forearm.L",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.0921129180219342
+              },
+              "forearm.R": {
+                "joint": "forearm.R",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.09212346823480964
+              },
+              "leg.L": {
+                "joint": "leg.L",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.13833351565779844
+              },
+              "leg.R": {
+                "joint": "leg.R",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.13833913304742576
+              },
+              "spine": {
+                "joint": "spine",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.14665083778455823
+              }
+            },
+            "blenderVersion": "5.2.0 LTS",
+            "materialPreservation": {
+              "passed": true,
+              "materialCount": 2,
+              "maxDiffuseError": 0.0,
+              "maxSpecularError": 0.0,
+              "maxShininessError": 0.0,
+              "maxOpacityError": 0.0
+            },
+            "cspCompatibility": {
+              "version": "personal-csp-names/1",
+              "applied": false,
+              "nameAliases": [],
+              "allOtherBytesExact": true,
+              "weightsTruncated": false,
+              "beforeSha256": "9921a3636f3417f958ed8ad30370c8eaebf2143ad6aebf7e87581aeb947d78eb",
+              "outputSha256": "9921a3636f3417f958ed8ad30370c8eaebf2143ad6aebf7e87581aeb947d78eb"
+            },
+            "reloadedPoseQuality": {
+              "version": "personal-pose-quality/1",
+              "meshes": [
+                {
+                  "version": "personal-pose-quality/1",
+                  "triangles": 180290,
+                  "edges": 270435,
+                  "maxStretch": 1.4780946519796063,
+                  "minCompression": 0.5997002847806776,
+                  "stretchP99": 1.04308592692393,
+                  "overDouble": 0,
+                  "compressed": 0,
+                  "collapsed": 0,
+                  "openedZeroLengthEdges": 0,
+                  "openedDegenerateTriangles": 0,
+                  "maxTriangleStretch": 1.6415368304404805,
+                  "triangleOverDouble": 0,
+                  "repairQualified": false
+                }
+              ],
+              "repairQualified": false
+            },
+            "poseQuality": {
+              "version": "personal-pose-quality/1",
+              "meshes": [
+                {
+                  "version": "personal-pose-quality/1",
+                  "triangles": 180290,
+                  "edges": 270435,
+                  "maxStretch": 1.4780946519796063,
+                  "minCompression": 0.5997002847806776,
+                  "stretchP99": 1.043084998742897,
+                  "overDouble": 0,
+                  "compressed": 0,
+                  "collapsed": 0,
+                  "openedZeroLengthEdges": 0,
+                  "openedDegenerateTriangles": 0,
+                  "maxTriangleStretch": 1.6415369012867156,
+                  "triangleOverDouble": 0,
+                  "repairQualified": false
+                }
+              ],
+              "repairQualified": false
+            }
+          },
+          "cachedSeconds": 0.2172625830862671
+        }
+      ]
+    },
+    {
+      "inputName": "child-tpose.fbx",
+      "sourceSha256": "b195a3ff87d67365f343fee9049f9d25026d6a49e4987d9e895d3a3f25e72385",
+      "registrationSeconds": 25.767855667043477,
+      "registrationEvent": "result",
+      "registration": {
+        "normalizedFormat": "fbx",
+        "normalizedHash": "e104655484029e44888eb1c67803ddedfe2d9e7ae07108e5739a2d1b481c8a50",
+        "archiveHash": "577debc482f3eaa3d42261dae8048e4199cec97def7c598f12744105a1d39c3b",
+        "validation": {
+          "passed": true,
+          "meshCount": 1,
+          "originalBoneCount": 65,
+          "vertexCount": 179990,
+          "maxSurfaceError": 2.981836075832689e-07,
+          "maxSkinProbeError": 6.565500711985806e-07,
+          "maxMaterialRegionError": 2.9816871460752736e-07,
+          "materialCount": 1,
+          "tolerance": 1.214052047710834e-05,
+          "fkProbes": {
+            "forearm.L": {
+              "joint": "forearm.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.0732310358147988
+            },
+            "forearm.R": {
+              "joint": "forearm.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.07323194878752119
+            },
+            "leg.L": {
+              "joint": "leg.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.08051338076185767
+            },
+            "leg.R": {
+              "joint": "leg.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.0804199570182805
+            },
+            "spine": {
+              "joint": "spine",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.13321581224990542
+            }
+          },
+          "blenderVersion": "5.2.0 LTS",
+          "materialPreservation": {
+            "passed": true,
+            "materialCount": 1,
+            "maxDiffuseError": 0.0,
+            "maxSpecularError": 0.0,
+            "maxShininessError": 0.0,
+            "maxOpacityError": 0.0
+          }
+        },
+        "versions": {
+          "importerVersion": "personal-import/4",
+          "normalizationVersion": "personal-normalize/5",
+          "rigMappingVersion": "personal-rig/2",
+          "converterVersion": "personal-converter/12",
+          "converterFingerprint": "2c59a03937a4316e3a6901e413b5353be39760981ed199a6d45f3f69accf2c47"
+        },
+        "capabilities": {
+          "supportLevel": "body_only",
+          "bodyPose": true,
+          "hands": {
+            "left": {
+              "supported": false,
+              "fingerBones": 20,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            },
+            "right": {
+              "supported": false,
+              "fingerBones": 20,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            }
+          },
+          "collisionPrevention": false,
+          "shapeSliders": false
+        }
+      },
+      "poses": [
+        {
+          "poseName": "03-staging-selected-pose.bvh",
+          "poseHash": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+          "event": "error",
+          "seconds": 96.07986579206772,
+          "error": {
+            "code": "POSE_QUALITY_REJECTED",
+            "message": "This model and pose exceed the personal export strain limits",
+            "details": {
+              "version": "personal-pose-quality/1",
+              "triangles": 360222,
+              "edges": 540087,
+              "maxStretch": 2.6052906202212083,
+              "minCompression": 0.03421003064054349,
+              "stretchP99": 1.5130498207280687,
+              "overDouble": 120,
+              "compressed": 225,
+              "collapsed": 2,
+              "openedZeroLengthEdges": 0,
+              "openedDegenerateTriangles": 0,
+              "maxTriangleStretch": 11.091744742734985,
+              "triangleOverDouble": 988,
+              "repairQualified": false
+            },
+            "retryable": false
+          }
+        },
+        {
+          "poseName": "cmu_135_01_04368.bvh",
+          "poseHash": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+          "event": "error",
+          "seconds": 120.54117624997161,
+          "error": {
+            "code": "TIMEOUT",
+            "message": "Local conversion exceeded the time limit",
+            "details": {},
+            "retryable": true
+          }
+        },
+        {
+          "poseName": "neutral.bvh",
+          "poseHash": "24852fcb5222a9a8c4511db527b479bc85f1122238260e0b75adede225d42a8d",
+          "event": "error",
+          "seconds": 121.11835658387281,
+          "error": {
+            "code": "TIMEOUT",
+            "message": "Local conversion exceeded the time limit",
+            "details": {},
+            "retryable": true
+          }
+        }
+      ]
+    }
+  ],
+  "timeoutRecheck": [
+    {
+      "inputName": "female-chubby-tpose.fbx",
+      "sourceSha256": "fb47d89d1507c377b0af136b9dc6357ef35787c59ac79467ee180b2e1640017f",
+      "registrationSeconds": 13.781148875132203,
+      "registrationEvent": "result",
+      "registration": {
+        "normalizedFormat": "fbx",
+        "normalizedHash": "83dbec09119a4e67c17a4e0d820ee4ea9f581703915fdda1689da1095197f21d",
+        "archiveHash": "35bf6dcf93c13d0f1e9d39c3928dae7e05143943e1388b64d98e31e5ac7e67d9",
+        "validation": {
+          "passed": true,
+          "meshCount": 1,
+          "originalBoneCount": 65,
+          "vertexCount": 90143,
+          "maxSurfaceError": 5.964653837509104e-07,
+          "maxSkinProbeError": 7.818496214895276e-07,
+          "maxMaterialRegionError": 5.964312208561751e-07,
+          "materialCount": 2,
+          "tolerance": 1.6805063650993922e-05,
+          "fkProbes": {
+            "forearm.L": {
+              "joint": "forearm.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.09234117604469821
+            },
+            "forearm.R": {
+              "joint": "forearm.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.09233935884212574
+            },
+            "leg.L": {
+              "joint": "leg.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.13833344943756284
+            },
+            "leg.R": {
+              "joint": "leg.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.13833923776528562
+            },
+            "spine": {
+              "joint": "spine",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.14665100718655352
+            }
+          },
+          "blenderVersion": "5.2.0 LTS",
+          "materialPreservation": {
+            "passed": true,
+            "materialCount": 2,
+            "maxDiffuseError": 0.0,
+            "maxSpecularError": 0.0,
+            "maxShininessError": 0.0,
+            "maxOpacityError": 0.0
+          }
+        },
+        "versions": {
+          "importerVersion": "personal-import/4",
+          "normalizationVersion": "personal-normalize/5",
+          "rigMappingVersion": "personal-rig/2",
+          "converterVersion": "personal-converter/12",
+          "converterFingerprint": "2c59a03937a4316e3a6901e413b5353be39760981ed199a6d45f3f69accf2c47"
+        },
+        "capabilities": {
+          "supportLevel": "body_only",
+          "bodyPose": true,
+          "hands": {
+            "left": {
+              "supported": false,
+              "fingerBones": 20,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            },
+            "right": {
+              "supported": false,
+              "fingerBones": 20,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            }
+          },
+          "collisionPrevention": false,
+          "shapeSliders": false
+        }
+      },
+      "poses": [
+        {
+          "poseName": "cmu_135_01_04368.bvh",
+          "poseHash": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+          "event": "error",
+          "seconds": 108.03301433380693,
+          "error": {
+            "code": "POSE_QUALITY_REJECTED",
+            "message": "This model and pose exceed the personal export strain limits",
+            "details": {
+              "version": "personal-pose-quality/1",
+              "triangles": 180356,
+              "edges": 270468,
+              "maxStretch": 198.62886289633894,
+              "minCompression": 0.023486432085886442,
+              "stretchP99": 1.806849571383904,
+              "overDouble": 1788,
+              "compressed": 183,
+              "collapsed": 1,
+              "openedZeroLengthEdges": 0,
+              "openedDegenerateTriangles": 0,
+              "maxTriangleStretch": 265.8326383191119,
+              "triangleOverDouble": 3398,
+              "repairQualified": false
+            },
+            "retryable": false
+          }
+        },
+        {
+          "poseName": "neutral.bvh",
+          "poseHash": "24852fcb5222a9a8c4511db527b479bc85f1122238260e0b75adede225d42a8d",
+          "event": "result",
+          "seconds": 18.37848070799373,
+          "artifactHash": "3ea3a3afd8b3fa437fe42b3f1eaa918f418bef2a9fd063c688ce9680df323be7",
+          "snapshotHash": "eb74315b1a511068fb9f3be45fffefe62253418d13c4651fb2724e294a35ce9b",
+          "validation": {
+            "passed": true,
+            "meshCount": 1,
+            "originalBoneCount": 78,
+            "vertexCount": 90143,
+            "maxSurfaceError": 5.568031724578759e-07,
+            "maxSkinProbeError": 7.656445859538508e-07,
+            "maxMaterialRegionError": 6.219784722816257e-07,
+            "materialCount": 2,
+            "tolerance": 1.680506127237149e-05,
+            "fkProbes": {
+              "forearm.L": {
+                "joint": "forearm.L",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.0921129180219342
+              },
+              "forearm.R": {
+                "joint": "forearm.R",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.09212346823480964
+              },
+              "leg.L": {
+                "joint": "leg.L",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.13833351565779844
+              },
+              "leg.R": {
+                "joint": "leg.R",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.13833913304742576
+              },
+              "spine": {
+                "joint": "spine",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.14665083778455823
+              }
+            },
+            "blenderVersion": "5.2.0 LTS",
+            "materialPreservation": {
+              "passed": true,
+              "materialCount": 2,
+              "maxDiffuseError": 0.0,
+              "maxSpecularError": 0.0,
+              "maxShininessError": 0.0,
+              "maxOpacityError": 0.0
+            },
+            "cspCompatibility": {
+              "version": "personal-csp-names/1",
+              "applied": false,
+              "nameAliases": [],
+              "allOtherBytesExact": true,
+              "weightsTruncated": false,
+              "beforeSha256": "3ea3a3afd8b3fa437fe42b3f1eaa918f418bef2a9fd063c688ce9680df323be7",
+              "outputSha256": "3ea3a3afd8b3fa437fe42b3f1eaa918f418bef2a9fd063c688ce9680df323be7"
+            },
+            "reloadedPoseQuality": {
+              "version": "personal-pose-quality/1",
+              "meshes": [
+                {
+                  "version": "personal-pose-quality/1",
+                  "triangles": 180290,
+                  "edges": 270435,
+                  "maxStretch": 1.4780946519796063,
+                  "minCompression": 0.5997002847806776,
+                  "stretchP99": 1.04308592692393,
+                  "overDouble": 0,
+                  "compressed": 0,
+                  "collapsed": 0,
+                  "openedZeroLengthEdges": 0,
+                  "openedDegenerateTriangles": 0,
+                  "maxTriangleStretch": 1.6415368304404805,
+                  "triangleOverDouble": 0,
+                  "repairQualified": false
+                }
+              ],
+              "repairQualified": false
+            },
+            "poseQuality": {
+              "version": "personal-pose-quality/1",
+              "meshes": [
+                {
+                  "version": "personal-pose-quality/1",
+                  "triangles": 180290,
+                  "edges": 270435,
+                  "maxStretch": 1.4780946519796063,
+                  "minCompression": 0.5997002847806776,
+                  "stretchP99": 1.043084998742897,
+                  "overDouble": 0,
+                  "compressed": 0,
+                  "collapsed": 0,
+                  "openedZeroLengthEdges": 0,
+                  "openedDegenerateTriangles": 0,
+                  "maxTriangleStretch": 1.6415369012867156,
+                  "triangleOverDouble": 0,
+                  "repairQualified": false
+                }
+              ],
+              "repairQualified": false
+            }
+          },
+          "exportSeconds": 0.25436187512241304,
+          "cachedSeconds": 0.20964033412747085
+        }
+      ]
+    },
+    {
+      "inputName": "child-tpose.fbx",
+      "sourceSha256": "b195a3ff87d67365f343fee9049f9d25026d6a49e4987d9e895d3a3f25e72385",
+      "registrationSeconds": 21.602432791143656,
+      "registrationEvent": "result",
+      "registration": {
+        "normalizedFormat": "fbx",
+        "normalizedHash": "75e93c29fcd0fc0d1a509ff773c09ee3f161f88d9c9232ed80c7c799b7d2ea00",
+        "archiveHash": "d36e50b8aa6fc7869f99794471f37dd06f8fb8602b2c1ea9b8838217c1ed95eb",
+        "validation": {
+          "passed": true,
+          "meshCount": 1,
+          "originalBoneCount": 65,
+          "vertexCount": 179990,
+          "maxSurfaceError": 2.981836075832689e-07,
+          "maxSkinProbeError": 6.565500711985806e-07,
+          "maxMaterialRegionError": 2.9816871460752736e-07,
+          "materialCount": 1,
+          "tolerance": 1.214052047710834e-05,
+          "fkProbes": {
+            "forearm.L": {
+              "joint": "forearm.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.0732310358147988
+            },
+            "forearm.R": {
+              "joint": "forearm.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.07323194878752119
+            },
+            "leg.L": {
+              "joint": "leg.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.08051338076185767
+            },
+            "leg.R": {
+              "joint": "leg.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.0804199570182805
+            },
+            "spine": {
+              "joint": "spine",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.13321581224990542
+            }
+          },
+          "blenderVersion": "5.2.0 LTS",
+          "materialPreservation": {
+            "passed": true,
+            "materialCount": 1,
+            "maxDiffuseError": 0.0,
+            "maxSpecularError": 0.0,
+            "maxShininessError": 0.0,
+            "maxOpacityError": 0.0
+          }
+        },
+        "versions": {
+          "importerVersion": "personal-import/4",
+          "normalizationVersion": "personal-normalize/5",
+          "rigMappingVersion": "personal-rig/2",
+          "converterVersion": "personal-converter/12",
+          "converterFingerprint": "2c59a03937a4316e3a6901e413b5353be39760981ed199a6d45f3f69accf2c47"
+        },
+        "capabilities": {
+          "supportLevel": "body_only",
+          "bodyPose": true,
+          "hands": {
+            "left": {
+              "supported": false,
+              "fingerBones": 20,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            },
+            "right": {
+              "supported": false,
+              "fingerBones": 20,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            }
+          },
+          "collisionPrevention": false,
+          "shapeSliders": false
+        }
+      },
+      "poses": [
+        {
+          "poseName": "cmu_135_01_04368.bvh",
+          "poseHash": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+          "event": "error",
+          "seconds": 120.54783120797947,
+          "error": {
+            "code": "TIMEOUT",
+            "message": "Local conversion exceeded the time limit",
+            "details": {},
+            "retryable": true
+          }
+        },
+        {
+          "poseName": "neutral.bvh",
+          "poseHash": "24852fcb5222a9a8c4511db527b479bc85f1122238260e0b75adede225d42a8d",
+          "event": "error",
+          "seconds": 120.93469516607001,
+          "error": {
+            "code": "TIMEOUT",
+            "message": "Local conversion exceeded the time limit",
+            "details": {},
+            "retryable": true
+          }
+        }
+      ]
+    }
+  ],
+  "nativeNeutralTiming": [
+    {
+      "inputName": "standin-male-0.7.6-mapped-review.cs3c",
+      "sourceSha256": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+      "registrationSeconds": 19.162358958041295,
+      "registrationEvent": "result",
+      "registration": {
+        "normalizedFormat": "fbx",
+        "normalizedHash": "676ad49b2ff8d9ecaa7a35cb560045047968cfc1a2c943fe95f57b3464fc254c",
+        "archiveHash": "c6a7ed09ee82acda3a18013c427a5164dc6c8c021c9c06d41ff1e56bbb14a730",
+        "validation": {
+          "passed": true,
+          "meshCount": 1,
+          "originalBoneCount": 53,
+          "vertexCount": 24988,
+          "maxSurfaceError": 5.101335887047753e-07,
+          "maxSkinProbeError": 7.601418019476114e-07,
+          "maxMaterialRegionError": 5.101335887047753e-07,
+          "materialCount": 1,
+          "tolerance": 1.780109771384568e-05,
+          "fkProbes": {
+            "forearm.L": {
+              "joint": "forearm.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1088190872464659
+            },
+            "forearm.R": {
+              "joint": "forearm.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.10896417965076514
+            },
+            "leg.L": {
+              "joint": "leg.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.13425406683096436
+            },
+            "leg.R": {
+              "joint": "leg.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1342576162504657
+            },
+            "spine": {
+              "joint": "spine",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1684601450844222
+            }
+          },
+          "blenderVersion": "5.2.0 LTS",
+          "materialPreservation": {
+            "passed": true,
+            "materialCount": 1,
+            "maxDiffuseError": 0.0,
+            "maxSpecularError": 0.0,
+            "maxShininessError": 2.288818308215923e-07,
+            "maxOpacityError": 0.0
+          }
+        },
+        "versions": {
+          "importerVersion": "personal-import/4",
+          "normalizationVersion": "personal-normalize/5",
+          "rigMappingVersion": "personal-rig/2",
+          "converterVersion": "personal-converter/12",
+          "converterFingerprint": "2c59a03937a4316e3a6901e413b5353be39760981ed199a6d45f3f69accf2c47"
+        },
+        "capabilities": {
+          "supportLevel": "body_only",
+          "bodyPose": true,
+          "hands": {
+            "left": {
+              "supported": false,
+              "fingerBones": 15,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            },
+            "right": {
+              "supported": false,
+              "fingerBones": 15,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            }
+          },
+          "collisionPrevention": false,
+          "shapeSliders": false
+        }
+      },
+      "poses": [
+        {
+          "poseName": "neutral.bvh",
+          "poseHash": "24852fcb5222a9a8c4511db527b479bc85f1122238260e0b75adede225d42a8d",
+          "event": "result",
+          "seconds": 9.02571745798923,
+          "artifactHash": "c6fc7de09f2cd40db3f124e589e89471c28e934f89c618e5b53b92ea77c8f2cd",
+          "snapshotHash": "c890fd437ba9a0a26ef498c56e16a1c8b5c332fdd5827b24df0072e33521f656",
+          "validation": {
+            "passed": true,
+            "meshCount": 1,
+            "originalBoneCount": 66,
+            "vertexCount": 24988,
+            "maxSurfaceError": 6.585234473277524e-07,
+            "maxSkinProbeError": 7.301568984985352e-07,
+            "maxMaterialRegionError": 6.3430655927732e-07,
+            "materialCount": 1,
+            "tolerance": 1.7801097716436052e-05,
+            "fkProbes": {
+              "forearm.L": {
+                "joint": "forearm.L",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.10881908939854547
+              },
+              "forearm.R": {
+                "joint": "forearm.R",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.10896417828712075
+              },
+              "leg.L": {
+                "joint": "leg.L",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.13425415105491398
+              },
+              "leg.R": {
+                "joint": "leg.R",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.1342574737382386
+              },
+              "spine": {
+                "joint": "spine",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.16846015686297253
+              }
+            },
+            "blenderVersion": "5.2.0 LTS",
+            "materialPreservation": {
+              "passed": true,
+              "materialCount": 1,
+              "maxDiffuseError": 0.0,
+              "maxSpecularError": 0.0,
+              "maxShininessError": 2.288818308215923e-07,
+              "maxOpacityError": 0.0
+            },
+            "cspCompatibility": {
+              "version": "personal-csp-names/1",
+              "applied": true,
+              "nameAliases": [
+                {
+                  "objectId": 302473015,
+                  "original": "root_group_",
+                  "exported": "StandinBase"
+                }
+              ],
+              "allOtherBytesExact": true,
+              "weightsTruncated": false,
+              "beforeSha256": "153c092db9ba478d04a65fdec74b3037062d73889c781f0ac5d5b54bfd8ad3c7",
+              "outputSha256": "c6fc7de09f2cd40db3f124e589e89471c28e934f89c618e5b53b92ea77c8f2cd"
+            },
+            "reloadedPoseQuality": {
+              "version": "personal-pose-quality/1",
+              "meshes": [
+                {
+                  "version": "personal-pose-quality/1",
+                  "triangles": 50000,
+                  "edges": 75000,
+                  "maxStretch": 1.0003161123472766,
+                  "minCompression": 0.9997723863370235,
+                  "stretchP99": 1.0000318674411612,
+                  "overDouble": 0,
+                  "compressed": 0,
+                  "collapsed": 0,
+                  "openedZeroLengthEdges": 0,
+                  "openedDegenerateTriangles": 0,
+                  "maxTriangleStretch": 1.0051571557178447,
+                  "triangleOverDouble": 0,
+                  "repairQualified": false
+                }
+              ],
+              "repairQualified": false
+            },
+            "poseQuality": {
+              "version": "personal-pose-quality/1",
+              "meshes": [
+                {
+                  "version": "personal-pose-quality/1",
+                  "triangles": 50000,
+                  "edges": 75000,
+                  "maxStretch": 1.0003161123472766,
+                  "minCompression": 0.9997723863370235,
+                  "stretchP99": 1.0000314167311044,
+                  "overDouble": 0,
+                  "compressed": 0,
+                  "collapsed": 0,
+                  "openedZeroLengthEdges": 0,
+                  "openedDegenerateTriangles": 0,
+                  "maxTriangleStretch": 1.0052343380353959,
+                  "triangleOverDouble": 0,
+                  "repairQualified": false
+                }
+              ],
+              "repairQualified": false
+            }
+          },
+          "exportSeconds": 0.12549966713413596,
+          "cachedSeconds": 0.12019574991427362
+        }
+      ]
+    },
+    {
+      "inputName": "female-chubby-tpose.fbx",
+      "sourceSha256": "fb47d89d1507c377b0af136b9dc6357ef35787c59ac79467ee180b2e1640017f",
+      "registrationSeconds": 16.92767812497914,
+      "registrationEvent": "result",
+      "registration": {
+        "normalizedFormat": "fbx",
+        "normalizedHash": "d0c8befd4bb6ac58ae02a3c822dce01d7d29c0a1a29a89387de97787af3c5fa0",
+        "archiveHash": "c568f06e5454d96fab48cd14820f944bf2622b5d0cc7376d9cf67f2e0e2ec811",
+        "validation": {
+          "passed": true,
+          "meshCount": 1,
+          "originalBoneCount": 65,
+          "vertexCount": 90143,
+          "maxSurfaceError": 5.964653837509104e-07,
+          "maxSkinProbeError": 7.818496214895276e-07,
+          "maxMaterialRegionError": 5.964312208561751e-07,
+          "materialCount": 2,
+          "tolerance": 1.6805063650993922e-05,
+          "fkProbes": {
+            "forearm.L": {
+              "joint": "forearm.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.09234117604469821
+            },
+            "forearm.R": {
+              "joint": "forearm.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.09233935884212574
+            },
+            "leg.L": {
+              "joint": "leg.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.13833344943756284
+            },
+            "leg.R": {
+              "joint": "leg.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.13833923776528562
+            },
+            "spine": {
+              "joint": "spine",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.14665100718655352
+            }
+          },
+          "blenderVersion": "5.2.0 LTS",
+          "materialPreservation": {
+            "passed": true,
+            "materialCount": 2,
+            "maxDiffuseError": 0.0,
+            "maxSpecularError": 0.0,
+            "maxShininessError": 0.0,
+            "maxOpacityError": 0.0
+          }
+        },
+        "versions": {
+          "importerVersion": "personal-import/4",
+          "normalizationVersion": "personal-normalize/5",
+          "rigMappingVersion": "personal-rig/2",
+          "converterVersion": "personal-converter/12",
+          "converterFingerprint": "2c59a03937a4316e3a6901e413b5353be39760981ed199a6d45f3f69accf2c47"
+        },
+        "capabilities": {
+          "supportLevel": "body_only",
+          "bodyPose": true,
+          "hands": {
+            "left": {
+              "supported": false,
+              "fingerBones": 20,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            },
+            "right": {
+              "supported": false,
+              "fingerBones": 20,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            }
+          },
+          "collisionPrevention": false,
+          "shapeSliders": false
+        }
+      },
+      "poses": [
+        {
+          "poseName": "neutral.bvh",
+          "poseHash": "24852fcb5222a9a8c4511db527b479bc85f1122238260e0b75adede225d42a8d",
+          "event": "result",
+          "seconds": 26.428539709188044,
+          "artifactHash": "bffa391b879e3e4651caca3cd12be671760c393119828b17bc858cf11d6f9a9a",
+          "snapshotHash": "050c40b7ede47fa2dad39c223b8c00b618403f063c33e0b89dbd90bd68d83d58",
+          "validation": {
+            "passed": true,
+            "meshCount": 1,
+            "originalBoneCount": 78,
+            "vertexCount": 90143,
+            "maxSurfaceError": 5.568031724578759e-07,
+            "maxSkinProbeError": 7.656445859538508e-07,
+            "maxMaterialRegionError": 6.219784722816257e-07,
+            "materialCount": 2,
+            "tolerance": 1.680506127237149e-05,
+            "fkProbes": {
+              "forearm.L": {
+                "joint": "forearm.L",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.0921129180219342
+              },
+              "forearm.R": {
+                "joint": "forearm.R",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.09212346823480964
+              },
+              "leg.L": {
+                "joint": "leg.L",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.13833351565779844
+              },
+              "leg.R": {
+                "joint": "leg.R",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.13833913304742576
+              },
+              "spine": {
+                "joint": "spine",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.14665083778455823
+              }
+            },
+            "blenderVersion": "5.2.0 LTS",
+            "materialPreservation": {
+              "passed": true,
+              "materialCount": 2,
+              "maxDiffuseError": 0.0,
+              "maxSpecularError": 0.0,
+              "maxShininessError": 0.0,
+              "maxOpacityError": 0.0
+            },
+            "cspCompatibility": {
+              "version": "personal-csp-names/1",
+              "applied": false,
+              "nameAliases": [],
+              "allOtherBytesExact": true,
+              "weightsTruncated": false,
+              "beforeSha256": "bffa391b879e3e4651caca3cd12be671760c393119828b17bc858cf11d6f9a9a",
+              "outputSha256": "bffa391b879e3e4651caca3cd12be671760c393119828b17bc858cf11d6f9a9a"
+            },
+            "reloadedPoseQuality": {
+              "version": "personal-pose-quality/1",
+              "meshes": [
+                {
+                  "version": "personal-pose-quality/1",
+                  "triangles": 180290,
+                  "edges": 270435,
+                  "maxStretch": 1.4780946519796063,
+                  "minCompression": 0.5997002847806776,
+                  "stretchP99": 1.04308592692393,
+                  "overDouble": 0,
+                  "compressed": 0,
+                  "collapsed": 0,
+                  "openedZeroLengthEdges": 0,
+                  "openedDegenerateTriangles": 0,
+                  "maxTriangleStretch": 1.6415368304404805,
+                  "triangleOverDouble": 0,
+                  "repairQualified": false
+                }
+              ],
+              "repairQualified": false
+            },
+            "poseQuality": {
+              "version": "personal-pose-quality/1",
+              "meshes": [
+                {
+                  "version": "personal-pose-quality/1",
+                  "triangles": 180290,
+                  "edges": 270435,
+                  "maxStretch": 1.4780946519796063,
+                  "minCompression": 0.5997002847806776,
+                  "stretchP99": 1.043084998742897,
+                  "overDouble": 0,
+                  "compressed": 0,
+                  "collapsed": 0,
+                  "openedZeroLengthEdges": 0,
+                  "openedDegenerateTriangles": 0,
+                  "maxTriangleStretch": 1.6415369012867156,
+                  "triangleOverDouble": 0,
+                  "repairQualified": false
+                }
+              ],
+              "repairQualified": false
+            }
+          },
+          "exportSeconds": 0.28598908288404346,
+          "cachedSeconds": 0.24317316710948944
+        }
+      ]
+    }
+  ],
+  "qualityBoundary": {
+    "sourceSha256": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+    "neutralSha256": "24852fcb5222a9a8c4511db527b479bc85f1122238260e0b75adede225d42a8d",
+    "unsafeSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+    "manifestSha256": "4929a7ab3200a96533a674361669ab278da108c46663d9b9b9f26d8257b1c852",
+    "checks": [
+      {
+        "name": "fresh import",
+        "passed": true
+      },
+      {
+        "name": "neutral accepted",
+        "passed": true
+      },
+      {
+        "name": "verified neutral saved",
+        "passed": true
+      },
+      {
+        "name": "unsafe explicitly rejected",
+        "passed": true
+      },
+      {
+        "name": "rejected snapshot not exportable",
+        "passed": true
+      },
+      {
+        "name": "previous verified neutral retained",
+        "passed": true
+      },
+      {
+        "name": "delete preserves saved file and source",
+        "passed": true
+      }
+    ],
+    "neutralApplySeconds": 6.799908583983779,
+    "unsafeApplySeconds": 15.169176500057802,
+    "rejection": {
+      "code": "POSE_QUALITY_REJECTED",
+      "message": "This model and pose exceed the personal export strain limits",
+      "details": {
+        "version": "personal-pose-quality/1",
+        "triangles": 50000,
+        "edges": 75000,
+        "maxStretch": 1.9059426050586534,
+        "minCompression": 0.26928924599440246,
+        "stretchP99": 1.4466855502359741,
+        "overDouble": 0,
+        "compressed": 0,
+        "collapsed": 0,
+        "openedZeroLengthEdges": 0,
+        "openedDegenerateTriangles": 0,
+        "maxTriangleStretch": 5.916456265643131,
+        "triangleOverDouble": 24,
+        "repairQualified": false
+      },
+      "retryable": false
+    },
+    "preservedOutputSha256": "e4a7892f86350223c9ab35ae1a443c8d5d7ee4b2b97f5808cbf052b3269f9568",
+    "allPassed": true
+  },
+  "nativeMigration": {
+    "allPassed": true,
+    "cardVersionIncremented": true,
+    "currentCacheReusePassed": true,
+    "currentExportSha256": "3f4fccdd3baed6bbc8ead849fae2a93cad58a31a56dd02c5c2637c74b68bd48f",
+    "currentSnapshotHash": "86a12854716c5172fac18dc45c65d1616b01989d048a2397e70fe78467fdb459",
+    "currentVersions": {
+      "converterFingerprint": "2c59a03937a4316e3a6901e413b5353be39760981ed199a6d45f3f69accf2c47",
+      "converterVersion": "personal-converter/12"
+    },
+    "deletionPreservesBothExports": true,
+    "explicitReregistrationPassed": true,
+    "freshCurrentApplyPassed": true,
+    "oldCardIdentityPreserved": true,
+    "oldSnapshotRejected": true,
+    "oldWorkerRejected": true,
+    "poseSha256": "24852fcb5222a9a8c4511db527b479bc85f1122238260e0b75adede225d42a8d",
+    "previousExportSha256": "be2247d7f42116ddd54b913071a84b77947be4fae0d649787bedc6a9e023a89e",
+    "previousSnapshotHash": "7c24be0dbbf2c194cf7a606a72004ffa373e653b42c256f799d4c1eef8f47a20",
+    "previousVersions": {
+      "converterFingerprint": "5fdc61c7775279392171e8002aece0e87744fe6187855746fe7411b4004458d1",
+      "converterVersion": "personal-converter/11"
+    },
+    "sameRuntimeDuplicateReused": true,
+    "scope": "actual product native registration/replacement core and retained NDJSON adapter; offline recorded pose; no picker/UI/live BFF/CSP or geometry quality qualification",
+    "sourceSha256": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c"
+  },
+  "bffOfflineHarness": {
+    "kind": "real BFF export/Hono/SQL/installation auth; offline recorded inference and filesystem S3 protocol substitute",
+    "sourceSha": "24852fcb5222a9a8c4511db527b479bc85f1122238260e0b75adede225d42a8d",
+    "checks": [
+      {
+        "name": "missing installation rejected",
+        "pass": true
+      },
+      {
+        "name": "foreign installation rejected",
+        "pass": true
+      },
+      {
+        "name": "verified base BVH exact",
+        "pass": true
+      },
+      {
+        "name": "persisted refined BVH exact",
+        "pass": true
+      },
+      {
+        "name": "auth invalid token rejected",
+        "pass": true
+      },
+      {
+        "name": "previous confirmed selection rejected",
+        "pass": true
+      },
+      {
+        "name": "changed source SHA rejected",
+        "pass": true
+      },
+      {
+        "name": "wrong person rejected",
+        "pass": true
+      },
+      {
+        "name": "wrong pose path rejected",
+        "pass": true
+      }
+    ],
+    "sqlExportEvents": 0
+  },
+  "actualAppAndCsp": {
+    "runtimeManifestSha256": "4929a7ab3200a96533a674361669ab278da108c46663d9b9b9f26d8257b1c852",
+    "releaseReady": false,
+    "diagnosticPoseNotSevereRepair": true,
+    "appBuild": {
+      "binarySha256": "be56cce3869e8a5733def7ca5c3ae614be269ff6f40522ed5c49abb23224b5c5",
+      "bundleBuildCompletedAt": "2026-11-21T20:46:00+09:00",
+      "sourceFeatureCommit": "23af50fa was committed at 20:49; recovery helper not yet in this build",
+      "runtimeManifestSha256": "4929a7ab3200a96533a674361669ab278da108c46663d9b9b9f26d8257b1c852",
+      "actualDownloads": 4,
+      "actualCspClipSaveCloseReopen": 4
+    },
+    "files": [
+      {
+        "gender": "male",
+        "cameraCase": "identity",
+        "sourceSha256": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+        "poseSha256": "24852fcb5222a9a8c4511db527b479bc85f1122238260e0b75adede225d42a8d",
+        "registeredCardVersion": 1,
+        "originalDownloadName": "standin_job_personal_hono_sql_20261121_standin_pose.fbx",
+        "file": "personal-v12-male-identity.fbx",
+        "bytes": 2239772,
+        "artifactSha256": "5918586f7a8df1872f6adfeb512f576bf0b04981b182208fea205099449ea88d",
+        "snapshotHash": "733e7dd03fce6b6c31c0dea477a9e500f8a16cebcab6fd88d52ab4cba4c772f3",
+        "snapshot": {
+          "sourceHash": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+          "importerVersion": "personal-import/4",
+          "normalizationVersion": "personal-normalize/5",
+          "rigMappingVersion": "personal-rig/2",
+          "converterVersion": "personal-converter/12",
+          "converterFingerprint": "2c59a03937a4316e3a6901e413b5353be39760981ed199a6d45f3f69accf2c47",
+          "poseHash": "24852fcb5222a9a8c4511db527b479bc85f1122238260e0b75adede225d42a8d",
+          "hands": {
+            "left": null,
+            "right": null
+          },
+          "orientation": "candidate-y-up-about-hips/1",
+          "camera": {
+            "version": "personal-camera/1",
+            "sourceBvhSha256": "24852fcb5222a9a8c4511db527b479bc85f1122238260e0b75adede225d42a8d",
+            "rotation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          },
+          "outputMode": "rigged_rest"
+        },
+        "validation": {
+          "passed": true,
+          "meshCount": 1,
+          "originalBoneCount": 66,
+          "vertexCount": 24988,
+          "maxSurfaceError": 6.585234473277524e-07,
+          "maxSkinProbeError": 7.301568984985352e-07,
+          "maxMaterialRegionError": 6.3430655927732e-07,
+          "materialCount": 1,
+          "tolerance": 1.7801097716436052e-05,
+          "fkProbes": {
+            "forearm.L": {
+              "joint": "forearm.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.10881908939854547
+            },
+            "forearm.R": {
+              "joint": "forearm.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.10896417828712075
+            },
+            "leg.L": {
+              "joint": "leg.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.13425415105491398
+            },
+            "leg.R": {
+              "joint": "leg.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1342574737382386
+            },
+            "spine": {
+              "joint": "spine",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.16846015686297253
+            }
+          },
+          "blenderVersion": "5.2.0 LTS",
+          "materialPreservation": {
+            "passed": true,
+            "materialCount": 1,
+            "maxDiffuseError": 0.0,
+            "maxSpecularError": 0.0,
+            "maxShininessError": 2.288818308215923e-07,
+            "maxOpacityError": 0.0
+          },
+          "cspCompatibility": {
+            "version": "personal-csp-names/1",
+            "applied": true,
+            "nameAliases": [
+              {
+                "objectId": 780939933,
+                "original": "root_group_",
+                "exported": "StandinBase"
+              }
+            ],
+            "allOtherBytesExact": true,
+            "weightsTruncated": false,
+            "beforeSha256": "4c4785e653110a640a1e459155dbde9276f473ba77a40c03d015a81d62e2e1d3",
+            "outputSha256": "5918586f7a8df1872f6adfeb512f576bf0b04981b182208fea205099449ea88d"
+          },
+          "reloadedPoseQuality": {
+            "version": "personal-pose-quality/1",
+            "meshes": [
+              {
+                "version": "personal-pose-quality/1",
+                "triangles": 50000,
+                "edges": 75000,
+                "maxStretch": 1.0003161123472766,
+                "minCompression": 0.9997723863370235,
+                "stretchP99": 1.0000318674411612,
+                "overDouble": 0,
+                "compressed": 0,
+                "collapsed": 0,
+                "openedZeroLengthEdges": 0,
+                "openedDegenerateTriangles": 0,
+                "maxTriangleStretch": 1.0051571557178447,
+                "triangleOverDouble": 0,
+                "repairQualified": false
+              }
+            ],
+            "repairQualified": false
+          },
+          "poseQuality": {
+            "version": "personal-pose-quality/1",
+            "meshes": [
+              {
+                "version": "personal-pose-quality/1",
+                "triangles": 50000,
+                "edges": 75000,
+                "maxStretch": 1.0003161123472766,
+                "minCompression": 0.9997723863370235,
+                "stretchP99": 1.0000314167311044,
+                "overDouble": 0,
+                "compressed": 0,
+                "collapsed": 0,
+                "openedZeroLengthEdges": 0,
+                "openedDegenerateTriangles": 0,
+                "maxTriangleStretch": 1.0052343380353959,
+                "triangleOverDouble": 0,
+                "repairQualified": false
+              }
+            ],
+            "repairQualified": false
+          }
+        },
+        "converterMetrics": {
+          "elapsedSeconds": 7.638283791951835,
+          "peakResidentBytes": 375455744
+        },
+        "csp": {
+          "file": "personal-v12-male-identity-20261121.clip",
+          "sha256": "2bf6d98ec262ffd243c3183383908fa65201b124b0c01ceb8511408aacadce0e",
+          "bytes": 2351865,
+          "imported": true,
+          "saved": true,
+          "closed": true,
+          "reopened": true,
+          "objectMoveRotatePersisted": true
+        }
+      },
+      {
+        "gender": "male",
+        "cameraCase": "yaw35",
+        "sourceSha256": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+        "poseSha256": "24852fcb5222a9a8c4511db527b479bc85f1122238260e0b75adede225d42a8d",
+        "registeredCardVersion": 1,
+        "originalDownloadName": "standin_job_personal_hono_sql_20261121_yaw35_standin_pose.fbx",
+        "file": "personal-v12-male-yaw35.fbx",
+        "bytes": 2239868,
+        "artifactSha256": "04633d60bbe7584e071563a5fc42fe059e2333f89435689f7ac4696186eef3a2",
+        "snapshotHash": "b41f89c10f827017028683c69b081e69b456eda8fc06b66aa753c39b2ef0b5e0",
+        "snapshot": {
+          "sourceHash": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+          "importerVersion": "personal-import/4",
+          "normalizationVersion": "personal-normalize/5",
+          "rigMappingVersion": "personal-rig/2",
+          "converterVersion": "personal-converter/12",
+          "converterFingerprint": "2c59a03937a4316e3a6901e413b5353be39760981ed199a6d45f3f69accf2c47",
+          "poseHash": "24852fcb5222a9a8c4511db527b479bc85f1122238260e0b75adede225d42a8d",
+          "hands": {
+            "left": null,
+            "right": null
+          },
+          "orientation": "candidate-y-up-about-hips/1",
+          "camera": {
+            "version": "personal-camera/1",
+            "sourceBvhSha256": "24852fcb5222a9a8c4511db527b479bc85f1122238260e0b75adede225d42a8d",
+            "rotation": [
+              [
+                0.8191520442889918,
+                0,
+                0.573576436351046
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                -0.573576436351046,
+                0,
+                0.8191520442889918
+              ]
+            ]
+          },
+          "outputMode": "rigged_rest"
+        },
+        "validation": {
+          "passed": true,
+          "meshCount": 1,
+          "originalBoneCount": 66,
+          "vertexCount": 24988,
+          "maxSurfaceError": 6.664001830358757e-07,
+          "maxSkinProbeError": 7.562981636510813e-07,
+          "maxMaterialRegionError": 6.419616624953051e-07,
+          "materialCount": 1,
+          "tolerance": 1.780094358508025e-05,
+          "fkProbes": {
+            "forearm.L": {
+              "joint": "forearm.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.10881909372728163
+            },
+            "forearm.R": {
+              "joint": "forearm.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.10896408029844892
+            },
+            "leg.L": {
+              "joint": "leg.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1342540753480548
+            },
+            "leg.R": {
+              "joint": "leg.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.13425751294276506
+            },
+            "spine": {
+              "joint": "spine",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.16846011024238924
+            }
+          },
+          "blenderVersion": "5.2.0 LTS",
+          "materialPreservation": {
+            "passed": true,
+            "materialCount": 1,
+            "maxDiffuseError": 0.0,
+            "maxSpecularError": 0.0,
+            "maxShininessError": 2.288818308215923e-07,
+            "maxOpacityError": 0.0
+          },
+          "cspCompatibility": {
+            "version": "personal-csp-names/1",
+            "applied": true,
+            "nameAliases": [
+              {
+                "objectId": 887938894,
+                "original": "root_group_",
+                "exported": "StandinBase"
+              }
+            ],
+            "allOtherBytesExact": true,
+            "weightsTruncated": false,
+            "beforeSha256": "e8df6669027d764e0b869c0f7266e6878a68d307af66730da320862861c88806",
+            "outputSha256": "04633d60bbe7584e071563a5fc42fe059e2333f89435689f7ac4696186eef3a2"
+          },
+          "reloadedPoseQuality": {
+            "version": "personal-pose-quality/1",
+            "meshes": [
+              {
+                "version": "personal-pose-quality/1",
+                "triangles": 50000,
+                "edges": 75000,
+                "maxStretch": 1.0003200435528412,
+                "minCompression": 0.9997732524717053,
+                "stretchP99": 1.0000325400166594,
+                "overDouble": 0,
+                "compressed": 0,
+                "collapsed": 0,
+                "openedZeroLengthEdges": 0,
+                "openedDegenerateTriangles": 0,
+                "maxTriangleStretch": 1.0051830283317669,
+                "triangleOverDouble": 0,
+                "repairQualified": false
+              }
+            ],
+            "repairQualified": false
+          },
+          "poseQuality": {
+            "version": "personal-pose-quality/1",
+            "meshes": [
+              {
+                "version": "personal-pose-quality/1",
+                "triangles": 50000,
+                "edges": 75000,
+                "maxStretch": 1.0003161123472766,
+                "minCompression": 0.9997723863370235,
+                "stretchP99": 1.0000314167311044,
+                "overDouble": 0,
+                "compressed": 0,
+                "collapsed": 0,
+                "openedZeroLengthEdges": 0,
+                "openedDegenerateTriangles": 0,
+                "maxTriangleStretch": 1.0052343380353959,
+                "triangleOverDouble": 0,
+                "repairQualified": false
+              }
+            ],
+            "repairQualified": false
+          }
+        },
+        "converterMetrics": {
+          "elapsedSeconds": 11.52877891692333,
+          "peakResidentBytes": 354418688
+        },
+        "csp": {
+          "file": "personal-v12-male-yaw35-20261121.clip",
+          "sha256": "1fac244ab5fb6898ef1fce9e0d9d7cdc2d6e9934cc9d160c462869a902b66f9b",
+          "bytes": 2343396,
+          "imported": true,
+          "saved": true,
+          "closed": true,
+          "reopened": true,
+          "objectMoveRotatePersisted": false
+        }
+      },
+      {
+        "gender": "female",
+        "cameraCase": "identity",
+        "sourceSha256": "fb47d89d1507c377b0af136b9dc6357ef35787c59ac79467ee180b2e1640017f",
+        "poseSha256": "24852fcb5222a9a8c4511db527b479bc85f1122238260e0b75adede225d42a8d",
+        "registeredCardVersion": 1,
+        "originalDownloadName": "standin_job_personal_hono_sql_20261121_standin_pose_v2.fbx",
+        "file": "personal-v12-female-identity.fbx",
+        "bytes": 6132700,
+        "artifactSha256": "ead8f61e5ba2541783dc97e05ab3d592255ba0339dec5c1662c4f9b7444e10f1",
+        "snapshotHash": "82389bdb63fe480c6708a13753b8eefdbc7e1e45af61de380305970075f196e6",
+        "snapshot": {
+          "sourceHash": "fb47d89d1507c377b0af136b9dc6357ef35787c59ac79467ee180b2e1640017f",
+          "importerVersion": "personal-import/4",
+          "normalizationVersion": "personal-normalize/5",
+          "rigMappingVersion": "personal-rig/2",
+          "converterVersion": "personal-converter/12",
+          "converterFingerprint": "2c59a03937a4316e3a6901e413b5353be39760981ed199a6d45f3f69accf2c47",
+          "poseHash": "24852fcb5222a9a8c4511db527b479bc85f1122238260e0b75adede225d42a8d",
+          "hands": {
+            "left": null,
+            "right": null
+          },
+          "orientation": "candidate-y-up-about-hips/1",
+          "camera": {
+            "version": "personal-camera/1",
+            "sourceBvhSha256": "24852fcb5222a9a8c4511db527b479bc85f1122238260e0b75adede225d42a8d",
+            "rotation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          },
+          "outputMode": "rigged_rest"
+        },
+        "validation": {
+          "passed": true,
+          "meshCount": 1,
+          "originalBoneCount": 78,
+          "vertexCount": 90143,
+          "maxSurfaceError": 5.568031724578759e-07,
+          "maxSkinProbeError": 7.656445859538508e-07,
+          "maxMaterialRegionError": 6.219784722816257e-07,
+          "materialCount": 2,
+          "tolerance": 1.680506127237149e-05,
+          "fkProbes": {
+            "forearm.L": {
+              "joint": "forearm.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.0921129180219342
+            },
+            "forearm.R": {
+              "joint": "forearm.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.09212346823480964
+            },
+            "leg.L": {
+              "joint": "leg.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.13833351565779844
+            },
+            "leg.R": {
+              "joint": "leg.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.13833913304742576
+            },
+            "spine": {
+              "joint": "spine",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.14665083778455823
+            }
+          },
+          "blenderVersion": "5.2.0 LTS",
+          "materialPreservation": {
+            "passed": true,
+            "materialCount": 2,
+            "maxDiffuseError": 0.0,
+            "maxSpecularError": 0.0,
+            "maxShininessError": 0.0,
+            "maxOpacityError": 0.0
+          },
+          "cspCompatibility": {
+            "version": "personal-csp-names/1",
+            "applied": false,
+            "nameAliases": [],
+            "allOtherBytesExact": true,
+            "weightsTruncated": false,
+            "beforeSha256": "ead8f61e5ba2541783dc97e05ab3d592255ba0339dec5c1662c4f9b7444e10f1",
+            "outputSha256": "ead8f61e5ba2541783dc97e05ab3d592255ba0339dec5c1662c4f9b7444e10f1"
+          },
+          "reloadedPoseQuality": {
+            "version": "personal-pose-quality/1",
+            "meshes": [
+              {
+                "version": "personal-pose-quality/1",
+                "triangles": 180290,
+                "edges": 270435,
+                "maxStretch": 1.4780946519796063,
+                "minCompression": 0.5997002847806776,
+                "stretchP99": 1.04308592692393,
+                "overDouble": 0,
+                "compressed": 0,
+                "collapsed": 0,
+                "openedZeroLengthEdges": 0,
+                "openedDegenerateTriangles": 0,
+                "maxTriangleStretch": 1.6415368304404805,
+                "triangleOverDouble": 0,
+                "repairQualified": false
+              }
+            ],
+            "repairQualified": false
+          },
+          "poseQuality": {
+            "version": "personal-pose-quality/1",
+            "meshes": [
+              {
+                "version": "personal-pose-quality/1",
+                "triangles": 180290,
+                "edges": 270435,
+                "maxStretch": 1.4780946519796063,
+                "minCompression": 0.5997002847806776,
+                "stretchP99": 1.043084998742897,
+                "overDouble": 0,
+                "compressed": 0,
+                "collapsed": 0,
+                "openedZeroLengthEdges": 0,
+                "openedDegenerateTriangles": 0,
+                "maxTriangleStretch": 1.6415369012867156,
+                "triangleOverDouble": 0,
+                "repairQualified": false
+              }
+            ],
+            "repairQualified": false
+          }
+        },
+        "converterMetrics": {
+          "elapsedSeconds": 27.369871417060494,
+          "peakResidentBytes": 704757760
+        },
+        "csp": {
+          "file": "personal-v12-female-identity-20261121.clip",
+          "sha256": "2cde35883b0c1c604a165306f3c6ba42f3f4b082cc93aa688bea5b9f74383602",
+          "bytes": 6151417,
+          "imported": true,
+          "saved": true,
+          "closed": true,
+          "reopened": true,
+          "objectMoveRotatePersisted": false
+        }
+      },
+      {
+        "gender": "female",
+        "cameraCase": "yaw35",
+        "sourceSha256": "fb47d89d1507c377b0af136b9dc6357ef35787c59ac79467ee180b2e1640017f",
+        "poseSha256": "24852fcb5222a9a8c4511db527b479bc85f1122238260e0b75adede225d42a8d",
+        "registeredCardVersion": 1,
+        "originalDownloadName": "standin_job_personal_hono_sql_20261121_yaw35_standin_pose_v2.fbx",
+        "file": "personal-v12-female-yaw35.fbx",
+        "bytes": 6132796,
+        "artifactSha256": "44fc1e94fb5ece013e77ba4fe9cd9573fde0ac5393c6e2e71f6b31c1d335be4a",
+        "snapshotHash": "a849486098ad0a3b5c8e8d2188fd6053b39946b3e338a27ed16d635b2b32667a",
+        "snapshot": {
+          "sourceHash": "fb47d89d1507c377b0af136b9dc6357ef35787c59ac79467ee180b2e1640017f",
+          "importerVersion": "personal-import/4",
+          "normalizationVersion": "personal-normalize/5",
+          "rigMappingVersion": "personal-rig/2",
+          "converterVersion": "personal-converter/12",
+          "converterFingerprint": "2c59a03937a4316e3a6901e413b5353be39760981ed199a6d45f3f69accf2c47",
+          "poseHash": "24852fcb5222a9a8c4511db527b479bc85f1122238260e0b75adede225d42a8d",
+          "hands": {
+            "left": null,
+            "right": null
+          },
+          "orientation": "candidate-y-up-about-hips/1",
+          "camera": {
+            "version": "personal-camera/1",
+            "sourceBvhSha256": "24852fcb5222a9a8c4511db527b479bc85f1122238260e0b75adede225d42a8d",
+            "rotation": [
+              [
+                0.8191520442889918,
+                0,
+                0.573576436351046
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                -0.573576436351046,
+                0,
+                0.8191520442889918
+              ]
+            ]
+          },
+          "outputMode": "rigged_rest"
+        },
+        "validation": {
+          "passed": true,
+          "meshCount": 1,
+          "originalBoneCount": 78,
+          "vertexCount": 90143,
+          "maxSurfaceError": 4.500051886680012e-07,
+          "maxSkinProbeError": 5.997601419949206e-07,
+          "maxMaterialRegionError": 5.20475168741541e-07,
+          "materialCount": 2,
+          "tolerance": 1.6804832695644063e-05,
+          "fkProbes": {
+            "forearm.L": {
+              "joint": "forearm.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.0921129304407199
+            },
+            "forearm.R": {
+              "joint": "forearm.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.09212355220007189
+            },
+            "leg.L": {
+              "joint": "leg.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1383334745403803
+            },
+            "leg.R": {
+              "joint": "leg.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1383390430382439
+            },
+            "spine": {
+              "joint": "spine",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1466508748193661
+            }
+          },
+          "blenderVersion": "5.2.0 LTS",
+          "materialPreservation": {
+            "passed": true,
+            "materialCount": 2,
+            "maxDiffuseError": 0.0,
+            "maxSpecularError": 0.0,
+            "maxShininessError": 0.0,
+            "maxOpacityError": 0.0
+          },
+          "cspCompatibility": {
+            "version": "personal-csp-names/1",
+            "applied": false,
+            "nameAliases": [],
+            "allOtherBytesExact": true,
+            "weightsTruncated": false,
+            "beforeSha256": "44fc1e94fb5ece013e77ba4fe9cd9573fde0ac5393c6e2e71f6b31c1d335be4a",
+            "outputSha256": "44fc1e94fb5ece013e77ba4fe9cd9573fde0ac5393c6e2e71f6b31c1d335be4a"
+          },
+          "reloadedPoseQuality": {
+            "version": "personal-pose-quality/1",
+            "meshes": [
+              {
+                "version": "personal-pose-quality/1",
+                "triangles": 180290,
+                "edges": 270435,
+                "maxStretch": 1.478095142813276,
+                "minCompression": 0.5997059819383386,
+                "stretchP99": 1.0430808788714008,
+                "overDouble": 0,
+                "compressed": 0,
+                "collapsed": 0,
+                "openedZeroLengthEdges": 0,
+                "openedDegenerateTriangles": 0,
+                "maxTriangleStretch": 1.641540314008502,
+                "triangleOverDouble": 0,
+                "repairQualified": false
+              }
+            ],
+            "repairQualified": false
+          },
+          "poseQuality": {
+            "version": "personal-pose-quality/1",
+            "meshes": [
+              {
+                "version": "personal-pose-quality/1",
+                "triangles": 180290,
+                "edges": 270435,
+                "maxStretch": 1.4780946519796063,
+                "minCompression": 0.5997002847806776,
+                "stretchP99": 1.043084998742897,
+                "overDouble": 0,
+                "compressed": 0,
+                "collapsed": 0,
+                "openedZeroLengthEdges": 0,
+                "openedDegenerateTriangles": 0,
+                "maxTriangleStretch": 1.6415369012867156,
+                "triangleOverDouble": 0,
+                "repairQualified": false
+              }
+            ],
+            "repairQualified": false
+          }
+        },
+        "converterMetrics": {
+          "elapsedSeconds": 30.88607041607611,
+          "peakResidentBytes": 587513856
+        },
+        "csp": {
+          "file": "personal-v12-female-yaw35-20261121.clip",
+          "sha256": "0c73bc3bbbfc53ba7907fd25029a4a279080ac3acbb59dd149e0b8937a0cbcf3",
+          "bytes": 6151830,
+          "imported": true,
+          "saved": true,
+          "closed": true,
+          "reopened": true,
+          "objectMoveRotatePersisted": false
+        }
+      }
+    ],
+    "uiEvents": [
+      {
+        "event": "female-picker-open",
+        "ms": 1795265976831
+      },
+      {
+        "event": "female-registration-observed",
+        "ms": 1795266010292
+      },
+      {
+        "event": "male-final-apply-request",
+        "ms": 1795266063345
+      },
+      {
+        "event": "male-final-ready-observed",
+        "ms": 1795266095238
+      },
+      {
+        "event": "male-download-click",
+        "ms": 1795266101723
+      },
+      {
+        "event": "male-disk-save-observed",
+        "ms": 1795266117906
+      },
+      {
+        "event": "female-identity-apply-request",
+        "ms": 1795266686923
+      },
+      {
+        "event": "female-identity-ready-observed",
+        "ms": 1795266814268
+      },
+      {
+        "event": "female-identity-disk-save-observed",
+        "ms": 1795266844637
+      }
+    ],
+    "timingLimit": "UI observation intervals include human/tool scheduling and CSP switch time; not converter latency. Native measured times are reported separately.",
+    "severeFemaleUi": {
+      "sourcePoseSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+      "observedReason": "POSE_QUALITY_REJECTED",
+      "downloadDisabled": true,
+      "fileNotCreated": true,
+      "recoveryButtonBuild": "older 20:46 app still displayed retry; later 23af50fa source fixes action; final rebuild verification separate"
+    }
+  },
+  "validation": {
+    "serverUnit": "48 passed + 32 subtests",
+    "serverSmoke": "54 passed",
+    "sharedRegression": "229 passed",
+    "blenderIntegration": "6 passed",
+    "clientBroad": "1744 passed, 7 skipped before two quality-recovery cases; affected 78 then passed",
+    "clientRustUnit": "21 passed, 6 ignored",
+    "nativeActualFinal": "5 actual tests passed, including v11->v12 migration and decoder enabled/absence",
+    "typecheck": "pass",
+    "webBuild": "pass",
+    "lint": "0 errors, 2 pre-existing warnings",
+    "packaging": "5 passed"
+  },
+  "unresolved": [
+    "severe pose deformation including female CMU pelvic triangles",
+    "child actual cases TIMEOUT within unchanged 120 second budget",
+    "current macOS bundled Blender/Python strict signatures invalid",
+    "Windows and Intel Mac actual runtime execution unavailable",
+    "live BFF inference/production SQL/S3 full E2E not run",
+    "approved public decoder redistribution and corresponding source/notices delivery",
+    "signing/notarization/release acceptance; Draft/default-off/releaseReady false retained"
+  ],
+  "postUiIntegrity": {
+    "packages": [
+      {
+        "label": "final-v12",
+        "manifestSha256": "4929a7ab3200a96533a674361669ab278da108c46663d9b9b9f26d8257b1c852",
+        "exactFileCount": 6616,
+        "changed": [],
+        "extra": [],
+        "missing": [],
+        "passed": true
+      },
+      {
+        "label": "preserved-v11",
+        "manifestSha256": "2540a161e19fa34ad1d9c38bcc79751d471b938f6de5b0757923e303def5789b",
+        "exactFileCount": 6606,
+        "changed": [],
+        "extra": [],
+        "missing": [],
+        "passed": true
+      },
+      {
+        "label": "final-app-resource",
+        "manifestSha256": "4929a7ab3200a96533a674361669ab278da108c46663d9b9b9f26d8257b1c852",
+        "exactFileCount": 6616,
+        "changed": [],
+        "extra": [],
+        "missing": [],
+        "passed": true
+      }
+    ],
+    "finalAppBinarySha256": "cec89b45c0c0e94771e8c3138ae096b202dbb25d48fec70fad39241596eaebf7",
+    "finalAppRecoverySource": "23af50fa",
+    "finalAppBuildComplete": true,
+    "finalAppKeychainReapprovalPending": true
+  }
+}
