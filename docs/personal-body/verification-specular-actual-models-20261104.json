@@ -1,0 +1,4558 @@
+{
+  "packageManifestSha256": "4a0f060fe4a350b1e4658188745fbb47adfbdc96d2186d2f58a02c8dc4dff814",
+  "liveBff": false,
+  "cspImportTested": false,
+  "models": [
+    {
+      "inputName": "standin-male-0.7.6-mapped-review.cs3c",
+      "sourceHash": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+      "registrationSeconds": 10.841415917006088,
+      "registrationEvent": "result",
+      "poses": [
+        {
+          "poseName": "03-staging-selected-pose.bvh",
+          "poseHash": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+          "event": "result",
+          "seconds": 3.998946124978829,
+          "snapshotHash": "afc7de50c413861a9ad590a65b758f7283a871009918551cfaabdb87a89046d5",
+          "artifactHash": "d8087b904a5acf70b3224787a4464d7b7ae317b8d152adc33af085d3145e6670",
+          "validation": {
+            "passed": true,
+            "meshCount": 1,
+            "originalBoneCount": 66,
+            "vertexCount": 24988,
+            "maxSurfaceError": 7.588719199702609e-07,
+            "maxSkinProbeError": 8.765126153775782e-07,
+            "maxMaterialRegionError": 7.588719199702609e-07,
+            "materialCount": 1,
+            "tolerance": 1.7444062930276232e-05,
+            "fkProbes": {
+              "forearm.L": {
+                "joint": "forearm.L",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.10876463535284306
+              },
+              "forearm.R": {
+                "joint": "forearm.R",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.1089407657011523
+              },
+              "leg.L": {
+                "joint": "leg.L",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.12953315171815846
+              },
+              "leg.R": {
+                "joint": "leg.R",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.12953383322654813
+              },
+              "spine": {
+                "joint": "spine",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.1619044103071455
+              }
+            },
+            "blenderVersion": "5.2.0 LTS",
+            "materialPreservation": {
+              "passed": true,
+              "materialCount": 1,
+              "maxDiffuseError": 0.0,
+              "maxSpecularError": 0.0,
+              "maxShininessError": 2.288818308215923e-07,
+              "maxOpacityError": 0.0
+            }
+          },
+          "retarget": {
+            "ok": true,
+            "output_mode": "",
+            "src_profile": "mixamo_noprefix",
+            "dst_profile": "mixamo",
+            "mapped_bones": 22,
+            "missing_required": [],
+            "unmapped_optional": [],
+            "max_joint_angle_deg": 164.8875557721428,
+            "pose_fidelity_rmse": null,
+            "skeleton_baseline_rmse": null,
+            "pose_fidelity_delta": null,
+            "mirrored": false,
+            "frame": 0,
+            "warnings": [
+              "rest \uc2a4\uc719 \ucd5c\ub300 39.8\u00b0 (shoulder.R) > 15\u00b0 \u2014 \uc18c\uc2a4\uc640 \ud0c0\uae43\uc758 rest \uaddc\uaca9\uc774 \ub2e4\ub974\ub2e4(\ub7f0\ud0c0\uc784 \ubcf4\uc815\uc73c\ub85c \ud761\uc218\ub428)"
+            ],
+            "rest_swing_deg": {
+              "spine": 12.100935507509382,
+              "spine1": 3.2364653735378526,
+              "spine2": 22.820122748477186,
+              "neck": 10.888169511234597,
+              "head": 1.8633329895970916,
+              "shoulder.L": 39.715287914408584,
+              "upperarm.L": 3.3075328602151384,
+              "forearm.L": 2.025101460944317,
+              "hand.L": 8.789675932788498,
+              "shoulder.R": 39.83831838650831,
+              "upperarm.R": 3.25241394615083,
+              "forearm.R": 2.0320734562608935,
+              "hand.R": 8.01148104372282,
+              "upleg.L": 2.6989463043910895,
+              "leg.L": 2.3017363135677296,
+              "foot.L": 7.669003655400447,
+              "toe.L": 4.831277777689796,
+              "upleg.R": 2.388533172324868,
+              "leg.R": 2.5238654959638986,
+              "foot.R": 8.170140388354346,
+              "toe.R": 4.876843003411022
+            },
+            "rest_swing_max_deg": 39.83831838650831,
+            "rest_swing_bone": "shoulder.R",
+            "twist_deg": {},
+            "degenerate_bones": [],
+            "solver_mode_by_bone": {
+              "hips": "legacy_structural",
+              "spine": "legacy_structural",
+              "spine1": "legacy_structural",
+              "spine2": "legacy_structural",
+              "neck": "legacy_structural",
+              "head": "legacy_structural",
+              "shoulder.L": "legacy_structural",
+              "upperarm.L": "legacy_compatible_chain",
+              "forearm.L": "legacy_compatible_chain",
+              "hand.L": "legacy_compatible_chain",
+              "shoulder.R": "legacy_structural",
+              "upperarm.R": "legacy_compatible_chain",
+              "forearm.R": "legacy_compatible_chain",
+              "hand.R": "legacy_compatible_chain",
+              "upleg.L": "legacy_compatible_chain",
+              "leg.L": "legacy_compatible_chain",
+              "foot.L": "legacy_compatible_chain",
+              "toe.L": "legacy_compatible_chain",
+              "upleg.R": "legacy_compatible_chain",
+              "leg.R": "legacy_compatible_chain",
+              "foot.R": "legacy_compatible_chain",
+              "toe.R": "legacy_compatible_chain"
+            },
+            "chain_diagnostics": {
+              "_pelvis_boundary": {
+                "mode": "parent_coherent_projection",
+                "parent_variant": "CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY",
+                "parent_retarget_sha256": "692e975d32f41e3406144763c7c0b7dbf0a586ff07732f09c4365e3233b13693",
+                "hips_transport_rotation_deg": 0.0,
+                "hips_transport_determinant": 1.0,
+                "hips_rotation_unchanged": true,
+                "root_translation_unchanged": true,
+                "bilateral_exact_v31_fallback": false,
+                "active_chains": [],
+                "fallback_chains": []
+              },
+              "arm.L": {
+                "kind": "arm",
+                "bones": [
+                  "upperarm.L",
+                  "forearm.L",
+                  "hand.L"
+                ],
+                "fallback": false,
+                "wrist_rest_compatibility_deg": 6.854396774178638,
+                "rest_direction_error_deg": [
+                  3.3074695355721953,
+                  2.0251090613532043
+                ],
+                "rest_direction_max_deg": 3.3074695355721953,
+                "activated": false,
+                "activation_reason": "rest direction/wrist frame already compatible"
+              },
+              "arm.R": {
+                "kind": "arm",
+                "bones": [
+                  "upperarm.R",
+                  "forearm.R",
+                  "hand.R"
+                ],
+                "fallback": false,
+                "wrist_rest_compatibility_deg": 6.3773683823134535,
+                "rest_direction_error_deg": [
+                  3.252412352845386,
+                  2.03197711015051
+                ],
+                "rest_direction_max_deg": 3.252412352845386,
+                "activated": false,
+                "activation_reason": "rest direction/wrist frame already compatible"
+              },
+              "leg.L": {
+                "kind": "leg",
+                "bones": [
+                  "upleg.L",
+                  "leg.L",
+                  "foot.L",
+                  "toe.L"
+                ],
+                "fallback": false,
+                "rest_direction_error_deg": [
+                  2.698801188276648,
+                  2.3016506148266713,
+                  7.668926882597014
+                ],
+                "rest_direction_max_deg": 7.668926882597014,
+                "activated": false,
+                "activation_reason": "rest directions already compatible"
+              },
+              "leg.R": {
+                "kind": "leg",
+                "bones": [
+                  "upleg.R",
+                  "leg.R",
+                  "foot.R",
+                  "toe.R"
+                ],
+                "fallback": false,
+                "rest_direction_error_deg": [
+                  2.3884512151702633,
+                  2.5238654959638986,
+                  8.170068295571314
+                ],
+                "rest_direction_max_deg": 8.170068295571314,
+                "activated": false,
+                "activation_reason": "rest directions already compatible"
+              },
+              "_palm_roll": {
+                "variant": "CHAIN_TRANSPORT_V3_2_1_PALM_ROLL_QA",
+                "parent_variant": "CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY",
+                "parent_retarget_sha256": "692e975d32f41e3406144763c7c0b7dbf0a586ff07732f09c4365e3233b13693",
+                "policy_sha256": "46da74c83a9dd63bc03d11fc4e6ccbd104f8fc1ec084b2a7a1c8613f5a93bb95",
+                "requested_mu": {
+                  "hand.L": 0.5,
+                  "hand.R": 0.5
+                },
+                "default_is_exact_parent": false,
+                "operational_status": "PROMOTED_RUNTIME",
+                "actual_mesh_gate": "V3.2.5_SELECTOR",
+                "hands": {
+                  "hand.L": {
+                    "mode": "identity",
+                    "frame_status": "inactive_compatible_chain",
+                    "selected_mu": 0.0,
+                    "mesh_gate": "NOT_NEEDED_COMPATIBLE_CHAIN"
+                  },
+                  "hand.R": {
+                    "mode": "identity",
+                    "frame_status": "inactive_compatible_chain",
+                    "selected_mu": 0.0,
+                    "mesh_gate": "NOT_NEEDED_COMPATIBLE_CHAIN"
+                  }
+                }
+              }
+            },
+            "chain_fallbacks": [],
+            "terminal_follow_bones": [],
+            "palm_roll_requested_deg": {
+              "hand.L": 0.0,
+              "hand.R": 0.0
+            },
+            "palm_roll_applied_deg": {
+              "hand.L": 0.0,
+              "hand.R": 0.0
+            },
+            "palm_roll_mu": {
+              "hand.L": 0.0,
+              "hand.R": 0.0
+            },
+            "palm_landmark_roles": {},
+            "palm_plane_sin": {},
+            "palm_frame_status": {
+              "hand.L": "inactive_compatible_chain",
+              "hand.R": "inactive_compatible_chain"
+            },
+            "palm_roll_mode": {
+              "hand.L": "identity",
+              "hand.R": "identity"
+            },
+            "wrist_transfer": {},
+            "palm_fallback_reason": {
+              "hand.L": null,
+              "hand.R": null
+            },
+            "palm_roll_bones": [],
+            "palm_roll_fallback_bones": [],
+            "local_normalization_surface_error": 6.420589215849759e-07,
+            "max_joint_edge_length_error": 2.3259386294771645e-07,
+            "camera": {
+              "version": "personal-camera/1",
+              "applied": false,
+              "maxRigidSurfaceError": 0.0
+            }
+          },
+          "file": "model-0-pose-0.fbx",
+          "cachedSeconds": 0.05008820799412206
+        },
+        {
+          "poseName": "cmu_135_01_04368.bvh",
+          "poseHash": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+          "event": "result",
+          "seconds": 3.7904346660070587,
+          "snapshotHash": "2a57523afcd172fd180a7e782f345c8e9e24aaa8a6ea3e432952db9b34de4316",
+          "artifactHash": "bcbc5f82ad79bb7147d14753bbb403d381ccd4c541d6e9c42c63a116d4dc7be8",
+          "validation": {
+            "passed": true,
+            "meshCount": 1,
+            "originalBoneCount": 66,
+            "vertexCount": 24988,
+            "maxSurfaceError": 8.689598871569615e-07,
+            "maxSkinProbeError": 9.702932857180713e-07,
+            "maxMaterialRegionError": 8.689135029271711e-07,
+            "materialCount": 1,
+            "tolerance": 1.7756132018480384e-05,
+            "fkProbes": {
+              "forearm.L": {
+                "joint": "forearm.L",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.10877168465902481
+              },
+              "forearm.R": {
+                "joint": "forearm.R",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.10896001008268852
+              },
+              "leg.L": {
+                "joint": "leg.L",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.1298630121431651
+              },
+              "leg.R": {
+                "joint": "leg.R",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.12857908758643313
+              },
+              "spine": {
+                "joint": "spine",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.1888558567590011
+              }
+            },
+            "blenderVersion": "5.2.0 LTS",
+            "materialPreservation": {
+              "passed": true,
+              "materialCount": 1,
+              "maxDiffuseError": 0.0,
+              "maxSpecularError": 0.0,
+              "maxShininessError": 2.288818308215923e-07,
+              "maxOpacityError": 0.0
+            }
+          },
+          "retarget": {
+            "ok": true,
+            "output_mode": "",
+            "src_profile": "cmu_bvh",
+            "dst_profile": "mixamo",
+            "mapped_bones": 22,
+            "missing_required": [],
+            "unmapped_optional": [],
+            "max_joint_angle_deg": 175.59510673018838,
+            "pose_fidelity_rmse": null,
+            "skeleton_baseline_rmse": null,
+            "pose_fidelity_delta": null,
+            "mirrored": false,
+            "frame": 0,
+            "warnings": [
+              "rest \uc2a4\uc719 \ucd5c\ub300 98.3\u00b0 (hand.L) > 15\u00b0 \u2014 \uc18c\uc2a4\uc640 \ud0c0\uae43\uc758 rest \uaddc\uaca9\uc774 \ub2e4\ub974\ub2e4(\ub7f0\ud0c0\uc784 \ubcf4\uc815\uc73c\ub85c \ud761\uc218\ub428)"
+            ],
+            "rest_swing_deg": {
+              "spine": 3.1907057723972945,
+              "spine1": 8.611188975734787,
+              "spine2": 5.06185820183351,
+              "neck": 4.013350508243193,
+              "head": 1.9108760710564017,
+              "shoulder.L": 40.845161637762615,
+              "upperarm.L": 3.0327374638604394,
+              "forearm.L": 1.8430251016176173,
+              "hand.L": 98.25097973074047,
+              "shoulder.R": 44.83537475248874,
+              "upperarm.R": 3.017724576261468,
+              "forearm.R": 1.8418566806551153,
+              "hand.R": 97.98240558755494,
+              "upleg.L": 20.421193963930627,
+              "leg.L": 20.120964463110464,
+              "foot.L": 27.5886100493806,
+              "toe.L": 4.831280695859293,
+              "upleg.R": 20.378277734481017,
+              "leg.R": 20.097864397592645,
+              "foot.R": 27.88161354817088,
+              "toe.R": 4.876845674485973
+            },
+            "rest_swing_max_deg": 98.25097973074047,
+            "rest_swing_bone": "hand.L",
+            "twist_deg": {},
+            "degenerate_bones": [],
+            "solver_mode_by_bone": {
+              "hips": "legacy_structural",
+              "spine": "legacy_structural",
+              "spine1": "legacy_structural",
+              "spine2": "legacy_structural",
+              "neck": "legacy_structural",
+              "head": "legacy_structural",
+              "shoulder.L": "legacy_structural",
+              "upperarm.L": "chain_transport",
+              "forearm.L": "chain_transport",
+              "hand.L": "terminal_follow_wrist_transfer",
+              "shoulder.R": "legacy_structural",
+              "upperarm.R": "chain_transport",
+              "forearm.R": "chain_transport",
+              "hand.R": "terminal_follow_wrist_transfer",
+              "upleg.L": "chain_transport_parent_coherent",
+              "leg.L": "chain_transport_parent_coherent",
+              "foot.L": "chain_transport_parent_coherent",
+              "toe.L": "terminal_follow",
+              "upleg.R": "chain_transport_parent_coherent",
+              "leg.R": "chain_transport_parent_coherent",
+              "foot.R": "chain_transport_parent_coherent",
+              "toe.R": "terminal_follow"
+            },
+            "chain_diagnostics": {
+              "_pelvis_boundary": {
+                "mode": "parent_coherent_projection",
+                "parent_variant": "CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY",
+                "parent_retarget_sha256": "692e975d32f41e3406144763c7c0b7dbf0a586ff07732f09c4365e3233b13693",
+                "hips_transport_rotation_deg": 143.30896389486807,
+                "hips_transport_determinant": 0.9999999403953552,
+                "hips_rotation_unchanged": true,
+                "root_translation_unchanged": true,
+                "bilateral_exact_v31_fallback": false,
+                "active_chains": [
+                  "leg.L",
+                  "leg.R"
+                ],
+                "fallback_chains": []
+              },
+              "arm.L": {
+                "kind": "arm",
+                "bones": [
+                  "upperarm.L",
+                  "forearm.L",
+                  "hand.L"
+                ],
+                "fallback": false,
+                "wrist_rest_compatibility_deg": 96.44188472345012,
+                "rest_direction_error_deg": [
+                  3.0326713665983926,
+                  1.8429189121305534
+                ],
+                "rest_direction_max_deg": 3.0326713665983926,
+                "activated": true,
+                "activation_reason": "rest direction or wrist frame mismatch",
+                "source_edge_lengths": [
+                  5.433011844500629,
+                  3.1593589531390047
+                ],
+                "target_edge_lengths": [
+                  0.2889158195975704,
+                  0.24769900734834122
+                ],
+                "source_bend_deg": 87.80001175600337,
+                "target_rest_bend_deg": 1.1972323269405243,
+                "target_rest_plane_used": false,
+                "incremental_min_rotation_deg": [
+                  62.98331358713444,
+                  87.1381643058749
+                ],
+                "applied_bones": [
+                  "upperarm.L",
+                  "forearm.L"
+                ],
+                "terminal_follow_bones": [
+                  "hand.L"
+                ],
+                "frame_determinants": [
+                  1.0,
+                  1.000000238418579
+                ],
+                "palm_roll": {
+                  "mode": "fallback",
+                  "fallback_reason": "source\uc640 target\uc5d0 \uacf5\ud1b5\uc778 index+pinky/index+thumb pair\uac00 \uc5c6\ub2e4",
+                  "frame_status": "landmark_pair_missing",
+                  "selected_mu": 0.0,
+                  "mesh_gate": "NOT_RUN_FALLBACK",
+                  "source_discovery": {
+                    "landmarks": {
+                      "index": "LeftHandIndex1"
+                    },
+                    "zero_base_candidates": {
+                      "index": [
+                        "LeftFingerBase"
+                      ],
+                      "pinky": [],
+                      "thumb": [
+                        "LThumb"
+                      ]
+                    },
+                    "uses_pose_geometry": false,
+                    "uses_tail_or_fingertip": false
+                  },
+                  "target_discovery": {
+                    "landmarks": {
+                      "index": "mixamorig:LeftHandIndex1",
+                      "pinky": "mixamorig:LeftHandPinky1",
+                      "thumb": "mixamorig:LeftHandThumb1"
+                    },
+                    "zero_base_candidates": {
+                      "index": [],
+                      "pinky": [],
+                      "thumb": []
+                    },
+                    "uses_pose_geometry": false,
+                    "uses_tail_or_fingertip": false
+                  },
+                  "wrist_transfer": {
+                    "applied_deg": 67.69946901533238,
+                    "mode": "forearm_relative_full",
+                    "forearm_twist_deg": -33.84974524046795
+                  }
+                }
+              },
+              "arm.R": {
+                "kind": "arm",
+                "bones": [
+                  "upperarm.R",
+                  "forearm.R",
+                  "hand.R"
+                ],
+                "fallback": false,
+                "wrist_rest_compatibility_deg": 95.61585197865918,
+                "rest_direction_error_deg": [
+                  3.017723256927529,
+                  1.8417504238240332
+                ],
+                "rest_direction_max_deg": 3.017723256927529,
+                "activated": true,
+                "activation_reason": "rest direction or wrist frame mismatch",
+                "source_edge_lengths": [
+                  5.341940233165466,
+                  3.193510410108512
+                ],
+                "target_edge_lengths": [
+                  0.28891193028906814,
+                  0.24769872877914723
+                ],
+                "source_bend_deg": 90.68188498048609,
+                "target_rest_bend_deg": 1.1765658795253542,
+                "target_rest_plane_used": false,
+                "incremental_min_rotation_deg": [
+                  140.49670809959997,
+                  91.52450307506832
+                ],
+                "applied_bones": [
+                  "upperarm.R",
+                  "forearm.R"
+                ],
+                "terminal_follow_bones": [
+                  "hand.R"
+                ],
+                "frame_determinants": [
+                  1.0000001192092896,
+                  1.0000003576278687
+                ],
+                "palm_roll": {
+                  "mode": "fallback",
+                  "fallback_reason": "source\uc640 target\uc5d0 \uacf5\ud1b5\uc778 index+pinky/index+thumb pair\uac00 \uc5c6\ub2e4",
+                  "frame_status": "landmark_pair_missing",
+                  "selected_mu": 0.0,
+                  "mesh_gate": "NOT_RUN_FALLBACK",
+                  "source_discovery": {
+                    "landmarks": {
+                      "index": "RightHandIndex1"
+                    },
+                    "zero_base_candidates": {
+                      "index": [
+                        "RightFingerBase"
+                      ],
+                      "pinky": [],
+                      "thumb": [
+                        "RThumb"
+                      ]
+                    },
+                    "uses_pose_geometry": false,
+                    "uses_tail_or_fingertip": false
+                  },
+                  "target_discovery": {
+                    "landmarks": {
+                      "index": "mixamorig:RightHandIndex1",
+                      "pinky": "mixamorig:RightHandPinky1",
+                      "thumb": "mixamorig:RightHandThumb1"
+                    },
+                    "zero_base_candidates": {
+                      "index": [],
+                      "pinky": [],
+                      "thumb": []
+                    },
+                    "uses_pose_geometry": false,
+                    "uses_tail_or_fingertip": false
+                  },
+                  "wrist_transfer": {
+                    "applied_deg": 12.038989615033794,
+                    "mode": "forearm_relative_full",
+                    "forearm_twist_deg": 6.019495068064024
+                  }
+                }
+              },
+              "leg.L": {
+                "kind": "leg",
+                "bones": [
+                  "upleg.L",
+                  "leg.L",
+                  "foot.L",
+                  "toe.L"
+                ],
+                "fallback": false,
+                "rest_direction_error_deg": [
+                  20.421184629141276,
+                  20.12094462475258,
+                  27.58862116814669
+                ],
+                "rest_direction_max_deg": 27.58862116814669,
+                "activated": true,
+                "activation_reason": "rest direction mismatch",
+                "source_edge_lengths": [
+                  7.127960053449914,
+                  7.58108477259107,
+                  2.1736481515804367
+                ],
+                "target_edge_lengths": [
+                  0.44916667249565073,
+                  0.4137820020640187,
+                  0.15790176663467745
+                ],
+                "source_bend_deg": 78.96562891009197,
+                "target_rest_bend_deg": 0.824375310068327,
+                "source_ankle_bend_deg": 86.96416935308591,
+                "target_rest_ankle_bend_deg": 55.451694326631035,
+                "target_rest_plane_used": false,
+                "foot_direction_solved": true,
+                "parent_coherent_available": true,
+                "parent_predicted_thigh_mismatch_deg": 88.78995788793029,
+                "v31_incremental_min_rotation_deg": [
+                  69.43356324910495,
+                  78.22968575069142
+                ],
+                "parent_coherent_incremental_min_rotation_deg": [
+                  88.78995788793029,
+                  79.78958270974452
+                ],
+                "v31_boundary_correction_deg": 150.7663073593137,
+                "v31_boundary_correction_twist_deg": -150.76631120282465,
+                "v31_boundary_correction_non_twist_residual_deg": 3.843510938850159e-06,
+                "parent_coherent_thigh_direction_error_deg": 0.0,
+                "v31_ankle_transport": {
+                  "schema_version": 1,
+                  "selector": "spherical_soft_cap",
+                  "profile_requested": "cmu_bvh",
+                  "policy_source": "profile_override",
+                  "soft_cap_deg": null,
+                  "hard_deg": 120.0,
+                  "global_hard_deg": 120.0,
+                  "sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+                  "selected_mu": 0.0,
+                  "applied_deg": 0.0,
+                  "residual_direction_deg": 139.66138838093258,
+                  "reason": "frozen_v3_hard_guard",
+                  "formula_applied_deg": 0.0
+                },
+                "parent_coherent_ankle_transport": {
+                  "schema_version": 1,
+                  "selector": "spherical_soft_cap",
+                  "profile_requested": "cmu_bvh",
+                  "policy_source": "profile_override",
+                  "soft_cap_deg": null,
+                  "hard_deg": 120.0,
+                  "global_hard_deg": 120.0,
+                  "sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+                  "selected_mu": 1.0,
+                  "applied_deg": 33.87951593599332,
+                  "residual_direction_deg": 0.0,
+                  "reason": "frozen_v3_profile",
+                  "formula_applied_deg": 33.87951231046915
+                },
+                "parent_coherent_applied": true,
+                "bilateral_exact_v31_fallback": false,
+                "incremental_min_rotation_deg": [
+                  88.78995788793029,
+                  79.78958270974452
+                ],
+                "foot_incremental_min_rotation_deg": 33.87951231046915,
+                "ankle_transport": {
+                  "schema_version": 1,
+                  "selector": "spherical_soft_cap",
+                  "profile_requested": "cmu_bvh",
+                  "policy_source": "profile_override",
+                  "soft_cap_deg": null,
+                  "hard_deg": 120.0,
+                  "global_hard_deg": 120.0,
+                  "sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+                  "selected_mu": 1.0,
+                  "applied_deg": 33.87951593599332,
+                  "residual_direction_deg": 0.0,
+                  "reason": "frozen_v3_profile",
+                  "formula_applied_deg": 33.87951231046915
+                },
+                "foot_direction_partially_solved": false,
+                "foot_transport_reason": "frozen_v3_profile",
+                "post_boundary_residual_to_parent_coherent_deg": 0.0,
+                "applied_bones": [
+                  "upleg.L",
+                  "leg.L",
+                  "foot.L"
+                ],
+                "terminal_follow_bones": [
+                  "toe.L"
+                ],
+                "frame_determinants": [
+                  1.0000001192092896,
+                  1.0000001192092896,
+                  1.0000001192092896
+                ]
+              },
+              "leg.R": {
+                "kind": "leg",
+                "bones": [
+                  "upleg.R",
+                  "leg.R",
+                  "foot.R",
+                  "toe.R"
+                ],
+                "fallback": false,
+                "rest_direction_error_deg": [
+                  20.378268294522517,
+                  20.097854461269595,
+                  27.881605617859737
+                ],
+                "rest_direction_max_deg": 27.881605617859737,
+                "activated": true,
+                "activation_reason": "rest direction mismatch",
+                "source_edge_lengths": [
+                  7.3300673913915215,
+                  7.6492648899703815,
+                  2.204933291120416
+                ],
+                "target_edge_lengths": [
+                  0.4490417647328698,
+                  0.4137205845599154,
+                  0.1558662017129248
+                ],
+                "source_bend_deg": 52.18713007250294,
+                "target_rest_bend_deg": 0.7388627979303675,
+                "source_ankle_bend_deg": 105.84249984091109,
+                "target_rest_ankle_bend_deg": 54.66779919725756,
+                "target_rest_plane_used": false,
+                "foot_direction_solved": true,
+                "parent_coherent_available": true,
+                "parent_predicted_thigh_mismatch_deg": 10.703318531553876,
+                "v31_incremental_min_rotation_deg": [
+                  29.770184756369034,
+                  51.58423750195224
+                ],
+                "parent_coherent_incremental_min_rotation_deg": [
+                  10.703318531553876,
+                  52.925475436921225
+                ],
+                "v31_boundary_correction_deg": 143.951343322072,
+                "v31_boundary_correction_twist_deg": -143.9513429837611,
+                "v31_boundary_correction_non_twist_residual_deg": 3.383109117294225e-07,
+                "parent_coherent_thigh_direction_error_deg": 0.019782341029446364,
+                "v31_ankle_transport": {
+                  "schema_version": 1,
+                  "selector": "spherical_soft_cap",
+                  "profile_requested": "cmu_bvh",
+                  "policy_source": "profile_override",
+                  "soft_cap_deg": null,
+                  "hard_deg": 120.0,
+                  "global_hard_deg": 120.0,
+                  "sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+                  "selected_mu": 1.0,
+                  "applied_deg": 105.76712679878916,
+                  "residual_direction_deg": 0.0,
+                  "reason": "frozen_v3_profile",
+                  "formula_applied_deg": 105.76711697655423
+                },
+                "parent_coherent_ankle_transport": {
+                  "schema_version": 1,
+                  "selector": "spherical_soft_cap",
+                  "profile_requested": "cmu_bvh",
+                  "policy_source": "profile_override",
+                  "soft_cap_deg": null,
+                  "hard_deg": 120.0,
+                  "global_hard_deg": 120.0,
+                  "sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+                  "selected_mu": 1.0,
+                  "applied_deg": 67.09771837645054,
+                  "residual_direction_deg": 1.9578634748995682e-06,
+                  "reason": "frozen_v3_profile",
+                  "formula_applied_deg": 67.09772033431402
+                },
+                "parent_coherent_applied": true,
+                "bilateral_exact_v31_fallback": false,
+                "incremental_min_rotation_deg": [
+                  10.703318531553876,
+                  52.925475436921225
+                ],
+                "foot_incremental_min_rotation_deg": 67.09772033431402,
+                "ankle_transport": {
+                  "schema_version": 1,
+                  "selector": "spherical_soft_cap",
+                  "profile_requested": "cmu_bvh",
+                  "policy_source": "profile_override",
+                  "soft_cap_deg": null,
+                  "hard_deg": 120.0,
+                  "global_hard_deg": 120.0,
+                  "sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+                  "selected_mu": 1.0,
+                  "applied_deg": 67.09771837645054,
+                  "residual_direction_deg": 1.9578634748995682e-06,
+                  "reason": "frozen_v3_profile",
+                  "formula_applied_deg": 67.09772033431402
+                },
+                "foot_direction_partially_solved": false,
+                "foot_transport_reason": "frozen_v3_profile",
+                "post_boundary_residual_to_parent_coherent_deg": 0.0,
+                "applied_bones": [
+                  "upleg.R",
+                  "leg.R",
+                  "foot.R"
+                ],
+                "terminal_follow_bones": [
+                  "toe.R"
+                ],
+                "frame_determinants": [
+                  1.0,
+                  1.0000001192092896,
+                  1.000000238418579
+                ]
+              },
+              "_palm_roll": {
+                "variant": "CHAIN_TRANSPORT_V3_2_1_PALM_ROLL_QA",
+                "parent_variant": "CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY",
+                "parent_retarget_sha256": "692e975d32f41e3406144763c7c0b7dbf0a586ff07732f09c4365e3233b13693",
+                "policy_sha256": "46da74c83a9dd63bc03d11fc4e6ccbd104f8fc1ec084b2a7a1c8613f5a93bb95",
+                "requested_mu": {
+                  "hand.L": 0.5,
+                  "hand.R": 0.5
+                },
+                "default_is_exact_parent": false,
+                "operational_status": "PROMOTED_RUNTIME",
+                "actual_mesh_gate": "V3.2.5_SELECTOR",
+                "hands": {
+                  "hand.L": {
+                    "mode": "fallback",
+                    "fallback_reason": "source\uc640 target\uc5d0 \uacf5\ud1b5\uc778 index+pinky/index+thumb pair\uac00 \uc5c6\ub2e4",
+                    "frame_status": "landmark_pair_missing",
+                    "selected_mu": 0.0,
+                    "mesh_gate": "NOT_RUN_FALLBACK",
+                    "source_discovery": {
+                      "landmarks": {
+                        "index": "LeftHandIndex1"
+                      },
+                      "zero_base_candidates": {
+                        "index": [
+                          "LeftFingerBase"
+                        ],
+                        "pinky": [],
+                        "thumb": [
+                          "LThumb"
+                        ]
+                      },
+                      "uses_pose_geometry": false,
+                      "uses_tail_or_fingertip": false
+                    },
+                    "target_discovery": {
+                      "landmarks": {
+                        "index": "mixamorig:LeftHandIndex1",
+                        "pinky": "mixamorig:LeftHandPinky1",
+                        "thumb": "mixamorig:LeftHandThumb1"
+                      },
+                      "zero_base_candidates": {
+                        "index": [],
+                        "pinky": [],
+                        "thumb": []
+                      },
+                      "uses_pose_geometry": false,
+                      "uses_tail_or_fingertip": false
+                    },
+                    "wrist_transfer": {
+                      "applied_deg": 67.69946901533238,
+                      "mode": "forearm_relative_full",
+                      "forearm_twist_deg": -33.84974524046795
+                    }
+                  },
+                  "hand.R": {
+                    "mode": "fallback",
+                    "fallback_reason": "source\uc640 target\uc5d0 \uacf5\ud1b5\uc778 index+pinky/index+thumb pair\uac00 \uc5c6\ub2e4",
+                    "frame_status": "landmark_pair_missing",
+                    "selected_mu": 0.0,
+                    "mesh_gate": "NOT_RUN_FALLBACK",
+                    "source_discovery": {
+                      "landmarks": {
+                        "index": "RightHandIndex1"
+                      },
+                      "zero_base_candidates": {
+                        "index": [
+                          "RightFingerBase"
+                        ],
+                        "pinky": [],
+                        "thumb": [
+                          "RThumb"
+                        ]
+                      },
+                      "uses_pose_geometry": false,
+                      "uses_tail_or_fingertip": false
+                    },
+                    "target_discovery": {
+                      "landmarks": {
+                        "index": "mixamorig:RightHandIndex1",
+                        "pinky": "mixamorig:RightHandPinky1",
+                        "thumb": "mixamorig:RightHandThumb1"
+                      },
+                      "zero_base_candidates": {
+                        "index": [],
+                        "pinky": [],
+                        "thumb": []
+                      },
+                      "uses_pose_geometry": false,
+                      "uses_tail_or_fingertip": false
+                    },
+                    "wrist_transfer": {
+                      "applied_deg": 12.038989615033794,
+                      "mode": "forearm_relative_full",
+                      "forearm_twist_deg": 6.019495068064024
+                    }
+                  }
+                }
+              }
+            },
+            "chain_fallbacks": [],
+            "terminal_follow_bones": [
+              "hand.L",
+              "hand.R",
+              "toe.L",
+              "toe.R"
+            ],
+            "palm_roll_requested_deg": {
+              "hand.L": 0.0,
+              "hand.R": 0.0
+            },
+            "palm_roll_applied_deg": {
+              "hand.L": 0.0,
+              "hand.R": 0.0
+            },
+            "palm_roll_mu": {
+              "hand.L": 0.0,
+              "hand.R": 0.0
+            },
+            "palm_landmark_roles": {},
+            "palm_plane_sin": {},
+            "palm_frame_status": {
+              "hand.L": "landmark_pair_missing",
+              "hand.R": "landmark_pair_missing"
+            },
+            "palm_roll_mode": {
+              "hand.L": "fallback",
+              "hand.R": "fallback"
+            },
+            "wrist_transfer": {
+              "hand.L": 67.69946901533238,
+              "hand.R": 12.038989615033794
+            },
+            "palm_fallback_reason": {
+              "hand.L": "source\uc640 target\uc5d0 \uacf5\ud1b5\uc778 index+pinky/index+thumb pair\uac00 \uc5c6\ub2e4",
+              "hand.R": "source\uc640 target\uc5d0 \uacf5\ud1b5\uc778 index+pinky/index+thumb pair\uac00 \uc5c6\ub2e4"
+            },
+            "palm_roll_bones": [],
+            "palm_roll_fallback_bones": [
+              "hand.L",
+              "hand.R"
+            ],
+            "local_normalization_surface_error": 6.420589215849759e-07,
+            "max_joint_edge_length_error": 1.816664080278585e-07,
+            "camera": {
+              "version": "personal-camera/1",
+              "applied": false,
+              "maxRigidSurfaceError": 0.0
+            }
+          },
+          "file": "model-0-pose-1.fbx",
+          "cachedSeconds": 0.050282874988624826
+        }
+      ],
+      "registration": {
+        "normalizedFormat": "fbx",
+        "normalizedHash": "a778b2856383a49343e83718dfc18587d05c2abde27180bfa5001c8e4d360d6f",
+        "archiveHash": "8eaaabb98155da4bd7dbc23478f91efcb9a0eca01c195247b2d0fb8f5e42f00d",
+        "validation": {
+          "passed": true,
+          "meshCount": 1,
+          "originalBoneCount": 53,
+          "vertexCount": 24988,
+          "maxSurfaceError": 5.101335887047753e-07,
+          "maxSkinProbeError": 7.601418019476114e-07,
+          "maxMaterialRegionError": 5.101335887047753e-07,
+          "materialCount": 1,
+          "tolerance": 1.780109771384568e-05,
+          "fkProbes": {
+            "forearm.L": {
+              "joint": "forearm.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1088190872464659
+            },
+            "forearm.R": {
+              "joint": "forearm.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.10896417965076514
+            },
+            "leg.L": {
+              "joint": "leg.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.13425406683096436
+            },
+            "leg.R": {
+              "joint": "leg.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1342576162504657
+            },
+            "spine": {
+              "joint": "spine",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1684601450844222
+            }
+          },
+          "blenderVersion": "5.2.0 LTS",
+          "materialPreservation": {
+            "passed": true,
+            "materialCount": 1,
+            "maxDiffuseError": 0.0,
+            "maxSpecularError": 0.0,
+            "maxShininessError": 2.288818308215923e-07,
+            "maxOpacityError": 0.0
+          }
+        },
+        "versions": {
+          "importerVersion": "personal-import/3",
+          "normalizationVersion": "personal-normalize/5",
+          "rigMappingVersion": "personal-rig/2",
+          "converterVersion": "personal-converter/5",
+          "converterFingerprint": "27ac6ab4e5b10d55c83cbf900b3c7c79047f037d8f1610339f298246aa94aba8"
+        },
+        "capabilities": {
+          "supportLevel": "body_only",
+          "bodyPose": true,
+          "hands": {
+            "left": {
+              "supported": false,
+              "fingerBones": 15,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            },
+            "right": {
+              "supported": false,
+              "fingerBones": 15,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            }
+          },
+          "collisionPrevention": false,
+          "shapeSliders": false
+        }
+      },
+      "sourceGeometry": {
+        "container": "SQLite3",
+        "catalogVersion": 2,
+        "declaredPlainBytes": 1601396,
+        "decoderAvailable": true,
+        "decoderVersion": "cs3c-catalog2/1",
+        "expandedBytes": 3574394,
+        "tableStreamSha256": "608dae40b92166479127d09b35849970a3ea0dc08301232197ea04d8254f74fa",
+        "hierarchyNodes": 53,
+        "meshes": 1,
+        "vertices": 24988,
+        "materials": [
+          {
+            "name": "Pilot neutral clay",
+            "ambient": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "diffuse": [
+              0.47999998927116394,
+              0.5299999713897705,
+              0.5899999737739563
+            ],
+            "specular": [
+              0.11999999731779099,
+              0.13249999284744263,
+              0.14749999344348907
+            ],
+            "emission": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "opacity": 1.0,
+            "shininess": 10.239999771118164
+          }
+        ],
+        "materialSupport": "source_solid_diffuse_specular_shininess_and_face_assignment",
+        "sourceShadingMatchToCSP": "unverified",
+        "maxInverseBindError": 9.414691248821327e-14,
+        "maxSourceRestSkinError": 2.501595091508979e-05,
+        "sourceAxisUp": "Y",
+        "sourceUnits": "unconfirmed",
+        "internalDisplayScale": 0.01,
+        "originalWeightsRenormalized": false,
+        "maxBlenderRestMatrixErrorSourceUnits": 1.3939711556498757e-05,
+        "maxOriginalFKProbeError": 5.666405482354816e-07,
+        "originalFKProbeCount": 5
+      },
+      "sourceMaterials": [
+        {
+          "name": "Pilot neutral clay",
+          "ambient": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "diffuse": [
+            0.47999998927116394,
+            0.5299999713897705,
+            0.5899999737739563
+          ],
+          "specular": [
+            0.11999999731779099,
+            0.13249999284744263,
+            0.14749999344348907
+          ],
+          "emission": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "opacity": 1.0,
+          "shininess": 10.239999771118164
+        }
+      ]
+    },
+    {
+      "inputName": "standin-male-0.7.6-arm-raised-review.cs3c",
+      "sourceHash": "276c0d3506e6d446ffd61392184a93def99624cfd063448b89f2a48ddaea859b",
+      "registrationSeconds": 9.167248540994478,
+      "registrationEvent": "result",
+      "poses": [
+        {
+          "poseName": "03-staging-selected-pose.bvh",
+          "poseHash": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+          "event": "result",
+          "seconds": 3.9107158749829978,
+          "snapshotHash": "e3a175f09bc0b372c41b22d45bb0a9cb2ef195b357b647d6822ad3202db2faf2",
+          "artifactHash": "0bc4d28862f42a4efce7c4ac3cf69a6394895a87157af5858d6c5c373e554b33",
+          "validation": {
+            "passed": true,
+            "meshCount": 1,
+            "originalBoneCount": 66,
+            "vertexCount": 24988,
+            "maxSurfaceError": 7.588719199702609e-07,
+            "maxSkinProbeError": 8.765126153775782e-07,
+            "maxMaterialRegionError": 7.588719199702609e-07,
+            "materialCount": 1,
+            "tolerance": 1.7444062930276232e-05,
+            "fkProbes": {
+              "forearm.L": {
+                "joint": "forearm.L",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.10876463535284306
+              },
+              "forearm.R": {
+                "joint": "forearm.R",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.1089407657011523
+              },
+              "leg.L": {
+                "joint": "leg.L",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.12953315171815846
+              },
+              "leg.R": {
+                "joint": "leg.R",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.12953383322654813
+              },
+              "spine": {
+                "joint": "spine",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.1619044103071455
+              }
+            },
+            "blenderVersion": "5.2.0 LTS",
+            "materialPreservation": {
+              "passed": true,
+              "materialCount": 1,
+              "maxDiffuseError": 0.0,
+              "maxSpecularError": 0.0,
+              "maxShininessError": 2.288818308215923e-07,
+              "maxOpacityError": 0.0
+            }
+          },
+          "retarget": {
+            "ok": true,
+            "output_mode": "",
+            "src_profile": "mixamo_noprefix",
+            "dst_profile": "mixamo",
+            "mapped_bones": 22,
+            "missing_required": [],
+            "unmapped_optional": [],
+            "max_joint_angle_deg": 164.8875557721428,
+            "pose_fidelity_rmse": null,
+            "skeleton_baseline_rmse": null,
+            "pose_fidelity_delta": null,
+            "mirrored": false,
+            "frame": 0,
+            "warnings": [
+              "rest \uc2a4\uc719 \ucd5c\ub300 39.8\u00b0 (shoulder.R) > 15\u00b0 \u2014 \uc18c\uc2a4\uc640 \ud0c0\uae43\uc758 rest \uaddc\uaca9\uc774 \ub2e4\ub974\ub2e4(\ub7f0\ud0c0\uc784 \ubcf4\uc815\uc73c\ub85c \ud761\uc218\ub428)"
+            ],
+            "rest_swing_deg": {
+              "spine": 12.100935507509382,
+              "spine1": 3.2364653735378526,
+              "spine2": 22.820122748477186,
+              "neck": 10.888169511234597,
+              "head": 1.8633329895970916,
+              "shoulder.L": 39.715287914408584,
+              "upperarm.L": 3.3075328602151384,
+              "forearm.L": 2.025101460944317,
+              "hand.L": 8.789675932788498,
+              "shoulder.R": 39.83831838650831,
+              "upperarm.R": 3.25241394615083,
+              "forearm.R": 2.0320734562608935,
+              "hand.R": 8.01148104372282,
+              "upleg.L": 2.6989463043910895,
+              "leg.L": 2.3017363135677296,
+              "foot.L": 7.669003655400447,
+              "toe.L": 4.831277777689796,
+              "upleg.R": 2.388533172324868,
+              "leg.R": 2.5238654959638986,
+              "foot.R": 8.170140388354346,
+              "toe.R": 4.876843003411022
+            },
+            "rest_swing_max_deg": 39.83831838650831,
+            "rest_swing_bone": "shoulder.R",
+            "twist_deg": {},
+            "degenerate_bones": [],
+            "solver_mode_by_bone": {
+              "hips": "legacy_structural",
+              "spine": "legacy_structural",
+              "spine1": "legacy_structural",
+              "spine2": "legacy_structural",
+              "neck": "legacy_structural",
+              "head": "legacy_structural",
+              "shoulder.L": "legacy_structural",
+              "upperarm.L": "legacy_compatible_chain",
+              "forearm.L": "legacy_compatible_chain",
+              "hand.L": "legacy_compatible_chain",
+              "shoulder.R": "legacy_structural",
+              "upperarm.R": "legacy_compatible_chain",
+              "forearm.R": "legacy_compatible_chain",
+              "hand.R": "legacy_compatible_chain",
+              "upleg.L": "legacy_compatible_chain",
+              "leg.L": "legacy_compatible_chain",
+              "foot.L": "legacy_compatible_chain",
+              "toe.L": "legacy_compatible_chain",
+              "upleg.R": "legacy_compatible_chain",
+              "leg.R": "legacy_compatible_chain",
+              "foot.R": "legacy_compatible_chain",
+              "toe.R": "legacy_compatible_chain"
+            },
+            "chain_diagnostics": {
+              "_pelvis_boundary": {
+                "mode": "parent_coherent_projection",
+                "parent_variant": "CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY",
+                "parent_retarget_sha256": "692e975d32f41e3406144763c7c0b7dbf0a586ff07732f09c4365e3233b13693",
+                "hips_transport_rotation_deg": 0.0,
+                "hips_transport_determinant": 1.0,
+                "hips_rotation_unchanged": true,
+                "root_translation_unchanged": true,
+                "bilateral_exact_v31_fallback": false,
+                "active_chains": [],
+                "fallback_chains": []
+              },
+              "arm.L": {
+                "kind": "arm",
+                "bones": [
+                  "upperarm.L",
+                  "forearm.L",
+                  "hand.L"
+                ],
+                "fallback": false,
+                "wrist_rest_compatibility_deg": 6.854396774178638,
+                "rest_direction_error_deg": [
+                  3.3074695355721953,
+                  2.0251090613532043
+                ],
+                "rest_direction_max_deg": 3.3074695355721953,
+                "activated": false,
+                "activation_reason": "rest direction/wrist frame already compatible"
+              },
+              "arm.R": {
+                "kind": "arm",
+                "bones": [
+                  "upperarm.R",
+                  "forearm.R",
+                  "hand.R"
+                ],
+                "fallback": false,
+                "wrist_rest_compatibility_deg": 6.3773683823134535,
+                "rest_direction_error_deg": [
+                  3.252412352845386,
+                  2.03197711015051
+                ],
+                "rest_direction_max_deg": 3.252412352845386,
+                "activated": false,
+                "activation_reason": "rest direction/wrist frame already compatible"
+              },
+              "leg.L": {
+                "kind": "leg",
+                "bones": [
+                  "upleg.L",
+                  "leg.L",
+                  "foot.L",
+                  "toe.L"
+                ],
+                "fallback": false,
+                "rest_direction_error_deg": [
+                  2.698801188276648,
+                  2.3016506148266713,
+                  7.668926882597014
+                ],
+                "rest_direction_max_deg": 7.668926882597014,
+                "activated": false,
+                "activation_reason": "rest directions already compatible"
+              },
+              "leg.R": {
+                "kind": "leg",
+                "bones": [
+                  "upleg.R",
+                  "leg.R",
+                  "foot.R",
+                  "toe.R"
+                ],
+                "fallback": false,
+                "rest_direction_error_deg": [
+                  2.3884512151702633,
+                  2.5238654959638986,
+                  8.170068295571314
+                ],
+                "rest_direction_max_deg": 8.170068295571314,
+                "activated": false,
+                "activation_reason": "rest directions already compatible"
+              },
+              "_palm_roll": {
+                "variant": "CHAIN_TRANSPORT_V3_2_1_PALM_ROLL_QA",
+                "parent_variant": "CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY",
+                "parent_retarget_sha256": "692e975d32f41e3406144763c7c0b7dbf0a586ff07732f09c4365e3233b13693",
+                "policy_sha256": "46da74c83a9dd63bc03d11fc4e6ccbd104f8fc1ec084b2a7a1c8613f5a93bb95",
+                "requested_mu": {
+                  "hand.L": 0.5,
+                  "hand.R": 0.5
+                },
+                "default_is_exact_parent": false,
+                "operational_status": "PROMOTED_RUNTIME",
+                "actual_mesh_gate": "V3.2.5_SELECTOR",
+                "hands": {
+                  "hand.L": {
+                    "mode": "identity",
+                    "frame_status": "inactive_compatible_chain",
+                    "selected_mu": 0.0,
+                    "mesh_gate": "NOT_NEEDED_COMPATIBLE_CHAIN"
+                  },
+                  "hand.R": {
+                    "mode": "identity",
+                    "frame_status": "inactive_compatible_chain",
+                    "selected_mu": 0.0,
+                    "mesh_gate": "NOT_NEEDED_COMPATIBLE_CHAIN"
+                  }
+                }
+              }
+            },
+            "chain_fallbacks": [],
+            "terminal_follow_bones": [],
+            "palm_roll_requested_deg": {
+              "hand.L": 0.0,
+              "hand.R": 0.0
+            },
+            "palm_roll_applied_deg": {
+              "hand.L": 0.0,
+              "hand.R": 0.0
+            },
+            "palm_roll_mu": {
+              "hand.L": 0.0,
+              "hand.R": 0.0
+            },
+            "palm_landmark_roles": {},
+            "palm_plane_sin": {},
+            "palm_frame_status": {
+              "hand.L": "inactive_compatible_chain",
+              "hand.R": "inactive_compatible_chain"
+            },
+            "palm_roll_mode": {
+              "hand.L": "identity",
+              "hand.R": "identity"
+            },
+            "wrist_transfer": {},
+            "palm_fallback_reason": {
+              "hand.L": null,
+              "hand.R": null
+            },
+            "palm_roll_bones": [],
+            "palm_roll_fallback_bones": [],
+            "local_normalization_surface_error": 6.420589215849759e-07,
+            "max_joint_edge_length_error": 2.3259386294771645e-07,
+            "camera": {
+              "version": "personal-camera/1",
+              "applied": false,
+              "maxRigidSurfaceError": 0.0
+            }
+          },
+          "file": "model-1-pose-0.fbx",
+          "cachedSeconds": 0.050668542011408135
+        },
+        {
+          "poseName": "cmu_135_01_04368.bvh",
+          "poseHash": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+          "event": "result",
+          "seconds": 3.7868163749808446,
+          "snapshotHash": "14e466397d4d8c215eefee27705104d783b36b7070bfc78958f347b83ae407ca",
+          "artifactHash": "e1c2b67937e646dac60d74e624fcad0a0dd2bc2066aeab2260520de043340ece",
+          "validation": {
+            "passed": true,
+            "meshCount": 1,
+            "originalBoneCount": 66,
+            "vertexCount": 24988,
+            "maxSurfaceError": 8.689598871569615e-07,
+            "maxSkinProbeError": 9.702932857180713e-07,
+            "maxMaterialRegionError": 8.689135029271711e-07,
+            "materialCount": 1,
+            "tolerance": 1.7756132018480384e-05,
+            "fkProbes": {
+              "forearm.L": {
+                "joint": "forearm.L",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.10877168465902481
+              },
+              "forearm.R": {
+                "joint": "forearm.R",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.10896001008268852
+              },
+              "leg.L": {
+                "joint": "leg.L",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.1298630121431651
+              },
+              "leg.R": {
+                "joint": "leg.R",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.12857908758643313
+              },
+              "spine": {
+                "joint": "spine",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.1888558567590011
+              }
+            },
+            "blenderVersion": "5.2.0 LTS",
+            "materialPreservation": {
+              "passed": true,
+              "materialCount": 1,
+              "maxDiffuseError": 0.0,
+              "maxSpecularError": 0.0,
+              "maxShininessError": 2.288818308215923e-07,
+              "maxOpacityError": 0.0
+            }
+          },
+          "retarget": {
+            "ok": true,
+            "output_mode": "",
+            "src_profile": "cmu_bvh",
+            "dst_profile": "mixamo",
+            "mapped_bones": 22,
+            "missing_required": [],
+            "unmapped_optional": [],
+            "max_joint_angle_deg": 175.59510673018838,
+            "pose_fidelity_rmse": null,
+            "skeleton_baseline_rmse": null,
+            "pose_fidelity_delta": null,
+            "mirrored": false,
+            "frame": 0,
+            "warnings": [
+              "rest \uc2a4\uc719 \ucd5c\ub300 98.3\u00b0 (hand.L) > 15\u00b0 \u2014 \uc18c\uc2a4\uc640 \ud0c0\uae43\uc758 rest \uaddc\uaca9\uc774 \ub2e4\ub974\ub2e4(\ub7f0\ud0c0\uc784 \ubcf4\uc815\uc73c\ub85c \ud761\uc218\ub428)"
+            ],
+            "rest_swing_deg": {
+              "spine": 3.1907057723972945,
+              "spine1": 8.611188975734787,
+              "spine2": 5.06185820183351,
+              "neck": 4.013350508243193,
+              "head": 1.9108760710564017,
+              "shoulder.L": 40.845161637762615,
+              "upperarm.L": 3.0327374638604394,
+              "forearm.L": 1.8430251016176173,
+              "hand.L": 98.25097973074047,
+              "shoulder.R": 44.83537475248874,
+              "upperarm.R": 3.017724576261468,
+              "forearm.R": 1.8418566806551153,
+              "hand.R": 97.98240558755494,
+              "upleg.L": 20.421193963930627,
+              "leg.L": 20.120964463110464,
+              "foot.L": 27.5886100493806,
+              "toe.L": 4.831280695859293,
+              "upleg.R": 20.378277734481017,
+              "leg.R": 20.097864397592645,
+              "foot.R": 27.88161354817088,
+              "toe.R": 4.876845674485973
+            },
+            "rest_swing_max_deg": 98.25097973074047,
+            "rest_swing_bone": "hand.L",
+            "twist_deg": {},
+            "degenerate_bones": [],
+            "solver_mode_by_bone": {
+              "hips": "legacy_structural",
+              "spine": "legacy_structural",
+              "spine1": "legacy_structural",
+              "spine2": "legacy_structural",
+              "neck": "legacy_structural",
+              "head": "legacy_structural",
+              "shoulder.L": "legacy_structural",
+              "upperarm.L": "chain_transport",
+              "forearm.L": "chain_transport",
+              "hand.L": "terminal_follow_wrist_transfer",
+              "shoulder.R": "legacy_structural",
+              "upperarm.R": "chain_transport",
+              "forearm.R": "chain_transport",
+              "hand.R": "terminal_follow_wrist_transfer",
+              "upleg.L": "chain_transport_parent_coherent",
+              "leg.L": "chain_transport_parent_coherent",
+              "foot.L": "chain_transport_parent_coherent",
+              "toe.L": "terminal_follow",
+              "upleg.R": "chain_transport_parent_coherent",
+              "leg.R": "chain_transport_parent_coherent",
+              "foot.R": "chain_transport_parent_coherent",
+              "toe.R": "terminal_follow"
+            },
+            "chain_diagnostics": {
+              "_pelvis_boundary": {
+                "mode": "parent_coherent_projection",
+                "parent_variant": "CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY",
+                "parent_retarget_sha256": "692e975d32f41e3406144763c7c0b7dbf0a586ff07732f09c4365e3233b13693",
+                "hips_transport_rotation_deg": 143.30896389486807,
+                "hips_transport_determinant": 0.9999999403953552,
+                "hips_rotation_unchanged": true,
+                "root_translation_unchanged": true,
+                "bilateral_exact_v31_fallback": false,
+                "active_chains": [
+                  "leg.L",
+                  "leg.R"
+                ],
+                "fallback_chains": []
+              },
+              "arm.L": {
+                "kind": "arm",
+                "bones": [
+                  "upperarm.L",
+                  "forearm.L",
+                  "hand.L"
+                ],
+                "fallback": false,
+                "wrist_rest_compatibility_deg": 96.44188472345012,
+                "rest_direction_error_deg": [
+                  3.0326713665983926,
+                  1.8429189121305534
+                ],
+                "rest_direction_max_deg": 3.0326713665983926,
+                "activated": true,
+                "activation_reason": "rest direction or wrist frame mismatch",
+                "source_edge_lengths": [
+                  5.433011844500629,
+                  3.1593589531390047
+                ],
+                "target_edge_lengths": [
+                  0.2889158195975704,
+                  0.24769900734834122
+                ],
+                "source_bend_deg": 87.80001175600337,
+                "target_rest_bend_deg": 1.1972323269405243,
+                "target_rest_plane_used": false,
+                "incremental_min_rotation_deg": [
+                  62.98331358713444,
+                  87.1381643058749
+                ],
+                "applied_bones": [
+                  "upperarm.L",
+                  "forearm.L"
+                ],
+                "terminal_follow_bones": [
+                  "hand.L"
+                ],
+                "frame_determinants": [
+                  1.0,
+                  1.000000238418579
+                ],
+                "palm_roll": {
+                  "mode": "fallback",
+                  "fallback_reason": "source\uc640 target\uc5d0 \uacf5\ud1b5\uc778 index+pinky/index+thumb pair\uac00 \uc5c6\ub2e4",
+                  "frame_status": "landmark_pair_missing",
+                  "selected_mu": 0.0,
+                  "mesh_gate": "NOT_RUN_FALLBACK",
+                  "source_discovery": {
+                    "landmarks": {
+                      "index": "LeftHandIndex1"
+                    },
+                    "zero_base_candidates": {
+                      "index": [
+                        "LeftFingerBase"
+                      ],
+                      "pinky": [],
+                      "thumb": [
+                        "LThumb"
+                      ]
+                    },
+                    "uses_pose_geometry": false,
+                    "uses_tail_or_fingertip": false
+                  },
+                  "target_discovery": {
+                    "landmarks": {
+                      "index": "mixamorig:LeftHandIndex1",
+                      "pinky": "mixamorig:LeftHandPinky1",
+                      "thumb": "mixamorig:LeftHandThumb1"
+                    },
+                    "zero_base_candidates": {
+                      "index": [],
+                      "pinky": [],
+                      "thumb": []
+                    },
+                    "uses_pose_geometry": false,
+                    "uses_tail_or_fingertip": false
+                  },
+                  "wrist_transfer": {
+                    "applied_deg": 67.69946901533238,
+                    "mode": "forearm_relative_full",
+                    "forearm_twist_deg": -33.84974524046795
+                  }
+                }
+              },
+              "arm.R": {
+                "kind": "arm",
+                "bones": [
+                  "upperarm.R",
+                  "forearm.R",
+                  "hand.R"
+                ],
+                "fallback": false,
+                "wrist_rest_compatibility_deg": 95.61585197865918,
+                "rest_direction_error_deg": [
+                  3.017723256927529,
+                  1.8417504238240332
+                ],
+                "rest_direction_max_deg": 3.017723256927529,
+                "activated": true,
+                "activation_reason": "rest direction or wrist frame mismatch",
+                "source_edge_lengths": [
+                  5.341940233165466,
+                  3.193510410108512
+                ],
+                "target_edge_lengths": [
+                  0.28891193028906814,
+                  0.24769872877914723
+                ],
+                "source_bend_deg": 90.68188498048609,
+                "target_rest_bend_deg": 1.1765658795253542,
+                "target_rest_plane_used": false,
+                "incremental_min_rotation_deg": [
+                  140.49670809959997,
+                  91.52450307506832
+                ],
+                "applied_bones": [
+                  "upperarm.R",
+                  "forearm.R"
+                ],
+                "terminal_follow_bones": [
+                  "hand.R"
+                ],
+                "frame_determinants": [
+                  1.0000001192092896,
+                  1.0000003576278687
+                ],
+                "palm_roll": {
+                  "mode": "fallback",
+                  "fallback_reason": "source\uc640 target\uc5d0 \uacf5\ud1b5\uc778 index+pinky/index+thumb pair\uac00 \uc5c6\ub2e4",
+                  "frame_status": "landmark_pair_missing",
+                  "selected_mu": 0.0,
+                  "mesh_gate": "NOT_RUN_FALLBACK",
+                  "source_discovery": {
+                    "landmarks": {
+                      "index": "RightHandIndex1"
+                    },
+                    "zero_base_candidates": {
+                      "index": [
+                        "RightFingerBase"
+                      ],
+                      "pinky": [],
+                      "thumb": [
+                        "RThumb"
+                      ]
+                    },
+                    "uses_pose_geometry": false,
+                    "uses_tail_or_fingertip": false
+                  },
+                  "target_discovery": {
+                    "landmarks": {
+                      "index": "mixamorig:RightHandIndex1",
+                      "pinky": "mixamorig:RightHandPinky1",
+                      "thumb": "mixamorig:RightHandThumb1"
+                    },
+                    "zero_base_candidates": {
+                      "index": [],
+                      "pinky": [],
+                      "thumb": []
+                    },
+                    "uses_pose_geometry": false,
+                    "uses_tail_or_fingertip": false
+                  },
+                  "wrist_transfer": {
+                    "applied_deg": 12.038989615033794,
+                    "mode": "forearm_relative_full",
+                    "forearm_twist_deg": 6.019495068064024
+                  }
+                }
+              },
+              "leg.L": {
+                "kind": "leg",
+                "bones": [
+                  "upleg.L",
+                  "leg.L",
+                  "foot.L",
+                  "toe.L"
+                ],
+                "fallback": false,
+                "rest_direction_error_deg": [
+                  20.421184629141276,
+                  20.12094462475258,
+                  27.58862116814669
+                ],
+                "rest_direction_max_deg": 27.58862116814669,
+                "activated": true,
+                "activation_reason": "rest direction mismatch",
+                "source_edge_lengths": [
+                  7.127960053449914,
+                  7.58108477259107,
+                  2.1736481515804367
+                ],
+                "target_edge_lengths": [
+                  0.44916667249565073,
+                  0.4137820020640187,
+                  0.15790176663467745
+                ],
+                "source_bend_deg": 78.96562891009197,
+                "target_rest_bend_deg": 0.824375310068327,
+                "source_ankle_bend_deg": 86.96416935308591,
+                "target_rest_ankle_bend_deg": 55.451694326631035,
+                "target_rest_plane_used": false,
+                "foot_direction_solved": true,
+                "parent_coherent_available": true,
+                "parent_predicted_thigh_mismatch_deg": 88.78995788793029,
+                "v31_incremental_min_rotation_deg": [
+                  69.43356324910495,
+                  78.22968575069142
+                ],
+                "parent_coherent_incremental_min_rotation_deg": [
+                  88.78995788793029,
+                  79.78958270974452
+                ],
+                "v31_boundary_correction_deg": 150.7663073593137,
+                "v31_boundary_correction_twist_deg": -150.76631120282465,
+                "v31_boundary_correction_non_twist_residual_deg": 3.843510938850159e-06,
+                "parent_coherent_thigh_direction_error_deg": 0.0,
+                "v31_ankle_transport": {
+                  "schema_version": 1,
+                  "selector": "spherical_soft_cap",
+                  "profile_requested": "cmu_bvh",
+                  "policy_source": "profile_override",
+                  "soft_cap_deg": null,
+                  "hard_deg": 120.0,
+                  "global_hard_deg": 120.0,
+                  "sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+                  "selected_mu": 0.0,
+                  "applied_deg": 0.0,
+                  "residual_direction_deg": 139.66138838093258,
+                  "reason": "frozen_v3_hard_guard",
+                  "formula_applied_deg": 0.0
+                },
+                "parent_coherent_ankle_transport": {
+                  "schema_version": 1,
+                  "selector": "spherical_soft_cap",
+                  "profile_requested": "cmu_bvh",
+                  "policy_source": "profile_override",
+                  "soft_cap_deg": null,
+                  "hard_deg": 120.0,
+                  "global_hard_deg": 120.0,
+                  "sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+                  "selected_mu": 1.0,
+                  "applied_deg": 33.87951593599332,
+                  "residual_direction_deg": 0.0,
+                  "reason": "frozen_v3_profile",
+                  "formula_applied_deg": 33.87951231046915
+                },
+                "parent_coherent_applied": true,
+                "bilateral_exact_v31_fallback": false,
+                "incremental_min_rotation_deg": [
+                  88.78995788793029,
+                  79.78958270974452
+                ],
+                "foot_incremental_min_rotation_deg": 33.87951231046915,
+                "ankle_transport": {
+                  "schema_version": 1,
+                  "selector": "spherical_soft_cap",
+                  "profile_requested": "cmu_bvh",
+                  "policy_source": "profile_override",
+                  "soft_cap_deg": null,
+                  "hard_deg": 120.0,
+                  "global_hard_deg": 120.0,
+                  "sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+                  "selected_mu": 1.0,
+                  "applied_deg": 33.87951593599332,
+                  "residual_direction_deg": 0.0,
+                  "reason": "frozen_v3_profile",
+                  "formula_applied_deg": 33.87951231046915
+                },
+                "foot_direction_partially_solved": false,
+                "foot_transport_reason": "frozen_v3_profile",
+                "post_boundary_residual_to_parent_coherent_deg": 0.0,
+                "applied_bones": [
+                  "upleg.L",
+                  "leg.L",
+                  "foot.L"
+                ],
+                "terminal_follow_bones": [
+                  "toe.L"
+                ],
+                "frame_determinants": [
+                  1.0000001192092896,
+                  1.0000001192092896,
+                  1.0000001192092896
+                ]
+              },
+              "leg.R": {
+                "kind": "leg",
+                "bones": [
+                  "upleg.R",
+                  "leg.R",
+                  "foot.R",
+                  "toe.R"
+                ],
+                "fallback": false,
+                "rest_direction_error_deg": [
+                  20.378268294522517,
+                  20.097854461269595,
+                  27.881605617859737
+                ],
+                "rest_direction_max_deg": 27.881605617859737,
+                "activated": true,
+                "activation_reason": "rest direction mismatch",
+                "source_edge_lengths": [
+                  7.3300673913915215,
+                  7.6492648899703815,
+                  2.204933291120416
+                ],
+                "target_edge_lengths": [
+                  0.4490417647328698,
+                  0.4137205845599154,
+                  0.1558662017129248
+                ],
+                "source_bend_deg": 52.18713007250294,
+                "target_rest_bend_deg": 0.7388627979303675,
+                "source_ankle_bend_deg": 105.84249984091109,
+                "target_rest_ankle_bend_deg": 54.66779919725756,
+                "target_rest_plane_used": false,
+                "foot_direction_solved": true,
+                "parent_coherent_available": true,
+                "parent_predicted_thigh_mismatch_deg": 10.703318531553876,
+                "v31_incremental_min_rotation_deg": [
+                  29.770184756369034,
+                  51.58423750195224
+                ],
+                "parent_coherent_incremental_min_rotation_deg": [
+                  10.703318531553876,
+                  52.925475436921225
+                ],
+                "v31_boundary_correction_deg": 143.951343322072,
+                "v31_boundary_correction_twist_deg": -143.9513429837611,
+                "v31_boundary_correction_non_twist_residual_deg": 3.383109117294225e-07,
+                "parent_coherent_thigh_direction_error_deg": 0.019782341029446364,
+                "v31_ankle_transport": {
+                  "schema_version": 1,
+                  "selector": "spherical_soft_cap",
+                  "profile_requested": "cmu_bvh",
+                  "policy_source": "profile_override",
+                  "soft_cap_deg": null,
+                  "hard_deg": 120.0,
+                  "global_hard_deg": 120.0,
+                  "sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+                  "selected_mu": 1.0,
+                  "applied_deg": 105.76712679878916,
+                  "residual_direction_deg": 0.0,
+                  "reason": "frozen_v3_profile",
+                  "formula_applied_deg": 105.76711697655423
+                },
+                "parent_coherent_ankle_transport": {
+                  "schema_version": 1,
+                  "selector": "spherical_soft_cap",
+                  "profile_requested": "cmu_bvh",
+                  "policy_source": "profile_override",
+                  "soft_cap_deg": null,
+                  "hard_deg": 120.0,
+                  "global_hard_deg": 120.0,
+                  "sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+                  "selected_mu": 1.0,
+                  "applied_deg": 67.09771837645054,
+                  "residual_direction_deg": 1.9578634748995682e-06,
+                  "reason": "frozen_v3_profile",
+                  "formula_applied_deg": 67.09772033431402
+                },
+                "parent_coherent_applied": true,
+                "bilateral_exact_v31_fallback": false,
+                "incremental_min_rotation_deg": [
+                  10.703318531553876,
+                  52.925475436921225
+                ],
+                "foot_incremental_min_rotation_deg": 67.09772033431402,
+                "ankle_transport": {
+                  "schema_version": 1,
+                  "selector": "spherical_soft_cap",
+                  "profile_requested": "cmu_bvh",
+                  "policy_source": "profile_override",
+                  "soft_cap_deg": null,
+                  "hard_deg": 120.0,
+                  "global_hard_deg": 120.0,
+                  "sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+                  "selected_mu": 1.0,
+                  "applied_deg": 67.09771837645054,
+                  "residual_direction_deg": 1.9578634748995682e-06,
+                  "reason": "frozen_v3_profile",
+                  "formula_applied_deg": 67.09772033431402
+                },
+                "foot_direction_partially_solved": false,
+                "foot_transport_reason": "frozen_v3_profile",
+                "post_boundary_residual_to_parent_coherent_deg": 0.0,
+                "applied_bones": [
+                  "upleg.R",
+                  "leg.R",
+                  "foot.R"
+                ],
+                "terminal_follow_bones": [
+                  "toe.R"
+                ],
+                "frame_determinants": [
+                  1.0,
+                  1.0000001192092896,
+                  1.000000238418579
+                ]
+              },
+              "_palm_roll": {
+                "variant": "CHAIN_TRANSPORT_V3_2_1_PALM_ROLL_QA",
+                "parent_variant": "CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY",
+                "parent_retarget_sha256": "692e975d32f41e3406144763c7c0b7dbf0a586ff07732f09c4365e3233b13693",
+                "policy_sha256": "46da74c83a9dd63bc03d11fc4e6ccbd104f8fc1ec084b2a7a1c8613f5a93bb95",
+                "requested_mu": {
+                  "hand.L": 0.5,
+                  "hand.R": 0.5
+                },
+                "default_is_exact_parent": false,
+                "operational_status": "PROMOTED_RUNTIME",
+                "actual_mesh_gate": "V3.2.5_SELECTOR",
+                "hands": {
+                  "hand.L": {
+                    "mode": "fallback",
+                    "fallback_reason": "source\uc640 target\uc5d0 \uacf5\ud1b5\uc778 index+pinky/index+thumb pair\uac00 \uc5c6\ub2e4",
+                    "frame_status": "landmark_pair_missing",
+                    "selected_mu": 0.0,
+                    "mesh_gate": "NOT_RUN_FALLBACK",
+                    "source_discovery": {
+                      "landmarks": {
+                        "index": "LeftHandIndex1"
+                      },
+                      "zero_base_candidates": {
+                        "index": [
+                          "LeftFingerBase"
+                        ],
+                        "pinky": [],
+                        "thumb": [
+                          "LThumb"
+                        ]
+                      },
+                      "uses_pose_geometry": false,
+                      "uses_tail_or_fingertip": false
+                    },
+                    "target_discovery": {
+                      "landmarks": {
+                        "index": "mixamorig:LeftHandIndex1",
+                        "pinky": "mixamorig:LeftHandPinky1",
+                        "thumb": "mixamorig:LeftHandThumb1"
+                      },
+                      "zero_base_candidates": {
+                        "index": [],
+                        "pinky": [],
+                        "thumb": []
+                      },
+                      "uses_pose_geometry": false,
+                      "uses_tail_or_fingertip": false
+                    },
+                    "wrist_transfer": {
+                      "applied_deg": 67.69946901533238,
+                      "mode": "forearm_relative_full",
+                      "forearm_twist_deg": -33.84974524046795
+                    }
+                  },
+                  "hand.R": {
+                    "mode": "fallback",
+                    "fallback_reason": "source\uc640 target\uc5d0 \uacf5\ud1b5\uc778 index+pinky/index+thumb pair\uac00 \uc5c6\ub2e4",
+                    "frame_status": "landmark_pair_missing",
+                    "selected_mu": 0.0,
+                    "mesh_gate": "NOT_RUN_FALLBACK",
+                    "source_discovery": {
+                      "landmarks": {
+                        "index": "RightHandIndex1"
+                      },
+                      "zero_base_candidates": {
+                        "index": [
+                          "RightFingerBase"
+                        ],
+                        "pinky": [],
+                        "thumb": [
+                          "RThumb"
+                        ]
+                      },
+                      "uses_pose_geometry": false,
+                      "uses_tail_or_fingertip": false
+                    },
+                    "target_discovery": {
+                      "landmarks": {
+                        "index": "mixamorig:RightHandIndex1",
+                        "pinky": "mixamorig:RightHandPinky1",
+                        "thumb": "mixamorig:RightHandThumb1"
+                      },
+                      "zero_base_candidates": {
+                        "index": [],
+                        "pinky": [],
+                        "thumb": []
+                      },
+                      "uses_pose_geometry": false,
+                      "uses_tail_or_fingertip": false
+                    },
+                    "wrist_transfer": {
+                      "applied_deg": 12.038989615033794,
+                      "mode": "forearm_relative_full",
+                      "forearm_twist_deg": 6.019495068064024
+                    }
+                  }
+                }
+              }
+            },
+            "chain_fallbacks": [],
+            "terminal_follow_bones": [
+              "hand.L",
+              "hand.R",
+              "toe.L",
+              "toe.R"
+            ],
+            "palm_roll_requested_deg": {
+              "hand.L": 0.0,
+              "hand.R": 0.0
+            },
+            "palm_roll_applied_deg": {
+              "hand.L": 0.0,
+              "hand.R": 0.0
+            },
+            "palm_roll_mu": {
+              "hand.L": 0.0,
+              "hand.R": 0.0
+            },
+            "palm_landmark_roles": {},
+            "palm_plane_sin": {},
+            "palm_frame_status": {
+              "hand.L": "landmark_pair_missing",
+              "hand.R": "landmark_pair_missing"
+            },
+            "palm_roll_mode": {
+              "hand.L": "fallback",
+              "hand.R": "fallback"
+            },
+            "wrist_transfer": {
+              "hand.L": 67.69946901533238,
+              "hand.R": 12.038989615033794
+            },
+            "palm_fallback_reason": {
+              "hand.L": "source\uc640 target\uc5d0 \uacf5\ud1b5\uc778 index+pinky/index+thumb pair\uac00 \uc5c6\ub2e4",
+              "hand.R": "source\uc640 target\uc5d0 \uacf5\ud1b5\uc778 index+pinky/index+thumb pair\uac00 \uc5c6\ub2e4"
+            },
+            "palm_roll_bones": [],
+            "palm_roll_fallback_bones": [
+              "hand.L",
+              "hand.R"
+            ],
+            "local_normalization_surface_error": 6.420589215849759e-07,
+            "max_joint_edge_length_error": 1.816664080278585e-07,
+            "camera": {
+              "version": "personal-camera/1",
+              "applied": false,
+              "maxRigidSurfaceError": 0.0
+            }
+          },
+          "file": "model-1-pose-1.fbx",
+          "cachedSeconds": 0.05106141700525768
+        }
+      ],
+      "registration": {
+        "normalizedFormat": "fbx",
+        "normalizedHash": "31c80c4a22fcefe55009a800ad514ec206debfdab457705379cd8c01e7584f39",
+        "archiveHash": "3f7cde1e1492cce27737a6bdd2f9e7625d54290056c18878b8ca4170500aeaf1",
+        "validation": {
+          "passed": true,
+          "meshCount": 1,
+          "originalBoneCount": 53,
+          "vertexCount": 24988,
+          "maxSurfaceError": 5.101335887047753e-07,
+          "maxSkinProbeError": 7.601418019476114e-07,
+          "maxMaterialRegionError": 5.101335887047753e-07,
+          "materialCount": 1,
+          "tolerance": 1.780109771384568e-05,
+          "fkProbes": {
+            "forearm.L": {
+              "joint": "forearm.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1088190872464659
+            },
+            "forearm.R": {
+              "joint": "forearm.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.10896417965076514
+            },
+            "leg.L": {
+              "joint": "leg.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.13425406683096436
+            },
+            "leg.R": {
+              "joint": "leg.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1342576162504657
+            },
+            "spine": {
+              "joint": "spine",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1684601450844222
+            }
+          },
+          "blenderVersion": "5.2.0 LTS",
+          "materialPreservation": {
+            "passed": true,
+            "materialCount": 1,
+            "maxDiffuseError": 0.0,
+            "maxSpecularError": 0.0,
+            "maxShininessError": 2.288818308215923e-07,
+            "maxOpacityError": 0.0
+          }
+        },
+        "versions": {
+          "importerVersion": "personal-import/3",
+          "normalizationVersion": "personal-normalize/5",
+          "rigMappingVersion": "personal-rig/2",
+          "converterVersion": "personal-converter/5",
+          "converterFingerprint": "27ac6ab4e5b10d55c83cbf900b3c7c79047f037d8f1610339f298246aa94aba8"
+        },
+        "capabilities": {
+          "supportLevel": "body_only",
+          "bodyPose": true,
+          "hands": {
+            "left": {
+              "supported": false,
+              "fingerBones": 15,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            },
+            "right": {
+              "supported": false,
+              "fingerBones": 15,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            }
+          },
+          "collisionPrevention": false,
+          "shapeSliders": false
+        }
+      },
+      "sourceGeometry": {
+        "container": "SQLite3",
+        "catalogVersion": 2,
+        "declaredPlainBytes": 1601470,
+        "decoderAvailable": true,
+        "decoderVersion": "cs3c-catalog2/1",
+        "expandedBytes": 3574394,
+        "tableStreamSha256": "c1297c991932e3fc2b43d557eef1f18faab94fe7142de16b3d4b8d4ea66ac8e9",
+        "hierarchyNodes": 53,
+        "meshes": 1,
+        "vertices": 24988,
+        "materials": [
+          {
+            "name": "Pilot neutral clay",
+            "ambient": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "diffuse": [
+              0.47999998927116394,
+              0.5299999713897705,
+              0.5899999737739563
+            ],
+            "specular": [
+              0.11999999731779099,
+              0.13249999284744263,
+              0.14749999344348907
+            ],
+            "emission": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "opacity": 1.0,
+            "shininess": 10.239999771118164
+          }
+        ],
+        "materialSupport": "source_solid_diffuse_specular_shininess_and_face_assignment",
+        "sourceShadingMatchToCSP": "unverified",
+        "maxInverseBindError": 9.414691248821327e-14,
+        "maxSourceRestSkinError": 2.501595091508979e-05,
+        "sourceAxisUp": "Y",
+        "sourceUnits": "unconfirmed",
+        "internalDisplayScale": 0.01,
+        "originalWeightsRenormalized": false,
+        "maxBlenderRestMatrixErrorSourceUnits": 1.3939711556498757e-05,
+        "maxOriginalFKProbeError": 5.666405482354816e-07,
+        "originalFKProbeCount": 5
+      },
+      "sourceMaterials": [
+        {
+          "name": "Pilot neutral clay",
+          "ambient": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "diffuse": [
+            0.47999998927116394,
+            0.5299999713897705,
+            0.5899999737739563
+          ],
+          "specular": [
+            0.11999999731779099,
+            0.13249999284744263,
+            0.14749999344348907
+          ],
+          "emission": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "opacity": 1.0,
+          "shininess": 10.239999771118164
+        }
+      ]
+    },
+    {
+      "inputName": "standin-male-0.7.6-recorded-pose-review.cs3c",
+      "sourceHash": "15976949366629cb20d57ca1d749f01d26e498baf17376000d5c78678dea897e",
+      "registrationSeconds": 8.279749499983154,
+      "registrationEvent": "result",
+      "poses": [
+        {
+          "poseName": "03-staging-selected-pose.bvh",
+          "poseHash": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+          "event": "result",
+          "seconds": 5.078994582989253,
+          "snapshotHash": "bec6597b45d71181ecf87843ae7b874fcef351cedf24850ad2a654149e96d8c6",
+          "artifactHash": "06303f89d2caeb50e136a3ea72e0d4f437eced5e347770550688ee268b5e463d",
+          "validation": {
+            "passed": true,
+            "meshCount": 1,
+            "originalBoneCount": 66,
+            "vertexCount": 24988,
+            "maxSurfaceError": 7.588719199702609e-07,
+            "maxSkinProbeError": 8.765126153775782e-07,
+            "maxMaterialRegionError": 7.588719199702609e-07,
+            "materialCount": 1,
+            "tolerance": 1.7444062930276232e-05,
+            "fkProbes": {
+              "forearm.L": {
+                "joint": "forearm.L",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.10876463535284306
+              },
+              "forearm.R": {
+                "joint": "forearm.R",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.1089407657011523
+              },
+              "leg.L": {
+                "joint": "leg.L",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.12953315171815846
+              },
+              "leg.R": {
+                "joint": "leg.R",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.12953383322654813
+              },
+              "spine": {
+                "joint": "spine",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.1619044103071455
+              }
+            },
+            "blenderVersion": "5.2.0 LTS",
+            "materialPreservation": {
+              "passed": true,
+              "materialCount": 1,
+              "maxDiffuseError": 0.0,
+              "maxSpecularError": 0.0,
+              "maxShininessError": 2.288818308215923e-07,
+              "maxOpacityError": 0.0
+            }
+          },
+          "retarget": {
+            "ok": true,
+            "output_mode": "",
+            "src_profile": "mixamo_noprefix",
+            "dst_profile": "mixamo",
+            "mapped_bones": 22,
+            "missing_required": [],
+            "unmapped_optional": [],
+            "max_joint_angle_deg": 164.8875557721428,
+            "pose_fidelity_rmse": null,
+            "skeleton_baseline_rmse": null,
+            "pose_fidelity_delta": null,
+            "mirrored": false,
+            "frame": 0,
+            "warnings": [
+              "rest \uc2a4\uc719 \ucd5c\ub300 39.8\u00b0 (shoulder.R) > 15\u00b0 \u2014 \uc18c\uc2a4\uc640 \ud0c0\uae43\uc758 rest \uaddc\uaca9\uc774 \ub2e4\ub974\ub2e4(\ub7f0\ud0c0\uc784 \ubcf4\uc815\uc73c\ub85c \ud761\uc218\ub428)"
+            ],
+            "rest_swing_deg": {
+              "spine": 12.100935507509382,
+              "spine1": 3.2364653735378526,
+              "spine2": 22.820122748477186,
+              "neck": 10.888169511234597,
+              "head": 1.8633329895970916,
+              "shoulder.L": 39.715287914408584,
+              "upperarm.L": 3.3075328602151384,
+              "forearm.L": 2.025101460944317,
+              "hand.L": 8.789675932788498,
+              "shoulder.R": 39.83831838650831,
+              "upperarm.R": 3.25241394615083,
+              "forearm.R": 2.0320734562608935,
+              "hand.R": 8.01148104372282,
+              "upleg.L": 2.6989463043910895,
+              "leg.L": 2.3017363135677296,
+              "foot.L": 7.669003655400447,
+              "toe.L": 4.831277777689796,
+              "upleg.R": 2.388533172324868,
+              "leg.R": 2.5238654959638986,
+              "foot.R": 8.170140388354346,
+              "toe.R": 4.876843003411022
+            },
+            "rest_swing_max_deg": 39.83831838650831,
+            "rest_swing_bone": "shoulder.R",
+            "twist_deg": {},
+            "degenerate_bones": [],
+            "solver_mode_by_bone": {
+              "hips": "legacy_structural",
+              "spine": "legacy_structural",
+              "spine1": "legacy_structural",
+              "spine2": "legacy_structural",
+              "neck": "legacy_structural",
+              "head": "legacy_structural",
+              "shoulder.L": "legacy_structural",
+              "upperarm.L": "legacy_compatible_chain",
+              "forearm.L": "legacy_compatible_chain",
+              "hand.L": "legacy_compatible_chain",
+              "shoulder.R": "legacy_structural",
+              "upperarm.R": "legacy_compatible_chain",
+              "forearm.R": "legacy_compatible_chain",
+              "hand.R": "legacy_compatible_chain",
+              "upleg.L": "legacy_compatible_chain",
+              "leg.L": "legacy_compatible_chain",
+              "foot.L": "legacy_compatible_chain",
+              "toe.L": "legacy_compatible_chain",
+              "upleg.R": "legacy_compatible_chain",
+              "leg.R": "legacy_compatible_chain",
+              "foot.R": "legacy_compatible_chain",
+              "toe.R": "legacy_compatible_chain"
+            },
+            "chain_diagnostics": {
+              "_pelvis_boundary": {
+                "mode": "parent_coherent_projection",
+                "parent_variant": "CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY",
+                "parent_retarget_sha256": "692e975d32f41e3406144763c7c0b7dbf0a586ff07732f09c4365e3233b13693",
+                "hips_transport_rotation_deg": 0.0,
+                "hips_transport_determinant": 1.0,
+                "hips_rotation_unchanged": true,
+                "root_translation_unchanged": true,
+                "bilateral_exact_v31_fallback": false,
+                "active_chains": [],
+                "fallback_chains": []
+              },
+              "arm.L": {
+                "kind": "arm",
+                "bones": [
+                  "upperarm.L",
+                  "forearm.L",
+                  "hand.L"
+                ],
+                "fallback": false,
+                "wrist_rest_compatibility_deg": 6.854396774178638,
+                "rest_direction_error_deg": [
+                  3.3074695355721953,
+                  2.0251090613532043
+                ],
+                "rest_direction_max_deg": 3.3074695355721953,
+                "activated": false,
+                "activation_reason": "rest direction/wrist frame already compatible"
+              },
+              "arm.R": {
+                "kind": "arm",
+                "bones": [
+                  "upperarm.R",
+                  "forearm.R",
+                  "hand.R"
+                ],
+                "fallback": false,
+                "wrist_rest_compatibility_deg": 6.3773683823134535,
+                "rest_direction_error_deg": [
+                  3.252412352845386,
+                  2.03197711015051
+                ],
+                "rest_direction_max_deg": 3.252412352845386,
+                "activated": false,
+                "activation_reason": "rest direction/wrist frame already compatible"
+              },
+              "leg.L": {
+                "kind": "leg",
+                "bones": [
+                  "upleg.L",
+                  "leg.L",
+                  "foot.L",
+                  "toe.L"
+                ],
+                "fallback": false,
+                "rest_direction_error_deg": [
+                  2.698801188276648,
+                  2.3016506148266713,
+                  7.668926882597014
+                ],
+                "rest_direction_max_deg": 7.668926882597014,
+                "activated": false,
+                "activation_reason": "rest directions already compatible"
+              },
+              "leg.R": {
+                "kind": "leg",
+                "bones": [
+                  "upleg.R",
+                  "leg.R",
+                  "foot.R",
+                  "toe.R"
+                ],
+                "fallback": false,
+                "rest_direction_error_deg": [
+                  2.3884512151702633,
+                  2.5238654959638986,
+                  8.170068295571314
+                ],
+                "rest_direction_max_deg": 8.170068295571314,
+                "activated": false,
+                "activation_reason": "rest directions already compatible"
+              },
+              "_palm_roll": {
+                "variant": "CHAIN_TRANSPORT_V3_2_1_PALM_ROLL_QA",
+                "parent_variant": "CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY",
+                "parent_retarget_sha256": "692e975d32f41e3406144763c7c0b7dbf0a586ff07732f09c4365e3233b13693",
+                "policy_sha256": "46da74c83a9dd63bc03d11fc4e6ccbd104f8fc1ec084b2a7a1c8613f5a93bb95",
+                "requested_mu": {
+                  "hand.L": 0.5,
+                  "hand.R": 0.5
+                },
+                "default_is_exact_parent": false,
+                "operational_status": "PROMOTED_RUNTIME",
+                "actual_mesh_gate": "V3.2.5_SELECTOR",
+                "hands": {
+                  "hand.L": {
+                    "mode": "identity",
+                    "frame_status": "inactive_compatible_chain",
+                    "selected_mu": 0.0,
+                    "mesh_gate": "NOT_NEEDED_COMPATIBLE_CHAIN"
+                  },
+                  "hand.R": {
+                    "mode": "identity",
+                    "frame_status": "inactive_compatible_chain",
+                    "selected_mu": 0.0,
+                    "mesh_gate": "NOT_NEEDED_COMPATIBLE_CHAIN"
+                  }
+                }
+              }
+            },
+            "chain_fallbacks": [],
+            "terminal_follow_bones": [],
+            "palm_roll_requested_deg": {
+              "hand.L": 0.0,
+              "hand.R": 0.0
+            },
+            "palm_roll_applied_deg": {
+              "hand.L": 0.0,
+              "hand.R": 0.0
+            },
+            "palm_roll_mu": {
+              "hand.L": 0.0,
+              "hand.R": 0.0
+            },
+            "palm_landmark_roles": {},
+            "palm_plane_sin": {},
+            "palm_frame_status": {
+              "hand.L": "inactive_compatible_chain",
+              "hand.R": "inactive_compatible_chain"
+            },
+            "palm_roll_mode": {
+              "hand.L": "identity",
+              "hand.R": "identity"
+            },
+            "wrist_transfer": {},
+            "palm_fallback_reason": {
+              "hand.L": null,
+              "hand.R": null
+            },
+            "palm_roll_bones": [],
+            "palm_roll_fallback_bones": [],
+            "local_normalization_surface_error": 6.420589215849759e-07,
+            "max_joint_edge_length_error": 2.3259386294771645e-07,
+            "camera": {
+              "version": "personal-camera/1",
+              "applied": false,
+              "maxRigidSurfaceError": 0.0
+            }
+          },
+          "file": "model-2-pose-0.fbx",
+          "cachedSeconds": 0.05055012498633005
+        },
+        {
+          "poseName": "cmu_135_01_04368.bvh",
+          "poseHash": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+          "event": "result",
+          "seconds": 3.7877656249911524,
+          "snapshotHash": "f8dadb9182586e3ffc5ebc0cc26fef5bb2754f3a92633b6e683c07e296746a86",
+          "artifactHash": "6b0ac7ce2076896bf000f4a9bab4cf2b6aa06f3db468c6de8cf219fb59895786",
+          "validation": {
+            "passed": true,
+            "meshCount": 1,
+            "originalBoneCount": 66,
+            "vertexCount": 24988,
+            "maxSurfaceError": 8.689598871569615e-07,
+            "maxSkinProbeError": 9.702932857180713e-07,
+            "maxMaterialRegionError": 8.689135029271711e-07,
+            "materialCount": 1,
+            "tolerance": 1.7756132018480384e-05,
+            "fkProbes": {
+              "forearm.L": {
+                "joint": "forearm.L",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.10877168465902481
+              },
+              "forearm.R": {
+                "joint": "forearm.R",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.10896001008268852
+              },
+              "leg.L": {
+                "joint": "leg.L",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.1298630121431651
+              },
+              "leg.R": {
+                "joint": "leg.R",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.12857908758643313
+              },
+              "spine": {
+                "joint": "spine",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.1888558567590011
+              }
+            },
+            "blenderVersion": "5.2.0 LTS",
+            "materialPreservation": {
+              "passed": true,
+              "materialCount": 1,
+              "maxDiffuseError": 0.0,
+              "maxSpecularError": 0.0,
+              "maxShininessError": 2.288818308215923e-07,
+              "maxOpacityError": 0.0
+            }
+          },
+          "retarget": {
+            "ok": true,
+            "output_mode": "",
+            "src_profile": "cmu_bvh",
+            "dst_profile": "mixamo",
+            "mapped_bones": 22,
+            "missing_required": [],
+            "unmapped_optional": [],
+            "max_joint_angle_deg": 175.59510673018838,
+            "pose_fidelity_rmse": null,
+            "skeleton_baseline_rmse": null,
+            "pose_fidelity_delta": null,
+            "mirrored": false,
+            "frame": 0,
+            "warnings": [
+              "rest \uc2a4\uc719 \ucd5c\ub300 98.3\u00b0 (hand.L) > 15\u00b0 \u2014 \uc18c\uc2a4\uc640 \ud0c0\uae43\uc758 rest \uaddc\uaca9\uc774 \ub2e4\ub974\ub2e4(\ub7f0\ud0c0\uc784 \ubcf4\uc815\uc73c\ub85c \ud761\uc218\ub428)"
+            ],
+            "rest_swing_deg": {
+              "spine": 3.1907057723972945,
+              "spine1": 8.611188975734787,
+              "spine2": 5.06185820183351,
+              "neck": 4.013350508243193,
+              "head": 1.9108760710564017,
+              "shoulder.L": 40.845161637762615,
+              "upperarm.L": 3.0327374638604394,
+              "forearm.L": 1.8430251016176173,
+              "hand.L": 98.25097973074047,
+              "shoulder.R": 44.83537475248874,
+              "upperarm.R": 3.017724576261468,
+              "forearm.R": 1.8418566806551153,
+              "hand.R": 97.98240558755494,
+              "upleg.L": 20.421193963930627,
+              "leg.L": 20.120964463110464,
+              "foot.L": 27.5886100493806,
+              "toe.L": 4.831280695859293,
+              "upleg.R": 20.378277734481017,
+              "leg.R": 20.097864397592645,
+              "foot.R": 27.88161354817088,
+              "toe.R": 4.876845674485973
+            },
+            "rest_swing_max_deg": 98.25097973074047,
+            "rest_swing_bone": "hand.L",
+            "twist_deg": {},
+            "degenerate_bones": [],
+            "solver_mode_by_bone": {
+              "hips": "legacy_structural",
+              "spine": "legacy_structural",
+              "spine1": "legacy_structural",
+              "spine2": "legacy_structural",
+              "neck": "legacy_structural",
+              "head": "legacy_structural",
+              "shoulder.L": "legacy_structural",
+              "upperarm.L": "chain_transport",
+              "forearm.L": "chain_transport",
+              "hand.L": "terminal_follow_wrist_transfer",
+              "shoulder.R": "legacy_structural",
+              "upperarm.R": "chain_transport",
+              "forearm.R": "chain_transport",
+              "hand.R": "terminal_follow_wrist_transfer",
+              "upleg.L": "chain_transport_parent_coherent",
+              "leg.L": "chain_transport_parent_coherent",
+              "foot.L": "chain_transport_parent_coherent",
+              "toe.L": "terminal_follow",
+              "upleg.R": "chain_transport_parent_coherent",
+              "leg.R": "chain_transport_parent_coherent",
+              "foot.R": "chain_transport_parent_coherent",
+              "toe.R": "terminal_follow"
+            },
+            "chain_diagnostics": {
+              "_pelvis_boundary": {
+                "mode": "parent_coherent_projection",
+                "parent_variant": "CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY",
+                "parent_retarget_sha256": "692e975d32f41e3406144763c7c0b7dbf0a586ff07732f09c4365e3233b13693",
+                "hips_transport_rotation_deg": 143.30896389486807,
+                "hips_transport_determinant": 0.9999999403953552,
+                "hips_rotation_unchanged": true,
+                "root_translation_unchanged": true,
+                "bilateral_exact_v31_fallback": false,
+                "active_chains": [
+                  "leg.L",
+                  "leg.R"
+                ],
+                "fallback_chains": []
+              },
+              "arm.L": {
+                "kind": "arm",
+                "bones": [
+                  "upperarm.L",
+                  "forearm.L",
+                  "hand.L"
+                ],
+                "fallback": false,
+                "wrist_rest_compatibility_deg": 96.44188472345012,
+                "rest_direction_error_deg": [
+                  3.0326713665983926,
+                  1.8429189121305534
+                ],
+                "rest_direction_max_deg": 3.0326713665983926,
+                "activated": true,
+                "activation_reason": "rest direction or wrist frame mismatch",
+                "source_edge_lengths": [
+                  5.433011844500629,
+                  3.1593589531390047
+                ],
+                "target_edge_lengths": [
+                  0.2889158195975704,
+                  0.24769900734834122
+                ],
+                "source_bend_deg": 87.80001175600337,
+                "target_rest_bend_deg": 1.1972323269405243,
+                "target_rest_plane_used": false,
+                "incremental_min_rotation_deg": [
+                  62.98331358713444,
+                  87.1381643058749
+                ],
+                "applied_bones": [
+                  "upperarm.L",
+                  "forearm.L"
+                ],
+                "terminal_follow_bones": [
+                  "hand.L"
+                ],
+                "frame_determinants": [
+                  1.0,
+                  1.000000238418579
+                ],
+                "palm_roll": {
+                  "mode": "fallback",
+                  "fallback_reason": "source\uc640 target\uc5d0 \uacf5\ud1b5\uc778 index+pinky/index+thumb pair\uac00 \uc5c6\ub2e4",
+                  "frame_status": "landmark_pair_missing",
+                  "selected_mu": 0.0,
+                  "mesh_gate": "NOT_RUN_FALLBACK",
+                  "source_discovery": {
+                    "landmarks": {
+                      "index": "LeftHandIndex1"
+                    },
+                    "zero_base_candidates": {
+                      "index": [
+                        "LeftFingerBase"
+                      ],
+                      "pinky": [],
+                      "thumb": [
+                        "LThumb"
+                      ]
+                    },
+                    "uses_pose_geometry": false,
+                    "uses_tail_or_fingertip": false
+                  },
+                  "target_discovery": {
+                    "landmarks": {
+                      "index": "mixamorig:LeftHandIndex1",
+                      "pinky": "mixamorig:LeftHandPinky1",
+                      "thumb": "mixamorig:LeftHandThumb1"
+                    },
+                    "zero_base_candidates": {
+                      "index": [],
+                      "pinky": [],
+                      "thumb": []
+                    },
+                    "uses_pose_geometry": false,
+                    "uses_tail_or_fingertip": false
+                  },
+                  "wrist_transfer": {
+                    "applied_deg": 67.69946901533238,
+                    "mode": "forearm_relative_full",
+                    "forearm_twist_deg": -33.84974524046795
+                  }
+                }
+              },
+              "arm.R": {
+                "kind": "arm",
+                "bones": [
+                  "upperarm.R",
+                  "forearm.R",
+                  "hand.R"
+                ],
+                "fallback": false,
+                "wrist_rest_compatibility_deg": 95.61585197865918,
+                "rest_direction_error_deg": [
+                  3.017723256927529,
+                  1.8417504238240332
+                ],
+                "rest_direction_max_deg": 3.017723256927529,
+                "activated": true,
+                "activation_reason": "rest direction or wrist frame mismatch",
+                "source_edge_lengths": [
+                  5.341940233165466,
+                  3.193510410108512
+                ],
+                "target_edge_lengths": [
+                  0.28891193028906814,
+                  0.24769872877914723
+                ],
+                "source_bend_deg": 90.68188498048609,
+                "target_rest_bend_deg": 1.1765658795253542,
+                "target_rest_plane_used": false,
+                "incremental_min_rotation_deg": [
+                  140.49670809959997,
+                  91.52450307506832
+                ],
+                "applied_bones": [
+                  "upperarm.R",
+                  "forearm.R"
+                ],
+                "terminal_follow_bones": [
+                  "hand.R"
+                ],
+                "frame_determinants": [
+                  1.0000001192092896,
+                  1.0000003576278687
+                ],
+                "palm_roll": {
+                  "mode": "fallback",
+                  "fallback_reason": "source\uc640 target\uc5d0 \uacf5\ud1b5\uc778 index+pinky/index+thumb pair\uac00 \uc5c6\ub2e4",
+                  "frame_status": "landmark_pair_missing",
+                  "selected_mu": 0.0,
+                  "mesh_gate": "NOT_RUN_FALLBACK",
+                  "source_discovery": {
+                    "landmarks": {
+                      "index": "RightHandIndex1"
+                    },
+                    "zero_base_candidates": {
+                      "index": [
+                        "RightFingerBase"
+                      ],
+                      "pinky": [],
+                      "thumb": [
+                        "RThumb"
+                      ]
+                    },
+                    "uses_pose_geometry": false,
+                    "uses_tail_or_fingertip": false
+                  },
+                  "target_discovery": {
+                    "landmarks": {
+                      "index": "mixamorig:RightHandIndex1",
+                      "pinky": "mixamorig:RightHandPinky1",
+                      "thumb": "mixamorig:RightHandThumb1"
+                    },
+                    "zero_base_candidates": {
+                      "index": [],
+                      "pinky": [],
+                      "thumb": []
+                    },
+                    "uses_pose_geometry": false,
+                    "uses_tail_or_fingertip": false
+                  },
+                  "wrist_transfer": {
+                    "applied_deg": 12.038989615033794,
+                    "mode": "forearm_relative_full",
+                    "forearm_twist_deg": 6.019495068064024
+                  }
+                }
+              },
+              "leg.L": {
+                "kind": "leg",
+                "bones": [
+                  "upleg.L",
+                  "leg.L",
+                  "foot.L",
+                  "toe.L"
+                ],
+                "fallback": false,
+                "rest_direction_error_deg": [
+                  20.421184629141276,
+                  20.12094462475258,
+                  27.58862116814669
+                ],
+                "rest_direction_max_deg": 27.58862116814669,
+                "activated": true,
+                "activation_reason": "rest direction mismatch",
+                "source_edge_lengths": [
+                  7.127960053449914,
+                  7.58108477259107,
+                  2.1736481515804367
+                ],
+                "target_edge_lengths": [
+                  0.44916667249565073,
+                  0.4137820020640187,
+                  0.15790176663467745
+                ],
+                "source_bend_deg": 78.96562891009197,
+                "target_rest_bend_deg": 0.824375310068327,
+                "source_ankle_bend_deg": 86.96416935308591,
+                "target_rest_ankle_bend_deg": 55.451694326631035,
+                "target_rest_plane_used": false,
+                "foot_direction_solved": true,
+                "parent_coherent_available": true,
+                "parent_predicted_thigh_mismatch_deg": 88.78995788793029,
+                "v31_incremental_min_rotation_deg": [
+                  69.43356324910495,
+                  78.22968575069142
+                ],
+                "parent_coherent_incremental_min_rotation_deg": [
+                  88.78995788793029,
+                  79.78958270974452
+                ],
+                "v31_boundary_correction_deg": 150.7663073593137,
+                "v31_boundary_correction_twist_deg": -150.76631120282465,
+                "v31_boundary_correction_non_twist_residual_deg": 3.843510938850159e-06,
+                "parent_coherent_thigh_direction_error_deg": 0.0,
+                "v31_ankle_transport": {
+                  "schema_version": 1,
+                  "selector": "spherical_soft_cap",
+                  "profile_requested": "cmu_bvh",
+                  "policy_source": "profile_override",
+                  "soft_cap_deg": null,
+                  "hard_deg": 120.0,
+                  "global_hard_deg": 120.0,
+                  "sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+                  "selected_mu": 0.0,
+                  "applied_deg": 0.0,
+                  "residual_direction_deg": 139.66138838093258,
+                  "reason": "frozen_v3_hard_guard",
+                  "formula_applied_deg": 0.0
+                },
+                "parent_coherent_ankle_transport": {
+                  "schema_version": 1,
+                  "selector": "spherical_soft_cap",
+                  "profile_requested": "cmu_bvh",
+                  "policy_source": "profile_override",
+                  "soft_cap_deg": null,
+                  "hard_deg": 120.0,
+                  "global_hard_deg": 120.0,
+                  "sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+                  "selected_mu": 1.0,
+                  "applied_deg": 33.87951593599332,
+                  "residual_direction_deg": 0.0,
+                  "reason": "frozen_v3_profile",
+                  "formula_applied_deg": 33.87951231046915
+                },
+                "parent_coherent_applied": true,
+                "bilateral_exact_v31_fallback": false,
+                "incremental_min_rotation_deg": [
+                  88.78995788793029,
+                  79.78958270974452
+                ],
+                "foot_incremental_min_rotation_deg": 33.87951231046915,
+                "ankle_transport": {
+                  "schema_version": 1,
+                  "selector": "spherical_soft_cap",
+                  "profile_requested": "cmu_bvh",
+                  "policy_source": "profile_override",
+                  "soft_cap_deg": null,
+                  "hard_deg": 120.0,
+                  "global_hard_deg": 120.0,
+                  "sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+                  "selected_mu": 1.0,
+                  "applied_deg": 33.87951593599332,
+                  "residual_direction_deg": 0.0,
+                  "reason": "frozen_v3_profile",
+                  "formula_applied_deg": 33.87951231046915
+                },
+                "foot_direction_partially_solved": false,
+                "foot_transport_reason": "frozen_v3_profile",
+                "post_boundary_residual_to_parent_coherent_deg": 0.0,
+                "applied_bones": [
+                  "upleg.L",
+                  "leg.L",
+                  "foot.L"
+                ],
+                "terminal_follow_bones": [
+                  "toe.L"
+                ],
+                "frame_determinants": [
+                  1.0000001192092896,
+                  1.0000001192092896,
+                  1.0000001192092896
+                ]
+              },
+              "leg.R": {
+                "kind": "leg",
+                "bones": [
+                  "upleg.R",
+                  "leg.R",
+                  "foot.R",
+                  "toe.R"
+                ],
+                "fallback": false,
+                "rest_direction_error_deg": [
+                  20.378268294522517,
+                  20.097854461269595,
+                  27.881605617859737
+                ],
+                "rest_direction_max_deg": 27.881605617859737,
+                "activated": true,
+                "activation_reason": "rest direction mismatch",
+                "source_edge_lengths": [
+                  7.3300673913915215,
+                  7.6492648899703815,
+                  2.204933291120416
+                ],
+                "target_edge_lengths": [
+                  0.4490417647328698,
+                  0.4137205845599154,
+                  0.1558662017129248
+                ],
+                "source_bend_deg": 52.18713007250294,
+                "target_rest_bend_deg": 0.7388627979303675,
+                "source_ankle_bend_deg": 105.84249984091109,
+                "target_rest_ankle_bend_deg": 54.66779919725756,
+                "target_rest_plane_used": false,
+                "foot_direction_solved": true,
+                "parent_coherent_available": true,
+                "parent_predicted_thigh_mismatch_deg": 10.703318531553876,
+                "v31_incremental_min_rotation_deg": [
+                  29.770184756369034,
+                  51.58423750195224
+                ],
+                "parent_coherent_incremental_min_rotation_deg": [
+                  10.703318531553876,
+                  52.925475436921225
+                ],
+                "v31_boundary_correction_deg": 143.951343322072,
+                "v31_boundary_correction_twist_deg": -143.9513429837611,
+                "v31_boundary_correction_non_twist_residual_deg": 3.383109117294225e-07,
+                "parent_coherent_thigh_direction_error_deg": 0.019782341029446364,
+                "v31_ankle_transport": {
+                  "schema_version": 1,
+                  "selector": "spherical_soft_cap",
+                  "profile_requested": "cmu_bvh",
+                  "policy_source": "profile_override",
+                  "soft_cap_deg": null,
+                  "hard_deg": 120.0,
+                  "global_hard_deg": 120.0,
+                  "sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+                  "selected_mu": 1.0,
+                  "applied_deg": 105.76712679878916,
+                  "residual_direction_deg": 0.0,
+                  "reason": "frozen_v3_profile",
+                  "formula_applied_deg": 105.76711697655423
+                },
+                "parent_coherent_ankle_transport": {
+                  "schema_version": 1,
+                  "selector": "spherical_soft_cap",
+                  "profile_requested": "cmu_bvh",
+                  "policy_source": "profile_override",
+                  "soft_cap_deg": null,
+                  "hard_deg": 120.0,
+                  "global_hard_deg": 120.0,
+                  "sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+                  "selected_mu": 1.0,
+                  "applied_deg": 67.09771837645054,
+                  "residual_direction_deg": 1.9578634748995682e-06,
+                  "reason": "frozen_v3_profile",
+                  "formula_applied_deg": 67.09772033431402
+                },
+                "parent_coherent_applied": true,
+                "bilateral_exact_v31_fallback": false,
+                "incremental_min_rotation_deg": [
+                  10.703318531553876,
+                  52.925475436921225
+                ],
+                "foot_incremental_min_rotation_deg": 67.09772033431402,
+                "ankle_transport": {
+                  "schema_version": 1,
+                  "selector": "spherical_soft_cap",
+                  "profile_requested": "cmu_bvh",
+                  "policy_source": "profile_override",
+                  "soft_cap_deg": null,
+                  "hard_deg": 120.0,
+                  "global_hard_deg": 120.0,
+                  "sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+                  "selected_mu": 1.0,
+                  "applied_deg": 67.09771837645054,
+                  "residual_direction_deg": 1.9578634748995682e-06,
+                  "reason": "frozen_v3_profile",
+                  "formula_applied_deg": 67.09772033431402
+                },
+                "foot_direction_partially_solved": false,
+                "foot_transport_reason": "frozen_v3_profile",
+                "post_boundary_residual_to_parent_coherent_deg": 0.0,
+                "applied_bones": [
+                  "upleg.R",
+                  "leg.R",
+                  "foot.R"
+                ],
+                "terminal_follow_bones": [
+                  "toe.R"
+                ],
+                "frame_determinants": [
+                  1.0,
+                  1.0000001192092896,
+                  1.000000238418579
+                ]
+              },
+              "_palm_roll": {
+                "variant": "CHAIN_TRANSPORT_V3_2_1_PALM_ROLL_QA",
+                "parent_variant": "CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY",
+                "parent_retarget_sha256": "692e975d32f41e3406144763c7c0b7dbf0a586ff07732f09c4365e3233b13693",
+                "policy_sha256": "46da74c83a9dd63bc03d11fc4e6ccbd104f8fc1ec084b2a7a1c8613f5a93bb95",
+                "requested_mu": {
+                  "hand.L": 0.5,
+                  "hand.R": 0.5
+                },
+                "default_is_exact_parent": false,
+                "operational_status": "PROMOTED_RUNTIME",
+                "actual_mesh_gate": "V3.2.5_SELECTOR",
+                "hands": {
+                  "hand.L": {
+                    "mode": "fallback",
+                    "fallback_reason": "source\uc640 target\uc5d0 \uacf5\ud1b5\uc778 index+pinky/index+thumb pair\uac00 \uc5c6\ub2e4",
+                    "frame_status": "landmark_pair_missing",
+                    "selected_mu": 0.0,
+                    "mesh_gate": "NOT_RUN_FALLBACK",
+                    "source_discovery": {
+                      "landmarks": {
+                        "index": "LeftHandIndex1"
+                      },
+                      "zero_base_candidates": {
+                        "index": [
+                          "LeftFingerBase"
+                        ],
+                        "pinky": [],
+                        "thumb": [
+                          "LThumb"
+                        ]
+                      },
+                      "uses_pose_geometry": false,
+                      "uses_tail_or_fingertip": false
+                    },
+                    "target_discovery": {
+                      "landmarks": {
+                        "index": "mixamorig:LeftHandIndex1",
+                        "pinky": "mixamorig:LeftHandPinky1",
+                        "thumb": "mixamorig:LeftHandThumb1"
+                      },
+                      "zero_base_candidates": {
+                        "index": [],
+                        "pinky": [],
+                        "thumb": []
+                      },
+                      "uses_pose_geometry": false,
+                      "uses_tail_or_fingertip": false
+                    },
+                    "wrist_transfer": {
+                      "applied_deg": 67.69946901533238,
+                      "mode": "forearm_relative_full",
+                      "forearm_twist_deg": -33.84974524046795
+                    }
+                  },
+                  "hand.R": {
+                    "mode": "fallback",
+                    "fallback_reason": "source\uc640 target\uc5d0 \uacf5\ud1b5\uc778 index+pinky/index+thumb pair\uac00 \uc5c6\ub2e4",
+                    "frame_status": "landmark_pair_missing",
+                    "selected_mu": 0.0,
+                    "mesh_gate": "NOT_RUN_FALLBACK",
+                    "source_discovery": {
+                      "landmarks": {
+                        "index": "RightHandIndex1"
+                      },
+                      "zero_base_candidates": {
+                        "index": [
+                          "RightFingerBase"
+                        ],
+                        "pinky": [],
+                        "thumb": [
+                          "RThumb"
+                        ]
+                      },
+                      "uses_pose_geometry": false,
+                      "uses_tail_or_fingertip": false
+                    },
+                    "target_discovery": {
+                      "landmarks": {
+                        "index": "mixamorig:RightHandIndex1",
+                        "pinky": "mixamorig:RightHandPinky1",
+                        "thumb": "mixamorig:RightHandThumb1"
+                      },
+                      "zero_base_candidates": {
+                        "index": [],
+                        "pinky": [],
+                        "thumb": []
+                      },
+                      "uses_pose_geometry": false,
+                      "uses_tail_or_fingertip": false
+                    },
+                    "wrist_transfer": {
+                      "applied_deg": 12.038989615033794,
+                      "mode": "forearm_relative_full",
+                      "forearm_twist_deg": 6.019495068064024
+                    }
+                  }
+                }
+              }
+            },
+            "chain_fallbacks": [],
+            "terminal_follow_bones": [
+              "hand.L",
+              "hand.R",
+              "toe.L",
+              "toe.R"
+            ],
+            "palm_roll_requested_deg": {
+              "hand.L": 0.0,
+              "hand.R": 0.0
+            },
+            "palm_roll_applied_deg": {
+              "hand.L": 0.0,
+              "hand.R": 0.0
+            },
+            "palm_roll_mu": {
+              "hand.L": 0.0,
+              "hand.R": 0.0
+            },
+            "palm_landmark_roles": {},
+            "palm_plane_sin": {},
+            "palm_frame_status": {
+              "hand.L": "landmark_pair_missing",
+              "hand.R": "landmark_pair_missing"
+            },
+            "palm_roll_mode": {
+              "hand.L": "fallback",
+              "hand.R": "fallback"
+            },
+            "wrist_transfer": {
+              "hand.L": 67.69946901533238,
+              "hand.R": 12.038989615033794
+            },
+            "palm_fallback_reason": {
+              "hand.L": "source\uc640 target\uc5d0 \uacf5\ud1b5\uc778 index+pinky/index+thumb pair\uac00 \uc5c6\ub2e4",
+              "hand.R": "source\uc640 target\uc5d0 \uacf5\ud1b5\uc778 index+pinky/index+thumb pair\uac00 \uc5c6\ub2e4"
+            },
+            "palm_roll_bones": [],
+            "palm_roll_fallback_bones": [
+              "hand.L",
+              "hand.R"
+            ],
+            "local_normalization_surface_error": 6.420589215849759e-07,
+            "max_joint_edge_length_error": 1.816664080278585e-07,
+            "camera": {
+              "version": "personal-camera/1",
+              "applied": false,
+              "maxRigidSurfaceError": 0.0
+            }
+          },
+          "file": "model-2-pose-1.fbx",
+          "cachedSeconds": 0.05101829199702479
+        }
+      ],
+      "registration": {
+        "normalizedFormat": "fbx",
+        "normalizedHash": "658866da0761a9a90495020835cb08402d415064c32563cc5dcaf4c5b02e36ba",
+        "archiveHash": "1a0d242c2ee2d71d2fba7beb19be3ec3d73fb745c6cb359120dbd26486716748",
+        "validation": {
+          "passed": true,
+          "meshCount": 1,
+          "originalBoneCount": 53,
+          "vertexCount": 24988,
+          "maxSurfaceError": 5.101335887047753e-07,
+          "maxSkinProbeError": 7.601418019476114e-07,
+          "maxMaterialRegionError": 5.101335887047753e-07,
+          "materialCount": 1,
+          "tolerance": 1.780109771384568e-05,
+          "fkProbes": {
+            "forearm.L": {
+              "joint": "forearm.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1088190872464659
+            },
+            "forearm.R": {
+              "joint": "forearm.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.10896417965076514
+            },
+            "leg.L": {
+              "joint": "leg.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.13425406683096436
+            },
+            "leg.R": {
+              "joint": "leg.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1342576162504657
+            },
+            "spine": {
+              "joint": "spine",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1684601450844222
+            }
+          },
+          "blenderVersion": "5.2.0 LTS",
+          "materialPreservation": {
+            "passed": true,
+            "materialCount": 1,
+            "maxDiffuseError": 0.0,
+            "maxSpecularError": 0.0,
+            "maxShininessError": 2.288818308215923e-07,
+            "maxOpacityError": 0.0
+          }
+        },
+        "versions": {
+          "importerVersion": "personal-import/3",
+          "normalizationVersion": "personal-normalize/5",
+          "rigMappingVersion": "personal-rig/2",
+          "converterVersion": "personal-converter/5",
+          "converterFingerprint": "27ac6ab4e5b10d55c83cbf900b3c7c79047f037d8f1610339f298246aa94aba8"
+        },
+        "capabilities": {
+          "supportLevel": "body_only",
+          "bodyPose": true,
+          "hands": {
+            "left": {
+              "supported": false,
+              "fingerBones": 15,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            },
+            "right": {
+              "supported": false,
+              "fingerBones": 15,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            }
+          },
+          "collisionPrevention": false,
+          "shapeSliders": false
+        }
+      },
+      "sourceGeometry": {
+        "container": "SQLite3",
+        "catalogVersion": 2,
+        "declaredPlainBytes": 1611336,
+        "decoderAvailable": true,
+        "decoderVersion": "cs3c-catalog2/1",
+        "expandedBytes": 3585270,
+        "tableStreamSha256": "759fd70ef9ff98b5c25854fba33c1b3c2c354030bcb1d303761ced44d973bcb6",
+        "hierarchyNodes": 53,
+        "meshes": 1,
+        "vertices": 24988,
+        "materials": [
+          {
+            "name": "Pilot neutral clay",
+            "ambient": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "diffuse": [
+              0.47999998927116394,
+              0.5299999713897705,
+              0.5899999737739563
+            ],
+            "specular": [
+              0.11999999731779099,
+              0.13249999284744263,
+              0.14749999344348907
+            ],
+            "emission": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "opacity": 1.0,
+            "shininess": 10.239999771118164
+          }
+        ],
+        "materialSupport": "source_solid_diffuse_specular_shininess_and_face_assignment",
+        "sourceShadingMatchToCSP": "unverified",
+        "maxInverseBindError": 9.414691248821327e-14,
+        "maxSourceRestSkinError": 2.501595091508979e-05,
+        "sourceAxisUp": "Y",
+        "sourceUnits": "unconfirmed",
+        "internalDisplayScale": 0.01,
+        "originalWeightsRenormalized": false,
+        "maxBlenderRestMatrixErrorSourceUnits": 1.3939711556498757e-05,
+        "maxOriginalFKProbeError": 5.666405482354816e-07,
+        "originalFKProbeCount": 5
+      },
+      "sourceMaterials": [
+        {
+          "name": "Pilot neutral clay",
+          "ambient": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "diffuse": [
+            0.47999998927116394,
+            0.5299999713897705,
+            0.5899999737739563
+          ],
+          "specular": [
+            0.11999999731779099,
+            0.13249999284744263,
+            0.14749999344348907
+          ],
+          "emission": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "opacity": 1.0,
+          "shininess": 10.239999771118164
+        }
+      ]
+    },
+    {
+      "inputName": "standin-male-0.7.6-recorded-and-applied-review.cs3c",
+      "sourceHash": "c309cb18c8be8db23a271c79850730ed0129b5cac1dba02136115381dafa943f",
+      "registrationSeconds": 8.056951292004669,
+      "registrationEvent": "result",
+      "poses": [
+        {
+          "poseName": "03-staging-selected-pose.bvh",
+          "poseHash": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+          "event": "result",
+          "seconds": 3.6814061669865623,
+          "snapshotHash": "222f454575b9f1a92584d4545a362037b9c0443a6e3985b737d0dceea2ce2670",
+          "artifactHash": "3e6619a4b88cc6fb873e7897c7a8bfc6a1e3db67ca13f194ead68585b6f83191",
+          "validation": {
+            "passed": true,
+            "meshCount": 1,
+            "originalBoneCount": 66,
+            "vertexCount": 24988,
+            "maxSurfaceError": 7.588719199702609e-07,
+            "maxSkinProbeError": 8.765126153775782e-07,
+            "maxMaterialRegionError": 7.588719199702609e-07,
+            "materialCount": 1,
+            "tolerance": 1.7444062930276232e-05,
+            "fkProbes": {
+              "forearm.L": {
+                "joint": "forearm.L",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.10876463535284306
+              },
+              "forearm.R": {
+                "joint": "forearm.R",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.1089407657011523
+              },
+              "leg.L": {
+                "joint": "leg.L",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.12953315171815846
+              },
+              "leg.R": {
+                "joint": "leg.R",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.12953383322654813
+              },
+              "spine": {
+                "joint": "spine",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.1619044103071455
+              }
+            },
+            "blenderVersion": "5.2.0 LTS",
+            "materialPreservation": {
+              "passed": true,
+              "materialCount": 1,
+              "maxDiffuseError": 0.0,
+              "maxSpecularError": 0.0,
+              "maxShininessError": 2.288818308215923e-07,
+              "maxOpacityError": 0.0
+            }
+          },
+          "retarget": {
+            "ok": true,
+            "output_mode": "",
+            "src_profile": "mixamo_noprefix",
+            "dst_profile": "mixamo",
+            "mapped_bones": 22,
+            "missing_required": [],
+            "unmapped_optional": [],
+            "max_joint_angle_deg": 164.8875557721428,
+            "pose_fidelity_rmse": null,
+            "skeleton_baseline_rmse": null,
+            "pose_fidelity_delta": null,
+            "mirrored": false,
+            "frame": 0,
+            "warnings": [
+              "rest \uc2a4\uc719 \ucd5c\ub300 39.8\u00b0 (shoulder.R) > 15\u00b0 \u2014 \uc18c\uc2a4\uc640 \ud0c0\uae43\uc758 rest \uaddc\uaca9\uc774 \ub2e4\ub974\ub2e4(\ub7f0\ud0c0\uc784 \ubcf4\uc815\uc73c\ub85c \ud761\uc218\ub428)"
+            ],
+            "rest_swing_deg": {
+              "spine": 12.100935507509382,
+              "spine1": 3.2364653735378526,
+              "spine2": 22.820122748477186,
+              "neck": 10.888169511234597,
+              "head": 1.8633329895970916,
+              "shoulder.L": 39.715287914408584,
+              "upperarm.L": 3.3075328602151384,
+              "forearm.L": 2.025101460944317,
+              "hand.L": 8.789675932788498,
+              "shoulder.R": 39.83831838650831,
+              "upperarm.R": 3.25241394615083,
+              "forearm.R": 2.0320734562608935,
+              "hand.R": 8.01148104372282,
+              "upleg.L": 2.6989463043910895,
+              "leg.L": 2.3017363135677296,
+              "foot.L": 7.669003655400447,
+              "toe.L": 4.831277777689796,
+              "upleg.R": 2.388533172324868,
+              "leg.R": 2.5238654959638986,
+              "foot.R": 8.170140388354346,
+              "toe.R": 4.876843003411022
+            },
+            "rest_swing_max_deg": 39.83831838650831,
+            "rest_swing_bone": "shoulder.R",
+            "twist_deg": {},
+            "degenerate_bones": [],
+            "solver_mode_by_bone": {
+              "hips": "legacy_structural",
+              "spine": "legacy_structural",
+              "spine1": "legacy_structural",
+              "spine2": "legacy_structural",
+              "neck": "legacy_structural",
+              "head": "legacy_structural",
+              "shoulder.L": "legacy_structural",
+              "upperarm.L": "legacy_compatible_chain",
+              "forearm.L": "legacy_compatible_chain",
+              "hand.L": "legacy_compatible_chain",
+              "shoulder.R": "legacy_structural",
+              "upperarm.R": "legacy_compatible_chain",
+              "forearm.R": "legacy_compatible_chain",
+              "hand.R": "legacy_compatible_chain",
+              "upleg.L": "legacy_compatible_chain",
+              "leg.L": "legacy_compatible_chain",
+              "foot.L": "legacy_compatible_chain",
+              "toe.L": "legacy_compatible_chain",
+              "upleg.R": "legacy_compatible_chain",
+              "leg.R": "legacy_compatible_chain",
+              "foot.R": "legacy_compatible_chain",
+              "toe.R": "legacy_compatible_chain"
+            },
+            "chain_diagnostics": {
+              "_pelvis_boundary": {
+                "mode": "parent_coherent_projection",
+                "parent_variant": "CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY",
+                "parent_retarget_sha256": "692e975d32f41e3406144763c7c0b7dbf0a586ff07732f09c4365e3233b13693",
+                "hips_transport_rotation_deg": 0.0,
+                "hips_transport_determinant": 1.0,
+                "hips_rotation_unchanged": true,
+                "root_translation_unchanged": true,
+                "bilateral_exact_v31_fallback": false,
+                "active_chains": [],
+                "fallback_chains": []
+              },
+              "arm.L": {
+                "kind": "arm",
+                "bones": [
+                  "upperarm.L",
+                  "forearm.L",
+                  "hand.L"
+                ],
+                "fallback": false,
+                "wrist_rest_compatibility_deg": 6.854396774178638,
+                "rest_direction_error_deg": [
+                  3.3074695355721953,
+                  2.0251090613532043
+                ],
+                "rest_direction_max_deg": 3.3074695355721953,
+                "activated": false,
+                "activation_reason": "rest direction/wrist frame already compatible"
+              },
+              "arm.R": {
+                "kind": "arm",
+                "bones": [
+                  "upperarm.R",
+                  "forearm.R",
+                  "hand.R"
+                ],
+                "fallback": false,
+                "wrist_rest_compatibility_deg": 6.3773683823134535,
+                "rest_direction_error_deg": [
+                  3.252412352845386,
+                  2.03197711015051
+                ],
+                "rest_direction_max_deg": 3.252412352845386,
+                "activated": false,
+                "activation_reason": "rest direction/wrist frame already compatible"
+              },
+              "leg.L": {
+                "kind": "leg",
+                "bones": [
+                  "upleg.L",
+                  "leg.L",
+                  "foot.L",
+                  "toe.L"
+                ],
+                "fallback": false,
+                "rest_direction_error_deg": [
+                  2.698801188276648,
+                  2.3016506148266713,
+                  7.668926882597014
+                ],
+                "rest_direction_max_deg": 7.668926882597014,
+                "activated": false,
+                "activation_reason": "rest directions already compatible"
+              },
+              "leg.R": {
+                "kind": "leg",
+                "bones": [
+                  "upleg.R",
+                  "leg.R",
+                  "foot.R",
+                  "toe.R"
+                ],
+                "fallback": false,
+                "rest_direction_error_deg": [
+                  2.3884512151702633,
+                  2.5238654959638986,
+                  8.170068295571314
+                ],
+                "rest_direction_max_deg": 8.170068295571314,
+                "activated": false,
+                "activation_reason": "rest directions already compatible"
+              },
+              "_palm_roll": {
+                "variant": "CHAIN_TRANSPORT_V3_2_1_PALM_ROLL_QA",
+                "parent_variant": "CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY",
+                "parent_retarget_sha256": "692e975d32f41e3406144763c7c0b7dbf0a586ff07732f09c4365e3233b13693",
+                "policy_sha256": "46da74c83a9dd63bc03d11fc4e6ccbd104f8fc1ec084b2a7a1c8613f5a93bb95",
+                "requested_mu": {
+                  "hand.L": 0.5,
+                  "hand.R": 0.5
+                },
+                "default_is_exact_parent": false,
+                "operational_status": "PROMOTED_RUNTIME",
+                "actual_mesh_gate": "V3.2.5_SELECTOR",
+                "hands": {
+                  "hand.L": {
+                    "mode": "identity",
+                    "frame_status": "inactive_compatible_chain",
+                    "selected_mu": 0.0,
+                    "mesh_gate": "NOT_NEEDED_COMPATIBLE_CHAIN"
+                  },
+                  "hand.R": {
+                    "mode": "identity",
+                    "frame_status": "inactive_compatible_chain",
+                    "selected_mu": 0.0,
+                    "mesh_gate": "NOT_NEEDED_COMPATIBLE_CHAIN"
+                  }
+                }
+              }
+            },
+            "chain_fallbacks": [],
+            "terminal_follow_bones": [],
+            "palm_roll_requested_deg": {
+              "hand.L": 0.0,
+              "hand.R": 0.0
+            },
+            "palm_roll_applied_deg": {
+              "hand.L": 0.0,
+              "hand.R": 0.0
+            },
+            "palm_roll_mu": {
+              "hand.L": 0.0,
+              "hand.R": 0.0
+            },
+            "palm_landmark_roles": {},
+            "palm_plane_sin": {},
+            "palm_frame_status": {
+              "hand.L": "inactive_compatible_chain",
+              "hand.R": "inactive_compatible_chain"
+            },
+            "palm_roll_mode": {
+              "hand.L": "identity",
+              "hand.R": "identity"
+            },
+            "wrist_transfer": {},
+            "palm_fallback_reason": {
+              "hand.L": null,
+              "hand.R": null
+            },
+            "palm_roll_bones": [],
+            "palm_roll_fallback_bones": [],
+            "local_normalization_surface_error": 6.420589215849759e-07,
+            "max_joint_edge_length_error": 2.3259386294771645e-07,
+            "camera": {
+              "version": "personal-camera/1",
+              "applied": false,
+              "maxRigidSurfaceError": 0.0
+            }
+          },
+          "file": "model-3-pose-0.fbx",
+          "cachedSeconds": 0.050314499996602535
+        },
+        {
+          "poseName": "cmu_135_01_04368.bvh",
+          "poseHash": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+          "event": "result",
+          "seconds": 3.6820999170013238,
+          "snapshotHash": "77ce145a86228f60f6a1f4daef0a4879a0dd231dbd1740206ebc6b6d0fb5bf49",
+          "artifactHash": "1fac645c57e01a674c5f3beb621195e97005746a25fd9c44fd68b64709916e4e",
+          "validation": {
+            "passed": true,
+            "meshCount": 1,
+            "originalBoneCount": 66,
+            "vertexCount": 24988,
+            "maxSurfaceError": 8.689598871569615e-07,
+            "maxSkinProbeError": 9.702932857180713e-07,
+            "maxMaterialRegionError": 8.689135029271711e-07,
+            "materialCount": 1,
+            "tolerance": 1.7756132018480384e-05,
+            "fkProbes": {
+              "forearm.L": {
+                "joint": "forearm.L",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.10877168465902481
+              },
+              "forearm.R": {
+                "joint": "forearm.R",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.10896001008268852
+              },
+              "leg.L": {
+                "joint": "leg.L",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.1298630121431651
+              },
+              "leg.R": {
+                "joint": "leg.R",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.12857908758643313
+              },
+              "spine": {
+                "joint": "spine",
+                "rotationRadians": 0.25,
+                "maxVertexDisplacement": 0.1888558567590011
+              }
+            },
+            "blenderVersion": "5.2.0 LTS",
+            "materialPreservation": {
+              "passed": true,
+              "materialCount": 1,
+              "maxDiffuseError": 0.0,
+              "maxSpecularError": 0.0,
+              "maxShininessError": 2.288818308215923e-07,
+              "maxOpacityError": 0.0
+            }
+          },
+          "retarget": {
+            "ok": true,
+            "output_mode": "",
+            "src_profile": "cmu_bvh",
+            "dst_profile": "mixamo",
+            "mapped_bones": 22,
+            "missing_required": [],
+            "unmapped_optional": [],
+            "max_joint_angle_deg": 175.59510673018838,
+            "pose_fidelity_rmse": null,
+            "skeleton_baseline_rmse": null,
+            "pose_fidelity_delta": null,
+            "mirrored": false,
+            "frame": 0,
+            "warnings": [
+              "rest \uc2a4\uc719 \ucd5c\ub300 98.3\u00b0 (hand.L) > 15\u00b0 \u2014 \uc18c\uc2a4\uc640 \ud0c0\uae43\uc758 rest \uaddc\uaca9\uc774 \ub2e4\ub974\ub2e4(\ub7f0\ud0c0\uc784 \ubcf4\uc815\uc73c\ub85c \ud761\uc218\ub428)"
+            ],
+            "rest_swing_deg": {
+              "spine": 3.1907057723972945,
+              "spine1": 8.611188975734787,
+              "spine2": 5.06185820183351,
+              "neck": 4.013350508243193,
+              "head": 1.9108760710564017,
+              "shoulder.L": 40.845161637762615,
+              "upperarm.L": 3.0327374638604394,
+              "forearm.L": 1.8430251016176173,
+              "hand.L": 98.25097973074047,
+              "shoulder.R": 44.83537475248874,
+              "upperarm.R": 3.017724576261468,
+              "forearm.R": 1.8418566806551153,
+              "hand.R": 97.98240558755494,
+              "upleg.L": 20.421193963930627,
+              "leg.L": 20.120964463110464,
+              "foot.L": 27.5886100493806,
+              "toe.L": 4.831280695859293,
+              "upleg.R": 20.378277734481017,
+              "leg.R": 20.097864397592645,
+              "foot.R": 27.88161354817088,
+              "toe.R": 4.876845674485973
+            },
+            "rest_swing_max_deg": 98.25097973074047,
+            "rest_swing_bone": "hand.L",
+            "twist_deg": {},
+            "degenerate_bones": [],
+            "solver_mode_by_bone": {
+              "hips": "legacy_structural",
+              "spine": "legacy_structural",
+              "spine1": "legacy_structural",
+              "spine2": "legacy_structural",
+              "neck": "legacy_structural",
+              "head": "legacy_structural",
+              "shoulder.L": "legacy_structural",
+              "upperarm.L": "chain_transport",
+              "forearm.L": "chain_transport",
+              "hand.L": "terminal_follow_wrist_transfer",
+              "shoulder.R": "legacy_structural",
+              "upperarm.R": "chain_transport",
+              "forearm.R": "chain_transport",
+              "hand.R": "terminal_follow_wrist_transfer",
+              "upleg.L": "chain_transport_parent_coherent",
+              "leg.L": "chain_transport_parent_coherent",
+              "foot.L": "chain_transport_parent_coherent",
+              "toe.L": "terminal_follow",
+              "upleg.R": "chain_transport_parent_coherent",
+              "leg.R": "chain_transport_parent_coherent",
+              "foot.R": "chain_transport_parent_coherent",
+              "toe.R": "terminal_follow"
+            },
+            "chain_diagnostics": {
+              "_pelvis_boundary": {
+                "mode": "parent_coherent_projection",
+                "parent_variant": "CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY",
+                "parent_retarget_sha256": "692e975d32f41e3406144763c7c0b7dbf0a586ff07732f09c4365e3233b13693",
+                "hips_transport_rotation_deg": 143.30896389486807,
+                "hips_transport_determinant": 0.9999999403953552,
+                "hips_rotation_unchanged": true,
+                "root_translation_unchanged": true,
+                "bilateral_exact_v31_fallback": false,
+                "active_chains": [
+                  "leg.L",
+                  "leg.R"
+                ],
+                "fallback_chains": []
+              },
+              "arm.L": {
+                "kind": "arm",
+                "bones": [
+                  "upperarm.L",
+                  "forearm.L",
+                  "hand.L"
+                ],
+                "fallback": false,
+                "wrist_rest_compatibility_deg": 96.44188472345012,
+                "rest_direction_error_deg": [
+                  3.0326713665983926,
+                  1.8429189121305534
+                ],
+                "rest_direction_max_deg": 3.0326713665983926,
+                "activated": true,
+                "activation_reason": "rest direction or wrist frame mismatch",
+                "source_edge_lengths": [
+                  5.433011844500629,
+                  3.1593589531390047
+                ],
+                "target_edge_lengths": [
+                  0.2889158195975704,
+                  0.24769900734834122
+                ],
+                "source_bend_deg": 87.80001175600337,
+                "target_rest_bend_deg": 1.1972323269405243,
+                "target_rest_plane_used": false,
+                "incremental_min_rotation_deg": [
+                  62.98331358713444,
+                  87.1381643058749
+                ],
+                "applied_bones": [
+                  "upperarm.L",
+                  "forearm.L"
+                ],
+                "terminal_follow_bones": [
+                  "hand.L"
+                ],
+                "frame_determinants": [
+                  1.0,
+                  1.000000238418579
+                ],
+                "palm_roll": {
+                  "mode": "fallback",
+                  "fallback_reason": "source\uc640 target\uc5d0 \uacf5\ud1b5\uc778 index+pinky/index+thumb pair\uac00 \uc5c6\ub2e4",
+                  "frame_status": "landmark_pair_missing",
+                  "selected_mu": 0.0,
+                  "mesh_gate": "NOT_RUN_FALLBACK",
+                  "source_discovery": {
+                    "landmarks": {
+                      "index": "LeftHandIndex1"
+                    },
+                    "zero_base_candidates": {
+                      "index": [
+                        "LeftFingerBase"
+                      ],
+                      "pinky": [],
+                      "thumb": [
+                        "LThumb"
+                      ]
+                    },
+                    "uses_pose_geometry": false,
+                    "uses_tail_or_fingertip": false
+                  },
+                  "target_discovery": {
+                    "landmarks": {
+                      "index": "mixamorig:LeftHandIndex1",
+                      "pinky": "mixamorig:LeftHandPinky1",
+                      "thumb": "mixamorig:LeftHandThumb1"
+                    },
+                    "zero_base_candidates": {
+                      "index": [],
+                      "pinky": [],
+                      "thumb": []
+                    },
+                    "uses_pose_geometry": false,
+                    "uses_tail_or_fingertip": false
+                  },
+                  "wrist_transfer": {
+                    "applied_deg": 67.69946901533238,
+                    "mode": "forearm_relative_full",
+                    "forearm_twist_deg": -33.84974524046795
+                  }
+                }
+              },
+              "arm.R": {
+                "kind": "arm",
+                "bones": [
+                  "upperarm.R",
+                  "forearm.R",
+                  "hand.R"
+                ],
+                "fallback": false,
+                "wrist_rest_compatibility_deg": 95.61585197865918,
+                "rest_direction_error_deg": [
+                  3.017723256927529,
+                  1.8417504238240332
+                ],
+                "rest_direction_max_deg": 3.017723256927529,
+                "activated": true,
+                "activation_reason": "rest direction or wrist frame mismatch",
+                "source_edge_lengths": [
+                  5.341940233165466,
+                  3.193510410108512
+                ],
+                "target_edge_lengths": [
+                  0.28891193028906814,
+                  0.24769872877914723
+                ],
+                "source_bend_deg": 90.68188498048609,
+                "target_rest_bend_deg": 1.1765658795253542,
+                "target_rest_plane_used": false,
+                "incremental_min_rotation_deg": [
+                  140.49670809959997,
+                  91.52450307506832
+                ],
+                "applied_bones": [
+                  "upperarm.R",
+                  "forearm.R"
+                ],
+                "terminal_follow_bones": [
+                  "hand.R"
+                ],
+                "frame_determinants": [
+                  1.0000001192092896,
+                  1.0000003576278687
+                ],
+                "palm_roll": {
+                  "mode": "fallback",
+                  "fallback_reason": "source\uc640 target\uc5d0 \uacf5\ud1b5\uc778 index+pinky/index+thumb pair\uac00 \uc5c6\ub2e4",
+                  "frame_status": "landmark_pair_missing",
+                  "selected_mu": 0.0,
+                  "mesh_gate": "NOT_RUN_FALLBACK",
+                  "source_discovery": {
+                    "landmarks": {
+                      "index": "RightHandIndex1"
+                    },
+                    "zero_base_candidates": {
+                      "index": [
+                        "RightFingerBase"
+                      ],
+                      "pinky": [],
+                      "thumb": [
+                        "RThumb"
+                      ]
+                    },
+                    "uses_pose_geometry": false,
+                    "uses_tail_or_fingertip": false
+                  },
+                  "target_discovery": {
+                    "landmarks": {
+                      "index": "mixamorig:RightHandIndex1",
+                      "pinky": "mixamorig:RightHandPinky1",
+                      "thumb": "mixamorig:RightHandThumb1"
+                    },
+                    "zero_base_candidates": {
+                      "index": [],
+                      "pinky": [],
+                      "thumb": []
+                    },
+                    "uses_pose_geometry": false,
+                    "uses_tail_or_fingertip": false
+                  },
+                  "wrist_transfer": {
+                    "applied_deg": 12.038989615033794,
+                    "mode": "forearm_relative_full",
+                    "forearm_twist_deg": 6.019495068064024
+                  }
+                }
+              },
+              "leg.L": {
+                "kind": "leg",
+                "bones": [
+                  "upleg.L",
+                  "leg.L",
+                  "foot.L",
+                  "toe.L"
+                ],
+                "fallback": false,
+                "rest_direction_error_deg": [
+                  20.421184629141276,
+                  20.12094462475258,
+                  27.58862116814669
+                ],
+                "rest_direction_max_deg": 27.58862116814669,
+                "activated": true,
+                "activation_reason": "rest direction mismatch",
+                "source_edge_lengths": [
+                  7.127960053449914,
+                  7.58108477259107,
+                  2.1736481515804367
+                ],
+                "target_edge_lengths": [
+                  0.44916667249565073,
+                  0.4137820020640187,
+                  0.15790176663467745
+                ],
+                "source_bend_deg": 78.96562891009197,
+                "target_rest_bend_deg": 0.824375310068327,
+                "source_ankle_bend_deg": 86.96416935308591,
+                "target_rest_ankle_bend_deg": 55.451694326631035,
+                "target_rest_plane_used": false,
+                "foot_direction_solved": true,
+                "parent_coherent_available": true,
+                "parent_predicted_thigh_mismatch_deg": 88.78995788793029,
+                "v31_incremental_min_rotation_deg": [
+                  69.43356324910495,
+                  78.22968575069142
+                ],
+                "parent_coherent_incremental_min_rotation_deg": [
+                  88.78995788793029,
+                  79.78958270974452
+                ],
+                "v31_boundary_correction_deg": 150.7663073593137,
+                "v31_boundary_correction_twist_deg": -150.76631120282465,
+                "v31_boundary_correction_non_twist_residual_deg": 3.843510938850159e-06,
+                "parent_coherent_thigh_direction_error_deg": 0.0,
+                "v31_ankle_transport": {
+                  "schema_version": 1,
+                  "selector": "spherical_soft_cap",
+                  "profile_requested": "cmu_bvh",
+                  "policy_source": "profile_override",
+                  "soft_cap_deg": null,
+                  "hard_deg": 120.0,
+                  "global_hard_deg": 120.0,
+                  "sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+                  "selected_mu": 0.0,
+                  "applied_deg": 0.0,
+                  "residual_direction_deg": 139.66138838093258,
+                  "reason": "frozen_v3_hard_guard",
+                  "formula_applied_deg": 0.0
+                },
+                "parent_coherent_ankle_transport": {
+                  "schema_version": 1,
+                  "selector": "spherical_soft_cap",
+                  "profile_requested": "cmu_bvh",
+                  "policy_source": "profile_override",
+                  "soft_cap_deg": null,
+                  "hard_deg": 120.0,
+                  "global_hard_deg": 120.0,
+                  "sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+                  "selected_mu": 1.0,
+                  "applied_deg": 33.87951593599332,
+                  "residual_direction_deg": 0.0,
+                  "reason": "frozen_v3_profile",
+                  "formula_applied_deg": 33.87951231046915
+                },
+                "parent_coherent_applied": true,
+                "bilateral_exact_v31_fallback": false,
+                "incremental_min_rotation_deg": [
+                  88.78995788793029,
+                  79.78958270974452
+                ],
+                "foot_incremental_min_rotation_deg": 33.87951231046915,
+                "ankle_transport": {
+                  "schema_version": 1,
+                  "selector": "spherical_soft_cap",
+                  "profile_requested": "cmu_bvh",
+                  "policy_source": "profile_override",
+                  "soft_cap_deg": null,
+                  "hard_deg": 120.0,
+                  "global_hard_deg": 120.0,
+                  "sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+                  "selected_mu": 1.0,
+                  "applied_deg": 33.87951593599332,
+                  "residual_direction_deg": 0.0,
+                  "reason": "frozen_v3_profile",
+                  "formula_applied_deg": 33.87951231046915
+                },
+                "foot_direction_partially_solved": false,
+                "foot_transport_reason": "frozen_v3_profile",
+                "post_boundary_residual_to_parent_coherent_deg": 0.0,
+                "applied_bones": [
+                  "upleg.L",
+                  "leg.L",
+                  "foot.L"
+                ],
+                "terminal_follow_bones": [
+                  "toe.L"
+                ],
+                "frame_determinants": [
+                  1.0000001192092896,
+                  1.0000001192092896,
+                  1.0000001192092896
+                ]
+              },
+              "leg.R": {
+                "kind": "leg",
+                "bones": [
+                  "upleg.R",
+                  "leg.R",
+                  "foot.R",
+                  "toe.R"
+                ],
+                "fallback": false,
+                "rest_direction_error_deg": [
+                  20.378268294522517,
+                  20.097854461269595,
+                  27.881605617859737
+                ],
+                "rest_direction_max_deg": 27.881605617859737,
+                "activated": true,
+                "activation_reason": "rest direction mismatch",
+                "source_edge_lengths": [
+                  7.3300673913915215,
+                  7.6492648899703815,
+                  2.204933291120416
+                ],
+                "target_edge_lengths": [
+                  0.4490417647328698,
+                  0.4137205845599154,
+                  0.1558662017129248
+                ],
+                "source_bend_deg": 52.18713007250294,
+                "target_rest_bend_deg": 0.7388627979303675,
+                "source_ankle_bend_deg": 105.84249984091109,
+                "target_rest_ankle_bend_deg": 54.66779919725756,
+                "target_rest_plane_used": false,
+                "foot_direction_solved": true,
+                "parent_coherent_available": true,
+                "parent_predicted_thigh_mismatch_deg": 10.703318531553876,
+                "v31_incremental_min_rotation_deg": [
+                  29.770184756369034,
+                  51.58423750195224
+                ],
+                "parent_coherent_incremental_min_rotation_deg": [
+                  10.703318531553876,
+                  52.925475436921225
+                ],
+                "v31_boundary_correction_deg": 143.951343322072,
+                "v31_boundary_correction_twist_deg": -143.9513429837611,
+                "v31_boundary_correction_non_twist_residual_deg": 3.383109117294225e-07,
+                "parent_coherent_thigh_direction_error_deg": 0.019782341029446364,
+                "v31_ankle_transport": {
+                  "schema_version": 1,
+                  "selector": "spherical_soft_cap",
+                  "profile_requested": "cmu_bvh",
+                  "policy_source": "profile_override",
+                  "soft_cap_deg": null,
+                  "hard_deg": 120.0,
+                  "global_hard_deg": 120.0,
+                  "sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+                  "selected_mu": 1.0,
+                  "applied_deg": 105.76712679878916,
+                  "residual_direction_deg": 0.0,
+                  "reason": "frozen_v3_profile",
+                  "formula_applied_deg": 105.76711697655423
+                },
+                "parent_coherent_ankle_transport": {
+                  "schema_version": 1,
+                  "selector": "spherical_soft_cap",
+                  "profile_requested": "cmu_bvh",
+                  "policy_source": "profile_override",
+                  "soft_cap_deg": null,
+                  "hard_deg": 120.0,
+                  "global_hard_deg": 120.0,
+                  "sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+                  "selected_mu": 1.0,
+                  "applied_deg": 67.09771837645054,
+                  "residual_direction_deg": 1.9578634748995682e-06,
+                  "reason": "frozen_v3_profile",
+                  "formula_applied_deg": 67.09772033431402
+                },
+                "parent_coherent_applied": true,
+                "bilateral_exact_v31_fallback": false,
+                "incremental_min_rotation_deg": [
+                  10.703318531553876,
+                  52.925475436921225
+                ],
+                "foot_incremental_min_rotation_deg": 67.09772033431402,
+                "ankle_transport": {
+                  "schema_version": 1,
+                  "selector": "spherical_soft_cap",
+                  "profile_requested": "cmu_bvh",
+                  "policy_source": "profile_override",
+                  "soft_cap_deg": null,
+                  "hard_deg": 120.0,
+                  "global_hard_deg": 120.0,
+                  "sha256": "79cb19adbc174d729cafbc7497e0862bea880e9370b00581ca6b567b1d80805f",
+                  "selected_mu": 1.0,
+                  "applied_deg": 67.09771837645054,
+                  "residual_direction_deg": 1.9578634748995682e-06,
+                  "reason": "frozen_v3_profile",
+                  "formula_applied_deg": 67.09772033431402
+                },
+                "foot_direction_partially_solved": false,
+                "foot_transport_reason": "frozen_v3_profile",
+                "post_boundary_residual_to_parent_coherent_deg": 0.0,
+                "applied_bones": [
+                  "upleg.R",
+                  "leg.R",
+                  "foot.R"
+                ],
+                "terminal_follow_bones": [
+                  "toe.R"
+                ],
+                "frame_determinants": [
+                  1.0,
+                  1.0000001192092896,
+                  1.000000238418579
+                ]
+              },
+              "_palm_roll": {
+                "variant": "CHAIN_TRANSPORT_V3_2_1_PALM_ROLL_QA",
+                "parent_variant": "CHAIN_TRANSPORT_V3_2_PELVIS_BOUNDARY",
+                "parent_retarget_sha256": "692e975d32f41e3406144763c7c0b7dbf0a586ff07732f09c4365e3233b13693",
+                "policy_sha256": "46da74c83a9dd63bc03d11fc4e6ccbd104f8fc1ec084b2a7a1c8613f5a93bb95",
+                "requested_mu": {
+                  "hand.L": 0.5,
+                  "hand.R": 0.5
+                },
+                "default_is_exact_parent": false,
+                "operational_status": "PROMOTED_RUNTIME",
+                "actual_mesh_gate": "V3.2.5_SELECTOR",
+                "hands": {
+                  "hand.L": {
+                    "mode": "fallback",
+                    "fallback_reason": "source\uc640 target\uc5d0 \uacf5\ud1b5\uc778 index+pinky/index+thumb pair\uac00 \uc5c6\ub2e4",
+                    "frame_status": "landmark_pair_missing",
+                    "selected_mu": 0.0,
+                    "mesh_gate": "NOT_RUN_FALLBACK",
+                    "source_discovery": {
+                      "landmarks": {
+                        "index": "LeftHandIndex1"
+                      },
+                      "zero_base_candidates": {
+                        "index": [
+                          "LeftFingerBase"
+                        ],
+                        "pinky": [],
+                        "thumb": [
+                          "LThumb"
+                        ]
+                      },
+                      "uses_pose_geometry": false,
+                      "uses_tail_or_fingertip": false
+                    },
+                    "target_discovery": {
+                      "landmarks": {
+                        "index": "mixamorig:LeftHandIndex1",
+                        "pinky": "mixamorig:LeftHandPinky1",
+                        "thumb": "mixamorig:LeftHandThumb1"
+                      },
+                      "zero_base_candidates": {
+                        "index": [],
+                        "pinky": [],
+                        "thumb": []
+                      },
+                      "uses_pose_geometry": false,
+                      "uses_tail_or_fingertip": false
+                    },
+                    "wrist_transfer": {
+                      "applied_deg": 67.69946901533238,
+                      "mode": "forearm_relative_full",
+                      "forearm_twist_deg": -33.84974524046795
+                    }
+                  },
+                  "hand.R": {
+                    "mode": "fallback",
+                    "fallback_reason": "source\uc640 target\uc5d0 \uacf5\ud1b5\uc778 index+pinky/index+thumb pair\uac00 \uc5c6\ub2e4",
+                    "frame_status": "landmark_pair_missing",
+                    "selected_mu": 0.0,
+                    "mesh_gate": "NOT_RUN_FALLBACK",
+                    "source_discovery": {
+                      "landmarks": {
+                        "index": "RightHandIndex1"
+                      },
+                      "zero_base_candidates": {
+                        "index": [
+                          "RightFingerBase"
+                        ],
+                        "pinky": [],
+                        "thumb": [
+                          "RThumb"
+                        ]
+                      },
+                      "uses_pose_geometry": false,
+                      "uses_tail_or_fingertip": false
+                    },
+                    "target_discovery": {
+                      "landmarks": {
+                        "index": "mixamorig:RightHandIndex1",
+                        "pinky": "mixamorig:RightHandPinky1",
+                        "thumb": "mixamorig:RightHandThumb1"
+                      },
+                      "zero_base_candidates": {
+                        "index": [],
+                        "pinky": [],
+                        "thumb": []
+                      },
+                      "uses_pose_geometry": false,
+                      "uses_tail_or_fingertip": false
+                    },
+                    "wrist_transfer": {
+                      "applied_deg": 12.038989615033794,
+                      "mode": "forearm_relative_full",
+                      "forearm_twist_deg": 6.019495068064024
+                    }
+                  }
+                }
+              }
+            },
+            "chain_fallbacks": [],
+            "terminal_follow_bones": [
+              "hand.L",
+              "hand.R",
+              "toe.L",
+              "toe.R"
+            ],
+            "palm_roll_requested_deg": {
+              "hand.L": 0.0,
+              "hand.R": 0.0
+            },
+            "palm_roll_applied_deg": {
+              "hand.L": 0.0,
+              "hand.R": 0.0
+            },
+            "palm_roll_mu": {
+              "hand.L": 0.0,
+              "hand.R": 0.0
+            },
+            "palm_landmark_roles": {},
+            "palm_plane_sin": {},
+            "palm_frame_status": {
+              "hand.L": "landmark_pair_missing",
+              "hand.R": "landmark_pair_missing"
+            },
+            "palm_roll_mode": {
+              "hand.L": "fallback",
+              "hand.R": "fallback"
+            },
+            "wrist_transfer": {
+              "hand.L": 67.69946901533238,
+              "hand.R": 12.038989615033794
+            },
+            "palm_fallback_reason": {
+              "hand.L": "source\uc640 target\uc5d0 \uacf5\ud1b5\uc778 index+pinky/index+thumb pair\uac00 \uc5c6\ub2e4",
+              "hand.R": "source\uc640 target\uc5d0 \uacf5\ud1b5\uc778 index+pinky/index+thumb pair\uac00 \uc5c6\ub2e4"
+            },
+            "palm_roll_bones": [],
+            "palm_roll_fallback_bones": [
+              "hand.L",
+              "hand.R"
+            ],
+            "local_normalization_surface_error": 6.420589215849759e-07,
+            "max_joint_edge_length_error": 1.816664080278585e-07,
+            "camera": {
+              "version": "personal-camera/1",
+              "applied": false,
+              "maxRigidSurfaceError": 0.0
+            }
+          },
+          "file": "model-3-pose-1.fbx",
+          "cachedSeconds": 0.05047887499677017
+        }
+      ],
+      "registration": {
+        "normalizedFormat": "fbx",
+        "normalizedHash": "42f1bd8eda77a577bc940b46de825cb667c5c2bf81a94e75f55ae1057dedb0d8",
+        "archiveHash": "2aeb4607689faa63e0df31be9b4d2d3bf4bfc791c7bd55da15ea1744641616d9",
+        "validation": {
+          "passed": true,
+          "meshCount": 1,
+          "originalBoneCount": 53,
+          "vertexCount": 24988,
+          "maxSurfaceError": 5.101335887047753e-07,
+          "maxSkinProbeError": 7.601418019476114e-07,
+          "maxMaterialRegionError": 5.101335887047753e-07,
+          "materialCount": 1,
+          "tolerance": 1.780109771384568e-05,
+          "fkProbes": {
+            "forearm.L": {
+              "joint": "forearm.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1088190872464659
+            },
+            "forearm.R": {
+              "joint": "forearm.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.10896417965076514
+            },
+            "leg.L": {
+              "joint": "leg.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.13425406683096436
+            },
+            "leg.R": {
+              "joint": "leg.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1342576162504657
+            },
+            "spine": {
+              "joint": "spine",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1684601450844222
+            }
+          },
+          "blenderVersion": "5.2.0 LTS",
+          "materialPreservation": {
+            "passed": true,
+            "materialCount": 1,
+            "maxDiffuseError": 0.0,
+            "maxSpecularError": 0.0,
+            "maxShininessError": 2.288818308215923e-07,
+            "maxOpacityError": 0.0
+          }
+        },
+        "versions": {
+          "importerVersion": "personal-import/3",
+          "normalizationVersion": "personal-normalize/5",
+          "rigMappingVersion": "personal-rig/2",
+          "converterVersion": "personal-converter/5",
+          "converterFingerprint": "27ac6ab4e5b10d55c83cbf900b3c7c79047f037d8f1610339f298246aa94aba8"
+        },
+        "capabilities": {
+          "supportLevel": "body_only",
+          "bodyPose": true,
+          "hands": {
+            "left": {
+              "supported": false,
+              "fingerBones": 15,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            },
+            "right": {
+              "supported": false,
+              "fingerBones": 15,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            }
+          },
+          "collisionPrevention": false,
+          "shapeSliders": false
+        }
+      },
+      "sourceGeometry": {
+        "container": "SQLite3",
+        "catalogVersion": 2,
+        "declaredPlainBytes": 1611327,
+        "decoderAvailable": true,
+        "decoderVersion": "cs3c-catalog2/1",
+        "expandedBytes": 3585270,
+        "tableStreamSha256": "193f4ad5f9eb0601051e0abf534a50011d518b0f8671fdfa35a639286f8832a2",
+        "hierarchyNodes": 53,
+        "meshes": 1,
+        "vertices": 24988,
+        "materials": [
+          {
+            "name": "Pilot neutral clay",
+            "ambient": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "diffuse": [
+              0.47999998927116394,
+              0.5299999713897705,
+              0.5899999737739563
+            ],
+            "specular": [
+              0.11999999731779099,
+              0.13249999284744263,
+              0.14749999344348907
+            ],
+            "emission": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "opacity": 1.0,
+            "shininess": 10.239999771118164
+          }
+        ],
+        "materialSupport": "source_solid_diffuse_specular_shininess_and_face_assignment",
+        "sourceShadingMatchToCSP": "unverified",
+        "maxInverseBindError": 9.414691248821327e-14,
+        "maxSourceRestSkinError": 2.501595091508979e-05,
+        "sourceAxisUp": "Y",
+        "sourceUnits": "unconfirmed",
+        "internalDisplayScale": 0.01,
+        "originalWeightsRenormalized": false,
+        "maxBlenderRestMatrixErrorSourceUnits": 1.3939711556498757e-05,
+        "maxOriginalFKProbeError": 5.666405482354816e-07,
+        "originalFKProbeCount": 5
+      },
+      "sourceMaterials": [
+        {
+          "name": "Pilot neutral clay",
+          "ambient": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "diffuse": [
+            0.47999998927116394,
+            0.5299999713897705,
+            0.5899999737739563
+          ],
+          "specular": [
+            0.11999999731779099,
+            0.13249999284744263,
+            0.14749999344348907
+          ],
+          "emission": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "opacity": 1.0,
+          "shininess": 10.239999771118164
+        }
+      ]
+    }
+  ],
+  "startupSeconds": 34.52870208400418,
+  "hello": {
+    "protocolVersion": "standin.local-converter/1",
+    "versions": {
+      "importerVersion": "personal-import/3",
+      "normalizationVersion": "personal-normalize/5",
+      "rigMappingVersion": "personal-rig/2",
+      "converterVersion": "personal-converter/5",
+      "converterFingerprint": "27ac6ab4e5b10d55c83cbf900b3c7c79047f037d8f1610339f298246aa94aba8"
+    },
+    "limits": {
+      "sourceBytes": 134217728,
+      "poseBytes": 8388608,
+      "vertices": 1000000,
+      "bones": 512,
+      "meshes": 128,
+      "workerSeconds": 120,
+      "workerMemoryBytes": 2147483648,
+      "expandedBytes": 67108864,
+      "requestBytes": 65536
+    },
+    "formats": {
+      "fbx": true,
+      "cs3c": true
+    },
+    "hands": false,
+    "cameraContractVersion": "personal-camera/1",
+    "modelStorageVersion": "personal-fbx/1",
+    "materialContractVersion": "personal-solid-specular/1"
+  },
+  "allPassed": true
+}

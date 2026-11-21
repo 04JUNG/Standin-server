@@ -1,0 +1,504 @@
+{
+  "converterVersion": "personal-converter/7",
+  "runtimeManifest": "e7e7c0d94eca98a7e5e8da6f58861b45f4f3a4420d49dd5ddb46966733baf296",
+  "verifiedRuntimeFiles": 6581,
+  "models": [
+    {
+      "source": "standin-male-0.7.6-mapped-review.cs3c",
+      "sha256": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+      "registration": "result",
+      "poses": [
+        {
+          "pose": "03-staging-selected-pose.bvh",
+          "seconds": 9.338889458973426,
+          "cachedSeconds": 0.04984683298971504,
+          "artifactHash": "ae6cf6ee5a0f546f3b8d66cf4bdbf33997ea281bf1f9d5963421276d7358f580",
+          "exportedFbx": {
+            "model": 0,
+            "pose": 0,
+            "exactWeights": true,
+            "exactPolygons": true,
+            "vertexCount": 24988,
+            "worstEdgeRatio": 1.8500086069107056,
+            "worstEdgeRestM": 0.0020093009807169437,
+            "worstEdgePosedM": 0.0037172241136431694
+          },
+          "selection": {
+            "applied": true,
+            "meshes": [
+              {
+                "applied": true,
+                "parts": [
+                  {
+                    "applied": true,
+                    "before": {
+                      "excessBend": 705.5974061159194,
+                      "maxStretch": 2.445760943803511,
+                      "stretchP99": 1.477323678708654,
+                      "overDouble": 76,
+                      "compressed": 33,
+                      "collapsed": 0,
+                      "sharp": 176,
+                      "folded": 82
+                    },
+                    "after": {
+                      "excessBend": 213.94152913865054,
+                      "maxStretch": 1.8500090809924767,
+                      "stretchP99": 1.2939143381850557,
+                      "overDouble": 0,
+                      "compressed": 0,
+                      "collapsed": 0,
+                      "sharp": 32,
+                      "folded": 20
+                    },
+                    "componentScale": 1.9884239923078906,
+                    "strength": 1.0,
+                    "maxMove": 0.041756903838465705,
+                    "filter": "ring_reference"
+                  }
+                ],
+                "skipped": {
+                  "rigid": 0,
+                  "budget": 0,
+                  "tiny": 0
+                },
+                "updatedCorners": 141919
+              }
+            ]
+          }
+        },
+        {
+          "pose": "cmu_135_01_04368.bvh",
+          "seconds": 10.575073832995258,
+          "cachedSeconds": 0.0498643750033807,
+          "artifactHash": "da047eb99a171d31f663b5dc0622e44c6a8272a4860858bf2802eefc6d1097a6",
+          "exportedFbx": {
+            "model": 0,
+            "pose": 1,
+            "exactWeights": true,
+            "exactPolygons": true,
+            "vertexCount": 24988,
+            "worstEdgeRatio": 1.9874863624572754,
+            "worstEdgeRestM": 0.0037271222099661827,
+            "worstEdgePosedM": 0.007407604716718197
+          },
+          "selection": {
+            "applied": true,
+            "meshes": [
+              {
+                "applied": true,
+                "parts": [
+                  {
+                    "applied": true,
+                    "before": {
+                      "excessBend": 850.9460540887285,
+                      "maxStretch": 8.320859053538083,
+                      "stretchP99": 1.575033876433608,
+                      "overDouble": 177,
+                      "compressed": 35,
+                      "collapsed": 1,
+                      "sharp": 199,
+                      "folded": 101
+                    },
+                    "after": {
+                      "excessBend": 287.78173000567324,
+                      "maxStretch": 1.987485530202413,
+                      "stretchP99": 1.4424478652672013,
+                      "overDouble": 0,
+                      "compressed": 0,
+                      "collapsed": 0,
+                      "sharp": 46,
+                      "folded": 33
+                    },
+                    "componentScale": 1.9884239923078906,
+                    "strength": 0.4,
+                    "maxMove": 0.027638591083122156,
+                    "filter": "ring_reference"
+                  }
+                ],
+                "skipped": {
+                  "rigid": 0,
+                  "budget": 0,
+                  "tiny": 0
+                },
+                "updatedCorners": 141919
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "source": "standin-master-v1-rig-clean-mixamo-core.fbx",
+      "sha256": "ec2d642f61ab812aec9a865f975733d2884bc443ac03367ff0dd832e085396dc",
+      "registration": "result",
+      "poses": [
+        {
+          "pose": "03-staging-selected-pose.bvh",
+          "seconds": 9.625594540993916,
+          "cachedSeconds": 0.048593209008686244,
+          "artifactHash": "5556dbe6ceafa99afeb2d82959907867b8f32d0c68133d7c5203424d37d0ccbd",
+          "exportedFbx": {
+            "model": 1,
+            "pose": 0,
+            "exactWeights": true,
+            "exactPolygons": true,
+            "vertexCount": 24991,
+            "worstEdgeRatio": 1.8499997854232788,
+            "worstEdgeRestM": 0.0036623443011194468,
+            "worstEdgePosedM": 0.006775336340069771
+          },
+          "selection": {
+            "applied": true,
+            "meshes": [
+              {
+                "applied": true,
+                "parts": [
+                  {
+                    "applied": true,
+                    "before": {
+                      "excessBend": 454.28368769186574,
+                      "maxStretch": 4.337775803942045,
+                      "stretchP99": 1.5683590580177675,
+                      "overDouble": 88,
+                      "compressed": 26,
+                      "collapsed": 0,
+                      "sharp": 119,
+                      "folded": 54
+                    },
+                    "after": {
+                      "excessBend": 185.9898850918539,
+                      "maxStretch": 1.8500068871506314,
+                      "stretchP99": 1.4117949882957912,
+                      "overDouble": 0,
+                      "compressed": 0,
+                      "collapsed": 0,
+                      "sharp": 53,
+                      "folded": 25
+                    },
+                    "componentScale": 1.1395523499612938,
+                    "strength": 0.75,
+                    "maxMove": 0.01887005661896611,
+                    "filter": "ring_reference"
+                  }
+                ],
+                "skipped": {
+                  "rigid": 0,
+                  "budget": 0,
+                  "tiny": 1
+                },
+                "updatedCorners": 146967
+              }
+            ]
+          }
+        },
+        {
+          "pose": "cmu_135_01_04368.bvh",
+          "seconds": 8.779420250008116,
+          "cachedSeconds": 0.04875083398655988,
+          "artifactHash": "454a9ea14a125ac334c508ece7eeab0003eca76a8b2209b83a3b7a8b1c30e301",
+          "exportedFbx": {
+            "model": 1,
+            "pose": 1,
+            "exactWeights": true,
+            "exactPolygons": true,
+            "vertexCount": 24991,
+            "worstEdgeRatio": 2.748832941055298,
+            "worstEdgeRestM": 0.005732603371143341,
+            "worstEdgePosedM": 0.01575796864926815
+          },
+          "selection": {
+            "applied": true,
+            "meshes": [
+              {
+                "applied": true,
+                "parts": [
+                  {
+                    "applied": true,
+                    "before": {
+                      "excessBend": 637.2946631965821,
+                      "maxStretch": 5.68035609594944,
+                      "stretchP99": 1.7753993889253938,
+                      "overDouble": 351,
+                      "compressed": 12,
+                      "collapsed": 2,
+                      "sharp": 172,
+                      "folded": 66
+                    },
+                    "after": {
+                      "excessBend": 298.7913725894732,
+                      "maxStretch": 2.748834049205955,
+                      "stretchP99": 1.490766497838418,
+                      "overDouble": 31,
+                      "compressed": 0,
+                      "collapsed": 0,
+                      "sharp": 37,
+                      "folded": 9
+                    },
+                    "componentScale": 1.0890989193999276,
+                    "strength": 0.3,
+                    "maxMove": 0.022871077307398527,
+                    "filter": "area_diffusion"
+                  }
+                ],
+                "skipped": {
+                  "rigid": 0,
+                  "budget": 0,
+                  "tiny": 1
+                },
+                "updatedCorners": 146967
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "source": "female-chubby-tpose.fbx",
+      "sha256": "fb47d89d1507c377b0af136b9dc6357ef35787c59ac79467ee180b2e1640017f",
+      "registration": "result",
+      "poses": [
+        {
+          "pose": "03-staging-selected-pose.bvh",
+          "seconds": 22.67940749999252,
+          "cachedSeconds": 0.11790333400131203,
+          "artifactHash": "4e28e1c6102db6185ea1bff521635ff23f6e5da4248d3bf85984bde69d8647ea",
+          "exportedFbx": {
+            "model": 2,
+            "pose": 0,
+            "exactWeights": true,
+            "exactPolygons": true,
+            "vertexCount": 90143,
+            "worstEdgeRatio": 15.831992149353027,
+            "worstEdgeRestM": 0.0004765642515849322,
+            "worstEdgePosedM": 0.007544961292296648
+          },
+          "selection": {
+            "applied": true,
+            "meshes": [
+              {
+                "applied": true,
+                "parts": [
+                  {
+                    "applied": true,
+                    "before": {
+                      "excessBend": 3469.625231918986,
+                      "maxStretch": 48.251339610708975,
+                      "stretchP99": 1.6062366992272272,
+                      "overDouble": 654,
+                      "compressed": 110,
+                      "collapsed": 2,
+                      "sharp": 385,
+                      "folded": 158
+                    },
+                    "after": {
+                      "excessBend": 2592.0181475441705,
+                      "maxStretch": 15.831875773929063,
+                      "stretchP99": 1.605697157429483,
+                      "overDouble": 271,
+                      "compressed": 52,
+                      "collapsed": 0,
+                      "sharp": 292,
+                      "folded": 158
+                    },
+                    "componentScale": 1.9309182695335845,
+                    "strength": 0.5,
+                    "blend": 0.75,
+                    "heldVertices": 0,
+                    "maxMove": 0.018391097991758924,
+                    "filter": "ring_reference",
+                    "adaptiveFallback": "numerical_budget"
+                  }
+                ],
+                "skipped": {
+                  "rigid": 0,
+                  "budget": 0,
+                  "tiny": 0
+                },
+                "updatedCorners": 519595
+              }
+            ]
+          }
+        },
+        {
+          "pose": "cmu_135_01_04368.bvh",
+          "seconds": 23.11823954200372,
+          "cachedSeconds": 0.12196725001558661,
+          "artifactHash": "a85369ad8130a26748e2e246e983f70d137d2f741d1f4913233d2a03aa4cfbcb",
+          "exportedFbx": {
+            "model": 2,
+            "pose": 1,
+            "exactWeights": true,
+            "exactPolygons": true,
+            "vertexCount": 90143,
+            "worstEdgeRatio": 177.3595428466797,
+            "worstEdgeRestM": 0.0004765642515849322,
+            "worstEdgePosedM": 0.08452321588993073
+          },
+          "selection": {
+            "applied": true,
+            "meshes": [
+              {
+                "applied": true,
+                "parts": [
+                  {
+                    "applied": true,
+                    "before": {
+                      "excessBend": 6270.897714899695,
+                      "maxStretch": 219.89973103988808,
+                      "stretchP99": 1.8113034243539459,
+                      "overDouble": 1853,
+                      "compressed": 181,
+                      "collapsed": 3,
+                      "sharp": 896,
+                      "folded": 522
+                    },
+                    "after": {
+                      "excessBend": 4713.29664491111,
+                      "maxStretch": 177.3582641682867,
+                      "stretchP99": 1.77557253949076,
+                      "overDouble": 1557,
+                      "compressed": 134,
+                      "collapsed": 1,
+                      "sharp": 705,
+                      "folded": 420
+                    },
+                    "componentScale": 1.9309182695335845,
+                    "strength": 1.0,
+                    "blend": 0.5,
+                    "heldVertices": 18,
+                    "maxMove": 0.02027464183010269,
+                    "filter": "ring_reference",
+                    "adaptiveFallback": "numerical_budget"
+                  }
+                ],
+                "skipped": {
+                  "rigid": 0,
+                  "budget": 0,
+                  "tiny": 0
+                },
+                "updatedCorners": 519205
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "source": "child-tpose.fbx",
+      "sha256": "b195a3ff87d67365f343fee9049f9d25026d6a49e4987d9e895d3a3f25e72385",
+      "registration": "result",
+      "poses": [
+        {
+          "pose": "03-staging-selected-pose.bvh",
+          "seconds": 42.637342041009106,
+          "cachedSeconds": 0.21367125000688247,
+          "artifactHash": "d3bd17d31c4a328ac7a67b6676493d73e57e56697159f3ebfd316d922faa98fd",
+          "exportedFbx": {
+            "model": 3,
+            "pose": 0,
+            "exactWeights": true,
+            "exactPolygons": true,
+            "vertexCount": 179990,
+            "worstEdgeRatio": 2.885342597961426,
+            "worstEdgeRestM": 0.0054925717413425446,
+            "worstEdgePosedM": 0.01584795117378235
+          },
+          "selection": {
+            "applied": false,
+            "meshes": [
+              {
+                "applied": false,
+                "parts": [
+                  {
+                    "applied": false,
+                    "reason": "metrics_regressed",
+                    "before": {
+                      "excessBend": 63880.25927284554,
+                      "maxStretch": 2.8853749963252566,
+                      "stretchP99": 1.4932864824304863,
+                      "overDouble": 171,
+                      "compressed": 292,
+                      "collapsed": 4,
+                      "sharp": 3757,
+                      "folded": 1790
+                    },
+                    "filter": "ring_reference",
+                    "adaptiveFallback": "numerical_budget"
+                  }
+                ],
+                "skipped": {
+                  "rigid": 0,
+                  "budget": 0,
+                  "tiny": 0
+                }
+              }
+            ]
+          }
+        },
+        {
+          "pose": "cmu_135_01_04368.bvh",
+          "seconds": 43.266137791011715,
+          "cachedSeconds": 0.21413579198997468,
+          "artifactHash": "8e8b642152c3ca1116e48ec13e3e12500f42f004b93ac365114887f29641b14b",
+          "exportedFbx": {
+            "model": 3,
+            "pose": 1,
+            "exactWeights": true,
+            "exactPolygons": true,
+            "vertexCount": 179990,
+            "worstEdgeRatio": 3.6996641159057617,
+            "worstEdgeRestM": 0.0017749706748872995,
+            "worstEdgePosedM": 0.0065667955204844475
+          },
+          "selection": {
+            "applied": true,
+            "meshes": [
+              {
+                "applied": true,
+                "parts": [
+                  {
+                    "applied": true,
+                    "before": {
+                      "excessBend": 47482.08092963346,
+                      "maxStretch": 4.788621870999053,
+                      "stretchP99": 1.6926642666791591,
+                      "overDouble": 1989,
+                      "compressed": 285,
+                      "collapsed": 0,
+                      "sharp": 2672,
+                      "folded": 1263
+                    },
+                    "after": {
+                      "excessBend": 31003.940272404547,
+                      "maxStretch": 3.699592875138786,
+                      "stretchP99": 1.6876762630423854,
+                      "overDouble": 1398,
+                      "compressed": 226,
+                      "collapsed": 0,
+                      "sharp": 1544,
+                      "folded": 831
+                    },
+                    "componentScale": 1.3887818812244457,
+                    "strength": 0.2,
+                    "blend": 0.5,
+                    "heldVertices": 3,
+                    "maxMove": 0.00958459309067601,
+                    "filter": "ring_reference",
+                    "adaptiveFallback": "numerical_budget"
+                  }
+                ],
+                "skipped": {
+                  "rigid": 0,
+                  "budget": 0,
+                  "tiny": 0
+                },
+                "updatedCorners": 996870
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,146 @@
+{
+  "date": "2026-11-04",
+  "contractRevision": 4,
+  "modelStorageVersion": "personal-fbx/1",
+  "runtimePackages": [
+    {
+      "kind": "runtime",
+      "decoderIncluded": true,
+      "manifestSha256": "a3eabed90e4100f5eb7896cb72fb6d01a4362d315c148a58abdeaeab8c439e03",
+      "target": "darwin-arm64",
+      "releaseReady": false,
+      "verifiedFiles": 6579,
+      "changedFiles": 0
+    },
+    {
+      "kind": "runtime",
+      "decoderIncluded": false,
+      "manifestSha256": "e97559f24faa7389f59ededd2b50fb94379bae2a00abfe2b208ca3299e357098",
+      "target": "darwin-arm64",
+      "releaseReady": false,
+      "verifiedFiles": 6578,
+      "changedFiles": 0
+    },
+    {
+      "kind": "debug-app-resource",
+      "decoderIncluded": true,
+      "manifestSha256": "a3eabed90e4100f5eb7896cb72fb6d01a4362d315c148a58abdeaeab8c439e03",
+      "target": "darwin-arm64",
+      "releaseReady": false,
+      "verifiedFiles": 6579,
+      "changedFiles": 0
+    }
+  ],
+  "timing": {
+    "applyFromFbxMs": 1679.0320410000002,
+    "cacheApplyMs": 18.817292,
+    "exportMs": 17.48725,
+    "modelConversionIncluded": true,
+    "networkAndUiIncluded": false,
+    "registrationMs": 2207.4330830000004,
+    "sameProcess": true,
+    "startupMs": 5997.266292,
+    "warmHelloMs": [
+      6.6930000000000005,
+      6.734249999999999,
+      6.909875
+    ],
+    "workingFormat": "fbx"
+  },
+  "tests": {
+    "frontendPassed": 1302,
+    "frontendSkipped": 1,
+    "rustPersonalBodyPassed": 10,
+    "rustRealPackagedTestsIncluded": 5,
+    "converterLocalPassed": 13,
+    "decoderPassed": 6,
+    "runtimePackagingPassed": 1,
+    "replayPrivatePayloadPassed": 2,
+    "typecheck": "passed",
+    "lint": "0 errors / 1 preexisting warning",
+    "rustClippy": "passed --offline --locked --all-targets -- -D warnings",
+    "debugAppBuild": "passed"
+  },
+  "uiVerification": {
+    "newNativePickerFlow": "not completed; macOS accessibility getApp timed out / AXError.cannotComplete",
+    "priorUiApprovalPreserved": true
+  },
+  "sourcePreservation": {
+    "originalBytes": true,
+    "verifiedFbxIsWorkingModel": true,
+    "blendRecoveryOnly": true,
+    "archiveNotReadDuringApply": true
+  },
+  "geometry": {
+    "passed": true,
+    "models": [
+      {
+        "sourceHash": "d4d81aff8b5f0537898e5541279749c46560515e1886f2443f1333094ceb7f4b",
+        "format": "cs3c",
+        "variants": [
+          {
+            "maxWorldVertexError": 5.71901807688846e-07,
+            "maxWorldBoneError": 3.8730480040230134e-07,
+            "exactSkinWeights": true,
+            "exactObjectScales": true,
+            "singleRotation": true
+          },
+          {
+            "maxWorldVertexError": 4.462891638468136e-07,
+            "maxWorldBoneError": 4.951133646320149e-07,
+            "exactSkinWeights": true,
+            "exactObjectScales": true,
+            "singleRotation": true
+          }
+        ]
+      },
+      {
+        "sourceHash": "0410c8b4c50cb896480ac8cd0890407b18df0155cc9a46aba53dcbe0834b20d6",
+        "format": "cs3c",
+        "variants": [
+          {
+            "maxWorldVertexError": 5.71901807688846e-07,
+            "maxWorldBoneError": 3.8730480040230134e-07,
+            "exactSkinWeights": true,
+            "exactObjectScales": true,
+            "singleRotation": true
+          },
+          {
+            "maxWorldVertexError": 4.462891638468136e-07,
+            "maxWorldBoneError": 4.951133646320149e-07,
+            "exactSkinWeights": true,
+            "exactObjectScales": true,
+            "singleRotation": true
+          }
+        ]
+      },
+      {
+        "sourceHash": "866de6cbc1b9f5c910a98aa5ee96fc0ac0b4e00b7fc4064cf23a50d73e2a1ab5",
+        "format": "fbx",
+        "variants": [
+          {
+            "maxWorldVertexError": 4.252056271525362e-07,
+            "maxWorldBoneError": 6.286146250924674e-07,
+            "exactSkinWeights": true,
+            "exactObjectScales": true,
+            "singleRotation": true
+          },
+          {
+            "maxWorldVertexError": 5.198348844714928e-07,
+            "maxWorldBoneError": 8.281882543319614e-07,
+            "exactSkinWeights": true,
+            "exactObjectScales": true,
+            "singleRotation": true
+          }
+        ]
+      }
+    ]
+  },
+  "scope": {
+    "liveBff": false,
+    "cspAcceptance": false,
+    "clipExportImplemented": false,
+    "releaseReady": false
+  },
+  "cameraEvidencePackageNote": "9-output run used the first v4 package; final package differs only in converter-client-contract.v1.json example version strings. All converter code, binary and converterFingerprint are identical. Final package is tested through native import/apply/export and timing."
+}

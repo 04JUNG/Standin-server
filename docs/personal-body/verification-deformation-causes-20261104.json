@@ -1,0 +1,2411 @@
+{
+  "version": "actual-cs3c-deformation-diagnosis/1",
+  "scope": "two unique geometries from the previous eight-file audit; same male0.7.6",
+  "experimentsAreProductionFixes": false,
+  "sourceComparisons": [
+    {
+      "file": "character.blend",
+      "sha256": "8eaaabb98155da4bd7dbc23478f91efcb9a0eca01c195247b2d0fb8f5e42f00d",
+      "vertexCount": 24988,
+      "maxRestVertexErrorM": 1.2065570608304177e-07,
+      "directVertexCorrespondence": true,
+      "maxWeightDifference": 0.0
+    },
+    {
+      "file": "01-male-0.7.6-neutral.fbx",
+      "sha256": "e610925dc9f4c25b106f0fb1af827ec3f52a457da1f706a3081c15f2433984b4",
+      "vertexCount": 24988,
+      "maxRestVertexErrorM": 3.102887297453871e-06,
+      "directVertexCorrespondence": true,
+      "maxWeightDifference": 1.7881393432617188e-07
+    }
+  ],
+  "numericalCaveat": "Reassigning float32 bone bases can alter a few near-boundary crossings. Compare substantive changes against the pre-bake baseline; no-op control is included.",
+  "poses": [
+    {
+      "pose": "03-staging-selected-pose.bvh",
+      "sourceProfile": "mixamo_noprefix",
+      "preBakeVsActualFbxMaxVertexErrorM": 4.5619218095665074e-07,
+      "maxJointEdgeLengthErrorM": 2.3259386294771645e-07,
+      "jointBendsDeg": {
+        "elbow.L": {
+          "source": 98.32925415039062,
+          "target": 98.35240173339844
+        },
+        "elbow.R": {
+          "source": 98.24586486816406,
+          "target": 98.40050506591797
+        },
+        "knee.L": {
+          "source": 104.42991638183594,
+          "target": 99.43656921386719
+        },
+        "knee.R": {
+          "source": 104.00801086425781,
+          "target": 99.1039047241211
+        }
+      },
+      "targetLocalRotations": {
+        "hips": {
+          "rotationDeg": 0.0,
+          "swingDeg": 0.0,
+          "twistDeg": 4.071108536330912e-13
+        },
+        "spine": {
+          "rotationDeg": 1.7996679748298539,
+          "swingDeg": 1.7996679748298539,
+          "twistDeg": 8.685056456964612e-13
+        },
+        "spine1": {
+          "rotationDeg": 2.0999414468770086,
+          "swingDeg": 2.0999414468770086,
+          "twistDeg": 2.3862173860545723e-14
+        },
+        "spine2": {
+          "rotationDeg": 2.0999414468770086,
+          "swingDeg": 2.0999414468770086,
+          "twistDeg": -3.8756147838540363e-13
+        },
+        "neck": {
+          "rotationDeg": 12.92112220671928,
+          "swingDeg": 12.91128502676717,
+          "twistDeg": 0.5047946288416069
+        },
+        "head": {
+          "rotationDeg": 19.375540835580964,
+          "swingDeg": 19.342189021863792,
+          "twistDeg": 1.1418376215488222
+        },
+        "shoulder.L": {
+          "rotationDeg": 7.729046333654661,
+          "swingDeg": 7.360402241128854,
+          "twistDeg": 2.3596173417146655
+        },
+        "upperarm.L": {
+          "rotationDeg": 70.06261884550841,
+          "swingDeg": 69.75073191743813,
+          "twistDeg": 7.066294295468105
+        },
+        "forearm.L": {
+          "rotationDeg": 113.85349561464224,
+          "swingDeg": 98.61081516092408,
+          "twistDeg": -66.36211114565472
+        },
+        "hand.L": {
+          "rotationDeg": 11.999977282041973,
+          "swingDeg": 11.938528631400308,
+          "twistDeg": -1.2151335554709926
+        },
+        "shoulder.R": {
+          "rotationDeg": 7.754541722279026,
+          "swingDeg": 7.384836389110929,
+          "twistDeg": -2.367449861145378
+        },
+        "upperarm.R": {
+          "rotationDeg": 70.07823265795106,
+          "swingDeg": 69.78991671270649,
+          "twistDeg": -6.795718059045343
+        },
+        "forearm.R": {
+          "rotationDeg": 113.79712606342213,
+          "swingDeg": 98.53753406131901,
+          "twistDeg": 66.36003476814703
+        },
+        "hand.R": {
+          "rotationDeg": 11.999977282041973,
+          "swingDeg": 11.95401864666425,
+          "twistDeg": 1.0506942966037025
+        },
+        "upleg.L": {
+          "rotationDeg": 85.44148644108746,
+          "swingDeg": 84.87318738138572,
+          "twistDeg": -10.93141211564005
+        },
+        "leg.L": {
+          "rotationDeg": 100.23677584379146,
+          "swingDeg": 100.23655044754885,
+          "twistDeg": 0.24742989926435302
+        },
+        "foot.L": {
+          "rotationDeg": 17.378740154369613,
+          "swingDeg": 14.812366583176315,
+          "twistDeg": 9.11467229642316
+        },
+        "toe.L": {
+          "rotationDeg": 0.0,
+          "swingDeg": 0.0,
+          "twistDeg": -2.9348475196563526e-06
+        },
+        "upleg.R": {
+          "rotationDeg": 85.24616352139262,
+          "swingDeg": 84.67588370683157,
+          "twistDeg": 10.931614459994211
+        },
+        "leg.R": {
+          "rotationDeg": 99.8148682285706,
+          "swingDeg": 99.81464283232799,
+          "twistDeg": -0.24492511414923596
+        },
+        "foot.R": {
+          "rotationDeg": 17.188319602951534,
+          "swingDeg": 14.558676281929117,
+          "twistDeg": -9.161642653571691
+        },
+        "toe.R": {
+          "rotationDeg": 0.0,
+          "swingDeg": 0.0,
+          "twistDeg": 8.004126406942445e-07
+        }
+      },
+      "sourceLocalRotations": {
+        "hips": {
+          "rotationDeg": 0.0,
+          "swingDeg": 0.0,
+          "twistDeg": 4.406844047973278e-28
+        },
+        "spine": {
+          "rotationDeg": 1.7996679748298539,
+          "swingDeg": 1.7996679748298539,
+          "twistDeg": -6.3954089390550296e-15
+        },
+        "spine1": {
+          "rotationDeg": 2.0999414468770086,
+          "swingDeg": 2.0999414468770086,
+          "twistDeg": 0.0
+        },
+        "spine2": {
+          "rotationDeg": 2.0999414468770086,
+          "swingDeg": 2.0999414468770086,
+          "twistDeg": 0.0
+        },
+        "neck": {
+          "rotationDeg": 12.92112220671928,
+          "swingDeg": 12.914564371342422,
+          "twistDeg": -0.4115022755875928
+        },
+        "head": {
+          "rotationDeg": 19.375540835580964,
+          "swingDeg": 19.35450556048462,
+          "twistDeg": 0.9068191365017343
+        },
+        "shoulder.L": {
+          "rotationDeg": 7.729046333654661,
+          "swingDeg": 7.705905652746657,
+          "twistDeg": 0.5981471464572553
+        },
+        "upperarm.L": {
+          "rotationDeg": 70.06261884550841,
+          "swingDeg": 69.69376813976022,
+          "twistDeg": 7.682097320847285
+        },
+        "forearm.L": {
+          "rotationDeg": 113.85351610520975,
+          "swingDeg": 96.36137432005042,
+          "twistDeg": -70.14564662505909
+        },
+        "hand.L": {
+          "rotationDeg": 11.99991239524486,
+          "swingDeg": 11.99716751297216,
+          "twistDeg": 0.2575325761400217
+        },
+        "shoulder.R": {
+          "rotationDeg": 7.754541722279026,
+          "swingDeg": 7.731275536645023,
+          "twistDeg": -0.6001346247840232
+        },
+        "upperarm.R": {
+          "rotationDeg": 70.07823265795106,
+          "swingDeg": 69.75315663459348,
+          "twistDeg": -7.214581971217314
+        },
+        "forearm.R": {
+          "rotationDeg": 113.79713289361129,
+          "swingDeg": 96.27797771028456,
+          "twistDeg": 70.15506545592454
+        },
+        "hand.R": {
+          "rotationDeg": 11.999977282041973,
+          "swingDeg": 11.99716751297216,
+          "twistDeg": -0.2609534070167138
+        },
+        "upleg.L": {
+          "rotationDeg": 85.44145912033079,
+          "swingDeg": 84.85410383284471,
+          "twistDeg": -11.111895595589406
+        },
+        "leg.L": {
+          "rotationDeg": 100.23675535322394,
+          "swingDeg": 100.23653678717051,
+          "twistDeg": 0.24379330377899724
+        },
+        "foot.L": {
+          "rotationDeg": 17.378694050592717,
+          "swingDeg": 15.660954408300576,
+          "twistDeg": 7.557212434515479
+        },
+        "toe.L": {
+          "rotationDeg": 0.0,
+          "swingDeg": 0.0,
+          "twistDeg": -2.4265694922308815e-20
+        },
+        "upleg.R": {
+          "rotationDeg": 85.24615669120344,
+          "swingDeg": 84.65449155435108,
+          "twistDeg": 11.133246766934866
+        },
+        "leg.R": {
+          "rotationDeg": 99.81486139838142,
+          "swingDeg": 99.81465649270633,
+          "twistDeg": -0.2420980294826589
+        },
+        "foot.R": {
+          "rotationDeg": 17.188319602951534,
+          "swingDeg": 15.438857147059272,
+          "twistDeg": -7.578159770926263
+        },
+        "toe.R": {
+          "rotationDeg": 0.0,
+          "swingDeg": 0.0,
+          "twistDeg": 0.0
+        }
+      },
+      "weightSum": {
+        "min": 0.9999998460434654,
+        "p01": 0.999999931344111,
+        "p50": 1.0,
+        "p95": 1.00000005457943,
+        "p99": 1.000000075438636,
+        "max": 1.000000168046764
+      },
+      "edgeWeightL1Difference": {
+        "min": 0.0,
+        "p01": 0.0,
+        "p50": 0.03486190604551073,
+        "p95": 0.30520726028788203,
+        "p99": 1.2661828818272567,
+        "max": 2.0
+      },
+      "verticesWithMoreThanFourWeights": 6709,
+      "worstEdges": [
+        {
+          "vertices": [
+            3742,
+            4032
+          ],
+          "restEdgeM": 0.007270484064058711,
+          "restEndpointsM": [
+            [
+              -0.015682581812143326,
+              -0.04301045462489128,
+              0.8793752193450928
+            ],
+            [
+              -0.008554615080356598,
+              -0.04158242419362068,
+              0.8792622685432434
+            ]
+          ],
+          "posedEdgeM": 0.017781866069138903,
+          "ratio": 2.4457609579316326,
+          "weightL1Difference": 0.6349541135279521,
+          "rigidEdgeTermM": 0.007174582445685568,
+          "weightGradientTermM": 0.012391237242415544,
+          "edgeDecompositionResidualM": 8.084910814103512e-08,
+          "weights": [
+            {
+              "bone": "mixamorig:Hips",
+              "weightStart": 0.14216209736224864,
+              "weightEnd": 0.0842692119519295,
+              "gradientTermVectorM": [
+                0.0007015806311823849,
+                0.0024486548011438693,
+                -0.05090630674005209
+              ]
+            },
+            {
+              "bone": "mixamorig:LeftUpLeg",
+              "weightStart": 0.1540084458290272,
+              "weightEnd": 0.47148550259300326,
+              "gradientTermVectorM": [
+                0.0011316072077099607,
+                -0.028501778752553428,
+                0.32070072166817665
+              ]
+            },
+            {
+              "bone": "mixamorig:RightUpLeg",
+              "weightStart": 0.7038294568087241,
+              "weightEnd": 0.44424528545506725,
+              "gradientTermVectorM": [
+                0.00719262920248197,
+                0.02191467083938196,
+                -0.2623815482105171
+              ]
+            }
+          ]
+        },
+        {
+          "vertices": [
+            24477,
+            24519
+          ],
+          "restEdgeM": 0.01155485279103889,
+          "restEndpointsM": [
+            [
+              0.006857288535684347,
+              0.12538906931877136,
+              0.9858404994010925
+            ],
+            [
+              0.005565924104303122,
+              0.12659241259098053,
+              0.9744212627410889
+            ]
+          ],
+          "posedEdgeM": 0.028248220858371483,
+          "ratio": 2.444706251928953,
+          "weightL1Difference": 0.23670974489551577,
+          "rigidEdgeTermM": 0.010628675809762117,
+          "weightGradientTermM": 0.019166001063991606,
+          "edgeDecompositionResidualM": 3.157709858557038e-08,
+          "weights": [
+            {
+              "bone": "mixamorig:Hips",
+              "weightStart": 0.9637966877717092,
+              "weightEnd": 0.8454418153239514,
+              "gradientTermVectorM": [
+                -0.000735173873698587,
+                -0.014911636868133972,
+                -0.11600327699382315
+              ]
+            },
+            {
+              "bone": "mixamorig:LeftUpLeg",
+              "weightStart": 0.009059423698887166,
+              "weightEnd": 0.06305757587789135,
+              "gradientTermVectorM": [
+                -0.00019244602377042994,
+                0.0013976782744221196,
+                0.045941969706463893
+              ]
+            },
+            {
+              "bone": "mixamorig:RightUpLeg",
+              "weightStart": 0.027143888529403543,
+              "weightEnd": 0.09150060879815727,
+              "gradientTermVectorM": [
+                0.0010180349294147595,
+                0.0017144994182131152,
+                0.054958321321906464
+              ]
+            }
+          ]
+        },
+        {
+          "vertices": [
+            24325,
+            24456
+          ],
+          "restEdgeM": 0.00991288989482595,
+          "restEndpointsM": [
+            [
+              -0.013057950884103775,
+              0.12395269423723221,
+              0.911760687828064
+            ],
+            [
+              -0.011918183416128159,
+              0.12717466056346893,
+              0.9210658073425293
+            ]
+          ],
+          "posedEdgeM": 0.023253193731424534,
+          "ratio": 2.3457532544128807,
+          "weightL1Difference": 0.18135052938934068,
+          "rigidEdgeTermM": 0.007479387769599625,
+          "weightGradientTermM": 0.01590852828839242,
+          "edgeDecompositionResidualM": 2.210993175138141e-08,
+          "weights": [
+            {
+              "bone": "mixamorig:Hips",
+              "weightStart": 0.3442831142033075,
+              "weightEnd": 0.43495837889797784,
+              "gradientTermVectorM": [
+                -0.001132358794361521,
+                0.011385533019256634,
+                0.08309602267536298
+              ]
+            },
+            {
+              "bone": "mixamorig:LeftUpLeg",
+              "weightStart": 0.18719745240203894,
+              "weightEnd": 0.15742147755228827,
+              "gradientTermVectorM": [
+                0.0004000742989339877,
+                0.0011805996665966909,
+                -0.02520819798689652
+              ]
+            },
+            {
+              "bone": "mixamorig:RightUpLeg",
+              "weightStart": 0.4685194333946536,
+              "weightEnd": 0.4076201435497339,
+              "gradientTermVectorM": [
+                0.000684910921174788,
+                0.002048639428569208,
+                -0.05160391952602631
+              ]
+            }
+          ]
+        },
+        {
+          "vertices": [
+            24313,
+            24423
+          ],
+          "restEdgeM": 0.0075134083102095135,
+          "restEndpointsM": [
+            [
+              0.0019079709891229868,
+              0.12266410142183304,
+              0.9240269064903259
+            ],
+            [
+              0.0015336436918005347,
+              0.12435828149318695,
+              0.9313372373580933
+            ]
+          ],
+          "posedEdgeM": 0.01740891818777912,
+          "ratio": 2.317046734186295,
+          "weightL1Difference": 0.14148011718478862,
+          "rigidEdgeTermM": 0.005523366953211496,
+          "weightGradientTermM": 0.011906848033228454,
+          "edgeDecompositionResidualM": 9.843110294088906e-08,
+          "weights": [
+            {
+              "bone": "mixamorig:Hips",
+              "weightStart": 0.4435454308986664,
+              "weightEnd": 0.5142854894910607,
+              "gradientTermVectorM": [
+                0.00012173001209053116,
+                0.008737199470379594,
+                0.0656242910781224
+              ]
+            },
+            {
+              "bone": "mixamorig:LeftUpLeg",
+              "weightStart": 0.252869188785553,
+              "weightEnd": 0.214411758947022,
+              "gradientTermVectorM": [
+                2.9486145549262037e-05,
+                0.0010269595193589586,
+                -0.03264376880976014
+              ]
+            },
+            {
+              "bone": "mixamorig:RightUpLeg",
+              "weightStart": 0.30358538031578064,
+              "weightEnd": 0.2713027515619173,
+              "gradientTermVectorM": [
+                -0.00013447264742074165,
+                0.0007968640312936193,
+                -0.027481654885846994
+              ]
+            }
+          ]
+        },
+        {
+          "vertices": [
+            24550,
+            24615
+          ],
+          "restEdgeM": 0.00980033442441613,
+          "restEndpointsM": [
+            [
+              0.014203115366399288,
+              0.12842905521392822,
+              0.9852083325386047
+            ],
+            [
+              0.012718253768980503,
+              0.12967604398727417,
+              0.9756017327308655
+            ]
+          ],
+          "posedEdgeM": 0.022585163810740935,
+          "ratio": 2.304529910170538,
+          "weightL1Difference": 0.18026610879637198,
+          "rigidEdgeTermM": 0.008973584254984868,
+          "weightGradientTermM": 0.01497246306535182,
+          "edgeDecompositionResidualM": 6.104756307602746e-08,
+          "weights": [
+            {
+              "bone": "mixamorig:Hips",
+              "weightStart": 0.9445472535592924,
+              "weightEnd": 0.8544141991611064,
+              "gradientTermVectorM": [
+                -0.001213252614376448,
+                -0.011631914789578321,
+                -0.0883669089086344
+              ]
+            },
+            {
+              "bone": "mixamorig:LeftUpLeg",
+              "weightStart": 0.038608823690727795,
+              "weightEnd": 0.07965846122329052,
+              "gradientTermVectorM": [
+                0.0001376088215797382,
+                0.0011254903988909886,
+                0.0347842085578363
+              ]
+            },
+            {
+              "bone": "mixamorig:RightUpLeg",
+              "weightStart": 0.016843922749979846,
+              "weightEnd": 0.0659273396156031,
+              "gradientTermVectorM": [
+                0.0011405407748601932,
+                0.00128373678067697,
+                0.04178810532285395
+              ]
+            }
+          ]
+        },
+        {
+          "vertices": [
+            24564,
+            24622
+          ],
+          "restEdgeM": 0.008893304964915076,
+          "restEndpointsM": [
+            [
+              0.01546773873269558,
+              0.12930211424827576,
+              0.920243501663208
+            ],
+            [
+              0.014690340496599674,
+              0.13123874366283417,
+              0.9288884997367859
+            ]
+          ],
+          "posedEdgeM": 0.02030848317264014,
+          "ratio": 2.283569859884375,
+          "weightL1Difference": 0.15466789914259604,
+          "rigidEdgeTermM": 0.006576326450695225,
+          "weightGradientTermM": 0.0137886332800566,
+          "edgeDecompositionResidualM": 3.2093282841654095e-08,
+          "weights": [
+            {
+              "bone": "mixamorig:Hips",
+              "weightStart": 0.4183029532432556,
+              "weightEnd": 0.49563690281455364,
+              "gradientTermVectorM": [
+                0.001166121689142815,
+                0.010074338272394252,
+                0.07150034798070944
+              ]
+            },
+            {
+              "bone": "mixamorig:LeftUpLeg",
+              "weightStart": 0.3583042025566101,
+              "weightEnd": 0.3004488602213731,
+              "gradientTermVectorM": [
+                -0.0007167333727931586,
+                0.0015829395369969933,
+                -0.04865981426270707
+              ]
+            },
+            {
+              "bone": "mixamorig:RightUpLeg",
+              "weightStart": 0.22339284420013428,
+              "weightEnd": 0.20391423696407324,
+              "gradientTermVectorM": [
+                -0.00033947541848889864,
+                0.0005660254761724046,
+                -0.016460472301691616
+              ]
+            }
+          ]
+        },
+        {
+          "vertices": [
+            24300,
+            24369
+          ],
+          "restEdgeM": 0.007774118174593683,
+          "restEndpointsM": [
+            [
+              -0.0009415021049790084,
+              0.12147331237792969,
+              0.9242285490036011
+            ],
+            [
+              -0.0010062602814286947,
+              0.12347271293401718,
+              0.9317408800125122
+            ]
+          ],
+          "posedEdgeM": 0.017735843407555137,
+          "ratio": 2.2813961672871157,
+          "weightL1Difference": 0.14448295709544623,
+          "rigidEdgeTermM": 0.005711004592899575,
+          "weightGradientTermM": 0.012030765405043957,
+          "edgeDecompositionResidualM": 1.124874268600733e-07,
+          "weights": [
+            {
+              "bone": "mixamorig:Hips",
+              "weightStart": 0.44098193110498685,
+              "weightEnd": 0.51322340965271,
+              "gradientTermVectorM": [
+                -7.035461732682232e-05,
+                0.008847642294257378,
+                0.06703899496225325
+              ]
+            },
+            {
+              "bone": "mixamorig:LeftUpLeg",
+              "weightStart": 0.23447792581435928,
+              "weightEnd": 0.20248043537139893,
+              "gradientTermVectorM": [
+                0.00010876228467621604,
+                0.0008596674690586891,
+                -0.02719924605866025
+              ]
+            },
+            {
+              "bone": "mixamorig:RightUpLeg",
+              "weightStart": 0.3245401430806539,
+              "weightEnd": 0.2842961549758911,
+              "gradientTermVectorM": [
+                -5.913020786092557e-05,
+                0.0009697050228027169,
+                -0.034295360563611925
+              ]
+            }
+          ]
+        },
+        {
+          "vertices": [
+            12159,
+            12176
+          ],
+          "restEdgeM": 0.0030803027404499384,
+          "restEndpointsM": [
+            [
+              0.32130327820777893,
+              0.027437185868620872,
+              1.4405814409255981
+            ],
+            [
+              0.31822657585144043,
+              0.027431344613432884,
+              1.4404326677322388
+            ]
+          ],
+          "posedEdgeM": 0.00701216316188509,
+          "ratio": 2.276452593377502,
+          "weightL1Difference": 0.04724167497368359,
+          "rigidEdgeTermM": 0.002530128446730939,
+          "weightGradientTermM": 0.005118654485669096,
+          "edgeDecompositionResidualM": 1.507684735811135e-07,
+          "weights": [
+            {
+              "bone": "mixamorig:Spine",
+              "weightStart": 0.002249809380102574,
+              "weightEnd": 0.002688951999685797,
+              "gradientTermVectorM": [
+                0.00014042240770662363,
+                7.4094788769637126e-06,
+                0.0006326448848133575
+              ]
+            },
+            {
+              "bone": "mixamorig:Spine1",
+              "weightStart": 0.013603951373391383,
+              "weightEnd": 0.015670614180237047,
+              "gradientTermVectorM": [
+                0.0006608462816258177,
+                1.7504337277542236e-05,
+                0.0029764423379869554
+              ]
+            },
+            {
+              "bone": "mixamorig:Spine2",
+              "weightStart": 0.10788459006764178,
+              "weightEnd": 0.12353741269729729,
+              "gradientTermVectorM": [
+                0.005005223685979274,
+                7.150939122199705e-05,
+                0.022531938263297226
+              ]
+            },
+            {
+              "bone": "mixamorig:Neck",
+              "weightStart": 0.0025846955055776706,
+              "weightEnd": 0.003153322469850631,
+              "gradientTermVectorM": [
+                0.00017979976068229752,
+                1.1244497375896421e-05,
+                0.0008021647495496426
+              ]
+            },
+            {
+              "bone": "mixamorig:Head",
+              "weightStart": 0.0014127660118400083,
+              "weightEnd": 0.0017564304718128074,
+              "gradientTermVectorM": [
+                0.00010167306607958548,
+                2.6245114497501263e-05,
+                0.00048025707717219316
+              ]
+            },
+            {
+              "bone": "mixamorig:LeftShoulder",
+              "weightStart": 0.056918809343472494,
+              "weightEnd": 0.06146872734998416,
+              "gradientTermVectorM": [
+                0.001429872242927705,
+                -0.00013936892807548892,
+                0.006532686748841245
+              ]
+            },
+            {
+              "bone": "mixamorig:LeftArm",
+              "weightStart": 0.7530078065725958,
+              "weightEnd": 0.7363903458196116,
+              "gradientTermVectorM": [
+                -0.0036834173111323885,
+                0.0006954555087975733,
+                -0.0212837280910142
+              ]
+            },
+            {
+              "bone": "mixamorig:LeftForeArm",
+              "weightStart": 0.062337571745378254,
+              "weightEnd": 0.05533419501152068,
+              "gradientTermVectorM": [
+                -0.0023725734405335435,
+                -0.00045728689285537573,
+                -0.007772459758913447
+              ]
+            }
+          ]
+        },
+        {
+          "vertices": [
+            24441,
+            24534
+          ],
+          "restEdgeM": 0.010002945264624991,
+          "restEndpointsM": [
+            [
+              0.009103530086576939,
+              0.12632350623607635,
+              0.9213706851005554
+            ],
+            [
+              0.007081232964992523,
+              0.12791019678115845,
+              0.9310377240180969
+            ]
+          ],
+          "posedEdgeM": 0.022741563130957185,
+          "ratio": 2.2734867110971604,
+          "weightL1Difference": 0.17841506004333496,
+          "rigidEdgeTermM": 0.007483686550852737,
+          "weightGradientTermM": 0.015511494368774486,
+          "edgeDecompositionResidualM": 1.4401314924827876e-08,
+          "weights": [
+            {
+              "bone": "mixamorig:Hips",
+              "weightStart": 0.42790329456329346,
+              "weightEnd": 0.5171108245849609,
+              "gradientTermVectorM": [
+                0.0007219013679082855,
+                0.011339793626978841,
+                0.08262439809604491
+              ]
+            },
+            {
+              "bone": "mixamorig:LeftUpLeg",
+              "weightStart": 0.3108171224594116,
+              "weightEnd": 0.2438841462135315,
+              "gradientTermVectorM": [
+                -0.00036681683160674723,
+                0.001805701747248304,
+                -0.05654126071693365
+              ]
+            },
+            {
+              "bone": "mixamorig:RightUpLeg",
+              "weightStart": 0.2612795829772949,
+              "weightEnd": 0.23900502920150757,
+              "gradientTermVectorM": [
+                -0.0002343177695693793,
+                0.0005954040682005457,
+                -0.01888733614132919
+              ]
+            }
+          ]
+        },
+        {
+          "vertices": [
+            24661,
+            24743
+          ],
+          "restEdgeM": 0.008901889770444779,
+          "restEndpointsM": [
+            [
+              0.022294722497463226,
+              0.1316370964050293,
+              0.9203364253044128
+            ],
+            [
+              0.022277407348155975,
+              0.13360515236854553,
+              0.9290180206298828
+            ]
+          ],
+          "posedEdgeM": 0.02012549691393775,
+          "ratio": 2.260811741430066,
+          "weightL1Difference": 0.15006787819114803,
+          "rigidEdgeTermM": 0.006559645307192703,
+          "weightGradientTermM": 0.013573771075866777,
+          "edgeDecompositionResidualM": 1.9450989605947723e-08,
+          "weights": [
+            {
+              "bone": "mixamorig:Hips",
+              "weightStart": 0.41414915898220006,
+              "weightEnd": 0.48918309807777405,
+              "gradientTermVectorM": [
+                0.0016722112380981524,
+                0.009951096518778934,
+                0.06938218168269983
+              ]
+            },
+            {
+              "bone": "mixamorig:LeftUpLeg",
+              "weightStart": 0.3970759451825031,
+              "weightEnd": 0.340837299823761,
+              "gradientTermVectorM": [
+                -0.0010873317803719573,
+                0.001465044779286619,
+                -0.047145868541453494
+              ]
+            },
+            {
+              "bone": "mixamorig:RightUpLeg",
+              "weightStart": 0.18877489583529689,
+              "weightEnd": 0.16997960209846497,
+              "gradientTermVectorM": [
+                -0.00046485734780284224,
+                0.0005593468155566029,
+                -0.01584721771594069
+              ]
+            }
+          ]
+        }
+      ],
+      "experiments": [
+        {
+          "experiment": "original_lbs_before_bake",
+          "maxJointHeadChangeM": 0.0,
+          "maxEdgeRatio": 2.445761189945372,
+          "p99EdgeRatio": 1.477316948566622,
+          "edgesOverTwoTimes": 76,
+          "edgesBelowOneFifth": 33,
+          "newStrictCrossingPairs": 352,
+          "totalStrictCrossingPairs": 364,
+          "facesBelowOnePercentArea": 0,
+          "minFaceAreaRatio": 0.01332882383542434,
+          "newCrossingPairRegions": {
+            "mixamorig:RightArm": 19,
+            "mixamorig:LeftArm": 30,
+            "mixamorig:Hips": 157,
+            "mixamorig:RightUpLeg": 144,
+            "mixamorig:LeftUpLeg": 142,
+            "mixamorig:LeftForeArm": 14,
+            "mixamorig:RightLeg": 66,
+            "mixamorig:LeftLeg": 63,
+            "mixamorig:RightForeArm": 2
+          },
+          "newCrossingPairsSharingVertex": 15
+        },
+        {
+          "experiment": "same_pose_original_weights_dual_quaternion",
+          "maxJointHeadChangeM": 0.0,
+          "maxEdgeRatio": 2.8200990359444678,
+          "p99EdgeRatio": 1.7413004585934144,
+          "edgesOverTwoTimes": 332,
+          "edgesBelowOneFifth": 30,
+          "newStrictCrossingPairs": 171,
+          "totalStrictCrossingPairs": 184,
+          "facesBelowOnePercentArea": 3,
+          "minFaceAreaRatio": 0.007198435161749578,
+          "newCrossingPairRegions": {
+            "mixamorig:LeftUpLeg": 72,
+            "mixamorig:Hips": 101,
+            "mixamorig:RightUpLeg": 51,
+            "mixamorig:RightLeg": 29,
+            "mixamorig:LeftLeg": 22,
+            "mixamorig:RightArm": 2
+          },
+          "newCrossingPairsSharingVertex": 10
+        },
+        {
+          "experiment": "same_pose_lbs_neighbor_weight_smoothing_1",
+          "maxJointHeadChangeM": 0.0,
+          "maxEdgeRatio": 2.5028796031738008,
+          "p99EdgeRatio": 1.4639555794260446,
+          "edgesOverTwoTimes": 67,
+          "edgesBelowOneFifth": 31,
+          "newStrictCrossingPairs": 391,
+          "totalStrictCrossingPairs": 403,
+          "facesBelowOnePercentArea": 0,
+          "minFaceAreaRatio": 0.01712898527837119,
+          "newCrossingPairRegions": {
+            "mixamorig:LeftArm": 30,
+            "mixamorig:Hips": 198,
+            "mixamorig:LeftUpLeg": 146,
+            "mixamorig:RightUpLeg": 159,
+            "mixamorig:RightLeg": 69,
+            "mixamorig:LeftLeg": 69,
+            "mixamorig:RightArm": 11,
+            "mixamorig:LeftForeArm": 10,
+            "mixamorig:RightForeArm": 1
+          },
+          "newCrossingPairsSharingVertex": 13
+        },
+        {
+          "experiment": "same_pose_lbs_neighbor_weight_smoothing_3",
+          "maxJointHeadChangeM": 0.0,
+          "maxEdgeRatio": 3.1360153346554203,
+          "p99EdgeRatio": 1.4643729525518703,
+          "edgesOverTwoTimes": 73,
+          "edgesBelowOneFifth": 35,
+          "newStrictCrossingPairs": 428,
+          "totalStrictCrossingPairs": 440,
+          "facesBelowOnePercentArea": 2,
+          "minFaceAreaRatio": 0.006182815224711836,
+          "newCrossingPairRegions": {
+            "mixamorig:LeftLeg": 71,
+            "mixamorig:LeftUpLeg": 151,
+            "mixamorig:LeftArm": 23,
+            "mixamorig:Hips": 223,
+            "mixamorig:RightUpLeg": 176,
+            "mixamorig:RightLeg": 82,
+            "mixamorig:RightArm": 9,
+            "mixamorig:LeftForeArm": 9
+          },
+          "newCrossingPairsSharingVertex": 19
+        },
+        {
+          "experiment": "neutral_thighs",
+          "maxJointHeadChangeM": 1.0069880782933702,
+          "maxEdgeRatio": 2.2764932931400605,
+          "p99EdgeRatio": 1.3078695647962835,
+          "edgesOverTwoTimes": 1,
+          "edgesBelowOneFifth": 14,
+          "newStrictCrossingPairs": 193,
+          "totalStrictCrossingPairs": 205,
+          "facesBelowOnePercentArea": 0,
+          "minFaceAreaRatio": 0.02714976502357884,
+          "newCrossingPairRegions": {
+            "mixamorig:LeftArm": 29,
+            "mixamorig:LeftLeg": 63,
+            "mixamorig:LeftUpLeg": 72,
+            "mixamorig:LeftForeArm": 13,
+            "mixamorig:RightLeg": 66,
+            "mixamorig:RightUpLeg": 74,
+            "mixamorig:RightArm": 18,
+            "mixamorig:RightForeArm": 2
+          },
+          "newCrossingPairsSharingVertex": 11
+        },
+        {
+          "experiment": "neutral_knees",
+          "maxJointHeadChangeM": 0.7597911120702229,
+          "maxEdgeRatio": 2.445762861279909,
+          "p99EdgeRatio": 1.4348692803576804,
+          "edgesOverTwoTimes": 76,
+          "edgesBelowOneFifth": 28,
+          "newStrictCrossingPairs": 204,
+          "totalStrictCrossingPairs": 216,
+          "facesBelowOnePercentArea": 0,
+          "minFaceAreaRatio": 0.01332882383542434,
+          "newCrossingPairRegions": {
+            "mixamorig:LeftArm": 29,
+            "mixamorig:Hips": 157,
+            "mixamorig:RightUpLeg": 70,
+            "mixamorig:LeftUpLeg": 70,
+            "mixamorig:LeftForeArm": 13,
+            "mixamorig:RightArm": 18,
+            "mixamorig:RightForeArm": 2
+          },
+          "newCrossingPairsSharingVertex": 10
+        },
+        {
+          "experiment": "neutral_elbows",
+          "maxJointHeadChangeM": 0.6781384036062329,
+          "maxEdgeRatio": 2.445762861279909,
+          "p99EdgeRatio": 1.4718551023678461,
+          "edgesOverTwoTimes": 76,
+          "edgesBelowOneFifth": 27,
+          "newStrictCrossingPairs": 310,
+          "totalStrictCrossingPairs": 323,
+          "facesBelowOnePercentArea": 0,
+          "minFaceAreaRatio": 0.01332882383542434,
+          "newCrossingPairRegions": {
+            "mixamorig:Hips": 157,
+            "mixamorig:RightUpLeg": 144,
+            "mixamorig:LeftUpLeg": 142,
+            "mixamorig:RightLeg": 66,
+            "mixamorig:LeftLeg": 63,
+            "mixamorig:RightArm": 7
+          },
+          "newCrossingPairsSharingVertex": 6
+        },
+        {
+          "experiment": "neutral_upperarms",
+          "maxJointHeadChangeM": 0.39178926590293867,
+          "maxEdgeRatio": 2.445762861279909,
+          "p99EdgeRatio": 1.4535648293031143,
+          "edgesOverTwoTimes": 75,
+          "edgesBelowOneFifth": 31,
+          "newStrictCrossingPairs": 358,
+          "totalStrictCrossingPairs": 371,
+          "facesBelowOnePercentArea": 0,
+          "minFaceAreaRatio": 0.01332882383542434,
+          "newCrossingPairRegions": {
+            "mixamorig:RightArm": 22,
+            "mixamorig:LeftArm": 33,
+            "mixamorig:Hips": 157,
+            "mixamorig:RightUpLeg": 144,
+            "mixamorig:LeftUpLeg": 142,
+            "mixamorig:LeftForeArm": 17,
+            "mixamorig:RightLeg": 66,
+            "mixamorig:LeftLeg": 63,
+            "mixamorig:RightForeArm": 12
+          },
+          "newCrossingPairsSharingVertex": 12
+        },
+        {
+          "experiment": "remove_local_thigh_twist",
+          "maxJointHeadChangeM": 0.09283046803955644,
+          "maxEdgeRatio": 2.549889902801257,
+          "p99EdgeRatio": 1.4868415230479937,
+          "edgesOverTwoTimes": 106,
+          "edgesBelowOneFifth": 31,
+          "newStrictCrossingPairs": 363,
+          "totalStrictCrossingPairs": 376,
+          "facesBelowOnePercentArea": 2,
+          "minFaceAreaRatio": 0.008264403740203475,
+          "newCrossingPairRegions": {
+            "mixamorig:Hips": 170,
+            "mixamorig:RightUpLeg": 144,
+            "mixamorig:LeftArm": 29,
+            "mixamorig:LeftUpLeg": 154,
+            "mixamorig:LeftForeArm": 13,
+            "mixamorig:RightLeg": 66,
+            "mixamorig:LeftLeg": 63,
+            "mixamorig:RightArm": 18,
+            "mixamorig:RightForeArm": 2
+          },
+          "newCrossingPairsSharingVertex": 12
+        },
+        {
+          "experiment": "remove_local_elbow_twist",
+          "maxJointHeadChangeM": 0.10828153781737365,
+          "maxEdgeRatio": 2.445762861279909,
+          "p99EdgeRatio": 1.4773228017082733,
+          "edgesOverTwoTimes": 76,
+          "edgesBelowOneFifth": 33,
+          "newStrictCrossingPairs": 310,
+          "totalStrictCrossingPairs": 323,
+          "facesBelowOnePercentArea": 0,
+          "minFaceAreaRatio": 0.01332882383542434,
+          "newCrossingPairRegions": {
+            "mixamorig:Hips": 157,
+            "mixamorig:RightUpLeg": 144,
+            "mixamorig:LeftUpLeg": 142,
+            "mixamorig:RightLeg": 66,
+            "mixamorig:LeftLeg": 63,
+            "mixamorig:RightArm": 7
+          },
+          "newCrossingPairsSharingVertex": 6
+        },
+        {
+          "experiment": "remove_local_upperarm_twist",
+          "maxJointHeadChangeM": 0.0556613153900756,
+          "maxEdgeRatio": 2.445762861279909,
+          "p99EdgeRatio": 1.477037076495522,
+          "edgesOverTwoTimes": 76,
+          "edgesBelowOneFifth": 33,
+          "newStrictCrossingPairs": 358,
+          "totalStrictCrossingPairs": 371,
+          "facesBelowOnePercentArea": 0,
+          "minFaceAreaRatio": 0.01332882383542434,
+          "newCrossingPairRegions": {
+            "mixamorig:LeftArm": 30,
+            "mixamorig:RightArm": 25,
+            "mixamorig:Hips": 157,
+            "mixamorig:RightUpLeg": 144,
+            "mixamorig:LeftUpLeg": 142,
+            "mixamorig:LeftForeArm": 14,
+            "mixamorig:RightLeg": 66,
+            "mixamorig:LeftLeg": 63,
+            "mixamorig:RightForeArm": 2
+          },
+          "newCrossingPairsSharingVertex": 15
+        },
+        {
+          "experiment": "no_op_basis_restore_control",
+          "maxJointHeadChangeM": 1.431209796093296e-07,
+          "maxEdgeRatio": 2.445762861279909,
+          "p99EdgeRatio": 1.4773228017082733,
+          "edgesOverTwoTimes": 76,
+          "edgesBelowOneFifth": 33,
+          "newStrictCrossingPairs": 350,
+          "totalStrictCrossingPairs": 363,
+          "facesBelowOnePercentArea": 0,
+          "minFaceAreaRatio": 0.01332882383542434,
+          "newCrossingPairRegions": {
+            "mixamorig:LeftArm": 29,
+            "mixamorig:Hips": 157,
+            "mixamorig:RightUpLeg": 144,
+            "mixamorig:LeftUpLeg": 142,
+            "mixamorig:LeftForeArm": 13,
+            "mixamorig:RightLeg": 66,
+            "mixamorig:LeftLeg": 63,
+            "mixamorig:RightArm": 18,
+            "mixamorig:RightForeArm": 2
+          },
+          "newCrossingPairsSharingVertex": 13
+        }
+      ],
+      "solverModes": {
+        "hips": "legacy_structural",
+        "spine": "legacy_structural",
+        "spine1": "legacy_structural",
+        "spine2": "legacy_structural",
+        "neck": "legacy_structural",
+        "head": "legacy_structural",
+        "shoulder.L": "legacy_structural",
+        "upperarm.L": "legacy_compatible_chain",
+        "forearm.L": "legacy_compatible_chain",
+        "hand.L": "legacy_compatible_chain",
+        "shoulder.R": "legacy_structural",
+        "upperarm.R": "legacy_compatible_chain",
+        "forearm.R": "legacy_compatible_chain",
+        "hand.R": "legacy_compatible_chain",
+        "upleg.L": "legacy_compatible_chain",
+        "leg.L": "legacy_compatible_chain",
+        "foot.L": "legacy_compatible_chain",
+        "toe.L": "legacy_compatible_chain",
+        "upleg.R": "legacy_compatible_chain",
+        "leg.R": "legacy_compatible_chain",
+        "foot.R": "legacy_compatible_chain",
+        "toe.R": "legacy_compatible_chain"
+      },
+      "restSwingDeg": {
+        "spine": 12.100935507509382,
+        "spine1": 3.2364653735378526,
+        "spine2": 22.820122748477186,
+        "neck": 10.888169511234597,
+        "head": 1.8633329895970916,
+        "shoulder.L": 39.715287914408584,
+        "upperarm.L": 3.3075328602151384,
+        "forearm.L": 2.025101460944317,
+        "hand.L": 8.789675932788498,
+        "shoulder.R": 39.83831838650831,
+        "upperarm.R": 3.25241394615083,
+        "forearm.R": 2.0320734562608935,
+        "hand.R": 8.01148104372282,
+        "upleg.L": 2.6989463043910895,
+        "leg.L": 2.3017363135677296,
+        "foot.L": 7.669003655400447,
+        "toe.L": 4.831277777689796,
+        "upleg.R": 2.388533172324868,
+        "leg.R": 2.5238654959638986,
+        "foot.R": 8.170140388354346,
+        "toe.R": 4.876843003411022
+      },
+      "parentSeededRollDetails": {},
+      "poseBvhSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+      "outputFbxSha256": "d8087b904a5acf70b3224787a4464d7b7ae317b8d152adc33af085d3145e6670"
+    },
+    {
+      "pose": "cmu_135_01_04368.bvh",
+      "sourceProfile": "cmu_bvh",
+      "preBakeVsActualFbxMaxVertexErrorM": 4.302186141868125e-07,
+      "maxJointEdgeLengthErrorM": 1.816664080278585e-07,
+      "jointBendsDeg": {
+        "elbow.L": {
+          "source": 87.80001068115234,
+          "target": 87.80001831054688
+        },
+        "elbow.R": {
+          "source": 90.68187713623047,
+          "target": 90.68185424804688
+        },
+        "knee.L": {
+          "source": 78.96562957763672,
+          "target": 78.96572875976562
+        },
+        "knee.R": {
+          "source": 52.187129974365234,
+          "target": 52.18714904785156
+        }
+      },
+      "targetLocalRotations": {
+        "hips": {
+          "rotationDeg": 143.3089664480782,
+          "swingDeg": 17.6154420676037,
+          "twistDeg": 142.85523698151425
+        },
+        "spine": {
+          "rotationDeg": 17.492389379516748,
+          "swingDeg": 17.199012264097192,
+          "twistDeg": 3.2022027112189555
+        },
+        "spine1": {
+          "rotationDeg": 5.205421635816002,
+          "swingDeg": 1.9114508507862824,
+          "twistDeg": 4.842061121500024
+        },
+        "spine2": {
+          "rotationDeg": 12.122784083318802,
+          "swingDeg": 11.76999627495118,
+          "twistDeg": 2.9085297632309715
+        },
+        "neck": {
+          "rotationDeg": 10.87710272022834,
+          "swingDeg": 2.877709388374935,
+          "twistDeg": 10.490623296232338
+        },
+        "head": {
+          "rotationDeg": 24.907813063278287,
+          "swingDeg": 12.114178044964587,
+          "twistDeg": 21.804199010086588
+        },
+        "shoulder.L": {
+          "rotationDeg": 0.0,
+          "swingDeg": 0.0,
+          "twistDeg": 1.4941041862735387e-06
+        },
+        "upperarm.L": {
+          "rotationDeg": 138.91089835848027,
+          "swingDeg": 89.62579693042068,
+          "twistDeg": 120.70202384257647
+        },
+        "forearm.L": {
+          "rotationDeg": 92.23815304265379,
+          "swingDeg": 87.13818056299951,
+          "twistDeg": -33.849744752949945
+        },
+        "hand.L": {
+          "rotationDeg": 33.8497549982337,
+          "swingDeg": 5.026675158349946,
+          "twistDeg": -33.485214141851785
+        },
+        "shoulder.R": {
+          "rotationDeg": 0.0,
+          "swingDeg": 0.0,
+          "twistDeg": 4.482311235709868e-06
+        },
+        "upperarm.R": {
+          "rotationDeg": 107.82471303051459,
+          "swingDeg": 57.50771345283865,
+          "twistDeg": 95.57733690522466
+        },
+        "forearm.R": {
+          "rotationDeg": 91.67830292695535,
+          "swingDeg": 91.5244802366575,
+          "twistDeg": 6.019507187234767
+        },
+        "hand.R": {
+          "rotationDeg": 6.019337286279163,
+          "swingDeg": 0.8308601224943465,
+          "twistDeg": 5.961848864695636
+        },
+        "upleg.L": {
+          "rotationDeg": 88.79000717225372,
+          "swingDeg": 88.79000717225372,
+          "twistDeg": 6.688940543231232e-05
+        },
+        "leg.L": {
+          "rotationDeg": 79.78964150668531,
+          "swingDeg": 79.78964150668531,
+          "twistDeg": -6.962105509936782e-05
+        },
+        "foot.L": {
+          "rotationDeg": 33.87951754754204,
+          "swingDeg": 33.87951754754204,
+          "twistDeg": 5.66784167078681e-05
+        },
+        "toe.L": {
+          "rotationDeg": 0.0,
+          "swingDeg": 0.0,
+          "twistDeg": -1.664858121657409e-05
+        },
+        "upleg.R": {
+          "rotationDeg": 10.703265868115052,
+          "swingDeg": 10.703265868115052,
+          "twistDeg": 1.1768388595100374e-05
+        },
+        "leg.R": {
+          "rotationDeg": 52.92548297264966,
+          "swingDeg": 52.92548297264966,
+          "twistDeg": -1.0653173761143479e-06
+        },
+        "foot.R": {
+          "rotationDeg": 67.09772934945426,
+          "swingDeg": 67.09772934945426,
+          "twistDeg": 2.4583874822433426e-05
+        },
+        "toe.R": {
+          "rotationDeg": 0.0,
+          "swingDeg": 0.0,
+          "twistDeg": 8.537736462515939e-06
+        }
+      },
+      "sourceLocalRotations": {
+        "hips": {
+          "rotationDeg": 143.3089664480782,
+          "swingDeg": 17.615486463833303,
+          "twistDeg": 142.85522332113592
+        },
+        "spine": {
+          "rotationDeg": 17.492344983287143,
+          "swingDeg": 17.288812176209934,
+          "twistDeg": 2.6708195433206643
+        },
+        "spine1": {
+          "rotationDeg": 5.205421635816002,
+          "swingDeg": 2.436408091336061,
+          "twistDeg": 4.600592163112094
+        },
+        "spine2": {
+          "rotationDeg": 12.122913856913033,
+          "swingDeg": 11.876764084509528,
+          "twistDeg": 2.4342384390575242
+        },
+        "neck": {
+          "rotationDeg": 10.87710272022834,
+          "swingDeg": 2.1594808462022446,
+          "twistDeg": 10.661196171696005
+        },
+        "head": {
+          "rotationDeg": 8.033470426283067,
+          "swingDeg": 3.1553674637499434,
+          "twistDeg": 7.388890960156978
+        },
+        "shoulder.L": {
+          "rotationDeg": 0.0,
+          "swingDeg": 0.0,
+          "twistDeg": 1.600825332277364e-07
+        },
+        "upperarm.L": {
+          "rotationDeg": 92.79253900701622,
+          "swingDeg": 92.41693324417888,
+          "twistDeg": -9.486021143860292
+        },
+        "forearm.L": {
+          "rotationDeg": 87.80001906338457,
+          "swingDeg": 87.80001906338457,
+          "twistDeg": 8.222109818590977e-06
+        },
+        "hand.L": {
+          "rotationDeg": 67.69948267571073,
+          "swingDeg": 67.69948267571073,
+          "twistDeg": 5.3329725162694065e-15
+        },
+        "shoulder.R": {
+          "rotationDeg": 0.0,
+          "swingDeg": 0.0,
+          "twistDeg": 5.002579163366762e-09
+        },
+        "upperarm.R": {
+          "rotationDeg": 62.27251488954207,
+          "swingDeg": 56.15457784617825,
+          "twistDeg": 28.088408471057907
+        },
+        "forearm.R": {
+          "rotationDeg": 90.68189444026639,
+          "swingDeg": 90.68189444026639,
+          "twistDeg": -1.2096796895957077e-05
+        },
+        "hand.R": {
+          "rotationDeg": 12.038989615033794,
+          "swingDeg": 12.038989615033794,
+          "twistDeg": 2.1398259805549564e-14
+        },
+        "upleg.L": {
+          "rotationDeg": 79.33273600215732,
+          "swingDeg": 74.74623665373707,
+          "twistDeg": -28.775679180817516
+        },
+        "leg.L": {
+          "rotationDeg": 78.96562699464747,
+          "swingDeg": 78.96562699464747,
+          "twistDeg": 1.0546133898116133e-05
+        },
+        "foot.L": {
+          "rotationDeg": 11.867848126321723,
+          "swingDeg": 11.819785792679635,
+          "twistDeg": 1.0689905591211684
+        },
+        "toe.L": {
+          "rotationDeg": 4.752880622167638,
+          "swingDeg": 4.752880622167638,
+          "twistDeg": -4.9757835868474904e-05
+        },
+        "upleg.R": {
+          "rotationDeg": 17.379643446887346,
+          "swingDeg": 9.730042458563691,
+          "twistDeg": 14.418017073709166
+        },
+        "leg.R": {
+          "rotationDeg": 52.187105372425435,
+          "swingDeg": 52.187105372425435,
+          "twistDeg": 2.676102953787733e-05
+        },
+        "foot.R": {
+          "rotationDeg": 37.3180738323474,
+          "swingDeg": 37.30560532201754,
+          "twistDeg": -0.983791953353193
+        },
+        "toe.R": {
+          "rotationDeg": 34.83723642767747,
+          "swingDeg": 34.83723642767747,
+          "twistDeg": -2.6258737615474646e-05
+        }
+      },
+      "weightSum": {
+        "min": 0.9999998460434654,
+        "p01": 0.999999931344111,
+        "p50": 1.0,
+        "p95": 1.00000005457943,
+        "p99": 1.000000075438636,
+        "max": 1.000000168046764
+      },
+      "edgeWeightL1Difference": {
+        "min": 0.0,
+        "p01": 0.0,
+        "p50": 0.03486190604551073,
+        "p95": 0.30520726028788203,
+        "p99": 1.2661828818272567,
+        "max": 2.0
+      },
+      "verticesWithMoreThanFourWeights": 6709,
+      "worstEdges": [
+        {
+          "vertices": [
+            20273,
+            20334
+          ],
+          "restEdgeM": 0.0047541842207261716,
+          "restEndpointsM": [
+            [
+              -0.026347346603870392,
+              0.08238642662763596,
+              0.8651267886161804
+            ],
+            [
+              -0.022547747939825058,
+              0.08242739737033844,
+              0.8679839968681335
+            ]
+          ],
+          "posedEdgeM": 0.039558889499828304,
+          "ratio": 8.320857514811644,
+          "weightL1Difference": 0.3476450230562965,
+          "rigidEdgeTermM": 0.004266017987508608,
+          "weightGradientTermM": 0.038019570997161516,
+          "edgeDecompositionResidualM": 7.494368843578829e-08,
+          "weights": [
+            {
+              "bone": "mixamorig:Hips",
+              "weightStart": 0.11242910223240177,
+              "weightEnd": 0.09542165270052913,
+              "gradientTermVectorM": [
+                -2.167692334628362e-05,
+                0.0016380356143953034,
+                -0.015076979491661549
+              ]
+            },
+            {
+              "bone": "mixamorig:LeftUpLeg",
+              "weightStart": 0.1281676859818171,
+              "weightEnd": 0.3019901975099654,
+              "gradientTermVectorM": [
+                0.0025360551844260987,
+                0.017621345665042733,
+                0.14126300807448786
+              ]
+            },
+            {
+              "bone": "mixamorig:RightUpLeg",
+              "weightStart": 0.7594032117857811,
+              "weightEnd": 0.6025881497895055,
+              "gradientTermVectorM": [
+                -0.0031200803092460237,
+                0.01675689825980279,
+                -0.13834943731509844
+              ]
+            }
+          ]
+        },
+        {
+          "vertices": [
+            18895,
+            18897
+          ],
+          "restEdgeM": 0.006212940655948325,
+          "restEndpointsM": [
+            [
+              -0.02078399807214737,
+              0.07363778352737427,
+              0.8624340891838074
+            ],
+            [
+              -0.02435285411775112,
+              0.07403385639190674,
+              0.8573638796806335
+            ]
+          ],
+          "posedEdgeM": 0.039865778232260306,
+          "ratio": 6.416571546372723,
+          "weightL1Difference": 0.35180285681415513,
+          "rigidEdgeTermM": 0.005277262996496147,
+          "weightGradientTermM": 0.03826856042251455,
+          "edgeDecompositionResidualM": 1.0480876450028565e-07,
+          "weights": [
+            {
+              "bone": "mixamorig:Hips",
+              "weightStart": 0.07940605732030953,
+              "weightEnd": 0.09195984360485919,
+              "gradientTermVectorM": [
+                7.889965091424529e-05,
+                -0.001131180175779091,
+                0.011033494885438058
+              ]
+            },
+            {
+              "bone": "mixamorig:LeftUpLeg",
+              "weightStart": 0.306868958962375,
+              "weightEnd": 0.13096753055529736,
+              "gradientTermVectorM": [
+                -0.003044874380398497,
+                -0.019310749413258874,
+                -0.14410918713153187
+              ]
+            },
+            {
+              "bone": "mixamorig:RightUpLeg",
+              "weightStart": 0.6137249837173155,
+              "weightEnd": 0.7770726258398434,
+              "gradientTermVectorM": [
+                0.004232478429132467,
+                -0.016512676901381376,
+                0.14293651089003412
+              ]
+            }
+          ]
+        },
+        {
+          "vertices": [
+            21505,
+            21837
+          ],
+          "restEdgeM": 0.00564991422659971,
+          "restEndpointsM": [
+            [
+              0.033865347504615784,
+              0.08901282399892807,
+              0.8638254404067993
+            ],
+            [
+              0.030347082763910294,
+              0.0918373391032219,
+              0.867226243019104
+            ]
+          ],
+          "posedEdgeM": 0.036186366151427264,
+          "ratio": 6.404763807043725,
+          "weightL1Difference": 0.32521226815352877,
+          "rigidEdgeTermM": 0.004311709660227175,
+          "weightGradientTermM": 0.032159108630362664,
+          "edgeDecompositionResidualM": 1.290370800820227e-07,
+          "weights": [
+            {
+              "bone": "mixamorig:Hips",
+              "weightStart": 0.0922158109481391,
+              "weightEnd": 0.0957315805118334,
+              "gradientTermVectorM": [
+                -0.00016516962242544043,
+                -0.000248767694124315,
+                0.003057648987504482
+              ]
+            },
+            {
+              "bone": "mixamorig:LeftUpLeg",
+              "weightStart": 0.7938739420809167,
+              "weightEnd": 0.6312678080041523,
+              "gradientTermVectorM": [
+                0.006374715785580717,
+                -0.01806056355275274,
+                -0.13484896865573212
+              ]
+            },
+            {
+              "bone": "mixamorig:RightUpLeg",
+              "weightStart": 0.11391024697094419,
+              "weightEnd": 0.2730006114840143,
+              "gradientTermVectorM": [
+                -0.004078753445296586,
+                -0.013482620743636984,
+                0.13614330529847016
+              ]
+            }
+          ]
+        },
+        {
+          "vertices": [
+            22470,
+            23107
+          ],
+          "restEdgeM": 0.006035772230489314,
+          "restEndpointsM": [
+            [
+              -0.014050492085516453,
+              0.09772830456495285,
+              0.8793365359306335
+            ],
+            [
+              -0.015778779983520508,
+              0.10290646553039551,
+              0.8819114565849304
+            ]
+          ],
+          "posedEdgeM": 0.03774492546145242,
+          "ratio": 6.253537081930687,
+          "weightL1Difference": 0.30919828843715647,
+          "rigidEdgeTermM": 0.0049987410197563946,
+          "weightGradientTermM": 0.03319844229854056,
+          "edgeDecompositionResidualM": 7.117443902169196e-08,
+          "weights": [
+            {
+              "bone": "mixamorig:Hips",
+              "weightStart": 0.13533960966231764,
+              "weightEnd": 0.1702486698292394,
+              "gradientTermVectorM": [
+                -0.0006837472156698243,
+                -0.0035467629423574466,
+                0.03136907993034119
+              ]
+            },
+            {
+              "bone": "mixamorig:LeftUpLeg",
+              "weightStart": 0.3005066334899286,
+              "weightEnd": 0.14590748927135036,
+              "gradientTermVectorM": [
+                0.00047373651583065276,
+                -0.013309958000695959,
+                -0.1244000790029103
+              ]
+            },
+            {
+              "bone": "mixamorig:RightUpLeg",
+              "weightStart": 0.5641537568477537,
+              "weightEnd": 0.6838438408994102,
+              "gradientTermVectorM": [
+                -0.00030055415996498556,
+                -0.013404558841789243,
+                0.10667397676649407
+              ]
+            }
+          ]
+        },
+        {
+          "vertices": [
+            3742,
+            4032
+          ],
+          "restEdgeM": 0.007270484064058711,
+          "restEndpointsM": [
+            [
+              -0.015682581812143326,
+              -0.04301045462489128,
+              0.8793752193450928
+            ],
+            [
+              -0.008554615080356598,
+              -0.04158242419362068,
+              0.8792622685432434
+            ]
+          ],
+          "posedEdgeM": 0.041366305836049756,
+          "ratio": 5.689621966237723,
+          "weightL1Difference": 0.6349541135279521,
+          "rigidEdgeTermM": 0.006860005790597688,
+          "weightGradientTermM": 0.038593800451743626,
+          "edgeDecompositionResidualM": 8.085876509527381e-08,
+          "weights": [
+            {
+              "bone": "mixamorig:Hips",
+              "weightStart": 0.14216209736224864,
+              "weightEnd": 0.0842692119519295,
+              "gradientTermVectorM": [
+                -0.0038040376859449837,
+                -0.0006892918065808623,
+                -0.05122562204944831
+              ]
+            },
+            {
+              "bone": "mixamorig:LeftUpLeg",
+              "weightStart": 0.1540084458290272,
+              "weightEnd": 0.47148550259300326,
+              "gradientTermVectorM": [
+                0.0187616384401994,
+                0.03658512083149617,
+                0.2951590499781193
+              ]
+            },
+            {
+              "bone": "mixamorig:RightUpLeg",
+              "weightStart": 0.7038294568087241,
+              "weightEnd": 0.44424528545506725,
+              "gradientTermVectorM": [
+                -0.020965769219875217,
+                -0.0008866319466121751,
+                -0.22884238870235338
+              ]
+            }
+          ]
+        },
+        {
+          "vertices": [
+            20334,
+            21044
+          ],
+          "restEdgeM": 0.00785622274401924,
+          "restEndpointsM": [
+            [
+              -0.022547747939825058,
+              0.08242739737033844,
+              0.8679839968681335
+            ],
+            [
+              -0.029373345896601677,
+              0.08538664877414703,
+              0.8654592633247375
+            ]
+          ],
+          "posedEdgeM": 0.04461247408422283,
+          "ratio": 5.678616243179366,
+          "weightL1Difference": 0.3596413646995701,
+          "rigidEdgeTermM": 0.00666530857436879,
+          "weightGradientTermM": 0.0396756862760605,
+          "edgeDecompositionResidualM": 6.312828219665475e-08,
+          "weights": [
+            {
+              "bone": "mixamorig:Hips",
+              "weightStart": 0.09542165270052913,
+              "weightEnd": 0.11571913040102824,
+              "gradientTermVectorM": [
+                3.027738562232586e-05,
+                -0.0019954940947235398,
+                0.01800822526067774
+              ]
+            },
+            {
+              "bone": "mixamorig:LeftUpLeg",
+              "weightStart": 0.3019901975099654,
+              "weightEnd": 0.1221695151601804,
+              "gradientTermVectorM": [
+                -0.002740901971437366,
+                -0.018099531161832633,
+                -0.14579551682971537
+              ]
+            },
+            {
+              "bone": "mixamorig:RightUpLeg",
+              "weightStart": 0.6025881497895055,
+              "weightEnd": 0.7621113544387914,
+              "gradientTermVectorM": [
+                0.0031979534416594645,
+                -0.017353165001076976,
+                0.14088521653793049
+              ]
+            }
+          ]
+        },
+        {
+          "vertices": [
+            18895,
+            19551
+          ],
+          "restEdgeM": 0.00782676212268713,
+          "restEndpointsM": [
+            [
+              -0.02078399807214737,
+              0.07363778352737427,
+              0.8624340891838074
+            ],
+            [
+              -0.026085974648594856,
+              0.07939256727695465,
+              0.8626064658164978
+            ]
+          ],
+          "posedEdgeM": 0.04438175151325757,
+          "ratio": 5.670512380159085,
+          "weightL1Difference": 0.3523725081536266,
+          "rigidEdgeTermM": 0.0062633566173143996,
+          "weightGradientTermM": 0.038237921581980215,
+          "edgeDecompositionResidualM": 1.3027620663676102e-07,
+          "weights": [
+            {
+              "bone": "mixamorig:Hips",
+              "weightStart": 0.07940605732030953,
+              "weightEnd": 0.1001833811374995,
+              "gradientTermVectorM": [
+                0.00010045525582144091,
+                -0.0019130689716142406,
+                0.01832286564766542
+              ]
+            },
+            {
+              "bone": "mixamorig:LeftUpLeg",
+              "weightStart": 0.306868958962375,
+              "weightEnd": 0.1306827048855617,
+              "gradientTermVectorM": [
+                -0.0029363747900968567,
+                -0.01877828352838189,
+                -0.14398366709595684
+              ]
+            },
+            {
+              "bone": "mixamorig:RightUpLeg",
+              "weightStart": 0.6137249837173155,
+              "weightEnd": 0.7691339139769389,
+              "gradientTermVectorM": [
+                0.003737362515288366,
+                -0.015986482346328254,
+                0.13643403116121425
+              ]
+            }
+          ]
+        },
+        {
+          "vertices": [
+            17755,
+            18897
+          ],
+          "restEdgeM": 0.007183435733724275,
+          "restEndpointsM": [
+            [
+              -0.019993791356682777,
+              0.06833382695913315,
+              0.8576955199241638
+            ],
+            [
+              -0.02435285411775112,
+              0.07403385639190674,
+              0.8573638796806335
+            ]
+          ],
+          "posedEdgeM": 0.040535135320733044,
+          "ratio": 5.642861831481504,
+          "weightL1Difference": 0.3212324961823402,
+          "rigidEdgeTermM": 0.005787338314573936,
+          "weightGradientTermM": 0.03487749601284166,
+          "edgeDecompositionResidualM": 2.160819227543462e-08,
+          "weights": [
+            {
+              "bone": "mixamorig:Hips",
+              "weightStart": 0.07141690754456004,
+              "weightEnd": 0.09195984360485919,
+              "gradientTermVectorM": [
+                0.0001650665378939617,
+                -0.0018153173901310435,
+                0.018001916869403202
+              ]
+            },
+            {
+              "bone": "mixamorig:LeftUpLeg",
+              "weightStart": 0.29158377864646745,
+              "weightEnd": 0.13096753055529736,
+              "gradientTermVectorM": [
+                -0.0029458716761469193,
+                -0.018093035846537507,
+                -0.13188823723352705
+              ]
+            },
+            {
+              "bone": "mixamorig:RightUpLeg",
+              "weightStart": 0.6369993138089725,
+              "weightEnd": 0.7770726258398434,
+              "gradientTermVectorM": [
+                0.00392391570633442,
+                -0.0139366631647117,
+                0.1222318515722153
+              ]
+            }
+          ]
+        },
+        {
+          "vertices": [
+            22677,
+            23107
+          ],
+          "restEdgeM": 0.00676784101034796,
+          "restEndpointsM": [
+            [
+              -0.010378002189099789,
+              0.10062364488840103,
+              0.8852913975715637
+            ],
+            [
+              -0.015778779983520508,
+              0.10290646553039551,
+              0.8819114565849304
+            ]
+          ],
+          "posedEdgeM": 0.03614355819746234,
+          "ratio": 5.340485709135189,
+          "weightL1Difference": 0.30930846468644635,
+          "rigidEdgeTermM": 0.005690878689546786,
+          "weightGradientTermM": 0.03292187078808097,
+          "edgeDecompositionResidualM": 1.571008231365706e-08,
+          "weights": [
+            {
+              "bone": "mixamorig:Hips",
+              "weightStart": 0.15089697910998792,
+              "weightEnd": 0.1702486698292394,
+              "gradientTermVectorM": [
+                -0.00043404457335969123,
+                -0.0019540991871784368,
+                0.017436181669203854
+              ]
+            },
+            {
+              "bone": "mixamorig:LeftUpLeg",
+              "weightStart": 0.30056172161457356,
+              "weightEnd": 0.14590748927135036,
+              "gradientTermVectorM": [
+                0.0008628465322298916,
+                -0.01287899081932188,
+                -0.12448549997387373
+              ]
+            },
+            {
+              "bone": "mixamorig:RightUpLeg",
+              "weightStart": 0.5485412992754385,
+              "weightEnd": 0.6838438408994102,
+              "gradientTermVectorM": [
+                -0.0007749414820511499,
+                -0.01505839634794116,
+                0.12084166426682692
+              ]
+            }
+          ]
+        },
+        {
+          "vertices": [
+            21037,
+            21505
+          ],
+          "restEdgeM": 0.0068273136743257305,
+          "restEndpointsM": [
+            [
+              0.027914784848690033,
+              0.08627930283546448,
+              0.8657569885253906
+            ],
+            [
+              0.033865347504615784,
+              0.08901282399892807,
+              0.8638254404067993
+            ]
+          ],
+          "posedEdgeM": 0.035494854506870475,
+          "ratio": 5.19894883991484,
+          "weightL1Difference": 0.34482039336860326,
+          "rigidEdgeTermM": 0.0065404209567792035,
+          "weightGradientTermM": 0.03252204762347077,
+          "edgeDecompositionResidualM": 9.989761714931445e-08,
+          "weights": [
+            {
+              "bone": "mixamorig:Hips",
+              "weightStart": 0.08391226703059275,
+              "weightEnd": 0.0922158109481391,
+              "gradientTermVectorM": [
+                -0.00036709810581893044,
+                -0.0005765856522911064,
+                0.007216789120415334
+              ]
+            },
+            {
+              "bone": "mixamorig:LeftUpLeg",
+              "weightStart": 0.6297672893141614,
+              "weightEnd": 0.7938739420809167,
+              "gradientTermVectorM": [
+                -0.006040583768676437,
+                0.018394923241989436,
+                0.1363758593696582
+              ]
+            },
+            {
+              "bone": "mixamorig:RightUpLeg",
+              "weightStart": 0.28632044365524584,
+              "weightEnd": 0.11391024697094419,
+              "gradientTermVectorM": [
+                0.003939309468595888,
+                0.014373446372391166,
+                -0.14750158244030248
+              ]
+            }
+          ]
+        }
+      ],
+      "experiments": [
+        {
+          "experiment": "original_lbs_before_bake",
+          "maxJointHeadChangeM": 0.0,
+          "maxEdgeRatio": 8.320859053538083,
+          "p99EdgeRatio": 1.5750338803984285,
+          "edgesOverTwoTimes": 177,
+          "edgesBelowOneFifth": 35,
+          "newStrictCrossingPairs": 278,
+          "totalStrictCrossingPairs": 290,
+          "facesBelowOnePercentArea": 1,
+          "minFaceAreaRatio": 0.005531330442278361,
+          "newCrossingPairRegions": {
+            "mixamorig:Hips": 77,
+            "mixamorig:LeftUpLeg": 109,
+            "mixamorig:LeftArm": 155,
+            "mixamorig:Spine2": 68,
+            "mixamorig:LeftLeg": 31,
+            "mixamorig:RightArm": 5
+          },
+          "newCrossingPairsSharingVertex": 15
+        },
+        {
+          "experiment": "same_pose_original_weights_dual_quaternion",
+          "maxJointHeadChangeM": 0.0,
+          "maxEdgeRatio": 8.907053329844812,
+          "p99EdgeRatio": 1.7753222785409672,
+          "edgesOverTwoTimes": 390,
+          "edgesBelowOneFifth": 11,
+          "newStrictCrossingPairs": 46,
+          "totalStrictCrossingPairs": 58,
+          "facesBelowOnePercentArea": 0,
+          "minFaceAreaRatio": 0.02976926776579359,
+          "newCrossingPairRegions": {
+            "mixamorig:LeftArm": 36,
+            "mixamorig:Spine2": 37,
+            "mixamorig:RightArm": 1
+          },
+          "newCrossingPairsSharingVertex": 6
+        },
+        {
+          "experiment": "same_pose_lbs_neighbor_weight_smoothing_1",
+          "maxJointHeadChangeM": 0.0,
+          "maxEdgeRatio": 5.298948254829779,
+          "p99EdgeRatio": 1.5735327201482865,
+          "edgesOverTwoTimes": 149,
+          "edgesBelowOneFifth": 31,
+          "newStrictCrossingPairs": 294,
+          "totalStrictCrossingPairs": 306,
+          "facesBelowOnePercentArea": 1,
+          "minFaceAreaRatio": 0.008111323040865096,
+          "newCrossingPairRegions": {
+            "mixamorig:LeftArm": 156,
+            "mixamorig:LeftUpLeg": 121,
+            "mixamorig:Hips": 77,
+            "mixamorig:Spine2": 69,
+            "mixamorig:LeftLeg": 37,
+            "mixamorig:RightArm": 5,
+            "mixamorig:LeftForeArm": 1
+          },
+          "newCrossingPairsSharingVertex": 17
+        },
+        {
+          "experiment": "same_pose_lbs_neighbor_weight_smoothing_3",
+          "maxJointHeadChangeM": 0.0,
+          "maxEdgeRatio": 3.330323575653844,
+          "p99EdgeRatio": 1.573027954779577,
+          "edgesOverTwoTimes": 163,
+          "edgesBelowOneFifth": 27,
+          "newStrictCrossingPairs": 318,
+          "totalStrictCrossingPairs": 330,
+          "facesBelowOnePercentArea": 0,
+          "minFaceAreaRatio": 0.011919939084964823,
+          "newCrossingPairRegions": {
+            "mixamorig:Hips": 96,
+            "mixamorig:LeftArm": 150,
+            "mixamorig:LeftUpLeg": 132,
+            "mixamorig:LeftLeg": 41,
+            "mixamorig:Spine2": 64,
+            "mixamorig:RightArm": 5,
+            "mixamorig:LeftForeArm": 1
+          },
+          "newCrossingPairsSharingVertex": 20
+        },
+        {
+          "experiment": "neutral_thighs",
+          "maxJointHeadChangeM": 1.1135670189036593,
+          "maxEdgeRatio": 3.3072887652755085,
+          "p99EdgeRatio": 1.3880280828977356,
+          "edgesOverTwoTimes": 22,
+          "edgesBelowOneFifth": 26,
+          "newStrictCrossingPairs": 454,
+          "totalStrictCrossingPairs": 466,
+          "facesBelowOnePercentArea": 1,
+          "minFaceAreaRatio": 0.005530053878402609,
+          "newCrossingPairRegions": {
+            "mixamorig:LeftArm": 157,
+            "mixamorig:LeftUpLeg": 41,
+            "mixamorig:RightFoot": 195,
+            "mixamorig:LeftToeBase": 252,
+            "mixamorig:LeftLeg": 31,
+            "mixamorig:Spine2": 68,
+            "mixamorig:RightLeg": 57,
+            "mixamorig:RightArm": 4
+          },
+          "newCrossingPairsSharingVertex": 14
+        },
+        {
+          "experiment": "neutral_knees",
+          "maxJointHeadChangeM": 0.5772795245925848,
+          "maxEdgeRatio": 8.320866235174215,
+          "p99EdgeRatio": 1.5630719798335289,
+          "edgesOverTwoTimes": 177,
+          "edgesBelowOneFifth": 31,
+          "newStrictCrossingPairs": 238,
+          "totalStrictCrossingPairs": 250,
+          "facesBelowOnePercentArea": 1,
+          "minFaceAreaRatio": 0.005530053878402609,
+          "newCrossingPairRegions": {
+            "mixamorig:LeftArm": 157,
+            "mixamorig:Spine2": 68,
+            "mixamorig:Hips": 77,
+            "mixamorig:LeftUpLeg": 68,
+            "mixamorig:RightArm": 4
+          },
+          "newCrossingPairsSharingVertex": 14
+        },
+        {
+          "experiment": "neutral_elbows",
+          "maxJointHeadChangeM": 0.6535296259846413,
+          "maxEdgeRatio": 8.320866235174215,
+          "p99EdgeRatio": 1.5729569511194956,
+          "edgesOverTwoTimes": 178,
+          "edgesBelowOneFifth": 29,
+          "newStrictCrossingPairs": 498,
+          "totalStrictCrossingPairs": 511,
+          "facesBelowOnePercentArea": 0,
+          "minFaceAreaRatio": 0.012150774640291611,
+          "newCrossingPairRegions": {
+            "mixamorig:LeftForeArm": 183,
+            "mixamorig:LeftUpLeg": 406,
+            "mixamorig:LeftHand": 115,
+            "mixamorig:Hips": 77,
+            "mixamorig:LeftLeg": 31,
+            "mixamorig:LeftArm": 80,
+            "mixamorig:Spine2": 6,
+            "mixamorig:RightArm": 3
+          },
+          "newCrossingPairsSharingVertex": 10
+        },
+        {
+          "experiment": "neutral_upperarms",
+          "maxJointHeadChangeM": 1.0343223775921822,
+          "maxEdgeRatio": 8.320866235174215,
+          "p99EdgeRatio": 1.4829263114533175,
+          "edgesOverTwoTimes": 155,
+          "edgesBelowOneFifth": 21,
+          "newStrictCrossingPairs": 123,
+          "totalStrictCrossingPairs": 136,
+          "facesBelowOnePercentArea": 0,
+          "minFaceAreaRatio": 0.012150774640291611,
+          "newCrossingPairRegions": {
+            "mixamorig:Hips": 77,
+            "mixamorig:LeftUpLeg": 108,
+            "mixamorig:LeftLeg": 31,
+            "mixamorig:LeftArm": 5,
+            "mixamorig:RightArm": 1
+          },
+          "newCrossingPairsSharingVertex": 7
+        },
+        {
+          "experiment": "remove_local_thigh_twist",
+          "maxJointHeadChangeM": 5.702006776227797e-07,
+          "maxEdgeRatio": 8.32086420578703,
+          "p99EdgeRatio": 1.575029500577551,
+          "edgesOverTwoTimes": 177,
+          "edgesBelowOneFifth": 35,
+          "newStrictCrossingPairs": 278,
+          "totalStrictCrossingPairs": 290,
+          "facesBelowOnePercentArea": 1,
+          "minFaceAreaRatio": 0.005530053878402609,
+          "newCrossingPairRegions": {
+            "mixamorig:Hips": 77,
+            "mixamorig:LeftUpLeg": 108,
+            "mixamorig:LeftArm": 157,
+            "mixamorig:Spine2": 68,
+            "mixamorig:LeftLeg": 31,
+            "mixamorig:RightArm": 4
+          },
+          "newCrossingPairsSharingVertex": 15
+        },
+        {
+          "experiment": "remove_local_elbow_twist",
+          "maxJointHeadChangeM": 0.06417973290834776,
+          "maxEdgeRatio": 8.320866235174215,
+          "p99EdgeRatio": 1.5758389956331442,
+          "edgesOverTwoTimes": 177,
+          "edgesBelowOneFifth": 32,
+          "newStrictCrossingPairs": 273,
+          "totalStrictCrossingPairs": 286,
+          "facesBelowOnePercentArea": 1,
+          "minFaceAreaRatio": 0.007141212950949636,
+          "newCrossingPairRegions": {
+            "mixamorig:Hips": 77,
+            "mixamorig:LeftUpLeg": 108,
+            "mixamorig:LeftArm": 151,
+            "mixamorig:Spine2": 69,
+            "mixamorig:LeftLeg": 31,
+            "mixamorig:RightArm": 5
+          },
+          "newCrossingPairsSharingVertex": 11
+        },
+        {
+          "experiment": "remove_local_upperarm_twist",
+          "maxJointHeadChangeM": 0.7867692112957506,
+          "maxEdgeRatio": 8.320866235174215,
+          "p99EdgeRatio": 1.5271715689618164,
+          "edgesOverTwoTimes": 158,
+          "edgesBelowOneFifth": 24,
+          "newStrictCrossingPairs": 186,
+          "totalStrictCrossingPairs": 199,
+          "facesBelowOnePercentArea": 0,
+          "minFaceAreaRatio": 0.012150774640291611,
+          "newCrossingPairRegions": {
+            "mixamorig:Hips": 77,
+            "mixamorig:LeftUpLeg": 108,
+            "mixamorig:LeftLeg": 31,
+            "mixamorig:LeftArm": 68,
+            "mixamorig:Spine2": 63,
+            "mixamorig:RightArm": 1
+          },
+          "newCrossingPairsSharingVertex": 7
+        },
+        {
+          "experiment": "parent_seeded_upperarm_roll_downstream_world_held",
+          "maxJointHeadChangeM": 5.219795092058895e-07,
+          "maxEdgeRatio": 8.320866235174215,
+          "p99EdgeRatio": 1.5261518153726408,
+          "edgesOverTwoTimes": 158,
+          "edgesBelowOneFifth": 21,
+          "newStrictCrossingPairs": 259,
+          "totalStrictCrossingPairs": 272,
+          "facesBelowOnePercentArea": 2,
+          "minFaceAreaRatio": 0.0059742566763834985,
+          "newCrossingPairRegions": {
+            "mixamorig:RightArm": 53,
+            "mixamorig:RightForeArm": 44,
+            "mixamorig:Hips": 77,
+            "mixamorig:LeftUpLeg": 108,
+            "mixamorig:LeftForeArm": 51,
+            "mixamorig:LeftArm": 89,
+            "mixamorig:LeftLeg": 31,
+            "mixamorig:Spine2": 12
+          },
+          "newCrossingPairsSharingVertex": 4
+        }
+      ],
+      "solverModes": {
+        "hips": "legacy_structural",
+        "spine": "legacy_structural",
+        "spine1": "legacy_structural",
+        "spine2": "legacy_structural",
+        "neck": "legacy_structural",
+        "head": "legacy_structural",
+        "shoulder.L": "legacy_structural",
+        "upperarm.L": "chain_transport",
+        "forearm.L": "chain_transport",
+        "hand.L": "terminal_follow_wrist_transfer",
+        "shoulder.R": "legacy_structural",
+        "upperarm.R": "chain_transport",
+        "forearm.R": "chain_transport",
+        "hand.R": "terminal_follow_wrist_transfer",
+        "upleg.L": "chain_transport_parent_coherent",
+        "leg.L": "chain_transport_parent_coherent",
+        "foot.L": "chain_transport_parent_coherent",
+        "toe.L": "terminal_follow",
+        "upleg.R": "chain_transport_parent_coherent",
+        "leg.R": "chain_transport_parent_coherent",
+        "foot.R": "chain_transport_parent_coherent",
+        "toe.R": "terminal_follow"
+      },
+      "restSwingDeg": {
+        "spine": 3.1907057723972945,
+        "spine1": 8.611188975734787,
+        "spine2": 5.06185820183351,
+        "neck": 4.013350508243193,
+        "head": 1.9108760710564017,
+        "shoulder.L": 40.845161637762615,
+        "upperarm.L": 3.0327374638604394,
+        "forearm.L": 1.8430251016176173,
+        "hand.L": 98.25097973074047,
+        "shoulder.R": 44.83537475248874,
+        "upperarm.R": 3.017724576261468,
+        "forearm.R": 1.8418566806551153,
+        "hand.R": 97.98240558755494,
+        "upleg.L": 20.421193963930627,
+        "leg.L": 20.120964463110464,
+        "foot.L": 27.5886100493806,
+        "toe.L": 4.831280695859293,
+        "upleg.R": 20.378277734481017,
+        "leg.R": 20.097864397592645,
+        "foot.R": 27.88161354817088,
+        "toe.R": 4.876845674485973
+      },
+      "parentSeededRollDetails": {
+        "upperarm.L": {
+          "beforeLocalTwistDeg": 120.70202384257647,
+          "afterLocalTwistDeg": -5.089404114199646e-06
+        },
+        "upperarm.R": {
+          "beforeLocalTwistDeg": 95.57733690522466,
+          "afterLocalTwistDeg": -3.332480771266171e-06
+        }
+      },
+      "poseBvhSha256": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+      "outputFbxSha256": "bcbc5f82ad79bb7147d14753bbb403d381ccd4c541d6e9c42c63a116d4dc7be8"
+    }
+  ],
+  "qaChecks": {
+    "all24ExperimentsCompleted": true,
+    "preBakeReproduction": true,
+    "edgeIdentity": true,
+    "samePoseJointHeads": true,
+    "archiveWeightsExact": true,
+    "originalFbxWeightsWithinTolerance": true,
+    "originalEightOutputHashesUnchanged": true
+  },
+  "runtimeIntegrity": {
+    "manifestSha256": "4a0f060fe4a350b1e4658188745fbb47adfbdc96d2186d2f58a02c8dc4dff814",
+    "files": 6580,
+    "changed": [],
+    "extra": []
+  },
+  "solverSha256": "2fca3bd577445989c178aa4ca33e772c595ad2aeb6083f817a3824c93508a579",
+  "inputCs3cSha256": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+  "registeredFbxSha256": "a778b2856383a49343e83718dfc18587d05c2abde27180bfa5001c8e4d360d6f"
+}

@@ -1,0 +1,1323 @@
+{
+  "version": "surface-only-diagnostic/1",
+  "scope": "two poses of the same actual male0.7.6",
+  "collisionObjective": false,
+  "collisionGate": false,
+  "productionIntegrated": false,
+  "maxCorrectionM": 0.02,
+  "reference": "https://igl.ethz.ch/projects/ARAP/",
+  "limitations": [
+    "Diagnostic thresholds are not release criteria.",
+    "No new hole filling or remeshing; existing connectivity is required.",
+    "Untested models and thin/detail anatomy need separate qualification.",
+    "No complete fold/collision/CSP certificate."
+  ],
+  "poses": [
+    {
+      "sourceFile": "model-0-pose-0.fbx",
+      "sourceSha256": "d8087b904a5acf70b3224787a4464d7b7ae317b8d152adc33af085d3145e6670",
+      "before": {
+        "maxEdgeRatio": 2.4457609579316326,
+        "p99EdgeRatio": 1.4773169479218307,
+        "edgesOverTwoTimes": 76,
+        "edgesBelowOneFifth": 33,
+        "facesBelowOnePercentArea": 0,
+        "degenerateFaces": 0,
+        "newCreasesOver60DegFromRestUnder30Deg": 176,
+        "newCreasesOver90DegFromRestUnder30Deg": 82,
+        "newCreasesOver120DegFromRestUnder30Deg": 47
+      },
+      "activeVertices": 3976,
+      "protectedVertices": 9437,
+      "candidates": [
+        {
+          "method": "arap",
+          "tether": 0.5,
+          "elapsedSeconds": 3.736670874990523,
+          "metrics": {
+            "maxEdgeRatio": 2.4117323071891716,
+            "p99EdgeRatio": 1.4551477844970477,
+            "edgesOverTwoTimes": 52,
+            "edgesBelowOneFifth": 10,
+            "facesBelowOnePercentArea": 0,
+            "degenerateFaces": 0,
+            "newCreasesOver60DegFromRestUnder30Deg": 204,
+            "newCreasesOver90DegFromRestUnder30Deg": 98,
+            "newCreasesOver120DegFromRestUnder30Deg": 43
+          },
+          "vertexDisplacementM": {
+            "min": 0.0,
+            "p01": 0.0,
+            "p50": 0.0,
+            "p95": 0.0004829070833730568,
+            "p99": 0.0016140463058226036,
+            "max": 0.004682997867686831
+          },
+          "verticesMovedOver1mm": 585,
+          "fixedOutsideMask": true,
+          "protectedVerticesUnchanged": true,
+          "diagnosticGates": {
+            "stretchNotWorse": true,
+            "p99StretchNotWorse": true,
+            "severeEdgeCountNotWorse": true,
+            "compressedEdgeCountNotWorse": true,
+            "nearCollapseNotWorse": true,
+            "sharpCreasesNotWorse": false,
+            "verySharpCreasesNotWorse": false,
+            "extremeCreasesNotWorse": true,
+            "noDegenerateTriangles": true
+          },
+          "eligibleUnderDiagnosticGates": false
+        },
+        {
+          "method": "arap",
+          "tether": 0.15,
+          "elapsedSeconds": 3.7478061669971794,
+          "metrics": {
+            "maxEdgeRatio": 2.4274878080639843,
+            "p99EdgeRatio": 1.437662467577002,
+            "edgesOverTwoTimes": 40,
+            "edgesBelowOneFifth": 4,
+            "facesBelowOnePercentArea": 0,
+            "degenerateFaces": 0,
+            "newCreasesOver60DegFromRestUnder30Deg": 208,
+            "newCreasesOver90DegFromRestUnder30Deg": 88,
+            "newCreasesOver120DegFromRestUnder30Deg": 29
+          },
+          "vertexDisplacementM": {
+            "min": 0.0,
+            "p01": 0.0,
+            "p50": 0.0,
+            "p95": 0.0011183581585050323,
+            "p99": 0.0032576545629005717,
+            "max": 0.008609590558738597
+          },
+          "verticesMovedOver1mm": 1346,
+          "fixedOutsideMask": true,
+          "protectedVerticesUnchanged": true,
+          "diagnosticGates": {
+            "stretchNotWorse": true,
+            "p99StretchNotWorse": true,
+            "severeEdgeCountNotWorse": true,
+            "compressedEdgeCountNotWorse": true,
+            "nearCollapseNotWorse": true,
+            "sharpCreasesNotWorse": false,
+            "verySharpCreasesNotWorse": false,
+            "extremeCreasesNotWorse": true,
+            "noDegenerateTriangles": true
+          },
+          "eligibleUnderDiagnosticGates": false
+        },
+        {
+          "method": "arap",
+          "tether": 0.04,
+          "elapsedSeconds": 3.7602975409827195,
+          "metrics": {
+            "maxEdgeRatio": 2.2680559592788034,
+            "p99EdgeRatio": 1.410831705573794,
+            "edgesOverTwoTimes": 15,
+            "edgesBelowOneFifth": 0,
+            "facesBelowOnePercentArea": 0,
+            "degenerateFaces": 0,
+            "newCreasesOver60DegFromRestUnder30Deg": 193,
+            "newCreasesOver90DegFromRestUnder30Deg": 65,
+            "newCreasesOver120DegFromRestUnder30Deg": 25
+          },
+          "vertexDisplacementM": {
+            "min": 0.0,
+            "p01": 0.0,
+            "p50": 0.0,
+            "p95": 0.0024214045983317564,
+            "p99": 0.006723878249903069,
+            "max": 0.015494611354993935
+          },
+          "verticesMovedOver1mm": 2192,
+          "fixedOutsideMask": true,
+          "protectedVerticesUnchanged": true,
+          "diagnosticGates": {
+            "stretchNotWorse": true,
+            "p99StretchNotWorse": true,
+            "severeEdgeCountNotWorse": true,
+            "compressedEdgeCountNotWorse": true,
+            "nearCollapseNotWorse": true,
+            "sharpCreasesNotWorse": false,
+            "verySharpCreasesNotWorse": true,
+            "extremeCreasesNotWorse": true,
+            "noDegenerateTriangles": true
+          },
+          "eligibleUnderDiagnosticGates": false
+        },
+        {
+          "method": "detail",
+          "tether": 0.04,
+          "elapsedSeconds": 1.5130309160158504,
+          "metrics": {
+            "maxEdgeRatio": 2.5440724254110907,
+            "p99EdgeRatio": 1.4027178353556327,
+            "edgesOverTwoTimes": 15,
+            "edgesBelowOneFifth": 44,
+            "facesBelowOnePercentArea": 2,
+            "degenerateFaces": 0,
+            "newCreasesOver60DegFromRestUnder30Deg": 537,
+            "newCreasesOver90DegFromRestUnder30Deg": 289,
+            "newCreasesOver120DegFromRestUnder30Deg": 172
+          },
+          "vertexDisplacementM": {
+            "min": 0.0,
+            "p01": 0.0,
+            "p50": 0.0,
+            "p95": 0.004765486566169278,
+            "p99": 0.010936648893609732,
+            "max": 0.020000000000000035
+          },
+          "verticesMovedOver1mm": 2766,
+          "fixedOutsideMask": true,
+          "protectedVerticesUnchanged": true,
+          "diagnosticGates": {
+            "stretchNotWorse": false,
+            "p99StretchNotWorse": true,
+            "severeEdgeCountNotWorse": true,
+            "compressedEdgeCountNotWorse": false,
+            "nearCollapseNotWorse": false,
+            "sharpCreasesNotWorse": false,
+            "verySharpCreasesNotWorse": false,
+            "extremeCreasesNotWorse": false,
+            "noDegenerateTriangles": true
+          },
+          "eligibleUnderDiagnosticGates": false
+        },
+        {
+          "method": "detail",
+          "tether": 0.01,
+          "elapsedSeconds": 1.499947375006741,
+          "metrics": {
+            "maxEdgeRatio": 2.5254145250617746,
+            "p99EdgeRatio": 1.3689163961645172,
+            "edgesOverTwoTimes": 10,
+            "edgesBelowOneFifth": 53,
+            "facesBelowOnePercentArea": 0,
+            "degenerateFaces": 0,
+            "newCreasesOver60DegFromRestUnder30Deg": 651,
+            "newCreasesOver90DegFromRestUnder30Deg": 376,
+            "newCreasesOver120DegFromRestUnder30Deg": 216
+          },
+          "vertexDisplacementM": {
+            "min": 0.0,
+            "p01": 0.0,
+            "p50": 0.0,
+            "p95": 0.009857901234440454,
+            "p99": 0.018347989300862677,
+            "max": 0.0199999999999981
+          },
+          "verticesMovedOver1mm": 3532,
+          "fixedOutsideMask": true,
+          "protectedVerticesUnchanged": true,
+          "diagnosticGates": {
+            "stretchNotWorse": false,
+            "p99StretchNotWorse": true,
+            "severeEdgeCountNotWorse": true,
+            "compressedEdgeCountNotWorse": false,
+            "nearCollapseNotWorse": true,
+            "sharpCreasesNotWorse": false,
+            "verySharpCreasesNotWorse": false,
+            "extremeCreasesNotWorse": false,
+            "noDegenerateTriangles": true
+          },
+          "eligibleUnderDiagnosticGates": false
+        },
+        {
+          "method": "detail",
+          "tether": 0.003,
+          "elapsedSeconds": 1.4997709580056835,
+          "metrics": {
+            "maxEdgeRatio": 3.035491870104288,
+            "p99EdgeRatio": 1.3570364215071715,
+            "edgesOverTwoTimes": 10,
+            "edgesBelowOneFifth": 62,
+            "facesBelowOnePercentArea": 1,
+            "degenerateFaces": 0,
+            "newCreasesOver60DegFromRestUnder30Deg": 777,
+            "newCreasesOver90DegFromRestUnder30Deg": 408,
+            "newCreasesOver120DegFromRestUnder30Deg": 232
+          },
+          "vertexDisplacementM": {
+            "min": 0.0,
+            "p01": 0.0,
+            "p50": 0.0,
+            "p95": 0.01288052153646848,
+            "p99": 0.01999999850331482,
+            "max": 0.0199999999999971
+          },
+          "verticesMovedOver1mm": 3731,
+          "fixedOutsideMask": true,
+          "protectedVerticesUnchanged": true,
+          "diagnosticGates": {
+            "stretchNotWorse": false,
+            "p99StretchNotWorse": true,
+            "severeEdgeCountNotWorse": true,
+            "compressedEdgeCountNotWorse": false,
+            "nearCollapseNotWorse": false,
+            "sharpCreasesNotWorse": false,
+            "verySharpCreasesNotWorse": false,
+            "extremeCreasesNotWorse": false,
+            "noDegenerateTriangles": true
+          },
+          "eligibleUnderDiagnosticGates": false
+        },
+        {
+          "method": "fairing",
+          "tether": 6,
+          "elapsedSeconds": 0.07145358301931992,
+          "metrics": {
+            "maxEdgeRatio": 4.657043576939498,
+            "p99EdgeRatio": 1.4954205419421889,
+            "edgesOverTwoTimes": 127,
+            "edgesBelowOneFifth": 34,
+            "facesBelowOnePercentArea": 1,
+            "degenerateFaces": 0,
+            "newCreasesOver60DegFromRestUnder30Deg": 111,
+            "newCreasesOver90DegFromRestUnder30Deg": 55,
+            "newCreasesOver120DegFromRestUnder30Deg": 24
+          },
+          "vertexDisplacementM": {
+            "min": 0.0,
+            "p01": 0.0,
+            "p50": 0.0,
+            "p95": 0.0008028667185264236,
+            "p99": 0.0021868789526412846,
+            "max": 0.008928652925807344
+          },
+          "verticesMovedOver1mm": 1007,
+          "fixedOutsideMask": true,
+          "protectedVerticesUnchanged": true,
+          "diagnosticGates": {
+            "stretchNotWorse": false,
+            "p99StretchNotWorse": false,
+            "severeEdgeCountNotWorse": false,
+            "compressedEdgeCountNotWorse": false,
+            "nearCollapseNotWorse": false,
+            "sharpCreasesNotWorse": true,
+            "verySharpCreasesNotWorse": true,
+            "extremeCreasesNotWorse": true,
+            "noDegenerateTriangles": true
+          },
+          "eligibleUnderDiagnosticGates": false
+        },
+        {
+          "method": "fairing",
+          "tether": 15,
+          "elapsedSeconds": 0.1794104170112405,
+          "metrics": {
+            "maxEdgeRatio": 5.651703899543421,
+            "p99EdgeRatio": 1.535296205105042,
+            "edgesOverTwoTimes": 156,
+            "edgesBelowOneFifth": 37,
+            "facesBelowOnePercentArea": 0,
+            "degenerateFaces": 0,
+            "newCreasesOver60DegFromRestUnder30Deg": 118,
+            "newCreasesOver90DegFromRestUnder30Deg": 52,
+            "newCreasesOver120DegFromRestUnder30Deg": 24
+          },
+          "vertexDisplacementM": {
+            "min": 0.0,
+            "p01": 0.0,
+            "p50": 0.0,
+            "p95": 0.001260256606377227,
+            "p99": 0.003046254571995166,
+            "max": 0.010646739266242065
+          },
+          "verticesMovedOver1mm": 1605,
+          "fixedOutsideMask": true,
+          "protectedVerticesUnchanged": true,
+          "diagnosticGates": {
+            "stretchNotWorse": false,
+            "p99StretchNotWorse": false,
+            "severeEdgeCountNotWorse": false,
+            "compressedEdgeCountNotWorse": false,
+            "nearCollapseNotWorse": true,
+            "sharpCreasesNotWorse": true,
+            "verySharpCreasesNotWorse": true,
+            "extremeCreasesNotWorse": true,
+            "noDegenerateTriangles": true
+          },
+          "eligibleUnderDiagnosticGates": false
+        },
+        {
+          "method": "fairing",
+          "tether": 30,
+          "elapsedSeconds": 0.3572821670095436,
+          "metrics": {
+            "maxEdgeRatio": 5.963476702774411,
+            "p99EdgeRatio": 1.569673420866176,
+            "edgesOverTwoTimes": 197,
+            "edgesBelowOneFifth": 37,
+            "facesBelowOnePercentArea": 1,
+            "degenerateFaces": 0,
+            "newCreasesOver60DegFromRestUnder30Deg": 126,
+            "newCreasesOver90DegFromRestUnder30Deg": 53,
+            "newCreasesOver120DegFromRestUnder30Deg": 22
+          },
+          "vertexDisplacementM": {
+            "min": 0.0,
+            "p01": 0.0,
+            "p50": 0.0,
+            "p95": 0.0016223541179120006,
+            "p99": 0.0035285236594984307,
+            "max": 0.011372644315965148
+          },
+          "verticesMovedOver1mm": 2059,
+          "fixedOutsideMask": true,
+          "protectedVerticesUnchanged": true,
+          "diagnosticGates": {
+            "stretchNotWorse": false,
+            "p99StretchNotWorse": false,
+            "severeEdgeCountNotWorse": false,
+            "compressedEdgeCountNotWorse": false,
+            "nearCollapseNotWorse": false,
+            "sharpCreasesNotWorse": true,
+            "verySharpCreasesNotWorse": true,
+            "extremeCreasesNotWorse": true,
+            "noDegenerateTriangles": true
+          },
+          "eligibleUnderDiagnosticGates": false
+        },
+        {
+          "method": "bounded_fairing",
+          "tether": 2,
+          "elapsedSeconds": 0.34565758297685534,
+          "metrics": {
+            "maxEdgeRatio": 1.9103625877725798,
+            "p99EdgeRatio": 1.4194631907930713,
+            "edgesOverTwoTimes": 0,
+            "edgesBelowOneFifth": 0,
+            "facesBelowOnePercentArea": 0,
+            "degenerateFaces": 0,
+            "newCreasesOver60DegFromRestUnder30Deg": 148,
+            "newCreasesOver90DegFromRestUnder30Deg": 38,
+            "newCreasesOver120DegFromRestUnder30Deg": 15
+          },
+          "vertexDisplacementM": {
+            "min": 0.0,
+            "p01": 0.0,
+            "p50": 0.0,
+            "p95": 0.0024193163992472853,
+            "p99": 0.006735055803516256,
+            "max": 0.01617765185611034
+          },
+          "verticesMovedOver1mm": 2209,
+          "fixedOutsideMask": true,
+          "protectedVerticesUnchanged": true,
+          "diagnosticGates": {
+            "stretchNotWorse": true,
+            "p99StretchNotWorse": true,
+            "severeEdgeCountNotWorse": true,
+            "compressedEdgeCountNotWorse": true,
+            "nearCollapseNotWorse": true,
+            "sharpCreasesNotWorse": true,
+            "verySharpCreasesNotWorse": true,
+            "extremeCreasesNotWorse": true,
+            "noDegenerateTriangles": true
+          },
+          "eligibleUnderDiagnosticGates": true,
+          "seed": {
+            "method": "arap",
+            "tether": 0.04
+          },
+          "computeSecondsIncludingSeed": 4.105955123959575
+        },
+        {
+          "method": "bounded_fairing",
+          "tether": 5,
+          "elapsedSeconds": 0.3795516660029534,
+          "metrics": {
+            "maxEdgeRatio": 1.9135769191279801,
+            "p99EdgeRatio": 1.4459323513911215,
+            "edgesOverTwoTimes": 0,
+            "edgesBelowOneFifth": 0,
+            "facesBelowOnePercentArea": 0,
+            "degenerateFaces": 0,
+            "newCreasesOver60DegFromRestUnder30Deg": 129,
+            "newCreasesOver90DegFromRestUnder30Deg": 33,
+            "newCreasesOver120DegFromRestUnder30Deg": 14
+          },
+          "vertexDisplacementM": {
+            "min": 0.0,
+            "p01": 0.0,
+            "p50": 0.0,
+            "p95": 0.002544594557543793,
+            "p99": 0.006773077726735713,
+            "max": 0.016658006025862596
+          },
+          "verticesMovedOver1mm": 2282,
+          "fixedOutsideMask": true,
+          "protectedVerticesUnchanged": true,
+          "diagnosticGates": {
+            "stretchNotWorse": true,
+            "p99StretchNotWorse": true,
+            "severeEdgeCountNotWorse": true,
+            "compressedEdgeCountNotWorse": true,
+            "nearCollapseNotWorse": true,
+            "sharpCreasesNotWorse": true,
+            "verySharpCreasesNotWorse": true,
+            "extremeCreasesNotWorse": true,
+            "noDegenerateTriangles": true
+          },
+          "eligibleUnderDiagnosticGates": true,
+          "seed": {
+            "method": "arap",
+            "tether": 0.04
+          },
+          "computeSecondsIncludingSeed": 4.139849206985673
+        },
+        {
+          "method": "bounded_fairing",
+          "tether": 10,
+          "elapsedSeconds": 0.43944662500871345,
+          "metrics": {
+            "maxEdgeRatio": 1.9155308116314473,
+            "p99EdgeRatio": 1.4777396699248513,
+            "edgesOverTwoTimes": 0,
+            "edgesBelowOneFifth": 0,
+            "facesBelowOnePercentArea": 0,
+            "degenerateFaces": 0,
+            "newCreasesOver60DegFromRestUnder30Deg": 111,
+            "newCreasesOver90DegFromRestUnder30Deg": 30,
+            "newCreasesOver120DegFromRestUnder30Deg": 11
+          },
+          "vertexDisplacementM": {
+            "min": 0.0,
+            "p01": 0.0,
+            "p50": 0.0,
+            "p95": 0.002670953230127651,
+            "p99": 0.006784825385369727,
+            "max": 0.01697249263803189
+          },
+          "verticesMovedOver1mm": 2398,
+          "fixedOutsideMask": true,
+          "protectedVerticesUnchanged": true,
+          "diagnosticGates": {
+            "stretchNotWorse": true,
+            "p99StretchNotWorse": false,
+            "severeEdgeCountNotWorse": true,
+            "compressedEdgeCountNotWorse": true,
+            "nearCollapseNotWorse": true,
+            "sharpCreasesNotWorse": true,
+            "verySharpCreasesNotWorse": true,
+            "extremeCreasesNotWorse": true,
+            "noDegenerateTriangles": true
+          },
+          "eligibleUnderDiagnosticGates": false,
+          "seed": {
+            "method": "arap",
+            "tether": 0.04
+          },
+          "computeSecondsIncludingSeed": 4.199744165991433
+        }
+      ],
+      "selectedTether": 5,
+      "selectedMethod": "bounded_fairing",
+      "localNormalRefresh": {
+        "changedCorners": 30933,
+        "positionCoordinatesUnchanged": true,
+        "outsideSupportOriginalNormalsSupplied": true,
+        "oldVsGeometricNormalAngleDeg": {
+          "min": 0.0,
+          "p01": 0.0,
+          "p50": 0.0,
+          "p95": 0.03100814110793003,
+          "p99": 0.03661082540421949,
+          "max": 0.04527183585729172
+        },
+        "activeCornersOver20DegMismatch": 0
+      },
+      "experimentalFile": "surface-only-pose-0-experimental.fbx",
+      "experimentalSha256": "b528eebcd7ac8fad2b3e72e2dca977d9cbd53019ef7cfc2486b30ed910491817",
+      "exportValidation": {
+        "passed": true,
+        "meshCount": 1,
+        "originalBoneCount": 79,
+        "vertexCount": 24988,
+        "maxSurfaceError": 5.062867103333701e-07,
+        "maxSkinProbeError": 8.60663021740038e-07,
+        "maxMaterialRegionError": 5.062867103333701e-07,
+        "materialCount": 1,
+        "tolerance": 1.7444061501390892e-05,
+        "fkProbes": {
+          "forearm.L": {
+            "joint": "forearm.L",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.10876461968966612
+          },
+          "forearm.R": {
+            "joint": "forearm.R",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.10894114486603959
+          },
+          "leg.L": {
+            "joint": "leg.L",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.12953337949883895
+          },
+          "leg.R": {
+            "joint": "leg.R",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.12953384592979034
+          },
+          "spine": {
+            "joint": "spine",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.16190431272274458
+          }
+        },
+        "blenderVersion": "5.2.0 LTS",
+        "materialPreservation": {
+          "passed": true,
+          "materialCount": 1,
+          "maxDiffuseError": 0.0,
+          "maxSpecularError": 0.0,
+          "maxShininessError": 0.0,
+          "maxOpacityError": 0.0
+        }
+      },
+      "exactOriginalWeights": true,
+      "exactFaceIndices": true,
+      "maxExportBoneHeadErrorM": 4.76837158203125e-07,
+      "maxExportSurfaceErrorM": 3.3939386905014814e-07,
+      "exportedMetrics": {
+        "maxEdgeRatio": 1.9135779409889764,
+        "p99EdgeRatio": 1.4459246073423129,
+        "edgesOverTwoTimes": 0,
+        "edgesBelowOneFifth": 0,
+        "facesBelowOnePercentArea": 0,
+        "degenerateFaces": 0,
+        "newCreasesOver60DegFromRestUnder30Deg": 129,
+        "newCreasesOver90DegFromRestUnder30Deg": 33,
+        "newCreasesOver120DegFromRestUnder30Deg": 14
+      },
+      "normalOnlyControl": {
+        "file": "surface-only-pose-0-normals-control.fbx",
+        "sha256": "5ba707c38b98ab00d4c68febdf9f67df54b6d932ed9c1da0b54031a9d23e3217",
+        "maxPositionRoundtripErrorM": 2.0874926039758176e-07,
+        "normalRefresh": {
+          "changedCorners": 30933,
+          "positionCoordinatesUnchanged": true,
+          "outsideSupportOriginalNormalsSupplied": true,
+          "oldVsGeometricNormalAngleDeg": {
+            "min": 0.0,
+            "p01": 0.0,
+            "p50": 0.0024199126243511005,
+            "p95": 0.030928246154122208,
+            "p99": 0.03627196247392664,
+            "max": 0.043460273269576466
+          },
+          "activeCornersOver20DegMismatch": 0
+        },
+        "validation": {
+          "passed": true,
+          "meshCount": 1,
+          "originalBoneCount": 79,
+          "vertexCount": 24988,
+          "maxSurfaceError": 5.062867103333701e-07,
+          "maxSkinProbeError": 8.766392625148001e-07,
+          "maxMaterialRegionError": 5.062867103333701e-07,
+          "materialCount": 1,
+          "tolerance": 1.7444061501390892e-05,
+          "fkProbes": {
+            "forearm.L": {
+              "joint": "forearm.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.10876460555163063
+            },
+            "forearm.R": {
+              "joint": "forearm.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.10894112261002542
+            },
+            "leg.L": {
+              "joint": "leg.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.12953337949883895
+            },
+            "leg.R": {
+              "joint": "leg.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1295338594168532
+            },
+            "spine": {
+              "joint": "spine",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.16190431272274458
+            }
+          },
+          "blenderVersion": "5.2.0 LTS",
+          "materialPreservation": {
+            "passed": true,
+            "materialCount": 1,
+            "maxDiffuseError": 0.0,
+            "maxSpecularError": 0.0,
+            "maxShininessError": 0.0,
+            "maxOpacityError": 0.0
+          }
+        }
+      }
+    },
+    {
+      "sourceFile": "model-0-pose-1.fbx",
+      "sourceSha256": "bcbc5f82ad79bb7147d14753bbb403d381ccd4c541d6e9c42c63a116d4dc7be8",
+      "before": {
+        "maxEdgeRatio": 8.320857514811644,
+        "p99EdgeRatio": 1.5750338668976238,
+        "edgesOverTwoTimes": 177,
+        "edgesBelowOneFifth": 35,
+        "facesBelowOnePercentArea": 1,
+        "degenerateFaces": 0,
+        "newCreasesOver60DegFromRestUnder30Deg": 199,
+        "newCreasesOver90DegFromRestUnder30Deg": 101,
+        "newCreasesOver120DegFromRestUnder30Deg": 48
+      },
+      "activeVertices": 4849,
+      "protectedVertices": 9437,
+      "candidates": [
+        {
+          "method": "arap",
+          "tether": 0.5,
+          "elapsedSeconds": 3.7522183749824762,
+          "metrics": {
+            "maxEdgeRatio": 4.253320717790574,
+            "p99EdgeRatio": 1.5495843486523166,
+            "edgesOverTwoTimes": 131,
+            "edgesBelowOneFifth": 9,
+            "facesBelowOnePercentArea": 0,
+            "degenerateFaces": 0,
+            "newCreasesOver60DegFromRestUnder30Deg": 191,
+            "newCreasesOver90DegFromRestUnder30Deg": 92,
+            "newCreasesOver120DegFromRestUnder30Deg": 52
+          },
+          "vertexDisplacementM": {
+            "min": 0.0,
+            "p01": 0.0,
+            "p50": 0.0,
+            "p95": 0.0006929642754178051,
+            "p99": 0.002011223466826126,
+            "max": 0.012261796929153003
+          },
+          "verticesMovedOver1mm": 820,
+          "fixedOutsideMask": true,
+          "protectedVerticesUnchanged": true,
+          "diagnosticGates": {
+            "stretchNotWorse": true,
+            "p99StretchNotWorse": true,
+            "severeEdgeCountNotWorse": true,
+            "compressedEdgeCountNotWorse": true,
+            "nearCollapseNotWorse": true,
+            "sharpCreasesNotWorse": true,
+            "verySharpCreasesNotWorse": true,
+            "extremeCreasesNotWorse": false,
+            "noDegenerateTriangles": true
+          },
+          "eligibleUnderDiagnosticGates": false
+        },
+        {
+          "method": "arap",
+          "tether": 0.15,
+          "elapsedSeconds": 3.7284141670097597,
+          "metrics": {
+            "maxEdgeRatio": 3.4675123192518655,
+            "p99EdgeRatio": 1.520853882737831,
+            "edgesOverTwoTimes": 107,
+            "edgesBelowOneFifth": 4,
+            "facesBelowOnePercentArea": 0,
+            "degenerateFaces": 0,
+            "newCreasesOver60DegFromRestUnder30Deg": 215,
+            "newCreasesOver90DegFromRestUnder30Deg": 91,
+            "newCreasesOver120DegFromRestUnder30Deg": 44
+          },
+          "vertexDisplacementM": {
+            "min": 0.0,
+            "p01": 0.0,
+            "p50": 0.0,
+            "p95": 0.001577859731731666,
+            "p99": 0.004061763985057554,
+            "max": 0.016058242427721095
+          },
+          "verticesMovedOver1mm": 1890,
+          "fixedOutsideMask": true,
+          "protectedVerticesUnchanged": true,
+          "diagnosticGates": {
+            "stretchNotWorse": true,
+            "p99StretchNotWorse": true,
+            "severeEdgeCountNotWorse": true,
+            "compressedEdgeCountNotWorse": true,
+            "nearCollapseNotWorse": true,
+            "sharpCreasesNotWorse": false,
+            "verySharpCreasesNotWorse": true,
+            "extremeCreasesNotWorse": true,
+            "noDegenerateTriangles": true
+          },
+          "eligibleUnderDiagnosticGates": false
+        },
+        {
+          "method": "arap",
+          "tether": 0.04,
+          "elapsedSeconds": 3.7291400419780985,
+          "metrics": {
+            "maxEdgeRatio": 3.9786730833207358,
+            "p99EdgeRatio": 1.4807744338884494,
+            "edgesOverTwoTimes": 76,
+            "edgesBelowOneFifth": 1,
+            "facesBelowOnePercentArea": 0,
+            "degenerateFaces": 0,
+            "newCreasesOver60DegFromRestUnder30Deg": 205,
+            "newCreasesOver90DegFromRestUnder30Deg": 79,
+            "newCreasesOver120DegFromRestUnder30Deg": 39
+          },
+          "vertexDisplacementM": {
+            "min": 0.0,
+            "p01": 0.0,
+            "p50": 0.0,
+            "p95": 0.003430246737604734,
+            "p99": 0.0074811875820538516,
+            "max": 0.01875665199284352
+          },
+          "verticesMovedOver1mm": 3107,
+          "fixedOutsideMask": true,
+          "protectedVerticesUnchanged": true,
+          "diagnosticGates": {
+            "stretchNotWorse": true,
+            "p99StretchNotWorse": true,
+            "severeEdgeCountNotWorse": true,
+            "compressedEdgeCountNotWorse": true,
+            "nearCollapseNotWorse": true,
+            "sharpCreasesNotWorse": false,
+            "verySharpCreasesNotWorse": true,
+            "extremeCreasesNotWorse": true,
+            "noDegenerateTriangles": true
+          },
+          "eligibleUnderDiagnosticGates": false
+        },
+        {
+          "method": "detail",
+          "tether": 0.04,
+          "elapsedSeconds": 1.4821489590103738,
+          "metrics": {
+            "maxEdgeRatio": 4.905735816983931,
+            "p99EdgeRatio": 1.493114714305101,
+            "edgesOverTwoTimes": 124,
+            "edgesBelowOneFifth": 23,
+            "facesBelowOnePercentArea": 1,
+            "degenerateFaces": 0,
+            "newCreasesOver60DegFromRestUnder30Deg": 479,
+            "newCreasesOver90DegFromRestUnder30Deg": 269,
+            "newCreasesOver120DegFromRestUnder30Deg": 153
+          },
+          "vertexDisplacementM": {
+            "min": 0.0,
+            "p01": 0.0,
+            "p50": 0.0,
+            "p95": 0.004535859716823272,
+            "p99": 0.010487084404388902,
+            "max": 0.019999999999999983
+          },
+          "verticesMovedOver1mm": 3440,
+          "fixedOutsideMask": true,
+          "protectedVerticesUnchanged": true,
+          "diagnosticGates": {
+            "stretchNotWorse": true,
+            "p99StretchNotWorse": true,
+            "severeEdgeCountNotWorse": true,
+            "compressedEdgeCountNotWorse": true,
+            "nearCollapseNotWorse": true,
+            "sharpCreasesNotWorse": false,
+            "verySharpCreasesNotWorse": false,
+            "extremeCreasesNotWorse": false,
+            "noDegenerateTriangles": true
+          },
+          "eligibleUnderDiagnosticGates": false
+        },
+        {
+          "method": "detail",
+          "tether": 0.01,
+          "elapsedSeconds": 1.494750624988228,
+          "metrics": {
+            "maxEdgeRatio": 5.321990218609912,
+            "p99EdgeRatio": 1.4697186457552385,
+            "edgesOverTwoTimes": 131,
+            "edgesBelowOneFifth": 30,
+            "facesBelowOnePercentArea": 0,
+            "degenerateFaces": 0,
+            "newCreasesOver60DegFromRestUnder30Deg": 544,
+            "newCreasesOver90DegFromRestUnder30Deg": 324,
+            "newCreasesOver120DegFromRestUnder30Deg": 170
+          },
+          "vertexDisplacementM": {
+            "min": 0.0,
+            "p01": 0.0,
+            "p50": 0.0,
+            "p95": 0.009112245849115136,
+            "p99": 0.017601950903765467,
+            "max": 0.01999999999999691
+          },
+          "verticesMovedOver1mm": 4368,
+          "fixedOutsideMask": true,
+          "protectedVerticesUnchanged": true,
+          "diagnosticGates": {
+            "stretchNotWorse": true,
+            "p99StretchNotWorse": true,
+            "severeEdgeCountNotWorse": true,
+            "compressedEdgeCountNotWorse": true,
+            "nearCollapseNotWorse": true,
+            "sharpCreasesNotWorse": false,
+            "verySharpCreasesNotWorse": false,
+            "extremeCreasesNotWorse": false,
+            "noDegenerateTriangles": true
+          },
+          "eligibleUnderDiagnosticGates": false
+        },
+        {
+          "method": "detail",
+          "tether": 0.003,
+          "elapsedSeconds": 1.7232094579958357,
+          "metrics": {
+            "maxEdgeRatio": 5.391654251747837,
+            "p99EdgeRatio": 1.4635691027022963,
+            "edgesOverTwoTimes": 135,
+            "edgesBelowOneFifth": 34,
+            "facesBelowOnePercentArea": 0,
+            "degenerateFaces": 0,
+            "newCreasesOver60DegFromRestUnder30Deg": 582,
+            "newCreasesOver90DegFromRestUnder30Deg": 346,
+            "newCreasesOver120DegFromRestUnder30Deg": 192
+          },
+          "vertexDisplacementM": {
+            "min": 0.0,
+            "p01": 0.0,
+            "p50": 0.0,
+            "p95": 0.012033904265449827,
+            "p99": 0.01961723506949677,
+            "max": 0.019999999999982396
+          },
+          "verticesMovedOver1mm": 4611,
+          "fixedOutsideMask": true,
+          "protectedVerticesUnchanged": true,
+          "diagnosticGates": {
+            "stretchNotWorse": true,
+            "p99StretchNotWorse": true,
+            "severeEdgeCountNotWorse": true,
+            "compressedEdgeCountNotWorse": true,
+            "nearCollapseNotWorse": true,
+            "sharpCreasesNotWorse": false,
+            "verySharpCreasesNotWorse": false,
+            "extremeCreasesNotWorse": false,
+            "noDegenerateTriangles": true
+          },
+          "eligibleUnderDiagnosticGates": false
+        },
+        {
+          "method": "fairing",
+          "tether": 6,
+          "elapsedSeconds": 0.07216270800563507,
+          "metrics": {
+            "maxEdgeRatio": 4.332360377628936,
+            "p99EdgeRatio": 1.6288224292485143,
+            "edgesOverTwoTimes": 252,
+            "edgesBelowOneFifth": 33,
+            "facesBelowOnePercentArea": 2,
+            "degenerateFaces": 0,
+            "newCreasesOver60DegFromRestUnder30Deg": 85,
+            "newCreasesOver90DegFromRestUnder30Deg": 33,
+            "newCreasesOver120DegFromRestUnder30Deg": 18
+          },
+          "vertexDisplacementM": {
+            "min": 0.0,
+            "p01": 0.0,
+            "p50": 0.0,
+            "p95": 0.00099428278964148,
+            "p99": 0.0025468466587105047,
+            "max": 0.018265790320101588
+          },
+          "verticesMovedOver1mm": 1242,
+          "fixedOutsideMask": true,
+          "protectedVerticesUnchanged": true,
+          "diagnosticGates": {
+            "stretchNotWorse": true,
+            "p99StretchNotWorse": false,
+            "severeEdgeCountNotWorse": false,
+            "compressedEdgeCountNotWorse": true,
+            "nearCollapseNotWorse": false,
+            "sharpCreasesNotWorse": true,
+            "verySharpCreasesNotWorse": true,
+            "extremeCreasesNotWorse": true,
+            "noDegenerateTriangles": true
+          },
+          "eligibleUnderDiagnosticGates": false
+        },
+        {
+          "method": "fairing",
+          "tether": 15,
+          "elapsedSeconds": 0.17921850000857376,
+          "metrics": {
+            "maxEdgeRatio": 4.481704597228641,
+            "p99EdgeRatio": 1.6739559226959335,
+            "edgesOverTwoTimes": 301,
+            "edgesBelowOneFifth": 41,
+            "facesBelowOnePercentArea": 1,
+            "degenerateFaces": 0,
+            "newCreasesOver60DegFromRestUnder30Deg": 73,
+            "newCreasesOver90DegFromRestUnder30Deg": 36,
+            "newCreasesOver120DegFromRestUnder30Deg": 16
+          },
+          "vertexDisplacementM": {
+            "min": 0.0,
+            "p01": 0.0,
+            "p50": 0.0,
+            "p95": 0.0015130390146206308,
+            "p99": 0.003495388888008238,
+            "max": 0.01874034127639196
+          },
+          "verticesMovedOver1mm": 2011,
+          "fixedOutsideMask": true,
+          "protectedVerticesUnchanged": true,
+          "diagnosticGates": {
+            "stretchNotWorse": true,
+            "p99StretchNotWorse": false,
+            "severeEdgeCountNotWorse": false,
+            "compressedEdgeCountNotWorse": false,
+            "nearCollapseNotWorse": true,
+            "sharpCreasesNotWorse": true,
+            "verySharpCreasesNotWorse": true,
+            "extremeCreasesNotWorse": true,
+            "noDegenerateTriangles": true
+          },
+          "eligibleUnderDiagnosticGates": false
+        },
+        {
+          "method": "fairing",
+          "tether": 30,
+          "elapsedSeconds": 0.3610233750077896,
+          "metrics": {
+            "maxEdgeRatio": 5.2040452197074885,
+            "p99EdgeRatio": 1.6939538058234664,
+            "edgesOverTwoTimes": 347,
+            "edgesBelowOneFifth": 51,
+            "facesBelowOnePercentArea": 1,
+            "degenerateFaces": 0,
+            "newCreasesOver60DegFromRestUnder30Deg": 64,
+            "newCreasesOver90DegFromRestUnder30Deg": 26,
+            "newCreasesOver120DegFromRestUnder30Deg": 13
+          },
+          "vertexDisplacementM": {
+            "min": 0.0,
+            "p01": 0.0,
+            "p50": 0.0,
+            "p95": 0.0018833102330131262,
+            "p99": 0.004093543954578066,
+            "max": 0.01978760402091255
+          },
+          "verticesMovedOver1mm": 2508,
+          "fixedOutsideMask": true,
+          "protectedVerticesUnchanged": true,
+          "diagnosticGates": {
+            "stretchNotWorse": true,
+            "p99StretchNotWorse": false,
+            "severeEdgeCountNotWorse": false,
+            "compressedEdgeCountNotWorse": false,
+            "nearCollapseNotWorse": true,
+            "sharpCreasesNotWorse": true,
+            "verySharpCreasesNotWorse": true,
+            "extremeCreasesNotWorse": true,
+            "noDegenerateTriangles": true
+          },
+          "eligibleUnderDiagnosticGates": false
+        },
+        {
+          "method": "bounded_fairing",
+          "tether": 2,
+          "elapsedSeconds": 0.3496188749850262,
+          "metrics": {
+            "maxEdgeRatio": 1.9985116016303637,
+            "p99EdgeRatio": 1.5231254261160205,
+            "edgesOverTwoTimes": 0,
+            "edgesBelowOneFifth": 0,
+            "facesBelowOnePercentArea": 0,
+            "degenerateFaces": 0,
+            "newCreasesOver60DegFromRestUnder30Deg": 153,
+            "newCreasesOver90DegFromRestUnder30Deg": 54,
+            "newCreasesOver120DegFromRestUnder30Deg": 21
+          },
+          "vertexDisplacementM": {
+            "min": 0.0,
+            "p01": 0.0,
+            "p50": 0.0,
+            "p95": 0.0034473008187689575,
+            "p99": 0.007598396401772985,
+            "max": 0.02
+          },
+          "verticesMovedOver1mm": 3120,
+          "fixedOutsideMask": true,
+          "protectedVerticesUnchanged": true,
+          "diagnosticGates": {
+            "stretchNotWorse": true,
+            "p99StretchNotWorse": true,
+            "severeEdgeCountNotWorse": true,
+            "compressedEdgeCountNotWorse": true,
+            "nearCollapseNotWorse": true,
+            "sharpCreasesNotWorse": true,
+            "verySharpCreasesNotWorse": true,
+            "extremeCreasesNotWorse": true,
+            "noDegenerateTriangles": true
+          },
+          "eligibleUnderDiagnosticGates": true,
+          "seed": {
+            "method": "arap",
+            "tether": 0.04
+          },
+          "computeSecondsIncludingSeed": 4.078758916963125
+        },
+        {
+          "method": "bounded_fairing",
+          "tether": 5,
+          "elapsedSeconds": 0.38148133299546316,
+          "metrics": {
+            "maxEdgeRatio": 1.9977703439998398,
+            "p99EdgeRatio": 1.5639006499930619,
+            "edgesOverTwoTimes": 0,
+            "edgesBelowOneFifth": 0,
+            "facesBelowOnePercentArea": 0,
+            "degenerateFaces": 0,
+            "newCreasesOver60DegFromRestUnder30Deg": 128,
+            "newCreasesOver90DegFromRestUnder30Deg": 46,
+            "newCreasesOver120DegFromRestUnder30Deg": 23
+          },
+          "vertexDisplacementM": {
+            "min": 0.0,
+            "p01": 0.0,
+            "p50": 0.0,
+            "p95": 0.003584587205689525,
+            "p99": 0.007592262089355181,
+            "max": 0.019999999999999997
+          },
+          "verticesMovedOver1mm": 3191,
+          "fixedOutsideMask": true,
+          "protectedVerticesUnchanged": true,
+          "diagnosticGates": {
+            "stretchNotWorse": true,
+            "p99StretchNotWorse": true,
+            "severeEdgeCountNotWorse": true,
+            "compressedEdgeCountNotWorse": true,
+            "nearCollapseNotWorse": true,
+            "sharpCreasesNotWorse": true,
+            "verySharpCreasesNotWorse": true,
+            "extremeCreasesNotWorse": true,
+            "noDegenerateTriangles": true
+          },
+          "eligibleUnderDiagnosticGates": true,
+          "seed": {
+            "method": "arap",
+            "tether": 0.04
+          },
+          "computeSecondsIncludingSeed": 4.110621374973562
+        },
+        {
+          "method": "bounded_fairing",
+          "tether": 10,
+          "elapsedSeconds": 0.43798899999819696,
+          "metrics": {
+            "maxEdgeRatio": 1.994636378232576,
+            "p99EdgeRatio": 1.6051477750335836,
+            "edgesOverTwoTimes": 0,
+            "edgesBelowOneFifth": 0,
+            "facesBelowOnePercentArea": 0,
+            "degenerateFaces": 0,
+            "newCreasesOver60DegFromRestUnder30Deg": 121,
+            "newCreasesOver90DegFromRestUnder30Deg": 42,
+            "newCreasesOver120DegFromRestUnder30Deg": 17
+          },
+          "vertexDisplacementM": {
+            "min": 0.0,
+            "p01": 0.0,
+            "p50": 0.0,
+            "p95": 0.00367097253963306,
+            "p99": 0.007560693537928459,
+            "max": 0.019999999999999997
+          },
+          "verticesMovedOver1mm": 3295,
+          "fixedOutsideMask": true,
+          "protectedVerticesUnchanged": true,
+          "diagnosticGates": {
+            "stretchNotWorse": true,
+            "p99StretchNotWorse": false,
+            "severeEdgeCountNotWorse": true,
+            "compressedEdgeCountNotWorse": true,
+            "nearCollapseNotWorse": true,
+            "sharpCreasesNotWorse": true,
+            "verySharpCreasesNotWorse": true,
+            "extremeCreasesNotWorse": true,
+            "noDegenerateTriangles": true
+          },
+          "eligibleUnderDiagnosticGates": false,
+          "seed": {
+            "method": "arap",
+            "tether": 0.04
+          },
+          "computeSecondsIncludingSeed": 4.167129041976295
+        }
+      ],
+      "selectedTether": 5,
+      "selectedMethod": "bounded_fairing",
+      "localNormalRefresh": {
+        "changedCorners": 36810,
+        "positionCoordinatesUnchanged": true,
+        "outsideSupportOriginalNormalsSupplied": true,
+        "oldVsGeometricNormalAngleDeg": {
+          "min": 0.0,
+          "p01": 0.0,
+          "p50": 0.003053001922555868,
+          "p95": 0.031049087997784264,
+          "p99": 0.03639793078232424,
+          "max": 0.051392655303934706
+        },
+        "activeCornersOver20DegMismatch": 0
+      },
+      "experimentalFile": "surface-only-pose-1-experimental.fbx",
+      "experimentalSha256": "3cb3c4e9f29011c09bf75d85f35df7db4664d1b74e99e1c461fcdbbc63a44b5f",
+      "exportValidation": {
+        "passed": true,
+        "meshCount": 1,
+        "originalBoneCount": 79,
+        "vertexCount": 24988,
+        "maxSurfaceError": 7.227063179016113e-07,
+        "maxSkinProbeError": 1.2208271300551132e-06,
+        "maxMaterialRegionError": 7.222068916235003e-07,
+        "materialCount": 1,
+        "tolerance": 1.775612643981268e-05,
+        "fkProbes": {
+          "forearm.L": {
+            "joint": "forearm.L",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.10877131822970479
+          },
+          "forearm.R": {
+            "joint": "forearm.R",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.10895991174665448
+          },
+          "leg.L": {
+            "joint": "leg.L",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.12986286950086445
+          },
+          "leg.R": {
+            "joint": "leg.R",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.12857897058254295
+          },
+          "spine": {
+            "joint": "spine",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.18885608685033548
+          }
+        },
+        "blenderVersion": "5.2.0 LTS",
+        "materialPreservation": {
+          "passed": true,
+          "materialCount": 1,
+          "maxDiffuseError": 0.0,
+          "maxSpecularError": 0.0,
+          "maxShininessError": 0.0,
+          "maxOpacityError": 0.0
+        }
+      },
+      "exactOriginalWeights": true,
+      "exactFaceIndices": true,
+      "maxExportBoneHeadErrorM": 6.258487701416016e-07,
+      "maxExportSurfaceErrorM": 3.022309895410769e-07,
+      "exportedMetrics": {
+        "maxEdgeRatio": 1.997777471764461,
+        "p99EdgeRatio": 1.563898141505262,
+        "edgesOverTwoTimes": 0,
+        "edgesBelowOneFifth": 0,
+        "facesBelowOnePercentArea": 0,
+        "degenerateFaces": 0,
+        "newCreasesOver60DegFromRestUnder30Deg": 128,
+        "newCreasesOver90DegFromRestUnder30Deg": 46,
+        "newCreasesOver120DegFromRestUnder30Deg": 23
+      },
+      "normalOnlyControl": {
+        "file": "surface-only-pose-1-normals-control.fbx",
+        "sha256": "28ae169bc4b0dba54e3b2f921bda9f044afff5667144b639e8af62cf517739bc",
+        "maxPositionRoundtripErrorM": 1.914088812271525e-07,
+        "normalRefresh": {
+          "changedCorners": 36810,
+          "positionCoordinatesUnchanged": true,
+          "outsideSupportOriginalNormalsSupplied": true,
+          "oldVsGeometricNormalAngleDeg": {
+            "min": 0.0,
+            "p01": 0.0,
+            "p50": 0.0018072311007843666,
+            "p95": 0.030490134053247638,
+            "p99": 0.03545516738070423,
+            "max": 0.0444356522393759
+          },
+          "activeCornersOver20DegMismatch": 0
+        },
+        "validation": {
+          "passed": true,
+          "meshCount": 1,
+          "originalBoneCount": 79,
+          "vertexCount": 24988,
+          "maxSurfaceError": 7.234380632326065e-07,
+          "maxSkinProbeError": 1.2087405139027396e-06,
+          "maxMaterialRegionError": 7.222068916235003e-07,
+          "materialCount": 1,
+          "tolerance": 1.775612627694063e-05,
+          "fkProbes": {
+            "forearm.L": {
+              "joint": "forearm.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.10877131822970479
+            },
+            "forearm.R": {
+              "joint": "forearm.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.10895981341714212
+            },
+            "leg.L": {
+              "joint": "leg.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.12986287583344702
+            },
+            "leg.R": {
+              "joint": "leg.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1285789772855162
+            },
+            "spine": {
+              "joint": "spine",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.18885598114200025
+            }
+          },
+          "blenderVersion": "5.2.0 LTS",
+          "materialPreservation": {
+            "passed": true,
+            "materialCount": 1,
+            "maxDiffuseError": 0.0,
+            "maxSpecularError": 0.0,
+            "maxShininessError": 0.0,
+            "maxOpacityError": 0.0
+          }
+        }
+      }
+    }
+  ],
+  "runtimeIntegrity": {
+    "manifestSha256": "4a0f060fe4a350b1e4658188745fbb47adfbdc96d2186d2f58a02c8dc4dff814",
+    "files": 6580,
+    "changed": [],
+    "extra": []
+  },
+  "originalEightOutputHashesUnchanged": true,
+  "sourceCs3cSha256": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+  "registeredFbxSha256": "a778b2856383a49343e83718dfc18587d05c2abde27180bfa5001c8e4d360d6f",
+  "validationScope": "24 candidates, two final surface FBX roundtrips, two normals-only controls; diagnostic improvement, not all-artifact removal or all-model certification"
+}

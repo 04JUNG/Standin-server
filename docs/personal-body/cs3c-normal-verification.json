@@ -1,0 +1,55 @@
+{
+  "converterVersion": "personal-converter/9",
+  "importerVersion": "personal-import/4",
+  "runtimeManifestSha256": "813a439d5c56cd9cd0ce822d1f07e7d7d00dc98522a5381d206c0e202eb8655c",
+  "maleSourceSha256": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+  "metric": "Angular error in degrees between decoded CS3C vertex normals and reimported registered FBX corner normals, both in world space.",
+  "before": {
+    "degrees_percentiles_50_95_100": [
+      4.913243847833687,
+      17.904689060214423,
+      164.8926999547477
+    ],
+    "maxRegisteredPositionErrorM": 1.8113929024034315e-07
+  },
+  "after": {
+    "degrees_percentiles_50_95_100": [
+      0.00022164595298173015,
+      0.0022419027896690945,
+      0.04055118482379932
+    ],
+    "maxRegisteredPositionErrorM": 1.8113929024034315e-07
+  },
+  "matchedPoseExports": [
+    {
+      "name": "model-0-pose-0.fbx",
+      "maxPositionDeltaM": 0.0,
+      "sameWeights": true,
+      "sameBones": true,
+      "sameRawMaterial": true
+    },
+    {
+      "name": "model-0-pose-1.fbx",
+      "maxPositionDeltaM": 0.0,
+      "sameWeights": true,
+      "sameBones": true,
+      "sameRawMaterial": true
+    },
+    {
+      "name": "model-1-pose-0.fbx",
+      "maxPositionDeltaM": 0.0,
+      "sameWeights": true,
+      "sameBones": true,
+      "sameRawMaterial": null
+    },
+    {
+      "name": "model-1-pose-1.fbx",
+      "maxPositionDeltaM": 0.0,
+      "sameWeights": true,
+      "sameBones": true,
+      "sameRawMaterial": null
+    }
+  ],
+  "registrationApplyExportCachePassed": true,
+  "cspImportTested": false
+}

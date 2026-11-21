@@ -1,0 +1,1516 @@
+{
+  "dateKst": "2026-11-05",
+  "status": {
+    "localFilePreservation": "passed",
+    "overallDeformationQuality": "not_qualified",
+    "csp511ImportSave": "unverified",
+    "releaseReady": false,
+    "defaultFeatureEnabled": false
+  },
+  "git": {
+    "startingPrHead": "69a9298deb77bcef61764c7b9a9093c410b24c13",
+    "develop": "efa8d68ff6ad7a27b1c613069ea77af53c00b109",
+    "integrationBase": "9734a37dd05ce7245ff097f08b600c6f14aa3299"
+  },
+  "evidence": {
+    "versions": {
+      "importerVersion": "personal-import/4",
+      "normalizationVersion": "personal-normalize/5",
+      "rigMappingVersion": "personal-rig/2",
+      "converterVersion": "personal-converter/10",
+      "converterFingerprint": "3fe31c1322bb2d5c618920bda19dee5d96ea58b15caa1e5a9d8cdf842c73b254"
+    },
+    "runtimeManifestSha256": "eaac3841c8b9e693ff88c959eabaceaf1ecc298e547eede748e83ad4a0de1d70",
+    "cspImport": "unverified",
+    "overallDeformationQuality": "not qualified",
+    "models": [
+      {
+        "source": "standin-male-0.7.6-mapped-review.cs3c",
+        "registration": {
+          "sourceSha256": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+          "decodedToRegisteredMaxPositionErrorM": 5.841112257546553e-07,
+          "decodedToRegisteredNormalErrorP50P95MaxDeg": [
+            0.00022164973534618683,
+            0.0022419030376825077,
+            0.04055118484241258
+          ]
+        },
+        "poses": [
+          {
+            "poseSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+            "exportSha256": "2075ae9d5546472054b7e7853bcaba2081d2764fe7cf26a5f9844d005e82960c",
+            "independentLbsMaxErrorM": 7.632569869190857e-07,
+            "armTransfer": {
+              "L": {
+                "applied": false,
+                "reason": "not_wrist_only_mismatch"
+              },
+              "R": {
+                "applied": false,
+                "reason": "not_wrist_only_mismatch"
+              }
+            },
+            "surfaceCorrection": {
+              "applied": true,
+              "meshes": [
+                {
+                  "applied": true,
+                  "parts": [
+                    {
+                      "applied": true,
+                      "before": {
+                        "excessBend": 705.5974061159194,
+                        "maxStretch": 2.445760943803511,
+                        "stretchP99": 1.477323678708654,
+                        "overDouble": 76,
+                        "compressed": 33,
+                        "collapsed": 0,
+                        "sharp": 176,
+                        "folded": 82
+                      },
+                      "after": {
+                        "excessBend": 613.232599461587,
+                        "maxStretch": 1.9059455059965165,
+                        "stretchP99": 1.446687285299274,
+                        "overDouble": 0,
+                        "compressed": 0,
+                        "collapsed": 0,
+                        "sharp": 129,
+                        "folded": 77
+                      },
+                      "componentScale": 1.9884239923078906,
+                      "strength": 0.5,
+                      "maxMove": 0.02408046150279435,
+                      "filter": "ring_reference",
+                      "eligibleVertices": 1929
+                    }
+                  ],
+                  "skipped": {
+                    "rigid": 0,
+                    "budget": 0,
+                    "tiny": 0
+                  },
+                  "movedVertices": 1929,
+                  "vertexCount": 24988,
+                  "updatedCorners": 11625
+                }
+              ]
+            },
+            "stageMetrics": {
+              "solver": {
+                "excessBend": 705.5974061159194,
+                "maxStretch": 2.445760943803511,
+                "stretchP99": 1.477323678708654,
+                "overDouble": 76,
+                "compressed": 33,
+                "collapsed": 0,
+                "sharp": 176,
+                "folded": 82
+              },
+              "arm": {
+                "excessBend": 705.5974061159194,
+                "maxStretch": 2.445760943803511,
+                "stretchP99": 1.477323678708654,
+                "overDouble": 76,
+                "compressed": 33,
+                "collapsed": 0,
+                "sharp": 176,
+                "folded": 82
+              },
+              "surface": {
+                "excessBend": 613.2236283403371,
+                "maxStretch": 1.9059422113909839,
+                "stretchP99": 1.4466850862795793,
+                "overDouble": 0,
+                "compressed": 0,
+                "collapsed": 0,
+                "sharp": 129,
+                "folded": 77
+              }
+            },
+            "solverWorstEdgeWitness": {
+              "vertices": [
+                3742,
+                4032
+              ],
+              "restLengthM": 0.007270484795761653,
+              "solverLengthM": 0.017781867755991096,
+              "correctedLengthM": 0.008411308595992264,
+              "averageWeightEdgeTermM": 0.007174582235368776,
+              "weightGradientTermM": 0.012391232111026542,
+              "decompositionResidualM": 6.640045386107016e-08
+            },
+            "outsideSupportVertices": 23059,
+            "outsideSupportMaxPositionDeltaM": 0.0,
+            "outsideSupportMaxNormalDeltaDeg": 0.14444662025628185,
+            "exportToRegeneratedSurfaceMaxErrorM": 7.588719000337781e-07,
+            "exportToRegeneratedWorldNormalMaxErrorDeg": 0.0274387103180043,
+            "exactPolygonsWeightsOriginalHierarchy": true,
+            "baseline": {
+              "sha256": "4fe9257335f5a843ccaa92e6c60e0ed3fe13ae31d57d399216a251ee71823afc",
+              "metrics": {
+                "excessBend": 613.2645418425282,
+                "maxStretch": 1.9059428018926106,
+                "stretchP99": 1.4466853574703005,
+                "overDouble": 0,
+                "compressed": 0,
+                "collapsed": 0,
+                "sharp": 129,
+                "folded": 77
+              },
+              "maxPositionDeltaM": 0.0
+            }
+          },
+          {
+            "poseSha256": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+            "exportSha256": "8b4bac949e2daf53a9fe66ceb93c9681c482ae2154f9efece4dccd1a05f1994f",
+            "independentLbsMaxErrorM": 7.024232035349297e-07,
+            "armTransfer": {
+              "L": {
+                "handFramePolicy": "preserve_world_orientation",
+                "palmFrameValidated": false,
+                "directionErrorsBeforeDeg": [
+                  6.072868709281473,
+                  7.270768666081855,
+                  7.5761624897690165
+                ],
+                "applied": true,
+                "strength": 1.0,
+                "maxHeadDisplacement": 0.042526585591585155,
+                "directionErrorsAfterDeg": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "wristLocalAngleDeg": 62.633510877744754,
+                "handWorldRotationErrorDeg": 0.0
+              },
+              "R": {
+                "handFramePolicy": "preserve_world_orientation",
+                "palmFrameValidated": false,
+                "directionErrorsBeforeDeg": [
+                  5.822192127966459,
+                  7.024824178938731,
+                  6.6056936899259755
+                ],
+                "applied": true,
+                "strength": 0.5,
+                "maxHeadDisplacement": 0.0355779101991326,
+                "directionErrorsAfterDeg": [
+                  2.9111474853637116,
+                  3.6609171374124845,
+                  3.5053164951907543
+                ],
+                "wristLocalAngleDeg": 45.26398123347091,
+                "handWorldRotationErrorDeg": 0.0
+              }
+            },
+            "surfaceCorrection": {
+              "applied": true,
+              "meshes": [
+                {
+                  "applied": true,
+                  "parts": [
+                    {
+                      "applied": true,
+                      "before": {
+                        "excessBend": 581.7831282059967,
+                        "maxStretch": 8.320859053538083,
+                        "stretchP99": 1.5431083562484624,
+                        "overDouble": 160,
+                        "compressed": 23,
+                        "collapsed": 0,
+                        "sharp": 134,
+                        "folded": 64
+                      },
+                      "after": {
+                        "excessBend": 401.78005362280373,
+                        "maxStretch": 2.0007383059711654,
+                        "stretchP99": 1.52526792063342,
+                        "overDouble": 1,
+                        "compressed": 0,
+                        "collapsed": 0,
+                        "sharp": 64,
+                        "folded": 38
+                      },
+                      "componentScale": 1.9884239923078906,
+                      "strength": 1.0,
+                      "maxMove": 0.02910033082537036,
+                      "filter": "ring_reference",
+                      "eligibleVertices": 2061
+                    }
+                  ],
+                  "skipped": {
+                    "rigid": 0,
+                    "budget": 0,
+                    "tiny": 0
+                  },
+                  "movedVertices": 2061,
+                  "vertexCount": 24988,
+                  "updatedCorners": 12469
+                }
+              ]
+            },
+            "stageMetrics": {
+              "solver": {
+                "excessBend": 850.9460540887285,
+                "maxStretch": 8.320859053538083,
+                "stretchP99": 1.575033876433608,
+                "overDouble": 177,
+                "compressed": 35,
+                "collapsed": 1,
+                "sharp": 199,
+                "folded": 101
+              },
+              "arm": {
+                "excessBend": 581.7831282059967,
+                "maxStretch": 8.320859053538083,
+                "stretchP99": 1.5431083562484624,
+                "overDouble": 160,
+                "compressed": 23,
+                "collapsed": 0,
+                "sharp": 134,
+                "folded": 64
+              },
+              "surface": {
+                "excessBend": 401.7907346012614,
+                "maxStretch": 2.0007368540043458,
+                "stretchP99": 1.5252690513223137,
+                "overDouble": 1,
+                "compressed": 0,
+                "collapsed": 0,
+                "sharp": 64,
+                "folded": 38
+              }
+            },
+            "solverWorstEdgeWitness": {
+              "vertices": [
+                20273,
+                20334
+              ],
+              "restLengthM": 0.0047541842207261716,
+              "solverLengthM": 0.03955889681521726,
+              "correctedLengthM": 0.008780470993395652,
+              "averageWeightEdgeTermM": 0.004266017910892335,
+              "weightGradientTermM": 0.038019574862214404,
+              "decompositionResidualM": 3.228105125161257e-08
+            },
+            "outsideSupportVertices": 22927,
+            "outsideSupportMaxPositionDeltaM": 0.0,
+            "outsideSupportMaxNormalDeltaDeg": 0.02999413905573959,
+            "exportToRegeneratedSurfaceMaxErrorM": 7.863804579948641e-07,
+            "exportToRegeneratedWorldNormalMaxErrorDeg": 0.027727723933474672,
+            "exactPolygonsWeightsOriginalHierarchy": true,
+            "baseline": {
+              "sha256": "0c28df57f2cf1b77f427d5908305c00c65a4bbce6973a7ad787b5f33e1fef0fa",
+              "metrics": {
+                "excessBend": 463.0832946044693,
+                "maxStretch": 1.9903981388619179,
+                "stretchP99": 1.5157111191138686,
+                "overDouble": 0,
+                "compressed": 0,
+                "collapsed": 0,
+                "sharp": 73,
+                "folded": 42
+              },
+              "maxPositionDeltaM": 0.09243619825514891
+            }
+          }
+        ]
+      },
+      {
+        "source": "female-chubby-tpose.fbx",
+        "registration": {
+          "sourceSha256": "fb47d89d1507c377b0af136b9dc6357ef35787c59ac79467ee180b2e1640017f"
+        },
+        "poses": [
+          {
+            "poseSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+            "exportSha256": "1230f12d037e6196d3dafdc8f8f2f498af2db6b58efbd177bf4e7a9ae0fac6b4",
+            "independentLbsMaxErrorM": 5.977201536367072e-07,
+            "armTransfer": {
+              "L": {
+                "handFramePolicy": "landmark_pair",
+                "palmFrameValidated": true,
+                "directionErrorsBeforeDeg": [
+                  1.8398450620154787,
+                  3.7699947514120558,
+                  3.553884049183939
+                ],
+                "palmFrameErrorBeforeDeg": 25.69470036097841,
+                "applied": true,
+                "strength": 0.5,
+                "maxHeadDisplacement": 0.011234834825715953,
+                "directionErrorsAfterDeg": [
+                  0.9195097471823732,
+                  1.8892667811578232,
+                  1.8247501013140297
+                ],
+                "wristLocalAngleDeg": 50.96513671858597,
+                "palmFrameErrorAfterDeg": 12.93598588029709
+              },
+              "R": {
+                "handFramePolicy": "landmark_pair",
+                "palmFrameValidated": true,
+                "directionErrorsBeforeDeg": [
+                  1.8471352442958064,
+                  3.8111660762144273,
+                  3.568774633318735
+                ],
+                "palmFrameErrorBeforeDeg": 25.4670125288796,
+                "applied": true,
+                "strength": 0.5,
+                "maxHeadDisplacement": 0.011229335940783897,
+                "directionErrorsAfterDeg": [
+                  0.9232628026230311,
+                  1.9097696458085416,
+                  1.8334500958461741
+                ],
+                "wristLocalAngleDeg": 50.88970752448693,
+                "palmFrameErrorAfterDeg": 13.074581119759396
+              }
+            },
+            "surfaceCorrection": {
+              "applied": true,
+              "meshes": [
+                {
+                  "applied": true,
+                  "parts": [
+                    {
+                      "applied": true,
+                      "before": {
+                        "excessBend": 4220.125984130961,
+                        "maxStretch": 48.251339610708975,
+                        "stretchP99": 1.6078901501155356,
+                        "overDouble": 654,
+                        "compressed": 82,
+                        "collapsed": 2,
+                        "sharp": 426,
+                        "folded": 195
+                      },
+                      "after": {
+                        "excessBend": 3764.085650090313,
+                        "maxStretch": 26.639710021134622,
+                        "stretchP99": 1.598001201413034,
+                        "overDouble": 403,
+                        "compressed": 65,
+                        "collapsed": 0,
+                        "sharp": 340,
+                        "folded": 193
+                      },
+                      "componentScale": 1.9309182695335845,
+                      "strength": 0.4,
+                      "blend": 0.5,
+                      "heldVertices": 3,
+                      "maxMove": 0.010624381491571834,
+                      "filter": "ring_reference",
+                      "eligibleVertices": 5305
+                    }
+                  ],
+                  "skipped": {
+                    "rigid": 0,
+                    "budget": 0,
+                    "tiny": 0
+                  },
+                  "movedVertices": 5302,
+                  "vertexCount": 90143,
+                  "updatedCorners": 31054
+                }
+              ]
+            },
+            "stageMetrics": {
+              "solver": {
+                "excessBend": 3469.625231918986,
+                "maxStretch": 48.251339610708975,
+                "stretchP99": 1.6062366992272272,
+                "overDouble": 654,
+                "compressed": 110,
+                "collapsed": 2,
+                "sharp": 385,
+                "folded": 158
+              },
+              "arm": {
+                "excessBend": 4220.125984130961,
+                "maxStretch": 48.251339610708975,
+                "stretchP99": 1.6078901501155356,
+                "overDouble": 654,
+                "compressed": 82,
+                "collapsed": 2,
+                "sharp": 426,
+                "folded": 195
+              },
+              "surface": {
+                "excessBend": 3764.056008278176,
+                "maxStretch": 26.63970660185597,
+                "stretchP99": 1.5979999441129342,
+                "overDouble": 403,
+                "compressed": 65,
+                "collapsed": 0,
+                "sharp": 340,
+                "folded": 193
+              }
+            },
+            "solverWorstEdgeWitness": {
+              "vertices": [
+                28683,
+                28685
+              ],
+              "restLengthM": 0.0004765677791296209,
+              "solverLengthM": 0.022995033758304684,
+              "correctedLengthM": 0.0126956258119112,
+              "averageWeightEdgeTermM": 0.00047125339985192965,
+              "weightGradientTermM": 0.022532771092282557,
+              "decompositionResidualM": 4.818284847205499e-08
+            },
+            "outsideSupportVertices": 84830,
+            "outsideSupportMaxPositionDeltaM": 0.0,
+            "outsideSupportMaxNormalDeltaDeg": 0.031011403581455627,
+            "exportToRegeneratedSurfaceMaxErrorM": 4.989108157987358e-07,
+            "exportToRegeneratedWorldNormalMaxErrorDeg": 0.039109697611009346,
+            "exactPolygonsWeightsOriginalHierarchy": true,
+            "baseline": {
+              "sha256": "690e12a30f709864d8ecfd440d4fa4e65f575a53b971e4ac4c84db6486997d66",
+              "metrics": {
+                "excessBend": 3764.075946153288,
+                "maxStretch": 26.639699445717138,
+                "stretchP99": 1.597999920057651,
+                "overDouble": 403,
+                "compressed": 65,
+                "collapsed": 0,
+                "sharp": 340,
+                "folded": 193
+              },
+              "maxPositionDeltaM": 0.0
+            }
+          },
+          {
+            "poseSha256": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+            "exportSha256": "617bce03b6a41db7027a6d0c55057d3953c8e8e66018d06d1da7f1eba7cb96f8",
+            "independentLbsMaxErrorM": 5.637109407812864e-07,
+            "armTransfer": {
+              "L": {
+                "applied": false,
+                "reason": "surface_candidate_rejected",
+                "rejectedCandidate": {
+                  "handFramePolicy": "preserve_world_orientation",
+                  "palmFrameValidated": false,
+                  "directionErrorsBeforeDeg": [
+                    5.426160020581849,
+                    5.475127747265474,
+                    6.000466540528004
+                  ],
+                  "applied": true,
+                  "strength": 0.75,
+                  "maxHeadDisplacement": 0.019121215393959168,
+                  "directionErrorsAfterDeg": [
+                    1.3566373620525387,
+                    1.7079235498680951,
+                    1.683503920274451
+                  ],
+                  "wristLocalAngleDeg": 39.31722239108594,
+                  "handWorldRotationErrorDeg": 0.0
+                }
+              },
+              "R": {
+                "applied": false,
+                "reason": "palm_basis_unavailable"
+              }
+            },
+            "surfaceCorrection": {
+              "applied": true,
+              "meshes": [
+                {
+                  "applied": true,
+                  "parts": [
+                    {
+                      "applied": true,
+                      "before": {
+                        "excessBend": 6270.9885176337675,
+                        "maxStretch": 219.89972520195624,
+                        "stretchP99": 1.8113014221337276,
+                        "overDouble": 1853,
+                        "compressed": 181,
+                        "collapsed": 3,
+                        "sharp": 897,
+                        "folded": 522
+                      },
+                      "after": {
+                        "excessBend": 5640.808302997812,
+                        "maxStretch": 198.62888987212668,
+                        "stretchP99": 1.8066514741167694,
+                        "overDouble": 1785,
+                        "compressed": 180,
+                        "collapsed": 1,
+                        "sharp": 783,
+                        "folded": 482
+                      },
+                      "componentScale": 1.9309182695335845,
+                      "strength": 0.4,
+                      "blend": 0.25,
+                      "heldVertices": 6,
+                      "maxMove": 0.010137320915051349,
+                      "filter": "ring_reference",
+                      "eligibleVertices": 7968
+                    }
+                  ],
+                  "skipped": {
+                    "rigid": 0,
+                    "budget": 0,
+                    "tiny": 0
+                  },
+                  "movedVertices": 7962,
+                  "vertexCount": 90143,
+                  "updatedCorners": 46404
+                }
+              ]
+            },
+            "stageMetrics": {
+              "solver": {
+                "excessBend": 6270.897714899695,
+                "maxStretch": 219.89973103988808,
+                "stretchP99": 1.8113034243539459,
+                "overDouble": 1853,
+                "compressed": 181,
+                "collapsed": 3,
+                "sharp": 896,
+                "folded": 522
+              },
+              "arm": {
+                "excessBend": 6270.9885176337675,
+                "maxStretch": 219.89972520195624,
+                "stretchP99": 1.8113014221337276,
+                "overDouble": 1853,
+                "compressed": 181,
+                "collapsed": 3,
+                "sharp": 897,
+                "folded": 522
+              },
+              "surface": {
+                "excessBend": 5640.842856615753,
+                "maxStretch": 198.6287880280724,
+                "stretchP99": 1.8066536507985997,
+                "overDouble": 1785,
+                "compressed": 180,
+                "collapsed": 1,
+                "sharp": 783,
+                "folded": 482
+              }
+            },
+            "solverWorstEdgeWitness": {
+              "vertices": [
+                28683,
+                28685
+              ],
+              "restLengthM": 0.0004765677791296209,
+              "solverLengthM": 0.10479712645288043,
+              "correctedLengthM": 0.0946600803817467,
+              "averageWeightEdgeTermM": 0.0004007314926176324,
+              "weightGradientTermM": 0.10454702666973192,
+              "decompositionResidualM": 1.1260992445055088e-07
+            },
+            "outsideSupportVertices": 82104,
+            "outsideSupportMaxPositionDeltaM": 0.0,
+            "outsideSupportMaxNormalDeltaDeg": 0.03475956440430958,
+            "exportToRegeneratedSurfaceMaxErrorM": 6.265579474457693e-07,
+            "exportToRegeneratedWorldNormalMaxErrorDeg": 0.034599360989730266,
+            "exactPolygonsWeightsOriginalHierarchy": true,
+            "baseline": {
+              "sha256": "97f5e24b75c31a3f3a4d0ee7d8f8e4a3bb5523cef7d9138a7709b134184d82ec",
+              "metrics": {
+                "excessBend": 5640.833565297176,
+                "maxStretch": 198.6288976603614,
+                "stretchP99": 1.8066547070498309,
+                "overDouble": 1785,
+                "compressed": 180,
+                "collapsed": 1,
+                "sharp": 783,
+                "folded": 482
+              },
+              "maxPositionDeltaM": 5.773118325415408e-07
+            }
+          }
+        ]
+      },
+      {
+        "source": "child-tpose.fbx",
+        "registration": {
+          "sourceSha256": "b195a3ff87d67365f343fee9049f9d25026d6a49e4987d9e895d3a3f25e72385"
+        },
+        "poses": [
+          {
+            "poseSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+            "exportSha256": "b9143dba88f2bcae6b4c3bbc4673071888e69fe82958db28ebafc4149a492fa4",
+            "independentLbsMaxErrorM": 3.429569398322981e-07,
+            "armTransfer": {
+              "L": {
+                "handFramePolicy": "landmark_pair",
+                "palmFrameValidated": true,
+                "directionErrorsBeforeDeg": [
+                  1.3618870950476085,
+                  0.2064449763879079,
+                  0.4727641102914155
+                ],
+                "palmFrameErrorBeforeDeg": 22.827981307794005,
+                "applied": true,
+                "strength": 0.25,
+                "maxHeadDisplacement": 0.0009179241160978906,
+                "directionErrorsAfterDeg": [
+                  1.0215313129792458,
+                  0.15414847209339247,
+                  0.36063855741573947
+                ],
+                "wristLocalAngleDeg": 52.030325210216965,
+                "palmFrameErrorAfterDeg": 0.0
+              },
+              "R": {
+                "handFramePolicy": "landmark_pair",
+                "palmFrameValidated": true,
+                "directionErrorsBeforeDeg": [
+                  1.3890304850534088,
+                  0.44960082264100437,
+                  0.5263873244394588
+                ],
+                "palmFrameErrorBeforeDeg": 21.825393366083087,
+                "applied": true,
+                "strength": 0.5,
+                "maxHeadDisplacement": 0.0014372788632116024,
+                "directionErrorsAfterDeg": [
+                  0.6949249813555599,
+                  0.2250106855042783,
+                  0.27130966837273585
+                ],
+                "wristLocalAngleDeg": 53.649667439778604,
+                "palmFrameErrorAfterDeg": 10.872056804212265
+              }
+            },
+            "surfaceCorrection": {
+              "applied": true,
+              "meshes": [
+                {
+                  "applied": true,
+                  "parts": [
+                    {
+                      "applied": true,
+                      "before": {
+                        "excessBend": 73134.72715803981,
+                        "maxStretch": 2.8591481165183055,
+                        "stretchP99": 1.520116932077159,
+                        "overDouble": 166,
+                        "compressed": 242,
+                        "collapsed": 3,
+                        "sharp": 4172,
+                        "folded": 2118
+                      },
+                      "after": {
+                        "excessBend": 67276.66529868238,
+                        "maxStretch": 2.605287923332489,
+                        "stretchP99": 1.5129885382567763,
+                        "overDouble": 120,
+                        "compressed": 224,
+                        "collapsed": 1,
+                        "sharp": 3662,
+                        "folded": 1886
+                      },
+                      "componentScale": 1.3537316855368737,
+                      "strength": 0.2,
+                      "blend": 0.25,
+                      "heldVertices": 9,
+                      "maxMove": 0.0071070913490686475,
+                      "filter": "area_diffusion",
+                      "eligibleVertices": 14301
+                    }
+                  ],
+                  "skipped": {
+                    "rigid": 0,
+                    "budget": 0,
+                    "tiny": 0
+                  },
+                  "movedVertices": 14292,
+                  "vertexCount": 179990,
+                  "updatedCorners": 81212
+                }
+              ]
+            },
+            "stageMetrics": {
+              "solver": {
+                "excessBend": 63880.25927284554,
+                "maxStretch": 2.8853749963252566,
+                "stretchP99": 1.4932864824304863,
+                "overDouble": 171,
+                "compressed": 292,
+                "collapsed": 4,
+                "sharp": 3757,
+                "folded": 1790
+              },
+              "arm": {
+                "excessBend": 73134.72715803981,
+                "maxStretch": 2.8591481165183055,
+                "stretchP99": 1.520116932077159,
+                "overDouble": 166,
+                "compressed": 242,
+                "collapsed": 3,
+                "sharp": 4172,
+                "folded": 2118
+              },
+              "surface": {
+                "excessBend": 67276.53995374552,
+                "maxStretch": 2.605289781015315,
+                "stretchP99": 1.5129883999787643,
+                "overDouble": 120,
+                "compressed": 224,
+                "collapsed": 1,
+                "sharp": 3662,
+                "folded": 1886
+              }
+            },
+            "solverWorstEdgeWitness": {
+              "vertices": [
+                111535,
+                111536
+              ],
+              "restLengthM": 0.005492511647538707,
+              "solverLengthM": 0.015847955774833427,
+              "correctedLengthM": 0.014309584467440186,
+              "averageWeightEdgeTermM": 0.004629230615891597,
+              "weightGradientTermM": 0.014471405799041444,
+              "decompositionResidualM": 1.9948004252486074e-07
+            },
+            "outsideSupportVertices": 165295,
+            "outsideSupportMaxPositionDeltaM": 0.0,
+            "outsideSupportMaxNormalDeltaDeg": 0.049747160823257516,
+            "exportToRegeneratedSurfaceMaxErrorM": 3.3785322955282504e-07,
+            "exportToRegeneratedWorldNormalMaxErrorDeg": 0.038729551460668143,
+            "exactPolygonsWeightsOriginalHierarchy": true
+          },
+          {
+            "poseSha256": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+            "exportSha256": "095ca2fcb2b576a7f3d863331d93b269eef0de79244f738bdf6c43a15291f002",
+            "independentLbsMaxErrorM": 3.98855619437548e-07,
+            "armTransfer": {
+              "L": {
+                "handFramePolicy": "preserve_world_orientation",
+                "palmFrameValidated": false,
+                "directionErrorsBeforeDeg": [
+                  6.175262102009567,
+                  1.8197494454031695,
+                  3.6579324689964765
+                ],
+                "applied": false,
+                "reason": "shape_or_joint_guard"
+              },
+              "R": {
+                "handFramePolicy": "preserve_world_orientation",
+                "palmFrameValidated": false,
+                "directionErrorsBeforeDeg": [
+                  5.914026181983044,
+                  3.592554472139498,
+                  3.686646670937105
+                ],
+                "applied": false,
+                "reason": "shape_or_joint_guard"
+              }
+            },
+            "surfaceCorrection": {
+              "applied": false,
+              "meshes": [
+                {
+                  "applied": false,
+                  "parts": [
+                    {
+                      "applied": false,
+                      "reason": "metrics_regressed",
+                      "before": {
+                        "excessBend": 47482.20229091389,
+                        "maxStretch": 4.788609483299597,
+                        "stretchP99": 1.6926537909842734,
+                        "overDouble": 1989,
+                        "compressed": 285,
+                        "collapsed": 0,
+                        "sharp": 2672,
+                        "folded": 1263
+                      },
+                      "filter": "ring_reference",
+                      "eligibleVertices": 16279
+                    }
+                  ],
+                  "skipped": {
+                    "rigid": 0,
+                    "budget": 0,
+                    "tiny": 0
+                  }
+                }
+              ]
+            },
+            "stageMetrics": {
+              "solver": {
+                "excessBend": 47482.08092963346,
+                "maxStretch": 4.788621870999053,
+                "stretchP99": 1.6926642666791591,
+                "overDouble": 1989,
+                "compressed": 285,
+                "collapsed": 0,
+                "sharp": 2672,
+                "folded": 1263
+              },
+              "arm": {
+                "excessBend": 47482.20229091389,
+                "maxStretch": 4.788609483299597,
+                "stretchP99": 1.6926537909842734,
+                "overDouble": 1989,
+                "compressed": 285,
+                "collapsed": 0,
+                "sharp": 2672,
+                "folded": 1263
+              },
+              "surface": {
+                "excessBend": 47482.2214676851,
+                "maxStretch": 4.788576175960403,
+                "stretchP99": 1.6926537609133785,
+                "overDouble": 1988,
+                "compressed": 285,
+                "collapsed": 0,
+                "sharp": 2672,
+                "folded": 1263
+              }
+            },
+            "solverWorstEdgeWitness": {
+              "vertices": [
+                31535,
+                31920
+              ],
+              "restLengthM": 0.0014743968704536204,
+              "solverLengthM": 0.007060329100386765,
+              "correctedLengthM": 0.007060261727764783,
+              "averageWeightEdgeTermM": 0.0014568246273100748,
+              "weightGradientTermM": 0.007115040565996386,
+              "decompositionResidualM": 6.865817545533412e-08
+            },
+            "outsideSupportVertices": 163437,
+            "outsideSupportMaxPositionDeltaM": 0.0,
+            "outsideSupportMaxNormalDeltaDeg": 0.0,
+            "exportToRegeneratedSurfaceMaxErrorM": 4.6843951671177594e-07,
+            "exportToRegeneratedWorldNormalMaxErrorDeg": 1.2548866968721886e-05,
+            "exactPolygonsWeightsOriginalHierarchy": true
+          }
+        ]
+      }
+    ]
+  },
+  "packagedRun": {
+    "startupSeconds": 8.59520512499148,
+    "models": [
+      {
+        "sourceName": "standin-male-0.7.6-mapped-review.cs3c",
+        "sourceSha256": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+        "registrationEvent": "result",
+        "registrationSeconds": 5.825710917008109,
+        "registrationValidation": {
+          "passed": true,
+          "meshCount": 1,
+          "originalBoneCount": 53,
+          "vertexCount": 24988,
+          "maxSurfaceError": 5.101335887047753e-07,
+          "maxSkinProbeError": 7.601418019476114e-07,
+          "maxMaterialRegionError": 5.101335887047753e-07,
+          "materialCount": 1,
+          "tolerance": 1.780109771384568e-05,
+          "fkProbes": {
+            "forearm.L": {
+              "joint": "forearm.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1088190872464659
+            },
+            "forearm.R": {
+              "joint": "forearm.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.10896417965076514
+            },
+            "leg.L": {
+              "joint": "leg.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.13425406683096436
+            },
+            "leg.R": {
+              "joint": "leg.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1342576162504657
+            },
+            "spine": {
+              "joint": "spine",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.1684601450844222
+            }
+          },
+          "blenderVersion": "5.2.0 LTS",
+          "materialPreservation": {
+            "passed": true,
+            "materialCount": 1,
+            "maxDiffuseError": 0.0,
+            "maxSpecularError": 0.0,
+            "maxShininessError": 2.288818308215923e-07,
+            "maxOpacityError": 0.0
+          }
+        },
+        "capabilities": {
+          "supportLevel": "body_only",
+          "bodyPose": true,
+          "hands": {
+            "left": {
+              "supported": false,
+              "fingerBones": 15,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            },
+            "right": {
+              "supported": false,
+              "fingerBones": 15,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            }
+          },
+          "collisionPrevention": false,
+          "shapeSliders": false
+        },
+        "poses": [
+          {
+            "poseName": "03-staging-selected-pose.bvh",
+            "poseHash": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+            "event": "result",
+            "seconds": 6.777230999985477,
+            "cachedSeconds": 0.03490079098264687,
+            "artifactHash": "2075ae9d5546472054b7e7853bcaba2081d2764fe7cf26a5f9844d005e82960c",
+            "snapshotHash": "0b5515b13619cd528a3cb4d58cce064fd47994334c4129450686d1903f63d71e",
+            "validation": {
+              "passed": true,
+              "meshCount": 1,
+              "originalBoneCount": 66,
+              "vertexCount": 24988,
+              "maxSurfaceError": 7.588719199702609e-07,
+              "maxSkinProbeError": 8.765126153775782e-07,
+              "maxMaterialRegionError": 7.588719199702609e-07,
+              "materialCount": 1,
+              "tolerance": 1.7444062930276232e-05,
+              "fkProbes": {
+                "forearm.L": {
+                  "joint": "forearm.L",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.10876463535284306
+                },
+                "forearm.R": {
+                  "joint": "forearm.R",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.1089407657011523
+                },
+                "leg.L": {
+                  "joint": "leg.L",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.12953315171815846
+                },
+                "leg.R": {
+                  "joint": "leg.R",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.12953383322654813
+                },
+                "spine": {
+                  "joint": "spine",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.1619044103071455
+                }
+              },
+              "blenderVersion": "5.2.0 LTS",
+              "materialPreservation": {
+                "passed": true,
+                "materialCount": 1,
+                "maxDiffuseError": 0.0,
+                "maxSpecularError": 0.0,
+                "maxShininessError": 2.288818308215923e-07,
+                "maxOpacityError": 0.0
+              }
+            }
+          },
+          {
+            "poseName": "cmu_135_01_04368.bvh",
+            "poseHash": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+            "event": "result",
+            "seconds": 9.993196333001833,
+            "cachedSeconds": 0.03519925000728108,
+            "artifactHash": "8b4bac949e2daf53a9fe66ceb93c9681c482ae2154f9efece4dccd1a05f1994f",
+            "snapshotHash": "eb3e88ae083ccd1540f0f3a1aee98e5abb262a591ed00da23bf1bb8b04987696",
+            "validation": {
+              "passed": true,
+              "meshCount": 1,
+              "originalBoneCount": 66,
+              "vertexCount": 24988,
+              "maxSurfaceError": 7.863804398766661e-07,
+              "maxSkinProbeError": 8.741165515857574e-07,
+              "maxMaterialRegionError": 7.715578931311029e-07,
+              "materialCount": 1,
+              "tolerance": 1.794299856504494e-05,
+              "fkProbes": {
+                "forearm.L": {
+                  "joint": "forearm.L",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.10793333136350992
+                },
+                "forearm.R": {
+                  "joint": "forearm.R",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.10894761871610623
+                },
+                "leg.L": {
+                  "joint": "leg.L",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.1298630121431651
+                },
+                "leg.R": {
+                  "joint": "leg.R",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.12857908758643313
+                },
+                "spine": {
+                  "joint": "spine",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.19067972956405657
+                }
+              },
+              "blenderVersion": "5.2.0 LTS",
+              "materialPreservation": {
+                "passed": true,
+                "materialCount": 1,
+                "maxDiffuseError": 0.0,
+                "maxSpecularError": 0.0,
+                "maxShininessError": 2.288818308215923e-07,
+                "maxOpacityError": 0.0
+              }
+            }
+          }
+        ]
+      },
+      {
+        "sourceName": "female-chubby-tpose.fbx",
+        "sourceSha256": "fb47d89d1507c377b0af136b9dc6357ef35787c59ac79467ee180b2e1640017f",
+        "registrationEvent": "result",
+        "registrationSeconds": 5.759254875010811,
+        "registrationValidation": {
+          "passed": true,
+          "meshCount": 1,
+          "originalBoneCount": 65,
+          "vertexCount": 90143,
+          "maxSurfaceError": 5.964653837509104e-07,
+          "maxSkinProbeError": 7.818496214895276e-07,
+          "maxMaterialRegionError": 5.964312208561751e-07,
+          "materialCount": 2,
+          "tolerance": 1.6805063650993922e-05,
+          "fkProbes": {
+            "forearm.L": {
+              "joint": "forearm.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.09234117604469821
+            },
+            "forearm.R": {
+              "joint": "forearm.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.09233935884212574
+            },
+            "leg.L": {
+              "joint": "leg.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.13833344943756284
+            },
+            "leg.R": {
+              "joint": "leg.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.13833923776528562
+            },
+            "spine": {
+              "joint": "spine",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.14665100718655352
+            }
+          },
+          "blenderVersion": "5.2.0 LTS",
+          "materialPreservation": {
+            "passed": true,
+            "materialCount": 2,
+            "maxDiffuseError": 0.0,
+            "maxSpecularError": 0.0,
+            "maxShininessError": 0.0,
+            "maxOpacityError": 0.0
+          }
+        },
+        "capabilities": {
+          "supportLevel": "body_only",
+          "bodyPose": true,
+          "hands": {
+            "left": {
+              "supported": false,
+              "fingerBones": 20,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            },
+            "right": {
+              "supported": false,
+              "fingerBones": 20,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            }
+          },
+          "collisionPrevention": false,
+          "shapeSliders": false
+        },
+        "poses": [
+          {
+            "poseName": "03-staging-selected-pose.bvh",
+            "poseHash": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+            "event": "result",
+            "seconds": 25.303299791994505,
+            "cachedSeconds": 0.08112575000268407,
+            "artifactHash": "1230f12d037e6196d3dafdc8f8f2f498af2db6b58efbd177bf4e7a9ae0fac6b4",
+            "snapshotHash": "8e97c3773b7e4299c6bddb00869a8a8654284e9f2914185fa3aac2eacb6ee164",
+            "validation": {
+              "passed": true,
+              "meshCount": 1,
+              "originalBoneCount": 78,
+              "vertexCount": 90143,
+              "maxSurfaceError": 4.989108219888294e-07,
+              "maxSkinProbeError": 8.905859658625559e-07,
+              "maxMaterialRegionError": 5.405651677392598e-07,
+              "materialCount": 2,
+              "tolerance": 1.6550384307532303e-05,
+              "fkProbes": {
+                "forearm.L": {
+                  "joint": "forearm.L",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.09180362969335634
+                },
+                "forearm.R": {
+                  "joint": "forearm.R",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.09181683868864866
+                },
+                "leg.L": {
+                  "joint": "leg.L",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.13659136453160323
+                },
+                "leg.R": {
+                  "joint": "leg.R",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.13652318366471464
+                },
+                "spine": {
+                  "joint": "spine",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.14171426046229135
+                }
+              },
+              "blenderVersion": "5.2.0 LTS",
+              "materialPreservation": {
+                "passed": true,
+                "materialCount": 2,
+                "maxDiffuseError": 0.0,
+                "maxSpecularError": 0.0,
+                "maxShininessError": 0.0,
+                "maxOpacityError": 0.0
+              }
+            }
+          },
+          {
+            "poseName": "cmu_135_01_04368.bvh",
+            "poseHash": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+            "event": "result",
+            "seconds": 45.74721770899487,
+            "cachedSeconds": 0.080932999990182,
+            "artifactHash": "617bce03b6a41db7027a6d0c55057d3953c8e8e66018d06d1da7f1eba7cb96f8",
+            "snapshotHash": "b3e0eab52f43f749907bbe8a10c1eaffdfaf78dcbf8709ce4124d40a0b727538",
+            "validation": {
+              "passed": true,
+              "meshCount": 1,
+              "originalBoneCount": 78,
+              "vertexCount": 90143,
+              "maxSurfaceError": 6.26557948635309e-07,
+              "maxSkinProbeError": 9.974877457352704e-07,
+              "maxMaterialRegionError": 6.848052294117224e-07,
+              "materialCount": 2,
+              "tolerance": 1.730607898612481e-05,
+              "fkProbes": {
+                "forearm.L": {
+                  "joint": "forearm.L",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.09233108396797761
+                },
+                "forearm.R": {
+                  "joint": "forearm.R",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.09233929214988855
+                },
+                "leg.L": {
+                  "joint": "leg.L",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.13710820378836752
+                },
+                "leg.R": {
+                  "joint": "leg.R",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.13606064599410553
+                },
+                "spine": {
+                  "joint": "spine",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.17750415233275985
+                }
+              },
+              "blenderVersion": "5.2.0 LTS",
+              "materialPreservation": {
+                "passed": true,
+                "materialCount": 2,
+                "maxDiffuseError": 0.0,
+                "maxSpecularError": 0.0,
+                "maxShininessError": 0.0,
+                "maxOpacityError": 0.0
+              }
+            }
+          }
+        ]
+      },
+      {
+        "sourceName": "child-tpose.fbx",
+        "sourceSha256": "b195a3ff87d67365f343fee9049f9d25026d6a49e4987d9e895d3a3f25e72385",
+        "registrationEvent": "result",
+        "registrationSeconds": 10.026993291976396,
+        "registrationValidation": {
+          "passed": true,
+          "meshCount": 1,
+          "originalBoneCount": 65,
+          "vertexCount": 179990,
+          "maxSurfaceError": 2.981836075832689e-07,
+          "maxSkinProbeError": 6.565500711985806e-07,
+          "maxMaterialRegionError": 2.9816871460752736e-07,
+          "materialCount": 1,
+          "tolerance": 1.214052047710834e-05,
+          "fkProbes": {
+            "forearm.L": {
+              "joint": "forearm.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.0732310358147988
+            },
+            "forearm.R": {
+              "joint": "forearm.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.07323194878752119
+            },
+            "leg.L": {
+              "joint": "leg.L",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.08051338076185767
+            },
+            "leg.R": {
+              "joint": "leg.R",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.0804199570182805
+            },
+            "spine": {
+              "joint": "spine",
+              "rotationRadians": 0.25,
+              "maxVertexDisplacement": 0.13321581224990542
+            }
+          },
+          "blenderVersion": "5.2.0 LTS",
+          "materialPreservation": {
+            "passed": true,
+            "materialCount": 1,
+            "maxDiffuseError": 0.0,
+            "maxSpecularError": 0.0,
+            "maxShininessError": 0.0,
+            "maxOpacityError": 0.0
+          }
+        },
+        "capabilities": {
+          "supportLevel": "body_only",
+          "bodyPose": true,
+          "hands": {
+            "left": {
+              "supported": false,
+              "fingerBones": 20,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            },
+            "right": {
+              "supported": false,
+              "fingerBones": 20,
+              "reason": "UNVALIDATED_FINGER_RIG"
+            }
+          },
+          "collisionPrevention": false,
+          "shapeSliders": false
+        },
+        "poses": [
+          {
+            "poseName": "03-staging-selected-pose.bvh",
+            "poseHash": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+            "event": "result",
+            "seconds": 50.817989917006344,
+            "cachedSeconds": 0.14338087500073016,
+            "artifactHash": "b9143dba88f2bcae6b4c3bbc4673071888e69fe82958db28ebafc4149a492fa4",
+            "snapshotHash": "39480d8024441cebab84ef91a8c50a560544037daef30967c06cb92dc2851164",
+            "validation": {
+              "passed": true,
+              "meshCount": 1,
+              "originalBoneCount": 78,
+              "vertexCount": 179990,
+              "maxSurfaceError": 3.378532369424647e-07,
+              "maxSkinProbeError": 5.591907665802864e-07,
+              "maxMaterialRegionError": 3.499592651223793e-07,
+              "materialCount": 1,
+              "tolerance": 1.1996233001911324e-05,
+              "fkProbes": {
+                "forearm.L": {
+                  "joint": "forearm.L",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.07290007378266114
+                },
+                "forearm.R": {
+                  "joint": "forearm.R",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.07305240409905168
+                },
+                "leg.L": {
+                  "joint": "leg.L",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.07747644247191439
+                },
+                "leg.R": {
+                  "joint": "leg.R",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.0775325893730777
+                },
+                "spine": {
+                  "joint": "spine",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.13097317589743548
+                }
+              },
+              "blenderVersion": "5.2.0 LTS",
+              "materialPreservation": {
+                "passed": true,
+                "materialCount": 1,
+                "maxDiffuseError": 0.0,
+                "maxSpecularError": 0.0,
+                "maxShininessError": 0.0,
+                "maxOpacityError": 0.0
+              }
+            }
+          },
+          {
+            "poseName": "cmu_135_01_04368.bvh",
+            "poseHash": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+            "event": "result",
+            "seconds": 49.293159458000446,
+            "cachedSeconds": 0.14313316700281575,
+            "artifactHash": "095ca2fcb2b576a7f3d863331d93b269eef0de79244f738bdf6c43a15291f002",
+            "snapshotHash": "b7851809521bf8e9558c9c515aaf4266a06ccc0e3d82acda39ac4575a716dd4f",
+            "validation": {
+              "passed": true,
+              "meshCount": 1,
+              "originalBoneCount": 78,
+              "vertexCount": 179990,
+              "maxSurfaceError": 4.6843950940456125e-07,
+              "maxSkinProbeError": 6.563280408045102e-07,
+              "maxMaterialRegionError": 5.5033518719938e-07,
+              "materialCount": 1,
+              "tolerance": 1.1951352374757548e-05,
+              "fkProbes": {
+                "forearm.L": {
+                  "joint": "forearm.L",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.07320601066087389
+                },
+                "forearm.R": {
+                  "joint": "forearm.R",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.0732322213614935
+                },
+                "leg.L": {
+                  "joint": "leg.L",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.07793606520170525
+                },
+                "leg.R": {
+                  "joint": "leg.R",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.07762216722128094
+                },
+                "spine": {
+                  "joint": "spine",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.13274146268735848
+                }
+              },
+              "blenderVersion": "5.2.0 LTS",
+              "materialPreservation": {
+                "passed": true,
+                "materialCount": 1,
+                "maxDiffuseError": 0.0,
+                "maxSpecularError": 0.0,
+                "maxShininessError": 0.0,
+                "maxOpacityError": 0.0
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "tests": {
+    "blenderUnit": {
+      "passed": 38,
+      "skipped": 0
+    },
+    "mockSmoke": {
+      "passed": 54
+    },
+    "pytestLocalApiWorkerInteractive": {
+      "passed": 203,
+      "skippedBlenderOnly": 3,
+      "subtestsPassed": 18
+    },
+    "compileall": "passed",
+    "diffCheck": "passed"
+  },
+  "runtimeIntegrity": [
+    {
+      "manifestSha256": "813a439d5c56cd9cd0ce822d1f07e7d7d00dc98522a5381d206c0e202eb8655c",
+      "filesChecked": 6582,
+      "mismatches": [],
+      "unexpectedFiles": [],
+      "releaseReady": false,
+      "label": "v9-read-only"
+    },
+    {
+      "manifestSha256": "5d766b0eb36d1f3aa3e870729ce47c06757f28e86b7ea1add4a8fb0a43b8eccc",
+      "filesChecked": 6582,
+      "mismatches": [],
+      "unexpectedFiles": [],
+      "releaseReady": false,
+      "label": "v8-read-only"
+    },
+    {
+      "manifestSha256": "eaac3841c8b9e693ff88c959eabaceaf1ecc298e547eede748e83ad4a0de1d70",
+      "filesChecked": 6591,
+      "mismatches": [],
+      "unexpectedFiles": [],
+      "releaseReady": false,
+      "label": "v10-test"
+    },
+    {
+      "manifestSha256": "eaac3841c8b9e693ff88c959eabaceaf1ecc298e547eede748e83ad4a0de1d70",
+      "filesChecked": 6591,
+      "mismatches": [],
+      "unexpectedFiles": [],
+      "releaseReady": false,
+      "label": "v10-shared"
+    }
+  ],
+  "runtimeCodeMatchesCurrentConverterTree": true,
+  "runtimeBuildExclusions": [
+    "hand_thumbs",
+    "__pycache__",
+    "*.pyc",
+    "unreviewed decoder input; reviewed resource supplied separately"
+  ]
+}

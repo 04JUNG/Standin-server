@@ -1,0 +1,2015 @@
+{
+  "schemaVersion": 1,
+  "dateKst": "2026-11-06",
+  "codeCommit": "7616e491fc500cbfec04fc9fe4defce93fa5776e",
+  "basePr142": "d5cfe23220573698f36ae03bbc226405645dc83d",
+  "freshDevelop": "160f33d57dfcb9720f858066cdad587c0e76161b",
+  "scope": "CSP importer only; separate deformation remains not qualified",
+  "cause": {
+    "verdict": "confirmed trigger in tested male files",
+    "trigger": "FBX Model display name root_group_",
+    "mechanism": "internal name collision inferred, proprietary importer not inspected",
+    "influence9Hypothesis": "rejected as sole cause",
+    "officialInfluenceLimit": "not established"
+  },
+  "environment": {
+    "os": "macOS 26.6.2 (25G83)",
+    "arch": "arm64",
+    "cspVersion": "5.1.1",
+    "cspBinarySha256": "40ff5d9a8519e9d9a09187f6a36f40f42a99745f6d2c4b981478fa0632d122c6"
+  },
+  "runtime": {
+    "manifestSha256": "2540a161e19fa34ad1d9c38bcc79751d471b938f6de5b0757923e303def5789b",
+    "target": "darwin-arm64",
+    "releaseReady": false,
+    "files": 6606,
+    "versions": {
+      "importerVersion": "personal-import/4",
+      "normalizationVersion": "personal-normalize/5",
+      "rigMappingVersion": "personal-rig/2",
+      "converterVersion": "personal-converter/11",
+      "converterFingerprint": "5fdc61c7775279392171e8002aece0e87744fe6187855746fe7411b4004458d1"
+    },
+    "v10ManifestSha256": "eaac3841c8b9e693ff88c959eabaceaf1ecc298e547eede748e83ad4a0de1d70",
+    "v10SharedTreeAudit": {
+      "changedListedFiles": 538,
+      "allChangesArePyc": true,
+      "changedAtHour": {
+        "2026-11-06T14": 526,
+        "2026-11-06T17": 12
+      },
+      "allExtrasArePyc": true,
+      "manifestSha256": "eaac3841c8b9e693ff88c959eabaceaf1ecc298e547eede748e83ad4a0de1d70",
+      "codeAndExecutableListedHashesUnchanged": true,
+      "baselineNotRelabeledOrRepaired": true
+    }
+  },
+  "native": {
+    "attempts": 25,
+    "displayPass": 16,
+    "diagnosticCrash": 9,
+    "freshDistinctOutputPass": 10,
+    "clipSave": "not part of importer fix; prior actual license block unchanged",
+    "shapeQuality": "not-qualified",
+    "cases": [
+      {
+        "case": "male-source-original9",
+        "sha256": "fd827d5fa720ff08b2aa328f3c15202eb689243f12c88511b3051ec4342e03f8",
+        "importResult": "crash",
+        "stage": "Open confirmed then App quit",
+        "crashLog": "CLIP STUDIO PAINT-2026-11-06-173300.ips",
+        "crashSha256": "0677d48a7d54b2d913383f574ac6e754215839df9cd49bcc60dd8b3e10d0cc2b",
+        "captureTime": "2026-11-06 17:32:56.8717 +0900",
+        "exception": {
+          "codes": "0x0000000000000002, 0x000000016e6abff0",
+          "message": "Thread stack size exceeded due to excessive recursion",
+          "rawCodes": [
+            2,
+            6147457008
+          ],
+          "type": "EXC_BAD_ACCESS",
+          "signal": "SIGSEGV",
+          "subtype": "KERN_PROTECTION_FAILURE at 0x000000016e6abff0"
+        },
+        "topOffsets": [
+          30123520,
+          30874856,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30873424,
+          30423580,
+          30422532,
+          56826316
+        ],
+        "file": "original9.fbx"
+      },
+      {
+        "case": "male-source-max8",
+        "sha256": "63925ca18f140cac114b8011855191839e44e76797b55400bc6fcc13f67f2f8e",
+        "importResult": "crash",
+        "stage": "exact file selected and Open confirmed then App quit",
+        "crashLog": "CLIP STUDIO PAINT-2026-11-06-173408.ips",
+        "crashSha256": "76a9927eb016559afec096644062c618071e0c24b3c1bb87aa79cc3ada2e7fd4",
+        "captureTime": "2026-11-06 17:34:04.8716 +0900",
+        "exception": {
+          "codes": "0x0000000000000002, 0x000000016e6a3ff0",
+          "message": "Thread stack size exceeded due to excessive recursion",
+          "rawCodes": [
+            2,
+            6147424240
+          ],
+          "type": "EXC_BAD_ACCESS",
+          "signal": "SIGSEGV",
+          "subtype": "KERN_PROTECTION_FAILURE at 0x000000016e6a3ff0"
+        },
+        "topOffsets": [
+          30123520,
+          30874856,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30873424,
+          30423580,
+          30422532,
+          56826316
+        ],
+        "file": "max8.fbx"
+      },
+      {
+        "case": "male-source-blender-roundtrip9",
+        "sha256": "cbe22988ff50a1570c4cbbd903a81c4f2d9d37dd2da644c5797b5609a1f76cca",
+        "importResult": "crash",
+        "stage": "exact file selected and Open confirmed then App quit",
+        "crashLog": "CLIP STUDIO PAINT-2026-11-06-173549.ips",
+        "crashSha256": "4bd540fe1afa78fd60a43bcd2ac71a1a9e2110f9fde5dffab05c17d89b9ca761",
+        "captureTime": "2026-11-06 17:35:47.1239 +0900",
+        "exception": {
+          "codes": "0x0000000000000002, 0x000000016d48bff0",
+          "message": "Thread stack size exceeded due to excessive recursion",
+          "rawCodes": [
+            2,
+            6128451568
+          ],
+          "type": "EXC_BAD_ACCESS",
+          "signal": "SIGSEGV",
+          "subtype": "KERN_PROTECTION_FAILURE at 0x000000016d48bff0"
+        },
+        "topOffsets": [
+          30123520,
+          30874856,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30873424,
+          30423580,
+          30422532,
+          56826316
+        ],
+        "file": "original9-blender.fbx"
+      },
+      {
+        "case": "male-source-no-empty-clusters9",
+        "sha256": "b09c3c82f721b78a16b0fbca6f043d352d300342b5481871a2a879a3755dcfba",
+        "importResult": "crash",
+        "stage": "exact file selected and Open confirmed then App quit",
+        "crashLog": "CLIP STUDIO PAINT-2026-11-06-173719.ips",
+        "crashSha256": "b9cdea99fa99d5eae106b3095de9eb5bf99650f309219e0644df0c1bc144f2b1",
+        "captureTime": "2026-11-06 17:37:16.5436 +0900",
+        "exception": {
+          "codes": "0x0000000000000002, 0x000000016c65bff0",
+          "message": "Thread stack size exceeded due to excessive recursion",
+          "rawCodes": [
+            2,
+            6113574896
+          ],
+          "type": "EXC_BAD_ACCESS",
+          "signal": "SIGSEGV",
+          "subtype": "KERN_PROTECTION_FAILURE at 0x000000016c65bff0"
+        },
+        "topOffsets": [
+          30123520,
+          30874856,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30873424,
+          30423580,
+          30422532,
+          56826316
+        ],
+        "file": "no-empty-clusters9.fbx"
+      },
+      {
+        "case": "male-source-no-bind-pose9",
+        "sha256": "2a1223855f8f720d348e8d9e5d6fe238ecad3a59a7f9a5d1f4c1dc2d9c4b87f3",
+        "importResult": "crash",
+        "stage": "exact file selected and Open confirmed then App quit",
+        "crashLog": "CLIP STUDIO PAINT-2026-11-06-174111.ips",
+        "crashSha256": "b85736bbb1eda68d66278309fef5a472d1f187e529a2271664c5ef9e10d1bc56",
+        "captureTime": "2026-11-06 17:41:08.3357 +0900",
+        "exception": {
+          "codes": "0x0000000000000002, 0x000000016b213ff0",
+          "message": "Thread stack size exceeded due to excessive recursion",
+          "rawCodes": [
+            2,
+            6092308464
+          ],
+          "type": "EXC_BAD_ACCESS",
+          "signal": "SIGSEGV",
+          "subtype": "KERN_PROTECTION_FAILURE at 0x000000016b213ff0"
+        },
+        "topOffsets": [
+          30123520,
+          30874856,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30873424,
+          30423580,
+          30422532,
+          56826316
+        ],
+        "file": "no-bind-pose9.fbx"
+      },
+      {
+        "case": "male-source-max1-original-hierarchy",
+        "sha256": "42d5f9e250a6e0c6e4726a76ff1417db7be02a7891746777d46a0b465929ca2e",
+        "importResult": "crash",
+        "stage": "exact file selected and Open confirmed then App quit",
+        "crashLog": "CLIP STUDIO PAINT-2026-11-06-174222.ips",
+        "crashSha256": "d2d546d538c699574fcc6f12cee00fe736248df72378f7bb990912d438d76948",
+        "captureTime": "2026-11-06 17:42:20.1430 +0900",
+        "exception": {
+          "codes": "0x0000000000000002, 0x000000016b27fff0",
+          "message": "Thread stack size exceeded due to excessive recursion",
+          "rawCodes": [
+            2,
+            6092750832
+          ],
+          "type": "EXC_BAD_ACCESS",
+          "signal": "SIGSEGV",
+          "subtype": "KERN_PROTECTION_FAILURE at 0x000000016b27fff0"
+        },
+        "topOffsets": [
+          30123520,
+          30874856,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30873424,
+          30423580,
+          30422532,
+          56826316
+        ],
+        "file": "max1-original-hierarchy.fbx"
+      },
+      {
+        "case": "male-source-rename-base9",
+        "sha256": "09ca6c6debe39f2b2f33037656d731153dbb5a0a80bf41489920928a7c110bbf",
+        "importResult": "display-pass",
+        "maxInfluences": 9,
+        "onlyChangedProperty": [
+          [
+            "/8:Objects/4:Model",
+            1
+          ]
+        ],
+        "screenshot": "male-rename-base9-pass.png",
+        "screenshotSha256": "75bf714bf41a5023c81877feed8df61e7e0161f3886f7ae168027d0f99ce4a15",
+        "shapeQuality": "not-qualified",
+        "file": "rename-base9.fbx"
+      },
+      {
+        "case": "male-source-restored-name9",
+        "sha256": "fd827d5fa720ff08b2aa328f3c15202eb689243f12c88511b3051ec4342e03f8",
+        "importResult": "crash",
+        "stage": "exact file selected and Open confirmed then App quit",
+        "crashLog": "CLIP STUDIO PAINT-2026-11-06-174517.ips",
+        "crashSha256": "d484f443305ae43aad960aa247bf654e685fe70792d05830d2625852afbd796c",
+        "captureTime": "2026-11-06 17:45:14.1279 +0900",
+        "exception": {
+          "codes": "0x0000000000000002, 0x000000016d12fff0",
+          "message": "Thread stack size exceeded due to excessive recursion",
+          "rawCodes": [
+            2,
+            6124929008
+          ],
+          "type": "EXC_BAD_ACCESS",
+          "signal": "SIGSEGV",
+          "subtype": "KERN_PROTECTION_FAILURE at 0x000000016d12fff0"
+        },
+        "topOffsets": [
+          30123520,
+          30874856,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30873424,
+          30423580,
+          30422532,
+          56826316
+        ],
+        "file": "restored9.fbx"
+      },
+      {
+        "case": "fixed-app-female-source",
+        "sha256": "80c1e94e5e4b1df5640c333a15f0001e5b4fdb73becc8980a533dac2f6a59462",
+        "importResult": "display-pass",
+        "screenshot": "female-source-unchanged-pass.png",
+        "screenshotSha256": "b88ce309bebdd06675af1aee5de4ea05011329278c014540253c21f6f334bfd6",
+        "shapeQuality": "not-qualified",
+        "observedAt": "2026-11-06T08:59:21.116Z",
+        "file": "female-source.fbx"
+      },
+      {
+        "case": "fixed-app-female-yaw35",
+        "sha256": "6d694a901a7eeca38a0fd3364fc9f1c28e1769bc647d0e19150647ca9598336b",
+        "importResult": "display-pass",
+        "screenshot": "female-yaw35-unchanged-pass.png",
+        "screenshotSha256": "bf44cdb23e16408b6b226df09d4f69e35c3a3247f77008041a672a7d4db9b19e",
+        "shapeQuality": "not-qualified",
+        "observedAt": "2026-11-06T08:59:53.149Z",
+        "file": "female-yaw35.fbx"
+      },
+      {
+        "case": "fixed-app-male-source-repeat",
+        "sha256": "09ca6c6debe39f2b2f33037656d731153dbb5a0a80bf41489920928a7c110bbf",
+        "importResult": "display-pass",
+        "maxInfluences": 9,
+        "screenshot": "male-source-alias9-repeat-pass.png",
+        "screenshotSha256": "80f3f31d9f99dcfa892aaf496f9e33f5beb967fa597d95e0c6080b104aa36250",
+        "shapeQuality": "not-qualified",
+        "file": "male-source.fbx"
+      },
+      {
+        "case": "fixed-app-male-yaw35",
+        "sha256": "1c4b45259a99fc17d6003d5dfe77e47c93a7489969a4391c6b8c3e3b3c95ddbd",
+        "importResult": "display-pass",
+        "maxInfluences": 9,
+        "screenshot": "male-yaw35-alias9-pass.png",
+        "screenshotSha256": "9ffdff0ffe204075af5dea0762b21020eefac65be07190d8d727ce6be62b928c",
+        "shapeQuality": "not-qualified",
+        "file": "male-yaw35.fbx"
+      },
+      {
+        "case": "fresh-v11-male-seated",
+        "sha256": "d45b112861b9668c42d572293cadd75e9976fd460f71f3f128ca65d4d30a3038",
+        "importResult": "display-pass",
+        "screenshot": "fresh-v11-male-seated-pass.png",
+        "screenshotSha256": "70e1ebd76cfee347afc1b3468af7b5f445ca09092d10672ddd31a4c555867707",
+        "shapeQuality": "not-qualified",
+        "observedAt": "2026-11-06T09:00:44.635Z",
+        "file": "model-0-pose-0.fbx"
+      },
+      {
+        "case": "fresh-v11-male-cmu",
+        "sha256": "0489f7827d47d5b9302ac971efc1d7d110e86309c2cca123b8188b672eaa8b5d",
+        "importResult": "display-pass",
+        "screenshot": "fresh-v11-male-cmu-pass.png",
+        "screenshotSha256": "6d08c08ce71c5f8167aef0bf610fdc061fdf4c6ad5ca3543ec57bcca02342546",
+        "shapeQuality": "not-qualified",
+        "observedAt": "2026-11-06T09:01:09.822Z",
+        "file": "model-0-pose-1.fbx"
+      },
+      {
+        "case": "fresh-v11-female-cmu",
+        "sha256": "cead62f91a3801cc4608e63fabbe49c82e60dcc9ea93dfddf17dc901a725765f",
+        "importResult": "display-pass",
+        "screenshot": "fresh-v11-female-cmu-pass.png",
+        "screenshotSha256": "e6820d142788e10b745e06177651bfd20d7a145bf133c1e9225f98acdb3974ee",
+        "shapeQuality": "not-qualified",
+        "observedAt": "2026-11-06T09:02:56.392Z",
+        "file": "model-1-pose-1.fbx"
+      },
+      {
+        "case": "fresh-v11-child-cmu",
+        "sha256": "26c359d95e68e3107327a1f70c5325670528509c3120f057d0e56175f74086b0",
+        "importResult": "display-pass",
+        "screenshot": "fresh-v11-child-cmu-pass.png",
+        "screenshotSha256": "da1a812f40f4a7d5cb46e6a95fd9085643154f8df3bb9c71d5a8398ce9acc0f5",
+        "shapeQuality": "not-qualified",
+        "observedAt": "2026-11-06T09:03:44.310Z",
+        "file": "model-2-pose-1.fbx"
+      },
+      {
+        "case": "fresh-v11-male-source",
+        "sha256": "aae323cba49f89815d7986294e06910666ff187e2cb343eeb0dfc5e7baff23cf",
+        "importResult": "display-pass",
+        "screenshot": "fresh-v11-male-source-pass.png",
+        "screenshotSha256": "94636cadd0039f7b39d708e6329b875840903ea96f6a287d36144ff968dcd4a9",
+        "shapeQuality": "not-qualified",
+        "observedAt": "2026-11-06T09:05:00.351Z",
+        "file": "male-source.fbx"
+      },
+      {
+        "case": "fresh-v11-male-yaw35",
+        "sha256": "6f0ea10b0da152322a66bc7ebd68eb753639424fa919820074b0833910881565",
+        "importResult": "display-pass",
+        "screenshot": "fresh-v11-male-yaw35-pass.png",
+        "screenshotSha256": "6f80871b660d4528befa4a6d0a8564f03fe8ec92b90a8578ceb9d24d2477a1da",
+        "shapeQuality": "not-qualified",
+        "observedAt": "2026-11-06T09:05:24.549Z",
+        "file": "male-yaw35.fbx"
+      },
+      {
+        "case": "fresh-v11-female-source",
+        "sha256": "96eaa763e7879a99263c008cbf870d96bf7631faf693113196715b274c333b70",
+        "importResult": "display-pass",
+        "screenshot": "fresh-v11-female-source-pass.png",
+        "screenshotSha256": "6c5b178c2182fe33d3d627e4fcf146c5e75c23e0379ad59dcb56cd857429d1c3",
+        "shapeQuality": "not-qualified",
+        "observedAt": "2026-11-06T09:06:22.239Z",
+        "file": "female-source.fbx"
+      },
+      {
+        "case": "fresh-v11-female-yaw35",
+        "sha256": "60c9cd7ef29c8a1d290d6c7b3624ae4ca5ad20c1a485e8e563c9fc467d215c97",
+        "importResult": "display-pass",
+        "screenshot": "fresh-v11-female-yaw35-pass.png",
+        "screenshotSha256": "ce3a635513d2acbed9da0a65be9bd28aa4e522e8791b0001f920a97274503cdd",
+        "shapeQuality": "not-qualified",
+        "observedAt": "2026-11-06T09:06:41.791Z",
+        "file": "female-yaw35.fbx"
+      },
+      {
+        "case": "fresh-v11-female-seated",
+        "sha256": "0a7dfccecae889e563d0f78df00022ad58180a2cda699e1d1466f10a14d2f908",
+        "importResult": "display-pass",
+        "screenshot": "fresh-v11-female-seated-pass.png",
+        "screenshotSha256": "a6a11ed88ea5fd2e0b8e38b117cbf53886d21a18678cc008d2b0bdf986180707",
+        "shapeQuality": "not-qualified",
+        "observedAt": "2026-11-06T09:08:02.746Z",
+        "file": "model-1-pose-0.fbx"
+      },
+      {
+        "case": "fresh-v11-child-seated",
+        "sha256": "866aa6811326daf3f45decad409a02c4b993567e8c304a64bcc866dd187ea69d",
+        "importResult": "display-pass",
+        "screenshot": "fresh-v11-child-seated-pass.png",
+        "screenshotSha256": "53d8ae79d34800c6efe29a8df81afab7fe1f715a00db3d67cc70c48ee72b6aed",
+        "shapeQuality": "not-qualified",
+        "observedAt": "2026-11-06T09:08:23.074Z",
+        "file": "model-2-pose-0.fbx"
+      },
+      {
+        "case": "male-source-max8-repeat",
+        "sha256": "63925ca18f140cac114b8011855191839e44e76797b55400bc6fcc13f67f2f8e",
+        "importResult": "crash",
+        "stage": "exact file selected and Open confirmed then App quit",
+        "crashLog": "CLIP STUDIO PAINT-2026-11-06-180902.ips",
+        "crashSha256": "7a0915b7c99076c6383ca543c49b0ba5175bac833ad4ebadd2c060e8efc6daf7",
+        "captureTime": "2026-11-06 18:08:58.9971 +0900",
+        "exception": {
+          "codes": "0x0000000000000002, 0x000000016eaa7ff0",
+          "message": "Thread stack size exceeded due to excessive recursion",
+          "rawCodes": [
+            2,
+            6151634928
+          ],
+          "type": "EXC_BAD_ACCESS",
+          "signal": "SIGSEGV",
+          "subtype": "KERN_PROTECTION_FAILURE at 0x000000016eaa7ff0"
+        },
+        "topOffsets": [
+          30123520,
+          30874856,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30873424,
+          30423580,
+          30422532,
+          56826316
+        ],
+        "file": "max8.fbx"
+      },
+      {
+        "case": "fresh-v11-male-restored-original-name9",
+        "sha256": "d08dfb6aa256ca48e764d2a010b002a5e2940774c141d9768d3318b4b2a5ab49",
+        "importResult": "crash",
+        "stage": "exact file selected and Open confirmed then App quit",
+        "crashLog": "CLIP STUDIO PAINT-2026-11-06-181417.ips",
+        "crashSha256": "26d4cafe194de81690d343d3375143d485d95ea5f5d1d88c109cd050db8bbbb6",
+        "captureTime": "2026-11-06 18:14:14.5098 +0900",
+        "exception": {
+          "codes": "0x0000000000000002, 0x000000016b4a3ff0",
+          "message": "Thread stack size exceeded due to excessive recursion",
+          "rawCodes": [
+            2,
+            6094995440
+          ],
+          "type": "EXC_BAD_ACCESS",
+          "signal": "SIGSEGV",
+          "subtype": "KERN_PROTECTION_FAILURE at 0x000000016b4a3ff0"
+        },
+        "topOffsets": [
+          30123520,
+          30874856,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30875312,
+          30873424,
+          30423580,
+          30422532,
+          56826316
+        ],
+        "file": "male-pose-0-original-name9.fbx"
+      },
+      {
+        "case": "fresh-v11-male-yaw35-final-repeat",
+        "sha256": "6f0ea10b0da152322a66bc7ebd68eb753639424fa919820074b0833910881565",
+        "importResult": "display-pass",
+        "screenshot": "fresh-v11-male-yaw35-final-pass.png",
+        "screenshotSha256": "287d3543f4eebc52273d7bc1cb27016b964c5f48ac79f6c61a471a8cce506bbe",
+        "shapeQuality": "not-qualified",
+        "observedAt": "2026-11-06T09:17:12.673Z",
+        "file": "male-yaw35.fbx"
+      }
+    ]
+  },
+  "fixedPriorAppAudits": [
+    {
+      "case": "male-source",
+      "sourceSha256": "fd827d5fa720ff08b2aa328f3c15202eb689243f12c88511b3051ec4342e03f8",
+      "outputSha256": "09ca6c6debe39f2b2f33037656d731153dbb5a0a80bf41489920928a7c110bbf",
+      "file": "male-source.fbx",
+      "nameAliases": [
+        {
+          "objectId": 885584777,
+          "original": "root_group_",
+          "exported": "StandinBase"
+        }
+      ],
+      "onlyChangedProperties": [
+        "/8:Objects/4:Model"
+      ],
+      "allOtherBytesExact": true,
+      "maxInfluences": 9,
+      "sourceModelSha256": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+      "poseSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+      "camera": {
+        "version": "personal-camera/1",
+        "sourceBvhSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+        "rotation": [
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "case": "male-yaw35",
+      "sourceSha256": "d5b7453f3bbf4fa83aadccd53f32ee6fe10c0b42ba36e7e4bbf57d57849297d8",
+      "outputSha256": "1c4b45259a99fc17d6003d5dfe77e47c93a7489969a4391c6b8c3e3b3c95ddbd",
+      "file": "male-yaw35.fbx",
+      "nameAliases": [
+        {
+          "objectId": 495293553,
+          "original": "root_group_",
+          "exported": "StandinBase"
+        }
+      ],
+      "onlyChangedProperties": [
+        "/8:Objects/4:Model"
+      ],
+      "allOtherBytesExact": true,
+      "maxInfluences": 9,
+      "sourceModelSha256": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+      "poseSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+      "camera": {
+        "version": "personal-camera/1",
+        "sourceBvhSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+        "rotation": [
+          [
+            0.8191520442889918,
+            0,
+            0.573576436351046
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            -0.573576436351046,
+            0,
+            0.8191520442889918
+          ]
+        ]
+      }
+    },
+    {
+      "case": "female-yaw35",
+      "sourceSha256": "6d694a901a7eeca38a0fd3364fc9f1c28e1769bc647d0e19150647ca9598336b",
+      "outputSha256": "6d694a901a7eeca38a0fd3364fc9f1c28e1769bc647d0e19150647ca9598336b",
+      "file": "female-yaw35.fbx",
+      "nameAliases": [],
+      "onlyChangedProperties": [],
+      "allOtherBytesExact": true,
+      "maxInfluences": 8,
+      "sourceModelSha256": "fb47d89d1507c377b0af136b9dc6357ef35787c59ac79467ee180b2e1640017f",
+      "poseSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+      "camera": {
+        "version": "personal-camera/1",
+        "sourceBvhSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+        "rotation": [
+          [
+            0.8191520442889918,
+            0,
+            0.573576436351046
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            -0.573576436351046,
+            0,
+            0.8191520442889918
+          ]
+        ]
+      }
+    },
+    {
+      "case": "female-source",
+      "sourceSha256": "80c1e94e5e4b1df5640c333a15f0001e5b4fdb73becc8980a533dac2f6a59462",
+      "outputSha256": "80c1e94e5e4b1df5640c333a15f0001e5b4fdb73becc8980a533dac2f6a59462",
+      "file": "female-source.fbx",
+      "nameAliases": [],
+      "onlyChangedProperties": [],
+      "allOtherBytesExact": true,
+      "maxInfluences": 8,
+      "sourceModelSha256": "fb47d89d1507c377b0af136b9dc6357ef35787c59ac79467ee180b2e1640017f",
+      "poseSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+      "camera": {
+        "version": "personal-camera/1",
+        "sourceBvhSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+        "rotation": [
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1
+          ]
+        ]
+      }
+    }
+  ],
+  "freshPackage": {
+    "allPassed": true,
+    "models": [
+      {
+        "modelIndex": 0,
+        "sourceSha256": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+        "normalizedSha256": "1ba41c8bd7e187bb8252680ed810a0dfdb1f8ab4c985337095392d082eae7368",
+        "archiveSha256": "df7cf26a280d403ebecd51accd1a282b3b4f90d7cde4aed1f501a90408b9a582",
+        "poses": [
+          {
+            "poseHash": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+            "snapshotHash": "356563078d8fc8be750746fef8b0f4a2e373ca6032cc25fe189600d89f1b41a7",
+            "artifactHash": "d45b112861b9668c42d572293cadd75e9976fd460f71f3f128ca65d4d30a3038",
+            "validation": {
+              "passed": true,
+              "meshCount": 1,
+              "originalBoneCount": 66,
+              "vertexCount": 24988,
+              "maxSurfaceError": 7.588719199702609e-07,
+              "maxSkinProbeError": 8.765126153775782e-07,
+              "maxMaterialRegionError": 7.588719199702609e-07,
+              "materialCount": 1,
+              "tolerance": 1.7444062930276232e-05,
+              "fkProbes": {
+                "forearm.L": {
+                  "joint": "forearm.L",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.10876463535284306
+                },
+                "forearm.R": {
+                  "joint": "forearm.R",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.1089407657011523
+                },
+                "leg.L": {
+                  "joint": "leg.L",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.12953315171815846
+                },
+                "leg.R": {
+                  "joint": "leg.R",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.12953383322654813
+                },
+                "spine": {
+                  "joint": "spine",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.1619044103071455
+                }
+              },
+              "blenderVersion": "5.2.0 LTS",
+              "materialPreservation": {
+                "passed": true,
+                "materialCount": 1,
+                "maxDiffuseError": 0.0,
+                "maxSpecularError": 0.0,
+                "maxShininessError": 2.288818308215923e-07,
+                "maxOpacityError": 0.0
+              },
+              "cspCompatibility": {
+                "version": "personal-csp-names/1",
+                "applied": true,
+                "nameAliases": [
+                  {
+                    "objectId": 757630619,
+                    "original": "root_group_",
+                    "exported": "StandinBase"
+                  }
+                ],
+                "allOtherBytesExact": true,
+                "weightsTruncated": false,
+                "beforeSha256": "d08dfb6aa256ca48e764d2a010b002a5e2940774c141d9768d3318b4b2a5ab49",
+                "outputSha256": "d45b112861b9668c42d572293cadd75e9976fd460f71f3f128ca65d4d30a3038"
+              }
+            },
+            "file": "model-0-pose-0.fbx"
+          },
+          {
+            "poseHash": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+            "snapshotHash": "67a161ea84387678044c6aa6e66a8b6465ba3ebe986081b21e5411e04063674c",
+            "artifactHash": "0489f7827d47d5b9302ac971efc1d7d110e86309c2cca123b8188b672eaa8b5d",
+            "validation": {
+              "passed": true,
+              "meshCount": 1,
+              "originalBoneCount": 66,
+              "vertexCount": 24988,
+              "maxSurfaceError": 7.863804398766661e-07,
+              "maxSkinProbeError": 8.741165515857574e-07,
+              "maxMaterialRegionError": 7.715578931311029e-07,
+              "materialCount": 1,
+              "tolerance": 1.794299856504494e-05,
+              "fkProbes": {
+                "forearm.L": {
+                  "joint": "forearm.L",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.10793333136350992
+                },
+                "forearm.R": {
+                  "joint": "forearm.R",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.10894761871610623
+                },
+                "leg.L": {
+                  "joint": "leg.L",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.1298630121431651
+                },
+                "leg.R": {
+                  "joint": "leg.R",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.12857908758643313
+                },
+                "spine": {
+                  "joint": "spine",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.19067972956405657
+                }
+              },
+              "blenderVersion": "5.2.0 LTS",
+              "materialPreservation": {
+                "passed": true,
+                "materialCount": 1,
+                "maxDiffuseError": 0.0,
+                "maxSpecularError": 0.0,
+                "maxShininessError": 2.288818308215923e-07,
+                "maxOpacityError": 0.0
+              },
+              "cspCompatibility": {
+                "version": "personal-csp-names/1",
+                "applied": true,
+                "nameAliases": [
+                  {
+                    "objectId": 759673599,
+                    "original": "root_group_",
+                    "exported": "StandinBase"
+                  }
+                ],
+                "allOtherBytesExact": true,
+                "weightsTruncated": false,
+                "beforeSha256": "00dfe134555b454c3269521d7f7f68ca57f439eacfc7fff7f8984717a0856ed8",
+                "outputSha256": "0489f7827d47d5b9302ac971efc1d7d110e86309c2cca123b8188b672eaa8b5d"
+              }
+            },
+            "file": "model-0-pose-1.fbx"
+          }
+        ]
+      },
+      {
+        "modelIndex": 1,
+        "sourceSha256": "fb47d89d1507c377b0af136b9dc6357ef35787c59ac79467ee180b2e1640017f",
+        "normalizedSha256": "5db73f45761d1a50ba4cdb3bb45c55569de37a6984e761818f1717c0928390cd",
+        "archiveSha256": "b5d34a26d66426b02058e1eb253af66687b30af341b14dba5b0ca2ac581b9266",
+        "poses": [
+          {
+            "poseHash": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+            "snapshotHash": "28dd9a066ee24df3971bad47ed51691eb2f87eb6f44f6ed075ef410b762ed029",
+            "artifactHash": "0a7dfccecae889e563d0f78df00022ad58180a2cda699e1d1466f10a14d2f908",
+            "validation": {
+              "passed": true,
+              "meshCount": 1,
+              "originalBoneCount": 78,
+              "vertexCount": 90143,
+              "maxSurfaceError": 4.989108219888294e-07,
+              "maxSkinProbeError": 8.905859658625559e-07,
+              "maxMaterialRegionError": 5.405651677392598e-07,
+              "materialCount": 2,
+              "tolerance": 1.6550384307532303e-05,
+              "fkProbes": {
+                "forearm.L": {
+                  "joint": "forearm.L",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.09180362969335634
+                },
+                "forearm.R": {
+                  "joint": "forearm.R",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.09181683868864866
+                },
+                "leg.L": {
+                  "joint": "leg.L",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.13659136453160323
+                },
+                "leg.R": {
+                  "joint": "leg.R",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.13652318366471464
+                },
+                "spine": {
+                  "joint": "spine",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.14171426046229135
+                }
+              },
+              "blenderVersion": "5.2.0 LTS",
+              "materialPreservation": {
+                "passed": true,
+                "materialCount": 2,
+                "maxDiffuseError": 0.0,
+                "maxSpecularError": 0.0,
+                "maxShininessError": 0.0,
+                "maxOpacityError": 0.0
+              },
+              "cspCompatibility": {
+                "version": "personal-csp-names/1",
+                "applied": false,
+                "nameAliases": [],
+                "allOtherBytesExact": true,
+                "weightsTruncated": false,
+                "beforeSha256": "0a7dfccecae889e563d0f78df00022ad58180a2cda699e1d1466f10a14d2f908",
+                "outputSha256": "0a7dfccecae889e563d0f78df00022ad58180a2cda699e1d1466f10a14d2f908"
+              }
+            },
+            "file": "model-1-pose-0.fbx"
+          },
+          {
+            "poseHash": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+            "snapshotHash": "9e0b6e99740d74dab2b6c3403101ddebb6bf8e86b7d8be1bf4a6ffd93fbaeba1",
+            "artifactHash": "cead62f91a3801cc4608e63fabbe49c82e60dcc9ea93dfddf17dc901a725765f",
+            "validation": {
+              "passed": true,
+              "meshCount": 1,
+              "originalBoneCount": 78,
+              "vertexCount": 90143,
+              "maxSurfaceError": 6.26557948635309e-07,
+              "maxSkinProbeError": 9.974877457352704e-07,
+              "maxMaterialRegionError": 6.848052294117224e-07,
+              "materialCount": 2,
+              "tolerance": 1.730607898612481e-05,
+              "fkProbes": {
+                "forearm.L": {
+                  "joint": "forearm.L",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.09233108396797761
+                },
+                "forearm.R": {
+                  "joint": "forearm.R",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.09233929214988855
+                },
+                "leg.L": {
+                  "joint": "leg.L",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.13710820378836752
+                },
+                "leg.R": {
+                  "joint": "leg.R",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.13606064599410553
+                },
+                "spine": {
+                  "joint": "spine",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.17750415233275985
+                }
+              },
+              "blenderVersion": "5.2.0 LTS",
+              "materialPreservation": {
+                "passed": true,
+                "materialCount": 2,
+                "maxDiffuseError": 0.0,
+                "maxSpecularError": 0.0,
+                "maxShininessError": 0.0,
+                "maxOpacityError": 0.0
+              },
+              "cspCompatibility": {
+                "version": "personal-csp-names/1",
+                "applied": false,
+                "nameAliases": [],
+                "allOtherBytesExact": true,
+                "weightsTruncated": false,
+                "beforeSha256": "cead62f91a3801cc4608e63fabbe49c82e60dcc9ea93dfddf17dc901a725765f",
+                "outputSha256": "cead62f91a3801cc4608e63fabbe49c82e60dcc9ea93dfddf17dc901a725765f"
+              }
+            },
+            "file": "model-1-pose-1.fbx"
+          }
+        ]
+      },
+      {
+        "modelIndex": 2,
+        "sourceSha256": "b195a3ff87d67365f343fee9049f9d25026d6a49e4987d9e895d3a3f25e72385",
+        "normalizedSha256": "23ac1c2c757302cd6edc2241a8ce65c27869fb0455866e492ad0d7ab5364a7c1",
+        "archiveSha256": "d57ff02fb56947a03f810eecf5864c746dce090fc5ceb3a8b949257cae9f7963",
+        "poses": [
+          {
+            "poseHash": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+            "snapshotHash": "322c6c1ac23e791b20511422f91957fb8f5de69657e516c0af97d154d05f1a8c",
+            "artifactHash": "866aa6811326daf3f45decad409a02c4b993567e8c304a64bcc866dd187ea69d",
+            "validation": {
+              "passed": true,
+              "meshCount": 1,
+              "originalBoneCount": 78,
+              "vertexCount": 179990,
+              "maxSurfaceError": 3.378532369424647e-07,
+              "maxSkinProbeError": 5.591907665802864e-07,
+              "maxMaterialRegionError": 3.499592651223793e-07,
+              "materialCount": 1,
+              "tolerance": 1.1996233001911324e-05,
+              "fkProbes": {
+                "forearm.L": {
+                  "joint": "forearm.L",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.07290007378266114
+                },
+                "forearm.R": {
+                  "joint": "forearm.R",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.07305240409905168
+                },
+                "leg.L": {
+                  "joint": "leg.L",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.07747644247191439
+                },
+                "leg.R": {
+                  "joint": "leg.R",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.0775325893730777
+                },
+                "spine": {
+                  "joint": "spine",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.13097317589743548
+                }
+              },
+              "blenderVersion": "5.2.0 LTS",
+              "materialPreservation": {
+                "passed": true,
+                "materialCount": 1,
+                "maxDiffuseError": 0.0,
+                "maxSpecularError": 0.0,
+                "maxShininessError": 0.0,
+                "maxOpacityError": 0.0
+              },
+              "cspCompatibility": {
+                "version": "personal-csp-names/1",
+                "applied": false,
+                "nameAliases": [],
+                "allOtherBytesExact": true,
+                "weightsTruncated": false,
+                "beforeSha256": "866aa6811326daf3f45decad409a02c4b993567e8c304a64bcc866dd187ea69d",
+                "outputSha256": "866aa6811326daf3f45decad409a02c4b993567e8c304a64bcc866dd187ea69d"
+              }
+            },
+            "file": "model-2-pose-0.fbx"
+          },
+          {
+            "poseHash": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+            "snapshotHash": "317e343727fbf292b67e36218ffe3453ff62255928c8e012c2eebfc3e4d5d652",
+            "artifactHash": "26c359d95e68e3107327a1f70c5325670528509c3120f057d0e56175f74086b0",
+            "validation": {
+              "passed": true,
+              "meshCount": 1,
+              "originalBoneCount": 78,
+              "vertexCount": 179990,
+              "maxSurfaceError": 4.6843950940456125e-07,
+              "maxSkinProbeError": 6.563280408045102e-07,
+              "maxMaterialRegionError": 5.5033518719938e-07,
+              "materialCount": 1,
+              "tolerance": 1.1951352374757548e-05,
+              "fkProbes": {
+                "forearm.L": {
+                  "joint": "forearm.L",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.07320601066087389
+                },
+                "forearm.R": {
+                  "joint": "forearm.R",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.0732322213614935
+                },
+                "leg.L": {
+                  "joint": "leg.L",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.07793606520170525
+                },
+                "leg.R": {
+                  "joint": "leg.R",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.07762216722128094
+                },
+                "spine": {
+                  "joint": "spine",
+                  "rotationRadians": 0.25,
+                  "maxVertexDisplacement": 0.13274146268735848
+                }
+              },
+              "blenderVersion": "5.2.0 LTS",
+              "materialPreservation": {
+                "passed": true,
+                "materialCount": 1,
+                "maxDiffuseError": 0.0,
+                "maxSpecularError": 0.0,
+                "maxShininessError": 0.0,
+                "maxOpacityError": 0.0
+              },
+              "cspCompatibility": {
+                "version": "personal-csp-names/1",
+                "applied": false,
+                "nameAliases": [],
+                "allOtherBytesExact": true,
+                "weightsTruncated": false,
+                "beforeSha256": "26c359d95e68e3107327a1f70c5325670528509c3120f057d0e56175f74086b0",
+                "outputSha256": "26c359d95e68e3107327a1f70c5325670528509c3120f057d0e56175f74086b0"
+              }
+            },
+            "file": "model-2-pose-1.fbx"
+          }
+        ]
+      }
+    ]
+  },
+  "freshCameras": [
+    {
+      "case": "male-source",
+      "file": "male-source.fbx",
+      "sourceSha256": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+      "poseSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+      "outputSha256": "aae323cba49f89815d7986294e06910666ff187e2cb343eeb0dfc5e7baff23cf",
+      "camera": {
+        "version": "personal-camera/1",
+        "sourceBvhSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+        "rotation": [
+          [
+            1.0,
+            0,
+            0.0
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            -0.0,
+            0,
+            1.0
+          ]
+        ]
+      },
+      "snapshotHash": "1b5ef23bafcaad9e0736fbe6827233d36807004260f68e905a821879e5b6ec69",
+      "validation": {
+        "passed": true,
+        "meshCount": 1,
+        "originalBoneCount": 66,
+        "vertexCount": 24988,
+        "maxSurfaceError": 7.588719199702609e-07,
+        "maxSkinProbeError": 8.765126153775782e-07,
+        "maxMaterialRegionError": 7.588719199702609e-07,
+        "materialCount": 1,
+        "tolerance": 1.7444062930276232e-05,
+        "fkProbes": {
+          "forearm.L": {
+            "joint": "forearm.L",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.10876463535284306
+          },
+          "forearm.R": {
+            "joint": "forearm.R",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.1089407657011523
+          },
+          "leg.L": {
+            "joint": "leg.L",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.12953315171815846
+          },
+          "leg.R": {
+            "joint": "leg.R",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.12953383322654813
+          },
+          "spine": {
+            "joint": "spine",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.1619044103071455
+          }
+        },
+        "blenderVersion": "5.2.0 LTS",
+        "materialPreservation": {
+          "passed": true,
+          "materialCount": 1,
+          "maxDiffuseError": 0.0,
+          "maxSpecularError": 0.0,
+          "maxShininessError": 2.288818308215923e-07,
+          "maxOpacityError": 0.0
+        },
+        "cspCompatibility": {
+          "version": "personal-csp-names/1",
+          "applied": true,
+          "nameAliases": [
+            {
+              "objectId": 753987266,
+              "original": "root_group_",
+              "exported": "StandinBase"
+            }
+          ],
+          "allOtherBytesExact": true,
+          "weightsTruncated": false,
+          "beforeSha256": "d2bbd5cb71f25158e1b03077ae303ae784015d4ba916607cb5dd714c74a53775",
+          "outputSha256": "aae323cba49f89815d7986294e06910666ff187e2cb343eeb0dfc5e7baff23cf"
+        }
+      },
+      "cacheReuse": true
+    },
+    {
+      "case": "male-yaw35",
+      "file": "male-yaw35.fbx",
+      "sourceSha256": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+      "poseSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+      "outputSha256": "6f0ea10b0da152322a66bc7ebd68eb753639424fa919820074b0833910881565",
+      "camera": {
+        "version": "personal-camera/1",
+        "sourceBvhSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+        "rotation": [
+          [
+            0.8191520442889918,
+            0,
+            0.573576436351046
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            -0.573576436351046,
+            0,
+            0.8191520442889918
+          ]
+        ]
+      },
+      "snapshotHash": "ddfd4d7f4717a6fab060e1992ea88dc30a58e51709813618686e01f2f11b7cfd",
+      "validation": {
+        "passed": true,
+        "meshCount": 1,
+        "originalBoneCount": 66,
+        "vertexCount": 24988,
+        "maxSurfaceError": 5.127385520609096e-07,
+        "maxSkinProbeError": 6.283273705776082e-07,
+        "maxMaterialRegionError": 5.101335887047753e-07,
+        "materialCount": 1,
+        "tolerance": 1.744625328763418e-05,
+        "fkProbes": {
+          "forearm.L": {
+            "joint": "forearm.L",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.10876471191225792
+          },
+          "forearm.R": {
+            "joint": "forearm.R",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.10894100590790161
+          },
+          "leg.L": {
+            "joint": "leg.L",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.1295331356076952
+          },
+          "leg.R": {
+            "joint": "leg.R",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.12953380917931084
+          },
+          "spine": {
+            "joint": "spine",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.16190432910397198
+          }
+        },
+        "blenderVersion": "5.2.0 LTS",
+        "materialPreservation": {
+          "passed": true,
+          "materialCount": 1,
+          "maxDiffuseError": 0.0,
+          "maxSpecularError": 0.0,
+          "maxShininessError": 2.288818308215923e-07,
+          "maxOpacityError": 0.0
+        },
+        "cspCompatibility": {
+          "version": "personal-csp-names/1",
+          "applied": true,
+          "nameAliases": [
+            {
+              "objectId": 348150160,
+              "original": "root_group_",
+              "exported": "StandinBase"
+            }
+          ],
+          "allOtherBytesExact": true,
+          "weightsTruncated": false,
+          "beforeSha256": "98f18fea9f820d531ec935f70f61b6f7e5c3383a89eefc297072cb4887a9d85f",
+          "outputSha256": "6f0ea10b0da152322a66bc7ebd68eb753639424fa919820074b0833910881565"
+        }
+      },
+      "cacheReuse": true
+    },
+    {
+      "case": "female-source",
+      "file": "female-source.fbx",
+      "sourceSha256": "fb47d89d1507c377b0af136b9dc6357ef35787c59ac79467ee180b2e1640017f",
+      "poseSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+      "outputSha256": "96eaa763e7879a99263c008cbf870d96bf7631faf693113196715b274c333b70",
+      "camera": {
+        "version": "personal-camera/1",
+        "sourceBvhSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+        "rotation": [
+          [
+            1.0,
+            0,
+            0.0
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            -0.0,
+            0,
+            1.0
+          ]
+        ]
+      },
+      "snapshotHash": "4a8e68aff00d10659223d0cd7b488b0c30dd4e8626f3f47cda308cff0ab82dee",
+      "validation": {
+        "passed": true,
+        "meshCount": 1,
+        "originalBoneCount": 78,
+        "vertexCount": 90143,
+        "maxSurfaceError": 4.989108219888294e-07,
+        "maxSkinProbeError": 8.905859658625559e-07,
+        "maxMaterialRegionError": 5.405651677392598e-07,
+        "materialCount": 2,
+        "tolerance": 1.6550384307532303e-05,
+        "fkProbes": {
+          "forearm.L": {
+            "joint": "forearm.L",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.09180362969335634
+          },
+          "forearm.R": {
+            "joint": "forearm.R",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.09181683868864866
+          },
+          "leg.L": {
+            "joint": "leg.L",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.13659136453160323
+          },
+          "leg.R": {
+            "joint": "leg.R",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.13652318366471464
+          },
+          "spine": {
+            "joint": "spine",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.14171426046229135
+          }
+        },
+        "blenderVersion": "5.2.0 LTS",
+        "materialPreservation": {
+          "passed": true,
+          "materialCount": 2,
+          "maxDiffuseError": 0.0,
+          "maxSpecularError": 0.0,
+          "maxShininessError": 0.0,
+          "maxOpacityError": 0.0
+        },
+        "cspCompatibility": {
+          "version": "personal-csp-names/1",
+          "applied": false,
+          "nameAliases": [],
+          "allOtherBytesExact": true,
+          "weightsTruncated": false,
+          "beforeSha256": "96eaa763e7879a99263c008cbf870d96bf7631faf693113196715b274c333b70",
+          "outputSha256": "96eaa763e7879a99263c008cbf870d96bf7631faf693113196715b274c333b70"
+        }
+      },
+      "cacheReuse": true
+    },
+    {
+      "case": "female-yaw35",
+      "file": "female-yaw35.fbx",
+      "sourceSha256": "fb47d89d1507c377b0af136b9dc6357ef35787c59ac79467ee180b2e1640017f",
+      "poseSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+      "outputSha256": "60c9cd7ef29c8a1d290d6c7b3624ae4ca5ad20c1a485e8e563c9fc467d215c97",
+      "camera": {
+        "version": "personal-camera/1",
+        "sourceBvhSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+        "rotation": [
+          [
+            0.8191520442889918,
+            0,
+            0.573576436351046
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            -0.573576436351046,
+            0,
+            0.8191520442889918
+          ]
+        ]
+      },
+      "snapshotHash": "2b30a04d35aa58da3140e2b84e004a28d64858c49043894b8a14795cccf7fc08",
+      "validation": {
+        "passed": true,
+        "meshCount": 1,
+        "originalBoneCount": 78,
+        "vertexCount": 90143,
+        "maxSurfaceError": 3.9198835111164954e-07,
+        "maxSkinProbeError": 6.005464001646033e-07,
+        "maxMaterialRegionError": 5.0046611477228e-07,
+        "materialCount": 2,
+        "tolerance": 1.654313786593061e-05,
+        "fkProbes": {
+          "forearm.L": {
+            "joint": "forearm.L",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.0918037702262534
+          },
+          "forearm.R": {
+            "joint": "forearm.R",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.09181677851645098
+          },
+          "leg.L": {
+            "joint": "leg.L",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.1365913814903711
+          },
+          "leg.R": {
+            "joint": "leg.R",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.13652308212235195
+          },
+          "spine": {
+            "joint": "spine",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.1417142162672941
+          }
+        },
+        "blenderVersion": "5.2.0 LTS",
+        "materialPreservation": {
+          "passed": true,
+          "materialCount": 2,
+          "maxDiffuseError": 0.0,
+          "maxSpecularError": 0.0,
+          "maxShininessError": 0.0,
+          "maxOpacityError": 0.0
+        },
+        "cspCompatibility": {
+          "version": "personal-csp-names/1",
+          "applied": false,
+          "nameAliases": [],
+          "allOtherBytesExact": true,
+          "weightsTruncated": false,
+          "beforeSha256": "60c9cd7ef29c8a1d290d6c7b3624ae4ca5ad20c1a485e8e563c9fc467d215c97",
+          "outputSha256": "60c9cd7ef29c8a1d290d6c7b3624ae4ca5ad20c1a485e8e563c9fc467d215c97"
+        }
+      },
+      "cacheReuse": true
+    }
+  ],
+  "freshDecodedByteAudit": [
+    {
+      "model": 0,
+      "pose": 0,
+      "sourceSha256": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+      "poseSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+      "beforeAliasSha256": "d08dfb6aa256ca48e764d2a010b002a5e2940774c141d9768d3318b4b2a5ab49",
+      "outputSha256": "d45b112861b9668c42d572293cadd75e9976fd460f71f3f128ca65d4d30a3038",
+      "maxInfluences": 9,
+      "changedPropertyPaths": [
+        "/8:Objects/4:Model"
+      ],
+      "weightsExact": true,
+      "geometryNormalsMaterialsBindPoseHierarchyIdsAllOtherBytesExact": true,
+      "byteLengthExact": true,
+      "validation": {
+        "passed": true,
+        "meshCount": 1,
+        "originalBoneCount": 66,
+        "vertexCount": 24988,
+        "maxSurfaceError": 7.588719199702609e-07,
+        "maxSkinProbeError": 8.765126153775782e-07,
+        "maxMaterialRegionError": 7.588719199702609e-07,
+        "materialCount": 1,
+        "tolerance": 1.7444062930276232e-05,
+        "fkProbes": {
+          "forearm.L": {
+            "joint": "forearm.L",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.10876463535284306
+          },
+          "forearm.R": {
+            "joint": "forearm.R",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.1089407657011523
+          },
+          "leg.L": {
+            "joint": "leg.L",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.12953315171815846
+          },
+          "leg.R": {
+            "joint": "leg.R",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.12953383322654813
+          },
+          "spine": {
+            "joint": "spine",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.1619044103071455
+          }
+        },
+        "blenderVersion": "5.2.0 LTS",
+        "materialPreservation": {
+          "passed": true,
+          "materialCount": 1,
+          "maxDiffuseError": 0.0,
+          "maxSpecularError": 0.0,
+          "maxShininessError": 2.288818308215923e-07,
+          "maxOpacityError": 0.0
+        },
+        "cspCompatibility": {
+          "version": "personal-csp-names/1",
+          "applied": true,
+          "nameAliases": [
+            {
+              "objectId": 757630619,
+              "original": "root_group_",
+              "exported": "StandinBase"
+            }
+          ],
+          "allOtherBytesExact": true,
+          "weightsTruncated": false,
+          "beforeSha256": "d08dfb6aa256ca48e764d2a010b002a5e2940774c141d9768d3318b4b2a5ab49",
+          "outputSha256": "d45b112861b9668c42d572293cadd75e9976fd460f71f3f128ca65d4d30a3038"
+        }
+      }
+    },
+    {
+      "model": 0,
+      "pose": 1,
+      "sourceSha256": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+      "poseSha256": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+      "beforeAliasSha256": "00dfe134555b454c3269521d7f7f68ca57f439eacfc7fff7f8984717a0856ed8",
+      "outputSha256": "0489f7827d47d5b9302ac971efc1d7d110e86309c2cca123b8188b672eaa8b5d",
+      "maxInfluences": 9,
+      "changedPropertyPaths": [
+        "/8:Objects/4:Model"
+      ],
+      "weightsExact": true,
+      "geometryNormalsMaterialsBindPoseHierarchyIdsAllOtherBytesExact": true,
+      "byteLengthExact": true,
+      "validation": {
+        "passed": true,
+        "meshCount": 1,
+        "originalBoneCount": 66,
+        "vertexCount": 24988,
+        "maxSurfaceError": 7.863804398766661e-07,
+        "maxSkinProbeError": 8.741165515857574e-07,
+        "maxMaterialRegionError": 7.715578931311029e-07,
+        "materialCount": 1,
+        "tolerance": 1.794299856504494e-05,
+        "fkProbes": {
+          "forearm.L": {
+            "joint": "forearm.L",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.10793333136350992
+          },
+          "forearm.R": {
+            "joint": "forearm.R",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.10894761871610623
+          },
+          "leg.L": {
+            "joint": "leg.L",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.1298630121431651
+          },
+          "leg.R": {
+            "joint": "leg.R",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.12857908758643313
+          },
+          "spine": {
+            "joint": "spine",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.19067972956405657
+          }
+        },
+        "blenderVersion": "5.2.0 LTS",
+        "materialPreservation": {
+          "passed": true,
+          "materialCount": 1,
+          "maxDiffuseError": 0.0,
+          "maxSpecularError": 0.0,
+          "maxShininessError": 2.288818308215923e-07,
+          "maxOpacityError": 0.0
+        },
+        "cspCompatibility": {
+          "version": "personal-csp-names/1",
+          "applied": true,
+          "nameAliases": [
+            {
+              "objectId": 759673599,
+              "original": "root_group_",
+              "exported": "StandinBase"
+            }
+          ],
+          "allOtherBytesExact": true,
+          "weightsTruncated": false,
+          "beforeSha256": "00dfe134555b454c3269521d7f7f68ca57f439eacfc7fff7f8984717a0856ed8",
+          "outputSha256": "0489f7827d47d5b9302ac971efc1d7d110e86309c2cca123b8188b672eaa8b5d"
+        }
+      }
+    },
+    {
+      "model": 1,
+      "pose": 0,
+      "sourceSha256": "fb47d89d1507c377b0af136b9dc6357ef35787c59ac79467ee180b2e1640017f",
+      "poseSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+      "beforeAliasSha256": "0a7dfccecae889e563d0f78df00022ad58180a2cda699e1d1466f10a14d2f908",
+      "outputSha256": "0a7dfccecae889e563d0f78df00022ad58180a2cda699e1d1466f10a14d2f908",
+      "maxInfluences": 8,
+      "changedPropertyPaths": [],
+      "weightsExact": true,
+      "geometryNormalsMaterialsBindPoseHierarchyIdsAllOtherBytesExact": true,
+      "byteLengthExact": true,
+      "validation": {
+        "passed": true,
+        "meshCount": 1,
+        "originalBoneCount": 78,
+        "vertexCount": 90143,
+        "maxSurfaceError": 4.989108219888294e-07,
+        "maxSkinProbeError": 8.905859658625559e-07,
+        "maxMaterialRegionError": 5.405651677392598e-07,
+        "materialCount": 2,
+        "tolerance": 1.6550384307532303e-05,
+        "fkProbes": {
+          "forearm.L": {
+            "joint": "forearm.L",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.09180362969335634
+          },
+          "forearm.R": {
+            "joint": "forearm.R",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.09181683868864866
+          },
+          "leg.L": {
+            "joint": "leg.L",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.13659136453160323
+          },
+          "leg.R": {
+            "joint": "leg.R",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.13652318366471464
+          },
+          "spine": {
+            "joint": "spine",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.14171426046229135
+          }
+        },
+        "blenderVersion": "5.2.0 LTS",
+        "materialPreservation": {
+          "passed": true,
+          "materialCount": 2,
+          "maxDiffuseError": 0.0,
+          "maxSpecularError": 0.0,
+          "maxShininessError": 0.0,
+          "maxOpacityError": 0.0
+        },
+        "cspCompatibility": {
+          "version": "personal-csp-names/1",
+          "applied": false,
+          "nameAliases": [],
+          "allOtherBytesExact": true,
+          "weightsTruncated": false,
+          "beforeSha256": "0a7dfccecae889e563d0f78df00022ad58180a2cda699e1d1466f10a14d2f908",
+          "outputSha256": "0a7dfccecae889e563d0f78df00022ad58180a2cda699e1d1466f10a14d2f908"
+        }
+      }
+    },
+    {
+      "model": 1,
+      "pose": 1,
+      "sourceSha256": "fb47d89d1507c377b0af136b9dc6357ef35787c59ac79467ee180b2e1640017f",
+      "poseSha256": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+      "beforeAliasSha256": "cead62f91a3801cc4608e63fabbe49c82e60dcc9ea93dfddf17dc901a725765f",
+      "outputSha256": "cead62f91a3801cc4608e63fabbe49c82e60dcc9ea93dfddf17dc901a725765f",
+      "maxInfluences": 8,
+      "changedPropertyPaths": [],
+      "weightsExact": true,
+      "geometryNormalsMaterialsBindPoseHierarchyIdsAllOtherBytesExact": true,
+      "byteLengthExact": true,
+      "validation": {
+        "passed": true,
+        "meshCount": 1,
+        "originalBoneCount": 78,
+        "vertexCount": 90143,
+        "maxSurfaceError": 6.26557948635309e-07,
+        "maxSkinProbeError": 9.974877457352704e-07,
+        "maxMaterialRegionError": 6.848052294117224e-07,
+        "materialCount": 2,
+        "tolerance": 1.730607898612481e-05,
+        "fkProbes": {
+          "forearm.L": {
+            "joint": "forearm.L",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.09233108396797761
+          },
+          "forearm.R": {
+            "joint": "forearm.R",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.09233929214988855
+          },
+          "leg.L": {
+            "joint": "leg.L",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.13710820378836752
+          },
+          "leg.R": {
+            "joint": "leg.R",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.13606064599410553
+          },
+          "spine": {
+            "joint": "spine",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.17750415233275985
+          }
+        },
+        "blenderVersion": "5.2.0 LTS",
+        "materialPreservation": {
+          "passed": true,
+          "materialCount": 2,
+          "maxDiffuseError": 0.0,
+          "maxSpecularError": 0.0,
+          "maxShininessError": 0.0,
+          "maxOpacityError": 0.0
+        },
+        "cspCompatibility": {
+          "version": "personal-csp-names/1",
+          "applied": false,
+          "nameAliases": [],
+          "allOtherBytesExact": true,
+          "weightsTruncated": false,
+          "beforeSha256": "cead62f91a3801cc4608e63fabbe49c82e60dcc9ea93dfddf17dc901a725765f",
+          "outputSha256": "cead62f91a3801cc4608e63fabbe49c82e60dcc9ea93dfddf17dc901a725765f"
+        }
+      }
+    },
+    {
+      "model": 2,
+      "pose": 0,
+      "sourceSha256": "b195a3ff87d67365f343fee9049f9d25026d6a49e4987d9e895d3a3f25e72385",
+      "poseSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+      "beforeAliasSha256": "866aa6811326daf3f45decad409a02c4b993567e8c304a64bcc866dd187ea69d",
+      "outputSha256": "866aa6811326daf3f45decad409a02c4b993567e8c304a64bcc866dd187ea69d",
+      "maxInfluences": 8,
+      "changedPropertyPaths": [],
+      "weightsExact": true,
+      "geometryNormalsMaterialsBindPoseHierarchyIdsAllOtherBytesExact": true,
+      "byteLengthExact": true,
+      "validation": {
+        "passed": true,
+        "meshCount": 1,
+        "originalBoneCount": 78,
+        "vertexCount": 179990,
+        "maxSurfaceError": 3.378532369424647e-07,
+        "maxSkinProbeError": 5.591907665802864e-07,
+        "maxMaterialRegionError": 3.499592651223793e-07,
+        "materialCount": 1,
+        "tolerance": 1.1996233001911324e-05,
+        "fkProbes": {
+          "forearm.L": {
+            "joint": "forearm.L",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.07290007378266114
+          },
+          "forearm.R": {
+            "joint": "forearm.R",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.07305240409905168
+          },
+          "leg.L": {
+            "joint": "leg.L",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.07747644247191439
+          },
+          "leg.R": {
+            "joint": "leg.R",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.0775325893730777
+          },
+          "spine": {
+            "joint": "spine",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.13097317589743548
+          }
+        },
+        "blenderVersion": "5.2.0 LTS",
+        "materialPreservation": {
+          "passed": true,
+          "materialCount": 1,
+          "maxDiffuseError": 0.0,
+          "maxSpecularError": 0.0,
+          "maxShininessError": 0.0,
+          "maxOpacityError": 0.0
+        },
+        "cspCompatibility": {
+          "version": "personal-csp-names/1",
+          "applied": false,
+          "nameAliases": [],
+          "allOtherBytesExact": true,
+          "weightsTruncated": false,
+          "beforeSha256": "866aa6811326daf3f45decad409a02c4b993567e8c304a64bcc866dd187ea69d",
+          "outputSha256": "866aa6811326daf3f45decad409a02c4b993567e8c304a64bcc866dd187ea69d"
+        }
+      }
+    },
+    {
+      "model": 2,
+      "pose": 1,
+      "sourceSha256": "b195a3ff87d67365f343fee9049f9d25026d6a49e4987d9e895d3a3f25e72385",
+      "poseSha256": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+      "beforeAliasSha256": "26c359d95e68e3107327a1f70c5325670528509c3120f057d0e56175f74086b0",
+      "outputSha256": "26c359d95e68e3107327a1f70c5325670528509c3120f057d0e56175f74086b0",
+      "maxInfluences": 8,
+      "changedPropertyPaths": [],
+      "weightsExact": true,
+      "geometryNormalsMaterialsBindPoseHierarchyIdsAllOtherBytesExact": true,
+      "byteLengthExact": true,
+      "validation": {
+        "passed": true,
+        "meshCount": 1,
+        "originalBoneCount": 78,
+        "vertexCount": 179990,
+        "maxSurfaceError": 4.6843950940456125e-07,
+        "maxSkinProbeError": 6.563280408045102e-07,
+        "maxMaterialRegionError": 5.5033518719938e-07,
+        "materialCount": 1,
+        "tolerance": 1.1951352374757548e-05,
+        "fkProbes": {
+          "forearm.L": {
+            "joint": "forearm.L",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.07320601066087389
+          },
+          "forearm.R": {
+            "joint": "forearm.R",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.0732322213614935
+          },
+          "leg.L": {
+            "joint": "leg.L",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.07793606520170525
+          },
+          "leg.R": {
+            "joint": "leg.R",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.07762216722128094
+          },
+          "spine": {
+            "joint": "spine",
+            "rotationRadians": 0.25,
+            "maxVertexDisplacement": 0.13274146268735848
+          }
+        },
+        "blenderVersion": "5.2.0 LTS",
+        "materialPreservation": {
+          "passed": true,
+          "materialCount": 1,
+          "maxDiffuseError": 0.0,
+          "maxSpecularError": 0.0,
+          "maxShininessError": 0.0,
+          "maxOpacityError": 0.0
+        },
+        "cspCompatibility": {
+          "version": "personal-csp-names/1",
+          "applied": false,
+          "nameAliases": [],
+          "allOtherBytesExact": true,
+          "weightsTruncated": false,
+          "beforeSha256": "26c359d95e68e3107327a1f70c5325670528509c3120f057d0e56175f74086b0",
+          "outputSha256": "26c359d95e68e3107327a1f70c5325670528509c3120f057d0e56175f74086b0"
+        }
+      }
+    }
+  ],
+  "aliasReimportAudit": [
+    {
+      "case": "model-0-pose-0",
+      "maxIndexedPositionDeltaM": 0.0,
+      "maxCornerNormalComponentDelta": 0.0,
+      "maxCornerNormalAngleDeltaDeg": 0.0,
+      "weightsExactWithExplicitNameAlias": true,
+      "hierarchyExactWithExplicitNameAlias": true,
+      "polygonsExact": true,
+      "materialsExact": true
+    },
+    {
+      "case": "model-0-pose-1",
+      "maxIndexedPositionDeltaM": 0.0,
+      "maxCornerNormalComponentDelta": 0.0,
+      "maxCornerNormalAngleDeltaDeg": 0.0,
+      "weightsExactWithExplicitNameAlias": true,
+      "hierarchyExactWithExplicitNameAlias": true,
+      "polygonsExact": true,
+      "materialsExact": true
+    },
+    {
+      "case": "model-1-pose-0",
+      "maxIndexedPositionDeltaM": 0.0,
+      "maxCornerNormalComponentDelta": 0.0,
+      "maxCornerNormalAngleDeltaDeg": 0.0,
+      "weightsExactWithExplicitNameAlias": true,
+      "hierarchyExactWithExplicitNameAlias": true,
+      "polygonsExact": true,
+      "materialsExact": true
+    },
+    {
+      "case": "model-1-pose-1",
+      "maxIndexedPositionDeltaM": 0.0,
+      "maxCornerNormalComponentDelta": 0.0,
+      "maxCornerNormalAngleDeltaDeg": 0.0,
+      "weightsExactWithExplicitNameAlias": true,
+      "hierarchyExactWithExplicitNameAlias": true,
+      "polygonsExact": true,
+      "materialsExact": true
+    },
+    {
+      "case": "model-2-pose-0",
+      "maxIndexedPositionDeltaM": 0.0,
+      "maxCornerNormalComponentDelta": 0.0,
+      "maxCornerNormalAngleDeltaDeg": 0.0,
+      "weightsExactWithExplicitNameAlias": true,
+      "hierarchyExactWithExplicitNameAlias": true,
+      "polygonsExact": true,
+      "materialsExact": true
+    },
+    {
+      "case": "model-2-pose-1",
+      "maxIndexedPositionDeltaM": 0.0,
+      "maxCornerNormalComponentDelta": 0.0,
+      "maxCornerNormalAngleDeltaDeg": 0.0,
+      "weightsExactWithExplicitNameAlias": true,
+      "hierarchyExactWithExplicitNameAlias": true,
+      "polygonsExact": true,
+      "materialsExact": true
+    },
+    {
+      "case": "male-source",
+      "maxIndexedPositionDeltaM": 0.0,
+      "maxCornerNormalComponentDelta": 0.0,
+      "maxCornerNormalAngleDeltaDeg": 0.0,
+      "weightsExactWithExplicitNameAlias": true,
+      "hierarchyExactWithExplicitNameAlias": true,
+      "polygonsExact": true,
+      "materialsExact": true
+    },
+    {
+      "case": "male-yaw35",
+      "maxIndexedPositionDeltaM": 0.0,
+      "maxCornerNormalComponentDelta": 0.0,
+      "maxCornerNormalAngleDeltaDeg": 0.0,
+      "weightsExactWithExplicitNameAlias": true,
+      "hierarchyExactWithExplicitNameAlias": true,
+      "polygonsExact": true,
+      "materialsExact": true
+    },
+    {
+      "case": "female-source",
+      "maxIndexedPositionDeltaM": 0.0,
+      "maxCornerNormalComponentDelta": 0.0,
+      "maxCornerNormalAngleDeltaDeg": 0.0,
+      "weightsExactWithExplicitNameAlias": true,
+      "hierarchyExactWithExplicitNameAlias": true,
+      "polygonsExact": true,
+      "materialsExact": true
+    },
+    {
+      "case": "female-yaw35",
+      "maxIndexedPositionDeltaM": 0.0,
+      "maxCornerNormalComponentDelta": 0.0,
+      "maxCornerNormalAngleDeltaDeg": 0.0,
+      "weightsExactWithExplicitNameAlias": true,
+      "hierarchyExactWithExplicitNameAlias": true,
+      "polygonsExact": true,
+      "materialsExact": true
+    }
+  ],
+  "checks": {
+    "stdlib": {
+      "passed": 28
+    },
+    "BlenderRegression": {
+      "passed": 6
+    },
+    "smoke": {
+      "passed": 54
+    },
+    "compileall": "pass",
+    "diffCheck": "pass",
+    "integrationCI": "pending single publishers"
+  },
+  "constraints": {
+    "draft": true,
+    "defaultOff": true,
+    "releaseReady": false,
+    "deploy": false,
+    "merge": false,
+    "rawAssetsUploaded": false
+  }
+}

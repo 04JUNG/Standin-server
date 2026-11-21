@@ -1,0 +1,232 @@
+{
+  "schemaVersion": 1,
+  "stage": "actual-app-v11-four-outputs",
+  "dateKst": "2026-11-06",
+  "verifiedAt": "2026-11-06T09:51:17.158723+00:00",
+  "environment": {
+    "CSP": "5.1.1",
+    "OS": "macOS26.6.2",
+    "arch": "arm64"
+  },
+  "sourceCommit": "35e0136cf9cd230b18f0772116bd955f4228bf68",
+  "connectionIntegrationCommit": "bed1d85",
+  "appBinarySha256": "265d37b474084916da59ecf6638228aed3b0f7f924b0473f29ec0351fe85b5f7",
+  "appTreeSha256": "3fe201675c9f551066ef4a9f7cbfcc45506de3dae5e2645cdb502e38b049ef3d",
+  "appFiles": 6610,
+  "runtimeManifestSha256": "2540a161e19fa34ad1d9c38bcc79751d471b938f6de5b0757923e303def5789b",
+  "runtimeFiles": 6606,
+  "converterVersion": "personal-converter/11",
+  "converterFingerprint": "5fdc61c7775279392171e8002aece0e87744fe6187855746fe7411b4004458d1",
+  "postUiExactAppAndRuntime": true,
+  "provenance": {
+    "productUiSave": "provided by connection owner with actual native picker/register/apply/save",
+    "CSP": "independent exact-SHA byte-identical copies imported in new canvases",
+    "BFF": "controlled loopback recorded BVH, not live production BFF",
+    "appSourceEquivalence": "connection owner evidence; CSP owner independently hashes binary, full app tree, runtime and four FBXs"
+  },
+  "results": {
+    "nativeImports": 4,
+    "displayPass": 4,
+    "crash": 0,
+    "geometryQuality": "not-qualified",
+    "objectManipulation": "unverified: actual CUA drag returned noWindowsAvailable",
+    "clipSave": "blocked: actual Save As requested license acquisition/registration; chose No",
+    "reopen": "unverified: no .clip created",
+    "jointRearticulation": "outside current FBX contract",
+    "lastCrashLogStillPriorDiagnostic": "CLIP STUDIO PAINT-2026-11-06-181417.ips"
+  },
+  "cases": [
+    {
+      "case": "male-identity",
+      "sha256": "04961228c2acd4532adc4066b0962bd402f2d51f1380dfd226f447d7a67500ea",
+      "sourceModelSha256": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+      "poseSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+      "camera": {
+        "version": "personal-camera/1",
+        "sourceBvhSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+        "rotation": [
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "cspCompatibility": {
+        "version": "personal-csp-names/1",
+        "applied": true,
+        "nameAliases": [
+          {
+            "objectId": 356537267,
+            "original": "root_group_",
+            "exported": "StandinBase"
+          }
+        ],
+        "allOtherBytesExact": true,
+        "weightsTruncated": false,
+        "beforeSha256": "b0dbda8ec5009923d453cc1323b6e66319e333822ce041fb420ee39410bde706",
+        "outputSha256": "04961228c2acd4532adc4066b0962bd402f2d51f1380dfd226f447d7a67500ea"
+      },
+      "maxInfluences": 9,
+      "copyBytesExact": true,
+      "nativeFile": "app-v11-male-identity.fbx",
+      "importResult": "display-pass",
+      "screenshot": "app-v11-male-identity-pass.png",
+      "screenshotSha256": "51b247091bafa40a000b55ff89a623c41d57dcdde48954c995be242e957a19bd"
+    },
+    {
+      "case": "male-yaw35",
+      "sha256": "6ffe3b3b79e61725f0145919ff6328c15266af98b40ef8f5fa69d4d76e99864c",
+      "sourceModelSha256": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+      "poseSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+      "camera": {
+        "version": "personal-camera/1",
+        "sourceBvhSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+        "rotation": [
+          [
+            0.8191520442889918,
+            0,
+            0.573576436351046
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            -0.573576436351046,
+            0,
+            0.8191520442889918
+          ]
+        ]
+      },
+      "cspCompatibility": {
+        "version": "personal-csp-names/1",
+        "applied": true,
+        "nameAliases": [
+          {
+            "objectId": 805612411,
+            "original": "root_group_",
+            "exported": "StandinBase"
+          }
+        ],
+        "allOtherBytesExact": true,
+        "weightsTruncated": false,
+        "beforeSha256": "073167a7e5d2270f7788b5f21711f8625aa5f546c048de1e8f237de011693457",
+        "outputSha256": "6ffe3b3b79e61725f0145919ff6328c15266af98b40ef8f5fa69d4d76e99864c"
+      },
+      "maxInfluences": 9,
+      "copyBytesExact": true,
+      "nativeFile": "app-v11-male-yaw35.fbx",
+      "importResult": "display-pass",
+      "screenshot": "app-v11-male-yaw35-pass.png",
+      "screenshotSha256": "bc5682b4d66bf5c1c1f3facc3ed72603cedc584a03154d91290e9380a7c8eaf8"
+    },
+    {
+      "case": "female-yaw35",
+      "sha256": "e9a7500df3fed7f1e27b1e92918599cefc67424dc08d89354b6a29a1c9b9021d",
+      "sourceModelSha256": "fb47d89d1507c377b0af136b9dc6357ef35787c59ac79467ee180b2e1640017f",
+      "poseSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+      "camera": {
+        "version": "personal-camera/1",
+        "sourceBvhSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+        "rotation": [
+          [
+            0.8191520442889918,
+            0,
+            0.573576436351046
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            -0.573576436351046,
+            0,
+            0.8191520442889918
+          ]
+        ]
+      },
+      "cspCompatibility": {
+        "version": "personal-csp-names/1",
+        "applied": false,
+        "nameAliases": [],
+        "allOtherBytesExact": true,
+        "weightsTruncated": false,
+        "beforeSha256": "e9a7500df3fed7f1e27b1e92918599cefc67424dc08d89354b6a29a1c9b9021d",
+        "outputSha256": "e9a7500df3fed7f1e27b1e92918599cefc67424dc08d89354b6a29a1c9b9021d"
+      },
+      "maxInfluences": 8,
+      "copyBytesExact": true,
+      "nativeFile": "app-v11-female-yaw35.fbx",
+      "importResult": "display-pass",
+      "screenshot": "app-v11-female-yaw35-pass.png",
+      "screenshotSha256": "910b7ad8d8e24e76a81f457b8700353defd880834fb7ced64092e52c3e73f9da"
+    },
+    {
+      "case": "female-identity",
+      "sha256": "016211a2800c6e1da70213e991ff30680de3fcade5cffe9408bf67b8d607d9f6",
+      "sourceModelSha256": "fb47d89d1507c377b0af136b9dc6357ef35787c59ac79467ee180b2e1640017f",
+      "poseSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+      "camera": {
+        "version": "personal-camera/1",
+        "sourceBvhSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+        "rotation": [
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      "cspCompatibility": {
+        "version": "personal-csp-names/1",
+        "applied": false,
+        "nameAliases": [],
+        "allOtherBytesExact": true,
+        "weightsTruncated": false,
+        "beforeSha256": "016211a2800c6e1da70213e991ff30680de3fcade5cffe9408bf67b8d607d9f6",
+        "outputSha256": "016211a2800c6e1da70213e991ff30680de3fcade5cffe9408bf67b8d607d9f6"
+      },
+      "maxInfluences": 8,
+      "copyBytesExact": true,
+      "nativeFile": "app-v11-female-identity.fbx",
+      "importResult": "display-pass",
+      "screenshot": "app-v11-female-identity-pass.png",
+      "screenshotSha256": "ee38fe2cef0c341159582ae649d94b75aeba714de156277ce62d90ce2e39fbb1"
+    }
+  ],
+  "saveAsScreenshot": {
+    "file": "app-v11-save-as-result.png",
+    "sha256": "0dc9eefec7bae2879abe27c67129b9f58a7ecf07934e5712336446ae70f031a9"
+  },
+  "constraints": {
+    "draft": true,
+    "defaultOff": true,
+    "releaseReady": false,
+    "deploy": false,
+    "merge": false,
+    "rawAssetsUploaded": false
+  }
+}

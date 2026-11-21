@@ -1,0 +1,570 @@
+{
+  "date": "2026-11-04",
+  "contractRevision": 5,
+  "materialContractVersion": "personal-solid-specular/1",
+  "actualCs3cFilesPassed": 4,
+  "posedFbxFilesPassed": 8,
+  "registeredFbxFilesPassed": 4,
+  "runtimePackages": [
+    {
+      "kind": "runtime",
+      "manifestSha256": "4a0f060fe4a350b1e4658188745fbb47adfbdc96d2186d2f58a02c8dc4dff814",
+      "fileCount": 6580,
+      "changed": 0,
+      "extraFiles": 0,
+      "target": "darwin-arm64",
+      "releaseReady": false,
+      "decoderIncluded": true
+    },
+    {
+      "kind": "no-decoder-runtime",
+      "manifestSha256": "c2d48bbdde7afd8366e2427d387db180ba1d2c9c450825bdd7b5369222612227",
+      "fileCount": 6579,
+      "changed": 0,
+      "extraFiles": 0,
+      "target": "darwin-arm64",
+      "releaseReady": false,
+      "decoderIncluded": false
+    },
+    {
+      "kind": "debug-app-resource",
+      "manifestSha256": "4a0f060fe4a350b1e4658188745fbb47adfbdc96d2186d2f58a02c8dc4dff814",
+      "fileCount": 6580,
+      "changed": 0,
+      "extraFiles": 0,
+      "target": "darwin-arm64",
+      "releaseReady": false,
+      "decoderIncluded": true
+    }
+  ],
+  "appBinarySha256": "3f20274b89172fded90e0561ea8b13520f8beae78a03c8c3f41928f1f57a999f",
+  "nativeTimingFirstRun": {
+    "applyFromFbxMs": 2524.2642499999997,
+    "cacheApplyMs": 33.987458,
+    "exportMs": 34.566667,
+    "modelConversionIncluded": true,
+    "networkAndUiIncluded": false,
+    "registrationMs": 5579.2,
+    "sameProcess": true,
+    "startupMs": 6180.536,
+    "warmHelloMs": [
+      6.294417,
+      6.313959,
+      6.347958
+    ],
+    "workingFormat": "fbx"
+  },
+  "nativeTimingFinalPackage": {
+    "applyFromFbxMs": 3686.771625,
+    "cacheApplyMs": 51.543834,
+    "exportMs": 51.072667,
+    "modelConversionIncluded": true,
+    "networkAndUiIncluded": false,
+    "registrationMs": 8439.970540999999,
+    "sameProcess": true,
+    "startupMs": 9935.625333,
+    "warmHelloMs": [
+      9.224375,
+      9.168333,
+      9.019291
+    ],
+    "workingFormat": "fbx"
+  },
+  "matrixTimingsFinal": {
+    "startupSeconds": 34.52870208400418,
+    "registrationSeconds": [
+      10.841415917006088,
+      9.167248540994478,
+      8.279749499983154,
+      8.056951292004669
+    ],
+    "applySeconds": [
+      3.998946124978829,
+      3.7904346660070587,
+      3.9107158749829978,
+      3.7868163749808446,
+      5.078994582989253,
+      3.7877656249911524,
+      3.6814061669865623,
+      3.6820999170013238
+    ]
+  },
+  "sourceFilesUnchanged": true,
+  "independentAudit": {
+    "passed": true,
+    "independentRawMaterialComparison": true,
+    "models": [
+      {
+        "inputName": "standin-male-0.7.6-mapped-review.cs3c",
+        "sourceHash": "a2b61fd5673abfec339fa7a2019f8f6894f8a207a0a524c334275846158bad0c",
+        "sourceMaterials": {
+          "CS3CMaterial_0": {
+            "diffuse": [
+              0.47999998927116394,
+              0.5299999713897705,
+              0.5899999737739563
+            ],
+            "specular": [
+              0.11999999731779099,
+              0.13249999284744263,
+              0.14749999344348907
+            ],
+            "shininess": 10.239999771118164,
+            "opacity": 1.0
+          }
+        },
+        "files": [
+          {
+            "file": "model-0-registered.fbx",
+            "sha256": "a778b2856383a49343e83718dfc18587d05c2abde27180bfa5001c8e4d360d6f",
+            "rawFbxMaterials": {
+              "CS3CMaterial_0": {
+                "diffuse": [
+                  0.47999998927116394,
+                  0.5299999713897705,
+                  0.5899999737739563
+                ],
+                "specular": [
+                  0.11999999731779099,
+                  0.13249999284744263,
+                  0.14749999344348907
+                ],
+                "shininess": 10.239999542236333,
+                "opacity": 1,
+                "rawSpecularColor": [
+                  0.47999998927116394,
+                  0.5299999713897705,
+                  0.5899999737739563
+                ],
+                "rawSpecularFactor": 0.25
+              }
+            },
+            "maxSourceMaterialError": 2.288818308215923e-07
+          },
+          {
+            "file": "model-0-pose-0.fbx",
+            "sha256": "d8087b904a5acf70b3224787a4464d7b7ae317b8d152adc33af085d3145e6670",
+            "rawFbxMaterials": {
+              "CS3CMaterial_0": {
+                "diffuse": [
+                  0.47999998927116394,
+                  0.5299999713897705,
+                  0.5899999737739563
+                ],
+                "specular": [
+                  0.11999999731779099,
+                  0.13249999284744263,
+                  0.14749999344348907
+                ],
+                "shininess": 10.239999542236333,
+                "opacity": 1,
+                "rawSpecularColor": [
+                  0.47999998927116394,
+                  0.5299999713897705,
+                  0.5899999737739563
+                ],
+                "rawSpecularFactor": 0.25
+              }
+            },
+            "maxSourceMaterialError": 2.288818308215923e-07,
+            "exactRegisteredSkinWeights": true,
+            "registeredBonesPreserved": true,
+            "maxVertexDisplacement": 0.9913711608563645,
+            "maxBoneHeadDisplacement": 1.0304537303515393
+          },
+          {
+            "file": "model-0-pose-1.fbx",
+            "sha256": "bcbc5f82ad79bb7147d14753bbb403d381ccd4c541d6e9c42c63a116d4dc7be8",
+            "rawFbxMaterials": {
+              "CS3CMaterial_0": {
+                "diffuse": [
+                  0.47999998927116394,
+                  0.5299999713897705,
+                  0.5899999737739563
+                ],
+                "specular": [
+                  0.11999999731779099,
+                  0.13249999284744263,
+                  0.14749999344348907
+                ],
+                "shininess": 10.239999542236333,
+                "opacity": 1,
+                "rawSpecularColor": [
+                  0.47999998927116394,
+                  0.5299999713897705,
+                  0.5899999737739563
+                ],
+                "rawSpecularFactor": 0.25
+              }
+            },
+            "maxSourceMaterialError": 2.288818308215923e-07,
+            "exactRegisteredSkinWeights": true,
+            "registeredBonesPreserved": true,
+            "maxVertexDisplacement": 1.0735670822724412,
+            "maxBoneHeadDisplacement": 1.0947095680789336
+          }
+        ]
+      },
+      {
+        "inputName": "standin-male-0.7.6-arm-raised-review.cs3c",
+        "sourceHash": "276c0d3506e6d446ffd61392184a93def99624cfd063448b89f2a48ddaea859b",
+        "sourceMaterials": {
+          "CS3CMaterial_0": {
+            "diffuse": [
+              0.47999998927116394,
+              0.5299999713897705,
+              0.5899999737739563
+            ],
+            "specular": [
+              0.11999999731779099,
+              0.13249999284744263,
+              0.14749999344348907
+            ],
+            "shininess": 10.239999771118164,
+            "opacity": 1.0
+          }
+        },
+        "files": [
+          {
+            "file": "model-1-registered.fbx",
+            "sha256": "31c80c4a22fcefe55009a800ad514ec206debfdab457705379cd8c01e7584f39",
+            "rawFbxMaterials": {
+              "CS3CMaterial_0": {
+                "diffuse": [
+                  0.47999998927116394,
+                  0.5299999713897705,
+                  0.5899999737739563
+                ],
+                "specular": [
+                  0.11999999731779099,
+                  0.13249999284744263,
+                  0.14749999344348907
+                ],
+                "shininess": 10.239999542236333,
+                "opacity": 1,
+                "rawSpecularColor": [
+                  0.47999998927116394,
+                  0.5299999713897705,
+                  0.5899999737739563
+                ],
+                "rawSpecularFactor": 0.25
+              }
+            },
+            "maxSourceMaterialError": 2.288818308215923e-07
+          },
+          {
+            "file": "model-1-pose-0.fbx",
+            "sha256": "0bc4d28862f42a4efce7c4ac3cf69a6394895a87157af5858d6c5c373e554b33",
+            "rawFbxMaterials": {
+              "CS3CMaterial_0": {
+                "diffuse": [
+                  0.47999998927116394,
+                  0.5299999713897705,
+                  0.5899999737739563
+                ],
+                "specular": [
+                  0.11999999731779099,
+                  0.13249999284744263,
+                  0.14749999344348907
+                ],
+                "shininess": 10.239999542236333,
+                "opacity": 1,
+                "rawSpecularColor": [
+                  0.47999998927116394,
+                  0.5299999713897705,
+                  0.5899999737739563
+                ],
+                "rawSpecularFactor": 0.25
+              }
+            },
+            "maxSourceMaterialError": 2.288818308215923e-07,
+            "exactRegisteredSkinWeights": true,
+            "registeredBonesPreserved": true,
+            "maxVertexDisplacement": 0.9913711608563645,
+            "maxBoneHeadDisplacement": 1.0304537303515393
+          },
+          {
+            "file": "model-1-pose-1.fbx",
+            "sha256": "e1c2b67937e646dac60d74e624fcad0a0dd2bc2066aeab2260520de043340ece",
+            "rawFbxMaterials": {
+              "CS3CMaterial_0": {
+                "diffuse": [
+                  0.47999998927116394,
+                  0.5299999713897705,
+                  0.5899999737739563
+                ],
+                "specular": [
+                  0.11999999731779099,
+                  0.13249999284744263,
+                  0.14749999344348907
+                ],
+                "shininess": 10.239999542236333,
+                "opacity": 1,
+                "rawSpecularColor": [
+                  0.47999998927116394,
+                  0.5299999713897705,
+                  0.5899999737739563
+                ],
+                "rawSpecularFactor": 0.25
+              }
+            },
+            "maxSourceMaterialError": 2.288818308215923e-07,
+            "exactRegisteredSkinWeights": true,
+            "registeredBonesPreserved": true,
+            "maxVertexDisplacement": 1.0735670822724412,
+            "maxBoneHeadDisplacement": 1.0947095680789336
+          }
+        ]
+      },
+      {
+        "inputName": "standin-male-0.7.6-recorded-pose-review.cs3c",
+        "sourceHash": "15976949366629cb20d57ca1d749f01d26e498baf17376000d5c78678dea897e",
+        "sourceMaterials": {
+          "CS3CMaterial_0": {
+            "diffuse": [
+              0.47999998927116394,
+              0.5299999713897705,
+              0.5899999737739563
+            ],
+            "specular": [
+              0.11999999731779099,
+              0.13249999284744263,
+              0.14749999344348907
+            ],
+            "shininess": 10.239999771118164,
+            "opacity": 1.0
+          }
+        },
+        "files": [
+          {
+            "file": "model-2-registered.fbx",
+            "sha256": "658866da0761a9a90495020835cb08402d415064c32563cc5dcaf4c5b02e36ba",
+            "rawFbxMaterials": {
+              "CS3CMaterial_0": {
+                "diffuse": [
+                  0.47999998927116394,
+                  0.5299999713897705,
+                  0.5899999737739563
+                ],
+                "specular": [
+                  0.11999999731779099,
+                  0.13249999284744263,
+                  0.14749999344348907
+                ],
+                "shininess": 10.239999542236333,
+                "opacity": 1,
+                "rawSpecularColor": [
+                  0.47999998927116394,
+                  0.5299999713897705,
+                  0.5899999737739563
+                ],
+                "rawSpecularFactor": 0.25
+              }
+            },
+            "maxSourceMaterialError": 2.288818308215923e-07
+          },
+          {
+            "file": "model-2-pose-0.fbx",
+            "sha256": "06303f89d2caeb50e136a3ea72e0d4f437eced5e347770550688ee268b5e463d",
+            "rawFbxMaterials": {
+              "CS3CMaterial_0": {
+                "diffuse": [
+                  0.47999998927116394,
+                  0.5299999713897705,
+                  0.5899999737739563
+                ],
+                "specular": [
+                  0.11999999731779099,
+                  0.13249999284744263,
+                  0.14749999344348907
+                ],
+                "shininess": 10.239999542236333,
+                "opacity": 1,
+                "rawSpecularColor": [
+                  0.47999998927116394,
+                  0.5299999713897705,
+                  0.5899999737739563
+                ],
+                "rawSpecularFactor": 0.25
+              }
+            },
+            "maxSourceMaterialError": 2.288818308215923e-07,
+            "exactRegisteredSkinWeights": true,
+            "registeredBonesPreserved": true,
+            "maxVertexDisplacement": 0.9913711608563645,
+            "maxBoneHeadDisplacement": 1.0304537303515393
+          },
+          {
+            "file": "model-2-pose-1.fbx",
+            "sha256": "6b0ac7ce2076896bf000f4a9bab4cf2b6aa06f3db468c6de8cf219fb59895786",
+            "rawFbxMaterials": {
+              "CS3CMaterial_0": {
+                "diffuse": [
+                  0.47999998927116394,
+                  0.5299999713897705,
+                  0.5899999737739563
+                ],
+                "specular": [
+                  0.11999999731779099,
+                  0.13249999284744263,
+                  0.14749999344348907
+                ],
+                "shininess": 10.239999542236333,
+                "opacity": 1,
+                "rawSpecularColor": [
+                  0.47999998927116394,
+                  0.5299999713897705,
+                  0.5899999737739563
+                ],
+                "rawSpecularFactor": 0.25
+              }
+            },
+            "maxSourceMaterialError": 2.288818308215923e-07,
+            "exactRegisteredSkinWeights": true,
+            "registeredBonesPreserved": true,
+            "maxVertexDisplacement": 1.0735670822724412,
+            "maxBoneHeadDisplacement": 1.0947095680789336
+          }
+        ]
+      },
+      {
+        "inputName": "standin-male-0.7.6-recorded-and-applied-review.cs3c",
+        "sourceHash": "c309cb18c8be8db23a271c79850730ed0129b5cac1dba02136115381dafa943f",
+        "sourceMaterials": {
+          "CS3CMaterial_0": {
+            "diffuse": [
+              0.47999998927116394,
+              0.5299999713897705,
+              0.5899999737739563
+            ],
+            "specular": [
+              0.11999999731779099,
+              0.13249999284744263,
+              0.14749999344348907
+            ],
+            "shininess": 10.239999771118164,
+            "opacity": 1.0
+          }
+        },
+        "files": [
+          {
+            "file": "model-3-registered.fbx",
+            "sha256": "42f1bd8eda77a577bc940b46de825cb667c5c2bf81a94e75f55ae1057dedb0d8",
+            "rawFbxMaterials": {
+              "CS3CMaterial_0": {
+                "diffuse": [
+                  0.47999998927116394,
+                  0.5299999713897705,
+                  0.5899999737739563
+                ],
+                "specular": [
+                  0.11999999731779099,
+                  0.13249999284744263,
+                  0.14749999344348907
+                ],
+                "shininess": 10.239999542236333,
+                "opacity": 1,
+                "rawSpecularColor": [
+                  0.47999998927116394,
+                  0.5299999713897705,
+                  0.5899999737739563
+                ],
+                "rawSpecularFactor": 0.25
+              }
+            },
+            "maxSourceMaterialError": 2.288818308215923e-07
+          },
+          {
+            "file": "model-3-pose-0.fbx",
+            "sha256": "3e6619a4b88cc6fb873e7897c7a8bfc6a1e3db67ca13f194ead68585b6f83191",
+            "rawFbxMaterials": {
+              "CS3CMaterial_0": {
+                "diffuse": [
+                  0.47999998927116394,
+                  0.5299999713897705,
+                  0.5899999737739563
+                ],
+                "specular": [
+                  0.11999999731779099,
+                  0.13249999284744263,
+                  0.14749999344348907
+                ],
+                "shininess": 10.239999542236333,
+                "opacity": 1,
+                "rawSpecularColor": [
+                  0.47999998927116394,
+                  0.5299999713897705,
+                  0.5899999737739563
+                ],
+                "rawSpecularFactor": 0.25
+              }
+            },
+            "maxSourceMaterialError": 2.288818308215923e-07,
+            "exactRegisteredSkinWeights": true,
+            "registeredBonesPreserved": true,
+            "maxVertexDisplacement": 0.9913711608563645,
+            "maxBoneHeadDisplacement": 1.0304537303515393
+          },
+          {
+            "file": "model-3-pose-1.fbx",
+            "sha256": "1fac645c57e01a674c5f3beb621195e97005746a25fd9c44fd68b64709916e4e",
+            "rawFbxMaterials": {
+              "CS3CMaterial_0": {
+                "diffuse": [
+                  0.47999998927116394,
+                  0.5299999713897705,
+                  0.5899999737739563
+                ],
+                "specular": [
+                  0.11999999731779099,
+                  0.13249999284744263,
+                  0.14749999344348907
+                ],
+                "shininess": 10.239999542236333,
+                "opacity": 1,
+                "rawSpecularColor": [
+                  0.47999998927116394,
+                  0.5299999713897705,
+                  0.5899999737739563
+                ],
+                "rawSpecularFactor": 0.25
+              }
+            },
+            "maxSourceMaterialError": 2.288818308215923e-07,
+            "exactRegisteredSkinWeights": true,
+            "registeredBonesPreserved": true,
+            "maxVertexDisplacement": 1.0735670822724412,
+            "maxBoneHeadDisplacement": 1.0947095680789336
+          }
+        ]
+      }
+    ]
+  },
+  "tests": {
+    "localConverter": 17,
+    "decoder": 6,
+    "blenderNative": 5,
+    "rustPersonalBody": 10,
+    "finalPackagedNativeFocus": 1,
+    "staleMaterialContractNegativeFocus": 1,
+    "frontendPassed": 1302,
+    "frontendSkipped": 1,
+    "runtimePackaging": 1,
+    "typecheck": "passed",
+    "lint": "0 errors / 1 preexisting warning",
+    "clippy": "passed",
+    "debugAppBuild": "passed",
+    "legacyMatteCs3c": "passed"
+  },
+  "scope": {
+    "actualOriginalCs3cUsed": true,
+    "fbxControlSubstitution": false,
+    "render": "Blender, actual CS3C-derived FBX",
+    "cspImportAcceptance": false,
+    "liveBffCalled": false,
+    "nativePickerUiE2e": false,
+    "fourIndependentModels": false,
+    "generalArbitraryMaterialSupport": false
+  },
+  "supportBoundary": "opaque nonemissive untextured solids with source SpecularRGB=DiffuseRGB*k, 0<=k<=0.5; unsupported colors/intensity rejected, never averaged/clamped"
+}

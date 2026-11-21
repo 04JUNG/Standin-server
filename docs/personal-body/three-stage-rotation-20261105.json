@@ -1,0 +1,1991 @@
+{
+  "baselineCommit": "1332d598be58aec68540137e887fea4dc5fb9991",
+  "runtimeManifestSha256": "eaac3841c8b9e693ff88c959eabaceaf1ecc298e547eede748e83ad4a0de1d70",
+  "stage": 1,
+  "experiments": 102,
+  "adopted": 0,
+  "limits": "Fixed joint heads and child world frames. Hip rotation changes while child frames are held are causal ablations, not valid source-pose replacements. No-op matrix reassignment can move a threshold crease count by one. Source rest-frame mismatch is not an error angle.",
+  "results": [
+    {
+      "model": 0,
+      "pose": 0,
+      "poseSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+      "localTwistDeg": {
+        "hips": 4.071108536330912e-13,
+        "upleg.L": -10.93141211564005,
+        "upleg.R": 10.931614459994211
+      },
+      "before": {
+        "excessBend": 705.5974061159194,
+        "maxStretch": 2.445760943803511,
+        "stretchP99": 1.477323678708654,
+        "overDouble": 76,
+        "compressed": 33,
+        "collapsed": 0,
+        "sharp": 176,
+        "folded": 82
+      },
+      "variants": [
+        {
+          "label": "hips-0.0",
+          "metrics": {
+            "excessBend": 705.6008617047933,
+            "maxStretch": 2.4457657389285425,
+            "stretchP99": 1.4773237576064118,
+            "overDouble": 76,
+            "compressed": 33,
+            "collapsed": 0,
+            "sharp": 176,
+            "folded": 82
+          },
+          "maxJointHeadErrorM": 1.850685827191803e-07,
+          "regressed": []
+        },
+        {
+          "label": "hips-0.5",
+          "metrics": {
+            "excessBend": 705.6008617047933,
+            "maxStretch": 2.4457657389285425,
+            "stretchP99": 1.4773237576064118,
+            "overDouble": 76,
+            "compressed": 33,
+            "collapsed": 0,
+            "sharp": 176,
+            "folded": 82
+          },
+          "maxJointHeadErrorM": 1.850685827191803e-07,
+          "regressed": []
+        },
+        {
+          "label": "hips-1.0",
+          "metrics": {
+            "excessBend": 705.6008617047933,
+            "maxStretch": 2.4457657389285425,
+            "stretchP99": 1.4773237576064118,
+            "overDouble": 76,
+            "compressed": 33,
+            "collapsed": 0,
+            "sharp": 176,
+            "folded": 82
+          },
+          "maxJointHeadErrorM": 1.850685827191803e-07,
+          "regressed": []
+        },
+        {
+          "label": "hips-1.5",
+          "metrics": {
+            "excessBend": 705.6008617047933,
+            "maxStretch": 2.4457657389285425,
+            "stretchP99": 1.4773237576064118,
+            "overDouble": 76,
+            "compressed": 33,
+            "collapsed": 0,
+            "sharp": 176,
+            "folded": 82
+          },
+          "maxJointHeadErrorM": 1.850685827191803e-07,
+          "regressed": []
+        },
+        {
+          "label": "upleg.L-0.0",
+          "metrics": {
+            "excessBend": 705.6002156238942,
+            "maxStretch": 2.445763508137788,
+            "stretchP99": 1.477323785463754,
+            "overDouble": 76,
+            "compressed": 33,
+            "collapsed": 0,
+            "sharp": 176,
+            "folded": 82
+          },
+          "maxJointHeadErrorM": 2.2152168672261396e-07,
+          "regressed": []
+        },
+        {
+          "label": "upleg.L-0.5",
+          "metrics": {
+            "excessBend": 703.0059443722607,
+            "maxStretch": 2.466520533456186,
+            "stretchP99": 1.4755278833301024,
+            "overDouble": 80,
+            "compressed": 33,
+            "collapsed": 0,
+            "sharp": 177,
+            "folded": 83
+          },
+          "maxJointHeadErrorM": 1.431209796093296e-07,
+          "regressed": [
+            "maxStretch",
+            "overDouble",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.L-1.0",
+          "metrics": {
+            "excessBend": 716.1648744800718,
+            "maxStretch": 2.4851228503074587,
+            "stretchP99": 1.4757105690467347,
+            "overDouble": 86,
+            "compressed": 32,
+            "collapsed": 2,
+            "sharp": 178,
+            "folded": 81
+          },
+          "maxJointHeadErrorM": 1.431209796093296e-07,
+          "regressed": [
+            "excessBend",
+            "maxStretch",
+            "overDouble",
+            "collapsed",
+            "sharp"
+          ]
+        },
+        {
+          "label": "upleg.L-1.5",
+          "metrics": {
+            "excessBend": 706.1346689638001,
+            "maxStretch": 2.5004177459616876,
+            "stretchP99": 1.4800529229554407,
+            "overDouble": 93,
+            "compressed": 29,
+            "collapsed": 0,
+            "sharp": 184,
+            "folded": 82
+          },
+          "maxJointHeadErrorM": 1.431209796093296e-07,
+          "regressed": [
+            "excessBend",
+            "maxStretch",
+            "stretchP99",
+            "overDouble",
+            "sharp"
+          ]
+        },
+        {
+          "label": "upleg.R-0.0",
+          "metrics": {
+            "excessBend": 705.600142460591,
+            "maxStretch": 2.4457648383973956,
+            "stretchP99": 1.4773237584476424,
+            "overDouble": 76,
+            "compressed": 33,
+            "collapsed": 0,
+            "sharp": 176,
+            "folded": 82
+          },
+          "maxJointHeadErrorM": 1.431209796093296e-07,
+          "regressed": []
+        },
+        {
+          "label": "upleg.R-0.5",
+          "metrics": {
+            "excessBend": 711.0504663959581,
+            "maxStretch": 2.4808681666187122,
+            "stretchP99": 1.480408567938378,
+            "overDouble": 82,
+            "compressed": 32,
+            "collapsed": 0,
+            "sharp": 177,
+            "folded": 84
+          },
+          "maxJointHeadErrorM": 1.431209796093296e-07,
+          "regressed": [
+            "excessBend",
+            "maxStretch",
+            "stretchP99",
+            "overDouble",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.R-1.0",
+          "metrics": {
+            "excessBend": 711.883277889239,
+            "maxStretch": 2.513752062202398,
+            "stretchP99": 1.486017209928328,
+            "overDouble": 93,
+            "compressed": 34,
+            "collapsed": 0,
+            "sharp": 184,
+            "folded": 85
+          },
+          "maxJointHeadErrorM": 1.431209796093296e-07,
+          "regressed": [
+            "excessBend",
+            "maxStretch",
+            "stretchP99",
+            "overDouble",
+            "compressed",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.R-1.5",
+          "metrics": {
+            "excessBend": 715.0192828643992,
+            "maxStretch": 2.5431926633122273,
+            "stretchP99": 1.4860537666367977,
+            "overDouble": 99,
+            "compressed": 34,
+            "collapsed": 0,
+            "sharp": 189,
+            "folded": 88
+          },
+          "maxJointHeadErrorM": 1.431209796093296e-07,
+          "regressed": [
+            "excessBend",
+            "maxStretch",
+            "stretchP99",
+            "overDouble",
+            "compressed",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.L+upleg.R-0.0",
+          "metrics": {
+            "excessBend": 705.6002900609649,
+            "maxStretch": 2.4457631117076137,
+            "stretchP99": 1.477323848112624,
+            "overDouble": 76,
+            "compressed": 33,
+            "collapsed": 0,
+            "sharp": 176,
+            "folded": 82
+          },
+          "maxJointHeadErrorM": 2.2152168672261396e-07,
+          "regressed": []
+        },
+        {
+          "label": "upleg.L+upleg.R-0.5",
+          "metrics": {
+            "excessBend": 707.4036067188667,
+            "maxStretch": 2.5017102051562756,
+            "stretchP99": 1.4778078219783044,
+            "overDouble": 88,
+            "compressed": 33,
+            "collapsed": 0,
+            "sharp": 179,
+            "folded": 84
+          },
+          "maxJointHeadErrorM": 1.431209796093296e-07,
+          "regressed": [
+            "excessBend",
+            "maxStretch",
+            "stretchP99",
+            "overDouble",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.L+upleg.R-1.0",
+          "metrics": {
+            "excessBend": 718.1388377378087,
+            "maxStretch": 2.549895630230417,
+            "stretchP99": 1.486597417199901,
+            "overDouble": 106,
+            "compressed": 34,
+            "collapsed": 2,
+            "sharp": 184,
+            "folded": 83
+          },
+          "maxJointHeadErrorM": 1.431209796093296e-07,
+          "regressed": [
+            "excessBend",
+            "maxStretch",
+            "stretchP99",
+            "overDouble",
+            "compressed",
+            "collapsed",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.L+upleg.R-1.5",
+          "metrics": {
+            "excessBend": 706.3022279193501,
+            "maxStretch": 2.8957702901266673,
+            "stretchP99": 1.4917761657154605,
+            "overDouble": 124,
+            "compressed": 31,
+            "collapsed": 0,
+            "sharp": 186,
+            "folded": 87
+          },
+          "maxJointHeadErrorM": 1.431209796093296e-07,
+          "regressed": [
+            "excessBend",
+            "maxStretch",
+            "stretchP99",
+            "overDouble",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "parent-seeded-thigh-roll",
+          "metrics": {
+            "excessBend": 718.1393258579633,
+            "maxStretch": 2.549895905981396,
+            "stretchP99": 1.48659746431544,
+            "overDouble": 106,
+            "compressed": 34,
+            "collapsed": 2,
+            "sharp": 184,
+            "folded": 83
+          },
+          "maxJointHeadErrorM": 1.431209796093296e-07,
+          "regressed": [
+            "excessBend",
+            "maxStretch",
+            "stretchP99",
+            "overDouble",
+            "compressed",
+            "collapsed",
+            "sharp",
+            "folded"
+          ]
+        }
+      ]
+    },
+    {
+      "model": 0,
+      "pose": 1,
+      "poseSha256": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+      "localTwistDeg": {
+        "hips": 142.85523698151425,
+        "upleg.L": 6.688940543231232e-05,
+        "upleg.R": 1.1768388595100374e-05
+      },
+      "before": {
+        "excessBend": 850.9460540887285,
+        "maxStretch": 8.320859053538083,
+        "stretchP99": 1.575033876433608,
+        "overDouble": 177,
+        "compressed": 35,
+        "collapsed": 1,
+        "sharp": 199,
+        "folded": 101
+      },
+      "variants": [
+        {
+          "label": "hips-0.0",
+          "metrics": {
+            "excessBend": 850.9351388455685,
+            "maxStretch": 8.320856929840419,
+            "stretchP99": 1.575032005843374,
+            "overDouble": 177,
+            "compressed": 35,
+            "collapsed": 1,
+            "sharp": 199,
+            "folded": 101
+          },
+          "maxJointHeadErrorM": 2.573418027038953e-07,
+          "regressed": []
+        },
+        {
+          "label": "hips-0.5",
+          "metrics": {
+            "excessBend": 1281.706850972162,
+            "maxStretch": 8.059247146386054,
+            "stretchP99": 1.773390721230433,
+            "overDouble": 535,
+            "compressed": 32,
+            "collapsed": 1,
+            "sharp": 327,
+            "folded": 167
+          },
+          "maxJointHeadErrorM": 1.4973257414230349e-06,
+          "regressed": [
+            "excessBend",
+            "stretchP99",
+            "overDouble",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "hips-1.0",
+          "metrics": {
+            "excessBend": 1695.6199342355562,
+            "maxStretch": 8.830539870352073,
+            "stretchP99": 2.1013563010323946,
+            "overDouble": 891,
+            "compressed": 42,
+            "collapsed": 1,
+            "sharp": 419,
+            "folded": 235
+          },
+          "maxJointHeadErrorM": 4.806057638785284e-07,
+          "regressed": [
+            "excessBend",
+            "maxStretch",
+            "stretchP99",
+            "overDouble",
+            "compressed",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "hips-1.5",
+          "metrics": {
+            "excessBend": 1845.2435573544522,
+            "maxStretch": 8.693619957601435,
+            "stretchP99": 2.162813396944728,
+            "overDouble": 1017,
+            "compressed": 51,
+            "collapsed": 2,
+            "sharp": 479,
+            "folded": 265
+          },
+          "maxJointHeadErrorM": 4.996335127740797e-07,
+          "regressed": [
+            "excessBend",
+            "maxStretch",
+            "stretchP99",
+            "overDouble",
+            "compressed",
+            "collapsed",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.L-0.0",
+          "metrics": {
+            "excessBend": 850.9351336817201,
+            "maxStretch": 8.320858867953028,
+            "stretchP99": 1.5750315887819464,
+            "overDouble": 177,
+            "compressed": 35,
+            "collapsed": 1,
+            "sharp": 199,
+            "folded": 101
+          },
+          "maxJointHeadErrorM": 4.231116433292831e-07,
+          "regressed": []
+        },
+        {
+          "label": "upleg.L-0.5",
+          "metrics": {
+            "excessBend": 850.9351244846596,
+            "maxStretch": 8.320859012777827,
+            "stretchP99": 1.5750317545843904,
+            "overDouble": 177,
+            "compressed": 35,
+            "collapsed": 1,
+            "sharp": 199,
+            "folded": 101
+          },
+          "maxJointHeadErrorM": 4.308471767545033e-07,
+          "regressed": []
+        },
+        {
+          "label": "upleg.L-1.0",
+          "metrics": {
+            "excessBend": 850.9353412135865,
+            "maxStretch": 8.320858676869204,
+            "stretchP99": 1.5750318054678858,
+            "overDouble": 177,
+            "compressed": 35,
+            "collapsed": 1,
+            "sharp": 199,
+            "folded": 101
+          },
+          "maxJointHeadErrorM": 4.6000924826959166e-07,
+          "regressed": []
+        },
+        {
+          "label": "upleg.L-1.5",
+          "metrics": {
+            "excessBend": 850.9352962032103,
+            "maxStretch": 8.320857128315923,
+            "stretchP99": 1.5750316500576858,
+            "overDouble": 177,
+            "compressed": 35,
+            "collapsed": 1,
+            "sharp": 199,
+            "folded": 101
+          },
+          "maxJointHeadErrorM": 4.6000924826959166e-07,
+          "regressed": []
+        },
+        {
+          "label": "upleg.R-0.0",
+          "metrics": {
+            "excessBend": 850.9352786985376,
+            "maxStretch": 8.320859840862187,
+            "stretchP99": 1.575032595163865,
+            "overDouble": 177,
+            "compressed": 35,
+            "collapsed": 1,
+            "sharp": 199,
+            "folded": 101
+          },
+          "maxJointHeadErrorM": 5.219795092058895e-07,
+          "regressed": []
+        },
+        {
+          "label": "upleg.R-0.5",
+          "metrics": {
+            "excessBend": 850.9352786985376,
+            "maxStretch": 8.320859840862187,
+            "stretchP99": 1.575032595163865,
+            "overDouble": 177,
+            "compressed": 35,
+            "collapsed": 1,
+            "sharp": 199,
+            "folded": 101
+          },
+          "maxJointHeadErrorM": 5.219795092058895e-07,
+          "regressed": []
+        },
+        {
+          "label": "upleg.R-1.0",
+          "metrics": {
+            "excessBend": 850.9352926003439,
+            "maxStretch": 8.32085969926337,
+            "stretchP99": 1.5750326225415063,
+            "overDouble": 177,
+            "compressed": 35,
+            "collapsed": 1,
+            "sharp": 199,
+            "folded": 101
+          },
+          "maxJointHeadErrorM": 5.219795092058895e-07,
+          "regressed": []
+        },
+        {
+          "label": "upleg.R-1.5",
+          "metrics": {
+            "excessBend": 850.9352926003439,
+            "maxStretch": 8.32085969926337,
+            "stretchP99": 1.5750326225415063,
+            "overDouble": 177,
+            "compressed": 35,
+            "collapsed": 1,
+            "sharp": 199,
+            "folded": 101
+          },
+          "maxJointHeadErrorM": 5.219795092058895e-07,
+          "regressed": []
+        },
+        {
+          "label": "upleg.L+upleg.R-0.0",
+          "metrics": {
+            "excessBend": 850.9350975699919,
+            "maxStretch": 8.320858496507997,
+            "stretchP99": 1.5750315862313096,
+            "overDouble": 177,
+            "compressed": 35,
+            "collapsed": 1,
+            "sharp": 199,
+            "folded": 101
+          },
+          "maxJointHeadErrorM": 4.231116433292831e-07,
+          "regressed": []
+        },
+        {
+          "label": "upleg.L+upleg.R-0.5",
+          "metrics": {
+            "excessBend": 850.9350883728715,
+            "maxStretch": 8.320858641333349,
+            "stretchP99": 1.5750317520337662,
+            "overDouble": 177,
+            "compressed": 35,
+            "collapsed": 1,
+            "sharp": 199,
+            "folded": 101
+          },
+          "maxJointHeadErrorM": 4.308471767545033e-07,
+          "regressed": []
+        },
+        {
+          "label": "upleg.L+upleg.R-1.0",
+          "metrics": {
+            "excessBend": 850.9353190034299,
+            "maxStretch": 8.320858163826749,
+            "stretchP99": 1.5750318302949349,
+            "overDouble": 177,
+            "compressed": 35,
+            "collapsed": 1,
+            "sharp": 199,
+            "folded": 101
+          },
+          "maxJointHeadErrorM": 4.6000924826959166e-07,
+          "regressed": []
+        },
+        {
+          "label": "upleg.L+upleg.R-1.5",
+          "metrics": {
+            "excessBend": 850.9352739931363,
+            "maxStretch": 8.32085661527341,
+            "stretchP99": 1.5750316748846818,
+            "overDouble": 177,
+            "compressed": 35,
+            "collapsed": 1,
+            "sharp": 199,
+            "folded": 101
+          },
+          "maxJointHeadErrorM": 4.6000924826959166e-07,
+          "regressed": []
+        },
+        {
+          "label": "parent-seeded-thigh-roll",
+          "metrics": {
+            "excessBend": 850.9354635514424,
+            "maxStretch": 8.320861095863828,
+            "stretchP99": 1.575032361147925,
+            "overDouble": 177,
+            "compressed": 35,
+            "collapsed": 1,
+            "sharp": 199,
+            "folded": 101
+          },
+          "maxJointHeadErrorM": 4.541799621024183e-07,
+          "regressed": []
+        }
+      ]
+    },
+    {
+      "model": 1,
+      "pose": 0,
+      "poseSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+      "localTwistDeg": {
+        "hips": 3.053332494204976e-13,
+        "upleg.L": -11.81639118866214,
+        "upleg.R": 11.782078025819288
+      },
+      "before": {
+        "excessBend": 3469.625231918986,
+        "maxStretch": 48.251339610708975,
+        "stretchP99": 1.6062366992272272,
+        "overDouble": 654,
+        "compressed": 110,
+        "collapsed": 2,
+        "sharp": 385,
+        "folded": 158
+      },
+      "variants": [
+        {
+          "label": "hips-0.0",
+          "metrics": {
+            "excessBend": 3469.6362413464517,
+            "maxStretch": 48.25135082346082,
+            "stretchP99": 1.6062292000815406,
+            "overDouble": 654,
+            "compressed": 110,
+            "collapsed": 2,
+            "sharp": 385,
+            "folded": 158
+          },
+          "maxJointHeadErrorM": 1.8189185285171422e-07,
+          "regressed": []
+        },
+        {
+          "label": "hips-0.5",
+          "metrics": {
+            "excessBend": 3469.6362413464517,
+            "maxStretch": 48.25135082346082,
+            "stretchP99": 1.6062292000815406,
+            "overDouble": 654,
+            "compressed": 110,
+            "collapsed": 2,
+            "sharp": 385,
+            "folded": 158
+          },
+          "maxJointHeadErrorM": 1.8189185285171422e-07,
+          "regressed": []
+        },
+        {
+          "label": "hips-1.0",
+          "metrics": {
+            "excessBend": 3469.6362413464517,
+            "maxStretch": 48.25135082346082,
+            "stretchP99": 1.6062292000815406,
+            "overDouble": 654,
+            "compressed": 110,
+            "collapsed": 2,
+            "sharp": 385,
+            "folded": 158
+          },
+          "maxJointHeadErrorM": 1.8189185285171422e-07,
+          "regressed": []
+        },
+        {
+          "label": "hips-1.5",
+          "metrics": {
+            "excessBend": 3469.6362413464517,
+            "maxStretch": 48.25135082346082,
+            "stretchP99": 1.6062292000815406,
+            "overDouble": 654,
+            "compressed": 110,
+            "collapsed": 2,
+            "sharp": 385,
+            "folded": 158
+          },
+          "maxJointHeadErrorM": 1.8189185285171422e-07,
+          "regressed": []
+        },
+        {
+          "label": "upleg.L-0.0",
+          "metrics": {
+            "excessBend": 3469.6351161092334,
+            "maxStretch": 48.25130779906533,
+            "stretchP99": 1.6062292186994787,
+            "overDouble": 654,
+            "compressed": 110,
+            "collapsed": 2,
+            "sharp": 385,
+            "folded": 158
+          },
+          "maxJointHeadErrorM": 1.812804499357408e-07,
+          "regressed": []
+        },
+        {
+          "label": "upleg.L-0.5",
+          "metrics": {
+            "excessBend": 3436.0132344652316,
+            "maxStretch": 44.2944093014512,
+            "stretchP99": 1.6095039481942497,
+            "overDouble": 686,
+            "compressed": 112,
+            "collapsed": 3,
+            "sharp": 391,
+            "folded": 154
+          },
+          "maxJointHeadErrorM": 1.2377834115800373e-07,
+          "regressed": [
+            "stretchP99",
+            "overDouble",
+            "compressed",
+            "collapsed",
+            "sharp"
+          ]
+        },
+        {
+          "label": "upleg.L-1.0",
+          "metrics": {
+            "excessBend": 3420.6862554546888,
+            "maxStretch": 43.04501693728937,
+            "stretchP99": 1.613887016846041,
+            "overDouble": 699,
+            "compressed": 113,
+            "collapsed": 3,
+            "sharp": 419,
+            "folded": 154
+          },
+          "maxJointHeadErrorM": 1.884864366154897e-07,
+          "regressed": [
+            "stretchP99",
+            "overDouble",
+            "compressed",
+            "collapsed",
+            "sharp"
+          ]
+        },
+        {
+          "label": "upleg.L-1.5",
+          "metrics": {
+            "excessBend": 3582.55290606972,
+            "maxStretch": 44.743574180644046,
+            "stretchP99": 1.6233188208721794,
+            "overDouble": 736,
+            "compressed": 118,
+            "collapsed": 2,
+            "sharp": 437,
+            "folded": 153
+          },
+          "maxJointHeadErrorM": 1.9082797281243946e-07,
+          "regressed": [
+            "excessBend",
+            "stretchP99",
+            "overDouble",
+            "compressed",
+            "sharp"
+          ]
+        },
+        {
+          "label": "upleg.R-0.0",
+          "metrics": {
+            "excessBend": 3469.6350636122097,
+            "maxStretch": 48.25133429287264,
+            "stretchP99": 1.606229305299678,
+            "overDouble": 654,
+            "compressed": 110,
+            "collapsed": 2,
+            "sharp": 385,
+            "folded": 158
+          },
+          "maxJointHeadErrorM": 2.3383430878036045e-07,
+          "regressed": []
+        },
+        {
+          "label": "upleg.R-0.5",
+          "metrics": {
+            "excessBend": 3453.2458037806778,
+            "maxStretch": 45.04270496087366,
+            "stretchP99": 1.6107137726801215,
+            "overDouble": 680,
+            "compressed": 106,
+            "collapsed": 0,
+            "sharp": 387,
+            "folded": 165
+          },
+          "maxJointHeadErrorM": 2.3383430878036045e-07,
+          "regressed": [
+            "stretchP99",
+            "overDouble",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.R-1.0",
+          "metrics": {
+            "excessBend": 3489.736021514881,
+            "maxStretch": 44.19967489224058,
+            "stretchP99": 1.6151944073133084,
+            "overDouble": 692,
+            "compressed": 110,
+            "collapsed": 0,
+            "sharp": 396,
+            "folded": 168
+          },
+          "maxJointHeadErrorM": 2.3383430878036045e-07,
+          "regressed": [
+            "excessBend",
+            "stretchP99",
+            "overDouble",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.R-1.5",
+          "metrics": {
+            "excessBend": 3536.599386645793,
+            "maxStretch": 45.86160004313056,
+            "stretchP99": 1.623566759796032,
+            "overDouble": 714,
+            "compressed": 101,
+            "collapsed": 1,
+            "sharp": 423,
+            "folded": 164
+          },
+          "maxJointHeadErrorM": 2.3383430878036045e-07,
+          "regressed": [
+            "excessBend",
+            "stretchP99",
+            "overDouble",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.L+upleg.R-0.0",
+          "metrics": {
+            "excessBend": 3469.634846987715,
+            "maxStretch": 48.25130897264922,
+            "stretchP99": 1.6062292170993762,
+            "overDouble": 654,
+            "compressed": 110,
+            "collapsed": 2,
+            "sharp": 385,
+            "folded": 158
+          },
+          "maxJointHeadErrorM": 1.812804499357408e-07,
+          "regressed": []
+        },
+        {
+          "label": "upleg.L+upleg.R-0.5",
+          "metrics": {
+            "excessBend": 3394.31045466937,
+            "maxStretch": 39.69363783535778,
+            "stretchP99": 1.6133058461062695,
+            "overDouble": 696,
+            "compressed": 108,
+            "collapsed": 1,
+            "sharp": 383,
+            "folded": 158
+          },
+          "maxJointHeadErrorM": 1.2377834115800373e-07,
+          "regressed": [
+            "stretchP99",
+            "overDouble"
+          ]
+        },
+        {
+          "label": "upleg.L+upleg.R-1.0",
+          "metrics": {
+            "excessBend": 3407.7042563587947,
+            "maxStretch": 32.81914758431293,
+            "stretchP99": 1.6264894062375113,
+            "overDouble": 735,
+            "compressed": 113,
+            "collapsed": 1,
+            "sharp": 391,
+            "folded": 161
+          },
+          "maxJointHeadErrorM": 1.884864366154897e-07,
+          "regressed": [
+            "stretchP99",
+            "overDouble",
+            "compressed",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.L+upleg.R-1.5",
+          "metrics": {
+            "excessBend": 3466.968605848761,
+            "maxStretch": 27.69288986967922,
+            "stretchP99": 1.6412298994734866,
+            "overDouble": 775,
+            "compressed": 109,
+            "collapsed": 1,
+            "sharp": 415,
+            "folded": 156
+          },
+          "maxJointHeadErrorM": 2.1542358837725164e-07,
+          "regressed": [
+            "stretchP99",
+            "overDouble",
+            "sharp"
+          ]
+        },
+        {
+          "label": "parent-seeded-thigh-roll",
+          "metrics": {
+            "excessBend": 3407.7037732624094,
+            "maxStretch": 32.81908636740936,
+            "stretchP99": 1.6264898028932142,
+            "overDouble": 735,
+            "compressed": 113,
+            "collapsed": 1,
+            "sharp": 391,
+            "folded": 161
+          },
+          "maxJointHeadErrorM": 1.812804499357408e-07,
+          "regressed": [
+            "stretchP99",
+            "overDouble",
+            "compressed",
+            "sharp",
+            "folded"
+          ]
+        }
+      ]
+    },
+    {
+      "model": 1,
+      "pose": 1,
+      "poseSha256": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+      "localTwistDeg": {
+        "hips": 142.85522332113592,
+        "upleg.L": 1.5404516769139244e-05,
+        "upleg.R": 7.3589661055811675e-06
+      },
+      "before": {
+        "excessBend": 6270.897714899695,
+        "maxStretch": 219.89973103988808,
+        "stretchP99": 1.8113034243539459,
+        "overDouble": 1853,
+        "compressed": 181,
+        "collapsed": 3,
+        "sharp": 896,
+        "folded": 522
+      },
+      "variants": [
+        {
+          "label": "hips-0.0",
+          "metrics": {
+            "excessBend": 6270.853675860544,
+            "maxStretch": 219.8997830537003,
+            "stretchP99": 1.811301241255422,
+            "overDouble": 1853,
+            "compressed": 181,
+            "collapsed": 3,
+            "sharp": 897,
+            "folded": 522
+          },
+          "maxJointHeadErrorM": 2.3728081493518023e-07,
+          "regressed": [
+            "sharp"
+          ]
+        },
+        {
+          "label": "hips-0.5",
+          "metrics": {
+            "excessBend": 8590.068725818452,
+            "maxStretch": 221.80431514981996,
+            "stretchP99": 2.3077232314844163,
+            "overDouble": 3743,
+            "compressed": 122,
+            "collapsed": 1,
+            "sharp": 1340,
+            "folded": 667
+          },
+          "maxJointHeadErrorM": 3.5701130608696404e-07,
+          "regressed": [
+            "excessBend",
+            "maxStretch",
+            "stretchP99",
+            "overDouble",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "hips-1.0",
+          "metrics": {
+            "excessBend": 9764.663180319556,
+            "maxStretch": 222.67704635910215,
+            "stretchP99": 2.841101945962195,
+            "overDouble": 6675,
+            "compressed": 135,
+            "collapsed": 2,
+            "sharp": 1645,
+            "folded": 765
+          },
+          "maxJointHeadErrorM": 2.7161428531346e-07,
+          "regressed": [
+            "excessBend",
+            "maxStretch",
+            "stretchP99",
+            "overDouble",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "hips-1.5",
+          "metrics": {
+            "excessBend": 10595.76893021616,
+            "maxStretch": 221.3395156390717,
+            "stretchP99": 2.83202781443934,
+            "overDouble": 7250,
+            "compressed": 152,
+            "collapsed": 2,
+            "sharp": 1722,
+            "folded": 860
+          },
+          "maxJointHeadErrorM": 3.0538293021796936e-07,
+          "regressed": [
+            "excessBend",
+            "maxStretch",
+            "stretchP99",
+            "overDouble",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.L-0.0",
+          "metrics": {
+            "excessBend": 6270.854080028462,
+            "maxStretch": 219.89985545241612,
+            "stretchP99": 1.8113015202139957,
+            "overDouble": 1853,
+            "compressed": 181,
+            "collapsed": 3,
+            "sharp": 897,
+            "folded": 522
+          },
+          "maxJointHeadErrorM": 2.4755668231600746e-07,
+          "regressed": [
+            "sharp"
+          ]
+        },
+        {
+          "label": "upleg.L-0.5",
+          "metrics": {
+            "excessBend": 6270.854297309733,
+            "maxStretch": 219.8998756791886,
+            "stretchP99": 1.811301538861021,
+            "overDouble": 1853,
+            "compressed": 181,
+            "collapsed": 3,
+            "sharp": 897,
+            "folded": 522
+          },
+          "maxJointHeadErrorM": 2.5965700956707213e-07,
+          "regressed": [
+            "sharp"
+          ]
+        },
+        {
+          "label": "upleg.L-1.0",
+          "metrics": {
+            "excessBend": 6270.854297309733,
+            "maxStretch": 219.8998756791886,
+            "stretchP99": 1.811301538861021,
+            "overDouble": 1853,
+            "compressed": 181,
+            "collapsed": 3,
+            "sharp": 897,
+            "folded": 522
+          },
+          "maxJointHeadErrorM": 2.5965700956707213e-07,
+          "regressed": [
+            "sharp"
+          ]
+        },
+        {
+          "label": "upleg.L-1.5",
+          "metrics": {
+            "excessBend": 6270.854472217338,
+            "maxStretch": 219.899871700891,
+            "stretchP99": 1.8113013475318078,
+            "overDouble": 1853,
+            "compressed": 181,
+            "collapsed": 3,
+            "sharp": 897,
+            "folded": 522
+          },
+          "maxJointHeadErrorM": 2.5272326552676957e-07,
+          "regressed": [
+            "sharp"
+          ]
+        },
+        {
+          "label": "upleg.R-0.0",
+          "metrics": {
+            "excessBend": 6270.853717245027,
+            "maxStretch": 219.89978046226148,
+            "stretchP99": 1.8113008607476,
+            "overDouble": 1853,
+            "compressed": 181,
+            "collapsed": 3,
+            "sharp": 897,
+            "folded": 522
+          },
+          "maxJointHeadErrorM": 1.9967695002641374e-07,
+          "regressed": [
+            "sharp"
+          ]
+        },
+        {
+          "label": "upleg.R-0.5",
+          "metrics": {
+            "excessBend": 6270.853717245027,
+            "maxStretch": 219.89978046226148,
+            "stretchP99": 1.8113008607476,
+            "overDouble": 1853,
+            "compressed": 181,
+            "collapsed": 3,
+            "sharp": 897,
+            "folded": 522
+          },
+          "maxJointHeadErrorM": 1.9967695002641374e-07,
+          "regressed": [
+            "sharp"
+          ]
+        },
+        {
+          "label": "upleg.R-1.0",
+          "metrics": {
+            "excessBend": 6270.854203052945,
+            "maxStretch": 219.89984650124936,
+            "stretchP99": 1.8113010562689635,
+            "overDouble": 1853,
+            "compressed": 181,
+            "collapsed": 3,
+            "sharp": 897,
+            "folded": 522
+          },
+          "maxJointHeadErrorM": 1.9967695002641374e-07,
+          "regressed": [
+            "sharp"
+          ]
+        },
+        {
+          "label": "upleg.R-1.5",
+          "metrics": {
+            "excessBend": 6270.854203052945,
+            "maxStretch": 219.89984650124936,
+            "stretchP99": 1.8113010562689635,
+            "overDouble": 1853,
+            "compressed": 181,
+            "collapsed": 3,
+            "sharp": 897,
+            "folded": 522
+          },
+          "maxJointHeadErrorM": 1.9967695002641374e-07,
+          "regressed": [
+            "sharp"
+          ]
+        },
+        {
+          "label": "upleg.L+upleg.R-0.0",
+          "metrics": {
+            "excessBend": 6270.853879832681,
+            "maxStretch": 219.89984850173764,
+            "stretchP99": 1.8113013840514398,
+            "overDouble": 1853,
+            "compressed": 181,
+            "collapsed": 3,
+            "sharp": 897,
+            "folded": 522
+          },
+          "maxJointHeadErrorM": 2.4755668231600746e-07,
+          "regressed": [
+            "sharp"
+          ]
+        },
+        {
+          "label": "upleg.L+upleg.R-0.5",
+          "metrics": {
+            "excessBend": 6270.8540971141465,
+            "maxStretch": 219.89986872851392,
+            "stretchP99": 1.8113014026984542,
+            "overDouble": 1853,
+            "compressed": 181,
+            "collapsed": 3,
+            "sharp": 897,
+            "folded": 522
+          },
+          "maxJointHeadErrorM": 2.5965700956707213e-07,
+          "regressed": [
+            "sharp"
+          ]
+        },
+        {
+          "label": "upleg.L+upleg.R-1.0",
+          "metrics": {
+            "excessBend": 6270.854582921981,
+            "maxStretch": 219.89993476749873,
+            "stretchP99": 1.8113015982197787,
+            "overDouble": 1853,
+            "compressed": 181,
+            "collapsed": 3,
+            "sharp": 897,
+            "folded": 522
+          },
+          "maxJointHeadErrorM": 2.5965700956707213e-07,
+          "regressed": [
+            "sharp"
+          ]
+        },
+        {
+          "label": "upleg.L+upleg.R-1.5",
+          "metrics": {
+            "excessBend": 6270.854757830661,
+            "maxStretch": 219.89993078920702,
+            "stretchP99": 1.8113014068905775,
+            "overDouble": 1853,
+            "compressed": 181,
+            "collapsed": 3,
+            "sharp": 897,
+            "folded": 522
+          },
+          "maxJointHeadErrorM": 2.5272326552676957e-07,
+          "regressed": [
+            "sharp"
+          ]
+        },
+        {
+          "label": "parent-seeded-thigh-roll",
+          "metrics": {
+            "excessBend": 6270.853794263356,
+            "maxStretch": 219.8998772085064,
+            "stretchP99": 1.8113011257407146,
+            "overDouble": 1853,
+            "compressed": 181,
+            "collapsed": 3,
+            "sharp": 897,
+            "folded": 522
+          },
+          "maxJointHeadErrorM": 2.0485709734063626e-07,
+          "regressed": [
+            "sharp"
+          ]
+        }
+      ]
+    },
+    {
+      "model": 2,
+      "pose": 0,
+      "poseSha256": "756b393a31732e270a6fa65454fb4162e6f442a7f0e31ef8c7f0da204dc74ad6",
+      "localTwistDeg": {
+        "hips": 3.053332494204976e-13,
+        "upleg.L": -16.3843909697154,
+        "upleg.R": 16.37166120464979
+      },
+      "before": {
+        "excessBend": 63880.25927284554,
+        "maxStretch": 2.8853749963252566,
+        "stretchP99": 1.4932864824304863,
+        "overDouble": 171,
+        "compressed": 292,
+        "collapsed": 4,
+        "sharp": 3757,
+        "folded": 1790
+      },
+      "variants": [
+        {
+          "label": "hips-0.0",
+          "metrics": {
+            "excessBend": 63880.54169166643,
+            "maxStretch": 2.8853621440292767,
+            "stretchP99": 1.4932940014146523,
+            "overDouble": 171,
+            "compressed": 292,
+            "collapsed": 4,
+            "sharp": 3757,
+            "folded": 1790
+          },
+          "maxJointHeadErrorM": 1.2818463544611077e-07,
+          "regressed": []
+        },
+        {
+          "label": "hips-0.5",
+          "metrics": {
+            "excessBend": 63880.54169166643,
+            "maxStretch": 2.8853621440292767,
+            "stretchP99": 1.4932940014146523,
+            "overDouble": 171,
+            "compressed": 292,
+            "collapsed": 4,
+            "sharp": 3757,
+            "folded": 1790
+          },
+          "maxJointHeadErrorM": 1.2818463544611077e-07,
+          "regressed": []
+        },
+        {
+          "label": "hips-1.0",
+          "metrics": {
+            "excessBend": 63880.54169166643,
+            "maxStretch": 2.8853621440292767,
+            "stretchP99": 1.4932940014146523,
+            "overDouble": 171,
+            "compressed": 292,
+            "collapsed": 4,
+            "sharp": 3757,
+            "folded": 1790
+          },
+          "maxJointHeadErrorM": 1.2818463544611077e-07,
+          "regressed": []
+        },
+        {
+          "label": "hips-1.5",
+          "metrics": {
+            "excessBend": 63880.54169166643,
+            "maxStretch": 2.8853621440292767,
+            "stretchP99": 1.4932940014146523,
+            "overDouble": 171,
+            "compressed": 292,
+            "collapsed": 4,
+            "sharp": 3757,
+            "folded": 1790
+          },
+          "maxJointHeadErrorM": 1.2818463544611077e-07,
+          "regressed": []
+        },
+        {
+          "label": "upleg.L-0.0",
+          "metrics": {
+            "excessBend": 63880.55797632456,
+            "maxStretch": 2.885360950166484,
+            "stretchP99": 1.493294076301248,
+            "overDouble": 171,
+            "compressed": 292,
+            "collapsed": 4,
+            "sharp": 3757,
+            "folded": 1790
+          },
+          "maxJointHeadErrorM": 1.2818463544611077e-07,
+          "regressed": []
+        },
+        {
+          "label": "upleg.L-0.5",
+          "metrics": {
+            "excessBend": 64338.90894738614,
+            "maxStretch": 2.885360950166484,
+            "stretchP99": 1.4948984102545528,
+            "overDouble": 176,
+            "compressed": 306,
+            "collapsed": 3,
+            "sharp": 3794,
+            "folded": 1810
+          },
+          "maxJointHeadErrorM": 1.2013700229374393e-07,
+          "regressed": [
+            "excessBend",
+            "stretchP99",
+            "overDouble",
+            "compressed",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.L-1.0",
+          "metrics": {
+            "excessBend": 65631.35796470444,
+            "maxStretch": 2.885360950166484,
+            "stretchP99": 1.496050734510122,
+            "overDouble": 187,
+            "compressed": 326,
+            "collapsed": 2,
+            "sharp": 3839,
+            "folded": 1846
+          },
+          "maxJointHeadErrorM": 1.6924465733171325e-07,
+          "regressed": [
+            "excessBend",
+            "stretchP99",
+            "overDouble",
+            "compressed",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.L-1.5",
+          "metrics": {
+            "excessBend": 66977.52229326051,
+            "maxStretch": 2.885360950166484,
+            "stretchP99": 1.498136437451676,
+            "overDouble": 203,
+            "compressed": 327,
+            "collapsed": 2,
+            "sharp": 3912,
+            "folded": 1900
+          },
+          "maxJointHeadErrorM": 2.430305843099965e-07,
+          "regressed": [
+            "excessBend",
+            "stretchP99",
+            "overDouble",
+            "compressed",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.R-0.0",
+          "metrics": {
+            "excessBend": 63880.55051339943,
+            "maxStretch": 2.885360950166484,
+            "stretchP99": 1.4932941100568498,
+            "overDouble": 171,
+            "compressed": 292,
+            "collapsed": 4,
+            "sharp": 3757,
+            "folded": 1790
+          },
+          "maxJointHeadErrorM": 1.2013700229374393e-07,
+          "regressed": []
+        },
+        {
+          "label": "upleg.R-0.5",
+          "metrics": {
+            "excessBend": 64440.20222197644,
+            "maxStretch": 2.885360950166484,
+            "stretchP99": 1.495636366986506,
+            "overDouble": 175,
+            "compressed": 310,
+            "collapsed": 3,
+            "sharp": 3770,
+            "folded": 1795
+          },
+          "maxJointHeadErrorM": 1.2013700229374393e-07,
+          "regressed": [
+            "excessBend",
+            "stretchP99",
+            "overDouble",
+            "compressed",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.R-1.0",
+          "metrics": {
+            "excessBend": 65501.53612934591,
+            "maxStretch": 2.885360950166484,
+            "stretchP99": 1.4974161259457202,
+            "overDouble": 180,
+            "compressed": 331,
+            "collapsed": 4,
+            "sharp": 3812,
+            "folded": 1813
+          },
+          "maxJointHeadErrorM": 1.7647026899944261e-07,
+          "regressed": [
+            "excessBend",
+            "stretchP99",
+            "overDouble",
+            "compressed",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.R-1.5",
+          "metrics": {
+            "excessBend": 66879.97683047898,
+            "maxStretch": 2.885360950166484,
+            "stretchP99": 1.5010102776264105,
+            "overDouble": 185,
+            "compressed": 345,
+            "collapsed": 3,
+            "sharp": 3870,
+            "folded": 1865
+          },
+          "maxJointHeadErrorM": 2.3513635751693695e-07,
+          "regressed": [
+            "excessBend",
+            "stretchP99",
+            "overDouble",
+            "compressed",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.L+upleg.R-0.0",
+          "metrics": {
+            "excessBend": 63880.5567127165,
+            "maxStretch": 2.885360950166484,
+            "stretchP99": 1.493294076301248,
+            "overDouble": 171,
+            "compressed": 292,
+            "collapsed": 4,
+            "sharp": 3757,
+            "folded": 1790
+          },
+          "maxJointHeadErrorM": 1.2818463544611077e-07,
+          "regressed": []
+        },
+        {
+          "label": "upleg.L+upleg.R-0.5",
+          "metrics": {
+            "excessBend": 64908.56885012303,
+            "maxStretch": 2.885360950166484,
+            "stretchP99": 1.4972720601462546,
+            "overDouble": 180,
+            "compressed": 325,
+            "collapsed": 2,
+            "sharp": 3817,
+            "folded": 1819
+          },
+          "maxJointHeadErrorM": 1.2013700229374393e-07,
+          "regressed": [
+            "excessBend",
+            "stretchP99",
+            "overDouble",
+            "compressed",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.L+upleg.R-1.0",
+          "metrics": {
+            "excessBend": 67276.3140583458,
+            "maxStretch": 2.885360950166484,
+            "stretchP99": 1.5022123699957015,
+            "overDouble": 201,
+            "compressed": 367,
+            "collapsed": 4,
+            "sharp": 3908,
+            "folded": 1890
+          },
+          "maxJointHeadErrorM": 1.7647026899944261e-07,
+          "regressed": [
+            "excessBend",
+            "stretchP99",
+            "overDouble",
+            "compressed",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.L+upleg.R-1.5",
+          "metrics": {
+            "excessBend": 69847.66818276295,
+            "maxStretch": 3.0846977872114922,
+            "stretchP99": 1.5123906361027841,
+            "overDouble": 224,
+            "compressed": 339,
+            "collapsed": 1,
+            "sharp": 3978,
+            "folded": 1954
+          },
+          "maxJointHeadErrorM": 2.430305843099965e-07,
+          "regressed": [
+            "excessBend",
+            "maxStretch",
+            "stretchP99",
+            "overDouble",
+            "compressed",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "parent-seeded-thigh-roll",
+          "metrics": {
+            "excessBend": 67276.30935256166,
+            "maxStretch": 2.885360950166484,
+            "stretchP99": 1.5022124625483064,
+            "overDouble": 201,
+            "compressed": 367,
+            "collapsed": 4,
+            "sharp": 3908,
+            "folded": 1890
+          },
+          "maxJointHeadErrorM": 1.7943374184954607e-07,
+          "regressed": [
+            "excessBend",
+            "stretchP99",
+            "overDouble",
+            "compressed",
+            "sharp",
+            "folded"
+          ]
+        }
+      ]
+    },
+    {
+      "model": 2,
+      "pose": 1,
+      "poseSha256": "8a755eb24f8385d1f00ea985e1266e7bdc30ed55e4ab6c464e3dd903fca73780",
+      "localTwistDeg": {
+        "hips": 142.85522332113592,
+        "upleg.L": -4.986970671417458e-05,
+        "upleg.R": 1.02478265703203e-05
+      },
+      "before": {
+        "excessBend": 47482.08092963346,
+        "maxStretch": 4.788621870999053,
+        "stretchP99": 1.6926642666791591,
+        "overDouble": 1989,
+        "compressed": 285,
+        "collapsed": 0,
+        "sharp": 2672,
+        "folded": 1263
+      },
+      "variants": [
+        {
+          "label": "hips-0.0",
+          "metrics": {
+            "excessBend": 47482.02316467487,
+            "maxStretch": 4.788592926532623,
+            "stretchP99": 1.6926663644459674,
+            "overDouble": 1989,
+            "compressed": 285,
+            "collapsed": 0,
+            "sharp": 2672,
+            "folded": 1264
+          },
+          "maxJointHeadErrorM": 1.519626234052415e-07,
+          "regressed": [
+            "folded"
+          ]
+        },
+        {
+          "label": "hips-0.5",
+          "metrics": {
+            "excessBend": 51441.28793658431,
+            "maxStretch": 9.61023295778518,
+            "stretchP99": 2.0250518778795463,
+            "overDouble": 5577,
+            "compressed": 224,
+            "collapsed": 0,
+            "sharp": 3373,
+            "folded": 1615
+          },
+          "maxJointHeadErrorM": 6.444213857104991e-07,
+          "regressed": [
+            "excessBend",
+            "maxStretch",
+            "stretchP99",
+            "overDouble",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "hips-1.0",
+          "metrics": {
+            "excessBend": 52762.573357798094,
+            "maxStretch": 14.733748033230365,
+            "stretchP99": 2.4232257803072668,
+            "overDouble": 9970,
+            "compressed": 262,
+            "collapsed": 0,
+            "sharp": 3696,
+            "folded": 1682
+          },
+          "maxJointHeadErrorM": 2.846862848779976e-07,
+          "regressed": [
+            "excessBend",
+            "maxStretch",
+            "stretchP99",
+            "overDouble",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "hips-1.5",
+          "metrics": {
+            "excessBend": 52903.497276664566,
+            "maxStretch": 14.315807405877178,
+            "stretchP99": 2.44343431256653,
+            "overDouble": 11186,
+            "compressed": 276,
+            "collapsed": 1,
+            "sharp": 3745,
+            "folded": 1716
+          },
+          "maxJointHeadErrorM": 4.475312655473115e-07,
+          "regressed": [
+            "excessBend",
+            "maxStretch",
+            "stretchP99",
+            "overDouble",
+            "collapsed",
+            "sharp",
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.L-0.0",
+          "metrics": {
+            "excessBend": 47482.02310727956,
+            "maxStretch": 4.7885947720773405,
+            "stretchP99": 1.6926672331709252,
+            "overDouble": 1989,
+            "compressed": 285,
+            "collapsed": 0,
+            "sharp": 2672,
+            "folded": 1264
+          },
+          "maxJointHeadErrorM": 2.735489569706592e-07,
+          "regressed": [
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.L-0.5",
+          "metrics": {
+            "excessBend": 47482.02488244573,
+            "maxStretch": 4.7885947720773405,
+            "stretchP99": 1.6926672881422022,
+            "overDouble": 1989,
+            "compressed": 285,
+            "collapsed": 0,
+            "sharp": 2672,
+            "folded": 1264
+          },
+          "maxJointHeadErrorM": 2.669762502188819e-07,
+          "regressed": [
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.L-1.0",
+          "metrics": {
+            "excessBend": 47482.02014011945,
+            "maxStretch": 4.7885947720773405,
+            "stretchP99": 1.692667251392826,
+            "overDouble": 1989,
+            "compressed": 285,
+            "collapsed": 0,
+            "sharp": 2672,
+            "folded": 1264
+          },
+          "maxJointHeadErrorM": 2.443972150513042e-07,
+          "regressed": [
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.L-1.5",
+          "metrics": {
+            "excessBend": 47482.01572387053,
+            "maxStretch": 4.7885947720773405,
+            "stretchP99": 1.6926672948577284,
+            "overDouble": 1989,
+            "compressed": 285,
+            "collapsed": 0,
+            "sharp": 2672,
+            "folded": 1264
+          },
+          "maxJointHeadErrorM": 2.356080457693621e-07,
+          "regressed": [
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.R-0.0",
+          "metrics": {
+            "excessBend": 47482.01004093511,
+            "maxStretch": 4.7885947720773405,
+            "stretchP99": 1.6926671952961492,
+            "overDouble": 1989,
+            "compressed": 285,
+            "collapsed": 0,
+            "sharp": 2672,
+            "folded": 1264
+          },
+          "maxJointHeadErrorM": 2.076828459615462e-07,
+          "regressed": [
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.R-0.5",
+          "metrics": {
+            "excessBend": 47482.01004093511,
+            "maxStretch": 4.7885947720773405,
+            "stretchP99": 1.6926671952961492,
+            "overDouble": 1989,
+            "compressed": 285,
+            "collapsed": 0,
+            "sharp": 2672,
+            "folded": 1264
+          },
+          "maxJointHeadErrorM": 2.076828459615462e-07,
+          "regressed": [
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.R-1.0",
+          "metrics": {
+            "excessBend": 47482.009497318744,
+            "maxStretch": 4.7885947720773405,
+            "stretchP99": 1.6926672192410983,
+            "overDouble": 1989,
+            "compressed": 285,
+            "collapsed": 0,
+            "sharp": 2672,
+            "folded": 1264
+          },
+          "maxJointHeadErrorM": 1.8685961073613842e-07,
+          "regressed": [
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.R-1.5",
+          "metrics": {
+            "excessBend": 47482.009497318744,
+            "maxStretch": 4.7885947720773405,
+            "stretchP99": 1.6926672192410983,
+            "overDouble": 1989,
+            "compressed": 285,
+            "collapsed": 0,
+            "sharp": 2672,
+            "folded": 1264
+          },
+          "maxJointHeadErrorM": 1.8685961073613842e-07,
+          "regressed": [
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.L+upleg.R-0.0",
+          "metrics": {
+            "excessBend": 47482.02338479972,
+            "maxStretch": 4.7885947720773405,
+            "stretchP99": 1.6926672535755785,
+            "overDouble": 1989,
+            "compressed": 285,
+            "collapsed": 0,
+            "sharp": 2672,
+            "folded": 1264
+          },
+          "maxJointHeadErrorM": 2.735489569706592e-07,
+          "regressed": [
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.L+upleg.R-0.5",
+          "metrics": {
+            "excessBend": 47482.02515996584,
+            "maxStretch": 4.7885947720773405,
+            "stretchP99": 1.6926673085468573,
+            "overDouble": 1989,
+            "compressed": 285,
+            "collapsed": 0,
+            "sharp": 2672,
+            "folded": 1264
+          },
+          "maxJointHeadErrorM": 2.669762502188819e-07,
+          "regressed": [
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.L+upleg.R-1.0",
+          "metrics": {
+            "excessBend": 47482.01987402321,
+            "maxStretch": 4.7885947720773405,
+            "stretchP99": 1.6926672957424345,
+            "overDouble": 1989,
+            "compressed": 285,
+            "collapsed": 0,
+            "sharp": 2672,
+            "folded": 1264
+          },
+          "maxJointHeadErrorM": 2.443972150513042e-07,
+          "regressed": [
+            "folded"
+          ]
+        },
+        {
+          "label": "upleg.L+upleg.R-1.5",
+          "metrics": {
+            "excessBend": 47482.01545777421,
+            "maxStretch": 4.7885947720773405,
+            "stretchP99": 1.6926673392073548,
+            "overDouble": 1989,
+            "compressed": 285,
+            "collapsed": 0,
+            "sharp": 2672,
+            "folded": 1264
+          },
+          "maxJointHeadErrorM": 2.356080457693621e-07,
+          "regressed": [
+            "folded"
+          ]
+        },
+        {
+          "label": "parent-seeded-thigh-roll",
+          "metrics": {
+            "excessBend": 47482.00671220888,
+            "maxStretch": 4.7885947720773405,
+            "stretchP99": 1.692667367713041,
+            "overDouble": 1989,
+            "compressed": 285,
+            "collapsed": 0,
+            "sharp": 2672,
+            "folded": 1264
+          },
+          "maxJointHeadErrorM": 2.356080457693621e-07,
+          "regressed": [
+            "folded"
+          ]
+        }
+      ]
+    }
+  ]
+}

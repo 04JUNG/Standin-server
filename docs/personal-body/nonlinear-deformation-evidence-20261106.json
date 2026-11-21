@@ -1,0 +1,839 @@
+{
+  "validatedCandidate": {
+    "growth": 0,
+    "free": 824,
+    "history": [
+      {
+        "iteration": 0,
+        "stepM": 0.00011832665000902224,
+        "correctionSteps": 3,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 1,
+        "stepM": 0.00012664604821780955,
+        "correctionSteps": 4,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 2,
+        "stepM": 0.00012750149419134873,
+        "correctionSteps": 3,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 3,
+        "stepM": 0.00012436315144508906,
+        "correctionSteps": 4,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 4,
+        "stepM": 0.00011825964806128623,
+        "correctionSteps": 4,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 5,
+        "stepM": 0.00011772756817882202,
+        "correctionSteps": 4,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 6,
+        "stepM": 0.00012121062726218509,
+        "correctionSteps": 4,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 7,
+        "stepM": 0.00012293005274240207,
+        "correctionSteps": 4,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 8,
+        "stepM": 0.00012391217685019074,
+        "correctionSteps": 4,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 9,
+        "stepM": 0.00014901112282678393,
+        "correctionSteps": 4,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 10,
+        "stepM": 0.00012503756619138505,
+        "correctionSteps": 5,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 11,
+        "stepM": 0.0001282438122786231,
+        "correctionSteps": 5,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 12,
+        "stepM": 0.00013669835517669582,
+        "correctionSteps": 11,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 13,
+        "stepM": 0.0001374332126881554,
+        "correctionSteps": 5,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 14,
+        "stepM": 0.00012103168171433777,
+        "correctionSteps": 7,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 15,
+        "stepM": 0.00013742940582936057,
+        "correctionSteps": 7,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 16,
+        "stepM": 0.00012715496406561814,
+        "correctionSteps": 7,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 17,
+        "stepM": 0.00014135725288841344,
+        "correctionSteps": 4,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 18,
+        "stepM": 0.00013635142163847812,
+        "correctionSteps": 5,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 19,
+        "stepM": 0.00013827129047306114,
+        "correctionSteps": 5,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 20,
+        "stepM": 0.000160267006137066,
+        "correctionSteps": 5,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 21,
+        "stepM": 0.00011917860000704747,
+        "correctionSteps": 6,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 22,
+        "stepM": 0.00012115962901544544,
+        "correctionSteps": 5,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 23,
+        "stepM": 0.0001225258223626081,
+        "correctionSteps": 5,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 24,
+        "stepM": 0.00012038743380301086,
+        "correctionSteps": 10,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 25,
+        "stepM": 0.0001283752663198015,
+        "correctionSteps": 5,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 26,
+        "stepM": 0.00012595618561680267,
+        "correctionSteps": 8,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 27,
+        "stepM": 0.00011891818723164629,
+        "correctionSteps": 6,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 28,
+        "stepM": 0.00013918872179166964,
+        "correctionSteps": 11,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 29,
+        "stepM": 0.0001292785666489389,
+        "correctionSteps": 5,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 30,
+        "stepM": 0.00011766690076698118,
+        "correctionSteps": 5,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 31,
+        "stepM": 0.00012455650609491804,
+        "correctionSteps": 7,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 32,
+        "stepM": 0.00011928167561395317,
+        "correctionSteps": 7,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 33,
+        "stepM": 0.00012123129727095753,
+        "correctionSteps": 8,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 34,
+        "stepM": 0.00011944041683235145,
+        "correctionSteps": 7,
+        "fullStepViolations": {},
+        "accepted": true,
+        "fraction": 1.0
+      },
+      {
+        "iteration": 35,
+        "stepM": 0.0,
+        "correctionSteps": 11,
+        "fullStepViolations": {
+          "stretch": 2,
+          "bend": 1,
+          "crease": 1
+        },
+        "accepted": false,
+        "reason": "constraints_blocked",
+        "violations": {
+          "bend": 2
+        }
+      }
+    ],
+    "metrics": {
+      "excessBend": 5281.693192802459,
+      "maxStretch": 185.2675401759367,
+      "stretchP99": 1.8034274542365274,
+      "overDouble": 1768,
+      "compressed": 180,
+      "collapsed": 1,
+      "sharp": 744,
+      "folded": 453
+    },
+    "targetMm": 88.29254016645396,
+    "violations": {},
+    "experimental": true
+  },
+  "independentAudit": {
+    "overDouble": {
+      "before": 1785,
+      "after": 1768,
+      "new": 0
+    },
+    "compressed": {
+      "before": 180,
+      "after": 180,
+      "new": 0
+    },
+    "sharp": {
+      "before": 783,
+      "after": 744,
+      "new": 0
+    },
+    "folded": {
+      "before": 482,
+      "after": 453,
+      "new": 0
+    },
+    "collapsed": {
+      "before": 1,
+      "after": 1,
+      "new": 0
+    },
+    "geometry": {
+      "maxMoveMm": 3.9762652203976026,
+      "outsideMoveMm": 0.0,
+      "edgeLengthIncreasedCount": 480,
+      "alreadyStretchedWorsened": 0,
+      "newlyStretched": 0,
+      "maxCreaseDeviationIncreaseDegrees": 2.0743000043774903e-07,
+      "originalCreasesOutsideTenDegrees": 214
+    },
+    "sourceGeometrySha256": "28cfd70f6148ff2016c7ec8c48e8d5f9664e00b51e3d4023774f3bc60e129c00"
+  },
+  "automaticSix": [
+    {
+      "source": "stages-0-0.npz",
+      "report": {
+        "applied": false,
+        "reason": "no_severe_stretch",
+        "otherDefectsEvaluated": false
+      }
+    },
+    {
+      "source": "stages-0-1.npz",
+      "report": {
+        "applied": false,
+        "beforeMaxStretch": 2.0007368540043458,
+        "afterMaxStretch": 2.0007368540043458,
+        "unresolved": true,
+        "seed": [
+          9127,
+          9198
+        ],
+        "history": [
+          {
+            "expansion": 0,
+            "vertices": 58,
+            "maxStretch": 2.0007368540043458,
+            "accepted": false,
+            "violations": {},
+            "solver": {
+              "history": [
+                {
+                  "iteration": 0,
+                  "reason": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+                  "free": 58
+                }
+              ],
+              "blockers": [
+                10456,
+                11685,
+                12219
+              ]
+            }
+          },
+          {
+            "expansion": 1,
+            "vertices": 80,
+            "maxStretch": 2.0007368540043458,
+            "accepted": false,
+            "violations": {},
+            "solver": {
+              "history": [
+                {
+                  "iteration": 0,
+                  "reason": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+                  "free": 80
+                }
+              ],
+              "blockers": [
+                275,
+                698,
+                1406,
+                14147,
+                14411,
+                14441,
+                14588,
+                14923,
+                15753,
+                15965,
+                16057,
+                16087,
+                16150
+              ]
+            }
+          }
+        ],
+        "selfIntersectionChecked": false,
+        "seamClassification": "unresolved boundaries pinned"
+      }
+    },
+    {
+      "source": "stages-1-0.npz",
+      "report": {
+        "applied": false,
+        "beforeMaxStretch": 26.63970660185597,
+        "afterMaxStretch": 26.63970660185597,
+        "unresolved": true,
+        "seed": [
+          28683,
+          28685
+        ],
+        "history": [
+          {
+            "expansion": 0,
+            "vertices": 454,
+            "maxStretch": 26.63970660185597,
+            "accepted": false,
+            "violations": {},
+            "solver": {
+              "history": [
+                {
+                  "iteration": 0,
+                  "reason": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+                  "free": 454
+                }
+              ],
+              "blockers": [
+                27445,
+                27446,
+                27454,
+                28616,
+                28617,
+                28621,
+                28647,
+                28652,
+                28663,
+                28664,
+                28670,
+                28674,
+                28676,
+                28677,
+                28681,
+                28684,
+                55657,
+                55684,
+                55687,
+                55688,
+                55690,
+                55708,
+                55710
+              ]
+            }
+          },
+          {
+            "expansion": 1,
+            "vertices": 493,
+            "maxStretch": 26.63970660185597,
+            "accepted": false,
+            "violations": {},
+            "solver": {
+              "history": [
+                {
+                  "iteration": 0,
+                  "reason": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+                  "free": 493
+                }
+              ],
+              "blockers": [
+                27404,
+                27406,
+                27407,
+                27437,
+                27438,
+                27440,
+                28616,
+                28617,
+                28621,
+                28647,
+                28652,
+                28663,
+                28664,
+                28670,
+                28674,
+                28676,
+                28677,
+                28681,
+                28684,
+                48791,
+                48792,
+                55684,
+                55687,
+                55688,
+                55690,
+                55781
+              ]
+            }
+          }
+        ],
+        "selfIntersectionChecked": false,
+        "seamClassification": "unresolved boundaries pinned"
+      }
+    },
+    {
+      "source": "stages-1-1.npz",
+      "report": {
+        "applied": true,
+        "beforeMaxStretch": 198.6287880280724,
+        "afterMaxStretch": 194.5705400331079,
+        "unresolved": true,
+        "seed": [
+          28683,
+          28685
+        ],
+        "history": [
+          {
+            "expansion": 0,
+            "vertices": 705,
+            "maxStretch": 198.6287880280724,
+            "accepted": false,
+            "violations": {},
+            "solver": {
+              "history": [
+                {
+                  "iteration": 0,
+                  "reason": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+                  "free": 705
+                }
+              ],
+              "blockers": [
+                28013,
+                28014,
+                28015,
+                28016,
+                28509,
+                28510,
+                28511,
+                48769,
+                48776,
+                48777,
+                48778,
+                48779,
+                48788,
+                55020,
+                55032,
+                55034,
+                55857,
+                55860,
+                55881
+              ]
+            }
+          },
+          {
+            "expansion": 1,
+            "vertices": 814,
+            "maxStretch": 194.5705400331079,
+            "accepted": true,
+            "violations": {},
+            "solver": {
+              "history": [
+                {
+                  "iteration": 0,
+                  "stepM": 0.00010932181664543456,
+                  "correctionSteps": 5,
+                  "fullStepViolations": {},
+                  "accepted": true,
+                  "fraction": 1.0
+                },
+                {
+                  "iteration": 1,
+                  "stepM": 0.00010200032904685102,
+                  "correctionSteps": 5,
+                  "fullStepViolations": {},
+                  "accepted": true,
+                  "fraction": 1.0
+                },
+                {
+                  "iteration": 2,
+                  "stepM": 0.00010592159753048918,
+                  "correctionSteps": 5,
+                  "fullStepViolations": {},
+                  "accepted": true,
+                  "fraction": 1.0
+                },
+                {
+                  "iteration": 3,
+                  "stepM": 0.00010017082734941506,
+                  "correctionSteps": 6,
+                  "fullStepViolations": {},
+                  "accepted": true,
+                  "fraction": 1.0
+                },
+                {
+                  "iteration": 4,
+                  "stepM": 0.0001094737105697351,
+                  "correctionSteps": 5,
+                  "fullStepViolations": {},
+                  "accepted": true,
+                  "fraction": 1.0
+                },
+                {
+                  "iteration": 5,
+                  "stepM": 0.0001090585075977303,
+                  "correctionSteps": 7,
+                  "fullStepViolations": {},
+                  "accepted": true,
+                  "fraction": 1.0
+                },
+                {
+                  "iteration": 6,
+                  "stepM": 0.0001106740381633396,
+                  "correctionSteps": 5,
+                  "fullStepViolations": {},
+                  "accepted": true,
+                  "fraction": 1.0
+                },
+                {
+                  "iteration": 7,
+                  "stepM": 0.00013840643435777104,
+                  "correctionSteps": 5,
+                  "fullStepViolations": {},
+                  "accepted": true,
+                  "fraction": 1.0
+                },
+                {
+                  "iteration": 8,
+                  "stepM": 0.00010617287917220482,
+                  "correctionSteps": 5,
+                  "fullStepViolations": {},
+                  "accepted": true,
+                  "fraction": 1.0
+                },
+                {
+                  "iteration": 9,
+                  "stepM": 0.00011120096628539013,
+                  "correctionSteps": 6,
+                  "fullStepViolations": {},
+                  "accepted": true,
+                  "fraction": 1.0
+                },
+                {
+                  "iteration": 10,
+                  "stepM": 0.00012782635467936543,
+                  "correctionSteps": 6,
+                  "fullStepViolations": {},
+                  "accepted": true,
+                  "fraction": 1.0
+                },
+                {
+                  "iteration": 11,
+                  "stepM": 0.00010384179809138985,
+                  "correctionSteps": 5,
+                  "fullStepViolations": {},
+                  "accepted": true,
+                  "fraction": 1.0
+                }
+              ],
+              "blockers": []
+            }
+          }
+        ],
+        "selfIntersectionChecked": false,
+        "seamClassification": "unresolved boundaries pinned"
+      }
+    },
+    {
+      "source": "stages-2-0.npz",
+      "report": {
+        "applied": false,
+        "beforeMaxStretch": 2.605289781015315,
+        "afterMaxStretch": 2.605289781015315,
+        "unresolved": true,
+        "seed": [
+          111535,
+          111536
+        ],
+        "history": [
+          {
+            "expansion": 0,
+            "vertices": 197,
+            "maxStretch": 2.605289781015315,
+            "accepted": false,
+            "violations": {},
+            "solver": {
+              "history": [
+                {
+                  "iteration": 0,
+                  "reason": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+                  "free": 197
+                }
+              ],
+              "blockers": [
+                111447,
+                111460,
+                111462,
+                111466,
+                111471,
+                111472,
+                111479,
+                155595,
+                155598,
+                155599
+              ]
+            }
+          },
+          {
+            "expansion": 1,
+            "vertices": 237,
+            "maxStretch": 2.605289781015315,
+            "accepted": false,
+            "violations": {},
+            "solver": {
+              "history": [
+                {
+                  "iteration": 0,
+                  "reason": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+                  "free": 237
+                }
+              ],
+              "blockers": [
+                155664,
+                155670,
+                155672
+              ]
+            }
+          }
+        ],
+        "selfIntersectionChecked": false,
+        "seamClassification": "unresolved boundaries pinned"
+      }
+    },
+    {
+      "source": "stages-2-1.npz",
+      "report": {
+        "applied": false,
+        "beforeMaxStretch": 4.788576175960403,
+        "afterMaxStretch": 4.788576175960403,
+        "unresolved": true,
+        "seed": [
+          31535,
+          31920
+        ],
+        "history": [
+          {
+            "expansion": 0,
+            "vertices": 377,
+            "maxStretch": 4.788576175960403,
+            "accepted": false,
+            "violations": {},
+            "solver": {
+              "history": [
+                {
+                  "iteration": 0,
+                  "reason": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+                  "free": 377
+                }
+              ],
+              "blockers": [
+                31245,
+                31251,
+                31256,
+                31549,
+                31552,
+                31554,
+                32128,
+                32131,
+                32173
+              ]
+            }
+          },
+          {
+            "expansion": 1,
+            "vertices": 427,
+            "maxStretch": 4.788576175960403,
+            "accepted": false,
+            "violations": {},
+            "solver": {
+              "history": [
+                {
+                  "iteration": 0,
+                  "reason": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+                  "free": 427
+                }
+              ],
+              "blockers": [
+                31553,
+                31555,
+                31559,
+                31995,
+                32000,
+                32001,
+                32130,
+                32291,
+                32292,
+                32300,
+                32301,
+                32302,
+                32303,
+                32314,
+                32497
+              ]
+            }
+          }
+        ],
+        "selfIntersectionChecked": false,
+        "seamClassification": "unresolved boundaries pinned"
+      }
+    }
+  ]
+}
