@@ -131,6 +131,8 @@ jobs:
       - name: Run local IPC and child cancellation contracts
         run: |
           python -m unittest discover -s tests/converter -p test_local_converter.py -v
+          python -m unittest discover -s tests/converter -p test_local_pose_quality.py -v
+          python -m unittest discover -s tests/converter -p test_csp_compat.py -v
           python -m unittest discover -s tests/converter -p test_cs3c_decoder.py -v
 
   inference-isolation:

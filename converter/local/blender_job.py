@@ -82,12 +82,14 @@ def run(job):
     bpy.data.objects.remove(src, do_unlink=True)
     rt.apply_output_mode(arm, meshes, "rigged_rest")
     surface_correction = surface.apply_to_meshes(meshes, before_normalization, references)
+    from converter.local.pose_quality import verify_meshes
+    quality = verify_meshes(meshes, before_normalization, references)
     from converter.local.camera import apply_camera
     camera_validation = apply_camera(arm, meshes, job["snapshot"]["camera"])
     validation = inspection.roundtrip(arm, meshes, work / "result.fbx", character["mapping"], job["materialExpectations"],
-                                      csp_compatibility=True)
+                                      csp_compatibility=True, pose_quality=(before_normalization, references))
     return {"snapshot": job["snapshot"], "snapshotHash": job["snapshotHash"],
-            "artifactHash": sha256(work / "result.fbx"), "validation": validation,
+            "artifactHash": sha256(work / "result.fbx"), "validation": {**validation, "poseQuality": quality},
             "retarget": {**report.as_dict(), "surfaceCorrection": surface_correction, "armTransfer": arm_correction, "local_normalization_surface_error": normalization_error,
                          "max_joint_edge_length_error": edge_error, "camera": camera_validation}, "selectionId": job["selectionId"]}
 

@@ -6,7 +6,7 @@
     "importerVersion": "personal-import/4",
     "normalizationVersion": "personal-normalize/5",
     "rigMappingVersion": "personal-rig/2",
-    "converterVersion": "personal-converter/11",
+    "converterVersion": "personal-converter/12",
     "converterFingerprint": "runtime-computed SHA256 of all shipped converter Python and JSON files"
   },
   "transport": {
@@ -343,7 +343,8 @@
     "SNAPSHOT_MISMATCH",
     "DESTINATION_EXISTS",
     "IO_ERROR",
-    "CAMERA_UNSUPPORTED"
+    "CAMERA_UNSUPPORTED",
+    "POSE_QUALITY_REJECTED"
   ],
   "capability": {
     "supportLevel": "body_only or rejected",
@@ -388,7 +389,7 @@
         "importerVersion": "personal-import/4",
         "normalizationVersion": "personal-normalize/5",
         "rigMappingVersion": "personal-rig/2",
-        "converterVersion": "personal-converter/11",
+        "converterVersion": "personal-converter/12",
         "converterFingerprint": "runtime-computed SHA256 of all shipped converter Python and JSON files"
       },
       "limits": {
@@ -444,7 +445,7 @@
       "importerVersion": "personal-import/4",
       "normalizationVersion": "personal-normalize/5",
       "rigMappingVersion": "personal-rig/2",
-      "converterVersion": "personal-converter/11",
+      "converterVersion": "personal-converter/12",
       "converterFingerprint": "runtime-computed SHA256 of all shipped converter Python and JSON files"
     },
     "sourceFormat": "fbx | cs3c",
@@ -1277,5 +1278,5 @@
       "$ref": "#/$defs/resultEvent"
     }
   ],
-  "contractRevision": 6
+  "contractRevision": 7
 }

@@ -75,4 +75,4 @@ class CspCompatibilityTests(unittest.TestCase):
         new={**old,'versions':VERSIONS}
         self.assertNotEqual(digest(snapshot(old,'b'*64,{'left':None,'right':None})),
                             digest(snapshot(new,'b'*64,{'left':None,'right':None})))
-        self.assertEqual(VERSIONS['converterVersion'],'personal-converter/11')
+        self.assertEqual(VERSIONS['converterVersion'],'personal-converter/12')

@@ -163,6 +163,8 @@ def verify(runtime, directory, poses, baseline=None):
                 "weightGradientTermM": float(np.linalg.norm(gradient)),
                 "decompositionResidualM": float(np.linalg.norm(uniform+gradient - (solver[vb]-solver[va])))}
             final_path = directory / model["poses"][pi]["file"]
+            aliases = {row['original']: row['exported'] for row in
+                       model['poses'][pi].get('validation', {}).get('cspCompatibility', {}).get('nameAliases', [])}
             bpy.ops.wm.read_factory_settings(use_empty=True)
             arm, meshes = inspection.import_fbx(final_path)
             exported = np.asarray(inspection.surface(meshes)[meshes[0].name])
@@ -172,8 +174,9 @@ def verify(runtime, directory, poses, baseline=None):
             assert normal_delta < .2
             assert weights(meshes[0]) == influences
             assert [tuple(p.vertices) for p in meshes[0].data.polygons] == polygons
-            assert all(arm.data.bones.get(name) is not None and
-                       (arm.data.bones[name].parent.name if arm.data.bones[name].parent else None) == parent
+            assert all(arm.data.bones.get(aliases.get(name, name)) is not None and
+                       (arm.data.bones[aliases.get(name, name)].parent.name
+                        if arm.data.bones[aliases.get(name, name)].parent else None) == aliases.get(parent, parent)
                        for name, parent in hierarchy.items())
             row = {"poseSha256": sha(pose), "exportSha256": sha(final_path),
                 "independentLbsMaxErrorM": lbs_error, "armTransfer": arm_report,

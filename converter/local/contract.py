@@ -8,7 +8,7 @@ from pathlib import Path
 
 PROTOCOL = "standin.local-converter/1"
 VERSIONS = {"importerVersion": "personal-import/4", "normalizationVersion": "personal-normalize/5",
-            "rigMappingVersion": "personal-rig/2", "converterVersion": "personal-converter/11"}
+            "rigMappingVersion": "personal-rig/2", "converterVersion": "personal-converter/12"}
 LIMITS = {"sourceBytes": 128 * 1024**2, "poseBytes": 8 * 1024**2,
           "vertices": 1_000_000, "bones": 512, "meshes": 128,
           "workerSeconds": 120, "workerMemoryBytes": 2 * 1024**3,
@@ -19,7 +19,7 @@ ERRORS = ["CAMERA_UNSUPPORTED", "PROTOCOL_MISMATCH", "INVALID_REQUEST", "BUSY", 
           "INVALID_SKIN", "UNSUPPORTED_TRANSFORM", "UNSUPPORTED_MATERIAL", "UNSUPPORTED_FEATURE",
           "HAND_UNSUPPORTED", "LIMIT_EXCEEDED", "CANCELLED", "TIMEOUT", "MEMORY_LIMIT",
           "RUNTIME_UNAVAILABLE", "RUNTIME_MISMATCH", "CONVERSION_FAILED", "ROUNDTRIP_FAILED",
-          "SNAPSHOT_MISMATCH", "DESTINATION_EXISTS", "IO_ERROR"]
+          "POSE_QUALITY_REJECTED", "SNAPSHOT_MISMATCH", "DESTINATION_EXISTS", "IO_ERROR"]
 
 
 class LocalError(Exception):

@@ -321,7 +321,7 @@ def material_regions(meshes, points):
     return regions
 
 
-def roundtrip(arm, meshes, path, table, expected_materials=None, *, csp_compatibility=False):
+def roundtrip(arm, meshes, path, table, expected_materials=None, *, csp_compatibility=False, pose_quality=None):
     from converter import retarget as rt
     before = surface(meshes)
     original_bones = {b.name: (b.parent.name if b.parent else None,
@@ -346,6 +346,10 @@ def roundtrip(arm, meshes, path, table, expected_materials=None, *, csp_compatib
     bpy.ops.wm.read_factory_settings(use_empty=True)
     after_arm, after_meshes = import_fbx(path)
     after_points = surface(after_meshes)
+    quality = None
+    if pose_quality is not None:
+        from converter.local.pose_quality import verify_meshes
+        quality = verify_meshes(after_meshes, *pose_quality)
     error = surface_error(before, after_points)
     extent = max((math.dist(p, (0, 0, 0)) for points in before.values() for p in points), default=1)
     tolerance = max(1e-5, extent * 1e-5)
@@ -378,4 +382,5 @@ def roundtrip(arm, meshes, path, table, expected_materials=None, *, csp_compatib
             "maxSkinProbeError": probe_error, "maxMaterialRegionError": material_region_error,
             "materialCount": len(material_before), "tolerance": tolerance, "fkProbes": probe_after,
             "blenderVersion": bpy.app.version_string, "materialPreservation": material_parameters,
-            **({"cspCompatibility": compatibility} if compatibility is not None else {})}
+            **({"cspCompatibility": compatibility} if compatibility is not None else {}),
+            **({"reloadedPoseQuality": quality} if quality is not None else {})}

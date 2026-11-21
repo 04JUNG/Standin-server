@@ -63,10 +63,12 @@ def verify(launcher, sources, poses, output):
                     else:
                         value = applied['result']
                         dest = output/f'model-{index}-pose-{pi}.fbx'
+                        export_start = time.monotonic()
                         exported = terminal(session, 'export', localModelId=model, snapshotHash=value['snapshotHash'], destinationPath=str(dest))
                         assert exported['event'] == 'result' and sha(dest) == value['artifactHash']
                         result.update({k:value[k] for k in ['snapshotHash','artifactHash','validation','retarget']})
                         result['file'] = dest.name
+                        result['exportSeconds'] = time.monotonic() - export_start
                         start = time.monotonic()
                         cached = terminal(session, 'apply', **fields)
                         assert cached['event'] == 'result' and cached['result']['cacheHit']
