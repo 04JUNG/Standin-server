@@ -25,7 +25,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from scripts.prepare_preset_bodies import stage_prepared  # noqa: E402
-from scripts.staging_body_assets_init import check_budget, validate_files, PREPARED_PROFILE, RELEASE_CAP  # noqa: E402
+from scripts.staging_body_assets_init import check_budget, validate_files, PREPARED_PROFILE, LOD_PROFILE, RELEASE_CAP  # noqa: E402
 from scripts.prepared_preset_scope import select, pinned_catalog  # noqa: E402
 from converter.prepared_body import MAX_RECEIPT_BYTES  # noqa: E402
 
@@ -69,7 +69,7 @@ def build(release, prepared, version, out, *, catalog=None, budget_profile=None,
         raise SystemExit('release already has prepared neutrals; use the explicit extension profile')
     original_registry = copy.deepcopy(registry)
     prepared_index = json.loads((prepared/'shape-bakes.local.json').read_text())['prepared_neutrals']['entries']
-    if budget_profile == PREPARED_PROFILE:
+    if budget_profile in (PREPARED_PROFILE, LOD_PROFILE):
         if catalog is None or set(select(catalog, registry, {'male': 9, 'female': 11})) != set(prepared_index):
             raise ValueError('prepared bundle must cover the exact approved 20 presets')
     # Production packaging must never label a macOS prototype as Linux usable.
@@ -135,7 +135,7 @@ def main():
     ap.add_argument('--out', required=True)
     ap.add_argument('--catalog')
     ap.add_argument('--catalog-sha256')
-    ap.add_argument('--budget-profile', choices=[PREPARED_PROFILE])
+    ap.add_argument('--budget-profile', choices=[PREPARED_PROFILE, LOD_PROFILE])
     args = ap.parse_args()
     if args.budget_profile and not args.release_sha256:
         ap.error('--release-sha256 is required with --budget-profile')

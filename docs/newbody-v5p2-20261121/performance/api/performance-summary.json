@@ -1,0 +1,1344 @@
+{
+  "scope": "Actual BFF API selection to file-ready and verified fsync save; native app observations are separate",
+  "complete": true,
+  "repeatsPerApiCondition": 1,
+  "statisticsScope": "Single observations for the full API condition matrix; representative repeated statistics come from the separate 3-repeat actual native app comparison",
+  "operatingSystemFileCache": "uncontrolled; no host/production cache clearing",
+  "nestedTimingsAreNotAdditive": true,
+  "rows": [
+    {
+      "sex": "female",
+      "kind": "base",
+      "variant": "new",
+      "repeat": 1,
+      "neutralMode": "prepared",
+      "cache": "cold",
+      "operationId": "op_f8e37064-9832-43fc-a158-d0be79df0ddf",
+      "selectionSeconds": 0.3864833328407258,
+      "authoritativeSeconds": 40.27790462481789,
+      "fileReadySeconds": 52.58605670789257,
+      "downloadSeconds": 0.950137292034924,
+      "localSavedSeconds": 53.549663916928694,
+      "fsyncSeconds": 0.01346962503157556,
+      "underConcurrentLoad": false,
+      "artifactBytes": 6131308,
+      "artifactSha256": "2e2ad1b0ff8e1ca584dd091b793bf8d03e4e129268fab99ce72117b0f156741d"
+    },
+    {
+      "sex": "female",
+      "kind": "base",
+      "variant": "new",
+      "repeat": 1,
+      "neutralMode": "prepared",
+      "cache": "warm",
+      "operationId": "op_7f4aa9f4-f18c-431f-81ab-79e03d359093",
+      "selectionSeconds": 5.5666081607341766e-05,
+      "authoritativeSeconds": 6.3056709580123425,
+      "fileReadySeconds": 9.921522750053555,
+      "downloadSeconds": 1.015627708984539,
+      "localSavedSeconds": 10.943029541056603,
+      "fsyncSeconds": 0.005878540920093656,
+      "underConcurrentLoad": false,
+      "artifactBytes": 6131308,
+      "artifactSha256": "2e2ad1b0ff8e1ca584dd091b793bf8d03e4e129268fab99ce72117b0f156741d"
+    },
+    {
+      "sex": "female",
+      "kind": "base",
+      "variant": "new",
+      "repeat": 1,
+      "neutralMode": "source",
+      "cache": "cold",
+      "operationId": "op_14b792b4-af52-4ba2-a661-211b9ac61dbb",
+      "selectionSeconds": 0.3007300419267267,
+      "authoritativeSeconds": 48.79688024986535,
+      "fileReadySeconds": 61.101849749917164,
+      "downloadSeconds": 1.0174042920116335,
+      "localSavedSeconds": 62.13047412503511,
+      "fsyncSeconds": 0.011219250038266182,
+      "underConcurrentLoad": false,
+      "artifactBytes": 6131308,
+      "artifactSha256": "2c6a283668d1c242470501969d2c348b2417d7b8f5dea8faa57b7d9b1ea48015"
+    },
+    {
+      "sex": "female",
+      "kind": "base",
+      "variant": "old",
+      "repeat": 1,
+      "neutralMode": "prepared",
+      "cache": "cold",
+      "operationId": "op_80883c0c-ec9f-48a1-9876-b6e510bcfb73",
+      "selectionSeconds": 0.1882048340048641,
+      "authoritativeSeconds": 39.908495666924864,
+      "fileReadySeconds": 50.00609004194848,
+      "downloadSeconds": 1.0069890001323074,
+      "localSavedSeconds": 51.021297208964825,
+      "fsyncSeconds": 0.008216999936848879,
+      "underConcurrentLoad": false,
+      "artifactBytes": 6716380,
+      "artifactSha256": "e05040c1c211eb59bca4ee70e26c5e1706cfa1af49a7301b048cf0a2f2992bf4"
+    },
+    {
+      "sex": "female",
+      "kind": "base",
+      "variant": "old",
+      "repeat": 1,
+      "neutralMode": "prepared",
+      "cache": "warm",
+      "operationId": "op_676c7c82-b792-47d3-8baa-0e5b537e2d17",
+      "selectionSeconds": 8.074985817074776e-05,
+      "authoritativeSeconds": 4.009761749999598,
+      "fileReadySeconds": 6.217560332966968,
+      "downloadSeconds": 0.8119911670219153,
+      "localSavedSeconds": 7.034559832885861,
+      "fsyncSeconds": 0.005007915897294879,
+      "underConcurrentLoad": false,
+      "artifactBytes": 6716380,
+      "artifactSha256": "e05040c1c211eb59bca4ee70e26c5e1706cfa1af49a7301b048cf0a2f2992bf4"
+    },
+    {
+      "sex": "female",
+      "kind": "base",
+      "variant": "old",
+      "repeat": 1,
+      "neutralMode": "source",
+      "cache": "cold",
+      "operationId": "op_ed8826c1-c69e-4e8e-9eb2-8812889d1b78",
+      "selectionSeconds": 0.21115645905956626,
+      "authoritativeSeconds": 48.23640775005333,
+      "fileReadySeconds": 58.22469108412042,
+      "downloadSeconds": 0.8438664579298347,
+      "localSavedSeconds": 59.080821625189856,
+      "fsyncSeconds": 0.012263250071555376,
+      "underConcurrentLoad": false,
+      "artifactBytes": 6716380,
+      "artifactSha256": "9a5b583db7ef1f02a8b0cef5358c360ce19ed4c4b6e55ee2bf55c5e454dfbb62"
+    },
+    {
+      "sex": "female",
+      "kind": "custom",
+      "variant": "new",
+      "repeat": 1,
+      "neutralMode": "prepared",
+      "cache": "cold",
+      "operationId": "op_d2714aaf-3a26-4625-a4da-6ce72dd9ac99",
+      "selectionSeconds": 0.31237074988894165,
+      "authoritativeSeconds": 62.159509665798396,
+      "fileReadySeconds": 121.31147850002162,
+      "downloadSeconds": 3.141884666867554,
+      "localSavedSeconds": 124.47394191590138,
+      "fsyncSeconds": 0.020578291034325957,
+      "underConcurrentLoad": false,
+      "artifactBytes": 15916412,
+      "artifactSha256": "372e581a3ed778cc5854af4fd0b35c47d37d3ed6b98f989c846757a168b6adea"
+    },
+    {
+      "sex": "female",
+      "kind": "custom",
+      "variant": "new",
+      "repeat": 1,
+      "neutralMode": "prepared",
+      "cache": "warm",
+      "operationId": "op_4e835b31-76a7-4695-9870-c6804ad4dd42",
+      "selectionSeconds": 0.00011145905591547489,
+      "authoritativeSeconds": 7.198081792099401,
+      "fileReadySeconds": 20.22007991699502,
+      "downloadSeconds": 3.6447474169544876,
+      "localSavedSeconds": 23.884199041873217,
+      "fsyncSeconds": 0.01937074982561171,
+      "underConcurrentLoad": false,
+      "artifactBytes": 15916412,
+      "artifactSha256": "372e581a3ed778cc5854af4fd0b35c47d37d3ed6b98f989c846757a168b6adea"
+    },
+    {
+      "sex": "female",
+      "kind": "custom",
+      "variant": "new",
+      "repeat": 1,
+      "neutralMode": "source",
+      "cache": "cold",
+      "operationId": "op_a5532a07-aeaf-4b50-9325-e6e1eff77aad",
+      "selectionSeconds": 0.3014268751721829,
+      "authoritativeSeconds": 64.22694454202428,
+      "fileReadySeconds": 123.6250622922089,
+      "downloadSeconds": 3.7883222920354456,
+      "localSavedSeconds": 127.43007545801811,
+      "fsyncSeconds": 0.016690040938556194,
+      "underConcurrentLoad": false,
+      "artifactBytes": 15916412,
+      "artifactSha256": "9ea2503f475abbcb6f0bbf1ff3ce5a46dc2e37330fb9611f2459f402d85230b7"
+    },
+    {
+      "sex": "female",
+      "kind": "custom",
+      "variant": "old",
+      "repeat": 1,
+      "neutralMode": "prepared",
+      "cache": "cold",
+      "operationId": "op_6e170295-07de-4313-864e-3444f9781e98",
+      "selectionSeconds": 0.22023533307947218,
+      "authoritativeSeconds": 64.30412208288908,
+      "fileReadySeconds": 123.86738591687754,
+      "downloadSeconds": 3.968713166890666,
+      "localSavedSeconds": 127.86176083306782,
+      "fsyncSeconds": 0.025661083171144128,
+      "underConcurrentLoad": false,
+      "artifactBytes": 17335484,
+      "artifactSha256": "280866bc5f95554ca708af7eb77fdf9a937ba39189861c0e3238ee48bd1848ed"
+    },
+    {
+      "sex": "female",
+      "kind": "custom",
+      "variant": "old",
+      "repeat": 1,
+      "neutralMode": "prepared",
+      "cache": "warm",
+      "operationId": "op_1c6dbfe9-3415-4f6c-b90c-a0ad8f67c8c7",
+      "selectionSeconds": 9.833415970206261e-05,
+      "authoritativeSeconds": 5.5662364170420915,
+      "fileReadySeconds": 16.733040084131062,
+      "downloadSeconds": 4.295143625000492,
+      "localSavedSeconds": 21.057336084078997,
+      "fsyncSeconds": 0.02915216702967882,
+      "underConcurrentLoad": false,
+      "artifactBytes": 17335484,
+      "artifactSha256": "280866bc5f95554ca708af7eb77fdf9a937ba39189861c0e3238ee48bd1848ed"
+    },
+    {
+      "sex": "female",
+      "kind": "custom",
+      "variant": "old",
+      "repeat": 1,
+      "neutralMode": "source",
+      "cache": "cold",
+      "operationId": "op_447665a5-8d32-4947-812d-b4a11e0479f0",
+      "selectionSeconds": 0.29178445786237717,
+      "authoritativeSeconds": 64.3212061659433,
+      "fileReadySeconds": 124.38639579084702,
+      "downloadSeconds": 3.783177957870066,
+      "localSavedSeconds": 128.19126295787282,
+      "fsyncSeconds": 0.021688499953597784,
+      "underConcurrentLoad": false,
+      "artifactBytes": 17335484,
+      "artifactSha256": "df59691a243c74890f53d797b16e7c8446b239953115d178d0bca83a93cd2a00"
+    },
+    {
+      "sex": "female",
+      "kind": "preset",
+      "variant": "new",
+      "repeat": 1,
+      "neutralMode": "prepared",
+      "cache": "cold",
+      "operationId": "op_ffe70fc7-4411-451c-9854-90cdc3107a71",
+      "selectionSeconds": 0.39496441604569554,
+      "authoritativeSeconds": 42.49994504102506,
+      "fileReadySeconds": 53.79367829114199,
+      "downloadSeconds": 1.5374783750157803,
+      "localSavedSeconds": 55.33779216604307,
+      "fsyncSeconds": 0.0066351250279694796,
+      "underConcurrentLoad": false,
+      "artifactBytes": 6130796,
+      "artifactSha256": "e988efd3a157e8a750185054502e9edd73e2a9ed8f6a23916e7716414814c7b1"
+    },
+    {
+      "sex": "female",
+      "kind": "preset",
+      "variant": "new",
+      "repeat": 1,
+      "neutralMode": "prepared",
+      "cache": "warm",
+      "operationId": "op_e6984b85-cbe8-45f2-8a2e-cc9148728ac4",
+      "selectionSeconds": 0.00011379108764231205,
+      "authoritativeSeconds": 6.6353615410625935,
+      "fileReadySeconds": 10.2081613750197,
+      "downloadSeconds": 1.0275418751407415,
+      "localSavedSeconds": 11.24705879110843,
+      "fsyncSeconds": 0.011355082970112562,
+      "underConcurrentLoad": false,
+      "artifactBytes": 6130796,
+      "artifactSha256": "e988efd3a157e8a750185054502e9edd73e2a9ed8f6a23916e7716414814c7b1"
+    },
+    {
+      "sex": "female",
+      "kind": "preset",
+      "variant": "new",
+      "repeat": 1,
+      "neutralMode": "source",
+      "cache": "cold",
+      "operationId": "op_204edca6-b75e-497b-b0bf-eb55ab32e815",
+      "selectionSeconds": 0.3142254159320146,
+      "authoritativeSeconds": 53.80070050014183,
+      "fileReadySeconds": 66.10009083314799,
+      "downloadSeconds": 1.4723501668777317,
+      "localSavedSeconds": 67.58001058315858,
+      "fsyncSeconds": 0.007568833185359836,
+      "underConcurrentLoad": false,
+      "artifactBytes": 6130796,
+      "artifactSha256": "eabcd30b71466b6ba212b033cdded87120859ca37d15759001c66224338f9c9a"
+    },
+    {
+      "sex": "female",
+      "kind": "preset",
+      "variant": "old",
+      "repeat": 1,
+      "neutralMode": "prepared",
+      "cache": "cold",
+      "operationId": "op_831975c6-5334-4cbc-96bc-e5980254fe7c",
+      "selectionSeconds": 0.19607062498107553,
+      "authoritativeSeconds": 41.911895874887705,
+      "fileReadySeconds": 52.90563870896585,
+      "downloadSeconds": 0.9125575830694288,
+      "localSavedSeconds": 53.831701084040105,
+      "fsyncSeconds": 0.013504042057320476,
+      "underConcurrentLoad": false,
+      "artifactBytes": 6716108,
+      "artifactSha256": "b1fcd37e006d9a931451cfb7e3f9a04e0ac394e761ea3ad6e41fed757140e9c3"
+    },
+    {
+      "sex": "female",
+      "kind": "preset",
+      "variant": "old",
+      "repeat": 1,
+      "neutralMode": "prepared",
+      "cache": "warm",
+      "operationId": "op_a3ae3421-d478-4519-8552-d7c69919c051",
+      "selectionSeconds": 9.258394129574299e-05,
+      "authoritativeSeconds": 4.419929584022611,
+      "fileReadySeconds": 6.908750624861568,
+      "downloadSeconds": 0.5341931660659611,
+      "localSavedSeconds": 7.453831916907802,
+      "fsyncSeconds": 0.010887916898354888,
+      "underConcurrentLoad": false,
+      "artifactBytes": 6716108,
+      "artifactSha256": "b1fcd37e006d9a931451cfb7e3f9a04e0ac394e761ea3ad6e41fed757140e9c3"
+    },
+    {
+      "sex": "female",
+      "kind": "preset",
+      "variant": "old",
+      "repeat": 1,
+      "neutralMode": "source",
+      "cache": "cold",
+      "operationId": "op_ebdec544-007f-4d83-9879-272e3835c27a",
+      "selectionSeconds": 0.21820020792074502,
+      "authoritativeSeconds": 52.703172999899834,
+      "fileReadySeconds": 62.63543462497182,
+      "downloadSeconds": 0.7900093330536038,
+      "localSavedSeconds": 63.4331246658694,
+      "fsyncSeconds": 0.0076796249486505985,
+      "underConcurrentLoad": false,
+      "artifactBytes": 6716108,
+      "artifactSha256": "e4b6f2e6b929996ad41325d57105ca13b9ec542267bb4b2ac63d9867b11a8516"
+    },
+    {
+      "sex": "male",
+      "kind": "base",
+      "variant": "new",
+      "repeat": 1,
+      "neutralMode": "prepared",
+      "cache": "cold",
+      "operationId": "op_d73e348d-7d1d-4d4b-aa72-a9ef3ca566cd",
+      "selectionSeconds": 0.3085256249178201,
+      "authoritativeSeconds": 44.43080624984577,
+      "fileReadySeconds": 56.312883832957596,
+      "downloadSeconds": 1.0180389159359038,
+      "localSavedSeconds": 57.342852666042745,
+      "fsyncSeconds": 0.011917625088244677,
+      "underConcurrentLoad": false,
+      "artifactBytes": 5950572,
+      "artifactSha256": "dc886fe8ed939186edf0c9d7c99901d02bf52d9c4c76ca50e347df2f362832cc"
+    },
+    {
+      "sex": "male",
+      "kind": "base",
+      "variant": "new",
+      "repeat": 1,
+      "neutralMode": "prepared",
+      "cache": "warm",
+      "operationId": "op_71c313a8-47f4-4c31-bfab-f80823a2295f",
+      "selectionSeconds": 5.487492308020592e-05,
+      "authoritativeSeconds": 6.528617624891922,
+      "fileReadySeconds": 10.49785237503238,
+      "downloadSeconds": 1.0171756660565734,
+      "localSavedSeconds": 11.526850332971662,
+      "fsyncSeconds": 0.011821416905149817,
+      "underConcurrentLoad": false,
+      "artifactBytes": 5950572,
+      "artifactSha256": "dc886fe8ed939186edf0c9d7c99901d02bf52d9c4c76ca50e347df2f362832cc"
+    },
+    {
+      "sex": "male",
+      "kind": "base",
+      "variant": "new",
+      "repeat": 1,
+      "neutralMode": "source",
+      "cache": "cold",
+      "operationId": "op_f7bb6110-6ced-4df4-a5a7-d4d446f171ad",
+      "selectionSeconds": 0.2149429579731077,
+      "authoritativeSeconds": 56.332476375158876,
+      "fileReadySeconds": 68.11449779197574,
+      "downloadSeconds": 0.9645587089471519,
+      "localSavedSeconds": 69.08941366709769,
+      "fsyncSeconds": 0.010356249986216426,
+      "underConcurrentLoad": false,
+      "artifactBytes": 5950572,
+      "artifactSha256": "9b0005582f055ec8bb9d6673fc3d931a2cbcd777d8302d58ca733c1e6058361f"
+    },
+    {
+      "sex": "male",
+      "kind": "base",
+      "variant": "old",
+      "repeat": 1,
+      "neutralMode": "prepared",
+      "cache": "cold",
+      "operationId": "op_2e911980-2c9e-4a5e-aff8-163c789bb147",
+      "selectionSeconds": 0.19086412503384054,
+      "authoritativeSeconds": 56.51453033299185,
+      "fileReadySeconds": 69.82834395812824,
+      "downloadSeconds": 0.9418544580694288,
+      "localSavedSeconds": 70.78196391719393,
+      "fsyncSeconds": 0.011764792026951909,
+      "underConcurrentLoad": false,
+      "artifactBytes": 9073452,
+      "artifactSha256": "929005d4e79d26c902b656ce4f5f8ce90e344742107c2e7895d1e486a83426cc"
+    },
+    {
+      "sex": "male",
+      "kind": "base",
+      "variant": "old",
+      "repeat": 1,
+      "neutralMode": "prepared",
+      "cache": "warm",
+      "operationId": "op_f3001a07-9c7a-42ca-854a-7513b3c8d153",
+      "selectionSeconds": 0.0001629579346626997,
+      "authoritativeSeconds": 5.280599041143432,
+      "fileReadySeconds": 7.5166574160102755,
+      "downloadSeconds": 0.8141125829424709,
+      "localSavedSeconds": 8.342672375030816,
+      "fsyncSeconds": 0.011901916936039925,
+      "underConcurrentLoad": false,
+      "artifactBytes": 9073452,
+      "artifactSha256": "929005d4e79d26c902b656ce4f5f8ce90e344742107c2e7895d1e486a83426cc"
+    },
+    {
+      "sex": "male",
+      "kind": "base",
+      "variant": "old",
+      "repeat": 1,
+      "neutralMode": "source",
+      "cache": "cold",
+      "operationId": "op_0388fb9c-e7fc-4136-940b-b2ade7f359ad",
+      "selectionSeconds": 0.20567508414387703,
+      "authoritativeSeconds": 68.90350437513553,
+      "fileReadySeconds": 81.88045487506315,
+      "downloadSeconds": 1.0319269159808755,
+      "localSavedSeconds": 82.92893787520006,
+      "fsyncSeconds": 0.01655537518672645,
+      "underConcurrentLoad": false,
+      "artifactBytes": 9073452,
+      "artifactSha256": "8c881b8718440f36064f3aae8ee51011a6d8380793e23dfb0260bf11c63a0ba0"
+    },
+    {
+      "sex": "male",
+      "kind": "custom",
+      "variant": "new",
+      "repeat": 1,
+      "neutralMode": "prepared",
+      "cache": "cold",
+      "operationId": "op_f120272f-f4b1-4e91-ba56-9fa004d0f337",
+      "selectionSeconds": 0.4056170000694692,
+      "authoritativeSeconds": 83.9687277500052,
+      "fileReadySeconds": 142.53553033294156,
+      "downloadSeconds": 3.7237514581065625,
+      "localSavedSeconds": 146.27889366587624,
+      "fsyncSeconds": 0.019610999850556254,
+      "underConcurrentLoad": false,
+      "artifactBytes": 15559724,
+      "artifactSha256": "c430b489a6a5076281c59e8958c94f7dcd562ba924f7977e9d3f111c1380fc55"
+    },
+    {
+      "sex": "male",
+      "kind": "custom",
+      "variant": "new",
+      "repeat": 1,
+      "neutralMode": "prepared",
+      "cache": "warm",
+      "operationId": "op_68e15367-64f9-4b70-90c6-80d22a56cf57",
+      "selectionSeconds": 5.187513306736946e-05,
+      "authoritativeSeconds": 7.652640667045489,
+      "fileReadySeconds": 20.11557950009592,
+      "downloadSeconds": 3.993111167103052,
+      "localSavedSeconds": 24.135828125057742,
+      "fsyncSeconds": 0.027136874850839376,
+      "underConcurrentLoad": false,
+      "artifactBytes": 15559724,
+      "artifactSha256": "c430b489a6a5076281c59e8958c94f7dcd562ba924f7977e9d3f111c1380fc55"
+    },
+    {
+      "sex": "male",
+      "kind": "custom",
+      "variant": "new",
+      "repeat": 1,
+      "neutralMode": "source",
+      "cache": "cold",
+      "operationId": "op_715bd330-3016-4287-bdfc-14c090e95f5b",
+      "selectionSeconds": 0.3063848330639303,
+      "authoritativeSeconds": 83.09773675003089,
+      "fileReadySeconds": 141.60295187518932,
+      "downloadSeconds": 3.8959081249777228,
+      "localSavedSeconds": 145.51000825013034,
+      "fsyncSeconds": 0.01114741712808609,
+      "underConcurrentLoad": false,
+      "artifactBytes": 15559724,
+      "artifactSha256": "0b3aa94ac48539935c73d82c9a4fc0d06700e6489bb7bf003628905f6b2ffc7c"
+    },
+    {
+      "sex": "male",
+      "kind": "custom",
+      "variant": "old",
+      "repeat": 1,
+      "neutralMode": "prepared",
+      "cache": "cold",
+      "operationId": "op_c3fadc48-793d-4849-a8c4-f87ed3785d56",
+      "selectionSeconds": 0.31033208407461643,
+      "authoritativeSeconds": 100.86535054189153,
+      "fileReadySeconds": 174.50976675003767,
+      "downloadSeconds": 4.0221595000475645,
+      "localSavedSeconds": 178.563038833905,
+      "fsyncSeconds": 0.031111083924770355,
+      "underConcurrentLoad": false,
+      "artifactBytes": 23048940,
+      "artifactSha256": "86e0297c4c4265cb643c3e91a00726e611c828b7217881f41aa4186ac0e25d27"
+    },
+    {
+      "sex": "male",
+      "kind": "custom",
+      "variant": "old",
+      "repeat": 1,
+      "neutralMode": "prepared",
+      "cache": "warm",
+      "operationId": "op_2e0ab319-f958-4d54-9662-348632755545",
+      "selectionSeconds": 0.0004051669966429472,
+      "authoritativeSeconds": 6.682209791848436,
+      "fileReadySeconds": 18.715915167005733,
+      "downloadSeconds": 4.79183041700162,
+      "localSavedSeconds": 23.525954624870792,
+      "fsyncSeconds": 0.01820829091593623,
+      "underConcurrentLoad": false,
+      "artifactBytes": 23048940,
+      "artifactSha256": "86e0297c4c4265cb643c3e91a00726e611c828b7217881f41aa4186ac0e25d27"
+    },
+    {
+      "sex": "male",
+      "kind": "custom",
+      "variant": "old",
+      "repeat": 1,
+      "neutralMode": "source",
+      "cache": "cold",
+      "operationId": "op_30154352-9da0-4d9a-af21-d99ec7328e7d",
+      "selectionSeconds": 0.2051936669740826,
+      "authoritativeSeconds": 98.70565041713417,
+      "fileReadySeconds": 171.42523874994367,
+      "downloadSeconds": 4.964616416953504,
+      "localSavedSeconds": 176.4161676671356,
+      "fsyncSeconds": 0.026311375200748444,
+      "underConcurrentLoad": false,
+      "artifactBytes": 23048940,
+      "artifactSha256": "72dc00d01ddf3224a727ea5b8816bd9297c66786722aecc6da65435faf59b362"
+    },
+    {
+      "sex": "male",
+      "kind": "preset",
+      "variant": "new",
+      "repeat": 1,
+      "neutralMode": "prepared",
+      "cache": "cold",
+      "operationId": "op_d7667bdd-1c5c-44ac-a575-a439da922b9f",
+      "selectionSeconds": 0.3887859999667853,
+      "authoritativeSeconds": 46.61913325008936,
+      "fileReadySeconds": 58.68960699997842,
+      "downloadSeconds": 0.8479580411221832,
+      "localSavedSeconds": 59.545989457983524,
+      "fsyncSeconds": 0.00842312490567565,
+      "underConcurrentLoad": false,
+      "artifactBytes": 5949084,
+      "artifactSha256": "1a1dbadb772f71b490605aedad6444785e630b5cabe0c68acf334b219bdc4c72"
+    },
+    {
+      "sex": "male",
+      "kind": "preset",
+      "variant": "new",
+      "repeat": 1,
+      "neutralMode": "prepared",
+      "cache": "warm",
+      "operationId": "op_8d361129-16a8-427e-b536-7ff6d7ecec41",
+      "selectionSeconds": 8.279201574623585e-05,
+      "authoritativeSeconds": 7.003641542047262,
+      "fileReadySeconds": 10.492509791860357,
+      "downloadSeconds": 1.2460366250015795,
+      "localSavedSeconds": 11.746610916918144,
+      "fsyncSeconds": 0.008063749875873327,
+      "underConcurrentLoad": false,
+      "artifactBytes": 5949084,
+      "artifactSha256": "1a1dbadb772f71b490605aedad6444785e630b5cabe0c68acf334b219bdc4c72"
+    },
+    {
+      "sex": "male",
+      "kind": "preset",
+      "variant": "new",
+      "repeat": 1,
+      "neutralMode": "source",
+      "cache": "cold",
+      "operationId": "op_a0550e9a-eef6-4b06-99ba-b6a68f5a5b55",
+      "selectionSeconds": 0.21410958282649517,
+      "authoritativeSeconds": 60.29597487486899,
+      "fileReadySeconds": 71.91098345792852,
+      "downloadSeconds": 0.9625489169266075,
+      "localSavedSeconds": 72.88557033287361,
+      "fsyncSeconds": 0.012037165928632021,
+      "underConcurrentLoad": false,
+      "artifactBytes": 5949084,
+      "artifactSha256": "461b97712d9635af6e2180b8c0cd16de56022e140e54d5b729b3171208c5d0db"
+    },
+    {
+      "sex": "male",
+      "kind": "preset",
+      "variant": "old",
+      "repeat": 1,
+      "neutralMode": "prepared",
+      "cache": "cold",
+      "operationId": "op_dfc31342-7241-4efe-aaf8-65c129186441",
+      "selectionSeconds": 0.18787266593426466,
+      "authoritativeSeconds": 57.69729737495072,
+      "fileReadySeconds": 70.52072120807134,
+      "downloadSeconds": 1.0156107498332858,
+      "localSavedSeconds": 71.54964787513018,
+      "fsyncSeconds": 0.013314667157828808,
+      "underConcurrentLoad": false,
+      "artifactBytes": 9071692,
+      "artifactSha256": "5f994a59b1e045d70dc4d6c38152848dcf1f2974a85e355a7aa07451e57da923"
+    },
+    {
+      "sex": "male",
+      "kind": "preset",
+      "variant": "old",
+      "repeat": 1,
+      "neutralMode": "prepared",
+      "cache": "warm",
+      "operationId": "op_9582ca47-aafe-4391-ab70-4a11ef24a321",
+      "selectionSeconds": 6.220792420208454e-05,
+      "authoritativeSeconds": 4.820393915986642,
+      "fileReadySeconds": 7.022245083004236,
+      "downloadSeconds": 0.872120541986078,
+      "localSavedSeconds": 7.905025790911168,
+      "fsyncSeconds": 0.010659582912921906,
+      "underConcurrentLoad": false,
+      "artifactBytes": 9071692,
+      "artifactSha256": "5f994a59b1e045d70dc4d6c38152848dcf1f2974a85e355a7aa07451e57da923"
+    },
+    {
+      "sex": "male",
+      "kind": "preset",
+      "variant": "old",
+      "repeat": 1,
+      "neutralMode": "source",
+      "cache": "cold",
+      "operationId": "op_2d45f0e8-5fd8-42d4-8f24-35fc37d3b58f",
+      "selectionSeconds": 0.28106662491336465,
+      "authoritativeSeconds": 76.70986400009133,
+      "fileReadySeconds": 88.89909066702239,
+      "downloadSeconds": 0.8454060829244554,
+      "localSavedSeconds": 89.76311033312231,
+      "fsyncSeconds": 0.018612875137478113,
+      "underConcurrentLoad": false,
+      "artifactBytes": 9071692,
+      "artifactSha256": "00884a6274ab4f71833e0d84bb1a2731a01fc0f3337201b19d47763b55172eca"
+    }
+  ],
+  "summary": [
+    {
+      "sex": "female",
+      "kind": "base",
+      "variant": "new",
+      "neutralMode": "prepared",
+      "cache": "cold",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 52.58605670789257,
+        "min": 52.58605670789257,
+        "max": 52.58605670789257
+      },
+      "localSavedSeconds": {
+        "median": 53.549663916928694,
+        "min": 53.549663916928694,
+        "max": 53.549663916928694
+      }
+    },
+    {
+      "sex": "female",
+      "kind": "base",
+      "variant": "new",
+      "neutralMode": "prepared",
+      "cache": "warm",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 9.921522750053555,
+        "min": 9.921522750053555,
+        "max": 9.921522750053555
+      },
+      "localSavedSeconds": {
+        "median": 10.943029541056603,
+        "min": 10.943029541056603,
+        "max": 10.943029541056603
+      }
+    },
+    {
+      "sex": "female",
+      "kind": "base",
+      "variant": "new",
+      "neutralMode": "source",
+      "cache": "cold",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 61.101849749917164,
+        "min": 61.101849749917164,
+        "max": 61.101849749917164
+      },
+      "localSavedSeconds": {
+        "median": 62.13047412503511,
+        "min": 62.13047412503511,
+        "max": 62.13047412503511
+      }
+    },
+    {
+      "sex": "female",
+      "kind": "base",
+      "variant": "old",
+      "neutralMode": "prepared",
+      "cache": "cold",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 50.00609004194848,
+        "min": 50.00609004194848,
+        "max": 50.00609004194848
+      },
+      "localSavedSeconds": {
+        "median": 51.021297208964825,
+        "min": 51.021297208964825,
+        "max": 51.021297208964825
+      }
+    },
+    {
+      "sex": "female",
+      "kind": "base",
+      "variant": "old",
+      "neutralMode": "prepared",
+      "cache": "warm",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 6.217560332966968,
+        "min": 6.217560332966968,
+        "max": 6.217560332966968
+      },
+      "localSavedSeconds": {
+        "median": 7.034559832885861,
+        "min": 7.034559832885861,
+        "max": 7.034559832885861
+      }
+    },
+    {
+      "sex": "female",
+      "kind": "base",
+      "variant": "old",
+      "neutralMode": "source",
+      "cache": "cold",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 58.22469108412042,
+        "min": 58.22469108412042,
+        "max": 58.22469108412042
+      },
+      "localSavedSeconds": {
+        "median": 59.080821625189856,
+        "min": 59.080821625189856,
+        "max": 59.080821625189856
+      }
+    },
+    {
+      "sex": "female",
+      "kind": "custom",
+      "variant": "new",
+      "neutralMode": "prepared",
+      "cache": "cold",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 121.31147850002162,
+        "min": 121.31147850002162,
+        "max": 121.31147850002162
+      },
+      "localSavedSeconds": {
+        "median": 124.47394191590138,
+        "min": 124.47394191590138,
+        "max": 124.47394191590138
+      }
+    },
+    {
+      "sex": "female",
+      "kind": "custom",
+      "variant": "new",
+      "neutralMode": "prepared",
+      "cache": "warm",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 20.22007991699502,
+        "min": 20.22007991699502,
+        "max": 20.22007991699502
+      },
+      "localSavedSeconds": {
+        "median": 23.884199041873217,
+        "min": 23.884199041873217,
+        "max": 23.884199041873217
+      }
+    },
+    {
+      "sex": "female",
+      "kind": "custom",
+      "variant": "new",
+      "neutralMode": "source",
+      "cache": "cold",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 123.6250622922089,
+        "min": 123.6250622922089,
+        "max": 123.6250622922089
+      },
+      "localSavedSeconds": {
+        "median": 127.43007545801811,
+        "min": 127.43007545801811,
+        "max": 127.43007545801811
+      }
+    },
+    {
+      "sex": "female",
+      "kind": "custom",
+      "variant": "old",
+      "neutralMode": "prepared",
+      "cache": "cold",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 123.86738591687754,
+        "min": 123.86738591687754,
+        "max": 123.86738591687754
+      },
+      "localSavedSeconds": {
+        "median": 127.86176083306782,
+        "min": 127.86176083306782,
+        "max": 127.86176083306782
+      }
+    },
+    {
+      "sex": "female",
+      "kind": "custom",
+      "variant": "old",
+      "neutralMode": "prepared",
+      "cache": "warm",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 16.733040084131062,
+        "min": 16.733040084131062,
+        "max": 16.733040084131062
+      },
+      "localSavedSeconds": {
+        "median": 21.057336084078997,
+        "min": 21.057336084078997,
+        "max": 21.057336084078997
+      }
+    },
+    {
+      "sex": "female",
+      "kind": "custom",
+      "variant": "old",
+      "neutralMode": "source",
+      "cache": "cold",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 124.38639579084702,
+        "min": 124.38639579084702,
+        "max": 124.38639579084702
+      },
+      "localSavedSeconds": {
+        "median": 128.19126295787282,
+        "min": 128.19126295787282,
+        "max": 128.19126295787282
+      }
+    },
+    {
+      "sex": "female",
+      "kind": "preset",
+      "variant": "new",
+      "neutralMode": "prepared",
+      "cache": "cold",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 53.79367829114199,
+        "min": 53.79367829114199,
+        "max": 53.79367829114199
+      },
+      "localSavedSeconds": {
+        "median": 55.33779216604307,
+        "min": 55.33779216604307,
+        "max": 55.33779216604307
+      }
+    },
+    {
+      "sex": "female",
+      "kind": "preset",
+      "variant": "new",
+      "neutralMode": "prepared",
+      "cache": "warm",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 10.2081613750197,
+        "min": 10.2081613750197,
+        "max": 10.2081613750197
+      },
+      "localSavedSeconds": {
+        "median": 11.24705879110843,
+        "min": 11.24705879110843,
+        "max": 11.24705879110843
+      }
+    },
+    {
+      "sex": "female",
+      "kind": "preset",
+      "variant": "new",
+      "neutralMode": "source",
+      "cache": "cold",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 66.10009083314799,
+        "min": 66.10009083314799,
+        "max": 66.10009083314799
+      },
+      "localSavedSeconds": {
+        "median": 67.58001058315858,
+        "min": 67.58001058315858,
+        "max": 67.58001058315858
+      }
+    },
+    {
+      "sex": "female",
+      "kind": "preset",
+      "variant": "old",
+      "neutralMode": "prepared",
+      "cache": "cold",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 52.90563870896585,
+        "min": 52.90563870896585,
+        "max": 52.90563870896585
+      },
+      "localSavedSeconds": {
+        "median": 53.831701084040105,
+        "min": 53.831701084040105,
+        "max": 53.831701084040105
+      }
+    },
+    {
+      "sex": "female",
+      "kind": "preset",
+      "variant": "old",
+      "neutralMode": "prepared",
+      "cache": "warm",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 6.908750624861568,
+        "min": 6.908750624861568,
+        "max": 6.908750624861568
+      },
+      "localSavedSeconds": {
+        "median": 7.453831916907802,
+        "min": 7.453831916907802,
+        "max": 7.453831916907802
+      }
+    },
+    {
+      "sex": "female",
+      "kind": "preset",
+      "variant": "old",
+      "neutralMode": "source",
+      "cache": "cold",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 62.63543462497182,
+        "min": 62.63543462497182,
+        "max": 62.63543462497182
+      },
+      "localSavedSeconds": {
+        "median": 63.4331246658694,
+        "min": 63.4331246658694,
+        "max": 63.4331246658694
+      }
+    },
+    {
+      "sex": "male",
+      "kind": "base",
+      "variant": "new",
+      "neutralMode": "prepared",
+      "cache": "cold",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 56.312883832957596,
+        "min": 56.312883832957596,
+        "max": 56.312883832957596
+      },
+      "localSavedSeconds": {
+        "median": 57.342852666042745,
+        "min": 57.342852666042745,
+        "max": 57.342852666042745
+      }
+    },
+    {
+      "sex": "male",
+      "kind": "base",
+      "variant": "new",
+      "neutralMode": "prepared",
+      "cache": "warm",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 10.49785237503238,
+        "min": 10.49785237503238,
+        "max": 10.49785237503238
+      },
+      "localSavedSeconds": {
+        "median": 11.526850332971662,
+        "min": 11.526850332971662,
+        "max": 11.526850332971662
+      }
+    },
+    {
+      "sex": "male",
+      "kind": "base",
+      "variant": "new",
+      "neutralMode": "source",
+      "cache": "cold",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 68.11449779197574,
+        "min": 68.11449779197574,
+        "max": 68.11449779197574
+      },
+      "localSavedSeconds": {
+        "median": 69.08941366709769,
+        "min": 69.08941366709769,
+        "max": 69.08941366709769
+      }
+    },
+    {
+      "sex": "male",
+      "kind": "base",
+      "variant": "old",
+      "neutralMode": "prepared",
+      "cache": "cold",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 69.82834395812824,
+        "min": 69.82834395812824,
+        "max": 69.82834395812824
+      },
+      "localSavedSeconds": {
+        "median": 70.78196391719393,
+        "min": 70.78196391719393,
+        "max": 70.78196391719393
+      }
+    },
+    {
+      "sex": "male",
+      "kind": "base",
+      "variant": "old",
+      "neutralMode": "prepared",
+      "cache": "warm",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 7.5166574160102755,
+        "min": 7.5166574160102755,
+        "max": 7.5166574160102755
+      },
+      "localSavedSeconds": {
+        "median": 8.342672375030816,
+        "min": 8.342672375030816,
+        "max": 8.342672375030816
+      }
+    },
+    {
+      "sex": "male",
+      "kind": "base",
+      "variant": "old",
+      "neutralMode": "source",
+      "cache": "cold",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 81.88045487506315,
+        "min": 81.88045487506315,
+        "max": 81.88045487506315
+      },
+      "localSavedSeconds": {
+        "median": 82.92893787520006,
+        "min": 82.92893787520006,
+        "max": 82.92893787520006
+      }
+    },
+    {
+      "sex": "male",
+      "kind": "custom",
+      "variant": "new",
+      "neutralMode": "prepared",
+      "cache": "cold",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 142.53553033294156,
+        "min": 142.53553033294156,
+        "max": 142.53553033294156
+      },
+      "localSavedSeconds": {
+        "median": 146.27889366587624,
+        "min": 146.27889366587624,
+        "max": 146.27889366587624
+      }
+    },
+    {
+      "sex": "male",
+      "kind": "custom",
+      "variant": "new",
+      "neutralMode": "prepared",
+      "cache": "warm",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 20.11557950009592,
+        "min": 20.11557950009592,
+        "max": 20.11557950009592
+      },
+      "localSavedSeconds": {
+        "median": 24.135828125057742,
+        "min": 24.135828125057742,
+        "max": 24.135828125057742
+      }
+    },
+    {
+      "sex": "male",
+      "kind": "custom",
+      "variant": "new",
+      "neutralMode": "source",
+      "cache": "cold",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 141.60295187518932,
+        "min": 141.60295187518932,
+        "max": 141.60295187518932
+      },
+      "localSavedSeconds": {
+        "median": 145.51000825013034,
+        "min": 145.51000825013034,
+        "max": 145.51000825013034
+      }
+    },
+    {
+      "sex": "male",
+      "kind": "custom",
+      "variant": "old",
+      "neutralMode": "prepared",
+      "cache": "cold",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 174.50976675003767,
+        "min": 174.50976675003767,
+        "max": 174.50976675003767
+      },
+      "localSavedSeconds": {
+        "median": 178.563038833905,
+        "min": 178.563038833905,
+        "max": 178.563038833905
+      }
+    },
+    {
+      "sex": "male",
+      "kind": "custom",
+      "variant": "old",
+      "neutralMode": "prepared",
+      "cache": "warm",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 18.715915167005733,
+        "min": 18.715915167005733,
+        "max": 18.715915167005733
+      },
+      "localSavedSeconds": {
+        "median": 23.525954624870792,
+        "min": 23.525954624870792,
+        "max": 23.525954624870792
+      }
+    },
+    {
+      "sex": "male",
+      "kind": "custom",
+      "variant": "old",
+      "neutralMode": "source",
+      "cache": "cold",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 171.42523874994367,
+        "min": 171.42523874994367,
+        "max": 171.42523874994367
+      },
+      "localSavedSeconds": {
+        "median": 176.4161676671356,
+        "min": 176.4161676671356,
+        "max": 176.4161676671356
+      }
+    },
+    {
+      "sex": "male",
+      "kind": "preset",
+      "variant": "new",
+      "neutralMode": "prepared",
+      "cache": "cold",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 58.68960699997842,
+        "min": 58.68960699997842,
+        "max": 58.68960699997842
+      },
+      "localSavedSeconds": {
+        "median": 59.545989457983524,
+        "min": 59.545989457983524,
+        "max": 59.545989457983524
+      }
+    },
+    {
+      "sex": "male",
+      "kind": "preset",
+      "variant": "new",
+      "neutralMode": "prepared",
+      "cache": "warm",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 10.492509791860357,
+        "min": 10.492509791860357,
+        "max": 10.492509791860357
+      },
+      "localSavedSeconds": {
+        "median": 11.746610916918144,
+        "min": 11.746610916918144,
+        "max": 11.746610916918144
+      }
+    },
+    {
+      "sex": "male",
+      "kind": "preset",
+      "variant": "new",
+      "neutralMode": "source",
+      "cache": "cold",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 71.91098345792852,
+        "min": 71.91098345792852,
+        "max": 71.91098345792852
+      },
+      "localSavedSeconds": {
+        "median": 72.88557033287361,
+        "min": 72.88557033287361,
+        "max": 72.88557033287361
+      }
+    },
+    {
+      "sex": "male",
+      "kind": "preset",
+      "variant": "old",
+      "neutralMode": "prepared",
+      "cache": "cold",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 70.52072120807134,
+        "min": 70.52072120807134,
+        "max": 70.52072120807134
+      },
+      "localSavedSeconds": {
+        "median": 71.54964787513018,
+        "min": 71.54964787513018,
+        "max": 71.54964787513018
+      }
+    },
+    {
+      "sex": "male",
+      "kind": "preset",
+      "variant": "old",
+      "neutralMode": "prepared",
+      "cache": "warm",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 7.022245083004236,
+        "min": 7.022245083004236,
+        "max": 7.022245083004236
+      },
+      "localSavedSeconds": {
+        "median": 7.905025790911168,
+        "min": 7.905025790911168,
+        "max": 7.905025790911168
+      }
+    },
+    {
+      "sex": "male",
+      "kind": "preset",
+      "variant": "old",
+      "neutralMode": "source",
+      "cache": "cold",
+      "repeats": 1,
+      "underConcurrentLoad": false,
+      "fileReadySeconds": {
+        "median": 88.89909066702239,
+        "min": 88.89909066702239,
+        "max": 88.89909066702239
+      },
+      "localSavedSeconds": {
+        "median": 89.76311033312231,
+        "min": 89.76311033312231,
+        "max": 89.76311033312231
+      }
+    }
+  ]
+}

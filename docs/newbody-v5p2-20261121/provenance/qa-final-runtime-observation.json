@@ -1,0 +1,61 @@
+{
+  "observedUtc": "2026-11-21T17:24:34.816656+00:00",
+  "actualNativeUiObserved": true,
+  "isolatedBundle": "app.standin.desktop.lod-qa-20261121b",
+  "catalogSha256": "6e35fd3b12b345915e6e2430644a22bbe9ca6349e1948ac89122f44a6aa7aa29",
+  "runtimeEventEvidence": {
+    "path": "evidence/v16-runtime-bindings.ndjson",
+    "sha256": "0b8cd11873e355f4c8531f78422e013064d30477144b8d53ec108e25c48d9f39"
+  },
+  "runtimeEventsObservedAfterCollectorAllowlistCorrection": true,
+  "qaBuildEvidence": "evidence/qa-reference-v16-reader-build.json",
+  "sexes": {
+    "male": {
+      "runtimeSha256": "7c8f92faef196060316834dc6a1b852508c296616151302d395f9e51d6bbc2e6",
+      "liveControlScreenshot": {
+        "path": "evidence/native-v16-male-custom-live.png",
+        "sha256": "5aaa0e94421bfdf9b1c6a9da15ac8464ff2065a2641530dc82deb28df6c2de86"
+      },
+      "nativeCase": "v16-male-custom",
+      "presetScreenshots": {
+        "base": {
+          "path": "evidence/native-v16-male-base-live.png",
+          "sha256": "2b3037c7a7e47bbbe126f0dbd782272b47db81cd1d92d3a84ea90423ad47a063"
+        },
+        "ideal83": {
+          "path": "evidence/native-v16-male-ideal83-live-final-session.png",
+          "sha256": "e83c303dd0ba7a7be2492cfaee5b3d7300e379127e12b71016ffa8ce96620974"
+        }
+      },
+      "sourceIdVerified": "male-base-lod-v5p2-20261118",
+      "eventSessions": [
+        "1b3e815c-2a24-4de0-af66-a3d8a0569203"
+      ],
+      "liveScreenshotsAndFinalBindingEventsFromSameBuiltBinary": true
+    },
+    "female": {
+      "runtimeSha256": "c417ac1e59b9350d1745a4061e75ecfa35e6389bb44797cfcd3c4053929d7592",
+      "liveControlScreenshot": {
+        "path": "evidence/native-v16-female-custom-live.png",
+        "sha256": "4ec09956ce8cbca91091cab9351c048a70b8773802ce6e0e628bf355078fcd49"
+      },
+      "nativeCase": "v16-female-custom",
+      "presetScreenshots": {
+        "base": {
+          "path": "evidence/native-v16-female-base-live.png",
+          "sha256": "2b2d082fcba15717a277f26dc5a3bee1d554dbb4543c3d12807350c2876a10c9"
+        },
+        "ideal83": {
+          "path": "evidence/native-v16-female-ideal83-live-final-session.png",
+          "sha256": "986da97bb2ace99678e2a58ab2a30cf666e196108c2d508568aa0009af5c8aaf"
+        }
+      },
+      "sourceIdVerified": "female-base-lod-v4-20261118",
+      "eventSessions": [
+        "1b3e815c-2a24-4de0-af66-a3d8a0569203"
+      ],
+      "liveScreenshotsAndFinalBindingEventsFromSameBuiltBinary": true
+    }
+  },
+  "productionChanged": false
+}

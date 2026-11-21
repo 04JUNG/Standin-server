@@ -1,0 +1,1387 @@
+{
+  "schema": "standin.native-export-trace.v1",
+  "input": {
+    "kind": "owned saved-history replay fixture",
+    "sourceImage": "unavailable; no image analysis in this run",
+    "candidateId": "local-real-standing::front",
+    "sourceBvhSha256": "83c43a28c334304486f7c680e6767735d2458f40e3f6bbf11d60b536b2528b68",
+    "people": 1,
+    "confidence": "not measured; fixture carries a selected library pose",
+    "search": "not executed"
+  },
+  "runtime": {
+    "app": "Isolated Standin LOD QA v5p2b with final v16 reference reader",
+    "clientMain": "03fb7c985732e5c7e7242d670b22b94bc7f3ec1b",
+    "readerImplementationCommit": "2bd6c868ff222d298ff4e90569865301bc9d3592",
+    "readerCodeSha256": {
+      "src/features/body-selection/shapeRuntime/format.ts": "4b75319b1f1b497f3a4cda947cd1cd08d4afd7902a9a6599842851c017bd4a2c",
+      "src/features/body-selection/shapeRuntime/sampled.ts": "f980fe8ffffa96f5b9aeb84a67bc71d75f4adfd905691ca39801530bb92e8a11",
+      "src/features/body-selection/shapeRuntime/evaluate.ts": "c3966b461d57d7758716a000672ffaf51b5a55921103f713460cf61c376c4213",
+      "src/features/body-selection/shapeRuntime/referenceFormat.ts": "bda9bcf38b7d16b6a3cf3125a0648fd6ddc0a663d9cd47ffbce5b4957b3623d0",
+      "src/features/body-selection/shapeRuntime/referenceFemaleV4.ts": "5ea5284cdafc1e3e687dc3a69bce96a8404cf4924a411bdb48dfd27f03a14b9e",
+      "src/features/body-selection/shapeRuntime/referenceEvaluate.ts": "6c52e66f2a17921a8aeaba1615a9b880632715aef905e318e6bc7cf5b8c9349d",
+      "src/features/body-selection/shapeRuntime/referenceAsync.ts": "439884c9c90875f42041d60bcaaafbf1be09df37ff7ef553c9f30960e7fa72ec",
+      "src/features/body-selection/shapeRuntime/reference.worker.ts": "ea0eacc8a8e70c6dcd97caefc20857d6cd6b0e49cdb756bfd98ce166d744e1f7",
+      "src/features/body-selection/shapeRuntime/mountShapeBody.ts": "d0a5fba55572d13d3e02c1a2b24ae5dbc69658270e8eba5362dd1b6be12cf91f"
+    },
+    "converter": "Linux/amd64 Blender 5.2.0 fbe6228777e7",
+    "network": "localhost/private Docker network",
+    "productionChanged": false
+  },
+  "events": [
+    {
+      "ts": "2026-11-21T17:19:28.701Z",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 852.5781669989228,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:28.701Z",
+      "type": "interactive_artifact",
+      "event": "artifact_prepare_started",
+      "stage": "export",
+      "durationMs": 52108,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:37.066Z",
+      "type": "interactive_converter_transport",
+      "requestId": "req_b4905187-1430-4acf-a867-0c4820792820",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 8363.44242100045
+    },
+    {
+      "ts": "2026-11-21T17:19:37.066Z",
+      "type": "interactive_converter_json",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "durationMs": 0.11112499982118607
+    },
+    {
+      "ts": "2026-11-21T17:19:37.066Z",
+      "type": "interactive_artifact",
+      "event": "artifact_converter_export",
+      "stage": "export",
+      "durationMs": 8363.87312900275,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:37.242Z",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 173.85341699793935,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:37.250Z",
+      "type": "interactive_artifact",
+      "event": "artifact_prepare_ready",
+      "stage": "export",
+      "durationMs": 9403,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:37.559Z",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 151.5458330027759,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:37.559Z",
+      "type": "interactive_artifact",
+      "event": "artifact_prepare_started",
+      "stage": "poster",
+      "durationMs": 60966,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:37.604Z",
+      "type": "interactive_converter_transport",
+      "requestId": "req_407065b8-5203-439b-b211-9c11b162e892",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 44.89241699874401
+    },
+    {
+      "ts": "2026-11-21T17:19:51.466Z",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 285.1407919973135,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:51.664Z",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 140.7070420011878,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:51.704Z",
+      "type": "interactive_artifact",
+      "event": "artifact_prepare_ready",
+      "stage": "poster",
+      "durationMs": 14297,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:18:36.797Z",
+      "requestId": "req_a6c6b9e5-74ad-4553-ad34-66ee9e0e2d2f",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 200.95833300054073,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:18:36.968Z",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 167.17945900186896,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:18:36.968Z",
+      "type": "interactive_artifact",
+      "event": "artifact_prepare_started",
+      "stage": "preview",
+      "durationMs": 375,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:18:37.997Z",
+      "requestId": "req_1aa57090-05d8-4f99-aee1-b6ac742ef6f5",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 173.46579200029373,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:18:37.998Z",
+      "requestId": "req_1aa57090-05d8-4f99-aee1-b6ac742ef6f5",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 174.42954199761152
+    },
+    {
+      "ts": "2026-11-21T17:18:39.141Z",
+      "requestId": "req_796ed135-aee4-4fd5-aaaf-03f292667a1e",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 125.93004200235009,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:18:39.141Z",
+      "requestId": "req_796ed135-aee4-4fd5-aaaf-03f292667a1e",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 126.668665997684
+    },
+    {
+      "ts": "2026-11-21T17:18:40.321Z",
+      "requestId": "req_76cf69ad-fcfc-4b05-a9df-04f2b3bb597f",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 163.37983400002122,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:18:40.321Z",
+      "requestId": "req_76cf69ad-fcfc-4b05-a9df-04f2b3bb597f",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 164.07787499949336
+    },
+    {
+      "ts": "2026-11-21T17:18:41.447Z",
+      "requestId": "req_49c3aa88-868c-43f1-ba23-a9ed52005ced",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 108.67937499657273,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:18:41.447Z",
+      "requestId": "req_49c3aa88-868c-43f1-ba23-a9ed52005ced",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 109.41987499967217
+    },
+    {
+      "ts": "2026-11-21T17:18:42.640Z",
+      "requestId": "req_5c14c3c3-2141-426d-abcb-31589796d8e3",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 175.5920000001788,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:18:42.640Z",
+      "requestId": "req_5c14c3c3-2141-426d-abcb-31589796d8e3",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 176.3522920012474
+    },
+    {
+      "ts": "2026-11-21T17:18:43.817Z",
+      "requestId": "req_7e2ab25d-28c5-4f05-babc-45433dfa316b",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 157.8918749988079,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:18:43.817Z",
+      "requestId": "req_7e2ab25d-28c5-4f05-babc-45433dfa316b",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 158.9692919999361
+    },
+    {
+      "ts": "2026-11-21T17:18:44.953Z",
+      "requestId": "req_ca663d86-916b-4c3d-9735-922361cc4436",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 119.07570799812675,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:18:44.953Z",
+      "requestId": "req_ca663d86-916b-4c3d-9735-922361cc4436",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 119.70066700130701
+    },
+    {
+      "ts": "2026-11-21T17:18:46.141Z",
+      "requestId": "req_50d98860-9b09-4526-98b9-d71fc0fd0fa7",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 170.2189170010388,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:18:46.141Z",
+      "requestId": "req_50d98860-9b09-4526-98b9-d71fc0fd0fa7",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 170.89495800063014
+    },
+    {
+      "ts": "2026-11-21T17:18:47.299Z",
+      "requestId": "req_b6bbdb82-2ec5-4f4f-b974-a528980354d4",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 140.70120900124311,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:18:47.299Z",
+      "requestId": "req_b6bbdb82-2ec5-4f4f-b974-a528980354d4",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 141.42233299836516
+    },
+    {
+      "ts": "2026-11-21T17:18:48.593Z",
+      "requestId": "req_ee0b3185-87b3-4119-92d3-7d4a9e64ec15",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 277.862584002316,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:18:48.593Z",
+      "requestId": "req_ee0b3185-87b3-4119-92d3-7d4a9e64ec15",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 279.101250000298
+    },
+    {
+      "ts": "2026-11-21T17:18:49.736Z",
+      "requestId": "req_7c17443e-be72-4565-8d8a-9d31e04d146f",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 124.62633400037885,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:18:49.736Z",
+      "requestId": "req_7c17443e-be72-4565-8d8a-9d31e04d146f",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 125.72624999657273
+    },
+    {
+      "ts": "2026-11-21T17:18:50.921Z",
+      "requestId": "req_114bbf59-a4e8-4027-815b-2a1f124414f9",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 167.59795799851418,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:18:50.921Z",
+      "requestId": "req_114bbf59-a4e8-4027-815b-2a1f124414f9",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 168.3220839984715
+    },
+    {
+      "ts": "2026-11-21T17:18:52.042Z",
+      "requestId": "req_2f7f9e8e-6b53-4712-92ea-fd295e45fc2b",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 104.36583300307393,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:18:52.042Z",
+      "requestId": "req_2f7f9e8e-6b53-4712-92ea-fd295e45fc2b",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 105.20891699939966
+    },
+    {
+      "ts": "2026-11-21T17:18:53.228Z",
+      "requestId": "req_8cdf0fc7-71a3-49f8-bc61-9c3759e3190b",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 168.90458399802446,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:18:53.229Z",
+      "requestId": "req_8cdf0fc7-71a3-49f8-bc61-9c3759e3190b",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 169.62470899894834
+    },
+    {
+      "ts": "2026-11-21T17:18:54.349Z",
+      "requestId": "req_da1e9ed2-04ad-41e8-9604-8c14e2ab86ba",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 103.64770900085568,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:18:54.350Z",
+      "requestId": "req_da1e9ed2-04ad-41e8-9604-8c14e2ab86ba",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 104.57704199850559
+    },
+    {
+      "ts": "2026-11-21T17:18:55.523Z",
+      "requestId": "req_9e45ad65-3f79-4b11-81af-ab5bfdd5d854",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 157.3125,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:18:55.524Z",
+      "requestId": "req_9e45ad65-3f79-4b11-81af-ab5bfdd5d854",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 158.06395799666643
+    },
+    {
+      "ts": "2026-11-21T17:18:56.655Z",
+      "requestId": "req_5abe9a5c-510e-4c67-8f3d-854d1dd65623",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 114.3724999986589,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:18:56.655Z",
+      "requestId": "req_5abe9a5c-510e-4c67-8f3d-854d1dd65623",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 115.04587499797344
+    },
+    {
+      "ts": "2026-11-21T17:18:57.833Z",
+      "requestId": "req_2c6c6010-b5ae-4327-871a-e3e317ab229b",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 161.50129200145602,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:18:57.833Z",
+      "requestId": "req_2c6c6010-b5ae-4327-871a-e3e317ab229b",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 162.53662499785423
+    },
+    {
+      "ts": "2026-11-21T17:18:59.033Z",
+      "requestId": "req_e76033b5-8de5-488f-9026-2a5ff2096d49",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 181.04591700062156,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:18:59.034Z",
+      "requestId": "req_e76033b5-8de5-488f-9026-2a5ff2096d49",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 181.99275099858642
+    },
+    {
+      "ts": "2026-11-21T17:19:00.197Z",
+      "requestId": "req_e74a2aa7-24be-4bfc-9834-29365a5c0078",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 147.02549999952316,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:00.197Z",
+      "requestId": "req_e74a2aa7-24be-4bfc-9834-29365a5c0078",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 147.68362499773502
+    },
+    {
+      "ts": "2026-11-21T17:19:01.393Z",
+      "requestId": "req_68585989-19f6-4268-8205-561eb73899bf",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 179.1617499999702,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:01.393Z",
+      "requestId": "req_68585989-19f6-4268-8205-561eb73899bf",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 179.84874999895692
+    },
+    {
+      "ts": "2026-11-21T17:19:02.843Z",
+      "requestId": "req_db2d3529-df5d-4f3a-a5a0-a0188263ce9f",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 429.0051669999957,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:02.843Z",
+      "requestId": "req_db2d3529-df5d-4f3a-a5a0-a0188263ce9f",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 430.0521669983864
+    },
+    {
+      "ts": "2026-11-21T17:19:04.234Z",
+      "requestId": "req_9f7d9d30-060b-4b37-b2b7-5c957a8e8e40",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 263.97687500342727,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:04.234Z",
+      "requestId": "req_9f7d9d30-060b-4b37-b2b7-5c957a8e8e40",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 266.5953340008855
+    },
+    {
+      "ts": "2026-11-21T17:19:05.562Z",
+      "requestId": "req_50c2d97b-59df-4475-ad51-3e8b2f483b9d",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 211.5683329999447,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:05.562Z",
+      "requestId": "req_50c2d97b-59df-4475-ad51-3e8b2f483b9d",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 212.8932919986546
+    },
+    {
+      "ts": "2026-11-21T17:19:07.329Z",
+      "requestId": "req_3652ffc2-2734-4184-8710-821d09db7d88",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 649.4108330011368,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:07.330Z",
+      "requestId": "req_3652ffc2-2734-4184-8710-821d09db7d88",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 650.3890420012176
+    },
+    {
+      "ts": "2026-11-21T17:19:08.706Z",
+      "requestId": "req_94c471bd-e9d0-4c37-aec6-90d3f999e0e9",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 255.8435829989612,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:08.706Z",
+      "requestId": "req_94c471bd-e9d0-4c37-aec6-90d3f999e0e9",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 258.2187080010772
+    },
+    {
+      "ts": "2026-11-21T17:19:10.205Z",
+      "requestId": "req_0111b320-b434-4ae9-b4a7-4d33e84b6f19",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 376.5059170015156,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:10.205Z",
+      "requestId": "req_0111b320-b434-4ae9-b4a7-4d33e84b6f19",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 378.74104199931026
+    },
+    {
+      "ts": "2026-11-21T17:19:11.529Z",
+      "requestId": "req_69f2cc54-0bf9-4ad5-a288-7ab6450a2392",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 205.16575000062585,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:11.529Z",
+      "requestId": "req_69f2cc54-0bf9-4ad5-a288-7ab6450a2392",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 206.10249999910593
+    },
+    {
+      "ts": "2026-11-21T17:19:12.763Z",
+      "requestId": "req_6a4db798-042f-49e7-a8a8-1a5e8e34cc13",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 119.49391699954867,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:12.763Z",
+      "requestId": "req_6a4db798-042f-49e7-a8a8-1a5e8e34cc13",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 120.25154200196266
+    },
+    {
+      "ts": "2026-11-21T17:19:14.052Z",
+      "requestId": "req_9c3da3a1-e669-4c4c-b37d-3e373b4942fc",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 171.75154200196266,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:14.052Z",
+      "requestId": "req_9c3da3a1-e669-4c4c-b37d-3e373b4942fc",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 172.57491700351238
+    },
+    {
+      "ts": "2026-11-21T17:19:15.355Z",
+      "requestId": "req_dc4c0921-61e3-4e68-913f-7589b2dcf677",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 183.8714580014348,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:15.355Z",
+      "requestId": "req_dc4c0921-61e3-4e68-913f-7589b2dcf677",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 184.93866600096226
+    },
+    {
+      "ts": "2026-11-21T17:19:16.651Z",
+      "requestId": "req_514fd978-1984-4d66-a84b-2009bb1d0b7f",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 178.59866699948907,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:16.694Z",
+      "requestId": "req_514fd978-1984-4d66-a84b-2009bb1d0b7f",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 221.8696670010686
+    },
+    {
+      "ts": "2026-11-21T17:19:17.960Z",
+      "requestId": "req_ea45709d-ee63-479b-88f8-7370cae0b04e",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 149.501791998744,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:17.960Z",
+      "requestId": "req_ea45709d-ee63-479b-88f8-7370cae0b04e",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 150.33262500166893
+    },
+    {
+      "ts": "2026-11-21T17:19:19.197Z",
+      "requestId": "req_67d9693e-a0eb-423e-afff-3aaf0ad4a26b",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 215.3801669999957,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:19.198Z",
+      "requestId": "req_67d9693e-a0eb-423e-afff-3aaf0ad4a26b",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 216.19095899909735
+    },
+    {
+      "ts": "2026-11-21T17:19:20.452Z",
+      "requestId": "req_dc5755ab-e5c2-4451-aca4-b1e08bb22972",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 138.56275000050664,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:20.452Z",
+      "requestId": "req_dc5755ab-e5c2-4451-aca4-b1e08bb22972",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 139.34650000184774
+    },
+    {
+      "ts": "2026-11-21T17:19:21.756Z",
+      "requestId": "req_88c3e577-859e-4550-9787-bb0544794f1b",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 185.67954099923372,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:21.756Z",
+      "requestId": "req_88c3e577-859e-4550-9787-bb0544794f1b",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 186.9657079987228
+    },
+    {
+      "ts": "2026-11-21T17:19:23.060Z",
+      "requestId": "req_303af422-8f74-41d3-9637-319e786b00cf",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 184.92462499812245,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:23.060Z",
+      "requestId": "req_303af422-8f74-41d3-9637-319e786b00cf",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 186.4117499999702
+    },
+    {
+      "ts": "2026-11-21T17:19:24.295Z",
+      "requestId": "req_91abda0c-5302-4a18-8589-e2217a1e7162",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 214.92908299714327,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:24.295Z",
+      "requestId": "req_91abda0c-5302-4a18-8589-e2217a1e7162",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 215.70004200190306
+    },
+    {
+      "ts": "2026-11-21T17:19:24.925Z",
+      "type": "interactive_converter_transport",
+      "requestId": "req_419fed68-1e21-4f45-8170-718c5667a406",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 47956.30743900314
+    },
+    {
+      "ts": "2026-11-21T17:19:24.925Z",
+      "type": "interactive_converter_json",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "durationMs": 0.02124999836087227
+    },
+    {
+      "ts": "2026-11-21T17:19:24.925Z",
+      "type": "interactive_artifact",
+      "event": "artifact_converter_solve",
+      "stage": "preview",
+      "durationMs": 47956.71223099902,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:24.991Z",
+      "type": "interactive_converter_transport",
+      "requestId": "req_dd8f536e-a11c-4688-af1e-96057361c970",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 65.2663330025971
+    },
+    {
+      "ts": "2026-11-21T17:19:24.992Z",
+      "type": "interactive_artifact",
+      "event": "artifact_converter_model",
+      "stage": "preview",
+      "durationMs": 65.72329200059175,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:25.224Z",
+      "type": "interactive_artifact",
+      "event": "artifact_packet_validation",
+      "stage": "preview",
+      "durationMs": 231.90687500312924,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:25.494Z",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 270.7977079972625,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:25.534Z",
+      "type": "interactive_artifact",
+      "event": "artifact_prepare_ready",
+      "stage": "preview",
+      "durationMs": 48733,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:25.691Z",
+      "requestId": "req_14d061e7-cb76-424d-b13e-63f763453522",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 197.76141699776053,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:25.692Z",
+      "requestId": "req_14d061e7-cb76-424d-b13e-63f763453522",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 198.56349999830127
+    },
+    {
+      "ts": "2026-11-21T17:19:27.091Z",
+      "requestId": "req_3748ef26-a087-4dae-9dc0-2bb0aa9fbe83",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 281.9296249970794,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:27.091Z",
+      "requestId": "req_3748ef26-a087-4dae-9dc0-2bb0aa9fbe83",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 283.339874997735
+    },
+    {
+      "ts": "2026-11-21T17:19:27.408Z",
+      "requestId": "req_b7258825-08c7-48de-ab4e-9a66f43811bb",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 286.96425000205636,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:27.605Z",
+      "requestId": "req_3f519551-29ab-40f2-bae6-30522527a81d",
+      "type": "interactive_converter_transport",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 196.10408300161362
+    },
+    {
+      "ts": "2026-11-21T17:19:27.610Z",
+      "requestId": "req_b7258825-08c7-48de-ab4e-9a66f43811bb",
+      "type": "interactive_artifact",
+      "event": "artifact_model_delivery_validation",
+      "stage": "validation",
+      "durationMs": 5.179124999791384,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:27.610Z",
+      "requestId": "req_63775feb-177b-47b9-84b5-2d5d0e465d28",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 393.28491700068116,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:27.913Z",
+      "requestId": "req_b7258825-08c7-48de-ab4e-9a66f43811bb",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 303.37845800071955,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:29.028Z",
+      "requestId": "req_126d94d1-257c-4d25-a572-fa6708ad3ee3",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 185.02850100025535,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:29.028Z",
+      "requestId": "req_126d94d1-257c-4d25-a572-fa6708ad3ee3",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 188.26820899918675
+    },
+    {
+      "ts": "2026-11-21T17:19:30.401Z",
+      "requestId": "req_f10b0a16-cd0f-466a-8d8e-64637b5ff018",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 161.68025000020862,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:30.401Z",
+      "requestId": "req_f10b0a16-cd0f-466a-8d8e-64637b5ff018",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 162.43487500026822
+    },
+    {
+      "ts": "2026-11-21T17:19:31.697Z",
+      "requestId": "req_5a4d8b39-584a-44dd-bded-18c2d842aa21",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 173.9454579986632,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:31.697Z",
+      "requestId": "req_5a4d8b39-584a-44dd-bded-18c2d842aa21",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 175.42675000056624
+    },
+    {
+      "ts": "2026-11-21T17:19:32.989Z",
+      "requestId": "req_6fd6149a-e7b3-425c-ae3b-aa354b7a47fb",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 174.90420900285244,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:32.990Z",
+      "requestId": "req_6fd6149a-e7b3-425c-ae3b-aa354b7a47fb",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 176.9731669984758
+    },
+    {
+      "ts": "2026-11-21T17:19:34.249Z",
+      "requestId": "req_8e3fe0df-cfd5-4555-990f-72e37d50fa26",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 143.36516700312495,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:34.249Z",
+      "requestId": "req_8e3fe0df-cfd5-4555-990f-72e37d50fa26",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 144.22795899957418
+    },
+    {
+      "ts": "2026-11-21T17:19:35.520Z",
+      "requestId": "req_87af5fa6-f498-4426-87e0-c48f4344c2f8",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 179.9602079987526,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:35.520Z",
+      "requestId": "req_87af5fa6-f498-4426-87e0-c48f4344c2f8",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 180.78095800057054
+    },
+    {
+      "ts": "2026-11-21T17:19:36.789Z",
+      "requestId": "req_4958ea00-0ae8-4cc9-852d-3c4d8f541b47",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 152.91933299973607,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:36.789Z",
+      "requestId": "req_4958ea00-0ae8-4cc9-852d-3c4d8f541b47",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 153.55175000056624
+    },
+    {
+      "ts": "2026-11-21T17:19:38.393Z",
+      "requestId": "req_7fa5f30b-3740-4f74-ac38-090c642d1225",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 485.9079999998212,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:19:38.394Z",
+      "requestId": "req_7fa5f30b-3740-4f74-ac38-090c642d1225",
+      "type": "interactive_poll",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 487.22149999812245
+    },
+    {
+      "ts": "2026-11-21T17:20:47.341Z",
+      "requestId": "req_49b04082-8ae5-428f-aa0b-750c408b5196",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 662.0477499999106,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:20:47.591Z",
+      "requestId": "req_49b04082-8ae5-428f-aa0b-750c408b5196",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 183.9781669974327,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:21:00.919Z",
+      "requestId": "req_d1535f75-1969-417d-88ba-5a8edaf538ff",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 267.4506669975817,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:21:00.963Z",
+      "requestId": "req_76ffdba2-f586-4735-92c9-aa9b56a986ab",
+      "type": "interactive_converter_transport",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 44.323582999408245
+    },
+    {
+      "ts": "2026-11-21T17:21:01.239Z",
+      "requestId": "req_d1535f75-1969-417d-88ba-5a8edaf538ff",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 272.32162499800324,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:22:00.400Z",
+      "requestId": "req_9bd1247c-d523-4943-b6e4-d32dd5c7c4df",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 179.31262600049376,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:22:00.472Z",
+      "requestId": "req_6c27b27f-f0c3-4118-aaea-e0f3a57a4c0e",
+      "type": "interactive_converter_transport",
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "status": 200,
+      "durationMs": 72.01708300039172
+    },
+    {
+      "ts": "2026-11-21T17:22:00.478Z",
+      "requestId": "req_9bd1247c-d523-4943-b6e4-d32dd5c7c4df",
+      "type": "interactive_artifact",
+      "event": "artifact_model_delivery_validation",
+      "stage": "validation",
+      "durationMs": 5.420459002256393,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    },
+    {
+      "ts": "2026-11-21T17:22:00.694Z",
+      "requestId": "req_9bd1247c-d523-4943-b6e4-d32dd5c7c4df",
+      "type": "interactive_artifact",
+      "event": "artifact_revalidate",
+      "stage": "validation",
+      "durationMs": 215.50262499973178,
+      "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+      "revision": 38
+    }
+  ],
+  "timing": [
+    {
+      "stage": "preview",
+      "seconds": 48.733,
+      "scope": "BFF component time of this functional observation; not the separate fair benchmark"
+    },
+    {
+      "stage": "export",
+      "seconds": 9.403,
+      "scope": "BFF component time of this functional observation; not the separate fair benchmark"
+    },
+    {
+      "stage": "poster",
+      "seconds": 14.297,
+      "scope": "BFF component time of this functional observation; not the separate fair benchmark"
+    }
+  ],
+  "nativeWallClockSeconds": null,
+  "identity": {
+    "body": {
+      "characterId": "female-base-lod-v4-20261118",
+      "characterSha256": "d9f65329a59ef043abcd7af48c33da1d0f8399632e27c65a29cbe545c99499d0",
+      "rigProfile": "mixamo"
+    },
+    "shape": {
+      "controlsSha256": "0ae2beb183c654bfe4133f78b17c072af8ed6d2d9d5082b20cbf9ff366fcb283",
+      "rulesVersion": "standin-lod-female-hands-body-250um-ref-v4-final",
+      "sha256": "b6c80d1645b9e139037abab3b2948bce4b085231851d6e5b1e633511626a6fb7",
+      "sourceSha256": "f753680786d8bb0ff748051ceda3caf550d79702852a3bc46a59d6642bdeed07"
+    },
+    "observedPublicSelection": {
+      "revision": 29,
+      "intent": "manual",
+      "controls": {
+        "calf": 0,
+        "glute": 0,
+        "heads": 8.000001,
+        "thigh": 0,
+        "waist": 0,
+        "height": 189.893087,
+        "muscle": 1.5,
+        "pelvis": 0,
+        "fat_arms": 0,
+        "fat_gain": 0,
+        "fat_legs": 0,
+        "physique": 0.6,
+        "fat_torso": 0,
+        "leg_ratio": 0,
+        "shoulders": 1,
+        "arm_length": 0,
+        "definition": 0,
+        "head_depth": 0,
+        "head_scale": 1,
+        "head_width": 0,
+        "leg_length": 0,
+        "neck_width": 0,
+        "breast_size": 1,
+        "chest_depth": 0,
+        "chest_width": 0,
+        "detail_back": 0,
+        "detail_calf": 0,
+        "neck_length": 0,
+        "breast_width": 0,
+        "detail_chest": 0,
+        "detail_thigh": 0,
+        "torso_length": 0,
+        "breast_height": 0,
+        "breast_spacing": 0,
+        "detail_forearm": 0,
+        "detail_shoulder": 0,
+        "detail_upperarm": 0,
+        "fat_distribution": 0,
+        "breast_projection": 0
+      }
+    },
+    "authoringSource": {
+      "rules": "standin-lod-female-hands-body-250um-ref-v4-final",
+      "blendSha256": "aa10276a7c63a2b0f2336b6f4569e0fb541c6f2aa2dcf689ab96ec04573159d3",
+      "controllerSha256": "3a3ccd4e1fe09967b86dde7823aad9d0886d47b86b47021a3fcea58e61145052"
+    },
+    "solver": {
+      "adapterVersion": "post-frozen-file-canonical-snapshot-v2",
+      "manifestSha256": "fa951f0a45c27e71d4f1b88f47af576dd366c3005d794d47ffb59336e6280065",
+      "runtimeSha256": "57dc8e8b7e84af286bf0ac88a78c9ece3eb41938f2919cd415b5d8ebe000541d",
+      "version": "chain-transport-v3.2.5"
+    },
+    "scope": "full",
+    "hands": {
+      "left": null,
+      "librarySha256": "d6c7a92051088ad6ba171b95f43065d6688b8b6595513505ba8a6763805c6b47",
+      "right": null,
+      "rulesVersion": "hand-bake-v1"
+    }
+  },
+  "result": {
+    "operationId": "op_7af2cf68-670f-47b7-a5fa-c03e01c8ac09",
+    "revision": 38,
+    "previewState": "authoritative",
+    "exportState": "ready",
+    "stateHash": "afadfb9364419e1e9afeaec04da8d00739571fd956137107d24f03910d306aae",
+    "packetModelSha256": "575e62fefaeb89dd30effd97baddb888320aeb467b9bcc792a107ba93eee56ad",
+    "artifactSha256": "e3fc10a614b6b9bae8edfeee4cd06ae656c0e36951ce2b1c3029180c72c5d106",
+    "artifactBytes": 6130988,
+    "meshes": [
+      {
+        "name": "mesh_000",
+        "vertices": 94901,
+        "triangles": 189798
+      }
+    ],
+    "bones": 54,
+    "diskReloadErrors": {
+      "maxPositionErrorM": 0.0,
+      "maxMatrixError": 0.0,
+      "maxWeightError": 0.0,
+      "maxNormalError": 0.0
+    },
+    "nativeUiSaved": true,
+    "cspImportSaveCloseReopen": true,
+    "clipSha256": "f25302247896e04c2e1ecf69b2b7f0a9041dacc0fc90928164a2b0426b24d4dc"
+  },
+  "relatedAssetGates": {
+    "label": "Separate exact-catalog asset checks; these are not execution/timing claims for this native operation",
+    "runtimeSha256": "c417ac1e59b9350d1745a4061e75ecfa35e6389bb44797cfcd3c4053929d7592",
+    "runtimeBytes": 17392897,
+    "catalogSha256": "6e35fd3b12b345915e6e2430644a22bbe9ca6349e1948ac89122f44a6aa7aa29",
+    "allTechnicalGatesPassed": false,
+    "finalSourceUnmodified": true,
+    "publicLimitsMm": {
+      "preset": 0.5,
+      "few": 5,
+      "basic": 10,
+      "all": 20
+    },
+    "runtimeSizeLimitBytes": 33554432,
+    "operatingDefaultsUnchanged": true,
+    "externalReviewRequired": true
+  },
+  "mediaSha256": {
+    "preview": "90027a53c043fd4a2691bb850c42c09781e5c717793d425de1ae1d320f96651c",
+    "saved": "290fdb3b3560dfd6e85a4d324beca716f706c6b946ec509cd7ecd6e04cee5c59",
+    "csp": "47d634956136cf351066f5760e639cf27830f7e2fca85518e65eb053dc9bf86d"
+  },
+  "limitations": [
+    "이 사례는 최종 커스텀 1건이며 전체 20종/480조합/SSR2/성능 검증은 별도 보고서와 연결합니다.",
+    "원본 러프 분석·검색·confidence·refine는 실행하지 않았습니다.",
+    "이 기능 검수의 BFF 구간 시간을 별도의 실제 앱 반복 성능 수치로 사용하지 않습니다.",
+    "전체 API 조건 36건은 완료했지만 실제 앱 3회 반복 중 Mac 잠금으로 남은 조건이 있습니다. 이 화면은 전체 릴리스 완료 선언이 아닙니다."
+  ]
+}
