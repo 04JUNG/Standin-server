@@ -168,3 +168,20 @@ BFF가 사용자 결과와 lineage를 명시적으로 갱신하는 별도 결정
 8. refined 최종 BVH와 그 BVH로 만든 FBX가 한 bundle에 함께 들어가며 manifest SHA가 일치
 
 실제 BFF PR에서도 같은 시나리오를 공개 export URL과 영속 저장소까지 확장해 검증한다.
+
+## 선택형 발바닥 보정 스위치 (2026-11-23)
+
+`CONVERTER_PLANTAR_CORRECTION_ENABLED=0`은 추가 발바닥·발목 후보 탐색 대신 동결 코드에
+이미 있는 V3.2.1 기본 변환을 선택한다. 기본 관절 매핑·발목 안전 제한·체형 조절·원본/선택 손·
+최종 FBX 재임포트/가중치 검증은 유지한다. `1`은 기존 V3.2.5 동작이며 소스 기본값이다.
+`CONVERTER_FORCE_EXACT_V324`와 동시에 끄기 모드를 선택하면 기동/변환을 거부한다.
+
+`GET /healthz`의 `plantar_correction_enabled`는 실제 적용한 bool을 추가로 반환한다.
+`solver_version`은 동결 코드 묶음의 버전이며 선택형 보정 활성 여부를 뜻하지 않는다.
+내부 worker 보고서의 `plantar_correction.mode`는 `v325-search` 또는 `v321-base-only`이다.
+interactive runtime/preview revision과 최종 파일 캐시는 모드 변경을 별도 식별하므로
+켜짐·꺼짐 결과를 혼용하지 않는다. 중립 체형 준비 identity는 그대로 유지한다.
+
+운영 Converter 배포 workflow는 전용 GitHub 환경 변수
+`CONVERTER_PLANTAR_CORRECTION_ENABLED`를 적용하며, 미설정 시 `0`을 선택한다.
+스테이징 설정은 변경하지 않는다. 이번 PR 생성 자체는 배포나 ECS 변경을 수행하지 않는다.

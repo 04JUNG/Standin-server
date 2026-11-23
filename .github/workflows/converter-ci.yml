@@ -16,6 +16,7 @@ on:
       - "deploy/ecs/**"
       - "scripts/measure_converter_latency.py"
       - "scripts/prepare_hand_screen_deployment.py"
+      - "scripts/prepare_plantar_deployment.py"
       - "src/hand_skin_capacity.py"
       - "tests/test_hand_screen_deployment.py"
       - "scripts/verify_shape_bake.py"
@@ -39,6 +40,7 @@ on:
       - "deploy/ecs/**"
       - "scripts/measure_converter_latency.py"
       - "scripts/prepare_hand_screen_deployment.py"
+      - "scripts/prepare_plantar_deployment.py"
       - "src/hand_skin_capacity.py"
       - "tests/test_hand_screen_deployment.py"
       - "scripts/verify_shape_bake.py"
@@ -91,6 +93,7 @@ jobs:
             tests/test_staging_final_cache.py \
             tests/converter/test_final_cache_remote.py \
             tests/converter/test_worker_contract.py \
+            tests/converter/test_plantar_mode.py \
             tests/converter/test_body_material.py \
             tests/converter/test_shape_bake_contract.py \
             tests/converter/test_prepared_body.py \

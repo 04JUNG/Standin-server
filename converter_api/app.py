@@ -315,9 +315,13 @@ def create_app(
     runner: BlenderRunner | None = None,
     max_bvh_bytes: int | None = None,
 ) -> FastAPI:
+    from converter.plantar_mode import enabled as plantar_enabled
+    plantar_enabled()  # Fail startup for an invalid operator value.
     character_registry = registry or CharacterRegistry.from_env()
     default_character_id = getattr(character_registry, "default_character_id", "standin-master-v2")
     blender_runner = runner or BlenderRunner()
+    if not plantar_enabled() and getattr(getattr(blender_runner, 'settings', None), 'force_exact_v324', False):
+        raise ValueError('plantar disabled conflicts with force_exact_v324')
     size_limit = (
         max_bvh_bytes
         if max_bvh_bytes is not None
@@ -524,6 +528,7 @@ def create_app(
                 checks["shape_sources"] = {"ok": False, "code": "SHAPE_SOURCE_UNAVAILABLE"}
         payload = {
             "ok": ok,
+            "plantar_correction_enabled": plantar_enabled(),
             "solver_version": SOLVER_VERSION,
             "camera_version": "candidate-camera-v1",
             "framing_version": FRAMING_VERSION,

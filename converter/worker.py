@@ -334,7 +334,7 @@ def _frozen_lineage() -> dict[str, str]:
     }
 
 
-def run_job(job: dict[str, Any]) -> dict[str, Any]:
+def _execute_job(job: dict[str, Any]) -> dict[str, Any]:
     """Execute one validated job inside Blender and persist its report."""
     from converter.lab_timing import StageTimings
     lab_timings = StageTimings()
@@ -518,6 +518,18 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
     if lab_timings.enabled:
         payload["lab_stage_timings"] = lab_timings.records
     return payload
+
+
+def run_job(job: dict[str, Any]) -> dict[str, Any]:
+    from converter.plantar_mode import enabled, selected
+    if not enabled():
+        # Verify frozen code before the adapter imports the frozen entrypoint.
+        # _execute_job retains its original independent checks as well.
+        _frozen_lineage()
+    with selected() as policy:
+        report = _execute_job(job)
+    report['plantar_correction'] = policy
+    return report
 
 
 def _render_thumbnail(request: dict[str, Any], artifact: Path) -> dict[str, Any]:
