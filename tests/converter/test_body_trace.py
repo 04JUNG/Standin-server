@@ -1,9 +1,15 @@
 import json
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 
 from converter.body_trace import BodyTrace, PREFIX, relay_lines, validated_event
+
+
+def test_diagnostic_module_is_in_the_deployable_image():
+    dockerfile = Path(__file__).resolve().parents[2]/'Dockerfile.converter'
+    assert 'COPY converter/body_trace.py /app/converter/body_trace.py' in dockerfile.read_text()
 
 
 def test_nested_calls_preserve_failures_and_never_log_arguments():
