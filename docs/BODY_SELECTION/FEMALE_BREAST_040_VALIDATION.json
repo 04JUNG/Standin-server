@@ -1,0 +1,181 @@
+{
+  "status": "technical_checks_passed_artist_review_required",
+  "rules": "standin-female-body-0.4.0.breast7.4",
+  "asset": "standin-female040-breast7-4-c235953fa8d3a7df233b",
+  "parent": {
+    "rules": "standin-female-body-0.4.0",
+    "asset": "standin-approved-female-ceee9f20f03e7cbd2df2",
+    "blend_sha256": "5a62d2f3fb49d77fdc04d1c78a361edf9fbab55e71e0e47d3b6b393fae14d3a9",
+    "controller_sha256": "1164dff9a4c6069d0da37b80dd26c61544bc6f9eb9c9f3469c33d457e893e9af"
+  },
+  "donor": {
+    "rules": "standin-female-body-0.3.4.breast7",
+    "blend_sha256": "c2d3a81e52eda54c0fed3d23aa3e45375f99989796f10fab9f2578e0d98a843a",
+    "controller_sha256": "1cdb04c45e34ecf054da0769479f9f28c5e62a8c6f5154340b1b28a25789ae2d"
+  },
+  "source": {
+    "blend_sha256": "4a559fba5378c76e071ed3c915c3b61c9141f48d33eb71047c4cc54f49c80215",
+    "controller_sha256": "a8ddb6814e351ee4efa0a5b2cd95cbe67c89cf71cce571c5acccddd879ffd3ae"
+  },
+  "transfer": {
+    "BODY_BreastSmall": {
+      "significant_donor_vertices": 1745,
+      "significant_missing_vertices": [],
+      "max_nonexact_displacement_mm": 0.00015257212369605613,
+      "exact_significant_transfer": true
+    },
+    "BODY_BreastExtended": {
+      "significant_donor_vertices": 1133,
+      "significant_missing_vertices": [],
+      "max_nonexact_displacement_mm": 0.0,
+      "exact_significant_transfer": true
+    }
+  },
+  "invariants": {
+    "basis": "669e19158038953e478262db99f83614685bd8b45a0194f9e69b023ba9538bcd",
+    "topology": "7e0118621aac1806ac681896ad03ab1461813274618b763102d06adc6407e6ff",
+    "weights": "60fff8e09bbd7ed3ccc11377394b729d56230c2770b454a4958caa6cdd546297",
+    "uv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "rest": "32901efb779f74981a1ed6747de48845e47190269f0b0357d4a6d64b2870afc0",
+    "bones": "ca1b38c61b526bde29be6659a1e089d6f691b6c471a9bc887f2c05f00770365b",
+    "materials": "964eedc9cdd7504ac257a3db7e9add12110741a6cc7f5773e855c6cfd583c129"
+  },
+  "all_unowned_shape_keys_exact": true,
+  "qa": {
+    "base_passed": true,
+    "grid_samples": 301,
+    "neutral_combinations": 150,
+    "base_pose_cases": 52,
+    "extreme_pose_cases": 18,
+    "extreme_no_added_global_pairs": true,
+    "zero_to_old_max_exact": true,
+    "invariants_equal": true,
+    "max_fbx_roundtrip_mm": 0.0003096980094596802,
+    "additional_posed_contact_path": {
+      "complete": true,
+      "passed": true,
+      "cases": 301,
+      "new_pairs": 0,
+      "max_local_correction_mm": 0.06584078073501587,
+      "max_affected_vertices": 13,
+      "inherited_crossings_retained": true
+    }
+  },
+  "runtime": {
+    "passed": true,
+    "independent": true,
+    "thresholdMm": 0.05,
+    "rules": "standin-female-body-0.4.0.breast7.4",
+    "source": {
+      "blendSha256": "4a559fba5378c76e071ed3c915c3b61c9141f48d33eb71047c4cc54f49c80215",
+      "controllerSha256": "a8ddb6814e351ee4efa0a5b2cd95cbe67c89cf71cce571c5acccddd879ffd3ae"
+    },
+    "vertices": 105430,
+    "cases": 129,
+    "bytes": 20020176,
+    "maxComponentErrorMm": 5.964408478220662e-05,
+    "maxVertexErrorMm": 8.37689658893493e-05,
+    "sha256": "4e7e0307ad0025ee05cc68aaa358335e9311336e436a4a4fe1ec3d70ca46fdb0"
+  },
+  "catalog": {
+    "current_preset_defaults_preserved": true,
+    "historical_catalog_preserved": true,
+    "default_selection_changed": false,
+    "breast_size": {
+      "min": -1,
+      "max": 2,
+      "step": 0.01
+    }
+  },
+  "repo_checks": {
+    "client_node24": "1710 passed, 6 skipped",
+    "server_contracts": "66 passed",
+    "typecheck": "passed",
+    "lint": "0 errors, 2 existing warnings",
+    "build": "passed, existing chunk warning"
+  },
+  "csp": {
+    "scope": "isolated localhost review app, actual client full-resolution evaluator and source-validated fixed-FBX writer; actual HTTP download and CLIP STUDIO PAINT import/save/close/reopen",
+    "rules": "standin-female-body-0.4.0.breast7.4",
+    "accepted": true,
+    "rows": [
+      {
+        "size": -1,
+        "job_id": "f04f5c4f0cd6440fa7885da3ca2eaa74",
+        "fbx": "female040-breast7-4-size--1.fbx",
+        "fbx_sha256": "a64e238fe131d771256eefbeebcd1849df6d923d268376e4b461daa250db9b49",
+        "fbx_bytes": 6707036,
+        "http_seconds": 7.057458208175376,
+        "clip": "female040-breast7-4-min.clip",
+        "clip_sha256": "cad8b54d92982b49002939c8951b0746b3d42ffb2faeb4eb761bba959ff8cace",
+        "clip_bytes": 6158319,
+        "download_import_save_close_reopen_observed": true,
+        "screenshots": [
+          "final4-min-csp-import.png",
+          "final4-min-csp-reopened.png"
+        ]
+      },
+      {
+        "size": 2,
+        "job_id": "cec130e60c0643a9a3d797f010295b0e",
+        "fbx": "female040-breast7-4-size-2.fbx",
+        "fbx_sha256": "370bb67e3d1817cbebdc646632d2c2214635944d423d68fe75b1376aefcf2bc6",
+        "fbx_bytes": 6707004,
+        "http_seconds": 6.174366999883205,
+        "clip": "female040-breast7-4-max.clip",
+        "clip_sha256": "01fd5380faecb7f284b666cb9e59794f03f854df91100a9371d8066bc6b369f8",
+        "clip_bytes": 6158592,
+        "download_import_save_close_reopen_observed": true,
+        "screenshots": [
+          "final4-max-csp-import.png",
+          "final4-max-csp-reopened.png"
+        ]
+      }
+    ],
+    "all_11_presets_previewed": true,
+    "slider_step_observed": 0.01,
+    "browser_current_origin_errors": 0,
+    "installed_tauri_production_bff_e2e": false,
+    "five_skin_csp_certification": "pending; no inherited certification copied"
+  },
+  "boundaries": {
+    "production_activated": false,
+    "s3_write": false,
+    "main_merge": false,
+    "release_or_update_feed_changed": false,
+    "lod_runtime_approval_changed": false,
+    "skin_certification_copied": false
+  },
+  "permanent_artifacts": "/Users/dowon/dev/Standin-server/out/female-breast-port-20261123/",
+  "linux_prepared": {
+    "passed": true,
+    "presets": 11,
+    "platform": "linux/x86_64",
+    "blender": "5.2.0 fbe6228777e7"
+  },
+  "linux_converter": {
+    "passed": true,
+    "sizes": [
+      -1,
+      0,
+      1,
+      2
+    ],
+    "uses_actual_converter": true
+  },
+  "skin": {
+    "new_uv_models": 11,
+    "existing_texture_sets": 5,
+    "exact_topology_weights_uv_correspondence": true,
+    "new_candidate_skin_csp_certification": "pending",
+    "inherited_csp_certification_copied": false
+  },
+  "review_bundle": {
+    "file_count": 81,
+    "manifest_sha256": "40ea8a200451d3601b30dd4d3e1c8b511cd5b0ebdc65dd9591bc9f63645658fb",
+    "all_file_pins_verified": true,
+    "activation_manifest": false,
+    "historical_catalog_unchanged": true,
+    "default_unchanged": true
+  }
+}
