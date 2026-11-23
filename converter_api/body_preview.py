@@ -16,10 +16,12 @@ def preview_contract() -> dict:
                  "converter/framed_model.py", "converter_api/body_preview.py",
                  "converter/final_preview_worker.py", "converter_api/final_preview.py", "converter/final_artifact.py",
                  "converter/shape_spec.py", "converter/shape_bake.py", "converter/prepared_body.py",
-                 "converter/source_body.py", "converter/reviewed_pose_frames.json"):
+                 "converter/source_body.py", "converter/reviewed_pose_frames.json", "converter/plantar_mode.py"):
         digest.update(name.encode())
         digest.update((root / name).read_bytes().replace(b"\r\n", b"\n"))
     digest.update((root / 'converter/fast_scene_reset.py').read_bytes())
+    from converter.plantar_mode import enabled
+    digest.update(b'plantar-on' if enabled() else b'plantar-off')
     return {
         "schema_version": "body-preview-runtime.v1",
         "preview_revision": digest.hexdigest(),

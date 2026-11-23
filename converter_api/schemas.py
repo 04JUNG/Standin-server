@@ -22,6 +22,7 @@ class HealthResponse(BaseModel):
     ok: bool
     solver_version: str
     checks: dict[str, Any]
+    plantar_correction_enabled: bool = True
     framing_version: str | None = None
     output_scopes: list[str] = []
     preview_model_revision: str | None = None

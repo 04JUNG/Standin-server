@@ -1,0 +1,138 @@
+{
+  "scope": "Local Linux/amd64 production-image overlay, 2 CPU/4 GiB, no network; original BVH, default male, original hands, full body; fixed front camera; single paired sample per condition, not AWS timings",
+  "model": "male-base-v0-8-0",
+  "prepared_body_identity_files_unchanged": true,
+  "production_changed": false,
+  "cases": [
+    {
+      "pose": "g1__M_Move9__n05_f0810",
+      "sourceBvhSha256": "cc2c67e90e4cbe33f6a4833823189067939808b27c5e11afc2fe9ca43a276ce3",
+      "on": {
+        "file_ready_seconds": 43.187518479000005,
+        "repeat_seconds": 0.7500080009999976,
+        "stages_seconds": {
+          "body_metadata": 0.000121,
+          "body_prepare": 23.507223000000003,
+          "body_metadata_after_prepare": 0.139393,
+          "blender_solve": 11.777848,
+          "validate_before_cache": 0.105328,
+          "solve_total": 35.880374,
+          "export_bundle": 7.173143,
+          "export_total": 7.188864
+        },
+        "modelSha256": "fa41e712adb650c0db29b18f01785bab1c177d7d96c80c73df63683560fd6f56",
+        "verified": true,
+        "correspondence": {
+          "jointIdentity": true,
+          "matrixTolerance": 1e-05,
+          "maxMatrixError": 0.0,
+          "maxNormalError": 0.0,
+          "maxPositionErrorM": 0.0,
+          "maxWeightError": 0.0,
+          "positionToleranceM": 0.0001,
+          "skinIdentity": true,
+          "topology": true,
+          "weightTolerance": 1e-06
+        }
+      },
+      "off": {
+        "file_ready_seconds": 37.40473843500001,
+        "repeat_seconds": 0.7865598760000125,
+        "stages_seconds": {
+          "body_metadata": 0.000122,
+          "body_prepare": 18.429921999999998,
+          "body_metadata_after_prepare": 0.16873500000000002,
+          "blender_solve": 11.298091000000001,
+          "validate_before_cache": 0.10759099999999999,
+          "solve_total": 30.395464,
+          "export_bundle": 6.870247999999999,
+          "export_total": 6.8868990000000005
+        },
+        "modelSha256": "fa41e712adb650c0db29b18f01785bab1c177d7d96c80c73df63683560fd6f56",
+        "verified": true,
+        "correspondence": {
+          "jointIdentity": true,
+          "matrixTolerance": 1e-05,
+          "maxMatrixError": 0.0,
+          "maxNormalError": 0.0,
+          "maxPositionErrorM": 0.0,
+          "maxWeightError": 0.0,
+          "positionToleranceM": 0.0001,
+          "skinIdentity": true,
+          "topology": true,
+          "weightTolerance": 1e-06
+        }
+      },
+      "same_model": true
+    },
+    {
+      "pose": "sd_cmu_124_01_f00424",
+      "sourceBvhSha256": "9265eed7d9c422ecc8d3ac2afc92d0f2d0d7b23ab2244628c5d6e3d03fb772b0",
+      "on": {
+        "file_ready_seconds": 87.06893824800002,
+        "repeat_seconds": 0.7741688749999867,
+        "stages_seconds": {
+          "body_metadata": 0.00018099999999999998,
+          "body_prepare": 67.75485400000001,
+          "body_metadata_after_prepare": 0.127708,
+          "blender_solve": 11.355084999999999,
+          "validate_before_cache": 0.108913,
+          "solve_total": 79.648398,
+          "export_bundle": 7.287015,
+          "export_total": 7.305877000000001
+        },
+        "modelSha256": "499bcf432a6edf05eed01a9eda85a482fd9ed2d308a7b877bce059824d5418f5",
+        "verified": true,
+        "correspondence": {
+          "jointIdentity": true,
+          "matrixTolerance": 1e-05,
+          "maxMatrixError": 0.0,
+          "maxNormalError": 0.0,
+          "maxPositionErrorM": 0.0,
+          "maxWeightError": 0.0,
+          "positionToleranceM": 0.0001,
+          "skinIdentity": true,
+          "topology": true,
+          "weightTolerance": 1e-06
+        }
+      },
+      "off": {
+        "file_ready_seconds": 40.789382184999965,
+        "repeat_seconds": 1.0758831669999722,
+        "stages_seconds": {
+          "body_metadata": 0.00021799999999999999,
+          "body_prepare": 18.956625,
+          "body_metadata_after_prepare": 0.16737,
+          "blender_solve": 12.851062,
+          "validate_before_cache": 0.119217,
+          "solve_total": 32.394897,
+          "export_bundle": 8.152663,
+          "export_total": 8.186381
+        },
+        "modelSha256": "499bcf432a6edf05eed01a9eda85a482fd9ed2d308a7b877bce059824d5418f5",
+        "verified": true,
+        "correspondence": {
+          "jointIdentity": true,
+          "matrixTolerance": 1e-05,
+          "maxMatrixError": 0.0,
+          "maxNormalError": 0.0,
+          "maxPositionErrorM": 0.0,
+          "maxWeightError": 0.0,
+          "positionToleranceM": 0.0001,
+          "skinIdentity": true,
+          "topology": true,
+          "weightTolerance": 1e-06
+        }
+      },
+      "same_model": true
+    }
+  ],
+  "source_sha256": {
+    "converter/plantar_mode.py": "50aec482e8f646199aa63c7dad18c0d54b12e14e14b9b515745618b7d73f7495",
+    "converter/worker.py": "ecfbc2132d4de160fc879133903190ad24a4f0afe7d78de007cf4eb5a16a7e47",
+    "converter/interactive_adapter.py": "1e8039b3b22dfca43b60d09a35f6487df37dfe5b7a697289d7bae5a6ba0d9cbe",
+    "converter_api/body_preview.py": "070d04114feac668b134bc01a9f3ad7e83e8ec331518fdedc265bd44d3b5404c",
+    "converter_api/app.py": "df0b05502fd15b3b427329e5f43be3e7ba46c5464ee456662009f8beb379fc05",
+    "converter_api/schemas.py": "e75376b2192412982b0506a735bfc64ffc67c682a2761a76be77c6e90d7a9b86"
+  }
+}

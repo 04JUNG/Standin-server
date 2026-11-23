@@ -52,7 +52,10 @@ def runtime_revision():
              'shape_bake.py', 'final_artifact.py', 'protocol.py', 'worker.py',
              'reviewed_library.py', 'reviewed_source_fingers.py', 'source_body.py',
              'reviewed_pose_frames.json', 'body_material.py']
-    return digest(b''.join(canonical([n, digest((root/n).read_bytes())]) for n in names))
+    from converter.plantar_mode import enabled
+    names.append('plantar_mode.py')
+    return digest(b''.join(canonical([n, digest((root/n).read_bytes())]) for n in names)
+                  + canonical({'plantar_correction_enabled': enabled()}))
 
 
 def checked_runtime():
