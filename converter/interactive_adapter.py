@@ -44,7 +44,7 @@ def _run_body_job(job):
 
 def runtime_revision():
     root = Path(__file__).parent
-    names = ['interactive_camera.py', 'interactive_worker.py', 'interactive_adapter.py', 'interactive_scene.py', 'interactive_export.py',
+    names = ['body_trace.py', 'interactive_camera.py', 'interactive_worker.py', 'interactive_adapter.py', 'interactive_scene.py', 'interactive_export.py',
              'interactive_revision.py', 'interactive_reuse.py', 'interactive_variants.py', 'shared/interactive_pose_v1.mjs',
              'shared/interactive_pose_v2.mjs', 'solved_state.py', 'solved_state_v2.py',
              'hands.py', 'hand_geometry.py', 'hand_library.py', 'hand_contact.py',

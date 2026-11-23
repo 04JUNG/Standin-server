@@ -197,6 +197,12 @@ class SnapshotStore:
                     event='interactive_blender', stage=stage, queue_wait_ms=round(queue_ms,3),
                     execution_ms=round(execution_ms,3), return_code=p.returncode,
                     request_id=control.request_id if control else None)))
+                if stage == 'prepare':
+                    from converter.body_trace import relay_lines
+                    log.seek(0)
+                    relay_lines(log.read(2*1024*1024).decode('utf-8', errors='replace'),
+                        logging.getLogger('standin.converter').info,
+                        control.request_id if control else None)
 
     def _body_metadata(self,directory,binding):
         """Reuse compact camera metadata; rehash v1/v2 artifacts on every access."""
@@ -273,6 +279,10 @@ class SnapshotStore:
                 checkpoint()
                 base_directory=base['directory']/'base'
                 metadata=measured('body_metadata',self._body_metadata,base_directory,binding)
+                control = current_work.get()
+                logging.getLogger('standin.converter').info(json.dumps(dict(
+                    event='interactive_body_cache', hit=metadata is not None,
+                    request_id=control.request_id if control else None)))
                 if metadata is None:
                     if base_directory.exists():shutil.rmtree(base_directory)
                     measured('body_prepare',self._child,'prepare',job_dir/'job.json',ip,base_directory,directory/'unused',checkpoint)

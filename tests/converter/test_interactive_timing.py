@@ -50,6 +50,28 @@ def test_blender_queue_execution_are_separate_and_accumulate(monkeypatch, caplog
         current_work.reset(token)
 
 
+def test_prepare_child_relays_only_closed_schema_with_parent_request_id(monkeypatch, caplog, tmp_path):
+    from converter.body_trace import PREFIX
+    control = SimpleNamespace(request_id='req_parent', execution_ms=0, check=lambda phase: None)
+    token = current_work.set(control)
+    store = SnapshotStore.__new__(SnapshotStore)
+    store.runner = SimpleNamespace(_process_slots=nullcontext(), settings=SimpleNamespace(
+        blender_binary='test-blender', shape_timeout_seconds=300))
+    def child(*args, **kwargs):
+        kwargs['stdout'].write((PREFIX + json.dumps(dict(event='converter_body_reuse',
+            status='prepared', hit=True, token='private', request_id='forged')) + '\nprivate stdout\n').encode())
+        return SimpleNamespace(returncode=0, poll=lambda: 0)
+    monkeypatch.setattr('subprocess.Popen', child)
+    try:
+        with caplog.at_level(logging.INFO, logger='standin.converter'):
+            store._child('prepare', tmp_path/'job', tmp_path/'identity', tmp_path/'base', tmp_path/'unused', lambda: None)
+        rows = [json.loads(record.message) for record in caplog.records]
+        assert rows[-1] == dict(event='converter_body_reuse', status='prepared', hit=True, request_id='req_parent')
+        assert 'private' not in caplog.text and 'forged' not in caplog.text
+    finally:
+        current_work.reset(token)
+
+
 def test_published_model_remains_readable_during_export_but_never_bypasses_hash(tmp_path):
     solved = tmp_path/'solved'
     solved.mkdir()

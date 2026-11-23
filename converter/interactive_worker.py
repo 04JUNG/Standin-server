@@ -13,7 +13,9 @@ encoding=args[5] if len(args)==6 else 'typed-f64be-json-v1'
 if len(args) not in (5,6) or encoding not in STATE_FILES:raise ValueError('invalid worker arguments')
 identity=decode(Path(identity).read_bytes())
 if stage == 'prepare':
-    prepare_body(job,identity,base)
+    from converter.body_trace import BodyTrace
+    with BodyTrace() as trace, trace.span('prepare_total'):
+        prepare_body(job,identity,base)
 elif stage == 'solve':
     try:
         solve_from_body(base,identity,destination,checkpoint=lambda:None,encoding=encoding)
