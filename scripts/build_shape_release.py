@@ -85,6 +85,8 @@ def main(argv):
     ap.add_argument('--source', action='append', required=True, help='directory with one .blend and standin_body.py')
     ap.add_argument('--out', required=True)
     ap.add_argument('--catalog-version', default=None)
+    ap.add_argument('--retain-declared-controls', action='store_true',
+                    help='retain exact declared preset defaults instead of Blender FloatProperty roundoff')
     args = ap.parse_args(argv)
     out = Path(args.out).resolve()
     if out.exists() and any(out.iterdir()):
@@ -124,7 +126,12 @@ def main(argv):
         for preset, (preset_label, _overrides) in sb.PRESETS.items():
             values = sb.normalize(sb.preset_values(preset, mesh))
             sb.set_controls(values, correct=False)
-            values = sb.controls()
+            observed = sb.controls()
+            if args.retain_declared_controls:
+                if set(values) != set(observed) or any(abs(values[k]-observed[k]) > 1e-5 for k in values):
+                    raise ValueError('Blender controls differ from the declared preset beyond FloatProperty roundoff')
+            else:
+                values = observed
             exported = sb.export_fixed(str(out / '.neutral-exports'))
             meta = json.loads((exported / 'manifest.json').read_text())
             cid = f"{sex}-{preset.lower().replace('_', '-')}-v{ver.replace('.', '-')}"
