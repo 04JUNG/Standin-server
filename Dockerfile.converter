@@ -132,6 +132,7 @@ COPY converter_api/preview_models.py /app/converter_api/preview_models.py
 COPY converter/solved_state.py /app/converter/solved_state.py
 COPY converter/solved_state_v2.py /app/converter/solved_state_v2.py
 COPY converter/interactive_adapter.py /app/converter/interactive_adapter.py
+COPY converter/body_trace.py /app/converter/body_trace.py
 COPY converter/interactive_scene.py /app/converter/interactive_scene.py
 COPY converter/interactive_export.py /app/converter/interactive_export.py
 COPY converter/interactive_revision.py /app/converter/interactive_revision.py
