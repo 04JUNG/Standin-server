@@ -22,6 +22,21 @@ def snapshot(arm):
     return {p.name:np.array(arm.matrix_world @ p.matrix) for p in arm.pose.bones}
 
 
+def capture_pose_channels(arm):
+    """Preserve channel values exactly; matrix decomposition adds rollback drift."""
+    return {p.name:(p.location.copy(),p.scale.copy(),p.rotation_mode,p.rotation_quaternion.copy(),p.rotation_euler.copy(),tuple(p.rotation_axis_angle)) for p in arm.pose.bones}
+
+
+def restore_pose_channels(arm,state):
+    for p in arm.pose.bones:
+        location,scale,mode,quaternion,euler,axis_angle=state[p.name]
+        p.rotation_mode=mode;p.location=location;p.scale=scale
+        if mode=='QUATERNION':p.rotation_quaternion=quaternion
+        elif mode=='AXIS_ANGLE':p.rotation_axis_angle=axis_angle
+        else:p.rotation_euler=euler
+    bpy.context.view_layer.update()
+
+
 def points17(arm):
     kp=np.zeros((17,3));scores=np.zeros(17)
     for i,name in COCO_NAMES.items():

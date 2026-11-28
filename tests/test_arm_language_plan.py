@@ -57,3 +57,28 @@ def test_behind_back_is_a_separate_role_and_keeps_the_other_chin_hand():
  assert plan['members'][0]['part']['target']=='behind_torso'
  assert plan['members'][1]['status']=='retained'
  assert not plan['members'][1]['active']
+
+
+def test_supported_phone_support_implies_upward_palm_without_an_axis_prompt():
+ p=interpret_arm('휴대폰을 받쳐 든다','right')
+ assert p['action']=='phone_palm_up'
+ assert p['directions'][0]['value']=='up'
+ assert p['directions'][0]['source']=='action_convention_inference'
+ assert interpret_arm('손바닥을 위로 두고 휴대폰을 든다','right')['directions'][0]['source']=='explicit_language'
+
+
+def test_quality_targets_are_not_interchanged_with_the_old_parts():
+ assert interpret_arm('손목을 곧게 펴서 이마를 짚는다','left')['part']['max_wrist_axis_deg']==25
+ assert interpret_arm('손목을 골반에 붙인다','left')['part']['patch']=='wrist_side'
+ assert interpret_arm('주먹을 무릎 쪽 위로 끌어올린다','right')['action']=='near_knee_fist'
+ assert interpret_arm('팔을 내리고 몸통보다 뒤에 둔다','left')['action']=='arms_down_back'
+ assert interpret_arm('팔을 유지하고 손만 주먹으로 바꾼다','left')['action']=='fist_preserve_arm'
+
+
+def test_repeated_baked_grip_is_reused_only_with_explicit_matching_lineage():
+ clauses={'left':'왼손은 우산대를 잡는다','right':'오른손은 휴대폰을 받쳐 든다'}
+ p=plan_language_arms(clauses,['right'],existing_hand_presets={'right':'hold_phone'},selection_source='user_correction_anatomical_side')
+ assert p['members'][1]['part']['reuse_existing_hand_shape']
+ assert p['selection_source']=='user_correction_anatomical_side'
+ assert 'reuse_existing_hand_shape' not in plan_language_arms(clauses,['right'])['members'][1]['part']
+ assert 'reuse_existing_hand_shape' not in plan_language_arms(clauses,['right'],existing_hand_presets={'right':'grip'})['members'][1]['part']

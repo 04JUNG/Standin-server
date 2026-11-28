@@ -1,0 +1,46 @@
+[
+  {
+    "test": "baked_phone_grip_not_curled_again",
+    "hand_relative_matrix_delta": 1.8477439880371094e-06,
+    "passed": true
+  },
+  {
+    "test": "canonical_identity_and_nonselected_surface_preservation",
+    "max_delta_m": 3.5762786865234375e-07,
+    "passed": true
+  },
+  {
+    "test": "topology_mismatch_rejected_before_surface_mutation",
+    "passed": true
+  },
+  {
+    "test": "inverted_phone_support_palm_rejected",
+    "passed": true
+  },
+  {
+    "test": "saved_forehead_contact_dorsal_forward_and_straight_wrist",
+    "passed": true
+  },
+  {
+    "test": "two_arm_stage_failure_restores_stage_input",
+    "case": "T001",
+    "stage_input": "prepared-fist.blend",
+    "matrix_delta": 0.0,
+    "passed": true
+  },
+  {
+    "test": "two_arm_stage_failure_restores_stage_input",
+    "case": "T025",
+    "stage_input": "before.fbx",
+    "matrix_delta": 0.0,
+    "passed": true
+  },
+  {
+    "test": "pending_arm_warning_cannot_escape_final_atomic_skin_check",
+    "passed": true
+  },
+  {
+    "test": "all_six_saved_fbx_pass_without_new_skin_warning",
+    "passed": true
+  }
+]

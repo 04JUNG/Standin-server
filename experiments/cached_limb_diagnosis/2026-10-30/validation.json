@@ -1,0 +1,28 @@
+{
+  "full_server_tests": {
+    "passed": 3044,
+    "skipped": 10,
+    "subtests_passed": 31
+  },
+  "smoke_tests": {
+    "passed": 54,
+    "total": 54
+  },
+  "compileall": "pass",
+  "native_saved_people": 28,
+  "partially_applied": 7,
+  "exact_source_retained": 21,
+  "native_quality_regressions_passed": 9,
+  "native_images": 168,
+  "artifact_links_verified": 367,
+  "default_off_test": "pass_before_blender_or_asset_import",
+  "source_snapshots_hashed": true,
+  "source_difference_only_trailing_blank_line": [
+    "src/arm_refine/score_views.py"
+  ],
+  "report_browser_rendering": "not_run_file_protocol_policy_block",
+  "gallery_handler_code_test": "pass_node_dom_stub_not_browser",
+  "external_vlm_calls": 0,
+  "independent_accuracy_measured": false,
+  "staging_modified": false
+}

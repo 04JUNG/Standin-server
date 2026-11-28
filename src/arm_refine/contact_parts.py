@@ -51,6 +51,10 @@ PARTS = (
                 ("옷깃 잡기", "목 아래 가슴 짚기")),
     ContactPart("forehead_touch", "이마 짚기", "forehead_front", "palm", "open", "outward_raised",
                 ("이마에 손", "이마 짚기"), planar_thumb=True),
+    ContactPart("forehead_straight", "손목을 곧게 펴서 이마 앞 짚기", "forehead_front", "palm", "open", "outward_raised",
+                ("손목 펴서 이마 짚기",), planar_thumb=True, max_wrist_axis_deg=25),
+    ContactPart("pelvis_wrist", "손목 안쪽을 골반 옆에 붙이기", "pelvis_side", "wrist_side", "relaxed", "outward_low",
+                ("손목을 골반에 붙이기",), max_wrist_axis_deg=55),
     ContactPart("knee_rest", "세운 무릎 위 주먹 얹기", "same_knee", "ulnar_edge", "fist", "side_below_shoulder",
                 ("무릎 위에 주먹",)),
 )
@@ -69,7 +73,7 @@ def select_contact_part(intent, side):
 
 
 def contact_axis(part):
-    return {"palm":1,"thumb_pad":1,"fist_top":0,"ulnar_edge":2}[part.patch]
+    return {"palm":1,"thumb_pad":1,"wrist_side":1,"fist_top":0,"ulnar_edge":2}[part.patch]
 
 
 def admission_reasons(metrics, part):

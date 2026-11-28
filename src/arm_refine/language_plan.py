@@ -11,13 +11,20 @@ from .relational_parts import PARTS as RELATIONAL_PARTS
 
 ACTION_RULES=[
  ('umbrella_shaft_grip',lambda t:'우산' in t and any(w in t for w in ['잡','쥐'])),
- ('phone_hold',lambda t:any(w in t for w in ['휴대폰','스마트폰']) and any(w in t for w in ['들','든','잡','쥐'])),
+ ('phone_palm_up',lambda t:any(w in t for w in ['휴대폰','스마트폰']) and ('받쳐' in t or ('손바닥' in t and '위' in t))),
+ ('phone_hold',lambda t:any(w in t for w in ['휴대폰','스마트폰']) and any(w in t for w in ['들','든','잡','쥐']) and not ('받쳐' in t or ('손바닥' in t and '위' in t))),
+ ('fist_preserve_arm',lambda t:'주먹' in t and '손만' in t and any(w in t for w in ['바꾼','바꾼다','변경'])),
+ ('fist_clearance',lambda t:'주먹' in t and '얼굴' in t and '간격' in t and '손만' not in t),
+ ('near_knee_fist',lambda t:'주먹' in t and '무릎 쪽' in t and any(w in t for w in ['끌어올','가까이 올'])),
+ ('arms_down_back',lambda t:'몸통' in t and '뒤' in t and any(w in t for w in ['내려','내린','내리'])),
  ('raised_knee_rest',lambda t:'무릎 위' in t and any(w in t for w in ['얹','올','놓','받'])),
  ('palm_up_offer',lambda t:'손바닥' in t and any(w in t for w in ['내민','내밀','내미','내뻗'])),
  ('chin_support',lambda t:'턱' in t and any(w in t for w in ['받','지지'])),
  ('waist_side',lambda t:'허리' in t and any(w in t for w in ['걸','얹','짚','댄'])),
+ ('pelvis_wrist',lambda t:'손목' in t and '골반' in t and any(w in t for w in ['붙','밀착'])),
  ('head_side',lambda t:any(w in t for w in ['머리 옆','관자놀이']) and any(w in t for w in ['짚','받','댄'])),
- ('forehead_touch',lambda t:'이마' in t and any(w in t for w in ['짚','댄','얹'])),
+ ('forehead_straight',lambda t:'이마' in t and any(w in t for w in ['짚','댄','얹']) and '손목' in t and any(w in t for w in ['곧게','편다','펴서','직선'])),
+ ('forehead_touch',lambda t:'이마' in t and any(w in t for w in ['짚','댄','얹']) and not ('손목' in t and any(w in t for w in ['곧게','편다','펴서','직선']))),
  ('behind_back',lambda t:'뒷짐' in t or ('등 뒤' in t and any(w in t for w in ['둔','둔다','보낸','내린']))),
  ('abdomen_rest',lambda t:'배 위' in t and any(w in t for w in ['얹','놓','댄'])),
  ('chest_touch',lambda t:'가슴' in t and any(w in t for w in ['짚','댄','접촉'])),
@@ -25,6 +32,13 @@ ACTION_RULES=[
 ]
 # Rules express the supported pose convention, not a universal anatomical fact.
 DEFAULTS={
+ 'phone_palm_up':[('palm','up','휴대폰을 받쳐 드는 손은 손바닥을 위로 둠')],
+ 'fist_preserve_arm':[],
+ 'fist_clearance':[],
+ 'near_knee_fist':[('hand_back','up','무릎 쪽 주먹의 손등을 위로 유지함')],
+ 'arms_down_back':[('hand_position','down_and_behind','팔을 내리고 몸통 앞보다 뒤에 둠')],
+ 'pelvis_wrist':[('palm','toward_pelvis','손목 안쪽을 골반 옆에 댐'),('fingers','down','골반 옆 손의 손가락을 내림')],
+ 'forehead_straight':[('palm','toward_forehead','손바닥이 이마를 향함'),('hand_back','forward','손등이 앞을 향함')],
  'umbrella_shaft_grip':[('thumb_side','up','수직 손잡이를 쥐는 기본 그립은 엄지 쪽을 위에 둠')],
  'phone_hold':[('palm','toward_phone','납작한 소품을 손가락과 손바닥으로 감싸는 그립')],
  'raised_knee_rest':[('support_patch','toward_knee','실제 무릎 표면에 지지면을 댐')],
@@ -93,14 +107,19 @@ def interpret_arm(description,side,*,active=True):
     return {**base,'action':action,'engine':engine,'part':part}
 
 
-def plan_language_arms(clauses,selection,*,source='ai_visual_reference_description',skeleton_scores=None):
+def plan_language_arms(clauses,selection,*,source='ai_visual_reference_description',skeleton_scores=None,selection_source='inherited_offline_trial_side_scope',existing_hand_presets=None):
     if set(clauses)!={'left','right'} or not selection or not set(selection)<={'left','right'}:
         raise ValueError('two descriptions and explicit selected anatomical sides required')
     members=[interpret_arm(clauses[s],s,active=s in selection) for s in ['left','right']]
+    for member in members:
+        part=member.get('part')
+        if member['active'] and part and (existing_hand_presets or {}).get(member['side'])==part['hand_preset']:
+            part['reuse_existing_hand_shape']=True
+            member['hand_shape_source']='current_accepted_part_lineage'
     active=[m for m in members if m['active']];ready=all(m['status']=='ready' for m in active)
     scores=[] if skeleton_scores is None else skeleton_scores
     return {'schema':'standin.per-arm-language-plan.v2','source':source,'members':members,'selection':selection,
       'ready':ready,'reasons':[m['side']+': '+r for m in active for r in m['reasons']],
-      'selection_source':'inherited_offline_trial_side_scope','direction_resolution':'language_plus_action_conventions',
+      'selection_source':selection_source,'direction_resolution':'language_plus_action_conventions',
       'automatic_image_recognition':False,'image_skeleton_reliable':len(scores)==17 and sum(v>=.3 for v in scores)>=8,
       'image_skeleton_used_for_targets':False,'geometry_source':'current_native_skeleton_and_skin','release_allowed':False}

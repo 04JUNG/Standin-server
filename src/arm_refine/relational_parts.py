@@ -16,6 +16,11 @@ class RelationalPart:
     def record(self):return asdict(self)
 
 PARTS={p.id:p for p in [
+ RelationalPart('phone_palm_up','손바닥을 위로 휴대폰 받쳐 들기','hold_phone','external_phone','palm_up'),
+ RelationalPart('fist_preserve_arm','팔 자세를 유지하고 손만 주먹으로 바꾸기','fist','current_wrist','preserve_arm_frame'),
+ RelationalPart('fist_clearance','얼굴과 충돌하지 않게 주먹으로 바꾸기','fist','near_current_wrist','small_face_clearance'),
+ RelationalPart('near_knee_fist','무릎 쪽 위로 주먹 끌어올리기','fist','free_space_near_raised_knee','hand_back_up'),
+ RelationalPart('arms_down_back','팔을 내리고 몸통보다 조금 뒤에 두기','relaxed','free_space_down_and_behind','palm_inward'),
  RelationalPart('behind_back','한 팔을 등 뒤로 보내 뒷짐 짓기','relaxed','behind_torso','hand_behind_torso'),
  RelationalPart('umbrella_shaft_grip','엄지를 위로 두고 우산대 쥐기','grip','external_vertical_shaft','thumb_side_up'),
  RelationalPart('palm_up_offer','손바닥을 위로 가슴 앞에 내밀기','cup','free_space_in_front_of_chest','palm_up'),

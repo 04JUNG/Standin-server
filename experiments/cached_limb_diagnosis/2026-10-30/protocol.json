@@ -1,0 +1,20 @@
+{
+  "mode": "strictly_offline_frozen_full_set_cached_diagnosis",
+  "dataset_id": "standin-fixed-50-20261027",
+  "baseline_git_commit": "468c3dde036b97ba45c99aaab4b5112f94674622",
+  "cuts": 50,
+  "expected_people": 60,
+  "native_ready_people": 28,
+  "targets_extracted_people": 52,
+  "new_api_calls": 0,
+  "new_api_tokens": 0,
+  "network_required": false,
+  "fresh_recognition_measured": false,
+  "grades_used_as_inputs": false,
+  "correction_answers_used_as_inputs": false,
+  "native_execution_enabled_by_default": false,
+  "production_or_staging_modified": false,
+  "multi_person_policy": "unique box IoU>=0.8 and margin>=0.15; reject collisions; never index fallback",
+  "accuracy_estimated": false,
+  "release_allowed": false
+}
